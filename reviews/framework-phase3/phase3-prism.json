@@ -1,0 +1,95 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "250e48e5661ec704e0f034aeaf3d2c56",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9a4f62ad53ad207b333202da98a71d85baa07567",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6c83a9c117437eee",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Errors from Workspace.Resize/Activate silently ignored, leaving model and native UI diverged",
+      "message": "The result of Workspace.Resize is discarded. If the model rejects the ratio, the native splitter stays at the user's position while the model keeps the old one, and nothing resyncs or reports it. The same applies to the ignored Activate call in the tab OnChange handler. Callers cannot tell the model and the native UI have diverged.",
+      "suggestion": "Check the returned error. On failure, invalidate the window so Sync/syncLayout restores the native pane to the model state, and surface the error through an error callback.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench.go",
+          "lines": {
+            "start": 125,
+            "end": 125
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "ui-sync",
+        "location-corrected"
+      ],
+      "evidence": "w.Workspace.Resize(g.ID, float64(s[0]))",
+      "fix": {
+        "before": "w.Workspace.Resize(g.ID, float64(s[0]))",
+        "after": "if err := w.Workspace.Resize(g.ID, float64(s[0])); err != nil {\n\t\t\t\t\t\tw.Owner.Invalidate(w.Window)\n\t\t\t\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 33631,
+    "totalMs": 17633
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 6,
+    "bytes": 23105,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 16041,
+        "output": 3947,
+        "costUSD": 0.071552
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

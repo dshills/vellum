@@ -52,3 +52,11 @@ from menus, toolbars, shortcuts and the palette. `tasks.Start[T]` accepts a
 context, an ordinary Go worker and a typed completion callback. Worker count and
 undelivered results share one bound. Progress is coalesced; completion waits for
 mailbox credit or lifetime cancellation. Workers cannot mutate live UI state.
+
+The `workbench` package owns a validated split/tab tree. Move, split and restore
+are atomic model operations; malformed or incompatible layouts leave the current
+workspace intact. The example provides dock/split/reset commands and resizable
+native panes. `-layout /path/layout.json` enables explicit Save/Restore; startup
+does not overwrite preferences. Drag-to-dock, floating panes and dynamic window
+creation are not yet implemented. Panel topology changes recreate those native
+panels; application domain state remains independent.

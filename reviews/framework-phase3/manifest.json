@@ -1,0 +1,15 @@
+{
+  "phase": 3,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "checks": [
+    "race tests",
+    "native tab/ratio/panel reconciliation",
+    "transactional layout validation and file roundtrip",
+    "vet/build",
+    "native dock/reset plus task smoke"
+  ],
+  "limits": [
+    "menu-driven docking; drag-to-dock and floating windows deferred"
+  ]
+}
