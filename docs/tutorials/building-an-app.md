@@ -15,7 +15,8 @@ version, cgo C toolchain and external Go modules, obtained from your module cach
 or the network. Native platform requirements are in
 [platform support](../../specs/platform-support.md).
 
-Create an application in a new directory:
+Create an application in a new directory. The generated starter retains its MIT
+LICENSE notice alongside the copied template source:
 
 ```sh
 export VELLUM_CACHE_DIR=/tmp/vellum-app-cache

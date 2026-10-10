@@ -25,7 +25,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix="vellum-new-app-", dir=destination.parent) as temporary:
         stage = Path(temporary) / "application"
         stage.mkdir()
-        for name in ["main.go", "model.go", "model_test.go", "go.mod", "go.sum"]:
+        for name in ["main.go", "model.go", "model_test.go", "go.mod", "go.sum", "LICENSE"]:
             shutil.copy2(ROOT / "examples/hello" / name, stage / name)
         subprocess.run(["go", "mod", "edit", f"-module={args.module}",
                         f"-replace=github.com/dshills/vellum={ROOT}",

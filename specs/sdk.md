@@ -35,6 +35,7 @@ Dependency-module replacements are not transitive in Go.
 
 `scripts/new-app.py` creates the same application in a new directory, with a caller
 selected application module path and absolute local framework/dependency replacements.
+It retains the starter template's MIT LICENSE notice in the generated application.
 It refuses existing destinations and requires preparation first. The generated
 application can be tested and built outside the repository with `GOWORK=off`; it
 still requires this checkout for its local SDK dependencies. Publishing versions,

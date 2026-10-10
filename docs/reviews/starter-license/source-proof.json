@@ -1,0 +1,14 @@
+{
+  "parent_commit": "412ee1d7f888f5cedbdaf6b5408d344fdb3599b1",
+  "staged_diff_sha256": "89dc4b2201b4135194a490ce0889cacb49c5c808085099842a1d39dfc9bbe794",
+  "files": {
+    "docs/tutorials/building-an-app.md": "4fc3823dbbc442713eea7f3991c9a1b4a5566f6ac1479ac96c31a4fef360bb89",
+    "scripts/new-app.py": "9c1891a71adfa303042eb27f6ba2cdb2f1ba1f722ffa7a9269258de9bde35b9b",
+    "scripts/release-sdk_test.py": "6e061054da2146e89f5dabddfdbb5fbb0052c1e3eb3db6377b973e7f0108831d",
+    "specs/sdk.md": "6e192674dc3447e216ba2a1a79843a377c68b9ffdd80d8298487c16a97ac0d9f"
+  },
+  "command": "python3 scripts/release-sdk_test.py",
+  "exit_code": 0,
+  "tests": 25,
+  "scope": "Real generator execution and local go mod edit verify copied starter license retention; other release-gate regressions pass."
+}

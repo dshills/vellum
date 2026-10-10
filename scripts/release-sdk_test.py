@@ -4,6 +4,7 @@ from contextlib import nullcontext
 import errno
 import os
 import subprocess
+import sys
 import gzip
 import io
 import json
@@ -26,6 +27,29 @@ class ReleaseChecks(unittest.TestCase):
                 with mock.patch.object(release,"source_state",return_value={"clean":False}):
                     release.release_gates(Path(tmp), {"module":"example.com/placeholder"}, True)
             release.release_gates(Path(tmp), {}, False)
+
+    def test_new_application_preserves_starter_license(self):
+        spec = importlib.util.spec_from_file_location("new_app", Path(__file__).with_name("new-app.py"))
+        generator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(generator)
+        with tempfile.TemporaryDirectory(prefix="vellum licensed starter ") as temporary:
+            root = Path(temporary) / "SDK"
+            template = root / "examples/hello"
+            template.mkdir(parents=True)
+            for name in ("main.go", "model.go", "model_test.go"):
+                (template / name).write_text("package main\n")
+            (template / "go.mod").write_text("module example.com/starter\ngo 1.25.6\n")
+            (template / "go.sum").write_text("")
+            (template / "LICENSE").write_text("Original starter copyright and license\n")
+            for name in ("upstream", "typesetting"):
+                native = root / "drivers/cogent/build" / name
+                native.mkdir(parents=True)
+                (native / "go.mod").write_text("module example.com/fixture\n")
+            destination = Path(temporary) / "application"
+            with mock.patch.object(generator, "ROOT", root), mock.patch.object(sys, "argv", ["new-app.py", str(destination), "--module=example.com/my-application"]):
+                generator.main()
+            self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
+            self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
 
     def test_selected_owner_choices_leave_distribution_audit_gated(self):
         metadata = json.loads((release.ROOT / "release/version.json").read_text())
