@@ -4,6 +4,8 @@ import (
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/virtual"
+	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -111,5 +113,61 @@ func TestDocumentUndoCapturesDomainIdentityAndInvalidatesWorkers(t *testing.T) {
 	}
 	if editor.change(-1, "Invalid", next) == nil || journal.Snapshot() != before {
 		t.Fatal("invalid edit recorded")
+	}
+}
+
+func TestFileReferencesUndoRedoPreserveCapturedBatches(t *testing.T) {
+	journal, err := history.New(8)
+	if err != nil {
+		t.Fatal(err)
+	}
+	refs := &fileReferences{}
+	first := []string{filepath.Join(t.TempDir(), "first Ω\nfile")}
+	original := first[0]
+	if err = refs.replace(journal, first); err != nil {
+		t.Fatal(err)
+	}
+	first[0] = "caller mutation"
+	if refs.paths[0] != original || !journal.Snapshot().Dirty {
+		t.Fatal("accepted batch aliased or clean")
+	}
+	second := []string{filepath.Join(t.TempDir(), "second"), original}
+	if err = refs.replace(journal, second); err != nil {
+		t.Fatal(err)
+	}
+	refs.paths[0] = "retained mutation"
+	if err = journal.Undo(); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(refs.paths, []string{original}) {
+		t.Fatal("undo did not restore first captured batch")
+	}
+	if err = journal.Redo(); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(refs.paths, second) {
+		t.Fatal("redo did not restore second captured batch")
+	}
+	before := journal.Snapshot()
+	if err = refs.replace(journal, second); err != nil || journal.Snapshot() != before {
+		t.Fatal("no-op changed history")
+	}
+	if err = refs.replace(journal, []string{"relative"}); err == nil || journal.Snapshot() != before {
+		t.Fatal("invalid batch changed history")
+	}
+	if err = journal.Undo(); err != nil {
+		t.Fatal(err)
+	}
+	if err = journal.Undo(); err != nil || len(refs.paths) != 0 || journal.Snapshot().Dirty {
+		t.Fatal("undo to baseline failed")
+	}
+}
+
+func TestFileReferenceSummaryBoundsChromeWithoutChangingPaths(t *testing.T) {
+	refs := &fileReferences{paths: []string{filepath.Join(t.TempDir(), strings.Repeat("Ω", 1000)), "/tmp/two", "/tmp/three", "/tmp/four"}}
+	original := append([]string(nil), refs.paths...)
+	summary := refs.summary()
+	if len(summary) > 800 || !strings.Contains(summary, "Referenced 4 files") || !strings.Contains(summary, "…") || strings.Contains(summary, "four") || !reflect.DeepEqual(refs.paths, original) {
+		t.Fatal("summary changed the paths or exceeded its display bound", summary)
 	}
 }

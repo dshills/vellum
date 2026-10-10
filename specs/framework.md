@@ -92,6 +92,11 @@ Virtual views publish bounded row snapshots and explicit paging semantics. The
 [accessibility contract](accessibility.md) distinguishes native selector probes
 from external assistive-technology acceptance and target input/AX gaps.
 
+External file-drop callbacks deliver bounded, privately copied file references
+on the application owner. The Mac adapter handles native file URL payloads and
+modal/active target routing. See [file drops](file-drop.md) for coordinates,
+limits and the separate physical Finder acceptance gate.
+
 Windows/Linux service adapters implement clipboard, chooser transports and
 window-local menu widgets. Actual target runtime, native IME/accessibility and
 native Wayland acceptance remain open; [platform support](platform-support.md)

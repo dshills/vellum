@@ -441,6 +441,7 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 	}
 	r.widget.AsWidget().SetName(n.ID)
 	syncSemantics(r)
+	bindFileDrop(r, a, window)
 	r.widget.AsWidget().Styler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
 	return r, nil
 }

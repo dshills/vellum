@@ -4,6 +4,7 @@ package sdkcontract_test
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -184,5 +185,23 @@ func TestDocumentHistoryAndSaveRevisionThroughPublicCommands(t *testing.T) {
 	}
 	if err = journal.Redo(); err != nil || value != 42 || journal.Snapshot().Dirty {
 		t.Fatal("saved revision identity not restored")
+	}
+}
+
+func TestFileDropPublicContract(t *testing.T) {
+	paths, err := ui.CopyFileDropPaths([]string{filepath.Join(t.TempDir(), "file Ω")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var captured ui.FileDropEvent
+	node := ui.Node{ID: "drop", Kind: ui.Column, FileDrop: func(e ui.FileDropEvent) bool { captured = e; return true }}
+	if err := ui.Validate(node); err != nil {
+		t.Fatal(err)
+	}
+	if !node.FileDrop(ui.FileDropEvent{ID: node.ID, WindowID: "consumer", Paths: paths, Position: ui.Point{X: 5, Y: 10}}) || captured.Position.Y != 10 || captured.WindowID != "consumer" {
+		t.Fatal("public payload contract")
+	}
+	if _, err := ui.CopyFileDropPaths([]string{"relative"}); err == nil {
+		t.Fatal("invalid path accepted")
 	}
 }

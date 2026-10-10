@@ -1,0 +1,125 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "173de66dc9d16fd953794303b8cd55b5",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "37db45395d4c197e98dc4e83bfff42830306d711",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c3b72a61826386b3",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Full check run is stale and largely cached relative to final source",
+      "message": "The only full-suite run (`scripts/check.sh`) predates the last changes (coordinate/MIME tests and workbench display abbreviation). The final tree is covered only by a narrow `-run 'TestFileDrop|TestFileReference'` subset plus vet. In full-check.txt most packages are `(cached)`, so they were not re-executed. The attached proof does not show that the final tree passes the whole suite.",
+      "suggestion": "Re-run `./scripts/check.sh` on the final tree with `-count=1` (or a cache-cleaned run). Regenerate full-check.txt and the hashes in this proof file from that run.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-file-drop/source-and-check-proof.json",
+          "lines": {
+            "start": 41,
+            "end": 41
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "test-coverage",
+        "stale-results"
+      ],
+      "evidence": "\"scope\": \"Before final test-only coordinate/MIME coverage and workbench display abbreviation; affected final checks below cover those changes.\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0ee039d93f7aec37",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Physical Finder drag verification failed; feature acceptance gate unmet",
+      "message": "The only real OS-level drag (Finder to window) failed with a deadline exceeded and no delivery. All passing native evidence comes from a synthetic cursor query plus a direct Cocoa selector call. The actual end-to-end drag path (draggingEntered/performDragOperation from Finder) is therefore unverified. If the feature is reported as complete, this gate is not met.",
+      "suggestion": "Do not mark the macOS file-drop feature as done until a physical drag succeeds and is recorded. Alternatively, state explicitly in the spec and README that real drag sessions are unverified. Investigate why the Finder drag never reached the fixture (registered drag types, window level, app bundle/sandbox).",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reports/macos-file-drop/source-and-check-proof.json",
+          "lines": {
+            "start": 76,
+            "end": 78
+          }
+        }
+      ],
+      "tags": [
+        "verification",
+        "manual-test",
+        "open-gate"
+      ],
+      "evidence": "\"scope\": \"CUA physical drag attempt produced no delivery; gate remains open.\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 58377,
+    "totalMs": 24150
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 30,
+    "bytes": 77429,
+    "chunks": 5,
+    "llmCalls": 7,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 58266,
+        "output": 6999,
+        "costUSD": 0.18652200000000002
+      }
+    ],
+    "widenedFiles": 7,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 2,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

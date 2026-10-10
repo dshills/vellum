@@ -87,3 +87,11 @@ workbench records component edits and updates source revisions on replay. See
 workflows remain open. Native command phases also run in focus-free windows;
 startup shutdown and late native creation use stable stop/admission handling.
 See [local evidence](reports/macos-history/README.md).
+
+External file drops are implemented through `ui.Node.FileDrop`, bounded absolute
+path payloads, synchronous owner admission, clipped target geometry, active
+tab/workbench eligibility and modal host fallback. The workbench references
+dropped files with undo/redo and a bounded status display. Portable/native race
+checks and a synthetic cursor/Cocoa receive fixture pass; the physical Finder
+drag attempt did not produce delivery and remains unqualified. See
+[contract](../specs/file-drop.md) and [evidence](reports/macos-file-drop/README.md).

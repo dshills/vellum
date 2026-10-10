@@ -23,6 +23,7 @@ type Node struct {
 	Grow                bool
 	MinWidth, MinHeight float32
 	Activate            func()
+	FileDrop            func(FileDropEvent) bool
 	Children            []Node
 	Custom              any
 	Style               Style

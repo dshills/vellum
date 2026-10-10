@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/history"
+	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
+	"path/filepath"
+	"slices"
 	"strconv"
+	"strings"
 )
 
 type part struct {
@@ -120,4 +124,46 @@ func (e *partEditor) change(index int, label string, next part) error {
 	return e.journal.Apply(history.Change{Label: label,
 		Apply:  func() error { return assign(next, newRect) },
 		Revert: func() error { return assign(before, oldRect) }})
+}
+
+// File references share document history; importing file contents is a separate
+// application policy. Journal captures and retained values never alias callers.
+type fileReferences struct{ paths []string }
+
+func (r *fileReferences) replace(journal *history.Journal, paths []string) error {
+	after, err := ui.CopyFileDropPaths(paths)
+	if err != nil {
+		return err
+	}
+	if slices.Equal(r.paths, after) {
+		return nil
+	}
+	before := slices.Clone(r.paths)
+	assign := func(paths []string) error { r.paths = slices.Clone(paths); return nil }
+	return journal.Apply(history.Change{Label: "Reference files", Apply: func() error { return assign(after) }, Revert: func() error { return assign(before) }})
+}
+
+// Keep the chrome small even for a maximum-size drop. The complete paths stay
+// in the document, independently of this abbreviated display.
+func (r *fileReferences) summary() string {
+	if len(r.paths) == 0 {
+		return "Drop files on Board A to reference them"
+	}
+	names := make([]string, 0, min(3, len(r.paths)))
+	for _, path := range r.paths[:min(3, len(r.paths))] {
+		name := filepath.Base(path)
+		count := 0
+		for index := range name {
+			if count == 64 {
+				name = name[:index] + "…"
+				break
+			}
+			count++
+		}
+		names = append(names, name)
+	}
+	if len(r.paths) > len(names) {
+		names = append(names, "…")
+	}
+	return fmt.Sprintf("Referenced %d files: %s", len(r.paths), strings.Join(names, " · "))
 }

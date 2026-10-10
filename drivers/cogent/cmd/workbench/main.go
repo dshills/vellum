@@ -200,6 +200,16 @@ func main() {
 	journal, err := history.New(256)
 	must(err)
 	editor := &partEditor{source: parts, table: table, journal: journal}
+	references := &fileReferences{}
+	referenceFiles := func(e ui.FileDropEvent) bool {
+		if err := references.replace(journal, e.Paths); err != nil {
+			status = err.Error()
+			a.Invalidate(e.WindowID)
+			return false
+		}
+		status = fmt.Sprintf("Referenced %d files", len(references.paths))
+		return true
+	}
 	must(registry.Register(command.Command{ID: "component.rotate", Label: "Rotate 90°", Shortcut: "Meta+R", Execute: func(context.Context) error {
 		next := parts.parts[selectedIndex]
 		next.Rotation = (next.Rotation + 90) % 360
@@ -287,7 +297,7 @@ func main() {
 				return ui.Node{ID: "outline.data", Kind: ui.Extension, Grow: true, Custom: treeView}
 			}
 			if id == "board-a" {
-				return ui.Node{ID: "board-a.root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "board-a.canvas", Kind: ui.Extension, Grow: true, MinHeight: 240, Custom: gpuCanvas}, {ID: "board-a.table", Kind: ui.Extension, Grow: true, Custom: tableView}}}
+				return ui.Node{ID: "board-a.root", Kind: ui.Column, Grow: true, FileDrop: referenceFiles, Children: []ui.Node{{ID: "board-a.canvas", Kind: ui.Extension, Grow: true, MinHeight: 240, Custom: gpuCanvas}, {ID: "board-a.table", Kind: ui.Extension, Grow: true, Custom: tableView}}}
 			}
 			if id == "inspector" {
 				row := parts.Row(selectedIndex)
@@ -316,7 +326,8 @@ func main() {
 		if journal.Snapshot().Dirty {
 			progress += " · Unsaved changes"
 		}
-		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "title", Kind: ui.Label, Text: "Vellum · Go native workbench"}, {ID: "commands", Kind: ui.Extension, Custom: bar}, {ID: "workbench", Kind: ui.Extension, Grow: true, MinHeight: 500, Custom: dock}, {ID: "status", Kind: ui.Label, Text: status + progress}}}
+		fileStatus := references.summary()
+		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "title", Kind: ui.Label, Text: "Vellum · Go native workbench"}, {ID: "commands", Kind: ui.Extension, Custom: bar}, {ID: "workbench", Kind: ui.Extension, Grow: true, MinHeight: 500, Custom: dock}, {ID: "files", Kind: ui.Label, Text: fileStatus}, {ID: "status", Kind: ui.Label, Text: status + progress}}}
 	}}))
 	if *smoke {
 		go func() {

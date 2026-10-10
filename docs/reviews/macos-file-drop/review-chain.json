@@ -1,0 +1,65 @@
+{
+  "parent_commit": "37db45395d4c197e98dc4e83bfff42830306d711",
+  "final_input_files_sha256": {
+    "docs/implementation.md": "4ac1cd7e3b12508373093c1825b8c33c591d86027b84a5fcb7f051e47cab8849",
+    "docs/reports/README.md": "765a0bd42488b277a83d348d4015cc726ea558786c20d51d903ee473f4f9477c",
+    "docs/reports/macos-file-drop/README.md": "9074788c235329059038ddf3a9d0706747ed88d9e8f964e0c91e2774df70b484",
+    "docs/reports/macos-file-drop/final-affected-tests.txt": "38a5a0d2f76d2b508ffac30e2c55f77e07837f38afe0f8c489c6093ed925fc61",
+    "docs/reports/macos-file-drop/final-affected-vet.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/reports/macos-file-drop/full-check.txt": "4fbdf7e8e481c3e36bccca4f26b919c2a993dc3f92a9f7ac6ab2dd4526c78fbb",
+    "docs/reports/macos-file-drop/native-receive-final.txt": "3c64bf1c9a88d9d63f6c5416cd5b8b0b685a2fcb3dee91e21194df8a7f77daad",
+    "docs/reports/macos-file-drop/native-receive-initial.txt": "441ca27e550ccb82fc0a373765388f02000dc96d2ed91b38ffae52f0a053e543",
+    "docs/reports/macos-file-drop/native-receive-title-failure.txt": "d2deb8b63f40eff8da6ca62c02493bed8af5ce9d4ff2fa96f11bc7d6a081433c",
+    "docs/reports/macos-file-drop/native-workbench.txt": "35e2f89de8ae71ce251024557a6d1e81e0a5f4c408976aa1d0b1afe551c2241b",
+    "docs/reports/macos-file-drop/physical-finder-attempt.txt": "bcb1ac73ab65fec7637a63aec7a0d9e9f21b9451be345616888ebe8315deb43f",
+    "docs/reports/macos-file-drop/routing-repeat.txt": "0e72cc66f5be962fc592329136df849b13336bc285f080c796199f8290c1fda1",
+    "docs/reports/macos-file-drop/source-and-check-proof.json": "a3c392ead743bef8e9c20497449d1d04cdbb3bb7c4f0e4805f55dc979b0cd4b8",
+    "drivers/cogent/cmd/file-drop-smoke/fixture_darwin.go": "f4cd8085ab34c1e49cb6e8c716e90578e03ba67ce5a18469800557cae7006ea9",
+    "drivers/cogent/cmd/file-drop-smoke/fixture_darwin.m": "f81d323f914d00eb10031905bbc9ebec53f5fab8241adb70aec7ca581be027f0",
+    "drivers/cogent/cmd/file-drop-smoke/fixture_other.go": "e91da1f7c1b6988a4ea26066c6e16aeb0c9477ad34f3e9b8b44a7f601c5d0eb3",
+    "drivers/cogent/cmd/file-drop-smoke/main.go": "96b704ec76f0fe85c42c674f4477b260b7ec06fc309fc71c9f58ab0994f3abf4",
+    "drivers/cogent/cmd/workbench/main.go": "026f757f7461e981e7263b41c02a07662df41e025c43d9b68618450fa098ce54",
+    "drivers/cogent/cmd/workbench/model.go": "ca20b7e164321c300158194fd80a80e041c67d99f727ec7de458facf9a1d3054",
+    "drivers/cogent/cmd/workbench/model_test.go": "55bdf6d3ef9ee186096fbd047f13e2874669a35fe091eaaacc0abf6cef7807b6",
+    "drivers/cogent/driver.go": "69575d9ea6bffd4c9152971be1043460448242170a6ba43b47fc193e03141909",
+    "drivers/cogent/file_drop.go": "4aa47cf5840de2e5f1e7ed5e2a5155bc00d78a86c05ad98bff9e0c00a0ca2257",
+    "drivers/cogent/file_drop_test.go": "142bcbebb8d823293456ee93016e143c23c836c6decda505b6799e57e1a0f227",
+    "examples/sdk-contract/contract_test.go": "19af26984b3f8689e5cc8b0b3ddf805c0a1d7104a472b7ff3ed20cdaf815cf07",
+    "specs/README.md": "bc6e418e24631a076b224cccc3880d88065a6dcc5b72ae410c144733a05787c5",
+    "specs/file-drop.md": "00e0afe9ac96435ba4cbc24e61675456f02e2079f7b1c87808615a6e3423d04a",
+    "specs/framework.md": "90793d44d54523b71ea9248ee15eab7fea5c3b1c238ed4c3b8c1ec5a86be66cf",
+    "specs/macos-completion.md": "542fc700733dc925d270e63f5125838a94698d860ddc692c1520a4a901ebb65f",
+    "ui/file_drop.go": "35def8f566eac67884d55301f01cc2dd08417d1cef385c21a6c919a5bba10504",
+    "ui/file_drop_test.go": "438747637de47210c07a65c877fb3230d2875123283b1c3fe73bf57d67aa9397",
+    "ui/node.go": "54f52b455e42573730bd12b7e2463608e03e1bd882336fa4dec106e376c76875"
+  },
+  "verified_composition": true,
+  "initial_coverage": "30 content-bearing files plus one empty successful vet log; 31 staged input hashes.",
+  "correction_files": [
+    "docs/reports/macos-file-drop/README.md",
+    "docs/reports/macos-file-drop/full-check.txt",
+    "docs/reports/macos-file-drop/native-receive-final.txt",
+    "docs/reports/macos-file-drop/source-and-check-proof.json",
+    "drivers/cogent/file_drop.go",
+    "drivers/cogent/file_drop_test.go"
+  ],
+  "report_hashes": {
+    "initial-prism.json": "b7fee8efa04bb74f3dc354fc7fd3a748d645ad5e5e8fde4514f579aae71c6de8",
+    "correction-prism.json": "36ecfc5d576de3d9b29576c33f272a1e76f76c91828d74db1caa8b5e558a904d"
+  },
+  "finding_disposition": {
+    "c3b72a61826386b3": {
+      "status": "resolved",
+      "reason": "Full scripts/check.sh rerun after clearing Vellum test results on final source; all suites/consumers exit 0. Updated exact source and log hashes."
+    },
+    "0ee039d93f7aec37": {
+      "status": "open qualification gate",
+      "reason": "Physical Finder drag remains explicitly unverified in specs/status/evidence. No completed Mac milestone, Finder feedback, or production acceptance claim. A source implementation checkpoint can be committed."
+    }
+  },
+  "internal_review": {
+    "controlled_tab_ordering": "Fixed: descendant admission requires native current page to equal retained model SelectedID. Regression passes; correction reviewed clean.",
+    "other_findings": "No additional actionable code findings."
+  },
+  "ui_cleanup": "Bounded native windows closed; temporary Finder window closed back to Desktop through CUA. No input-source or VoiceOver settings changed."
+}

@@ -1,0 +1,16 @@
+{
+  "phase": "macos-file-drop-correction",
+  "parent_commit": "37db45395d4c197e98dc4e83bfff42830306d711",
+  "review_report": "correction-prism.json",
+  "review_report_sha256": "36ecfc5d576de3d9b29576c33f272a1e76f76c91828d74db1caa8b5e558a904d",
+  "unstaged_diff_sha256": "05520e00a12a23eff0334f5931acfc9d9f5fa8130ec375d8bbd9fcc84b333a67",
+  "files": {
+    "docs/reports/macos-file-drop/README.md": "9074788c235329059038ddf3a9d0706747ed88d9e8f964e0c91e2774df70b484",
+    "docs/reports/macos-file-drop/full-check.txt": "4fbdf7e8e481c3e36bccca4f26b919c2a993dc3f92a9f7ac6ab2dd4526c78fbb",
+    "docs/reports/macos-file-drop/native-receive-final.txt": "3c64bf1c9a88d9d63f6c5416cd5b8b0b685a2fcb3dee91e21194df8a7f77daad",
+    "docs/reports/macos-file-drop/source-and-check-proof.json": "a3c392ead743bef8e9c20497449d1d04cdbb3bb7c4f0e4805f55dc979b0cd4b8",
+    "drivers/cogent/file_drop.go": "4aa47cf5840de2e5f1e7ed5e2a5155bc00d78a86c05ad98bff9e0c00a0ca2257",
+    "drivers/cogent/file_drop_test.go": "142bcbebb8d823293456ee93016e143c23c836c6decda505b6799e57e1a0f227"
+  },
+  "scope": "Exact corrective source/test/evidence bytes before staging; no function context widening."
+}

@@ -1,0 +1,99 @@
+{
+  "parent_commit": "37db45395d4c197e98dc4e83bfff42830306d711",
+  "captured_utc": "2026-10-10T22:20:46.577328+00:00",
+  "host": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "go": "go version go1.27.2 darwin/arm64",
+  "changed_source_and_spec_sha256": {
+    "docs/implementation.md": "4ac1cd7e3b12508373093c1825b8c33c591d86027b84a5fcb7f051e47cab8849",
+    "docs/reports/README.md": "765a0bd42488b277a83d348d4015cc726ea558786c20d51d903ee473f4f9477c",
+    "drivers/cogent/cmd/file-drop-smoke/fixture_darwin.go": "f4cd8085ab34c1e49cb6e8c716e90578e03ba67ce5a18469800557cae7006ea9",
+    "drivers/cogent/cmd/file-drop-smoke/fixture_darwin.m": "f81d323f914d00eb10031905bbc9ebec53f5fab8241adb70aec7ca581be027f0",
+    "drivers/cogent/cmd/file-drop-smoke/fixture_other.go": "e91da1f7c1b6988a4ea26066c6e16aeb0c9477ad34f3e9b8b44a7f601c5d0eb3",
+    "drivers/cogent/cmd/file-drop-smoke/main.go": "96b704ec76f0fe85c42c674f4477b260b7ec06fc309fc71c9f58ab0994f3abf4",
+    "drivers/cogent/cmd/workbench/main.go": "026f757f7461e981e7263b41c02a07662df41e025c43d9b68618450fa098ce54",
+    "drivers/cogent/cmd/workbench/model.go": "ca20b7e164321c300158194fd80a80e041c67d99f727ec7de458facf9a1d3054",
+    "drivers/cogent/cmd/workbench/model_test.go": "55bdf6d3ef9ee186096fbd047f13e2874669a35fe091eaaacc0abf6cef7807b6",
+    "drivers/cogent/driver.go": "69575d9ea6bffd4c9152971be1043460448242170a6ba43b47fc193e03141909",
+    "drivers/cogent/file_drop.go": "4aa47cf5840de2e5f1e7ed5e2a5155bc00d78a86c05ad98bff9e0c00a0ca2257",
+    "drivers/cogent/file_drop_test.go": "142bcbebb8d823293456ee93016e143c23c836c6decda505b6799e57e1a0f227",
+    "examples/sdk-contract/contract_test.go": "19af26984b3f8689e5cc8b0b3ddf805c0a1d7104a472b7ff3ed20cdaf815cf07",
+    "specs/README.md": "bc6e418e24631a076b224cccc3880d88065a6dcc5b72ae410c144733a05787c5",
+    "specs/file-drop.md": "00e0afe9ac96435ba4cbc24e61675456f02e2079f7b1c87808615a6e3423d04a",
+    "specs/framework.md": "90793d44d54523b71ea9248ee15eab7fea5c3b1c238ed4c3b8c1ec5a86be66cf",
+    "specs/macos-completion.md": "542fc700733dc925d270e63f5125838a94698d860ddc692c1520a4a901ebb65f",
+    "ui/file_drop.go": "35def8f566eac67884d55301f01cc2dd08417d1cef385c21a6c919a5bba10504",
+    "ui/file_drop_test.go": "438747637de47210c07a65c877fb3230d2875123283b1c3fe73bf57d67aa9397",
+    "ui/node.go": "54f52b455e42573730bd12b7e2463608e03e1bd882336fa4dec106e376c76875"
+  },
+  "prepared_backend_sha256": {
+    "system/driver/desktop/event.go": "8b80415bbeb760382f5ffb0ea68f3f178ac3debced62b835f2791b2f813a89a3",
+    "events/source.go": "6272b3bab79bee0191a7df327b79f630777a52ba08d1c672af33e3b7c44ceb92",
+    "events/drop.go": "896d5263266ffe373b259de74a3a62018a0bde53613687ee8ebe22b6cdce90f0",
+    "core/events.go": "e91b7f98bdfa087165147df84ccb46f053ebf25858252c1834c6348f6ffcb6af",
+    "core/mainstage.go": "0fe228a505fd38d6f8589c03add4c6dc73954c495bd55ac3079e60890d893500",
+    "styles/units/unitgen.go": "3bea634fd3b6a9f93f8528c4c83cdc87d9a42355d340a55384e6933375668216"
+  },
+  "checks": [
+    {
+      "command": "go clean -testcache then VELLUM_CACHE_DIR=/tmp/vellum-p0-cache ./scripts/check.sh",
+      "exit": 0,
+      "log": "full-check.txt",
+      "scope": "Final runtime/test source, including controlled-tab ordering and bounded workbench display; fresh test results."
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go test -race . ./cmd/workbench -run 'TestFileDrop|TestFileReferences' -count=10",
+      "exit": 0,
+      "log": "routing-repeat.txt"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go test -race . ./cmd/workbench -run 'TestFileDrop|TestFileReference' -count=1",
+      "exit": 0,
+      "log": "final-affected-tests.txt"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go vet . ./cmd/workbench ./cmd/file-drop-smoke",
+      "exit": 0,
+      "log": "final-affected-vet.txt"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go run -race ./cmd/file-drop-smoke -timeout 20s",
+      "exit": 0,
+      "log": "native-receive-final.txt",
+      "scope": "Final runtime source; synthetic cursor query and Cocoa selector; no OS drag session."
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go run -race ./cmd/workbench -smoke -rows 100000 -exit-after 4s",
+      "exit": 0,
+      "log": "native-workbench.txt"
+    },
+    {
+      "command": "/private/tmp/VellumFileDropCheck.app/Contents/MacOS/VellumFileDropCheck -interactive -timeout 120s '/private/tmp/vellum-physical-drop/Finder space \u03a9.txt'",
+      "exit": 1,
+      "log": "physical-finder-attempt.txt",
+      "scope": "CUA physical drag attempt produced no delivery; gate remains open."
+    }
+  ],
+  "logs_sha256": {
+    "full-check.txt": "4fbdf7e8e481c3e36bccca4f26b919c2a993dc3f92a9f7ac6ab2dd4526c78fbb",
+    "routing-repeat.txt": "0e72cc66f5be962fc592329136df849b13336bc285f080c796199f8290c1fda1",
+    "final-affected-tests.txt": "38a5a0d2f76d2b508ffac30e2c55f77e07837f38afe0f8c489c6093ed925fc61",
+    "final-affected-vet.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-receive-initial.txt": "441ca27e550ccb82fc0a373765388f02000dc96d2ed91b38ffae52f0a053e543",
+    "native-receive-title-failure.txt": "d2deb8b63f40eff8da6ca62c02493bed8af5ce9d4ff2fa96f11bc7d6a081433c",
+    "native-receive-final.txt": "3c64bf1c9a88d9d63f6c5416cd5b8b0b685a2fcb3dee91e21194df8a7f77daad",
+    "physical-finder-attempt.txt": "bcb1ac73ab65fec7637a63aec7a0d9e9f21b9451be345616888ebe8315deb43f",
+    "native-workbench.txt": "35e2f89de8ae71ce251024557a6d1e81e0a5f4c408976aa1d0b1afe551c2241b"
+  },
+  "internal_review": {
+    "result": "Controlled-tab ordering correction reviewed clean; final full suite and synthetic Cocoa smoke pass; physical Finder gate remains open.",
+    "corrected_files_sha256": {
+      "drivers/cogent/file_drop.go": "4aa47cf5840de2e5f1e7ed5e2a5155bc00d78a86c05ad98bff9e0c00a0ca2257",
+      "drivers/cogent/file_drop_test.go": "142bcbebb8d823293456ee93016e143c23c836c6decda505b6799e57e1a0f227"
+    }
+  }
+}
