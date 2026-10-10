@@ -18,6 +18,11 @@ def verify(root):
     require(0 <= order["applied_at_shortcut"] <= 32, "missing shortcut observation")
     require(order["ordered_with_legacy_keys"] == (order["applied_at_shortcut"] == 32), "contradictory ordering status")
     require(order["max_applied_per_wake"] <= 16, "batch limit exceeded")
+    if "legacy_ordering_control" in audit:
+        control = audit["legacy_ordering_control"]
+        require(control["applied_at_shortcut"] == 16 and control["applied_final"] == 32 and control["fifo"]
+                and control["ordered_with_legacy_keys"] is False, "legacy control no longer reproduces the reported defect")
+        require(order["native_batch_events"] == 2, "fixed audit batch count differs")
     long = audit["long_text"]
     local_pass = order["ordered_with_legacy_keys"] and all(long[key] for key in (
         "exact_roundtrip", "trailing_newline_deletion", "grapheme_movement"))

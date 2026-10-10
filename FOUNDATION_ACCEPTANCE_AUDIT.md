@@ -2,6 +2,8 @@
 
 10 October 2026. **G1 remains open. The remaining checks executable on this macOS host are recorded, with a reproduced input-ordering failure. Keep the broad workbench on hold.** This updates the open-check status in [the integration report](FOUNDATION_INTEGRATION_RESULTS.md); the prior implementation and control evidence remain intact. The research still supports Go application ownership over Cogent Core, go-text shaping and native input/accessibility adapters, subject to these gates. See [ADR 0008](decisions/0008-foundation-acceptance-audit.md).
 
+The ordering failure recorded below was subsequently [fixed and tested](INPUT_ORDERING_FIX.md). This report preserves the pre-fix evidence; its other G1 limitations remain open.
+
 ## Measured contracts
 
 | Check | Result | Evidence and boundary |

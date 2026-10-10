@@ -39,11 +39,12 @@ type orderingResult struct {
 	LegacyKeyBetweenBatches bool   `json:"legacy_key_ran_between_batches"`
 	MaxAppliedPerWake       int    `json:"max_applied_per_wake"`
 	Wakes                   uint64 `json:"wakes"`
+	BatchEvents             int    `json:"native_batch_events"`
 }
 
 // This uses the actual toolkit Source/Deque and the fixture's wake placement.
 // A queued legacy shortcut must observe all earlier admitted native updates.
-func checkOrdering() (orderingResult, error) {
+func checkLegacyOrdering() (orderingResult, error) {
 	var source events.Source
 	p, e := transport.New[record](mailbox.Limits{Slots: 64, PayloadBytes: 4096, MessageBytes: 128}, func() {
 		ev := &events.CustomEvent{}
@@ -69,6 +70,7 @@ func checkOrdering() (orderingResult, error) {
 		}
 		switch ev.Type() {
 		case events.Custom:
+			r.BatchEvents++
 			before := r.AppliedFinal
 			if e = p.Drain(16, func(v record) {
 				if v.N != r.AppliedFinal+1 {
@@ -88,6 +90,52 @@ func checkOrdering() (orderingResult, error) {
 	r.LegacyKeyBetweenBatches = r.AppliedAtShortcut > 0 && r.AppliedAtShortcut < 32
 	if p.Stats().Queue.Outstanding != 0 || r.AppliedAtShortcut < 0 {
 		return r, errors.New("ordering probe did not complete")
+	}
+	return r, nil
+}
+
+// The fixed path reserves FIFO nodes at admission; dequeue merges only adjacent
+// committed nodes and never crosses a legacy event boundary.
+func checkOrdering() (orderingResult, error) {
+	var source events.Source
+	p, err := transport.NewOrdered[record](mailbox.Limits{Slots: 64, PayloadBytes: 4096, MessageBytes: 128}, &source.Deque, 16)
+	if err != nil {
+		return orderingResult{}, err
+	}
+	for i := 1; i <= 32; i++ {
+		if err := p.Send(record{i}); err != nil {
+			return orderingResult{}, err
+		}
+	}
+	source.Key(events.KeyDown, 'z', key.CodeZ, key.Meta)
+	r := orderingResult{AppliedAtShortcut: -1, RequiredBeforeShortcut: 32, FIFO: true}
+	for turns := 0; turns < 100; turns++ {
+		e, ok := source.Deque.PollEvent()
+		if !ok {
+			break
+		}
+		before := r.AppliedFinal
+		handled, err := p.HandleEvent(e, func(v record) {
+			if v.N != r.AppliedFinal+1 {
+				r.FIFO = false
+			}
+			r.AppliedFinal++
+		})
+		if err != nil {
+			return r, err
+		}
+		if handled {
+			r.BatchEvents++
+			r.MaxAppliedPerWake = max(r.MaxAppliedPerWake, r.AppliedFinal-before)
+		} else if e.Type() == events.KeyChord {
+			r.AppliedAtShortcut = r.AppliedFinal
+		}
+	}
+	r.Wakes = p.Stats().Wakes
+	r.OrderedWithLegacyKeys = r.AppliedAtShortcut == 32
+	r.LegacyKeyBetweenBatches = r.AppliedAtShortcut > 0 && r.AppliedAtShortcut < 32
+	if p.Stats().Queue.Outstanding != 0 || r.AppliedAtShortcut < 0 {
+		return r, errors.New("ordered probe did not complete")
 	}
 	return r, nil
 }
@@ -220,6 +268,10 @@ func run() (bool, error) {
 	if e != nil {
 		return false, e
 	}
+	control, e := checkLegacyOrdering()
+	if e != nil {
+		return false, e
+	}
 	long := checkLongText()
 	bidi, e := checkBidi(*cache)
 	if e != nil {
@@ -234,7 +286,7 @@ func run() (bool, error) {
 	scale["heap_after_second_gc"] = heap()
 	count, size, fallbacks := fontscan.NewFontMap(nil).SnapshotStats()
 	scale["snapshots_after_gc"] = map[string]any{"count": count, "bytes": size, "fallbacks": fallbacks}
-	result := map[string]any{"schema": 1, "ordering": ordering, "long_text": long, "bidi": bidi, "font_scale": scale, "G1_passed": false, "unavailable_checks": []string{"full live IME candidate panel and screen-reader workflow", "Windows/Linux native runtimes", "trusted release on a clean machine"}}
+	result := map[string]any{"schema": 1, "ordering": ordering, "legacy_ordering_control": control, "long_text": long, "bidi": bidi, "font_scale": scale, "G1_passed": false, "unavailable_checks": []string{"full live IME candidate panel and screen-reader workflow", "Windows/Linux native runtimes", "trusted release on a clean machine"}}
 	if e = json.NewEncoder(os.Stdout).Encode(result); e != nil {
 		return false, e
 	}

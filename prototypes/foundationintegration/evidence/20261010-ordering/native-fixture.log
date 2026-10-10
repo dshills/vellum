@@ -1,0 +1,988 @@
+native_attach before_show=true
+foundation shown callback 386.2 ms; adapter=true
+input_probe {"selected_start":2,"caret_view":[24,117,1,23],"caret_screen":[280,1052,0,23],"has_marked":true,"marked_start":1,"actual_caret_start":2,"input_source":"com.apple.keylayout.US","selected_length":0,"step":1,"text":"Aに👩Z","marked_length":1,"sequence":1,"substring":"Aに👩Z"}
+input_update {Sequence:1 Kind:mark Text:Aに👩Z Anchor:2 Focus:2 MarkedStart:1 MarkedEnd:2}
+input_probe {"selected_start":1,"caret_view":[40,117,1,23],"caret_screen":[296,1052,0,23],"has_marked":true,"marked_start":1,"actual_caret_start":3,"input_source":"com.apple.keylayout.US","selected_length":2,"step":2,"text":"A日本👩Z","marked_length":2,"sequence":2,"substring":"A日本👩Z"}
+input_update {Sequence:2 Kind:mark Text:A日本👩Z Anchor:1 Focus:3 MarkedStart:1 MarkedEnd:3}
+input_probe {"selected_start":3,"caret_view":[56,117,1,23],"caret_screen":[312,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":3,"input_source":"com.apple.keylayout.US","selected_length":0,"step":3,"text":"A日本👩Z","marked_length":0,"sequence":3,"substring":"A日本👩Z"}
+input_update {Sequence:3 Kind:insert Text:A日本👩Z Anchor:3 Focus:3 MarkedStart:-1 MarkedEnd:-1}
+input_probe {"selected_start":5,"caret_view":[56,117,1,23],"caret_screen":[312,1052,0,23],"has_marked":true,"marked_start":3,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":4,"text":"A日本取消👩Z","marked_length":2,"sequence":4,"substring":"A日本取消👩Z"}
+input_update {Sequence:4 Kind:mark Text:A日本取消👩Z Anchor:5 Focus:5 MarkedStart:3 MarkedEnd:5}
+input_probe {"selected_start":3,"caret_view":[88,117,1,23],"caret_screen":[344,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":3,"input_source":"com.apple.keylayout.US","selected_length":0,"step":5,"text":"A日本👩Z","marked_length":0,"sequence":5,"substring":"A日本👩Z"}
+input_update {Sequence:5 Kind:cancel Text:A日本👩Z Anchor:3 Focus:3 MarkedStart:-1 MarkedEnd:-1}
+input_probe {"selected_start":3,"caret_view":[56,117,1,23],"caret_screen":[312,1052,0,23],"has_marked":true,"marked_start":1,"actual_caret_start":3,"input_source":"com.apple.keylayout.US","selected_length":0,"step":6,"text":"A中文👩Z","marked_length":2,"sequence":6,"substring":"A中文👩Z"}
+input_update {Sequence:6 Kind:mark Text:A中文👩Z Anchor:3 Focus:3 MarkedStart:1 MarkedEnd:3}
+input_probe {"selected_start":3,"caret_view":[56,117,1,23],"caret_screen":[312,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":3,"input_source":"com.apple.keylayout.US","selected_length":0,"step":7,"text":"A中文👩Z","marked_length":0,"sequence":7,"substring":"A中文👩Z"}
+input_update {Sequence:7 Kind:unmark Text:A中文👩Z Anchor:3 Focus:3 MarkedStart:-1 MarkedEnd:-1}
+input_probe {"selected_start":3,"caret_view":[56,117,1,23],"caret_screen":[312,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":3,"input_source":"com.apple.keylayout.US","selected_length":0,"step":8,"text":"A中文👩Z","marked_length":0,"sequence":7,"substring":"A中文👩Z"}
+input_probe {"selected_start":4,"caret_view":[56,117,1,23],"caret_screen":[312,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":4,"input_source":"com.apple.keylayout.US","selected_length":0,"step":9,"text":"A中文漢👩Z","marked_length":0,"sequence":10,"substring":"A中文漢👩Z"}
+input_update {Sequence:8 Kind:mark Text:A中文字👩Z Anchor:4 Focus:4 MarkedStart:3 MarkedEnd:4}
+input_update {Sequence:9 Kind:mark Text:A中文汉👩Z Anchor:4 Focus:4 MarkedStart:3 MarkedEnd:4}
+input_update {Sequence:10 Kind:insert Text:A中文漢👩Z Anchor:4 Focus:4 MarkedStart:-1 MarkedEnd:-1}
+saturation {"before":{"selected_start":5,"caret_view":[72,117,1,23],"caret_screen":[328,1052,0,23],"has_marked":true,"marked_start":4,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":1,"text":"A中文漢に👩Z","marked_length":1,"sequence":11,"substring":"A中文漢に👩Z"},"fill_admitted":254,"refused_states":[{"selected_start":5,"caret_view":[72,117,1,23],"caret_screen":[328,1052,0,23],"has_marked":true,"marked_start":4,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":2,"text":"A中文漢に👩Z","marked_length":1,"sequence":11,"substring":"A中文漢に👩Z"},{"selected_start":5,"caret_view":[72,117,1,23],"caret_screen":[328,1052,0,23],"has_marked":true,"marked_start":4,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":3,"text":"A中文漢に👩Z","marked_length":1,"sequence":11,"substring":"A中文漢に👩Z"},{"selected_start":5,"caret_view":[72,117,1,23],"caret_screen":[328,1052,0,23],"has_marked":true,"marked_start":4,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":5,"text":"A中文漢に👩Z","marked_length":1,"sequence":11,"substring":"A中文漢に👩Z"},{"selected_start":5,"caret_view":[72,117,1,23],"caret_screen":[328,1052,0,23],"has_marked":true,"marked_start":4,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":7,"text":"A中文漢に👩Z","marked_length":1,"sequence":11,"substring":"A中文漢に👩Z"},{"selected_start":5,"caret_view":[72,117,1,23],"caret_screen":[328,1052,0,23],"has_marked":true,"marked_start":4,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":9,"text":"A中文漢に👩Z","marked_length":1,"sequence":11,"substring":"A中文漢に👩Z"}],"transport":{"Queue":{"Outstanding":256,"PayloadBytes":92190,"InFlight":1,"Closed":false},"Refused":8,"Wakes":284,"LatestBytes":0,"Closed":false}}
+input_update {Sequence:11 Kind:mark Text:A中文漢に👩Z Anchor:5 Focus:5 MarkedStart:4 MarkedEnd:5}
+input_probe {"selected_start":4,"caret_view":[88,117,1,23],"caret_screen":[344,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":4,"input_source":"com.apple.keylayout.US","selected_length":0,"step":5,"text":"A中文漢👩Z","marked_length":0,"sequence":12,"substring":"A中文漢👩Z"}
+input_update {Sequence:12 Kind:cancel Text:A中文漢👩Z Anchor:4 Focus:4 MarkedStart:-1 MarkedEnd:-1}
+input_probe {"selected_start":5,"caret_view":[72,117,1,23],"caret_screen":[328,1052,0,23],"has_marked":true,"marked_start":4,"actual_caret_start":5,"input_source":"com.apple.keylayout.US","selected_length":0,"step":1,"text":"A中文漢に👩Z","marked_length":1,"sequence":13,"substring":"A中文漢に👩Z"}
+input_update {Sequence:13 Kind:mark Text:A中文漢に👩Z Anchor:5 Focus:5 MarkedStart:4 MarkedEnd:5}
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 27,
+  "canvas_repaints_proxy": 14,
+  "commits": 0,
+  "editing_state": {
+    "Text": "A中文漢に👩Z",
+    "Cursor": 5,
+    "Anchor": 5,
+    "Focus": 5,
+    "Caret": {
+      "Min": {
+        "X": 88,
+        "Y": 116
+      },
+      "Max": {
+        "X": 89,
+        "Y": 139
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "A中文漢に👩Z",
+  "go_heap_alloc_bytes_after_forced_gc": 58275592,
+  "go_heap_alloc_bytes_before_gc": 62401248,
+  "go_heap_inuse_bytes": 65323008,
+  "goroutines": 4,
+  "idle_samples": null,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "input_environment_scope": "captured at first show; each recorded native probe reports its current source",
+  "input_history_bytes": 245,
+  "input_history_dropped": 0,
+  "input_probes": [
+    {
+      "selected_start": 2,
+      "caret_view": [
+        24,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        280,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": 2,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 1,
+      "text": "Aに👩Z",
+      "marked_length": 1,
+      "sequence": 1,
+      "substring": "Aに👩Z"
+    },
+    {
+      "selected_start": 1,
+      "caret_view": [
+        40,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        296,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 2,
+      "step": 2,
+      "text": "A日本👩Z",
+      "marked_length": 2,
+      "sequence": 2,
+      "substring": "A日本👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 3,
+      "text": "A日本👩Z",
+      "marked_length": 0,
+      "sequence": 3,
+      "substring": "A日本👩Z"
+    },
+    {
+      "selected_start": 5,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 3,
+      "actual_caret_start": 5,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 4,
+      "text": "A日本取消👩Z",
+      "marked_length": 2,
+      "sequence": 4,
+      "substring": "A日本取消👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        88,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        344,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 5,
+      "text": "A日本👩Z",
+      "marked_length": 0,
+      "sequence": 5,
+      "substring": "A日本👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 6,
+      "text": "A中文👩Z",
+      "marked_length": 2,
+      "sequence": 6,
+      "substring": "A中文👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 7,
+      "text": "A中文👩Z",
+      "marked_length": 0,
+      "sequence": 7,
+      "substring": "A中文👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 8,
+      "text": "A中文👩Z",
+      "marked_length": 0,
+      "sequence": 7,
+      "substring": "A中文👩Z"
+    },
+    {
+      "selected_start": 4,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 4,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 9,
+      "text": "A中文漢👩Z",
+      "marked_length": 0,
+      "sequence": 10,
+      "substring": "A中文漢👩Z"
+    },
+    {
+      "selected_start": 4,
+      "caret_view": [
+        88,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        344,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 4,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 5,
+      "text": "A中文漢👩Z",
+      "marked_length": 0,
+      "sequence": 12,
+      "substring": "A中文漢👩Z"
+    },
+    {
+      "selected_start": 5,
+      "caret_view": [
+        72,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        328,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 4,
+      "actual_caret_start": 5,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 1,
+      "text": "A中文漢に👩Z",
+      "marked_length": 1,
+      "sequence": 13,
+      "substring": "A中文漢に👩Z"
+    }
+  ],
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": [
+    {
+      "Sequence": 1,
+      "Kind": "mark",
+      "Text": "Aに👩Z",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": 1,
+      "MarkedEnd": 2
+    },
+    {
+      "Sequence": 2,
+      "Kind": "mark",
+      "Text": "A日本👩Z",
+      "Anchor": 1,
+      "Focus": 3,
+      "MarkedStart": 1,
+      "MarkedEnd": 3
+    },
+    {
+      "Sequence": 3,
+      "Kind": "insert",
+      "Text": "A日本👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 4,
+      "Kind": "mark",
+      "Text": "A日本取消👩Z",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 3,
+      "MarkedEnd": 5
+    },
+    {
+      "Sequence": 5,
+      "Kind": "cancel",
+      "Text": "A日本👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 6,
+      "Kind": "mark",
+      "Text": "A中文👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": 1,
+      "MarkedEnd": 3
+    },
+    {
+      "Sequence": 7,
+      "Kind": "unmark",
+      "Text": "A中文👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 8,
+      "Kind": "mark",
+      "Text": "A中文字👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 9,
+      "Kind": "mark",
+      "Text": "A中文汉👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 10,
+      "Kind": "insert",
+      "Text": "A中文漢👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 11,
+      "Kind": "mark",
+      "Text": "A中文漢に👩Z",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 4,
+      "MarkedEnd": 5
+    },
+    {
+      "Sequence": 12,
+      "Kind": "cancel",
+      "Text": "A中文漢👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 13,
+      "Kind": "mark",
+      "Text": "A中文漢に👩Z",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 4,
+      "MarkedEnd": 5
+    }
+  ],
+  "limitations": [
+    "small fixture, not full performance workload",
+    "single-line logical selection and current IME caret only; arbitrary text-range geometry, bidi and multiline ranges absent",
+    "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+  "native_actions": 0,
+  "native_input_ack": 13,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 185,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 220823552,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 26,
+  "shown_callback_ms": 386.205,
+  "spell_checker_initialized": false,
+  "status": "Native mark · sequence 13",
+  "text_samples": null,
+  "transport": {
+    "Queue": {
+      "Outstanding": 1,
+      "PayloadBytes": 360,
+      "InFlight": 1,
+      "Closed": false
+    },
+    "Refused": 8,
+    "Wakes": 292,
+    "LatestBytes": 0,
+    "Closed": false
+  },
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 27,
+  "canvas_repaints_proxy": 14,
+  "commits": 0,
+  "editing_state": {
+    "Text": "A中文漢に👩Z",
+    "Cursor": 5,
+    "Anchor": 5,
+    "Focus": 5,
+    "Caret": {
+      "Min": {
+        "X": 88,
+        "Y": 116
+      },
+      "Max": {
+        "X": 89,
+        "Y": 139
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "A中文漢に👩Z",
+  "go_heap_alloc_bytes_after_forced_gc": 58285456,
+  "go_heap_alloc_bytes_before_gc": 59830968,
+  "go_heap_inuse_bytes": 65216512,
+  "goroutines": 5,
+  "idle_samples": null,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "input_environment_scope": "captured at first show; each recorded native probe reports its current source",
+  "input_history_bytes": 245,
+  "input_history_dropped": 0,
+  "input_probes": [
+    {
+      "selected_start": 2,
+      "caret_view": [
+        24,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        280,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": 2,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 1,
+      "text": "Aに👩Z",
+      "marked_length": 1,
+      "sequence": 1,
+      "substring": "Aに👩Z"
+    },
+    {
+      "selected_start": 1,
+      "caret_view": [
+        40,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        296,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 2,
+      "step": 2,
+      "text": "A日本👩Z",
+      "marked_length": 2,
+      "sequence": 2,
+      "substring": "A日本👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 3,
+      "text": "A日本👩Z",
+      "marked_length": 0,
+      "sequence": 3,
+      "substring": "A日本👩Z"
+    },
+    {
+      "selected_start": 5,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 3,
+      "actual_caret_start": 5,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 4,
+      "text": "A日本取消👩Z",
+      "marked_length": 2,
+      "sequence": 4,
+      "substring": "A日本取消👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        88,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        344,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 5,
+      "text": "A日本👩Z",
+      "marked_length": 0,
+      "sequence": 5,
+      "substring": "A日本👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 6,
+      "text": "A中文👩Z",
+      "marked_length": 2,
+      "sequence": 6,
+      "substring": "A中文👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 7,
+      "text": "A中文👩Z",
+      "marked_length": 0,
+      "sequence": 7,
+      "substring": "A中文👩Z"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 8,
+      "text": "A中文👩Z",
+      "marked_length": 0,
+      "sequence": 7,
+      "substring": "A中文👩Z"
+    },
+    {
+      "selected_start": 4,
+      "caret_view": [
+        56,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        312,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 4,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 9,
+      "text": "A中文漢👩Z",
+      "marked_length": 0,
+      "sequence": 10,
+      "substring": "A中文漢👩Z"
+    },
+    {
+      "selected_start": 4,
+      "caret_view": [
+        88,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        344,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 4,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 5,
+      "text": "A中文漢👩Z",
+      "marked_length": 0,
+      "sequence": 12,
+      "substring": "A中文漢👩Z"
+    },
+    {
+      "selected_start": 5,
+      "caret_view": [
+        72,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        328,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": true,
+      "marked_start": 4,
+      "actual_caret_start": 5,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 1,
+      "text": "A中文漢に👩Z",
+      "marked_length": 1,
+      "sequence": 13,
+      "substring": "A中文漢に👩Z"
+    }
+  ],
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": [
+    {
+      "Sequence": 1,
+      "Kind": "mark",
+      "Text": "Aに👩Z",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": 1,
+      "MarkedEnd": 2
+    },
+    {
+      "Sequence": 2,
+      "Kind": "mark",
+      "Text": "A日本👩Z",
+      "Anchor": 1,
+      "Focus": 3,
+      "MarkedStart": 1,
+      "MarkedEnd": 3
+    },
+    {
+      "Sequence": 3,
+      "Kind": "insert",
+      "Text": "A日本👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 4,
+      "Kind": "mark",
+      "Text": "A日本取消👩Z",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 3,
+      "MarkedEnd": 5
+    },
+    {
+      "Sequence": 5,
+      "Kind": "cancel",
+      "Text": "A日本👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 6,
+      "Kind": "mark",
+      "Text": "A中文👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": 1,
+      "MarkedEnd": 3
+    },
+    {
+      "Sequence": 7,
+      "Kind": "unmark",
+      "Text": "A中文👩Z",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 8,
+      "Kind": "mark",
+      "Text": "A中文字👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 9,
+      "Kind": "mark",
+      "Text": "A中文汉👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 10,
+      "Kind": "insert",
+      "Text": "A中文漢👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 11,
+      "Kind": "mark",
+      "Text": "A中文漢に👩Z",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 4,
+      "MarkedEnd": 5
+    },
+    {
+      "Sequence": 12,
+      "Kind": "cancel",
+      "Text": "A中文漢👩Z",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 13,
+      "Kind": "mark",
+      "Text": "A中文漢に👩Z",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 4,
+      "MarkedEnd": 5
+    }
+  ],
+  "limitations": [
+    "small fixture, not full performance workload",
+    "single-line logical selection and current IME caret only; arbitrary text-range geometry, bidi and multiline ranges absent",
+    "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+  "native_actions": 0,
+  "native_input_ack": 13,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 186,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 222167040,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 26,
+  "shown_callback_ms": 386.205,
+  "spell_checker_initialized": false,
+  "status": "Native mark · sequence 13",
+  "text_samples": null,
+  "transport": {
+    "Queue": {
+      "Outstanding": 0,
+      "PayloadBytes": 0,
+      "InFlight": 0,
+      "Closed": true
+    },
+    "Refused": 8,
+    "Wakes": 292,
+    "LatestBytes": 0,
+    "Closed": true
+  },
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+native_detach before_gpu_view_release=true

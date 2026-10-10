@@ -54,7 +54,6 @@ type idleSample struct {
 	PaintSchedulerWakes                    uint64
 	Note                                   string
 }
-type wake struct{}
 
 type message struct {
 	Idle          idleSample
@@ -66,8 +65,8 @@ type message struct {
 	Step          int
 }
 type fixture struct {
-	nativePump                             atomic.Pointer[transport.Pump[message]]
-	pump                                   *transport.Pump[message]
+	nativePump                             atomic.Pointer[transport.OrderedPump[message]]
+	pump                                   *transport.OrderedPump[message]
 	body                                   *core.Body
 	source                                 *events.Source
 	bridge                                 *macbridge.Bridge
@@ -146,7 +145,7 @@ func main() {
 			return nil, fmt.Errorf("accessibility attachment failed")
 		}
 		if f.nativeInput {
-			var pending *transport.Ticket[message]
+			var pending *transport.OrderedTicket[message]
 			f.input = inputbridge.Attach(dw.Glw.GetCocoaView(), func(u inputbridge.Update) bool {
 				pump := f.nativePump.Load()
 				if pump == nil || f.closed.Load() {
@@ -176,27 +175,15 @@ func main() {
 		}
 		f.shownMS = float64(time.Since(f.launched).Microseconds()) / 1000
 		f.source = f.body.SystemEvents()
-		f.pump, _ = transport.New[message](mailbox.Limits{Slots: 256, PayloadBytes: 4 * 1024 * 1024, MessageBytes: 64 * 1024}, func() {
-			e := &events.CustomEvent{}
-			e.Typ = events.Custom
-			e.Data = wake{}
-			e.Init()
-			e.SetUnique()
-			f.source.Deque.Send(e)
-		})
+		var err error
+		f.pump, err = transport.NewOrdered[message](mailbox.Limits{Slots: 256, PayloadBytes: 4 * 1024 * 1024, MessageBytes: 64 * 1024}, &f.source.Deque, 16)
+		if err != nil {
+			panic(err)
+		}
 		f.nativePump.Store(f.pump)
 		f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window).SetOnDemand(f.onDemand)
 		f.body.Scene.On(events.Custom, func(e events.Event) {
-			ce, ok := e.(*events.CustomEvent)
-			if !ok {
-				return
-			}
-			_, ok = ce.Data.(wake)
-			if !ok {
-				return
-			}
-			e.SetHandled()
-			if err := f.pump.Drain(16, f.processMessage); err != nil {
+			if _, err := f.pump.HandleEvent(e, f.processMessage); err != nil {
 				panic(err)
 			}
 		})

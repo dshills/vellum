@@ -1,0 +1,368 @@
+{
+  "schema": 1,
+  "date": "2026-10-10",
+  "base_commit": "e1c8e1b12f16388407d5c8e40d2e583bf9c93e4c",
+  "ordering_passed": true,
+  "G1_passed": false,
+  "host": {
+    "os": "macOS 26.6.2 (25G83)",
+    "arch": "arm64",
+    "go": "go version go1.27.2 darwin/arm64"
+  },
+  "sources": [
+    {
+      "path": "prototypes/foundationintegration/transport/ordered.go",
+      "bytes": 6207,
+      "sha256": "fe1a3b94dbaadbe4f5ae5bd97c82d30babb5df04bcbe497a5526fad80f1a5622"
+    },
+    {
+      "path": "prototypes/foundationintegration/transport/ordered_test.go",
+      "bytes": 8981,
+      "sha256": "904834a6ae887f3b1e7dc1e28fbe010dca7630b04e8301d5203597dc5355427f"
+    },
+    {
+      "path": "prototypes/foundationintegration/main.go",
+      "bytes": 31985,
+      "sha256": "306dcc5bea51f7ee21926642f9d12639178cf6c0d481f91142a584342e385703"
+    },
+    {
+      "path": "prototypes/foundationintegration/cmd/foundationaudit/main.go",
+      "bytes": 10682,
+      "sha256": "2fa22124bc08962c78df7cc6c4a33802d3f1229d2529d9928b06fd1b90937dbd"
+    },
+    {
+      "path": "prototypes/foundationintegration/prepare.py",
+      "bytes": 1297,
+      "sha256": "653d8c5132fa01674fb1c3325a16b03ccd861fd2642448d797b98d0e5322950e"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/0010-ordered-deferred-events.patch",
+      "bytes": 2756,
+      "sha256": "2ffbafa501f1a0374bd0c5c417641253a2e7eae6f14e4c96619afe7fb22194a5"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/original-hashes.json",
+      "bytes": 476,
+      "sha256": "d3d4c9c7e55499f51cf31611dc2fea82b9e309526ff8a276a1c75dfe1c8955aa"
+    },
+    {
+      "path": "INPUT_ORDERING_FIX.md",
+      "bytes": 6686,
+      "sha256": "4772332d733b21e29c424c1bb9d613bf2b5c7457609fe5e3af35ca89f999361d"
+    },
+    {
+      "path": "decisions/0009-ordered-native-events.md",
+      "bytes": 1668,
+      "sha256": "d26d0f72e28d514ac9261a0bc82469c5a4cdf0a60dfdbab39b5c352b3807262b"
+    },
+    {
+      "path": "FOUNDATION_ACCEPTANCE_AUDIT.md",
+      "bytes": 9471,
+      "sha256": "ea1bd81f485b39626aeffdade38efe0465b6ecc46dc6e5117ed3d1fd629ae18e"
+    },
+    {
+      "path": "FOUNDATION_INTEGRATION_RESULTS.md",
+      "bytes": 9248,
+      "sha256": "95d557e700bedf114e9132937e04aaf343ce303d4edcdffa93a65b4a4c49fb7c"
+    },
+    {
+      "path": "prototypes/foundationintegration/README.md",
+      "bytes": 7117,
+      "sha256": "9cbb71f14ee13dccbc66f6807af9c254b495b66a3898898e3cdc352e7dedc78a"
+    },
+    {
+      "path": "prototypes/foundationintegration/verify_acceptance.py",
+      "bytes": 3260,
+      "sha256": "0f260d463c170ef70f4ab48d5e58897416b19800308b371f6105b57aa7da28d4"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/acceptance-audit.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/acceptance-audit.json",
+      "bytes": 4393,
+      "sha256": "e1610073103be2beb1ca515c1f8b1db0e8173dad16fb8ec3dfff3ce1dd5cbea8"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/acceptance-audit.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/core-tests.txt",
+      "bytes": 122,
+      "sha256": "38cee761adabb83c9ec2155663ab1fb26021d96f5582e19c4583ea4b745f8b15"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/native-fixture.json",
+      "bytes": 10169,
+      "sha256": "c4bdb6acd238408ddc9396b7af1d2ebfd263d54bcc7571d2ddacab8d339a6bd8"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/native-fixture.json.heap.pprof",
+      "bytes": 23943,
+      "sha256": "9ae157aa666029ffcf7427dfcdaa8e3f8687c6735625aa9507ff1cd4b5238d2d"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/native-fixture.log",
+      "bytes": 27101,
+      "sha256": "8b37693eb039f17f50ee8d4ec692c629187d7ce2ca7d259157008ba5785cdf46"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/native-queries-lifetime.json",
+      "bytes": 2423,
+      "sha256": "d228e4a85251681a6a9da216330dd7b6c2876122a9e076ced74f4b5f6b527c77"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/native-queries-lifetime.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/native-verification.txt",
+      "bytes": 186,
+      "sha256": "24eb2b3fac6325790d7bd750ed670bf37bd2bc07add125f82f59115863ca38d6"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/prepare.txt",
+      "bytes": 1584,
+      "sha256": "fcb3d385c5e2355b0c0c0d4f1947cdee030bbc853266bba78b9847b6e03d5c72"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/race-repeat-ten.txt",
+      "bytes": 191,
+      "sha256": "92ac5096df0daf395f6a75c016fc269ea6750de8834c9d35445cdf99256ff430"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/race-tests.txt",
+      "bytes": 191,
+      "sha256": "a2f936713a437f58150b0a1766ab51ba93af0cfe4d3af04c20b543f48acb3e3b"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/runner.txt",
+      "bytes": 379,
+      "sha256": "7a6ff928bf5e97b56485ae70a4c1211bd9abc30db8f348f10df1cedca7dfa455"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/saturation.json",
+      "bytes": 1990,
+      "sha256": "7fd76ffbca8dbb45c8e6bb20b898dad57b996c759187c1d3e5d280de99aad369"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/verification.txt",
+      "bytes": 63,
+      "sha256": "d6605d1c7da530503aca5e3f66e9ee764cd8d5beba1c57eacd312d1d2f25d0f2"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010-ordering/vet.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "preparation_inputs": [
+    {
+      "path": "prototypes/foundationintegration/go.mod",
+      "bytes": 2367,
+      "sha256": "45c41edd6ab857e1fb4491de931ecd16c12c99116134d1324c4d8d16776a8569"
+    },
+    {
+      "path": "prototypes/foundationintegration/go.sum",
+      "bytes": 9918,
+      "sha256": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14"
+    },
+    {
+      "path": "prototypes/foundationintegration/check_foundation.sh",
+      "bytes": 1380,
+      "sha256": "93a4dd13352e44b1bb430f63c6c0132c35a29758480c51f80ace53a583a49af1"
+    },
+    {
+      "path": "prototypes/foundationintegration/env.sh",
+      "bytes": 405,
+      "sha256": "e6f4d7ef6523b979e7843dc9fc20c71f9a2190da85c6aa877dfd3a8ab44e2c13"
+    },
+    {
+      "path": "prototypes/nativeinput/patches/0001-grapheme-and-selection.patch",
+      "bytes": 11138,
+      "sha256": "1649a8ca53e0d510b34d89306d222d307a3e17d70aef88a729c7d116f339649e"
+    },
+    {
+      "path": "prototypes/nativeinput/patches/0002-lazy-spelling.patch",
+      "bytes": 2014,
+      "sha256": "5d0a0e4f7b8ea16bab05436f60d3d1794cae9c61b57e8e756595b5dbc3e9c8e5"
+    },
+    {
+      "path": "prototypes/nativeinput/patches/0003-requested-paint.patch",
+      "bytes": 8199,
+      "sha256": "b10202ed3f3b18b7c5693285d659cdf92667ad93f3961eb703d64d08065b57d1"
+    },
+    {
+      "path": "prototypes/nativeinput/patches/0004-native-composition.patch",
+      "bytes": 11387,
+      "sha256": "bfc609e98c056f6cddc30c8b6fba182b6441cd17eb8966e8cf2cdd40cef7724f"
+    },
+    {
+      "path": "prototypes/nativeinput/patches/COGENT_LICENSE",
+      "bytes": 1498,
+      "sha256": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1"
+    },
+    {
+      "path": "prototypes/nativeinput/patches/original-hashes.json",
+      "bytes": 1160,
+      "sha256": "7bbe27b3a87f1a624a8e2977382b05cb4ab7c16cbdff0d24cc7dc42bd320e784"
+    },
+    {
+      "path": "prototypes/foundationchecks/patches/0005-multiline-grapheme.patch",
+      "bytes": 4703,
+      "sha256": "8a2f44e5a41fd5b917bbf3410e4b2dc1a2f8a4504f9b75af3881d4148e2134db"
+    },
+    {
+      "path": "prototypes/foundationchecks/patches/0006-glyph-cluster-lookup.patch",
+      "bytes": 1389,
+      "sha256": "c1b6064dd79bf62635a989b05b1d222fa99f3095b21a7923ae0d3d2a80f9128a"
+    },
+    {
+      "path": "prototypes/foundationchecks/patches/COGENT_LICENSE",
+      "bytes": 1498,
+      "sha256": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1"
+    },
+    {
+      "path": "prototypes/foundationchecks/patches/original-hashes.json",
+      "bytes": 402,
+      "sha256": "7c0fedbeea62735a5dffb0aaecedcae56ab095c37e5ef7ff835cce6955a0f437"
+    },
+    {
+      "path": "prototypes/foundationcontracts/patches/0007-exact-multiline-text.patch",
+      "bytes": 11416,
+      "sha256": "c235a769ce3e50683a3fb54c554aa404b8211f51b78ac6afc618914e8a851318"
+    },
+    {
+      "path": "prototypes/foundationcontracts/patches/COGENT_LICENSE",
+      "bytes": 1498,
+      "sha256": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1"
+    },
+    {
+      "path": "prototypes/foundationcontracts/patches/original-hashes.json",
+      "bytes": 522,
+      "sha256": "674c68e3dd355641067809f297c3102356a13a2abe8b864cbe70148735328b0a"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/0008-native-lifetime.patch",
+      "bytes": 3905,
+      "sha256": "3fadb62158f9f0d09efa1a6949de540740a3172c51bddc27c64cafb9a94800c5"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/0009-owned-device-queue-release.patch",
+      "bytes": 707,
+      "sha256": "0fa0b25ad508cf85ad606eb840dcc9f33d0a1a55640dfd1132100956e5675ce7"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/0010-ordered-deferred-events.patch",
+      "bytes": 2756,
+      "sha256": "2ffbafa501f1a0374bd0c5c417641253a2e7eae6f14e4c96619afe7fb22194a5"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/COGENT_LICENSE",
+      "bytes": 1498,
+      "sha256": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/original-hashes.json",
+      "bytes": 476,
+      "sha256": "d3d4c9c7e55499f51cf31611dc2fea82b9e309526ff8a276a1c75dfe1c8955aa"
+    },
+    {
+      "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+      "bytes": 19035,
+      "sha256": "b62243ab4487b2c4a9c0f9e112150493ee5743355d674041712b956510b305f9"
+    },
+    {
+      "path": "prototypes/fontresources/patches/0002-deferred-static-outlines.patch",
+      "bytes": 14639,
+      "sha256": "8cd046c233dc65eadbb1812d5f94a432be8e8a2d35537d94748ed5db9fd46be1"
+    },
+    {
+      "path": "prototypes/fontresources/patches/0002-hashes.json",
+      "bytes": 419,
+      "sha256": "a7c1bccbfffb9b32306b4cd51ada8dc27bf82f871328841b837e494023dd2de0"
+    },
+    {
+      "path": "prototypes/fontresources/patches/GO_TEXT_LICENSE",
+      "bytes": 3006,
+      "sha256": "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+    },
+    {
+      "path": "prototypes/fontresources/patches/original-hashes.json",
+      "bytes": 598,
+      "sha256": "ecbe49835924f16f69a9e741fafaaf18a7b1cacbde382706d8bdc19a72f04844"
+    }
+  ],
+  "builds": [
+    {
+      "path": "prototypes/foundationintegration/build/integration-fixture",
+      "bytes": 55336882,
+      "sha256": "4ff076da28fd8e717d51f50c75ab98b25e58a031d591815f1abf0157ae85187c"
+    },
+    {
+      "path": "prototypes/foundationintegration/build/foundationaudit",
+      "bytes": 52647074,
+      "sha256": "45307475e43aed22dbaea1d61a60ce6edf63ad22d1d0a988a42748bd67059a30"
+    },
+    {
+      "path": "prototypes/foundationintegration/build/lifecyclecheck",
+      "bytes": 23616514,
+      "sha256": "11415825248a15cb18b6cbd9400a56927110081e64c0bd752634f88778c85055"
+    }
+  ],
+  "applied_deque": {
+    "path": "prototypes/foundationintegration/build/upstream/events/deque.go",
+    "bytes": 5547,
+    "sha256": "27d9386d588c666d0ce0f7f3651cadc931b515f18eb075fd847a4fece42f9152"
+  },
+  "pins": {
+    "cogent": "v0.3.46-0.20261009095036-5cc519b24044",
+    "go_text": "v0.3.5-0.20260418130854-c41d02a44bec"
+  },
+  "test_environment": "P0_CACHE_DIR=/tmp/vellum-p0-cache; source env.sh; GOWORK=off. Commands below run from prototypes/foundationintegration.",
+  "commands": [
+    {
+      "command": "python3 prepare.py",
+      "exit": 0
+    },
+    {
+      "command": "go test -race -count=10 -timeout 90s -modfile=integration.mod ./transport ./inputbridge ./semantics",
+      "exit": 0
+    },
+    {
+      "command": "go test -tags offscreen -count=1 -timeout 90s -modfile=integration.mod cogentcore.org/core/core",
+      "exit": 0
+    },
+    {
+      "command": "go build -modfile=integration.mod -o build/integration-fixture .",
+      "exit": 0
+    },
+    {
+      "command": "./build/integration-fixture -input-probe -saturation -exit-after=14s -report=evidence/20261010-ordering/native-fixture.json",
+      "exit": 0
+    },
+    {
+      "command": "./check_foundation.sh evidence/20261010-ordering",
+      "exit": 1,
+      "meaning": "valid evidence; other G1 gates open. Includes vet, focused race tests, offscreen audit and native lifecycle build/run."
+    },
+    {
+      "command": "./build/foundationaudit -nogui -font-cache=../fontresources/build/font-cache",
+      "exit": 0,
+      "meaning": "local ordering/buffer assertions pass; JSON G1 remains false"
+    },
+    {
+      "command": "python3 verify_acceptance.py evidence/20261010-ordering",
+      "exit": 0
+    }
+  ],
+  "native_scope": "deterministic protocol/saturation and hidden-window lifetime probes; no live IME/VoiceOver or settings changes",
+  "review_scope": "implementation/tests/toolkit patch and docs/evidence manifest separately; raw output hashes verified locally"
+}
