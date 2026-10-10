@@ -1,0 +1,291 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "caff397fec2b199bba79db407425e755",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "805870cb0d50f6ba43275a2538863c33eae3668b",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 4,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "4cb3d3a2e6ed420b",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Do silently drops the callback after Close",
+      "message": "Do silently discards fn once the application is closed, and the caller gets no signal. Because Do is the sole entry point for UI actions and headless state mutation, a caller cannot tell whether its mutation ran. This can hide lost work around shutdown, for example the Close button's Activate racing with a timer-driven Close.",
+      "suggestion": "Return a bool or an error (ErrClosed) from Do, or document clearly that callbacks are dropped after Close and test that behavior.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 93,
+            "end": 93
+          }
+        }
+      ],
+      "tags": [
+        "api",
+        "lifecycle"
+      ],
+      "evidence": "if !closed \u0026\u0026 fn != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "84c80b2b73cb3833",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Callbacks lost on panic in Drain; reentrant Do/Drain deadlocks",
+      "message": "Drain detaches the whole batch from the queue before running it. If any callback panics, for example one recovered higher up by the driver, the remaining callbacks in the batch are lost permanently while the app stays open. Callbacks that run Do or Drain on the same goroutine also deadlock, because owner is a non-reentrant mutex. The README documents this restriction but nothing detects it.",
+      "suggestion": "Pop one callback at a time (bounded by the initial batch length), or restore the unexecuted tail to the front of the queue in a deferred function. Optionally detect reentrancy and panic with a clear message instead of deadlocking.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 126,
+            "end": 136
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "deadlock"
+      ],
+      "evidence": "batch := a.queue\n\t\ta.queue = nil\n\t\ta.mu.Unlock()\n\t\tfor _, fn := range batch {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a521eae207db2459",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Quit requested before the main loop starts may be lost, hanging Run",
+      "message": "The initial `refresh()` runs before `RunMain`. If validation or sync fails, it only sets `runErr` and calls `go core.TheApp.QuitReq()` before the main loop exists. That quit request can be dropped, so `RunMain` then blocks forever on an invalid UI. The same applies to `context.AfterFunc` when `ctx` is already cancelled, because the callback runs immediately, before the loop starts.",
+      "suggestion": "Run the initial validation and mount synchronously and return the error before calling `RunMain`. Also check `ctx.Err()` before starting the window. Alternatively, defer the quit request until the window is shown (for example in `OnShow`).",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 96,
+            "end": 96
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "error-handling"
+      ],
+      "evidence": "refresh()\n\tstop := context.AfterFunc(ctx, func() { go core.TheApp.QuitReq() })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "cc797cbcf3c43ea0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil widget dereference after mount switch",
+      "message": "`r.widget` can be nil here. An unhandled `n.Kind` leaves it unset because the switch has no default case. An `Extension.Mount` that returns nil has the same effect. Either case panics with a nil dereference inside the UI loop.",
+      "suggestion": "Add a `default` case to the switch that falls back to a placeholder `core.NewText`. Check the result of `ext.Mount` and replace a nil widget with the placeholder, or return an error.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 144,
+            "end": 144
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "robustness"
+      ],
+      "evidence": "r.widget.AsWidget().SetName(n.ID)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2c95f9d18bf46afb",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "go.mod replace directives point at build output directories",
+      "message": "Both dependencies are replaced with local paths under `build/` directories. These are typically generated artifacts, and the diff does not add them. The module therefore will not build from a clean checkout and cannot be consumed as a dependency, because replace directives are ignored in non-main modules. The `require` pseudo-versions are also not the code that is actually compiled.",
+      "suggestion": "Vendor or commit the pinned sources, or add a documented bootstrap step (a script or `go generate`) that produces these directories. Alternatively, depend on real upstream pseudo-versions and drop the replaces.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/go.mod",
+          "lines": {
+            "start": 50,
+            "end": 51
+          }
+        }
+      ],
+      "tags": [
+        "build",
+        "reproducibility"
+      ],
+      "evidence": "replace cogentcore.org/core =\u003e ../../prototypes/foundationintegration/build/upstream\nreplace github.com/go-text/typesetting =\u003e ../../prototypes/fontresources/build/typesetting",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "20127344b8295316",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Invalidate with an unknown id is a silent no-op that still wakes the driver",
+      "message": "An unknown window id is silently ignored, but the wake function is still called. A typo in an ID therefore causes no repaint and no diagnostic, and it triggers a useless wake.",
+      "suggestion": "Track whether any window matched, and skip the wake or return an error when none did.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 146,
+            "end": 150
+          }
+        }
+      ],
+      "tags": [
+        "api"
+      ],
+      "evidence": "if id == \"\" || w.ID == id {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "be46970996b9b1c0",
+      "severity": "low",
+      "category": "bug",
+      "title": "runErr written from callback and read after RunMain without synchronization",
+      "message": "`runErr` is written inside the `a.Do` callback, which runs on a UI or event goroutine. It is read by the goroutine running `Run` after `RunMain` returns, with no synchronization. The error is also overwritten if several refreshes fail. This is a data race unless `a.Do` and `RunMain` establish a happens-before relation, which is not guaranteed by the code shown.",
+      "suggestion": "Store the error in an `atomic.Pointer[error]` or protect it with a mutex. Keep only the first error.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 70,
+            "end": 71
+          }
+        }
+      ],
+      "tags": [
+        "race"
+      ],
+      "evidence": "runErr = err\n\t\t\t\tgo core.TheApp.QuitReq()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a5740ffa6acbfbd6",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Off-by-one in hierarchy depth limit",
+      "message": "The root is at depth 0, so `depth \u003e 128` accepts depth 128, which is the 129th level. The error message says the limit is 128 levels, so the check and the message disagree by one.",
+      "suggestion": "Use `depth \u003e= 128` so at most 128 levels are accepted, or change the message and a named constant to match the intended limit.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "ui/node.go",
+          "lines": {
+            "start": 34,
+            "end": 35
+          }
+        }
+      ],
+      "tags": [
+        "off-by-one",
+        "validation"
+      ],
+      "evidence": "if depth \u003e 128 {\n\t\t\treturn fmt.Errorf(\"ui: hierarchy exceeds 128 levels\")",
+      "fix": {
+        "before": "if depth \u003e 128 {",
+        "after": "if depth \u003e= 128 {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "30595736eeae5b2e",
+      "severity": "low",
+      "category": "testing",
+      "title": "Validate error paths largely untested",
+      "message": "Only duplicate IDs are tested. The empty ID, unknown kind, leaf-with-children and depth-limit branches have no tests, and the depth boundary is the one with an off-by-one.",
+      "suggestion": "Add table-driven tests for each error branch, including a hierarchy of exactly 128 and 129 levels to pin down the boundary.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "ui/node_test.go",
+          "lines": {
+            "start": 5,
+            "end": 14
+          }
+        }
+      ],
+      "tags": [
+        "tests",
+        "coverage"
+      ],
+      "evidence": "func TestIdentityValidation(t *testing.T) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 63826,
+    "totalMs": 29736
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 31530,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 25710,
+        "output": 8619,
+        "costUSD": 0.13761
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

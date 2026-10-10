@@ -1,0 +1,423 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8eca9cd42132530d21ee9a0772396b2d",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "805870cb0d50f6ba43275a2538863c33eae3668b",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 10,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d6a60e2aedd01702",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "CI pins a Go toolchain version that may not exist",
+      "message": "The workflow pins Go 1.27.x. If that release line is not yet published, setup-go fails and the whole CI job breaks. It also has to agree with the `go` directive in go.mod, which is not visible in this part.",
+      "suggestion": "Use a Go version that exists and matches go.mod, or use `go-version-file: go.mod` so the two cannot drift.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": ".github/workflows/framework.yml",
+          "lines": {
+            "start": 10,
+            "end": 10
+          }
+        }
+      ],
+      "tags": [
+        "ci",
+        "go-version"
+      ],
+      "evidence": "go-version: '1.27.x'",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d1ef3c3e31ad1900",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Do does not apply the panic-closes-application policy that Drain does",
+      "message": "Drain closes the application when a callback panics, and the comment says a panic in a UI callback closes the application. Do runs `fn()` with no recovery, so a panic in a native event callback or UI action propagates while the application stays open. The model state may be left half-mutated, and later Do, Drain and view reconciliation continue on it.",
+      "suggestion": "Apply the same recover, Close and re-panic policy inside Do, and have Drain rely on it, so every owner entry point treats panics identically.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 96,
+            "end": 96
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "consistency"
+      ],
+      "evidence": "\tfn()\n\treturn nil",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "bac3b58277c3fdb4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Generic styler overrides extension widget min size and grow",
+      "message": "The generic styler is appended after the extension widget's own styler. It unconditionally sets Min to the node's MinWidth/MinHeight, which are usually 0. That overwrites any minimum size an extension widget (canvas, workbench) set for itself, and it can collapse the widget. It also resets Grow to 0 for extensions.",
+      "suggestion": "Only apply Min when MinWidth or MinHeight is non-zero. For extension nodes, apply Grow only when node.Grow is set, so the widget's own styling is preserved.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 186,
+            "end": 187
+          }
+        }
+      ],
+      "tags": [
+        "cogent",
+        "layout"
+      ],
+      "evidence": "s.Min.Set(units.Dp(r.node.MinWidth), units.Dp(r.node.MinHeight))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5b34baab40294b67",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Queue capacity is not a hard bound on outstanding callbacks",
+      "message": "Drain moves the whole queue into a local batch and resets `a.queue`, so while a batch is running the queue accepts up to `capacity` more items. The number of admitted but unexecuted callbacks can then reach 2x the configured capacity, which weakens the bounded-admission guarantee.",
+      "suggestion": "Track in-flight batch size in the capacity check, or document that capacity bounds only the pending queue.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 111,
+            "end": 115
+          }
+        }
+      ],
+      "tags": [
+        "backpressure"
+      ],
+      "evidence": "a.queue = append(a.queue, fn)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4155018552587440",
+      "severity": "low",
+      "category": "bug",
+      "title": "Drain ignores the error from Do",
+      "message": "Drain discards the error returned by Do. A Drain on a closed application is a silent no-op, and the Do and Drain contract says nesting is forbidden but nothing enforces it. A nested call would deadlock on `owner` rather than fail.",
+      "suggestion": "Return the error from Drain, or document explicitly that it is ignored. For the non-reentrancy contract, add a debug guard that detects reentry.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 128,
+            "end": 128
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "a.Do(func() {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "33f767ef7050a7fc",
+      "severity": "low",
+      "category": "bug",
+      "title": "Close is called under the owner lock in the Drain panic path",
+      "message": "On a panic, Close runs while the owner lock is held and calls the driver's wake function. If the wake function tries to enter Do, for example to reconcile synchronously, it deadlocks instead of propagating the panic. Re-panicking with `panic(p)` also discards the original stack trace.",
+      "suggestion": "Document that wake must never block on the owner. Consider closing in a deferred function that runs after the owner is released, and include the original stack in the re-panic.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 130,
+            "end": 132
+          }
+        }
+      ],
+      "tags": [
+        "deadlock",
+        "panic"
+      ],
+      "evidence": "a.Close()\n\t\t\t\tpanic(p)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "38d75f758ce45423",
+      "severity": "low",
+      "category": "bug",
+      "title": "Wake coalescing flag can get stuck",
+      "message": "pending is set to true before s.Custom is called. If the custom event is dropped (queue full, window closing or not yet processed) or the Scene handler rejects it, pending stays true. Every later wake is then silently swallowed and the UI stops updating.",
+      "suggestion": "Reset pending if Custom fails or the event is not delivered. Alternatively, drop the flag and let the handler coalesce by draining and refreshing on every event.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 90,
+            "end": 91
+          }
+        }
+      ],
+      "tags": [
+        "cogent",
+        "concurrency"
+      ],
+      "evidence": "if s != nil \u0026\u0026 pending.CompareAndSwap(false, true) {\n\t\t\ts.Custom(\"vellum.wake\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4ec7ec37ec58c846",
+      "severity": "low",
+      "category": "bug",
+      "title": "Process-once guard checked too late",
+      "message": "The once-per-process guard runs only after the body, widgets, handlers and the initial refresh have been built. On a second call it returns an error after having already mounted widgets and run the application's View and Activate logic, which has side effects. It also consumes dirty state. The guard should fail fast before any work.",
+      "suggestion": "Move the processRun.CompareAndSwap check to the top of Run. Reset it with a deferred Store(false) if a failure before RunMain should allow a retry.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 125,
+            "end": 127
+          }
+        }
+      ],
+      "tags": [
+        "cogent",
+        "lifecycle"
+      ],
+      "evidence": "if !processRun.CompareAndSwap(false, true) {\n\t\treturn fmt.Errorf(\"cogent: native main loop runs once per process\")\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "16b8a21203a2b801",
+      "severity": "low",
+      "category": "performance",
+      "title": "Type comparison via Sprintf",
+      "message": "Comparing dynamic types by formatting them with fmt.Sprintf allocates strings on every refresh for every extension node. reflect.TypeOf is the idiomatic and cheaper way to do this. Add the \"reflect\" import.",
+      "suggestion": "Use reflect.TypeOf(a) != reflect.TypeOf(b).",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 139,
+            "end": 139
+          }
+        }
+      ],
+      "tags": [
+        "cogent"
+      ],
+      "evidence": "if fmt.Sprintf(\"%T\", r.node.Custom) != fmt.Sprintf(\"%T\", n.Custom) {",
+      "fix": {
+        "before": "if fmt.Sprintf(\"%T\", r.node.Custom) != fmt.Sprintf(\"%T\", n.Custom) {",
+        "after": "if reflect.TypeOf(r.node.Custom) != reflect.TypeOf(n.Custom) {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7ee1c354bb07d1c1",
+      "severity": "low",
+      "category": "bug",
+      "title": "Nil check misses typed-nil widgets from extensions",
+      "message": "An extension's Mount may return a typed nil pointer wrapped in the core.Widget interface. That passes the == nil check and then panics at r.widget.AsWidget().SetName.",
+      "suggestion": "Also guard against a typed nil, for example with a recover around Mount or a reflect-based nil check. Document that Mount must return a non-nil widget.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 177,
+            "end": 177
+          }
+        }
+      ],
+      "tags": [
+        "cogent",
+        "robustness"
+      ],
+      "evidence": "if r.widget == nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c5aace1bc5b17e20",
+      "severity": "low",
+      "category": "testing",
+      "title": "Ignored error in test setup",
+      "message": "The error from app.New is discarded. If construction fails, `a` is nil and `defer a.Close()` or later calls panic with a confusing nil dereference instead of a clear test failure. The test also never exercises the Button and Extension sync paths.",
+      "suggestion": "Check the error and fail the test with t.Fatal. Add cases for Button state changes and for extension Sync errors.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver_test.go",
+          "lines": {
+            "start": 16,
+            "end": 16
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "location-corrected"
+      ],
+      "evidence": "a, _ := app.New(app.Config{})",
+      "fix": {
+        "before": "a, _ := app.New(app.Config{})",
+        "after": "a, err := app.New(app.Config{})\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a2dfbe70e31bc75a",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Replace directives depend on generated build artifacts",
+      "message": "The replace directives point at generated build directories under prototypes/.../build (presumably produced by prepare.sh). The module does not build from a clean checkout until that script has run, which breaks `go build`/`go mod` for anyone and any CI step that has not run it. The require version also becomes meaningless.",
+      "suggestion": "Document or enforce the prepare step in CI and README. Prefer vendoring the patched upstream or pinning a fork module so the build is reproducible.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/go.mod",
+          "lines": {
+            "start": 48,
+            "end": 51
+          }
+        }
+      ],
+      "tags": [
+        "build",
+        "reproducibility"
+      ],
+      "evidence": " cogentcore.org/core =\u003e ../../prototypes/foundationintegration/build/upstream",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1afb800b66c5a6c3",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Placeholder module path",
+      "message": "The root module uses the placeholder path example.com/vellum. Any consumer or nested module (such as drivers/cogent) that imports ui or app will depend on a non-resolvable path, which complicates later publishing or replace directives.",
+      "suggestion": "Use the real repository module path, or document that the placeholder is intentional and that the drivers/cogent module uses a replace directive.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "go.mod",
+          "lines": {
+            "start": 1,
+            "end": 1
+          }
+        }
+      ],
+      "tags": [
+        "go-mod"
+      ],
+      "evidence": "module example.com/vellum",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 87580,
+    "totalMs": 42668
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 37782,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 29259,
+        "output": 11938,
+        "costUSD": 0.177898
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "202e6b44e5181825",
+        "severity": "medium",
+        "category": "maintainability",
+        "title": "Compiled binary artifact committed to the repository",
+        "message": "A compiled executable was committed at drivers/cogent/workbench. It looks like the output of `go build ./cmd/workbench` in scripts/check.sh, which drops a binary named `workbench` into drivers/cogent. Committed binaries bloat history, cannot be reviewed, go stale against the source, and are a supply-chain risk because the contents are unverifiable.",
+        "suggestion": "Remove the binary from version control and add `drivers/cogent/workbench` to .gitignore. Have check.sh build to a temp location, e.g. `go build -o \"$(mktemp -d)/workbench\" ./cmd/workbench`, or use `go build -o /dev/null`.",
+        "confidence": 0.7,
+        "locations": [
+          {
+            "path": "drivers/cogent/workbench",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "binary",
+          "artifact",
+          "gitignore"
+        ],
+        "evidence": "Binary files /dev/null and b/drivers/cogent/workbench differ",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    }
+  ],
+  "suppressed": []
+}

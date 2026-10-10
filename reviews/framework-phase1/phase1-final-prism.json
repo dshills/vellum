@@ -1,0 +1,218 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "97596990a46f31f1067ce8de0e9ea403",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "805870cb0d50f6ba43275a2538863c33eae3668b",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 4,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d9ebe4f8c13933f5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Close does not wake the driver event loop",
+      "message": "Close clears the wake callback and cancels the context without ever invoking the wake. When Close is called from another goroutine (the workbench's time.AfterFunc(*exit, a.Close), a worker, or the OS-signal path through context.AfterFunc), a driver blocked in its native event loop gets no notification. It may not notice the closure until an unrelated OS event arrives, so shutdown can hang or be delayed.",
+      "suggestion": "Capture the wake function under the lock, then call it after unlocking once the app has been closed, so the driver's loop wakes and observes the closed state or cancelled context.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 195,
+            "end": 204
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "shutdown",
+        "concurrency"
+      ],
+      "evidence": "a.wake = nil",
+      "fix": {
+        "before": "func (a *Application) Close() {\n\ta.mu.Lock()\n\tif !a.closed {\n\t\ta.closed = true\n\t\ta.queue = nil\n\t\ta.wake = nil\n\t\ta.cancel()\n\t}\n\ta.mu.Unlock()\n}",
+        "after": "func (a *Application) Close() {\n\ta.mu.Lock()\n\twake := a.wake\n\tif !a.closed {\n\t\ta.closed = true\n\t\ta.queue = nil\n\t\ta.wake = nil\n\t\ta.cancel()\n\t} else {\n\t\twake = nil\n\t}\n\ta.mu.Unlock()\n\tif wake != nil {\n\t\twake()\n\t}\n}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2c95f9d18bf46afb",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "go.mod replaces pinned dependencies with local build-artifact paths",
+      "message": "The module claims to pin Cogent Core and go-text/typesetting, but both are replaced with local paths under `build/` directories. Those paths are generated artifacts that are probably untracked and are produced by prepare.sh. A fresh checkout fails to build until that script has run. The pinned versions in `require` are not what gets compiled, and the `go.sum` entries for them are bypassed. Builds are therefore not reproducible or verifiable. The replace directives are also not in a parenthesised block.",
+      "suggestion": "Vendor or commit the patched sources, or point at a pinned fork or commit via `replace ... =\u003e github.com/org/fork vX`. Failing that, document the prepare step clearly and add a CI check that the paths exist. Group the replace directives in one block., e.g. `replace (\\n...\\n)`.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/go.mod",
+          "lines": {
+            "start": 49,
+            "end": 51
+          }
+        }
+      ],
+      "tags": [
+        "build",
+        "reproducibility",
+        "go.mod"
+      ],
+      "evidence": "replace cogentcore.org/core =\u003e ../../prototypes/foundationintegration/build/upstream\nreplace github.com/go-text/typesetting =\u003e ../../prototypes/fontresources/build/typesetting",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "533db6de1978ca78",
+      "severity": "low",
+      "category": "bug",
+      "title": "QuitReq issued before the main loop starts and run-once flag consumed on early failure",
+      "message": "The first `refresh()` runs before the main loop starts. On a validation or mount failure it spawns `go core.TheApp.QuitReq()` and then returns the error immediately. That goroutine may call QuitReq with no app running, or later, with unpredictable effects. Because the process-wide `processRun` flag has already been set, the app can never run again in this process after such a failure. The same flag is also consumed when `ctx.Err() != nil` returns early.",
+      "suggestion": "Only call QuitReq when the main loop is running, for example by tracking a `running` flag. Otherwise just record the failure. Consider setting `processRun` only immediately before `RunMain`.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 110,
+            "end": 116
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "concurrency"
+      ],
+      "evidence": "refresh()\n\tif err := failure.Load(); err != nil {\n\t\treturn *err\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "839291faecf1a886",
+      "severity": "low",
+      "category": "correctness",
+      "title": "Misleading error for unsupported node kinds",
+      "message": "The `r.widget == nil` check applies to every node kind. A kind with no case in the switch (for example a new `ui` kind) hits this branch, and the error wrongly says an extension returned a nil widget. This misleads debugging. There is also no `default` case in the switch.",
+      "suggestion": "Add `default: return nil, fmt.Errorf(\"cogent: unsupported node kind %v for %q\", n.Kind, n.ID)` to the switch, and keep the nil-widget message for extensions only.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 167,
+            "end": 169
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "return nil, fmt.Errorf(\"cogent: extension %q returned nil widget\", n.ID)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "16e968f2abbc7e0e",
+      "severity": "low",
+      "category": "testing",
+      "title": "No tests for the driver's reconcile and lifecycle logic",
+      "message": "The reconciliation logic (sameShape, mount, syncRecord), the wake/pending state machine and the failure handling are non-trivial. No tests for them are visible in the shown files, and the driver package has no `_test.go` file in this diff. Regressions such as missed wakes or type-assertion panics would go unnoticed.",
+      "suggestion": "Add tests with a fake Extension and a headless scene covering shape changes, extension type changes, and failure propagation.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 192,
+            "end": 221
+          }
+        }
+      ],
+      "tags": [
+        "tests"
+      ],
+      "evidence": "func syncRecord(r *record, n ui.Node) error {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3ca562ae0d98c86e",
+      "severity": "low",
+      "category": "performance",
+      "title": "Buttons are unconditionally updated on every sync",
+      "message": "Every sync unconditionally calls SetText, SetState and Update on every button, even when nothing changed. Labels guard against this and extensions are meant to preserve native resources. Each dirty refresh therefore triggers a full re-style and re-layout of every button. It can also reset hover or focus visuals.",
+      "suggestion": "Compare against `previous` (Text and Disabled) and only update the widget when one of them changed, as the Label case does.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 204,
+            "end": 205
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "ui"
+      ],
+      "evidence": "r.widget.(*core.Button).SetText(n.Text).SetState(n.Disabled, states.Disabled)\n\t\tr.widget.AsWidget().Update()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 72472,
+    "totalMs": 42119
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 34195,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 27350,
+        "output": 9829,
+        "costUSD": 0.15299
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
