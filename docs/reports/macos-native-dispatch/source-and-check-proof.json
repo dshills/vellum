@@ -1,0 +1,154 @@
+{
+  "parent_commit": "7e6624cd3ea4a51a74e2efc3b43c629a42e21c36",
+  "captured_utc": "2026-10-10T22:34:56.331022+00:00",
+  "host": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "go": "go version go1.27.2 darwin/arm64",
+  "changed_source_and_spec_sha256": {
+    "docs/implementation.md": "042aa6755ec0c234f7595def6e7fe1288ecc41fe1d7a0ab81b503c7060fd124d",
+    "docs/reports/README.md": "f234f18395e53213ad72d78fcdcedd65af72411ba4114500a4b5150cc31ff6a5",
+    "docs/reports/macos-native-dispatch/README.md": "b8f8adb9fc2efd3e58308c3701e208e4021b4c0aecfedf0925fca69c79fda525",
+    "drivers/cogent/cmd/mainqueue-smoke/main.go": "67a0cd19e9283f1b4a28a3d261a6dc791a18a5b20c3bd8a062244720db086516",
+    "drivers/cogent/native/README.md": "10f74b47512adc3abe220fb5c2bdcd4294cbc85faf208e8a8f89f64092dbf99a",
+    "drivers/cogent/native/dependencies.json": "b7a01a5de9debb637022333b7d3252895620a8e016fa4050254daf98be89c034",
+    "drivers/cogent/native/patches/dispatch/0022-main-dispatch-failure.patch": "e3fc27c44cbb06b420b8d8a35bbaa77a23628fc288f96e42e060f064e0acf648",
+    "drivers/cogent/native/patches/dispatch/original-hashes.json": "1925bb633e0f7a46b9032710ff73ea4e9667e57b1e6343cf2be9ded793ca73ea",
+    "drivers/cogent/native/patches/dispatch/output-hashes.json": "aa22db2188ae9e7adde7671fb66aacfdc603cc2500d686143a42ae6520fe3d05",
+    "drivers/cogent/prepare_test.py": "8657925167209bd9adeaa24a5ad4392ce286d9dba59b74ba32f18b112f9c680a",
+    "scripts/check.sh": "fc9d5efe251fed3836d75c95d7f3500b9fb8439a3d8fc2d0b60926cd4010c82f",
+    "specs/README.md": "f6981a444d579ffc5283b231d051025d19c01f0228d2dde34428dac6f5731c9f",
+    "specs/macos-completion.md": "7c7514c4d0e356c9369d5ffa9e108dc03c1310afc81b525d4480561a5d30b6c8",
+    "specs/native-dispatch.md": "f72fa6c5740b014f703ed0ecfa407001eaf4ef06dae025ebea4e6d0146aa282e"
+  },
+  "prepared_backend_sha256": {
+    "system/driver/base/app.go": "45760739540dffde4ca8cc6473ae5be238485285630d8414208a37f76d9b83ee",
+    "system/driver/base/helpers.go": "49f1374f9ecf0a9770fc0674421e981678b1c43e2a12b14b3294334625e54455",
+    "system/driver/desktop/app.go": "8ae3d8c643ec3ece72a7dbc078358b25d9371596c1afb828d8c2f24dd5b74903",
+    "system/driver/desktop/event.go": "fe2104045284b0069ca69ab7fdf4fb9654d6421f359e36a5aebf7e737d228334",
+    "core/recover.go": "d61367d9cca8c68dbdfeaca8327c529adf3c3b96d78ca80570048691163786fd",
+    "system/driver/base/app_vellum_failure_test.go": "a0a903ac5b1ad041e749d9df668a194391000f914ced3b1d39e13986ab42b521",
+    "system/driver/desktop/native_events.go": "0539fea78ce7acf47fbf01db783056cdd23fa5790ba2de6a7d0867df1f6d548f",
+    "system/driver/desktop/native_events_vellum_test.go": "2135948fc5024d0b28a60efced5bb4a38a2bdae98fb0ac0da34bb4540824123e",
+    "core/recover_vellum_terminal_test.go": "0d2aa6dcef4ecfcbde4a737fb9b2571fef86aac29d72b5a8f7433faf9a3acf6f"
+  },
+  "executables_sha256": {
+    "/private/tmp/vellum-mainqueue-smoke": "27854ee09a12fe3ceff95becd9e359ea38b1c0f533778dac23c2d7d77f6e7ba8",
+    "drivers/cogent/build/vellum-workbench": "3b14b5e3e7ea09fade996515264f8c0ccc36d043b3e394a05b160f92cfd68757"
+  },
+  "checks": [
+    {
+      "cwd": ".",
+      "command": "VELLUM_CACHE_DIR=/tmp/vellum-p0-cache ./drivers/cogent/prepare.sh",
+      "exit": 0,
+      "log": "prepare.txt"
+    },
+    {
+      "cwd": ".",
+      "command": "go clean -testcache then VELLUM_CACHE_DIR=/tmp/vellum-p0-cache ./scripts/check.sh",
+      "exit": 0,
+      "log": "full-check.txt",
+      "scope": "Final source; all test results fresh; no cached results."
+    },
+    {
+      "cwd": "drivers/cogent/build/upstream",
+      "command": "go test -race ./system/driver/base ./system/driver/desktop ./core -run 'TestVellumMainQueue(Failure|Stop)|TestVellumNativeEventLifecycle|TestVellumTerminalMainRecovery' -count=20",
+      "exit": 0,
+      "log": "stress-race.txt"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go build -o /private/tmp/vellum-mainqueue-smoke ./cmd/mainqueue-smoke",
+      "exit": 0,
+      "log": "native-build.txt"
+    },
+    {
+      "name": "native-normal",
+      "cwd": "drivers/cogent",
+      "argv": [
+        "/private/tmp/vellum-mainqueue-smoke",
+        "-case",
+        "normal"
+      ],
+      "started_utc": "2026-10-10T22:33:45.252010+00:00",
+      "duration_seconds": 2.033,
+      "exit": 0,
+      "log": "native-normal.txt"
+    },
+    {
+      "name": "native-panic",
+      "cwd": "drivers/cogent",
+      "argv": [
+        "/private/tmp/vellum-mainqueue-smoke",
+        "-case",
+        "panic"
+      ],
+      "started_utc": "2026-10-10T22:33:47.285041+00:00",
+      "duration_seconds": 0.384,
+      "exit": 0,
+      "log": "native-panic.txt"
+    },
+    {
+      "name": "window-handoff",
+      "cwd": "drivers/cogent",
+      "argv": [
+        "go",
+        "run",
+        "-race",
+        "./cmd/window-handoff-smoke"
+      ],
+      "started_utc": "2026-10-10T22:33:47.669076+00:00",
+      "duration_seconds": 3.487,
+      "exit": 0,
+      "log": "window-handoff.txt"
+    },
+    {
+      "name": "workbench",
+      "cwd": "drivers/cogent",
+      "argv": [
+        "./build/vellum-workbench",
+        "-smoke",
+        "-rows",
+        "100000",
+        "-exit-after",
+        "4s"
+      ],
+      "started_utc": "2026-10-10T22:33:51.155927+00:00",
+      "duration_seconds": 4.7,
+      "exit": 0,
+      "log": "workbench.txt"
+    }
+  ],
+  "logs_sha256": {
+    "full-check.txt": "cc269cc21df9d91cb4c8033a998b44682816019a2e3d4084a2578e2cba31a6b3",
+    "native-build.txt": "2b378ef44208d7c9617e5dbb2bedb54a24bc1142c7b794606507393406bf8d75",
+    "native-normal.txt": "4d8eab8462e93675e70bd5c0375106c1ced6afbc3ed0434d6f0bc443c9e83cfe",
+    "native-panic.txt": "2d60353c1d69e2744cc82d824aec2536c7b3d9138c55585b901872badcdd5ddf",
+    "prepare.txt": "348d61b66ad955d4b19e34222370d27c203ce9f624096067aeb4343e2f5d9959",
+    "stress-race.txt": "0a0e7fe18a453e1f2ddddf9deba89a3c5ab5257de09c6da1a1f4b60c95751386",
+    "window-handoff.txt": "4409c375854771c936a31fd1e1b9add5a7bc2d9709fc2ab34abe222b6d39f83f",
+    "workbench.txt": "ba3b96f2f1bf68e104a4813972cb4852de7560da162a425ce29679166653d033"
+  },
+  "internal_reviews": [
+    {
+      "agent": "/root/mac_history_review",
+      "scope": "design",
+      "finding": "P1 terminal core recovery attempts crash window and waits forever after queue stop",
+      "resolution": "Terminal MainStopped guard logs/rethrows before GUI crash state, with regression."
+    },
+    {
+      "agent": "/root/mac_history_review",
+      "scope": "nine prepared source/test files",
+      "findings": []
+    },
+    {
+      "agent": "/root/mac_history_review",
+      "scope": "canonical patch/hashes/manifest/test selectors/spec and native probe",
+      "findings": []
+    }
+  ],
+  "scope_limits": [
+    "Standalone GPU GLFW helpers and unrelated native operations are outside desktop event barrier.",
+    "Callback panic is fail-stop; complete GPU/AX/native resource recovery is not claimed.",
+    "Physical OS workflows, sustained performance and public distribution remain unqualified."
+  ],
+  "os_preferences_changed": false
+}

@@ -155,6 +155,17 @@
               "sha256": "6395c5c8340dc95d5d16425db2803cdb513edd317748d84df4b5d7666aabf516"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/dispatch",
+          "inputs": "native/patches/dispatch/original-hashes.json",
+          "outputs": "native/patches/dispatch/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/dispatch/0022-main-dispatch-failure.patch",
+              "sha256": "e3fc27c44cbb06b420b8d8a35bbaa77a23628fc288f96e42e060f064e0acf648"
+            }
+          ]
         }
       ]
     },

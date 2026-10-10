@@ -21,6 +21,10 @@ keyed reconciliation, layout/theme, docking/window sessions, virtual tables/tree
 shared-device rectangle canvas, Cocoa clipboard/menus/file panels, demand painting,
 resource lifecycle checks and private SDK/bundle tooling exist.
 
+Native dispatch now has explicit synchronous failure and desktop wake termination
+semantics. See [contract](native-dispatch.md) and its evidence; broad panic resource
+recovery remains outside that contract.
+
 Document history adds bounded sparse undo/redo, revision-aware dirty/save handling
 and focused native text precedence. Its evidence is separate from document file
 persistence; the workbench does not yet save a component document.

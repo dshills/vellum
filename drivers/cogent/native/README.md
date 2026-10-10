@@ -41,3 +41,11 @@ before queue publication. It releases startup/unaccepted delivery waiters while
 preserving synchronous output for accepted callbacks. Both loops acknowledge
 refused deliveries; native window creation is one admitted callback and returns
 an error on refusal. Six owned race regressions cover these transitions.
+
+Patch 0022 acknowledges admitted callback failure before replaying the original
+panic, stops further admissions and avoids a crash-dialog wait on a terminal main
+loop. A process-wide desktop barrier serializes native empty posts and GLFW
+termination; all five input-event posts use it. Its race tests cover queued/inline
+panic, nil panic, incomplete Goexit, pending callers and event lifecycle ordering.
+The barrier does not guard every GLFW operation or standalone GPU helper lifetimes.
+See [dispatch contract](../../../specs/native-dispatch.md) for supported outcomes.

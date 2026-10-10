@@ -1,0 +1,658 @@
+--- a/system/driver/base/app.go
++++ b/system/driver/base/app.go
+@@ -112,6 +112,7 @@
+ }
+ 
+ func (a *App) MainLoop() {
++	defer a.StopMain()
+ 	queue, stopped := a.InitMainQueue()
+ 	for {
+ 		select {
+@@ -130,8 +131,11 @@
+ 	a.RunOnMainIfOpen(f)
+ }
+ 
+-// RunOnMainIfOpen reports whether the callback executed. Pending delivery can
+-// refuse after stop; once delivered, acknowledgment always precedes return so
++// RunOnMainIfOpen reports whether the callback completed normally. A callback
++// panic stops admission, acknowledges its caller and is rethrown on both threads.
++// An incomplete callback (such as runtime.Goexit) fails its caller with
++// ErrMainCallbackIncomplete. Legacy GODEBUG=panicnil=1 is not supported.
++// Pending delivery can refuse after stop; once delivered, acknowledgment always precedes return so
+ // callbacks may safely capture caller-owned output. Never call on a published
+ // native main queue from its own main thread or from a queued callback.
+ func (a *App) RunOnMainIfOpen(f func()) bool {
+@@ -142,20 +146,23 @@
+ 	default:
+ 	}
+ 	if queue == nil {
+-		f()
+-		return true
++		return a.ExecuteMain(FuncRun{F: f})
+ 	}
+ 	a.This.SendEmptyEvent()
+ 	done := make(chan struct{}, 1)
+ 	executed := false
++	var failure mainFailure
+ 	select {
+ 	case <-stopped:
+ 		return false
+-	case queue <- FuncRun{F: f, Done: done, executed: &executed}:
++	case queue <- FuncRun{F: f, Done: done, executed: &executed, failure: &failure}:
+ 	}
+ 	// The loop acknowledges either completion or refusal after accepting the
+ 	// rendezvous. Stop cannot release this caller while its output is being used.
+ 	<-done
++	if failure.present {
++		panic(failure.value)
++	}
+ 	select {
+ 	case <-stopped:
+ 	default:
+@@ -187,6 +194,14 @@
+ 	// no-op by default
+ }
+ 
++// MainStopped reports the terminal queue state for recovery code. Once true it
++// never becomes false; querying it does not publish or allocate queue channels.
++func (a *App) MainStopped() bool {
++	a.mainQueueMu.Lock()
++	defer a.mainQueueMu.Unlock()
++	return a.mainQueueStopped
++}
++
+ // StopMain signals shutdown once, including before loop publication. It does
+ // not publish a work queue. Startup and unaccepted delivery waiters return;
+ // accepted callbacks retain synchronous completion before their callers return.
+--- a/system/driver/base/helpers.go
++++ b/system/driver/base/helpers.go
+@@ -14,29 +14,62 @@
+ // ErrMainStopped refuses native operations after process loop shutdown.
+ var ErrMainStopped = errors.New("native main loop stopped")
+ 
++// ErrMainCallbackIncomplete reports an admitted callback that left its goroutine
++// without returning or a recoverable panic payload (for example runtime.Goexit).
++var ErrMainCallbackIncomplete = errors.New("native main callback exited without returning")
++
++// mainFailure is published to the waiting caller only by the Done acknowledgement.
++// A separate presence bit keeps failure distinct from a successful nil result.
++type mainFailure struct {
++	present bool
++	value   any
++}
++
+ // FuncRun is a simple helper type that contains a function to call and a channel
+ // to send a signal on when the function is finished running.
+ type FuncRun struct {
+ 	F        func()
+ 	Done     chan struct{}
+ 	executed *bool
++	failure  *mainFailure
+ }
+ 
+ // ExecuteMain admits work under the same lock as StopMain, then releases that
+-// lock before invoking code. Admitted work retains synchronous completion;
+-// refusal is also acknowledged. Only the native loop calls this method.
+-func (a *App) ExecuteMain(f FuncRun) bool {
++// lock before invoking code. Normal completion, refusal and failure all receive
++// one acknowledgement. A panic stops further admissions before releasing its
++// caller, then propagates on the native thread. Goexit retains its native-thread
++// semantics while its caller receives ErrMainCallbackIncomplete.
++// Used only by the native loop or its pre-publication inline caller.
++func (a *App) ExecuteMain(f FuncRun) (completed bool) {
+ 	a.mainQueueMu.Lock()
+-	executed := !a.mainQueueStopped
++	admitted := !a.mainQueueStopped
+ 	a.mainQueueMu.Unlock()
+-	if executed {
+-		f.F()
++	defer func() {
++		var recovered any
++		if admitted && !completed {
++			recovered = recover()
++			failure := recovered
++			if failure == nil {
++				failure = ErrMainCallbackIncomplete
++			}
++			a.StopMain()
++			if f.failure != nil {
++				*f.failure = mainFailure{present: true, value: failure}
++			}
++		}
++		if f.executed != nil {
++			*f.executed = completed
++		}
++		if f.Done != nil {
++			f.Done <- struct{}{}
++		}
++		if recovered != nil {
++			panic(recovered)
++		}
++	}()
++	if !admitted {
++		return false
+ 	}
+-	if f.executed != nil {
+-		*f.executed = executed
+-	}
+-	if f.Done != nil {
+-		f.Done <- struct{}{}
+-	}
+-	return executed
++	f.F()
++	return true
+ }
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -65,21 +65,23 @@
+ // system, which has the effect of pushing the system along during cases when
+ // the event loop needs to be "pinged" to get things moving along..
+ func (a *App) SendEmptyEvent() {
+-	glfw.PostEmptyEvent()
++	desktopEvents.wake(glfw.PostEmptyEvent)
+ }
+ 
+ // MainLoop starts running event loop on main thread (must be called
+ // from the main thread).
+ func (a *App) MainLoop() {
++	defer func() {
++		a.StopMain()
++		desktopEvents.stop(glfw.Terminate)
++	}()
+ 	queue, stopped := a.InitMainQueue()
+ 	for {
+ 		select {
+ 		case <-stopped:
+-			glfw.Terminate()
+ 			return
+ 		case f := <-queue:
+ 			if !a.ExecuteMain(f) {
+-				glfw.Terminate()
+ 				return
+ 			}
+ 		default:
+@@ -90,7 +92,7 @@
+ 
+ // InitGPU initializes glfw, gpu, and the screens.
+ func (a *App) InitGPU() {
+-	if err := glfw.Init(); err != nil {
++	if err := desktopEvents.start(glfw.Init); err != nil {
+ 		log.Fatalln("system/driver/desktop failed to initialize glfw:", err)
+ 	}
+ 	glfw.SetMonitorCallback(a.MonitorChange)
+--- a/system/driver/desktop/event.go
++++ b/system/driver/desktop/event.go
+@@ -64,7 +64,7 @@
+ 	}
+ 	fw := w.FocusWindow()
+ 	fw.Event.Key(typ, rn, ec, mods)
+-	glfw.PostEmptyEvent() // todo: why??
++	TheApp.SendEmptyEvent()
+ }
+ 
+ // char input
+@@ -72,7 +72,7 @@
+ 	mods := GlfwMods(mod)
+ 	fw := w.FocusWindow()
+ 	fw.Event.KeyChord(char, key.CodeUnknown, mods)
+-	glfw.PostEmptyEvent() // todo: why?
++	TheApp.SendEmptyEvent()
+ }
+ 
+ func (w *Window) CurMousePosPoint(gw *glfw.Window) image.Point {
+@@ -108,7 +108,7 @@
+ 	}
+ 	where := w.CurMousePosPoint(gw)
+ 	w.Event.MouseButton(typ, but, where, mods)
+-	glfw.PostEmptyEvent() // why?
++	TheApp.SendEmptyEvent()
+ }
+ 
+ func (w *Window) ScrollEvent(gw *glfw.Window, xoff, yoff float64) {
+@@ -120,7 +120,7 @@
+ 	}
+ 	where := w.CurMousePosPoint(gw)
+ 	w.Event.Scroll(where, delta)
+-	glfw.PostEmptyEvent()
++	TheApp.SendEmptyEvent()
+ }
+ 
+ func (w *Window) CursorPosEvent(gw *glfw.Window, x, y float64) {
+@@ -138,7 +138,7 @@
+ 		w.Event.ResettingPos = false
+ 	}
+ 	w.Event.MouseMove(where)
+-	glfw.PostEmptyEvent()
++	TheApp.SendEmptyEvent()
+ }
+ 
+ func (w *Window) CursorEnterEvent(gw *glfw.Window, entered bool) {
+--- a/core/recover.go
++++ b/core/recover.go
+@@ -34,6 +34,13 @@
+ func handleRecover(r any) {
+ 	if r == nil {
+ 		return
++	}
++	// Native callback failure has already stopped the process queue. A crash
++	// window cannot be serviced there, so fail immediately instead of waiting
++	// forever for an unreachable Quit button. Check before shared GUI state.
++	if state, ok := system.TheApp.(interface{ MainStopped() bool }); ok && state.MainStopped() {
++		system.HandleRecoverBase(r)
++		panic(r)
+ 	}
+ 	timesCrashed++
+ 	system.HandleRecoverBase(r)
+--- /dev/null
++++ b/system/driver/base/app_vellum_failure_test.go
+@@ -0,0 +1,139 @@
++package base
++
++import (
++	"errors"
++	"runtime"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++type failureOutcome struct {
++	returned bool
++	value    any
++}
++
++func observeFailure(f func()) (out failureOutcome) {
++	defer func() { out.value = recover() }()
++	f()
++	out.returned = true
++	return
++}
++
++func failureWait(t *testing.T, ch <-chan failureOutcome) failureOutcome {
++	t.Helper()
++	select {
++	case out := <-ch:
++		return out
++	case <-time.After(3 * time.Second):
++		t.Fatal("callback failure stranded its caller or loop")
++		return failureOutcome{}
++	}
++}
++
++func TestVellumMainQueueFailureReplaysPanicAndReleasesPendingCallers(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	a.InitMainQueue()
++	loop := make(chan failureOutcome, 1)
++	go func() { loop <- observeFailure(a.MainLoop) }()
++	started, release := make(chan struct{}), make(chan struct{})
++	sentinel := errors.New("callback panic identity")
++	caller := make(chan failureOutcome, 1)
++	output := 0
++	go func() {
++		caller <- observeFailure(func() {
++			a.RunOnMainIfOpen(func() { output = 42; close(started); <-release; panic(sentinel) })
++		})
++	}()
++	stopWait(t, started)
++	var waiting sync.WaitGroup
++	var pendingRan atomic.Bool
++	for i := 0; i < 64; i++ {
++		waiting.Add(1)
++		go func() {
++			defer waiting.Done()
++			if a.RunOnMainIfOpen(func() { pendingRan.Store(true) }) {
++				t.Error("pending work escaped fail-stop")
++			}
++		}()
++	}
++	close(release)
++	gotCaller, gotLoop := failureWait(t, caller), failureWait(t, loop)
++	if gotCaller.returned || gotLoop.returned || gotCaller.value != sentinel || gotLoop.value != sentinel || output != 42 {
++		t.Fatalf("panic/output publication changed: caller=%+v loop=%+v output=%d", gotCaller, gotLoop, output)
++	}
++	done := make(chan struct{})
++	go func() { waiting.Wait(); close(done) }()
++	stopWait(t, done)
++	if !a.MainStopped() || pendingRan.Load() || a.RunOnMainIfOpen(func() { t.Error("terminal callback executed") }) {
++		t.Fatal("panic did not close admission")
++	}
++}
++
++func TestVellumMainQueueFailurePreservesNilPanic(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	a.InitMainQueue()
++	loop, caller := make(chan failureOutcome, 1), make(chan failureOutcome, 1)
++	go func() { loop <- observeFailure(a.MainLoop) }()
++	go func() { caller <- observeFailure(func() { a.RunOnMainIfOpen(func() { panic(nil) }) }) }()
++	gotCaller, gotLoop := failureWait(t, caller), failureWait(t, loop)
++	if gotCaller.returned || gotLoop.returned || gotCaller.value == nil || gotCaller.value != gotLoop.value {
++		t.Fatalf("nil panic lost: caller=%+v loop=%+v", gotCaller, gotLoop)
++	}
++	if _, ok := gotCaller.value.(*runtime.PanicNilError); !ok {
++		t.Fatalf("nil panic became %T", gotCaller.value)
++	}
++}
++
++func TestVellumMainQueueFailureGoexitAcknowledgesIncomplete(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	a.InitMainQueue()
++	exited, caller := make(chan struct{}), make(chan failureOutcome, 1)
++	go func() { defer close(exited); a.MainLoop(); t.Error("Goexit loop returned") }()
++	go func() { caller <- observeFailure(func() { a.RunOnMainIfOpen(runtime.Goexit) }) }()
++	got := failureWait(t, caller)
++	stopWait(t, exited)
++	if got.returned || got.value != ErrMainCallbackIncomplete || !a.MainStopped() {
++		t.Fatalf("incomplete callback outcome=%+v", got)
++	}
++}
++
++func TestVellumMainQueueFailureInlineStartup(t *testing.T) {
++	for _, dispatch := range []func(*App, func()){
++		func(a *App, f func()) { a.RunOnMain(f) },
++		func(a *App, f func()) { a.RunOnMainIfOpen(f) },
++	} {
++		a := &App{}
++		sentinel := errors.New("startup callback panic")
++		got := observeFailure(func() { dispatch(a, func() { panic(sentinel) }) })
++		if got.returned || got.value != sentinel || !a.MainStopped() {
++			t.Fatalf("inline callback outcome=%+v", got)
++		}
++		queue, stopped := a.mainQueueChannels()
++		if queue != nil {
++			t.Fatal("failure published a queue")
++		}
++		stopWait(t, stopped)
++	}
++}
++
++func TestVellumMainQueueFailureDirectAcknowledgementIsNotSuccess(t *testing.T) {
++	a := &App{}
++	completed := true
++	var failure mainFailure
++	done := make(chan struct{}, 1)
++	sentinel := errors.New("direct callback panic")
++	got := observeFailure(func() {
++		a.ExecuteMain(FuncRun{F: func() { panic(sentinel) }, Done: done, executed: &completed, failure: &failure})
++	})
++	if got.returned || got.value != sentinel || completed || !failure.present || failure.value != sentinel {
++		t.Fatal("failed callback acknowledged as success", got, completed, failure)
++	}
++	stopWait(t, done)
++	select {
++	case <-done:
++		t.Fatal("duplicate acknowledgement")
++	default:
++	}
++}
+--- /dev/null
++++ b/system/driver/desktop/native_events.go
+@@ -0,0 +1,60 @@
++// Copyright 2026 Vellum contributors. All rights reserved.
++// Use of this source code is governed by the MIT license in the Vellum repository.
++
++package desktop
++
++import (
++	"sync"
++
++	"cogentcore.org/core/system/driver/base"
++)
++
++// GLFW is process-wide. Only initialization, event posting and termination use
++// this barrier; never hold it over polling, queue delivery, or user callbacks.
++var desktopEvents nativeEventLifecycle
++
++type nativeEventLifecycle struct {
++	mu      sync.Mutex
++	ready   bool
++	stopped bool
++}
++
++// start and stop are called on the native main thread. Native operations supplied
++// to these methods must not reenter the barrier. A failed init can be retried;
++// a terminated process loop cannot be restarted.
++func (n *nativeEventLifecycle) start(initialize func() error) error {
++	n.mu.Lock()
++	defer n.mu.Unlock()
++	if n.stopped {
++		return base.ErrMainStopped
++	}
++	if n.ready {
++		return nil
++	}
++	if err := initialize(); err != nil {
++		return err
++	}
++	n.ready = true
++	return nil
++}
++
++// wake can run on any thread. Late posts, including a callback caller's trailing
++// wake, are ignored. A post admitted here finishes before native termination.
++func (n *nativeEventLifecycle) wake(post func()) {
++	n.mu.Lock()
++	defer n.mu.Unlock()
++	if n.ready && !n.stopped {
++		post()
++	}
++}
++
++func (n *nativeEventLifecycle) stop(terminate func()) {
++	n.mu.Lock()
++	defer n.mu.Unlock()
++	n.stopped = true
++	wasReady := n.ready
++	n.ready = false
++	if wasReady {
++		terminate()
++	}
++}
+--- /dev/null
++++ b/system/driver/desktop/native_events_vellum_test.go
+@@ -0,0 +1,152 @@
++package desktop
++
++import (
++	"errors"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/system/driver/base"
++)
++
++func nativeEventWait(t *testing.T, ch <-chan struct{}) {
++	t.Helper()
++	select {
++	case <-ch:
++	case <-time.After(3 * time.Second):
++		t.Fatal("native event lifecycle blocked")
++	}
++}
++
++func TestVellumNativeEventLifecycleSerializesTerminationAndWake(t *testing.T) {
++	var n nativeEventLifecycle
++	var initialized, terminated, posts atomic.Int32
++	n.wake(func() { t.Error("pre-initialization wake posted") })
++	if err := n.start(func() error { initialized.Add(1); return nil }); err != nil {
++		t.Fatal(err)
++	}
++	if err := n.start(func() error { t.Error("duplicate initialization"); return nil }); err != nil {
++		t.Fatal(err)
++	}
++	started, release, posted := make(chan struct{}), make(chan struct{}), make(chan struct{})
++	go func() {
++		n.wake(func() {
++			close(started)
++			<-release
++			if terminated.Load() != 0 {
++				t.Error("termination overlapped post")
++			}
++			posts.Add(1)
++		})
++		close(posted)
++	}()
++	nativeEventWait(t, started)
++	stopping, stopped := make(chan struct{}), make(chan struct{})
++	go func() {
++		close(stopping)
++		n.stop(func() {
++			if posts.Load() != 1 {
++				t.Error("termination preceded accepted post")
++			}
++			terminated.Add(1)
++		})
++		close(stopped)
++	}()
++	nativeEventWait(t, stopping)
++	select {
++	case <-stopped:
++		t.Fatal("termination returned while posting")
++	case <-time.After(10 * time.Millisecond):
++	}
++	close(release)
++	nativeEventWait(t, posted)
++	nativeEventWait(t, stopped)
++	n.wake(func() { t.Error("wake posted after termination") })
++	n.stop(func() { t.Error("duplicate termination") })
++	if err := n.start(func() error { t.Error("terminal restart"); return nil }); !errors.Is(err, base.ErrMainStopped) {
++		t.Fatal("restart status", err)
++	}
++	if initialized.Load() != 1 || terminated.Load() != 1 || posts.Load() != 1 {
++		t.Fatal("lifecycle invocation counts changed")
++	}
++}
++
++func TestVellumNativeEventLifecycleConcurrentPostsAndStop(t *testing.T) {
++	for round := 0; round < 20; round++ {
++		var n nativeEventLifecycle
++		var alive atomic.Bool
++		var terminations atomic.Int32
++		if err := n.start(func() error { alive.Store(true); return nil }); err != nil {
++			t.Fatal(err)
++		}
++		var workers sync.WaitGroup
++		for i := 0; i < 100; i++ {
++			workers.Add(1)
++			go func() {
++				defer workers.Done()
++				for j := 0; j < 10; j++ {
++					n.wake(func() {
++						if !alive.Load() {
++							t.Error("post entered terminated native API")
++						}
++					})
++				}
++			}()
++		}
++		for i := 0; i < 10; i++ {
++			workers.Add(1)
++			go func() { defer workers.Done(); n.stop(func() { alive.Store(false); terminations.Add(1) }) }()
++		}
++		done := make(chan struct{})
++		go func() { workers.Wait(); close(done) }()
++		nativeEventWait(t, done)
++		if terminations.Load() != 1 || alive.Load() {
++			t.Fatal("native termination was not once")
++		}
++	}
++}
++
++func TestVellumNativeEventLifecycleInitFailureAndEarlyStop(t *testing.T) {
++	var n nativeEventLifecycle
++	sentinel := errors.New("initialization refused")
++	if err := n.start(func() error { return sentinel }); err != sentinel {
++		t.Fatal(err)
++	}
++	n.wake(func() { t.Error("failed initialization enabled wake") })
++	if err := n.start(func() error { return nil }); err != nil {
++		t.Fatal("failed initialization could not retry", err)
++	}
++	n.stop(func() {})
++	var early nativeEventLifecycle
++	early.stop(func() { t.Error("uninitialized native termination") })
++	if err := early.start(func() error { t.Error("stopped startup initialized"); return nil }); !errors.Is(err, base.ErrMainStopped) {
++		t.Fatal(err)
++	}
++}
++
++func TestVellumNativeEventLifecyclePanicReleasesBarrier(t *testing.T) {
++	var n nativeEventLifecycle
++	if err := n.start(func() error { return nil }); err != nil {
++		t.Fatal(err)
++	}
++	sentinel := errors.New("native post panic")
++	func() {
++		defer func() {
++			if recover() != sentinel {
++				t.Error("post panic identity changed")
++			}
++		}()
++		n.wake(func() { panic(sentinel) })
++	}()
++	func() {
++		defer func() {
++			if recover() != sentinel {
++				t.Error("termination panic identity changed")
++			}
++		}()
++		n.stop(func() { panic(sentinel) })
++	}()
++	n.wake(func() { t.Error("terminated panic path enabled wake") })
++	n.stop(func() { t.Error("termination panic retried") })
++}
+--- /dev/null
++++ b/core/recover_vellum_terminal_test.go
+@@ -0,0 +1,50 @@
++package core
++
++import (
++	"errors"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"cogentcore.org/core/system"
++)
++
++type terminalRecoveryApp struct {
++	system.App
++	dir string
++}
++
++func (*terminalRecoveryApp) MainStopped() bool                { return true }
++func (a *terminalRecoveryApp) AppDataDir() string             { return a.dir }
++func (*terminalRecoveryApp) Platform() system.Platforms       { return system.MacOS }
++func (*terminalRecoveryApp) SystemPlatform() system.Platforms { return system.MacOS }
++func (*terminalRecoveryApp) SystemInfo() string               { return "terminal recovery fixture" }
++
++func TestVellumTerminalMainRecoveryRethrowsWithoutCrashWindow(t *testing.T) {
++	original := system.TheApp
++	dir := t.TempDir()
++	system.TheApp = &terminalRecoveryApp{dir: dir}
++	defer func() { system.TheApp = original }()
++	before := timesCrashed
++	sentinel := errors.New("terminal original panic")
++	returned := false
++	func() {
++		defer func() {
++			if got := recover(); got != sentinel {
++				t.Fatalf("terminal recovery changed panic: %v", got)
++			}
++		}()
++		handleRecover(sentinel)
++		returned = true
++	}()
++	if returned || timesCrashed != before {
++		t.Fatal("terminal recovery entered GUI crash bookkeeping")
++	}
++	logs, err := filepath.Glob(filepath.Join(dir, "crash-logs", "crash_*"))
++	if err != nil || len(logs) != 1 {
++		t.Fatal("terminal panic omitted crash log", logs, err)
++	}
++	if info, err := os.Stat(logs[0]); err != nil || info.Size() == 0 {
++		t.Fatal("empty terminal crash log", err)
++	}
++}

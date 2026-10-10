@@ -95,3 +95,11 @@ dropped files with undo/redo and a bounded status display. Portable/native race
 checks and a synthetic cursor/Cocoa receive fixture pass; the physical Finder
 drag attempt did not produce delivery and remains unqualified. See
 [contract](../specs/file-drop.md) and [evidence](reports/macos-file-drop/README.md).
+
+Native dispatch now acknowledges failure, preserves panic identity, closes
+admission and avoids a terminal crash-dialog wait. Desktop wakes serialize with
+GLFW termination. Reproducible patch22, twenty repeated race runs and real native
+loop/windowed checks support the bounded contract. See
+[dispatch](../specs/native-dispatch.md) and
+[evidence](reports/macos-native-dispatch/README.md); broad panic resource recovery
+and remaining macOS qualification stay open.

@@ -12,6 +12,7 @@
   actions, focus scopes and bounded virtual data publication.
 - [External file drops](file-drop.md): bounded native file references and owner callbacks.
 - [Document history](history.md): bounded undo/redo, save revisions and native keyboard precedence.
+- [Native dispatch](native-dispatch.md): synchronous callback failure and desktop event termination.
 - [macOS completion](macos-completion.md): remaining framework and target acceptance work.
 - [Rendering](rendering.md): demand painting, resource lifetimes and device loss.
 - [Platform support](platform-support.md): Windows/Linux services and target gates.

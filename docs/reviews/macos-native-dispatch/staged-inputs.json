@@ -1,0 +1,33 @@
+{
+  "phase": "macos-native-dispatch",
+  "parent_commit": "7e6624cd3ea4a51a74e2efc3b43c629a42e21c36",
+  "review_report": "prism-final.json",
+  "review_report_sha256": "c69ce51d56ff23d5d6d6110871a93fc8d29081855df1b0ff5891d7b9ff2b1b42",
+  "staged_diff_sha256": "1178829389abe08d3a0a60c30a02d270e47addfb4a24a9e818dbeedba4fa7dff",
+  "files": {
+    "docs/implementation.md": "042aa6755ec0c234f7595def6e7fe1288ecc41fe1d7a0ab81b503c7060fd124d",
+    "docs/reports/README.md": "f234f18395e53213ad72d78fcdcedd65af72411ba4114500a4b5150cc31ff6a5",
+    "docs/reports/macos-native-dispatch/README.md": "b8f8adb9fc2efd3e58308c3701e208e4021b4c0aecfedf0925fca69c79fda525",
+    "docs/reports/macos-native-dispatch/full-check.txt": "cc269cc21df9d91cb4c8033a998b44682816019a2e3d4084a2578e2cba31a6b3",
+    "docs/reports/macos-native-dispatch/native-build.txt": "2b378ef44208d7c9617e5dbb2bedb54a24bc1142c7b794606507393406bf8d75",
+    "docs/reports/macos-native-dispatch/native-normal.txt": "4d8eab8462e93675e70bd5c0375106c1ced6afbc3ed0434d6f0bc443c9e83cfe",
+    "docs/reports/macos-native-dispatch/native-panic.txt": "2d60353c1d69e2744cc82d824aec2536c7b3d9138c55585b901872badcdd5ddf",
+    "docs/reports/macos-native-dispatch/prepare.txt": "348d61b66ad955d4b19e34222370d27c203ce9f624096067aeb4343e2f5d9959",
+    "docs/reports/macos-native-dispatch/source-and-check-proof.json": "8b50df2fcd60d68caa169ad7f67f8e61c2263402c0ab4a3a0109e5d0a1a5602d",
+    "docs/reports/macos-native-dispatch/stress-race.txt": "0a0e7fe18a453e1f2ddddf9deba89a3c5ab5257de09c6da1a1f4b60c95751386",
+    "docs/reports/macos-native-dispatch/window-handoff.txt": "4409c375854771c936a31fd1e1b9add5a7bc2d9709fc2ab34abe222b6d39f83f",
+    "docs/reports/macos-native-dispatch/workbench.txt": "ba3b96f2f1bf68e104a4813972cb4852de7560da162a425ce29679166653d033",
+    "drivers/cogent/cmd/mainqueue-smoke/main.go": "67a0cd19e9283f1b4a28a3d261a6dc791a18a5b20c3bd8a062244720db086516",
+    "drivers/cogent/native/README.md": "10f74b47512adc3abe220fb5c2bdcd4294cbc85faf208e8a8f89f64092dbf99a",
+    "drivers/cogent/native/dependencies.json": "b7a01a5de9debb637022333b7d3252895620a8e016fa4050254daf98be89c034",
+    "drivers/cogent/native/patches/dispatch/0022-main-dispatch-failure.patch": "e3fc27c44cbb06b420b8d8a35bbaa77a23628fc288f96e42e060f064e0acf648",
+    "drivers/cogent/native/patches/dispatch/original-hashes.json": "1925bb633e0f7a46b9032710ff73ea4e9667e57b1e6343cf2be9ded793ca73ea",
+    "drivers/cogent/native/patches/dispatch/output-hashes.json": "aa22db2188ae9e7adde7671fb66aacfdc603cc2500d686143a42ae6520fe3d05",
+    "drivers/cogent/prepare_test.py": "8657925167209bd9adeaa24a5ad4392ce286d9dba59b74ba32f18b112f9c680a",
+    "scripts/check.sh": "fc9d5efe251fed3836d75c95d7f3500b9fb8439a3d8fc2d0b60926cd4010c82f",
+    "specs/README.md": "f6981a444d579ffc5283b231d051025d19c01f0228d2dde34428dac6f5731c9f",
+    "specs/macos-completion.md": "7c7514c4d0e356c9369d5ffa9e108dc03c1310afc81b525d4480561a5d30b6c8",
+    "specs/native-dispatch.md": "f72fa6c5740b014f703ed0ecfa407001eaf4ef06dae025ebea4e6d0146aa282e"
+  },
+  "scope": "Implementation/specification/test/evidence inputs before adding immutable review records."
+}
