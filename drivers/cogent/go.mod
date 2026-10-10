@@ -47,6 +47,6 @@ require (
 
 replace (
  example.com/vellum => ../..
- cogentcore.org/core => ../../prototypes/foundationintegration/build/upstream
- github.com/go-text/typesetting => ../../prototypes/fontresources/build/typesetting
+ cogentcore.org/core => ./build/upstream
+ github.com/go-text/typesetting => ./build/typesetting
 )

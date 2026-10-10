@@ -5,9 +5,11 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+      - run: echo "VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-go-cache" >> "$GITHUB_ENV"
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
       - run: drivers/cogent/prepare.sh
       - run: scripts/check.sh
+      - run: scripts/benchmark.sh

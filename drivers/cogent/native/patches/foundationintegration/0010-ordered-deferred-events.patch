@@ -1,0 +1,108 @@
+--- a/events/deque.go
++++ b/events/deque.go
+@@ -55,10 +55,7 @@
+ 			return e
+ 		}
+ 
+-		if n := len(q.Back); n > 0 {
+-			e := q.Back[0]
+-			q.Back[0] = nil
+-			q.Back = q.Back[1:]
++		if e, ok := q.nextBack(); ok {
+ 			return e
+ 		}
+ 
+@@ -80,10 +77,7 @@
+ 		return e, true
+ 	}
+ 
+-	if n := len(q.Back); n > 0 {
+-		e := q.Back[0]
+-		q.Back[0] = nil
+-		q.Back = q.Back[1:]
++	if e, ok := q.nextBack(); ok {
+ 		return e, true
+ 	}
+ 	return nil, false
+@@ -147,3 +141,81 @@
+ 	q.Front = append(q.Front, ev)
+ 	q.Cond.Signal()
+ }
++
++// DeferredEvent occupies a FIFO position before its producer is ready. Ready
++// and Merge run under Deque.Mu and must not reenter the deque. Merge may combine
++// only adjacent ready events and must bound the work represented by one event.
++// Priority events in Front retain their existing precedence.
++type DeferredEvent interface {
++	Event
++	Ready() bool
++	Merge(DeferredEvent) bool
++}
++
++// SendDeferred admits and appends atomically relative to ordinary Send calls.
++// prepare runs under Deque.Mu; nil means a coalesced publication needs no node.
++// It must not reenter the deque or block waiting for UI/native work.
++func (q *Deque) SendDeferred(prepare func() (DeferredEvent, error)) error {
++	q.LockAndInit()
++	defer q.Mu.Unlock()
++	e, err := prepare()
++	if err != nil {
++		return err
++	}
++	if e != nil {
++		q.Back = append(q.Back, e)
++	}
++	q.Cond.Signal()
++	return nil
++}
++
++// UpdateDeferred commits/cancels under the same lock as admission and wakes a
++// consumer blocked on an unready FIFO head. After successful update, remove may
++// erase canceled or closed-owner nodes without leaving unbounded tombstones.
++// Both callbacks must obey the same non-reentrancy rule as SendDeferred.
++func (q *Deque) UpdateDeferred(update func() error, remove func(DeferredEvent) bool) error {
++	q.LockAndInit()
++	defer q.Mu.Unlock()
++	if err := update(); err != nil {
++		return err
++	}
++	if remove != nil {
++		old := q.Back
++		keep := old[:0]
++		for _, e := range old {
++			if d, ok := e.(DeferredEvent); ok && remove(d) {
++				continue
++			}
++			keep = append(keep, e)
++		}
++		clear(old[len(keep):])
++		q.Back = keep
++	}
++	q.Cond.Signal()
++	return nil
++}
++
++// nextBack runs with Mu held. An unready head blocks FIFO events without spin;
++// NextEvent can still receive priority window events while waiting on Cond.
++func (q *Deque) nextBack() (Event, bool) {
++	if len(q.Back) == 0 {
++		return nil, false
++	}
++	e := q.Back[0]
++	n := 1
++	if d, ok := e.(DeferredEvent); ok {
++		if !d.Ready() {
++			return nil, false
++		}
++		for n < len(q.Back) {
++			other, ok := q.Back[n].(DeferredEvent)
++			if !ok || !other.Ready() || !d.Merge(other) {
++				break
++			}
++			n++
++		}
++	}
++	clear(q.Back[:n])
++	q.Back = q.Back[n:]
++	return e, true
++}

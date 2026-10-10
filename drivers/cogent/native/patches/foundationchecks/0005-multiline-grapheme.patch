@@ -1,0 +1,152 @@
+--- /dev/null
++++ b/text/lines/grapheme.go
+@@ -0,0 +1,42 @@
++package lines
++
++import "cogentcore.org/core/text/textpos"
++
++// MoveForwardGrapheme moves in logical extended grapheme clusters. A line
++// boundary is one step. MoveForward retains its existing rune semantics.
++func (ls *Lines) MoveForwardGrapheme(pos textpos.Pos, steps int) textpos.Pos {
++	ls.Lock()
++	defer ls.Unlock()
++	if !ls.isValidPos(pos) {
++		return pos
++	}
++	for range max(0, steps) {
++		line := ls.lines[pos.Line]
++		if pos.Char < len(line) {
++			pos.Char = textpos.NextGrapheme(line, pos.Char)
++		} else if pos.Line < len(ls.lines)-1 {
++			pos.Line++
++			pos.Char = 0
++		}
++	}
++	return pos
++}
++
++// MoveBackwardGrapheme moves in logical extended grapheme clusters. A line
++// boundary is one step. MoveBackward retains its existing rune semantics.
++func (ls *Lines) MoveBackwardGrapheme(pos textpos.Pos, steps int) textpos.Pos {
++	ls.Lock()
++	defer ls.Unlock()
++	if !ls.isValidPos(pos) {
++		return pos
++	}
++	for range max(0, steps) {
++		if pos.Char > 0 {
++			pos.Char = textpos.PrevGrapheme(ls.lines[pos.Line], pos.Char)
++		} else if pos.Line > 0 {
++			pos.Line--
++			pos.Char = len(ls.lines[pos.Line])
++		}
++	}
++	return pos
++}
+--- /dev/null
++++ b/text/lines/grapheme_vellum_test.go
+@@ -0,0 +1,44 @@
++package lines
++
++import (
++	"cogentcore.org/core/text/textpos"
++	"testing"
++)
++
++func TestFoundationGraphemeNavigationAndDelete(t *testing.T) {
++	for _, s := range []string{"é", "👩‍💻", "👨‍👩‍👧‍👦", "🇺🇳", "नमस्ते"} {
++		t.Run(s, func(t *testing.T) {
++			ls := NewLines().SetText([]byte(s))
++			defer ls.Close()
++			end := ls.EndPos()
++			prev := ls.MoveBackwardGrapheme(end, 1)
++			want := textpos.PrevGrapheme([]rune(s), len([]rune(s)))
++			if prev.Char != want {
++				t.Fatalf("backward %+v, want rune %d", prev, want)
++			}
++			if next := ls.MoveForwardGrapheme(prev, 1); next != end {
++				t.Fatalf("roundtrip %+v != %+v", next, end)
++			}
++			ls.DeleteText(prev, end)
++			if got := string(ls.Line(0)); got != string([]rune(s)[:want]) {
++				t.Fatalf("delete %q", got)
++			}
++		})
++	}
++	ls := NewLines().SetText([]byte("é\n👩‍💻"))
++	defer ls.Close()
++	a := textpos.Pos{Line: 0, Char: 2}
++	b := textpos.Pos{Line: 1, Char: 0}
++	if ls.MoveForwardGrapheme(a, 1) != b || ls.MoveBackwardGrapheme(b, 1) != a {
++		t.Fatal("line boundary")
++	}
++	if ls.MoveForwardGrapheme(a, -1) != a || ls.MoveBackwardGrapheme(b, -1) != b {
++		t.Fatal("negative steps")
++	}
++	if ls.MoveForwardGrapheme(textpos.Pos{}, 1).Char != 2 {
++		t.Fatal("forward combining")
++	}
++	if ls.MoveForward(textpos.Pos{}, 1).Char != 1 {
++		t.Fatal("rune API changed")
++	}
++}
+--- a/text/textcore/nav.go
++++ b/text/textcore/nav.go
+@@ -157,7 +157,7 @@
+ // cursorForward moves the cursor forward
+ func (ed *Base) cursorForward(steps int) {
+ 	org := ed.validateCursor()
+-	ed.CursorPos = ed.Lines.MoveForward(org, steps)
++	ed.CursorPos = ed.Lines.MoveForwardGrapheme(org, steps)
+ 	ed.setCursorColumn(ed.CursorPos)
+ 	ed.cursorSelectShow(org)
+ }
+@@ -173,7 +173,7 @@
+ // cursorBackward moves the cursor backward
+ func (ed *Base) cursorBackward(steps int) {
+ 	org := ed.validateCursor()
+-	ed.CursorPos = ed.Lines.MoveBackward(org, steps)
++	ed.CursorPos = ed.Lines.MoveBackwardGrapheme(org, steps)
+ 	ed.setCursorColumn(ed.CursorPos)
+ 	ed.cursorSelectShow(org)
+ }
+--- /dev/null
++++ b/text/textcore/grapheme_foundation_test.go
+@@ -0,0 +1,37 @@
++package textcore
++
++import (
++	"cogentcore.org/core/text/textpos"
++	"testing"
++)
++
++func TestFoundationEditorGraphemeEditing(t *testing.T) {
++	for _, tc := range []struct{ input, prefix, first string }{
++		{"é", "", "é"}, {"👩‍💻", "", "👩‍💻"}, {"👨‍👩‍👧‍👦", "", "👨‍👩‍👧‍👦"}, {"🇺🇳", "", "🇺🇳"}, {"नमस्ते", "नम", "न"},
++	} {
++		t.Run(tc.input, func(t *testing.T) {
++			ed := NewEditor()
++			defer ed.Lines.Close()
++			ed.Lines.SetText([]byte(tc.input))
++			ed.CursorPos = ed.Lines.EndPos()
++			ed.cursorBackspace(1)
++			if got := string(ed.Lines.Line(0)); got != tc.prefix || ed.CursorPos.Char != len([]rune(tc.prefix)) {
++				t.Fatalf("backspace %q @%+v", got, ed.CursorPos)
++			}
++			ed.Lines.SetText([]byte(tc.input))
++			ed.CursorPos = textpos.Pos{}
++			ed.cursorForward(1)
++			if ed.CursorPos.Char != len([]rune(tc.first)) {
++				t.Fatalf("forward @%+v", ed.CursorPos)
++			}
++			ed.cursorBackward(1)
++			if ed.CursorPos.Char != 0 {
++				t.Fatalf("backward @%+v", ed.CursorPos)
++			}
++			ed.cursorDelete(1)
++			if got := string(ed.Lines.Line(0)); got != string([]rune(tc.input)[len([]rune(tc.first)):]) || ed.CursorPos.Char != 0 {
++				t.Fatalf("delete %q @%+v", got, ed.CursorPos)
++			}
++		})
++	}
++}

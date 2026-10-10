@@ -1,0 +1,1844 @@
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -22,6 +22,7 @@
+ 	"cogentcore.org/core/icons"
+ 	"cogentcore.org/core/keymap"
+ 	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
+ 	"cogentcore.org/core/styles"
+ 	"cogentcore.org/core/styles/abilities"
+ 	"cogentcore.org/core/styles/states"
+@@ -42,6 +43,12 @@
+ // to be rendered on a single line. With multi-line wrapped text,
+ // the text is still treated as a single contiguous line of wrapped text.
+ type TextField struct { //core:embedder
++	visualGeometry   *shaped.Interaction
++	visualText       string
++	visualNoEcho     bool
++	nativeLastLayout *shaped.Lines
++	visualLine       int
++	visualScroll     float32
+ 	Frame
+ 
+ 	// Type is the styling type of the text field.
+@@ -683,34 +690,14 @@
+ 
+ // cursorDown moves the cursor down
+ func (tf *TextField) cursorDown(steps int) {
+-	if tf.numLines <= 1 {
+-		return
+-	}
+-	if tf.cursorLine >= tf.numLines-1 {
+-		return
+-	}
+-	tf.cursorPos = tf.renderVisible.RuneAtLineDelta(tf.cursorPos, steps)
+-	tf.updateLinePos()
+-	if tf.selectMode {
+-		tf.selectRegionUpdate(tf.cursorPos)
+-	}
+-	tf.NeedsRender()
++	tf.cursorVisualLine(steps)
++
+ }
+ 
+ // cursorUp moves the cursor up
+ func (tf *TextField) cursorUp(steps int) {
+-	if tf.numLines <= 1 {
+-		return
+-	}
+-	if tf.cursorLine <= 0 {
+-		return
+-	}
+-	tf.cursorPos = tf.renderVisible.RuneAtLineDelta(tf.cursorPos, -steps)
+-	tf.updateLinePos()
+-	if tf.selectMode {
+-		tf.selectRegionUpdate(tf.cursorPos)
+-	}
+-	tf.NeedsRender()
++	tf.cursorVisualLine(-steps)
++
+ }
+ 
+ // cursorStart moves the cursor to the start of the text, updating selection
+@@ -1168,18 +1155,13 @@
+ // in the overall RenderAll of all the text.
+ // These positions can be out of visible range: see CharRenderPos
+ func (tf *TextField) charPos(idx int) math32.Vector2 {
+-	if idx <= 0 || len(tf.renderAll.Lines) == 0 {
+-		return math32.Vector2{}
+-	}
+-	bb := tf.renderAll.RuneBounds(idx)
+-	if idx >= len(tf.editText) {
+-		if tf.numLines > 1 && tf.editText[len(tf.editText)-1] == ' ' {
+-			bb.Max.X += tf.lineHeight * 0.2
+-			return bb.Max
+-		}
+-		return bb.Max
+-	}
+-	return bb.Min
++	if g := tf.interactionGeometry(); g != nil {
++		if c, ok := g.At(idx, tf.visualLine); ok {
++			return c.Pos
++		}
++	}
++	return tf.legacyCharPos(idx)
++
+ }
+ 
+ // relCharPos returns the text width in dots between the two text string
+@@ -1195,7 +1177,8 @@
+ 	pos := tf.effPos
+ 	sc := tf.Scene
+ 	pos = pos.Add(math32.FromPoint(sc.SceneGeom.Pos))
+-	cpos := tf.relCharPos(tf.dispRange.Start, charidx)
++	cpos := tf.charPos(charidx)
++	cpos.X -= tf.visualScroll
+ 	return pos.Add(cpos)
+ }
+ 
+@@ -1291,152 +1274,42 @@
+ 	if tf.nativeComposition == nil {
+ 		tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, tf.cursorPos)
+ 	}
+-
+-	if tf.hasWordWrap() { // does not scroll
+-		tf.dispRange.Start = 0
+-		tf.dispRange.End = n
+-		if len(tf.renderAll.Lines) != tf.numLines {
+-			tf.renderVisible = nil
+-			tf.NeedsLayout()
+-		}
+-		return
+-	}
+-	st := &tf.Styles
+-
+-	if n == 0 || tf.Geom.Size.Actual.Content.X <= 0 {
+-		tf.cursorPos = 0
+-		tf.dispRange.End = 0
+-		tf.dispRange.Start = 0
+-		return
+-	}
+-	maxw := tf.effSize.X
+-	if maxw < 0 {
+-		return
+-	}
+-	tf.charWidth = int(maxw / st.UnitContext.Dots(units.UnitCh)) // rough guess in chars
+-	if tf.charWidth < 1 {
+-		tf.charWidth = 1
+-	}
+-
+-	// first rationalize all the values
+-	if tf.dispRange.End == 0 || tf.dispRange.End > n { // not init
+-		tf.dispRange.End = n
+-	}
+-	if tf.dispRange.Start >= tf.dispRange.End {
+-		tf.dispRange.Start = max(0, tf.dispRange.End-tf.charWidth)
+-	}
+-
+-	inc := int(math32.Ceil(.1 * float32(tf.charWidth)))
+-	inc = max(4, inc)
+-
+-	// keep cursor in view with buffer
+-	startIsAnchor := true
+-	if tf.cursorPos < (tf.dispRange.Start + inc) {
+-		tf.dispRange.Start -= inc
+-		tf.dispRange.Start = max(tf.dispRange.Start, 0)
+-		tf.dispRange.End = tf.dispRange.Start + tf.charWidth
+-		tf.dispRange.End = min(n, tf.dispRange.End)
+-	} else if tf.cursorPos > (tf.dispRange.End - inc) {
+-		tf.dispRange.End += inc
+-		tf.dispRange.End = min(tf.dispRange.End, n)
+-		tf.dispRange.Start = tf.dispRange.End - tf.charWidth
+-		tf.dispRange.Start = max(0, tf.dispRange.Start)
+-		startIsAnchor = false
+-	}
+-	if tf.dispRange.End < tf.dispRange.Start {
+-		return
+-	}
+-
+-	if startIsAnchor {
+-		gotWidth := false
+-		spos := tf.charPos(tf.dispRange.Start).X
+-		for {
+-			w := tf.charPos(tf.dispRange.End).X - spos
+-			if w < maxw {
+-				if tf.dispRange.End == n {
+-					break
+-				}
+-				nw := tf.charPos(tf.dispRange.End+1).X - spos
+-				if nw >= maxw {
+-					gotWidth = true
+-					break
+-				}
+-				tf.dispRange.End++
+-			} else {
+-				tf.dispRange.End--
+-			}
+-		}
+-		if gotWidth || tf.dispRange.Start == 0 {
+-			return
+-		}
+-		// otherwise, try getting some more chars by moving up start..
+-	}
+-
+-	// end is now anchor
+-	epos := tf.charPos(tf.dispRange.End).X
+-	for {
+-		w := epos - tf.charPos(tf.dispRange.Start).X
+-		if w < maxw {
+-			if tf.dispRange.Start == 0 {
+-				break
+-			}
+-			nw := epos - tf.charPos(tf.dispRange.Start-1).X
+-			if nw >= maxw {
+-				break
+-			}
+-			tf.dispRange.Start--
+-		} else {
+-			tf.dispRange.Start++
+-		}
+-	}
++	tf.dispRange = textpos.Range{Start: 0, End: n}
++	tf.renderVisible = tf.renderAll // shape the full paragraph, never a reordered substring
++	tf.renderedRange = tf.dispRange
++	if tf.hasWordWrap() {
++		tf.visualScroll = 0
++		return
++	}
++	width := max(float32(0), tf.effSize.X-1)
++	x := tf.charPos(tf.cursorPos).X
++	if x < tf.visualScroll {
++		tf.visualScroll = x
++	}
++	if x > tf.visualScroll+width {
++		tf.visualScroll = x - width
++	}
++	tf.clampVisualScroll()
++
+ }
+ 
+ // pixelToCursor finds the cursor position that corresponds to the given pixel location
+ func (tf *TextField) pixelToCursor(pt image.Point) (pos int) {
+-	defer func() { pos = textpos.GraphemeAtOrBefore(tf.editText, pos) }()
+-	ptf := math32.FromPoint(pt)
+-	rpt := ptf.Sub(tf.effPos)
+-	if rpt.X <= 0 || rpt.Y < 0 {
+-		return tf.dispRange.Start
+-	}
+-	n := len(tf.editText)
+-	if tf.hasWordWrap() {
+-		ix := tf.renderAll.RuneAtPoint(ptf, tf.effPos)
+-		if ix >= 0 {
+-			return ix
+-		}
+-		return tf.dispRange.Start
+-	}
+-	pr := tf.PointToRelPos(pt)
+-
+-	px := float32(pr.X)
+-	st := &tf.Styles
+-	c := tf.dispRange.Start + int(float64(px/st.UnitContext.Dots(units.UnitCh)))
+-	c = min(c, n)
+-
+-	w := tf.relCharPos(tf.dispRange.Start, c).X
+-	if w > px {
+-		for w > px {
+-			c--
+-			if c <= tf.dispRange.Start {
+-				c = tf.dispRange.Start
+-				break
+-			}
+-			w = tf.relCharPos(tf.dispRange.Start, c).X
+-		}
+-	} else if w < px {
+-		for c < tf.dispRange.End {
+-			wn := tf.relCharPos(tf.dispRange.Start, c+1).X
+-			if wn > px {
+-				break
+-			} else if wn == px {
+-				c++
+-				break
+-			}
+-			c++
+-		}
+-	}
+-	return c
++	tf.refreshInteractionLayout()
++	if g := tf.interactionGeometry(); g != nil {
++		p := math32.FromPoint(pt).Sub(tf.effPos)
++		p.X += tf.visualScroll
++		if c, ok := g.Nearest(p); ok {
++			tf.visualLine = c.Line
++			return c.Rune
++		}
++	}
++	if tf.renderAll != nil {
++		r := tf.renderAll.RuneAtPoint(math32.FromPoint(pt), tf.effPos.Sub(math32.Vec2(tf.visualScroll, 0)))
++		return textpos.GraphemeAtOrBefore(tf.editText, max(0, min(len(tf.editText), r)))
++	}
++	return 0
++
+ }
+ 
+ // setCursorFromPixel finds cursor location from given scene-relative
+@@ -1477,7 +1350,7 @@
+ 		case keymap.MoveRight:
+ 			e.SetHandled()
+ 			tf.shiftSelect(e)
+-			tf.cursorForward(textpos.NextGrapheme(tf.editText, tf.cursorPos) - tf.cursorPos)
++			tf.cursorVisual(1)
+ 			tf.offerComplete()
+ 		case keymap.WordRight:
+ 			e.SetHandled()
+@@ -1487,7 +1360,7 @@
+ 		case keymap.MoveLeft:
+ 			e.SetHandled()
+ 			tf.shiftSelect(e)
+-			tf.cursorBackward(tf.cursorPos - textpos.PrevGrapheme(tf.editText, tf.cursorPos))
++			tf.cursorVisual(-1)
+ 			tf.offerComplete()
+ 		case keymap.WordLeft:
+ 			e.SetHandled()
+@@ -1657,6 +1530,9 @@
+ 	etxs := *tsty
+ 	etxs.Align, etxs.AlignV = text.Start, text.Start // only works with this
+ 	tx := rich.NewText(sty, txt)
++	tf.visualGeometry = nil
++	tf.visualText = string(tf.editText)
++	tf.visualNoEcho = tf.NoEcho
+ 	tf.renderAll = tf.Scene.TextShaper().WrapLines(tx, sty, &etxs, sz)
+ 	rsz := tf.renderAll.Bounds.Size().Ceil()
+ 	return rsz
+@@ -1791,14 +1667,15 @@
+ 	if tf.dispRange.Start < 0 || tf.dispRange.End > len(tf.editText) {
+ 		return
+ 	}
+-	if tf.renderVisible == nil || tf.dispRange != tf.renderedRange {
+-		tf.layoutCurrent()
+-	}
++
+ 	tf.updateCursorPosition()
+ 	tf.renderHighlights()
+ 	tf.renderSelect()
+-	tf.Scene.Painter.DrawText(tf.renderVisible, tf.effPos)
++	pc := &tf.Scene.Painter
++	pc.PushContext(nil, render.NewBoundsRect(tf.textViewport(), tf.Styles.Border.Radius.Dots()))
++	pc.DrawTextWithGeometry(tf.renderVisible, tf.effPos.Sub(math32.Vec2(tf.visualScroll, 0)), tf.interactionGeometry())
+ 	tf.renderNativeComposition()
++	pc.PopContext()
+ 	tf.notifyNativeEditing()
+ }
+ 
+--- a/core/textfield_editing.go
++++ b/core/textfield_editing.go
+@@ -12,12 +12,13 @@
+ type TextFieldEditingState struct {
+ 	Text                  string
+ 	Cursor, Anchor, Focus int
++	VisualLine            int
+ 	Caret                 image.Rectangle
+ }
+ 
+ // EditingState exposes the field's logical selection without native encoding.
+ func (tf *TextField) EditingState() TextFieldEditingState {
+-	state := TextFieldEditingState{Text: string(tf.editText), Cursor: tf.cursorPos, Anchor: tf.cursorPos, Focus: tf.cursorPos}
++	state := TextFieldEditingState{Text: string(tf.editText), VisualLine: tf.visualLine, Cursor: tf.cursorPos, Anchor: tf.cursorPos, Focus: tf.cursorPos}
+ 	if tf.selectRange.Start >= 0 && tf.selectRange.Start < tf.selectRange.End && tf.selectRange.End <= len(tf.editText) {
+ 		state.Anchor, state.Focus = tf.selectRange.Start, tf.selectRange.End
+ 		if tf.cursorPos == state.Anchor {
+@@ -40,6 +41,7 @@
+ 	}
+ 	tf.selectInit = anchor
+ 	tf.cursorPos = focus
++	tf.visualLine = -1
+ 	tf.selectRange = textpos.Range{Start: min(anchor, focus), End: max(anchor, focus)}
+ 	tf.selectMode, tf.selectModeShift = false, false
+ 	tf.updateLinePos()
+--- a/core/textfield_native.go
++++ b/core/textfield_native.go
+@@ -117,6 +117,8 @@
+ 	tf.selectRange = textpos.Range{Start: min(anchor, focus), End: max(anchor, focus)}
+ 	tf.selectMode, tf.selectModeShift = false, false
+ 	tf.renderVisible = nil
++	tf.visualGeometry = nil
++	tf.visualLine = -1
+ 	tf.updateLinePos()
+ 	tf.NeedsRender()
+ 	return true
+@@ -130,16 +132,24 @@
+ 	if start >= end {
+ 		return
+ 	}
+-	a, b := tf.charRenderPos(start), tf.charRenderPos(end)
+-	// This seam is exercised only with wrapping disabled and logical LTR input.
+ 	pc := tf.Scene.Painter
+ 	fill, stroke, width := pc.Fill.Color, pc.Stroke.Color, pc.Stroke.Width
+ 	pc.Fill.Color = nil
+ 	pc.Stroke.Color = tf.CursorColor
+ 	pc.Stroke.Width.Dot(1)
+-	y := a.Y + tf.lineHeight - 1
+-	pc.Line(a.X, y, b.X, y)
+-	pc.Draw()
++	geometry := tf.NativeTextGeometry()
++	for _, cell := range geometry.Cells {
++		if cell.Range.Intersect(textpos.Range{Start: start, End: end}).Len() == 0 {
++			continue
++		}
++		// Painter coordinates are scene-relative; native snapshots include window offset.
++		rect := cell.Rect
++		scene := tf.Scene.SceneGeom.Pos
++		y := rect.Max.Y - float32(scene.Y) - 1
++		pc.Line(rect.Min.X-float32(scene.X), y, rect.Max.X-float32(scene.X), y)
++		pc.Draw()
++	}
++
+ 	pc.Fill.Color, pc.Stroke.Color, pc.Stroke.Width = fill, stroke, width
+ }
+ 
+@@ -149,7 +159,7 @@
+ 	if caret.Empty() || tf.Scene == nil {
+ 		return image.Rectangle{}
+ 	}
+-	visible := tf.Geom.ContentBBox.Add(tf.Scene.SceneGeom.Pos)
++	visible := tf.textViewport().Add(tf.Scene.SceneGeom.Pos)
+ 	if visible.Empty() {
+ 		return image.Rectangle{}
+ 	}
+@@ -166,9 +176,10 @@
+ 	}
+ 	state := tf.EditingState()
+ 	state.Caret = tf.NativeCaretBounds()
+-	if state == tf.nativeLastState {
++	if state == tf.nativeLastState && tf.nativeLastLayout == tf.renderAll {
+ 		return
+ 	}
+ 	tf.nativeLastState = state
++	tf.nativeLastLayout = tf.renderAll
+ 	tf.nativeListener(state)
+ }
+--- a/core/textfield_visual.go
++++ b/core/textfield_visual.go
+@@ -0,0 +1,168 @@
++// Experimental strong-caret navigation and owned layout geometry for Vellum.
++package core
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/textpos"
++	"image"
++	"slices"
++)
++
++func (tf *TextField) interactionGeometry() *shaped.Interaction {
++	if tf.renderAll == nil {
++		return nil
++	}
++	if tf.visualGeometry == nil {
++		tf.visualGeometry = tf.renderAll.InteractionLayout()
++		if tf.NoEcho || len(tf.editText) == 0 {
++			bounds := textpos.GraphemeBounds(tf.editText)
++			tf.visualGeometry.Carets = slices.DeleteFunc(tf.visualGeometry.Carets, func(c shaped.Caret) bool {
++				return func() bool { _, ok := slices.BinarySearch(bounds, c.Rune); return !ok }()
++			})
++		}
++	}
++	return tf.visualGeometry
++}
++func (tf *TextField) cursorVisual(delta int) {
++	tf.refreshInteractionLayout()
++	if g := tf.interactionGeometry(); g != nil {
++		if c, ok := g.Move(tf.cursorPos, tf.visualLine, delta); ok {
++			tf.cursorPos, tf.visualLine = c.Rune, c.Line
++			tf.cursorLine = c.Line
++			if tf.selectMode {
++				tf.selectRegionUpdate(tf.cursorPos)
++			}
++			tf.NeedsRender()
++			return
++		}
++	}
++	// Before layout, logical grapheme navigation is the only available behavior.
++	if delta > 0 {
++		tf.cursorForward(textpos.NextGrapheme(tf.editText, tf.cursorPos) - tf.cursorPos)
++	} else {
++		tf.cursorBackward(tf.cursorPos - textpos.PrevGrapheme(tf.editText, tf.cursorPos))
++	}
++}
++
++// TextFieldGeometry is an owned snapshot in physical window/scene pixels.
++// Native clients copy this on the UI thread and publish it with the same text/ack.
++type TextFieldGeometry struct {
++	Cells    []shaped.Cell
++	Carets   []shaped.Caret
++	Viewport math32.Box2
++}
++
++func (tf *TextField) NativeTextGeometry() TextFieldGeometry {
++	var out TextFieldGeometry
++	if tf.Scene == nil || tf.NoEcho {
++		return out
++	}
++	out.Viewport = math32.B2FromRect(tf.textViewport().Add(tf.Scene.SceneGeom.Pos))
++	if tf.renderAll == nil || tf.visualText != string(tf.editText) || tf.visualNoEcho != tf.NoEcho {
++		return out
++	}
++	off := tf.effPos.Add(math32.FromPoint(tf.Scene.SceneGeom.Pos)).Sub(math32.Vec2(tf.visualScroll, 0))
++	if len(tf.editText) == 0 {
++		out.Carets = []shaped.Caret{{Rune: 0, Line: 0, Pos: off, Height: max(1, tf.lineHeight)}}
++		return out
++	}
++	if g := tf.interactionGeometry(); g != nil {
++		for _, c := range g.Cells {
++			c.Rect = c.Rect.Translate(off)
++			out.Cells = append(out.Cells, c)
++		}
++		for _, c := range g.Carets {
++			c.Pos = c.Pos.Add(off)
++			out.Carets = append(out.Carets, c)
++		}
++	}
++	return out
++}
++
++func (tf *TextField) cursorVisualLine(delta int) {
++	tf.refreshInteractionLayout()
++	if g := tf.interactionGeometry(); g != nil {
++		if c, ok := g.At(tf.cursorPos, tf.visualLine); ok && g.SupportsLine(c.Line) && g.SupportsLine(c.Line+delta) {
++			target := c.Line + delta
++			best := c
++			distance := float32(1e30)
++			found := false
++			for _, other := range g.Carets {
++				if other.Line == target {
++					d := math32.Abs(other.Pos.X - c.Pos.X)
++					if d < distance {
++						best = other
++						distance = d
++						found = true
++					}
++				}
++			}
++			if found || target < 0 || target >= len(tf.renderAll.Lines) {
++				tf.cursorPos, tf.visualLine, tf.cursorLine = best.Rune, best.Line, best.Line
++				if tf.selectMode {
++					tf.selectRegionUpdate(tf.cursorPos)
++				}
++				tf.NeedsRender()
++				return
++			}
++		}
++	}
++	// Unsupported interaction runs retain their existing glyph-based navigation.
++	if tf.renderAll != nil {
++		r := tf.renderAll.RuneAtLineDelta(tf.cursorPos, delta)
++		tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, max(0, min(len(tf.editText), r)))
++		tf.visualLine = -1
++		tf.updateLinePos()
++		if tf.selectMode {
++			tf.selectRegionUpdate(tf.cursorPos)
++		}
++		tf.NeedsRender()
++	}
++}
++
++// Exclude leading/trailing icons from text clipping and native hit-testing.
++func (tf *TextField) textViewport() image.Rectangle {
++	bounds := tf.Geom.ContentBBox
++	return image.Rect(int(tf.effPos.X), bounds.Min.Y, int(tf.effPos.X+tf.effSize.X), bounds.Max.Y).Intersect(bounds)
++}
++
++func (tf *TextField) refreshInteractionLayout() {
++	// A queued edit can precede its render. Refresh before consulting layout.
++	if tf.Scene != nil && (tf.renderAll == nil || tf.visualText != string(tf.editText) || tf.visualNoEcho != tf.NoEcho) {
++		tf.configTextSize(tf.Geom.Size.Actual.Content.Sub(tf.iconsSize()))
++		tf.clampVisualScroll()
++	}
++}
++
++func (tf *TextField) clampVisualScroll() {
++	if tf.hasWordWrap() {
++		tf.visualScroll = 0
++		return
++	}
++	width := max(float32(0), tf.effSize.X-1)
++	advance := float32(0)
++	if g := tf.interactionGeometry(); g != nil {
++		advance = max(advance, g.ExtentX)
++		for _, cell := range g.Cells {
++			advance = max(advance, cell.Rect.Max.X)
++		}
++	}
++	tf.visualScroll = max(float32(0), min(tf.visualScroll, max(float32(0), advance-width)))
++}
++
++// Preserve prior positioning for unsupported vertical/math interaction runs.
++func (tf *TextField) legacyCharPos(idx int) math32.Vector2 {
++	if idx <= 0 || len(tf.renderAll.Lines) == 0 {
++		return math32.Vector2{}
++	}
++	bb := tf.renderAll.RuneBounds(idx)
++	if idx >= len(tf.editText) {
++		if tf.numLines > 1 && tf.editText[len(tf.editText)-1] == ' ' {
++			bb.Max.X += tf.lineHeight * 0.2
++			return bb.Max
++		}
++		return bb.Max
++	}
++	return bb.Min
++}
+--- a/core/textfield_visual_test.go
++++ b/core/textfield_visual_test.go
+@@ -0,0 +1,315 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/system/composer"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++	"cogentcore.org/core/text/textpos"
++	"github.com/go-text/typesetting/di"
++	"github.com/go-text/typesetting/shaping"
++	"golang.org/x/image/math/fixed"
++	"image"
++	"image/png"
++	"os"
++	"slices"
++	"testing"
++)
++
++func visualField(source string) *TextField {
++	tf := NewTextField(NewBody()).SetText(source)
++	uc := units.Context{}
++	uc.Defaults()
++	ts := text.NewStyle()
++	ts.WhiteSpace = text.WrapNever
++	ts.ToDots(&uc)
++	sty := rich.NewStyle()
++	tf.renderAll = shapedgt.NewShaperWithFonts(fonts.Embedded).WrapLines(rich.NewText(sty, []rune(source)), sty, ts, math32.Vec2(1000, 100))
++	tf.visualText = source
++	tf.renderVisible = tf.renderAll
++	tf.numLines = 1
++	tf.lineHeight = tf.renderAll.LineHeight
++	return tf
++}
++func TestVellumVisualArrowHandlersAndSelection(t *testing.T) {
++	tf := visualField("abc אבג xyz")
++	tf.SetEditingSelection(0, 0)
++	var got []int
++	for range 7 {
++		ev := events.NewKey(events.KeyChord, 0, key.CodeRightArrow, 1<<key.Shift)
++		ev.Init()
++		tf.HandleEvent(ev)
++		if !ev.IsHandled() {
++			t.Fatal("handler not reached")
++		}
++		got = append(got, tf.cursorPos)
++	}
++	if !slices.Equal(got, []int{1, 2, 3, 4, 6, 5, 7}) {
++		t.Fatalf("right-arrow order %v", got)
++	}
++	if tf.selectRange.Start != 0 || tf.selectRange.End != 7 || tf.selectInit != 0 {
++		t.Fatal("logical selection anchor lost")
++	}
++	tf.cursorVisual(-1)
++	if tf.cursorPos != 5 || tf.selectRange.End != 5 {
++		t.Fatal("reverse arrow selection")
++	}
++	c, _ := tf.interactionGeometry().At(5, tf.visualLine)
++	tf.effPos = math32.Vec2(20, 30)
++	tf.visualScroll = 8
++	pos := tf.pixelToCursor(image.Pt(int(c.Pos.X+12), int(c.Pos.Y+31)))
++	if pos != 5 {
++		t.Fatalf("pointer placement %d", pos)
++	}
++	// Delete remains a logical grapheme edit, even after visual arrow movement.
++	tf.SetEditingSelection(4, 7)
++	tf.deleteSelection()
++	if string(tf.editText) != "abc  xyz" {
++		t.Fatal("selection deletion changed logical text")
++	}
++}
++
++func TestVellumRenderedGeometryScrollAndWrap(t *testing.T) {
++	if cache := os.Getenv("VELLUM_FONT_CACHE"); cache != "" {
++		previous := shaped.NewShaper
++		defer func() { shaped.NewShaper = previous }()
++		shaped.NewShaper = func() shaped.Shaper {
++			sh := shapedgt.NewShaperWithFonts(fonts.Embedded).(*shapedgt.Shaper)
++			if err := sh.FontMap().UseSystemFonts(cache); err != nil {
++				panic(err)
++			}
++			return sh
++		}
++	}
++	for _, wrap := range []bool{false, true} {
++		b := NewBody()
++		source := "abc אבג 123 office é 👩‍💻 xyz more text"
++		tf := NewTextField(b).SetText(source)
++		tf.Styler(func(s *styles.Style) { s.SetTextWrap(wrap); s.Min.Set(units.Em(12), units.Em(2)); s.Max.X.Em(12) })
++		tf.SetEditingSelection(4, 7)
++		b.runAndShowNewWindow()
++		rw := b.Scene.RenderWindow()
++		b.waitNoEvents(rw)
++		b.AsyncLock()
++
++		tf.autoScroll()
++		tf.setEffPosAndSize()
++		g := tf.NativeTextGeometry()
++		if os.Getenv("VELLUM_FONT_CACHE") != "" {
++			count := 0
++			for _, ln := range tf.renderAll.Lines {
++				for _, run := range ln.Runs {
++					for _, glyph := range run.(*shapedgt.Run).Glyphs {
++						if glyph.TextIndex() >= 4 && glyph.TextIndex() < 7 {
++							if glyph.GlyphID == 0 {
++								t.Fatal("Hebrew fallback missing")
++							}
++							count++
++						}
++					}
++				}
++			}
++			if count != 3 {
++				t.Fatal("Hebrew glyphs not shaped")
++			}
++		}
++		if tf.renderVisible != tf.renderAll || len(g.Cells) == 0 || len(g.Carets) == 0 {
++			t.Fatal("geometry not tied to rendered layout")
++		}
++		if wrap && len(tf.renderAll.Lines) < 2 {
++			t.Fatal("wrap fixture did not wrap")
++		}
++		if !wrap {
++			tf.SetEditingSelection(len([]rune(source)), len([]rune(source)))
++			tf.autoScroll()
++			if tf.visualScroll <= 0 {
++				t.Fatal("long paragraph did not scroll")
++			}
++			tf.SetEditingSelection(0, 0)
++			tf.autoScroll()
++			if tf.visualScroll != 0 {
++				t.Fatal("scroll did not return to start")
++			}
++		}
++		for _, c := range g.Carets {
++			p := tf.charRenderPos(c.Rune)
++			want, _ := tf.interactionGeometry().At(c.Rune, tf.visualLine)
++			if p.X != want.Pos.X+tf.effPos.X-tf.visualScroll+float32(tf.Scene.SceneGeom.Pos.X) {
++				t.Fatal("caret and native layout disagree")
++			}
++		}
++		tf.SetEditingSelection(4, 7)
++		tf.NeedsRender()
++		b.AsyncUnlock()
++		for range 3 {
++			rw.renderWindow()
++		}
++		// Save the actual raster output for visual inspection; no self-generated golden.
++		if dir := os.Getenv("VELLUM_VISUAL_EVIDENCE"); dir != "" {
++			drawer := rw.SystemWindow.Composer().(*composer.ComposerDrawer).Drawer
++			path := dir + "/textfield-scroll.png"
++			if wrap {
++				path = dir + "/textfield-wrap.png"
++			}
++			f, err := os.Create(path)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if err = png.Encode(f, drawer.(getImager).GetImage()); err != nil {
++				t.Fatal(err)
++			}
++			f.Close()
++		}
++		rc := b.Scene.renderContext()
++		rc.Lock()
++		b.Close()
++		rc.Unlock()
++	}
++}
++
++func TestVellumVerticalMovementRefreshesEditedLayout(t *testing.T) {
++	tf := visualField("a long paragraph with wrapped words")
++	tf.Scene.textShaper = shapedgt.NewShaperWithFonts(fonts.Embedded)
++	tf.Style()
++	tf.Styles.Text.WhiteSpace = text.WrapAlways
++	tf.Geom.Size.Actual.Content = math32.Vec2(45, 500)
++	tf.configTextSize(tf.Geom.Size.Actual.Content)
++	tf.SetEditingSelection(len(tf.editText), len(tf.editText))
++	if !tf.ApplyNativeEdit("A", 1, 1, -1, -1, "insert") {
++		t.Fatal("edit refused")
++	}
++	tf.cursorVisualLine(-1) // no intervening render
++	if string(tf.renderAll.Source.Join()) != "A" || tf.cursorPos < 0 || tf.cursorPos > 1 {
++		t.Fatal("vertical movement used stale text layout")
++	}
++}
++
++func TestVellumEditBeforePointerAndScrollShrink(t *testing.T) {
++	tf := visualField("a long paragraph beyond the viewport")
++	tf.Scene.textShaper = shapedgt.NewShaperWithFonts(fonts.Embedded)
++	tf.Style()
++	tf.Styles.SetTextWrap(false)
++	tf.Geom.Size.Actual.Content = math32.Vec2(80, 40)
++	tf.effSize = math32.Vec2(80, 40)
++	tf.SetEditingSelection(len(tf.editText), len(tf.editText))
++	tf.autoScroll()
++	if tf.visualScroll == 0 {
++		t.Fatal("scroll precondition")
++	}
++	tf.ApplyNativeEdit("A", 1, 1, -1, -1, "insert")
++	pos := tf.pixelToCursor(image.Pt(0, 20)) // left edge before render
++	if pos != 0 || tf.visualScroll != 0 {
++		t.Fatal("pointer used stale scroll after layout refresh")
++	}
++	pos = tf.pixelToCursor(image.Pt(10000, 20)) // queued pointer before render
++	if pos < 0 || pos > 1 || string(tf.renderAll.Source.Join()) != "A" {
++		t.Fatal("pointer used obsolete layout")
++	}
++	tf.autoScroll()
++	if tf.visualScroll != 0 {
++		t.Fatal("shortened text left scrolled out of view")
++	}
++}
++
++func TestVellumMaskedInteractionKeepsUnchangedLayout(t *testing.T) {
++	tf := visualField("é 👩‍💻")
++	tf.Scene.textShaper = shapedgt.NewShaperWithFonts(fonts.Embedded)
++	tf.Style()
++	tf.NoEcho = true
++	tf.Geom.Size.Actual.Content = math32.Vec2(200, 40)
++	tf.configTextSize(tf.Geom.Size.Actual.Content)
++	previous := tf.renderAll
++	tf.cursorVisual(1)
++	tf.pixelToCursor(image.Pt(30, 10))
++	if tf.renderAll != previous {
++		t.Fatal("unchanged masked text reshaped on interaction")
++	}
++	for _, c := range tf.interactionGeometry().Carets {
++		if c.Rune == 1 || c.Rune == 4 || c.Rune == 5 {
++			t.Fatal("masked interaction split a grapheme")
++		}
++	}
++}
++
++func TestVellumUnsupportedVerticalInteractionRetainsLegacy(t *testing.T) {
++	tf := visualField("ABCD")
++	makeLine := func(start int, y float32) shaped.Line {
++		run := &shapedgt.Run{Output: shaping.Output{Direction: di.DirectionTTB, Advance: fixed.I(20), Runes: shaping.Range{Offset: start, Count: 2}, Glyphs: []shaping.Glyph{{ClusterIndex: start, RuneCount: 1, Advance: fixed.I(10)}, {ClusterIndex: start + 1, RuneCount: 1, Advance: fixed.I(10)}}}}
++		run.MaxBounds = math32.B2(0, 0, 20, 20)
++		return shaped.Line{SourceRange: textpos.Range{Start: start, End: start + 2}, Offset: math32.Vec2(40, y), Bounds: math32.B2(0, 0, 20, 20), Runs: []shaped.Run{run}}
++	}
++	tf.renderAll = &shaped.Lines{Source: rich.NewText(rich.NewStyle(), []rune("ABCD")), Direction: rich.TTB, LineHeight: 20, Bounds: math32.B2(40, 30, 60, 70), Lines: []shaped.Line{makeLine(0, 30), makeLine(2, 50)}}
++	tf.renderVisible = tf.renderAll
++	tf.visualGeometry = nil
++	tf.numLines = 2
++	tf.cursorPos = 1
++	if tf.charPos(1) != tf.legacyCharPos(1) || tf.charPos(1) == (math32.Vector2{}) {
++		t.Fatal("vertical position lost legacy offset")
++	}
++	if got := tf.pixelToCursor(image.Pt(55, 35)); got != 1 {
++		t.Fatalf("legacy vertical pointer %d", got)
++	}
++	tf.renderAll.Lines[0].Runs[0].(*shapedgt.Run).Direction = di.DirectionLTR
++	tf.visualGeometry = nil
++	if got := tf.pixelToCursor(image.Pt(55, 55)); got != 3 {
++		t.Fatalf("mixed-layout unsupported-line pointer %d", got)
++	}
++	// Mixed target still has horizontal caret candidates; reject the entire line.
++	horizontal := *tf.renderAll.Lines[0].Runs[0].(*shapedgt.Run)
++	horizontal.Output.Runes = shaping.Range{Offset: 2, Count: 1}
++	horizontal.Output.Glyphs = []shaping.Glyph{{ClusterIndex: 2, RuneCount: 1, Advance: fixed.I(10)}}
++	tf.renderAll.Lines[1].Runs = append(tf.renderAll.Lines[1].Runs, &horizontal)
++	tf.visualGeometry = nil
++	if tf.interactionGeometry().SupportsLine(1) {
++		t.Fatal("mixed target incorrectly supported")
++	}
++	want := tf.renderAll.RuneAtLineDelta(1, 1)
++	tf.cursorVisualLine(1)
++	if tf.cursorPos != want {
++		t.Fatal("vertical navigation lost fallback")
++	}
++}
++
++func TestVellumUnsupportedHorizontalMovementAndScroll(t *testing.T) {
++	tf := visualField("ABC")
++	tf.Styles.SetTextWrap(false)
++	supported := &shapedgt.Run{Output: shaping.Output{Direction: di.DirectionLTR, Advance: fixed.I(10), Runes: shaping.Range{Offset: 0, Count: 1}, Glyphs: []shaping.Glyph{{ClusterIndex: 0, RuneCount: 1, Advance: fixed.I(10)}}}}
++	supported.MaxBounds = math32.B2(0, 0, 10, 20)
++	unsupported := &shapedgt.Run{Output: shaping.Output{Direction: di.DirectionLTR, Advance: fixed.I(200), Runes: shaping.Range{Offset: 1, Count: 2}}}
++	unsupported.Math.Path = append(unsupported.Math.Path, 0)
++	tf.renderAll = &shaped.Lines{Source: rich.NewText(rich.NewStyle(), tf.editText), Lines: []shaped.Line{{SourceRange: textpos.Range{Start: 0, End: 3}, Runs: []shaped.Run{supported, unsupported}}}}
++	tf.visualGeometry = nil
++	tf.cursorPos = 1
++	tf.cursorVisual(1)
++	if tf.cursorPos != 2 {
++		t.Fatal("arrow skipped unsupported content", tf.cursorPos)
++	}
++	tf.effSize = math32.Vec2(80, 40)
++	tf.visualScroll = 500
++	tf.clampVisualScroll()
++	if tf.visualScroll != 131 {
++		t.Fatal("unsupported advance excluded from scroll", tf.visualScroll)
++	}
++	tf.renderAll.Lines = []shaped.Line{{SourceRange: textpos.Range{Start: 0, End: 1}, Runs: []shaped.Run{supported}}, {SourceRange: textpos.Range{Start: 1, End: 3}, Runs: []shaped.Run{unsupported}}}
++	tf.visualGeometry = nil
++	tf.cursorPos = 1
++	tf.visualLine = 0
++	tf.cursorVisual(1)
++	if tf.cursorPos != 2 {
++		t.Fatal("arrow stuck before unsupported line", tf.cursorPos)
++	}
++	tf.renderAll.Lines = tf.renderAll.Lines[1:]
++	tf.visualGeometry = nil
++	tf.visualScroll = 500
++	tf.clampVisualScroll()
++	if tf.visualScroll != 121 {
++		t.Fatal("all-unsupported advance excluded from scroll", tf.visualScroll)
++	}
++}
+--- a/paint/painter.go
++++ b/paint/painter.go
+@@ -597,3 +597,8 @@
+ func (pc *Painter) DrawText(tx *shaped.Lines, pos math32.Vector2) {
+ 	pc.Render.Add(render.NewText(tx, pc.Paint, pc.Context(), pos))
+ }
++
++// DrawTextWithGeometry publishes a render item with matching immutable geometry.
++func (pc *Painter) DrawTextWithGeometry(tx *shaped.Lines, pos math32.Vector2, geometry *shaped.Interaction) {
++	pc.Render.Add(render.NewTextWithGeometry(tx, pc.Paint, pc.Context(), pos, geometry))
++}
+--- a/paint/render/text.go
++++ b/paint/render/text.go
+@@ -17,6 +17,10 @@
+ 	// Postion is at the upper left corner of the resulting text rendering.
+ 	Text *shaped.Lines
+ 
++	// Geometry is immutable interaction data captured with this render item.
++	// Selection/color changes do not rebuild it during raster replay.
++	Geometry *shaped.Interaction
++
+ 	// Position to render, which typically specifies the upper left corner of
+ 	// the Text. This is added directly to the offsets and is transformed by the
+ 	// active transform matrix. See also PositionAbs
+@@ -29,7 +33,21 @@
+ }
+ 
+ func NewText(txt *shaped.Lines, sty *styles.Paint, ctx *Context, pos math32.Vector2) *Text {
+-	nt := &Text{Text: txt, Position: pos}
++	return NewTextWithGeometry(txt, sty, ctx, pos, nil)
++}
++
++// NewTextWithGeometry reuses an owned layout supplied by the UI. The geometry
++// must correspond to txt's current shaping; do not mutate it after publication.
++func NewTextWithGeometry(txt *shaped.Lines, sty *styles.Paint, ctx *Context, pos math32.Vector2, geometry *shaped.Interaction) *Text {
++	if geometry == nil {
++		for _, ln := range txt.Lines {
++			if len(ln.Selections) > 0 || len(ln.Highlights) > 0 {
++				geometry = txt.InteractionLayout()
++				break
++			}
++		}
++	}
++	nt := &Text{Text: txt, Position: pos, Geometry: geometry}
+ 	nt.Context.Init(sty, nil, ctx)
+ 	return nt
+ }
+--- a/paint/renderers/rasterx/text.go
++++ b/paint/renderers/rasterx/text.go
+@@ -11,6 +11,8 @@
+ 	"image/draw"
+ 	_ "image/jpeg" // load image formats for users of the API
+ 	_ "image/png"
++	"slices"
++	"sort"
+ 
+ 	"cogentcore.org/core/colors"
+ 	"cogentcore.org/core/math32"
+@@ -28,7 +30,7 @@
+ // RenderText rasterizes the given Text
+ func (rs *Renderer) RenderText(txt *render.Text) {
+ 	// pr := profile.Start("RenderText")
+-	rs.TextLines(&txt.Context, txt.Text, txt.Position)
++	rs.TextLinesWithGeometry(&txt.Context, txt.Text, txt.Position, txt.Geometry)
+ 	// pr.End()
+ }
+ 
+@@ -36,6 +38,18 @@
+ // The text will be drawn starting at the start pixel position, which specifies the
+ // left baseline location of the first text item..
+ func (rs *Renderer) TextLines(ctx *render.Context, lns *shaped.Lines, pos math32.Vector2) {
++	// Direct callers have no render item. Capture once here; normal replay uses
++	// geometry published by NewText/NewTextWithGeometry on the UI owner.
++	var geometry *shaped.Interaction
++	for _, ln := range lns.Lines {
++		if len(ln.Selections) > 0 || len(ln.Highlights) > 0 {
++			geometry = lns.InteractionLayout()
++			break
++		}
++	}
++	rs.TextLinesWithGeometry(ctx, lns, pos, geometry)
++}
++func (rs *Renderer) TextLinesWithGeometry(ctx *render.Context, lns *shaped.Lines, pos math32.Vector2, geometry *shaped.Interaction) {
+ 	m := ctx.Cumulative
+ 	identity := m == math32.Identity2()
+ 	off := pos.Add(lns.Offset)
+@@ -43,27 +57,45 @@
+ 	// tbb := lns.Bounds.Translate(off)
+ 	// rs.StrokeBounds(ctx, tbb, colors.Red)
+ 	clr := colors.Uniform(lns.Color)
++	cellIndex := 0
+ 	for li := range lns.Lines {
+-		ln := &lns.Lines[li]
+-		rs.TextLine(ctx, ln, lns, clr, off, identity)
+-	}
++		var cells []shaped.Cell
++		if geometry != nil {
++			start := cellIndex
++			for cellIndex < len(geometry.Cells) && geometry.Cells[cellIndex].Line == li {
++				cellIndex++
++			}
++			cells = geometry.Cells[start:cellIndex]
++		}
++		rs.TextLine(ctx, &lns.Lines[li], lns, clr, off, identity, cells, pos)
++	}
++
+ }
+ 
+ // TextLine rasterizes the given shaped.Line.
+-func (rs *Renderer) TextLine(ctx *render.Context, ln *shaped.Line, lns *shaped.Lines, clr image.Image, off math32.Vector2, identity bool) {
++func (rs *Renderer) TextLine(ctx *render.Context, ln *shaped.Line, lns *shaped.Lines, clr image.Image, off math32.Vector2, identity bool, cells []shaped.Cell, origin math32.Vector2) {
+ 	start := off.Add(ln.Offset)
+ 	off = start
+ 	// tbb := ln.Bounds.Translate(off)
+ 	// rs.StrokeBounds(ctx, tbb, colors.Blue)
+ 	for ri := range ln.Runs {
+ 		run := ln.Runs[ri].(*shapedgt.Run)
+-		rs.TextRunRegions(ctx, run, ln, lns, off)
++		if run.Background != nil {
++			rs.FillBounds(ctx, run.MaxBounds.Translate(off), run.Background)
++		}
++		if run.Direction.IsVertical() || run.Math.Path != nil {
++			// Keep pre-existing glyph-region behavior for unsupported interaction runs.
++			rs.TextLegacyRegionFill(ctx, run, off, lns.HighlightColor, ln.Highlights)
++			rs.TextLegacyRegionFill(ctx, run, off, lns.SelectionColor, ln.Selections)
++		}
+ 		if run.Direction.IsVertical() {
+ 			off.Y += run.Advance()
+ 		} else {
+ 			off.X += run.Advance()
+ 		}
+ 	}
++	rs.TextRegionFill(ctx, cells, origin, lns.HighlightColor, ln.Highlights)
++	rs.TextRegionFill(ctx, cells, origin, lns.SelectionColor, ln.Selections)
+ 	off = start
+ 	for ri := range ln.Runs {
+ 		run := ln.Runs[ri].(*shapedgt.Run)
+@@ -76,34 +108,96 @@
+ 	}
+ }
+ 
+-// TextRegionFill fills given regions within run with given fill color.
+-func (rs *Renderer) TextRegionFill(ctx *render.Context, run *shapedgt.Run, off math32.Vector2, fill image.Image, ranges []textpos.Range) {
++// textRegionRects normalizes logical ranges and coalesces physically adjacent
++// advance cells with matching vertical bounds. Disjoint bidi fragments stay apart.
++func textRegionRects(cells []shaped.Cell, ranges []textpos.Range) []math32.Box2 {
++	if len(ranges) == 0 {
++		return nil
++	}
++	normalized := slices.Clone(ranges)
++	slices.SortFunc(normalized, func(a, b textpos.Range) int {
++		if a.Start != b.Start {
++			return a.Start - b.Start
++		}
++		return a.End - b.End
++	})
++	merged := normalized[:0]
++	for _, r := range normalized {
++		if r.Len() <= 0 {
++			continue
++		}
++		if len(merged) > 0 && r.Start <= merged[len(merged)-1].End {
++			merged[len(merged)-1].End = max(merged[len(merged)-1].End, r.End)
++		} else {
++			merged = append(merged, r)
++		}
++	}
++	var rects []math32.Box2
++	for _, cell := range cells {
++		i := sort.Search(len(merged), func(i int) bool { return merged[i].End > cell.Range.Start })
++		if i < len(merged) && merged[i].Start < cell.Range.End {
++			rects = append(rects, cell.Rect)
++		}
++	}
++	slices.SortFunc(rects, func(a, b math32.Box2) int {
++		for _, pair := range [][2]float32{{a.Min.Y, b.Min.Y}, {a.Max.Y, b.Max.Y}, {a.Min.X, b.Min.X}} {
++			if pair[0] < pair[1] {
++				return -1
++			}
++			if pair[0] > pair[1] {
++				return 1
++			}
++		}
++		return 0
++	})
++	out := rects[:0]
++	for _, box := range rects {
++		if len(out) > 0 {
++			last := &out[len(out)-1]
++			if last.Min.Y == box.Min.Y && last.Max.Y == box.Max.Y && box.Min.X <= last.Max.X {
++				last.Max.X = max(last.Max.X, box.Max.X)
++				continue
++			}
++		}
++		out = append(out, box)
++	}
++	return out
++}
++
++// TextRegionFill fills selected advance fragments and avoids offscreen raster work.
++func (rs *Renderer) TextRegionFill(ctx *render.Context, cells []shaped.Cell, origin math32.Vector2, fill image.Image, ranges []textpos.Range) {
++	if fill == nil || len(ranges) == 0 {
++		return
++	}
++	for _, box := range textRegionRects(cells, ranges) {
++		box = box.Translate(origin)
++		corners := []math32.Vector2{box.Min, math32.Vec2(box.Max.X, box.Min.Y), box.Max, math32.Vec2(box.Min.X, box.Max.Y)}
++		transformed := math32.Box2{Min: ctx.Cumulative.MulPoint(corners[0]), Max: ctx.Cumulative.MulPoint(corners[0])}
++		for _, p := range corners[1:] {
++			transformed.ExpandByPoint(ctx.Cumulative.MulPoint(p))
++		}
++		if !transformed.IntersectsBox(ctx.Bounds.Rect) {
++			continue
++		}
++		rs.FillBounds(ctx, box, fill)
++	}
++}
++
++// TextLegacyRegionFill retains the earlier renderer behavior for vertical/math runs.
++func (rs *Renderer) TextLegacyRegionFill(ctx *render.Context, run *shapedgt.Run, off math32.Vector2, fill image.Image, ranges []textpos.Range) {
+ 	if fill == nil {
+ 		return
+ 	}
+ 	for _, sel := range ranges {
+-		rsel := sel.Intersect(run.Runes())
+-		if rsel.Len() == 0 {
++		selected := sel.Intersect(run.Runes())
++		if selected.Len() == 0 {
+ 			continue
+ 		}
+-		fi := run.FirstGlyphAt(rsel.Start)
+-		li := run.LastGlyphAt(rsel.End - 1)
+-		if fi >= 0 && li >= fi {
+-			sbb := run.GlyphRegionBounds(fi, li).Canon()
+-			rs.FillBounds(ctx, sbb.Translate(off), fill)
+-		}
+-	}
+-}
+-
+-// TextRunRegions draws region fills for given run.
+-func (rs *Renderer) TextRunRegions(ctx *render.Context, run *shapedgt.Run, ln *shaped.Line, lns *shaped.Lines, off math32.Vector2) {
+-	// dir := run.Direction
+-	rbb := run.MaxBounds.Translate(off)
+-	if run.Background != nil {
+-		rs.FillBounds(ctx, rbb, run.Background)
+-	}
+-	rs.TextRegionFill(ctx, run, off, lns.HighlightColor, ln.Highlights)
+-	rs.TextRegionFill(ctx, run, off, lns.SelectionColor, ln.Selections)
++		first, last := run.FirstGlyphAt(selected.Start), run.LastGlyphAt(selected.End-1)
++		if first >= 0 && last >= first {
++			rs.FillBounds(ctx, run.GlyphRegionBounds(first, last).Canon().Translate(off), fill)
++		}
++	}
+ }
+ 
+ // TextRun rasterizes the given text run into the output image using the
+--- a/paint/renderers/rasterx/text_geometry_vellum_test.go
++++ b/paint/renderers/rasterx/text_geometry_vellum_test.go
+@@ -0,0 +1,79 @@
++package rasterx
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++	"cogentcore.org/core/text/textpos"
++	"strings"
++	"testing"
++)
++
++func selectedRenderItem() (*Renderer, *render.Text) {
++	sh := shapedgt.NewShaperWithFonts(fonts.Embedded)
++	uc := units.Context{}
++	uc.Defaults()
++	ts := text.NewStyle()
++	ts.WhiteSpace = text.WrapNever
++	ts.ToDots(&uc)
++	sty := rich.NewStyle()
++	source := strings.Repeat("abc אבג ", 1000)
++	ls := sh.WrapLines(rich.NewText(sty, []rune(source)), sty, ts, math32.Vec2(800, 100))
++	ls.SelectRegion(textpos.Range{Start: 0, End: ls.Source.Len()})
++	paint := styles.NewPaint()
++	parent := &render.Context{}
++	parent.Init(paint, &render.Bounds{Rect: math32.B2(0, 0, 800, 100)}, nil)
++	geometry := ls.InteractionLayout()
++	return New(math32.Vec2(800, 100)).(*Renderer), render.NewTextWithGeometry(ls, paint, parent, math32.Vector2{}, geometry)
++}
++func TestVellumRenderItemReusesGeometry(t *testing.T) {
++	rs, item := selectedRenderItem()
++	geometry := item.Geometry
++	if geometry == nil {
++		t.Fatal("missing cached geometry")
++	}
++	for range 3 {
++		rs.RenderText(item)
++		if item.Geometry != geometry {
++			t.Fatal("render replay replaced immutable geometry")
++		}
++	}
++	// Region changes use the same cells; the UI publishes a fresh matching item.
++	item.Text.SelectReset()
++	item.Text.SelectRegion(textpos.Range{Start: 0, End: 3})
++	next := render.NewTextWithGeometry(item.Text, &item.Context.Style, &item.Context, item.Position, geometry)
++	if next.Geometry != geometry {
++		t.Fatal("selection change rebuilt geometry")
++	}
++	rs.RenderText(next)
++}
++func BenchmarkVellumSelectedTextReplay(b *testing.B) {
++	rs, item := selectedRenderItem()
++	rs.RenderText(item) // warm glyph cache
++	b.ReportAllocs()
++	b.ResetTimer()
++	for range b.N {
++		rs.RenderText(item)
++	}
++}
++
++func TestVellumSelectionCoalescesPhysicalFragments(t *testing.T) {
++	cells := []shaped.Cell{{Range: textpos.Range{Start: 0, End: 1}, Rect: math32.B2(0, 0, 10, 20)}, {Range: textpos.Range{Start: 2, End: 3}, Rect: math32.B2(20, 0, 30, 20)}, {Range: textpos.Range{Start: 1, End: 2}, Rect: math32.B2(10, 0, 20, 20)}, {Range: textpos.Range{Start: 3, End: 4}, Rect: math32.B2(40, 0, 50, 20)}}
++	boxes := textRegionRects(cells, []textpos.Range{{Start: 2, End: 4}, {Start: 0, End: 3}, {Start: 1, End: 1}})
++	if len(boxes) != 2 || boxes[0] != math32.B2(0, 0, 30, 20) || boxes[1] != math32.B2(40, 0, 50, 20) {
++		t.Fatal("physical fragments", boxes)
++	}
++	if len(textRegionRects(cells, nil)) != 0 {
++		t.Fatal("empty range selection")
++	}
++	boxes = textRegionRects(cells, []textpos.Range{{Start: 0, End: 1}, {Start: 2, End: 3}})
++	if len(boxes) != 2 {
++		t.Fatal("unselected bidi gap filled", boxes)
++	}
++}
+--- a/text/shaped/interaction.go
++++ b/text/shaped/interaction.go
+@@ -0,0 +1,256 @@
++// Experimental horizontal interaction geometry shared by Vellum editing and Cocoa.
++package shaped
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/textpos"
++	"math"
++	"slices"
++)
++
++// Cell covers a complete source grapheme using typographic advance, including spaces.
++// Rect is relative to the rendered Lines origin. Line is a physical line index.
++type Cell struct {
++	Range textpos.Range
++	Rect  math32.Box2
++	RTL   bool
++	Line  int
++}
++
++// Caret chooses the strong (paragraph-direction) edge at a bidi junction.
++// Line preserves upstream/downstream affinity at a wrapped boundary.
++type Caret struct {
++	Rune, Line int
++	Pos        math32.Vector2
++	Height     float32
++}
++type Interaction struct {
++	Cells   []Cell
++	Carets  []Caret
++	RTL     bool
++	Lines   []InteractionLine
++	ExtentX float32
++}
++type InteractionLine struct {
++	Index       int
++	Bounds      math32.Box2
++	Unsupported bool
++}
++type cellRun interface {
++	InteractionCells([]int) []Cell
++	InteractionAdvance() math32.Vector2
++}
++
++// InteractionLayout follows rendered run order. Unsupported vertical/math runs
++// return no fabricated cells. A strong caret is chosen separately on each line.
++func (ls *Lines) InteractionLayout() *Interaction {
++	out := &Interaction{RTL: ls.Direction == rich.RTL, ExtentX: ls.Bounds.Max.X + ls.Offset.X}
++	bounds := textpos.GraphemeBounds(ls.Source.Join())
++	for li := range ls.Lines {
++		ln := &ls.Lines[li]
++		off := ls.Offset.Add(ln.Offset)
++		candidates := map[int]Caret{}
++		ranks := map[int]int{}
++		add := func(r int, x float32, rtl, leading bool, rect math32.Box2) {
++			rank := 0
++			if rtl == (ls.Direction == rich.RTL) {
++				rank += 2
++			}
++			if leading {
++				rank++
++			}
++			if old, ok := ranks[r]; !ok || rank > old {
++				candidates[r] = Caret{Rune: r, Line: li, Pos: math32.Vec2(x, rect.Min.Y), Height: rect.Size().Y}
++				ranks[r] = rank
++			}
++		}
++		var cells []Cell
++		indexes := map[textpos.Range]int{}
++		unsupported := false
++		for _, run := range ln.Runs {
++			if cr, ok := run.(cellRun); ok {
++				runCells := cr.InteractionCells(bounds)
++				if len(runCells) == 0 && run.Runes().Len() > 0 {
++					unsupported = true
++				}
++				for _, cell := range runCells {
++					cell.Line = li
++					cell.Rect = cell.Rect.Translate(off)
++					// Font fallback can split a grapheme across runs. Combine its advances
++					// before choosing edges so no interior fallback boundary becomes a caret.
++					if i, ok := indexes[cell.Range]; ok {
++						cells[i].Rect.ExpandByBox(cell.Rect)
++					} else {
++						indexes[cell.Range] = len(cells)
++						cells = append(cells, cell)
++					}
++				}
++			} else if run.Runes().Len() > 0 {
++				unsupported = true
++			}
++			if cr, ok := run.(cellRun); ok {
++				off = off.Add(cr.InteractionAdvance())
++			} else {
++				off.X += run.Advance()
++			}
++			out.ExtentX = max(out.ExtentX, off.X)
++		}
++		for _, cell := range cells {
++			out.Cells = append(out.Cells, cell)
++			a, b := cell.Rect.Min.X, cell.Rect.Max.X
++			if cell.RTL {
++				a, b = b, a
++			}
++			add(cell.Range.Start, a, cell.RTL, true, cell.Rect)
++			add(cell.Range.End, b, cell.RTL, false, cell.Rect)
++		}
++
++		if len(candidates) == 0 && len(ln.Runs) == 0 {
++			candidates[ln.SourceRange.Start] = Caret{Rune: ln.SourceRange.Start, Line: li, Pos: ls.Offset.Add(ln.Offset).Add(ln.Bounds.Min), Height: max(ln.Bounds.Size().Y, ls.LineHeight)}
++		}
++		var line []Caret
++		for _, c := range candidates {
++			line = append(line, c)
++		}
++		slices.SortFunc(line, func(a, b Caret) int {
++			if a.Pos.X < b.Pos.X {
++				return -1
++			}
++			if a.Pos.X > b.Pos.X {
++				return 1
++			}
++			return a.Rune - b.Rune
++		})
++		out.Carets = append(out.Carets, line...)
++		box := ln.Bounds.Translate(ls.Offset.Add(ln.Offset))
++		for _, c := range line {
++			box.ExpandByPoint(c.Pos)
++			box.ExpandByPoint(c.Pos.Add(math32.Vec2(0, c.Height)))
++		}
++		out.Lines = append(out.Lines, InteractionLine{Index: li, Bounds: box, Unsupported: unsupported})
++	}
++	return out
++}
++
++// At defaults to the downstream line when affinity does not identify a stop.
++func (g *Interaction) At(r, line int) (Caret, bool) {
++	var found Caret
++	ok := false
++	for _, c := range g.Carets {
++		if c.Rune == r {
++			found = c
++			ok = true
++			if c.Line == line {
++				return c, true
++			}
++		}
++	}
++	return found, ok
++}
++
++// SupportsLine reports whether the whole line has horizontal interaction geometry.
++func (g *Interaction) SupportsLine(line int) bool {
++	return !g.unsupportedLine(line)
++}
++
++func (g *Interaction) unsupportedLine(line int) bool {
++	for _, ln := range g.Lines {
++		if ln.Index == line {
++			return ln.Unsupported
++		}
++	}
++	return false
++}
++
++func (g *Interaction) Move(r, line, delta int) (Caret, bool) {
++	c, ok := g.At(r, line)
++	if !ok || g.unsupportedLine(c.Line) {
++		return c, false
++	}
++	if delta == 0 {
++		return c, true
++	}
++	step := 1
++	if delta < 0 {
++		step = -1
++		delta = -delta
++	}
++	for range delta {
++		i := slices.Index(g.Carets, c)
++		next := i + step
++		if next >= 0 && next < len(g.Carets) && g.Carets[next].Line == c.Line {
++			c = g.Carets[next]
++			continue
++		}
++		target := c.Line + step
++		if g.RTL {
++			target = c.Line - step
++		}
++		if g.unsupportedLine(target) {
++			return c, false
++		}
++		found := false
++		for _, other := range g.Carets {
++			if other.Line == target {
++				if !found || step < 0 {
++					c = other
++					found = true
++				}
++			}
++		}
++		if !found {
++			break
++		}
++	}
++	return c, true
++
++}
++
++// Nearest chooses a caret for pointer placement; native character hits instead
++// require a containing advance cell, so blank space does not claim a character.
++func (g *Interaction) Nearest(p math32.Vector2) (Caret, bool) {
++	if len(g.Carets) == 0 {
++		return Caret{}, false
++	}
++	lines := g.Lines
++	if len(lines) == 0 {
++		// Hand-constructed geometries also group carets by physical line.
++		indexes := map[int]int{}
++		for _, c := range g.Carets {
++			box := math32.Box2{Min: c.Pos, Max: c.Pos.Add(math32.Vec2(0, c.Height))}
++			if i, ok := indexes[c.Line]; ok {
++				lines[i].Bounds.ExpandByBox(box)
++			} else {
++				indexes[c.Line] = len(lines)
++				lines = append(lines, InteractionLine{Index: c.Line, Bounds: box})
++			}
++		}
++	}
++	line := lines[0].Index
++	vertical := float32(math.Inf(1))
++	for _, ln := range lines {
++		dy := max(ln.Bounds.Min.Y-p.Y, p.Y-ln.Bounds.Max.Y, float32(0))
++		if dy < vertical {
++			line = ln.Index
++			vertical = dy
++		}
++	}
++	if g.unsupportedLine(line) {
++		return Caret{}, false
++	}
++	best := g.Carets[0]
++	distance := float32(math.Inf(1))
++	for _, c := range g.Carets {
++		if c.Line != line {
++			continue
++		}
++		dx := math32.Abs(c.Pos.X - p.X)
++		if dx < distance {
++			best = c
++			distance = dx
++		}
++	}
++
++	return best, distance < float32(math.Inf(1))
++}
+--- a/text/shaped/regions.go
++++ b/text/shaped/regions.go
+@@ -135,7 +135,7 @@
+ 		for ri := range ln.Runs {
+ 			run := ln.Runs[ri]
+ 			rr := run.Runes()
+-			if ti >= rr.End {
++			if !rr.Contains(ti) {
+ 				off.X += run.Advance()
+ 				continue
+ 			}
+--- a/text/shaped/shapers/shapedgt/interaction_vellum_test.go
++++ b/text/shaped/shapers/shapedgt/interaction_vellum_test.go
+@@ -0,0 +1,224 @@
++package shapedgt
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/text"
++	"cogentcore.org/core/text/textpos"
++	"github.com/go-text/typesetting/di"
++	"github.com/go-text/typesetting/shaping"
++	"golang.org/x/image/math/fixed"
++	"slices"
++	"strings"
++	"testing"
++)
++
++func interactionText(s string, dir rich.Directions, width float32) *shaped.Lines {
++	sh := NewShaperWithFonts(fonts.Embedded)
++	uc := units.Context{}
++	uc.Defaults()
++	ts := text.NewStyle()
++	ts.Direction = dir
++	ts.WhiteSpace = text.WrapAlways
++	ts.ToDots(&uc)
++	sty := rich.NewStyle()
++	sty.Direction = rich.Default
++	return sh.WrapLines(rich.NewText(sty, []rune(s)), sty, ts, math32.Vec2(width, 1000))
++}
++func TestVellumVisualStrongCaretOrder(t *testing.T) {
++	ls := interactionText("abc אבג xyz", rich.LTR, 1000)
++	g := ls.InteractionLayout()
++	var got []int
++	for _, c := range g.Carets {
++		got = append(got, c.Rune)
++	}
++	want := []int{0, 1, 2, 3, 4, 6, 5, 7, 8, 9, 10, 11}
++	if !slices.Equal(got, want) {
++		t.Fatalf("visual order %v, want %v", got, want)
++	}
++	for i, c := range g.Carets {
++		if i+1 < len(g.Carets) {
++			next, _ := g.Move(c.Rune, c.Line, 1)
++			back, _ := g.Move(next.Rune, next.Line, -1)
++			if back != c {
++				t.Fatal("non-reversible caret")
++			}
++		}
++	}
++	// Explicit RTL paragraph: digits and Latin runs retain their own direction.
++	ls = interactionText("אבג abc 123", rich.RTL, 1000)
++	g = ls.InteractionLayout()
++	got = nil
++	for _, c := range g.Carets {
++		got = append(got, c.Rune)
++	}
++	t.Logf("RTL paragraph order %v", got)
++	if len(got) != 12 || got[len(got)-1] != 0 || slices.Equal(got, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}) {
++		t.Fatal("RTL paragraph not visually ordered")
++	}
++	for _, ln := range ls.Lines {
++		previous := int32(-1)
++		for _, r := range ln.Runs {
++			index := r.(*Run).VisualIndex
++			if index < previous {
++				t.Fatal("rendered runs not visual")
++			}
++			previous = index
++		}
++	}
++}
++func TestVellumAdvanceGraphemesAndWrapAffinity(t *testing.T) {
++	for _, source := range []string{"office  é 👩‍💻", "سلام אבג 12", "abc אבג xyz more text", "A\nB\n"} {
++		ls := interactionText(source, rich.LTR, 70)
++		g := ls.InteractionLayout()
++		bounds := textpos.GraphemeBounds([]rune(source))
++		for _, r := range bounds {
++			if _, ok := g.At(r, -1); !ok {
++				t.Fatalf("missing caret %d in %q", r, source)
++			}
++		}
++		for _, c := range g.Carets {
++			if !slices.Contains(bounds, c.Rune) {
++				t.Fatalf("interior grapheme caret %d in %q", c.Rune, source)
++			}
++			if c.Height <= 0 {
++				t.Fatal("empty caret height")
++			}
++		}
++		for _, cell := range g.Cells {
++			if !slices.Contains(bounds, cell.Range.Start) || !slices.Contains(bounds, cell.Range.End) {
++				t.Fatal("partial grapheme cell")
++			}
++			if cell.Rect.Size().X < 0 {
++				t.Fatal("negative advance")
++			}
++		}
++		for _, c := range g.Carets {
++			if next, ok := g.Move(c.Rune, c.Line, 1); ok && next != c {
++				back, _ := g.Move(next.Rune, next.Line, -1)
++				if back != c {
++					t.Fatal("wrap affinity lost")
++				}
++			}
++		}
++	}
++	ls := interactionText("abcdef", rich.LTR, 22)
++	g := ls.InteractionLayout()
++	wrapped := false
++	for _, c := range g.Carets {
++		for _, other := range g.Carets {
++			if c.Rune == other.Rune && c.Line != other.Line {
++				wrapped = true
++				a, _ := g.At(c.Rune, c.Line)
++				if a != c {
++					t.Fatal("affinity not honored")
++				}
++			}
++		}
++	}
++	if !wrapped {
++		t.Fatal("did not exercise a dual wrap stop")
++	}
++	// A synthetic ligature has ink unrelated to its 30px advance. Space has no ink.
++	r := Run{Output: shaping.Output{Direction: di.DirectionLTR, Glyphs: []shaping.Glyph{{ClusterIndex: 0, RuneCount: 3, Advance: fixed.I(30)}, {ClusterIndex: 3, RuneCount: 1, Advance: fixed.I(8)}}}}
++	r.MaxBounds = math32.Box2{Min: math32.Vec2(0, -10), Max: math32.Vec2(38, 3)}
++	cells := r.InteractionCells(textpos.GraphemeBounds([]rune("ffi ")))
++	if len(cells) != 4 {
++		t.Fatal("ligature subdivision")
++	}
++	for i, c := range cells {
++		width := float32(10)
++		if i == 3 {
++			width = 8
++		}
++		if c.Rect.Size().X != width {
++			t.Fatal("ink-based geometry")
++		}
++	}
++}
++
++func BenchmarkVellumInteractionManyBidiRuns(b *testing.B) {
++	ls := interactionText(strings.Repeat("ab אב ", 2000), rich.LTR, 1000)
++	b.SetBytes(int64(ls.Source.Len()))
++	b.ReportAllocs()
++	b.ResetTimer()
++	for range b.N {
++		g := ls.InteractionLayout()
++		if len(g.Carets) == 0 {
++			b.Fatal("empty geometry")
++		}
++	}
++}
++
++func TestVellumPointerChoosesLineBeforeHorizontalDistance(t *testing.T) {
++	g := shaped.Interaction{Carets: []shaped.Caret{{Rune: 1, Line: 0, Pos: math32.Vec2(10, 0), Height: 20}, {Rune: 2, Line: 1, Pos: math32.Vec2(10000, 20), Height: 20}}}
++	c, ok := g.Nearest(math32.Vec2(10000, 10))
++	if !ok || c.Line != 0 {
++		t.Fatal("horizontal distance overrode clicked line")
++	}
++}
++
++func TestVellumRTLWrappedTransitions(t *testing.T) {
++	g := interactionText("אבג דהו זחט יכל מנס", rich.RTL, 45).InteractionLayout()
++	if len(g.Lines) < 2 {
++		t.Fatal("RTL wrap precondition")
++	}
++	var left0, right1 shaped.Caret
++	have0, have1 := false, false
++	for _, c := range g.Carets {
++		if c.Line == 0 && !have0 {
++			left0 = c
++			have0 = true
++		}
++		if c.Line == 1 {
++			right1 = c
++			have1 = true
++		}
++	}
++	if !have0 || !have1 {
++		t.Fatal("missing RTL line stops")
++	}
++	next, _ := g.Move(left0.Rune, left0.Line, -1)
++	back, _ := g.Move(next.Rune, next.Line, 1)
++	if next != right1 || back != left0 {
++		t.Fatalf("RTL cross-line transitions %v -> %v -> %v", left0, next, back)
++	}
++}
++func TestVellumMixedAxisOffsetAndAggregatePointerLine(t *testing.T) {
++	a := &Run{Output: shaping.Output{Direction: di.DirectionTTB, Advance: fixed.I(20), Runes: shaping.Range{Offset: 0, Count: 1}}}
++	b := &Run{Output: shaping.Output{Direction: di.DirectionLTR, Advance: fixed.I(10), Runes: shaping.Range{Offset: 1, Count: 1}, Glyphs: []shaping.Glyph{{ClusterIndex: 1, RuneCount: 1, Advance: fixed.I(10)}}}}
++	b.MaxBounds = math32.Box2{Min: math32.Vec2(0, 0), Max: math32.Vec2(10, 20)}
++	ls := shaped.Lines{Source: rich.NewText(rich.NewStyle(), []rune("ab")), Lines: []shaped.Line{{Runs: []shaped.Run{a, b}}}}
++	g := ls.InteractionLayout()
++	if len(g.Cells) != 1 || g.Cells[0].Rect.Min != math32.Vec2(0, 20) {
++		t.Fatal("vertical advance disagrees with renderer")
++	}
++	g = &shaped.Interaction{Carets: []shaped.Caret{{Rune: 1, Line: 0, Pos: math32.Vec2(10, 40), Height: 20}, {Rune: 2, Line: 0, Pos: math32.Vec2(10000, 0), Height: 60}, {Rune: 3, Line: 1, Pos: math32.Vec2(20, 80), Height: 20}}}
++	c, _ := g.Nearest(math32.Vec2(10, 20))
++	if c.Rune != 1 {
++		t.Fatal("mixed font heights overrode horizontal caret proximity on clicked line")
++	}
++}
++
++func TestVellumSplitGraphemeClustersAndRunsMerge(t *testing.T) {
++	makeRun := func(offset, count int, glyphs []shaping.Glyph) *Run {
++		r := &Run{Output: shaping.Output{Direction: di.DirectionLTR, Advance: fixed.I(10 * count), Runes: shaping.Range{Offset: offset, Count: count}, Glyphs: glyphs}}
++		r.MaxBounds = math32.B2(0, 0, float32(10*count), 20)
++		return r
++	}
++	a := shaping.Glyph{ClusterIndex: 0, RuneCount: 1, Advance: fixed.I(10)}
++	b := shaping.Glyph{ClusterIndex: 1, RuneCount: 1, Advance: fixed.I(10)}
++	for _, runs := range [][]shaped.Run{{makeRun(0, 2, []shaping.Glyph{a, b})}, {makeRun(0, 1, []shaping.Glyph{a}), makeRun(1, 1, []shaping.Glyph{b})}} {
++		ls := shaped.Lines{Source: rich.NewText(rich.NewStyle(), []rune("é")), Lines: []shaped.Line{{Runs: runs}}}
++		g := ls.InteractionLayout()
++		if len(g.Cells) != 1 || g.Cells[0].Range != (textpos.Range{Start: 0, End: 2}) || g.Cells[0].Rect != math32.B2(0, 0, 20, 20) {
++			t.Fatal("split grapheme advance", g.Cells)
++		}
++		if len(g.Carets) != 2 || g.Carets[0].Rune != 0 || g.Carets[1].Rune != 2 || g.Carets[1].Pos.X != 20 {
++			t.Fatal("split grapheme carets", g.Carets)
++		}
++	}
++}
+--- a/text/shaped/shapers/shapedgt/run.go
++++ b/text/shaped/shapers/shapedgt/run.go
+@@ -6,11 +6,13 @@
+ 
+ import (
+ 	"fmt"
++	"slices"
+ 
+ 	"cogentcore.org/core/math32"
+ 	"cogentcore.org/core/text/rich"
+ 	"cogentcore.org/core/text/shaped"
+ 	"cogentcore.org/core/text/textpos"
++	"github.com/go-text/typesetting/di"
+ 	"github.com/go-text/typesetting/shaping"
+ 	"golang.org/x/image/math/fixed"
+ )
+@@ -232,3 +234,54 @@
+ 	}
+ 	return mb
+ }
++
++// InteractionCells exposes horizontal advance cells, never glyph ink bounds.
++// Ligatures are subdivided equally at extended grapheme boundaries; font GDEF
++// ligature carets are not currently used. Combining and ZWJ sequences stay whole.
++func (run *Run) InteractionCells(allBounds []int) []shaped.Cell {
++	if run.Direction.IsVertical() || run.Math.Path != nil {
++		return nil
++	}
++	var cells []shaped.Cell
++	x := float32(0)
++	for i := 0; i < len(run.Glyphs); {
++		g := run.Glyphs[i]
++		start, end := g.TextIndex(), g.TextIndex()+g.RunesCount()
++		advance := float32(0)
++		for i < len(run.Glyphs) && run.Glyphs[i].TextIndex() == start {
++			advance += math32.FromFixed(run.Glyphs[i].Advance)
++			i++
++		}
++		if len(allBounds) == 0 || start < 0 || end > allBounds[len(allBounds)-1] || end <= start {
++			x += advance
++			continue
++		}
++		a, _ := slices.BinarySearch(allBounds, start)
++		if a == len(allBounds) || allBounds[a] > start {
++			a--
++		}
++		b, _ := slices.BinarySearch(allBounds, end)
++		bounds := allBounds[a : b+1]
++
++		rtl := run.Direction.Progression() == di.TowardTopLeft
++		n := len(bounds) - 1
++		for j := 0; j < n; j++ {
++			k := j
++			if rtl {
++				k = n - 1 - j
++			}
++			a, b := x+advance*float32(k)/float32(n), x+advance*float32(k+1)/float32(n)
++			cells = append(cells, shaped.Cell{Range: textpos.Range{Start: bounds[j], End: bounds[j+1]}, Rect: math32.Box2{Min: math32.Vec2(a, run.MaxBounds.Min.Y), Max: math32.Vec2(b, run.MaxBounds.Max.Y)}, RTL: rtl})
++		}
++		x += advance
++	}
++	return cells
++}
++
++// InteractionAdvance follows the renderer even when cells are unsupported.
++func (run *Run) InteractionAdvance() math32.Vector2 {
++	if run.Direction.IsVertical() {
++		return math32.Vec2(0, run.Advance())
++	}
++	return math32.Vec2(run.Advance(), 0)
++}
+--- a/text/shaped/shapers/shapedgt/wrap.go
++++ b/text/shaped/shapers/shapedgt/wrap.go
+@@ -6,6 +6,7 @@
+ 
+ import (
+ 	"fmt"
++	"slices"
+ 
+ 	"cogentcore.org/core/math32"
+ 	"cogentcore.org/core/text/rich"
+@@ -91,7 +92,7 @@
+ func (sh *Shaper) LinesBounds(lines []shaping.Line, truncated int, tx rich.Text, defSty *rich.Style, tsty *text.Style, size math32.Vector2) *shaped.Lines {
+ 
+ 	lht := tsty.LineHeightDots(defSty)
+-	lns := &shaped.Lines{Source: tx, Color: tsty.Color, SelectionColor: tsty.SelectColor, HighlightColor: tsty.HighlightColor, LineHeight: lht}
++	lns := &shaped.Lines{Source: tx, Color: tsty.Color, SelectionColor: tsty.SelectColor, HighlightColor: tsty.HighlightColor, LineHeight: lht, Direction: tsty.Direction}
+ 	lns.Truncated = truncated > 0
+ 
+ 	fsz := tsty.FontHeight(defSty)
+@@ -173,6 +174,11 @@
+ 			}
+ 			ln.Runs = append(ln.Runs, &run)
+ 		}
++		// The wrapper returns logical runs with explicit visual positions. Render
++		// and interaction geometry must use the same physical run order.
++		slices.SortStableFunc(ln.Runs, func(a, b shaped.Run) int {
++			return int(a.(*Run).VisualIndex - b.(*Run).VisualIndex)
++		})
+ 		if li == 0 { // set offset for first line based on max ascent
+ 			if !dir.IsVertical() { // todo: vertical!
+ 				off.Y = math32.FromFixed(maxAsc)

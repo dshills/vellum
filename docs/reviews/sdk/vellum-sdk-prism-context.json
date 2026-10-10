@@ -1,0 +1,8 @@
+{
+  "required": [
+    {
+      "id": "intentional-inspectable-preparation-lock",
+      "text": "specs/sdk.md explicitly states that a killed preparation process can leave build/.prepare-lock, requiring inspection for an active process before manual removal. This is deliberate portable fail-closed behavior; automatic PID-based stale-lock deletion is not part of the contract. Normal exceptions and KeyboardInterrupt run cleanup and independently release the lock. Incomplete installation rollback preserves original backups in a diagnostic recovery directory and must never remove them. SIGKILL cannot run finally handlers; a retained lock after process death is documented manual recovery, not a promise of automatic restart. Review actual data loss, incorrect backup/lock behavior or unsupported cleanup assumptions; do not treat absence of automatic stale-lock deletion as a correctness failure of this explicitly scoped local SDK. No severity overrides or baseline suppressions apply."
+    }
+  ]
+}

@@ -5,7 +5,7 @@ and [implementation status](implementation.md).
 
 - [Research and recommendations](research/README.md): source-backed investigation and architecture alternatives.
 - [Architecture decisions](decisions/): recorded choices and the evidence available when each was made.
-- [Foundation reports](reports/README.md): investigation outcomes, fixes and remaining validation gaps.
+- [Foundation and SDK reports](reports/README.md): investigation outcomes, fixes and remaining validation gaps.
 - [Distribution checks](distribution.md): packaging the native foundation fixture.
 - [Review records](reviews/): committed reviews and verification evidence.
 - [Architecture diagrams](assets/): research illustrations.

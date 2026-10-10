@@ -1,0 +1,339 @@
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -548,6 +548,7 @@
+ func (tf *TextField) revert() {
+ 	tf.renderVisible = nil
+ 	tf.editText = []rune(tf.text)
++	tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, tf.cursorPos)
+ 	tf.edited = false
+ 	tf.dispRange.Start = 0
+ 	tf.dispRange.End = tf.charWidth
+@@ -630,6 +631,7 @@
+ // cursorForwardWord moves the cursor forward by words
+ func (tf *TextField) cursorForwardWord(steps int) {
+ 	tf.cursorPos, _ = textpos.ForwardWord(tf.editText, tf.cursorPos, steps)
++	tf.cursorPos = textpos.GraphemeAtOrAfter(tf.editText, tf.cursorPos)
+ 	if tf.cursorPos > tf.dispRange.End {
+ 		inc := tf.cursorPos - tf.dispRange.End
+ 		tf.dispRange.End += inc
+@@ -661,6 +663,7 @@
+ // cursorBackwardWord moves the cursor backward by words
+ func (tf *TextField) cursorBackwardWord(steps int) {
+ 	tf.cursorPos, _ = textpos.BackwardWord(tf.editText, tf.cursorPos, steps)
++	tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, tf.cursorPos)
+ 	if tf.cursorPos <= tf.dispRange.Start {
+ 		dec := min(tf.dispRange.Start, 8)
+ 		tf.dispRange.Start -= dec
+@@ -907,6 +910,8 @@
+ 		if tf.selectRange.End > ed {
+ 			tf.selectRange.End = ed
+ 		}
++		tf.selectRange.Start = textpos.GraphemeAtOrBefore(tf.editText, tf.selectRange.Start)
++		tf.selectRange.End = textpos.GraphemeAtOrAfter(tf.editText, tf.selectRange.End)
+ 	} else {
+ 		tf.selectReset()
+ 	}
+@@ -1275,7 +1280,7 @@
+ 	}
+ 	tf.configTextSize(availSz)
+ 	n := len(tf.editText)
+-	tf.cursorPos = math32.Clamp(tf.cursorPos, 0, n)
++	tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, tf.cursorPos)
+ 
+ 	if tf.hasWordWrap() { // does not scroll
+ 		tf.dispRange.Start = 0
+@@ -1377,7 +1382,8 @@
+ }
+ 
+ // pixelToCursor finds the cursor position that corresponds to the given pixel location
+-func (tf *TextField) pixelToCursor(pt image.Point) int {
++func (tf *TextField) pixelToCursor(pt image.Point) (pos int) {
++	defer func() { pos = textpos.GraphemeAtOrBefore(tf.editText, pos) }()
+ 	ptf := math32.FromPoint(pt)
+ 	rpt := ptf.Sub(tf.effPos)
+ 	if rpt.X <= 0 || rpt.Y < 0 {
+@@ -1461,7 +1467,7 @@
+ 		case keymap.MoveRight:
+ 			e.SetHandled()
+ 			tf.shiftSelect(e)
+-			tf.cursorForward(1)
++			tf.cursorForward(textpos.NextGrapheme(tf.editText, tf.cursorPos) - tf.cursorPos)
+ 			tf.offerComplete()
+ 		case keymap.WordRight:
+ 			e.SetHandled()
+@@ -1471,7 +1477,7 @@
+ 		case keymap.MoveLeft:
+ 			e.SetHandled()
+ 			tf.shiftSelect(e)
+-			tf.cursorBackward(1)
++			tf.cursorBackward(tf.cursorPos - textpos.PrevGrapheme(tf.editText, tf.cursorPos))
+ 			tf.offerComplete()
+ 		case keymap.WordLeft:
+ 			e.SetHandled()
+@@ -1545,7 +1551,7 @@
+ 		case keymap.Backspace:
+ 			e.SetHandled()
+ 			tf.saveUndo()
+-			tf.cursorBackspace(1)
++			tf.cursorBackspace(tf.cursorPos - textpos.PrevGrapheme(tf.editText, tf.cursorPos))
+ 			tf.offerComplete()
+ 			tf.Send(events.Input, e)
+ 		case keymap.Kill:
+@@ -1556,7 +1562,7 @@
+ 		case keymap.Delete:
+ 			e.SetHandled()
+ 			tf.saveUndo()
+-			tf.cursorDelete(1)
++			tf.cursorDelete(textpos.NextGrapheme(tf.editText, tf.cursorPos) - tf.cursorPos)
+ 			tf.offerComplete()
+ 			tf.Send(events.Input, e)
+ 		case keymap.BackspaceWord:
+--- /dev/null
++++ b/text/textpos/grapheme.go
+@@ -0,0 +1,66 @@
++// Grapheme boundary helpers for the disposable Vellum remediation patch.
++package textpos
++
++import "github.com/go-text/typesetting/segmenter"
++
++// GraphemeBounds returns rune offsets including zero and the end of text.
++// Offsets are logical, not visual bidi positions. The result is owned.
++func GraphemeBounds(text []rune) []int {
++	var seg segmenter.Segmenter
++	seg.Init(text)
++	it := seg.GraphemeIterator()
++	bounds := []int{0}
++	for it.Next() {
++		g := it.Grapheme()
++		bounds = append(bounds, g.Offset+len(g.Text))
++	}
++	return bounds
++}
++
++// NextGrapheme returns the first boundary strictly after pos, or end of text.
++func NextGrapheme(text []rune, pos int) int {
++	pos = max(0, min(pos, len(text)))
++	for _, boundary := range GraphemeBounds(text) {
++		if boundary > pos {
++			return boundary
++		}
++	}
++	return len(text)
++}
++
++// PrevGrapheme returns the last boundary strictly before pos, or zero.
++func PrevGrapheme(text []rune, pos int) int {
++	pos = max(0, min(pos, len(text)))
++	prev := 0
++	for _, boundary := range GraphemeBounds(text) {
++		if boundary >= pos {
++			return prev
++		}
++		prev = boundary
++	}
++	return prev
++}
++
++// GraphemeAtOrBefore returns a valid boundary at or before the clamped offset.
++func GraphemeAtOrBefore(text []rune, pos int) int {
++	pos = max(0, min(pos, len(text)))
++	previous := 0
++	for _, boundary := range GraphemeBounds(text) {
++		if boundary > pos {
++			break
++		}
++		previous = boundary
++	}
++	return previous
++}
++
++// GraphemeAtOrAfter returns a valid boundary at or after the clamped offset.
++func GraphemeAtOrAfter(text []rune, pos int) int {
++	pos = max(0, min(pos, len(text)))
++	for _, boundary := range GraphemeBounds(text) {
++		if boundary >= pos {
++			return boundary
++		}
++	}
++	return len(text)
++}
+--- /dev/null
++++ b/core/textfield_editing.go
+@@ -0,0 +1,48 @@
++// Experimental editing-state seam for Vellum's native adapter.
++package core
++
++import (
++	"cogentcore.org/core/text/textpos"
++	"image"
++	"slices"
++)
++
++// TextFieldEditingState is an owned logical snapshot. All offsets are runes.
++// Caret bounds are scene pixels. Read and mutate only on the UI goroutine.
++type TextFieldEditingState struct {
++	Text                  string
++	Cursor, Anchor, Focus int
++	Caret                 image.Rectangle
++}
++
++// EditingState exposes the field's logical selection without native encoding.
++func (tf *TextField) EditingState() TextFieldEditingState {
++	state := TextFieldEditingState{Text: string(tf.editText), Cursor: tf.cursorPos, Anchor: tf.cursorPos, Focus: tf.cursorPos}
++	if tf.selectRange.Start >= 0 && tf.selectRange.Start < tf.selectRange.End && tf.selectRange.End <= len(tf.editText) {
++		state.Anchor, state.Focus = tf.selectRange.Start, tf.selectRange.End
++		if tf.cursorPos == state.Anchor {
++			state.Anchor, state.Focus = state.Focus, state.Anchor
++		}
++	}
++	if tf.Scene != nil && tf.renderAll != nil && tf.renderVisible != nil {
++		pos := tf.charRenderPos(tf.cursorPos).ToPointFloor()
++		state.Caret = image.Rectangle{Min: pos, Max: pos.Add(image.Pt(max(1, int(tf.CursorWidth.Dots)), max(1, int(tf.lineHeight))))}
++	}
++	return state
++}
++
++// SetEditingSelection rejects out-of-range and interior-grapheme positions.
++// It keeps anchor/focus direction and does not edit or reset undo history.
++func (tf *TextField) SetEditingSelection(anchor, focus int) bool {
++	bounds := textpos.GraphemeBounds(tf.editText)
++	if !slices.Contains(bounds, anchor) || !slices.Contains(bounds, focus) {
++		return false
++	}
++	tf.selectInit = anchor
++	tf.cursorPos = focus
++	tf.selectRange = textpos.Range{Start: min(anchor, focus), End: max(anchor, focus)}
++	tf.selectMode, tf.selectModeShift = false, false
++	tf.updateLinePos()
++	tf.NeedsRender()
++	return true
++}
+--- /dev/null
++++ b/text/textpos/grapheme_test.go
+@@ -0,0 +1,55 @@
++package textpos
++
++import (
++	"reflect"
++	"testing"
++)
++
++func TestVellumGraphemeBoundaries(t *testing.T) {
++	cases := []struct {
++		text   string
++		bounds []int
++	}{
++		{"", []int{0}}, {"AB", []int{0, 1, 2}}, {"e\u0301", []int{0, 2}},
++		{"👩‍💻", []int{0, 3}}, {"👨‍👩‍👧‍👦", []int{0, 7}}, {"🇺🇳🇯🇵", []int{0, 2, 4}},
++		{"👍🏽", []int{0, 2}}, {"\r\n", []int{0, 2}}, {"가", []int{0, 2}},
++		{"A👩‍💻e\u0301Z", []int{0, 1, 4, 6, 7}},
++	}
++	for _, tc := range cases {
++		t.Run(tc.text, func(t *testing.T) {
++			text := []rune(tc.text)
++			if got := GraphemeBounds(text); !reflect.DeepEqual(got, tc.bounds) {
++				t.Fatalf("%v != %v", got, tc.bounds)
++			}
++			for i := 0; i < len(tc.bounds)-1; i++ {
++				start, end := tc.bounds[i], tc.bounds[i+1]
++				if got := NextGrapheme(text, start); got != end {
++					t.Fatalf("next %d = %d", start, got)
++				}
++				if got := PrevGrapheme(text, end); got != start {
++					t.Fatalf("prev %d = %d", end, got)
++				}
++				for p := start + 1; p < end; p++ {
++					if NextGrapheme(text, p) != end || PrevGrapheme(text, p) != start {
++						t.Fatalf("interior %d", p)
++					}
++				}
++			}
++			if PrevGrapheme(text, 0) != 0 || NextGrapheme(text, len(text)) != len(text) {
++				t.Fatal("endpoint")
++			}
++		})
++	}
++}
++
++func TestVellumInclusiveGraphemeBounds(t *testing.T) {
++	text := []rune("A👩‍💻Z")
++	for _, boundary := range []int{0, 1, 4, 5} {
++		if GraphemeAtOrBefore(text, boundary) != boundary || GraphemeAtOrAfter(text, boundary) != boundary {
++			t.Fatal("valid boundary changed")
++		}
++	}
++	if GraphemeAtOrBefore(text, 2) != 1 || GraphemeAtOrAfter(text, 2) != 4 {
++		t.Fatal("interior boundary")
++	}
++}
+--- /dev/null
++++ b/core/textfield_vellum_test.go
+@@ -0,0 +1,68 @@
++package core
++
++import (
++	"cogentcore.org/core/text/textpos"
++	"testing"
++)
++
++func TestVellumFieldEditing(t *testing.T) {
++	for _, text := range []string{"AB", "e\u0301", "👩‍💻", "🇺🇳", "👍🏽"} {
++		t.Run(text, func(t *testing.T) {
++			tf := &TextField{editText: []rune(text), cursorPos: len([]rune(text))}
++			start := textpos.PrevGrapheme(tf.editText, tf.cursorPos)
++			tf.cursorBackspace(tf.cursorPos - start)
++			if tf.cursorPos != start || string(tf.editText) != string([]rune(text)[:start]) {
++				t.Fatalf("backspace = %q @%d", string(tf.editText), tf.cursorPos)
++			}
++			tf = &TextField{editText: []rune(text)}
++			end := textpos.NextGrapheme(tf.editText, 0)
++			tf.cursorDelete(end)
++			if string(tf.editText) != string([]rune(text)[end:]) || tf.cursorPos != 0 {
++				t.Fatal("delete")
++			}
++		})
++	}
++	tf := &TextField{editText: []rune("A👩‍💻e\u0301Z")}
++	if tf.SetEditingSelection(1, 2) || tf.SetEditingSelection(-1, 0) || tf.SetEditingSelection(0, 8) {
++		t.Fatal("invalid selection accepted")
++	}
++	if !tf.SetEditingSelection(6, 1) {
++		t.Fatal("valid reversed selection rejected")
++	}
++	state := tf.EditingState()
++	if state.Anchor != 6 || state.Focus != 1 || state.Cursor != 1 {
++		t.Fatalf("reversed selection: %+v", state)
++	}
++	tf.deleteSelection()
++	if string(tf.editText) != "AZ" {
++		t.Fatalf("selection delete: %q", string(tf.editText))
++	}
++	tf = &TextField{editText: []rune("AB"), cursorPos: 1}
++	tf.insertAtCursor("👩‍💻")
++	if string(tf.editText) != "A👩‍💻B" || tf.cursorPos != 4 {
++		t.Fatal("insertion lost rune offset")
++	}
++}
++
++func TestVellumEditingSnapshotIsReadOnly(t *testing.T) {
++	tf := &TextField{editText: []rune("A👩‍💻Z"), cursorPos: 4, selectRange: textpos.Range{Start: 1, End: 4}, selectMode: true, edited: true}
++	for i := 0; i < 3; i++ {
++		state := tf.EditingState()
++		if state.Anchor != 1 || state.Focus != 4 {
++			t.Fatal("selection not observed")
++		}
++	}
++	if !tf.edited || !tf.selectMode || tf.selectRange.Start != 1 || tf.selectRange.End != 4 {
++		t.Fatal("inspection mutated editing")
++	}
++	tf.cursorPos = 2
++	tf.SetText("👩‍💻")
++	if tf.cursorPos != 0 || !tf.SetEditingSelection(3, 3) {
++		t.Fatal("replacement left interior caret")
++	}
++	tf.selectRange = textpos.Range{Start: 1, End: 2}
++	tf.deleteSelection()
++	if len(tf.editText) != 0 {
++		t.Fatal("partial selection split a grapheme")
++	}
++}

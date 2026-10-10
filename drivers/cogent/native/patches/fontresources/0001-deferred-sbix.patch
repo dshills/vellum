@@ -1,0 +1,656 @@
+--- a/font/font.go
++++ b/font/font.go
+@@ -152,11 +152,12 @@
+ 	post post         // optional
+ 	svg  svg          // optional
+ 
+-	glyf   tables.Glyf
+-	hmtx   tables.Hmtx
+-	vmtx   tables.Vmtx
+-	bitmap bitmap
+-	sbix   sbix
++	glyf     tables.Glyf
++	hmtx     tables.Hmtx
++	vmtx     tables.Vmtx
++	bitmap   bitmap
++	sbix     sbix
++	lazySbix *lazySbix
+ 
+ 	STAT *STAT // optional
+ 
+@@ -262,9 +263,14 @@
+ 
+ 	out.bitmap = selectBitmapTable(ld)
+ 
+-	raw, _ = ld.RawTable(ot.MustNewTag("sbix"))
+-	sbix, _, _ := tables.ParseSbix(raw, out.nGlyphs)
+-	out.sbix = newSbix(sbix)
++	if reader, length, ok := ld.DeferredTable(ot.MustNewTag("sbix")); ok {
++		out.lazySbix, _ = newLazySbix(reader, length, out.nGlyphs)
++	}
++	if out.lazySbix == nil {
++		raw, _ = ld.RawTable(ot.MustNewTag("sbix"))
++		sbix, _, _ := tables.ParseSbix(raw, out.nGlyphs)
++		out.sbix = newSbix(sbix)
++	}
+ 
+ 	out.cff, _ = loadCff(ld, out.nGlyphs)
+ 	out.cff2, _ = loadCff2(ld, out.nGlyphs, len(out.fvar))
+@@ -670,3 +676,6 @@
+ 	// invalid the cache
+ 	f.extentsCache.reset()
+ }
++
++// HasDeferredResources reports whether a font retains a stable backing reader.
++func (f *Font) HasDeferredResources() bool { return f.lazySbix != nil }
+--- a/font/renderer.go
++++ b/font/renderer.go
+@@ -387,6 +387,9 @@
+ 	}
+ 
+ 	if hori := font.hhea; hori != nil {
++		if font.lazySbix != nil {
++			return font.lazySbix.sizes.availableSizes(hori, avgWidth, upem)
++		}
+ 		return font.sbix.availableSizes(hori, avgWidth, upem)
+ 	}
+ 
+@@ -468,6 +471,9 @@
+ func (f *Face) GlyphDataBitmap(gid GID) (GlyphBitmap, bool) {
+ 	g := gID(gid)
+ 	outB, err := f.sbix.glyphData(g, f.xPpem, f.yPpem)
++	if f.lazySbix != nil {
++		outB, err = f.lazySbix.glyphData(g, f.xPpem, f.yPpem)
++	}
+ 	if err == nil {
+ 		outline, ok := f.GlyphDataOutline(gid)
+ 		if ok {
+--- a/font/metrics.go
++++ b/font/metrics.go
+@@ -356,6 +356,9 @@
+ }
+ 
+ func (f *Font) getExtentsFromSbix(glyph gID, xPpem, yPpem uint16) (GlyphExtents, bool) {
++	if f.lazySbix != nil {
++		return f.lazySbix.extents(glyph, xPpem, yPpem, f.upem)
++	}
+ 	strike := f.sbix.chooseStrike(xPpem, yPpem)
+ 	if strike == nil || strike.Ppem == 0 {
+ 		return GlyphExtents{}, false
+--- a/font/opentype/reader.go
++++ b/font/opentype/reader.go
+@@ -369,3 +369,22 @@
+ 	}
+ 	return out
+ }
++
++// StableResource opts into deferred reads after the initial Resource is closed.
++// The reader must stay valid for the Font lifetime and reject backing-file changes.
++// No caller-owned open descriptor may be returned here.
++type StableResource interface{ StableReaderAt() io.ReaderAt }
++
++// DeferredTable returns an uncompressed table view only for an explicitly stable
++// resource. Compressed or ordinary resources retain the eager parsing behavior.
++func (ld *Loader) DeferredTable(tag Tag) (io.ReaderAt, int64, bool) {
++	stable, ok := ld.file.(StableResource)
++	if !ok {
++		return nil, 0, false
++	}
++	s, ok := ld.tables[tag]
++	if !ok || (s.length != 0 && s.length < s.zLength) {
++		return nil, 0, false
++	}
++	return io.NewSectionReader(stable.StableReaderAt(), int64(s.offset), int64(s.length)), int64(s.length), true
++}
+--- a/fontscan/footprint.go
++++ b/fontscan/footprint.go
+@@ -130,16 +130,40 @@
+ 	if err != nil {
+ 		return nil, err
+ 	}
+-
+-	if index := int(location.Index); len(loaders) <= index {
+-		// this should only happen if the font file as changed
+-		// since the last scan (very unlikely)
+-		return nil, fmt.Errorf("invalid font index in collection: %d >= %d", index, len(loaders))
++	if int(location.Index) >= len(loaders) {
++		return nil, fmt.Errorf("invalid font collection index")
+ 	}
+-
+-	ft, err := font.NewFont(loaders[location.Index])
++	loader := loaders[location.Index]
++	var snapshot *stableFile
++	eligible := loader.HasTable(ot.MustNewTag("sbix")) || (loader.HasTable(ot.MustNewTag("glyf")) && !loader.HasTable(ot.MustNewTag("gvar")))
++	if eligible {
++		snapshot, err = newStableFile(file)
++		if err == nil {
++			copies, e := ot.NewLoaders(snapshot)
++			if e != nil {
++				snapshot.Close()
++				return nil, e
++			}
++			if int(location.Index) >= len(copies) {
++				snapshot.Close()
++				return nil, fmt.Errorf("snapshot collection changed")
++			}
++			loader = copies[location.Index]
++		} else {
++			fmSnapshotFallback()
++			snapshot = nil
++		} // Preserve valid-font compatibility on admission/IO failure.
++	}
++	ft, err := font.NewFont(loader)
+ 	if err != nil {
++		if snapshot != nil {
++			snapshot.Close()
++		}
+ 		return nil, fmt.Errorf("reading font at %s: %s", location.File, err)
++	}
++	// Eager/compressed/invalid deferred tables must not await finalization for credit.
++	if snapshot != nil && !ft.HasDeferredResources() {
++		snapshot.Close()
+ 	}
+ 
+ 	return font.NewFace(ft), nil
+--- /dev/null
++++ b/font/lazy_sbix.go
+@@ -0,0 +1,166 @@
++// SPDX-License-Identifier: Unlicense OR BSD-3-Clause
++package font
++
++import (
++	"container/list"
++	"encoding/binary"
++	"fmt"
++	"github.com/go-text/typesetting/font/opentype/tables"
++	"io"
++	"sync"
++)
++
++const sbixGlyphLimit = 2 * 1024 * 1024
++const sbixCacheLimit = 4 * 1024 * 1024
++const sbixCacheEntries = 32
++
++// Only strike headers are retained at font load. Offset pairs and bitmap payloads
++// are read on demand. The LRU bounds internal payload retention; returned bitmap
++// slices owned by application/render caches are outside this internal budget.
++type lazySbix struct {
++	mu      sync.Mutex
++	r       io.ReaderAt
++	length  int64
++	glyphs  int
++	offsets []uint32
++	sizes   sbix
++	cache   map[uint64]*list.Element
++	lru     list.List
++	bytes   int
++}
++type sbixEntry struct {
++	key   uint64
++	data  tables.BitmapGlyphData
++	bytes int
++}
++
++func newLazySbix(r io.ReaderAt, length int64, glyphs int) (*lazySbix, error) {
++	if glyphs < 0 || glyphs > 65535 || length < 8 {
++		return nil, fmt.Errorf("invalid sbix bounds")
++	}
++	var h [8]byte
++	if _, e := r.ReadAt(h[:], 0); e != nil {
++		return nil, e
++	}
++	count := binary.BigEndian.Uint32(h[4:])
++	if binary.BigEndian.Uint16(h[:]) != 1 || count == 0 || count > 256 || int64(count)*4 > length-8 {
++		return nil, fmt.Errorf("invalid sbix header")
++	}
++	b := make([]byte, int(count)*4)
++	if _, e := r.ReadAt(b, 8); e != nil {
++		return nil, e
++	}
++	s := &lazySbix{r: r, length: length, glyphs: glyphs, cache: make(map[uint64]*list.Element)}
++	for i := 0; i < int(count); i++ {
++		off := binary.BigEndian.Uint32(b[4*i:])
++		minSize := int64(4) + 4*int64(glyphs+1)
++		if int64(off) < 8+int64(count)*4 || int64(off) > length-minSize {
++			return nil, fmt.Errorf("invalid strike offset")
++		}
++		var header [4]byte
++		if _, e := r.ReadAt(header[:], int64(off)); e != nil {
++			return nil, e
++		}
++		// Scan bounded offset metadata so an over-budget record selects eager
++		// compatibility for the entire bitmap table at load time.
++		indices := make([]byte, 4*(glyphs+1))
++		if _, e := r.ReadAt(indices, int64(off)+4); e != nil {
++			return nil, e
++		}
++		for j := 0; j < glyphs; j++ {
++			start, end := int64(binary.BigEndian.Uint32(indices[4*j:])), int64(binary.BigEndian.Uint32(indices[4*(j+1):]))
++			if start < minSize || end < start || end > length-int64(off) || end-start > sbixGlyphLimit {
++				return nil, fmt.Errorf("bitmap table requires eager compatibility or has invalid offsets")
++			}
++		}
++		s.offsets = append(s.offsets, off)
++		s.sizes = append(s.sizes, tables.Strike{Ppem: binary.BigEndian.Uint16(header[:]), Ppi: binary.BigEndian.Uint16(header[2:])})
++	}
++	return s, nil
++}
++func (s *lazySbix) glyph(g gID, x, y uint16) (tables.BitmapGlyphData, uint16, error) {
++	st := s.sizes.chooseStrike(x, y)
++	if st == nil || st.Ppem == 0 {
++		return tables.BitmapGlyphData{}, 0, errEmptySbixTable
++	}
++	index := 0
++	for i := range s.sizes {
++		if &s.sizes[i] == st {
++			index = i
++			break
++		}
++	}
++	s.mu.Lock()
++	defer s.mu.Unlock()
++	for depth := 0; depth <= 8; depth++ {
++		if int(g) >= s.glyphs {
++			return tables.BitmapGlyphData{}, 0, fmt.Errorf("glyph outside sbix")
++		}
++		key := uint64(index)<<32 | uint64(g)
++		var data tables.BitmapGlyphData
++		if entry := s.cache[key]; entry != nil {
++			s.lru.MoveToFront(entry)
++			data = entry.Value.(sbixEntry).data
++		} else {
++			base := int64(s.offsets[index])
++			var pair [8]byte
++			if _, e := s.r.ReadAt(pair[:], base+4+4*int64(g)); e != nil {
++				return data, 0, e
++			}
++			start, end := int64(binary.BigEndian.Uint32(pair[:])), int64(binary.BigEndian.Uint32(pair[4:]))
++			if end < start || start < 4+4*int64(s.glyphs+1) || end > s.length-base || end-start > sbixGlyphLimit {
++				return data, 0, fmt.Errorf("invalid or oversized bitmap glyph")
++			}
++			if start == end {
++				return data, 0, fmt.Errorf("empty bitmap glyph")
++			}
++			raw := make([]byte, int(end-start))
++			if _, e := s.r.ReadAt(raw, base+start); e != nil {
++				return data, 0, e
++			}
++			var e error
++			data, _, e = tables.ParseBitmapGlyphData(raw)
++			if e != nil {
++				return data, 0, e
++			}
++			for s.bytes+len(raw) > sbixCacheLimit || s.lru.Len() >= sbixCacheEntries {
++				e := s.lru.Back()
++				v := e.Value.(sbixEntry)
++				s.bytes -= v.bytes
++				delete(s.cache, v.key)
++				s.lru.Remove(e)
++			}
++			s.cache[key] = s.lru.PushFront(sbixEntry{key, data, len(raw)})
++			s.bytes += len(raw)
++		}
++		if data.GraphicType != dupe {
++			return data, st.Ppem, nil
++		}
++		if len(data.Data) < 2 {
++			return data, 0, fmt.Errorf("short duplicate glyph")
++		}
++		g = gID(binary.BigEndian.Uint16(data.Data))
++	}
++	return tables.BitmapGlyphData{}, 0, fmt.Errorf("cyclic/deep duplicate glyph")
++}
++func (s *lazySbix) glyphData(g gID, x, y uint16) (GlyphBitmap, error) {
++	d, _, e := s.glyph(g, x, y)
++	if e != nil {
++		return GlyphBitmap{}, e
++	}
++	w, h, f, e := decodeBitmapConfig(d)
++	return GlyphBitmap{Data: d.Data, Width: w, Height: h, Format: f}, e
++}
++func (s *lazySbix) extents(g gID, x, y, upem uint16) (GlyphExtents, bool) {
++	d, ppem, e := s.glyph(g, x, y)
++	if e != nil || ppem == 0 {
++		return GlyphExtents{}, false
++	}
++	v, ok := bitmapGlyphExtents(d)
++	scale := float32(upem) / float32(ppem)
++	v.XBearing *= scale
++	v.YBearing *= scale
++	v.Width *= scale
++	v.Height *= scale
++	return v, ok
++}
+--- /dev/null
++++ b/font/lazy_sbix_test.go
+@@ -0,0 +1,110 @@
++package font
++
++import (
++	"bytes"
++	"container/list"
++	"encoding/binary"
++	"github.com/go-text/typesetting/font/opentype/tables"
++	"io"
++	"testing"
++)
++
++type countedReader struct {
++	*bytes.Reader
++	n int
++}
++
++func (r *countedReader) ReadAt(b []byte, o int64) (int, error) {
++	r.n += len(b)
++	return r.Reader.ReadAt(b, o)
++}
++func fixtureSbix(glyphs, payload int) []byte {
++	header := 4 + 4*(glyphs+1)
++	b := make([]byte, 12+header+glyphs*(8+payload))
++	binary.BigEndian.PutUint16(b, 1)
++	binary.BigEndian.PutUint32(b[4:], 1)
++	binary.BigEndian.PutUint32(b[8:], 12)
++	binary.BigEndian.PutUint16(b[12:], 16)
++	for i := 0; i <= glyphs; i++ {
++		binary.BigEndian.PutUint32(b[16+4*i:], uint32(header+i*(8+payload)))
++	}
++	for i := 0; i < glyphs; i++ {
++		pos := 12 + header + i*(8+payload)
++		copy(b[pos+4:], []byte("png "))
++		for j := 0; j < payload; j++ {
++			b[pos+8+j] = byte(i)
++		}
++	}
++	return b
++}
++func TestDeferredSbixParityAndBudget(t *testing.T) {
++	raw := fixtureSbix(48, 128*1024)
++	reader := &countedReader{Reader: bytes.NewReader(raw)}
++	s, e := newLazySbix(reader, int64(len(raw)), 48)
++	if e != nil {
++		t.Fatal(e)
++	}
++	if reader.n != 16+4*(48+1) {
++		t.Fatal("eager payload read", reader.n)
++	}
++	parsed, _, e := tables.ParseSbix(raw, 48)
++	if e != nil {
++		t.Fatal(e)
++	}
++	eager := newSbix(parsed)
++	for g := 0; g < 48; g++ {
++		d, ppem, e := s.glyph(gID(g), 16, 16)
++		if e != nil {
++			t.Fatal(e)
++		}
++		expected := strikeGlyph(eager.chooseStrike(16, 16), gID(g), 0)
++		if ppem != 16 || !bytes.Equal(d.Data, expected.Data) || d.GraphicType != expected.GraphicType {
++			t.Fatal("eager/lazy divergence", g)
++		}
++		if s.bytes > sbixCacheLimit || s.lru.Len() > sbixCacheEntries {
++			t.Fatal("cache exceeds bound", s.bytes, s.lru.Len())
++		}
++	}
++	if _, ok := s.cache[0]; ok {
++		t.Fatal("old glyph not evicted")
++	}
++	if _, _, e := s.glyph(0, 0, 0); e != nil {
++		t.Fatal("evicted glyph cannot reload", e)
++	}
++}
++func TestDeferredSbixInvalidAndCycles(t *testing.T) {
++	raw := fixtureSbix(1, sbixGlyphLimit)
++	s, e := newLazySbix(bytes.NewReader(raw), int64(len(raw)), 1)
++	if e == nil || s != nil {
++		t.Fatal("oversize bitmap must select eager compatibility")
++	}
++	parsed, _, err := tables.ParseSbix(raw, 1)
++	if err != nil || len(newSbix(parsed).chooseStrike(16, 16).GlyphDatas[0].Data) == 0 {
++		t.Fatal("valid large bitmap lost on eager compatibility", err)
++	}
++	raw = fixtureSbix(1, 2)
++	copy(raw[28:], []byte("dupe"))
++	raw[32] = 0
++	raw[33] = 0
++	s, e = newLazySbix(bytes.NewReader(raw), int64(len(raw)), 1)
++	if e != nil {
++		t.Fatal(e)
++	}
++	if _, _, e = s.glyph(0, 16, 16); e == nil {
++		t.Fatal("duplicate cycle accepted")
++	}
++	for n := 0; n < 24; n++ {
++		if _, e = newLazySbix(bytes.NewReader(raw[:n]), int64(n), 1); e == nil {
++			t.Fatal("truncated metadata", n)
++		}
++	}
++	s.r = errorReader{}
++	s.cache = make(map[uint64]*list.Element)
++	if _, _, e = s.glyph(0, 16, 16); e == nil {
++		t.Fatal("read error ignored")
++	}
++}
++
++type errorReader struct{}
++
++func (errorReader) ReadAt([]byte, int64) (int, error) { return 0, io.ErrUnexpectedEOF }
+--- /dev/null
++++ b/fontscan/stable_file.go
+@@ -0,0 +1,123 @@
++// SPDX-License-Identifier: Unlicense OR BSD-3-Clause
++package fontscan
++
++import (
++	"fmt"
++	"io"
++	"os"
++	"runtime"
++	"sync"
++)
++
++const snapshotFileLimit int64 = 512 * 1024 * 1024
++const snapshotBytesLimit int64 = 2 * 1024 * 1024 * 1024
++const snapshotCountLimit = 32
++
++var snapshotBudget struct {
++	sync.Mutex
++	bytes     int64
++	count     int
++	fallbacks uint64
++}
++
++// An immutable, library-owned private snapshot backs initial and deferred parsing.
++// The source is never reopened after parsing. Snapshot count/disk size are bounded;
++// the finalizer releases its descriptor/storage/credit after the last font reader.
++type stableFile struct {
++	*os.File
++	path string
++	size int64
++	once sync.Once
++}
++
++func newStableFile(source *os.File) (*stableFile, error) {
++	info, e := source.Stat()
++	if e != nil {
++		return nil, e
++	}
++	size := info.Size()
++	if size < 0 || size > snapshotFileLimit {
++		return nil, fmt.Errorf("font exceeds snapshot file budget")
++	}
++	snapshotBudget.Lock()
++	if snapshotBudget.count >= snapshotCountLimit || size > snapshotBytesLimit-snapshotBudget.bytes {
++		snapshotBudget.Unlock()
++		return nil, fmt.Errorf("font snapshot admission capacity exhausted")
++	}
++	snapshotBudget.count++
++	snapshotBudget.bytes += size
++	snapshotBudget.Unlock()
++	s := &stableFile{size: size}
++	ok := false
++	defer func() {
++		if !ok {
++			s.Close()
++		}
++	}()
++	f, e := os.CreateTemp("", "vellum-font-*")
++	if e != nil {
++		return nil, e
++	}
++	s.File = f
++	s.path = f.Name()
++	if _, e = source.Seek(0, io.SeekStart); e != nil {
++		return nil, e
++	}
++	// Read at most declared size+1, so a growing source cannot bypass the budget.
++	n, e := io.Copy(f, io.LimitReader(source, size+1))
++	if e != nil {
++		return nil, e
++	}
++	if n != size {
++		return nil, fmt.Errorf("font changed while snapshotting")
++	}
++	after, e := source.Stat()
++	if e != nil {
++		return nil, e
++	}
++	if after.Size() != size || !after.ModTime().Equal(info.ModTime()) {
++		return nil, fmt.Errorf("font changed while snapshotting")
++	}
++	if _, e = f.Seek(0, io.SeekStart); e != nil {
++		return nil, e
++	}
++	// No path remains on Unix; Windows defers deletion until its descriptor closes.
++	if e = os.Remove(s.path); e == nil {
++		s.path = ""
++	}
++	runtime.SetFinalizer(s, func(s *stableFile) { s.Close() })
++	ok = true
++	return s, nil
++}
++func (s *stableFile) StableReaderAt() io.ReaderAt { return s }
++func (s *stableFile) Close() error {
++	var err error
++	s.once.Do(func() {
++		if s.File != nil {
++			err = s.File.Close()
++		}
++		if s.path != "" {
++			_ = os.Remove(s.path)
++		}
++		snapshotBudget.Lock()
++		snapshotBudget.count--
++		snapshotBudget.bytes -= s.size
++		snapshotBudget.Unlock()
++	})
++	return err
++}
++
++func (s *stableFile) ReadAt(b []byte, off int64) (int, error) {
++	n, e := s.File.ReadAt(b, off)
++	runtime.KeepAlive(s)
++	return n, e
++}
++
++func fmSnapshotFallback() { snapshotBudget.Lock(); snapshotBudget.fallbacks++; snapshotBudget.Unlock() }
++
++// SnapshotStats reports process-wide disk-snapshot admission, not Go heap usage.
++func (fm *FontMap) SnapshotStats() (int, int64, uint64) {
++	snapshotBudget.Lock()
++	defer snapshotBudget.Unlock()
++	return snapshotBudget.count, snapshotBudget.bytes, snapshotBudget.fallbacks
++}
+--- /dev/null
++++ b/fontscan/stable_file_test.go
+@@ -0,0 +1,91 @@
++package fontscan
++
++import (
++	"os"
++	"path/filepath"
++	"testing"
++)
++
++func TestStableDeferredReader(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "font")
++	if e := os.WriteFile(path, []byte("abcd"), 0600); e != nil {
++		t.Fatal(e)
++	}
++	f, e := os.Open(path)
++	if e != nil {
++		t.Fatal(e)
++	}
++	r, e := newStableFile(f)
++	if e != nil {
++		t.Fatal(e)
++	}
++	f.Close()
++	defer r.Close()
++	b := make([]byte, 2)
++	if n, e := r.ReadAt(b, 1); n != 2 || e != nil || string(b) != "bc" {
++		t.Fatal(n, e, string(b))
++	}
++	if e := os.WriteFile(path, []byte("WXYZ"), 0600); e != nil {
++		t.Fatal(e)
++	}
++	if n, e := r.ReadAt(b, 1); n != 2 || e != nil || string(b) != "bc" {
++		t.Fatal("snapshot changed with source", n, e, string(b))
++	}
++	replacement := path + "new"
++	os.WriteFile(replacement, []byte("EFGH"), 0600)
++	if e := os.Rename(replacement, path); e != nil {
++		t.Fatal(e)
++	}
++	if n, e := r.ReadAt(b, 1); n != 2 || e != nil || string(b) != "bc" {
++		t.Fatal("snapshot changed with replacement", n, e, string(b))
++	}
++}
++
++func TestStableSnapshotBudgetAndClose(t *testing.T) {
++	path := filepath.Join(t.TempDir(), "font")
++	os.WriteFile(path, []byte("abcd"), 0600)
++	source, e := os.Open(path)
++	if e != nil {
++		t.Fatal(e)
++	}
++	defer source.Close()
++	snapshotBudget.Lock()
++	beforeCount, beforeBytes := snapshotBudget.count, snapshotBudget.bytes
++	snapshotBudget.Unlock()
++	var snapshots []*stableFile
++	for i := beforeCount; i < snapshotCountLimit; i++ {
++		s, e := newStableFile(source)
++		if e != nil {
++			t.Fatal(e)
++		}
++		snapshots = append(snapshots, s)
++	}
++	if s, e := newStableFile(source); e == nil {
++		s.Close()
++		t.Fatal("global snapshot count cap ignored")
++	}
++	for _, s := range snapshots {
++		s.Close()
++		s.Close()
++	}
++	snapshotBudget.Lock()
++	defer snapshotBudget.Unlock()
++	if snapshotBudget.count != beforeCount || snapshotBudget.bytes != beforeBytes {
++		t.Fatal("snapshot credits retained after close")
++	}
++}
++
++func TestStableSnapshotExhaustionFallsBack(t *testing.T) {
++	snapshotBudget.Lock()
++	before := snapshotBudget.count
++	snapshotBudget.count = snapshotCountLimit
++	snapshotBudget.Unlock()
++	defer func() { snapshotBudget.Lock(); snapshotBudget.count = before; snapshotBudget.Unlock() }()
++	f, e := (&Footprint{Location: Location{File: "../font/testdata/Roboto-Regular.ttf"}}).loadFromDisk()
++	if e != nil || f == nil {
++		t.Fatal("valid font rejected on snapshot exhaustion", e)
++	}
++	if _, ok := f.NominalGlyph('A'); !ok {
++		t.Fatal("fallback font coverage lost")
++	}
++}

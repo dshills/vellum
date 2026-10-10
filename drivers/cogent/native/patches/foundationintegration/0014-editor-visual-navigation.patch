@@ -1,0 +1,673 @@
+--- a/text/textcore/base.go
++++ b/text/textcore/base.go
+@@ -187,6 +187,7 @@
+ 	lastFilename                           string
+ 	nativeListener                         func(EditorEditingState)
+ 	nativeComposition                      *editorNativeComposition
++	visualState                            editorVisualState
+ 	nativeGeometry                         core.TextFieldGeometry
+ 	nativeText                             string
+ 	nativeRunes                            []rune
+--- a/text/textcore/native_vellum.go
++++ b/text/textcore/native_vellum.go
+@@ -52,7 +52,7 @@
+ 			state.Anchor, state.Focus = a, b
+ 		}
+ 	}
+-	state.VisualLine = ed.Lines.PosToView(ed.viewId, ed.CursorPos).Line
++	state.VisualLine = ed.visualAffinity(state.Cursor, ed.Lines.PosToView(ed.viewId, ed.CursorPos).Line)
+ 	state.Caret = ed.NativeCaretBounds()
+ 	return state
+ }
+@@ -72,6 +72,8 @@
+ 	return true
+ }
+ func (ed *Base) setNativeSelection(anchor, focus int) {
++	ed.visualState.vertical = false
++	ed.visualState.offset = -1
+ 	ed.refreshNativeDocument()
+ 	ed.selectStart = ed.nativePos(anchor)
+ 	ed.CursorPos = ed.nativePos(focus)
+@@ -187,7 +189,7 @@
+ 	}
+ 	ed.refreshNativeDocument()
+ 	offset := ed.nativeOffset(ed.CursorPos)
+-	line := ed.Lines.PosToView(ed.viewId, ed.CursorPos).Line
++	line := ed.visualAffinity(offset, ed.Lines.PosToView(ed.viewId, ed.CursorPos).Line)
+ 	if ed.nativeLayoutRevision != ed.nativeRevision {
+ 		return image.Rectangle{}
+ 	}
+@@ -201,17 +203,24 @@
+ }
+ func (ed *Base) beginNativeGeometry() {
+ 	ed.nativeGeometry = core.TextFieldGeometry{}
+-	if ed.nativeListener == nil || ed.Lines == nil {
++	ed.visualState.unsupported = map[int]bool{}
++	ed.visualState.interaction = nil
++	if ed.Lines == nil {
+ 		return
+ 	}
+ 	ed.refreshNativeDocument()
+ }
+ func (ed *Base) captureNativeSpan(ls *shaped.Lines, pos math32.Vector2, source textpos.Pos, line int, tabWidth float32) {
+-	if ed.nativeListener == nil || source.Line >= len(ed.nativeOffsets) {
++	if source.Line >= len(ed.nativeOffsets) {
+ 		return
+ 	}
+ 	base := ed.nativeOffsets[source.Line] + source.Char
+ 	g := ls.InteractionLayout()
++	for _, ln := range g.Lines {
++		if ln.Unsupported {
++			ed.visualState.unsupported[line] = true
++		}
++	}
+ 	off := pos.Add(math32.FromPoint(ed.Scene.SceneGeom.Pos))
+ 	if tabWidth > 0 {
+ 		g.Cells = []shaped.Cell{{Range: textpos.Range{Start: 0, End: 1}, Rect: math32.B2(0, 0, tabWidth, ed.charSize.Y)}}
+@@ -247,7 +256,7 @@
+ 	}
+ }
+ func (ed *Base) finishNativeGeometry() {
+-	if ed.nativeListener == nil || ed.Lines == nil {
++	if ed.Lines == nil {
+ 		return
+ 	}
+ 	type key struct {
+@@ -289,8 +298,13 @@
+ 			ed.nativeGeometry.Cells = append(ed.nativeGeometry.Cells, shaped.Cell{Range: textpos.Range{Start: c.Rune, End: c.Rune + 1}, Line: c.Line, Rect: math32.Box2{Min: c.Pos, Max: c.Pos.Add(math32.Vec2(0, c.Height))}})
+ 		}
+ 	}
++	ed.visualState.interaction = nil
++	if c, ok := ed.editorInteraction().At(ed.visualState.offset, ed.visualState.line); !ok || c.Line != ed.visualState.line {
++		ed.visualState.offset = -1
++	}
+ 	ed.nativeLayoutRevision = ed.nativeRevision
+ 	ed.nativeGeometry.Viewport = ed.nativeViewport()
++	ed.visualState.scroll, ed.visualState.viewport = ed.scrollPos, ed.nativeGeometry.Viewport
+ 	ed.nativeGeneration++
+ 	if start, end, ok := ed.NativeCompositionRange(); ok {
+ 		pc := ed.Scene.Painter
+--- a/text/textcore/nav.go
++++ b/text/textcore/nav.go
+@@ -26,6 +26,9 @@
+ // setCursor sets a new cursor position, enforcing it in range.
+ // This is the main final pathway for all cursor movement.
+ func (ed *Base) setCursor(pos textpos.Pos) {
++	if pos != ed.CursorPos {
++		ed.visualState.vertical = false
++	}
+ 	if ed.Lines == nil {
+ 		ed.CursorPos = textpos.PosZero
+ 		return
+@@ -127,6 +130,7 @@
+ // setCursorColumn sets the current target cursor column (cursorColumn) to that
+ // of the given position
+ func (ed *Base) setCursorColumn(pos textpos.Pos) {
++	ed.visualState.vertical = false
+ 	if ed.Lines == nil {
+ 		return
+ 	}
+@@ -148,6 +152,9 @@
+ // cursorSelectShow does SetCursorShow, cursorSelect, and NeedsRender.
+ // This is typically called for move actions.
+ func (ed *Base) cursorSelectShow(org textpos.Pos) {
++	if ed.visualState.vertical {
++		ed.visualState.preferredCursor = ed.CursorPos
++	}
+ 	ed.SetCursorShow(ed.CursorPos)
+ 	ed.cursorSelect(org)
+ 	ed.SendInput()
+@@ -156,6 +163,9 @@
+ 
+ // cursorForward moves the cursor forward
+ func (ed *Base) cursorForward(steps int) {
++	if ed.cursorVisual(steps, false) {
++		return
++	}
+ 	org := ed.validateCursor()
+ 	ed.CursorPos = ed.Lines.MoveForwardGrapheme(org, steps)
+ 	ed.setCursorColumn(ed.CursorPos)
+@@ -172,6 +182,9 @@
+ 
+ // cursorBackward moves the cursor backward
+ func (ed *Base) cursorBackward(steps int) {
++	if ed.cursorVisual(-steps, false) {
++		return
++	}
+ 	org := ed.validateCursor()
+ 	ed.CursorPos = ed.Lines.MoveBackwardGrapheme(org, steps)
+ 	ed.setCursorColumn(ed.CursorPos)
+@@ -188,6 +201,9 @@
+ 
+ // cursorDown moves the cursor down line(s)
+ func (ed *Base) cursorDown(steps int) {
++	if ed.cursorVisual(steps, true) {
++		return
++	}
+ 	org := ed.validateCursor()
+ 	ed.CursorPos = ed.Lines.MoveDown(ed.viewId, org, steps, ed.cursorColumn)
+ 	ed.cursorSelectShow(org)
+@@ -213,6 +229,9 @@
+ 
+ // cursorUp moves the cursor up line(s)
+ func (ed *Base) cursorUp(steps int) {
++	if ed.cursorVisual(-steps, true) {
++		return
++	}
+ 	org := ed.validateCursor()
+ 	ed.CursorPos = ed.Lines.MoveUp(ed.viewId, org, steps, ed.cursorColumn)
+ 	ed.cursorSelectShow(org)
+--- a/text/textcore/render.go
++++ b/text/textcore/render.go
+@@ -59,8 +59,8 @@
+ 		ed.renderLines()
+ 		ed.RenderChildren()
+ 		ed.RenderScrolls()
++		ed.finishNativeGeometry()
+ 		ed.updateCursorPosition()
+-		ed.finishNativeGeometry()
+ 		ed.EndRender()
+ 		ed.notifyNativeEditing()
+ 	}
+@@ -237,8 +237,8 @@
+ 	lsz.X -= ic
+ 	hasTab := false
+ 	for si := range rtx {
+-		sn, rn := rich.SpanLen(tx[si])
+-		if rn > 0 && tx[si][sn] == '\t' {
++		sn, rn := rich.SpanLen(rtx[si])
++		if rn > 0 && rtx[si][sn] == '\t' {
+ 			hasTab = true
+ 			break
+ 		}
+@@ -402,6 +402,15 @@
+ // PixelToCursor finds the cursor position that corresponds to the given pixel
+ // location (e.g., from mouse click), in widget-relative coordinates.
+ func (ed *Base) PixelToCursor(pt image.Point) textpos.Pos {
++	if ed.refreshVisualGeometry() {
++		g := ed.editorInteraction()
++		// PointToRelPos uses ContentBBox.Min, including window/scene translation.
++		if c, ok := g.Nearest(math32.FromPoint(pt.Add(ed.Geom.ContentBBox.Min).Add(ed.Scene.SceneGeom.Pos))); ok {
++			ed.visualState.vertical = false
++			ed.rememberVisualCaret(c)
++			return ed.Lines.ValidPos(ed.nativePos(c.Rune))
++		}
++	}
+ 	if ed.Lines == nil {
+ 		return textpos.PosErr
+ 	}
+@@ -438,6 +447,9 @@
+ // charStartPos returns the starting (top left) render coords for the
+ // given source text position.
+ func (ed *Base) charStartPos(pos textpos.Pos) math32.Vector2 {
++	if c, ok := ed.cachedVisualCaret(pos); ok {
++		return c.Pos.Sub(math32.FromPoint(ed.Scene.SceneGeom.Pos))
++	}
+ 	if ed.Lines == nil {
+ 		return math32.Vector2{}
+ 	}
+--- a/text/textcore/visual_vellum.go
++++ b/text/textcore/visual_vellum.go
+@@ -0,0 +1,234 @@
++package textcore
++
++import (
++	"cmp"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/textpos"
++	"golang.org/x/text/unicode/bidi"
++	"slices"
++)
++
++type editorVisualState struct {
++	line, offset      int
++	revision          uint64
++	scroll            float32
++	viewport          math32.Box2
++	unsupported       map[int]bool
++	interaction       *shaped.Interaction
++	vertical          bool
++	preferredX        float32
++	preferredRevision uint64
++	preferredCursor   textpos.Pos
++}
++
++func (ed *Base) visualAffinity(offset, fallback int) int {
++	if ed.visualState.revision == ed.nativeRevision && ed.visualState.offset == offset {
++		return ed.visualState.line
++	}
++	return fallback
++}
++func (ed *Base) rememberVisualCaret(c shaped.Caret) {
++	ed.visualState.line, ed.visualState.offset, ed.visualState.revision = c.Line, c.Rune, ed.nativeRevision
++}
++func (ed *Base) editorInteraction() *shaped.Interaction {
++	if ed.visualState.interaction != nil {
++		return ed.visualState.interaction
++	}
++	g := &shaped.Interaction{Carets: slices.Clone(ed.nativeGeometry.Carets)}
++	slices.SortFunc(g.Carets, func(a, b shaped.Caret) int {
++		if a.Line != b.Line {
++			return cmp.Compare(a.Line, b.Line)
++		}
++		if a.Pos.X != b.Pos.X {
++			return cmp.Compare(a.Pos.X, b.Pos.X)
++		}
++		return cmp.Compare(a.Rune, b.Rune)
++	})
++
++	// Nearest needs physical line bounds even when no unsupported runs exist.
++	bounds := map[int]math32.Box2{}
++	for _, c := range g.Carets {
++		box := math32.Box2{Min: c.Pos, Max: c.Pos.Add(math32.Vec2(0, c.Height))}
++		if old, ok := bounds[c.Line]; ok {
++			old.ExpandByBox(box)
++			box = old
++		}
++		bounds[c.Line] = box
++	}
++	for line := range ed.visualState.unsupported {
++		if _, ok := bounds[line]; !ok {
++			y := ed.Geom.Pos.Content.Y + float32(ed.Scene.SceneGeom.Pos.Y) + (float32(line)-ed.scrollPos)*ed.charSize.Y
++			bounds[line] = math32.B2(ed.nativeViewport().Min.X, y, ed.nativeViewport().Max.X, y+ed.charSize.Y)
++		}
++	}
++	g.Lines = nil
++	for line, box := range bounds {
++		g.Lines = append(g.Lines, shaped.InteractionLine{Index: line, Bounds: box, Unsupported: ed.visualState.unsupported[line]})
++	}
++	slices.SortFunc(g.Lines, func(a, b shaped.InteractionLine) int { return cmp.Compare(a.Index, b.Index) })
++	ed.visualState.interaction = g
++	return g
++}
++func (ed *Base) cachedVisualCaret(pos textpos.Pos) (shaped.Caret, bool) {
++	if ed.Lines == nil || ed.Scene == nil {
++		return shaped.Caret{}, false
++	}
++	ed.refreshNativeDocument()
++	if ed.nativeLayoutRevision != ed.nativeRevision || ed.visualState.scroll != ed.scrollPos || ed.visualState.viewport != ed.nativeViewport() {
++		return shaped.Caret{}, false
++	}
++	offset := ed.nativeOffset(pos)
++	line := ed.visualAffinity(offset, ed.Lines.PosToView(ed.viewId, pos).Line)
++	if ed.visualState.unsupported[line] {
++		return shaped.Caret{}, false
++	}
++	return ed.editorInteraction().At(offset, line)
++}
++
++// Refresh queued-edit/scroll layout into a scratch painter, without emitting a
++// render notification or appending commands to the active frame.
++func (ed *Base) refreshVisualGeometry() bool {
++	if ed.Scene == nil || ed.Lines == nil || ed.charSize.X <= 0 || ed.charSize.Y <= 0 {
++		return false
++	}
++	ed.refreshNativeDocument()
++	if len(ed.nativeGeometry.Carets) > 0 && ed.nativeLayoutRevision == ed.nativeRevision && ed.visualState.scroll == ed.scrollPos && ed.visualState.viewport == ed.nativeViewport() {
++		return true
++	}
++	ed.layoutAllLines()
++	if len(ed.lineRenders) == 0 || ed.visSize.Y <= 0 {
++		return false
++	}
++	painter := ed.Scene.Painter
++	ed.Scene.Painter = *paint.NewPainter(painter.Size)
++	defer func() { ed.Scene.Painter = painter }()
++	ed.beginNativeGeometry()
++	ed.renderLines()
++	ed.finishNativeGeometry()
++	return len(ed.nativeGeometry.Carets) > 0
++}
++func (ed *Base) visualParagraphRTL(pos textpos.Pos) bool {
++	if pos.Line < 0 || pos.Line >= len(ed.nativeOffsets) {
++		return false
++	}
++	start, end := ed.nativeOffsets[pos.Line], len(ed.nativeRunes)
++	if pos.Line+1 < len(ed.nativeOffsets) {
++		end = ed.nativeOffsets[pos.Line+1] - 1
++	}
++	isolateDepth := 0
++	for _, r := range ed.nativeRunes[start:end] {
++		prop, _ := bidi.LookupRune(r)
++		switch prop.Class() {
++		case bidi.LRI, bidi.RLI, bidi.FSI:
++			isolateDepth++
++		case bidi.PDI:
++			isolateDepth = max(0, isolateDepth-1)
++		case bidi.L:
++			if isolateDepth == 0 {
++				return false
++			}
++		case bidi.R, bidi.AL:
++			if isolateDepth == 0 {
++				return true
++			}
++		}
++	}
++	return false
++}
++func (ed *Base) cursorVisual(delta int, vertical bool) bool {
++	if !ed.refreshVisualGeometry() {
++		return false
++	}
++	org := ed.validateCursor()
++	offset := ed.nativeOffset(org)
++	g := ed.editorInteraction()
++	if vertical && (!ed.visualState.vertical || ed.visualState.preferredRevision != ed.nativeRevision || ed.visualState.preferredCursor != org) {
++		ed.visualState.preferredX = ed.charStartPos(org).X + float32(ed.Scene.SceneGeom.Pos.X)
++		ed.visualState.vertical = true
++		ed.visualState.preferredRevision = ed.nativeRevision
++	}
++	if !vertical {
++		ed.visualState.vertical = false
++	}
++	c, ok := g.At(offset, ed.visualAffinity(offset, ed.Lines.PosToView(ed.viewId, org).Line))
++	if !ok || !g.SupportsLine(c.Line) {
++		return false
++	}
++	old := c
++	if vertical {
++		target := c.Line + delta
++		if target >= 0 && target < ed.Lines.ViewLines(ed.viewId) && !g.SupportsLine(target) && !ed.visualState.unsupported[target] {
++			ed.scrollPos = float32(max(0, target-ed.visSize.Y/2))
++			if ed.refreshVisualGeometry() {
++				g = ed.editorInteraction()
++			}
++		}
++		if !g.SupportsLine(target) {
++			return false
++		}
++		found := false
++		distance := float32(1e30)
++		for _, other := range g.Carets {
++			if other.Line == target {
++				d := math32.Abs(other.Pos.X - ed.visualState.preferredX)
++				if d < distance {
++					c = other
++					distance = d
++					found = true
++				}
++			}
++		}
++		if !found {
++			return false
++		}
++	} else {
++		// Each source paragraph may choose a different cross-line direction.
++		g.RTL = ed.visualParagraphRTL(org)
++		c, ok = g.Move(c.Rune, c.Line, delta)
++		if !ok {
++			return false
++		}
++		if c == old {
++			// A true document edge stays put. If the adjacent line is outside the
++			// viewport, shift the viewport and choose its actual shaped edge.
++			step := 1
++			if delta < 0 {
++				step = -1
++			}
++			target := c.Line + step
++			if g.RTL {
++				target = c.Line - step
++			}
++			if target < 0 || target >= ed.Lines.ViewLines(ed.viewId) {
++				ed.cursorSelectShow(org)
++				return true
++			}
++			ed.scrollPos = float32(max(0, target-ed.visSize.Y/2))
++			if !ed.refreshVisualGeometry() {
++				return false
++			}
++			next := ed.editorInteraction()
++			found := false
++			for _, other := range next.Carets {
++				if other.Line == target {
++					if !found || step < 0 {
++						c = other
++						found = true
++					}
++				}
++			}
++			if !found || !next.SupportsLine(target) {
++				return false
++			}
++		}
++	}
++	ed.rememberVisualCaret(c)
++	ed.CursorPos = ed.Lines.ValidPos(ed.nativePos(c.Rune))
++	if !vertical {
++		ed.setCursorColumn(ed.CursorPos)
++	}
++	ed.cursorSelectShow(org)
++	return true
++}
+--- a/text/textcore/visual_vellum_test.go
++++ b/text/textcore/visual_vellum_test.go
+@@ -0,0 +1,225 @@
++package textcore
++
++import (
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/lines"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/textpos"
++	"image"
++	"os"
++	"strings"
++	"testing"
++)
++
++func visualEditor(t *testing.T, text string, width float32) (*core.Body, *Editor) {
++	t.Helper()
++	b := core.NewBody()
++	b.Scene.AddChild(b)
++	ed := NewEditor(b)
++	old := ed.Lines
++	ls := lines.NewLinesExact().SetString(text)
++	ls.Autosave = false
++	ed.SetLines(ls)
++	old.Close()
++	t.Cleanup(ls.Close)
++	ed.Styler(func(s *styles.Style) { s.Min.X.Em(width); s.Max.X.Em(width); s.Min.Y.Em(6); s.Max.Y.Em(6) })
++	if cache := os.Getenv("VELLUM_FONT_CACHE"); cache != "" {
++		pre := shapedgt.NewShaperWithFonts(fonts.Embedded).(*shapedgt.Shaper)
++		if err := pre.FontMap().UseSystemFonts(cache); err != nil {
++			t.Fatal(err)
++		}
++		if err := b.Scene.MakeTextShaper().(*shapedgt.Shaper).FontMap().UseSystemFonts(cache); err != nil {
++			t.Fatal(err)
++		}
++	}
++	b.Scene.Resize(math32.Geom2DInt{Size: image.Pt(400, 180)})
++	b.Scene.LayoutRenderScene()
++	return b, ed
++}
++func TestVellumEditorVisualArrowPointerSelection(t *testing.T) {
++	_, ed := visualEditor(t, "abc אבג xyz\né 👩‍💻\n", 30)
++	ed.SetEditingSelection(0, 0)
++	for _, want := range []int{1, 2, 3, 4, 6, 5, 7} {
++		ed.HandleEvent(events.NewKey(events.KeyChord, 0, key.CodeRightArrow, 0))
++		if got := ed.EditingState().Cursor; got != want {
++			t.Fatalf("right got %d want %d", got, want)
++		}
++		c, ok := ed.cachedVisualCaret(ed.CursorPos)
++		if !ok || ed.charStartPos(ed.CursorPos) != c.Pos {
++			t.Fatal("raster cursor differs from strong caret")
++		}
++	}
++	for _, want := range []int{5, 6, 4, 3, 2, 1, 0} {
++		ed.HandleEvent(events.NewKey(events.KeyChord, 0, key.CodeLeftArrow, 0))
++		if got := ed.EditingState().Cursor; got != want {
++			t.Fatalf("left got %d want %d", got, want)
++		}
++	}
++	ed.SetEditingSelection(4, 4)
++	ed.HandleEvent(events.NewKey(events.KeyChord, 0, key.CodeRightArrow, 1<<key.Shift))
++	state := ed.EditingState()
++	if state.Anchor != 4 || state.Focus != 6 {
++		t.Fatal("logical selection lost", state)
++	}
++	for _, c := range ed.editorInteraction().Carets {
++		if c.Line != 0 {
++			continue
++		}
++		pt := c.Pos.Add(math32.Vec2(0, c.Height/2)).ToPointFloor().Sub(ed.Geom.ContentBBox.Min)
++		got := ed.PixelToCursor(pt)
++		// Integer pointer positions need only select the nearest shaped stop.
++		if ed.nativeOffset(got) != c.Rune {
++			t.Fatalf("pointer got %v want rune %d at %v", got, c.Rune, c.Pos)
++		}
++	}
++}
++func TestVellumEditorVisualWrapScrollQueuedEdit(t *testing.T) {
++	b, ed := visualEditor(t, "abc אבג xyz more words wrapping here\nsecond\nthird\nfourth\nfifth\nsixth\n", 12)
++	g := ed.editorInteraction()
++	var boundary int
++	found := false
++	for _, a := range g.Carets {
++		for _, c := range g.Carets {
++			if a.Rune == c.Rune && a.Line+1 == c.Line {
++				boundary = a.Rune
++				found = true
++				break
++			}
++		}
++	}
++	if !found {
++		t.Fatal("no wrapped shared boundary")
++	}
++	ed.SetEditingSelection(boundary, boundary)
++	// Choose upstream affinity, move right over the wrap, then reverse.
++	for _, c := range g.Carets {
++		if c.Rune == boundary {
++			ed.rememberVisualCaret(c)
++			break
++		}
++	}
++	original := ed.visualState.line
++	ed.cursorForward(1)
++	if ed.EditingState().Cursor != boundary || ed.visualState.line != original+1 {
++		t.Fatal("right did not cross to downstream wrap affinity")
++	}
++	ed.cursorBackward(1)
++	if ed.EditingState().Cursor != boundary || ed.visualState.line != original {
++		t.Fatal("wrap affinity did not reverse")
++	}
++	ed.Lines.SetString("new é 👩‍💻\nnext\n")
++	ed.SetEditingSelection(0, 0)
++	ed.cursorDown(1)
++	if ed.CursorPos.Line != 1 {
++		t.Fatal("vertical movement used stale text layout", ed.CursorPos)
++	}
++	ed.scrollPos = 0.5
++	ed.isScrolling = true
++	ed.NeedsRender()
++	b.Scene.LayoutRenderScene()
++	c := ed.editorInteraction().Carets[0]
++	// Add scene/window translation and exercise the real relative-pointer path.
++	b.Scene.SceneGeom.Pos = image.Pt(13, 19)
++	ed.NeedsRender()
++	b.Scene.LayoutRenderScene()
++	c = ed.editorInteraction().Carets[0]
++	ed.rememberVisualCaret(c)
++	if ed.charStartPos(ed.nativePos(c.Rune)) != c.Pos.Sub(math32.FromPoint(b.Scene.SceneGeom.Pos)) {
++		t.Fatal("raster cursor includes scene translation")
++	}
++	scenePoint := c.Pos.Sub(math32.FromPoint(b.Scene.SceneGeom.Pos)).Add(math32.Vec2(0, c.Height/2)).ToPointFloor()
++	if got := ed.PixelToCursor(ed.PointToRelPos(scenePoint)); ed.nativeOffset(got) != c.Rune {
++		t.Fatal("translated/scrolled pointer mismatch", got, c)
++	}
++}
++func TestVellumEditorVisualDocumentEdges(t *testing.T) {
++	_, ed := visualEditor(t, "אבג", 20)
++	ed.SetEditingSelection(0, 0)
++	ed.cursorForward(1)
++	if ed.CursorPos != (textpos.Pos{}) {
++		t.Fatal("right at RTL document start moved logically", ed.CursorPos)
++	}
++	ed.cursorBackward(1)
++	if ed.CursorPos.Char != 1 {
++		t.Fatal("left did not follow RTL visual carets", ed.CursorPos)
++	}
++}
++
++func TestVellumEditorVisualPreferredColumn(t *testing.T) {
++	_, ed := visualEditor(t, "abcdefghij\nx\nabcdefghij\n", 30)
++	ed.SetEditingSelection(8, 8)
++	ed.cursorDown(1)
++	if ed.CursorPos.Char != 1 {
++		t.Fatal("short line endpoint", ed.CursorPos)
++	}
++	ed.cursorDown(1)
++	if ed.CursorPos.Char != 8 {
++		t.Fatal("preferred visual X lost", ed.CursorPos)
++	}
++	ed.cursorUp(1)
++	ed.cursorUp(1)
++	if ed.CursorPos != (textpos.Pos{Line: 0, Char: 8}) {
++		t.Fatal("preferred X did not reverse", ed.CursorPos)
++	}
++	ed.SetEditingSelection(2, 2)
++	ed.cursorDown(1)
++	ed.cursorDown(1)
++	if ed.CursorPos.Char != 2 {
++		t.Fatal("explicit selection did not reset preferred X", ed.CursorPos)
++	}
++}
++
++func TestVellumEditorVisualBeyondViewport(t *testing.T) {
++	b, ed := visualEditor(t, strings.Repeat("abc אבג xyz\n", 30), 30)
++	ed.SetEditingSelection(6, 6)
++	x := ed.charStartPos(ed.CursorPos).X
++	for i := 1; i <= 20; i++ {
++		ed.cursorDown(1)
++		b.Scene.LayoutRenderScene()
++		if ed.CursorPos.Line != i || math32.Abs(ed.charStartPos(ed.CursorPos).X-x) > 1 {
++			t.Fatal("visual column lost across viewport", i, ed.CursorPos, "x", x, "got", ed.charStartPos(ed.CursorPos).X, "preferred", ed.visualState.preferredX, "scroll", ed.scrollPos, "affinity", ed.visualState.line, ed.visualState.offset)
++		}
++	}
++}
++func TestVellumEditorVisualReflowAffinity(t *testing.T) {
++	b, ed := visualEditor(t, "many words that wrap across multiple narrow lines here", 12)
++	g := ed.editorInteraction()
++	c := g.Carets[len(g.Carets)-1]
++	ed.SetEditingSelection(c.Rune, c.Rune)
++	ed.rememberVisualCaret(c)
++	ed.Styler(func(s *styles.Style) { s.Min.X.Em(40); s.Max.X.Em(40) })
++	ed.Update()
++	b.Scene.Resize(math32.Geom2DInt{Size: image.Pt(700, 180)})
++	b.Scene.LayoutRenderScene()
++	state := ed.EditingState()
++	if _, ok := ed.editorInteraction().At(c.Rune, state.VisualLine); !ok {
++		t.Fatal("obsolete wrapped affinity", state.VisualLine)
++	}
++}
++
++func TestVellumEditorVisualWrappedIsolation(t *testing.T) {
++	_, ed := visualEditor(t, "\u2067אבג\u2069abc many words wrapping here", 12)
++	if ed.visualParagraphRTL(textpos.Pos{}) {
++		t.Fatal("isolated RTL text changed LTR paragraph direction")
++	}
++	g := ed.editorInteraction()
++	for _, a := range g.Carets {
++		for _, b := range g.Carets {
++			if a.Rune == b.Rune && a.Line+1 == b.Line {
++				ed.SetEditingSelection(a.Rune, a.Rune)
++				ed.rememberVisualCaret(a)
++				ed.cursorForward(1)
++				if ed.EditingState().Cursor != a.Rune || ed.visualState.line != b.Line {
++					t.Fatal("wrong cross-line direction after isolate")
++				}
++				return
++			}
++		}
++	}
++	t.Fatal("missing wrapped boundary")
++}

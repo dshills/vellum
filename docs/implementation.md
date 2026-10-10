@@ -35,4 +35,7 @@ evidence. This limits runtime certification, rather than the implemented API sco
 4. Multiple windows and platform services — implemented; scoped callbacks,
    independent close lifetimes and macOS clipboard/file panels/application menus.
    See the [contract](../specs/windows-services.md).
-5. Independently consumable SDK and benchmarks — in progress.
+5. Independently consumable SDK and benchmarks — implemented; driver-owned pinned
+   bootstrap, standalone consumer/generator and repeatable host measurements. See
+   the [contract](../specs/sdk.md). Publication and production performance remain
+   release gates.

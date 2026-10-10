@@ -1,0 +1,246 @@
+--- a/text/parse/regression_vellum_test.go
++++ b/text/parse/regression_vellum_test.go
+@@ -0,0 +1,39 @@
++package parse
++
++import (
++	"cogentcore.org/core/text/parse/languages"
++	"cogentcore.org/core/text/parse/lexer"
++	rules "cogentcore.org/core/text/parse/parser"
++	"cogentcore.org/core/tree"
++	"testing"
++)
++
++// Embedded grammars exercise many sibling replacements in the JSON node slice.
++func TestVellumEmbeddedGrammarNodeTypes(t *testing.T) {
++	for language := range StandardLanguageProperties {
++		data, err := languages.OpenParser(language)
++		if err != nil {
++			continue
++		}
++		t.Run(language.String(), func(t *testing.T) {
++			pr := NewParser()
++			if err := pr.ReadJSON(data); err != nil {
++				t.Fatal(err)
++			}
++			pr.Lexer.WalkDown(func(n tree.Node) bool {
++				if _, ok := n.(*lexer.Rule); !ok {
++					t.Errorf("lexer node %s decoded as %T", n.AsTree().Name, n)
++					return false
++				}
++				return true
++			})
++			pr.Parser.WalkDown(func(n tree.Node) bool {
++				if _, ok := n.(*rules.Rule); !ok {
++					t.Errorf("parser node %s decoded as %T", n.AsTree().Name, n)
++					return false
++				}
++				return true
++			})
++		})
++	}
++}
+--- a/tree/json.go
++++ b/tree/json.go
+@@ -5,13 +5,13 @@
+ package tree
+ 
+ import (
+-	"bytes"
+ 	"encoding/json"
+ 	"fmt"
+ 	"reflect"
+ 	"slices"
+ 	"strconv"
+ 	"strings"
++	"sync"
+ 
+ 	"cogentcore.org/core/base/reflectx"
+ 	"cogentcore.org/core/types"
+@@ -40,6 +40,7 @@
+ // [BenchmarkNodeUnmarshalJSON], a benefit that should only increase
+ // for larger trees.
+ var unmarshalTypeCache = map[string]reflect.Type{}
++var unmarshalTypeMutex sync.Mutex
+ 
+ // UnmarshalJSON unmarshals the node by extracting the nodeType and numChildren fields
+ // added by [NodeBase.MarshalJSON] and then updating the node to the correct type and
+@@ -50,51 +51,57 @@
+ // again through the children of its parent. You do not need to call [UnmarshalRootJSON]
+ // or worry about pointers changing if this node is already of the correct type.
+ func (n *NodeBase) UnmarshalJSON(b []byte) error {
+-	typeStart := bytes.Index(b, []byte(`":`)) + 3
+-	typeEnd := bytes.Index(b, []byte(`",`))
+-	typeName := string(b[typeStart:typeEnd])
+-	// we may end up with an extraneous quote / space at the start
+-	typeName = strings.TrimPrefix(strings.TrimSpace(typeName), `"`)
++
++	// Decode metadata independently of member order and whitespace. Children must
++	// be loaded explicitly: encoding/json retains the interface element it started
++	// decoding, even if UnmarshalJSON replaces that placeholder in its parent.
++	var wire struct {
++		NodeType    string `json:"nodeType"`
++		NumChildren *int   `json:"numChildren"`
++		Children    []json.RawMessage
++	}
++	if err := json.Unmarshal(b, &wire); err != nil {
++		return err
++	}
++	typeName := wire.NodeType
+ 	typ := types.TypeByName(typeName)
+ 	if typ == nil {
+ 		return fmt.Errorf("tree.NodeBase.UnmarshalJSON: type %q not found", typeName)
+ 	}
+-
+-	// if our type does not match, we must replace our This to make it match
++	children := wire.Children
++	if wire.NumChildren != nil && *wire.NumChildren != len(children) {
++		return fmt.Errorf("tree.NodeBase.UnmarshalJSON: declared %d children, found %d", *wire.NumChildren, len(children))
++	}
++	var fields map[string]json.RawMessage
++	if err := json.Unmarshal(b, &fields); err != nil {
++		return err
++	}
++	if n.This == nil {
++		return fmt.Errorf("tree.NodeBase.UnmarshalJSON: uninitialized node")
++	}
+ 	if n.NodeType() != typ {
+-		parent := n.Parent
+-		index := n.IndexInParent()
+-		if index >= 0 {
+-			n.Delete()
+-			n.This = NewOfType(typ)
+-			parent.AsTree().InsertChild(n.This, index)
+-			n = n.This.AsTree() // our NodeBase pointer is now different
++		parent, index := n.Parent, n.IndexInParent()
++		if parent == nil || index < 0 {
++			return fmt.Errorf("tree.NodeBase.UnmarshalJSON: root type differs; use UnmarshalRootJSON")
++		}
++		replacement := NewOfType(typ)
++		n.Delete()
++		parent.AsTree().InsertChild(replacement, index)
++		n = replacement.AsTree()
++	}
++	n.DeleteChildren()
++	for key := range fields {
++		if strings.EqualFold(key, "Children") {
++			delete(fields, key)
+ 		}
+ 	}
+-
+-	// We must delete any existing children first.
+-	n.DeleteChildren()
+-
+-	remainder := b[typeEnd+2:]
+-	numStart := bytes.Index(remainder, []byte(`"numChildren":`))
+-	if numStart >= 0 { // numChildren may not be specified if it is 0
+-		numStart += 14 // start of actual number bytes
+-		numEnd := bytes.Index(remainder, []byte(`,`))
+-		numString := string(remainder[numStart:numEnd])
+-		// we may end up with extraneous space at the start
+-		numString = strings.TrimSpace(numString)
+-		numChildren, err := strconv.Atoi(numString)
+-		if err != nil {
+-			return err
+-		}
+-		// We make placeholder NodeBase children that will be replaced
+-		// with children of the correct type during their UnmarshalJSON.
+-		for range numChildren {
+-			New[NodeBase](n)
+-		}
++	members, err := json.Marshal(fields)
++	if err != nil {
++		return err
+ 	}
+ 
+ 	uv := reflectx.UnderlyingPointer(reflect.ValueOf(n.This))
++	unmarshalTypeMutex.Lock()
+ 	rtyp := unmarshalTypeCache[typeName]
+ 	if rtyp == nil {
+ 		// We must create a new type that has the exact same fields as the original type
+@@ -111,11 +118,19 @@
+ 		rtyp = reflect.PointerTo(nt)
+ 		unmarshalTypeCache[typeName] = rtyp
+ 	}
++	unmarshalTypeMutex.Unlock()
+ 	// We can directly convert because our new struct type has the exact same fields.
+ 	uvi := uv.Convert(rtyp).Interface()
+-	err := json.Unmarshal(b, uvi)
++	err = json.Unmarshal(members, uvi)
+ 	if err != nil {
+ 		return err
++	}
++	for _, data := range children {
++		child, err := UnmarshalRootJSON(data)
++		if err != nil {
++			return err
++		}
++		n.AddChild(child)
+ 	}
+ 	return nil
+ }
+--- a/tree/json_vellum_test.go
++++ b/tree/json_vellum_test.go
+@@ -0,0 +1,62 @@
++package tree_test
++
++import (
++	"bytes"
++	"cogentcore.org/core/tree"
++	"cogentcore.org/core/tree/testdata"
++	"encoding/json"
++	"sync"
++	"testing"
++)
++
++func TestVellumNodeJSONMetadataAndConcurrentDecode(t *testing.T) {
++	root := testNodeTree()
++	data, err := json.Marshal(root)
++	if err != nil {
++		t.Fatal(err)
++	}
++	// Member order and formatting must not select metadata from descendants.
++	var fields map[string]json.RawMessage
++	if err = json.Unmarshal(data, &fields); err != nil {
++		t.Fatal(err)
++	}
++	reordered, err := json.MarshalIndent(fields, "", "  ")
++	if err != nil {
++		t.Fatal(err)
++	}
++	lower := bytes.ReplaceAll(data, []byte(`"Children"`), []byte(`"children"`))
++	if n, err := tree.UnmarshalRootJSON(lower); err != nil || n.AsTree().Child(1).AsTree().NumChildren() != 1 {
++		t.Fatal("case-folded child metadata", err)
++	}
++	var wg sync.WaitGroup
++	for range 12 {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			for range 20 {
++				node, err := tree.UnmarshalRootJSON(reordered)
++				if err != nil {
++					t.Error(err)
++					return
++				}
++				parent, ok := node.(*testdata.NodeEmbed)
++				if !ok || len(parent.Children) != 3 || parent.Child(1).AsTree().NumChildren() != 1 {
++					t.Error("nested children lost")
++					return
++				}
++				for _, child := range parent.Children {
++					if child.AsTree().Parent != parent {
++						t.Error("parent identity lost")
++						return
++					}
++				}
++			}
++		}()
++	}
++	wg.Wait()
++	for _, bad := range []string{`{}`, `{"nodeType":1}`, `{"nodeType":"unknown"}`, `{"nodeType":"cogentcore.org/core/tree.NodeBase","numChildren":-1}`, `{"nodeType":"cogentcore.org/core/tree.NodeBase","numChildren":2,"Children":[]}`} {
++		if _, err := tree.UnmarshalRootJSON([]byte(bad)); err == nil {
++			t.Errorf("invalid metadata accepted: %s", bad)
++		}
++	}
++}

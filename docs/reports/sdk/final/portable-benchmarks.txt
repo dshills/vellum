@@ -1,0 +1,32 @@
+PASS
+ok  	example.com/vellum/app	0.214s
+PASS
+ok  	example.com/vellum/canvas	0.158s
+PASS
+ok  	example.com/vellum/command	0.159s
+PASS
+ok  	example.com/vellum/tasks	0.159s
+PASS
+ok  	example.com/vellum/ui	0.158s
+goos: darwin
+goarch: arm64
+pkg: example.com/vellum/virtual
+cpu: Apple M4 Pro
+BenchmarkMillionViewport-14    	  424419	      2888 ns/op	    4354 B/op	     200 allocs/op
+BenchmarkMillionViewport-14    	  422466	      2859 ns/op	    4354 B/op	     200 allocs/op
+BenchmarkMillionViewport-14    	  430005	      2847 ns/op	    4354 B/op	     200 allocs/op
+PASS
+ok  	example.com/vellum/virtual	4.799s
+PASS
+ok  	example.com/vellum/workbench	0.243s
+# example.com/vellum/hello.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+goos: darwin
+goarch: arm64
+pkg: example.com/vellum/hello
+cpu: Apple M4 Pro
+BenchmarkCounterViewValidation-14    	  999409	      1195 ns/op	    1817 B/op	       3 allocs/op
+BenchmarkCounterViewValidation-14    	 1000000	      1197 ns/op	    1817 B/op	       3 allocs/op
+BenchmarkCounterViewValidation-14    	 1000000	      1198 ns/op	    1817 B/op	       3 allocs/op
+PASS
+ok  	example.com/vellum/hello	4.916s

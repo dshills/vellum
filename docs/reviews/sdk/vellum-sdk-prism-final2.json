@@ -1,0 +1,100 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ec6ca65b8a335f90d19b8756cea8d0f1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "fee37ec5950058ed97b16251e46cdd9db1c840f6",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6b30320184657707",
+      "severity": "medium",
+      "category": "bug",
+      "title": "select() on a buffered text stream can miss already-buffered ready line",
+      "message": "The selector watches the OS pipe, but readline() reads from Python's buffered text wrapper. If the child writes several lines in one burst, readline() can pull them all into the buffer and return only the first. The remaining lines, possibly including the ready event, are then invisible to select(). The loop waits until the 40s deadline and fails with a spurious 'did not report a verified GPU frame' error. readline() can also block on a partial line with no newline.",
+      "suggestion": "Read the pipe without wrapper buffering. Use bufsize=0 in binary mode and os.read() into your own buffer, splitting on newlines. Alternatively, run a reader thread that pushes parsed lines into a queue.Queue and wait on it with a timeout.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/benchmark-native.py",
+          "lines": {
+            "start": 55,
+            "end": 57
+          }
+        }
+      ],
+      "tags": [
+        "subprocess",
+        "selectors",
+        "buffering",
+        "flaky"
+      ],
+      "evidence": "if selector.select(timeout=.2):\n                    line = process.stdout.readline()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 75056,
+    "totalMs": 24050
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 25,
+    "bytes": 83769,
+    "chunks": 7,
+    "llmCalls": 8,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 60141,
+        "output": 8346,
+        "costUSD": 0.20374199999999998
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

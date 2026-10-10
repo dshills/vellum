@@ -1,0 +1,150 @@
+--- a/system/window.go
++++ b/system/window.go
+@@ -264,6 +264,9 @@
+ 
+ // NewWindowOptions are optional arguments to NewWindow.
+ type NewWindowOptions struct {
++	// StartHidden constructs a desktop GPU window without showing it. The owner
++	// must call Show explicitly when ready. Other drivers do not implement this.
++	StartHidden bool
+ 	// Size specifies the dimensions of the new window, either in raw pixels
+ 	// or std 96 dpi pixels depending on StdPixels. If Width or Height are
+ 	// zero, a driver-dependent default will be used for each zero value
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -35,7 +35,18 @@
+ var TheApp = &App{AppMulti: base.NewAppMulti[*Window]()}
+ 
+ // App is the [system.App] implementation for the desktop platform
++// NativeAttachment receives main-thread focus and teardown while the view is valid.
++// Methods must not reenter the UI or call RunOnMain, which would deadlock.
++type NativeAttachment interface {
++	Focus(bool)
++	Close()
++}
++
+ type App struct {
++	// NativeAttach is configured before creating any windows. It runs on the
++	// native main thread after surface creation and before show. On error the
++	// partial attachment (if any) is closed and the window/resources are released.
++	NativeAttach func(*Window) (NativeAttachment, error)
+ 	base.AppMulti[*Window]
+ 
+ 	// GPU is the system GPU used for the app
+@@ -131,6 +142,17 @@
+ 		w.Compose = &composer.ComposerDrawer{Drawer: w.Draw}
+ 	})
+ 
++	if a.NativeAttach != nil {
++		a.RunOnMain(func() {
++			w.Native, err = a.NativeAttach(w)
++			if err != nil {
++				w.releaseNativeResources()
++			}
++		})
++		if err != nil {
++			return nil, err
++		}
++	}
+ 	// w.Flgs.SetFlag(true, system.Focused) // starts out focused
+ 
+ 	a.Mu.Lock()
+@@ -154,7 +176,9 @@
+ 	w.Glw.SetDropCallback(w.DropEvent)
+ 	w.Glw.SetInputMode(glfw.LockKeyMods, glfw.True)
+ 
+-	w.Show()
++	if !opts.StartHidden {
++		w.Show()
++	}
+ 	a.RunOnMain(func() {
+ 		w.updateGeometry()
+ 		w.ConstrainFrame(false) // constrain full frame on open
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -12,6 +12,7 @@
+ import (
+ 	"image"
+ 	"log"
++	"sync"
+ 
+ 	"cogentcore.org/core/events"
+ 	"cogentcore.org/core/gpu"
+@@ -25,6 +26,8 @@
+ 
+ // Window is the implementation of [system.Window] for the desktop platform.
+ type Window struct {
++	Native    NativeAttachment
++	closeOnce sync.Once
+ 	base.WindowMulti[*App, *composer.ComposerDrawer]
+ 
+ 	// Glw is the glfw window associated with this window
+@@ -410,12 +413,31 @@
+ 	if w == nil {
+ 		return
+ 	}
+-	w.Window.Close()
+-
+-	w.Mu.Lock()
+-	defer w.Mu.Unlock()
+-
+-	w.App.RunOnMain(func() {
++	w.closeOnce.Do(func() {
++		// Stop native callbacks before application cleanup and before GPU/view release.
++		w.App.RunOnMain(func() {
++			if w.Native != nil {
++				w.Native.Close()
++				w.Native = nil
++			}
++		})
++		w.Window.Close()
++		w.Mu.Lock()
++		defer w.Mu.Unlock()
++		w.App.RunOnMain(w.releaseNativeResources)
++	})
++}
++
++// releaseNativeResources runs on the main thread, including failed creation.
++func (w *Window) releaseNativeResources() {
++	if w.Native != nil {
++		w.Native.Close()
++		w.Native = nil
++	}
++	if w.Glw == nil {
++		return
++	}
++	if w.Draw != nil {
+ 		w.Draw.System.WaitDone()
+ 		if w.DestroyGPUFunc != nil {
+ 			w.DestroyGPUFunc()
+@@ -425,14 +447,14 @@
+ 			surf = sf
+ 		}
+ 		w.Draw.Release()
+-		if surf != nil { // note: release surface after draw
++		if surf != nil {
+ 			surf.Release()
+ 		}
+-		w.Glw.Destroy()
+-		w.Glw = nil // marks as closed for all other calls
+-		w.Draw = nil
+-		w.Compose = nil
+-	})
++	}
++	w.Glw.Destroy()
++	w.Glw = nil
++	w.Draw = nil
++	w.Compose = nil
+ }
+ 
+ func (w *Window) SetMousePos(x, y float64) {
+@@ -535,6 +557,9 @@
+ }
+ 
+ func (w *Window) Focused(gw *glfw.Window, focused bool) {
++	if w.Native != nil {
++		w.Native.Focus(focused)
++	}
+ 	// w.Flgs.SetFlag(focused, system.Focused)
+ 	if focused {
+ 		w.Event.Window(events.WinFocus)
