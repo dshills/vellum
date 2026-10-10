@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "fce754551709ef4bd5f5b318dd48e56e",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ee2dd4cc7d41e7be",
+      "severity": "medium",
+      "category": "security",
+      "title": "Git commands used for the clean-source gate run with the unsanitized environment",
+      "message": "The git calls in source_state and source_files inherit the caller's full environment, while the Go calls use the allowlisted child_environment(). Variables such as GIT_DIR, GIT_WORK_TREE and GIT_INDEX_FILE (set when the script runs from a git hook or wrapper) or GIT_CONFIG_* can point git at a different repository or index. The public-release \"clean\" gate, the recorded commit and the tracked-file list could then be wrong. That undermines the \"committed and clean\" guarantee and the before/after consistency check. The git calls also have no timeout.",
+      "suggestion": "Run every git invocation with a sanitized environment: drop GIT_* variables, or pass `--git-dir=\u003croot\u003e/.git` explicitly. Add a `timeout=COMMAND_TIMEOUT_SECONDS` to each call, and reuse one helper for all git calls.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 38,
+            "end": 38
+          }
+        }
+      ],
+      "tags": [
+        "environment",
+        "release-gate",
+        "git",
+        "location-corrected"
+      ],
+      "evidence": "status = subprocess.check_output([\"git\", \"status\", \"--porcelain\", \"-z\", \"--untracked-files=normal\"], cwd=root)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "e0dea8846ec54553",
+      "severity": "medium",
+      "category": "security",
+      "title": "Allowlist passes proxy credentials and desktop-session variables to all archive-code child processes",
+      "message": "A single allowlist is used for every child process, including checks that run archived, possibly self-attested code. Proxy variables often embed credentials (http://user:pass@host). DISPLAY, XAUTHORITY, XDG_RUNTIME_DIR and DBUS_SESSION_BUS_ADDRESS expose the user's desktop session, though the spec says default checks create no native windows. The documented claim that unrelated secrets are dropped is weakened, because these credential-bearing and session-access variables reach every child.",
+      "suggestion": "Split the allowlist: a base set for Go build/test/vet, and a display/GPU set added only for the `--runtime` launch. Also document, or strip, proxy credentials. For example, make `child_environment(runtime=False)` include the display/D-Bus/GPU variables only when `runtime=True`.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/sdk_environment.py",
+          "lines": {
+            "start": 10,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "environment",
+        "least-privilege",
+        "secrets"
+      ],
+      "evidence": "\"HTTP_PROXY\", \"HTTPS_PROXY\", \"NO_PROXY\", \"http_proxy\", \"https_proxy\", \"no_proxy\", \"SSL_CERT_FILE\", \"SSL_CERT_DIR\",\n    \"DISPLAY\", \"WAYLAND_DISPLAY\", \"XDG_RUNTIME_DIR\", \"XAUTHORITY\", \"DBUS_SESSION_BUS_ADDRESS\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 89139,
+    "totalMs": 39346
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 30,
+    "bytes": 144787,
+    "chunks": 11,
+    "llmCalls": 6,
+    "cacheHit": false,
+    "cachedChunks": 5,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 60502,
+        "output": 10808,
+        "costUSD": 0.229084
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

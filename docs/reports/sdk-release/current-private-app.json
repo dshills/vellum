@@ -1,0 +1,56 @@
+{
+  "event": "vellum.sdk.private_app",
+  "archive_sha256": "59be0e9f025a53bcf6544133f796b36eaf80709ff9896aeb5ab460e9e1dc5881",
+  "artifact": {
+    "output": "/private/tmp/Vellum Phase5 Current Alpha.app",
+    "private_build": true,
+    "target": "darwin",
+    "signed": false,
+    "notarized": false,
+    "native_distribution_audit": "pending"
+  },
+  "manifest": {
+    "schema": 1,
+    "name": "Vellum Private Alpha",
+    "identifier": "org.example.vellum.private.alpha",
+    "version": "0.1.0",
+    "build_version": "1",
+    "sdk_release": "v0.1.0-alpha.1",
+    "target": "darwin",
+    "source_binary_sha256": "dae1624232ad4e4315466b31b2b3f63dd5ee58053f9ad5d8b1e0102c085473b6",
+    "private_build": true,
+    "signed_identity": null,
+    "notarized": false,
+    "native_distribution_audit": "pending",
+    "target_runtime": "unverified"
+  },
+  "source": {
+    "clean": false,
+    "commit": "89cb930d570d2b03b6225b4c9cecc3aa1f8ebb56"
+  },
+  "replacements_within_sdk": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "example.com/vellum": ".",
+    "example.com/vellum/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+  },
+  "path_contains_spaces": true,
+  "source_binary_sha256": "dae1624232ad4e4315466b31b2b3f63dd5ee58053f9ad5d8b1e0102c085473b6",
+  "native_runtime": {
+    "event": "vellum.native.ready",
+    "go_version": "go1.27.2",
+    "heap_alloc_bytes": 76187872,
+    "height": 722,
+    "render_readback_ns": [
+      1940000,
+      2021625,
+      1969000
+    ],
+    "startup_to_verified_gpu_ns": 740962042,
+    "width": 3054
+  },
+  "acceptance": "private-precommit-snapshot-validation",
+  "digest_trust": "local-producer-self-attested",
+  "independent_authenticity_verified": false,
+  "scope": "Exact precommit archive snapshot; later platform CLI diagnostic aggregation is outside this snapshot. Final committed archive must be regenerated separately."
+}

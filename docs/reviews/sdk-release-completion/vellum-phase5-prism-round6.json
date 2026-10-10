@@ -1,0 +1,286 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cb54f2524280a57e5b1d80ec63ca8fec",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7ff89cec0a18b9cf",
+      "severity": "medium",
+      "category": "docs",
+      "title": "SDK check command omits the required digest or self-attested flag",
+      "message": "The tutorial runs check-sdk.py with only --archive. The review policy says SDK execution needs a caller-supplied expected digest or an explicit --allow-self-attested for the caller's own private source. As written, the command may be refused, or users may learn to bypass the trust gate. The text also never says that execution is not a filesystem or process sandbox.",
+      "suggestion": "Show the command with `--sha256 \u003cdigest from the producer\u003e`, or with `--allow-self-attested` for the user's own freshly built archive. State that the checker runs archive code (go test, go vet, go build) without sandboxing.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/tutorials/building-an-app.md",
+          "lines": {
+            "start": 116,
+            "end": 117
+          }
+        }
+      ],
+      "tags": [
+        "supply-chain",
+        "docs",
+        "trust-gate"
+      ],
+      "evidence": "python3 scripts/check-sdk.py --archive /tmp/vellum-private-alpha.tar.gz",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5d5dfafba7ec36cc",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Fallback publication exposes a partially written artifact at the final path",
+      "message": "The fallback creates the final output path and then streams data into it. A concurrent reader, or a crash mid-copy, sees a truncated artifact under its final name. On failure the cleanup only runs for exceptions caught in this process, so a SIGKILL or power loss leaves a partial file that looks published. The mode is also applied only after the content is written. The hardlink path is atomic, so the two paths behave differently.",
+      "suggestion": "Copy into a uniquely named temporary file in the output directory, apply fsync and mode there, then publish it with os.link(tmp, output) or an exclusive rename. Remove the temporary file in a finally block. If copying directly is kept, document that the output is not complete until the function returns.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/artifact_io.py",
+          "lines": {
+            "start": 18,
+            "end": 25
+          }
+        }
+      ],
+      "tags": [
+        "atomicity",
+        "artifact",
+        "durability"
+      ],
+      "evidence": "with output.open(\"xb\") as destination:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "cc1364a5c1ce8d3d",
+      "severity": "medium",
+      "category": "security",
+      "title": "Inherited GOFLAGS/GOENV can alter module resolution in the \"hermetic\" relocation check",
+      "message": "The child environment forwards GOFLAGS, GOENV, GOTOOLCHAIN, GOPROXY and the CGO_*/CC settings from the caller. Flags like -modfile, -overlay, -mod=mod, or a GOENV file can change module resolution and file contents. That can make the relocated-consumer check pass or fail for reasons unrelated to the SDK archive. check_origin reads `go list` output produced under the same environment, so the replacement checks do not guard against this. The allowlist also does not remove a hostile GOFLAGS.",
+      "suggestion": "For a hermetic relocation check, do not forward GOFLAGS or GOENV. Set GOFLAGS to '-mod=mod' only if needed, set GOENV=off, and pin GOTOOLCHAIN to local. Forward the remaining Go and CGO variables only through an explicit opt-in flag.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 224,
+            "end": 224
+          }
+        }
+      ],
+      "tags": [
+        "environment",
+        "hermeticity",
+        "go",
+        "location-corrected"
+      ],
+      "evidence": "\"GOPATH\", \"GOCACHE\", \"GOMODCACHE\", \"GOROOT\", \"GOTOOLCHAIN\", \"GOFLAGS\", \"GOENV\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6135d593208cff99",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "App name validation is too permissive for a path/executable component",
+      "message": "`valid_name` only rejects `/`, `\\`, `:` and NUL. The name becomes an archive path component, the `.exe` file name and the Info.plist executable name. Names with newlines or other control characters, Windows-reserved characters (`*?\"\u003c\u003e|`), or a trailing space or dot pass validation. Such archives cannot be extracted correctly on Windows, and control characters in the name can break tooling or log output.",
+      "suggestion": "Reject control characters, Windows-reserved characters, and trailing space or dot. A leading '-' is worth rejecting as well, for tools that receive the name as an argument.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 22,
+            "end": 22
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "portability"
+      ],
+      "evidence": "return isinstance(value,str) and value not in {\"\", \".\", \"..\"} and not any(c in value for c in \"/\\\\:\\x00\")",
+      "fix": {
+        "before": "return isinstance(value,str) and value not in {\"\", \".\", \"..\"} and not any(c in value for c in \"/\\\\:\\x00\")",
+        "after": "return isinstance(value,str) and value not in {\"\", \".\", \"..\"} and not any(c in value for c in \"/\\\\:*?\\\"\u003c\u003e|\") and not any(ord(c) \u003c 32 for c in value) and not value.endswith((\" \", \".\")) and not value.startswith(\"-\")"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ab15033cf2cc8b08",
+      "severity": "medium",
+      "category": "security",
+      "title": "Public release builds inherit the full ambient environment into Go and prepare steps",
+      "message": "The public release path passes the full caller environment to `go mod download`, `go mod verify` and `go list`, and to the in-process `prepare.py`. Variables such as GOFLAGS, GOPROXY, GONOSUMDB, GOINSECURE, GOPRIVATE, GOMODCACHE and GOFLAGS=-modfile can change which sources are fetched or how they are verified. Unrelated secrets are also inherited by `go` and by `prepare.py`, which is repo code run in this process. This weakens the public release's reproducibility and verification guarantees.",
+      "suggestion": "Build the child environment from an allowlist (PATH, HOME, TMPDIR, GOCACHE, GOMODCACHE, GOPATH). Force GOWORK=off, GOFLAGS=-mod=readonly, GONOSUMDB= and GOINSECURE=, and set GOPROXY and GOSUMDB explicitly for public builds. Use the same helper in `license_inventory`.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 111,
+            "end": 111
+          }
+        }
+      ],
+      "tags": [
+        "supply-chain",
+        "environment",
+        "go"
+      ],
+      "evidence": "env = {**os.environ, \"GOWORK\": \"off\"}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 183409,
+    "totalMs": 48671
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 28,
+    "bytes": 128883,
+    "chunks": 9,
+    "llmCalls": 9,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 82622,
+        "output": 23241,
+        "cachedInput": 2625,
+        "costUSD": 0.397654
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "ec087a78c575e6be",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Archive parser acceptance claim has no recorded evidence",
+        "message": "The README claims the historical archive passes the current bounded path-only PAX parser without being rebuilt or launched. No artifact in this directory backs that claim: not in `unit-tests.txt`, `private-archive.json` or `relocated-consumer.json`. `relocated-consumer.json` records only manifest integrity, a consumer build and API scenarios. A security-relevant archive-parsing claim that can't be reproduced from the committed evidence weakens the integrity story.",
+        "suggestion": "Commit the output of the parser check against the archive SHA-256 `c958d0c4...`, including the parser version or script hash. Otherwise remove the claim.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reports/sdk-release/README.md",
+            "lines": {
+              "start": 21,
+              "end": 22
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "archive-integrity"
+        ],
+        "evidence": "The historical archive also passes the current",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/sdk-release/README.md"
+    },
+    {
+      "finding": {
+        "id": "a573ae4d287d9594",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Environment-scrubbing claim overstates isolation; non-sandbox caveat missing",
+        "message": "The report says unrelated child-environment tokens are removed, with no qualifier. The repository spec describes this as an allowlist that only reduces inheritance of unrelated secrets, and says SDK execution is not a filesystem or process sandbox. This evidence README never states that limit. A reader could treat the archive-execution validation as isolation, when the only gate is the producer digest or the explicit `--allow-self-attested` opt-in.",
+        "suggestion": "Reword to say the environment allowlist only reduces inheritance of unrelated secrets. State that SDK execution is not a filesystem or process sandbox and still requires a trusted digest or explicit self-attestation. Also record which trust mode the relocated-consumer check used.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/sdk-release/README.md",
+            "lines": {
+              "start": 23,
+              "end": 26
+            }
+          }
+        ],
+        "tags": [
+          "supply-chain",
+          "sandbox",
+          "docs-accuracy"
+        ],
+        "evidence": "unrelated child-environment tokens are removed",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/sdk-release/README.md"
+    },
+    {
+      "finding": {
+        "id": "e2e1dff1477f99d6",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "License inventory loses version/checksum for replaced pinned dependencies",
+        "message": "In public mode the graph replaces the upstream and typesetting modules with local directories. `go list -m` then reports them with no Version or Sum at the top level, so the inventory records `version` and `sum` as null for exactly the pinned dependencies. The shipped THIRD_PARTY_INVENTORY.json therefore does not carry the pinned checksums that were verified earlier.",
+        "suggestion": "When a module is replaced by a local directory, take the version and sum from the pinned entries in `drivers/cogent/native/dependencies.json` (pass them into `license_inventory`). Alternatively, fail the public build if a non-main module has an empty Sum or Version.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "scripts/release-sdk.py",
+            "lines": {
+              "start": 187,
+              "end": 187
+            }
+          }
+        ],
+        "tags": [
+          "inventory",
+          "provenance"
+        ],
+        "evidence": "inventory.append({\"module\": module[\"Path\"], \"version\": module.get(\"Version\"), \"sum\": module.get(\"Sum\"),",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in scripts/release-sdk.py"
+    }
+  ],
+  "suppressed": []
+}

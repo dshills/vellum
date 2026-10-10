@@ -1,0 +1,93 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f1bc658efa587d975e929a5b0b6746cf",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a8d1ce45c168902f",
+      "severity": "medium",
+      "category": "security",
+      "title": "Fallback copy creates output with default permissions and applies source mode only after the full write",
+      "message": "In the copy fallback the output file is created with the default umask-derived mode (typically 0644). The source's real mode is applied only at the end, after the whole archive has been copied and fsynced. For the whole copy, a private SDK archive may be readable by other local users. A crash before fchmod leaves a partial file with the wrong permissions. The hardlink path preserves the source mode, so the two paths behave differently.",
+      "suggestion": "Create the file with the intended mode from the start, for example `fd = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, source.stat().st_mode \u0026 0o777)` and wrap it with `os.fdopen(fd, 'wb')`. Alternatively, restrict the mode to 0o600 on creation and widen it only after the copy completes. Note that the creation mode is still filtered by the umask.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/artifact_io.py",
+          "lines": {
+            "start": 23,
+            "end": 23
+          }
+        }
+      ],
+      "tags": [
+        "permissions",
+        "atomicity",
+        "file-io",
+        "location-corrected"
+      ],
+      "evidence": "with output.open(\"xb\") as destination:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 167983,
+    "totalMs": 35761
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 45,
+    "bytes": 254503,
+    "chunks": 15,
+    "llmCalls": 15,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 179610,
+        "output": 19093,
+        "cachedInput": 27462,
+        "costUSD": 0.55015
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

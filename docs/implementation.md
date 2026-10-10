@@ -39,3 +39,36 @@ evidence. This limits runtime certification, rather than the implemented API sco
    bootstrap, standalone consumer/generator and repeatable host measurements. See
    the [contract](../specs/sdk.md). Publication and production performance remain
    release gates.
+
+## Framework completion work
+
+1. Workbench interaction — implemented; pointer docking/reordering, independent
+   floating windows, redocking and transactional session persistence. Domain data
+   survives native adapter remounts. See [contract](../specs/workbench-interaction.md)
+   and [evidence](reports/workbench-interaction/README.md).
+2. Native accessibility and keyboard workflows — implemented for macOS managed
+   controls, active dock panels, modal scopes and bounded virtual views. Native
+   selector probes and keyboard regression tests are separate from external
+   screen-reader/IME acceptance. See [contract](../specs/accessibility.md).
+3. Rendering hardening — implemented; demand painting, synchronized composition,
+   live resource rebuilds and device-loss error/shutdown. Local race checks cover
+   resize/minimize/restore and teardown. Automatic physical GPU recreation,
+   cross-display DPI and sustained workload budgets remain open. See
+   [contract](../specs/rendering.md) and [evidence](reports/rendering/README.md).
+4. Windows/Linux services and qualification tooling — implemented; native-main
+   clipboard, OS chooser transports, menu widgets, target smoke/CI harness and
+   explicit strict qualification gates. This macOS host cannot establish target
+   runtime, TSF/IBus/Fcitx, UIA/AT-SPI or native Wayland support. See
+   [contract](../specs/platform-support.md) and [evidence](reports/platform-support/README.md).
+5. Versioned private SDK — implemented; alpha version API, independent consumer
+   scenarios, integrity-checked relocation, tutorial and private application
+   packaging. Namespace, framework license, distribution audit and actual target
+   acceptance remain public-release gates. See [contract](../specs/release.md)
+   [tutorial](tutorials/building-an-app.md) and [evidence](reports/sdk-release/README.md).
+
+Per-phase Prism reviews and verification records accompany these implementations.
+The private SDK evidence records a tested precommit snapshot; its clean committed
+archive is generated after committing, so its future commit identity cannot be
+embedded in the earlier evidence. These
+implementations extend the experimental framework; they do not certify a public
+or production-ready cross-platform release.

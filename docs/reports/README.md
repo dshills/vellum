@@ -3,6 +3,10 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Workbench interaction](workbench-interaction/README.md)
+- [Rendering hardening](rendering/README.md)
+- [Windows/Linux services](platform-support/README.md)
+- [Private alpha SDK packaging](sdk-release/README.md)
 - [Local SDK checks and performance](sdk/README.md), including [final integrated evidence](sdk/final/README.md)
 - [P0 feasibility](P0_RESULTS.md)
 - [Initial foundation](FOUNDATION_RESULTS.md) and [remediation](REMEDIATION_RESULTS.md)

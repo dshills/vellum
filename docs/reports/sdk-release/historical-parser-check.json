@@ -1,0 +1,17 @@
+{
+  "event": "vellum.sdk.historical_parser",
+  "archive_sha256": "c958d0c418ee2b52c0d3252b56d60e8f72ddad7f8e4b7d4100ee752cb8aa9f46",
+  "expected_sha256_source": "private-archive.json successful historical producer",
+  "verified_files": 6340,
+  "module": "example.com/vellum",
+  "parser_source_sha256": {
+    "scripts/check-sdk.py": "20fcecfac728cb1c3b7a0007b4502bd1089917920283271250a01c8ec9f42bfe",
+    "scripts/sdk_environment.py": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311",
+    "scripts/child_process.py": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc"
+  },
+  "archive_code_executed": false,
+  "native_runtime": "not executed",
+  "scope": "current bounded parser checks existing historical archive; no rebuild/consumer execution/current native acceptance",
+  "digest_trust": "local-producer-self-attested",
+  "independent_authenticity_verified": false
+}

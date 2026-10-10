@@ -6,6 +6,13 @@
 - [Layout and themes](layout-theme.md): portable style values and local themes.
 - [Standard controls](controls.md): interaction, focus and semantic metadata.
 - [Windows and services](windows-services.md): scoped lifetimes and OS integration.
+- [Workbench interaction](workbench-interaction.md): pointer docking, floating,
+  redocking and transactional multiwindow session persistence.
+- [Accessibility and keyboard workflows](accessibility.md): native macOS semantics,
+  actions, focus scopes and bounded virtual data publication.
+- [Rendering](rendering.md): demand painting, resource lifetimes and device loss.
+- [Platform support](platform-support.md): Windows/Linux services and target gates.
+- [Release artifacts](release.md): alpha API, private SDK integrity and packaging.
 - [Local SDK](sdk.md): independent applications, pinned bootstrap and benchmarks.
 - [Prototype validation plan](prototype-plan.md): research acceptance gates and
   recorded investigation progress; this is a historical foundation plan.

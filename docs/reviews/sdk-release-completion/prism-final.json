@@ -1,0 +1,58 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "583de617a56ad487349051c75fbc488b",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "5561f478aa49479f7c4fd1706083003f4325370d",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 23013,
+    "totalMs": 11572
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 47,
+    "bytes": 258337,
+    "chunks": 15,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 12,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 32917,
+        "output": 2442,
+        "cachedInput": 12013,
+        "costUSD": 0.090254
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

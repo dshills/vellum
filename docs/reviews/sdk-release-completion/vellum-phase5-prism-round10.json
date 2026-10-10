@@ -1,0 +1,171 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "837b0fa009b999849903526bbada8aad",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c90753e83b39332f",
+      "severity": "medium",
+      "category": "security",
+      "title": "Tutorial's SHA-256 verification flow is circular (digest taken from the producer's own output)",
+      "message": "The tutorial reads the expected digest from the JSON written by the same producer run, then passes it to the checker as if it were a trusted digest. This is effectively self-attestation presented as digest verification. It only detects accidental corruption. A reader may mistake it for an authenticity check, and may copy the pattern to verify an archive from another party. The checker runs archive code with the caller's filesystem privileges and is not a sandbox.",
+      "suggestion": "Say next to the command that this flow is self-attested and is only valid for an archive you built yourself. For an archive from anyone else, show the digest being obtained from a separate trusted channel and passed as a literal `--sha256 \u003cdigest\u003e`. Alternatively, use `--allow-self-attested` explicitly for the own-build case, so the trust decision is visible.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/tutorials/building-an-app.md",
+          "lines": {
+            "start": 117,
+            "end": 117
+          }
+        }
+      ],
+      "tags": [
+        "supply-chain",
+        "self-attestation",
+        "docs",
+        "location-corrected"
+      ],
+      "evidence": "VELLUM_SDK_SHA256=$(python3 -c 'import json; print(json.load(open(\"/tmp/vellum-private-alpha.json\"))[\"sha256\"])')",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d90931ed4891f2e2",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Replacement origin check only requires 'somewhere inside the SDK'",
+      "message": "check_origin accepts any replacement directory anywhere inside the extracted SDK. It does not check that the root module points at the SDK root, or that the cogent module points at its own subdirectory. A consumer whose replacement points at the wrong subdirectory of the SDK, or at a module the archive manifest does not cover, still passes. The check is meant to prove the consumer builds against the relocated SDK, so it is weaker than it claims to be.",
+      "suggestion": "Assert the expected relative directory for each required module, for example origins[module_path] == '.' and origins[module_path + '/cogent'] == 'cogent'. Take the expected paths from the manifest or from the SDK layout.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 213,
+            "end": 215
+          }
+        }
+      ],
+      "tags": [
+        "verification",
+        "go-modules",
+        "location-corrected"
+      ],
+      "evidence": "directory = Path(replaced[\"Dir\"]).resolve()\n        try:\n            origins[module[\"Path\"]] = directory.relative_to(sdk.resolve()).as_posix()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0c4a2e378b31dc24",
+      "severity": "medium",
+      "category": "security",
+      "title": "Proxy variables with embedded credentials are forwarded to the child process",
+      "message": "The allowlist is meant to reduce secret inheritance, but it passes through HTTP_PROXY/HTTPS_PROXY unchanged. These values commonly embed credentials (http://user:pass@host). The child runs SDK code that has not necessarily been verified, so it can read the credentials. HOME and USERPROFILE are also passed, which exposes ~/.netrc, ~/.ssh and similar.",
+      "suggestion": "Strip userinfo from proxy URLs before passing them on, or require an explicit opt-in flag for proxy variables. Document the remaining exposure of HOME in the spec.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/sdk_environment.py",
+          "lines": {
+            "start": 11,
+            "end": 11
+          }
+        }
+      ],
+      "tags": [
+        "secrets",
+        "environment",
+        "allowlist"
+      ],
+      "evidence": "\"HTTP_PROXY\", \"HTTPS_PROXY\", \"NO_PROXY\", \"http_proxy\", \"https_proxy\", \"no_proxy\", \"SSL_CERT_FILE\", \"SSL_CERT_DIR\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2d0cb91d31b077a8",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Hard-coded GOPROXY/GOSUMDB override breaks offline and mirrored builds",
+      "message": "GOPROXY and GOSUMDB are hard-coded and ignore the caller's settings. In air-gapped or corporate-mirror environments, or with a vendored module cache, the Go build fails or goes to the public network. Overrides are also lost with no diagnostic, because GOENV=off disables the go env config file.",
+      "suggestion": "Honor an explicit, validated opt-in override, for example GOPROXY=off or a mirror URL passed as a script argument. Alternatively, document that verification requires public network access.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/sdk_environment.py",
+          "lines": {
+            "start": 20,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "go",
+        "environment",
+        "reproducibility"
+      ],
+      "evidence": "\"GOPROXY\": \"https://proxy.golang.org,direct\", \"GOSUMDB\": \"sum.golang.org\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 157690,
+    "totalMs": 44796
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 30,
+    "bytes": 148582,
+    "chunks": 11,
+    "llmCalls": 9,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 83107,
+        "output": 19134,
+        "cachedInput": 13280,
+        "costUSD": 0.357554
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

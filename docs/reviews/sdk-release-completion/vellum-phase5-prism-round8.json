@@ -1,0 +1,148 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e628bb2da50311bb0ed74ce19c5f6c73",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a26bb9d4717aceb0",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Failure injection may trigger on the sign call instead of the final verify",
+      "message": "The fake `subprocess.run` raises on any call whose last argument is the output bundle path. A `codesign --sign` call typically ends with the bundle path too, so the failure may fire at signing instead of at the final verification. The test then passes without exercising cleanup after a failed final verification, which is what its name claims. Another test pins the verify call as `[\"codesign\",\"--verify\",\"--strict\",str(output)]`, so the two can be told apart.",
+      "suggestion": "Match only the verify invocation, for example `if arguments[:3]==[\"codesign\",\"--verify\",\"--strict\"]:raise subprocess.CalledProcessError(1,arguments)`. Also assert that the sign call happened before the failure.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/package-app_test.py",
+          "lines": {
+            "start": 87,
+            "end": 87
+          }
+        }
+      ],
+      "tags": [
+        "test-precision",
+        "signing",
+        "location-corrected"
+      ],
+      "evidence": "if arguments[-1]==str(output):raise subprocess.CalledProcessError(1,arguments)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ebee1ac72579dd30",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Temp archive inside the repo breaks the post-packaging clean-state check",
+      "message": "The temp file `.vellum-sdk-*` is created in `output.parent` before the final cleanliness re-check. If `output.parent` is inside the repository and not git-ignored, `git status --porcelain` reports it as untracked. `source_state(root)` then differs from the earlier `state`, so a public build fails with a misleading 'source changed during packaging' error. The same cause can make a private build pick up its own partially written temp archive, but only if the temp file lands under an allowed source directory.",
+      "suggestion": "Create the temp file in a directory outside the working tree (e.g. a `tempfile.mkdtemp` directory) and move it into place, which requires the same filesystem as `output`. Alternatively, reject output paths inside `root`, or compare the tracked-file state and ignore the temp path before the final check.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 233,
+            "end": 269
+          }
+        }
+      ],
+      "tags": [
+        "packaging",
+        "public-release",
+        "reproducibility"
+      ],
+      "evidence": "if public and source_state(root) != state:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a6137f94ddeacbaf",
+      "severity": "medium",
+      "category": "security",
+      "title": "Ambient GOROOT passes through the 'controlled' child environment",
+      "message": "GOROOT is forwarded from the ambient environment while the module forces GOTOOLCHAIN=local and the spec says ambient toolchain overrides are dropped. An inherited GOROOT can point the go command at a different, possibly untrusted, toolchain or standard library. That undermines the controlled build environment for verifying and executing archive code. PKG_CONFIG_PATH is forwarded in the same way and can influence cgo flags.",
+      "suggestion": "Do not forward GOROOT. Let the go binary found on PATH determine its own root. If an override is needed, validate it explicitly or make it opt-in. Consider the same for PKG_CONFIG_PATH.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/sdk_environment.py",
+          "lines": {
+            "start": 10,
+            "end": 10
+          }
+        }
+      ],
+      "tags": [
+        "environment",
+        "toolchain",
+        "hardening",
+        "location-corrected"
+      ],
+      "evidence": "\"GOPATH\", \"GOCACHE\", \"GOMODCACHE\", \"GOROOT\", \"GOMAXPROCS\", \"GOMEMLIMIT\", \"GORACE\",",
+      "fix": {
+        "before": "\"GOPATH\", \"GOCACHE\", \"GOMODCACHE\", \"GOROOT\", \"GOMAXPROCS\", \"GOMEMLIMIT\", \"GORACE\",",
+        "after": "\"GOPATH\", \"GOCACHE\", \"GOMODCACHE\", \"GOMAXPROCS\", \"GOMEMLIMIT\", \"GORACE\","
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 144157,
+    "totalMs": 41683
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 30,
+    "bytes": 142314,
+    "chunks": 11,
+    "llmCalls": 8,
+    "cacheHit": false,
+    "cachedChunks": 3,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 68578,
+        "output": 17165,
+        "costUSD": 0.308806
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

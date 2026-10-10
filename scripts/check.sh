@@ -9,14 +9,20 @@ if [ ! -f drivers/cogent/build/upstream/go.mod ] || [ ! -f drivers/cogent/build/
 fi
 python3 drivers/cogent/prepare_test.py
 python3 scripts/benchmark-native_test.py
+python3 scripts/child_process_test.py
+python3 scripts/release-sdk_test.py
+python3 scripts/check-sdk_test.py
+python3 scripts/package-app_test.py
 go test -race ./...
 go vet ./...
 cd drivers/cogent
-go test ./...
+go test -race ./...
 go vet ./...
 mkdir -p build
 go build -o build/vellum-workbench ./cmd/workbench
 # Replacement dependency tests do not run transitively with driver tests.
-(cd build/upstream && go test -race ./system ./system/driver/base ./system/driver/desktop ./core -run 'TestComposerPublicationAndWithdrawal|TestLockRechecksAfterWaitingForNativeTeardown|TestSceneShowUsesOwnWindowTitle|TestQueuedCloseStopsLoopAfterComposerWithdrawal|TestNewWindowSizingOwnsContextDuringOtherWindowResize|TestSameWindowStageSizingUsesExistingContext|TestScreenSnapshotDuringCacheRebuild|TestWindowOptionsFixupUsesScreenSnapshot|TestMainQueuePublicationDuringStartupDispatch|TestMainQueueInitializationPreservesIdentityAndCompletion|TestMainThreadRequiredCallbackWaitsForLoopPublication|TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW')
+(cd build/upstream && go test -race ./system ./system/driver/base ./system/driver/desktop ./system/composer ./gpu ./gpu/gpudraw ./core ./xyz/xyzcore -run 'TestComposerPublicationAndWithdrawal|TestLockRechecksAfterWaitingForNativeTeardown|TestSceneShowUsesOwnWindowTitle|TestQueuedCloseStopsLoopAfterComposerWithdrawal|TestNewWindowSizingOwnsContextDuringOtherWindowResize|TestSameWindowStageSizingUsesExistingContext|TestScreenSnapshotDuringCacheRebuild|TestWindowOptionsFixupUsesScreenSnapshot|TestMainQueuePublicationDuringStartupDispatch|TestMainQueueInitializationPreservesIdentityAndCompletion|TestMainThreadRequiredCallbackWaitsForLoopPublication|TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW|TestDeviceLoss|TestSurfaceAcquisition|TestRetiredDirectRenderSource|TestComposition|TestInlineComposition|TestIdleBarrier|TestVellumScreenPoll|TestVellumScreenAccessors|TestVellumCurrentWindowSnapshot|TestVellumRedraw|TestVellumComposer|TestVellumUnsafeResizeReplay|TestVellumRenderedGeometryScrollAndWrap')
 
 "$VELLUM_REPO_ROOT/scripts/check-example.sh"
+
+(cd "$VELLUM_REPO_ROOT/examples/sdk-contract" && go test -race ./... && go vet ./...)

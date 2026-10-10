@@ -1,0 +1,170 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c5d8aceab5033b54a1366c269f1a5d60",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "64b77d468a2515ed",
+      "severity": "medium",
+      "category": "security",
+      "title": "Archive code is executed without a trusted digest being required",
+      "message": "When `--sha256` is omitted, the only integrity data is the manifest inside the archive, so tampering is not detected. The script then runs `new-app.py` and `go test` from that archive with the full environment. The output JSON does not say whether the archive digest was trusted, so a report can look verified when it was not.",
+      "suggestion": "Record `\"archive_trusted\": expected_sha256 is not None` in the report, or require `--sha256` (or an explicit `--insecure-self-attested` flag) before executing archive contents.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 64,
+            "end": 64
+          }
+        }
+      ],
+      "tags": [
+        "supply-chain",
+        "authenticity"
+      ],
+      "evidence": "if expected_sha256 is not None and digest != expected_sha256:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0c5ccd92062d3b4b",
+      "severity": "medium",
+      "category": "security",
+      "title": "Replacement without Dir resolves to the current working directory",
+      "message": "A `Replace` entry with no `Dir` (for example a module-to-module replacement) gets `Dir` defaulted to an empty string. `Path(\"\").resolve()` is the current working directory. If the script runs from inside the relocated SDK, that check passes. Otherwise the error blames the wrong location. The check exists to prove no replacement points at the original checkout, so it should fail closed.",
+      "suggestion": "Reject replacements that have no local `Dir` instead of defaulting to an empty path.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 153,
+            "end": 153
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "fail-open"
+      ],
+      "evidence": "directory = Path(replaced.get(\"Dir\", \"\")).resolve()",
+      "fix": {
+        "before": "        directory = Path(replaced.get(\"Dir\", \"\")).resolve()",
+        "after": "        if not replaced.get(\"Dir\"):\n            raise ValueError(f\"consumer replacement has no local directory: {module['Path']}\")\n        directory = Path(replaced[\"Dir\"]).resolve()"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d6f99ff852638a21",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Code signature verified at the stage path, not the final bundle",
+      "message": "The bundle is signed and verified inside the temp stage directory named `application.app`. It is then moved piecemeal into `output`, which has a different path and may not end in `.app`. The final artifact is never re-verified, so a broken move or a differing bundle layout would go unnoticed.",
+      "suggestion": "Run `codesign --verify --strict` on `output` after the move completes. Also require or enforce a `.app` suffix on the output path for darwin.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 86,
+            "end": 88
+          }
+        }
+      ],
+      "tags": [
+        "codesign",
+        "macos",
+        "verification"
+      ],
+      "evidence": "subprocess.run([\"codesign\",\"--verify\",\"--strict\",str(stage)],check=True)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b2c02e9cfd615158",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Archive contents depend on host umask and builder identity",
+      "message": "Archive entry modes, uid/gid and mtimes come from the build host: only the executable is chmod'ed. The directory and the manifest take their modes from the umask. Under umask 077 the extracted app directory and manifest are 0700/0600 and unusable for other users. The archive also embeds the builder's uid/gid/uname, so it is not reproducible. The zip branch has the same umask dependence.",
+      "suggestion": "Normalize modes (0o755 for dirs and the executable, 0o644 for other files) before archiving. For tar, pass a `filter=` that sets uid/gid=0, uname/gname='' and mtime to a fixed value.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 99,
+            "end": 104
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "permissions"
+      ],
+      "evidence": "with tarfile.open(artifact,\"w:gz\") as archive:archive.add(stage,arcname=name)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 157215,
+    "totalMs": 57394
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 28,
+    "bytes": 112784,
+    "chunks": 8,
+    "llmCalls": 7,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 58205,
+        "output": 19568,
+        "costUSD": 0.31209
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -236,13 +236,11 @@ func TestNativePipeLimitsAndCancelWarnings(t *testing.T) {
 
 func TestMissingHelperPathsAreUnavailable(t *testing.T) {
 	missing := filepath.Join(t.TempDir(), "missing-helper")
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	relative, err := filepath.Rel(cwd, missing)
-	if err != nil {
-		t.Fatal(err)
+	// Construct a relative path directly: the checkout and temporary directory
+	// may be on different Windows volumes, where filepath.Rel cannot work.
+	relative := filepath.Join(fmt.Sprintf("vellum-missing-%d", time.Now().UnixNano()), "missing-helper")
+	if _, err := os.Stat(relative); !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("relative missing-helper fixture must not exist: %v", err)
 	}
 	for _, executable := range []string{"vellum-executable-that-does-not-exist", missing, relative} {
 		t.Run(executable, func(t *testing.T) {
@@ -255,7 +253,7 @@ func TestMissingHelperPathsAreUnavailable(t *testing.T) {
 	// A path that exists but cannot execute is a native startup failure, not a
 	// missing dependency callers should silently replace with a fallback.
 	directory := t.TempDir()
-	_, err = Run(context.Background(), directory, nil, nil)
+	_, err := Run(context.Background(), directory, nil, nil)
 	var process *ProcessError
 	if errors.Is(err, app.ErrUnavailable) || !errors.As(err, &process) {
 		t.Fatalf("non-executable existing helper: %v", err)

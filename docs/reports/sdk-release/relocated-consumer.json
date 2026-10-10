@@ -1,0 +1,26 @@
+{
+  "event": "vellum.sdk.relocated",
+  "archive_sha256": "c958d0c418ee2b52c0d3252b56d60e8f72ddad7f8e4b7d4100ee752cb8aa9f46",
+  "version": "v0.1.0-alpha.1",
+  "source": {
+    "clean": false,
+    "commit": "0793546149bb4d3beee97b90834a2204f97e5f76"
+  },
+  "verified_files": 6340,
+  "replacements_within_sdk": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "example.com/vellum": ".",
+    "example.com/vellum/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+  },
+  "path_contains_spaces": true,
+  "checks": [
+    "manifest all-file integrity",
+    "standalone consumer race/vet/build",
+    "public API scenarios race/vet"
+  ],
+  "native_runtime": "not executed",
+  "public_distribution_audit": "not certified",
+  "acceptance": "historical-dirty-snapshot-not-current-acceptance",
+  "independent_authenticity_verified": false
+}

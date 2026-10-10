@@ -1,0 +1,148 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "859fe8d98e9090c306f2da40a9da8672",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "3854c7b3bc42d04f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Source hash record omits packaging helper files changed in this PR",
+      "message": "The README says source-hashes.json identifies the exact packaging files in the validated archive. It lists release-sdk.py, check-sdk.py and package-app.py, but not scripts/artifact_io.py or scripts/check.sh. Both are changed in this PR and sit beside those scripts. If the packaging scripts import artifact_io.py, the hash record cannot pin the code that was actually validated. That weakens the evidence.",
+      "suggestion": "Regenerate source-hashes.json from the final archive and include every packaging helper (scripts/artifact_io.py, scripts/check.sh). Ideally generate the list automatically rather than curating it by hand.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "docs/reports/sdk-release/source-hashes.json",
+          "lines": {
+            "start": 10,
+            "end": 14
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "reproducibility"
+      ],
+      "evidence": "\"scripts/package-app_test.py\": \"ac666a6a25d6eeccc8262e503f09e2bf7744e6274c78d06153878f809eb65347\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6132f1d1a57fabdc",
+      "severity": "medium",
+      "category": "security",
+      "title": "No size limits when verifying and extracting an untrusted SDK archive",
+      "message": "The archive is read fully into memory and every member is fully decompressed during verification (`extractfile(...).read()`), then again at extraction. There are no limits on member count, per-member size or total uncompressed size. The trusted SHA-256 is optional, so a hostile or corrupted gzip bomb can exhaust memory or disk before any check rejects it. The tool exists to verify archives, so it should not depend on the archive being benign.",
+      "suggestion": "Check `member.size` against a per-file and total cap before reading. Stream-hash members in chunks instead of `.read()`. Reject archives with an unreasonable member count.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 22,
+            "end": 22
+          }
+        }
+      ],
+      "tags": [
+        "tar",
+        "dos",
+        "resource-limits",
+        "location-corrected"
+      ],
+      "evidence": "with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode=\"r:gz\") as archive:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3f3f5c30e686c2a7",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "License file detection is a loose prefix match and can falsely satisfy the public license gate",
+      "message": "The license-file match is a bare prefix on the file name, so source files such as `license.go` or `notice_test.go` and testdata anywhere in the module tree count as license files. That can bloat THIRD_PARTY_NOTICES. It can also make the public-release check `any(not item[\"license_files\"] ...)` pass for a module that ships no real license text.",
+      "suggestion": "Match exact conventional names (LICENSE, LICENSE.md, COPYING, NOTICE and similar) and exclude source extensions. Better, restrict the match to the module root and top-level directories rather than walking the whole tree.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 164,
+            "end": 164
+          }
+        }
+      ],
+      "tags": [
+        "license",
+        "supply-chain",
+        "release-gate",
+        "location-corrected"
+      ],
+      "evidence": "if path.is_file() and not path.is_symlink() and path.name.lower().startswith((\"license\", \"copying\", \"notice\")):",
+      "fix": {
+        "before": "if path.is_file() and not path.is_symlink() and path.name.lower().startswith((\"license\", \"copying\", \"notice\")):",
+        "after": "if path.is_file() and not path.is_symlink() and re.fullmatch(r\"(licen[sc]e|copying|notice)([-_.][A-Za-z0-9_.-]*)?\", path.name, re.IGNORECASE) and path.suffix.lower() not in {\".go\", \".c\", \".h\", \".rs\", \".py\", \".js\"}:"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 119960,
+    "totalMs": 32685
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 27,
+    "bytes": 98808,
+    "chunks": 7,
+    "llmCalls": 7,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 58111,
+        "output": 13958,
+        "costUSD": 0.255802
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,222 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "eb6706df324baacf87d9b1aff8e6956f",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 1
+    },
+    "highestSeverity": "high"
+  },
+  "findings": [
+    {
+      "id": "7431aec9369f54b9",
+      "severity": "high",
+      "category": "bug",
+      "title": "SDK contract tests use a relative path after cd into drivers/cogent",
+      "message": "Earlier in the script the shell does `cd drivers/cogent` and never returns to the repo root, which is why check-example.sh is called through `$VELLUM_REPO_ROOT`. The new line uses a relative path, so `examples/sdk-contract` resolves under `drivers/cogent` and does not exist. `cd` fails and the contract tests are never run. Depending on `set -e`, that either aborts check.sh with an error or skips the check silently.",
+      "suggestion": "Use an absolute path via `$VELLUM_REPO_ROOT` (or `cd \"$VELLUM_REPO_ROOT\"` first) so the contract tests run from the repo root.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "scripts/check.sh",
+          "lines": {
+            "start": 27,
+            "end": 27
+          }
+        }
+      ],
+      "tags": [
+        "shell",
+        "cwd",
+        "check-script"
+      ],
+      "evidence": "(cd examples/sdk-contract \u0026\u0026 go test -race ./... \u0026\u0026 go vet ./...)",
+      "fix": {
+        "before": "(cd examples/sdk-contract \u0026\u0026 go test -race ./... \u0026\u0026 go vet ./...)",
+        "after": "(cd \"$VELLUM_REPO_ROOT/examples/sdk-contract\" \u0026\u0026 go test -race ./... \u0026\u0026 go vet ./...)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d0669b531a746ddb",
+      "severity": "medium",
+      "category": "bug",
+      "title": "otool parsing misreports fat/universal binaries as having non-system dependencies",
+      "message": "The parser skips only the first line of `otool -L` output. For universal (fat) binaries, otool prints a header line per architecture, such as `path (architecture arm64):`. Those lines are treated as dependencies, so every universal binary is rejected as having non-system native dependencies. The validator explicitly accepts the fat magic `\\xca\\xfe\\xba\\xbe`, so this path is reachable. Also, `otool` being absent raises a raw FileNotFoundError.",
+      "suggestion": "Skip arch header lines, i.e. any line that is not indented (`not line.startswith((\"\\t\",\" \"))`), and only parse indented dependency lines. Optionally de-duplicate across architectures and handle a missing `otool` with a clear error.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 51,
+            "end": 56
+          }
+        }
+      ],
+      "tags": [
+        "macos",
+        "universal-binary",
+        "otool"
+      ],
+      "evidence": "for line in output.splitlines()[1:]:\n        value = line.strip().split(\" (\",1)[0]\n        if value and not value.startswith((\"/System/Library/\",\"/usr/lib/\")):\n            dependencies.append(value)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "9bb5bcaed2dbbb5f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "os.link used for final publication fails on filesystems without hardlink support",
+      "message": "Publishing the archive with `os.link` requires hardlink support on the destination filesystem. On FAT/exFAT, some network or container mounts, or restricted environments it raises OSError (EPERM/ENOTSUP), even though packaging succeeded. The temp directory is then deleted and nothing is produced.",
+      "suggestion": "Catch OSError from `os.link` and fall back to an exclusive copy: open `output` with mode `'xb'` and `shutil.copyfileobj` from the artifact, removing the partial output on failure. This keeps the no-overwrite guarantee.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 101,
+            "end": 101
+          }
+        }
+      ],
+      "tags": [
+        "portability",
+        "filesystem"
+      ],
+      "evidence": "os.link(artifact,output)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "17b2a5cdb6a354fb",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Overbroad 'build' path exclusion silently drops source",
+      "message": "Any tracked file with a path component named `build` is silently dropped from the SDK, not only the generated `drivers/cogent/build` directory. A legitimate Go package or example directory named `build` would be omitted without any warning. Consumers would then get a broken SDK, and the manifest would show nothing missing.",
+      "suggestion": "Exclude only the specific generated path, for example `name.startswith(\"drivers/cogent/build/\")`, and keep skipping `__pycache__` generally.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 74,
+            "end": 74
+          }
+        }
+      ],
+      "tags": [
+        "correctness",
+        "packaging",
+        "location-corrected"
+      ],
+      "evidence": "        if \"build\" in path.parts or \"__pycache__\" in path.parts:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "890efbd27a657a56",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Public release includes unverified, untracked dependency tree",
+      "message": "The public release cleanliness gate and the 'source changed during packaging' check rely on `git status`. Everything under `drivers/cogent/build/{upstream,typesetting}` is generated and most likely git-ignored. That content is packaged without any provenance or hash check, so a stale or locally modified dependency tree can ship in a 'clean' public archive and the gates will not notice. The recheck that the source is unchanged also cannot see these files.",
+      "suggestion": "For public builds, record and verify the dependency tree against an expected manifest or hash (for example from go.sum or a pinned commit). Alternatively regenerate the tree in a temporary directory during packaging, and compare dependency file hashes before and after.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 83,
+            "end": 92
+          }
+        }
+      ],
+      "tags": [
+        "supply-chain",
+        "reproducibility"
+      ],
+      "evidence": "        base = root / \"drivers/cogent/build\" / dependency",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c889e4c3d3734915",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Published archive inherits 0600 permissions from temp file",
+      "message": "The archive is written to a `NamedTemporaryFile`, which is created with mode 0600, and it is hard-linked into place, so the published artifact keeps those permissions. A release archive that is unreadable by group and others is unexpected for something meant to be distributed or consumed by other users or CI. Hard-linking also fails on filesystems that do not support it, and the failure surfaces as a raw OSError.",
+      "suggestion": "Call `os.chmod(pending, 0o644)` before linking, and catch `OSError` around `os.link` to produce a clear error message.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/release-sdk.py",
+          "lines": {
+            "start": 168,
+            "end": 168
+          }
+        }
+      ],
+      "tags": [
+        "permissions",
+        "artifact"
+      ],
+      "evidence": "        os.link(pending, output)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 113487,
+    "totalMs": 39204
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 26,
+    "bytes": 84983,
+    "chunks": 6,
+    "llmCalls": 6,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 49861,
+        "output": 14004,
+        "costUSD": 0.239762
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

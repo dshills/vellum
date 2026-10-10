@@ -1,0 +1,149 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "513d3c190d925950d4669bd858a9d666",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "3bc1f8861328371f",
+      "severity": "medium",
+      "category": "security",
+      "title": "Untrusted SDK code is executed with the full parent environment",
+      "message": "The script runs SDK-supplied code (new-app.py, go test, the built consumer binary) with the caller's whole environment. Even with the digest checks, `--allow-self-attested` means an unverified archive can read tokens and credentials from the environment (CI secrets, cloud keys). Go tests and generators can run arbitrary code.",
+      "suggestion": "Pass an allowlisted environment (PATH, HOME, GOCACHE, GOMODCACHE, GOFLAGS, display variables) instead of all of os.environ, so secrets are not exposed to archive code.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 208,
+            "end": 213
+          }
+        }
+      ],
+      "tags": [
+        "security",
+        "environment",
+        "untrusted-code"
+      ],
+      "evidence": "env = {**os.environ, \"GOWORK\": \"off\"}",
+      "fix": {
+        "before": "env = {**os.environ, \"GOWORK\": \"off\"}",
+        "after": "env = {**{k: v for k, v in os.environ.items() if k in {\"PATH\", \"HOME\", \"GOPATH\", \"GOCACHE\", \"GOMODCACHE\", \"GOFLAGS\", \"GOPROXY\", \"GOSUMDB\", \"DISPLAY\", \"WAYLAND_DISPLAY\", \"XDG_RUNTIME_DIR\", \"TMPDIR\", \"LANG\"}}, \"GOWORK\": \"off\"}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d37be368fa1c35d5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Manifest release.module used without validation (KeyError, unvalidated trust input)",
+      "message": "verify_archive validates the manifest's schema, release dict and release.version, but not release.module. If the manifest has no `module`, this raises a KeyError, after the SDK has been extracted and new-app.py and go list have already run. The value is also untrusted and unvalidated, yet it picks which replacement names check_origin enforces.",
+      "suggestion": "Validate release.module (a non-empty string matching the expected module path) inside verify_archive and raise ValueError, before anything is executed.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 215,
+            "end": 215
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "manifest"
+      ],
+      "evidence": "origins = check_origin(modules, sdk, verified[\"manifest\"][\"release\"][\"module\"])",
+      "fix": {
+        "before": "origins = check_origin(modules, sdk, verified[\"manifest\"][\"release\"][\"module\"])",
+        "after": "module_path = verified[\"manifest\"][\"release\"].get(\"module\")\n        if not isinstance(module_path, str) or not module_path:\n            raise ValueError(\"invalid SDK manifest module path\")\n        origins = check_origin(modules, sdk, module_path)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "95b8b89959b78290",
+      "severity": "medium",
+      "category": "docs",
+      "title": "Spec index links to files not present in this change",
+      "message": "The README and framework.md now link to workbench-interaction.md, accessibility.md, rendering.md and platform-support.md. Only release.md is added in this diff, and none of the others appear in any other part of the review. If they are not already in the repo, these links are dead and the specs they describe are missing.",
+      "suggestion": "Confirm the four linked spec files exist in the repository, and add them to this change if they do not. Otherwise remove the links.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "specs/README.md",
+          "lines": {
+            "start": 8,
+            "end": 13
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "broken-link"
+      ],
+      "evidence": "- [Workbench interaction](workbench-interaction.md): pointer docking, floating,",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 59846,
+    "totalMs": 38304
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 28,
+    "bytes": 124144,
+    "chunks": 9,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 5,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 33058,
+        "output": 7134,
+        "costUSD": 0.137456
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

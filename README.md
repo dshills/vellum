@@ -4,8 +4,10 @@ Vellum is an experimental Go-native professional UI framework. Applications use
 ordinary Go values, stable widget IDs, explicit commands and cancellable tasks.
 A separate native driver reuses Cogent Core's windowing and WebGPU stack.
 
-Production readiness, native accessibility, international input, and Windows/Linux
-runtime validation remain open. The workbench does not change system input sources.
+The framework includes multiwindow docking, native macOS accessibility, standard
+controls, virtual data views and a shared-device GPU canvas. Production readiness,
+complete assistive/input acceptance and Windows/Linux runtime qualification remain
+open. The workbench does not change system input sources.
 
 ## Repository layout
 
@@ -19,7 +21,7 @@ runtime validation remain open. The workbench does not change system input sourc
 | `examples/hello/` | Standalone application module consuming the local SDK |
 | [docs/](docs/README.md) | Development guide, research, decisions, reports and review evidence |
 | [specs/](specs/README.md) | Framework contract and foundation validation plan |
-| `scripts/` | Repository checks and macOS fixture packaging |
+| `scripts/` | Repository checks, SDK release and private application packaging |
 | `prototypes/` | Independent experimental modules and historical foundation evidence |
 
 Public packages stay at the module root so framework consumers can import them
@@ -51,7 +53,7 @@ windows in one process main loop and must run from main.
 
 See the [development guide](docs/development.md) for the full check workflow,
 [framework contract](specs/framework.md) for implemented behavior and limits, and
-[implementation status](docs/implementation.md) for the five completed phases.
+[implementation status](docs/implementation.md) for completed phases and remaining acceptance gates.
 
 The [independent hello application](examples/hello/README.md) has its own module.
 Use `python3 scripts/new-app.py /path/to/my-app --module example.com/my-app`
@@ -59,3 +61,8 @@ after preparation to create an application outside the checkout. Native patches
 and preparation inputs belong to the driver; prototype directories are not needed.
 See the [local SDK contract](specs/sdk.md) and run `scripts/benchmark.sh` for
 portable baselines or `scripts/benchmark.sh --native` for visible GPU measurements.
+
+The SDK identifies `v0.1.0-alpha.1`. Follow the
+[application tutorial](docs/tutorials/building-an-app.md) and
+[release contract](specs/release.md) to create and verify a relocatable private SDK.
+Public packaging fails until namespace, license and redistribution gates are met.

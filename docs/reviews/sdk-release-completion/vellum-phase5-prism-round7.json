@@ -1,0 +1,228 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "bd0d533142e250b302bc9d78dbe6975a",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 6,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "759f6a8af58e4ed7",
+      "severity": "medium",
+      "category": "security",
+      "title": "x",
+      "message": "The expected digest used for the parser check comes from the producer's own output (private-archive.json). That is self-attestation, not an independently trusted digest. The check proves internal consistency only, not authenticity. The README states that authenticity needs an independently trusted digest. This report format does not mark the check as self-attested.",
+      "suggestion": "Add an explicit field such as \"digest_trust\": \"self-attested\". Alternatively, record an out-of-band digest or signature and note that no independent verification occurred.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reports/sdk-release/historical-parser-check.json",
+          "lines": {
+            "start": 4,
+            "end": 4
+          }
+        }
+      ],
+      "tags": [
+        "supply-chain",
+        "integrity"
+      ],
+      "evidence": "\"expected_sha256_source\": \"private-archive.json successful historical producer\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7b324dbd1b8aa48f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "x",
+      "message": "The relocated-consumer acceptance evidence is tied to an archive built from a dirty tree. The recorded commit 0793546 does not describe the archived content, and the README says the archive predates later Prism corrections. The recorded checks (race/vet/build, 6340 verified files) therefore do not validate the committed or current source. A reader could mistake this record for acceptance of the phase.",
+      "suggestion": "Regenerate the archive from a clean checkout of the phase commit and record its commit and digest. Until then, mark this file explicitly as non-acceptance evidence, for example with an \"acceptance\": \"historical-dirty-snapshot\" field.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/sdk-release/relocated-consumer.json",
+          "lines": {
+            "start": 5,
+            "end": 7
+          }
+        }
+      ],
+      "tags": [
+        "provenance",
+        "release-evidence"
+      ],
+      "evidence": "\"clean\": false,",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a31dc67d7bb83b2b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Subprocesses running SDK-provided code have no timeout",
+      "message": "The script runs code from the archive (new-app.py, go list, go test, go vet, go build) with no timeout, while only the native runtime run has timeout=30. An archive with a hanging test or generator, or a stalled network fetch, blocks the check forever. The execution is also not sandboxed, so there is no other bound on the run.",
+      "suggestion": "Pass a generous timeout= to every subprocess.run and check_output call, for example through a shared helper. Handle subprocess.TimeoutExpired so the check fails cleanly.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 232,
+            "end": 232
+          }
+        }
+      ],
+      "tags": [
+        "subprocess",
+        "timeout",
+        "untrusted-code"
+      ],
+      "evidence": "modules = decode_objects(subprocess.check_output([\"go\", \"list\", \"-m\", \"-json\", \"all\"], cwd=consumer, env=env, text=True))",
+      "fix": {
+        "before": "modules = decode_objects(subprocess.check_output([\"go\", \"list\", \"-m\", \"-json\", \"all\"], cwd=consumer, env=env, text=True))",
+        "after": "modules = decode_objects(subprocess.check_output([\"go\", \"list\", \"-m\", \"-json\", \"all\"], cwd=consumer, env=env, text=True, timeout=600))"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "fee520f0242ddcf8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "App name \"APP_MANIFEST.json\" makes the manifest overwrite the executable on Linux",
+      "message": "On Linux the executable is written to `stage/\u003cname\u003e` and the manifest to `stage/APP_MANIFEST.json`. `valid_name` accepts `APP_MANIFEST.json`, so with that name the manifest silently overwrites the copied binary. The archive then ships a JSON file as the executable. The manifest's `source_binary_sha256`, computed before the overwrite, no longer matches the file.",
+      "suggestion": "Reject app names that collide with reserved layout files such as `APP_MANIFEST.json` (case-insensitively), or put the manifest and executable in different directories.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 142,
+            "end": 142
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "name-collision",
+        "data-corruption"
+      ],
+      "evidence": "(stage/\"APP_MANIFEST.json\").write_text(json.dumps(manifest,indent=2)+\"\\n\")",
+      "fix": {
+        "before": "    if not valid_name(name) or not re.fullmatch(r\"[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)+\",identifier):",
+        "after": "    if not valid_name(name) or name == \"APP_MANIFEST.json\" or not re.fullmatch(r\"[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)+\",identifier):"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "fea02224737f9420",
+      "severity": "medium",
+      "category": "security",
+      "title": "Environment allowlist forwards cgo compiler and linker flag overrides and allow-lists to archived code",
+      "message": "The allowlist forwards ambient CC/CXX/AR, the CGO_*FLAGS variables and the CGO_*_ALLOW/DISALLOW patterns to children that build and run extracted SDK code. A permissive `CGO_LDFLAGS_ALLOW=.*` or an attacker-influenced `CC` lets archived cgo code pass arbitrary compiler or linker flags. This undercuts the stated goal of dropping ambient overrides, and `--allow-self-attested` runs untrusted archives with them. Public builds also lose reproducibility.",
+      "suggestion": "Drop the CGO_*_ALLOW and CGO_*_DISALLOW variables by default, and probably the CGO_*FLAGS and CC/CXX as well. Make them opt-in through an explicit flag, or force them to fixed values for public and verification builds.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/sdk_environment.py",
+          "lines": {
+            "start": 13,
+            "end": 13
+          }
+        }
+      ],
+      "tags": [
+        "environment",
+        "cgo",
+        "supply-chain",
+        "location-corrected"
+      ],
+      "evidence": "\"CGO_CFLAGS_ALLOW\", \"CGO_CPPFLAGS_ALLOW\", \"CGO_CXXFLAGS_ALLOW\", \"CGO_FFLAGS_ALLOW\", \"CGO_LDFLAGS_ALLOW\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8de140f08e636b02",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Child environment drops proxy and TLS variables needed for module download",
+      "message": "Go's module fetching honors HTTP_PROXY, HTTPS_PROXY, NO_PROXY, SSL_CERT_FILE and SSL_CERT_DIR (and GOPROXY is forced to the public proxy), but none of these are allowlisted. In corporate-proxy or custom-CA environments, and in any setup using a local GOPROXY or an offline mirror, bootstrap and verification fail to fetch modules. Because GOPROXY is hard-coded, the only workaround is editing the script.",
+      "suggestion": "Allowlist the proxy and TLS variables (HTTP_PROXY, HTTPS_PROXY, NO_PROXY and their lowercase forms, SSL_CERT_FILE, SSL_CERT_DIR). Alternatively, document that network access through proxies is unsupported. Public/audited builds can still pin GOPROXY and GOSUMDB.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/sdk_environment.py",
+          "lines": {
+            "start": 26,
+            "end": 27
+          }
+        }
+      ],
+      "tags": [
+        "environment",
+        "networking"
+      ],
+      "evidence": "return {**{name: value for name, value in os.environ.items() if name in CHILD_ENVIRONMENT}, **GO_CONFIGURATION}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 179342,
+    "totalMs": 41994
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 30,
+    "bytes": 138096,
+    "chunks": 10,
+    "llmCalls": 9,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 84633,
+        "output": 22187,
+        "cachedInput": 2625,
+        "costUSD": 0.391136
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

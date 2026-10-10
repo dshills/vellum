@@ -1,0 +1,17 @@
+{
+  "source_fixture": "drivers/cogent/internal/platformio/process_test.go",
+  "source_sha256": "668dbb1a88beaf8bbfe1f1ce05d06cd75f8d14ae4d7554416c4ca3661ee0ca5f",
+  "commands": [
+    "go test -race -count=1 ./internal/platformio",
+    "go vet ./internal/platformio",
+    "GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go test -c -o /private/tmp/vellum-platform-cross-volume-windows.test.exe ./internal/platformio"
+  ],
+  "exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "artifact_sha256": "00870977f658e287df5f1f1312cc30a062a4047f08cdc82ed45284db27dc69b6",
+  "artifact_format": "/private/tmp/vellum-platform-cross-volume-windows.test.exe: PE32+ executable (console) x86-64, for MS Windows",
+  "scope": "macOS host tests and Windows pure-helper crosscompile only; no Windows target execution"
+}

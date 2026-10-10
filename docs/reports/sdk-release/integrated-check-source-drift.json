@@ -1,0 +1,12 @@
+{
+  "changed": [
+    "specs/accessibility.md"
+  ],
+  "check_exit": 0,
+  "event": "vellum.sdk.integrated_snapshot_provenance",
+  "comparison_scope": "Immediately after the earlier integrated-check.txt run, compared with its integrated-check-source-hashes.json snapshot; not a final checkout or final release attestation.",
+  "tested_code_or_script_changed_during_run": false,
+  "documentation_change_reason": "Only specs/accessibility.md Markdown changed. The Go compiler and the invoked preparation/SDK Python tests and shell checks do not consume this document as executable/test input. The passing code checks therefore describe the captured tested code, while the document belongs to a later documentation snapshot.",
+  "later_changes": "Platform CLI diagnostic aggregation and a later CLI acceptance predicate were changed after this run and have separate phase tests. The earlier capture must not certify these later harness bytes.",
+  "final_source_tree_qualified": false
+}

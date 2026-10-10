@@ -30,8 +30,12 @@ The `workbench` package owns a validated split/tab tree. Move, split and restore
 are atomic model operations; malformed or incompatible layouts leave the current
 workspace intact. The example provides dock/split/reset commands and resizable
 native panes. `-layout /path/layout.json` enables explicit Save/Restore; startup
-does not overwrite preferences. Drag-to-dock, floating panes and dynamic window
-creation are not yet implemented. Dock containers may be recreated for topology changes; compatible panel contents
+does not overwrite preferences. Pointer drag supports docking/reordering inside a window. Explicit tab menus
+float panels into independent windows and redock them into another group/window.
+Session v2 persists the complete window layout, bounds, title and focus, while
+Workspace v1 remains supported. Closing a floating window transfers its panels to
+a surviving window. Panel factories share application data and create fresh native
+extensions per mount. See [workbench interaction](workbench-interaction.md). Dock containers may be recreated for topology changes; compatible panel contents
 retain their native identities. See [keyed reconciliation](keyed-reconciliation.md).
 
 ## Virtualized data
@@ -62,7 +66,9 @@ Wheel zoom anchors the pointer; dragging pans; clicking selects a component in
 the inspector; Fit/Zoom commands share the command registry. Native scene
 destruction releases GPU resources. The current canvas is a bounded rectangle
 renderer, with a 10,000-object limit; arbitrary shaders, image tiles, spatial
-indexes/LOD and device-loss recovery remain future work. Runtime verification
+indexes/LOD and automatic physical-device recreation remain future work.
+Demand painting, live resource rebuilding and actionable device-loss shutdown are
+implemented; see [rendering](rendering.md). Runtime verification
 covers macOS; the integration is not a production performance certification.
 
 ## Layout and appearance
@@ -70,3 +76,20 @@ covers macOS; the integration is not a production performance certification.
 See [layout and theming](layout-theme.md) for the optional value API and native
 reset semantics. The driver snapshots its theme for each run; workbench panel
 trees inherit that theme through the optional ThemeExtension adapter contract.
+
+## Native semantics, services and release scope
+
+The macOS driver publishes managed controls and active workbench content through
+NSAccessibility, including actions, post-layout geometry and modal focus scopes.
+Virtual views publish bounded row snapshots and explicit paging semantics. The
+[accessibility contract](accessibility.md) distinguishes native selector probes
+from external assistive-technology acceptance and target input/AX gaps.
+
+Windows/Linux service adapters implement clipboard, chooser transports and
+window-local menu widgets. Actual target runtime, native IME/accessibility and
+native Wayland acceptance remain open; [platform support](platform-support.md)
+reports those gates without inferring qualification from fixtures/crosscompiles.
+
+The independently relocated private SDK uses an explicit alpha version, complete
+archive integrity checks and public consumer scenarios. [Release artifacts](release.md)
+document packaging and the owner namespace/license/audit gates for public release.

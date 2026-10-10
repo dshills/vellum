@@ -1,0 +1,173 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ad6b9cefc3618939a6afa55907d70a42",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "41a5d6f66bbd59a9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Windows taskkill failure on an already-exited child masks the timeout and leaves descendants",
+      "message": "On Windows, any non-zero taskkill exit is treated as failed cleanup. taskkill also exits non-zero when the direct child has already exited, for example when only a descendant still holds the capture pipes. In that case the timeout path raises ChildCleanupError and the original TimeoutExpired is lost. A direct child that has exited is also not terminated by taskkill /PID, so its leftover descendants are not killed either.",
+      "suggestion": "Skip taskkill when process.poll() is not None, or accept the 'process not found' exit code (128) as success. Use a Job Object if descendants must be killed after the direct child has exited.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/child_process.py",
+          "lines": {
+            "start": 15,
+            "end": 19
+          }
+        }
+      ],
+      "tags": [
+        "windows",
+        "process-cleanup",
+        "error-handling"
+      ],
+      "evidence": "raise ChildCleanupError(\"Windows taskkill could not confirm owned process-tree termination\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "aa73f91e31ee8b34",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Descendants are not cleaned up on the normal exit path",
+      "message": "The owned process group is killed only when communicate raises. When the direct child exits normally (success or non-zero status), its descendants are never terminated. Without capture pipes, a background grandchild outlives the call. With pipes, communicate returns only when the grandchild closes them. This contradicts the module's stated 'owned process-group cleanup' guarantee, and the finally block kills only the direct child.",
+      "suggestion": "After the direct child exits, call terminate_owned_group(process) best-effort on every path, tolerating ProcessLookupError, so no descendants remain after run_child returns.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/child_process.py",
+          "lines": {
+            "start": 63,
+            "end": 66
+          }
+        }
+      ],
+      "tags": [
+        "process-cleanup",
+        "resource-leak"
+      ],
+      "evidence": "completed = subprocess.CompletedProcess(arguments, process.returncode, stdout, stderr)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d6de5493296ee720",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Timing-sensitive test may be flaky because pidfile is written within 0.5s",
+      "message": "The test relies on a 0.5s deadline during which two Python interpreters must start and the PID file must be written. On a slow or loaded CI host the timeout can fire before the pidfile exists, so `assertTrue(pidfile.is_file())` fails spuriously. The test also asserts total time \u003c 3s, which adds further timing sensitivity. This is the only real-descendant acceptance test, and it is part of check.sh.",
+      "suggestion": "Make the parent signal readiness (write the pidfile) and give a generous timeout only for the sleeping phase. For example, use a longer timeout such as 5s and have the parent exit the wait early, or have the test poll for the pidfile before the deadline expires.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/child_process_test.py",
+          "lines": {
+            "start": 32,
+            "end": 32
+          }
+        }
+      ],
+      "tags": [
+        "flaky",
+        "timing",
+        "location-corrected"
+      ],
+      "evidence": "child.run_child([sys.executable, \"-c\", parent, str(pidfile), grandchild], timeout=0.5, capture_output=True, text=True)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 192274,
+    "totalMs": 48157
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 45,
+    "bytes": 248891,
+    "chunks": 15,
+    "llmCalls": 13,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 124739,
+        "output": 23194,
+        "cachedInput": 16878,
+        "costUSD": 0.481418
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "e70ca4c5c956cf7d",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Public SDK inventory hardcodes distribution_audit \"pending\", contradicting the approved gate",
+        "message": "license_inventory always writes distribution_audit as \"pending\", even for a public build. release_gates only lets a public build through when third_party_distribution_audit is \"approved\". The shipped THIRD_PARTY_INVENTORY.json therefore contradicts the release metadata and the gate, and consumers or automation reading it get a wrong audit status. The status is also non-deterministic with respect to the release metadata.",
+        "suggestion": "Pass the release metadata (or the public flag) into license_inventory and set distribution_audit from metadata[\"third_party_distribution_audit\"]. Keep \"pending\" only for private builds.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "scripts/release-sdk.py",
+            "lines": {
+              "start": 216,
+              "end": 216
+            }
+          }
+        ],
+        "tags": [
+          "release",
+          "provenance",
+          "metadata"
+        ],
+        "evidence": "\"distribution_audit\": \"pending\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in scripts/release-sdk.py"
+    }
+  ],
+  "suppressed": []
+}

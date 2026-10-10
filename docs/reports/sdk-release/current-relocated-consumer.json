@@ -1,0 +1,48 @@
+{
+  "event": "vellum.sdk.relocated",
+  "trust_basis": "caller-supplied expected digest",
+  "independent_authenticity_verified": false,
+  "archive_sha256": "59be0e9f025a53bcf6544133f796b36eaf80709ff9896aeb5ab460e9e1dc5881",
+  "version": "v0.1.0-alpha.1",
+  "source": {
+    "clean": false,
+    "commit": "89cb930d570d2b03b6225b4c9cecc3aa1f8ebb56"
+  },
+  "verified_files": 6348,
+  "replacements_within_sdk": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "example.com/vellum": ".",
+    "example.com/vellum/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+  },
+  "path_contains_spaces": true,
+  "checks": [
+    "manifest all-file integrity",
+    "external Go module cache verification",
+    "standalone consumer race/vet/build",
+    "public API scenarios race/vet"
+  ],
+  "native_runtime": {
+    "event": "vellum.native.ready",
+    "go_version": "go1.27.2",
+    "heap_alloc_bytes": 76188208,
+    "height": 722,
+    "render_readback_ns": [
+      2301458,
+      2384333,
+      2354125
+    ],
+    "startup_to_verified_gpu_ns": 189996000,
+    "width": 3054
+  },
+  "public_distribution_audit": "not certified",
+  "acceptance": "private-precommit-snapshot-validation",
+  "digest_trust": "local-producer-self-attested",
+  "scope": "Exact precommit archive snapshot; later platform CLI diagnostic aggregation is outside this snapshot. Final committed archive must be regenerated separately.",
+  "digest_verified_against_expected": true,
+  "original_wire_report": {
+    "path": "current-relocated-consumer-original.txt",
+    "sha256": "410d23962f1d33a90dc39df2b05c622cd9bef8fe8329c863309f47189d119223",
+    "schema_note": "The original checker output used archive_trusted for expected-digest presence. This normalized evidence renames that integrity flag; neither form independently establishes authenticity."
+  }
+}

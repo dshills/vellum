@@ -1,0 +1,175 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "44da45a95ecc026f696b1c891bb5b8a7",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9b4c60969de631ae",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Evidence record omits the explicit trust and qualification flags used by sibling records",
+      "message": "The other evidence records for this archive, such as current-capture-proof.json and current-private-archive.json, all state the trust and qualification flags explicitly. This hash record is for the same archive (59be0e9f...) but omits `digest_trust`, `independent_authenticity_verified`, `final_source_tree_qualified` and `acceptance`. It is a dirty-source snapshot with no recorded trust level, so a consumer reading it alone cannot tell it is only locally self-attested, and could read the digest list as authenticated or qualified. This is inconsistent with the stated convention that every record sets independent_authenticity_verified=false and local-producer self-attestation. The same gap exists in followup-integrated-check-provenance.json, which has no `digest_trust` or `independent_authenticity_verified`.",
+      "suggestion": "Add `\"digest_trust\": \"local-producer-self-attested\"`, `\"independent_authenticity_verified\": false`, `\"final_source_tree_qualified\": false` and an `acceptance` value to this record, matching the sibling current-* records. Do the same for followup-integrated-check-provenance.json.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reports/sdk-release/current-archive-source-hashes.json",
+          "lines": {
+            "start": 6,
+            "end": 8
+          }
+        }
+      ],
+      "tags": [
+        "evidence-schema",
+        "consistency",
+        "provenance"
+      ],
+      "evidence": "\"scope\": \"Selected archive metadata/bootstrap/example and platform CLI bytes; complete all-file hashes are in the verified archive SDK_MANIFEST.json. These identify archived source, not final checkout source.\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "04461fce8548c5dc",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Timeouts do not terminate grandchild processes",
+      "message": "subprocess.run with a timeout kills only the direct child, which here is `go`. Test binaries and the generated app, which `go test` and `go build` spawn, can survive the kill and keep running. Child processes that keep file handles or write into the temp directory can make TemporaryDirectory cleanup fail or leave stray processes behind, especially during the `-race` native runtime checks. The check executes untrusted SDK code, so reliably terminating the whole process group matters.",
+      "suggestion": "Run children with `start_new_session=True` and, on TimeoutExpired, `os.killpg` the process group. Use Popen with communicate(timeout=...) in a small helper used by all the subprocess calls.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 244,
+            "end": 244
+          }
+        }
+      ],
+      "tags": [
+        "subprocess",
+        "timeout",
+        "cleanup",
+        "location-corrected"
+      ],
+      "evidence": "subprocess.run(arguments, cwd=consumer, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "567afbef8826800b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Corrupt gzip data raises uncaught zlib.error, bypassing structured failure output",
+      "message": "preflight_tar reads the archive through gzip.GzipFile directly. A corrupt deflate stream there raises zlib.error, which is not an OSError, ValueError or tarfile.TarError, so the handler in main() does not catch it. The script then dies with a raw traceback instead of emitting the structured `vellum.sdk.check_failed` JSON event that callers and evidence tooling expect.",
+      "suggestion": "Add `import zlib` and include `zlib.error` in the caught exception tuple. Alternatively, wrap the gzip read in preflight_tar and re-raise zlib.error as ValueError.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 277,
+            "end": 277
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "robustness"
+      ],
+      "evidence": "except (ValueError, OSError, EOFError, tarfile.TarError, subprocess.CalledProcessError) as error:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c188438a9024d355",
+      "severity": "medium",
+      "category": "security",
+      "title": "Dependency allowlist can be bypassed with '..' path components",
+      "message": "The system-library allowlist is a plain string-prefix test on the raw load-command path. A path such as \"/usr/lib/../../tmp/evil.dylib\" or \"/System/Library/../../Users/x/lib.dylib\" matches the prefix and bypasses the \"audited bundle closure\" check, even though it resolves outside the system directories. The gate then reports no unaudited native dependencies.",
+      "suggestion": "Normalize the path with posixpath.normpath() (and import posixpath) before the prefix test, or reject any path containing a \"..\" component.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 63,
+            "end": 63
+          }
+        }
+      ],
+      "tags": [
+        "path-traversal",
+        "validation",
+        "macos",
+        "location-corrected"
+      ],
+      "evidence": "if value and not value.startswith((\"/System/Library/\",\"/usr/lib/\")):",
+      "fix": {
+        "before": "if value and not value.startswith((\"/System/Library/\",\"/usr/lib/\")):",
+        "after": "if value and not posixpath.normpath(value).startswith((\"/System/Library/\",\"/usr/lib/\")):"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 185201,
+    "totalMs": 41054
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 43,
+    "bytes": 238334,
+    "chunks": 15,
+    "llmCalls": 15,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 168617,
+        "output": 22592,
+        "cachedInput": 18236,
+        "costUSD": 0.563154
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

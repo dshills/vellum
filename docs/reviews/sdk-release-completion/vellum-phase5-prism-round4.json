@@ -1,0 +1,118 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "2218cc86dc14e2e101ae4bcf045c0610",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "67e58e1b59aa2c63",
+      "severity": "medium",
+      "category": "security",
+      "title": "Tar preflight can be desynchronised from tarfile via PAX size override, bypassing size limits",
+      "message": "preflight_tar sizes each member from the raw ustar header only. It never parses PAX records, so it ignores a PAX `size` override that tarfile honours. An attacker can put a PAX `size` before a file whose header says size 0. Preflight then reads that file's body as headers, hits an all-zero block, and returns early. tarfile still reads the whole body as one member, and parses any later `x`/`L` metadata header with a huge size by reading it fully into memory (`fileobj.read(self._block(self.size))`). The pre-parse bound on metadata and expanded size is therefore bypassable, which allows a memory or decompression DoS before the later per-member checks run. The 512 MiB in-memory compressed read does not mitigate this.",
+      "suggestion": "Make preflight match tarfile's framing. Either parse PAX records for `size` and `GNU.sparse.*` and apply the limits to the effective size, or reject any `x`/`g` header carrying a `size` key and any non-regular or sparse typeflag. Alternatively, iterate with tarfile using a bounded wrapper stream that caps decompressed bytes and metadata reads, and drop the separate re-implementation of the framing.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 39,
+            "end": 50
+          }
+        }
+      ],
+      "tags": [
+        "tar",
+        "dos",
+        "parser-differential",
+        "pax"
+      ],
+      "evidence": "member = tarfile.TarInfo.frombuf(header, \"utf-8\", \"surrogateescape\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "43d610961a8b121c",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Unsafe-member test passes for the wrong reason (generic ValueError)",
+      "message": "Each unsafe member is added to an archive whose manifest only covers the regular files. Every case therefore also fails with a coverage mismatch ValueError. The bare assertRaises(ValueError) passes even if traversal, symlink, hardlink, absolute-path and duplicate checks are missing or broken. Each case needs its own expected error.",
+      "suggestion": "Add the extra member's checksum to the manifest where applicable, and assert a specific message per case, for example assertRaisesRegex(ValueError, 'unsafe|link|duplicate|absolute'). The test should fail if only the coverage check is present.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "scripts/check-sdk_test.py",
+          "lines": {
+            "start": 44,
+            "end": 47
+          }
+        }
+      ],
+      "tags": [
+        "tests",
+        "false-pass",
+        "security-regression"
+      ],
+      "evidence": "path=Path(tmp)/\"sdk.tar.gz\";member=tarfile.TarInfo(name);member.type=kind;member.linkname=\"/outside\";artifact(path,extra=member)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 89989,
+    "totalMs": 43262
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 28,
+    "bytes": 120358,
+    "chunks": 9,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 4,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 41460,
+        "output": 10788,
+        "costUSD": 0.1908
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

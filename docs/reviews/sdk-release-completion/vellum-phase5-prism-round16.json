@@ -1,0 +1,211 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "898cc7564eebd08898c9a481f11f3ec8",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "5058ba1a010f306c",
+      "severity": "medium",
+      "category": "docs",
+      "title": "New SDK release report missing from the reports index",
+      "message": "The reports index adds the workbench-interaction, rendering and platform-support reports. It does not add the new docs/reports/sdk-release/README.md, although docs/implementation.md links to it. The SDK release evidence is therefore not reachable from the index, which this phase is updating to list the current reports.",
+      "suggestion": "Add a link to sdk-release/README.md in the reports index next to the other phase reports.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "docs/reports/README.md",
+          "lines": {
+            "start": 8,
+            "end": 8
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "index",
+        "navigation"
+      ],
+      "evidence": "- [Windows/Linux services](platform-support/README.md)",
+      "fix": {
+        "before": "- [Windows/Linux services](platform-support/README.md)",
+        "after": "- [Windows/Linux services](platform-support/README.md)\n- [Private alpha SDK packaging](sdk-release/README.md)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "11164bc6a6d0252e",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "Unlabeled older archive hash snapshot differs from the current one without provenance",
+      "message": "This file is a bare path-to-hash map with no archive_sha256, source commit, scope, digest_trust or final_source_tree_qualified fields. The sibling current-archive-source-hashes.json is labeled and hashes the same paths, but most of its hashes differ (building-an-app.md, contract_test.go, check-sdk.py, release-sdk.py, specs/release.md). A reader or tool cannot tell which archive or run this belongs to. It could be mistaken for current evidence, or for a contradiction of the current snapshot, when it is probably an earlier one.",
+      "suggestion": "Add the same metadata wrapper as current-archive-source-hashes.json (archive_sha256 or run identifier, source commit and clean flag, scope, historical/superseded status, and the final_source_tree_qualified false flag). Alternatively, rename the file to mark it as historical and reference it from the README.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reports/sdk-release/archive-source-hashes.json",
+          "lines": {
+            "start": 2,
+            "end": 2
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "provenance",
+        "ambiguity"
+      ],
+      "evidence": "\"docs/tutorials/building-an-app.md\": \"527474936615395a7d3aa699f0c34a007e24f75f03b49f74d741edd47f19c48f\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "20e54dd943bd64ee",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Verification and archive-parse failures bypass structured failure reporting",
+      "message": "Only subprocess.TimeoutExpired produces the structured check_failed event. Verification failures (ValueError), malformed archives (tarfile.HeaderError, gzip.BadGzipFile, EOFError, UnicodeDecodeError, JSON errors) and failed child commands (CalledProcessError) escape as raw tracebacks. A tool that consumes this JSON output gets inconsistent failure reporting. The malformed-archive errors are also not ValueError subclasses, so the checker's own validation errors are mixed with unexpected crashes.",
+      "suggestion": "Catch ValueError, tarfile.TarError, OSError, EOFError and CalledProcessError in main() and emit the same structured vellum.sdk.check_failed event with a non-zero exit.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 274,
+            "end": 277
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "cli"
+      ],
+      "evidence": "    except subprocess.TimeoutExpired as error:\n        print(json.dumps({\"event\": \"vellum.sdk.check_failed\", \"reason\": \"child command timed out\", \"timeout_seconds\": error.timeout}), file=sys.stderr)\n        raise SystemExit(1)",
+      "fix": {
+        "before": "    except subprocess.TimeoutExpired as error:\n        print(json.dumps({\"event\": \"vellum.sdk.check_failed\", \"reason\": \"child command timed out\", \"timeout_seconds\": error.timeout}), file=sys.stderr)\n        raise SystemExit(1)",
+        "after": "    except subprocess.TimeoutExpired as error:\n        print(json.dumps({\"event\": \"vellum.sdk.check_failed\", \"reason\": \"child command timed out\", \"timeout_seconds\": error.timeout}), file=sys.stderr)\n        raise SystemExit(1)\n    except (ValueError, OSError, EOFError, tarfile.TarError, subprocess.CalledProcessError) as error:\n        print(json.dumps({\"event\": \"vellum.sdk.check_failed\", \"reason\": str(error)}), file=sys.stderr)\n        raise SystemExit(1)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "34986f542db6d74f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Zip external attributes depend on host filesystem modes, not normalized modes",
+      "message": "The Windows zip stores whatever mode `stat()` reports for each file. `normalize_layout` relies on POSIX `chmod`, which on a Windows host only toggles the read-only flag. The mode bits in the zip therefore vary by build host and do not match the normalized 0755/0644 used elsewhere. The archive is no longer reproducible across hosts, and the executable bit can be wrong when the archive is extracted on Unix-like systems.",
+      "suggestion": "Write explicit, host-independent modes into the zip (0o40755 for directories, 0o100755 for the .exe or any file with an exec bit, 0o100644 for other files) instead of reading `stat().st_mode`.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 93,
+            "end": 93
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "windows",
+        "archive"
+      ],
+      "evidence": "record.external_attr = source.stat().st_mode \u003c\u003c 16",
+      "fix": {
+        "before": "record.external_attr = source.stat().st_mode \u003c\u003c 16",
+        "after": "mode = 0o040755 if source.is_dir() else (0o100755 if source.suffix.lower() == \".exe\" or source.stat().st_mode \u0026 0o111 else 0o100644)\n                record.external_attr = mode \u003c\u003c 16"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 207613,
+    "totalMs": 42799
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 43,
+    "bytes": 233989,
+    "chunks": 15,
+    "llmCalls": 15,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 161781,
+        "output": 24947,
+        "cachedInput": 16314,
+        "costUSD": 0.573032
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "2698a7d5a1ae0a48",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Inconsistent Python check counts (52 vs 50) without explicit reconciliation",
+        "message": "The same README says the current unit results are fifty-two Python checks, then says the 'fresh' integrated gate passed all 50 SDK Python checks. The README only partly explains the chronology, so a reader cannot tell which count describes the current tree. Evidence counts that disagree without explanation weaken the audit trail.",
+        "suggestion": "State explicitly that integrated-check.txt was captured before two checks were added (50 at that moment, 52 now). Or label the 50 as historical rather than 'fresh'.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "docs/reports/sdk-release/README.md",
+            "lines": {
+              "start": 118,
+              "end": 121
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "evidence",
+          "consistency"
+        ],
+        "evidence": "`integrated-check.txt` records the fresh complete local check gate passing all\n50 SDK Python checks",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/sdk-release/README.md"
+    }
+  ],
+  "suppressed": []
+}

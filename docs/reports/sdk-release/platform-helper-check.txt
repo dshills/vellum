@@ -1,0 +1,7 @@
+Final platform helper fixture portability follow-up (macOS host).
+Source: drivers/cogent/internal/platformio/process_test.go
+SHA-256: 668dbb1a88beaf8bbfe1f1ce05d06cd75f8d14ae4d7554416c4ca3661ee0ca5f
+Parent-reported checks: transport package -race -count=1, vet and pure Go Windows/amd64 cross-compilation PASS.
+Windows binary was not executed; cross-compilation is not target runtime qualification.
+Captured native race test stdout:
+ok  	example.com/vellum/cogent/internal/platformio	4.572s

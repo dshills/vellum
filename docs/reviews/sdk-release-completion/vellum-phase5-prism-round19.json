@@ -1,0 +1,144 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6229fca10146a9f6cef47a473ce5e58e",
+  "repo": {
+    "root": "/private/tmp/vellum-phase5-prism-78usjyz7",
+    "head": "17b2f87bb05d2f1ce7715fcd64054b530cab91f3",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "057553b630b2199a",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "ChildCleanupError is not handled, so no structured failure event is emitted",
+      "message": "The child-runner contract says a failed owned-group cleanup raises ChildCleanupError, chained to the original timeout, instead of TimeoutExpired. `main()` catches neither that type nor a stated base class of it. If ChildCleanupError is not a subclass of one of the listed exceptions, it escapes as a raw traceback. The process still exits non-zero, but no `vellum.sdk.check_failed` JSON event is emitted for the one case where cleanup is unknown. Callers that parse stderr for the failure event would get nothing.",
+      "suggestion": "Import ChildCleanupError from child_process and catch it explicitly. Emit a failure event with reason 'child cleanup failed; descendant termination unknown' and include the chained timeout from `error.__cause__`. Then exit 1.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "scripts/check-sdk.py",
+          "lines": {
+            "start": 277,
+            "end": 282
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "child-process",
+        "fail-closed"
+      ],
+      "evidence": "    except subprocess.TimeoutExpired as error:\n        print(json.dumps({\"event\": \"vellum.sdk.check_failed\", \"reason\": \"child command timed out\", \"timeout_seconds\": error.timeout}), file=sys.stderr)\n        raise SystemExit(1)\n    except (ValueError, OSError, EOFError, tarfile.TarError, zlib.error, subprocess.CalledProcessError) as error:",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "045bc24f58a09516",
+      "severity": "medium",
+      "category": "security",
+      "title": "Dependency audit and format validation inspect the source path, not the copied executable (TOCTOU)",
+      "message": "The non-system dependency audit runs on the caller-supplied `binary` path at line 117. The bytes that are packaged and signed come from a later `shutil.copyfile(binary, executable)` at line 125, after the temp dir is created. The binary can change between the audit and the copy, so the audited file may not be the packaged one. The manifest hash is taken from the copy, not from what was audited. The `private_build` and `native_distribution_audit` framing implies the audit applies to the shipped bytes.",
+      "suggestion": "Copy the binary into the stage first, then run `darwin_dependencies(executable)` and the format validation on the staged copy, so the audited bytes are the packaged bytes. Alternatively, open the file once and verify the hash before and after copying.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 117,
+            "end": 125
+          }
+        }
+      ],
+      "tags": [
+        "toctou",
+        "integrity",
+        "macos"
+      ],
+      "evidence": "darwin_dependencies(binary)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "703168293bcd20ff",
+      "severity": "medium",
+      "category": "bug",
+      "title": "macOS bundle is published non-atomically via mkdir plus per-child move",
+      "message": "The final .app path is created empty and filled child by child. A concurrent observer, or a crash or kill between the steps, can see or leave a partial bundle at the final path. The `except BaseException: rmtree` handler does not run on SIGKILL or power loss. The following `output.exists()` check then makes the package unrecoverable without manual cleanup. The Windows and Linux paths avoid this by using `publish_exclusive`.",
+      "suggestion": "Publish the fully signed, verified stage with a single atomic rename of the stage directory onto the final path (os.rename, or a link-and-rename helper like `publish_exclusive`). If the path already exists as a non-empty directory the rename fails, which keeps the existing reservation safety.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "scripts/package-app.py",
+          "lines": {
+            "start": 137,
+            "end": 145
+          }
+        }
+      ],
+      "tags": [
+        "atomicity",
+        "race-condition",
+        "macos"
+      ],
+      "evidence": "output.mkdir()\n            try:\n                output.chmod(0o755)\n                for child in stage.iterdir():\n                    shutil.move(str(child),output/child.name)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 224617,
+    "totalMs": 48538
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 45,
+    "bytes": 251827,
+    "chunks": 15,
+    "llmCalls": 15,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 174275,
+        "output": 27531,
+        "cachedInput": 21432,
+        "costUSD": 0.62386
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
