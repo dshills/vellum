@@ -1,0 +1,95 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1b562d49db7310cee2f15c07b4193d71",
+  "repo": {
+    "root": "/private/tmp/vellum-0014-editor-visual-navigation-review",
+    "head": "2c699ce634e23320fb8e46c3f193121efddb3e3e",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9b7a6c5079dddcb0",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Ignore isolated text when determining paragraph direction",
+      "message": "Paragraph-direction detection counts strong characters inside bidi isolates, although Unicode's paragraph-direction rules exclude them. For example, \"\\u2067אבג\\u2069abc\" is an LTR paragraph, but this function returns RTL. Since cursorVisual uses this result for cross-line movement, horizontal arrows can traverse wrapped lines in the wrong direction.",
+      "suggestion": "Ignore characters within LRI/RLI/FSI isolates until their matching PDI when finding the first strong character. Add a wrapped-paragraph navigation test with an isolated RTL prefix followed by LTR text.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "text/textcore/visual_vellum.go",
+          "lines": {
+            "start": 121,
+            "end": 128
+          }
+        }
+      ],
+      "tags": [
+        "unicode",
+        "bidi"
+      ],
+      "evidence": "\tfor _, r := range ed.nativeRunes[start:end] {\n\t\tprop, _ := bidi.LookupRune(r)\n\t\tswitch prop.Class() {\n\t\tcase bidi.L:\n\t\t\treturn false\n\t\tcase bidi.R, bidi.AL:\n\t\t\treturn true\n\t\t}",
+      "fix": {
+        "before": "\tfor _, r := range ed.nativeRunes[start:end] {\n\t\tprop, _ := bidi.LookupRune(r)\n\t\tswitch prop.Class() {\n\t\tcase bidi.L:\n\t\t\treturn false\n\t\tcase bidi.R, bidi.AL:\n\t\t\treturn true\n\t\t}\n\t}",
+        "after": "\tisolateDepth := 0\n\tfor _, r := range ed.nativeRunes[start:end] {\n\t\tprop, _ := bidi.LookupRune(r)\n\t\tswitch prop.Class() {\n\t\tcase bidi.LRI, bidi.RLI, bidi.FSI:\n\t\t\tisolateDepth++\n\t\tcase bidi.PDI:\n\t\t\tisolateDepth = max(0, isolateDepth-1)\n\t\tcase bidi.L:\n\t\t\tif isolateDepth == 0 {\n\t\t\t\treturn false\n\t\t\t}\n\t\tcase bidi.R, bidi.AL:\n\t\t\tif isolateDepth == 0 {\n\t\t\t\treturn true\n\t\t\t}\n\t\t}\n\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 33769,
+    "totalMs": 28351
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 28236,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 11277,
+        "output": 1657,
+        "reasoning": 1124,
+        "cachedInput": 2328
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

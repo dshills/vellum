@@ -1,0 +1,28 @@
+{
+  "baseline": "87637a999b01fc3af7c7a3c09b908ac46d7db5fe",
+  "decoded_source_sha256": {
+    "text/textcore/base.go": "69b6a2003a0c01cf63cb4a977175769c9fe81e97b91d31e103c3a634cc28117b",
+    "text/textcore/native_vellum.go": "bebabee62e39f58a26a655c2e96fdc8041cc07cb5b19998313e588d17a2a797c",
+    "text/textcore/nav.go": "4683abef8fec994b4543f619b6c8f5b9928e84c5ab1fc36e26bbaa040e14904a",
+    "text/textcore/render.go": "19df01747092f0ce2a5c064db53c2f745b13823480cd7bdbc3fc1c88e6138f79",
+    "text/textcore/visual_vellum.go": "424421b37def2f6fd94ee14b05232ee6b03b108b39b596cc05909cf0e1e70d94",
+    "text/textcore/visual_vellum_test.go": "019a91db6319b375baaa9282827eda00fce4077128f6044e92495f2f2a654c80"
+  },
+  "evidence_sha256": {
+    "editor-core.txt": "83620348a592b7e8a6fc9c8486ab97d4896dac85b0d298f59c2c707f9ba47550",
+    "editor-final.txt": "8e33d54e122927d8cb028df0cf2f079ffd67719a9dc37e4d01e6f5e873be7934",
+    "editor-geometry.json": "c06a0b6b570cc1e56152bcfbde1f37bb323ec859c3786e0d204d3f5d6da1051c",
+    "editor-geometry.json.heap.pprof": "fd6f3b6916ca12da6b9ba55d82b35f638ab0afa30a0aa09f8a8920e0980640d6",
+    "editor-geometry.log": "0bea9abc3417c65eff110cb02c1ca5da75efa354ac460d1b3beeeb410376883e",
+    "editor-input.json": "cc81d13173902581aae506e0c81d0f168e588910e1762b297e0a61be4445b054",
+    "editor-input.json.heap.pprof": "317d40d6590e153a8e8018acb33fe66ce2a24e0e4940fe04ef272a4592228da5",
+    "editor-input.log": "3584b998b3a53faf041f3166d5eed24a91900e7a1893725651dfa27ecbefc0f4",
+    "native-lifetime.json": "352de1219b9c6da89bf4bca4cc10d226fa0110880549b4feb1974d1094cc26e1",
+    "native-lifetime.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prepare.txt": "30785bdbaf2778a144e76d786bf325c85999454569fe3d64039e1534eb148293",
+    "saturation.json": "1559623162c3dfd14cdb8f77eef54b13020c237c26591e45230f94dd2af341ee",
+    "vet.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "visual-race.txt": "326b33026bcf20e3492fa83db00ab87dc7399b46d0d56a629fe755222d352da3"
+  },
+  "native_probe_scope": "Canonical native probes precede the final bidi-isolate direction change; final editor/race results cover that change."
+}

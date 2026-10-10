@@ -1,0 +1,57 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e9f8e4087f8fb990aa10a01e1fe00994",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "87637a999b01fc3af7c7a3c09b908ac46d7db5fe",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4677,
+    "totalMs": 4694
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 4,
+    "bytes": 13179,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 5149,
+        "output": 178,
+        "reasoning": 159
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

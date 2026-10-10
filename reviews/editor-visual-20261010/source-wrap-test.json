@@ -1,0 +1,99 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cc5a74de17c156e4bb60a1bf1df98b9e",
+  "repo": {
+    "root": "/private/tmp/vellum-0014-editor-visual-navigation-review",
+    "head": "2c699ce634e23320fb8e46c3f193121efddb3e3e",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9a68b08251b7a706",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Verify the intermediate wrap-affinity transition",
+      "message": "The round-trip assertion passes even if navigation does nothing at the wrap boundary, or moves logically forward and backward without crossing affinities. Consequently, this regression test can pass while the wrap-crossing behavior it claims to exercise is broken.",
+      "suggestion": "Assert immediately after cursorForward that the cursor retains the boundary offset and moves to the downstream visual line, then retain the existing reverse assertion.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "text/textcore/visual_vellum_test.go",
+          "lines": {
+            "start": 106,
+            "end": 109
+          }
+        }
+      ],
+      "tags": [
+        "regression-test",
+        "caret-affinity"
+      ],
+      "evidence": "\toriginal := ed.visualState.line\n\ted.cursorForward(1)\n\ted.cursorBackward(1)\n\tif ed.EditingState().Cursor != boundary || ed.visualState.line != original {",
+      "fix": {
+        "before": "\toriginal := ed.visualState.line\n\ted.cursorForward(1)\n\ted.cursorBackward(1)\n\tif ed.EditingState().Cursor != boundary || ed.visualState.line != original {",
+        "after": "\toriginal := ed.visualState.line\n\ted.cursorForward(1)\n\tif ed.EditingState().Cursor != boundary || ed.visualState.line != original+1 {\n\t\tt.Fatal(\"right did not cross to downstream wrap affinity\")\n\t}\n\ted.cursorBackward(1)\n\tif ed.EditingState().Cursor != boundary || ed.visualState.line != original {"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 170660,
+    "totalMs": 120043
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 26132,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 3228,
+        "output": 2403,
+        "reasoning": 2048
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [
+      {
+        "target": "chunk 1/2 (text/textcore/base.go, text/textcore/native_vellum.go, text/textcore/nav.go, text/textcore/render.go, text/textcore/visual_vellum.go)",
+        "reason": "review failed: sending request: Post \"https://api.openai.com/v1/chat/completions\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+      }
+    ],
+    "complete": false
+  },
+  "discarded": [],
+  "suppressed": []
+}

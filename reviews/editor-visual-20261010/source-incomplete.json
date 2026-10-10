@@ -1,0 +1,63 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "315a954fe31fb78af28a7704fcc7d0f6",
+  "repo": {
+    "root": "/private/tmp/vellum-0014-editor-visual-navigation-review",
+    "head": "2c699ce634e23320fb8e46c3f193121efddb3e3e",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 143152,
+    "totalMs": 120035
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 28236,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 3712,
+        "output": 942,
+        "reasoning": 916,
+        "cachedInput": 1164
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [
+      {
+        "target": "chunk 1/2 (text/textcore/base.go, text/textcore/native_vellum.go, text/textcore/nav.go, text/textcore/render.go, text/textcore/visual_vellum.go)",
+        "reason": "review failed: sending request: Post \"https://api.openai.com/v1/chat/completions\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+      }
+    ],
+    "complete": false
+  },
+  "discarded": [],
+  "suppressed": []
+}

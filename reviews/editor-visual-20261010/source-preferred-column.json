@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "c61d9adb5054e46df8557ce883ce28ce",
+  "repo": {
+    "root": "/private/tmp/vellum-0014-editor-visual-navigation-review",
+    "head": "2c699ce634e23320fb8e46c3f193121efddb3e3e",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "61ea6198b22a9731",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Preserve preferred horizontal position during vertical navigation",
+      "message": "Each vertical move chooses the nearest caret to the current caret's X, rather than preserving the preferred horizontal position across consecutive vertical moves. Moving down from a long line through a short line to another long line permanently shifts the cursor left; moving back up likewise fails to restore its original column. This regresses the existing navigation behavior, which retains cursorColumn for vertical moves.",
+      "suggestion": "Track a preferred visual X coordinate separately. Initialize it on the first vertical move, preserve it for subsequent vertical moves (including logical fallbacks), and reset it after horizontal navigation, pointer placement, or explicit cursor positioning. Compare target carets against that preferred X instead of c.Pos.X. Add a long–short–long line navigation test.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "text/textcore/visual_vellum.go",
+          "lines": {
+            "start": 139,
+            "end": 139
+          }
+        }
+      ],
+      "tags": [
+        "navigation",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\t\td := math32.Abs(other.Pos.X - c.Pos.X)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 17174,
+    "totalMs": 17190
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 22395,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 8109,
+        "output": 721,
+        "reasoning": 473,
+        "cachedInput": 1164
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

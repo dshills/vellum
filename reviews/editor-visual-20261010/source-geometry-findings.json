@@ -1,0 +1,174 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "212e3aee4d8b7be50542e0357ac518df",
+  "repo": {
+    "root": "/private/tmp/vellum-0014-editor-visual-navigation-review",
+    "head": "2c699ce634e23320fb8e46c3f193121efddb3e3e",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9b98eb2e3edb9074",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Convert cached caret positions back to render coordinates",
+      "message": "Captured caret positions include Scene.SceneGeom.Pos, whereas charStartPos returns render coordinates within the scene. Returning the captured position directly introduces an extra scene translation whenever the scene has a nonzero origin, misplacing the rendered cursor and other consumers of charStartPos.",
+      "suggestion": "Subtract Scene.SceneGeom.Pos before returning the cached caret position.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "text/textcore/render.go",
+          "lines": {
+            "start": 450,
+            "end": 452
+          }
+        }
+      ],
+      "tags": [
+        "coordinates",
+        "caret"
+      ],
+      "evidence": "\tif c, ok := ed.cachedVisualCaret(pos); ok {\n\t\treturn c.Pos\n\t}",
+      "fix": {
+        "before": "\tif c, ok := ed.cachedVisualCaret(pos); ok {\n\t\treturn c.Pos\n\t}",
+        "after": "\tif c, ok := ed.cachedVisualCaret(pos); ok {\n\t\treturn c.Pos.Sub(math32.FromPoint(ed.Scene.SceneGeom.Pos))\n\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "8215c83b1e3afe84",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Invalidate remembered affinity after line reflow",
+      "message": "Remembered affinity is validated only against the document revision and rune offset. Rewrapping after a width change can move that unchanged offset to another physical line. Geometry rebuilding preserves the remembered line, so EditingState can report an obsolete VisualLine and NativeCaretBounds can fail to find the caret.",
+      "suggestion": "Track the layout or wrapping revision alongside remembered affinity, or reconcile the remembered offset/line against rebuilt geometry and invalidate it when that insertion stop no longer exists.",
+      "confidence": 0.93,
+      "locations": [
+        {
+          "path": "text/textcore/visual_vellum.go",
+          "lines": {
+            "start": 27,
+            "end": 29
+          }
+        }
+      ],
+      "tags": [
+        "layout",
+        "caret"
+      ],
+      "evidence": "\tif ed.visualState.revision == ed.nativeRevision \u0026\u0026 ed.visualState.offset == offset {\n\t\treturn ed.visualState.line\n\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "faf6197a55cd7f1f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Preserve visual column when moving beyond the viewport",
+      "message": "Geometry is captured for rendered lines, so moving vertically beyond the viewport makes SupportsLine(target) false even for supported text. Returning false delegates to MoveDown/MoveUp, which use cursorColumn rather than preferredX. Consequently, vertical navigation loses its visual horizontal position at viewport boundaries, particularly with proportional fonts or bidi text.",
+      "suggestion": "Distinguish an uncaptured target from an explicitly unsupported line. For an offscreen target within the document, scroll and refresh its geometry, then select the caret nearest preferredX, as the horizontal path already refreshes offscreen targets.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "text/textcore/visual_vellum.go",
+          "lines": {
+            "start": 152,
+            "end": 155
+          }
+        }
+      ],
+      "tags": [
+        "navigation",
+        "scrolling"
+      ],
+      "evidence": "\t\ttarget := c.Line + delta\n\t\tif !g.SupportsLine(target) {\n\t\t\treturn false\n\t\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "f185914428570ecf",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Finalize selection handling at document edges",
+      "message": "At a document edge, this returns success without running cursorSelectShow, unlike the previous navigation path. An unmodified arrow press after selecting through the document edge therefore skips selection cleanup and can leave the selection active even though selection mode has ended.",
+      "suggestion": "Run cursorSelectShow(org) before returning at a document edge so selection updates and input notification still occur when the cursor does not move.",
+      "confidence": 0.89,
+      "locations": [
+        {
+          "path": "text/textcore/visual_vellum.go",
+          "lines": {
+            "start": 189,
+            "end": 191
+          }
+        }
+      ],
+      "tags": [
+        "navigation",
+        "selection"
+      ],
+      "evidence": "\t\t\tif target \u003c 0 || target \u003e= ed.Lines.ViewLines(ed.viewId) {\n\t\t\t\treturn true\n\t\t\t}",
+      "fix": {
+        "before": "\t\t\tif target \u003c 0 || target \u003e= ed.Lines.ViewLines(ed.viewId) {\n\t\t\t\treturn true\n\t\t\t}",
+        "after": "\t\t\tif target \u003c 0 || target \u003e= ed.Lines.ViewLines(ed.viewId) {\n\t\t\t\ted.cursorSelectShow(org)\n\t\t\t\treturn true\n\t\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 122952,
+    "totalMs": 107221
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 26279,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 10673,
+        "output": 6534,
+        "reasoning": 5357,
+        "cachedInput": 8571
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
