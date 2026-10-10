@@ -1,0 +1,188 @@
+package cogent
+
+import (
+	"fmt"
+	"reflect"
+
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/tree"
+	"example.com/vellum/app"
+	"example.com/vellum/ui"
+)
+
+// reconcile preserves compatible native widgets by ID throughout a managed tree.
+// Validation and allocation finish before any retained node is moved or removed.
+func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Application, window string) (*record, error) {
+	if err := ui.Validate(n); err != nil {
+		return previous, err
+	}
+	if err := validateExtensions(n); err != nil {
+		return previous, err
+	}
+	old := map[string]*record{}
+	var collect func(*record)
+	collect = func(r *record) {
+		if r == nil || tree.IsNil(r.widget) {
+			return
+		}
+		old[r.node.ID] = r
+		for _, child := range r.children {
+			collect(child)
+		}
+	}
+	collect(previous)
+	type plan struct {
+		r        *record
+		node     ui.Node
+		children []*plan
+		parent   tree.Node
+	}
+	used := map[*record]bool{}
+	var created []*record
+	var prepare func(tree.Node, ui.Node) (*plan, error)
+	prepare = func(p tree.Node, node ui.Node) (*plan, error) {
+		r := old[node.ID]
+		if r == nil || !compatible(r.node, node) {
+			var err error
+			r, err = mountShallow(p, node, a, window)
+			if err != nil {
+				return nil, err
+			}
+			created = append(created, r)
+		} else {
+			used[r] = true
+		}
+		next := &plan{r: r, node: node, parent: p}
+		for _, child := range node.Children {
+			entry, err := prepare(r.widget, child)
+			if err != nil {
+				return nil, err
+			}
+			next.children = append(next.children, entry)
+		}
+		return next, nil
+	}
+	next, err := prepare(parent, n)
+	if err != nil {
+		for _, r := range created {
+			if !tree.IsNil(r.widget) {
+				r.widget.AsTree().Delete()
+			}
+		}
+		return previous, err
+	}
+	changed := previous == nil || len(created) > 0
+	for _, r := range old {
+		if !used[r] {
+			changed = true
+		}
+	}
+	var checkOrder func(*plan)
+	checkOrder = func(p *plan) {
+		if p.r.widget.AsTree().Parent != p.parent || len(p.r.children) != len(p.children) {
+			changed = true
+		}
+		for i, child := range p.children {
+			if i < len(p.r.children) && p.r.children[i] != child.r {
+				changed = true
+			}
+			checkOrder(child)
+		}
+	}
+	checkOrder(next)
+	// Detach every retained node whose parent changes before making new links.
+	// This also handles an ancestor moving beneath its former descendant safely.
+	var parking *core.Frame
+	var park func(*plan)
+	park = func(p *plan) {
+		if used[p.r] && p.r.widget.AsTree().Parent != p.parent {
+			if parking == nil {
+				parking = core.NewFrame(parent)
+			}
+			tree.MoveToParent(p.r.widget, parking)
+		}
+		for _, child := range p.children {
+			park(child)
+		}
+	}
+	park(next)
+	if parking != nil {
+		defer parking.Delete()
+	}
+	var attach func(*plan)
+	attach = func(p *plan) {
+		if p.r.widget.AsTree().Parent != p.parent {
+			tree.MoveToParent(p.r.widget, p.parent)
+		}
+		p.r.children = make([]*record, len(p.children))
+		for i, child := range p.children {
+			attach(child)
+			p.r.children[i] = child.r
+		}
+	}
+	attach(next)
+	for _, r := range old {
+		if !used[r] && !tree.IsNil(r.widget) {
+			r.widget.AsTree().Delete()
+		}
+	}
+	var order func(*plan)
+	order = func(p *plan) {
+		// ui.Validate rejects children on leaf/extension kinds. These children
+		// therefore occupy the entire managed container; no extension subtree
+		// is reordered. A same-parent reorder uses the exported native slice
+		// to avoid calling OnAdd and resetting native state.
+		if len(p.children) > 0 {
+			children := make([]tree.Node, len(p.children))
+			for i, child := range p.children {
+				children[i] = child.r.widget
+			}
+			p.r.widget.AsTree().Children = children
+		}
+		for _, child := range p.children {
+			order(child)
+		}
+	}
+	order(next)
+	// The parent is dedicated to this managed root (not an extension's own tree).
+	if parking != nil {
+		parking.Delete()
+	}
+	parent.AsTree().Children = []tree.Node{next.r.widget}
+	if err := syncRecord(next.r, n); err != nil {
+		return next.r, err
+	}
+	if changed {
+		parent.AsWidget().Update()
+	}
+	return next.r, nil
+}
+
+func compatible(old, next ui.Node) bool {
+	if old.ID != next.ID || old.Kind != next.Kind {
+		return false
+	}
+	if next.Kind != ui.Extension {
+		return true
+	}
+	if reflect.TypeOf(old.Custom) != reflect.TypeOf(next.Custom) {
+		return false
+	}
+	a, b := reflect.ValueOf(old.Custom), reflect.ValueOf(next.Custom)
+	return !a.IsValid() || a.Kind() != reflect.Pointer || a.Pointer() == b.Pointer()
+}
+
+func validateExtensions(n ui.Node) error {
+	if n.Kind == ui.Extension {
+		v := reflect.ValueOf(n.Custom)
+		if _, ok := n.Custom.(Extension); !ok || !v.IsValid() || (v.Kind() == reflect.Pointer && v.IsNil()) {
+			return fmt.Errorf("cogent: unsupported or nil extension %q", n.ID)
+		}
+	}
+	for _, child := range n.Children {
+		if err := validateExtensions(child); err != nil {
+			return err
+		}
+	}
+	return nil
+}

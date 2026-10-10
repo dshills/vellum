@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f096098a1670bc7df1e7758f87252e23",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ff4fdb065cf19f52e30ee6c6df7d6418d925a873",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "eda2b5967d635250",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "",
+      "message": "The final native child order is applied only to Column and Row nodes. Any other kind that can hold children keeps whatever order the move and create steps produced. Reused children are moved only when their parent changes, and new children are appended at creation. After an insert or reorder, the native order can therefore differ from the description, while checkOrder still reports the change. The step also assigns `Children` directly, which skips the tree API and drops any non-managed children the container may have.",
+      "suggestion": "Apply the ordering to every node that has plan children, not only Column and Row. Prefer tree-API moves (for example MoveToParent with an index) over overwriting `Children`, so non-managed children are not lost.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/reconcile.go",
+          "lines": {
+            "start": 131,
+            "end": 131
+          }
+        }
+      ],
+      "tags": [
+        "reconciliation",
+        "ordering",
+        "location-corrected"
+      ],
+      "evidence": "if p.node.Kind == ui.Column || p.node.Kind == ui.Row {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b400bf6ee0acb05b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Error during dock rebuild deletes parked widgets and leaves stale records",
+      "message": "Retained panel widgets are moved into a parking frame and w.records is then reset. If build or reconcile fails, the deferred parking.Delete() destroys every panel widget not yet re-homed. w.records holds only the partially built entries, and w.signature is unchanged. The next Sync treats those partial records as retained and rebuilds. Panels whose widgets were destroyed have no record, so they are recreated, but records that reference deleted widgets are never reconciled safely. That leaves inconsistent state after a transient error.",
+      "suggestion": "Make the rebuild transactional. Build into a new records map and only swap it into w.records on success. On failure, move retained widgets back into the host or clear w.records and w.signature so the next Sync does a full rebuild. Do not leave records that point at deleted widgets.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench.go",
+          "lines": {
+            "start": 59,
+            "end": 66
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "state-consistency",
+        "lifecycle"
+      ],
+      "evidence": "defer parking.Delete()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 49206,
+    "totalMs": 34863
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 23098,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15726,
+        "output": 5907,
+        "costUSD": 0.090522
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,125 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "07230c5d31eaa600fcb7d45773b73196",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ff4fdb065cf19f52e30ee6c6df7d6418d925a873",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ef23854afdb460bb",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unchecked type assertion can panic",
+      "message": "`parent` is typed as `tree.Node`, and the code asserts it to `core.Widget` without the comma-ok form. If a caller passes a non-widget tree node, this panics after the tree has already been mutated, leaving a half-updated state. The current driver passes a `core.Frame`, so this is a latent risk from the function signature.",
+      "suggestion": "Use the comma-ok form, or change the `parent` parameter type to `core.Widget` so the compiler enforces it.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/reconcile.go",
+          "lines": {
+            "start": 152,
+            "end": 152
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "type-assertion",
+        "location-corrected"
+      ],
+      "evidence": "parent.(core.Widget).AsWidget().Update()",
+      "fix": {
+        "before": "parent.(core.Widget).AsWidget().Update()",
+        "after": "if w, ok := parent.(core.Widget); ok {\n\t\t\tw.AsWidget().Update()\n\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "eb01d8f609050039",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Parking loop does not guard against nil record or widget",
+      "message": "The parking loop moves every retained record's widget without a nil check. The cleanup loop a few lines later guards the same widget with `!tree.IsNil(r.widget)`. If any record has a nil or invalid widget, `MoveToParent` may panic or corrupt the tree before the rebuild starts. The code treats this as possible in one place and not in the other.",
+      "suggestion": "Skip nil records and widgets in the parking loop, as the cleanup loop does.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench.go",
+          "lines": {
+            "start": 61,
+            "end": 63
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "for _, r := range retained {\n\t\t\ttree.MoveToParent(r.widget, parking)\n\t\t}",
+      "fix": {
+        "before": "for _, r := range retained {\n\t\t\ttree.MoveToParent(r.widget, parking)\n\t\t}",
+        "after": "for _, r := range retained {\n\t\t\tif r != nil \u0026\u0026 !tree.IsNil(r.widget) {\n\t\t\t\ttree.MoveToParent(r.widget, parking)\n\t\t\t}\n\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 53667,
+    "totalMs": 35494
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 23024,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 15682,
+        "output": 6158,
+        "costUSD": 0.092944
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

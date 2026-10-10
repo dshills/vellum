@@ -31,8 +31,8 @@ are atomic model operations; malformed or incompatible layouts leave the current
 workspace intact. The example provides dock/split/reset commands and resizable
 native panes. `-layout /path/layout.json` enables explicit Save/Restore; startup
 does not overwrite preferences. Drag-to-dock, floating panes and dynamic window
-creation are not yet implemented. Panel topology changes recreate those native
-panels; application domain state remains independent.
+creation are not yet implemented. Dock containers may be recreated for topology changes; compatible panel contents
+retain their native identities. See [keyed reconciliation](keyed-reconciliation.md).
 
 ## Virtualized data
 

@@ -18,3 +18,14 @@ Phase 5 has passing model/native regression tests and real GPU pixel verificatio
 The live pointer automation check remains unverified because the computer-use
 window coordinate mapping targeted a different region; see the phase 5 review
 evidence. This limits runtime certification, rather than the implemented API scope.
+
+## Framework expansion
+
+1. Keyed reconciliation — implemented; native identity and retained state survive
+   insert/remove/reorder/reparent and docking moves. See the
+   [contract](../specs/keyed-reconciliation.md). Portable/native checks pass;
+   live focus/accessibility workflows remain acceptance checks.
+2. Layout and theming — in progress.
+3. Standard controls and interaction — planned.
+4. Multiple windows and platform services — in progress.
+5. Independently consumable SDK and benchmarks — in progress.

@@ -79,18 +79,9 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				quit()
 				return
 			}
-			if root == nil || !sameShape(root, n) {
-				host.DeleteChildren()
-				var err error
-				root, err = mount(host, n, a, w.ID)
-				if err != nil {
-					failure.CompareAndSwap(nil, &err)
-					quit()
-					return
-				}
-				host.Update()
-			}
-			if err := syncRecord(root, n); err != nil {
+			var err error
+			root, err = reconcile(host, root, n, a, w.ID)
+			if err != nil {
 				failure.CompareAndSwap(nil, &err)
 				quit()
 			}
@@ -172,6 +163,22 @@ func sameShape(r *record, n ui.Node) bool {
 	return true
 }
 func mount(parent tree.Node, n ui.Node, a *app.Application, window string) (*record, error) {
+	r, err := mountShallow(parent, n, a, window)
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range n.Children {
+		child, err := mount(r.widget, c, a, window)
+		if err != nil {
+			r.widget.AsTree().Delete()
+			return nil, err
+		}
+		r.children = append(r.children, child)
+	}
+	return r, nil
+}
+
+func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string) (*record, error) {
 	r := &record{node: n}
 	switch n.Kind {
 	case ui.Column, ui.Row:
@@ -222,13 +229,6 @@ func mount(parent tree.Node, n ui.Node, a *app.Application, window string) (*rec
 			s.Direction = styles.Column
 		}
 	})
-	for _, c := range n.Children {
-		child, err := mount(r.widget, c, a, window)
-		if err != nil {
-			return nil, err
-		}
-		r.children = append(r.children, child)
-	}
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {

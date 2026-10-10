@@ -1,0 +1,96 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9ab9ee2e1ddf1cddd9f53cd33c5fbd79",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "ff4fdb065cf19f52e30ee6c6df7d6418d925a873",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 46215,
+    "totalMs": 41287
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 8,
+    "bytes": 25285,
+    "chunks": 2,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 20354,
+        "output": 6513,
+        "costUSD": 0.105838
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "ec09c2ed1ee4a160",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Parking frame is attached to the host's external parent and may perturb its layout",
+        "message": "The parking frame is added as a sibling of the host inside whatever parent the caller mounted into. If that parent is a Splits, Tabs or other container that counts its children, the temporary child can change split counts, ratios or tab indexes, and can affect layout during the `w.host.Update()` call before the deferred `parking.Delete()` runs. Parking inside the host's own subtree, or in a detached frame, avoids touching the caller's container.",
+        "suggestion": "Park retained widgets in a frame owned by the host, for example a hidden child of `w.host` that is excluded from `DeleteChildren` and removed afterwards. Alternatively, reparent retained widgets directly into their new containers during `build` without a temporary sibling frame.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/workbench.go",
+            "lines": {
+              "start": 74,
+              "end": 74
+            }
+          }
+        ],
+        "tags": [
+          "lifecycle",
+          "native-widgets",
+          "reparenting",
+          "location-corrected"
+        ],
+        "evidence": "parking := core.NewFrame(w.host.AsTree().Parent)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The parking frame is appended after the host and deleted by a defer before Sync returns, within the same synchronous call. Layout is deferred to the render loop, so no pass sees the extra child, and the host's own index among its siblings does not change. The claimed split-count, ratio or tab-index perturbation is speculative and not shown by the code. Parking in the host's parent also keeps retained widgets in the same scene while they are moved, which a detached frame would not."
+    }
+  ],
+  "suppressed": []
+}

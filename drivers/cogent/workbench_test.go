@@ -46,6 +46,7 @@ func TestDockReconcileRestoresTabsAndRatio(t *testing.T) {
 	if tab != 1 {
 		t.Fatal("restored tab", tab)
 	}
+	oldPanel := w.records["three"].widget
 	if err := model.Move("three", "left", 0); err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +57,50 @@ func TestDockReconcileRestoresTabsAndRatio(t *testing.T) {
 	if selected != 0 || w.tabs["left"].NumTabs() != 3 {
 		t.Fatal("moved panel placement", selected)
 	}
+	if w.records["three"].widget != oldPanel {
+		t.Fatal("dock move recreated panel content")
+	}
 	if len(w.records) != 3 {
 		t.Fatal("panel lost")
+	}
+}
+
+func TestDockFailedRebuildClearsNativeCacheForRetry(t *testing.T) {
+	a, _ := app.New(app.Config{})
+	defer a.Close()
+	model, err := workbench.New(workbench.Layout{Version: 1, Root: &workbench.Group{ID: "group", Tabs: []string{"one", "two"}, Active: "one"}}, []string{"one", "two"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	bad := false
+	w := &Workbench{Owner: a, Workspace: model, Panels: []Panel{
+		{ID: "one", Title: "one", View: func() ui.Node { return ui.Node{ID: "one", Kind: ui.Label} }},
+		{ID: "two", Title: "two", View: func() ui.Node {
+			if bad {
+				return ui.Node{ID: "two", Kind: "invalid"}
+			}
+			return ui.Node{ID: "two", Kind: ui.Label}
+		}},
+	}}
+	widget := w.Mount(core.NewBody("headless"))
+	if err := w.Sync(widget); err != nil {
+		t.Fatal(err)
+	}
+	if err := model.Move("two", "group", 0); err != nil {
+		t.Fatal(err)
+	}
+	bad = true
+	if err := w.Sync(widget); err == nil {
+		t.Fatal("invalid panel accepted")
+	}
+	if len(w.records) != 0 || w.signature != "" || len(w.host.Children) != 0 {
+		t.Fatal("partial native cache survived failure")
+	}
+	bad = false
+	if err := w.Sync(widget); err != nil {
+		t.Fatal("retry failed", err)
+	}
+	if len(w.records) != 2 || w.records["two"].widget.AsTree().This == nil {
+		t.Fatal("retry did not recreate live contents")
 	}
 }
