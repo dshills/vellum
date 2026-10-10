@@ -7,8 +7,8 @@ import (
 	"cogentcore.org/core/events"
 	"context"
 	"errors"
-	"example.com/vellum/app"
-	"example.com/vellum/command"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/command"
 	"image"
 	"testing"
 )

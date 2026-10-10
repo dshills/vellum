@@ -9,9 +9,9 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/text/rich"
-	"example.com/vellum/app"
-	"example.com/vellum/ui"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 )
 
 func TestNativeStyleAppliesThemeAndNode(t *testing.T) {

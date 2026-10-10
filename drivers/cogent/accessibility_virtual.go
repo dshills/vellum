@@ -6,7 +6,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/workbench"
 )
 
 // Extensions expose only materialized rows, plus previous/next page actions.

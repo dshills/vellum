@@ -12,9 +12,9 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/tree"
-	"example.com/vellum/app"
-	cogent "example.com/vellum/cogent"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/app"
+	cogent "github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/ui"
 )
 
 type handoff struct {

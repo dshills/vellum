@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"example.com/vellum"
-	"example.com/vellum/app"
-	"example.com/vellum/command"
-	"example.com/vellum/tasks"
-	"example.com/vellum/ui"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/tasks"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 )
 
 func TestControlledViewAndCommandContract(t *testing.T) {

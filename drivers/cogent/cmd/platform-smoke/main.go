@@ -20,11 +20,11 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/system"
 	"cogentcore.org/core/tree"
-	"example.com/vellum/app"
-	"example.com/vellum/canvas"
-	cogent "example.com/vellum/cogent"
-	"example.com/vellum/command"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/canvas"
+	cogent "github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/ui"
 )
 
 type report struct {

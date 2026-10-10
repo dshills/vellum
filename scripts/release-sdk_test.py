@@ -24,8 +24,16 @@ class ReleaseChecks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaisesRegex(ValueError,"namespace.*license.*audit"):
                 with mock.patch.object(release,"source_state",return_value={"clean":False}):
-                    release.release_gates(Path(tmp), {"module":"example.com/vellum"}, True)
+                    release.release_gates(Path(tmp), {"module":"example.com/placeholder"}, True)
             release.release_gates(Path(tmp), {}, False)
+
+    def test_selected_owner_choices_leave_distribution_audit_gated(self):
+        metadata = json.loads((release.ROOT / "release/version.json").read_text())
+        metadata["third_party_distribution_audit"] = "pending"
+        with mock.patch.object(release, "source_state", return_value={"clean": True}), mock.patch.object(release, "hidden_index_paths", return_value=[]):
+            with self.assertRaisesRegex(ValueError, "third-party/native binary distribution audit is incomplete") as failure:
+                release.release_gates(release.ROOT, metadata, True)
+            self.assertEqual(str(failure.exception), "Public release blocked: third-party/native binary distribution audit is incomplete")
 
     def test_git_provenance_ignores_ambient_repository_index_and_config_redirection(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -223,7 +231,7 @@ class ReleaseChecks(unittest.TestCase):
 
     def test_notice_inventory_requires_module_own_license(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"example.com/vellum"}')
+            root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"github.com/dshills/vellum"}')
             dependency=root/"dependency";dependency.mkdir()
             for name in ("license.go", "testdata/LICENSE", "third-party/LICENSE-MIT"):
                 path=dependency/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text("fixture")
@@ -241,7 +249,7 @@ class ReleaseChecks(unittest.TestCase):
 
     def test_locally_replaced_native_notice_records_keep_pinned_provenance(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"example.com/vellum"}')
+            root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"github.com/dshills/vellum"}')
             native=root/"drivers/cogent/native";native.mkdir(parents=True)
             (native/"dependencies.json").write_text(json.dumps({"dependencies":[{"module":"cogentcore.org/core","version":"v0.3.0","sum":"h1:pinned"}]}))
             source=root/"core";source.mkdir();(source/"LICENSE").write_text("notice")
@@ -253,7 +261,7 @@ class ReleaseChecks(unittest.TestCase):
 
     def test_public_graph_checks_use_controlled_go_environment(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"example.com/vellum"}')
+            root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"github.com/dshills/vellum"}')
             driver=root/"drivers/cogent";driver.mkdir(parents=True);(driver/"go.mod").write_text("module fixture");(driver/"go.sum").write_text("")
             with mock.patch.dict(release.os.environ,{"GOFLAGS":"-modfile=outside","GOENV":"outside","AWS_SECRET_ACCESS_KEY":"fixture"}),mock.patch.object(release,"run_child") as run,mock.patch.object(release,"check_child_output",return_value="") as listed:
                 release.license_inventory(root,{"upstream":root/"core","typesetting":root/"text"})

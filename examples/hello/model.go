@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/ui"
 )
 
 type counter struct{ value int }

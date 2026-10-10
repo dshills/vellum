@@ -28,7 +28,7 @@ import (
 	"unsafe"
 
 	"cogentcore.org/core/system/driver/desktop"
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 )
 
 type accessibilityAttachment struct{ bridge *accessibilityBridge }

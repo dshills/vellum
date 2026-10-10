@@ -92,4 +92,5 @@ reports those gates without inferring qualification from fixtures/crosscompiles.
 
 The independently relocated private SDK uses an explicit alpha version, complete
 archive integrity checks and public consumer scenarios. [Release artifacts](release.md)
-document packaging and the owner namespace/license/audit gates for public release.
+document packaging, the selected `github.com/dshills/vellum` namespace and MIT
+license, and remaining distribution audit/qualification gates for public release.

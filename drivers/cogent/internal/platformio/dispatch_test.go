@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 )
 
 func TestDispatchValue(t *testing.T) {

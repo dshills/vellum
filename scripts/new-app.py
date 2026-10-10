@@ -28,8 +28,8 @@ def main():
         for name in ["main.go", "model.go", "model_test.go", "go.mod", "go.sum"]:
             shutil.copy2(ROOT / "examples/hello" / name, stage / name)
         subprocess.run(["go", "mod", "edit", f"-module={args.module}",
-                        f"-replace=example.com/vellum={ROOT}",
-                        f"-replace=example.com/vellum/cogent={ROOT / 'drivers/cogent'}",
+                        f"-replace=github.com/dshills/vellum={ROOT}",
+                        f"-replace=github.com/dshills/vellum/drivers/cogent={ROOT / 'drivers/cogent'}",
                         f"-replace=cogentcore.org/core={ROOT / 'drivers/cogent/build/upstream'}",
                         f"-replace=github.com/go-text/typesetting={ROOT / 'drivers/cogent/build/typesetting'}"], cwd=stage, check=True)
         stage.rename(destination)

@@ -12,10 +12,10 @@ import (
 	"runtime"
 	"time"
 
-	"example.com/vellum/app"
-	"example.com/vellum/canvas"
-	"example.com/vellum/cogent"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/canvas"
+	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/ui"
 )
 
 func main() {

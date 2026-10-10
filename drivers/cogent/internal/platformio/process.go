@@ -17,7 +17,7 @@ import (
 	"unicode/utf16"
 	"unicode/utf8"
 
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 )
 
 var ErrOutputLimit = errors.New("platform service response exceeded limit")

@@ -1,8 +1,10 @@
 # Local SDK consumption and performance measurements
 
 The root framework module stays standard-library-only. The native adapter is a
-separate module. This phase supplies a repository-local SDK; the framework namespace
-remains `example.com/vellum` until publication is deliberately configured.
+separate module, `github.com/dshills/vellum/drivers/cogent`, matching its repository
+directory. The framework namespace is `github.com/dshills/vellum` and its own code
+is MIT-licensed. Public distribution remains gated on the dependency/native audit
+and target qualification.
 
 ## Native dependency preparation
 

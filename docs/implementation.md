@@ -62,8 +62,9 @@ evidence. This limits runtime certification, rather than the implemented API sco
    [contract](../specs/platform-support.md) and [evidence](reports/platform-support/README.md).
 5. Versioned private SDK — implemented; alpha version API, independent consumer
    scenarios, integrity-checked relocation, tutorial and private application
-   packaging. Namespace, framework license, distribution audit and actual target
-   acceptance remain public-release gates. See [contract](../specs/release.md)
+   packaging. The owner selected `github.com/dshills/vellum` and MIT for Vellum's
+   own code. Distribution audit and actual target acceptance remain public-release
+   gates. See [contract](../specs/release.md)
    [tutorial](tutorials/building-an-app.md) and [evidence](reports/sdk-release/README.md).
 
 Per-phase Prism reviews and verification records accompany these implementations.

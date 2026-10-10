@@ -16,9 +16,9 @@ import (
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
-	"example.com/vellum/app"
-	"example.com/vellum/command"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/ui"
 )
 
 // Extension is implemented by optional adapter widgets (workbench, canvas, etc.).

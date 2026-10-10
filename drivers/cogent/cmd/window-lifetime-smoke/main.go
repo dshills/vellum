@@ -15,9 +15,9 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/tree"
-	"example.com/vellum/app"
-	"example.com/vellum/cogent"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/ui"
 )
 
 const invalidKind ui.Kind = "window-smoke-invalid"

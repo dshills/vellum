@@ -1,7 +1,7 @@
 package main
 
 import (
-	"example.com/vellum/virtual"
+	"github.com/dshills/vellum/virtual"
 	"strings"
 	"testing"
 )

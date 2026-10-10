@@ -3,8 +3,8 @@ package cogent
 import (
 	"cogentcore.org/core/core"
 	"context"
-	"example.com/vellum/app"
-	"example.com/vellum/command"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/command"
 	"testing"
 	"time"
 )

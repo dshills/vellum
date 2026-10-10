@@ -1,10 +1,10 @@
-module example.com/vellum/cogent
+module github.com/dshills/vellum/drivers/cogent
 
 go 1.25.6
 
 require (
 	cogentcore.org/core v0.3.46-0.20261009095036-5cc519b24044
-	example.com/vellum v0.0.0
+	github.com/dshills/vellum v0.0.0
 )
 
 require (
@@ -46,7 +46,7 @@ require (
 )
 
 replace (
- example.com/vellum => ../..
+ github.com/dshills/vellum => ../..
  cogentcore.org/core => ./build/upstream
  github.com/go-text/typesetting => ./build/typesetting
 )

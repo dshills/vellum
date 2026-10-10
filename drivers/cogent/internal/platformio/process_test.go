@@ -16,7 +16,7 @@ import (
 	"time"
 	"unicode/utf16"
 
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 )
 
 func TestFileArgsKeepValuesOutOfCode(t *testing.T) {

@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"cogentcore.org/core/system"
-	"example.com/vellum/app"
-	cogent "example.com/vellum/cogent"
-	"example.com/vellum/ui"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/app"
+	cogent "github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 )
 
 func main() {

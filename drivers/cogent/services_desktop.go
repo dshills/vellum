@@ -8,8 +8,8 @@ import (
 
 	"cogentcore.org/core/system/driver/base"
 	"cogentcore.org/core/system/driver/desktop"
-	"example.com/vellum/app"
-	"example.com/vellum/cogent/internal/platformio"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent/internal/platformio"
 	"github.com/go-gl/glfw/v3.4/glfw"
 )
 

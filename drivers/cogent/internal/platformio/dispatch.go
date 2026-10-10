@@ -2,7 +2,7 @@ package platformio
 
 import (
 	"context"
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 )
 
 type Result[T any] struct {

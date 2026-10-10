@@ -205,7 +205,7 @@ def decode_objects(raw):
     return objects
 
 
-def check_origin(modules, sdk, module_path="example.com/vellum"):
+def check_origin(modules, sdk, module_path="github.com/dshills/vellum"):
     origins = {}
     for module in modules:
         replaced = module.get("Replace")
@@ -218,7 +218,7 @@ def check_origin(modules, sdk, module_path="example.com/vellum"):
             origins[module["Path"]] = directory.relative_to(sdk.resolve()).as_posix()
         except ValueError:
             raise ValueError(f"consumer replacement is outside relocated SDK: {module['Path']}")
-    expected = {module_path: ".", module_path + "/cogent": "drivers/cogent",
+    expected = {module_path: ".", module_path + "/drivers/cogent": "drivers/cogent",
                 "cogentcore.org/core": "drivers/cogent/build/upstream",
                 "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"}
     for name, relative in expected.items():

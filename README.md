@@ -30,8 +30,8 @@ dependencies. Prototype modules remain separate from the framework API.
 
 ## Build and run
 
-The dependency-free root module is locally named `example.com/vellum` until a
-publication namespace is chosen. Test the portable packages from the repository root:
+The dependency-free root module is `github.com/dshills/vellum`; the native driver is
+`github.com/dshills/vellum/drivers/cogent`. Test the portable packages from the repository root:
 
 ```sh
 go test -race ./...
@@ -65,4 +65,6 @@ portable baselines or `scripts/benchmark.sh --native` for visible GPU measuremen
 The SDK identifies `v0.1.0-alpha.1`. Follow the
 [application tutorial](docs/tutorials/building-an-app.md) and
 [release contract](specs/release.md) to create and verify a relocatable private SDK.
-Public packaging fails until namespace, license and redistribution gates are met.
+Vellum's own code uses the [MIT license](LICENSE). The selected module namespace
+and license are recorded in `release/version.json`; public packaging still requires
+the third-party/native distribution audit and target qualification.

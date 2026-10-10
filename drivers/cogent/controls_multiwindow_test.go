@@ -8,8 +8,8 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/tree"
-	"example.com/vellum/app"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/ui"
 )
 
 func TestOtherWindowDrainDefersNativeControlRestoration(t *testing.T) {

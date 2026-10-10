@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"example.com/vellum"
+	"github.com/dshills/vellum"
 )
 
 func TestVersionMatchesReleaseMetadata(t *testing.T) {

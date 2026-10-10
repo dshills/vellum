@@ -4,8 +4,8 @@ package cogent
 
 import (
 	"context"
-	"example.com/vellum/app"
-	"example.com/vellum/cogent/internal/platformio"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent/internal/platformio"
 )
 
 func nativeChooseFile(ctx context.Context, o app.FileOptions) (string, error) {

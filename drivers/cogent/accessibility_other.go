@@ -4,7 +4,7 @@ package cogent
 
 import (
 	"context"
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 )
 
 func configureAccessibility(*app.Application) error                { return nil }

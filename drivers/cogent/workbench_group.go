@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"example.com/vellum/app"
-	"example.com/vellum/ui"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 )
 
 var workbenchGroupIDs atomic.Uint64

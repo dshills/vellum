@@ -4,7 +4,7 @@ package cogent
 
 import (
 	"context"
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 )
 
 func nativeChooseFile(context.Context, app.FileOptions) (string, error) {

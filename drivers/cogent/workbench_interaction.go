@@ -12,8 +12,8 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/system"
-	"example.com/vellum/app"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/workbench"
 )
 
 func (w *Workbench) layout() (workbench.Layout, error) {

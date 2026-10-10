@@ -2,8 +2,11 @@
 
 `release/version.json` and the public `vellum.Version` constant identify
 `v0.1.0-alpha.1`. This is an alpha packaging/API version; no Git tag or remote
-release is created by these tools. The module namespace and framework license
-remain owner choices. The Go module graph notice inventory does not establish
+release is created by these tools. The owner selected `github.com/dshills/vellum`
+and the MIT license for Vellum's own code. The native module is
+`github.com/dshills/vellum/drivers/cogent`; example module paths also match their
+repository directories. Root and module-local LICENSE files record this choice.
+The third-party/native distribution audit remains pending. The Go module graph notice inventory does not establish
 complete embedded Rust/native binary/font redistribution rights.
 
 ## API compatibility
@@ -124,6 +127,11 @@ A runtime check records its host only; Windows/Linux qualification remains a
 separate target gate.
 
 ## Public release gates
+
+The namespace and framework-license selections are complete and recorded in
+`release/version.json`. Third-party licenses and notices remain unchanged; this
+MIT selection applies to Vellum's own code and does not approve redistribution
+of dependency/native/font components.
 
 `--public` fails until the owner has selected a non-placeholder module namespace,
 a framework license is selected and present, and the third-party/native

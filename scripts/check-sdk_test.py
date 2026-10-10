@@ -15,13 +15,13 @@ from child_process import ChildCleanupError
 
 spec=importlib.util.spec_from_file_location("check_sdk",Path(__file__).with_name("check-sdk.py"));sdk=importlib.util.module_from_spec(spec);spec.loader.exec_module(sdk)
 PREFIX="vellum-v0.1.0-alpha.1"
-ORIGINS={"example.com/vellum":".","example.com/vellum/cogent":"drivers/cogent","cogentcore.org/core":"drivers/cogent/build/upstream","github.com/go-text/typesetting":"drivers/cogent/build/typesetting"}
+ORIGINS={"github.com/dshills/vellum":".","github.com/dshills/vellum/drivers/cogent":"drivers/cogent","cogentcore.org/core":"drivers/cogent/build/upstream","github.com/go-text/typesetting":"drivers/cogent/build/typesetting"}
 def artifact(path,files=None,extra=None,checksums=None,release_record=None):
  files=dict(files or {"api.go":b"package vellum\n"})
- files.setdefault("go.mod",b"module example.com/vellum\ngo 1.25.6\n")
+ files.setdefault("go.mod",b"module github.com/dshills/vellum\ngo 1.25.6\n")
  if checksums is not None:
   checksums=dict(checksums);checksums.setdefault("go.mod",hashlib.sha256(files["go.mod"]).hexdigest())
- manifest={"schema":1,"release":release_record if release_record is not None else {"version":"v0.1.0-alpha.1","module":"example.com/vellum"},"files":checksums if checksums is not None else {name:hashlib.sha256(data).hexdigest() for name,data in files.items()}}
+ manifest={"schema":1,"release":release_record if release_record is not None else {"version":"v0.1.0-alpha.1","module":"github.com/dshills/vellum"},"files":checksums if checksums is not None else {name:hashlib.sha256(data).hexdigest() for name,data in files.items()}}
  with tarfile.open(path,"w:gz") as archive:
   for name,data in [*files.items(),("SDK_MANIFEST.json",json.dumps(manifest).encode())]:
    member=tarfile.TarInfo(PREFIX+"/"+name);member.size=len(data);archive.addfile(member,io.BytesIO(data))
@@ -132,9 +132,9 @@ class SDKChecks(unittest.TestCase):
     sdk.check(Path("missing"))
    verify.assert_not_called();execute.assert_not_called()
   with tempfile.TemporaryDirectory() as tmp:
-   root=Path(tmp);names=["example.com/vellum","example.com/vellum/cogent","cogentcore.org/core","github.com/go-text/typesetting"]
+   root=Path(tmp);names=["github.com/dshills/vellum","github.com/dshills/vellum/drivers/cogent","cogentcore.org/core","github.com/go-text/typesetting"]
    modules="\n".join(json.dumps({"Path":name,"Replace":{"Dir":str(root/ORIGINS[name])}}) for name in names)
-   verified={"archive_sha256":"digest","manifest":{"release":{"module":"example.com/vellum","version":"v0.1.0-alpha.1"},"files":{}}}
+   verified={"archive_sha256":"digest","manifest":{"release":{"module":"github.com/dshills/vellum","version":"v0.1.0-alpha.1"},"files":{}}}
    with mock.patch.object(sdk,"verify_archive",return_value=verified),mock.patch.object(sdk,"extract_verified",return_value=root),mock.patch.object(sdk,"run_child") as commands,mock.patch.object(sdk,"check_child_output",return_value=modules) as listing:
     self.assertFalse(sdk.check(Path("own-archive"),allow_self_attested=True)["digest_verified_against_expected"])
     self.assertTrue(sdk.check(Path("trusted-archive"),expected_sha256="trusted-digest")["digest_verified_against_expected"])
@@ -142,7 +142,7 @@ class SDKChecks(unittest.TestCase):
     for call in commands.call_args_list:self.assertIn(call.kwargs["timeout"],(sdk.COMMAND_TIMEOUT_SECONDS,sdk.GENERATOR_TIMEOUT_SECONDS))
  def test_command_timeout_fails_before_acceptance(self):
   import subprocess
-  verified={"archive_sha256":"digest","manifest":{"release":{"module":"example.com/vellum","version":"v0.1.0-alpha.1"},"files":{}}}
+  verified={"archive_sha256":"digest","manifest":{"release":{"module":"github.com/dshills/vellum","version":"v0.1.0-alpha.1"},"files":{}}}
   with tempfile.TemporaryDirectory() as tmp,mock.patch.object(sdk,"verify_archive",return_value=verified),mock.patch.object(sdk,"extract_verified",return_value=Path(tmp)),mock.patch.object(sdk,"run_child",side_effect=subprocess.TimeoutExpired("generator",sdk.GENERATOR_TIMEOUT_SECONDS)) as commands:
    with self.assertRaises(subprocess.TimeoutExpired):sdk.check(Path("own-archive"),expected_sha256="digest")
    self.assertEqual(commands.call_count,1)
@@ -155,7 +155,7 @@ class SDKChecks(unittest.TestCase):
     for directory in (None,"", "."):
      replacement={} if directory is None else {"Dir":directory}
      with self.subTest(directory=directory),self.assertRaisesRegex(ValueError,"no absolute local directory"):
-      sdk.check_origin([{"Path":"example.com/vellum","Replace":replacement}],root)
+      sdk.check_origin([{"Path":"github.com/dshills/vellum","Replace":replacement}],root)
    finally:os.chdir(original)
  def test_replacement_inside_sdk_must_match_exact_module_layout(self):
   with tempfile.TemporaryDirectory() as tmp:
@@ -198,7 +198,7 @@ class SDKChecks(unittest.TestCase):
  def test_replacements_must_stay_in_sdk(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp)/"sdk";root.mkdir()
-   names=["example.com/vellum","example.com/vellum/cogent","cogentcore.org/core","github.com/go-text/typesetting"]
+   names=["github.com/dshills/vellum","github.com/dshills/vellum/drivers/cogent","cogentcore.org/core","github.com/go-text/typesetting"]
    modules=[{"Path":name,"Replace":{"Dir":str(root/ORIGINS[name])}} for name in names]
    self.assertEqual(set(sdk.check_origin(modules,root)),set(names))
    modules[-1]["Replace"]["Dir"]=str(Path(tmp)/"original checkout")

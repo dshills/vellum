@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"example.com/vellum/virtual"
+	"github.com/dshills/vellum/virtual"
 	"fmt"
 	"strconv"
 )

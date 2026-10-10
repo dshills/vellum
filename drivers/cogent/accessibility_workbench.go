@@ -3,8 +3,8 @@ package cogent
 import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/styles/states"
-	"example.com/vellum/ui"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 )
 
 func accessibilityWorkbenchNamespace(extension, panel string) string {

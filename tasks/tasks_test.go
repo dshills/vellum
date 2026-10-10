@@ -3,7 +3,7 @@ package tasks
 import (
 	"context"
 	"errors"
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 	"testing"
 	"time"
 )

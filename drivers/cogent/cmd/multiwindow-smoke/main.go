@@ -10,10 +10,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"example.com/vellum/app"
-	cogent "example.com/vellum/cogent"
-	"example.com/vellum/command"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/app"
+	cogent "github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/ui"
 )
 
 func main() {

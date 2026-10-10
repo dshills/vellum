@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"example.com/vellum/canvas"
+	"github.com/dshills/vellum/canvas"
 	"image"
 	"image/color"
 	"strings"

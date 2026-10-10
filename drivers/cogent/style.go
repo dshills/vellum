@@ -6,7 +6,7 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/text/rich"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/ui"
 )
 
 // applyStyle runs after native default stylers, on a freshly reset native Style.

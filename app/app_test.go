@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"errors"
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/ui"
 	"sync"
 	"testing"
 )

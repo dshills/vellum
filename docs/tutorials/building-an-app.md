@@ -1,7 +1,8 @@
 # Build an application with Vellum
 
-This tutorial uses the private alpha SDK. Its public module namespace, framework
-license, native distribution audit and full target qualification remain gates.
+This tutorial uses the private alpha SDK. Vellum's module namespace is
+`github.com/dshills/vellum` and its own code uses the MIT license. Native
+distribution audit and full target qualification remain gates.
 The alpha version is available as `vellum.Version`; see the
 [release contract](../../specs/release.md).
 
@@ -44,9 +45,9 @@ import (
     "context"
     "log"
 
-    "example.com/vellum/app"
-    "example.com/vellum/cogent"
-    "example.com/vellum/ui"
+    "github.com/dshills/vellum/app"
+    "github.com/dshills/vellum/drivers/cogent"
+    "github.com/dshills/vellum/ui"
 )
 
 func main() {
@@ -142,8 +143,8 @@ successful producer return; interrupted output must not be used or assumed valid
 it with other live native checks.
 
 The alpha toolkit still has platform/accessibility/performance gates. Private SDK
-checks are not production or redistribution approval. Choose licensing and
-finish dependency/native/font audits before a public release. Signing,
+checks are not production or redistribution approval. Finish dependency/native/font
+audits before a public release. Signing,
 notarization and store publication require separate owner configuration.
 
 For a private macOS app bundle from a prebuilt executable:

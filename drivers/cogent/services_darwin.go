@@ -19,7 +19,7 @@ import "C"
 import (
 	"context"
 	"encoding/json"
-	"example.com/vellum/app"
+	"github.com/dshills/vellum/app"
 	"sync"
 	"sync/atomic"
 	"unsafe"

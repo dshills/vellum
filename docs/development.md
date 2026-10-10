@@ -2,7 +2,7 @@
 
 ## Modules and dependencies
 
-The root `example.com/vellum` module contains portable public packages and uses
+The root `github.com/dshills/vellum` module contains portable public packages and uses
 only the standard library. The `drivers/cogent` module depends on that local root
 module and the pinned native stack. Keep driver-specific dependencies in that
 module. Each prototype has its own module and records its experimental inputs.

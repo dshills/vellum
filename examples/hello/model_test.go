@@ -1,7 +1,7 @@
 package main
 
 import (
-	"example.com/vellum/ui"
+	"github.com/dshills/vellum/ui"
 	"testing"
 )
 

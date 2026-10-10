@@ -12,9 +12,9 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles/sides"
 	"cogentcore.org/core/system"
-	"example.com/vellum/app"
-	"example.com/vellum/ui"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 )
 
 func mustEncodeSession(t *testing.T, s *workbench.Session) []byte {

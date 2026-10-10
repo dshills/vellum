@@ -5,8 +5,8 @@ package cogent
 import (
 	"context"
 	"errors"
-	"example.com/vellum/app"
-	"example.com/vellum/command"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/command"
 	"testing"
 	"time"
 )

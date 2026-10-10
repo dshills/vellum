@@ -15,9 +15,9 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/tree"
-	"example.com/vellum/app"
-	"example.com/vellum/ui"
-	"example.com/vellum/workbench"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 )
 
 type accessibilityNode struct {
