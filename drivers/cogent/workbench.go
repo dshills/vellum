@@ -12,47 +12,74 @@ import (
 	"fmt"
 	"html"
 	"math"
+	"sync/atomic"
 )
 
 type Panel struct {
 	ID, Title string
 	View      func() ui.Node
+	// NewView creates a private per-window view for panels containing native
+	// extensions. Its returned closure should share domain state, not widgets.
+	NewView func(nativeWindowID string) func() ui.Node
 }
 
 // Workbench renders the validated dock model. Dock containers may rebuild while
 // compatible panel content survives moves and keyed UI changes.
 type Workbench struct {
-	OnError   func(error)
-	parents   map[string]*core.Frame
-	tabs      map[string]*core.Tabs
-	splits    map[string]*core.Splits
-	Owner     *app.Application
-	Window    string
-	Workspace *workbench.Workspace
-	Panels    []Panel
-	signature string
-	records   map[string]*record
-	host      *core.Frame
-	syncing   bool
-	theme     ui.Theme
+	OnError        func(error)
+	parents        map[string]*core.Frame
+	tabs           map[string]*core.Tabs
+	splits         map[string]*core.Splits
+	Owner          *app.Application
+	Window         string
+	Workspace      *workbench.Workspace
+	Group          *WorkbenchGroup
+	SessionWindow  string
+	buttons        map[string]*core.Tab
+	pendingError   atomic.Pointer[error]
+	geometryEpoch  atomic.Uint64
+	boundsSequence atomic.Uint64
+	pendingBounds  atomic.Pointer[nativeBoundsCapture]
+	boundsQueued   atomic.Bool
+	generation     atomic.Uint64
+	generationID   uint64
+	menuWindows    []workbench.WindowLayout
+	layoutSnapshot *workbench.Group
+	focusSerial    uint64
+	focusPanel     string
+	bounds         workbench.Bounds
+	appliedBounds  workbench.Bounds
+	boundsApplied  bool
+	title          string
+	positioned     bool
+	Panels         []Panel
+	signature      string
+	records        map[string]*record
+	host           *core.Frame
+	syncing        bool
+	theme          ui.Theme
 }
 
 func (w *Workbench) SetTheme(theme ui.Theme) { w.theme = theme.Clone() }
 
 func (w *Workbench) Mount(parent tree.Node) core.Widget {
-	if w == nil || w.Owner == nil || w.Workspace == nil {
+	if w == nil || w.Owner == nil || w.Workspace == nil && w.Group == nil {
 		return nil
 	}
 	w.host = core.NewFrame(parent)
 	w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1) })
+	w.bindWindowGeometry()
 	return w.host
 }
 func (w *Workbench) Sync(core.Widget) (err error) {
-	if w == nil || w.Owner == nil || w.Workspace == nil {
+	if w == nil || w.Owner == nil || w.Workspace == nil && w.Group == nil {
 		return fmt.Errorf("workbench: owner and workspace required")
 	}
 	if w.host == nil {
 		return fmt.Errorf("workbench: not mounted")
+	}
+	if pending := w.pendingError.Swap(nil); pending != nil && !w.reportError(*pending) {
+		return fmt.Errorf("workbench: queued native change: %w", *pending)
 	}
 	// A failed native extension update is a lifetime boundary, not a rollback
 	// of arbitrary extension side effects. Clear every partial dock cache so a
@@ -66,9 +93,15 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		w.parents = nil
 		w.tabs = nil
 		w.splits = nil
+		w.buttons = nil
+		w.layoutSnapshot = nil
 		w.signature = ""
 	}()
-	l := w.Workspace.Layout()
+	l, err := w.layout()
+	if err != nil {
+		return err
+	}
+	w.layoutSnapshot = l.Root
 	signature := shape(l.Root)
 	w.syncing = true
 	defer func() { w.syncing = false }()
@@ -82,9 +115,11 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		}
 		defer parking.Delete()
 		w.host.DeleteChildren()
+		w.generation.Add(1)
 		w.records = map[string]*record{}
 		w.parents = map[string]*core.Frame{}
 		w.tabs = map[string]*core.Tabs{}
+		w.buttons = map[string]*core.Tab{}
 		w.splits = map[string]*core.Splits{}
 		if err := w.build(w.host, l.Root, retained); err != nil {
 			return err
@@ -101,7 +136,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 	for _, p := range w.Panels {
 		r := w.records[p.ID]
 		if r == nil {
-			return fmt.Errorf("workbench: panel %q absent", p.ID)
+			continue
 		}
 		n := p.View()
 		if err := ui.Validate(n); err != nil {
@@ -114,6 +149,8 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		}
 		w.records[p.ID] = r
 	}
+	w.syncWindowGeometry()
+	w.syncFocus()
 	return nil
 }
 func shape(g *workbench.Group) string {
@@ -152,15 +189,16 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 			if w.syncing {
 				return
 			}
-			w.Owner.Do(func() {
-				s := split.Splits()
-				if len(s) == 2 {
-					if err := w.Workspace.Resize(g.ID, float64(s[0])); err != nil && w.OnError != nil {
-						w.OnError(err)
+			s := split.Splits()
+			if len(s) == 2 {
+				ratio := math.Max(.05, math.Min(.95, float64(s[0])))
+				w.queue(func() error {
+					if w.Group != nil {
+						return w.Group.Apply(func(model *workbench.Session) error { return model.Resize(w.SessionWindow, g.ID, ratio) })
 					}
-					w.Owner.Invalidate(w.Window)
-				}
-			})
+					return w.Workspace.Resize(g.ID, ratio)
+				})
+			}
 		})
 		return nil
 	}
@@ -178,7 +216,9 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 		if panel == nil || panel.View == nil {
 			return fmt.Errorf("workbench: unregistered panel %q", id)
 		}
-		frame, _ := tabs.NewTab(html.EscapeString(panel.Title))
+		frame, button := tabs.NewTab(html.EscapeString(panel.Title))
+		w.buttons[id] = button
+		w.bindTabPointer(button, id, g.ID)
 		n := panel.View()
 		if err := ui.Validate(n); err != nil {
 			return err
@@ -199,15 +239,16 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 		if w.syncing {
 			return
 		}
-		w.Owner.Do(func() {
-			_, i := tabs.CurrentTab()
-			if i >= 0 && i < len(g.Tabs) {
-				if err := w.Workspace.Activate(g.ID, g.Tabs[i]); err != nil && w.OnError != nil {
-					w.OnError(err)
+		_, i := tabs.CurrentTab()
+		if i >= 0 && i < len(g.Tabs) {
+			panel := g.Tabs[i]
+			w.queue(func() error {
+				if w.Group != nil {
+					return w.Group.Apply(func(model *workbench.Session) error { return model.Activate(w.SessionWindow, g.ID, panel) })
 				}
-				w.Owner.Invalidate(w.Window)
-			}
-		})
+				return w.Workspace.Activate(g.ID, panel)
+			})
+		}
 	})
 	return nil
 }

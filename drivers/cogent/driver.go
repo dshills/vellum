@@ -277,6 +277,19 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			}
 			w.body.OnClose(func(events.Event) {
 				w.closing.Store(true)
+				// CloseWindow changes registration and wakes topology reconciliation;
+				// native CloseReq runs outside the application owner. If the owner
+				// already stopped, skip model notifications; native/control cleanup
+				// below still releases every mounted widget.
+				if err := a.Do(func() {
+					w.rootMu.Lock()
+					defer w.rootMu.Unlock()
+					if err := closeWorkbenchExtensions(w.root); err != nil {
+						fail(err)
+					}
+				}); err != nil && err != app.ErrClosed {
+					fail(err)
+				}
 				stopDeviceLoss(w)
 				a.CloseWindow(spec.ID)
 				cleanup := func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); disposeControlTree(w.root) }

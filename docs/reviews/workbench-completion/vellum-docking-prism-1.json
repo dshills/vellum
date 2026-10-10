@@ -1,0 +1,266 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a3aeee6a56d1b08db4b85bb62d73be0e",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2ceb74371a571c1c66abebb9c49e489a06349060",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 6,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "56e9c388590715fd",
+      "severity": "medium",
+      "category": "bug",
+      "title": "x",
+      "message": "The smoke goroutine calls `system.TheApp.WindowByName` and `native.CloseReq()` directly. Cogent/GUI window operations are meant to run on the owner/main thread, while this goroutine is neither. This can race or crash on some platforms, and it undermines the 'owner-confined' guarantee the smoke test advertises. The test can also become flaky.",
+      "suggestion": "Look up the window and call `CloseReq` inside `onOwner(func() error { ... })` so both run on the owner thread.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/docking-smoke/main.go",
+          "lines": {
+            "start": 148,
+            "end": 148
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "threading",
+        "location-corrected"
+      ],
+      "evidence": "native.CloseReq()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "da1c7664343b6071",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Controller-initiated close can re-enter WindowClosed and Apply",
+      "message": "apply() closes a removed window's native registration while g.windows still maps it and the session still holds the previous layout (the delete and Restore come later). If the driver calls WindowClosed synchronously from CloseWindow, as WindowCloseExtension documents, the current != w guard passes. WindowClosed then calls Group.Close for the same window, which re-enters Apply, tries to close the same window again, and risks recursion or a double close. The rollback path deletes the map entry before closing added windows, so the two paths are inconsistent.",
+      "suggestion": "Remove the window from g.windows before calling g.close, and restore it on failure. Alternatively set a 'closing by controller' flag so WindowClosed returns early for controller-initiated closes.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_group.go",
+          "lines": {
+            "start": 162,
+            "end": 162
+          }
+        }
+      ],
+      "tags": [
+        "reentrancy",
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "if err := g.close(w.Window); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7d1f1810d2a7ab8d",
+      "severity": "medium",
+      "category": "testing",
+      "title": "app.New error ignored in test fixture",
+      "message": "The error from `app.New` is discarded. If construction fails, `a` may be nil, and `t.Cleanup(a.Close)` and later calls panic or produce confusing failures. A setup failure should fail the test with a clear message.",
+      "suggestion": "Check the error and call `t.Fatal(err)` before registering the cleanup.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_group_test.go",
+          "lines": {
+            "start": 19,
+            "end": 19
+          }
+        }
+      ],
+      "tags": [
+        "tests",
+        "error-handling"
+      ],
+      "evidence": "a, _ := app.New(app.Config{})",
+      "fix": {
+        "before": "a, _ := app.New(app.Config{})",
+        "after": "a, err := app.New(app.Config{})\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "e12c46a9ea6cd84a",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Encode errors ignored, so snapshot equality can pass vacuously",
+      "message": "The rollback tests compare `before` and `after` snapshots from `Session.Encode()` with the error discarded. If `Encode` fails on both calls, both values are nil and `bytes.Equal(before, after)` passes. The rollback invariants would then be asserted vacuously.",
+      "suggestion": "Add a small helper such as `mustEncode(t, s)` that calls `t.Fatal` on error and returns the bytes. Use it everywhere `Encode()` is currently called with `_`.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_group_test.go",
+          "lines": {
+            "start": 85,
+            "end": 85
+          }
+        }
+      ],
+      "tags": [
+        "tests",
+        "error-handling"
+      ],
+      "evidence": "before, _ := g.Session.Encode()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "07c48bfc397cc692",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Errors from queued model changes are silently dropped when OnError is nil",
+      "message": "If OnError is nil, a failed queued change (drop, float, dock, window-bounds capture) is silently discarded. The spec says failures are reported and that a failed close transfer or persistence terminates the application. Here the user gets no feedback, and the native UI may differ from the model until the next full sync.",
+      "suggestion": "When OnError is nil, store the error in pendingError, as the PostWindow refusal path does, or return it to a central handler so it is surfaced on the next refresh.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 36,
+            "end": 38
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "silent-failure"
+      ],
+      "evidence": "if err := change(); err != nil \u0026\u0026 w.OnError != nil {\n\t\t\tw.OnError(err)\n\t\t}",
+      "fix": {
+        "before": "if err := change(); err != nil \u0026\u0026 w.OnError != nil {\n\t\t\tw.OnError(err)\n\t\t}",
+        "after": "if err := change(); err != nil {\n\t\t\tif w.OnError != nil {\n\t\t\t\tw.OnError(err)\n\t\t\t} else {\n\t\t\t\tw.pendingError.Store(\u0026err)\n\t\t\t}\n\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "40759d98a8cef848",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Encode errors ignored, so equality checks can pass vacuously",
+      "message": "The Encode errors are discarded here and in the roundtrip, rejected-transaction and oversize tests. If Encode fails, both byte slices are nil and bytes.Equal(nil, nil) is true. The roundtrip and \"unchanged after rejection\" assertions then pass without checking anything. The oversize test is the most likely to hit this, because it is built around the encode size limit.",
+      "suggestion": "Check the error from every Encode call and call t.Fatal on failure, so the byte comparisons compare real snapshots. Apply this to the Encode calls at lines 46, 62, 66 and in TestSessionCannotEncodeBeyondItsDecodeLimit.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "workbench/session_test.go",
+          "lines": {
+            "start": 37,
+            "end": 37
+          }
+        }
+      ],
+      "tags": [
+        "test-quality",
+        "error-handling"
+      ],
+      "evidence": "data, _ := s.Encode()",
+      "fix": {
+        "before": "data, _ := s.Encode()",
+        "after": "data, err := s.Encode()\n\tif err != nil {\n\t\tt.Fatal(err)\n\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 159607,
+    "totalMs": 50042
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 77106,
+    "chunks": 6,
+    "llmCalls": 13,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 87876,
+        "output": 22514,
+        "costUSD": 0.400892
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 7,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "342601626082f6d9",
+        "severity": "medium",
+        "category": "testing",
+        "title": "WindowContext lookup result ignored before dereferencing",
+        "message": "The `ok` result from `WindowContext` is discarded in several tests (here, and for `oldID` in the Open/Close test). If the lookup fails because the registration was removed, `ctx` can be nil and `ctx.Err()` panics. The panic hides the real assertion about the retired registration.",
+        "suggestion": "Check `ok`. A missing context should either count as retired or fail the test with a clear message, instead of dereferencing a possibly nil context.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/workbench_group_test.go",
+            "lines": {
+              "start": 75,
+              "end": 75
+            }
+          }
+        ],
+        "tags": [
+          "tests",
+          "nil-deref"
+        ],
+        "evidence": "ctx, _ := a.WindowContext(nativeID)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The ignored `ok` only affects how the test fails. If the lookup returned nil, the test would already be failing, and a nil-pointer panic instead of a clear Fatal is a cosmetic diagnostic issue. The test relies on `WindowContext` still returning the retired registration's cancelled context, so `ctx` is expected to be non-nil. This does not warrant blocking the change."
+    }
+  ],
+  "suppressed": []
+}

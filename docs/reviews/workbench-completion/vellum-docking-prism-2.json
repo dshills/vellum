@@ -1,0 +1,214 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "186fe456923be9751da36fdda892cc9f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2ceb74371a571c1c66abebb9c49e489a06349060",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7f839c2d7d715b9a",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Pending error overwritten by later failures",
+      "message": "Unhandled queued errors are kept in a single atomic pointer slot via Store. A second failure before Sync drains the first overwrites it, so the earlier error is lost silently. This contradicts the spec's claim that errors are never silently discarded. The same applies to the PostWindow failure path.",
+      "suggestion": "Keep the first error with CompareAndSwap(nil, \u0026err), or accumulate errors under a mutex and return them with errors.Join from Sync.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 50,
+            "end": 50
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "w.pendingError.Store(\u0026err)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3448e5c91fd01b26",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native geometry sync can overwrite in-progress user resize/move with stale model bounds",
+      "message": "syncWindowGeometry pushes the model bounds (w.bounds) onto the native window whenever they differ. A user resize or move is first captured by the native event handler and only reaches the model after a queued PostWindow round trip. If a Sync/refresh runs in between, it sees the live geometry differing from the stale model and snaps the window back (SetWinSize/SetPos). That fights the user's drag and can cause flicker or lost resizes. The geometry epoch only guards explicit restores, not this race.",
+      "suggestion": "Apply model geometry to the native window only when the model bounds changed since the last applied value (track the last applied bounds or a geometry epoch). Skip the push while a native-originated capture is pending.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 150,
+            "end": 152
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "geometry",
+        "ux"
+      ],
+      "evidence": "if size := win.WinSize(); size != image.Pt(b.Width, b.Height) {\n\t\twin.SetWinSize(image.Pt(b.Width, b.Height))\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 144973,
+    "totalMs": 48515
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 82973,
+    "chunks": 6,
+    "llmCalls": 10,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 69688,
+        "output": 19840,
+        "costUSD": 0.33777599999999997
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 2
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "05454e2f3a3449c9",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Missing panel silently ignored in non-group mode",
+        "message": "The \"panel absent\" error was replaced by a silent skip for every Workbench. That is only legitimate for grouped windows, where a panel may live in another window. In the single-Workspace mode a registered panel with no record now goes unnoticed, which hides build or layout bugs.",
+        "suggestion": "Skip missing records only when w.Group != nil. Keep returning the error for plain Workspace mode.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/workbench.go",
+            "lines": {
+              "start": 140,
+              "end": 142
+            }
+          }
+        ],
+        "tags": [
+          "error-handling",
+          "regression"
+        ],
+        "evidence": "\t\tif r == nil {\n\t\t\tcontinue\n\t\t}",
+        "fix": {
+          "before": "\t\tif r == nil {\n\t\t\tcontinue\n\t\t}",
+          "after": "\t\tif r == nil {\n\t\t\tif w.Group != nil {\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\treturn fmt.Errorf(\"workbench: panel %q absent\", p.ID)\n\t\t}"
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/workbench.go"
+    },
+    {
+      "finding": {
+        "id": "ad32a006c56778df",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Shared ready channel can deliver stale/wrong-window readiness to waitReady",
+        "message": "The smoke test shares one buffered ready channel for all windows and never drains it. OnWindowReady can fire again for the main window (for example after redock, relayout or window replacement), leaving stale IDs in the channel. A later waitReady then returns immediately, before the new floating window is actually ready. latestReady may also hold the main window's native ID, so CloseReq would hit the wrong window or race with its creation. This makes the smoke flaky or able to pass or fail for the wrong reason.",
+        "suggestion": "Send the logical window ID together with the native ID. Make waitReady take the expected logical window ID, for example the new floating window, and discard non-matching or stale events until it arrives.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/docking-smoke/main.go",
+            "lines": {
+              "start": 57,
+              "end": 57
+            }
+          }
+        ],
+        "tags": [
+          "flaky-test",
+          "concurrency",
+          "location-corrected"
+        ],
+        "evidence": "case ready \u003c- nativeID:",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The finding rests on an assumption the code does not support. OnWindowReady is a per-window creation signal, and the test pairs each waitReady with exactly one window creation: the main window at startup, then one for each Float. Redocking only closes the floating window and does not recreate the main one. Nothing shown makes the main window fire ready again. The channel holds 32 entries and the non-blocking send is only a drop guard. The stale-ID or wrong-window CloseReq scenario is speculation, not something the code demonstrates."
+    },
+    {
+      "finding": {
+        "id": "377734c6abf2fea9",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Owner entry (a.Do) added to native close hook risks reentrant deadlock and ordering races",
+        "message": "The new close hook runs a.Do from the native OnClose callback. The README says the driver's close event enters a non-reentrant owner through a.Do. If OnClose fires while already on the owner, for example during app shutdown, a controller-initiated window close, or a synchronous Scene.Close, this deadlocks. If a.Do queues the call instead, the cleanup below may dispose the control tree first, so the extensions' close hook sees a disposed root. The hook also takes rootMu inside the owner, while the render context lock is held on the CloseReq path, which creates a lock-order hazard. Neither the a.Do error nor idempotence across repeated OnClose calls is handled.",
+        "suggestion": "Use a non-blocking owner post that tolerates a closed app (a.Post, with the error ignored or logged), or detect that you are already on the owner. Make closeWorkbenchExtensions idempotent. Finish the extension close before disposeControlTree, or run both in the same owner task.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/driver.go",
+            "lines": {
+              "start": 280,
+              "end": 277
+            }
+          }
+        ],
+        "tags": [
+          "deadlock",
+          "concurrency",
+          "lifecycle"
+        ],
+        "evidence": "a.Do(func() {\n\t\t\t\t\tw.rootMu.Lock()\n\t\t\t\t\tdefer w.rootMu.Unlock()\n\t\t\t\t\tif err := closeWorkbenchExtensions(w.root); err != nil {\n\t\t\t\t\t\tfail(err)\n\t\t\t\t\t}\n\t\t\t\t})",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The finding is speculative and not supported by the code shown. It asserts that OnClose may fire on the owner, that a.Do is non-reentrant, and that the render context lock is held on the CloseReq path, but none of this is visible here. The diff shows the hook is added before the cleanup, which is itself presumably deferred. The a.Do call precedes it in program order, so if a.Do runs synchronously, ordering is fine. The only concrete risk is the unverified deadlock, and the author likely added this hook deliberately, following the pattern of other a.Do uses in the driver. The error from a.Do is also not dropped, since fail is called inside the closure. Idempotence is not shown to be a problem either."
+    }
+  ],
+  "suppressed": []
+}

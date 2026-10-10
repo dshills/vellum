@@ -1,0 +1,100 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "95b334d9fea67bc1acde56f864f7880d",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2ceb74371a571c1c66abebb9c49e489a06349060",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "98cdf65dd93ff22f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Drop on non-tab area inside the window floats the panel",
+      "message": "On SlideStop, any pointer position that hitDock does not resolve to a tab group floats the panel into a new window. hitDock only matches inside tab groups, so releasing over a splitter, a gap or any non-tab area still inside the same window detaches the panel. A slightly imprecise drop therefore creates a floating window and discards the user's dock intent.",
+      "suggestion": "Float only when the release point is outside the source window's content bounds. Check e.WindowPos() against the scene's bounds (for example w.host.Scene.Geom.TotalBBox), and treat a release inside the window with no dock target as a cancelled drag.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 362,
+            "end": 365
+          }
+        }
+      ],
+      "tags": [
+        "docking",
+        "ux",
+        "drag-and-drop"
+      ],
+      "evidence": "bounds := w.floatingBounds(e.WindowPos())",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 72484,
+    "totalMs": 52688
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 17,
+    "bytes": 104858,
+    "chunks": 8,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 5,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 43771,
+        "output": 9681,
+        "cachedInput": 9393,
+        "costUSD": 0.184352
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

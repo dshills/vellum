@@ -1,0 +1,257 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "14c972306f42b8a2f4bd30c6d86ef169",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2ceb74371a571c1c66abebb9c49e489a06349060",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 7,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c91e3a655a12c9da",
+      "severity": "medium",
+      "category": "bug",
+      "title": "os.Exit in must() bypasses deferred cleanup",
+      "message": "must() calls os.Exit(1) on any later error, which skips the deferred os.RemoveAll and a.Close(). Smoke failures therefore leak the temporary session directory, and the app is left without an orderly shutdown. The failing path is the one that runs most often in CI.",
+      "suggestion": "Move the body into a run() error function that defers cleanup and have main call os.Exit only on its result, so the defers run before exit.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/docking-smoke/main.go",
+          "lines": {
+            "start": 31,
+            "end": 33
+          }
+        }
+      ],
+      "tags": [
+        "cleanup",
+        "os.Exit",
+        "location-corrected"
+      ],
+      "evidence": "directory, err := os.MkdirTemp(\"\", \"vellum-docking-smoke-*\")\n\t\tmust(err)\n\t\tdefer os.RemoveAll(directory)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "377734c6abf2fea9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native close hook calls a.Do and ignores its result, with possible owner reentry",
+      "message": "The OnClose handler calls a.Do and ignores its result. Window close is not guaranteed to come from outside the owner: a native close can run synchronously when the owner closes a window, for example from WorkbenchGroup.Apply. In that case a.Do could block on the non-reentrant owner or deadlock. If the application is already shutting down, a.Do may return an error or never run the callback. Then closeWorkbenchExtensions is skipped and extension resources leak, with no error reported.",
+      "suggestion": "Check the error returned by a.Do and fall back to closing the extensions directly, or report it via fail, when the owner is unavailable. Also make sure the hook cannot run synchronously on the owner, for example by using a.Post when already on the owner, or by tracking owner re-entry.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 280,
+            "end": 286
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "deadlock",
+        "shutdown"
+      ],
+      "evidence": "a.Do(func() {\n\t\t\t\t\tw.rootMu.Lock()\n\t\t\t\t\tdefer w.rootMu.Unlock()\n\t\t\t\t\tif err := closeWorkbenchExtensions(w.root); err != nil {\n\t\t\t\t\t\tfail(err)\n\t\t\t\t\t}\n\t\t\t\t})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "190539225c3df5bf",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Queued interaction error causes destructive teardown of the dock",
+      "message": "When no error handler reports a queued interaction error (for example a rejected resize or activate), Sync returns it. The deferred cleanup then deletes all dock children, native widgets and caches. A routine rejected user interaction therefore tears down the whole workbench, including native extension state. It is also unclear whether the next Sync is guaranteed to rebuild cleanly.",
+      "suggestion": "Treat queued interaction errors as non-fatal to the widget tree. Surface them separately and return from Sync before the cleanup defer is armed, or have the cleanup defer skip them. For example, store the pending error after the defer is registered and return it only after a successful sync.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench.go",
+          "lines": {
+            "start": 100,
+            "end": 102
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "if pending := w.pendingError.Swap(nil); pending != nil \u0026\u0026 !w.reportError(*pending) {\n\t\treturn fmt.Errorf(\"workbench: queued native change: %w\", *pending)\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8a2372561e0db817",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Layout is saved before the in-memory commit, so a failed Restore leaves disk and memory inconsistent",
+      "message": "The layout is persisted to disk before g.Session.Restore(next) runs. If Restore fails, rollback reverts the native windows and in-memory state, but the file on disk already holds the rejected layout. The next launch would then load a layout the running session refused. The comment on PersistencePath says a failed change is rejected, which this ordering does not guarantee.",
+      "suggestion": "Call g.Session.Restore(next) first and save afterwards. Alternatively, restore the previous layout in the rollback path when Restore fails after a successful save, for example by saving `previous` again.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_group.go",
+          "lines": {
+            "start": 174,
+            "end": 181
+          }
+        }
+      ],
+      "tags": [
+        "persistence",
+        "atomicity"
+      ],
+      "evidence": "if err := draft.Save(g.PersistencePath); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "f48020179e78f4dd",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference when the surviving window has no tab group",
+      "message": "firstTabGroup returns nil if target.Root is nil, or if a split group has a nil First child. The closure then evaluates group.ID and panics on the owner goroutine, which would crash the application while a window is being closed.",
+      "suggestion": "Check `group == nil` before building the closure and return an error such as `workbench: window %q has no tab group`. Alternatively, have the session API choose the destination group.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_group.go",
+          "lines": {
+            "start": 259,
+            "end": 259
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "group := firstTabGroup(target.Root)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c10546680d1272c5",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "closeWorkbenchExtensions stops at the first error, skipping cleanup for remaining extensions",
+      "message": "The first WindowClosed error aborts the traversal. Any later sibling or nested extension is never notified before its native window closes. Those extensions skip their bounds capture and cleanup, and the failure of one workbench hides the state of the others.",
+      "suggestion": "Visit every child, collect the errors with `errors.Join`, and return the joined error at the end. Do not return early.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_group.go",
+          "lines": {
+            "start": 300,
+            "end": 306
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "cleanup"
+      ],
+      "evidence": "if err := closeWorkbenchExtensions(child); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3fdffa7b84b92d90",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Model bounds applied to native window without validation (may resize to 0x0)",
+      "message": "syncWindowBounds applies the model bounds without checking they are usable. native capture rejects bounds through validNativeBounds, but the model-to-native direction does not. If a session window has zero or unset Bounds (for example a window that has never been sized or restored from an older session), the first sync calls SetWinSize(0,0). That can collapse or fail to size the native window.",
+      "suggestion": "Skip the size application unless the model bounds have a sane non-zero size. Reuse validNativeBounds or a Width\u003e0 \u0026\u0026 Height\u003e0 check, and still apply Position separately when Positioned is true.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 212,
+            "end": 214
+          }
+        }
+      ],
+      "tags": [
+        "geometry",
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if size := win.WinSize(); size != image.Pt(b.Width, b.Height) {\n\t\twin.SetWinSize(image.Pt(b.Width, b.Height))\n\t}",
+      "fix": {
+        "before": "if size := win.WinSize(); size != image.Pt(b.Width, b.Height) {\n\t\twin.SetWinSize(image.Pt(b.Width, b.Height))\n\t}",
+        "after": "if b.Width \u003e= 160 \u0026\u0026 b.Height \u003e= 96 {\n\t\tif size := win.WinSize(); size != image.Pt(b.Width, b.Height) {\n\t\t\twin.SetWinSize(image.Pt(b.Width, b.Height))\n\t\t}\n\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 148703,
+    "totalMs": 51576
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 17,
+    "bytes": 99152,
+    "chunks": 8,
+    "llmCalls": 14,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 97492,
+        "output": 21045,
+        "costUSD": 0.40543399999999996
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 7,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

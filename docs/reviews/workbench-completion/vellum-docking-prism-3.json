@@ -1,0 +1,206 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b3390e3f85eea7566fa067077330e886",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2ceb74371a571c1c66abebb9c49e489a06349060",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6bb2b94ee1fe402e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Smoke can pick up a stale ready notification and close the wrong native window",
+      "message": "`ready` is a shared 32-slot buffered channel fed by every OnWindowReady callback, and `latestReady` takes whichever ID `waitReady` pops first. If any window, including `main`, signals ready more than once (for example after a layout rebuild), a stale entry can be consumed instead of the new floating window's ID. `CloseReq` could then target the wrong window, or `WindowByName` could return nil. That makes the smoke flaky or lets it pass without exercising the floating-window close path.",
+      "suggestion": "Have `waitReady` loop until it receives a ready ID that differs from the windows already seen, or record the expected native ID returned from the Float call and compare against it. Drain stale entries from `ready` before each step.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/docking-smoke/main.go",
+          "lines": {
+            "start": 148,
+            "end": 148
+          }
+        }
+      ],
+      "tags": [
+        "flaky",
+        "test",
+        "concurrency"
+      ],
+      "evidence": "native := system.TheApp.WindowByName(latestReady)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d7f6a9edd04352de",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Error returned after the transaction is already committed",
+      "message": "By the time Invalidate runs, the session has been restored, the autosave file is written and the native windows are changed. If Invalidate then fails, the error is returned without a rollback. The caller sees a failed Apply while the model, persisted file and native windows have already moved to the new layout. That is inconsistent with the all-or-nothing contract the rest of apply provides.",
+      "suggestion": "Treat the commit as final once Session.Restore succeeds. Either report the Invalidate failure through OnError and return nil, or move the Invalidate before the commit points. Do not return an error from an already-committed transaction.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_group.go",
+          "lines": {
+            "start": 188,
+            "end": 188
+          }
+        }
+      ],
+      "tags": [
+        "transaction",
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "if err := g.Owner.Invalidate(\"\"); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "bda1e519fdd5401f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unsynchronized read of w.generation from native callbacks",
+      "message": "queue is called from native event callbacks, and it reads the plain field w.generation. The retirement path (in another part of this review) likely changes it on the application owner. Unless both run under the same lock or goroutine, this is a data race. The sibling counter geometryEpoch is atomic, which suggests cross-thread access was anticipated for it but not for generation.",
+      "suggestion": "Make generation an atomic.Uint64 (or guard it with a mutex), and load it in queue and in the posted closure.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 45,
+            "end": 45
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "concurrency"
+      ],
+      "evidence": "generation := w.generation",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3db96f8ea8b42ec9",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Per-event geometry capture triggers fsync'd autosave and full invalidation on every resize/move",
+      "message": "Every resize or move event queues an owner transaction. Each one calls Group.Apply, which validates a candidate and, with PersistencePath set, writes a temp file, fsyncs and renames it. It then invalidates every surviving window. Interactive drags emit dozens of events per second, so the owner thread that renders all windows is blocked on disk fsyncs and repeated full refreshes, making the UI janky.",
+      "suggestion": "Debounce or coalesce geometry captures. Keep only the latest bounds per window in a pending slot and apply it after a short quiet period, or on drag end. Persist geometry on a timer rather than per event.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 104,
+            "end": 105
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "persistence",
+        "debounce"
+      ],
+      "evidence": "w.host.Scene.On(events.WindowResize, capture)\n\t\tw.host.Scene.On(events.Window, capture)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "427d6e9992610d5d",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native geometry capture can feed invalid bounds to SetBounds and cause fatal errors",
+      "message": "Raw native WinSize/Position is forwarded to Session.SetBounds without validation. The session rejects client sizes below 160×96, so a minimized window (often 0×0 or off-screen), a window dragged below the minimum, or a transient zero size will make SetBounds return an error. That error goes through reportError, or into pendingError and Sync's central failure path, which can terminate the application on an ordinary user resize.",
+      "suggestion": "Skip or clamp captured bounds that fall outside the valid range before calling SetBounds. Alternatively, treat geometry-capture failures as non-fatal and do not route them to the fatal error path.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/workbench_interaction.go",
+          "lines": {
+            "start": 129,
+            "end": 132
+          }
+        }
+      ],
+      "tags": [
+        "geometry",
+        "error-handling",
+        "robustness"
+      ],
+      "evidence": "if current.Bounds == b {\n\t\treturn nil\n\t}\n\treturn w.Group.Apply(func(s *workbench.Session) error { return s.SetBounds(w.SessionWindow, b) })",
+      "fix": {
+        "before": "if current.Bounds == b {\n\t\treturn nil\n\t}",
+        "after": "if b.Width \u003c 160 || b.Height \u003c 96 || b.Width \u003e 16384 || b.Height \u003e 16384 {\n\t\t// Transient native geometry (minimized or tiny windows) is outside the\n\t\t// session's valid range; ignore it rather than failing the application.\n\t\treturn nil\n\t}\n\tif current.Bounds == b {\n\t\treturn nil\n\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 149321,
+    "totalMs": 66250
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 15,
+    "bytes": 87130,
+    "chunks": 6,
+    "llmCalls": 11,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 83988,
+        "output": 20779,
+        "costUSD": 0.375766
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 5,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

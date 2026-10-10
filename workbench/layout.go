@@ -249,6 +249,10 @@ func (w *Workspace) Save(path string) error {
 	if err != nil {
 		return err
 	}
+	return saveBytes(path, data)
+}
+
+func saveBytes(path string, data []byte) error {
 	f, err := os.CreateTemp(filepath.Dir(path), ".vellum-layout-*")
 	if err != nil {
 		return err
