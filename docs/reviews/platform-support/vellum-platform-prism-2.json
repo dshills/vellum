@@ -1,0 +1,186 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7edf65a54045c0e8c632c508c2e97d1d",
+  "repo": {
+    "root": "/private/tmp/vellum-platform-review-final",
+    "head": "fed69c37385bf400500fe8b538d07528bd396bdb",
+    "branch": "codex/platform-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8fd2692b7f007630",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "No job timeouts on GUI/runtime smoke jobs",
+      "message": "The Linux job runs a GPU/clipboard/chooser runtime smoke under Xvfb and D-Bus. A stuck GTK chooser, clipboard call or window loop would hold the runner for the 6-hour default. The Windows and qualification jobs have the same gap. The qualification job is the riskiest because it uses a self-hosted interactive desktop.",
+      "suggestion": "Add `timeout-minutes` (for example 30) to each job, with a longer limit for the self-hosted qualification job.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": ".github/workflows/platforms.yml",
+          "lines": {
+            "start": 16,
+            "end": 16
+          }
+        }
+      ],
+      "tags": [
+        "ci",
+        "reliability"
+      ],
+      "evidence": "    runs-on: ubuntu-24.04",
+      "fix": {
+        "before": "    runs-on: ubuntu-24.04",
+        "after": "    runs-on: ubuntu-24.04\n    timeout-minutes: 30"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "9144d9d4f6411cb5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Stderr diagnostic buffer overflow aborts the helper instead of truncating",
+      "message": "The same limitedBuffer is used for stderr (8 KiB cap) and stdout. When a write would exceed the cap it returns an error, so exec closes the pipe and the helper gets EPIPE/SIGPIPE on stderr. A helper such as zenity that emits more than 8 KiB of GTK warnings could be killed or reported as failed even though it would otherwise succeed. A diagnostic buffer should truncate, not fail the process. Stdout overflow is a different case, where an error is appropriate.",
+      "suggestion": "Use a separate truncating writer for stderr that keeps the first N bytes and discards the rest while always returning len(p), nil. Keep the erroring behavior only for stdout.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/platformio/process.go",
+          "lines": {
+            "start": 42,
+            "end": 47
+          }
+        }
+      ],
+      "tags": [
+        "exec",
+        "stderr",
+        "robustness"
+      ],
+      "evidence": "if len(p) \u003e b.max-b.Len() {\n\t\treturn 0, ErrOutputLimit\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a9925fd02b354acc",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Text I/O uses locale default encoding for Go sources",
+      "message": "read_text() and write_text() use the locale's default encoding. On Windows that is usually cp1252, so Go sources containing non-ASCII UTF-8 characters (the docs mention Unicode clipboard tests) can fail to decode or be corrupted. The script claims to run on the current host, including Windows. The same problem applies to the read_text()/write_text() calls in the per-target loop.",
+      "suggestion": "Pass encoding=\"utf-8\" to every read_text()/write_text() call, or copy the files as bytes and strip the first line there.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/check-platform-fixture.py",
+          "lines": {
+            "start": 38,
+            "end": 38
+          }
+        }
+      ],
+      "tags": [
+        "portability",
+        "encoding",
+        "windows"
+      ],
+      "evidence": "(root / name).write_text(without_build_constraint((DRIVER / name).read_text()))",
+      "fix": {
+        "before": "(root / name).write_text(without_build_constraint((DRIVER / name).read_text()))",
+        "after": "(root / name).write_text(without_build_constraint((DRIVER / name).read_text(encoding=\"utf-8\")), encoding=\"utf-8\")"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 87604,
+    "totalMs": 31151
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 25,
+    "bytes": 66506,
+    "chunks": 5,
+    "llmCalls": 8,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 51761,
+        "output": 11878,
+        "costUSD": 0.222302
+      }
+    ],
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 3,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "b74215ad13ca51e9",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Empty workflow-lint evidence record",
+        "message": "The README says the workflow passes local `actionlint`. The raw record `workflow-lint.txt` added as evidence is empty, so it cannot support that claim. Empty output may mean a clean run, but the file does not show the tool, version or exit status. `source-hashes.json` also records a workflow hash that cannot be checked against this file.",
+        "suggestion": "Record the actionlint version, command and exit status (for example 'actionlint 1.x: exit 0') in the file, or drop the file and the claim.",
+        "confidence": 0.45,
+        "locations": [
+          {
+            "path": "docs/reports/platform-support/workflow-lint.txt",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "evidence"
+        ],
+        "evidence": "+++ b/docs/reports/platform-support/workflow-lint.txt",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    }
+  ],
+  "suppressed": []
+}

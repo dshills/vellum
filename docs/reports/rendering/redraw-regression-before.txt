@@ -1,0 +1,5 @@
+--- FAIL: TestVellumRedrawRejectsRetiredBorrowedTextureBeforeGPUAccess (0.00s)
+    drawer_vellum_redraw_test.go:20: retired borrowed batch reached GPU replay: runtime error: invalid memory address or nil pointer dereference
+FAIL
+FAIL	cogentcore.org/core/gpu/gpudraw	0.285s
+FAIL

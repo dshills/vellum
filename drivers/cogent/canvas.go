@@ -191,8 +191,13 @@ func (g *GPUCanvas) report(err error) {
 	}
 }
 
-// Snapshot explicitly reads back a live GPU frame. Call only on the UI owner;
-// ordinary rendering and navigation do not perform readback.
+// Snapshot reads back a live GPU frame using the allocation from the last
+// completed canvas Render and the current Model camera. Call while holding the
+// Application UI owner (Do/PostWait); that owner may drain on another window's
+// native event thread. Snapshot does not wait for a pending native layout: callers
+// requiring a newly requested size must first wait for Render to publish it to
+// Model.View. It never reads raw widget geometry. Ordinary rendering/navigation
+// do not perform readback.
 func (g *GPUCanvas) Snapshot() (*image.NRGBA, error) {
 	if g == nil || g.widget == nil {
 		return nil, ErrFrameNotReady
@@ -211,8 +216,9 @@ func (g *GPUCanvas) Snapshot() (*image.NRGBA, error) {
 	if err := g.Sync(g.widget); err != nil {
 		return nil, err
 	}
-	g.size()
-	g.syncCamera()
+	// Render captures the viewport on the owner after native layout. Snapshot
+	// may drain through a different window: its native GPU lock does not own
+	// this widget's layout geometry. Sync applies the current Model camera to that captured allocation.
 	img := g.widget.XYZ.RenderGrabImage()
 	if img == nil {
 		return nil, fmt.Errorf("canvas: GPU readback failed")

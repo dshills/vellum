@@ -1,0 +1,212 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "15f6aed5625662ccdafc6c79b758a7ad",
+  "repo": {
+    "root": "/private/tmp/vellum-platform-review-final",
+    "head": "fed69c37385bf400500fe8b538d07528bd396bdb",
+    "branch": "codex/platform-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1a0b2058f41382ff",
+      "severity": "medium",
+      "category": "security",
+      "title": "Checkout on self-hosted runner persists credentials",
+      "message": "The qualification job runs on a persistent self-hosted interactive desktop. `actions/checkout` persists the GITHUB_TOKEN in `.git/config` by default, and the token stays on that machine's workspace after the job. The job also runs repository scripts (`prepare.sh`, `check-platform.sh`) that don't need the credential.",
+      "suggestion": "Set `persist-credentials: false` on checkout for self-hosted jobs. Also consider pinning third-party actions to commit SHAs.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": ".github/workflows/platforms.yml",
+          "lines": {
+            "start": 69,
+            "end": 70
+          }
+        }
+      ],
+      "tags": [
+        "ci",
+        "self-hosted",
+        "credentials",
+        "location-corrected"
+      ],
+      "evidence": "      - uses: actions/checkout@v4\n      - name: Full target release gate on prepared interactive desktop",
+      "fix": {
+        "before": "      - uses: actions/checkout@v4\n      - name: Full target release gate on prepared interactive desktop",
+        "after": "      - uses: actions/checkout@v4\n        with:\n          persist-credentials: false\n      - name: Full target release gate on prepared interactive desktop"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6e5bfeca4dc58a1c",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Post-fix regression evidence comes from cached test results",
+      "message": "The \"after\" log is cited as evidence that the fix works, but the gpudraw and composer results are Go test cache hits. They were not run when this log was captured. The log also does not show -race, although the README calls these race tests. The before/after comparison therefore does not show the regression test passing on the fixed code.",
+      "suggestion": "Re-run with `go test -race -count=1` for gpudraw, composer and core, and replace the log with that output. Make sure the command line is recorded.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/rendering/redraw-regression-after.txt",
+          "lines": {
+            "start": 1,
+            "end": 2
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "test-cache",
+        "race"
+      ],
+      "evidence": "ok  \tcogentcore.org/core/gpu/gpudraw\t(cached)\nok  \tcogentcore.org/core/system/composer\t(cached)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "f3383f913b24b8e1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Snapshot drops size/camera sync and may read stale viewport",
+      "message": "Snapshot no longer calls size() or syncCamera() before RenderGrabImage. If the widget was resized or its camera changed after the last Render pass, the readback uses the previous viewport and camera. That can give a stale-sized or stale-camera image, which matters for the resize-replay checks. The comment's claim that Sync already applies the captured camera is not verifiable here. The remaining code also still touches widget state under a lock that, by the new comment, does not own the layout geometry. Sync and the g.widget.XYZ accesses are therefore not shown to be race-free. The doc comment still says to call only on the UI owner, which contradicts the new comment about draining through a different window.",
+      "suggestion": "Add a test that resizes the canvas and then calls Snapshot, asserting the image dimensions and camera. Confirm Sync alone refreshes both. Also reconcile the doc comment with the cross-window drain behavior, or marshal the readback onto the widget's owner window so no unsynchronized layout state is read.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/canvas.go",
+          "lines": {
+            "start": 214,
+            "end": 216
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "rendering",
+        "snapshot"
+      ],
+      "evidence": "// Render captures the viewport on the owner after native layout. Snapshot\n\t// may drain through a different window: its native GPU lock does not own\n\t// this widget's layout geometry. Sync already applies the captured camera.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "aec721c5f38d29b0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Window registry queried from a non-UI goroutine",
+      "message": "The worker goroutine calls core.TheApp.WindowByName directly from a polling loop. This reads Cogent's window list from off the main/UI thread while windows are being opened and closed on it. The rest of the smoke test routes owner and native access through a.Do or PostWait. The unsynchronized read can race, giving flaky results or a crash. The same pattern appears again after CloseWindow (line 276).",
+      "suggestion": "Perform the lookup inside the owner/main thread, e.g. `wait(func() bool { var ok bool; if err := a.Do(func() { ok = secondViews.Load() \u003e 0 \u0026\u0026 core.TheApp.WindowByName(second.Title) != nil }); err != nil { return true }; return ok })`, and do the same for the first window after CloseWindow.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/platform-smoke/main.go",
+          "lines": {
+            "start": 254,
+            "end": 254
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "race",
+        "thread-safety",
+        "location-corrected"
+      ],
+      "evidence": "if err := wait(func() bool { return secondViews.Load() \u003e 0 \u0026\u0026 core.TheApp.WindowByName(second.Title) != nil }); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 100316,
+    "totalMs": 23237
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 43,
+    "bytes": 112215,
+    "chunks": 8,
+    "llmCalls": 11,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 72170,
+        "output": 12712,
+        "costUSD": 0.27146
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "4fd625479ae24a7b",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Smoke log does not substantiate the claims made in the README",
+        "message": "The README says each run had \"six snapshot/resize/readback cycles\" and that the smoke \"passed\". The log is one JSON line with \"complete\":false and a list of check names. It records no cycle count, no race-build marker and no explicit pass status. The README's figures cannot be verified from the log it links.",
+        "suggestion": "Make the smoke output include the cycle count, the build flags (race) and an explicit result. Alternatively, drop the unverifiable claims from the README or attach the raw command and output.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reports/rendering/redraw-native-smoke-1.txt",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "docs-accuracy"
+        ],
+        "evidence": "\"second window GPU snapshot/resize replay before teardown\",\"second window GPU readback and resize replay after first teardown\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/rendering/redraw-native-smoke-1.txt"
+    }
+  ],
+  "suppressed": []
+}

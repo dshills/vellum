@@ -1,0 +1,99 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6b0b8fffc78a872b3182e8d691962211",
+  "repo": {
+    "root": "/private/tmp/vellum-platform-review-final",
+    "head": "fed69c37385bf400500fe8b538d07528bd396bdb",
+    "branch": "codex/platform-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1357aff11299f5ae",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Cancellation detection breaks when zenity emits any stderr warning",
+      "message": "A zenity cancel (exit code 1) is only treated as cancellation when stderr is completely empty. GTK commonly writes harmless warnings such as Gtk-Message or theme/dbus notices to stderr. A user who cancels in that case gets a hard ProcessError instead of app.ErrCanceled. This contradicts the design in `truncatingBuffer`, which says warnings must not turn a chooser result into a failure.",
+      "suggestion": "Treat exit code 1 as cancellation unless the diagnostic matches a known failure pattern, such as \"cannot open display\" or \"Unable to init server\". Alternatively, ignore GTK warning-prefixed lines when checking whether the diagnostic is empty. Add a test where the helper exits 1 with a non-fatal warning on stderr.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/platformio/process.go",
+          "lines": {
+            "start": 154,
+            "end": 154
+          }
+        }
+      ],
+      "tags": [
+        "linux",
+        "zenity",
+        "cancellation",
+        "location-corrected"
+      ],
+      "evidence": "if errors.As(err, \u0026exit) \u0026\u0026 exit.ExitCode() == 1 \u0026\u0026 errors.As(err, \u0026transport) \u0026\u0026 transport.Diagnostic == \"\" {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 37255,
+    "totalMs": 23228
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 25,
+    "bytes": 69062,
+    "chunks": 5,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 30719,
+        "output": 4549,
+        "costUSD": 0.106928
+      }
+    ],
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

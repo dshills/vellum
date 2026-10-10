@@ -151,6 +151,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				fail(fmt.Errorf("cogent: reconciliation returned no root"))
 				return
 			}
+			nativeRefreshServices(w.body)
 			bindControlWake(w.root, func(e events.Event) { custom(w, e) }, d.OnError)
 			flushDialogs(w.root)
 			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
@@ -177,6 +178,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					defer w.rootMu.Unlock()
 					stopDeviceLoss(w)
 					closeAccessibility(w)
+					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
 					// NewBody assigns a Scene parent before adding the body to
 					// its children, so Delete cannot find an unlaunched body.
@@ -215,6 +217,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w := &nativeWindow{window: spec}
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
+				nativeMountServices(w.body, services)
 				w.body.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(spec.Width), units.Dp(spec.Height)); s.Grow.Set(1, 1) })
 				w.host = newAccessibilityHost(w)
 				w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
@@ -298,7 +301,13 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				}
 				stopDeviceLoss(w)
 				a.CloseWindow(spec.ID)
-				cleanup := func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); closeAccessibility(w); disposeControlTree(w.root) }
+				cleanup := func() {
+					w.rootMu.Lock()
+					defer w.rootMu.Unlock()
+					closeAccessibility(w)
+					nativeUnmountServices(w.body)
+					disposeControlTree(w.root)
+				}
 				if err := a.Do(cleanup); err != nil {
 					cleanup()
 				}

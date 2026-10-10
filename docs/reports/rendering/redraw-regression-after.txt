@@ -1,0 +1,9 @@
+Command: go test -race -count=1 ./gpu/gpudraw ./system/composer ./core -run TestVellumRedraw|TestVellumComposer|TestVellumUnsafeResizeReplay
+Canonical base: 89cb930d570d2b03b6225b4c9cecc3aa1f8ebb56
+Patch19 SHA256: bb07a31f8516da9fd643ec4fe5e616322d3845f0914e22e832d3d67a1d66eddb
+# cogentcore.org/core/core.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	cogentcore.org/core/gpu/gpudraw	1.592s
+ok  	cogentcore.org/core/system/composer	1.349s
+ok  	cogentcore.org/core/core	1.541s
+Exit: 0

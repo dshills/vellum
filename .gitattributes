@@ -1,2 +1,6 @@
 # Preserve hash-locked unified-diff context (leading spaces before Go tabs).
 drivers/cogent/native/patches/**/*.patch -whitespace
+
+# Native preparation must receive stable LF bytes on Windows checkouts.
+*.sh text eol=lf
+*.patch text eol=lf

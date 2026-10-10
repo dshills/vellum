@@ -1,0 +1,38 @@
+Historical platform smoke diagnostic-result follow-up
+
+This follow-up changes post-Run error collection only. The two live GPU logs
+remain acceptance evidence for the preceding graphics CLI source:
+3286bcac14d3d0dc7f844e4a23cdea708a496831bd5123482aa5785b4ac07adb.
+At that follow-up no native graphics rerun was claimed. The later final bounded-resize runs in native-smoke-1.txt and native-smoke-2.txt include this error-collection fix; resize-followup.txt records their current source consistency checks.
+
+A ready worker result is collected without blocking after Run and errors.Join
+preserves native and worker failures together. A failed native Run never waits
+for pending worker work. Only successful Run waits for worker completion or
+caller cancellation. Focused tests cover all-nil, native-only, worker-only,
+combined failures, worker cancellation alongside native failure, ready result
+with canceled caller, pending native failure, pending caller cancellation and
+pending worker success/failure. The waiting branch is exercised via a context
+observation barrier, without sleeps.
+
+Follow-up main.go SHA256: accbf933227322812c10246bb555790ed44e90dfbe07ea6bd4e2756495a8304e
+Follow-up main_test.go SHA256: f82a472b3d120e13a306253c21adf410eac29b1e52abc1a6b4fbb67acbd71990
+
+Command: go test -C drivers/cogent -race -count=1 ./cmd/platform-smoke
+Working directory: /Users/dshills/Development/projects/Vellum
+Environment: VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh
+# example.com/vellum/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent/cmd/platform-smoke	1.884s
+exit_status: 0
+
+Command: go vet -C drivers/cogent . ./cmd/platform-smoke
+Working directory: /Users/dshills/Development/projects/Vellum
+Environment: VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh
+exit_status: 0
+
+Command: go build -C drivers/cogent -race -o /private/tmp/vellum-platform-smoke-diagnostics ./cmd/platform-smoke
+Working directory: /Users/dshills/Development/projects/Vellum
+Environment: VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh
+# example.com/vellum/cogent/cmd/platform-smoke
+ld: warning: ignoring duplicate libraries: '-lobjc'
+exit_status: 0

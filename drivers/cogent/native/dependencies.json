@@ -122,6 +122,17 @@
               "sha256": "67128034e301fdfdbc13b2f024faffacd771cbaca3f0f392c082c2c2366e6c41"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/rendercache",
+          "inputs": "native/patches/rendercache/original-hashes.json",
+          "outputs": "native/patches/rendercache/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/rendercache/0019-borrowed-texture-redraw.patch",
+              "sha256": "bb07a31f8516da9fd643ec4fe5e616322d3845f0914e22e832d3d67a1d66eddb"
+            }
+          ]
         }
       ]
     },

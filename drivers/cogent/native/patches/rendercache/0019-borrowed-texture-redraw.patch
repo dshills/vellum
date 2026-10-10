@@ -1,0 +1,235 @@
+--- a/gpu/gpudraw/drawer.go
++++ b/gpu/gpudraw/drawer.go
+@@ -137,11 +137,36 @@
+ 	dw.opList = dw.opList[:0]
+ }
+ 
+-// Redraw re-renders the last draw
++// CanRedraw reports whether the previous batch can be replayed without
++// re-gathering its sources. UseTexture borrows its owner's GPU handles: that
++// owner can release or replace them between batches, even when replay itself
++// holds the native window lock. Go images are uploaded into owned textures.
++func (dw *Drawer) CanRedraw() bool {
++	dw.Lock()
++	defer dw.Unlock()
++	return dw.canRedraw()
++}
++
++// canRedraw requires Drawer ownership. images.used survives End and is reset
++// only by Start, so it describes the entire previous draw batch.
++func (dw *Drawer) canRedraw() bool {
++	if dw.lastOpN == 0 {
++		return false
++	}
++	for _, image := range dw.images.used {
++		if _, borrowed := image.img.(*gpu.Texture); borrowed {
++			return false
++		}
++	}
++	return true
++}
++
++// Redraw re-renders the last draw when its textures are owned by the drawer.
++// Callers should use CanRedraw to request fresh composition for borrowed views.
+ func (dw *Drawer) Redraw() {
+ 	dw.Lock()
+ 	defer dw.Unlock()
+-	if dw.lastOpN == 0 {
++	if !dw.canRedraw() {
+ 		return
+ 	}
+ 	dw.opList = dw.opList[:dw.lastOpN]
+--- a/system/composer/composerdrawer.go
++++ b/system/composer/composerdrawer.go
+@@ -36,3 +36,12 @@
+ func (cd *ComposerDrawer) Redraw() {
+ 	cd.Drawer.Redraw()
+ }
++
++// CanRedraw exposes optional drawer lifetime admission without changing the
++// Composer or Drawer contracts. Existing drawers retain their replay behavior.
++func (cd *ComposerDrawer) CanRedraw() bool {
++	if drawer, ok := cd.Drawer.(interface{ CanRedraw() bool }); ok {
++		return drawer.CanRedraw()
++	}
++	return true
++}
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -693,10 +693,15 @@
+ 		if !w.SystemWindow.Lock() {
+ 			return
+ 		}
+-		w.SystemWindow.Composer().Redraw()
++		redrawn := redrawCached(w.SystemWindow.Composer())
+ 		w.SystemWindow.Unlock()
+-		w.requestPaintAfter(100*time.Millisecond - sinceResize)
+-		return
++		if redrawn {
++			w.requestPaintAfter(100*time.Millisecond - sinceResize)
++			return
++		}
++		// Borrowed texture views cannot outlive their source owner. Fall
++		// through to fresh gather/compose under renderContext ownership.
++		// winRenderSkipped forces a frame even when no model changed.
+ 	}
+ 
+ 	rc := w.renderContext()
+@@ -887,3 +892,13 @@
+ 		}
+ 	}
+ }
++
++// redrawCached requires the native window lock. A drawer with borrowed GPU
++// textures must re-gather current sources instead of replaying stale bindings.
++func redrawCached(cp composer.Composer) bool {
++	if cache, ok := cp.(interface{ CanRedraw() bool }); ok && !cache.CanRedraw() {
++		return false
++	}
++	cp.Redraw()
++	return true
++}
+--- /dev/null
++++ b/gpu/gpudraw/drawer_vellum_redraw_test.go
+@@ -0,0 +1,53 @@
++package gpudraw
++
++import (
++	"image"
++	"image/draw"
++	"testing"
++
++	"cogentcore.org/core/gpu"
++)
++
++// The minimal cached batch has no live GPU system deliberately: rejection must
++// precede any backend access after the owner has retired its borrowed texture.
++func TestVellumRedrawRejectsRetiredBorrowedTextureBeforeGPUAccess(t *testing.T) {
++	tx := &gpu.Texture{}
++	dw := &Drawer{opList: make([]draw.Op, 0, 1), lastOpN: 1}
++	dw.images.init()
++	dw.images.use(tx)
++	tx.Release()
++	defer func() {
++		if failure := recover(); failure != nil {
++			t.Errorf("retired borrowed batch reached GPU replay: %v", failure)
++		}
++	}()
++	dw.Redraw()
++}
++
++func TestVellumRedrawEligibilityFollowsLastBatch(t *testing.T) {
++	dw := &Drawer{lastOpN: 1}
++	dw.images.init()
++	tx := &gpu.Texture{}
++	dw.images.use(tx)
++	if dw.CanRedraw() {
++		t.Fatal("borrowed texture eligible for cached redraw")
++	}
++	// End truncates opList, not images.used. That retained batch must remain
++	// ineligible even when its owner has already released the texture.
++	dw.opList = nil
++	tx.Release()
++	if dw.CanRedraw() {
++		t.Fatal("End/owner retirement forgot borrowed batch")
++	}
++	// A new independent batch must not permanently inherit a former texture's
++	// lifetime restriction. Stale entries in all are not part of this batch.
++	dw.images.start()
++	dw.images.use(image.NewRGBA(image.Rect(0, 0, 10, 10)))
++	if !dw.CanRedraw() {
++		t.Fatal("new owned raster batch remained ineligible")
++	}
++	dw.lastOpN = 0
++	if dw.CanRedraw() {
++		t.Fatal("empty batch eligible for redraw")
++	}
++}
+--- /dev/null
++++ b/system/composer/composerdrawer_vellum_redraw_test.go
+@@ -0,0 +1,33 @@
++package composer
++
++import "testing"
++
++type vellumRedrawDrawer struct {
++	DrawerBase
++	eligible bool
++	redraws  int
++}
++
++func (d *vellumRedrawDrawer) CanRedraw() bool { return d.eligible }
++func (d *vellumRedrawDrawer) End()            {}
++func (d *vellumRedrawDrawer) Redraw()         { d.redraws++ }
++
++type vellumLegacyDrawer struct{ DrawerBase }
++
++func (d *vellumLegacyDrawer) End()    {}
++func (d *vellumLegacyDrawer) Redraw() {}
++
++func TestVellumComposerPropagatesCachedRedrawAdmission(t *testing.T) {
++	drawer := &vellumRedrawDrawer{}
++	c := &ComposerDrawer{Drawer: drawer}
++	if c.CanRedraw() {
++		t.Fatal("borrowed batch admitted")
++	}
++	drawer.eligible = true
++	if !c.CanRedraw() {
++		t.Fatal("owned batch rejected")
++	}
++	if !(&ComposerDrawer{Drawer: &vellumLegacyDrawer{}}).CanRedraw() {
++		t.Fatal("legacy drawer replay changed")
++	}
++}
+--- /dev/null
++++ b/core/render_vellum_redraw_test.go
+@@ -0,0 +1,49 @@
++package core
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++
++	"cogentcore.org/core/system/composer"
++)
++
++type redrawAdmissionDrawer struct {
++	composer.DrawerBase
++	eligible               bool
++	replays, presentations int
++}
++
++func (d *redrawAdmissionDrawer) CanRedraw() bool { return d.eligible }
++func (d *redrawAdmissionDrawer) Redraw()         { d.replays++ }
++func (d *redrawAdmissionDrawer) End()            { d.presentations++ }
++
++type redrawAdmissionSource struct{ image *image.RGBA }
++
++func (s *redrawAdmissionSource) Draw(cp composer.Composer) {
++	cp.(*composer.ComposerDrawer).Drawer.Copy(image.Point{}, s.image, s.image.Bounds(), draw.Src, composer.Changed)
++}
++
++func TestVellumUnsafeResizeReplayRequiresFreshComposition(t *testing.T) {
++	d := &redrawAdmissionDrawer{DrawerBase: composer.DrawerBase{Image: image.NewRGBA(image.Rect(0, 0, 1, 1))}}
++	cp := &composer.ComposerDrawer{Drawer: d}
++	if redrawCached(cp) || d.replays != 0 {
++		t.Fatal("borrowed resize batch replayed")
++	}
++	// The caller takes the normal gather/compose path on refusal. A fresh
++	// source after replacement reaches the target without any model update.
++	current := image.NewRGBA(image.Rect(0, 0, 1, 1))
++	current.SetRGBA(0, 0, color.RGBA{G: 255, A: 255})
++	cp.Start()
++	cp.Add(&redrawAdmissionSource{image: current}, current)
++	w := &renderWindow{SystemWindow: &contextTestWindow{}}
++	w.renderAsyncOwned(cp)
++	if d.presentations != 1 || d.Image.RGBAAt(0, 0).G != 255 {
++		t.Fatal("fallback did not present replacement source")
++	}
++	d.eligible = true
++	if !redrawCached(cp) || d.replays != 1 {
++		t.Fatal("owned batch resize replay lost")
++	}
++}

@@ -1,0 +1,105 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "2588603805678c491665a86c6e2d477a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a5516810ad25659deb0ecfa2e42552bcf13aac61",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "0beffb6cad476d7f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "First window snapshot is not gated on its Show event",
+      "message": "The shownCanvasProbe comment says owner-posted readback must not run while the native window is still constructing its topology. The smoke waits for secondShown before snapshotting the second window, but firstShown is set and never read. The first window's Snapshot is posted to the owner as soon as Services() is available, so it can pump a window that is still being constructed. That makes the smoke flaky or able to deadlock on slower hosts.",
+      "suggestion": "Call wait(firstShown.Load) before the first snapshot, the same way secondShown is awaited before the second window's snapshot.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/platform-smoke/main.go",
+          "lines": {
+            "start": 261,
+            "end": 261
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "flaky",
+        "native-window",
+        "location-corrected"
+      ],
+      "evidence": "if err := snapshot(firstGPU, firstModel); err != nil {",
+      "fix": {
+        "before": "if err := snapshot(firstGPU, firstModel); err != nil {",
+        "after": "if err := wait(firstShown.Load); err != nil {\n\t\t\tfinish(err)\n\t\t\treturn\n\t\t}\n\t\tif err := snapshot(firstGPU, firstModel); err != nil {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 118335,
+    "totalMs": 32459
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 48,
+    "bytes": 155534,
+    "chunks": 11,
+    "llmCalls": 12,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 122766,
+        "output": 14647,
+        "cachedInput": 9701,
+        "costUSD": 0.392002
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,61 @@
+Final native Show and bounded-resize qualification
+
+Both the first and second windows now wait for actual native canvas Show
+publication before owner-posted GPU readback. Services becoming available is
+insufficient to establish completed native scene topology for the first window.
+Readiness uses the same context-bound error/finish path for both windows.
+
+Resize acceptance requires native pixel geometry equal to the requested size,
+an actual transition from the previous native size, and completed canvas allocation
+changes on every resized axis. Width-only and height-only transitions qualify;
+ignored, clamped, already-requested, stale-axis and missing-allocation cases do not.
+Canvas dimensions exclude labels/insets and can reflow, so only changed axes are
+compared, not exact whole-window-minus-canvas deltas. Each request has its own
+five-second bound within the global timeout, with before/requested/observed failure
+diagnostics. Native Size is read under native.Lock outside the application owner;
+the completed canvas viewport is captured on the application owner.
+
+Both final macOS race runs passed six observed requested resize transitions,
+exact Snapshot dimensions/current-camera pixels, first-window teardown isolation
+and final application shutdown. Raw metadata-bearing evidence is retained at:
+/private/tmp/vellum-platform-shown-live-1.txt
+/private/tmp/vellum-platform-shown-live-2.txt
+Earlier raw source acceptance records remain unmodified at:
+/private/tmp/vellum-platform-resize-live-1.txt
+/private/tmp/vellum-platform-resize-live-2.txt
+/private/tmp/vellum-platform-snapshot-live-1.txt
+/private/tmp/vellum-platform-snapshot-live-2.txt
+No Windows/Linux target runtime or native presentation timing is claimed.
+
+source_sha256: cc5835685a410001cddd0b3cc70d9510898036cd5be31a28bf856b7c57ec1dac  drivers/cogent/canvas.go
+source_sha256: 40f7feead8ae4d5778981bd649ef9e9b0c99d97c2fb1f84d1f70a258a8a00035  drivers/cogent/cmd/platform-smoke/main.go
+source_sha256: 66208c16bb9118e73c9b5d9f1a1d20214059b6ed362b7c5b9eafb3f9326dda99  drivers/cogent/cmd/platform-smoke/main_test.go
+
+Command: go test -C drivers/cogent -race -count=1 ./cmd/platform-smoke
+Working directory: /Users/dshills/Development/projects/Vellum
+Environment: VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh
+# example.com/vellum/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent/cmd/platform-smoke	1.935s
+exit_status: 0
+
+Command: go vet -C drivers/cogent . ./cmd/platform-smoke
+Working directory: /Users/dshills/Development/projects/Vellum
+Environment: VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh
+exit_status: 0
+
+Command: go build -C drivers/cogent -race -o /private/tmp/vellum-platform-smoke-final-shown ./cmd/platform-smoke
+Working directory: /Users/dshills/Development/projects/Vellum
+Environment: VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh
+# example.com/vellum/cogent/cmd/platform-smoke
+ld: warning: ignoring duplicate libraries: '-lobjc'
+exit_status: 0
+
+Source consistency check: compare each emitted source SHA256 with the current file and source-hashes.json; require race=true, smoke event, and exit_status=0.
+PASS docs/reports/platform-support/native-smoke-1.txt: drivers/cogent/canvas.go matches native log, current file and source-hashes.json (cc5835685a410001cddd0b3cc70d9510898036cd5be31a28bf856b7c57ec1dac)
+PASS docs/reports/platform-support/native-smoke-1.txt: drivers/cogent/cmd/platform-smoke/main.go matches native log, current file and source-hashes.json (40f7feead8ae4d5778981bd649ef9e9b0c99d97c2fb1f84d1f70a258a8a00035)
+PASS docs/reports/platform-support/native-smoke-1.txt: drivers/cogent/cmd/platform-smoke/main_test.go matches native log, current file and source-hashes.json (66208c16bb9118e73c9b5d9f1a1d20214059b6ed362b7c5b9eafb3f9326dda99)
+PASS docs/reports/platform-support/native-smoke-2.txt: drivers/cogent/canvas.go matches native log, current file and source-hashes.json (cc5835685a410001cddd0b3cc70d9510898036cd5be31a28bf856b7c57ec1dac)
+PASS docs/reports/platform-support/native-smoke-2.txt: drivers/cogent/cmd/platform-smoke/main.go matches native log, current file and source-hashes.json (40f7feead8ae4d5778981bd649ef9e9b0c99d97c2fb1f84d1f70a258a8a00035)
+PASS docs/reports/platform-support/native-smoke-2.txt: drivers/cogent/cmd/platform-smoke/main_test.go matches native log, current file and source-hashes.json (66208c16bb9118e73c9b5d9f1a1d20214059b6ed362b7c5b9eafb3f9326dda99)
+exit_status: 0

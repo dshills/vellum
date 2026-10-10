@@ -1,0 +1,270 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "301fa5807cbe0e943832a24b99498127",
+  "repo": {
+    "root": "/private/tmp/vellum-platform-review-final",
+    "head": "fed69c37385bf400500fe8b538d07528bd396bdb",
+    "branch": "codex/platform-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "32f8240fc6808a40",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Windows CI may check out shell scripts and patches with CRLF endings",
+      "message": "On windows-2022 runners actions/checkout typically applies core.autocrlf=true, so shell scripts and the patch files that prepare.sh applies can be checked out with CRLF endings. MSYS2 bash then fails with '\\r: command not found' or `patch` rejects hunks. The diff does not show a .gitattributes rule forcing LF for *.sh and *.patch.",
+      "suggestion": "Add a .gitattributes rule such as `*.sh text eol=lf` and `*.patch text eol=lf`. Alternatively, disable CRLF conversion before checkout: `git config --global core.autocrlf false`.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": ".github/workflows/platforms.yml",
+          "lines": {
+            "start": 63,
+            "end": 64
+          }
+        }
+      ],
+      "tags": [
+        "ci",
+        "windows",
+        "line-endings"
+      ],
+      "evidence": "          drivers/cogent/prepare.sh\n          scripts/check-platform.sh",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "66043f17f7f44087",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Smoke report source hash for main.go does not match source-hashes.json",
+      "message": "The smoke report records main.go with sha256 3286bcac..., but source-hashes.json in the same change set lists accbf933... for drivers/cogent/cmd/platform-smoke/main.go. The canvas.go hash matches in both files. So the smoke binary was built from a different main.go than the one being committed. The binary was also built with vcs.modified=true. The native smoke evidence therefore does not show that the committed source passes. That matters because the policy relies on this smoke to confirm Render/Snapshot size and camera behaviour.",
+      "suggestion": "Rebuild the smoke binary from the final committed tree, rerun both native smoke runs and regenerate source-hashes.json from the same tree. Add a check that fails when the source_sha256 lines in the smoke reports disagree with source-hashes.json.",
+      "confidence": 0.85,
+      "locations": [
+        {
+          "path": "docs/reports/platform-support/native-smoke-1.txt",
+          "lines": {
+            "start": 62,
+            "end": 62
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "reproducibility",
+        "stale-artifact"
+      ],
+      "evidence": "source_sha256: 3286bcac14d3d0dc7f844e4a23cdea708a496831bd5123482aa5785b4ac07adb  drivers/cogent/cmd/platform-smoke/main.go",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3c83e6e79677f616",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Resize wait keyed only on viewport width change",
+      "message": "Resize completion is detected only by a change in model.View.Width. If the window manager clamps, ignores or already matches the requested size (tiling WMs, small displays, or a window already at that width), the width never changes. The wait then runs until the global 30s timeout and the smoke fails spuriously. A height-only change is also missed, and the check does not compare against the requested size.",
+      "suggestion": "Wait on a combined width/height change, or on the viewport matching the size the native window reports after SetSize. Alternatively, treat an unchanged size as acceptable when the native window already reports the requested size, and bound each resize with its own shorter timeout.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/platform-smoke/main.go",
+          "lines": {
+            "start": 222,
+            "end": 222
+          }
+        }
+      ],
+      "tags": [
+        "flaky-test",
+        "resize",
+        "location-corrected"
+      ],
+      "evidence": "ownerErr = a.Do(func() { changed = model.View.Width != before })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "eb41c8cdafef020d",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Final shutdown assertion races with asynchronous close",
+      "message": "The first window's teardown is awaited via IsClosed before its lifetime is checked. The final shutdown check runs immediately after CloseWindow(\"second\"). Native window close and application shutdown are asynchronous, so the window context and the application context may not yet be cancelled. That makes the smoke test flaky or falsely failing on slower platforms.",
+      "suggestion": "Poll with wait() until both the second window context and the application context are cancelled, or until the timeout, before judging shutdown.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/platform-smoke/main.go",
+          "lines": {
+            "start": 348,
+            "end": 348
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "flaky-test",
+        "shutdown",
+        "location-corrected"
+      ],
+      "evidence": "if secondLife.Err() == nil || a.Context().Err() == nil {",
+      "fix": {
+        "before": "if secondLife.Err() == nil || a.Context().Err() == nil {\n\t\t\tfinish(fmt.Errorf(\"final window did not close application\"))\n\t\t\treturn\n\t\t}",
+        "after": "if err := wait(func() bool { return secondLife.Err() != nil \u0026\u0026 a.Context().Err() != nil }); err != nil {\n\t\t\tfinish(fmt.Errorf(\"final window did not close application: %w\", err))\n\t\t\treturn\n\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "02d9fb9c42f24990",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Empty extension accepted by ValidateFileOptions",
+      "message": "An empty extension string passes validation because the inner loop never runs. The Linux adapter then emits the pattern `*.` and the Windows script builds the same filter. That filter matches only names ending in a dot, so the chooser hides the user's files, or hides every file when it is the only entry.",
+      "suggestion": "Reject empty extensions in ValidateFileOptions, and add a test case for it.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/platformio/process.go",
+          "lines": {
+            "start": 105,
+            "end": 106
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "input",
+        "location-corrected"
+      ],
+      "evidence": "for _, ext := range o.Extensions {\n\t\tfor _, r := range ext {",
+      "fix": {
+        "before": "for _, ext := range o.Extensions {\n\t\tfor _, r := range ext {",
+        "after": "for _, ext := range o.Extensions {\n\t\tif ext == \"\" {\n\t\t\treturn fmt.Errorf(\"unsupported empty file extension\")\n\t\t}\n\t\tfor _, r := range ext {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 126361,
+    "totalMs": 38094
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 46,
+    "bytes": 144207,
+    "chunks": 10,
+    "llmCalls": 13,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 102667,
+        "output": 17528,
+        "cachedInput": 21244,
+        "costUSD": 0.380614
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 5,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "ab4e99b7d20f4ba8",
+        "severity": "medium",
+        "category": "testing",
+        "title": "Workflow lint report is empty and gives no verification evidence",
+        "message": "workflow-lint.txt is added as an empty file. It has no command, no tool version and no exit status, unlike the other reports (for example preparation-tests.txt records the command and 'Exit: 0'). An empty file cannot show that the workflow was linted or that the lint passed. It looks like the lint output was lost or never captured.",
+        "suggestion": "Record the lint command, tool version, output and exit status, in the same format as the other reports. If no lint was run, drop the file or mark it as not run.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/platform-support/workflow-lint.txt",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "empty-report"
+        ],
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    },
+    {
+      "finding": {
+        "id": "e2d651b05ad49713",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Check-then-replay is not atomic; Redraw can silently no-op after CanRedraw reports true",
+        "message": "redrawCached calls CanRedraw and then Redraw as two separate steps. Drawer.Redraw re-checks canRedraw under its own lock and silently returns when it fails, with no result. If the drawer's batch state changes between the two calls, Redraw does nothing, yet redrawCached still returns true. The caller then skips the fresh gather/compose fallback and schedules another paint, so a borrowed-texture batch is never redrawn and the window can show stale content.",
+        "suggestion": "Make the admission check and the replay a single atomic operation under the Drawer lock. For example, add a `TryRedraw() bool` that returns false when the batch is not eligible, and have ComposerDrawer and redrawCached use its result instead of treating Redraw as always successful.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/rendercache/0019-borrowed-texture-redraw.patch",
+            "lines": {
+              "start": 233,
+              "end": 235
+            }
+          }
+        ],
+        "tags": [
+          "race",
+          "toctou",
+          "redraw"
+        ],
+        "evidence": "cp.Redraw()\n\treturn true",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/rendercache/0019-borrowed-texture-redraw.patch"
+    }
+  ],
+  "suppressed": []
+}

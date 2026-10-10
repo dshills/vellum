@@ -1,0 +1,58 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "069fe4c14290525d57350125d6518b66",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "a5516810ad25659deb0ecfa2e42552bcf13aac61",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 39776,
+    "totalMs": 22522
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 49,
+    "bytes": 158890,
+    "chunks": 11,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 8,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 34318,
+        "output": 4607,
+        "cachedInput": 10046,
+        "costUSD": 0.114706
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

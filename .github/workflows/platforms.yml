@@ -1,0 +1,81 @@
+name: Platform adapters
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      qualification_target:
+        description: Run full qualification on an interactive self-hosted target (fails on documented missing adapters)
+        type: choice
+        options: [none, Windows, Linux]
+        default: none
+permissions:
+  contents: read
+jobs:
+  linux-x11:
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: echo "VELLUM_CACHE_DIR=$RUNNER_TEMP/vellum-go-cache" >> "$GITHUB_ENV"
+      - name: X11, Vulkan software driver and native GTK chooser dependencies
+        run: sudo apt-get update && sudo apt-get install -y patch xvfb zenity dbus-x11 libgl1-mesa-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libxxf86vm-dev libwayland-dev libxkbcommon-dev mesa-vulkan-drivers
+      - run: drivers/cogent/prepare.sh
+      - name: Build/unit tests and X11 software-GPU runtime smoke
+        run: dbus-run-session -- xvfb-run -a scripts/check-platform.sh --runtime --clipboard-write
+      - name: Record scope
+        run: echo 'Xvfb/Mesa smoke covers X11 fixtures only; hardware, IME, AT-SPI and native Wayland remain release gates.' >> "$GITHUB_STEP_SUMMARY"
+  windows-build:
+    timeout-minutes: 45
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          path-type: inherit
+          install: patch mingw-w64-ucrt-x86_64-gcc
+      - name: Build and unit tests (no interactive desktop qualification)
+        shell: msys2 {0}
+        run: |
+          export VELLUM_CACHE_DIR="$(cygpath -m "$RUNNER_TEMP")/vellum-go-cache"
+          export CC=gcc
+          export CGO_ENABLED=1
+          drivers/cogent/prepare.sh
+          scripts/check-platform.sh
+      - name: Record scope
+        shell: bash
+        run: echo 'Windows hosted CI builds/tests adapters; no interactive GPU, chooser, TSF or UI Automation runtime qualification is claimed.' >> "$GITHUB_STEP_SUMMARY"
+  qualification:
+    if: github.event_name == 'workflow_dispatch' && inputs.qualification_target != 'none'
+    timeout-minutes: 30
+    runs-on: [self-hosted, '${{ inputs.qualification_target }}']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Full target release gate on prepared interactive desktop
+        shell: bash
+        run: |
+          export VELLUM_CACHE_DIR="$RUNNER_TEMP/vellum-go-cache"
+          drivers/cogent/prepare.sh
+          scripts/check-platform.sh --qualification

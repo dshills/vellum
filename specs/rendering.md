@@ -58,3 +58,33 @@ accepted as no presentation for that attempt; exposure/input/resize requests the
 next frame. The acquired surface texture and its view are retained through submission
 and presentation, then both references are released. Synthetic surface results test bounded retry/yield,
 and actual race-instrumented resize/minimize/restore verifies the integration.
+
+## Cached resize replay and borrowed texture lifetime
+
+A GPU drawer can replay a previous composition only when all texture bindings
+are owned by that drawer. Direct-render textures passed through UseTexture are
+borrowed from their canvas owner; resize, explicit Snapshot readback and canvas
+retirement may replace or release those views between complete draw batches.
+Native window locking serializes each batch with mutation but cannot extend a
+view's lifetime across batches.
+
+The drawer exposes optional CanRedraw admission and rejects borrowed batches
+before entering the GPU replay path. ComposerDrawer propagates that admission.
+The native resize shortcut falls through to fresh gather and composition under
+the renderContext when replay is refused, even if the model is unchanged. This
+uses current direct-source lifetime checks rather than reusing cached bindings;
+a later raster-only batch can use the cached resize shortcut again. This policy
+may do more composition work during canvas resize; it does not add a ticker.
+
+Snapshot's caller holds the Application UI owner through Do/PostWait; this is
+application model ownership, not a requirement to run on the source window's
+native event thread. Snapshot uses the GPU allocation and viewport last published
+by the completed canvas Render, and applies the current accepted Model center/zoom
+through Sync. It must not read raw widget geometry: another native window's event
+thread may drain the application mailbox while the source window lays out. The
+native GPU mutex protects textures during readback, not that separate layout.
+
+Snapshot does not flush an outstanding native resize. A caller needing a newly
+requested size waits for Render to update Model.View; then image dimensions match
+that completed owner viewport. An immediate owner-held center/zoom edit is
+reflected in Snapshot without waiting for another native Render callback.

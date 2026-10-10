@@ -1,0 +1,181 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e9e20ba9004afb67d4de090046f22dd8",
+  "repo": {
+    "root": "/private/tmp/vellum-platform-review-final",
+    "head": "fed69c37385bf400500fe8b538d07528bd396bdb",
+    "branch": "codex/platform-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ffebf0adbb5f15f3",
+      "severity": "medium",
+      "category": "security",
+      "title": "Workflow does not restrict GITHUB_TOKEN permissions",
+      "message": "The workflow has no `permissions` block, so the GITHUB_TOKEN gets the repository or org default scopes, which may include write access. The jobs run build scripts and `prepare.sh`, and the qualification job runs on persistent self-hosted machines. Granting more token scope than needed raises the impact of any compromised step or dependency.",
+      "suggestion": "Add a top-level `permissions: contents: read`, and widen it per job only if a job needs more.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": ".github/workflows/platforms.yml",
+          "lines": {
+            "start": 13,
+            "end": 13
+          }
+        }
+      ],
+      "tags": [
+        "ci",
+        "least-privilege",
+        "github-actions"
+      ],
+      "evidence": "jobs:\n  linux-x11:",
+      "fix": {
+        "before": "jobs:\n  linux-x11:",
+        "after": "permissions:\n  contents: read\njobs:\n  linux-x11:"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d783b52517df8dad",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Data race on `evidence` between the smoke goroutine and main",
+      "message": "The helper goroutine appends to `evidence.Checks`, while the main goroutine reads and JSON-encodes `evidence` once `a.Run` returns. The only synchronization is the `result` channel, and it is bypassed when `a.Run` returns a non-nil error or when `ctx.Done()` wins the select. In those cases the goroutine may still be mutating the slice during `json.NewEncoder(os.Stdout).Encode(evidence)`, which is a data race. It can corrupt the failure report that exists to diagnose the problem, and it fails under `-race`.",
+      "suggestion": "Do not share `evidence` across goroutines. Send check names over a mutex-guarded recorder or a channel. Alternatively, make the goroutine own the evidence and hand back a completed copy through `result`, and wait for the goroutine to exit (for example with a done channel) before encoding the report on the failure path.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/platform-smoke/main.go",
+          "lines": {
+            "start": 154,
+            "end": 154
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "evidence.Checks = append(evidence.Checks, \"first window GPU pixel readback\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4fa1e25d0c2844b7",
+      "severity": "medium",
+      "category": "security",
+      "title": "Extension validation applies only to Linux; Windows filter built from unvalidated extensions",
+      "message": "The Linux path restricts extensions to [A-Za-z0-9_-] so they cannot act as globs or filter separators. The Windows script has no such restriction in this diff. Extensions are concatenated into the Windows Forms `Filter` string, where `|` and `;` are structural. An extension containing them could corrupt the filter, or throw ArgumentException if the pairs end up malformed. The comment on LinuxFileArgs says this punctuation is deliberately restricted, so the two platforms behave inconsistently. This assumes `FileOptions.Validate` does not already check extensions, which is not visible here.",
+      "suggestion": "Move the extension character validation into a shared function, or into `FileOptions.Validate`, and apply it to every platform before the options are serialized to JSON for PowerShell.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/platformio/process.go",
+          "lines": {
+            "start": 168,
+            "end": 168
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "windows",
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "if ($o.Extensions.Count -gt 0) { $patterns = ($o.Extensions | ForEach-Object { '*.' + $_ }) -join ';'; $d.Filter = 'Allowed files|' + $patterns }",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "fdd4c299c6fdba7b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "go.mod rewriting via str.replace fails silently when patterns don't match",
+      "message": "The temporary go.mod is built with chained str.replace calls on literal text from drivers/cogent/go.mod. If that file's replace directives change (a `replace (` block, different spacing, or a different relative path), a replacement silently does nothing. The relative paths then resolve against the temp directory, so the check fails with a confusing module-resolution error. Worse, it could resolve to the wrong module. The \" =\u003e /\" quoting loop also never matches Windows drive-letter paths, so such paths stay unquoted.",
+      "suggestion": "Check that each replacement actually changed the text, for example `assert old in module`. Better, drop the string rewriting: write the temp go.mod from scratch and emit absolute `replace` directives with json.dumps for every path.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/check-platform-fixture.py",
+          "lines": {
+            "start": 26,
+            "end": 29
+          }
+        }
+      ],
+      "tags": [
+        "fragility",
+        "go.mod",
+        "build-script"
+      ],
+      "evidence": "module = module.replace(\"example.com/vellum =\u003e ../..\", f\"example.com/vellum =\u003e {ROOT}\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 86210,
+    "totalMs": 22660
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 25,
+    "bytes": 64917,
+    "chunks": 5,
+    "llmCalls": 9,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 56036,
+        "output": 11023,
+        "costUSD": 0.222302
+      }
+    ],
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

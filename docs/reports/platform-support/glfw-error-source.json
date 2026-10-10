@@ -1,0 +1,23 @@
+{
+  "module": "github.com/go-gl/glfw/v3.4/glfw",
+  "version": "v0.1.0-pre.1.0.20260628091122-0bd588dc30cf",
+  "scope": "Pinned primary-source call graph inspection; not target clipboard runtime acceptance",
+  "sources": {
+    "glfw.go": "16229a09304efe5653bde9ffb37a5289302146ed7c23bf4c5ca38acbe6a25455",
+    "error.go": "16dda57816f5cc1294a2b43642b766d1f0de239891668c12e3080e8f75f80e40",
+    "glfw/src/init.c": "61ac2188518cae852bc2bfe0c0f2363dad365f8166099a3aa78a3c9ff8504654",
+    "glfw/src/input.c": "f5efbc7ec6a38a6c462cd2311dbe51616a4810c4dc8d1a2f735195e5cf72c753"
+  },
+  "call_graph": [
+    "C glfwGetClipboardString/glfwSetClipboardString delegate to the active platform implementation.",
+    "C _glfwInputError stores code/description in C thread-local error state (or pre-init state) before invoking the error callback.",
+    "Go goErrorCB writes its own buffered Go channel; flushErrors/fetchError drain that channel only.",
+    "Go GetClipboardString accepts absent-format errors; acceptError/panicError can log a platform error and return success. They do not call C glfwGetError.",
+    "Go GetError calls C glfwGetError, which reads and clears the separate C error code; its Go channel cleanup is independent.",
+    "Vellum clears stale C state before an operation, then reads its current-operation error on the same pinned main-queue OS thread. Native failures remain typed errors; absent-format reads return empty text."
+  ],
+  "limits": [
+    "GLFW requires native-main-thread clipboard calls.",
+    "Windows/Linux actual clipboard interoperation and availability failures still require target-host acceptance."
+  ]
+}

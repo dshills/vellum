@@ -1,0 +1,166 @@
+==================
+WARNING: DATA RACE
+Write at 0x00c0011c4c38 by goroutine 156:
+  cogentcore.org/core/core.(*WidgetBase).setBBoxes()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1804 +0x374
+  cogentcore.org/core/core.(*WidgetBase).ApplyScenePos()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1752 +0x30
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren.func1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1822 +0x34
+  cogentcore.org/core/core.(*WidgetBase).forVisibleChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widget.go:504 +0x1a4
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1821 +0x64
+  cogentcore.org/core/core.(*Frame).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1836 +0x58
+  cogentcore.org/core/core.(*Frame).ApplyScenePos()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1857 +0x198
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren.func1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1822 +0x34
+  cogentcore.org/core/core.(*WidgetBase).forVisibleChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widget.go:504 +0x1a4
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1821 +0x64
+  cogentcore.org/core/core.(*Frame).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1836 +0x58
+  cogentcore.org/core/core.(*Frame).ApplyScenePos()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1857 +0x198
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren.func1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1822 +0x34
+  cogentcore.org/core/core.(*WidgetBase).forVisibleChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widget.go:504 +0x1a4
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1821 +0x64
+  cogentcore.org/core/core.(*Frame).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1836 +0x58
+  cogentcore.org/core/core.(*Frame).ApplyScenePos()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1857 +0x198
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren.func1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1822 +0x34
+  cogentcore.org/core/core.(*WidgetBase).forVisibleChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widget.go:504 +0x1a4
+  cogentcore.org/core/core.(*WidgetBase).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1821 +0x64
+  cogentcore.org/core/core.(*Frame).applyScenePosChildren()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1836 +0x58
+  cogentcore.org/core/core.(*Frame).ApplyScenePos()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/layout.go:1857 +0x198
+  cogentcore.org/core/core.(*Scene).ApplyScenePos()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/scene.go:463 +0x30
+  cogentcore.org/core/core.(*Scene).LayoutScene()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/render.go:131 +0x12c
+  cogentcore.org/core/core.(*Scene).LayoutRenderScene()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/render.go:176 +0x28
+  cogentcore.org/core/core.(*Scene).doUpdate()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/render.go:242 +0x400
+  cogentcore.org/core/core.(*Stage).doUpdate()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/stage.go:363 +0xbc
+  cogentcore.org/core/core.(*stages).updateAll()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/stages.go:258 +0x150
+  cogentcore.org/core/core.(*renderWindow).renderWindow()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:715 +0x2e8
+  cogentcore.org/core/core.(*renderWindow).handleWindowEvents()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:494 +0x8e0
+  cogentcore.org/core/core.(*renderWindow).handleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:470 +0x520
+  cogentcore.org/core/core.(*renderWindow).eventLoop()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:440 +0x88
+  cogentcore.org/core/core.(*renderWindow).goStartEventLoop.gowrap1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:411 +0x2c
+
+Previous read at 0x00c0011c4c38 by goroutine 33:
+  example.com/vellum/cogent.(*GPUCanvas).size()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/canvas.go:134 +0x4c
+  example.com/vellum/cogent.(*GPUCanvas).Snapshot()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/canvas.go:214 +0x3f4
+  main.main.func3.4.1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/cmd/platform-smoke/main.go:143 +0x40
+  example.com/vellum/app.(*Application).Drain.1()
+      /Users/dshills/Development/projects/Vellum/app/app.go:228 +0x7c
+  example.com/vellum/app.(*Application).Do()
+      /Users/dshills/Development/projects/Vellum/app/app.go:180 +0x160
+  example.com/vellum/app.(*Application).Drain()
+      /Users/dshills/Development/projects/Vellum/app/app.go:212 +0x84
+  example.com/vellum/cogent.Driver.Run.func9()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/driver.go:340 +0x54
+  example.com/vellum/cogent.Driver.Run.func8.4()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/driver.go:268 +0x58
+  cogentcore.org/core/events.(*Listeners).Call()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/events/listeners.go:61 +0x124
+  cogentcore.org/core/core.(*WidgetBase).HandleEvent.func1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widgetevents.go:261 +0x1d0
+  cogentcore.org/core/base/tiered.(*Tiered[go.shape.map[cogentcore.org/core/events.Types][]func(cogentcore.org/core/events.Event)]).Do()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/base/tiered/tiered.go:29 +0x160
+  cogentcore.org/core/core.(*WidgetBase).HandleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widgetevents.go:260 +0x178
+  cogentcore.org/core/core.(*Events).handleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/events.go:183 +0xb0
+  cogentcore.org/core/core.(*Stage).mainHandleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/mainstage.go:458 +0x240
+  cogentcore.org/core/core.(*stages).mainHandleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/mainstage.go:466 +0xa8
+  cogentcore.org/core/core.(*renderWindow).handleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:479 +0x4d0
+  cogentcore.org/core/core.(*renderWindow).eventLoop()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:440 +0x88
+  cogentcore.org/core/core.(*renderWindow).goStartEventLoop.gowrap1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:411 +0x2c
+
+Goroutine 156 (running) created at:
+  cogentcore.org/core/core.(*renderWindow).goStartEventLoop()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:411 +0x90
+  cogentcore.org/core/core.(*Stage).runWindow()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/mainstage.go:297 +0x514
+  cogentcore.org/core/core.(*Stage).run()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/stage.go:345 +0xac
+  cogentcore.org/core/core.(*Stage).Run()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/stage.go:324 +0xc4
+  example.com/vellum/cogent.Driver.Run.func8()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/driver.go:335 +0x1538
+  example.com/vellum/cogent.Driver.Run.func9()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/driver.go:341 +0x9c
+  example.com/vellum/cogent.Driver.Run.func8.4()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/driver.go:268 +0x58
+  cogentcore.org/core/events.(*Listeners).Call()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/events/listeners.go:61 +0x124
+  cogentcore.org/core/core.(*WidgetBase).HandleEvent.func1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widgetevents.go:261 +0x1d0
+  cogentcore.org/core/base/tiered.(*Tiered[go.shape.map[cogentcore.org/core/events.Types][]func(cogentcore.org/core/events.Event)]).Do()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/base/tiered/tiered.go:29 +0x160
+  cogentcore.org/core/core.(*WidgetBase).HandleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/widgetevents.go:260 +0x178
+  cogentcore.org/core/core.(*Events).handleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/events.go:183 +0xb0
+  cogentcore.org/core/core.(*Stage).mainHandleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/mainstage.go:458 +0x240
+  cogentcore.org/core/core.(*stages).mainHandleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/mainstage.go:466 +0xa8
+  cogentcore.org/core/core.(*renderWindow).handleEvent()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:479 +0x4d0
+  cogentcore.org/core/core.(*renderWindow).eventLoop()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:440 +0x88
+  cogentcore.org/core/core.(*renderWindow).goStartEventLoop.gowrap1()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:411 +0x2c
+
+Goroutine 33 (running) created at:
+  cogentcore.org/core/core.(*renderWindow).goStartEventLoop()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/renderwindow.go:411 +0x90
+  cogentcore.org/core/core.(*Stage).runWindow()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/mainstage.go:297 +0x514
+  cogentcore.org/core/core.(*Stage).run()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/stage.go:345 +0xac
+  cogentcore.org/core/core.(*Stage).Run()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/core/stage.go:324 +0xc4
+  example.com/vellum/cogent.Driver.Run.func8()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/driver.go:335 +0x1538
+  example.com/vellum/cogent.Driver.Run()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/driver.go:353 +0x1064
+  example.com/vellum/cogent.(*Driver).Run()
+      <autogenerated>:1 +0xac
+  example.com/vellum/app.(*Application).Run()
+      /Users/dshills/Development/projects/Vellum/app/app.go:318 +0x284
+  main.main()
+      /Users/dshills/Development/projects/Vellum/drivers/cogent/cmd/platform-smoke/main.go:310 +0x94c
+==================
+{"event":"vellum.platform.smoke","os":"darwin","architecture":"arm64","display":"native","checks":["first window GPU pixel readback","first window GPU snapshot/resize replay","menu snapshot installation (activation requires interactive acceptance)","plain text clipboard read","file chooser transport cancellation (display readiness/selection require acceptance)","second window GPU snapshot/resize replay before teardown","second window GPU readback and resize replay after first teardown","isolated window lifetime","final window application shutdown"],"qualification_gaps":["target-specific full qualification is outside this portable smoke"],"complete":false}
+Found 1 data race(s)

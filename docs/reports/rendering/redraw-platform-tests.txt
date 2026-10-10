@@ -1,0 +1,25 @@
+# example.com/vellum/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent	1.831s
+# example.com/vellum/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent/cmd/platform-smoke	1.835s
+# example.com/vellum/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent/cmd/platform-smoke	1.906s
+
+Final current-source bounded-resize/diagnostic command tests:
+Command: go test -C drivers/cogent -race -count=1 ./cmd/platform-smoke
+source_sha256: d3878f256c4c78eadd649d5d1d46b668bbd2625dd6bb5b48ff366844f18f7527  drivers/cogent/cmd/platform-smoke/main.go
+# example.com/vellum/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent/cmd/platform-smoke	1.922s
+exit_status: 0
+
+Final current-source first-window Show barrier command tests:
+Command: go test -C drivers/cogent -race -count=1 ./cmd/platform-smoke
+source_sha256: 40f7feead8ae4d5778981bd649ef9e9b0c99d97c2fb1f84d1f70a258a8a00035  drivers/cogent/cmd/platform-smoke/main.go
+# example.com/vellum/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent/cmd/platform-smoke	1.935s
+exit_status: 0
