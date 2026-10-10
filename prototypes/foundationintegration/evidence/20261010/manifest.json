@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "date": "2026-10-10",
+  "base_commit": "a9ec133",
+  "G1_passed": false,
+  "host": {
+    "os": "macOS 26.6.2 (25G83)",
+    "arch": "arm64",
+    "go": "go version go1.27.2 darwin/arm64"
+  },
+  "pins": {
+    "cogent": "v0.3.46-0.20261009095036-5cc519b24044",
+    "go_text": "v0.3.5-0.20260418130854-c41d02a44bec"
+  },
+  "sources_and_evidence": [
+    {
+      "path": "FOUNDATION_ACCEPTANCE_AUDIT.md",
+      "bytes": 9292,
+      "sha256": "4d4ef6d99db904cad167ff85d678f20a6dbf90a1d2a178435a68590c865cbeb1"
+    },
+    {
+      "path": "FOUNDATION_INTEGRATION_RESULTS.md",
+      "bytes": 9165,
+      "sha256": "1de2ff1d9e063d88584274db43940b7343f0ee9890970aa20822d49a069575c2"
+    },
+    {
+      "path": "decisions/0008-foundation-acceptance-audit.md",
+      "bytes": 1545,
+      "sha256": "76e738abbc0ca63448b3cc8c7e6d00a4f091174a6e6e2604fa094e9f06562aeb"
+    },
+    {
+      "path": "prototypes/foundationintegration/README.md",
+      "bytes": 6430,
+      "sha256": "1eba7c8e89c04f29da5c083a90c0504695c06481e682aca6c6de02c912157258"
+    },
+    {
+      "path": "prototypes/foundationintegration/cmd/foundationaudit/main.go",
+      "bytes": 9046,
+      "sha256": "4d55b2e6864485f942811b1c83331e730ba7c0a3d5e8830f3b89a2e15f81917b"
+    },
+    {
+      "path": "prototypes/foundationintegration/cmd/lifecyclecheck/main.go",
+      "bytes": 9225,
+      "sha256": "07a6a1c8a8c08da8c7b77c6a4817b2e10b3bb613f1add7d5906d7b94f67e0234"
+    },
+    {
+      "path": "prototypes/foundationintegration/inputbridge/input.h",
+      "bytes": 859,
+      "sha256": "79bf15e8da0830bbea05ada00e8bb91c7d3e38f11af2bc148a5b7a8e17ffe453"
+    },
+    {
+      "path": "prototypes/foundationintegration/inputbridge/input_darwin.go",
+      "bytes": 3474,
+      "sha256": "3147bff8ad53fbf2ddeff07751e3b2de3fd54f83535b15ce3e83cfd555af7d56"
+    },
+    {
+      "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+      "bytes": 21820,
+      "sha256": "5aa04e794f714847b2073e6817a67a2d1d4cca7a112b4ff569d5c6e350d0b494"
+    },
+    {
+      "path": "prototypes/foundationintegration/check_foundation.sh",
+      "bytes": 1380,
+      "sha256": "93a4dd13352e44b1bb430f63c6c0132c35a29758480c51f80ace53a583a49af1"
+    },
+    {
+      "path": "prototypes/foundationintegration/verify_acceptance.py",
+      "bytes": 2847,
+      "sha256": "82ab65edffe3e0111232b686581325e2b3f81a6e64b995095b0efa3e10b1f977"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/acceptance-audit.json",
+      "bytes": 4132,
+      "sha256": "f9e43b975aa2b05919f2bf7637fbcc0c9f9e45f5c61b16567c521d51b6d8e92c"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/acceptance-audit.log",
+      "bytes": 59,
+      "sha256": "1a6680d3f00fe520fd820a55d6bf58666dd57dcefae8a2083c1b0a4d9311921f"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/acceptance-audit.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/native-queries-lifetime.json",
+      "bytes": 2423,
+      "sha256": "a13270bb510aa51e7d78f0b839c6f14960308466697ae3f46998ab1d739cb236"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/native-queries-lifetime.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/vet.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/race-tests.txt",
+      "bytes": 191,
+      "sha256": "1e93f1ad444ea7f4fac7afe1b029b1328033439d315ac06919022fa7c1f9bfec"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/upstream-cogent-core-final.txt",
+      "bytes": 122,
+      "sha256": "5927f99767145ce95af1e790a257fd2f5a4fe24cee6efa57139e4e79eef3046e"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/upstream-cogent-text-complete.txt",
+      "bytes": 323599,
+      "sha256": "a57b2a98d8091086c9a7b61b5dd6a9cab69456a8cf7aba9bbcf374d95913ed27"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/upstream-baseline-failures.txt",
+      "bytes": 7812,
+      "sha256": "b1bba3678320d59b7eb3449230e57ab579d7680652dc65850552f1c8e33258ae"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/shaped-repeat.txt",
+      "bytes": 44,
+      "sha256": "548642b4eb5d5c5dbb0cc5cd876d96a0080eab7652e5399214db4b4dbf3176d0"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/shaped-repeat-five.txt",
+      "bytes": 44,
+      "sha256": "06c92ef1ec0fa8cf9a29839ed622476ba8e0e3d8a5a1f73f337b687a67b3512b"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/shaped-baseline-repeat.txt",
+      "bytes": 44,
+      "sha256": "81261226494a42cee9a81461aaaa97b800828874c70fd4a6afb3c6f3770d940a"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/signing-identities.txt",
+      "bytes": 30,
+      "sha256": "0ad30eb1563c325d77f4dc564c5d96851d5a39205307f5cdd7d762b59688f87a"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/live-bundle.json",
+      "bytes": 10622,
+      "sha256": "6b645b67ca9650a3f6c2f0a7a41d5c9f15591a567eafe82a5e05e280a8afbebe"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/live-bundle.log",
+      "bytes": 26449,
+      "sha256": "98bb677adab408aeaf883cb930cbf9c3c7949717e86ca6958fc6dec69283d4e4"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/live-observations.json",
+      "bytes": 1373,
+      "sha256": "e8116442a682629615f854e33b7f486f5d1b2f8847cb20764ec6f4cf55ff3edd"
+    },
+    {
+      "path": "prototypes/foundationintegration/evidence/20261010/settings-restoration.json",
+      "bytes": 1002,
+      "sha256": "623954b6c521829a8b5f096dc1b5974c0e059a32ea21d3e2545892ad30d0bf42"
+    },
+    {
+      "path": "prototypes/fontresources/evidence/upstream-20261010.txt",
+      "bytes": 450,
+      "sha256": "c9dcd918cb81909f24b6ab8ce638248069d0a35fb54c386bfbfbc6cc4c65ac2a"
+    }
+  ],
+  "unchanged_preparation_inputs": [
+    {
+      "path": "prototypes/foundationintegration/go.mod",
+      "bytes": 2367,
+      "sha256": "45c41edd6ab857e1fb4491de931ecd16c12c99116134d1324c4d8d16776a8569"
+    },
+    {
+      "path": "prototypes/foundationintegration/go.sum",
+      "bytes": 9918,
+      "sha256": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14"
+    },
+    {
+      "path": "prototypes/foundationintegration/prepare.py",
+      "bytes": 1298,
+      "sha256": "5a12708a93e35254eb75adb94a40de46d79f9d412fea70327fbee51d652f8e3e"
+    },
+    {
+      "path": "prototypes/fontresources/prepare.py",
+      "bytes": 1223,
+      "sha256": "858ec60617525932707fe587b520c4a56fec468b576741f4814e99b416449584"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/0008-native-lifetime.patch",
+      "bytes": 3905,
+      "sha256": "3fadb62158f9f0d09efa1a6949de540740a3172c51bddc27c64cafb9a94800c5"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/0009-owned-device-queue-release.patch",
+      "bytes": 707,
+      "sha256": "0fa0b25ad508cf85ad606eb840dcc9f33d0a1a55640dfd1132100956e5675ce7"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/COGENT_LICENSE",
+      "bytes": 1498,
+      "sha256": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1"
+    },
+    {
+      "path": "prototypes/foundationintegration/patches/original-hashes.json",
+      "bytes": 387,
+      "sha256": "7363d8ae2655204ceb30df98e71ca93acc4a1dfbb5fd761634cadd72af0d4d6c"
+    },
+    {
+      "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+      "bytes": 19035,
+      "sha256": "b62243ab4487b2c4a9c0f9e112150493ee5743355d674041712b956510b305f9"
+    },
+    {
+      "path": "prototypes/fontresources/patches/0002-deferred-static-outlines.patch",
+      "bytes": 14639,
+      "sha256": "8cd046c233dc65eadbb1812d5f94a432be8e8a2d35537d94748ed5db9fd46be1"
+    },
+    {
+      "path": "prototypes/fontresources/patches/0002-hashes.json",
+      "bytes": 419,
+      "sha256": "a7c1bccbfffb9b32306b4cd51ada8dc27bf82f871328841b837e494023dd2de0"
+    },
+    {
+      "path": "prototypes/fontresources/patches/GO_TEXT_LICENSE",
+      "bytes": 3006,
+      "sha256": "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+    },
+    {
+      "path": "prototypes/fontresources/patches/original-hashes.json",
+      "bytes": 598,
+      "sha256": "ecbe49835924f16f69a9e741fafaaf18a7b1cacbde382706d8bdc19a72f04844"
+    }
+  ],
+  "local_builds": [
+    {
+      "path": "prototypes/foundationintegration/build/foundationaudit",
+      "bytes": 52551522,
+      "sha256": "a3cfa2a596688dbc8eb89b77fd41dafeac319a6e7ea48e9052bcff706e338a71"
+    },
+    {
+      "path": "prototypes/foundationintegration/build/lifecyclecheck",
+      "bytes": 23616514,
+      "sha256": "b8f08b952451b3731bd409755dc49bda4e2dd6cbc37064437f81db7dbae0abd0"
+    }
+  ],
+  "commands": [
+    {
+      "cwd": "prototypes/foundationintegration",
+      "command": "P0_CACHE_DIR=/tmp/vellum-p0-cache ./check_foundation.sh evidence/20261010",
+      "exit": 1,
+      "meaning": "valid evidence, foundation gate open"
+    },
+    {
+      "cwd": "prototypes/foundationintegration",
+      "environment": ". ./env.sh; P0_CACHE_DIR=/tmp/vellum-p0-cache",
+      "command": "go test -tags offscreen -count=1 -timeout 90s -modfile=integration.mod cogentcore.org/core/core",
+      "exit": 0
+    },
+    {
+      "cwd": "prototypes/foundationintegration",
+      "command": "go test -tags offscreen -count=1 -timeout 90s -mod=mod -modfile=regression.mod cogentcore.org/core/text/...",
+      "exit": 1,
+      "preparation": "copy integration.mod/sum to regression.mod/sum; production requirements unchanged"
+    },
+    {
+      "cwd": "prototypes/foundationintegration",
+      "command": "go test -tags offscreen -count=5 -timeout 60s -modfile=integration.mod cogentcore.org/core/text/shaped",
+      "exit": 0
+    },
+    {
+      "cwd": "prototypes/foundationintegration",
+      "command": "go test -tags offscreen -count=3 -timeout 60s -modfile=control.mod cogentcore.org/core/text/shaped",
+      "exit": 0,
+      "preparation": "drop Cogent and go-text local replacements from integration.mod, copy pinned unmodified Cogent to owned build/audit-baseline for writable golden comparison outputs, replace Cogent with that copy"
+    },
+    {
+      "cwd": "prototypes/foundationintegration",
+      "command": "go test -tags offscreen -count=1 -timeout 60s -modfile=auditbase.mod cogentcore.org/core/text/highlighting cogentcore.org/core/text/lines cogentcore.org/core/text/parse/languages/golang",
+      "exit": 1,
+      "preparation": "drop both Cogent and go-text local replacements"
+    },
+    {
+      "cwd": "prototypes/fontresources",
+      "command": "go test -count=1 -timeout 120s -modfile=font.mod github.com/go-text/typesetting/font/... github.com/go-text/typesetting/fontscan github.com/go-text/typesetting/shaping github.com/go-text/typesetting/segmenter",
+      "exit": 0
+    }
+  ],
+  "excluded_attempts": "Interrupted unbundled live process, initial missing test dependencies and invalid test flags are not passing evidence; complete corrected regression output is retained.",
+  "review_scope": "Read-only native probe/lifecycle assertions, audit CLI/runner/verifier, acceptance documentation. Runtime results and manual observations retain their stated limits."
+}

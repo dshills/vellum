@@ -301,3 +301,18 @@ char *vellum_input_inactive_probe(void *input){
  [client insertText:@"ignored" replacementRange:NSMakeRange(NSNotFound,0)];[client unmarkText];
  return strdup("inactive_optional_super_queries_passed");
 }
+
+char *vellum_input_query_probe(void *input,int start,int length,double x,double y){
+ NSCAssert(NSThread.isMainThread,@"Query probe requires main thread");
+ VellumInputState *s=(id)input;if(!usable(s) || start<0 || length<0)return NULL;
+ id<NSTextInputClient> client=(id)s->view;
+ NSRange requested=NSMakeRange((NSUInteger)start,(NSUInteger)length);
+ NSRange substringRange=NSMakeRange(NSNotFound,0),rectRange=NSMakeRange(NSNotFound,0);
+ NSAttributedString *substring=[client attributedSubstringForProposedRange:requested actualRange:&substringRange];
+ NSRect rect=[client firstRectForCharacterRange:requested actualRange:&rectRange];
+ NSUInteger index=[client characterIndexForPoint:NSMakePoint(x,y)];
+ NSDictionary *report=@{@"requested":@[@(start),@(length)],@"substring":substring.string ?: @"",@"substring_range":@[substringRange.location==NSNotFound ? @(-1):@(substringRange.location),@(substringRange.length)],@"rect_range":@[rectRange.location==NSNotFound ? @(-1):@(rectRange.location),@(rectRange.length)],@"screen_rect":@[@(rect.origin.x),@(rect.origin.y),@(rect.size.width),@(rect.size.height)],@"point_index":index==NSNotFound ? @(-1):@(index)};
+ NSData *data=[NSJSONSerialization dataWithJSONObject:report options:0 error:NULL];
+ if(!data)return NULL;
+ return strdup([[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]autorelease].UTF8String);
+}

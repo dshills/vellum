@@ -8,6 +8,7 @@ package inputbridge
 */
 import "C"
 import (
+	"math"
 	"runtime/cgo"
 	"unsafe"
 )
@@ -96,6 +97,21 @@ func Environment() string {
 // ProbeInactive exercises optional superclass methods on an inactive attached view.
 func (i *Input) ProbeInactive() string {
 	p := C.vellum_input_inactive_probe(i.native)
+	if p == nil {
+		return ""
+	}
+	defer C.free(unsafe.Pointer(p))
+	return C.GoString(p)
+}
+
+// QueryProbe observes read-only Cocoa text queries on its owner thread.
+// Coordinates are screen points, ranges are UTF-16 units. Empty means unavailable.
+func (i *Input) QueryProbe(start, length int, point [2]float64) string {
+	const maxCInt = 1<<31 - 1
+	if start < 0 || length < 0 || start > maxCInt || length > maxCInt || math.IsNaN(point[0]) || math.IsNaN(point[1]) || math.IsInf(point[0], 0) || math.IsInf(point[1], 0) {
+		return ""
+	}
+	p := C.vellum_input_query_probe(i.native, C.int(start), C.int(length), C.double(point[0]), C.double(point[1]))
 	if p == nil {
 		return ""
 	}

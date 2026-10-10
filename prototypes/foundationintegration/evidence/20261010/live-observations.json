@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "date": "2026-10-10",
+  "build_scope": "previous committed sealed fixture; new read-only query instrumentation was tested separately",
+  "fixture_source_commit": "a9ec133",
+  "method": "CUA native app actions and accessibility trees; no full desktop candidate-panel capture or speech recording",
+  "ime": {
+    "status": "unverified",
+    "sources_temporarily_added": ["Japanese Romaji", "Pinyin - Simplified"],
+    "reason": "synthetic source-switch shortcuts did not establish a non-U.S. active source; querying the input-menu app timed out",
+    "candidate_panel_geometry": "unverified"
+  },
+  "voiceover": {
+    "status": "unverified",
+    "temporarily_enabled": true,
+    "reason": "no verified screen-reader focus, editing action or speech observation from the attempted synthetic commands"
+  },
+  "observations": [
+    "Mixed Hebrew/Latin text appeared in the field and its accessible value.",
+    "Recorded accessibility actions overtook pending legacy cursor-key processing; final field cursor later reached rune 4. The separate deterministic Deque probe reproduces the ordering failure.",
+    "Live report contains 15 admitted and acknowledged native updates and zero rejected application actions; this is not successful IME conversion evidence."
+  ],
+  "raw_report": "live-bundle.json",
+  "settings_restoration": "settings-restoration.json"
+}

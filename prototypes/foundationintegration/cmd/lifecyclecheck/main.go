@@ -180,6 +180,40 @@ func publicationContracts() map[string]any {
 	if in.ProbeInactive() != "inactive_optional_super_queries_passed" {
 		panic("optional superclass fallback")
 	}
+	in.Update("A👩Z\nאבג", 1, 1, -1, -1, true, 0, [4]float64{10, 20, 1, 23})
+	if in.QueryProbe(-1, 1, [2]float64{}) != "" || in.QueryProbe(0, 1<<31, [2]float64{}) != "" {
+		panic("invalid query range admitted")
+	}
+	var queries []map[string]any
+	for _, request := range [][2]int{{0, 2147483647}, {2, 1}, {4, 3}, {20, 1}} {
+		var observed struct {
+			Substring      string `json:"substring"`
+			SubstringRange [2]int `json:"substring_range"`
+			RectRange      [2]int `json:"rect_range"`
+			PointIndex     int    `json:"point_index"`
+		}
+		raw := in.QueryProbe(request[0], request[1], [2]float64{12, 24})
+		if err := json.Unmarshal([]byte(raw), &observed); err != nil {
+			panic(err)
+		}
+		queries = append(queries, map[string]any{"requested": request, "observed": json.RawMessage(raw)})
+		if observed.RectRange != [2]int{1, 0} || observed.PointIndex != -1 {
+			panic("advertised geometry capability changed unexpectedly")
+		}
+		if request[0] == 0 && (observed.Substring != "A👩Z\nאבג" || observed.SubstringRange != [2]int{0, 8}) {
+			panic("clipped context query")
+		}
+		if request[0] == 2 && (observed.Substring != "👩" || observed.SubstringRange != [2]int{1, 2}) {
+			panic("surrogate context query")
+		}
+		if request[0] == 4 && (observed.Substring != "\nאב" || observed.SubstringRange != [2]int{4, 3}) {
+			panic("multiline context query")
+		}
+		if request[0] == 20 && observed.SubstringRange != [2]int{-1, 0} {
+			panic("outside context query")
+		}
+	}
+
 	in.Update("A👩Z", 1, 1, 1, 3, true, 0, [4]float64{})
 	in.Probe(7) // externally published marked text can unmark without a cancellation snapshot
 	if commits != 1 {
@@ -222,5 +256,5 @@ func publicationContracts() map[string]any {
 		panic("obsolete baseline erased external edit")
 	}
 	in.Probe(7)
-	return map[string]any{"backward_cancel_direction": true, "stale_geometry_rejected": true, "obsolete_baseline_invalidated": true, "bare_view_optional_methods": true, "external_unmark": true, "atomic_invalid_publications": 6, "snapshotless_cancel_refused": true}
+	return map[string]any{"native_queries": queries, "geometry_scope": "current insertion caret only; arbitrary/multiline rectangles and point hit-testing unavailable", "backward_cancel_direction": true, "stale_geometry_rejected": true, "obsolete_baseline_invalidated": true, "bare_view_optional_methods": true, "external_unmark": true, "atomic_invalid_publications": 6, "snapshotless_cancel_refused": true}
 }

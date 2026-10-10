@@ -12,3 +12,5 @@ void vellum_input_caret(void *input, double x, double y, double width, double he
 char *vellum_input_environment(void);
 
 char *vellum_input_inactive_probe(void *input);
+// Read-only deterministic NSTextInputClient query observations (UTF-16 ranges).
+char *vellum_input_query_probe(void *input, int start, int length, double x, double y);

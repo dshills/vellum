@@ -1,0 +1,99 @@
+# cogentcore.org/core/text/highlighting.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestMarkup (0.00s)
+panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule [recovered, repanicked]
+
+goroutine 51 [running]:
+testing.tRunner.func1.2({0x105e4c3d0, 0x47d1eb299860})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2125 +0x1a0
+testing.tRunner.func1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2128 +0x2c8
+panic({0x105e4c3d0?, 0x47d1eb299860?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileNameMap(0x47d1eb2aa820, 0x47d1eb19c0a8)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:116 +0x4b4
+cogentcore.org/core/text/parse/lexer.(*Rule).Compile(0x47d1eb2aa820, 0x47d1eb19c0a8)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:104 +0x108
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll.func1({0x105f39548?, 0x47d1eb2aa820?})
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:84 +0x44
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0x47d1eb14d520, 0x47d1eb12cab0)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/tree/nodebase.go:502 +0x100
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll(0x47d1eb14d520, 0x47d1eb19c0a8)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:82 +0x90
+cogentcore.org/core/text/parse.(*Parser).InitAll(0x47d1eb134240)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/parser.go:63 +0x48
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x47d1eb0da9f8?)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/languagesupport.go:132 +0x140
+cogentcore.org/core/text/highlighting.Init()
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/styles.go:181 +0x2c
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/styles.go:69 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0x47d1eb311d00, {0x1055122ef, 0x5})
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/highlighter.go:117 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).Init(0x47d1eb311d00, 0x47d1eb311ea8, 0x47d1eb25ea08)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/highlighter.go:67 +0x40
+cogentcore.org/core/text/highlighting.TestMarkup(0x47d1eb1b9208)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/high_test.go:34 +0x108
+testing.tRunner(0x47d1eb1b9208, 0x105f3aac8)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x3b8
+FAIL	cogentcore.org/core/text/highlighting	0.322s
+# cogentcore.org/core/text/lines.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestMarkup (0.00s)
+panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule [recovered, repanicked]
+
+goroutine 53 [running]:
+testing.tRunner.func1.2({0x1049a3050, 0x632d302173b0})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2125 +0x1a0
+testing.tRunner.func1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2128 +0x2c8
+panic({0x1049a3050?, 0x632d302173b0?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).Validate(0x632d3026e9c0, 0x632d30284b28)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:187 +0x794
+cogentcore.org/core/text/parse.(*Parser).InitAll(0x632d304ad200)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/parser.go:64 +0x58
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x632d2ffa0ba8?)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/languagesupport.go:132 +0x140
+cogentcore.org/core/text/highlighting.Init()
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/styles.go:181 +0x2c
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/styles.go:69 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0x632d30282048, {0x10397be73, 0x5})
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/highlighter.go:117 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).Init(0x632d30282048, 0x632d302dbe40, 0x632d302821f0)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/highlighting/highlighter.go:67 +0x40
+cogentcore.org/core/text/lines.(*Lines).setFileInfo(0x632d30282008, 0x632d302dbe40)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/lines/markup.go:24 +0x58
+cogentcore.org/core/text/lines.NewLinesFromBytes({0x103981b8d, 0x8}, 0x28, {0x632d30123290, 0x86, 0x90})
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/lines/api.go:42 +0x124
+cogentcore.org/core/text/lines.TestMarkup(0x632d3027c248)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/lines/markup_test.go:22 +0x54
+testing.tRunner(0x632d3027c248, 0x104b93e98)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x3b8
+FAIL	cogentcore.org/core/text/lines	0.645s
+panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule
+
+goroutine 1 [running]:
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileNameMap(0x4403563509c0, 0x440356332ea8)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:116 +0x4b4
+cogentcore.org/core/text/parse/lexer.(*Rule).Compile(0x4403563509c0, 0x440356332ea8)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:104 +0x108
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll.func1({0x104d84e18?, 0x4403563509c0?})
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:84 +0x44
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0x440356234d00, 0x44035621a7b0)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/tree/nodebase.go:502 +0x100
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll(0x440356234d00, 0x440356332ea8)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/lexer/rule.go:82 +0x90
+cogentcore.org/core/text/parse.(*Parser).InitAll(0x440356232540)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/parser.go:63 +0x48
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x44030000001e?)
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/languagesupport.go:132 +0x140
+cogentcore.org/core/text/parse/languages/golang.init.1()
+	/tmp/vellum-p0-cache/mod/cogentcore.org/core@v0.3.46-0.20261009095036-5cc519b24044/text/parse/languages/golang/golang_test.go:22 +0x24
+FAIL	cogentcore.org/core/text/parse/languages/golang	0.272s
+FAIL

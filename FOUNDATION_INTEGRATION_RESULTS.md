@@ -2,6 +2,8 @@
 
 9 October 2026. **The remaining local foundation engineering is implemented in isolated, pinned prototypes; G1 has not passed. Keep Cogent Core as the experimental foundation and keep broad workbench expansion on hold.** This report supersedes the outstanding implementation status in the earlier contracts report, while preserving its original evidence. See [ADR 0007](decisions/0007-foundation-integration.md).
 
+Current acceptance-check status is recorded in [the 10 October audit](FOUNDATION_ACCEPTANCE_AUDIT.md). It reproduces legacy shortcut ordering failure and records the narrower passing scopes; G1 remains open.
+
 ## Implemented and checked
 
 | Area | Implementation | Evidence and scope |
