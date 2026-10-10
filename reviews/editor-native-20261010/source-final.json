@@ -1,0 +1,95 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0f090fff503fc51c4c8558ce77a2c304",
+  "repo": {
+    "root": "/private/tmp/vellum-editor-review-source",
+    "head": "26ec0b7cced1466a5415f442af750594f40da459",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "56934c9a7786f278",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Discard active composition when closing the buffer",
+      "message": "Close clears the document and undo stack but retains an active composition, including its old document baseline. Subsequent operations that commit compositions can treat the cleared document as an edit of that old baseline, creating stale undo records. NativeCompositionActive also continues reporting an owner after all views have been removed.",
+      "suggestion": "Clear nativeComposition when closing the buffer, before discarding its text and undo history.",
+      "confidence": 0.92,
+      "locations": [
+        {
+          "path": "text/lines/api.go",
+          "lines": {
+            "start": 208,
+            "end": 209
+          }
+        }
+      ],
+      "tags": [
+        "composition",
+        "lifecycle"
+      ],
+      "evidence": "\tls.nativeRevision++\n\tls.lines = nil",
+      "fix": {
+        "before": "\tls.nativeRevision++\n\tls.lines = nil",
+        "after": "\tls.nativeRevision++\n\tls.nativeComposition = nil\n\tls.lines = nil"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 56853,
+    "totalMs": 27166
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 9,
+    "bytes": 42048,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 17383,
+        "output": 2268,
+        "reasoning": 2010,
+        "cachedInput": 3492
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

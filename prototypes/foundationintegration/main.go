@@ -82,6 +82,8 @@ type fixture struct {
 	inputSource                            string
 	inputEnvironment                       json.RawMessage
 	nativeInput                            bool
+	nativeClientID                         uint64
+	editorProbe                            bool
 	widgets                                map[uint64]core.Widget
 	roles                                  map[uint64]string
 	field                                  *core.TextField
@@ -119,9 +121,10 @@ func main() {
 	lifecycle := flag.Bool("lifecycle", false, "exercise six public window resize requests")
 	onDemand := flag.Bool("on-demand", true, "use experimental requested-paint scheduler")
 	warmSpelling := flag.Bool("warm-spelling", false, "initialize optional spell checker explicitly for comparison")
-	nativeInput := flag.Bool("native-input", true, "attach experimental single-field Cocoa input client")
+	nativeInput := flag.Bool("native-input", true, "attach experimental focused field/editor Cocoa input client")
 	saturation := flag.Bool("saturation", false, "verify native refusal while ordered UI delivery is stalled")
 	geometryProbe := flag.Bool("geometry-probe", false, "check native queries against the rendered mixed-direction field")
+	editorProbe := flag.Bool("editor-probe", false, "exercise the exact multiline editor native client")
 	inputProbe := flag.Bool("input-probe", false, "exercise native protocol deterministically, not a live IME")
 	trace := flag.Bool("trace", false, "log window lifecycle events")
 	flag.Parse()
@@ -130,7 +133,7 @@ func main() {
 	}
 	core.DebugSettings.WindowEventTrace = *trace
 	core.DebugSettings.KeyEventTrace = *trace
-	f := &fixture{widgets: map[uint64]core.Widget{}, roles: map[uint64]string{}, rowWidgets: map[uint64]*core.Button{}, enabled: true, expanded: true, value: "10k", selected: 17, focus: 2, report: *report, launched: time.Now(), ax: *ax, warmSpelling: *warmSpelling, onDemand: *onDemand, nativeInput: *nativeInput, geometryProbe: *geometryProbe}
+	f := &fixture{widgets: map[uint64]core.Widget{}, roles: map[uint64]string{}, rowWidgets: map[uint64]*core.Button{}, enabled: true, expanded: true, value: "10k", selected: 17, focus: 2, report: *report, launched: time.Now(), ax: *ax, warmSpelling: *warmSpelling, onDemand: *onDemand, nativeInput: *nativeInput, geometryProbe: *geometryProbe, editorProbe: *editorProbe}
 	f.build()
 	desktop.TheApp.NativeAttach = func(dw *desktop.Window) (desktop.NativeAttachment, error) {
 		if dw.Glw.GetAttrib(glfw.Visible) != glfw.False {
@@ -195,20 +198,27 @@ func main() {
 		f.body.Scene.SetGeometry(false, image.Point{}, image.Pt(1120, 960), -1)
 		f.body.Defer(func() {
 			if f.nativeInput {
-				f.field.SetNativeEditingListener(func(state core.TextFieldEditingState) {
+				listener := func(state core.TextFieldEditingState) {
 					if !f.closed.Load() {
 						if err := f.pump.Latest(message{Kind: "caret"}); err != nil {
 							fmt.Println("caret refused:", err)
 						}
 					}
-				})
+				}
+				f.field.SetNativeEditingListener(listener)
+				f.editor.SetNativeEditingListener(listener)
 			}
-			if *geometryProbe {
+			if *editorProbe {
+				f.buffer.SetString("A👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n")
+				f.editor.SetEditingSelection(1, 1)
+				f.editor.SetFocus()
+			}
+			if *geometryProbe && !*editorProbe {
 				f.field.SetText("abc אבג xyz é 👩‍💻")
 				f.field.SetEditingSelection(0, 0)
 				f.field.SetFocus()
 			}
-			if *inputProbe {
+			if *inputProbe && !*editorProbe {
 				f.field.SetText("A👩Z")
 				f.field.SetEditingSelection(1, 1)
 				f.field.SetFocus()
@@ -686,16 +696,30 @@ func (f *fixture) publish() {
 		fmt.Println("snapshot validation:", err)
 		return
 	}
-	state := f.field.EditingState()
+	clientID, client, active := f.nativeClient()
+	active = active && !client.IsReadOnly()
+	state := client.EditingState()
+	supported := nativePublicationSupported(state.Text)
+	if !supported {
+		state = core.TextFieldEditingState{}
+		active = false
+	}
 	a, _ := inputbridge.UTF16Offset(state.Text, state.Anchor)
 	b, _ := inputbridge.UTF16Offset(state.Text, state.Focus)
-	markStart, markEnd, marked := f.field.NativeCompositionRange()
+	markStart, markEnd, marked := client.NativeCompositionRange()
+	if !supported {
+		markStart, markEnd, marked = -1, -1, false
+	}
 	if marked {
 		markStart, _ = inputbridge.UTF16Offset(state.Text, markStart)
 		markEnd, _ = inputbridge.UTF16Offset(state.Text, markEnd)
 	}
-	rect := f.caretPoints(f.field.NativeCaretBounds())
-	geometry := f.field.NativeTextGeometry()
+	rect := f.caretPoints(client.NativeCaretBounds())
+	geometry := client.NativeTextGeometry()
+	if !supported {
+		geometry = core.TextFieldGeometry{}
+		rect = [4]float64{}
+	}
 	offsets := inputbridge.UTF16Offsets(state.Text)
 	g := inputbridge.Geometry{Viewport: f.caretPoints(geometry.Viewport.ToRect()), FocusLine: state.VisualLine}
 	for _, c := range geometry.Cells {
@@ -707,7 +731,7 @@ func (f *fixture) publish() {
 		offset := offsets[c.Rune]
 		g.Carets = append(g.Carets, inputbridge.TextCaret{Offset: offset, Line: c.Line, Rect: f.layoutPoints([4]float64{float64(c.Pos.X), float64(c.Pos.Y), 0, float64(c.Height)})})
 	}
-	active, ack := f.field.StateIs(states.Focused), f.inputAck
+	ack := f.inputAck
 	if f.geometryProbe {
 		fmt.Printf("geometry_publication active=%v cells=%d carets=%d\n", active, len(g.Cells), len(g.Carets))
 	}
@@ -717,14 +741,18 @@ func (f *fixture) publish() {
 			f.bridge.Update(s)
 		}
 		if f.input != nil {
-			if err := f.input.UpdateGeometry(state.Text, a, b, markStart, markEnd, active, ack, rect, g); err != nil {
+			accepted, err := f.input.UpdateGeometryForClient(clientID, state.Text, a, b, markStart, markEnd, active, ack, rect, g)
+			if err != nil {
 				// If no viewport is available, retain the legacy insertion-only API.
-				f.input.Update(state.Text, a, b, markStart, markEnd, active, ack, rect)
-			} else {
+				accepted = f.input.UpdateClient(clientID, state.Text, a, b, markStart, markEnd, active, ack, rect)
+			} else if accepted {
 				f.geometryPublications++
 				if f.geometryProbe && active && len(g.Cells) > 0 && len(f.geometryQueries) == 0 {
 					f.probeRenderedGeometry(g, geometry)
 				}
+			}
+			if accepted {
+				f.nativeClientID = clientID
 			}
 		}
 	})
@@ -737,7 +765,7 @@ func (f *fixture) save() {
 	runtime.GC()
 	runtime.ReadMemStats(&mem)
 	s := f.snapshot()
-	r := map[string]any{"idle_samples": f.idle, "transport": f.pump.Stats(), "native_input_enabled": f.nativeInput, "input_source": f.inputSource, "input_environment": f.inputEnvironment, "input_environment_scope": "captured at first show; each recorded native probe reports its current source", "input_updates": f.inputHistory, "input_history_bytes": f.inputHistoryBytes, "input_history_dropped": f.inputHistoryDropped, "input_probes": f.inputProbes, "native_geometry_publications": f.geometryPublications, "rendered_geometry_queries": f.geometryQueries, "native_input_ack": f.inputAck, "platform": "darwin/arm64", "editing_state": f.field.EditingState(), "experimental_toolkit_patch": true, "spell_checker_initialized": spell.Spell != nil, "on_demand": f.onDemand, "paint_scheduler_wakes_total": f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window).Paint.Wakes.Load(), "shown_callback_ms": f.shownMS, "presentation_timestamp": false, "accessibility_enabled": f.ax, "semantic_node_count": len(s.Nodes), "virtual_row_total": 100000, "virtual_rows_materialized": 8, "selected_id": f.selected, "value": f.value, "field_text": f.field.EditingState().Text, "multiline_text": string(f.buffer.Text()), "rotations": f.rotations, "commits": f.commits, "rejected_actions": f.rejected, "native_actions": f.actions, "semantic_updates": f.updates, "canvas_repaints_proxy": f.paints.Load(), "text_samples": f.samples, "resize_content_sizes_pixels": f.resizes, "go_heap_alloc_bytes_after_forced_gc": mem.HeapAlloc, "go_heap_alloc_bytes_before_gc": beforeGC, "resident_bytes_after_gc": macbridge.ResidentBytes(), "go_heap_inuse_bytes": mem.HeapInuse, "goroutines": runtime.NumGoroutine(), "status": f.status, "limitations": []string{"small fixture, not full performance workload", "native TextField uses strong visual bidi carets and advance-based range geometry; multiline code-editor native composition/geometry remains absent", "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests", "Windows/Linux untested"}}
+	r := map[string]any{"idle_samples": f.idle, "transport": f.pump.Stats(), "native_input_enabled": f.nativeInput, "input_source": f.inputSource, "input_environment": f.inputEnvironment, "input_environment_scope": "captured at first show; each recorded native probe reports its current source", "input_updates": f.inputHistory, "input_history_bytes": f.inputHistoryBytes, "input_history_dropped": f.inputHistoryDropped, "input_probes": f.inputProbes, "native_geometry_publications": f.geometryPublications, "rendered_geometry_queries": f.geometryQueries, "native_input_ack": f.inputAck, "platform": "darwin/arm64", "editing_state": f.field.EditingState(), "editor_editing_state": f.editor.EditingState(), "native_client_id": f.nativeClientID, "editor_probe": f.editorProbe, "experimental_toolkit_patch": true, "spell_checker_initialized": spell.Spell != nil, "on_demand": f.onDemand, "paint_scheduler_wakes_total": f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window).Paint.Wakes.Load(), "shown_callback_ms": f.shownMS, "presentation_timestamp": false, "accessibility_enabled": f.ax, "semantic_node_count": len(s.Nodes), "virtual_row_total": 100000, "virtual_rows_materialized": 8, "selected_id": f.selected, "value": f.value, "field_text": f.field.EditingState().Text, "multiline_text": string(f.buffer.Text()), "rotations": f.rotations, "commits": f.commits, "rejected_actions": f.rejected, "native_actions": f.actions, "semantic_updates": f.updates, "canvas_repaints_proxy": f.paints.Load(), "text_samples": f.samples, "resize_content_sizes_pixels": f.resizes, "go_heap_alloc_bytes_after_forced_gc": mem.HeapAlloc, "go_heap_alloc_bytes_before_gc": beforeGC, "resident_bytes_after_gc": macbridge.ResidentBytes(), "go_heap_inuse_bytes": mem.HeapInuse, "goroutines": runtime.NumGoroutine(), "status": f.status, "limitations": []string{"small fixture, not full performance workload", "native TextField and exact multiline Editor support composition/range geometry; Editor keyboard/pointer navigation retains its fixed-grid policy", "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests", "Windows/Linux untested"}}
 	if f.bridge != nil {
 		r["adapter_active"] = f.bridge.Active()
 		r["adapter_snapshot_requests"] = f.bridge.Activations.Load()
@@ -769,7 +797,8 @@ func (f *fixture) applyInput(u inputbridge.Update) {
 		return
 	}
 	decoded, err := inputbridge.Decode(u)
-	if err != nil || !f.field.ApplyNativeEdit(u.Text, decoded.RuneAnchor, decoded.RuneFocus, decoded.RuneMarkedStart, decoded.RuneMarkedEnd, u.Kind) {
+	applied := err == nil && f.applyNativeSnapshot(u, decoded)
+	if !applied {
 		f.rejected++
 		f.status = "Rejected native input update"
 		fmt.Printf("input_rejected %+v error=%v\n", u, err)
@@ -870,9 +899,9 @@ func (a *attachment) Close() {
 // Diagnostic history has separate retention limits from delivery credit.
 func (f *fixture) recordInput(u inputbridge.Update) {
 	f.inputHistory = append(f.inputHistory, u)
-	f.inputHistoryBytes += len(u.Text) + len(u.Kind)
+	f.inputHistoryBytes += len(u.Text) + len(u.BeforeText) + len(u.Kind)
 	for len(f.inputHistory) > 128 || f.inputHistoryBytes > 2*1024*1024 {
-		f.inputHistoryBytes -= len(f.inputHistory[0].Text) + len(f.inputHistory[0].Kind)
+		f.inputHistoryBytes -= len(f.inputHistory[0].Text) + len(f.inputHistory[0].BeforeText) + len(f.inputHistory[0].Kind)
 		f.inputHistory[0] = inputbridge.Update{}
 		f.inputHistory = f.inputHistory[1:]
 		f.inputHistoryDropped++
@@ -896,9 +925,6 @@ func (f *fixture) probeRenderedGeometry(g inputbridge.Geometry, layout core.Text
 	dw := f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window)
 	pixelWidth, pixelHeight := dw.Glw.GetFramebufferSize()
 	for index, cell := range g.Cells {
-		if cell.Rect[2] <= 0 {
-			continue
-		}
 		raw := f.input.QueryProbe(cell.Start, cell.End-cell.Start, [2]float64{-999, -999})
 		var q struct {
 			Range  [2]int     `json:"rect_range"`
@@ -927,6 +953,13 @@ func (f *fixture) probeRenderedGeometry(g inputbridge.Geometry, layout core.Text
 				panic(fmt.Sprintf("rendered/native rect mismatch got=%v expected=%v", q.Screen, expected))
 			}
 		}
+		// Newline cells have zero advance; they support range geometry but no
+		// containing point. Character cells also exercise native hit lookup.
+		if cell.Rect[2] == 0 {
+			record, _ := json.Marshal(map[string]any{"kind": "newline", "expected_screen_rect": expected, "native": json.RawMessage(raw)})
+			f.geometryQueries = append(f.geometryQueries, record)
+			continue
+		}
 		point := [2]float64{expected[0] + expected[2]/2, expected[1] + expected[3]/2}
 		raw = f.input.QueryProbe(cell.Start, cell.End-cell.Start, point)
 		if err := json.Unmarshal([]byte(raw), &q); err != nil {
@@ -938,6 +971,56 @@ func (f *fixture) probeRenderedGeometry(g inputbridge.Geometry, layout core.Text
 		record, _ := json.Marshal(map[string]any{"rendered_pixels": [4]float64{float64(left), float64(top), float64(right - left), float64(bottom - top)}, "expected_screen_rect": expected, "native": json.RawMessage(raw)})
 		f.geometryQueries = append(f.geometryQueries, record)
 	}
+	// Match the native affinity rule when an offset occurs at a wrap boundary.
+	best := map[int]int{}
+	_, client, _ := f.nativeClient()
+	state := client.EditingState()
+	focus, _ := inputbridge.UTF16Offset(state.Text, state.Focus)
+	for i, c := range g.Carets {
+		old, exists := best[c.Offset]
+		if !exists || c.Line > g.Carets[old].Line {
+			best[c.Offset] = i
+		}
+	}
+	for i, c := range g.Carets {
+		if c.Offset == focus && c.Line == g.FocusLine {
+			best[c.Offset] = i
+		}
+	}
+	for i, c := range g.Carets {
+		if best[c.Offset] != i {
+			continue
+		}
+		source := layout.Carets[i]
+		x, top := source.Pos.X, max(source.Pos.Y, layout.Viewport.Min.Y)
+		bottom := min(source.Pos.Y+source.Height, layout.Viewport.Max.Y)
+		if x < layout.Viewport.Min.X || x > layout.Viewport.Max.X || bottom <= top {
+			continue
+		}
+		// Float coordinates are retained here, as they are in publication.
+		y := math.Max(float64(source.Pos.Y), float64(layout.Viewport.Min.Y))
+		height := math.Min(float64(source.Pos.Y+source.Height), float64(layout.Viewport.Max.Y)) - y
+		expected := f.input.RenderedRectToScreen([4]float64{float64(source.Pos.X), y, 0, height}, [2]int{pixelWidth, pixelHeight})
+		raw := f.input.QueryProbe(c.Offset, 0, [2]float64{-999, -999})
+		var q struct {
+			Range  [2]int     `json:"rect_range"`
+			Screen [4]float64 `json:"screen_rect"`
+		}
+		if err := json.Unmarshal([]byte(raw), &q); err != nil {
+			panic(err)
+		}
+		if q.Range != [2]int{c.Offset, 0} {
+			panic("native insertion range: " + raw)
+		}
+		for j := range expected {
+			if math.Abs(q.Screen[j]-expected[j]) > 0.05 {
+				panic(fmt.Sprintf("native insertion rect got=%v expected=%v", q.Screen, expected))
+			}
+		}
+		record, _ := json.Marshal(map[string]any{"kind": "insertion", "expected_screen_rect": expected, "native": json.RawMessage(raw)})
+		f.geometryQueries = append(f.geometryQueries, record)
+	}
+
 	if len(f.geometryQueries) == 0 {
 		panic("no rendered native range queries")
 	}

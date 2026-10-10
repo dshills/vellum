@@ -8,8 +8,8 @@ import (
 )
 
 type Update struct {
-	Sequence                              uint64
-	Kind, Text                            string
+	Sequence, ClientID                    uint64
+	Kind, Text, BeforeText                string
 	Anchor, Focus, MarkedStart, MarkedEnd int // UTF-16 offsets; -1 means unmarked.
 }
 
@@ -22,7 +22,7 @@ type RuneUpdate struct {
 // IME selections may be inside graphemes but must be on Unicode scalar bounds.
 func Decode(u Update) (RuneUpdate, error) {
 	result := RuneUpdate{Update: u, RuneMarkedStart: -1, RuneMarkedEnd: -1}
-	if !utf8.ValidString(u.Text) || strings.ContainsRune(u.Text, 0) {
+	if !utf8.ValidString(u.Text) || strings.ContainsRune(u.Text, 0) || !utf8.ValidString(u.BeforeText) || strings.ContainsRune(u.BeforeText, 0) {
 		return result, fmt.Errorf("unrepresentable text")
 	}
 	positions := map[int]int{0: 0}

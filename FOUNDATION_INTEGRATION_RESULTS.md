@@ -2,6 +2,8 @@
 
 9 October 2026. **The remaining local foundation engineering is implemented in isolated, pinned prototypes; G1 has not passed. Keep Cogent Core as the experimental foundation and keep broad workbench expansion on hold.** This report supersedes the outstanding implementation status in the earlier contracts report, while preserving its original evidence. See [ADR 0007](decisions/0007-foundation-integration.md).
 
+The multiline Editor native composition/range adapter is now [implemented, reviewed and tested](MULTILINE_NATIVE_ADAPTER.md), superseding its earlier missing-adapter status. This extension preserves the editor's fixed-grid keyboard/pointer policy; live input/assistive, larger performance/resource, platform/release, regression and upstream gates remain open.
+
 Current acceptance-check status is recorded in [the 10 October audit](FOUNDATION_ACCEPTANCE_AUDIT.md). It records the initial legacy shortcut ordering failure and narrower passing scopes. That ordering defect is now [fixed and tested](INPUT_ORDERING_FIX.md); the other G1 gates remain open.
 
 ## Implemented and checked

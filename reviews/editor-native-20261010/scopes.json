@@ -1,0 +1,67 @@
+{
+  "source-approved.json": {
+    "root": "/private/tmp/vellum-editor-review-source",
+    "paths": [
+      "text/lines/api.go",
+      "text/lines/file.go",
+      "text/lines/lines.go",
+      "text/lines/native_vellum.go",
+      "text/lines/native_vellum_test.go",
+      "text/textcore/base.go",
+      "text/textcore/native_vellum.go",
+      "text/textcore/native_vellum_test.go",
+      "text/textcore/render.go"
+    ],
+    "diff_sha256": "eb270595f0c70d6d341b06ee56a40894d13836c4109c70704c2c1c2eeac22081",
+    "report_sha256": "00e0f6ae55a7717affb9606930a13c2f885e100cb44a88a1dccc72c1a75f4e1f",
+    "complete": true,
+    "findings": 0
+  },
+  "bridge-final.json": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "paths": [
+      "prototypes/foundationintegration/cmd/lifecyclecheck/clients_darwin.go",
+      "prototypes/foundationintegration/cmd/lifecyclecheck/main.go",
+      "prototypes/foundationintegration/editor_adapter.go",
+      "prototypes/foundationintegration/editor_adapter_test.go",
+      "prototypes/foundationintegration/inputbridge/encoding.go",
+      "prototypes/foundationintegration/inputbridge/encoding_test.go",
+      "prototypes/foundationintegration/inputbridge/input.h",
+      "prototypes/foundationintegration/inputbridge/input_darwin.go",
+      "prototypes/foundationintegration/inputbridge/input_darwin.m",
+      "prototypes/foundationintegration/main.go",
+      "prototypes/foundationintegration/patches/original-hashes.json",
+      "prototypes/foundationintegration/prepare.py"
+    ],
+    "diff_sha256": "9bd4237b692887d36cb25b9430a3e26639b7f7ed130390175f287ec36780d4f2",
+    "report_sha256": "de60bbbba7c6f98732d46f76a4daf10f3d7816f532580630e8cbd629c9aab1e9",
+    "complete": true,
+    "findings": 0
+  },
+  "docs.json": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "paths": [
+      "MULTILINE_NATIVE_ADAPTER.md",
+      "decisions/0011-multiline-native-adapter.md",
+      "FOUNDATION_ACCEPTANCE_AUDIT.md",
+      "FOUNDATION_INTEGRATION_RESULTS.md",
+      "prototypes/foundationintegration/README.md"
+    ],
+    "diff_sha256": "939bfb9f856b45800301ac2deff7e38ca7fbbd34ee25576911642ac24e6ebe25",
+    "report_sha256": "d469fc169fc531ca33dba442a062c3c36a48300ed1d86a060f58b7484d049cec",
+    "complete": true,
+    "findings": 0
+  },
+  "evidence-final.json": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "paths": [
+      "prototypes/foundationintegration/verify_editor_native.py",
+      "prototypes/foundationintegration/evidence/20261010-editor-native/README.md",
+      "prototypes/foundationintegration/evidence/20261010-editor-native/manifest.json"
+    ],
+    "diff_sha256": "884f509f589e0e5e8ca67f56aab2d282e58831c36e4565ff86ff63ff05b0f7dc",
+    "report_sha256": "bca6ea008595cda2a5f21d0748c209d6efe0cb3d781b5133849d5307b7f8cf55",
+    "complete": true,
+    "findings": 0
+  }
+}

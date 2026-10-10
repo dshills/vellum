@@ -1,0 +1,9 @@
+# cogentcore.org/core/text/textcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+goos: darwin
+goarch: arm64
+pkg: cogentcore.org/core/text/textcore
+cpu: Apple M4 Pro
+BenchmarkVellumEditorNativeCachedSnapshot-14    	 7355475	        15.37 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	cogentcore.org/core/text/textcore	0.576s

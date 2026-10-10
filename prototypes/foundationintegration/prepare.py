@@ -1,4 +1,4 @@
-"""Apply eleven isolated patches to an owned copy of the pinned module."""
+"""Apply twelve isolated patches to an owned copy of the pinned module."""
 from pathlib import Path
 import hashlib,json,os,shutil,subprocess
 root=Path(__file__).resolve().parent

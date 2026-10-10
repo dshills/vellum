@@ -1,0 +1,92 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "087a5ef08503ee10c8d0acf00dc58540",
+  "repo": {
+    "root": "/private/tmp/vellum-editor-review-source",
+    "head": "26ec0b7cced1466a5415f442af750594f40da459",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "eccac369ac536c5d",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Restore dirty flags when a composition commits no net change",
+      "message": "When preedit changes the document and then returns to its original text, committing clears the composition but leaves the dirty flags set by the intermediate edits. recordNativeUndo returns immediately for identical before/after text, so this creates no undo entry yet can leave an originally clean document marked changed and not saved. Implicit commits through commitNativeComposition have the same problem.",
+      "suggestion": "In both explicit and implicit composition commits, compare the final text with c.before. If they are equal, restore c.changed and c.notSaved, as cancellation already does; otherwise record the net undo transaction. Add a test that marks different text, marks the original text again, and commits an initially clean buffer.",
+      "confidence": 0.86,
+      "locations": [
+        {
+          "path": "text/lines/native_vellum.go",
+          "lines": {
+            "start": 154,
+            "end": 155
+          }
+        }
+      ],
+      "tags": [
+        "composition",
+        "dirty-state",
+        "undo"
+      ],
+      "evidence": "\t\tls.nativeComposition = nil\n\t\tls.recordNativeUndo(baseline, next)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 34333,
+    "totalMs": 29331
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 8,
+    "bytes": 36992,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 14445,
+        "output": 1443,
+        "reasoning": 1166,
+        "cachedInput": 2328
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

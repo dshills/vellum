@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0b5d042ad03038af5bd0a2762490579c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "60c4f9513ea9bd7af9a3ae886a61f2bcf8715968",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "4f9fce9ab9cac8b9",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Reject embedded NULs before publishing client text",
+      "message": "UpdateClient passes arbitrary Go text through a NUL-terminated C string without rejecting embedded NULs. For example, \"A\\x00B\" reaches the native implementation as \"A\", so a successful binding can silently publish different text and invalidate subsequent BeforeText provenance checks. Native validation cannot detect the discarded suffix.",
+      "suggestion": "Reject embedded NULs and invalid UTF-8 before calling C.CString, consistent with Decode and the geometry publication path. Return false without modifying native state for unrepresentable text.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.go",
+          "lines": {
+            "start": 179,
+            "end": 181
+          }
+        }
+      ],
+      "tags": [
+        "cgo",
+        "input-validation"
+      ],
+      "evidence": "\tp := C.CString(text)\n\tdefer C.free(unsafe.Pointer(p))\n\treturn bool(C.vellum_input_client_update(i.native, C.uint64_t(clientID), p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack), C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3])))",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "88d3206408041a3f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Validate client offsets before narrowing to C.int",
+      "message": "UpdateClient narrows Go int offsets to 32-bit C.int without checking their range. On 64-bit Darwin, an invalid offset such as 1\u003c\u003c32 becomes zero, allowing native range validation to accept a different selection instead of rejecting the supplied value. UpdateGeometryForClient already guards against this conversion.",
+      "suggestion": "Apply the same [-1, 1\u003c\u003c31-1] offset checks used by UpdateGeometryForClient before converting anchor, focus, markedStart, and markedEnd to C.int; return false on failure.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.go",
+          "lines": {
+            "start": 182,
+            "end": 182
+          }
+        }
+      ],
+      "tags": [
+        "cgo",
+        "integer-narrowing",
+        "location-corrected"
+      ],
+      "evidence": "\treturn bool(C.vellum_input_client_update(i.native, C.uint64_t(clientID), p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack), C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3])))",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 30331,
+    "totalMs": 14367
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 10,
+    "bytes": 61398,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 22862,
+        "output": 1215,
+        "reasoning": 601,
+        "cachedInput": 1164
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

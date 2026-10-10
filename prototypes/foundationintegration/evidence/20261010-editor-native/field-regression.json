@@ -1,0 +1,1145 @@
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 3,
+  "canvas_repaints_proxy": 3,
+  "commits": 0,
+  "editing_state": {
+    "Text": "abc אבג xyz é 👩‍💻",
+    "Cursor": 0,
+    "Anchor": 0,
+    "Focus": 0,
+    "VisualLine": -1,
+    "Caret": {
+      "Min": {
+        "X": 16,
+        "Y": 116
+      },
+      "Max": {
+        "X": 17,
+        "Y": 139
+      }
+    }
+  },
+  "editor_editing_state": {
+    "Text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+    "Cursor": 0,
+    "Anchor": 0,
+    "Focus": 0,
+    "VisualLine": 0,
+    "Caret": {
+      "Min": {
+        "X": 68,
+        "Y": 676
+      },
+      "Max": {
+        "X": 69,
+        "Y": 698
+      }
+    }
+  },
+  "editor_probe": false,
+  "experimental_toolkit_patch": true,
+  "field_text": "abc אבג xyz é 👩‍💻",
+  "go_heap_alloc_bytes_after_forced_gc": 50037376,
+  "go_heap_alloc_bytes_before_gc": 51591632,
+  "go_heap_inuse_bytes": 56254464,
+  "goroutines": 5,
+  "idle_samples": null,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "input_environment_scope": "captured at first show; each recorded native probe reports its current source",
+  "input_history_bytes": 0,
+  "input_history_dropped": 0,
+  "input_probes": null,
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": null,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "native TextField and exact multiline Editor support composition/range geometry; Editor keyboard/pointer navigation retains its fixed-grid policy",
+    "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+  "native_actions": 0,
+  "native_client_id": 8,
+  "native_geometry_publications": 2,
+  "native_input_ack": 0,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 32,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "rendered_geometry_queries": [
+    {
+      "expected_screen_rect": [
+        272,
+        1052,
+        8.96875,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          0,
+          1
+        ],
+        "screen_rect": [
+          272,
+          1052,
+          8.96875,
+          23
+        ],
+        "point_index": 0,
+        "requested": [
+          0,
+          1
+        ],
+        "rect_range": [
+          0,
+          1
+        ],
+        "substring": "a"
+      },
+      "rendered_pixels": [
+        16,
+        117,
+        8.96875,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        280.96875,
+        1052,
+        9.84375,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          1,
+          1
+        ],
+        "screen_rect": [
+          280.96875,
+          1052,
+          9.84375,
+          23
+        ],
+        "point_index": 1,
+        "requested": [
+          1,
+          1
+        ],
+        "rect_range": [
+          1,
+          1
+        ],
+        "substring": "b"
+      },
+      "rendered_pixels": [
+        24.96875,
+        117,
+        9.84375,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        290.8125,
+        1052,
+        7.6875,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          2,
+          1
+        ],
+        "screen_rect": [
+          290.8125,
+          1052,
+          7.6875,
+          23
+        ],
+        "point_index": 2,
+        "requested": [
+          2,
+          1
+        ],
+        "rect_range": [
+          2,
+          1
+        ],
+        "substring": "c"
+      },
+      "rendered_pixels": [
+        34.8125,
+        117,
+        7.6875,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        298.5,
+        1052,
+        4.15625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          3,
+          1
+        ],
+        "screen_rect": [
+          298.5,
+          1052,
+          4.15625,
+          23
+        ],
+        "point_index": 3,
+        "requested": [
+          3,
+          1
+        ],
+        "rect_range": [
+          3,
+          1
+        ],
+        "substring": " "
+      },
+      "rendered_pixels": [
+        42.5,
+        117,
+        4.15625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        302.65625,
+        1052,
+        6.390625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          6,
+          1
+        ],
+        "screen_rect": [
+          302.65625,
+          1052,
+          6.390625,
+          23
+        ],
+        "point_index": 6,
+        "requested": [
+          6,
+          1
+        ],
+        "rect_range": [
+          6,
+          1
+        ],
+        "substring": "ג"
+      },
+      "rendered_pixels": [
+        46.65625,
+        117,
+        6.390625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        309.046875,
+        1052,
+        8.671875,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          5,
+          1
+        ],
+        "screen_rect": [
+          309.046875,
+          1052,
+          8.671875,
+          23
+        ],
+        "point_index": 5,
+        "requested": [
+          5,
+          1
+        ],
+        "rect_range": [
+          5,
+          1
+        ],
+        "substring": "ב"
+      },
+      "rendered_pixels": [
+        53.046875,
+        117,
+        8.671875,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        317.71875,
+        1052,
+        9.015625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          4,
+          1
+        ],
+        "screen_rect": [
+          317.71875,
+          1052,
+          9.015625,
+          23
+        ],
+        "point_index": 4,
+        "requested": [
+          4,
+          1
+        ],
+        "rect_range": [
+          4,
+          1
+        ],
+        "substring": "א"
+      },
+      "rendered_pixels": [
+        61.71875,
+        117,
+        9.015625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        326.734375,
+        1052,
+        4.15625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          7,
+          1
+        ],
+        "screen_rect": [
+          326.734375,
+          1052,
+          4.15625,
+          23
+        ],
+        "point_index": 7,
+        "requested": [
+          7,
+          1
+        ],
+        "rect_range": [
+          7,
+          1
+        ],
+        "substring": " "
+      },
+      "rendered_pixels": [
+        70.734375,
+        117,
+        4.15625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        330.890625,
+        1052,
+        8.46875,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          8,
+          1
+        ],
+        "screen_rect": [
+          330.890625,
+          1052,
+          8.46875,
+          23
+        ],
+        "point_index": 8,
+        "requested": [
+          8,
+          1
+        ],
+        "rect_range": [
+          8,
+          1
+        ],
+        "substring": "x"
+      },
+      "rendered_pixels": [
+        74.890625,
+        117,
+        8.46875,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        339.359375,
+        1052,
+        8.15625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          9,
+          1
+        ],
+        "screen_rect": [
+          339.359375,
+          1052,
+          8.15625,
+          23
+        ],
+        "point_index": 9,
+        "requested": [
+          9,
+          1
+        ],
+        "rect_range": [
+          9,
+          1
+        ],
+        "substring": "y"
+      },
+      "rendered_pixels": [
+        83.359375,
+        117,
+        8.15625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        347.515625,
+        1052,
+        7.515625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          10,
+          1
+        ],
+        "screen_rect": [
+          347.515625,
+          1052,
+          7.515625,
+          23
+        ],
+        "point_index": 10,
+        "requested": [
+          10,
+          1
+        ],
+        "rect_range": [
+          10,
+          1
+        ],
+        "substring": "z"
+      },
+      "rendered_pixels": [
+        91.515625,
+        117,
+        7.515625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        355.03125,
+        1052,
+        4.15625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          11,
+          1
+        ],
+        "screen_rect": [
+          355.03125,
+          1052,
+          4.15625,
+          23
+        ],
+        "point_index": 11,
+        "requested": [
+          11,
+          1
+        ],
+        "rect_range": [
+          11,
+          1
+        ],
+        "substring": " "
+      },
+      "rendered_pixels": [
+        99.03125,
+        117,
+        4.15625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        359.1875,
+        1052,
+        9.03125,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          12,
+          2
+        ],
+        "screen_rect": [
+          359.1875,
+          1052,
+          9.03125,
+          23
+        ],
+        "point_index": 12,
+        "requested": [
+          12,
+          2
+        ],
+        "rect_range": [
+          12,
+          2
+        ],
+        "substring": "é"
+      },
+      "rendered_pixels": [
+        103.1875,
+        117,
+        9.03125,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        368.21875,
+        1052,
+        4.15625,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          14,
+          1
+        ],
+        "screen_rect": [
+          368.21875,
+          1052,
+          4.15625,
+          23
+        ],
+        "point_index": 14,
+        "requested": [
+          14,
+          1
+        ],
+        "rect_range": [
+          14,
+          1
+        ],
+        "substring": " "
+      },
+      "rendered_pixels": [
+        112.21875,
+        117,
+        4.15625,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        372.375,
+        1052,
+        16,
+        23
+      ],
+      "native": {
+        "substring_range": [
+          15,
+          5
+        ],
+        "screen_rect": [
+          372.375,
+          1052,
+          16,
+          23
+        ],
+        "point_index": 15,
+        "requested": [
+          15,
+          5
+        ],
+        "rect_range": [
+          15,
+          5
+        ],
+        "substring": "👩‍💻"
+      },
+      "rendered_pixels": [
+        116.375,
+        117,
+        16,
+        23
+      ]
+    },
+    {
+      "expected_screen_rect": [
+        272,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          272,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          0,
+          0
+        ],
+        "rect_range": [
+          0,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        280.96875,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          280.96875,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          1,
+          0
+        ],
+        "rect_range": [
+          1,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        290.8125,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          290.8125,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          2,
+          0
+        ],
+        "rect_range": [
+          2,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        298.5,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          298.5,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          3,
+          0
+        ],
+        "rect_range": [
+          3,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        302.65625,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          302.65625,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          4,
+          0
+        ],
+        "rect_range": [
+          4,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        309.046875,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          309.046875,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          6,
+          0
+        ],
+        "rect_range": [
+          6,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        317.71875,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          317.71875,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          5,
+          0
+        ],
+        "rect_range": [
+          5,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        326.734375,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          326.734375,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          7,
+          0
+        ],
+        "rect_range": [
+          7,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        330.890625,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          330.890625,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          8,
+          0
+        ],
+        "rect_range": [
+          8,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        339.359375,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          339.359375,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          9,
+          0
+        ],
+        "rect_range": [
+          9,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        347.515625,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          347.515625,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          10,
+          0
+        ],
+        "rect_range": [
+          10,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        355.03125,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          355.03125,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          11,
+          0
+        ],
+        "rect_range": [
+          11,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        359.1875,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          359.1875,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          12,
+          0
+        ],
+        "rect_range": [
+          12,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        368.21875,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          368.21875,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          14,
+          0
+        ],
+        "rect_range": [
+          14,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        372.375,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          372.375,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          15,
+          0
+        ],
+        "rect_range": [
+          15,
+          0
+        ],
+        "substring": ""
+      }
+    },
+    {
+      "expected_screen_rect": [
+        388.375,
+        1052,
+        0,
+        23
+      ],
+      "kind": "insertion",
+      "native": {
+        "substring_range": [
+          -1,
+          0
+        ],
+        "screen_rect": [
+          388.375,
+          1052,
+          0,
+          23
+        ],
+        "point_index": -1,
+        "requested": [
+          20,
+          0
+        ],
+        "rect_range": [
+          20,
+          0
+        ],
+        "substring": ""
+      }
+    }
+  ],
+  "resident_bytes_after_gc": 201572352,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 2,
+  "shown_callback_ms": 358.952,
+  "spell_checker_initialized": false,
+  "status": "",
+  "text_samples": null,
+  "transport": {
+    "Queue": {
+      "Outstanding": 0,
+      "PayloadBytes": 0,
+      "InFlight": 0,
+      "Closed": true
+    },
+    "Refused": 0,
+    "Wakes": 2,
+    "LatestBytes": 0,
+    "Closed": true
+  },
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}

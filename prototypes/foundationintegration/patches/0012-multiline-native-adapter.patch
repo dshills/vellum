@@ -1,0 +1,1233 @@
+--- a/text/lines/api.go
++++ b/text/lines/api.go
+@@ -79,6 +79,9 @@
+ // existing views.
+ func (ls *Lines) DeleteView(vid int) {
+ 	ls.Lock()
++	if ls.nativeComposition != nil && ls.nativeComposition.owner == vid {
++		ls.commitNativeComposition()
++	}
+ 	defer ls.Unlock()
+ 	ls.deleteView(vid)
+ }
+@@ -201,6 +204,8 @@
+ 	ls.Lock()
+ 	ls.stopDelayedReMarkup()
+ 	ls.views = make(map[int]*view)
++	ls.nativeRevision++
++	ls.nativeComposition = nil
+ 	ls.lines = nil
+ 	ls.tags = nil
+ 	ls.hiTags = nil
+@@ -629,6 +634,7 @@
+ // SetUndoOn turns on or off the recording of undo records for every edit.
+ func (ls *Lines) SetUndoOn(on bool) {
+ 	ls.Lock()
++	ls.commitNativeComposition()
+ 	defer ls.Unlock()
+ 	ls.undos.Off = !on
+ }
+@@ -644,6 +650,7 @@
+ // UndoReset resets all current undo records.
+ func (ls *Lines) UndoReset() {
+ 	ls.Lock()
++	ls.commitNativeComposition()
+ 	defer ls.Unlock()
+ 	ls.undos.Reset()
+ }
+@@ -653,6 +660,7 @@
+ // Calls sendInput to send an Input event to views, so they update.
+ func (ls *Lines) Undo() []*textpos.Edit {
+ 	ls.Lock()
++	ls.commitNativeComposition()
+ 	autoSave := ls.batchUpdateStart()
+ 	tbe := ls.undo()
+ 	if tbe == nil || ls.undos.Pos == 0 { // no more undo = fully undone
+@@ -670,6 +678,7 @@
+ // Calls sendInput to send an Input event to views, so they update.
+ func (ls *Lines) Redo() []*textpos.Edit {
+ 	ls.Lock()
++	ls.commitNativeComposition()
+ 	autoSave := ls.batchUpdateStart()
+ 	tbe := ls.redo()
+ 	ls.batchUpdateEnd(autoSave)
+--- a/text/lines/file.go
++++ b/text/lines/file.go
+@@ -185,6 +185,7 @@
+ // has indicated that editing is done, and the results are to be consumed.
+ func (ls *Lines) EditDone() {
+ 	ls.Lock()
++	ls.commitNativeComposition()
+ 	ls.changed = false
+ 	ls.Unlock()
+ 	ls.sendChange()
+@@ -245,6 +246,9 @@
+ // setReadOnly sets whether the buffer is read-only.
+ // read-only buffers also do not record undo events.
+ func (ls *Lines) setReadOnly(readonly bool) *Lines {
++	if readonly {
++		ls.commitNativeComposition()
++	}
+ 	ls.readOnly = readonly
+ 	ls.undos.Off = readonly
+ 	return ls
+@@ -357,6 +361,7 @@
+ 
+ // saveFile writes current buffer to file, with no prompting, etc
+ func (ls *Lines) saveFile(filename string) error {
++	ls.commitNativeComposition()
+ 	err := os.WriteFile(string(filename), ls.bytes(0), 0644)
+ 	if err != nil {
+ 		// core.ErrorSnackbar(tb.sceneFromEditor(), err) // todo:
+@@ -425,17 +430,26 @@
+ 
+ // autoSave does the autosave -- safe to call in a separate goroutine
+ func (ls *Lines) autoSave() error {
++	ls.Lock()
+ 	if ls.autoSaving {
++		ls.Unlock()
+ 		return nil
+ 	}
+ 	ls.autoSaving = true
+ 	asfn := ls.autosaveFilename()
+ 	b := ls.bytes(0)
++	// A delayed autosave from a prior committed edit must not persist preedit.
++	if ls.nativeComposition != nil {
++		b = []byte(ls.nativeComposition.before)
++	}
++	ls.Unlock()
+ 	err := os.WriteFile(asfn, b, 0644)
+ 	if err != nil {
+ 		log.Printf("Lines: Could not Autosave file: %v, error: %v\n", asfn, err)
+ 	}
++	ls.Lock()
+ 	ls.autoSaving = false
++	ls.Unlock()
+ 	return err
+ }
+ 
+--- a/text/lines/lines.go
++++ b/text/lines/lines.go
+@@ -67,7 +67,10 @@
+ type Lines struct {
+ 	// exactText preserves the final empty line and emits no synthetic newlines.
+ 	// Opted into only by NewLinesExact; legacy buffers retain their policy.
+-	exactText bool
++	exactText         bool
++	nativeComposition *nativeComposition
++	nativeUpdating    bool
++	nativeRevision    uint64
+ 
+ 	// Settings are the options for how text editing and viewing works.
+ 	Settings Settings
+@@ -201,6 +204,7 @@
+ // setText sets the rune lines from source text,
+ // and triggers initial markup and delayed full markup.
+ func (ls *Lines) setText(txt []byte) {
++	ls.commitNativeComposition()
+ 	ls.bytesToLines(txt)
+ 	ls.initialMarkup()
+ 	ls.startDelayedReMarkup()
+@@ -217,6 +221,8 @@
+ 
+ // setLineBytes sets the lines from source [][]byte.
+ func (ls *Lines) setLineBytes(lns [][]byte) {
++	ls.nativeRevision++
++	ls.commitNativeComposition()
+ 	if ls.exactText && len(lns) == 0 {
+ 		lns = [][]byte{nil}
+ 	}
+@@ -487,6 +493,8 @@
+ }
+ 
+ func (ls *Lines) deleteTextImpl(st, ed textpos.Pos) *textpos.Edit {
++	ls.nativeRevision++
++	ls.commitNativeComposition()
+ 	tbe := ls.region(st, ed)
+ 	if tbe == nil {
+ 		return nil
+@@ -537,6 +545,8 @@
+ }
+ 
+ func (ls *Lines) deleteTextRectImpl(st, ed textpos.Pos) *textpos.Edit {
++	ls.nativeRevision++
++	ls.commitNativeComposition()
+ 	tbe := ls.regionRect(st, ed)
+ 	if tbe == nil {
+ 		return nil
+@@ -595,6 +605,8 @@
+ 
+ // insertTextImpl inserts the Text at given starting position.
+ func (ls *Lines) insertTextImpl(st textpos.Pos, txt [][]rune) *textpos.Edit {
++	ls.nativeRevision++
++	ls.commitNativeComposition()
+ 	if st.Line == ls.numLines() && st.Char == 0 { // adding new line
+ 		ls.appendLines(1)
+ 	}
+@@ -644,6 +656,8 @@
+ }
+ 
+ func (ls *Lines) insertTextRectImpl(tbe *textpos.Edit) *textpos.Edit {
++	ls.nativeRevision++
++	ls.commitNativeComposition()
+ 	st := tbe.Region.Start
+ 	ed := tbe.Region.End
+ 	nlns := (ed.Line - st.Line) + 1
+--- a/text/lines/native_vellum.go
++++ b/text/lines/native_vellum.go
+@@ -0,0 +1,195 @@
++// Experimental exact-buffer composition transactions for native editor clients.
++package lines
++
++import (
++	"cogentcore.org/core/text/runes"
++	"cogentcore.org/core/text/textpos"
++	"strings"
++	"unicode/utf8"
++)
++
++type nativeComposition struct {
++	owner    int
++	before   string
++	changed  bool
++	notSaved bool
++}
++
++// NativeCompositionActive identifies the view owning the current preedit.
++func (ls *Lines) NativeCompositionActive(owner int) bool {
++	ls.Lock()
++	defer ls.Unlock()
++	return ls.nativeComposition != nil && ls.nativeComposition.owner == owner
++}
++
++// ViewSourcePosNoLock maps a rendered fragment while the caller holds Lines.Lock.
++func (ls *Lines) ViewSourcePosNoLock(owner int, pos textpos.Pos) textpos.Pos {
++	vw := ls.view(owner)
++	if vw == nil {
++		return textpos.Pos{}
++	}
++	return ls.posFromView(vw, pos)
++}
++
++func nativePos(rs []rune, offset int) textpos.Pos {
++	p := textpos.Pos{}
++	for _, r := range rs[:offset] {
++		if r == '\n' {
++			p.Line++
++			p.Char = 0
++		} else {
++			p.Char++
++		}
++	}
++	return p
++}
++func nativeDiff(a, b []rune) (start, ae, be int) {
++	for start < len(a) && start < len(b) && a[start] == b[start] {
++		start++
++	}
++	ae, be = len(a), len(b)
++	for ae > start && be > start && a[ae-1] == b[be-1] {
++		ae--
++		be--
++	}
++	return
++}
++func (ls *Lines) recordNativeUndo(before, after string) {
++	if before == after {
++		return
++	}
++	a, b := []rune(before), []rune(after)
++	start, ae, be := nativeDiff(a, b)
++	pos := nativePos(a, start)
++	deletion := textpos.NewEditFromRunes(a[start:ae])
++	deletion.Delete = true
++	deletion.Region = textpos.NewRegionPos(pos, nativePos(a, ae))
++	insertion := textpos.NewEditFromRunes(b[start:be])
++	insertion.Region = textpos.NewRegionPos(pos, nativePos(b, be))
++	insertion.Region.Time = deletion.Region.Time
++	ls.undos.NewGroup()
++	if ae > start {
++		ls.saveUndo(deletion)
++	}
++	if be > start {
++		ls.saveUndo(insertion)
++	}
++	ls.undos.NewGroup()
++}
++
++// Called with the buffer locked, before any ordinary mutation or undo/redo.
++func (ls *Lines) commitNativeComposition() {
++	if ls.nativeUpdating || ls.nativeComposition == nil {
++		return
++	}
++	c := ls.nativeComposition
++	ls.nativeComposition = nil
++	after := string(ls.bytes(0))
++	if after == c.before {
++		ls.changed = c.changed
++		ls.notSaved = c.notSaved
++	} else {
++		ls.recordNativeUndo(c.before, after)
++	}
++}
++
++// ApplyNativeSnapshot is an atomic compare-and-edit for an exact buffer/view.
++// Preedit changes are visible to all views without creating intermediate undo
++// records. Commit records one net transaction; cancellation restores its baseline.
++// Ordinary buffer mutations seal that transaction before editing, so a subsequent
++// native cancellation cannot erase them. Callers own selection and UI state.
++func (ls *Lines) ApplyNativeSnapshot(owner int, expected, next, phase string) bool {
++	if !utf8.ValidString(next) || strings.ContainsRune(next, 0) || len(next) > 1<<20 {
++		return false
++	}
++	if phase != "mark" && phase != "insert" && phase != "unmark" && phase != "cancel" {
++		return false
++	}
++	ls.Lock()
++	if !ls.exactText || ls.readOnly || ls.view(owner) == nil || string(ls.bytes(0)) != expected {
++		ls.Unlock()
++		return false
++	}
++	if ls.nativeComposition == nil && phase != "cancel" {
++		modified := ls.fileModCheck()
++		if !ls.exactText || ls.readOnly || ls.view(owner) == nil || string(ls.bytes(0)) != expected {
++			ls.Unlock()
++			if modified {
++				ls.sendChange()
++			}
++			return false
++		}
++	}
++	c := ls.nativeComposition
++	if c != nil && c.owner != owner {
++		ls.Unlock()
++		return false
++	}
++	if phase == "cancel" {
++		if c == nil {
++			ls.Unlock()
++			return false
++		}
++		next = c.before
++	}
++	if phase == "mark" && c == nil {
++		c = &nativeComposition{owner: owner, before: expected, changed: ls.changed, notSaved: ls.notSaved}
++		ls.nativeComposition = c
++	}
++	ls.nativeUpdating = true
++	a, b := []rune(expected), []rune(next)
++	start, ae, be := nativeDiff(a, b)
++	pos := nativePos(a, start)
++	if ae > start {
++		ls.deleteTextImpl(pos, nativePos(a, ae))
++	}
++	if be > start {
++		ls.insertTextImpl(pos, runes.Split(b[start:be], []rune("\n")))
++	}
++	ls.nativeUpdating = false
++	if phase == "cancel" {
++		ls.changed = c.changed
++		ls.notSaved = c.notSaved
++		ls.nativeComposition = nil
++	} else if phase != "mark" {
++		baseline := expected
++		if c != nil {
++			baseline = c.before
++		}
++		ls.nativeComposition = nil
++		if c != nil && baseline == next {
++			ls.changed = c.changed
++			ls.notSaved = c.notSaved
++		} else {
++			ls.recordNativeUndo(baseline, next)
++		}
++	}
++	changed := expected != next
++	autoSave := phase != "mark" && phase != "cancel" && ls.Autosave
++	ls.Unlock()
++	if changed {
++		ls.sendInput()
++	}
++	if autoSave {
++		go ls.autoSave()
++	}
++	return true
++}
++
++// NativeEditable reports the buffer policy required by this native seam.
++func (ls *Lines) NativeEditable() bool {
++	ls.Lock()
++	defer ls.Unlock()
++	return ls.exactText && !ls.readOnly
++}
++
++// NativeTextSnapshot avoids encoding unchanged text during UI-only redraws.
++func (ls *Lines) NativeTextSnapshot(known uint64, initialized bool) (text string, revision uint64, changed bool) {
++	ls.Lock()
++	defer ls.Unlock()
++	revision = ls.nativeRevision
++	if !initialized || known != revision {
++		return string(ls.bytes(0)), revision, true
++	}
++	return "", revision, false
++}
+--- a/text/lines/native_vellum_test.go
++++ b/text/lines/native_vellum_test.go
+@@ -0,0 +1,65 @@
++package lines
++
++import (
++	"os"
++	"path/filepath"
++	"testing"
++)
++
++func TestVellumNativeEditorPersistenceSealsComposition(t *testing.T) {
++	ls := NewLinesExact().SetString("A\n")
++	defer ls.Close()
++	owner := ls.NewView(80)
++	filename := filepath.Join(t.TempDir(), "native.txt")
++	if err := ls.SaveFile(filename); err != nil {
++		t.Fatal(err)
++	}
++	// FileInfo uses a fixed timestamp under go test; restore real file stat for
++	// the ordinary external-modification guard exercised by native edits.
++	info, err := os.Stat(filename)
++	if err != nil {
++		t.Fatal(err)
++	}
++	ls.fileInfo.ModTime = info.ModTime()
++	if !ls.ApplyNativeSnapshot(owner, "A\n", "Aに\n", "mark") {
++		t.Fatal("mark")
++	}
++	if err := ls.autoSave(); err != nil {
++		t.Fatal(err)
++	}
++	saved, err := os.ReadFile(ls.AutosaveFilename())
++	if err != nil || string(saved) != "A\n" {
++		t.Fatal("autosave persisted preedit", string(saved), err)
++	}
++	if err := ls.SaveFile(filename); err != nil {
++		t.Fatal(err)
++	}
++	if ls.NativeCompositionActive(owner) || ls.ApplyNativeSnapshot(owner, "Aに\n", "A\n", "cancel") {
++		t.Fatal("save left obsolete cancel baseline")
++	}
++	saved, err = os.ReadFile(filename)
++	if err != nil || string(saved) != "Aに\n" {
++		t.Fatal("save lost committed preedit", string(saved), err)
++	}
++	if len(ls.Undo()) == 0 || ls.String() != "A\n" {
++		t.Fatal("save lost composition undo")
++	}
++}
++
++func TestVellumNativeEditorCloseDiscardsComposition(t *testing.T) {
++	ls := NewLinesExact().SetString("old\n")
++	ls.Autosave = false
++	owner := ls.NewView(80)
++	if !ls.ApplyNativeSnapshot(owner, "old\n", "oldに\n", "mark") {
++		t.Fatal("mark")
++	}
++	ls.Close()
++	if ls.NativeCompositionActive(owner) {
++		t.Fatal("closed owner retained")
++	}
++	ls.SetString("new\n")
++	if len(ls.Undo()) != 0 || ls.String() != "new\n" {
++		t.Fatal("closed baseline resurrected")
++	}
++	ls.Close()
++}
+--- a/text/textcore/base.go
++++ b/text/textcore/base.go
+@@ -182,9 +182,20 @@
+ 	// targetSet indicates that the CursorTarget is set
+ 	targetSet bool
+ 
+-	lastRecenter   int
+-	lastAutoInsert rune
+-	lastFilename   string
++	lastRecenter                           int
++	lastAutoInsert                         rune
++	lastFilename                           string
++	nativeListener                         func(EditorEditingState)
++	nativeComposition                      *editorNativeComposition
++	nativeGeometry                         core.TextFieldGeometry
++	nativeText                             string
++	nativeRunes                            []rune
++	nativeDocument                         *lines.Lines
++	nativeRevision, nativeLayoutRevision   uint64
++	nativeOffsets                          []int
++	nativeGraphemes                        []int
++	nativeLastState                        EditorEditingState
++	nativeGeneration, nativeLastGeneration uint64
+ }
+ 
+ func (ed *Base) WidgetValue() any { return ed.Lines.Text() }
+@@ -263,6 +274,7 @@
+ // editDone completes editing and copies the active edited text to the text;
+ // called when the return key is pressed or goes out of focus
+ func (ed *Base) editDone() {
++	ed.nativeComposition = nil
+ 	if ed.Lines != nil {
+ 		ed.Lines.EditDone() // sends the change event
+ 	}
+@@ -323,6 +335,8 @@
+ 		oldln.DeleteView(ed.viewId)
+ 		ed.viewId = -1
+ 	}
++	ed.nativeComposition = nil
++	ed.nativeGeometry = core.TextFieldGeometry{}
+ 	ed.Lines = ln
+ 	ed.resetState()
+ 	if ln != nil {
+--- a/text/textcore/native_vellum.go
++++ b/text/textcore/native_vellum.go
+@@ -0,0 +1,365 @@
++// Experimental UI-owner native composition and visible rendered geometry.
++package textcore
++
++import (
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/textpos"
++	"image"
++	"slices"
++	"strings"
++	"unicode/utf8"
++)
++
++// EditorEditingState uses document-wide rune offsets; geometry is window pixels.
++type EditorEditingState = core.TextFieldEditingState
++type editorNativeComposition struct {
++	before     EditorEditingState
++	start, end int
++}
++
++func (ed *Base) SetNativeEditingListener(fn func(EditorEditingState)) {
++	ed.nativeListener = fn
++	ed.NeedsRender()
++}
++
++// nativePos resolves a document offset from the cached line-start index.
++func (ed *Base) nativePos(offset int) textpos.Pos {
++	line, exact := slices.BinarySearch(ed.nativeOffsets, offset)
++	if !exact {
++		line--
++	}
++	if line < 0 {
++		return textpos.Pos{}
++	}
++	return textpos.Pos{Line: line, Char: offset - ed.nativeOffsets[line]}
++}
++func (ed *Base) EditingState() EditorEditingState {
++	state := EditorEditingState{VisualLine: -1}
++	if ed.Lines == nil {
++		return state
++	}
++	ed.refreshNativeDocument()
++	state.Text = ed.nativeText
++	state.Cursor = ed.nativeOffset(ed.CursorPos)
++	state.Anchor, state.Focus = state.Cursor, state.Cursor
++	if !ed.SelectRegion.IsNil() {
++		a, b := ed.nativeOffset(ed.SelectRegion.Start), ed.nativeOffset(ed.SelectRegion.End)
++		if state.Cursor == a {
++			state.Anchor, state.Focus = b, a
++		} else {
++			state.Anchor, state.Focus = a, b
++		}
++	}
++	state.VisualLine = ed.Lines.PosToView(ed.viewId, ed.CursorPos).Line
++	state.Caret = ed.NativeCaretBounds()
++	return state
++}
++func (ed *Base) SetEditingSelection(anchor, focus int) bool {
++	if ed.Lines == nil {
++		return false
++	}
++	ed.refreshNativeDocument()
++	bounds := ed.nativeGraphemes
++	if _, ok := slices.BinarySearch(bounds, anchor); !ok {
++		return false
++	}
++	if _, ok := slices.BinarySearch(bounds, focus); !ok {
++		return false
++	}
++	ed.setNativeSelection(anchor, focus)
++	return true
++}
++func (ed *Base) setNativeSelection(anchor, focus int) {
++	ed.refreshNativeDocument()
++	ed.selectStart = ed.nativePos(anchor)
++	ed.CursorPos = ed.nativePos(focus)
++	ed.cursorColumn = ed.CursorPos.Char
++	lo, hi := ed.selectStart, ed.CursorPos
++	if focus < anchor {
++		lo, hi = hi, lo
++	}
++	ed.SelectRegion = textpos.NewRegionPos(lo, hi)
++	ed.selectMode = false
++	ed.isScrolling = false
++	ed.NeedsRender()
++}
++func (ed *Base) NativeCompositionRange() (int, int, bool) {
++	if ed.nativeComposition == nil || ed.Lines == nil || !ed.Lines.NativeCompositionActive(ed.viewId) {
++		ed.nativeComposition = nil
++		return -1, -1, false
++	}
++	return ed.nativeComposition.start, ed.nativeComposition.end, true
++}
++func (ed *Base) ApplyNativeEdit(text string, anchor, focus, start, end int, phase string) bool {
++	if ed.Lines == nil {
++		return false
++	}
++	ed.refreshNativeDocument()
++	return ed.ApplyNativeEditFrom(ed.nativeText, text, anchor, focus, start, end, phase)
++}
++
++// ApplyNativeEditFrom rejects a native shadow that predates an application edit.
++func (ed *Base) ApplyNativeEditFrom(expected, text string, anchor, focus, start, end int, phase string) bool {
++	if ed.Lines == nil || ed.IsReadOnly() || !utf8.ValidString(text) || strings.ContainsRune(text, 0) {
++		return false
++	}
++	rs := []rune(text)
++	n := len(rs)
++	if anchor < 0 || focus < 0 || anchor > n || focus > n {
++		return false
++	}
++	switch phase {
++	case "mark", "insert", "unmark", "cancel":
++	default:
++		return false
++	}
++	if phase == "mark" {
++		if start < 0 || end < start || end > n || anchor < start || anchor > end || focus < start || focus > end {
++			return false
++		}
++	} else if start != -1 || end != -1 {
++		return false
++	}
++	_, _, active := ed.NativeCompositionRange()
++	c := ed.nativeComposition
++	if phase == "cancel" && !active {
++		return false
++	}
++	before := ed.EditingState()
++	if !ed.Lines.ApplyNativeSnapshot(ed.viewId, expected, text, phase) {
++		return false
++	}
++	if phase == "mark" {
++		if c == nil {
++			c = &editorNativeComposition{before: before}
++		}
++		c.start, c.end = start, end
++		ed.nativeComposition = c
++	} else {
++		if phase == "cancel" {
++			ed.refreshNativeDocument()
++			text = ed.nativeText
++			rs = ed.nativeRunes
++			anchor, focus = c.before.Anchor, c.before.Focus
++		}
++		ed.nativeComposition = nil
++		if anchor == focus {
++			anchor = textpos.GraphemeAtOrAfter(rs, anchor)
++			focus = anchor
++		} else {
++			lo, hi := textpos.GraphemeAtOrBefore(rs, min(anchor, focus)), textpos.GraphemeAtOrAfter(rs, max(anchor, focus))
++			if anchor < focus {
++				anchor, focus = lo, hi
++			} else {
++				anchor, focus = hi, lo
++			}
++		}
++	}
++	ed.nativeGeometry = core.TextFieldGeometry{}
++	ed.setNativeSelection(anchor, focus)
++	return true
++}
++func (ed *Base) nativeViewport() math32.Box2 {
++	if ed.Scene == nil {
++		return math32.Box2{}
++	}
++	bb := ed.renderBBox()
++	bb.Min.X += int(ed.LineNumberPixels())
++	bb.Max.X = min(bb.Max.X, int(ed.Geom.Pos.Content.X+ed.visSizeAlloc.X))
++	bb.Max.Y = min(bb.Max.Y, int(ed.Geom.Pos.Content.Y+ed.visSizeAlloc.Y))
++	return math32.B2FromRect(bb.Add(ed.Scene.SceneGeom.Pos))
++}
++func (ed *Base) NativeTextGeometry() core.TextFieldGeometry {
++	out := core.TextFieldGeometry{Viewport: ed.nativeViewport()}
++	ed.refreshNativeDocument()
++	if ed.Lines == nil || ed.nativeLayoutRevision != ed.nativeRevision {
++		return out
++	}
++	out.Cells = slices.Clone(ed.nativeGeometry.Cells)
++	out.Carets = slices.Clone(ed.nativeGeometry.Carets)
++	return out
++}
++func (ed *Base) NativeCaretBounds() image.Rectangle {
++	if ed.Scene == nil || ed.Lines == nil {
++		return image.Rectangle{}
++	}
++	ed.refreshNativeDocument()
++	offset := ed.nativeOffset(ed.CursorPos)
++	line := ed.Lines.PosToView(ed.viewId, ed.CursorPos).Line
++	if ed.nativeLayoutRevision != ed.nativeRevision {
++		return image.Rectangle{}
++	}
++	for _, c := range ed.nativeGeometry.Carets {
++		if c.Rune == offset && c.Line == line {
++			rect := image.Rect(int(c.Pos.X), int(c.Pos.Y), int(c.Pos.X)+1, int(c.Pos.Y+c.Height))
++			return rect.Intersect(ed.nativeViewport().ToRect())
++		}
++	}
++	return image.Rectangle{}
++}
++func (ed *Base) beginNativeGeometry() {
++	ed.nativeGeometry = core.TextFieldGeometry{}
++	if ed.nativeListener == nil || ed.Lines == nil {
++		return
++	}
++	ed.refreshNativeDocument()
++}
++func (ed *Base) captureNativeSpan(ls *shaped.Lines, pos math32.Vector2, source textpos.Pos, line int, tabWidth float32) {
++	if ed.nativeListener == nil || source.Line >= len(ed.nativeOffsets) {
++		return
++	}
++	base := ed.nativeOffsets[source.Line] + source.Char
++	g := ls.InteractionLayout()
++	off := pos.Add(math32.FromPoint(ed.Scene.SceneGeom.Pos))
++	if tabWidth > 0 {
++		g.Cells = []shaped.Cell{{Range: textpos.Range{Start: 0, End: 1}, Rect: math32.B2(0, 0, tabWidth, ed.charSize.Y)}}
++		g.Carets = []shaped.Caret{{Rune: 0, Pos: math32.Vector2{}, Height: ed.charSize.Y}, {Rune: 1, Pos: math32.Vec2(tabWidth, 0), Height: ed.charSize.Y}}
++	}
++	if len(ls.Source.Join()) == 0 && len(g.Carets) == 0 {
++		g.Carets = []shaped.Caret{{Rune: 0, Height: ed.charSize.Y}}
++	}
++	for _, c := range g.Cells {
++		c.Range.Start += base
++		c.Range.End += base
++		a, _ := slices.BinarySearch(ed.nativeGraphemes, c.Range.Start)
++		if a == len(ed.nativeGraphemes) || ed.nativeGraphemes[a] > c.Range.Start {
++			a--
++		}
++		b, _ := slices.BinarySearch(ed.nativeGraphemes, c.Range.End)
++		if a < 0 || b >= len(ed.nativeGraphemes) {
++			continue
++		}
++		c.Range = textpos.Range{Start: ed.nativeGraphemes[a], End: ed.nativeGraphemes[b]}
++		c.Line = line
++		c.Rect = c.Rect.Translate(off)
++		ed.nativeGeometry.Cells = append(ed.nativeGeometry.Cells, c)
++	}
++	for _, c := range g.Carets {
++		c.Rune += base
++		if _, ok := slices.BinarySearch(ed.nativeGraphemes, c.Rune); !ok {
++			continue
++		}
++		c.Line = line
++		c.Pos = c.Pos.Add(off)
++		ed.nativeGeometry.Carets = append(ed.nativeGeometry.Carets, c)
++	}
++}
++func (ed *Base) finishNativeGeometry() {
++	if ed.nativeListener == nil || ed.Lines == nil {
++		return
++	}
++	type key struct {
++		r    textpos.Range
++		line int
++	}
++	indexes := map[key]int{}
++	cells := ed.nativeGeometry.Cells[:0]
++	for _, c := range ed.nativeGeometry.Cells {
++		k := key{c.Range, c.Line}
++		if i, ok := indexes[k]; ok {
++			cells[i].Rect.ExpandByBox(c.Rect)
++		} else {
++			indexes[k] = len(cells)
++			cells = append(cells, c)
++		}
++	}
++	ed.nativeGeometry.Cells = cells
++	// Native geometry has one insertion stop per offset/physical line, matching
++	// InteractionLayout's strong-caret API and Geometry.Validate. At a styled
++	// fragment boundary prefer the downstream rendered fragment. Secondary bidi
++	// affinity is outside this editor adapter's current interaction policy.
++	type caretKey struct{ r, line int }
++	ci := map[caretKey]int{}
++	carets := ed.nativeGeometry.Carets[:0]
++	for _, c := range ed.nativeGeometry.Carets {
++		k := caretKey{c.Rune, c.Line}
++		if i, ok := ci[k]; ok {
++			carets[i] = c
++		} else {
++			ci[k] = len(carets)
++			carets = append(carets, c)
++		}
++	}
++	ed.nativeGeometry.Carets = carets
++	rs := ed.nativeRunes
++	for _, c := range carets {
++		if c.Rune < len(rs) && rs[c.Rune] == '\n' {
++			ed.nativeGeometry.Cells = append(ed.nativeGeometry.Cells, shaped.Cell{Range: textpos.Range{Start: c.Rune, End: c.Rune + 1}, Line: c.Line, Rect: math32.Box2{Min: c.Pos, Max: c.Pos.Add(math32.Vec2(0, c.Height))}})
++		}
++	}
++	ed.nativeLayoutRevision = ed.nativeRevision
++	ed.nativeGeometry.Viewport = ed.nativeViewport()
++	ed.nativeGeneration++
++	if start, end, ok := ed.NativeCompositionRange(); ok {
++		pc := ed.Scene.Painter
++		fill, stroke, width := pc.Fill.Color, pc.Stroke.Color, pc.Stroke.Width
++		pc.Fill.Color = nil
++		pc.Stroke.Color = ed.CursorColor
++		pc.Stroke.Width.Dot(1)
++		scene := math32.FromPoint(ed.Scene.SceneGeom.Pos)
++		for _, c := range cells {
++			if c.Range.Intersect(textpos.Range{Start: start, End: end}).Len() > 0 && c.Rect.IntersectsBox(ed.nativeGeometry.Viewport) {
++				rect := c.Rect.Intersect(ed.nativeGeometry.Viewport)
++				y := rect.Max.Y - scene.Y - 1
++				pc.Line(rect.Min.X-scene.X, y, rect.Max.X-scene.X, y)
++				pc.Draw()
++			}
++		}
++		pc.Fill.Color, pc.Stroke.Color, pc.Stroke.Width = fill, stroke, width
++	}
++}
++func (ed *Base) notifyNativeEditing() {
++	if ed.nativeListener == nil {
++		return
++	}
++	state := ed.EditingState()
++	if state == ed.nativeLastState && ed.nativeGeneration == ed.nativeLastGeneration {
++		return
++	}
++	ed.nativeLastState = state
++	ed.nativeLastGeneration = ed.nativeGeneration
++	ed.nativeListener(state)
++}
++
++func (ed *Base) NativeEditingEnabled() bool {
++	return ed.Lines != nil && !ed.IsReadOnly() && ed.Lines.NativeEditable()
++}
++
++func (ed *Base) refreshNativeDocument() {
++	if ed.Lines == nil {
++		ed.nativeDocument = nil
++		return
++	}
++	text, revision, changed := ed.Lines.NativeTextSnapshot(ed.nativeRevision, ed.nativeDocument == ed.Lines)
++	if !changed {
++		return
++	}
++	ed.nativeDocument = ed.Lines
++	ed.nativeRevision = revision
++	ed.nativeText = text
++	ed.nativeRunes = []rune(text)
++	ed.nativeGraphemes = textpos.GraphemeBounds(ed.nativeRunes)
++	ed.nativeOffsets = []int{0}
++	for i, r := range ed.nativeRunes {
++		if r == '\n' {
++			ed.nativeOffsets = append(ed.nativeOffsets, i+1)
++		}
++	}
++	ed.nativeGeometry = core.TextFieldGeometry{}
++}
++func (ed *Base) nativeOffset(pos textpos.Pos) int {
++	if pos.Line < 0 {
++		return 0
++	}
++	if pos.Line >= len(ed.nativeOffsets) {
++		return len(ed.nativeRunes)
++	}
++	start := ed.nativeOffsets[pos.Line]
++	end := len(ed.nativeRunes)
++	if pos.Line+1 < len(ed.nativeOffsets) {
++		end = ed.nativeOffsets[pos.Line+1] - 1
++	}
++	return start + max(0, min(pos.Char, end-start))
++}
+--- a/text/textcore/native_vellum_test.go
++++ b/text/textcore/native_vellum_test.go
+@@ -0,0 +1,307 @@
++package textcore
++
++import (
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/lines"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/textpos"
++	"image"
++	"image/png"
++	"os"
++	"strings"
++	"testing"
++)
++
++func nativeEditor(source string) *Editor {
++	ed := NewEditor()
++	original := ed.Lines
++	ls := lines.NewLinesExact().SetString(source)
++	ls.Autosave = false
++	ls.Settings.EmacsUndo = false
++	ed.SetLines(ls)
++	original.Close()
++	return ed
++}
++func TestVellumEditorNativeCompositionUndoCancel(t *testing.T) {
++	original := "A\n👩‍💻\n"
++	ed := nativeEditor(original)
++	defer ed.Lines.Close()
++	if !ed.SetEditingSelection(2, 2) {
++		t.Fatal("selection")
++	}
++	if !ed.ApplyNativeEdit("A\nに👩‍💻\n", 3, 3, 2, 3, "mark") || !ed.ApplyNativeEdit("A\n日本👩‍💻\n", 4, 4, 2, 4, "mark") {
++		t.Fatal("marked edits")
++	}
++	if !ed.ApplyNativeEdit("A\n日本👩‍💻\n", 4, 4, -1, -1, "insert") {
++		t.Fatal("commit")
++	}
++	if len(ed.Lines.Undo()) == 0 || ed.Lines.String() != original {
++		t.Fatal("one composition undo", ed.Lines.String())
++	}
++	if len(ed.Lines.Redo()) == 0 || ed.Lines.String() != "A\n日本👩‍💻\n" {
++		t.Fatal("redo")
++	}
++	state := ed.EditingState()
++	ed.SetEditingSelection(4, 2)
++	before := ed.EditingState()
++	ed.ApplyNativeEdit("A\n取消👩‍💻\n", 4, 4, 2, 4, "mark")
++	if !ed.ApplyNativeEdit(before.Text, 2, 2, -1, -1, "cancel") || ed.EditingState().Text != before.Text || ed.EditingState().Anchor != 4 || ed.EditingState().Focus != 2 {
++		t.Fatal("cancel direction", ed.EditingState(), state)
++	}
++	if len(ed.Lines.Undo()) == 0 || ed.Lines.String() != original {
++		t.Fatal("cancel left undo records", ed.Lines.String())
++	}
++}
++func TestVellumEditorNativeExternalEditAndReadonly(t *testing.T) {
++	ed := nativeEditor("A\nB\n")
++	defer ed.Lines.Close()
++	ed.ApplyNativeEdit("Aに\nB\n", 2, 2, 1, 2, "mark")
++	ed.Lines.InsertText(ed.Lines.EndPos(), []rune("X"))
++	if _, _, active := ed.NativeCompositionRange(); active {
++		t.Fatal("external edit did not seal preedit")
++	}
++	current := ed.Lines.String()
++	if ed.ApplyNativeEditFrom("Aに\nB\n", "A\nB\n", 1, 1, -1, -1, "cancel") || ed.Lines.String() != current {
++		t.Fatal("cancel erased shared edit")
++	}
++	if ed.ApplyNativeEditFrom("Aに\nB\n", "stale", 0, 0, -1, -1, "insert") || ed.Lines.String() != current {
++		t.Fatal("stale shadow accepted")
++	}
++	if len(ed.Lines.Undo()) == 0 || ed.Lines.String() != "Aに\nB\n" {
++		t.Fatal("external undo")
++	}
++	if len(ed.Lines.Undo()) == 0 || ed.Lines.String() != "A\nB\n" {
++		t.Fatal("preedit undo")
++	}
++	ed.Lines.SetReadOnly(true)
++	if ed.ApplyNativeEdit("bad", 0, 0, -1, -1, "insert") {
++		t.Fatal("readonly buffer edited")
++	}
++	ed.Lines.SetReadOnly(false)
++	for _, v := range []struct {
++		text       string
++		a, f, s, e int
++		phase      string
++	}{{"a", 2, 2, -1, -1, "insert"}, {"a\x00b", 0, 0, -1, -1, "insert"}, {"a", 0, 0, 1, 2, "mark"}, {"a", 0, 0, -1, -1, "unknown"}} {
++		if ed.ApplyNativeEdit(v.text, v.a, v.f, v.s, v.e, v.phase) {
++			t.Fatal("invalid snapshot accepted", v)
++		}
++	}
++	if ed.Lines.String() != "A\nB\n" {
++		t.Fatal("validation mutated buffer")
++	}
++}
++func TestVellumEditorNativeFocusCommitAndExactPolicy(t *testing.T) {
++	ed := nativeEditor("A\n")
++	defer ed.Lines.Close()
++	ed.ApplyNativeEdit("Aに\n", 2, 2, 1, 2, "mark")
++	ed.editDone()
++	if _, _, ok := ed.NativeCompositionRange(); ok {
++		t.Fatal("focus commit remained marked")
++	}
++	if len(ed.Lines.Undo()) == 0 || ed.Lines.String() != "A\n" {
++		t.Fatal("focus commit undo")
++	}
++	if !ed.ApplyNativeEdit("", 0, 0, -1, -1, "insert") || ed.Lines.String() != "" {
++		t.Fatal("empty snapshot")
++	}
++	if len(ed.Lines.Undo()) == 0 || ed.Lines.String() != "A\n" {
++		t.Fatal("empty undo")
++	}
++	legacy := NewEditor()
++	defer legacy.Lines.Close()
++	if legacy.ApplyNativeEdit("A\n", 1, 1, -1, -1, "insert") {
++		t.Fatal("legacy newline policy silently changed")
++	}
++}
++func TestVellumEditorNativeRenderedGeometry(t *testing.T) {
++	b := core.NewBody()
++	b.Scene.AddChild(b)
++	ed := NewEditor(b)
++	original := ed.Lines
++	ls := lines.NewLinesExact().SetString("abc אבג é 👩‍💻\n\tA\tB\nlong words wrapping beyond the visible viewport\n")
++	ls.Autosave = false
++	ed.SetLines(ls)
++	original.Close()
++	defer ls.Close()
++	ed.Styler(func(s *styles.Style) { s.Min.X.Em(16); s.Max.X.Em(16); s.Min.Y = units.Em(4); s.Max.Y = units.Em(4) })
++	count := 0
++	ed.SetNativeEditingListener(func(EditorEditingState) { count++ })
++	if cache := os.Getenv("VELLUM_FONT_CACHE"); cache != "" {
++		preload := shapedgt.NewShaperWithFonts(fonts.Embedded).(*shapedgt.Shaper)
++		if err := preload.FontMap().UseSystemFonts(cache); err != nil {
++			t.Fatal(err)
++		}
++		if err := b.Scene.MakeTextShaper().(*shapedgt.Shaper).FontMap().UseSystemFonts(cache); err != nil {
++			t.Fatal(err)
++		}
++	}
++	b.Scene.Resize(math32.Geom2DInt{Size: image.Pt(320, 130)})
++	b.Scene.LayoutRenderScene()
++	g := ed.NativeTextGeometry()
++	if len(g.Cells) == 0 || len(g.Carets) == 0 || count == 0 {
++		t.Fatal("render geometry missing")
++	}
++	if g.Viewport.Min.X <= float32(ed.renderBBox().Min.X) {
++		t.Fatal("gutter included")
++	}
++	rs := []rune(ed.EditingState().Text)
++	bounds := textpos.GraphemeBounds(rs)
++	for _, c := range g.Cells {
++		if !containsBoundary(bounds, c.Range.Start) || !containsBoundary(bounds, c.Range.End) {
++			t.Fatal("interior grapheme cell", c)
++		}
++	}
++	seenCarets := map[[2]int]bool{}
++	for _, c := range g.Carets {
++		k := [2]int{c.Rune, c.Line}
++		if seenCarets[k] {
++			t.Fatal("duplicate native strong caret", k)
++		}
++		seenCarets[k] = true
++	}
++	// A tab spans the entire whitespace advance rather than one glyph slot.
++	tab := 14 // locate by source rather than assumptions about UTF-8 byte width
++	for i, r := range rs {
++		if r == '\t' {
++			tab = i
++			break
++		}
++	}
++	found := false
++	for _, c := range g.Cells {
++		if c.Range.Start == tab {
++			found = true
++			if c.Rect.Size().X <= ed.charSize.X {
++				t.Fatal("tab advance lost", c)
++			}
++		}
++	}
++	if !found {
++		t.Fatal("tab fixture not visible")
++	}
++	originalX := g.Cells[0].Rect.Min.X
++	g.Cells[0].Rect.Min.X += 100
++	if ed.NativeTextGeometry().Cells[0].Rect.Min.X != originalX {
++		t.Fatal("snapshot aliases mutable layout")
++	}
++	ed.scrollPos = 1.5
++	ed.isScrolling = true
++	ed.NeedsRender()
++	b.Scene.LayoutRenderScene()
++	g = ed.NativeTextGeometry()
++	if len(g.Cells) == 0 || g.Cells[0].Line == 0 {
++		t.Fatal("scroll did not refresh visible cells")
++	}
++	// Layout records painter actions; explicitly execute them before inspecting
++	// pixels. Renderer.Image alone returns an untouched target.
++	b.Scene.Renderer.Render(b.Scene.Painter.RenderDone())
++	if dir := os.Getenv("VELLUM_EDITOR_EVIDENCE"); dir != "" {
++		f, err := os.Create(dir + "/editor-scroll.png")
++		if err != nil {
++			t.Fatal(err)
++		}
++		err = png.Encode(f, b.Scene.Renderer.Image())
++		f.Close()
++		if err != nil {
++			t.Fatal(err)
++		}
++	}
++	ls.SetString("changed\n")
++	if len(ed.NativeTextGeometry().Cells) != 0 {
++		t.Fatal("stale geometry published")
++	}
++}
++func containsBoundary(bounds []int, r int) bool {
++	for _, b := range bounds {
++		if b == r {
++			return true
++		}
++	}
++	return false
++}
++
++func TestVellumEditorNativeCancelRestoresFlagsAndSharedOwnership(t *testing.T) {
++	ed := nativeEditor("A\n")
++	defer ed.Lines.Close()
++	ed.Lines.ClearNotSaved()
++	ed.ApplyNativeEdit("Aに\n", 2, 2, 1, 2, "mark")
++	if !ed.Lines.IsNotSaved() {
++		t.Fatal("preedit not tracked")
++	}
++	if !ed.ApplyNativeEdit("A\n", 1, 1, -1, -1, "cancel") || ed.Lines.IsNotSaved() || ed.Lines.IsChanged() {
++		t.Fatal("cancel dirtied clean buffer")
++	}
++	ed.ApplyNativeEdit("Aに\n", 2, 2, 1, 2, "mark")
++	other := NewEditor()
++	original := other.Lines
++	other.SetLines(ed.Lines)
++	original.Close()
++	if other.ApplyNativeEdit("bad", 0, 0, -1, -1, "insert") {
++		t.Fatal("second view stole composition")
++	}
++	ed.Lines.SetReadOnly(true)
++	if ed.NativeEditingEnabled() {
++		t.Fatal("readonly native client remains enabled")
++	}
++	if _, _, active := ed.NativeCompositionRange(); active {
++		t.Fatal("readonly did not seal composition")
++	}
++	ed.Lines.SetReadOnly(false)
++	if len(ed.Lines.Undo()) == 0 || ed.Lines.String() != "A\n" {
++		t.Fatal("readonly transition lost undo")
++	}
++}
++
++func TestVellumEditorNativeMetadataRevisionCache(t *testing.T) {
++	ed := nativeEditor(strings.Repeat("abc é 👩‍💻\n", 1000))
++	defer ed.Lines.Close()
++	ed.EditingState()
++	ptr := &ed.nativeRunes[0]
++	revision := ed.nativeRevision
++	for range 20 {
++		ed.EditingState()
++		ed.NativeCaretBounds()
++		ed.NativeTextGeometry()
++	}
++	if ptr != &ed.nativeRunes[0] || revision != ed.nativeRevision {
++		t.Fatal("unchanged document metadata rebuilt")
++	}
++	ed.Lines.InsertText(textpos.Pos{}, []rune("X"))
++	state := ed.EditingState()
++	if ed.nativeRevision == revision || !strings.HasPrefix(state.Text, "Xabc") {
++		t.Fatal("cache missed buffer edit")
++	}
++}
++func BenchmarkVellumEditorNativeCachedSnapshot(b *testing.B) {
++	ed := nativeEditor(strings.Repeat("abc é 👩‍💻\n", 10000))
++	defer ed.Lines.Close()
++	ed.EditingState()
++	b.ReportAllocs()
++	b.ResetTimer()
++	for range b.N {
++		ed.EditingState()
++	}
++}
++
++func TestVellumEditorNativeNoNetChangeRestoresFlags(t *testing.T) {
++	for _, implicit := range []bool{false, true} {
++		ed := nativeEditor("A\n")
++		ed.Lines.ClearNotSaved()
++		ed.ApplyNativeEdit("Aに\n", 2, 2, 1, 2, "mark")
++		ed.ApplyNativeEdit("A\n", 1, 1, 1, 1, "mark")
++		if implicit {
++			ed.Lines.SetReadOnly(true)
++		} else {
++			ed.ApplyNativeEdit("A\n", 1, 1, -1, -1, "insert")
++		}
++		if ed.Lines.IsNotSaved() || ed.Lines.IsChanged() || len(ed.Lines.Undo()) != 0 {
++			t.Fatal("no-net commit dirtied document", implicit)
++		}
++		ed.Lines.Close()
++	}
++}
+--- a/text/textcore/render.go
++++ b/text/textcore/render.go
+@@ -55,11 +55,14 @@
+ 			ed.scrollCursorToCenterIfHidden()
+ 		}
+ 		ed.PositionScrolls()
++		ed.beginNativeGeometry()
+ 		ed.renderLines()
+ 		ed.RenderChildren()
+ 		ed.RenderScrolls()
+ 		ed.updateCursorPosition()
++		ed.finishNativeGeometry()
+ 		ed.EndRender()
++		ed.notifyNativeEditing()
+ 	}
+ }
+ 
+@@ -195,7 +198,7 @@
+ 		return lns
+ 	}
+ 
+-	rendSpan := func(lns *shaped.Lines, pos math32.Vector2, coff int) {
++	rendSpan := func(lns *shaped.Lines, pos math32.Vector2, coff int, tabWidth float32) {
+ 		lns.SelectReset()
+ 		lns.HighlightReset()
+ 		lns.SetGlyphXAdvance(math32.ToFixed(ed.charSize.X))
+@@ -208,6 +211,7 @@
+ 				lns.HighlightRegion(textpos.Range{Start: hlsi.Start.Char - coff, End: hlsi.End.Char - coff})
+ 			}
+ 		}
++		ed.captureNativeSpan(lns, pos, buf.ViewSourcePosNoLock(ed.viewId, textpos.Pos{Line: ln, Char: coff}), ln, tabWidth)
+ 		pc.DrawText(lns, pos)
+ 	}
+ 
+@@ -219,7 +223,7 @@
+ 			lpos.X += ic
+ 			lsz := sz
+ 			lsz.X -= ic
+-			rendSpan(shapeTab(tx[si:si+1], lsz), lpos, indent)
++			rendSpan(shapeTab(tx[si:si+1], lsz), lpos, indent, float32(ts)*ed.charSize.X)
+ 			indent++
+ 		} else {
+ 			break
+@@ -240,7 +244,7 @@
+ 		}
+ 	}
+ 	if !hasTab {
+-		rendSpan(shapeSpan(rtx, lsz), lpos, indent)
++		rendSpan(shapeSpan(rtx, lsz), lpos, indent, 0)
+ 		return
+ 	}
+ 	coff := indent
+@@ -255,16 +259,16 @@
+ 		spos.X += float32(cc-scc) * ed.charSize.X
+ 		if rtx[si][sn] != '\t' {
+ 			ssz := ed.charSize.Mul(math32.Vec2(float32(rn), 1))
+-			rendSpan(shapeSpan(rtx[si:si+1], ssz), spos, coff)
++			rendSpan(shapeSpan(rtx[si:si+1], ssz), spos, coff, 0)
+ 			cc += rn
+ 			coff += rn
+ 			continue
+ 		}
+ 		for range rn {
+ 			tcc := ((cc / 8) + 1) * 8
++			rendSpan(shapeTab(rtx[si:si+1], ed.charSize), spos, coff, float32(tcc-cc)*ed.charSize.X)
+ 			spos.X += float32(tcc-cc) * ed.charSize.X
+ 			cc = tcc
+-			rendSpan(shapeTab(rtx[si:si+1], ed.charSize), spos, coff)
+ 			coff++
+ 		}
+ 	}

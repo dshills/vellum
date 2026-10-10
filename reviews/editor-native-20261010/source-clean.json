@@ -1,0 +1,149 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b473d9388882de7192df6060e6961808",
+  "repo": {
+    "root": "/private/tmp/vellum-editor-review-source",
+    "head": "26ec0b7cced1466a5415f442af750594f40da459",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2f83a34695e90edb",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Native selection updates repeatedly scan the document",
+      "message": "Each selection update scans the document prefix four times through editorPos. Even a collapsed caret near the end of a large document therefore requires four full-prefix scans, despite the cached line-offset index. Repeated native cursor movement or selection dragging becomes linear in document size.",
+      "suggestion": "Resolve offsets using binary search over the line-start offsets and reuse the computed anchor/focus positions to build the ordered region. Ensure the offsets are refreshed for the newly applied snapshot before using them in ApplyNativeEditFrom.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "text/textcore/native_vellum.go",
+          "lines": {
+            "start": 76,
+            "end": 79
+          }
+        }
+      ],
+      "tags": [
+        "selection",
+        "large-documents"
+      ],
+      "evidence": "\ted.selectStart = editorPos(rs, anchor)\n\ted.CursorPos = editorPos(rs, focus)\n\ted.cursorColumn = ed.CursorPos.Char\n\ted.SelectRegion = textpos.NewRegionPos(editorPos(rs, min(anchor, focus)), editorPos(rs, max(anchor, focus)))",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "e3fffcfe91d9c6c9",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Caret deduplication discards distinct bidi positions",
+      "message": "At bidirectional run boundaries, one logical rune offset can have two distinct visual caret positions on the same line. Deduplicating solely by rune and line overwrites one of these positions, so the published geometry loses a valid caret location for native hit testing and selection.",
+      "suggestion": "Deduplicate only identical visual caret positions by including the position in the key. Preserve distinct positions at bidi boundaries and resolve caret affinity separately when selecting the active caret.",
+      "confidence": 0.87,
+      "locations": [
+        {
+          "path": "text/textcore/native_vellum.go",
+          "lines": {
+            "start": 266,
+            "end": 272
+          }
+        }
+      ],
+      "tags": [
+        "bidi",
+        "geometry"
+      ],
+      "evidence": "\ttype caretKey struct{ r, line int }\n\tci := map[caretKey]int{}\n\tcarets := ed.nativeGeometry.Carets[:0]\n\tfor _, c := range ed.nativeGeometry.Carets {\n\t\tk := caretKey{c.Rune, c.Line}\n\t\tif i, ok := ci[k]; ok {\n\t\t\tcarets[i] = c",
+      "fix": {
+        "before": "\ttype caretKey struct{ r, line int }\n\tci := map[caretKey]int{}\n\tcarets := ed.nativeGeometry.Carets[:0]\n\tfor _, c := range ed.nativeGeometry.Carets {\n\t\tk := caretKey{c.Rune, c.Line}",
+        "after": "\ttype caretKey struct {\n\t\tr, line int\n\t\tpos math32.Vector2\n\t}\n\tci := map[caretKey]int{}\n\tcarets := ed.nativeGeometry.Carets[:0]\n\tfor _, c := range ed.nativeGeometry.Carets {\n\t\tk := caretKey{c.Rune, c.Line, c.Pos}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 42393,
+    "totalMs": 42446
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 9,
+    "bytes": 42760,
+    "chunks": 3,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 8327,
+        "output": 2017,
+        "reasoning": 1364,
+        "cachedInput": 1164
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "33dcd75291c40656",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Autosave compositions committed by EditDone",
+        "message": "Completing editing seals the preedit into a committed transaction but never schedules an autosave. ApplyNativeSnapshot explicitly skips autosaving during \"mark\", and commitNativeComposition only records undo information. Consequently, a composition committed by focus loss can remain absent from the recovery file indefinitely, until another edit triggers autosaving.",
+        "suggestion": "Have commitNativeComposition report whether it committed a net change, and have EditDone schedule autoSave after unlocking when that result is true and Autosave is enabled. Apply the same handling to other composition-sealing paths that do not otherwise save or schedule autosaving.",
+        "confidence": 0.9,
+        "locations": [
+          {
+            "path": "text/lines/file.go",
+            "lines": {
+              "start": 188,
+              "end": 188
+            }
+          }
+        ],
+        "tags": [
+          "autosave",
+          "composition"
+        ],
+        "evidence": "\tls.commitNativeComposition();",
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      },
+      "reason": "quoted evidence not found in text/lines/file.go"
+    }
+  ],
+  "suppressed": []
+}

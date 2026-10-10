@@ -1,0 +1,41 @@
+# cogentcore.org/core/text/textcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/text/lines.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestMove (0.00s)
+panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule [recovered, repanicked]
+
+goroutine 89 [running]:
+testing.tRunner.func1.2({0x104c1c220, 0x7508bf62fda0})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2125 +0x1a0
+testing.tRunner.func1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2128 +0x2c8
+panic({0x104c1c220?, 0x7508bf62fda0?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).Validate(0x7508bf24c9c0, 0x7508bf044b28)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/lexer/rule.go:187 +0x794
+cogentcore.org/core/text/parse.(*Parser).InitAll(0x7508bf2c9860)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/parser.go:64 +0x58
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x7508bf077018?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/languagesupport.go:132 +0x140
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:181 +0x2c
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:69 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0x7508bf638068, {0x103bdcfaa, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/highlighter.go:117 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).Init(0x7508bf638068, 0x7508beef92b0, 0x7508bf638210)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/highlighter.go:67 +0x40
+cogentcore.org/core/text/lines.(*Lines).setFileInfo(0x7508bf638008, 0x7508beef92b0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/markup.go:24 +0x58
+cogentcore.org/core/text/lines.NewLinesFromBytes({0x103be2d05, 0x8}, 0x50, {0x7508bf636000, 0x370, 0x380})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/api.go:54 +0x124
+cogentcore.org/core/text/lines.TestMove(0x7508bf2a7208)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/move_test.go:21 +0x58
+testing.tRunner(0x7508bf2a7208, 0x104e10c58)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x3b8
+FAIL	cogentcore.org/core/text/lines	0.904s
+ok  	cogentcore.org/core/text/textcore	1.037s
+FAIL

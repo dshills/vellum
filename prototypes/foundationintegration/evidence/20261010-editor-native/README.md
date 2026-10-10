@@ -1,0 +1,9 @@
+# Multiline native adapter evidence
+
+The [adapter report](../../../../MULTILINE_NATIVE_ADAPTER.md) defines scope. `manifest.json` records source, decoded patch, binary and artifact hashes plus commands. Run `python3 prototypes/foundationintegration/verify_editor_native.py` from the repository to validate committed evidence. This checks integrity and local contracts; G1 remains open.
+
+`rendered-canonical.json` passes 63 Editor range/insertion queries. `field-regression.json` passes 31 TextField queries. `editor-input-canonical.json` has 10 ordered editor protocol updates; the saturation-inclusive `editor-input-final.json` has 13 and eight refused admissions. `saturation-final.json` preserves the state before every refusal. `lifecycle-final.json` records 1,000 hidden windows and 11,000 drained messages plus client handoff contracts. These are deterministic Cocoa protocol calls, not live IME or VoiceOver workflows.
+
+`focused-final.txt` and `focused-canonical.txt` cover exact-buffer, grapheme and adapter regressions. `race.txt`, vet output and `core-regressions.txt` pass. `cached-snapshot-benchmark.txt` is a cached-state microbenchmark. `editor-scroll.png` is the inspected scrolled raster. `editor-packages.txt` retains the failing broader lines/textcore run (parser panic and 90-second timeout); `editor-regressions.txt` retains a narrower run that also encountered the known parser issue. Neither failure was rebaselined or declared passing.
+
+Native fixture binaries were built in canonical Vellum; the saturation run uses a copy of that final binary in the research workspace; reports and saturation evidence use the dedicated output directory. The field-only control preceded the final editor selection-index optimization, which changes no TextField/native bridge code. Tests use an explicit system-font cache. No macOS settings were changed and the installed sealed bundle remains the previous build.

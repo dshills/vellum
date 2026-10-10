@@ -6,7 +6,7 @@
 #include <string.h>
 #include <math.h>
 
-extern bool goVellumPreflight(uintptr_t, uint64_t, char *, char *, int, int, int, int);
+extern bool goVellumPreflight(uintptr_t, uint64_t, uint64_t, char *, char *, char *, int, int, int, int);
 extern void goVellumCommit(uintptr_t);
 static char inputKey;
 @interface VellumInputState : NSObject {
@@ -14,7 +14,7 @@ static char inputKey;
  NSView *view;
  Class baseClass, subclass;
  uintptr_t handle;
- uint64_t sequence;
+ uint64_t sequence, clientID;
  BOOL active, forwarding, forwarded, closed;
  NSEvent *keyEvent;
  NSMutableString *text;
@@ -60,7 +60,7 @@ static BOOL admit(VellumInputState *s,const char *kind,NSString *next,NSRange se
  int start=marked.location==NSNotFound ? -1 : (int)marked.location;
  int end=start<0 ? -1 : start+(int)marked.length;
  NSUInteger anchor=focus==selected.location ? NSMaxRange(selected) : selected.location;
- if(!goVellumPreflight(s->handle,s->sequence+1,(char *)kind,(char *)next.UTF8String,(int)anchor,(int)focus,start,end)){
+ if(!goVellumPreflight(s->handle,s->sequence+1,s->clientID,(char *)kind,(char *)next.UTF8String,(char *)s->text.UTF8String,(int)anchor,(int)focus,start,end)){
   NSBeep();return NO; // Explicit audible refusal; caller can retry after drain.
  }
  return YES;
@@ -253,7 +253,7 @@ void *vellum_input_attach(void *view, uintptr_t handle) {
  for(NSNotificationName name in @[NSWindowDidMoveNotification,NSWindowDidResizeNotification,NSWindowDidChangeScreenNotification])[[NSNotificationCenter defaultCenter] addObserver:s selector:@selector(windowGeometryChanged:) name:name object:s->view.window];
  return s;
 }
-static BOOL publish(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height, NSData *cells, NSData *carets, NSRect viewport, int focusLine, BOOL geometryClient) {
+static BOOL publish(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height, NSData *cells, NSData *carets, NSRect viewport, int focusLine, BOOL geometryClient, uint64_t clientID) {
  VellumInputState *s=(id)input;
  NSCAssert(NSThread.isMainThread,@"Input update requires main thread");
  if(!s || s->closed)return NO;
@@ -271,10 +271,9 @@ static BOOL publish(void *input,const char *text,int anchor,int focus,int marked
  if(acknowledged<s->sequence)return NO; // Reject stale text AND its geometry/activation.
  // Validate the complete publication before changing any state. A refused
  // focus-loss commit leaves composition active until credit is available.
- if(s->active && !active){if(!finish(s,NO))return NO;[[s->view inputContext] discardMarkedText];}
- s->active=active;s->caret=NSMakeRect(x,y,width,height);
- [[s->view inputContext] invalidateCharacterCoordinates];
+ if(s->active && (!active || clientID!=s->clientID)){if(!finish(s,NO))return NO;[[s->view inputContext] discardMarkedText];}
  if(acknowledged<s->sequence)return NO;
+ s->clientID=clientID;s->active=active;s->caret=NSMakeRect(x,y,width,height);
  // External edits invalidate the whole-document restoration baseline. Retain
  // their marked range but refuse cancellation until it is unmarked; otherwise
  // Escape could restore a document older than an accepted application edit.
@@ -288,17 +287,17 @@ static BOOL publish(void *input,const char *text,int anchor,int focus,int marked
  return YES;
 }
 void vellum_input_update(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height) {
- publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,nil,nil,NSZeroRect,-1,NO);
+ publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,nil,nil,NSZeroRect,-1,NO,0);
 }
 static int compareCells(const void *a,const void *b){const VellumTextCell *x=a,*y=b;if(x->start!=y->start)return x->start<y->start ? -1:1;return (x->line>y->line)-(x->line<y->line);}
-void vellum_input_geometry_update(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height,const VellumTextCell *cells,int nc,const VellumTextCaret *carets,int nk,double vx,double vy,double vw,double vh,int focusLine) {
+bool vellum_input_client_geometry_update(void *input,uint64_t clientID,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height,const VellumTextCell *cells,int nc,const VellumTextCaret *carets,int nk,double vx,double vy,double vw,double vh,int focusLine) {
  NSCAssert(NSThread.isMainThread,@"Input geometry publication requires main thread");
- if(nc<0 || nk<0 || nc>262144 || nk>262144 || (nc && !cells) || (nk && !carets) || !isfinite(vx) || !isfinite(vy) || !isfinite(vw) || !isfinite(vh) || vw<0 || vh<=0 || !isfinite(vx+vw) || !isfinite(vy+vh))return;
- NSString *value=[NSString stringWithUTF8String:text];if(!value)return;
- for(int i=0;i<nc;i++){const VellumTextCell *c=&cells[i];if(c->start<0 || c->end<=c->start || c->line<0 || !validRange(value,NSMakeRange(c->start,c->end-c->start)) || !isfinite(c->x) || !isfinite(c->y) || !isfinite(c->width) || !isfinite(c->height) || c->width<0 || c->height<=0 || !isfinite(c->x+c->width) || !isfinite(c->y+c->height))return;}
- for(int i=0;i<nk;i++){const VellumTextCaret *c=&carets[i];if(c->offset<0 || c->line<0 || !validRange(value,NSMakeRange(c->offset,0)) || !isfinite(c->x) || !isfinite(c->y) || !isfinite(c->height) || c->height<=0 || !isfinite(c->y+c->height))return;}
+ if(nc<0 || nk<0 || nc>262144 || nk>262144 || (nc && !cells) || (nk && !carets) || !isfinite(vx) || !isfinite(vy) || !isfinite(vw) || !isfinite(vh) || vw<0 || vh<=0 || !isfinite(vx+vw) || !isfinite(vy+vh))return NO;
+ NSString *value=[NSString stringWithUTF8String:text];if(!value)return NO;
+ for(int i=0;i<nc;i++){const VellumTextCell *c=&cells[i];if(c->start<0 || c->end<=c->start || c->line<0 || !validRange(value,NSMakeRange(c->start,c->end-c->start)) || !isfinite(c->x) || !isfinite(c->y) || !isfinite(c->width) || !isfinite(c->height) || c->width<0 || c->height<=0 || !isfinite(c->x+c->width) || !isfinite(c->y+c->height))return NO;}
+ for(int i=0;i<nk;i++){const VellumTextCaret *c=&carets[i];if(c->offset<0 || c->line<0 || !validRange(value,NSMakeRange(c->offset,0)) || !isfinite(c->x) || !isfinite(c->y) || !isfinite(c->height) || c->height<=0 || !isfinite(c->y+c->height))return NO;}
  NSMutableData *ownedCells=[NSMutableData dataWithBytes:cells length:(NSUInteger)nc*sizeof(*cells)];if(nc>1)qsort(ownedCells.mutableBytes,nc,sizeof(*cells),compareCells);NSData *ownedCarets=[NSData dataWithBytes:carets length:(NSUInteger)nk*sizeof(*carets)];
- publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,ownedCells,ownedCarets,NSMakeRect(vx,vy,vw,vh),focusLine,YES);
+ return publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,ownedCells,ownedCarets,NSMakeRect(vx,vy,vw,vh),focusLine,YES,clientID);
 }
 
 void vellum_input_close(void *input) {
@@ -337,7 +336,7 @@ char *vellum_input_probe(void *input,int step) {
  NSRange all=NSMakeRange(0,s->text.length),substringRange;
  NSAttributedString *substring=[client attributedSubstringForProposedRange:all actualRange:&substringRange];
  char *source=vellum_input_source();
- NSDictionary *report=@{@"step":@(step),@"sequence":@(s->sequence),@"text":s->text,@"selected_start":@(selection.location),@"selected_length":@(selection.length),@"marked_start":marked.location==NSNotFound ? @(-1):@(marked.location),@"marked_length":@(marked.length),@"has_marked":@([client hasMarkedText]),@"caret_screen":@[@(rect.origin.x),@(rect.origin.y),@(rect.size.width),@(rect.size.height)],@"caret_view":@[@(s->caret.origin.x),@(s->caret.origin.y),@(s->caret.size.width),@(s->caret.size.height)],@"actual_caret_start":actual.location==NSNotFound ? @(-1) : @(actual.location),@"substring":substring.string ?: @"",@"input_source":@(source ?: "unknown")};
+ NSDictionary *report=@{@"client_id":@(s->clientID),@"step":@(step),@"sequence":@(s->sequence),@"text":s->text,@"selected_start":@(selection.location),@"selected_length":@(selection.length),@"marked_start":marked.location==NSNotFound ? @(-1):@(marked.location),@"marked_length":@(marked.length),@"has_marked":@([client hasMarkedText]),@"caret_screen":@[@(rect.origin.x),@(rect.origin.y),@(rect.size.width),@(rect.size.height)],@"caret_view":@[@(s->caret.origin.x),@(s->caret.origin.y),@(s->caret.size.width),@(s->caret.size.height)],@"actual_caret_start":actual.location==NSNotFound ? @(-1) : @(actual.location),@"substring":substring.string ?: @"",@"input_source":@(source ?: "unknown")};
  free(source);
  NSData *data=[NSJSONSerialization dataWithJSONObject:report options:0 error:NULL];
  return strdup([[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease].UTF8String);
@@ -394,3 +393,7 @@ VellumScreenRect vellum_input_rendered_rect(void *input,double x,double y,double
  r=[view convertRect:r toView:nil];r=[view.window convertRectToScreen:r];
  return (VellumScreenRect){r.origin.x,r.origin.y,r.size.width,r.size.height};
 }
+
+void vellum_input_geometry_update(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height,const VellumTextCell *cells,int nc,const VellumTextCaret *carets,int nk,double vx,double vy,double vw,double vh,int focusLine) {vellum_input_client_geometry_update(input,0,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,cells,nc,carets,nk,vx,vy,vw,vh,focusLine);}
+
+bool vellum_input_client_update(void *input,uint64_t clientID,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height) {return publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,nil,nil,NSZeroRect,-1,NO,clientID);}

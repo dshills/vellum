@@ -11,6 +11,8 @@ import (
 	"errors"
 	"math"
 	"runtime/cgo"
+	"strings"
+	"unicode/utf8"
 	"unsafe"
 )
 
@@ -64,12 +66,12 @@ func Source() string {
 }
 
 //export goVellumPreflight
-func goVellumPreflight(h C.uintptr_t, sequence C.uint64_t, kind, text *C.char, anchor, focus, markedStart, markedEnd C.int) C.bool {
+func goVellumPreflight(h C.uintptr_t, sequence, clientID C.uint64_t, kind, text, beforeText *C.char, anchor, focus, markedStart, markedEnd C.int) C.bool {
 	i := cgo.Handle(h).Value().(*Input)
 	if i.pending {
 		panic("nested native input admission")
 	}
-	i.pending = i.admit(Update{Sequence: uint64(sequence), Kind: C.GoString(kind), Text: C.GoString(text), Anchor: int(anchor), Focus: int(focus), MarkedStart: int(markedStart), MarkedEnd: int(markedEnd)})
+	i.pending = i.admit(Update{Sequence: uint64(sequence), ClientID: uint64(clientID), BeforeText: C.GoString(beforeText), Kind: C.GoString(kind), Text: C.GoString(text), Anchor: int(anchor), Focus: int(focus), MarkedStart: int(markedStart), MarkedEnd: int(markedEnd)})
 	return C.bool(i.pending)
 }
 
@@ -123,22 +125,29 @@ func (i *Input) QueryProbe(start, length int, point [2]float64) string {
 // UpdateGeometry validates an owned snapshot before making one native transaction.
 // A rejected/stale publication leaves previously accepted state intact.
 func (i *Input) UpdateGeometry(text string, anchor, focus, markedStart, markedEnd int, active bool, ack uint64, rect [4]float64, g Geometry) error {
+	_, err := i.UpdateGeometryForClient(0, text, anchor, focus, markedStart, markedEnd, active, ack, rect, g)
+	return err
+}
+
+// UpdateGeometryForClient preserves the old client until its preedit is committed
+// and acknowledged. Updates carry their originating client and prior native text.
+func (i *Input) UpdateGeometryForClient(clientID uint64, text string, anchor, focus, markedStart, markedEnd int, active bool, ack uint64, rect [4]float64, g Geometry) (bool, error) {
 	const maxCInt = 1<<31 - 1
 	for _, v := range []int{anchor, focus, markedStart, markedEnd} {
 		if v < -1 || v > maxCInt {
-			return errors.New("native offset out of range")
+			return false, errors.New("native offset out of range")
 		}
 	}
 	for _, v := range rect {
 		if math.IsNaN(v) || math.IsInf(v, 0) {
-			return errors.New("nonfinite insertion anchor")
+			return false, errors.New("nonfinite insertion anchor")
 		}
 	}
 	if rect[2] < 0 || rect[3] < 0 {
-		return errors.New("invalid insertion anchor")
+		return false, errors.New("invalid insertion anchor")
 	}
 	if err := g.Validate(text); err != nil {
-		return err
+		return false, err
 	}
 	cells := make([]C.VellumTextCell, len(g.Cells))
 	for j, c := range g.Cells {
@@ -158,8 +167,8 @@ func (i *Input) UpdateGeometry(text string, anchor, focus, markedStart, markedEn
 	}
 	p := C.CString(text)
 	defer C.free(unsafe.Pointer(p))
-	C.vellum_input_geometry_update(i.native, p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack), C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3]), cp, C.int(len(cells)), kp, C.int(len(carets)), C.double(g.Viewport[0]), C.double(g.Viewport[1]), C.double(g.Viewport[2]), C.double(g.Viewport[3]), C.int(g.FocusLine))
-	return nil
+	accepted := C.vellum_input_client_geometry_update(i.native, C.uint64_t(clientID), p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack), C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3]), cp, C.int(len(cells)), kp, C.int(len(carets)), C.double(g.Viewport[0]), C.double(g.Viewport[1]), C.double(g.Viewport[2]), C.double(g.Viewport[3]), C.int(g.FocusLine))
+	return bool(accepted), nil
 }
 
 // RenderedRectToScreen is a read-only test oracle. It derives scale from native
@@ -167,4 +176,26 @@ func (i *Input) UpdateGeometry(text string, anchor, focus, markedStart, markedEn
 func (i *Input) RenderedRectToScreen(rect [4]float64, pixels [2]int) [4]float64 {
 	r := C.vellum_input_rendered_rect(i.native, C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3]), C.int(pixels[0]), C.int(pixels[1]))
 	return [4]float64{float64(r.x), float64(r.y), float64(r.width), float64(r.height)}
+}
+
+func (i *Input) UpdateClient(clientID uint64, text string, anchor, focus, markedStart, markedEnd int, active bool, ack uint64, rect [4]float64) bool {
+	if !utf8.ValidString(text) || strings.ContainsRune(text, 0) || len(text) > 1<<20 {
+		return false
+	}
+	for _, v := range []int{anchor, focus, markedStart, markedEnd} {
+		if v < -1 || v > 1<<31-1 {
+			return false
+		}
+	}
+	for _, v := range rect {
+		if math.IsNaN(v) || math.IsInf(v, 0) {
+			return false
+		}
+	}
+	if rect[2] < 0 || rect[3] < 0 || math.IsInf(rect[0]+rect[2], 0) || math.IsInf(rect[1]+rect[3], 0) {
+		return false
+	}
+	p := C.CString(text)
+	defer C.free(unsafe.Pointer(p))
+	return bool(C.vellum_input_client_update(i.native, C.uint64_t(clientID), p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack), C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3])))
 }

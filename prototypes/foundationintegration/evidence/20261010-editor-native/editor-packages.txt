@@ -1,0 +1,229 @@
+# cogentcore.org/core/text/lines.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/text/textcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestMarkup (0.00s)
+panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule [recovered, repanicked]
+
+goroutine 77 [running]:
+testing.tRunner.func1.2({0x1029e8200, 0x1d7025c5b740})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2125 +0x1a0
+testing.tRunner.func1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2128 +0x2c8
+panic({0x1029e8200?, 0x1d7025c5b740?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileNameMap(0x1d7025850d00, 0x1d7025744b28)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/lexer/rule.go:116 +0x4b4
+cogentcore.org/core/text/parse/lexer.(*Rule).Compile(0x1d7025850d00, 0x1d7025744b28)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/lexer/rule.go:104 +0x108
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll.func1({0x102bd66d0?, 0x1d7025850d00?})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/lexer/rule.go:84 +0x44
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0x1d70258d89c0, 0x1d7025b21578)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/tree/nodebase.go:502 +0x100
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll(0x1d70258d89c0, 0x1d7025744b28)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/lexer/rule.go:82 +0x90
+cogentcore.org/core/text/parse.(*Parser).InitAll(0x1d7025701020)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/parser.go:63 +0x48
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x1d7025621ba8?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/languagesupport.go:132 +0x140
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:181 +0x2c
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:69 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0x1d7025ca4ae8, {0x1019a8da2, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/highlighter.go:117 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).Init(0x1d7025ca4ae8, 0x1d7025cdde40, 0x1d7025ca4c90)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/highlighter.go:67 +0x40
+cogentcore.org/core/text/lines.(*Lines).setFileInfo(0x1d7025ca4a88, 0x1d7025cdde40)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/markup.go:24 +0x58
+cogentcore.org/core/text/lines.NewLinesFromBytes({0x1019aeaee, 0x8}, 0x28, {0x1d7025820c60, 0x86, 0x90})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/api.go:54 +0x124
+cogentcore.org/core/text/lines.TestMarkup(0x1d702590f208)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/markup_test.go:22 +0x54
+testing.tRunner(0x1d702590f208, 0x102bdcc28)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x3b8
+FAIL	cogentcore.org/core/text/lines	0.387s
+2026/10/10 06:58:09 panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule
+2026/10/10 06:58:09 
+2026/10/10 06:58:09 ----- START OF STACK TRACE: -----
+2026/10/10 06:58:09 goroutine 66 [running]:
+runtime/debug.Stack()
+	/opt/homebrew/opt/go/libexec/src/runtime/debug/stack.go:26 +0x64
+cogentcore.org/core/system.HandleRecoverBase({0x1046a9dd0, 0x77e302108630})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/system/recover.go:50 +0x38
+cogentcore.org/core/core.handleRecover({0x1046a9dd0, 0x77e302108630})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/recover.go:39 +0x4c
+cogentcore.org/core/core.(*renderWindow).eventLoop.func1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:416 +0x2c
+panic({0x1046a9dd0?, 0x77e302108630?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).Validate(0x77e3010ac9c0, 0x77e300fe1228)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/lexer/rule.go:187 +0x794
+cogentcore.org/core/text/parse.(*Parser).InitAll(0x77e30116dd40)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/parser.go:64 +0x58
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x104a52360?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/languagesupport.go:132 +0x140
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:181 +0x2c
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:69 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0x77e3010c6ae8, {0x10477894f, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/highlighter.go:117 +0x34
+cogentcore.org/core/text/lines.(*Lines).SetHighlighting(0x77e301185498?, {0x10477894f?, 0x77e3011854d8?})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/api.go:195 +0xb8
+cogentcore.org/core/text/textcore.(*Base).styleBase(0x77e30112bb08)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/textcore/base.go:383 +0x130
+cogentcore.org/core/text/textcore.(*Base).Style(0x77e30112bb08)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/textcore/base.go:391 +0x20
+cogentcore.org/core/core.(*WidgetBase).StyleTree.func1({0x1048a73e8?, 0x77e30112bb08?}, 0x77e3011855b8?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/style.go:146 +0x2c
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown.func1({0x1323aee00?, 0x77e30112bb08})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/widget.go:517 +0xb8
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0x77e3010ec008, 0x77e301d87cf0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/tree/nodebase.go:502 +0x100
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown(...)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/widget.go:515
+cogentcore.org/core/core.(*WidgetBase).StyleTree(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/style.go:145 +0x5c
+cogentcore.org/core/core.(*Scene).applyStyleScene(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/render.go:289 +0x74
+cogentcore.org/core/core.(*Scene).doRebuild(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/render.go:302 +0x3c
+cogentcore.org/core/core.(*Scene).doUpdate(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/render.go:235 +0x310
+cogentcore.org/core/core.(*Stage).doUpdate(0x77e300f20900?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/stage.go:363 +0x70
+cogentcore.org/core/core.(*stages).updateAll(0x77e301d87760?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/stages.go:258 +0xf8
+cogentcore.org/core/core.(*renderWindow).renderWindow(0x77e3013e6f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:690 +0x188
+cogentcore.org/core/core.(*renderWindow).handleWindowEvents(0x77e3013e6f00, {0x1048aa478, 0x77e300ff3420})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:486 +0x638
+cogentcore.org/core/core.(*renderWindow).handleEvent(0x77e3013e6f00, {0x1048aa478, 0x77e300ff3420})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:462 +0x3e0
+cogentcore.org/core/core.(*renderWindow).eventLoop(0x77e3013e6f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:430 +0x94
+created by cogentcore.org/core/core.(*renderWindow).goStartEventLoop in goroutine 37
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:401 +0x74
+
+2026/10/10 06:58:09 ----- END OF STACK TRACE -----
+2026/10/10 06:58:09 SAVED CRASH LOG TO /var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/cogent-core-offscreen-data-dir-959891632/Cogent\ Core/crash-logs/crash_2026-10-10_06-58-09
+panic: test timed out after 1m30s
+	running tests:
+		TestBase (1m30s)
+
+goroutine 40 [running]:
+testing.(*M).startAlarm.func1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2961 +0x2c4
+created by time.goFunc
+	/opt/homebrew/opt/go/libexec/src/time/sleep.go:182 +0x38
+
+goroutine 1 [chan receive, 1 minutes]:
+testing.(*T).Run(0x77e300f27b08, {0x1035dfbb2?, 0x77e300df7a88?}, 0x1048aad88)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2268 +0x3cc
+testing.runTests.func1(0x77e300f27b08)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2744 +0x38
+testing.tRunner(0x77e300f27b08, 0x77e300df7bb8)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0xc4
+testing.runTests({0x1035f7712, 0x13}, {0x10360ce45, 0x21}, 0x77e301481338, {0x104a075d8, 0x15, 0x15}, {0x77e300df7c58?, 0x77e3010129c0?, ...})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2742 +0x400
+testing.(*M).Run(0x77e301037220)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2602 +0x578
+main.main()
+	_testmain.go:88 +0x80
+
+goroutine 37 [chan receive, 1 minutes]:
+cogentcore.org/core/core.(*Body).runAndShowNewWindow(0x77e300e7b508)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/testing.go:73 +0x194
+cogentcore.org/core/core.(*Body).AssertRender(0x77e300e7b508, {0x10489a6b8, 0x77e300f27d48}, {0x1035d9a6f, 0x5}, {0x0, 0x0, 0x6aca2851?})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/testing.go:31 +0x3c
+cogentcore.org/core/text/textcore.TestBase(0x77e300f27d48)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/textcore/base_test.go:26 +0x80
+testing.tRunner(0x77e300f27d48, 0x1048aad88)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x3b8
+
+goroutine 25 [select]:
+cogentcore.org/core/system/driver/base.(*Window[...]).WinLoop(0x1045f29e0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/system/driver/base/window.go:113 +0x1c0
+created by cogentcore.org/core/system/driver/offscreen.(*App).NewWindow in goroutine 37
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/system/driver/offscreen/app.go:64 +0x42c
+
+goroutine 66 [chan receive]:
+cogentcore.org/core/core.handleRecover({0x1046a9dd0, 0x77e302108630})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/recover.go:86 +0x394
+cogentcore.org/core/core.(*renderWindow).eventLoop.func1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:416 +0x2c
+panic({0x1046a9dd0?, 0x77e302108630?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).Validate(0x77e3010ac9c0, 0x77e300fe1228)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/lexer/rule.go:187 +0x794
+cogentcore.org/core/text/parse.(*Parser).InitAll(0x77e30116dd40)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/parser.go:64 +0x58
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x104a52360?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/parse/languagesupport.go:132 +0x140
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:181 +0x2c
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/styles.go:69 +0x34
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0x77e3010c6ae8, {0x10477894f, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/highlighting/highlighter.go:117 +0x34
+cogentcore.org/core/text/lines.(*Lines).SetHighlighting(0x77e301185498?, {0x10477894f?, 0x77e3011854d8?})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/lines/api.go:195 +0xb8
+cogentcore.org/core/text/textcore.(*Base).styleBase(0x77e30112bb08)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/textcore/base.go:383 +0x130
+cogentcore.org/core/text/textcore.(*Base).Style(0x77e30112bb08)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/text/textcore/base.go:391 +0x20
+cogentcore.org/core/core.(*WidgetBase).StyleTree.func1({0x1048a73e8?, 0x77e30112bb08?}, 0x77e3011855b8?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/style.go:146 +0x2c
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown.func1({0x1323aee00?, 0x77e30112bb08})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/widget.go:517 +0xb8
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0x77e3010ec008, 0x77e301d87cf0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/tree/nodebase.go:502 +0x100
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown(...)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/widget.go:515
+cogentcore.org/core/core.(*WidgetBase).StyleTree(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/style.go:145 +0x5c
+cogentcore.org/core/core.(*Scene).applyStyleScene(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/render.go:289 +0x74
+cogentcore.org/core/core.(*Scene).doRebuild(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/render.go:302 +0x3c
+cogentcore.org/core/core.(*Scene).doUpdate(0x77e3010ec008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/render.go:235 +0x310
+cogentcore.org/core/core.(*Stage).doUpdate(0x77e300f20900?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/stage.go:363 +0x70
+cogentcore.org/core/core.(*stages).updateAll(0x77e301d87760?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/stages.go:258 +0xf8
+cogentcore.org/core/core.(*renderWindow).renderWindow(0x77e3013e6f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:690 +0x188
+cogentcore.org/core/core.(*renderWindow).handleWindowEvents(0x77e3013e6f00, {0x1048aa478, 0x77e300ff3420})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:486 +0x638
+cogentcore.org/core/core.(*renderWindow).handleEvent(0x77e3013e6f00, {0x1048aa478, 0x77e300ff3420})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:462 +0x3e0
+cogentcore.org/core/core.(*renderWindow).eventLoop(0x77e3013e6f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:430 +0x94
+created by cogentcore.org/core/core.(*renderWindow).goStartEventLoop in goroutine 37
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:401 +0x74
+
+goroutine 39 [select]:
+cogentcore.org/core/system/driver/base.(*Window[...]).WinLoop(0x1045f29e0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/system/driver/base/window.go:113 +0x1c0
+created by cogentcore.org/core/system/driver/offscreen.(*App).NewWindow in goroutine 66
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/system/driver/offscreen/app.go:64 +0x42c
+
+goroutine 82 [sync.Cond.Wait]:
+sync.runtime_notifyListWait(0x77e3012f0280, 0x1512)
+	/opt/homebrew/opt/go/libexec/src/runtime/sema.go:617 +0x194
+sync.(*Cond).Wait(0x77e3012f0270)
+	/opt/homebrew/opt/go/libexec/src/sync/cond.go:71 +0xa4
+cogentcore.org/core/events.(*Deque).NextEvent(0x77e3012f0238)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/events/deque.go:62 +0x64
+cogentcore.org/core/core.(*renderWindow).eventLoop(0x77e3013e6000)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:425 +0x74
+created by cogentcore.org/core/core.(*renderWindow).goStartEventLoop in goroutine 66
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/core/renderwindow.go:401 +0x74
+FAIL	cogentcore.org/core/text/textcore	90.701s
+FAIL

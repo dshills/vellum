@@ -1,0 +1,147 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dfce5331585a10f3868b296f0dc3149a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "60c4f9513ea9bd7af9a3ae886a61f2bcf8715968",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "beaa1b3ade0cdcdd",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Reject incomplete geometry rectangles",
+      "message": "zip silently truncates mismatched rectangles, and all returns True for an empty rectangle. Consequently, missing coordinates can pass the native geometry contract check. Hash verification establishes artifact integrity, not that the artifact contains a valid rectangle.",
+      "suggestion": "Require both rectangles to contain exactly four coordinates before comparing them.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/verify_editor_native.py",
+          "lines": {
+            "start": 31,
+            "end": 31
+          }
+        }
+      ],
+      "tags": [
+        "validation"
+      ],
+      "evidence": "        require(all(abs(a-b) \u003c= 0.05 for a, b in zip(actual, expected)), 'native geometry mismatch')",
+      "fix": {
+        "before": "        require(all(abs(a-b) \u003c= 0.05 for a, b in zip(actual, expected)), 'native geometry mismatch')",
+        "after": "        require(len(actual) == len(expected) == 4, 'invalid geometry rectangle')\n        require(all(abs(a-b) \u003c= 0.05 for a, b in zip(actual, expected)), 'native geometry mismatch')"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "6a6e45c7318ff3c3",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Require refusal snapshots before validating state preservation",
+      "message": "An empty refused_states list passes this check without testing any refusal. The manifest explicitly promises five native-state comparisons, but the verifier never requires that coverage before announcing that refusal validation passed.",
+      "suggestion": "Require the documented five refusal-state snapshots before checking that each preserves the prior state.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/verify_editor_native.py",
+          "lines": {
+            "start": 47,
+            "end": 48
+          }
+        }
+      ],
+      "tags": [
+        "coverage",
+        "validation"
+      ],
+      "evidence": "    require(all({k: v for k, v in state.items() if k != 'step'} == before\n                for state in saturation['refused_states']), 'refusal changed native state')",
+      "fix": {
+        "before": "    require(all({k: v for k, v in state.items() if k != 'step'} == before\n                for state in saturation['refused_states']), 'refusal changed native state')",
+        "after": "    require(len(saturation['refused_states']) == 5, 'missing refusal state comparisons')\n    require(all({k: v for k, v in state.items() if k != 'step'} == before\n                for state in saturation['refused_states']), 'refusal changed native state')"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "d5fb76f9b0969ace",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Validate TextField query results rather than only their count",
+      "message": "The TextField regression check only counts queries. It never compares their native rectangles with expected rectangles, so a report containing 31 incorrect results still passes the advertised field geometry regression check.",
+      "suggestion": "Extract the rectangle validation into a shared helper and apply it to every field-regression query as well as every editor query, including rectangle shape and tolerance checks.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/verify_editor_native.py",
+          "lines": {
+            "start": 56,
+            "end": 56
+          }
+        }
+      ],
+      "tags": [
+        "coverage",
+        "validation"
+      ],
+      "evidence": "    require(len(read('field-regression.json')['rendered_geometry_queries']) == 31, 'field geometry regression')",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 18556,
+    "totalMs": 18597
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 3,
+    "bytes": 17135,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 6701,
+        "output": 968,
+        "reasoning": 290,
+        "cachedInput": 1046
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

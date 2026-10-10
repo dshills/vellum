@@ -41,3 +41,16 @@ func TestRejectNativeRanges(t *testing.T) {
 		t.Fatal("out of range")
 	}
 }
+
+func TestNativeClientShadowEncoding(t *testing.T) {
+	for _, before := range []string{"a\x00b", string([]byte{0xff})} {
+		if _, err := Decode(Update{ClientID: 40, BeforeText: before, Text: "A\n", MarkedStart: -1, MarkedEnd: -1}); err == nil {
+			t.Fatal("invalid shadow decoded")
+		}
+	}
+	u := Update{Sequence: 9, ClientID: 40, BeforeText: "👩\n", Text: "日本👩\n", Anchor: 2, Focus: 2, MarkedStart: 0, MarkedEnd: 2}
+	r, err := Decode(u)
+	if err != nil || r.ClientID != 40 || r.BeforeText != u.BeforeText {
+		t.Fatal("client identity/shadow lost", err, r)
+	}
+}

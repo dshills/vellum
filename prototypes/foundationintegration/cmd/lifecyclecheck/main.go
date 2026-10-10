@@ -84,6 +84,7 @@ func main() {
 	}
 	contracts := publicationContracts()
 	contracts["native_geometry"] = geometryContracts()
+	contracts["native_clients"] = clientContracts()
 	start := time.Now()
 	samples := []map[string]any{measurement(0)}
 	for cycle := 1; cycle <= *n; cycle++ {
