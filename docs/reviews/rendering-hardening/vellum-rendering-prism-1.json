@@ -1,0 +1,209 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "507618bf4ad03eb0d1c557a41a05b730",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0793546149bb4d3beee97b90834a2204f97e5f76",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6850ac11ab408ae7",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Idle wake threshold contradicts documented zero-wake acceptance",
+      "message": "The smoke test tolerates up to 5 paint wakeups in the idle second. The README says both runs reported zero paint wakeups over a quiet interval. A regression that wakes the loop a few times per second would still pass while the docs claim zero. The acceptance criterion and the check disagree.",
+      "suggestion": "Make the threshold match the documented acceptance (`idleWakes != 0`), or document the real tolerance and justify it. Alternatively, have the output JSON assert the measured count.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/render-smoke/main.go",
+          "lines": {
+            "start": 72,
+            "end": 72
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "docs"
+      ],
+      "evidence": "if idleWakes \u003e 5 {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "42a628256553d184",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Device-loss subscription may leak or race with window close",
+      "message": "`watchDeviceLoss` is registered before the check on whether the window is already closing. If cleanup or OnClose has already called `stopDeviceLoss`, the late subscription is never released. `stopDeviceLoss` is also called from OnClose without `rootMu`, while `w.stopLoss` is set in OnShow, so the field may be racy.",
+      "suggestion": "Check `w.closing` first, and set or clear `stopLoss` under `rootMu`. If closing is already set, skip the subscription or call stop immediately after registering.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 225,
+            "end": 231
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "resource-leak"
+      ],
+      "evidence": "watchDeviceLoss(w, fail)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ee66160a96ee1a32",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Surface resize now performed while holding window mutex",
+      "message": "SetSize now runs while holding w.Mu. Renderer.SetSize reconfigures the surface, which needs sf.Lock(). That lock is held from GetCurrentTexture until submit, and the render path can also need w.Mu or the window lock. This inverts the lock order and can deadlock the resize/render handshake. The comment also says this keeps reconfiguration inside composer ownership, but no renderContext lock is taken here, so the claim does not match the code.",
+      "suggestion": "Call SetSize outside w.Mu, under the same renderContext lock that renderAsync now takes. Alternatively, document and enforce a single lock order (renderContext, then window, then surface).",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/native/patches/rendering/0017-device-loss.patch",
+          "lines": {
+            "start": 296,
+            "end": 297
+          }
+        }
+      ],
+      "tags": [
+        "deadlock",
+        "lock-ordering",
+        "resize",
+        "location-corrected"
+      ],
+      "evidence": "+\tw.Draw.System.Renderer.SetSize(w.PixelSize)\n w.Mu.Unlock()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c3e7c83b3602955b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference when registering device-loss watcher",
+      "message": "RenderWindow() returns nil until the scene is attached to a render window, and SystemWindow can be a nil interface. Dereferencing either panics. The other functions in this file (NativeWindow, RequestFrameAfter) guard against exactly this case. A panic here would occur during window setup.",
+      "suggestion": "Check that RenderWindow() and its SystemWindow are non-nil before calling nativeDevice, and return early if either is nil.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/rendering.go",
+          "lines": {
+            "start": 50,
+            "end": 50
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "panic"
+      ],
+      "evidence": "device := nativeDevice(w.body.Scene.RenderWindow().SystemWindow)",
+      "fix": {
+        "before": "device := nativeDevice(w.body.Scene.RenderWindow().SystemWindow)",
+        "after": "rw := w.body.Scene.RenderWindow()\n\tif rw == nil || rw.SystemWindow == nil {\n\t\treturn\n\t}\n\tdevice := nativeDevice(rw.SystemWindow)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 77658,
+    "totalMs": 49794
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 37492,
+    "chunks": 3,
+    "llmCalls": 7,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 39367,
+        "output": 11729,
+        "costUSD": 0.196024
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "c9d74d3e97d95df6",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Surface reconfigure retry may self-deadlock on sf.Lock",
+        "message": "GetCurrentTexture takes sf.Lock() and keeps it held until submit. The configure callback is the Surface.Config method value, and Surface configuration methods typically take sf.Lock() themselves. If Config does that here, the Outdated/Lost retry deadlocks on the non-reentrant mutex. The new test only passes a counter closure, so it cannot catch this.",
+        "suggestion": "Confirm that Config does not lock sf.Mutex. If it does, pass a lock-free internal reconfigure helper (e.g. sf.configLocked) to acquireSurfaceFrame. Add a test that uses the real Surface type.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/rendering/0017-device-loss.patch",
+            "lines": {
+              "start": 216,
+              "end": 216
+            }
+          }
+        ],
+        "tags": [
+          "deadlock",
+          "surface",
+          "concurrency"
+        ],
+        "evidence": "stexture, err := acquireSurfaceFrame(sf.surface.TryGetCurrentTexture, sf.Config)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/rendering/0017-device-loss.patch"
+    }
+  ],
+  "suppressed": []
+}

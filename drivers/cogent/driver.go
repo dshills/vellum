@@ -35,6 +35,8 @@ type Driver struct {
 	Commands *command.Registry
 	OnError  func(error)
 	Theme    ui.Theme
+	// ContinuousRendering opts into refresh-rate paint ticks; default uses invalidation.
+	ContinuousRendering bool
 }
 type record struct {
 	widget   core.Widget
@@ -53,6 +55,8 @@ type nativeWindow struct {
 	root             *record
 	rootMu           sync.Mutex
 	lastFocus        ui.FocusRequest
+	stopLoss         func()
+	lossMu           sync.Mutex
 	source           atomic.Pointer[events.Source]
 	pending, closing atomic.Bool
 }
@@ -167,6 +171,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				cleanup := func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
+					stopDeviceLoss(w)
 					disposeControlTree(w.root)
 					// NewBody assigns a Scene parent before adding the body to
 					// its children, so Delete cannot find an unlaunched body.
@@ -217,7 +222,23 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			mu.Unlock()
 			launch = append(launch, w)
 			w.body.OnShow(func(events.Event) {
+				rw := w.body.Scene.RenderWindow()
+				if rw == nil || rw.SystemWindow == nil {
+					if !w.closing.Load() {
+						fail(fmt.Errorf("cogent: render window unavailable on show"))
+					}
+					return
+				}
 				shown.Store(true)
+				if w.closing.Load() {
+					go rw.SystemWindow.CloseReq()
+					return
+				}
+				if err := configureRendering(rw.SystemWindow, d.ContinuousRendering); err != nil {
+					fail(err)
+					return
+				}
+				watchDeviceLoss(w, fail)
 				lifetime, lifetimeErr := a.WindowContext(spec.ID)
 				if w.closing.Load() || lifetimeErr != nil || lifetime.Err() != nil {
 					w.closing.Store(true)
@@ -256,6 +277,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			}
 			w.body.OnClose(func(events.Event) {
 				w.closing.Store(true)
+				stopDeviceLoss(w)
 				a.CloseWindow(spec.ID)
 				cleanup := func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); disposeControlTree(w.root) }
 				if err := a.Do(cleanup); err != nil {

@@ -1,0 +1,211 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "567de5fd9c861b893e966c867cc6eb88",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0793546149bb4d3beee97b90834a2204f97e5f76",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c9c5cc9da754eab5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Window lock acquired inside Owner.Do may deadlock with a composition that already holds it",
+      "message": "Render now takes the window mutex (the composer ownership mutex w.Mu) inside Owner.Do. Async composition holds that mutex before calling Compose. If Render can run from a context that already holds the window lock and then waits for the owner to execute the callback, the callback blocks on the same non-reentrant mutex and deadlocks. The new Snapshot and Destroy paths take the same lock. The lock-order contract (renderContext, then window, then surface) is not documented or tested for this entry point.",
+      "suggestion": "Confirm that Render is never invoked with the window lock held, and add a regression test for this path. Otherwise, perform the work under the lock the caller already holds instead of re-locking.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/canvas.go",
+          "lines": {
+            "start": 262,
+            "end": 267
+          }
+        }
+      ],
+      "tags": [
+        "deadlock",
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "if err := w.owner.Owner.Do(func() {\n\t\twindow := w.owner.NativeWindow()\n\t\tif window == nil || !window.Lock() {\n\t\t\treturn\n\t\t}\n\t\tdefer window.Unlock()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c3ec8961e4677d67",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Errors from app.New and canvas.New are ignored",
+      "message": "The errors from app.New and canvas.New are discarded. If either fails, the next use (defer a.Close(), model.Fit()) dereferences a nil value and panics. The smoke test then reports a nil dereference rather than the real cause.",
+      "suggestion": "Check both errors and call fail(err). Because `err` is declared later with `err := a.Open(...)`, change that statement to `err =` or use a distinct variable name.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/render-smoke/main.go",
+          "lines": {
+            "start": 23,
+            "end": 23
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "a, _ := app.New(app.Config{})",
+      "fix": {
+        "before": "a, _ := app.New(app.Config{})",
+        "after": "a, err := app.New(app.Config{})\n\tif err != nil {\n\t\tfail(err)\n\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b2cfd4e0e8d08d78",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unchecked type assertion on native window",
+      "message": "The unchecked type assertion panics inside the owner-thread callback if NativeWindow returns a different type or nil (for example, the window was closed between Snapshot and this call). A panic there takes down the whole owner loop instead of producing a diagnosable error.",
+      "suggestion": "Use the comma-ok form and set probeErr, or return an error, when the assertion fails.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/render-smoke/main.go",
+          "lines": {
+            "start": 46,
+            "end": 46
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "win = g.NativeWindow().(*desktop.Window)",
+      "fix": {
+        "before": "win = g.NativeWindow().(*desktop.Window)",
+        "after": "if dw, ok := g.NativeWindow().(*desktop.Window); ok {\n\t\t\t\t\t\twin = dw\n\t\t\t\t\t} else {\n\t\t\t\t\t\tprobeErr = fmt.Errorf(\"unexpected native window type\")\n\t\t\t\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0b658ee615602636",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil RenderWindow dereference in OnShow",
+      "message": "RenderWindow() is dereferenced without a nil check inside the OnShow handler. If the window is closing or has been torn down when the event fires, this panics. The new code is also placed after shown.Store(true) and before the closing check, so the window can appear shown with rendering unconfigured.",
+      "suggestion": "Guard against a nil RenderWindow and handle a closing window before configuring. Return without failing if w.closing is already set.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 226,
+            "end": 227
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref"
+      ],
+      "evidence": "if err := configureRendering(w.body.Scene.RenderWindow().SystemWindow, d.ContinuousRendering); err != nil {",
+      "fix": {
+        "before": "if err := configureRendering(w.body.Scene.RenderWindow().SystemWindow, d.ContinuousRendering); err != nil {",
+        "after": "rw := w.body.Scene.RenderWindow()\n\t\t\t\tif rw == nil {\n\t\t\t\t\tfail(errors.New(\"cogent: render window unavailable on show\"))\n\t\t\t\t\treturn\n\t\t\t\t}\n\t\t\t\tif err := configureRendering(rw.SystemWindow, d.ContinuousRendering); err != nil {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a26004127b0a458b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Subscription callback may run under lossMu and deadlock via stopDeviceLoss",
+      "message": "subscribe() runs while lossMu is held. If Device.ObserveLoss replays an already-retained loss synchronously to a new observer, the callback runs fail(...) on this goroutine. fail typically triggers window shutdown, which reaches stopDeviceLoss and re-locks the non-reentrant lossMu, so it deadlocks. The spec says a loss is retained once and observers are called without the health lock, which makes immediate replay plausible.",
+      "suggestion": "Call subscribe() outside lossMu. Then take the lock to store the stop function, and call stop immediately if closing was set in the meantime. Alternatively, have the callback dispatch fail asynchronously so it never re-enters lossMu on the subscribing goroutine.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/rendering.go",
+          "lines": {
+            "start": 81,
+            "end": 81
+          }
+        }
+      ],
+      "tags": [
+        "deadlock",
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "\tw.stopLoss = subscribe()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 77080,
+    "totalMs": 44656
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 41685,
+    "chunks": 3,
+    "llmCalls": 8,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 42096,
+        "output": 12644,
+        "costUSD": 0.21063199999999999
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 5,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

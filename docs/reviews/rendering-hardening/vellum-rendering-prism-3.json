@@ -1,0 +1,151 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "42772ba079864c1a38fb593f5458f5b6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0793546149bb4d3beee97b90834a2204f97e5f76",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "dd534f189fa22bc7",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Init re-registers the XYZ updater its comment says must be avoided",
+      "message": "The comment above this Init says the inherited XYZ updater can resize or release textures concurrently with composition, and that Init replaces the inherited behaviour. It then installs the same updater, which calls `XYZ.Update()` during the scene update pass. That puts back the racy path the override was meant to remove, and the inherited updater may still be registered as well.",
+      "suggestion": "If the goal is to avoid the inherited updater, do not register `w.XYZ.Update()` here. Run resource and size updates only through the owner-scheduled Render path, which holds the window lock. If the updater is needed, fix the comment and add a regression test.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/canvas.go",
+          "lines": {
+            "start": 237,
+            "end": 237
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "gpu",
+        "resources"
+      ],
+      "evidence": "w.Updater(func() { w.XYZ.Update() })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1c75aa65ef7053e9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "RequestFrameAfter bypasses the window-liveness check used by NativeWindow",
+      "message": "RequestFrameAfter reads the render window's SystemWindow directly. Unlike NativeWindow(), it skips the owner/window-context liveness check. After the window is closing or destroyed, a delayed paint request can reach a torn-down native window. A nil SystemWindow also yields the 'unavailable' error rather than ErrFrameNotReady, so callers cannot tell the two cases apart.",
+      "suggestion": "Use g.NativeWindow() so the context check applies, return ErrFrameNotReady when it is nil, and then assert the painter interface on the result.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/rendering.go",
+          "lines": {
+            "start": 120,
+            "end": 120
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "painter, ok := rw.SystemWindow.(interface{ RequestPaintAfter(time.Duration) })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "32ee9820923656b3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Frame nil-check is done outside the window lock that guards its lifetime",
+      "message": "g.widget.XYZ.Frame is read before the native window lock is taken, but the spec says canvas resource mutation, rebuild and destruction own the window mutex. Destroy could nil or replace Frame between the check and Lock(). The code then dereferences Frame.Device() after the lock without re-checking, which risks a nil-pointer panic or use of a destroyed frame.",
+      "suggestion": "Take the window lock first (via NativeWindow), then check g.widget.XYZ.Frame for nil under the lock before calling Device().",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/rendering.go",
+          "lines": {
+            "start": 133,
+            "end": 136
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "nil",
+        "lifecycle"
+      ],
+      "evidence": "\tif g == nil || g.widget == nil || g.widget.XYZ.Frame == nil {\n\t\treturn ErrFrameNotReady\n\t}\n\twindow := g.NativeWindow()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 67688,
+    "totalMs": 33386
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 43263,
+    "chunks": 3,
+    "llmCalls": 6,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 39970,
+        "output": 9762,
+        "costUSD": 0.17756000000000002
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 3,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

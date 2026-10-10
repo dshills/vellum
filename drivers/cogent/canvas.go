@@ -5,6 +5,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
 	"cogentcore.org/core/xyz"
@@ -17,6 +18,7 @@ import (
 	"image/color"
 	"math"
 	"strings"
+	"sync/atomic"
 )
 
 // GPUCanvas renders rectangles through Cogent's public shared-device direct-render
@@ -160,7 +162,7 @@ func (g *GPUCanvas) syncCamera() {
 	sc.Update()
 }
 func (g *GPUCanvas) Sync(core.Widget) error {
-	if g == nil || g.widget == nil || g.Model == nil {
+	if g == nil || g.widget == nil || g.widget.retired.Load() || g.Model == nil {
 		return fmt.Errorf("canvas: mounted renderer and model required")
 	}
 	if err := g.Model.Validate(); err != nil {
@@ -192,8 +194,19 @@ func (g *GPUCanvas) report(err error) {
 // Snapshot explicitly reads back a live GPU frame. Call only on the UI owner;
 // ordinary rendering and navigation do not perform readback.
 func (g *GPUCanvas) Snapshot() (*image.NRGBA, error) {
-	if g == nil || g.widget == nil || g.widget.XYZ.Frame == nil {
+	if g == nil || g.widget == nil {
 		return nil, ErrFrameNotReady
+	}
+	window := g.NativeWindow()
+	if window == nil || !window.Lock() {
+		return nil, ErrFrameNotReady
+	}
+	defer window.Unlock()
+	if g.widget == nil || g.widget.retired.Load() || g.widget.XYZ.Frame == nil {
+		return nil, ErrFrameNotReady
+	}
+	if err := g.widget.XYZ.Frame.Device().LossError(); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrDeviceLost, err)
 	}
 	if err := g.Sync(g.widget); err != nil {
 		return nil, err
@@ -211,21 +224,71 @@ func (g *GPUCanvas) Snapshot() (*image.NRGBA, error) {
 // before direct rendering. Updaters run before layout and cannot supply this size.
 type canvasWidget struct {
 	xyzcore.Scene
-	owner *GPUCanvas
+	owner   *GPUCanvas
+	retired atomic.Bool
 }
 
 func (w *canvasWidget) OnAdd() { w.WidgetBase.OnAdd(); w.WidgetBase.Scene.AddDirectRender(w) }
+func (w *canvasWidget) Init() {
+	// Use the adapter's explicit navigation and resource scheduler. The inherited
+	// XYZ updater can resize/release textures concurrently with composition.
+	w.WidgetBase.Init()
+	w.XYZ = xyz.NewScene()
+	w.SelectionParams.Defaults()
+	w.Styler(func(s *styles.Style) {
+		s.SetAbilities(true, abilities.Clickable, abilities.Focusable, abilities.Activatable, abilities.Slideable, abilities.DoubleClickable)
+		s.Grow.Set(1, 1)
+	})
+}
 func (w *canvasWidget) Destroy() {
-	w.WidgetBase.Scene.DeleteDirectRender(w)
+	w.retired.Store(true)
+	var unlock func()
+	if w.WidgetBase.Scene != nil {
+		if rw := w.WidgetBase.Scene.RenderWindow(); rw != nil && rw.SystemWindow.Lock() {
+			unlock = rw.SystemWindow.Unlock
+		}
+		w.WidgetBase.Scene.DeleteDirectRender(w)
+	}
+	if unlock != nil {
+		defer unlock()
+	}
 	w.XYZ.Destroy()
 	w.WidgetBase.Destroy()
+	// Native teardown never mutates owner-managed handles. The retired marker
+	// invalidates resource APIs; the UI owner may remount or discard this adapter.
+
 }
+
+// Render runs during WidgetBase.RenderWidget (scene update/layout/render), before
+// renderWindow locks the native window to gather/compose sources. Composition
+// later invokes xyzSource.Draw, which never calls this method or takes the owner.
 func (w *canvasWidget) Render() {
 	if w.owner == nil {
-		w.Scene.Render()
 		return
 	}
-	if err := w.owner.Owner.Do(func() { w.owner.size(); w.owner.syncCamera(); w.Scene.Render() }); err != nil {
+	if err := w.owner.Owner.Do(func() {
+		window := w.owner.NativeWindow()
+		if window == nil || !window.Lock() {
+			return
+		}
+		defer window.Unlock()
+		surface := nativeSurface(window)
+		if surface == nil {
+			return
+		}
+		if surface.Device().LossError() != nil {
+			return
+		}
+		w.owner.size()
+		w.owner.syncCamera()
+		w.XYZ.Geom.Size = w.Geom.ContentBBox.Size()
+		if w.XYZ.Geom.Size.X <= 0 || w.XYZ.Geom.Size.Y <= 0 {
+			return
+		}
+		w.XYZ.Update()
+		w.XYZ.ConfigOffscreenFromSurface(surface)
+		w.XYZ.Render()
+	}); err != nil {
 		w.owner.report(err)
 	}
 }

@@ -1,0 +1,125 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "efa95d20c3f5c01ed2b561a4ef140ccd",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "0793546149bb4d3beee97b90834a2204f97e5f76",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d1c2cc0eb67d04b4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unsynchronized writes to owner state during Destroy",
+      "message": "Destroy clears the owner's widget, solids and ids fields. Destroy can run from native teardown rather than the UI owner goroutine. Snapshot reads g.widget before taking the window lock, and the owner's resource APIs touch solids and ids. If the window Lock in Destroy fails, these writes happen with no lock held at all. That is a possible data race.",
+      "suggestion": "Clear these fields on the UI owner (for example via Owner.Do) or under a mutex that Snapshot, Sync and RebuildResources also take. Snapshot should read g.widget under that same mutex.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/canvas.go",
+          "lines": {
+            "start": 251,
+            "end": 255
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "concurrency"
+      ],
+      "evidence": "if w.owner != nil \u0026\u0026 w.owner.widget == w {\n\t\tw.owner.widget = nil\n\t\tw.owner.solids = nil\n\t\tw.owner.ids = nil\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "68ee32367564d36b",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Model validation runs while holding the native window lock",
+      "message": "RebuildResources takes the native window mutex (window.Lock) and then calls g.Model.Validate() while still holding it. If Validate does anything slow or calls back into application or UI code (Application.Do, Invalidate, resource APIs), it can stall composition or deadlock, since composition needs that same mutex. The spec says canvas resource APIs own the window mutex only for the resource work itself.",
+      "suggestion": "Check g.Model for nil and call Validate before acquiring window.Lock(), so only the Rebuild/updateCamera resource mutation runs under the native window mutex. If the model must be read under the lock, document that Validate must be pure.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/rendering.go",
+          "lines": {
+            "start": 146,
+            "end": 151
+          }
+        }
+      ],
+      "tags": [
+        "locking",
+        "deadlock",
+        "canvas"
+      ],
+      "evidence": "if err := g.Model.Validate(); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 43445,
+    "totalMs": 25781
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 12,
+    "bytes": 43394,
+    "chunks": 3,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24686,
+        "output": 6047,
+        "cachedInput": 5846,
+        "costUSD": 0.109842
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 2,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

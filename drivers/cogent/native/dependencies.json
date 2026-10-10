@@ -100,6 +100,17 @@
               "sha256": "627293f27fcf55a6cfc09434109e35a389302991706afcd5def426366fb2df8a"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/rendering",
+          "inputs": "native/patches/rendering/original-hashes.json",
+          "outputs": "native/patches/rendering/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/rendering/0017-device-loss.patch",
+              "sha256": "7b60ed6ee2317c568bb2f33525138fa3b4759651360065c914bf7ca815c596ac"
+            }
+          ]
         }
       ]
     },

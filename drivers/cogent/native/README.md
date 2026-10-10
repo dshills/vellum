@@ -25,3 +25,8 @@ after patches 0001–0015 and expected final source hashes, including regression
 Patch 0016 also gives new windows independent sizing contexts, snapshots shared
 screen metadata, and synchronizes startup main-queue publication. The manifest
 and regression list identify the complete cumulative safety change.
+
+Patch 0017 adds shared device-loss notification, bounds recoverable surface
+reconfiguration, and holds composition/resource ownership through GPU submission.
+Surface textures remain retained through presentation. Its input/output hashes
+and backend regression tests make these adapter-owned fixes reproducible.

@@ -1,0 +1,645 @@
+--- a/gpu/device.go
++++ b/gpu/device.go
+@@ -6,6 +6,7 @@
+ 
+ import (
+ 	"fmt"
++	"sync"
+ 
+ 	"cogentcore.org/core/base/errors"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+@@ -20,16 +21,20 @@
+ 
+ 	// queue for device
+ 	Queue *wgpu.Queue
++
++	// Shared by borrowed Device copies; loss observers never retain GPU resources.
++	health *deviceHealth
+ }
+ 
+ // NewDevice returns a new device for given GPU.
+ // It gets the Queue for this device.
+ func NewDevice(gpu *GPU) (*Device, error) {
+-	wdev, err := gpu.GPU.RequestDevice(nil)
++	health := &deviceHealth{}
++	wdev, err := gpu.GPU.RequestDevice(&wgpu.DeviceDescriptor{DeviceLostCallback: health.callback})
+ 	if errors.Log(err) != nil {
+ 		return nil, err
+ 	}
+-	dev := &Device{Device: wdev}
++	dev := &Device{Device: wdev, health: health}
+ 	dev.Queue = wdev.GetQueue()
+ 	return dev, nil
+ }
+@@ -64,14 +69,16 @@
+ 	if Debug {
+ 		fmt.Printf("Requesting sizes: MaxStorageBufferBindingSize: %X  MaxBufferSize: %X\n", limits.MaxStorageBufferBindingSize, limits.MaxBufferSize)
+ 	}
++	health := &deviceHealth{}
+ 	desc := wgpu.DeviceDescriptor{
+-		RequiredLimits: &limits,
++		DeviceLostCallback: health.callback,
++		RequiredLimits:     &limits,
+ 	}
+ 	wdev, err := gpu.GPU.RequestDevice(&desc)
+ 	if errors.Log(err) != nil {
+ 		return nil, err
+ 	}
+-	dev := &Device{Device: wdev}
++	dev := &Device{Device: wdev, health: health}
+ 	dev.Queue = wdev.GetQueue()
+ 	return dev, nil
+ }
+@@ -112,3 +119,70 @@
+ 	}
+ 	dv.Device.Poll(true, nil)
+ }
++
++// deviceHealth transfers spontaneous device loss without entering native locks.
++type deviceHealth struct {
++	mu        sync.Mutex
++	lost      error
++	next      uint64
++	observers map[uint64]func(error)
++}
++
++func (h *deviceHealth) callback(reason wgpu.DeviceLostReason, message string) {
++	if reason == wgpu.DeviceLostReasonDestroyed {
++		return
++	}
++	h.fail(fmt.Errorf("WebGPU device lost (%s): %s", reason, message))
++}
++func (h *deviceHealth) fail(err error) {
++	h.mu.Lock()
++	if h.lost != nil {
++		h.mu.Unlock()
++		return
++	}
++	h.lost = err
++	callbacks := make([]func(error), 0, len(h.observers))
++	for _, f := range h.observers {
++		callbacks = append(callbacks, f)
++	}
++	h.observers = nil
++	h.mu.Unlock()
++	for _, f := range callbacks {
++		f(err)
++	}
++}
++
++// LossError returns the first unexpected loss, including through borrowed copies.
++func (dv *Device) LossError() error {
++	if dv == nil || dv.health == nil {
++		return nil
++	}
++	dv.health.mu.Lock()
++	defer dv.health.mu.Unlock()
++	return dv.health.lost
++}
++
++// ObserveLoss registers a nonblocking callback. It may run on a foreign GPU
++// thread, including before this function returns. Cancel unregisters future
++// notifications but cannot recall a callback already copied for delivery.
++func (dv *Device) ObserveLoss(f func(error)) func() {
++	if dv == nil || dv.health == nil || f == nil {
++		return func() {}
++	}
++	h := dv.health
++	h.mu.Lock()
++	if h.lost != nil {
++		err := h.lost
++		h.mu.Unlock()
++		f(err)
++		return func() {}
++	}
++	h.next++
++	id := h.next
++	if h.observers == nil {
++		h.observers = map[uint64]func(error){}
++	}
++	h.observers[id] = f
++	h.mu.Unlock()
++	return func() { h.mu.Lock(); delete(h.observers, id); h.mu.Unlock() }
++}
+--- a/xyz/xyzcore/render_notjs.go
++++ b/xyz/xyzcore/render_notjs.go
+@@ -43,6 +43,13 @@
+ 		return
+ 	}
+ 	xr.sw.XYZ.Lock()
++	// A source can wait between gather and compose while resize/destruction
++	// releases its borrowed texture. Only submit the current live frame.
++	frame, live := xr.sw.XYZ.Frame.(*gpu.RenderTexture)
++	if !live || frame.CurrentFrame() != xr.texture {
++		xr.sw.XYZ.Unlock()
++		return
++	}
+ 	gdrw.UseTexture(xr.texture)
+ 	gdrw.CopyUsed(xr.destBBox.Min, xr.srcBBox, draw.Src, false)
+ 	xr.sw.XYZ.Unlock()
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -95,7 +95,8 @@
+ 	// noEventsChan is a channel on which a signal is sent when there are
+ 	// no events left in the window [events.Deque]. It is used internally
+ 	// for event handling in tests.
+-	noEventsChan chan struct{}
++	noEventsChan atomic.Pointer[chan struct{}]
++	noEventsWait sync.Mutex
+ 
+ 	// flags are atomic renderWindow flags.
+ 	flags renderWindowFlags
+@@ -428,9 +429,7 @@
+ 			break
+ 		}
+ 		w.handleEvent(e)
+-		if w.noEventsChan != nil && len(d.Back) == 0 && len(d.Front) == 0 {
+-			w.noEventsChan <- struct{}{}
+-		}
++		w.notifyNoEvents(d)
+ 	}
+ 	if DebugSettings.WindowEventTrace {
+ 		fmt.Printf("Win: %v out of event loop\n", w.name)
+@@ -796,7 +795,7 @@
+ 	w.SystemWindow.Unlock()
+ 	if offscreen || w.flags.HasFlag(winResize) || sinceResize < 500*time.Millisecond {
+ 		atomic.AddInt32(&w.winRenderCounter, 1)
+-		w.renderAsync(cp)
++		w.renderAsyncOwned(cp)
+ 		if w.flags.HasFlag(winResize) {
+ 			w.lastResize = time.Now()
+ 		}
+@@ -814,6 +813,15 @@
+ // which is usually called in a goroutine.
+ // It calls the Compose function on the given composer.
+ func (w *renderWindow) renderAsync(cp composer.Composer) {
++	rc := w.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	w.renderAsyncOwned(cp)
++}
++
++// renderAsyncOwned requires renderContext ownership through the entire batch,
++// including lazy raster and direct sources. The inline resize path already owns it.
++func (w *renderWindow) renderAsyncOwned(cp composer.Composer) {
+ 	if !w.SystemWindow.Lock() {
+ 		atomic.AddInt32(&w.winRenderCounter, -1)
+ 		// fmt.Println("renderAsync SystemWindow lock fail")
+@@ -854,3 +862,19 @@
+ 	// another update will be run to ensure full updating.
+ 	winRenderSkipped
+ )
++
++// notifyNoEvents snapshots the test-only barrier and queue under their ownership
++// boundaries. Delivery never blocks rendering after a waiter retires.
++func (w *renderWindow) notifyNoEvents(d *events.Deque) {
++	if done := w.noEventsChan.Load(); done != nil {
++		d.Mu.Lock()
++		empty := len(d.Back) == 0 && len(d.Front) == 0
++		d.Mu.Unlock()
++		if empty {
++			select {
++			case *done <- struct{}{}:
++			default:
++			}
++		}
++	}
++}
+--- a/gpu/surface.go
++++ b/gpu/surface.go
+@@ -7,10 +7,8 @@
+ import (
+ 	"image"
+ 	"sync"
+-	"time"
+ 
+ 	"cogentcore.org/core/base/errors"
+-	"cogentcore.org/core/system"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ )
+ 
+@@ -44,6 +42,9 @@
+ 
+ 	// current texture: must release at end
+ 	curTexture *wgpu.TextureView
++
++	// Retain the acquired surface texture through submission and presentation.
++	curTextureOwner *wgpu.Texture
+ 
+ 	sync.Mutex
+ }
+@@ -113,29 +114,13 @@
+ // also nil, in which case the surface needs to be reconfigured,
+ func (sf *Surface) GetCurrentTexture() (*wgpu.TextureView, error) {
+ 	sf.Lock() // we remain locked until submit!
+-	var stexture wgpu.SurfaceTexture
+-	for {
+-		var err error
+-		stexture, err = sf.surface.TryGetCurrentTexture()
+-		if errors.Log(err) != nil {
+-			sf.Unlock()
+-			return nil, err
+-		}
+-		if stexture.Status == wgpu.SurfaceGetCurrentTextureStatusOccluded {
+-			time.Sleep(16 * time.Millisecond)
+-			if system.TheApp != nil {
+-				system.TheApp.RunOnMain(func() {
+-					GLFWPollEvents()
+-				})
+-			} else {
+-				GLFWPollEvents()
+-			}
+-			continue
+-		}
+-		break
++	stexture, err := acquireSurfaceFrame(sf.surface.TryGetCurrentTexture, sf.Config)
++	if errors.Log(err) != nil {
++		sf.Unlock()
++		return nil, err
+ 	}
+ 	texture, ok := stexture.Get()
+-	if !ok {
++	if !ok || texture == nil {
+ 		sf.Unlock()
+ 		return nil, nil
+ 	}
+@@ -148,9 +133,11 @@
+ 		Format:          sf.Format.Format,
+ 	})
+ 	if errors.Log(err) != nil {
++		texture.Release()
+ 		sf.Unlock()
+ 		return nil, err
+ 	}
++	sf.curTextureOwner = texture
+ 	sf.curTexture = view
+ 	return view, nil
+ }
+@@ -162,6 +149,10 @@
+ 	if sf.curTexture != nil {
+ 		sf.curTexture.Release()
+ 		sf.curTexture = nil
++	}
++	if sf.curTextureOwner != nil {
++		sf.curTextureOwner.Release()
++		sf.curTextureOwner = nil
+ 	}
+ 	sf.Unlock()
+ }
+@@ -228,3 +219,27 @@
+ 	}
+ 	sf.GPU = nil
+ }
++
++// Unavailable/occluded surfaces yield without polling under a render lock.
++// Lost/outdated surface configuration gets one bounded retry on the same device.
++func acquireSurfaceFrame(acquire func() (wgpu.SurfaceTexture, error), configure func()) (wgpu.SurfaceTexture, error) {
++	for attempt := 0; attempt < 2; attempt++ {
++		frame, err := acquire()
++		if err != nil {
++			return frame, err
++		}
++		if frame.IsStatusSuccess() {
++			return frame, nil
++		}
++		if frame.Texture != nil {
++			frame.Texture.Release()
++			frame.Texture = nil
++		}
++		if (frame.Status == wgpu.SurfaceGetCurrentTextureStatusOutdated || frame.Status == wgpu.SurfaceGetCurrentTextureStatusLost) && attempt == 0 {
++			configure()
++			continue
++		}
++		return frame, nil
++	}
++	panic("unreachable surface acquisition")
++}
+--- a/gpu/gpudraw/system.go
++++ b/gpu/gpudraw/system.go
+@@ -124,6 +124,9 @@
+ 	if errors.Log(err) != nil {
+ 		return err
+ 	}
++	if rp == nil {
++		return nil
++	} // occlusion/timeout produced no presentation frame
+ 
+ 	imgIdx := 0
+ 	lastOp := draw.Op(-1)
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -310,6 +310,7 @@
+ 	if w.IsClosed() {
+ 		return
+ 	}
++	w.Mu.Lock()
+ 	if pos == (image.Point{}) {
+ 		pos = w.Pos
+ 	}
+@@ -319,6 +320,7 @@
+ 	if screen != nil {
+ 		pos = pos.Add(screen.Geometry.Min)
+ 	}
++	w.Mu.Unlock()
+ 	sc := w.Screen()
+ 	if screen != nil {
+ 		sc = screen // critical to use this b/c w.Screen() can be wrong on new screen sequence
+@@ -348,24 +350,31 @@
+ }
+ 
+ func (w *Window) ConstrainFrame(topOnly bool) sides.Sides[int] {
++	w.Mu.Lock()
++	frameSize, position := w.FrameSize, w.Pos
++	w.Mu.Unlock()
+ 	if w.IsClosed() || w.Is(system.Fullscreen) || w.Is(system.Maximized) {
+-		return w.FrameSize
+-	}
+-	if TheApp.Platform() == system.Windows && w.Pos.X == -32000 || w.Pos.Y == -32000 {
+-		return w.FrameSize
++		return frameSize
++	}
++	if TheApp.Platform() == system.Windows && (position.X == -32000 || position.Y == -32000) {
++		return frameSize
+ 	}
+ 	l, t, r, b := w.Glw.GetFrameSize()
++	w.Mu.Lock()
+ 	w.FrameSize.Set(t, r, b, l)
++	frameSize, position = w.FrameSize, w.Pos
++	windowSize := w.WnSize
++	w.Mu.Unlock()
+ 	sc := w.Screen()
+ 	if sc == nil {
+-		return w.FrameSize
++		return frameSize
+ 	}
+ 	scSize := sc.Geometry.Size()
+ 	// fmt.Println("\tconstrainframe screen:", sc.Name, scSize, w.FrameSize, "geom:", w.Pos, w.WnSize)
+-	frSize := image.Pt(w.FrameSize.Left+w.FrameSize.Right, w.FrameSize.Top+w.FrameSize.Bottom)
+-	frOff := image.Pt(w.FrameSize.Left, w.FrameSize.Top)
+-	sz := w.WnSize.Add(frSize)
+-	scpos := w.Pos.Sub(sc.Geometry.Min)
++	frSize := image.Pt(frameSize.Left+frameSize.Right, frameSize.Top+frameSize.Bottom)
++	frOff := image.Pt(frameSize.Left, frameSize.Top)
++	sz := windowSize.Add(frSize)
++	scpos := position.Sub(sc.Geometry.Min)
+ 	pos := scpos.Sub(frOff)
+ 	cpos, csz := system.ConstrainWindowGeometry(pos, sz, scSize)
+ 	cpos = cpos.Add(frOff)
+@@ -381,7 +390,7 @@
+ 		change = true
+ 		pos.Y = cpos.Y
+ 	}
+-	sz = w.WnSize
++	sz = windowSize
+ 	if !topOnly && csz.X < sz.X {
+ 		change = true
+ 		sz.X = csz.X
+@@ -394,7 +403,7 @@
+ 		// fmt.Println("\tconstrainframe changed:", pos, sz)
+ 		w.SetGeometry(false, pos, sz, sc)
+ 	}
+-	return w.FrameSize
++	return frameSize
+ }
+ 
+ func (w *Window) Show() {
+@@ -557,11 +566,14 @@
+ 	w.PixelSize = fbsz
+ 	w.PhysDPI = sc.PhysicalDPI
+ 	w.LogDPI = sc.LogicalDPI
++	// Keep surface reconfiguration inside composer ownership: an acquired
++	// presentation texture must not be invalidated before queue submission.
++	w.Draw.System.Renderer.SetSize(w.PixelSize)
++	nextsc := w.ScreenWindow
+ 	w.Mu.Unlock()
+-	w.Draw.System.Renderer.SetSize(w.PixelSize)
+-	if cursc != w.ScreenWindow {
++	if cursc != nextsc {
+ 		if ScreenDebug {
+-			log.Printf("desktop.Window.updateGeometry: %v: got new screen: %v (was: %v)\n", w.Nm, w.ScreenWindow, cursc)
++			log.Printf("desktop.Window.updateGeometry: %v: got new screen: %v (was: %v)\n", w.Nm, nextsc, cursc)
+ 		}
+ 	}
+ 	w.Event.WindowResize()
+@@ -575,9 +587,12 @@
+ 			height = sc.PixelSize.Y
+ 		}
+ 		fbsz := image.Point{width, height}
+-		if w.PixelSize != fbsz {
++		w.Mu.Lock()
++		previousSize := w.PixelSize
++		w.Mu.Unlock()
++		if previousSize != fbsz {
+ 			if ScreenDebug {
+-				log.Printf("desktop.Window.FbResized: %v: %v (was: %v)\n", w.Nm, fbsz, w.PixelSize)
++				log.Printf("desktop.Window.FbResized: %v: %v (was: %v)\n", w.Nm, fbsz, previousSize)
+ 			}
+ 			w.updateGeometry()
+ 		}
+--- a/core/testing.go
++++ b/core/testing.go
+@@ -76,7 +76,12 @@
+ // waitNoEvents waits for all events to be handled and does any rendering
+ // of the body necessary.
+ func (b *Body) waitNoEvents(rw *renderWindow) {
+-	rw.noEventsChan = make(chan struct{})
+-	<-rw.noEventsChan
+-	rw.noEventsChan = nil
++	rw.noEventsWait.Lock()
++	defer rw.noEventsWait.Unlock()
++	done := make(chan struct{}, 1)
++	rw.noEventsChan.Store(&done)
++	defer rw.noEventsChan.CompareAndSwap(&done, nil)
++	// Requested painting may be idle; wake the event loop after publication.
++	rw.SystemWindow.Events().WindowPaint()
++	<-done
+ }
+--- /dev/null
++++ b/gpu/device_vellum_loss_test.go
+@@ -0,0 +1,41 @@
++package gpu
++
++import (
++	"errors"
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"sync"
++	"sync/atomic"
++	"testing"
++)
++
++func TestDeviceLossBorrowedCopiesAndObservers(t *testing.T) {
++	h := &deviceHealth{}
++	original := &Device{health: h}
++	borrowed := *original
++	var delivered atomic.Int32
++	cancel := original.ObserveLoss(func(error) { delivered.Add(100) })
++	cancel()
++	borrowed.ObserveLoss(func(error) { delivered.Add(1); original.ObserveLoss(func(error) { delivered.Add(1) }) })
++	h.callback(wgpu.DeviceLostReasonDestroyed, "expected teardown")
++	if original.LossError() != nil {
++		t.Fatal("normal teardown marked lost")
++	}
++	h.fail(errors.New("lost"))
++	h.fail(errors.New("duplicate"))
++	if delivered.Load() != 2 || borrowed.LossError() == nil {
++		t.Fatal("loss delivery", delivered.Load())
++	}
++}
++func TestDeviceLossConcurrentSubscribeCancel(t *testing.T) {
++	h := &deviceHealth{}
++	d := &Device{health: h}
++	var wg sync.WaitGroup
++	for i := 0; i < 100; i++ {
++		wg.Go(func() { cancel := d.ObserveLoss(func(error) {}); cancel(); _ = d.LossError() })
++	}
++	wg.Go(func() { h.fail(errors.New("fault")) })
++	wg.Wait()
++	if d.LossError() == nil {
++		t.Fatal("lost fault")
++	}
++}
+--- /dev/null
++++ b/xyz/xyzcore/render_vellum_lifetime_test.go
+@@ -0,0 +1,18 @@
++//go:build !js
++
++package xyzcore
++
++import (
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/gpu/gpudraw"
++	"cogentcore.org/core/system/composer"
++	"cogentcore.org/core/xyz"
++	"testing"
++)
++
++func TestRetiredDirectRenderSourceDoesNotSubmitTexture(t *testing.T) {
++	sc := &Scene{XYZ: xyz.NewScene()}
++	source := &xyzSource{sw: sc, texture: &gpu.Texture{}}
++	// No GPU is required: a destroyed frame must return before UseTexture.
++	source.Draw(&composer.ComposerDrawer{Drawer: &gpudraw.Drawer{}})
++}
+--- /dev/null
++++ b/gpu/surface_vellum_lifecycle_test.go
+@@ -0,0 +1,39 @@
++package gpu
++
++import (
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"testing"
++)
++
++func TestSurfaceAcquisitionYieldsAndBoundedRecovery(t *testing.T) {
++	for _, status := range []wgpu.SurfaceGetCurrentTextureStatus{wgpu.SurfaceGetCurrentTextureStatusOccluded, wgpu.SurfaceGetCurrentTextureStatusTimeout} {
++		calls := 0
++		configs := 0
++		f, e := acquireSurfaceFrame(func() (wgpu.SurfaceTexture, error) { calls++; return wgpu.SurfaceTexture{Status: status}, nil }, func() { configs++ })
++		if e != nil || f.Status != status || calls != 1 || configs != 0 {
++			t.Fatal("unavailable surface did not yield", calls, configs, e)
++		}
++	}
++	calls := 0
++	configs := 0
++	frame, e := acquireSurfaceFrame(func() (wgpu.SurfaceTexture, error) {
++		calls++
++		status := wgpu.SurfaceGetCurrentTextureStatusOutdated
++		if calls == 2 {
++			status = wgpu.SurfaceGetCurrentTextureStatusSuccessOptimal
++		}
++		return wgpu.SurfaceTexture{Status: status}, nil
++	}, func() { configs++ })
++	if e != nil || !frame.IsStatusSuccess() || calls != 2 || configs != 1 {
++		t.Fatal("surface not recovered")
++	}
++	calls = 0
++	configs = 0
++	_, e = acquireSurfaceFrame(func() (wgpu.SurfaceTexture, error) {
++		calls++
++		return wgpu.SurfaceTexture{Status: wgpu.SurfaceGetCurrentTextureStatusLost}, nil
++	}, func() { configs++ })
++	if e != nil || calls != 2 || configs != 1 {
++		t.Fatal("unbounded recovery")
++	}
++}
+--- /dev/null
++++ b/core/render_vellum_composition_test.go
+@@ -0,0 +1,79 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/composer"
++	"sync"
++	"testing"
++	"time"
++)
++
++type contextTestWindow struct {
++	system.Window
++	mu sync.Mutex
++}
++
++func (w *contextTestWindow) Lock() bool { w.mu.Lock(); return true }
++func (w *contextTestWindow) Unlock()    { w.mu.Unlock() }
++
++type contextTestComposer struct {
++	composer.Composer
++	composed chan struct{}
++}
++
++func (c *contextTestComposer) Compose() { close(c.composed) }
++func TestCompositionWaitsForResizeAndDestroyContext(t *testing.T) {
++	w := &renderWindow{SystemWindow: &contextTestWindow{}}
++	w.mains.renderContext = &renderContext{}
++	w.renderContext().Lock()
++	c := &contextTestComposer{composed: make(chan struct{})}
++	done := make(chan struct{})
++	go func() { w.renderAsync(c); close(done) }()
++	select {
++	case <-c.composed:
++		t.Fatal("composition bypassed resize context")
++	case <-time.After(20 * time.Millisecond):
++	}
++	w.renderContext().Unlock()
++	select {
++	case <-done:
++	case <-time.After(time.Second):
++		t.Fatal("composition stuck")
++	}
++}
++func TestInlineCompositionUsesAlreadyOwnedContext(t *testing.T) {
++	w := &renderWindow{SystemWindow: &contextTestWindow{}}
++	w.mains.renderContext = &renderContext{}
++	w.renderContext().Lock()
++	defer w.renderContext().Unlock()
++	c := &contextTestComposer{composed: make(chan struct{})}
++	w.renderAsyncOwned(c)
++	<-c.composed
++}
++
++func TestIdleBarrierPublicationAndRetirement(t *testing.T) {
++	w := &renderWindow{}
++	d := &events.Deque{}
++	var wg sync.WaitGroup
++	wg.Add(2)
++	go func() {
++		defer wg.Done()
++		for range 1000 {
++			done := make(chan struct{}, 1)
++			w.noEventsChan.Store(&done)
++			w.noEventsChan.CompareAndSwap(&done, nil)
++		}
++	}()
++	go func() {
++		defer wg.Done()
++		for range 1000 {
++			w.notifyNoEvents(d)
++		}
++	}()
++	wg.Wait()
++	done := make(chan struct{}, 1)
++	w.noEventsChan.Store(&done)
++	done <- struct{}{}
++	w.notifyNoEvents(d) // a previously signaled/retired consumer cannot block it
++}
