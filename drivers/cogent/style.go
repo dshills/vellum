@@ -16,7 +16,8 @@ func applyStyle(s *styles.Style, n ui.Node, theme ui.Theme) {
 	if err != nil {
 		return
 	} // validated before mounting or syncing a record
-	if n.Kind != ui.Extension {
+	legacy := n.Kind == ui.Column || n.Kind == ui.Row || n.Kind == ui.Label || n.Kind == ui.Button
+	if legacy {
 		s.Grow.Set(0, 0)
 		s.Min.Set(units.Dp(0), units.Dp(0))
 	}
@@ -42,7 +43,7 @@ func applyStyle(s *styles.Style, n ui.Node, theme ui.Theme) {
 	if value.MinSize.Set {
 		v := value.MinSize.Value
 		explicit := theme.Default.MinSize.Set || theme.Kinds[n.Kind].MinSize.Set || n.Style.MinSize.Set
-		if n.Kind != ui.Extension || explicit {
+		if legacy || explicit {
 			s.Min.Set(units.Dp(v.Width), units.Dp(v.Height))
 		} else {
 			if n.MinWidth > 0 {

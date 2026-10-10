@@ -1,0 +1,134 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "69635db8d18539bff6053919aeccb61d",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "3272290bc4050af58f6732560d412f06ffc6605d",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d589de289ed89bc5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Race between OnClose disposal and a later refresh leaks dialogs",
+      "message": "OnClose disposes the control tree and only then calls a.Close(). Between the unlock and Close, a pending refresh can still pass a.Do, reconcile and flushDialogs, creating new external dialog scenes or controls that are never disposed. That leaks native resources after window close.",
+      "suggestion": "Call a.Close() first so no further Do callbacks are accepted, then take rootMu (which waits for any in-flight refresh) and dispose the tree. Alternatively, set a 'closed' flag under rootMu that refresh checks before reconciling.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 156,
+            "end": 159
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "race",
+        "resource-leak"
+      ],
+      "evidence": "disposeControlTree(root)\n\t\trootMu.Unlock()\n\t\ta.Close()",
+      "fix": {
+        "before": "\t\trootMu.Lock()\n\t\tdisposeControlTree(root)\n\t\trootMu.Unlock()\n\t\ta.Close()\n",
+        "after": "\t\ta.Close()\n\t\trootMu.Lock()\n\t\tdisposeControlTree(root)\n\t\trootMu.Unlock()\n"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 67829,
+    "totalMs": 39676
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 75097,
+    "chunks": 5,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 42462,
+        "output": 10598,
+        "costUSD": 0.19090400000000002
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 2,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "81d2bbfb3529ec43",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Programmatic dialog close may be reported as a user dismissal",
+        "message": "closeDialog sets d.closing for the duration of body.Close() and clears it immediately afterwards. If Cogent delivers the close event to the body's OnClose handler asynchronously, the handler sees closing == false. It then marks the dialog dismissed and calls the model's Dismiss callback even though the model closed it. The handler also sets d.body = nil unconditionally, which could clobber a newly prepared body.",
+        "suggestion": "Make the OnClose handler identify its own body, for example by comparing `d.body` to the body it was created for and ignoring stale closes. Track programmatic closes per body instead of with a shared flag that is reset right after Close(). Confirm in Cogent whether Close() runs OnClose synchronously.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "drivers/cogent/controls.go",
+            "lines": {
+              "start": 445,
+              "end": 451
+            }
+          }
+        ],
+        "tags": [
+          "dialog",
+          "state",
+          "race",
+          "location-corrected"
+        ],
+        "evidence": "\td.closing = true\n\ttree.MoveToParent(d.host, r.widget)\n\td.host.SetScene(r.widget.AsWidget().Scene)\n\tbody.Close()\n\td.body = nil\n\td.active = false\n\td.closing = false",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: "
+    }
+  ],
+  "suppressed": []
+}

@@ -28,6 +28,9 @@ evidence. This limits runtime certification, rather than the implemented API sco
 2. Layout and theming — implemented; optional value styles, application-local
    themes, native layout/appearance mapping and reset semantics. See the
    [contract](../specs/layout-theme.md).
-3. Standard controls and interaction — planned.
+3. Standard controls and interaction — implemented; controlled values, queued events,
+   keyed tabs/scroll/modal children, focus requests and semantic metadata. See
+   the [contract](../specs/controls.md); platform screen-reader publication remains
+   an acceptance gate.
 4. Multiple windows and platform services — in progress.
 5. Independently consumable SDK and benchmarks — in progress.

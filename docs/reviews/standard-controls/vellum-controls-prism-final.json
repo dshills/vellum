@@ -1,0 +1,220 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "db40912732efeba19c804c4f62f3209f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "3272290bc4050af58f6732560d412f06ffc6605d",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b96a4f024730874f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Widget created and attached before validation; left orphaned on error",
+      "message": "The native widget is created and attached to `parent` before `ui.ValidateControl` runs, which happens inside `prepareControl` and `syncControl`. When validation fails, the function returns an error but leaves a half-initialised widget in the parent tree. `r.control` and `r.widget` also stay set on the record. The retained tree and the record can then disagree, and the orphan can be rendered or leaked.",
+      "suggestion": "Call `ui.ValidateControl(r.node)` before creating any widget. Alternatively, on error, delete the widget (`widget.AsTree().Delete()`) and reset `r.widget` and `r.control` to nil before returning.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 87,
+            "end": 92
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "error-handling"
+      ],
+      "evidence": "if err := prepareControl(r, r.node); err != nil {\n\t\treturn nil, true, err\n\t}\n\tif err := syncControl(r, ui.Node{}); err != nil {\n\t\treturn nil, true, err\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5a35771e5480ae9c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Control tree disposed outside the application serialization",
+      "message": "`root` is written inside `a.Do` in refresh, and the other reader in `OnShow` also takes `a.Do`. The OnClose handler reads `root` and disposes control state without `a.Do`. A refresh running concurrently can race with the disposal, or dispose a tree that is being replaced.",
+      "suggestion": "Run the disposal inside `a.Do`, as the other accesses to `root` do, before `a.Close()`.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 149,
+            "end": 149
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "b.OnClose(func(e events.Event) { disposeControlTree(root); a.Close(); source.Store(nil) })",
+      "fix": {
+        "before": "b.OnClose(func(e events.Event) { disposeControlTree(root); a.Close(); source.Store(nil) })",
+        "after": "b.OnClose(func(e events.Event) { a.Do(func() { disposeControlTree(root) }); a.Close(); source.Store(nil) })"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 87977,
+    "totalMs": 50381
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 71716,
+    "chunks": 5,
+    "llmCalls": 10,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 72977,
+        "output": 15701,
+        "costUSD": 0.302964
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 5,
+      "refuted": 3
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "b97587215ce3008c",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Programmatic dialog close relies on synchronous OnClose delivery",
+        "message": "`closeDialog` sets `d.closing = true`, calls `body.Close()`, then resets `d.closing = false` immediately. The `OnClose` handler in `prepareDialogBody` relies on `d.closing` being true to skip the dismiss path. If Cogent delivers the close event asynchronously, which is plausible for scene/window teardown, the flag is already false when the handler runs. The handler would then mark the dialog as dismissed and call `Dismiss` for a programmatic close. It would also set `d.body = nil`, which could clobber a newly opened body.",
+        "suggestion": "Make the handler robust. Capture the specific `body` in the closure and ignore the event if `d.body != body`. Track the programmatic close per body (for example a `closedByOwner` flag on that body) instead of a shared `d.closing` boolean that is reset synchronously.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "drivers/cogent/controls.go",
+            "lines": {
+              "start": 434,
+              "end": 437
+            }
+          }
+        ],
+        "tags": [
+          "state",
+          "modal",
+          "location-corrected"
+        ],
+        "evidence": "\tbody.Close()\n\td.body = nil\n\td.active = false\n\td.closing = false",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The finding rests on a hypothetical that the code does not support. In Cogent, Body.Close() and Scene.Close() dispatch the events.Close event synchronously through HandleEvent, so the OnClose handler runs while d.closing is still true. The surrounding code relies on this too: closeDialog moves the host back before Close and clears state afterwards."
+    },
+    {
+      "finding": {
+        "id": "d716a6d7827c4cd6",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Control validation runs after the native tree has been mutated",
+        "message": "The reconcile header says validation and allocation finish before any retained node is moved or removed. `ui.ValidateControl` is only called inside `syncRecord`, which runs after nodes have been parked, re-parented, deleted and reordered. An invalid control therefore leaves the native tree already mutated, and `r.node` is overwritten with the invalid node before the error returns. The tree is then half-updated, and refresh still stores it as `root`.",
+        "suggestion": "Walk the whole tree with `ui.ValidateControl` next to `validateStyle` and `ui.Validate` at the start of `reconcile`, before any mutation. Keep `syncRecord` free of validation failures, or have it assign `r.node` only after it succeeds.",
+        "confidence": 0.45,
+        "locations": [
+          {
+            "path": "drivers/cogent/driver.go",
+            "lines": {
+              "start": 263,
+              "end": 263
+            }
+          }
+        ],
+        "tags": [
+          "atomicity",
+          "validation",
+          "location-corrected"
+        ],
+        "evidence": "if err := ui.ValidateControl(n); err != nil {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The specific claims don't hold in the code shown. In syncRecord, ValidateControl runs before `r.node = n`, so an invalid node is never stored in the record. A failing reconcile sets `failure` and calls quit(), so the app shuts down rather than continuing with a half-updated tree. The ResolveStyle check already follows the same pattern, and refresh calls ui.Validate(n) before reconciling. The reconcile function and ui.Validate are not shown, so the pre-validation claim can't be fully verified."
+    },
+    {
+      "finding": {
+        "id": "387c31df94ce30ac",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unchecked type assertion on parent when re-parenting",
+        "message": "`p.parent` is a `tree.Node`, and the code asserts it to `core.Widget` without checking. If `childHost` ever returns a non-widget node, or an extension host is not a `core.Widget`, this panics in the UI thread during reconcile. Moving a retained widget into a new host is also only safe if the host's Scene is valid at that point, and nothing guards that.",
+        "suggestion": "Use the comma-ok form of the type assertion, and skip or return an error when the parent is not a widget.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/reconcile.go",
+            "lines": {
+              "start": 154,
+              "end": 154
+            }
+          }
+        ],
+        "tags": [
+          "panic",
+          "type-assertion",
+          "location-corrected"
+        ],
+        "evidence": "p.r.widget.AsWidget().SetScene(p.parent.(core.Widget).AsWidget().Scene)",
+        "fix": {
+          "before": "p.r.widget.AsWidget().SetScene(p.parent.(core.Widget).AsWidget().Scene)",
+          "after": "if pw, ok := p.parent.(core.Widget); ok {\n\t\t\t\tp.r.widget.AsWidget().SetScene(pw.AsWidget().Scene)\n\t\t\t}"
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The assertion is on a value that is always a widget. The root `parent` is a `core.Widget`, and the other parents come from `childHost(r, ...)`, which returns a host inside a retained record's widget. Those records' widgets are used throughout via `AsWidget()`, so they are `core.Widget`. The panic scenario depends on hypothetical non-widget hosts that the code does not show. The Scene is copied from the new parent, which has the same validity as the parent itself. The finding is speculative and not a demonstrated bug."
+    }
+  ],
+  "suppressed": []
+}

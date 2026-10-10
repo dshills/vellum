@@ -1,0 +1,99 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dfc4411af983edff3b84fa5ec78d7f90",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "3272290bc4050af58f6732560d412f06ffc6605d",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 55126,
+    "totalMs": 39072
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 73307,
+    "chunks": 5,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 36782,
+        "output": 7592,
+        "costUSD": 0.149484
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "73c1b3d3b3948591",
+        "severity": "medium",
+        "category": "bug",
+        "title": "",
+        "message": "In OnShow, flushDialogs(root) runs with whatever root currently holds. If the initial refresh failed or produced no tree, root is nil. The refresh path guards this call with `root != nil`, but this call does not. A nil dereference inside the show callback would crash the UI thread.",
+        "suggestion": "Guard the call with `if root != nil` as the refresh path does, or make flushDialogs and disposeControlTree nil-safe.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/driver.go",
+            "lines": {
+              "start": 127,
+              "end": 127
+            }
+          }
+        ],
+        "tags": [
+          "nil",
+          "panic",
+          "location-corrected"
+        ],
+        "evidence": "a.Do(func() { rootMu.Lock(); defer rootMu.Unlock(); flushDialogs(root) })",
+        "fix": {
+          "before": "a.Do(func() { rootMu.Lock(); defer rootMu.Unlock(); flushDialogs(root) })",
+          "after": "a.Do(func() {\n\t\t\trootMu.Lock()\n\t\t\tdefer rootMu.Unlock()\n\t\t\tif root != nil {\n\t\t\t\tflushDialogs(root)\n\t\t\t}\n\t\t})"
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The nil case described cannot occur at show time. If the initial refresh fails, Run returns the failure before RunMain, so OnShow never fires. A successful reconcile returns a non-nil root, and OnClose already calls disposeControlTree(root) with no guard. The `root != nil` check in refresh looks redundant rather than evidence that root can be nil here. flushDialogs is not shown, but nothing indicates it would dereference nil."
+    }
+  ],
+  "suppressed": []
+}

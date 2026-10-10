@@ -26,6 +26,16 @@ type Node struct {
 	Children            []Node
 	Custom              any
 	Style               Style
+	Checked             bool
+	Number              float32
+	Numeric             Numeric
+	Options             []Option
+	SelectedID          string
+	Change              func(ChangeEvent)
+	Accessibility       Accessibility
+	Focus               FocusRequest
+	Open                bool
+	Dismiss             func()
 }
 
 func Validate(root Node) error {
@@ -39,12 +49,18 @@ func Validate(root Node) error {
 			return fmt.Errorf("ui: empty or duplicate ID %q", n.ID)
 		}
 		seen[n.ID] = true
+		if depth > 0 && n.Focus.ID != "" {
+			return fmt.Errorf("ui: focus requests belong on the root")
+		}
+		if err := ValidateControl(n); err != nil {
+			return err
+		}
 		if _, err := ResolveStyle(n, Theme{}); err != nil {
 			return err
 		}
 		switch n.Kind {
-		case Column, Row:
-		case Label, Button, Extension:
+		case Column, Row, Tabs, Scroll, Dialog:
+		case Label, Button, Extension, Checkbox, Selector, Slider, NumberField, TextField:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}
@@ -58,5 +74,8 @@ func Validate(root Node) error {
 		}
 		return nil
 	}
-	return walk(root, 0)
+	if err := walk(root, 0); err != nil {
+		return err
+	}
+	return nil
 }

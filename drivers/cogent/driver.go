@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html"
 	"reflect"
+	"sync"
 	"sync/atomic"
 
 	"cogentcore.org/core/core"
@@ -40,6 +41,7 @@ type record struct {
 	node     ui.Node
 	children []*record
 	theme    ui.Theme
+	control  *controlState
 }
 
 var processRun atomic.Bool
@@ -69,6 +71,8 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	host := core.NewFrame(b)
 	host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
 	var root *record
+	var rootMu sync.Mutex
+	var lastFocus ui.FocusRequest
 	var failure atomic.Pointer[error]
 	var source atomic.Pointer[events.Source]
 	var pending atomic.Bool
@@ -78,8 +82,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			go core.TheApp.QuitReq()
 		}
 	}
-	refresh := func() {
+	var refresh func()
+	refresh = func() {
 		a.Do(func() {
+			rootMu.Lock()
+			defer rootMu.Unlock()
 			if !a.TakeDirty(w.ID) {
 				return
 			}
@@ -94,6 +101,15 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if err != nil {
 				failure.CompareAndSwap(nil, &err)
 				quit()
+				return
+			}
+			if root != nil {
+				bindControlWake(root, func(e events.Event) { drainCustom(a, &pending, refresh, e) }, d.OnError)
+				flushDialogs(root)
+				if err := applyFocus(root, n.Focus, &lastFocus); err != nil {
+					failure.CompareAndSwap(nil, &err)
+					quit()
+				}
 			}
 		})
 	}
@@ -108,6 +124,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	}
 	b.OnShow(func(e events.Event) {
 		shown.Store(true)
+		a.Do(func() { rootMu.Lock(); defer rootMu.Unlock(); flushDialogs(root) })
 		source.Store(b.SystemEvents())
 		if ctx.Err() != nil || failure.Load() != nil {
 			quit()
@@ -133,7 +150,15 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			})
 		})
 	}
-	b.OnClose(func(e events.Event) { a.Close(); source.Store(nil) })
+	// Native cleanup must run even after Application.Close has rejected Do.
+	// rootMu protects the retained tree independently of the model owner.
+	b.OnClose(func(e events.Event) {
+		a.Close()
+		rootMu.Lock()
+		disposeControlTree(root)
+		rootMu.Unlock()
+		source.Store(nil)
+	})
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -178,8 +203,9 @@ func mount(parent tree.Node, n ui.Node, a *app.Application, window string, theme
 		return nil, err
 	}
 	for _, c := range n.Children {
-		child, err := mount(r.widget, c, a, window, r.theme)
+		child, err := mount(childHost(r, c.ID), c, a, window, r.theme)
 		if err != nil {
+			disposeControlTree(r)
 			r.widget.AsTree().Delete()
 			return nil, err
 		}
@@ -211,7 +237,7 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 		r.widget = btn
 		btn.OnClick(func(e events.Event) {
 			a.Do(func() {
-				if !r.node.Disabled && r.node.Activate != nil {
+				if !controlDisabled(r) && r.node.Activate != nil {
 					r.node.Activate()
 					a.Invalidate(window)
 				}
@@ -224,17 +250,29 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 			return nil, fmt.Errorf("cogent: unsupported extension %q", n.ID)
 		}
 	default:
-		return nil, fmt.Errorf("cogent: unsupported kind %q", n.Kind)
+		var ok bool
+		var err error
+		r.widget, ok, err = mountControl(parent, r, a, window)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return nil, fmt.Errorf("cogent: unsupported kind %q", n.Kind)
+		}
 	}
 	if r.widget == nil || (reflect.ValueOf(r.widget).Kind() == reflect.Pointer && reflect.ValueOf(r.widget).IsNil()) {
 		return nil, fmt.Errorf("cogent: extension %q returned nil widget", n.ID)
 	}
 	r.widget.AsWidget().SetName(n.ID)
+	syncSemantics(r)
 	r.widget.AsWidget().Styler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {
 	if _, err := ui.ResolveStyle(n, r.theme); err != nil {
+		return err
+	}
+	if err := ui.ValidateControl(n); err != nil {
 		return err
 	}
 	previous := r.node
@@ -260,6 +298,10 @@ func syncRecord(r *record, n ui.Node) error {
 		if err := ext.Sync(r.widget); err != nil {
 			return err
 		}
+	}
+	syncSemantics(r)
+	if err := syncControl(r, previous); err != nil {
+		return err
 	}
 	for i, c := range n.Children {
 		if err := syncRecord(r.children[i], c); err != nil {

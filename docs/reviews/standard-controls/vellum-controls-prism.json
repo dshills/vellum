@@ -1,0 +1,221 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "fb3262f21c7bab3fca8673e69860eb46",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "3272290bc4050af58f6732560d412f06ffc6605d",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "268a80ec4689fde1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Context cancellation compared with != instead of errors.Is",
+      "message": "The error is compared with `!=`, so a wrapped `context.Canceled` returned from `a.Run` is treated as a failure. With `-exit-after` or smoke checks, the gallery would then print an error and exit 1 even though the shutdown was clean. `os.Exit` inside `must` also skips the deferred `a.Close()` and `cancel()`.",
+      "suggestion": "Use `errors.Is(err, context.Canceled)` and add the `errors` import.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/gallery/main.go",
+          "lines": {
+            "start": 80,
+            "end": 80
+          }
+        }
+      ],
+      "tags": [
+        "errors",
+        "go",
+        "location-corrected"
+      ],
+      "evidence": "if err != nil \u0026\u0026 err != context.Canceled {",
+      "fix": {
+        "before": "if err != nil \u0026\u0026 err != context.Canceled {",
+        "after": "if err != nil \u0026\u0026 !errors.Is(err, context.Canceled) {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a95752e9b54c85fb",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Controlled text/number fields do not resync when the app rejects an edit",
+      "message": "The TextField and Spinner are only rewritten when the node's value changed between two syncs. If the user edits the widget and the app rejects or ignores the change, the node value stays the same. `previous` then equals the current node, so the widget keeps the user's text or number while the model holds another value. The widget and the controlled model silently diverge, which breaks the externally controlled model the code comment describes. `restoreControlValue` only covers the disabled and invalid cases.",
+      "suggestion": "Compare against the widget's current value rather than the previous node. For example, in the TextField case use `if w.EditingState().Text != r.node.Text { w.SetText(r.node.Text) }`, and do the same for the Spinner using `w.Value != r.node.Number`.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 257,
+            "end": 258
+          }
+        }
+      ],
+      "tags": [
+        "controlled-component",
+        "state-sync",
+        "location-corrected"
+      ],
+      "evidence": "if previous.Text != r.node.Text {\n\t\t\tw.SetText(r.node.Text)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "dc7be84598db0b17",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Post-reconcile work runs even after reconcile failed",
+      "message": "After reconcile fails and quit() is requested, the code still binds wake handlers, flushes dialogs and applies focus on the possibly partially synced tree. This can open dialogs or move focus during shutdown and may produce a second error.",
+      "suggestion": "Return right after the reconcile error is recorded, or guard the post-reconcile block on failure.Load() == nil.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 101,
+            "end": 102
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "if root != nil {\n\t\t\t\tbindControlWake(root, func(e events.Event) { drainCustom(a, \u0026pending, refresh, e) }, d.OnError)",
+      "fix": {
+        "before": "if root != nil {\n\t\t\t\tbindControlWake(root, func(e events.Event) { drainCustom(a, \u0026pending, refresh, e) }, d.OnError)",
+        "after": "if root != nil \u0026\u0026 failure.Load() == nil {\n\t\t\t\tbindControlWake(root, func(e events.Event) { drainCustom(a, \u0026pending, refresh, e) }, d.OnError)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "55b9de91a52db9fe",
+      "severity": "medium",
+      "category": "bug",
+      "title": "mount error path does not dispose control state",
+      "message": "When a child fails to mount, the parent widget is deleted but its control state, and that of already-mounted siblings, is never disposed. reconcile's error path now calls disposeControl for this, but mount does not. Any resources, wake bindings or dialog state held by controlState leak.",
+      "suggestion": "Call disposeControlTree(r) (or dispose each mounted child record) before deleting the widget on the error path.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 194,
+            "end": 197
+          }
+        }
+      ],
+      "tags": [
+        "leak",
+        "cleanup"
+      ],
+      "evidence": "child, err := mount(childHost(r, c.ID), c, a, window, r.theme)\n\t\tif err != nil {\n\t\t\tr.widget.AsTree().Delete()",
+      "fix": {
+        "before": "child, err := mount(childHost(r, c.ID), c, a, window, r.theme)\n\t\tif err != nil {\n\t\t\tr.widget.AsTree().Delete()",
+        "after": "child, err := mount(childHost(r, c.ID), c, a, window, r.theme)\n\t\tif err != nil {\n\t\t\tdisposeControlTree(r)\n\t\t\tr.widget.AsTree().Delete()"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 90036,
+    "totalMs": 44058
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 67685,
+    "chunks": 5,
+    "llmCalls": 10,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 67697,
+        "output": 13590,
+        "costUSD": 0.271294
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 5,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "387c31df94ce30ac",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unchecked type assertion and shallow SetScene on reparent",
+        "message": "The unchecked type assertion on p.parent (a tree.Node) panics if a child host is not a core.Widget. It also only sets the scene on the moved widget, not its retained descendants, which may keep a stale Scene after a reparent.",
+        "suggestion": "Use a checked assertion, and set the scene recursively (e.g. via tree walk) for the moved subtree.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/reconcile.go",
+            "lines": {
+              "start": 154,
+              "end": 154
+            }
+          }
+        ],
+        "tags": [
+          "panic",
+          "type-assertion",
+          "location-corrected"
+        ],
+        "evidence": "p.r.widget.AsWidget().SetScene(p.parent.(core.Widget).AsWidget().Scene)",
+        "fix": {
+          "before": "p.r.widget.AsWidget().SetScene(p.parent.(core.Widget).AsWidget().Scene)",
+          "after": "if pw, ok := p.parent.(core.Widget); ok {\n\t\t\t\tp.r.widget.AsWidget().SetScene(pw.AsWidget().Scene)\n\t\t\t}"
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The assertion is almost certainly safe: every parent in the plan is either the core.Widget passed to reconcile or a childHost result, and childHost returns native core widgets. The shallow SetScene is also benign. Reparenting happens within one managed tree and a same-scene parking frame, so retained descendants already share the Scene and cannot go stale. The finding is speculative."
+    }
+  ],
+  "suppressed": []
+}

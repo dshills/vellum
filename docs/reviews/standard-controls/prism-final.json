@@ -1,0 +1,126 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b1565eae2ce759ebd0c22bb16791c627",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "3272290bc4050af58f6732560d412f06ffc6605d",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 37760,
+    "totalMs": 36442
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 79723,
+    "chunks": 5,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 3,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 24380,
+        "output": 5599,
+        "costUSD": 0.10475000000000001
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 2,
+      "refuted": 2
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "81d2bbfb3529ec43",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Programmatic dialog close may be reported as a user dismissal",
+        "message": "closeDialog sets d.closing for the duration of body.Close() and clears it immediately afterwards. If Cogent delivers the close event to the body's OnClose handler asynchronously, the handler sees closing == false. It then marks the dialog dismissed and calls the model's Dismiss callback even though the model closed it. The handler also sets d.body = nil unconditionally, which could clobber a newly prepared body.",
+        "suggestion": "Make the OnClose handler identify its own body, for example by comparing `d.body` to the body it was created for and ignoring stale closes. Track programmatic closes per body instead of with a shared flag that is reset right after Close(). Confirm in Cogent whether Close() runs OnClose synchronously.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "drivers/cogent/controls.go",
+            "lines": {
+              "start": 445,
+              "end": 451
+            }
+          }
+        ],
+        "tags": [
+          "dialog",
+          "state",
+          "race",
+          "location-corrected"
+        ],
+        "evidence": "\td.closing = true\n\ttree.MoveToParent(d.host, r.widget)\n\td.host.SetScene(r.widget.AsWidget().Scene)\n\tbody.Close()\n\td.body = nil\n\td.active = false\n\td.closing = false",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: "
+    },
+    {
+      "finding": {
+        "id": "387c31df94ce30ac",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unchecked type assertion and shallow scene reassignment when re-parenting widgets",
+        "message": "The unchecked type assertion `p.parent.(core.Widget)` panics if `childHost` ever returns a `tree.Node` that is not a `core.Widget`. `plan.parent` is typed `tree.Node`, so the compiler does not guarantee the assertion holds. `SetScene` is also applied only to the moved widget, not its descendants. If `MoveToParent` does not propagate the scene, nested widgets keep the parking frame's scene.",
+        "suggestion": "Use a checked assertion, for example `if pw, ok := p.parent.(core.Widget); ok { p.r.widget.AsWidget().SetScene(pw.AsWidget().Scene) }`. Also confirm that descendants of the moved widget are re-scened, for example by walking the subtree.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "drivers/cogent/reconcile.go",
+            "lines": {
+              "start": 154,
+              "end": 154
+            }
+          }
+        ],
+        "tags": [
+          "panic",
+          "type-assertion",
+          "cogent",
+          "location-corrected"
+        ],
+        "evidence": "p.r.widget.AsWidget().SetScene(p.parent.(core.Widget).AsWidget().Scene)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The panic and the shallow scene update are both speculative. Every plan.parent is either the core.Widget root parent or a host returned by childHost, which holds widget children and so is a widget in practice. The parking frame is created under the same managed parent, so retained descendants already share the same Scene. The extra SetScene call is a harmless safeguard, not a real defect."
+    }
+  ],
+  "suppressed": []
+}

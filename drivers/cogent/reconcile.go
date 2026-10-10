@@ -78,9 +78,12 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		} else {
 			used[r] = true
 		}
+		if err := prepareControl(r, node); err != nil {
+			return nil, err
+		}
 		next := &plan{r: r, node: node, parent: p}
 		for _, child := range node.Children {
-			entry, err := prepare(r.widget, child)
+			entry, err := prepare(childHost(r, child.ID), child)
 			if err != nil {
 				return nil, err
 			}
@@ -92,6 +95,7 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	if err != nil {
 		for _, r := range created {
 			if !tree.IsNil(r.widget) {
+				disposeControl(r)
 				r.widget.AsTree().Delete()
 			}
 		}
@@ -147,6 +151,7 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		}
 		if p.r.widget.AsTree().Parent != p.parent {
 			tree.MoveToParent(p.r.widget, p.parent)
+			p.r.widget.AsWidget().SetScene(p.parent.(core.Widget).AsWidget().Scene)
 		}
 		p.r.children = make([]*record, len(p.children))
 		for i, child := range p.children {
@@ -155,6 +160,13 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		}
 	}
 	attach(next)
+	// Dispose external modal scenes before deleting any ancestor; map order is
+	// unspecified, and an ancestor Delete would otherwise hide live descendants.
+	for _, r := range old {
+		if !used[r] && !tree.IsNil(r.widget) {
+			disposeControl(r)
+		}
+	}
 	for _, r := range old {
 		if !used[r] && !tree.IsNil(r.widget) {
 			r.widget.AsTree().Delete()
@@ -166,13 +178,14 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		// therefore occupy the entire managed container; no extension subtree
 		// is reordered. A same-parent reorder uses the exported native slice
 		// to avoid calling OnAdd and resetting native state.
-		if len(p.children) > 0 {
+		if p.node.Kind == ui.Column || p.node.Kind == ui.Row || p.node.Kind == ui.Scroll || p.node.Kind == ui.Dialog {
 			children := make([]tree.Node, len(p.children))
 			for i, child := range p.children {
 				children[i] = child.r.widget
 			}
-			p.r.widget.AsTree().Children = children
+			childHost(p.r, "").AsTree().Children = children
 		}
+		finishControl(p.r, p.node)
 		for _, child := range p.children {
 			order(child)
 		}
