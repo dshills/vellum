@@ -1,0 +1,29 @@
+{
+  "phase": 4,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "coverage": "complete",
+  "checks": [
+    "root race tests; native adapter tests; vet/build",
+    "million-record native smoke",
+    "stale revision/replacement projection rejection",
+    "remount pool and deep tree viewport tests"
+  ],
+  "adjudicated": [
+    {
+      "finding": "4c464630fe4a0dc9",
+      "disposition": "not applicable",
+      "reason": "Application.Do executes the closure synchronously under the owner mutex (app/app.go); it never defers or dispatches. The native event remains live throughout this call."
+    },
+    {
+      "finding": "a01c7aa83bd6a812",
+      "disposition": "not applicable",
+      "reason": "partSource.Snapshot deep-copies the records and revision; model_test.go verifies isolation."
+    }
+  ],
+  "limits": [
+    "tree expansion and index memory O(N)",
+    "benchmarks measure model materialization only, not frame latency",
+    "macOS native runtime tested"
+  ]
+}

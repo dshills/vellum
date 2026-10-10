@@ -60,3 +60,20 @@ native panes. `-layout /path/layout.json` enables explicit Save/Restore; startup
 does not overwrite preferences. Drag-to-dock, floating panes and dynamic window
 creation are not yet implemented. Panel topology changes recreate those native
 panels; application domain state remains independent.
+
+The example generates one million stored component records and 100,101 tree
+nodes, with 20 table-row and 24 tree-row controls. Wheel scrolling and paging
+materialize the current viewport; stable domain IDs connect selection to the
+inspector. Table sorting runs against an immutable snapshot in a bounded task;
+revision checks discard stale results. Tree expansion rebuilds a lightweight visible-node index; subsequent viewport
+materialization takes O(viewport) work even at deep offsets.
+Domain records, tree indexes and optional sort indexes retain O(N) memory. The
+viewport bound is not a claim that all application memory is independent of N.
+
+`-tree-rows` controls the outline's explicit subset of the component dataset
+(default 100,000); its label shows the subset and full table count. Versioned
+sources expose `Revision()` so same-length edits invalidate active projections.
+Providers without revisions explicitly reset projections after edits. Source
+growth preserves the viewport offset, clamping only when necessary.
+
+Tree expansion rebuilds a lightweight O(N) visible-node index; scrolling materializes O(viewport) records. Worker projections carry source revision metadata and require an owner-captured table token when installed. Background sources must be immutable snapshots. The Cancel command also cancels sorting.

@@ -1,0 +1,198 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "34b2d073fffd776569a6e8b553d1f449",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "162ee79d86ebfe232f8b7a85f0874a62f494b9b8",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a8ca495325af3ea1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Sort task is not cancellable and can pile up",
+      "message": "The sort task handle is discarded and no cancel command exists for it. Repeated invocations can start overlapping 1M-element sorts, and the user has no way to stop one. The sort also never reports progress. This contradicts the 'cancellable sorting' claim in the docs. The revision check only discards stale results after the work is done, so it does not stop the work itself.",
+      "suggestion": "Keep the sort task in a variable, cancel any in-flight sort before starting a new one, and register a 'table.cancel-sort' command, mirroring analysis.cancel. Also report progress if the projection supports it.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/workbench/main.go",
+          "lines": {
+            "start": 155,
+            "end": 155
+          }
+        }
+      ],
+      "tags": [
+        "tasks",
+        "cancellation",
+        "location-corrected"
+      ],
+      "evidence": "_, err := tasks.Start(manager, ctx, func(ctx context.Context, _ func(float64, string)) (virtual.Projection, error) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4c464630fe4a0dc9",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Mouse scroll event read and wheel accumulator updated inside deferred closure",
+      "message": "The scroll handler reads `s.Delta.Y` and mutates `v.wheel` inside a closure passed to `Owner.Do`. If `Do` runs later or on another goroutine, the event object may have been recycled by then. The accumulator is also touched from a different context than in `VirtualTable`, where it is updated directly in the event handler. This inconsistency risks races or a stale delta.",
+      "suggestion": "Read the delta synchronously in the handler (`dy := s.Delta.Y`), then call `wheelRows(\u0026v.wheel, dy)` in the same context for both adapters, and pass only the computed row delta into `Owner.Do`.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/virtual.go",
+          "lines": {
+            "start": 198,
+            "end": 199
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "events",
+        "location-corrected"
+      ],
+      "evidence": "v.Owner.Do(func() {\n\t\t\t\td := wheelRows(\u0026v.wheel, s.Delta.Y)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "34836fcccb630815",
+      "severity": "medium",
+      "category": "bug",
+      "title": "ProjectContext panics on a source with negative Len",
+      "message": "NewTable and ReplaceSource reject sources with Len() \u003c 0, but ProjectContext does not. A negative length makes `make([]int, 0, source.Len())` panic, and this function is meant to run in background workers where a panic would crash the process. Len() is also re-read on every loop iteration, so a source that shrinks mid-scan would lead to an out-of-range Row(i).",
+      "suggestion": "Validate source.Len() \u003e= 0 up front. Read the length once into a local variable and use it for the capacity and the loop bound.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "virtual/table.go",
+          "lines": {
+            "start": 115,
+            "end": 115
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if source.Len() \u003e 0 \u0026\u0026 column \u003e= len(source.Row(0).Cells) {",
+      "fix": {
+        "before": "if source.Len() \u003e 0 \u0026\u0026 column \u003e= len(source.Row(0).Cells) {",
+        "after": "if source.Len() \u003c 0 {\n\t\treturn Projection{}, fmt.Errorf(\"virtual: invalid source length\")\n\t}\n\tif source.Len() \u003e 0 \u0026\u0026 column \u003e= len(source.Row(0).Cells) {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1236b6ef8efbef10",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "ApplyProjection cannot detect a replaced source",
+      "message": "Staleness is checked only by length and revision, not by source identity. After ReplaceSource, a projection computed from the old source is accepted if the new source has the same length and revision (for example both at revision 0). Wrong ordering or filtering would then be silently applied to different data.",
+      "suggestion": "Record the source (or a generation counter incremented in ReplaceSource) in Projection and compare it in ApplyProjection.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "virtual/table.go",
+          "lines": {
+            "start": 205,
+            "end": 205
+          }
+        }
+      ],
+      "tags": [
+        "stale-data",
+        "correctness",
+        "location-corrected"
+      ],
+      "evidence": "if projection.length != t.sourceLength || projection.versioned != isVersioned(t.source) || (projection.versioned \u0026\u0026 projection.revision != t.sourceRevision) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c00053ec8668f581",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Tree.View is O(start) per call",
+      "message": "View walks every visible node before `start` on each call, so each render costs O(start+count). For large expanded trees, scrolling deep in the viewport makes every frame linear in the scroll offset. This undermines the virtualization goal stated in the package doc.",
+      "suggestion": "Cache per-node visible subtree sizes (invalidated on Toggle) so the walk can skip whole collapsed or off-screen subtrees. Alternatively, cache a flattened visible-ID slice that is rebuilt only when `dirty`.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "virtual/tree.go",
+          "lines": {
+            "start": 80,
+            "end": 98
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "virtualization"
+      ],
+      "evidence": "for len(stack) \u003e 0 \u0026\u0026 len(out) \u003c count {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 63358,
+    "totalMs": 26221
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 45674,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 32136,
+        "output": 7621,
+        "costUSD": 0.140482
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

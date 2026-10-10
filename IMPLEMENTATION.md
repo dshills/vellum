@@ -8,7 +8,7 @@ and a separate commit.
 1. Application lifecycle and keyed UI API — implemented; native driver and executable example.
 2. Commands and cancellable tasks — implemented; shared registry, menus, toolbar, palette, shortcuts and bounded owner-thread completions.
 3. Docking, document tabs, inspector and layout persistence — implemented; menu-driven move/split, resizable native panes, transactional versioned layouts.
-4. Virtualized tables and trees — pending.
+4. Virtualized tables and trees — implemented; 1,000,000 real records, 100,101 tree nodes, 20/24 native row pools, cancellable sorting and stable domain selection.
 5. Shared-device GPU canvas with navigation and selection — pending.
 
 The first driver deliberately exposes one native window. Root UI ownership and

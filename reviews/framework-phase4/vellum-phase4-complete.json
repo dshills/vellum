@@ -1,0 +1,195 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3c263f9b97b5771395c0d28f93366a25",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "162ee79d86ebfe232f8b7a85f0874a62f494b9b8",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a01c7aa83bd6a812",
+      "severity": "medium",
+      "category": "bug",
+      "title": "In-place mutation of records may race with worker tasks reading the snapshot",
+      "message": "The rotate and raise-value commands edit `parts.parts` in place on the owner thread. The sort and calculate tasks read a `parts.Snapshot()` from worker goroutines. If `Snapshot()` shares the backing slice rather than copying it, a user edit during a running sort or sum is a data race. A sort could then read torn or changing values, and the revision check cannot prevent that.",
+      "suggestion": "Confirm that `Snapshot()` deep-copies the records, or use copy-on-write for edits. For example, copy the slice when a snapshot is taken, or replace the edited element in a fresh slice. Run the tests with `-race` while editing during a sort.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/workbench/main.go",
+          "lines": {
+            "start": 173,
+            "end": 181
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "data-race"
+      ],
+      "evidence": "parts.parts[selectedIndex].Value += 100",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "f07801a23d8ec3d4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Selection error ignored in click handler",
+      "message": "The error from SelectVisible is silently dropped in the click handler. The failure is never reported through OnError, although scroll() does report its errors that way. A failed selection looks like a no-op to the user.",
+      "suggestion": "Forward the error to v.OnError when it is non-nil, as scroll() does.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/virtual.go",
+          "lines": {
+            "start": 65,
+            "end": 67
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "r, err := v.Model.SelectVisible(slot)\n\t\t\t\tif err == nil \u0026\u0026 v.Select != nil {\n\t\t\t\t\tv.Select(r)\n\t\t\t\t}",
+      "fix": {
+        "before": "r, err := v.Model.SelectVisible(slot)\n\t\t\t\tif err == nil \u0026\u0026 v.Select != nil {\n\t\t\t\t\tv.Select(r)\n\t\t\t\t}",
+        "after": "r, err := v.Model.SelectVisible(slot)\n\t\t\t\tif err != nil {\n\t\t\t\t\tif v.OnError != nil {\n\t\t\t\t\t\tv.OnError(err)\n\t\t\t\t\t}\n\t\t\t\t} else if v.Select != nil {\n\t\t\t\t\tv.Select(r)\n\t\t\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "3a810dabae51064f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Mount is not idempotent; row pool accumulates on remount",
+      "message": "Mount appends to v.rows without resetting it. If Mount is called a second time on the same struct, for example when the widget tree is rebuilt, the pool holds stale buttons from the old host. len(v.rows) then no longer equals Model.Count, so Sync permanently returns an error. The same applies to VirtualTree.Mount.",
+      "suggestion": "Set `v.rows = v.rows[:0]` (or `make([]*core.Button, 0, Count)`) at the start of Mount, or return the existing host if it is already mounted.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/virtual.go",
+          "lines": {
+            "start": 72,
+            "end": 72
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "v.rows = append(v.rows, b)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c91890646ca32255",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Exported Start/Count fields allow invalid viewport state that panics or exceeds MaxVisible",
+      "message": "Start and Count are exported and mutable, so callers can bypass the validation in SetViewport and the MaxVisible bound. View() uses them directly. A negative Start indexes t.order[i] with a negative index and panics, or makes make() receive a wrong capacity. An oversized Count materializes an unbounded number of rows, defeating the point of the viewport.",
+      "suggestion": "Make the fields unexported and expose read-only accessors such as StartRow() and VisibleCount(). Alternatively, clamp Start and Count at the top of View().",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "virtual/table.go",
+          "lines": {
+            "start": 29,
+            "end": 29
+          }
+        }
+      ],
+      "tags": [
+        "encapsulation",
+        "invariants"
+      ],
+      "evidence": "Start, Count          int",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "a3a495189c90c898",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "ApplyProjection cannot detect a projection computed against an older source revision",
+      "message": "ProjectContext runs against whatever the source looks like at that moment, and the docs say a worker may run it. ApplyProjection has no way to tell which source revision the indices came from. It calls syncSource first, which adopts the current revision, and then only range-checks the indices. If the source changed to a same-length revision while the worker ran, the stale permutation is accepted and the table shows rows in the wrong order with no error. The invalidation machinery is bypassed.",
+      "suggestion": "Have Project return the source revision (or a small Projection struct holding indices and revision). Have ApplyProjection take that revision and reject the projection with an error if it no longer matches the current source revision or length.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "virtual/table.go",
+          "lines": {
+            "start": 185,
+            "end": 186
+          }
+        }
+      ],
+      "tags": [
+        "stale-data",
+        "concurrency",
+        "api-design",
+        "location-corrected"
+      ],
+      "evidence": "func (t *Table) ApplyProjection(indices []int) error {\n\tt.syncSource()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 74007,
+    "totalMs": 24871
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 10,
+    "bytes": 42951,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 28343,
+        "output": 9475,
+        "costUSD": 0.151436
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,14 @@
+# example.com/vellum/cogent/cmd/workbench.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+goos: darwin
+goarch: arm64
+pkg: example.com/vellum/cogent/cmd/workbench
+cpu: Apple M4 Pro
+BenchmarkActualMillionViewport-14    	  474187	      2488 ns/op	    3378 B/op	     170 allocs/op
+BenchmarkActualMillionViewport-14    	  483668	      2425 ns/op	    3378 B/op	     170 allocs/op
+BenchmarkActualMillionViewport-14    	  483112	      2415 ns/op	    3378 B/op	     170 allocs/op
+BenchmarkTypedMatcher-14             	26131976	        45.99 ns/op	       0 B/op	       0 allocs/op
+BenchmarkTypedMatcher-14             	25980516	        46.71 ns/op	       0 B/op	       0 allocs/op
+BenchmarkTypedMatcher-14             	25049228	        46.60 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	example.com/vellum/cogent/cmd/workbench	7.834s

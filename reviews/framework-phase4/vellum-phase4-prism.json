@@ -1,0 +1,226 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f513678e862d0a62079a39d54127f17a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "162ee79d86ebfe232f8b7a85f0874a62f494b9b8",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 6,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9e2e41c6c6e50c63",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Applied sort projection is not invalidated when data is mutated",
+      "message": "The `revision` counter only guards in-flight tasks. After a sort by value has been applied, `component.raise-value` changes a Value and bumps `revision`. The projection already installed in `table` is not recomputed or cleared. The table keeps showing an order that no longer matches the data, and nothing tells the user the sort is stale.",
+      "suggestion": "When a mutation changes a sortable field, clear the table projection or re-run the sort task. Also record the sort revision in the table so a stale order can be detected and shown.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/workbench/main.go",
+          "lines": {
+            "start": 175,
+            "end": 176
+          }
+        }
+      ],
+      "tags": [
+        "stale-state",
+        "sorting",
+        "location-corrected"
+      ],
+      "evidence": "parts.parts[selectedIndex].Value += 100\n\t\trevision++",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "425e7fe4a193d05e",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "SetViewport error ignored in table scroll",
+      "message": "The error returned by SetViewport is discarded. The test shows SetViewport can fail, and this call has no upper clamp, so scrolling past the end can fail silently. Invalidate is then called regardless, and the failure is invisible to callers.",
+      "suggestion": "Check the error, clamp start to Len()-Count, or surface the failure, and skip Invalidate when nothing changed.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/virtual.go",
+          "lines": {
+            "start": 94,
+            "end": 94
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "v.Model.SetViewport(start, v.Model.Count)",
+      "fix": {
+        "before": "v.Model.SetViewport(start, v.Model.Count)",
+        "after": "if err := v.Model.SetViewport(start, v.Model.Count); err != nil {\n\t\t\treturn\n\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8e1e21c9f43e0780",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Toggling a node resets scroll position to top",
+      "message": "Clicking an expandable row toggles it and then resets Start to 0. Expanding or collapsing a node while scrolled deep into a large tree jumps the viewport back to the top, which loses the user's position. A collapse may need a clamp to the new length, but not a reset to zero.",
+      "suggestion": "Keep v.Start on toggle and only clamp it if it exceeds the new visible length, or keep the toggled row anchored in view.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/virtual.go",
+          "lines": {
+            "start": 164,
+            "end": 164
+          }
+        }
+      ],
+      "tags": [
+        "ux",
+        "state"
+      ],
+      "evidence": "v.Start = 0",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8ff946072750ae1f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Tree scroll ignores small wheel deltas",
+      "message": "The tree scroll handler truncates Delta.Y/24 to an int with no minimum step. Small deltas, such as those from trackpads or fine wheels, produce 0 and the tree never scrolls. VirtualTable handles this case with a ±1 fallback, so the two widgets behave differently.",
+      "suggestion": "Apply the same minimum ±1 step used in VirtualTable's scroll handler, ideally via a shared helper.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/virtual.go",
+          "lines": {
+            "start": 177,
+            "end": 177
+          }
+        }
+      ],
+      "tags": [
+        "scroll",
+        "ux"
+      ],
+      "evidence": "start := v.Start + int(s.Delta.Y/24)",
+      "fix": {
+        "before": "start := v.Start + int(s.Delta.Y/24)",
+        "after": "d := int(s.Delta.Y / 24)\n\t\t\t\tif d == 0 {\n\t\t\t\t\tif s.Delta.Y \u003e 0 {\n\t\t\t\t\t\td = 1\n\t\t\t\t\t} else if s.Delta.Y \u003c 0 {\n\t\t\t\t\t\td = -1\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tstart := v.Start + d"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7da1c997907717d5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "View can panic on stale projection indices",
+      "message": "ApplyProjection validates indices against Source.Len() only at apply time, and the table keeps the stored order. If the Source later shrinks or is replaced (it is a public mutable field), View passes stale indices to Source.Row. That can panic with an out-of-range index, and a Source such as `tiny` would do exactly that. The doc comment only says to apply against the same revision, and nothing enforces it.",
+      "suggestion": "In View, skip or clamp indices \u003e= Source.Len(), or clear t.order and reset the viewport when the source length changes. Alternatively, make Source unexported and add a revision check.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "virtual/table.go",
+          "lines": {
+            "start": 71,
+            "end": 71
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "stale-index",
+        "location-corrected"
+      ],
+      "evidence": "out = append(out, t.Source.Row(index))",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "554fff41b4c0ef8d",
+      "severity": "medium",
+      "category": "performance",
+      "title": "",
+      "message": "For sources that do not implement Comparator, every sort comparison calls source.Row twice. Each call materializes a Row, which may allocate a Cells slice. Sorting N rows costs about N log N comparisons, so a million-row source means tens of millions of materializations and heavy allocation, which defeats the point of virtualizing. The ctx.Err() call on every comparison adds more overhead.",
+      "suggestion": "Extract the sort key for each matched index once into a parallel slice of strings, then sort indices by those keys. Check ctx only periodically, not on every comparison. Alternatively require Comparator for large sources.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "virtual/table.go",
+          "lines": {
+            "start": 135,
+            "end": 135
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "sort",
+        "allocation",
+        "location-corrected"
+      ],
+      "evidence": "return source.Row(a).Cells[column] \u003c source.Row(b).Cells[column]",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 67691,
+    "totalMs": 27534
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 33631,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 23674,
+        "output": 8499,
+        "costUSD": 0.132338
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
