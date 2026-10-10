@@ -1,0 +1,12 @@
+{
+  "scope": "Owned Cogent fixture, confirmed GLFW iconified state, 60-second interval; CPU and scheduler/canvas proxies, no OS wakeup/compositor attribution",
+  "iconified": true,
+  "sample": {
+    "Seconds": 60.000188875,
+    "CPUSeconds": 0.20022899999999993,
+    "CPUPercentOneCore": 0.33371394949629635,
+    "CanvasRepaints": 0,
+    "PaintSchedulerWakes": 75,
+    "Note": "Whole-process CPU; canvas repaint proxy, not compositor presents or wakeups. Small fixture, not the 1000-control budget workload."
+  }
+}

@@ -1,0 +1,582 @@
+# cogentcore.org/core/text/lines.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/text/textcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestMarkup (0.03s)
+panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule [recovered, repanicked]
+
+goroutine 48 [running]:
+testing.tRunner.func1.2({0x1075152a8, 0xc0002558f0})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2125 +0x2b8
+testing.tRunner.func1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2128 +0x438
+panic({0x1075152a8?, 0xc0002558f0?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileNameMap(0xc00027c340, 0xc0002d27a8)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/lexer/rule.go:116 +0x7ac
+cogentcore.org/core/text/parse/lexer.(*Rule).Compile(0xc00027c340, 0xc0002d27a8)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/lexer/rule.go:104 +0x184
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll.func1({0x10770d280, 0xc00027c340})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/lexer/rule.go:84 +0x54
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0xc000242680, 0xc00045e048)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/tree/nodebase.go:502 +0x170
+cogentcore.org/core/text/parse/lexer.(*Rule).CompileAll(0xc000242680, 0xc0002d27a8)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/lexer/rule.go:82 +0xe4
+cogentcore.org/core/text/parse.(*Parser).InitAll(0xc0000d0fc0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/parser.go:63 +0xb0
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x8000000000?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/languagesupport.go:132 +0x234
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/styles.go:181 +0x34
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/styles.go:69 +0x44
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0xc000264048, {0x10639f40c, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/highlighter.go:117 +0x50
+cogentcore.org/core/text/highlighting.(*Highlighter).Init(0xc000264048, 0xc000307d80, 0xc0002641f0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/highlighter.go:67 +0x74
+cogentcore.org/core/text/lines.(*Lines).setFileInfo(0xc000264008, 0xc000307d80)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/lines/markup.go:24 +0xa4
+cogentcore.org/core/text/lines.NewLinesFromBytes({0x1063a52ee, 0x8}, 0x28, {0xc0004c6bd0, 0x86, 0x90})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/lines/api.go:42 +0x2a0
+cogentcore.org/core/text/lines.TestMarkup(0xc000248fc8)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/lines/markup_test.go:22 +0x5c
+testing.tRunner(0xc000248fc8, 0x1077137a0)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x168
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x7c0
+FAIL	cogentcore.org/core/text/lines	0.543s
+2026/10/09 14:52:01 panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule
+2026/10/09 14:52:01 
+2026/10/09 14:52:01 ----- START OF STACK TRACE: -----
+2026/10/09 14:52:01 goroutine 67 [running]:
+runtime/debug.Stack()
+	/opt/homebrew/opt/go/libexec/src/runtime/debug/stack.go:26 +0x6c
+cogentcore.org/core/system.HandleRecoverBase({0x1028f2dd8, 0xc004988810})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/system/recover.go:50 +0x3c
+cogentcore.org/core/core.handleRecover({0x1028f2dd8, 0xc004988810})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/recover.go:39 +0x78
+cogentcore.org/core/core.(*renderWindow).eventLoop.func1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:416 +0x54
+panic({0x1028f2dd8?, 0xc004988810?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).Validate(0xc0001624e0, 0xc00498e7a8)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/lexer/rule.go:187 +0x152c
+cogentcore.org/core/text/parse.(*Parser).InitAll(0xc00011dce0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/parser.go:64 +0xc8
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0xc000172e98?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/languagesupport.go:132 +0x234
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/styles.go:181 +0x34
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/styles.go:69 +0x44
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0xc00016eac8, {0x1029c347f, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/highlighter.go:117 +0x50
+cogentcore.org/core/text/lines.(*Lines).SetHighlighting(0xc00016ea88, {0x1029c347f, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/lines/api.go:180 +0x8c
+cogentcore.org/core/text/textcore.(*Base).styleBase(0xc000112008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/textcore/base.go:369 +0x324
+cogentcore.org/core/text/textcore.(*Base).Style(0xc000112008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/textcore/base.go:377 +0x2c
+cogentcore.org/core/core.(*WidgetBase).StyleTree.func1({0x102af8ae0, 0xc000112008}, 0xc000173318?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/style.go:146 +0x38
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown.func1({0x11213fe00, 0xc000112008})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/widget.go:517 +0xb8
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0xc00017c008, 0xc000058ff0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/tree/nodebase.go:502 +0x170
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown(...)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/widget.go:515
+cogentcore.org/core/core.(*WidgetBase).StyleTree(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/style.go:145 +0x90
+cogentcore.org/core/core.(*Scene).applyStyleScene(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/render.go:289 +0xa4
+cogentcore.org/core/core.(*Scene).doRebuild(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/render.go:302 +0x58
+cogentcore.org/core/core.(*Scene).doUpdate(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/render.go:235 +0x20c
+cogentcore.org/core/core.(*Stage).doUpdate(0xc00018e900)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/stage.go:363 +0xc0
+cogentcore.org/core/core.(*stages).updateAll(0xc003c48f30)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/stages.go:258 +0x154
+cogentcore.org/core/core.(*renderWindow).renderWindow(0xc003c48f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:690 +0x2a0
+cogentcore.org/core/core.(*renderWindow).handleWindowEvents(0xc003c48f00, {0x102afbb70, 0xc003cbd340})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:486 +0x8e0
+cogentcore.org/core/core.(*renderWindow).handleEvent(0xc003c48f00, {0x102afbb70, 0xc003cbd340})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:462 +0x524
+cogentcore.org/core/core.(*renderWindow).eventLoop(0xc003c48f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:430 +0xdc
+created by cogentcore.org/core/core.(*renderWindow).goStartEventLoop in goroutine 25
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:401 +0x94
+
+2026/10/09 14:52:01 ----- END OF STACK TRACE -----
+2026/10/09 14:52:01 SAVED CRASH LOG TO /var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/cogent-core-offscreen-data-dir-4230545307/Cogent\ Core/crash-logs/crash_2026-10-09_14-52-01
+SIGQUIT: quit
+PC=0x184a1350c m=0 sigcode=0
+
+goroutine 0 gp=0x102ca6660 m=0 mp=0x102ca7cc0 [idle]:
+runtime.pthread_cond_wait(0x102ca8228, 0x102ca81e8)
+	/opt/homebrew/opt/go/libexec/src/runtime/sys_darwin.go:470 +0x20 fp=0x16fb9c510 sp=0x16fb9c4e0 pc=0x1002cdbc0
+runtime.semasleep(0xffffffffffffffff)
+	/opt/homebrew/opt/go/libexec/src/runtime/os_darwin.go:72 +0x9c fp=0x16fb9c570 sp=0x16fb9c510 pc=0x1002a8e3c
+runtime.notesleep(0x102ca7e18)
+	/opt/homebrew/opt/go/libexec/src/runtime/lock_sema.go:62 +0xac fp=0x16fb9c5a0 sp=0x16fb9c570 pc=0x10027f09c
+runtime.mPark(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:1985
+runtime.stopm()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:3023 +0x84 fp=0x16fb9c5d0 sp=0x16fb9c5a0 pc=0x1002b2fc4
+runtime.findRunnable()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:3811 +0xff0 fp=0x16fb9c7a0 sp=0x16fb9c5d0 pc=0x1002b4d30
+runtime.schedule()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:4179 +0x90 fp=0x16fb9c7e0 sp=0x16fb9c7a0 pc=0x1002b6090
+runtime.park_m(0xc000104f00)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:4319 +0x23c fp=0x16fb9c840 sp=0x16fb9c7e0 pc=0x1002b650c
+runtime.mcall()
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:319 +0x54 fp=0x16fb9c850 sp=0x16fb9c840 pc=0x1002edef4
+
+goroutine 1 gp=0xc0000041e0 m=nil [chan receive]:
+runtime.gopark(0x3001543c0?, 0x112442588?, 0xd0?, 0xf5?, 0x18?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00005d5a0 sp=0xc00005d580 pc=0x1002e83d8
+runtime.chanrecv(0xc00003f300, 0xc00005d6ae, 0x1)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:667 +0x410 fp=0xc00005d630 sp=0xc00005d5a0 pc=0x1002797c0
+runtime.chanrecv1(0x102a1c828?, 0x1029f5a78?)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:509 +0x14 fp=0xc00005d660 sp=0xc00005d630 pc=0x100279374
+testing.(*T).Run(0xc000195b08, {0x1016ee681, 0x8}, 0x102afc478)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2268 +0x7dc fp=0xc00005d7b0 sp=0xc00005d660 pc=0x1003f852c
+testing.runTests.func1(0xc000195b08)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2744 +0x78 fp=0xc00005d800 sp=0xc00005d7b0 pc=0x100400548
+testing.tRunner(0xc000195b08, 0xc00005da28)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x168 fp=0xc00005d8e0 sp=0xc00005d800 pc=0x1003f7ce8
+testing.runTests({0x101706440, 0x13}, {0x10171b7cf, 0x21}, 0xc000452030, {0x102c56048, 0xd, 0xd}, {0x0?, 0xc000246ad0?, ...})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2742 +0x7a4 fp=0xc00005da50 sp=0xc00005d8e0 pc=0x1003fb374
+testing.(*M).Run(0xc000154320)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2602 +0xb3c fp=0xc00005ddd0 sp=0xc00005da50 pc=0x1003f987c
+main.main()
+	_testmain.go:70 +0x104 fp=0xc00005dea0 sp=0xc00005ddd0 pc=0x101119444
+runtime.main()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:302 +0x380 fp=0xc00005dfd0 sp=0xc00005dea0 pc=0x1002ae4c0
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00005dfd0 sp=0xc00005dfd0 pc=0x1002f0014
+
+goroutine 18 gp=0xc0001043c0 m=nil [force gc (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00009c790 sp=0xc00009c770 pc=0x1002e83d8
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.forcegchelper()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:387 +0xb4 fp=0xc00009c7d0 sp=0xc00009c790 pc=0x1002ae7a4
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00009c7d0 sp=0xc00009c7d0 pc=0x1002f0014
+created by runtime.init.7 in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:375 +0x24
+
+goroutine 19 gp=0xc0001045a0 m=nil [GC sweep wait]:
+runtime.gopark(0x1?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc0000b4f70 sp=0xc0000b4f50 pc=0x1002e83d8
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.bgsweep(0xc000114000)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgcsweep.go:324 +0x178 fp=0xc0000b4fb0 sp=0xc0000b4f70 pc=0x1002984e8
+runtime.gcenable.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:214 +0x20 fp=0xc0000b4fd0 sp=0xc0000b4fb0 pc=0x1002ddd00
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000b4fd0 sp=0xc0000b4fd0 pc=0x1002f0014
+created by runtime.gcenable in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:214 +0x6c
+
+goroutine 20 gp=0xc000104780 m=nil [GC scavenge wait]:
+runtime.gopark(0x10000?, 0x101ac9368?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc0000aef60 sp=0xc0000aef40 pc=0x1002e83d8
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.(*scavengerState).park(0x102ca5d20)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgcscavenge.go:425 +0x5c fp=0xc0000aef90 sp=0xc0000aef60 pc=0x10029605c
+runtime.bgscavenge(0xc000114000)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgcscavenge.go:658 +0xac fp=0xc0000aefb0 sp=0xc0000aef90 pc=0x1002965ec
+runtime.gcenable.gowrap2()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:215 +0x20 fp=0xc0000aefd0 sp=0xc0000aefb0 pc=0x1002ddcc0
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000aefd0 sp=0xc0000aefd0 pc=0x1002f0014
+created by runtime.gcenable in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:215 +0xac
+
+goroutine 2 gp=0xc0000054a0 m=nil [GOMAXPROCS updater (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00009cf70 sp=0xc00009cf50 pc=0x1002e83d8
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.updateMaxProcsGoroutine()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:7146 +0xf4 fp=0xc00009cfd0 sp=0xc00009cf70 pc=0x1002bc304
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00009cfd0 sp=0xc00009cfd0 pc=0x1002f0014
+created by runtime.defaultGOMAXPROCSUpdateEnable in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:7134 +0x48
+
+goroutine 3 gp=0xc000005a40 m=nil [finalizer wait]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc0000afd80 sp=0xc0000afd60 pc=0x1002e83d8
+runtime.runFinalizers()
+	/opt/homebrew/opt/go/libexec/src/runtime/mfinal.go:210 +0x120 fp=0xc0000affd0 sp=0xc0000afd80 pc=0x1002895f0
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000affd0 sp=0xc0000affd0 pc=0x1002f0014
+created by runtime.createfing in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mfinal.go:172 +0x78
+
+goroutine 4 gp=0xc000005c20 m=nil [GC worker (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000491f20 sp=0xc000491f00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc000491fb0 sp=0xc000491f20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc000491fd0 sp=0xc000491fb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000491fd0 sp=0xc000491fd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 5 gp=0xc000492000 m=nil [GC worker (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000490f20 sp=0xc000490f00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc000490fb0 sp=0xc000490f20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc000490fd0 sp=0xc000490fb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000490fd0 sp=0xc000490fd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 34 gp=0xc000504000 m=nil [GC worker (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00048ff20 sp=0xc00048ff00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00048ffb0 sp=0xc00048ff20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00048ffd0 sp=0xc00048ffb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00048ffd0 sp=0xc00048ffd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 21 gp=0xc000104960 m=nil [GC worker (idle)]:
+runtime.gopark(0x102b04fa0?, 0x102ca7cc0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00048ef20 sp=0xc00048ef00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00048efb0 sp=0xc00048ef20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00048efd0 sp=0xc00048efb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00048efd0 sp=0xc00048efd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 6 gp=0xc0004921e0 m=nil [GC worker (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00048df20 sp=0xc00048df00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00048dfb0 sp=0xc00048df20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00048dfd0 sp=0xc00048dfb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00048dfd0 sp=0xc00048dfd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 7 gp=0xc0004923c0 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc1d33a5?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00048cf20 sp=0xc00048cf00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00048cfb0 sp=0xc00048cf20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00048cfd0 sp=0xc00048cfb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00048cfd0 sp=0xc00048cfd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 35 gp=0xc0005041e0 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc1c2235?, 0x1?, 0xca?, 0x3?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00048bf20 sp=0xc00048bf00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00048bfb0 sp=0xc00048bf20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00048bfd0 sp=0xc00048bfb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00048bfd0 sp=0xc00048bfd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 22 gp=0xc000104b40 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc215b9c?, 0x3?, 0x3c?, 0x73?, 0x102ad5a18?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00048af20 sp=0xc00048af00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00048afb0 sp=0xc00048af20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00048afd0 sp=0xc00048afb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00048afd0 sp=0xc00048afd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 23 gp=0xc000104d20 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc1d5580?, 0x3?, 0xf9?, 0xe?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00049bf20 sp=0xc00049bf00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00049bfb0 sp=0xc00049bf20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00049bfd0 sp=0xc00049bfb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00049bfd0 sp=0xc00049bfd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 8 gp=0xc0004925a0 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc1d717e?, 0x1?, 0x24?, 0x58?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00049af20 sp=0xc00049af00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc00049afb0 sp=0xc00049af20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc00049afd0 sp=0xc00049afb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00049afd0 sp=0xc00049afd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 36 gp=0xc0005043c0 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc215f07?, 0x3?, 0x7d?, 0xe?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000499f20 sp=0xc000499f00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc000499fb0 sp=0xc000499f20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc000499fd0 sp=0xc000499fb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000499fd0 sp=0xc000499fd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 9 gp=0xc000492780 m=nil [GC worker (idle)]:
+runtime.gopark(0x103c1b180?, 0x1?, 0x3b?, 0x76?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000498f20 sp=0xc000498f00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc000498fb0 sp=0xc000498f20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc000498fd0 sp=0xc000498fb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000498fd0 sp=0xc000498fd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 24 gp=0xc000104f00 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc1d6d96?, 0x3?, 0x4e?, 0x7e?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000497f20 sp=0xc000497f00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc000497fb0 sp=0xc000497f20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc000497fd0 sp=0xc000497fb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000497fd0 sp=0xc000497fd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 37 gp=0xc0005045a0 m=nil [GC worker (idle)]:
+runtime.gopark(0x5f8fdc1d603e?, 0x1?, 0x40?, 0x14?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000496f20 sp=0xc000496f00 pc=0x1002e83d8
+runtime.gcBgMarkWorker(0xc000046460)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1807 +0xe0 fp=0xc000496fb0 sp=0xc000496f20 pc=0x10028c8d0
+runtime.gcBgMarkStartWorkers.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x20 fp=0xc000496fd0 sp=0xc000496fb0 pc=0x1002de230
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000496fd0 sp=0xc000496fd0 pc=0x1002f0014
+created by runtime.gcBgMarkStartWorkers in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:1711 +0x130
+
+goroutine 50 gp=0xc000504780 m=nil [cleanup wait]:
+runtime.gopark(0xc0000a37a8?, 0x1002de230?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc0000a3710 sp=0xc0000a36f0 pc=0x1002e83d8
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.(*cleanupQueue).dequeue(0x102ca64a0)
+	/opt/homebrew/opt/go/libexec/src/runtime/mcleanup.go:522 +0x160 fp=0xc0000a3750 sp=0xc0000a3710 pc=0x1002863b0
+runtime.runCleanups()
+	/opt/homebrew/opt/go/libexec/src/runtime/mcleanup.go:718 +0x3c fp=0xc0000a37d0 sp=0xc0000a3750 pc=0x100286afc
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000a37d0 sp=0xc0000a37d0 pc=0x1002f0014
+created by runtime.(*cleanupQueue).createGs in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mcleanup.go:672 +0x108
+
+goroutine 25 gp=0xc000105a40 m=nil [chan receive]:
+runtime.gopark(0xc000470000?, 0xc000177c10?, 0xcc?, 0x8a?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000177c20 sp=0xc000177c00 pc=0x1002e83d8
+runtime.chanrecv(0xc000047030, 0x0, 0x1)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:667 +0x410 fp=0xc000177cb0 sp=0xc000177c20 pc=0x1002797c0
+runtime.chanrecv1(0xc0000df508?, 0xc00032cb40?)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:509 +0x14 fp=0xc000177ce0 sp=0xc000177cb0 pc=0x100279374
+cogentcore.org/core/core.(*Body).runAndShowNewWindow(0xc0000df508)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/testing.go:73 +0x220 fp=0xc000177d60 sp=0xc000177ce0 pc=0x100e77570
+cogentcore.org/core/core.(*Body).AssertRender(0xc0000df508, {0x102aebe20, 0xc000195d48}, {0x1016e838d, 0x5}, {0x0, 0x0, 0x1003f7cd8?})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/testing.go:31 +0x48 fp=0xc000177e50 sp=0xc000177d60 pc=0x100e76e78
+cogentcore.org/core/text/textcore.TestBase(0xc000195d48)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/textcore/base_test.go:26 +0x98 fp=0xc000177ec0 sp=0xc000177e50 pc=0x101103618
+testing.tRunner(0xc000195d48, 0x102afc478)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x168 fp=0xc000177fa0 sp=0xc000177ec0 pc=0x1003f7ce8
+testing.(*T).Run.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x38 fp=0xc000177fd0 sp=0xc000177fa0 pc=0x1003fff18
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000177fd0 sp=0xc000177fd0 pc=0x1002f0014
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x7c0
+
+goroutine 66 gp=0xc003da6b40 m=nil [select]:
+runtime.gopark(0xc0000b0f00?, 0x3?, 0x0?, 0x0?, 0xc0000b0dfa?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc0000b0c50 sp=0xc0000b0c30 pc=0x1002e83d8
+runtime.selectgo(0xc0000b0f00, 0xc0000b0df4, 0xc0000b0dd8?, 0x0, 0xc0000b0de8?, 0x1)
+	/opt/homebrew/opt/go/libexec/src/runtime/select.go:351 +0x8d4 fp=0xc0000b0db0 sp=0xc0000b0c50 pc=0x1002c1fd4
+cogentcore.org/core/system/driver/base.(*Window[...]).WinLoop(0x102839de0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/system/driver/base/window.go:113 +0x390 fp=0xc0000b0fa0 sp=0xc0000b0db0 pc=0x100aa5eb0
+cogentcore.org/core/system/driver/offscreen.(*App).NewWindow.gowrap1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/system/driver/offscreen/app.go:64 +0x38 fp=0xc0000b0fd0 sp=0xc0000b0fa0 pc=0x100aac9b8
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000b0fd0 sp=0xc0000b0fd0 pc=0x1002f0014
+created by cogentcore.org/core/system/driver/offscreen.(*App).NewWindow in goroutine 25
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/system/driver/offscreen/app.go:64 +0x51c
+
+goroutine 67 gp=0xc003da7860 m=nil [chan receive]:
+runtime.gopark(0xc003670000?, 0xc00499e720?, 0xcc?, 0x8a?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc00499e730 sp=0xc00499e710 pc=0x1002e83d8
+runtime.chanrecv(0xc0049cc000, 0x0, 0x1)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:667 +0x410 fp=0xc00499e7c0 sp=0xc00499e730 pc=0x1002797c0
+runtime.chanrecv1(0xc0034b8a88?, 0x1?)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:509 +0x14 fp=0xc00499e7f0 sp=0xc00499e7c0 pc=0x100279374
+cogentcore.org/core/core.handleRecover({0x1028f2dd8, 0xc004988810})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/recover.go:86 +0x5cc fp=0xc00499e970 sp=0xc00499e7f0 pc=0x100e3ffac
+cogentcore.org/core/core.(*renderWindow).eventLoop.func1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:416 +0x54 fp=0xc00499e9a0 sp=0xc00499e970 pc=0x100f238b4
+panic({0x1028f2dd8?, 0xc004988810?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120 fp=0xc00499ea50 sp=0xc00499e9a0 pc=0x1002e7f90
+runtime.panicdottypeE(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/iface.go:293
+runtime.panicdottypeI(0xc00499eac8?, 0x1028dbb88, 0x102a5fa20)
+	/opt/homebrew/opt/go/libexec/src/runtime/iface.go:303 +0x6c fp=0xc00499ea80 sp=0xc00499ea50 pc=0x10027df3c
+cogentcore.org/core/text/parse/lexer.(*Rule).Validate(0xc0001624e0, 0xc00498e7a8)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/lexer/rule.go:187 +0x152c fp=0xc00499ed10 sp=0xc00499ea80 pc=0x100ba1afc
+cogentcore.org/core/text/parse.(*Parser).InitAll(0xc00011dce0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/parser.go:64 +0xc8 fp=0xc00499ed60 sp=0xc00499ed10 pc=0x100be3ca8
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0xc000172e98?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/parse/languagesupport.go:132 +0x234 fp=0xc00499ee80 sp=0xc00499ed60 pc=0x100be3764
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/styles.go:181 +0x34 fp=0xc00499efd0 sp=0xc00499ee80 pc=0x100dd8e14
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/styles.go:69 +0x44 fp=0xc00499f030 sp=0xc00499efd0 pc=0x100dd7c44
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0xc00016eac8, {0x1029c347f, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/highlighting/highlighter.go:117 +0x50 fp=0xc00499f0d0 sp=0xc00499f030 pc=0x100dd2720
+cogentcore.org/core/text/lines.(*Lines).SetHighlighting(0xc00016ea88, {0x1029c347f, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/lines/api.go:180 +0x8c fp=0xc00499f140 sp=0xc00499f0d0 pc=0x1010635ec
+cogentcore.org/core/text/textcore.(*Base).styleBase(0xc000112008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/textcore/base.go:369 +0x324 fp=0xc00499f290 sp=0xc00499f140 pc=0x1010e67b4
+cogentcore.org/core/text/textcore.(*Base).Style(0xc000112008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/text/textcore/base.go:377 +0x2c fp=0xc00499f2b0 sp=0xc00499f290 pc=0x1010e67fc
+cogentcore.org/core/core.(*WidgetBase).StyleTree.func1({0x102af8ae0, 0xc000112008}, 0xc000173318?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/style.go:146 +0x38 fp=0xc00499f2d0 sp=0xc00499f2b0 pc=0x100f24478
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown.func1({0x11213fe00, 0xc000112008})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/widget.go:517 +0xb8 fp=0xc00499f320 sp=0xc00499f2d0 pc=0x100ef1ba8
+cogentcore.org/core/tree.(*NodeBase).WalkDown(0xc00017c008, 0xc000058ff0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/tree/nodebase.go:502 +0x170 fp=0xc00499f4e0 sp=0xc00499f320 pc=0x10067d2e0
+cogentcore.org/core/core.(*WidgetBase).WidgetWalkDown(...)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/widget.go:515
+cogentcore.org/core/core.(*WidgetBase).StyleTree(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/style.go:145 +0x90 fp=0xc00499f510 sp=0xc00499f4e0 pc=0x100e6b450
+cogentcore.org/core/core.(*Scene).applyStyleScene(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/render.go:289 +0xa4 fp=0xc00499f5b0 sp=0xc00499f510 pc=0x100e41e04
+cogentcore.org/core/core.(*Scene).doRebuild(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/render.go:302 +0x58 fp=0xc00499f5d0 sp=0xc00499f5b0 pc=0x100e41f48
+cogentcore.org/core/core.(*Scene).doUpdate(0xc00017c008)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/render.go:235 +0x20c fp=0xc00499f6f0 sp=0xc00499f5d0 pc=0x100e416fc
+cogentcore.org/core/core.(*Stage).doUpdate(0xc00018e900)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/stage.go:363 +0xc0 fp=0xc00499f730 sp=0xc00499f6f0 pc=0x100e68c60
+cogentcore.org/core/core.(*stages).updateAll(0xc003c48f30)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/stages.go:258 +0x154 fp=0xc00499f7d0 sp=0xc00499f730 pc=0x100e6a514
+cogentcore.org/core/core.(*renderWindow).renderWindow(0xc003c48f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:690 +0x2a0 fp=0xc00499fb80 sp=0xc00499f7d0 pc=0x100e48f30
+cogentcore.org/core/core.(*renderWindow).handleWindowEvents(0xc003c48f00, {0x102afbb70, 0xc003cbd340})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:486 +0x8e0 fp=0xc00499fd60 sp=0xc00499fb80 pc=0x100e48910
+cogentcore.org/core/core.(*renderWindow).handleEvent(0xc003c48f00, {0x102afbb70, 0xc003cbd340})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:462 +0x524 fp=0xc00499fec0 sp=0xc00499fd60 pc=0x100e47f94
+cogentcore.org/core/core.(*renderWindow).eventLoop(0xc003c48f00)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:430 +0xdc fp=0xc00499ffa0 sp=0xc00499fec0 pc=0x100e4789c
+cogentcore.org/core/core.(*renderWindow).goStartEventLoop.gowrap1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:401 +0x30 fp=0xc00499ffd0 sp=0xc00499ffa0 pc=0x100ee9d00
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc00499ffd0 sp=0xc00499ffd0 pc=0x1002f0014
+created by cogentcore.org/core/core.(*renderWindow).goStartEventLoop in goroutine 25
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:401 +0x94
+
+goroutine 27 gp=0xc0005050e0 m=nil [select]:
+runtime.gopark(0xc0000eff00?, 0x3?, 0x0?, 0x0?, 0xc0000efdfa?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc0000efc50 sp=0xc0000efc30 pc=0x1002e83d8
+runtime.selectgo(0xc0000eff00, 0xc0000efdf4, 0x0?, 0x0, 0x0?, 0x1)
+	/opt/homebrew/opt/go/libexec/src/runtime/select.go:351 +0x8d4 fp=0xc0000efdb0 sp=0xc0000efc50 pc=0x1002c1fd4
+cogentcore.org/core/system/driver/base.(*Window[...]).WinLoop(0x102839de0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/system/driver/base/window.go:113 +0x390 fp=0xc0000effa0 sp=0xc0000efdb0 pc=0x100aa5eb0
+cogentcore.org/core/system/driver/offscreen.(*App).NewWindow.gowrap1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/system/driver/offscreen/app.go:64 +0x38 fp=0xc0000effd0 sp=0xc0000effa0 pc=0x100aac9b8
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000effd0 sp=0xc0000effd0 pc=0x1002f0014
+created by cogentcore.org/core/system/driver/offscreen.(*App).NewWindow in goroutine 67
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/system/driver/offscreen/app.go:64 +0x51c
+
+goroutine 28 gp=0xc0050a0000 m=nil [sync.Cond.Wait]:
+runtime.gopark(0xc000173d98?, 0x1002ff7f0?, 0xa8?, 0x3d?, 0x1002fec48?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000173d70 sp=0xc000173d50 pc=0x1002e83d8
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+sync.runtime_notifyListWait(0xc0006e1240, 0xd20)
+	/opt/homebrew/opt/go/libexec/src/runtime/sema.go:617 +0x194 fp=0xc000173dc0 sp=0xc000173d70 pc=0x1002ea1c4
+sync.(*Cond).Wait(0xc0006e1230)
+	/opt/homebrew/opt/go/libexec/src/sync/cond.go:71 +0x58 fp=0xc000173df0 sp=0xc000173dc0 pc=0x1002ff158
+cogentcore.org/core/events.(*Deque).NextEvent(0xc0006e11f8)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/events/deque.go:65 +0x10c fp=0xc000173ec0 sp=0xc000173df0 pc=0x1009f22ac
+cogentcore.org/core/core.(*renderWindow).eventLoop(0xc00018d380)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:425 +0xa8 fp=0xc000173fa0 sp=0xc000173ec0 pc=0x100e47868
+cogentcore.org/core/core.(*renderWindow).goStartEventLoop.gowrap1()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:401 +0x30 fp=0xc000173fd0 sp=0xc000173fa0 pc=0x100ee9d00
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000173fd0 sp=0xc000173fd0 pc=0x1002f0014
+created by cogentcore.org/core/core.(*renderWindow).goStartEventLoop in goroutine 67
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/upstream/core/renderwindow.go:401 +0x94
+
+r0      0x104
+r1      0x0
+r2      0x1f00
+r3      0x0
+r4      0x0
+r5      0xa0
+r6      0x0
+r7      0x0
+r8      0x16fb9c3f8
+r9      0x0
+r10     0x0
+r11     0x2
+r12     0x2
+r13     0x0
+r14     0x0
+r15     0x0
+r16     0x131
+r17     0x1f2ad3310
+r18     0x0
+r19     0x102ca81e8
+r20     0x102ca8228
+r21     0x1f1492260
+r22     0x0
+r23     0x0
+r24     0x1f00
+r25     0x1f01
+r26     0x2000
+r27     0x102c31000
+r28     0x102ca6660
+r29     0x16fb9c470
+lr      0x184a54128
+sp      0x16fb9c3e0
+pc      0x184a1350c
+fault   0x184a1350c
+FAIL	cogentcore.org/core/text/textcore	57.389s
+ok  	cogentcore.org/core/text/shaped/shapers/shapedgt	2.043s
+FAIL

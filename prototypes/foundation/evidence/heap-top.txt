@@ -1,0 +1,125 @@
+File: vellum-foundation
+Type: inuse_space
+Time: 2026-10-09 10:55:46 CDT
+Showing nodes accounting for 377.64MB, 97.13% of 388.80MB total
+Dropped 87 nodes (cum <= 1.94MB)
+      flat  flat%   sum%        cum   cum%
+  213.16MB 54.83% 54.83%   213.16MB 54.83%  github.com/go-text/typesetting/font/opentype.(*Loader).findTableBuffer
+  103.22MB 26.55% 81.38%   115.22MB 29.64%  cogentcore.org/core/text/spell.(*Model).createSuggestKeys
+   14.51MB  3.73% 85.11%    14.51MB  3.73%  github.com/go-text/typesetting/font/opentype/tables.(*SimpleGlyph).parsePoints
+      12MB  3.09% 88.19%       12MB  3.09%  cogentcore.org/core/text/spell.Edits1
+    8.70MB  2.24% 90.43%     8.70MB  2.24%  github.com/go-text/typesetting/font.newMorxSubtable
+    8.21MB  2.11% 92.54%     8.21MB  2.11%  image.NewRGBA
+    4.50MB  1.16% 93.70%    20.01MB  5.15%  github.com/go-text/typesetting/font/opentype/tables.(*Glyph).parseData
+    2.83MB  0.73% 94.43%     2.83MB  0.73%  github.com/go-text/typesetting/font/opentype/tables.(*Strike).parseGlyphDatas
+    2.68MB  0.69% 95.11%     2.68MB  0.69%  github.com/go-text/typesetting/font.NewFace (inline)
+    2.50MB  0.64% 95.76%     2.50MB  0.64%  runtime.mallocgc
+    2.13MB  0.55% 96.31%    22.14MB  5.69%  github.com/go-text/typesetting/font/opentype/tables.ParseGlyf
+    2.05MB  0.53% 96.83%     2.05MB  0.53%  cogentcore.org/core/text/spell.NewDictFromList (inline)
+    0.65MB  0.17% 97.00%     2.71MB   0.7%  cogentcore.org/core/text/spell.OpenDictFS
+    0.50MB  0.13% 97.13%     2.54MB  0.65%  github.com/go-text/typesetting/font/opentype/tables.parseGPOSLookup
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/core.(*Frame).RenderChildren
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/core.(*Frame).RenderChildren.func1
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/core.(*Frame).RenderWidget
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*Frame).SizeUp
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*Frame).layoutFrame
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*Frame).sizeUpChildren
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*Frame).sizeUpChildren.func2
+         0     0% 97.13%   242.65MB 62.41%  cogentcore.org/core/core.(*Scene).LayoutRenderScene
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*Scene).LayoutScene
+         0     0% 97.13%     4.10MB  1.06%  cogentcore.org/core/core.(*Scene).Resize
+         0     0% 97.13%   242.65MB 62.41%  cogentcore.org/core/core.(*Scene).doUpdate
+         0     0% 97.13%    11.78MB  3.03%  cogentcore.org/core/core.(*Stage).Run
+         0     0% 97.13%    11.78MB  3.03%  cogentcore.org/core/core.(*Stage).RunMain
+         0     0% 97.13%   242.65MB 62.41%  cogentcore.org/core/core.(*Stage).doUpdate
+         0     0% 97.13%    11.28MB  2.90%  cogentcore.org/core/core.(*Stage).newRenderWindow
+         0     0% 97.13%    11.78MB  3.03%  cogentcore.org/core/core.(*Stage).run
+         0     0% 97.13%    11.78MB  3.03%  cogentcore.org/core/core.(*Stage).runWindow
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*Text).SizeUp
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*Text).configTextSize
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/core.(*WidgetBase).ForWidgetChildren
+         0     0% 97.13%     8.20MB  2.11%  cogentcore.org/core/core.(*WidgetBase).forVisibleChildren
+         0     0% 97.13%   251.36MB 64.65%  cogentcore.org/core/core.(*renderWindow).eventLoop
+         0     0% 97.13%   251.36MB 64.65%  cogentcore.org/core/core.(*renderWindow).handleEvent
+         0     0% 97.13%   251.36MB 64.65%  cogentcore.org/core/core.(*renderWindow).handleWindowEvents
+         0     0% 97.13%   247.26MB 63.60%  cogentcore.org/core/core.(*renderWindow).renderWindow
+         0     0% 97.13%     4.10MB  1.06%  cogentcore.org/core/core.(*renderWindow).resized
+         0     0% 97.13%     4.10MB  1.06%  cogentcore.org/core/core.(*stages).resize
+         0     0% 97.13%   242.65MB 62.41%  cogentcore.org/core/core.(*stages).updateAll
+         0     0% 97.13%     4.10MB  1.06%  cogentcore.org/core/core.SpritesSource
+         0     0% 97.13%     5.63MB  1.45%  cogentcore.org/core/core.appIconImages
+         0     0% 97.13%     5.65MB  1.45%  cogentcore.org/core/core.newRenderContext
+         0     0% 97.13%     8.21MB  2.11%  cogentcore.org/core/paint/renderers/rasterx.(*Renderer).SetSize
+         0     0% 97.13%     4.10MB  1.06%  cogentcore.org/core/paint/renderers/rasterx.New
+         0     0% 97.13%     5.63MB  1.45%  cogentcore.org/core/svg.(*SVG).Render
+         0     0% 97.13%     5.63MB  1.45%  cogentcore.org/core/svg.(*SVG).RenderImage
+         0     0% 97.13%    12.79MB  3.29%  cogentcore.org/core/text/fonts.UseEmbeddedInMap (inline)
+         0     0% 97.13%    12.79MB  3.29%  cogentcore.org/core/text/fonts.UseInMap
+         0     0% 97.13%    12.79MB  3.29%  cogentcore.org/core/text/fonts.UseInMap.func1
+         0     0% 97.13%   242.65MB 62.41%  cogentcore.org/core/text/shaped/shapers/shapedgt.(*Shaper).ShapeTextOutput
+         0     0% 97.13%   242.65MB 62.41%  cogentcore.org/core/text/shaped/shapers/shapedgt.(*Shaper).WrapLines
+         0     0% 97.13%    15.95MB  4.10%  cogentcore.org/core/text/shaped/shapers/shapedgt.NewShaper
+         0     0% 97.13%       12MB  3.09%  cogentcore.org/core/text/spell.(*Model).EditsMulti
+         0     0% 97.13%   115.22MB 29.64%  cogentcore.org/core/text/spell.(*Model).addSuggestionsForWords
+         0     0% 97.13%     2.71MB   0.7%  cogentcore.org/core/text/spell.NewSpell
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/text/textcore.(*Base).RenderWidget
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/text/textcore.(*Base).renderLine
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/text/textcore.(*Base).renderLine.func2
+         0     0% 97.13%   234.46MB 60.30%  cogentcore.org/core/text/textcore.(*Base).renderLines
+         0     0% 97.13%     2.71MB   0.7%  cogentcore.org/core/text/textcore.(*Editor).Init
+         0     0% 97.13%     2.71MB   0.7%  cogentcore.org/core/text/textcore.(*Editor).setSpell
+         0     0% 97.13%     2.71MB   0.7%  cogentcore.org/core/text/textcore.NewEditor (inline)
+         0     0% 97.13%     2.71MB   0.7%  cogentcore.org/core/text/textcore.initSpell
+         0     0% 97.13%     7.88MB  2.03%  cogentcore.org/core/tree.InitNode
+         0     0% 97.13%     4.67MB  1.20%  cogentcore.org/core/tree.New[go.shape.7a6a5b5e338d89e0239172823163350ee9e1c623d0bac5217fec2fb857759de6]
+         0     0% 97.13%     4.67MB  1.20%  cogentcore.org/core/tree.New[go.shape.struct { cogentcore.org/core/core.WidgetBase; XYZ *cogentcore.org/core/xyz.Scene "set:\"-\""; SelectionMode cogentcore.org/core/xyz/xyzcore.SelectionModes; CurrentSelected cogentcore.org/core/xyz.Node "copier:\"-\" json:\"-\" xml:\"-\" display:\"-\""; CurrentManipPoint *cogentcore.org/core/xyz/xyzcore.ManipPoint "copier:\"-\" json:\"-\" xml:\"-\" display:\"-\""; SelectionParams cogentcore.org/core/xyz/xyzcore.SelectionParams "display:\"inline\"" }]
+         0     0% 97.13%     2.71MB   0.7%  cogentcore.org/core/tree.New[go.shape.struct { cogentcore.org/core/text/textcore.Base; ISearch cogentcore.org/core/text/textcore.ISearch "set:\"-\" edit:\"-\" json:\"-\" xml:\"-\""; QReplace cogentcore.org/core/text/textcore.QReplace "set:\"-\" edit:\"-\" json:\"-\" xml:\"-\""; Complete *cogentcore.org/core/core.Complete "json:\"-\" xml:\"-\""; cogentcore.org/core/text/textcore.spell *cogentcore.org/core/text/textcore.spellCheck; cogentcore.org/core/text/textcore.curFilename string }]
+         0     0% 97.13%     4.67MB  1.20%  cogentcore.org/core/xyz.(*Scene).Init
+         0     0% 97.13%     4.67MB  1.20%  cogentcore.org/core/xyz.NewScene (inline)
+         0     0% 97.13%     4.67MB  1.20%  cogentcore.org/core/xyz.initTextShaper (inline)
+         0     0% 97.13%     4.67MB  1.20%  cogentcore.org/core/xyz/xyzcore.(*Scene).Init
+         0     0% 97.13%     4.67MB  1.20%  cogentcore.org/core/xyz/xyzcore.NewScene (inline)
+         0     0% 97.13%   252.27MB 64.88%  github.com/go-text/typesetting/font.NewFont
+         0     0% 97.13%    12.29MB  3.16%  github.com/go-text/typesetting/font.ParseTTC
+         0     0% 97.13%     7.08MB  1.82%  github.com/go-text/typesetting/font.loadCff
+         0     0% 97.13%     2.54MB  0.65%  github.com/go-text/typesetting/font.newGPOS
+         0     0% 97.13%     8.70MB  2.24%  github.com/go-text/typesetting/font.newMorx
+         0     0% 97.13%     8.70MB  2.24%  github.com/go-text/typesetting/font.newMorxChain
+         0     0% 97.13%   213.16MB 54.83%  github.com/go-text/typesetting/font/opentype.(*Loader).RawTable (inline)
+         0     0% 97.13%   213.16MB 54.83%  github.com/go-text/typesetting/font/opentype.(*Loader).RawTableTo
+         0     0% 97.13%     2.04MB  0.52%  github.com/go-text/typesetting/font/opentype/tables.ExtensionPos.Resolve
+         0     0% 97.13%    20.01MB  5.15%  github.com/go-text/typesetting/font/opentype/tables.ParseGlyph
+         0     0% 97.13%     2.83MB  0.73%  github.com/go-text/typesetting/font/opentype/tables.ParseSbix
+         0     0% 97.13%    14.51MB  3.73%  github.com/go-text/typesetting/font/opentype/tables.ParseSimpleGlyph
+         0     0% 97.13%     2.83MB  0.73%  github.com/go-text/typesetting/font/opentype/tables.ParseStrike
+         0     0% 97.13%    12.79MB  3.29%  github.com/go-text/typesetting/fontscan.(*FontMap).AddFont
+         0     0% 97.13%   242.65MB 62.41%  github.com/go-text/typesetting/fontscan.(*FontMap).ResolveFace
+         0     0% 97.13%     3.16MB  0.81%  github.com/go-text/typesetting/fontscan.(*FontMap).UseSystemFonts
+         0     0% 97.13%   242.65MB 62.41%  github.com/go-text/typesetting/fontscan.(*FontMap).loadFont
+         0     0% 97.13%   242.65MB 62.41%  github.com/go-text/typesetting/fontscan.(*FontMap).resolveForRune
+         0     0% 97.13%     2.09MB  0.54%  github.com/go-text/typesetting/fontscan.(*Footprint).deserializeFrom
+         0     0% 97.13%   242.65MB 62.41%  github.com/go-text/typesetting/fontscan.(*Footprint).loadFromDisk
+         0     0% 97.13%     2.59MB  0.67%  github.com/go-text/typesetting/fontscan.(*fileFootprints).deserializeFrom
+         0     0% 97.13%     2.09MB  0.54%  github.com/go-text/typesetting/fontscan.deserializeFootprints
+         0     0% 97.13%     2.59MB  0.67%  github.com/go-text/typesetting/fontscan.deserializeIndex
+         0     0% 97.13%     2.59MB  0.67%  github.com/go-text/typesetting/fontscan.deserializeIndexFile
+         0     0% 97.13%     2.59MB  0.67%  github.com/go-text/typesetting/fontscan.initSystemFonts
+         0     0% 97.13%     2.59MB  0.67%  github.com/go-text/typesetting/fontscan.initSystemFonts.func1
+         0     0% 97.13%     2.59MB  0.67%  github.com/go-text/typesetting/fontscan.refreshSystemFontsIndex
+         0     0% 97.13%   242.65MB 62.41%  github.com/go-text/typesetting/shaping.(*Segmenter).Split
+         0     0% 97.13%   242.65MB 62.41%  github.com/go-text/typesetting/shaping.(*Segmenter).splitByFace
+         0     0% 97.13%   242.65MB 62.41%  github.com/go-text/typesetting/shaping.splitByFace
+         0     0% 97.13%    12.79MB  3.29%  io/fs.WalkDir
+         0     0% 97.13%    12.79MB  3.29%  io/fs.walkDir
+         0     0% 97.13%     7.38MB  1.90%  main.(*fixture).build
+         0     0% 97.13%    19.16MB  4.93%  main.main
+         0     0% 97.13%        2MB  0.52%  runtime.allocm
+         0     0% 97.13%    19.71MB  5.07%  runtime.main
+         0     0% 97.13%        2MB  0.52%  runtime.newm
+         0     0% 97.13%     2.50MB  0.64%  runtime.newobject
+         0     0% 97.13%        2MB  0.52%  runtime.resetspinning
+         0     0% 97.13%        2MB  0.52%  runtime.schedule
+         0     0% 97.13%        2MB  0.52%  runtime.startm
+         0     0% 97.13%        2MB  0.52%  runtime.wakep
+         0     0% 97.13%     2.59MB  0.67%  sync.(*Once).Do (inline)
+         0     0% 97.13%     2.59MB  0.67%  sync.(*Once).doSlow

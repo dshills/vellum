@@ -1,0 +1,35 @@
+{
+  "scope": "CGO_ENABLED=0 GOARCH=amd64 test binaries for semantics/textbridge/inputbridge; compile only, not native adapters or runtime tests",
+  "artifacts": [
+    {
+      "file": "linux-inputbridge.test",
+      "sha256": "45c929da1ec7f9d60058dcea87fc6531e9b02694076a485db9311ee3e332acb9",
+      "description": "prototypes/foundationchecks/build/linux-inputbridge.test: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=5ylrGZVaOpNN3k8kteOY/G4X1uhlxpUV99uoE5yYk/RSf1rPknPpQwlBBgHPFp/pidrIyhW8-_ZJ8llJBQS, BuildID[sha1]=caaedf801321c089f8a081c02fb28f11913f9461, with debug_info, not stripped"
+    },
+    {
+      "file": "linux-semantics.test",
+      "sha256": "a81285f2fe7d7387e3b4f48404f5a3099edcd6b83821145dc1ccaa07c2fedd4b",
+      "description": "prototypes/foundationchecks/build/linux-semantics.test: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=bjq3ZBjhNovMfsyox-YD/njWMgE9nQLmIbE60KZVY/-9mqwZG4f51ZTTcVNozu/NTvKr9jJUF7o6UpViZfM, BuildID[sha1]=9de8f7fe0780c310a1caa3ef446e2ec36bd656cc, with debug_info, not stripped"
+    },
+    {
+      "file": "linux-textbridge.test",
+      "sha256": "178a6a1792c5d1ad28967667d94701cd19e41c15850737a2275c747a5e4e001b",
+      "description": "prototypes/foundationchecks/build/linux-textbridge.test: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=-J3kzsBhX6i3A5ptv9Jn/pjIYnf1dPppyevlbggzM/yPjg2PAwanVR2MaC1DZ3/HKEo4ofVUFQbpb6srKgr, BuildID[sha1]=db67f36923cbf7aa26ea4755ddee93389a5b1ece, with debug_info, not stripped"
+    },
+    {
+      "file": "windows-inputbridge.test",
+      "sha256": "e8c4b12d98611a714033402fd9289584c00fcb0b64f66f698910cd81f90e1093",
+      "description": "prototypes/foundationchecks/build/windows-inputbridge.test: PE32+ executable (console) x86-64, for MS Windows"
+    },
+    {
+      "file": "windows-semantics.test",
+      "sha256": "e6785f35bd255827ae3b2983384fd38e8fc49f5871147f296fbf3c41bdf86ac3",
+      "description": "prototypes/foundationchecks/build/windows-semantics.test: PE32+ executable (console) x86-64, for MS Windows"
+    },
+    {
+      "file": "windows-textbridge.test",
+      "sha256": "f70641257ad9900b4ce8dad3441c4ac7338d922c8d9e457ca5b81022bafd7919",
+      "description": "prototypes/foundationchecks/build/windows-textbridge.test: PE32+ executable (console) x86-64, for MS Windows"
+    }
+  ]
+}

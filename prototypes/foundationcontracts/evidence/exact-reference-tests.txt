@@ -1,0 +1,48 @@
+# cogentcore.org/core/text/textcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/text/lines.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestContractsExactRoundTrip
+=== RUN   TestContractsExactRoundTrip/#00
+=== RUN   TestContractsExactRoundTrip/a
+=== RUN   TestContractsExactRoundTrip/a_
+=== RUN   TestContractsExactRoundTrip/a__
+=== RUN   TestContractsExactRoundTrip/_
+=== RUN   TestContractsExactRoundTrip/__
+=== RUN   TestContractsExactRoundTrip/a__b
+=== RUN   TestContractsExactRoundTrip/a__b__
+=== RUN   TestContractsExactRoundTrip/日本語_👩\u200d💻
+=== RUN   TestContractsExactRoundTrip/العربية_אבג_123
+=== RUN   TestContractsExactRoundTrip/é_नमस्ते_
+=== RUN   TestContractsExactRoundTrip/___
+--- PASS: TestContractsExactRoundTrip (0.00s)
+    --- PASS: TestContractsExactRoundTrip/#00 (0.00s)
+    --- PASS: TestContractsExactRoundTrip/a (0.00s)
+    --- PASS: TestContractsExactRoundTrip/a_ (0.00s)
+    --- PASS: TestContractsExactRoundTrip/a__ (0.00s)
+    --- PASS: TestContractsExactRoundTrip/_ (0.00s)
+    --- PASS: TestContractsExactRoundTrip/__ (0.00s)
+    --- PASS: TestContractsExactRoundTrip/a__b (0.00s)
+    --- PASS: TestContractsExactRoundTrip/a__b__ (0.00s)
+    --- PASS: TestContractsExactRoundTrip/日本語_👩\u200d💻 (0.00s)
+    --- PASS: TestContractsExactRoundTrip/العربية_אבג_123 (0.00s)
+    --- PASS: TestContractsExactRoundTrip/é_नमस्ते_ (0.00s)
+    --- PASS: TestContractsExactRoundTrip/___ (0.00s)
+=== RUN   TestContractsExactEditUndoRedo
+--- PASS: TestContractsExactEditUndoRedo (0.00s)
+=== RUN   TestContractsExactLineAPI
+--- PASS: TestContractsExactLineAPI (0.00s)
+=== RUN   TestContractsExactDiffPatch
+--- PASS: TestContractsExactDiffPatch (0.00s)
+=== RUN   TestContractsExactSelectedDiffAndHistory
+--- PASS: TestContractsExactSelectedDiffAndHistory (0.00s)
+=== RUN   TestContractsExactDiffMatrix
+--- PASS: TestContractsExactDiffMatrix (0.00s)
+=== RUN   TestContractsExactEditsAgainstReference
+--- PASS: TestContractsExactEditsAgainstReference (0.01s)
+PASS
+ok  	cogentcore.org/core/text/lines	1.920s
+=== RUN   TestContractsExactEditorDeleteUndo
+--- PASS: TestContractsExactEditorDeleteUndo (0.00s)
+PASS
+ok  	cogentcore.org/core/text/textcore	1.522s

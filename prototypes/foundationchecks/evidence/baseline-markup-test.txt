@@ -1,0 +1,38 @@
+# cogentcore.org/core/text/lines.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestMarkup (0.00s)
+panic: interface conversion: tree.Node is *tree.NodeBase, not *lexer.Rule [recovered, repanicked]
+
+goroutine 9 [running]:
+testing.tRunner.func1.2({0x10307d248, 0xc0002f05d0})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2125 +0x2b8
+testing.tRunner.func1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2128 +0x438
+panic({0x10307d248?, 0xc0002f05d0?})
+	/opt/homebrew/opt/go/libexec/src/runtime/panic.go:859 +0x120
+cogentcore.org/core/text/parse/lexer.(*Rule).Validate(0xc0002ec680, 0xc0003e4428)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/parse/lexer/rule.go:187 +0x152c
+cogentcore.org/core/text/parse.(*Parser).InitAll(0xc0001c0ba0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/parse/parser.go:64 +0xc8
+cogentcore.org/core/text/parse.(*LanguageSupporter).OpenStandard(0x8000?)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/parse/languagesupport.go:132 +0x234
+cogentcore.org/core/text/highlighting.Init()
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/highlighting/styles.go:181 +0x34
+cogentcore.org/core/text/highlighting.AvailableStyle({0x0, 0x0})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/highlighting/styles.go:69 +0x44
+cogentcore.org/core/text/highlighting.(*Highlighter).SetStyle(0xc0001a1548, {0x101f09aa9, 0x5})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/highlighting/highlighter.go:117 +0x50
+cogentcore.org/core/text/highlighting.(*Highlighter).Init(0xc0001a1548, 0xc0003d1d80, 0xc0001a16f0)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/highlighting/highlighter.go:67 +0x74
+cogentcore.org/core/text/lines.(*Lines).setFileInfo(0xc0001a1508, 0xc0003d1d80)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/lines/markup.go:24 +0xa4
+cogentcore.org/core/text/lines.NewLinesFromBytes({0x101f0f983, 0x8}, 0x28, {0xc000328ea0, 0x86, 0x90})
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/lines/api.go:42 +0x2a0
+cogentcore.org/core/text/lines.TestMarkup(0xc0001fdd48)
+	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/upstream/text/lines/markup_test.go:22 +0x5c
+testing.tRunner(0xc0001fdd48, 0x10327b708)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x168
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x7c0
+FAIL	cogentcore.org/core/text/lines	0.581s
+FAIL

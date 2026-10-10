@@ -1,0 +1,114 @@
+foundation shown callback 358.4 ms; adapter=true
+idle_sample {"Seconds":60.000568708,"CPUSeconds":1.082243,"CPUPercentOneCore":1.8037212368217141,"CanvasRepaints":0,"PaintSchedulerWakes":3600,"Note":"Whole-process CPU; canvas repaint proxy, not compositor presents or wakeups. Small fixture, not the 1000-control budget workload."}
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 1,
+  "canvas_repaints_proxy": 2,
+  "commits": 0,
+  "editing_state": {
+    "Text": "10k",
+    "Cursor": 0,
+    "Anchor": 0,
+    "Focus": 0,
+    "Caret": {
+      "Min": {
+        "X": 16,
+        "Y": 117
+      },
+      "Max": {
+        "X": 17,
+        "Y": 140
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "10k",
+  "go_heap_alloc_bytes_after_forced_gc": 290217736,
+  "go_heap_alloc_bytes_before_gc": 300216512,
+  "go_heap_inuse_bytes": 295346176,
+  "goroutines": 4,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "logical native selection for single-line field only; native text geometry and multiline ranges absent",
+    "real IME and screen readers not automatically exercised",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 0,
+  "on_demand": false,
+  "paint_scheduler_wakes_total": 4034,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 441057280,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 1,
+  "shown_callback_ms": 358.42,
+  "spell_checker_initialized": false,
+  "status": "",
+  "text_samples": null,
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 1,
+  "canvas_repaints_proxy": 2,
+  "commits": 0,
+  "editing_state": {
+    "Text": "10k",
+    "Cursor": 0,
+    "Anchor": 0,
+    "Focus": 0,
+    "Caret": {
+      "Min": {
+        "X": 16,
+        "Y": 117
+      },
+      "Max": {
+        "X": 17,
+        "Y": 140
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "10k",
+  "go_heap_alloc_bytes_after_forced_gc": 290216032,
+  "go_heap_alloc_bytes_before_gc": 291659072,
+  "go_heap_inuse_bytes": 295313408,
+  "goroutines": 5,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "logical native selection for single-line field only; native text geometry and multiline ranges absent",
+    "real IME and screen readers not automatically exercised",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 0,
+  "on_demand": false,
+  "paint_scheduler_wakes_total": 4035,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 442089472,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 1,
+  "shown_callback_ms": 358.42,
+  "spell_checker_initialized": false,
+  "status": "",
+  "text_samples": null,
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}

@@ -1,0 +1,401 @@
+Win: Vellum Remediation — text seams scene-windowstage Resized from: {(0,0) (5120,1440)} to: {(0,0) (1120,960)}
+Win: Vellum Remediation — text seams scene-windowstage got focus
+foundation shown callback 361.6 ms; adapter=true
+command commit selected=17 rotations=0 commits=1 rejected=0
+text_capture {"Name":"sample-1","Text":"é","Runes":2,"Bytes":3,"Editing":{"Text":"é","Cursor":2,"Anchor":2,"Focus":2,"Caret":{"Min":{"X":25,"Y":116},"Max":{"X":26,"Y":139}}}}
+command capture selected=17 rotations=0 commits=1 rejected=0
+2026/10/09 11:35:26 INFO TextField KeyInput widget="/Vellum Remediatio… seams/text-field-2" keyFunction=Backspace
+text_capture {"Name":"sample-2","Text":"","Runes":0,"Bytes":0,"Editing":{"Text":"","Cursor":0,"Anchor":0,"Focus":0,"Caret":{"Min":{"X":16,"Y":117},"Max":{"X":17,"Y":140}}}}
+command capture selected=17 rotations=0 commits=1 rejected=0
+command commit selected=17 rotations=0 commits=2 rejected=0
+text_capture {"Name":"sample-3","Text":"👩‍💻","Runes":3,"Bytes":11,"Editing":{"Text":"👩‍💻","Cursor":3,"Anchor":3,"Focus":3,"Caret":{"Min":{"X":32,"Y":116},"Max":{"X":33,"Y":139}}}}
+command capture selected=17 rotations=0 commits=2 rejected=0
+2026/10/09 11:35:37 INFO TextField KeyInput widget="/Vellum Remediatio… seams/text-field-2" keyFunction=Backspace
+text_capture {"Name":"sample-4","Text":"","Runes":0,"Bytes":0,"Editing":{"Text":"","Cursor":0,"Anchor":0,"Focus":0,"Caret":{"Min":{"X":16,"Y":117},"Max":{"X":17,"Y":140}}}}
+command capture selected=17 rotations=0 commits=2 rejected=0
+command commit selected=17 rotations=0 commits=3 rejected=0
+text_capture {"Name":"sample-5","Text":"A👩‍💻éZ","Runes":7,"Bytes":16,"Editing":{"Text":"A👩‍💻éZ","Cursor":4,"Anchor":4,"Focus":4,"Caret":{"Min":{"X":41,"Y":116},"Max":{"X":42,"Y":139}}}}
+command capture selected=17 rotations=0 commits=3 rejected=0
+text_capture {"Name":"sample-6","Text":"A👩‍💻éZ","Runes":7,"Bytes":16,"Editing":{"Text":"A👩‍💻éZ","Cursor":4,"Anchor":4,"Focus":4,"Caret":{"Min":{"X":41,"Y":116},"Max":{"X":42,"Y":139}}}}
+command capture selected=17 rotations=0 commits=3 rejected=0
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 16,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 21,
+  "canvas_repaints_proxy": 19,
+  "commits": 3,
+  "editing_state": {
+    "Text": "A👩‍💻éZ",
+    "Cursor": 4,
+    "Anchor": 4,
+    "Focus": 4,
+    "Caret": {
+      "Min": {
+        "X": 41,
+        "Y": 116
+      },
+      "Max": {
+        "X": 42,
+        "Y": 139
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "A👩‍💻éZ",
+  "go_heap_alloc_bytes_after_forced_gc": 290233728,
+  "go_heap_alloc_bytes_before_gc": 290281296,
+  "go_heap_inuse_bytes": 296198144,
+  "goroutines": 4,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "logical native selection for single-line field only; native text geometry and multiline ranges absent",
+    "real IME and screen readers not automatically exercised",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 16,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 183,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 473677824,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 21,
+  "shown_callback_ms": 361.555,
+  "spell_checker_initialized": false,
+  "status": "Text recorded cursor 4 selection 4..4",
+  "text_samples": [
+    {
+      "Name": "sample-1",
+      "Text": "é",
+      "Runes": 2,
+      "Bytes": 3,
+      "Editing": {
+        "Text": "é",
+        "Cursor": 2,
+        "Anchor": 2,
+        "Focus": 2,
+        "Caret": {
+          "Min": {
+            "X": 25,
+            "Y": 116
+          },
+          "Max": {
+            "X": 26,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-2",
+      "Text": "",
+      "Runes": 0,
+      "Bytes": 0,
+      "Editing": {
+        "Text": "",
+        "Cursor": 0,
+        "Anchor": 0,
+        "Focus": 0,
+        "Caret": {
+          "Min": {
+            "X": 16,
+            "Y": 117
+          },
+          "Max": {
+            "X": 17,
+            "Y": 140
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-3",
+      "Text": "👩‍💻",
+      "Runes": 3,
+      "Bytes": 11,
+      "Editing": {
+        "Text": "👩‍💻",
+        "Cursor": 3,
+        "Anchor": 3,
+        "Focus": 3,
+        "Caret": {
+          "Min": {
+            "X": 32,
+            "Y": 116
+          },
+          "Max": {
+            "X": 33,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-4",
+      "Text": "",
+      "Runes": 0,
+      "Bytes": 0,
+      "Editing": {
+        "Text": "",
+        "Cursor": 0,
+        "Anchor": 0,
+        "Focus": 0,
+        "Caret": {
+          "Min": {
+            "X": 16,
+            "Y": 117
+          },
+          "Max": {
+            "X": 17,
+            "Y": 140
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-5",
+      "Text": "A👩‍💻éZ",
+      "Runes": 7,
+      "Bytes": 16,
+      "Editing": {
+        "Text": "A👩‍💻éZ",
+        "Cursor": 4,
+        "Anchor": 4,
+        "Focus": 4,
+        "Caret": {
+          "Min": {
+            "X": 41,
+            "Y": 116
+          },
+          "Max": {
+            "X": 42,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-6",
+      "Text": "A👩‍💻éZ",
+      "Runes": 7,
+      "Bytes": 16,
+      "Editing": {
+        "Text": "A👩‍💻éZ",
+        "Cursor": 4,
+        "Anchor": 4,
+        "Focus": 4,
+        "Caret": {
+          "Min": {
+            "X": 41,
+            "Y": 116
+          },
+          "Max": {
+            "X": 42,
+            "Y": 139
+          }
+        }
+      }
+    }
+  ],
+  "value": "A👩‍💻éZ",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+command quit selected=17 rotations=0 commits=3 rejected=0
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 16,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 22,
+  "canvas_repaints_proxy": 20,
+  "commits": 3,
+  "editing_state": {
+    "Text": "A👩‍💻éZ",
+    "Cursor": 4,
+    "Anchor": 4,
+    "Focus": 4,
+    "Caret": {
+      "Min": {
+        "X": 41,
+        "Y": 116
+      },
+      "Max": {
+        "X": 42,
+        "Y": 139
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "A👩‍💻éZ",
+  "go_heap_alloc_bytes_after_forced_gc": 290261896,
+  "go_heap_alloc_bytes_before_gc": 293402968,
+  "go_heap_inuse_bytes": 295993344,
+  "goroutines": 5,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "logical native selection for single-line field only; native text geometry and multiline ranges absent",
+    "real IME and screen readers not automatically exercised",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 16,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 191,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 479330304,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 22,
+  "shown_callback_ms": 361.555,
+  "spell_checker_initialized": false,
+  "status": "Text recorded cursor 4 selection 4..4",
+  "text_samples": [
+    {
+      "Name": "sample-1",
+      "Text": "é",
+      "Runes": 2,
+      "Bytes": 3,
+      "Editing": {
+        "Text": "é",
+        "Cursor": 2,
+        "Anchor": 2,
+        "Focus": 2,
+        "Caret": {
+          "Min": {
+            "X": 25,
+            "Y": 116
+          },
+          "Max": {
+            "X": 26,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-2",
+      "Text": "",
+      "Runes": 0,
+      "Bytes": 0,
+      "Editing": {
+        "Text": "",
+        "Cursor": 0,
+        "Anchor": 0,
+        "Focus": 0,
+        "Caret": {
+          "Min": {
+            "X": 16,
+            "Y": 117
+          },
+          "Max": {
+            "X": 17,
+            "Y": 140
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-3",
+      "Text": "👩‍💻",
+      "Runes": 3,
+      "Bytes": 11,
+      "Editing": {
+        "Text": "👩‍💻",
+        "Cursor": 3,
+        "Anchor": 3,
+        "Focus": 3,
+        "Caret": {
+          "Min": {
+            "X": 32,
+            "Y": 116
+          },
+          "Max": {
+            "X": 33,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-4",
+      "Text": "",
+      "Runes": 0,
+      "Bytes": 0,
+      "Editing": {
+        "Text": "",
+        "Cursor": 0,
+        "Anchor": 0,
+        "Focus": 0,
+        "Caret": {
+          "Min": {
+            "X": 16,
+            "Y": 117
+          },
+          "Max": {
+            "X": 17,
+            "Y": 140
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-5",
+      "Text": "A👩‍💻éZ",
+      "Runes": 7,
+      "Bytes": 16,
+      "Editing": {
+        "Text": "A👩‍💻éZ",
+        "Cursor": 4,
+        "Anchor": 4,
+        "Focus": 4,
+        "Caret": {
+          "Min": {
+            "X": 41,
+            "Y": 116
+          },
+          "Max": {
+            "X": 42,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-6",
+      "Text": "A👩‍💻éZ",
+      "Runes": 7,
+      "Bytes": 16,
+      "Editing": {
+        "Text": "A👩‍💻éZ",
+        "Cursor": 4,
+        "Anchor": 4,
+        "Focus": 4,
+        "Caret": {
+          "Min": {
+            "X": 41,
+            "Y": 116
+          },
+          "Max": {
+            "X": 42,
+            "Y": 139
+          }
+        }
+      }
+    }
+  ],
+  "value": "A👩‍💻éZ",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+Win: Vellum Remediation — text seams scene-windowstage Closed
+Win: Vellum Remediation — text seams scene-windowstage out of event loop

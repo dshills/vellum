@@ -1,0 +1,39 @@
+[
+  {
+    "command": [
+      "/usr/bin/codesign",
+      "--verify",
+      "--deep",
+      "--strict",
+      "--verbose=2",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/Vellum-NativeInput.app"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/Vellum-NativeInput.app: code has no resources but signature indicates they must be present\n"
+  },
+  {
+    "command": [
+      "/usr/bin/xcrun",
+      "stapler",
+      "validate",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/Vellum-NativeInput.app"
+    ],
+    "exit_code": 65,
+    "stdout": "Processing: /Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/Vellum-NativeInput.app\nVellum-NativeInput.app does not have a ticket stapled to it.\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/usr/sbin/spctl",
+      "--assess",
+      "--type",
+      "execute",
+      "--verbose=2",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/Vellum-NativeInput.app"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/nativeinput/build/Vellum-NativeInput.app: code has no resources but signature indicates they must be present\n"
+  }
+]

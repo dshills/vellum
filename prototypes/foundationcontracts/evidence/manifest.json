@@ -1,0 +1,94 @@
+{
+  "recorded_date": "2026-10-09",
+  "scope": "Opt-in exact multiline application text; standalone reserved mailbox; G1 open",
+  "pins": {
+    "cogent": "5cc519b24044b34414e8dcfc0d6a33106c368f3c",
+    "webgpu": "de8bdd5d5976db28883db41211e049446078f8fd",
+    "accesskit_c": "8b6ed37c20ed4c59390e253407983333053662ba",
+    "accesskit_c_version": "0.23.1",
+    "accesskit": "0.25.1",
+    "accesskit_macos": "0.27.1",
+    "glfw_go": "v0.1.0-pre.1.0.20260628091122-0bd588dc30cf",
+    "go_text": "v0.3.5-0.20260418130854-c41d02a44bec"
+  },
+  "environment": {
+    "hardware": "Apple M4 Pro / Mac16,11",
+    "ram_bytes": 68719476736,
+    "os": "macOS 26.6.2 / 25G83",
+    "display": "5120x1440 at 60 Hz",
+    "go": "1.27.1 darwin/arm64",
+    "rust": "1.99.0",
+    "cargo": "1.99.0",
+    "xcode": "27.0 / 27A266a",
+    "unrecorded": [
+      "power mode",
+      "OS wakeup counts",
+      "compositor presents",
+      "GPU/native allocation split"
+    ]
+  },
+  "source_hashes": {
+    ".gitignore": "db5359bb88bcbcd098114bfdb9aa558f6cd7a5bebf039b1ae238c1aedf79d8fe",
+    "README.md": "f524cb41ad00b37ffa9ee56f6eb3a78e14ab0880738ca453001d43e4fd872222",
+    "cmd/contractcheck/main.go": "7b7e07f739c482525ad45e4184774ef5adce85fb7fbce6caa39f1722d4d156ff",
+    "env.sh": "2884ecd93f1a3a2bc4ae374b5fe1ccc00cdb7c41e4ab4c26da833b357b4c66a1",
+    "fixture.py": "40de6b2815eb5508ce98661c77ec524b5b909e3eb3f68f3b5e7f9b1a0552a4a3",
+    "go.mod": "48deaccb09768aaa0eeafedb0e032ab5b95f58696d72d041a47c8c70e50cdcf6",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "mailbox/queue.go": "bbafdb926f44947f4e11fe1ae3f6ed3efc277a1c013663b0a3250556a7a4728e",
+    "mailbox/queue_test.go": "eee309d95bcaadc862171096b5c5a7c4544e5263092b0eef420b0df0291e6532",
+    "manifest.py": "8b1eb1607e47f5b35cea7733a1b498172694e567e4a875be25a84b74a529215e",
+    "patches/0007-exact-multiline-text.patch": "c235a769ce3e50683a3fb54c554aa404b8211f51b78ac6afc618914e8a851318",
+    "patches/COGENT_LICENSE": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1",
+    "patches/original-hashes.json": "674c68e3dd355641067809f297c3102356a13a2abe8b864cbe70148735328b0a",
+    "prepare.py": "3fc70f380d53e2cf4fced6ea806c0158d823b68e9b7fa0e7ae8712abc340538d",
+    "run.sh": "6ea4bdff679632c70adaa9cbe8be9a9e92ff23e432da2e771a689522286e106b",
+    "verify.py": "30c29ee49ecadc44a660a64edc7dd7f073d73ae9d4607311b99d700cef107844"
+  },
+  "evidence_hashes": {
+    "build-and-tests.txt": "b87ad2cfb62b4bc6e2932c4349a71490cf8cb84fb4b66d7ea4f33d89d78e7eba",
+    "contracts.json": "b234467802683406e1e228fc4c9b836dcf7c776a5fda8b0de71eb270b10073dc",
+    "contracts.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "diagnostic-before-exact-diff-fix.txt": "e68f8280631e5f1382450ada7c48b7a82fd39dcb0b29625498e8f2380a74e290",
+    "earlier-prototype-integrity.json": "d9958a6a6ef38da0ab081b0f761789a201122ae9827502e0a26eaad7f3212fff",
+    "exact-reference-tests.txt": "7b6affcb285a96b1a38cd1d8940d38801c423eb68d130de3061dd4b372527469",
+    "fixture-build.txt": "df499f7b5a7bfd2687b551bf01d44bcb79c882e1272a4049f0252fc733f3e64b",
+    "mailbox-tests.txt": "94bcd01104c1145f9fe400aab0a1e870747b75700d6f76243e7d5727c48b339a",
+    "native-exact.json": "b88d34d050176bad444c0c5eb23aa7c84687f35938f94b21fd45d187c4312494",
+    "native-exact.json.heap.pprof": "1fdc2827aa4cc86109e6ca156928257e0a3cf8f289d87dc800d12ea9378a08a1",
+    "native-exact.log": "bda7356b59b6cac185d43801d7beaec65fc78c080597a4f723266d8944a70b55",
+    "portable-crosscompile.json": "c0f15a417c25eb4710105852a8123a9b13ad810061441cde78b56146948c5709",
+    "text-tests.txt": "7328b7bf3ece2d4532b7cf90d9aa6e2d1548f9e4b9ae0b63d2b8ea05f4e75d4c",
+    "verification.txt": "efa1d6d64f7e37d8b6f84e7a6b4e4ec8fd1ab0b6e1df9d3fe6d8aa9175448389"
+  },
+  "artifact_hashes": {
+    "contractcheck": "c635a7a5a4d38141016a149d70446f783929d0c8fc675a69430ea1deeb870450",
+    "contracts-fixture": "db36c818182738d30abfd875bdc7123b7deb3ff33b960bde89b13d334a638bc6",
+    "fixture-src/main.go": "12ea4d72e9e1c4779ed4f4d8556fb8e1e25aeae317613357ffd07a8125ec9aa1",
+    "linux-mailbox.test": "2a4797f4f890eb55d4377365f448a2ee085f8c06849882b7dd32e45bf7c62373",
+    "native/libaccesskit.dylib": "eeaf4da3ad9c55b993739ec092023307258bbf5b3bfd5fa130b7acbc7a8a3469",
+    "windows-mailbox.test": "a0bad2db8aa60f72da251c0af4a06badcaf0fbf16348ee04ddec9cbe7b171eb4"
+  },
+  "document_hashes": {
+    "FOUNDATION_CONTRACTS_RESULTS.md": "65aae5c58168a208378ce2468ed68020d1729a58e7c08c76f6efb775ccba9eeb",
+    "PROTOTYPE_PLAN.md": "d3dc67ff877d781e712e37a69bacd5288e9feb1ff7cd249640fc19ad8cc5bffb",
+    "decisions/0006-foundation-contracts.md": "e7ec05b83903b7c6c96b16f1cd548098aba9d3856a3b9111d635bf499e300b3a",
+    "research/RECOMMENDATION.md": "95e231b0ec77d5f5837c4a16c4704c89139071f480fb13bc35a8893ccb84fa56"
+  },
+  "installed_document_hashes": {
+    "FOUNDATION_CONTRACTS_RESULTS.md": "65aae5c58168a208378ce2468ed68020d1729a58e7c08c76f6efb775ccba9eeb",
+    "PROTOTYPE_PLAN.md": "d3dc67ff877d781e712e37a69bacd5288e9feb1ff7cd249640fc19ad8cc5bffb",
+    "decisions/0006-foundation-contracts.md": "e7ec05b83903b7c6c96b16f1cd548098aba9d3856a3b9111d635bf499e300b3a",
+    "RECOMMENDATION.md": "690592f927d42bca8f23dc111000d110d06f4af2281607ac466f4d8a2874ed3f"
+  },
+  "boundaries": [
+    "Seven local Cogent patches; earlier prototypes unchanged",
+    "Mailbox bounds queue-owned payload lengths and slots through Ack, not caller/native/downstream memory",
+    "Current native bridge is still unbounded; no native preflight or bounded event-pump integration",
+    "Native fixture is a hash-locked derivative of nativeinput changing only multiline constructor",
+    "Native probes under U.S. source are not live CJK/VoiceOver checks",
+    "No OS preferences changed; no upstream message or release publication",
+    "Font-memory policy and broader lexer/render regression failures remain unresolved",
+    "Cross-platform compile only; G1 and workbench expansion on hold"
+  ]
+}

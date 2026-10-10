@@ -1,0 +1,43 @@
+Window: "Vellum Foundation — P1 P2 P3", App: Vellum Foundation.
+0 standard window Vellum Foundation — P1 P2 P3, Secondary Actions: Raise
+	1 container
+		2 button Rotate selected
+		3 button Apply value
+		4 checkbox (settable, boolean) Toggle enabled, Value: off
+		5 button Next 8 rows
+		6 button Record text
+		7 button Finish
+		8 text field (settable) Component value
+		9 button Focus single-line ⌘I
+		10 button Focus multiline ⌘M
+		11 outline Component tree
+			12 row (selectable) Components · collapsed
+		13 table Components virtual table
+			14 row R9 package 0603
+			15 row R10 package 0603
+			16 row R11 package 0603
+			17 row R12 package 0603
+			18 row R13 package 0603
+			19 row R14 package 0603
+			20 row R15 package 0603
+			21 row R16 package 0603
+		22 text entry area (settable) Multilingual text editor, Value: Latin: office AV
+Arabic: العربية 123
+Hebrew: שלום 456
+Indic: नमस्ते
+CJK: 日本語 中文
+Combining: é å
+Emoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳
+
+
+		23 outline Schematic objects
+			24 row (selectable) Canvas component R17, Secondary Actions: Pick
+			25 row (selected) Canvas component R18, Secondary Actions: Pick
+		26 text (settable) R18 · value 22k · rotations 1 · commits 1 · enabled false · rows 9–16/100000 · Tree expansion changed
+	27 close button
+	28 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	29 minimize button
+	30 text Vellum Foundation — P1 P2 P3
+31 menu bar
+	32 Vellum Foundation
+	33 Window

@@ -1,0 +1,76 @@
+{
+  "grapheme_movement": true,
+  "results": [
+    {
+      "name": "multiline_backspace_primitive",
+      "input": "AB",
+      "expected": "A",
+      "observed": "A",
+      "pass": true
+    },
+    {
+      "name": "multiline_backspace_primitive",
+      "input": "é",
+      "expected": "",
+      "observed": "",
+      "pass": true
+    },
+    {
+      "name": "multiline_backspace_primitive",
+      "input": "👩‍💻",
+      "expected": "",
+      "observed": "",
+      "pass": true
+    },
+    {
+      "name": "multiline_backspace_primitive",
+      "input": "👨‍👩‍👧‍👦",
+      "expected": "",
+      "observed": "",
+      "pass": true
+    },
+    {
+      "name": "multiline_backspace_primitive",
+      "input": "🇺🇳",
+      "expected": "",
+      "observed": "",
+      "pass": true
+    },
+    {
+      "name": "multiline_backspace_primitive",
+      "input": "नमस्ते",
+      "expected": "नम",
+      "observed": "नम",
+      "pass": true
+    },
+    {
+      "name": "multiline_exact_roundtrip",
+      "input": "one\ntwo",
+      "expected": "one\ntwo",
+      "observed": "one\ntwo\n\n",
+      "pass": false
+    },
+    {
+      "name": "multiline_exact_roundtrip",
+      "input": "one\ntwo\n",
+      "expected": "one\ntwo\n",
+      "observed": "one\ntwo\n\n",
+      "pass": false
+    },
+    {
+      "name": "multiline_exact_roundtrip",
+      "input": "one\ntwo\n\n",
+      "expected": "one\ntwo\n\n",
+      "observed": "one\ntwo\n\n",
+      "pass": true
+    },
+    {
+      "name": "multiline_exact_roundtrip",
+      "input": "日本語\n👩‍💻",
+      "expected": "日本語\n👩‍💻",
+      "observed": "日本語\n👩‍💻\n\n",
+      "pass": false
+    }
+  ],
+  "scope": "buffer primitives used by editor, not OS input"
+}

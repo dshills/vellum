@@ -1,0 +1,36 @@
+{
+  "idle-demand": {
+    "idle": {
+      "Seconds": 60.001074291,
+      "CPUSeconds": 0.170603,
+      "CPUPercentOneCore": 0.2843332423892783,
+      "CanvasRepaints": 0,
+      "PaintSchedulerWakes": 0,
+      "Note": "Whole-process CPU; canvas repaint proxy, not compositor presents or wakeups. Small fixture, not the 1000-control budget workload."
+    },
+    "heap_mib": 276.76004791259766,
+    "resident_mib": 420.03125,
+    "adapter_active": true,
+    "spell_checker_initialized": false
+  },
+  "idle-periodic": {
+    "idle": {
+      "Seconds": 60.000568708,
+      "CPUSeconds": 1.082243,
+      "CPUPercentOneCore": 1.8037212368217141,
+      "CanvasRepaints": 0,
+      "PaintSchedulerWakes": 3600,
+      "Note": "Whole-process CPU; canvas repaint proxy, not compositor presents or wakeups. Small fixture, not the 1000-control budget workload."
+    },
+    "heap_mib": 276.7715759277344,
+    "resident_mib": 421.609375,
+    "adapter_active": true,
+    "spell_checker_initialized": false
+  },
+  "spelling-warm": {
+    "heap_mib": 403.13045501708984,
+    "resident_mib": 586.703125,
+    "spell_checker_initialized": true
+  },
+  "measurement_scope": "One 60-second diagnostic per scheduling condition; warm system font cache; unchanged multilingual corpus. These runs preceded only native-string rejection and runner/patch formatting cleanup, not changes to scheduler, grapheme handling or lazy spelling."
+}

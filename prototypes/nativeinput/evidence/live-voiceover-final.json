@@ -1,0 +1,128 @@
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 6,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 13,
+  "canvas_repaints_proxy": 11,
+  "commits": 1,
+  "editing_state": {
+    "Text": "VoiceOver b",
+    "Cursor": 11,
+    "Anchor": 11,
+    "Focus": 11,
+    "Caret": {
+      "Min": {
+        "X": 106,
+        "Y": 116
+      },
+      "Max": {
+        "X": 107,
+        "Y": 139
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "VoiceOver b",
+  "go_heap_alloc_bytes_after_forced_gc": 291135664,
+  "go_heap_alloc_bytes_before_gc": 292547392,
+  "go_heap_inuse_bytes": 296615936,
+  "goroutines": 6,
+  "input_environment": {
+    "current": "com.apple.inputmethod.SCIM.ITABC",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      },
+      {
+        "id": "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese",
+        "name": "Hiragana"
+      },
+      {
+        "id": "com.apple.inputmethod.Kotoeri.RomajiTyping",
+        "name": "Japanese – Romaji"
+      },
+      {
+        "id": "com.apple.inputmethod.SCIM",
+        "name": "Chinese, Simplified"
+      },
+      {
+        "id": "com.apple.inputmethod.SCIM.ITABC",
+        "name": "Pinyin – Simplified"
+      }
+    ]
+  },
+  "input_probes": null,
+  "input_source": "com.apple.inputmethod.SCIM.ITABC",
+  "input_updates": [
+    {
+      "Sequence": 1,
+      "Kind": "mark",
+      "Text": "VoiceOver b",
+      "Anchor": 11,
+      "Focus": 11,
+      "MarkedStart": 10,
+      "MarkedEnd": 11
+    },
+    {
+      "Sequence": 2,
+      "Kind": "insert",
+      "Text": "VoiceOver b",
+      "Anchor": 11,
+      "Focus": 11,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    }
+  ],
+  "limitations": [
+    "small fixture, not full performance workload",
+    "single-line logical selection and current IME caret only; arbitrary text-range geometry, bidi and multiline ranges absent",
+    "live Japanese/Chinese IME and full screen-reader workflows remain unverified; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 6,
+  "native_input_ack": 2,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 197,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 509149184,
+  "resize_content_sizes_pixels": null,
+  "rotations": 1,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 13,
+  "shown_callback_ms": 738.448,
+  "spell_checker_initialized": false,
+  "status": "Text recorded cursor 11 selection 11..11",
+  "text_samples": [
+    {
+      "Name": "sample-1",
+      "Text": "VoiceOver b",
+      "Runes": 11,
+      "Bytes": 11,
+      "Editing": {
+        "Text": "VoiceOver b",
+        "Cursor": 11,
+        "Anchor": 11,
+        "Focus": 11,
+        "Caret": {
+          "Min": {
+            "X": 106,
+            "Y": 116
+          },
+          "Max": {
+            "X": 107,
+            "Y": 139
+          }
+        }
+      }
+    }
+  ],
+  "value": "VoiceOver check",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}

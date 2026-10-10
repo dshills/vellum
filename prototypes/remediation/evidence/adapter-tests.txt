@@ -1,0 +1,20 @@
+=== RUN   TestRejectDanglingAndCycles
+--- PASS: TestRejectDanglingAndCycles (0.00s)
+=== RUN   TestActionOnRemovedVirtualRowRejected
+--- PASS: TestActionOnRemovedVirtualRowRejected (0.00s)
+=== RUN   TestSnapshotOwnsSlices
+--- PASS: TestSnapshotOwnsSlices (0.00s)
+=== RUN   TestNativeTextSelectionValidation
+--- PASS: TestNativeTextSelectionValidation (0.00s)
+PASS
+ok  	example.com/vellum/remediation/semantics	1.463s
+=== RUN   TestBurstCommandsPreserveOrder
+--- PASS: TestBurstCommandsPreserveOrder (0.00s)
+PASS
+ok  	example.com/vellum/remediation/eventqueue	1.307s
+=== RUN   TestNativeEncodingBoundaries
+--- PASS: TestNativeEncodingBoundaries (0.00s)
+=== RUN   TestRejectInvalidOrOversizedCluster
+--- PASS: TestRejectInvalidOrOversizedCluster (0.00s)
+PASS
+ok  	example.com/vellum/remediation/textbridge	1.609s

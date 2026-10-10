@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960" role="img">
+<title>C · Gio shell, independent UI and renderer</title>
+<defs><marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto"><path d="M0 0 L10 3.5 L0 7 Z" fill="#6B7280"/></marker></defs>
+<style>text{font-family:Helvetica,Arial,sans-serif;fill:#111827}.sub{fill:#4B5563;font-size:14px}.title{font-weight:700;font-size:25px}.node{font-weight:700;font-size:18px}</style>
+<rect width="960" height="960" fill="#FFFFFF"/>
+<text x="40" y="48" class="title" text-anchor="start">C · Gio shell, independent UI and renderer</text>
+<text x="40" y="78" class="sub" text-anchor="start">Proposed dependency structure · arrows point toward dependencies</text>
+<rect x="40" y="112" width="880" height="80" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+<circle cx="56" cy="125" r="2.5" fill="#3B82F6"/>
+<circle cx="67" cy="125" r="2.5" fill="#3B82F6"/>
+<circle cx="78" cy="125" r="2.5" fill="#3B82F6"/>
+<text x="480.0" y="142" class="node" text-anchor="middle">Application domain and state</text>
+<text x="480.0" y="166" class="sub" text-anchor="middle">Documents · history · immutable job inputs · explicit result commits</text>
+<rect x="40" y="272" width="880" height="80" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+<circle cx="56" cy="285" r="2.5" fill="#3B82F6"/>
+<circle cx="67" cy="285" r="2.5" fill="#3B82F6"/>
+<circle cx="78" cy="285" r="2.5" fill="#3B82F6"/>
+<text x="480.0" y="302" class="node" text-anchor="middle">Vellum hybrid core</text>
+<text x="480.0" y="326" class="sub" text-anchor="middle">UI ownership · workbench · commands / tasks · semantic records</text>
+<path d="M480 192 V272" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<rect x="40" y="432" width="880" height="80" rx="8" fill="#FFF7ED" stroke="#F97316" stroke-width="1.5"/>
+<text x="480.0" y="462" class="node" text-anchor="middle">Vellum shell and rendering adapters</text>
+<text x="480.0" y="486" class="sub" text-anchor="middle">Gio event translation · surface lifecycle · text / semantics bridges</text>
+<path d="M480 352 V432" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<rect x="40" y="592" width="160" height="104" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+<text x="120.0" y="622" class="node" text-anchor="middle">go-text</text>
+<text x="120.0" y="646" class="sub" text-anchor="middle">Shape / fallback</text>
+<text x="120.0" y="666" class="sub" text-anchor="middle">Vellum editing</text>
+<path d="M120 512 V592" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<path d="M120 696 V792" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<rect x="280" y="592" width="160" height="104" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+<text x="360.0" y="622" class="node" text-anchor="middle">wgpu-native</text>
+<text x="360.0" y="646" class="sub" text-anchor="middle">Go binding</text>
+<text x="360.0" y="666" class="sub" text-anchor="middle">Owned presentation</text>
+<path d="M360 512 V592" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<path d="M360 696 V792" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<rect x="520" y="592" width="160" height="104" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+<text x="600.0" y="622" class="node" text-anchor="middle">Gio shell</text>
+<text x="600.0" y="646" class="sub" text-anchor="middle">CustomRenderer</text>
+<text x="600.0" y="666" class="sub" text-anchor="middle">Native ViewEvent</text>
+<path d="M600 512 V592" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<path d="M600 696 V792" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<rect x="760" y="592" width="160" height="104" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1.5"/>
+<text x="840.0" y="622" class="node" text-anchor="middle">AccessKit</text>
+<text x="840.0" y="646" class="sub" text-anchor="middle">C bridge</text>
+<text x="840.0" y="666" class="sub" text-anchor="middle">Native adapters</text>
+<path d="M840 512 V592" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<path d="M840 696 V792" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+<rect x="40" y="792" width="880" height="64" rx="8" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="480.0" y="822" class="node" text-anchor="middle">Desktop operating systems and GPU drivers</text>
+<text x="480" y="839" class="sub" text-anchor="middle">Windows · macOS · Linux (Wayland and X11)</text>
+<text x="40" y="888" class="sub" text-anchor="start">Critical gate: public shell APIs must support input, IME and surface lifetime cleanly.</text>
+<rect x="40" y="917" width="15" height="15" rx="3" fill="#EFF6FF" stroke="#3B82F6"/>
+<text x="63" y="929" class="sub" text-anchor="start">Owned</text>
+<rect x="210" y="917" width="15" height="15" rx="3" fill="#ECFDF5" stroke="#10B981"/>
+<text x="233" y="929" class="sub" text-anchor="start">Reused</text>
+<rect x="380" y="917" width="15" height="15" rx="3" fill="#FFF7ED" stroke="#F97316"/>
+<text x="403" y="929" class="sub" text-anchor="start">Integration / extension</text>
+<rect x="680" y="917" width="15" height="15" rx="3" fill="#F3F4F6" stroke="#9CA3AF"/>
+<text x="703" y="929" class="sub" text-anchor="start">OS / drivers</text>
+</svg>

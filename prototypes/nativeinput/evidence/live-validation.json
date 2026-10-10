@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-09",
+  "authorization": "User: Yes, test and restore settings",
+  "original_voiceover_state": "off, observed in Settings before enabling; raw original capture is an unchanged-tree diff",
+  "live_cjk": {
+    "result": "pass for recorded single-field conversion/undo/redo/cancel and Japanese candidate cycling after horizontal scroll",
+    "callbacks": 43,
+    "rejected": 0,
+    "sources": [
+      "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese",
+      "com.apple.inputmethod.SCIM.ITABC"
+    ],
+    "samples": [
+      "A霓虹哦",
+      "A中文",
+      "A",
+      "A中文",
+      "A中文",
+      "A中文ni日本語",
+      "A中文ni",
+      "A中文ni日本語",
+      "A中文ni日本語",
+      "A012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789Z"
+    ]
+  },
+  "voiceover": {
+    "process_confirmed_running": true,
+    "welcome_completed": true,
+    "value_selection_keyboard_replacement": "pass",
+    "full_navigation_speech_workflow": "unverified: automated Control-Option navigation/invoke yielded no verifiable result",
+    "expired_first_run": "excluded"
+  },
+  "restoration": {
+    "environment": {
+      "current": "com.apple.keylayout.US",
+      "enabled": [
+        {
+          "id": "com.apple.keylayout.US",
+          "name": "U.S."
+        }
+      ]
+    },
+    "voiceover": "off",
+    "globe_key": "Show Emoji & Symbols",
+    "dictation": "English (United States), enabled as originally",
+    "other_input_preferences": "match recorded original settings"
+  },
+  "unverified": [
+    "separate candidate-panel visual placement",
+    "live CJK resize/move and vertical scroll",
+    "full VoiceOver navigation and speech",
+    "broader G1 requirements"
+  ],
+  "live_run_binary_sha256": "c250d84bb8e03b0387c0252483630d01e32b0521f4613a9c0ba9e48a44fb7bde",
+  "subsequent_source_change": "Report metadata only: document initial input-environment capture and reword remaining verification limitations; no input/editing logic changed."
+}

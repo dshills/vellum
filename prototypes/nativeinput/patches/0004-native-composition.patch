@@ -1,0 +1,348 @@
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -167,6 +167,10 @@
+ 
+ 	// undos is the undo manager for the text field.
+ 	undos textFieldUndos
++
++	nativeComposition *textFieldNativeComposition
++	nativeListener    func(TextFieldEditingState)
++	nativeLastState   TextFieldEditingState
+ 
+ 	leadingIconButton, trailingIconButton *Button
+ }
+@@ -459,7 +463,7 @@
+ // SetText sets the text of the text field and reverts any current edits
+ // to reflect this new text.
+ func (tf *TextField) SetText(text string) *TextField {
+-	if tf.text == text && !tf.edited {
++	if tf.text == text && !tf.edited && tf.nativeComposition == nil {
+ 		return tf
+ 	}
+ 	tf.text = text
+@@ -531,6 +535,7 @@
+ // editDone completes editing and copies the active edited text to the [TextField.text].
+ // It is called when the return key is pressed or the text field goes out of focus.
+ func (tf *TextField) editDone() {
++	tf.commitNativeComposition()
+ 	if tf.edited {
+ 		tf.edited = false
+ 		tf.text = string(tf.editText)
+@@ -546,6 +551,7 @@
+ 
+ // revert aborts editing and reverts to the last saved text.
+ func (tf *TextField) revert() {
++	tf.nativeComposition = nil
+ 	tf.renderVisible = nil
+ 	tf.editText = []rune(tf.text)
+ 	tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, tf.cursorPos)
+@@ -910,8 +916,10 @@
+ 		if tf.selectRange.End > ed {
+ 			tf.selectRange.End = ed
+ 		}
+-		tf.selectRange.Start = textpos.GraphemeAtOrBefore(tf.editText, tf.selectRange.Start)
+-		tf.selectRange.End = textpos.GraphemeAtOrAfter(tf.editText, tf.selectRange.End)
++		if tf.nativeComposition == nil {
++			tf.selectRange.Start = textpos.GraphemeAtOrBefore(tf.editText, tf.selectRange.Start)
++			tf.selectRange.End = textpos.GraphemeAtOrAfter(tf.editText, tf.selectRange.End)
++		}
+ 	} else {
+ 		tf.selectReset()
+ 	}
+@@ -1280,7 +1288,9 @@
+ 	}
+ 	tf.configTextSize(availSz)
+ 	n := len(tf.editText)
+-	tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, tf.cursorPos)
++	if tf.nativeComposition == nil {
++		tf.cursorPos = textpos.GraphemeAtOrBefore(tf.editText, tf.cursorPos)
++	}
+ 
+ 	if tf.hasWordWrap() { // does not scroll
+ 		tf.dispRange.Start = 0
+@@ -1728,6 +1738,7 @@
+ func (tf *TextField) ApplyScenePos() {
+ 	tf.Frame.ApplyScenePos()
+ 	tf.setEffPosAndSize()
++	tf.notifyNativeEditing()
+ }
+ 
+ // setEffPosAndSize sets the effective position and size of
+@@ -1787,6 +1798,8 @@
+ 	tf.renderHighlights()
+ 	tf.renderSelect()
+ 	tf.Scene.Painter.DrawText(tf.renderVisible, tf.effPos)
++	tf.renderNativeComposition()
++	tf.notifyNativeEditing()
+ }
+ 
+ // concealDots creates an n-length []rune of bullet characters.
+--- /dev/null
++++ b/core/textfield_native.go
+@@ -0,0 +1,174 @@
++// Experimental single-field native composition seam; UI/render thread only.
++package core
++
++import (
++	"cogentcore.org/core/text/textpos"
++	"image"
++	"strings"
++	"time"
++	"unicode/utf8"
++)
++
++type textFieldNativeComposition struct {
++	before     TextFieldEditingState
++	edited     bool
++	start, end int
++}
++
++// SetNativeEditingListener receives owned snapshots after field layout/rendering.
++// The callback must enqueue geometry; it must not reenter widget rendering.
++func (tf *TextField) SetNativeEditingListener(listener func(TextFieldEditingState)) {
++	tf.nativeListener = listener
++}
++func (tf *TextField) NativeCompositionRange() (start, end int, active bool) {
++	if tf.nativeComposition == nil {
++		return -1, -1, false
++	}
++	return tf.nativeComposition.start, tf.nativeComposition.end, true
++}
++func (tf *TextField) nativeUndo(before TextFieldEditingState) {
++	if tf.undos.pos < len(tf.undos.stack) {
++		tf.undos.stack = tf.undos.stack[:tf.undos.pos+1]
++	}
++	tf.undos.lastSave = time.Time{}
++	tf.undos.saveUndo([]rune(before.Text), before.Cursor)
++	tf.undos.lastSave = time.Time{}
++}
++func (tf *TextField) commitNativeComposition() {
++	if tf.nativeComposition == nil {
++		return
++	}
++	before := tf.nativeComposition.before
++	tf.nativeComposition = nil
++	if before.Text != string(tf.editText) {
++		tf.nativeUndo(before)
++		tf.edited = true
++	}
++}
++
++// ApplyNativeEdit applies an authoritative scalar-aligned snapshot from a native
++// text client. Only preedit permits selection inside graphemes. Multiple marked
++// updates form one undo transaction; cancellation restores the original state.
++func (tf *TextField) ApplyNativeEdit(text string, anchor, focus, start, end int, phase string) bool {
++	if tf.IsReadOnly() || !utf8.ValidString(text) || strings.ContainsRune(text, 0) {
++		return false
++	}
++	runes := []rune(text)
++	n := len(runes)
++	if anchor < 0 || focus < 0 || anchor > n || focus > n {
++		return false
++	}
++	switch phase {
++	case "mark", "insert", "unmark", "cancel":
++	default:
++		return false
++	}
++	if phase == "mark" {
++		if start < 0 || end < start || end > n || anchor < start || anchor > end || focus < start || focus > end {
++			return false
++		}
++		if tf.nativeComposition == nil {
++			tf.nativeComposition = &textFieldNativeComposition{before: tf.EditingState(), edited: tf.edited}
++		}
++		tf.nativeComposition.start, tf.nativeComposition.end = start, end
++	} else if start != -1 || end != -1 {
++		return false
++	}
++	if phase == "cancel" {
++		if tf.nativeComposition == nil {
++			return false
++		}
++		before := tf.nativeComposition
++		tf.nativeComposition = nil
++		text = before.before.Text
++		runes = []rune(text)
++		anchor, focus = before.before.Anchor, before.before.Focus
++		tf.edited = before.edited
++	} else if phase != "mark" {
++		if tf.nativeComposition != nil {
++			before := tf.nativeComposition.before
++			tf.nativeComposition = nil
++			if before.Text != text {
++				tf.nativeUndo(before)
++				tf.edited = true
++			}
++		} else if phase == "insert" && string(tf.editText) != text {
++			tf.nativeUndo(tf.EditingState())
++		}
++		tf.edited = tf.edited || string(tf.editText) != text
++	}
++	if phase != "mark" {
++		if anchor == focus {
++			anchor = textpos.GraphemeAtOrAfter(runes, anchor)
++			focus = anchor
++		} else {
++			lo := textpos.GraphemeAtOrBefore(runes, min(anchor, focus))
++			hi := textpos.GraphemeAtOrAfter(runes, max(anchor, focus))
++			if anchor < focus {
++				anchor, focus = lo, hi
++			} else {
++				anchor, focus = hi, lo
++			}
++		}
++	}
++	tf.editText = runes
++	tf.cursorPos = focus
++	tf.selectInit = anchor
++	tf.selectRange = textpos.Range{Start: min(anchor, focus), End: max(anchor, focus)}
++	tf.selectMode, tf.selectModeShift = false, false
++	tf.renderVisible = nil
++	tf.updateLinePos()
++	tf.NeedsRender()
++	return true
++}
++func (tf *TextField) renderNativeComposition() {
++	c := tf.nativeComposition
++	if c == nil || c.start == c.end || tf.renderVisible == nil {
++		return
++	}
++	start, end := max(c.start, tf.dispRange.Start), min(c.end, tf.dispRange.End)
++	if start >= end {
++		return
++	}
++	a, b := tf.charRenderPos(start), tf.charRenderPos(end)
++	// This seam is exercised only with wrapping disabled and logical LTR input.
++	pc := tf.Scene.Painter
++	fill, stroke, width := pc.Fill.Color, pc.Stroke.Color, pc.Stroke.Width
++	pc.Fill.Color = nil
++	pc.Stroke.Color = tf.CursorColor
++	pc.Stroke.Width.Dot(1)
++	y := a.Y + tf.lineHeight - 1
++	pc.Line(a.X, y, b.X, y)
++	pc.Draw()
++	pc.Fill.Color, pc.Stroke.Color, pc.Stroke.Width = fill, stroke, width
++}
++
++// NativeCaretBounds represents only the current caret, in physical scene pixels.
++func (tf *TextField) NativeCaretBounds() image.Rectangle {
++	caret := tf.EditingState().Caret
++	if caret.Empty() || tf.Scene == nil {
++		return image.Rectangle{}
++	}
++	visible := tf.Geom.ContentBBox.Add(tf.Scene.SceneGeom.Pos)
++	if visible.Empty() {
++		return image.Rectangle{}
++	}
++	// Keep an insertion anchor inside the visible field, including horizontal scroll.
++	height := min(caret.Dy(), visible.Dy())
++	x := max(visible.Min.X, min(caret.Min.X, visible.Max.X-1))
++	y := max(visible.Min.Y, min(caret.Min.Y, visible.Max.Y-height))
++	return image.Rect(x, y, x+1, y+height)
++}
++
++func (tf *TextField) notifyNativeEditing() {
++	if tf.nativeListener == nil {
++		return
++	}
++	state := tf.EditingState()
++	state.Caret = tf.NativeCaretBounds()
++	if state == tf.nativeLastState {
++		return
++	}
++	tf.nativeLastState = state
++	tf.nativeListener(state)
++}
+--- /dev/null
++++ b/core/textfield_native_test.go
+@@ -0,0 +1,89 @@
++package core
++
++import "testing"
++
++func TestVellumCompositionCommitUndoCancel(t *testing.T) {
++	tf := &TextField{text: "A👩Z", editText: []rune("A👩Z"), cursorPos: 1}
++	if !tf.ApplyNativeEdit("Aに👩Z", 2, 2, 1, 2, "mark") || !tf.ApplyNativeEdit("A日本👩Z", 1, 3, 1, 3, "mark") {
++		t.Fatal("mark rejected")
++	}
++	if len(tf.undos.stack) != 0 || tf.text != "A👩Z" {
++		t.Fatal("preedit became committed undo state")
++	}
++	if !tf.ApplyNativeEdit("A日本👩Z", 3, 3, -1, -1, "insert") || len(tf.undos.stack) != 1 {
++		t.Fatal("composition undo grouping")
++	}
++	tf.undo()
++	if string(tf.editText) != "A👩Z" {
++		t.Fatal("undo did not restore original")
++	}
++	tf.redo()
++	if string(tf.editText) != "A日本👩Z" {
++		t.Fatal("redo")
++	}
++	tf.SetEditingSelection(1, 3)
++	original := tf.EditingState()
++	undoCount := len(tf.undos.stack)
++	if !tf.ApplyNativeEdit("A取消👩Z", 3, 3, 1, 3, "mark") || !tf.ApplyNativeEdit("A日本👩Z", 1, 3, -1, -1, "cancel") {
++		t.Fatal("cancel rejected")
++	}
++	after := tf.EditingState()
++	if after.Text != original.Text || after.Anchor != original.Anchor || after.Focus != original.Focus || len(tf.undos.stack) != undoCount {
++		t.Fatal("cancel did not restore selection/history")
++	}
++}
++func TestVellumCompositionValidationAndFocusCommit(t *testing.T) {
++	tf := &TextField{text: "AB", editText: []rune("AB"), cursorPos: 1}
++	before := tf.EditingState()
++	if tf.ApplyNativeEdit("AにB", 9, 9, 1, 2, "mark") || tf.ApplyNativeEdit("A\x00B", 1, 1, -1, -1, "insert") || tf.ApplyNativeEdit("AB", 1, 1, -1, -1, "unknown") {
++		t.Fatal("invalid native state")
++	}
++	if tf.EditingState() != before {
++		t.Fatal("invalid update mutated state")
++	}
++	if !tf.ApplyNativeEdit("AéB", 2, 2, 1, 3, "mark") {
++		t.Fatal("scalar preedit selection")
++	}
++	tf.editDone()
++	if tf.text != "AéB" || tf.nativeComposition != nil || len(tf.undos.stack) != 1 {
++		t.Fatal("focus/commit did not finish composition")
++	}
++	tf.undo()
++	if string(tf.editText) != "AB" {
++		t.Fatal("focus commit undo")
++	}
++}
++
++func TestVellumNativeCommitBoundaryAndReplacement(t *testing.T) {
++	tf := &TextField{text: "B", editText: []rune("B")}
++	if !tf.ApplyNativeEdit("éB", 1, 1, 0, 2, "mark") {
++		t.Fatal("scalar preedit")
++	}
++	if !tf.ApplyNativeEdit("éB", 1, 1, -1, -1, "insert") {
++		t.Fatal("commit")
++	}
++	if state := tf.EditingState(); state.Cursor != 2 {
++		t.Fatalf("commit left interior-grapheme caret %+v", state)
++	}
++	if !tf.ApplyNativeEdit("éXB", 3, 3, 2, 3, "mark") {
++		t.Fatal("second composition")
++	}
++	tf.SetText("B")
++	if tf.nativeComposition != nil || string(tf.editText) != "B" {
++		t.Fatal("explicit value replacement retained preedit")
++	}
++}
++
++func TestVellumCompositionCommitsIdenticalPreeditValue(t *testing.T) {
++	for _, phase := range []string{"insert", "unmark"} {
++		t.Run(phase, func(t *testing.T) {
++			tf := &TextField{text: "AB", editText: []rune("AB"), cursorPos: 1}
++			if !tf.ApplyNativeEdit("A日本B", 3, 3, 1, 3, "mark") || !tf.ApplyNativeEdit("A日本B", 3, 3, -1, -1, phase) {
++				t.Fatal("update rejected")
++			}
++			if !tf.edited || len(tf.undos.stack) != 1 || tf.Text() != "A日本B" {
++				t.Fatal("identical final/preedit text did not reach committed value")
++			}
++		})
++	}
++}

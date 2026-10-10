@@ -1,0 +1,478 @@
+{
+  "recorded_date": "2026-10-09",
+  "scope": "Single-field local macOS input implementation; G1 remains open",
+  "pins": {
+    "cogent": "5cc519b24044b34414e8dcfc0d6a33106c368f3c",
+    "webgpu": "de8bdd5d5976db28883db41211e049446078f8fd",
+    "accesskit_c": "8b6ed37c20ed4c59390e253407983333053662ba",
+    "accesskit_c_version": "0.23.1",
+    "accesskit": "0.25.1",
+    "accesskit_macos": "0.27.1",
+    "glfw_go": "v0.1.0-pre.1.0.20260628091122-0bd588dc30cf",
+    "go_text": "v0.3.5-0.20260418130854-c41d02a44bec"
+  },
+  "environment": {
+    "hardware": "Apple M4 Pro / Mac16,11",
+    "ram_bytes": 68719476736,
+    "os": "macOS 26.6.2 / 25G83",
+    "display": "5120x1440 at 60 Hz",
+    "go": "1.27.1 darwin/arm64",
+    "rust": "1.99.0",
+    "cargo": "1.99.0",
+    "xcode": "27.0 / 27A266a",
+    "unrecorded": [
+      "power mode",
+      "OS wakeup counts",
+      "compositor presents",
+      "GPU/native allocation split"
+    ]
+  },
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "verification": {
+    "top_level_race_tests": 23,
+    "race_tests_result": "pass",
+    "vet": "pass",
+    "locked_native_build": "pass",
+    "final_protocol_updates": 10,
+    "final_protocol_acknowledged": 10,
+    "final_protocol_rejected": 0,
+    "visible_resize_sizes_verified": 6,
+    "live_keyboard_samples": [
+      "Aé",
+      "A",
+      "Aé",
+      "Aé",
+      "AbZ",
+      "A👩‍💻Z"
+    ],
+    "final_termination_samples": [
+      "A´",
+      "A´e",
+      "Re"
+    ],
+    "geometry_final_cursor_offsets": [
+      0,
+      122,
+      123,
+      123
+    ],
+    "not_run": [
+      "Visual separate candidate-panel placement and live CJK resize/move/vertical scroll",
+      "Full VoiceOver/NVDA/Orca workflows",
+      "Verified vertical scroll/candidate window movement",
+      "Before-show attachment",
+      "Multiline/bidi editing",
+      "Arbitrary native character-range geometry",
+      "Bounded transport/long lifetime stress",
+      "Windows/Linux",
+      "Clean distribution",
+      "Font-memory and formal performance gates"
+    ],
+    "real_ime_sources": [
+      "U.S. dead keys",
+      "Japanese Romaji/Hiragana",
+      "Chinese Simplified Pinyin"
+    ],
+    "live_cjk_callbacks": 43,
+    "live_cjk_rejected": 0,
+    "live_cjk_checks": "commit, Undo/Redo, cancel; Japanese candidate cycling after horizontal scroll",
+    "voiceover": "Enabled and running; value/selection actions and keyboard replacement verified. Full navigation/speech unverified.",
+    "settings_restoration": "Verified U.S.-only current/enabled, VoiceOver off, Globe behavior and English-only Dictation restored",
+    "final_smoke": "pass after report metadata clarification"
+  },
+  "source_hashes": {
+    ".gitignore": "6b1f1cc405c7e828db24ae81e4697bb765fd7dff630b761b4bfdd5f75305d2d0",
+    "README.md": "bd67506aa945cf18d89c6e40aeeb6db8984421695bd560f356701a14309be40a",
+    "bundle.py": "059f46daf3854cd00c1e21427609a8429e1eaccc247c8377fbd1a08f49612d48",
+    "env.sh": "2884ecd93f1a3a2bc4ae374b5fe1ccc00cdb7c41e4ab4c26da833b357b4c66a1",
+    "eventqueue/queue.go": "0380ffebbd3e212841e713f6e3c87d99b825cc75730178ff7174be52c7e71d9c",
+    "eventqueue/queue_test.go": "4ea99920be3850217fc87227274864ddc313cffdb4d167a4b4077afb9581e841",
+    "go.mod": "afe673936cbde87b812774d29bae219a3fff18edb0f8663bc67b60d48a07537b",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "inputbridge/encoding.go": "f7952aaa3519ffc10c5c8051441968e806c5ca54879eee59bde26008ed5ad2a7",
+    "inputbridge/encoding_test.go": "6fea98600b9d634b3193147b3595510ec6e50dbdc0d3359a92d998e23a34cf93",
+    "inputbridge/input.h": "b13b396b494a00ca30db4d86d1f5e8baa5332acfb922f2e8fae4e154f493d401",
+    "inputbridge/input_darwin.go": "e89d5a96f60d1b161865c566514e96377f11317fb247932f938e0e63c0c5f2c2",
+    "inputbridge/input_darwin.m": "6c1116196795243d89b36c144b5bcf52a2f3ceedad94ee355922f4dfb8782e7f",
+    "macbridge/bridge.h": "7bcb335b86314b95e28ecdacdbdc31b951c74d92f1126d505cdcbebaf1ad2fcb",
+    "macbridge/bridge_darwin.c": "015d2b60964447b96eaf4e7fc87bdfea03cef4e6a11638c7fdd3074c53569cfa",
+    "macbridge/bridge_darwin.go": "a65b2be44a41205f0f67ae64ec764f2d9c477df6abd0ba46977d88707b024a18",
+    "main.go": "82066219801384154327283fc6f6c84e7e8e0786f770636ca97606d7bee10b96",
+    "native/accesskit-c/COPYING.LIB": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+    "native/accesskit-c/Cargo.lock": "97ac8966d2fadbc325ef960d874d89b50877253bcdcffaec499645f18b04ef7d",
+    "native/accesskit-c/Cargo.toml": "d816e52f6f323debeb98b1f424d96fd6310e76b306709d08e25673a1ff1fdf13",
+    "native/accesskit-c/LICENSE-APACHE": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+    "native/accesskit-c/LICENSE-MIT": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "native/accesskit-c/LICENSE.chromium": "845022e0c1db1abb41a6ba4cd3c4b674ec290f3359d9d3c78ae558d4c0ed9308",
+    "native/accesskit-c/PROVENANCE.md": "ac6404cd2cc9980e1dfae2fca9dff9ccb31d66e653aa19ddec56d29a120010c5",
+    "native/accesskit-c/include/accesskit.h": "1a99c7a8dac2f5b4fa99ab323d0274ab5a3bbac8bee02220ef941cde4d36af4f",
+    "native/accesskit-c/src/android.rs": "1fe6662f3d1aaf7fc9473ae1a39ddeb8340a32ae825c1e3c5a73f050d16efd73",
+    "native/accesskit-c/src/common.rs": "7448430cd4569eebe9dc397fb78be9453ddee5cf1e3e49bb66284fe6523a6f57",
+    "native/accesskit-c/src/geometry.rs": "c0eaa0290ec0e6e2a60fd4bf002f602d02393fb7319d05d511cf21da200eb234",
+    "native/accesskit-c/src/ios.rs": "0da97a041d7e53eee337791dfe70b77d4fd89b6761ec45bfe0ba7053d2749cb7",
+    "native/accesskit-c/src/lib.rs": "74f508b7490a7722dabe2cd51874d02b7c19e72483182e7af03da17d020a6189",
+    "native/accesskit-c/src/macos.rs": "bb90ef15c2cb8a04ae165caafc97d3fcbec64199544fe89a85136ebaf9db7252",
+    "native/accesskit-c/src/unix.rs": "552558a4bcc9873503f02ee70f0a78e13ab7cae44ee5ca4b84edb932a48c5fd7",
+    "native/accesskit-c/src/windows.rs": "e42ee7f72abbd0c29d0e993da072fb494b60b3905a008d95b4d9a9ec5abbe90b",
+    "patches/0001-grapheme-and-selection.patch": "1649a8ca53e0d510b34d89306d222d307a3e17d70aef88a729c7d116f339649e",
+    "patches/0002-lazy-spelling.patch": "5d0a0e4f7b8ea16bab05436f60d3d1794cae9c61b57e8e756595b5dbc3e9c8e5",
+    "patches/0003-requested-paint.patch": "b10202ed3f3b18b7c5693285d659cdf92667ad93f3961eb703d64d08065b57d1",
+    "patches/0004-native-composition.patch": "bfc609e98c056f6cddc30c8b6fba182b6441cd17eb8966e8cf2cdd40cef7724f",
+    "patches/COGENT_LICENSE": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1",
+    "patches/original-hashes.json": "7bbe27b3a87f1a624a8e2977382b05cb4ab7c16cbdff0d24cc7dc42bd320e784",
+    "prepare.py": "230ec5392c6634dda37006a0f3477ea1b06d45175bb4bff093e461155ef18db1",
+    "run.sh": "b3fd08336fd0f34fcce98b44eeb4663eb43c9b3dd32a9ea8c7b42b667269f9ad",
+    "semantics/tree.go": "36d33b6b338692301351edb6066f3904aafb2602cb7d540ddc782c4deb54bc86",
+    "semantics/tree_test.go": "a12e906e3926c5222bbad291ccc55fe2955b714d7f5c9b071630266a637256dc",
+    "textbridge/text.go": "47c4c1487bc875f037e1bb4c7359bbe886531a9680529dea82ce48f20bef7c45",
+    "textbridge/text_test.go": "c055323f31384ecc6e274c3fe75a6589d5df8a2802806b427611532350fd113c"
+  },
+  "evidence": {
+    "build.txt": {
+      "sha256": "a10d72e8d4a122104ba4ca538e5f27ab81d8580ab529417b80ee351e705eaa08",
+      "bytes": 944,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "diagnostic-pre-cancel-fix.json": {
+      "sha256": "48b6773d9c89c0d1fcf23f94ab39b7f46678285578620cdca3d082dd6097246b",
+      "bytes": 4501,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-cancel-fix.json.heap.pprof": {
+      "sha256": "f5c7a5f0d6a34bec03a6ab51730b9a69b3312356e3d8f8ee1a1773cb358f31ab",
+      "bytes": 24115,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-cancel-fix.log": {
+      "sha256": "2722237f46fc1c3f09927f779a98787b88be31e309692f19d80ce27a694574cc",
+      "bytes": 11561,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-commit-fix.json": {
+      "sha256": "bfc98ce958f3b048d4b41cd062ea3d12a8d7b59709a415fdb06c02ed77c620dd",
+      "bytes": 2408,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-commit-fix.json.heap.pprof": {
+      "sha256": "a3c49196c2b3263e8642868ca651eda169446ba908fc376c98e7c9b705a18dd4",
+      "bytes": 23400,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-commit-fix.log": {
+      "sha256": "c8066581d721059792189d02c971165baeb7ccfb2ae8c4c03025581794de288b",
+      "bytes": 5223,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-focus-fix.json": {
+      "sha256": "b77e2a3f9c80b41a833975ef320be2bd62045e31ce60075653f5bc22f94fbc5d",
+      "bytes": 2081,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-focus-fix.json.heap.pprof": {
+      "sha256": "74ed9947b26894716e8c3d49341608caa13ab3b54c283c27723cb08703fca595",
+      "bytes": 20794,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "diagnostic-pre-focus-fix.log": {
+      "sha256": "359d63d0af2273db9a1c2075a78f5f298f66537ae5a081908c2b16cf219f2a61",
+      "bytes": 4331,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "environment.txt": {
+      "sha256": "7012cf6e4f01aafb4d1173538ee16c448324ca248567f0290e7b609afc4bffa0",
+      "bytes": 381,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "final-smoke.json": {
+      "sha256": "8a4599b8ccf7c2e708e81ee2d674ef67600a7d0e27a71a7d0397d7d67b0989ca",
+      "bytes": 2192,
+      "scope": "Final rebuilt artifact smoke check after report-metadata-only clarification; restored U.S. input environment."
+    },
+    "final-smoke.json.heap.pprof": {
+      "sha256": "10d35a27e07dffc254695052f905e28393d34c4c86971ef4d42136b6a97a9017",
+      "bytes": 17448,
+      "scope": "Final rebuilt artifact smoke check after report-metadata-only clarification; restored U.S. input environment."
+    },
+    "final-smoke.log": {
+      "sha256": "8deaf80442e23a64a6ebf129eba9b6aa218b21134c3ea0eef455b7d75e999c45",
+      "bytes": 4433,
+      "scope": "Final rebuilt artifact smoke check after report-metadata-only clarification; restored U.S. input environment."
+    },
+    "geometry-ax.txt": {
+      "sha256": "c32a620ffb1dc059dfa167176f1857c58a82500a9903aede1dd30cb1d67a714c",
+      "bytes": 2080,
+      "scope": "Earlier current-caret/scroll diagnostic; no independently verified vertical viewport scroll"
+    },
+    "geometry-final-ax.txt": {
+      "sha256": "a147a02b5466b404676358762f760644cd7dbb95089eb0c1b9f9499112dadb2b",
+      "bytes": 2087,
+      "scope": "Verified final visible-caret behavior and live commit/cancel before later focus/identical-final-text correction"
+    },
+    "geometry-final.json": {
+      "sha256": "6d635a6a79c3c7beac28504759a4b8575c05deaa75b2259cadc7c142058c0b25",
+      "bytes": 9030,
+      "scope": "Verified final visible-caret behavior and live commit/cancel before later focus/identical-final-text correction"
+    },
+    "geometry-final.json.heap.pprof": {
+      "sha256": "687cbbbe636c22aaa2b13b02ad56029b87e23a0562dbb591d448582a4dfa9e3f",
+      "bytes": 20942,
+      "scope": "Verified final visible-caret behavior and live commit/cancel before later focus/identical-final-text correction"
+    },
+    "geometry-final.log": {
+      "sha256": "b8fdd9796f4110fde94079c7e53ca6171412a2c6c8b3346a0e4f59d5b4a3d426",
+      "bytes": 23160,
+      "scope": "Verified final visible-caret behavior and live commit/cancel before later focus/identical-final-text correction"
+    },
+    "geometry-final.png": {
+      "sha256": "da25e853aeef7339c89a01bf5ec0c7265567154374606e368c32be6923a726d6",
+      "bytes": 105541,
+      "scope": "Verified final visible-caret behavior and live commit/cancel before later focus/identical-final-text correction"
+    },
+    "geometry.json": {
+      "sha256": "51a88546ba03ddf45e73e5b0334129cf25964c581a47b4f75290109a95542495",
+      "bytes": 7715,
+      "scope": "Earlier current-caret/scroll diagnostic; no independently verified vertical viewport scroll"
+    },
+    "geometry.json.heap.pprof": {
+      "sha256": "c79d4aafe32e1afddc3355534e391b5044683cd77e26a0d7a98ca23c39353531",
+      "bytes": 23072,
+      "scope": "Earlier current-caret/scroll diagnostic; no independently verified vertical viewport scroll"
+    },
+    "geometry.log": {
+      "sha256": "d59dcd840672243621197db35c855e2132fcac29b6a8484c0b572770c9614d5f",
+      "bytes": 20194,
+      "scope": "Earlier current-caret/scroll diagnostic; no independently verified vertical viewport scroll"
+    },
+    "geometry.png": {
+      "sha256": "aa81cf6c75af1bc9f5fb547e69f2f5bf8cc3c62f7302b947e07588b830e311a0",
+      "bytes": 105486,
+      "scope": "Earlier current-caret/scroll diagnostic; no independently verified vertical viewport scroll"
+    },
+    "japanese-conversion.png": {
+      "sha256": "efef7e42a4ce521a706b594ab130c4117881c35bd07acf968a7dd50aa212be6f",
+      "bytes": 103899,
+      "scope": "Live CJK input/candidate cycling evidence; separate candidate panel placement unverified. Build preceded report-metadata-only clarification."
+    },
+    "japanese-scrolled-candidate.png": {
+      "sha256": "7421cb473854823e9a9ae883f9148d34d9fa5f02f5b4720ceec57f3e55407da8",
+      "bytes": 105659,
+      "scope": "Live CJK input/candidate cycling evidence; separate candidate panel placement unverified. Build preceded report-metadata-only clarification."
+    },
+    "live-cjk.json": {
+      "sha256": "3ebac01e089e1ea65de9dafdf53b601b91dd38fd272c6d204a2aecebadad7a6f",
+      "bytes": 20768,
+      "scope": "Live CJK input/candidate cycling evidence; separate candidate panel placement unverified. Build preceded report-metadata-only clarification."
+    },
+    "live-cjk.json.heap.pprof": {
+      "sha256": "362294ed6d026adee540fe8d4931ef43c292e389d86a2c75cb3367fe39558bce",
+      "bytes": 26897,
+      "scope": "Live CJK input/candidate cycling evidence; separate candidate panel placement unverified. Build preceded report-metadata-only clarification."
+    },
+    "live-cjk.log": {
+      "sha256": "c1961566bf9ae8cae387f2f4c494d98efd1d456d858c7dd3e90f11c3e4b90f02",
+      "bytes": 54243,
+      "scope": "Live CJK input/candidate cycling evidence; separate candidate panel placement unverified. Build preceded report-metadata-only clarification."
+    },
+    "live-keyboard.json": {
+      "sha256": "ace31769bf2e886e61d9e073e6079af852b60aebdb95eb4d6b17cbed29a6f0a7",
+      "bytes": 5178,
+      "scope": "Verified earlier live editing build, before later geometry/focus/identical-commit corrections; final termination/protocol/geometry checks complement it"
+    },
+    "live-keyboard.json.heap.pprof": {
+      "sha256": "4df332e14772c0c6a03d57da8b6aa55e798dfe5eacfe38a7532f8e3f3bc5062b",
+      "bytes": 23362,
+      "scope": "Verified earlier live editing build, before later geometry/focus/identical-commit corrections; final termination/protocol/geometry checks complement it"
+    },
+    "live-keyboard.log": {
+      "sha256": "fc952777804f30d67286f75c1995b50c4a6c7fc732a7cb7dd261b076e53b84d4",
+      "bytes": 13294,
+      "scope": "Verified earlier live editing build, before later geometry/focus/identical-commit corrections; final termination/protocol/geometry checks complement it"
+    },
+    "live-marked-ax.txt": {
+      "sha256": "12d71b478d2b50e6fc3c39a67255f0de32a02e7fbf9c75a892633a66c252017f",
+      "bytes": 1706,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "live-marked.png": {
+      "sha256": "36f23a92c1cdba00124ad117aa9f9962ff257904fbd544b4371d746dd5dfbace",
+      "bytes": 102568,
+      "scope": "Early diagnostic; excluded from passing editing evidence"
+    },
+    "live-validation.json": {
+      "sha256": "09178965f4fd8ad5456dc8c322229fe9255675f125c8ec68fb066cc98901ae71",
+      "bytes": 2046,
+      "scope": "Asserted live sample/callback/source/restoration verification; scope and binary stage recorded."
+    },
+    "live-verified-ax.txt": {
+      "sha256": "508e58a2e788ea3eb7ef261581c055503acec44382ba6d01e780aa9253d8eac0",
+      "bytes": 1750,
+      "scope": "Verified earlier live editing build, before later geometry/focus/identical-commit corrections; final termination/protocol/geometry checks complement it"
+    },
+    "live-verified.png": {
+      "sha256": "13c08242c1c7ebb6cd260fd2076f0bb6e61bdd353e419aada8906efe768cf13c",
+      "bytes": 102864,
+      "scope": "Verified earlier live editing build, before later geometry/focus/identical-commit corrections; final termination/protocol/geometry checks complement it"
+    },
+    "live-voiceover-final.json": {
+      "sha256": "b57148c8ae637d69735e9f656cacf548bc83d523291a35e8b3f546aa5cf3ce9a",
+      "bytes": 3351,
+      "scope": "Bounded VoiceOver-active actions/editing; full navigation and speech unverified. Build preceded report-metadata-only clarification."
+    },
+    "live-voiceover-final.json.heap.pprof": {
+      "sha256": "09b84deeb9eca0de455317f8e9c606de1f111787d69f8c5cf18a74b6ee77f4de",
+      "bytes": 24300,
+      "scope": "Bounded VoiceOver-active actions/editing; full navigation and speech unverified. Build preceded report-metadata-only clarification."
+    },
+    "live-voiceover-final.log": {
+      "sha256": "80f653da6a6ffbf0aa738527c43f23af8ebb89300b92389095911b75d816198e",
+      "bytes": 9523,
+      "scope": "Bounded VoiceOver-active actions/editing; full navigation and speech unverified. Build preceded report-metadata-only clarification."
+    },
+    "live-voiceover.json": {
+      "sha256": "9b991aa633cdf15485cef2d3ab625aedec01a3e12aceadde84e962d766488573",
+      "bytes": 2587,
+      "scope": "Expired while VoiceOver first-run welcome remained open; excluded from screen-reader passing evidence."
+    },
+    "live-voiceover.json.heap.pprof": {
+      "sha256": "e08d6a2843ace4e11159855207921ac5d6a0c30920fa9da8331af4117e462d88",
+      "bytes": 19768,
+      "scope": "Expired while VoiceOver first-run welcome remained open; excluded from screen-reader passing evidence."
+    },
+    "live-voiceover.log": {
+      "sha256": "f135a429f29e5632d9303f696b6da51f69d809dd829cac62f2e04ca7f95b5010",
+      "bytes": 5730,
+      "scope": "Expired while VoiceOver first-run welcome remained open; excluded from screen-reader passing evidence."
+    },
+    "pinyin-marked.png": {
+      "sha256": "588a2ac0c2c6e052dc8e5debd1109104bfd5673fa44997d0f440553faa3e9302",
+      "bytes": 103890,
+      "scope": "Live CJK input/candidate cycling evidence; separate candidate panel placement unverified. Build preceded report-metadata-only clarification."
+    },
+    "prepare-base.txt": {
+      "sha256": "42d455764f948e4c8ee1f6cfd966d30d2364c2f18ef2f74296dbc6ea37459020",
+      "bytes": 664,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "protocol-ax.txt": {
+      "sha256": "d939dd42a6b11a6cb8c942637aa5e78eaa9a21822f0b703daae4d735c6dd1193",
+      "bytes": 1728,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "protocol.json": {
+      "sha256": "7d1d4c94c0c7be2a119e856be9a431bc5b450d0d8295b23081f8b25dbf745198",
+      "bytes": 11434,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "protocol.json.heap.pprof": {
+      "sha256": "1ea04eea6e57155a1794ab9aaa7e984fe73056a4dc24fb0e6443ac0efb72977f",
+      "bytes": 24859,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "protocol.log": {
+      "sha256": "f8ac6f50f21f94a92d9441db04ba7b7464003e595c02aef966bd7c027ed57d28",
+      "bytes": 28427,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "protocol.png": {
+      "sha256": "414522820e01eb158bd6b348e0682d1d5309b0044cab1ce81e3ea0ee6b8386f2",
+      "bytes": 103298,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "settings-original-input.txt": {
+      "sha256": "b7cd395361f3e7241fcd03855b65bfd713cdbcebc7168e07722db48724b01b92",
+      "bytes": 1322,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-original-voiceover.txt": {
+      "sha256": "d590811d3184ca97db20a7364158859cb974f5ac508164b880885aca3cb746bb",
+      "bytes": 371,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-restored-environment.json": {
+      "sha256": "22c4c97e0e464fb46a497f1b239d7ebb4cea32cc141f432b55f93918e3081a62",
+      "bytes": 2070,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-restored-environment.json.heap.pprof": {
+      "sha256": "7557c5539e79e8db614554f087ab165ad01cd3dadf875eb845330283d83f1b4c",
+      "bytes": 21609,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-restored-environment.log": {
+      "sha256": "366670e454ce04c4af8036d44a6289aa11c45405ae69162e8071b1352ded78cb",
+      "bytes": 4189,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-restored-input.txt": {
+      "sha256": "b7cd395361f3e7241fcd03855b65bfd713cdbcebc7168e07722db48724b01b92",
+      "bytes": 1322,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-restored-keyboard.txt": {
+      "sha256": "84dafc1c294eb189626ac2077bfb3cd1ea8274c925fe91192008ed2fbdbf239a",
+      "bytes": 3953,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-restored-voiceover.txt": {
+      "sha256": "99bfaf607e4ab1720b9e945b93e403d3ef798d29f3f4cf129ba36780f888f19c",
+      "bytes": 2929,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "settings-voiceover-active.txt": {
+      "sha256": "d3e3b2a24c1a6dea7db3873c1f5d7118d6579b23d4f8a3060c157b6f46ab7ebd",
+      "bytes": 371,
+      "scope": "Original/temporary/restored settings evidence; unchanged-tree captures supplemented by observed states in live-validation.json."
+    },
+    "termination-ax.txt": {
+      "sha256": "02b270feed4845ddd170c0500f595cbb14f4f70be3352c23370a918d386e3e91",
+      "bytes": 1716,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "termination.json": {
+      "sha256": "e5d02e6871313628523aca4a13dc88af3059afccc2ebed689f2fc42661f80ea1",
+      "bytes": 5478,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "termination.json.heap.pprof": {
+      "sha256": "9a438057133e74504ac4eff9ed8eb5c8380fb99fb59a26ea9856877d4ca05270",
+      "bytes": 23876,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "termination.log": {
+      "sha256": "a962d558f8b861b4309677794a35ab20534014801568a1f14dfc9b2c8a99b992",
+      "bytes": 13264,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "tests.txt": {
+      "sha256": "de97781863697181c36337fc3cdddf918472d2c6d6b0d08ddfbf84d12cb05fb5",
+      "bytes": 5325,
+      "scope": "Final local verification or diagnostic; protocol string calls are not live CJK IME input"
+    },
+    "voiceover-active-ax.txt": {
+      "sha256": "197a9d5d3a7103f794cc44cddcfe1047c07db9a583dabd3ae740243675b36d16",
+      "bytes": 159,
+      "scope": "Bounded VoiceOver-active actions/editing; full navigation and speech unverified. Build preceded report-metadata-only clarification."
+    }
+  },
+  "final_build_artifacts": {
+    "build/Vellum-NativeInput.app/Contents/Info.plist": "92e58d15f6d869b27f829299f24cb5fef62c08e3fc05c86f1d77682c940062a4",
+    "build/Vellum-NativeInput.app/Contents/MacOS/native/libaccesskit.dylib": "eeaf4da3ad9c55b993739ec092023307258bbf5b3bfd5fa130b7acbc7a8a3469",
+    "build/Vellum-NativeInput.app/Contents/MacOS/vellum-nativeinput": "21daa6fb529b60e482b7ea7fbe1ea48a2f6a5ffaa18d070700cc8456d47db598",
+    "build/native/libaccesskit.dylib": "eeaf4da3ad9c55b993739ec092023307258bbf5b3bfd5fa130b7acbc7a8a3469",
+    "build/vellum-nativeinput": "21daa6fb529b60e482b7ea7fbe1ea48a2f6a5ffaa18d070700cc8456d47db598"
+  },
+  "artifact_scope": "Live CJK/VoiceOver captures used the final editing logic, preceding a report-metadata-only clarification. Final smoke uses current artifact. Earlier captures retain stage labels; diagnostics excluded. Four local Cogent patches and per-view Objective-C interposition; build/upstream excluded from installation. G1 remains open.",
+  "document_hashes": {
+    "NATIVE_INPUT_RESULTS.md": "6f3e00da822e352f363af08413b47efa057cfea00815143d1c46e86ede4d7735",
+    "PROTOTYPE_PLAN.md": "ac7886550670902e514aeeb3dc07abc92602bd6071c538e560b13533e8450269",
+    "decisions/0004-native-input-prototype.md": "29749490d38494829fc27cbae617dc8921bbaeeadc38bda2b8871e8a66fe995a"
+  }
+}

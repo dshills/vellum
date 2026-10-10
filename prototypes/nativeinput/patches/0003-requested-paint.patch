@@ -1,0 +1,344 @@
+--- /dev/null
++++ b/system/driver/base/paint_request.go
+@@ -0,0 +1,80 @@
++// Experimental opt-in paint requests for Vellum's scheduling trial.
++package base
++
++import (
++	"sync"
++	"sync/atomic"
++	"time"
++)
++
++// PaintRequests coalesces paint invalidations, not input or command events.
++type PaintRequests struct {
++	Wake       chan struct{}
++	Demand     atomic.Bool
++	Closed     atomic.Bool
++	Wakes      atomic.Uint64
++	mu         sync.Mutex
++	timer      *time.Timer
++	deadline   time.Time
++	generation uint64
++}
++
++func NewPaintRequests() *PaintRequests { return &PaintRequests{Wake: make(chan struct{}, 1)} }
++func (p *PaintRequests) signal() {
++	if p.Closed.Load() {
++		return
++	}
++	select {
++	case p.Wake <- struct{}{}:
++	default:
++	}
++}
++func (p *PaintRequests) SetDemand(on bool) { p.Demand.Store(on); p.signal() }
++func (p *PaintRequests) Request() {
++	if p.Demand.Load() {
++		p.signal()
++	}
++}
++
++// After keeps the earliest outstanding deadline. Close invalidates callbacks.
++func (p *PaintRequests) After(delay time.Duration) {
++	if !p.Demand.Load() || p.Closed.Load() {
++		return
++	}
++	if delay <= 0 {
++		p.Request()
++		return
++	}
++	deadline := time.Now().Add(delay)
++	p.mu.Lock()
++	defer p.mu.Unlock()
++	if p.Closed.Load() || p.timer != nil && !deadline.Before(p.deadline) {
++		return
++	}
++	if p.timer != nil {
++		p.timer.Stop()
++	}
++	p.generation++
++	generation := p.generation
++	p.deadline = deadline
++	p.timer = time.AfterFunc(delay, func() {
++		p.mu.Lock()
++		if p.Closed.Load() || generation != p.generation {
++			p.mu.Unlock()
++			return
++		}
++		p.timer = nil
++		p.mu.Unlock()
++		p.Request()
++	})
++}
++func (p *PaintRequests) Close() {
++	p.mu.Lock()
++	defer p.mu.Unlock()
++	p.Closed.Store(true)
++	p.generation++
++	if p.timer != nil {
++		p.timer.Stop()
++		p.timer = nil
++	}
++}
+--- a/system/driver/base/window.go
++++ b/system/driver/base/window.go
+@@ -10,7 +10,6 @@
+ package base
+ 
+ import (
+-	"fmt"
+ 	"image"
+ 	"sync"
+ 	"time"
+@@ -61,12 +60,16 @@
+ 
+ 	// CursorEnabled is whether the cursor is currently enabled
+ 	CursorEnabled bool
++
++	// Paint is the opt-in request scheduler; ordinary windows retain their ticker.
++	Paint *PaintRequests
+ }
+ 
+ // NewWindow makes a new [Window] for the given app with the given options.
+ func NewWindow[A system.App](a A, opts *system.NewWindowOptions) Window[A] {
+ 	return Window[A]{
+ 		WinClose:      make(chan struct{}),
++		Paint:         NewPaintRequests(),
+ 		App:           a,
+ 		Titl:          opts.GetTitle(),
+ 		Flgs:          opts.Flags,
+@@ -83,23 +86,55 @@
+ 		fps = 60
+ 	}
+ 	dur := time.Second / time.Duration(fps)
+-	winPaint := time.NewTicker(dur)
+-outer:
++	if w.Paint == nil {
++		w.Paint = NewPaintRequests()
++	}
++	defer w.Paint.Close()
++	var ticker *time.Ticker
++	var tick <-chan time.Time
++	setMode := func() {
++		if ticker != nil {
++			ticker.Stop()
++			ticker = nil
++			tick = nil
++		}
++		if !w.Paint.Demand.Load() {
++			ticker = time.NewTicker(dur)
++			tick = ticker.C
++		}
++	}
++	setMode()
++	defer func() {
++		if ticker != nil {
++			ticker.Stop()
++		}
++	}()
+ 	for {
+ 		select {
+ 		case <-w.WinClose:
+-			winPaint.Stop()
+-			break outer
+-		case <-winPaint.C:
++			return
++		case <-w.Paint.Wake:
++			setMode()
+ 			if w.This.IsClosed() {
+-				winPaint.Stop()
+-				fmt.Println("win IsClosed in paint:", w.Name())
+-				break outer
++				return
+ 			}
++			w.Paint.Wakes.Add(1)
+ 			w.This.SendPaintEvent()
+-		}
+-	}
+-}
++		case <-tick:
++			if w.This.IsClosed() {
++				return
++			}
++			w.Paint.Wakes.Add(1)
++			w.This.SendPaintEvent()
++		}
++	}
++}
++
++// SetOnDemand is an experimental opt-in; defaults keep existing scheduling.
++func (w *Window[A]) SetOnDemand(on bool)                   { w.Paint.SetDemand(on) }
++func (w *Window[A]) IsOnDemand() bool                      { return w.Paint.Demand.Load() }
++func (w *Window[A]) RequestPaint()                         { w.Paint.Request() }
++func (w *Window[A]) RequestPaintAfter(delay time.Duration) { w.Paint.After(delay) }
+ 
+ func (w *Window[A]) SendPaintEvent() {
+ 	w.This.Events().WindowPaint()
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -155,6 +155,14 @@
+ // setFlag sets the given flags to the given value.
+ func (sc *Scene) setFlag(on bool, f ...enums.BitFlag) {
+ 	sc.flags.SetFlag(on, f...)
++	if on {
++		for _, flag := range f {
++			if flag == sceneNeedsRender || flag == sceneNeedsLayout || flag == sceneHasDeferred || flag == sceneImageUpdated {
++				sc.requestPaint()
++				break
++			}
++		}
++	}
+ }
+ 
+ // newBodyScene creates a new Scene for use with an associated Body that
+--- /dev/null
++++ b/core/paint_request.go
+@@ -0,0 +1,27 @@
++// Experimental opt-in invalidation seam for the Vellum trial.
++package core
++
++import "time"
++
++type requestedPainter interface {
++	RequestPaint()
++	RequestPaintAfter(time.Duration)
++	IsOnDemand() bool
++}
++
++func (sc *Scene) requestPaint() {
++	if rw := sc.RenderWindow(); rw != nil && rw.SystemWindow != nil {
++		if painter, ok := rw.SystemWindow.(requestedPainter); ok {
++			painter.RequestPaint()
++		}
++	}
++}
++func (w *renderWindow) requestPaintAfter(delay time.Duration) {
++	if painter, ok := w.SystemWindow.(requestedPainter); ok {
++		painter.RequestPaintAfter(delay)
++	}
++}
++func (w *renderWindow) onDemand() bool {
++	painter, ok := w.SystemWindow.(requestedPainter)
++	return ok && painter.IsOnDemand()
++}
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -470,10 +470,14 @@
+ 	// fmt.Printf("got event type: %v: %v\n", et.BitIndexString(), evi)
+ 	w.mains.mainHandleEvent(e)
+ 	rc.Unlock()
++	w.requestPaintAfter(0)
+ }
+ 
+ func (w *renderWindow) handleWindowEvents(e events.Event) {
+ 	et := e.Type()
++	if et != events.WindowPaint {
++		defer w.requestPaintAfter(0)
++	}
+ 	switch et {
+ 	case events.WindowPaint:
+ 		e.SetHandled()
+@@ -656,6 +660,7 @@
+ func (w *renderWindow) renderWindow() {
+ 	if atomic.LoadInt32(&w.winRenderCounter) > 0 { // still working
+ 		w.flags.SetFlag(true, winRenderSkipped)
++		w.requestPaintAfter(time.Second / 60)
+ 		if DebugSettings.WindowRenderTrace {
+ 			log.Printf("RenderWindow: still rendering, skipped: %v\n", w.name)
+ 		}
+@@ -670,6 +675,7 @@
+ 		// this works best in practice after a lot of experimentation.
+ 		w.flags.SetFlag(true, winRenderSkipped)
+ 		w.SystemWindow.Composer().Redraw()
++		w.requestPaintAfter(100*time.Millisecond - sinceResize)
+ 		return
+ 	}
+ 
+@@ -691,6 +697,9 @@
+ 	spriteUpdateTime := TimingSettings.CursorBlinkTime
+ 	if spriteUpdateTime == 0 {
+ 		spriteUpdateTime = 500 * time.Millisecond
++	}
++	if w.onDemand() && w.flags.HasFlag(winGotFocus) && w.isVisible() && top.Sprites.HasActive() {
++		w.requestPaintAfter(spriteUpdateTime)
+ 	}
+ 	if w.flags.HasFlag(winGotFocus) && time.Since(w.lastSpriteDraw) > spriteUpdateTime {
+ 		spriteMods = true
+--- a/core/sprite.go
++++ b/core/sprite.go
+@@ -299,3 +299,18 @@
+ 		}
+ 	}
+ }
++
++// HasActive reports whether any sprite needs its existing update deadline.
++func (ss *Sprites) HasActive() bool {
++	ss.Lock()
++	defer ss.Unlock()
++	active := false
++	ss.Do(func(sl *SpriteList) {
++		for _, sp := range sl.Values {
++			if sp.Active {
++				active = true
++			}
++		}
++	})
++	return active
++}
+--- a/core/textcursor.go
++++ b/core/textcursor.go
+@@ -28,6 +28,7 @@
+ 	if sc == nil || sc.Stage == nil || sc.Stage.Main == nil {
+ 		return
+ 	}
++	sc.requestPaint()
+ 	ms := sc.Stage.Main
+ 	ms.Sprites.Lock()
+ 	defer ms.Sprites.Unlock()
+--- /dev/null
++++ b/system/driver/base/paint_request_test.go
+@@ -0,0 +1,43 @@
++package base
++
++import (
++	"sync"
++	"testing"
++	"time"
++)
++
++func TestVellumPaintRequests(t *testing.T) {
++	p := NewPaintRequests()
++	p.Request()
++	if len(p.Wake) != 0 {
++		t.Fatal("default mode changed")
++	}
++	p.SetDemand(true)
++	<-p.Wake
++	var group sync.WaitGroup
++	for i := 0; i < 1000; i++ {
++		group.Add(1)
++		go func() { defer group.Done(); p.Request() }()
++	}
++	group.Wait()
++	if len(p.Wake) != 1 {
++		t.Fatal("paint invalidations did not coalesce")
++	}
++	<-p.Wake
++	p.After(time.Hour)
++	first := p.deadline
++	p.After(2 * time.Hour)
++	if p.deadline != first {
++		t.Fatal("later deadline postponed frame")
++	}
++	p.After(30 * time.Minute)
++	if !p.deadline.Before(first) {
++		t.Fatal("earlier deadline ignored")
++	}
++	p.Close()
++	p.Request()
++	p.After(0)
++	if p.timer != nil || len(p.Wake) != 0 {
++		t.Fatal("closed scheduler retained work")
++	}
++}

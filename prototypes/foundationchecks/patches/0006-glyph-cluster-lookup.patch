@@ -1,0 +1,41 @@
+--- a/text/shaped/shapers/shapedgt/run.go
++++ b/text/shaped/shapers/shapedgt/run.go
+@@ -131,10 +131,9 @@
+ 	var gis []int
+ 	for gi := range run.Glyphs {
+ 		g := &run.Glyphs[gi]
+-		if g.TextIndex() > i {
+-			break
+-		}
+-		if g.TextIndex() == i {
++		// Glyph order is visual and RTL cluster indexes may descend.
++		// Every rune in a ligature/combining cluster uses the same glyphs.
++		if g.TextIndex() <= i && i < g.TextIndex()+g.RunesCount() {
+ 			gis = append(gis, gi)
+ 		}
+ 	}
+--- /dev/null
++++ b/text/shaped/shapers/shapedgt/run_foundation_test.go
+@@ -0,0 +1,22 @@
++package shapedgt
++
++import (
++	"github.com/go-text/typesetting/shaping"
++	"reflect"
++	"testing"
++)
++
++func TestFoundationGlyphLookupDescendingAndClusterInterior(t *testing.T) {
++	r := &Run{Output: shaping.Output{Glyphs: []shaping.Glyph{{ClusterIndex: 6, RuneCount: 1}, {ClusterIndex: 5, RuneCount: 1}, {ClusterIndex: 4, RuneCount: 1}}}}
++	for i, want := range map[int][]int{4: {2}, 5: {1}, 6: {0}, 3: nil, 7: nil} {
++		if got := r.GlyphsAt(i); !reflect.DeepEqual(got, want) {
++			t.Fatalf("rune %d: %v != %v", i, got, want)
++		}
++	}
++	r = &Run{Output: shaping.Output{Glyphs: []shaping.Glyph{{ClusterIndex: 0, RuneCount: 3}, {ClusterIndex: 3, RuneCount: 1}}}}
++	for _, i := range []int{0, 1, 2} {
++		if got := r.GlyphsAt(i); !reflect.DeepEqual(got, []int{0}) {
++			t.Fatalf("ligature interior %d: %v", i, got)
++		}
++	}
++}

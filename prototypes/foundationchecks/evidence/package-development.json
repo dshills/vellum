@@ -1,0 +1,66 @@
+{
+  "scope": "Ad-hoc development copy; no Developer ID, notarization submission or release trust established",
+  "results": [
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app/Contents/MacOS/native/libaccesskit.dylib"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app/Contents/MacOS/native/libaccesskit.dylib: replacing existing signature\n"
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app: replacing existing signature\n"
+    },
+    {
+      "command": [
+        "/usr/bin/codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "--verbose=2",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "--prepared:/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app/Contents/MacOS/native/libaccesskit.dylib\n--validated:/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app/Contents/MacOS/native/libaccesskit.dylib\n/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app: valid on disk\n/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app: satisfies its Designated Requirement\n"
+    },
+    {
+      "command": [
+        "/usr/bin/xcrun",
+        "stapler",
+        "validate",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app"
+      ],
+      "exit_code": 65,
+      "stdout": "Processing: /Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app\nVellum-NativeInput.app does not have a ticket stapled to it.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/usr/sbin/spctl",
+        "--assess",
+        "--type",
+        "execute",
+        "--verbose=2",
+        "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app"
+      ],
+      "exit_code": 3,
+      "stdout": "",
+      "stderr": "/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationchecks/build/development/Vellum-NativeInput.app: rejected\n"
+    }
+  ]
+}

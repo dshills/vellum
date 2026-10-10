@@ -1,0 +1,14 @@
+=== RUN   TestAdmissionAndAckOwnership
+--- PASS: TestAdmissionAndAckOwnership (0.00s)
+=== RUN   TestReservationOrderAndCancel
+--- PASS: TestReservationOrderAndCancel (0.00s)
+=== RUN   TestCloseDrainsAcceptedAndWakesWorkers
+--- PASS: TestCloseDrainsAcceptedAndWakesWorkers (0.00s)
+=== RUN   TestCancellationAndLimits
+--- PASS: TestCancellationAndLimits (0.00s)
+=== RUN   TestConcurrentBoundedDelivery
+--- PASS: TestConcurrentBoundedDelivery (0.03s)
+=== RUN   TestCanceledMiddleReservationDoesNotOvertake
+--- PASS: TestCanceledMiddleReservationDoesNotOvertake (0.00s)
+PASS
+ok  	example.com/vellum/foundationcontracts/mailbox	1.244s

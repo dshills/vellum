@@ -1,0 +1,105 @@
+foundation shown callback 873.2 ms; adapter=true
+command commit selected=17 rotations=0 commits=1 rejected=0
+command rotate selected=17 rotations=1 commits=1 rejected=0
+command toggle selected=17 rotations=1 commits=1 rejected=0
+command next selected=17 rotations=1 commits=1 rejected=2
+command expand selected=11 rotations=1 commits=1 rejected=2
+command expand selected=18 rotations=1 commits=1 rejected=2
+text_capture "é"
+command capture selected=18 rotations=1 commits=1 rejected=2
+text_capture "é"
+command capture selected=18 rotations=1 commits=1 rejected=2
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 12,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 20,
+  "canvas_repaints_proxy": 23,
+  "commits": 1,
+  "field_text": "é",
+  "go_heap_alloc_bytes": 422719128,
+  "go_heap_inuse_bytes": 463372288,
+  "goroutines": 4,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "no native text selection/range bridge",
+    "real IME and screen readers not automatically exercised",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 12,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 2,
+  "resize_content_sizes_pixels": null,
+  "rotations": 1,
+  "selected_id": 18,
+  "semantic_node_count": 26,
+  "semantic_updates": 20,
+  "shown_callback_ms": 873.195,
+  "status": "Text recorded",
+  "text_samples": [
+    {
+      "Name": "sample-1",
+      "Text": "é",
+      "Runes": 2,
+      "Bytes": 3
+    },
+    {
+      "Name": "sample-2",
+      "Text": "é",
+      "Runes": 2,
+      "Bytes": 3
+    }
+  ],
+  "value": "22k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 12,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 20,
+  "canvas_repaints_proxy": 23,
+  "commits": 1,
+  "field_text": "é",
+  "go_heap_alloc_bytes": 422758472,
+  "go_heap_inuse_bytes": 463388672,
+  "goroutines": 5,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "no native text selection/range bridge",
+    "real IME and screen readers not automatically exercised",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 12,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 2,
+  "resize_content_sizes_pixels": null,
+  "rotations": 1,
+  "selected_id": 18,
+  "semantic_node_count": 26,
+  "semantic_updates": 20,
+  "shown_callback_ms": 873.195,
+  "status": "Text recorded",
+  "text_samples": [
+    {
+      "Name": "sample-1",
+      "Text": "é",
+      "Runes": 2,
+      "Bytes": 3
+    },
+    {
+      "Name": "sample-2",
+      "Text": "é",
+      "Runes": 2,
+      "Bytes": 3
+    }
+  ],
+  "value": "22k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}

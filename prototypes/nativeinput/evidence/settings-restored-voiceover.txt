@@ -1,0 +1,83 @@
+Window: "VoiceOver", App: System Settings.
+0 standard window VoiceOver, ID: main, Secondary Actions: Raise
+	1 list
+		2 split group main, SidebarNavigationSplitView
+			3 list
+				4 scroll area Secondary Actions: Scroll Up, Scroll Down
+					5 list Sidebar
+						6 row (selectable)
+						7 row (selectable) Davin Hills, Apple Account
+						8 row (selectable) Family
+						9 row (selectable)
+						10 row (selectable) Wi‑Fi
+						11 row (selectable) Bluetooth
+						12 row (selectable) Network
+						13 row (selectable) VPN
+						14 row (selectable) Energy
+						15 row (selectable)
+						16 row (selectable) General
+						17 row (selected) Accessibility
+						18 row (selectable) Appearance
+						19 row (selectable) Apple Intelligence & Siri
+						20 row (selectable) Desktop & Dock
+						21 row (selectable) Displays
+						22 row (selectable) Menu Bar
+						23 row (selectable) Spotlight
+						24 row (selectable) Wallpaper
+						25 row (selectable)
+						26 row (selectable) Notifications
+						27 row (selectable) Sound
+						28 row (selectable) Focus
+						29 row (selectable) Screen Time
+						30 row (selectable)
+						31 row (selectable) Lock Screen
+						32 row (selectable) Privacy & Security
+						33 row (selectable) Login Password
+						34 row (selectable) Users & Groups
+						35 row (selectable)
+						36 row (selectable) Internet Accounts
+						37 row (selectable) Game Center
+						38 row (selectable) iCloud
+						39 row (selectable) Wallet & Apple Pay
+						40 row (selectable)
+						41 row (selectable) Keyboard
+						42 row (selectable) Mouse
+						43 row (selectable) Trackpad
+						44 row (selectable) Printers & Scanners
+						45 row (selectable)
+						46 row (selectable) 3Dconnexion
+					47 scroll bar (settable, float) 0
+						48 value indicator (settable, float) 0
+						49 increment arrow button
+						50 decrement arrow button
+						51 increment page button
+						52 decrement page button
+			53 list
+				54 search text field (settable) Search
+					55 button Search
+			56 splitter (disabled, settable, float) 223
+			57 list
+				58 scroll area Secondary Actions: Cancel
+					59 switch Toggle VoiceOver: ⌘F5, Value: off, ID: AX_VOICEOVER_ENABLED
+					60 button Description: Open VoiceOver Tutorial…, ID: AX_VO_OPEN_TRAINING
+					61 button Description: Open VoiceOver Utility…, ID: AX_VO_OPEN_UTILITY
+					62 button Help
+	63 toolbar
+		64 container
+			65 button Description: Back, ID: go back
+			66 menu button (disabled) Description: Forward, ID: go forward
+	67 close button
+	68 zoom button
+	69 minimize button
+	70 text VoiceOver
+71 menu bar
+	72 System Settings
+	73 Edit
+	74 View
+	75 Window
+	76 Help
+
+Selected:
+	17 row (selected)
+
+Note: Pay special attention to the content selected by the user. If the user asks a question or refers to the content they are looking at on-screen, they might be referring to the selected content (but they might be referring to something else that's visible, too).

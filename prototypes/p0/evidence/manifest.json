@@ -1,0 +1,261 @@
+{
+  "recorded_date": "2026-10-09",
+  "scope": "Native macOS comparison only; not a performance benchmark or clean deployment validation",
+  "environment": {
+    "os": "macOS 26.6.2",
+    "build": "25G83",
+    "go": "go1.27.1",
+    "goos": "darwin",
+    "goarch": "arm64",
+    "native_toolchain": "Existing Xcode/macOS SDK"
+  },
+  "pins": {
+    "gio": "9393ca1c7322260c50d0023a9c49643c0c89a1c0",
+    "cogent": "5cc519b24044b34414e8dcfc0d6a33106c368f3c",
+    "webgpu": "de8bdd5d5976db28883db41211e049446078f8fd"
+  },
+  "fixture": {
+    "documents": 2,
+    "rows_per_document": 100000,
+    "tree_limit": 64,
+    "canvas_limit": 96,
+    "worker_delay_ms_per_256_rows": 5
+  },
+  "verification": {
+    "model_race_tests": 5,
+    "model_race_tests_status": "pass",
+    "vet_modules": [
+      "model",
+      "gio",
+      "cogent"
+    ],
+    "native_builds": [
+      "gio",
+      "cogent"
+    ],
+    "final_cogent_workspace_and_gpu_shutdown_exit_codes": [
+      0,
+      0
+    ],
+    "private_imports": 0,
+    "toolkit_patches": 0,
+    "application_codegen_steps": 0,
+    "windows_linux": "not run",
+    "real_ime": "not run",
+    "screen_reader_completion": "not run",
+    "native_ax": "window chrome only; controls not exposed"
+  },
+  "dependency_counts": {
+    "gio": {
+      "imported_packages_including_stdlib": 186,
+      "cgo_package_list_entries_including_runtime": 5,
+      "module_graph_entries_including_local_modules": 24,
+      "unstripped_native_binary_bytes": 10788514
+    },
+    "cogent": {
+      "imported_packages_including_stdlib": 462,
+      "cgo_package_list_entries_including_runtime": 11,
+      "module_graph_entries_including_local_modules": 91,
+      "unstripped_native_binary_bytes": 53234386
+    }
+  },
+  "evidence": {
+    "cogent-ax.txt": {
+      "description": "Native Cocoa AX snapshot; controls absent",
+      "sha256": "e077f53b47ac31222a4fffe0886b658c888efe2f9b32b07fc86c6aac31c02c32",
+      "bytes": 450
+    },
+    "cogent-cancelled.png": {
+      "description": "Verified Cogent cancellation, before final palette visibility change",
+      "sha256": "5abfa08ba6f1e6a8e3c0b989f7b3cd0116405da43a0d5501186f5deaa9c6ef20",
+      "bytes": 339607
+    },
+    "cogent-cgo-packages.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "e0974e9ef601edc679c9cba32f5a1a90196847e3b0efe120c0d4da400cfa0d34",
+      "bytes": 421
+    },
+    "cogent-edited-filtered.png": {
+      "description": "Verified Cogent edit/filter/sort with centralized shortcuts and deferred focus",
+      "sha256": "dc8118d1fb68f352f2a7c1c812543ca175cbc5f1fd974f0405754aee70c7839c",
+      "bytes": 333455
+    },
+    "cogent-final-smoke.log": {
+      "description": "Earlier diagnostic artifact; may predate wrapper corrections; not evidence of final behavior",
+      "sha256": "23943d26259be76f9cd2f3cd25290e155ce86de9bfdddbf6c8a34cd479ddb35b",
+      "bytes": 647
+    },
+    "cogent-final.json": {
+      "description": "Final palette/tab run structural counters before quit-route correction",
+      "sha256": "5712aa2dd8d11bafce7e01be0538ce203dd631fe968ffd9a2b0421d178c1a2ba",
+      "bytes": 299
+    },
+    "cogent-final.log": {
+      "description": "Final palette/tab dispatch: one rotation per document",
+      "sha256": "27693d6e263e32a5355345925a77efe04785faeecaf355e7fb8af5ec63cf6b4d",
+      "bytes": 510
+    },
+    "cogent-gpu-shutdown.log": {
+      "description": "Final GPU probe timed close after quit-route correction",
+      "sha256": "6de1d1b57e2420460e74f6beecff5ffbe35632624653f826141b36987e9c00a7",
+      "bytes": 44
+    },
+    "cogent-gpu.log": {
+      "description": "GPU rendering run log",
+      "sha256": "6de1d1b57e2420460e74f6beecff5ffbe35632624653f826141b36987e9c00a7",
+      "bytes": 44
+    },
+    "cogent-gpu.png": {
+      "description": "Rendered public xyzcore GPU scene, before quit-route correction",
+      "sha256": "72c2278eff44f8a4a9cba882b55a0e2a32806d5f7151d167bc7bb29a07223f92",
+      "bytes": 66066
+    },
+    "cogent-initial.png": {
+      "description": "Earlier diagnostic artifact; may predate wrapper corrections; not evidence of final behavior",
+      "sha256": "198646afc29ae91561e5489551e0ad997d4080260230187a3d08a167f2c1b601",
+      "bytes": 296974
+    },
+    "cogent-modules.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "10fba3d6ef55e07e487e33dc7f44feed3116ba29f5886e55124fc578f22294c7",
+      "bytes": 3883
+    },
+    "cogent-native-libraries.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "032da91f83a38724fee3991ee7544f8b3dc2619f48a06c2fc98dbb10cdadb0aa",
+      "bytes": 1769
+    },
+    "cogent-packages.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "f47b4297f8affeca0583405342a25619e30ed2efbef3260fde5dcca9f1d68f44",
+      "bytes": 11835
+    },
+    "cogent-palette.png": {
+      "description": "Final palette visibility and filtered command list",
+      "sha256": "1791ea0989abeef179f08e8befcb12596dcf129f7668809c1e4770937c94bfc6",
+      "bytes": 328357
+    },
+    "cogent-shutdown.json": {
+      "description": "Final executable short startup structural counters",
+      "sha256": "657322d87973613cd14211ba29976c94847cca44c496951ba0c938d32a648310",
+      "bytes": 279
+    },
+    "cogent-shutdown.log": {
+      "description": "Final workspace timed close after quit-route correction",
+      "sha256": "03e893ad58dad6a9c7ac297d2cb2499d5184b4edbc82e405b7b1904464f80635",
+      "bytes": 649
+    },
+    "cogent-smoke.json": {
+      "description": "Earlier diagnostic artifact; may predate wrapper corrections; not evidence of final behavior",
+      "sha256": "6f7fc824053f192d50115a134023edea18eb8f3158dd688554610b1a978bf9df",
+      "bytes": 301
+    },
+    "cogent-smoke.log": {
+      "description": "Earlier diagnostic artifact; may predate wrapper corrections; not evidence of final behavior",
+      "sha256": "9615c686202369e5ca0a16bd2f01e368fab7c06c4c2c931ab6a2784c0e73bac1",
+      "bytes": 104923
+    },
+    "cogent-stale-result.png": {
+      "description": "Verified Cogent stale-result status, before final palette visibility change",
+      "sha256": "459a2fd6ea0eb5bd65b6b72e3960b48e64eebe1b05e0029fe5fbd339e9af570f",
+      "bytes": 334102
+    },
+    "cogent-verified.log": {
+      "description": "Earlier diagnostic artifact; may predate wrapper corrections; not evidence of final behavior",
+      "sha256": "f3f725f13449cc401799676888a27d5ee6803cf32db7c3b47102ab5e6279c684",
+      "bytes": 479
+    },
+    "final-checks.txt": {
+      "description": "Final source runner tests, vet and both builds",
+      "sha256": "c1f8e2abe715dd34d919f18723b79df124efeda56eceb8cf4bca6df4f318c192",
+      "bytes": 574
+    },
+    "gio-ax.txt": {
+      "description": "Native Cocoa AX snapshot; controls absent",
+      "sha256": "4fd2cb9ff85586754036fad591b4a77d76795bb7b0a1713361db9b0d7d4148d6",
+      "bytes": 402
+    },
+    "gio-cancelled.png": {
+      "description": "Verified Gio cancellation",
+      "sha256": "4231be8af5d3dbff709fcee9da9587b7ac704265353975221bcca8f3ad6b50a9",
+      "bytes": 195280
+    },
+    "gio-cgo-packages.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "0c5d503e611bc5441e99a66a31dca03d7503d3d4cd3de4ba6abe3dbb50063951",
+      "bytes": 106
+    },
+    "gio-edited-filtered.png": {
+      "description": "Verified Gio editor/filter state after event-order correction",
+      "sha256": "eb47fc5b37c9f87f0eaf8b94abc885ccf8f8ad53f11fcec8797221fdff78a044",
+      "bytes": 186519
+    },
+    "gio-final-smoke.log": {
+      "description": "Log for short Gio startup/shutdown run",
+      "sha256": "2c00030431054e0924f1a3575dcf7e298f249e824c777fbbfc867af8b51829d2",
+      "bytes": 403
+    },
+    "gio-initial.png": {
+      "description": "Earlier diagnostic artifact; may predate wrapper corrections; not evidence of final behavior",
+      "sha256": "acfa46ee1e5cc926d6ee12f2d00de12496e88fd46ec404630606a57c8ceb3e8a",
+      "bytes": 179883
+    },
+    "gio-modules.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "c8f5cee20a37928da86b98bfa29930bbcda9b949bf6bde92c02f329b9fdfa1d1",
+      "bytes": 950
+    },
+    "gio-native-libraries.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "246198eea9b97da6fa3ff43d2006450e5cdf30fc1bc4d03fe4c1451957eebf8f",
+      "bytes": 1164
+    },
+    "gio-packages.txt": {
+      "description": "Pinned dependency audit",
+      "sha256": "990b7920db63871f4f327ff23ff00d7643142f0601475ad8a6fc8d2a61a2579a",
+      "bytes": 3906
+    },
+    "gio-scrolled.png": {
+      "description": "Separate Gio scrolling smoke, 100000 rows",
+      "sha256": "77a9446757ab8c6d928cae6d993146a970bc663234ad99f3964dc0bdaba6e670",
+      "bytes": 181299
+    },
+    "gio-smoke.json": {
+      "description": "Short startup counter run, not the longer interactive session",
+      "sha256": "44fb2284cf43dc651eeb7c25ab5b1dd5e9ea19c14545c2f91468a1e304e82a14",
+      "bytes": 316
+    },
+    "gio-smoke.log": {
+      "description": "Earlier diagnostic artifact; may predate wrapper corrections; not evidence of final behavior",
+      "sha256": "2f204bcbd90c49cd6b41ccdc70082627b3cf44a6575f37103e3a5042ac356c5e",
+      "bytes": 87
+    },
+    "gio-stale-result.png": {
+      "description": "Verified Gio stale calculation rejection",
+      "sha256": "7575250448d0d1c336d62a10037cb79a60afea09517800bc3dc71fa7430aa152",
+      "bytes": 194990
+    },
+    "model-tests.txt": {
+      "description": "Uncached race-detector model test output",
+      "sha256": "cfa2400ff311f6d8b71555de8e0a6382c86718ec74f4376bffd47647052da3ad",
+      "bytes": 489
+    }
+  },
+  "source_hashes": {
+    "cogent/go.mod": "97e79f1631497823ea9bfe0fd6bd24e9e0385cf2f7d69bf55a2da73c3945fef0",
+    "cogent/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "cogent/main.go": "03b414e4d495f3fa73e78296beab873d889c0d1faf9b2a6028d7b331f0a55e82",
+    "env.sh": "974e43ba4411d77cb647672b3828331262aa8defa938a382dbb40b8a619626a1",
+    "gio/go.mod": "74af09ec561f30d471d437356976147d3f5a775d2df16c1e0aef523ddbfa9c80",
+    "gio/go.sum": "dabecb2c5667c9992426058ad159a6de178633e3df3634e4bb74c849abd02f94",
+    "gio/main.go": "8226b1b92ec444686bc957a2fa6d77401234b00a0d4479424af93ce04e191b43",
+    "model/go.mod": "9f6792da70b755afd55285fd193cfffa53865ead59a5114ffc76402fef122211",
+    "model/model.go": "cf0f4c7472c4f968bf3567abd7df5e5b08e445803cc5a85db9eb9adcb4732f73",
+    "model/model_test.go": "1f14af2bc54654d30fab9365852ab668b22d1a14ecd9d337d4af5f5e6e0bfc88",
+    "run.sh": "92100898892f2f4e33cefd000915e60c64a06de809f8c3253af8ca20b0dcf66b"
+  },
+  "artifact_hashes": {
+    "build/vellum-p0-gio": "ec2bdd0e3b1fcafd5b888cfc5865d152da8cf702646620499f8e4babdd96666d",
+    "build/vellum-p0-cogent": "c7c1035973e9293eff8689e915fa693842a0406d697ad6a504f8b16f268f80d9"
+  }
+}

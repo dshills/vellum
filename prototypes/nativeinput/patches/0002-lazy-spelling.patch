@@ -1,0 +1,66 @@
+--- a/text/textcore/editor.go
++++ b/text/textcore/editor.go
+@@ -59,7 +59,6 @@
+ func (ed *Editor) Init() {
+ 	ed.Base.Init()
+ 	ed.editorSetLines(ed.Lines)
+-	ed.setSpell()
+ 	ed.AddContextMenu(ed.contextMenu)
+ 	ed.handleKeyChord()
+ 	ed.handleMouse()
+--- a/text/textcore/spell.go
++++ b/text/textcore/spell.go
+@@ -195,9 +195,10 @@
+ // taking into account given position in text if it is relevant for cases
+ // where it is only conditionally enabled
+ func (ed *Editor) isSpellEnabled(pos textpos.Pos) bool {
+-	if ed.spell == nil || !ed.Lines.Settings.SpellCorrect {
+-		return false
+-	}
++	if ed.Lines == nil || !ed.Lines.Settings.SpellCorrect {
++		return false
++	}
++	ed.setSpell() // Allocate the dictionary only on the first potential spelling operation.
+ 	switch ed.Lines.FileInfo().Cat {
+ 	case fileinfo.Doc: // not in code!
+ 		return !ed.Lines.InTokenCode(pos)
+@@ -239,6 +240,7 @@
+ 	if !ed.Lines.IsValidLine(ln) {
+ 		return nil
+ 	}
++	ed.setSpell() // An explicit line check is a spelling operation.
+ 	return spell.CheckLexLine(ed.Lines.Line(ln), ed.Lines.HiTags(ln))
+ }
+ 
+--- /dev/null
++++ b/text/textcore/spell_vellum_test.go
+@@ -0,0 +1,29 @@
++package textcore
++
++import (
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/text/spell"
++	"testing"
++)
++
++func TestVellumLazySpell(t *testing.T) {
++	previous := core.SystemSettings.Editor.SpellCorrect
++	defer func() { core.SystemSettings.Editor.SpellCorrect = previous }()
++	core.SystemSettings.Editor.SpellCorrect = false
++	ed := NewEditor()
++	ed.Lines.SetText([]byte("hello world"))
++	if ed.spell != nil || spell.Spell != nil {
++		t.Fatal("constructor initialized spelling")
++	}
++	if ed.isSpellEnabled(ed.CursorPos) || spell.Spell != nil {
++		t.Fatal("disabled spelling initialized dictionary")
++	}
++	ed.SpellCheckLineErrors(0)
++	if ed.spell == nil || spell.Spell == nil {
++		t.Fatal("explicit spelling did not initialize")
++	}
++	suggestions, known := spell.Spell.CheckWord("hello")
++	if !known {
++		t.Fatalf("dictionary lost ordinary word: %v", suggestions)
++	}
++}

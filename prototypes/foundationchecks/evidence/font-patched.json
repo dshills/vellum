@@ -1,0 +1,168 @@
+{
+  "samples": [
+    {
+      "after_release": {
+        "HeapAlloc": 2031408,
+        "HeapInuse": 3538944,
+        "TotalAlloc": 339016592,
+        "Goroutines": 1
+      },
+      "before": {
+        "HeapAlloc": 466056,
+        "HeapInuse": 1040384,
+        "TotalAlloc": 504752,
+        "Goroutines": 1
+      },
+      "coverage": [
+        {
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 14,
+          "text": "Latin: office AV",
+          "zero_glyph_ids": 0
+        },
+        {
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 19,
+          "text": "Arabic: العربية 123",
+          "zero_glyph_ids": 0
+        },
+        {
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 16,
+          "text": "Hebrew: שלום 456",
+          "zero_glyph_ids": 0
+        },
+        {
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/Library/Fonts/Arial Unicode.ttf"
+          ],
+          "glyph_count": 12,
+          "text": "Indic: नमस्ते",
+          "zero_glyph_ids": 0
+        },
+        {
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc"
+          ],
+          "glyph_count": 11,
+          "text": "CJK: 日本語 中文",
+          "zero_glyph_ids": 0
+        },
+        {
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf"
+          ],
+          "glyph_count": 15,
+          "text": "Combining: é å",
+          "zero_glyph_ids": 0
+        },
+        {
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Apple Color Emoji.ttc"
+          ],
+          "glyph_count": 12,
+          "text": "Emoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+          "zero_glyph_ids": 0
+        }
+      ],
+      "cycle": 1,
+      "initialized": {
+        "HeapAlloc": 7232304,
+        "HeapInuse": 8511488,
+        "TotalAlloc": 67702936,
+        "Goroutines": 1
+      },
+      "live": {
+        "HeapAlloc": 269031544,
+        "HeapInuse": 271237120,
+        "TotalAlloc": 337960976,
+        "Goroutines": 1
+      },
+      "mixed_rune_bounds": [
+        [
+          -1.265625,
+          0.3984375,
+          9.671875,
+          22.398438
+        ],
+        [
+          8.328125,
+          0.3984375,
+          19.921875,
+          22.398438
+        ],
+        [
+          17.6875,
+          0.3984375,
+          27.953125,
+          22.398438
+        ],
+        [
+          24.5,
+          0.3984375,
+          32.65625,
+          22.398438
+        ],
+        [
+          49,
+          0.3984375,
+          60.765625,
+          22.398438
+        ],
+        [
+          39.890625,
+          0.3984375,
+          51.828125,
+          22.398438
+        ],
+        [
+          33.3125,
+          0.3984375,
+          42.9375,
+          22.398438
+        ],
+        [
+          28.65625,
+          0.3984375,
+          37.109375,
+          22.398438
+        ],
+        [
+          58.609375,
+          0.3984375,
+          66.859375,
+          22.398438
+        ],
+        [
+          67.109375,
+          0.3984375,
+          78.65625,
+          22.398438
+        ],
+        [
+          76.21875,
+          0.3984375,
+          87.734375,
+          22.398438
+        ]
+      ],
+      "mixed_text": "abc אבג 123"
+    }
+  ],
+  "scope": "isolated shaper diagnostics; glyph IDs do not prove visual correctness; not full app memory",
+  "system_only": false
+}

@@ -1,0 +1,537 @@
+foundation shown callback 330.0 ms; adapter=true
+command commit selected=17 rotations=0 commits=1 rejected=0
+input_update {Sequence:1 Kind:mark Text:A´ Anchor:2 Focus:2 MarkedStart:1 MarkedEnd:2}
+input_update {Sequence:2 Kind:unmark Text:A´ Anchor:2 Focus:2 MarkedStart:-1 MarkedEnd:-1}
+command commit selected=17 rotations=0 commits=2 rejected=0
+input_probe {"selected_start":2,"caret_view":[30,117,1,23],"caret_screen":[286,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":2,"input_source":"com.apple.keylayout.US","selected_length":0,"step":0,"text":"A´","marked_length":0,"sequence":2,"substring":"A´"}
+text_capture {"Name":"sample-1","Text":"A´","Runes":2,"Bytes":3,"Editing":{"Text":"A´","Cursor":2,"Anchor":2,"Focus":2,"Caret":{"Min":{"X":30,"Y":116},"Max":{"X":31,"Y":139}}}}
+command capture selected=17 rotations=0 commits=2 rejected=0
+input_update {Sequence:3 Kind:insert Text:A´e Anchor:3 Focus:3 MarkedStart:-1 MarkedEnd:-1}
+input_probe {"selected_start":3,"caret_view":[39,117,1,23],"caret_screen":[295,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":3,"input_source":"com.apple.keylayout.US","selected_length":0,"step":0,"text":"A´e","marked_length":0,"sequence":3,"substring":"A´e"}
+text_capture {"Name":"sample-2","Text":"A´e","Runes":3,"Bytes":4,"Editing":{"Text":"A´e","Cursor":3,"Anchor":3,"Focus":3,"Caret":{"Min":{"X":39,"Y":116},"Max":{"X":40,"Y":139}}}}
+command capture selected=17 rotations=0 commits=2 rejected=0
+input_update {Sequence:4 Kind:mark Text:A´e´ Anchor:4 Focus:4 MarkedStart:3 MarkedEnd:4}
+command commit selected=17 rotations=0 commits=3 rejected=0
+input_update {Sequence:5 Kind:insert Text:Re Anchor:2 Focus:2 MarkedStart:-1 MarkedEnd:-1}
+input_probe {"selected_start":2,"caret_view":[34,117,1,23],"caret_screen":[290,1052,0,23],"has_marked":false,"marked_start":-1,"actual_caret_start":2,"input_source":"com.apple.keylayout.US","selected_length":0,"step":0,"text":"Re","marked_length":0,"sequence":5,"substring":"Re"}
+text_capture {"Name":"sample-3","Text":"Re","Runes":2,"Bytes":2,"Editing":{"Text":"Re","Cursor":2,"Anchor":2,"Focus":2,"Caret":{"Min":{"X":34,"Y":116},"Max":{"X":35,"Y":139}}}}
+command capture selected=17 rotations=0 commits=3 rejected=0
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 8,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 18,
+  "canvas_repaints_proxy": 15,
+  "commits": 3,
+  "editing_state": {
+    "Text": "Re",
+    "Cursor": 2,
+    "Anchor": 2,
+    "Focus": 2,
+    "Caret": {
+      "Min": {
+        "X": 34,
+        "Y": 116
+      },
+      "Max": {
+        "X": 35,
+        "Y": 139
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "Re",
+  "go_heap_alloc_bytes_after_forced_gc": 290248248,
+  "go_heap_alloc_bytes_before_gc": 319359288,
+  "go_heap_inuse_bytes": 296468480,
+  "goroutines": 4,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "input_probes": [
+    {
+      "selected_start": 2,
+      "caret_view": [
+        30,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        286,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 2,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 0,
+      "text": "A´",
+      "marked_length": 0,
+      "sequence": 2,
+      "substring": "A´"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        39,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        295,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 0,
+      "text": "A´e",
+      "marked_length": 0,
+      "sequence": 3,
+      "substring": "A´e"
+    },
+    {
+      "selected_start": 2,
+      "caret_view": [
+        34,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        290,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 2,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 0,
+      "text": "Re",
+      "marked_length": 0,
+      "sequence": 5,
+      "substring": "Re"
+    }
+  ],
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": [
+    {
+      "Sequence": 1,
+      "Kind": "mark",
+      "Text": "A´",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": 1,
+      "MarkedEnd": 2
+    },
+    {
+      "Sequence": 2,
+      "Kind": "unmark",
+      "Text": "A´",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 3,
+      "Kind": "insert",
+      "Text": "A´e",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 4,
+      "Kind": "mark",
+      "Text": "A´e´",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 5,
+      "Kind": "insert",
+      "Text": "Re",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    }
+  ],
+  "limitations": [
+    "small fixture, not full performance workload",
+    "single-line logical selection and current IME caret only; arbitrary text-range geometry, bidi and multiline ranges absent",
+    "live Japanese/Chinese IME and full screen-reader workflows remain unverified; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 8,
+  "native_input_ack": 5,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 217,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 470925312,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 18,
+  "shown_callback_ms": 329.966,
+  "spell_checker_initialized": false,
+  "status": "Text recorded cursor 2 selection 2..2",
+  "text_samples": [
+    {
+      "Name": "sample-1",
+      "Text": "A´",
+      "Runes": 2,
+      "Bytes": 3,
+      "Editing": {
+        "Text": "A´",
+        "Cursor": 2,
+        "Anchor": 2,
+        "Focus": 2,
+        "Caret": {
+          "Min": {
+            "X": 30,
+            "Y": 116
+          },
+          "Max": {
+            "X": 31,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-2",
+      "Text": "A´e",
+      "Runes": 3,
+      "Bytes": 4,
+      "Editing": {
+        "Text": "A´e",
+        "Cursor": 3,
+        "Anchor": 3,
+        "Focus": 3,
+        "Caret": {
+          "Min": {
+            "X": 39,
+            "Y": 116
+          },
+          "Max": {
+            "X": 40,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-3",
+      "Text": "Re",
+      "Runes": 2,
+      "Bytes": 2,
+      "Editing": {
+        "Text": "Re",
+        "Cursor": 2,
+        "Anchor": 2,
+        "Focus": 2,
+        "Caret": {
+          "Min": {
+            "X": 34,
+            "Y": 116
+          },
+          "Max": {
+            "X": 35,
+            "Y": 139
+          }
+        }
+      }
+    }
+  ],
+  "value": "R",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+command quit selected=17 rotations=0 commits=3 rejected=0
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 8,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 19,
+  "canvas_repaints_proxy": 16,
+  "commits": 3,
+  "editing_state": {
+    "Text": "Re",
+    "Cursor": 2,
+    "Anchor": 2,
+    "Focus": 2,
+    "Caret": {
+      "Min": {
+        "X": 34,
+        "Y": 116
+      },
+      "Max": {
+        "X": 35,
+        "Y": 139
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "Re",
+  "go_heap_alloc_bytes_after_forced_gc": 291055944,
+  "go_heap_alloc_bytes_before_gc": 292611408,
+  "go_heap_inuse_bytes": 296804352,
+  "goroutines": 6,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "input_probes": [
+    {
+      "selected_start": 2,
+      "caret_view": [
+        30,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        286,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 2,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 0,
+      "text": "A´",
+      "marked_length": 0,
+      "sequence": 2,
+      "substring": "A´"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        39,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        295,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 0,
+      "text": "A´e",
+      "marked_length": 0,
+      "sequence": 3,
+      "substring": "A´e"
+    },
+    {
+      "selected_start": 2,
+      "caret_view": [
+        34,
+        117,
+        1,
+        23
+      ],
+      "caret_screen": [
+        290,
+        1052,
+        0,
+        23
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 2,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 0,
+      "text": "Re",
+      "marked_length": 0,
+      "sequence": 5,
+      "substring": "Re"
+    }
+  ],
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": [
+    {
+      "Sequence": 1,
+      "Kind": "mark",
+      "Text": "A´",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": 1,
+      "MarkedEnd": 2
+    },
+    {
+      "Sequence": 2,
+      "Kind": "unmark",
+      "Text": "A´",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 3,
+      "Kind": "insert",
+      "Text": "A´e",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 4,
+      "Kind": "mark",
+      "Text": "A´e´",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 5,
+      "Kind": "insert",
+      "Text": "Re",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    }
+  ],
+  "limitations": [
+    "small fixture, not full performance workload",
+    "single-line logical selection and current IME caret only; arbitrary text-range geometry, bidi and multiline ranges absent",
+    "live Japanese/Chinese IME and full screen-reader workflows remain unverified; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳\n\n",
+  "native_actions": 8,
+  "native_input_ack": 5,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 223,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 476282880,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 19,
+  "shown_callback_ms": 329.966,
+  "spell_checker_initialized": false,
+  "status": "Text recorded cursor 2 selection 2..2",
+  "text_samples": [
+    {
+      "Name": "sample-1",
+      "Text": "A´",
+      "Runes": 2,
+      "Bytes": 3,
+      "Editing": {
+        "Text": "A´",
+        "Cursor": 2,
+        "Anchor": 2,
+        "Focus": 2,
+        "Caret": {
+          "Min": {
+            "X": 30,
+            "Y": 116
+          },
+          "Max": {
+            "X": 31,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-2",
+      "Text": "A´e",
+      "Runes": 3,
+      "Bytes": 4,
+      "Editing": {
+        "Text": "A´e",
+        "Cursor": 3,
+        "Anchor": 3,
+        "Focus": 3,
+        "Caret": {
+          "Min": {
+            "X": 39,
+            "Y": 116
+          },
+          "Max": {
+            "X": 40,
+            "Y": 139
+          }
+        }
+      }
+    },
+    {
+      "Name": "sample-3",
+      "Text": "Re",
+      "Runes": 2,
+      "Bytes": 2,
+      "Editing": {
+        "Text": "Re",
+        "Cursor": 2,
+        "Anchor": 2,
+        "Focus": 2,
+        "Caret": {
+          "Min": {
+            "X": 34,
+            "Y": 116
+          },
+          "Max": {
+            "X": 35,
+            "Y": 139
+          }
+        }
+      }
+    }
+  ],
+  "value": "R",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}

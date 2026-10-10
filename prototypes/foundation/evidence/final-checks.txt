@@ -1,0 +1,15 @@
+=== RUN   TestRejectDanglingAndCycles
+--- PASS: TestRejectDanglingAndCycles (0.00s)
+=== RUN   TestActionOnRemovedVirtualRowRejected
+--- PASS: TestActionOnRemovedVirtualRowRejected (0.00s)
+=== RUN   TestSnapshotOwnsSlices
+--- PASS: TestSnapshotOwnsSlices (0.00s)
+PASS
+ok  	example.com/vellum/foundation/semantics	1.211s
+=== RUN   TestBurstCommandsPreserveOrder
+--- PASS: TestBurstCommandsPreserveOrder (0.00s)
+PASS
+ok  	example.com/vellum/foundation/eventqueue	1.369s
+    Finished `release` profile [optimized + debuginfo] target(s) in 0.03s
+# example.com/vellum/foundation
+ld: warning: ignoring duplicate libraries: '-lobjc'

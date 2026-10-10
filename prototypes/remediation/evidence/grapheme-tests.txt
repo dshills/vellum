@@ -1,0 +1,32 @@
+=== RUN   TestVellumGraphemeBoundaries
+=== RUN   TestVellumGraphemeBoundaries/#00
+=== RUN   TestVellumGraphemeBoundaries/AB
+=== RUN   TestVellumGraphemeBoundaries/é
+=== RUN   TestVellumGraphemeBoundaries/👩\u200d💻
+=== RUN   TestVellumGraphemeBoundaries/👨\u200d👩\u200d👧\u200d👦
+=== RUN   TestVellumGraphemeBoundaries/🇺🇳🇯🇵
+=== RUN   TestVellumGraphemeBoundaries/👍🏽
+=== RUN   TestVellumGraphemeBoundaries/__
+=== RUN   TestVellumGraphemeBoundaries/가
+=== RUN   TestVellumGraphemeBoundaries/A👩\u200d💻éZ
+--- PASS: TestVellumGraphemeBoundaries (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/#00 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/AB (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/é (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/👩\u200d💻 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/👨\u200d👩\u200d👧\u200d👦 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/🇺🇳🇯🇵 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/👍🏽 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/__ (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/가 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/A👩\u200d💻éZ (0.00s)
+=== RUN   TestVellumInclusiveGraphemeBounds
+--- PASS: TestVellumInclusiveGraphemeBounds (0.00s)
+=== RUN   TestWordAt
+--- PASS: TestWordAt (0.00s)
+=== RUN   TestForwardWord
+--- PASS: TestForwardWord (0.00s)
+=== RUN   TestBackwardWord
+--- PASS: TestBackwardWord (0.00s)
+PASS
+ok  	cogentcore.org/core/text/textpos	1.208s

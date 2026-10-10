@@ -1,0 +1,98 @@
+patching file 'core/textfield.go'
+patching file 'text/textpos/grapheme.go'
+patching file 'core/textfield_editing.go'
+patching file 'text/textpos/grapheme_test.go'
+patching file 'core/textfield_vellum_test.go'
+patching file 'text/textcore/editor.go'
+patching file 'text/textcore/spell.go'
+patching file 'text/textcore/spell_vellum_test.go'
+patching file 'system/driver/base/paint_request.go'
+patching file 'system/driver/base/window.go'
+patching file 'core/scene.go'
+patching file 'core/paint_request.go'
+patching file 'core/renderwindow.go'
+patching file 'core/sprite.go'
+patching file 'core/textcursor.go'
+patching file 'system/driver/base/paint_request_test.go'
+=== RUN   TestRejectUnrepresentableNativeStrings
+--- PASS: TestRejectUnrepresentableNativeStrings (0.00s)
+=== RUN   TestRejectDanglingAndCycles
+--- PASS: TestRejectDanglingAndCycles (0.00s)
+=== RUN   TestActionOnRemovedVirtualRowRejected
+--- PASS: TestActionOnRemovedVirtualRowRejected (0.00s)
+=== RUN   TestSnapshotOwnsSlices
+--- PASS: TestSnapshotOwnsSlices (0.00s)
+=== RUN   TestNativeTextSelectionValidation
+--- PASS: TestNativeTextSelectionValidation (0.00s)
+PASS
+ok  	example.com/vellum/remediation/semantics	1.365s
+=== RUN   TestBurstCommandsPreserveOrder
+--- PASS: TestBurstCommandsPreserveOrder (0.00s)
+PASS
+ok  	example.com/vellum/remediation/eventqueue	1.221s
+=== RUN   TestNativeEncodingBoundaries
+--- PASS: TestNativeEncodingBoundaries (0.00s)
+=== RUN   TestRejectInvalidOrOversizedCluster
+--- PASS: TestRejectInvalidOrOversizedCluster (0.00s)
+PASS
+ok  	example.com/vellum/remediation/textbridge	1.514s
+=== RUN   TestVellumGraphemeBoundaries
+=== RUN   TestVellumGraphemeBoundaries/#00
+=== RUN   TestVellumGraphemeBoundaries/AB
+=== RUN   TestVellumGraphemeBoundaries/é
+=== RUN   TestVellumGraphemeBoundaries/👩\u200d💻
+=== RUN   TestVellumGraphemeBoundaries/👨\u200d👩\u200d👧\u200d👦
+=== RUN   TestVellumGraphemeBoundaries/🇺🇳🇯🇵
+=== RUN   TestVellumGraphemeBoundaries/👍🏽
+=== RUN   TestVellumGraphemeBoundaries/__
+=== RUN   TestVellumGraphemeBoundaries/가
+=== RUN   TestVellumGraphemeBoundaries/A👩\u200d💻éZ
+--- PASS: TestVellumGraphemeBoundaries (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/#00 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/AB (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/é (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/👩\u200d💻 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/👨\u200d👩\u200d👧\u200d👦 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/🇺🇳🇯🇵 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/👍🏽 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/__ (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/가 (0.00s)
+    --- PASS: TestVellumGraphemeBoundaries/A👩\u200d💻éZ (0.00s)
+=== RUN   TestVellumInclusiveGraphemeBounds
+--- PASS: TestVellumInclusiveGraphemeBounds (0.00s)
+=== RUN   TestWordAt
+--- PASS: TestWordAt (0.00s)
+=== RUN   TestForwardWord
+--- PASS: TestForwardWord (0.00s)
+=== RUN   TestBackwardWord
+--- PASS: TestBackwardWord (0.00s)
+PASS
+ok  	cogentcore.org/core/text/textpos	1.252s
+=== RUN   TestVellumPaintRequests
+--- PASS: TestVellumPaintRequests (0.00s)
+PASS
+ok  	cogentcore.org/core/system/driver/base	1.218s
+# cogentcore.org/core/core.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/text/textcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestVellumFieldEditing
+=== RUN   TestVellumFieldEditing/AB
+=== RUN   TestVellumFieldEditing/é
+=== RUN   TestVellumFieldEditing/👩\u200d💻
+=== RUN   TestVellumFieldEditing/🇺🇳
+=== RUN   TestVellumFieldEditing/👍🏽
+--- PASS: TestVellumFieldEditing (0.00s)
+    --- PASS: TestVellumFieldEditing/AB (0.00s)
+    --- PASS: TestVellumFieldEditing/é (0.00s)
+    --- PASS: TestVellumFieldEditing/👩\u200d💻 (0.00s)
+    --- PASS: TestVellumFieldEditing/🇺🇳 (0.00s)
+    --- PASS: TestVellumFieldEditing/👍🏽 (0.00s)
+=== RUN   TestVellumEditingSnapshotIsReadOnly
+--- PASS: TestVellumEditingSnapshotIsReadOnly (0.00s)
+PASS
+ok  	cogentcore.org/core/core	1.515s
+=== RUN   TestVellumLazySpell
+--- PASS: TestVellumLazySpell (1.11s)
+PASS
+ok  	cogentcore.org/core/text/textcore	2.673s

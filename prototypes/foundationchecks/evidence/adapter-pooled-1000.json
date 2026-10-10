@@ -1,0 +1,82 @@
+{
+  "callbacks": 10000,
+  "cycles": 1000,
+  "fresh_windows": false,
+  "protocol_queries": 9000,
+  "samples": [
+    {
+      "cycle": 0,
+      "goroutines": 1,
+      "heap_alloc": 307360,
+      "resident": 78233600
+    },
+    {
+      "cycle": 100,
+      "goroutines": 1,
+      "heap_alloc": 331872,
+      "resident": 86671360
+    },
+    {
+      "cycle": 200,
+      "goroutines": 1,
+      "heap_alloc": 326672,
+      "resident": 87261184
+    },
+    {
+      "cycle": 300,
+      "goroutines": 1,
+      "heap_alloc": 327056,
+      "resident": 87769088
+    },
+    {
+      "cycle": 400,
+      "goroutines": 1,
+      "heap_alloc": 327440,
+      "resident": 87818240
+    },
+    {
+      "cycle": 500,
+      "goroutines": 1,
+      "heap_alloc": 333416,
+      "resident": 87982080
+    },
+    {
+      "cycle": 600,
+      "goroutines": 1,
+      "heap_alloc": 333800,
+      "resident": 87982080
+    },
+    {
+      "cycle": 700,
+      "goroutines": 1,
+      "heap_alloc": 334168,
+      "resident": 87998464
+    },
+    {
+      "cycle": 800,
+      "goroutines": 1,
+      "heap_alloc": 334536,
+      "resident": 88014848
+    },
+    {
+      "cycle": 900,
+      "goroutines": 1,
+      "heap_alloc": 334968,
+      "resident": 88031232
+    },
+    {
+      "cycle": 1000,
+      "goroutines": 1,
+      "heap_alloc": 335336,
+      "resident": 88031232
+    },
+    {
+      "cycle": 1000,
+      "goroutines": 1,
+      "heap_alloc": 327912,
+      "resident": 88080384
+    }
+  ],
+  "scope": "owned hidden GLFW view native adapter lifetime; no OS settings changed; not Cogent/GPU lifecycle or a live IME/VoiceOver test",
+  "seconds": 0.109833
+}

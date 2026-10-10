@@ -1,0 +1,253 @@
+system/driver/base/window.go
+77: // WinLoop runs the window's own locked processing loop.
+78: func (w *Window[A]) WinLoop() {
+79: 	defer func() { system.HandleRecover(recover()) }()
+80: 
+81: 	fps := w.This.Screen().RefreshRate
+82: 	if fps <= 0 {
+83: 		fps = 60
+84: 	}
+85: 	dur := time.Second / time.Duration(fps)
+86: 	winPaint := time.NewTicker(dur)
+87: outer:
+88: 	for {
+89: 		select {
+90: 		case <-w.WinClose:
+91: 			winPaint.Stop()
+92: 			break outer
+93: 		case <-winPaint.C:
+94: 			if w.This.IsClosed() {
+95: 				winPaint.Stop()
+96: 				fmt.Println("win IsClosed in paint:", w.Name())
+97: 				break outer
+98: 			}
+99: 			w.This.SendPaintEvent()
+100: 		}
+101: 	}
+102: }
+103: 
+104: func (w *Window[A]) SendPaintEvent() {
+105: 	w.This.Events().WindowPaint()
+106: }
+107: 
+108: func (w *Window[A]) Lock() bool {
+109: 	if w.This.IsClosed() {
+110: 		return false
+111: 	}
+112: 	w.Mu.Lock()
+113: 	return true
+114: }
+115: 
+116: func (w *Window[A]) Unlock() {
+117: 	w.Mu.Unlock()
+118: }
+119: 
+120: func (w *Window[A]) Name() string {
+121: 	return w.Nm
+122: }
+123: 
+124: func (w *Window[A]) SetName(name string) {
+125: 	w.Nm = name
+126: }
+127: 
+128: func (w *Window[A]) Title() string {
+129: 	return w.Titl
+130: }
+131: 
+132: func (w *Window[A]) SetTitle(title string) {
+133: 	if w.This.IsClosed() {
+134: 		return
+135: 	}
+136: 	w.Titl = title
+137: }
+138: 
+139: func (w *Window[A]) SetIcon(images []image.Image) {
+140: 	// no-op by default
+141: }
+142: 
+143: func (w *Window[A]) Raise() {
+144: 	// no-op by default
+145: }
+146: 
+147: func (w *Window[A]) Minimize() {
+148: 	// no-op by default
+149: }
+150: 
+151: func (w *Window[A]) Flags() system.WindowFlags {
+152: 	return w.Flgs
+153: }
+154: 
+155: func (w *Window[A]) Is(flag system.WindowFlags) bool {
+156: 	return w.Flgs.HasFlag(flag)
+157: }
+158: 
+159: func (w *Window[A]) IsClosed() bool {
+160: 	return w == nil || w.This == nil || w.This.Composer() == nil
+161: }
+162: 
+163: func (w *Window[A]) IsVisible() bool {
+164: 	return !w.This.IsClosed() && !w.Is(system.Minimized)
+165: }
+166: 
+167: func (w *Window[A]) SetDestroyGPUResourcesFunc(f func()) {
+168: 	w.DestroyGPUFunc = f
+169: }
+170: 
+171: func (w *Window[A]) RenderGeom() math32.Geom2DInt {
+
+events/deque.go
+96: func (q *Deque) Send(ev Event) {
+97: 	q.LockAndInit()
+98: 	defer q.Mu.Unlock()
+99: 
+100: 	n := len(q.Back)
+101: 	if !ev.IsUnique() && n > 0 {
+102: 		lev := q.Back[n-1]
+103: 		if ev.IsSame(lev) {
+104: 			q.Back[n-1] = ev // replace
+105: 			switch ev.Type() {
+106: 			case MouseMove, MouseDrag:
+107: 				me := ev.(*Mouse)
+108: 				le := lev.(*Mouse)
+109: 				me.Prev = le.Prev
+110: 				me.PrvTime = le.PrvTime
+111: 			case Scroll:
+112: 				me := ev.(*MouseScroll)
+113: 				le := lev.(*MouseScroll)
+114: 				me.Delta = me.Delta.Add(le.Delta)
+115: 			}
+116: 			q.Cond.Signal()
+117: 			if TraceEventCompression {
+118: 				fmt.Println("compressed back:", ev)
+119: 			}
+120: 			return
+121: 		}
+122: 	}
+123: 	q.Back = append(q.Back, ev)
+124: 	q.Cond.Signal()
+125: }
+126: 
+127: // SendFirst adds an event to the start of the deque.
+128: // They are returned by NextEvent in LIFO order,
+129: // and have priority over events sent via Send.
+130: // This is typically reserved for window events.
+131: func (q *Deque) SendFirst(ev Event) {
+132: 	q.LockAndInit()
+133: 	defer q.Mu.Unlock()
+134: 
+135: 	n := len(q.Front)
+136: 	if !ev.IsUnique() && n > 0 {
+137: 		lev := q.Front[n-1]
+138: 		if ev.IsSame(lev) {
+139: 			if TraceEventCompression {
+140: 				fmt.Println("compressed front:", ev)
+141: 			}
+142: 			q.Front[n-1] = ev // replace
+143: 			q.Cond.Signal()
+144: 			return
+145: 		}
+146: 	}
+147: 	q.Front = append(q.Front, ev)
+148: 	q.Cond.Signal()
+149: }
+
+core/textfield.go
+733: func (tf *TextField) cursorBackspace(steps int) {
+734: 	if tf.hasSelection() {
+735: 		tf.deleteSelection()
+736: 		return
+737: 	}
+738: 	if tf.cursorPos < steps {
+739: 		steps = tf.cursorPos
+740: 	}
+741: 	if steps <= 0 {
+742: 		return
+743: 	}
+744: 	tf.editText = append(tf.editText[:tf.cursorPos-steps], tf.editText[tf.cursorPos:]...)
+745: 	tf.textEdited()
+746: 	tf.cursorBackward(steps)
+747: }
+748: 
+749: // cursorDelete deletes character(s) immediately after the cursor
+750: func (tf *TextField) cursorDelete(steps int) {
+751: 	if tf.hasSelection() {
+752: 		tf.deleteSelection()
+753: 		return
+754: 	}
+755: 	if tf.cursorPos+steps > len(tf.editText) {
+756: 		steps = len(tf.editText) - tf.cursorPos
+757: 	}
+758: 	if steps <= 0 {
+759: 		return
+760: 	}
+761: 	tf.editText = append(tf.editText[:tf.cursorPos], tf.editText[tf.cursorPos+steps:]...)
+762: 	tf.textEdited()
+763: }
+764: 
+765: // cursorBackspaceWord deletes words(s) immediately before cursor
+766: func (tf *TextField) cursorBackspaceWord(steps int) {
+767: 	if tf.hasSelection() {
+
+GLFW Cocoa setMarkedText:
+670: - (void)setMarkedText:(id)string
+671:         selectedRange:(NSRange)selectedRange
+672:      replacementRange:(NSRange)replacementRange
+673: {
+674:     [markedText release];
+675:     if ([string isKindOfClass:[NSAttributedString class]])
+676:         markedText = [[NSMutableAttributedString alloc] initWithAttributedString:string];
+677:     else
+678:         markedText = [[NSMutableAttributedString alloc] initWithString:string];
+679: }
+680: 
+681: - (void)unmarkText
+682: {
+683:     [[markedText mutableString] setString:@""];
+684: }
+685: 
+686: - (NSArray*)validAttributesForMarkedText
+687: {
+688:     return [NSArray array];
+689: }
+690: 
+691: - (NSAttributedString*)attributedSubstringForProposedRange:(NSRange)range
+692:                                                actualRange:(NSRangePointer)actualRange
+693: {
+694:     return nil;
+695: }
+696: 
+697: - (NSUInteger)characterIndexForPoint:(NSPoint)point
+698: {
+699:     return 0;
+
+GLFW Cocoa firstRectForCharacterRange:
+702: - (NSRect)firstRectForCharacterRange:(NSRange)range
+703:                          actualRange:(NSRangePointer)actualRange
+704: {
+705:     const NSRect frame = [window->ns.view frame];
+706:     return NSMakeRect(frame.origin.x, frame.origin.y, 0.0, 0.0);
+707: }
+708: 
+709: - (void)insertText:(id)string replacementRange:(NSRange)replacementRange
+710: {
+711:     NSString* characters;
+712:     NSEvent* event = [NSApp currentEvent];
+713:     const int mods = translateFlags([event modifierFlags]);
+714:     const int plain = !(mods & GLFW_MOD_SUPER);
+715: 
+716:     if ([string isKindOfClass:[NSAttributedString class]])
+717:         characters = [string string];
+718:     else
+719:         characters = (NSString*) string;
+720: 
+721:     NSRange range = NSMakeRange(0, [characters length]);
+722:     while (range.length)
+723:     {
+724:         uint32_t codepoint = 0;
+725: 
+726:         if ([characters getBytes:&codepoint
+727:                        maxLength:sizeof(codepoint)
+728:                       usedLength:NULL
+729:                         encoding:NSUTF32StringEncoding
+730:                          options:0
+731:                            range:range

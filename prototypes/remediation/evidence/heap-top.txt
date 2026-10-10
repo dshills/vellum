@@ -1,0 +1,115 @@
+File: vellum-remediation
+Type: inuse_space
+Time: 2026-10-09 11:46:24 CDT
+Showing nodes accounting for 277.39MB, 96.48% of 287.51MB total
+Dropped 118 nodes (cum <= 1.44MB)
+      flat  flat%   sum%        cum   cum%
+  212.92MB 74.06% 74.06%   212.92MB 74.06%  github.com/go-text/typesetting/font/opentype.(*Loader).findTableBuffer
+   26.01MB  9.05% 83.10%    26.01MB  9.05%  github.com/go-text/typesetting/font/opentype/tables.(*SimpleGlyph).parsePoints
+   10.18MB  3.54% 86.65%    10.18MB  3.54%  github.com/go-text/typesetting/font.newMorxSubtable
+    8.21MB  2.85% 89.50%     8.21MB  2.85%  image.NewRGBA
+    5.50MB  1.91% 91.41%    35.51MB 12.35%  github.com/go-text/typesetting/font/opentype/tables.(*Glyph).parseData
+    2.50MB  0.87% 92.28%     2.50MB  0.87%  runtime.mallocgc
+    2.50MB  0.87% 93.15%    28.51MB  9.92%  github.com/go-text/typesetting/font/opentype/tables.ParseSimpleGlyph
+    2.36MB  0.82% 93.97%     2.36MB  0.82%  github.com/go-text/typesetting/font.NewFace (inline)
+    2.13MB  0.74% 94.71%    37.64MB 13.09%  github.com/go-text/typesetting/font/opentype/tables.ParseGlyf
+    2.01MB   0.7% 95.41%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.(*RuneSet).deserializeFrom
+    1.58MB  0.55% 95.96%     1.58MB  0.55%  github.com/go-text/typesetting/fontscan.(*FontMap).appendFootprints (inline)
+    1.50MB  0.52% 96.48%     1.50MB  0.52%  github.com/go-text/typesetting/font/opentype/tables.(*CompositeGlyph).parseGlyphs
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/core.(*Frame).RenderChildren
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/core.(*Frame).RenderChildren.func1
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/core.(*Frame).RenderWidget
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*Frame).SizeUp
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*Frame).layoutFrame
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*Frame).sizeUpChildren
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*Frame).sizeUpChildren.func2
+         0     0% 96.48%   257.49MB 89.56%  cogentcore.org/core/core.(*Scene).LayoutRenderScene
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*Scene).LayoutScene
+         0     0% 96.48%     4.10MB  1.43%  cogentcore.org/core/core.(*Scene).Resize
+         0     0% 96.48%   257.49MB 89.56%  cogentcore.org/core/core.(*Scene).doUpdate
+         0     0% 96.48%    11.13MB  3.87%  cogentcore.org/core/core.(*Stage).Run
+         0     0% 96.48%    11.13MB  3.87%  cogentcore.org/core/core.(*Stage).RunMain
+         0     0% 96.48%   257.49MB 89.56%  cogentcore.org/core/core.(*Stage).doUpdate
+         0     0% 96.48%    10.13MB  3.52%  cogentcore.org/core/core.(*Stage).newRenderWindow
+         0     0% 96.48%    11.13MB  3.87%  cogentcore.org/core/core.(*Stage).run
+         0     0% 96.48%    11.13MB  3.87%  cogentcore.org/core/core.(*Stage).runWindow
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*Text).SizeUp
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*Text).configTextSize
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/core.(*WidgetBase).ForWidgetChildren
+         0     0% 96.48%     8.88MB  3.09%  cogentcore.org/core/core.(*WidgetBase).forVisibleChildren
+         0     0% 96.48%   266.20MB 92.59%  cogentcore.org/core/core.(*renderWindow).eventLoop
+         0     0% 96.48%   266.20MB 92.59%  cogentcore.org/core/core.(*renderWindow).handleEvent
+         0     0% 96.48%   266.20MB 92.59%  cogentcore.org/core/core.(*renderWindow).handleWindowEvents
+         0     0% 96.48%   262.09MB 91.16%  cogentcore.org/core/core.(*renderWindow).renderWindow
+         0     0% 96.48%     4.10MB  1.43%  cogentcore.org/core/core.(*renderWindow).resized
+         0     0% 96.48%     4.10MB  1.43%  cogentcore.org/core/core.(*stages).resize
+         0     0% 96.48%   257.49MB 89.56%  cogentcore.org/core/core.(*stages).updateAll
+         0     0% 96.48%     4.10MB  1.43%  cogentcore.org/core/core.SpritesSource
+         0     0% 96.48%     4.04MB  1.41%  cogentcore.org/core/core.appIconImages
+         0     0% 96.48%     6.09MB  2.12%  cogentcore.org/core/core.newRenderContext
+         0     0% 96.48%     8.21MB  2.85%  cogentcore.org/core/paint/renderers/rasterx.(*Renderer).SetSize
+         0     0% 96.48%     4.10MB  1.43%  cogentcore.org/core/paint/renderers/rasterx.New
+         0     0% 96.48%     4.04MB  1.41%  cogentcore.org/core/svg.(*SVG).Render
+         0     0% 96.48%     4.04MB  1.41%  cogentcore.org/core/svg.(*SVG).RenderImage
+         0     0% 96.48%    11.67MB  4.06%  cogentcore.org/core/text/fonts.UseEmbeddedInMap (inline)
+         0     0% 96.48%    11.67MB  4.06%  cogentcore.org/core/text/fonts.UseInMap
+         0     0% 96.48%    11.67MB  4.06%  cogentcore.org/core/text/fonts.UseInMap.func1
+         0     0% 96.48%   257.49MB 89.56%  cogentcore.org/core/text/shaped/shapers/shapedgt.(*Shaper).ShapeTextOutput
+         0     0% 96.48%   257.49MB 89.56%  cogentcore.org/core/text/shaped/shapers/shapedgt.(*Shaper).WrapLines
+         0     0% 96.48%    15.25MB  5.31%  cogentcore.org/core/text/shaped/shapers/shapedgt.NewShaper
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/text/textcore.(*Base).RenderWidget
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/text/textcore.(*Base).renderLine
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/text/textcore.(*Base).renderLine.func2
+         0     0% 96.48%   248.61MB 86.47%  cogentcore.org/core/text/textcore.(*Base).renderLines
+         0     0% 96.48%     5.62MB  1.96%  cogentcore.org/core/tree.InitNode
+         0     0% 96.48%     5.12MB  1.78%  cogentcore.org/core/tree.New[go.shape.7a6a5b5e338d89e0239172823163350ee9e1c623d0bac5217fec2fb857759de6]
+         0     0% 96.48%     5.12MB  1.78%  cogentcore.org/core/tree.New[go.shape.struct { cogentcore.org/core/core.WidgetBase; XYZ *cogentcore.org/core/xyz.Scene "set:\"-\""; SelectionMode cogentcore.org/core/xyz/xyzcore.SelectionModes; CurrentSelected cogentcore.org/core/xyz.Node "copier:\"-\" json:\"-\" xml:\"-\" display:\"-\""; CurrentManipPoint *cogentcore.org/core/xyz/xyzcore.ManipPoint "copier:\"-\" json:\"-\" xml:\"-\" display:\"-\""; SelectionParams cogentcore.org/core/xyz/xyzcore.SelectionParams "display:\"inline\"" }]
+         0     0% 96.48%     5.12MB  1.78%  cogentcore.org/core/xyz.(*Scene).Init
+         0     0% 96.48%     5.12MB  1.78%  cogentcore.org/core/xyz.NewScene (inline)
+         0     0% 96.48%     5.12MB  1.78%  cogentcore.org/core/xyz.initTextShaper (inline)
+         0     0% 96.48%     5.12MB  1.78%  cogentcore.org/core/xyz/xyzcore.(*Scene).Init
+         0     0% 96.48%     5.12MB  1.78%  cogentcore.org/core/xyz/xyzcore.NewScene (inline)
+         0     0% 96.48%   266.30MB 92.63%  github.com/go-text/typesetting/font.NewFont
+         0     0% 96.48%    11.67MB  4.06%  github.com/go-text/typesetting/font.ParseTTC
+         0     0% 96.48%     7.08MB  2.46%  github.com/go-text/typesetting/font.loadCff
+         0     0% 96.48%     2.06MB  0.72%  github.com/go-text/typesetting/font.newGPOS
+         0     0% 96.48%    10.18MB  3.54%  github.com/go-text/typesetting/font.newMorx
+         0     0% 96.48%    10.18MB  3.54%  github.com/go-text/typesetting/font.newMorxChain
+         0     0% 96.48%   212.92MB 74.06%  github.com/go-text/typesetting/font/opentype.(*Loader).RawTable (inline)
+         0     0% 96.48%   212.92MB 74.06%  github.com/go-text/typesetting/font/opentype.(*Loader).RawTableTo
+         0     0% 96.48%     1.50MB  0.52%  github.com/go-text/typesetting/font/opentype/tables.ParseCompositeGlyph
+         0     0% 96.48%    35.51MB 12.35%  github.com/go-text/typesetting/font/opentype/tables.ParseGlyph
+         0     0% 96.48%     2.06MB  0.72%  github.com/go-text/typesetting/font/opentype/tables.parseGPOSLookup
+         0     0% 96.48%    11.67MB  4.06%  github.com/go-text/typesetting/fontscan.(*FontMap).AddFont
+         0     0% 96.48%   256.99MB 89.39%  github.com/go-text/typesetting/fontscan.(*FontMap).ResolveFace
+         0     0% 96.48%     3.58MB  1.25%  github.com/go-text/typesetting/fontscan.(*FontMap).UseSystemFonts
+         0     0% 96.48%   256.99MB 89.39%  github.com/go-text/typesetting/fontscan.(*FontMap).loadFont
+         0     0% 96.48%   256.99MB 89.39%  github.com/go-text/typesetting/fontscan.(*FontMap).resolveForRune
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.(*Footprint).deserializeFrom
+         0     0% 96.48%   256.99MB 89.39%  github.com/go-text/typesetting/fontscan.(*Footprint).loadFromDisk
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.(*fileFootprints).deserializeFrom
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.deserializeFootprints
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.deserializeIndex
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.deserializeIndexFile
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.initSystemFonts
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.initSystemFonts.func1
+         0     0% 96.48%     2.01MB   0.7%  github.com/go-text/typesetting/fontscan.refreshSystemFontsIndex
+         0     0% 96.48%   256.99MB 89.39%  github.com/go-text/typesetting/shaping.(*Segmenter).Split
+         0     0% 96.48%   256.99MB 89.39%  github.com/go-text/typesetting/shaping.(*Segmenter).splitByFace
+         0     0% 96.48%   256.99MB 89.39%  github.com/go-text/typesetting/shaping.splitByFace
+         0     0% 96.48%    11.67MB  4.06%  io/fs.WalkDir
+         0     0% 96.48%    11.67MB  4.06%  io/fs.walkDir
+         0     0% 96.48%     5.62MB  1.96%  main.(*fixture).build
+         0     0% 96.48%    16.76MB  5.83%  main.main
+         0     0% 96.48%     1.50MB  0.52%  runtime.allocm
+         0     0% 96.48%     2.05MB  0.71%  runtime.doInit (inline)
+         0     0% 96.48%     2.05MB  0.71%  runtime.doInit1
+         0     0% 96.48%    18.81MB  6.54%  runtime.main
+         0     0% 96.48%     1.50MB  0.52%  runtime.newm
+         0     0% 96.48%     2.50MB  0.87%  runtime.newobject
+         0     0% 96.48%     1.50MB  0.52%  runtime.resetspinning
+         0     0% 96.48%     1.50MB  0.52%  runtime.schedule
+         0     0% 96.48%     1.50MB  0.52%  runtime.startm
+         0     0% 96.48%     1.50MB  0.52%  runtime.wakep
+         0     0% 96.48%     2.01MB   0.7%  sync.(*Once).Do (inline)
+         0     0% 96.48%     2.01MB   0.7%  sync.(*Once).doSlow

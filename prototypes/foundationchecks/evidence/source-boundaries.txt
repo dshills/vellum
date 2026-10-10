@@ -1,0 +1,167 @@
+events/deque.go
+18: // are being compressed to eliminate laggy behavior.
+19: var TraceEventCompression = false
+20: 
+21: // Dequer is an infinitely buffered double-ended queue of events.
+22: // If an event is not marked as Unique, and the last
+23: // event in the queue is of the same type, then the new one
+24: // replaces the last one.  This automatically implements
+25: // event compression to manage the common situation where
+26: // event processing is slower than event generation,
+27: // such as with Mouse movement and Paint events.
+28: // The zero value is usable, but a Deque value must not be copied.
+29: type Deque struct {
+30: 	Back  []Event // FIFO.
+31: 	Front []Event // LIFO.
+32: 
+33: 	Mu   sync.Mutex
+
+system/driver/desktop/app.go
+145: 	w.Glw.SetFocusCallback(w.Focused)
+146: 	w.Glw.SetIconifyCallback(w.Iconify)
+147: 
+148: 	w.Glw.SetKeyCallback(w.KeyEvent)
+149: 	w.Glw.SetCharModsCallback(w.CharEvent)
+150: 	w.Glw.SetMouseButtonCallback(w.MouseButtonEvent)
+151: 	w.Glw.SetScrollCallback(w.ScrollEvent)
+152: 	w.Glw.SetCursorPosCallback(w.CursorPosEvent)
+153: 	w.Glw.SetCursorEnterCallback(w.CursorEnterEvent)
+154: 	w.Glw.SetDropCallback(w.DropEvent)
+155: 	w.Glw.SetInputMode(glfw.LockKeyMods, glfw.True)
+156: 
+157: 	w.Show()
+158: 	a.RunOnMain(func() {
+159: 		w.updateGeometry()
+160: 		w.ConstrainFrame(false) // constrain full frame on open
+161: 	})
+162: 
+
+system/driver/desktop/window.go
+190: 		isect := sc.Geometry.Intersect(wgeom).Size()
+191: 		ov := isect.X * isect.Y
+192: 		if ov > ovlp || ovlp == 0 {
+193: 			csc = sc
+194: 			ovlp = ov
+195: 		}
+196: 	}
+197: 	return csc
+198: }
+199: 
+200: func (w *Window) Position(screen *system.Screen) image.Point {
+201: 	w.Mu.Lock()
+202: 	defer w.Mu.Unlock()
+203: 	if w.Glw == nil {
+204: 		return w.Pos
+205: 	}
+206: 	var ps image.Point
+207: 	ps.X, ps.Y = w.Glw.GetPos()
+208: 	w.Pos = ps
+209: 	if screen != nil {
+210: 		ps = ps.Sub(screen.Geometry.Min)
+211: 	}
+212: 	return ps
+213: }
+214: 
+215: func (w *Window) SetTitle(title string) {
+216: 	if w.IsClosed() {
+217: 		return
+218: 	}
+219: 	w.Titl = title
+220: 	w.App.RunOnMain(func() {
+221: 		if w.Glw == nil { // by time we got to main, could be diff
+222: 			return
+223: 		}
+224: 		w.Glw.SetTitle(title)
+225: 	})
+226: }
+227: 
+228: func (w *Window) SetIcon(images []image.Image) {
+229: 	if w.IsClosed() {
+230: 		return
+231: 	}
+232: 	w.App.RunOnMain(func() {
+233: 		if w.Glw == nil { // by time we got to main, could be diff
+234: 			return
+235: 		}
+236: 		w.Glw.SetIcon(images)
+237: 	})
+238: }
+239: 
+240: func (w *Window) SetWinSize(sz image.Point) {
+
+text/lines/lines.go
+235: // bytes returns the current text lines as a slice of bytes, up to
+236: // given number of lines if maxLines > 0.
+237: // Adds an additional line feed at the end, per POSIX standards.
+238: func (ls *Lines) bytes(maxLines int) []byte {
+239: 	nl := ls.numLines()
+240: 	if maxLines > 0 {
+241: 		nl = min(nl, maxLines)
+242: 	}
+243: 	nb := 80 * nl
+244: 	b := make([]byte, 0, nb)
+245: 	lastEmpty := false
+246: 	for ln := range nl {
+247: 		ll := []byte(string(ls.lines[ln]))
+248: 		if len(ll) == 0 {
+249: 			lastEmpty = true
+250: 		}
+251: 		b = append(b, ll...)
+252: 		b = append(b, []byte("\n")...)
+253: 	}
+254: 	// https://stackoverflow.com/questions/729692/why-should-text-files-end-with-a-newline
+255: 	if !lastEmpty {
+256: 		b = append(b, []byte("\n")...)
+257: 	}
+258: 	return b
+259: }
+260: 
+261: // strings returns the current text as []string array.
+262: // If addNewLine is true, each string line has a \n appended at end.
+263: func (ls *Lines) strings(addNewLine bool) []string {
+264: 	str := make([]string, ls.numLines())
+265: 	for i, l := range ls.lines {
+266: 		str[i] = string(l)
+267: 		if addNewLine {
+268: 			str[i] += "\n"
+269: 		}
+270: 	}
+271: 	return str
+272: }
+273: 
+274: ////////   Appending Lines
+275: 
+276: // endPos returns the ending position at end of lines
+277: func (ls *Lines) endPos() textpos.Pos {
+278: 	n := ls.numLines()
+279: 	if n == 0 {
+280: 		return textpos.Pos{}
+
+system/driver/desktop/window.go (close path)
+409: func (w *Window) Close() {
+410: 	if w == nil {
+411: 		return
+412: 	}
+413: 	w.Window.Close()
+414: 
+415: 	w.Mu.Lock()
+416: 	defer w.Mu.Unlock()
+417: 
+418: 	w.App.RunOnMain(func() {
+419: 		w.Draw.System.WaitDone()
+420: 		if w.DestroyGPUFunc != nil {
+421: 			w.DestroyGPUFunc()
+422: 		}
+423: 		var surf *gpu.Surface
+424: 		if sf, ok := w.Draw.Renderer().(*gpu.Surface); ok {
+425: 			surf = sf
+426: 		}
+427: 		w.Draw.Release()
+428: 		if surf != nil { // note: release surface after draw
+429: 			surf.Release()
+430: 		}
+431: 		w.Glw.Destroy()
+432: 		w.Glw = nil // marks as closed for all other calls
+433: 		w.Draw = nil
+434: 		w.Compose = nil
+435: 	})

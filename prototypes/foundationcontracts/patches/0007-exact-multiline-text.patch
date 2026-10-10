@@ -1,0 +1,384 @@
+--- a/text/lines/lines.go
++++ b/text/lines/lines.go
+@@ -65,6 +65,9 @@
+ // and thus nothing is exported and all access is through protected accessor functions.
+ // In general, all unexported methods do NOT lock, and all exported methods do.
+ type Lines struct {
++	// exactText preserves the final empty line and emits no synthetic newlines.
++	// Opted into only by NewLinesExact; legacy buffers retain their policy.
++	exactText bool
+ 
+ 	// Settings are the options for how text editing and viewing works.
+ 	Settings Settings
+@@ -214,8 +217,11 @@
+ 
+ // setLineBytes sets the lines from source [][]byte.
+ func (ls *Lines) setLineBytes(lns [][]byte) {
++	if ls.exactText && len(lns) == 0 {
++		lns = [][]byte{nil}
++	}
+ 	n := len(lns)
+-	if n > 1 && len(lns[n-1]) == 0 { // lines have lf at end typically
++	if !ls.exactText && n > 1 && len(lns[n-1]) == 0 { // lines have lf at end typically
+ 		lns = lns[:n-1]
+ 		n--
+ 	}
+@@ -239,6 +245,16 @@
+ 	nl := ls.numLines()
+ 	if maxLines > 0 {
+ 		nl = min(nl, maxLines)
++	}
++	if ls.exactText {
++		var result []byte
++		for ln := range nl {
++			if ln > 0 {
++				result = append(result, '\n')
++			}
++			result = append(result, []byte(string(ls.lines[ln]))...)
++		}
++		return result
+ 	}
+ 	nb := 80 * nl
+ 	b := make([]byte, 0, nb)
+--- a/text/lines/api.go
++++ b/text/lines/api.go
+@@ -26,6 +26,18 @@
+ 	ls := &Lines{}
+ 	ls.Defaults()
+ 	ls.setText([]byte(""))
++	return ls
++}
++
++// NewLinesExact returns an empty buffer for exact valid UTF-8 application text.
++// Unlike NewLines, it preserves a final empty line when text ends in a newline,
++// and Text/String/file output join the current lines without adding newlines.
++// This policy lasts for the buffer lifetime, including subsequent SetText calls,
++// edits and undo/redo. Existing buffers and constructors retain legacy behavior.
++func NewLinesExact() *Lines {
++	ls := &Lines{exactText: true}
++	ls.Defaults()
++	ls.setText(nil)
+ 	return ls
+ }
+ 
+@@ -157,7 +169,7 @@
+ }
+ 
+ // Text returns the current text lines as a slice of bytes,
+-// with an additional line feed at the end, per POSIX standards.
++// with legacy newline normalization, unless constructed with NewLinesExact.
+ // It does NOT call EditDone or send a Change event: that should
+ // happen prior or separately from this call.
+ func (ls *Lines) Text() []byte {
+--- a/text/lines/file.go
++++ b/text/lines/file.go
+@@ -328,6 +328,8 @@
+ 	didDiff := false
+ 	if ls.numLines() < diffRevertLines {
+ 		ob := NewLines()
++		// Match the current buffer policy when importing the comparison file.
++		ob.exactText = ls.exactText
+ 		err := ob.openFileOnly(ls.filename)
+ 		if errors.Log(err) != nil {
+ 			// sc := tb.sceneFromEditor() // todo:
+--- a/text/lines/diff.go
++++ b/text/lines/diff.go
+@@ -186,6 +186,9 @@
+ // patchFrom patches (edits) using content from other,
+ // according to diff operations (e.g., as generated from DiffBufs).
+ func (ls *Lines) patchFrom(ob *Lines, diffs Diffs) bool {
++	if ls.exactText {
++		return ls.patchFromExact(ob, diffs)
++	}
+ 	ls.undos.NewGroup()
+ 	sz := len(diffs)
+ 	mods := false
+@@ -216,3 +219,45 @@
+ 	}
+ 	return mods
+ }
++
++// patchFromExact applies only the supplied line operations to a full line snapshot,
++// then records one grouped replacement. Legacy line-region edits cannot represent
++// deleting/inserting a final empty line. The full replacement trades incremental
++// formatting/selection preservation for exact text; legacy buffers keep their path.
++func (ls *Lines) patchFromExact(ob *Lines, diffs Diffs) bool {
++	if ob == ls {
++		return false
++	}
++	current := ls.strings(false)
++	before := strings.Join(current, "\n")
++	ob.Lock()
++	other := ob.strings(false)
++	ob.Unlock()
++	for i := len(diffs) - 1; i >= 0; i-- {
++		d := diffs[i]
++		var replacement []string
++		switch d.Tag {
++		case 'r', 'i':
++			replacement = other[d.J1:d.J2]
++		case 'd':
++		default:
++			continue
++		}
++		next := make([]string, 0, len(current)-(d.I2-d.I1)+len(replacement))
++		next = append(next, current[:d.I1]...)
++		next = append(next, replacement...)
++		next = append(next, current[d.I2:]...)
++		current = next
++	}
++	after := strings.Join(current, "\n")
++	if before == after {
++		return false
++	}
++	ls.undos.NewGroup()
++	ls.deleteText(textpos.Pos{}, ls.endPos())
++	if after != "" {
++		ls.insertText(textpos.Pos{}, []rune(after))
++	}
++	ls.undos.NewGroup()
++	return true
++}
+--- /dev/null
++++ b/text/lines/exact_contracts_test.go
+@@ -0,0 +1,142 @@
++package lines
++
++import (
++	"cogentcore.org/core/text/difflib"
++	"cogentcore.org/core/text/textpos"
++	"strings"
++	"testing"
++)
++
++func TestContractsExactRoundTrip(t *testing.T) {
++	for _, text := range []string{"", "a", "a\n", "a\n\n", "\n", "\n\n", "a\n\nb", "a\r\nb\r\n", "日本語\n👩‍💻", "العربية\nאבג 123", "é\nनमस्ते\n", "\t \n"} {
++		t.Run(text, func(t *testing.T) {
++			ls := NewLinesExact()
++			defer ls.Close()
++			ls.Autosave = false
++			for range 2 {
++				ls.SetText([]byte(text))
++				if got := string(ls.Text()); got != text {
++					t.Fatalf("Text got %q want %q", got, text)
++				}
++				if got := ls.String(); got != text {
++					t.Fatalf("String got %q", got)
++				}
++				if got := ls.NumLines(); got != strings.Count(text, "\n")+1 {
++					t.Fatalf("lines %d", got)
++				}
++			}
++		})
++	}
++	legacy := NewLines().SetString("one\ntwo")
++	defer legacy.Close()
++	if got := string(legacy.Text()); got != "one\ntwo\n\n" {
++		t.Fatalf("legacy changed: %q", got)
++	}
++}
++func TestContractsExactEditUndoRedo(t *testing.T) {
++	ls := NewLinesExact().SetString("A👩‍💻\n")
++	defer ls.Close()
++	ls.Autosave = false
++	ls.Settings.EmacsUndo = false
++	ls.NewUndoGroup()
++	ls.InsertTextBytes(ls.EndPos(), []byte("日本語\n\n"))
++	edited := "A👩‍💻\n日本語\n\n"
++	if got := ls.String(); got != edited {
++		t.Fatalf("insert %q", got)
++	}
++	if len(ls.Undo()) == 0 || ls.String() != "A👩‍💻\n" {
++		t.Fatalf("undo %q", ls.String())
++	}
++	if len(ls.Redo()) == 0 || ls.String() != edited {
++		t.Fatalf("redo %q", ls.String())
++	}
++	ls.NewUndoGroup()
++	ls.DeleteText(textpos.Pos{Line: 1}, ls.EndPos())
++	if got := ls.String(); got != "A👩‍💻\n" {
++		t.Fatalf("delete %q", got)
++	}
++	if len(ls.Undo()) == 0 || ls.String() != edited {
++		t.Fatalf("delete undo %q", ls.String())
++	}
++	if len(ls.Redo()) == 0 || ls.String() != "A👩‍💻\n" {
++		t.Fatalf("delete redo %q", ls.String())
++	}
++}
++func TestContractsExactLineAPI(t *testing.T) {
++	ls := NewLinesExact()
++	defer ls.Close()
++	ls.Autosave = false
++	ls.SetTextLines([][]byte{[]byte("x"), {}, {}})
++	if ls.String() != "x\n\n" {
++		t.Fatal(ls.String())
++	}
++	ls.SetTextLines(nil)
++	if ls.String() != "" || ls.NumLines() != 1 {
++		t.Fatal(ls.String(), ls.NumLines())
++	}
++}
++
++func TestContractsExactDiffPatch(t *testing.T) {
++	for _, tc := range [][2]string{{"local", "disk\n\n"}, {"x\n", "x"}, {"x", "x\n"}, {"", "a\n"}, {"a\n\n", ""}} {
++		ls := NewLinesExact().SetString(tc[0])
++		ls.Autosave = false
++		ob := NewLines()
++		ob.exactText = ls.exactText
++		ob.bytesToLines([]byte(tc[1]))
++		ls.patchFrom(ob, ls.diffs(ob))
++		if ls.String() != tc[1] {
++			t.Fatalf("diff patch %q -> %q got %q", tc[0], tc[1], ls.String())
++		}
++		ls.Close()
++		ob.Close()
++	}
++}
++
++func TestContractsExactSelectedDiffAndHistory(t *testing.T) {
++	ls := NewLinesExact().SetString("a\nb\n")
++	ls.Autosave = false
++	ls.Settings.EmacsUndo = false
++	ob := NewLinesExact().SetString("A\nB\n")
++	defer ob.Close()
++	defer ls.Close()
++	changed := ls.patchFrom(ob, Diffs{{Tag: 'r', I1: 0, I2: 1, J1: 0, J2: 1}})
++	if !changed || ls.String() != "A\nb\n" {
++		t.Fatalf("selected diff %q", ls.String())
++	}
++	if len(ls.Undo()) == 0 || ls.String() != "a\nb\n" {
++		t.Fatalf("undo %q", ls.String())
++	}
++	if len(ls.Redo()) == 0 || ls.String() != "A\nb\n" {
++		t.Fatalf("redo %q", ls.String())
++	}
++	ls.patchFrom(ob, Diffs{difflib.OpCode{Tag: 'r', I1: 1, I2: 2, J1: 1, J2: 2}})
++	if ls.String() != "A\nB\n" {
++		t.Fatalf("second selected diff %q", ls.String())
++	}
++}
++
++func TestContractsExactDiffMatrix(t *testing.T) {
++	corpus := []string{"", "x", "x\n", "x\n\n", "\n", "\n\n", "a\nb\n", "a\n\nb", "日本語\n👩‍💻", "a\r\nb\r\n"}
++	for _, before := range corpus {
++		for _, after := range corpus {
++			ls := NewLinesExact().SetString(before)
++			ls.Autosave = false
++			ls.Settings.EmacsUndo = false
++			ob := NewLinesExact().SetString(after)
++			changed := ls.patchFrom(ob, ls.diffs(ob))
++			if ls.String() != after {
++				t.Fatalf("diff %q -> %q got %q", before, after, ls.String())
++			}
++			if changed {
++				if len(ls.Undo()) == 0 || ls.String() != before {
++					t.Fatalf("diff undo %q", ls.String())
++				}
++				if len(ls.Redo()) == 0 || ls.String() != after {
++					t.Fatalf("diff redo %q", ls.String())
++				}
++			}
++			ls.Close()
++			ob.Close()
++		}
++	}
++}
+--- /dev/null
++++ b/text/lines/exact_reference_contracts_test.go
+@@ -0,0 +1,58 @@
++package lines
++
++import (
++	"cogentcore.org/core/text/textpos"
++	"math/rand"
++	"testing"
++)
++
++func referencePos(text []rune, offset int) textpos.Pos {
++	p := textpos.Pos{}
++	for _, r := range text[:offset] {
++		if r == '\n' {
++			p.Line++
++			p.Char = 0
++		} else {
++			p.Char++
++		}
++	}
++	return p
++}
++func TestContractsExactEditsAgainstReference(t *testing.T) {
++	rng := rand.New(rand.NewSource(17))
++	inserts := []string{"\n", "\n\n", "abc", "日本語", "👩‍💻", "é", "\r\n", "אבג"}
++	for range 40 {
++		ref := []rune(inserts[rng.Intn(len(inserts))])
++		ls := NewLinesExact().SetString(string(ref))
++		ls.Autosave = false
++		ls.Settings.EmacsUndo = false
++		for range 20 {
++			before := string(ref)
++			ls.NewUndoGroup()
++			if rng.Intn(2) == 0 || len(ref) == 0 {
++				offset := rng.Intn(len(ref) + 1)
++				txt := []rune(inserts[rng.Intn(len(inserts))])
++				ls.InsertTextBytes(referencePos(ref, offset), []byte(string(txt)))
++				next := append([]rune{}, ref[:offset]...)
++				next = append(next, txt...)
++				ref = append(next, ref[offset:]...)
++			} else {
++				a := rng.Intn(len(ref))
++				b := a + 1 + rng.Intn(len(ref)-a)
++				ls.DeleteText(referencePos(ref, a), referencePos(ref, b))
++				ref = append(append([]rune{}, ref[:a]...), ref[b:]...)
++			}
++			after := string(ref)
++			if ls.String() != after {
++				t.Fatalf("edit got %q want %q", ls.String(), after)
++			}
++			if len(ls.Undo()) == 0 || ls.String() != before {
++				t.Fatalf("undo got %q want %q", ls.String(), before)
++			}
++			if len(ls.Redo()) == 0 || ls.String() != after {
++				t.Fatalf("redo got %q want %q", ls.String(), after)
++			}
++		}
++		ls.Close()
++	}
++}
+--- /dev/null
++++ b/text/textcore/exact_contracts_test.go
+@@ -0,0 +1,34 @@
++package textcore
++
++import (
++	"cogentcore.org/core/text/lines"
++	"testing"
++)
++
++func TestContractsExactEditorDeleteUndo(t *testing.T) {
++	ed := NewEditor()
++	original := ed.Lines
++	ls := lines.NewLinesExact().SetString("A\n👩‍💻\n")
++	ls.Autosave = false
++	ls.Settings.EmacsUndo = false
++	ed.SetLines(ls)
++	original.Close()
++	defer ls.Close()
++	ed.CursorPos = ls.EndPos()
++	ls.NewUndoGroup()
++	ed.cursorBackspace(1)
++	if ls.String() != "A\n👩‍💻" {
++		t.Fatalf("newline deletion %q", ls.String())
++	}
++	ls.NewUndoGroup()
++	ed.cursorBackspace(1)
++	if ls.String() != "A\n" {
++		t.Fatalf("grapheme deletion %q", ls.String())
++	}
++	if len(ls.Undo()) == 0 || ls.String() != "A\n👩‍💻" {
++		t.Fatalf("undo %q", ls.String())
++	}
++	if len(ls.Undo()) == 0 || ls.String() != "A\n👩‍💻\n" {
++		t.Fatalf("newline undo %q", ls.String())
++	}
++}
