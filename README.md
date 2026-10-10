@@ -77,3 +77,13 @@ Providers without revisions explicitly reset projections after edits. Source
 growth preserves the viewport offset, clamping only when necessary.
 
 Tree expansion rebuilds a lightweight O(N) visible-node index; scrolling materializes O(viewport) records. Worker projections carry source revision metadata and require an owner-captured table token when installed. Background sources must be immutable snapshots. The Cancel command also cancels sorting.
+
+`canvas.Scene` owns explicit rectangle objects, viewport transforms and picking.
+The Cogent `GPUCanvas` adapter uses its public `xyzcore.Scene` direct renderer
+on the shared WebGPU device, with one reusable mesh and retained instances.
+Wheel zoom anchors the pointer; dragging pans; clicking selects a component in
+the inspector; Fit/Zoom commands share the command registry. Native scene
+destruction releases GPU resources. The current canvas is a bounded rectangle
+renderer, with a 10,000-object limit; arbitrary shaders, image tiles, spatial
+indexes/LOD and device-loss recovery remain future work. Runtime verification
+covers macOS; the integration is not a production performance certification.

@@ -159,6 +159,10 @@ func sameShape(r *record, n ui.Node) bool {
 		if reflect.TypeOf(r.node.Custom) != reflect.TypeOf(n.Custom) {
 			return false
 		}
+		a, b := reflect.ValueOf(r.node.Custom), reflect.ValueOf(n.Custom)
+		if a.IsValid() && a.Kind() == reflect.Pointer && a.Pointer() != b.Pointer() {
+			return false
+		}
 	}
 	for i, c := range n.Children {
 		if !sameShape(r.children[i], c) {

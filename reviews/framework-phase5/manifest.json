@@ -1,0 +1,27 @@
+{
+  "phase": 5,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "coverage": "complete; final zero medium/high findings",
+  "checks": [
+    "root and native race tests",
+    "vet and native executable build",
+    "pointer anchoring, picking, invalid-navigation atomicity",
+    "native pointer handler and inherited 3D selection suppression",
+    "allocated viewport sizing and WebGPU depth range at zoom .01..100",
+    "live shared-device GPU snapshot: selected component pixel RGBA 255,190,69,255",
+    "live keyboard selection reflected in inspector and board"
+  ],
+  "fixed": [
+    "objects clipped by orthographic depth mapping",
+    "pre-layout viewport size",
+    "inherited 3D pointer behavior",
+    "rotation retains object center",
+    "fixed-delay smoke replaced by frame-ready probe with bounded timeout"
+  ],
+  "limitations": [
+    "Live pointer automation unverified: coordinates mapped to a different window region; adjusted attempt rejected by computer-use with windowNotFoundAtPosition. Native pointer handler regression passes.",
+    "one native window; macOS runtime tested",
+    "rectangle renderer, 10000-object bound; spatial indexes/LOD and device-loss handling deferred"
+  ]
+}
