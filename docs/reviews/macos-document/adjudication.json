@@ -1,0 +1,67 @@
+{
+  "review": "Prism using Anthropic Claude Sonnet 5.5, followed by primary and independent internal source adjudication",
+  "raw_prism_exit": 1,
+  "raw_prism_findings": 4,
+  "confirmed_defects": 0,
+  "resolution": "Three findings refuted from actual source; one intentional strict-sync filesystem/platform limitation retained. No source changes after Prism, so no unchanged repeat review.",
+  "findings": [
+    {
+      "id": "8497d8d184bcfd5c",
+      "disposition": "refuted",
+      "reason": "Application.Open installs a nonnil lifetime before registration and forbids ID reuse. CloseWindow cancels the lifetime but never deletes it; only windows and dirty state are removed. CheckCloseWindow rechecks under app.mu, returning ErrWindowClosed/ErrClosed after concurrent closure.",
+      "evidence": [
+        "app/app.go:81",
+        "app/app.go:86",
+        "app/app.go:155",
+        "app/app.go:183",
+        "app/app.go:185"
+      ]
+    },
+    {
+      "id": "f1e2aa9ae88617f4",
+      "disposition": "documented_limit",
+      "reason": "Strict post-rename directory synchronization is an intentional contract. Failure returns Written=true and Err, withholding save acknowledgment/automatic close. Local Mac checks qualify the tested temporary volume, not other mounted/network/removable filesystems. Windows/Linux runtime behavior is deferred. Blanket EINVAL/ENOTSUP/EPERM suppression would change durability semantics and may hide genuine failures; any best-effort policy requires explicit semantics and target tests.",
+      "evidence": [
+        "document/file.go:146",
+        "document/file_test.go:32",
+        "document/session_test.go:232",
+        "specs/document.md:48",
+        "specs/macos-completion.md:3",
+        "docs/reports/macos-document/native-million.txt"
+      ]
+    },
+    {
+      "id": "04b0d8e3fdeb4617",
+      "disposition": "refuted",
+      "reason": "Application.Do is synchronous: it locks the serialized owner and invokes fn directly in the calling test goroutine. It does not schedule work on another goroutine. These headless tests never start a native run loop; Fatal/Goexit executes the deferred owner unlock.",
+      "evidence": [
+        "app/app.go:224",
+        "app/app.go:226",
+        "app/app.go:242",
+        "drivers/cogent/cmd/workbench/document_workflow_test.go:67"
+      ]
+    },
+    {
+      "id": "908726a25974e3a3",
+      "disposition": "refuted",
+      "reason": "Every live model/session/journal/workflow/registry access in runDocumentSmoke occurs inside documentOwner/documentWait, whose callbacks execute under Do. captureDocument clones all slices; worker comparisons and final decoding use detached private snapshots. The failure injection flag is atomic. Native WindowByName and CloseReq use the synchronized backend path. The final million-component fixture passed with race detection.",
+      "evidence": [
+        "drivers/cogent/cmd/workbench/document_smoke.go:33",
+        "drivers/cogent/cmd/workbench/document_smoke.go:41",
+        "drivers/cogent/cmd/workbench/document_smoke.go:91",
+        "drivers/cogent/cmd/workbench/document_smoke.go:115",
+        "drivers/cogent/cmd/workbench/document_smoke.go:143",
+        "drivers/cogent/cmd/workbench/document.go:47",
+        "docs/reports/macos-document/native-million.txt"
+      ]
+    }
+  ],
+  "reviewed_file_sha256": {
+    "app/app.go": "37912a38f3d57a0959526c48544588437da4ba0e379cce67a75ab062dad7b452",
+    "document/file.go": "274529e88b145fae125197097d25e670a707e65691870d081609357ba6a4105c",
+    "document/session.go": "2878d08fa4688556e9b997346124983a764f574d8e9c4776de7dadff2cf36970",
+    "drivers/cogent/cmd/workbench/document_workflow_test.go": "57fbafedda61a86059d6a4b96931ffbedc4a2a44a8c2664233e44271ebffc372",
+    "drivers/cogent/cmd/workbench/document_smoke.go": "377ad9607a653769b6581d874c3a50f0524d50e77fbd66a6032684613b23cf1c",
+    "specs/document.md": "087c7cdbbb9ebfd4fb377e11bb223277c4eefda533bfdff893302f5ebb98450a"
+  }
+}

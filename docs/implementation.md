@@ -83,8 +83,10 @@ for the complete remaining scope.
 Document history is implemented with bounded sparse changes, undo/redo, save
 revision validation, dirty status and focused native keyboard precedence. The
 workbench records component edits and updates source revisions on replay. See
-[document history](../specs/history.md); document persistence and unsaved-close
-workflows remain open. Native command phases also run in focus-free windows;
+[document history](../specs/history.md) and [document persistence](../specs/document.md).
+The portable session now saves/loads on a worker and guards unsaved native closes;
+the workbench persists component data, geometry and ordered file references.
+Actual file-panel selection remains an acceptance gate. Native command phases also run in focus-free windows;
 startup shutdown and late native creation use stable stop/admission handling.
 See [local evidence](reports/macos-history/README.md).
 

@@ -26,15 +26,15 @@ semantics. See [contract](native-dispatch.md) and its evidence; broad panic reso
 recovery remains outside that contract.
 
 Document history adds bounded sparse undo/redo, revision-aware dirty/save handling
-and focused native text precedence. Its evidence is separate from document file
-persistence; the workbench does not yet save a component document.
+and focused native text precedence. [Document persistence](document.md) adds asynchronous save/open and native
+unsaved-close prompts with a working component-document consumer. Its bounded
+acceptance evidence remains separate from actual file-panel selection.
 
 External file-drop callbacks and Mac file-URL routing are implemented; physical
 Finder workflow acceptance remains separate. See [contract](file-drop.md).
 
 Remaining framework work includes richer reusable
-custom drawing (beyond bounded rectangle scenes), document persistence and close
-handling for unsaved changes, and supported integration of the multiline editor
+custom drawing (beyond bounded rectangle scenes) and supported integration of the multiline editor
 beyond historical prototypes. Semantic command/UI inspection exists through APIs
 and native accessibility; application automation transport and deterministic UI
 replay need an explicit public contract and working consumer evidence.

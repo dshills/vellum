@@ -1,0 +1,6 @@
+PASS native CloseReq refusal, modal Cancel and intact workbench
+PASS asynchronous 1000000-component save/load with exact geometry and ordered references
+PASS failed Save keeps unsaved native window open
+PASS native Save confirmation closes only after successful current-revision acknowledgment
+workbench actions=0 status=save complete: /var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum-document-native-2808789326/fixture.vellum rows=1000000 pooled=20 tree_nodes=1002 selected=component:1
+canvas objects=96 zoom=0.7018 selected=component:1

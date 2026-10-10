@@ -203,6 +203,14 @@ func (j *Journal) Clear() error {
 // Reset releases all captures and represents a replaced document. saved says
 // whether that new model is already persisted. It does not modify model data.
 func (j *Journal) Reset(saved bool) error {
+	return j.Replace(saved, func() error { return nil })
+}
+
+// Replace installs a complete replacement model, then releases history and
+// advances revision identity. The install callback must be atomic on error and
+// must not reenter the journal. Failed admission or installation preserves both
+// history stacks. Like Reset, Replace can recover an invalid journal explicitly.
+func (j *Journal) Replace(saved bool, install func() error) error {
 	if j.busy {
 		return ErrBusy
 	}
@@ -211,6 +219,12 @@ func (j *Journal) Reset(saved bool) error {
 	}
 	if j.next == math.MaxUint64 {
 		return ErrRevisionExhausted
+	}
+	if install == nil {
+		return fmt.Errorf("history: replacement callback required")
+	}
+	if err := j.invoke(install); err != nil {
+		return err
 	}
 	j.next++
 	j.current = j.next

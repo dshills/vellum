@@ -269,6 +269,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if d.Commands != nil {
 				bindCommandShortcuts(w.body.Scene, a, spec.ID, d.Commands, d.OnError)
 			}
+			bindCloseRequest(w, a, d.OnError)
 			w.body.OnClose(func(events.Event) {
 				w.closing.Store(true)
 				// CloseWindow changes registration and wakes topology reconciliation;

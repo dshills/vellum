@@ -4,8 +4,8 @@ package app
 import (
 	"context"
 	"errors"
-	"github.com/dshills/vellum/ui"
 	"fmt"
+	"github.com/dshills/vellum/ui"
 	"math"
 	"strings"
 	"sync"
@@ -16,6 +16,8 @@ var (
 	ErrClosed       = errors.New("vellum: application closed")
 	ErrQueueFull    = errors.New("vellum: UI queue full")
 	ErrWindowClosed = errors.New("vellum: window closed")
+	ErrCloseRefused = errors.New("vellum: window close refused")
+	ErrClosePending = errors.New("vellum: window close callback is already executing")
 )
 
 type Config struct{ QueueCapacity int }
@@ -23,6 +25,10 @@ type Window struct {
 	ID, Title     string
 	Width, Height float32
 	View          func() ui.Node
+	// CloseRequest runs on the UI owner for user/native close requests. Return
+	// false to keep the window open while showing an asynchronous confirmation.
+	// Once confirmed, CloseWindow can force teardown. Never block or nest Do.
+	CloseRequest func() bool
 }
 
 // Driver.Run must execute on the native main thread. It installs a wakeup,
@@ -41,6 +47,7 @@ type Application struct {
 	windows         []Window
 	lifetimes       map[string]context.Context
 	windowCancels   map[string]context.CancelFunc
+	closeRequests   map[string]bool
 	services        Services
 	dirty           map[string]bool
 	wake            func()
@@ -55,7 +62,7 @@ func New(c Config) (*Application, error) {
 		return nil, fmt.Errorf("vellum: queue capacity must be positive")
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, changed: make(chan struct{})}, nil
+	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, closeRequests: map[string]bool{}, changed: make(chan struct{})}, nil
 }
 func (a *Application) Context() context.Context { return a.ctx }
 
@@ -97,6 +104,61 @@ func (a *Application) WindowContext(id string) (context.Context, error) {
 		return nil, fmt.Errorf("vellum: unknown window %q", id)
 	}
 	return ctx, nil
+}
+
+// RequestCloseWindow invokes the window's close policy and closes on acceptance.
+// Call only on the UI owner (Do/Drain/widget callbacks), never inside nested Do.
+// Refusal preserves registration and lifetime; CloseWindow and Close explicitly
+// force cancellation/teardown without prompting. Recursive requests refuse.
+func (a *Application) RequestCloseWindow(id string) error {
+	if err := a.CheckCloseWindow(id); err != nil {
+		return err
+	}
+	return a.CloseWindow(id)
+}
+
+// CheckCloseWindow runs the same owner-held policy without committing teardown.
+// Drivers use it before native close events; registration changes only when native
+// close is accepted. As with RequestCloseWindow, recursive policy calls refuse.
+func (a *Application) CheckCloseWindow(id string) error {
+	a.mu.Lock()
+	if a.closed {
+		a.mu.Unlock()
+		return ErrClosed
+	}
+	var callback func() bool
+	found := false
+	for _, window := range a.windows {
+		if window.ID == id {
+			callback = window.CloseRequest
+			found = true
+			break
+		}
+	}
+	if !found {
+		a.mu.Unlock()
+		return fmt.Errorf("vellum: unknown window %q", id)
+	}
+	if a.closeRequests[id] {
+		a.mu.Unlock()
+		return ErrClosePending
+	}
+	a.closeRequests[id] = true
+	a.mu.Unlock()
+	defer func() { a.mu.Lock(); delete(a.closeRequests, id); a.mu.Unlock() }()
+	accepted := callback == nil || callback()
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.closed {
+		return ErrClosed
+	}
+	if a.lifetimes[id].Err() != nil {
+		return ErrWindowClosed
+	}
+	if !accepted {
+		return ErrCloseRefused
+	}
+	return nil
 }
 
 // CloseWindow removes a registered window and requests native teardown. Closing

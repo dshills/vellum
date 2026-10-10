@@ -1,0 +1,116 @@
+{
+  "parent_commit": "e5a362f63e7a57cf7f61a28b67f62623ec669b2a",
+  "captured_utc": "2026-10-10T22:59:41.281023+00:00",
+  "host": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "go": "go version go1.27.2 darwin/arm64",
+  "changed_source_and_spec_sha256": {
+    "README.md": "220739b33f15f671b48deb5bb8e54a465366efa61228cc3083d4bc98f94486c6",
+    "app/app.go": "37912a38f3d57a0959526c48544588437da4ba0e379cce67a75ab062dad7b452",
+    "app/app_test.go": "81bbb95c6e740f5d35bb91a557441a90e8407e885a9079a231d0ee720d6735dc",
+    "docs/implementation.md": "1ba5452d81054a3ccf7bf962c11425131225d0422f2ee0e78e63b363d5f58b8f",
+    "docs/reports/README.md": "01355fa0aec956a2f924921c38446328886cac7c3fc7083469d501fe10676df6",
+    "docs/reports/macos-document/README.md": "2ab00cb0c65aa3a37beae24f08af0198ef0511d7456d7d5ca1e7162ae341ad24",
+    "docs/tutorials/building-an-app.md": "4e927c7c5e8066191996ee91c7d4d8ac5de01dbf891283f91b695cd7f3b71cbd",
+    "document/file.go": "274529e88b145fae125197097d25e670a707e65691870d081609357ba6a4105c",
+    "document/file_test.go": "914df037110f966a8917184359a527e7c22038c848a76203463e059c61852edf",
+    "document/file_unix_test.go": "3c58e139acc450680eeda7cb78659a3896d6d113f2462d205926ffcea6806037",
+    "document/read_other.go": "c84a5aca51333b41301174788f899046915dc1c168d96fa077710b0a33340ae8",
+    "document/read_unix.go": "74ffff1389476952c0acc320bb5c1d425db25c9dd35c687317b5dde70c1e2ccf",
+    "document/session.go": "2878d08fa4688556e9b997346124983a764f574d8e9c4776de7dadff2cf36970",
+    "document/session_test.go": "a780d795a42de3d385974703804a31ceecb9277510860c3606af6c5d47cf9cfb",
+    "drivers/cogent/close_request.go": "2e24c44b40d656e3f37400b578df31c52696001ec6540d55f1c595657df6e3af",
+    "drivers/cogent/close_request_test.go": "d185869378f706620989cad992785f39c89202a829d7e4141a276e42d67d7375",
+    "drivers/cogent/cmd/workbench/document.go": "b2e276fca89fd6cd680389545ca2f2dceb7c6ac86d5f62d8d73df2b78cf75e81",
+    "drivers/cogent/cmd/workbench/document_smoke.go": "377ad9607a653769b6581d874c3a50f0524d50e77fbd66a6032684613b23cf1c",
+    "drivers/cogent/cmd/workbench/document_test.go": "7ac4eefffccc53fd41e0d1ec5e50b048ad66574bfc50f9b9afce3edf35ef2b44",
+    "drivers/cogent/cmd/workbench/document_workflow.go": "a586c5a582bdb48b0618db931ba550b5f1e1a80dec5ae3de482055d8a7062f91",
+    "drivers/cogent/cmd/workbench/document_workflow_test.go": "57fbafedda61a86059d6a4b96931ffbedc4a2a44a8c2664233e44271ebffc372",
+    "drivers/cogent/cmd/workbench/main.go": "fa9c0f510676a4d55ee9a9c201a589d43e14c9b1087eb585437da72332fbc9db",
+    "drivers/cogent/driver.go": "a2f15c0a4ee0851e9850daf410cc7b8f5ce8c8829c2e06ee7e26049158080870",
+    "examples/sdk-contract/contract_test.go": "9c4258d2beaadf1031bc29cc231b4acc3dea677ea6ffe50e377afc42d2ba1ca2",
+    "history/history.go": "474e6093dc1d0d1c3a588a3942d01ded1b7ccec5b938bf99f6220fbd9a7a3220",
+    "history/history_test.go": "ef992abe0733fb209423025fe4f006926f69eec63e1b50b3c0ef1552e30a9ce2",
+    "scripts/release-sdk.py": "e1bb50d799302351491b43308b07be504e7334da558a95fce1df3cb28f34861b",
+    "scripts/release-sdk_test.py": "3ffa9dfc6153e734a1ffeeb9eb6519f3d4e428bfde65e1a532131ca03f5cc48e",
+    "specs/README.md": "ea9c8b6f7fefb2afba37b5e733c44e23bcda55777b678e54f450439f941a60ea",
+    "specs/document.md": "087c7cdbbb9ebfd4fb377e11bb223277c4eefda533bfdff893302f5ebb98450a",
+    "specs/framework.md": "139bcc37ca374182a6c6d03cd9f4b7ae7eba9fa40862f33cab60a174cba886ff",
+    "specs/history.md": "69b53d7d15173ec44a380ddd81b4e050df5fba39640c49341eea18098296ab02",
+    "specs/macos-completion.md": "ae1cce12df514f686e5327b9b383942062db6b35be856cb881eb2cda0908b0b6",
+    "specs/sdk.md": "f0e7f23b10a79f2929211694ff445ee34416ce8a957d08339669c4de09f45ea1",
+    "specs/windows-services.md": "bda351e1f4bfd75d58dbd0ed8ab7bfef31c7e781b8f8c2c0a19d4bf5970ee082"
+  },
+  "prepared_backend_sha256": {
+    "core/scene.go": "9aa94b384b1e62e31d0fb169869b54bc61ecfedf08dc08e4e960e296344509e9",
+    "core/widgetevents.go": "d30fa366270a507e21d74edc94c0c52171ee79d3cd5753a16eb86a821011b87b",
+    "events/listeners.go": "a7c9938341ed7ba8e250b4267a44ae84f9afdb367dd6c9173cec87fd11a1f845",
+    "system/driver/desktop/window.go": "de45a58d893cd51482cdf372ead259ff4cbecd479de0e2dbbc66496cdad21f8c"
+  },
+  "dependency_manifest_sha256": "b7a01a5de9debb637022333b7d3252895620a8e016fa4050254daf98be89c034",
+  "executables_sha256": {
+    "/private/tmp/vellum-document-workbench": "7f0575c27b6828425303aef6c2b56f5222f2293975e286b020b36362a423ef25",
+    "drivers/cogent/build/vellum-workbench": "5d67759dd5beb725afe4c4b78865196cb8626dcfe45f04d30a7f6b5acec6d952"
+  },
+  "checks": [
+    {
+      "cwd": ".",
+      "command": "VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh; go clean -testcache; ./scripts/check.sh",
+      "exit": 0,
+      "log": "full-check.txt",
+      "scope": "Final source, uncached full portable/native race/vet, backend regressions, SDK/starter consumers."
+    },
+    {
+      "cwd": ".",
+      "command": "go test -race ./app ./history ./document -count=20",
+      "exit": 0,
+      "log": "root-race-repeat.txt"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go test -race . ./cmd/workbench -run 'TestNative.*Close|TestDocument|TestWorkflow|TestSaveDecision' -count=5",
+      "exit": 0,
+      "log": "native-race-repeat.txt"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go build -race -o /private/tmp/vellum-document-workbench ./cmd/workbench",
+      "exit": 0,
+      "log": "native-build.txt"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "/private/tmp/vellum-document-workbench -rows=1000000 -tree-rows=1000 -document-smoke",
+      "exit": 0,
+      "log": "native-million.txt",
+      "scope": "Actual native CloseReq and Cocoa accessibility actions; deterministic chooser, temporary file IO. Fixture-only post-close verification wait enlarged after a preliminary million-row attempt exceeded its former two-second wait."
+    },
+    {
+      "cwd": ".",
+      "command": "/private/tmp/vellum-document-workbench -rows=100000 -tree-rows=1000 -smoke -exit-after=4s",
+      "exit": 0,
+      "log": "gpu-regression.txt"
+    },
+    {
+      "cwd": ".",
+      "command": "python3 scripts/release-sdk_test.py",
+      "exit": 0,
+      "log": "relocated-sdk.txt",
+      "scope": "26 tests; real document/app/ui/history archived, relocated and consumed after deleting fixture source."
+    }
+  ],
+  "logs_sha256": {
+    "full-check.txt": "cd9c8db9799b2a0d5ef1cd04dbfeca04bbc4961660da3b23124a8a3fe83b7a99",
+    "root-race-repeat.txt": "9a5f3f8cd9ecaf115b243261dfa18de23ec73de1c24ea3fbbfbf75202bcaf77f",
+    "native-race-repeat.txt": "64fcb13eade89f6c2d03c84b231bbcbcdb6386b00196a9583703cc670414ac64",
+    "native-build.txt": "5e6c50b7e8c7a5fe2644ca4c4783227c747ebf2399245250c6dadf3925a1aca3",
+    "native-million.txt": "9ad21cfeecf6e979e6a963d9c713069177cf10815b68d79180a00cbe1ba2c21b",
+    "gpu-regression.txt": "13629d86c0c5ca209ac36376ec36223dfe993a4e93ea336dab5bc22efde3824c",
+    "relocated-sdk.txt": "54326360f315e5d3787d78ee0e5eff51a9e89e139fa9d5fe7d33a1ea47bbe060"
+  },
+  "qualification_limits": [
+    "Actual OS chooser selection and external human accessibility remain unqualified.",
+    "No external-edit detection or power-loss guarantee.",
+    "No Windows/Linux runtime claim.",
+    "No OS preference changes; native fixture windows closed."
+  ]
+}

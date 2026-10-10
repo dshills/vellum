@@ -52,21 +52,27 @@ class ReleaseChecks(unittest.TestCase):
             self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
             self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
 
-    def test_exported_history_is_consumable_without_the_source_checkout(self):
+    def test_exported_history_and_document_are_consumable_without_the_source_checkout(self):
         with tempfile.TemporaryDirectory(prefix="vellum history SDK ") as temporary:
             base = Path(temporary)
             root = base / "source"
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
-            (root / "history").mkdir()
-            (root / "history/history.go").write_bytes((release.ROOT / "history/history.go").read_bytes())
+            public_files = []
+            for package in ("history", "document", "app", "ui"):
+                (root / package).mkdir()
+                for source in (release.ROOT / package).glob("*.go"):
+                    if not source.name.endswith("_test.go"):
+                        name = package + "/" + source.name
+                        (root / name).write_bytes(source.read_bytes())
+                        public_files.append(name)
             (root / "release").mkdir()
             (root / "release/version.json").write_text('{"version":"v0.1.0-alpha.1"}')
             for name in ("upstream", "typesetting"):
                 dependency = root / "drivers/cogent/build" / name
                 dependency.mkdir(parents=True)
                 (dependency / "go.mod").write_text("module example.com/nativefixture\n")
-            tracked = b"go.mod\0history/history.go\0release/version.json\0"
+            tracked = ("\0".join(["go.mod", "release/version.json", *public_files]) + "\0").encode()
             archive_path = base / "sdk.tar.gz"
             with mock.patch.object(release, "git_output", return_value=tracked), mock.patch.object(release, "license_inventory", return_value=({"modules": []}, {})), mock.patch.object(release, "source_state", return_value={"clean": True, "commit": "fixture"}):
                 release.package(root, archive_path)
@@ -80,8 +86,17 @@ class ReleaseChecks(unittest.TestCase):
             (consumer / "main_test.go").write_text('''package consumer
 import (
     "testing"
+    "context"
+    "path/filepath"
+    "github.com/dshills/vellum/document"
     "github.com/dshills/vellum/history"
 )
+func TestExportedPersistence(t *testing.T) {
+    store := document.FileStore{}
+    path := filepath.Join(t.TempDir(), "doc")
+    if written, err := store.Write(context.Background(), path, []byte("SDK roundtrip"), 64); err != nil || !written { t.Fatal(written, err) }
+    if data, err := store.Read(context.Background(), path, 64); err != nil || string(data) != "SDK roundtrip" { t.Fatal(string(data), err) }
+}
 func TestExportedHistory(t *testing.T) {
     j, err := history.New(2)
     if err != nil { t.Fatal(err) }

@@ -184,3 +184,21 @@ distributing another build.
 Pass `--sign-identity` only after choosing a signing configuration. Windows/Linux
 archive layouts also exist; their dynamic runtime closure and actual target
 execution require separate acceptance.
+
+## Saving documents
+
+Register your window before calling `document.New`. Provide a `history.Journal`
+and typed `document.Codec[T]`: Capture clones the owner model, Encode/Decode run
+on a worker, and Install replaces the validated model atomically on the owner.
+Start Save/Open inside Do or a widget callback; OnComplete also runs on the owner.
+An untitled save and Open use the native file chooser on the operation worker;
+SaveOptions{Choose:true} always chooses another path. Add the extension without a
+leading dot, for example `Extensions: []string{"vellum"}`.
+
+Use Window.CloseRequest to show an asynchronous Save/Discard/Cancel dialog and
+return false while changes are unsaved. After Save completes, close only if
+Result.Err == nil and the journal is clean. `Written` alone is insufficient.
+RequestCloseWindow applies the policy; CloseWindow and Close force teardown.
+Use Cancel to cancel IO while keeping the window alive. Window closure cancels
+pending work and suppresses late commits. See the [document contract](../../specs/document.md)
+and [workbench consumer](../../drivers/cogent/cmd/workbench/document_workflow.go).

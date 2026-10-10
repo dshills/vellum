@@ -70,3 +70,7 @@ error, or sampling fails. Measurements provide host-specific baselines without
 invented pass thresholds. Cold OS/font caches, other desktop processes, GPU/power
 state and hardware affect results; comparisons should record matching conditions.
 Windows/Linux runtime performance and accessibility/input correctness remain gates.
+
+The public `document` package ships in private SDK archives alongside app/ui/history.
+A relocated archive consumer exercises bounded file persistence after deleting
+the fixture source checkout. Session/close policies follow [document.md](document.md).

@@ -30,6 +30,10 @@ The bounded [history contract](history.md) supplies sparse application-owned
 Undo/Redo and revision-aware dirty/save state. Native command shortcut scopes
 preserve focused text editing before document fallback. The workbench's component
 changes use the shared journal and invalidate stale worker results on replay.
+The portable [document session](document.md) captures detached snapshots, performs
+file IO/decode on a worker and commits only a matching revision on the owner.
+Window.CloseRequest permits asynchronous unsaved-change prompts; confirmed
+CloseWindow forces teardown. The workbench persists its component document.
 
 ## Workbench layouts
 

@@ -8,6 +8,7 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/document"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/tasks"
@@ -17,6 +18,7 @@ import (
 	"image/color"
 	"math"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -29,7 +31,11 @@ func main() {
 	rowCount := flag.Int("rows", 1000000, "actual component records")
 	layoutPath := flag.String("layout", "", "layout file for explicit Save/Restore commands")
 	smoke := flag.Bool("smoke", false, "exercise registered actions and worker completion")
+	documentSmoke := flag.Bool("document-smoke", false, "exercise native unsaved-close and temporary document save/open")
 	flag.Parse()
+	if *documentSmoke && (*smoke || *exit > 0) {
+		must(errors.New("document-smoke requires its own native process without smoke/exit-after"))
+	}
 	a, err := app.New(app.Config{})
 	must(err)
 	defer a.Close()
@@ -110,7 +116,13 @@ func main() {
 		}
 		return nil
 	}}))
-	must(registry.Register(command.Command{ID: "app.close", Label: "Close", Shortcut: "Meta+Shift+X", Execute: func(context.Context) error { a.Close(); return nil }}))
+	must(registry.Register(command.Command{ID: "app.close", Label: "Close", Shortcut: "Meta+Shift+X", Execute: func(context.Context) error {
+		err := a.RequestCloseWindow("main")
+		if errors.Is(err, app.ErrCloseRefused) {
+			return nil
+		}
+		return err
+	}}))
 	must(registry.Register(command.Command{ID: "layout.move-inspector", Label: "Dock inspector", Execute: func(context.Context) error { return workspace.Move("inspector", "documents", 0) }}))
 	must(registry.Register(command.Command{ID: "layout.split-inspector", Label: "Split inspector", Execute: func(context.Context) error {
 		return workspace.Split("inspector", "documents", "inspector-split", workbench.Vertical, false)
@@ -130,18 +142,8 @@ func main() {
 	}, Execute: func(context.Context) error { return workspace.Load(*layoutPath) }}))
 	table, err = virtual.NewTable(parts, 20)
 	must(err)
-	treeNodes := []virtual.TreeNode{{ID: "project", Label: fmt.Sprintf("Outline · %d of %d components", *treeCount, parts.Len())}}
-	for group := 0; group < (*treeCount+999)/1000; group++ {
-		id := fmt.Sprintf("group:%d", group)
-		treeNodes = append(treeNodes, virtual.TreeNode{ID: id, Parent: "project", Label: fmt.Sprintf("Group %d", group+1)})
-		for j := 0; j < 1000 && group*1000+j < *treeCount; j++ {
-			index := group*1000 + j
-			treeNodes = append(treeNodes, virtual.TreeNode{ID: "component:" + strconv.Itoa(index+1), Parent: id, Label: fmt.Sprintf("R%07d", index+1)})
-		}
-	}
-	treeModel, err := virtual.NewTree(treeNodes)
+	treeModel, err := buildOutline(*treeCount, parts.Len())
 	must(err)
-	must(treeModel.Toggle("project"))
 	selectID = func(id string) {
 		if !strings.HasPrefix(id, "component:") {
 			return
@@ -314,8 +316,10 @@ func main() {
 			return ui.Node{ID: id + ".root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: id + ".title", Kind: ui.Label, Text: text}, {ID: id + ".detail", Kind: ui.Label, Text: "Panel content · Vellum keyed UI"}}}
 		}})
 	}
-	bar := &cogent.CommandBar{Owner: a, Registry: registry, Toolbar: []string{"edit.undo", "edit.redo", "project.increment", "analysis.calculate", "analysis.cancel"}, OnError: func(err error) { status = err.Error() }}
-	must(a.Open(app.Window{ID: "main", Title: "Vellum Workbench", Width: 1280, Height: 900, View: func() ui.Node {
+	var persistence *document.Session[documentImage]
+	workflow := &documentWorkflow{owner: a, window: "main", status: func(text string) { status = text }}
+	bar := &cogent.CommandBar{Owner: a, Registry: registry, Toolbar: []string{"file.open", "file.save", "file.save-as", "edit.undo", "edit.redo", "project.increment", "analysis.calculate", "analysis.cancel"}, OnError: func(err error) { status = err.Error() }}
+	must(a.Open(app.Window{ID: "main", Title: "Vellum Workbench", Width: 1280, Height: 900, CloseRequest: workflow.requestClose, View: func() ui.Node {
 		progress := ""
 		if task != nil {
 			s := task.Snapshot()
@@ -327,8 +331,73 @@ func main() {
 			progress += " · Unsaved changes"
 		}
 		fileStatus := references.summary()
-		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "title", Kind: ui.Label, Text: "Vellum · Go native workbench"}, {ID: "commands", Kind: ui.Extension, Custom: bar}, {ID: "workbench", Kind: ui.Extension, Grow: true, MinHeight: 500, Custom: dock}, {ID: "files", Kind: ui.Label, Text: fileStatus}, {ID: "status", Kind: ui.Label, Text: status + progress}}}
+		if persistence != nil {
+			ds := persistence.State()
+			if ds.Busy {
+				progress += " · " + string(ds.Action) + " pending"
+			}
+			if ds.Path != "" {
+				fileStatus = ds.Path + " · " + fileStatus
+			}
+		}
+		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "title", Kind: ui.Label, Text: "Vellum · Go native workbench"}, {ID: "commands", Kind: ui.Extension, Custom: bar}, {ID: "workbench", Kind: ui.Extension, Grow: true, MinHeight: 500, Custom: dock}, {ID: "files", Kind: ui.Label, Text: fileStatus}, {ID: "status", Kind: ui.Label, Text: status + progress}, workflow.view()}}
 	}}))
+
+	var documentStore document.Store
+	var documentChoose func(context.Context, app.FileOptions) (string, error)
+	var smokeDocumentPath string
+	var smokeStore *documentSmokeStore
+	var documentOutcome chan error
+	if *documentSmoke {
+		dir, err := os.MkdirTemp("", "vellum-document-native-*")
+		must(err)
+		defer os.RemoveAll(dir)
+		smokeDocumentPath = filepath.Join(dir, "fixture.vellum")
+		smokeStore = &documentSmokeStore{}
+		documentStore = smokeStore
+		documentChoose = func(context.Context, app.FileOptions) (string, error) { return smokeDocumentPath, nil }
+		documentOutcome = make(chan error, 1)
+	}
+	persistence, err = document.New(document.Config[documentImage]{Store: documentStore, Choose: documentChoose, Owner: a, Window: "main", Journal: journal, Filename: "Untitled.vellum", Extensions: []string{"vellum"}, Codec: document.Codec[documentImage]{
+		Capture: func() (documentImage, error) { return captureDocument(parts, board, references), nil },
+		Encode:  encodeDocument,
+		Decode:  func(data []byte) (documentImage, error) { return decodeDocument(data, *treeCount) },
+		Install: func(image documentImage) error {
+			if err := installDocument(parts, table, board, references, image); err != nil {
+				return err
+			}
+			treeModel = image.outline
+			treeView.Model = treeModel
+			selectedIndex = min(selectedIndex, parts.Len()-1)
+			selectID(parts.Row(selectedIndex).ID)
+			return nil
+		},
+	}, OnComplete: workflow.complete})
+	must(err)
+	workflow.session = persistence
+	fileAvailable := func() error {
+		if persistence.State().Busy {
+			return document.ErrBusy
+		}
+		if workflow.pending != "" {
+			return app.ErrClosePending
+		}
+		return nil
+	}
+	must(registry.Register(command.Command{ID: "file.open", Label: "Open", Shortcut: "Meta+O", Available: fileAvailable, Execute: workflow.open}))
+	must(registry.Register(command.Command{ID: "file.save", Label: "Save", Shortcut: "Meta+S", Available: fileAvailable, Execute: func(ctx context.Context) error { return persistence.Save(ctx, document.SaveOptions{}) }}))
+	must(registry.Register(command.Command{ID: "file.save-as", Label: "Save As", Shortcut: "Meta+Shift+S", Available: fileAvailable, Execute: func(ctx context.Context) error { return persistence.Save(ctx, document.SaveOptions{Choose: true}) }}))
+	if *documentSmoke {
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
+			defer cancel()
+			err := runDocumentSmoke(ctx, a, persistence, workflow, journal, registry, parts, board, references, smokeDocumentPath, smokeStore)
+			documentOutcome <- err
+			if err != nil {
+				a.Close()
+			}
+		}()
+	}
 	if *smoke {
 		go func() {
 			ctx, cancel := context.WithTimeout(a.Context(), 10*time.Second)
@@ -419,6 +488,14 @@ func main() {
 		time.AfterFunc(*exit, a.Close)
 	}
 	must(a.Run(context.Background(), cogent.Driver{Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16})}, Kinds: map[ui.Kind]ui.Style{ui.Row: {Gap: ui.Some(float32(8))}, ui.Column: {Gap: ui.Some(float32(8))}}}, Commands: registry, OnError: func(err error) { status = err.Error() }}))
+	if *documentSmoke {
+		select {
+		case err := <-documentOutcome:
+			must(err)
+		case <-time.After(90 * time.Second):
+			must(errors.New("document smoke ended before outcome"))
+		}
+	}
 	if *smoke && !gpuVerified.Load() {
 		must(errors.New("GPU smoke ended before a frame was verified"))
 	}

@@ -1,0 +1,213 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dca731f46abeb6944ced31a474d9cbd0",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e5a362f63e7a57cf7f61a28b67f62623ec669b2a",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8497d8d184bcfd5c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil-interface panic when window is closed during CloseRequest callback",
+      "message": "After the close callback returns, the code reads a.lifetimes[id] and calls Err() on it. The callback runs without a.mu held, and CloseWindow is documented as safe from workers, so the window can be closed and unregistered while the callback is running. WindowContext treats a missing entry in a.lifetimes as an unknown window, which suggests CloseWindow removes it. If so, this lookup returns a nil context.Context and the method call panics with a nil dereference.",
+      "suggestion": "Check that the map entry exists before using it, and return ErrWindowClosed when it is missing or already cancelled.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 155,
+            "end": 155
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "concurrency"
+      ],
+      "evidence": "if a.lifetimes[id].Err() != nil {",
+      "fix": {
+        "before": "if a.lifetimes[id].Err() != nil {",
+        "after": "if lifetime, ok := a.lifetimes[id]; !ok || lifetime.Err() != nil {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "f1e2aa9ae88617f4",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Directory fsync failure turns a completed save into an error on Windows and some filesystems",
+      "message": "The default syncDirectory calls Sync on a directory handle opened with os.Open. On Windows this typically fails because FlushFileBuffers is denied on directory handles. Some Unix filesystems also return EINVAL or ENOTSUP for a directory fsync. writeAtomic returns (true, err) when syncDirectory fails, so a save that actually replaced the file is reported as an error. The document then stays dirty and the owner refuses to close. The repository also documents Windows archive layouts and services.",
+      "suggestion": "Make the directory sync best-effort on platforms that cannot support it, for example a no-op on Windows via build tags or a runtime.GOOS check. Treat EINVAL/ENOTSUP/EPERM from the directory fsync as non-fatal on Unix. Add a test that covers the platform behaviour.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "document/file.go",
+          "lines": {
+            "start": 87,
+            "end": 87
+          }
+        }
+      ],
+      "tags": [
+        "portability",
+        "windows",
+        "durability"
+      ],
+      "evidence": "var defaultAtomicFileOps = atomicFileOps{syncFile: func(f *os.File) error { return f.Sync() }, rename: os.Rename, syncDirectory: func(f *os.File) error { return f.Sync() }}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "04b0d8e3fdeb4617",
+      "severity": "medium",
+      "category": "testing",
+      "title": "t.Fatal called from owner goroutine inside a.Do",
+      "message": "t.Fatal is called inside the a.Do callback, which runs on the app owner goroutine rather than the test goroutine. FailNow must only be called from the goroutine running the test. Calling Goexit on the owner goroutine can wedge the owner loop, so a.Do never returns and the test hangs or the failure is lost. The same pattern appears in the other a.Do closures in both tests.",
+      "suggestion": "Inside owner callbacks, record failures in a variable using t.Error or a captured error, return from the callback, and call t.Fatal from the test goroutine after a.Do returns. Also check the error that a.Do returns.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/workbench/document_workflow_test.go",
+          "lines": {
+            "start": 67,
+            "end": 67
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "goroutine",
+        "t.Fatal",
+        "location-corrected"
+      ],
+      "evidence": "t.Fatal(\"dirty close not deferred\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "908726a25974e3a3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "",
+      "message": "runDocumentSmoke runs on a separate goroutine and receives the UI-owned state (parts, board, references, journal, workflow, persistence). Every other cross-goroutine access in this file goes through a.Post or a.PostWait, because the app mutates this state without locks on the UI thread. If runDocumentSmoke reads or mutates it directly, there is a data race with rendering and command handlers. This can make the smoke check flaky or hide real failures.",
+      "suggestion": "Make sure runDocumentSmoke touches parts, board, references, journal and workflow only inside a.PostWait callbacks. Do the same for registry.Invoke calls, and run it under `go run -race` to confirm.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/workbench/main.go",
+          "lines": {
+            "start": 394,
+            "end": 394
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "data-race",
+        "smoke-test",
+        "location-corrected"
+      ],
+      "evidence": "err := runDocumentSmoke(ctx, a, persistence, workflow, journal, registry, parts, board, references, smokeDocumentPath, smokeStore)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 125927,
+    "totalMs": 33191
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 43,
+    "bytes": 143385,
+    "chunks": 8,
+    "llmCalls": 13,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 104157,
+        "output": 17694,
+        "costUSD": 0.385254
+      }
+    ],
+    "widenedFiles": 10,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 5,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "2c92bedce838cdb8",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "SDK export fixture may omit transitive package dependencies",
+        "message": "The relocated-SDK fixture copies only the top-level .go files of history, document, app and ui. The consumer test imports `document`, which likely depends on `app`, and `app` in turn likely depends on other public packages such as command, tasks and canvas. Those packages are not copied, so the consumer test may fail to compile for a reason unrelated to the export logic. The fixture could also hide a missing-package regression in `source_files`.",
+        "suggestion": "Build the fixture from the full set of public packages that `source_files` allows (or from the transitive import closure of `document`). Alternatively, copy the whole tracked tree for those packages and assert that the consumer builds.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "scripts/release-sdk_test.py",
+            "lines": {
+              "start": 62,
+              "end": 62
+            }
+          }
+        ],
+        "tags": [
+          "test",
+          "release",
+          "fixture",
+          "location-corrected"
+        ],
+        "evidence": "for package in (\"history\", \"document\", \"app\", \"ui\"):",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The finding is speculative: it says dependencies are 'likely' missing and the test 'may' fail. The author deliberately widened the copied set to history, document, app and ui. That set was presumably chosen to cover what `document` transitively imports, because the test would not compile otherwise. Go only compiles the packages the consumer actually imports, and nothing in the diff shows an import of command, tasks or canvas. A missing package would fail the test loudly, not silently."
+    }
+  ],
+  "suppressed": []
+}

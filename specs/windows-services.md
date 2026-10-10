@@ -19,7 +19,11 @@ the extension contract.
 `PostWindow(id, callback)` delivery, and asks the driver to close its native
 window. Other window contexts and accepted application work remain active.
 Closing the final window or calling `Close` ends the app and cancels all workers.
-A native close action follows the same lifecycle. Callers handle invalid IDs and
+User/native requests first evaluate Window.CloseRequest on the owner; refusal
+preserves registration and native widgets. RequestCloseWindow invokes that policy;
+CloseWindow/Close force teardown for confirmed decisions or cancellation. Native
+CheckCloseWindow permission is separate from body cleanup. See [document and close
+contract](document.md). An accepted native close follows the same lifecycle. Callers handle invalid IDs and
 `ErrClosed`; a closed ID cannot be reused for a different document.
 
 The driver uses an event source and coalesced wake flag for each window. A wake

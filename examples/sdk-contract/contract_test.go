@@ -11,10 +11,12 @@ import (
 	"github.com/dshills/vellum"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/document"
 	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/tasks"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
+	"strconv"
 )
 
 func TestControlledViewAndCommandContract(t *testing.T) {
@@ -203,5 +205,51 @@ func TestFileDropPublicContract(t *testing.T) {
 	}
 	if _, err := ui.CopyFileDropPaths([]string{"relative"}); err == nil {
 		t.Fatal("invalid path accepted")
+	}
+}
+
+func TestPublicDocumentSessionSaveAndClosePolicy(t *testing.T) {
+	a, _ := app.New(app.Config{})
+	defer a.Close()
+	j, _ := history.New(4)
+	value := 42
+	requests := 0
+	confirmed := false
+	a.Open(app.Window{ID: "main", Title: "SDK", Width: 200, Height: 200, CloseRequest: func() bool { requests++; return confirmed }, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }})
+	path := filepath.Join(t.TempDir(), "SDK.vellum")
+	completed := false
+	session, err := document.New(document.Config[int]{Owner: a, Window: "main", Journal: j, Codec: document.Codec[int]{Capture: func() (int, error) { return value, nil }, Encode: func(v int) ([]byte, error) { return []byte(strconv.Itoa(v)), nil }, Decode: func(b []byte) (int, error) { return strconv.Atoi(string(b)) }, Install: func(v int) error { value = v; return nil }}, OnComplete: func(r document.Result) {
+		if r.Err != nil {
+			t.Error(r.Err)
+		}
+		completed = true
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.Do(func() {
+		if !errors.Is(a.RequestCloseWindow("main"), app.ErrCloseRefused) {
+			t.Fatal("public close policy ignored")
+		}
+		if err := session.Save(context.Background(), document.SaveOptions{Path: path}); err != nil {
+			t.Fatal(err)
+		}
+	})
+	deadline := time.Now().Add(3 * time.Second)
+	for !completed && time.Now().Before(deadline) {
+		a.Drain()
+		time.Sleep(time.Millisecond)
+	}
+	if !completed || session.State().Path != path || session.State().Busy {
+		t.Fatal("SDK save incomplete")
+	}
+	confirmed = true
+	a.Do(func() {
+		if err := a.RequestCloseWindow("main"); err != nil {
+			t.Fatal(err)
+		}
+	})
+	if a.Context().Err() == nil || requests != 2 {
+		t.Fatal("SDK confirmed close failed")
 	}
 }

@@ -66,7 +66,8 @@ captured component even when selection changes. Every accepted edit/Undo/Redo
 advances the source revision and clears table projection state, so a background
 result from an older model cannot become valid after returning to older content.
 Selection, worker snapshots and layout state remain independent. The status
-shows unsaved document changes; the example does not implement document saving.
+shows unsaved document changes. The [document session](document.md) supplies
+asynchronous persistence and unsaved-close handling.
 
 Portable race tests cover branches, clean revisions, eviction, failure admission,
 reentrancy, panic invalidation and stale saves. Adapter tests exercise real native
@@ -79,3 +80,9 @@ window. It injects ordered native key chords, waits for AppKit focus publication
 and verifies text Undo/Redo, document fallback, dirty status and disabled refusal.
 It does not toggle input sources or VoiceOver. This check is not human
 screen-reader or live IME acceptance.
+
+`Replace(saved, install)` prevalidates initialization, busy state, nil callback and
+revision exhaustion before model installation. Atomic installation failure preserves
+both stacks/revision identities. Success releases captures, advances identity and
+sets dirty according to saved. Panic invalidates history; explicit replacement can
+recover an invalid journal. Install must not reenter the journal.

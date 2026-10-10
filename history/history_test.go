@@ -186,3 +186,48 @@ func TestInvalidAdmissionAndRevisionExhaustionNeverCallModel(t *testing.T) {
 		t.Fatal("exhausted callback/reset mutated")
 	}
 }
+
+func TestReplaceAtomicallyResetsAndRejectsBeforeInstall(t *testing.T) {
+	j := journal(t, 4)
+	v := 0
+	check(t, j.Apply(set(&v, 1)))
+	check(t, j.Undo())
+	before := j.Snapshot()
+	failure := errors.New("install")
+	if err := j.Replace(true, func() error { return failure }); !errors.Is(err, failure) || j.Snapshot() != before || v != 0 {
+		t.Fatal("failed install changed history")
+	}
+	check(t, j.Replace(true, func() error {
+		if !errors.Is(j.Replace(true, func() error { t.Fatal("nested install"); return nil }), ErrBusy) {
+			t.Fatal("reentrant install")
+		}
+		v = 90
+		return nil
+	}))
+	if v != 90 || j.Snapshot().Dirty || j.Snapshot().Revision == before.Revision || j.entries != nil {
+		t.Fatal(j.Snapshot())
+	}
+	calls := 0
+	j.next = math.MaxUint64
+	if !errors.Is(j.Replace(true, func() error { calls++; return nil }), ErrRevisionExhausted) || calls != 0 {
+		t.Fatal("exhausted install executed")
+	}
+}
+func TestReplacementPanicInvalidatesAndCanRecover(t *testing.T) {
+	j := journal(t, 4)
+	func() {
+		defer func() {
+			if recover() != "install panic" {
+				t.Fatal("panic suppressed")
+			}
+		}()
+		j.Replace(true, func() error { panic("install panic") })
+	}()
+	if !j.Snapshot().Invalid || j.Snapshot().Busy || !j.Snapshot().Dirty {
+		t.Fatal(j.Snapshot())
+	}
+	check(t, j.Replace(true, func() error { return nil }))
+	if j.Snapshot().Invalid || j.Snapshot().Dirty {
+		t.Fatal(j.Snapshot())
+	}
+}

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/dshills/vellum/ui"
 	"sync"
 	"testing"
@@ -128,5 +129,73 @@ func TestDirectActionPanicClosesOwner(t *testing.T) {
 	}()
 	if a.Context().Err() == nil {
 		t.Fatal("owner left open")
+	}
+}
+
+func TestCloseRequestRefusalCheckAndForce(t *testing.T) {
+	a, _ := New(Config{})
+	defer a.Close()
+	calls := 0
+	accept := false
+	w := Window{ID: "main", Title: "Document", Width: 400, Height: 300, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }, CloseRequest: func() bool {
+		calls++
+		if !errors.Is(a.CheckCloseWindow("main"), ErrClosePending) {
+			t.Fatal("recursive policy admitted")
+		}
+		return accept
+	}}
+	if err := a.Open(w); err != nil {
+		t.Fatal(err)
+	}
+	lifetime, _ := a.WindowContext("main")
+	a.Do(func() {
+		if !errors.Is(a.RequestCloseWindow("main"), ErrCloseRefused) {
+			t.Fatal("refusal ignored")
+		}
+	})
+	if lifetime.Err() != nil || len(a.Windows()) != 1 || calls != 1 {
+		t.Fatal("refusal changed lifetime")
+	}
+	accept = true
+	a.Do(func() {
+		if err := a.CheckCloseWindow("main"); err != nil {
+			t.Fatal(err)
+		}
+	})
+	if lifetime.Err() != nil || len(a.Windows()) != 1 || calls != 2 {
+		t.Fatal("permission check committed teardown")
+	}
+	accept = false
+	if err := a.CloseWindow("main"); err != nil {
+		t.Fatal(err)
+	}
+	if calls != 2 || lifetime.Err() == nil {
+		t.Fatal("forced close called policy")
+	}
+}
+func TestAcceptedCloseAndPolicyCancellation(t *testing.T) {
+	for _, force := range []bool{false, true} {
+		t.Run(fmt.Sprint(force), func(t *testing.T) {
+			a, _ := New(Config{})
+			defer a.Close()
+			a.Open(Window{ID: "main", Title: "Document", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }, CloseRequest: func() bool {
+				if force {
+					a.Close()
+				}
+				return !force
+			}})
+			a.Do(func() {
+				err := a.RequestCloseWindow("main")
+				if force && !errors.Is(err, ErrClosed) {
+					t.Fatal(err)
+				}
+				if !force && err != nil {
+					t.Fatal(err)
+				}
+			})
+			if a.Context().Err() == nil {
+				t.Fatal("accepted close left app alive")
+			}
+		})
 	}
 }
