@@ -352,7 +352,7 @@ func main() {
 	if *exit > 0 {
 		time.AfterFunc(*exit, a.Close)
 	}
-	must(a.Run(context.Background(), cogent.Driver{Commands: registry, OnError: func(err error) { status = err.Error() }}))
+	must(a.Run(context.Background(), cogent.Driver{Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16})}, Kinds: map[ui.Kind]ui.Style{ui.Row: {Gap: ui.Some(float32(8))}, ui.Column: {Gap: ui.Some(float32(8))}}}, Commands: registry, OnError: func(err error) { status = err.Error() }}))
 	if *smoke && !gpuVerified.Load() {
 		must(errors.New("GPU smoke ended before a frame was verified"))
 	}

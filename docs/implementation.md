@@ -25,7 +25,9 @@ evidence. This limits runtime certification, rather than the implemented API sco
    insert/remove/reorder/reparent and docking moves. See the
    [contract](../specs/keyed-reconciliation.md). Portable/native checks pass;
    live focus/accessibility workflows remain acceptance checks.
-2. Layout and theming — in progress.
+2. Layout and theming — implemented; optional value styles, application-local
+   themes, native layout/appearance mapping and reset semantics. See the
+   [contract](../specs/layout-theme.md).
 3. Standard controls and interaction — planned.
 4. Multiple windows and platform services — in progress.
 5. Independently consumable SDK and benchmarks — in progress.

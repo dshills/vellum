@@ -64,3 +64,9 @@ destruction releases GPU resources. The current canvas is a bounded rectangle
 renderer, with a 10,000-object limit; arbitrary shaders, image tiles, spatial
 indexes/LOD and device-loss recovery remain future work. Runtime verification
 covers macOS; the integration is not a production performance certification.
+
+## Layout and appearance
+
+See [layout and theming](layout-theme.md) for the optional value API and native
+reset semantics. The driver snapshots its theme for each run; workbench panel
+trees inherit that theme through the optional ThemeExtension adapter contract.

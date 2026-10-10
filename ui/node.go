@@ -25,6 +25,7 @@ type Node struct {
 	Activate            func()
 	Children            []Node
 	Custom              any
+	Style               Style
 }
 
 func Validate(root Node) error {
@@ -38,6 +39,9 @@ func Validate(root Node) error {
 			return fmt.Errorf("ui: empty or duplicate ID %q", n.ID)
 		}
 		seen[n.ID] = true
+		if _, err := ResolveStyle(n, Theme{}); err != nil {
+			return err
+		}
 		switch n.Kind {
 		case Column, Row:
 		case Label, Button, Extension:

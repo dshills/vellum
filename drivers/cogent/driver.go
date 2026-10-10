@@ -26,19 +26,29 @@ type Extension interface {
 	Mount(tree.Node) core.Widget
 	Sync(core.Widget) error
 }
+
+// ThemeExtension receives a private application theme snapshot for managed subtrees.
+type ThemeExtension interface{ SetTheme(ui.Theme) }
+
 type Driver struct {
 	Commands *command.Registry
 	OnError  func(error)
+	Theme    ui.Theme
 }
 type record struct {
 	widget   core.Widget
 	node     ui.Node
 	children []*record
+	theme    ui.Theme
 }
 
 var processRun atomic.Bool
 
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
+	if err := d.Theme.Validate(); err != nil {
+		return err
+	}
+	theme := d.Theme.Clone()
 	ws := a.Windows()
 	if len(ws) != 1 {
 		return fmt.Errorf("cogent: one native window supported; got %d", len(ws))
@@ -80,7 +90,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				return
 			}
 			var err error
-			root, err = reconcile(host, root, n, a, w.ID)
+			root, err = reconcile(host, root, n, a, w.ID, theme)
 			if err != nil {
 				failure.CompareAndSwap(nil, &err)
 				quit()
@@ -162,13 +172,13 @@ func sameShape(r *record, n ui.Node) bool {
 	}
 	return true
 }
-func mount(parent tree.Node, n ui.Node, a *app.Application, window string) (*record, error) {
-	r, err := mountShallow(parent, n, a, window)
+func mount(parent tree.Node, n ui.Node, a *app.Application, window string, themes ...ui.Theme) (*record, error) {
+	r, err := mountShallow(parent, n, a, window, themes...)
 	if err != nil {
 		return nil, err
 	}
 	for _, c := range n.Children {
-		child, err := mount(r.widget, c, a, window)
+		child, err := mount(r.widget, c, a, window, r.theme)
 		if err != nil {
 			r.widget.AsTree().Delete()
 			return nil, err
@@ -178,8 +188,18 @@ func mount(parent tree.Node, n ui.Node, a *app.Application, window string) (*rec
 	return r, nil
 }
 
-func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string) (*record, error) {
-	r := &record{node: n}
+func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string, themes ...ui.Theme) (*record, error) {
+	var theme ui.Theme
+	if len(themes) > 0 {
+		theme = themes[0]
+	}
+	if _, err := ui.ResolveStyle(n, theme); err != nil {
+		return nil, err
+	}
+	r := &record{node: n, theme: theme}
+	if ext, ok := n.Custom.(ThemeExtension); n.Kind == ui.Extension && ok {
+		ext.SetTheme(theme.Clone())
+	}
 	switch n.Kind {
 	case ui.Column, ui.Row:
 		r.widget = core.NewFrame(parent)
@@ -210,31 +230,16 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 		return nil, fmt.Errorf("cogent: extension %q returned nil widget", n.ID)
 	}
 	r.widget.AsWidget().SetName(n.ID)
-	r.widget.AsWidget().Styler(func(s *styles.Style) {
-		if r.node.Kind != ui.Extension {
-			s.Grow.Set(0, 0)
-		}
-		if r.node.Grow {
-			s.Grow.Set(1, 1)
-		}
-		if r.node.Kind != ui.Extension || r.node.MinWidth > 0 {
-			s.Min.X = units.Dp(r.node.MinWidth)
-		}
-		if r.node.Kind != ui.Extension || r.node.MinHeight > 0 {
-			s.Min.Y = units.Dp(r.node.MinHeight)
-		}
-		if r.node.Kind == ui.Row {
-			s.Direction = styles.Row
-		} else if r.node.Kind == ui.Column {
-			s.Direction = styles.Column
-		}
-	})
+	r.widget.AsWidget().Styler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {
+	if _, err := ui.ResolveStyle(n, r.theme); err != nil {
+		return err
+	}
 	previous := r.node
 	r.node = n
-	if previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
+	if previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
 		r.widget.AsWidget().Update()
 	}
 	switch n.Kind {

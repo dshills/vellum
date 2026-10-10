@@ -34,7 +34,10 @@ type Workbench struct {
 	records   map[string]*record
 	host      *core.Frame
 	syncing   bool
+	theme     ui.Theme
 }
+
+func (w *Workbench) SetTheme(theme ui.Theme) { w.theme = theme.Clone() }
 
 func (w *Workbench) Mount(parent tree.Node) core.Widget {
 	if w == nil || w.Owner == nil || w.Workspace == nil {
@@ -105,7 +108,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 			return err
 		}
 		var err error
-		r, err = reconcile(w.parents[p.ID], r, n, w.Owner, w.Window)
+		r, err = reconcile(w.parents[p.ID], r, n, w.Owner, w.Window, w.theme)
 		if err != nil {
 			return err
 		}
@@ -180,7 +183,7 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 		if err := ui.Validate(n); err != nil {
 			return err
 		}
-		r, err := reconcile(frame, retained[id], n, w.Owner, w.Window)
+		r, err := reconcile(frame, retained[id], n, w.Owner, w.Window, w.theme)
 		if err != nil {
 			return err
 		}

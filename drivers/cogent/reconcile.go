@@ -12,7 +12,33 @@ import (
 
 // reconcile preserves compatible native widgets by ID throughout a managed tree.
 // Validation and allocation finish before any retained node is moved or removed.
-func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Application, window string) (*record, error) {
+func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Application, window string, themes ...ui.Theme) (*record, error) {
+	var theme ui.Theme
+	if previous != nil {
+		theme = previous.theme
+	}
+	if len(themes) > 0 {
+		theme = themes[0]
+	}
+	if err := theme.Validate(); err != nil {
+		return previous, err
+	}
+	theme = theme.Clone()
+	var validateStyle func(ui.Node) error
+	validateStyle = func(node ui.Node) error {
+		if _, err := ui.ResolveStyle(node, theme); err != nil {
+			return err
+		}
+		for _, child := range node.Children {
+			if err := validateStyle(child); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	if err := validateStyle(n); err != nil {
+		return previous, err
+	}
 	if err := ui.Validate(n); err != nil {
 		return previous, err
 	}
@@ -44,7 +70,7 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		r := old[node.ID]
 		if r == nil || !compatible(r.node, node) {
 			var err error
-			r, err = mountShallow(p, node, a, window)
+			r, err = mountShallow(p, node, a, window, theme)
 			if err != nil {
 				return nil, err
 			}
@@ -111,6 +137,14 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	}
 	var attach func(*plan)
 	attach = func(p *plan) {
+		if !reflect.DeepEqual(p.r.theme, theme) {
+			p.r.theme = theme
+			if ext, ok := p.node.Custom.(ThemeExtension); p.node.Kind == ui.Extension && ok {
+				ext.SetTheme(theme.Clone())
+			}
+			p.r.widget.AsWidget().Update()
+			changed = true
+		}
 		if p.r.widget.AsTree().Parent != p.parent {
 			tree.MoveToParent(p.r.widget, p.parent)
 		}
