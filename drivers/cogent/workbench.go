@@ -15,6 +15,10 @@ import (
 	"sync/atomic"
 )
 
+// workbenchActiveProperty is the owner snapshot used by nested modal controls.
+// Set it before reconciliation, including the initial mount of inactive panels.
+const workbenchActiveProperty = "vellum.workbench.active"
+
 type Panel struct {
 	ID, Title string
 	View      func() ui.Node
@@ -217,6 +221,7 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 			return fmt.Errorf("workbench: unregistered panel %q", id)
 		}
 		frame, button := tabs.NewTab(html.EscapeString(panel.Title))
+		frame.SetProperty(workbenchActiveProperty, g.Active == id)
 		w.buttons[id] = button
 		w.bindTabPointer(button, id, g.ID)
 		n := panel.View()
@@ -264,6 +269,11 @@ func (w *Workbench) syncLayout(g *workbench.Group) {
 		w.syncLayout(g.First)
 		w.syncLayout(g.Second)
 		return
+	}
+	for _, id := range g.Tabs {
+		if frame := w.parents[id]; frame != nil {
+			frame.SetProperty(workbenchActiveProperty, g.Active == id)
+		}
 	}
 	if tabs := w.tabs[g.ID]; tabs != nil {
 		for i, id := range g.Tabs {

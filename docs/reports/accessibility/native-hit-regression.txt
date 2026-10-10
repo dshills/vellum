@@ -1,0 +1,33 @@
+Vellum native accessibility phase2 fresh evidence
+Started UTC: 2026-10-10T19:44:51.917523+00:00
+Tested checkout: /private/tmp/vellum-phase2-final-isolated
+Working directory: /private/tmp/vellum-phase2-final-isolated/drivers/cogent
+Canonical phase1 commit: 89cb930
+Candidate synthetic Git baseline: 5a7667995982006ea5799c3b78cb44e0d24fbe26
+Source manifest SHA256: c8ac680cb1f580af127633934a0e46b5c1e6363ab1a988042eaffbf336e80e58
+Dependency boundary: through owned patch0018, excludes phase4 patch0019
+Command argv: ["go", "test", "-race", "-count=1", "-run", "TestNativeAccessibilityHitTestRetainedTreeOrder", "-v", "."]
+# example.com/vellum/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder/equal_parent_and_child
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder/later_equal_sibling
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder/reordered_equal_sibling
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder/zero_frame_ancestor
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder/later_root_overlays_earlier_descendant
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder/noncontaining_later_sibling
+=== RUN   TestNativeAccessibilityHitTestRetainedTreeOrder/outside_all_frames
+--- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder (0.00s)
+    --- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder/equal_parent_and_child (0.00s)
+    --- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder/later_equal_sibling (0.00s)
+    --- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder/reordered_equal_sibling (0.00s)
+    --- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder/zero_frame_ancestor (0.00s)
+    --- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder/later_root_overlays_earlier_descendant (0.00s)
+    --- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder/noncontaining_later_sibling (0.00s)
+    --- PASS: TestNativeAccessibilityHitTestRetainedTreeOrder/outside_all_frames (0.00s)
+PASS
+ok  	example.com/vellum/cogent	1.517s
+
+EXIT_STATUS=0
+RESULT=PASS
+Finished UTC: 2026-10-10T19:44:54.850821+00:00

@@ -1,0 +1,30 @@
+Vellum native accessibility phase2 fresh evidence
+Started UTC: 2026-10-10T19:43:13.977058+00:00
+Tested checkout: /private/tmp/vellum-phase2-final-isolated
+Working directory: /private/tmp/vellum-phase2-final-isolated/drivers/cogent
+Canonical phase1 commit: 89cb930
+Candidate synthetic Git baseline: 5a7667995982006ea5799c3b78cb44e0d24fbe26
+Source manifest SHA256: c8ac680cb1f580af127633934a0e46b5c1e6363ab1a988042eaffbf336e80e58
+Dependency boundary: through owned patch0018, excludes phase4 patch0019
+Command argv: ["go", "test", "-race", "-count=1", "./..."]
+# example.com/vellum/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# example.com/vellum/cogent/cmd/gallery.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# example.com/vellum/cogent/cmd/docking-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# example.com/vellum/cogent/cmd/workbench.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent	6.884s
+?   	example.com/vellum/cogent/cmd/accessibility-smoke	[no test files]
+ok  	example.com/vellum/cogent/cmd/docking-smoke	1.822s
+ok  	example.com/vellum/cogent/cmd/gallery	2.241s
+?   	example.com/vellum/cogent/cmd/multiwindow-smoke	[no test files]
+?   	example.com/vellum/cogent/cmd/render-smoke	[no test files]
+?   	example.com/vellum/cogent/cmd/window-handoff-smoke	[no test files]
+?   	example.com/vellum/cogent/cmd/window-lifetime-smoke	[no test files]
+ok  	example.com/vellum/cogent/cmd/workbench	2.520s
+
+EXIT_STATUS=0
+RESULT=PASS
+Finished UTC: 2026-10-10T19:43:22.548112+00:00

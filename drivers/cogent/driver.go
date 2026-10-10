@@ -78,6 +78,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			processRun.Store(false)
 		}
 	}()
+	if err := configureAccessibility(a); err != nil {
+		return err
+	}
+	defer releaseAccessibilityConfiguration()
 	var failure atomic.Pointer[error]
 	var mu sync.Mutex
 	windows := map[string]*nativeWindow{}
@@ -152,7 +156,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
 				fail(err)
 			}
-
+			syncAccessibility(w, a)
 		})
 	}
 	var topologyMu sync.Mutex
@@ -172,6 +176,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
 					stopDeviceLoss(w)
+					closeAccessibility(w)
 					disposeControlTree(w.root)
 					// NewBody assigns a Scene parent before adding the body to
 					// its children, so Delete cannot find an unlaunched body.
@@ -211,8 +216,9 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
 				w.body.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(spec.Width), units.Dp(spec.Height)); s.Grow.Set(1, 1) })
-				w.host = core.NewFrame(w.body)
+				w.host = newAccessibilityHost(w)
 				w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
+				bindAccessibilityKeyboard(w, a, d.OnError)
 			})
 			if buildErr != nil {
 				return
@@ -248,7 +254,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					return
 				}
 				w.source.Store(w.body.SystemEvents())
-				a.Do(func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); flushDialogs(w.root) })
+				a.Do(func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); flushDialogs(w.root); syncAccessibility(w, a) })
 				if ctx.Err() != nil || failure.Load() != nil {
 					quit()
 					return
@@ -292,7 +298,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				}
 				stopDeviceLoss(w)
 				a.CloseWindow(spec.ID)
-				cleanup := func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); disposeControlTree(w.root) }
+				cleanup := func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); closeAccessibility(w); disposeControlTree(w.root) }
 				if err := a.Do(cleanup); err != nil {
 					cleanup()
 				}

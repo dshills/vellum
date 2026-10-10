@@ -1,0 +1,559 @@
+Vellum native accessibility phase2 fresh evidence
+Started UTC: 2026-10-10T19:45:09.440309+00:00
+Tested checkout: /private/tmp/vellum-phase2-final-isolated
+Working directory: /private/tmp/vellum-phase2-final-isolated
+Canonical phase1 commit: 89cb930
+Candidate synthetic Git baseline: 5a7667995982006ea5799c3b78cb44e0d24fbe26
+Source manifest SHA256: c8ac680cb1f580af127633934a0e46b5c1e6363ab1a988042eaffbf336e80e58
+Dependency boundary: through owned patch0018, excludes phase4 patch0019
+Command argv: ["env", "VELLUM_AX_EVENT_TRACE=1", "/private/tmp/vellum-accessibility-smoke-phase2-final"]
+2026/10/10 14:45:10 Window got event Window{Action: Focus, Time: 45:10}
+2026/10/10 14:45:10 Window got event WindowResize{Action: NoWinAction, Time: 45:10}
+Show{Time: 45:10, Handled: false} to /Vellum accessibility smoke scene
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…accessibility smoke
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ccessibility-host-0
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ibility-host-0/root
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…-host-0/root/button
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…-0/root/button/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…host-0/root/enabled
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/root/enabled/stack
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…abled/stack/icon-on
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…bled/stack/icon-off
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/icon-indeterminate
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/root/enabled/space
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…0/root/enabled/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…root/disabled-scope
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…disabled-scope/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…sabled-scope/number
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…pe/number/lead-icon
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…mber/lead-icon/icon
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/trail-icon-stretch
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…e/number/trail-icon
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ber/trail-icon/icon
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ty-host-0/root/tabs
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…st-0/root/tabs/tabs
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…oot/tabs/tabs/first
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…abs/tabs/first/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ot/tabs/tabs/second
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…bs/tabs/second/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…t-0/root/tabs/frame
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ot/tabs/frame/first
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…s/frame/first/first
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…t/first/first-label
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…t/tabs/frame/second
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…frame/second/second
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…second/second-label
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ot/overlap-selector
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…erlap-selector/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…-selector/indicator
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…y-host-0/root/table
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…0/root/table/text-0
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/root/table/frame-1
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…le/frame-1/button-0
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ame-1/button-0/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…le/frame-1/button-1
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ame-1/button-1/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…able/frame-1/text-2
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/table/table-slot-0
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…e/table-slot-0/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/table/table-slot-1
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…e/table-slot-1/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/table/table-slot-2
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…e/table-slot-2/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…/table/table-slot-3
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…e/table-slot-3/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…host-0/root/outline
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…oot/outline/frame-0
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ne/frame-0/button-0
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ame-0/button-0/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ne/frame-0/button-1
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ame-0/button-1/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ot/outline/button-1
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…tline/button-1/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ot/outline/button-2
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…tline/button-2/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…-0/root/show-dialog
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ot/show-dialog/text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…-host-0/root/dialog
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…-host-0/dialog-text
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…host-0/dialog-apply
+Show{Time: 45:10, Handled: false} to /Vellum accessibil…0/dialog-apply/text
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.496051 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.496051 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.512916 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.512916 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.513021 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.513021 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.577556 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.577556 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.645116 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.645116 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.714206 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.714206 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.780086 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.780086 -0500 CDT} to /Vellum accessibility smoke scene
+/Vellum accessibility smoke scene SetFocusEvent: /Vellum accessibil…disabled-scope/text
+Focus{Time: 45:10, Handled: false} to /Vellum accessibil…disabled-scope/text
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.84665 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.84665 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:10 Window got event KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:10, Handled: false}
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:10, Handled: false} first to /Vellum accessibil…root/disabled-scope
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:10, Handled: false} first to /Vellum accessibil…ibility-host-0/root
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:10, Handled: false} first to /Vellum accessibil…ccessibility-host-0
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:10, Handled: false} first to /Vellum accessibil…accessibility smoke
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:10, Handled: false} first to /Vellum accessibility smoke scene
+/Vellum accessibility smoke scene SetFocusEvent: /Vellum accessibil…sabled-scope/number
+/Vellum accessibility smoke scene Losing focus: /Vellum accessibil…disabled-scope/text
+FocusLost{Time: 45:10, Handled: false} to /Vellum accessibil…disabled-scope/text
+Focus{Time: 45:10, Handled: false} to /Vellum accessibil…sabled-scope/number
+2026/10/10 14:45:10 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.930273 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.930273 -0500 CDT} to /Vellum accessibility smoke scene
+Show{Time: 45:11, Handled: false} to /Vellum accessibil…t/tabs/frame/second
+Show{Time: 45:11, Handled: false} to /Vellum accessibil…frame/second/second
+Show{Time: 45:11, Handled: false} to /Vellum accessibil…second/second-label
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.984056 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:10.984056 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.057775 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.057775 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.076736 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.076736 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.12953 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.12953 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.166827 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.166827 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.211491 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.211491 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.239432 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.239432 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.303059 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.303059 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.373981 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.373981 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.397261 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.397261 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.446307 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.446307 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.469577 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.469577 -0500 CDT} to /Preferences scene
+Show{Time: 45:11, Handled: false} to /Preferences scene
+Show{Time: 45:11, Handled: false} to /Preferences scene/parts
+Show{Time: 45:11, Handled: false} to /Preferences scene/parts/move
+Show{Time: 45:11, Handled: false} to /Preferences scene/parts/resize
+Show{Time: 45:11, Handled: false} to /Preferences scene/top-bar
+Show{Time: 45:11, Handled: false} to /Preferences scene/top-bar/text-0
+Show{Time: 45:11, Handled: false} to /Preferences scene/Preferences
+Show{Time: 45:11, Handled: false} to /Preferences scene…ility-dialog-host-0
+Show{Time: 45:11, Handled: false} to /Preferences scene…-host-0/dialog-text
+Show{Time: 45:11, Handled: false} to /Preferences scene…host-0/dialog-apply
+Show{Time: 45:11, Handled: false} to /Preferences scene…0/dialog-apply/text
+Show{Time: 45:11, Handled: false} to /Preferences scene/bottom-bar
+Show{Time: 45:11, Handled: false} to /Preferences scene/bottom-bar/button-0
+Show{Time: 45:11, Handled: false} to /Preferences scene…m-bar/button-0/text
+/Preferences scene SetFocusEvent: /Preferences scene…-host-0/dialog-text
+Focus{Time: 45:11, Handled: false} to /Preferences scene…-host-0/dialog-text
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.54962 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.54962 -0500 CDT} to /Preferences scene
+/Preferences scene SetFocusEvent: /Preferences scene…-host-0/dialog-text
+/Preferences scene Already Focus: /Preferences scene…-host-0/dialog-text
+/Preferences scene SetFocusEvent: Failed /Preferences scene…-host-0/dialog-text
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.713084 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.713084 -0500 CDT} to /Preferences scene
+2026/10/10 14:45:11 Window got event KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false}
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false} first to /Preferences scene…ility-dialog-host-0
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false} first to /Preferences scene/Preferences
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false} first to /Preferences scene
+/Preferences scene SetFocusEvent: /Preferences scene…host-0/dialog-apply
+/Preferences scene Losing focus: /Preferences scene…-host-0/dialog-text
+FocusLost{Time: 45:11, Handled: false} to /Preferences scene…-host-0/dialog-text
+Focus{Time: 45:11, Handled: false} to /Preferences scene…host-0/dialog-apply
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.783223 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.783223 -0500 CDT} to /Preferences scene
+2026/10/10 14:45:11 Window got event KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false}
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false} first to /Preferences scene…ility-dialog-host-0
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false} first to /Preferences scene/Preferences
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:11, Handled: false} first to /Preferences scene
+/Preferences scene SetFocusEvent: /Preferences scene…-host-0/dialog-text
+/Preferences scene Losing focus: /Preferences scene…host-0/dialog-apply
+FocusLost{Time: 45:11, Handled: false} to /Preferences scene…host-0/dialog-apply
+Focus{Time: 45:11, Handled: false} to /Preferences scene…-host-0/dialog-text
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.862637 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.862637 -0500 CDT} to /Preferences scene
+2026/10/10 14:45:11 Window got event KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:11, Handled: false}
+KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:11, Handled: false} first to /Preferences scene…ility-dialog-host-0
+KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:11, Handled: false} first to /Preferences scene/Preferences
+/Preferences scene FocusClear: /Preferences scene…-host-0/dialog-text
+/Preferences scene SetFocusEvent: <nil>
+/Preferences scene Losing focus: /Preferences scene…-host-0/dialog-text
+FocusLost{Time: 45:11, Handled: false} to /Preferences scene…-host-0/dialog-text
+Click{Time: 45:11, Handled: false} to /Preferences scene/bottom-bar/button-0
+Close{Time: 45:11, Handled: false} to /Preferences scene
+Close{Time: 45:11, Handled: false} to /Preferences scene/parts
+Close{Time: 45:11, Handled: false} to /Preferences scene/parts/move
+Close{Time: 45:11, Handled: false} to /Preferences scene/parts/resize
+Close{Time: 45:11, Handled: false} to /Preferences scene/top-bar
+Close{Time: 45:11, Handled: false} to /Preferences scene/top-bar/text-0
+Close{Time: 45:11, Handled: false} to /Preferences scene/Preferences
+Close{Time: 45:11, Handled: false} to /Preferences scene/bottom-bar
+Close{Time: 45:11, Handled: false} to /Preferences scene/bottom-bar/button-0
+Close{Time: 45:11, Handled: false} to /Preferences scene…m-bar/button-0/text
+Close{Time: 45:11, Handled: false} to /Preferences scene
+Close{Time: 45:11, Handled: false} to /Preferences scene/parts
+Close{Time: 45:11, Handled: false} to /Preferences scene/parts/move
+Close{Time: 45:11, Handled: false} to /Preferences scene/parts/resize
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.942556 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.942556 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:11 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.943499 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.943499 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.958956 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:11.958956 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Window{Action: FocusLost, Time: 45:12}
+2026/10/10 14:45:12 Window got event WindowResize{Action: NoWinAction, Time: 45:12}
+2026/10/10 14:45:12 Window got event Window{Action: Focus, Time: 45:12}
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…docking smoke scene
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ility docking smoke
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ccessibility-host-0
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.270532 -0500 CDT}
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ty-host-0/workbench
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.270532 -0500 CDT} to /Vellum accessibility smoke scene
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…/workbench/splits-0
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ench/splits-0/parts
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ts-0/parts/handle-0
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ch/splits-0/frame-1
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ts-0/frame-1/tabs-0
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…frame-1/tabs-0/tabs
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…e-1/tabs-0/tabs/One
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…abs-0/tabs/One/text
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…e-1/tabs-0/tabs/Two
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…abs-0/tabs/Two/text
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…rame-1/tabs-0/frame
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…-1/tabs-0/frame/One
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…s-0/frame/One/panel
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…me/One/panel/shared
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ne/panel/show-modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…nel/show-modal/text
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ame/One/panel/modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…-1/tabs-0/frame/Two
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…s-0/frame/Two/panel
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…me/Two/panel/shared
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…wo/panel/show-modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…nel/show-modal/text
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ame/Two/panel/modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…-host-0/modal-field
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ch/splits-0/frame-2
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ts-0/frame-2/tabs-0
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…frame-2/tabs-0/tabs
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…2/tabs-0/tabs/Three
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…s-0/tabs/Three/text
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…rame-2/tabs-0/frame
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…/tabs-0/frame/Three
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…0/frame/Three/panel
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…/Three/panel/shared
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ee/panel/show-modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…nel/show-modal/text
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…e/Three/panel/modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…-host-0/modal-field
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.270537 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.270537 -0500 CDT} to /One preferences scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.38818 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.38818 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.388288 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.388288 -0500 CDT} to /Vellum accessibility smoke scene
+Show{Time: 45:12, Handled: false} to /One preferences scene
+Show{Time: 45:12, Handled: false} to /One preferences scene/parts
+Show{Time: 45:12, Handled: false} to /One preferences scene/parts/move
+Show{Time: 45:12, Handled: false} to /One preferences scene/parts/resize
+Show{Time: 45:12, Handled: false} to /One preferences scene/top-bar
+Show{Time: 45:12, Handled: false} to /One preferences scene/top-bar/text-0
+Show{Time: 45:12, Handled: false} to /One preferences scene/One preferences
+Show{Time: 45:12, Handled: false} to /One preferences s…ility-dialog-host-0
+Show{Time: 45:12, Handled: false} to /One preferences s…-host-0/modal-field
+Show{Time: 45:12, Handled: false} to /One preferences scene/bottom-bar
+Show{Time: 45:12, Handled: false} to /One preferences s…bottom-bar/button-0
+Show{Time: 45:12, Handled: false} to /One preferences s…m-bar/button-0/text
+/One preferences scene SetFocusEvent: /One preferences s…-host-0/modal-field
+Focus{Time: 45:12, Handled: false} to /One preferences s…-host-0/modal-field
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.469301 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.469301 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.388187 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.388187 -0500 CDT} to /One preferences scene
+2026/10/10 14:45:12 Window got event KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:12, Handled: false}
+KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:12, Handled: false} first to /One preferences s…ility-dialog-host-0
+KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:12, Handled: false} first to /One preferences scene/One preferences
+/One preferences scene FocusClear: /One preferences s…-host-0/modal-field
+/One preferences scene SetFocusEvent: <nil>
+/One preferences scene Losing focus: /One preferences s…-host-0/modal-field
+FocusLost{Time: 45:12, Handled: false} to /One preferences s…-host-0/modal-field
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.57881 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.57881 -0500 CDT} to /Vellum accessibility smoke scene
+Click{Time: 45:12, Handled: false} to /One preferences s…bottom-bar/button-0
+Close{Time: 45:12, Handled: false} to /One preferences scene
+Close{Time: 45:12, Handled: false} to /One preferences scene/parts
+Close{Time: 45:12, Handled: false} to /One preferences scene/parts/move
+Close{Time: 45:12, Handled: false} to /One preferences scene/parts/resize
+Close{Time: 45:12, Handled: false} to /One preferences scene/top-bar
+Close{Time: 45:12, Handled: false} to /One preferences scene/top-bar/text-0
+Close{Time: 45:12, Handled: false} to /One preferences scene/One preferences
+Close{Time: 45:12, Handled: false} to /One preferences scene/bottom-bar
+Close{Time: 45:12, Handled: false} to /One preferences s…bottom-bar/button-0
+Close{Time: 45:12, Handled: false} to /One preferences s…m-bar/button-0/text
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.579595 -0500 CDT}
+Close{Time: 45:12, Handled: false} to /One preferences scene
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.579595 -0500 CDT} to /Vellum accessibility smoke scene
+Close{Time: 45:12, Handled: false} to /One preferences scene/parts
+Close{Time: 45:12, Handled: false} to /One preferences scene/parts/move
+Close{Time: 45:12, Handled: false} to /One preferences scene/parts/resize
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.579664 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.579664 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.578815 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.578815 -0500 CDT} to /Vellum accessibil…docking smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.609542 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.609542 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.609647 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.609647 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.609546 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.609546 -0500 CDT} to /Vellum accessibil…docking smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.651561 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.651561 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.651654 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.651654 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.651566 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.651566 -0500 CDT} to /Vellum accessibil…docking smoke scene
+/Vellum accessibil…docking smoke scene SetFocusEvent: /Vellum accessibil…me/One/panel/shared
+Focus{Time: 45:12, Handled: false} to /Vellum accessibil…me/One/panel/shared
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.681314 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.681314 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.681317 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.681317 -0500 CDT} to /Vellum accessibil…docking smoke scene
+2026/10/10 14:45:12 Window got event KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false}
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…s-0/frame/One/panel
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…-1/tabs-0/frame/One
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…rame-1/tabs-0/frame
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…ts-0/frame-1/tabs-0
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…ch/splits-0/frame-1
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…/workbench/splits-0
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…ty-host-0/workbench
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…ccessibility-host-0
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…ility docking smoke
+KeyChord{Chord: Tab, Rune: 9, Hex: 9, Mods: , Time: 45:12, Handled: false} first to /Vellum accessibil…docking smoke scene
+/Vellum accessibil…docking smoke scene SetFocusEvent: /Vellum accessibil…ne/panel/show-modal
+/Vellum accessibil…docking smoke scene Losing focus: /Vellum accessibil…me/One/panel/shared
+FocusLost{Time: 45:12, Handled: false} to /Vellum accessibil…me/One/panel/shared
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.768639 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.768639 -0500 CDT} to /Vellum accessibility smoke scene
+Focus{Time: 45:12, Handled: false} to /Vellum accessibil…ne/panel/show-modal
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.768718 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.768718 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.768643 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.768643 -0500 CDT} to /Vellum accessibil…docking smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.787284 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.787284 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.787376 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.787376 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.787288 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.787288 -0500 CDT} to /Vellum accessibil…docking smoke scene
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…-1/tabs-0/frame/Two
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…s-0/frame/Two/panel
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…me/Two/panel/shared
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…wo/panel/show-modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…nel/show-modal/text
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ame/Two/panel/modal
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Show{Time: 45:12, Handled: false} to /Vellum accessibil…-host-0/modal-field
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.852416 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.852416 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.852507 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.852507 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.852413 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.852413 -0500 CDT} to /Vellum accessibil…docking smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.918564 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.918564 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:12 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.91867 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.91867 -0500 CDT} to /Vellum accessibility smoke scene
+Show{Time: 45:13, Handled: false} to /Two preferences scene
+Show{Time: 45:13, Handled: false} to /Two preferences scene/parts
+Show{Time: 45:13, Handled: false} to /Two preferences scene/parts/move
+Show{Time: 45:13, Handled: false} to /Two preferences scene/parts/resize
+Show{Time: 45:13, Handled: false} to /Two preferences scene/top-bar
+Show{Time: 45:13, Handled: false} to /Two preferences scene/top-bar/text-0
+Show{Time: 45:13, Handled: false} to /Two preferences scene/Two preferences
+Show{Time: 45:13, Handled: false} to /Two preferences s…ility-dialog-host-0
+Show{Time: 45:13, Handled: false} to /Two preferences s…-host-0/modal-field
+Show{Time: 45:13, Handled: false} to /Two preferences scene/bottom-bar
+Show{Time: 45:13, Handled: false} to /Two preferences s…bottom-bar/button-0
+Show{Time: 45:13, Handled: false} to /Two preferences s…m-bar/button-0/text
+/Two preferences scene SetFocusEvent: /Two preferences s…-host-0/modal-field
+Focus{Time: 45:13, Handled: false} to /Two preferences s…-host-0/modal-field
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.005275 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.005275 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.918569 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:12.918569 -0500 CDT} to /Two preferences scene
+/Two preferences scene SetFocusEvent: /Two preferences s…-host-0/modal-field
+/Two preferences scene Already Focus: /Two preferences s…-host-0/modal-field
+/Two preferences scene SetFocusEvent: Failed /Two preferences s…-host-0/modal-field
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.069935 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.069935 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.070007 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.070007 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.06994 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.06994 -0500 CDT} to /Two preferences scene
+2026/10/10 14:45:13 Window got event KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:13, Handled: false}
+KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:13, Handled: false} first to /Two preferences s…ility-dialog-host-0
+KeyChord{Chord: Escape, Rune: 0, Hex: 0, Mods: , Time: 45:13, Handled: false} first to /Two preferences scene/Two preferences
+/Two preferences scene FocusClear: /Two preferences s…-host-0/modal-field
+/Two preferences scene SetFocusEvent: <nil>
+/Two preferences scene Losing focus: /Two preferences s…-host-0/modal-field
+FocusLost{Time: 45:13, Handled: false} to /Two preferences s…-host-0/modal-field
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.221374 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.221374 -0500 CDT} to /Vellum accessibility smoke scene
+Click{Time: 45:13, Handled: false} to /Two preferences s…bottom-bar/button-0
+Close{Time: 45:13, Handled: false} to /Two preferences scene
+Close{Time: 45:13, Handled: false} to /Two preferences scene/parts
+Close{Time: 45:13, Handled: false} to /Two preferences scene/parts/move
+Close{Time: 45:13, Handled: false} to /Two preferences scene/parts/resize
+Close{Time: 45:13, Handled: false} to /Two preferences scene/top-bar
+Close{Time: 45:13, Handled: false} to /Two preferences scene/top-bar/text-0
+Close{Time: 45:13, Handled: false} to /Two preferences scene/Two preferences
+Close{Time: 45:13, Handled: false} to /Two preferences scene/bottom-bar
+Close{Time: 45:13, Handled: false} to /Two preferences s…bottom-bar/button-0
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.22224 -0500 CDT}
+Close{Time: 45:13, Handled: false} to /Two preferences s…m-bar/button-0/text
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.22224 -0500 CDT} to /Vellum accessibility smoke scene
+Close{Time: 45:13, Handled: false} to /Two preferences scene
+Close{Time: 45:13, Handled: false} to /Two preferences scene/parts
+Close{Time: 45:13, Handled: false} to /Two preferences scene/parts/move
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.222301 -0500 CDT}
+Close{Time: 45:13, Handled: false} to /Two preferences scene/parts/resize
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.222301 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.221378 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.221378 -0500 CDT} to /Vellum accessibil…docking smoke scene
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.242444 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.242444 -0500 CDT} to /Vellum accessibility smoke scene
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.242448 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.242448 -0500 CDT} to /Vellum accessibil…docking smoke scene
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…docking smoke scene
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ility docking smoke
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ccessibility-host-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ty-host-0/workbench
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/workbench/splits-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ench/splits-0/parts
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ts-0/parts/handle-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ch/splits-0/frame-1
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ts-0/frame-1/tabs-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…frame-1/tabs-0/tabs
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e-1/tabs-0/tabs/One
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…abs-0/tabs/One/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e-1/tabs-0/tabs/Two
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…abs-0/tabs/Two/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…rame-1/tabs-0/frame
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-1/tabs-0/frame/One
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…s-0/frame/One/panel
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…me/One/panel/shared
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ne/panel/show-modal
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…nel/show-modal/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ame/One/panel/modal
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-host-0/modal-field
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-1/tabs-0/frame/Two
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…s-0/frame/Two/panel
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…me/Two/panel/shared
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…wo/panel/show-modal
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…nel/show-modal/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ame/Two/panel/modal
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-host-0/modal-field
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ch/splits-0/frame-2
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ts-0/frame-2/tabs-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…frame-2/tabs-0/tabs
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…2/tabs-0/tabs/Three
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…s-0/tabs/Three/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…rame-2/tabs-0/frame
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/tabs-0/frame/Three
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…0/frame/Three/panel
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/Three/panel/shared
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ee/panel/show-modal
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…nel/show-modal/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e/Three/panel/modal
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-host-0/modal-field
+2026/10/10 14:45:13 Window got event Window{Action: Close, Time: 45:13}
+{"checks":["reachable Cocoa tree","native NSWindow identity and AXWindow role","roles labels values native hit testing","deterministic equal-frame descendant and sibling hit testing","controlled native actions","disabled refusal","Tab order","selected tab visibility","bounded stable virtual rows and paging","real outline pager geometry and native hit testing","independent outline selection disclosure and leaf refusal","modal isolation Tab wrap Escape","live dock panel namespaces activation focus modal geometry and retirement"],"native":"macOS NSAccessibility","preferences_changed":false,"reachable_elements":27,"result":"PASS","voiceover_tested":false}
+2026/10/10 14:45:13 Window got event Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.308165 -0500 CDT}
+Custom{Data: vellum.wake, Time: 2026-10-10 14:45:13.308165 -0500 CDT} to /Vellum accessibility smoke scene
+Close{Time: 45:13, Handled: false} to /Vellum accessibility smoke scene
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…accessibility smoke
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ccessibility-host-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ibility-host-0/root
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-host-0/root/button
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-0/root/button/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…host-0/root/enabled
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/root/enabled/stack
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…abled/stack/icon-on
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…bled/stack/icon-off
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/icon-indeterminate
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/root/enabled/space
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…0/root/enabled/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…root/disabled-scope
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…disabled-scope/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…sabled-scope/number
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…pe/number/lead-icon
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…mber/lead-icon/icon
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/trail-icon-stretch
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e/number/trail-icon
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ber/trail-icon/icon
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ty-host-0/root/tabs
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…st-0/root/tabs/tabs
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…oot/tabs/tabs/first
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…abs/tabs/first/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ot/tabs/tabs/second
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…bs/tabs/second/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…t-0/root/tabs/frame
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ot/tabs/frame/first
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…s/frame/first/first
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…t/first/first-label
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…t/tabs/frame/second
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…frame/second/second
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…second/second-label
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ot/overlap-selector
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…erlap-selector/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-selector/indicator
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…y-host-0/root/table
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…0/root/table/text-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/root/table/frame-1
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…le/frame-1/button-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ame-1/button-0/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…le/frame-1/button-1
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ame-1/button-1/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…able/frame-1/text-2
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/table/table-slot-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e/table-slot-0/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/table/table-slot-1
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e/table-slot-1/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/table/table-slot-2
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e/table-slot-2/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…/table/table-slot-3
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…e/table-slot-3/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…host-0/root/outline
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…oot/outline/frame-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ne/frame-0/button-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ame-0/button-0/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ne/frame-0/button-1
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ame-0/button-1/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ot/outline/button-1
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…tline/button-1/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ot/outline/button-2
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…tline/button-2/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-0/root/show-dialog
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ot/show-dialog/text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-host-0/root/dialog
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…ility-dialog-host-0
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…-host-0/dialog-text
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…host-0/dialog-apply
+Close{Time: 45:13, Handled: false} to /Vellum accessibil…0/dialog-apply/text
+2026/10/10 14:45:13 Window got event Window{Action: Close, Time: 45:13}
+
+EXIT_STATUS=0
+RESULT=PASS
+Finished UTC: 2026-10-10T19:45:14.354339+00:00

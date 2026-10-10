@@ -1,0 +1,154 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "eba9ed5b9de23495c787ece720344ace",
+  "repo": {
+    "root": "/private/tmp/vellum-phase2-final-isolated",
+    "head": "5a7667995982006ea5799c3b78cb44e0d24fbe26",
+    "branch": "codex/phase-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 213899,
+    "totalMs": 54594
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 45,
+    "bytes": 313917,
+    "chunks": 21,
+    "llmCalls": 22,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 255347,
+        "output": 25810,
+        "cachedInput": 50665,
+        "costUSD": 0.7687940000000001
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "3628fcc507489315",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Removed zero-monitor guard before GetScreens in PollScreenChanges",
+        "message": "The old PollScreenChanges returned early when glfw.GetMonitors() reported zero monitors, so GetScreens never ran in that state. The new code always calls GetScreens. With no monitors it can clear or rebuild the cache, run the DPI callback over an empty list, and send a ScreenUpdate to the first window. Code that assumes at least one screen can then fail (for example Screens[0] indexing in GetScreens or the callers of Window.Screen). This is a transient state during monitor hot-plug or sleep and is easy to hit while polling.",
+        "suggestion": "Keep the guard before refreshing: `if len(glfw.GetMonitors()) == 0 { return }` ahead of `a.GetScreens()`, so the cache is not rebuilt without monitors.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+            "lines": {
+              "start": 166,
+              "end": 168
+            }
+          }
+        ],
+        "tags": [
+          "regression",
+          "monitors"
+        ],
+        "evidence": "before, _ := a.screenPollSnapshot()\n+\ta.GetScreens()",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch"
+    },
+    {
+      "finding": {
+        "id": "bbca422e13fae7d4",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Screen cache is published before logical-DPI scaling is applied",
+        "message": "GetScreens used to run UpdateLogicalDPIScaleFunc under a.Mu, so no reader ever saw the rebuilt cache without the zoom and per-screen DPI scaling applied. Now the lock is released first and the callback runs afterwards. Concurrent window paint loops that call Screen(), ScreenByName() or Window.Screen() in that gap can read unscaled LogicalDPI values. This can cause a transient wrong-DPI layout or render, or spurious differences in PollScreenChanges comparisons.",
+        "suggestion": "Apply the logical-DPI scaling to the new cache before it is published, while still holding a.Mu. For example, call the update closure directly on the local screens slice before assigning a.Screens, or keep the callback under the lock and make it use only the locked UpdateScreenLogicalDPI path. Alternatively, build the scaled cache fully before publishing it.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+            "lines": {
+              "start": 195,
+              "end": 205
+            }
+          }
+        ],
+        "tags": [
+          "race",
+          "dpi",
+          "locking"
+        ],
+        "evidence": "defer func() {\n+\t\ta.Mu.Unlock()\n+\t\t// The callback may use locked app accessors or UpdateScreenLogicalDPI.\n+\t\t// Run it only after publishing the completed native cache.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch"
+    },
+    {
+      "finding": {
+        "id": "a047e6b80cf80873",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Snapshot validation rejects JSON null for optional fields while the rest of the code expects null values",
+        "message": "The validator rejects the whole snapshot if any optional field is JSON null, because NSNull is neither NSString nor NSNumber. The rest of the file expects null values: accessibilityValue maps NSNull to nil and vellumAXWalk uses NSNull.null as a fallback. If the Go encoder emits \"value\":null (or null name/help/min/max) for a node, every update is dropped by `if(!vellumAXValidSnapshot(snapshot))return;` with no error. The native tree would then stay empty or stale with no diagnostic.",
+        "suggestion": "Treat NSNull as absent for optional keys (value, domain_id, name, help, min, max and the other numeric fields) in vellumAXValidSnapshot. Also report validation failures back to the caller instead of returning silently.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/accessibility_darwin.m",
+            "lines": {
+              "start": 186,
+              "end": 186
+            }
+          }
+        ],
+        "tags": [
+          "validation",
+          "robustness",
+          "json",
+          "location-corrected"
+        ],
+        "evidence": "id accepted=node[@\"value\"];if(accepted\u0026\u0026![accepted isKindOfClass:NSString.class]\u0026\u0026![accepted isKindOfClass:NSNumber.class])return NO;",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The validator does reject an explicit JSON null, since NSNull is not an NSString or NSNumber. But the finding only holds if the Go encoder emits nulls, and nothing shown does. The validator is deliberately strict and is exported as vellumAXSnapshotValid for Go-side tests, so the encoder's output contract is checked there. Omitted keys pass as nil, so an encoder that omits empty fields works. The cited NSNull handling elsewhere is defensive and not evidence of a real mismatch."
+    }
+  ],
+  "suppressed": []
+}

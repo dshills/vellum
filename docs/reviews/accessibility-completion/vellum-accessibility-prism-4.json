@@ -1,0 +1,187 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "67d9c6b8d3e230028483ca5e5c8e9ceb",
+  "repo": {
+    "root": "/private/tmp/vellum-phase2-final-isolated",
+    "head": "5a7667995982006ea5799c3b78cb44e0d24fbe26",
+    "branch": "codex/phase-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e3860247cdaf529b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Hit test picks arbitrary element on equal-area ties",
+      "message": "Hit testing iterates an NSDictionary's allValues, which has no defined order, and picks the candidate with the strictly smallest area. A parent and child with equal frames, such as a group wrapping a single button or a row wrapping a cell, tie, and the winner depends on hash order. The result can change between calls, so VoiceOver hit-testing and the probe's hit_test_id can be nondeterministic and can resolve to a container instead of the leaf. The code also does not account for z-order, so a modal dialog sitting over underlying content is not preferred.",
+      "suggestion": "Hit-test deterministically. Walk the retained tree depth-first from state.roots, descend into the child that contains the point, and prefer later siblings, which sit on top. Alternatively, break area ties in favour of the element with greater depth, or the later one in state.hierarchy order, instead of relying on dictionary order.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_darwin.m",
+          "lines": {
+            "start": 128,
+            "end": 129
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "nondeterminism",
+        "hit-test",
+        "location-corrected"
+      ],
+      "evidence": "for(VellumAXElement *x in state.elements.allValues)if(x.live\u0026\u0026NSPointInRect(point,x.accessibilityFrame)){\n  if(!best||x.accessibilityFrame.size.width*x.accessibilityFrame.size.height\u003cbest.accessibilityFrame.size.width*best.accessibilityFrame.size.height)best=x;",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c6107f5560b584c1",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Smoke test can fail after a successful run because Run returns context cancellation",
+      "message": "The check goroutine calls cancel() on success, which cancels the context passed to a.Run. If Run returns ctx.Err() (context.Canceled) on shutdown, the code treats that as a driver failure, prints \"native driver:\" and exits 1 even though every check passed. This depends on Run's behavior, which this diff does not show. If Run returns nil on cancel, the issue does not occur.",
+      "suggestion": "When the check succeeded, ignore errors.Is(err, context.Canceled) from Run, or use a dedicated shutdown signal instead of cancelling the shared context. For example: `if result == nil \u0026\u0026 err != nil \u0026\u0026 !errors.Is(err, context.Canceled) { result = err }`.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/accessibility-smoke/main.go",
+          "lines": {
+            "start": 447,
+            "end": 455
+          }
+        }
+      ],
+      "tags": [
+        "shutdown",
+        "context",
+        "exit-code"
+      ],
+      "evidence": "if result == nil \u0026\u0026 err != nil {\n\t\tresult = err\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 114236,
+    "totalMs": 42792
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 35,
+    "bytes": 216769,
+    "chunks": 17,
+    "llmCalls": 12,
+    "cacheHit": false,
+    "cachedChunks": 8,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 118082,
+        "output": 15025,
+        "cachedInput": 3219,
+        "costUSD": 0.38641400000000004
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 3,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "8624c06a001f8fbb",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Two independent current-window snapshots in runWindow can disagree",
+        "message": "runWindow takes one current-window snapshot at the top. windowSizingStages() then takes a second, independent snapshot to choose the stage's mains. If focus or publication changes between the two reads, the mains chosen could belong to window A while the later NewWindow-versus-existing-window branch, `fitInWindow` and `ms.push` use window B (or nil). The old code read a single global value; the patch trades a data race for a logical inconsistency.",
+        "suggestion": "Take one snapshot per operation and pass it through. For example, change windowSizingStages to accept the `current *renderWindow` taken at the top of runWindow, so mains selection and the later branch decisions use the same window.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+            "lines": {
+              "start": 395,
+              "end": 405
+            }
+          }
+        ],
+        "tags": [
+          "race",
+          "toctou",
+          "snapshot"
+        ],
+        "evidence": "current := currentRenderWindowSnapshot()\n \tsc := st.Scene\n+\tst.setMains(st.windowSizingStages())",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch"
+    },
+    {
+      "finding": {
+        "id": "5153cb62b05ef1c9",
+        "severity": "medium",
+        "category": "bug",
+        "title": "AX tree paging mutates Start without triggering a re-sync",
+        "message": "The AX page handler for VirtualTree changes `v.Start` and returns true without invalidating the window. The mouse path in `mountAccessibilityTreePager` calls `v.Owner.Invalidate(v.Window)` after paging. The AX path may leave the native row pool and the stamped `vellum.accessibility-domain` properties showing the old page, so row bounds and the visible UI disagree with the reported tree until some other refresh happens. It also returns true when the page did not change at all.",
+        "suggestion": "Invalidate the window after paging, as the button handler does, or confirm that the caller of AX handlers always refreshes. Return false when `v.Start` did not change.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/accessibility_virtual.go",
+            "lines": {
+              "start": 102,
+              "end": 108
+            }
+          }
+        ],
+        "tags": [
+          "accessibility",
+          "virtual-tree",
+          "sync",
+          "location-corrected"
+        ],
+        "evidence": "page := func(delta int) bool {\n\t\t\tif v.Model == nil {\n\t\t\t\treturn false\n\t\t\t}\n\t\t\taccessibilityTreePage(v, delta)\n\t\t\treturn true\n\t\t}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The finding is speculative. Every other AX handler here (table paging via SetViewport, row select, expand/collapse via Toggle) also changes state without invalidating, which points to the AX dispatcher re-syncing after a handler returns true. The mouse path needs its own Invalidate only because it bypasses that dispatcher. Returning true for a clamped no-op page press is harmless."
+    }
+  ],
+  "suppressed": []
+}

@@ -1,0 +1,560 @@
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -14,6 +14,7 @@
+ 	"image"
+ 	"log"
+ 	"runtime"
++	"time"
+ 
+ 	"cogentcore.org/core/gpu"
+ 	"cogentcore.org/core/gpu/gpudraw"
+@@ -44,6 +45,9 @@
+ }
+ 
+ type App struct {
++	// lastScreenPoll is protected by Mu; each window has its own paint loop.
++	lastScreenPoll time.Time
++
+ 	// NativeAttach is configured before creating any windows. It runs on the
+ 	// native main thread after surface creation and before show. On error the
+ 	// partial attachment (if any) is closed and the window/resources are released.
+@@ -94,7 +98,7 @@
+ }
+ 
+ func (a *App) NewWindow(opts *system.NewWindowOptions) (system.Window, error) {
+-	if len(a.Windows) == 0 && system.UpdateLogicalDPIScaleFunc != nil {
++	if a.NWindows() == 0 && system.UpdateLogicalDPIScaleFunc != nil {
+ 		if ScreenDebug {
+ 			log.Println("app first new window calling UpdateLogicalDPIScaleFunc")
+ 		}
+--- a/system/driver/desktop/screen.go
++++ b/system/driver/desktop/screen.go
+@@ -48,6 +48,35 @@
+ 	return &copy
+ }
+ 
++// NScreens and Screen override unlocked base accessors because each window
++// can request paints while another polls and replaces the native screen cache.
++func (a *App) NScreens() int {
++	a.Mu.Lock()
++	defer a.Mu.Unlock()
++	return len(a.Screens)
++}
++func (a *App) Screen(n int) *system.Screen { return a.ScreenSnapshot(n) }
++func (a *App) ScreenByName(name string) *system.Screen {
++	a.Mu.Lock()
++	defer a.Mu.Unlock()
++	for _, sc := range a.Screens {
++		if sc.Name == name {
++			copy := *sc
++			return &copy
++		}
++	}
++	return nil
++}
++
++// UpdateScreenLogicalDPI owns both cache values and the logical-DPI globals
++// while the core settings callback updates them. The callback must not call
++// app accessors; it receives the already locked cache directly.
++func (a *App) UpdateScreenLogicalDPI(update func([]*system.Screen)) {
++	a.Mu.Lock()
++	defer a.Mu.Unlock()
++	update(a.Screens)
++}
++
+ // MonitorChange is called when a monitor is connected to or
+ // disconnected from the system.
+ func (a *App) MonitorChange(monitor *glfw.Monitor, event glfw.PeripheralEvent) {
+@@ -62,17 +91,18 @@
+ 			log.Printf("ScreenDebug: monitorChange: %v event: %v\n", monitor.GetName(), enm)
+ 		}
+ 		a.GetScreens()
+-		if len(a.Windows) > 0 {
++		_, windows := a.screenPollSnapshot()
++		if len(windows) > 0 {
+ 			if ScreenDebug {
+ 				log.Println("ScreenDebug: monitorChange: sending screen update")
+ 			}
+-			for _, w := range a.Windows {
++			for _, w := range windows {
+ 				sc := w.Screen()
+ 				if sc != nil {
+ 					w.SetLogicalDPI(sc.LogicalDPI)
+ 				}
+ 			}
+-			fw := a.Windows[0]
++			fw := windows[0]
+ 			fw.Event.Window(events.ScreenUpdate)
+ 		} else {
+ 			if ScreenDebug {
+@@ -82,53 +112,60 @@
+ 	}()
+ }
+ 
+-var lastScreenPoll time.Time
++// beginScreenPoll admits one window's paint loop in each polling interval.
++// This must share the app mutex with cache and window-list snapshots; a package
++// timestamp was raced by independent window event loops.
++func (a *App) beginScreenPoll(now time.Time) bool {
++	a.Mu.Lock()
++	defer a.Mu.Unlock()
++	if now.Sub(a.lastScreenPoll) < ScreenPollInterval {
++		return false
++	}
++	a.lastScreenPoll = now
++	return true
++}
++
++// screenPollSnapshot detaches mutable cache values and window-list storage.
++// No app mutex may remain held when publishing a window event or acquiring its
++// mutex: window close and geometry paths also need the app mutex.
++func (a *App) screenPollSnapshot() ([]system.Screen, []*Window) {
++	a.Mu.Lock()
++	defer a.Mu.Unlock()
++	screens := make([]system.Screen, len(a.Screens))
++	for i, sc := range a.Screens {
++		screens[i] = *sc
++	}
++	return screens, append([]*Window(nil), a.Windows...)
++}
+ 
+ func (a *App) PollScreenChanges() {
+-	now := time.Now()
+-	if now.Sub(lastScreenPoll) < ScreenPollInterval {
++	if !a.beginScreenPoll(time.Now()) {
+ 		return
+ 	}
+-	lastScreenPoll = now
+-
+-	mons := glfw.GetMonitors()
+-	ns := len(mons)
+-	if ns == 0 {
++	before, _ := a.screenPollSnapshot()
++	a.GetScreens()
++	after, windows := a.screenPollSnapshot()
++	if slices.Equal(before, after) {
+ 		return
+ 	}
+-	csc := make([]*system.Screen, ns)
+-	if len(mons) != len(a.Screens) {
+-		goto doUpdate
+-	}
+-	for i, sc := range a.Screens {
+-		ssc := &system.Screen{}
+-		*ssc = *sc
+-		csc[i] = ssc
+-	}
+-	a.GetScreens()
+-	for i, sc := range a.Screens {
+-		if i >= len(csc) { // number could have changed
+-			goto doUpdate
+-		}
+-		ssc := csc[i]
+-		if *ssc != *sc {
+-			goto doUpdate
+-		}
+-	}
+-	return // no change
+-doUpdate:
+-	if len(a.Windows) > 0 {
+-		fw := a.Windows[0]
++	if len(windows) > 0 {
+ 		if ScreenDebug {
+ 			log.Println("ScreenDebug: PollScreenChanges: sending screen update")
+ 		}
+-		fw.Event.Window(events.ScreenUpdate)
++		windows[0].Event.Window(events.ScreenUpdate)
+ 	}
+ }
+ 
+ func (a *App) GetScreens() {
+ 	a.Mu.Lock()
+-	defer a.Mu.Unlock()
++	defer func() {
++		a.Mu.Unlock()
++		// The callback may use locked app accessors or UpdateScreenLogicalDPI.
++		// Run it only after publishing the completed native cache.
++		if system.UpdateLogicalDPIScaleFunc != nil {
++			system.UpdateLogicalDPIScaleFunc()
++		}
++	}()
+ 
+ 	mons := glfw.GetMonitors()
+ 	a.Monitors = mons
+@@ -256,9 +293,6 @@
+ 			a.Screens[1].ScreenNumber = 1
+ 		}
+ 	}
+-	if system.UpdateLogicalDPIScaleFunc != nil {
+-		system.UpdateLogicalDPIScaleFunc()
+-	}
+ }
+ 
+ // SaveScreenInfo saves a copy of given screen info to screensAll list if unique
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -166,7 +166,7 @@
+ // Screen gets the screen of the window, computing various window parameters.
+ func (w *Window) Screen() *system.Screen {
+ 	if w == nil || w.Glw == nil {
+-		return TheApp.Screens[0]
++		return TheApp.ScreenSnapshot(0)
+ 	}
+ 	var sc *system.Screen
+ 	mon := w.Glw.GetMonitor() // this returns nil for windowed windows -- i.e., most windows
+@@ -178,7 +178,7 @@
+ 		sc = TheApp.ScreenByName(mon.GetName())
+ 		if sc == nil {
+ 			log.Printf("ScreenDebug: desktop.Window.Screen: could not find screen of name: %v\n", mon.GetName())
+-			sc = TheApp.Screens[0]
++			sc = TheApp.ScreenSnapshot(0)
+ 		}
+ 		goto setScreen
+ 	}
+@@ -228,7 +228,11 @@
+ 			ovlp = ov
+ 		}
+ 	}
+-	return csc
++	if csc == nil {
++		return nil
++	}
++	copy := *csc
++	return &copy
+ }
+ 
+ func (w *Window) Position(screen *system.Screen) image.Point {
+--- a/core/settings.go
++++ b/core/settings.go
+@@ -386,21 +386,28 @@
+ // updateLogicalDPI updates the screen LogicalDPI values according to current
+ // settings and zoom factor. set this as [system.UpdateLogicalDPIFunc] function.
+ func (as *AppearanceSettingsData) updateLogicalDPI() {
+-	// zoom is percentage, but LogicalDPIScale is multiplier
+-	system.LogicalDPIScale = as.Zoom / 100
+-	// fmt.Println("system ldpi:", system.LogicalDPIScale)
+-	n := system.TheApp.NScreens()
+-	for i := 0; i < n; i++ {
+-		sc := system.TheApp.Screen(i)
+-		if sc == nil {
+-			continue
++	update := func(screens []*system.Screen) {
++		// Desktop holds its cache mutex across these globals and cache mutations.
++		system.LogicalDPIScale = as.Zoom / 100
++		for _, sc := range screens {
++			if sc == nil {
++				continue
++			}
++			if scp, ok := as.Screens[sc.Name]; ok {
++				system.SetLogicalDPIScale(sc.Name, scp.Zoom/100)
++			}
++			sc.UpdateLogicalDPI()
+ 		}
+-		if scp, ok := as.Screens[sc.Name]; ok {
+-			// zoom is percentage, but LogicalDPIScale is multiplier
+-			system.SetLogicalDPIScale(sc.Name, scp.Zoom/100)
+-		}
+-		sc.UpdateLogicalDPI()
+-	}
++	}
++	if owner, ok := system.TheApp.(interface{ UpdateScreenLogicalDPI(func([]*system.Screen)) }); ok {
++		owner.UpdateScreenLogicalDPI(update)
++		return
++	}
++	screens := make([]*system.Screen, system.TheApp.NScreens())
++	for i := range screens {
++		screens[i] = system.TheApp.Screen(i)
++	}
++	update(screens)
+ }
+ 
+ // applyDPI updates the screen LogicalDPI values according to current
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -62,6 +62,15 @@
+ 	renderWindowGlobalMu.Unlock()
+ }
+ 
++// currentRenderWindowSnapshot pairs every production read with publication.
++// The returned window's immutable native handle remains valid even if focus
++// moves to another window immediately after the snapshot.
++func currentRenderWindowSnapshot() *renderWindow {
++	renderWindowGlobalMu.Lock()
++	defer renderWindowGlobalMu.Unlock()
++	return currentRenderWindow
++}
++
+ // renderWindow provides an outer "actual" window where everything is rendered,
+ // and is the point of entry for all events coming in from user actions.
+ //
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -206,8 +206,8 @@
+ 	if st.Screen >= 0 && st.Screen < TheApp.NScreens() {
+ 		return TheApp.Screen(st.Screen)
+ 	}
+-	if currentRenderWindow != nil {
+-		return currentRenderWindow.SystemWindow.Screen()
++	if current := currentRenderWindowSnapshot(); current != nil {
++		return current.SystemWindow.Screen()
+ 	}
+ 	return TheApp.Screen(0)
+ }
+@@ -245,14 +245,16 @@
+ // incorrectly makes the new window depend on another window's geometry/DPI.
+ // Stages placed in an existing window continue to use that window's context.
+ func (st *Stage) windowSizingStages() *stages {
+-	if st.NewWindow || currentRenderWindow == nil {
++	current := currentRenderWindowSnapshot()
++	if st.NewWindow || current == nil {
+ 		return st.firstWindowStages()
+ 	}
+-	return &currentRenderWindow.mains
++	return &current.mains
+ }
+ 
+ // runWindow runs a Window with current settings.
+ func (st *Stage) runWindow() *Stage {
++	current := currentRenderWindowSnapshot()
+ 	sc := st.Scene
+ 	st.setMains(st.windowSizingStages())
+ 	st.configMainStage()
+@@ -263,7 +265,7 @@
+ 	// and thus don't consider pref size.
+ 	// Desktop new windows and non-full windows can pref size.
+ 	if !TheApp.Platform().IsMobile() &&
+-		(st.NewWindow || !st.FullWindow || currentRenderWindow == nil) {
++		(st.NewWindow || !st.FullWindow || current == nil) {
+ 		sz = sc.contentSize(sz)
+ 		// On offscreen, we don't want any extra space, as we want the smallest
+ 		// possible representation of the content.
+@@ -287,7 +289,7 @@
+ 		fmt.Println("MainStage.RunWindow: Window Size:", sz)
+ 	}
+ 
+-	if st.NewWindow || currentRenderWindow == nil {
++	if st.NewWindow || current == nil {
+ 		sc.Resize(math32.Geom2DInt{st.renderContext.geom.Pos, sz})
+ 		win := st.newRenderWindow()
+ 		mainRenderWindows.add(win)
+@@ -303,7 +305,7 @@
+ 		ms.push(st)
+ 		st.setMains(ms)
+ 	} else {
+-		ms := &currentRenderWindow.mains
++		ms := &current.mains
+ 		msc := ms.top().Scene
+ 		sc.SceneGeom.Size = sz
+ 		sc.fitInWindow(msc.SceneGeom) // does resize
+@@ -319,11 +321,12 @@
+ // the calling function must bail.
+ func (st *Stage) getValidContext() bool {
+ 	if st.Context == nil || st.Context.AsTree().This == nil || st.Context.AsWidget().Scene == nil {
+-		if currentRenderWindow == nil {
++		current := currentRenderWindowSnapshot()
++		if current == nil {
+ 			slog.Error("Stage.Run: Context is nil and CurrentRenderWindow is nil, so cannot Run", "Name", st.Name, "Title", st.Title)
+ 			return false
+ 		}
+-		st.Context = currentRenderWindow.mains.top().Scene
++		st.Context = current.mains.top().Scene
+ 	}
+ 	return true
+ }
+--- a/core/stage.go
++++ b/core/stage.go
+@@ -371,11 +371,11 @@
+ // raise moves the Stage to the top of its main [stages]
+ // and raises the [renderWindow] it is in if necessary.
+ func (st *Stage) raise() {
+-	if st.Mains.renderWindow != currentRenderWindow {
++	if st.Mains.renderWindow != currentRenderWindowSnapshot() {
+ 		st.Mains.renderWindow.Raise()
+ 	}
+ 	st.Mains.moveToTop(st)
+-	currentRenderWindow.SetStageTitle(st.Title)
++	st.Mains.renderWindow.SetStageTitle(st.Title)
+ }
+ 
+ func (st *Stage) delete() {
+--- a/core/dialog.go
++++ b/core/dialog.go
+@@ -199,5 +199,9 @@
+ 	if !reflectx.IsNil(reflect.ValueOf(ctx)) {
+ 		return ctx
+ 	}
+-	return currentRenderWindow.mains.top().Scene
+-}
++	current := currentRenderWindowSnapshot()
++	if current == nil {
++		return nil
++	}
++	return current.mains.top().Scene
++}
+--- a/core/funcbutton.go
++++ b/core/funcbutton.go
+@@ -358,14 +358,14 @@
+ 	// If there is a single value button, automatically
+ 	// open its dialog instead of this one
+ 	if len(fb.Args) == 1 {
+-		curWin := currentRenderWindow
++		curWin := currentRenderWindowSnapshot()
+ 		sv.UpdateWidget() // need to update first
+ 		bt := AsButton(sv.Child(1))
+ 		if bt != nil {
+ 			bt.OnFinal(events.Change, func(e events.Event) {
+ 				// the dialog for the argument has been accepted, so we call the function
+ 				async := false
+-				if !tree.IsNil(ctx) && currentRenderWindow != curWin { // calling from another window, must lock
++				if !tree.IsNil(ctx) && currentRenderWindowSnapshot() != curWin { // calling from another window, must lock
+ 					async = true
+ 					ctx.AsWidget().AsyncLock()
+ 				}
+--- a/core/sizeclasses.go
++++ b/core/sizeclasses.go
+@@ -28,8 +28,8 @@
+ func (wb *WidgetBase) SceneSize() math32.Vector2 {
+ 	dots := math32.FromPoint(wb.Scene.SceneGeom.Size)
+ 	if wb.Scene.hasFlag(sceneContentSizing) {
+-		if currentRenderWindow != nil {
+-			rg := currentRenderWindow.SystemWindow.RenderGeom()
++		if current := currentRenderWindowSnapshot(); current != nil {
++			rg := current.SystemWindow.RenderGeom()
+ 			dots = math32.FromPoint(rg.Size)
+ 		}
+ 	}
+--- /dev/null
++++ b/system/driver/desktop/screen_vellum_poll_test.go
+@@ -0,0 +1,89 @@
++package desktop
++
++import (
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/driver/base"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++func TestVellumScreenPollAdmission(t *testing.T) {
++	a := &App{AppMulti: base.NewAppMulti[*Window]()}
++	now := time.Now()
++	var admitted atomic.Int32
++	var wg sync.WaitGroup
++	for range 64 {
++		wg.Go(func() {
++			if a.beginScreenPoll(now) {
++				admitted.Add(1)
++			}
++		})
++	}
++	wg.Wait()
++	if got := admitted.Load(); got != 1 {
++		t.Fatalf("admitted %d simultaneous polls", got)
++	}
++	if !a.beginScreenPoll(now.Add(ScreenPollInterval)) {
++		t.Fatal("next interval was not admitted")
++	}
++}
++
++func TestVellumScreenPollSnapshot(t *testing.T) {
++	a := &App{AppMulti: base.NewAppMulti[*Window]()}
++	first, second := &Window{}, &Window{}
++	a.Screens = []*system.Screen{{Name: "first"}}
++	a.Windows = []*Window{first}
++	screens, windows := a.screenPollSnapshot()
++	var wg sync.WaitGroup
++	wg.Go(func() {
++		for range 1000 {
++			a.Mu.Lock()
++			a.Screens[0].Name = "changed"
++			a.Windows[0] = second
++			a.Mu.Unlock()
++		}
++	})
++	for range 1000 {
++		a.screenPollSnapshot()
++		if screens[0].Name != "first" || windows[0] != first {
++			t.Fatal("snapshot aliases mutable cache")
++		}
++	}
++	wg.Wait()
++}
++
++func TestVellumScreenAccessorsDuringCacheRebuild(t *testing.T) {
++	a := &App{AppMulti: base.NewAppMulti[*Window]()}
++	a.Screens = []*system.Screen{{Name: "screen", LogicalDPI: 160}}
++	first := a.Screen(0)
++	named := a.ScreenByName("screen")
++	var wg sync.WaitGroup
++	wg.Go(func() {
++		for range 1000 {
++			a.Mu.Lock()
++			a.Screens = []*system.Screen{{Name: "screen", LogicalDPI: 192}}
++			a.Mu.Unlock()
++		}
++	})
++	for range 1000 {
++		if a.NScreens() != 1 || a.Screen(0) == nil || a.ScreenByName("screen") == nil {
++			t.Fatal("invalid detached cache accessor")
++		}
++		if first.LogicalDPI != 160 || named.LogicalDPI != 160 {
++			t.Fatal("published screen alias changed")
++		}
++	}
++	wg.Wait()
++	a.UpdateScreenLogicalDPI(func(screens []*system.Screen) { screens[0].LogicalDPI = 200 })
++	if got := a.Screen(0).LogicalDPI; got != 200 {
++		t.Fatalf("locked DPI update was not published: %v", got)
++	}
++	a.Mu.Lock()
++	a.Screens = nil
++	a.Mu.Unlock()
++	if a.NScreens() != 0 || a.Screen(0) != nil || a.ScreenByName("screen") != nil {
++		t.Fatal("empty screen cache fallback")
++	}
++}
+--- /dev/null
++++ b/core/renderwindow_vellum_snapshot_test.go
+@@ -0,0 +1,40 @@
++package core
++
++import (
++	"cogentcore.org/core/system"
++	"sync"
++	"testing"
++)
++
++type snapshotScreenWindow struct {
++	system.Window
++	screen *system.Screen
++}
++
++func (w *snapshotScreenWindow) Screen() *system.Screen { return w.screen }
++
++func TestVellumCurrentWindowSnapshotDuringPublication(t *testing.T) {
++	previous := currentRenderWindowSnapshot()
++	defer setCurrentRenderWindow(previous)
++	a := &renderWindow{SystemWindow: &snapshotScreenWindow{screen: &system.Screen{Name: "A"}}}
++	b := &renderWindow{SystemWindow: &snapshotScreenWindow{screen: &system.Screen{Name: "B"}}}
++	setCurrentRenderWindow(a)
++	var writers sync.WaitGroup
++	writers.Go(func() {
++		for range 2000 {
++			setCurrentRenderWindow(b)
++			setCurrentRenderWindow(a)
++		}
++	})
++	stage := &Stage{Screen: -1}
++	for range 2000 {
++		screen := stage.targetScreen()
++		if screen == nil || (screen.Name != "A" && screen.Name != "B") {
++			t.Fatal("invalid current native screen")
++		}
++		if current := currentRenderWindowSnapshot(); current != a && current != b {
++			t.Fatal("invalid current window")
++		}
++	}
++	writers.Wait()
++}

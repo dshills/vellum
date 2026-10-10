@@ -111,6 +111,17 @@
               "sha256": "7b60ed6ee2317c568bb2f33525138fa3b4759651360065c914bf7ca815c596ac"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/accessibility",
+          "inputs": "native/patches/accessibility/original-hashes.json",
+          "outputs": "native/patches/accessibility/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/accessibility/0018-screen-poll-snapshots.patch",
+              "sha256": "67128034e301fdfdbc13b2f024faffacd771cbaca3f0f392c082c2c2366e6c41"
+            }
+          ]
         }
       ]
     },

@@ -1,0 +1,19 @@
+Vellum native accessibility phase2 fresh evidence
+Started UTC: 2026-10-10T19:43:08.082654+00:00
+Tested checkout: /private/tmp/vellum-phase2-final-isolated
+Working directory: /private/tmp/vellum-phase2-final-isolated/drivers/cogent
+Canonical phase1 commit: 89cb930
+Candidate synthetic Git baseline: 5a7667995982006ea5799c3b78cb44e0d24fbe26
+Source manifest SHA256: c8ac680cb1f580af127633934a0e46b5c1e6363ab1a988042eaffbf336e80e58
+Dependency boundary: through owned patch0018, excludes phase4 patch0019
+Command argv: ["go", "test", "-race", "-count=1", "-run", "TestAccessibilityDialogInitialFocusBeforeDeferredShow", "-v", "."]
+# example.com/vellum/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestAccessibilityDialogInitialFocusBeforeDeferredShow
+--- PASS: TestAccessibilityDialogInitialFocusBeforeDeferredShow (0.01s)
+PASS
+ok  	example.com/vellum/cogent	1.637s
+
+EXIT_STATUS=0
+RESULT=PASS
+Finished UTC: 2026-10-10T19:43:13.948245+00:00

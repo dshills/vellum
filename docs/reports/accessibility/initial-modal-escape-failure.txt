@@ -1,0 +1,15 @@
+Vellum native accessibility phase2 fresh evidence
+Started UTC: 2026-10-10T19:38:01.515657+00:00
+Tested checkout: /private/tmp/vellum-phase2-final-isolated
+Working directory: /private/tmp/vellum-phase2-final-isolated
+Canonical phase1 commit: 89cb930
+Candidate synthetic Git baseline: 5a7667995982006ea5799c3b78cb44e0d24fbe26
+Source manifest SHA256: c0e7d59f89e017ea8761db0fd8cdb5854b47b56e5c348366853c4b904c1422ce
+Dependency boundary: through owned patch0018, excludes phase4 patch0019
+Command argv: ["/private/tmp/vellum-accessibility-smoke-phase2-final"]
+live workbench bridge: dock initial visible panel tree: accessibility wait: context deadline exceeded; last={Generation:3 Reachable:true FocusedID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWwtZmllbGQ WindowRole:AXWindow NativeWindow:true Elements:[{ID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWw Role:AXGroup Name:One preferences Value:<nil> Enabled:true Frame:[1058 947 337 133] Selected:false Expanded:false Parent: DomainID:modal HitTestID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWw} {ID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWwtZmllbGQ Role:AXTextField Name:One modal field Value:One initial modal accepted Enabled:true Frame:[1058 1039 280 41] Selected:false Expanded:false Parent:workbench:d29ya2JlbmNo:b25l:node:bW9kYWw DomainID:modal-field HitTestID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWwtZmllbGQ}]}; last query error=<nil>
+live workbench bridge: dock initial visible panel tree: accessibility wait: context deadline exceeded; last={Generation:3 Reachable:true FocusedID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWwtZmllbGQ WindowRole:AXWindow NativeWindow:true Elements:[{ID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWw Role:AXGroup Name:One preferences Value:<nil> Enabled:true Frame:[1058 947 337 133] Selected:false Expanded:false Parent: DomainID:modal HitTestID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWw} {ID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWwtZmllbGQ Role:AXTextField Name:One modal field Value:One initial modal accepted Enabled:true Frame:[1058 1039 280 41] Selected:false Expanded:false Parent:workbench:d29ya2JlbmNo:b25l:node:bW9kYWw DomainID:modal-field HitTestID:workbench:d29ya2JlbmNo:b25l:node:bW9kYWwtZmllbGQ}]}; last query error=<nil>
+
+EXIT_STATUS=1
+RESULT=FAIL
+Finished UTC: 2026-10-10T19:38:21.723225+00:00

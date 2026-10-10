@@ -166,6 +166,7 @@ func (v *VirtualTree) Mount(parent tree.Node) core.Widget {
 	v.wheel = 0
 	v.host = core.NewFrame(parent)
 	v.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
+	mountAccessibilityTreePager(v)
 	for i := 0; i < v.Count; i++ {
 		slot := i
 		b := core.NewButton(v.host)

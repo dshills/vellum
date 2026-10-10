@@ -1,0 +1,276 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "d306a05bc065fa284b99eb61f5b97df0",
+  "repo": {
+    "root": "/private/tmp/vellum-ax-review-final",
+    "head": "b9f4deb2feb46cf81f386f95abc15eaadee98cbc",
+    "branch": "codex/phase-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "8dc216d2ab9e2cfe",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference of record widget when binding dialog keyboard handler",
+      "message": "bindAccessibilityDialogKeyboard calls r.widget.AsTree() without first checking that the widget is non-nil. Every other function in this file guards widgets with tree.IsNil. If a dialog record has no widget yet, or a parent in the chain is a typed nil, this panics while a modal is being created.",
+      "suggestion": "Return early when tree.IsNil(r.widget) or body is nil, and use tree.IsNil(parent) in the loop condition.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 498,
+            "end": 498
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "panic",
+        "dialog",
+        "location-corrected"
+      ],
+      "evidence": "for parent := r.widget.AsTree().Parent; parent != nil; parent = parent.AsTree().Parent {",
+      "fix": {
+        "before": "for parent := r.widget.AsTree().Parent; parent != nil; parent = parent.AsTree().Parent {",
+        "after": "if tree.IsNil(r.widget) || body == nil {\n\t\treturn\n\t}\n\tfor parent := r.widget.AsTree().Parent; !tree.IsNil(parent); parent = parent.AsTree().Parent {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5bdd806295ed3b8f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native request can wait forever if no result is delivered",
+      "message": "The request waits only for vellumAXResult or ctx cancellation. If the native side never answers, the caller blocks until the context ends. This can happen if the token is detached or the window closes between lookupAccessibility and the native call, or if the main-thread block is dropped. With context.Background() or a context without a deadline, InspectAccessibility and PerformAccessibilityAction hang forever. I could not see the Objective-C side, so I cannot confirm it always replies.",
+      "suggestion": "Have the native side always call vellumAXResult, including for a detached token or missing window. In Go, also fail on detach by selecting on a per-bridge closed channel, or apply a default timeout when ctx has no deadline.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_darwin.go",
+          "lines": {
+            "start": 130,
+            "end": 136
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "hang",
+        "cgo",
+        "location-corrected"
+      ],
+      "evidence": "\tstart(request)\n\tselect {\n\tcase value := \u003c-result:\n\t\treturn value, nil\n\tcase \u003c-ctx.Done():\n\t\treturn \"\", ctx.Err()\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "200f6ed481c8e08c",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Namespaced handler wrapper swallows focus actions for non-focusable nodes",
+      "message": "Every namespaced node that has a handler gets a wrapper that intercepts the \"focus\" action. The wrapper calls accessibilityFocus on the prefixed ID and returns true unconditionally. It never checks that the node is focusable, that it advertises a focus action, or whether it is disabled. A focus request on a press-only or non-focusable node inside a dock panel is reported as handled, and the inner handler's own focus logic is skipped. The workbench group and option handlers verify the generation counter, but this wrapper does not.",
+      "suggestion": "Intercept focus only for nodes that are Focusable and list \"focus\" in Actions. Otherwise delegate to the original handler. Also use the result of accessibilityFocus rather than returning true unconditionally, if it reports success.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_workbench.go",
+          "lines": {
+            "start": 55,
+            "end": 58
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "focus",
+        "handlers"
+      ],
+      "evidence": "if action.Kind == \"focus\" {\n\t\t\t\t\taccessibilityFocus(b, id)\n\t\t\t\t\treturn true\n\t\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8a9186d64e95795b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "slices package used in screen.go without a visible import",
+      "message": "The rewritten PollScreenChanges calls slices.Equal, but the only import hunk in this patch (for app.go) adds just \"time\". The screen.go hunks add no \"slices\" import. If screen.go does not already import slices, the patched file fails to compile. The output-hashes.json check would then fail, or the build would break.",
+      "suggestion": "Add an import hunk for \"slices\" to system/driver/desktop/screen.go, or compare the snapshots with an explicit loop. Compile-check the patched tree.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+          "lines": {
+            "start": 135,
+            "end": 135
+          }
+        }
+      ],
+      "tags": [
+        "compile",
+        "patch",
+        "location-corrected"
+      ],
+      "evidence": "+\tif slices.Equal(before, after) {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 178578,
+    "totalMs": 44007
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 22,
+    "bytes": 151819,
+    "chunks": 11,
+    "llmCalls": 17,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 150084,
+        "output": 26304,
+        "cachedInput": 9403,
+        "costUSD": 0.563208
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 6,
+      "refuted": 2
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "704423c3768d8b96",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Ignored a.Do error lets final owner-state verification pass vacuously",
+        "message": "The error returned by a.Do is discarded. If Do fails (for example the app is closing or the context is cancelled), the closure never runs, modelErr stays nil, and the smoke test reports PASS without verifying the accepted owner state. The press-count check earlier has the same problem, though it fails safe there by timing out.",
+        "suggestion": "Capture the error from a.Do and return it when non-nil. Declare `var doErr error` first, assign the result to it, and fail on `doErr != nil` before checking modelErr.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/accessibility-smoke/main.go",
+            "lines": {
+              "start": 282,
+              "end": 283
+            }
+          }
+        ],
+        "tags": [
+          "error-handling",
+          "test-validity"
+        ],
+        "evidence": "\t_ = a.Do(func() {\n\t\tif m.presses != 1 || !m.checked",
+        "fix": {
+          "before": "\t_ = a.Do(func() {\n\t\tif m.presses != 1 || !m.checked",
+          "after": "\tif doErr := a.Do(func() {\n\t\tif m.presses != 1 || !m.checked"
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/accessibility-smoke/main.go"
+    },
+    {
+      "finding": {
+        "id": "a047e6b80cf80873",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Snapshot validation rejects null `value`, silently dropping the whole tree",
+        "message": "The validator rejects the whole snapshot if a node's value is anything but NSString or NSNumber. `accessibilityValue` (and the probe walker) explicitly handle `NSNull`, so a descriptor with an explicit JSON `null` value is expected to be possible. Such a node would fail validation, and `vellumAXUpdate` would drop the entire tree with no log or error. Assistive technology would then keep seeing a stale or empty hierarchy.",
+        "suggestion": "Treat NSNull as an absent value in validation (`if(accepted\u0026\u0026accepted!=NSNull.null\u0026\u0026...)`), or confirm the Go side never emits null and drop the NSNull handling for consistency. Apply the same treatment to the optional `min`/`max` keys, and consider logging when a snapshot is rejected.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/accessibility_darwin.m",
+            "lines": {
+              "start": 173,
+              "end": 173
+            }
+          }
+        ],
+        "tags": [
+          "accessibility",
+          "validation",
+          "darwin",
+          "location-corrected"
+        ],
+        "evidence": "id accepted=node[@\"value\"];if(accepted\u0026\u0026![accepted isKindOfClass:NSString.class]\u0026\u0026![accepted isKindOfClass:NSNumber.class])return NO;",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The validator does reject an explicit JSON null (it parses to NSNull, which is neither NSString nor NSNumber), but the finding assumes descriptors can carry null, and nothing shown supports that. The NSNull in the probe walker is on the output side, where a nil accessibilityValue is turned into null for the probe result. It does not show that input snapshots contain null. The strict type check looks deliberate, since the code comments say the whole payload is validated up front, and it matches how name, help and domain_id are treated. The exported vellumAXSnapshotValid also lets the producer check a payload before sending it, so a rejection need not be silent."
+    },
+    {
+      "finding": {
+        "id": "4fb1728bdf50590c",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Poll now unconditionally rebuilds screens and runs DPI callback, dropping the zero-monitor guard",
+        "message": "The old PollScreenChanges returned early when glfw.GetMonitors() was empty and only refreshed the cache when the monitor count matched. The new version always runs GetScreens, including with zero monitors. GetScreens also now calls UpdateLogicalDPIScaleFunc on every poll, even when nothing changed. That callback rewrites the DPI globals and every screen's LogicalDPI. This adds work to the paint loop and risks resetting the cache or hitting unguarded Screens[0] access while monitors are transiently absent, for example during sleep or a hot-plug.",
+        "suggestion": "Keep the early return when glfw.GetMonitors() is empty. Run the DPI callback from GetScreens only when the cache contents actually changed, for example by comparing the before and after snapshots.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+            "lines": {
+              "start": 133,
+              "end": 134
+            }
+          }
+        ],
+        "tags": [
+          "regression",
+          "screen-poll",
+          "location-corrected"
+        ],
+        "evidence": "+\ta.GetScreens()\n+\tafter, windows := a.screenPollSnapshot()",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The finding overstates the risk. The old poll already called GetScreens, and so the DPI callback, whenever the monitor count matched, so per-poll callback work is not new. MonitorChange already ran GetScreens on any monitor event, including removal of the last monitor, so it must already tolerate zero monitors. This patch also replaces the unguarded Screens[0] accesses with ScreenSnapshot(0), and its tests show Screen(0) returning nil on an empty cache. The dropped early return is a real behaviour change, but the harm described is speculative and is not shown by the code."
+    }
+  ],
+  "suppressed": []
+}

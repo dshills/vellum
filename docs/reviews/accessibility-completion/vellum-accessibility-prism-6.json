@@ -1,0 +1,129 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "89901c5b54bc862e464f9dd06f9b32fe",
+  "repo": {
+    "root": "/private/tmp/vellum-phase2-final-isolated",
+    "head": "5a7667995982006ea5799c3b78cb44e0d24fbe26",
+    "branch": "codex/phase-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2dda59717107798d",
+      "severity": "medium",
+      "category": "bug",
+      "title": "AX tree paging mutates the viewport without invalidating or resyncing the native view",
+      "message": "The AX page handler for VirtualTree changes v.Start and returns true. It does not invalidate the window or resync, unlike the native button path, which calls v.Owner.Invalidate(v.Window). The fixed row pool and the 'vellum.accessibility-domain' stamps come from the last sync (v.visible), while the AX snapshot is built from Model.View(v.Start, v.Count). Until a sync happens, the published tree nodes can disagree with the stamped native widgets, so row bounds can be missing or wrong after an AX page action. The page action may also appear to succeed without visibly changing the view.",
+      "suggestion": "After accessibilityTreePage in the AX handler, invalidate the window the same way the native button does (for example `_ = v.Owner.Invalidate(v.Window)`), or confirm the driver always resyncs after a handler returns true. Apply the same check to the VirtualTable page handler.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_virtual.go",
+          "lines": {
+            "start": 106,
+            "end": 107
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "virtual-tree",
+        "consistency"
+      ],
+      "evidence": "accessibilityTreePage(v, delta)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 187546,
+    "totalMs": 39290
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 45,
+    "bytes": 311496,
+    "chunks": 21,
+    "llmCalls": 22,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 242684,
+        "output": 22706,
+        "cachedInput": 45743,
+        "costUSD": 0.712428
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "99aaa07dbd52d815",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Zero-monitor guard removed from PollScreenChanges",
+        "message": "The rewritten poll drops the old guard that returned when `glfw.GetMonitors()` reported no monitors. It now calls `GetScreens()` and the DPI callback on every poll tick. If no monitors are reported (transient hotplug or sleep), this can rebuild the cache as empty, send a spurious `ScreenUpdate`, and run the DPI callback against an empty cache. The old code skipped all of that. `GetScreens` also now runs the callback on every return path, including early returns.",
+        "suggestion": "Restore the zero-monitor early return before `GetScreens()` (check `len(glfw.GetMonitors()) == 0`). Alternatively, make sure `GetScreens` leaves the previous cache in place and skips the callback when no monitors are found.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+            "lines": {
+              "start": 143,
+              "end": 152
+            }
+          }
+        ],
+        "tags": [
+          "screen",
+          "regression"
+        ],
+        "evidence": "if !a.beginScreenPoll(time.Now()) {\n\t\treturn\n\t}\n\tbefore, _ := a.screenPollSnapshot()\n\ta.GetScreens()",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch"
+    }
+  ],
+  "suppressed": []
+}

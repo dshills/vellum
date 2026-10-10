@@ -1,0 +1,29 @@
+{
+  "drivers/cogent/driver.go": {
+    "phase2_tested_sha256": "57ed510e5fe74534c9adffdddc2801c30f8fa207cb0969bafefa1dc578fd1853",
+    "canonical_later_phase_sha256": "602d5a2008811800466a948767ca4892fb5432014da8b25695d536f35fb62d9c",
+    "phase2_snapshot": "/private/tmp/vellum-phase2-driver.go",
+    "snapshot_sha256": "57ed510e5fe74534c9adffdddc2801c30f8fa207cb0969bafefa1dc578fd1853",
+    "snapshot_matches": true,
+    "canonical_difference_expected": true,
+    "reason": "Phase2 driver excludes later platform-service lifecycle hooks"
+  },
+  "drivers/cogent/native/dependencies.json": {
+    "phase2_tested_sha256": "dd3f1e2ea604f3b2158983524b6f7c36fbc7b2526b3e9a9d46d23d9368637a53",
+    "canonical_later_phase_sha256": "9441a75d3a3c34476e4d8c64abfb4ae8c2d35e74db0dd6eda9a0579db4968877",
+    "phase2_snapshot": "/private/tmp/vellum-phase2-dependencies.json",
+    "snapshot_sha256": "dd3f1e2ea604f3b2158983524b6f7c36fbc7b2526b3e9a9d46d23d9368637a53",
+    "snapshot_matches": true,
+    "canonical_difference_expected": true,
+    "reason": "Phase2 adapter includes patches001..0018; canonical later phase adds0019"
+  },
+  "drivers/cogent/prepare_test.py": {
+    "phase2_tested_sha256": "afa31c08c0ca18da7fab49703839125b20391912c25ca59fc19f6cd2d195307f",
+    "canonical_later_phase_sha256": "f142e79ae01d155c7f408ec323e466d61f148e0fd9d5366e02a3968a0fda091b",
+    "phase2_snapshot": "/private/tmp/vellum-phase2-prepare_test.py",
+    "snapshot_sha256": "afa31c08c0ca18da7fab49703839125b20391912c25ca59fc19f6cd2d195307f",
+    "snapshot_matches": true,
+    "canonical_difference_expected": true,
+    "reason": "Phase2 preparation assertion range(1,19); canonical later phase range(1,20)"
+  }
+}

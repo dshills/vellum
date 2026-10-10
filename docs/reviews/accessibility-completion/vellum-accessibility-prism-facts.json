@@ -1,0 +1,196 @@
+{
+  "phase": "native accessibility",
+  "basis": "Checked canonical source and freshly prepared driver inputs; no human VoiceOver acceptance is inferred.",
+  "refuted_findings": [
+    {
+      "id": "d0253da2ee8cadb4",
+      "fact": "Nonfinite numeric descriptor values cannot reach the snapshot. ui.Numeric.Validate rejects Number, Min, Max, Step NaN/\u00b1Inf and out-of-range numbers; ui.Validate invokes ValidateControl; driver.refresh and Workbench.Mount/Sync call ui.Validate, and mountControl calls ValidateControl independently. Snapshot numeric values are exclusively those validated fields; other Value types are string/bool and optional bounds are float32. Regression TestAccessibilityNumericDescriptionsRejectNonfiniteBeforeSnapshot covers both kinds and every numeric field, then verifies JSON serialization of an accepted descriptor.",
+      "sources": [
+        "ui/controls.go:67",
+        "ui/controls.go:90",
+        "ui/node.go:55",
+        "drivers/cogent/driver.go:140",
+        "drivers/cogent/workbench.go:146",
+        "drivers/cogent/workbench.go:228",
+        "drivers/cogent/controls.go:58"
+      ]
+    },
+    {
+      "id": "dd3bd9e49ebedfdd",
+      "fact": "Modal host RenderWidget runs under the originating shared renderContext, not a new independent OS window. prepareDialogBody invokes NewDialog(r.widget), not NewWindowDialog. NewDialog's Stage.NewWindow remains false; Stage.runDialog takes ctx.Scene.Stage.Mains and setMains assigns its shared renderContext. core.renderWindow.handleEvent holds that context for all event dispatch; renderAsync/renderAsyncOwned holds it through Scene rendering. driver.refresh/keyboard/native modal close mutate records only in that event path (or pre-show with no renderer). Queued AX actions only mutate accepted owner models or atomic pendingFocus; native-widget changes are deferred to originating refresh. Main host's rootMu is extra protection for retained tree lifecycle, rather than an indication that modal rendering lacks shared render exclusion. Adding another foreign Scene lock would risk cross-window owner lock inversion.",
+      "sources": [
+        "drivers/cogent/controls.go:419",
+        "drivers/cogent/controls.go:417",
+        "drivers/cogent/build/upstream/core/dialog.go:31",
+        "drivers/cogent/build/upstream/core/mainstage.go:332",
+        "drivers/cogent/build/upstream/core/stage.go:258",
+        "drivers/cogent/build/upstream/core/renderwindow.go:449",
+        "drivers/cogent/build/upstream/core/renderwindow.go:816",
+        "drivers/cogent/driver.go:128",
+        "drivers/cogent/driver.go:341"
+      ]
+    },
+    {
+      "id": "059c8764b22ca970",
+      "fact": "The fixture injects system events by queue, not direct widget dispatch. WindowByName protects only the registry slice with AppMulti.Mu; Name/SetName are not mutex protected, and native NewWindow publishes before SetName, so startup lookup is not generally thread safe. Main fixture lookup occurs after stable actual AX geometry/actions and before it opens a second window. Workbench lookup now occurs only after its actual modal geometry/hit-test probe and owner-accepted modal edit; no other window starts during either lookup. Source.KeyChord constructs a fresh event and only calls Deque.Send under its mutex. core.renderWindow.handleEvent later dispatches under renderContext.Lock. The early post-Open lookup was removed, rather than relying on the registry lock for window-field publication.",
+      "sources": [
+        "drivers/cogent/build/upstream/system/driver/base/app_multi.go:80",
+        "drivers/cogent/build/upstream/system/driver/base/window.go:155",
+        "drivers/cogent/build/upstream/core/renderwindow.go:135",
+        "drivers/cogent/build/upstream/core/renderwindow.go:140",
+        "drivers/cogent/cmd/accessibility-smoke/main.go",
+        "drivers/cogent/cmd/accessibility-smoke/workbench.go",
+        "drivers/cogent/build/upstream/events/source.go:101",
+        "drivers/cogent/build/upstream/events/deque.go:90",
+        "drivers/cogent/build/upstream/core/renderwindow.go:449"
+      ]
+    },
+    {
+      "id": "8a9186d64e95795b",
+      "fact": "screen.go already imports slices in the pinned original upstream source and in freshly prepared output. Patch18 adds slices.Equal calls without an import hunk because no import edit is needed. Native builds and the focused backend race suite compile and pass. Expanded patch18 also snapshots production currentRenderWindow access under its existing mutex; the concurrent publication/targetScreen test verifies the previously reproduced integration race.",
+      "sources": [
+        "drivers/cogent/build/upstream/system/driver/desktop/screen.go:14",
+        "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+        "drivers/cogent/build/upstream/core/renderwindow_vellum_snapshot_test.go"
+      ]
+    },
+    {
+      "id": "c6107f5560b584c1",
+      "fact": "The hypothesized Run return contract does not apply. Application.Run registers context.AfterFunc(ctx,a.Close) and calls d.Run(a.ctx,a). Driver.Run returns ctx.Err only before any native window starts. After started=true and core.Wait(), it returns the recorded refresh/device/native failure if present, otherwise nil; it does not return ctx.Err on normal post-start shutdown. The smoke cancels after publishing its check result, by which point real native windows have started. Keeping err propagation preserves legitimate native/device failures. Consecutive live fixtures already exit0 on this contract; no context.Canceled suppression is needed.",
+      "sources": [
+        "app/app.go:300",
+        "app/app.go:315",
+        "drivers/cogent/driver.go:341",
+        "drivers/cogent/driver.go:348",
+        "drivers/cogent/driver.go:355",
+        "drivers/cogent/cmd/accessibility-smoke/main.go"
+      ]
+    },
+    {
+      "id": "096f24a3784588fa",
+      "fact": "ui.Numeric is mandatory for both Slider and NumberField. Numeric.Validate rejects nonfinite fields, Max<=Min, Step<=0, oversized span/step and values outside the declared range; ValidateControl always invokes it for both numeric kinds. There is no optional/unbounded flag. Driver refresh, control mount and Workbench Mount/Sync validate descriptors before accessibility publication, so omitted or 0..0 bounds cannot reach the native tree. Existing TestControlValidationAndFocus rejects zero Step, and TestAccessibilityNumericDescriptionsRejectNonfiniteBeforeSnapshot covers nonfinite values in all four numeric fields. A portable contract probe additionally verifies omitted/equal-zero bounds and zero Step are refused for both kinds while a declared 0..10 range is accepted. Publishing validated Min/Max is required, and suppressing those pointers would misrepresent supported controls.",
+      "sources": [
+        "ui/controls.go:33",
+        "ui/controls.go:67",
+        "ui/controls.go:90",
+        "ui/node.go:55",
+        "ui/controls_test.go:24",
+        "drivers/cogent/accessibility_test.go:264",
+        "drivers/cogent/controls.go:58",
+        "drivers/cogent/driver.go:140",
+        "drivers/cogent/workbench.go:146",
+        "drivers/cogent/workbench.go:228",
+        "docs/reports/accessibility/numeric-contract.txt",
+        "docs/reports/accessibility/numeric-contract-source.txt"
+      ]
+    },
+    {
+      "id": "2dda59717107798d",
+      "fact": "AX page handlers use the common delivery invalidation path. accessibilityDeliver posts to the registered logical window, rechecks lifetime/generation, resolves the current handler, and calls owner.Invalidate(window) whenever that handler accepts the action. This covers both VirtualTree accessibilityTreePage (returns true after updating Start) and VirtualTable SetViewport (returns true on success); neither handler needs a second local invalidation. Application.Invalidate marks the matching window dirty and wakes the driver. The Custom event handler drains accepted owner callbacks before syncTopology and refresh(w). Refresh consumes TakeDirty, validates/reconciles the descriptor, and reconcile calls syncRecord; ui.Extension syncRecord calls ext.Sync on every reconciliation, even with the same Custom pointer. VirtualTree.Sync updates its fixed native row pool and v.visible from the accepted Start; VirtualTable.Sync updates its pool from Model.View. Only afterward does refresh call syncAccessibility, which stamps current materialized domain IDs before publishing the semantic snapshot. Geometry is published after render. Both repeated final native AX runs accepted tree Next/Previous page actions, observed the recycled row with nonzero geometry, and verified the actual native pager hit-test target; the table Next page action likewise replaced row-0 with row-4. The finding overlooks this verified cross-file delivery/refresh path.",
+      "sources": [
+        "drivers/cogent/accessibility.go:101",
+        "drivers/cogent/accessibility.go:116",
+        "drivers/cogent/accessibility.go:186",
+        "drivers/cogent/accessibility_virtual.go:18",
+        "drivers/cogent/accessibility_virtual.go:45",
+        "drivers/cogent/accessibility_virtual.go:102",
+        "app/app.go:232",
+        "drivers/cogent/driver.go:126",
+        "drivers/cogent/driver.go:329",
+        "drivers/cogent/driver.go:475",
+        "drivers/cogent/reconcile.go:199",
+        "drivers/cogent/virtual.go:117",
+        "drivers/cogent/virtual.go:219",
+        "drivers/cogent/accessibility_virtual.go:191",
+        "drivers/cogent/cmd/accessibility-smoke/main.go:242",
+        "drivers/cogent/cmd/accessibility-smoke/main.go:311",
+        "docs/reports/accessibility/native-ax-1.txt",
+        "docs/reports/accessibility/native-ax-2.txt"
+      ]
+    }
+  ],
+  "implemented_findings": [
+    {
+      "id": "2c7d60e90dba0ce3",
+      "change": "Tabs bounds require control!=nil and tabs!=nil; unbuilt state regression."
+    },
+    {
+      "id": "2c79ec3cecfdc274",
+      "change": "NativeAttachment.Close already runs under RunOnMainQueued before GLFW native destruction; Objective-C detach now defensively dispatches to main synchronously if a direct caller is off-main. Bridge retirement releases all Go mutexes before the C call."
+    },
+    {
+      "id": "39f195259c538abc",
+      "change": "Store the installed runtime content-view subclass; restore original isa only if current object_getClass still equals that exact installed class. NSWindow isa is never changed."
+    },
+    {
+      "id": "4669d87eaf70ff49",
+      "change": "Validate complete native payload before any retained object mutation: required types, nonempty/duplicate identifiers, action string types, scalar metadata/value types, parent existence and parent cycles. Darwin parser regression covers a malformed later node, duplicate ID, orphan, cycle, bad action and bad value."
+    },
+    {
+      "id": "fea87f4e3e82eecc",
+      "change": "Added actual VirtualTree native Previous/Next pager widgets in Mount, stamped with stable page property; geometry reads those widgets; native smoke verifies nonzero frames, actual hit test and owner-accepted paging."
+    },
+    {
+      "id": "ea12f7891dcea42f",
+      "change": "Every native focus predicate requires a present nonempty identifier, including all captured dock fields."
+    },
+    {
+      "id": "8dc216d2ab9e2cfe",
+      "change": "Dialog keyboard binding rejects nil record/widget/body/Scene and uses accessibilityTreeNil for every parent; that helper rejects typed-nil pointers before upstream tree.IsNil retirement checks. Tests cover concrete typed-nil widgets/parents and unbuilt body/record state."
+    },
+    {
+      "id": "5bdd806295ed3b8f",
+      "change": "Every request waits on attachment retirement and a five-second maximum timeout including Background contexts; request map registration is removed on all completion paths. Darwin tests prove immediate close cancellation/no leak and actual default Background timeout with no native reply. Cocoa already returns {} for missing probe token and false for missing action target when its main queue runs."
+    },
+    {
+      "id": "200f6ed481c8e08c",
+      "change": "Namespaced focus requires Focusable, enabled and advertised focus action. It invokes original handler validation before rewriting pending focus to qualified ID. Regression proves no invented permission, qualified live focus, and stale-generation refusal."
+    },
+    {
+      "id": "704423c3768d8b96",
+      "change": "Although review discarded this finding because its location/evidence did not match, the genuine ignored final owner-state Do error is fixed. Counter sampling fails closed on owner error; final accepted-state checks return owner errors and include the outline accepted viewport."
+    },
+    {
+      "id": "d2510327a73af37b",
+      "change": "The initial source-only refutation was incorrect: upstream tree.IsNil invokes the promoted AsTree method before checking the underlying This, so typed-nil *core.Tabs can panic. A missing-dock-widget regression reproduced that exact crash. All owned AX nil checks now use accessibilityTreeNil, which rejects a typed-nil pointer before retaining upstream retired-node checks. Tests cover missing dock Tabs/Tab map entries, concrete typed-nil Frame/Tabs, retired This, and modal parent/widget typed nils."
+    },
+    {
+      "id": "4da0c1f54a67f683",
+      "change": "Go caching is keyed by test inputs, so a valid cached result does not prove the tested source is stale. Final evidence nevertheless reruns portable/native race suites with -count=1. Every command log includes the actual candidate Git baseline, canonical prior-phase base, source-manifest SHA256, exact argv and exit/PASS markers. Vet records command and successful exit even when it emits no diagnostics."
+    },
+    {
+      "id": "fdb53dacb94981cf",
+      "change": "Table.SetViewport already clamps the upper start and returns errors for invalid count; the original tail-unreachable hypothesis does not match that model implementation. The adapter now explicitly clamps both ends, returns SetViewport error as refused action, and rejects a changed captured viewport count. A six-row/four-slot regression verifies the trailing row, boundary next/previous, and stale-count refusal."
+    },
+    {
+      "id": "c62f5a82da1955c8",
+      "change": "Outline press selects only. Separate advertised expand/collapse actions reread the current materialized row, validate current HasChildren/Expanded, check Select/Toggle errors, and preserve selection through disclosure. Unadvertised actions, recycled/offscreen rows and replaced leaves are refused. Cocoa maps actual setAccessibilityExpanded: to queued expand/collapse and probes isAccessibilityExpanded. Model regressions cover independent callbacks/idempotence/replacement, while native fixture verifies disclosure state, child reachability, selection preservation and leaf refusal."
+    },
+    {
+      "id": "e3860247cdaf529b",
+      "change": "Native hit testing traverses retained roots/children in reverse descriptor sibling order and descends before testing the parent. This selects later painted branches and deeper targets deterministically, and traverses synthetic zero-frame containers. Native unit fixtures run the production traversal against parsed retained snapshots for equal parent/child, equal/reordered siblings, zero-frame ancestors, later-root overlay, non-containing later sibling and misses (32 repeated queries each). A live selector fixture asserts equal frames and repeated actual content-view probes resolving to the later option. Modal snapshots already omit underlying window content."
+    }
+  ],
+  "native_disclosure_basis": "Apple NSAccessibilityProtocol.setAccessibilityExpanded(_:), and NSAccessibility accessibilityExpanded property getter isAccessibilityExpanded: https://developer.apple.com/documentation/appkit/nsaccessibilityprotocol/setaccessibilityexpanded%28_%3A%29",
+  "preparation_input_contract": {
+    "phase2_test": "drivers/cogent/prepare_test.py",
+    "phase2_patch_assertion": "list(range(1,19)) = patch001..0018",
+    "canonical_later_phase_assertion": "list(range(1,20)) = patch001..0019",
+    "phase2_test_source_sha256": "afa31c08c0ca18da7fab49703839125b20391912c25ca59fc19f6cd2d195307f",
+    "result": "11 phase2 preparation tests pass, including manifest pin/order/hash checks and failure/rollback preservation; no native compiled input changed."
+  },
+  "modal_keyboard_readiness": {
+    "failure_evidence": "/private/tmp/vellum-ax-initial-modal-escape-failure.txt",
+    "observed": "Initial dock modal retained accepted text/AX geometry after first queued Escape in one live run, with no race report.",
+    "source_contract": "core.Events.handleFocusEvent reaches Scene.OnFirst through focus ancestors. With no event focus it checks explicit startFocus/prevFocus; NewDialog sets only startFocusFirst, activated later by deferred Shown.",
+    "fix": "bindAccessibilityDialogKeyboard now explicitly seeds the first visible enabled own-modal start focus before NewDialog.Run, skipping nested modal Scenes and using the modal body as an Escape anchor if no managed target exists.",
+    "regression": "TestAccessibilityDialogInitialFocusBeforeDeferredShow verifies disabled, closed, nested-modal, first-target and body-fallback behavior. Native fixture sends initial Escape once, without a focus action or retry.",
+    "sources": [
+      "drivers/cogent/build/upstream/core/events.go:187",
+      "drivers/cogent/build/upstream/core/mainstage.go:368",
+      "drivers/cogent/build/upstream/core/render.go:473",
+      "drivers/cogent/accessibility.go",
+      "drivers/cogent/accessibility_test.go"
+    ]
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f57f1eda82ded7c3ef788829921ffd30",
+  "repo": {
+    "root": "/private/tmp/vellum-ax-prism-round3",
+    "head": "c7233c6de053c6f3ed771c1c6ac7f666c1243539",
+    "branch": "codex/phase-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "4da0c1f54a67f683",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Race-test evidence is a cached result, not a fresh race run",
+      "message": "The log `portable-race.txt` records `ok example.com/vellum/ui (cached)`. A cached Go test result replays an earlier run. It does not show that the race detector ran against the code at this commit. The `native-race.txt` log has the same problem for several packages (gallery, platform-smoke, platformio). The `ui/focus.go` changes are in this commit, so a cached pass is weak evidence for the focus race claims. The empty `native-vet.txt` also cannot show that vet was actually run.",
+      "suggestion": "Re-run with `-count=1` (for example `go test -race -count=1 ./ui` and `cd drivers/cogent \u0026\u0026 go test -race -count=1 ./...`). Regenerate the logs and add the commit hash and the command to them.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/reports/accessibility/README.md",
+          "lines": {
+            "start": 21,
+            "end": 21
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "test-caching"
+      ],
+      "evidence": "| Portable focus race tests | `go test -race ./ui` | [PASS](portable-race.txt) |",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "fdb53dacb94981cf",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Table paging ignores SetViewport error and does not clamp the upper bound",
+      "message": "The table page closure clamps only the lower bound, unlike `accessibilityTreePage`, which clamps both bounds. The SetViewport error is discarded. If SetViewport rejects a start whose window extends past Len, paging \"next\" onto the last partial page silently does nothing and the trailing rows are unreachable through accessibility. The failure is also not reported.",
+      "suggestion": "Clamp next to max(0, length-count) before calling SetViewport, as the tree pager does. Handle the returned error by returning false from the handler or reporting it.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_virtual.go",
+          "lines": {
+            "start": 46,
+            "end": 51
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "virtual-table"
+      ],
+      "evidence": "_ = v.Model.SetViewport(next, count)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c62f5a82da1955c8",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Tree row press both selects and toggles expansion",
+      "message": "The single \"press\" action on a tree row both selects the row and toggles its expansion when it has children. A screen-reader user who only wants to select an expanded node will collapse it, and one who wants to expand a node cannot do so without also changing selection. The row's `expanded` state is exposed but there are no separate expand/collapse actions. Errors from Select and Toggle are also ignored, and `row.HasChildren` is a stale snapshot captured when the nodes were built.",
+      "suggestion": "Make \"press\" select only, and add distinct \"expand\" and \"collapse\" actions that call Toggle when the current state differs. Re-read HasChildren and Expanded from the model inside the handler, and check any returned errors.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_virtual.go",
+          "lines": {
+            "start": 120,
+            "end": 123
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "semantics"
+      ],
+      "evidence": "v.Model.Select(row.ID)\n\t\t\t\t\t\t\tif row.HasChildren {\n\t\t\t\t\t\t\t\tv.Model.Toggle(row.ID)\n\t\t\t\t\t\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 232854,
+    "totalMs": 53870
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 30,
+    "bytes": 183748,
+    "chunks": 15,
+    "llmCalls": 18,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 156541,
+        "output": 30142,
+        "cachedInput": 21611,
+        "costUSD": 0.6145020000000001
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 3,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "7c85e8aa9f3ccd88",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Report acknowledges an unresolved currentRenderWindow race while claiming race-suite acceptance",
+        "message": "The report opens with an unqualified claim that the native race suite and backend screen-cache regressions pass. It then says a known `currentRenderWindow` data race found in integrated docking is not yet covered by final evidence. The review policy says this race is already fixed by patch18 and covered by a publication/targetScreen test. So the report is either stale or ahead of its evidence. The focused backend command (`TestVellumScreen|TestScreenSnapshot`) and the attached `backend-screen-race.txt` do not show that test, and `native-race.txt` does not cover the integration fixture. An acceptance report that admits a known race with no evidence of the fix is not a reliable gate.",
+        "suggestion": "Re-run the dynamic docking and multiwindow race suites against the repaired backend, including the `currentRenderWindow` publication test. Add that log, widen the `-run` pattern in the documented command to match, and remove the 'will be updated' caveat. Otherwise state the race as an open gate.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "docs/reports/accessibility/README.md",
+            "lines": {
+              "start": 44,
+              "end": 44
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "race",
+          "stale-docs"
+        ],
+        "evidence": "Integrated dynamic docking additionally reproduced a direct `currentRenderWindow` read racing with its protected setter; final integration evidence will be updated after that backend repair.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/accessibility/README.md"
+    },
+    {
+      "finding": {
+        "id": "d014953e0d2aa599",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Geometry JSON entries not type-validated before doubleValue use",
+        "message": "The geometry payload is checked only for being a 4-element array. The element types are never checked. If an entry is NSNull, NSString, NSArray or NSDictionary, `[rect[0] doubleValue]` can raise an unrecognized-selector exception on the main thread, which crashes the app. The rect is also cached in `state.geometry` and re-read later in vellumAXUpdate with the same unchecked `doubleValue` calls. The snapshot path validates its whole payload up front, but this path does not.",
+        "suggestion": "Check that each of the four elements is an NSNumber with a finite value before storing the rect in `state.geometry` or applying it to the element. Skip the entry otherwise. Apply the same check where vellumAXUpdate reads cached geometry.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/accessibility_darwin.m",
+            "lines": {
+              "start": 222,
+              "end": 222
+            }
+          }
+        ],
+        "tags": [
+          "robustness",
+          "validation",
+          "crash"
+        ],
+        "evidence": "for(NSString *id in bounds){NSArray *rect=bounds[id];if(![rect isKindOfClass:NSArray.class]||rect.count!=4)continue;state.geometry[id]=rect;",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/accessibility_darwin.m"
+    },
+    {
+      "finding": {
+        "id": "8624c06a001f8fbb",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Two independent current-window snapshots in runWindow can disagree",
+        "message": "runWindow takes one current-window snapshot at the top. windowSizingStages() then takes a second, independent snapshot to choose the stage's mains. If focus or publication changes between the two reads, the mains chosen could belong to window A while the later NewWindow-versus-existing-window branch, `fitInWindow` and `ms.push` use window B (or nil). The old code read a single global value; the patch trades a data race for a logical inconsistency.",
+        "suggestion": "Take one snapshot per operation and pass it through. For example, change windowSizingStages to accept the `current *renderWindow` taken at the top of runWindow, so mains selection and the later branch decisions use the same window.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+            "lines": {
+              "start": 395,
+              "end": 405
+            }
+          }
+        ],
+        "tags": [
+          "race",
+          "toctou",
+          "snapshot"
+        ],
+        "evidence": "current := currentRenderWindowSnapshot()\n \tsc := st.Scene\n+\tst.setMains(st.windowSizingStages())",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch"
+    }
+  ],
+  "suppressed": []
+}

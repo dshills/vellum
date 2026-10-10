@@ -49,7 +49,7 @@ type tabState struct {
 	order   []string
 }
 type dialogState struct {
-	host                       *core.Frame
+	host                       *accessibilityDialogHost
 	body                       *core.Body
 	active, closing, dismissed bool
 }
@@ -83,7 +83,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		w := core.NewFrame(parent)
 		w.Styler(func(s *styles.Style) { s.Display = styles.DisplayNone })
 		widget = w
-		c.dialog = &dialogState{host: core.NewFrame(w)}
+		c.dialog = &dialogState{host: newAccessibilityDialogHost(w, r)}
 		c.dialog.host.Styler(func(s *styles.Style) { s.Direction = styles.Column; s.Grow.Set(1, 1) })
 	default:
 		r.control = nil
@@ -399,12 +399,12 @@ func selectTabButtons(r *record, selected string) {
 
 func syncDialog(r *record) {
 	d := r.control.dialog
-	if !r.node.Open {
+	if !r.node.Open || controlDisabled(r) || !accessibilityDialogVisible(r) {
 		d.dismissed = false
 		closeDialog(r)
 		return
 	}
-	if d.active || d.dismissed || controlDisabled(r) {
+	if d.active || d.dismissed {
 		return
 	}
 	scene := r.widget.AsWidget().Scene
@@ -421,6 +421,7 @@ func prepareDialogBody(r *record) *core.Body {
 	d := r.control.dialog
 	d.body = core.NewBody(r.node.Text)
 	body := d.body
+	bindAccessibilityDialogKeyboard(r, body)
 	body.Scene.OnFirst(events.Custom, func(e events.Event) {
 		if r.control.wake != nil {
 			r.control.wake(e)
@@ -474,6 +475,9 @@ func flushDialogs(r *record) {
 	for _, c := range r.children {
 		flushDialogs(c)
 	}
+	for _, c := range activeWorkbenchRecords(r) {
+		flushDialogs(c)
+	}
 }
 
 // bindControlWake keeps queued owner work flowing while a modal owns events.
@@ -488,6 +492,9 @@ func bindControlWake(r *record, wake func(events.Event), onError ...func(error))
 		}
 	}
 	for _, c := range r.children {
+		bindControlWake(c, wake, onError...)
+	}
+	for _, c := range activeWorkbenchRecords(r) {
 		bindControlWake(c, wake, onError...)
 	}
 }
@@ -514,39 +521,7 @@ func disposeControlTree(r *record) {
 }
 
 func applyFocus(root *record, request ui.FocusRequest, last *ui.FocusRequest) error {
-	if request.ID == "" || request == *last {
-		return nil
-	}
-	if _, ok := ui.FocusTarget(root.node, request.ID); !ok {
-		return fmt.Errorf("cogent: focus target %q is hidden, absent, disabled, or not focusable", request.ID)
-	}
-	var target *record
-	var find func(*record)
-	find = func(r *record) {
-		if r.node.ID == request.ID {
-			target = r
-		}
-		for _, c := range r.children {
-			find(c)
-		}
-	}
-	find(root)
-	if target == nil || controlDisabled(target) || !ui.IsFocusable(target.node.Kind) {
-		return fmt.Errorf("cogent: focus target %q unavailable", request.ID)
-	}
-	focus, err := focusWidget(target)
-	if err != nil {
-		return err
-	}
-	widget := focus.AsWidget()
-	scene := widget.Scene
-	if scene == nil || scene.RenderWindow() == nil {
-		widget.StartFocus()
-	} else {
-		widget.SetFocus()
-	}
-	*last = request
-	return nil
+	return applyAccessibleFocus(root, request, last)
 }
 
 // A Tabs descriptor focuses an enabled header button, never its nonfocusable

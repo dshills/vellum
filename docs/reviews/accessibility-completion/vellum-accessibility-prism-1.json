@@ -1,0 +1,372 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "89a539c2d2828f140b64b188c186f5aa",
+  "repo": {
+    "root": "/private/tmp/vellum-ax-review-check",
+    "head": "3475235074c31434d3d9a44e6cbd1b07d6637ff9",
+    "branch": "codex/phase-review"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 10,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d0253da2ee8cadb4",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "JSON marshal error silently drops accessibility updates; non-finite floats can trigger it",
+      "message": "Marshal failures are swallowed silently, so the whole accessibility tree stops updating. Number, Min and Max are float32 values copied straight from the node. json.Marshal fails on NaN or ±Inf, so a single unbounded or NaN numeric control makes the entire tree stale. The failure is invisible and leaves screen readers with an outdated tree.",
+      "suggestion": "Sanitize non-finite floats before building the node: omit Min/Max when infinite and use 0 for NaN. Also report the marshal error, for example through the driver's onError path, instead of returning silently.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 131,
+            "end": 131
+          }
+        }
+      ],
+      "tags": [
+        "json",
+        "error-handling"
+      ],
+      "evidence": "semantic, err := json.Marshal(nodes)\n\tif err != nil {\n\t\treturn\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2c7d60e90dba0ce3",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference of r.control.tabs in accessibilityBounds",
+      "message": "For a Tabs node, accessibilityBounds dereferences r.control.tabs without a nil check. The snapshot code guards the same access with `r.control != nil \u0026\u0026 r.control.tabs != nil`. If a Tabs record has no control or no tabs yet, for example before the widget is built or after it is retired, this panics inside RenderWidget on the render thread.",
+      "suggestion": "Guard the access: `if r.control != nil \u0026\u0026 r.control.tabs != nil { ... }`. Skip the option bounds when the tabs control is absent.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 574,
+            "end": 574
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "bounds(accessibilityOptionID(r.node.ID, o.ID), r.control.tabs.buttons[o.ID])",
+      "fix": {
+        "before": "bounds(accessibilityOptionID(r.node.ID, o.ID), r.control.tabs.buttons[o.ID])",
+        "after": "if r.control != nil \u0026\u0026 r.control.tabs != nil {\n\t\t\t\t\tbounds(accessibilityOptionID(r.node.ID, o.ID), r.control.tabs.buttons[o.ID])\n\t\t\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "dd3bd9e49ebedfdd",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Dialog host geometry reads record tree without rootMu",
+      "message": "The main host's publishAccessibilityGeometry takes w.rootMu before walking the record tree. accessibilityDialogHost.RenderWidget calls accessibilityBounds(r) without any lock, and it reads r.children, r.node and r.control.dialog. Those records are mutated under rootMu by the owner/reconcile path and by the keyboard handler. That is a data race, and it can cause a concurrent map or slice access panic.",
+      "suggestion": "Acquire the same lock before computing bounds, for example via the owning nativeWindow's rootMu, or snapshot the record state under the lock and compute geometry outside it. Release the lock before calling nativeAccessibilityGeometry.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 646,
+            "end": 646
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "bounds := accessibilityBounds(r)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2c79ec3cecfdc274",
+      "severity": "medium",
+      "category": "bug",
+      "title": "vellumAXDetach mutates shared state without ensuring main-thread execution",
+      "message": "vellumAXAttach asserts it runs on the main thread, and vellumAXUpdate, vellumAXGeometry and vellumAXProbe run their state access on the main queue. vellumAXDetach has no such guard or dispatch. It mutates vellumAXStates, the element objects, state.geometry and the view's class, and it is called from the Go side, where the calling thread is not guaranteed to be main. This is a data race with the main-queue blocks, since NSMutableDictionary is not thread-safe, and calling object_setClass off the main thread is unsafe.",
+      "suggestion": "Mirror Attach: if not on the main thread, dispatch the body synchronously or asynchronously to the main queue. For example: if(![NSThread isMainThread]){dispatch_sync(dispatch_get_main_queue(),^{vellumAXDetach(token);});return;}",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_darwin.m",
+          "lines": {
+            "start": 149,
+            "end": 149
+          }
+        }
+      ],
+      "tags": [
+        "threading",
+        "race",
+        "location-corrected"
+      ],
+      "evidence": "void vellumAXDetach(uint64_t token){",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "39f195259c538abc",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Isa-swizzling the host view and restoring it unconditionally is unsafe with KVO or other swizzlers",
+      "message": "The view's isa is swapped to a runtime subclass and restored on detach by forcing the saved class back. If anything else (KVO, another isa-swizzling library, AppKit) has subclassed or observed the view in between, restoring the original class discards their class. That can crash or silently break observation. Setting the class on a view that is already KVO-observed can also corrupt the observer machinery.",
+      "suggestion": "Only restore if object_getClass(view) is still the class this code installed. Otherwise leave the subclass in place; it is inert once the associated state is cleared, since accessibilityChildren returns @[]. Alternatively, avoid isa-swizzling and use a proper NSView subclass or an accessibility container owned by the view.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_darwin.m",
+          "lines": {
+            "start": 153,
+            "end": 153
+          }
+        }
+      ],
+      "tags": [
+        "objc-runtime",
+        "kvo",
+        "isa-swizzling",
+        "location-corrected"
+      ],
+      "evidence": "object_setClass(state.view,state.viewClass);",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4669d87eaf70ff49",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Malformed snapshot aborts mid-way after partially mutating live elements",
+      "message": "Nodes are validated inside the same loop that mutates existing elements (element.state, element.node, element.live, next[id]). If a later node is malformed, the function returns after some retained elements already have new nodes, while state.generation, roots and hierarchy still describe the old snapshot. The accessibility tree is then left inconsistent: values changed with no notification, and a half-applied snapshot.",
+      "suggestion": "Validate every node in a separate first pass (and check for duplicate IDs) before mutating any element or state. Apply the snapshot only if the whole payload is valid.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_darwin.m",
+          "lines": {
+            "start": 168,
+            "end": 168
+          }
+        }
+      ],
+      "tags": [
+        "atomicity",
+        "validation",
+        "accessibility",
+        "location-corrected"
+      ],
+      "evidence": "if(![node isKindOfClass:NSDictionary.class]||![node[@\"id\"] isKindOfClass:NSString.class]||![node[@\"actions\"] isKindOfClass:NSArray.class])return;",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "fea87f4e3e82eecc",
+      "severity": "medium",
+      "category": "bug",
+      "title": "VirtualTree page buttons never get accessibility bounds",
+      "message": "extensionAccessibility publishes \"previous\" and \"next\" page button nodes for VirtualTree, but this bounds function only publishes row bounds for it. The page buttons get no geometry, unlike the VirtualTable case, which does publish them. Assistive tech cannot locate or hit-test those buttons, and focus rings and pointer-based actions will not work on them.",
+      "suggestion": "Add the same page-button scan used for VirtualTable to the VirtualTree case. Better, key the buttons by a stamped property instead of matching on the button text.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_virtual.go",
+          "lines": {
+            "start": 176,
+            "end": 185
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "virtual-tree",
+        "bounds"
+      ],
+      "evidence": "for _, widget := range v.rows {\n\t\t\tif id, ok := widget.Property(\"vellum.accessibility-domain\").(string); ok {\n\t\t\t\tbounds(accessibilityRowID(r.node.ID, id), widget)\n\t\t\t}\n\t\t}\n\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d2510327a73af37b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible typed-nil widget passed to bounds callback",
+      "message": "The code passes `w.tabs[group.ID]` and `w.buttons[panel]` straight into a `core.Widget` parameter. If these maps hold concrete pointer types, a missing entry or a not-yet-built widget becomes a non-nil interface wrapping a nil pointer. The bounds callback may then dereference it and panic. Other code in this file guards with `button != nil` or `tree.IsNil`, so this call site is inconsistent with it.",
+      "suggestion": "Check each lookup for nil before calling the callback, for example `if t := w.tabs[group.ID]; t != nil { bounds(..., t) }`. Do the same for `w.buttons[panel]`. Alternatively, make sure the callback uses `tree.IsNil`.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_workbench.go",
+          "lines": {
+            "start": 161,
+            "end": 163
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "typed-nil",
+        "panic",
+        "location-corrected"
+      ],
+      "evidence": "bounds(accessibilityDockID(r.node.ID, group.ID), w.tabs[group.ID])\n\t\tfor _, panel := range group.Tabs {\n\t\t\tbounds(accessibilityDockOptionID(r.node.ID, panel), w.buttons[panel])",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "ea12f7891dcea42f",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Focus predicates can match an empty ID and pass spuriously",
+      "message": "Several focus predicates ignore the `ok` result of `element` and compare `s.FocusedID == x.ID`. If the element is missing, `x.ID` is \"\", so the predicate is true whenever nothing is focused. The smoke test can then pass without the expected focus change. The same pattern is used for the number, dialog-text and dialog-apply focus checks.",
+      "suggestion": "Require `ok` and a non-empty ID in every focus predicate: `x, ok := element(s, id); return ok \u0026\u0026 x.ID != \"\" \u0026\u0026 s.FocusedID == x.ID`.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/accessibility-smoke/main.go",
+          "lines": {
+            "start": 180,
+            "end": 180
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "false-positive",
+        "location-corrected"
+      ],
+      "evidence": "focused, err := wait(ctx, func(s cogent.AccessibilityInspection) bool { x, _ := element(s, \"text\"); return s.FocusedID == x.ID })",
+      "fix": {
+        "before": "focused, err := wait(ctx, func(s cogent.AccessibilityInspection) bool { x, _ := element(s, \"text\"); return s.FocusedID == x.ID })",
+        "after": "focused, err := wait(ctx, func(s cogent.AccessibilityInspection) bool { x, ok := element(s, \"text\"); return ok \u0026\u0026 s.FocusedID == x.ID })"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "059c8764b22ca970",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native key events injected from a non-UI goroutine",
+      "message": "The check goroutine fetches the native Cogent window and injects `KeyChord` events directly. This runs off the UI/app thread, while all model access in the same function is marshalled through `a.Do`. Event dispatch into core widgets from another goroutine races with the render and event loop. That makes the smoke test flaky and could crash it.",
+      "suggestion": "Dispatch the window lookup and the `KeyChord` calls on the UI thread, for example inside `a.Do(func(){ ... })` or the driver's main-thread executor, instead of calling them from the background goroutine.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/accessibility-smoke/main.go",
+          "lines": {
+            "start": 183,
+            "end": 187
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "thread-safety"
+      ],
+      "evidence": "native := core.TheApp.WindowByName(\"Vellum accessibility smoke\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 198294,
+    "totalMs": 53461
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 20,
+    "bytes": 131277,
+    "chunks": 11,
+    "llmCalls": 21,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 153231,
+        "output": 29481,
+        "costUSD": 0.601272
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 10,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "cd7cb5e185f2a59d",
+        "severity": "medium",
+        "category": "bug",
+        "title": "",
+        "message": "PollScreenChanges now calls slices.Equal, but the patch never touches the import block of screen.go. The original code compared screens with `*ssc != *sc` and likely never imported \"slices\". If the import is missing, the patched file will not compile. The output-hashes.json entry cannot be checked here.",
+        "suggestion": "Add `\"slices\"` to the imports of system/driver/desktop/screen.go in the patch, and re-check that glfw and time are still used. Then regenerate output-hashes.json.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch",
+            "lines": {
+              "start": 131,
+              "end": 131
+            }
+          }
+        ],
+        "tags": [
+          "go",
+          "compile",
+          "patch"
+        ],
+        "evidence": "if slices.Equal(before, after) {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/accessibility/0018-screen-poll-snapshots.patch"
+    }
+  ],
+  "suppressed": []
+}
