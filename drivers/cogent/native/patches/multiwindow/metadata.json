@@ -1,0 +1,19 @@
+{
+  "patch": "0016-multiwindow-ownership.patch",
+  "sha256": "627293f27fcf55a6cfc09434109e35a389302991706afcd5def426366fb2df8a",
+  "requires": "Cogent pinned source after Vellum patches 0001\u20130015",
+  "regression_tests": [
+    "TestComposerPublicationAndWithdrawal",
+    "TestLockRechecksAfterWaitingForNativeTeardown",
+    "TestSceneShowUsesOwnWindowTitle",
+    "TestQueuedCloseStopsLoopAfterComposerWithdrawal",
+    "TestNewWindowSizingOwnsContextDuringOtherWindowResize",
+    "TestSameWindowStageSizingUsesExistingContext",
+    "TestScreenSnapshotDuringCacheRebuild",
+    "TestWindowOptionsFixupUsesScreenSnapshot",
+    "TestMainQueuePublicationDuringStartupDispatch",
+    "TestMainQueueInitializationPreservesIdentityAndCompletion",
+    "TestMainThreadRequiredCallbackWaitsForLoopPublication",
+    "TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW"
+  ]
+}

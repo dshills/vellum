@@ -1,0 +1,12 @@
+# example.com/vellum/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# example.com/vellum/cogent/cmd/gallery.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# example.com/vellum/cogent/cmd/workbench.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	example.com/vellum/cogent	1.914s
+ok  	example.com/vellum/cogent/cmd/gallery	1.916s
+?   	example.com/vellum/cogent/cmd/multiwindow-smoke	[no test files]
+?   	example.com/vellum/cogent/cmd/window-handoff-smoke	[no test files]
+?   	example.com/vellum/cogent/cmd/window-lifetime-smoke	[no test files]
+ok  	example.com/vellum/cogent/cmd/workbench	2.342s

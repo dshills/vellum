@@ -1,0 +1,861 @@
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -13,6 +13,7 @@
+ 	"image"
+ 	"log"
+ 	"sync"
++	"sync/atomic"
+ 
+ 	"cogentcore.org/core/events"
+ 	"cogentcore.org/core/gpu"
+@@ -26,8 +27,9 @@
+ 
+ // Window is the implementation of [system.Window] for the desktop platform.
+ type Window struct {
+-	Native    NativeAttachment
+-	closeOnce sync.Once
++	Native          NativeAttachment
++	closeOnce       sync.Once
++	composerPointer atomic.Pointer[composer.ComposerDrawer]
+ 	base.WindowMulti[*App, *composer.ComposerDrawer]
+ 
+ 	// Glw is the glfw window associated with this window
+@@ -38,6 +40,35 @@
+ 
+ 	// ScreenName is the name of the last known screen this window was on
+ 	ScreenWindow string
++}
++
++// Composer is published once before window event loops start, and withdrawn
++// under Mu before native teardown completes. IsClosed must not read Compose while
++// the native main thread clears it.
++func (w *Window) Composer() composer.Composer {
++	if w == nil {
++		return nil
++	}
++	value := w.composerPointer.Load()
++	if value == nil {
++		return nil
++	}
++	return value
++}
++func (w *Window) IsClosed() bool { return w == nil || w.composerPointer.Load() == nil }
++
++// Lock rechecks after acquiring Mu: teardown may have won while this caller
++// waited. Rendering must never enter using an already released composer.
++func (w *Window) Lock() bool {
++	if w == nil {
++		return false
++	}
++	w.Mu.Lock()
++	if w.IsClosed() {
++		w.Mu.Unlock()
++		return false
++	}
++	return true
+ }
+ 
+ func (w *Window) IsVisible() bool {
+@@ -415,7 +446,7 @@
+ 	}
+ 	w.closeOnce.Do(func() {
+ 		// Stop native callbacks before application cleanup and before GPU/view release.
+-		w.App.RunOnMain(func() {
++		w.App.RunOnMainQueued(func() {
+ 			if w.Native != nil {
+ 				w.Native.Close()
+ 				w.Native = nil
+@@ -424,12 +455,13 @@
+ 		w.Window.Close()
+ 		w.Mu.Lock()
+ 		defer w.Mu.Unlock()
+-		w.App.RunOnMain(w.releaseNativeResources)
++		w.App.RunOnMainQueued(w.releaseNativeResources)
+ 	})
+ }
+ 
+ // releaseNativeResources runs on the main thread, including failed creation.
+ func (w *Window) releaseNativeResources() {
++	w.composerPointer.Store(nil)
+ 	if w.Native != nil {
+ 		w.Native.Close()
+ 		w.Native = nil
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -10,6 +10,7 @@
+ package desktop
+ 
+ import (
++	"errors"
+ 	"image"
+ 	"log"
+ 	"runtime"
+@@ -66,14 +67,13 @@
+ // MainLoop starts running event loop on main thread (must be called
+ // from the main thread).
+ func (a *App) MainLoop() {
+-	a.MainQueue = make(chan base.FuncRun)
+-	a.MainDone = make(chan struct{})
++	queue, stopped := a.InitMainQueue()
+ 	for {
+ 		select {
+-		case <-a.MainDone:
++		case <-stopped:
+ 			glfw.Terminate()
+ 			return
+-		case f := <-a.MainQueue:
++		case f := <-queue:
+ 			f.F()
+ 			if f.Done != nil {
+ 				f.Done <- struct{}{}
+@@ -101,16 +101,14 @@
+ 		system.UpdateLogicalDPIScaleFunc()
+ 	}
+ 
+-	sc := a.Screens[0]
+-
+ 	if opts == nil {
+ 		opts = &system.NewWindowOptions{}
+ 	}
++	sc := a.ScreenSnapshot(opts.Screen)
++	if sc == nil {
++		return nil, errors.New("desktop: no screen available for new window")
++	}
+ 	opts.Fixup()
+-	// can also apply further tuning here..
+-	if opts.Screen > 0 && opts.Screen < len(a.Screens) {
+-		sc = a.Screens[opts.Screen]
+-	}
+ 
+ 	w := &Window{
+ 		WindowMulti:  base.NewWindowMulti[*App, *composer.ComposerDrawer](a, opts),
+@@ -140,6 +138,7 @@
+ 		sf := gpu.NewSurface(a.GPU, surf, fbsz, 1, gpu.UndefinedType)
+ 		w.Draw = gpudraw.NewDrawer(a.GPU, sf)
+ 		w.Compose = &composer.ComposerDrawer{Drawer: w.Draw}
++		w.composerPointer.Store(w.Compose)
+ 	})
+ 
+ 	if a.NativeAttach != nil {
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -215,7 +215,9 @@
+ 		s.Padding.Set(units.Dp(8))
+ 	})
+ 	sc.OnShow(func(e events.Event) {
+-		currentRenderWindow.SetStageTitle(sc.Stage.Title)
++		if window := sc.RenderWindow(); window != nil {
++			window.SetStageTitle(sc.Stage.Title)
++		}
+ 	})
+ 	sc.OnClose(func(e events.Event) {
+ 		sm := sc.Stage.Mains
+@@ -230,7 +232,9 @@
+ 		}
+ 		// the stage that will be visible next
+ 		st := sm.stack.ValueByIndex(sm.stack.Len() - 2)
+-		currentRenderWindow.SetStageTitle(st.Title)
++		if window := sc.RenderWindow(); window != nil {
++			window.SetStageTitle(st.Title)
++		}
+ 	})
+ 	sc.Updater(func() {
+ 		if TheApp.Platform() == system.Offscreen {
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -495,11 +495,14 @@
+ 		ev := e.(*events.WindowEvent)
+ 		switch ev.Action {
+ 		case events.WinClose:
+-			if w.SystemWindow.Lock() {
+-				// fmt.Printf("got close event for window %v \n", w.name)
+-				e.SetHandled()
+-				w.flags.SetFlag(true, winStopEventLoop)
+-				w.closed()
++			// Native teardown may have completed before this queued event gets
++			// the window mutex. The event loop must still terminate and remove
++			// this window from render registries when Lock reports closed.
++			locked := w.SystemWindow.Lock()
++			e.SetHandled()
++			w.flags.SetFlag(true, winStopEventLoop)
++			w.closed()
++			if locked {
+ 				w.SystemWindow.Unlock()
+ 			}
+ 		case events.WinMinimize:
+@@ -629,7 +632,12 @@
+ // called after the window is created by the OS.
+ func newRenderContext() *renderContext {
+ 	rc := &renderContext{}
+-	scr := system.TheApp.Screen(0)
++	var scr *system.Screen
++	if snapshots, ok := system.TheApp.(interface{ ScreenSnapshot(int) *system.Screen }); ok {
++		scr = snapshots.ScreenSnapshot(0)
++	} else {
++		scr = system.TheApp.Screen(0)
++	}
+ 	if scr != nil {
+ 		rc.geom.SetRect(image.Rectangle{Max: scr.PixelSize})
+ 		rc.logicalDPI = scr.LogicalDPI
+@@ -674,7 +682,11 @@
+ 		// get many rapid updates during resizing, so just rerender last one if so.
+ 		// this works best in practice after a lot of experimentation.
+ 		w.flags.SetFlag(true, winRenderSkipped)
++		if !w.SystemWindow.Lock() {
++			return
++		}
+ 		w.SystemWindow.Composer().Redraw()
++		w.SystemWindow.Unlock()
+ 		w.requestPaintAfter(100*time.Millisecond - sinceResize)
+ 		return
+ 	}
+--- /dev/null
++++ b/system/driver/desktop/window_vellum_ownership_test.go
+@@ -0,0 +1,98 @@
++package desktop
++
++import (
++	"sync"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/system/composer"
++)
++
++func TestComposerPublicationAndWithdrawal(t *testing.T) {
++	w := &Window{}
++	if !w.IsClosed() || w.Composer() != nil || w.Lock() {
++		t.Fatal("unpublished window admitted rendering")
++	}
++	value := &composer.ComposerDrawer{}
++	w.Compose = value
++	w.composerPointer.Store(value)
++	if w.IsClosed() || w.Composer() != value {
++		t.Fatal("published composer unavailable")
++	}
++	if !w.Lock() {
++		t.Fatal("live window lock failed")
++	}
++	w.Unlock()
++	var readers sync.WaitGroup
++	for i := 0; i < 8; i++ {
++		readers.Add(1)
++		go func() {
++			defer readers.Done()
++			for j := 0; j < 1000; j++ {
++				_ = w.IsClosed()
++				_ = w.Composer()
++			}
++		}()
++	}
++	w.Mu.Lock()
++	w.composerPointer.Store(nil)
++	w.Compose = nil
++	w.Mu.Unlock()
++	readers.Wait()
++	if !w.IsClosed() || w.Composer() != nil || w.Lock() {
++		t.Fatal("withdrawn composer admitted rendering")
++	}
++}
++func TestLockRechecksAfterWaitingForNativeTeardown(t *testing.T) {
++	w := &Window{}
++	value := &composer.ComposerDrawer{}
++	w.Compose = value
++	w.composerPointer.Store(value)
++	w.Mu.Lock()
++	attempting := make(chan struct{})
++	result := make(chan bool, 1)
++	go func() {
++		close(attempting)
++		locked := w.Lock()
++		if locked {
++			w.Unlock()
++		}
++		result <- locked
++	}()
++	<-attempting
++	w.composerPointer.Store(nil)
++	w.Compose = nil
++	w.Mu.Unlock()
++	select {
++	case locked := <-result:
++		if locked {
++			t.Fatal("lock admitted a composer withdrawn during wait")
++		}
++	case <-time.After(time.Second):
++		t.Fatal("lock did not return after teardown")
++	}
++}
++
++type withdrawalAttachment struct{ check func() }
++
++func (*withdrawalAttachment) Focus(bool) {}
++func (a *withdrawalAttachment) Close()   { a.check() }
++func TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW(t *testing.T) {
++	w := &Window{}
++	value := &composer.ComposerDrawer{}
++	w.Compose = value
++	w.composerPointer.Store(value)
++	nativeClosed := false
++	w.Native = &withdrawalAttachment{check: func() {
++		nativeClosed = true
++		if !w.IsClosed() || w.Composer() != nil {
++			t.Error("native teardown observed a still-published composer")
++		}
++	}}
++	w.Mu.Lock()
++	w.releaseNativeResources()
++	w.Mu.Unlock()
++	if !nativeClosed || w.Native != nil || !w.IsClosed() || w.Composer() != nil || w.Lock() {
++		t.Fatal("partial teardown stranded a published composer")
++	}
++}
+--- /dev/null
++++ b/core/multiwindow_vellum_ownership_test.go
+@@ -0,0 +1,111 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/system"
++	"image"
++	"sync"
++	"testing"
++)
++
++type ownershipTitleWindow struct {
++	system.Window
++	title string
++}
++
++func (w *ownershipTitleWindow) SetTitle(value string) { w.title = value }
++func TestSceneShowUsesOwnWindowTitle(t *testing.T) {
++	own := &ownershipTitleWindow{}
++	other := &ownershipTitleWindow{}
++	previous := currentRenderWindow
++	currentRenderWindow = &renderWindow{title: "Other", SystemWindow: other}
++	defer func() { currentRenderWindow = previous }()
++	sc := NewScene()
++	sc.Stage = &Stage{Title: "Document", Mains: &stages{renderWindow: &renderWindow{title: "Own", SystemWindow: own}}}
++	sc.Send(events.Show)
++	if own.title != "Document • Own" || other.title != "" {
++		t.Fatalf("own=%q other=%q", own.title, other.title)
++	}
++}
++
++type ownershipClosedWindow struct{ system.Window }
++
++func (*ownershipClosedWindow) Lock() bool { return false }
++func (*ownershipClosedWindow) Unlock()    { panic("unlock of closed window") }
++func TestQueuedCloseStopsLoopAfterComposerWithdrawal(t *testing.T) {
++	previousAll, previousMain, previousDialogs := AllRenderWindows, mainRenderWindows, dialogRenderWindows
++	defer func() {
++		AllRenderWindows = previousAll
++		mainRenderWindows = previousMain
++		dialogRenderWindows = previousDialogs
++	}()
++	w := &renderWindow{SystemWindow: &ownershipClosedWindow{}}
++	AllRenderWindows = renderWindowList{w}
++	mainRenderWindows = renderWindowList{w}
++	dialogRenderWindows = nil
++	e := events.NewWindow(events.WinClose)
++	w.handleWindowEvents(e)
++	if !e.IsHandled() || !w.flags.HasFlag(winStopEventLoop) || len(AllRenderWindows) != 0 || len(mainRenderWindows) != 0 {
++		t.Fatal("closed native resources prevented render-loop termination")
++	}
++}
++
++func TestNewWindowSizingOwnsContextDuringOtherWindowResize(t *testing.T) {
++	previous := currentRenderWindow
++	existing := &renderContext{logicalDPI: 123, geom: math32.Geom2DInt{Size: image.Pt(333, 222)}}
++	currentRenderWindow = &renderWindow{mains: stages{renderContext: existing}}
++	defer func() { currentRenderWindow = previous }()
++	// The actual event loop owns these mutations under the old window's mutex.
++	// New-window sizing must never read any of them, even before its OS window exists.
++	var writers sync.WaitGroup
++	done := make(chan struct{})
++	writers.Add(1)
++	go func() {
++		defer writers.Done()
++		for {
++			select {
++			case <-done:
++				return
++			default:
++			}
++			existing.Lock()
++			existing.logicalDPI++
++			existing.geom.Size.X++
++			existing.Unlock()
++		}
++	}()
++	defer func() { close(done); writers.Wait() }()
++	for i := 0; i < 100; i++ {
++		sc := NewScene()
++		st := &Stage{NewWindow: true, Scene: sc}
++		sc.Stage = st
++		st.setMains(st.windowSizingStages())
++		if st.renderContext == existing || st.Mains == &currentRenderWindow.mains {
++			t.Fatal("new window borrowed another window's mutable sizing state")
++		}
++		if st.renderContext.geom.Size.X <= 0 || st.renderContext.logicalDPI <= 0 {
++			t.Fatal("independent sizing context has no screen defaults")
++		}
++		style := &styles.Style{}
++		setUnitContext(style, sc, math32.Vector2{}, math32.Vector2{})
++		if style.UnitContext.DPI != st.renderContext.logicalDPI {
++			t.Fatal("scene styling did not use its independent sizing DPI")
++		}
++	}
++}
++
++func TestSameWindowStageSizingUsesExistingContext(t *testing.T) {
++	previous := currentRenderWindow
++	existing := &renderWindow{mains: stages{renderContext: &renderContext{logicalDPI: 160}}}
++	currentRenderWindow = existing
++	defer func() { currentRenderWindow = previous }()
++	if got := (&Stage{}).windowSizingStages(); got != &existing.mains {
++		t.Fatal("stage sharing an existing window lost its owner context")
++	}
++	currentRenderWindow = nil
++	if got := (&Stage{}).windowSizingStages(); got == nil || got.renderContext == nil {
++		t.Fatal("first window lacks its temporary sizing context")
++	}
++}
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -240,16 +240,21 @@
+ 	sc.updateScene()
+ }
+ 
++// windowSizingStages gives a new window its own temporary sizing context.
++// Borrowing the current window's context races with its resize/event loop and
++// incorrectly makes the new window depend on another window's geometry/DPI.
++// Stages placed in an existing window continue to use that window's context.
++func (st *Stage) windowSizingStages() *stages {
++	if st.NewWindow || currentRenderWindow == nil {
++		return st.firstWindowStages()
++	}
++	return &currentRenderWindow.mains
++}
++
+ // runWindow runs a Window with current settings.
+ func (st *Stage) runWindow() *Stage {
+ 	sc := st.Scene
+-	if currentRenderWindow == nil {
+-		// If we have no current render window, we need to be in a new window,
+-		// and we need a *temporary* Mains to get initial pref size
+-		st.setMains(st.firstWindowStages())
+-	} else {
+-		st.setMains(&currentRenderWindow.mains)
+-	}
++	st.setMains(st.windowSizingStages())
+ 	st.configMainStage()
+ 	st.addSceneParts()
+ 
+--- a/system/driver/desktop/screen.go
++++ b/system/driver/desktop/screen.go
+@@ -31,6 +31,22 @@
+ 	// https://github.com/glfw/glfw/issues/2160
+ 	MacOsBuiltinMonitor = "Built-in Retina Display"
+ )
++
++// ScreenSnapshot copies screen sizing data while GetScreens owns the app mutex.
++// New windows may be sized while an existing window polls/rebuilds this cache;
++// publishing the cache's pointers before unlocking would expose partial fields.
++func (a *App) ScreenSnapshot(n int) *system.Screen {
++	a.Mu.Lock()
++	defer a.Mu.Unlock()
++	if len(a.Screens) == 0 {
++		return nil
++	}
++	if n < 0 || n >= len(a.Screens) {
++		n = 0
++	}
++	copy := *a.Screens[n]
++	return &copy
++}
+ 
+ // MonitorChange is called when a monitor is connected to or
+ // disconnected from the system.
+--- a/system/window.go
++++ b/system/window.go
+@@ -323,7 +323,15 @@
+ // Fixup fills in defaults and updates everything based on current screen and
+ // window context. Specific hardware can fine-tune this as well, in driver code.
+ func (o *NewWindowOptions) Fixup() {
+-	sc := TheApp.Screen(o.Screen)
++	var sc *Screen
++	if snapshots, ok := TheApp.(interface{ ScreenSnapshot(int) *Screen }); ok {
++		sc = snapshots.ScreenSnapshot(o.Screen)
++	} else {
++		sc = TheApp.Screen(o.Screen)
++	}
++	if sc == nil {
++		return
++	}
+ 	scsz := sc.Geometry.Size() // window coords size
+ 
+ 	if o.Flags.HasFlag(Fullscreen) {
+--- /dev/null
++++ b/system/driver/desktop/screen_vellum_ownership_test.go
+@@ -0,0 +1,44 @@
++package desktop
++
++import (
++	"cogentcore.org/core/system"
++	"sync"
++	"testing"
++)
++
++func TestScreenSnapshotDuringCacheRebuild(t *testing.T) {
++	a := &App{}
++	var writers sync.WaitGroup
++	done := make(chan struct{})
++	writers.Add(1)
++	go func() {
++		defer writers.Done()
++		for {
++			select {
++			case <-done:
++				return
++			default:
++			}
++			// GetScreens replaces the slice and fills screen fields under this lock.
++			a.Mu.Lock()
++			a.Screens = []*system.Screen{{}}
++			a.Screens[0].Name = "Complete"
++			a.Screens[0].LogicalDPI = 160
++			a.Mu.Unlock()
++		}
++	}()
++	defer func() { close(done); writers.Wait() }()
++	for i := 0; i < 1000; i++ {
++		if snapshot := a.ScreenSnapshot(0); snapshot != nil {
++			if snapshot.Name != "Complete" || snapshot.LogicalDPI != 160 {
++				t.Fatal("screen snapshot exposed a partially rebuilt cache")
++			}
++			snapshot.Name = "Private"
++			snapshot.LogicalDPI = 1
++		}
++	}
++	empty := &App{}
++	if empty.ScreenSnapshot(0) != nil {
++		t.Fatal("empty screen cache did not use the render-context fallback")
++	}
++}
+--- /dev/null
++++ b/system/window_vellum_ownership_test.go
+@@ -0,0 +1,33 @@
++package system
++
++import (
++	"image"
++	"testing"
++)
++
++type sizingSnapshotApp struct {
++	App
++	screen *Screen
++	calls  int
++}
++
++func (a *sizingSnapshotApp) Screen(int) *Screen         { panic("window sizing accessed mutable screen cache") }
++func (a *sizingSnapshotApp) ScreenSnapshot(int) *Screen { a.calls++; return a.screen }
++func (a *sizingSnapshotApp) NWindows() int              { return 0 }
++func (a *sizingSnapshotApp) Platform() Platforms        { return Offscreen }
++func TestWindowOptionsFixupUsesScreenSnapshot(t *testing.T) {
++	previous := TheApp
++	app := &sizingSnapshotApp{screen: &Screen{Geometry: image.Rect(0, 0, 1920, 1080), PixelSize: image.Pt(1920, 1080), DevicePixelRatio: 1}}
++	TheApp = app
++	defer func() { TheApp = previous }()
++	opts := &NewWindowOptions{}
++	opts.Fixup()
++	if app.calls != 1 || opts.Size.X <= 0 || opts.Size.Y <= 0 {
++		t.Fatal("window fixup did not use screen snapshot sizing")
++	}
++	app.screen = nil
++	(&NewWindowOptions{}).Fixup()
++	if app.calls != 2 {
++		t.Fatal("missing screen snapshot was not handled")
++	}
++}
+--- a/system/driver/base/app.go
++++ b/system/driver/base/app.go
+@@ -39,6 +39,12 @@
+ 	// MainDone is a channel on which is a signal is sent when the main
+ 	// loop of the app should be terminated.
+ 	MainDone chan struct{} `display:"-"`
++
++	// mainQueueMu publishes the queue/done pair without taking the app mutex.
++	// Main-thread callbacks may themselves require Mu. Channels are never replaced.
++	mainQueueMu        sync.Mutex
++	mainQueueReady     chan struct{}
++	mainQueuePublished bool
+ 
+ 	// Nm is the name of the app.
+ 	Nm string `label:"Name"`
+@@ -72,14 +78,40 @@
+ 	// fmt.Println("locale:", sl, sl.Language(), sl.Region())
+ }
+ 
++// InitMainQueue publishes the main-loop channels once. Platform loops must use
++// the returned channels rather than replacing them after a caller has queued work.
++func (a *App) InitMainQueue() (chan FuncRun, chan struct{}) {
++	a.mainQueueMu.Lock()
++	defer a.mainQueueMu.Unlock()
++	if a.MainQueue == nil {
++		a.MainQueue = make(chan FuncRun)
++	}
++	if a.MainDone == nil {
++		a.MainDone = make(chan struct{})
++	}
++	if a.mainQueueReady == nil {
++		a.mainQueueReady = make(chan struct{})
++	}
++	if !a.mainQueuePublished {
++		close(a.mainQueueReady)
++		a.mainQueuePublished = true
++	}
++	return a.MainQueue, a.MainDone
++}
++
++func (a *App) mainQueueChannels() (chan FuncRun, chan struct{}) {
++	a.mainQueueMu.Lock()
++	defer a.mainQueueMu.Unlock()
++	return a.MainQueue, a.MainDone
++}
++
+ func (a *App) MainLoop() {
+-	a.MainQueue = make(chan FuncRun)
+-	a.MainDone = make(chan struct{})
++	queue, stopped := a.InitMainQueue()
+ 	for {
+ 		select {
+-		case <-a.MainDone:
++		case <-stopped:
+ 			return
+-		case f := <-a.MainQueue:
++		case f := <-queue:
+ 			f.F()
+ 			if f.Done != nil {
+ 				f.Done <- struct{}{}
+@@ -90,15 +122,32 @@
+ 
+ // RunOnMain runs the given function on the main thread
+ func (a *App) RunOnMain(f func()) {
+-	if a.MainQueue == nil {
++	queue, _ := a.mainQueueChannels()
++	if queue == nil {
+ 		f()
+ 		return
+ 	}
+ 	a.This.SendEmptyEvent()
+ 	done := make(chan struct{})
+-	a.MainQueue <- FuncRun{F: f, Done: done}
++	queue <- FuncRun{F: f, Done: done}
+ 	<-done
+ 	a.This.SendEmptyEvent()
++}
++
++// RunOnMainQueued is for worker callbacks that require the native main thread,
++// including window teardown. Before the platform loop starts it waits for queue
++// publication without publishing a queue itself: initial main-thread window
++// creation can still use RunOnMain's inline fallback. Never call this from the
++// native main thread or from a main-thread callback, which cannot wait on itself.
++func (a *App) RunOnMainQueued(f func()) {
++	a.mainQueueMu.Lock()
++	if a.mainQueueReady == nil {
++		a.mainQueueReady = make(chan struct{})
++	}
++	ready := a.mainQueueReady
++	a.mainQueueMu.Unlock()
++	<-ready
++	a.RunOnMain(f)
+ }
+ 
+ // SendEmptyEvent sends an empty, blank event to global event processing
+@@ -110,7 +159,8 @@
+ 
+ // StopMain stops the main loop and thus terminates the app
+ func (a *App) StopMain() {
+-	a.MainDone <- struct{}{}
++	_, stopped := a.mainQueueChannels()
++	stopped <- struct{}{}
+ }
+ 
+ func (a *App) SystemPlatform() system.Platforms {
+--- a/system/driver/android/android.go
++++ b/system/driver/android/android.go
+@@ -273,8 +273,7 @@
+ )
+ 
+ func (a *App) MainLoop() {
+-	a.MainQueue = make(chan base.FuncRun)
+-	a.MainDone = make(chan struct{})
++	a.InitMainQueue()
+ 	// TODO: maybe merge the RunInputQueue and MainUI functions?
+ 	go func() {
+ 		defer func() { system.HandleRecover(recover()) }()
+@@ -325,13 +324,14 @@
+ 
+ 	var dpi float32
+ 	var orientation system.ScreenOrientation
++	queue, stopped := a.InitMainQueue()
+ 
+ 	for {
+ 		select {
+-		case <-a.MainDone:
++		case <-stopped:
+ 			a.FullDestroyGPU()
+ 			return nil
+-		case f := <-a.MainQueue:
++		case f := <-queue:
+ 			f.F()
+ 			if f.Done != nil {
+ 				f.Done <- struct{}{}
+--- /dev/null
++++ b/system/driver/base/app_vellum_ownership_test.go
+@@ -0,0 +1,140 @@
++package base
++
++import (
++	"cogentcore.org/core/system"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++type queueTestApp struct{ system.App }
++
++func (*queueTestApp) SendEmptyEvent() {}
++
++func TestMainQueuePublicationDuringStartupDispatch(t *testing.T) {
++	for round := 0; round < 20; round++ {
++		a := &App{This: &queueTestApp{}}
++		var executed atomic.Int32
++		// Calls before the platform loop preserve the direct synchronous fallback.
++		a.RunOnMain(func() { executed.Add(1) })
++		if executed.Load() != 1 {
++			t.Fatal("pre-loop callback was not synchronous")
++		}
++		start := make(chan struct{})
++		var callers sync.WaitGroup
++		for i := 0; i < 50; i++ {
++			callers.Add(1)
++			go func() { defer callers.Done(); <-start; a.RunOnMain(func() { executed.Add(1) }) }()
++		}
++		exited := make(chan struct{})
++		go func() { <-start; a.MainLoop(); close(exited) }()
++		close(start)
++		completed := make(chan struct{})
++		go func() { callers.Wait(); close(completed) }()
++		select {
++		case <-completed:
++		case <-time.After(3 * time.Second):
++			t.Fatal("startup publication lost or blocked a callback")
++		}
++		if executed.Load() != 51 {
++			t.Fatal("startup callback was lost or duplicated")
++		}
++		a.StopMain()
++		select {
++		case <-exited:
++		case <-time.After(3 * time.Second):
++			t.Fatal("main loop did not stop")
++		}
++	}
++}
++
++func TestMainQueueInitializationPreservesIdentityAndCompletion(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	queue, stopped := a.InitMainQueue()
++	var initializers sync.WaitGroup
++	for i := 0; i < 100; i++ {
++		initializers.Add(1)
++		go func() {
++			defer initializers.Done()
++			q, d := a.InitMainQueue()
++			if q != queue || d != stopped {
++				t.Error("main-loop channel identity changed")
++			}
++		}()
++	}
++	initializers.Wait()
++	completed := make(chan struct{})
++	go func() { a.RunOnMain(func() {}); close(completed) }()
++	var call FuncRun
++	select {
++	case call = <-queue:
++	case <-time.After(3 * time.Second):
++		t.Fatal("published queue did not receive caller")
++	}
++	call.F()
++	select {
++	case <-completed:
++		t.Fatal("queued caller returned before main-loop acknowledgment")
++	default:
++	}
++	call.Done <- struct{}{}
++	select {
++	case <-completed:
++	case <-time.After(3 * time.Second):
++		t.Fatal("acknowledged caller did not return")
++	}
++}
++
++func TestMainThreadRequiredCallbackWaitsForLoopPublication(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	var queuedRan atomic.Bool
++	completed := make(chan struct{})
++	go func() { a.RunOnMainQueued(func() { queuedRan.Store(true) }); close(completed) }()
++	deadline := time.Now().Add(3 * time.Second)
++	for {
++		a.mainQueueMu.Lock()
++		waiting := a.mainQueueReady != nil
++		queueUnpublished := a.MainQueue == nil
++		a.mainQueueMu.Unlock()
++		if !queueUnpublished {
++			t.Fatal("worker published a queue before the platform loop")
++		}
++		if waiting {
++			break
++		}
++		if time.Now().After(deadline) {
++			t.Fatal("worker did not reach readiness wait")
++		}
++		time.Sleep(time.Millisecond)
++	}
++	if queuedRan.Load() {
++		t.Fatal("main-thread callback ran inline on startup worker")
++	}
++	// The main thread must still be able to construct initial windows inline.
++	var inlineRan bool
++	a.RunOnMain(func() { inlineRan = true })
++	if !inlineRan {
++		t.Fatal("queued startup worker blocked inline initial creation")
++	}
++	queue, _ := a.InitMainQueue()
++	var call FuncRun
++	select {
++	case call = <-queue:
++	case <-time.After(3 * time.Second):
++		t.Fatal("loop publication did not release queued worker")
++	}
++	if queuedRan.Load() {
++		t.Fatal("worker executed callback instead of main-loop consumer")
++	}
++	call.F()
++	call.Done <- struct{}{}
++	select {
++	case <-completed:
++	case <-time.After(3 * time.Second):
++		t.Fatal("main-loop callback did not complete")
++	}
++	if !queuedRan.Load() {
++		t.Fatal("queued native callback missing")
++	}
++}

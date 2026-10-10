@@ -5,6 +5,7 @@
 - [Keyed reconciliation](keyed-reconciliation.md): retained native identity.
 - [Layout and themes](layout-theme.md): portable style values and local themes.
 - [Standard controls](controls.md): interaction, focus and semantic metadata.
+- [Windows and services](windows-services.md): scoped lifetimes and OS integration.
 - [Prototype validation plan](prototype-plan.md): research acceptance gates and
   recorded investigation progress; this is a historical foundation plan.
 

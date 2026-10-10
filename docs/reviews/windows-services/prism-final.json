@@ -1,0 +1,88 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dca140c2b3c6b1837bfe1a9ed3a5609c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9035ca072e285323e0e607036f67e2cdda535ecf",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 62630,
+    "totalMs": 46466
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 28,
+    "bytes": 156598,
+    "chunks": 10,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 8,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 28410,
+        "output": 8313,
+        "cachedInput": 6006,
+        "costUSD": 0.13995
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "2a2cbe016e33e9ce",
+        "severity": "medium",
+        "category": "bug",
+        "title": "RunOnMainQueued can block indefinitely in Window.Close if the main loop never publishes its queue",
+        "message": "RunOnMainQueued blocks forever on `\u003c-ready` until the platform main loop publishes its queue. Window.Close now uses it for both teardown steps. If Close is called before MainLoop starts, with no loop running, or from the main thread, the closing goroutine hangs. That goroutine holds `closeOnce` and, for the second step, `w.Mu`. Other callers of Close, and any render path that calls Lock, then block permanently. The old RunOnMain ran inline when no queue existed, so this is a new hang.",
+        "suggestion": "Give the wait an escape: select on `ready` and a loop-stopped/app-closed signal, or fall back to inline execution when no loop will ever run. Document and assert that Window.Close must not be called on the native main thread.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/multiwindow/0016-multiwindow-ownership.patch",
+            "lines": {
+              "start": 725,
+              "end": 740
+            }
+          }
+        ],
+        "tags": [
+          "deadlock",
+          "lifecycle",
+          "concurrency"
+        ],
+        "evidence": "\t\u003c-ready\n+\ta.RunOnMain(f)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/multiwindow/0016-multiwindow-ownership.patch"
+    }
+  ],
+  "suppressed": []
+}

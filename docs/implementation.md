@@ -11,7 +11,7 @@ and a separate commit.
 4. Virtualized tables and trees — implemented; 1,000,000 real records, 100,101 tree nodes, 20/24 native row pools, cancellable sorting and stable domain selection.
 5. Shared-device GPU canvas with navigation and selection — implemented; 96 retained GPU objects, pointer-anchored zoom, pan, selection and inspector integration.
 
-The first driver deliberately exposes one native window. Root UI ownership and
+The native driver exposes multiple desktop windows in one process main loop. Root UI ownership and
 logic tests are portable; native runtime support is not claimed across platforms.
 
 Phase 5 has passing model/native regression tests and real GPU pixel verification.
@@ -32,5 +32,7 @@ evidence. This limits runtime certification, rather than the implemented API sco
    keyed tabs/scroll/modal children, focus requests and semantic metadata. See
    the [contract](../specs/controls.md); platform screen-reader publication remains
    an acceptance gate.
-4. Multiple windows and platform services — in progress.
+4. Multiple windows and platform services — implemented; scoped callbacks,
+   independent close lifetimes and macOS clipboard/file panels/application menus.
+   See the [contract](../specs/windows-services.md).
 5. Independently consumable SDK and benchmarks — in progress.

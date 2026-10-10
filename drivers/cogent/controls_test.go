@@ -15,6 +15,9 @@ import (
 func TestNativeControlsChangeRetainedCallbacksAndDisabled(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	var changes []ui.ChangeEvent
 	callback := func(e ui.ChangeEvent) { changes = append(changes, e) }
@@ -72,6 +75,13 @@ func TestNativeControlsChangeRetainedCallbacksAndDisabled(t *testing.T) {
 	before := len(changes)
 	text.SetText("blocked").SendChange()
 	a.Drain()
+	if len(changes) != before {
+		t.Fatal("disabled edit reached model before refresh")
+	}
+	r, err = reconcile(host, r, n, a, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(changes) != before || text.Text() != "one" {
 		t.Fatal("disabled control changed model or retained invalid input")
 	}
@@ -79,6 +89,13 @@ func TestNativeControlsChangeRetainedCallbacksAndDisabled(t *testing.T) {
 	slider.Value = float32(math.NaN())
 	slider.SendChange()
 	a.Drain()
+	if len(changes) != before {
+		t.Fatal("nonfinite edit reached model before refresh")
+	}
+	r, err = reconcile(host, r, n, a, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(changes) != before || slider.Value != 4 {
 		t.Fatal("NaN input reached model")
 	}
@@ -97,6 +114,9 @@ func TestNativeControlsChangeRetainedCallbacksAndDisabled(t *testing.T) {
 func TestNativeTabsReorderReparentAndDisabledOption(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	selected := "a"
 	tabs := ui.Node{ID: "tabs", Kind: ui.Tabs, SelectedID: "a", Options: []ui.Option{{ID: "a", Label: "First"}, {ID: "b", Label: "Second", Disabled: true}}, Change: func(e ui.ChangeEvent) { selected = e.SelectedID }, Children: []ui.Node{{ID: "a", Kind: ui.Column, Children: []ui.Node{{ID: "edit", Kind: ui.TextField, Text: "retained"}}}, {ID: "b", Kind: ui.Column}}}
@@ -145,6 +165,9 @@ func TestNativeTabsReorderReparentAndDisabledOption(t *testing.T) {
 func TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	dismissed := 0
 	n := ui.Node{ID: "dialog", Kind: ui.Dialog, Text: "Preferences", Open: true, Dismiss: func() { dismissed++ }, Children: []ui.Node{{ID: "dialog-field", Kind: ui.TextField, Text: "saved"}}}
@@ -195,6 +218,9 @@ func TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce(t *testing.T) {
 func TestNativeFocusRequestUsesStableIDAndSequence(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	n := ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "field", Kind: ui.TextField}, {ID: "off", Kind: ui.Button, Disabled: true}}}
 	r, err := reconcile(host, nil, n, a, "main")
@@ -224,6 +250,9 @@ func TestNativeFocusRequestUsesStableIDAndSequence(t *testing.T) {
 func TestControlRefreshPreservesUncommittedTextAndNumericEditing(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	changes := 0
 	n := ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "text", Kind: ui.TextField, Text: "one", Change: func(e ui.ChangeEvent) { changes++ }}, {ID: "number", Kind: ui.NumberField, Number: 4, Numeric: ui.Numeric{Min: 0, Max: 10, Step: 1}}}}
@@ -261,6 +290,9 @@ func TestControlRefreshPreservesUncommittedTextAndNumericEditing(t *testing.T) {
 func TestControlMailboxRefusalAndRemovedQueuedCallbacks(t *testing.T) {
 	a, _ := app.New(app.Config{QueueCapacity: 1})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	changes := 0
 	reported := 0
@@ -275,6 +307,15 @@ func TestControlMailboxRefusalAndRemovedQueuedCallbacks(t *testing.T) {
 		t.Fatal(err)
 	}
 	check.widget.(*core.Switch).SetChecked(true).SendChange()
+	if reported != 0 || !check.widget.(*core.Switch).IsChecked() || check.control.refused.Load() == nil || changes != 0 {
+		t.Fatal("refusal accessed controlled values or callback before owner refresh")
+	}
+	if err := a.Do(func() { r, err = reconcile(host, r, n, a, "main") }); err != nil {
+		t.Fatal(err)
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
 	if reported != 1 || check.widget.(*core.Switch).IsChecked() || changes != 0 {
 		t.Fatal("refused control edit not restored/reported")
 	}
@@ -294,6 +335,9 @@ func TestControlMailboxRefusalAndRemovedQueuedCallbacks(t *testing.T) {
 func TestDialogForwardsNativeCustomWake(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	n := ui.Node{ID: "dialog", Kind: ui.Dialog, Open: true}
 	r, err := reconcile(host, nil, n, a, "main")
@@ -318,6 +362,9 @@ func TestDialogForwardsNativeCustomWake(t *testing.T) {
 func TestStandardControlLabelsRemainLiteral(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	literal := "a < b & c"
 	escaped := "a &lt; b &amp; c"
@@ -334,6 +381,9 @@ func TestStandardControlLabelsRemainLiteral(t *testing.T) {
 func TestSelectorDeselectionClearsNativeValue(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	n := ui.Node{ID: "choice", Kind: ui.Selector, SelectedID: "a", Options: []ui.Option{{ID: "a", Label: "A"}}, Text: "Choose an option"}
 	r, err := reconcile(host, nil, n, a, "main")
@@ -355,6 +405,9 @@ func TestSelectorDeselectionClearsNativeValue(t *testing.T) {
 func TestRejectedCommittedTextAndNumberRestoreAcceptedModel(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	noop := func(ui.ChangeEvent) {}
 	n := ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "text", Kind: ui.TextField, Text: "accepted", Change: noop}, {ID: "number", Kind: ui.NumberField, Number: 4, Numeric: ui.Numeric{Min: 0, Max: 10, Step: 1}, Change: noop}}}
@@ -379,6 +432,9 @@ func TestRejectedCommittedTextAndNumberRestoreAcceptedModel(t *testing.T) {
 func TestRefusedDialogDismissalRemainsClosedUntilAcknowledged(t *testing.T) {
 	a, _ := app.New(app.Config{QueueCapacity: 1})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	dismissed := 0
 	reported := 0
@@ -396,6 +452,12 @@ func TestRefusedDialogDismissalRemainsClosedUntilAcknowledged(t *testing.T) {
 	body.Send(events.Close)
 	body.Scene.DeleteChildren()
 	a.Drain()
+	if err := a.Do(func() { r, err = reconcile(host, r, n, a, "main") }); err != nil {
+		t.Fatal(err)
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
 	if dismissed != 0 || reported != 1 || r.control.dialog.active || !r.control.dialog.dismissed || r.control.dialog.body != nil || tree.IsNil(field) {
 		t.Fatal("refused dismissal lost content, silently reopened or failed error reporting")
 	}
@@ -420,6 +482,9 @@ func TestRefusedDialogDismissalRemainsClosedUntilAcknowledged(t *testing.T) {
 func TestNumericFieldRetainsTightFiniteBounds(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	maximum := float32(1.999999)
 	n := ui.Node{ID: "number", Kind: ui.NumberField, Number: maximum, Numeric: ui.Numeric{Min: 0, Max: maximum, Step: 0.01}}
@@ -436,6 +501,9 @@ func TestNumericFieldRetainsTightFiniteBounds(t *testing.T) {
 func TestTabsReorderAndSelectionAtSameNativeIndex(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	n := ui.Node{ID: "tabs", Kind: ui.Tabs, SelectedID: "a", Options: []ui.Option{{ID: "a"}, {ID: "b"}}, Children: []ui.Node{{ID: "a", Kind: ui.Column}, {ID: "b", Kind: ui.Column}}}
 	r, err := reconcile(host, nil, n, a, "main")
@@ -463,6 +531,9 @@ func TestTabsReorderAndSelectionAtSameNativeIndex(t *testing.T) {
 func TestTabsFocusTargetsEnabledNativeButton(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	n := ui.Node{ID: "tabs", Kind: ui.Tabs, SelectedID: "b", Options: []ui.Option{{ID: "a", Disabled: true}, {ID: "b"}}, Children: []ui.Node{{ID: "a", Kind: ui.Column}, {ID: "b", Kind: ui.Column}}}
 	r, err := reconcile(host, nil, n, a, "main")
@@ -502,6 +573,9 @@ func TestTabsFocusTargetsEnabledNativeButton(t *testing.T) {
 func TestRemovedAncestorDisposesDescendantDialog(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(app.Window{ID: "main", Title: "headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}); err != nil {
+		t.Fatal(err)
+	}
 	host := core.NewFrame(core.NewBody("headless"))
 	dismissed := 0
 	n := ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "ancestor", Kind: ui.Column, Children: []ui.Node{{ID: "modal", Kind: ui.Dialog, Open: true, Dismiss: func() { dismissed++ }, Children: []ui.Node{{ID: "field", Kind: ui.TextField}}}}}}}

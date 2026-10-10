@@ -17,7 +17,11 @@ closure: retained controls read the current callback when owner delivery runs.
 Native changes, tab choices and dialog dismissal enqueue bounded application
 owner work. Values are captured when the native event occurs; mounted state,
 disabled state, available options and current callbacks are rechecked on drain.
-Removed widgets do not deliver queued stale edits. Refused value/tab delivery restores the
+Removed widgets do not deliver queued stale edits. Queued callbacks use owner
+snapshots for disabled/retired state; they only update model state and request
+restoration. Native value restoration runs in the originating window's next
+refresh, even when another window drains the shared application queue. Refused value/tab delivery atomically requests restoration during the next
+originating native refresh under the UI owner. That refresh restores the
 controlled native value/selection and reports the error through `Driver.OnError` when
 provided, also storing it in native property `vellum.control-error`. Error
 observers must not reenter application ownership. Changes emitted synchronously

@@ -6,12 +6,16 @@ import (
 	"errors"
 	"example.com/vellum/ui"
 	"fmt"
+	"math"
+	"strings"
 	"sync"
+	"unicode/utf8"
 )
 
 var (
-	ErrClosed    = errors.New("vellum: application closed")
-	ErrQueueFull = errors.New("vellum: UI queue full")
+	ErrClosed       = errors.New("vellum: application closed")
+	ErrQueueFull    = errors.New("vellum: UI queue full")
+	ErrWindowClosed = errors.New("vellum: window closed")
 )
 
 type Config struct{ QueueCapacity int }
@@ -35,6 +39,9 @@ type Application struct {
 	queue           []func()
 	capacity        int
 	windows         []Window
+	lifetimes       map[string]context.Context
+	windowCancels   map[string]context.CancelFunc
+	services        Services
 	dirty           map[string]bool
 	wake            func()
 	running, closed bool
@@ -48,31 +55,101 @@ func New(c Config) (*Application, error) {
 		return nil, fmt.Errorf("vellum: queue capacity must be positive")
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, dirty: map[string]bool{}, changed: make(chan struct{})}, nil
+	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, changed: make(chan struct{})}, nil
 }
 func (a *Application) Context() context.Context { return a.ctx }
 
-// Open registers a window before Run. Dynamic native window creation is deferred.
+// Open registers a window before or during Run. IDs are unique for the entire
+// application lifetime: a closed ID cannot be reopened. View runs on the owner.
 func (a *Application) Open(w Window) error {
 	a.mu.Lock()
-	defer a.mu.Unlock()
 	if a.closed {
+		a.mu.Unlock()
 		return ErrClosed
 	}
-	if a.running {
-		return fmt.Errorf("vellum: register windows before Run")
-	}
-	if w.ID == "" || w.Title == "" || w.View == nil || w.Width <= 0 || w.Height <= 0 {
+	if w.ID == "" || w.Title == "" || !utf8.ValidString(w.Title) || strings.ContainsRune(w.Title, 0) || w.View == nil || w.Width <= 0 || w.Height <= 0 || math.IsNaN(float64(w.Width)) || math.IsNaN(float64(w.Height)) || math.IsInf(float64(w.Width), 0) || math.IsInf(float64(w.Height), 0) {
+		a.mu.Unlock()
 		return fmt.Errorf("vellum: invalid window")
 	}
-	for _, old := range a.windows {
-		if old.ID == w.ID {
-			return fmt.Errorf("vellum: duplicate window %q", w.ID)
-		}
+	if _, exists := a.lifetimes[w.ID]; exists {
+		a.mu.Unlock()
+		return fmt.Errorf("vellum: duplicate window %q", w.ID)
 	}
+	lifetime, cancel := context.WithCancel(a.ctx)
+	a.lifetimes[w.ID], a.windowCancels[w.ID] = lifetime, cancel
 	a.windows = append(a.windows, w)
 	a.dirty[w.ID] = true
+	wake := a.wake
+	a.mu.Unlock()
+	if wake != nil {
+		wake()
+	}
 	return nil
+}
+
+// WindowContext scopes work to a particular window. Its cancellation does not
+// cancel other windows; closing the last registered window closes the app.
+func (a *Application) WindowContext(id string) (context.Context, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	ctx, ok := a.lifetimes[id]
+	if !ok {
+		return nil, fmt.Errorf("vellum: unknown window %q", id)
+	}
+	return ctx, nil
+}
+
+// CloseWindow removes a registered window and requests native teardown. Closing
+// the last window ends the app. It is safe from workers and native callbacks.
+func (a *Application) CloseWindow(id string) error {
+	a.mu.Lock()
+	if a.closed {
+		a.mu.Unlock()
+		return ErrClosed
+	}
+	index := -1
+	for i, w := range a.windows {
+		if w.ID == id {
+			index = i
+			break
+		}
+	}
+	if index < 0 {
+		a.mu.Unlock()
+		return fmt.Errorf("vellum: unknown window %q", id)
+	}
+	a.windowCancels[id]()
+	a.windows = append(a.windows[:index], a.windows[index+1:]...)
+	delete(a.dirty, id)
+	wake := a.wake
+	if len(a.windows) == 0 {
+		wake = a.closeLocked()
+	}
+	a.mu.Unlock()
+	if wake != nil {
+		wake()
+	}
+	return nil
+}
+
+// PostWindow discards delivery if its window closes before dispatch. It shares
+// Post's bounded queue and does not transfer mutable data ownership implicitly.
+func (a *Application) PostWindow(id string, fn func()) error {
+	if fn == nil {
+		return fmt.Errorf("vellum: nil UI callback")
+	}
+	ctx, err := a.WindowContext(id)
+	if err != nil {
+		return err
+	}
+	if ctx.Err() != nil {
+		return ErrWindowClosed
+	}
+	return a.Post(func() {
+		if ctx.Err() == nil {
+			fn()
+		}
+	})
 }
 func (a *Application) Windows() []Window {
 	a.mu.Lock()
@@ -199,19 +276,22 @@ func (a *Application) SetWake(fn func()) {
 
 // Close is idempotent and cancels lifetime-scoped workers. Already-running work
 // cooperates with context cancellation; admitted but undispatched callbacks drop.
+func (a *Application) closeLocked() func() {
+	if a.closed {
+		return nil
+	}
+	wake := a.wake
+	a.closed = true
+	a.queue = nil
+	close(a.changed)
+	a.changed = make(chan struct{})
+	a.wake = nil
+	a.cancel()
+	return wake
+}
 func (a *Application) Close() {
 	a.mu.Lock()
-	wake := a.wake
-	if !a.closed {
-		a.closed = true
-		a.queue = nil
-		close(a.changed)
-		a.changed = make(chan struct{})
-		a.wake = nil
-		a.cancel()
-	} else {
-		wake = nil
-	}
+	wake := a.closeLocked()
 	a.mu.Unlock()
 	if wake != nil {
 		wake()

@@ -45,8 +45,8 @@ go run ./cmd/workbench
 ```
 
 The native driver requires Go, a C compiler, platform graphics libraries and a
-supported GPU. Runtime evidence currently covers macOS. It supports one native
-window per process and must run from main.
+supported GPU. Runtime evidence currently covers macOS. It supports multiple native
+windows in one process main loop and must run from main.
 
 See the [development guide](docs/development.md) for the full check workflow,
 [framework contract](specs/framework.md) for implemented behavior and limits, and

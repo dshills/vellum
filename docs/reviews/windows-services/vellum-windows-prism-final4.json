@@ -1,0 +1,246 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "23dc8e97813a2da099640906ccfb6476",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9035ca072e285323e0e607036f67e2cdda535ecf",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "091ab9264d7b7c4b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Ignored CloseWindow error and failure paths that skip app shutdown",
+      "message": "The error from CloseWindow(\"second\") is ignored. The final failure paths send to result directly instead of using finish(), so a.Close() is never called. If closing the window fails, or the pending service survives shutdown, the app keeps running until the 12s timeout. The real failure is then masked by a generic timeout error, because Run's error takes precedence over the result channel. The smoke test becomes slow and gives a misleading diagnosis.",
+      "suggestion": "Check the CloseWindow error and use finish(...) on all failure paths so the app is closed and the real error is reported.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/multiwindow-smoke/main.go",
+          "lines": {
+            "start": 118,
+            "end": 127
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "shutdown",
+        "test-harness"
+      ],
+      "evidence": "\t\ta.CloseWindow(\"second\")\n\t\tselect {\n\t\tcase err := \u003c-pending:\n\t\t\tif !errors.Is(err, context.Canceled) {\n\t\t\t\tresult \u003c- fmt.Errorf(\"pending service survived shutdown: %v\", err)\n\t\t\t\treturn\n\t\t\t}",
+      "fix": {
+        "before": "\t\ta.CloseWindow(\"second\")\n\t\tselect {\n\t\tcase err := \u003c-pending:\n\t\t\tif !errors.Is(err, context.Canceled) {\n\t\t\t\tresult \u003c- fmt.Errorf(\"pending service survived shutdown: %v\", err)\n\t\t\t\treturn\n\t\t\t}",
+        "after": "\t\tif err := a.CloseWindow(\"second\"); err != nil {\n\t\t\tfinish(err)\n\t\t\treturn\n\t\t}\n\t\tselect {\n\t\tcase err := \u003c-pending:\n\t\t\tif !errors.Is(err, context.Canceled) {\n\t\t\t\tfinish(fmt.Errorf(\"pending service survived shutdown: %v\", err))\n\t\t\t\treturn\n\t\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "971b1f704781e64e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Early return in syncTopology drops already-prepared windows and may leave core.Wait with no windows",
+      "message": "When creating a window's body via a.Do fails (for example the app closed concurrently), syncTopology returns immediately. Windows already added to `launch` in this pass have been inserted into `windows` and refreshed, but their `Run()` calls are skipped. They stay registered as 'existing' without ever being shown, so they are never closed or cleaned up. On the initial call, Run then proceeds to core.Wait() with no native window, because neither `started` nor `failure` is set.",
+      "suggestion": "Handle a.Do failure explicitly. Either break out of the loop and still launch the windows collected so far, or remove the created entries from `windows`. In Run, return an error or ctx.Err() when no window was started, before calling core.Wait().",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 185,
+            "end": 185
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "if w.body == nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2e48f0290ea6ccee",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Close cleanup skipped when Do returns an error other than the exact ErrClosed value",
+      "message": "Cleanup runs inline only if Do returns exactly app.ErrClosed. Any other or wrapped error means Do did not run the cleanup, so disposeControlTree is skipped and native control resources leak. The comparison uses == rather than errors.Is, and the fallback should cover any failure to enqueue.",
+      "suggestion": "Run cleanup inline whenever Do returns a non-nil error. cleanup is protected by rootMu and does not need the owner.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/driver.go",
+          "lines": {
+            "start": 233,
+            "end": 233
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "resource-leak",
+        "location-corrected"
+      ],
+      "evidence": "if err := a.Do(cleanup); err == app.ErrClosed {",
+      "fix": {
+        "before": "if err := a.Do(cleanup); err == app.ErrClosed {",
+        "after": "if err := a.Do(cleanup); err != nil {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "d5712695d7d6b29b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unvalidated JSON types in menu construction can raise an uncaught NSException",
+      "message": "The menu JSON is decoded without validating element types. A Go nil slice marshals to JSON null, which NSJSONSerialization returns as NSNull, and fast-enumerating NSNull throws an unrecognized-selector exception. A missing or non-string Label passed to initWithTitle:, or a non-dictionary group, would raise the same kind of exception on the Cocoa main thread. Uncaught Objective-C exceptions abort the whole process.",
+      "suggestion": "Check every decoded value's class (group and item are NSDictionary, Label is NSString, Items is NSArray) before use. On a mismatch, report vellumServiceResult(token, \"\", 2) and return.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/services_darwin.m",
+          "lines": {
+            "start": 96,
+            "end": 96
+          }
+        }
+      ],
+      "tags": [
+        "objc",
+        "crash",
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "for (NSDictionary *item in group[@\"Items\"]) {",
+      "fix": {
+        "before": "for (NSDictionary *item in group[@\"Items\"]) {",
+        "after": "NSArray *items = [group[@\"Items\"] isKindOfClass:[NSArray class]] ? group[@\"Items\"] : @[];\n            for (NSDictionary *item in items) {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 185375,
+    "totalMs": 63931
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 28,
+    "bytes": 139663,
+    "chunks": 9,
+    "llmCalls": 13,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 118071,
+        "output": 25168,
+        "costUSD": 0.48782200000000003
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "11c81f0aa88bb85b",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Composer withdrawn after native resources are destroyed",
+        "message": "In native teardown the composer pointer is withdrawn only after Glw.Destroy() and Draw = nil. The patch intends Composer() and IsClosed() to be read without Mu. A lock-free caller can therefore still see a non-nil composer whose Drawer and Glw are already released or being destroyed, which defeats the withdrawal-before-teardown invariant stated in the comment.",
+        "suggestion": "Call w.composerPointer.Store(nil) at the start of the teardown, under Mu and before Glw.Destroy() and Draw release. Then every lock-free reader sees a closed window before any native resource is freed.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/multiwindow/0016-multiwindow-ownership.patch",
+            "lines": {
+              "start": 74,
+              "end": 78
+            }
+          }
+        ],
+        "tags": [
+          "concurrency",
+          "lifecycle"
+        ],
+        "evidence": "w.composerPointer.Store(nil)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/multiwindow/0016-multiwindow-ownership.patch"
+    },
+    {
+      "finding": {
+        "id": "ad4082f715b35cdf",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Fixup silently skips all defaults when no screen is available",
+        "message": "NewWindowOptions.Fixup now returns early when no screen is available. This skips all remaining defaulting, including size, position and flags that do not depend on a screen. The previous code would have dereferenced nil here, so the early return hides the problem. Callers other than desktop NewWindow (which does check for nil) then receive half-initialized options, such as a zero size, without any error.",
+        "suggestion": "Fall back to a default screen geometry so Fixup still applies the other defaults, or have Fixup return an error that callers must handle. Do not silently skip the defaults.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/multiwindow/0016-multiwindow-ownership.patch",
+            "lines": {
+              "start": 333,
+              "end": 340
+            }
+          }
+        ],
+        "tags": [
+          "error-handling"
+        ],
+        "evidence": "if sc == nil {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/multiwindow/0016-multiwindow-ownership.patch"
+    }
+  ],
+  "suppressed": []
+}

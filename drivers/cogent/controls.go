@@ -1,9 +1,11 @@
 package cogent
 
 import (
+	"errors"
 	"fmt"
 	"html"
 	"reflect"
+	"sync/atomic"
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
@@ -36,6 +38,10 @@ type controlState struct {
 	wake      func(events.Event)
 	onError   func(error)
 	committed bool
+	disabled  bool                  // UI-owner snapshot; queued callbacks never inspect native ancestors.
+	retired   bool                  // UI-owner lifetime marker; native tree destruction is window-owned.
+	restore   bool                  // Restore accepted controlled value during the next native refresh.
+	refused   atomic.Pointer[error] // Native-event refusal handed to the owner refresh.
 }
 type tabState struct {
 	pages   map[string]*core.Frame
@@ -111,16 +117,18 @@ func postControl(r *record, fn func()) {
 	if tree.IsNil(r.widget) {
 		return
 	}
-	if err := r.control.a.Post(func() {
-		if !tree.IsNil(r.widget) {
+	if err := r.control.a.PostWindow(r.control.window, func() {
+		if !r.control.retired {
 			fn()
 		}
 	}); err != nil {
-		restoreControlValue(r)
-		r.widget.AsTree().SetProperty("vellum.control-error", err)
-		if r.control.onError != nil {
-			r.control.onError(err)
+		if errors.Is(err, app.ErrClosed) || errors.Is(err, app.ErrWindowClosed) {
+			return
 		}
+		// Refusal can occur outside the owner. Coalesce the error atomically;
+		// accepted values and user error callbacks are handled by native refresh.
+		r.control.refused.Store(&err)
+		r.control.a.Invalidate(r.control.window)
 	}
 }
 func dispatchControl(r *record, e events.Event) {
@@ -147,8 +155,8 @@ func dispatchControl(r *record, e events.Event) {
 		return
 	}
 	postControl(r, func() {
-		if controlDisabled(r) || r.node.Change == nil {
-			restoreControlValue(r)
+		if r.control.disabled || r.node.Change == nil {
+			requestControlRestore(r)
 			return
 		}
 		switch change.Kind {
@@ -161,13 +169,13 @@ func dispatchControl(r *record, e events.Event) {
 				}
 			}
 			if !enabled {
-				restoreControlValue(r)
+				requestControlRestore(r)
 				return
 			}
 		case ui.Slider, ui.NumberField:
 			value, ok := ui.ClampNumeric(change.Number, r.node.Numeric)
 			if !ok {
-				restoreControlValue(r)
+				requestControlRestore(r)
 				return
 			}
 			change.Number = value
@@ -178,17 +186,11 @@ func dispatchControl(r *record, e events.Event) {
 	})
 }
 
-func restoreControlValue(r *record) {
-	switch w := r.widget.(type) {
-	case *core.TextField:
-		w.SetText(r.node.Text)
-	case *core.Spinner:
-		w.SetValue(r.node.Number)
-	case *core.Slider:
-		w.SetValue(r.node.Number)
-	default:
-		_ = syncControl(r, r.node)
-	}
+// This function only updates owner fields/model invalidation. A Drain may run
+// from another window's event loop, where this widget's native lock is absent.
+func requestControlRestore(r *record) {
+	r.control.restore = true
+	r.control.a.Invalidate(r.control.window)
 }
 
 func syncSemantics(r *record) {
@@ -214,8 +216,14 @@ func syncControl(r *record, previous ui.Node) error {
 	if r.control == nil {
 		return nil
 	}
-	committed := r.control.committed
+	// reconcile attaches the full topology before syncRecord visits parents then
+	// children; parent semantic properties are current before this snapshot.
+	r.control.disabled = controlDisabled(r)
+	refused := r.control.refused.Swap(nil)
+	restoring := r.control.restore || refused != nil
+	committed := r.control.committed || restoring
 	r.control.committed = false
+	r.control.restore = false
 	switch w := r.widget.(type) {
 	case *core.Switch:
 		w.SetText(html.EscapeString(r.node.Text)).SetChecked(r.node.Checked)
@@ -283,8 +291,14 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if restoring || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
+	}
+	if refused != nil {
+		r.widget.AsTree().SetProperty("vellum.control-error", *refused)
+		if r.control.onError != nil {
+			r.control.onError(*refused)
+		}
 	}
 	return nil
 }
@@ -314,12 +328,12 @@ func prepareControl(r *record, n ui.Node) error {
 					enabled := false
 					for _, current := range r.node.Options {
 						if current.ID == id {
-							enabled = !controlDisabled(r) && !current.Disabled
+							enabled = !r.control.disabled && !current.Disabled
 							break
 						}
 					}
 					if !enabled || r.node.Change == nil {
-						w.SelectTabByName(r.node.SelectedID)
+						requestControlRestore(r)
 						return
 					}
 					r.node.Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.Tabs, SelectedID: id})
@@ -481,6 +495,9 @@ func bindControlWake(r *record, wake func(events.Event), onError ...func(error))
 func disposeControl(r *record) {
 	if r == nil {
 		return
+	}
+	if r.control != nil {
+		r.control.retired = true
 	}
 	if r.control != nil && r.control.dialog != nil {
 		closeDialog(r)

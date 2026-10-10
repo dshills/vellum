@@ -1,5 +1,5 @@
 // Package cogent implements Vellum's native driver using pinned Cogent Core.
-// It is experimental; the current adapter supports one desktop window per run.
+// It is experimental; one process main loop owns multiple desktop windows.
 package cogent
 
 import (
@@ -46,132 +46,273 @@ type record struct {
 
 var processRun atomic.Bool
 
+type nativeWindow struct {
+	window           app.Window
+	body             *core.Body
+	host             *core.Frame
+	root             *record
+	rootMu           sync.Mutex
+	lastFocus        ui.FocusRequest
+	source           atomic.Pointer[events.Source]
+	pending, closing atomic.Bool
+}
+
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	if err := d.Theme.Validate(); err != nil {
 		return err
 	}
-	theme := d.Theme.Clone()
-	ws := a.Windows()
-	if len(ws) != 1 {
-		return fmt.Errorf("cogent: one native window supported; got %d", len(ws))
+	d.Theme = d.Theme.Clone()
+	if len(a.Windows()) == 0 {
+		return fmt.Errorf("cogent: at least one registered window required")
 	}
-
 	if !processRun.CompareAndSwap(false, true) {
 		return fmt.Errorf("cogent: native main loop runs once per process")
 	}
-	started := false
+	var started, shown atomic.Bool
 	defer func() {
-		if !started {
+		if !started.Load() {
 			processRun.Store(false)
 		}
 	}()
-	w := ws[0]
-	b := core.NewBody(w.Title)
-	b.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(w.Width), units.Dp(w.Height)); s.Grow.Set(1, 1) })
-	host := core.NewFrame(b)
-	host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
-	var root *record
-	var rootMu sync.Mutex
-	var lastFocus ui.FocusRequest
 	var failure atomic.Pointer[error]
-	var source atomic.Pointer[events.Source]
-	var pending atomic.Bool
-	var shown atomic.Bool
+	var mu sync.Mutex
+	windows := map[string]*nativeWindow{}
+	snapshot := func() []*nativeWindow {
+		mu.Lock()
+		defer mu.Unlock()
+		out := make([]*nativeWindow, 0, len(windows))
+		for _, w := range windows {
+			out = append(out, w)
+		}
+		return out
+	}
+	services := &platformServices{owner: a, commands: d.Commands, onError: d.OnError}
+	var quitting atomic.Bool
 	quit := func() {
-		if shown.Load() {
-			go core.TheApp.QuitReq()
+		if !shown.Load() {
+			return
+		}
+		if quitting.CompareAndSwap(false, true) {
+			go func() { services.shutdown(); core.TheApp.QuitReq() }()
 		}
 	}
-	var refresh func()
-	refresh = func() {
+	defer func() {
+		if started.Load() {
+			services.shutdown()
+		}
+	}()
+	fail := func(err error) {
+		if failure.CompareAndSwap(nil, &err) {
+			a.Close()
+			quit()
+		}
+	}
+	wake := func() {
+		for _, w := range snapshot() {
+			if s := w.source.Load(); s != nil && !w.closing.Load() && w.pending.CompareAndSwap(false, true) {
+				s.Custom("vellum.wake")
+			}
+		}
+	}
+	var custom func(*nativeWindow, events.Event)
+	refresh := func(w *nativeWindow) {
+		if w.closing.Load() {
+			return
+		}
 		a.Do(func() {
-			rootMu.Lock()
-			defer rootMu.Unlock()
-			if !a.TakeDirty(w.ID) {
+			w.rootMu.Lock()
+			defer w.rootMu.Unlock()
+			if w.closing.Load() {
 				return
 			}
-			n := w.View()
+			if !a.TakeDirty(w.window.ID) {
+				return
+			}
+			n := w.window.View()
 			if err := ui.Validate(n); err != nil {
-				failure.CompareAndSwap(nil, &err)
-				quit()
+				fail(err)
 				return
 			}
 			var err error
-			root, err = reconcile(host, root, n, a, w.ID, theme)
+			w.root, err = reconcile(w.host, w.root, n, a, w.window.ID, d.Theme)
 			if err != nil {
-				failure.CompareAndSwap(nil, &err)
-				quit()
+				fail(err)
 				return
 			}
-			if root != nil {
-				bindControlWake(root, func(e events.Event) { drainCustom(a, &pending, refresh, e) }, d.OnError)
-				flushDialogs(root)
-				if err := applyFocus(root, n.Focus, &lastFocus); err != nil {
-					failure.CompareAndSwap(nil, &err)
-					quit()
+			if w.root == nil {
+				fail(fmt.Errorf("cogent: reconciliation returned no root"))
+				return
+			}
+			bindControlWake(w.root, func(e events.Event) { custom(w, e) }, d.OnError)
+			flushDialogs(w.root)
+			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
+				fail(err)
+			}
+
+		})
+	}
+	var topologyMu sync.Mutex
+	var syncTopology func()
+	syncTopology = func() {
+		// No other window's native render lock is acquired while holding the owner.
+		// Native CloseReq runs asynchronously so Close events can finish independently.
+		topologyMu.Lock()
+		defer topologyMu.Unlock()
+		var launch []*nativeWindow
+		// If construction or refresh fails, discard every tree that never entered
+		// a native loop. Close callbacks cannot clean up unlaunched bodies.
+		defer func() {
+			for _, w := range launch {
+				w.closing.Store(true)
+				cleanup := func() {
+					w.rootMu.Lock()
+					defer w.rootMu.Unlock()
+					disposeControlTree(w.root)
+					// NewBody assigns a Scene parent before adding the body to
+					// its children, so Delete cannot find an unlaunched body.
+					scene := w.body.Scene
+					w.body.Destroy()
+					scene.Destroy()
+				}
+				if err := a.Do(cleanup); err != nil {
+					cleanup()
+				}
+				mu.Lock()
+				delete(windows, w.window.ID)
+				mu.Unlock()
+			}
+		}()
+		desired := a.Windows()
+		active := map[string]bool{}
+		for _, w := range desired {
+			active[w.ID] = true
+		}
+		for _, w := range snapshot() {
+			if !active[w.window.ID] && w.closing.CompareAndSwap(false, true) {
+				if w.body.Scene.RenderWindow() != nil {
+					win := w.body.Scene.RenderWindow().SystemWindow
+					go win.CloseReq()
 				}
 			}
-		})
-	}
-	wake := func() {
-		if ctx.Err() != nil {
-			return
 		}
-		s := source.Load()
-		if s != nil && pending.CompareAndSwap(false, true) {
-			s.Custom("vellum.wake")
-		}
-	}
-	b.OnShow(func(e events.Event) {
-		shown.Store(true)
-		a.Do(func() { rootMu.Lock(); defer rootMu.Unlock(); flushDialogs(root) })
-		source.Store(b.SystemEvents())
-		if ctx.Err() != nil || failure.Load() != nil {
-			quit()
-			return
-		}
-		a.SetWake(wake)
-		wake()
-	})
-	// Cogent compresses consecutive Custom events by type, including events
-	// from other producers. Every Custom event drains our coalesced work.
-	b.Scene.OnFirst(events.Custom, func(e events.Event) { drainCustom(a, &pending, refresh, e) })
-	if d.Commands != nil {
-		b.Scene.OnFirst(events.KeyChord, func(e events.Event) {
-			a.Do(func() {
-				matched, err := d.Commands.Shortcut(ctx, string(e.KeyChord()))
-				if matched {
-					e.SetHandled()
-					if err != nil && d.OnError != nil {
-						d.OnError(err)
+		for _, spec := range desired {
+			mu.Lock()
+			_, exists := windows[spec.ID]
+			mu.Unlock()
+			if exists || ctx.Err() != nil {
+				continue
+			}
+			w := &nativeWindow{window: spec}
+			buildErr := a.Do(func() {
+				w.body = core.NewBody(spec.Title)
+				w.body.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(spec.Width), units.Dp(spec.Height)); s.Grow.Set(1, 1) })
+				w.host = core.NewFrame(w.body)
+				w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
+			})
+			if buildErr != nil {
+				return
+			}
+			mu.Lock()
+			windows[spec.ID] = w
+			mu.Unlock()
+			launch = append(launch, w)
+			w.body.OnShow(func(events.Event) {
+				shown.Store(true)
+				lifetime, lifetimeErr := a.WindowContext(spec.ID)
+				if w.closing.Load() || lifetimeErr != nil || lifetime.Err() != nil {
+					w.closing.Store(true)
+					if native := w.body.Scene.RenderWindow(); native != nil {
+						go native.SystemWindow.CloseReq()
 					}
-					a.Invalidate(w.ID)
+					return
+				}
+				w.source.Store(w.body.SystemEvents())
+				a.Do(func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); flushDialogs(w.root) })
+				if ctx.Err() != nil || failure.Load() != nil {
+					quit()
+					return
+				}
+				a.SetServices(services)
+				wake()
+			})
+			w.body.Scene.OnFirst(events.Custom, func(e events.Event) { custom(w, e) })
+			if d.Commands != nil {
+				w.body.Scene.OnFirst(events.KeyChord, func(e events.Event) {
+					a.Do(func() {
+						lifetime, err := a.WindowContext(spec.ID)
+						if err != nil || lifetime.Err() != nil {
+							return
+						}
+						matched, err := d.Commands.Shortcut(lifetime, string(e.KeyChord()))
+						if matched {
+							e.SetHandled()
+							if err != nil && d.OnError != nil {
+								d.OnError(err)
+							}
+							a.Invalidate("")
+						}
+					})
+				})
+			}
+			w.body.OnClose(func(events.Event) {
+				w.closing.Store(true)
+				a.CloseWindow(spec.ID)
+				cleanup := func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); disposeControlTree(w.root) }
+				if err := a.Do(cleanup); err != nil {
+					cleanup()
+				}
+				w.source.Store(nil)
+				mu.Lock()
+				delete(windows, spec.ID)
+				mu.Unlock()
+				// A new registration may have been accepted just before the last native
+				// window closes, before its queued Custom wake could create that window.
+				// Launch remaining registrations before returning from Close, keeping
+				// Cogent's window wait group alive without requiring a shown event source.
+				if ctx.Err() == nil {
+					syncTopology()
 				}
 			})
-		})
+			refresh(w)
+			if failure.Load() != nil {
+				return
+			}
+		}
+		for len(launch) > 0 {
+			w := launch[0]
+			launch = launch[1:]
+			started.Store(true)
+			w.body.NewWindow().SetUseMinSize(true).Run()
+		}
 	}
-	// Native cleanup must run even after Application.Close has rejected Do.
-	// rootMu protects the retained tree independently of the model owner.
-	b.OnClose(func(e events.Event) {
-		a.Close()
-		rootMu.Lock()
-		disposeControlTree(root)
-		rootMu.Unlock()
-		source.Store(nil)
-	})
+	custom = func(w *nativeWindow, e events.Event) {
+		w.pending.Store(false)
+		a.Drain()
+		syncTopology()
+		refresh(w)
+		if ce, ok := e.(*events.CustomEvent); ok && ce.Data == "vellum.wake" {
+			e.SetHandled()
+		}
+	}
+	a.SetWake(wake)
+	defer a.SetWake(nil)
+	defer a.SetServices(nil)
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
-	refresh()
-	if err := failure.Load(); err != nil {
+	syncTopology()
+	if err := failure.Load(); err != nil && !started.Load() {
 		return *err
 	}
-	stop := context.AfterFunc(ctx, func() { quit() })
+	if ctx.Err() != nil && !started.Load() {
+		return ctx.Err()
+	}
+	if !started.Load() {
+		return fmt.Errorf("cogent: no native window started")
+	}
+	stop := context.AfterFunc(ctx, quit)
 	defer stop()
-	defer a.SetWake(nil)
-
-	started = true
-	b.NewWindow().SetUseMinSize(true).RunMain()
+	core.Wait()
 	if err := failure.Load(); err != nil {
 		return *err
 	}

@@ -8,3 +8,5 @@ cd "$VELLUM_REPO_ROOT/prototypes/foundationintegration"
 cp go.mod integration.mod
 cp go.sum integration.sum
 python3 prepare.py
+
+python3 "$VELLUM_REPO_ROOT/drivers/cogent/apply-native-safety.py" "$VELLUM_REPO_ROOT/prototypes/foundationintegration/build/upstream"

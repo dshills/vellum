@@ -1,0 +1,100 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "885448b145ced12d10fd9686ed1b52b3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "9035ca072e285323e0e607036f67e2cdda535ecf",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6b7c9569f18aed89",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Composer withdrawn after native resources are released, not before",
+      "message": "The composer is withdrawn only after Glw.Destroy() and w.Draw = nil. The new comment says it is withdrawn before native teardown completes. A reader that calls Composer() or IsClosed() without Mu in the window between destroy and the Store can still see a live composer whose drawer and GLFW window are already released. Lock() only protects callers that go through it.",
+      "suggestion": "Call w.composerPointer.Store(nil) first in the teardown path, under Mu, before Draw is released and Glw.Destroy() runs. Then clear Draw and Compose.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/native/patches/multiwindow/0016-multiwindow-ownership.patch",
+          "lines": {
+            "start": 62,
+            "end": 64
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "\tw.Draw = nil\n+\tw.composerPointer.Store(nil)\n \tw.Compose = nil",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 83403,
+    "totalMs": 32896
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 28,
+    "bytes": 152532,
+    "chunks": 10,
+    "llmCalls": 7,
+    "cacheHit": false,
+    "cachedChunks": 4,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 75875,
+        "output": 10162,
+        "cachedInput": 9468,
+        "costUSD": 0.25337
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
