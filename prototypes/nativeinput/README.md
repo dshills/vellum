@@ -1,6 +1,6 @@
 # Single-field Cocoa input prototype
 
-A separate continuation of the [remediation fixture](../remediation/README.md). Results and limits are recorded in [NATIVE_INPUT_RESULTS.md](../../NATIVE_INPUT_RESULTS.md). The previous prototypes are unchanged. This is a local macOS arm64 experiment, not a public Vellum API or a production backend.
+A separate continuation of the [remediation fixture](../remediation/README.md). Results and limits are recorded in [NATIVE_INPUT_RESULTS.md](../../docs/reports/NATIVE_INPUT_RESULTS.md). The previous prototypes are unchanged. This is a local macOS arm64 experiment, not a public Vellum API or a production backend.
 
 ## Build and run
 

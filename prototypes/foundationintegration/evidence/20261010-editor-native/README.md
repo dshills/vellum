@@ -1,6 +1,6 @@
 # Multiline native adapter evidence
 
-The [adapter report](../../../../MULTILINE_NATIVE_ADAPTER.md) defines scope. `manifest.json` records source, decoded patch, binary and artifact hashes plus commands. Run `python3 prototypes/foundationintegration/verify_editor_native.py` from the repository to validate committed evidence. This checks integrity and local contracts; G1 remains open.
+The [adapter report](../../../../docs/reports/MULTILINE_NATIVE_ADAPTER.md) defines scope. `manifest.json` records source, decoded patch, binary and artifact hashes plus commands. Run `python3 prototypes/foundationintegration/verify_editor_native.py` from the repository to validate committed evidence. This checks integrity and local contracts; G1 remains open.
 
 `rendered-canonical.json` passes 63 Editor range/insertion queries. `field-regression.json` passes 31 TextField queries. `editor-input-canonical.json` has 10 ordered editor protocol updates; the saturation-inclusive `editor-input-final.json` has 13 and eight refused admissions. `saturation-final.json` preserves the state before every refusal. `lifecycle-final.json` records 1,000 hidden windows and 11,000 drained messages plus client handoff contracts. These are deterministic Cocoa protocol calls, not live IME or VoiceOver workflows.
 

@@ -1,9 +1,0 @@
-# Multiline editor visual navigation
-
-10 October 2026. Item 2 adds patch 0014 to the pinned Cogent experiment. Normal left/right arrows walk shaped visual caret positions in mixed-direction text. Up/down preserve the desired horizontal position across short lines. Pointer placement, the raster cursor, and native caret queries use the same strong-caret geometry. Wrapped-line affinity is remembered; scroll and queued edits refresh stale geometry before interaction. Unsupported layouts retain the existing fallback. Word, home/end and page commands retain their existing policies. Secondary bidi caret affinity is not implemented.
-
-Geometry is captured from rendered fragments for every editor, including editors without a native listener. A stale interaction uses a scratch painter without appending commands to the active frame. Cache reuse requires matching document revision, scroll and viewport. The native range contract remains one strong caret per rune and physical line.
-
-Tests send real toolkit key events through the editor for mixed LTR/RTL arrows and Shift selection, then compare pointer/cursor positions with the shaped geometry. They cover wrapped affinity, a queued buffer replacement, scrolled/window-relative pointer coordinates, RTL document edges and preferred-column reset. The complete lines/textcore suite passes without golden-image changes. Prism's preferred-column finding is fixed and tested. Native geometry and protocol checks remain separate from live IME/VoiceOver acceptance.
-
-Reproduction and raw evidence are under prototypes/foundationintegration/evidence/20261010-editor-visual/. Prism source and integration reviews are recorded under reviews/editor-visual-20261010/. G1 remains open for large-document input, live assistive/input workflows, production-scale resource measurements, other platforms and trusted distribution.

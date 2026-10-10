@@ -1,6 +1,6 @@
 # Foundation contracts prototype
 
-A separate follow-up to [foundationchecks](../foundationchecks/README.md). It layers patch 0007 on the six existing patches and adds an independent bounded mailbox. See [results](../../FOUNDATION_CONTRACTS_RESULTS.md). G1 remains open; no workbench expansion or production API commitment.
+A separate follow-up to [foundationchecks](../foundationchecks/README.md). It layers patch 0007 on the six existing patches and adds an independent bounded mailbox. See [results](../../docs/reports/FOUNDATION_CONTRACTS_RESULTS.md). G1 remains open; no workbench expansion or production API commitment.
 
 ## Reproduce
 

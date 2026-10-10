@@ -1,0 +1,147 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e12fa647bcd21f99a789d3630b5a2384",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "640ed73b063e841ad8d0e3d4b14f4973bd3f64ba",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 37905,
+    "totalMs": 13196
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 26,
+    "bytes": 147125,
+    "chunks": 12,
+    "llmCalls": 6,
+    "cacheHit": false,
+    "cachedChunks": 6,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 43875,
+        "output": 4424,
+        "costUSD": 0.13199
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "d3f8d4b914da42a9",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Report dated 9 October references later 10 October evidence",
+        "message": "The report is dated 9 October 2026 but links to a 10 October audit and to fixes made after that audit (INPUT_ORDERING_FIX, MULTILINE_NATIVE_ADAPTER, VISUAL_TEXT_GEOMETRY_FIX). The header date is stale or the report was edited later without updating it. That makes the evidence chronology unreliable for a gate-tracking document.",
+        "suggestion": "Update the header date, or add an explicit 'Updated 10 October' note so the document does not cite a later audit from an earlier date.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "docs/reports/FOUNDATION_INTEGRATION_RESULTS.md",
+            "lines": {
+              "start": 7,
+              "end": 7
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "chronology"
+        ],
+        "evidence": "Current acceptance-check status is recorded in [the 10 October audit](FOUNDATION_ACCEPTANCE_AUDIT.md).",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/FOUNDATION_INTEGRATION_RESULTS.md"
+    },
+    {
+      "finding": {
+        "id": "acf17a4a8acd87d3",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Acceptance gate lists the multiline native adapter as outstanding although it is declared implemented",
+        "message": "The report says the multiline Editor native composition/range adapter is now implemented, reviewed and tested, superseding its earlier missing-adapter status. The 'Still required before foundation acceptance' list still names that adapter as outstanding work. A reader cannot tell whether the adapter exists, and the acceptance-gate list overstates what remains.",
+        "suggestion": "Remove the adapter from the outstanding gate. Keep only the live-input and assistive validation that is still open, and link to MULTILINE_NATIVE_ADAPTER.md.",
+        "confidence": 0.8,
+        "locations": [
+          {
+            "path": "docs/reports/FOUNDATION_INTEGRATION_RESULTS.md",
+            "lines": {
+              "start": 39,
+              "end": 39
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "consistency"
+        ],
+        "evidence": "1. Long-document interactive layout and the multiline code editor's native composition/range adapter.",
+        "fix": {
+          "before": "1. Long-document interactive layout and the multiline code editor's native composition/range adapter.",
+          "after": "1. Long-document interactive layout. The multiline code editor's native composition/range adapter is now [implemented](MULTILINE_NATIVE_ADAPTER.md); only its live input/assistive validation remains open."
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/FOUNDATION_INTEGRATION_RESULTS.md"
+    },
+    {
+      "finding": {
+        "id": "ad479890b161f40f",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Conflicting native document size limit between reports (1 MiB vs 4 MiB)",
+        "message": "This report says the native context ceiling is 1 MiB. The companion LARGE_DOCUMENT_NATIVE_INPUT.md, dated the same day, says native editable documents are capped at 4 MiB of UTF-8 with delta transport. Both documents are in the same change. A reader cannot tell which limit applies to the multiline editor adapter, or whether the later patch 0015 superseded this one.",
+        "suggestion": "Reconcile the two limits. If patch 0015 raised the ceiling, update or annotate this sentence (for example, 'superseded by LARGE_DOCUMENT_NATIVE_INPUT.md: 4 MiB with delta transport'). If the editor still has a 1 MiB limit, say so in the large-document report.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reports/MULTILINE_NATIVE_ADAPTER.md",
+            "lines": {
+              "start": 27,
+              "end": 27
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "consistency",
+          "limits"
+        ],
+        "evidence": "The native context ceiling is 1 MiB, but the unchanged transport ceiling is 64 KiB per encoded message",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/MULTILINE_NATIVE_ADAPTER.md"
+    }
+  ],
+  "suppressed": []
+}

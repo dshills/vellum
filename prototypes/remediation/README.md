@@ -1,6 +1,6 @@
 # Disposable remediation trial
 
-This continues the [foundation fixture](../foundation/README.md), retaining the original as a baseline. Results are in [REMEDIATION_RESULTS.md](../../REMEDIATION_RESULTS.md). These local Cogent patches have not been accepted upstream and are not a production fork or public Vellum API.
+This continues the [foundation fixture](../foundation/README.md), retaining the original as a baseline. Results are in [REMEDIATION_RESULTS.md](../../docs/reports/REMEDIATION_RESULTS.md). These local Cogent patches have not been accepted upstream and are not a production fork or public Vellum API.
 
 ## Reproduce
 

@@ -1,0 +1,293 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "eb2e72dc3e78711aff022d95957654a7",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "640ed73b063e841ad8d0e3d4b14f4973bd3f64ba",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "22dd663357dd0b5e",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "docs/reviews/ is gitignored but documented as committed evidence",
+      "message": "The .gitignore now ignores `docs/reviews/`, but docs/README.md describes that directory as holding \"committed reviews and verification evidence\", and this change links to it as a tracked location. New review records will be silently untracked unless someone force-adds them with `git add -f`. Existing tracked files stay tracked, so the inconsistency only shows up for new files. That makes the review evidence easy to lose.",
+      "suggestion": "Decide which behaviour is intended. If review records are meant to be committed, remove the ignore rule or narrow it to scratch output, e.g. `docs/reviews/tmp/`. If they are meant to be local only, update docs/README.md and the README so they stop calling them committed evidence.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": ".gitignore",
+          "lines": {
+            "start": 4,
+            "end": 4
+          }
+        }
+      ],
+      "tags": [
+        "gitignore",
+        "docs",
+        "repo-hygiene"
+      ],
+      "evidence": "docs/reviews/",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6578985258427c3b",
+      "severity": "medium",
+      "category": "docs",
+      "title": "Diagram alt text calls option C \"selected\", contradicting the recommendation",
+      "message": "The alt text for Architecture C says \"selected\". The document's own recommendation says B is the hypothesis and C is only \"a focused shell experiment\". A reader or screen-reader user could take C as the chosen design. The research is explicitly proposal-only, so this is a factual inconsistency.",
+      "suggestion": "Change the alt text to describe the option neutrally, e.g. \"Architecture C: Gio shell with independent renderer\".",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "docs/research/ARCHITECTURE_OPTIONS.md",
+          "lines": {
+            "start": 61,
+            "end": 61
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "consistency",
+        "location-corrected"
+      ],
+      "evidence": "![Architecture C: selected Gio shell reuse](../assets/architecture-c.png)",
+      "fix": {
+        "before": "![Architecture C: selected Gio shell reuse](../assets/architecture-c.png)",
+        "after": "![Architecture C: Gio shell with independent renderer](../assets/architecture-c.png)"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 197919,
+    "totalMs": 30611
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 52,
+    "bytes": 363154,
+    "chunks": 24,
+    "llmCalls": 24,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 192118,
+        "output": 23582,
+        "costUSD": 0.620056
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "3cbf46811a16989a",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Grapheme walk arithmetic does not add up (70,000 - 200 != 69,500)",
+        "message": "200 backward grapheme moves from the end of a 70,000-rune line land on rune 69,800 if each grapheme is one rune. The report says 69,500, which implies about 2.5 runes per move. The text never says the test line uses multi-rune graphemes, so the figures look inconsistent. If the 69,500 comes from a wrong expected value or a mis-copied number, the 'Passed this scope' claim rests on a misreported assertion.",
+        "suggestion": "Check the figure against the audit JSON. Then either correct the number or state the grapheme composition of the test line (for example, the average runes per grapheme) so the expected position can be reproduced.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reports/FOUNDATION_ACCEPTANCE_AUDIT.md",
+            "lines": {
+              "start": 14,
+              "end": 14
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "accuracy",
+          "evidence"
+        ],
+        "evidence": "200 backward grapheme moves on a 70,000-rune line reach the expected rune 69,500",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/FOUNDATION_ACCEPTANCE_AUDIT.md"
+    },
+    {
+      "finding": {
+        "id": "ff110ae9d613b353",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Required-work list contradicts the implemented multiline adapter status",
+        "message": "The report states near the top that the multiline Editor native composition/range adapter is now implemented, reviewed and tested, superseding its earlier missing-adapter status. The 'Still required before foundation acceptance' list then names that same adapter as outstanding. A reader tracking G1 cannot tell whether the adapter is done. The report is also dated 9 October but links to 10 October evidence, which suggests it was edited without reconciling its sections.",
+        "suggestion": "Remove the adapter from required item 1, or reword it to the remaining open work, such as live input/assistive validation and long-document layout. Also update the report date so it matches the 10 October evidence it cites.",
+        "confidence": 0.7,
+        "locations": [
+          {
+            "path": "docs/reports/FOUNDATION_INTEGRATION_RESULTS.md",
+            "lines": {
+              "start": 39,
+              "end": 39
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "consistency",
+          "acceptance-gates"
+        ],
+        "evidence": "1. Long-document interactive layout and the multiline code editor's native composition/range adapter.",
+        "fix": {
+          "before": "Long-document interactive layout and the multiline code editor's native composition/range adapter.",
+          "after": "Long-document interactive layout and live multiline editor workflow acceptance."
+        },
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/FOUNDATION_INTEGRATION_RESULTS.md"
+    },
+    {
+      "finding": {
+        "id": "17bd5178b1bfdf48",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Conflicting native document size ceilings across reports (1 MiB vs 4 MiB)",
+        "message": "This report says the native context ceiling is 1 MiB. LARGE_DOCUMENT_NATIVE_INPUT.md, added in the same change, says native editable documents are capped at 4 MiB and that tests use a two-megabyte exact buffer. A 2 MB document exceeds a 1 MiB ceiling, so the two reports give different support boundaries. Readers cannot tell which limit is authoritative.",
+        "suggestion": "Reconcile the limits. If the 4 MiB delta-mode cap supersedes the 1 MiB snapshot ceiling, say so here and link to LARGE_DOCUMENT_NATIVE_INPUT.md. Otherwise correct whichever figure is wrong.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/reports/MULTILINE_NATIVE_ADAPTER.md",
+            "lines": {
+              "start": 27,
+              "end": 27
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "consistency"
+        ],
+        "evidence": "The native context ceiling is 1 MiB, but the unchanged transport ceiling is 64 KiB per encoded message",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/MULTILINE_NATIVE_ADAPTER.md"
+    },
+    {
+      "finding": {
+        "id": "a2ba9eb1231a5b41",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Asset path in prose does not match relative image links",
+        "message": "The prose says exports live under `assets/`, but the image and SVG links use `../assets/...`. From docs/research/ that resolves to docs/assets/, not docs/research/assets/. If the files are not at docs/assets/, all four PNG embeds and SVG links break. The prose and the links do not agree on the location. The assets are not in this part of the diff, so I could not verify them.",
+        "suggestion": "Confirm that docs/assets/architecture-{a,b,c,d}.{png,svg} exist. Then state the exact path in the prose (`docs/assets/`) so it matches the relative links.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "docs/research/ARCHITECTURE_OPTIONS.md",
+            "lines": {
+              "start": 9,
+              "end": 9
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "broken-links"
+        ],
+        "evidence": "SVG and PNG exports are provided under `assets/`.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/research/ARCHITECTURE_OPTIONS.md"
+    },
+    {
+      "finding": {
+        "id": "fb1bd7f8cae62cf1",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Contradictory wake semantics: \"lossless\" yet \"coalesced\"",
+        "message": "The sentence calls the wake path \"lossless\" and also says wakes are \"coalesced\". Coalescing drops duplicate wake events, so a reader cannot tell what guarantee a wake gives. The real guarantee is that a posted callback is never lost and a wake is never missed while work is pending. Whether each wake event is preserved is not the guarantee.",
+        "suggestion": "State the guarantee precisely, for example: \"The custom-event deque never drops an enqueued event. Redundant wake notifications are coalesced while one is outstanding, and the owner drains the whole queue on each wake, so no posted callback is lost.\"",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "specs/framework.md",
+            "lines": {
+              "start": 14,
+              "end": 15
+            }
+          }
+        ],
+        "tags": [
+          "spec",
+          "concurrency",
+          "clarity"
+        ],
+        "evidence": "Native wakes use Cogent's lossless custom-event deque; they are coalesced while\none wake is outstanding.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in specs/framework.md"
+    },
+    {
+      "finding": {
+        "id": "36b730fdce77113b",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Status narrative embedded in plan header is a single unmaintainable paragraph with overlapping claims",
+        "message": "Line 3 packs the current status of P0–P3, ADRs 0001–0007, several reports and gate G1 into one run-on line with mixed bold markers. Status is interleaved with historical results (\"older results below preserve their original experimental status\"), and the plan itself says an ADR is the place to record decisions. A reader cannot tell which claims are current, so the spec and the reports can drift apart. It also states that the plan 'remains' open while linking to results that appear to supersede parts of it.",
+        "suggestion": "Move the status into a separate 'Status' table (one row per prototype and gate: state, evidence link, open items) and keep this document as a stable plan. Link to the latest ADR instead of narrating every result chronologically.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "specs/prototype-plan.md",
+            "lines": {
+              "start": 3,
+              "end": 3
+            }
+          }
+        ],
+        "evidence": "G1 has not passed. Workbench expansion remains on hold. P4–P11 remain designed experiments.**",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in specs/prototype-plan.md"
+    }
+  ],
+  "suppressed": []
+}

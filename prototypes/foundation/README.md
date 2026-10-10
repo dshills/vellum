@@ -1,6 +1,6 @@
 # Disposable Cogent foundation experiment
 
-This macOS arm64 fixture checks P1–P3 extension boundaries. It is not Vellum's production core. See [the results](../../FOUNDATION_RESULTS.md) and [ADR 0002](../../decisions/0002-foundation-gaps.md).
+This macOS arm64 fixture checks P1–P3 extension boundaries. It is not Vellum's production core. See [the results](../../docs/reports/FOUNDATION_RESULTS.md) and [ADR 0002](../../docs/decisions/0002-foundation-gaps.md).
 
 ## Build and run
 

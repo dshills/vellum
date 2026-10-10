@@ -2,7 +2,7 @@
 
 Disposable comparison, recorded 9 October 2026. Two native engineering-workspace prototypes share one Go domain model. These are experiments, not the initial production framework.
 
-Read [P0 results](../../P0_RESULTS.md) and [the provisional decision](../../decisions/0001-p0-foundation.md).
+Read [P0 results](../../docs/reports/P0_RESULTS.md) and [the provisional decision](../../docs/decisions/0001-p0-foundation.md).
 
 ## Run
 

@@ -1,6 +1,6 @@
 # Remaining foundation checks
 
-Separate, disposable macOS checks layered on the unchanged nativeinput prototype. See [results](../../FOUNDATION_CHECKS_RESULTS.md). G1 remains open. These are diagnostics and two local remediation patches, not an accepted framework or expanded workbench.
+Separate, disposable macOS checks layered on the unchanged nativeinput prototype. See [results](../../docs/reports/FOUNDATION_CHECKS_RESULTS.md). G1 remains open. These are diagnostics and two local remediation patches, not an accepted framework or expanded workbench.
 
 ## Reproduce
 
