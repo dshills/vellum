@@ -1,0 +1,93 @@
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.030s
+
+OK
+..
+........
+----------------------------------------------------------------------
+Ran 10 tests in 0.055s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.578s
+
+OK
+..........................
+----------------------------------------------------------------------
+Ran 26 tests in 0.798s
+
+OK
+Created /private/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum licensed starter lwye7mv6/application; source '/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum licensed starter lwye7mv6/SDK/drivers/cogent/env.sh' then run go test ./... and go run .
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 0.093s
+
+OK
+................
+----------------------------------------------------------------------
+Ran 16 tests in 0.027s
+
+OK
+ok  	github.com/dshills/vellum	1.225s
+ok  	github.com/dshills/vellum/app	1.408s
+ok  	github.com/dshills/vellum/canvas	3.053s
+ok  	github.com/dshills/vellum/command	1.686s
+ok  	github.com/dshills/vellum/document	1.938s
+ok  	github.com/dshills/vellum/history	2.156s
+ok  	github.com/dshills/vellum/tasks	1.979s
+ok  	github.com/dshills/vellum/ui	2.479s
+ok  	github.com/dshills/vellum/virtual	2.477s
+ok  	github.com/dshills/vellum/workbench	2.674s
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/gallery.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/workbench.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	github.com/dshills/vellum/drivers/cogent	6.962s
+?   	github.com/dshills/vellum/drivers/cogent/cmd/accessibility-smoke	[no test files]
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke	1.646s
+?   	github.com/dshills/vellum/drivers/cogent/cmd/file-drop-smoke	[no test files]
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/gallery	2.038s
+?   	github.com/dshills/vellum/drivers/cogent/cmd/history-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/mainqueue-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/multiwindow-smoke	[no test files]
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke	2.694s
+?   	github.com/dshills/vellum/drivers/cogent/cmd/render-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-handoff-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-lifetime-smoke	[no test files]
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/workbench	9.514s
+ok  	github.com/dshills/vellum/drivers/cogent/internal/platformio	6.017s
+# github.com/dshills/vellum/drivers/cogent/cmd/workbench
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/system/driver/desktop.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/core.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/xyz/xyzcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	cogentcore.org/core/system	1.226s
+ok  	cogentcore.org/core/system/driver/base	1.254s
+ok  	cogentcore.org/core/system/driver/desktop	1.560s
+ok  	cogentcore.org/core/system/composer	1.255s
+ok  	cogentcore.org/core/gpu	1.977s
+ok  	cogentcore.org/core/gpu/gpudraw	1.724s
+ok  	cogentcore.org/core/core	6.040s
+ok  	cogentcore.org/core/xyz/xyzcore	2.287s
+# github.com/dshills/vellum/examples/hello.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	github.com/dshills/vellum/examples/hello	1.516s
+# github.com/dshills/vellum/examples/hello
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/examples/drawing.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	github.com/dshills/vellum/examples/drawing	2.504s
+# github.com/dshills/vellum/examples/drawing
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	github.com/dshills/vellum/examples/sdk-contract	1.317s

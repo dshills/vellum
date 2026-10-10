@@ -15,6 +15,7 @@
 - [Document history](history.md): bounded undo/redo, save revisions and native keyboard precedence.
 - [Native dispatch](native-dispatch.md): synchronous callback failure and desktop event termination.
 - [macOS completion](macos-completion.md): remaining framework and target acceptance work.
+- [Retained GPU drawing](drawing.md): immutable meshes, strokes, waveform reduction, indexed culling and resource accounting.
 - [Rendering](rendering.md): demand painting, resource lifetimes and device loss.
 - [Platform support](platform-support.md): Windows/Linux services and target gates.
 - [Release artifacts](release.md): alpha API, private SDK integrity and packaging.

@@ -2,8 +2,10 @@
 set -eu
 VELLUM_REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 . "$VELLUM_REPO_ROOT/drivers/cogent/env.sh"
-cd "$VELLUM_REPO_ROOT/examples/hello"
+for VELLUM_EXAMPLE_NAME in hello drawing; do
+cd "$VELLUM_REPO_ROOT/examples/$VELLUM_EXAMPLE_NAME"
 go test -race ./...
 go vet ./...
 mkdir -p build
-go build -o build/vellum-hello .
+go build -o "build/vellum-$VELLUM_EXAMPLE_NAME" .
+done

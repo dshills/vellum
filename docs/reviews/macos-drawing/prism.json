@@ -1,0 +1,177 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a1edcc83b99899fbfe748ec05ddb3676",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "5d714af471bdbc76cfa10a98a2fbb15643e7db48",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "72f085bd5e427ab2",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Model and view state mutated without synchronization",
+      "message": "`selectMode` mutates `model.mode`, `view` and `g.Revision` from the button `Activate` callback. `model.prepare` reads `mode` and `view`, and writes `query`, `columns`, `sampleStart` and `sampleEnd`, from the canvas's Prepare path. The smoke goroutine likely reads the same fields. If the canvas prepares on a different goroutine than `Activate` runs on, these are unsynchronized shared accesses, and there is a torn-state risk between `mode` and `view`.",
+      "suggestion": "Protect the model and viewport with a mutex, or confirm in the driver contract that `Activate` and `Prepare` run on the same thread. Document that contract if so.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/drawing/main.go",
+          "lines": {
+            "start": 50,
+            "end": 52
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "data-race",
+        "location-corrected"
+      ],
+      "evidence": "model.mode = mode\n\t\tview.Center = canvas.Point{}\n\t\tview.Zoom = 1",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6a9aae20ed7c695a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unsynchronized write to `status` from the smoke goroutine",
+      "message": "The `status` string is written from the smoke goroutine through this callback. It is also read by the window's `View` closure and written by `selectMode`, which likely run on the UI/driver thread. The code shows no synchronization, so this is a data race and will fail under `-race`. Unsynchronized string writes can also tear.",
+      "suggestion": "Guard `status` with a mutex or atomic.Value. Alternatively, run the status change on the UI thread through an app-provided dispatch function before calling `a.Invalidate(\"drawing\")`.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/drawing/main.go",
+          "lines": {
+            "start": 86,
+            "end": 86
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "data-race",
+        "location-corrected"
+      ],
+      "evidence": "result \u003c- drawingSmoke(ctx, a, g, other, model, nativeErrors, func() { status = \"Chrome remains responsive\" })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6c4e12c277a1a15d",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Nil error dereference when receiving from nativeErrors",
+      "message": "If nativeErrors is closed, or a nil error is sent, the receive yields nil and err.Error() panics with a nil dereference instead of reporting a failed assertion. The same pattern appears later: `case err := \u003c-nativeErrors: return err` would return nil and skip the success JSON event.",
+      "suggestion": "Use `case err, ok := \u003c-nativeErrors:` and return a descriptive error when `!ok || err == nil`. Apply the same guard at the final non-blocking select.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "examples/drawing/smoke.go",
+          "lines": {
+            "start": 195,
+            "end": 196
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "channel",
+        "location-corrected"
+      ],
+      "evidence": "case err := \u003c-nativeErrors:\n\t\tif !strings.Contains(err.Error(), \"budget exceeded\") {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8595a7550d6fbe8b",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native window resized outside the owner thread",
+      "message": "Every other access to window and canvas state in this smoke test goes through owner(), which runs on the application's owner thread. window.SetSize is called directly from the test goroutine. A native desktop window call from a non-owner thread can race or crash, and `go test -race` is part of the check script.",
+      "suggestion": "Wrap the call: `if err := owner(a, func() error { window.SetSize(size); return nil }); err != nil { return err }`.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/drawing/smoke.go",
+          "lines": {
+            "start": 237,
+            "end": 237
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "thread-safety",
+        "location-corrected"
+      ],
+      "evidence": "window.SetSize(size)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 102241,
+    "totalMs": 35761
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 32,
+    "bytes": 128355,
+    "chunks": 7,
+    "llmCalls": 11,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 101157,
+        "output": 14316,
+        "costUSD": 0.345474
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

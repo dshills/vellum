@@ -75,9 +75,12 @@ The Cogent `GPUCanvas` adapter uses its public `xyzcore.Scene` direct renderer
 on the shared WebGPU device, with one reusable mesh and retained instances.
 Wheel zoom anchors the pointer; dragging pans; clicking selects a component in
 the inspector; Fit/Zoom commands share the command registry. Native scene
-destruction releases GPU resources. The current canvas is a bounded rectangle
-renderer, with a 10,000-object limit; arbitrary shaders, image tiles, spatial
-indexes/LOD and automatic physical-device recreation remain future work.
+destruction releases GPU resources. That API remains a bounded rectangle
+renderer, with a 10,000-object limit. [Retained drawing](drawing.md) separately
+adds immutable arbitrary indexed 2D meshes, strokes, waveform reduction and a
+rectangle spatial index through the shared-device `MeshCanvas` adapter.
+Arbitrary shaders, image tiles, 3D/compute qualification and automatic
+physical-device recreation remain future work.
 Demand painting, live resource rebuilding and actionable device-loss shutdown are
 implemented; see [rendering](rendering.md). Runtime verification
 covers macOS; the integration is not a production performance certification.

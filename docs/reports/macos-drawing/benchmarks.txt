@@ -1,0 +1,12 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/dshills/vellum/canvas
+cpu: Apple M4 Pro
+BenchmarkIndexed100kVisibleMesh-14    	   26292	     46246 ns/op	  410280 B/op	      18 allocs/op
+BenchmarkIndexed100kVisibleMesh-14    	   25957	     57962 ns/op	  410280 B/op	      18 allocs/op
+BenchmarkIndexed100kVisibleMesh-14    	   26671	     49605 ns/op	  410280 B/op	      18 allocs/op
+BenchmarkMillionSampleEnvelope-14     	   82592	     13395 ns/op	   24576 B/op	       1 allocs/op
+BenchmarkMillionSampleEnvelope-14     	   90536	     15520 ns/op	   24576 B/op	       1 allocs/op
+BenchmarkMillionSampleEnvelope-14     	   89810	     13127 ns/op	   24576 B/op	       1 allocs/op
+PASS
+ok  	github.com/dshills/vellum/canvas	12.072s

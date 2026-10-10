@@ -33,8 +33,10 @@ acceptance evidence remains separate from actual file-panel selection.
 External file-drop callbacks and Mac file-URL routing are implemented; physical
 Finder workflow acceptance remains separate. See [contract](file-drop.md).
 
-Remaining framework work includes richer reusable
-custom drawing (beyond bounded rectangle scenes) and supported integration of the multiline editor
+[Retained GPU drawing](drawing.md) adds arbitrary indexed 2D meshes, strokes,
+waveform envelopes and rectangle spatial culling, with an independent consumer.
+P4 custom drawing still needs 3D/image-tile/compute/asynchronous-readback and
+broader performance qualification. Remaining framework work includes supported integration of the multiline editor
 beyond historical prototypes. Semantic command/UI inspection exists through APIs
 and native accessibility; application automation transport and deterministic UI
 replay need an explicit public contract and working consumer evidence.

@@ -1,0 +1,109 @@
+{
+  "captured_utc": "2026-10-10T23:42:51.494833+00:00",
+  "reviewer": "/root/mac_history_review",
+  "original_review": {
+    "files": 32,
+    "bytes": 128355,
+    "chunks": 7,
+    "llm_calls": 11,
+    "counts": {
+      "medium": 4,
+      "high": 0
+    },
+    "coverage_complete": true,
+    "exit_code": 1
+  },
+  "dispositions": [
+    {
+      "id": "72f085bd5e427ab2",
+      "title": "Model/view race",
+      "disposition": "Refuted",
+      "facts": [
+        "driver.go Button.OnClick calls Activate under Application.Do.",
+        "MeshCanvas.Render calls Prepare under the same captured application owner.",
+        "Smoke model queries/column/source reads also use owner(a,...). Mutex ownership serializes goroutines; equal thread identity is unnecessary."
+      ]
+    },
+    {
+      "id": "6a9aae20ed7c695a",
+      "title": "Status callback race",
+      "disposition": "Refuted",
+      "facts": [
+        "drawingSmoke calls chrome inside owner(a,...).",
+        "Driver refresh executes Window.View inside Application.Do; selectMode writes execute through owner-held Button.Activate."
+      ]
+    },
+    {
+      "id": "6c4e12c277a1a15d",
+      "title": "Nil/closed error channel",
+      "disposition": "Refuted under private fixture invariants",
+      "facts": [
+        "main creates the private channel and never closes it.",
+        "Its only sender is OnError. Every adapter report call is guarded by a nonnil error; callback replacement errors use nonnil fmt.Errorf.",
+        "No external caller supplies or invokes the channel/callback."
+      ]
+    },
+    {
+      "id": "8595a7550d6fbe8b",
+      "title": "Worker resize",
+      "disposition": "Partly valid; fixed",
+      "facts": [
+        "SetSize called Screen before dispatch, invoking GLFW GetMonitor/GetPos/GetSize on the worker. Pinned GLFW headers require native main for those queries.",
+        "Application.Do alone would not marshal native queries.",
+        "The fixture now calls SetWinSize with native window coordinate sizes; atomic closure/flag checks precede RunOnMain, which checks Glw and performs SetSize on native main.",
+        "Independent drawing race/vet/build and live race fixture pass after the correction. Prism reviews only the changed hunk: zero findings."
+      ]
+    }
+  ],
+  "corrective_review": {
+    "report": "resize-fix-prism.json",
+    "report_sha256": "5c8c8f1e1161df252d097c94d0aa4bc168c74a7d9425b8e47b61c660a0d83139",
+    "files": 1,
+    "bytes": 991,
+    "llm_calls": 1,
+    "counts": {
+      "medium": 0,
+      "high": 0
+    },
+    "coverage_complete": true,
+    "exit_code": 0,
+    "scope": "Unstaged three-line resize correction only; unchanged batch not repeated."
+  },
+  "final_corrected_input": {
+    "path": "examples/drawing/smoke.go",
+    "sha256": "96129e2a655ca875d789606269d9f39445d24cd5cac56c231f24adab7baac3f3"
+  },
+  "runs": [
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/examples/drawing",
+      "commands": [
+        "go test -race ./...",
+        "go vet ./..."
+      ],
+      "exit_codes": [
+        0,
+        0
+      ],
+      "log": "resize-fix-check.txt",
+      "scope": "Affected public consumer; model tests reused their passing cache because model/test inputs did not change."
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/examples/drawing",
+      "command": "go build -race -o /private/tmp/vellum-drawing-resize-qualified .",
+      "exit_code": 0,
+      "log": "resize-fix-build.txt"
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/examples/drawing",
+      "command": "/private/tmp/vellum-drawing-resize-qualified -smoke",
+      "exit_code": 0,
+      "log": "resize-fix-native.txt"
+    }
+  ],
+  "logs": {
+    "resize-fix-check.txt": "a6d28c55f96aa9ff0a36ad6ad6a9c67bd2376620e2af0067a307864839fd54a2",
+    "resize-fix-build.txt": "5f4ae157037abcb0974aaf8715ccb24fd9954413e64c0cfa3fda3e0a57950979",
+    "resize-fix-native.txt": "0f5480902800103c44fb916100ce885cb2a2c7b14475782a853725ee48e846a8"
+  },
+  "final_internal_result": "Three findings refuted, one fixed; no further substantive defect in final correction. Read-only internal review; no repeated unchanged Prism."
+}

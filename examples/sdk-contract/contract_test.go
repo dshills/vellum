@@ -4,12 +4,14 @@ package sdkcontract_test
 import (
 	"context"
 	"errors"
+	"image/color"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/dshills/vellum"
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/document"
 	"github.com/dshills/vellum/history"
@@ -251,5 +253,43 @@ func TestPublicDocumentSessionSaveAndClosePolicy(t *testing.T) {
 	})
 	if a.Context().Err() == nil || requests != 2 {
 		t.Fatal("SDK confirmed close failed")
+	}
+}
+
+func TestPublicDrawingWorkloads(t *testing.T) {
+	stroke, err := canvas.StrokePolyline([]canvas.Point{{X: 1, Y: 2}, {X: 10, Y: 12}}, 2, color.NRGBA{R: 255, A: 128})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v, ix := stroke.Counts(); v != 4 || ix != 6 {
+		t.Fatal("public stroke mesh")
+	}
+	samples := make([]float32, 1000000)
+	samples[12345] = 1
+	wave, err := canvas.NewWaveform(samples)
+	if err != nil {
+		t.Fatal(err)
+	}
+	buckets, err := wave.Envelope(12000, 13000, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	peak := false
+	for _, b := range buckets {
+		peak = peak || b.Max == 1
+	}
+	if !peak {
+		t.Fatal("public peak reduction")
+	}
+	index, err := canvas.NewRectIndex([]canvas.Rect{{ID: "visible", Width: 10, Height: 10}, {ID: "outside", X: 1000, Width: 10, Height: 10}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	mesh, stats, err := index.Mesh(canvas.Viewport{Width: 100, Height: 100, Zoom: 1})
+	if err != nil || stats.VisibleObjects != 1 {
+		t.Fatal(stats, err)
+	}
+	if v, ix := mesh.Counts(); v != 4 || ix != 6 {
+		t.Fatal("public culled mesh")
 	}
 }

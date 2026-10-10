@@ -18,6 +18,7 @@ open. The workbench does not change system input sources.
 | `workbench/`, `virtual/`, `canvas/` | Dock layouts, large-data views and canvas models |
 | `drivers/cogent/` | Separate native driver module |
 | `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |
+| `examples/drawing/` | Independent retained GPU drawing and scalable workload consumer |
 | `examples/hello/` | Standalone application module consuming the local SDK |
 | [docs/](docs/README.md) | Development guide, research, decisions, reports and review evidence |
 | [specs/](specs/README.md) | Framework contract and foundation validation plan |

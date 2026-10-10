@@ -105,3 +105,10 @@ loop/windowed checks support the bounded contract. See
 [dispatch](../specs/native-dispatch.md) and
 [evidence](reports/macos-native-dispatch/README.md); broad panic resource recovery
 and remaining macOS qualification stay open.
+
+Retained custom drawing now adds immutable indexed 2D meshes, world strokes,
+million-sample envelope reduction and paint-ordered rectangle spatial culling.
+The independent drawing application exercises a flat shared-device native
+renderer, explicit resource accounting, retention and snapshot color handling.
+See [contract](../specs/drawing.md) and [bounded evidence](reports/macos-drawing/README.md);
+the broader P4 workloads and Mac qualification gates remain open.
