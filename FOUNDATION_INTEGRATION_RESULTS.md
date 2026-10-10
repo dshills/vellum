@@ -34,9 +34,9 @@ Validation includes native protocol/saturation runs, real hidden Cogent/Metal li
 
 ## Still required before foundation acceptance
 
-1. Visual bidi navigation/selection, arbitrary and multiline native text-range geometry, and long-document behavior. Current bridge advertises only the visible insertion caret.
+1. Long-document interactive layout and the multiline code editor's native composition/range adapter. The native TextField now has [visual bidi navigation and range geometry](VISUAL_TEXT_GEOMETRY_FIX.md); native-reference comparisons and live workflow acceptance remain open.
 2. Live Japanese/Chinese candidate-panel position under scrolling, scale and focus changes, plus complete VoiceOver editing/navigation workflows on the final build. Earlier live conversion evidence remains historical and does not substitute for these checks.
-3. Ordering and fairness between bounded input batches and legacy forwarded key/shortcut events; global font/render/cache and application-history bounds; full performance workloads and edit-to-present measurement.
+3. General scheduling fairness and latency; [cross-path FIFO ordering is fixed](INPUT_ORDERING_FIX.md); global font/render/cache and application-history bounds; full performance workloads and edit-to-present measurement.
 4. Native Windows D3D12/NVDA and Linux Wayland/X11 Vulkan/Orca adapters and runtime tests on their actual hosts. Those hosts are unavailable here; the macOS adapter does not provide their implementations.
 5. Developer ID notarized release and clean-machine launch without development dependencies, followed by broader upstream text/render regression suites and a supported extension/upstream acceptance decision.
 

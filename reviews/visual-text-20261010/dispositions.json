@@ -1,0 +1,170 @@
+[
+  {
+    "report": "vellum-visual-prism-audit-final.json",
+    "id": "2d711c5df6777c0e",
+    "severity": "medium",
+    "title": "Validate bidi independently of optional native geometry",
+    "disposition": "Schema 2 independently asserts bidi and requires native geometry; missing-geometry and failed-bidi negative checks exit 2."
+  },
+  {
+    "report": "vellum-visual-prism-code-final.json",
+    "id": "5e3321f484c1f467",
+    "severity": "medium",
+    "title": "Validate native rectangles against independently derived rendered geometry",
+    "disposition": "Expected native screen rectangles use independently measured framebuffer/view dimensions and rendered physical cells."
+  },
+  {
+    "report": "vellum-visual-prism-code-final.json",
+    "id": "5d56222edbd7ee81",
+    "severity": "medium",
+    "title": "Clamp horizontal scrolling after text shrinks",
+    "disposition": "Scroll offsets clamp to the remaining full layout extent after text shrinks."
+  },
+  {
+    "report": "vellum-visual-prism-code-final.json",
+    "id": "4716a14c03d523bb",
+    "severity": "medium",
+    "title": "Refresh edited layout before pointer hit-testing",
+    "disposition": "Pointer placement refreshes queued-edit layout before hit testing."
+  },
+  {
+    "report": "vellum-visual-prism-code-fourth.json",
+    "id": "1d85f1ec22644d45",
+    "severity": "medium",
+    "title": "Advance unsupported vertical runs along the rendered axis",
+    "disposition": "Run offsets advance along the renderer axis; mixed-axis regression passes."
+  },
+  {
+    "report": "vellum-visual-prism-code-fourth.json",
+    "id": "2d296304b797ca62",
+    "severity": "medium",
+    "title": "Make wrapped arrow transitions respect RTL paragraph direction",
+    "disposition": "Wrapped horizontal arrows follow RTL paragraph direction and reverse to the same stop."
+  },
+  {
+    "report": "vellum-visual-prism-code-fourth.json",
+    "id": "bc36726b1fbaf602",
+    "severity": "medium",
+    "title": "Choose the clicked line before comparing individual carets",
+    "disposition": "Pointer line selection uses aggregate line bounds, including varied font heights."
+  },
+  {
+    "report": "vellum-visual-prism-code-third.json",
+    "id": "b69c7e3393d73df2",
+    "severity": "medium",
+    "title": "Reject missing native geometry for visible cells",
+    "disposition": "Missing geometry for any visible probe cell fails the native fixture."
+  },
+  {
+    "report": "vellum-visual-prism-code-third.json",
+    "id": "9df0afbe0b9e6bd8",
+    "severity": "medium",
+    "title": "Avoid repeatedly reshaping unchanged masked text",
+    "disposition": "Masked layout freshness compares logical text and mask state; unchanged interaction reuses layout."
+  },
+  {
+    "report": "vellum-visual-prism-code-third.json",
+    "id": "3ce49d2f52da52cc",
+    "severity": "medium",
+    "title": "Preserve region fills for unsupported interaction runs",
+    "disposition": "Vertical/math region fills keep their prior glyph-region fallback."
+  },
+  {
+    "report": "vellum-visual-prism-code-third.json",
+    "id": "592029db40634648",
+    "severity": "medium",
+    "title": "Prevent horizontal distance from overriding pointer line",
+    "disposition": "Pointer lookup chooses a physical line before horizontal caret proximity."
+  },
+  {
+    "report": "vellum-visual-prism-code.json",
+    "id": "d872233c18dd1436",
+    "severity": "medium",
+    "title": "Keep actualRange consistent with the clipped rectangle",
+    "disposition": "Clipped native fragments now omit wholly hidden cells from actualRange; clipping probes pass."
+  },
+  {
+    "report": "vellum-visual-prism-code.json",
+    "id": "b8039469229649b2",
+    "severity": "medium",
+    "title": "Refresh edited text layout before vertical cursor movement",
+    "disposition": "Vertical movement refreshes layout before reading caret geometry; queued-edit regression passes."
+  },
+  {
+    "report": "vellum-visual-prism-code.json",
+    "id": "0a4aa5fe72ec2c10",
+    "severity": "medium",
+    "title": "Avoid scanning the full paragraph separately for every run",
+    "disposition": "Paragraph grapheme boundaries are computed once and passed into each run."
+  },
+  {
+    "report": "vellum-visual-prism-layout-eighth.json",
+    "id": "5a8f30a9de1ce16d",
+    "severity": "medium",
+    "title": "Visual navigation bypasses unsupported text",
+    "disposition": "Mixed unsupported lines and unsupported cross-line transitions use logical-grapheme arrow fallback."
+  },
+  {
+    "report": "vellum-visual-prism-layout-eighth.json",
+    "id": "4081c989717fafd0",
+    "severity": "medium",
+    "title": "Unsupported runs are excluded from the scroll extent",
+    "disposition": "Scroll extent includes rendered bounds and accumulated advances of unsupported runs."
+  },
+  {
+    "report": "vellum-visual-prism-layout-final.json",
+    "id": "a9ce18786ff5edb6",
+    "severity": "medium",
+    "title": "Clamp stale scrolling before hit-testing refreshed text",
+    "disposition": "Refresh normalizes stale scroll before pointer placement."
+  },
+  {
+    "report": "vellum-visual-prism-layout-final.json",
+    "id": "8543ced2140dc3e5",
+    "severity": "medium",
+    "title": "Avoid rebuilding paragraph interaction geometry on every draw",
+    "disposition": "Render items reuse immutable interaction geometry; raster replay does not reconstruct it."
+  },
+  {
+    "report": "vellum-visual-prism-layout-ninth.json",
+    "id": "084da63d66cc882c",
+    "severity": "high",
+    "title": "Incorrect hunk counts make the patch unapplyable",
+    "disposition": "False positive from the patch nested inside a Git diff. Generated headers are valid. Every final hunk count (35) is mechanically checked; dry-run application and research/canonical prepare both pass. No manual header changes were made."
+  },
+  {
+    "report": "vellum-visual-prism-layout-ninth.json",
+    "id": "0230d7804dc43ec2",
+    "severity": "medium",
+    "title": "Vertical navigation ignores unsupported-line flags",
+    "disposition": "Vertical movement rejects unsupported current/target lines and uses legacy fallback; mixed target regression passes."
+  },
+  {
+    "report": "vellum-visual-prism-layout-seventh.json",
+    "id": "51a550eea2ee2be3",
+    "severity": "medium",
+    "title": "Fall back when the clicked line has no interaction carets",
+    "disposition": "Nearest reports unavailable when the chosen line has no supported carets."
+  },
+  {
+    "report": "vellum-visual-prism-layout-sixth.json",
+    "id": "2602a89d45c7390a",
+    "severity": "medium",
+    "title": "Preserve legacy interaction for unsupported runs",
+    "disposition": "Unsupported positioning, pointer and vertical navigation retain legacy fallback."
+  },
+  {
+    "report": "vellum-visual-prism-source-final.json",
+    "id": "ae0cad7146064c65",
+    "severity": "medium",
+    "title": "Coalesce selection cells before rasterizing",
+    "disposition": "Selection ranges normalize for indexed lookup; adjacent physical cells coalesce and fully clipped fragments skip raster fill."
+  },
+  {
+    "report": "vellum-visual-prism-source-final.json",
+    "id": "d9d29289c0b694fe",
+    "severity": "medium",
+    "title": "Merge cluster geometry before expanding to grapheme boundaries",
+    "disposition": "Already handled by InteractionLayout: duplicate grapheme ranges merge across clusters and runs before caret creation. New split-cluster and split-run regression verifies one full-advance cell and only outer carets. No raw run cells are published directly."
+  }
+]

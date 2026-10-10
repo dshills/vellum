@@ -8,8 +8,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"image"
 	"os"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -18,12 +20,10 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/math32"
-	"cogentcore.org/core/styles/units"
+	"cogentcore.org/core/styles"
 	"cogentcore.org/core/text/fonts"
 	"cogentcore.org/core/text/lines"
-	"cogentcore.org/core/text/rich"
 	"cogentcore.org/core/text/shaped/shapers/shapedgt"
-	"cogentcore.org/core/text/text"
 	"example.com/vellum/foundationcontracts/mailbox"
 	"example.com/vellum/foundationintegration/transport"
 	"github.com/go-text/typesetting/fontscan"
@@ -173,45 +173,45 @@ func checkLongText() map[string]any {
 }
 
 func checkBidi(cache string) (map[string]any, error) {
-	body := core.NewBody("offscreen foundation audit")
-	tf := core.NewTextField(body).SetText("abc אבג 123")
+	body := core.NewBody("offscreen visual bidi audit")
+	body.Scene.AddChild(body) // standalone offscreen scene has no app-bar plan
+	tf := core.NewTextField(body).SetText("abc אבג xyz")
+	tf.Styler(func(s *styles.Style) { s.SetTextWrap(false) })
+	preload := shapedgt.NewShaperWithFonts(fonts.Embedded).(*shapedgt.Shaper)
+	if err := preload.FontMap().UseSystemFonts(cache); err != nil {
+		return nil, err
+	}
+	sh := body.Scene.MakeTextShaper().(*shapedgt.Shaper)
+	if err := sh.FontMap().UseSystemFonts(cache); err != nil {
+		return nil, err
+	}
+	body.Scene.Resize(math32.Geom2DInt{Size: image.Pt(800, 120)})
+	body.Scene.LayoutRenderScene()
 	if !tf.SetEditingSelection(0, 0) {
 		return nil, errors.New("initial selection refused")
 	}
 	var cursor []int
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		ev := events.NewKey(events.KeyChord, 0, key.CodeRightArrow, 0)
 		ev.Init()
 		tf.HandleEvent(ev)
 		if !ev.IsHandled() {
-			return nil, errors.New("right-arrow handler not reached")
+			return nil, errors.New("arrow handler not reached")
 		}
 		cursor = append(cursor, tf.EditingState().Cursor)
 	}
-	sh := shapedgt.NewShaperWithFonts(fonts.Embedded).(*shapedgt.Shaper)
-	if e := sh.FontMap().UseSystemFonts(cache); e != nil {
-		return nil, e
+	want := []int{1, 2, 3, 4, 6, 5, 7}
+	visual := slices.Equal(cursor, want)
+	if !visual {
+		return nil, fmt.Errorf("visual arrow positions %v, want %v", cursor, want)
 	}
-	uc := units.Context{}
-	uc.Defaults()
-	ts := text.NewStyle()
-	ts.ToDots(&uc)
-	sty := rich.NewStyle()
-	ln := sh.WrapLines(rich.NewText(sty, []rune("abc אבג 123")), sty, ts, math32.Vec2(1000, 100))
-	var boxes [][4]float32
-	for i := range []rune("abc אבג 123") {
-		b := ln.RuneBounds(i)
-		boxes = append(boxes, [4]float32{b.Min.X, b.Min.Y, b.Max.X, b.Max.Y})
+	body.Scene.LayoutRenderScene()
+	geometry := tf.NativeTextGeometry()
+	if len(geometry.Cells) == 0 || len(geometry.Carets) == 0 {
+		return nil, errors.New("missing rendered geometry")
 	}
-	logical := true
-	for i, v := range cursor {
-		if v != i+1 {
-			logical = false
-		}
-	}
-	descending := boxes[4][0] > boxes[5][0] && boxes[5][0] > boxes[6][0]
-	runtime.KeepAlive(sh)
-	return map[string]any{"scope": "actual field right-arrow handler plus shaped rune boxes; no rendered caret or native reference editor", "text": "abc אבג 123", "right_arrow_rune_positions": cursor, "rune_boxes": boxes, "logical_navigation": logical, "rtl_box_order_descends": descending, "visual_navigation_established": false, "reason": "the handler advances logical graphemes; shaped boxes are not a bidi caret/selection policy"}, nil
+	return map[string]any{"scope": "laid-out field arrow handler and offscreen render geometry; deterministic strong-caret policy, no native-reference editor comparison", "text": "abc אבג xyz", "right_arrow_rune_positions": cursor, "expected_positions": want, "logical_navigation": false, "visual_navigation_established": visual, "caret_policy": "strong paragraph-direction edges; wrapped-line affinity; ligature advance divided equally at grapheme boundaries", "geometry": geometry}, nil
+
 }
 
 func checkFontScale(cache string) (map[string]any, error) {
@@ -286,7 +286,7 @@ func run() (bool, error) {
 	scale["heap_after_second_gc"] = heap()
 	count, size, fallbacks := fontscan.NewFontMap(nil).SnapshotStats()
 	scale["snapshots_after_gc"] = map[string]any{"count": count, "bytes": size, "fallbacks": fallbacks}
-	result := map[string]any{"schema": 1, "ordering": ordering, "legacy_ordering_control": control, "long_text": long, "bidi": bidi, "font_scale": scale, "G1_passed": false, "unavailable_checks": []string{"full live IME candidate panel and screen-reader workflow", "Windows/Linux native runtimes", "trusted release on a clean machine"}}
+	result := map[string]any{"schema": 2, "ordering": ordering, "legacy_ordering_control": control, "long_text": long, "bidi": bidi, "font_scale": scale, "G1_passed": false, "unavailable_checks": []string{"full live IME candidate panel and screen-reader workflow", "Windows/Linux native runtimes", "trusted release on a clean machine"}}
 	if e = json.NewEncoder(os.Stdout).Encode(result); e != nil {
 		return false, e
 	}

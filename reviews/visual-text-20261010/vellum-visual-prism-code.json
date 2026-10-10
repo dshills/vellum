@@ -1,0 +1,140 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a3c145beddc50feb5fea8d03e1bad5ba",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1b20cffe5f1d0e3d0bf0e45fa2ee84a86470aa86",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d872233c18dd1436",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Keep actualRange consistent with the clipped rectangle",
+      "message": "The rectangle is clipped to the viewport, but represented still includes every cell merged before clipping. With horizontal scrolling, wholly offscreen characters are therefore advertised in actualRange even though the returned rectangle does not contain them. Cocoa uses actualRange to determine which portion of the requested text the rectangle represents, so subsequent range queries can skip those characters.",
+      "suggestion": "Compute represented from the contiguous cells actually intersecting the viewport. Exclude wholly clipped cells before building the rectangle and actualRange, while preserving atomic cluster boundaries and stopping at line or bidi-fragment boundaries.",
+      "confidence": 0.87,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 202,
+            "end": 212
+          }
+        }
+      ],
+      "tags": [
+        "ime",
+        "geometry"
+      ],
+      "evidence": "    r=clipTextRect(r,s-\u003eviewport);if(r.size.height\u003c=0)represented=NSMakeRange(NSNotFound,0);",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "b8039469229649b2",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Refresh edited text layout before vertical cursor movement",
+      "message": "Vertical navigation consults cached layout without checking whether it matches editText. Unlike cursorVisual, it does not refresh after a queued edit. Typing or deleting and then pressing Up/Down before rendering can therefore move the cursor using obsolete wrapping and rune offsets, potentially assigning a cursor position beyond the edited text.",
+      "suggestion": "Extract the layout-freshness check from cursorVisual into a shared helper and invoke it before cursorVisualLine consults interactionGeometry. Add a test that edits wrapped text and immediately navigates vertically without an intervening render.",
+      "confidence": 0.93,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 488,
+            "end": 490
+          }
+        }
+      ],
+      "tags": [
+        "cursor",
+        "stale-layout"
+      ],
+      "evidence": "+func (tf *TextField) cursorVisualLine(delta int) {\n+\tif g := tf.interactionGeometry(); g != nil {",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "0a4aa5fe72ec2c10",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Avoid scanning the full paragraph separately for every run",
+      "message": "Every run recomputes grapheme boundaries for the entire source paragraph. InteractionLayout calls this for every run, and selection rendering calls it again for every selected run and range. For text with many bidi or rich-text runs, geometry construction and rendering become quadratic in paragraph length, causing avoidable UI stalls.",
+      "suggestion": "Compute the joined source and its grapheme boundaries once per layout, then pass the boundaries into run geometry construction. Cache the resulting cells for selection rendering instead of rebuilding them for each range.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 1067,
+            "end": 1067
+          }
+        }
+      ],
+      "tags": [
+        "text-layout",
+        "complexity"
+      ],
+      "evidence": "+\tallBounds := textpos.GraphemeBounds(src)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 105075,
+    "totalMs": 50706
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 10,
+    "bytes": 96961,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 34532,
+        "output": 4800,
+        "reasoning": 4065
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

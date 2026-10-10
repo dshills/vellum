@@ -1,0 +1,176 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "db2d560d9bf52c625a512f10de703db3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1b20cffe5f1d0e3d0bf0e45fa2ee84a86470aa86",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b69c7e3393d73df2",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Reject missing native geometry for visible cells",
+      "message": "The probe treats every missing native range as a completely clipped cell without checking the rendered viewport. A regression that drops geometry for visible cells is therefore silently skipped; as long as one other cell succeeds, the probe reports passed=true.",
+      "suggestion": "Intersect the rendered cell rectangle with layout.Viewport before accepting a missing range. Fail the probe if that intersection has positive width and height.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 911,
+            "end": 913
+          }
+        }
+      ],
+      "tags": [
+        "geometry",
+        "false-positive"
+      ],
+      "evidence": "\t\tif q.Range == [2]int{-1, 0} {\n\t\t\tcontinue\n\t\t} // completely clipped cells have no native geometry",
+      "fix": {
+        "before": "\t\tif q.Range == [2]int{-1, 0} {\n\t\t\tcontinue\n\t\t} // completely clipped cells have no native geometry",
+        "after": "\t\tif q.Range == [2]int{-1, 0} {\n\t\t\tsource := layout.Cells[index].Rect\n\t\t\tleft := max(source.Min.X, layout.Viewport.Min.X)\n\t\t\ttop := max(source.Min.Y, layout.Viewport.Min.Y)\n\t\t\tright := min(source.Max.X, layout.Viewport.Max.X)\n\t\t\tbottom := min(source.Max.Y, layout.Viewport.Max.Y)\n\t\t\tif right \u003e left \u0026\u0026 bottom \u003e top {\n\t\t\t\tpanic(fmt.Sprintf(\"visible cell has no native geometry: %s\", raw))\n\t\t\t}\n\t\t\tcontinue\n\t\t} // completely clipped cells have no native geometry"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "9df0afbe0b9e6bd8",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Avoid repeatedly reshaping unchanged masked text",
+      "message": "For NoEcho fields, the shaped source contains masking characters rather than editText, so this comparison remains unequal even after refreshing the layout. Every arrow movement and pointer hit therefore reshapes the entire password and rebuilds its interaction geometry despite no edit having occurred.",
+      "suggestion": "Track the logical text revision used to produce renderAll, including for masked layouts, and refresh only when that revision or the layout inputs change.",
+      "confidence": 0.92,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 533,
+            "end": 534
+          }
+        }
+      ],
+      "tags": [
+        "password",
+        "layout",
+        "location-corrected"
+      ],
+      "evidence": "+\tif tf.Scene != nil \u0026\u0026 (tf.renderAll == nil || string(tf.renderAll.Source.Join()) != string(tf.editText)) {\n+\t\ttf.configTextSize(tf.Geom.Size.Actual.Content.Sub(tf.iconsSize()))",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "3ce49d2f52da52cc",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Preserve region fills for unsupported interaction runs",
+      "message": "Region rendering now depends exclusively on interaction cells, but InteractionCells explicitly returns nil for vertical runs and math-path runs. Removing TextRunRegions therefore removes selection/highlight rendering for unsupported runs rather than retaining their previous rendering behavior. This affects the shared raster renderer, not just experimental text fields.",
+      "suggestion": "Retain the previous glyph-region rendering as a fallback for runs that cannot provide interaction cells, while using cell-based fills for supported horizontal runs.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 800,
+            "end": 801
+          }
+        }
+      ],
+      "tags": [
+        "rendering",
+        "regression",
+        "location-corrected"
+      ],
+      "evidence": "+\trs.TextRegionFill(ctx, cells, origin, lns.HighlightColor, ln.Highlights)\n+\trs.TextRegionFill(ctx, cells, origin, lns.SelectionColor, ln.Selections)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "592029db40634648",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Prevent horizontal distance from overriding pointer line",
+      "message": "A finite vertical penalty allows horizontal distance to override the clicked line. Clicking sufficiently far to the right of a short line can select a caret on a longer neighboring line, even when the pointer is inside the short line's vertical bounds.",
+      "suggestion": "Choose the nearest line vertically first, then minimize horizontal distance among its carets. At minimum, compare vertical and horizontal distances lexicographically rather than adding a weighted penalty.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 990,
+            "end": 991
+          }
+        }
+      ],
+      "tags": [
+        "hit-testing",
+        "location-corrected"
+      ],
+      "evidence": "+\t\tdy := max(c.Pos.Y-p.Y, p.Y-(c.Pos.Y+c.Height), float32(0))\n+\t\td := dy*dy*10000 + (c.Pos.X-p.X)*(c.Pos.X-p.X)",
+      "fix": {
+        "before": "+\tbest := g.Carets[0]\n+\tdist := float32(math.Inf(1))\n+\tfor _, c := range g.Carets {\n+\t\tdy := max(c.Pos.Y-p.Y, p.Y-(c.Pos.Y+c.Height), float32(0))\n+\t\td := dy*dy*10000 + (c.Pos.X-p.X)*(c.Pos.X-p.X)\n+\t\tif d \u003c dist {\n+\t\t\tbest = c\n+\t\t\tdist = d\n+\t\t}",
+        "after": "+\tbest := g.Carets[0]\n+\tbestDY := float32(math.Inf(1))\n+\tdist := float32(math.Inf(1))\n+\tfor _, c := range g.Carets {\n+\t\tdy := max(c.Pos.Y-p.Y, p.Y-(c.Pos.Y+c.Height), float32(0))\n+\t\td := (c.Pos.X-p.X)*(c.Pos.X-p.X)\n+\t\tif dy \u003c bestDY || (dy == bestDY \u0026\u0026 d \u003c dist) {\n+\t\t\tbest = c\n+\t\t\tbestDY = dy\n+\t\t\tdist = d\n+\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 137308,
+    "totalMs": 84836
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 10,
+    "bytes": 105773,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 37211,
+        "output": 6841,
+        "reasoning": 5288,
+        "cachedInput": 2455
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

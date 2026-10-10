@@ -8,6 +8,7 @@ package inputbridge
 */
 import "C"
 import (
+	"errors"
 	"math"
 	"runtime/cgo"
 	"unsafe"
@@ -117,4 +118,53 @@ func (i *Input) QueryProbe(start, length int, point [2]float64) string {
 	}
 	defer C.free(unsafe.Pointer(p))
 	return C.GoString(p)
+}
+
+// UpdateGeometry validates an owned snapshot before making one native transaction.
+// A rejected/stale publication leaves previously accepted state intact.
+func (i *Input) UpdateGeometry(text string, anchor, focus, markedStart, markedEnd int, active bool, ack uint64, rect [4]float64, g Geometry) error {
+	const maxCInt = 1<<31 - 1
+	for _, v := range []int{anchor, focus, markedStart, markedEnd} {
+		if v < -1 || v > maxCInt {
+			return errors.New("native offset out of range")
+		}
+	}
+	for _, v := range rect {
+		if math.IsNaN(v) || math.IsInf(v, 0) {
+			return errors.New("nonfinite insertion anchor")
+		}
+	}
+	if rect[2] < 0 || rect[3] < 0 {
+		return errors.New("invalid insertion anchor")
+	}
+	if err := g.Validate(text); err != nil {
+		return err
+	}
+	cells := make([]C.VellumTextCell, len(g.Cells))
+	for j, c := range g.Cells {
+		cells[j] = C.VellumTextCell{start: C.int(c.Start), end: C.int(c.End), line: C.int(c.Line), x: C.double(c.Rect[0]), y: C.double(c.Rect[1]), width: C.double(c.Rect[2]), height: C.double(c.Rect[3])}
+	}
+	carets := make([]C.VellumTextCaret, len(g.Carets))
+	for j, c := range g.Carets {
+		carets[j] = C.VellumTextCaret{offset: C.int(c.Offset), line: C.int(c.Line), x: C.double(c.Rect[0]), y: C.double(c.Rect[1]), height: C.double(c.Rect[3])}
+	}
+	var cp *C.VellumTextCell
+	var kp *C.VellumTextCaret
+	if len(cells) > 0 {
+		cp = &cells[0]
+	}
+	if len(carets) > 0 {
+		kp = &carets[0]
+	}
+	p := C.CString(text)
+	defer C.free(unsafe.Pointer(p))
+	C.vellum_input_geometry_update(i.native, p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack), C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3]), cp, C.int(len(cells)), kp, C.int(len(carets)), C.double(g.Viewport[0]), C.double(g.Viewport[1]), C.double(g.Viewport[2]), C.double(g.Viewport[3]), C.int(g.FocusLine))
+	return nil
+}
+
+// RenderedRectToScreen is a read-only test oracle. It derives scale from native
+// view bounds and framebuffer dimensions, independently of the published DPR.
+func (i *Input) RenderedRectToScreen(rect [4]float64, pixels [2]int) [4]float64 {
+	r := C.vellum_input_rendered_rect(i.native, C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3]), C.int(pixels[0]), C.int(pixels[1]))
+	return [4]float64{float64(r.x), float64(r.y), float64(r.width), float64(r.height)}
 }

@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8763b82b835ccf11546af7fedf6d8634",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1b20cffe5f1d0e3d0bf0e45fa2ee84a86470aa86",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a9ce18786ff5edb6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Clamp stale scrolling before hit-testing refreshed text",
+      "message": "Refreshing the layout after a queued edit leaves visualScroll from the previous paragraph unchanged. If a horizontally scrolled paragraph is replaced with short text before the next render, even a click at the viewport's left edge is translated far beyond the new text and places the cursor at its end. The added test only clicks far to the right, so it misses this case.",
+      "suggestion": "When refreshInteractionLayout rebuilds the paragraph, normalize visualScroll against the new geometry and viewport before pixelToCursor adds it to the pointer coordinates. Add a regression test that replaces scrolled text with a short string and clicks its left edge before rendering.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 272,
+            "end": 275
+          }
+        }
+      ],
+      "tags": [
+        "hit-testing",
+        "queued-edits"
+      ],
+      "evidence": "+ \t\tp.X += tf.visualScroll",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "8543ced2140dc3e5",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Avoid rebuilding paragraph interaction geometry on every draw",
+      "message": "Every draw of selected or highlighted text rebuilds the entire interaction layout, including grapheme segmentation, per-line maps, cells, and sorted carets. TextField already caches this geometry, but the renderer independently recomputes it on every frame. Since this patch also renders the full paragraph rather than a visible substring, selecting a long field incurs full-paragraph allocations and sorting on every repaint, including caret blinking.",
+      "suggestion": "Cache interaction geometry on the shaped Lines layout, or pass the existing immutable geometry to the renderer. Invalidate it when shaping changes, not when selection ranges or highlight colors change. Benchmark repeated rendering of a long selected paragraph to verify that geometry is built only once per layout.",
+      "confidence": 0.91,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 783,
+            "end": 786
+          }
+        }
+      ],
+      "tags": [
+        "rendering",
+        "allocations",
+        "caching"
+      ],
+      "evidence": "+\t\t\tgeometry = lns.InteractionLayout()",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 64037,
+    "totalMs": 64085
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 1,
+    "bytes": 45832,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 15710,
+        "output": 3533,
+        "reasoning": 3034
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

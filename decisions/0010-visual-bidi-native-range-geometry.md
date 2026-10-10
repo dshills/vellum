@@ -1,0 +1,13 @@
+# ADR 0010: Share visual grapheme advances with native text clients
+
+Date: 10 October 2026. Status: accepted for experimental macOS TextField integration; production G1 remains open.
+
+Render wrapped go-text runs in VisualIndex order. Derive advance cells and strong paragraph-direction caret edges from the same shaped output. Keep logical rune anchors/focus for selection and edits; carry physical line affinity at wrapped boundaries, with cross-line transitions following paragraph direction. Choose the pointer line from aggregate vertical bounds before horizontal caret proximity. Divide ligatures equally at extended grapheme boundaries, merge fallback-font fragments of a grapheme and preserve combining/ZWJ sequences. This is a documented interaction policy, not a claim of native-editor equivalence.
+
+Retain full paragraph shaping while scrolling. Refresh interaction layout before horizontal/vertical navigation or pointer placement following a queued edit. Clamp scrolling to the remaining advance width after text shrinks. Use shared cells for macOS raster selections and composition underlines, computing paragraph grapheme boundaries once per interaction layout. Render items reuse that immutable geometry. Unsupported vertical/math interaction keeps legacy navigation; scroll extent includes those runs, while native horizontal cells remain unavailable for them.
+
+Publish immutable UTF-16 cells, carets, viewport and focus-line affinity alongside matching text/acknowledgement. Cocoa owns its copied geometry and answers queries without calling Go widgets. Accepted native edits invalidate geometry; admission refusal preserves it. Range queries return a visible contiguous logical fragment and accurate actualRange; screen-point lookup requires a containing advance cell. Unknown/clipped geometry reports unavailable. Concealed/unlaid-out legacy cases retain the insertion-only API where no viewport is available.
+
+Preparation validates patch inputs and installs patch 0011 on the owned pinned toolkit. Preserve the legacy insertion-only update API and hidden-view control evidence. Verify actual rendered/native coordinates independently using framebuffer dimensions and Cocoa view bounds, in addition to synthetic range-contract probes.
+
+The [implementation report](../VISUAL_TEXT_GEOMETRY_FIX.md) records evidence and Prism dispositions. This extends the native TextField seam, not the multiline code editor's separate native adapter. Global memory/performance, live assistive/input workflows, other platform runtimes, trusted release and upstream acceptance remain foundation gates.

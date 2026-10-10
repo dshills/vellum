@@ -76,3 +76,18 @@ func UTF16Offset(text string, runeOffset int) (int, bool) {
 	}
 	return offset, index == runeOffset
 }
+
+// UTF16Offsets maps each rune boundary in one pass; geometry has many offsets.
+func UTF16Offsets(text string) []int {
+	offsets := []int{0}
+	u := 0
+	for _, r := range text {
+		if r > 0xffff {
+			u += 2
+		} else {
+			u++
+		}
+		offsets = append(offsets, u)
+	}
+	return offsets
+}

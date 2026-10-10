@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "cf73aa7454c68f77b6ab18d8163bb613",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1b20cffe5f1d0e3d0bf0e45fa2ee84a86470aa86",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2d711c5df6777c0e",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Validate bidi independently of optional native geometry",
+      "message": "The bidi assertion is nested under the optional native_geometry check. If native-queries-lifetime.json lacks that key, verification can succeed even when acceptance-audit.json reports failed visual navigation or incorrect cursor positions. These are separate artifacts, so missing native geometry should not disable validation of the newly changed bidi audit.",
+      "suggestion": "Move the bidi lookup and assertion outside the native_geometry conditional so the current bidi audit is always validated. If compatibility with older audit schemas is required, gate it explicitly on the audit schema rather than an unrelated artifact's geometry key.",
+      "confidence": 0.9,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/verify_acceptance.py",
+          "lines": {
+            "start": 56,
+            "end": 57
+          }
+        }
+      ],
+      "tags": [
+        "acceptance",
+        "bidi"
+      ],
+      "evidence": "        bidi = audit[\"bidi\"]\n        require(bidi[\"visual_navigation_established\"] and bidi[\"right_arrow_rune_positions\"] == [1, 2, 3, 4, 6, 5, 7], \"visual bidi handler failed\")",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 14786,
+    "totalMs": 14794
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 4,
+    "bytes": 10899,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 4706,
+        "output": 710,
+        "reasoning": 451
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

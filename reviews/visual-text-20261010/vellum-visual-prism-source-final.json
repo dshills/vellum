@@ -1,0 +1,150 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "80e4294f523ac9b8d1313a5026af3107",
+  "repo": {
+    "root": "/private/tmp/vellum-visual-review-source",
+    "head": "318592c6f23c05f96652f3ebd377472b83283d25",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ae0cad7146064c65",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Coalesce selection cells before rasterizing",
+      "message": "Selection replay now performs a separate FillBounds operation for every selected grapheme, instead of one glyph-region fill per intersected run. Selecting a long, unwrapped line therefore issues thousands of raster fills on every replay, including cells outside the clip. Checking every range against every cell also introduces O(cells × ranges) intersection work.",
+      "suggestion": "Coalesce adjacent selected cells with matching vertical bounds into rectangles before calling FillBounds, and reject rectangles outside the clip. Return immediately when ranges is empty; for many ranges, normalize them and use an indexed or sweeping intersection lookup.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "paint/renderers/rasterx/text.go",
+          "lines": {
+            "start": 112,
+            "end": 119
+          }
+        }
+      ],
+      "tags": [
+        "rasterization",
+        "selection",
+        "replay"
+      ],
+      "evidence": "\tfor _, cell := range cells {\n\t\tfor _, sel := range ranges {\n\t\t\tif cell.Range.Intersect(sel).Len() \u003e 0 {\n\t\t\t\trs.FillBounds(ctx, cell.Rect.Translate(origin), fill)\n\t\t\t\tbreak\n\t\t\t}\n\t\t}\n\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "d9d29289c0b694fe",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Merge cluster geometry before expanding to grapheme boundaries",
+      "message": "Rounding each shaping cluster outward independently can produce multiple cells for the same grapheme rather than one cell covering its complete advance. For example, clusters [0,1) and [1,2) with grapheme boundaries [0,2] both become cells for [0,2], each covering only its own advance. This can occur when a grapheme crosses font/style runs, and makes its caret endpoints and selection geometry ambiguous.",
+      "suggestion": "Aggregate cluster advances belonging to the same grapheme before emitting cells. Handle graphemes spanning runs in the interaction-layout aggregation as well, and add a regression test with a base character and combining mark split across shaping clusters or styled runs.",
+      "confidence": 0.88,
+      "locations": [
+        {
+          "path": "text/shaped/shapers/shapedgt/run.go",
+          "lines": {
+            "start": 257,
+            "end": 262
+          }
+        }
+      ],
+      "tags": [
+        "graphemes",
+        "interaction"
+      ],
+      "evidence": "\t\ta, _ := slices.BinarySearch(allBounds, start)\n\t\tif a == len(allBounds) || allBounds[a] \u003e start {\n\t\t\ta--\n\t\t}\n\t\tb, _ := slices.BinarySearch(allBounds, end)\n\t\tbounds := allBounds[a : b+1]",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 76446,
+    "totalMs": 28225
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 74434,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 28624,
+        "output": 3334,
+        "reasoning": 2423,
+        "cachedInput": 4656
+      }
+    ],
+    "widenedFiles": 7,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "aad5b32bc81e271d",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Clip selection and highlights to the text viewport",
+        "message": "Selection and highlight backgrounds are rendered before the text viewport clip is installed. Since autoScroll now exposes the entire paragraph rather than a visible substring, selecting or highlighting horizontally scrolled text can paint outside the text viewport, including over icon areas.",
+        "suggestion": "Push the text viewport context before rendering highlights and selection, so their backgrounds are clipped along with the text.",
+        "confidence": 0.88,
+        "locations": [
+          {
+            "path": "core/textfield.go",
+            "lines": {
+              "start": 1672,
+              "end": 1675
+            }
+          }
+        ],
+        "tags": [
+          "rendering",
+          "scrolling"
+        ],
+        "evidence": "\ttf.renderHighlights()\n\ttf.renderSelect()\n\tpc := \u0026tf.Scene.Painter\n\tpc.PushContext(nil, render.NewBoundsRect(tf.textViewport(), tf.Styles.Border.Radius.Dots()))",
+        "fix": {
+          "before": "\ttf.renderHighlights()\n\ttf.renderSelect()\n\tpc := \u0026tf.Scene.Painter\n\tpc.PushContext(nil, render.NewBoundsRect(tf.textViewport(), tf.Styles.Border.Radius.Dots()))",
+          "after": "\tpc := \u0026tf.Scene.Painter\n\tpc.PushContext(nil, render.NewBoundsRect(tf.textViewport(), tf.Styles.Border.Radius.Dots()))\n\ttf.renderHighlights()\n\ttf.renderSelect()"
+        },
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      },
+      "reason": "quoted evidence not found in core/textfield.go"
+    }
+  ],
+  "suppressed": []
+}

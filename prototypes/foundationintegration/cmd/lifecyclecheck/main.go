@@ -83,6 +83,7 @@ func main() {
 		return l, nil
 	}
 	contracts := publicationContracts()
+	contracts["native_geometry"] = geometryContracts()
 	start := time.Now()
 	samples := []map[string]any{measurement(0)}
 	for cycle := 1; cycle <= *n; cycle++ {
@@ -256,5 +257,5 @@ func publicationContracts() map[string]any {
 		panic("obsolete baseline erased external edit")
 	}
 	in.Probe(7)
-	return map[string]any{"native_queries": queries, "geometry_scope": "current insertion caret only; arbitrary/multiline rectangles and point hit-testing unavailable", "backward_cancel_direction": true, "stale_geometry_rejected": true, "obsolete_baseline_invalidated": true, "bare_view_optional_methods": true, "external_unmark": true, "atomic_invalid_publications": 6, "snapshotless_cancel_refused": true}
+	return map[string]any{"native_queries": queries, "geometry_scope": "legacy insertion-only API remains supported; native_geometry contains the new range/point contract", "backward_cancel_direction": true, "stale_geometry_rejected": true, "obsolete_baseline_invalidated": true, "bare_view_optional_methods": true, "external_unmark": true, "atomic_invalid_publications": 6, "snapshotless_cancel_refused": true}
 }

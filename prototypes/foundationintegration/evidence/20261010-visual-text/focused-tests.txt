@@ -1,0 +1,67 @@
+# cogentcore.org/core/core.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestVellumCompositionCommitUndoCancel
+--- PASS: TestVellumCompositionCommitUndoCancel (0.00s)
+=== RUN   TestVellumCompositionValidationAndFocusCommit
+--- PASS: TestVellumCompositionValidationAndFocusCommit (0.00s)
+=== RUN   TestVellumNativeCommitBoundaryAndReplacement
+--- PASS: TestVellumNativeCommitBoundaryAndReplacement (0.00s)
+=== RUN   TestVellumCompositionCommitsIdenticalPreeditValue
+=== RUN   TestVellumCompositionCommitsIdenticalPreeditValue/insert
+=== RUN   TestVellumCompositionCommitsIdenticalPreeditValue/unmark
+--- PASS: TestVellumCompositionCommitsIdenticalPreeditValue (0.00s)
+    --- PASS: TestVellumCompositionCommitsIdenticalPreeditValue/insert (0.00s)
+    --- PASS: TestVellumCompositionCommitsIdenticalPreeditValue/unmark (0.00s)
+=== RUN   TestVellumFieldEditing
+=== RUN   TestVellumFieldEditing/AB
+=== RUN   TestVellumFieldEditing/é
+=== RUN   TestVellumFieldEditing/👩\u200d💻
+=== RUN   TestVellumFieldEditing/🇺🇳
+=== RUN   TestVellumFieldEditing/👍🏽
+--- PASS: TestVellumFieldEditing (0.00s)
+    --- PASS: TestVellumFieldEditing/AB (0.00s)
+    --- PASS: TestVellumFieldEditing/é (0.00s)
+    --- PASS: TestVellumFieldEditing/👩\u200d💻 (0.00s)
+    --- PASS: TestVellumFieldEditing/🇺🇳 (0.00s)
+    --- PASS: TestVellumFieldEditing/👍🏽 (0.00s)
+=== RUN   TestVellumEditingSnapshotIsReadOnly
+--- PASS: TestVellumEditingSnapshotIsReadOnly (0.00s)
+=== RUN   TestVellumVisualArrowHandlersAndSelection
+--- PASS: TestVellumVisualArrowHandlersAndSelection (0.03s)
+=== RUN   TestVellumRenderedGeometryScrollAndWrap
+--- PASS: TestVellumRenderedGeometryScrollAndWrap (0.39s)
+=== RUN   TestVellumVerticalMovementRefreshesEditedLayout
+--- PASS: TestVellumVerticalMovementRefreshesEditedLayout (0.01s)
+=== RUN   TestVellumEditBeforePointerAndScrollShrink
+--- PASS: TestVellumEditBeforePointerAndScrollShrink (0.01s)
+=== RUN   TestVellumMaskedInteractionKeepsUnchangedLayout
+--- PASS: TestVellumMaskedInteractionKeepsUnchangedLayout (0.01s)
+=== RUN   TestVellumUnsupportedVerticalInteractionRetainsLegacy
+--- PASS: TestVellumUnsupportedVerticalInteractionRetainsLegacy (0.00s)
+=== RUN   TestVellumUnsupportedHorizontalMovementAndScroll
+--- PASS: TestVellumUnsupportedHorizontalMovementAndScroll (0.00s)
+PASS
+ok  	cogentcore.org/core/core	0.951s
+=== RUN   TestVellumVisualStrongCaretOrder
+    interaction_vellum_test.go:58: RTL paragraph order [5 6 7 8 9 10 4 11 3 2 1 0]
+--- PASS: TestVellumVisualStrongCaretOrder (0.01s)
+=== RUN   TestVellumAdvanceGraphemesAndWrapAffinity
+--- PASS: TestVellumAdvanceGraphemesAndWrapAffinity (0.02s)
+=== RUN   TestVellumPointerChoosesLineBeforeHorizontalDistance
+--- PASS: TestVellumPointerChoosesLineBeforeHorizontalDistance (0.00s)
+=== RUN   TestVellumRTLWrappedTransitions
+--- PASS: TestVellumRTLWrappedTransitions (0.00s)
+=== RUN   TestVellumMixedAxisOffsetAndAggregatePointerLine
+--- PASS: TestVellumMixedAxisOffsetAndAggregatePointerLine (0.00s)
+=== RUN   TestVellumSplitGraphemeClustersAndRunsMerge
+--- PASS: TestVellumSplitGraphemeClustersAndRunsMerge (0.00s)
+=== RUN   TestFoundationGlyphLookupDescendingAndClusterInterior
+--- PASS: TestFoundationGlyphLookupDescendingAndClusterInterior (0.00s)
+PASS
+ok  	cogentcore.org/core/text/shaped/shapers/shapedgt	0.653s
+=== RUN   TestVellumRenderItemReusesGeometry
+--- PASS: TestVellumRenderItemReusesGeometry (0.04s)
+=== RUN   TestVellumSelectionCoalescesPhysicalFragments
+--- PASS: TestVellumSelectionCoalescesPhysicalFragments (0.00s)
+PASS
+ok  	cogentcore.org/core/paint/renderers/rasterx	0.848s

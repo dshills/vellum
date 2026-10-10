@@ -1,0 +1,141 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a360bb79d50cd861ee53f986124934a9",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1b20cffe5f1d0e3d0bf0e45fa2ee84a86470aa86",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "1d85f1ec22644d45",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Advance unsupported vertical runs along the rendered axis",
+      "message": "Interaction layout advances X for every run, including unsupported vertical runs. The renderer advances Y for vertical runs instead. In a line containing vertical and horizontal runs, subsequent horizontal cells therefore receive a different origin from their rendered glyphs, misplacing selection fills and hit-test geometry.",
+      "suggestion": "Expose the run's advance vector or direction through the shaped-run interface and update the interaction offset along the same axis used by the renderer, even when the run contributes no interaction cells. Add a mixed vertical/horizontal run test.",
+      "confidence": 0.9,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 970,
+            "end": 970
+          }
+        }
+      ],
+      "tags": [
+        "geometry",
+        "vertical-text"
+      ],
+      "evidence": "+\t\t\toff.X += run.Advance()",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "2d296304b797ca62",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Make wrapped arrow transitions respect RTL paragraph direction",
+      "message": "Carets are flattened in top-to-bottom line order, with each line sorted left-to-right. Consequently, Right at the right edge of a wrapped RTL line jumps to the next line's left edge, and Left at its left edge jumps to the previous line's right edge. RTL paragraphs require the opposite cross-line transitions to continue visual navigation in paragraph reading order.",
+      "suggestion": "Preserve paragraph direction in the interaction geometry and handle cross-line transitions explicitly: for RTL paragraphs, Right crosses to the preceding physical line and Left to the following physical line. Test both transitions on a wrapped RTL paragraph.",
+      "confidence": 0.92,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 1023,
+            "end": 1024
+          }
+        }
+      ],
+      "tags": [
+        "bidi",
+        "keyboard-navigation"
+      ],
+      "evidence": "+\ti := slices.Index(g.Carets, c)\n+\treturn g.Carets[max(0, min(len(g.Carets)-1, i+delta))], true",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "bc36726b1fbaf602",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Choose the clicked line before comparing individual carets",
+      "message": "Vertical distance is evaluated for each caret rather than each physical line. With different font sizes or baseline offsets on one line, clicking above a short glyph can select a distant tall glyph because its vertical distance is zero, regardless of horizontal proximity.",
+      "suggestion": "First select a physical line using its aggregate vertical bounds, then choose the nearest horizontal caret among all carets on that line. Add a test with differently sized runs on the same line.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 1037,
+            "end": 1042
+          }
+        }
+      ],
+      "tags": [
+        "hit-testing",
+        "mixed-fonts"
+      ],
+      "evidence": "+\t\tdy := max(c.Pos.Y-p.Y, p.Y-(c.Pos.Y+c.Height), float32(0))\n+\t\td := (c.Pos.X - p.X) * (c.Pos.X - p.X)\n+\t\tif dy \u003c bestDY || (dy == bestDY \u0026\u0026 d \u003c dist) {",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 79456,
+    "totalMs": 70771
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 10,
+    "bytes": 108326,
+    "chunks": 4,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 23073,
+        "output": 4149,
+        "reasoning": 3403,
+        "cachedInput": 1164
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

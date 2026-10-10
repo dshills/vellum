@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "566f85863ff21593c7bbdc679cafb600",
+  "repo": {
+    "root": "/private/tmp/vellum-visual-review-source",
+    "head": "318592c6f23c05f96652f3ebd377472b83283d25",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 32162,
+    "totalMs": 23684
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 79203,
+    "chunks": 4,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 14025,
+        "output": 1159,
+        "reasoning": 1113,
+        "cachedInput": 2328
+      }
+    ],
+    "widenedFiles": 7,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "aad5b32bc81e271d",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Clip selection and highlights to the text viewport",
+        "message": "Selection and highlight backgrounds are rendered before the text viewport clip is installed. Since autoScroll now exposes the entire paragraph rather than a visible substring, selecting or highlighting horizontally scrolled text can paint outside the text viewport, including over icon areas.",
+        "suggestion": "Push the text viewport context before rendering highlights and selection, so their backgrounds are clipped along with the text.",
+        "confidence": 0.88,
+        "locations": [
+          {
+            "path": "core/textfield.go",
+            "lines": {
+              "start": 1672,
+              "end": 1675
+            }
+          }
+        ],
+        "tags": [
+          "rendering",
+          "scrolling"
+        ],
+        "evidence": "\ttf.renderHighlights()\n\ttf.renderSelect()\n\tpc := \u0026tf.Scene.Painter\n\tpc.PushContext(nil, render.NewBoundsRect(tf.textViewport(), tf.Styles.Border.Radius.Dots()))",
+        "fix": {
+          "before": "\ttf.renderHighlights()\n\ttf.renderSelect()\n\tpc := \u0026tf.Scene.Painter\n\tpc.PushContext(nil, render.NewBoundsRect(tf.textViewport(), tf.Styles.Border.Radius.Dots()))",
+          "after": "\tpc := \u0026tf.Scene.Painter\n\tpc.PushContext(nil, render.NewBoundsRect(tf.textViewport(), tf.Styles.Border.Radius.Dots()))\n\ttf.renderHighlights()\n\ttf.renderSelect()"
+        },
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      },
+      "reason": "quoted evidence not found in core/textfield.go"
+    }
+  ],
+  "suppressed": []
+}

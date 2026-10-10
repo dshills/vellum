@@ -1,0 +1,62 @@
+{
+  "decoded_toolkit": {
+    "report": "vellum-visual-prism-source-second.json",
+    "diff_sha256": "3ddd05e545cbe0cfa183598556f3f836d253dc0afb57d3657ed402eec2710bc4",
+    "base_commit": "318592c6f23c05f96652f3ebd377472b83283d25",
+    "files": {
+      "core/textfield.go": "c225280bfd2e4d0fd784bedbd103c664f769621a7f02fd5fa38cca49f6eeacae",
+      "core/textfield_editing.go": "8188216d58de199574da1ef1005ec81c61bbca03796c273e8b211a2549a81b19",
+      "core/textfield_native.go": "0e2239678d80d83bf0871ad777fdd3ed69b46d839ba56cf63ef1f6c46bd88d98",
+      "core/textfield_visual.go": "c98a714bc2d7a62eb9e55c9cec678f55454b4abd2c70c915a2c0077bf80446ea",
+      "core/textfield_visual_test.go": "c8f3deb31c464e6439083784d81e5dff4ecefc6bcf360e881ee326179f942c1b",
+      "paint/painter.go": "5481a0b0ad058d4aa68f7580f492b39f799a96db6feee3905b9b1d5e6ab40331",
+      "paint/render/text.go": "2771200c5fdcf17f668351a25f4e4cda646c378417b13d3d82cbc2dd8326d0c3",
+      "paint/renderers/rasterx/text.go": "5944f5ccf59ea142b8c12d8ba3a97988def20ab7be11c7cde087c9004535f7f2",
+      "paint/renderers/rasterx/text_geometry_vellum_test.go": "3cdf171341a2ca0b49763813643b76b16e5cb6d9832f0fe384d49c72e619f2f6",
+      "text/shaped/interaction.go": "c23703266b9407fb7e8d507b062a765c33654a9f2db2b5d70a60079d63722a70",
+      "text/shaped/regions.go": "81e9426c8a07df73342f16a5a82d0924924bb283aef79172bed780e97c2c935c",
+      "text/shaped/shapers/shapedgt/interaction_vellum_test.go": "53d2a44136e27270e4e9bb62a4f976a1f7f3034d785413fe12d3f7d4adc5286c",
+      "text/shaped/shapers/shapedgt/run.go": "89d8819dab6d0422e700f5c4d93cd9a226fccb1cf80e7587d6b77d9ff0b067dc",
+      "text/shaped/shapers/shapedgt/wrap.go": "cbd6071e0b91f33139c901c66e1ea61a16c55d91c1414e56215b3095cd752a37"
+    }
+  },
+  "native_bridge": {
+    "report": "vellum-visual-prism-code-fourth.json",
+    "diff_sha256": "9b9a6e2fbc61594df307b853c354c6fe4c303422b4c32d1c82a0320e010cd870",
+    "files": {
+      "prototypes/foundationintegration/inputbridge/input.h": "faedb3fab675c9311ee28d7d9f05533c156c0559d5125029b52da4d9111c3218",
+      "prototypes/foundationintegration/inputbridge/input_darwin.go": "ba29edc2a6d25e49b59ca355d0a52c550ad366cc8ad609d8edebcb397606b692",
+      "prototypes/foundationintegration/inputbridge/input_darwin.m": "3f8c2b788668d3a33aabc9e78afec0f72d4126b90146665d427005876b96f1e1",
+      "prototypes/foundationintegration/inputbridge/geometry.go": "3684ae4b8c4297ec3eff64fa1f2478cdaa8c042d2e6162b8a96e18738af9dd20",
+      "prototypes/foundationintegration/inputbridge/geometry_test.go": "2aa39595811da1631a889be03abc783009b5012c49c3814b6f0662211b90a0dc",
+      "prototypes/foundationintegration/inputbridge/encoding.go": "0f96efb87770258fa5ffbe5233f38f68cc260491e01e615d58278e85228da7fe",
+      "prototypes/foundationintegration/main.go": "5fccb27ead878a7f388c17a319e6db7c3a875d0e76e3ebdce00114971a2e8b1b",
+      "prototypes/foundationintegration/cmd/lifecyclecheck/main.go": "13c24baecee7a8088bfbd6efa5664261bf495752dd9c1d6d86d6488e55d88c26",
+      "prototypes/foundationintegration/cmd/lifecyclecheck/geometry_darwin.go": "54f8591b4ece6a68e77c8de954028e70e8498da13c5a8ab8c12c252438aefd3d"
+    }
+  },
+  "audit": {
+    "report": "vellum-visual-prism-audit-second.json",
+    "diff_sha256": "56e1f27871bcc4175733884c4eb9fdb67e0cadc7fbdd8ee18a745ecec20b1e65",
+    "files": {
+      "prototypes/foundationintegration/cmd/foundationaudit/main.go": "9afbbd907f20aeb3b1debc6c387c8d523cb690d7ef56c858e0140b75ff134f0b",
+      "prototypes/foundationintegration/prepare.py": "89a974fa819623c042d5d5ec556b50ab7838f6da6ecca5ee19df2296e9de0fe6",
+      "prototypes/foundationintegration/verify_acceptance.py": "e0f9d007a8a1fc64d39c6080d737f87571f26e70049b4fe437fc7ae33e7ce9a0",
+      "prototypes/foundationintegration/patches/original-hashes.json": "6209c16a354ea6ed5b02c76588d1aca2a24b2a1b8925f480748cf116065a3864"
+    }
+  },
+  "documentation": {
+    "report": "vellum-visual-prism-docs-final.json",
+    "diff_sha256": "b29323146274a69044a8429663d8af99342556b6d7a687393b91d83ee45e7b5b",
+    "files": {
+      "FOUNDATION_ACCEPTANCE_AUDIT.md": "35185b740ce53a6391dd3280f9f85890c619c7be8d809505b123925916e5944b",
+      "FOUNDATION_INTEGRATION_RESULTS.md": "e7df2a50126272b6fb3828f9b0d99ba08dc94450d81a3eb3ac92332da52f5f67",
+      "VISUAL_TEXT_GEOMETRY_FIX.md": "e9ca30bfd98380b26dad086682ee459ab731ad8de881264360abca821c64d8eb",
+      "decisions/0010-visual-bidi-native-range-geometry.md": "403c167c4115d13cfa02e2d88caebdbf1782d860fb3d0bcd71a53f7fe8fe48fb",
+      "prototypes/foundationintegration/README.md": "86a864eac462bf5e11a1b8ab832f49fc9fd26d8e3420b66b47c99913b0198b46",
+      "prototypes/foundationintegration/evidence/20261010-visual-text/README.md": "204d036c33f641be63b0eea656f502ae652a67a0a19f108e77dd60b376934cbd",
+      "prototypes/foundationintegration/evidence/20261010-visual-text/manifest.json": "27ece34bc6c77660fffbb3a406fc07d6840f61992a9e2c0382f1698cfe97a6f4",
+      "prototypes/foundationintegration/evidence/20261010-visual-text/verification.txt": "92d93c3eb05a0830833899b63d19f2a063786c241570deefba950f80044872e1"
+    }
+  }
+}

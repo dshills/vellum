@@ -1,0 +1,89 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dba355a653c29f3c78737ce38f2860f1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "1b20cffe5f1d0e3d0bf0e45fa2ee84a86470aa86",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2602a89d45c7390a",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Preserve legacy interaction for unsupported runs",
+      "message": "InteractionCells deliberately produces no cells for vertical and math runs, so their rune positions have no interaction carets. Replacing the previous RuneBounds lookup with a zero-vector fallback places the cursor at the field origin for these layouts. The new pointer and vertical-navigation paths also lack a legacy fallback, making unsupported layouts uneditable through those interactions.",
+      "suggestion": "Retain the previous RuneBounds-based charPos behavior when interaction geometry has no matching caret. Likewise, fall back to the previous RuneAtPoint and RuneAtLineDelta behavior when pointer or vertical navigation cannot resolve a supported caret. Add a vertical-text regression test.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/patches/0011-visual-bidi-range-geometry.patch",
+          "lines": {
+            "start": 79,
+            "end": 84
+          }
+        }
+      ],
+      "tags": [
+        "text-editing",
+        "interaction-geometry"
+      ],
+      "evidence": "+\tif g := tf.interactionGeometry(); g != nil {\n+\t\tif c, ok := g.At(idx, tf.visualLine); ok {\n+\t\t\treturn c.Pos\n+\t\t}\n+\t}\n+\treturn math32.Vector2{}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 79406,
+    "totalMs": 79456
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 1,
+    "bytes": 51413,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 17339,
+        "output": 3692,
+        "reasoning": 3375
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

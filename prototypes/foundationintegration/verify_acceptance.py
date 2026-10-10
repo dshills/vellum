@@ -12,7 +12,7 @@ def require(condition, message):
 
 def verify(root):
     audit = json.loads((root / "acceptance-audit.json").read_text())
-    require(audit["schema"] == 1, "unsupported audit schema")
+    require(audit["schema"] in (1, 2), "unsupported audit schema")
     order = audit["ordering"]
     require(order["fifo"] and order["applied_final"] == 32, "incomplete or non-FIFO native delivery")
     require(0 <= order["applied_at_shortcut"] <= 32, "missing shortcut observation")
@@ -45,6 +45,17 @@ def verify(root):
                 "native text range differs from expected UTF-16 clipping")
         require(value["rect_range"] == [1, 0] and value["point_index"] == -1,
                 "geometry capability changed; update acceptance scope explicitly")
+    if "native_geometry" in native["publication_contracts"]:
+        geometry = native["publication_contracts"]["native_geometry"]
+        require(all(geometry[k] for k in ("invalid_atomic", "refused_edit_preserves_geometry", "native_edit_invalidates_geometry", "stale_ack_rejected", "screen_point_roundtrip")), "native geometry contract failed")
+        expected_rects = [[0, 5], [1, 2], [5, 3], [4, 1], [3, 0], [-1, 0]]
+        require([q["observed"]["rect_range"] for q in geometry["queries"]] == expected_rects, "native geometry range mismatch")
+        require([q["observed"]["point_index"] for q in geometry["queries"][:3]] == [1, 1, 6], "native geometry hit mismatch")
+        require(geometry["scaled"]["screen_rect"][2:] == [10, 10] and geometry["clipped"]["screen_rect"][2:] == [7, 10], "native geometry scale/clip mismatch")
+    if audit["schema"] == 2:
+        bidi = audit["bidi"]
+        require(bidi["visual_navigation_established"] and bidi["right_arrow_rune_positions"] == [1, 2, 3, 4, 6, 5, 7], "visual bidi handler failed")
+        require("native_geometry" in native["publication_contracts"], "missing native geometry evidence for schema 2")
     print("Evidence integrity passes; foundation acceptance remains open.")
 
 
