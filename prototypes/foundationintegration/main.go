@@ -74,6 +74,7 @@ type fixture struct {
 	input                                  *inputbridge.Input
 	inputAck                               uint64
 	inputHistory                           []inputbridge.Update
+	nativeShadows                          map[uint64]string
 	inputHistoryBytes, inputHistoryDropped int
 	inputProbes                            []json.RawMessage
 	geometryProbe                          bool
@@ -171,6 +172,7 @@ func main() {
 			if f.input == nil {
 				return &attachment{f}, fmt.Errorf("native attachment failed")
 			}
+			f.input.EnableDeltas()
 			f.inputSource = inputbridge.Source()
 			f.inputEnvironment = json.RawMessage(inputbridge.Environment())
 		}
@@ -753,6 +755,10 @@ func (f *fixture) publish() {
 			}
 			if accepted {
 				f.nativeClientID = clientID
+				if f.nativeShadows == nil {
+					f.nativeShadows = map[uint64]string{}
+				}
+				f.nativeShadows[clientID] = state.Text
 			}
 		}
 	})
@@ -796,14 +802,22 @@ func (f *fixture) applyInput(u inputbridge.Update) {
 		f.rejected++
 		return
 	}
-	decoded, err := inputbridge.Decode(u)
-	applied := err == nil && f.applyNativeSnapshot(u, decoded)
+	wire := u
+	expanded, err := f.expandNativeUpdate(u)
+	var decoded inputbridge.RuneUpdate
+	if err == nil {
+		decoded, err = inputbridge.Decode(expanded)
+	}
+	applied := err == nil && f.applyNativeSnapshot(expanded, decoded)
 	if !applied {
 		f.rejected++
 		f.status = "Rejected native input update"
 		fmt.Printf("input_rejected %+v error=%v\n", u, err)
 	} else {
-		f.recordInput(u)
+		if wire.Delta {
+			f.nativeShadows[u.ClientID] = expanded.Text
+		}
+		f.recordInput(wire)
 		f.status = fmt.Sprintf("Native %s · sequence %d", u.Kind, u.Sequence)
 		fmt.Printf("input_update %+v\n", u)
 	}

@@ -1,0 +1,32 @@
+{
+  "baseline": "fb0b354acc28560975241828438a970d3959d93c",
+  "reviewed_source_sha256": {
+    "cmd/lifecyclecheck/delta.go": "7a26ee2db6733e2165189fe1db7039367cdfba4312209a465b09c4f64207ec56",
+    "cmd/lifecyclecheck/main.go": "cd626cc2f4e82265c59666332d4c05d4a9e6926454c291ec25f7ac368ac3bfca",
+    "editor_adapter.go": "e04c1ab9fc98a835edaf8d413e54d1186d83a57c2a9e89079237e0b26334e515",
+    "editor_adapter_test.go": "769516bda70e2b950f17a4a98e66eb9310b3c421e084a36a756eb4b19fa77bf8",
+    "inputbridge/delta.go": "3b288983fc2f9c7cfa531fdd520e67b1d03bb486b3e157247662286f52ed20c6",
+    "inputbridge/delta_test.go": "f249052c80334fc016496754c90bfa4992c849be01ca353a5b1367b677400cb2",
+    "inputbridge/encoding.go": "329f3d3d0efda647ac795800ec73a6723114cf1b1a3d778ed1a0218aea292940",
+    "inputbridge/geometry.go": "964863e02ae6f660b4efec76607e77e5044e3b8b4b87929ffd15fb88826d7396",
+    "inputbridge/input.h": "928f8ec6c03a9062cc969fd2974c982b8a77ddbcbbf457f52eef8068ad6b06d3",
+    "inputbridge/input_darwin.go": "a788511f006ef407474efd789725b8083ebc661caae7ed351d496d80edc9cf73",
+    "inputbridge/input_darwin.m": "107a3bdc350328511b0d4dcdd9d813ac8dd9f4228ffffe38b1e90883c23acf08",
+    "main.go": "b229585473f690f9f481c3568f4b852964f41b3e00fbf4dfd66efeef68185e05",
+    "prepare.py": "0b18deaae1a015838aa8fde4526306299eaef7c09672856fe9557af38650adf8",
+    "decoded:text/lines/native_vellum.go": "eccd5d58fd7a3ea3e40054cd2245dfcd5cdef46bb6f990afa3c35ec0d66fb933"
+  },
+  "evidence_sha256": {
+    "bridge-race.txt": "700d4146faa85a3d4136c7297a87dbf9d513539d43a59f57d0c9504967423a39",
+    "editor-input.json": "807625c6cec52aad768148297136b302fd1a3860cf52e5be81ef16152f7e39c1",
+    "editor-input.json.heap.pprof": "849a4bde11d44679ed278e70993d58d97b9e49d985b59b49ab3eada290650881",
+    "editor-input.log": "9d2ae21fccb54ff05bd4abcbe60e0dab2a2936242b8398553c1a18a89949d324",
+    "editor-regressions.txt": "20e84b37cc7ffaed48b4410662d2aed5e2ddf7f98bf4ea37d8f750ca2db77bb8",
+    "editor.txt": "9dbfdad4c0dcad76e89c0bb410bd69d368da630814999dcf1e81bde82a157f69",
+    "native-delta.json": "35498aeedf4ac7b4d594948ad6591414047f7e5ef7eea7e6da3cd7f58faa4403",
+    "native-delta.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prepare.txt": "ae8c3e87e88bc93d5c00a7b6b4eec60c004acef7b78fd922458c1fa8ea9c3801",
+    "saturation.json": "9fd0bbef4c6f06f6a19749246eab6c57766119580ac2614e88e588d070048925",
+    "vet.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

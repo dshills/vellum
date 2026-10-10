@@ -25,3 +25,5 @@ VellumScreenRect vellum_input_rendered_rect(void *input,double x,double y,double
 
 bool vellum_input_client_geometry_update(void *input,uint64_t clientID,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height,const VellumTextCell *cells,int nc,const VellumTextCaret *carets,int nk,double vx,double vy,double vw,double vh,int focusLine);
 bool vellum_input_client_update(void *input,uint64_t clientID,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height);
+
+void vellum_input_enable_deltas(void *input);

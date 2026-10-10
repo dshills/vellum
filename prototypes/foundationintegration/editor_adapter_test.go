@@ -46,12 +46,72 @@ func TestNativeQueuedClientRoutingAndStaleShadow(t *testing.T) {
 }
 
 func TestNativePublicationUnsupportedDocument(t *testing.T) {
-	for _, text := range []string{"a\x00b", "\xff", strings.Repeat("a", (1<<20)+1)} {
+	for _, text := range []string{"a\x00b", "\xff", strings.Repeat("a", inputbridge.MaxDocumentBytes+1)} {
 		if nativePublicationSupported(text) {
 			t.Fatal("unsupported document accepted")
 		}
 	}
 	if !nativePublicationSupported("a\nאבג👩") {
 		t.Fatal("multiline UTF-8 refused")
+	}
+}
+
+func TestNativeLargeDocumentQueuedDeltasAndSharedEdit(t *testing.T) {
+	text := strings.Repeat("abcdefghij\n", 190000)
+	ed := textcore.NewEditor()
+	old := ed.Lines
+	ls := lines.NewLinesExact().SetString(text)
+	ls.Autosave = false
+	ed.SetLines(ls)
+	old.Close()
+	defer ls.Close()
+	f := fixture{editor: ed, nativeShadows: map[uint64]string{40: text}}
+	apply := func(u inputbridge.Update) bool {
+		expanded, err := f.expandNativeUpdate(u)
+		if err != nil {
+			return false
+		}
+		decoded, err := inputbridge.Decode(expanded)
+		if err != nil || !f.applyNativeSnapshot(expanded, decoded) {
+			return false
+		}
+		f.nativeShadows[40] = expanded.Text
+		return true
+	}
+	start := len(text) - 2
+	u := inputbridge.Update{ClientID: 40, Delta: true, ReplaceStart: start, ReplaceEnd: start, Text: "に", Kind: "mark", Anchor: start + 1, Focus: start + 1, MarkedStart: start, MarkedEnd: start + 1}
+	if !apply(u) {
+		t.Fatal("large-document preedit refused")
+	}
+	u.ReplaceEnd = start + 1
+	u.BeforeText = "に"
+	u.Text = "日本"
+	u.Anchor = start + 2
+	u.Focus = start + 2
+	u.MarkedEnd = start + 2
+	if !apply(u) {
+		t.Fatal("queued large-document replacement refused")
+	}
+	u.ReplaceEnd = start + 2
+	u.BeforeText = "日本"
+	u.Text = ""
+	u.Kind = "cancel"
+	u.Anchor = start
+	u.Focus = start
+	u.MarkedStart = -1
+	u.MarkedEnd = -1
+	if !apply(u) || ls.String() != text {
+		t.Fatal("large-document cancellation did not restore exact bytes")
+	}
+	u.ReplaceEnd = start
+	u.BeforeText = ""
+	u.Text = "字"
+	u.Kind = "insert"
+	u.Anchor = start + 1
+	u.Focus = start + 1
+	ls.InsertText(ls.EndPos(), []rune("external"))
+	before := ls.String()
+	if apply(u) || ls.String() != before {
+		t.Fatal("outside-range shared edit was overwritten")
 	}
 }

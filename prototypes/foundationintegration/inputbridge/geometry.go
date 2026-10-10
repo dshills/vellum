@@ -35,7 +35,7 @@ func validRect(r [4]float64, caret bool) bool {
 	return r[2] >= 0 && r[3] > 0 && (!caret || r[2] == 0) && !math.IsInf(r[0]+r[2], 0) && !math.IsInf(r[1]+r[3], 0)
 }
 func (g Geometry) Validate(text string) error {
-	if !utf8.ValidString(text) || strings.ContainsRune(text, 0) || len(text) > 1<<20 {
+	if !utf8.ValidString(text) || strings.ContainsRune(text, 0) || len(text) > MaxDocumentBytes {
 		return errors.New("invalid geometry text")
 	}
 	offsets := UTF16Offsets(text)

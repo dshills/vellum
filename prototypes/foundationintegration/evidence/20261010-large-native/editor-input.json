@@ -1,0 +1,594 @@
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 38,
+  "canvas_repaints_proxy": 15,
+  "commits": 0,
+  "editing_state": {
+    "Text": "10k",
+    "Cursor": 0,
+    "Anchor": 0,
+    "Focus": 0,
+    "VisualLine": 0,
+    "Caret": {
+      "Min": {
+        "X": 16,
+        "Y": 116
+      },
+      "Max": {
+        "X": 17,
+        "Y": 139
+      }
+    }
+  },
+  "editor_editing_state": {
+    "Text": "A中文漢に👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+    "Cursor": 5,
+    "Anchor": 5,
+    "Focus": 5,
+    "VisualLine": 0,
+    "Caret": {
+      "Min": {
+        "X": 118,
+        "Y": 676
+      },
+      "Max": {
+        "X": 119,
+        "Y": 698
+      }
+    }
+  },
+  "editor_probe": true,
+  "experimental_toolkit_patch": true,
+  "field_text": "10k",
+  "go_heap_alloc_bytes_after_forced_gc": 50091392,
+  "go_heap_alloc_bytes_before_gc": 51672280,
+  "go_heap_inuse_bytes": 56696832,
+  "goroutines": 5,
+  "idle_samples": null,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      },
+      {
+        "id": "com.apple.inputmethod.SCIM.ITABC",
+        "name": "Pinyin – Simplified"
+      },
+      {
+        "id": "com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese",
+        "name": "Hiragana"
+      },
+      {
+        "id": "com.apple.inputmethod.Kotoeri.RomajiTyping",
+        "name": "Japanese – Romaji"
+      },
+      {
+        "id": "com.apple.inputmethod.SCIM",
+        "name": "Chinese, Simplified"
+      }
+    ]
+  },
+  "input_environment_scope": "captured at first show; each recorded native probe reports its current source",
+  "input_history_bytes": 122,
+  "input_history_dropped": 0,
+  "input_probes": [
+    {
+      "selected_start": 2,
+      "caret_view": [
+        78,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 1,
+      "text": "Aに👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 1,
+      "client_id": 40,
+      "sequence": 1,
+      "substring": "Aに👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 1,
+      "caret_view": [
+        88,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 2,
+      "step": 2,
+      "text": "A日本👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 2,
+      "client_id": 40,
+      "sequence": 2,
+      "substring": "A日本👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        98,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 3,
+      "text": "A日本👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 0,
+      "client_id": 40,
+      "sequence": 3,
+      "substring": "A日本👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 5,
+      "caret_view": [
+        98,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": true,
+      "marked_start": 3,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 4,
+      "text": "A日本取消👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 2,
+      "client_id": 40,
+      "sequence": 4,
+      "substring": "A日本取消👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        118,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 5,
+      "text": "A日本👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 0,
+      "client_id": 40,
+      "sequence": 5,
+      "substring": "A日本👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        98,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": true,
+      "marked_start": 1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 6,
+      "text": "A中文👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 2,
+      "client_id": 40,
+      "sequence": 6,
+      "substring": "A中文👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        98,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 7,
+      "text": "A中文👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 0,
+      "client_id": 40,
+      "sequence": 7,
+      "substring": "A中文👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 3,
+      "caret_view": [
+        98,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        354,
+        493.4453125,
+        0,
+        22
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": 3,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 8,
+      "text": "A中文👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 0,
+      "client_id": 40,
+      "sequence": 7,
+      "substring": "A中文👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 4,
+      "caret_view": [
+        98,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 9,
+      "text": "A中文漢👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 0,
+      "client_id": 40,
+      "sequence": 10,
+      "substring": "A中文漢👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 4,
+      "caret_view": [
+        118,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": false,
+      "marked_start": -1,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 5,
+      "text": "A中文漢👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 0,
+      "client_id": 40,
+      "sequence": 12,
+      "substring": "A中文漢👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    },
+    {
+      "selected_start": 5,
+      "caret_view": [
+        108,
+        676,
+        1,
+        22
+      ],
+      "caret_screen": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "has_marked": true,
+      "marked_start": 4,
+      "actual_caret_start": -1,
+      "input_source": "com.apple.keylayout.US",
+      "selected_length": 0,
+      "step": 1,
+      "text": "A中文漢に👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+      "marked_length": 1,
+      "client_id": 40,
+      "sequence": 13,
+      "substring": "A中文漢に👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n"
+    }
+  ],
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": [
+    {
+      "Sequence": 1,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 1,
+      "ReplaceEnd": 1,
+      "Kind": "mark",
+      "Text": "に",
+      "BeforeText": "",
+      "Anchor": 2,
+      "Focus": 2,
+      "MarkedStart": 1,
+      "MarkedEnd": 2
+    },
+    {
+      "Sequence": 2,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 1,
+      "ReplaceEnd": 2,
+      "Kind": "mark",
+      "Text": "日本",
+      "BeforeText": "に",
+      "Anchor": 1,
+      "Focus": 3,
+      "MarkedStart": 1,
+      "MarkedEnd": 3
+    },
+    {
+      "Sequence": 3,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 39,
+      "ReplaceEnd": 39,
+      "Kind": "insert",
+      "Text": "",
+      "BeforeText": "",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 4,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 3,
+      "ReplaceEnd": 3,
+      "Kind": "mark",
+      "Text": "取消",
+      "BeforeText": "",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 3,
+      "MarkedEnd": 5
+    },
+    {
+      "Sequence": 5,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 3,
+      "ReplaceEnd": 5,
+      "Kind": "cancel",
+      "Text": "",
+      "BeforeText": "取消",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 6,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 1,
+      "ReplaceEnd": 3,
+      "Kind": "mark",
+      "Text": "中文",
+      "BeforeText": "日本",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": 1,
+      "MarkedEnd": 3
+    },
+    {
+      "Sequence": 7,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 39,
+      "ReplaceEnd": 39,
+      "Kind": "unmark",
+      "Text": "",
+      "BeforeText": "",
+      "Anchor": 3,
+      "Focus": 3,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 8,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 3,
+      "ReplaceEnd": 3,
+      "Kind": "mark",
+      "Text": "字",
+      "BeforeText": "",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 9,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 3,
+      "ReplaceEnd": 4,
+      "Kind": "mark",
+      "Text": "汉",
+      "BeforeText": "字",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": 3,
+      "MarkedEnd": 4
+    },
+    {
+      "Sequence": 10,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 3,
+      "ReplaceEnd": 4,
+      "Kind": "insert",
+      "Text": "漢",
+      "BeforeText": "汉",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 11,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 4,
+      "ReplaceEnd": 4,
+      "Kind": "mark",
+      "Text": "に",
+      "BeforeText": "",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 4,
+      "MarkedEnd": 5
+    },
+    {
+      "Sequence": 12,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 4,
+      "ReplaceEnd": 5,
+      "Kind": "cancel",
+      "Text": "",
+      "BeforeText": "に",
+      "Anchor": 4,
+      "Focus": 4,
+      "MarkedStart": -1,
+      "MarkedEnd": -1
+    },
+    {
+      "Sequence": 13,
+      "ClientID": 40,
+      "Delta": true,
+      "ReplaceStart": 4,
+      "ReplaceEnd": 4,
+      "Kind": "mark",
+      "Text": "に",
+      "BeforeText": "",
+      "Anchor": 5,
+      "Focus": 5,
+      "MarkedStart": 4,
+      "MarkedEnd": 5
+    }
+  ],
+  "limitations": [
+    "small fixture, not full performance workload",
+    "native TextField and exact multiline Editor support composition/range geometry; Editor arrows/pointer/cursor use shaped visual geometry with explicit fallback for unsupported layouts",
+    "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "A中文漢に👩Z\nsecond אבג é 👩‍💻\n\tthird\tline\n",
+  "native_actions": 0,
+  "native_client_id": 40,
+  "native_geometry_publications": 37,
+  "native_input_ack": 13,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 213,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "rendered_geometry_queries": null,
+  "resident_bytes_after_gc": 208207872,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 37,
+  "shown_callback_ms": 406.908,
+  "spell_checker_initialized": false,
+  "status": "Native mark · sequence 13",
+  "text_samples": null,
+  "transport": {
+    "Queue": {
+      "Outstanding": 0,
+      "PayloadBytes": 0,
+      "InFlight": 0,
+      "Closed": true
+    },
+    "Refused": 8,
+    "Wakes": 292,
+    "LatestBytes": 0,
+    "Closed": true
+  },
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}

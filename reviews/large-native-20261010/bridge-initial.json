@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b3efaad31466d362aa6b620b8d6d76cb",
+  "repo": {
+    "root": "/private/tmp/vellum-p3-integration-review",
+    "head": "5b3d368b50d9602794b6545ab78789b8bf5a8a95",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6ea8f194c3cce3a9",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Avoid decoding the full document twice per delta",
+      "message": "Decode builds a map containing every rune boundary, but its decoded result is discarded here. applyInput subsequently decodes the expanded snapshot again. At the new 4 MiB document limit, an ASCII document requires roughly four million map entries per decode, creating substantial allocation and garbage-collection overhead for every small native edit.",
+      "suggestion": "Return the validated RuneUpdate alongside the expanded update and reuse it in applyInput, or validate the requested offsets without constructing a full boundary map here so that Decode runs only once.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "inputbridge/delta.go",
+          "lines": {
+            "start": 53,
+            "end": 55
+          }
+        }
+      ],
+      "tags": [
+        "allocations",
+        "native-input"
+      ],
+      "evidence": "\tif _, err := Decode(u); err != nil {\n\t\treturn u, err\n\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 75110,
+    "totalMs": 61391
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 13,
+    "bytes": 31629,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 12288,
+        "output": 3421,
+        "reasoning": 3180,
+        "cachedInput": 1164
+      }
+    ],
+    "widenedFiles": 7,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

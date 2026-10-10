@@ -179,7 +179,7 @@ func (i *Input) RenderedRectToScreen(rect [4]float64, pixels [2]int) [4]float64 
 }
 
 func (i *Input) UpdateClient(clientID uint64, text string, anchor, focus, markedStart, markedEnd int, active bool, ack uint64, rect [4]float64) bool {
-	if !utf8.ValidString(text) || strings.ContainsRune(text, 0) || len(text) > 1<<20 {
+	if !utf8.ValidString(text) || strings.ContainsRune(text, 0) || len(text) > MaxDocumentBytes {
 		return false
 	}
 	for _, v := range []int{anchor, focus, markedStart, markedEnd} {
@@ -198,4 +198,18 @@ func (i *Input) UpdateClient(clientID uint64, text string, anchor, focus, marked
 	p := C.CString(text)
 	defer C.free(unsafe.Pointer(p))
 	return bool(C.vellum_input_client_update(i.native, C.uint64_t(clientID), p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack), C.double(rect[0]), C.double(rect[1]), C.double(rect[2]), C.double(rect[3])))
+}
+
+// EnableDeltas opts this attachment into bounded native edit messages. Call once
+// before activating a document. The native text/range context remains global.
+func (i *Input) EnableDeltas() { C.vellum_input_enable_deltas(i.native) }
+
+//export goVellumPreflightDelta
+func goVellumPreflightDelta(h C.uintptr_t, sequence, clientID C.uint64_t, kind, text, beforeText *C.char, start, end, anchor, focus, markedStart, markedEnd C.int) C.bool {
+	i := cgo.Handle(h).Value().(*Input)
+	if i.pending {
+		panic("nested native input admission")
+	}
+	i.pending = i.admit(Update{Sequence: uint64(sequence), ClientID: uint64(clientID), Delta: true, ReplaceStart: int(start), ReplaceEnd: int(end), Kind: C.GoString(kind), Text: C.GoString(text), BeforeText: C.GoString(beforeText), Anchor: int(anchor), Focus: int(focus), MarkedStart: int(markedStart), MarkedEnd: int(markedEnd)})
+	return C.bool(i.pending)
 }

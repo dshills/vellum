@@ -9,6 +9,8 @@ import (
 
 type Update struct {
 	Sequence, ClientID                    uint64
+	Delta                                 bool
+	ReplaceStart, ReplaceEnd              int // UTF-16 range in the prior document when Delta is true.
 	Kind, Text, BeforeText                string
 	Anchor, Focus, MarkedStart, MarkedEnd int // UTF-16 offsets; -1 means unmarked.
 }
@@ -21,6 +23,9 @@ type RuneUpdate struct {
 // Decode rejects malformed strings, surrogate interiors and invalid ranges.
 // IME selections may be inside graphemes but must be on Unicode scalar bounds.
 func Decode(u Update) (RuneUpdate, error) {
+	if u.Delta {
+		return RuneUpdate{}, fmt.Errorf("delta requires an owned document shadow")
+	}
 	result := RuneUpdate{Update: u, RuneMarkedStart: -1, RuneMarkedEnd: -1}
 	if !utf8.ValidString(u.Text) || strings.ContainsRune(u.Text, 0) || !utf8.ValidString(u.BeforeText) || strings.ContainsRune(u.BeforeText, 0) {
 		return result, fmt.Errorf("unrepresentable text")
@@ -33,7 +38,11 @@ func Decode(u Update) (RuneUpdate, error) {
 			utf16Offset++
 		}
 		runeOffset++
-		positions[utf16Offset] = runeOffset
+		// Retain only queried boundaries; a large document must not allocate
+		// one hash entry for every rune on each keystroke.
+		if utf16Offset == u.Anchor || utf16Offset == u.Focus || utf16Offset == u.MarkedStart || utf16Offset == u.MarkedEnd {
+			positions[utf16Offset] = runeOffset
+		}
 	}
 	var ok bool
 	if result.RuneAnchor, ok = positions[u.Anchor]; !ok {

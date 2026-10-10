@@ -4,6 +4,7 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/styles/states"
 	"example.com/vellum/foundationintegration/inputbridge"
+	"fmt"
 	"image"
 	"strings"
 	"unicode/utf8"
@@ -47,5 +48,20 @@ func (f *fixture) applyNativeSnapshot(u inputbridge.Update, decoded inputbridge.
 // Unsupported documents relinquish native activation through the same client
 // handoff. Keeping the previous active context would route keystrokes incorrectly.
 func nativePublicationSupported(text string) bool {
-	return utf8.ValidString(text) && !strings.ContainsRune(text, 0) && len(text) <= 1<<20
+	return utf8.ValidString(text) && !strings.ContainsRune(text, 0) && len(text) <= inputbridge.MaxDocumentBytes
+}
+
+// A shadow is published only after Cocoa accepts its matching acknowledgement.
+// Accepted queued edits advance it in order. Atomic expected-text comparison
+// rejects shared/external mutations anywhere in the document, including outside
+// the small delta range.
+func (f *fixture) expandNativeUpdate(u inputbridge.Update) (inputbridge.Update, error) {
+	if !u.Delta {
+		return u, nil
+	}
+	shadow, ok := f.nativeShadows[u.ClientID]
+	if !ok {
+		return u, fmt.Errorf("missing native document shadow")
+	}
+	return inputbridge.ExpandDelta(u, shadow)
 }

@@ -1,0 +1,11 @@
+--- a/text/lines/native_vellum.go
++++ b/text/lines/native_vellum.go
+@@ -99,7 +99,7 @@
+ // Ordinary buffer mutations seal that transaction before editing, so a subsequent
+ // native cancellation cannot erase them. Callers own selection and UI state.
+ func (ls *Lines) ApplyNativeSnapshot(owner int, expected, next, phase string) bool {
+-	if !utf8.ValidString(next) || strings.ContainsRune(next, 0) || len(next) > 1<<20 {
++	if !utf8.ValidString(next) || strings.ContainsRune(next, 0) || len(next) > 4<<20 {
+ 		return false
+ 	}
+ 	if phase != "mark" && phase != "insert" && phase != "unmark" && phase != "cancel" {

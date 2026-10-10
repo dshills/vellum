@@ -7,6 +7,7 @@
 #include <math.h>
 
 extern bool goVellumPreflight(uintptr_t, uint64_t, uint64_t, char *, char *, char *, int, int, int, int);
+extern bool goVellumPreflightDelta(uintptr_t,uint64_t,uint64_t,char *,char *,char *,int,int,int,int,int,int);
 extern void goVellumCommit(uintptr_t);
 static char inputKey;
 @interface VellumInputState : NSObject {
@@ -15,7 +16,7 @@ static char inputKey;
  Class baseClass, subclass;
  uintptr_t handle;
  uint64_t sequence, clientID;
- BOOL active, forwarding, forwarded, closed;
+ BOOL deltas, active, forwarding, forwarded, closed;
  NSEvent *keyEvent;
  NSMutableString *text;
  NSString *before;
@@ -60,7 +61,19 @@ static BOOL admit(VellumInputState *s,const char *kind,NSString *next,NSRange se
  int start=marked.location==NSNotFound ? -1 : (int)marked.location;
  int end=start<0 ? -1 : start+(int)marked.length;
  NSUInteger anchor=focus==selected.location ? NSMaxRange(selected) : selected.location;
- if(!goVellumPreflight(s->handle,s->sequence+1,s->clientID,(char *)kind,(char *)next.UTF8String,(char *)s->text.UTF8String,(int)anchor,(int)focus,start,end)){
+ BOOL accepted=NO;
+ if(s->deltas){
+  if([next lengthOfBytesUsingEncoding:NSUTF8StringEncoding]>(4u<<20)){NSBeep();return NO;}
+  NSUInteger prefix=0,ae=s->text.length,be=next.length;
+  while(prefix<ae && prefix<be && [s->text characterAtIndex:prefix]==[next characterAtIndex:prefix])prefix++;
+  if(prefix>0 && prefix<ae && CFStringIsSurrogateLowCharacter([s->text characterAtIndex:prefix]))prefix--;
+  while(ae>prefix && be>prefix && [s->text characterAtIndex:ae-1]==[next characterAtIndex:be-1]){ae--;be--;}
+  if(ae<s->text.length && ae>prefix && CFStringIsSurrogateLowCharacter([s->text characterAtIndex:ae])){ae++;be++;}
+  NSString *removed=[s->text substringWithRange:NSMakeRange(prefix,ae-prefix)],*inserted=[next substringWithRange:NSMakeRange(prefix,be-prefix)];
+  if([removed lengthOfBytesUsingEncoding:NSUTF8StringEncoding]>4096 || [inserted lengthOfBytesUsingEncoding:NSUTF8StringEncoding]>4096){NSBeep();return NO;}
+  accepted=goVellumPreflightDelta(s->handle,s->sequence+1,s->clientID,(char *)kind,(char *)inserted.UTF8String,(char *)removed.UTF8String,(int)prefix,(int)ae,(int)anchor,(int)focus,start,end);
+ }else accepted=goVellumPreflight(s->handle,s->sequence+1,s->clientID,(char *)kind,(char *)next.UTF8String,(char *)s->text.UTF8String,(int)anchor,(int)focus,start,end);
+ if(!accepted){
   NSBeep();return NO; // Explicit audible refusal; caller can retry after drain.
  }
  return YES;
@@ -322,6 +335,7 @@ char *vellum_input_source(void) {
 char *vellum_input_probe(void *input,int step) {
  VellumInputState *s=(id)input;if(!s || !s->active)return NULL;
  id<NSTextInputClient> client=(id)s->view;
+ if(step==10)[client insertText:[@"" stringByPaddingToLength:4097 withString:@"a" startingAtIndex:0] replacementRange:NSMakeRange(NSNotFound,0)];
  if(step==1)[client setMarkedText:@"に" selectedRange:NSMakeRange(1,0) replacementRange:NSMakeRange(NSNotFound,0)];
  if(step==2)[client setMarkedText:@"日本" selectedRange:NSMakeRange(0,2) replacementRange:NSMakeRange(NSNotFound,0)];
  if(step==3)[client insertText:@"日本" replacementRange:NSMakeRange(NSNotFound,0)];
@@ -397,3 +411,5 @@ VellumScreenRect vellum_input_rendered_rect(void *input,double x,double y,double
 void vellum_input_geometry_update(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height,const VellumTextCell *cells,int nc,const VellumTextCaret *carets,int nk,double vx,double vy,double vw,double vh,int focusLine) {vellum_input_client_geometry_update(input,0,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,cells,nc,carets,nk,vx,vy,vw,vh,focusLine);}
 
 bool vellum_input_client_update(void *input,uint64_t clientID,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height) {return publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,nil,nil,NSZeroRect,-1,NO,clientID);}
+
+void vellum_input_enable_deltas(void *input){VellumInputState *s=(id)input;NSCAssert(NSThread.isMainThread,@"Input mode requires main thread");if(s && !s->closed && !s->active)s->deltas=YES;}
