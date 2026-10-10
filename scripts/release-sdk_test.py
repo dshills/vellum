@@ -4,6 +4,7 @@ from contextlib import nullcontext
 import errno
 import os
 import subprocess
+import shutil
 import sys
 import gzip
 import io
@@ -50,6 +51,48 @@ class ReleaseChecks(unittest.TestCase):
                 generator.main()
             self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
             self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
+
+    def test_exported_history_is_consumable_without_the_source_checkout(self):
+        with tempfile.TemporaryDirectory(prefix="vellum history SDK ") as temporary:
+            base = Path(temporary)
+            root = base / "source"
+            root.mkdir()
+            (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
+            (root / "history").mkdir()
+            (root / "history/history.go").write_bytes((release.ROOT / "history/history.go").read_bytes())
+            (root / "release").mkdir()
+            (root / "release/version.json").write_text('{"version":"v0.1.0-alpha.1"}')
+            for name in ("upstream", "typesetting"):
+                dependency = root / "drivers/cogent/build" / name
+                dependency.mkdir(parents=True)
+                (dependency / "go.mod").write_text("module example.com/nativefixture\n")
+            tracked = b"go.mod\0history/history.go\0release/version.json\0"
+            archive_path = base / "sdk.tar.gz"
+            with mock.patch.object(release, "git_output", return_value=tracked), mock.patch.object(release, "license_inventory", return_value=({"modules": []}, {})), mock.patch.object(release, "source_state", return_value={"clean": True, "commit": "fixture"}):
+                release.package(root, archive_path)
+            with tarfile.open(archive_path) as archive:
+                archive.extractall(base / "relocated", filter="data")
+            shutil.rmtree(root)
+            sdk = base / "relocated/vellum-v0.1.0-alpha.1"
+            consumer = base / "consumer"
+            consumer.mkdir()
+            (consumer / "go.mod").write_text("module example.com/history-consumer\ngo 1.25.6\nrequire github.com/dshills/vellum v0.0.0\nreplace github.com/dshills/vellum => " + json.dumps(sdk.as_posix()) + "\n")
+            (consumer / "main_test.go").write_text('''package consumer
+import (
+    "testing"
+    "github.com/dshills/vellum/history"
+)
+func TestExportedHistory(t *testing.T) {
+    j, err := history.New(2)
+    if err != nil { t.Fatal(err) }
+    value := 0
+    if err := j.Apply(history.Change{Label: "Edit", Apply: func() error { value = 42; return nil }, Revert: func() error { value = 0; return nil }}); err != nil { t.Fatal(err) }
+    if err := j.Undo(); err != nil || value != 0 || j.Snapshot().Dirty { t.Fatalf("undo value=%d state=%+v err=%v", value, j.Snapshot(), err) }
+    if err := j.Redo(); err != nil || value != 42 || !j.Snapshot().Dirty { t.Fatalf("redo value=%d state=%+v err=%v", value, j.Snapshot(), err) }
+}
+''')
+            result = subprocess.run(["go", "test", "./..."], cwd=consumer, env=release.child_environment(), capture_output=True, text=True, timeout=60)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_selected_owner_choices_leave_distribution_audit_gated(self):
         metadata = json.loads((release.ROOT / "release/version.json").read_text())

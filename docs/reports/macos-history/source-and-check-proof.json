@@ -1,0 +1,174 @@
+{
+  "captured_utc": "2026-10-10T21:23:39.094112+00:00",
+  "parent_commit": "2ec26e34995897f5e00bb760863bb141d440d7c3",
+  "host": {
+    "os": "macOS 26.6.2",
+    "build": "25G83",
+    "arch": "arm64",
+    "go": "go1.27.2"
+  },
+  "environment": {
+    "VELLUM_CACHE_DIR": "/tmp/vellum-p0-cache",
+    "GOWORK": "off",
+    "native_env": ". ./drivers/cogent/env.sh"
+  },
+  "inputs": {
+    "README.md": "07cb1e525ff8ebcab3cc448a67bae9610399e37d7cfd93ec7539e1d731a0219f",
+    "command/command.go": "3d5c6c43ce79f12cf66abcfc6bdce1fe83846d4866270bbba2fce3a9d1fad4f7",
+    "command/command_test.go": "19e0f51697b321e3b73bd2ba3bd79a11aa33759ef1420b5ad62ee782466849ae",
+    "docs/implementation.md": "f6e2d429420ac41bcb2a65a38531c7b27f07a39bc2665ef03ee99e0e00098941",
+    "docs/tutorials/building-an-app.md": "dda97c371b4cd7fb264a3b1e657ada97537d21bd407039b28a1a76a503c74443",
+    "drivers/cogent/cmd/history-smoke/main.go": "1f884470ef024356c977bb86cb4c61c816b628926367d68a446f0f801693f868",
+    "drivers/cogent/cmd/workbench/main.go": "8e768c8ab64c1f5c0912c2871181dfeedb52ea304af50297c366599e925e0dc8",
+    "drivers/cogent/cmd/workbench/model.go": "280774c0e24cd957544ec29c71fb2c4642ce6b21393dd062284cc79057d4d2b3",
+    "drivers/cogent/cmd/workbench/model_test.go": "89630cc080d16a00a4fa4f93da062ef7f03b913961a70361976933c2f8478006",
+    "drivers/cogent/commands.go": "f9c0c3b2590c2ba6254f54d0482ac4341bafa2a6af0a20744ec66f6c46e07fa2",
+    "drivers/cogent/commands_test.go": "fe1c705b09592ff1770a7ac4d1ccf8124db68293272d016e678e26f0a9ad210a",
+    "drivers/cogent/driver.go": "0694e5d4ae44a74c9b3572ce8ae5b9dc61aca9e2d47988335de8dac3be4116d9",
+    "drivers/cogent/native/README.md": "ec57eec8eb2dc5826dcbcd9a4c1843f6736ded5702b20e1aa97712e7897d56fb",
+    "drivers/cogent/native/dependencies.json": "dca4be61aae3dccbe777ac8d94e5ed1f1ae4df049123e1d3ea03d3040bc253e6",
+    "drivers/cogent/native/patches/mainqueue/0021-main-queue-stop.patch": "6395c5c8340dc95d5d16425db2803cdb513edd317748d84df4b5d7666aabf516",
+    "drivers/cogent/native/patches/mainqueue/original-hashes.json": "4ea18f159d8db12b0ebc8e37cbb2298f9855fd38af04d5d2086895a89c749385",
+    "drivers/cogent/native/patches/mainqueue/output-hashes.json": "c0964006faa304ba83fb50fe863d0f32e65d8362e35ac52e2d99cd3f85f8f33f",
+    "drivers/cogent/native/patches/shortcuts/0020-focusless-shortcuts.patch": "1eee4dcf432a2ac70fde45852eb7f6e2b82b505370e0ea8affde085025e8ceff",
+    "drivers/cogent/native/patches/shortcuts/original-hashes.json": "23e99d56cdc0de20ae4dc052f0b5b2113ef667665d385973df62a5b7f51a6af0",
+    "drivers/cogent/native/patches/shortcuts/output-hashes.json": "50f8bc300c2fd911381ace42c92e2af6de2723d7317fecdaa35a428ca9247164",
+    "drivers/cogent/prepare_test.py": "b1a4541b8477708587f32843d426300e4d5ffb704d043dad25cc0b7572a450fd",
+    "examples/sdk-contract/contract_test.go": "6ed299248d65311024c65d39c3192d9876579f986af6a7b590b9be86e10b8c0b",
+    "history/history.go": "d9389450dfc188dec3d13bd99e6a0696657fe336d7160cacdd59e6e60f244b82",
+    "history/history_test.go": "65f575397d4bae78c0f9f9e7d94ef785cc4e8acf2d7525e0d81840621979c096",
+    "scripts/check.sh": "e708b3fac6bf39604cb77a2d5fd44a407f4881ed4d2d11e4dff34c8b14a91bc5",
+    "specs/README.md": "6e88c72451c7598a55fe7f58488333eb09070b585b03379b5bf6cbba5011f30b",
+    "specs/framework.md": "643b233a3bb35cf9d18ff894d96bb4798ace656da27f65fae8682d2758b20d40",
+    "specs/history.md": "bf81d9847965076ae80f899a4dd93d35fb177d98e8d3925ed5e9129562dc6009",
+    "specs/macos-completion.md": "51ee8315b3506bd1c59d286adf46b374989becb48eb9d5f26ae81c34bb35df78",
+    "specs/windows-services.md": "fe146ccb51d96c0f3f30d2f401edd0886f63b8eb7ac21ec1a7bdb484ae880e73",
+    "scripts/release-sdk.py": "75b7d0f3b866bef99af0d7345b95c1dfe0ade35c63814aa9ea666562fdd94968",
+    "scripts/release-sdk_test.py": "a2a70ab362c86f5be90b54f26119ed6667c9f667939a53960094662e7cbcb2bc"
+  },
+  "logs": {
+    "prepare.txt": "39479d3572530041c5f86e68c909bfd41d355a9d9c8db6094965470018144b18",
+    "check.txt": "2b4a2589a64433800f0bbb788ef6a1e267837ed964dffa8ce6f41f2649484152",
+    "native-runtime.txt": "8872382a3ba7ef4e5f631694a38859d60e32814e4322988a6a922edc78cf4c35",
+    "queue-race-20.txt": "6f078d537e269bf7032c96fd0f5b549d2bc0651d0ea6670717229bf8e295fa88",
+    "initial-startup-failure.txt": "a20ad5bcb143c0889830f2c71fd8c650b41a4043a292dfcbfdf186a26c0a22a5",
+    "sdk-history-before.txt": "e194fc82904e8133531c332f8df08aed3c5213c26babf30f79bbfd3d48ab6bd3",
+    "sdk-history-after.txt": "2e65a31ac385fe2c090b4797b0f47e2d69f02b747ed56820e6a392921f4475dd"
+  },
+  "runs": [
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "command": "./drivers/cogent/prepare.sh",
+      "exit_code": 0,
+      "log": "prepare.txt"
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "command": "./scripts/check.sh",
+      "exit_code": 0,
+      "log": "check.txt",
+      "scope": "86 Python regressions; root and native race tests/vet; native workbench build; selected patched backend race tests; hello external module test/build; public SDK contract race/vet.",
+      "snapshot_note": "Integrated run precedes the final two-file SDK exporter correction; Go/native inputs were unchanged. All 26 exporter regressions were then run on the corrected exporter, including the archived independent history consumer."
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "command": "go run -race ./cmd/history-smoke && go run -race ./cmd/window-handoff-smoke && go run -race ./cmd/docking-smoke",
+      "exit_code": 0,
+      "log": "native-runtime.txt"
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "command": "go run -race ./cmd/workbench -smoke -exit-after=4s -rows=100000 -tree-rows=10000",
+      "exit_code": 0,
+      "log": "native-runtime.txt",
+      "log_note": "Appended after the three-smoke batch completed successfully."
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "command": "go test -race ./system/driver/base ./system/driver/desktop -run 'TestMainQueue|TestMainThreadRequired|TestVellumMainQueueStop' -count=20 -timeout=60s",
+      "exit_code": 0,
+      "log": "queue-race-20.txt"
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "command": "python3 scripts/release-sdk_test.py",
+      "exit_code": 0,
+      "log": "sdk-history-after.txt",
+      "scope": "All 26 exporter regressions, including archive relocation, original checkout removal and independent public history Undo/Redo consumption. Native dependency fixtures are not native runtime qualification."
+    }
+  ],
+  "initial_failure": {
+    "log": "initial-startup-failure.txt",
+    "observation": "Before patch21, the integrated check stopped making progress in TestMainQueuePublicationDuringStartupDispatch. The live base.test process was sent SIGQUIT to capture its stack; StopMain was blocked sending to a nil stop channel while MainLoop waited on its published queue.",
+    "exit_code": 1,
+    "scope": "Diagnostic failure snapshot before patch21; not a passing qualification run or full source identity claim."
+  },
+  "internal_review": {
+    "agent": "/root/mac_history_review",
+    "scope": "Portable history, command phases, sparse workbench replay, consumer contract, patch20 and patch21. Final SDK archive exporter and relocated history consumer.",
+    "resolved_findings": [
+      "Workbench stale revision reference now uses source.Revision().",
+      "Focus-free Scene now runs first/final command phases through owned patch20.",
+      "Accepted main-queue callback must complete before returning caller-owned outputs.",
+      "Refused native window creation returns ErrMainStopped before any native allocation.",
+      "Creation constraining uses direct geometry helpers rather than recursively queuing.",
+      "Go 1.25 dependency test literal now initializes the embedded app through a.This.",
+      "StopMain no longer posts a native wake after closing its stop signal; zero identity and forbidden wake regression pass.",
+      "Final integration adds history to the SDK exporter whitelist and proves relocated archive consumption after removing the original checkout."
+    ],
+    "final_patch21_sha256": "6395c5c8340dc95d5d16425db2803cdb513edd317748d84df4b5d7666aabf516",
+    "final_result": "No new actionable findings. Agent verified six output hashes and reconstructed original hashes. No edits, commits or GUI tests performed by reviewer.",
+    "separate_existing_gap": "A callback panic can strand its accepted caller if a platform panic handler recovers; unchanged by this checkpoint and not claimed fixed. The initial RunOnMain native-wake lifetime race also predates this patch; this checkpoint resolves the new StopMain wake ordering only.",
+    "sdk_files": {
+      "scripts/release-sdk.py": "75b7d0f3b866bef99af0d7345b95c1dfe0ade35c63814aa9ea666562fdd94968",
+      "scripts/release-sdk_test.py": "a2a70ab362c86f5be90b54f26119ed6667c9f667939a53960094662e7cbcb2bc"
+    }
+  },
+  "limits": [
+    "Synthetic native backend chords with AppKit focus publication do not qualify physical NSEvent/NSTextInputClient, IME, or human screen-reader workflows.",
+    "No OS input sources, VoiceOver settings, or other preferences were changed.",
+    "Dirty state covers journal-tracked model state; document file persistence and unsaved close remain open.",
+    "No Windows/Linux runtime acceptance, sustained performance, public publication, signing, or notarization claim."
+  ],
+  "documentation_timing": "Evidence summaries and links were assembled after passing checks; tested Go/Python/shell/native bytes were unchanged.",
+  "prism_dispositions": [
+    {
+      "finding_id": "7a0ca1e03233f31e",
+      "title": "Native window lookup and key events are dispatched from a background goroutine",
+      "disposition": "Refuted by source inspection and independent internal review.",
+      "facts": [
+        "system/driver/base/app_multi.go WindowByName locks App.Mu while reading the list. Smoke fixture names are stable after native readiness.",
+        "system/driver/base/window_multi.go Events returns the stable address of the window Event field.",
+        "events/source.go Source.KeyChord constructs a fresh key event, calls its Init, and enqueues through Deque.Send. It does not mutate Source.Last or dispatch widget handlers.",
+        "events/deque.go Deque.Send holds Deque.Mu. KeyChord events are unique FIFO items, so synthetic chords retain their ordering.",
+        "Application.Do serializes application ownership; it does not marshal native-main execution. No change to this safe producer path is needed."
+      ],
+      "evidence_sha256": {
+        "system/driver/base/app_multi.go": "38847a72dd47b2f89f1b4f3678e9e61329810fed9e217de4dd71db00d2a37381",
+        "system/driver/base/window_multi.go": "9df2a1ba7beac0e92f1c9313d884cb8fc64d22141fbcd4ce731c663b44779453",
+        "events/source.go": "6272b3bab79bee0191a7df327b79f630777a52ba08d1c672af33e3b7c44ceb92",
+        "events/deque.go": "27d9386d588c666d0ce0f7f3651cadc931b515f18eb075fd847a4fece42f9152"
+      }
+    },
+    {
+      "finding_id": "05647d7e5c072f61",
+      "title": "StopMain posts an empty event that may reach an already-terminated GLFW or a nil This",
+      "disposition": "Fixed, tested and internally reviewed.",
+      "facts": [
+        "The first stop could signal termination before its SendEmptyEvent call, allowing GLFW to terminate before that wake. A nil This also panicked.",
+        "StopMain now closes its stable signal and releases waiters without posting any native wake. Desktop MainLoop already uses WaitEventsTimeout(0.1); base queue loop directly selects the signal.",
+        "TestVellumMainQueueStopNeedsNoNativeWake checks nil This and a fake native backend whose SendEmptyEvent panics. Repeated stop, main-loop exit and post-stop callback refusal pass.",
+        "Fresh prepare, integrated checks, 20 queue race repetitions and four native smokes pass on the corrected bytes."
+      ]
+    }
+  ],
+  "discarded_nested_creation_assessment": "Internal review audited installed DPI and accessibility hooks, newGlfwWindow, updateGeometry and direct geometry helpers; no reachable nested main-queue dispatch exists for this Vellum driver. Replacement hooks retain the non-reentrancy contract.",
+  "sdk_history_before": {
+    "command": "python3 scripts/release-sdk_test.py ReleaseChecks.test_exported_history_is_consumable_without_the_source_checkout",
+    "exit_code": 1,
+    "log": "sdk-history-before.txt",
+    "cause": "Exporter root whitelist omitted history, leaving the relocated consumer unable to import github.com/dshills/vellum/history.",
+    "exporter_sha256": "354be599eea8c8464b0e34048287ef9ba05f1c97467298d6bde2ff59d0469f00",
+    "regression_sha256": "a2a70ab362c86f5be90b54f26119ed6667c9f667939a53960094662e7cbcb2bc"
+  }
+}

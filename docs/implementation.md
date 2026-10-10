@@ -73,3 +73,17 @@ archive is generated after committing, so its future commit identity cannot be
 embedded in the earlier evidence. These
 implementations extend the experimental framework; they do not certify a public
 or production-ready cross-platform release.
+
+## macOS completion milestone
+
+The current goal focuses framework completion and acceptance on the local Mac;
+Windows/Linux runtime work is deferred. See the [macOS completion checklist](../specs/macos-completion.md)
+for the complete remaining scope.
+
+Document history is implemented with bounded sparse changes, undo/redo, save
+revision validation, dirty status and focused native keyboard precedence. The
+workbench records component edits and updates source revisions on replay. See
+[document history](../specs/history.md); document persistence and unsaved-close
+workflows remain open. Native command phases also run in focus-free windows;
+startup shutdown and late native creation use stable stop/admission handling.
+See [local evidence](reports/macos-history/README.md).

@@ -1,0 +1,15 @@
+# github.com/dshills/vellum/drivers/cogent/cmd/history-smoke
+ld: warning: ignoring duplicate libraries: '-lobjc'
+PASS macOS native text Undo/Redo precedence, document fallback, focus-free window routing, dirty state and disabled command refusal
+# github.com/dshills/vellum/drivers/cogent/cmd/window-handoff-smoke
+ld: warning: ignoring duplicate libraries: '-lobjc'
+PASS accepted dynamic Open during last native Close survives and dispatches
+# github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke
+ld: warning: ignoring duplicate libraries: '-lobjc'
+PASS native float, cross-window redock, native close return, shared document state, focus transfer and complete session persistence
+# github.com/dshills/vellum/drivers/cogent/cmd/workbench
+ld: warning: ignoring duplicate libraries: '-lobjc'
+Document history verified sparse property deltas, undo/redo and dirty state
+GPU verified snapshot=(0,0)-(3034,244) viewport={Width:3034 Height:244 Zoom:0.9312977099236641 Center:{X:550 Y:131.25}} objects=96 pixel={255 190 69 255}
+workbench actions=1 status=Sum: 59695550 rows=100000 pooled=20 tree_nodes=10011 selected=component:24
+canvas objects=96 zoom=0.9313 selected=component:24

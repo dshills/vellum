@@ -1,0 +1,18 @@
+{
+  "scope": "Source/specification/test/evidence inputs before adding immutable review records.",
+  "parent_commit": "2ec26e34995897f5e00bb760863bb141d440d7c3",
+  "final_staged_diff_sha256": "140c36f0e1f40839f1e0c08543e4decba35724d7917cfb7c4f2f4972ea0cf97e",
+  "final_files": 42,
+  "source_coverage_verified": "Initial full staged review, nine-file corrective review, and six-file final SDK integration review compose to exactly the final staged file hashes.",
+  "reports": {
+    "prism-initial.json": "2d494bf522a120f25f08352d4f38d74aebdfa7cce846572f3097ed4be4179d22",
+    "prism-corrections.json": "9e0253bf7458cbe3655248e400baf0de147ffa38824442220bcdb509d592977e",
+    "prism-sdk.json": "4cd66ccd4af41acce33bf0c6053fe329509f056dc96f099f8ac9dae2c57cf328"
+  },
+  "initial_findings": {
+    "7a0ca1e03233f31e": "Refuted by exact queue source and internal review; see report proof facts.",
+    "05647d7e5c072f61": "Fixed by removing StopMain native wake, verified by regression and clean corrective review."
+  },
+  "internal_review_agent": "/root/mac_history_review",
+  "remaining_scope": "Mac completion remains active; persistence/unsaved close, external file drops, richer custom drawing, native multiline integration and broader qualification remain open."
+}

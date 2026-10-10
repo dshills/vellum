@@ -14,7 +14,7 @@ open. The workbench does not change system input sources.
 | Path | Purpose |
 | --- | --- |
 | `app/`, `ui/` | Application lifecycle, UI ownership and keyed widget descriptions |
-| `command/`, `tasks/` | Commands and bounded asynchronous work |
+| `command/`, `tasks/`, `history/` | Commands, bounded asynchronous work and document undo/redo |
 | `workbench/`, `virtual/`, `canvas/` | Dock layouts, large-data views and canvas models |
 | `drivers/cogent/` | Separate native driver module |
 | `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |

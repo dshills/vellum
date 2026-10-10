@@ -6,9 +6,9 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/tree"
+	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
-	"fmt"
 	"html"
 	"image"
 	"strings"
@@ -116,4 +116,33 @@ func (c *CommandBar) Sync(core.Widget) error {
 		c.buttons[i].Update()
 	}
 	return nil
+}
+
+// bindCommandShortcuts uses the backend's first/final focused-event phases.
+// Text widgets consume Undo/Redo in their normal phase before document fallback.
+func bindCommandShortcuts(scene *core.Scene, owner *app.Application, window string, registry *command.Registry, onError func(error)) {
+	route := func(scope command.ShortcutScope) func(events.Event) {
+		return func(e events.Event) {
+			if e.IsHandled() {
+				return
+			}
+			owner.Do(func() {
+				lifetime, err := owner.WindowContext(window)
+				if err != nil || lifetime.Err() != nil {
+					return
+				}
+				matched, err := registry.ShortcutInScope(lifetime, string(e.KeyChord()), scope)
+				if !matched {
+					return
+				}
+				e.SetHandled()
+				if err != nil && onError != nil {
+					onError(err)
+				}
+				owner.Invalidate("")
+			})
+		}
+	}
+	scene.OnFirst(events.KeyChord, route(command.WindowShortcuts))
+	scene.OnFinal(events.KeyChord, route(command.AfterFocusShortcuts))
 }

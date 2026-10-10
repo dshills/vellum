@@ -1,0 +1,503 @@
+--- a/system/driver/base/app.go
++++ b/system/driver/base/app.go
+@@ -36,8 +36,8 @@
+ 	// To add to it, use [App.RunOnMain].
+ 	MainQueue chan FuncRun `display:"-"`
+ 
+-	// MainDone is a channel on which is a signal is sent when the main
+-	// loop of the app should be terminated.
++	// MainDone is closed once when the main loop should terminate.
++	// StopMain owns closure; callers and loops only receive from it.
+ 	MainDone chan struct{} `display:"-"`
+ 
+ 	// mainQueueMu publishes the queue/done pair without taking the app mutex.
+@@ -45,6 +45,7 @@
+ 	mainQueueMu        sync.Mutex
+ 	mainQueueReady     chan struct{}
+ 	mainQueuePublished bool
++	mainQueueStopped   bool
+ 
+ 	// Nm is the name of the app.
+ 	Nm string `label:"Name"`
+@@ -93,7 +94,9 @@
+ 		a.mainQueueReady = make(chan struct{})
+ 	}
+ 	if !a.mainQueuePublished {
+-		close(a.mainQueueReady)
++		if !a.mainQueueStopped {
++			close(a.mainQueueReady)
++		}
+ 		a.mainQueuePublished = true
+ 	}
+ 	return a.MainQueue, a.MainDone
+@@ -102,6 +105,9 @@
+ func (a *App) mainQueueChannels() (chan FuncRun, chan struct{}) {
+ 	a.mainQueueMu.Lock()
+ 	defer a.mainQueueMu.Unlock()
++	if a.MainDone == nil {
++		a.MainDone = make(chan struct{})
++	}
+ 	return a.MainQueue, a.MainDone
+ }
+ 
+@@ -112,9 +118,8 @@
+ 		case <-stopped:
+ 			return
+ 		case f := <-queue:
+-			f.F()
+-			if f.Done != nil {
+-				f.Done <- struct{}{}
++			if !a.ExecuteMain(f) {
++				return
+ 			}
+ 		}
+ 	}
+@@ -122,16 +127,41 @@
+ 
+ // RunOnMain runs the given function on the main thread
+ func (a *App) RunOnMain(f func()) {
+-	queue, _ := a.mainQueueChannels()
++	a.RunOnMainIfOpen(f)
++}
++
++// RunOnMainIfOpen reports whether the callback executed. Pending delivery can
++// refuse after stop; once delivered, acknowledgment always precedes return so
++// callbacks may safely capture caller-owned output. Never call on a published
++// native main queue from its own main thread or from a queued callback.
++func (a *App) RunOnMainIfOpen(f func()) bool {
++	queue, stopped := a.mainQueueChannels()
++	select {
++	case <-stopped:
++		return false
++	default:
++	}
+ 	if queue == nil {
+ 		f()
+-		return
++		return true
+ 	}
+ 	a.This.SendEmptyEvent()
+-	done := make(chan struct{})
+-	queue <- FuncRun{F: f, Done: done}
++	done := make(chan struct{}, 1)
++	executed := false
++	select {
++	case <-stopped:
++		return false
++	case queue <- FuncRun{F: f, Done: done, executed: &executed}:
++	}
++	// The loop acknowledges either completion or refusal after accepting the
++	// rendezvous. Stop cannot release this caller while its output is being used.
+ 	<-done
+-	a.This.SendEmptyEvent()
++	select {
++	case <-stopped:
++	default:
++		a.This.SendEmptyEvent()
++	}
++	return executed
+ }
+ 
+ // RunOnMainQueued is for worker callbacks that require the native main thread,
+@@ -157,10 +187,29 @@
+ 	// no-op by default
+ }
+ 
+-// StopMain stops the main loop and thus terminates the app
++// StopMain signals shutdown once, including before loop publication. It does
++// not publish a work queue. Startup and unaccepted delivery waiters return;
++// accepted callbacks retain synchronous completion before their callers return.
+ func (a *App) StopMain() {
+-	_, stopped := a.mainQueueChannels()
+-	stopped <- struct{}{}
++	a.mainQueueMu.Lock()
++	if a.mainQueueStopped {
++		a.mainQueueMu.Unlock()
++		return
++	}
++	a.mainQueueStopped = true
++	if a.MainDone == nil {
++		a.MainDone = make(chan struct{})
++	}
++	close(a.MainDone)
++	if a.mainQueueReady == nil {
++		a.mainQueueReady = make(chan struct{})
++	}
++	if !a.mainQueuePublished {
++		close(a.mainQueueReady)
++	}
++	a.mainQueueMu.Unlock()
++	// The desktop loop already has a bounded event wait. No native wake is
++	// needed here, and posting after the stop signal could race termination.
+ }
+ 
+ func (a *App) SystemPlatform() system.Platforms {
+--- a/system/driver/base/helpers.go
++++ b/system/driver/base/helpers.go
+@@ -9,9 +9,34 @@
+ 
+ package base
+ 
++import "errors"
++
++// ErrMainStopped refuses native operations after process loop shutdown.
++var ErrMainStopped = errors.New("native main loop stopped")
++
+ // FuncRun is a simple helper type that contains a function to call and a channel
+ // to send a signal on when the function is finished running.
+ type FuncRun struct {
+-	F    func()
+-	Done chan struct{}
++	F        func()
++	Done     chan struct{}
++	executed *bool
+ }
++
++// ExecuteMain admits work under the same lock as StopMain, then releases that
++// lock before invoking code. Admitted work retains synchronous completion;
++// refusal is also acknowledged. Only the native loop calls this method.
++func (a *App) ExecuteMain(f FuncRun) bool {
++	a.mainQueueMu.Lock()
++	executed := !a.mainQueueStopped
++	a.mainQueueMu.Unlock()
++	if executed {
++		f.F()
++	}
++	if f.executed != nil {
++		*f.executed = executed
++	}
++	if f.Done != nil {
++		f.Done <- struct{}{}
++	}
++	return executed
++}
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -78,9 +78,9 @@
+ 			glfw.Terminate()
+ 			return
+ 		case f := <-queue:
+-			f.F()
+-			if f.Done != nil {
+-				f.Done <- struct{}{}
++			if !a.ExecuteMain(f) {
++				glfw.Terminate()
++				return
+ 			}
+ 		default:
+ 			glfw.WaitEventsTimeout(0.1) // timeout is essential on linux
+@@ -98,6 +98,17 @@
+ }
+ 
+ func (a *App) NewWindow(opts *system.NewWindowOptions) (system.Window, error) {
++	var window system.Window
++	var err error
++	if !a.RunOnMainIfOpen(func() { window, err = a.newWindowOnMain(opts) }) {
++		return nil, base.ErrMainStopped
++	}
++	return window, err
++}
++
++// One admitted callback owns the complete native creation transaction. It does
++// not redispatch to the main queue from inside that callback.
++func (a *App) newWindowOnMain(opts *system.NewWindowOptions) (system.Window, error) {
+ 	if a.NWindows() == 0 && system.UpdateLogicalDPIScaleFunc != nil {
+ 		if ScreenDebug {
+ 			log.Println("app first new window calling UpdateLogicalDPIScaleFunc")
+@@ -121,14 +132,14 @@
+ 	w.This = w
+ 
+ 	var err error
+-	a.RunOnMain(func() {
++	func() {
+ 		err = w.newGlfwWindow(opts, sc)
+-	})
++	}()
+ 	if err != nil {
+ 		return nil, err
+ 	}
+ 
+-	a.RunOnMain(func() {
++	func() {
+ 		surf := gpu.Instance().CreateSurface(wgpuglfw.GetSurfaceDescriptor(w.Glw))
+ 		var fbsz image.Point
+ 		fbsz.X, fbsz.Y = w.Glw.GetFramebufferSize()
+@@ -143,15 +154,15 @@
+ 		w.Draw = gpudraw.NewDrawer(a.GPU, sf)
+ 		w.Compose = &composer.ComposerDrawer{Drawer: w.Draw}
+ 		w.composerPointer.Store(w.Compose)
+-	})
++	}()
+ 
+ 	if a.NativeAttach != nil {
+-		a.RunOnMain(func() {
++		func() {
+ 			w.Native, err = a.NativeAttach(w)
+ 			if err != nil {
+ 				w.releaseNativeResources()
+ 			}
+-		})
++		}()
+ 		if err != nil {
+ 			return nil, err
+ 		}
+@@ -180,12 +191,12 @@
+ 	w.Glw.SetInputMode(glfw.LockKeyMods, glfw.True)
+ 
+ 	if !opts.StartHidden {
+-		w.Show()
+-	}
+-	a.RunOnMain(func() {
++		w.Glw.Show()
++	}
++	func() {
+ 		w.updateGeometry()
+-		w.ConstrainFrame(false) // constrain full frame on open
+-	})
++		w.constrainFrameOnMain(false) // constrain full frame on open
++	}()
+ 
+ 	go w.WinLoop() // start window's own dedicated publish update loop
+ 
+--- /dev/null
++++ b/system/driver/base/app_vellum_stop_test.go
+@@ -0,0 +1,147 @@
++package base
++
++import (
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++func stopWait(t *testing.T, done <-chan struct{}) {
++	t.Helper()
++	select {
++	case <-done:
++	case <-time.After(3 * time.Second):
++		t.Fatal("main-queue waiter or loop survived stop")
++	}
++}
++func TestVellumMainQueueStopBeforePublication(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	done := make(chan struct{})
++	var ran atomic.Bool
++	go func() { a.RunOnMainQueued(func() { ran.Store(true) }); close(done) }()
++	_, signal := a.mainQueueChannels()
++	a.StopMain()
++	a.StopMain()
++	stopWait(t, done)
++	a.mainQueueMu.Lock()
++	queue := a.MainQueue
++	stopped := a.MainDone
++	a.mainQueueMu.Unlock()
++	if queue != nil || ran.Load() || signal != stopped {
++		t.Fatal("stop published a queue, changed signal or executed worker")
++	}
++	if a.RunOnMainIfOpen(func() { ran.Store(true) }) || ran.Load() {
++		t.Fatal("post-stop inline callback executed")
++	}
++	published, signal := a.InitMainQueue()
++	if published == nil || signal != stopped {
++		t.Fatal("stop/loop channel identity changed")
++	}
++	exited := make(chan struct{})
++	go func() { a.MainLoop(); close(exited) }()
++	stopWait(t, exited)
++}
++func TestVellumMainQueueStopReleasesPendingDelivery(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	a.InitMainQueue()
++	done := make(chan struct{})
++	var ran atomic.Bool
++	go func() {
++		if a.RunOnMainIfOpen(func() { ran.Store(true) }) {
++			t.Error("refused operation reported success")
++		}
++		close(done)
++	}()
++	a.StopMain()
++	stopWait(t, done)
++	if ran.Load() {
++		t.Fatal("unconsumed callback executed")
++	}
++}
++func TestVellumMainQueueStopDuringCallbackPreservesSynchronousOutput(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	a.InitMainQueue()
++	exited := make(chan struct{})
++	go func() { a.MainLoop(); close(exited) }()
++	started, release, done := make(chan struct{}), make(chan struct{}), make(chan struct{})
++	output := 0
++	go func() {
++		if !a.RunOnMainIfOpen(func() { close(started); <-release; output = 42 }) || output != 42 {
++			t.Error("accepted callback returned before output completed")
++		}
++		close(done)
++	}()
++	stopWait(t, started)
++	a.StopMain()
++	select {
++	case <-done:
++		t.Fatal("stop released an executing callback's caller")
++	case <-time.After(10 * time.Millisecond):
++	}
++	close(release)
++	stopWait(t, done)
++	stopWait(t, exited)
++}
++func TestVellumMainQueueStopIsConcurrentAndIdempotent(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	var group sync.WaitGroup
++	for i := 0; i < 100; i++ {
++		group.Add(1)
++		go func() { defer group.Done(); a.StopMain() }()
++	}
++	group.Wait()
++	_, stopped := a.InitMainQueue()
++	select {
++	case <-stopped:
++	default:
++		t.Fatal("stop signal absent")
++	}
++	done := make(chan struct{})
++	go func() { a.RunOnMainQueued(func() { t.Error("closed queue callback ran") }); close(done) }()
++	stopWait(t, done)
++}
++func TestVellumMainQueueStopAcknowledgesAcceptedRefusal(t *testing.T) {
++	a := &App{This: &queueTestApp{}}
++	queue, _ := a.InitMainQueue()
++	done := make(chan struct{})
++	var ran atomic.Bool
++	go func() {
++		if a.RunOnMainIfOpen(func() { ran.Store(true) }) {
++			t.Error("refused delivery succeeded")
++		}
++		close(done)
++	}()
++	var call FuncRun
++	select {
++	case call = <-queue:
++	case <-time.After(3 * time.Second):
++		t.Fatal("delivery absent")
++	}
++	a.StopMain()
++	if a.ExecuteMain(call) {
++		t.Fatal("stopped loop executed accepted delivery")
++	}
++	stopWait(t, done)
++	if ran.Load() {
++		t.Fatal("callback executed after refusal")
++	}
++}
++
++type noStopWakeApp struct{ queueTestApp }
++
++func (*noStopWakeApp) SendEmptyEvent() { panic("stop posted to native backend") }
++
++func TestVellumMainQueueStopNeedsNoNativeWake(t *testing.T) {
++	for _, a := range []*App{{}, {This: &noStopWakeApp{}}} {
++		a.InitMainQueue()
++		a.StopMain()
++		a.StopMain()
++		done := make(chan struct{})
++		go func() { a.MainLoop(); close(done) }()
++		stopWait(t, done)
++		if a.RunOnMainIfOpen(func() { t.Error("stopped callback ran") }) {
++			t.Fatal("stopped callback admitted")
++		}
++	}
++}
+--- /dev/null
++++ b/system/driver/desktop/app_vellum_stopped_creation_test.go
+@@ -0,0 +1,21 @@
++package desktop
++
++import (
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/driver/base"
++	"errors"
++	"testing"
++)
++
++type stoppedCreationApp struct{ system.App }
++
++func (*stoppedCreationApp) SendEmptyEvent() {}
++func TestVellumMainQueueStopRefusesNativeWindowCreation(t *testing.T) {
++	a := &App{}
++	a.This = &stoppedCreationApp{}
++	a.StopMain()
++	window, err := a.NewWindow(nil)
++	if window != nil || !errors.Is(err, base.ErrMainStopped) || a.NWindows() != 0 {
++		t.Fatal("stopped creation escaped as success", window, err)
++	}
++}
+--- a/system/driver/desktop/window.go
++++ b/system/driver/desktop/window.go
+@@ -314,6 +314,15 @@
+ 	if w.IsClosed() {
+ 		return
+ 	}
++	w.App.RunOnMain(func() { w.setGeometryOnMain(fullscreen, pos, size, screen) })
++}
++
++// setGeometryOnMain is used by already-admitted native operations without
++// recursively dispatching to the main queue.
++func (w *Window) setGeometryOnMain(fullscreen bool, pos, size image.Point, screen *system.Screen) {
++	if w.IsClosed() || w.Glw == nil {
++		return
++	}
+ 	w.Mu.Lock()
+ 	if pos == (image.Point{}) {
+ 		pos = w.Pos
+@@ -329,9 +338,11 @@
+ 	if screen != nil {
+ 		sc = screen // critical to use this b/c w.Screen() can be wrong on new screen sequence
+ 	}
++	if sc == nil {
++		return
++	}
+ 	size = sc.WindowSizeFromPixels(size)
+-	// note: anything run on main only doesn't need lock -- implicit lock
+-	w.App.RunOnMain(func() {
++	func() {
+ 		if w.Glw == nil { // by time we got to main, could be diff
+ 			return
+ 		}
+@@ -350,14 +361,24 @@
+ 			w.Glw.SetSize(size.X, size.Y)
+ 			w.Glw.SetPos(pos.X, pos.Y)
+ 		}
+-	})
++	}()
+ }
+ 
+ func (w *Window) ConstrainFrame(topOnly bool) sides.Sides[int] {
++	w.Mu.Lock()
++	frameSize := w.FrameSize
++	w.Mu.Unlock()
++	w.App.RunOnMain(func() { frameSize = w.constrainFrameOnMain(topOnly) })
++	return frameSize
++}
++
++// constrainFrameOnMain keeps any resulting geometry change in the same native
++// callback. Public callers dispatch once through ConstrainFrame.
++func (w *Window) constrainFrameOnMain(topOnly bool) sides.Sides[int] {
+ 	w.Mu.Lock()
+ 	frameSize, position := w.FrameSize, w.Pos
+ 	w.Mu.Unlock()
+-	if w.IsClosed() || w.Is(system.Fullscreen) || w.Is(system.Maximized) {
++	if w.Glw == nil || w.IsClosed() || w.Is(system.Fullscreen) || w.Is(system.Maximized) {
+ 		return frameSize
+ 	}
+ 	if TheApp.Platform() == system.Windows && (position.X == -32000 || position.Y == -32000) {
+@@ -405,7 +426,7 @@
+ 	}
+ 	if change {
+ 		// fmt.Println("\tconstrainframe changed:", pos, sz)
+-		w.SetGeometry(false, pos, sz, sc)
++		w.setGeometryOnMain(false, pos, sz, sc)
+ 	}
+ 	return frameSize
+ }

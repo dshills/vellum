@@ -10,6 +10,7 @@ import (
 	"github.com/dshills/vellum"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/tasks"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
@@ -134,5 +135,54 @@ func TestWorkspacesRoundTripFloatingLayoutsWithoutAliasing(t *testing.T) {
 	layout.Windows[0].Root.Tabs[0] = "external mutation"
 	if session.Layout().Windows[0].Root.Tabs[0] != "document" {
 		t.Fatal("returned layout aliases retained state")
+	}
+}
+
+func TestDocumentHistoryAndSaveRevisionThroughPublicCommands(t *testing.T) {
+	journal, err := history.New(2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	value := 0
+	change := func(next int) history.Change {
+		previous := value
+		return history.Change{Label: "Property", Apply: func() error { value = next; return nil }, Revert: func() error { value = previous; return nil }}
+	}
+	if err = journal.Apply(change(42)); err != nil {
+		t.Fatal(err)
+	}
+	captured := journal.Snapshot().Revision
+	if err = journal.Apply(change(84)); err != nil {
+		t.Fatal(err)
+	}
+	if !errors.Is(journal.MarkSavedRevision(captured), history.ErrStale) || !journal.Snapshot().Dirty {
+		t.Fatal("stale save cleaned document")
+	}
+	registry := command.New()
+	if err = registry.Register(command.Command{ID: "undo", Label: "Undo", Shortcut: "Meta+Z", ShortcutScope: command.AfterFocusShortcuts, Available: func() error {
+		if journal.Snapshot().UndoCount == 0 {
+			return history.ErrEmpty
+		}
+		return nil
+	}, Execute: func(context.Context) error { return journal.Undo() }}); err != nil {
+		t.Fatal(err)
+	}
+	if matched, err := registry.ShortcutInScope(context.Background(), "Meta+Z", command.WindowShortcuts); matched || err != nil || value != 84 {
+		t.Fatal("document undo preempted focused widget")
+	}
+	if matched, err := registry.ShortcutInScope(context.Background(), "Meta+Z", command.AfterFocusShortcuts); !matched || err != nil || value != 42 {
+		t.Fatal("document fallback failed")
+	}
+	if err = journal.MarkSavedRevision(captured); err != nil || journal.Snapshot().Dirty {
+		t.Fatal("matching save rejected")
+	}
+	if err = registry.Invoke(context.Background(), "undo"); err != nil || value != 0 || !journal.Snapshot().Dirty {
+		t.Fatal("menu undo failed")
+	}
+	if err = registry.Invoke(context.Background(), "undo"); !errors.Is(err, history.ErrEmpty) {
+		t.Fatal("empty history allowed")
+	}
+	if err = journal.Redo(); err != nil || value != 42 || journal.Snapshot().Dirty {
+		t.Fatal("saved revision identity not restored")
 	}
 }

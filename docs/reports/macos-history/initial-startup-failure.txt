@@ -1,0 +1,273 @@
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.039s
+
+OK
+..
+........
+----------------------------------------------------------------------
+Ran 10 tests in 0.055s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.580s
+
+OK
+.........................
+----------------------------------------------------------------------
+Ran 25 tests in 0.410s
+
+OK
+Created /private/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum licensed starter nm9yqrji/application; source '/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum licensed starter nm9yqrji/SDK/drivers/cogent/env.sh' then run go test ./... and go run .
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 0.095s
+
+OK
+................
+----------------------------------------------------------------------
+Ran 16 tests in 0.028s
+
+OK
+ok  	github.com/dshills/vellum	(cached)
+ok  	github.com/dshills/vellum/app	(cached)
+ok  	github.com/dshills/vellum/canvas	(cached)
+ok  	github.com/dshills/vellum/command	(cached)
+ok  	github.com/dshills/vellum/history	(cached)
+ok  	github.com/dshills/vellum/tasks	(cached)
+ok  	github.com/dshills/vellum/ui	(cached)
+ok  	github.com/dshills/vellum/virtual	(cached)
+ok  	github.com/dshills/vellum/workbench	(cached)
+# github.com/dshills/vellum/drivers/cogent/cmd/gallery.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/workbench.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	github.com/dshills/vellum/drivers/cogent	(cached)
+?   	github.com/dshills/vellum/drivers/cogent/cmd/accessibility-smoke	[no test files]
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke	(cached)
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/gallery	(cached)
+?   	github.com/dshills/vellum/drivers/cogent/cmd/history-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/multiwindow-smoke	[no test files]
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke	(cached)
+?   	github.com/dshills/vellum/drivers/cogent/cmd/render-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-handoff-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-lifetime-smoke	[no test files]
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/workbench	(cached)
+ok  	github.com/dshills/vellum/drivers/cogent/internal/platformio	(cached)
+# github.com/dshills/vellum/drivers/cogent/cmd/workbench
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/system/driver/desktop.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	cogentcore.org/core/system	1.259s
+# cogentcore.org/core/core.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/xyz/xyzcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+SIGQUIT: quit
+PC=0x184a1350c m=0 sigcode=0
+
+goroutine 0 gp=0x100985b80 m=0 mp=0x1009869c0 [idle]:
+runtime.pthread_cond_wait(0x100986f28, 0x100986ee8)
+	/opt/homebrew/opt/go/libexec/src/runtime/sys_darwin.go:470 +0x20 fp=0x16fb28270 sp=0x16fb28240 pc=0x10033bd30
+runtime.semasleep(0xffffffffffffffff)
+	/opt/homebrew/opt/go/libexec/src/runtime/os_darwin.go:72 +0x9c fp=0x16fb282d0 sp=0x16fb28270 pc=0x10031792c
+runtime.notesleep(0x100986b18)
+	/opt/homebrew/opt/go/libexec/src/runtime/lock_sema.go:62 +0xac fp=0x16fb28300 sp=0x16fb282d0 pc=0x1002ee3cc
+runtime.mPark(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:1985
+runtime.stopm()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:3023 +0x84 fp=0x16fb28330 sp=0x16fb28300 pc=0x100321914
+runtime.findRunnable()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:3811 +0xff0 fp=0x16fb28500 sp=0x16fb28330 pc=0x100323680
+runtime.schedule()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:4179 +0x90 fp=0x16fb28540 sp=0x16fb28500 pc=0x1003249e0
+runtime.goexit0(0xc0001fd860?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:4515 +0x20 fp=0x16fb28560 sp=0x16fb28540 pc=0x1003257d0
+runtime.mcall()
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:319 +0x54 fp=0x16fb28570 sp=0x16fb28560 pc=0x10035a444
+
+goroutine 1 gp=0xc0000041e0 m=nil [chan receive]:
+runtime.gopark(0x3001d1220?, 0x10880c380?, 0x8?, 0x1?, 0x18?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc0000cf5a0 sp=0xc0000cf580 pc=0x100355658
+runtime.chanrecv(0xc000031280, 0xc0000cf6ae, 0x1)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:667 +0x410 fp=0xc0000cf630 sp=0xc0000cf5a0 pc=0x1002e8e20
+runtime.chanrecv1(0x1008f6590?, 0x1008eb968?)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:509 +0x14 fp=0xc0000cf660 sp=0xc0000cf630 pc=0x1002e8a04
+testing.(*T).Run(0xc0000ee488, {0x100656217, 0x2d}, 0x100936370)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2268 +0x7dc fp=0xc0000cf7b0 sp=0xc0000cf660 pc=0x10040a05c
+testing.runTests.func1(0xc0000ee488)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2744 +0x78 fp=0xc0000cf800 sp=0xc0000cf7b0 pc=0x1004117e8
+testing.tRunner(0xc0000ee488, 0xc0000cfa28)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x168 fp=0xc0000cf8e0 sp=0xc0000cf800 pc=0x100409818
+testing.runTests({0x10064b839, 0x13}, {0x100653b1b, 0x26}, 0xc0000124b0, {0x100961ba8, 0x4, 0x4}, {0x0?, 0xc0000dbbf0?, ...})
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2742 +0x7a4 fp=0xc0000cfa50 sp=0xc0000cf8e0 pc=0x10040cdb4
+testing.(*M).Run(0xc000184460)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2602 +0xb3c fp=0xc0000cfdd0 sp=0xc0000cfa50 pc=0x10040b2bc
+main.main()
+	_testmain.go:52 +0x104 fp=0xc0000cfea0 sp=0xc0000cfdd0 pc=0x1005edc64
+runtime.main()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:302 +0x380 fp=0xc0000cffd0 sp=0xc0000cfea0 pc=0x10031ce10
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000cffd0 sp=0xc0000cffd0 pc=0x10035c564
+
+goroutine 18 gp=0xc0001043c0 m=nil [force gc (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000080790 sp=0xc000080770 pc=0x100355658
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.forcegchelper()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:387 +0xb4 fp=0xc0000807d0 sp=0xc000080790 pc=0x10031d0f4
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc0000807d0 sp=0xc0000807d0 pc=0x10035c564
+created by runtime.init.7 in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:375 +0x24
+
+goroutine 19 gp=0xc0001045a0 m=nil [GC sweep wait]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000096f70 sp=0xc000096f50 pc=0x100355658
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.bgsweep(0xc000114000)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgcsweep.go:279 +0x9c fp=0xc000096fb0 sp=0xc000096f70 pc=0x10030745c
+runtime.gcenable.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:214 +0x20 fp=0xc000096fd0 sp=0xc000096fb0 pc=0x10034be20
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000096fd0 sp=0xc000096fd0 pc=0x10035c564
+created by runtime.gcenable in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:214 +0x6c
+
+goroutine 20 gp=0xc000104780 m=nil [GC scavenge wait]:
+runtime.gopark(0xc000114000?, 0x100662c48?, 0x1?, 0x0?, 0xc000104780?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000090f60 sp=0xc000090f40 pc=0x100355658
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.(*scavengerState).park(0x100985500)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgcscavenge.go:425 +0x5c fp=0xc000090f90 sp=0xc000090f60 pc=0x1003050ac
+runtime.bgscavenge(0xc000114000)
+	/opt/homebrew/opt/go/libexec/src/runtime/mgcscavenge.go:653 +0x44 fp=0xc000090fb0 sp=0xc000090f90 pc=0x1003055d4
+runtime.gcenable.gowrap2()
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:215 +0x20 fp=0xc000090fd0 sp=0xc000090fb0 pc=0x10034bde0
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000090fd0 sp=0xc000090fd0 pc=0x10035c564
+created by runtime.gcenable in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mgc.go:215 +0xac
+
+goroutine 2 gp=0xc0000054a0 m=nil [GOMAXPROCS updater (idle)]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000080f70 sp=0xc000080f50 pc=0x100355658
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.updateMaxProcsGoroutine()
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:7146 +0xf4 fp=0xc000080fd0 sp=0xc000080f70 pc=0x10032ab94
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000080fd0 sp=0xc000080fd0 pc=0x10035c564
+created by runtime.defaultGOMAXPROCSUpdateEnable in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:7134 +0x48
+
+goroutine 3 gp=0xc000005a40 m=nil [finalizer wait]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000091d80 sp=0xc000091d60 pc=0x100355658
+runtime.runFinalizers()
+	/opt/homebrew/opt/go/libexec/src/runtime/mfinal.go:210 +0x120 fp=0xc000091fd0 sp=0xc000091d80 pc=0x1002f8640
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000091fd0 sp=0xc000091fd0 pc=0x10035c564
+created by runtime.createfing in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mfinal.go:172 +0x78
+
+goroutine 4 gp=0xc000005c20 m=nil [cleanup wait]:
+runtime.gopark(0x0?, 0x0?, 0x0?, 0x0?, 0x0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000084f10 sp=0xc000084ef0 pc=0x100355658
+runtime.goparkunlock(...)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:480
+runtime.(*cleanupQueue).dequeue(0x1009859c0)
+	/opt/homebrew/opt/go/libexec/src/runtime/mcleanup.go:522 +0x160 fp=0xc000084f50 sp=0xc000084f10 pc=0x1002f5400
+runtime.runCleanups()
+	/opt/homebrew/opt/go/libexec/src/runtime/mcleanup.go:718 +0x3c fp=0xc000084fd0 sp=0xc000084f50 pc=0x1002f5b4c
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000084fd0 sp=0xc000084fd0 pc=0x10035c564
+created by runtime.(*cleanupQueue).createGs in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/runtime/mcleanup.go:672 +0x108
+
+goroutine 5 gp=0xc0001ee000 m=nil [chan send (nil chan)]:
+runtime.gopark(0x0?, 0x1000000?, 0x78?, 0x5d?, 0x1005ebf34?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000095cd0 sp=0xc000095cb0 pc=0x100355658
+runtime.chansend(0xc0001d12e8?, 0x0?, 0x0?, 0xc0001d12d8?)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:181 +0x5a8 fp=0xc000095d50 sp=0xc000095cd0 pc=0x1002e80d8
+runtime.chansend1(0xc0001d12c0?, 0xc000095dc0?)
+	/opt/homebrew/opt/go/libexec/src/runtime/chan.go:161 +0x18 fp=0xc000095d80 sp=0xc000095d50 pc=0x1002e7b18
+cogentcore.org/core/system/driver/base.(*App).StopMain(...)
+	/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/system/driver/base/app.go:163
+cogentcore.org/core/system/driver/base.TestMainQueuePublicationDuringStartupDispatch(0xc0000ee6c8)
+	/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/system/driver/base/app_vellum_ownership_test.go:43 +0x5f0 fp=0xc000095ec0 sp=0xc000095d80 pc=0x1005ebf40
+testing.tRunner(0xc0000ee6c8, 0x100936370)
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x168 fp=0xc000095fa0 sp=0xc000095ec0 pc=0x100409818
+testing.(*T).Run.gowrap1()
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x38 fp=0xc000095fd0 sp=0xc000095fa0 pc=0x1004111b8
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000095fd0 sp=0xc000095fd0 pc=0x10035c564
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x7c0
+
+goroutine 73 gp=0xc0001fe5a0 m=nil [select]:
+runtime.gopark(0xc000092f68?, 0x2?, 0x38?, 0x2e?, 0xc000092f2c?)
+	/opt/homebrew/opt/go/libexec/src/runtime/proc.go:474 +0xb8 fp=0xc000092d90 sp=0xc000092d70 pc=0x100355658
+runtime.selectgo(0xc000092f68, 0xc000092f28, 0x0?, 0x0, 0x0?, 0x1)
+	/opt/homebrew/opt/go/libexec/src/runtime/select.go:351 +0x8d4 fp=0xc000092ef0 sp=0xc000092d90 pc=0x100330814
+cogentcore.org/core/system/driver/base.(*App).MainLoop(0xc0001d12c0)
+	/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/system/driver/base/app.go:111 +0x8c fp=0xc000092f90 sp=0xc000092ef0 pc=0x1005eb10c
+cogentcore.org/core/system/driver/base.TestMainQueuePublicationDuringStartupDispatch.func3()
+	/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/system/driver/base/app_vellum_ownership_test.go:31 +0x48 fp=0xc000092fd0 sp=0xc000092f90 pc=0x1005ed338
+runtime.goexit({})
+	/opt/homebrew/opt/go/libexec/src/runtime/asm_arm64.s:1039 +0x4 fp=0xc000092fd0 sp=0xc000092fd0 pc=0x10035c564
+created by cogentcore.org/core/system/driver/base.TestMainQueuePublicationDuringStartupDispatch in goroutine 5
+	/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream/system/driver/base/app_vellum_ownership_test.go:31 +0x434
+
+r0      0x104
+r1      0x0
+r2      0x300
+r3      0x0
+r4      0x0
+r5      0xa0
+r6      0x0
+r7      0x0
+r8      0x16fb28158
+r9      0x0
+r10     0x0
+r11     0x2
+r12     0x2
+r13     0x0
+r14     0x0
+r15     0x0
+r16     0x131
+r17     0x1f2ad3310
+r18     0x0
+r19     0x100986ee8
+r20     0x100986f28
+r21     0x1f1492260
+r22     0x0
+r23     0x0
+r24     0x300
+r25     0x301
+r26     0x400
+r27     0x100958000
+r28     0x100985b80
+r29     0x16fb281d0
+lr      0x184a54128
+sp      0x16fb28140
+pc      0x184a1350c
+fault   0x184a1350c
+FAIL	cogentcore.org/core/system/driver/base	148.857s
+ok  	cogentcore.org/core/system/driver/desktop	1.530s
+ok  	cogentcore.org/core/system/composer	1.269s
+ok  	cogentcore.org/core/gpu	1.975s
+ok  	cogentcore.org/core/gpu/gpudraw	1.718s
+ok  	cogentcore.org/core/core	5.276s
+ok  	cogentcore.org/core/xyz/xyzcore	1.923s
+FAIL

@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
-	"github.com/dshills/vellum/virtual"
 	"fmt"
+	"github.com/dshills/vellum/canvas"
+	"github.com/dshills/vellum/history"
+	"github.com/dshills/vellum/virtual"
 	"strconv"
 )
 
@@ -76,3 +78,46 @@ func (s *partSource) Snapshot() *partSource {
 }
 
 func (s *partSource) Revision() uint64 { return s.revision }
+
+// partEditor records sparse deltas rather than copying the million-row document.
+// All mutations, including replay, advance the source revision so workers and
+// table projections cannot install results from an older accepted model.
+type partEditor struct {
+	source  *partSource
+	table   *virtual.Table
+	board   *canvas.Scene
+	journal *history.Journal
+}
+
+func (e *partEditor) change(index int, label string, next part) error {
+	if index < 0 || index >= e.source.Len() {
+		return fmt.Errorf("component index out of range")
+	}
+	before := e.source.parts[index]
+	if before == next {
+		return nil
+	}
+	var oldRect, newRect canvas.Rect
+	hasRect := e.board != nil && index < len(e.board.Objects)
+	if hasRect {
+		oldRect = e.board.Objects[index]
+		newRect = oldRect
+		if (before.Rotation/90)%2 != (next.Rotation/90)%2 {
+			newRect.X += (newRect.Width - newRect.Height) / 2
+			newRect.Y += (newRect.Height - newRect.Width) / 2
+			newRect.Width, newRect.Height = newRect.Height, newRect.Width
+		}
+	}
+	assign := func(p part, rect canvas.Rect) error {
+		e.source.parts[index] = p
+		if hasRect {
+			e.board.Objects[index] = rect
+		}
+		e.source.revision++
+		e.table.Reset()
+		return nil
+	}
+	return e.journal.Apply(history.Change{Label: label,
+		Apply:  func() error { return assign(next, newRect) },
+		Revert: func() error { return assign(before, oldRect) }})
+}

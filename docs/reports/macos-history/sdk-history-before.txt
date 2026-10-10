@@ -1,0 +1,18 @@
+F
+======================================================================
+FAIL: test_exported_history_is_consumable_without_the_source_checkout (__main__.ReleaseChecks.test_exported_history_is_consumable_without_the_source_checkout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/dshills/Development/projects/Vellum/scripts/release-sdk_test.py", line 95, in test_exported_history_is_consumable_without_the_source_checkout
+    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : FAIL	example.com/history-consumer [setup failed]
+FAIL
+# example.com/history-consumer
+main_test.go:4:5: cannot find module providing package github.com/dshills/vellum/history: import lookup disabled by -mod=readonly
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.038s
+
+FAILED (failures=1)

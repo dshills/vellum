@@ -3,17 +3,19 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
+	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
-	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/command"
+	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/tasks"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
 	"github.com/dshills/vellum/workbench"
-	"flag"
-	"fmt"
 	"image/color"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -39,7 +41,6 @@ func main() {
 	}
 	parts := newParts(*rowCount)
 	selectedIndex := 0
-	revision := uint64(1)
 	count := 0
 	status := "Ready"
 	var task *tasks.Task
@@ -68,7 +69,7 @@ func main() {
 		return nil
 	}, Execute: func(ctx context.Context) error {
 		snapshot := parts.Snapshot()
-		expectedRevision := revision
+		expectedRevision := parts.Revision()
 		var err error
 		task, err = tasks.Start(manager, ctx, func(ctx context.Context, report func(float64, string)) (int64, error) {
 			var total int64
@@ -83,7 +84,7 @@ func main() {
 			}
 			return total, nil
 		}, func(total int64, err error) {
-			if expectedRevision != revision {
+			if expectedRevision != parts.Revision() {
 				status = "Stale calculation discarded"
 				return
 			}
@@ -175,7 +176,7 @@ func main() {
 	}, Execute: func(ctx context.Context) error {
 		snapshot := parts.Snapshot()
 		token := table.ProjectionToken()
-		expectedRevision := revision
+		expectedRevision := parts.Revision()
 		var err error
 		sortTask, err = tasks.Start(manager, ctx, func(ctx context.Context, _ func(float64, string)) (virtual.Projection, error) {
 			return virtual.ProjectContext(ctx, snapshot, "", 1, false)
@@ -184,7 +185,7 @@ func main() {
 				status = err.Error()
 				return
 			}
-			if revision != expectedRevision {
+			if parts.Revision() != expectedRevision {
 				status = "Stale projection discarded"
 				return
 			}
@@ -196,34 +197,70 @@ func main() {
 		})
 		return err
 	}}))
+	journal, err := history.New(256)
+	must(err)
+	editor := &partEditor{source: parts, table: table, journal: journal}
 	must(registry.Register(command.Command{ID: "component.rotate", Label: "Rotate 90°", Shortcut: "Meta+R", Execute: func(context.Context) error {
-		parts.parts[selectedIndex].Rotation = (parts.parts[selectedIndex].Rotation + 90) % 360
-		if board != nil && selectedIndex < len(board.Objects) {
-			o := &board.Objects[selectedIndex]
-			o.X += (o.Width - o.Height) / 2
-			o.Y += (o.Height - o.Width) / 2
-			o.Width, o.Height = o.Height, o.Width
+		next := parts.parts[selectedIndex]
+		next.Rotation = (next.Rotation + 90) % 360
+		if err := editor.change(selectedIndex, "Rotate component", next); err != nil {
+			return err
 		}
-		table.Reset()
-		revision++
-		parts.revision++
 		status = "Component rotated"
 		return nil
 	}}))
 	must(registry.Register(command.Command{ID: "component.raise-value", Label: "Increase value", Execute: func(context.Context) error {
-		parts.parts[selectedIndex].Value += 100
-		table.Reset()
-		revision++
-		parts.revision++
+		next := parts.parts[selectedIndex]
+		if next.Value > math.MaxUint32-100 {
+			return errors.New("component value would overflow")
+		}
+		next.Value += 100
+		if err := editor.change(selectedIndex, "Increase component value", next); err != nil {
+			return err
+		}
 		status = "Component value changed; sort reset"
 		return nil
 	}}))
+	for _, operation := range []struct {
+		id, label, chord string
+		redo             bool
+	}{{"edit.undo", "Undo", "Meta+Z", false}, {"edit.redo", "Redo", "Meta+Shift+Z", true}} {
+		op := operation
+		must(registry.Register(command.Command{ID: op.id, Label: op.label, Shortcut: op.chord, ShortcutScope: command.AfterFocusShortcuts, Available: func() error {
+			state := journal.Snapshot()
+			if state.Invalid {
+				return history.ErrInvalid
+			}
+			if state.Busy {
+				return history.ErrBusy
+			}
+			if (!op.redo && state.UndoCount == 0) || (op.redo && state.RedoCount == 0) {
+				return history.ErrEmpty
+			}
+			return nil
+		}, Execute: func(context.Context) error {
+			state := journal.Snapshot()
+			label := state.UndoLabel
+			replay := journal.Undo
+			if op.redo {
+				label = state.RedoLabel
+				replay = journal.Redo
+			}
+			if err := replay(); err != nil {
+				return err
+			}
+			status = op.label + ": " + label
+			return nil
+		}}))
+	}
+
 	objects := make([]canvas.Rect, 96)
 	for i := range objects {
 		objects[i] = canvas.Rect{ID: parts.Row(i).ID, X: float64(i%16) * 70, Y: float64(i/16) * 50, Width: 50, Height: 25, Color: color.RGBA{67, 197, 166, 255}}
 	}
 	board, err = canvas.New(objects)
 	must(err)
+	editor.board = board
 	board.View.SetSize(800, 400)
 	board.Fit()
 	gpuCanvas := &cogent.GPUCanvas{Owner: a, Window: "main", Model: board, Select: selectID}
@@ -267,7 +304,7 @@ func main() {
 			return ui.Node{ID: id + ".root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: id + ".title", Kind: ui.Label, Text: text}, {ID: id + ".detail", Kind: ui.Label, Text: "Panel content · Vellum keyed UI"}}}
 		}})
 	}
-	bar := &cogent.CommandBar{Owner: a, Registry: registry, Toolbar: []string{"project.increment", "analysis.calculate", "analysis.cancel"}, OnError: func(err error) { status = err.Error() }}
+	bar := &cogent.CommandBar{Owner: a, Registry: registry, Toolbar: []string{"edit.undo", "edit.redo", "project.increment", "analysis.calculate", "analysis.cancel"}, OnError: func(err error) { status = err.Error() }}
 	must(a.Open(app.Window{ID: "main", Title: "Vellum Workbench", Width: 1280, Height: 900, View: func() ui.Node {
 		progress := ""
 		if task != nil {
@@ -275,6 +312,9 @@ func main() {
 			if s.Running {
 				progress = fmt.Sprintf(" · %.0f%% %s", s.Progress*100, s.Message)
 			}
+		}
+		if journal.Snapshot().Dirty {
+			progress += " · Unsaved changes"
 		}
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "title", Kind: ui.Label, Text: "Vellum · Go native workbench"}, {ID: "commands", Kind: ui.Extension, Custom: bar}, {ID: "workbench", Kind: ui.Extension, Grow: true, MinHeight: 500, Custom: dock}, {ID: "status", Kind: ui.Label, Text: status + progress}}}
 	}}))
@@ -337,6 +377,21 @@ func main() {
 
 		a.Post(func() {
 			must(registry.Invoke(a.Context(), "project.increment"))
+			original := parts.parts[selectedIndex]
+			must(registry.Invoke(a.Context(), "component.rotate"))
+			must(registry.Invoke(a.Context(), "component.raise-value"))
+			edited := parts.parts[selectedIndex]
+			must(registry.Invoke(a.Context(), "edit.undo"))
+			must(registry.Invoke(a.Context(), "edit.undo"))
+			if parts.parts[selectedIndex] != original || journal.Snapshot().Dirty {
+				must(errors.New("document undo failed"))
+			}
+			must(registry.Invoke(a.Context(), "edit.redo"))
+			must(registry.Invoke(a.Context(), "edit.redo"))
+			if parts.parts[selectedIndex] != edited || !journal.Snapshot().Dirty {
+				must(errors.New("document redo failed"))
+			}
+			fmt.Println("Document history verified sparse property deltas, undo/redo and dirty state")
 			must(registry.Invoke(a.Context(), "analysis.calculate"))
 			must(registry.Invoke(a.Context(), "layout.move-inspector"))
 			must(registry.Invoke(a.Context(), "layout.reset"))

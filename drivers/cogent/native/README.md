@@ -30,3 +30,14 @@ Patch 0017 adds shared device-loss notification, bounds recoverable surface
 reconfiguration, and holds composition/resource ownership through GPU submission.
 Surface textures remain retained through presentation. Its input/output hashes
 and backend regression tests make these adapter-owned fixes reproducible.
+
+Patch 0020 delivers window shortcut first/final phases even when a Scene has no
+focused widget. Focused widgets retain their existing precedence. The owned
+regression verifies document fallback, consumed window commands and unregistered
+chords, with stage input/output hashes for independent SDK preparation.
+
+Patch 0021 makes main-loop stop a closed, idempotent signal that also works
+before queue publication. It releases startup/unaccepted delivery waiters while
+preserving synchronous output for accepted callbacks. Both loops acknowledge
+refused deliveries; native window creation is one admitted callback and returns
+an error on refusal. Six owned race regressions cover these transitions.

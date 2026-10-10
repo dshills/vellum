@@ -3,6 +3,7 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [macOS document history and native command lifecycle](macos-history/README.md)
 - [Workbench interaction](workbench-interaction/README.md)
 - [Rendering hardening](rendering/README.md)
 - [Windows/Linux services](platform-support/README.md)

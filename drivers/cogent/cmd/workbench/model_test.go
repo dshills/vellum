@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/dshills/vellum/canvas"
+	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/virtual"
 	"strings"
 	"testing"
@@ -41,5 +43,73 @@ func BenchmarkTypedMatcher(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		source.Matches(i%1000000, "0603")
+	}
+}
+
+func TestDocumentUndoCapturesDomainIdentityAndInvalidatesWorkers(t *testing.T) {
+	source := newParts(100000)
+	table, err := virtual.NewTable(source, 20)
+	if err != nil {
+		t.Fatal(err)
+	}
+	board, err := canvas.New([]canvas.Rect{{ID: source.Row(0).ID, X: 2, Y: 4, Width: 50, Height: 25}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	journal, err := history.New(256)
+	if err != nil {
+		t.Fatal(err)
+	}
+	editor := &partEditor{source: source, table: table, board: board, journal: journal}
+	old := source.parts[0]
+	oldRect := board.Objects[0]
+	token := table.ProjectionToken()
+	projection, err := virtual.Project(source.Snapshot(), "", 1, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	next := old
+	next.Rotation = (next.Rotation + 90) % 360
+	if err = editor.change(0, "Rotate", next); err != nil {
+		t.Fatal(err)
+	}
+	if source.parts[0] != next || board.Objects[0].Width != 25 || source.Revision() != 2 {
+		t.Fatal("edit not reflected")
+	}
+	if table.ApplyProjection(projection, token) == nil {
+		t.Fatal("stale pre-edit worker accepted")
+	}
+	nextOther := source.parts[5]
+	nextOther.Value += 100
+	if err = editor.change(5, "Value", nextOther); err != nil {
+		t.Fatal(err)
+	}
+	if err = journal.Undo(); err != nil {
+		t.Fatal(err)
+	}
+	if source.parts[0] != next || source.parts[5] == nextOther {
+		t.Fatal("undo used current selection instead of captured component")
+	}
+	if err = journal.Undo(); err != nil {
+		t.Fatal(err)
+	}
+	if source.parts[0] != old || board.Objects[0] != oldRect || journal.Snapshot().Dirty || source.Revision() != 5 {
+		t.Fatal("undo did not restore model, geometry and clean state", source.Revision())
+	}
+	if table.ApplyProjection(projection, token) == nil {
+		t.Fatal("undo incorrectly revived old worker token")
+	}
+	if err = journal.Redo(); err != nil {
+		t.Fatal(err)
+	}
+	if source.parts[0] != next || board.Objects[0].Width != 25 || source.Revision() != 6 {
+		t.Fatal("redo not reflected")
+	}
+	before := journal.Snapshot()
+	if err = editor.change(0, "No-op", next); err != nil || journal.Snapshot() != before {
+		t.Fatal("no-op recorded")
+	}
+	if editor.change(-1, "Invalid", next) == nil || journal.Snapshot() != before {
+		t.Fatal("invalid edit recorded")
 	}
 }

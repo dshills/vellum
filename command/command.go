@@ -8,8 +8,19 @@ import (
 	"strings"
 )
 
+// ShortcutScope controls native keyboard precedence. WindowShortcuts run before
+// focused widgets; AfterFocusShortcuts run only when focused widgets decline.
+// Explicit Invoke and Shortcut calls always use normal availability validation.
+type ShortcutScope uint8
+
+const (
+	WindowShortcuts ShortcutScope = iota
+	AfterFocusShortcuts
+)
+
 type Command struct {
 	ID, Label, Shortcut string
+	ShortcutScope       ShortcutScope
 	// Available returns a disabled reason. Both presentation and execution check it.
 	Available func() error
 	Execute   func(context.Context) error
@@ -20,6 +31,9 @@ type Registry struct{ entries map[string]Command }
 
 func New() *Registry { return &Registry{entries: map[string]Command{}} }
 func (r *Registry) Register(c Command) error {
+	if c.ShortcutScope != WindowShortcuts && c.ShortcutScope != AfterFocusShortcuts {
+		return fmt.Errorf("command: invalid shortcut scope")
+	}
 	if c.ID == "" || c.Label == "" || c.Execute == nil {
 		return fmt.Errorf("command: ID, label and action required")
 	}
@@ -68,8 +82,21 @@ func (r *Registry) Search(query string) []Command {
 	return out
 }
 func (r *Registry) Shortcut(ctx context.Context, chord string) (bool, error) {
+	return r.shortcut(ctx, chord, nil)
+}
+
+// ShortcutInScope routes one native keyboard phase; it never invokes a command
+// registered in the other phase. Shortcut uniqueness spans both scopes.
+func (r *Registry) ShortcutInScope(ctx context.Context, chord string, scope ShortcutScope) (bool, error) {
+	if scope != WindowShortcuts && scope != AfterFocusShortcuts {
+		return false, fmt.Errorf("command: invalid shortcut scope")
+	}
+	return r.shortcut(ctx, chord, &scope)
+}
+
+func (r *Registry) shortcut(ctx context.Context, chord string, scope *ShortcutScope) (bool, error) {
 	for _, c := range r.entries {
-		if c.Shortcut != "" && strings.EqualFold(chord, c.Shortcut) {
+		if (scope == nil || c.ShortcutScope == *scope) && c.Shortcut != "" && strings.EqualFold(chord, c.Shortcut) {
 			return true, r.Invoke(ctx, c.ID)
 		}
 	}

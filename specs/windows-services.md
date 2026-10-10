@@ -33,6 +33,18 @@ application UI owner or another window's render lock. All windows share one
 
 Window titles must contain valid UTF-8 and no embedded NUL characters.
 
+Owned native patch 0021 permits shutdown before main-loop queue publication. Stop
+is idempotent and closes a stable signal without publishing a work queue. Startup
+workers and unaccepted delivery waiters are released. An accepted callback retains
+synchronous completion before its caller returns; loops acknowledge canceled
+deliveries as well as executed work. Native window construction is one admitted
+main-thread callback and returns an explicit error on refusal. The legacy
+RunOnMain API returns no refusal error; worker service transports use the stopped
+signal and their own context/error protocol.
+Stop does not post a native wake after
+signaling shutdown; the desktop loop's existing 100 ms event wait observes the
+closed signal, avoiding a post-termination GLFW call or nil native identity.
+
 ## Services
 
 `Application.Services()` is available after a native window is shown and returns

@@ -24,6 +24,13 @@ context, an ordinary Go worker and a typed completion callback. Worker count and
 undelivered results share one bound. Progress is coalesced; completion waits for
 mailbox credit or lifetime cancellation. Workers cannot mutate live UI state.
 
+## Document edits
+
+The bounded [history contract](history.md) supplies sparse application-owned
+Undo/Redo and revision-aware dirty/save state. Native command shortcut scopes
+preserve focused text editing before document fallback. The workbench's component
+changes use the shared journal and invalidate stale worker results on replay.
+
 ## Workbench layouts
 
 The `workbench` package owns a validated split/tab tree. Move, split and restore

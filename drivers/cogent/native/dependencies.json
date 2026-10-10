@@ -133,6 +133,28 @@
               "sha256": "bb07a31f8516da9fd643ec4fe5e616322d3845f0914e22e832d3d67a1d66eddb"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/shortcuts",
+          "inputs": "native/patches/shortcuts/original-hashes.json",
+          "outputs": "native/patches/shortcuts/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/shortcuts/0020-focusless-shortcuts.patch",
+              "sha256": "1eee4dcf432a2ac70fde45852eb7f6e2b82b505370e0ea8affde085025e8ceff"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/mainqueue",
+          "inputs": "native/patches/mainqueue/original-hashes.json",
+          "outputs": "native/patches/mainqueue/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/mainqueue/0021-main-queue-stop.patch",
+              "sha256": "6395c5c8340dc95d5d16425db2803cdb513edd317748d84df4b5d7666aabf516"
+            }
+          ]
         }
       ]
     },

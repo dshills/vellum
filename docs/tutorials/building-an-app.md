@@ -106,10 +106,30 @@ model objects, and use `workbench.Session` for the separate window/panel layout.
 The same document can move between docked/floating windows without becoming
 layout-owned data.
 
+## Keep document undo separate from widget editing
+
+Create a `history.Journal` for each document under the application owner.
+A Change captures immutable before/after values and supplies synchronous Apply
+and Revert callbacks; both must validate before making any model assignments.
+Record sparse deltas for large datasets. The journal bounds retained change
+count, reports undo/redo labels and tracks dirty state by revision identity.
+
+Register document Undo/Redo commands with
+`ShortcutScope: command.AfterFocusShortcuts`. Meta+Z and Meta+Shift+Z then let a
+focused native text field consume its own undo before the document command runs.
+Toolbar/palette activation invokes the explicit document command. Model edits
+and replay should advance source revisions to invalidate older worker results.
+
+After successful synchronous persistence, call MarkSaved. For asynchronous
+persistence, capture Snapshot.Revision with the immutable model snapshot and use
+MarkSavedRevision on completion; ErrStale keeps later edits dirty. Reset when
+replacing the document. See the [history contract](../../specs/history.md) and
+workbench's sparse component example for failure and retention behavior.
+
 ## Test and package deliberately
 
 The independent `examples/sdk-contract` module tests controlled values,
-explicit-zero styles, commands, bounded worker commits and docking layout
+explicit-zero styles, commands, document undo/save revisions, bounded worker commits and docking layout
 snapshots through public APIs. Run it with `GOWORK=off` to check consumer usage.
 
 Build and validate your own private SDK archive. The producer digest below is

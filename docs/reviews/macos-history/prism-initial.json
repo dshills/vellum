@@ -1,0 +1,157 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3211ada665fb9cab60094e7934201b0f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "2ec26e34995897f5e00bb760863bb141d440d7c3",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "7a0ca1e03233f31e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Native window lookup and key events are dispatched from a background goroutine",
+      "message": "The check goroutine calls core.TheApp.WindowByName and native.Events().KeyChord directly, off the UI/main thread. The other state it touches is correctly marshalled through a.Do. Cogent Core's window list and event manager are not goroutine-safe, so this can race with the render loop. It may corrupt event ordering and make the smoke test flaky or crash.",
+      "suggestion": "Look up the windows and dispatch the synthetic key chords inside a.Do, or through whatever main-queue helper the driver provides. A small helper such as `sendChord(a, name, r, code, mods)` that wraps the lookup and the KeyChord call in a.Do would cover every call site.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/cmd/history-smoke/main.go",
+          "lines": {
+            "start": 113,
+            "end": 113
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "data-race",
+        "native-events",
+        "location-corrected"
+      ],
+      "evidence": "native := core.TheApp.WindowByName(\"Vellum document history smoke\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "05647d7e5c072f61",
+      "severity": "medium",
+      "category": "bug",
+      "title": "StopMain posts an empty event that may reach an already-terminated GLFW or a nil This",
+      "message": "StopMain now calls `a.This.SendEmptyEvent()` after closing MainDone, and it can be called more than once or after the loop has exited. On the desktop driver the loop calls `glfw.Terminate()` before returning, and a later StopMain would post an empty event to an uninitialised GLFW. That can panic or raise a GLFW error. `a.This` may also be nil if StopMain is called before it is set.",
+      "suggestion": "Guard the call with `if a.This != nil`. Make the desktop SendEmptyEvent a no-op once GLFW is terminated, for example with an atomic 'terminated' flag. Alternatively, skip the wake-up when the loop has already exited.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/native/patches/mainqueue/0021-main-queue-stop.patch",
+          "lines": {
+            "start": 79,
+            "end": 79
+          }
+        }
+      ],
+      "tags": [
+        "glfw",
+        "shutdown",
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "a.This.SendEmptyEvent()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 109978,
+    "totalMs": 48449
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 38,
+    "bytes": 137182,
+    "chunks": 10,
+    "llmCalls": 12,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 101686,
+        "output": 14427,
+        "costUSD": 0.347642
+      }
+    ],
+    "widenedFiles": 10,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 2,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "814e8504f499ca78",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Creating the whole window inside one main-queue callback risks self-deadlock",
+        "message": "NewWindow now runs the whole window-creation transaction inside one callback on the main loop. That includes the user hooks `system.UpdateLogicalDPIScaleFunc` and `a.NativeAttach`, and helpers such as `w.updateGeometry()` and `newGlfwWindow`. If any of these still call `a.RunOnMain` or `w.Show()`, `SetGeometry` or similar, they will block on `queue \u003c- ...` while the loop is busy running this callback, which deadlocks. The new doc comment says this call pattern is forbidden, but nothing enforces it.",
+        "suggestion": "Audit everything reachable from newWindowOnMain, including UpdateLogicalDPIScaleFunc, NativeAttach, updateGeometry and newGlfwWindow, for RunOnMain/RunOnMainIfOpen calls and replace them with *OnMain variants. Alternatively, make RunOnMainIfOpen detect re-entrancy (for example with a main-thread flag) and run the function inline.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/mainqueue/0021-main-queue-stop.patch",
+            "lines": {
+              "start": 213,
+              "end": 216
+            }
+          }
+        ],
+        "tags": [
+          "deadlock",
+          "reentrancy",
+          "main-thread"
+        ],
+        "evidence": "if !a.RunOnMainIfOpen(func() { window, err = a.newWindowOnMain(opts) }) {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/mainqueue/0021-main-queue-stop.patch"
+    }
+  ],
+  "suppressed": []
+}

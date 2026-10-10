@@ -1,0 +1,66 @@
+--- a/core/events.go
++++ b/core/events.go
+@@ -201,7 +201,15 @@
+ 			em.prevFocus = nil
+ 		}
+ 	}
+-	if !tree.IsNil(em.focus) {
++	if tree.IsNil(em.focus) {
++		// Window-level commands still need both phases when a scene contains
++		// no focusable control, or after focus was cleared. Keep manager keys
++		// last, exactly as in the focused-widget path.
++		em.scene.firstHandleEvent(e)
++		if !e.IsHandled() {
++			em.scene.finalHandleEvent(e)
++		}
++	} else {
+ 		em.focus.AsTree().WalkUpParent(func(k tree.Node) bool {
+ 			wb := AsWidget(k)
+ 			if !wb.IsDisplayable() {
+--- /dev/null
++++ b/core/vellum_focusless_shortcuts_test.go
+@@ -0,0 +1,44 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"testing"
++)
++
++func TestVellumFocuslessShortcutPhases(t *testing.T) {
++	body := NewBody("focus-free window")
++	scene := body.Scene
++	// No native render window is necessary for first/final command dispatch.
++	scene.Stage = &Stage{Mains: &stages{}}
++	em := &Events{scene: scene}
++	first, final := 0, 0
++	consumeFirst := false
++	scene.OnFirst(events.KeyChord, func(e events.Event) {
++		first++
++		if consumeFirst {
++			e.SetHandled()
++		}
++	})
++	scene.OnFinal(events.KeyChord, func(e events.Event) { final++; e.SetHandled() })
++	event := events.NewKey(events.KeyChord, 'z', key.CodeZ, key.Modifiers(1<<key.Meta))
++	em.handleFocusEvent(event)
++	if first != 1 || final != 1 || !event.IsHandled() {
++		t.Fatal("focus-free fallback missing", first, final)
++	}
++	consumeFirst = true
++	event = events.NewKey(events.KeyChord, 'z', key.CodeZ, key.Modifiers(1<<key.Meta))
++	em.handleFocusEvent(event)
++	if first != 2 || final != 1 || !event.IsHandled() {
++		t.Fatal("consumed window shortcut reached fallback", first, final)
++	}
++	// An unhandled chord continues to manager dispatch and remains unhandled
++	// here because this headless scene has no native render window.
++	scene.Listeners.First = events.Listeners{}
++	scene.Listeners.Final = events.Listeners{}
++	event = events.NewKey(events.KeyChord, 'q', key.CodeQ, 0)
++	em.handleFocusEvent(event)
++	if event.IsHandled() {
++		t.Fatal("unregistered chord swallowed")
++	}
++}

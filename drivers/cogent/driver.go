@@ -267,22 +267,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			})
 			w.body.Scene.OnFirst(events.Custom, func(e events.Event) { custom(w, e) })
 			if d.Commands != nil {
-				w.body.Scene.OnFirst(events.KeyChord, func(e events.Event) {
-					a.Do(func() {
-						lifetime, err := a.WindowContext(spec.ID)
-						if err != nil || lifetime.Err() != nil {
-							return
-						}
-						matched, err := d.Commands.Shortcut(lifetime, string(e.KeyChord()))
-						if matched {
-							e.SetHandled()
-							if err != nil && d.OnError != nil {
-								d.OnError(err)
-							}
-							a.Invalidate("")
-						}
-					})
-				})
+				bindCommandShortcuts(w.body.Scene, a, spec.ID, d.Commands, d.OnError)
 			}
 			w.body.OnClose(func(events.Event) {
 				w.closing.Store(true)
