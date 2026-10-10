@@ -6,7 +6,7 @@ assessing the workbench API. Each phase receives Prism review, relevant tests,
 and a separate commit.
 
 1. Application lifecycle and keyed UI API — implemented; native driver and executable example.
-2. Commands and cancellable tasks — pending.
+2. Commands and cancellable tasks — implemented; shared registry, menus, toolbar, palette, shortcuts and bounded owner-thread completions.
 3. Docking, document tabs, inspector and layout persistence — pending.
 4. Virtualized tables and trees — pending.
 5. Shared-device GPU canvas with navigation and selection — pending.

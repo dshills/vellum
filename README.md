@@ -46,3 +46,9 @@ Queue capacity bounds pending callbacks, plus the one callback currently executi
 Driver wake functions are nonblocking notifications and never enter the UI owner.
 Native wakes use Cogent's lossless custom-event deque; they are coalesced while
 one wake is outstanding. A panic closes the application and propagates.
+
+Commands live in an owner-thread registry. Availability is rechecked on invocation
+from menus, toolbars, shortcuts and the palette. `tasks.Start[T]` accepts a
+context, an ordinary Go worker and a typed completion callback. Worker count and
+undelivered results share one bound. Progress is coalesced; completion waits for
+mailbox credit or lifetime cancellation. Workers cannot mutate live UI state.

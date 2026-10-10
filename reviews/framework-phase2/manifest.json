@@ -1,0 +1,13 @@
+{
+  "phase": 2,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "final_review": "phase2-final.json",
+  "checks": [
+    "race tests",
+    "native menu construction test",
+    "cancellation after completion admission",
+    "vet/build",
+    "native smoke: action and calculation completed"
+  ]
+}

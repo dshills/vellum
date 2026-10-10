@@ -16,6 +16,7 @@ import (
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
 	"example.com/vellum/app"
+	"example.com/vellum/command"
 	"example.com/vellum/ui"
 )
 
@@ -25,7 +26,10 @@ type Extension interface {
 	Mount(tree.Node) core.Widget
 	Sync(core.Widget) error
 }
-type Driver struct{}
+type Driver struct {
+	Commands *command.Registry
+	OnError  func(error)
+}
 type record struct {
 	widget   core.Widget
 	node     ui.Node
@@ -34,7 +38,7 @@ type record struct {
 
 var processRun atomic.Bool
 
-func (Driver) Run(ctx context.Context, a *app.Application) error {
+func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	ws := a.Windows()
 	if len(ws) != 1 {
 		return fmt.Errorf("cogent: one native window supported; got %d", len(ws))
@@ -114,6 +118,20 @@ func (Driver) Run(ctx context.Context, a *app.Application) error {
 	// Cogent compresses consecutive Custom events by type, including events
 	// from other producers. Every Custom event drains our coalesced work.
 	b.Scene.OnFirst(events.Custom, func(e events.Event) { drainCustom(a, &pending, refresh, e) })
+	if d.Commands != nil {
+		b.Scene.OnFirst(events.KeyChord, func(e events.Event) {
+			a.Do(func() {
+				matched, err := d.Commands.Shortcut(ctx, string(e.KeyChord()))
+				if matched {
+					e.SetHandled()
+					if err != nil && d.OnError != nil {
+						d.OnError(err)
+					}
+					a.Invalidate(w.ID)
+				}
+			})
+		})
+	}
 	b.OnClose(func(e events.Event) { a.Close(); source.Store(nil) })
 	if ctx.Err() != nil {
 		return ctx.Err()

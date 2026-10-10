@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "fdd4cb7c1800e4f85fdbd85730121cc1",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "c5dc1f81788843fcec93b7011579af83bdfdd318",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "92854e4713189862",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Mount dereferences nil Registry/Owner without validation",
+      "message": "Mount calls c.capture(), which dereferences c.Registry, without first checking that Owner and Registry are set. Sync does perform that check and returns an error, so the contract is clear. A CommandBar built without a Registry panics with a nil pointer in Mount. Owner is also unchecked, so a nil Owner panics later when a button is clicked.",
+      "suggestion": "Validate Owner and Registry at the start of Mount. Since Mount cannot return an error, either panic with a clear message or call OnError, then return an empty frame. Alternatively, validate in a constructor.",
+      "confidence": 0.7,
+      "locations": [
+        {
+          "path": "drivers/cogent/commands.go",
+          "lines": {
+            "start": 73,
+            "end": 74
+          }
+        }
+      ],
+      "tags": [
+        "nil-pointer",
+        "validation"
+      ],
+      "evidence": "func (c *CommandBar) Mount(parent tree.Node) core.Widget {\n\tc.capture()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "e4bb9eab2e015129",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible double release of task slot after PostWait failure",
+      "message": "The slot is released in two places. The commit closure releases it via `defer func() { \u003c-m.slots }()`. The error path after PostWait releases it again. If PostWait returns an error, for example the app context is cancelled while the closure is queued, the closure may still run later, for example during Drain or Close. The slot would then be released twice. That either blocks forever on an empty channel, leaking the goroutine and never closing t.done, or frees a slot belonging to another task and breaks the concurrency bound. The closure also writes the captured `err` and calls commit concurrently with this error path.",
+      "suggestion": "Make slot release idempotent, for example with a sync.Once shared by the closure and the error path. Also guard the commit closure so it does not run once delivery has been abandoned.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "tasks/tasks.go",
+          "lines": {
+            "start": 113,
+            "end": 116
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "resource-leak"
+      ],
+      "evidence": "if delivery != nil {\n\t\t\tcancel()\n\t\t\tstop()\n\t\t\t\u003c-m.slots\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 40251,
+    "totalMs": 29247
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 13,
+    "bytes": 27205,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18088,
+        "output": 4948,
+        "costUSD": 0.085656
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

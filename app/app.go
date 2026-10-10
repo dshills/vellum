@@ -27,6 +27,7 @@ type Driver interface {
 	Run(context.Context, *Application) error
 }
 type Application struct {
+	changed         chan struct{}
 	owner           sync.Mutex
 	mu              sync.Mutex
 	ctx             context.Context
@@ -47,7 +48,7 @@ func New(c Config) (*Application, error) {
 		return nil, fmt.Errorf("vellum: queue capacity must be positive")
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, dirty: map[string]bool{}}, nil
+	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, dirty: map[string]bool{}, changed: make(chan struct{})}, nil
 }
 func (a *Application) Context() context.Context { return a.ctx }
 
@@ -144,6 +145,8 @@ func (a *Application) Drain() error {
 			fn := a.queue[0]
 			a.queue[0] = nil
 			a.queue = a.queue[1:]
+			close(a.changed)
+			a.changed = make(chan struct{})
 			a.mu.Unlock()
 			fn()
 		}
@@ -202,6 +205,8 @@ func (a *Application) Close() {
 	if !a.closed {
 		a.closed = true
 		a.queue = nil
+		close(a.changed)
+		a.changed = make(chan struct{})
 		a.wake = nil
 		a.cancel()
 	} else {
