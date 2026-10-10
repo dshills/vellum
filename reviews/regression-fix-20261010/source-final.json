@@ -1,0 +1,58 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "2cce8134af240426e205702c0b768055",
+  "repo": {
+    "root": "/private/tmp/vellum-0013-regression-json-review",
+    "head": "ad122277464df13da1d6b582adb82e0e4d42fc1b",
+    "branch": "main"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 12556,
+    "totalMs": 12563
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 3,
+    "bytes": 9330,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 3902,
+        "output": 423,
+        "reasoning": 403,
+        "cachedInput": 1164
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

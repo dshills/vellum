@@ -1,0 +1,34 @@
+--- FAIL: TestNodeJSON (0.00s)
+    json_test.go:47: 
+        	Error Trace:	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/tree/json_test.go:47
+        	Error:      	Not equal: 
+        	            	expected: "{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"numChildren\":3,\"Name\":\"node-embed\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child1\",\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"numChildren\":1,\"Name\":\"child2\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"subchild1\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child3\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"bloop\",\"Mbr2\":32}\n"
+        	            	actual  : "{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"numChildren\":3,\"Name\":\"node-embed\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child1\",\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child2\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"subchild1\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child3\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"bloop\",\"Mbr2\":32}\n"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1,2 +1,2 @@
+        	            	-{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","numChildren":3,"Name":"node-embed","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child1","Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","numChildren":1,"Name":"child2","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"subchild1","Mbr1":"","Mbr2":0}],"Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child3","Mbr1":"","Mbr2":0}],"Mbr1":"bloop","Mbr2":32}
+        	            	+{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","numChildren":3,"Name":"node-embed","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child1","Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child2","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"subchild1","Mbr1":"","Mbr2":0}],"Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child3","Mbr1":"","Mbr2":0}],"Mbr1":"bloop","Mbr2":32}
+        	            	 
+        	Test:       	TestNodeJSON
+--- FAIL: TestNodeRootJSON (0.00s)
+    json_test.go:68: 
+        	Error Trace:	/Users/dshills/Documents/ChatGPT/Go Native UI/prototypes/foundationintegration/build/upstream/tree/json_test.go:68
+        	Error:      	Not equal: 
+        	            	expected: "{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"numChildren\":3,\"Name\":\"node-embed\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child1\",\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"numChildren\":1,\"Name\":\"child2\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"subchild1\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child3\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"bloop\",\"Mbr2\":32}\n"
+        	            	actual  : "{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"numChildren\":3,\"Name\":\"node-embed\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child1\",\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child2\",\"Children\":[{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"subchild1\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"\",\"Mbr2\":0},{\"nodeType\":\"cogentcore.org/core/tree/testdata.NodeEmbed\",\"Name\":\"child3\",\"Mbr1\":\"\",\"Mbr2\":0}],\"Mbr1\":\"bloop\",\"Mbr2\":32}\n"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1,2 +1,2 @@
+        	            	-{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","numChildren":3,"Name":"node-embed","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child1","Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","numChildren":1,"Name":"child2","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"subchild1","Mbr1":"","Mbr2":0}],"Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child3","Mbr1":"","Mbr2":0}],"Mbr1":"bloop","Mbr2":32}
+        	            	+{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","numChildren":3,"Name":"node-embed","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child1","Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child2","Children":[{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"subchild1","Mbr1":"","Mbr2":0}],"Mbr1":"","Mbr2":0},{"nodeType":"cogentcore.org/core/tree/testdata.NodeEmbed","Name":"child3","Mbr1":"","Mbr2":0}],"Mbr1":"bloop","Mbr2":32}
+        	            	 
+        	Test:       	TestNodeRootJSON
+FAIL
+FAIL	cogentcore.org/core/tree	0.266s
+ok  	cogentcore.org/core/text/parse	0.184s
+FAIL
