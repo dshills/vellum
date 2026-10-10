@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "date": "2026-10-09",
+  "host": {
+    "os": "26.6.2",
+    "arch": "arm64",
+    "go": "go version go1.27.2 darwin/arm64"
+  },
+  "baseline_commit": "f864534f5b723fb33da17b1f78058505b433e681",
+  "pins": {
+    "cogentcore": "v0.3.46-0.20261009095036-5cc519b24044",
+    "go_text": "v0.3.5-0.20260418130854-c41d02a44bec"
+  },
+  "source_sha256": {
+    "prototypes/foundationintegration/go.mod": "45c41edd6ab857e1fb4491de931ecd16c12c99116134d1324c4d8d16776a8569",
+    "prototypes/foundationintegration/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "prototypes/foundationintegration/run.sh": "8f91bf867d45317214470a09652f27245da8d37cb7ad387bbd5d324f62a05416",
+    "prototypes/foundationintegration/README.md": "95d635eeab0380e5daff5107fa65831ae66e1fe398ba573d0bfbd2d9c798b10e",
+    "prototypes/foundationintegration/.gitignore": "62a28762116193717c7d0ba95bf5314f29c873cbf04d1770d0ff6cb18816ff5b",
+    "prototypes/foundationintegration/env.sh": "e6f4d7ef6523b979e7843dc9fc20c71f9a2190da85c6aa877dfd3a8ab44e2c13",
+    "prototypes/foundationintegration/verify.py": "53a98489c03f3f045fccfba9ae34448cbf71d8ea542e6dacd99b0bd241fcceef",
+    "prototypes/foundationintegration/main.go": "103ae30c1677b413d5c4e3c2ac288c57c9b13950963eb53e52282c36f0f44c93",
+    "prototypes/foundationintegration/prepare.py": "5a12708a93e35254eb75adb94a40de46d79f9d412fea70327fbee51d652f8e3e",
+    "prototypes/foundationintegration/cmd/lifecyclecheck/pool_darwin.go": "814bd8e33b9f8cc8e0394cbba706f955baba5ec8824b732196d467c8f47bd3d7",
+    "prototypes/foundationintegration/cmd/lifecyclecheck/pool_darwin.m": "73303fc8f148ea030a1b3cc9fcb06584b750173f2c0430a5e80132dd2d6529b8",
+    "prototypes/foundationintegration/cmd/lifecyclecheck/main.go": "655243a52ba8545b046e58fde955af82ff5e50e6da04698305438aeab95865d6",
+    "prototypes/foundationintegration/transport/pump.go": "0182c26e1eb668f99a5822777e5589f466d226e7b7a8892698fef2460d44ed4b",
+    "prototypes/foundationintegration/transport/pump_test.go": "d609d42a0e72eec124bf8b575854f127a30361a9d2c4dc004eb51363ef347348",
+    "prototypes/foundationintegration/macbridge/bridge.h": "3d297574d8c9b26ae70a09909cceaf9eec02bbbf450be55d0d38dd0ade6ad57d",
+    "prototypes/foundationintegration/macbridge/bridge_darwin.go": "db7af32b41c6379879043220ae9032aa5c7a9ad35881d2ce9a0e7b9e4600e848",
+    "prototypes/foundationintegration/macbridge/bridge_darwin.c": "661c8285175040caa228a7c80ff0598fc3f33e795b1a4959b8494b0255eb48c5",
+    "prototypes/foundationintegration/patches/0009-owned-device-queue-release.patch": "0fa0b25ad508cf85ad606eb840dcc9f33d0a1a55640dfd1132100956e5675ce7",
+    "prototypes/foundationintegration/patches/COGENT_LICENSE": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1",
+    "prototypes/foundationintegration/patches/original-hashes.json": "7363d8ae2655204ceb30df98e71ca93acc4a1dfbb5fd761634cadd72af0d4d6c",
+    "prototypes/foundationintegration/patches/0008-native-lifetime.patch": "3fadb62158f9f0d09efa1a6949de540740a3172c51bddc27c64cafb9a94800c5",
+    "prototypes/foundationintegration/semantics/tree.go": "3de09375b995c73aa18a0b593c2ac7fce9132d1f115d86a2e9ccc758d6b30a42",
+    "prototypes/foundationintegration/semantics/tree_test.go": "5b08a7285aa92632df6915c525ff17db32839c202b7ddd1ce03747badd787919",
+    "prototypes/foundationintegration/inputbridge/encoding.go": "f7952aaa3519ffc10c5c8051441968e806c5ca54879eee59bde26008ed5ad2a7",
+    "prototypes/foundationintegration/inputbridge/input.h": "769c18f850bcd9975365d4d4f414716f8f33f258bebd4e2a51dcd444390293a0",
+    "prototypes/foundationintegration/inputbridge/input_darwin.m": "a57649ccd5770d3aaf5debb8c15be997116e8dc94176600e343cd173b85ef7df",
+    "prototypes/foundationintegration/inputbridge/encoding_test.go": "6fea98600b9d634b3193147b3595510ec6e50dbdc0d3359a92d998e23a34cf93",
+    "prototypes/foundationintegration/inputbridge/input_darwin.go": "37227f4dd79ea11f948f99c7b9a194f10ac51c5f7104d7c152992aa4980d551e",
+    "prototypes/fontresources/go.mod": "eba6446886a125d3d0925b8f2faa27afb55aa328c9f8fb59513fd1d9f28c67f8",
+    "prototypes/fontresources/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "prototypes/fontresources/run.sh": "9a732e25899662611ff91d4620e3b3e6e498c6316a2a0faf0ffa4db4479aefdd",
+    "prototypes/fontresources/README.md": "a21e4d9438ae3d3de7b29f1b8ad613961fb15d3b9c285c7e591e44488775537b",
+    "prototypes/fontresources/.gitignore": "0cdb8a7940e4f3342c6bd91d5139950e8e5af35fa2664e79f8887610bc05944c",
+    "prototypes/fontresources/env.sh": "e6f4d7ef6523b979e7843dc9fc20c71f9a2190da85c6aa877dfd3a8ab44e2c13",
+    "prototypes/fontresources/verify.py": "f863306ea4730eeb0bd47173e725cb861c951c023d473f9f671a195004cf07b3",
+    "prototypes/fontresources/prepare.py": "858ec60617525932707fe587b520c4a56fec468b576741f4814e99b416449584",
+    "prototypes/fontresources/cmd/fontcheck/main.go": "5e8035bb2d9443ad214fa192a2a2dce5796e923d872c96f9516f4388ce1f7593",
+    "prototypes/fontresources/patches/original-hashes.json": "ecbe49835924f16f69a9e741fafaaf18a7b1cacbde382706d8bdc19a72f04844",
+    "prototypes/fontresources/patches/0002-hashes.json": "a7c1bccbfffb9b32306b4cd51ada8dc27bf82f871328841b837e494023dd2de0",
+    "prototypes/fontresources/patches/0001-deferred-sbix.patch": "b62243ab4487b2c4a9c0f9e112150493ee5743355d674041712b956510b305f9",
+    "prototypes/fontresources/patches/GO_TEXT_LICENSE": "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca",
+    "prototypes/fontresources/patches/0002-deferred-static-outlines.patch": "8cd046c233dc65eadbb1812d5f94a432be8e8a2d35537d94748ed5db9fd46be1",
+    "distribution/package_macos.py": "de0b642f1118d74937ccbbc25c9661266954c4ebec5590e71c8bd764f45a19f2",
+    "distribution/README.md": "bcac7278e739c9534c047f2c925cc1a81cd57d7edfa16bc33c2533fe745d99a2",
+    "prototypes/foundationcontracts/mailbox/queue.go": "2c660cd917a42ffc2bb1762ad7069ff3ce93c2d98e5389b17c1e7b66e5988eb4"
+  },
+  "evidence_sha256": {
+    "prototypes/foundationintegration/evidence/native-saturated.log": "599000895e6394d15f603cc9bba2a2d36e420ce0907b5fb77281399c1cbc028a",
+    "prototypes/foundationintegration/evidence/lifetime-release-5000.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/foundationintegration/evidence/lifetime-release-1000.json": "59361a4c093db89083a080bc9c09ed5f1272c95967a299548095320bc9431696",
+    "prototypes/foundationintegration/evidence/native-saturated.json": "aabffade6c48f0f611da3a9dbaf3a833fed3ff9ba71ee12937cb6674173f9be6",
+    "prototypes/foundationintegration/evidence/idle-final.log": "f2211d774bca898037dcc06e3fe5b48ecb54964947fdb3056d2c9c9510eaf506",
+    "prototypes/foundationintegration/evidence/prepare.txt": "611a88927dcc236a6420abe11c024cd93884e95cc92730d42faed016e15f622e",
+    "prototypes/foundationintegration/evidence/idle-final.json": "a95f22bee26e1d8ae41b05aca258c5a3f8e096476d0d538d896c820055ea908f",
+    "prototypes/foundationintegration/evidence/saturation.json": "d840c5165774befcbd0f05207f01e751d662967eecdbef3f43ffe5715ec69101",
+    "prototypes/foundationintegration/evidence/tests.txt": "c1a2b11f4ee1fb023fde55f5207808ec6fb0e528cd3e659c1cf6c13b0f4679ae",
+    "prototypes/foundationintegration/evidence/idle-final.json.heap.pprof": "d2f094870b81434f37d80fb261b35c097531f378369300e3cb30a24a343bc43e",
+    "prototypes/foundationintegration/evidence/lifetime-final-1000.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/foundationintegration/evidence/native-saturated.json.heap.pprof": "91d56cc6210a854cc2c07137c929b87e335502577155335b9560a9e3ac1b0da8",
+    "prototypes/foundationintegration/evidence/lifetime-release-1000.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/foundationintegration/evidence/relocated.log": "5c7bac0ac536240e8bc0f6de1f80da1fe52eec84bfb005ac3019c6736ffefd15",
+    "prototypes/foundationintegration/evidence/native.json": "9ed43d56ee016985d3cfccd8c15b3d28c2174621c4d8d82f38f3195521bff8f8",
+    "prototypes/foundationintegration/evidence/relocated.json": "34d2add7a06393ff5d6cc5d9775330287ff9fe85b354af57655291229903f1c3",
+    "prototypes/foundationintegration/evidence/lifetime-1000.json": "232fe6317f6b795b1405fa9b00c693ee1be8f95042744115c291a1e9ce5e3549",
+    "prototypes/foundationintegration/evidence/lifetime-1000.log": "f056313ea59626e4307d2430296efa7f586f8ad2ed5c580c734255350bef31ec",
+    "prototypes/foundationintegration/evidence/native.log": "79d5f916b47c66ecda701667b57e4d47dd53fce838d82fd5f039893202eda166",
+    "prototypes/foundationintegration/evidence/package.json": "6aac52944b904a0a4e8cee225ab09d3d6f939f3a964d82c3bded484f5d279957",
+    "prototypes/foundationintegration/evidence/native-before-font.json": "1c2802f1462903925e314cb17170a36038dd452db29e8163b02bdc6d60d13ce4",
+    "prototypes/foundationintegration/evidence/vet.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/foundationintegration/evidence/relocated.json.heap.pprof": "252de14d60781664d22497e4a5692362e68100878f02e4cd53d0320d94c16656",
+    "prototypes/foundationintegration/evidence/native-lifetime.json.heap.pprof": "4b8814af622c1d70101a5e00852c442bdae96116fe16e31855e03d616cb9bdd8",
+    "prototypes/foundationintegration/evidence/native-lifetime.json": "2114403de012bf5841d99bdf8876b26a77c9a9653621df36a0cc92e2e6b2a293",
+    "prototypes/foundationintegration/evidence/native.json.heap.pprof": "cc8d2aa27104b4d78401f823f8195362cc90b25baed6b9313ed3a57232f9410b",
+    "prototypes/foundationintegration/evidence/lifetime-release-5000.json": "dafda98c89268300204948ec5348f1f17391bb1c6afb23104c7b9ef11423d8dc",
+    "prototypes/foundationintegration/evidence/lifetime-final-1000.json": "bf6ffc5085eebfee100ac1476719e747670e6bbdc842a8b1bf0a8044ace0d2be",
+    "prototypes/foundationintegration/evidence/native-lifetime.log": "a55db86c5e969a8b7533e671fcaf24f6c411fac906ac5919da29f2db22229276",
+    "prototypes/foundationintegration/evidence/native-before-font.log": "e2492ef7236df932c23cfffd69e14d7f5556c0f5d1a222b0d10f3433e775ea15",
+    "prototypes/fontresources/evidence/font-eager-outline.json": "62d32220b6efaf8659cbc127085b818bcf1d03a2ceccbc5d7668c08f68e1b9f3",
+    "prototypes/fontresources/evidence/font-lazy-outline.heap.pprof": "09d2e3674076386a26b3972f3068aae9757c9444e2cf78708a718afbd9fedf9b",
+    "prototypes/fontresources/evidence/font-lazy.json": "3793114cb7758f93151b89d4fc7fdc3283a1466e07d3a058a6f849aa37979416",
+    "prototypes/fontresources/evidence/font-lazy.heap.pprof": "19e67c5d8b15b7ff53694144efbbad05351fc49bea540dba2d6a5dece9307d31",
+    "prototypes/fontresources/evidence/font-lazy.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/fontresources/evidence/prepare.txt": "7b70a536c34a67c79aa83f93dd9671a24f4e9ce3fa136c1c6d7065f182e2ef48",
+    "prototypes/fontresources/evidence/font-eager.json": "7252b6e883e91cf3fb37ed7acd84f6f14d67a7ace99044c3ad4919bdd028b8e1",
+    "prototypes/fontresources/evidence/font-lazy-outline.json": "c3db441e3dc81c3250b205fb3bb9a35f50907c6f69b3da8cac348b623ed06ced",
+    "prototypes/fontresources/evidence/font-eager.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/fontresources/evidence/outline-tests.txt": "58cc5eff32b970d54b755203a21150c06846b692bb099334adb24679800baaa0",
+    "prototypes/fontresources/evidence/font-eager-outline.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/fontresources/evidence/lazy-tests.txt": "04797edaf79c7f32ad28f877f08675adb9f6c56c342725993fbfb51ce0f45b7a",
+    "prototypes/fontresources/evidence/final-font-tests.txt": "35f1e878b80de8b58939f5eda7962c2bf380f0a05568587bc8a4795f3037f937",
+    "prototypes/fontresources/evidence/font-lazy-outline.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prototypes/fontresources/evidence/prepare-final.txt": "7b70a536c34a67c79aa83f93dd9671a24f4e9ce3fa136c1c6d7065f182e2ef48",
+    "prototypes/fontresources/evidence/font-profile-top.txt": "66b13e3336bd2c2216e026763c51f0b92a711778243c21b16b9601add587f40a"
+  },
+  "compile_only": [
+    {
+      "artifact": "vellum-font-windows-final.test.exe",
+      "sha256": "e6074a70627265aaad4f6b6e4b69209f22572d2f4b252755ce35bfacdca20190",
+      "scope": "Windows/Linux amd64 CGO-disabled package cross-compilation only; no native runtime evidence"
+    },
+    {
+      "artifact": "vellum-font-linux-final.test",
+      "sha256": "fd2acb534ab13506ac1cb4c7e130a9413c49c5fc661a0dc9a7a4a7899ec58564",
+      "scope": "Windows/Linux amd64 CGO-disabled package cross-compilation only; no native runtime evidence"
+    },
+    {
+      "artifact": "vellum-transport-windows-final.test.exe",
+      "sha256": "57f1be72b67e94d3a38fa5c561966b3fb279790a71b036e2c6788727805abd97",
+      "scope": "Windows/Linux amd64 CGO-disabled package cross-compilation only; no native runtime evidence"
+    },
+    {
+      "artifact": "vellum-transport-linux-final.test",
+      "sha256": "505b4b1c682096a3a0cdbd116936d8d81664596f2865d9b8f172c58febc0afae",
+      "scope": "Windows/Linux amd64 CGO-disabled package cross-compilation only; no native runtime evidence"
+    }
+  ],
+  "prism_reviews": [
+    {
+      "area_run": "native-final6",
+      "run_id": "0f2e39e510f1e0c9923867aeee64e8ba",
+      "counts": {
+        "low": 0,
+        "medium": 1,
+        "high": 0
+      },
+      "complete": true,
+      "files": 13
+    },
+    {
+      "area_run": "native-final8",
+      "run_id": "d568d2bfb0d9af53980d5f3c26f9d855",
+      "counts": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "complete": true,
+      "files": 1
+    },
+    {
+      "area_run": "lifetime-final3",
+      "run_id": "7ae07e933683c2fda388de90db284174",
+      "counts": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "complete": true,
+      "files": 4
+    },
+    {
+      "area_run": "gpu",
+      "run_id": "f1a62686d21ff0493123680d9b877e68",
+      "counts": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "complete": true,
+      "files": 1
+    },
+    {
+      "area_run": "font-final6",
+      "run_id": "de9fed4ca40ae327c44401745285f5ce",
+      "counts": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "complete": true,
+      "files": 14
+    },
+    {
+      "area_run": "tooling-final5",
+      "run_id": "1a40a9fceb98af4c6f9ce89359e53cb6",
+      "counts": {
+        "low": 0,
+        "medium": 1,
+        "high": 0
+      },
+      "complete": true,
+      "files": 8
+    },
+    {
+      "area_run": "tooling-final8",
+      "run_id": "6cebb9527bf6cd60079a5d92097b5670",
+      "counts": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "complete": true,
+      "files": 2
+    },
+    {
+      "area_run": "docs-final",
+      "run_id": "791dc921b65f9d1785adce4893088079",
+      "counts": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "complete": true,
+      "files": 3
+    }
+  ],
+  "settings_changed": false,
+  "G1_passed": false,
+  "native_binary_sha256": "b1bf18f63fbd2e36470108b17aded7fe87d028a07e43df3ecaec24386262b071"
+}

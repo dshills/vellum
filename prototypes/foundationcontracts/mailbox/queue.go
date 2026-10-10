@@ -256,3 +256,12 @@ func (q *Queue) Stats() Stats {
 	}
 	return Stats{q.count, q.bytes, flight, q.closed}
 }
+
+// Ready reports whether the FIFO head can be delivered without waiting. It does
+// not acquire an in-flight receipt or release any payload credit.
+func (q *Queue) Ready() bool {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	q.skipCanceled()
+	return q.count > 0 && q.slots[q.head].state == committed
+}

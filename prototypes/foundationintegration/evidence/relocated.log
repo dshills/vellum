@@ -1,0 +1,175 @@
+native_attach before_show=true
+foundation shown callback 671.6 ms; adapter=true
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 2,
+  "canvas_repaints_proxy": 2,
+  "commits": 0,
+  "editing_state": {
+    "Text": "10k",
+    "Cursor": 0,
+    "Anchor": 0,
+    "Focus": 0,
+    "Caret": {
+      "Min": {
+        "X": 16,
+        "Y": 117
+      },
+      "Max": {
+        "X": 17,
+        "Y": 140
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "10k",
+  "go_heap_alloc_bytes_after_forced_gc": 49389992,
+  "go_heap_alloc_bytes_before_gc": 51350776,
+  "go_heap_inuse_bytes": 54976512,
+  "goroutines": 4,
+  "idle_samples": null,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "input_environment_scope": "captured at first show; each recorded native probe reports its current source",
+  "input_history_bytes": 0,
+  "input_history_dropped": 0,
+  "input_probes": null,
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": null,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "single-line logical selection and current IME caret only; arbitrary text-range geometry, bidi and multiline ranges absent",
+    "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+  "native_actions": 0,
+  "native_input_ack": 0,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 27,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 202457088,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 1,
+  "shown_callback_ms": 671.56,
+  "spell_checker_initialized": false,
+  "status": "",
+  "text_samples": null,
+  "transport": {
+    "Queue": {
+      "Outstanding": 1,
+      "PayloadBytes": 360,
+      "InFlight": 1,
+      "Closed": false
+    },
+    "Refused": 0,
+    "Wakes": 1,
+    "LatestBytes": 0,
+    "Closed": false
+  },
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+{
+  "accessibility_enabled": true,
+  "adapter_action_callbacks": 0,
+  "adapter_active": true,
+  "adapter_snapshot_requests": 2,
+  "canvas_repaints_proxy": 2,
+  "commits": 0,
+  "editing_state": {
+    "Text": "10k",
+    "Cursor": 0,
+    "Anchor": 0,
+    "Focus": 0,
+    "Caret": {
+      "Min": {
+        "X": 16,
+        "Y": 117
+      },
+      "Max": {
+        "X": 17,
+        "Y": 140
+      }
+    }
+  },
+  "experimental_toolkit_patch": true,
+  "field_text": "10k",
+  "go_heap_alloc_bytes_after_forced_gc": 49409896,
+  "go_heap_alloc_bytes_before_gc": 50799832,
+  "go_heap_inuse_bytes": 54968320,
+  "goroutines": 5,
+  "idle_samples": null,
+  "input_environment": {
+    "current": "com.apple.keylayout.US",
+    "enabled": [
+      {
+        "id": "com.apple.keylayout.US",
+        "name": "U.S."
+      }
+    ]
+  },
+  "input_environment_scope": "captured at first show; each recorded native probe reports its current source",
+  "input_history_bytes": 0,
+  "input_history_dropped": 0,
+  "input_probes": null,
+  "input_source": "com.apple.keylayout.US",
+  "input_updates": null,
+  "limitations": [
+    "small fixture, not full performance workload",
+    "single-line logical selection and current IME caret only; arbitrary text-range geometry, bidi and multiline ranges absent",
+    "candidate-window placement and full screen-reader workflows require separate live evidence; deterministic protocol calls are not live IME tests",
+    "Windows/Linux untested"
+  ],
+  "multiline_text": "Latin: office AV\nArabic: العربية 123\nHebrew: שלום 456\nIndic: नमस्ते\nCJK: 日本語 中文\nCombining: é å\nEmoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+  "native_actions": 0,
+  "native_input_ack": 0,
+  "native_input_enabled": true,
+  "on_demand": true,
+  "paint_scheduler_wakes_total": 28,
+  "platform": "darwin/arm64",
+  "presentation_timestamp": false,
+  "rejected_actions": 0,
+  "resident_bytes_after_gc": 203554816,
+  "resize_content_sizes_pixels": null,
+  "rotations": 0,
+  "selected_id": 17,
+  "semantic_node_count": 29,
+  "semantic_updates": 1,
+  "shown_callback_ms": 671.56,
+  "spell_checker_initialized": false,
+  "status": "",
+  "text_samples": null,
+  "transport": {
+    "Queue": {
+      "Outstanding": 0,
+      "PayloadBytes": 0,
+      "InFlight": 0,
+      "Closed": true
+    },
+    "Refused": 0,
+    "Wakes": 2,
+    "LatestBytes": 0,
+    "Closed": true
+  },
+  "value": "10k",
+  "virtual_row_total": 100000,
+  "virtual_rows_materialized": 8
+}
+native_detach before_gpu_view_release=true

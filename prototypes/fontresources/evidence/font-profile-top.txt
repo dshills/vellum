@@ -1,0 +1,18 @@
+File: fontcheck
+Type: inuse_space
+Time: 2026-10-09 19:42:36 CDT
+Showing nodes accounting for 69.94MB, 95.23% of 73.45MB total
+Showing top 12 nodes out of 102
+      flat  flat%   sum%        cum   cum%
+   28.21MB 38.41% 38.41%    28.21MB 38.41%  github.com/go-text/typesetting/font/opentype.(*Loader).findTableBuffer
+   17.01MB 23.16% 61.57%    17.01MB 23.16%  github.com/go-text/typesetting/font/opentype/tables.(*SimpleGlyph).parsePoints
+    8.65MB 11.77% 73.34%     8.65MB 11.77%  github.com/go-text/typesetting/font.newMorxSubtable
+    4.01MB  5.45% 78.80%     4.01MB  5.45%  runtime.mallocgc
+       4MB  5.45% 84.24%    22.01MB 29.97%  github.com/go-text/typesetting/font/opentype/tables.(*Glyph).parseData
+    3.20MB  4.36% 88.60%    25.21MB 34.33%  github.com/go-text/typesetting/font/opentype/tables.ParseGlyf
+    1.85MB  2.51% 91.11%     1.85MB  2.51%  github.com/go-text/typesetting/font.NewFace
+    0.77MB  1.05% 92.16%     0.77MB  1.05%  github.com/go-text/typesetting/font/cff.parseIndexContent
+    0.60MB  0.82% 92.99%     0.60MB  0.82%  github.com/go-text/typesetting/font/opentype/tables.ParseHmtx
+    0.57MB  0.78% 93.77%     0.57MB  0.78%  github.com/go-text/typesetting/fontscan.(*FontMap).appendFootprints
+    0.56MB  0.76% 94.52%     0.56MB  0.76%  github.com/go-text/typesetting/font/opentype/tables.ParseUint16s
+    0.52MB   0.7% 95.23%     0.52MB   0.7%  github.com/go-text/typesetting/fontscan.(*footprintScanner).consume

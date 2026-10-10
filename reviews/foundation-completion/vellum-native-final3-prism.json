@@ -1,0 +1,148 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a737c1f3c84b0c71a3d12babc94d16ee",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "4a6230e05d707366",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Allow input methods to handle Control shortcuts",
+      "message": "Every Control-modified key commits the current composition before the input context can interpret it. Input methods use Control shortcuts themselves—for example, Japanese input uses Control-J and Control-K for script conversion. Those shortcuts will prematurely commit the preedit and reach the application rather than performing conversion.",
+      "suggestion": "Let the input context handle composition-related modified keys first, and only commit and forward an application shortcut if the input context does not consume it. Do not classify every Control-modified event as an application shortcut.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 97,
+            "end": 98
+          }
+        }
+      ],
+      "tags": [
+        "ime",
+        "keyboard"
+      ],
+      "evidence": " if(event.modifierFlags \u0026 (NSEventModifierFlagCommand|NSEventModifierFlagControl)){\n  if(composing(s)){if(!finish(s,NO)){s-\u003ekeyEvent=nil;return;}[[self inputContext] discardMarkedText];}forwardKey(self);",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "94dbc1a4c31a5d56",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Do not recreate an invalidated composition baseline",
+      "message": "After an external publication supplies marked text or invalidates the restoration baseline, the next setMarkedText call recreates that baseline from an already-composing document. Escape then restores partially composed text and unmarks it instead of refusing cancellation, contrary to the explicit baseline policy in finish and vellum_input_update.",
+      "suggestion": "Capture a restoration baseline only when starting a new composition from an unmarked document. Keep the baseline unavailable throughout an externally supplied or externally modified composition.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 118,
+            "end": 118
+          }
+        }
+      ],
+      "tags": [
+        "ime",
+        "composition"
+      ],
+      "evidence": " if(!s-\u003ebefore){s-\u003ebefore=[s-\u003etext copy];s-\u003ebeforeSelected=s-\u003eselected;s-\u003ebeforeCaretOffset=s-\u003ecaretOffset;}",
+      "fix": {
+        "before": " if(!s-\u003ebefore){s-\u003ebefore=[s-\u003etext copy];s-\u003ebeforeSelected=s-\u003eselected;s-\u003ebeforeCaretOffset=s-\u003ecaretOffset;}",
+        "after": " if(!s-\u003ebefore \u0026\u0026 s-\u003emarked.location==NSNotFound){s-\u003ebefore=[s-\u003etext copy];s-\u003ebeforeSelected=s-\u003eselected;s-\u003ebeforeCaretOffset=s-\u003ecaretOffset;}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "e4ea157125ae2923",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Persist idle measurements in the experiment report",
+      "message": "The idle measurement is printed but never delivered to the existing \"idle\" message handler. Consequently, f.idle remains empty and saved reports contain no idle_samples even when --idle-sample is enabled.",
+      "suggestion": "Send the completed sample through the pump so the UI-thread handler appends it to f.idle before the report is saved; do not append directly from the timer goroutine.",
+      "confidence": 1,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 269,
+            "end": 270
+          }
+        }
+      ],
+      "tags": [
+        "reporting",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\t\t\tdata, _ := json.Marshal(s)\n\t\t\t\t\tfmt.Printf(\"idle_sample %s\\n\", data)",
+      "fix": {
+        "before": "\t\t\t\t\tdata, _ := json.Marshal(s)\n\t\t\t\t\tfmt.Printf(\"idle_sample %s\\n\", data)",
+        "after": "\t\t\t\t\tdata, _ := json.Marshal(s)\n\t\t\t\t\tfmt.Printf(\"idle_sample %s\\n\", data)\n\t\t\t\t\tf.send(message{Kind: \"idle\", Idle: s})"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 65698,
+    "totalMs": 39701
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 88648,
+    "chunks": 5,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 3,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 18130,
+        "output": 3146,
+        "reasoning": 2225,
+        "cachedInput": 1164
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

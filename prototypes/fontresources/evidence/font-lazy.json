@@ -1,0 +1,588 @@
+{
+  "samples": [
+    {
+      "after_release": {
+        "HeapAlloc": 2034200,
+        "HeapInuse": 3760128,
+        "TotalAlloc": 145830584,
+        "Goroutines": 1
+      },
+      "before": {
+        "HeapAlloc": 467320,
+        "HeapInuse": 1228800,
+        "TotalAlloc": 506496,
+        "Goroutines": 1
+      },
+      "coverage": [
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 14,
+          "text": "Latin: office AV",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 19,
+          "text": "Arabic: العربية 123",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 16,
+          "text": "Hebrew: שלום 456",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/Library/Fonts/Arial Unicode.ttf"
+          ],
+          "glyph_count": 12,
+          "text": "Indic: नमस्ते",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc"
+          ],
+          "glyph_count": 11,
+          "text": "CJK: 日本語 中文",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf"
+          ],
+          "glyph_count": 15,
+          "text": "Combining: é å",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": [
+            {
+              "encoded_bytes": 1915,
+              "format": "png",
+              "glyph": 1438,
+              "height": 32,
+              "pixel_sha256": "4412f60bc4d01c4e436bfd86e45b4a4eef1b660bf8fc6051b059ace27283e8f4",
+              "width": 32
+            },
+            {
+              "encoded_bytes": 1917,
+              "format": "png",
+              "glyph": 3237,
+              "height": 32,
+              "pixel_sha256": "3c95f8fbe331d8a84813fe2f636e882b051cfdb988f0fe66d3b7f9b3838d9511",
+              "width": 32
+            },
+            {
+              "encoded_bytes": 1236,
+              "format": "png",
+              "glyph": 607,
+              "height": 32,
+              "pixel_sha256": "065d6ff7113510feb782fa3265102d54c65c5c4309b4a1b689f93c5c59db6b00",
+              "width": 32
+            }
+          ],
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Apple Color Emoji.ttc"
+          ],
+          "glyph_count": 12,
+          "text": "Emoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+          "zero_glyph_ids": 0
+        }
+      ],
+      "cycle": 1,
+      "initialized": {
+        "HeapAlloc": 7233664,
+        "HeapInuse": 8519680,
+        "TotalAlloc": 67704768,
+        "Goroutines": 1
+      },
+      "live": {
+        "HeapAlloc": 76786480,
+        "HeapInuse": 79339520,
+        "TotalAlloc": 145830584,
+        "Goroutines": 1
+      },
+      "mixed_rune_bounds": [
+        [
+          -1.265625,
+          0.3984375,
+          9.671875,
+          22.398438
+        ],
+        [
+          8.328125,
+          0.3984375,
+          19.921875,
+          22.398438
+        ],
+        [
+          17.6875,
+          0.3984375,
+          27.953125,
+          22.398438
+        ],
+        [
+          24.5,
+          0.3984375,
+          32.65625,
+          22.398438
+        ],
+        [
+          49,
+          0.3984375,
+          60.765625,
+          22.398438
+        ],
+        [
+          39.890625,
+          0.3984375,
+          51.828125,
+          22.398438
+        ],
+        [
+          33.3125,
+          0.3984375,
+          42.9375,
+          22.398438
+        ],
+        [
+          28.65625,
+          0.3984375,
+          37.109375,
+          22.398438
+        ],
+        [
+          58.609375,
+          0.3984375,
+          66.859375,
+          22.398438
+        ],
+        [
+          67.109375,
+          0.3984375,
+          78.65625,
+          22.398438
+        ],
+        [
+          76.21875,
+          0.3984375,
+          87.734375,
+          22.398438
+        ]
+      ],
+      "mixed_text": "abc אבג 123"
+    },
+    {
+      "after_release": {
+        "HeapAlloc": 2045000,
+        "HeapInuse": 3866624,
+        "TotalAlloc": 230722344,
+        "Goroutines": 1
+      },
+      "before": {
+        "HeapAlloc": 2034720,
+        "HeapInuse": 3760128,
+        "TotalAlloc": 145831104,
+        "Goroutines": 1
+      },
+      "coverage": [
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 14,
+          "text": "Latin: office AV",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 19,
+          "text": "Arabic: العربية 123",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 16,
+          "text": "Hebrew: שלום 456",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/Library/Fonts/Arial Unicode.ttf"
+          ],
+          "glyph_count": 12,
+          "text": "Indic: नमस्ते",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc"
+          ],
+          "glyph_count": 11,
+          "text": "CJK: 日本語 中文",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf"
+          ],
+          "glyph_count": 15,
+          "text": "Combining: é å",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": [
+            {
+              "encoded_bytes": 1915,
+              "format": "png",
+              "glyph": 1438,
+              "height": 32,
+              "pixel_sha256": "4412f60bc4d01c4e436bfd86e45b4a4eef1b660bf8fc6051b059ace27283e8f4",
+              "width": 32
+            },
+            {
+              "encoded_bytes": 1917,
+              "format": "png",
+              "glyph": 3237,
+              "height": 32,
+              "pixel_sha256": "3c95f8fbe331d8a84813fe2f636e882b051cfdb988f0fe66d3b7f9b3838d9511",
+              "width": 32
+            },
+            {
+              "encoded_bytes": 1236,
+              "format": "png",
+              "glyph": 607,
+              "height": 32,
+              "pixel_sha256": "065d6ff7113510feb782fa3265102d54c65c5c4309b4a1b689f93c5c59db6b00",
+              "width": 32
+            }
+          ],
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Apple Color Emoji.ttc"
+          ],
+          "glyph_count": 12,
+          "text": "Emoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+          "zero_glyph_ids": 0
+        }
+      ],
+      "cycle": 2,
+      "initialized": {
+        "HeapAlloc": 7252320,
+        "HeapInuse": 8593408,
+        "TotalAlloc": 152601768,
+        "Goroutines": 1
+      },
+      "live": {
+        "HeapAlloc": 76797360,
+        "HeapInuse": 79314944,
+        "TotalAlloc": 230722344,
+        "Goroutines": 1
+      },
+      "mixed_rune_bounds": [
+        [
+          -1.265625,
+          0.3984375,
+          9.671875,
+          22.398438
+        ],
+        [
+          8.328125,
+          0.3984375,
+          19.921875,
+          22.398438
+        ],
+        [
+          17.6875,
+          0.3984375,
+          27.953125,
+          22.398438
+        ],
+        [
+          24.5,
+          0.3984375,
+          32.65625,
+          22.398438
+        ],
+        [
+          49,
+          0.3984375,
+          60.765625,
+          22.398438
+        ],
+        [
+          39.890625,
+          0.3984375,
+          51.828125,
+          22.398438
+        ],
+        [
+          33.3125,
+          0.3984375,
+          42.9375,
+          22.398438
+        ],
+        [
+          28.65625,
+          0.3984375,
+          37.109375,
+          22.398438
+        ],
+        [
+          58.609375,
+          0.3984375,
+          66.859375,
+          22.398438
+        ],
+        [
+          67.109375,
+          0.3984375,
+          78.65625,
+          22.398438
+        ],
+        [
+          76.21875,
+          0.3984375,
+          87.734375,
+          22.398438
+        ]
+      ],
+      "mixed_text": "abc אבג 123"
+    },
+    {
+      "after_release": {
+        "HeapAlloc": 2055560,
+        "HeapInuse": 3964928,
+        "TotalAlloc": 316740736,
+        "Goroutines": 1
+      },
+      "before": {
+        "HeapAlloc": 2045520,
+        "HeapInuse": 3866624,
+        "TotalAlloc": 230722872,
+        "Goroutines": 1
+      },
+      "coverage": [
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 14,
+          "text": "Latin: office AV",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 19,
+          "text": "Arabic: العربية 123",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            "noto/NotoSans-Regular.ttf"
+          ],
+          "glyph_count": 16,
+          "text": "Hebrew: שלום 456",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/Library/Fonts/Arial Unicode.ttf"
+          ],
+          "glyph_count": 12,
+          "text": "Indic: नमस्ते",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc"
+          ],
+          "glyph_count": 11,
+          "text": "CJK: 日本語 中文",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": null,
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf"
+          ],
+          "glyph_count": 15,
+          "text": "Combining: é å",
+          "zero_glyph_ids": 0
+        },
+        {
+          "decoded_bitmaps": [
+            {
+              "encoded_bytes": 1915,
+              "format": "png",
+              "glyph": 1438,
+              "height": 32,
+              "pixel_sha256": "4412f60bc4d01c4e436bfd86e45b4a4eef1b660bf8fc6051b059ace27283e8f4",
+              "width": 32
+            },
+            {
+              "encoded_bytes": 1917,
+              "format": "png",
+              "glyph": 3237,
+              "height": 32,
+              "pixel_sha256": "3c95f8fbe331d8a84813fe2f636e882b051cfdb988f0fe66d3b7f9b3838d9511",
+              "width": 32
+            },
+            {
+              "encoded_bytes": 1236,
+              "format": "png",
+              "glyph": 607,
+              "height": 32,
+              "pixel_sha256": "065d6ff7113510feb782fa3265102d54c65c5c4309b4a1b689f93c5c59db6b00",
+              "width": 32
+            }
+          ],
+          "font_locations": [
+            "noto/NotoSans-Regular.ttf",
+            "/System/Library/Fonts/Apple Color Emoji.ttc"
+          ],
+          "glyph_count": 12,
+          "text": "Emoji: 👩‍💻 👨‍👩‍👧‍👦 🇺🇳",
+          "zero_glyph_ids": 0
+        }
+      ],
+      "cycle": 3,
+      "initialized": {
+        "HeapAlloc": 7262864,
+        "HeapInuse": 8634368,
+        "TotalAlloc": 237493296,
+        "Goroutines": 1
+      },
+      "live": {
+        "HeapAlloc": 76808096,
+        "HeapInuse": 79413248,
+        "TotalAlloc": 315613824,
+        "Goroutines": 1
+      },
+      "mixed_rune_bounds": [
+        [
+          -1.265625,
+          0.3984375,
+          9.671875,
+          22.398438
+        ],
+        [
+          8.328125,
+          0.3984375,
+          19.921875,
+          22.398438
+        ],
+        [
+          17.6875,
+          0.3984375,
+          27.953125,
+          22.398438
+        ],
+        [
+          24.5,
+          0.3984375,
+          32.65625,
+          22.398438
+        ],
+        [
+          49,
+          0.3984375,
+          60.765625,
+          22.398438
+        ],
+        [
+          39.890625,
+          0.3984375,
+          51.828125,
+          22.398438
+        ],
+        [
+          33.3125,
+          0.3984375,
+          42.9375,
+          22.398438
+        ],
+        [
+          28.65625,
+          0.3984375,
+          37.109375,
+          22.398438
+        ],
+        [
+          58.609375,
+          0.3984375,
+          66.859375,
+          22.398438
+        ],
+        [
+          67.109375,
+          0.3984375,
+          78.65625,
+          22.398438
+        ],
+        [
+          76.21875,
+          0.3984375,
+          87.734375,
+          22.398438
+        ]
+      ],
+      "mixed_text": "abc אבג 123"
+    }
+  ],
+  "scope": "isolated shaper diagnostics; glyph IDs do not prove visual correctness; not full app memory",
+  "system_only": false
+}

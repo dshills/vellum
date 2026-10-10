@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "0f2e39e510f1e0c9923867aeee64e8ba",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "424dbee62ba7feb6",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Bound retained full-text input history",
+      "message": "Every accepted edit retains its complete text snapshot for the lifetime of the fixture. Typing or repeatedly editing a large field accumulates memory proportional to the sum of all document versions, not the current document size. With automatic exit disabled, this history grows indefinitely; serializing it in save() also requires another large allocation and can stall shutdown.",
+      "suggestion": "Bound input history by a total byte budget, evicting older snapshots and reporting the number dropped, or stream updates to a report file rather than retaining every full-text version in memory.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 753,
+            "end": 753
+          }
+        }
+      ],
+      "tags": [
+        "memory",
+        "unbounded-history",
+        "location-corrected"
+      ],
+      "evidence": "\t\tf.inputHistory = append(f.inputHistory, u)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 30849,
+    "totalMs": 30930
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 13,
+    "bytes": 88788,
+    "chunks": 5,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 4,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 11418,
+        "output": 1429,
+        "reasoning": 1210,
+        "cachedInput": 1164
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

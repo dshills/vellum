@@ -1,0 +1,199 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3376f6aa5d7f3e3bf9e94af4749cc529",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 5,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "beea47fb7d096174",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Preserve selection direction when publishing cancellation",
+      "message": "Cancellation restores the original focus locally through beforeCaretOffset, but publishes only the sorted NSRange endpoints through admit. For a backward selection, the cancellation event reports the lower endpoint first and the upper endpoint second, reversing the original anchor/focus. When that event is published back through vellum_input_update, focus becomes the upper endpoint and the restored insertion position changes.",
+      "suggestion": "Preserve the original anchor and focus in the composition baseline and publish those endpoints on cancellation, rather than deriving both endpoints solely from beforeSelected. Ensure a backward-selection cancellation round trip preserves caretOffset.",
+      "confidence": 0.88,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 70,
+            "end": 73
+          }
+        }
+      ],
+      "tags": [
+        "selection",
+        "composition"
+      ],
+      "evidence": " NSString *next=cancel ? s-\u003ebefore : s-\u003etext;\n NSRange selection=cancel ? s-\u003ebeforeSelected : s-\u003eselected;\n if(!admit(s,cancel ? \"cancel\" : \"unmark\",next,selection,NSMakeRange(NSNotFound,0)))return NO;\n if(cancel){[s-\u003etext setString:next];s-\u003eselected=selection;s-\u003ecaretOffset=s-\u003ebeforeCaretOffset;}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "3138cb8ec8fd13d1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Do not apply stale snapshot caret geometry",
+      "message": "A publication acknowledging an older text snapshot still overwrites the caret rectangle before being rejected. After native input advances the sequence and caretOffset, a delayed application publication can therefore pair the new character offset with geometry for the old insertion point. firstRectForCharacterRange then reports an inconsistent location, moving the IME candidate window to the wrong position.",
+      "suggestion": "Keep focus-state handling separate, but only accept snapshot-derived caret geometry when the acknowledged sequence is current. Use vellum_input_caret for geometry-only updates that must apply independently of text acknowledgments.",
+      "confidence": 0.88,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 214,
+            "end": 216
+          }
+        }
+      ],
+      "tags": [
+        "ime",
+        "geometry",
+        "sequencing"
+      ],
+      "evidence": " s-\u003eactive=active;s-\u003ecaret=NSMakeRect(x,y,width,height);\n [[s-\u003eview inputContext] invalidateCharacterCoordinates];\n if(acknowledged\u003cs-\u003esequence)return;",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "4031d3d62d26500c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Discard native composition when an external marked range is cleared",
+      "message": "The restoration baseline is not a reliable indicator of an ongoing composition. An external edit can clear s-\u003ebefore while retaining s-\u003emarked. A subsequent publication that removes the marked range then skips discardMarkedText, leaving the input method composing against text that the bridge considers unmarked. Its next update can replace the wrong selection or reinsert canceled composition text.",
+      "suggestion": "Determine whether to discard the input context's composition from the previous marked range as well as the restoration baseline, before overwriting s-\u003emarked.",
+      "confidence": 0.95,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 222,
+            "end": 222
+          }
+        }
+      ],
+      "tags": [
+        "ime",
+        "composition"
+      ],
+      "evidence": " if(mark.location==NSNotFound){BOOL discard=s-\u003ebefore!=nil;s-\u003emarked=mark;[s-\u003ebefore release];s-\u003ebefore=nil;if(discard)[[s-\u003eview inputContext] discardMarkedText];}",
+      "fix": {
+        "before": " if(mark.location==NSNotFound){BOOL discard=s-\u003ebefore!=nil;s-\u003emarked=mark;[s-\u003ebefore release];s-\u003ebefore=nil;if(discard)[[s-\u003eview inputContext] discardMarkedText];}",
+        "after": " if(mark.location==NSNotFound){BOOL discard=s-\u003emarked.location!=NSNotFound || s-\u003ebefore!=nil;s-\u003emarked=mark;[s-\u003ebefore release];s-\u003ebefore=nil;if(discard)[[s-\u003eview inputContext] discardMarkedText];}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "1744d3fae98fdfa3",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Persist idle measurements in the experiment report",
+      "message": "The idle sample is only printed: it is never added to f.idle, and save() does not include idle samples in the report. Consequently, running with --idle-sample and --report produces a report without the measured CPU interval or repaint/wake deltas, losing the experiment's idle-performance evidence.",
+      "suggestion": "Send the completed sample through the pump, append it to f.idle on the UI thread, and include f.idle in the saved report. Avoid appending directly from the timer callback, which would race with report generation.",
+      "confidence": 0.95,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 264,
+            "end": 266
+          }
+        }
+      ],
+      "tags": [
+        "reporting",
+        "measurement"
+      ],
+      "evidence": "\t\t\t\t\ts.CPUPercentOneCore = s.CPUSeconds / s.Seconds * 100\n\t\t\t\t\tdata, _ := json.Marshal(s)\n\t\t\t\t\tfmt.Printf(\"idle_sample %s\\n\", data)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "69142e0016699c38",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Saturation probe crashes when output directory is absent",
+      "message": "Running with --saturation from a working directory without an evidence directory panics because os.WriteFile does not create parent directories. This aborts the experiment before its remaining probes and normal report generation.",
+      "suggestion": "Create the output directory before writing and report output failures without panicking, or use a configurable output path.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 785,
+            "end": 787
+          }
+        }
+      ],
+      "tags": [
+        "experiment",
+        "filesystem"
+      ],
+      "evidence": "\t\t\tif err := os.WriteFile(\"evidence/saturation.json\", append(data, '\\n'), 0644); err != nil {\n\t\t\t\tpanic(err)\n\t\t\t}",
+      "fix": {
+        "before": "\t\t\tif err := os.WriteFile(\"evidence/saturation.json\", append(data, '\\n'), 0644); err != nil {\n\t\t\t\tpanic(err)\n\t\t\t}",
+        "after": "\t\t\tif err := os.MkdirAll(\"evidence\", 0755); err != nil {\n\t\t\t\tfmt.Println(\"saturation report:\", err)\n\t\t\t\treturn\n\t\t\t}\n\t\t\tif err := os.WriteFile(\"evidence/saturation.json\", append(data, '\\n'), 0644); err != nil {\n\t\t\t\tfmt.Println(\"saturation report:\", err)\n\t\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 127730,
+    "totalMs": 69288
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 88086,
+    "chunks": 5,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 3,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 17987,
+        "output": 6704,
+        "reasoning": 5227,
+        "cachedInput": 1164
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

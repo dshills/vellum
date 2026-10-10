@@ -1,0 +1,94 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b78719a4bdf2e97cfc1dcbd2bbb77867",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "b303f92f92d80d2d",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Move keyboard focus when replacing a focused row",
+      "message": "When pagination removes a focused row, this changes only the accessibility focus ID. It does not focus the “Next 8 rows” button in the toolkit, so the published accessibility focus can disagree with the actual keyboard focus.",
+      "suggestion": "Move actual widget focus to the pagination button with SetFocus, letting the registered OnFocus callback update f.focus.",
+      "confidence": 0.92,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 569,
+            "end": 571
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "focus"
+      ],
+      "evidence": "\tif f.focus \u003e= 1000 {\n\t\tf.focus = 5\n\t}",
+      "fix": {
+        "before": "\tif f.focus \u003e= 1000 {\n\t\tf.focus = 5\n\t}",
+        "after": "\tif f.focus \u003e= 1000 {\n\t\tf.widgets[5].AsWidget().SetFocus()\n\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 84769,
+    "totalMs": 55543
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 13,
+    "bytes": 88765,
+    "chunks": 5,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 2,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 22464,
+        "output": 3987,
+        "reasoning": 3684,
+        "cachedInput": 2455
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

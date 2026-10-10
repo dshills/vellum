@@ -1,0 +1,120 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "5ee587eacaf4d7ea31d010fa6c4e0041",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f7a70cf98a2b3c58",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Reject dangling output symlinks before resolving them",
+      "message": "Resolving the output before checking its existence follows an existing dangling symlink. If its target is a nonexistent .app path, validation passes and the bundle is published at the symlink target rather than rejecting the existing output path.",
+      "suggestion": "Resolve only the output's parent directory and reject both existing paths and dangling symlinks before packaging.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "distribution/package_macos.py",
+          "lines": {
+            "start": 10,
+            "end": 12
+          }
+        }
+      ],
+      "tags": [
+        "filesystem"
+      ],
+      "evidence": " binary=args.binary.resolve();library=args.library.resolve();output=args.output.resolve()\n if not binary.is_file() or not library.is_file():raise ValueError('binary and native library are required')\n if output.suffix!='.app' or output.exists():raise ValueError('output must be a new .app path')",
+      "fix": {
+        "before": " binary=args.binary.resolve();library=args.library.resolve();output=args.output.resolve()\n if not binary.is_file() or not library.is_file():raise ValueError('binary and native library are required')\n if output.suffix!='.app' or output.exists():raise ValueError('output must be a new .app path')",
+        "after": " binary=args.binary.resolve();library=args.library.resolve();output=args.output.parent.resolve()/args.output.name\n if not binary.is_file() or not library.is_file():raise ValueError('binary and native library are required')\n if output.suffix!='.app' or output.exists() or output.is_symlink():raise ValueError('output must be a new .app path')"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "52a1e2e1513e6406",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Prevent the manifest from overwriting input artifacts",
+      "message": "The manifest destination is only checked against the bundle directory. Supplying the binary or library path as --manifest therefore succeeds and replaces that input artifact with JSON, destroying the previously built executable or dylib. Resolving the manifest path also makes this possible through a symlink to an input.",
+      "suggestion": "Reject manifest destinations that resolve to either input artifact before doing any packaging work. Consider requiring a new manifest path as well if overwriting existing manifests is not intended.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "distribution/package_macos.py",
+          "lines": {
+            "start": 62,
+            "end": 62
+          }
+        }
+      ],
+      "tags": [
+        "data-loss"
+      ],
+      "evidence": "   try:pending_manifest.replace(manifest_path)",
+      "fix": {
+        "before": " if args.manifest.resolve().is_relative_to(output):raise ValueError('manifest must be outside the sealed bundle')",
+        "after": " if args.manifest.resolve().is_relative_to(output):raise ValueError('manifest must be outside the sealed bundle')\n if args.manifest.resolve() in (binary,library):raise ValueError('manifest must not overwrite an input artifact')"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 20209,
+    "totalMs": 20228
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 2,
+    "bytes": 7397,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 2946,
+        "output": 1098,
+        "reasoning": 500
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

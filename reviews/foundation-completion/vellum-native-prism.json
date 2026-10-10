@@ -1,0 +1,246 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ff51bc43319b3765da3f5ee68005898c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 7,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "42f20727c454af77",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Finish externally published composition without a snapshot",
+      "message": "finish treats the absence of a cancellation snapshot as the absence of composition. However, vellum_input_update can install a valid marked range without creating s-\u003ebefore. For that state, unmarkText and deactivation report success without clearing or emitting the marked range, so later insertions can continue replacing text that was supposedly committed.",
+      "suggestion": "Determine whether composition exists from the marked state as well as the snapshot. Allow unmarking externally published marked text to preflight, clear the marked range, and emit a commit even without s-\u003ebefore; explicitly define cancellation behavior when no restoration snapshot exists.",
+      "confidence": 0.93,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 65,
+            "end": 65
+          }
+        }
+      ],
+      "tags": [
+        "ime",
+        "composition"
+      ],
+      "evidence": " if(!s-\u003ebefore)return YES;",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "6752abcfa1d68b53",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Guard optional superclass text-input methods",
+      "message": "When the bridge is inactive, closed, or forwarding a key, this sends selectedRange directly to the original superclass. Attachment does not require that superclass to implement NSTextInputClient, and NSView itself does not provide all of these methods. Queries on such a view can therefore raise an unrecognized-selector exception. The other unconditional NSTextInputClient superclass calls have the same problem.",
+      "suggestion": "Check whether the original superclass implements each selector before forwarding. Provide safe inactive defaults, such as an NSNotFound range, nil substring, and no-op text mutations, when it does not.",
+      "confidence": 0.93,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 139,
+            "end": 139
+          }
+        }
+      ],
+      "tags": [
+        "appkit",
+        "runtime-forwarding"
+      ],
+      "evidence": "- (NSRange)selectedRange {VellumInputState *s=state(self);if(usable(s))return s-\u003eselected;struct objc_super p=parent(self);return ((NSRange(*)(struct objc_super *,SEL))objc_msgSendSuper)(\u0026p,_cmd);}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "4e91af1bbc81cafd",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Validate the complete publication before replacing text",
+      "message": "The new text and selection are installed before the marked range is validated. If markedEnd precedes markedStart, or the marked range exceeds the new text or splits a surrogate pair, the previous marked range remains attached to the new text. It can then be out of bounds, causing subsequent default insertText/setMarkedText calls to be rejected and leaving composition stuck.",
+      "suggestion": "Construct and validate both the selected and marked ranges against value before mutating any text, selection, or composition state. Reject an invalid publication atomically, including mismatched -1 marked-range endpoints.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 203,
+            "end": 205
+          }
+        }
+      ],
+      "tags": [
+        "ime",
+        "state-consistency"
+      ],
+      "evidence": " if(value \u0026\u0026 validRange(value,selected)){[s-\u003etext setString:value];s-\u003eselected=selected;s-\u003ecaretOffset=focus;\n  if(markedStart\u003c0){BOOL discard=s-\u003ebefore!=nil;s-\u003emarked=NSMakeRange(NSNotFound,0);[s-\u003ebefore release];s-\u003ebefore=nil;if(discard)[[s-\u003eview inputContext] discardMarkedText];}\n  else {if(markedEnd\u003cmarkedStart)return;NSRange range=NSMakeRange((NSUInteger)markedStart,(NSUInteger)markedEnd-(NSUInteger)markedStart);if(validRange(value,range))s-\u003emarked=range;}}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "4312255e80227edf",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Install focus forwarding per window class",
+      "message": "The focus forwarder is installed on a window class, but this process-wide flag skips installation for every subsequent class. If bridges are attached to windows of different classes, only the first class receives focus forwarding, leaving accessibility focus state incorrect for the others.",
+      "suggestion": "Track installation per Objective-C window class and install the forwarder once for each distinct class rather than once for the entire process.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/macbridge/bridge_darwin.c",
+          "lines": {
+            "start": 11,
+            "end": 12
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "focus"
+      ],
+      "evidence": " static bool forwarded=false;\n if(!forwarded){accesskit_macos_add_focus_forwarder_to_window_class(object_getClassName((id)window));forwarded=true;}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "ab3ea79b94631e3e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Synchronize pump publication to Cocoa callbacks",
+      "message": "The OnShow handler assigns f.pump on the UI event thread, while the Cocoa callbacks installed before showing the window read it in their nil checks and input preflight. Those accesses have no shared synchronization. A native callback concurrent with first-show initialization races with this assignment; the atomic closed flag does not synchronize publication of pump.",
+      "suggestion": "Publish and read the pump through an atomic.Pointer or a mutex-protected accessor, loading it once per callback. Alternatively, initialize it before native callbacks can run and ensure the wake callback can safely handle the not-yet-shown window.",
+      "confidence": 0.91,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 166,
+            "end": 166
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "data-race",
+        "location-corrected"
+      ],
+      "evidence": "\t\tf.pump, _ = transport.New[message](mailbox.Limits{Slots: 256, PayloadBytes: 4 * 1024 * 1024, MessageBytes: 64 * 1024}, func() {",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "0869d641ed42d063",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Guard saturation when native input is disabled",
+      "message": "The flags allow --saturation --native-input=false, but this handler unconditionally calls Probe on f.input. That combination reaches this code after ten seconds with a nil input bridge and can crash instead of reporting that the test is unavailable.",
+      "suggestion": "Reject this flag combination after parsing, or guard the saturation handler when f.input is nil.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 756,
+            "end": 758
+          }
+        }
+      ],
+      "tags": [
+        "nil",
+        "flags"
+      ],
+      "evidence": "\tcase \"saturation\":\n\t\tcore.TheApp.RunOnMain(func() {\n\t\t\tbefore := f.input.Probe(1) // accepted mark, before stall",
+      "fix": {
+        "before": "\tcase \"saturation\":\n\t\tcore.TheApp.RunOnMain(func() {\n\t\t\tbefore := f.input.Probe(1) // accepted mark, before stall",
+        "after": "\tcase \"saturation\":\n\t\tif f.input == nil {\n\t\t\tfmt.Println(\"saturation requires native input\")\n\t\t\treturn\n\t\t}\n\t\tcore.TheApp.RunOnMain(func() {\n\t\t\tbefore := f.input.Probe(1) // accepted mark, before stall"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "dab5cd0d5ff04b11",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Decode failures leave the pump permanently armed",
+      "message": "A decoding error returns without acknowledging the acquired delivery or clearing p.armed. This permanently holds queue credits and prevents subsequent Commit/Latest calls from scheduling another wake. Successful json.Marshal does not guarantee successful json.Unmarshal into T, particularly when T implements custom JSON methods. The latest-snapshot decoding error also bypasses wake cleanup.",
+      "suggestion": "Ensure every acquired delivery is acknowledged or explicitly released even on decoding failure, and run disarm/readiness/rearm cleanup on every Drain exit. Preserve the current behavior of holding credits until apply completes on successful decoding.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/transport/pump.go",
+          "lines": {
+            "start": 152,
+            "end": 154
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "queue",
+        "liveness"
+      ],
+      "evidence": "\t\tif e := json.Unmarshal(d.Data, \u0026v); e != nil {\n\t\t\treturn e\n\t\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 123953,
+    "totalMs": 50922
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 83424,
+    "chunks": 5,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 32481,
+        "output": 6140,
+        "reasoning": 4175,
+        "cachedInput": 4910
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

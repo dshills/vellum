@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "84dfb83b8c94551693944f34f825d59b",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "82ac3e7e2fb81d3c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Manifest failure leaves a published bundle behind",
+      "message": "package() publishes the final bundle before the manifest is written. If manifest directory creation or writing fails (for example, because of permissions or a full disk), the command fails but leaves the final .app behind, potentially alongside a truncated manifest. Retrying then fails because the output already exists. This violates the documented failure-cleanup guarantee.",
+      "suggestion": "Stage the manifest in a temporary file before publishing the bundle, atomically replace the manifest, and roll back the newly published bundle if manifest publication fails. Keep both publication steps within the packaging transaction.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "distribution/package_macos.py",
+          "lines": {
+            "start": 66,
+            "end": 68
+          }
+        }
+      ],
+      "tags": [
+        "failure-handling",
+        "packaging"
+      ],
+      "evidence": " result=package(args)\n args.manifest.parent.mkdir(parents=True,exist_ok=True)\n args.manifest.write_text(json.dumps(result,indent=2)+'\\n')",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 17366,
+    "totalMs": 17376
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 12608,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 4472,
+        "output": 672,
+        "reasoning": 441,
+        "cachedInput": 1144
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

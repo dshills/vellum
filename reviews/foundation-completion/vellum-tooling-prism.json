@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "791769fc4b3c4885f982d4ba478ed921",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a67354a0ac5a0f8d",
+      "severity": "medium",
+      "category": "security",
+      "title": "Additional rpaths can bypass the bundled library",
+      "message": "Checking that the bundled-library rpath exists does not exclude other LC_RPATH entries. If an absolute build-directory or other external rpath precedes it, an executable referencing @rpath/libaccesskit.dylib can load an external library instead of the signed bundled copy. The dependency whitelist does not catch this because it checks the unresolved dependency token.",
+      "suggestion": "Parse all LC_RPATH entries and reject paths other than @executable_path/native, or rewrite the executable's AccessKit dependency to @executable_path/native/libaccesskit.dylib before signing.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "distribution/package_macos.py",
+          "lines": {
+            "start": 32,
+            "end": 33
+          }
+        }
+      ],
+      "tags": [
+        "dynamic-linking",
+        "relocatability"
+      ],
+      "evidence": "  paths=run(['otool','-l',str(executable)])\n  if 'path @executable_path/native ' not in paths:raise ValueError('required application-relative library rpath missing')",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "c1578b020c6d6417",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Optimization disables every evidence check",
+      "message": "All evidence validation uses assert statements, which Python removes when invoked with -O or with PYTHONOPTIMIZE enabled. In that mode this script can print its verification-success message even when lifecycle counts, queue state, and attachment ordering are incorrect.",
+      "suggestion": "Replace assertions throughout this verification script with explicit checks that raise an exception or exit nonzero on failure, so validation remains active under optimized Python.",
+      "confidence": 1,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/verify.py",
+          "lines": {
+            "start": 7,
+            "end": 8
+          }
+        }
+      ],
+      "tags": [
+        "verification"
+      ],
+      "evidence": "assert before['has_marked']\nassert all(all(state[k]==before[k] for k in keys) for state in p['refused_states'])",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "cc2a9a268746590c",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Empty refusal evidence passes saturation verification",
+      "message": "all() returns True for an empty list, so saturation evidence containing no refused attempts passes this check. Having 256 outstanding entries only demonstrates a full queue; it does not demonstrate that a subsequent admission was refused without changing the input state.",
+      "suggestion": "Require a nonempty refused_states collection, or preferably the exact expected number of refused attempts, before comparing each recorded state. Use an explicit runtime check if replacing the script's assertions.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/verify.py",
+          "lines": {
+            "start": 8,
+            "end": 8
+          }
+        }
+      ],
+      "tags": [
+        "saturation",
+        "evidence"
+      ],
+      "evidence": "assert all(all(state[k]==before[k] for k in keys) for state in p['refused_states'])",
+      "fix": {
+        "before": "assert all(all(state[k]==before[k] for k in keys) for state in p['refused_states'])",
+        "after": "assert p['refused_states'], 'No refused admission states were recorded'\nassert all(all(state[k]==before[k] for k in keys) for state in p['refused_states'])"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 25401,
+    "totalMs": 25432
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 11740,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 4248,
+        "output": 1170,
+        "reasoning": 512,
+        "cachedInput": 1144
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

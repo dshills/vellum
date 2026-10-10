@@ -1,0 +1,143 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "b2df062fae44e03a702cce497d9936ae",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "bb8bf4612910bf5e",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Metadata checks do not ensure stable deferred font contents",
+      "message": "The metadata check does not guarantee stable contents. An in-place write can occur between Stat and ReadAt, and a same-size modification with its modification time restored passes the check entirely. Deferred parsing can consequently combine headers and glyph payloads from different font contents, contrary to StableResource's contract.",
+      "suggestion": "Back deferred reads with an immutable snapshot, or authenticate each deferred range against content hashes captured from a consistent initial snapshot. A post-read Stat check can detect ordinary concurrent writes but is not sufficient to guarantee immutability.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+          "lines": {
+            "start": 418,
+            "end": 421
+          }
+        }
+      ],
+      "tags": [
+        "deferred-io",
+        "file-integrity"
+      ],
+      "evidence": "+\tif !os.SameFile(r.info, info) || info.Size() != r.info.Size() || !info.ModTime().Equal(r.info.ModTime()) {\n+\t\treturn 0, fmt.Errorf(\"font file changed since load: %s\", r.path)\n+\t}\n+\treturn f.ReadAt(dst, offset)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "74ec85f094c06a57",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Deferred component failures can produce successful partial outlines",
+      "message": "A deferred read or parse failure in a composite glyph's child is silently discarded by this recursive function. The parent can continue assembling its other components and return an incomplete outline as successful; the top-level phantom-point length check does not establish that every child loaded successfully. File removal or modification after loading makes this a newly reachable failure mode.",
+      "suggestion": "Propagate a success flag or error through getPointsForGlyphRec and its callers. If any required component fails to load, discard the assembled points and report the entire outline as unavailable rather than returning partial geometry.",
+      "confidence": 0.93,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/patches/0002-deferred-static-outlines.patch",
+          "lines": {
+            "start": 45,
+            "end": 48
+          }
+        }
+      ],
+      "tags": [
+        "composite-glyphs",
+        "error-handling"
+      ],
+      "evidence": "+\tg, ok := f.glyfGlyph(gid)\n+\tif !ok {\n+\t\treturn\n+\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "4bec13613def9d22",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Do not force a macOS-specific temporary directory",
+      "message": "Forcing TMPDIR to /private/tmp makes patch application fail when patch needs temporary files on systems where this macOS-specific directory does not exist, including typical Linux environments. It also overrides any valid temporary directory configured by the caller.",
+      "suggestion": "Inherit the caller's environment instead of overriding TMPDIR, or use tempfile.TemporaryDirectory() if an explicitly managed temporary directory is required.",
+      "confidence": 0.92,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/prepare.py",
+          "lines": {
+            "start": 18,
+            "end": 18
+          }
+        }
+      ],
+      "tags": [
+        "portability"
+      ],
+      "evidence": " subprocess.run(['patch','--batch','-p1','-i',str(patch)],cwd=o,check=True,env=dict(os.environ,TMPDIR='/private/tmp'))",
+      "fix": {
+        "before": " subprocess.run(['patch','--batch','-p1','-i',str(patch)],cwd=o,check=True,env=dict(os.environ,TMPDIR='/private/tmp'))",
+        "after": " subprocess.run(['patch','--batch','-p1','-i',str(patch)],cwd=o,check=True)"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 60949,
+    "totalMs": 42520
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 59129,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 26116,
+        "output": 2874,
+        "reasoning": 2054,
+        "cachedInput": 2406
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

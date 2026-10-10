@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1a40a9fceb98af4c6f9ce89359e53cb6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "dbaf57770bcbb9c8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Validate Mach-O dependencies and rpaths per architecture",
+      "message": "For a universal Mach-O binary, `otool -L` emits a separate heading for each architecture. Skipping only the first line causes subsequent architecture headings to be interpreted as dependencies and rejected, even when every actual dependency is allowed. Additionally, `otool -l` collects rpaths from all slices, so the later single-element comparison rejects valid universal executables too.",
+      "suggestion": "Enumerate Mach-O architectures and run both dependency and rpath validation separately for each slice using `otool -arch \u003carchitecture\u003e`, or parse the output into architecture-specific sections before validating.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "distribution/package_macos.py",
+          "lines": {
+            "start": 27,
+            "end": 28
+          }
+        }
+      ],
+      "tags": [
+        "macos",
+        "universal-binaries"
+      ],
+      "evidence": "   for line in dependencies[path.name].splitlines()[1:]:\n    dependency=line.strip().split(' (',1)[0]",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 25168,
+    "totalMs": 25190
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 8,
+    "bytes": 15892,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 5460,
+        "output": 1095,
+        "reasoning": 855,
+        "cachedInput": 1144
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

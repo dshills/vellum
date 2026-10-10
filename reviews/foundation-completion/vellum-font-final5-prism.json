@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "37137f107113d85f52429d22f6ae454d",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c227c8f3ecc533f1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Oversized valid bitmap glyphs disappear on the deferred path",
+      "message": "The deferred path rejects bitmap records larger than 2 MiB, although sbix permits them and the previous eager path could render them. Once lazySbix is initialized, glyphData and extents do not fall back to the eager implementation, so an otherwise valid large bitmap silently loses its bitmap rendering and extents. The internal cache budget should not become an undocumented font-format restriction.",
+      "suggestion": "Separate cache admission from glyph validity: read valid oversized records without retaining them in the LRU, or provide an explicit compatibility fallback for such records. Add a valid bitmap fixture larger than 2 MiB and verify rendering and extents match the eager path.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+          "lines": {
+            "start": 170,
+            "end": 171
+          }
+        }
+      ],
+      "tags": [
+        "compatibility",
+        "sbix",
+        "location-corrected"
+      ],
+      "evidence": "+const sbixGlyphLimit = 2 * 1024 * 1024\n\n+const sbixCacheLimit = 4 * 1024 * 1024",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 83385,
+    "totalMs": 48638
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 71667,
+    "chunks": 5,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 23120,
+        "output": 3475,
+        "reasoning": 3124,
+        "cachedInput": 2406
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

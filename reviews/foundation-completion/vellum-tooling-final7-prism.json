@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "68b11e575bc8d75d53f8f5f0b2e36513",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "db7ba4bc39afe372",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Publish the bundle without replacing an existing destination",
+      "message": "The initial output-existence check does not reserve the destination. If another process creates an empty directory at the output path during packaging or notarization, macOS directory rename can replace it successfully. This violates the promise to reject existing output paths and allows concurrent packaging operations to interfere with one another.",
+      "suggestion": "Publish the bundle using an atomic exclusive rename on macOS, such as renameatx_np with RENAME_EXCL, and fail if the destination exists. Rechecking exists() immediately before rename is insufficient because it leaves the same race.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "distribution/package_macos.py",
+          "lines": {
+            "start": 68,
+            "end": 68
+          }
+        }
+      ],
+      "tags": [
+        "filesystem",
+        "race-condition",
+        "location-corrected"
+      ],
+      "evidence": "   bundle.rename(output)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 14215,
+    "totalMs": 14227
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 2,
+    "bytes": 7963,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 3100,
+        "output": 586,
+        "reasoning": 387,
+        "cachedInput": 1046
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

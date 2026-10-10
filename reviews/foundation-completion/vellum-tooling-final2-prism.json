@@ -1,0 +1,117 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "98ca55f5ff774c294952246358351972",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a9986556d9df2e28",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Automatically created Go caches are never cleaned up",
+      "message": "Each invocation without P0_CACHE_DIR creates a new temporary Go cache, but run.sh only removes private_build. The module downloads and build cache remain after both successful and failed runs, accumulating substantial disk usage across repeated builds.",
+      "suggestion": "Track whether this invocation created P0_CACHE_DIR and install an exit cleanup handler in run.sh immediately after sourcing env.sh. Remove only automatically created caches, preserving caller-supplied cache directories.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/env.sh",
+          "lines": {
+            "start": 4,
+            "end": 5
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak"
+      ],
+      "evidence": " P0_CACHE_DIR=$(mktemp -d \"${TMPDIR:-/tmp}/vellum-cache.XXXXXXXX\") || return 1\n export P0_CACHE_DIR",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "6cf768b75d8205cd",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Termination signals clean up without terminating the build",
+      "message": "The signal handlers delete the temporary build directory but do not terminate the shell. A trapped signal can therefore let execution resume with its Cargo home or target directory already removed. With an externally supplied target directory, the script can even continue publishing build artifacts after termination was requested.",
+      "suggestion": "Keep cleanup in the EXIT handler and make HUP, INT, and TERM handlers exit with the appropriate nonzero status, allowing EXIT to perform cleanup.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/run.sh",
+          "lines": {
+            "start": 13,
+            "end": 13
+          }
+        }
+      ],
+      "tags": [
+        "signal-handling"
+      ],
+      "evidence": "trap 'rm -rf \"$private_build\"' EXIT HUP INT TERM",
+      "fix": {
+        "before": "trap 'rm -rf \"$private_build\"' EXIT HUP INT TERM",
+        "after": "trap 'rm -rf \"$private_build\"' EXIT\ntrap 'exit 129' HUP\ntrap 'exit 130' INT\ntrap 'exit 143' TERM"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 27890,
+    "totalMs": 27920
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 6,
+    "bytes": 13182,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 4608,
+        "output": 1167,
+        "reasoning": 739,
+        "cachedInput": 1144
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,123 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "da88f488c57b3645f443b686e543a7ba",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "fd635a19bce4faaf",
+      "severity": "low",
+      "category": "bug",
+      "title": "Check heap-profile close errors",
+      "message": "Closing the written heap-profile file can report a delayed write error. Ignoring it lets the probe report success even when the profile artifact is incomplete.",
+      "suggestion": "Check the error returned by Close and fail the probe if it is non-nil.",
+      "confidence": 1,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/cmd/fontcheck/main.go",
+          "lines": {
+            "start": 124,
+            "end": 124
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\tf.Close()",
+      "fix": {
+        "before": "\t\t\tf.Close()",
+        "after": "\t\t\tif err := f.Close(); err != nil {\n\t\t\t\tpanic(err)\n\t\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 13762,
+    "totalMs": 13813
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 12,
+    "bytes": 44794,
+    "chunks": 2,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 11152,
+        "output": 562,
+        "reasoning": 385,
+        "cachedInput": 1262
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "573f182aee4f993b",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Revalidate the backing file after deferred reads",
+        "message": "The stability check happens before reading, so an in-place modification between Stat and ReadAt is accepted. Deferred requests can consequently combine strike metadata or glyph offsets from the original font with payload bytes from a modified font, violating the stable-resource contract.",
+        "suggestion": "At minimum, stat the same descriptor again after ReadAt and reject the result if its identity, size, or modification time changed. If strict immutability is required, use an owned immutable snapshot rather than relying solely on filesystem metadata.",
+        "confidence": 0.98,
+        "locations": [
+          {
+            "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+            "lines": {
+              "start": 418,
+              "end": 421
+            }
+          }
+        ],
+        "tags": [
+          "deferred-io",
+          "race-condition"
+        ],
+        "evidence": "+if !os.SameFile(r.info, info) || info.Size() != r.info.Size() || !info.ModTime().Equal(r.info.ModTime()) {\n+\t\treturn 0, fmt.Errorf(\"font file changed since load: %s\", r.path)\n+\t}\n+\treturn f.ReadAt(dst, offset)",
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      },
+      "reason": "quoted evidence not found in prototypes/fontresources/patches/0001-deferred-sbix.patch"
+    }
+  ],
+  "suppressed": []
+}

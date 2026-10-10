@@ -1,0 +1,470 @@
+--- a/font/font.go
++++ b/font/font.go
+@@ -153,6 +153,7 @@
+ 	svg  svg          // optional
+ 
+ 	glyf     tables.Glyf
++	lazyGlyf *lazyGlyf
+ 	hmtx     tables.Hmtx
+ 	vmtx     tables.Vmtx
+ 	bitmap   bitmap
+@@ -195,7 +196,8 @@
+ }
+ 
+ // NewFont loads all the font tables, sanitizing them.
+-// An error is returned only when required tables 'cmap', 'head', 'maxp' are invalid (or missing).
++// Deferred static outlines additionally require all glyph headers to meet the stated resource limits.
++// For other paths, an error is returned only when required tables 'cmap', 'head', 'maxp' are invalid (or missing).
+ // More control on errors is available by using package [tables].
+ func NewFont(ld *ot.Loader) (*Font, error) {
+ 	var (
+@@ -254,11 +256,18 @@
+ 
+ 	out.upem = out.head.Upem()
+ 
+-	raw, _ = ld.RawTable(ot.MustNewTag("glyf"))
+ 	locaRaw, _ := ld.RawTable(ot.MustNewTag("loca"))
+ 	loca, err := tables.ParseLoca(locaRaw, out.nGlyphs, out.head.IndexToLocFormat == 1)
+-	if err == nil { // ParseGlyf panics if len(loca) == 0
+-		out.glyf, _ = tables.ParseGlyf(raw, loca)
++	if err == nil {
++		if reader, length, ok := ld.DeferredTable(ot.MustNewTag("glyf")); ok && !ld.HasTable(ot.MustNewTag("gvar")) {
++			out.lazyGlyf, err = newLazyGlyf(reader, length, loca)
++			if err != nil {
++				return nil, fmt.Errorf("deferred outline admission: %w", err)
++			}
++		} else {
++			raw, _ = ld.RawTable(ot.MustNewTag("glyf"))
++			out.glyf, _ = tables.ParseGlyf(raw, loca)
++		}
+ 	}
+ 
+ 	out.bitmap = selectBitmapTable(ld)
+@@ -678,4 +687,4 @@
+ }
+ 
+ // HasDeferredResources reports whether a font retains a stable backing reader.
+-func (f *Font) HasDeferredResources() bool { return f.lazySbix != nil }
++func (f *Font) HasDeferredResources() bool { return f.lazySbix != nil || f.lazyGlyf != nil }
+--- a/font/renderer.go
++++ b/font/renderer.go
+@@ -332,10 +332,13 @@
+ 
+ // apply variation when needed
+ func (f *Face) glyphDataFromGlyf(glyph gID) (GlyphOutline, error) {
+-	if int(glyph) >= len(f.glyf) {
++	if int(glyph) >= f.glyfCount() {
+ 		return GlyphOutline{}, errGlyphOutOfRange(glyph)
+ 	}
+ 	points := f.getPointsForGlyph(glyph)
++	if len(points) < phantomCount {
++		return GlyphOutline{}, fmt.Errorf("deferred glyph unavailable %d", glyph)
++	}
+ 	segments := buildSegments(points[:len(points)-phantomCount])
+ 	return GlyphOutline{Segments: segments}, nil
+ }
+--- a/font/metrics.go
++++ b/font/metrics.go
+@@ -286,7 +286,7 @@
+ 
+ 	// If and only if `vmtx` is present and it's a `glyf` font,
+ 	// we use the top phantom point, deduced from vmtx,glyf[,gvar].
+-	if !f.vmtx.IsEmpty() && f.glyf != nil {
++	if !f.vmtx.IsEmpty() && (f.glyf != nil || f.lazyGlyf != nil) {
+ 		y = f.getVOriginWithVar(gID(glyph))
+ 		return x, y
+ 	}
+@@ -315,14 +315,18 @@
+ }
+ 
+ func (f *Face) getExtentsFromGlyf(glyph gID) (GlyphExtents, bool) {
+-	if int(glyph) >= len(f.glyf) {
++	if int(glyph) >= f.glyfCount() {
+ 		return GlyphExtents{}, false
+ 	}
+ 	if f.isVar() { // we have to compute the outline points and apply variations
+ 		extents, _ := f.getGlyfPoints(glyph, true)
+ 		return extents, true
+ 	}
+-	return getGlyphExtents(f.glyf[glyph], f.hmtx, glyph), true
++	g, ok := f.glyfGlyph(glyph)
++	if !ok {
++		return GlyphExtents{}, false
++	}
++	return getGlyphExtents(g, f.hmtx, glyph), true
+ }
+ 
+ func (f *Font) getExtentsFromBitmap(glyph gID, xPpem, yPpem uint16) (GlyphExtents, bool) {
+--- a/font/glyphs.go
++++ b/font/glyphs.go
+@@ -47,7 +47,9 @@
+ func (f *Face) getPointsForGlyph(gid tables.GlyphID) []contourPoint {
+ 	var out []contourPoint
+ 	seenGlyphs := make(glyphSet) // used to deny loops
+-	f.getPointsForGlyphRec(gid, 0, seenGlyphs, &out)
++	if !f.getPointsForGlyphRec(gid, 0, seenGlyphs, &out) {
++		return nil
++	}
+ 	return out
+ }
+ 
+@@ -56,14 +58,17 @@
+ // use the `glyf` table to fetch the contour points,
+ // applying variation if needed.
+ // for composite, recursively calls itself; allPoints includes phantom points and will be at least of length 4
+-func (f *Face) getPointsForGlyphRec(gid tables.GlyphID, currentDepth int, currentGlyphs glyphSet, allPoints *[]contourPoint /* OUT */) {
++func (f *Face) getPointsForGlyphRec(gid tables.GlyphID, currentDepth int, currentGlyphs glyphSet, allPoints *[]contourPoint /* OUT */) bool {
+ 	// adapted from harfbuzz/src/OT/glyf/Glyph.hh
+ 
+-	if currentDepth > maxCompositeNesting || int(gid) >= len(f.glyf) {
+-		return
+-	}
+-
+-	g := f.glyf[gid]
++	if currentDepth > maxCompositeNesting || int(gid) >= f.glyfCount() {
++		return false
++	}
++
++	g, ok := f.glyfGlyph(gid)
++	if !ok {
++		return false
++	}
+ 
+ 	var points []contourPoint
+ 	if data, ok := g.Data.(tables.SimpleGlyph); ok {
+@@ -102,12 +107,14 @@
+ 			// recurse on component
+ 			var compPoints []contourPoint
+ 
+-			f.getPointsForGlyphRec(item.GlyphIndex, currentDepth+1, currentGlyphs, &compPoints)
++			if !f.getPointsForGlyphRec(item.GlyphIndex, currentDepth+1, currentGlyphs, &compPoints) {
++				return false
++			}
+ 
+ 			LC := len(compPoints)
+ 			if LC < phantomCount { // in case of max depth reached
+ 				delete(currentGlyphs, item.GlyphIndex)
+-				return
++				return false
+ 			}
+ 
+ 			/* Copy phantom points from component if USE_MY_METRICS flag set */
+@@ -153,6 +160,7 @@
+ 			(*allPoints)[i].translate(tx, 0)
+ 		}
+ 	}
++	return true
+ }
+ 
+ // does not includes phantom points
+@@ -206,11 +214,14 @@
+ // walk through the contour points of the given glyph to compute its extends and its phantom points
+ // As an optimization, if `computeExtents` is false, the extents computation is skipped (a zero value is returned).
+ func (f *Face) getGlyfPoints(gid tables.GlyphID, computeExtents bool) (ext GlyphExtents, ph [phantomCount]contourPoint) {
+-	if int(gid) >= len(f.glyf) {
++	if int(gid) >= f.glyfCount() {
+ 		return
+ 	}
+ 	allPoints := f.getPointsForGlyph(gid)
+ 
++	if len(allPoints) < phantomCount {
++		return
++	}
+ 	copy(ph[:], allPoints[len(allPoints)-phantomCount:])
+ 
+ 	if computeExtents {
+--- /dev/null
++++ b/font/lazy_glyf.go
+@@ -0,0 +1,152 @@
++// SPDX-License-Identifier: Unlicense OR BSD-3-Clause
++package font
++
++import (
++	"container/list"
++	"encoding/binary"
++	"fmt"
++	"github.com/go-text/typesetting/font/opentype/tables"
++	"io"
++	"sync"
++	"unsafe"
++)
++
++const glyfRecordLimit = 64 * 1024
++const glyfCacheLimit = 2 * 1024 * 1024
++const glyfCacheEntries = 256
++
++// Static outlines are deferred. Variable gvar fonts retain eager outlines because
++// variation initialization consumes the complete glyph table.
++type lazyGlyf struct {
++	mu      sync.Mutex
++	r       io.ReaderAt
++	offsets []uint32
++	cache   map[gID]*list.Element
++	lru     list.List
++	bytes   int
++}
++type glyfEntry struct {
++	id    gID
++	glyph tables.Glyph
++	bytes int
++}
++
++func newLazyGlyf(r io.ReaderAt, length int64, offsets []uint32) (*lazyGlyf, error) {
++	if len(offsets) < 1 || len(offsets) > 65536 {
++		return nil, fmt.Errorf("invalid glyph count")
++	}
++	for i, v := range offsets {
++		if int64(v) > length || (i > 0 && v < offsets[i-1]) {
++			return nil, fmt.Errorf("invalid glyph offset")
++		}
++	}
++	// Admit the font as a whole. Never silently drop a valid glyph because its
++	// resource requirements exceed this prototype's supported outline policy.
++	var header [10]byte
++	var endpoint [2]byte
++	for i := 0; i+1 < len(offsets); i++ {
++		start, end := offsets[i], offsets[i+1]
++		if start == end {
++			continue
++		}
++		if end-start > glyfRecordLimit {
++			return nil, fmt.Errorf("glyph %d exceeds record limit", i)
++		}
++		if end-start < 10 {
++			return nil, fmt.Errorf("short glyph %d", i)
++		}
++		if _, err := r.ReadAt(header[:], int64(start)); err != nil {
++			return nil, err
++		}
++		contours := int(int16(binary.BigEndian.Uint16(header[:])))
++		if contours >= 0 {
++			if contours > 1024 || uint32(10+2*contours) > end-start {
++				return nil, fmt.Errorf("glyph %d exceeds contour policy or is truncated", i)
++			}
++			if contours > 0 {
++				if _, err := r.ReadAt(endpoint[:], int64(start)+10+int64(2*(contours-1))); err != nil {
++					return nil, err
++				}
++				if binary.BigEndian.Uint16(endpoint[:]) >= 8192 {
++					return nil, fmt.Errorf("glyph %d exceeds point policy", i)
++				}
++			}
++		}
++	}
++	return &lazyGlyf{r: r, offsets: append([]uint32(nil), offsets...), cache: make(map[gID]*list.Element)}, nil
++}
++func (g *lazyGlyf) glyph(id gID) (tables.Glyph, error) {
++	g.mu.Lock()
++	defer g.mu.Unlock()
++	if int(id) >= len(g.offsets)-1 {
++		return tables.Glyph{}, fmt.Errorf("glyph out of range")
++	}
++	if e := g.cache[id]; e != nil {
++		g.lru.MoveToFront(e)
++		return e.Value.(glyfEntry).glyph, nil
++	}
++	start, end := g.offsets[id], g.offsets[int(id)+1]
++	if start == end {
++		return tables.Glyph{}, nil
++	}
++	if end-start > glyfRecordLimit {
++		return tables.Glyph{}, fmt.Errorf("outline record exceeds budget")
++	}
++	raw := make([]byte, int(end-start))
++	if _, e := g.r.ReadAt(raw, int64(start)); e != nil {
++		return tables.Glyph{}, e
++	}
++	if len(raw) < 10 {
++		return tables.Glyph{}, fmt.Errorf("short glyph")
++	}
++	contours := int(int16(binary.BigEndian.Uint16(raw)))
++	// Bound decompression before ParseGlyph allocates points from contour endpoints.
++	if contours >= 0 {
++		if contours > 1024 || 10+2*contours > len(raw) {
++			return tables.Glyph{}, fmt.Errorf("invalid/oversized contours")
++		}
++		if contours > 0 && binary.BigEndian.Uint16(raw[10+2*(contours-1):]) >= 8192 {
++			return tables.Glyph{}, fmt.Errorf("outline point budget exceeded")
++		}
++	}
++	value, _, e := tables.ParseGlyph(raw)
++	if e != nil {
++		return tables.Glyph{}, e
++	}
++	weight := len(raw) + int(unsafe.Sizeof(value))
++	switch d := value.Data.(type) {
++	case tables.SimpleGlyph:
++		weight += int(unsafe.Sizeof(d)) + cap(d.EndPtsOfContours)*2 + cap(d.Points)*int(unsafe.Sizeof(tables.GlyphContourPoint{}))
++	case tables.CompositeGlyph:
++		weight += int(unsafe.Sizeof(d)) + cap(d.Glyphs)*int(unsafe.Sizeof(tables.CompositeGlyphPart{}))
++	}
++	if weight > glyfCacheLimit {
++		return tables.Glyph{}, fmt.Errorf("decoded outline exceeds cache budget")
++	}
++	for g.bytes+weight > glyfCacheLimit || g.lru.Len() >= glyfCacheEntries {
++		e := g.lru.Back()
++		v := e.Value.(glyfEntry)
++		g.bytes -= v.bytes
++		delete(g.cache, v.id)
++		g.lru.Remove(e)
++	}
++	g.cache[id] = g.lru.PushFront(glyfEntry{id, value, weight})
++	g.bytes += weight
++	return value, nil
++}
++func (f *Font) glyfCount() int {
++	if f.lazyGlyf != nil {
++		return len(f.lazyGlyf.offsets) - 1
++	}
++	return len(f.glyf)
++}
++func (f *Font) glyfGlyph(id gID) (tables.Glyph, bool) {
++	if f.lazyGlyf != nil {
++		g, e := f.lazyGlyf.glyph(id)
++		return g, e == nil
++	}
++	if int(id) >= len(f.glyf) {
++		return tables.Glyph{}, false
++	}
++	return f.glyf[id], true
++}
+--- /dev/null
++++ b/font/lazy_glyf_test.go
+@@ -0,0 +1,137 @@
++package font
++
++import (
++	"bytes"
++	"encoding/binary"
++	ot "github.com/go-text/typesetting/font/opentype"
++	"github.com/go-text/typesetting/font/opentype/tables"
++	"io"
++	"os"
++	"reflect"
++	"testing"
++)
++
++type stableMemory struct{ *bytes.Reader }
++
++func (r stableMemory) StableReaderAt() io.ReaderAt { return r.Reader }
++func TestDeferredGlyfEagerParity(t *testing.T) {
++	for _, path := range []string{"testdata/UbuntuMono-R.ttf", "testdata/Amiri-Regular.ttf", "testdata/Roboto-Regular.ttf", "testdata/Selawik-VF-Subset.ttf"} {
++		raw, e := os.ReadFile(path)
++		if e != nil {
++			t.Fatal(e)
++		}
++		eagerLoader, e := ot.NewLoader(bytes.NewReader(raw))
++		if e != nil {
++			t.Fatal(e)
++		}
++		deferredLoader, e := ot.NewLoader(stableMemory{bytes.NewReader(raw)})
++		if e != nil {
++			t.Fatal(e)
++		}
++		eager, e := NewFont(eagerLoader)
++		if e != nil {
++			t.Fatal(e)
++		}
++		deferred, e := NewFont(deferredLoader)
++		if e != nil {
++			t.Fatal(e)
++		}
++		if eagerLoader.HasTable(ot.MustNewTag("gvar")) {
++			if deferred.lazyGlyf != nil {
++				t.Fatal("variable glyphs unexpectedly deferred")
++			}
++		} else if deferred.lazyGlyf == nil {
++			t.Fatal("static outlines remain eager", path)
++		}
++		a, b := NewFace(eager), NewFace(deferred)
++		for glyph := 0; glyph < eager.nGlyphs; glyph++ {
++			gid := GID(glyph)
++			aa, aok := a.GlyphDataOutline(gid)
++			bb, bok := b.GlyphDataOutline(gid)
++			if aok != bok || !reflect.DeepEqual(aa, bb) {
++				t.Fatalf("outline divergence %s glyph %d", path, glyph)
++			}
++			ae, aok := a.glyphExtentsRaw(gid)
++			be, bok := b.glyphExtentsRaw(gid)
++			if aok != bok || ae != be {
++				t.Fatalf("extents divergence %s glyph %d", path, glyph)
++			}
++			if g := deferred.lazyGlyf; g != nil && (g.bytes > glyfCacheLimit || g.lru.Len() > glyfCacheEntries) {
++				t.Fatal("outline cache exceeded budget")
++			}
++		}
++	}
++}
++func TestDeferredGlyfMalformed(t *testing.T) {
++	if _, e := newLazyGlyf(bytes.NewReader(nil), 10, []uint32{4, 2}); e == nil {
++		t.Fatal("nonmonotone offsets")
++	}
++	for _, spec := range []struct{ size, contours, endpoint int }{{12, 1, 8192}, {2060, 1025, 0}, {glyfRecordLimit + 1, 0, 0}} {
++		raw := make([]byte, spec.size)
++		binary.BigEndian.PutUint16(raw, uint16(spec.contours))
++		if spec.contours > 0 {
++			binary.BigEndian.PutUint16(raw[10+2*(spec.contours-1):], uint16(spec.endpoint))
++		}
++		if _, e := newLazyGlyf(bytes.NewReader(raw), int64(len(raw)), []uint32{0, uint32(len(raw))}); e == nil {
++			t.Fatal("unsupported outline admitted", spec)
++		}
++	}
++	raw := make([]byte, 10)
++	g, e := newLazyGlyf(bytes.NewReader(raw), 10, []uint32{0, 10})
++	if e != nil {
++		t.Fatal(e)
++	}
++	g.r = errorReader{}
++	if _, e = g.glyph(0); e == nil {
++		t.Fatal("read error ignored")
++	}
++	if _, e = g.glyph(5); e == nil {
++		t.Fatal("out-of-range glyph")
++	}
++
++}
++
++type failingGlyphReader struct {
++	r          io.ReaderAt
++	start, end int64
++}
++
++func (r failingGlyphReader) ReadAt(dst []byte, offset int64) (int, error) {
++	if offset < r.end && offset+int64(len(dst)) > r.start {
++		return 0, io.ErrUnexpectedEOF
++	}
++	return r.r.ReadAt(dst, offset)
++}
++func TestDeferredGlyfComponentFailure(t *testing.T) {
++	raw, e := os.ReadFile("testdata/Amiri-Regular.ttf")
++	if e != nil {
++		t.Fatal(e)
++	}
++	loader, _ := ot.NewLoader(stableMemory{bytes.NewReader(raw)})
++	f, e := NewFont(loader)
++	if e != nil {
++		t.Fatal(e)
++	}
++	ordinary, _ := ot.NewLoader(bytes.NewReader(raw))
++	eager, e := NewFont(ordinary)
++	if e != nil {
++		t.Fatal(e)
++	}
++	for id, g := range eager.glyf {
++		data, ok := g.Data.(tables.CompositeGlyph)
++		if !ok || len(data.Glyphs) < 2 {
++			continue
++		}
++		child := int(data.Glyphs[1].GlyphIndex)
++		a, b := f.lazyGlyf.offsets[child], f.lazyGlyf.offsets[child+1]
++		if a == b {
++			continue
++		}
++		f.lazyGlyf.r = failingGlyphReader{f.lazyGlyf.r, int64(a), int64(b)}
++		if _, ok := NewFace(f).GlyphDataOutline(GID(id)); ok {
++			t.Fatal("partial composite outline reported successful", id)
++		}
++		return
++	}
++	t.Fatal("fixture has no suitable composite glyph")
++}

@@ -1,0 +1,27 @@
+--- a/gpu/device.go
++++ b/gpu/device.go
+@@ -76,15 +76,20 @@
+ 	return dev, nil
+ }
+ 
++// Release is serialized by the resource owner after all users have stopped.
++// GetQueue owns a WebGPU reference independently of the device. Complete work
++// before releasing both owned handles; no deferred callback retains this Device.
+ func (dv *Device) Release() {
+ 	if dv.Device == nil {
+ 		return
+ 	}
+-	dv.Queue.OnSubmittedWorkDone(func(wgpu.QueueWorkDoneStatus) {
+-		dv.Device.Release()
+-		dv.Device = nil
++	dv.Device.Poll(true, nil)
++	if dv.Queue != nil {
++		dv.Queue.Release()
+ 		dv.Queue = nil
+-	})
++	}
++	dv.Device.Release()
++	dv.Device = nil
+ }
+ 
+ // WaitDoneFunc waits until the device is idle and then calls

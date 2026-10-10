@@ -1,0 +1,115 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "edb435bd31ee2a09f17e316b63c405fa",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "914b775280ad58f4",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Fall back to eager parsing when lazy sbix initialization fails",
+      "message": "A stable resource always takes this branch, but initialization errors are discarded without populating the eager sbix table. The lazy parser introduces restrictions such as a maximum of 256 strikes that are not sbix format limits, so otherwise valid fonts can silently lose their bitmap glyphs simply because they were loaded through a stable resource.",
+      "suggestion": "Check the initialization error and fall back to RawTable, ParseSbix, and newSbix when deferred initialization fails. Only retain the deferred reader when initialization succeeds.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+          "lines": {
+            "start": 28,
+            "end": 29
+          }
+        }
+      ],
+      "tags": [
+        "fallback",
+        "font-loading"
+      ],
+      "evidence": "+\t\tout.lazySbix, _ = newLazySbix(reader, length, out.nGlyphs)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "3fddfc3fa568f795",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Resource caps silently remove valid glyph outlines",
+      "message": "Deferred loading rejects otherwise valid TrueType glyphs larger than 64 KiB, and the subsequent checks also reject valid glyphs with more than 1,024 contours or 8,192 points. These are implementation budgets, not format limits. Consequently, the same font can render successfully through the eager loader but lose outlines through the stable-reader loader; the error is reduced to an unavailable glyph by glyfGlyph.",
+      "suggestion": "Separate cache-admission limits from supported glyph limits: decode valid larger glyphs without retaining them in the cache, using an explicitly bounded decoding strategy. If rejecting such fonts is intentional, expose that limitation at font loading rather than silently losing individual outlines. Add eager/deferred parity tests covering valid glyphs above each threshold.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/patches/0002-deferred-static-outlines.patch",
+          "lines": {
+            "start": 224,
+            "end": 242
+          }
+        }
+      ],
+      "tags": [
+        "deferred-loading",
+        "font-compatibility"
+      ],
+      "evidence": "+\tif end-start \u003e glyfRecordLimit {\n+\t\treturn tables.Glyph{}, fmt.Errorf(\"outline record exceeds budget\")\n+\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 74926,
+    "totalMs": 42038
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 69524,
+    "chunks": 4,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 21377,
+        "output": 3465,
+        "reasoning": 2917,
+        "cachedInput": 2406
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

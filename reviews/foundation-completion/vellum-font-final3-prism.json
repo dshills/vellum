@@ -1,0 +1,116 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "69e9702d24e03e7b852bc38b6387220a",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 1
+    },
+    "highestSeverity": "high"
+  },
+  "findings": [
+    {
+      "id": "46c662e5b92bdf65",
+      "severity": "high",
+      "category": "bug",
+      "title": "Snapshot exhaustion rejects otherwise valid fonts",
+      "message": "Every footprint load now consumes one of only 32 global snapshot slots, including fonts with no deferred tables. Successful snapshots are released only by finalizers. A scan can therefore exhaust the slots before garbage collection runs and reject ordinary fonts; retaining 32 fonts with deferred readers prevents further admission indefinitely. This introduces font-loading failures on normal installations with more than 32 fonts.",
+      "suggestion": "Release snapshots deterministically when no deferred reader retains them, and provide an eager-loading fallback when snapshot admission is exhausted rather than failing the font load. Use explicit ownership or reference counting for snapshots retained by deferred readers.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+          "lines": {
+            "start": 104,
+            "end": 108
+          }
+        }
+      ],
+      "tags": [
+        "resource-lifetime",
+        "font-scanning"
+      ],
+      "evidence": "+\tsnapshot, err := newStableFile(file)\n+\tif err != nil {\n+\t\treturn nil, err\n+\t}\n+\tloaders, err := ot.NewLoaders(snapshot)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "7871abc039bd0344",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Footprint loading copies every font in full",
+      "message": "The unconditional snapshot in footprint loading copies the entire source font to temporary storage before parsing, even when it has no sbix table or cannot use deferred parsing. Scanning a font directory now reads and writes every font in full, including large tables that footprint extraction would otherwise skip. This can substantially increase scan latency and temporary-disk traffic.",
+      "suggestion": "Inspect the table directory before creating a snapshot and preserve the existing direct-reader path for fonts that do not need deferred resources. For eligible fonts, consider snapshotting only the deferred table bytes rather than the entire file.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/fontresources/patches/0001-deferred-sbix.patch",
+          "lines": {
+            "start": 448,
+            "end": 449
+          }
+        }
+      ],
+      "tags": [
+        "disk-io",
+        "font-scanning",
+        "location-corrected"
+      ],
+      "evidence": "+\t// Read at most declared size+1, so a growing source cannot bypass the budget.\n+\tn, e := io.Copy(f, io.LimitReader(source, size+1))",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 74279,
+    "totalMs": 43022
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 65640,
+    "chunks": 4,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 1,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 20303,
+        "output": 3317,
+        "reasoning": 2663,
+        "cachedInput": 2406
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

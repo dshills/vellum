@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "be33f8d86d00324efb639bfd9ab45cc6",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "f864534f5b723fb33da17b1f78058505b433e681",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c91447ee5bab59a2",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Return available context for partially out-of-bounds substring requests",
+      "message": "NSTextInputClient requires an intersecting substring when the proposed range extends beyond the document. This implementation instead returns nil whenever any part is out of bounds. Input methods requesting surrounding context beyond the available text therefore receive no context, even when most of the requested range exists, which can disrupt composition and reconversion.",
+      "suggestion": "Intersect the proposed range with the document's UTF-16 range using overflow-safe arithmetic, adjust boundaries as necessary to avoid splitting surrogate pairs, and return that substring with its actual range. Return nil when no usable intersection exists.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 153,
+            "end": 155
+          }
+        }
+      ],
+      "tags": [
+        "macos",
+        "ime"
+      ],
+      "evidence": " if(!validRange(s-\u003etext,range))return nil;\n if(actual)*actual=range;\n return [[[NSAttributedString alloc] initWithString:[s-\u003etext substringWithRange:range]] autorelease];",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "c6bbb85c646ad993",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Do not discard automatic shutdown when the mailbox is full",
+      "message": "The one-shot exit-after timer uses this helper, so a full mailbox permanently discards automatic shutdown. This can occur when the timer overlaps the saturation test or a stalled UI, leaving the experiment running indefinitely instead of closing at the configured deadline.",
+      "suggestion": "Give shutdown a reliable control path. If enqueueing an exit message fails, invoke QuitReq independently of the mailbox; the OnClose handler can drain outstanding messages and save the final report.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/foundationintegration/main.go",
+          "lines": {
+            "start": 820,
+            "end": 822
+          }
+        }
+      ],
+      "tags": [
+        "shutdown",
+        "backpressure"
+      ],
+      "evidence": "\tif err := f.pump.Send(m); err != nil {\n\t\tfmt.Printf(\"message refused kind=%s: %v\\n\", m.Kind, err)\n\t}",
+      "fix": {
+        "before": "func (f *fixture) send(m message) {\n\tif err := f.pump.Send(m); err != nil {\n\t\tfmt.Printf(\"message refused kind=%s: %v\\n\", m.Kind, err)\n\t}\n}",
+        "after": "func (f *fixture) send(m message) {\n\tif err := f.pump.Send(m); err != nil {\n\t\tfmt.Printf(\"message refused kind=%s: %v\\n\", m.Kind, err)\n\t\tif m.Kind == \"exit\" {\n\t\t\tgo core.TheApp.QuitReq()\n\t\t}\n\t}\n}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 97096,
+    "totalMs": 58208
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 14,
+    "bytes": 88669,
+    "chunks": 5,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 3,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 18140,
+        "output": 4490,
+        "reasoning": 3854,
+        "cachedInput": 1164
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,759 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f5eb2213d7cd351d42f55b5c9a50a0c3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "",
+    "branch": ""
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 23,
+      "high": 3
+    },
+    "highestSeverity": "high"
+  },
+  "findings": [
+    {
+      "id": "b05152b85629b8e3",
+      "severity": "high",
+      "category": "security",
+      "title": "Predictable Cargo home permits local code execution",
+      "message": "Both defaults are predictable shared temporary paths. Another local user can pre-create the Cargo home and supply a config.toml with a malicious rustc-wrapper, causing arbitrary code execution as the user running this script. --locked protects dependency resolution, not Cargo configuration or cached build artifacts.",
+      "suggestion": "Create a private directory with mktemp -d and put the default Cargo home and target directory inside it. Register cleanup with a trap, and retain explicit environment overrides only for trusted directories.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/foundation/run.sh",
+          "lines": {
+            "start": 19,
+            "end": 21
+          }
+        }
+      ],
+      "tags": [
+        "temporary-files",
+        "code-execution"
+      ],
+      "evidence": "export CARGO_HOME=\"${FOUNDATION_CARGO_HOME:-/tmp/vellum-foundation-cargo}\"\nnative_target=${FOUNDATION_RUST_TARGET:-/tmp/vellum-foundation-rust}\ncargo build --release --locked --manifest-path native/accesskit-c/Cargo.toml --target-dir \"$native_target\"",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "5a33f7ea1264c820",
+      "severity": "high",
+      "category": "bug",
+      "title": "Use the structure-return dispatcher for NSRect on Intel",
+      "message": "On x86-64 macOS, NSRect is returned through the structure-return ABI. Casting objc_msgSendSuper to this signature does not select the correct runtime entry point: the hidden return-buffer pointer is interpreted as the objc_super argument, potentially crashing when an inactive or forwarding client requests character geometry.",
+      "suggestion": "Use objc_msgSendSuper_stret for this NSRect-returning super call on x86-64, while retaining objc_msgSendSuper on arm64.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 134,
+            "end": 134
+          }
+        }
+      ],
+      "tags": [
+        "macos",
+        "abi",
+        "location-corrected"
+      ],
+      "evidence": " if(!usable(s)){struct objc_super p=parent(self);return ((NSRect(*)(struct objc_super *,SEL,NSRange,NSRangePointer))objc_msgSendSuper)(\u0026p,_cmd,range,actual);}",
+      "fix": {
+        "before": " if(!usable(s)){struct objc_super p=parent(self);return ((NSRect(*)(struct objc_super *,SEL,NSRange,NSRangePointer))objc_msgSendSuper)(\u0026p,_cmd,range,actual);}",
+        "after": " if(!usable(s)){\n  struct objc_super p=parent(self);\n#if defined(__x86_64__)\n  return ((NSRect(*)(struct objc_super *,SEL,NSRange,NSRangePointer))objc_msgSendSuper_stret)(\u0026p,_cmd,range,actual);\n#else\n  return ((NSRect(*)(struct objc_super *,SEL,NSRange,NSRangePointer))objc_msgSendSuper)(\u0026p,_cmd,range,actual);\n#endif\n }"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "43ff19295bef6d0e",
+      "severity": "high",
+      "category": "bug",
+      "title": "Register the input-client protocol on the dynamic subclass",
+      "message": "Copying the methods does not copy NSTextInputClient protocol conformance. For a base view that does not already conform, NSView's default inputContext returns nil, so the dynamically attached client never gets an input context and live IME composition does not work.",
+      "suggestion": "Add NSTextInputClient protocol conformance to the generated subclass before registering it.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 158,
+            "end": 160
+          }
+        }
+      ],
+      "tags": [
+        "macos",
+        "ime"
+      ],
+      "evidence": "  free(methods);objc_registerClassPair(s-\u003esubclass);",
+      "fix": {
+        "before": "  free(methods);objc_registerClassPair(s-\u003esubclass);",
+        "after": "  free(methods);\n  class_addProtocol(s-\u003esubclass,@protocol(NSTextInputClient));\n  objc_registerClassPair(s-\u003esubclass);"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "4b51aed3bf75c1ab",
+      "severity": "medium",
+      "category": "security",
+      "title": "Use a private directory for build caches",
+      "message": "The default caches reside under a predictable path in world-writable /tmp. Another local user can pre-create that directory or its children, leaving attacker-controlled build artifacts or module sources where subsequent builds expect trusted caches. This can compromise builds or prevent them from running.",
+      "suggestion": "When P0_CACHE_DIR is unset, create a private directory with mktemp -d and export it as P0_CACHE_DIR before deriving these paths. For persistent caches, use a user-owned cache directory and verify its ownership and permissions rather than sharing a fixed /tmp path.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/foundation/env.sh",
+          "lines": {
+            "start": 4,
+            "end": 6
+          }
+        }
+      ],
+      "tags": [
+        "cache-poisoning",
+        "temporary-directory"
+      ],
+      "evidence": "export GOCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/gopath\"",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "195fce38bb1ab1bf",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Accessibility text editing implicitly commits the value",
+      "message": "An accessibility set_value action also applies the value and increments commits. Ordinary text input only updates the field; applying it requires the separate Apply value button. Assistive technology therefore triggers a model-changing operation merely by editing text.",
+      "suggestion": "Make set_value update only the text field. Leave committing to the Apply value action, matching keyboard and pointer behavior.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/foundation/main.go",
+          "lines": {
+            "start": 369,
+            "end": 371
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "behavior-parity"
+      ],
+      "evidence": "\tcase a.Target == 8 \u0026\u0026 a.Kind == \"set_value\":\n\t\tf.field.SetText(a.Value).Update()\n\t\tf.command(\"commit\", a.Value)",
+      "fix": {
+        "before": "\tcase a.Target == 8 \u0026\u0026 a.Kind == \"set_value\":\n\t\tf.field.SetText(a.Value).Update()\n\t\tf.command(\"commit\", a.Value)",
+        "after": "\tcase a.Target == 8 \u0026\u0026 a.Kind == \"set_value\":\n\t\tf.field.SetText(a.Value).Update()"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "1fbfd49c667f30c2",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Tree leaves omit their selection state",
+      "message": "The component-tree leaves change f.selected when activated, but their semantic nodes never expose Selected. Unlike table rows and canvas components, these tree items cannot communicate their selection state to a screen reader, even after a fresh snapshot is published.",
+      "suggestion": "Populate Selected for nodes 22 and 23 from f.selected so selection is consistently reflected across all representations of the components.",
+      "confidence": 0.95,
+      "locations": [
+        {
+          "path": "prototypes/foundation/main.go",
+          "lines": {
+            "start": 472,
+            "end": 473
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "selection"
+      ],
+      "evidence": "\t\t\tn.Actions = []string{\"click\", \"focus\", \"expand\", \"collapse\"}\n\t\tcase 30:",
+      "fix": {
+        "before": "\t\t\tn.Actions = []string{\"click\", \"focus\", \"expand\", \"collapse\"}\n\t\tcase 30:",
+        "after": "\t\t\tn.Actions = []string{\"click\", \"focus\", \"expand\", \"collapse\"}\n\t\tcase 22, 23:\n\t\t\tn.Selected = boolp(f.selected == int(id)-5)\n\t\tcase 30:"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "710e7b166a2e9809",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Bounds validation accepts non-finite coordinates",
+      "message": "The ordering comparisons accept NaN coordinates because comparisons with NaN are false, and also accept infinite coordinates. Consequently Validate can approve bounds that cannot represent usable native geometry.",
+      "suggestion": "Reject every coordinate for which math.IsNaN or math.IsInf is true before checking the minimum/maximum ordering. Add tests for NaN and both signs of infinity.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/foundation/semantics/tree.go",
+          "lines": {
+            "start": 33,
+            "end": 35
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "geometry"
+      ],
+      "evidence": "\t\tif n.Bounds[2] \u003c n.Bounds[0] || n.Bounds[3] \u003c n.Bounds[1] {\n\t\t\treturn fmt.Errorf(\"invalid bounds for %d\", n.ID)\n\t\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "92e71192187eb30a",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Tree traversal repeatedly scans all nodes",
+      "message": "Each visited node is located by scanning the entire node slice. Validating a connected snapshot therefore performs quadratic work, even for a shallow tree. Large accessibility snapshots can make validation disproportionately expensive.",
+      "suggestion": "Build an ID-to-node-index map during the initial validation pass and use it to retrieve children directly in visit, making validation O(nodes + edges).",
+      "confidence": 1,
+      "locations": [
+        {
+          "path": "prototypes/foundation/semantics/tree.go",
+          "lines": {
+            "start": 57,
+            "end": 65
+          }
+        }
+      ],
+      "tags": [
+        "quadratic-complexity"
+      ],
+      "evidence": "\t\tfor _, n := range s.Nodes {\n\t\t\tif n.ID == id {\n\t\t\t\tfor _, c := range n.Children {\n\t\t\t\t\tif err := visit(c); err != nil {\n\t\t\t\t\t\treturn err\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tbreak",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "406ce773b8504e53",
+      "severity": "medium",
+      "category": "security",
+      "title": "Keep build caches out of predictable shared temporary paths",
+      "message": "The default Go caches use a predictable directory in shared /tmp without checking its ownership. Another local user can pre-create that directory and retain control of cached module sources or build artifacts, potentially injecting code into subsequent builds and test executions.",
+      "suggestion": "Default to a cache beneath the user's home directory, or create a private temporary directory with mktemp. If shared temporary storage must be supported, validate ownership and permissions before using it.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/env.sh",
+          "lines": {
+            "start": 4,
+            "end": 6
+          }
+        }
+      ],
+      "tags": [
+        "cache-poisoning",
+        "shared-temporary-directory"
+      ],
+      "evidence": "export GOCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/gopath\"",
+      "fix": {
+        "before": "export GOCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/gopath\"",
+        "after": "export GOCACHE=\"${P0_CACHE_DIR:-$HOME/.cache/vellum-p0-cache}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-$HOME/.cache/vellum-p0-cache}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-$HOME/.cache/vellum-p0-cache}/gopath\""
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "c63d704d7f9cd310",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Validate offsets before signed range arithmetic",
+      "message": "The range arithmetic runs before validating the incoming offsets. focus-anchor and markedEnd-markedStart can overflow signed int, and abs(INT_MIN) is undefined. The later validRange checks cannot make those operations safe. Input.Update also narrows unrestricted Go ints to C.int without checking their representability.",
+      "suggestion": "Reject offsets outside the C.int range in Go. In the native function, validate nonnegative selection endpoints and ordered marked endpoints before subtraction, then compute lengths using NSUInteger. Reject malformed marked ranges before changing any text or selection state.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/inputbridge/input_darwin.m",
+          "lines": {
+            "start": 178,
+            "end": 181
+          }
+        }
+      ],
+      "tags": [
+        "integer-overflow",
+        "range-validation"
+      ],
+      "evidence": " NSRange selected=NSMakeRange(MIN(anchor,focus),abs(focus-anchor));\n if(value \u0026\u0026 validRange(value,selected)){[s-\u003etext setString:value];s-\u003eselected=selected;s-\u003ecaretOffset=focus;\n  if(markedStart\u003c0){BOOL discard=s-\u003ebefore!=nil;s-\u003emarked=NSMakeRange(NSNotFound,0);[s-\u003ebefore release];s-\u003ebefore=nil;if(discard)[[s-\u003eview inputContext] discardMarkedText];}\n  else {NSRange range=NSMakeRange(markedStart,markedEnd-markedStart);if(validRange(value,range))s-\u003emarked=range;}}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "9a051e12667b9be8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Idle timers access window state outside its lifecycle",
+      "message": "Both idle-sampling timers traverse the UI's scene/window state from background goroutines, and neither is cancelled or checks shutdown. Closing the window before either timer fires can make this traversal race with teardown or dereference a detached window. Atomic counter loads do not protect the preceding scene/window lookup.",
+      "suggestion": "Capture the paint-counter owner on the UI thread before scheduling the timers, so callbacks only read retained atomic counters. Also cancel both timers on close or suppress their callbacks after shutdown without traversing UI state.",
+      "confidence": 0.84,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/main.go",
+          "lines": {
+            "start": 232,
+            "end": 234
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "\t\t\t\twakes := f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window).Paint.Wakes.Load()\n\t\t\t\ttime.AfterFunc(*idle, func() {\n\t\t\t\t\ts := idleSample{Seconds: time.Since(start).Seconds(), CPUSeconds: cpuSeconds() - cpu, CanvasRepaints: f.paints.Load() - paints, PaintSchedulerWakes: f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window).Paint.Wakes.Load() - wakes, Note: \"Whole-process CPU; canvas repaint proxy, not compositor presents or wakeups. Small fixture, not the 1000-control budget workload.\"}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "def64443cda0e5f7",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Boundary lookups repeatedly segment and allocate the entire field",
+      "message": "Every boundary lookup constructs boundaries for the entire text before searching them. The new arrow-key, backspace, delete, and cursor-normalization paths therefore repeatedly segment the whole field and allocate an O(n) slice, even when moving between its first two characters. Large pasted values can make ordinary editing noticeably stall and generate substantial garbage.",
+      "suggestion": "Cache grapheme boundaries for the current editing text, invalidate the cache whenever the text changes, and use binary search for boundary lookups. Alternatively, provide allocation-free lookup helpers that stop segmentation once the required boundary is reached.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/patches/0001-grapheme-and-selection.patch",
+          "lines": {
+            "start": 103,
+            "end": 108
+          }
+        }
+      ],
+      "tags": [
+        "grapheme",
+        "allocations",
+        "interactive-latency"
+      ],
+      "evidence": "+\tseg.Init(text)\n+\tit := seg.GraphemeIterator()\n+\tbounds := []int{0}\n+\tfor it.Next() {\n+\t\tg := it.Grapheme()\n+\t\tbounds = append(bounds, g.Offset+len(g.Text))",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "3338eb304215f530",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Reject character lengths that split UTF-8 scalars",
+      "message": "Checking the total byte length does not ensure that individual character lengths end on UTF-8 boundaries. For example, Value \"é\" with CharacterLengths []uint8{1, 1} passes validation despite splitting a multibyte scalar. Native text selection and character-range operations can then receive invalid byte boundaries.",
+      "suggestion": "Validate every cumulative character-length offset against the string length and a UTF-8 rune boundary, in addition to checking the final total. Add a test rejecting \"é\" with lengths {1, 1}.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/semantics/tree.go",
+          "lines": {
+            "start": 60,
+            "end": 62
+          }
+        }
+      ],
+      "tags": [
+        "utf8",
+        "validation"
+      ],
+      "evidence": "\t\t\tif !utf8.ValidString(n.Value) || length != len(n.Value) {\n\t\t\t\treturn fmt.Errorf(\"invalid text run %d\", n.ID)\n\t\t\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "10a3a24fc164190a",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Use the existing node map during tree traversal",
+      "message": "Each visited node scans the snapshot from the beginning to locate its children. A valid N-node tree therefore takes quadratic time to validate, making large accessibility snapshots unnecessarily expensive. The function already builds an ID-to-node map.",
+      "suggestion": "Use nodes[id].Children directly in the traversal to make this reachability check linear in the number of nodes and edges.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/nativeinput/semantics/tree.go",
+          "lines": {
+            "start": 106,
+            "end": 115
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "complexity"
+      ],
+      "evidence": "\t\tfor _, n := range s.Nodes {\n\t\t\tif n.ID == id {\n\t\t\t\tfor _, c := range n.Children {\n\t\t\t\t\tif err := visit(c); err != nil {\n\t\t\t\t\t\treturn err\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tbreak\n\t\t\t}\n\t\t}",
+      "fix": {
+        "before": "\t\tfor _, n := range s.Nodes {\n\t\t\tif n.ID == id {\n\t\t\t\tfor _, c := range n.Children {\n\t\t\t\t\tif err := visit(c); err != nil {\n\t\t\t\t\t\treturn err\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tbreak\n\t\t\t}\n\t\t}",
+        "after": "\t\tfor _, c := range nodes[id].Children {\n\t\t\tif err := visit(c); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "cd84edeffe858901",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Handle failures when writing the requested report",
+      "message": "Report write failures are silently discarded. An invalid path, permission failure, or full disk leaves the requested smoke-run artifact missing or incomplete while the program appears to finish successfully.",
+      "suggestion": "Check the WriteFile error and report it to stderr; if the report is required by automation, also propagate the failure to the process exit status.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/p0/cogent/main.go",
+          "lines": {
+            "start": 177,
+            "end": 177
+          }
+        }
+      ],
+      "tags": [
+        "error-handling"
+      ],
+      "evidence": "\t\t\tos.WriteFile(*report, append(data, '\\n'), 0644)",
+      "fix": {
+        "before": "\t\t\tos.WriteFile(*report, append(data, '\\n'), 0644)",
+        "after": "\t\t\tif err := os.WriteFile(*report, append(data, '\\n'), 0644); err != nil {\n\t\t\t\tfmt.Fprintf(os.Stderr, \"write report %q: %v\\n\", *report, err)\n\t\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "43c87dbb36b60ef1",
+      "severity": "medium",
+      "category": "security",
+      "title": "Use private directories for build and module caches",
+      "message": "The default caches use a predictable, shared /tmp directory without checking ownership or permissions. Another local user can pre-create this directory and populate or modify the module cache, causing builds to consume attacker-controlled source code.",
+      "suggestion": "Default to a private user-owned cache directory, or create an isolated directory with mktemp -d and abort if creation fails. Validate ownership and permissions before reusing an existing cache directory.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/p0/env.sh",
+          "lines": {
+            "start": 4,
+            "end": 6
+          }
+        }
+      ],
+      "tags": [
+        "local-security",
+        "build-cache"
+      ],
+      "evidence": "export GOCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/gopath\"",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "f26115f287a376d8",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Tree clicks can select the wrong component after projection changes",
+      "message": "Tree click state is keyed by projection index rather than component identity. events() applies filtering, sorting, and document switching before navigation() consumes these clicks. If a projection change and a queued tree click are processed in the same frame, rows[i] can now identify a different component, so the click selects a component other than the one displayed when it occurred.",
+      "suggestion": "Key tree clickables by document and component ID, and consume pending clicks against the previously displayed identities before rebuilding the projection. Alternatively, discard pending tree clicks whenever the document or projection changes.",
+      "confidence": 0.93,
+      "locations": [
+        {
+          "path": "prototypes/p0/gio/main.go",
+          "lines": {
+            "start": 253,
+            "end": 255
+          }
+        }
+      ],
+      "tags": [
+        "input",
+        "selection"
+      ],
+      "evidence": "\t\t\t\tif ui.treeButtons[i].Clicked(gtx) {\n\t\t\t\t\tui.selectID(rows[i].ID)\n\t\t\t\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "d56bb738da252542",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Report output failures are silently discarded",
+      "message": "Report write failures are silently ignored. An invalid destination, permission error, or full disk leaves the requested metrics file missing or incomplete while the application exits successfully, making automated smoke runs appear successful without their report artifact.",
+      "suggestion": "Check the write error and report it at minimum. Prefer returning it from saveReport and propagating it to the shutdown path so a requested report that cannot be written produces a nonzero exit status.",
+      "confidence": 1,
+      "locations": [
+        {
+          "path": "prototypes/p0/gio/main.go",
+          "lines": {
+            "start": 377,
+            "end": 377
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "reporting"
+      ],
+      "evidence": "\t\tos.WriteFile(ui.report, append(b, '\\n'), 0644)",
+      "fix": {
+        "before": "\t\tos.WriteFile(ui.report, append(b, '\\n'), 0644)",
+        "after": "\t\tif err := os.WriteFile(ui.report, append(b, '\\n'), 0644); err != nil {\n\t\t\tfmt.Fprintf(os.Stderr, \"write report %q: %v\\n\", ui.report, err)\n\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "6d77ee073839b8e6",
+      "severity": "medium",
+      "category": "security",
+      "title": "Move Go caches out of a predictable shared temporary directory",
+      "message": "The default caches use a predictable, shared /tmp directory. Another local user can pre-create that directory or redirect it with a symlink, retaining control over cached dependency sources or build artifacts subsequently consumed by Go. This can compromise builds or prevent other users from building.",
+      "suggestion": "Default to a cache directory beneath the current user's home or XDG cache directory. If temporary caches are required, create a private directory with mktemp instead of using a fixed shared path.",
+      "confidence": 0.96,
+      "locations": [
+        {
+          "path": "prototypes/remediation/env.sh",
+          "lines": {
+            "start": 4,
+            "end": 6
+          }
+        }
+      ],
+      "tags": [
+        "cache-poisoning",
+        "shared-temporary-directory"
+      ],
+      "evidence": "export GOCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/gopath\"",
+      "fix": {
+        "before": "export GOCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-/tmp/vellum-p0-cache}/gopath\"",
+        "after": "export GOCACHE=\"${P0_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/vellum-remediation}/build\"\nexport GOMODCACHE=\"${P0_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/vellum-remediation}/mod\"\nexport GOPATH=\"${P0_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/vellum-remediation}/gopath\""
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "a2f02d154aff46ae",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Idle timers access the window after teardown",
+      "message": "Both idle-sampling timers access the render window without checking whether it has closed. Closing the window during settling or sampling can leave these callbacks dereferencing a detached window. These background callbacks also traverse UI-owned lifecycle state concurrently with teardown.",
+      "suggestion": "Capture the paint counter on the UI thread while the window is valid, rather than resolving RenderWindow inside timers. Retain and stop both timers on close, and check closed before collecting or emitting samples.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/remediation/main.go",
+          "lines": {
+            "start": 177,
+            "end": 179
+          }
+        }
+      ],
+      "tags": [
+        "lifecycle",
+        "timers",
+        "concurrency"
+      ],
+      "evidence": "\t\t\t\twakes := f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window).Paint.Wakes.Load()\n\t\t\t\ttime.AfterFunc(*idle, func() {\n\t\t\t\t\ts := idleSample{Seconds: time.Since(start).Seconds(), CPUSeconds: cpuSeconds() - cpu, CanvasRepaints: f.paints.Load() - paints, PaintSchedulerWakes: f.body.Scene.RenderWindow().SystemWindow.(*desktop.Window).Paint.Wakes.Load() - wakes, Note: \"Whole-process CPU; canvas repaint proxy, not compositor presents or wakeups. Small fixture, not the 1000-control budget workload.\"}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "b657019ec9ddfc9c",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Expose Rotate's disabled state to assistive technology",
+      "message": "The Rotate button continues to advertise an enabled click action when f.enabled is false, even though command(\"rotate\", ...) rejects the operation. Assistive technology therefore presents an available control that cannot perform its advertised action.",
+      "suggestion": "Represent the Rotate button's disabled state in the semantic snapshot when !f.enabled, and ensure its advertised actions and visual widget state agree with that availability.",
+      "confidence": 0.95,
+      "locations": [
+        {
+          "path": "prototypes/remediation/main.go",
+          "lines": {
+            "start": 488,
+            "end": 490
+          }
+        }
+      ],
+      "tags": [
+        "accessibility"
+      ],
+      "evidence": "\t\tif b, ok := w.(*core.Button); ok {\n\t\t\tn.Label = b.Text\n\t\t\tn.Actions = []string{\"click\", \"focus\"}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "b3fa2436bebb2c10",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Revalidate grapheme boundaries after deletion",
+      "message": "Deleting a whole grapheme can merge the surrounding text into a new grapheme, leaving the cursor inside it. For example, deleting X in \"🇺X🇳\" at rune offset 1 produces \"🇺🇳\" with the cursor still at offset 1. The next Backspace then deletes only one regional indicator, splitting the flag despite the new grapheme-aware handling.",
+      "suggestion": "Normalize the cursor and selection against the resulting text after deletion and other text mutations. Add a regression test that deletes the separator between regional indicators and then exercises Backspace and Delete.",
+      "confidence": 0.94,
+      "locations": [
+        {
+          "path": "prototypes/remediation/patches/0001-grapheme-and-selection.patch",
+          "lines": {
+            "start": 83,
+            "end": 87
+          }
+        }
+      ],
+      "tags": [
+        "unicode",
+        "editing"
+      ],
+      "evidence": "+ \t\tcase keymap.Delete:\n+ \t\t\te.SetHandled()\n+ \t\t\ttf.saveUndo()\n+-\t\t\ttf.cursorDelete(1)\n++\t\t\ttf.cursorDelete(textpos.NextGrapheme(tf.editText, tf.cursorPos) - tf.cursorPos)",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "c953b3f18149eab3",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Avoid rebuilding every grapheme boundary for each cursor operation",
+      "message": "Every boundary lookup segments the entire field and allocates all its boundaries. The patch invokes these lookups for arrow movement, hit testing, selection clamping, and text-size configuration, so even moving one position in a long pasted field incurs linear work and allocations. Repeated navigation across the field becomes quadratic.",
+      "suggestion": "Cache grapheme boundaries per text revision and use binary search for neighboring boundaries. Invalidate the cache only when editText changes, and benchmark navigation and layout with long field contents.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/remediation/patches/0001-grapheme-and-selection.patch",
+          "lines": {
+            "start": 101,
+            "end": 110
+          }
+        }
+      ],
+      "tags": [
+        "unicode",
+        "allocation"
+      ],
+      "evidence": "++func GraphemeBounds(text []rune) []int {\n++\tvar seg segmenter.Segmenter\n++\tseg.Init(text)\n++\tit := seg.GraphemeIterator()\n++\tbounds := []int{0}\n++\tfor it.Next() {\n++\t\tg := it.Grapheme()\n++\t\tbounds = append(bounds, g.Offset+len(g.Text))\n++\t}\n++\treturn bounds",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "c2e3a7cd9c9d1942",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Reject character lengths that split UTF-8 sequences",
+      "message": "Checking only the total byte length accepts character boundaries inside UTF-8 sequences. For example, Value \"é\" with CharacterLengths {1, 1} passes validation, although both declared characters contain invalid UTF-8. Native text navigation then receives invalid character offsets.",
+      "suggestion": "Validate each byte-length segment as UTF-8, with a bounds check before slicing. Add a test rejecting \"é\" with lengths {1, 1}.",
+      "confidence": 0.97,
+      "locations": [
+        {
+          "path": "prototypes/remediation/semantics/tree.go",
+          "lines": {
+            "start": 59,
+            "end": 61
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "unicode"
+      ],
+      "evidence": "\t\t\t\tlength += int(v)\n\t\t\t}\n\t\t\tif !utf8.ValidString(n.Value) || length != len(n.Value) {",
+      "fix": {
+        "before": "\t\t\t\tlength += int(v)\n\t\t\t}\n\t\t\tif !utf8.ValidString(n.Value) || length != len(n.Value) {",
+        "after": "\t\t\t\tlength += int(v)\n\t\t\t\tif length \u003e len(n.Value) || !utf8.ValidString(n.Value[length-int(v):length]) {\n\t\t\t\t\treturn fmt.Errorf(\"invalid character boundary in text run %d\", n.ID)\n\t\t\t\t}\n\t\t\t}\n\t\t\tif !utf8.ValidString(n.Value) || length != len(n.Value) {"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "ff8d507f99f13d29",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Reject non-finite accessibility bounds",
+      "message": "The ordering checks accept NaN coordinates because comparisons with NaN are false. They also accept infinite coordinates. Consequently, Validate can approve rectangles that cannot represent usable native accessibility geometry.",
+      "suggestion": "Reject math.IsNaN and math.IsInf for every bounds coordinate before checking rectangle ordering, and add tests for non-finite bounds.",
+      "confidence": 0.98,
+      "locations": [
+        {
+          "path": "prototypes/remediation/semantics/tree.go",
+          "lines": {
+            "start": 65,
+            "end": 67
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "geometry"
+      ],
+      "evidence": "\t\tif n.Bounds[2] \u003c n.Bounds[0] || n.Bounds[3] \u003c n.Bounds[1] {\n\t\t\treturn fmt.Errorf(\"invalid bounds for %d\", n.ID)\n\t\t}",
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    },
+    {
+      "id": "de4b039336164ef6",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Use indexed node lookup during tree validation",
+      "message": "Every visited node scans the entire node slice to find its children. A valid snapshot visits all nodes, making this traversal quadratic even for a shallow tree. Large accessibility snapshots incur unnecessary validation latency despite the node lookup map already being available.",
+      "suggestion": "Use the existing nodes map to retrieve nodes[id] directly during traversal.",
+      "confidence": 0.99,
+      "locations": [
+        {
+          "path": "prototypes/remediation/semantics/tree.go",
+          "lines": {
+            "start": 105,
+            "end": 107
+          }
+        }
+      ],
+      "tags": [
+        "complexity"
+      ],
+      "evidence": "\t\tfor _, n := range s.Nodes {\n\t\t\tif n.ID == id {\n\t\t\t\tfor _, c := range n.Children {",
+      "fix": {
+        "before": "\t\tfor _, n := range s.Nodes {\n\t\t\tif n.ID == id {\n\t\t\t\tfor _, c := range n.Children {\n\t\t\t\t\tif err := visit(c); err != nil {\n\t\t\t\t\t\treturn err\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tbreak\n\t\t\t}\n\t\t}",
+        "after": "\t\tn := nodes[id]\n\t\tfor _, c := range n.Children {\n\t\t\tif err := visit(c); err != nil {\n\t\t\t\treturn err\n\t\t\t}\n\t\t}"
+      },
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 443115,
+    "totalMs": 64071
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "openai",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol"
+      }
+    ],
+    "files": 83,
+    "bytes": 634744,
+    "chunks": 20,
+    "llmCalls": 20,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "openai",
+        "model": "gpt-6.1-sol",
+        "input": 210061,
+        "output": 21089,
+        "reasoning": 13689,
+        "cachedInput": 11888
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
