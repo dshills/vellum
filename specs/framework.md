@@ -78,7 +78,7 @@ growth preserves the viewport offset, clamping only when necessary.
 Tree expansion rebuilds a lightweight O(N) visible-node index; scrolling materializes O(viewport) records. Worker projections carry source revision metadata and require an owner-captured table token when installed. Background sources must be immutable snapshots. The Cancel command also cancels sorting.
 
 The separate `virtual.Grid` projects an owner-confined indexed source in two axes,
-with fixed row/header heights, frozen leading columns, bounded overscan and stable
+with fixed or indexed variable row heights, fixed headers, frozen leading columns, bounded overscan and stable
 row-key/column-ID active cells. It validates accessed indices instead of copying
 or scanning the full row source. Snapshot rectangles and clips are portable model
 geometry. The [managed adapter](grid-native.md) separately owns bounded native
@@ -87,7 +87,7 @@ Source revisions preserve the active key and top-row anchor where still present,
 subject to viewport extent clamping;
 retired opaque cell refs refuse activation after a viewport/source transition.
 See the [grid contract](grid.md). This adds an indexed foundation for the P6
-million-row workload; variable heights, editing, all-row selection and native
+million-row workload; editing, all-row selection and native
 performance remain open. Existing Table/Tree interfaces remain supported.
 
 ## GPU canvas

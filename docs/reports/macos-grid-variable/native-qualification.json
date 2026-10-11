@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "scope": "native indexed variable-row acceptance; actual Core offscreen geometry/pointer/wheel/Page, stable anchor/ref retirement and native local/pool budget refusals. No desktop GUI/external AX/performance qualification.",
+  "base_commit": "1aea5eb",
+  "created_utc": "2026-10-11T09:59:28.574325+00:00",
+  "source_root": "/private/tmp/vellum-grid-variable-rows",
+  "owned_sources": {
+    "drivers/cogent/grid.go": "04d0a6299ae33dd05ce82b89845f6bfd01eeb1f46c14392d2e97c9dfd730ea57",
+    "drivers/cogent/grid_variable_rows_test.go": "d3416c4eb82d161032c764c2c8d3c6afc97bdc4b5e282f20bc7ec277cb307e48",
+    "specs/grid-native.md": "bd825b0d539e8765aca9efffb1bbbf78ba20003e16eb1605f3a4586e99574ec5"
+  },
+  "portable_runtime": {
+    "virtual/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "virtual/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46"
+  },
+  "prepared_dependencies_metadata": {
+    "path": "/private/tmp/vellum-grid-variable-rows/drivers/cogent/native/dependencies.json",
+    "sha256": "315a4adfa620cfe6693d6924b87f358ed140c3baefe63d6048cf52d0c99723cc"
+  },
+  "prepared_before": [
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "files": 5832,
+      "sorted_relative_path_hashes_sha256": "45a54016343139711a62253de7b112ce0ae4b91a44afe096022ce71ca1cbc095"
+    },
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/typesetting",
+      "files": 288,
+      "sorted_relative_path_hashes_sha256": "6ba9b5825ef3d4214c7bb0c31455ce0c80bd6b5ac175f8adddd0c5d2deefce07"
+    }
+  ],
+  "native_runtime_and_test_tree_before": {
+    "files": 210,
+    "sorted_relative_path_hashes_sha256": "f1172269a6694bec92113548253367ebe6ae004d697e4159add9cd4b6a99a52c"
+  },
+  "verifier": {
+    "path": "/private/tmp/qualify-vellum-variable-native.py",
+    "sha256": "f981877d2964973c1ad9634307ae01e04b75cf224ba8d522138a7c93c2f5c03c"
+  },
+  "go_version": "go version go1.27.2 darwin/arm64",
+  "preliminary_runs": {
+    "/private/tmp/vellum-grid-variable-native-initial.log": {
+      "sha256": "a14c83877978134fa89445c6d45c34b895529de197f694a58f5fd67d7d16f79d",
+      "scope": "exploratory before root portable metric consistency corrections; not final acceptance"
+    },
+    "/private/tmp/vellum-grid-variable-native-corrected-1.log": {
+      "sha256": "d7729ca1425d06a150b6069def5ebf1ae271a1d076279d8155a44c288f5d9c3c",
+      "scope": "exploratory before root portable metric consistency corrections; not final acceptance"
+    }
+  },
+  "checks": [
+    {
+      "name": "variable-native-race3",
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-race",
+        "-count=3",
+        "-run",
+        "TestManagedGridVariable",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-grid-variable-rows/drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 31.057367208006326,
+      "log": "/private/tmp/vellum-grid-variable-native-final/variable-native-race3.log",
+      "log_sha256": "1114173f42611cad4ce2772fb4e7f3f5d47a36af5a3edef2c00106bcd34593b8"
+    },
+    {
+      "name": "fixed-native-regressions",
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-race",
+        "-count=1",
+        "-run",
+        "TestManagedGridActualGeometryAndPools|TestManagedGridNativeBudgetRefusedBeforeAllocation|TestReviewGridEmptyHugeViewportRefusedBeforeMount|TestReviewGridFractionalGlobalEdges",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-grid-variable-rows/drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 6.222113583004102,
+      "log": "/private/tmp/vellum-grid-variable-native-final/fixed-native-regressions.log",
+      "log_sha256": "b6f1a53bb79fc2602e0fac07036e109c06df7989b30bbb7e502e0110148662b6"
+    },
+    {
+      "name": "native-offscreen-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-grid-variable-rows/drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 15.194315375003498,
+      "log": "/private/tmp/vellum-grid-variable-native-final/native-offscreen-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_hashes_after": {
+    "drivers/cogent/grid.go": "04d0a6299ae33dd05ce82b89845f6bfd01eeb1f46c14392d2e97c9dfd730ea57",
+    "drivers/cogent/grid_variable_rows_test.go": "d3416c4eb82d161032c764c2c8d3c6afc97bdc4b5e282f20bc7ec277cb307e48",
+    "specs/grid-native.md": "bd825b0d539e8765aca9efffb1bbbf78ba20003e16eb1605f3a4586e99574ec5",
+    "virtual/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "virtual/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46"
+  },
+  "changed_sources": {},
+  "prepared_after": [
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "files": 5832,
+      "sorted_relative_path_hashes_sha256": "45a54016343139711a62253de7b112ce0ae4b91a44afe096022ce71ca1cbc095"
+    },
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/typesetting",
+      "files": 288,
+      "sorted_relative_path_hashes_sha256": "6ba9b5825ef3d4214c7bb0c31455ce0c80bd6b5ac175f8adddd0c5d2deefce07"
+    }
+  ],
+  "native_runtime_and_test_tree_after": {
+    "files": 210,
+    "sorted_relative_path_hashes_sha256": "f1172269a6694bec92113548253367ebe6ae004d697e4159add9cd4b6a99a52c"
+  },
+  "result": "PASS"
+}

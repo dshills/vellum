@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "result": "CHANGES_REQUIRED",
+  "candidate_root": "/private/tmp/vellum-grid-variable-rows",
+  "review_scope": "Adversarial portable source review of exact copied runtime draft using Go overlay; no candidate/canonical writes or GUI.",
+  "runtime_inputs": {
+    "/private/tmp/vellum-variable-row-review/draft-1/source/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "/private/tmp/vellum-variable-row-review/draft-1/source/grid_geometry.go": "df0b45ef9776da03af6faad4cf3714d03c44bf9c3263f7bf6082d127a74c1648",
+    "/private/tmp/vellum-variable-row-review/draft-1/source/grid_rows.go": "e2f7864f3ba8951e85883fb9a204b26b5285a90fb4e225ab57a41810404844e4"
+  },
+  "test": {
+    "path": "/private/tmp/vellum-variable-row-review/draft-1/metrics_review_test.go",
+    "sha256": "f1911419b83a9546481ebe2c36571d89812544677468aa33830d3f523c953e22"
+  },
+  "overlay": {
+    "path": "/private/tmp/vellum-variable-row-review/draft-1/overlay.json",
+    "sha256": "c140492d139206e245df50e4f0ee37a003ffcc9230ceb01d9d1a37f4827ce6db"
+  },
+  "check": {
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=1",
+      "-overlay=/private/tmp/vellum-variable-row-review/draft-1/overlay.json",
+      "-run",
+      "^TestReviewVariableRows",
+      "./virtual"
+    ],
+    "cwd": "/private/tmp/vellum-grid-variable-rows",
+    "env": {
+      "GOCACHE": "/private/tmp/vellum-variable-row-review/go-cache",
+      "GOWORK": "off"
+    },
+    "exit_code": 1,
+    "log": "/private/tmp/vellum-variable-row-review/draft-1/regressions-confirmed.log",
+    "log_sha256": "78efa0924d8b7063c042ee344982ae5db159023b9d4d4f13403ae8b2e6971ac4",
+    "scope": "Three assertions fail against initial copied draft; this is historical RED evidence, not current candidate acceptance."
+  },
+  "findings": [
+    {
+      "id": "variable-row-accessed-inverse",
+      "severity": "medium",
+      "file": "virtual/grid_rows.go",
+      "line": 161,
+      "test": "TestReviewVariableRowsDirectBoundsRequireInverse",
+      "description": "Direct indexed bounds only check offsets. With [0,100,50,300], JumpToKey row2 accepts its offset50 even RowAt(50) is row0, producing active identity and viewport anchor disagreement.",
+      "minimal_fix": "For each accessed direct row, validate metrics.RowAt(start) and metrics.RowAt(end-1) equal that row; avoid recursive at/bounds calls."
+    },
+    {
+      "id": "variable-row-page-direction",
+      "severity": "medium",
+      "file": "virtual/grid_rows.go",
+      "line": 161,
+      "test": "TestReviewVariableRowsPageCannotReverseDirection",
+      "description": "The same unchecked direct row span permits Page(+1) from row2 to accept overlapping lower row0 rather than refuse invalid source geometry. Test isolates Page with internal active origin; first finding also shows this origin can be produced through public JumpToKey before correction.",
+      "minimal_fix": "Validate accessed direct-row inverses; navigation must refuse contradictory metrics rather than accept opposite index motion."
+    },
+    {
+      "id": "variable-row-prospective-interior",
+      "severity": "medium",
+      "file": "virtual/grid_geometry.go",
+      "line": 49,
+      "test": "TestReviewVariableRowsProspectiveInteriorGeometry",
+      "description": "After accepting source revision2 while bad row2 is hidden, SetViewport Height45 accepts malformed interior span [20,15] because layout validates only visible endpoints. Snapshot then fails after viewport/generation already committed.",
+      "minimal_fix": "After capacity admission, validate all bounded visible/overscan row spans before committing a geometry transition. No hidden-source scan is required."
+    }
+  ],
+  "limitations": [
+    "The source is borrowed and must be immutable within revision; no complete validation of hidden boundaries is expected.",
+    "This tests observed malformed metrics and atomic geometry refusal, not concurrency on one owner-confined Grid."
+  ],
+  "created_utc": "2026-10-11T09:51:48.525501+00:00"
+}

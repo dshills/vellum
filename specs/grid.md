@@ -1,9 +1,9 @@
-# Fixed-height two-dimensional grid draft
+# Indexed two-dimensional grid draft
 
 This independent portable checkpoint adds a `virtual.Grid` without changing
 `Table`, `Tree`, or their source interfaces. It qualifies bounded projection,
 geometry and identity behavior. It does not qualify native rendering, frame
-performance, accessibility, editable cells, variable heights, all-row selection,
+performance, accessibility, editable cells, all-row selection,
 tree indexing, or completion of P6.
 
 ## Domain source and ownership
@@ -13,7 +13,7 @@ tree indexing, or completion of P6.
 `Cell(rowKey,columnID) (string,error)`. Identity is a nonempty UTF-8 incarnation
 identifier of at most 1,024 bytes. A row key cannot be reused for a different
 entity within one incarnation. Revision is nonzero and increases on changes
-to content, membership or order within that incarnation. A new incarnation may
+to content, membership, order or row geometry within that incarnation. A new incarnation may
 restart its revision. Reusing an incarnation for different domain entities is a
 source contract violation.
 
@@ -37,12 +37,15 @@ does not pin a large caller backing allocation. A source may itself retain its
 domain memory; that borrowed source memory is outside the Grid payload budget.
 
 Public methods refuse changed metadata with `ErrGridStale` until `Refresh`
-acknowledges a new revision. `Refresh` with unchanged metadata is a no-op.
+acknowledges a new revision. `Refresh` with unchanged metadata is a no-op after
+verifying the accepted indexed extent.
 `ReplaceSource` explicitly installs a borrowed indexed snapshot and always
 retires references, even when its stamp is unchanged. Within the same
 incarnation revision cannot decrease, and membership cannot change at an
-unchanged revision. The active key survives order changes if the new index still
+unchanged revision. Changing the presence of row metrics or their total extent
+also requires a new revision. The active key survives order changes if the new index still
 contains it. Preserving the top-row key and fractional row offset is best effort:
+the old in-row pixel offset is clamped to the new row's final pixel if it shrinks;
 normal extent clamping may place that key farther down the viewport near the
 source end or when the viewport becomes taller. Deleted/filtered-out active keys clear active
 state; a new incarnation clears active state and scroll offsets. Refusals do not
@@ -56,12 +59,39 @@ return `ErrGridInvalid`. Column definitions are copied once, have unique stable
 UTF-8 IDs and titles, positive integer logical-pixel widths, and at most 4,096
 definitions. The summed widths and total row extent plus header must fit `int`.
 
-`GridConfig` specifies fixed `RowHeight`, optional `HeaderHeight`, count of
+`GridConfig` specifies a positive fixed-height fallback `RowHeight`, optional `HeaderHeight`, count of
 `FrozenColumns`, row/column overscan, and capacities. `GridViewport` specifies
 positive Width/Height and nonnegative ScrollX/ScrollY. Grid clamps scrolling
 to content extents. The body excludes header height; nonfrozen columns exclude
 the leading frozen-column region. Header Y is always zero. Frozen columns retain
 their X while other columns pan. There are no frozen body rows.
+
+A source can additionally implement `GridRowMetrics{RowOffset(boundary),
+RowAt(pixel)}`. Boundaries range from zero through RowCount inclusive, start at
+zero and strictly increase; RowAt maps the half-open pixel domain `[0,total)`
+to its containing row. Both methods return `(int,error)`, must use bounded
+indexed in-memory reads, and must remain immutable within the source revision.
+`GridState.VariableHeights` reports the chosen mode; TotalHeight is the accepted
+indexed extent. Natural cell rectangles use each row's actual height.
+
+`NewRowHeights` and `NewRowHeightsContext` provide an immutable private prefix
+index copied from positive input heights. Preparation costs O(N) time and
+`(N+1)*sizeof(int)` retained storage, limited to 64 MiB; it checks overflow and
+cancellation before allocation, at least every 256 rows and before publication.
+The caller keeps the input unchanged during construction. Boundary reads are
+O(1), pixel lookup O(log N). Build this index before installation, usually on a
+worker; Grid never builds it on its owner. One million rows retain about 8 MB of
+prefix entries on a 64-bit machine, separately from input and domain data.
+Specialized sources may supply their own index, including procedural metrics.
+
+Grid verifies endpoints, accessed spans, predecessor ordering and the inverse
+mapping of both endpoints of each accessed row. Before committing geometry it
+checks all capacity-admitted visible/overscan spans. Capacity refusal precedes
+that bounded scan. It does not certify hidden spans, detect every unrevisioned
+interior mutation, or validate a whole-source index. Those remain source-contract
+requirements. Callback failures preserve their cause within ErrGridSource;
+revision drift refuses publication. Failed operations preserve Grid state and
+reference generations, although Grid cannot undo mutation of the borrowed source.
 
 `SetViewport` and `Scroll` validate the prospective pool before committing. A
 viewport that exceeds a capacity returns `ErrGridCapacity`, preserving the
@@ -106,12 +136,14 @@ to the configured row/column/cell capacities. Payload length is checked before
 UTF-8 scanning. Metadata is checked again after source reads; revision drift
 returns an error and a zero snapshot, never partially published mixed cells.
 
-Construction costs O(column definitions) plus one anchor lookup. Viewport
+Construction costs O(column definitions) plus bounded admitted-row validation and anchor lookup. Viewport
 geometry uses a bounded column prefix index and binary search, then visits only
 frozen/visible/overscan columns. Snapshot calls RowKey and IndexOf once per
 materialized row, and Cell once per materialized cell. Refresh and navigation
 perform a bounded number of indexed active/anchor/key lookups independent of
-total row count. No Grid operation scans or copies the million-row source.
+total row count. Indexed variable geometry adds a bounded number of boundary
+and pixel lookups per materialized row; lookup cost depends on the supplied
+index. No Grid operation scans or copies the million-row source.
 
 ## Active cells and renderer identity
 
@@ -119,7 +151,10 @@ total row count. No Grid operation scans or copies the million-row source.
 space permits. Oversized cells align their leading edge and are clipped.
 `Move(rowDelta,columnDelta)` clamps to row/column extents; with no active cell
 it starts at the viewport's first row/first column before applying the deltas.
-`Page(-1|1)` moves max(1, floor(bodyHeight/RowHeight)) rows. Empty sources and
+For fixed rows, `Page(-1|1)` moves max(1, floor(bodyHeight/RowHeight)) rows.
+For indexed variable rows, it maps the current row's top plus/minus
+max(1, bodyHeight) pixels to a row, with at least one row of progress except at
+the corresponding endpoint. Tall rows align their top when revealed. Empty sources and
 unknown keys/columns return `ErrGridRange`. Navigation does not materialize cell
 strings. Single active cell is the entire selection scope of this draft.
 
@@ -150,8 +185,18 @@ and 520 Cell calls in both datasets. A far jump makes two RowKey and two IndexOf
 calls and zero Cell calls. This is a callback/geometry workload proof, not a
 stored-dataset memory test, allocation benchmark or native performance result.
 
+Variable-row tests compare 500 seeded geometries with an independent brute
+oracle, helper boundaries with every pixel in 100 seeded indexes, checked
+overflow/cancellation, source failures and revision drift, anchor shrink/grow/
+reordering and pixel paging. The three original malformed-index review regressions
+remain tests. A procedural alternating 11/37-pixel source compares exact
+snapshot geometry and callback counts at 10k and 1M rows ×20 columns, including
+bounded metric reads; this does not measure latency, allocation or stored-data
+memory. Native and independent consumer evidence is recorded separately in the
+[variable-row report](../docs/reports/macos-grid-variable/README.md).
+
 The managed adapter owns bounded measured-cell/header pools and validates refs
-through this model. Variable-height indices, selection universes, editing draft
+through this model. Selection universes, editing draft
 conflict/settlement, background projection index preparation, hidden-cell
 accessibility navigation and full million-row native performance acceptance
 remain explicit later work. Existing Table/Tree callers need no migration for

@@ -1,0 +1,159 @@
+package virtual
+
+import (
+	"fmt"
+	"sort"
+	"strings"
+	"unicode/utf8"
+)
+
+type gridLayout struct {
+	firstRow, endRow int
+	columns          []int
+}
+
+func intersectGrid(a, b GridRect) GridRect {
+	x, y := max(a.X, b.X), max(a.Y, b.Y)
+	w, h := min(a.X+a.Width, b.X+b.Width)-x, min(a.Y+a.Height, b.Y+b.Height)-y
+	if w <= 0 || h <= 0 {
+		return GridRect{X: x, Y: y}
+	}
+	return GridRect{x, y, w, h}
+}
+func (g *Grid) columnClip(v GridViewport, col int) GridRect {
+	left, right := 0, min(v.Width, g.prefix[g.config.FrozenColumns])
+	if col >= g.config.FrozenColumns {
+		left, right = min(v.Width, g.prefix[g.config.FrozenColumns]), v.Width
+	}
+	return GridRect{left, 0, right - left, v.Height}
+}
+func (g *Grid) columnX(v GridViewport, col int) int {
+	x := g.prefix[col]
+	if col >= g.config.FrozenColumns {
+		x -= v.ScrollX
+	}
+	return x
+}
+func (g *Grid) cellRect(v GridViewport, start, height, col int) GridRect {
+	return GridRect{g.columnX(v, col), g.config.HeaderHeight + start - v.ScrollY, g.columns[col].Width, height}
+}
+func (g *Grid) cellClip(v GridViewport, start, height, col int) GridRect {
+	clip := g.columnClip(v, col)
+	clip.Y = min(v.Height, g.config.HeaderHeight)
+	clip.Height = v.Height - clip.Y
+	return intersectGrid(g.cellRect(v, start, height, col), clip)
+}
+
+// layout uses a binary search over bounded column definitions, not source rows.
+// Overscan may include empty clips; frozen columns outside the viewport are omitted.
+func (g *Grid) layout(v GridViewport, rows gridRows) (gridLayout, error) {
+	var out gridLayout
+	body := max(0, v.Height-g.config.HeaderHeight)
+	if body > 0 && rows.count > 0 {
+		first, err := rows.at(v.ScrollY)
+		if err != nil {
+			return gridLayout{}, err
+		}
+		remaining := rows.total - v.ScrollY
+		end := rows.count
+		if body < remaining {
+			last, err := rows.at(v.ScrollY + body - 1)
+			if err != nil {
+				return gridLayout{}, err
+			}
+			end = last + 1
+		}
+		if end <= first {
+			return gridLayout{}, ErrGridSource
+		}
+		out.firstRow = max(0, first-min(first, g.config.OverscanRows))
+		out.endRow = end + min(rows.count-end, g.config.OverscanRows)
+	}
+	for i := 0; i < g.config.FrozenColumns && g.prefix[i] < v.Width; i++ {
+		out.columns = append(out.columns, i)
+	}
+	frozen := g.prefix[g.config.FrozenColumns]
+	if pane := max(0, v.Width-frozen); pane > 0 && g.config.FrozenColumns < len(g.columns) {
+		start := frozen + v.ScrollX
+		first := sort.Search(len(g.columns), func(i int) bool { return g.prefix[i+1] > start })
+		end := len(g.columns)
+		if pane < g.prefix[len(g.columns)]-start {
+			edge := start + pane
+			end = sort.Search(len(g.columns), func(i int) bool { return g.prefix[i] >= edge })
+		}
+		first = max(g.config.FrozenColumns, first-min(first-g.config.FrozenColumns, g.config.OverscanColumns))
+		end += min(len(g.columns)-end, g.config.OverscanColumns)
+		for i := first; i < end; i++ {
+			out.columns = append(out.columns, i)
+		}
+	}
+	rowCount, cols := out.endRow-out.firstRow, len(out.columns)
+	if rowCount > g.config.MaxRows || cols > g.config.MaxColumns || (cols > 0 && rowCount > g.config.MaxCells/cols) {
+		return gridLayout{}, ErrGridCapacity
+	}
+	return out, nil
+}
+
+// Snapshot validates only accessed rows/cells. Source revision drift produces no
+// partial snapshot, and no Grid mutation. Text limits bound retained payload,
+// not allocations performed by the caller's source before returning its strings.
+func (g *Grid) Snapshot() (GridSnapshot, error) {
+	if err := g.current(); err != nil {
+		return GridSnapshot{}, err
+	}
+	l, err := g.layout(g.viewport, g.rows)
+	if err != nil {
+		return GridSnapshot{}, err
+	}
+	out := GridSnapshot{State: g.state(), Headers: make([]GridHeader, 0, len(l.columns)), Cells: make([]GridCell, 0, (l.endRow-l.firstRow)*len(l.columns))}
+	bytes := 0
+	addBytes := func(n int) bool {
+		if n > g.config.MaxTextBytes-bytes {
+			return false
+		}
+		bytes += n
+		return true
+	}
+	for _, col := range l.columns {
+		c := g.columns[col]
+		if !addBytes(len(c.ID) + len(c.Title)) {
+			return GridSnapshot{}, ErrGridCapacity
+		}
+		rect := GridRect{g.columnX(g.viewport, col), 0, c.Width, g.config.HeaderHeight}
+		out.Headers = append(out.Headers, GridHeader{col, c.ID, c.Title, rect, intersectGrid(rect, g.columnClip(g.viewport, col)), col < g.config.FrozenColumns})
+	}
+	for row := l.firstRow; row < l.endRow; row++ {
+		start, height, err := g.rows.bounds(row)
+		if err != nil {
+			return GridSnapshot{}, err
+		}
+		key, err := checkedGridRow(g.source, g.stamp, row)
+		if err != nil {
+			return GridSnapshot{}, err
+		}
+		if !addBytes(len(key)) {
+			return GridSnapshot{}, ErrGridCapacity
+		}
+		// One detached key per row is shared by its cells and opaque refs.
+		key = strings.Clone(key)
+		for _, col := range l.columns {
+			id := g.columns[col].ID
+			text, err := g.source.Cell(key, id)
+			if err != nil {
+				return GridSnapshot{}, fmt.Errorf("%w: cell: %w", ErrGridSource, err)
+			}
+			if !addBytes(len(text)) {
+				return GridSnapshot{}, ErrGridCapacity
+			}
+			if !utf8.ValidString(text) {
+				return GridSnapshot{}, ErrGridSource
+			}
+			ref := GridCellRef{g.token, g.generation, row, col, key, id}
+			out.Cells = append(out.Cells, GridCell{row, col, key, id, strings.Clone(text), g.cellRect(g.viewport, start, height, col), g.cellClip(g.viewport, start, height, col), col < g.config.FrozenColumns, g.active == (GridActive{key, id}), ref})
+		}
+	}
+	if err := checkedGridRows(g.source, g.stamp, g.rows); err != nil {
+		return GridSnapshot{}, err
+	}
+	return out, nil
+}

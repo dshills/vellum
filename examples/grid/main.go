@@ -1,4 +1,4 @@
-// Grid is an independent consumer of Vellum's managed fixed-height data grid.
+// Grid is an independent consumer of Vellum's managed two-dimensional data grid.
 package main
 
 import (
@@ -12,8 +12,10 @@ import (
 	"github.com/dshills/vellum/drivers/cogent"
 )
 
-func run(smoke bool) error {
-	program, err := newProgram()
+func run(smoke bool) error { return runMode(smoke, false) }
+
+func runMode(smoke, variableRows bool) error {
+	program, err := newProgramMode(1024, 760, variableRows)
 	if err != nil {
 		return err
 	}
@@ -54,8 +56,9 @@ func run(smoke bool) error {
 
 func main() {
 	smoke := flag.Bool("smoke", false, "check desktop measured geometry, model transitions and two-window lifetimes")
+	variableRows := flag.Bool("variable-rows", false, "use indexed stable-key variable row heights and per-window height toggles")
 	flag.Parse()
-	if err := run(*smoke); err != nil {
+	if err := runMode(*smoke, *variableRows); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

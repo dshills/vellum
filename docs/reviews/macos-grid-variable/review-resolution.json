@@ -1,0 +1,24 @@
+{
+  "result": "APPROVED",
+  "implementation_inputs": "prism-inputs.json",
+  "prism_result": {
+    "file": "prism.json",
+    "sha256": "74770377ed86ef03cd3a6417a1f7d700c28d53df43ebf3978ae01b07e17cf43e",
+    "exit_code": 0,
+    "complete": true,
+    "files": 22,
+    "reviewed_bytes": 133410,
+    "chunks": 3,
+    "findings": 0,
+    "discarded": 0,
+    "suppressed": 0
+  },
+  "internal_corrections": [
+    "Accessed row inverse mismatch",
+    "Paging against contradictory row spans",
+    "Prospective newly-visible interior geometry"
+  ],
+  "original_red_and_unchanged_green": "draft-1/review.json and draft-2/review.json",
+  "source_unchanged_after_prism": true,
+  "scope": "P6 variable-height model/native/consumer checkpoint; broader Mac completion remains open"
+}

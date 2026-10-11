@@ -1,0 +1,34 @@
+{
+  "base": "1aea5eb64e7dccc531611a5b07d5cf51b4103655",
+  "command": [
+    "/bin/zsh",
+    "-c",
+    "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. drivers/cogent/env.sh\ngo test -race -count=1 ./..."
+  ],
+  "exit_code": 0,
+  "seconds": 4.101,
+  "source_inputs": {
+    "docs/implementation.md": "6f9bc8e12db68efb328d2d628df8e59f30440c475edbaf4b8adcdad76c90dbf8",
+    "drivers/cogent/grid.go": "04d0a6299ae33dd05ce82b89845f6bfd01eeb1f46c14392d2e97c9dfd730ea57",
+    "drivers/cogent/grid_variable_rows_test.go": "d3416c4eb82d161032c764c2c8d3c6afc97bdc4b5e282f20bc7ec277cb307e48",
+    "examples/grid/README.md": "f21c24d34d032386d6b37b3df0a4bc77533039a77ff477ce9286e4267b5bdeae",
+    "examples/grid/main.go": "d2f22f61e44a7bc286f02955b719e62b7f9089c4d4b89f6d1ea9e3c991a38488",
+    "examples/grid/model.go": "52bb568c3639e7d61db478df222a39998d5134b3d00eb3191b62c894a1b267d2",
+    "examples/grid/smoke.go": "4301f090ce0d96fd6ebe8e5168bf5287415ad8fdf28953b799c8e5a777d0c478",
+    "examples/grid/source.go": "c3f28fb33a2bc20bc26a70532bcaa4f97e6b3aa90e26b5a3c93027e66ba4f699",
+    "examples/grid/variable_rows_managed_test.go": "c35c38375b93914862b66282194ad130745542882551b05963e3d4c334198780",
+    "examples/grid/variable_rows_test.go": "59d09ef77c346c192f7d1d033b687ac39a3a28777903b5a83577c32034d922ad",
+    "specs/framework.md": "1080a67bc52f5a032a44eeac987ed853f417db6acbc8332b8d445b4cec23fbcf",
+    "specs/grid-native.md": "bd825b0d539e8765aca9efffb1bbbf78ba20003e16eb1605f3a4586e99574ec5",
+    "specs/grid.md": "663f8201c391a76eefb99bd15e20a4580f99bf7d44a95a8d20f6d38e65b98afc",
+    "specs/macos-completion.md": "ed4c94ac06de162c9c5cfe5bdf9f419af8e2ed4820453ac60b94b6c47461d419",
+    "virtual/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "virtual/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46",
+    "virtual/grid_rows_failure_test.go": "fc0ac5d495a888207d62471ab82f4de318a9b9b73e724573feef0fb7a3c0fd1e",
+    "virtual/grid_rows_review_test.go": "22379096c683336c1bbe45ea7efd399c386210314d46d8e8935a5e27f4297ab7",
+    "virtual/grid_rows_test.go": "c64e33d8d72f66dc4ceacd283b0f202714bc3ce1ba077a0a9798d3d9a9056fe5"
+  },
+  "unchanged": true,
+  "log_sha256": "15fcd29a87ee660c287e2157a052b5acc68048124c8547f0126c0a99be20fecd"
+}

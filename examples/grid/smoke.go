@@ -215,6 +215,11 @@ func desktopSmoke(ctx context.Context, p *gridProgram) error {
 		RetainedViewport virtual.GridViewport
 		RevealedViewport virtual.GridViewport
 	}{projected.Stamp.Rows, projected.Stamp.Revision, retained.Active, retained.Viewport, projected.Viewport})
+	if p.variableRows {
+		if err := desktopVariablePage(ctx, p, second); err != nil {
+			return err
+		}
+	}
 	if err = owned(p.owner, func() error { return p.owner.CloseWindow(first.id) }); err != nil {
 		return err
 	}
@@ -238,5 +243,82 @@ func desktopSmoke(ctx context.Context, p *gridProgram) error {
 		return errors.New("grid smoke: last domain window lifetime remains active")
 	}
 	emit("pass", struct{ Scope string }{"desktop measured geometry, explicit model commands, closed-binding refusal and domain lifetimes; no human input/performance claim"})
+	return nil
+}
+
+// This remains a model-command desktop check. The optional source computes the
+// expected page destination arithmetically; the completed native inspection must
+// contain that exact selected stable key after the public Page command.
+func desktopVariablePage(ctx context.Context, p *gridProgram, w *gridWindow) error {
+	var before, after virtual.GridState
+	var expected virtual.GridActive
+	var metricCounts rowMetricCalls
+	if err := owned(p.owner, func() error {
+		var err error
+		before, err = w.grid.State()
+		if err != nil {
+			return err
+		}
+		if !before.VariableHeights || !w.variableRows {
+			return errors.New("grid smoke: variable source not installed")
+		}
+		index, found := w.source.rowIndex(before.Active.RowKey)
+		if !found {
+			return errors.New("grid smoke: variable page requires current active key")
+		}
+		metrics := &variableGridSource{gridSource: w.source}
+		start, err := metrics.RowOffset(index)
+		if err != nil {
+			return err
+		}
+		extent, err := metrics.RowOffset(w.source.RowCount())
+		if err != nil {
+			return err
+		}
+		pixel := min(extent-1, start+max(1, before.Viewport.Height-before.Config.HeaderHeight))
+		target, err := metrics.RowAt(pixel)
+		if err != nil {
+			return err
+		}
+		target = max(target, min(index+1, w.source.RowCount()-1))
+		key, err := w.source.RowKey(target)
+		if err != nil {
+			return err
+		}
+		expected = virtual.GridActive{RowKey: key, ColumnID: before.Active.ColumnID}
+		if err = w.grid.Page(1); err != nil {
+			return err
+		}
+		after, err = w.grid.State()
+		if err != nil {
+			return err
+		}
+		if !after.VariableHeights || after.Stamp != before.Stamp || after.Active != expected {
+			return errors.New("grid smoke: variable Page did not use active-top plus body pixels")
+		}
+		metricCounts = *w.metricCalls
+		w.report(nil)
+		return nil
+	}); err != nil {
+		return err
+	}
+	measured, err := waitInspection(ctx, w)
+	if err != nil {
+		return err
+	}
+	if err = checkInspection(measured); err != nil {
+		return err
+	}
+	if !measuredActive(measured, expected) {
+		return errors.New("grid smoke: variable pixel Page selection not in completed measured frame")
+	}
+	emit("variable-pixel-page", struct {
+		Rows         int
+		TotalHeight  int
+		Active       virtual.GridActive
+		Viewport     virtual.GridViewport
+		MetricCalls  rowMetricCalls
+		SourcePolicy string
+	}{after.Stamp.Rows, after.TotalHeight, expected, measured.Viewport, metricCounts, "stable-key periodic heights 23/35/47/29; indexed prefix/inverse; explicit owner Page"})
 	return nil
 }

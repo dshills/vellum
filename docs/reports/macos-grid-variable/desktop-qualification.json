@@ -1,0 +1,236 @@
+{
+  "created_utc": "2026-10-11T10:04:36.375654+00:00",
+  "scope": "Actual Cocoa completed-frame geometry, explicit owner commands and independent window lifetimes; no physical input, compositor teardown or performance qualification",
+  "producer_sha256": "1a18808d1fd37bb8650a55182d1f58ece40815163e852095391ace9c43d29cc2",
+  "binary": {
+    "path": "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop",
+    "sha256": "288c43db8dd505e3a96bdc27d06bb940d4385da3482900f672e293062fb96026"
+  },
+  "source_inputs": {
+    "drivers/cogent/env.sh": "8d008bd388bb856ac993bab286ab32fb2d1a02ccceb525097be55f60888491b3",
+    "drivers/cogent/go.mod": "27998a50e1f6b5b7f95e21c1f7ab5ab8672e557ed4438be427bf0aecd4d35fe2",
+    "drivers/cogent/grid.go": "04d0a6299ae33dd05ce82b89845f6bfd01eeb1f46c14392d2e97c9dfd730ea57",
+    "drivers/cogent/grid_accessibility.go": "3dc8d299b5f210b9c911e30e0fd4e18d9ab7e02dbf112cac3641f434c2d44b79",
+    "drivers/cogent/grid_geometry.go": "1fd281781debc97d6578612139b6aa5bcec4b9f592d4aff2d5aab735a81135c3",
+    "drivers/cogent/manual.go": "b56386e5e60b70566977c19a8362645ff9f783e62b725755add59504effd222e",
+    "drivers/cogent/manual_desktop.go": "19e2b3740ee612848df77a79da2e6968bde0831ace22371bfcf6d95c23120458",
+    "drivers/cogent/manual_offscreen.go": "9594a8afb8d8d97a91b5a06f666c445f159c520121ccb4909490fddfbeb330af",
+    "drivers/cogent/native/dependencies.json": "315a4adfa620cfe6693d6924b87f358ed140c3baefe63d6048cf52d0c99723cc",
+    "examples/grid/LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+    "examples/grid/README.md": "f21c24d34d032386d6b37b3df0a4bc77533039a77ff477ce9286e4267b5bdeae",
+    "examples/grid/go.mod": "a8783fc2baadfacb99cfe32918cbd292a53d24f956ae7f16a7951eda8da91309",
+    "examples/grid/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/grid/main.go": "d2f22f61e44a7bc286f02955b719e62b7f9089c4d4b89f6d1ea9e3c991a38488",
+    "examples/grid/managed_test.go": "be399d22ab8b39190a5fcc5c14bd60d9a1b328f3dae142d0c43dc76bda203d43",
+    "examples/grid/model.go": "52bb568c3639e7d61db478df222a39998d5134b3d00eb3191b62c894a1b267d2",
+    "examples/grid/model_test.go": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa",
+    "examples/grid/smoke.go": "4301f090ce0d96fd6ebe8e5168bf5287415ad8fdf28953b799c8e5a777d0c478",
+    "examples/grid/source.go": "c3f28fb33a2bc20bc26a70532bcaa4f97e6b3aa90e26b5a3c93027e66ba4f699",
+    "examples/grid/variable_rows_managed_test.go": "c35c38375b93914862b66282194ad130745542882551b05963e3d4c334198780",
+    "examples/grid/variable_rows_test.go": "59d09ef77c346c192f7d1d033b687ac39a3a28777903b5a83577c32034d922ad",
+    "virtual/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "virtual/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46"
+  },
+  "prepared_before": [
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "files": 5832,
+      "sorted_relative_path_hashes_sha256": "45a54016343139711a62253de7b112ce0ae4b91a44afe096022ce71ca1cbc095"
+    },
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/typesetting",
+      "files": 288,
+      "sorted_relative_path_hashes_sha256": "6ba9b5825ef3d4214c7bb0c31455ce0c80bd6b5ac175f8adddd0c5d2deefce07"
+    }
+  ],
+  "checks": [
+    {
+      "name": "fixed",
+      "argv": [
+        "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop",
+        "-smoke"
+      ],
+      "exit_code": 0,
+      "seconds": 4.481,
+      "log": "/private/tmp/vellum-grid-variable-desktop/fixed.log",
+      "log_sha256": "24ff15efba87d1aa6b6b96539be39fa9c4002204f7fc57b9c3c4fa544e46d5eb",
+      "stages": [
+        "ready",
+        "far-both-axes",
+        "immutable-projection",
+        "pass"
+      ],
+      "records": [
+        {
+          "stage": "ready",
+          "data": {
+            "Rows": [
+              10000,
+              1000000
+            ],
+            "Cells": [
+              256,
+              256
+            ]
+          }
+        },
+        {
+          "stage": "far-both-axes",
+          "data": {
+            "Viewport": {
+              "Width": 1797,
+              "Height": 380,
+              "ScrollX": 603,
+              "ScrollY": 23999648
+            },
+            "Cells": 256,
+            "Frames": 4
+          }
+        },
+        {
+          "stage": "immutable-projection",
+          "data": {
+            "Rows": 500000,
+            "Revision": 2,
+            "Active": {
+              "RowKey": "row:000999998",
+              "ColumnID": "column:19"
+            },
+            "RetainedViewport": {
+              "Width": 1797,
+              "Height": 380,
+              "ScrollX": 603,
+              "ScrollY": 11999648
+            },
+            "RevealedViewport": {
+              "Width": 1797,
+              "Height": 380,
+              "ScrollX": 603,
+              "ScrollY": 0
+            }
+          }
+        },
+        {
+          "stage": "pass",
+          "data": {
+            "Scope": "desktop measured geometry, explicit model commands, closed-binding refusal and domain lifetimes; no human input/performance claim"
+          }
+        }
+      ]
+    },
+    {
+      "name": "variable",
+      "argv": [
+        "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop",
+        "-smoke",
+        "-variable-rows"
+      ],
+      "exit_code": 0,
+      "seconds": 3.494,
+      "log": "/private/tmp/vellum-grid-variable-desktop/variable.log",
+      "log_sha256": "76492536cb04536c6bc6ba17c4b9ac1a45926c658a1f92d9be29dfae8096cfe7",
+      "stages": [
+        "ready",
+        "far-both-axes",
+        "immutable-projection",
+        "variable-pixel-page",
+        "pass"
+      ],
+      "records": [
+        {
+          "stage": "ready",
+          "data": {
+            "Rows": [
+              10000,
+              1000000
+            ],
+            "Cells": [
+              192,
+              192
+            ]
+          }
+        },
+        {
+          "stage": "far-both-axes",
+          "data": {
+            "Viewport": {
+              "Width": 1797,
+              "Height": 380,
+              "ScrollX": 603,
+              "ScrollY": 33499648
+            },
+            "Cells": 192,
+            "Frames": 4
+          }
+        },
+        {
+          "stage": "immutable-projection",
+          "data": {
+            "Rows": 500000,
+            "Revision": 2,
+            "Active": {
+              "RowKey": "row:000999998",
+              "ColumnID": "column:19"
+            },
+            "RetainedViewport": {
+              "Width": 1797,
+              "Height": 380,
+              "ScrollX": 603,
+              "ScrollY": 17499648
+            },
+            "RevealedViewport": {
+              "Width": 1797,
+              "Height": 380,
+              "ScrollX": 603,
+              "ScrollY": 0
+            }
+          }
+        },
+        {
+          "stage": "variable-pixel-page",
+          "data": {
+            "Rows": 500000,
+            "TotalHeight": 17500000,
+            "Active": {
+              "RowKey": "row:000999978",
+              "ColumnID": "column:19"
+            },
+            "Viewport": {
+              "Width": 1797,
+              "Height": 380,
+              "ScrollX": 603,
+              "ScrollY": 45
+            },
+            "MetricCalls": {
+              "Offset": 1026,
+              "At": 556
+            },
+            "SourcePolicy": "stable-key periodic heights 23/35/47/29; indexed prefix/inverse; explicit owner Page"
+          }
+        },
+        {
+          "stage": "pass",
+          "data": {
+            "Scope": "desktop measured geometry, explicit model commands, closed-binding refusal and domain lifetimes; no human input/performance claim"
+          }
+        }
+      ]
+    }
+  ],
+  "source_unchanged": true,
+  "prepared_after": [
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "files": 5832,
+      "sorted_relative_path_hashes_sha256": "45a54016343139711a62253de7b112ce0ae4b91a44afe096022ce71ca1cbc095"
+    },
+    {
+      "resolved_root": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/typesetting",
+      "files": 288,
+      "sorted_relative_path_hashes_sha256": "6ba9b5825ef3d4214c7bb0c31455ce0c80bd6b5ac175f8adddd0c5d2deefce07"
+    }
+  ],
+  "binary_unchanged": true,
+  "result": "PASS"
+}

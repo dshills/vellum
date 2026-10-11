@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--format",
+    "json",
+    "--out",
+    "/private/tmp/vellum-grid-variable-rows/docs/reviews/macos-grid-variable/prism.json",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--baseline",
+    "none",
+    "--max-diff-bytes",
+    "262144",
+    "--chunk-bytes",
+    "65536",
+    "--max-findings",
+    "12"
+  ],
+  "exit_code": 0,
+  "seconds": 27.982,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

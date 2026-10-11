@@ -43,6 +43,21 @@ dimensions are at most 65536 logical px and natural relative rectangle edges are
 within±262144 logical px; scale must be finite, positive and≤32, producing edges
 within±8388608 scene dots. These checks do not cap domain row counts or total
 vertical scroll extents. Portable MaxInt dimensions can be refused natively.
+An optional `virtual.GridRowMetrics` source supplies indexed variable row
+boundaries and pixel lookup. `GridState.VariableHeights` reports that selection;
+`GridConfig.RowHeight` remains a positive fixed-height fallback. Its native size
+cap is ignored when indexed metrics are active: the actual materialized row
+rectangles, including overscan, retain the local 65536 px bound. This does not
+permit oversized visible rows or increase record/text budgets. Heights, order
+and membership must be immutable within a source revision, and source replacement
+preserves the stable row-key anchor with its in-row pixel offset and active key.
+Page navigation uses the body-height distance from the current row's actual
+top, with at least one row of progress except at the corresponding end; wheel
+scroll remains a logical-pixel offset. Native rendering consumes the accepted
+bounded rectangle projection and never queries the metric source. Callers may
+prepare `RowHeights` before installation or supply a bounded index; the adapter
+never builds an entire row-height index on its owner.
+
 Hidden oversized column definitions are checked if/when materialized. Pools
 reuse active widgets and destroy surplus slots to release private shaped-text
 caches, with no whole-source allocation.
@@ -84,5 +99,8 @@ NewManual captures current grid geometry and dynamic cells without calling
 callbacks directly. Actual pointer/key/wheel events route through Core scene
 focus/modal handling and the grid host. Dynamic cell incarnations retire on
 projection changes. A source inspection failure remains an explicit failure,
-rather than being mislabeled pending layout. Desktop GUI, physical input,
+rather than being mislabeled pending layout. Current inspection uses the
+portable State revision/extent verification, including a constant number of
+metric boundary reads for variable sources; it does not enumerate rows, perform
+pixel search or refetch Cell strings. Desktop GUI, physical input,
 external AX and performance acceptance are not proved by these offscreen checks.

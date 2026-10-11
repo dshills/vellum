@@ -99,7 +99,7 @@ func validateNativeGrid(n ui.Node) error {
 		return err
 	}
 	c := s.Config
-	if s.Viewport.Width > gridNativeMaxDimension || s.Viewport.Height > gridNativeMaxDimension || c.RowHeight > gridNativeMaxDimension || c.HeaderHeight > gridNativeMaxDimension || c.MaxRows > gridNativeMaxRows || c.MaxColumns > gridNativeMaxColumns || c.MaxCells > gridNativeMaxCells || c.MaxTextBytes > gridNativeMaxText {
+	if s.Viewport.Width > gridNativeMaxDimension || s.Viewport.Height > gridNativeMaxDimension || !s.VariableHeights && c.RowHeight > gridNativeMaxDimension || c.HeaderHeight > gridNativeMaxDimension || c.MaxRows > gridNativeMaxRows || c.MaxColumns > gridNativeMaxColumns || c.MaxCells > gridNativeMaxCells || c.MaxTextBytes > gridNativeMaxText {
 		return ErrGridBudget
 	}
 	return nil

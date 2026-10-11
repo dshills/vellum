@@ -1,0 +1,9 @@
+--- FAIL: TestReviewVariableRowsDirectBoundsRequireInverse (0.00s)
+    metrics_review_test.go:24: indexed row2 has RowOffset=50 but RowAt(50)=row0; Jump must refuse contradictory accessed inverse, got err=<nil> state={Stamp:{Identity:review Revision:1 Rows:3} Generation:2 Viewport:{Width:20 Height:5 ScrollX:0 ScrollY:50} Active:{RowKey:2 ColumnID:c} Columns:1 TotalWidth:20 TotalHeight:300 FrozenWidth:0 Config:{RowHeight:1 HeaderHeight:0 FrozenColumns:0 OverscanRows:0 OverscanColumns:0 MaxRows:256 MaxColumns:64 MaxCells:4096 MaxTextBytes:8388608} VariableHeights:true}
+--- FAIL: TestReviewVariableRowsPageCannotReverseDirection (0.00s)
+    metrics_review_test.go:35: Page(+1) from row2 maps pixel55 to row0 and moves backward; expected source refusal, got <nil> active={RowKey:0 ColumnID:c}
+--- FAIL: TestReviewVariableRowsProspectiveInteriorGeometry (0.00s)
+    metrics_review_test.go:49: newly materialized row2 has end15<=start20; geometry transition should refuse atomically, got err=<nil> state={Stamp:{Identity:review Revision:2 Rows:5} Generation:3 Viewport:{Width:20 Height:45 ScrollX:0 ScrollY:0} Active:{RowKey: ColumnID:} Columns:1 TotalWidth:20 TotalHeight:50 FrozenWidth:0 Config:{RowHeight:1 HeaderHeight:0 FrozenColumns:0 OverscanRows:0 OverscanColumns:0 MaxRows:256 MaxColumns:64 MaxCells:4096 MaxTextBytes:8388608} VariableHeights:true}
+FAIL
+FAIL	github.com/dshills/vellum/virtual	0.275s
+FAIL

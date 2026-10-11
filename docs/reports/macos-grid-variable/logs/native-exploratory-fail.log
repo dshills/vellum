@@ -1,0 +1,16 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestManagedGridVariableRowGeometryPointerWheelAndPage (3.24s)
+    --- FAIL: TestManagedGridVariableRowGeometryPointerWheelAndPage/96 (1.25s)
+        grid_variable_rows_test.go:256: cogent: target requires a current explicit frame
+    --- FAIL: TestManagedGridVariableRowGeometryPointerWheelAndPage/120 (0.84s)
+        grid_variable_rows_test.go:256: cogent: target requires a current explicit frame
+    --- FAIL: TestManagedGridVariableRowGeometryPointerWheelAndPage/144 (0.63s)
+        grid_variable_rows_test.go:256: cogent: target requires a current explicit frame
+    --- FAIL: TestManagedGridVariableRowGeometryPointerWheelAndPage/192 (0.51s)
+        grid_variable_rows_test.go:256: cogent: target requires a current explicit frame
+--- FAIL: TestManagedGridVariableRowsReplaceAnchorAndRetireRefs (0.75s)
+    grid_variable_rows_test.go:381: InspectGrid reread variable source/metric index
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	4.610s
+FAIL

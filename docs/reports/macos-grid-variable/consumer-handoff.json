@@ -1,0 +1,143 @@
+{
+  "schema": "vellum-variable-grid-example-handoff-v1",
+  "created_utc": "2026-10-11T10:04:42.524337+00:00",
+  "result": "PASS",
+  "owned_source_hashes": {
+    "/private/tmp/vellum-grid-variable-rows/examples/grid/source.go": "c3f28fb33a2bc20bc26a70532bcaa4f97e6b3aa90e26b5a3c93027e66ba4f699",
+    "/private/tmp/vellum-grid-variable-rows/examples/grid/model.go": "52bb568c3639e7d61db478df222a39998d5134b3d00eb3191b62c894a1b267d2",
+    "/private/tmp/vellum-grid-variable-rows/examples/grid/main.go": "d2f22f61e44a7bc286f02955b719e62b7f9089c4d4b89f6d1ea9e3c991a38488",
+    "/private/tmp/vellum-grid-variable-rows/examples/grid/smoke.go": "4301f090ce0d96fd6ebe8e5168bf5287415ad8fdf28953b799c8e5a777d0c478",
+    "/private/tmp/vellum-grid-variable-rows/examples/grid/README.md": "f21c24d34d032386d6b37b3df0a4bc77533039a77ff477ce9286e4267b5bdeae",
+    "/private/tmp/vellum-grid-variable-rows/examples/grid/variable_rows_test.go": "59d09ef77c346c192f7d1d033b687ac39a3a28777903b5a83577c32034d922ad",
+    "/private/tmp/vellum-grid-variable-rows/examples/grid/variable_rows_managed_test.go": "c35c38375b93914862b66282194ad130745542882551b05963e3d4c334198780"
+  },
+  "qualification": {
+    "path": "/private/tmp/vellum-variable-grid-example/qualified-v1/qualification.json",
+    "sha256": "1a18808d1fd37bb8650a55182d1f58ece40815163e852095391ace9c43d29cc2"
+  },
+  "verifier": {
+    "path": "/private/tmp/vellum-variable-grid-example/qualify.py",
+    "sha256": "b37a7d8a3688cb90628d7d950017faf04155362fe1833cd8c13e85dcde7b33fb"
+  },
+  "checks": [
+    {
+      "name": "portable-race20",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-variable-rows/drivers/cogent/env.sh; go test -race -count=20 source.go model.go model_test.go variable_rows_test.go",
+      "cwd": "/private/tmp/vellum-grid-variable-rows/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.029,
+      "log": "/private/tmp/vellum-variable-grid-example/qualified-v1/portable-race20.log",
+      "log_sha256": "b34c094e3ceb4beb9d55da4d01b3f0e49f643dc5b4b5661c30ba3c86e9490155"
+    },
+    {
+      "name": "managed-race",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-variable-rows/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v ./...",
+      "cwd": "/private/tmp/vellum-grid-variable-rows/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 85.498,
+      "log": "/private/tmp/vellum-variable-grid-example/qualified-v1/managed-race.log",
+      "log_sha256": "c0e8da1c2775f3df926f6036896d62d0fe5aba540ed35fdc7e6a96a3b528eebf"
+    },
+    {
+      "name": "managed-vet",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-variable-rows/drivers/cogent/env.sh; go vet -tags offscreen ./...",
+      "cwd": "/private/tmp/vellum-grid-variable-rows/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 6.881,
+      "log": "/private/tmp/vellum-variable-grid-example/qualified-v1/managed-vet.log",
+      "log_sha256": "25ead168fb89fe4978b028e354be1448ef4bea9fd165fb5f3d25df32bf570182"
+    },
+    {
+      "name": "desktop-race-build",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-variable-rows/drivers/cogent/env.sh; go build -race -o /private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop .",
+      "cwd": "/private/tmp/vellum-grid-variable-rows/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 14.358,
+      "log": "/private/tmp/vellum-variable-grid-example/qualified-v1/desktop-race-build.log",
+      "log_sha256": "bf50bf73eb2ffe1c59f1883dcf287d83190518ea6f086d362c4d11b03c6c407f"
+    }
+  ],
+  "native_producer_qualification": {
+    "path": "/private/tmp/vellum-grid-variable-native-final/qualification.json",
+    "sha256": "5b9ff9a3f26a3f3e2904e860f4a16c451aba5deb93df527658807a40257625e3",
+    "result": "PASS",
+    "shared_runtime_hashes_match": true,
+    "shared_runtime_hashes": {
+      "virtual/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+      "virtual/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+      "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46",
+      "drivers/cogent/grid.go": "04d0a6299ae33dd05ce82b89845f6bfd01eeb1f46c14392d2e97c9dfd730ea57"
+    }
+  },
+  "binary": {
+    "path": "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop",
+    "sha256": "288c43db8dd505e3a96bdc27d06bb940d4385da3482900f672e293062fb96026"
+  },
+  "binary_metadata": [
+    {
+      "command": [
+        "go",
+        "version",
+        "-m",
+        "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop"
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-variable-grid-example/qualified-v1/binary-build-info.log",
+      "sha256": "e198cb2205f8c92d714fae9497aca549c1eb830dd4eae46b982032730c6d7fd5"
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop"
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-variable-grid-example/qualified-v1/binary-libraries.log",
+      "sha256": "48147a3e3404f1ed6a5eaabb6278a032dd6f55c0ce694fdc70e89a91cc06e7ab"
+    },
+    {
+      "command": [
+        "otool",
+        "-l",
+        "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop"
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-variable-grid-example/qualified-v1/binary-load-commands.log",
+      "sha256": "a8f906a2802d138b76fc419c14de02e4c3819c96c88035539f747c7ee13f0653"
+    }
+  ],
+  "library_layout": "otool-L lists only absolute macOS system libraries/frameworks; no bundled external dylib or native/ directory required by this race binary; no LC_RPATH commands.",
+  "desktop_commands": [
+    "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop -smoke",
+    "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop -smoke -variable-rows"
+  ],
+  "interactive_command": "/private/tmp/vellum-variable-grid-example/qualified-v1/grid-desktop -variable-rows",
+  "build_source_symlinks": {
+    "core": "/private/tmp/vellum-grid-variable-rows/drivers/cogent/build/upstream",
+    "typesetting": "/private/tmp/vellum-grid-variable-rows/drivers/cogent/build/typesetting"
+  },
+  "source_contract": "stable-key procedural height pattern23/35/47/29, period\u22644 prefix/inverse, default source remains nonmetrics, source revision advances on height mode changes",
+  "qualified_scope": "Portable brute/prefix/inverse/bounds and immutable projection; actual managed offscreen geometry/input at96/120/144/192, pixel Page, wheel, source controls, toggles, stale press, same-viewport10k/1M indexed access counts; legacy tests preserved.",
+  "limits": [
+    "No Cocoa/native desktop execution performed by this producer. Integration owner will run actual desktop checks sequentially.",
+    "Desktop smoke uses explicit owner model commands and completed inspection; no synthesized desktop input/compositor teardown claim.",
+    "Compact7/5/12 maps are not a complete build source closure; integration owner retains full graph separately.",
+    "Access counts are not latency/memory/performance measurement.",
+    "Variable-height grids do not complete all selection, editing/conflicts, tree expansion, native services or fullP6 workloads."
+  ],
+  "history": {
+    "exploratory_logs": {
+      "/private/tmp/vellum-variable-grid-example/managed-initial.log": "f30c4d1cdd61aef8af724a7212d51480ea5f0847fd7044c007744ab392ed6b32",
+      "/private/tmp/vellum-variable-grid-example/portable-initial.log": "67584c5b67cd87ea0ba362ada7670bd94b5690026ea4710bdea00e27bffb36b4",
+      "/private/tmp/vellum-variable-grid-example/managed-projection-followup.log": "e348c70fdfec353dcf5d57c51d266fb4d8f3d5681333014d88578d5026fe728e"
+    },
+    "harness_refusal": "/private/tmp/vellum-variable-grid-example/harness-manifest-path-refusal/reason.txt",
+    "harness_refusal_before_go_checks": true
+  },
+  "old_regression_files_unchanged": true,
+  "no_source_or_binary_writes_after_qualification": true
+}

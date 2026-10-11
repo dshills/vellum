@@ -59,13 +59,13 @@ work; future-only timers do not force an implicit advance. The scope is one
 active managed application per process, with multiple windows sharing its clock.
 See the [checkpoint report](../docs/reports/macos-replay/README.md).
 
-The [indexed grid foundation](grid.md) now provides bounded fixed-height,
+The [indexed grid foundation](grid.md) now provides bounded fixed or indexed variable-height,
 two-axis portable geometry with frozen headers/columns and stable cell identity.
 Its 10k and million-row procedural fixtures have identical visible callback work.
 That proves the projection cost. The [managed adapter](grid-native.md) adds
 bounded native cell pools, clipped measured geometry, routed pointer/keyboard
 navigation and visible-cell accessibility. Retained dataset memory, frame
-performance, variable heights, selection/editing and the complete P6 table/tree
+performance, selection/editing and the complete P6 table/tree
 workload remain open.
 
 Full P9 professional workload and large-data replay acceptance, external

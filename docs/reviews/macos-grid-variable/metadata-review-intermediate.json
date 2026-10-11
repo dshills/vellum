@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "reviewer": "platform_completion",
+  "created_utc": "2026-10-11T10:11:34.474048+00:00",
+  "result": "CHANGES_REQUIRED",
+  "scope": "Read-only final variable-row checkpoint evidence and staged implementation parity; supplemental review receipts revalidated after prior complete metadata audit. No tests, GUI, Prism or candidate/canonical/Git mutations. Only this detached certificate was written.",
+  "source_root": "/private/tmp/vellum-grid-variable-rows",
+  "base_commit": "1aea5eb64e7dccc531611a5b07d5cf51b4103655",
+  "ledger": {
+    "path": "docs/reports/macos-grid-variable/qualification.json",
+    "sha256": "d11d73c003618f917b919f39c95a8781feea2e62f01abea776a329d2b64033a0"
+  },
+  "maps": {
+    "implementation_inputs": {
+      "count": 22,
+      "sorted_map_sha256": "9660a950d066973edcc5666094c52211612e5bb539e26540b6007af78e306759",
+      "all_current_hashes_match": true
+    },
+    "evidence_artifacts": {
+      "count": 27,
+      "sorted_map_sha256": "0fe2eecda7cc0c26e131c31e97ec45ac7ab913efd9773e04cd60e2fc8d90c669",
+      "all_current_hashes_match": true
+    },
+    "review_artifacts": {
+      "count": 27,
+      "sorted_map_sha256": "4c9a2d0f6c659867b8f40162f0759667881c22ceb059df96881011b6668f24cb",
+      "all_current_hashes_match": true
+    }
+  },
+  "staged_implementation": {
+    "count": 22,
+    "current_index_files": 22,
+    "current_index_and_worktree_match_reviewed_inputs": true
+  },
+  "supplements": {
+    "internal-final.json": "af20d18fd59ba1193c89982810c954aff325257df38dc40ef10fbc2b08686cbc",
+    "internal-final-inputs.json": "4b06e1d92c7727ae3bc5aa75bb22705eb2216520d5d55cd931a71c2148832432",
+    "internal-final-original-regressions.log": "6421a0fda10750287d794cd27f595e75e920300b9287521e542859ae75815ef3",
+    "review-resolution.json": "032bc7c4446af64f006cdf3aeaaa992b8682eb717bf8e04153c52e6528467bef"
+  },
+  "prism": {
+    "sha256": "74770377ed86ef03cd3a6417a1f7d700c28d53df43ebf3978ae01b07e17cf43e",
+    "inputs_sha256": "0d8ae89da997dcde1535a48ce4a617a5c1f2313f66b194f5b8c617478bd4c997",
+    "process_sha256": "c28c721d8c4c8c91423a6df4bb8d9473c5ad173008613e54fb34bac692d48fe8",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "complete": true,
+    "files": 22,
+    "bytes": 133410,
+    "chunks": 3,
+    "calls": 3,
+    "exit_code": 0,
+    "findings": 0,
+    "discarded": 0,
+    "suppressed": 0
+  },
+  "checked": [
+    "All22 implementation,27 producer/evidence and26 review hashes match current files; implementation map is unchanged from the prior audit and matches current index bytes.",
+    "Internal20-source certificate/map agree with current implementation; retained exact-original current regression log and historical red/green references match.",
+    "Strict fixed4-stage and variable5-stage raw transcripts match producer records and both process exits0; unused wrong expected-stage literal in original runner is not relied on.",
+    "No historical .go file is an active package; retained source/test versions use .go.txt.",
+    "Current supplemental approval and zero-finding Prism result are consistent with the checkpoint scope."
+  ],
+  "desktop_stages": {
+    "fixed": [
+      "ready",
+      "far-both-axes",
+      "immutable-projection",
+      "pass"
+    ],
+    "variable": [
+      "ready",
+      "far-both-axes",
+      "immutable-projection",
+      "variable-pixel-page",
+      "pass"
+    ]
+  },
+  "material_issues": [
+    "Final ledger SHA differs from announced frozen bytes"
+  ],
+  "limits": [
+    "Audit verifies existing records and exact hashes; it does not independently rerun tests or Cocoa.",
+    "Selected consumer source maps are deliberately not a complete build closure.",
+    "Historical exploratory native test SHA differs from final source and is not current acceptance.",
+    "Physical desktop input, external AX, sustained latency/frame/allocation/memory qualification, full P6 and remaining Mac milestones are not established by this checkpoint.",
+    "A future committed clean SDK qualification is separate; this certificate does not certify that future artifact."
+  ]
+}

@@ -170,7 +170,7 @@ performance acceptance remain open. Software replay does not certify those gates
 
 ## Indexed grid foundation
 
-`virtual.Grid` adds a separate indexed-source model for fixed-height two-axis
+`virtual.Grid` adds a separate indexed-source model for fixed or variable-height two-axis
 virtualization, frozen headers/leading columns, bounded detached snapshots and
 stale press identities. Active keys and top-row anchors survive indexed source
 reordering, subject to viewport extent clamping, without a full-row owner scan. The procedural 10k and million-row ×20
@@ -179,5 +179,10 @@ See [contract](../specs/grid.md) and [portable evidence](reports/macos-grid-mode
 The [managed adapter](../specs/grid-native.md) exposes `ui.DataGrid` with bounded
 native cell/header pools, a single keyboard focus target, routed pointer/wheel/
 arrow/page navigation, completed-frame geometry inspection and visible-cell
-accessibility. Native performance, variable-height rows, all-row selection,
+accessibility. Optional `GridRowMetrics` supports bounded indexed geometry and
+pixel paging; `RowHeights` offers cancellable prefix preparation outside the UI
+owner. The independent Grid example opts in with `-variable-rows`, retaining
+stable-key heights through reverse/filter and source-revision toggles. See the
+[variable-row report](reports/macos-grid-variable/README.md).
+Native performance, all-row selection,
 editing and large-tree completion remain subsequent P6 work.

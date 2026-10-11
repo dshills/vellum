@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "result": "APPROVED_CORRECTIVE_RUNTIME",
+  "scope": "Read-only source review plus original exact three regression bodies; not final batch qualification or full test-suite certification.",
+  "candidate_root": "/private/tmp/vellum-grid-variable-rows",
+  "reviewed_runtime": {
+    "virtual/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "virtual/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46"
+  },
+  "source_copies": {
+    "/private/tmp/vellum-variable-row-review/draft-2/source/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "/private/tmp/vellum-variable-row-review/draft-2/source/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+    "/private/tmp/vellum-variable-row-review/draft-2/source/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46",
+    "/private/tmp/vellum-variable-row-review/draft-1/metrics_review_test.go": "f1911419b83a9546481ebe2c36571d89812544677468aa33830d3f523c953e22"
+  },
+  "prior_red_review": {
+    "path": "/private/tmp/vellum-variable-row-review/draft-1/review.json",
+    "sha256": "ca61130f13309195aae7e631271425b0901fa9192e151c7f33cfafb0cdbccb5d"
+  },
+  "prior_red_log": {
+    "path": "/private/tmp/vellum-variable-row-review/draft-1/regressions-confirmed.log",
+    "sha256": "78efa0924d8b7063c042ee344982ae5db159023b9d4d4f13403ae8b2e6971ac4"
+  },
+  "original_test_body": {
+    "path": "/private/tmp/vellum-variable-row-review/draft-1/metrics_review_test.go",
+    "sha256": "f1911419b83a9546481ebe2c36571d89812544677468aa33830d3f523c953e22"
+  },
+  "green_check": {
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=1",
+      "-overlay=/private/tmp/vellum-variable-row-review/draft-2/overlay.json",
+      "-run",
+      "^TestReviewVariableRows",
+      "./virtual"
+    ],
+    "cwd": "/private/tmp/vellum-grid-variable-rows",
+    "exit_code": 0,
+    "env": {
+      "GOCACHE": "/private/tmp/vellum-variable-row-review/go-cache",
+      "GOWORK": "off"
+    },
+    "overlay_sha256": "b74cd176bd78ae5df155b5d450331df9c73ec3718ca5263efb1c122544f74cc8",
+    "log": "/private/tmp/vellum-variable-row-review/draft-2/original-regressions.log",
+    "log_sha256": "98c9f64f1c68c795c88fb529aaac83189be29006e913bcf917f8ee3e2da3fd8b"
+  },
+  "resolved_findings": [
+    "variable-row-accessed-inverse",
+    "variable-row-page-direction",
+    "variable-row-prospective-interior"
+  ],
+  "source_findings": [],
+  "source_reasoning": [
+    "bounds validates offset(row), offset(row+1), local previous-boundary strict ordering and raw inverse at start/end-1; no recursive at/bounds cycle.",
+    "layout checks capacity first, then only its materialized visible/overscan row span. MaxRows limits that scan to4096; neither hidden row count nor total extent drives the validation loop.",
+    "Snapshot validates prospective geometry before allocating cell records; SetViewport/ReplaceSource/activateKey commit only after admitted geometry, anchor/identity and final stamp/endpoint checks.",
+    "Empty row sources have zero total and do not call RowAt; positive/checked helper prefix and total+header validation preserve half-open finite int geometry.",
+    "Anchor shrink uses min(old offset,new height-1); addition stays below new row end. Page saturates pixel targets and preserves endpoint/tall-row progress semantics.",
+    "Context helper preallocation, periodic cancellation and private copied prefix remain unchanged by this correction."
+  ],
+  "current_runtime_drift": {},
+  "limits": [
+    "Only accessed endpoints/adjacent row boundaries/inverses are validated. Hidden source geometry remains the borrowed immutable-source contract.",
+    "Same-revision unversioned content/geometry mutation is outside that source contract; no full hidden geometry validation is claimed.",
+    "Later producer tests/spec/SDK/native evidence must bind final frozen bytes separately."
+  ],
+  "created_utc": "2026-10-11T09:55:30.192492+00:00"
+}

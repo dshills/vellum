@@ -119,3 +119,91 @@ func sourceColumns() []virtual.GridColumn {
 	}
 	return columns
 }
+
+// rowMetricCalls counts public indexed metric callbacks, separately from the
+// fixed source's unchanged row/cell callback-count fixtures.
+type rowMetricCalls struct{ Offset, At uint64 }
+
+// variableGridSource adds optional metrics without making the default fixed
+// gridSource implement them. Heights are associated with stable domain keys,
+// so reordering/filtering changes offsets while each retained row keeps height.
+type variableGridSource struct {
+	*gridSource
+	metrics *rowMetricCalls
+}
+
+func domainRowHeight(row int) int {
+	return [...]int{23, 35, 47, 29}[row%4]
+}
+
+// cycle describes the projected height period. Its maximum length is four,
+// independent of row count; the even-only projection has length two.
+func (s *variableGridSource) cycle() ([4]int, int, int, error) {
+	var heights [4]int
+	if s == nil || s.gridSource == nil || s.total < 1 || s.total > maxSourceRows {
+		return heights, 0, 0, errSourceConfig
+	}
+	period, step, first := 4, 1, 0
+	if s.filtered {
+		period, step = 2, 2
+	}
+	if s.reverse {
+		first, step = (s.RowCount()-1)*step, -step
+	}
+	sum := 0
+	for i := 0; i < period; i++ {
+		residue := (first + i*step) % 4
+		if residue < 0 {
+			residue += 4
+		}
+		heights[i] = domainRowHeight(residue)
+		sum += heights[i]
+	}
+	return heights, period, sum, nil
+}
+
+func periodicOffset(boundary int, heights [4]int, period, sum int) int {
+	offset := boundary / period * sum
+	for i := 0; i < boundary%period; i++ {
+		offset += heights[i]
+	}
+	return offset
+}
+
+func (s *variableGridSource) RowOffset(boundary int) (int, error) {
+	if s != nil && s.metrics != nil {
+		s.metrics.Offset++
+	}
+	heights, period, sum, err := s.cycle()
+	if err != nil {
+		return 0, err
+	}
+	if boundary < 0 || boundary > s.RowCount() {
+		return 0, virtual.ErrGridRange
+	}
+	return periodicOffset(boundary, heights, period, sum), nil
+}
+
+func (s *variableGridSource) RowAt(pixel int) (int, error) {
+	if s != nil && s.metrics != nil {
+		s.metrics.At++
+	}
+	heights, period, sum, err := s.cycle()
+	if err != nil {
+		return 0, err
+	}
+	extent := periodicOffset(s.RowCount(), heights, period, sum)
+	if pixel < 0 || pixel >= extent {
+		return 0, virtual.ErrGridRange
+	}
+	row, remainder := pixel/sum*period, pixel%sum
+	for i := 0; i < period; i++ {
+		if remainder < heights[i] {
+			return row + i, nil
+		}
+		remainder -= heights[i]
+	}
+	return 0, errSourceConfig // positive finite period makes this unreachable
+}
+
+var _ virtual.GridSource = (*variableGridSource)(nil)

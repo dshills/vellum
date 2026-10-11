@@ -1,0 +1,59 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-variable-rows/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v ./...
+# github.com/dshills/vellum/examples/grid.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestActualGridRouterBatchesEquivalent
+=== RUN   TestActualGridRouterBatchesEquivalent/1
+=== RUN   TestActualGridRouterBatchesEquivalent/7
+=== RUN   TestActualGridRouterBatchesEquivalent/64
+--- PASS: TestActualGridRouterBatchesEquivalent (34.32s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/1 (11.67s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/7 (11.24s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/64 (11.40s)
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/96
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/120
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/144
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/192
+--- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization (14.22s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/96 (3.39s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/120 (3.06s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/144 (3.40s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/192 (4.36s)
+=== RUN   TestActualGridStalePressDisabledModalAndRetirement
+--- PASS: TestActualGridStalePressDisabledModalAndRetirement (7.73s)
+=== RUN   TestActualGridStatusWrapDoesNotWidenLayout
+--- PASS: TestActualGridStatusWrapDoesNotWidenLayout (3.84s)
+=== RUN   TestIndexedSourceProjectionBijectionAndStableCellValues
+--- PASS: TestIndexedSourceProjectionBijectionAndStableCellValues (0.00s)
+=== RUN   TestSourceRefusalAndImmutableRevision
+--- PASS: TestSourceRefusalAndImmutableRevision (0.00s)
+=== RUN   TestCommandProjectionRetainsKeyAndRejectsStalePress
+--- PASS: TestCommandProjectionRetainsKeyAndRejectsStalePress (0.00s)
+=== RUN   TestMillionAndTenThousandSameViewportCommands
+--- PASS: TestMillionAndTenThousandSameViewportCommands (0.01s)
+=== RUN   TestProgramIndependentWindowLifetimes
+--- PASS: TestProgramIndependentWindowLifetimes (0.00s)
+=== RUN   TestProjectionPreservesHiddenActiveUntilExplicitReveal
+--- PASS: TestProjectionPreservesHiddenActiveUntilExplicitReveal (0.00s)
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/96
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/120
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/144
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/192
+--- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork (12.29s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/96 (2.77s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/120 (2.57s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/144 (2.90s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/192 (4.06s)
+=== RUN   TestActualVariableGridPixelPageWheelAndHeightRevision
+--- PASS: TestActualVariableGridPixelPageWheelAndHeightRevision (9.87s)
+=== RUN   TestVariableMetricsBrutePrefixAndPixelInverse
+--- PASS: TestVariableMetricsBrutePrefixAndPixelInverse (0.01s)
+=== RUN   TestVariableMetricsMillionRowQueriesAvoidDomainEnumeration
+--- PASS: TestVariableMetricsMillionRowQueriesAvoidDomainEnumeration (0.00s)
+=== RUN   TestVariableMetricsHeightsFollowStableKeysAcrossProjection
+--- PASS: TestVariableMetricsHeightsFollowStableKeysAcrossProjection (0.00s)
+=== RUN   TestVariableModeHeightChangesAreIndependentImmutableRevisions
+--- PASS: TestVariableModeHeightChangesAreIndependentImmutableRevisions (0.00s)
+PASS
+ok  	github.com/dshills/vellum/examples/grid	83.857s

@@ -1,0 +1,15 @@
+{
+  "scope": "Desktop qualification preflight only; neither refusal started a GUI process",
+  "failures": [
+    {
+      "error": "FileNotFoundError root go.sum",
+      "cause": "Example-owned relative paths were incorrectly interpreted relative to repository root"
+    },
+    {
+      "error": "source-map assertion",
+      "cause": "Module-relative source paths still needed examples/grid prefix"
+    }
+  ],
+  "resolution": "Normalize owned and preserved-example inputs to examples/grid; integration inputs remain repository relative; verify exact producer map before launch",
+  "application_source_changed": false
+}
