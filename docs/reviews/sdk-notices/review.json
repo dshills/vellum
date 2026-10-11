@@ -1,0 +1,57 @@
+{
+  "captured_utc": "2026-10-11T00:11:51.440474+00:00",
+  "prism_report_sha256": "440db7234babe63c92f1b3ea67c90baae3bec5422e630be8c59bad12a62d9760",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "exit_code": 0,
+  "counts": {
+    "low": 0,
+    "medium": 0,
+    "high": 0
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 23541,
+    "chunks": 1,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14784,
+        "output": 2765,
+        "costUSD": 0.057218
+      }
+    ],
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "internal_review": {
+    "agent": "/root/mac_history_review",
+    "result": "Pass, no actionable defect; read-only review.",
+    "input_sha256": {
+      "scripts/release-sdk.py": "c235ce7869afcaf67fb69c1fcf00b2c99f50770690e238681a3d339d0404fc3b",
+      "scripts/release-sdk_test.py": "487db769ea7ec696beb1e88ecd3ecaa0765b03ca357afe057849d8795ab109f8",
+      "specs/release.md": "18237cd8e78c1c57a21d7126a7810830de765c9040f7b9ecb4040f63a92d36ed"
+    }
+  },
+  "scope": "New SDK notice correction only. Previously reviewed/committed image batch was not repeated."
+}

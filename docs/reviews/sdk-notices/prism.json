@@ -1,0 +1,94 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "082aeb0d0d751bd03a5fd0b23c15a03f",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "8a75a8a97eb298d912931504da0848b7877719f6",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 18159,
+    "totalMs": 24822
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 23541,
+    "chunks": 1,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14784,
+        "output": 2765,
+        "costUSD": 0.057218
+      }
+    ],
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "e87411866eee8ecf",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Hardcoded default replacement directories for the no-dependencies path",
+        "message": "When `dependencies` is None, the framework/Core and typesetting replacements are forced to guessed paths under `drivers/cogent/build/`. The old code used the driver's own go.mod replacements in that case. If those directories are missing or are not the sources the driver really uses, `go mod download all`/`go mod verify` fails, or the inventory is built against the wrong sources. Nothing in the diff checks that the paths exist.",
+        "suggestion": "Require explicit `dependencies` or check that the default directories exist and contain a go.mod, failing with a clear error otherwise. Alternatively keep the driver's existing replace directives and only make them absolute.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "scripts/release-sdk.py",
+            "lines": {
+              "start": 186,
+              "end": 186
+            }
+          }
+        ],
+        "tags": [
+          "go-modules",
+          "hardcoded-path",
+          "regression-risk"
+        ],
+        "evidence": "owned = dependencies if dependencies is not None else {name: root / \"drivers/cogent/build\" / name for name in (\"upstream\", \"typesetting\")}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The default paths are a deliberate choice, because go.mod is now copied to a temp dir where its relative replace directives would break. They use the same `upstream` and `typesetting` names as the `dependencies` mapping. If the directories are missing, `go mod download all` or `go mod verify` fails, or the new `dependency source unavailable` ValueError is raised, so the build fails closed instead of producing a wrong inventory. The claim of silently wrong sources rests on speculation the diff does not support."
+    }
+  ],
+  "suppressed": []
+}

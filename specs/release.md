@@ -39,6 +39,13 @@ opt-in. Public gating also rejects `assume-unchanged`/`skip-worktree` index flag
 which could otherwise hide changed working-tree bytes from Git status. Build outputs and review/research
 artifacts are omitted. Files and dependency paths cannot contain symlinks.
 
+Notice collection first downloads and verifies the external module graph in a
+temporary copy of the driver module files, with absolute owned replacements.
+Cold and warm caches therefore collect the same available declarations; missing
+source directories fail inventory creation. Canonical go.mod/go.sum files stay
+unchanged. A downloaded module without its own license declaration still requires
+manual review, and the public distribution audit remains separately gated.
+
 Archive order, file ownership and timestamps are normalized. Every regular file
 is SHA-256 recorded, including copied third-party notices, the inventory and the
 private-build marker. Only `SDK_MANIFEST.json` excludes itself. The manifest

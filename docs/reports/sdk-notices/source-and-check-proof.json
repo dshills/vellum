@@ -1,0 +1,56 @@
+{
+  "captured_utc": "2026-10-11T00:10:47.396565+00:00",
+  "parent_commit": "8a75a8a97eb298d912931504da0848b7877719f6",
+  "inputs": {
+    "scripts/release-sdk.py": "c235ce7869afcaf67fb69c1fcf00b2c99f50770690e238681a3d339d0404fc3b",
+    "scripts/release-sdk_test.py": "487db769ea7ec696beb1e88ecd3ecaa0765b03ca357afe057849d8795ab109f8",
+    "specs/release.md": "18237cd8e78c1c57a21d7126a7810830de765c9040f7b9ecb4040f63a92d36ed"
+  },
+  "logs": {
+    "release-checks.txt": "66042c489d77f2933f292443a2deb7cadc9d20e1afbd4da431b8c587b6f6649a",
+    "checker.txt": "a11c08f25cd2e235533107b9f182e0e0354066b40259cc3c8dd6efdca6cc753f",
+    "package-app.txt": "4db7cbc074d776770b30d9d3bd5112cd50a14ef27b613a094aaa69fd71dfca44",
+    "actual-inventory.json": "354f8a65b45bff4e888363803721c6ffcf7acf6f22aa30564a4cd8cc46e51f51"
+  },
+  "runs": [
+    {
+      "command": "python3 scripts/release-sdk_test.py",
+      "exit_code": 0,
+      "tests": 28,
+      "log": "release-checks.txt"
+    },
+    {
+      "command": "python3 scripts/check-sdk_test.py",
+      "exit_code": 0,
+      "tests": 20,
+      "log": "checker.txt"
+    },
+    {
+      "command": "python3 scripts/package-app_test.py",
+      "exit_code": 0,
+      "tests": 16,
+      "log": "package-app.txt"
+    },
+    {
+      "command": "license_inventory(ROOT) twice; assert identical inventory/notices and unchanged driver module file digests",
+      "exit_code": 0,
+      "log": "actual-inventory.json"
+    }
+  ],
+  "internal_review": {
+    "agent": "/root/mac_history_review",
+    "result": "Pass: no actionable defects. Read-only review. Source hashes match inputs.",
+    "verified": [
+      "Copied temporary graph isolates sum updates.",
+      "Three absolute owned replacements, complete external downloads and actual cache verification.",
+      "Absent source directories fail before archive publication.",
+      "Real local module proxy cold/warm test, original graph immutability, pinned provenance and public own-license gate."
+    ]
+  },
+  "limits": [
+    "Downloaded module without own license remains manual-review-required.",
+    "The five native-library modules have no own declaration in the inventoried module directories.",
+    "This is not the embedded Rust/font/native redistribution audit or public distribution approval.",
+    "No native/framework Go code changed in this correction; affected exporter/checker/bundle checks suffice alongside prior native checks."
+  ]
+}

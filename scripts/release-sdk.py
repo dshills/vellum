@@ -175,18 +175,20 @@ def module_license(path):
 
 def license_inventory(root, dependencies=None):
     env = child_environment()
-    with tempfile.TemporaryDirectory(prefix="vellum-sdk-license-graph-") if dependencies is not None else nullcontext(None) as temporary:
-        graph = root / "drivers/cogent"
-        if temporary is not None:
-            graph = Path(temporary)
-            shutil.copyfile(root / "drivers/cogent/go.mod", graph / "go.mod")
-            shutil.copyfile(root / "drivers/cogent/go.sum", graph / "go.sum")
-            module_path = json.loads((root / "release/version.json").read_text())["module"]
-            replacements = {module_path: root, "cogentcore.org/core": dependencies["upstream"], "github.com/go-text/typesetting": dependencies["typesetting"]}
-            run_child(["go", "mod", "edit", *["-replace=" + name + "=" + str(path) for name, path in replacements.items()]], cwd=graph, env=env, check=True, timeout=COMMAND_TIMEOUT_SECONDS)
+    # Listing the module graph alone leaves Dir absent for cold-cache modules.
+    # Materialize and verify every external source before collecting declarations.
+    # Work on copied graph files: Go downloads may add sums even in readonly mode.
+    with tempfile.TemporaryDirectory(prefix="vellum-sdk-license-graph-") as temporary:
+        graph = Path(temporary)
+        shutil.copyfile(root / "drivers/cogent/go.mod", graph / "go.mod")
+        shutil.copyfile(root / "drivers/cogent/go.sum", graph / "go.sum")
+        module_path = json.loads((root / "release/version.json").read_text())["module"]
+        owned = dependencies if dependencies is not None else {name: root / "drivers/cogent/build" / name for name in ("upstream", "typesetting")}
+        replacements = {module_path: root.resolve(), "cogentcore.org/core": owned["upstream"].resolve(), "github.com/go-text/typesetting": owned["typesetting"].resolve()}
+        run_child(["go", "mod", "edit", *["-replace=" + name + "=" + str(path) for name, path in replacements.items()]], cwd=graph, env=env, check=True, timeout=COMMAND_TIMEOUT_SECONDS)
+        run_child(["go", "mod", "download", "all"], cwd=graph, env=env, check=True, timeout=COMMAND_TIMEOUT_SECONDS)
+        run_child(["go", "mod", "verify"], cwd=graph, env=env, check=True, stdout=subprocess.PIPE, timeout=COMMAND_TIMEOUT_SECONDS)
         raw = check_child_output(["go", "list", "-m", "-json", "all"], cwd=graph, text=True, env=env, timeout=COMMAND_TIMEOUT_SECONDS)
-        if dependencies is not None:
-            run_child(["go", "mod", "verify"], cwd=graph, env=env, check=True, stdout=subprocess.PIPE, timeout=COMMAND_TIMEOUT_SECONDS)
     modules = decode_objects(raw)
     pinned_file = root / "drivers/cogent/native/dependencies.json"
     pinned = {item["module"]: item for item in json.loads(pinned_file.read_text())["dependencies"]} if pinned_file.is_file() else {}
@@ -199,16 +201,17 @@ def license_inventory(root, dependencies=None):
         directory = Path(effective["Dir"]) if "Dir" in effective else None
         copies = []
         own_licenses = []
-        if directory and directory.is_dir():
-            for path in sorted(directory.rglob("*")):
-                if path.is_file() and not path.is_symlink() and declared_notice(path.relative_to(directory)):
-                    relative = path.relative_to(directory).as_posix()
-                    key = hashlib.sha256(module["Path"].encode()).hexdigest()[:16] + "/" + relative
-                    content = path.read_bytes()
-                    notices["THIRD_PARTY_NOTICES/" + key] = content
-                    copies.append({"file": relative, "notice": key, "sha256": hashlib.sha256(content).hexdigest()})
-                    if module_license(Path(relative)):
-                        own_licenses.append(relative)
+        if directory is None or not directory.is_dir():
+            raise ValueError("dependency source unavailable after verified download: " + module["Path"])
+        for path in sorted(directory.rglob("*")):
+            if path.is_file() and not path.is_symlink() and declared_notice(path.relative_to(directory)):
+                relative = path.relative_to(directory).as_posix()
+                key = hashlib.sha256(module["Path"].encode()).hexdigest()[:16] + "/" + relative
+                content = path.read_bytes()
+                notices["THIRD_PARTY_NOTICES/" + key] = content
+                copies.append({"file": relative, "notice": key, "sha256": hashlib.sha256(content).hexdigest()})
+                if module_license(Path(relative)):
+                    own_licenses.append(relative)
         source_pin = pinned.get(module["Path"]) if module.get("Replace") and effective.get("Dir") and not effective.get("Version") else None
         version = source_pin["version"] if source_pin else effective.get("Version", module.get("Version"))
         source_sum = source_pin["sum"] if source_pin else effective.get("Sum", module.get("Sum"))

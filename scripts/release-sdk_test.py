@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import tarfile
 import tempfile
+import zipfile
 import unittest
 
 import artifact_io
@@ -311,14 +312,21 @@ func TestExportedHistory(t *testing.T) {
         self.assertFalse(release.module_license(Path("NOTICE")))
         self.assertFalse(release.module_license(Path("vendor/dependency/LICENSE")))
 
+    def notice_graph_fixture(self, root):
+        driver = root / "drivers/cogent"
+        driver.mkdir(parents=True, exist_ok=True)
+        (driver / "go.mod").write_text("module example.com/notice-fixture\ngo 1.25.6\n")
+        (driver / "go.sum").write_text("")
+
     def test_notice_inventory_requires_module_own_license(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"github.com/dshills/vellum"}')
             dependency=root/"dependency";dependency.mkdir()
             for name in ("license.go", "testdata/LICENSE", "third-party/LICENSE-MIT"):
                 path=dependency/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text("fixture")
+            self.notice_graph_fixture(root)
             modules=json.dumps({"Path":"example.com/dependency","Dir":str(dependency)})
-            with mock.patch.object(release,"check_child_output",return_value=modules):
+            with mock.patch.object(release,"check_child_output",return_value=modules), mock.patch.object(release,"run_child"):
                 inventory,notices=release.license_inventory(root)
                 record=inventory["modules"][0]
                 self.assertEqual([item["file"] for item in record["license_files"]],["third-party/LICENSE-MIT"])
@@ -336,10 +344,51 @@ func TestExportedHistory(t *testing.T) {
             (native/"dependencies.json").write_text(json.dumps({"dependencies":[{"module":"cogentcore.org/core","version":"v0.3.0","sum":"h1:pinned"}]}))
             source=root/"core";source.mkdir();(source/"LICENSE").write_text("notice")
             module={"Path":"cogentcore.org/core","Dir":str(source),"Replace":{"Path":str(source),"Dir":str(source)}}
-            with mock.patch.object(release,"check_child_output",return_value=json.dumps(module)):
+            self.notice_graph_fixture(root)
+            with mock.patch.object(release,"check_child_output",return_value=json.dumps(module)), mock.patch.object(release,"run_child"):
                 inventory,_=release.license_inventory(root)
             self.assertEqual(inventory["modules"][0]["version"],"v0.3.0")
             self.assertEqual(inventory["modules"][0]["sum"],"h1:pinned")
+
+
+    def test_missing_downloaded_source_fails_instead_of_silent_notice_omission(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp); (root/"release").mkdir()
+            (root/"release/version.json").write_text('{"module":"github.com/dshills/vellum"}')
+            self.notice_graph_fixture(root)
+            for module in ({"Path":"example.com/missing","Version":"v1.0.0"}, {"Path":"example.com/missing","Dir":str(root/"missing")}):
+                with self.subTest(module=module), mock.patch.object(release,"run_child"), mock.patch.object(release,"check_child_output",return_value=json.dumps(module)):
+                    with self.assertRaisesRegex(ValueError,"source unavailable after verified download"):
+                        release.license_inventory(root)
+
+    def test_cold_and_warm_real_module_caches_collect_identical_notices_without_editing_source_graph(self):
+        with tempfile.TemporaryDirectory(prefix="Vellum license cold cache ") as tmp:
+            base=Path(tmp); root=base/"source"; root.mkdir(); (root/"release").mkdir()
+            (root/"release/version.json").write_text('{"module":"example.com/framework"}')
+            (root/"go.mod").write_text("module example.com/framework\ngo 1.25.6\n")
+            driver=root/"drivers/cogent"; driver.mkdir(parents=True)
+            (driver/"go.mod").write_text("module example.com/driver\ngo 1.25.6\nrequire example.com/dependency v1.0.0\n")
+            (driver/"go.sum").write_text("")
+            proxy=base/"proxy/example.com/dependency/@v"; proxy.mkdir(parents=True)
+            module="module example.com/dependency\ngo 1.25.6\n"
+            (proxy/"v1.0.0.mod").write_text(module)
+            (proxy/"v1.0.0.info").write_text('{"Version":"v1.0.0","Time":"2026-01-01T00:00:00Z"}')
+            with zipfile.ZipFile(proxy/"v1.0.0.zip","w") as archive:
+                archive.writestr("example.com/dependency@v1.0.0/go.mod", module)
+                archive.writestr("example.com/dependency@v1.0.0/LICENSE", "Fixture license declaration\n")
+                archive.writestr("example.com/dependency@v1.0.0/api.go", "package dependency\n")
+            env=release.child_environment()
+            env.update({"GOPROXY":(base/"proxy").as_uri(), "GOSUMDB":"off", "GOMODCACHE":str(base/"module cache")})
+            before={name:(driver/name).read_bytes() for name in ("go.mod","go.sum")}
+            with mock.patch.object(release,"child_environment",return_value=env):
+                cold=release.license_inventory(root)
+                warm=release.license_inventory(root)
+            self.assertEqual(cold,warm)
+            inventory,notices=cold
+            self.assertEqual(inventory["modules"][0]["module"],"example.com/dependency")
+            self.assertEqual(inventory["modules"][0]["module_license_files"],["LICENSE"])
+            self.assertEqual(list(notices.values()),[b"Fixture license declaration\n"])
+            self.assertEqual(before,{name:(driver/name).read_bytes() for name in before})
 
     def test_public_graph_checks_use_controlled_go_environment(self):
         with tempfile.TemporaryDirectory() as tmp:
