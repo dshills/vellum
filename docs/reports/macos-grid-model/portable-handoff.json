@@ -1,0 +1,23 @@
+{
+  "result": "frozen final v3 portable draft",
+  "qualification": {
+    "path": "/private/tmp/vellum-p6-grid/acceptance/qualification-v3.json",
+    "sha256": "38da28a8782ce73bdd8c46a5fd3654fa576ca5934a307268480e9a8aa597c679"
+  },
+  "owned_files": {
+    "/private/tmp/vellum-p6-grid/go.mod": "a9992b75506599b90afc488e3905cf41ba685f3058aacc0b62df12cd7cca8758",
+    "/private/tmp/vellum-p6-grid/virtual/grid.go": "d3d72cfe33ac3f57e66cb52c6e9eb7b153863f928963c485ad1091bd8efd0482",
+    "/private/tmp/vellum-p6-grid/virtual/grid_boundary_test.go": "038e1e143e52c8e3aa884ab77f653b762e806f11c2ae255f911db6817816c80a",
+    "/private/tmp/vellum-p6-grid/virtual/grid_geometry.go": "5c9d1ee306a7a76e233a798d3c078ce59ed9dca9241d52b9d56e16a0b2d3850d",
+    "/private/tmp/vellum-p6-grid/virtual/grid_retention_test.go": "2dafc40276ed8af426c12742ad884fa7f26f43c3218482e16d47f2924fff16f2",
+    "/private/tmp/vellum-p6-grid/virtual/grid_test.go": "56b9c8e7599bd9712f7699b0e6468f4257a87ae7fbbe59e1972d7e93357a2eb2",
+    "/private/tmp/vellum-p6-grid/specs/grid.md": "9b28f21aed047c1c037290d85ed5bbb76e0e591be72ea7851843947b09e17398"
+  },
+  "changes_since_v1": [
+    "accepted strings.Clone boundaries and shared detached per-row keys",
+    "opaque nonzero-sized reference token without Grid/source/owner backpointer",
+    "GridState.Columns total bounded column count",
+    "best-effort anchor clamp contract/regression"
+  ],
+  "integration_note": "Copy virtual/grid*.go after approval; portable Table/Tree compatibility passes via read-only overlay. Native adapter/consumer remain separate qualification."
+}

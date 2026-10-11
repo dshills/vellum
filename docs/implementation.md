@@ -167,3 +167,14 @@ See the [checkpoint report](reports/macos-replay/README.md).
 The full P9 professional workloads, large-data replay, external automation
 transport, native services/IME/accessibility, GPU presentation and sustained
 performance acceptance remain open. Software replay does not certify those gates.
+
+## Indexed grid foundation
+
+`virtual.Grid` adds a separate indexed-source model for fixed-height two-axis
+virtualization, frozen headers/leading columns, bounded detached snapshots and
+stale press identities. Active keys and top-row anchors survive indexed source
+reordering, subject to viewport extent clamping, without a full-row owner scan. The procedural 10k and million-row ×20
+fixtures expose 400 visible cells with identical bounded source-call counts.
+See [contract](../specs/grid.md) and [portable evidence](reports/macos-grid-model/README.md).
+Native rendering/performance, variable-height rows, all-row selection, editing
+and large-tree completion remain subsequent P6 work.

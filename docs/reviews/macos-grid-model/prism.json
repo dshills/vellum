@@ -1,0 +1,57 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "22f221a78ec9604e771c9b038fd1eaa0",
+  "repo": {
+    "root": "/private/tmp/vellum-p6-integration",
+    "head": "bcac9dc1d057acde979d3ad7e47396e02685d65d",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 33139,
+    "totalMs": 33217
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 16,
+    "bytes": 87073,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 43782,
+        "output": 4316,
+        "costUSD": 0.130724
+      }
+    ],
+    "widenedFiles": 2,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

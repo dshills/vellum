@@ -53,14 +53,14 @@ class ReleaseChecks(unittest.TestCase):
             self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
             self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
 
-    def test_exported_history_document_editor_execution_and_replay_are_consumable_without_the_source_checkout(self):
+    def test_exported_history_document_editor_execution_replay_and_grid_are_consumable_without_the_source_checkout(self):
         with tempfile.TemporaryDirectory(prefix="vellum history SDK ") as temporary:
             base = Path(temporary)
             root = base / "source"
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
             public_files = []
-            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui"):
+            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui", "virtual"):
                 (root / package).mkdir()
                 for source in (release.ROOT / package).glob("*.go"):
                     if not source.name.endswith("_test.go"):
@@ -148,6 +148,11 @@ func TestExportedHistory(t *testing.T) {
     if err := j.Redo(); err != nil || value != 42 || !j.Snapshot().Dirty { t.Fatalf("redo value=%d state=%+v err=%v", value, j.Snapshot(), err) }
 }
 ''')
+            # Reuse the external API scenario against packaged bytes after the
+            # synthetic source tree was deleted. This also catches omitted new
+            # public files without requiring the native driver or a display.
+            contract = release.ROOT / "examples/sdk-contract/grid_test.go"
+            (consumer / "grid_test.go").write_text(contract.read_text().replace("package sdkcontract_test", "package consumer", 1))
             result = subprocess.run(["go", "test", "./..."], cwd=consumer, env=release.child_environment(), capture_output=True, text=True, timeout=60)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 

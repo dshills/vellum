@@ -3,6 +3,7 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Indexed portable grid foundation](macos-grid-model/README.md)
 - [Managed software UI replay](macos-replay/README.md)
 - [macOS retained image drawing](macos-images/README.md)
 - [macOS retained GPU meshes and scalable workloads](macos-drawing/README.md)

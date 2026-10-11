@@ -2,6 +2,7 @@
 
 - [Framework contract](framework.md): implemented application ownership, commands,
   tasks, docking, virtualization and GPU canvas behavior, including current limits.
+- [Indexed data grid](grid.md): bounded two-axis projection, frozen regions, stable cell identities and stale press refusal.
 - [Keyed reconciliation](keyed-reconciliation.md): retained native identity.
 - [Layout and themes](layout-theme.md): portable style values and local themes.
 - [Standard controls](controls.md): interaction, focus and semantic metadata.

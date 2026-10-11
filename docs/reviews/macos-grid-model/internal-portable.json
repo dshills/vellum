@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "created_utc": "2026-10-11T06:10:56.817263+00:00",
+  "scope": "Read-only portable P6 Grid API/model/geometry/retention review of frozen v3. No native Grid, GUI, editing, accessibility, measured memory/performance or full P6 acceptance.",
+  "reviewed_sources": {
+    "/private/tmp/vellum-p6-grid/go.mod": "a9992b75506599b90afc488e3905cf41ba685f3058aacc0b62df12cd7cca8758",
+    "/private/tmp/vellum-p6-grid/virtual/grid.go": "d3d72cfe33ac3f57e66cb52c6e9eb7b153863f928963c485ad1091bd8efd0482",
+    "/private/tmp/vellum-p6-grid/virtual/grid_boundary_test.go": "038e1e143e52c8e3aa884ab77f653b762e806f11c2ae255f911db6817816c80a",
+    "/private/tmp/vellum-p6-grid/virtual/grid_geometry.go": "5c9d1ee306a7a76e233a798d3c078ce59ed9dca9241d52b9d56e16a0b2d3850d",
+    "/private/tmp/vellum-p6-grid/virtual/grid_retention_test.go": "2dafc40276ed8af426c12742ad884fa7f26f43c3218482e16d47f2924fff16f2",
+    "/private/tmp/vellum-p6-grid/virtual/grid_test.go": "56b9c8e7599bd9712f7699b0e6468f4257a87ae7fbbe59e1972d7e93357a2eb2",
+    "/private/tmp/vellum-p6-grid/specs/grid.md": "9b28f21aed047c1c037290d85ed5bbb76e0e591be72ea7851843947b09e17398"
+  },
+  "compatibility_sources": {
+    "/Users/dshills/Development/projects/Vellum/go.mod": "99ee007066964a9d64df4a52090519338a7c7b08a39654773920c654564ff441",
+    "/Users/dshills/Development/projects/Vellum/virtual/table.go": "f0e3eff0098647a59b8a73ea508053fc493a7c522f3290db5a45865f1fdbfb11",
+    "/Users/dshills/Development/projects/Vellum/virtual/tree.go": "e0f4ba824cf13e9366d7aee9c8693935c0bbd0a55fc7a14f210e4f82e2057ebe",
+    "/Users/dshills/Development/projects/Vellum/virtual/virtual_test.go": "0d25afc860878fd3133f5b88231cb79b146c94be01b2593d9459473871e8a1d1"
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "GRID_RETAINED_STRING_BACKING",
+      "severity": "medium",
+      "initial": "V1 source identity, column ID/title, active/anchor row keys, snapshot row/ref keys and cell text retained oversized backing through bounded substrings. Three unchanged reviewer tests failed against detached v1.",
+      "resolution": "V3 clones only accepted persistent strings; Snapshot clones one validated, budgeted row key shared across cells/ref and clones each validated, budgeted cell text. Column metadata and active keys are already owned. Empty strings detach. All three original regressions pass race20.",
+      "source_sites": [
+        "virtual/grid.go:211",
+        "virtual/grid.go:356",
+        "virtual/grid.go:456",
+        "virtual/grid.go:518",
+        "virtual/grid_geometry.go:128",
+        "virtual/grid_geometry.go:142"
+      ]
+    },
+    {
+      "id": "GRID_REF_DOMAIN_RETENTION",
+      "severity": "medium",
+      "initial": "An opaque ref with *Grid indirectly retained borrowed Grid.source; cloning string payload alone did not make snapshots independent of domain lifetime.",
+      "resolution": "V3 ref retains only a nonzero-sized private identity token and detached key/column ID. Token has no source/Grid/interface/closure backpointer; exact-model and generation checks remain, no registry, and retained token prevents allocator ABA. Structural graph and identical foreign-model regression pass race20.",
+      "source_sites": [
+        "virtual/grid.go:72",
+        "virtual/grid.go:81",
+        "virtual/grid.go:193",
+        "virtual/grid.go:586",
+        "virtual/grid_retention_test.go:35"
+      ]
+    },
+    {
+      "id": "GRID_ANCHOR_SCOPE",
+      "severity": "low",
+      "resolution": "Spec/test correctly describes best-effort row anchor preservation subject to viewport extent clamping; exact anchor guarantee near end is not claimed."
+    }
+  ],
+  "reasoning": [
+    "Owner-confined source methods and revision declarations remain explicit contracts; implementation validates only accessed rows/cells, indexed inverse consistency, complete stamp stability, generation exhaustion and prospective capacity before state publication.",
+    "Integer extent/product/width sums and viewport math are bounded; clipping partitions frozen/header/scrolling regions, overscan refs with empty clips refuse activation, failure/no-op retains valid ref generation.",
+    "Activation uses detached token + generation + key/column identity and current visibility. Self identity refuses copied Grid values. Source replacement preserves owned active/anchor keys only within matching source incarnation and clears them for new incarnation.",
+    "Existing Table/Tree source and tests are unchanged; qualified additive overlay compatibility is distinct from replacing/migrating those controls.",
+    "Callback-count workload demonstrates bounded queried/materialized cells for indexed procedural sources, not source heap usage, native frames, aggregate P6 completion or complexity of arbitrary caller implementations."
+  ],
+  "evidence": {
+    "qualification": {
+      "path": "/private/tmp/vellum-p6-grid/acceptance/qualification-v3.json",
+      "sha256": "38da28a8782ce73bdd8c46a5fd3654fa576ca5934a307268480e9a8aa597c679",
+      "checks_exit_zero": 5
+    },
+    "handoff": {
+      "path": "/private/tmp/vellum-p6-grid/acceptance/handoff-v3.json",
+      "sha256": "b1c0d37ed807e2e10bc80764b46296e5507a9abe7f8e985c37ffa8c6ae2f5f47"
+    },
+    "mechanical_verification": {
+      "path": "/private/tmp/vellum-p6-grid-review/mechanical-v3.json",
+      "sha256": "3ed44e96e8859360756f6969f81108f56e64f166585a13b34e90e6a2645c17dc",
+      "verified_files": 37,
+      "historical_nested_files_verified": {
+        "v1": 15,
+        "pre_token_v2_owned": 7,
+        "pre_token_v2_records": 9
+      }
+    },
+    "independent_green": {
+      "path": "/private/tmp/vellum-p6-grid-review/independent-green-v3.json",
+      "sha256": "75bad0b039c9087c3f6394fdc397b03781090aef1aecb82f471bc1728fd38731",
+      "exit_code": 0,
+      "copy": "/private/tmp/vellum-p6-grid-review/v3"
+    },
+    "historical_red": {
+      "path": "/private/tmp/vellum-p6-grid-review/retention-red-proof.json",
+      "sha256": "bd427560c28072b9cbf8882bd8b5b840f10d1672970236ecdde4308f3a59d6d0",
+      "exit_code": 1
+    },
+    "initial_review": {
+      "path": "/private/tmp/vellum-p6-grid-review/review-v1.json",
+      "sha256": "2e0087c7beb8174e86300757be78958dcf49cd1ede934c469765177e8330b67a"
+    }
+  },
+  "limitations": [
+    "procedural indexed source; no stored dataset heap measurement",
+    "pointer graph/string backing tests are deterministic retention regressions, not GC memory benchmarks",
+    "source owner serialization and declared indexed access complexity are caller contracts",
+    "native input/layout/frame/GPU/AX/performance, variable heights, multi/all selection, editing, tree expansion and full P6 acceptance remain open"
+  ],
+  "actions": "Only detached source/test copies and review JSON were written under /private/tmp. No canonical or integration changes, Git, GUI, native settings, or Prism."
+}

@@ -1,0 +1,235 @@
+{
+  "schema": 3,
+  "result": "PASS",
+  "scope": "portable fixed-height 2D grid + bounded string/ref retention only; no native/performance/P6 completion claim",
+  "created_utc": "2026-10-11T06:08:43.418595+00:00",
+  "go_version": "go version go1.27.2 darwin/arm64",
+  "go_env": {
+    "GOARCH": "arm64",
+    "GOOS": "darwin",
+    "GOVERSION": "go1.27.2"
+  },
+  "inputs_before": {
+    "owned_inputs": {
+      "/private/tmp/vellum-p6-grid/go.mod": "a9992b75506599b90afc488e3905cf41ba685f3058aacc0b62df12cd7cca8758",
+      "/private/tmp/vellum-p6-grid/virtual/grid.go": "d3d72cfe33ac3f57e66cb52c6e9eb7b153863f928963c485ad1091bd8efd0482",
+      "/private/tmp/vellum-p6-grid/virtual/grid_boundary_test.go": "038e1e143e52c8e3aa884ab77f653b762e806f11c2ae255f911db6817816c80a",
+      "/private/tmp/vellum-p6-grid/virtual/grid_geometry.go": "5c9d1ee306a7a76e233a798d3c078ce59ed9dca9241d52b9d56e16a0b2d3850d",
+      "/private/tmp/vellum-p6-grid/virtual/grid_retention_test.go": "2dafc40276ed8af426c12742ad884fa7f26f43c3218482e16d47f2924fff16f2",
+      "/private/tmp/vellum-p6-grid/virtual/grid_test.go": "56b9c8e7599bd9712f7699b0e6468f4257a87ae7fbbe59e1972d7e93357a2eb2",
+      "/private/tmp/vellum-p6-grid/specs/grid.md": "9b28f21aed047c1c037290d85ed5bbb76e0e591be72ea7851843947b09e17398"
+    },
+    "compatibility_inputs": {
+      "/Users/dshills/Development/projects/Vellum/go.mod": "99ee007066964a9d64df4a52090519338a7c7b08a39654773920c654564ff441",
+      "/Users/dshills/Development/projects/Vellum/virtual/table.go": "f0e3eff0098647a59b8a73ea508053fc493a7c522f3290db5a45865f1fdbfb11",
+      "/Users/dshills/Development/projects/Vellum/virtual/tree.go": "e0f4ba824cf13e9366d7aee9c8693935c0bbd0a55fc7a14f210e4f82e2057ebe",
+      "/Users/dshills/Development/projects/Vellum/virtual/virtual_test.go": "0d25afc860878fd3133f5b88231cb79b146c94be01b2593d9459473871e8a1d1"
+    },
+    "independent_regression_inputs": {
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/compatibility-overlay.json": "5a18986dc277477ba5c7ebc8d7e3828b67a0b9132518730dcf6b4aa4f08557cf",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/compatibility-race.log": "8d7ffa6feb990b7d78d9061d3a829c14553bec26f8acdc8a5cbd3b54afbd3dc3",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/coverage.log": "59fd096b4968c44e2b757389d6f4d238ef84e77dcecba71d9f1613c1060cfee5",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/handoff.json": "9842467258bc7b87534cb1eaa28ab9d0ed28ebc9dea53508b3a09df468cf5326",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/inputs-before.json": "13a003b7ee2211b943b5337504598e9ae315630720079d63a3f71436601a9cb3",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/qualification.json": "825a62dc72814a2884bf456d265a785b2f5cdd110b1043c518137a5aa5ade3ad",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/race20.log": "3d4473f38cd6bfabd95c1197d199c12a8e427df4a5b62c74bc2928eea2645ec3",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/workload.log": "43ed02d7d918ba9fdb86fbf30b9c9ee54006a08ad2a958073ea13b81ea2ed0c9",
+      "/private/tmp/vellum-p6-grid-review/v1/go.mod": "a9992b75506599b90afc488e3905cf41ba685f3058aacc0b62df12cd7cca8758",
+      "/private/tmp/vellum-p6-grid-review/v1/specs/grid.md": "e8d0986cd9b6fc33e32edf91b2c57a3c2da489709dd621b65c8a2fd4a57fb0c5",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid.go": "f2d8529b393bfe2c3aba3ff2aff4e0c2c54b0b4edef10e8cb4d0497ab2b93d66",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid_boundary_test.go": "b5b80ce9a4eeea855ca2f36093daf8dd0f0735b56b4fdd203ae2b36c4df9955a",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid_geometry.go": "3822220a713d3484af2514751122d2de03a82787843c107851cbc0e4b8615523",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid_test.go": "583f1b305d3fb79abfd4d917ae73c42a9a77064a38de585e5e820074a4dd056e",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/retention_review_test.go": "43ad98bccf644707cdc67d5d08a453622b4085408c79fcdb427e3e01cbe65de0"
+    }
+  },
+  "inputs_after": {
+    "owned_inputs": {
+      "/private/tmp/vellum-p6-grid/go.mod": "a9992b75506599b90afc488e3905cf41ba685f3058aacc0b62df12cd7cca8758",
+      "/private/tmp/vellum-p6-grid/virtual/grid.go": "d3d72cfe33ac3f57e66cb52c6e9eb7b153863f928963c485ad1091bd8efd0482",
+      "/private/tmp/vellum-p6-grid/virtual/grid_boundary_test.go": "038e1e143e52c8e3aa884ab77f653b762e806f11c2ae255f911db6817816c80a",
+      "/private/tmp/vellum-p6-grid/virtual/grid_geometry.go": "5c9d1ee306a7a76e233a798d3c078ce59ed9dca9241d52b9d56e16a0b2d3850d",
+      "/private/tmp/vellum-p6-grid/virtual/grid_retention_test.go": "2dafc40276ed8af426c12742ad884fa7f26f43c3218482e16d47f2924fff16f2",
+      "/private/tmp/vellum-p6-grid/virtual/grid_test.go": "56b9c8e7599bd9712f7699b0e6468f4257a87ae7fbbe59e1972d7e93357a2eb2",
+      "/private/tmp/vellum-p6-grid/specs/grid.md": "9b28f21aed047c1c037290d85ed5bbb76e0e591be72ea7851843947b09e17398"
+    },
+    "compatibility_inputs": {
+      "/Users/dshills/Development/projects/Vellum/go.mod": "99ee007066964a9d64df4a52090519338a7c7b08a39654773920c654564ff441",
+      "/Users/dshills/Development/projects/Vellum/virtual/table.go": "f0e3eff0098647a59b8a73ea508053fc493a7c522f3290db5a45865f1fdbfb11",
+      "/Users/dshills/Development/projects/Vellum/virtual/tree.go": "e0f4ba824cf13e9366d7aee9c8693935c0bbd0a55fc7a14f210e4f82e2057ebe",
+      "/Users/dshills/Development/projects/Vellum/virtual/virtual_test.go": "0d25afc860878fd3133f5b88231cb79b146c94be01b2593d9459473871e8a1d1"
+    },
+    "independent_regression_inputs": {
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/compatibility-overlay.json": "5a18986dc277477ba5c7ebc8d7e3828b67a0b9132518730dcf6b4aa4f08557cf",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/compatibility-race.log": "8d7ffa6feb990b7d78d9061d3a829c14553bec26f8acdc8a5cbd3b54afbd3dc3",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/coverage.log": "59fd096b4968c44e2b757389d6f4d238ef84e77dcecba71d9f1613c1060cfee5",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/handoff.json": "9842467258bc7b87534cb1eaa28ab9d0ed28ebc9dea53508b3a09df468cf5326",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/inputs-before.json": "13a003b7ee2211b943b5337504598e9ae315630720079d63a3f71436601a9cb3",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/qualification.json": "825a62dc72814a2884bf456d265a785b2f5cdd110b1043c518137a5aa5ade3ad",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/race20.log": "3d4473f38cd6bfabd95c1197d199c12a8e427df4a5b62c74bc2928eea2645ec3",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-p6-grid-review/v1/acceptance/workload.log": "43ed02d7d918ba9fdb86fbf30b9c9ee54006a08ad2a958073ea13b81ea2ed0c9",
+      "/private/tmp/vellum-p6-grid-review/v1/go.mod": "a9992b75506599b90afc488e3905cf41ba685f3058aacc0b62df12cd7cca8758",
+      "/private/tmp/vellum-p6-grid-review/v1/specs/grid.md": "e8d0986cd9b6fc33e32edf91b2c57a3c2da489709dd621b65c8a2fd4a57fb0c5",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid.go": "f2d8529b393bfe2c3aba3ff2aff4e0c2c54b0b4edef10e8cb4d0497ab2b93d66",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid_boundary_test.go": "b5b80ce9a4eeea855ca2f36093daf8dd0f0735b56b4fdd203ae2b36c4df9955a",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid_geometry.go": "3822220a713d3484af2514751122d2de03a82787843c107851cbc0e4b8615523",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/grid_test.go": "583f1b305d3fb79abfd4d917ae73c42a9a77064a38de585e5e820074a4dd056e",
+      "/private/tmp/vellum-p6-grid-review/v1/virtual/retention_review_test.go": "43ad98bccf644707cdc67d5d08a453622b4085408c79fcdb427e3e01cbe65de0"
+    }
+  },
+  "unchanged": true,
+  "inputs_before_record": {
+    "path": "/private/tmp/vellum-p6-grid/acceptance/inputs-before-v3.json",
+    "sha256": "48ef9225e007d9350a548bab9653d4bc991e0fa99e15dbe1a5aa7227f9e1fb62"
+  },
+  "overlays": {
+    "/private/tmp/vellum-p6-grid/acceptance/compatibility-overlay-v3.json": "165b8de5e9511027e503a422a1923622d94e3ecc971c38d542620fd2c7f91fd0",
+    "/private/tmp/vellum-p6-grid/acceptance/review-regression-overlay-v3.json": "343b8e11a98b913827c4d15d4aaef3631dbf4f7deb614d854948c635f53c36f2"
+  },
+  "checks": [
+    {
+      "name": "race20",
+      "argv": [
+        "env",
+        "GOCACHE=/private/tmp/vellum-p6-grid-gocache",
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "./virtual"
+      ],
+      "cwd": "/private/tmp/vellum-p6-grid",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-grid/acceptance/race20-v3.log",
+      "log_sha256": "a3706259c2931e32e7ce98c522554d035089b5e1b74ce4e78ee2e9de0fbfe7e9"
+    },
+    {
+      "name": "vet",
+      "argv": [
+        "env",
+        "GOCACHE=/private/tmp/vellum-p6-grid-gocache",
+        "go",
+        "vet",
+        "./virtual"
+      ],
+      "cwd": "/private/tmp/vellum-p6-grid",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-grid/acceptance/vet-v3.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "legacy_compatibility_race",
+      "argv": [
+        "env",
+        "GOCACHE=/private/tmp/vellum-p6-grid-gocache",
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-overlay=/private/tmp/vellum-p6-grid/acceptance/compatibility-overlay-v3.json",
+        "./virtual"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-grid/acceptance/compatibility-race-v3.log",
+      "log_sha256": "3fe4a0ad08821c4567d5e4393f4af32922cf1a90e19547ecc2f8c6a7f6b8e569"
+    },
+    {
+      "name": "original_review_regressions_green",
+      "argv": [
+        "env",
+        "GOCACHE=/private/tmp/vellum-p6-grid-gocache",
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "-run",
+        "^TestReviewGrid",
+        "-overlay=/private/tmp/vellum-p6-grid/acceptance/review-regression-overlay-v3.json",
+        "./virtual"
+      ],
+      "cwd": "/private/tmp/vellum-p6-grid-review/v1",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-grid/acceptance/review-regression-green-v3.log",
+      "log_sha256": "82884c99e2b815dce03746d6084749c9626444fee8d798473b16ee5d6c4fad8e"
+    },
+    {
+      "name": "workload_callbacks",
+      "argv": [
+        "env",
+        "GOCACHE=/private/tmp/vellum-p6-grid-gocache",
+        "go",
+        "test",
+        "-run",
+        "TestGridWorkloadCallbacks",
+        "-v",
+        "-count=1",
+        "./virtual"
+      ],
+      "cwd": "/private/tmp/vellum-p6-grid",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-grid/acceptance/workload-v3.log",
+      "log_sha256": "23b563e839d3eb3b5b4cf19678d308fd7b748ef8ce3c33dea9515a29c4711f3c"
+    }
+  ],
+  "workload": [
+    {
+      "Rows": 10000,
+      "Columns": 20,
+      "VisibleCells": 400,
+      "MaterializedCells": 520,
+      "Headers": 10,
+      "Calls": {
+        "RowKey": 52,
+        "IndexOf": 52,
+        "Cell": 520
+      },
+      "NavigationCalls": {
+        "RowKey": 2,
+        "IndexOf": 2,
+        "Cell": 0
+      }
+    },
+    {
+      "Rows": 1000000,
+      "Columns": 20,
+      "VisibleCells": 400,
+      "MaterializedCells": 520,
+      "Headers": 10,
+      "Calls": {
+        "RowKey": 52,
+        "IndexOf": 52,
+        "Cell": 520
+      },
+      "NavigationCalls": {
+        "RowKey": 2,
+        "IndexOf": 2,
+        "Cell": 0
+      }
+    }
+  ],
+  "history": {
+    "v1": {
+      "path": "/private/tmp/vellum-p6-grid/acceptance/history-v1/preservation.json",
+      "sha256": "e0bf36f02440d07446f92eaa300968d3876542d902ba1233aabf0ac5eff6b920",
+      "original_qualification_sha256": "825a62dc72814a2884bf456d265a785b2f5cdd110b1043c518137a5aa5ade3ad",
+      "unchanged": true
+    },
+    "pre_token_v2": {
+      "path": "/private/tmp/vellum-p6-grid/acceptance/history-v2/intermediate-proof.json",
+      "sha256": "1a875fa49b044bd1f0f75f5cca6dbc10b689c3b07be1f3d4b1b6b5d31dd8bfb4"
+    },
+    "independent_v1_red": {
+      "path": "/private/tmp/vellum-p6-grid-review/retention-red-proof.json",
+      "sha256": "bd427560c28072b9cbf8882bd8b5b840f10d1672970236ecdde4308f3a59d6d0"
+    }
+  },
+  "limitations": [
+    "procedural indexed source; no stored dataset heap measurement",
+    "pointer graph/string backing tests are deterministic retention regressions, not GC memory benchmarks",
+    "source owner serialization and declared indexed access complexity are caller contracts",
+    "native input/layout/frame/GPU/AX/performance, variable heights, multi/all selection, editing, tree expansion and full P6 acceptance remain open"
+  ]
+}

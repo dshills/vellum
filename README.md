@@ -33,6 +33,11 @@ open. The workbench does not change system input sources.
 | `scripts/` | Repository checks, SDK release and private application packaging |
 | `prototypes/` | Independent experimental modules and historical foundation evidence |
 
+The [indexed grid foundation](specs/grid.md) adds fixed-height two-axis
+virtualization and frozen regions through `virtual.Grid`. Its bounded portable
+source work is qualified; native rendering and the complete large-data workload
+remain under development.
+
 Public packages stay at the module root so framework consumers can import them
 directly. Executable code lives under `cmd/` in the module that owns its native
 dependencies. Prototype modules remain separate from the framework API.
