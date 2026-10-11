@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"math"
 
@@ -13,6 +14,7 @@ type drawingModel struct {
 	waveform               *canvas.Waveform
 	schematic              *canvas.RectIndex
 	fixture                *canvas.Mesh
+	imageLayer             *canvas.ImageLayer
 	query                  canvas.QueryStats
 	columns                int
 	sampleStart, sampleEnd int
@@ -40,7 +42,16 @@ func newDrawingModel() (*drawingModel, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &drawingModel{mode: "mesh", waveform: waveform, schematic: schematic, fixture: fixture}, nil
+	source := image.NewNRGBA(image.Rect(0, 0, 4096, 4096))
+	for i := 0; i < len(source.Pix); i += 4 {
+		copy(source.Pix[i:i+4], []byte{40, 100, 160, 255})
+	}
+	tiled, err := canvas.NewTiledImage(source)
+	if err != nil {
+		return nil, err
+	}
+	layer := &canvas.ImageLayer{Image: tiled, Bounds: canvas.Bounds{Min: canvas.Point{X: -256, Y: -256}, Max: canvas.Point{X: 256, Y: 256}}}
+	return &drawingModel{mode: "mesh", waveform: waveform, schematic: schematic, fixture: fixture, imageLayer: layer}, nil
 }
 func fixtureMesh() (*canvas.Mesh, error) {
 	v := []canvas.Vertex{{Position: canvas.Point{X: -160, Y: -100}, Color: color.NRGBA{255, 0, 0, 255}}, {Position: canvas.Point{X: 0, Y: -100}, Color: color.NRGBA{0, 255, 0, 255}}, {Position: canvas.Point{X: -80, Y: 80}, Color: color.NRGBA{0, 0, 255, 255}}}
@@ -66,7 +77,7 @@ func fixtureMesh() (*canvas.Mesh, error) {
 }
 func (m *drawingModel) prepare(v canvas.Viewport) (*canvas.Mesh, error) {
 	switch m.mode {
-	case "mesh":
+	case "mesh", "image":
 		return m.fixture, nil
 	case "schematic":
 		mesh, stats, err := m.schematic.Mesh(v)

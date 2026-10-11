@@ -188,6 +188,10 @@ func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.Mesh
 	}); err != nil {
 		return err
 	}
+	imageStats, imageReport, err := imageSmoke(ctx, a, g, other, m, wave.Frames, chrome)
+	if err != nil {
+		return err
+	}
 	if err := owner(a, func() error { g.MaxGPUBytes = 1; return a.Invalidate("drawing") }); err != nil {
 		return err
 	}
@@ -204,7 +208,7 @@ func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.Mesh
 		if err != nil {
 			return err
 		}
-		if !stats.Ready || stats.Frames != wave.Frames {
+		if !stats.Ready || stats.Frames != imageStats.Frames {
 			return fmt.Errorf("budget refusal discarded completed frame")
 		}
 		return nil
@@ -214,11 +218,11 @@ func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.Mesh
 	if err := owner(a, func() error { g.MaxGPUBytes = 0; return g.RebuildResources() }); err != nil {
 		return err
 	}
-	rebuilt, err := waitFrame(ctx, a, g, wave.Frames)
+	rebuilt, err := waitFrame(ctx, a, g, imageStats.Frames)
 	if err != nil {
 		return err
 	}
-	if rebuilt.Generation <= wave.Generation || rebuilt.MeshUploads <= wave.MeshUploads {
+	if rebuilt.Generation <= imageStats.Generation || rebuilt.MeshUploads <= imageStats.MeshUploads || rebuilt.ImageTileUploads-imageStats.ImageTileUploads != 1024 {
 		return fmt.Errorf("resource rebuild did not re-upload geometry")
 	}
 	var window *desktop.Window
@@ -241,7 +245,7 @@ func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.Mesh
 		if err != nil {
 			return err
 		}
-		if next.Size == prior.Size || next.Generation <= prior.Generation {
+		if next.Size == prior.Size || next.Generation <= prior.Generation || next.ImageTileUploads != prior.ImageTileUploads || next.ImageTextureAllocations != prior.ImageTextureAllocations {
 			return fmt.Errorf("resize did not replace target allocation")
 		}
 		if err := owner(a, func() error { _, err := g.Snapshot(); return err }); err != nil {
@@ -250,14 +254,20 @@ func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.Mesh
 		prior = next
 	}
 	empty, _ := canvas.NewMesh(nil, nil)
-	if err := owner(a, func() error { g.Prepare = nil; g.Mesh = empty; g.Revision++; return a.Invalidate("drawing") }); err != nil {
+	if err := owner(a, func() error {
+		g.Prepare = nil
+		g.Mesh = empty
+		g.Image = nil
+		g.Revision++
+		return a.Invalidate("drawing")
+	}); err != nil {
 		return err
 	}
 	cleared, err := waitFrame(ctx, a, g, prior.Frames)
 	if err != nil {
 		return err
 	}
-	if cleared.SubmittedTriangles != 0 || cleared.MeshBytes != 0 || cleared.MeshUploads != prior.MeshUploads {
+	if cleared.SubmittedTriangles != 0 || cleared.MeshBytes != 0 || cleared.ImageBytes != 0 || cleared.ImageUniformBytes != 0 || cleared.MeshUploads != prior.MeshUploads {
 		return fmt.Errorf("empty frame retained geometry or falsely counted upload")
 	}
 	if err := owner(a, func() error {
@@ -292,7 +302,7 @@ func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.Mesh
 		return err
 	default:
 	}
-	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.drawing.smoke", "gradient_and_linear_alpha_pixels": true, "transparent_snapshot": true, "unchanged_mesh_uploads": unchanged.MeshUploads, "unchanged_offscreen_frames": unchanged.Frames, "static_pan_retains_mesh": true, "independent_windows": true, "schematic_source_objects": query.TotalObjects, "schematic_visible_objects": query.VisibleObjects, "schematic_tested_objects": query.TestedObjects, "waveform_source_samples": 1000000, "waveform_columns": columns, "waveform_submitted_triangles": wave.SubmittedTriangles, "empty_frame_clear": true, "budget_refusal": true, "error_callback_resource_query": true, "resource_rebuild": true, "repeated_resize": true, "final_stats": prior, "physical_device_loss_verified": false, "presentation_latency_measured": false})
+	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.drawing.smoke", "gradient_and_linear_alpha_pixels": true, "transparent_snapshot": true, "unchanged_mesh_uploads": unchanged.MeshUploads, "unchanged_offscreen_frames": unchanged.Frames, "static_pan_retains_mesh": true, "independent_windows": true, "schematic_source_objects": query.TotalObjects, "schematic_visible_objects": query.VisibleObjects, "schematic_tested_objects": query.TestedObjects, "waveform_source_samples": 1000000, "waveform_columns": columns, "waveform_submitted_triangles": wave.SubmittedTriangles, "empty_frame_clear": true, "retained_image": imageReport, "budget_refusal": true, "error_callback_resource_query": true, "resource_rebuild": true, "repeated_resize": true, "final_stats": prior, "physical_device_loss_verified": false, "presentation_latency_measured": false})
 }
 
 // Readiness requires an actual frame and a stable submitted allocation across

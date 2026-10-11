@@ -48,18 +48,22 @@ func main() {
 	status := "Triangle gradients, alpha overlap and a retained stroke"
 	selectMode := func(mode string) {
 		model.mode = mode
+		g.Image = nil
+		if mode == "image" {
+			g.Image = model.imageLayer
+		}
 		view.Center = canvas.Point{}
 		view.Zoom = 1
 		if mode == "schematic" {
 			view.Center = canvas.Point{X: 500, Y: 400}
 		}
 		g.Revision++
-		status = map[string]string{"mesh": "Triangle gradients, alpha overlap and a retained stroke", "schematic": "100,000 source rectangles; visible geometry is queried from a retained index", "waveform": "1,000,000 source samples; min/max peaks reduced to visible columns"}[mode]
+		status = map[string]string{"image": "4096×4096 RGBA; retained texture and changed 128-pixel tiles", "mesh": "Triangle gradients, alpha overlap and a retained stroke", "schematic": "100,000 source rectangles; visible geometry is queried from a retained index", "waveform": "1,000,000 source samples; min/max peaks reduced to visible columns"}[mode]
 		a.Invalidate("drawing")
 	}
 	err = a.Open(app.Window{ID: "drawing", Title: "Vellum custom GPU drawing", Width: 800, Height: 600, View: func() ui.Node {
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
-			{ID: "modes", Kind: ui.Row, Children: []ui.Node{{ID: "mesh", Kind: ui.Button, Text: "Mesh and strokes", Activate: func() { selectMode("mesh") }}, {ID: "schematic", Kind: ui.Button, Text: "100k schematic", Activate: func() { selectMode("schematic") }}, {ID: "waveform", Kind: ui.Button, Text: "Million-sample waveform", Activate: func() { selectMode("waveform") }}}},
+			{ID: "modes", Kind: ui.Row, Children: []ui.Node{{ID: "mesh", Kind: ui.Button, Text: "Mesh and strokes", Activate: func() { selectMode("mesh") }}, {ID: "schematic", Kind: ui.Button, Text: "100k schematic", Activate: func() { selectMode("schematic") }}, {ID: "waveform", Kind: ui.Button, Text: "Million-sample waveform", Activate: func() { selectMode("waveform") }}, {ID: "image", Kind: ui.Button, Text: "4K tiled image", Activate: func() { selectMode("image") }}}},
 			{ID: "status", Kind: ui.Label, Text: status}, {ID: "canvas", Kind: ui.Extension, Grow: true, Custom: g},
 		}}
 	}})

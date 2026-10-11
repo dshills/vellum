@@ -3,6 +3,8 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [macOS retained image drawing](macos-images/README.md)
+- [macOS retained GPU meshes and scalable workloads](macos-drawing/README.md)
 - [macOS document persistence and unsaved close](macos-document/README.md)
 - [macOS native dispatch and termination](macos-native-dispatch/README.md)
 - [macOS native external file drops](macos-file-drop/README.md)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/dshills/vellum/canvas"
+	"image"
 	"testing"
 )
 
@@ -9,6 +10,9 @@ func TestIndependentConsumerWorkloads(t *testing.T) {
 	m, err := newDrawingModel()
 	if err != nil {
 		t.Fatal(err)
+	}
+	if m.imageLayer.Image.Size() != image.Pt(4096, 4096) || m.imageLayer.Image.TileCount() != 1024 {
+		t.Fatal("actual 4K source")
 	}
 	view := canvas.Viewport{Width: 800, Height: 600, Zoom: 1, Center: canvas.Point{X: 400, Y: 300}}
 	m.mode = "schematic"

@@ -16,6 +16,7 @@
 - [Native dispatch](native-dispatch.md): synchronous callback failure and desktop event termination.
 - [macOS completion](macos-completion.md): remaining framework and target acceptance work.
 - [Retained GPU drawing](drawing.md): immutable meshes, strokes, waveform reduction, indexed culling and resource accounting.
+- [Retained image drawing](images.md): immutable tile patches, native texture retention and alpha-safe filtering.
 - [Rendering](rendering.md): demand painting, resource lifetimes and device loss.
 - [Platform support](platform-support.md): Windows/Linux services and target gates.
 - [Release artifacts](release.md): alpha API, private SDK integrity and packaging.

@@ -1,0 +1,9 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/dshills/vellum/canvas
+cpu: Apple M4 Pro
+BenchmarkImage4096SingleTilePatch-14    	  376629	      2666 ns/op	   75080 B/op	       4 allocs/op
+BenchmarkImage4096SingleTilePatch-14    	  399470	      2606 ns/op	   75080 B/op	       4 allocs/op
+BenchmarkImage4096SingleTilePatch-14    	  468304	      3121 ns/op	   75080 B/op	       4 allocs/op
+PASS
+ok  	github.com/dshills/vellum/canvas	4.804s

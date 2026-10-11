@@ -35,7 +35,9 @@ Finder workflow acceptance remains separate. See [contract](file-drop.md).
 
 [Retained GPU drawing](drawing.md) adds arbitrary indexed 2D meshes, strokes,
 waveform envelopes and rectangle spatial culling, with an independent consumer.
-P4 custom drawing still needs 3D/image-tile/compute/asynchronous-readback and
+[Retained images](images.md) add a real 4096² native texture workload with changed
+tile uploads, alpha-safe filtering and independent-window retention evidence.
+P4 custom drawing still needs 3D/compute/float-target/asynchronous-readback and
 broader performance qualification. Remaining framework work includes supported integration of the multiline editor
 beyond historical prototypes. Semantic command/UI inspection exists through APIs
 and native accessibility; application automation transport and deterministic UI

@@ -47,6 +47,7 @@ type MeshCanvas struct {
 	Window          string
 	View            *canvas.Viewport
 	Mesh            *canvas.Mesh
+	Image           *canvas.ImageLayer // optional image below meshes; owner-held placement
 	Prepare         func(canvas.Viewport) (*canvas.Mesh, error)
 	Revision        uint64
 	Background      color.NRGBA
@@ -61,11 +62,12 @@ type MeshCanvas struct {
 
 // DrawingStats reports submitted work, not GPU timings or process-wide memory.
 type DrawingStats struct {
-	Ready                                                                                     bool
-	RenderVisits, Frames, MeshUploads, MeshUploadBytes, UniformUploadBytes, SnapshotReadbacks uint64
-	Generation, TargetBytes, MeshBytes, ReadbackBytes                                         uint64
-	SubmittedTriangles                                                                        int
-	Size                                                                                      image.Point
+	Ready                                                                                      bool
+	RenderVisits, Frames, MeshUploads, MeshUploadBytes, UniformUploadBytes, SnapshotReadbacks  uint64
+	Generation, TargetBytes, MeshBytes, ReadbackBytes                                          uint64
+	ImageBytes, ImageUniformBytes, ImageTileUploads, ImageUploadBytes, ImageTextureAllocations uint64
+	SubmittedTriangles                                                                         int
+	Size                                                                                       image.Point
 }
 
 const defaultDrawingBudget = 512 << 20
@@ -80,8 +82,13 @@ func (g *MeshCanvas) validate() error {
 	if g.widget != nil && !g.widget.retired.Load() && (g.Owner != g.widget.application || g.Window != g.widget.windowID) {
 		return fmt.Errorf("drawing: mounted owner/window identity cannot change")
 	}
-	if g.Mesh == nil && g.Prepare == nil {
-		return fmt.Errorf("drawing: mesh or preparation callback required")
+	if g.Image != nil {
+		if err := g.Image.Validate(); err != nil {
+			return err
+		}
+	}
+	if g.Mesh == nil && g.Prepare == nil && g.Image == nil {
+		return fmt.Errorf("drawing: mesh, image or preparation callback required")
 	}
 	if g.Background.A != 255 && g.Background != (color.NRGBA{}) {
 		return fmt.Errorf("drawing: background must be opaque or transparent black")
@@ -271,7 +278,7 @@ func (g *MeshCanvas) Snapshot() (*image.NRGBA, error) {
 	tex := r.frame.CurrentFrame()
 	size := r.frame.Size()
 	bytes := uint64((size.X*4+255)/256*256) * uint64(size.Y)
-	if r.stats.TargetBytes+r.stats.MeshBytes+16+bytes > g.budget() {
+	if r.stats.TargetBytes+r.stats.MeshBytes+r.stats.ImageBytes+r.stats.ImageUniformBytes+16+bytes > g.budget() {
 		return nil, fmt.Errorf("drawing: readback exceeds GPU resource budget")
 	}
 	if bytes > r.limits.MaxBufferSize {
@@ -423,7 +430,15 @@ func (w *meshWidget) Render() {
 		r := &w.resources
 		r.mu.Lock()
 		defer r.mu.Unlock()
-		renderErr = r.render(nativeSurface(window), size, g.Mesh, *g.View, g.Background, g.budget())
+		mesh := g.Mesh
+		if mesh == nil {
+			mesh = emptyDrawingMesh
+		}
+		var layer canvas.ImageLayer
+		if g.Image != nil {
+			layer = *g.Image
+		}
+		renderErr = r.render(nativeSurface(window), size, mesh, *g.View, g.Background, g.budget(), layer)
 	})
 }
 func (w *meshWidget) RenderSource(op draw.Op) composer.Source {
@@ -478,7 +493,11 @@ func (s *meshSource) Draw(c composer.Composer) {
 	drawer.CopyUsed(s.dest.Min, s.source, draw.Over, false)
 }
 
+var emptyDrawingMesh, _ = canvas.NewMesh(nil, nil)
+
 type meshResources struct {
+	image                                 *imageResources
+	layer                                 canvas.ImageLayer
 	origin                                canvas.Point
 	limits                                wgpu.Limits
 	haveLimits                            bool
@@ -496,6 +515,13 @@ type meshResources struct {
 
 func (r *meshResources) release() {
 	r.ready = false
+	if r.image != nil {
+		r.image.release()
+		r.image = nil
+	}
+	r.layer = canvas.ImageLayer{}
+	r.stats.ImageBytes = 0
+	r.stats.ImageUniformBytes = 0
 	if r.system != nil {
 		r.system.Release()
 	}
@@ -568,7 +594,18 @@ func (r *meshResources) configure(surface *gpu.Surface, size image.Point) error 
 	r.stats.Generation++
 	return nil
 }
-func (r *meshResources) render(surface *gpu.Surface, size image.Point, m *canvas.Mesh, view canvas.Viewport, bg color.NRGBA, budget uint64) error {
+func (r *meshResources) render(surface *gpu.Surface, size image.Point, m *canvas.Mesh, view canvas.Viewport, bg color.NRGBA, budget uint64, layers ...canvas.ImageLayer) error {
+	var layer canvas.ImageLayer
+	if len(layers) > 0 {
+		layer = layers[0]
+	}
+	if layer.Image != nil {
+		if err := layer.Validate(); err != nil {
+			return err
+		}
+	} else {
+		layer = canvas.ImageLayer{}
+	}
 	target, mesh, err := drawingBytes(size, m)
 	if err != nil {
 		return err
@@ -578,7 +615,7 @@ func (r *meshResources) render(surface *gpu.Surface, size image.Point, m *canvas
 	if r.frame != nil && r.frame.Size() != size {
 		readback = 0
 	}
-	if target+mesh+16+readback > budget {
+	if target+mesh+16+readback+imageBytes(layer) > budget {
 		return fmt.Errorf("drawing: GPU resource budget exceeded")
 	}
 	if !r.haveLimits {
@@ -586,6 +623,9 @@ func (r *meshResources) render(surface *gpu.Surface, size image.Point, m *canvas
 		r.haveLimits = true
 	}
 	if err := drawingAdmission(size, m, readback, r.limits); err != nil {
+		return err
+	}
+	if err := imageAdmission(layer, r.limits); err != nil {
 		return err
 	}
 	if r.frame == nil {
@@ -604,11 +644,35 @@ func (r *meshResources) render(surface *gpu.Surface, size image.Point, m *canvas
 		r.stats.ReadbackBytes = 0
 	}
 	changed := r.mesh != m
-	if !changed && !resized && r.ready && r.view == view && r.background == bg {
+	if !changed && !resized && r.ready && r.view == view && r.background == bg && r.layer == layer {
 		return nil
 	}
 	// Failed upload/submission must never expose a partially updated frame.
 	r.ready = false
+	defer func() {
+		if !r.ready && r.image != nil {
+			r.image.source = nil
+		}
+	}()
+	if layer.Image == nil {
+		if r.image != nil {
+			r.image.release()
+			r.image = nil
+		}
+		r.stats.ImageBytes = 0
+		r.stats.ImageUniformBytes = 0
+	} else {
+		if r.image == nil {
+			var err error
+			r.image, err = newImageResources(r.frame.Device(), r.frame.Format.Format, r.frame.Format.Samples)
+			if err != nil {
+				return err
+			}
+		}
+		if err := r.image.upload(r.frame.Device(), layer, &r.stats); err != nil {
+			return err
+		}
+	}
 	if changed {
 		r.mesh = nil
 		ix := m.Indices()
@@ -654,7 +718,10 @@ func (r *meshResources) render(surface *gpu.Surface, size image.Point, m *canvas
 	}
 	_, count := m.Counts()
 	var bindErr error
-	if count > 0 {
+	if layer.Image != nil {
+		bindErr = r.image.draw(r.frame.Device(), pass, layer, view, &r.stats)
+	}
+	if count > 0 && bindErr == nil {
 		bindErr = r.pipeline.BindPipeline(pass)
 		if bindErr == nil {
 			r.pipeline.BindDrawIndexed(pass)
@@ -673,12 +740,16 @@ func (r *meshResources) render(surface *gpu.Surface, size image.Point, m *canvas
 	}
 	r.view = view
 	r.background = bg
+	r.layer = layer
 	r.ready = true
 	r.stats.Frames++
 	r.stats.TargetBytes = target
 	r.stats.MeshBytes = mesh
 	r.stats.Size = size
 	r.stats.SubmittedTriangles = count / 3
+	if layer.Image != nil {
+		r.stats.SubmittedTriangles += 2
+	}
 	return nil
 }
 

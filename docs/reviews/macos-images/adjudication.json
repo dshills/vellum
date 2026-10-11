@@ -1,0 +1,52 @@
+{
+  "captured_utc": "2026-10-11T00:04:37.586644+00:00",
+  "reviewer": "/root/mac_history_review",
+  "prism_report": "prism.json",
+  "prism_report_sha256": "390f0bb31d72b26ad4868f2f979575f648e50e66d6d0bf98b9bc93b86cebbaf5",
+  "review": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "files": 29,
+    "bytes": 115145,
+    "chunks": 6,
+    "llm_calls": 8,
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "coverage_complete": true,
+    "excluded": [],
+    "skipped": [],
+    "truncated_bytes": 0,
+    "exit_code": 1
+  },
+  "dispositions": [
+    {
+      "id": "c9426d84f2298909",
+      "title": "Restore step leaves the patched image in the shared model",
+      "disposition": "Refuted; no source change required",
+      "facts": [
+        "The owner publishes the edited next version into m.imageLayer.Image. The later restore transaction rebinds that retained edited 4096-square image after the temporary 2x1 halo texture.",
+        "Restoration refers to placement/filter/mesh bindings and texture dimensions. No stats, report or contract claims pristine pixels.",
+        "Downstream budget/rebuild/resize checks retain the edited source without assuming original pixel colors. Removal then clears Image and checks transparent empty pixels.",
+        "The private smoke has one caller in one smoke run with a fresh model, closes the independent original-image window and calls Application.Close afterward. No persisted model/user document survives.",
+        "Resetting the source to original would discard the edited version intentionally retained through GPU recreation."
+      ],
+      "source_identities": {
+        "examples/drawing/image_smoke.go": "f3bc788bf8c8487dcb98b558ece229342f56606f72e02b1b17c420feb7f799f7",
+        "examples/drawing/smoke.go": "0fac1055a7a62e76d2fbaafbf0ed07c1acec47b5f6add39f8b4b278f320a8bd2",
+        "examples/drawing/main.go": "44bfcccbd15e84e9c23ee7e4fa702452651dd4d3489e0cef6e59d48ddb0043b6",
+        "examples/drawing/model.go": "e5d7810a67c18316ca8cbe7901fd4913f231c5e817ae5da9f02d892555e55868"
+      }
+    }
+  ],
+  "discarded_by_prism": [
+    {
+      "id": "99f6dd6d67bc8dd6",
+      "disposition": "Prism confirmation refuted: expected injected budget error is identified by report/JSON.",
+      "counter_reconciliation": "Main canvas cumulative 3074 image tile writes = 1024 initial + 1 changed tile + 1 small halo tile + 1024 return-to-4K + 1024 explicit rebuild. Bytes = 3*67108864 + 65536 + 8 = 201392136. Independent window counters are separate."
+    }
+  ],
+  "final_internal_result": "Pass: no remaining actionable production defect. Four internal source/assertion findings resolved before Prism. Single Prism finding independently refuted. No repeated unchanged Prism review."
+}

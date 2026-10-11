@@ -86,10 +86,14 @@ allocation and effective content bounds, translated independently on both axes.
 upload operations/bytes, uniform bytes, snapshots, allocation generation, size
 and submitted triangles. These are renderer counters and calculated resource
 sizes, not GPU timestamps, resident process memory or presentation latency.
+Image counters report live texel/uniform bytes, successful tile uploads/bytes and
+texture allocations separately. Submitted triangle counts include the image quad
+(two triangles) when present; uniform upload bytes include its 32-byte transform.
 
 `MaxGPUBytes` defaults to 512 MiB for this renderer's tracked allocation estimate:
 20 bytes per target pixel (RGBA8 resolve + 4× MSAA), position/color/index buffers,
-16-byte transform and optional row-aligned readback staging. Device/driver internal
+16-byte mesh transform, optional [image texture plus 32-byte uniform](images.md),
+and optional row-aligned readback staging. Device/driver internal
 overhead, UI textures, Go data and transient allocator behavior are separate.
 The renderer checks logical-device texture/buffer limits before admission and
 uses checked texture APIs for actual target/MSAA allocation. Budget refusal
@@ -125,7 +129,8 @@ with exact source ranges, including isolated peaks and zoomed sample selection.
 The clipping math and generation/lifetime rules have deterministic tests. Native
 scroll-clipped compositor pixels and MSAA edge quality require separate evidence;
 full-frame offscreen snapshots do not certify them. The rectangle index is not a
-general triangle spatial index. P4's 3D viewport, 4096² changed image tiles,
+general triangle spatial index. [Retained image drawing](images.md) adds the
+4096² changed-tile workload with native pixels and resource checks. P4's 3D viewport,
 compute preparation, float targets and asynchronous screenshot readback remain
 open, along with sustained GPU/frame/input and global resource acceptance.
 This phase does not qualify P4 as a whole or the Mac framework as complete.

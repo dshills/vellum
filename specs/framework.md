@@ -79,7 +79,9 @@ destruction releases GPU resources. That API remains a bounded rectangle
 renderer, with a 10,000-object limit. [Retained drawing](drawing.md) separately
 adds immutable arbitrary indexed 2D meshes, strokes, waveform reduction and a
 rectangle spatial index through the shared-device `MeshCanvas` adapter.
-Arbitrary shaders, image tiles, 3D/compute qualification and automatic
+[Retained images](images.md) add immutable RGBA tiles, changed-tile uploads and
+nearest/linear filtering in that adapter, including image-only canvases.
+Arbitrary shaders, 3D/compute qualification and automatic
 physical-device recreation remain future work.
 Demand painting, live resource rebuilding and actionable device-loss shutdown are
 implemented; see [rendering](rendering.md). Runtime verification

@@ -4,6 +4,7 @@ package sdkcontract_test
 import (
 	"context"
 	"errors"
+	"image"
 	"image/color"
 	"path/filepath"
 	"testing"
@@ -291,5 +292,41 @@ func TestPublicDrawingWorkloads(t *testing.T) {
 	}
 	if v, ix := mesh.Counts(); v != 4 || ix != 6 {
 		t.Fatal("public culled mesh")
+	}
+}
+
+func TestPublicRetainedImageContract(t *testing.T) {
+	source := image.NewNRGBA(image.Rect(-10, 20, 250, 150))
+	source.SetNRGBA(-10, 20, color.NRGBA{R: 240, A: 128})
+	original, err := canvas.NewTiledImage(source)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if original.Size() != image.Pt(260, 130) || original.TileCount() != 6 {
+		t.Fatal("normalized image dimensions")
+	}
+	var publicImage image.Image = original
+	if publicImage.At(0, 0) != (color.NRGBA{R: 240, A: 128}) {
+		t.Fatal("public image.Image pixels")
+	}
+	source.SetNRGBA(-10, 20, color.NRGBA{})
+	patch := image.NewNRGBA(image.Rect(0, 0, 1, 1))
+	patch.SetNRGBA(0, 0, color.NRGBA{G: 200, A: 255})
+	next, err := original.WithPatch(image.Rect(129, 1, 130, 2), patch)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tiles := next.ChangedTiles(original)
+	if len(tiles) != 1 || tiles[0].Bounds() != image.Rect(128, 0, 256, 128) || len(tiles[0].Pixels()) != canvas.ImageTileSize*canvas.ImageTileSize*4 {
+		t.Fatal("public changed-tile contract")
+	}
+	tiles[0].Pixels()[(tiles[0].Bounds().Dx()+1)*4+1] = 0
+	patch.Pix[1] = 0
+	if next.NRGBAAt(129, 1).G != 200 || original.NRGBAAt(129, 1).G != 0 || original.NRGBAAt(0, 0).R != 240 {
+		t.Fatal("public source/version/accessor isolation")
+	}
+	layer := canvas.ImageLayer{Image: next, Bounds: canvas.Bounds{Min: canvas.Point{X: -10, Y: -10}, Max: canvas.Point{X: 250, Y: 120}}, Filter: canvas.ImageLinear}
+	if err := layer.Validate(); err != nil {
+		t.Fatal(err)
 	}
 }

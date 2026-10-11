@@ -112,3 +112,11 @@ The independent drawing application exercises a flat shared-device native
 renderer, explicit resource accounting, retention and snapshot color handling.
 See [contract](../specs/drawing.md) and [bounded evidence](reports/macos-drawing/README.md);
 the broader P4 workloads and Mac qualification gates remain open.
+
+Retained image drawing adds immutable 128×128 RGBA tiles and source patches,
+image-only or image-below-mesh canvases, nearest and alpha-safe linear filtering.
+The native consumer verifies a real 4096² source, one-tile 64 KiB updates,
+independent upload baselines, retention, removal, rebuild and resize. See
+[image contract](../specs/images.md) and [evidence](reports/macos-images/README.md).
+The source patch benchmark measures portable allocation/work only; sustained
+GPU/frame/input and broader Mac/P4 acceptance remain open.

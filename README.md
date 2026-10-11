@@ -5,7 +5,7 @@ ordinary Go values, stable widget IDs, explicit commands and cancellable tasks.
 A separate native driver reuses Cogent Core's windowing and WebGPU stack.
 
 The framework includes multiwindow docking, native macOS accessibility, standard
-controls, virtual data views and a shared-device GPU canvas. Production readiness,
+controls, virtual data views and shared-device GPU meshes and tiled images. Production readiness,
 complete assistive/input acceptance and Windows/Linux runtime qualification remain
 open. The workbench does not change system input sources.
 
@@ -18,7 +18,7 @@ open. The workbench does not change system input sources.
 | `workbench/`, `virtual/`, `canvas/` | Dock layouts, large-data views and canvas models |
 | `drivers/cogent/` | Separate native driver module |
 | `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |
-| `examples/drawing/` | Independent retained GPU drawing and scalable workload consumer |
+| `examples/drawing/` | Independent retained GPU mesh/image drawing and scalable workload consumer |
 | `examples/hello/` | Standalone application module consuming the local SDK |
 | [docs/](docs/README.md) | Development guide, research, decisions, reports and review evidence |
 | [specs/](specs/README.md) | Framework contract and foundation validation plan |

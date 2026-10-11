@@ -1,0 +1,222 @@
+{
+  "captured_utc": "2026-10-11T00:01:35.019448+00:00",
+  "parent_commit": "55dc3fe1c33e69850c9f5e1bb2e30356a7a885d7",
+  "identity_scope": "Final changed implementation/specification/test inputs excluding reports/reviews assembled after tests. Production code was unchanged after complete checks; two test-only precision corrections were verified by affected independent consumer race/vet/build and final live fixture.",
+  "host": {
+    "os": "macOS 26.6.2",
+    "build": "25G83",
+    "arch": "arm64",
+    "cpu": "Apple M4 Pro",
+    "go": "go1.27.2"
+  },
+  "environment": {
+    "VELLUM_CACHE_DIR": "/tmp/vellum-p0-cache",
+    "GOWORK": "off",
+    "native_env": ". ./drivers/cogent/env.sh"
+  },
+  "inputs": {
+    "README.md": "1aae33b7e3876e284fe2036051a57d0b81a80ebf4d61f238566e623eff334ecc",
+    "canvas/image.go": "2bf2f04843d72bf8ff1be2b74947a10d82dd835d7e42248281db227022848ccf",
+    "canvas/image_test.go": "aed1de6a3277d307d57af24df08da736dbe5a5ae474da3ce58229ab51aeb943c",
+    "docs/implementation.md": "56b37efa83b92519fc03e242aaa7fa3b53959daadbdf6e5bafc14cebbfbd5754",
+    "docs/reports/README.md": "a78ecfa5ea0961bd30cc7a634275ba2f6b0ad668876c87dfcdde41e02f92bfbc",
+    "drivers/cogent/image_canvas.go": "898329b540f12b51bd0fc3c4f30c6606d6a4637e4adf7762588cb8353d5b9fdf",
+    "drivers/cogent/image_canvas.wgsl": "dd31453b287062b73f5e234acef99058780e9008e7b24bb59d33b1af455f052f",
+    "drivers/cogent/image_canvas_test.go": "e114d3c4977c12f522b60c5201b5180ec6453f25ddde625a8955ed58b7d1fd75",
+    "drivers/cogent/mesh_canvas.go": "df45dd2375264ac5da9344b5b245dbcce6cc307ccfb27817e0ffce8eafa86afb",
+    "examples/drawing/README.md": "b14ab465bb3f3cd5515c3327f3f48c0fb69e9cffdb1d3ff0c512886f1b6d7751",
+    "examples/drawing/image_smoke.go": "f3bc788bf8c8487dcb98b558ece229342f56606f72e02b1b17c420feb7f799f7",
+    "examples/drawing/main.go": "44bfcccbd15e84e9c23ee7e4fa702452651dd4d3489e0cef6e59d48ddb0043b6",
+    "examples/drawing/model.go": "e5d7810a67c18316ca8cbe7901fd4913f231c5e817ae5da9f02d892555e55868",
+    "examples/drawing/model_test.go": "f899f9045df12bb026f59aca32cd38b9e34579b89ab2a4ee7aed11ea4d354b1c",
+    "examples/drawing/smoke.go": "0fac1055a7a62e76d2fbaafbf0ed07c1acec47b5f6add39f8b4b278f320a8bd2",
+    "examples/sdk-contract/contract_test.go": "50a0c4d3acd39e1f42b4d86f7acfecd7c13f165e2c1d69486b74f7e8f758f768",
+    "specs/README.md": "f2d11835750d2e8448733033cbc1b4f1c7c60ed7a9882829445683a06d66a5e1",
+    "specs/drawing.md": "03add6ac8193fcc8b2562859778d06e996d2b88e9efe40acb02efcd7ea3eabfc",
+    "specs/framework.md": "6cea08c5aef963481fad4cd082727dfd48b0e291fe7d7f1a0d9dda1e7723e596",
+    "specs/images.md": "db5b380c53026396811246841b66724bcb06ba9865262f04ce067a0ba0946005",
+    "specs/macos-completion.md": "8c683117fb507560f1a26f8bf520db9b6abb3f72bc095f9ade22ab183e7b713b"
+  },
+  "full_check_inputs": {
+    "README.md": "1aae33b7e3876e284fe2036051a57d0b81a80ebf4d61f238566e623eff334ecc",
+    "canvas/image.go": "2bf2f04843d72bf8ff1be2b74947a10d82dd835d7e42248281db227022848ccf",
+    "canvas/image_test.go": "aed1de6a3277d307d57af24df08da736dbe5a5ae474da3ce58229ab51aeb943c",
+    "docs/implementation.md": "56b37efa83b92519fc03e242aaa7fa3b53959daadbdf6e5bafc14cebbfbd5754",
+    "docs/reports/README.md": "a78ecfa5ea0961bd30cc7a634275ba2f6b0ad668876c87dfcdde41e02f92bfbc",
+    "drivers/cogent/image_canvas.go": "898329b540f12b51bd0fc3c4f30c6606d6a4637e4adf7762588cb8353d5b9fdf",
+    "drivers/cogent/image_canvas.wgsl": "dd31453b287062b73f5e234acef99058780e9008e7b24bb59d33b1af455f052f",
+    "drivers/cogent/image_canvas_test.go": "e114d3c4977c12f522b60c5201b5180ec6453f25ddde625a8955ed58b7d1fd75",
+    "drivers/cogent/mesh_canvas.go": "df45dd2375264ac5da9344b5b245dbcce6cc307ccfb27817e0ffce8eafa86afb",
+    "examples/drawing/README.md": "b14ab465bb3f3cd5515c3327f3f48c0fb69e9cffdb1d3ff0c512886f1b6d7751",
+    "examples/drawing/image_smoke.go": "d1025aa1ef57b3684a318b30d3f4a700ef75d1a11e9dded31dff3ef600854da0",
+    "examples/drawing/main.go": "44bfcccbd15e84e9c23ee7e4fa702452651dd4d3489e0cef6e59d48ddb0043b6",
+    "examples/drawing/model.go": "e5d7810a67c18316ca8cbe7901fd4913f231c5e817ae5da9f02d892555e55868",
+    "examples/drawing/model_test.go": "f899f9045df12bb026f59aca32cd38b9e34579b89ab2a4ee7aed11ea4d354b1c",
+    "examples/drawing/smoke.go": "0fac1055a7a62e76d2fbaafbf0ed07c1acec47b5f6add39f8b4b278f320a8bd2",
+    "examples/sdk-contract/contract_test.go": "e363e1fd402842b3ca085d925a40a44234696e5f046c1e9a23f57099e543c539",
+    "specs/README.md": "f2d11835750d2e8448733033cbc1b4f1c7c60ed7a9882829445683a06d66a5e1",
+    "specs/drawing.md": "03add6ac8193fcc8b2562859778d06e996d2b88e9efe40acb02efcd7ea3eabfc",
+    "specs/framework.md": "6cea08c5aef963481fad4cd082727dfd48b0e291fe7d7f1a0d9dda1e7723e596",
+    "specs/images.md": "db5b380c53026396811246841b66724bcb06ba9865262f04ce067a0ba0946005",
+    "specs/macos-completion.md": "8c683117fb507560f1a26f8bf520db9b6abb3f72bc095f9ade22ab183e7b713b"
+  },
+  "test_only_corrections_after_full_check": {
+    "examples/drawing/image_smoke.go": {
+      "full_check_sha256": "d1025aa1ef57b3684a318b30d3f4a700ef75d1a11e9dded31dff3ef600854da0",
+      "final_sha256": "f3bc788bf8c8487dcb98b558ece229342f56606f72e02b1b17c420feb7f799f7"
+    },
+    "examples/sdk-contract/contract_test.go": {
+      "full_check_sha256": "e363e1fd402842b3ca085d925a40a44234696e5f046c1e9a23f57099e543c539",
+      "final_sha256": "50a0c4d3acd39e1f42b4d86f7acfecd7c13f165e2c1d69486b74f7e8f758f768"
+    }
+  },
+  "logs": {
+    "check.txt": "f599de2fc0470d46764330c7d75d22ad8be1614d5dade54f75c7ce3a3eaa6471",
+    "focused-race.txt": "5fe7cd425a90af2fea01f99fd07842dc112c486b2c667f95180c90a3003e8aae",
+    "native-build.txt": "5f4ae157037abcb0974aaf8715ccb24fd9954413e64c0cfa3fda3e0a57950979",
+    "native-runtime.txt": "c31c9821c5a2b073c7120d60f4c5de88b7ff67328ab15e3cfa4069066df02ad7",
+    "benchmarks.txt": "79e946cf4b8600a0c54a2d0fd62fa8989787b138e4498d3cf004d2e4e0a52a85",
+    "corrected-consumers.txt": "ba71979bc839c53d36850db8fd3b1454cf404d15e8fd7d21ecb099728e4f5440"
+  },
+  "runs": [
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "command": "go clean -testcache; ./scripts/check.sh",
+      "exit_code": 0,
+      "log": "check.txt",
+      "scope": "87 Python regressions; root/native race and vet; owned backend race tests; workbench build; hello/drawing own module race/vet/build; public SDK contract race/vet."
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent",
+      "command": "go test -race . -run 'TestImage|TestDrawing|TestMeshCanvas' -count=5",
+      "exit_code": 0,
+      "log": "focused-race.txt"
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "command": "go test ./canvas -run '^$' -bench BenchmarkImage4096SingleTilePatch -benchmem -benchtime=1s -count=3",
+      "exit_code": 0,
+      "log": "benchmarks.txt",
+      "scope": "Portable one-pixel patch touches one 128x128 tile; source construction excluded from timing; concurrent checks, no native GPU timing."
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "commands": [
+        "(cd examples/sdk-contract && go test -race ./... -count=1 && go vet ./...)",
+        "(cd examples/drawing && go test -race ./... -count=1 && go vet ./...)"
+      ],
+      "exit_codes": [
+        0,
+        0
+      ],
+      "log": "corrected-consumers.txt"
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/examples/drawing",
+      "command": "go build -race -o /private/tmp/vellum-images-qualified .",
+      "exit_code": 0,
+      "log": "native-build.txt"
+    },
+    {
+      "cwd": "/Users/dshills/Development/projects/Vellum/examples/drawing",
+      "command": "/private/tmp/vellum-images-qualified -smoke",
+      "exit_code": 0,
+      "log": "native-runtime.txt"
+    }
+  ],
+  "native_report": {
+    "budget_refusal": true,
+    "empty_frame_clear": true,
+    "error_callback_resource_query": true,
+    "event": "vellum.drawing.smoke",
+    "final_stats": {
+      "Ready": true,
+      "RenderVisits": 26,
+      "Frames": 19,
+      "MeshUploads": 6,
+      "MeshUploadBytes": 399552,
+      "UniformUploadBytes": 720,
+      "SnapshotReadbacks": 16,
+      "Generation": 7,
+      "TargetBytes": 19857600,
+      "MeshBytes": 0,
+      "ReadbackBytes": 4085760,
+      "ImageBytes": 0,
+      "ImageUniformBytes": 0,
+      "ImageTileUploads": 3074,
+      "ImageUploadBytes": 201392136,
+      "ImageTextureAllocations": 4,
+      "SubmittedTriangles": 0,
+      "Size": {
+        "X": 1182,
+        "Y": 840
+      }
+    },
+    "gradient_and_linear_alpha_pixels": true,
+    "independent_windows": true,
+    "physical_device_loss_verified": false,
+    "presentation_latency_measured": false,
+    "repeated_resize": true,
+    "resource_rebuild": true,
+    "retained_image": {
+      "changed_tiles": 1,
+      "changed_upload_bytes": 65536,
+      "chrome_camera_placement_filter_retention": true,
+      "image_below_mesh": true,
+      "image_snapshot_budget_refusal": true,
+      "independent_image_only_window": true,
+      "initial_tiles": 1024,
+      "initial_upload_bytes": 67108864,
+      "nearest_pixels": true,
+      "premultiplied_linear_filter_pixels": true,
+      "source_dimensions": {
+        "X": 4096,
+        "Y": 4096
+      },
+      "translated_fractional_pixels": true
+    },
+    "schematic_source_objects": 100000,
+    "schematic_tested_objects": 2409,
+    "schematic_visible_objects": 2310,
+    "static_pan_retains_mesh": true,
+    "transparent_snapshot": true,
+    "unchanged_mesh_uploads": 1,
+    "unchanged_offscreen_frames": 2,
+    "waveform_columns": 1000,
+    "waveform_source_samples": 1000000,
+    "waveform_submitted_triangles": 2000
+  },
+  "limits": [
+    "Controlled writer faults test upload baseline repair; no physical GPU-fault injection.",
+    "No native clipped compositor or MSAA edge qualification.",
+    "No sustained CPU/GPU/frame/input, global memory or presentation latency qualification.",
+    "Broader 3D/compute/float/asynchronous-readback P4 and other Mac gates remain open.",
+    "No OS preference changes, public release, push/tag/signing/notarization."
+  ],
+  "internal_review": {
+    "agent": "/root/mac_history_review",
+    "result": "Pass: no remaining actionable defects found. Read-only review; no edits, tests, GUI or Prism execution.",
+    "reviewed_core_inputs": {
+      "canvas/image.go": "2bf2f04843d72bf8ff1be2b74947a10d82dd835d7e42248281db227022848ccf",
+      "drivers/cogent/image_canvas.go": "898329b540f12b51bd0fc3c4f30c6606d6a4637e4adf7762588cb8353d5b9fdf",
+      "drivers/cogent/image_canvas.wgsl": "dd31453b287062b73f5e234acef99058780e9008e7b24bb59d33b1af455f052f",
+      "drivers/cogent/mesh_canvas.go": "df45dd2375264ac5da9344b5b245dbcce6cc307ccfb27817e0ffce8eafa86afb",
+      "examples/drawing/image_smoke.go": "f3bc788bf8c8487dcb98b558ece229342f56606f72e02b1b17c420feb7f799f7",
+      "examples/sdk-contract/contract_test.go": "50a0c4d3acd39e1f42b4d86f7acfecd7c13f165e2c1d69486b74f7e8f758f768",
+      "specs/images.md": "db5b380c53026396811246841b66724bcb06ba9865262f04ce067a0ba0946005"
+    },
+    "resolved_findings": [
+      "Reject raw empty/reversed rectangle before overflow-prone Size subtraction.",
+      "Capture native chrome render-visit baseline in the same owner transaction as invalidation.",
+      "Readback budget assertion includes image uniform and excludes only source texels.",
+      "Public consumer mutates the copied patched green pixel before checking isolation."
+    ],
+    "accepted_invariants": [
+      "Immutable source/accessor copies, unchanged tile sharing and no ancestor chain.",
+      "Separate completed-frame layer values and uploaded-texel baseline.",
+      "Lifetime guards, checked allocations/uploads, partial cleanup and full baseline repair after failure.",
+      "Target resize retains image; removal/rebuild retire it; render/readback estimate includes image.",
+      "Premultiplied linear filtering and native nearest/halo/order/translated probes."
+    ]
+  }
+}

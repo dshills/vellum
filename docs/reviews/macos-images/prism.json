@@ -1,0 +1,132 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e8d6e6c628159f60f8512fbfb44ee293",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "55dc3fe1c33e69850c9f5e1bb2e30356a7a885d7",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "c9426d84f2298909",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Restore step leaves the patched image in the shared model",
+      "message": "The restore step resets Bounds, Filter, Prepare and Mesh. It never resets m.imageLayer.Image, which was replaced earlier with the patched 'next' image. The shared model keeps the red 128x128 patch after the smoke run. Later smoke steps and the live fixture then see a modified source while the 'restored' stats imply a pristine one. The 1024-tile upload check passes either way, so the leaked state goes unnoticed.",
+      "suggestion": "Set m.imageLayer.Image = original in the restore transaction so the model returns to its initial 4K source.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/drawing/image_smoke.go",
+          "lines": {
+            "start": 232,
+            "end": 232
+          }
+        }
+      ],
+      "tags": [
+        "test-state",
+        "smoke",
+        "location-corrected"
+      ],
+      "evidence": "m.imageLayer.Bounds = canvas.Bounds{Min: canvas.Point{X: -256, Y: -256}, Max: canvas.Point{X: 256, Y: 256}}",
+      "fix": {
+        "before": "m.imageLayer.Bounds = canvas.Bounds{Min: canvas.Point{X: -256, Y: -256}, Max: canvas.Point{X: 256, Y: 256}}",
+        "after": "m.imageLayer.Image = original\n\t\tm.imageLayer.Bounds = canvas.Bounds{Min: canvas.Point{X: -256, Y: -256}, Max: canvas.Point{X: 256, Y: 256}}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 84561,
+    "totalMs": 28461
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 29,
+    "bytes": 115145,
+    "chunks": 6,
+    "llmCalls": 8,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 78752,
+        "output": 10976,
+        "costUSD": 0.267264
+      }
+    ],
+    "widenedFiles": 9,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 2,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "99f6dd6d67bc8dd6",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Unexplained error line in native runtime log that is recorded as a passing run",
+        "message": "The native runtime log starts with an error-style line, \"drawing: GPU resource budget exceeded\", yet the proof records exit_code 0 for this run and treats it as a clean qualification. This is probably the intentional budget-refusal probe printing to stderr. The artifact does not say so, though, and a reader cannot tell an expected refusal from a real failure. The same log also reports ImageUploadBytes of about 201 MB and 3074 tile uploads, which the proof does not explain.",
+        "suggestion": "Add a note in the report README or proof JSON that this line is the expected output of the deliberate budget-refusal probe (budget_refusal and image_snapshot_budget_refusal). Alternatively, tag the line or capture stderr in a separate log so the evidence is unambiguous.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "docs/reports/macos-images/native-runtime.txt",
+            "lines": {
+              "start": 1,
+              "end": 1
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "reports"
+        ],
+        "evidence": "drawing: GPU resource budget exceeded",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: The log is self-explanatory. The JSON line reports \"budget_refusal\":true and \"image_snapshot_budget_refusal\":true, so the leading \"GPU resource budget exceeded\" line is the expected refusal probe and not a failure. The upload figures also reconcile with the recorded retained_image data: 3074 tiles is three full 1024-tile uploads plus 2 more, and 201392136 bytes is about 3 x 67108864 plus the 65536-byte changed tile. Nothing in the artifact shows a real defect."
+    }
+  ],
+  "suppressed": []
+}
