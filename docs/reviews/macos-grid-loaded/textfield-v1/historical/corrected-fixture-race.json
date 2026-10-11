@@ -1,0 +1,42 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "-tags",
+    "offscreen",
+    "-overlay",
+    "/private/tmp/vellum-grid-loaded-review/textfield-settlement/overlay.json",
+    "-run",
+    "^TestReviewFieldSettlement",
+    "-count=1",
+    "."
+  ],
+  "cwd": "/private/tmp/vellum-grid-loaded/drivers/cogent",
+  "exit_code": 1,
+  "inputs_before": {
+    "textfield_settle.go": "5e2241127f6c4c0f76b3e162a8e1cacce3d7c1e3d6349650b0f3cd9c1af5b645",
+    "controls.go": "4755cebf6d631818dbf04a15e6886f40a1fce7eef0fb76ab81d6696fb4a5ed6e",
+    "editor.go": "1600cf654c8015ae34a05b3b9c82c70ea4dcc0f5716438135e47579b93b1a205",
+    "editor_geometry.go": "f9928044137efddc77dba9434836bf25b1f30248f967f267aca31253690f02c5",
+    "editor_test.go": "0e66df12e419938f75aba7a89855a5e7c3ce87180cec1e530e3803dad2737c83",
+    "grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "go.mod": "27998a50e1f6b5b7f95e21c1f7ab5ab8672e557ed4438be427bf0aecd4d35fe2",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "reviewer-test": "572dff8067c451e054c09ea66e1c955a5f134d3575d22dd34b3a498c058b3640"
+  },
+  "inputs_after": {
+    "textfield_settle.go": "5e2241127f6c4c0f76b3e162a8e1cacce3d7c1e3d6349650b0f3cd9c1af5b645",
+    "controls.go": "4755cebf6d631818dbf04a15e6886f40a1fce7eef0fb76ab81d6696fb4a5ed6e",
+    "editor.go": "1600cf654c8015ae34a05b3b9c82c70ea4dcc0f5716438135e47579b93b1a205",
+    "editor_geometry.go": "f9928044137efddc77dba9434836bf25b1f30248f967f267aca31253690f02c5",
+    "editor_test.go": "0e66df12e419938f75aba7a89855a5e7c3ce87180cec1e530e3803dad2737c83",
+    "grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "go.mod": "27998a50e1f6b5b7f95e21c1f7ab5ab8672e557ed4438be427bf0aecd4d35fe2",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "reviewer-test": "572dff8067c451e054c09ea66e1c955a5f134d3575d22dd34b3a498c058b3640"
+  },
+  "unchanged": true,
+  "log_sha256": "d2996ad482b2ab4687cbf40e4b77a3b6adab2e466bd073757f0e2a6711f8d10d",
+  "scope": "Selected current native settlement files + overlay only; actual originating FIFO with mounted widgets; offscreen no Cocoa/GUI"
+}

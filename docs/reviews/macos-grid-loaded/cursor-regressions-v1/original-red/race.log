@@ -1,0 +1,84 @@
+==================
+WARNING: DATA RACE
+Write at 0x00c00060beb0 by goroutine 24:
+  cogentcore.org/core/core.TextCursor()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor.go:104 +0xac0
+  cogentcore.org/core/core.reviewCursorOn()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:36 +0x120
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.func1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:71 +0xbc
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.gowrap1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:75 +0x38
+
+Previous read at 0x00c00060beb0 by goroutine 25:
+  cogentcore.org/core/core.TextCursor()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor.go:54 +0x388
+  cogentcore.org/core/core.reviewCursorOn()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:36 +0x120
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.func1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:71 +0xbc
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.gowrap1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:75 +0x38
+
+Goroutine 24 (running) created at:
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:67 +0x428
+  testing.tRunner()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 25 (running) created at:
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:67 +0x428
+  testing.tRunner()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x34
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c00060beb0 by goroutine 24:
+  cogentcore.org/core/core.TextCursor()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor.go:104 +0xac0
+  cogentcore.org/core/core.reviewCursorOn()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:36 +0x120
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.func1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:74 +0x12c
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.gowrap1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:75 +0x38
+
+Previous read at 0x00c00060beb0 by goroutine 25:
+  cogentcore.org/core/core.TextCursor()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor.go:54 +0x388
+  cogentcore.org/core/core.reviewCursorOn()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:36 +0x120
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.func1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:71 +0xbc
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner.gowrap1()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:75 +0x38
+
+Goroutine 24 (running) created at:
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:67 +0x428
+  testing.tRunner()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 25 (running) created at:
+  cogentcore.org/core/core.TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner()
+      /private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream/core/textcursor_vellum_review_test.go:67 +0x428
+  testing.tRunner()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/opt/go/libexec/src/testing/testing.go:2260 +0x34
+==================
+--- FAIL: TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner (0.03s)
+    textcursor_vellum_review_test.go:80: TextCursor modified the shared legacy owner pointer
+    testing.go:1867: race detected during execution of test
+--- FAIL: TestVellumReviewTextCursorSceneOwnerAndPositionRetention (0.00s)
+    textcursor_vellum_review_test.go:105: another scene changed the first scene's retained cursor owner
+FAIL
+FAIL	cogentcore.org/core/core	0.583s
+FAIL

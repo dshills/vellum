@@ -20,9 +20,11 @@ one wake is outstanding. A panic closes the application and propagates.
 
 Commands live in an owner-thread registry. Availability is rechecked on invocation
 from menus, toolbars, shortcuts and the palette. `tasks.Start[T]` accepts a
-context, an ordinary Go worker and a typed completion callback. Worker count and
-undelivered results share one bound. Progress is coalesced; completion waits for
-mailbox credit or lifetime cancellation. Workers cannot mutate live UI state.
+context, an ordinary Go worker and a typed completion callback. It reserves
+completion mailbox credit before executor admission and refuses immediately if
+that reservation is full. Worker count and undelivered results share one bound;
+task credit returns only after both worker termination and owner terminal
+delivery. Progress is coalesced. Workers cannot mutate live UI state.
 
 ## Document edits
 
@@ -86,7 +88,11 @@ cell pools, clipped measured geometry, routed input and viewport accessibility.
 Source revisions preserve the active key and top-row anchor where still present,
 subject to viewport extent clamping;
 retired opaque cell refs refuse activation after a viewport/source transition.
-See the [grid contract](grid.md). This adds an indexed foundation for the P6
+`BuildGridProjection` prepares immutable loaded sort/filter and optional height
+indexes on workers; opaque owner requests refuse superseded results and preserve
+current drafts and selection. View revisions are separate from the captured full
+domain revision. See [worker-built views](grid-projection.md) and the independent
+stored-data consumer in `examples/loadedgrid`. See the [grid contract](grid.md). This adds an indexed foundation for the P6
 million-row workload. Optional [row selection](grid-selection.md) captures
 immutable range/All membership, with bounded key toggles and detached worker
 enumeration. The active cell remains a separate cursor. Optional [cell editing](grid-editing.md)

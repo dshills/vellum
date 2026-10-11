@@ -1,0 +1,83 @@
+{
+  "changed_inputs": {},
+  "checks": [
+    {
+      "argv": [
+        "go",
+        "version"
+      ],
+      "cwd": "/private/tmp/vellum-grid-loaded",
+      "elapsed_seconds": 0.010439,
+      "exit_code": 0,
+      "log": "go-version.log",
+      "log_sha256": "94e911f9fbf3c118f6a0573ab3a13fa546ad13e89ba40cf53df77e468509c92d"
+    },
+    {
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-count=3",
+        "-run",
+        "^TestGridProjection",
+        "./virtual"
+      ],
+      "cwd": "/private/tmp/vellum-grid-loaded",
+      "elapsed_seconds": 5.617866,
+      "exit_code": 0,
+      "log": "projection-race.log",
+      "log_sha256": "1ce04358e90677aec693293f8ecd270d69a64c022b49845f69e8630e545ebc53"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "./virtual"
+      ],
+      "cwd": "/private/tmp/vellum-grid-loaded",
+      "elapsed_seconds": 0.492201,
+      "exit_code": 0,
+      "log": "virtual-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "environment": {
+    "GOCACHE": "/private/tmp/vellum-grid-loaded-portable-cache",
+    "GOENV": "off",
+    "GOFLAGS": "",
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "off",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "exploratory": [
+    {
+      "path": "/private/tmp/vellum-grid-projection-exploratory-1.log",
+      "scope": "Exploratory focused test output; no before/after input binding; historical earlier source versions except final exploratory3.",
+      "sha256": "f5f17cc2aad1f3789b895d2f78fcf5899a14a0d0ca2102dabe9368021f04352b"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-projection-exploratory-2.log",
+      "scope": "Exploratory focused test output; no before/after input binding; historical earlier source versions except final exploratory3.",
+      "sha256": "3fa9e68dc8004311be9a0580e237f7e6436b76fb011c482bee8721d719c561a8"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-projection-exploratory-3.log",
+      "scope": "Exploratory focused test output; no before/after input binding; historical earlier source versions except final exploratory3.",
+      "sha256": "23b88fd617042f32ead549491be0ab93886e8615790f43396fb331dcaa5ebf02"
+    }
+  ],
+  "input_count": 28,
+  "input_scope": "All virtual package Go implementation/tests, root module files (go.sum explicitly absent), and bounded child helper. This is selected portable package provenance, not a complete toolchain or native dependency closure.",
+  "inputs_after": "inputs-after.json",
+  "inputs_after_sha256": "73a0cb1d17d075d0547bd01d06cc682bb7f8293e2a4b7595352ff921adc6437a",
+  "inputs_before": "inputs-before.json",
+  "inputs_before_sha256": "73a0cb1d17d075d0547bd01d06cc682bb7f8293e2a4b7595352ff921adc6437a",
+  "limits": "Focused portable builder/request race tests and virtual vet only; no native/UI/GUI, sustained memory/latency, or full framework acceptance.",
+  "owned_map": "owned-files.json",
+  "owned_map_sha256": "3ccad26fd98262eec949710f4672c539061723822fe23bdc60395d8458b5651b",
+  "producer": "/private/tmp/vellum-grid-projection-builder/qualify.py",
+  "producer_sha256": "6b1b23ad725dde782d2a35a03e6c551ac9fb84118469a3c2a9092716ab16f8e5",
+  "result": "PASS",
+  "root": "/private/tmp/vellum-grid-loaded",
+  "schema": "vellum-grid-projection-builder-qualification-v1"
+}

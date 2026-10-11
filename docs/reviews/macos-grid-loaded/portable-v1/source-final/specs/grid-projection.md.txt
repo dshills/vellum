@@ -1,0 +1,117 @@
+# Worker-built loaded grid views
+
+`BuildGridProjection` builds reusable immutable sorting/filtering indexes for
+`virtual.Grid` outside the UI owner. This advances the loaded-data portion of P6;
+it does not complete sustained table/tree performance or Mac acceptance.
+
+## Immutable input and queries
+
+The input is a full indexed `GridSource` snapshot. Every metadata, key, inverse,
+cell, optional edit and row-metric read must be immutable for the snapshot's
+entire lifetime and safe for concurrent worker/owner reads. A mutable owner source
+must first produce a genuinely immutable snapshot. The builder borrows that
+snapshot; cancellation cannot make a blocking source callback return. Callbacks
+must remain bounded, in memory, nonblocking and free of UI reentry or IO.
+
+`GridQuery` accepts at most four sort columns and four filters. Sort text uses
+case-sensitive UTF-8 byte order. Integer sorts accept an optional single `+` or
+`-` followed by one or more ASCII decimal digits within signed int64 range;
+leading zeroes are allowed. Spaces, underscores, bases, exponents and empty
+strings are refused. Equal complete sort tuples retain original input order,
+including descending sorts. Filters use case-sensitive UTF-8 exact equality or
+substring matching; all filters must match. Empty queries retain input order.
+Column IDs and query text are checked and cloned. Column validity belongs to
+the source; Cell read failures propagate. There is no application comparator callback.
+
+Preparation checks every full-input row key and inverse, including filtered-out
+rows. Optional row metrics are likewise validated across the full input. Cached
+sort cells prevent repeated domain callbacks during comparisons. A stable merge
+sort checks cancellation during comparisons and copy passes. Cancellation is
+checked before allocation, at least every 256 rows/comparisons and after source
+callbacks, with a final cancellation/stamp check before publication. Source
+errors preserve their cause under `ErrGridSource`, malformed query/limits use
+`ErrGridInvalid`, admitted-budget refusals use `ErrGridCapacity`, and cancellation
+preserves the context cause.
+
+The result implements `GridSource` and constant-time `GridSelectionSource`.
+RowKey uses the projection's input ordinal array; IndexOf uses the input's indexed
+inverse plus a prepared inverse ordinal array. No owner lookup scans the input.
+Optional `GridRowMetrics` and `GridEditSource` are present only if the input has
+them. Variable-height results retain a projected prefix index with O(1) boundary
+and O(log N) pixel lookup. Sorting/filtering preserves stable row keys and cell
+versions. Indexed callbacks check input metadata drift before and after reads;
+this detects revision changes, but does not make an unrevisioned mutable source
+valid. Captured selection keeps its original immutable scope across later views.
+
+## Budgets and accounting
+
+Zero limits choose one million rows, 64 MiB retained index arrays, 256 MiB working
+arrays/payload, 64 KiB per cell read and 16 KiB total query payload. Hard maxima
+are 4,194,304 rows, 512 MiB index, 1 GiB working, 1 MiB cell and 64 KiB query.
+Before array allocation the builder admits worst-case full-input capacities,
+including retained order/inverse, merge scratch, cached sort-key headers and
+optional height/prefix arrays. Cloned strings are charged before retention.
+
+Filtering does not shrink retained order capacity. `GridProjectionStats` reports
+input/matching rows, capacity-based retained `IndexBytes`, peak logical
+`WorkingBytes`, CellReads and SortComparisons. A heavily filtered view may still
+retain full-input-capacity arrays. These are logical owned payload counts,
+excluding borrowed immutable domain data, allocator rounding, runtime/native/GPU
+memory and separate caller-held results. An application must account for all
+concurrently live snapshots/results; a per-build limit is not a process-memory
+limit. One million stored records with twenty int64 fields alone uses
+160,000,000 logical payload bytes, before indexes and all other storage.
+
+## Owner admission and revisions
+
+Domain revision and view revision are separate. `InputStamp` identifies the full
+immutable domain snapshot. The builder's positive explicit output revision
+identifies its derived view and need not equal the domain revision.
+
+`Grid.PrepareProjection()` returns a detached opaque request with accepted view
+`Stamp()`, full domain `InputStamp()` and `OutputRevision()` (accepted view + 1).
+When the accepted source is a builder result, InputStamp remains that result's
+full input stamp, so re-sorting a filtered view can restore excluded rows by
+building from the application's full snapshot. The request has no Grid/source/
+owner backpointer. Preparing supersedes the previous request without changing
+generation, viewport, cursor, selection, draft or references. Revision exhaustion
+refuses preparation before superseding it.
+
+`CompleteProjection(request, result)` accepts only exact private builder result
+types for the captured full input and exact next view revision. A public-interface
+embedding wrapper is refused before invoking any caller-overridden method.
+The final live-token/view check follows all prospective anchor, selection, edit
+and metric callbacks, immediately before one source publication. Success uses
+ordinary stable-key replacement semantics and retires the pending request and
+old cell references. Refusal preserves the accepted source, draft, generation,
+references and pending request. Viewport/cursor/selection/draft-text changes alone
+do not retire a request. Every accepted source installation, including a
+same-stamp ReplaceSource or CompleteEdit, retires pending queries. A healthy
+unchanged Refresh does not. `CancelProjection` retires exactly its pending token
+and works with an unacknowledged source revision; it does not stop the worker.
+
+The application also checks its current full-domain pointer/revision, query
+operation identity, session and window lifetime before owner admission. Grid
+cannot observe a domain change that the application has not installed. Worker
+cancellation and pending-result slots use the tasks/execution lifetime contract:
+canceling accepted work does not release its slot before both actual worker
+termination and owner completion. Initial loading or a new domain incarnation
+can use bounded ReplaceSource; it is not a query of the previously accepted
+empty domain. For async edits, prepare the edit on the owner, copy/build the
+candidate full snapshot on a worker at the next view revision, CompleteEdit,
+then publish the application's domain pointer only after success. An exact builder
+result requires its full domain revision to advance and proves the changed cell
+against its full input, allowing that edit to
+filter the row out of the new view while closing the draft atomically.
+
+## Independent Mac consumer and evidence boundary
+
+`examples/loadedgrid` exercises stored 10k/million-row ×20 numeric data, immutable
+worker generation, sorting/filtering, independent windows, versioned edits and
+external updates. It uses the managed DataGrid and native input settlement.
+Deterministic manual-worker tests cover reordered/canceled results and bounded
+owner delivery. Qualification records source hashes, commands, raw logs and
+actual exits; native smoke establishes only its enumerated Cocoa workflow.
+Sustained p95/p99 owner/frame latency, retained heap/RSS, long-string/cold-cache
+cases, 100k-node tree workloads and human IME/external assistive workflows remain
+separate acceptance gates.

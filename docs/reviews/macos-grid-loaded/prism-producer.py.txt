@@ -1,0 +1,30 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,time
+ROOT=Path('/private/tmp/vellum-grid-loaded')
+OUT=ROOT/'docs/reviews/macos-grid-loaded'
+sys.dont_write_bytecode=True
+sys.path.insert(0,str(ROOT))
+from scripts.child_process import run_child
+sha=lambda data: hashlib.sha256(data).hexdigest()
+def save(name,value):
+    with (OUT/name).open('x') as f:f.write(json.dumps(value,indent=2)+'\n')
+def git(*args):return subprocess.check_output(['git',*args],cwd=ROOT)
+paths=json.loads(Path('/private/tmp/vellum-grid-loaded-prism-paths.json').read_text())
+actual=git('diff','--cached','--name-only').decode().splitlines()
+if set(actual)!=set(paths):raise RuntimeError('stage exactly the selected review files first')
+sources={p:sha((ROOT/p).read_bytes()) for p in paths}
+for p in paths:
+    if sha(git('show',':'+p))!=sources[p]:raise RuntimeError('index differs: '+p)
+diff=git('diff','--cached','--binary')
+save('prism-inputs.json',{'scope':'Loaded-data grid builder/admission/edit integration, ordinary field settlement, independent consumer, tests, specs, selected guides and qualification wrappers. Historical proof payloads excluded. Selected staged bytes, not dependency closure.','provider':'anthropic','model':'claude-sonnet-5-5','base':git('rev-parse','HEAD').decode().strip(),'files':sources,'file_count':len(paths),'staged_diff_bytes':len(diff),'staged_diff_sha256':sha(diff)})
+argv=['/Users/dshills/Development/Go/bin/prism','review','staged','--provider','anthropic','--model','claude-sonnet-5-5','--format','json','--out',str(OUT/'prism.json'),'--min-severity','medium','--fail-on','medium','--baseline','none','--max-diff-bytes','1048576','--chunk-bytes','65536','--context-lines','3','--max-findings','12','--paths',','.join(paths)]
+started=time.monotonic();failure=None
+with (OUT/'prism-process.log').open('xb') as stream:
+    try:code=run_child(argv,cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT,timeout=600).returncode
+    except Exception as e:
+        code=124 if isinstance(e,subprocess.TimeoutExpired) else 125
+        failure={'type':type(e).__name__,'message':str(e)}
+unchanged=diff==git('diff','--cached','--binary') and sources=={p:sha((ROOT/p).read_bytes()) for p in paths}
+save('prism-process.json',{'argv':argv,'exit_code':code,'failure':failure,'elapsed_seconds':round(time.monotonic()-started,3),'selected_staged_and_working_bytes_unchanged':unchanged,'log_sha256':sha((OUT/'prism-process.log').read_bytes()),'runner_sha256':sha(Path(__file__).read_bytes())})
+print(json.dumps({'exit_code':code,'unchanged':unchanged,'report_exists':(OUT/'prism.json').is_file(),'process':str(OUT/'prism-process.json')}),flush=True)
+sys.exit(code if code else 0 if unchanged else 1)

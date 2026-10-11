@@ -1,0 +1,15 @@
+--- current-grid.go
++++ counterfactual-grid.go
+@@ -573,11 +573,7 @@
+ 		}
+ 		if projection, ok := source.(GridProjection); ok {
+ 			if prepared, exact := unwrapGridProjection(projection); exact {
+-				// Cached empty-view metadata cannot prove the full edited
+-				// input after live-source callbacks have run.
+-				if err := prepared.current(); err != nil {
+-					return err
+-				}
++				_ = prepared // Counterfactual: omit only final edited full-input health check.
+ 			}
+ 		}
+ 		edit = gridEditDraft{}

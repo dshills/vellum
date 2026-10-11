@@ -1,0 +1,324 @@
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"sync/atomic"
+	"testing"
+
+	"github.com/dshills/vellum/execution"
+	"github.com/dshills/vellum/tasks"
+	"github.com/dshills/vellum/virtual"
+)
+
+// These are controller/domain checks. The held callback is delivered explicitly
+// under owner control; it is not evidence of native field settlement or UI input.
+func prismSaveAdmission(t *testing.T, p *program, w *window) {
+	t.Helper()
+	var ack func(error)
+	owner(t, p, func() error {
+		w.settle = func(_ context.Context, cb func(error)) error { ack = cb; return nil }
+		return w.save()
+	})
+	if ack == nil || !w.settling {
+		t.Fatal("Save did not admit held settlement")
+	}
+	owner(t, p, func() error { ack(nil); return nil })
+	if w.settling || w.settleCancel != nil {
+		t.Fatal("settlement reservation did not retire")
+	}
+}
+func prismDraft(t *testing.T, p *program, w *window) virtual.GridEditState {
+	t.Helper()
+	var draft virtual.GridEditState
+	owner(t, p, func() error {
+		if err := w.grid.JumpToKey(key(0), column(1)); err != nil {
+			return err
+		}
+		if err := w.begin(); err != nil {
+			return err
+		}
+		if err := w.grid.SetEditText("42"); err != nil {
+			return err
+		}
+		var err error
+		draft, err = w.grid.Edit()
+		return err
+	})
+	return draft
+}
+func prismTaskTerminals(t *testing.T, task *tasks.Task, ownerDone bool) {
+	t.Helper()
+	select {
+	case <-task.Done():
+	default:
+		t.Fatal("worker not terminal")
+	}
+	select {
+	case <-task.OwnerDone():
+		if !ownerDone {
+			t.Fatal("owner terminal before explicit drain")
+		}
+	default:
+		if ownerDone {
+			t.Fatal("owner not terminal after explicit drain")
+		}
+	}
+}
+func prismRunEdit(t *testing.T, p *program, w *window, ex *execution.Manual, batch int) {
+	t.Helper()
+	task := w.editTask
+	if task == nil || w.manager.Pending().Active != 1 {
+		t.Fatal("edit worker not admitted")
+	}
+	ids := ex.PendingIDs()
+	if len(ids) != 1 {
+		t.Fatal(ids)
+	}
+	old := w.domain
+	if err := ex.Step(bg, ids[0]); err != nil {
+		t.Fatal(err)
+	}
+	prismTaskTerminals(t, task, false)
+	if w.domain != old || w.manager.Pending().Active != 1 {
+		t.Fatal("worker published domain or refunded owner credit early")
+	}
+	drain(t, p, batch)
+	prismTaskTerminals(t, task, true)
+	if !w.manager.Pending().Idle() || w.editTask != nil || len(w.jobs) != 0 {
+		t.Fatal("edit credit/task stranded")
+	}
+	var draft virtual.GridEditState
+	owner(t, p, func() error { var err error; draft, err = w.grid.Edit(); return err })
+	if draft.Active || w.domain == old {
+		t.Fatal("retry did not accept candidate and close draft")
+	}
+	value, version, err := w.domain.value(key(0), column(1))
+	if err != nil || value != 42 || version != 2 {
+		t.Fatal(value, version, err, w.message)
+	}
+}
+func TestPrismCanceledEditCanSaveAfterDualTerminalDrain(t *testing.T) {
+	for _, batch := range []int{1, 7, 64} {
+		t.Run(fmt.Sprintf("batch-%d", batch), func(t *testing.T) {
+			p, ex := portable(t, batch)
+			w := p.windows[1]
+			draft := prismDraft(t, p, w)
+			var before virtual.GridState
+			owner(t, p, func() error {
+				var err error
+				before, err = w.grid.State()
+				if err != nil {
+					return err
+				}
+				a, err := w.grid.PrepareEdit()
+				if err != nil {
+					return err
+				}
+				b, err := w.grid.PrepareEdit()
+				if err != nil {
+					return err
+				}
+				after, err := w.grid.State()
+				if err != nil {
+					return err
+				}
+				if a != b || a.State() != draft || before != after {
+					t.Fatal("PrepareEdit mutated live state or registered exclusive request")
+				}
+				return nil
+			})
+			prismSaveAdmission(t, p, w)
+			oldTask, oldDomain, oldView := w.editTask, w.domain, w.view
+			if oldTask == nil {
+				t.Fatal("first edit not admitted")
+			}
+			owner(t, p, w.cancelWork)
+			if w.manager.Pending().Active != 1 || w.editTask != nil {
+				t.Fatal("cancel hid accepted worker credit")
+			}
+			ids := ex.PendingIDs()
+			if len(ids) != 1 {
+				t.Fatal(ids)
+			}
+			if err := ex.Step(bg, ids[0]); err != nil {
+				t.Fatal(err)
+			}
+			prismTaskTerminals(t, oldTask, false)
+			if w.manager.Pending().Active != 1 {
+				t.Fatal("credit returned before owner terminal")
+			}
+			drain(t, p, batch)
+			prismTaskTerminals(t, oldTask, true)
+			if !w.manager.Pending().Idle() || len(w.jobs) != 0 || w.domain != oldDomain || w.view != oldView {
+				t.Fatal("canceled candidate published or credit stranded")
+			}
+			owner(t, p, func() error {
+				current, err := w.grid.State()
+				if err != nil {
+					return err
+				}
+				if current != before {
+					t.Fatal("canceled work changed draft/live grid")
+				}
+				req, err := w.grid.PrepareEdit()
+				if err != nil {
+					return err
+				}
+				if req.State() != draft {
+					t.Fatal("cancel abandoned or invalidated recoverable request")
+				}
+				return nil
+			})
+			prismSaveAdmission(t, p, w)
+			prismRunEdit(t, p, w, ex, batch)
+		})
+	}
+}
+
+var prismSubmitRefused = errors.New("adjudication: executor refused")
+
+type prismSubmitGate struct {
+	executor execution.Executor
+	reject   atomic.Bool
+	calls    atomic.Uint64
+}
+
+func (g *prismSubmitGate) Submit(fn func()) error {
+	g.calls.Add(1)
+	if g.reject.Load() {
+		return prismSubmitRefused
+	}
+	return g.executor.Submit(fn)
+}
+func TestPrismRefusedEditStartCanRetrySameDraft(t *testing.T) {
+	for _, batch := range []int{1, 7, 64} {
+		t.Run(fmt.Sprintf("batch-%d", batch), func(t *testing.T) {
+			p, ex := portable(t, batch)
+			w := p.windows[1]
+			gate := &prismSubmitGate{executor: ex}
+			gate.reject.Store(true)
+			manager, err := tasks.NewWithConfig(tasks.Config{Owner: p.owner, Window: w.id, Limit: 2, Executor: gate})
+			if err != nil {
+				t.Fatal(err)
+			}
+			owner(t, p, func() error { w.manager = manager; return nil })
+			draft := prismDraft(t, p, w)
+			oldDomain, oldView := w.domain, w.view
+			var before virtual.GridState
+			owner(t, p, func() error { var err error; before, err = w.grid.State(); return err })
+			prismSaveAdmission(t, p, w)
+			if gate.calls.Load() != 1 || w.editTask != nil || !w.manager.Pending().Idle() || len(ex.PendingIDs()) != 0 || len(w.jobs) != 0 {
+				t.Fatal("refused Submit retained request/task credit or accepted work")
+			}
+			if w.message != prismSubmitRefused.Error() || w.domain != oldDomain || w.view != oldView {
+				t.Fatal("refusal mutated domain/view or hid error", w.message)
+			}
+			owner(t, p, func() error {
+				after, err := w.grid.State()
+				if err != nil {
+					return err
+				}
+				if after != before {
+					t.Fatal("refused Start changed live draft/grid")
+				}
+				req, err := w.grid.PrepareEdit()
+				if err != nil {
+					return err
+				}
+				if req.State() != draft {
+					t.Fatal("refusal made same draft unpreparable")
+				}
+				return nil
+			})
+			gate.reject.Store(false)
+			prismSaveAdmission(t, p, w)
+			prismRunEdit(t, p, w, ex, batch)
+			if gate.calls.Load() != 2 {
+				t.Fatal("retry admission count", gate.calls.Load())
+			}
+		})
+	}
+}
+func TestPrismReadOnlyUserRefusalAndExternalImmutableUpdate(t *testing.T) {
+	p, ex := portable(t, 7)
+	w := p.windows[1]
+	owner(t, p, func() error { return w.grid.JumpToKey(key(0), column(0)) })
+	old, oldView := w.domain, w.view
+	oldValue, oldVersion, err := old.value(key(0), column(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var before virtual.GridState
+	owner(t, p, func() error {
+		var err error
+		before, err = w.grid.State()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	execBefore := ex.Snapshot()
+	owner(t, p, func() error {
+		if err := w.begin(); !errors.Is(err, virtual.ErrGridEditReadOnly) {
+			t.Fatal("user begin did not reject read-only cell", err)
+		}
+		if _, err := w.grid.PrepareEdit(); !errors.Is(err, virtual.ErrGridRange) {
+			t.Fatal("read-only begin created draft", err)
+		}
+		if err := w.save(); !errors.Is(err, virtual.ErrGridRange) {
+			t.Fatal("Save admitted read-only user copy", err)
+		}
+		after, err := w.grid.State()
+		if err != nil {
+			return err
+		}
+		if after != before {
+			t.Fatal("read-only user refusal changed live state")
+		}
+		return nil
+	})
+	if ex.Snapshot() != execBefore || !w.manager.Pending().Idle() || w.domain != old || w.view != oldView || len(w.jobs) != 0 {
+		t.Fatal("read-only user path submitted copy/work or changed domain")
+	}
+	owner(t, p, w.external)
+	if w.editTask == nil || w.domain != old || len(ex.PendingIDs()) != 1 {
+		t.Fatal("explicit external update not independently admitted")
+	}
+	task := w.editTask
+	if _, err := ex.StepNext(bg); err != nil {
+		t.Fatal(err)
+	}
+	prismTaskTerminals(t, task, false)
+	if w.domain != old || w.manager.Pending().Active != 1 {
+		t.Fatal("external worker mutated owner/source before delivery")
+	}
+	drain(t, p, 7)
+	prismTaskTerminals(t, task, true)
+	if !w.manager.Pending().Idle() || w.editTask != nil || w.domain == old || w.view == oldView {
+		t.Fatal("external candidate did not publish/retire")
+	}
+	current, currentVersion, err := w.domain.value(key(0), column(0))
+	if err != nil || current != oldValue+1 || currentVersion != oldVersion+1 || w.domain.Revision() != old.Revision()+1 {
+		t.Fatal("external immutable value/version incorrect", current, currentVersion, err)
+	}
+	kept, keptVersion, err := old.value(key(0), column(0))
+	if err != nil || kept != oldValue || keptVersion != oldVersion || &old.data.Records[0] == &w.domain.data.Records[0] {
+		t.Fatal("external revision mutated/shared writable old backing")
+	}
+	cell, err := w.domain.EditCell(key(0), column(0))
+	if err != nil || cell.Editable || cell.Text != fmt.Sprint(current) {
+		t.Fatal("external update changed user editability", cell, err)
+	}
+	acceptedExec := ex.Snapshot()
+	owner(t, p, func() error {
+		if err := w.begin(); !errors.Is(err, virtual.ErrGridEditReadOnly) {
+			t.Fatal("updated display column became user-editable", err)
+		}
+		return nil
+	})
+	if ex.Snapshot() != acceptedExec {
+		t.Fatal("read-only retry admitted user work")
+	}
+}

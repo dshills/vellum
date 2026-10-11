@@ -82,3 +82,12 @@ listeners still receive the event. The core regressions cover default, declined,
 deferred, refocused and read-only behavior. This seam preserves accepted native
 text through a focus handoff; it does not redefine all programmatic focus and
 legacy key routing as one FIFO. Input/output hashes make the change reproducible.
+
+Patch 0033 gives every main scene its own named text-cursor ownership map,
+protected by that stage's sprite lock. Desktop window closure can run
+concurrently; different stage locks cannot protect the old package-global cursor
+owner pointers. `TextCursor` retains its legacy pointer argument for source
+compatibility but ignores it. Independent cursor names and manual scene clocks
+retain their behavior. Pinned input/output hashes and concurrent-scene regression
+tests accompany the fix; the loaded-data Cocoa report records the triggering
+race and the subsequent acceptance scope.

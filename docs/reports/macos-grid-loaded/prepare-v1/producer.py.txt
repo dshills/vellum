@@ -1,0 +1,16 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,time
+R=Path('/private/tmp/vellum-grid-loaded');D=R/'drivers/cogent';O=R/'docs/reports/macos-grid-loaded/prepare-v1';O.mkdir(exist_ok=False)
+sys.dont_write_bytecode=True;sys.path.insert(0,str(R))
+from scripts.child_process import run_child
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def inputs():
+ paths=[D/'prepare.py',D/'prepare.sh',D/'env.sh',D/'native/dependencies.json']+sorted((D/'native/patches').rglob('*'))
+ return {str(p.relative_to(R)):sha(p) for p in paths if p.is_file()}
+b=inputs();argv=['/bin/zsh','-c','export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+str(D/'env.sh')+'\npython3 prepare.py'];start=time.monotonic();error=None
+with (O/'prepare.log').open('xb') as f:
+ try:c=run_child(argv,cwd=D,stdout=f,stderr=subprocess.STDOUT,timeout=600).returncode
+ except Exception as e:c=124 if isinstance(e,subprocess.TimeoutExpired) else 125;error={'type':type(e).__name__,'message':str(e)}
+a=inputs();expected=json.loads((D/'native/patches/textcursor/output-hashes.json').read_text());actual={p:sha(D/'build/upstream'/p) for p in expected};match=expected==actual
+v={'scope':'Fresh cached module copies; prepare.py validates pinned checksums and every ordered patch input/output, including cursor stage33. Selected owned preparation inputs before/after and final cursor-stage outputs; no full toolchain/dependency closure or GUI claim.','argv':argv,'cwd':str(D),'exit_code':c,'failure':error,'elapsed_seconds':round(time.monotonic()-start,3),'inputs_before':b,'inputs_after':a,'unchanged':b==a,'expected_cursor_outputs':expected,'actual_cursor_outputs':actual,'cursor_outputs_match':match,'log_sha256':sha(O/'prepare.log'),'producer_sha256':sha(Path(__file__))}
+v['result']='PASS' if c==0 and b==a and match else 'FAIL';(O/'qualification.json').write_text(json.dumps(v,indent=2)+'\n');(O/'producer.py.txt').write_bytes(Path(__file__).read_bytes());print(v['result'],sha(O/'qualification.json'),flush=True);sys.exit(0 if v['result']=='PASS' else 1)

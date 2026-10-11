@@ -1,0 +1,86 @@
+"""Bound actual Cocoa stored-million fixtures; owner commands are not OS input."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shlex
+import shutil
+import subprocess
+import sys
+import time
+
+parser = argparse.ArgumentParser()
+parser.add_argument('qualification', type=Path)
+args = parser.parse_args()
+proof_path = args.qualification.resolve()
+proof = json.loads(proof_path.read_bytes())
+assert proof['result'] == 'PASS' and proof['unchanged']
+root = Path(proof['source_root'])
+module = root / 'examples/loadedgrid'
+sys.path.insert(0, str(root / 'scripts'))
+from child_process import run_child
+binary = Path(proof['binary']['path'])
+out = proof_path.parent / 'cocoa-smokes'
+out.mkdir(exist_ok=False)
+shutil.copyfile(__file__, out / 'native_smoke.py.txt')
+
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def inputs():
+    values = {}
+    for section, originals in proof['after'].items():
+        base = root
+        if section == 'owned': base = module
+        if section == 'prepared': base = root / 'drivers/cogent/build'
+        values[section] = {}
+        for name in originals:
+            path = base / name
+            if section == 'qualification' and name == 'qualify.py': path = Path(proof['producer']['path'])
+            values[section][name] = sha(path)
+    return values
+
+before = inputs()
+assert before == proof['after'] and sha(binary) == proof['binary']['sha256']
+checks = []
+for name, flags in [('fixed', ['-smoke']), ('variable', ['-smoke', '-variable-rows'])]:
+    path = out / (name + '.log')
+    prefix = 'export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. ' + shlex.quote(str(root / 'drivers/cogent/env.sh')) + '\nexec '
+    argv = ['/bin/zsh', '-c', prefix + shlex.join([str(binary)] + flags)]
+    start, code, timeout, error = time.monotonic(), -1, False, None
+    print('START', name, flush=True)
+    with path.open('wb') as log:
+        log.write(('argv: ' + json.dumps(argv) + '\ncwd: ' + str(module) + '\n').encode()); log.flush()
+        try:
+            code = run_child(argv, cwd=module, stdout=log, stderr=subprocess.STDOUT, timeout=120).returncode
+        except subprocess.TimeoutExpired:
+            code, timeout = 124, True
+        except Exception as e:
+            error = repr(e)
+            log.write(('qualification-runner-error: ' + error + '\n').encode())
+    text = path.read_text(errors='replace')
+    stages = []
+    for line in text.splitlines():
+        if not line.startswith('{'): continue
+        try: item = json.loads(line)
+        except json.JSONDecodeError: continue
+        if 'stage' in item: stages.append(item['stage'])
+    required = ['empty-ready', 'stored-loaded', 'worker-projection', 'async-edit-conflict', 'pass']
+    qualified = code == 0 and not timeout and error is None and stages == required and 'WARNING: DATA RACE' not in text
+    item = {'name': name, 'argv': argv, 'cwd': str(module), 'exit_code': code, 'timed_out': timeout, 'runner_error': error, 'elapsed_seconds': round(time.monotonic()-start, 3), 'log': str(path), 'log_sha256': sha(path), 'stages': stages, 'qualified': qualified}
+    checks.append(item)
+    (out / 'checks.json').write_text(json.dumps(checks, indent=2) + '\n')
+    print('END', json.dumps(item), flush=True)
+    if not qualified: break
+
+after = inputs()
+result = {
+    'scope': 'Two actual Cocoa processes with stored million-row domain, immutable worker projections/edit candidates, originating native cell-editor settlement and completed current-stamp measured frames. Commands run on the application owner. No physical desktop input, human IME/VoiceOver, external AX, peak/RSS/performance or private cleanup/compositor teardown claim.',
+    'producer': {'path': str(Path(__file__).resolve()), 'sha256': sha(Path(__file__))},
+    'qualification': {'path': str(proof_path), 'sha256': sha(proof_path)},
+    'binary': {'path': str(binary), 'sha256': sha(binary)},
+    'before': before, 'after': after, 'unchanged': before == after and sha(binary) == proof['binary']['sha256'], 'checks': checks,
+}
+result['result'] = 'PASS' if result['unchanged'] and len(checks) == 2 and all(c['qualified'] for c in checks) else 'FAIL'
+path = out / 'qualification.json'
+path.write_text(json.dumps(result, indent=2) + '\n')
+print('PROOF', str(path), sha(path), result['result'], flush=True)
+sys.exit(0 if result['result'] == 'PASS' else 1)

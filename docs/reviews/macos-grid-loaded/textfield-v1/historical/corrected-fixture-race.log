@@ -1,0 +1,12 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestReviewFieldSettlementRetiredAndClosedBinding (0.00s)
+    --- FAIL: TestReviewFieldSettlementRetiredAndClosedBinding/window_close (0.00s)
+        textfield_settlement_review_test.go:149: retired barrier callback/credit/value incorrect 0 []
+--- FAIL: TestReviewFieldSettlementChangeCanCloseWindow (0.00s)
+    textfield_settlement_review_test.go:165: reentrant Change retirement left barrier
+--- FAIL: TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier (0.00s)
+    textfield_settlement_review_test.go:179: unchanged second barrier replayed Change 2 [stable stable]
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	0.602s
+FAIL

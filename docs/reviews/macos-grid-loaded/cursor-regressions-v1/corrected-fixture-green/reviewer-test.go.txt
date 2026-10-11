@@ -1,0 +1,198 @@
+package core
+
+import (
+	"image"
+	"image/color"
+	"sync"
+	"testing"
+	"time"
+
+	"cogentcore.org/core/math32"
+	"cogentcore.org/core/paint"
+	"cogentcore.org/core/tree"
+)
+
+// These synthetic fixtures use no native window, renderer, event loop, wall
+// timer, preferences, or initialized widget tree. Only production TextCursor,
+// named sprites, and the optional explicit Scene clock are exercised.
+func reviewCursorScene() (*Scene, *Stage) {
+	sc := &Scene{}
+	st := &Stage{Scene: sc}
+	st.Main = st
+	sc.Stage = st
+	return sc, st
+}
+
+func reviewCursorField(sc *Scene) *TextField {
+	f := &TextField{}
+	f.This = f
+	f.Scene = sc
+	f.Geom.TotalBBox = image.Rect(0, 0, 100, 100)
+	f.Geom.ContentBBox = image.Rect(0, 0, 100, 100)
+	return f
+}
+
+func reviewCursorOn(f *TextField, legacy *tree.Node, name string, p image.Point) {
+	TextCursor(true, &f.WidgetBase, legacy, name, 2, 10, image.NewUniform(color.White), func() image.Point { return p })
+}
+
+func reviewCursorSprite(t *testing.T, st *Stage, name string) *Sprite {
+	t.Helper()
+	sp, ok := st.Sprites.SpriteByName(name)
+	if !ok || sp == nil {
+		t.Fatalf("cursor %q missing", name)
+	}
+	return sp
+}
+
+func reviewCursorDraw(st *Stage, sp *Sprite) int {
+	st.Sprites.Lock()
+	defer st.Sprites.Unlock()
+	pc := paint.NewPainter(math32.Vec2(120, 120))
+	sp.Draw(pc)
+	return len(pc.Render)
+}
+
+func TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner(t *testing.T) {
+	first, fs := reviewCursorScene()
+	second, ss := reviewCursorScene()
+	one := reviewCursorField(first)
+	two := reviewCursorField(second)
+	sentinel := &TextField{}
+	var legacy tree.Node = sentinel
+	start := make(chan struct{})
+	var wg sync.WaitGroup
+	for _, f := range []*TextField{one, two} {
+		wg.Add(1)
+		go func(f *TextField) {
+			defer wg.Done()
+			<-start
+			for range 1000 {
+				reviewCursorOn(f, &legacy, "shared-field-cursor", image.Pt(9, 11))
+				TextCursor(false, &f.WidgetBase, &legacy, "shared-field-cursor", 2, 10, nil, func() image.Point { return image.Point{} })
+			}
+			reviewCursorOn(f, &legacy, "shared-field-cursor", image.Pt(9, 11))
+		}(f)
+	}
+	close(start)
+	wg.Wait()
+	if legacy != sentinel {
+		t.Fatal("TextCursor modified the shared legacy owner pointer")
+	}
+	for _, st := range []*Stage{fs, ss} {
+		sp := reviewCursorSprite(t, st, "shared-field-cursor")
+		if !sp.Active || sp.EventBBox.Min != image.Pt(9, 11) {
+			t.Fatalf("scene cursor lost its final activation/position: %+v", sp.EventBBox)
+		}
+	}
+}
+
+func TestVellumReviewTextCursorSceneOwnerAndPositionRetention(t *testing.T) {
+	first, fs := reviewCursorScene()
+	second, ss := reviewCursorScene()
+	one := reviewCursorField(first)
+	two := reviewCursorField(second)
+	var legacy tree.Node
+	reviewCursorOn(one, &legacy, "same-name", image.Pt(7, 8))
+	original := reviewCursorSprite(t, fs, "same-name")
+	reviewCursorOn(two, &legacy, "same-name", image.Pt(21, 22))
+	other := reviewCursorSprite(t, ss, "same-name")
+	if original == other {
+		t.Fatal("different main scenes share a cursor sprite")
+	}
+	reviewCursorOn(one, &legacy, "same-name", image.Pt(12, 13))
+	if reviewCursorSprite(t, fs, "same-name") != original {
+		t.Fatal("another scene changed the first scene's retained cursor owner")
+	}
+	if original.EventBBox.Min != image.Pt(12, 13) || other.EventBBox.Min != image.Pt(21, 22) {
+		t.Fatal("scene cursor positions crossed")
+	}
+	TextCursor(false, &two.WidgetBase, &legacy, "same-name", 2, 10, nil, nil)
+	if !original.Active || other.Active {
+		t.Fatal("deactivating one scene changed another scene cursor")
+	}
+	if reviewCursorDraw(fs, original) == 0 {
+		t.Fatal("visible originating widget did not produce a cursor draw")
+	}
+	one.Geom.TotalBBox = image.Rectangle{}
+	if reviewCursorDraw(fs, original) != 0 {
+		t.Fatal("retained sprite draw used the other scene's widget")
+	}
+}
+
+func TestVellumReviewTextCursorSingleSceneSwitchAndNames(t *testing.T) {
+	sc, st := reviewCursorScene()
+	one := reviewCursorField(sc)
+	two := reviewCursorField(sc)
+	var legacy tree.Node
+	reviewCursorOn(one, &legacy, "field", image.Pt(5, 6))
+	first := reviewCursorSprite(t, st, "field")
+	reviewCursorOn(one, &legacy, "field", image.Pt(8, 9))
+	if reviewCursorSprite(t, st, "field") != first {
+		t.Fatal("same widget activation replaced its retained cursor")
+	}
+	reviewCursorOn(two, &legacy, "field", image.Pt(16, 17))
+	second := reviewCursorSprite(t, st, "field")
+	if second == first {
+		t.Fatal("switching widgets retained the previous widget's draw closure")
+	}
+	one.Geom.TotalBBox = image.Rectangle{}
+	if reviewCursorDraw(st, second) == 0 {
+		t.Fatal("switched cursor still observes old widget visibility")
+	}
+	reviewCursorOn(one, &legacy, "editor", image.Pt(20, 21))
+	reviewCursorOn(two, &legacy, "field", image.Pt(18, 19))
+	if reviewCursorSprite(t, st, "field") != second {
+		t.Fatal("another cursor name changed this cursor owner")
+	}
+	TextCursor(false, &two.WidgetBase, &legacy, "field", 2, 10, nil, nil)
+	if second.Active {
+		t.Fatal("same-scene cursor did not deactivate")
+	}
+	reviewCursorOn(two, &legacy, "field", image.Pt(23, 24))
+	if reviewCursorSprite(t, st, "field") != second || !second.Active || second.EventBBox.Min != image.Pt(23, 24) {
+		t.Fatal("reactivation did not retain the switched widget cursor")
+	}
+	// Missing off and nil legacy arguments are safe: source compatibility does
+	// not authorize production to read/write the ignored pointer.
+	TextCursor(false, &two.WidgetBase, nil, "absent", 2, 10, nil, nil)
+	reviewCursorOn(two, nil, "nil-legacy", image.Pt(2, 3))
+}
+
+func TestVellumReviewTextCursorManualClockRetained(t *testing.T) {
+	// Synthetic scenes do not bootstrap preferences/default settings. Establish
+	// a bounded test-local blink interval and restore the package value.
+	oldInterval := TimingSettings.CursorBlinkTime
+	TimingSettings.CursorBlinkTime = 250 * time.Millisecond
+	t.Cleanup(func() { TimingSettings.CursorBlinkTime = oldInterval })
+	sc, st := reviewCursorScene()
+	now := time.Date(2031, 2, 3, 4, 5, 6, 0, time.UTC)
+	manual := &ManualWindow{config: ManualWindowConfig{Now: func() time.Time { return now }}}
+	st.Mains = &stages{renderContext: &renderContext{manual: manual}}
+	f := reviewCursorField(sc)
+	var legacy tree.Node
+	reviewCursorOn(f, &legacy, "manual", image.Pt(10, 11))
+	sp := reviewCursorSprite(t, st, "manual")
+	if got := sp.Properties["lastSwitch"].(time.Time); !got.Equal(now) {
+		t.Fatalf("manual activation ignored explicit scene clock: %v", got)
+	}
+	if reviewCursorDraw(st, sp) == 0 {
+		t.Fatal("initial manual cursor draw missing")
+	}
+	before := now
+	if reviewCursorDraw(st, sp) == 0 || !now.Equal(before) {
+		t.Fatal("manual cursor advanced time or blinked without explicit advancement")
+	}
+	interval := TimingSettings.CursorBlinkTime
+	now = now.Add(interval)
+	if reviewCursorDraw(st, sp) != 0 || sp.Properties["on"].(bool) {
+		t.Fatal("manual cursor did not turn off at explicit deadline")
+	}
+	now = now.Add(interval)
+	if reviewCursorDraw(st, sp) == 0 || !sp.Properties["on"].(bool) {
+		t.Fatal("manual cursor did not turn on at next explicit deadline")
+	}
+	if legacy != nil {
+		t.Fatal("manual cursor changed legacy owner pointer")
+	}
+}

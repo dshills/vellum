@@ -1,0 +1,58 @@
+{
+  "findings": [
+    {
+      "category": "bug",
+      "confidence": 0.35,
+      "evidence": "r := GridProjectionRequest{[REDACTED] stamp: stamp, input: input}",
+      "id": "2364d22065daef23",
+      "locations": [
+        {
+          "lines": {
+            "end": 52,
+            "start": 52
+          },
+          "path": "virtual/grid_projection_request.go"
+        }
+      ],
+      "message": "The composite literal contains a bare `[REDACTED]` token, which is not valid Go and would stop the package compiling. The token field is never set, and `OutputRevision`, `CancelProjection` and `CompleteProjection` all depend on it. This may only be redaction in the supplied diff, so confidence is low.",
+      "model": "claude-sonnet-5-5",
+      "provider": "anthropic",
+      "severity": "high",
+      "suggestion": "Initialise the token explicitly, for example `GridProjectionRequest{token: &gridRefToken{}, stamp: stamp, input: input}`. Use whatever constructor `gridRefToken` actually has.",
+      "tags": [
+        "compile-error",
+        "location-corrected",
+        "unverified"
+      ],
+      "title": "Invalid composite literal: token field is missing or corrupted"
+    },
+    {
+      "category": "testing",
+      "confidence": 0.5,
+      "evidence": "if !live.fired || proofs!=4 {t.Fatalf(\"did not reach final input boundary: fired=%v proofs=%d\",live.fired,proofs)}",
+      "id": "dfe84756757701b9",
+      "locations": [
+        {
+          "lines": {
+            "end": 87,
+            "start": 87
+          },
+          "path": "virtual/projection_edit_review_test.go"
+        }
+      ],
+      "message": "The test hard-codes the number of edit-proof calls (4) that CompleteEdit makes before the final input check. `RowCount` also fires the drift on `*s.proofs>=4`. Any harmless refactor that adds or removes a proof call makes the test fail, or makes it stop exercising the late-drift boundary. The `proofs!=4` check also fails if the drift fires and later proofs are made.",
+      "model": "claude-sonnet-5-5",
+      "provider": "anthropic",
+      "severity": "medium",
+      "suggestion": "Trigger the drift on a semantic boundary instead of a call count. For example, fire it from the last call to the hook, or have the fixture record the phase. Then assert only that the drift fired and the result was atomic, rather than checking an exact count.",
+      "tags": [
+        "brittle-test",
+        "call-count",
+        "location-corrected"
+      ],
+      "title": "Late-drift test depends on exact internal call counts"
+    }
+  ],
+  "raw_report_path": "/private/tmp/vellum-grid-loaded/docs/reviews/macos-grid-loaded/prism.json",
+  "raw_report_sha256": "ac83fca848898c57ef83ba3435f316ed8d73e8ccd159d067032a2442b3eceece"
+}

@@ -1,0 +1,179 @@
+{
+  "Cocoa": {
+    "binary_sha256": "9b4c4dcce17d1d3fed1c67b94aae1258f18cdc98dc4effca556df9ed7034bba9",
+    "fixed_exit": 0,
+    "historical_fixed_exit": 66,
+    "historical_races": 2,
+    "strict_stage_count_per_run": 5,
+    "variable_exit": 0
+  },
+  "Prism": {
+    "chunks": 5,
+    "excluded": [
+      {
+        "path": "examples/loadedgrid/go.sum",
+        "reason": "lockfile"
+      }
+    ],
+    "fixed_test_only": 1,
+    "raw_exit_code": 1,
+    "raw_findings": 4,
+    "refuted": 3,
+    "remaining": 0,
+    "reviewed": 44,
+    "selected": 45
+  },
+  "archive_files_verified": 326,
+  "archive_map_sha256": "682b1f3133ba0e274bebdafa4bc8aacb02b126db0fb174164370f279a4ec30a8",
+  "embedded_manifest_entry_checks": 459,
+  "embedded_manifest_records_verified": 17,
+  "embedded_raw_log_roundtrips_verified": 30,
+  "ledger_path": "/private/tmp/vellum-grid-loaded/docs/reports/macos-grid-loaded/qualification.json",
+  "ledger_sha256": "7a623b58007e837b3a372ead1c4bc47853c95e6af1ed2a8b29f05591398d8669",
+  "prepared_files_verified": 6121,
+  "prepared_trees": {
+    "typesetting": {
+      "files": 288,
+      "sha256": "6ba9b5825ef3d4214c7bb0c31455ce0c80bd6b5ac175f8adddd0c5d2deefce07"
+    },
+    "upstream": {
+      "files": 5833,
+      "sha256": "70193d3757c57f71aa429e70d1ea445ea955cc1a00594e8f80b9ba7a3a3b1f94"
+    }
+  },
+  "qualification_checks": [
+    {
+      "exit_code": 0,
+      "log_sha256": "7e33c7285125ca86907b9929a4f4d9478a45da54045d79dfdcdb9ab2a99e1b36",
+      "name": "portable-race3",
+      "proof": "core-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "caf89feb8795b922e6327cd6a3b31b2001cd5dc429b68e8cafff8bca845600ef",
+      "name": "core-race",
+      "proof": "core-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "core-vet",
+      "proof": "core-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "a2f57519f4f72409c2619dfc44fc440a877c7551da90722d6f2905dd70749eb4",
+      "name": "prepare-tests",
+      "proof": "native-v3"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "28e970141c93c6426c32a0c0c2f83726fbbc892c1c00746410e88571a00a0850",
+      "name": "upstream-cursor-race",
+      "proof": "native-v3"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "d8f39a1ec311949bb9f603eccdc543e5a4db00c625cf04127441ad7139c6bba6",
+      "name": "text-grid-race",
+      "proof": "native-v3"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "offscreen-vet",
+      "proof": "native-v3"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "desktop-vet",
+      "proof": "native-v3"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "da9ee53730c5c1b4178e414b7e04d872f5b6723eb5d3fc7f1f0490582a979f8a",
+      "name": "fresh-preparation",
+      "proof": "prepare-v1"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "fe8e852ac02e451d98b2db272c5869571499b447b31035b32e27f2aa66626c29",
+      "name": "portable-race20",
+      "proof": "consumer/consumer-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "9bf5717d82b86ef18d85564341e5915d96dbe5fa6ac0ed1a0ded7737e0e356a8",
+      "name": "offscreen-all-race1",
+      "proof": "consumer/consumer-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "8bb75e8be2bad0aeb3bb7d10ec8e8470a4de3056e92bd622a48eb3950699a824",
+      "name": "offscreen-vet",
+      "proof": "consumer/consumer-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "ce4cd5d8347995c580bf7c0e868823778aa1b83e2dc948bdc19a233062be57fc",
+      "name": "desktop-vet",
+      "proof": "consumer/consumer-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "4999cd088a378f5dead1696320e03bd6abef0f7026d32373dd58db1694eb41eb",
+      "name": "desktop-race-build",
+      "proof": "consumer/consumer-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "9ee2a308da5df5ea1656bd57759552d2bb88a831f092663899bb57fbe686b74f",
+      "name": "fixed",
+      "proof": "consumer/desktop-v2"
+    },
+    {
+      "exit_code": 0,
+      "log_sha256": "4454716dcde0770b527ba57635de43f0d88340a57c1d8d2988c4dfff109c96e9",
+      "name": "variable",
+      "proof": "consumer/desktop-v2"
+    }
+  ],
+  "result": "PASS",
+  "reviewer_verifier_sha256": "2afc833dfd86473e351457431aa3d1e003af8c0540de564015bc209087127978",
+  "schema": "vellum-loadedgrid-final-metadata-audit-proof-v1",
+  "scope": "Read-only current source/archive/hash/log/metadata verification. No tests, GUI, Git, Prism or shared mutation. Selected identities do not establish complete compiler/SDK/module-cache closure.",
+  "selected_source_map_sha256": "afe2946792e5c78d9d2c2d04c7e294db5111e60eceba743995dd6f56fe8ad5dc",
+  "selected_sources_verified": 360,
+  "source_generation_differences": [
+    {
+      "adjudication": "Test-only semantic fixture improvement; root core-v2 compiles/runs installed bytes. This dependency _test.go is not compiled into native/consumer packages or desktop binary.",
+      "current_sha256": "fea7d89b188f013aedc529d14a2ee67e1819fc463119ed0bb1bc4d74f403f284",
+      "path": "virtual/projection_edit_review_test.go",
+      "record": "native-v3",
+      "recorded_sha256": "8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d"
+    },
+    {
+      "adjudication": "Test-only semantic fixture improvement; root core-v2 compiles/runs installed bytes. This dependency _test.go is not compiled into native/consumer packages or desktop binary.",
+      "current_sha256": "fea7d89b188f013aedc529d14a2ee67e1819fc463119ed0bb1bc4d74f403f284",
+      "path": "virtual/projection_edit_review_test.go",
+      "record": "consumer-v2/root_packages",
+      "recorded_sha256": "8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d"
+    },
+    {
+      "adjudication": "Post-Prism evidence README adds resolved findings and test-generation scope; factual metadata only, independently audited.",
+      "current_sha256": "74faa76facad5fc13e04f75373e4bcfb9c70a5b22383d5abc2576b82d148b54c",
+      "path": "docs/reports/macos-grid-loaded/README.md",
+      "record": "prism",
+      "recorded_sha256": "29837c0719f1af7e2e829c41fa54797e1edcad181ffdf41418a13e1cc065c27e"
+    },
+    {
+      "adjudication": "Test-only semantic fixture improvement; root core-v2 compiles/runs installed bytes. This dependency _test.go is not compiled into native/consumer packages or desktop binary.",
+      "current_sha256": "fea7d89b188f013aedc529d14a2ee67e1819fc463119ed0bb1bc4d74f403f284",
+      "path": "virtual/projection_edit_review_test.go",
+      "record": "prism",
+      "recorded_sha256": "8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d"
+    }
+  ],
+  "utf8_archive_files": 326
+}

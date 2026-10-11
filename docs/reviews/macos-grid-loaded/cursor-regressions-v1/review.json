@@ -1,0 +1,71 @@
+{
+  "actual_red_proof": {
+    "failure": "Race detector identifies original TextCursor line104 shared owner write versus line54 read; deterministic second main-scene activation invalidates retained first-scene sprite ownership.",
+    "path": "original-red/qualification.json",
+    "sha256": "f5f8a4405afeda6953e43b9667a64328cc27b5bec0d11af0a83a489aad34f692",
+    "source_classification": "Actual captured original upstream bytes, not reconstructed",
+    "source_hashes": {
+      "core/scene.go": "c909640a9522459e0a2ca35013e769a0f27d0a9ebd3f65319ab4d454d62abe33",
+      "core/textcursor.go": "8503ef77855b6baea558e15ba249ef9e05165515f7496ec0f85c7897cda5ccf3"
+    },
+    "unchanged_red_and_final_regression_bodies": {
+      "TestVellumReviewTextCursorConcurrentScenesIgnoreLegacyOwner": "e68d95ee78de52f48e33aa3026676b57c0f929a455bff41d4dddd2016a178bf5",
+      "TestVellumReviewTextCursorSceneOwnerAndPositionRetention": "ac280964e8836f7afa515e7870076b1651e545bd1d9962c7d84341e86db3259c"
+    }
+  },
+  "coverage": [
+    "Concurrent independent main scenes share the exact legacy *lastW without reading/writing it; final cursor positions remain local.",
+    "Interleaved main scenes preserve sprite identity, distinct positions, own widget Draw visibility and independent deactivation.",
+    "Single main scene reuses same owner, changes Draw closure when switching owners, separates names, and supports absent off/nil legacy parameter.",
+    "Manual activation and blink use explicit Scene.Now without implicit advancement; test scopes/restores a positive blink interval without preference bootstrap.",
+    "Concurrent same-main normal and manual calls exercise cursor owner-map access under Sprites lock."
+  ],
+  "final_green_proof": {
+    "exit_code": 0,
+    "inputs_unchanged": true,
+    "log_sha256": "eb7f3b982a41bce05e6895826f5185107794e9ef2b137e29d68725767641f0cc",
+    "path": "final-green/qualification.json",
+    "race_repetitions": 20,
+    "sha256": "75b4452bd08f65a0c0efe1647b1ab3638c1ccfd728c8edb76df9486ae23514ca"
+  },
+  "final_test": {
+    "bytes": 8278,
+    "gofmt_clean": true,
+    "install_path": "/private/tmp/vellum-grid-loaded-review/textcursor/textcursor_review_test.go",
+    "sha256": "d746f948257db911dc9986dd6fe8f10e2a48f0df16fd98da263ffc49c7f5d978",
+    "snapshot": "final-test/textcursor_review_test.go.txt"
+  },
+  "historical_scope": "corrected-green is a failed reviewer fixture: synthetic scenes skip settings initialization, so initial blink interval is zero. Its FAIL remains immutable, not counted as source acceptance. Scoped explicit interval passes corrected-fixture-green; final-green adds the same-main map-lock stress.",
+  "limits": [
+    "Synthetic fixtures exercise actual production Scene/Stage/TextField/TextCursor/Sprite and Painter command recording, not GPU pixels/native Cocoa/event loops or physical IME.",
+    "Selected implementation/supporting/module provenance only, not complete build dependency/toolchain closure.",
+    "The original root Cocoa race log is separately owned by root; this archive independently reproduces the actual pointer race.",
+    "No performance, full P6, global focus FIFO, public release, or OS settings claim."
+  ],
+  "resolved_findings": [
+    {
+      "correction": "Legacy *tree.Node is intentionally ignored for source compatibility. All platforms and manual scenes resolve cursor-name owner in the main Scene.textCursors map only while that main Stage.Sprites lock is held. Sprite activation and map publication share the same lock.",
+      "id": "global-last-text-widget-shared-between-main-scenes",
+      "result": "FIXED",
+      "severity": "high",
+      "source_locations": [
+        "core/textcursor.go:26",
+        "core/textcursor.go:34",
+        "core/scene.go:111"
+      ]
+    }
+  ],
+  "result": "APPROVED",
+  "reviewed_sources": {
+    "core/scene.go": "6f5e2cebd0ca614c8f41ef5f6e6931ae11da827253fdefdbb835ea7d63e9a227",
+    "core/textcursor.go": "46102a9a5d4d7bb9c16877c678170d2b2d2c6dfc69d8ef706c51fc7b27457d25"
+  },
+  "schema": "vellum-scene-local-textcursor-independent-review-v1",
+  "source_review": [
+    "Main scene owns the map per cursor name; lock is acquired before map initialization/read/update, and deferred map publication runs before mutex release.",
+    "Sprite Draw already executes under the same main Sprites lock in SpritesSource, preserving map/sprite synchronization.",
+    "No callback, app owner, native-main marshalling or global lifecycle lock is introduced; manual versus ambient blink clock behavior is unchanged."
+  ],
+  "supporting_source_maps": "final-green/qualification.json inputs_before/after (selected provenance, not full closure)",
+  "unresolved_findings": []
+}

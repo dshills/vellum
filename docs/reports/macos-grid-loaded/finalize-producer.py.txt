@@ -1,0 +1,159 @@
+from pathlib import Path
+from datetime import datetime, timezone
+import hashlib, json, subprocess
+
+R = Path('/private/tmp/vellum-grid-loaded')
+P = R / 'docs/reports/macos-grid-loaded'
+V = R / 'docs/reviews/macos-grid-loaded'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+def write(p, value):
+    if p.exists():
+        assert read(p) == value, str(p)
+        return
+    with p.open('x') as f:
+        f.write(json.dumps(value, indent=2) + '\n')
+def rel(p): return p.relative_to(R).as_posix()
+def artifact(p): return {'path': rel(p), 'sha256': sha(p), 'bytes': p.stat().st_size}
+
+prism = read(V / 'prism.json')
+process = read(V / 'prism-process.json')
+prism_inputs = read(V / 'prism-inputs.json')
+portable = read(V / 'prism-portable-v1/review.json')
+consumer = read(V / 'prism-consumer-v1/adjudication.json')
+assert process['exit_code'] == 1 and process['selected_staged_and_working_bytes_unchanged']
+assert prism['coverage']['complete'] and prism['coverage']['files'] == 44
+assert prism_inputs['file_count'] == 45
+assert not portable['unresolved_findings'] and consumer['result'] == 'REFUTED_BOTH'
+entries = []
+for entry in portable['findings']:
+    entries.append({**entry, 'independent_review': artifact(V / 'prism-portable-v1/review.json')})
+for entry in consumer['findings']:
+    entries.append({**entry, 'disposition': entry['status'], 'independent_review': artifact(V / 'prism-consumer-v1/adjudication.json')})
+assert {e['id'] for e in entries} == {e['id'] for e in prism['findings']}
+assert sha(R / 'virtual/projection_edit_review_test.go') == portable['final_test']['sha256']
+write(V / 'findings.json', {
+    'schema': 'vellum-prism-adjudication-v1', 'result': 'RESOLVED',
+    'scope': 'Separate source-backed internal adjudication of one preserved Prism batch; raw Prism exit/findings are not rewritten.',
+    'raw_report': artifact(V / 'prism.json'), 'raw_process': artifact(V / 'prism-process.json'),
+    'input_record': artifact(V / 'prism-inputs.json'),
+    'provider': 'anthropic', 'model': 'claude-sonnet-5-5',
+    'raw_exit_code': 1, 'raw_counts': prism['summary']['counts'],
+    'dispositions': sorted(entries, key=lambda e: e['id']),
+    'production_changes_after_prism': [], 'test_changes_after_prism': [
+        {'path': 'virtual/projection_edit_review_test.go',
+         'before_sha256': portable['findings'][0]['historical_prior_test_sha256'],
+         'after_sha256': portable['final_test']['sha256'],
+         'reason': 'Semantic validation phases replace exact proof-call count; author test installed byte-identically and final core-v2 qualification passes.'}],
+    'remaining_findings': [],
+    'post_prism_metadata': ['docs/reports/macos-grid-loaded/README.md',
+                            'docs/reviews/macos-grid-loaded/README.md',
+                            'final archived review/proof/qualification records'],
+    'limits': ['Focused overlay regressions do not establish native performance, physical input or complete Mac acceptance.',
+               'No second Prism batch for unchanged production; final metadata and the test-only delta receive internal review.']})
+
+core = read(P / 'core-v2/qualification.json')
+native = read(P / 'native-v3/qualification.json')
+prepare = read(P / 'prepare-v1/qualification.json')
+cpu = read(P / 'consumer/consumer-v2/qualification.json')
+desktop = read(P / 'consumer/desktop-v2/qualification.json')
+proofs = {'core-v2': core, 'native-v3': native, 'prepare-v1': prepare,
+          'consumer/consumer-v2': cpu, 'consumer/desktop-v2': desktop}
+for name, proof in proofs.items():
+    assert proof['result'] == 'PASS' and proof['unchanged'], name
+    if 'checks' in proof:
+        assert proof['checks'] and all(c['exit_code'] == 0 for c in proof['checks']), name
+    else:
+        assert proof['exit_code'] == 0
+assert prepare['cursor_outputs_match']
+assert native['prepared_after'] == native['prepared_before']
+assert cpu['before'] == cpu['after'] == desktop['before'] == desktop['after']
+assert cpu['binary'] == desktop['binary'] and sha(Path(cpu['binary']['path'])) == cpu['binary']['sha256']
+
+test_path = 'virtual/projection_edit_review_test.go'
+old_test = portable['findings'][0]['historical_prior_test_sha256']
+new_test = portable['final_test']['sha256']
+source_maps = [('core-v2', core['source_inputs']), ('native-v3', native['inputs_after']),
+               ('prepare-v1', prepare['inputs_after'])]
+for group in ['owned', 'root_packages', 'native', 'unchanged_grid_example']:
+    prefix = 'examples/loadedgrid/' if group == 'owned' else ''
+    source_maps.append(('consumer-v2/' + group, {prefix + p: h for p, h in cpu['after'][group].items()}))
+source_maps.append(('prism', prism_inputs['files']))
+selected, differences = {}, []
+for origin, source_map in source_maps:
+    for path, expected in source_map.items():
+        actual = sha(R / path)
+        if actual != expected:
+            if path == test_path:
+                assert expected == old_test and actual == new_test, (origin, path)
+                reason = 'Test-only semantic fixture improvement; root core-v2 compiles/runs installed bytes. This dependency _test.go is not compiled into native/consumer packages or desktop binary.'
+            else:
+                assert origin == 'prism' and path == 'docs/reports/macos-grid-loaded/README.md', (origin, path)
+                reason = 'Post-Prism evidence README adds resolved findings and test-generation scope; factual metadata only, independently audited.'
+            differences.append({'record': origin, 'path': path, 'recorded_sha256': expected,
+                                'current_sha256': actual, 'adjudication': reason})
+        if path in selected: assert selected[path] == actual
+        selected[path] = actual
+
+raw = read(P / 'consumer/raw-evidence.json')
+for name, entry in raw.items():
+    data = entry['text_utf8'].encode('utf-8')
+    assert hashlib.sha256(data).hexdigest() == entry['sha256'] and len(data) == entry['bytes'], name
+checks = []
+for origin, proof in proofs.items():
+    group = proof.get('checks') or [{'name': 'fresh-preparation', 'exit_code': proof['exit_code'],
+                                  'log_sha256': proof['log_sha256'], 'log': str(P / 'prepare-v1/prepare.log')}]
+    for check in group:
+        path = Path(check['log'])
+        if path.exists():
+            assert sha(path) == check['log_sha256'], str(path)
+            log = artifact(path) if path.is_relative_to(R) else {'original_path': str(path), 'sha256': sha(path)}
+        else:
+            assert raw[str(path)]['sha256'] == check['log_sha256']
+            log = {'original_path': str(path), 'container': artifact(P / 'consumer/raw-evidence.json'), 'sha256': check['log_sha256']}
+        checks.append({'proof': origin, 'name': check['name'], 'exit_code': check['exit_code'],
+                       'elapsed_seconds': check.get('elapsed_seconds', proof.get('elapsed_seconds')),
+                       'log': log, 'coverage_qualified': check.get('coverage_qualified', check.get('qualified'))})
+
+prepared = cpu['after']['prepared']
+for path, expected in prepared.items(): assert sha(R / 'drivers/cogent/build' / path) == expected, path
+review_names = ['portable-v1/review.json', 'consumer-v1/frozen-v1/source-review.json',
+                'textfield-v1/review.json', 'contracts-v1/review-v3/review.json',
+                'cursor-source-v1/v1/review.json', 'cursor-regressions-v1/review.json',
+                'cursor-pinned-v1/review.json', 'prism-portable-v1/review.json',
+                'prism-consumer-v1/adjudication.json']
+reviews = {name: artifact(V / name) for name in review_names}
+all_artifacts = {rel(p): {'sha256': sha(p), 'bytes': p.stat().st_size}
+                 for directory in [P, V] for p in sorted(directory.rglob('*')) if p.is_file()}
+assert not any(p.endswith('.go') for p in all_artifacts)
+write(P / 'qualification.json', {
+    'schema': 'vellum-stored-grid-checkpoint-v1', 'result': 'PASS_WITH_ADJUDICATED_REVIEW',
+    'base': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=R, text=True).strip(),
+    'source_root': str(R), 'canonical': '/Users/dshills/Development/projects/Vellum',
+    'scope': 'Local Mac worker-built stored-data grid, immutable projected edits, ordinary-field settlement and pinned scene cursor correction. Selected source provenance and bounded checks; not complete compiler/SDK/dependency source closure or full Mac acceptance.',
+    'namespace': 'github.com/dshills/vellum', 'license': 'MIT', 'settings_changed': False,
+    'final_selected_sources': dict(sorted(selected.items())), 'selected_source_count': len(selected),
+    'source_generation_differences': differences,
+    'qualification_records': {name: artifact(P / name / 'qualification.json') for name in proofs},
+    'checks': checks, 'prepared_trees': native['prepared_after'],
+    'prepared_file_count': len(prepared), 'prepared_files_record': artifact(P / 'consumer/consumer-v2/qualification.json'),
+    'cursor_outputs': prepare['actual_cursor_outputs'],
+    'retained_desktop_binary': {**cpu['binary'], 'committed': False},
+    'independent_reviews': reviews,
+    'prism': {'raw_report': artifact(V / 'prism.json'), 'process': artifact(V / 'prism-process.json'),
+              'adjudication': artifact(V / 'findings.json'), 'selected_files': 45, 'reviewed_files': 44,
+              'excluded': prism['coverage']['excluded'], 'chunks': 5, 'complete': True,
+              'raw_exit_code': 1, 'resolved': True, 'production_delta_after_review': []},
+    'archive_files': all_artifacts,
+    'archive_map_excludes': ['This ledger (self hash)', 'later final metadata audit certificate and promotion/precommit records'],
+    'historical_records': ['core-v1 has prior exact-count fixture; core-v2 qualifies final installed fixture.',
+                           'native-v1/v2 predate final ordinary-field/cursor source generation.',
+                           'consumer/history/desktop-v1 is FAIL: actual exit66 cursor race despite workflow pass marker; variable run withheld.',
+                           'builder-v1 predates portable reviewer files; earlier internal reviews qualify only recorded generations.',
+                           'Counterfactual missing-guard red cases are labelled reconstructed; actual ordering/cursor regressions are preserved separately.'],
+    'open_acceptance': ['Sustained table owner/frame p95/p99, retained process/native/GPU memory and soak workloads.',
+                        'Large-tree workload and broader professional replay/external automation.',
+                        'Physical input, human IME/VoiceOver, external AX and remaining broader Mac/device acceptance.',
+                        'Public distribution, signing/notarization; Windows/Linux qualification later.'],
+    'recorded_at_utc': datetime.now(timezone.utc).isoformat()})
+print('Ledger', len(selected), len(all_artifacts), sha(P / 'qualification.json'))

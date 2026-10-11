@@ -1,0 +1,47 @@
+{
+  "author_test_path": "/private/tmp/vellum-grid-loaded-review/textcursor/textcursor_review_test.go",
+  "author_test_sha256": "d746f948257db911dc9986dd6fe8f10e2a48f0df16fd98da263ffc49c7f5d978",
+  "findings": [],
+  "fresh_prepare_record": {
+    "before_after_equal": true,
+    "exit_code": 0,
+    "log_path": "/private/tmp/vellum-grid-loaded/docs/reports/macos-grid-loaded/prepare-v1/prepare.log",
+    "log_sha256": "da9ee53730c5c1b4178e414b7e04d872f5b6723eb5d3fc7f1f0490582a979f8a",
+    "outputs_match": true,
+    "path": "/private/tmp/vellum-grid-loaded/docs/reports/macos-grid-loaded/prepare-v1/qualification.json",
+    "producer_path": "/private/tmp/vellum-grid-loaded/docs/reports/macos-grid-loaded/prepare-v1/producer.py.txt",
+    "producer_sha256": "2986858cde712e9354b82f8ecc7df9e548ce9f71eff88a164e395bfea47ae353",
+    "result": "PASS",
+    "sha256": "7d2122ff2ec0aa3f08f4b429cbd7db16a12027e40793a3b72b560dd2adf619cc",
+    "verified_input_hashes": 82
+  },
+  "inputs": "inputs.json",
+  "inputs_sha256": "36b3e25a04a100b387d3c585a71187f365bbecd8e9668aaeb9a1a492c6d218c5",
+  "limits": [
+    "No independent preparation, patch application or test command was executed during this audit; preparation PASS is the exact producer record whose hashes/log were verified.",
+    "The selected input map is not complete dependency/toolchain closure. Qualification wrappers and source checks do not establish final race-clean Cocoa acceptance.",
+    "The triggering Cocoa exit66 remains a failed historical record even though its functional workflow emitted a pass stage. Fresh race-clean native acceptance is required.",
+    "The fix retains existing Scene/Stage/widget originating render ownership requirements and introduces no guarantee for arbitrary unsynchronized native destruction."
+  ],
+  "patch_sha256": "727d379112f0a835727daf4e4024ead3ce853c7a6d7a0385e4b5081d92d0bd70",
+  "prepared_outputs": "prepared-outputs.json",
+  "prepared_outputs_sha256": "7033c1decfe11cde38c37b36b2679fcdc2253a2529ef8060e698638e903a4a25",
+  "prior_source_review": {
+    "path": "/private/tmp/vellum-loadedgrid-cursor-source-review/v1/review.json",
+    "sha256": "50eb20106bc8b182738a48b2d44ae7a92522f3b60eb26512a1b7838c037173d4"
+  },
+  "result": "APPROVED",
+  "root": "/private/tmp/vellum-grid-loaded",
+  "schema": "vellum-loadedgrid-cursor-pinned-review-v1",
+  "scope": "Pinned stage33 metadata, selected preparation/qualification/gate scripts and cursor contract documentation. Read-only source and recorded evidence audit; no tests, GUI, Git, Prism or shared edits.",
+  "selected_inputs": 14,
+  "stage_numbers_verified": "1 through 33, in order",
+  "verified": [
+    "The stage33 patch headers cover exactly the three declared output paths. Original existing-file hashes match the latest preceding ordered-stage outputs; the new test input is explicitly absent.",
+    "All three prepared outputs match their expected hashes. The production two-file bytes match the approved source review; the independently authored five-test fixture is copied byte-for-byte.",
+    "prepare_test.py expects patch numbers 1..33 and verifies patch checksums. scripts/check.sh includes the cursor selector in default and offscreen replacement-backend gates.",
+    "qualify-native.py includes actual native/patches and preparation inputs, records absent/nonregular tracked path markers, hashes selected inputs and complete prepared-tree fingerprints before/after, and requires all command exits plus unchanged identities.",
+    "The qualifier requires exact top-level execution counts for five cursor tests at count20 and two ordinary-field settlement tests at count3. Current required test bodies have no skip/parallel escape.",
+    "Controls/native README describe per-main-scene ownership protected by that stage Sprites lock and the ignored legacy pointer argument, with no global teardown ordering or broader framework acceptance claim."
+  ]
+}

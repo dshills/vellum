@@ -1,0 +1,36 @@
+{
+  "qualification": false,
+  "results": {
+    "router-1.log": {
+      "exit_code": 1,
+      "scope": "Initial example compilation refusal; test import name collision, wrong Position type and unsupported fixture declarations. No routed execution or frozen source map.",
+      "sha256": "01be1dd7fa2e9e542c7a4fb16d6ef83f886a65414182003ba4ec819fe56cbee8"
+    },
+    "router-2.log": {
+      "exit_code": 1,
+      "scope": "Actual routed queued field input followed by Apply. Expected nonempty filter failed at all three batches; async edit/conflict test passed. Mutable exploratory inputs, no complete source binding.",
+      "sha256": "1a73adf2ee3e59121262e391fd87a46bb8107ed491f0d5fd6a7a5ca8832f0915"
+    },
+    "router-3-filter-diagnostic.log": {
+      "exit_code": 1,
+      "scope": "Same event ordering; failure read records accepted empty filter while owner controlled field was 7. Demonstrates stale query capture before native settlement.",
+      "sha256": "90d3585d42912e3a6ae826bc0e377a392cee379e909b27d226d501bb9c02117b"
+    },
+    "router-4-filter-edit.log": {
+      "exit_code": 0,
+      "scope": "Wrong root working directory, no matching tests. Explicitly excluded from example qualification.",
+      "sha256": "91d7c4edc46083779b6c2dadf9b526c20565c16d24a8797ecff75562454a2871"
+    },
+    "router-5-filter-edit.log": {
+      "exit_code": 0,
+      "scope": "Actual inline Return/async filtered-row removal route plus held-settlement external refusal tests passed. Exploratory, no full frozen before/after source binding.",
+      "sha256": "15dbcad64e486cc2af1a9d07d88b49547b11e05b04a780a88684c820442e87e5"
+    },
+    "router-6-filter-barrier.log": {
+      "exit_code": 0,
+      "scope": "Unchanged actual queued-key/Apply oracle passes with ordinary native field settlement at batches1/7/64. Exploratory, dependent native source final freeze pending at execution.",
+      "sha256": "d34cbcf9499917d67276d8439968bb5b248f924b74d7be93160e614dca15b383"
+    }
+  },
+  "source_limit": "Original exploratory commands did not capture all before/after input maps; their logs remain historical observations, not final source-bound proof."
+}

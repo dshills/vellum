@@ -1,0 +1,8 @@
+{
+ "result":"UNQUALIFIED_EXPLORATORY_FAILURE",
+ "exit_code":1,
+ "log_origin":"Console output copied faithfully from tool-returned command output; raw file capture/source maps were not established for this first exploratory command.",
+ "reason":"Test changed full-domain pointer without accepting it into Grid to prove callback CAS, then incorrectly expected a subsequent projection request to accept that unadmitted full input. Grid.InputStamp correctly still described accepted old input.",
+ "fixture_correction":"After verifying late result rejection, independently prepare and bounded-owner ReplaceSource a projection of the new full input before testing filter-membership edit. No model/core oracle weakened.",
+ "claim":"Not final source-bound qualification. Formal checks will use captured before/after maps and owned-child timeout cleanup."
+}

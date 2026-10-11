@@ -1,0 +1,67 @@
+{
+  "final_test": {
+    "bytes": 7171,
+    "gofmt_clean": true,
+    "install_path": "/private/tmp/vellum-grid-loaded-review/projection-prism-delta/projection_edit_review_test.go",
+    "sha256": "fea7d89b188f013aedc529d14a2ee67e1819fc463119ed0bb1bc4d74f403f284",
+    "snapshot": "final-test/projection_edit_review_test.go.txt"
+  },
+  "findings": [
+    {
+      "counterfactual_proof": "counterfactual-red/qualification.json",
+      "disposition": "FIXED_TEST_ONLY",
+      "final_proof": "final-green/qualification.json",
+      "historical_prior_proof": "historical-prior-test/qualification.json",
+      "historical_prior_test_sha256": "8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d",
+      "id": "dfe84756757701b9",
+      "rationale": "The previous >=4/exact4 edit callback count was a maintainability defect. The fixture now records candidate proof, subsequent live edit-request proof, then candidate revalidation. Only subsequent live RowCount drifts candidate full input; no exact count is assumed. Atomic source/draft/generation/pending-request assertions and ErrGridSource remain unchanged."
+    },
+    {
+      "actual_line": "r := GridProjectionRequest{token: &gridRefToken{}, stamp: stamp, input: input}",
+      "compile_and_runtime_proof": "final-green/qualification.json",
+      "disposition": "REFUTED",
+      "id": "2364d22065daef23",
+      "rationale": "Actual Go source line52 contains a valid token field initialization. [REDACTED] appears in Prism presentation evidence, not the source. Current source hash matches previously independently qualified implementation and compiles in final race20. No production edit is warranted.",
+      "source": "virtual/grid_projection_request.go:52",
+      "source_sha256": "c9a08279f5d46d3febce6bf8418bd38f2cf9506a795ef57e698ac355bd6f3390"
+    }
+  ],
+  "limits": [
+    "Test-only semantic phase/gofmt change; no production/native/consumer bytes changed by reviewer.",
+    "Actual portable CompleteEdit and worker-built empty projection exercised with adversarial stamp drift; no GUI/native/performance/public-release claim.",
+    "Selected current virtual package/module provenance verified; not complete copied build closure.",
+    "Root final installed-byte qualification remains separate if broader integration is required."
+  ],
+  "production_unchanged_reviewed_sources": {
+    "virtual/grid.go": "09fe176512bc4d181b13eb20177b8957ff49473d55821a9381b6fbcb5d7fd9b8",
+    "virtual/grid_edit.go": "a5e15e1d672c92e2b7bc55cfbc1f9a783009d209111235a493486f5717f59a8c",
+    "virtual/grid_projection.go": "d1a44db19dbd02a90025700196e945132173a77ab280288f9b9686a88401eedf",
+    "virtual/grid_projection_request.go": "c9a08279f5d46d3febce6bf8418bd38f2cf9506a795ef57e698ac355bd6f3390",
+    "virtual/grid_projection_types.go": "314a7dad9451a79979091e66defa33df6e39ddbc4e2c33175ed3e8c1598bc5cb"
+  },
+  "regressions": {
+    "counterfactual_red": {
+      "classification": "Reconstructed by omitting ONLY trailing prepared.current in completing-edit branch; no original-source claim.",
+      "exit_code": 1,
+      "path": "counterfactual-red/qualification.json",
+      "result": "Late full-input drift returns nil and publishes without the final health guard.",
+      "same_final_test_sha256": "fea7d89b188f013aedc529d14a2ee67e1819fc463119ed0bb1bc4d74f403f284",
+      "sha256": "69eb4f7bfed04a87e6bfeea2dd60e0813ae60b298ef3106827a519ea62c14bf2"
+    },
+    "final_green": {
+      "exit_code": 0,
+      "path": "final-green/qualification.json",
+      "race_repetitions": 20,
+      "selected_inputs_unchanged": true,
+      "sha256": "0d1cb751e5ba334cfe71495e8f32b83a7b6cd596be0e39104126678ff64cd73e"
+    },
+    "prior_pass": {
+      "classification": "Historical passed original exact-count test/body, preserved immutable; not final-test qualification.",
+      "proof_sha256": "3ad49ef05aefcc3bb58217a5c63a6d3e08fad311cb2ecb6b01b66d3d1e0f5083"
+    }
+  },
+  "result": "APPROVED",
+  "schema": "vellum-projection-prism-independent-delta-review-v1",
+  "source_root": "/private/tmp/vellum-grid-loaded",
+  "unresolved_findings": []
+}

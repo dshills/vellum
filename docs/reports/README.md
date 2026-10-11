@@ -3,6 +3,7 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Stored-data worker grid](macos-grid-loaded/README.md)
 - [Managed native grid adapter](macos-grid-native/README.md)
 - [Independent managed grid example](macos-grid-example/README.md)
 - [Indexed portable grid foundation](macos-grid-model/README.md)

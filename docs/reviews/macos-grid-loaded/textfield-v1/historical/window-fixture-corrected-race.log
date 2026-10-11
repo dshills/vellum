@@ -1,0 +1,7 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier (0.00s)
+    textfield_settlement_review_test.go:180: unchanged second barrier replayed Change 2 [stable stable]
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	0.666s
+FAIL

@@ -1,0 +1,100 @@
+"""Create inert archival copies; raw UTF-8 evidence is round-trip preserved."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import tarfile
+
+HERE = Path(__file__).resolve().parent
+parser = argparse.ArgumentParser()
+parser.add_argument('--final-version', type=int, required=True)
+parser.add_argument('--out', type=Path, required=True)
+args = parser.parse_args()
+FINAL = HERE / f'qualified-v{args.final_version}'
+proof = json.loads((FINAL / 'qualification.json').read_bytes())
+native = json.loads((FINAL / 'cocoa-smokes/qualification.json').read_bytes())
+assert proof['result'] == 'PASS' and proof['unchanged']
+assert native['result'] == 'PASS' and native['unchanged']
+OUT = args.out.resolve()
+OUT.mkdir(exist_ok=False)
+entries = []
+evidence = {}
+
+def sha(data): return hashlib.sha256(data).hexdigest()
+def copy(source, relative, role):
+    source = Path(source)
+    raw = source.read_bytes()
+    raw.decode('utf-8')  # No binary/invalid-text artifact enters this handoff.
+    target = OUT / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(raw)
+    entries.append({'path': relative, 'role': role, 'original_path': str(source), 'sha256': sha(raw), 'bytes': len(raw)})
+
+def retain_log(source, role):
+    source = Path(source)
+    raw = source.read_bytes()
+    text = raw.decode('utf-8')
+    assert text.encode('utf-8') == raw
+    evidence[str(source)] = {'role': role, 'sha256': sha(raw), 'bytes': len(raw), 'text_utf8': text}
+
+for name, expected in proof['after']['owned'].items():
+    source = FINAL / 'owned-source' / name
+    assert sha(source.read_bytes()) == expected
+    copy(source, 'sources/' + name + '.txt', 'final-consumer-owned')
+copy(HERE / 'consumer-freeze-v1.json', 'consumer-freeze-v1.json', 'initial-owned-freeze-still-final')
+review = Path('/private/tmp/vellum-loadedgrid-consumer-review/frozen-v1/source-review.json')
+copy(review, 'independent-consumer-source-review.json', 'source-review')
+for version in range(1, args.final_version + 1):
+    folder = HERE / f'qualified-v{version}'
+    if not folder.exists(): continue
+    history = '' if version == args.final_version else 'history/'
+    prefix = history + f'consumer-v{version}/'
+    for name in ['qualification.json', 'inputs-before.json', 'checks.json', 'qualify.py.txt']:
+        if (folder / name).exists(): copy(folder / name, prefix + name, 'final-cpu-proof' if not history else 'historical-cpu-proof')
+    value = json.loads((folder / 'qualification.json').read_bytes())
+    for check in value['checks']:
+        path = Path(check['log'])
+        assert sha(path.read_bytes()) == check['log_sha256']
+        retain_log(path, 'final-cpu-check' if not history else 'historical-cpu-check')
+    if value.get('compiler'):
+        path = Path(value['compiler']['path'])
+        assert sha(path.read_bytes()) == value['compiler']['sha256']
+        retain_log(path, 'final-compiler' if not history else 'historical-compiler')
+    if (HERE / f'qualifier-v{version}-console.log').exists(): retain_log(HERE / f'qualifier-v{version}-console.log', 'qualification-console')
+    cocoa = folder / 'cocoa-smokes'
+    if cocoa.exists():
+        for name in ['qualification.json', 'checks.json', 'adjudication.json', 'native_smoke.py.txt']:
+            if (cocoa / name).exists(): copy(cocoa / name, history + f'desktop-v{version}/' + name, 'final-desktop-proof' if not history else 'historical-native-failure')
+        value = json.loads((cocoa / 'qualification.json').read_bytes())
+        for check in value['checks']:
+            path = Path(check['log'])
+            assert sha(path.read_bytes()) == check['log_sha256']
+            retain_log(path, 'final-desktop-check' if not history else 'historical-native-failure')
+        if (HERE / f'native-v{version}-console.log').exists(): retain_log(HERE / f'native-v{version}-console.log', 'native-qualification-console')
+for path in sorted((HERE / 'exploratory-history').iterdir()):
+    if not path.is_file(): continue
+    if path.suffix == '.log': retain_log(path, 'explicitly-unqualified-exploratory-history')
+    elif path.suffix == '.json': copy(path, 'history/exploratory/' + path.name, 'exploratory-adjudication')
+copy(__file__, 'producers/archive_handoff.py.txt', 'archive-producer')
+(OUT / 'raw-evidence.json').write_text(json.dumps(evidence, indent=2, ensure_ascii=True) + '\n')
+raw = (OUT / 'raw-evidence.json').read_bytes()
+entries.append({'path': 'raw-evidence.json', 'role': 'exact-UTF8-encoded-raw-log-bytes', 'sha256': sha(raw), 'bytes': len(raw)})
+text = '''# Loaded-grid consumer handoff
+
+The final consumer CPU and Cocoa qualification records bind the eleven frozen example files, selected root/native sources and enumerated prepared fingerprints. The binary itself is excluded; its original path and SHA256 remain in the proof. Module-cache/compiler/system SDK source closure, human input/IME/VoiceOver, broad AX, performance, peak/RSS memory and private teardown completeness are not claimed.
+
+`raw-evidence.json` preserves original logs through strict UTF-8 decode/encode round trips, including CRLF and trailing compiler tabs. Each entry carries the original SHA256/path/byte count. It is the exact raw evidence represented inside JSON, without whitespace-normalizing a log. Source snapshots and wrapper bodies are inert `.txt` files.
+
+The initial source-bound CPU gate passed, but its first fixed-million Cocoa process exited66 with two upstream shared TextCursor races during simultaneous native closure; its functional pass stage is explicitly overridden by that failure. The variable attempt was withheld. This history is retained separately from final qualification after the backend correction. Earlier compilation/ordering failures and the wrong-cwd no-tests command remain explicitly unqualified exploratory history.
+
+One million records store twenty int64 values each (160,000,000 logical value bytes). The measured Go HeapAlloc delta and projection index/working budgets in the full test log are scoped observations, not RSS/peak or native/GPU-memory estimates. Offscreen primitive routing and Cocoa owner-command/native-settlement workflows are separate evidence categories.
+'''
+(OUT / 'README.md').write_text(text)
+raw = (OUT / 'README.md').read_bytes()
+entries.append({'path': 'README.md', 'role': 'scope', 'sha256': sha(raw), 'bytes': len(raw)})
+manifest = {'scope': 'Inert source/proof/UTF8-raw-log handoff; no executable Go/Python source or binary included.', 'final_version': args.final_version, 'final_cpu_proof_sha256': sha((FINAL / 'qualification.json').read_bytes()), 'final_native_proof_sha256': sha((FINAL / 'cocoa-smokes/qualification.json').read_bytes()), 'entries': entries, 'manifest_self_excluded': True}
+(OUT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+archive = OUT.with_suffix('.tar.gz')
+with tarfile.open(archive, 'w:gz') as tar: tar.add(OUT, arcname=OUT.name)
+print(json.dumps({'root': str(OUT), 'manifest_sha256': sha((OUT / 'manifest.json').read_bytes()), 'files': len(entries)+1, 'archive': str(archive), 'archive_sha256': sha(archive.read_bytes()), 'archive_bytes': archive.stat().st_size}))

@@ -1,0 +1,107 @@
+package virtual
+
+import (
+	"math"
+	"strings"
+)
+
+// GridProjectionRequest is a detached, copyable owner-issued worker admission.
+// It carries no Grid, application or source pointer. Preparing another request,
+// cancellation, or any accepted source installation retires it. Viewport,
+// selection and draft changes alone do not retire it.
+type GridProjectionRequest struct {
+	token *gridRefToken
+	stamp GridStamp
+	input GridStamp
+}
+
+func (r GridProjectionRequest) Stamp() GridStamp      { return r.stamp }
+func (r GridProjectionRequest) InputStamp() GridStamp { return r.input }
+func (r GridProjectionRequest) OutputRevision() uint64 {
+	if r.token == nil {
+		return 0
+	}
+	return r.stamp.Revision + 1
+}
+
+// PrepareProjection supersedes the previous request without changing the view
+// or retiring cell references. Build from the application's full immutable
+// snapshot matching InputStamp, using OutputRevision as the view revision.
+// The caller separately guards its domain pointer and worker operation identity.
+func (g *Grid) PrepareProjection() (GridProjectionRequest, error) {
+	if err := g.current(); err != nil {
+		return GridProjectionRequest{}, err
+	}
+	if g.stamp.Revision == math.MaxUint64 {
+		return GridProjectionRequest{}, ErrGridExhausted
+	}
+	input := g.stamp
+	if p, ok := g.source.(GridProjection); ok {
+		if prepared, exact := unwrapGridProjection(p); exact {
+			if err := prepared.current(); err != nil {
+				return GridProjectionRequest{}, err
+			}
+			input = prepared.input
+		}
+	}
+	if err := g.current(); err != nil {
+		return GridProjectionRequest{}, err
+	}
+	stamp := g.stamp
+	stamp.Identity, input.Identity = strings.Clone(stamp.Identity), strings.Clone(input.Identity)
+	r := GridProjectionRequest{token: &gridRefToken{}, stamp: stamp, input: input}
+	g.pendingProjection = r.token
+	return r, nil
+}
+
+// CancelProjection retires only this pending request, including when the live
+// source has drifted and cannot currently be read. Worker cancellation and task
+// lifetime accounting remain the caller's responsibility.
+func (g *Grid) CancelProjection(r GridProjectionRequest) error {
+	if err := g.valid(); err != nil {
+		return err
+	}
+	if r.token == nil || r.token != g.pendingProjection {
+		return ErrGridStale
+	}
+	g.pendingProjection = nil
+	return nil
+}
+
+func (g *Grid) checkProjectionRequest(r GridProjectionRequest) error {
+	if r.token == nil || r.token != g.pendingProjection || r.stamp != g.stamp {
+		return ErrGridStale
+	}
+	return g.current()
+}
+
+// CompleteProjection admits only an exact BuildGridProjection result for this
+// request's full input and next view revision. It atomically preserves current
+// cursor, anchor, selection and draft by stable identities. Refusal preserves
+// the view, generation, cell references and pending request.
+func (g *Grid) CompleteProjection(r GridProjectionRequest, candidate GridProjection) error {
+	if err := g.valid(); err != nil {
+		return err
+	}
+	prepared, exact := unwrapGridProjection(candidate)
+	if !exact {
+		return ErrGridSource
+	}
+	if err := g.checkProjectionRequest(r); err != nil {
+		return err
+	}
+	if err := prepared.current(); err != nil {
+		return err
+	}
+	if prepared.input != r.input {
+		return ErrGridStale
+	}
+	stamp, err := sourceStamp(candidate)
+	if err != nil {
+		return err
+	}
+	if stamp.Identity != r.input.Identity || stamp.Revision != r.OutputRevision() {
+		return ErrGridStale
+	}
+	return g.replaceSource(candidate, nil, &r)
+}

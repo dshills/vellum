@@ -1,0 +1,7 @@
+{
+  "scope": "Preliminary read-only finding on mutable consumer source, not final qualification",
+  "source": "/private/tmp/vellum-grid-loaded/examples/loadedgrid/model.go",
+  "sha256": "236dae6c0924129250b11f49964384408ab531051ba9864b5554b6706a9fcb01",
+  "external_guard_shape_still_present": true,
+  "finding": "Held Save settlement plus external editToken advancement leaves stale callback returning before clearing settling/settleCancel. Also reachable on external submission refusal. Owner notified; final review follows freeze."
+}

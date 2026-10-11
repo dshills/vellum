@@ -1,0 +1,25 @@
+[
+  {
+    "name": "fixed",
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-grid-loaded/drivers/cogent/env.sh\nexec /private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/loadedgrid-desktop -smoke"
+    ],
+    "cwd": "/private/tmp/vellum-grid-loaded/examples/loadedgrid",
+    "exit_code": 66,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 32.818,
+    "log": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/cocoa-smokes/fixed.log",
+    "log_sha256": "843e4d1763cb46e2378c2997150921adf9bfa5ea84d3c16a1fea69d197b6776c",
+    "stages": [
+      "empty-ready",
+      "stored-loaded",
+      "worker-projection",
+      "async-edit-conflict",
+      "pass"
+    ],
+    "qualified": false
+  }
+]

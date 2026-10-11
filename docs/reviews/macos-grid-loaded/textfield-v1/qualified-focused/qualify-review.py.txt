@@ -1,0 +1,18 @@
+from pathlib import Path
+import hashlib,json,os,subprocess,sys
+r=Path(__file__).resolve().parent
+out=r/sys.argv[1];out.mkdir(exist_ok=False)
+source=Path('/private/tmp/vellum-grid-loaded')
+paths=['drivers/cogent/textfield_settle.go','drivers/cogent/controls.go','drivers/cogent/editor.go','drivers/cogent/editor_geometry.go','drivers/cogent/editor_test.go','drivers/cogent/grid_editing.go','drivers/cogent/driver.go','drivers/cogent/go.mod','drivers/cogent/go.sum','drivers/cogent/internal/transport/ordered.go','drivers/cogent/internal/platformio/dispatch.go','drivers/cogent/build/upstream/core/textfield.go','drivers/cogent/build/upstream/core/textfield_native.go','drivers/cogent/build/upstream/events/deque.go','app/app.go']
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def inputs():return {**{p:sha(source/p) for p in paths},'reviewer-test':sha(r/'textfield_settlement_review_test.go'),'overlay':sha(r/'overlay.json'),'review-producer':sha(Path(__file__))}
+before=inputs()
+for rel in ['drivers/cogent/textfield_settle.go','drivers/cogent/controls.go','drivers/cogent/editor.go']:
+ dest=out/'source'/Path(rel).with_suffix('.go.txt');dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes((source/rel).read_bytes())
+(out/'reviewer-test.go.txt').write_bytes((r/'textfield_settlement_review_test.go').read_bytes())
+cmd=['go','test','-race','-tags','offscreen','-overlay',str(r/'overlay.json'),'-run','^TestReviewFieldSettlement','-count='+sys.argv[2],'.']
+with (out/'race.log').open('xb') as log:result=subprocess.run(cmd,cwd=source/'drivers/cogent',env=os.environ,stdout=log,stderr=subprocess.STDOUT,timeout=180)
+after=inputs()
+proof={'schema':'vellum-field-settlement-independent-regressions-v1','result':'PASS' if result.returncode==0 and before==after else 'FAIL','command':cmd,'cwd':str(source/'drivers/cogent'),'exit_code':result.returncode,'inputs_before':before,'inputs_after':after,'unchanged':before==after,'log_sha256':sha(out/'race.log'),'scope':'Selected driver/transport/app/prepared field sources + reviewer overlay; actual mounted field + originating deferred FIFO. Offscreen, no native window, Cocoa, GUI, full toolchain/dependency closure or real consumer qualification.'}
+(out/'qualification.json').write_text(json.dumps(proof,indent=2)+'\n')
+print(json.dumps({'result':proof['result'],'proof_sha256':sha(out/'qualification.json'),'log':(out/'race.log').read_text()}))

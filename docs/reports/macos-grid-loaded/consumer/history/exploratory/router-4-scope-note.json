@@ -1,0 +1,7 @@
+{
+  "command": "go test -tags offscreen -race -run TestActualLoadedGridAsyncEditRemovesFilteredRow|TestExternalRefuses -count=1 -v ./...",
+  "working_directory": "/private/tmp/vellum-grid-loaded",
+  "exit_code": 0,
+  "qualification": false,
+  "reason": "Wrong module working directory: root packages reported no tests to run. This log does not qualify examples/loadedgrid."
+}

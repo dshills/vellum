@@ -1,0 +1,41 @@
+{
+  "docs": [
+    "README.md",
+    "docs/implementation.md",
+    "docs/development.md",
+    "specs/controls.md",
+    "specs/grid-projection.md",
+    "specs/framework.md",
+    "specs/macos-completion.md"
+  ],
+  "execution": "Read-only review; no tests, GUI, Git, Prism or candidate edits.",
+  "findings": [
+    {
+      "file": "specs/framework.md",
+      "id": "completion-reservation-contract",
+      "line": 24,
+      "problem": "Legacy completion waiting wording differs from pre-worker ReserveCompletion and immediate refusal.",
+      "resolution": "Describe reserved owner completion before worker admission and credit retained until both worker and owner terminals."
+    },
+    {
+      "file": "specs/controls.md",
+      "id": "settled-field-change-required",
+      "line": 91,
+      "problem": "SettleTextField refuses ordinary fields without Change, but refusal description omits this precondition.",
+      "resolution": "State ordinary managed field must have Change callback."
+    }
+  ],
+  "inputs": "inputs.json",
+  "inputs_sha256": "1d55b63f2ba323bd794120b8e3b233f493278712588f0fb7b3e29160d168ae46",
+  "result": "NEEDS_NARROW_DOC_CORRECTION",
+  "root": "/private/tmp/vellum-grid-loaded",
+  "schema": "vellum-loadedgrid-doc-review-v1",
+  "scope_checks": [
+    "Immutable full-domain input, stable strict numeric sorting, cancellation and cached-array/string budgets agree with builder.",
+    "Opaque result/view revision and final callback admission match current source.",
+    "Consumer filter acknowledgment follows controlled Change before capture, and separate filter/session tokens guard late results.",
+    "Mac milestone, P4/P6/P9 sustained workloads, human input/accessibility and public dependency/signing audit are explicitly unfinished.",
+    "New durable loaded-data report link is pending its producer qualification/archive and is not treated as current evidence."
+  ],
+  "source_scope": "Selected API/runtime contracts, not source closure or requalification. Native regression author remains responsible for settlement API qualification."
+}

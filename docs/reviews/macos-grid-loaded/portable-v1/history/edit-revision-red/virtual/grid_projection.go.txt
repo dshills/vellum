@@ -1,0 +1,730 @@
+package virtual
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"math"
+	"strconv"
+	"strings"
+	"unicode/utf8"
+	"unsafe"
+)
+
+// BuildGridProjection scans a full immutable, concurrently readable indexed
+// snapshot on a worker. Its optional metrics/edit methods must have the same
+// lifetime and concurrency contract. The result borrows that domain snapshot;
+// it never copies the domain or builds a key map. Query/cache strings are cloned
+// after admission to avoid retaining oversized backing allocations.
+//
+// Index admission reserves input-sized order/inverse arrays and, for metrics,
+// an input-sized prefix even when filtering removes all rows. WorkingBytes is
+// the peak logical array/string reservation (including cached sort payload),
+// excluding borrowed domain storage, allocator overhead and caller-held results.
+// Callbacks must be bounded/nonblocking: cancellation cannot interrupt a callback.
+func BuildGridProjection(ctx context.Context, snapshot GridSource, revision uint64, query GridQuery, limits GridProjectionLimits) (GridProjection, error) {
+	if ctx == nil || revision == 0 {
+		return nil, ErrGridInvalid
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	l, err := projectionLimits(limits)
+	if err != nil {
+		return nil, err
+	}
+	queryBytes, err := projectionQuerySize(query, l.MaxQueryBytes)
+	if err != nil {
+		return nil, err
+	}
+	stamp, err := sourceStamp(snapshot)
+	if e := ctx.Err(); e != nil {
+		return nil, e
+	}
+	if err != nil {
+		return nil, err
+	}
+	if stamp.Rows > l.MaxRows {
+		return nil, ErrGridCapacity
+	}
+	metrics, variable := snapshot.(GridRowMetrics)
+	structural, indexBytes, err := projectionFootprint(stamp.Rows, len(query.Sort), len(query.Filters), variable)
+	if err != nil {
+		return nil, err
+	}
+	if indexBytes > l.MaxIndexBytes || structural > l.MaxWorkingBytes-queryBytes-len(stamp.Identity) {
+		return nil, ErrGridCapacity
+	}
+	if err = ctx.Err(); err != nil {
+		return nil, err
+	}
+	p := &gridProjectionBase{base: snapshot, input: stamp, revision: revision, cellLimit: l.MaxCellBytes}
+	p.input.Identity = strings.Clone(stamp.Identity)
+	p.stats = GridProjectionStats{InputRows: stamp.Rows, IndexBytes: indexBytes, WorkingBytes: structural + queryBytes + len(stamp.Identity)}
+	if err = projectionBuildCheck(ctx, p); err != nil {
+		return nil, err
+	}
+	copied := GridQuery{}
+	if err = ctx.Err(); err != nil {
+		return nil, err
+	}
+	copied.Sort = make([]GridSortColumn, len(query.Sort))
+	if err = ctx.Err(); err != nil {
+		return nil, err
+	}
+	copied.Filters = make([]GridFilter, len(query.Filters))
+	for i, s := range query.Sort {
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
+		s.ColumnID = strings.Clone(s.ColumnID)
+		copied.Sort[i] = s
+	}
+	for i, f := range query.Filters {
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
+		f.ColumnID = strings.Clone(f.ColumnID)
+		f.Text = strings.Clone(f.Text)
+		copied.Filters[i] = f
+	}
+	if err = ctx.Err(); err != nil {
+		return nil, err
+	}
+	p.order = make([]int, 0, stamp.Rows)
+	if err = ctx.Err(); err != nil {
+		return nil, err
+	}
+	p.inverse = make([]int, stamp.Rows)
+	for i := range p.inverse {
+		if i%256 == 0 {
+			if err = ctx.Err(); err != nil {
+				return nil, err
+			}
+		}
+		p.inverse[i] = -1
+	}
+	var keys []projectionSortValue
+	var merge, heights []int
+	if len(copied.Sort) > 0 {
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
+		keys = make([]projectionSortValue, stamp.Rows*len(copied.Sort))
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
+		merge = make([]int, stamp.Rows)
+	}
+	if variable {
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
+		heights = make([]int, stamp.Rows)
+		if err = ctx.Err(); err != nil {
+			return nil, err
+		}
+		p.prefix = make([]int, stamp.Rows+1)
+	}
+	start := 0
+	if variable {
+		start, err = projectionOffset(ctx, p, metrics, 0)
+		if err != nil {
+			return nil, err
+		}
+		if start != 0 {
+			return nil, ErrGridSource
+		}
+	}
+	for row := 0; row < stamp.Rows; row++ {
+		if row%256 == 0 {
+			if err = projectionBuildCheck(ctx, p); err != nil {
+				return nil, err
+			}
+		}
+		key, err := projectionRow(ctx, p, row)
+		if err != nil {
+			return nil, err
+		}
+		if variable {
+			end, e := projectionOffset(ctx, p, metrics, row+1)
+			if e != nil {
+				return nil, e
+			}
+			if end <= start {
+				return nil, ErrGridSource
+			}
+			for _, pixel := range []int{start, end - 1} {
+				if e = projectionBuildCheck(ctx, p); e != nil {
+					return nil, e
+				}
+				at, e := metrics.RowAt(pixel)
+				if err = projectionAfterCallback(ctx, p, e, "row inverse"); err != nil {
+					return nil, err
+				}
+				if at != row {
+					return nil, ErrGridSource
+				}
+			}
+			heights[row] = end - start
+			start = end
+		}
+		accepted := true
+		for _, filter := range copied.Filters {
+			value, e := projectionCell(ctx, p, key, filter.ColumnID)
+			if e != nil {
+				return nil, e
+			}
+			p.stats.CellReads++
+			if filter.Kind == GridFilterEquals {
+				accepted = value == filter.Text
+			} else {
+				accepted = strings.Contains(value, filter.Text)
+			}
+			if !accepted {
+				break
+			}
+		}
+		if !accepted {
+			continue
+		}
+		p.order = append(p.order, row)
+		for i, column := range copied.Sort {
+			value, e := projectionCell(ctx, p, key, column.ColumnID)
+			if e != nil {
+				return nil, e
+			}
+			p.stats.CellReads++
+			if len(value) > l.MaxWorkingBytes-p.stats.WorkingBytes {
+				return nil, ErrGridCapacity
+			}
+			if err = ctx.Err(); err != nil {
+				return nil, err
+			}
+			k := projectionSortValue{text: strings.Clone(value)}
+			p.stats.WorkingBytes += len(value)
+			if column.Kind == GridSortInteger {
+				k.integer, e = projectionInteger(value)
+				if e != nil {
+					return nil, fmt.Errorf("%w: integer sort cell: %w", ErrGridSource, e)
+				}
+			}
+			keys[row*len(copied.Sort)+i] = k
+		}
+	}
+	if err = projectionMerge(ctx, p, p.order, merge, keys, copied.Sort); err != nil {
+		return nil, err
+	}
+	total := 0
+	for position, row := range p.order {
+		if position%256 == 0 {
+			if err = projectionBuildCheck(ctx, p); err != nil {
+				return nil, err
+			}
+		}
+		p.inverse[row] = position
+		if variable {
+			if heights[row] > math.MaxInt-total {
+				return nil, ErrGridSource
+			}
+			total += heights[row]
+			p.prefix[position+1] = total
+		}
+	}
+	if variable {
+		p.prefix = p.prefix[:len(p.order)+1]
+	}
+	p.stats.Rows = len(p.order)
+	if err = projectionBuildCheck(ctx, p); err != nil {
+		return nil, err
+	}
+	editable, hasEdit := snapshot.(GridEditSource)
+	switch {
+	case variable && hasEdit:
+		return &gridProjectionMetricsEdit{gridProjectionBase: p, metrics: metrics, editable: editable}, nil
+	case variable:
+		return &gridProjectionMetrics{gridProjectionBase: p, metrics: metrics}, nil
+	case hasEdit:
+		return &gridProjectionEdit{gridProjectionBase: p, editable: editable}, nil
+	default:
+		return p, nil
+	}
+}
+
+func projectionLimits(l GridProjectionLimits) (GridProjectionLimits, error) {
+	defaults := []int{1_000_000, 64 << 20, 256 << 20, 64 << 10, 16 << 10}
+	values := []*int{&l.MaxRows, &l.MaxIndexBytes, &l.MaxWorkingBytes, &l.MaxCellBytes, &l.MaxQueryBytes}
+	hard := []int{4 << 20, 512 << 20, 1 << 30, 1 << 20, 64 << 10}
+	for i, p := range values {
+		if *p == 0 {
+			*p = defaults[i]
+		}
+		if *p < 1 || *p > hard[i] {
+			return l, ErrGridInvalid
+		}
+	}
+	return l, nil
+}
+func projectionQuerySize(q GridQuery, maximum int) (int, error) {
+	if len(q.Sort) > 4 || len(q.Filters) > 4 {
+		return 0, ErrGridInvalid
+	}
+	bytes := 0
+	add := func(text string, identity bool) error {
+		if identity && (text == "" || len(text) > gridMaxIdentityBytes) {
+			return ErrGridInvalid
+		}
+		if len(text) > maximum-bytes {
+			return ErrGridCapacity
+		}
+		if !utf8.ValidString(text) {
+			return ErrGridInvalid
+		}
+		bytes += len(text)
+		return nil
+	}
+	for _, s := range q.Sort {
+		if s.Kind > GridSortInteger {
+			return 0, ErrGridInvalid
+		}
+		if err := add(s.ColumnID, true); err != nil {
+			return 0, err
+		}
+	}
+	for _, f := range q.Filters {
+		if f.Kind > GridFilterEquals {
+			return 0, ErrGridInvalid
+		}
+		if err := add(f.ColumnID, true); err != nil {
+			return 0, err
+		}
+		if err := add(f.Text, false); err != nil {
+			return 0, err
+		}
+	}
+	return bytes, nil
+}
+
+type projectionSortValue struct {
+	text    string
+	integer int64
+}
+
+func projectionFootprint(rows, sorts, filters int, metrics bool) (working, index int, err error) {
+	integer := int(unsafe.Sizeof(int(0)))
+	// int64 checked accumulation also supports 32-bit builds. Limits are <=1GiB.
+	n := int64(rows)
+	idx := 2 * n * int64(integer)
+	work := idx
+	if metrics {
+		idx += (n + 1) * int64(integer)
+		work = idx + n*int64(integer)
+	}
+	if sorts > 0 {
+		work += n*int64(integer) + n*int64(sorts)*int64(unsafe.Sizeof(projectionSortValue{}))
+	}
+	work += int64(sorts)*int64(unsafe.Sizeof(GridSortColumn{})) + int64(filters)*int64(unsafe.Sizeof(GridFilter{}))
+	if idx > math.MaxInt || work > math.MaxInt {
+		return 0, 0, ErrGridCapacity
+	}
+	return int(work), int(idx), nil
+}
+func projectionBuildCheck(ctx context.Context, p *gridProjectionBase) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	err := p.current()
+	if e := ctx.Err(); e != nil {
+		return e
+	}
+	return err
+}
+func projectionAfterCallback(ctx context.Context, p *gridProjectionBase, callback error, operation string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	after := projectionBuildCheck(ctx, p)
+	if callback != nil {
+		return errors.Join(fmt.Errorf("%w: %s: %w", ErrGridSource, operation, callback), after)
+	}
+	return after
+}
+func projectionRow(ctx context.Context, p *gridProjectionBase, row int) (string, error) {
+	if err := projectionBuildCheck(ctx, p); err != nil {
+		return "", err
+	}
+	value, err := p.base.RowKey(row)
+	if e := projectionAfterCallback(ctx, p, err, "row key"); e != nil {
+		return "", e
+	}
+	if value == "" || len(value) > gridMaxIdentityBytes || !utf8.ValidString(value) {
+		return "", ErrGridSource
+	}
+	if err = projectionBuildCheck(ctx, p); err != nil {
+		return "", err
+	}
+	inverse, found, err := p.base.IndexOf(value)
+	if e := projectionAfterCallback(ctx, p, err, "row index"); e != nil {
+		return "", e
+	}
+	if !found || inverse != row {
+		return "", ErrGridSource
+	}
+	return value, nil
+}
+func projectionCell(ctx context.Context, p *gridProjectionBase, key, column string) (string, error) {
+	if err := projectionBuildCheck(ctx, p); err != nil {
+		return "", err
+	}
+	value, err := p.base.Cell(key, column)
+	if e := projectionAfterCallback(ctx, p, err, "cell"); e != nil {
+		return "", e
+	}
+	if len(value) > p.cellLimit {
+		return "", ErrGridCapacity
+	}
+	if !utf8.ValidString(value) {
+		return "", ErrGridSource
+	}
+	return value, nil
+}
+func projectionOffset(ctx context.Context, p *gridProjectionBase, m GridRowMetrics, row int) (int, error) {
+	if err := projectionBuildCheck(ctx, p); err != nil {
+		return 0, err
+	}
+	value, err := m.RowOffset(row)
+	if e := projectionAfterCallback(ctx, p, err, "row offset"); e != nil {
+		return 0, e
+	}
+	if value < 0 {
+		return 0, ErrGridSource
+	}
+	return value, nil
+}
+func projectionInteger(value string) (int64, error) {
+	digits := value
+	if len(digits) > 0 && (digits[0] == '-' || digits[0] == '+') {
+		digits = digits[1:]
+	}
+	if len(digits) == 0 {
+		return 0, strconv.ErrSyntax
+	}
+	for i := range digits {
+		if digits[i] < '0' || digits[i] > '9' {
+			return 0, strconv.ErrSyntax
+		}
+	}
+	return strconv.ParseInt(value, 10, 64)
+}
+func projectionMerge(ctx context.Context, p *gridProjectionBase, order, buffer []int, keys []projectionSortValue, columns []GridSortColumn) error {
+	if len(columns) == 0 {
+		return projectionBuildCheck(ctx, p)
+	}
+	compare := func(a, b int) (int, error) {
+		if err := ctx.Err(); err != nil {
+			return 0, err
+		}
+		if p.stats.SortComparisons%256 == 0 {
+			if err := projectionBuildCheck(ctx, p); err != nil {
+				return 0, err
+			}
+		}
+		p.stats.SortComparisons++
+		for i, c := range columns {
+			x, y := keys[a*len(columns)+i], keys[b*len(columns)+i]
+			v := 0
+			if c.Kind == GridSortInteger {
+				if x.integer < y.integer {
+					v = -1
+				} else if x.integer > y.integer {
+					v = 1
+				}
+			} else {
+				v = strings.Compare(x.text, y.text)
+			}
+			if v != 0 {
+				if c.Descending {
+					v = -v
+				}
+				return v, nil
+			}
+		}
+		if a < b {
+			return -1, nil
+		}
+		if a > b {
+			return 1, nil
+		}
+		return 0, nil
+	}
+	for width := 1; width < len(order); width *= 2 {
+		for first := 0; first < len(order); first += 2 * width {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
+			middle, end := min(first+width, len(order)), min(first+2*width, len(order))
+			left, right := first, middle
+			for out := first; out < end; out++ {
+				if out%256 == 0 {
+					if err := ctx.Err(); err != nil {
+						return err
+					}
+				}
+				takeLeft := right == end
+				if left < middle && right < end {
+					comparison, err := compare(order[left], order[right])
+					if err != nil {
+						return err
+					}
+					takeLeft = comparison <= 0
+				}
+				if takeLeft {
+					buffer[out] = order[left]
+					left++
+				} else {
+					buffer[out] = order[right]
+					right++
+				}
+			}
+		}
+		for i := range order {
+			if i%256 == 0 {
+				if err := ctx.Err(); err != nil {
+					return err
+				}
+			}
+			order[i] = buffer[i]
+		}
+	}
+	return projectionBuildCheck(ctx, p)
+}
+
+type gridProjectionBase struct {
+	base                   GridSource
+	input                  GridStamp
+	revision               uint64
+	order, inverse, prefix []int
+	cellLimit              int
+	stats                  GridProjectionStats
+}
+
+func (p *gridProjectionBase) gridProjectionMarker()      {}
+func (p *gridProjectionBase) Identity() string           { return p.input.Identity }
+func (p *gridProjectionBase) Revision() uint64           { return p.revision }
+func (p *gridProjectionBase) RowCount() int              { return len(p.order) }
+func (p *gridProjectionBase) InputStamp() GridStamp      { return p.input }
+func (p *gridProjectionBase) Stats() GridProjectionStats { return p.stats }
+func (p *gridProjectionBase) current() error {
+	// A second observation catches a metadata callback changing the stamp after
+	// its returned value. Immutable snapshots remain essential: guards cannot
+	// certify a provider hiding unstamped mutations.
+	for i := 0; i < 2; i++ {
+		if err := sameStamp(p.base, p.input); err != nil {
+			return fmt.Errorf("%w: projection input: %w", ErrGridSource, err)
+		}
+	}
+	return nil
+}
+func (p *gridProjectionBase) after(err error, operation string) error {
+	after := p.current()
+	if err != nil {
+		return errors.Join(fmt.Errorf("%w: %s: %w", ErrGridSource, operation, err), after)
+	}
+	return after
+}
+func (p *gridProjectionBase) RowKey(row int) (string, error) {
+	if row < 0 || row >= len(p.order) {
+		return "", ErrGridRange
+	}
+	if err := p.current(); err != nil {
+		return "", err
+	}
+	key, err := p.base.RowKey(p.order[row])
+	if e := p.after(err, "row key"); e != nil {
+		return "", e
+	}
+	if key == "" || len(key) > gridMaxIdentityBytes || !utf8.ValidString(key) {
+		return "", ErrGridSource
+	}
+	if err = p.current(); err != nil {
+		return "", err
+	}
+	at, found, err := p.base.IndexOf(key)
+	if e := p.after(err, "row index"); e != nil {
+		return "", e
+	}
+	if !found || at != p.order[row] {
+		return "", ErrGridSource
+	}
+	return strings.Clone(key), nil
+}
+func (p *gridProjectionBase) IndexOf(key string) (int, bool, error) {
+	if key == "" || len(key) > gridMaxIdentityBytes || !utf8.ValidString(key) {
+		return 0, false, ErrGridRange
+	}
+	if err := p.current(); err != nil {
+		return 0, false, err
+	}
+	at, found, err := p.base.IndexOf(key)
+	if e := p.after(err, "row index"); e != nil {
+		return 0, false, e
+	}
+	if !found {
+		return 0, false, nil
+	}
+	if at < 0 || at >= len(p.inverse) {
+		return 0, false, ErrGridSource
+	}
+	if err = p.current(); err != nil {
+		return 0, false, err
+	}
+	actual, err := p.base.RowKey(at)
+	if e := p.after(err, "row key"); e != nil {
+		return 0, false, e
+	}
+	if actual != key {
+		return 0, false, ErrGridSource
+	}
+	row := p.inverse[at]
+	return max(row, 0), row >= 0, nil
+}
+func (p *gridProjectionBase) Cell(key, column string) (string, error) {
+	if column == "" || len(column) > gridMaxIdentityBytes || !utf8.ValidString(column) {
+		return "", ErrGridRange
+	}
+	if _, found, err := p.IndexOf(key); err != nil {
+		return "", err
+	} else if !found {
+		return "", ErrGridRange
+	}
+	if err := p.current(); err != nil {
+		return "", err
+	}
+	value, err := p.base.Cell(key, column)
+	if e := p.after(err, "cell"); e != nil {
+		return "", e
+	}
+	if len(value) > p.cellLimit {
+		return "", ErrGridCapacity
+	}
+	if !utf8.ValidString(value) {
+		return "", ErrGridSource
+	}
+	return value, nil
+}
+func (p *gridProjectionBase) SelectionSnapshot() (GridRowIndex, error) {
+	if err := p.current(); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+func (p *gridProjectionBase) rowOffset(boundary int) (int, error) {
+	if boundary < 0 || boundary >= len(p.prefix) {
+		return 0, ErrGridRange
+	}
+	if err := p.current(); err != nil {
+		return 0, err
+	}
+	return p.prefix[boundary], p.current()
+}
+func (p *gridProjectionBase) rowAt(pixel int) (int, error) {
+	if err := p.current(); err != nil {
+		return 0, err
+	}
+	if pixel < 0 || pixel >= p.prefix[len(p.prefix)-1] {
+		return 0, ErrGridRange
+	}
+	lo, hi := 0, len(p.prefix)-1
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if p.prefix[mid+1] <= pixel {
+			lo = mid + 1
+		} else {
+			hi = mid
+		}
+	}
+	return lo, p.current()
+}
+func (p *gridProjectionBase) editCell(source GridEditSource, key, column string) (GridEditValue, error) {
+	if column == "" || len(column) > gridMaxIdentityBytes || !utf8.ValidString(column) {
+		return GridEditValue{}, ErrGridRange
+	}
+	if _, found, err := p.IndexOf(key); err != nil {
+		return GridEditValue{}, err
+	} else if !found {
+		return GridEditValue{}, ErrGridRange
+	}
+	if err := p.current(); err != nil {
+		return GridEditValue{}, err
+	}
+	value, err := source.EditCell(key, column)
+	if e := p.after(err, "edit cell"); e != nil {
+		return GridEditValue{}, e
+	}
+	if len(value.Text) > p.cellLimit {
+		return GridEditValue{}, ErrGridCapacity
+	}
+	if value.Version == 0 || !utf8.ValidString(value.Text) || strings.ContainsRune(value.Text, 0) {
+		return GridEditValue{}, ErrGridSource
+	}
+	text, err := p.Cell(key, column)
+	if err != nil {
+		return GridEditValue{}, err
+	}
+	if value.Text != text {
+		return GridEditValue{}, ErrGridSource
+	}
+	return value, nil
+}
+
+type gridProjectionMetrics struct {
+	*gridProjectionBase
+	metrics GridRowMetrics
+}
+
+func (p *gridProjectionMetrics) RowOffset(i int) (int, error) { return p.rowOffset(i) }
+func (p *gridProjectionMetrics) RowAt(i int) (int, error)     { return p.rowAt(i) }
+
+type gridProjectionEdit struct {
+	*gridProjectionBase
+	editable GridEditSource
+}
+
+func (p *gridProjectionEdit) EditCell(key, column string) (GridEditValue, error) {
+	return p.editCell(p.editable, key, column)
+}
+
+type gridProjectionMetricsEdit struct {
+	*gridProjectionBase
+	metrics  GridRowMetrics
+	editable GridEditSource
+}
+
+func (p *gridProjectionMetricsEdit) RowOffset(i int) (int, error) { return p.rowOffset(i) }
+func (p *gridProjectionMetricsEdit) RowAt(i int) (int, error)     { return p.rowAt(i) }
+func (p *gridProjectionMetricsEdit) EditCell(key, column string) (GridEditValue, error) {
+	return p.editCell(p.editable, key, column)
+}
+
+// Exact concrete admission defeats an external embedding wrapper inheriting the
+// sealed marker but overriding source/metadata methods. Used by Grid admission.
+func unwrapGridProjection(projection GridProjection) (*gridProjectionBase, bool) {
+	var base *gridProjectionBase
+	switch p := projection.(type) {
+	case *gridProjectionBase:
+		base = p
+	case *gridProjectionMetrics:
+		if p != nil {
+			base = p.gridProjectionBase
+		}
+	case *gridProjectionEdit:
+		if p != nil {
+			base = p.gridProjectionBase
+		}
+	case *gridProjectionMetricsEdit:
+		if p != nil {
+			base = p.gridProjectionBase
+		}
+	}
+	return base, base != nil
+}

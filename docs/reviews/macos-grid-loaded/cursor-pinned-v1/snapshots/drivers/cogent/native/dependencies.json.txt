@@ -1,0 +1,322 @@
+{
+  "dependencies": [
+    {
+      "name": "upstream",
+      "module": "cogentcore.org/core",
+      "version": "v0.3.46-0.20261009095036-5cc519b24044",
+      "sum": "h1:altSVNLn4rjmPC/DKppmTzxKc1STLqh40O0Cog58hFw=",
+      "stages": [
+        {
+          "origin": "prototypes/nativeinput/patches",
+          "inputs": "native/patches/nativeinput/original-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/nativeinput/0001-grapheme-and-selection.patch",
+              "sha256": "1649a8ca53e0d510b34d89306d222d307a3e17d70aef88a729c7d116f339649e"
+            },
+            {
+              "file": "native/patches/nativeinput/0002-lazy-spelling.patch",
+              "sha256": "5d0a0e4f7b8ea16bab05436f60d3d1794cae9c61b57e8e756595b5dbc3e9c8e5"
+            },
+            {
+              "file": "native/patches/nativeinput/0003-requested-paint.patch",
+              "sha256": "b10202ed3f3b18b7c5693285d659cdf92667ad93f3961eb703d64d08065b57d1"
+            },
+            {
+              "file": "native/patches/nativeinput/0004-native-composition.patch",
+              "sha256": "bfc609e98c056f6cddc30c8b6fba182b6441cd17eb8966e8cf2cdd40cef7724f"
+            }
+          ]
+        },
+        {
+          "origin": "prototypes/foundationchecks/patches",
+          "inputs": "native/patches/foundationchecks/original-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/foundationchecks/0005-multiline-grapheme.patch",
+              "sha256": "8a2f44e5a41fd5b917bbf3410e4b2dc1a2f8a4504f9b75af3881d4148e2134db"
+            },
+            {
+              "file": "native/patches/foundationchecks/0006-glyph-cluster-lookup.patch",
+              "sha256": "c1b6064dd79bf62635a989b05b1d222fa99f3095b21a7923ae0d3d2a80f9128a"
+            }
+          ]
+        },
+        {
+          "origin": "prototypes/foundationcontracts/patches",
+          "inputs": "native/patches/foundationcontracts/original-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/foundationcontracts/0007-exact-multiline-text.patch",
+              "sha256": "c235a769ce3e50683a3fb54c554aa404b8211f51b78ac6afc618914e8a851318"
+            }
+          ]
+        },
+        {
+          "origin": "prototypes/foundationintegration/patches",
+          "inputs": "native/patches/foundationintegration/original-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/foundationintegration/0008-native-lifetime.patch",
+              "sha256": "3fadb62158f9f0d09efa1a6949de540740a3172c51bddc27c64cafb9a94800c5"
+            },
+            {
+              "file": "native/patches/foundationintegration/0009-owned-device-queue-release.patch",
+              "sha256": "0fa0b25ad508cf85ad606eb840dcc9f33d0a1a55640dfd1132100956e5675ce7"
+            },
+            {
+              "file": "native/patches/foundationintegration/0010-ordered-deferred-events.patch",
+              "sha256": "2ffbafa501f1a0374bd0c5c417641253a2e7eae6f14e4c96619afe7fb22194a5"
+            },
+            {
+              "file": "native/patches/foundationintegration/0011-visual-bidi-range-geometry.patch",
+              "sha256": "47515d48d5ce1204a8ba25b032cd5c7bfe75ebbeb0557d783e9d3d46146c2270"
+            },
+            {
+              "file": "native/patches/foundationintegration/0012-multiline-native-adapter.patch",
+              "sha256": "5f52f4fdfe9dfdd92f946a982991c2d4217f2a0b678ef79bae1baaac42c31a12"
+            },
+            {
+              "file": "native/patches/foundationintegration/0013-regression-json.patch",
+              "sha256": "bc0590a9f537b11626d1a6dd2ede08b9265b9d7f0607fa434283f05e9bf9de03"
+            },
+            {
+              "file": "native/patches/foundationintegration/0014-editor-visual-navigation.patch",
+              "sha256": "54d6ed6cf5213ae8f8473beccdf1a949e6f354fb8c09e0d981b2cf28815fd430"
+            },
+            {
+              "file": "native/patches/foundationintegration/0015-bounded-native-edits.patch",
+              "sha256": "4c9c6fee877baefa3f3c5bfea62a95edcb74d4f3276e7afb13ea692c6ac9e51e"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/multiwindow",
+          "inputs": "native/patches/multiwindow/original-hashes.json",
+          "outputs": "native/patches/multiwindow/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/multiwindow/0016-multiwindow-ownership.patch",
+              "sha256": "627293f27fcf55a6cfc09434109e35a389302991706afcd5def426366fb2df8a"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/rendering",
+          "inputs": "native/patches/rendering/original-hashes.json",
+          "outputs": "native/patches/rendering/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/rendering/0017-device-loss.patch",
+              "sha256": "7b60ed6ee2317c568bb2f33525138fa3b4759651360065c914bf7ca815c596ac"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/accessibility",
+          "inputs": "native/patches/accessibility/original-hashes.json",
+          "outputs": "native/patches/accessibility/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/accessibility/0018-screen-poll-snapshots.patch",
+              "sha256": "67128034e301fdfdbc13b2f024faffacd771cbaca3f0f392c082c2c2366e6c41"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/rendercache",
+          "inputs": "native/patches/rendercache/original-hashes.json",
+          "outputs": "native/patches/rendercache/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/rendercache/0019-borrowed-texture-redraw.patch",
+              "sha256": "bb07a31f8516da9fd643ec4fe5e616322d3845f0914e22e832d3d67a1d66eddb"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/shortcuts",
+          "inputs": "native/patches/shortcuts/original-hashes.json",
+          "outputs": "native/patches/shortcuts/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/shortcuts/0020-focusless-shortcuts.patch",
+              "sha256": "1eee4dcf432a2ac70fde45852eb7f6e2b82b505370e0ea8affde085025e8ceff"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/mainqueue",
+          "inputs": "native/patches/mainqueue/original-hashes.json",
+          "outputs": "native/patches/mainqueue/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/mainqueue/0021-main-queue-stop.patch",
+              "sha256": "6395c5c8340dc95d5d16425db2803cdb513edd317748d84df4b5d7666aabf516"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/dispatch",
+          "inputs": "native/patches/dispatch/original-hashes.json",
+          "outputs": "native/patches/dispatch/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/dispatch/0022-main-dispatch-failure.patch",
+              "sha256": "e3fc27c44cbb06b420b8d8a35bbaa77a23628fc288f96e42e060f064e0acf648"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/quit",
+          "inputs": "native/patches/quit/original-hashes.json",
+          "outputs": "native/patches/quit/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/quit/0023-concurrent-window-quit.patch",
+              "sha256": "74e2822221d9f00db66339659ae7def402c28eb6e2a984ee4c5d79014ff5f796"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/readback",
+          "inputs": "native/patches/readback/original-hashes.json",
+          "outputs": "native/patches/readback/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/readback/0024-independent-texture-readback.patch",
+              "sha256": "2bff3bdffc53a5817d0cbc6c2901d9d63bb6967e830b1cd684c2b8bd499990c8"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/windowlist",
+          "inputs": "native/patches/windowlist/original-hashes.json",
+          "outputs": "native/patches/windowlist/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/windowlist/0025-window-registry-lifecycle.patch",
+              "sha256": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/eventboundary",
+          "inputs": "native/patches/eventboundary/original-hashes.json",
+          "outputs": "native/patches/eventboundary/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/eventboundary/0026-originating-event-boundary.patch",
+              "sha256": "197e6f33f129e21ef95084928557ee1e16cb087ab0a261bdc9a35b33da92d5cb"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/dequecompression",
+          "inputs": "native/patches/dequecompression/original-hashes.json",
+          "outputs": "native/patches/dequecompression/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/dequecompression/0027-preserve-deferred-fifo-nodes.patch",
+              "sha256": "7ca29aacb4e5c8757117150180bd7530ded160a965d71dcf910ca60e4a0b1606"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/fieldrefresh",
+          "inputs": "native/patches/fieldrefresh/original-hashes.json",
+          "outputs": "native/patches/fieldrefresh/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fieldrefresh/0028-preserve-field-preedit-on-refresh.patch",
+              "sha256": "07c45c97a47abc970c9be0f6c7574502368dd434282fdf2a01421ba49294ca69"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/fieldfocusloss",
+          "inputs": "native/patches/fieldfocusloss/original-hashes.json",
+          "outputs": "native/patches/fieldfocusloss/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fieldfocusloss/0029-defer-managed-field-focus-loss.patch",
+              "sha256": "e9d3221ce8bc9e963b54f9357e9a9ac2f80b62d74f4afbb849aab13358b26c11"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/manualrouting",
+          "inputs": "native/patches/manualrouting/original-hashes.json",
+          "outputs": "native/patches/manualrouting/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/manualrouting/0030-manual-routing.patch",
+              "sha256": "cf002ec08ecd511f98cad430427dcfaccb3e8c94c9c02117ec411e19a9809bee"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/ownedtimers",
+          "inputs": "native/patches/ownedtimers/original-hashes.json",
+          "outputs": "native/patches/ownedtimers/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/ownedtimers/0031-owned-widget-timers.patch",
+              "sha256": "3da3782e9deabe16e6f7d27c903555727df3d55357ef1da9fe19a496f0aadefe"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/checkedmanual",
+          "inputs": "native/patches/checkedmanual/original-hashes.json",
+          "outputs": "native/patches/checkedmanual/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/checkedmanual/0032-replay-native-corrections.patch",
+              "sha256": "593be2cc9ad3eec49eadce6ba0e4428971278f4d55f6243ed201937d8c1c41f9"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/textcursor",
+          "inputs": "native/patches/textcursor/original-hashes.json",
+          "outputs": "native/patches/textcursor/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/textcursor/0033-scene-owned-text-cursors.patch",
+              "sha256": "727d379112f0a835727daf4e4024ead3ce853c7a6d7a0385e4b5081d92d0bd70"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "typesetting",
+      "module": "github.com/go-text/typesetting",
+      "version": "v0.3.5-0.20260418130854-c41d02a44bec",
+      "sum": "h1:qkk9+cZlaY8920dQrhY8GoI91N72f58XmJgGDkkDiaA=",
+      "stages": [
+        {
+          "origin": "prototypes/fontresources/patches",
+          "inputs": "native/patches/fontresources/original-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fontresources/0001-deferred-sbix.patch",
+              "sha256": "b62243ab4487b2c4a9c0f9e112150493ee5743355d674041712b956510b305f9"
+            }
+          ]
+        },
+        {
+          "origin": "prototypes/fontresources/patches",
+          "inputs": "native/patches/fontresources/0002-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fontresources/0002-deferred-static-outlines.patch",
+              "sha256": "8cd046c233dc65eadbb1812d5f94a432be8e8a2d35537d94748ed5db9fd46be1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

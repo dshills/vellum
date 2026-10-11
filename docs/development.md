@@ -94,6 +94,18 @@ two-window lifecycle checks. This desktop smoke uses explicit owner commands;
 offscreen routing, desktop rendering and physical input are separate evidence.
 See the [grid example acceptance](reports/macos-grid-example/README.md).
 
+`examples/loadedgrid` stores actual million-row ×20 numeric records and runs
+generation, sort/filter indexing and immutable edit copies on bounded workers.
+From the repository root, source `drivers/cogent/env.sh`, then run `go run .`
+inside that module. `-rows 10000` selects a smaller input and `-variable-rows`
+adds indexed heights. Its offscreen race tests and vet are included in
+`scripts/check.sh`. Apply waits for the filter text field's native input barrier
+before reading its controlled value; Save uses the inline-cell barrier.
+Run `go run -race . -smoke` and then `go run -race . -smoke -variable-rows`
+sequentially for the bounded Cocoa workflow. See the
+[loaded-data report](reports/macos-grid-loaded/README.md) for qualification scope
+and the remaining sustained performance and large-tree gates.
+
 ## Standalone applications and benchmarks
 
 `examples/hello` is a separately versioned consumer module. To create a consumer

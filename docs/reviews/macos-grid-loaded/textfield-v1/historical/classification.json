@@ -1,0 +1,26 @@
+[
+  {
+    "classification": "REVIEWER_FIXTURE_COMPILE_FAILURE",
+    "proof": "historical/initial-race.json",
+    "proof_sha256": "e530400735fd741094093899bebad6e76f81f9af1e508c620131855e002158b6",
+    "scope": "Unused import and interface HandleEvent call; no product-defect evidence.",
+    "test": "historical/compile-failure-test.go.txt",
+    "test_sha256": "0b604b23cacd4857f53c2adcf27fecb34c0082f2dec144193807caf345df77e5"
+  },
+  {
+    "classification": "REVIEWER_FIXTURE_LIFETIME_FAILURE_AND_PRODUCT_FAILURE",
+    "proof": "historical/corrected-fixture-race.json",
+    "proof_sha256": "0654dc21e07eac7832289a041fc6af49a498f743365479ba912fbfb8dcd17f05",
+    "scope": "Two close assertions wrongly expected callbacks after last app window closes; repeated unchanged settlement also exposed the genuine duplicate Change.",
+    "test": "historical/last-window-fixture-test.go.txt",
+    "test_sha256": "572dff8067c451e054c09ea66e1c955a5f134d3575d22dd34b3a498c058b3640"
+  },
+  {
+    "classification": "ACTUAL_PRODUCT_RED",
+    "proof": "historical/window-fixture-corrected-race.json",
+    "proof_sha256": "94160b4f2da0574fe6bb6d326c59e0a3a318c2e25459480f56bc6af7233e52a2",
+    "scope": "Unrelated app window remains registered; only repeated unchanged settlement fails with [stable stable].",
+    "test": "historical/duplicate-change-red-test.go.txt",
+    "test_sha256": "26895bcc9ccfb207685c169921d9faacbea52e8fc22797ca370adfcac85f91dd"
+  }
+]

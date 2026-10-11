@@ -84,6 +84,13 @@ and unrelated updates retain drafts, while edited-cell updates refuse silent
 overwrite. This checkpoint remains separate from loaded-data workers, sustained
 P6 performance, large-tree acceptance and human IME/external AX workflows.
 
+[Worker-built grid views](grid-projection.md) add reusable bounded immutable
+sort/filter/height indexes, cancellation and opaque latest-result owner admission.
+The independent loaded-data consumer stores 10k/million records ×20 numeric
+fields and uses separate domain/view revisions with worker-built edit candidates.
+This advances loaded projection integration; sustained latency/memory, large-tree
+workloads and broader Mac acceptance remain open.
+
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded

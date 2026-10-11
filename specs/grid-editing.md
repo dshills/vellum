@@ -68,8 +68,14 @@ Viewport/cursor changes alone do not change the prepared edit proposal.
 
 The application builds an immutable candidate from its current domain view
 without changing the live domain. `CompleteEdit(request,candidate)` requires the
-same incarnation, a higher source revision, the edited row present, exact draft
-text and a higher cell version. It validates candidate geometry, row/selection
+same incarnation, a higher view revision, the edited row present, exact draft
+text and a higher cell version. For an exact [worker-built projection](grid-projection.md),
+its full input revision must advance the accepted full domain revision, and
+the edited row must be present in that input; it may be absent from
+the resulting filtered view. The full input receives indexed cell/version and
+revision-health checks before and after prospective admission. This lets an edit
+change filter membership while publishing the new view and closing the draft
+atomically. Other candidates retain the view-row requirement. It validates candidate geometry, row/selection
 admission and capacities, then rechecks the live request/cell and candidate value
 and source stamps before publishing the source and closing the draft in one
 generation. Any refusal leaves the Grid source, draft and generation unchanged.

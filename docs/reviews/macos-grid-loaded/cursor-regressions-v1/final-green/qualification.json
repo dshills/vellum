@@ -1,0 +1,51 @@
+{
+  "schema": "vellum-textcursor-independent-regression-v1",
+  "result": "PASS",
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "-tags",
+    "offscreen",
+    "-overlay",
+    "/private/tmp/vellum-grid-loaded-review/textcursor/final-green/overlay.json",
+    "-run",
+    "^TestVellumReviewTextCursor",
+    "-count=20",
+    "./core"
+  ],
+  "cwd": "/private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream",
+  "exit_code": 0,
+  "inputs_before": {
+    "core/textcursor.go": "46102a9a5d4d7bb9c16877c678170d2b2d2c6dfc69d8ef706c51fc7b27457d25",
+    "core/scene.go": "6f5e2cebd0ca614c8f41ef5f6e6931ae11da827253fdefdbb835ea7d63e9a227",
+    "core/sprite.go": "ec2c6b9872a5c6a9a1400ac9f730be8052642f20898a08cbc31c79bafe5b13a7",
+    "core/paint_request.go": "cda8eff4cdffd5377c0bb9b65f80495c8e6c5c61cc02f18d26750ba2fd471904",
+    "core/manual_window.go": "1f3eb4ec53458961edc87998f262116b0444d41a5fb2d2995423b5e764dce06f",
+    "core/manual_timer.go": "992b089f25f4249ee41a778247b88fc542d1034acf8706ce5a2f07ccfad77b80",
+    "core/stages.go": "b7675b84a2dd0541fe28a3ab0d259a0f04981212100f34f233174a9a5c4dd1cd",
+    "go.mod": "5e4b81d96894f4e537da971f36c3bb20a2a1b63af62f25f86f4b0c8e226ae45a",
+    "go.sum": "5b37e567d439e407f9e899c8e408f738937b1e798490676735167009de68b864",
+    "reviewer-test": "d746f948257db911dc9986dd6fe8f10e2a48f0df16fd98da263ffc49c7f5d978",
+    "overlay": "e5535aa1e9738b86477ce56be18c44aabf6c2f8b90188985b374dd84e9d51062",
+    "review-producer": "abc4d7f6d8f39099408a8b77c1ac4767ee6a383698b74bc044c6eca805a37720"
+  },
+  "inputs_after": {
+    "core/textcursor.go": "46102a9a5d4d7bb9c16877c678170d2b2d2c6dfc69d8ef706c51fc7b27457d25",
+    "core/scene.go": "6f5e2cebd0ca614c8f41ef5f6e6931ae11da827253fdefdbb835ea7d63e9a227",
+    "core/sprite.go": "ec2c6b9872a5c6a9a1400ac9f730be8052642f20898a08cbc31c79bafe5b13a7",
+    "core/paint_request.go": "cda8eff4cdffd5377c0bb9b65f80495c8e6c5c61cc02f18d26750ba2fd471904",
+    "core/manual_window.go": "1f3eb4ec53458961edc87998f262116b0444d41a5fb2d2995423b5e764dce06f",
+    "core/manual_timer.go": "992b089f25f4249ee41a778247b88fc542d1034acf8706ce5a2f07ccfad77b80",
+    "core/stages.go": "b7675b84a2dd0541fe28a3ab0d259a0f04981212100f34f233174a9a5c4dd1cd",
+    "go.mod": "5e4b81d96894f4e537da971f36c3bb20a2a1b63af62f25f86f4b0c8e226ae45a",
+    "go.sum": "5b37e567d439e407f9e899c8e408f738937b1e798490676735167009de68b864",
+    "reviewer-test": "d746f948257db911dc9986dd6fe8f10e2a48f0df16fd98da263ffc49c7f5d978",
+    "overlay": "e5535aa1e9738b86477ce56be18c44aabf6c2f8b90188985b374dd84e9d51062",
+    "review-producer": "abc4d7f6d8f39099408a8b77c1ac4767ee6a383698b74bc044c6eca805a37720"
+  },
+  "unchanged": true,
+  "log_sha256": "eb7f3b982a41bce05e6895826f5185107794e9ef2b137e29d68725767641f0cc",
+  "scope": "Synthetic production Scene/Stage/TextField and named Sprite storage only; explicit ManualWindow config clock for blink. No native window, GPU, event loop or GUI. Selected source/dependency-module maps, not full closure.",
+  "source_classification": "ACTUAL_CORRECTED_SOURCE"
+}

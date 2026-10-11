@@ -1,0 +1,54 @@
+{
+  "contract_checks": [
+    "Immutable full-domain input, independent view revisions, strict numeric sorting, cancellation and logical index/working/string budgets match the builder and request APIs.",
+    "Exact private projection admission and final callback/source guards correspond to current source; no domain/source publication occurs before successful admission.",
+    "Ordinary-field settlement delivers the controlled Change before dependent capture, retires older queued snapshots, uses bounded originating-window FIFO admission and preserves cancellation/application shutdown rules.",
+    "Development run, smoke and offscreen workflows agree with the consumer; its future durable report link is not treated as existing qualification evidence.",
+    "Mac milestone, sustained P4/P6/P9 workloads, large-tree workflow, human input/accessibility and public distribution audit remain explicitly unfinished."
+  ],
+  "current_inputs_match_v2": true,
+  "docs": [
+    "README.md",
+    "docs/implementation.md",
+    "docs/development.md",
+    "specs/controls.md",
+    "specs/grid-projection.md",
+    "specs/framework.md",
+    "specs/macos-completion.md"
+  ],
+  "execution": "No tests, GUI, Git, Prism or shared edits. Only this reviewer-owned certificate and inert document snapshots were written.",
+  "findings": [],
+  "history": [
+    {
+      "path": "/private/tmp/vellum-loadedgrid-doc-review/review-v1/review.json",
+      "sha256": "e6dbb3eb1a771c436d0ffe6818bb20aac7a2992f4d62319a0359bf5d037925a8",
+      "status": "Initial read findings; input hash snapshot was captured after the parent corrected documentation. It does not reproduce the earlier wording."
+    },
+    {
+      "path": "/private/tmp/vellum-loadedgrid-doc-review/review-v2/review.json",
+      "sha256": "c0bc1d289248fb53729e0874dab957685ed31d00ea7e932b2cc8d6d4a3ae7e20",
+      "status": "Preliminary verifier used an overly specific literal phrase and returned UNVERIFIED_CORRECTION. That was a reviewer guard mismatch, not a documentation defect; normalized text and source checks now pass."
+    }
+  ],
+  "inputs": "inputs.json",
+  "inputs_sha256": "1d55b63f2ba323bd794120b8e3b233f493278712588f0fb7b3e29160d168ae46",
+  "limits": [
+    "Final source-bound API, loaded-data evidence and Cocoa qualification are separate producer/reviewer records.",
+    "No full macOS, sustained performance, physical IME/VoiceOver or external assistive workflow acceptance is established by this documentation review.",
+    "Logical builder/domain budgets exclude peak process RSS, allocator/native/GPU memory and all concurrently retained source revisions."
+  ],
+  "resolved_findings": [
+    {
+      "evidence": "specs/framework.md:23-27 matches tasks.Start reserved completion admission and worker-plus-owner terminal release.",
+      "id": "completion-reservation-contract"
+    },
+    {
+      "evidence": "specs/controls.md:91-94 states callback-free refusal, matching textfield_settle.go:42 and the repeat settlement guard.",
+      "id": "settled-field-change-required"
+    }
+  ],
+  "result": "APPROVED",
+  "root": "/private/tmp/vellum-grid-loaded",
+  "schema": "vellum-loadedgrid-doc-review-v3",
+  "scope": "Seven documentation files and twelve selected supporting API/runtime files. Read-only contract review; not a dependency closure or test qualification."
+}

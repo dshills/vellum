@@ -34,6 +34,11 @@ type Semantics struct {
 	Number           float32
 	Text, SelectedID string
 }
+
+// fieldChangeEpoch retires queued ordinary Change snapshots only at explicit
+// settlement. Its nonzero size keeps independently allocated identities distinct.
+type fieldChangeEpoch struct{ marker byte }
+
 type controlState struct {
 	a                 *app.Application
 	window            string
@@ -48,6 +53,8 @@ type controlState struct {
 	editor            *editorBinding
 	grid              *gridBinding
 	gridEdit          *gridEditBinding
+	fieldChanges      atomic.Pointer[fieldChangeEpoch]
+	fieldDelivered    string // owner: last delivered value, or controlled value applied by reconciliation
 	fieldState        *core.TextFieldEditingState
 	fieldSelection    *editor.Selection
 	fieldNativeActive atomic.Bool           // native acceptance snapshot; focus callbacks may run outside the application owner
@@ -87,7 +94,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	if err := ui.ValidateControl(r.node); err != nil {
 		return nil, true, err
 	}
-	c := &controlState{a: a, window: window}
+	c := &controlState{a: a, window: window, fieldDelivered: r.node.Text}
 	r.control = c
 	var widget core.Widget
 	gridReturned := false
@@ -113,6 +120,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	case ui.NumberField:
 		widget = core.NewSpinner(parent)
 	case ui.TextField:
+		c.fieldChanges.Store(&fieldChangeEpoch{})
 		c.client = textClientID.Add(1)
 		c.textEpoch = 1
 		field := core.NewTextField(parent)
@@ -224,7 +232,11 @@ func dispatchControl(r *record, e events.Event) {
 	default:
 		return
 	}
+	fieldEpoch := r.control.fieldChanges.Load()
 	postControl(r, func() {
+		if change.Kind == ui.TextField && r.control.fieldChanges.Load() != fieldEpoch {
+			return // explicit settlement already published this field's final value
+		}
 		if r.control.disabled || r.node.Change == nil {
 			requestControlRestore(r)
 			return
@@ -254,6 +266,9 @@ func dispatchControl(r *record, e events.Event) {
 				return
 			}
 			change.Number = value
+		}
+		if change.Kind == ui.TextField {
+			r.control.fieldDelivered = change.Text
 		}
 		r.node.Change(change)
 		r.control.committed = true
@@ -362,6 +377,7 @@ func syncControl(r *record, previous ui.Node) error {
 		}
 		if previous.Text != r.node.Text || committed {
 			w.SetText(r.node.Text)
+			r.control.fieldDelivered = r.node.Text
 		}
 		if r.control.fieldSelection != nil {
 			selection := r.control.fieldSelection

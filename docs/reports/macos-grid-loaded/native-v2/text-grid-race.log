@@ -1,0 +1,460 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestControlRefreshPreservesUncommittedTextAndNumericEditing
+--- PASS: TestControlRefreshPreservesUncommittedTextAndNumericEditing (0.01s)
+=== RUN   TestControlMailboxRefusalAndRemovedQueuedCallbacks
+--- PASS: TestControlMailboxRefusalAndRemovedQueuedCallbacks (0.00s)
+=== RUN   TestRejectedCommittedTextAndNumberRestoreAcceptedModel
+--- PASS: TestRejectedCommittedTextAndNumberRestoreAcceptedModel (0.00s)
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/x
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/i
+--- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue (2.96s)
+    --- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/x (2.96s)
+    --- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/i (0.00s)
+=== RUN   TestManagedEditorCompositionHistoryExactBytes
+--- PASS: TestManagedEditorCompositionHistoryExactBytes (0.00s)
+=== RUN   TestManagedEditorStaleRevisionAndRemount
+--- PASS: TestManagedEditorStaleRevisionAndRemount (0.00s)
+=== RUN   TestManagedEditorLegacyBoundaryPrecedesUndoAndNative
+--- PASS: TestManagedEditorLegacyBoundaryPrecedesUndoAndNative (0.01s)
+=== RUN   TestManagedEditorLargePasteAndCut
+--- PASS: TestManagedEditorLargePasteAndCut (0.02s)
+=== RUN   TestManagedEditorBindingRollbackAndBoundaryRestore
+--- PASS: TestManagedEditorBindingRollbackAndBoundaryRestore (0.00s)
+=== RUN   TestManagedEditorSettlementBoundCancellationRetirementAndAppClose
+--- PASS: TestManagedEditorSettlementBoundCancellationRetirementAndAppClose (0.01s)
+=== RUN   TestManagedEditorExternalGraphemeSelectionMapping
+--- PASS: TestManagedEditorExternalGraphemeSelectionMapping (0.00s)
+=== RUN   TestManagedEditorSettlementCapturesPriorNativeFIFO
+--- PASS: TestManagedEditorSettlementCapturesPriorNativeFIFO (0.00s)
+=== RUN   TestManagedEditorNativeAdmissionStopsAtLogicalWindowClose
+--- PASS: TestManagedEditorNativeAdmissionStopsAtLogicalWindowClose (0.00s)
+=== RUN   TestManagedEditorSameVisibleInstallRetiresPrivatePreedit
+--- PASS: TestManagedEditorSameVisibleInstallRetiresPrivatePreedit (0.00s)
+=== RUN   TestManagedEditorLogicalCloseRefusesAlreadyAdmittedInput
+--- PASS: TestManagedEditorLogicalCloseRefusesAlreadyAdmittedInput (0.00s)
+=== RUN   TestManagedEditorShutdownWaitsForAcceptedNativeCommit
+--- PASS: TestManagedEditorShutdownWaitsForAcceptedNativeCommit (0.00s)
+=== RUN   TestManagedEditorModalBoundaryRegistryRetiresPriorScenes
+--- PASS: TestManagedEditorModalBoundaryRegistryRetiresPriorScenes (0.00s)
+=== RUN   TestManagedEditorNativeBudgetRefusedBeforeAllocation
+--- PASS: TestManagedEditorNativeBudgetRefusedBeforeAllocation (0.00s)
+=== RUN   TestManagedEditorInitialPublicationSurvivesApplicationWake
+--- PASS: TestManagedEditorInitialPublicationSurvivesApplicationWake (0.00s)
+=== RUN   TestManagedTextFieldNativeCompositionControlledChangeAndStaleGuard
+--- PASS: TestManagedTextFieldNativeCompositionControlledChangeAndStaleGuard (0.00s)
+=== RUN   TestManagedEditorNativeMainReadinessDoesNotBlockOwnerOrActivateRetiredWindow
+--- PASS: TestManagedEditorNativeMainReadinessDoesNotBlockOwnerOrActivateRetiredWindow (0.00s)
+=== RUN   TestManagedTextFieldNativeBudgetRefusedBeforeAllocation
+--- PASS: TestManagedTextFieldNativeBudgetRefusedBeforeAllocation (0.00s)
+=== RUN   TestManagedTextFieldOversizedLegacyEditingRestoresControlledValueWithoutChange
+--- PASS: TestManagedTextFieldOversizedLegacyEditingRestoresControlledValueWithoutChange (5.97s)
+=== RUN   TestManagedTextFieldRefreshPreservesPreeditAndQueuedDeltaShadow
+--- PASS: TestManagedTextFieldRefreshPreservesPreeditAndQueuedDeltaShadow (0.00s)
+=== RUN   TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO
+--- PASS: TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO (0.00s)
+=== RUN   TestManagedTextFieldFocusLossRetainsUnmarkAndRefocusSelection
+--- PASS: TestManagedTextFieldFocusLossRetainsUnmarkAndRefocusSelection (0.00s)
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/no-native-client
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/pre-main
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/closed-window
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/retired-field
+--- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/no-native-client (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/pre-main (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/closed-window (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/retired-field (0.00s)
+=== RUN   TestManagedTextFieldFocusLossDoesNotActivateInterveningField
+--- PASS: TestManagedTextFieldFocusLossDoesNotActivateInterveningField (0.00s)
+=== RUN   TestManagedTextFieldRepublishDoesNotTemporarilyDeactivate
+--- PASS: TestManagedTextFieldRepublishDoesNotTemporarilyDeactivate (0.14s)
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff/outgoing
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff/refocused
+--- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff (0.00s)
+    --- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff/outgoing (0.00s)
+    --- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff/refocused (0.00s)
+=== RUN   TestFieldAccessibilityAfterInactiveControlledRefresh
+--- PASS: TestFieldAccessibilityAfterInactiveControlledRefresh (0.00s)
+=== RUN   TestFieldAccessibilityRetainedRefreshPreservesPreview
+--- PASS: TestFieldAccessibilityRetainedRefreshPreservesPreview (0.00s)
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/96
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/120
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/144
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/192
+--- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit (4.57s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/96 (1.31s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/120 (1.28s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/144 (1.03s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/192 (0.95s)
+=== RUN   TestManagedGridInlineOrderedSettleAndCancellation
+--- PASS: TestManagedGridInlineOrderedSettleAndCancellation (0.88s)
+=== RUN   TestManagedGridInlinePreflightBudgetsAndSessionRetirement
+--- PASS: TestManagedGridInlinePreflightBudgetsAndSessionRetirement (0.99s)
+=== RUN   TestManagedGridInlineHiddenDraftSettlesAdmittedInput
+--- PASS: TestManagedGridInlineHiddenDraftSettlesAdmittedInput (0.90s)
+=== RUN   TestManagedGridInlineConflictSealsQueuedMarkedInputAndRestoresHost
+--- PASS: TestManagedGridInlineConflictSealsQueuedMarkedInputAndRestoresHost (1.16s)
+=== RUN   TestManagedGridInlineExpectedOwnerRetirementAndAXReplacement
+--- PASS: TestManagedGridInlineExpectedOwnerRetirementAndAXReplacement (1.04s)
+=== RUN   TestManagedGridInlineEscapeCompositionTabAndDetachedAX
+--- PASS: TestManagedGridInlineEscapeCompositionTabAndDetachedAX (1.24s)
+=== RUN   TestManagedGridInlineSettlementRetiresWithWindowAndApp
+--- PASS: TestManagedGridInlineSettlementRetiresWithWindowAndApp (0.75s)
+=== RUN   TestManagedGridInlineRetainedThemeAndGeometry
+--- PASS: TestManagedGridInlineRetainedThemeAndGeometry (0.95s)
+=== RUN   TestManualCaptureKeepsLiveFieldTextAndDirectionalSelectionCoherent
+--- PASS: TestManualCaptureKeepsLiveFieldTextAndDirectionalSelectionCoherent (0.08s)
+=== RUN   TestReviewFieldSettlementOrdinaryKeyBeforeCallback
+--- PASS: TestReviewFieldSettlementOrdinaryKeyBeforeCallback (0.00s)
+=== RUN   TestReviewFieldSettlementRetiresOlderQueuedChanges
+--- PASS: TestReviewFieldSettlementRetiresOlderQueuedChanges (0.00s)
+=== RUN   TestReviewFieldSettlementMarkedCommitBeforeCallback
+--- PASS: TestReviewFieldSettlementMarkedCommitBeforeCallback (0.00s)
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_context
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_application
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_callback
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/empty_id
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_id
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_window
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/foreign_application
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/multiline_id
+--- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_context (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_application (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_callback (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/empty_id (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_id (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_window (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/foreign_application (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/multiline_id (0.00s)
+=== RUN   TestReviewFieldSettlementSharedCapacityAndRecovery
+--- PASS: TestReviewFieldSettlementSharedCapacityAndRecovery (0.00s)
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding/replacement
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding/window_close
+--- PASS: TestReviewFieldSettlementRetiredAndClosedBinding (0.00s)
+    --- PASS: TestReviewFieldSettlementRetiredAndClosedBinding/replacement (0.00s)
+    --- PASS: TestReviewFieldSettlementRetiredAndClosedBinding/window_close (0.00s)
+=== RUN   TestReviewFieldSettlementChangeCanCloseWindow
+--- PASS: TestReviewFieldSettlementChangeCanCloseWindow (0.00s)
+=== RUN   TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier
+--- PASS: TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier (0.00s)
+=== RUN   TestReviewFieldSettlementAfterOrdinaryDeliveredChange
+--- PASS: TestReviewFieldSettlementAfterOrdinaryDeliveredChange (0.00s)
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection/normalize
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection/reject
+--- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection (0.00s)
+    --- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection/normalize (0.00s)
+    --- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection/reject (0.00s)
+=== RUN   TestControlRefreshPreservesUncommittedTextAndNumericEditing
+--- PASS: TestControlRefreshPreservesUncommittedTextAndNumericEditing (0.00s)
+=== RUN   TestControlMailboxRefusalAndRemovedQueuedCallbacks
+--- PASS: TestControlMailboxRefusalAndRemovedQueuedCallbacks (0.00s)
+=== RUN   TestRejectedCommittedTextAndNumberRestoreAcceptedModel
+--- PASS: TestRejectedCommittedTextAndNumberRestoreAcceptedModel (0.00s)
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/x
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/i
+--- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue (3.15s)
+    --- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/x (3.15s)
+    --- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/i (0.00s)
+=== RUN   TestManagedEditorCompositionHistoryExactBytes
+--- PASS: TestManagedEditorCompositionHistoryExactBytes (0.00s)
+=== RUN   TestManagedEditorStaleRevisionAndRemount
+--- PASS: TestManagedEditorStaleRevisionAndRemount (0.00s)
+=== RUN   TestManagedEditorLegacyBoundaryPrecedesUndoAndNative
+--- PASS: TestManagedEditorLegacyBoundaryPrecedesUndoAndNative (0.00s)
+=== RUN   TestManagedEditorLargePasteAndCut
+--- PASS: TestManagedEditorLargePasteAndCut (0.02s)
+=== RUN   TestManagedEditorBindingRollbackAndBoundaryRestore
+--- PASS: TestManagedEditorBindingRollbackAndBoundaryRestore (0.00s)
+=== RUN   TestManagedEditorSettlementBoundCancellationRetirementAndAppClose
+--- PASS: TestManagedEditorSettlementBoundCancellationRetirementAndAppClose (0.01s)
+=== RUN   TestManagedEditorExternalGraphemeSelectionMapping
+--- PASS: TestManagedEditorExternalGraphemeSelectionMapping (0.00s)
+=== RUN   TestManagedEditorSettlementCapturesPriorNativeFIFO
+--- PASS: TestManagedEditorSettlementCapturesPriorNativeFIFO (0.00s)
+=== RUN   TestManagedEditorNativeAdmissionStopsAtLogicalWindowClose
+--- PASS: TestManagedEditorNativeAdmissionStopsAtLogicalWindowClose (0.00s)
+=== RUN   TestManagedEditorSameVisibleInstallRetiresPrivatePreedit
+--- PASS: TestManagedEditorSameVisibleInstallRetiresPrivatePreedit (0.00s)
+=== RUN   TestManagedEditorLogicalCloseRefusesAlreadyAdmittedInput
+--- PASS: TestManagedEditorLogicalCloseRefusesAlreadyAdmittedInput (0.00s)
+=== RUN   TestManagedEditorShutdownWaitsForAcceptedNativeCommit
+--- PASS: TestManagedEditorShutdownWaitsForAcceptedNativeCommit (0.00s)
+=== RUN   TestManagedEditorModalBoundaryRegistryRetiresPriorScenes
+--- PASS: TestManagedEditorModalBoundaryRegistryRetiresPriorScenes (0.00s)
+=== RUN   TestManagedEditorNativeBudgetRefusedBeforeAllocation
+--- PASS: TestManagedEditorNativeBudgetRefusedBeforeAllocation (0.00s)
+=== RUN   TestManagedEditorInitialPublicationSurvivesApplicationWake
+--- PASS: TestManagedEditorInitialPublicationSurvivesApplicationWake (0.00s)
+=== RUN   TestManagedTextFieldNativeCompositionControlledChangeAndStaleGuard
+--- PASS: TestManagedTextFieldNativeCompositionControlledChangeAndStaleGuard (0.00s)
+=== RUN   TestManagedEditorNativeMainReadinessDoesNotBlockOwnerOrActivateRetiredWindow
+--- PASS: TestManagedEditorNativeMainReadinessDoesNotBlockOwnerOrActivateRetiredWindow (0.00s)
+=== RUN   TestManagedTextFieldNativeBudgetRefusedBeforeAllocation
+--- PASS: TestManagedTextFieldNativeBudgetRefusedBeforeAllocation (0.00s)
+=== RUN   TestManagedTextFieldOversizedLegacyEditingRestoresControlledValueWithoutChange
+--- PASS: TestManagedTextFieldOversizedLegacyEditingRestoresControlledValueWithoutChange (6.27s)
+=== RUN   TestManagedTextFieldRefreshPreservesPreeditAndQueuedDeltaShadow
+--- PASS: TestManagedTextFieldRefreshPreservesPreeditAndQueuedDeltaShadow (0.00s)
+=== RUN   TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO
+--- PASS: TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO (0.00s)
+=== RUN   TestManagedTextFieldFocusLossRetainsUnmarkAndRefocusSelection
+--- PASS: TestManagedTextFieldFocusLossRetainsUnmarkAndRefocusSelection (0.00s)
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/no-native-client
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/pre-main
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/closed-window
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/retired-field
+--- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/no-native-client (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/pre-main (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/closed-window (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/retired-field (0.00s)
+=== RUN   TestManagedTextFieldFocusLossDoesNotActivateInterveningField
+--- PASS: TestManagedTextFieldFocusLossDoesNotActivateInterveningField (0.00s)
+=== RUN   TestManagedTextFieldRepublishDoesNotTemporarilyDeactivate
+--- PASS: TestManagedTextFieldRepublishDoesNotTemporarilyDeactivate (0.13s)
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff/outgoing
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff/refocused
+--- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff (0.00s)
+    --- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff/outgoing (0.00s)
+    --- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff/refocused (0.00s)
+=== RUN   TestFieldAccessibilityAfterInactiveControlledRefresh
+--- PASS: TestFieldAccessibilityAfterInactiveControlledRefresh (0.00s)
+=== RUN   TestFieldAccessibilityRetainedRefreshPreservesPreview
+--- PASS: TestFieldAccessibilityRetainedRefreshPreservesPreview (0.00s)
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/96
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/120
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/144
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/192
+--- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit (4.42s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/96 (1.32s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/120 (1.16s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/144 (1.00s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/192 (0.94s)
+=== RUN   TestManagedGridInlineOrderedSettleAndCancellation
+--- PASS: TestManagedGridInlineOrderedSettleAndCancellation (0.91s)
+=== RUN   TestManagedGridInlinePreflightBudgetsAndSessionRetirement
+--- PASS: TestManagedGridInlinePreflightBudgetsAndSessionRetirement (1.03s)
+=== RUN   TestManagedGridInlineHiddenDraftSettlesAdmittedInput
+--- PASS: TestManagedGridInlineHiddenDraftSettlesAdmittedInput (0.96s)
+=== RUN   TestManagedGridInlineConflictSealsQueuedMarkedInputAndRestoresHost
+--- PASS: TestManagedGridInlineConflictSealsQueuedMarkedInputAndRestoresHost (1.08s)
+=== RUN   TestManagedGridInlineExpectedOwnerRetirementAndAXReplacement
+--- PASS: TestManagedGridInlineExpectedOwnerRetirementAndAXReplacement (1.01s)
+=== RUN   TestManagedGridInlineEscapeCompositionTabAndDetachedAX
+--- PASS: TestManagedGridInlineEscapeCompositionTabAndDetachedAX (1.22s)
+=== RUN   TestManagedGridInlineSettlementRetiresWithWindowAndApp
+--- PASS: TestManagedGridInlineSettlementRetiresWithWindowAndApp (0.76s)
+=== RUN   TestManagedGridInlineRetainedThemeAndGeometry
+--- PASS: TestManagedGridInlineRetainedThemeAndGeometry (0.96s)
+=== RUN   TestManualCaptureKeepsLiveFieldTextAndDirectionalSelectionCoherent
+--- PASS: TestManualCaptureKeepsLiveFieldTextAndDirectionalSelectionCoherent (0.08s)
+=== RUN   TestReviewFieldSettlementOrdinaryKeyBeforeCallback
+--- PASS: TestReviewFieldSettlementOrdinaryKeyBeforeCallback (0.00s)
+=== RUN   TestReviewFieldSettlementRetiresOlderQueuedChanges
+--- PASS: TestReviewFieldSettlementRetiresOlderQueuedChanges (0.00s)
+=== RUN   TestReviewFieldSettlementMarkedCommitBeforeCallback
+--- PASS: TestReviewFieldSettlementMarkedCommitBeforeCallback (0.00s)
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_context
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_application
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_callback
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/empty_id
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_id
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_window
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/foreign_application
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/multiline_id
+--- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_context (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_application (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_callback (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/empty_id (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_id (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_window (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/foreign_application (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/multiline_id (0.00s)
+=== RUN   TestReviewFieldSettlementSharedCapacityAndRecovery
+--- PASS: TestReviewFieldSettlementSharedCapacityAndRecovery (0.00s)
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding/replacement
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding/window_close
+--- PASS: TestReviewFieldSettlementRetiredAndClosedBinding (0.00s)
+    --- PASS: TestReviewFieldSettlementRetiredAndClosedBinding/replacement (0.00s)
+    --- PASS: TestReviewFieldSettlementRetiredAndClosedBinding/window_close (0.00s)
+=== RUN   TestReviewFieldSettlementChangeCanCloseWindow
+--- PASS: TestReviewFieldSettlementChangeCanCloseWindow (0.00s)
+=== RUN   TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier
+--- PASS: TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier (0.00s)
+=== RUN   TestReviewFieldSettlementAfterOrdinaryDeliveredChange
+--- PASS: TestReviewFieldSettlementAfterOrdinaryDeliveredChange (0.00s)
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection/normalize
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection/reject
+--- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection (0.00s)
+    --- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection/normalize (0.00s)
+    --- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection/reject (0.00s)
+=== RUN   TestControlRefreshPreservesUncommittedTextAndNumericEditing
+--- PASS: TestControlRefreshPreservesUncommittedTextAndNumericEditing (0.00s)
+=== RUN   TestControlMailboxRefusalAndRemovedQueuedCallbacks
+--- PASS: TestControlMailboxRefusalAndRemovedQueuedCallbacks (0.00s)
+=== RUN   TestRejectedCommittedTextAndNumberRestoreAcceptedModel
+--- PASS: TestRejectedCommittedTextAndNumberRestoreAcceptedModel (0.00s)
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/x
+=== RUN   TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/i
+--- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue (3.12s)
+    --- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/x (3.11s)
+    --- PASS: TestManagedTextFieldNativeRetirementIndependentOfRefusedLegacyValue/i (0.00s)
+=== RUN   TestManagedEditorCompositionHistoryExactBytes
+--- PASS: TestManagedEditorCompositionHistoryExactBytes (0.00s)
+=== RUN   TestManagedEditorStaleRevisionAndRemount
+--- PASS: TestManagedEditorStaleRevisionAndRemount (0.00s)
+=== RUN   TestManagedEditorLegacyBoundaryPrecedesUndoAndNative
+--- PASS: TestManagedEditorLegacyBoundaryPrecedesUndoAndNative (0.00s)
+=== RUN   TestManagedEditorLargePasteAndCut
+--- PASS: TestManagedEditorLargePasteAndCut (0.01s)
+=== RUN   TestManagedEditorBindingRollbackAndBoundaryRestore
+--- PASS: TestManagedEditorBindingRollbackAndBoundaryRestore (0.00s)
+=== RUN   TestManagedEditorSettlementBoundCancellationRetirementAndAppClose
+--- PASS: TestManagedEditorSettlementBoundCancellationRetirementAndAppClose (0.01s)
+=== RUN   TestManagedEditorExternalGraphemeSelectionMapping
+--- PASS: TestManagedEditorExternalGraphemeSelectionMapping (0.00s)
+=== RUN   TestManagedEditorSettlementCapturesPriorNativeFIFO
+--- PASS: TestManagedEditorSettlementCapturesPriorNativeFIFO (0.00s)
+=== RUN   TestManagedEditorNativeAdmissionStopsAtLogicalWindowClose
+--- PASS: TestManagedEditorNativeAdmissionStopsAtLogicalWindowClose (0.00s)
+=== RUN   TestManagedEditorSameVisibleInstallRetiresPrivatePreedit
+--- PASS: TestManagedEditorSameVisibleInstallRetiresPrivatePreedit (0.00s)
+=== RUN   TestManagedEditorLogicalCloseRefusesAlreadyAdmittedInput
+--- PASS: TestManagedEditorLogicalCloseRefusesAlreadyAdmittedInput (0.00s)
+=== RUN   TestManagedEditorShutdownWaitsForAcceptedNativeCommit
+--- PASS: TestManagedEditorShutdownWaitsForAcceptedNativeCommit (0.00s)
+=== RUN   TestManagedEditorModalBoundaryRegistryRetiresPriorScenes
+--- PASS: TestManagedEditorModalBoundaryRegistryRetiresPriorScenes (0.00s)
+=== RUN   TestManagedEditorNativeBudgetRefusedBeforeAllocation
+--- PASS: TestManagedEditorNativeBudgetRefusedBeforeAllocation (0.00s)
+=== RUN   TestManagedEditorInitialPublicationSurvivesApplicationWake
+--- PASS: TestManagedEditorInitialPublicationSurvivesApplicationWake (0.00s)
+=== RUN   TestManagedTextFieldNativeCompositionControlledChangeAndStaleGuard
+--- PASS: TestManagedTextFieldNativeCompositionControlledChangeAndStaleGuard (0.00s)
+=== RUN   TestManagedEditorNativeMainReadinessDoesNotBlockOwnerOrActivateRetiredWindow
+--- PASS: TestManagedEditorNativeMainReadinessDoesNotBlockOwnerOrActivateRetiredWindow (0.00s)
+=== RUN   TestManagedTextFieldNativeBudgetRefusedBeforeAllocation
+--- PASS: TestManagedTextFieldNativeBudgetRefusedBeforeAllocation (0.00s)
+=== RUN   TestManagedTextFieldOversizedLegacyEditingRestoresControlledValueWithoutChange
+--- PASS: TestManagedTextFieldOversizedLegacyEditingRestoresControlledValueWithoutChange (6.31s)
+=== RUN   TestManagedTextFieldRefreshPreservesPreeditAndQueuedDeltaShadow
+--- PASS: TestManagedTextFieldRefreshPreservesPreeditAndQueuedDeltaShadow (0.00s)
+=== RUN   TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO
+--- PASS: TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO (0.00s)
+=== RUN   TestManagedTextFieldFocusLossRetainsUnmarkAndRefocusSelection
+--- PASS: TestManagedTextFieldFocusLossRetainsUnmarkAndRefocusSelection (0.00s)
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/no-native-client
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/pre-main
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/closed-window
+=== RUN   TestManagedTextFieldFocusLossFallbackAndRetirement/retired-field
+--- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/no-native-client (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/pre-main (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/closed-window (0.00s)
+    --- PASS: TestManagedTextFieldFocusLossFallbackAndRetirement/retired-field (0.00s)
+=== RUN   TestManagedTextFieldFocusLossDoesNotActivateInterveningField
+--- PASS: TestManagedTextFieldFocusLossDoesNotActivateInterveningField (0.00s)
+=== RUN   TestManagedTextFieldRepublishDoesNotTemporarilyDeactivate
+--- PASS: TestManagedTextFieldRepublishDoesNotTemporarilyDeactivate (0.16s)
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff/outgoing
+=== RUN   TestFieldAccessibilityAfterCoalescedFocusHandoff/refocused
+--- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff (0.00s)
+    --- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff/outgoing (0.00s)
+    --- PASS: TestFieldAccessibilityAfterCoalescedFocusHandoff/refocused (0.00s)
+=== RUN   TestFieldAccessibilityAfterInactiveControlledRefresh
+--- PASS: TestFieldAccessibilityAfterInactiveControlledRefresh (0.00s)
+=== RUN   TestFieldAccessibilityRetainedRefreshPreservesPreview
+--- PASS: TestFieldAccessibilityRetainedRefreshPreservesPreview (0.00s)
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/96
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/120
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/144
+=== RUN   TestManagedGridInlineActualFieldGeometryDraftAndCommit/192
+--- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit (4.45s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/96 (1.34s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/120 (1.16s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/144 (1.02s)
+    --- PASS: TestManagedGridInlineActualFieldGeometryDraftAndCommit/192 (0.93s)
+=== RUN   TestManagedGridInlineOrderedSettleAndCancellation
+--- PASS: TestManagedGridInlineOrderedSettleAndCancellation (0.90s)
+=== RUN   TestManagedGridInlinePreflightBudgetsAndSessionRetirement
+--- PASS: TestManagedGridInlinePreflightBudgetsAndSessionRetirement (1.02s)
+=== RUN   TestManagedGridInlineHiddenDraftSettlesAdmittedInput
+--- PASS: TestManagedGridInlineHiddenDraftSettlesAdmittedInput (0.94s)
+=== RUN   TestManagedGridInlineConflictSealsQueuedMarkedInputAndRestoresHost
+--- PASS: TestManagedGridInlineConflictSealsQueuedMarkedInputAndRestoresHost (1.08s)
+=== RUN   TestManagedGridInlineExpectedOwnerRetirementAndAXReplacement
+--- PASS: TestManagedGridInlineExpectedOwnerRetirementAndAXReplacement (1.02s)
+=== RUN   TestManagedGridInlineEscapeCompositionTabAndDetachedAX
+--- PASS: TestManagedGridInlineEscapeCompositionTabAndDetachedAX (1.24s)
+=== RUN   TestManagedGridInlineSettlementRetiresWithWindowAndApp
+--- PASS: TestManagedGridInlineSettlementRetiresWithWindowAndApp (0.75s)
+=== RUN   TestManagedGridInlineRetainedThemeAndGeometry
+--- PASS: TestManagedGridInlineRetainedThemeAndGeometry (0.94s)
+=== RUN   TestManualCaptureKeepsLiveFieldTextAndDirectionalSelectionCoherent
+--- PASS: TestManualCaptureKeepsLiveFieldTextAndDirectionalSelectionCoherent (0.08s)
+=== RUN   TestReviewFieldSettlementOrdinaryKeyBeforeCallback
+--- PASS: TestReviewFieldSettlementOrdinaryKeyBeforeCallback (0.00s)
+=== RUN   TestReviewFieldSettlementRetiresOlderQueuedChanges
+--- PASS: TestReviewFieldSettlementRetiresOlderQueuedChanges (0.00s)
+=== RUN   TestReviewFieldSettlementMarkedCommitBeforeCallback
+--- PASS: TestReviewFieldSettlementMarkedCommitBeforeCallback (0.00s)
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_context
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_application
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/nil_callback
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/empty_id
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_id
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_window
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/foreign_application
+=== RUN   TestReviewFieldSettlementArgumentAndScopeRefusals/multiline_id
+--- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_context (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_application (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/nil_callback (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/empty_id (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_id (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/unknown_window (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/foreign_application (0.00s)
+    --- PASS: TestReviewFieldSettlementArgumentAndScopeRefusals/multiline_id (0.00s)
+=== RUN   TestReviewFieldSettlementSharedCapacityAndRecovery
+--- PASS: TestReviewFieldSettlementSharedCapacityAndRecovery (0.00s)
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding/replacement
+=== RUN   TestReviewFieldSettlementRetiredAndClosedBinding/window_close
+--- PASS: TestReviewFieldSettlementRetiredAndClosedBinding (0.00s)
+    --- PASS: TestReviewFieldSettlementRetiredAndClosedBinding/replacement (0.00s)
+    --- PASS: TestReviewFieldSettlementRetiredAndClosedBinding/window_close (0.00s)
+=== RUN   TestReviewFieldSettlementChangeCanCloseWindow
+--- PASS: TestReviewFieldSettlementChangeCanCloseWindow (0.00s)
+=== RUN   TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier
+--- PASS: TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier (0.00s)
+=== RUN   TestReviewFieldSettlementAfterOrdinaryDeliveredChange
+--- PASS: TestReviewFieldSettlementAfterOrdinaryDeliveredChange (0.00s)
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection/normalize
+=== RUN   TestReviewFieldSettlementControlledNormalizationOrRejection/reject
+--- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection (0.00s)
+    --- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection/normalize (0.00s)
+    --- PASS: TestReviewFieldSettlementControlledNormalizationOrRejection/reject (0.00s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	67.458s

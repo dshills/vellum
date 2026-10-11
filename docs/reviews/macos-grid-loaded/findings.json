@@ -1,0 +1,148 @@
+{
+  "schema": "vellum-prism-adjudication-v1",
+  "result": "RESOLVED",
+  "scope": "Separate source-backed internal adjudication of one preserved Prism batch; raw Prism exit/findings are not rewritten.",
+  "raw_report": {
+    "path": "docs/reviews/macos-grid-loaded/prism.json",
+    "sha256": "ac83fca848898c57ef83ba3435f316ed8d73e8ccd159d067032a2442b3eceece",
+    "bytes": 6820
+  },
+  "raw_process": {
+    "path": "docs/reviews/macos-grid-loaded/prism-process.json",
+    "sha256": "ab1c71a5fbeda3679927c5a9a74d929d62b6f7b27204ada0e80846ab7688d06f",
+    "bytes": 2266
+  },
+  "input_record": {
+    "path": "docs/reviews/macos-grid-loaded/prism-inputs.json",
+    "sha256": "4de37607839a833e99b1ebf48fc286e2101adc339ed43fdf2b33df9b4dec5c5f",
+    "bytes": 5335
+  },
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "raw_exit_code": 1,
+  "raw_counts": {
+    "low": 0,
+    "medium": 3,
+    "high": 1
+  },
+  "dispositions": [
+    {
+      "id": "0b7707f851577341",
+      "status": "REFUTED",
+      "reason": "Editable is the user editing capability, not an immutable domain update prohibition. edited is the bounded worker domain candidate constructor intentionally shared by user saves and explicit External +1. User Begin checks Editable before any worker admission; Prepare/Complete also check read-only. External domain updates can change column0 while it remains user read-only. Rejecting column0 in shared edited would disable the declared external-update workflow.",
+      "source_facts": [
+        {
+          "path": "examples/loadedgrid/source.go",
+          "start": 153,
+          "end": 160,
+          "detail": "EditCell exposes Editable only for columns other than0."
+        },
+        {
+          "path": "virtual/grid_edit.go",
+          "start": 227,
+          "end": 257,
+          "detail": "Begin refuses read-only before creating draft."
+        },
+        {
+          "path": "examples/loadedgrid/model.go",
+          "start": 544,
+          "end": 612,
+          "detail": "Explicit external update captures active identity/version, creates immutable worker candidate, then replaces accepted source before domain pointer."
+        }
+      ],
+      "tests": [
+        "TestPrismReadOnlyUserRefusalAndExternalImmutableUpdate"
+      ],
+      "observations": "Column0 Begin returns ErrGridEditReadOnly; Prepare/Save have no draft, Grid.State/source/executor ledger unchanged, and no task/array copy occurs. Explicit External +1 then succeeds through worker and owner terminals, increments domain/cell version, uses fresh array backing, preserves old immutable value and keeps Editable=false; user Begin still refuses afterward.",
+      "disposition": "REFUTED",
+      "independent_review": {
+        "path": "docs/reviews/macos-grid-loaded/prism-consumer-v1/adjudication.json",
+        "sha256": "c17294ef7d81e0fb09cc5c0a3857f9d4d37c7977491dd9c8a8467cd21af8c747",
+        "bytes": 3810
+      }
+    },
+    {
+      "actual_line": "r := GridProjectionRequest{token: &gridRefToken{}, stamp: stamp, input: input}",
+      "compile_and_runtime_proof": "final-green/qualification.json",
+      "disposition": "REFUTED",
+      "id": "2364d22065daef23",
+      "rationale": "Actual Go source line52 contains a valid token field initialization. [REDACTED] appears in Prism presentation evidence, not the source. Current source hash matches previously independently qualified implementation and compiles in final race20. No production edit is warranted.",
+      "source": "virtual/grid_projection_request.go:52",
+      "source_sha256": "c9a08279f5d46d3febce6bf8418bd38f2cf9506a795ef57e698ac355bd6f3390",
+      "independent_review": {
+        "path": "docs/reviews/macos-grid-loaded/prism-portable-v1/review.json",
+        "sha256": "44447a42595fbaf5c41e44a93c80d8c8da36723cc2ef4189af8fbc7fe91c61c7",
+        "bytes": 4081
+      }
+    },
+    {
+      "id": "829992bcdc6d8a30",
+      "status": "REFUTED",
+      "reason": "PrepareEdit validates current source/draft and returns a copied proposal using the already-existing draft token; it does not register an outstanding exclusive request or mutate Grid. There is no edit-request cleanup API because there is no registered prepared request. Cancel work preserves the draft and lets task worker/delivery cleanup refund credits.",
+      "source_facts": [
+        {
+          "path": "virtual/grid_edit.go",
+          "start": 61,
+          "end": 68,
+          "detail": "Copyable proposal without source/Grid backpointer."
+        },
+        {
+          "path": "virtual/grid_edit.go",
+          "start": 308,
+          "end": 328,
+          "detail": "Validation and returned token/state/stamp only; no Grid assignment."
+        },
+        {
+          "path": "examples/loadedgrid/model.go",
+          "start": 473,
+          "end": 542,
+          "detail": "Prepare before tasks.Start; source pointer only after CompleteEdit."
+        }
+      ],
+      "tests": [
+        "TestPrismCanceledEditCanSaveAfterDualTerminalDrain",
+        "TestPrismRefusedEditStartCanRetrySameDraft"
+      ],
+      "observations": "Repeated Prepare returns identical proposals without Grid.State change. Cancelled admitted edit retains worker credit until explicit worker and owner terminals, preserves source and exact draft, then Save accepts. Refused executor Submit starts no job, refunds all credits and leaves draft preparable; same-draft Save retry succeeds. Both run owner batches1/7/64.",
+      "disposition": "REFUTED",
+      "independent_review": {
+        "path": "docs/reviews/macos-grid-loaded/prism-consumer-v1/adjudication.json",
+        "sha256": "c17294ef7d81e0fb09cc5c0a3857f9d4d37c7977491dd9c8a8467cd21af8c747",
+        "bytes": 3810
+      }
+    },
+    {
+      "counterfactual_proof": "counterfactual-red/qualification.json",
+      "disposition": "FIXED_TEST_ONLY",
+      "final_proof": "final-green/qualification.json",
+      "historical_prior_proof": "historical-prior-test/qualification.json",
+      "historical_prior_test_sha256": "8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d",
+      "id": "dfe84756757701b9",
+      "rationale": "The previous >=4/exact4 edit callback count was a maintainability defect. The fixture now records candidate proof, subsequent live edit-request proof, then candidate revalidation. Only subsequent live RowCount drifts candidate full input; no exact count is assumed. Atomic source/draft/generation/pending-request assertions and ErrGridSource remain unchanged.",
+      "independent_review": {
+        "path": "docs/reviews/macos-grid-loaded/prism-portable-v1/review.json",
+        "sha256": "44447a42595fbaf5c41e44a93c80d8c8da36723cc2ef4189af8fbc7fe91c61c7",
+        "bytes": 4081
+      }
+    }
+  ],
+  "production_changes_after_prism": [],
+  "test_changes_after_prism": [
+    {
+      "path": "virtual/projection_edit_review_test.go",
+      "before_sha256": "8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d",
+      "after_sha256": "fea7d89b188f013aedc529d14a2ee67e1819fc463119ed0bb1bc4d74f403f284",
+      "reason": "Semantic validation phases replace exact proof-call count; author test installed byte-identically and final core-v2 qualification passes."
+    }
+  ],
+  "remaining_findings": [],
+  "post_prism_metadata": [
+    "docs/reports/macos-grid-loaded/README.md",
+    "docs/reviews/macos-grid-loaded/README.md",
+    "final archived review/proof/qualification records"
+  ],
+  "limits": [
+    "Focused overlay regressions do not establish native performance, physical input or complete Mac acceptance.",
+    "No second Prism batch for unchanged production; final metadata and the test-only delta receive internal review."
+  ]
+}

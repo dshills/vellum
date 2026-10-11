@@ -1,0 +1,47 @@
+"""Focused Prism adjudication overlays; no shared source mutation or native run."""
+import hashlib,json,pathlib,shlex,subprocess,sys,time
+BASE=pathlib.Path(__file__).resolve().parent
+ROOT=pathlib.Path('/private/tmp/vellum-grid-loaded')
+MODULE=ROOT/'examples/loadedgrid'
+PRIOR=pathlib.Path('/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/qualification.json')
+FROZEN=pathlib.Path('/private/tmp/vellum-grid-loaded-consumer-qualification/consumer-freeze-v1.json')
+PRISM=ROOT/'docs/reviews/macos-grid-loaded/prism.json'
+sys.path.insert(0,str(ROOT/'scripts'))
+from child_process import run_child
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+prior=json.loads(PRIOR.read_bytes())
+def inputs():
+ result={}
+ for section,old in prior['after'].items():
+  result[section]={}
+  base=ROOT
+  if section=='owned':base=MODULE
+  if section=='prepared':base=ROOT/'drivers/cogent/build'
+  for name in old:
+   p=base/name
+   if section=='qualification' and name=='qualify.py':p=pathlib.Path(prior['producer']['path'])
+   result[section][name]=sha(p)
+ result['adjudication']={p.name:sha(p) for p in (BASE/'adjudication_test.go',BASE/'overlay.json',pathlib.Path(__file__))}
+ return result
+before=inputs();assert before['owned']==prior['after']['owned']
+(BASE/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+(BASE/'adjudication_test.go.txt').write_bytes((BASE/'adjudication_test.go').read_bytes())
+(BASE/'run_adjudication.py.txt').write_bytes(pathlib.Path(__file__).read_bytes())
+checks=[]
+for name in ['TestPrismCanceledEditCanSaveAfterDualTerminalDrain','TestPrismRefusedEditStartCanRetrySameDraft','TestPrismReadOnlyUserRefusalAndExternalImmutableUpdate']:
+ cmd=['go','test','-race','-count=20','-v','-overlay',str(BASE/'overlay.json'),'-run','^'+name+'$','.']
+ argv=['/bin/zsh','-c','export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+shlex.quote(str(ROOT/'drivers/cogent/env.sh'))+'\nexec '+shlex.join(cmd)]
+ path=BASE/(name+'.log');start=time.monotonic();code,error,timeout=-1,None,False
+ print('START',name,flush=True)
+ with path.open('wb') as log:
+  log.write(('argv: '+json.dumps(argv)+'\ncwd: '+str(MODULE)+'\n').encode());log.flush()
+  try:code=run_child(argv,cwd=MODULE,stdout=log,stderr=subprocess.STDOUT,timeout=120).returncode
+  except subprocess.TimeoutExpired:code,timeout=124,True
+  except Exception as e:error=repr(e);log.write(('runner-error: '+error+'\n').encode())
+ checks.append({'name':name,'command':cmd,'argv':argv,'cwd':str(MODULE),'exit_code':code,'timed_out':timeout,'runner_error':error,'elapsed_seconds':round(time.monotonic()-start,3),'log':str(path),'log_sha256':sha(path)})
+ (BASE/'checks.json').write_text(json.dumps(checks,indent=2)+'\n');print('END',json.dumps(checks[-1]),flush=True)
+ if code:break
+after=inputs()
+proof={'scope':'Focused controller/domain overlay regression only. No shared-source edits, native/GUI run, native settlement proof, full suite or broader dependency closure. Held acknowledgment occurs explicitly under owner control.','findings':['829992bcdc6d8a30','0b7707f851577341'],'prior_final_cpu_proof':{'path':str(PRIOR),'sha256':sha(PRIOR)},'frozen_owned':{'path':str(FROZEN),'sha256':sha(FROZEN)},'prism':{'path':str(PRISM),'sha256':sha(PRISM)},'before':before,'after':after,'unchanged':before==after,'counts':{k:len(v) for k,v in before.items()},'checks':checks}
+proof['result']='PASS' if proof['unchanged'] and len(checks)==3 and all(x['exit_code']==0 and not x['timed_out'] and x['runner_error'] is None for x in checks) else 'FAIL'
+p=BASE/'qualification.json';p.write_text(json.dumps(proof,indent=2)+'\n');print('PROOF',p,sha(p),proof['result'],flush=True);sys.exit(0 if proof['result']=='PASS' else 1)

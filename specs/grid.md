@@ -3,7 +3,8 @@
 This independent portable checkpoint adds a `virtual.Grid` without changing
 `Table`, `Tree`, or their source interfaces. It qualifies bounded projection,
 geometry and identity behavior. Subsequent [cell drafts](grid-editing.md) add
-versioned edit admission. This portable evidence does not qualify native
+versioned edit admission; [worker-built views](grid-projection.md) add cancellable
+loaded sorting/filtering indexes and separate domain/view revisions. This portable evidence does not qualify native
 rendering, frame performance, accessibility, tree indexing, or completion of P6.
 
 ## Domain source and ownership
@@ -18,6 +19,8 @@ restart its revision. Reusing an incarnation for different domain entities is a
 source contract violation.
 
 The caller serializes a Grid, its source mutation, and all calls on one owner.
+Worker-built projection inputs must instead remain immutable for their entire
+lifetime and support concurrent reads, as specified in [grid projections](grid-projection.md).
 Independent Grids may run on independent owners; there is no package-global
 state. This is not a concurrent mutable-source API. Metadata must be O(1), RowKey
 must be direct indexed access, and IndexOf must use a prepared O(1) or O(log N)

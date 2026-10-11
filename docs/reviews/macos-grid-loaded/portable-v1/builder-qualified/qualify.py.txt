@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Focused portable projection qualification, without native/prepared mutation."""
+from pathlib import Path
+import hashlib, json, os, sys, time
+ROOT = Path('/private/tmp/vellum-grid-loaded')
+OUT = Path('/private/tmp/vellum-grid-projection-builder/qualified-v1')
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(ROOT))
+from scripts.child_process import run_child
+
+def sha(data): return hashlib.sha256(data).hexdigest()
+def write(name, value):
+    p = OUT / name
+    p.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    return sha(p.read_bytes())
+def inputs():
+    paths = sorted(str(p.relative_to(ROOT)) for p in (ROOT / 'virtual').glob('*.go'))
+    paths += ['go.mod', 'go.sum', 'scripts/child_process.py']
+    return {p: sha((ROOT/p).read_bytes()) if (ROOT/p).is_file() else None for p in paths}
+OUT.mkdir(parents=True, exist_ok=True)
+before = inputs()
+before_sha = write('inputs-before.json', before)
+env = dict(os.environ)
+env.update(GOENV='off', GOWORK='off', GOTOOLCHAIN='local', GOFLAGS='',
+           GOCACHE='/private/tmp/vellum-grid-loaded-portable-cache', PYTHONDONTWRITEBYTECODE='1')
+commands = [(['go', 'version'], 'go-version.log'),
+            (['go', 'test', '-race', '-count=3', '-run', '^TestGridProjection', './virtual'], 'projection-race.log'),
+            (['go', 'vet', './virtual'], 'virtual-vet.log')]
+checks=[]
+for args, name in commands:
+    start=time.monotonic()
+    with (OUT/name).open('xb') as stream:
+        completed=run_child(args, timeout=120, cwd=ROOT, env=env, stdout=stream, stderr=stream)
+    checks.append({'argv': args, 'cwd': str(ROOT), 'exit_code': completed.returncode,
+                   'elapsed_seconds': round(time.monotonic()-start, 6),
+                   'log': name, 'log_sha256': sha((OUT/name).read_bytes())})
+    if completed.returncode: break
+after = inputs()
+after_sha = write('inputs-after.json', after)
+changed={p: {'before': before.get(p), 'after': after.get(p)} for p in set(before)|set(after) if before.get(p)!=after.get(p)}
+record = {
+    'schema': 'vellum-grid-projection-builder-qualification-v1',
+    'result': 'PASS' if len(checks)==3 and all(c['exit_code']==0 for c in checks) and not changed else 'FAIL',
+    'root': str(ROOT), 'producer': str(Path(__file__).resolve()),
+    'producer_sha256': sha(Path(__file__).read_bytes()),
+    'owned_map': 'owned-files.json', 'owned_map_sha256': sha((OUT/'owned-files.json').read_bytes()),
+    'inputs_before': 'inputs-before.json', 'inputs_before_sha256': before_sha,
+    'inputs_after': 'inputs-after.json', 'inputs_after_sha256': after_sha,
+    'input_count': len(before), 'changed_inputs': changed,
+    'input_scope': 'All virtual package Go implementation/tests, root module files (go.sum explicitly absent), and bounded child helper. This is selected portable package provenance, not a complete toolchain or native dependency closure.',
+    'environment': {k:env[k] for k in ('GOENV','GOWORK','GOTOOLCHAIN','GOFLAGS','GOCACHE','PYTHONDONTWRITEBYTECODE')},
+    'checks': checks,
+    'limits': 'Focused portable builder/request race tests and virtual vet only; no native/UI/GUI, sustained memory/latency, or full framework acceptance.',
+    'exploratory': [{'path': '/private/tmp/vellum-grid-projection-exploratory-'+str(i)+'.log',
+                     'sha256': sha(Path('/private/tmp/vellum-grid-projection-exploratory-'+str(i)+'.log').read_bytes()),
+                     'scope': 'Exploratory focused test output; no before/after input binding; historical earlier source versions except final exploratory3.'} for i in (1,2,3)]
+}
+record_sha=write('qualification.json', record)
+print(json.dumps({'result':record['result'], 'qualification':str(OUT/'qualification.json'),
+                  'sha256':record_sha, 'input_count':len(before), 'checks':checks, 'changed_inputs':changed}, indent=2))

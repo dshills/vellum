@@ -1,0 +1,65 @@
+{
+  "result": "PASS",
+  "scope": "Mechanical handoff/current selected source, compiler and binary identity plus exact UTF8 log roundtrip/archive verification; no rerun or broader source closure.",
+  "handoff": "/private/tmp/vellum-grid-loaded-consumer-qualification/handoff-v2",
+  "manifest_sha256": "9a40d4283d532efa1631a624b8ab7e42e7ee3fe61c73c12769c54a7c9a88d85f",
+  "archive": "/private/tmp/vellum-grid-loaded-consumer-qualification/handoff-v2.tar.gz",
+  "archive_sha256": "0a7fe4b0754c06af5029422d3f489f90b75d483eb699b1159e35776daffb315a",
+  "files": 35,
+  "raw_logs": 26,
+  "source_counts": {
+    "owned": 11,
+    "root_packages": 94,
+    "native": 219,
+    "prepared": 6121,
+    "qualification": 2,
+    "unchanged_grid_example": 16
+  },
+  "cpu_proof_sha256": "0dcfd06888d449b0f19999fc143ae5b81be766517d56d67f5d91f4ac71a2e690",
+  "native_proof_sha256": "ce94130a3aae3f8b39e27bed4cc239cdb908e9133b0b94b76ccbc5cc77225cc5",
+  "binary": {
+    "path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/loadedgrid-desktop",
+    "sha256": "9b4c4dcce17d1d3fed1c67b94aae1258f18cdc98dc4effca556df9ed7034bba9"
+  },
+  "prepared_cursor": {
+    "upstream/core/scene.go": "6f5e2cebd0ca614c8f41ef5f6e6931ae11da827253fdefdbb835ea7d63e9a227",
+    "upstream/core/textcursor.go": "46102a9a5d4d7bb9c16877c678170d2b2d2c6dfc69d8ef706c51fc7b27457d25"
+  },
+  "checks": [
+    {
+      "name": "portable-race20",
+      "exit_code": 0,
+      "log_sha256": "fe8e852ac02e451d98b2db272c5869571499b447b31035b32e27f2aa66626c29"
+    },
+    {
+      "name": "offscreen-all-race1",
+      "exit_code": 0,
+      "log_sha256": "9bf5717d82b86ef18d85564341e5915d96dbe5fa6ac0ed1a0ded7737e0e356a8"
+    },
+    {
+      "name": "offscreen-vet",
+      "exit_code": 0,
+      "log_sha256": "8bb75e8be2bad0aeb3bb7d10ec8e8470a4de3056e92bd622a48eb3950699a824"
+    },
+    {
+      "name": "desktop-vet",
+      "exit_code": 0,
+      "log_sha256": "ce4cd5d8347995c580bf7c0e868823778aa1b83e2dc948bdc19a233062be57fc"
+    },
+    {
+      "name": "desktop-race-build",
+      "exit_code": 0,
+      "log_sha256": "4999cd088a378f5dead1696320e03bd6abef0f7026d32373dd58db1694eb41eb"
+    },
+    {
+      "name": "fixed",
+      "exit_code": 0,
+      "log_sha256": "9ee2a308da5df5ea1656bd57759552d2bb88a831f092663899bb57fbe686b74f"
+    },
+    {
+      "name": "variable",
+      "exit_code": 0,
+      "log_sha256": "4454716dcde0770b527ba57635de43f0d88340a57c1d8d2988c4dfff109c96e9"
+    }
+  ]
+}

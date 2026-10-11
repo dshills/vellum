@@ -194,5 +194,12 @@ recoverable drafts and atomic immutable-source completion after application
 validation. The Mac adapter uses one native inline field and settles its input
 before commit. `examples/grid -editable-cells` demonstrates sparse copy-on-write
 edits, external-cell conflicts and cancellation alongside the existing modes.
-Native performance, loaded projection integration and large-tree
-completion remain subsequent P6 work.
+Reusable [worker-built views](../specs/grid-projection.md) add immutable
+sort/filter/variable-height indexes with explicit array/string budgets and latest
+owner-result admission. The independent `examples/loadedgrid` consumer uses real
+stored records, separate domain/view revisions and cancellable tasks.
+Its Apply action uses ordinary text-field settlement to read the final controlled
+filter value after all preceding admitted input. Repeated unchanged settlement
+does not emit duplicate changes before redraw.
+Native sustained performance, large-tree completion and broader Mac acceptance
+remain subsequent P6 work.

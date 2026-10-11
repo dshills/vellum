@@ -1,0 +1,150 @@
+from pathlib import Path
+import hashlib, json, re
+R=Path('/private/tmp/vellum-grid-loaded')
+P=R/'docs/reports/macos-grid-loaded';V=R/'docs/reviews/macos-grid-loaded'
+O=Path(__file__).parent
+ledger_path=P/'qualification.json'
+EXPECTED='7a623b58007e837b3a372ead1c4bc47853c95e6af1ed2a8b29f05591398d8669'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def obj(p):return json.loads(p.read_text())
+def fold(value):return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+def require(flag,message):
+ if not flag:raise ValueError(message)
+def artifact(item):
+ p=R/item['path'];require(p.is_file(),f'missing artifact {p}')
+ require(sha(p)==item['sha256'],f'artifact hash {p}')
+ if 'bytes' in item:require(p.stat().st_size==item['bytes'],f'artifact bytes {p}')
+ return p
+require(sha(ledger_path)==EXPECTED,'ledger freeze identity')
+ledger=obj(ledger_path)
+require(ledger['result']=='PASS_WITH_ADJUDICATED_REVIEW','ledger result')
+current={p:sha(R/p) for p in ledger['final_selected_sources']}
+require(current==ledger['final_selected_sources'],'current selected source bytes')
+require(len(current)==ledger['selected_source_count']==360,'selected count')
+require(str(ledger_path.relative_to(R)) not in current,'selected self hash')
+archive=ledger['archive_files']
+for p,e in archive.items():artifact(dict(e,path=p));require(not p.endswith('.go'),'active historical Go source')
+actual={str(p.relative_to(R)) for directory in [P,V] for p in directory.rglob('*') if p.is_file()}
+require(actual-set(archive)=={str(ledger_path.relative_to(R))},'archive inventory/self exclusion')
+require(set(archive)<=actual and len(archive)==326,'archive count')
+utf8_archive_files=0
+for p in archive:
+ b=(R/p).read_bytes();require(b.decode('utf8').encode('utf8')==b,'archive UTF8 roundtrip');utf8_archive_files+=1
+manifest_entries=0;manifest_records=0
+for directory in [P,V]:
+ for p in directory.rglob('*.json'):
+  if p.name not in ['archive-inputs.json','manifest.json','handoff.json','root-handoff.json']:continue
+  q=obj(p);entries=[]
+  if isinstance(q.get('entries'),list):entries += [(p.parent/e['path'],e) for e in q['entries']]
+  if isinstance(q.get('files'),dict):
+   for key,e in q['files'].items():
+    target=R/e['archive'] if 'archive' in e else p.parent/key
+    entries.append((target,e))
+  if isinstance(q.get('files'),list):entries += [(R/e['archived'],e) for e in q['files']]
+  for target,e in entries:
+   require(target.is_file(),f'manifest missing {target}')
+   require(sha(target)==e['sha256'],f'manifest hash {target}')
+   if 'bytes' in e:require(target.stat().st_size==e['bytes'],f'manifest bytes {target}')
+   manifest_entries+=1
+  if entries:manifest_records+=1
+raw={};raw_roundtrips=0
+for directory in [P,V]:
+ for p in directory.rglob('raw-evidence.json'):
+  for name,e in obj(p).items():
+   b=e['text_utf8'].encode('utf8');require(len(b)==e['bytes'] and hashlib.sha256(b).hexdigest()==e['sha256'],f'raw UTF8 {name}')
+   if Path(name).is_file():require(Path(name).read_bytes()==b,f'original raw bytes {name}')
+   require(name not in raw or raw[name]==b,f'raw identity collision {name}')
+   raw[name]=b;raw_roundtrips+=1
+proofs={name:obj(artifact(e)) for name,e in ledger['qualification_records'].items()}
+require(len(proofs)==5,'proof count')
+for name,q in proofs.items():
+ require(q['result']=='PASS' and q['unchanged'],f'proof result {name}')
+ if 'checks' in q:require(all(c['exit_code']==0 for c in q['checks']),f'proof exit {name}')
+ else:require(q['exit_code']==0 and q['cursor_outputs_match'],f'prepare result {name}')
+ for c in q.get('checks',[]):
+  if c.get('failure') is not None:raise ValueError('recorded failure '+name)
+  if c.get('runner_error') is not None or c.get('timed_out',False):raise ValueError('runner failure '+name)
+  b=raw[c['log']] if c['log'] in raw else Path(c['log']).read_bytes()
+  require(hashlib.sha256(b).hexdigest()==c['log_sha256'],f'proof log {name}')
+  require(b'WARNING: DATA RACE' not in b,f'final race warning {name}')
+  if 'required_test_runs' in c:
+   lines=b.decode('utf8').splitlines();counts={t:lines.count('=== RUN   '+t) for t in c['required_test_runs']}
+   require(counts==c['required_test_runs']==c['observed_test_runs'] and c['coverage_qualified'],f'execution coverage {name}')
+core=proofs['core-v2'];native=proofs['native-v3'];prepare=proofs['prepare-v1'];cpu=proofs['consumer/consumer-v2'];desktop=proofs['consumer/desktop-v2']
+require(native['inputs_before']==native['inputs_after'],'native source interval')
+require(prepare['inputs_before']==prepare['inputs_after'],'prepare source interval')
+require(cpu['before']==cpu['after']==desktop['before']==desktop['after'],'consumer desktop source interval')
+require(cpu['binary']==desktop['binary'],'desktop build binary identity')
+require(sha(Path(cpu['binary']['path']))==cpu['binary']['sha256'],'retained binary bytes')
+require(ledger['retained_desktop_binary']['sha256']==cpu['binary']['sha256'] and not ledger['retained_desktop_binary']['committed'],'binary ledger')
+prepared=cpu['after']['prepared'];trees={}
+for name in ['upstream','typesetting']:
+ base=R/'drivers/cogent/build'/name
+ files={str(p.relative_to(base)):sha(p) for p in sorted(base.rglob('*')) if p.is_file() and '.git' not in p.relative_to(base).parts}
+ require(files=={p.split('/',1)[1]:h for p,h in prepared.items() if p.startswith(name+'/')},'prepared byte map '+name)
+ trees[name]={'files':len(files),'sha256':fold(files)}
+require(trees==native['prepared_before']==native['prepared_after']==ledger['prepared_trees'],'prepared fingerprints')
+require(sum(t['files'] for t in trees.values())==len(prepared)==ledger['prepared_file_count']==6121,'prepared count')
+require(prepare['actual_cursor_outputs']==prepare['expected_cursor_outputs']==ledger['cursor_outputs'],'cursor outputs')
+require(all(sha(R/'drivers/cogent/build/upstream'/p)==h for p,h in ledger['cursor_outputs'].items()),'cursor actual byte hashes')
+prism=obj(artifact(ledger['prism']['raw_report']));process=obj(artifact(ledger['prism']['process']));findings=obj(artifact(ledger['prism']['adjudication']))
+prism_inputs=obj(V/'prism-inputs.json');artifact(findings['input_record'])
+require(prism['coverage']['complete'] and prism['coverage']['files']==44 and len(prism_inputs['files'])==45,'Prism coverage')
+require(prism['coverage']['chunks']==prism['coverage']['llmCalls']==5 and not prism['coverage']['skipped'] and prism['coverage']['truncatedBytes']==0,'Prism completeness')
+require(prism['coverage']['excluded']==[{'path':'examples/loadedgrid/go.sum','reason':'lockfile'}],'Prism lockfile exclusion')
+require(process['exit_code']==findings['raw_exit_code']==ledger['prism']['raw_exit_code']==1,'raw Prism exit preserved')
+require(process['selected_staged_and_working_bytes_unchanged'],'Prism source interval')
+require(sha(V/'prism-process.log')==process['log_sha256'],'Prism process log')
+require(sha(V/'prism-producer.py.txt')==process['runner_sha256'],'Prism producer')
+require(not prism['discarded'] and not prism['suppressed'],'Prism discarded/suppressed')
+ids={f['id'] for f in prism['findings']};dispositions={f['id']:f for f in findings['dispositions']}
+require(ids==set(dispositions) and len(ids)==4,'all raw findings dispositioned')
+require(sum(d['disposition']=='REFUTED' for d in dispositions.values())==3 and sum(d['disposition']=='FIXED_TEST_ONLY' for d in dispositions.values())==1,'disposition counts')
+require(findings['result']=='RESOLVED' and not findings['remaining_findings'] and not findings['production_changes_after_prism'],'resolution scope')
+for d in dispositions.values():artifact(d['independent_review'])
+for e in ledger['independent_reviews'].values():artifact(e)
+source_maps=[('core-v2',core['source_inputs']),('native-v3',native['inputs_after']),('prepare-v1',prepare['inputs_after'])]
+for group in ['owned','root_packages','native','unchanged_grid_example']:
+ prefix='examples/loadedgrid/' if group=='owned' else ''
+ source_maps.append(('consumer-v2/'+group,{prefix+p:h for p,h in cpu['after'][group].items()}))
+source_maps.append(('prism',prism_inputs['files']))
+computed_union={};differences=[]
+for origin,source in source_maps:
+ for p,h in source.items():
+  now=sha(R/p);computed_union[p]=now
+  if now!=h:differences.append((origin,p,h,now))
+require(computed_union==current,'selected source union')
+declared={(d['record'],d['path'],d['recorded_sha256'],d['current_sha256']) for d in ledger['source_generation_differences']}
+require(set(differences)==declared and len(differences)==4,'source generation differences')
+old='8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d';new='fea7d89b188f013aedc529d14a2ee67e1819fc463119ed0bb1bc4d74f403f284'
+require(core['source_inputs']['virtual/projection_edit_review_test.go']==new,'final compiled test')
+require(sha(V/'prism-portable-v1/historical-prior-test/projection_edit_review_test.go.txt')==old,'old inert test')
+require(sha(V/'prism-portable-v1/final-test/projection_edit_review_test.go.txt')==new==sha(R/'virtual/projection_edit_review_test.go'),'new installed test')
+require('r := GridProjectionRequest{token: &gridRefToken{}, stamp: stamp, input: input}' in (R/'virtual/grid_projection_request.go').read_text(),'source-backed token refutation')
+checks=[]
+for c in ledger['checks']:
+ if 'path' in c['log']:b=artifact(c['log']).read_bytes()
+ else:b=raw[c['log']['original_path']]
+ require(hashlib.sha256(b).hexdigest()==c['log']['sha256'] and c['exit_code']==0,'aggregate check log/exit')
+ checks.append({'proof':c['proof'],'name':c['name'],'exit_code':c['exit_code'],'log_sha256':c['log']['sha256']})
+require(len(checks)==16,'aggregate check count')
+for c in desktop['checks']:
+ stages=[];b=raw[c['log']]
+ for line in b.decode('utf8').splitlines():
+  try:x=json.loads(line)
+  except ValueError:continue
+  if isinstance(x,dict) and 'stage' in x:stages.append(x['stage'])
+ require(stages==c['stages']==['empty-ready','stored-loaded','worker-projection','async-edit-conflict','pass'] and c['qualified'],'strict Cocoa stages')
+historical=obj(P/'consumer/history/desktop-v1/qualification.json')
+require(historical['result']=='FAIL' and historical['checks'][0]['exit_code']==66,'historical native failure')
+history_bytes=raw[historical['checks'][0]['log']]
+require(b'"stage":"pass"' in history_bytes and history_bytes.count(b'WARNING: DATA RACE')==2,'historical pass+race retained')
+require(not any(c['name']=='variable' for c in historical['checks']),'historical variable withheld')
+readme=(P/'README.md').read_text();review_readme=(V/'README.md').read_text()
+require('(core-v2/qualification.json)' in readme and 'not frame-latency' in readme and 'not total process memory' in readme,'report current gate and limits')
+require('exit 1' in review_readme and 'four' in review_readme and '44 files' in review_readme and '45 selected' in review_readme,'review historical summary')
+require(sha(ledger_path)==EXPECTED,'ledger unchanged at end')
+require({p:sha(R/p) for p in current}==current and all(sha(R/p)==e['sha256'] for p,e in archive.items()),'source/archive unchanged at end')
+audit={'schema':'vellum-loadedgrid-final-metadata-audit-proof-v1','result':'PASS','ledger_path':str(ledger_path),'ledger_sha256':EXPECTED,'reviewer_verifier_sha256':sha(Path(__file__)),'selected_sources_verified':len(current),'selected_source_map_sha256':fold(current),'archive_files_verified':len(archive),'archive_map_sha256':fold(archive),'utf8_archive_files':utf8_archive_files,'embedded_manifest_records_verified':manifest_records,'embedded_manifest_entry_checks':manifest_entries,'embedded_raw_log_roundtrips_verified':raw_roundtrips,'prepared_files_verified':len(prepared),'prepared_trees':trees,'qualification_checks':checks,'source_generation_differences':ledger['source_generation_differences'],'Prism':{'selected':45,'reviewed':44,'chunks':5,'raw_exit_code':1,'raw_findings':4,'refuted':3,'fixed_test_only':1,'remaining':0,'excluded':prism['coverage']['excluded']},'Cocoa':{'fixed_exit':0,'variable_exit':0,'strict_stage_count_per_run':5,'binary_sha256':cpu['binary']['sha256'],'historical_fixed_exit':66,'historical_races':2},'scope':'Read-only current source/archive/hash/log/metadata verification. No tests, GUI, Git, Prism or shared mutation. Selected identities do not establish complete compiler/SDK/module-cache closure.'}
+(O/'audit.json').write_text(json.dumps(audit,sort_keys=True,indent=2)+'\n')
+print(json.dumps({'audit_path':str(O/'audit.json'),'audit_sha256':sha(O/'audit.json'),'ledger_sha256':EXPECTED,'result':'PASS','sources':len(current),'archive_files':len(archive),'prepared':len(prepared),'raw_roundtrips':raw_roundtrips,'manifest_entry_checks':manifest_entries},indent=2))

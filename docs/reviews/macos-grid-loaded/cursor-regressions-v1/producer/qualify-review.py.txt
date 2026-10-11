@@ -1,0 +1,26 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys
+root=Path('/private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream')
+base=Path('/private/tmp/vellum-grid-loaded-review/textcursor')
+label=sys.argv[1];old=label=='original-red'
+out=base/label;out.mkdir(exist_ok=False)
+test=base/'textcursor_review_test.go'
+mapping={str(root/'core/textcursor_vellum_review_test.go'):str(test)}
+if old:
+ for n in ['textcursor.go','scene.go']:mapping[str(root/'core'/n)]=str(base/'original-source/core'/f'{n}.txt')
+overlay=out/'overlay.json';overlay.write_text(json.dumps({'Replace':mapping},indent=2)+'\n')
+files=['core/textcursor.go','core/scene.go','core/sprite.go','core/paint_request.go','core/manual_window.go','core/manual_timer.go','core/stages.go','go.mod','go.sum']
+def h(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def inputs():return {n:h(Path(mapping.get(str(root/n),root/n))) for n in files}|{'reviewer-test':h(test),'overlay':h(overlay),'review-producer':h(Path(__file__))}
+before=inputs();(out/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+for n in ['textcursor.go','scene.go']:
+ p=Path(mapping.get(str(root/'core'/n),root/'core'/n));(out/(n+'.txt')).write_bytes(p.read_bytes())
+(out/'reviewer-test.go.txt').write_bytes(test.read_bytes())
+select='^TestVellumReviewTextCursor(ConcurrentScenesIgnoreLegacyOwner|SceneOwnerAndPositionRetention)$' if old else '^TestVellumReviewTextCursor'
+cmd=['go','test','-race','-tags','offscreen','-overlay',str(overlay),'-run',select,'-count='+('1' if old else '20'),'./core']
+with (out/'race.log').open('xb') as log:
+ process=subprocess.run(cmd,cwd=root,stdout=log,stderr=subprocess.STDOUT,timeout=180)
+after=inputs()
+proof={'schema':'vellum-textcursor-independent-regression-v1','result':'EXPECTED_RED' if old and process.returncode else 'PASS' if not process.returncode else 'FAIL','command':cmd,'cwd':str(root),'exit_code':process.returncode,'inputs_before':before,'inputs_after':after,'unchanged':before==after,'log_sha256':h(out/'race.log'),'scope':'Synthetic production Scene/Stage/TextField and named Sprite storage only; explicit ManualWindow config clock for blink. No native window, GPU, event loop or GUI. Selected source/dependency-module maps, not full closure.','source_classification':'ACTUAL_CAPTURED_PRE_FIX' if old else 'ACTUAL_CORRECTED_SOURCE'}
+(out/'qualification.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps({'proof':str(out/'qualification.json'),'sha256':h(out/'qualification.json'),'result':proof['result'],'exit':process.returncode,'unchanged':proof['unchanged']}))
+sys.exit(0 if (old and process.returncode!=0 and before==after) or (not old and process.returncode==0 and before==after) else 1)

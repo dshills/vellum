@@ -1,0 +1,220 @@
+package virtual
+
+import (
+	"context"
+	"errors"
+	"strings"
+	"testing"
+)
+
+func reviewEditedProjection(t *testing.T, input GridSource, revision uint64) GridProjection {
+	t.Helper()
+	p, err := BuildGridProjection(context.Background(), input, revision, GridQuery{Filters: []GridFilter{{ColumnID: "c:1", Kind: GridFilterEquals, Text: "exclude every row"}}}, GridProjectionLimits{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.RowCount() != 0 {
+		t.Fatal("fixture must hide edited row")
+	}
+	return p
+}
+
+func TestReviewProjectionEditFullInputFailuresAreAtomic(t *testing.T) {
+	cases := []struct {
+		name   string
+		change func(*editableGridFixture, GridEditState)
+		want   error
+	}{
+		{"wrong text", func(s *editableGridFixture, e GridEditState) {
+			v := s.values[GridActive{e.RowKey, e.ColumnID}]
+			v.Text = "wrong"
+			s.values[GridActive{e.RowKey, e.ColumnID}] = v
+		}, ErrGridEditConflict},
+		{"base version", func(s *editableGridFixture, e GridEditState) {
+			v := s.values[GridActive{e.RowKey, e.ColumnID}]
+			v.Version = e.BaseVersion
+			s.values[GridActive{e.RowKey, e.ColumnID}] = v
+		}, ErrGridEditConflict},
+		{"read only", func(s *editableGridFixture, e GridEditState) {
+			v := s.values[GridActive{e.RowKey, e.ColumnID}]
+			v.Editable = false
+			s.values[GridActive{e.RowKey, e.ColumnID}] = v
+		}, ErrGridEditReadOnly},
+		{"deleted row", func(s *editableGridFixture, e GridEditState) { s.rows = 0 }, ErrGridEditConflict},
+		{"oversize", func(s *editableGridFixture, e GridEditState) {
+			v := s.values[GridActive{e.RowKey, e.ColumnID}]
+			v.Text = strings.Repeat("x", 65537)
+			s.values[GridActive{e.RowKey, e.ColumnID}] = v
+		}, ErrGridCapacity},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			g, live := editableFixtureGrid(t, 1)
+			e := beginFixtureEdit(t, g)
+			if err := g.SetEditText("edited draft"); err != nil {
+				t.Fatal(err)
+			}
+			r, err := g.PrepareEdit()
+			if err != nil {
+				t.Fatal(err)
+			}
+			pending, err := g.PrepareProjection()
+			if err != nil {
+				t.Fatal(err)
+			}
+			input := live.candidate(e.RowKey, e.ColumnID, r.State().Text, e.BaseVersion+1)
+			tc.change(input, e)
+			p := reviewEditedProjection(t, input, g.stamp.Revision+1)
+			before := g.state()
+			if err := g.CompleteEdit(r, p); !errors.Is(err, tc.want) {
+				t.Fatalf("invalid full input returned %v, want %v", err, tc.want)
+			}
+			if g.source != live || g.state() != before || g.pendingProjection != pending.token {
+				t.Fatal("refusal changed accepted source/draft/request")
+			}
+		})
+	}
+}
+
+func TestReviewProjectionEditExclusionDiffersFromQueryHide(t *testing.T) {
+	for _, edit := range []bool{false, true} {
+		t.Run(map[bool]string{false: "query hides", true: "own edit excludes"}[edit], func(t *testing.T) {
+			g, live := editableFixtureGrid(t, 1)
+			e := beginFixtureEdit(t, g)
+			if err := g.SetEditText("edited draft"); err != nil {
+				t.Fatal(err)
+			}
+			er, err := g.PrepareEdit()
+			if err != nil {
+				t.Fatal(err)
+			}
+			qr, err := g.PrepareProjection()
+			if err != nil {
+				t.Fatal(err)
+			}
+			input := live
+			if edit {
+				input = live.candidate(e.RowKey, e.ColumnID, er.State().Text, e.BaseVersion+1)
+			}
+			p := reviewEditedProjection(t, input, g.stamp.Revision+1)
+			before := g.state()
+			if edit {
+				err = g.CompleteEdit(er, p)
+			} else {
+				err = g.CompleteProjection(qr, p)
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			after := g.state()
+			if after.Generation != before.Generation+1 || after.Stamp.Rows != 0 || g.source != p || g.pendingProjection != nil {
+				t.Fatal("result was not published once")
+			}
+			if edit {
+				if after.Edit.Active {
+					t.Fatal("successful edit retained draft")
+				}
+			} else {
+				if !after.Edit.Active || after.Edit.Status != GridEditUnavailable || after.Edit.Text != er.State().Text || after.Edit.Session != e.Session {
+					t.Fatal("query discarded or committed recoverable draft", after.Edit)
+				}
+			}
+		})
+	}
+}
+
+// The fixture identifies validation phases rather than counting EditCell calls.
+// Extra proofs within a phase cannot cause or suppress the late metadata drift.
+type reviewEditProofPhases struct {
+	candidateProved      bool
+	requestRechecked     bool
+	finalCandidateProved bool
+}
+
+type reviewLateEditInputDrift struct {
+	*editableGridFixture
+	driftInput *editableGridFixture
+	phases     *reviewEditProofPhases
+	fired      bool
+}
+
+func (s *reviewLateEditInputDrift) EditCell(key, col string) (GridEditValue, error) {
+	value, err := s.editableGridFixture.EditCell(key, col)
+	if s.phases != nil && s.phases.candidateProved {
+		s.phases.requestRechecked = true
+	}
+	return value, err
+}
+func (s *reviewLateEditInputDrift) RowCount() int {
+	if s.driftInput != nil && s.phases.finalCandidateProved && !s.fired {
+		s.driftInput.revision++
+		s.fired = true
+	}
+	return s.rows
+}
+
+func TestReviewProjectionEditLateFullInputDriftIsAtomic(t *testing.T) {
+	live := &reviewLateEditInputDrift{editableGridFixture: newEditableFixture(1)}
+	g := mustGrid(t, live, gridColumns(2, 100), GridConfig{RowHeight: 20, CellEditing: true}, GridViewport{Width: 200, Height: 80})
+	e := beginFixtureEdit(t, g)
+	if err := g.SetEditText("edited draft"); err != nil {
+		t.Fatal(err)
+	}
+	r, err := g.PrepareEdit()
+	if err != nil {
+		t.Fatal(err)
+	}
+	pending, err := g.PrepareProjection()
+	if err != nil {
+		t.Fatal(err)
+	}
+	input := live.candidate(e.RowKey, e.ColumnID, r.State().Text, 2)
+	p := reviewEditedProjection(t, input, g.stamp.Revision+1)
+	phases := &reviewEditProofPhases{}
+	input.editHook = func(key, col string) (GridEditValue, error) {
+		if key == e.RowKey && col == e.ColumnID {
+			phases.candidateProved = true
+			if phases.requestRechecked {
+				phases.finalCandidateProved = true
+			}
+		}
+		if v, ok := input.values[GridActive{key, col}]; ok {
+			return v, nil
+		}
+		return GridEditValue{Text: key + "/" + col, Version: 1, Editable: true}, nil
+	}
+	live.driftInput = input
+	live.phases = phases
+	before := g.state()
+	if err := g.CompleteEdit(r, p); !errors.Is(err, ErrGridSource) {
+		t.Fatalf("late full-input drift returned %v", err)
+	}
+	if !live.fired || !phases.candidateProved || !phases.requestRechecked || !phases.finalCandidateProved {
+		t.Fatalf("did not reach final input boundary: fired=%v phases=%+v", live.fired, *phases)
+	}
+	if g.state() != before || g.source != live || g.pendingProjection != pending.token {
+		t.Fatal("late edit refusal published or discarded draft")
+	}
+}
+
+func TestReviewProjectionEditMustAdvanceFullDomainRevision(t *testing.T) {
+	g, live := editableFixtureGrid(t, 1)
+	e := beginFixtureEdit(t, g)
+	if err := g.SetEditText("edited draft"); err != nil {
+		t.Fatal(err)
+	}
+	r, err := g.PrepareEdit()
+	if err != nil {
+		t.Fatal(err)
+	}
+	input := live.candidate(e.RowKey, e.ColumnID, r.State().Text, 2)
+	input.revision = live.revision // changed full-domain value under reused domain stamp
+	p := reviewEditedProjection(t, input, g.stamp.Revision+1)
+	before := g.state()
+	if err := g.CompleteEdit(r, p); !errors.Is(err, ErrGridStale) && !errors.Is(err, ErrGridSource) {
+		t.Fatalf("full domain revision reused on edit: %v", err)
+	}
+	if g.state() != before || g.source != live {
+		t.Fatal("invalid unchanged-domain-revision candidate published")
+	}
+}

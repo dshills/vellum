@@ -1,0 +1,104 @@
+{
+  "entries": [
+    {
+      "path": "qualification.json",
+      "original_path": "/private/tmp/vellum-loadedgrid-prism-adjudication-v1/qualification.json",
+      "role": "focused-overlay-proof",
+      "sha256": "5b22cd74e8bbd54a878970c5f157ffae368e0bbe43722b55833e7973a1b07896",
+      "bytes": 1487857
+    },
+    {
+      "path": "inputs-before.json",
+      "original_path": "/private/tmp/vellum-loadedgrid-prism-adjudication-v1/inputs-before.json",
+      "role": "focused-overlay-proof",
+      "sha256": "9307d410d27c722e94fe24afd9bf9ba10fa1ad39bf5e863eaff972e35b40abc4",
+      "bytes": 728726
+    },
+    {
+      "path": "checks.json",
+      "original_path": "/private/tmp/vellum-loadedgrid-prism-adjudication-v1/checks.json",
+      "role": "focused-overlay-proof",
+      "sha256": "c591ec9ea30951e24c463d34e62bd0bac5c4a4bda235f8011b70d733a452a4d2",
+      "bytes": 3149
+    },
+    {
+      "path": "overlay.json",
+      "original_path": "/private/tmp/vellum-loadedgrid-prism-adjudication-v1/overlay.json",
+      "role": "focused-overlay-proof",
+      "sha256": "16d30adaf1cab27dace457d955ebd42071cd7b3c991ac0c732ac2c4f84aafa6a",
+      "bytes": 185
+    },
+    {
+      "path": "sources/adjudication_test.go.txt",
+      "original_path": "/private/tmp/vellum-loadedgrid-prism-adjudication-v1/adjudication_test.go",
+      "role": "focused-regression-source",
+      "sha256": "239ea9b49a7bc4ae6a675bf5b0f57c01aaee923e9998cce0371f82f0cde98262",
+      "bytes": 9699
+    },
+    {
+      "path": "producers/run_adjudication.py.txt",
+      "original_path": "/private/tmp/vellum-loadedgrid-prism-adjudication-v1/run_adjudication.py",
+      "role": "bounded-proof-producer",
+      "sha256": "8f77fbfab673c711bab1bfb0d99593626fd3e4dae65770af87df7c06a1b93362",
+      "bytes": 3693
+    },
+    {
+      "path": "reviewed-source/examples/loadedgrid/model.go.txt",
+      "original_path": "/private/tmp/vellum-grid-loaded/examples/loadedgrid/model.go",
+      "role": "frozen-source-facts",
+      "sha256": "1735239d123e159baaaed5f0b0f2fc34a04c3370c6caa45dfa967ab6fb704547",
+      "bytes": 18789
+    },
+    {
+      "path": "reviewed-source/examples/loadedgrid/source.go.txt",
+      "original_path": "/private/tmp/vellum-grid-loaded/examples/loadedgrid/source.go",
+      "role": "frozen-source-facts",
+      "sha256": "72e082d4da21abcd2e5147b860df554021744210570d0f7a100923769cb2303c",
+      "bytes": 7906
+    },
+    {
+      "path": "reviewed-source/examples/loadedgrid/README.md.txt",
+      "original_path": "/private/tmp/vellum-grid-loaded/examples/loadedgrid/README.md",
+      "role": "frozen-source-facts",
+      "sha256": "00ebfd803af07d7a8a363d68d2fa88e25264745678fc5258cd05504eff764143",
+      "bytes": 5213
+    },
+    {
+      "path": "reviewed-source/virtual/grid_edit.go.txt",
+      "original_path": "/private/tmp/vellum-grid-loaded/virtual/grid_edit.go",
+      "role": "frozen-source-facts",
+      "sha256": "a5e15e1d672c92e2b7bc55cfbc1f9a783009d209111235a493486f5717f59a8c",
+      "bytes": 11458
+    },
+    {
+      "path": "reviewed-source/tasks/tasks.go.txt",
+      "original_path": "/private/tmp/vellum-grid-loaded/tasks/tasks.go",
+      "role": "frozen-source-facts",
+      "sha256": "f95a8cbb4726f14d25f454fdf71bcf767d2407d6079575b58c44adfc06c3fea2",
+      "bytes": 5206
+    },
+    {
+      "path": "raw-evidence.json",
+      "role": "exact-UTF8-raw-logs",
+      "sha256": "8908cb0664816726ac6ea184744beee1d11afaafa8b66ac6aea29ed58ec5a139",
+      "bytes": 30898
+    },
+    {
+      "path": "adjudication.json",
+      "role": "finding-adjudication",
+      "sha256": "c17294ef7d81e0fb09cc5c0a3857f9d4d37c7977491dd9c8a8467cd21af8c747",
+      "bytes": 3810
+    },
+    {
+      "path": "README.md",
+      "role": "scope",
+      "sha256": "97e6c7f0a75cac4cf5dff86f78df46ff2f186713be0466efee2c38376a81e240",
+      "bytes": 766
+    }
+  ],
+  "manifest_self_excluded": true,
+  "proof_sha256": "5b22cd74e8bbd54a878970c5f157ffae368e0bbe43722b55833e7973a1b07896",
+  "adjudication_sha256": "c17294ef7d81e0fb09cc5c0a3857f9d4d37c7977491dd9c8a8467cd21af8c747",
+  "result": "REFUTED_BOTH",
+  "files": 15
+}

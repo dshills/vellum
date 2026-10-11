@@ -1,0 +1,245 @@
+{
+  "scope": "Inert source/proof/UTF8-raw-log handoff; no executable Go/Python source or binary included.",
+  "final_version": 2,
+  "final_cpu_proof_sha256": "0dcfd06888d449b0f19999fc143ae5b81be766517d56d67f5d91f4ac71a2e690",
+  "final_native_proof_sha256": "ce94130a3aae3f8b39e27bed4cc239cdb908e9133b0b94b76ccbc5cc77225cc5",
+  "entries": [
+    {
+      "path": "sources/source.go.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/source.go",
+      "sha256": "72e082d4da21abcd2e5147b860df554021744210570d0f7a100923769cb2303c",
+      "bytes": 7906
+    },
+    {
+      "path": "sources/model.go.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/model.go",
+      "sha256": "1735239d123e159baaaed5f0b0f2fc34a04c3370c6caa45dfa967ab6fb704547",
+      "bytes": 18789
+    },
+    {
+      "path": "sources/main.go.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/main.go",
+      "sha256": "c7e6391047bd82d2061f8ce9065a255a67b2b4c0ca1293ae5fb436e2e372aa5b",
+      "bytes": 1824
+    },
+    {
+      "path": "sources/smoke.go.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/smoke.go",
+      "sha256": "c90d2c97e648300d623beaf5dd0a392dc69bb0a350fb65c6c4f98e36305cac0d",
+      "bytes": 6936
+    },
+    {
+      "path": "sources/source_test.go.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/source_test.go",
+      "sha256": "9932260870c19560c8358c576b41510507b3a949dd6c47abf208004e4e54e939",
+      "bytes": 4467
+    },
+    {
+      "path": "sources/model_test.go.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/model_test.go",
+      "sha256": "665849d32ee5b89ebeb799709e2f97fd43e3b92baa9490f184bc27c8addf1b43",
+      "bytes": 11512
+    },
+    {
+      "path": "sources/managed_test.go.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/managed_test.go",
+      "sha256": "07c193841171a4d0c3d29574a6413f35c4ea5aa08644419090dfcb48209e585e",
+      "bytes": 13399
+    },
+    {
+      "path": "sources/README.md.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/README.md",
+      "sha256": "00ebfd803af07d7a8a363d68d2fa88e25264745678fc5258cd05504eff764143",
+      "bytes": 5213
+    },
+    {
+      "path": "sources/go.mod.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/go.mod",
+      "sha256": "bf4e964723f869ac814ee3c73f84e76fe0d4f39f858bff8ab9440d12ff4a96f8",
+      "bytes": 2495
+    },
+    {
+      "path": "sources/go.sum.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/go.sum",
+      "sha256": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+      "bytes": 9918
+    },
+    {
+      "path": "sources/LICENSE.txt",
+      "role": "final-consumer-owned",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/owned-source/LICENSE",
+      "sha256": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+      "bytes": 1068
+    },
+    {
+      "path": "consumer-freeze-v1.json",
+      "role": "initial-owned-freeze-still-final",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/consumer-freeze-v1.json",
+      "sha256": "a11c6ba52d6c234c5a2e846e008757bad6d18c0523e31958ab918a964c65e0fa",
+      "bytes": 1238
+    },
+    {
+      "path": "independent-consumer-source-review.json",
+      "role": "source-review",
+      "original_path": "/private/tmp/vellum-loadedgrid-consumer-review/frozen-v1/source-review.json",
+      "sha256": "d9cc697172568513912d9d737ef7a94364ff25bdb9e18426355eff8e64c85c6f",
+      "bytes": 4732
+    },
+    {
+      "path": "history/consumer-v1/qualification.json",
+      "role": "historical-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/qualification.json",
+      "sha256": "cd67a95002a6b5a778bb3862d5aa2125558734b44795f0e8fcc85842c997ea2f",
+      "bytes": 1486942
+    },
+    {
+      "path": "history/consumer-v1/inputs-before.json",
+      "role": "historical-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/inputs-before.json",
+      "sha256": "7ab413c4ebf87ca2fc9066a8b7c9a2948e0dcd955afd598c0c71c9ff2f5ab33b",
+      "bytes": 727884
+    },
+    {
+      "path": "history/consumer-v1/checks.json",
+      "role": "historical-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/checks.json",
+      "sha256": "542e8a55110e7a6c1749071fc6252025694e5aa2afd0bd47a416cdf6ea76a48c",
+      "bytes": 3859
+    },
+    {
+      "path": "history/consumer-v1/qualify.py.txt",
+      "role": "historical-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/qualify.py.txt",
+      "sha256": "dedb02478e7dddbe5c7593b2ec333f455aca3c597ee7a67497e80e2670e7e965",
+      "bytes": 6121
+    },
+    {
+      "path": "history/desktop-v1/qualification.json",
+      "role": "historical-native-failure",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/cocoa-smokes/qualification.json",
+      "sha256": "24baab9e2d9133da3998415b0ccf2fdc7d8572da83900cff7dee141575771834",
+      "bytes": 1483570
+    },
+    {
+      "path": "history/desktop-v1/checks.json",
+      "role": "historical-native-failure",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/cocoa-smokes/checks.json",
+      "sha256": "191b041cc6a30a5eaa5ae83bc25480f0144097632f14f8760e836464f83475a2",
+      "bytes": 812
+    },
+    {
+      "path": "history/desktop-v1/adjudication.json",
+      "role": "historical-native-failure",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/cocoa-smokes/adjudication.json",
+      "sha256": "5164a2faad19e69995cc2688910629b6e501529ca20ff2dbeaf9a0ed366b4569",
+      "bytes": 842
+    },
+    {
+      "path": "history/desktop-v1/native_smoke.py.txt",
+      "role": "historical-native-failure",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/cocoa-smokes/native_smoke.py.txt",
+      "sha256": "fc5e2e5c34995cafa708624f5103d038a474f1168ace06c1071cd82e42219a63",
+      "bytes": 4368
+    },
+    {
+      "path": "consumer-v2/qualification.json",
+      "role": "final-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/qualification.json",
+      "sha256": "0dcfd06888d449b0f19999fc143ae5b81be766517d56d67f5d91f4ac71a2e690",
+      "bytes": 1488036
+    },
+    {
+      "path": "consumer-v2/inputs-before.json",
+      "role": "final-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/inputs-before.json",
+      "sha256": "bc5e35b84086f95d82f14fee54b42f9e35f1d761f2908777e6a6823060c0d40f",
+      "bytes": 728423
+    },
+    {
+      "path": "consumer-v2/checks.json",
+      "role": "final-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/checks.json",
+      "sha256": "67c8e907200ed8df96262a90d6e362a5f56318dac5ae1b7c9ada3ebb77a6d67f",
+      "bytes": 3859
+    },
+    {
+      "path": "consumer-v2/qualify.py.txt",
+      "role": "final-cpu-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/qualify.py.txt",
+      "sha256": "dedb02478e7dddbe5c7593b2ec333f455aca3c597ee7a67497e80e2670e7e965",
+      "bytes": 6121
+    },
+    {
+      "path": "desktop-v2/qualification.json",
+      "role": "final-desktop-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/cocoa-smokes/qualification.json",
+      "sha256": "ce94130a3aae3f8b39e27bed4cc239cdb908e9133b0b94b76ccbc5cc77225cc5",
+      "bytes": 1485536
+    },
+    {
+      "path": "desktop-v2/checks.json",
+      "role": "final-desktop-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/cocoa-smokes/checks.json",
+      "sha256": "c1e1ebe80ac451933c18eeb5b1015eb3c3a6ee12b287067884f3a49a3ceb37af",
+      "bytes": 1638
+    },
+    {
+      "path": "desktop-v2/native_smoke.py.txt",
+      "role": "final-desktop-proof",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/cocoa-smokes/native_smoke.py.txt",
+      "sha256": "fc5e2e5c34995cafa708624f5103d038a474f1168ace06c1071cd82e42219a63",
+      "bytes": 4368
+    },
+    {
+      "path": "history/exploratory/exploratory-results.json",
+      "role": "exploratory-adjudication",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/exploratory-history/exploratory-results.json",
+      "sha256": "e989d7d34229f16d4a476ee7601950da9e0d30dcae01fbc0c6c9c1c4995e8008",
+      "bytes": 2141
+    },
+    {
+      "path": "history/exploratory/initial-controller-note.json",
+      "role": "exploratory-adjudication",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/exploratory-history/initial-controller-note.json",
+      "sha256": "3de3e2652e5e8dc3a783b1aeacd0cc086717f1804c815fd3588a60471215008e",
+      "bytes": 849
+    },
+    {
+      "path": "history/exploratory/router-4-scope-note.json",
+      "role": "exploratory-adjudication",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/exploratory-history/router-4-scope-note.json",
+      "sha256": "7a02e89e002609b0c833d25cd62f053a705c597dda0cdd3e16d0769d6104f8c9",
+      "bytes": 376
+    },
+    {
+      "path": "producers/archive_handoff.py.txt",
+      "role": "archive-producer",
+      "original_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/archive_handoff.py",
+      "sha256": "5e1e816393acdb3a025e63f3007e7caab57551db3c7c753588cb16d71d1568d5",
+      "bytes": 7159
+    },
+    {
+      "path": "raw-evidence.json",
+      "role": "exact-UTF8-encoded-raw-log-bytes",
+      "sha256": "8f0a04144c4c295fd7bc6fc1c5835838285f91d571ba932ada08d5aaf5622ec5",
+      "bytes": 187615
+    },
+    {
+      "path": "README.md",
+      "role": "scope",
+      "sha256": "36b12c5e0e5abe84094659a0a585f4a19f97aa0b19ab4659cc5bc540b75cc061",
+      "bytes": 1634
+    }
+  ],
+  "manifest_self_excluded": true
+}

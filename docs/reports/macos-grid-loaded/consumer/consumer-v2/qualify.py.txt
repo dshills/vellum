@@ -1,0 +1,107 @@
+"""Selected source-bound consumer gate; no complete dependency closure claim."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shlex
+import shutil
+import subprocess
+import sys
+import time
+
+ROOT = Path('/private/tmp/vellum-grid-loaded')
+MODULE = ROOT / 'examples/loadedgrid'
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / 'scripts'))
+from child_process import run_child
+
+OWNED = ['source.go', 'model.go', 'main.go', 'smoke.go', 'source_test.go', 'model_test.go', 'managed_test.go', 'README.md', 'go.mod', 'go.sum', 'LICENSE']
+ROOT_PACKAGES = ['app', 'canvas', 'command', 'document', 'editor', 'execution', 'history', 'replay', 'tasks', 'ui', 'virtual', 'workbench']
+
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def mapping(paths, base): return {str(p.relative_to(base)): sha(p) for p in sorted(paths) if p.is_file()}
+def inputs():
+    root_files = [ROOT / 'go.mod', ROOT / 'vellum.go']
+    if (ROOT / 'go.sum').exists(): root_files.append(ROOT / 'go.sum')
+    for package in ROOT_PACKAGES: root_files.extend((ROOT / package).rglob('*.go'))
+    driver = ROOT / 'drivers/cogent'
+    native_files = [driver / 'go.mod', driver / 'go.sum', driver / 'env.sh']
+    for p in driver.rglob('*'):
+        rel = p.relative_to(driver)
+        if 'build' in rel.parts: continue
+        if p.is_file() and (p.suffix in ['.go', '.m', '.h', '.c', '.sh'] or 'native' in rel.parts and p.suffix in ['.json', '.patch']): native_files.append(p)
+    prepared = []
+    for name in ['upstream', 'typesetting']:
+        prepared.extend(p for p in (driver / 'build' / name).rglob('*') if p.is_file() and '.git' not in p.parts)
+    return {
+        'owned': {n: sha(MODULE / n) for n in OWNED},
+        'root_packages': mapping(set(root_files), ROOT),
+        'native': mapping(set(native_files), ROOT),
+        'prepared': mapping(prepared, driver / 'build'),
+        'qualification': {'qualify.py': sha(Path(__file__)), 'scripts/child_process.py': sha(ROOT / 'scripts/child_process.py')},
+        'unchanged_grid_example': mapping([p for p in (ROOT / 'examples/grid').iterdir() if p.is_file() and p.suffix in ['.go', '.md'] or p.is_file() and p.name in ['go.mod', 'go.sum', 'LICENSE']], ROOT),
+    }
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--version', type=int, required=True)
+args = parser.parse_args()
+OUT = HERE / f'qualified-v{args.version}'
+OUT.mkdir(exist_ok=False)
+before = inputs()
+(OUT / 'inputs-before.json').write_text(json.dumps(before, indent=2) + '\n')
+(OUT / 'owned-source').mkdir()
+for name in OWNED: shutil.copyfile(MODULE / name, OUT / 'owned-source' / name)
+shutil.copyfile(__file__, OUT / 'qualify.py.txt')
+checks = []
+COMMANDS = [
+    ('portable-race20', ['go', 'test', '-race', '-count=20', '-v', '-run', 'TestStoredRecords|TestGeneration|TestWorker|TestOwner|TestWindow|TestExternal|TestFilterSettlement', './...']),
+    ('offscreen-all-race1', ['go', 'test', '-tags', 'offscreen', '-race', '-count=1', '-v', './...']),
+    ('offscreen-vet', ['go', 'vet', '-tags', 'offscreen', './...']),
+    ('desktop-vet', ['go', 'vet', './...']),
+    ('desktop-race-build', ['go', 'build', '-race', '-o', str(OUT / 'loadedgrid-desktop'), '.']),
+]
+prefix = 'export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. ' + shlex.quote(str(ROOT / 'drivers/cogent/env.sh')) + '\nexec '
+for name, command in COMMANDS:
+    path = OUT / (name + '.log')
+    started, code, timeout, error = time.monotonic(), -1, False, None
+    print('START', name, flush=True)
+    with path.open('wb') as log:
+        argv = ['/bin/zsh', '-c', prefix + shlex.join(command)]
+        log.write(('argv: ' + json.dumps(argv) + '\ncwd: ' + str(MODULE) + '\n').encode())
+        log.flush()
+        try:
+            code = run_child(argv, cwd=MODULE, stdout=log, stderr=subprocess.STDOUT, timeout=600).returncode
+        except subprocess.TimeoutExpired:
+            timeout, code = True, 124
+        except Exception as e:
+            error = repr(e)
+            log.write(('qualification-runner-error: ' + error + '\n').encode())
+    item = {'name': name, 'command': command, 'argv': argv, 'cwd': str(MODULE), 'exit_code': code, 'timed_out': timeout, 'runner_error': error, 'elapsed_seconds': round(time.monotonic()-started, 3), 'log': str(path), 'log_sha256': sha(path)}
+    checks.append(item)
+    (OUT / 'checks.json').write_text(json.dumps(checks, indent=2) + '\n')
+    print('END', json.dumps(item), flush=True)
+    if code: break
+
+after = inputs()
+binary = OUT / 'loadedgrid-desktop'
+compiler = None
+if binary.exists():
+    path = OUT / 'compiler.log'
+    with path.open('wb') as log:
+        for cmd in [['go', 'version'], ['go', 'version', '-m', str(binary)], ['go', 'env', 'GOOS', 'GOARCH', 'CGO_ENABLED', 'GOVERSION'], ['otool', '-L', str(binary)]]:
+            log.write(('argv: ' + json.dumps(cmd) + '\n').encode()); log.flush()
+            run_child(['/bin/zsh', '-c', prefix+shlex.join(cmd)], cwd=MODULE, stdout=log, stderr=subprocess.STDOUT, timeout=20, check=True)
+    compiler = {'path': str(path), 'sha256': sha(path)}
+proof = {
+    'scope': 'Eleven new example sources/manifests, root package Go inputs, native source/manifests, unchanged prior grid example, enumerated prepared input fingerprints and qualification wrapper. Go module-cache/toolchain/system SDK dependency source closure is not claimed. No desktop execution or performance claim.',
+    'source_root': str(ROOT), 'before': before, 'after': after,
+    'unchanged': before == after, 'counts': {name: len(values) for name, values in before.items()},
+    'checks': checks, 'result': 'PASS' if before == after and len(checks) == len(COMMANDS) and all(c['exit_code'] == 0 for c in checks) else 'FAIL',
+    'producer': {'path': str(Path(__file__).resolve()), 'sha256': sha(Path(__file__))},
+    'binary': {'path': str(binary), 'sha256': sha(binary)} if binary.exists() else None,
+    'compiler': compiler,
+}
+path = OUT / 'qualification.json'
+path.write_text(json.dumps(proof, indent=2) + '\n')
+print('PROOF', str(path), sha(path), proof['result'], flush=True)
+sys.exit(0 if proof['result'] == 'PASS' else 1)

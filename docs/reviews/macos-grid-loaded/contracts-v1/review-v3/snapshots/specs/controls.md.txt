@@ -1,0 +1,175 @@
+# Standard controls contract
+
+The public `ui.Node` vocabulary now includes checkbox, selector, slider, numeric
+field, single-line text field, multiline document editor, managed data grid,
+tabs, scroll container and modal dialog. Cogent
+adapts these to its existing native controls. The portable module remains free
+of native dependencies.
+
+Managed node IDs beginning with `grid:` are reserved for generated grid rows,
+cells and headers. Descriptor validation rejects that prefix before mounting controls,
+so ordinary controls cannot alias a generated input or accessibility target.
+
+## Controlled values and events
+
+`Checked`, `Number`, `Text` and `SelectedID` describe accepted model values.
+`Change func(ui.ChangeEvent)` receives the relevant typed payload plus stable
+node ID and kind. A callback changes application-owned model state; the next
+view describes the accepted value. Programmatic setters do not emit changes.
+`Activate` continues to serve buttons. No callback is bound to an obsolete view
+closure: retained controls read the current callback when owner delivery runs.
+
+`DataGrid` binds `Node.Grid` to the portable indexed model. Its `GridChange`
+callback reports an already accepted owner-held selection or viewport change;
+the caller does not apply it again. See the [managed grid contract](grid-native.md)
+for native bounds, input, focus and measured geometry.
+
+Standard value changes, tab choices and dialog dismissal enqueue bounded
+application owner work. Managed native text input uses a separately bounded
+originating-window FIFO and legacy editor event boundaries before owner changes. Values are captured when the native event occurs; mounted state,
+disabled state, available options and current callbacks are rechecked on drain.
+Removed widgets do not deliver queued stale edits. Queued callbacks use owner
+snapshots for disabled/retired state; they only update model state and request
+restoration. Native value restoration runs in the originating window's next
+refresh, even when another window drains the shared application queue. Refused value/tab delivery atomically requests restoration during the next
+originating native refresh under the UI owner. That refresh restores the
+controlled native value/selection and reports the error through `Driver.OnError` when
+provided, also storing it in native property `vellum.control-error`. Error
+observers must not reenter application ownership. Changes emitted synchronously
+by native focus transitions therefore cannot nest `Application.Do`.
+
+`Disabled` blocks model changes, including descendants of disabled managed
+containers. Native styles reflect that disabled state. Selector/tabs options use
+stable IDs independent of displayed labels; duplicate/empty IDs and missing
+selected IDs are rejected. Native selector menus omit disabled choices; a
+model-selected disabled choice can still be displayed. Tabs display disabled
+buttons but reject their actions. Selector empty selection uses its `Text` as a
+placeholder; tabs require one selected page and one option per child page ID,
+in the same order.
+
+## Numeric and text editing
+
+`Numeric{Min, Max, Step}` supplies finite ordered float32 bounds, a positive
+keyboard step no larger than the range, and a finite accepted `Number` inside
+the bounds. Range spans that overflow native float32 arithmetic are rejected.
+Finite native events are clamped to bounds; nonfinite values are refused.
+Keyboard increments follow Step; pointer/typed values are not rounded to step
+multiples. Precision/display rounding remains the native backend's behavior.
+
+Text fields use the existing native editing/input foundation. Unrelated view
+updates preserve uncommitted text, composition, selection and numeric-field
+editing. Active native preedit also survives the backend Maker refresh while
+the controlled value remains uncommitted. A changed model text/value replaces pending edits. After a committed Change
+callback, the next redraw reapplies the accepted model value even if it stayed
+unchanged, so rejected/normalized commits cannot leave stale native text/value. Adapter reads
+use the read-only native editing snapshot, avoiding the native `Text()` getter's
+implicit commit and change event. Display labels, option labels, tab labels and
+help tooltips are escaped before entering Cogent's markup-capable text widgets;
+editable text remains literal text.
+
+A managed Mac text field finishes a focus-loss `Change` only after the outgoing
+native client acknowledges all already-admitted input and becomes inactive.
+Native unmark may add another FIFO record; the adapter waits for its owner
+acknowledgment before finishing the field or activating the next native client.
+This handoff is asynchronous and does not block the UI owner. A refocused field
+retains its fresh directional selection when a late, same-visible native unmark
+seals the outgoing composition. Retired fields suppress completion callbacks;
+fields without an active native client retain the backend's immediate focus-loss
+behavior. This contract covers admitted native field input through handoff;
+programmatic focus requests do not impose a global order on legacy key events.
+
+`cogent.SettleTextField(ctx, application, windowID, nodeID, callback)` admits an
+asynchronous barrier for an ordinary managed text field on the application
+owner. A dependent action, such as applying a filter, reads its controlled model
+value inside the successful callback. The originating-window FIFO processes
+already admitted input, seals composition and delivers the final `Change` before
+that callback. It retires older queued change snapshots for that field, so they
+cannot overwrite the settled value. Repeated settlement without a value change
+does not repeat `Change`, including before the next redraw. Reconciliation still
+applies the application's accepted, rejected or normalized controlled value.
+
+The barrier shares the existing one-pending-settlement capacity per window with
+document and inline-grid settlement. Missing, ambiguous, disabled, retired,
+nonordinary or callback-free field bindings are refused; an immediate refusal
+has no callback.
+Cancellation and binding/window retirement terminate admitted requests while the
+application remains open. Application shutdown suppresses outstanding callbacks.
+The callback and `Change` run on the owner without nested owner draining. Manual
+drivers require explicit `Step`; settlement starts no worker or ambient frame.
+This is an ordering contract for admitted native input, rather than a guarantee
+about future input or input from a different window.
+
+The Mac native adapter refuses a single-line `TextField.Text` above 4 MiB before
+mounting; the portable descriptor has no such platform bound. Cocoa input
+preflights that native budget before mutation. A legacy field edit above the
+budget is refused as a whole pending value and restored to the accepted
+controlled value without `Change`; pending field edits and private editing state
+are reset. The document editor's stronger model/history atomic refusal contract
+is specified separately below.
+
+`MultilineText` binds `Node.Editor` to the portable document model. It updates
+that model on the application owner and reports committed bytes through `Change`.
+Preedit remains outside committed history. `TabInserts` chooses literal tab input;
+otherwise Tab participates in managed focus traversal. `SoftWrap` changes visual
+wrapping without changing document bytes. Editor input uses its
+originating native FIFO and explicit persistence settlement; see the
+[document editor contract](editor.md) for bounds, position units, history and
+lifetime rules.
+
+## Containers, focus and semantic metadata
+
+Tabs retain native page hosts by stable ID. Reordering or removing pages preserves
+compatible managed widgets; moving a widget from a removed page happens before
+its old native host is destroyed. The reconciler never replaces Cogent Tabs'
+internal tab/frame structure. Scroll containers use native overflow and retain
+their native state.
+
+A root `FocusRequest{ID, Sequence}` requests keyboard focus by managed node ID.
+Changing Sequence repeats a request for the same ID. Unchanged requests are
+consumed once and do not steal focus on later redraws, even if the old target is
+subsequently hidden/disabled/removed. A new request must name an enabled focusable
+node in the visible tree (selected tab and open dialogs). Before the native scene
+is shown the driver installs start focus; afterward it sets native focus. Child
+nodes cannot carry independent focus requests. A Tabs request targets its selected
+enabled native tab button, or the first enabled option when the selected option
+is disabled. A Tabs control with no enabled options cannot receive focus.
+
+`Accessibility{Name, Help}` carries a semantic label independently of visible
+text. The native adapter stores typed `cogent.Semantics` under
+`cogent.SemanticsProperty`, including stable ID, kind/role, name, help, disabled
+state and controlled value. Help also appears as a native tooltip. Platform
+screen-reader acceptance remains an explicit foundation gate. The macOS bridge
+publishes these semantics through NSAccessibility; see the
+[accessibility contract](accessibility.md) for its verified scope.
+
+## Modal lifetime
+
+`Dialog` is a descriptor with `Open`, title in `Text`, `Children` and `Dismiss`.
+A hidden managed placeholder owns one stable child host. Opening moves that host
+into a native modal Body/Stage. Closing parks it before Cogent destroys the old
+scene, preserving retained content across reopening. Programmatic close/removal
+suppresses Dismiss; native Escape/Close posts Dismiss once. If the owner mailbox refuses dismissal,
+the modal remains closed, reports `Driver.OnError`, and preserves content; it
+cannot restore a native scene already closed by the user. The application can
+acknowledge `Open=false` and then request `Open=true` to reopen. There is no
+unbounded retry queue. The application should
+set `Open=false` in Dismiss. Until that acknowledgment, the driver does not reopen
+a user-dismissed dialog on each refresh. Removing a dialog closes its external
+stage before removing the placeholder. Active modal scenes forward native custom
+wake events so worker delivery and programmatic close continue to function.
+
+## Executable acceptance and tests
+
+Run `go run ./cmd/gallery` from `drivers/cogent` after dependency preparation.
+It demonstrates every control, shared slider/numeric state, a checkbox disabling
+other controls, named focus requests, local theme values, tabs and a native modal.
+`-smoke -exit-after=4s` opens and closes a modal through posted owner callbacks;
+window-render diagnostics confirm the modal reached the native stage pipeline.
+
+Portable tests cover finite constraints, option/page identity and focus visibility.
+Native tests cover every change payload, latest callbacks, disabled ancestors and
+options, mailbox refusal, removed queued callbacks, NaN rejection, text editing
+across unrelated redraws, tab reorder/reparent, modal scene cleanup preserving
+content, custom wake forwarding and repeated focus sequence requests. The gallery
+model test checks the complete controlled workflow. Native visual/input behavior
+still requires platform acceptance beyond these adapter checks.

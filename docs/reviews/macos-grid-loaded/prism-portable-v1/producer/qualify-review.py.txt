@@ -1,0 +1,33 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,difflib
+root=Path('/private/tmp/vellum-grid-loaded');base=Path('/private/tmp/vellum-grid-loaded-review/projection-prism-delta')
+label=sys.argv[1];red=label=='counterfactual-red';out=base/label;out.mkdir(exist_ok=False)
+test=base/'projection_edit_review_test.go';grid=root/'virtual/grid.go';data=grid.read_text()
+needle='''\t\t\t\t// Cached empty-view metadata cannot prove the full edited
+\t\t\t\t// input after live-source callbacks have run.
+\t\t\t\tif err := prepared.current(); err != nil {
+\t\t\t\t\treturn err
+\t\t\t\t}'''
+assert data.count(needle)==1
+mapping={str(root/'virtual/projection_edit_review_test.go'):str(test)}
+if red:
+ c=out/'grid-counterfactual.go.txt';modified=data.replace(needle,'\t\t\t\t_ = prepared // Counterfactual: omit only final edited full-input health check.')
+ c.write_text(modified);mapping[str(grid)]=str(c)
+ (out/'counterfactual.diff').write_text(''.join(difflib.unified_diff(data.splitlines(True),modified.splitlines(True),fromfile='current-grid.go',tofile='counterfactual-grid.go')))
+overlay=out/'overlay.json';overlay.write_text(json.dumps({'Replace':mapping},indent=2)+'\n')
+def h(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def inputs():
+ files=[root/'go.mod']+sorted((root/'virtual').glob('*.go'))
+ return {str(p.relative_to(root)):h(Path(mapping.get(str(p),p))) for p in files}|{'overlay':h(overlay),'producer':h(Path(__file__))}
+before=inputs();(out/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+for n in ['grid.go','grid_edit.go','grid_projection_request.go','grid_projection.go','grid_projection_types.go']:
+ p=root/'virtual'/n;src=Path(mapping.get(str(p),p));(out/(n+'.txt')).write_bytes(src.read_bytes())
+(out/'reviewer-test.go.txt').write_bytes(test.read_bytes())
+selection='^TestReviewProjectionEditLateFullInputDriftIsAtomic$' if red else '^TestReviewProjection'
+command=['go','test','-race','-overlay',str(overlay),'./virtual','-run',selection,'-count='+('1' if red else '20')]
+with (out/'race.log').open('xb') as log:
+ p=subprocess.run(command,cwd=root,stdout=log,stderr=subprocess.STDOUT,timeout=180,env=__import__('os').environ|{'GOCACHE':'/tmp/vellum-editor-go-cache','GOWORK':'off'})
+after=inputs();j={'schema':'vellum-projection-prism-test-delta-v1','result':'EXPECTED_RED' if red and p.returncode!=0 else 'PASS' if p.returncode==0 else 'FAIL','command':command,'cwd':str(root),'exit_code':p.returncode,'inputs_before':before,'inputs_after':after,'unchanged':before==after,'log_sha256':h(out/'race.log'),'classification':'RECONSTRUCTED_COUNTERFACTUAL_REMOVING_ONLY_FINAL_EDITED_INPUT_HEALTH_CHECK' if red else 'FINAL_SEMANTIC_PHASE_TEST_ON_UNCHANGED_PRODUCTION','scope':'Portable actual transaction methods/immutable empty projection; selected current virtual/module provenance, no GUI/native/consumer rebuild/full closure.'}
+(out/'qualification.json').write_text(json.dumps(j,indent=2)+'\n')
+print(json.dumps({'path':str(out/'qualification.json'),'sha256':h(out/'qualification.json'),'exit_code':p.returncode,'unchanged':before==after,'result':j['result']}))
+sys.exit(0 if before==after and ((red and p.returncode!=0) or (not red and p.returncode==0)) else 1)

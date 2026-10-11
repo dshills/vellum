@@ -1,0 +1,174 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6d701e0ac766b7d727e5e75e84fa0ef8",
+  "repo": {
+    "root": "/private/tmp/vellum-grid-loaded",
+    "head": "39fb4867f2f8e32eb7fe852559dff3ecd78ee2c8",
+    "branch": "codex/grid-loaded"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 1
+    },
+    "highestSeverity": "high"
+  },
+  "findings": [
+    {
+      "id": "2364d22065daef23",
+      "severity": "high",
+      "category": "bug",
+      "title": "Invalid composite literal: token field is missing or corrupted",
+      "message": "The composite literal contains a bare `[REDACTED]` token, which is not valid Go and would stop the package compiling. The token field is never set, and `OutputRevision`, `CancelProjection` and `CompleteProjection` all depend on it. This may only be redaction in the supplied diff, so confidence is low.",
+      "suggestion": "Initialise the token explicitly, for example `GridProjectionRequest{token: \u0026gridRefToken{}, stamp: stamp, input: input}`. Use whatever constructor `gridRefToken` actually has.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "virtual/grid_projection_request.go",
+          "lines": {
+            "start": 52,
+            "end": 52
+          }
+        }
+      ],
+      "tags": [
+        "compile-error",
+        "location-corrected",
+        "unverified"
+      ],
+      "evidence": "r := GridProjectionRequest{[REDACTED] stamp: stamp, input: input}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "829992bcdc6d8a30",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Prepared edit request is not released when the edit worker is canceled or abandoned",
+      "message": "editWork calls PrepareEdit, which presumably registers an outstanding edit request in the grid. cancelWork cancels the worker task and bumps editToken, so the completion callback returns early on the token check. Nothing releases the prepared request. The same applies to the stale, error and Start-refusal paths in editWork. By contrast, queryWork cancels its prepared projection on every abandoned path. If the grid keeps the request pending, the next Save or Return may be refused and the draft left stuck. I could not see the grid API, so this is unconfirmed.",
+      "suggestion": "Release the prepared edit request in cancelWork and in the abandoned paths of editWork, if the grid exposes a way to do so without discarding the draft. Otherwise add a test showing that Save works after Cancel work.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "examples/loadedgrid/model.go",
+          "lines": {
+            "start": 384,
+            "end": 393
+          }
+        }
+      ],
+      "tags": [
+        "cancellation",
+        "state-leak",
+        "location-corrected"
+      ],
+      "evidence": "\tif w.editTask != nil {\n\t\tw.editTask.Cancel()\n\t\tw.editTask = nil\n\t}\n\tif w.settleCancel != nil {\n\t\tw.settleCancel()\n\t\tw.settleCancel = nil\n\t}\n\tw.settling = false\n\tw.message = \"Canceled work; credits remain until worker and owner terminals\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0b7707f851577341",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "edited() does not enforce the read-only column rule",
+      "message": "EditCell marks column 0 as non-editable (`Editable: col != 0`), but `edited` builds a candidate for any valid column, including column 0. A caller that does not pre-check the column gets a candidate that silently changes a read-only cell. The edit then fails later in CompleteEdit with ErrGridEditReadOnly, after the full O(rows) copy. The same applies to external updates that go through this helper.",
+      "suggestion": "After parsing the column, reject column 0 up front (for example with a read-only error) so the read-only rule is enforced at the source layer and no copy is wasted.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/loadedgrid/source.go",
+          "lines": {
+            "start": 243,
+            "end": 247
+          }
+        }
+      ],
+      "tags": [
+        "validation",
+        "read-only",
+        "location-corrected"
+      ],
+      "evidence": "n, e := numeric(text)\n\tif e != nil {\n\t\treturn nil, e\n\t}\n\t_, version, e := s.value(k, c)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "dfe84756757701b9",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Late-drift test depends on exact internal call counts",
+      "message": "The test hard-codes the number of edit-proof calls (4) that CompleteEdit makes before the final input check. `RowCount` also fires the drift on `*s.proofs\u003e=4`. Any harmless refactor that adds or removes a proof call makes the test fail, or makes it stop exercising the late-drift boundary. The `proofs!=4` check also fails if the drift fires and later proofs are made.",
+      "suggestion": "Trigger the drift on a semantic boundary instead of a call count. For example, fire it from the last call to the hook, or have the fixture record the phase. Then assert only that the drift fired and the result was atomic, rather than checking an exact count.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "virtual/projection_edit_review_test.go",
+          "lines": {
+            "start": 87,
+            "end": 87
+          }
+        }
+      ],
+      "tags": [
+        "brittle-test",
+        "call-count",
+        "location-corrected"
+      ],
+      "evidence": "if !live.fired || proofs!=4 {t.Fatalf(\"did not reach final input boundary: fired=%v proofs=%d\",live.fired,proofs)}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 130891,
+    "totalMs": 41140
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 44,
+    "bytes": 247143,
+    "chunks": 5,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 130005,
+        "output": 16611,
+        "costUSD": 0.42612
+      }
+    ],
+    "widenedFiles": 7,
+    "excluded": [
+      {
+        "path": "examples/loadedgrid/go.sum",
+        "reason": "lockfile"
+      }
+    ],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

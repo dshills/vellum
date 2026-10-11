@@ -276,6 +276,17 @@
               "sha256": "593be2cc9ad3eec49eadce6ba0e4428971278f4d55f6243ed201937d8c1c41f9"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/textcursor",
+          "inputs": "native/patches/textcursor/original-hashes.json",
+          "outputs": "native/patches/textcursor/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/textcursor/0033-scene-owned-text-cursors.patch",
+              "sha256": "727d379112f0a835727daf4e4024ead3ce853c7a6d7a0385e4b5081d92d0bd70"
+            }
+          ]
         }
       ]
     },

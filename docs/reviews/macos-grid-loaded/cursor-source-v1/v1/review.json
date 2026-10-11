@@ -1,0 +1,41 @@
+{
+  "after_sha256": {
+    "core/scene.go": "6f5e2cebd0ca614c8f41ef5f6e6931ae11da827253fdefdbb835ea7d63e9a227",
+    "core/textcursor.go": "46102a9a5d4d7bb9c16877c678170d2b2d2c6dfc69d8ef706c51fc7b27457d25"
+  },
+  "before_sha256": {
+    "core/scene.go": "c909640a9522459e0a2ca35013e769a0f27d0a9ebd3f65319ab4d454d62abe33",
+    "core/textcursor.go": "8503ef77855b6baea558e15ba249ef9e05165515f7496ec0f85c7897cda5ccf3"
+  },
+  "conclusions": [
+    "The failed Cocoa run races writes through the caller package-global textFieldCursor during two different window CloseReq/Scene.Close/Destroy paths. Per-window RC and Sprites locks cannot synchronize that shared pointer.",
+    "All execution modes now initialize/read/write main Scene textCursors under that main Stage Sprites lock. Deferred map write runs before deferred unlock; owner nil refuses safely under the same lock.",
+    "SpritesSource already draws cursor closures under that lock. Existing RC-to-Sprites ownership order and requestPaint-before-Sprites order are preserved; no main dispatch or new RC acquisition is introduced.",
+    "The legacy argument is ignored rather than dereferenced. Its public call signature remains source-compatible and the documentation states the changed ownership contract.",
+    "The two pinned callers only pass addresses of private textFieldCursor/lastCursor globals, with no other reads or writes relying on their updates. Cursor per-name reuse and manual-time blink behavior remain unchanged.",
+    "The map is attached to the owning main Scene and retains at most the last widget per supplied cursor name. Existing sprite closures already retain those widgets; no new process-global owner retention is introduced."
+  ],
+  "constraints": [
+    "Scene/Stage topology and widget fields still require the existing originating render-context ownership; this change does not make arbitrary unsynchronized Scene deletion safe.",
+    "External users inspecting the legacy pointer will no longer receive cursor ownership updates; this deliberate behavior change is documented.",
+    "Pinned stage input/output verification, independent concurrent regression and fresh race-clean Cocoa acceptance remain separate required records."
+  ],
+  "execution": "No tests, GUI, Git, Prism or shared source edits. Inert before/after snapshots and this certificate only.",
+  "findings": [],
+  "historical_failure": {
+    "changed_originals_match_record": true,
+    "note": "Functional workflow pass precedes two race reports; it is not a native gate pass.",
+    "path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/cocoa-smokes/fixed.log",
+    "producer_inputs_path": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v1/inputs-before.json",
+    "producer_inputs_sha256": "7ab413c4ebf87ca2fc9066a8b7c9a2948e0dcd955afd598c0c71c9ff2f5ab33b",
+    "reported_races": 2,
+    "result": "FAILED_EXIT_66",
+    "sha256": "843e4d1763cb46e2378c2997150921adf9bfa5ea84d3c16a1fea69d197b6776c"
+  },
+  "inputs": "inputs.json",
+  "inputs_sha256": "6a75d7260efee4b0bee0d4a6e88847c8202dcc1b8f76c045b7fcb31b499d1e09",
+  "result": "APPROVED_SOURCE",
+  "root": "/private/tmp/vellum-grid-loaded/drivers/cogent/build/upstream",
+  "schema": "vellum-loadedgrid-cursor-source-review-v1",
+  "scope": "Exact two-file prepared delta and eight selected ownership/lock/caller sources. Read-only design/API/lifetime review; not pinned patch reproduction or runtime qualification."
+}

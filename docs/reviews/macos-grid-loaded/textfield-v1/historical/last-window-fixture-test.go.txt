@@ -1,0 +1,180 @@
+//go:build offscreen
+
+package cogent
+
+import (
+ "context"
+ "errors"
+ "testing"
+
+ "cogentcore.org/core/core"
+ "cogentcore.org/core/events/key"
+ "github.com/dshills/vellum/app"
+ "github.com/dshills/vellum/drivers/cogent/internal/mailbox"
+ "github.com/dshills/vellum/ui"
+)
+
+func reviewSettlementField(t *testing.T) (*app.Application,*nativeWindow,*textWindow,*record,*[]string) {
+ t.Helper()
+ a,w,tw,_,_:=editorFixture(t,"peer editor")
+ changes:=[]string{}
+ r:=focusLossField(t,a,w,tw,"filter",&changes)
+ tw.manual=true
+ reviewOwner(t,a,func(){r.widget.(*core.TextField).SetEditingSelection(1,1)})
+ return a,w,tw,r,&changes
+}
+func reviewDeliverFieldFIFO(t *testing.T,w *nativeWindow,r *record) {
+ t.Helper()
+ for {
+  e,ok:=w.source.Load().Deque.PollEvent();if !ok{return}
+  if !handleTextEvent(w,e) {
+   if e.Type().IsKey(){r.widget.AsWidget().HandleEvent(e)}
+   if boundary:=w.body.Scene.EventBoundary;boundary!=nil{boundary(e)}
+  }
+ }
+}
+func reviewOwner(t *testing.T,a *app.Application,f func()) {t.Helper();if err:=a.Do(f);err!=nil{t.Fatal(err)}}
+
+func TestReviewFieldSettlementOrdinaryKeyBeforeCallback(t *testing.T) {
+ a,w,tw,r,changes:=reviewSettlementField(t)
+ tw.shadows[r.control.client]=textShadow{Text:"A",Epoch:r.control.textEpoch}
+ w.source.Load().KeyChord('7',key.Code7,0)
+ called:=false
+ reviewOwner(t,a,func(){
+  if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){
+   if err!=nil{t.Error(err)}
+   called=true
+   if len(*changes)!=1||(*changes)[0]!="A7"{t.Errorf("settlement callback preceded controlled final key: %v",*changes)}
+  });err!=nil{t.Fatal(err)}
+ })
+ reviewDeliverFieldFIFO(t,w,r)
+ if !called||len(tw.requests)!=0{t.Fatal("barrier did not finish")}
+ a.Drain()
+ if len(*changes)!=1{t.Fatalf("settled Change replayed: %v",*changes)}
+}
+
+func TestReviewFieldSettlementRetiresOlderQueuedChanges(t *testing.T) {
+ a,w,_,r,changes:=reviewSettlementField(t)
+ field:=r.widget.(*core.TextField)
+ called:=false
+ reviewOwner(t,a,func(){
+  if !field.ApplyNativeEdit("old",3,3,-1,-1,"insert"){t.Fatal("old fixture edit refused")}
+  field.Text() // queues an older controlled Change before the native barrier
+  if !field.ApplyNativeEdit("new",3,3,-1,-1,"insert"){t.Fatal("new fixture edit refused")}
+  if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){
+   if err!=nil{t.Error(err)}
+   called=true
+   if len(*changes)!=1||(*changes)[0]!="new"{t.Errorf("callback did not observe one settled value: %v",*changes)}
+  });err!=nil{t.Fatal(err)}
+ })
+ reviewDeliverFieldFIFO(t,w,r)
+ a.Drain()
+ if !called||len(*changes)!=1||(*changes)[0]!="new"{t.Fatalf("old queued Change survived settlement: %v",*changes)}
+}
+
+func TestReviewFieldSettlementMarkedCommitBeforeCallback(t *testing.T) {
+ a,w,tw,r,changes:=reviewSettlementField(t)
+ if err:=tw.pump.Send(textMessage{Kind:"input",Input:fixtureInput(r,1,"mark","A","Aに",2,2,1,2)});err!=nil{t.Fatal(err)}
+ called:=false
+ reviewOwner(t,a,func(){
+  if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){
+   called=true
+   if err!=nil{t.Error(err)}
+   if _,_,marked:=r.widget.(*core.TextField).NativeCompositionRange();marked{t.Error("callback saw unsealed preedit")}
+   if len(*changes)!=1||(*changes)[0]!="Aに"{t.Errorf("callback did not see committed preedit: %v",*changes)}
+  });err!=nil{t.Fatal(err)}
+ })
+ reviewDeliverFieldFIFO(t,w,r)
+ a.Drain()
+ if !called||len(*changes)!=1{t.Fatal("marked barrier failed or replayed Change",*changes)}
+}
+
+func TestReviewFieldSettlementArgumentAndScopeRefusals(t *testing.T) {
+ a,w,tw,r,_:=reviewSettlementField(t)
+ foreign,err:=app.New(app.Config{});if err!=nil{t.Fatal(err)};defer foreign.Close()
+ called:=0
+ cb:=func(error){called++}
+ cases:=[]struct{name string;run func()error}{
+  {"nil context",func()error{return SettleTextField(nil,a,w.window.ID,r.node.ID,cb)}},
+  {"nil application",func()error{return SettleTextField(context.Background(),nil,w.window.ID,r.node.ID,cb)}},
+  {"nil callback",func()error{return SettleTextField(context.Background(),a,w.window.ID,r.node.ID,nil)}},
+  {"empty id",func()error{return SettleTextField(context.Background(),a,w.window.ID,"",cb)}},
+  {"unknown id",func()error{return SettleTextField(context.Background(),a,w.window.ID,"missing",cb)}},
+  {"unknown window",func()error{return SettleTextField(context.Background(),a,"missing",r.node.ID,cb)}},
+  {"foreign application",func()error{return SettleTextField(context.Background(),foreign,w.window.ID,r.node.ID,cb)}},
+  {"multiline id",func()error{return SettleTextField(context.Background(),a,w.window.ID,"document",cb)}},
+ }
+ for _,tc:=range cases{t.Run(tc.name,func(t *testing.T){reviewOwner(t,a,func(){if err:=tc.run();err==nil{t.Error("invalid settlement admitted")}});if called!=0||len(tw.requests)!=0{t.Fatal("immediate refusal called callback or retained request")}})}
+ reviewOwner(t,a,func(){r.control.disabled=true;if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,cb);err==nil{t.Error("disabled settlement admitted")};r.control.disabled=false})
+ if called!=0||len(tw.requests)!=0{t.Fatal("disabled refusal retained barrier")}
+}
+
+func TestReviewFieldSettlementSharedCapacityAndRecovery(t *testing.T) {
+ a,w,tw,r,_:=reviewSettlementField(t)
+ callbacks:=0
+ ctx,cancel:=context.WithCancel(context.Background())
+ reviewOwner(t,a,func(){
+  if err:=SettleTextField(ctx,a,w.window.ID,r.node.ID,func(err error){callbacks++;if !errors.Is(err,context.Canceled){t.Error("canceled barrier result",err)}});err!=nil{t.Fatal(err)}
+  if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(error){t.Error("refused callback")});!errors.Is(err,mailbox.ErrFull){t.Error("second same-window barrier not refused",err)}
+  // The pre-existing multiline settlement shares the exact same window slot.
+  editor:=w.root.control.editor.model
+  if err:=SettleEditor(context.Background(),a,w.window.ID,editor,func(error){t.Error("refused editor callback")});!errors.Is(err,mailbox.ErrFull){t.Error("cross-kind barrier not bounded",err)}
+ })
+ cancel()
+ reviewDeliverFieldFIFO(t,w,r)
+ if callbacks!=1||len(tw.requests)!=0{t.Fatal("canceled barrier did not release slot")}
+ reviewOwner(t,a,func(){if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){callbacks++;if err!=nil{t.Error(err)}});err!=nil{t.Fatal(err)}})
+ reviewDeliverFieldFIFO(t,w,r)
+ if callbacks!=2||len(tw.requests)!=0{t.Fatal("released slot was not reusable")}
+}
+
+func TestReviewFieldSettlementRetiredAndClosedBinding(t *testing.T) {
+ for _,closed:=range []bool{false,true}{t.Run(map[bool]string{false:"replacement",true:"window close"}[closed],func(t *testing.T){
+  a,w,tw,r,changes:=reviewSettlementField(t)
+  called:=0
+  reviewOwner(t,a,func(){if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){called++;if err==nil{t.Error("retired/closed barrier succeeded")}});err!=nil{t.Fatal(err)}})
+  reviewOwner(t,a,func(){
+   if closed {
+    if err:=a.CloseWindow(w.window.ID);err!=nil{t.Fatal(err)}
+    closeTextWindow(w)
+   }else{
+    r.control.retired=true
+    delete(tw.clients,r.control.client)
+    // Same public ID at a distinct mount incarnation must not inherit request.
+    next:=focusLossField(t,a,w,tw,r.node.ID,changes)
+    if next.control.client==r.control.client{t.Fatal("replacement reused client")}
+   }
+  })
+  if !closed{reviewDeliverFieldFIFO(t,w,r)}
+  if called!=1||len(tw.requests)!=0||len(*changes)!=0{t.Fatal("retired barrier callback/credit/value incorrect",called,*changes)}
+ })}
+}
+
+// A controlled Change may close its own window. The adapter must stop native
+// reads and report retirement rather than invoke a successful Apply afterward.
+func TestReviewFieldSettlementChangeCanCloseWindow(t *testing.T) {
+ a,w,tw,r,_:=reviewSettlementField(t)
+ field:=r.widget.(*core.TextField)
+ called:=0
+ reviewOwner(t,a,func(){
+  r.node.Change=func(ui.ChangeEvent){if err:=a.CloseWindow(w.window.ID);err!=nil{t.Error(err)}}
+  if !field.ApplyNativeEdit("closed",6,6,-1,-1,"insert"){t.Fatal("fixture edit refused")}
+  if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){called++;if err==nil{t.Error("closed Change delivered successful settlement")}});err!=nil{t.Fatal(err)}
+ })
+ reviewDeliverFieldFIFO(t,w,r)
+ if called!=1||len(tw.requests)!=0{t.Fatal("reentrant Change retirement left barrier")}
+}
+
+func TestReviewFieldSettlementNoDuplicateForUnchangedSecondBarrier(t *testing.T) {
+ a,w,_,r,changes:=reviewSettlementField(t)
+ calls:=0
+ reviewOwner(t,a,func(){
+  if !r.widget.(*core.TextField).ApplyNativeEdit("stable",6,6,-1,-1,"insert"){t.Fatal("fixture edit refused")}
+  if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){calls++;if err!=nil{t.Error(err)}});err!=nil{t.Fatal(err)}
+ })
+ reviewDeliverFieldFIFO(t,w,r)
+ reviewOwner(t,a,func(){if err:=SettleTextField(context.Background(),a,w.window.ID,r.node.ID,func(err error){calls++;if err!=nil{t.Error(err)}});err!=nil{t.Fatal(err)}})
+ reviewDeliverFieldFIFO(t,w,r)
+ a.Drain()
+ if calls!=2||len(*changes)!=1||(*changes)[0]!="stable"{t.Fatal("unchanged second barrier replayed Change",calls,*changes)}
+}

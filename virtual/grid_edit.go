@@ -107,6 +107,36 @@ func (g *Grid) checkedEditCell(source GridSource, stamp GridStamp, rowKey, colum
 	return value, true, nil
 }
 
+// A worker-built candidate can filter the edited row out of its new view.
+// Its exact private full input still proves the committed cell in constant time.
+func (g *Grid) checkedEditCommitCell(source GridSource, stamp GridStamp, rowKey, columnID string) (GridEditValue, bool, error) {
+	if projection, ok := source.(GridProjection); ok {
+		if prepared, exact := unwrapGridProjection(projection); exact {
+			acceptedInput := g.stamp
+			if old, ok := g.source.(GridProjection); ok {
+				if accepted, exact := unwrapGridProjection(old); exact {
+					acceptedInput = accepted.input
+				}
+			}
+			if prepared.input.Identity != acceptedInput.Identity || prepared.input.Revision <= acceptedInput.Revision {
+				return GridEditValue{}, false, ErrGridStale
+			}
+			if err := prepared.current(); err != nil {
+				return GridEditValue{}, false, err
+			}
+			value, found, err := g.checkedEditCell(prepared.base, prepared.input, rowKey, columnID)
+			if err != nil {
+				return value, found, err
+			}
+			if err := prepared.current(); err != nil {
+				return GridEditValue{}, false, err
+			}
+			return value, found, nil
+		}
+	}
+	return g.checkedEditCell(source, stamp, rowKey, columnID)
+}
+
 func (g *Grid) editForSource(source GridSource, stamp GridStamp) (gridEditDraft, error) {
 	d := g.edit
 	if !d.state.Active {
@@ -316,6 +346,8 @@ func (g *Grid) checkEditRequest(r GridEditRequest) error {
 
 // CompleteEdit atomically installs a validated immutable candidate and closes
 // the draft. A failure preserves the live source, draft, generation and refs.
+// An exact worker-built projection validates the committed cell against its full
+// immutable input, even when the new view filters that row out.
 // Caller installs its domain/source pointer only after this method succeeds.
 // No user mutation/validation callback runs inside this transaction.
 func (g *Grid) CompleteEdit(request GridEditRequest, candidate GridSource) error {
@@ -332,7 +364,7 @@ func (g *Grid) CompleteEdit(request GridEditRequest, candidate GridSource) error
 	if stamp.Identity != g.stamp.Identity || stamp.Revision <= g.stamp.Revision {
 		return ErrGridStale
 	}
-	v, found, err := g.checkedEditCell(candidate, stamp, request.state.RowKey, request.state.ColumnID)
+	v, found, err := g.checkedEditCommitCell(candidate, stamp, request.state.RowKey, request.state.ColumnID)
 	if err != nil {
 		return err
 	}
@@ -345,5 +377,5 @@ func (g *Grid) CompleteEdit(request GridEditRequest, candidate GridSource) error
 	if v.Version <= request.state.BaseVersion || v.Text != request.state.Text {
 		return ErrGridEditConflict
 	}
-	return g.replaceSource(candidate, &request)
+	return g.replaceSource(candidate, &request, nil)
 }

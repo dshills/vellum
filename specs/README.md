@@ -4,6 +4,7 @@
   tasks, docking, virtualization and GPU canvas behavior, including current limits.
 - [Indexed data grid](grid.md): bounded two-axis projection, frozen regions, stable cell identities and stale press refusal.
 - [Captured grid row selection](grid-selection.md): immutable range/All scopes, bounded stable-key exceptions and worker enumeration.
+- [Worker-built grid views](grid-projection.md): bounded immutable sort/filter indexes, cancellation and latest-result owner admission.
 - [Versioned grid cell drafts](grid-editing.md): recoverable bounded drafts, per-cell conflict detection and atomic immutable-source completion.
 - [Managed grid adapter](grid-native.md): bounded native cells, measured geometry, routed input and viewport accessibility.
 - [Keyed reconciliation](keyed-reconciliation.md): retained native identity.

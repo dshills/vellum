@@ -78,6 +78,32 @@ fields without an active native client retain the backend's immediate focus-loss
 behavior. This contract covers admitted native field input through handoff;
 programmatic focus requests do not impose a global order on legacy key events.
 
+`cogent.SettleTextField(ctx, application, windowID, nodeID, callback)` admits an
+asynchronous barrier for an ordinary managed text field on the application
+owner. A dependent action, such as applying a filter, reads its controlled model
+value inside the successful callback. The originating-window FIFO processes
+already admitted input, seals composition and delivers the final `Change` before
+that callback. It retires older queued change snapshots for that field, so they
+cannot overwrite the settled value. Repeated settlement without a value change
+does not repeat `Change`, including before the next redraw. Reconciliation still
+applies the application's accepted, rejected or normalized controlled value.
+
+The barrier shares the existing one-pending-settlement capacity per window with
+document and inline-grid settlement. Missing, ambiguous, disabled, retired,
+nonordinary or callback-free field bindings are refused; an immediate refusal
+has no callback.
+Cancellation and binding/window retirement terminate admitted requests while the
+application remains open. Application shutdown suppresses outstanding callbacks.
+The callback and `Change` run on the owner without nested owner draining. Manual
+drivers require explicit `Step`; settlement starts no worker or ambient frame.
+This is an ordering contract for admitted native input, rather than a guarantee
+about future input or input from a different window.
+
+Native text-cursor sprite ownership is local to the main scene for both manual
+and desktop execution. Each stage's sprite lock guards its own ownership map, so
+concurrent window closure does not write a shared last-widget pointer. This does
+not impose a global order on window teardown or native event delivery.
+
 The Mac native adapter refuses a single-line `TextField.Text` above 4 MiB before
 mounting; the portable descriptor has no such platform bound. Cocoa input
 preflights that native budget before mutation. A legacy field edit above the

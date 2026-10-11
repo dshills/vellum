@@ -104,6 +104,7 @@ type textSettlement struct {
 	binding   *record
 	model     *editor.Model
 	gridEdit  *gridEditBinding
+	field     *fieldChangeEpoch
 	ctx       context.Context
 	callback  func(error)
 	stop      func() bool
@@ -714,6 +715,10 @@ func (t *textWindow) settled(id uint64) {
 	}
 	if q.binding.control.retired || t.clients[q.binding.control.client] != q.binding {
 		t.complete(id, ErrTextInputStale)
+		return
+	}
+	if q.field != nil {
+		t.settledField(id, q)
 		return
 	}
 	if q.gridEdit != nil {

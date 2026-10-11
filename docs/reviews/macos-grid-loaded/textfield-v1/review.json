@@ -1,0 +1,73 @@
+{
+  "coverage": [
+    "ordinary queued key before committed callback",
+    "older queued Change retirement after barrier",
+    "manual marked text seals before callback",
+    "malformed, foreign, multiline, missing and disabled binding refusal",
+    "shared ordinary/multiline one-window settlement credit and cancellation recovery",
+    "remount/retired binding and logical window close with surviving app lifetime",
+    "controlled Change may close originating window with no further native reads",
+    "repeated unchanged barrier emits no duplicate Change",
+    "ordinary delivered Change followed by settlement without redraw emits no duplicate",
+    "controlled normalization/rejection is applied by reconciliation and not repeated"
+  ],
+  "final_reviewer_test": {
+    "bytes": 13091,
+    "format_only_relation": "final-test/formatting.json",
+    "install_path": "/private/tmp/vellum-grid-loaded-review/textfield-settlement/textfield_settlement_review_test.go",
+    "sha256": "f844a74fb81954bb688f6176893464f1d56d5e35b3901dc0ce71569f31de8582",
+    "snapshot": "final-test/textfield_settlement_review_test.go.txt"
+  },
+  "focused_regression_proof": {
+    "exit_code": 0,
+    "inputs_unchanged": true,
+    "path": "qualified-focused/qualification.json",
+    "race_repetitions": 20,
+    "result": "PASS",
+    "sha256": "71420917a16fdfbe925b7f2a0009f0b1b8282636d67f0fabb2df9154a6586ad9",
+    "test_sha256": "b6f4b3720945eece5121df127db2f266e90ae50ba978573f89d43071aa2b7d5f"
+  },
+  "limits": [
+    "Selected source/proof review, not complete copied dependency/toolchain closure.",
+    "Focused checks use actual mounted offscreen TextField and originating deferred FIFO; legacy key case invokes mounted widget handler, not the public consumer router.",
+    "Manual marked-input test does not qualify physical IME, Cocoa/native window/external AX or GUI.",
+    "Prior focused proof binds unformatted exact test body; mechanically verified formatting only creates final installation bytes, to be independently qualified by root installed native checks.",
+    "No performance, full P6, public release, OS settings or global focus FIFO claim."
+  ],
+  "resolved_findings": [
+    {
+      "after": "Owner-held fieldDelivered is initialized/reset by controlled reconciliation and advanced before ordinary or settled Change callbacks. Field epoch drops earlier queued snapshots only after explicit settlement.",
+      "before": "Both settlements compare with stale r.node.Text and emit Change twice",
+      "green_proof": "qualified-focused/qualification.json",
+      "id": "repeated-settlement-duplicate-change",
+      "red_proof": "historical/window-fixture-corrected-race.json",
+      "result": "FIXED",
+      "severity": "medium",
+      "source_locations": [
+        "drivers/cogent/controls.go:40",
+        "drivers/cogent/controls.go:57",
+        "drivers/cogent/controls.go:271",
+        "drivers/cogent/controls.go:380",
+        "drivers/cogent/textfield_settle.go:75",
+        "drivers/cogent/textfield_settle.go:79"
+      ],
+      "trigger": "Settle same changed native field twice before descriptor refresh"
+    }
+  ],
+  "result": "APPROVED",
+  "review_conclusions": [
+    "Public admission is owner-held and performs no originating widget reads; actual field state/commit executes at its existing originating FIFO with render lock and owner.",
+    "Epoch is nonzero-sized, captured for each ordinary queued Change; settlement retires prior queued snapshots without coalescing ordinary delivery.",
+    "The committed controlled Change runs before settlement callback, with last-delivered state recorded first; callback-driven close/retirement is checked before continuing and no native widget read follows application code.",
+    "Shared per-window capacity, cancellation, late remount and lifetime contracts remain those of existing text settlement transport."
+  ],
+  "reviewed_sources": {
+    "drivers/cogent/controls.go": "161ab0cc271248beefa69735ab67342f2da28ad4f086ed6d863e1c9025cb28c9",
+    "drivers/cogent/editor.go": "1600cf654c8015ae34a05b3b9c82c70ea4dcc0f5716438135e47579b93b1a205",
+    "drivers/cogent/textfield_settle.go": "61f6f29fb0584949b2102bd40d57c5abea5d781a24cfa7936c0fb1b36b6a6bc8"
+  },
+  "reviewer": "mac_history_review",
+  "schema": "vellum-native-textfield-settlement-independent-review-v1",
+  "source_root": "/private/tmp/vellum-grid-loaded",
+  "unresolved_findings": []
+}

@@ -1,0 +1,62 @@
+{
+  "aggregate_qualification_path": "docs/reports/macos-grid-loaded/qualification.json",
+  "aggregate_qualification_sha256": "7a623b58007e837b3a372ead1c4bc47853c95e6af1ed2a8b29f05591398d8669",
+  "audit_proof": "audit.json",
+  "audit_proof_sha256": "28141ca265b17f1df54c01336e4269be3d855d3e07327a080385e81b58379b9c",
+  "bound_records": {
+    "consumer_v2_sha256": "0dcfd06888d449b0f19999fc143ae5b81be766517d56d67f5d91f4ac71a2e690",
+    "core_v2_sha256": "63048b3824a37742b7205e6c5b168b51bc68341b9491ada5aa612bfbf2e9dab4",
+    "desktop_v2_sha256": "ce94130a3aae3f8b39e27bed4cc239cdb908e9133b0b94b76ccbc5cc77225cc5",
+    "findings_sha256": "ad11f37d2246db941a5b64f28f20ec54318576ceb85f8b5aa37f0d4de2c3a765",
+    "native_v3_sha256": "2e3054912221d487dacafd999188b98b2e797c9e20b167c74bbfcb37a98cab55",
+    "report_readme_sha256": "74faa76facad5fc13e04f75373e4bcfb9c70a5b22383d5abc2576b82d148b54c",
+    "review_readme_sha256": "5a19f33b5383c4898d69494a7dc31ae3d0efef078950f5f63d18e3a15bf8c9f1"
+  },
+  "conclusions": [
+    "All 360 current selected hashes and 326 archive file hashes/lengths match the frozen ledger. The archive inventory excludes only the ledger at this point; later metadata-audit/promotion records are explicitly outside its own hash map. No historical Go snapshot is an active .go file.",
+    "All recorded final command exits are zero and raw logs match. The complete 6121-file prepared byte map equals current upstream/typesetting bytes and both final native fingerprints; cursor stage33 output hashes and pinned metadata are retained.",
+    "The only current-code difference from native-v3 and consumer-v2/desktop-v2 input generations is the disclosed virtual/projection_edit_review_test.go semantic fixture improvement, old8c948f4a to finalfea7d89b. It is an uncompiled dependency test in those packages; core-v2 compiles/runs final installed bytes. Consumer OWN11, native runtime and desktop binary remain identical.",
+    "Both final Cocoa logs contain all five ordered actual stages with exit0/no race warnings and the same qualified binary. The first Cocoa workflow pass plus exit66/two races remains a failure, and its variable run was withheld. Earlier compilation/ordering cases and reconstructed counterfactuals retain their distinct labels.",
+    "Raw Prism remains exit1 with one high and three medium findings. Its complete five-chunk scope reviews44 files and explicitly excludes one identity-bound lockfile from45 selected files. Separate source-backed dispositions cover all four: three refuted and one test-only correction, with no subsequent production delta.",
+    "Final report and review README links target the final gates and describe historical source versions, logical memory exclusions and open Mac/performance/public-distribution acceptance honestly."
+  ],
+  "limits": [
+    "This certificate verifies recorded provenance and metadata; it does not independently reexecute the tests or inspect staged Git index parity. Root promotion/precommit checks remain separate.",
+    "Selected source maps and prepared bytes are not complete compiler, module-cache, system SDK or external dependency source closure. Retained desktop binary identity is bound; binary bytes are excluded from the committed inert archive.",
+    "Logical domain/index/working sizes and recorded workflow durations are not peak/RSS/native/GPU memory bounds or sustained p95/p99 latency benchmarks.",
+    "Physical input, human IME/VoiceOver, external AX, large-tree/sustained P6/P9 workloads, broader Mac/device acceptance and public signing/notarization remain open. Windows/Linux qualification remains later."
+  ],
+  "material_issues": [],
+  "preserved_diff_carriers": [
+    {
+      "path": "docs/reviews/macos-grid-loaded/cursor-pinned-v1/snapshots/drivers/cogent/native/patches/textcursor/0033-scene-owned-text-cursors.patch.txt",
+      "sha256": "727d379112f0a835727daf4e4024ead3ce853c7a6d7a0385e4b5081d92d0bd70"
+    },
+    {
+      "path": "docs/reviews/macos-grid-loaded/prism-portable-v1/counterfactual-red/counterfactual.diff",
+      "sha256": "2be4b4e43a7a7faa0718063a53e11c2a87a3f7f3b58c03c5fce4d6efcb002d11"
+    },
+    {
+      "path": "docs/reviews/macos-grid-loaded/prism-portable-v1/test-delta.diff",
+      "sha256": "45691168fce1f861aca03dd468a7fc7a98aa820670c00a8696628b1236872534"
+    },
+    {
+      "path": "docs/reviews/macos-grid-loaded/textfield-v1/final-test/gofmt-only.diff",
+      "sha256": "be6b6d0e8b1030492984659cc5db6849fc99b6dba2a6b765500e5cca9e0eadb9"
+    }
+  ],
+  "result": "APPROVED",
+  "reviewer_verifier": "audit.py",
+  "reviewer_verifier_sha256": "2afc833dfd86473e351457431aa3d1e003af8c0540de564015bc209087127978",
+  "schema": "vellum-loadedgrid-final-metadata-review-v1",
+  "scope": "Independent read-only final evidence/metadata review of the exact ledger, final report/review records, selected source generations, prepared byte maps, raw transcripts and archive references. No shared edits, tests, GUI, Git or Prism.",
+  "source_root": "/private/tmp/vellum-grid-loaded",
+  "verified_counts": {
+    "archive_files": 326,
+    "current_selected_sources": 360,
+    "embedded_manifest_entry_checks": 459,
+    "embedded_raw_log_roundtrips": 30,
+    "final_qualification_checks": 16,
+    "prepared_files": 6121
+  }
+}

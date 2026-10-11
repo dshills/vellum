@@ -1,0 +1,98 @@
+{
+  "schema": "vellum-loaded-grid-portable-internal-review-v1",
+  "result": "APPROVED_SELECTED_SOURCE",
+  "source_root": "/private/tmp/vellum-grid-loaded",
+  "baseline": "39fb486",
+  "reviewed_files": {
+    "virtual/grid.go": "09fe176512bc4d181b13eb20177b8957ff49473d55821a9381b6fbcb5d7fd9b8",
+    "virtual/grid_edit.go": "a5e15e1d672c92e2b7bc55cfbc1f9a783009d209111235a493486f5717f59a8c",
+    "virtual/grid_projection_request.go": "c9a08279f5d46d3febce6bf8418bd38f2cf9506a795ef57e698ac355bd6f3390",
+    "virtual/grid_projection_request_test.go": "897d64cd756ca159aa7096a48fbf8de22bb4e7a08fa1527fc3b879b3459ed556",
+    "virtual/grid_projection_types.go": "314a7dad9451a79979091e66defa33df6e39ddbc4e2c33175ed3e8c1598bc5cb",
+    "virtual/grid_projection.go": "d1a44db19dbd02a90025700196e945132173a77ab280288f9b9686a88401eedf",
+    "virtual/grid_projection_test.go": "e2f6b3856259af016a1823577fb7a02785ebdc05124fef2de4e1b5d516bf158f",
+    "specs/grid-projection.md": "ec9bb22b3bc3073d6f3542fafc78bee865d8f5918fc5788beec982b2e9c266d2"
+  },
+  "reviewer_tests": {
+    "virtual/projection_health_review_test.go": "a478026f19fa4d4e8f4c1cdc2f32f163b12a36cd55c361bdacf4f4302a637a2b",
+    "virtual/projection_edit_review_test.go": "8c948f4ae163bdb008ae52e4327bc409c9ad89119252756e8d5bdb5f357b7c6d"
+  },
+  "scope": "Owner projection requests, Grid source/edit publication, sealed result admission, portable builder, public types and grid-projection specification. No consumer/native/UI qualification.",
+  "findings": [
+    {
+      "id": "empty-full-input-health",
+      "severity": "medium",
+      "status": "FIXED",
+      "history": "First three regression failures are explicitly reconstructed counterfactual; no original producer pre-fix file retained. Guarded source passes unchanged tests."
+    },
+    {
+      "id": "late-empty-live-metadata",
+      "severity": "medium",
+      "status": "FIXED",
+      "history": "Exact captured corrected-three-guard source fails at final live metadata callback; trailing private health guard passes."
+    },
+    {
+      "id": "edited-full-domain-revision",
+      "severity": "medium",
+      "status": "FIXED",
+      "history": "Exact captured edit source accepted changed cell/version under reused full domain stamp despite advanced view stamp; helper now requires full input revision advancement."
+    }
+  ],
+  "final_independent_check": {
+    "proof": "checks/request-v3-final-review-regressions.json",
+    "sha256": "3ad49ef05aefcc3bb58217a5c63a6d3e08fad311cb2ecb6b01b66d3d1e0f5083",
+    "classification": "FINAL_RACE20_GREEN",
+    "exit_code": 0
+  },
+  "builder_proof": {
+    "path": "builder-qualified/qualification.json",
+    "sha256": "a7b0e619dfe49a0c53065413094d03f45c501862fdf1f03c6c761d7d975c8b77",
+    "checks": "Focused projection race3 and virtual vet exit0; all declared inputs/log hashes independently verified"
+  },
+  "source_conclusions": [
+    "Latest request token is detached and nonzero-sized, with cloned bounded identities; no Grid/source/owner backpointer. Supersede/cancel/refusal do not retire accepted cell references.",
+    "Exact concrete four-variant unwrap rejects wrappers and typed nil before caller-overridden candidate methods.",
+    "Projection admission validates captured full input, exact next view revision and trailing health after prospective/live callbacks. Accepted source installation alone retires pending token.",
+    "Exact projected edit validates full immutable edited input, advancing full-domain and view revisions, cell text/version/editability; query-hide retains recoverable draft while own accepted edit may filter row out and close atomically.",
+    "Builder charges input-sized retained capacity, temporary arrays/query headers and cloned sort payload before allocation/retention; stable merge and full input key/inverse/metrics validation remain worker-only.",
+    "Per-source-callback cancellation/stamp checks, byte limits before UTF8 scans, detached retained strings and indexed output operations match documented scope."
+  ],
+  "limits": [
+    "Borrowed source must remain immutable and concurrent-readable; stamped drift guards cannot detect hidden unstamped mutations or preempt blocking callbacks.",
+    "Application separately checks full-domain pointer/revision, query/edit operation identity and lifetime; Grid cannot observe uninstalled application mutations.",
+    "Logical per-build budgets exclude borrowed domain storage, allocator/runtime/native overhead and other live results. No sustained memory/latency, GUI, physical input, external AX or full P6/Mac completion claim.",
+    "Reviewer-only compile fixture failure retained separately. Three initial shell wrappers failed after go test because zsh status is read-only; their unbound exit logs are superseded by source-bound reruns and are not qualification records."
+  ],
+  "checks": [
+    {
+      "proof": "checks/request-v1-reconstructed-red.json",
+      "sha256": "6b6986fb7c643d125db0c774c42d60b20e64d1a78bf8a66bbb65685ae04d45f2",
+      "classification": "RECONSTRUCTED_COUNTERFACTUAL_RED",
+      "exit_code": 1
+    },
+    {
+      "proof": "checks/request-v1-corrected-three-green.json",
+      "sha256": "43948d043f897397276480a317fac8e0560fa4c418d0a92bea82a77c84d51c36",
+      "classification": "HISTORICAL_THREE_GUARDS_GREEN",
+      "exit_code": 0
+    },
+    {
+      "proof": "checks/request-v1-captured-late-gap-red.json",
+      "sha256": "ac95109d12f537b6f12248962f880fe26ea6f136f192b7305cc085a4540448cf",
+      "classification": "ACTUAL_CAPTURED_LATE_GAP_RED",
+      "exit_code": 1
+    },
+    {
+      "proof": "checks/request-v2-edit-negatives-corrected-fixture.json",
+      "sha256": "bcf68e3b091c4d905215c2d47d65e1b4fff0de36430cad682231209390dff1c6",
+      "classification": "ACTUAL_FULL_DOMAIN_REVISION_RED",
+      "exit_code": 1
+    },
+    {
+      "proof": "checks/request-v3-final-review-regressions.json",
+      "sha256": "3ad49ef05aefcc3bb58217a5c63a6d3e08fad311cb2ecb6b01b66d3d1e0f5083",
+      "classification": "FINAL_RACE20_GREEN",
+      "exit_code": 0
+    }
+  ]
+}

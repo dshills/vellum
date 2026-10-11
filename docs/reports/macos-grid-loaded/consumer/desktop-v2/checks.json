@@ -1,0 +1,48 @@
+[
+  {
+    "name": "fixed",
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-grid-loaded/drivers/cogent/env.sh\nexec /private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/loadedgrid-desktop -smoke"
+    ],
+    "cwd": "/private/tmp/vellum-grid-loaded/examples/loadedgrid",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 34.612,
+    "log": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/cocoa-smokes/fixed.log",
+    "log_sha256": "9ee2a308da5df5ea1656bd57759552d2bb88a831f092663899bb57fbe686b74f",
+    "stages": [
+      "empty-ready",
+      "stored-loaded",
+      "worker-projection",
+      "async-edit-conflict",
+      "pass"
+    ],
+    "qualified": true
+  },
+  {
+    "name": "variable",
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-grid-loaded/drivers/cogent/env.sh\nexec /private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/loadedgrid-desktop -smoke -variable-rows"
+    ],
+    "cwd": "/private/tmp/vellum-grid-loaded/examples/loadedgrid",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 50.797,
+    "log": "/private/tmp/vellum-grid-loaded-consumer-qualification/qualified-v2/cocoa-smokes/variable.log",
+    "log_sha256": "4454716dcde0770b527ba57635de43f0d88340a57c1d8d2988c4dfff109c96e9",
+    "stages": [
+      "empty-ready",
+      "stored-loaded",
+      "worker-projection",
+      "async-edit-conflict",
+      "pass"
+    ],
+    "qualified": true
+  }
+]

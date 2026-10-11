@@ -1,0 +1,13 @@
+from pathlib import Path
+import hashlib,json,os,subprocess,sys
+cwd=Path(sys.argv[1]); out=Path(sys.argv[2]); pattern=sys.argv[3]; count=sys.argv[4]
+files=lambda:{str(f.relative_to(cwd)):hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(cwd.rglob('*')) if f.is_file()}
+before=files()
+cmd=['go','test','-race','./virtual','-run',pattern,'-count='+count]
+env=dict(os.environ,GOWORK='off',GOCACHE='/private/tmp/vellum-grid-loaded-review/go-cache')
+with out.with_suffix('.log').open('xb') as log:
+ result=subprocess.run(cmd,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=90)
+after=files()
+proof={'classification':sys.argv[5],'command':cmd,'cwd':str(cwd),'exit_code':result.returncode,'inputs_before':before,'inputs_after':after,'unchanged':before==after,'log_sha256':hashlib.sha256(out.with_suffix('.log').read_bytes()).hexdigest()}
+out.with_suffix('.json').write_text(json.dumps(proof,indent=2)+'\n')
+print(json.dumps({'proof':str(out.with_suffix('.json')),'exit_code':result.returncode,'unchanged':before==after,'log':out.with_suffix('.log').read_text()}))

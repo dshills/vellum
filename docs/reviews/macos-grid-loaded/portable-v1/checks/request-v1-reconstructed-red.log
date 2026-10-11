@@ -1,0 +1,9 @@
+--- FAIL: TestReviewProjectionCompleteRejectsEmptyInputDrift (0.00s)
+    projection_health_review_test.go:24: empty drifted input accepted: <nil>
+--- FAIL: TestReviewProjectionPrepareRejectsEmptyInputDrift (0.00s)
+    projection_health_review_test.go:35: prepared query from unhealthy empty full input: <nil>
+--- FAIL: TestReviewProjectionFinalRequestRejectsEmptyInputDrift (0.00s)
+    projection_health_review_test.go:68: late empty input drift published: <nil> (calls=4)
+FAIL
+FAIL	github.com/dshills/vellum/virtual	0.218s
+FAIL

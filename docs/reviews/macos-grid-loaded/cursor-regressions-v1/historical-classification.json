@@ -1,0 +1,30 @@
+[
+  {
+    "classification": "ACTUAL_CAPTURED_PRODUCT_RACE_AND_RETENTION_FAILURE",
+    "exit_code": 1,
+    "path": "original-red/qualification.json",
+    "result": "EXPECTED_RED",
+    "sha256": "f5f8a4405afeda6953e43b9667a64328cc27b5bec0d11af0a83a489aad34f692"
+  },
+  {
+    "classification": "REVIEWER_MANUAL_FIXTURE_FAILURE (unbootstrapped blink interval zero)",
+    "exit_code": 1,
+    "path": "corrected-green/qualification.json",
+    "result": "FAIL",
+    "sha256": "a9d41a99e317233ca8098392a150851103811517d9d2c089e68fb2adacdf77c3"
+  },
+  {
+    "classification": "QUALIFIED_INTERMEDIATE_4_TESTS",
+    "exit_code": 0,
+    "path": "corrected-fixture-green/qualification.json",
+    "result": "PASS",
+    "sha256": "354744a7e2bba41a55110beaacc0f46f97c0b345eead2c04f8125baca19644bb"
+  },
+  {
+    "classification": "QUALIFIED_FINAL_5_TESTS",
+    "exit_code": 0,
+    "path": "final-green/qualification.json",
+    "result": "PASS",
+    "sha256": "75b4452bd08f65a0c0efe1647b1ab3638c1ccfd728c8edb76df9486ae23514ca"
+  }
+]

@@ -1,0 +1,38 @@
+{
+  "changes_from_initial_review": {},
+  "contract_checks": [
+    "Immutable full-domain input, stable strict numeric sorting, cancellation and cached-array/string budgets agree with builder.",
+    "Opaque result/view revision and final callback admission match current source.",
+    "Consumer filter acknowledgment follows controlled Change before capture, and separate filter/session tokens guard late results.",
+    "Mac milestone, P4/P6/P9 sustained workloads, human input/accessibility and public dependency/signing audit are explicitly unfinished.",
+    "New durable loaded-data report link is pending its producer qualification/archive and is not treated as current evidence."
+  ],
+  "docs": [
+    "README.md",
+    "docs/implementation.md",
+    "docs/development.md",
+    "specs/controls.md",
+    "specs/grid-projection.md",
+    "specs/framework.md",
+    "specs/macos-completion.md"
+  ],
+  "execution": "Read-only source/docs and hash review; no tests, GUI, Git, Prism or shared edits.",
+  "findings": [],
+  "inputs": "inputs.json",
+  "inputs_sha256": "1d55b63f2ba323bd794120b8e3b233f493278712588f0fb7b3e29160d168ae46",
+  "limits": [
+    "Loaded report/evidence and final source-bound API/Cocoa qualification are separate and pending.",
+    "No full macOS/production/performance acceptance or physical IME/VoiceOver/external assistive workflow certification.",
+    "Logical builder/domain budgets do not bound peak process RSS, allocator/native/GPU memory or all concurrent retained revisions."
+  ],
+  "prior_review": "/private/tmp/vellum-loadedgrid-doc-review/review-v1/review.json",
+  "prior_review_sha256": "e6dbb3eb1a771c436d0ffe6818bb20aac7a2992f4d62319a0359bf5d037925a8",
+  "resolved_findings": [
+    "completion-reservation-contract",
+    "settled-field-change-required"
+  ],
+  "result": "UNVERIFIED_CORRECTION",
+  "root": "/private/tmp/vellum-grid-loaded",
+  "schema": "vellum-loadedgrid-doc-review-v2",
+  "scope": "Seven current documentation files plus selected supporting API/runtime inputs. Document review only, not native source closure or test qualification."
+}

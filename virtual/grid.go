@@ -111,22 +111,23 @@ type GridSnapshot struct {
 // Grid is owner-confined, like Table. Copying a Grid value is refused. Snapshot
 // records are detached; strings are immutable and no source arrays are retained.
 type Grid struct {
-	self         *Grid
-	token        *gridRefToken
-	source       GridSource
-	stamp        GridStamp
-	rows         gridRows
-	columns      []GridColumn
-	prefix       []int
-	config       GridConfig
-	viewport     GridViewport
-	active       GridActive
-	generation   uint64
-	anchorKey    string
-	anchorOffset int
-	selection    GridSelection
-	edit         gridEditDraft
-	editSerial   uint64
+	self              *Grid
+	token             *gridRefToken
+	source            GridSource
+	stamp             GridStamp
+	rows              gridRows
+	columns           []GridColumn
+	prefix            []int
+	config            GridConfig
+	viewport          GridViewport
+	active            GridActive
+	generation        uint64
+	anchorKey         string
+	anchorOffset      int
+	selection         GridSelection
+	edit              gridEditDraft
+	editSerial        uint64
+	pendingProjection *gridRefToken
 }
 
 const gridMaxDefinitions = 4096
@@ -443,9 +444,9 @@ func (g *Grid) Refresh() error {
 	return g.ReplaceSource(g.source)
 }
 func (g *Grid) ReplaceSource(source GridSource) error {
-	return g.replaceSource(source, nil)
+	return g.replaceSource(source, nil, nil)
 }
-func (g *Grid) replaceSource(source GridSource, completing *GridEditRequest) error {
+func (g *Grid) replaceSource(source GridSource, completing *GridEditRequest, projection *GridProjectionRequest) error {
 	if err := g.valid(); err != nil {
 		return err
 	}
@@ -557,7 +558,7 @@ func (g *Grid) replaceSource(source GridSource, completing *GridEditRequest) err
 		if err := g.checkEditRequest(*completing); err != nil {
 			return err
 		}
-		value, found, err := g.checkedEditCell(source, stamp, completing.state.RowKey, completing.state.ColumnID)
+		value, found, err := g.checkedEditCommitCell(source, stamp, completing.state.RowKey, completing.state.ColumnID)
 		if err != nil {
 			return err
 		}
@@ -570,12 +571,47 @@ func (g *Grid) replaceSource(source GridSource, completing *GridEditRequest) err
 		if err := sameStamp(source, stamp); err != nil {
 			return err
 		}
+		if projection, ok := source.(GridProjection); ok {
+			if prepared, exact := unwrapGridProjection(projection); exact {
+				// Cached empty-view metadata cannot prove the full edited
+				// input after live-source callbacks have run.
+				if err := prepared.current(); err != nil {
+					return err
+				}
+			}
+		}
 		edit = gridEditDraft{}
+	}
+	if projection != nil {
+		// All prospective source, selection, metric and draft reads have
+		// finished. Recheck the live request immediately before publication.
+		prepared, exact := unwrapGridProjection(source.(GridProjection))
+		if !exact {
+			return ErrGridSource
+		}
+		if err := g.checkProjectionRequest(*projection); err != nil {
+			return err
+		}
+		// Fixed view metadata alone cannot expose a drifted full input when
+		// the prospective filter has no rows to read.
+		if err := prepared.current(); err != nil {
+			return err
+		}
+		if err := sameStamp(g.source, g.stamp); err != nil {
+			return err
+		}
+		if err := sameStamp(source, stamp); err != nil {
+			return err
+		}
+		if err := prepared.current(); err != nil {
+			return err
+		}
 	}
 	stamp.Identity = strings.Clone(stamp.Identity)
 	g.source, g.stamp, g.rows, g.active, g.viewport, g.anchorKey, g.anchorOffset = source, stamp, rows, active, v, strings.Clone(key), offset
 	g.selection = selection
 	g.edit = edit
+	g.pendingProjection = nil
 	g.generation++
 	return nil
 }
