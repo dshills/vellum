@@ -1,0 +1,29 @@
+{
+  "review": "prism.json",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "counts": {
+    "low": 0,
+    "medium": 3,
+    "high": 0
+  },
+  "dispositions": [
+    {
+      "id": "e6a62edf23e9cd85",
+      "outcome": "refuted",
+      "reason": "app/app.go already imports math; required gate and compiler checks pass."
+    },
+    {
+      "id": "0836dda49c3c5a52",
+      "outcome": "refuted",
+      "reason": "Completion.Abort synchronously runs its exact resource hook; document hook cancels context and stops lifetime observer. Concurrent revocation already owns that same terminal hook."
+    },
+    {
+      "id": "80c65b942274eed6",
+      "outcome": "refuted",
+      "reason": "Outer Application.Do retains returned=false and closes after releasing ownership even if the local DrainN cleanup unwinds. The added public-path matrix verifies owner panic/Goexit with cleanup failures, all unrelated ticket terminalization and native wake."
+    }
+  ],
+  "production_fix_required": false,
+  "reviewed_after_prism": "test-only owner_cleanup_failure_test.go and documentation precision are independently reviewed, not attributed to Prism coverage"
+}

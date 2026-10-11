@@ -128,3 +128,11 @@ The independently relocated private SDK uses an explicit alpha version, complete
 archive integrity checks and public consumer scenarios. [Release artifacts](release.md)
 document packaging, the selected `github.com/dshills/vellum` namespace and MIT
 license, and remaining distribution audit/qualification gates for public release.
+
+## Explicit execution foundation
+
+[Execution](execution.md) adds selected/FIFO manual workers and bounded real/manual
+timers, plus separate reserved completion admission. Tasks and document sessions
+accept an injected Executor; owner batches retain an initial arrival cutoff.
+Worker and owner delivery termination remain independently visible. Native Scene
+clock/input/frame integration and the complete P9 replay workload remain open.

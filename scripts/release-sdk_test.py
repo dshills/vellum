@@ -53,14 +53,14 @@ class ReleaseChecks(unittest.TestCase):
             self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
             self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
 
-    def test_exported_history_document_and_editor_are_consumable_without_the_source_checkout(self):
+    def test_exported_history_document_editor_and_execution_are_consumable_without_the_source_checkout(self):
         with tempfile.TemporaryDirectory(prefix="vellum history SDK ") as temporary:
             base = Path(temporary)
             root = base / "source"
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
             public_files = []
-            for package in ("history", "document", "editor", "app", "ui"):
+            for package in ("history", "document", "editor", "execution", "tasks", "app", "ui"):
                 (root / package).mkdir()
                 for source in (release.ROOT / package).glob("*.go"):
                     if not source.name.endswith("_test.go"):
@@ -92,7 +92,27 @@ import (
     "github.com/dshills/vellum/document"
     "github.com/dshills/vellum/editor"
     "github.com/dshills/vellum/history"
+    "github.com/dshills/vellum/app"
+    "github.com/dshills/vellum/execution"
+    "github.com/dshills/vellum/tasks"
 )
+func TestExportedExecution(t *testing.T) {
+    a, err := app.New(app.Config{QueueCapacity: 1, CompletionCapacity: 1})
+    if err != nil { t.Fatal(err) }; defer a.Close()
+    executor, err := execution.NewManual(1)
+    if err != nil { t.Fatal(err) }; defer executor.Close()
+    manager, err := tasks.NewWithConfig(tasks.Config{Owner: a, Limit: 1, Executor: executor})
+    if err != nil { t.Fatal(err) }
+    if err := a.Post(func() {}); err != nil { t.Fatal(err) }
+    var task *tasks.Task
+    var startErr error
+    var got int
+    if err := a.Do(func() { task, startErr = tasks.Start(manager, context.Background(), func(context.Context, func(float64, string)) (int, error) { return 42, nil }, func(v int, err error) { if err != nil { t.Error(err) }; got = v }) }); err != nil || startErr != nil { t.Fatal(err, startErr) }
+    if _, err := executor.StepNext(context.Background()); err != nil { t.Fatal(err) }
+    if !task.Snapshot().AwaitingOwner || got != 0 { t.Fatal("result escaped its owner") }
+    if n, err := a.DrainN(7); err != nil || n != 2 { t.Fatal(n, err) }
+    if got != 42 || !manager.Pending().Idle() { t.Fatal("reserved result did not complete") }
+}
 func TestExportedPersistence(t *testing.T) {
     store := document.FileStore{}
     path := filepath.Join(t.TempDir(), "doc")

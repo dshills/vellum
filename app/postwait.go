@@ -20,8 +20,11 @@ func (a *Application) PostWait(ctx context.Context, fn func()) error {
 			a.mu.Unlock()
 			return ErrClosed
 		}
-		if len(a.queue) < a.capacity {
-			a.queue = append(a.queue, fn)
+		if a.normalPending < a.capacity {
+			if err := a.postLocked(fn); err != nil {
+				a.mu.Unlock()
+				return err
+			}
 			wake := a.wake
 			a.mu.Unlock()
 			if wake != nil {

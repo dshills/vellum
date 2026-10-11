@@ -1,0 +1,50 @@
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.041s
+
+OK
+# cogentcore.org/core/core.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/text/lines.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# cogentcore.org/core/text/textcore.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	cogentcore.org/core/events	1.250s
+ok  	cogentcore.org/core/core	1.543s
+ok  	cogentcore.org/core/text/textcore	4.029s
+ok  	cogentcore.org/core/text/lines	1.888s
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.011s
+
+OK
+..
+........
+----------------------------------------------------------------------
+Ran 10 tests in 0.055s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.582s
+
+OK
+.....F......................
+======================================================================
+FAIL: test_exported_history_document_and_editor_are_consumable_without_the_source_checkout (__main__.ReleaseChecks.test_exported_history_document_and_editor_are_consumable_without_the_source_checkout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/dshills/Development/projects/Vellum/scripts/release-sdk_test.py", line 119, in test_exported_history_document_and_editor_are_consumable_without_the_source_checkout
+    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : FAIL	example.com/history-consumer [setup failed]
+FAIL
+# example.com/history-consumer
+/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum history SDK keh9nsxa/relocated/vellum-v0.1.0-alpha.1/document/session.go:8:2: cannot find module providing package github.com/dshills/vellum/execution: import lookup disabled by -mod=readonly
+
+
+----------------------------------------------------------------------
+Ran 28 tests in 0.515s
+
+FAILED (failures=1)
+Created /private/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum licensed starter re73u73n/application; source '/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/vellum licensed starter re73u73n/SDK/drivers/cogent/env.sh' then run go test ./... and go run .

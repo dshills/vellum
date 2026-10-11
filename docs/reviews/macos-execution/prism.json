@@ -1,0 +1,145 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "92170b2c2ff997aef062970f4f43b14c",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "fa5ec5a760706031428211fccd0490cc4b1d983a",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e6a62edf23e9cd85",
+      "severity": "medium",
+      "category": "bug",
+      "title": "`math` may not be imported in app.go",
+      "message": "The new `Drain` uses `math.MaxInt`, but the diff does not touch the import block of app/app.go. If that file did not already import `math`, the package will not compile. Imports are per file, and `math` is imported only in completion.go.",
+      "suggestion": "Confirm app.go imports \"math\". If it does not, add the import, or move `Drain` into completion.go next to `DrainN`.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "app/app.go",
+          "lines": {
+            "start": 287,
+            "end": 287
+          }
+        }
+      ],
+      "tags": [
+        "compile",
+        "location-corrected"
+      ],
+      "evidence": "_, err := a.DrainN(math.MaxInt)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "80c65b942274eed6",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Owner-callback failure may skip Close if cleanup hook panics",
+      "message": "In the DrainN deferred handler, `runCompletionHooks(hooks)` runs before `a.Close()`. If a cleanup hook panics or calls Goexit, `a.Close()` is skipped. The app then stays open after an owner callback failed to return, which breaks the invariant that a failed owner callback closes the application. The panic/Goexit-safe cleanup elsewhere in this change shows that hook failure is an expected case.",
+      "suggestion": "Make closing independent of hook success, for example close first and then run hooks, or put `if !returned { a.Close() }` in its own defer registered before `runCompletionHooks(hooks)`.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "app/completion.go",
+          "lines": {
+            "start": 325,
+            "end": 327
+          }
+        }
+      ],
+      "tags": [
+        "panic-safety",
+        "lifecycle"
+      ],
+      "evidence": "runCompletionHooks(hooks)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0836dda49c3c5a52",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Operation context and AfterFunc not released when executor refuses submission",
+      "message": "When Executor.Submit refuses the job, the code calls ticket.Abort() and restores session state. The op context's cancel and the context.AfterFunc registration on the window lifetime are only released inside the ReserveCompletion callback. That callback is not guaranteed to run on Abort. The ReserveCompletion failure path above calls cancel() and stop() by hand, which suggests the callback is not invoked there either. If Abort does not invoke it, each refused submission leaks a derived context and an AfterFunc registration until the window closes.",
+      "suggestion": "Call cancel() and stop() explicitly after ticket.Abort() in the Submit-failure path. Both are idempotent, so this is safe even if Abort also runs the callback.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "document/session.go",
+          "lines": {
+            "start": 247,
+            "end": 247
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "context",
+        "location-corrected"
+      ],
+      "evidence": "ticket.Abort()",
+      "fix": {
+        "before": "ticket.Abort()",
+        "after": "ticket.Abort()\n\t\tcancel()\n\t\tstop()"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 121404,
+    "totalMs": 50038
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 27,
+    "bytes": 162194,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 87736,
+        "output": 15256,
+        "costUSD": 0.328032
+      }
+    ],
+    "widenedFiles": 9,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

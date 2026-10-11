@@ -1,0 +1,301 @@
+{
+  "blocking_findings": [],
+  "checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-timeout=30s",
+        "./..."
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/examples/sdk-contract",
+      "executor": "independent reviewer",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-execution-internal-sdk.log",
+      "log_sha256": "d06c23fc95ebdd39efe8792963050481bcfe0d396135b98dd7516349aa3c0853"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/release-sdk_test.py",
+        "ReleaseChecks.test_exported_history_document_editor_and_execution_are_consumable_without_the_source_checkout"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum",
+      "executor": "independent reviewer",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-execution-internal-export.log",
+      "log_sha256": "4442379df30e661b6878994eed8617d26ad2a395354634fe6d517d7cfce18e76"
+    },
+    {
+      "case_count": 12,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "-timeout=30s",
+        "./app",
+        "-run",
+        "^TestOwnerAndCleanupFailureStillCloseAndRetireEveryTicket$"
+      ],
+      "cwd": "/private/tmp/vellum-execution-owner-failure-review",
+      "elapsed_seconds": 1.6844974579871632,
+      "executor": "independent reviewer",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-execution-owner-failure-review/race.log",
+      "log_sha256": "8ef3fc0f8bb484b8a6f3b299275d6e7774b4105442f3c238363b21f6883ae7dc",
+      "scope": "public DrainN/Do combined abnormal callback and cleanup; frozen temporary canonical-source copy"
+    }
+  ],
+  "created_at": "2026-10-11T04:19:35.609481+00:00",
+  "files": {
+    "README.md": "216fbf1c5b7a954295683965e2664613fd1e5524a2da11bcca871650f0b5ce34",
+    "app/app.go": "b70e7dac15367c2999679880f72c90ebf8a8404a9cf05a33ed63f319c1af2487",
+    "app/completion.go": "cc0991f1521ef45b4e9d3dff70d439b2ad3386f76f45bda4bacaf02868cc79a3",
+    "app/completion_test.go": "a4c2a5bd141355421ed1fdbe13cf2c179c3c10dba96b8e0a2ec63cf3fe0713e9",
+    "app/owner_cleanup_failure_test.go": "b0d2b403167269b57999f0550d88f8d2727e6246c8217053124fde8ac91aff75",
+    "app/postwait.go": "9f99dac362669cf22ff5efc4354394c52915618b5467269a765898b213e818af",
+    "docs/implementation.md": "6e3f1798b524b81db404a51d73f84304951778590d27e36888fc727d1e442c45",
+    "docs/reports/MACOS_COMPLETION_AUDIT.md": "a9653c43ad2e7d3069ead8ae31f2d1dfd2e72b8a5323d3f93f23953d161efdb1",
+    "document/execution_test.go": "6dab2341c9e1e7bfb11f07107e91dd3c32036af6f000f2beebdf76a1f38e962b",
+    "document/session.go": "0257151d6bcfae89bb51e77573d1abc1cc7abf28bdabb16ec8cade2c4573a2eb",
+    "examples/sdk-contract/completion_test.go": "74f51a151f9fe0c015983a76b2968c5ebe792486ef7791f4afd155f0869bc1f7",
+    "examples/sdk-contract/execution_test.go": "c57d080ebaaab32fe38fef4e5515e640bd0945dcb54d2c869d7a92c07eecd0a9",
+    "execution/clock.go": "c29a4b5cef43c06eaa4d4469f242824bce098529d2931adab3b64139cd044ac6",
+    "execution/clock_readiness.go": "f738665ab59659e5f131945ad43b35f629626a2642076f0b28d4de3f27a78587",
+    "execution/clock_readiness_test.go": "8c9c083897f0fc1b45025a30bf72c0d92b426f9c92db117fde151041e4c5e990",
+    "execution/clock_test.go": "3b0d4a9a16bf38c57a8f8d4d431b734c966a4de00fe152ecadd52f8fdbe33f9f",
+    "execution/execution.go": "2b46889c00f1bca909e5311f03a60aaf222a50d69ee71f1542be669c4c5cde76",
+    "execution/execution_test.go": "588221bf36c3a9eaf51f464e03ec502bdd2c5ae1e0f03f4d0755cf4f8e06647d",
+    "scripts/release-sdk.py": "4fef5fbb8f15b08e9982b6bfb79c8c6042dbe2a9bd9089ee7be0ae1b504f4bca",
+    "scripts/release-sdk_test.py": "428a02add768ab2c3690389fa006d37eb236a526f19393ec7ed64a0dc079a372",
+    "specs/README.md": "84b9ffe144422e2e2a24ac0698bfda42f609c9b7e4acb5acf722510910abd361",
+    "specs/document.md": "0fc9bb23f1b6efb2c0f1699d36e2f24c6a5a4b996c683810e32aea8c5f0624fe",
+    "specs/execution.md": "12a8377db1e05b009943aa9d642fa48a46c4541b218389266b8837728a0489ac",
+    "specs/framework.md": "0a8a9fb04e0d2a47eac8afbad68d8b211dfb9faf7fab1f585a70162bdf333709",
+    "specs/macos-completion.md": "64f35c77d6888ffe82a52c4609f0b1baaec392cbb15e624f9d9817692aab62e4",
+    "specs/sdk.md": "5cf250279e7b73b85876e56bea2b6ea0ab34bd9d9d06b8ea0527ddea214baf67",
+    "tasks/execution_test.go": "98d3e42bfc4fee79d12e03671e2821c7074cd8ba05a7c369d8e8b13b152bf378",
+    "tasks/tasks.go": "f95a8cbb4726f14d25f454fdf71bcf767d2407d6079575b58c44adfc06c3fea2"
+  },
+  "limitations": [
+    "Mailbox idle excludes dirty windows and native/frame quiescence.",
+    "Logical completion/worker capacities do not bound arbitrary callback heap, nonblocking-contract violations, or post-retirement resource cleanup concurrency.",
+    "Third-party executors must honor admission/refusal/no-inline/terminal-cleanup contract.",
+    "No portable cancellation forcibly terminates uncooperative user callbacks.",
+    "Native Scene timer/input/frame stepping, deterministic fonts, records, bounded run-until-idle and routed P9 public replay consumer are not implemented or qualified by this checkpoint.",
+    "Human IME, VoiceOver, public distribution and P4 performance gates remain separate.",
+    "Unintegrated replay record draft and native design sketches are next-phase work, excluded from this approval."
+  ],
+  "parent_commit": "fa5ec5a760706031428211fccd0490cc4b1d983a",
+  "prism_adjudication": {
+    "complete": true,
+    "findings": [
+      {
+        "disposition": "REFUTED",
+        "evidence": "app/app.go:9 already imports math used by Drain; complete package compiles in independent SDK race check and root full gate.",
+        "id": "e6a62edf23e9cd85"
+      },
+      {
+        "disposition": "REFUTED",
+        "evidence": "document/session.go:185-190 reservation cleanup calls cancel/stop; Completion.Abort terminalLocked then synchronously runCompletionHooks at app/completion.go:165-168. Already revoked tickets have cleanup owned by Close; no missing cancellation path.",
+        "id": "0836dda49c3c5a52"
+      },
+      {
+        "disposition": "REFUTED",
+        "evidence": "Local DrainN Close may be skipped by abnormal hook but outer Application.Do returned flag remains false; app/app.go:243-248 unlocks and forces Close during unwind. Independent public-path 12-case race20 regression verifies closed context, every ticket terminal, no surviving callback and exactly one shutdown wake.",
+        "id": "80c65b942274eed6"
+      }
+    ],
+    "report": "/private/tmp/vellum-execution-prism.json",
+    "report_sha256": "70493845ff6466c8cf43d3a2ca8c79905d549a6326815b64a2344edc27a8519f"
+  },
+  "promoted_source_identity": {
+    "app/app.go": "b70e7dac15367c2999679880f72c90ebf8a8404a9cf05a33ed63f319c1af2487",
+    "app/app_test.go": "81bbb95c6e740f5d35bb91a557441a90e8407e885a9079a231d0ee720d6735dc",
+    "app/completion.go": "cc0991f1521ef45b4e9d3dff70d439b2ad3386f76f45bda4bacaf02868cc79a3",
+    "app/completion_test.go": "a4c2a5bd141355421ed1fdbe13cf2c179c3c10dba96b8e0a2ec63cf3fe0713e9",
+    "app/postwait.go": "9f99dac362669cf22ff5efc4354394c52915618b5467269a765898b213e818af",
+    "app/postwait_test.go": "728a704dd14c81d20f8331f55053d5e160aa35a14acba648ade9712e7c3fe82d",
+    "app/services.go": "39dca49207455e9783483a970aec067a51fa776fc908d6bb7f07c421d6ed5193",
+    "app/windows_test.go": "7259d1784538c3e905059488e794f710f7a5084cb53cbc69827d4aea072f6ae0",
+    "document/execution_test.go": "6dab2341c9e1e7bfb11f07107e91dd3c32036af6f000f2beebdf76a1f38e962b",
+    "document/file.go": "274529e88b145fae125197097d25e670a707e65691870d081609357ba6a4105c",
+    "document/file_test.go": "914df037110f966a8917184359a527e7c22038c848a76203463e059c61852edf",
+    "document/file_unix_test.go": "3c58e139acc450680eeda7cb78659a3896d6d113f2462d205926ffcea6806037",
+    "document/read_other.go": "c84a5aca51333b41301174788f899046915dc1c168d96fa077710b0a33340ae8",
+    "document/read_unix.go": "74ffff1389476952c0acc320bb5c1d425db25c9dd35c687317b5dde70c1e2ccf",
+    "document/session.go": "0257151d6bcfae89bb51e77573d1abc1cc7abf28bdabb16ec8cade2c4573a2eb",
+    "document/session_test.go": "a780d795a42de3d385974703804a31ceecb9277510860c3606af6c5d47cf9cfb",
+    "execution/clock.go": "c29a4b5cef43c06eaa4d4469f242824bce098529d2931adab3b64139cd044ac6",
+    "execution/clock_readiness.go": "f738665ab59659e5f131945ad43b35f629626a2642076f0b28d4de3f27a78587",
+    "execution/clock_readiness_test.go": "8c9c083897f0fc1b45025a30bf72c0d92b426f9c92db117fde151041e4c5e990",
+    "execution/clock_test.go": "3b0d4a9a16bf38c57a8f8d4d431b734c966a4de00fe152ecadd52f8fdbe33f9f",
+    "execution/execution.go": "2b46889c00f1bca909e5311f03a60aaf222a50d69ee71f1542be669c4c5cde76",
+    "execution/execution_test.go": "588221bf36c3a9eaf51f464e03ec502bdd2c5ae1e0f03f4d0755cf4f8e06647d",
+    "tasks/execution_test.go": "98d3e42bfc4fee79d12e03671e2821c7074cd8ba05a7c369d8e8b13b152bf378",
+    "tasks/tasks.go": "f95a8cbb4726f14d25f454fdf71bcf767d2407d6079575b58c44adfc06c3fea2",
+    "tasks/tasks_test.go": "e7a9915d5546e2d1531a7011bf48ed4b79ae24f3553e60c17bf7aac6def50e15"
+  },
+  "qualification_proofs": [
+    {
+      "checks": [
+        {
+          "command": [
+            "go",
+            "test",
+            "-race",
+            "-count=20",
+            "./..."
+          ],
+          "elapsed_seconds": 3.863349749997724,
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-p9-appintegration/acceptance/race.log",
+          "log_sha256": "9e452dae01d8c9898781112914fffa2ffd4cc011004b5bdc5b62a261e5c571e3"
+        },
+        {
+          "command": [
+            "go",
+            "vet",
+            "./..."
+          ],
+          "elapsed_seconds": 0.18259454201324843,
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-p9-appintegration/acceptance/vet.log",
+          "log_sha256": "68cf2108daacb58328c74d93b473ee6b336db0bc36c29619ffb110f601285459"
+        }
+      ],
+      "path": "/private/tmp/vellum-p9-appintegration/acceptance/qualification.json",
+      "scope": "45-input portable candidate, race20 and vet; all source/log hashes verified, canonical promotions identical.",
+      "sha256": "6959d80f797538972a8ee697ef6635eae55787652197b525fefe8d0943e076bd"
+    },
+    {
+      "checks": [
+        {
+          "command": [
+            "go",
+            "test",
+            "-race",
+            "-count=20",
+            "./..."
+          ],
+          "elapsed_seconds": 1.644797082990408,
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-p9-clock-inspection/acceptance/race.log",
+          "log_sha256": "ac191e79a72b68705059c83efdc4cfb87fc7692e64c6197dc9d2275055dcc51c"
+        },
+        {
+          "command": [
+            "go",
+            "vet",
+            "./..."
+          ],
+          "elapsed_seconds": 1.4819057499989867,
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-p9-clock-inspection/acceptance/vet.log",
+          "log_sha256": "68cf2108daacb58328c74d93b473ee6b336db0bc36c29619ffb110f601285459"
+        }
+      ],
+      "path": "/private/tmp/vellum-p9-clock-inspection/acceptance/qualification.json",
+      "scope": "9-input additive clock inspection; race20/vet and original-source preservation verified; canonical Go sources identical.",
+      "sha256": "4e1df2a7fc9192524d8861f3659985b5192228457fb2307b8af7a9448f957bbf"
+    },
+    {
+      "path": "/private/tmp/vellum-execution-owner-failure-review/qualification.json",
+      "scope": "Independent temporary failure combination fixture; inputs and log verified; added canonical test exact copy.",
+      "sha256": "b3ccf34e17124c0dd4b387cea1049a499f68a64f103d8f23fcf5bbf71b0b7228"
+    },
+    {
+      "checks": [
+        {
+          "command": [
+            "zsh",
+            "-c",
+            "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . ./drivers/cogent/env.sh; ./scripts/check.sh"
+          ],
+          "cwd": "/Users/dshills/Development/projects/Vellum",
+          "elapsed_seconds": 45.53441704099532,
+          "exit_code": 0,
+          "log_sha256": "f91171bbf3ee339dbb263db9a3c87906c563b88cbe70e3bb7b664584e50fa5d0",
+          "name": "gate",
+          "timed_out": false
+        },
+        {
+          "command": [
+            "zsh",
+            "-c",
+            "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . ../../drivers/cogent/env.sh; go build -race -o /private/tmp/vellum-execution-editor ."
+          ],
+          "cwd": "/Users/dshills/Development/projects/Vellum/examples/editor",
+          "elapsed_seconds": 2.9343750840052962,
+          "exit_code": 0,
+          "log_sha256": "905a7da78c61b05fffd2fe552eb734eb8e81057a78beed8de61a626721dedec3",
+          "name": "editor-build",
+          "timed_out": false
+        },
+        {
+          "command": [
+            "/private/tmp/vellum-execution-editor",
+            "-smoke"
+          ],
+          "cwd": "/Users/dshills/Development/projects/Vellum",
+          "elapsed_seconds": 8.113742458983324,
+          "exit_code": 0,
+          "log_sha256": "6d738aa3a5ecc7caec72c48267150392ed5344c0e8d1d7e302bd75a1f8ae2336",
+          "name": "editor-live",
+          "timed_out": false
+        }
+      ],
+      "native_binary_sha256": "210804da6c380be382d7469d0637d6b7e8a45f1f877f91e73c89d04ff897c2fe",
+      "path": "/private/tmp/vellum-execution-final/qualification.json",
+      "scope": "Root-owned full required repository gate plus race build/actual editor runtime before final test-only addition and documentation precision change. All 229 input hashes, logs and binary mechanically verified. Reviewer did not run native GUI.",
+      "sha256": "d16f5f5621b8f31c89a404010312762b0e7a688c3ad162910ae2f174a008e5e4"
+    }
+  ],
+  "repository": "/Users/dshills/Development/projects/Vellum",
+  "resolved_review_items": [
+    {
+      "item": "Cleanup panic/Goexit must not strand unrelated revoked tickets or shutdown wake",
+      "resolution": "Deferred remaining-hook retirement plus deferred Close/CloseWindow wake and ordinary Go unwinding documented/tested in approved source."
+    },
+    {
+      "item": "Do runtime.Goexit must close after ownership release",
+      "resolution": "Returned flag handles abnormal return, including Goexit; isolated combination regression exercises public DrainN/Do path."
+    },
+    {
+      "item": "Initial count alone cannot bound arrival batch after abort",
+      "resolution": "Initial arrival cutoff implemented and tested."
+    },
+    {
+      "item": "Public document State must be owner-held",
+      "resolution": "SDK getState wraps Application.Do."
+    },
+    {
+      "item": "Documentation must not imply infinite callback termination or sole task/session idle authority",
+      "resolution": "Spec explicitly names panic/Goexit and requires aggregate Executor.Snapshot accounting for wrapper/reentrant operation overlap."
+    }
+  ],
+  "result": "APPROVED",
+  "reviewed_contracts": [
+    "Completion tickets hold separate bounded capacity and publication-sequence credit before executor submission; unpublished tickets create no queue position.",
+    "Ordinary Post and successful result publication share arrival order; DrainN retains initial arrival cutoff even when initial work is aborted.",
+    "Identity-protected tickets, immutable window lifetimes and synchronous cleanup outside app.mu; logical admission credit and resource-cleanup accounting have explicit separate boundaries.",
+    "Task slots persist through actual worker and owner delivery/revocation terminals; Done compatibility retained with additive OwnerDone.",
+    "Document refused submission restores prior operation state, performs no work, and cancels operation/AfterFunc through synchronous Abort cleanup.",
+    "Callback panic/Goexit keeps outer Do returned=false; ownership unlock precedes forced Close; all unrelated terminal accounting and shutdown wake survive abnormal cleanup.",
+    "Manual executor cancellation leaves accepted/running jobs visible; accepted canceled callbacks still execute terminal cleanup.",
+    "Manual clock advancement holds admission through true callback termination; checked ReadySnapshot distinguishes registered Due/Future and complete versus current-instant quiescence without mutation.",
+    "Independent SDK tests use only public APIs and owner-held Session.State; source-deleted relocated archive consumes execution/tasks and manual saturated-mailbox completion."
+  ],
+  "reviewer": "mac_history_review internal agent",
+  "schema_version": 1,
+  "scope": "Portable explicit execution, bounded owner completion admission, tasks/document integration, additive clock readiness, public SDK/export coverage and documented scope. Read-only canonical review; one adversarial test authored and executed in temporary copy then integrated unchanged by root. No reviewer GUI, OS preferences, staging or commits.",
+  "sdk_contract_copy": {
+    "canonical": "examples/sdk-contract/completion_test.go",
+    "difference": "Only package contract_test renamed sdkcontract_test; exact bytes otherwise.",
+    "origin": "/private/tmp/vellum-p9-appintegration/sdk-contract/contract_test.go",
+    "origin_sha256": "8ac0a68cbd035ee1e3f5e26952e60775cb2262886fd2ce864dcd2c2c94bb470a"
+  }
+}

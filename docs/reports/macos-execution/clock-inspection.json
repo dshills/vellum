@@ -1,0 +1,63 @@
+{
+  "after_inputs": {
+    "clock.go": "c29a4b5cef43c06eaa4d4469f242824bce098529d2931adab3b64139cd044ac6",
+    "clock_readiness.go": "f738665ab59659e5f131945ad43b35f629626a2642076f0b28d4de3f27a78587",
+    "clock_readiness_test.go": "8c9c083897f0fc1b45025a30bf72c0d92b426f9c92db117fde151041e4c5e990",
+    "clock_test.go": "3b0d4a9a16bf38c57a8f8d4d431b734c966a4de00fe152ecadd52f8fdbe33f9f",
+    "execution.go": "2b46889c00f1bca909e5311f03a60aaf222a50d69ee71f1542be669c4c5cde76",
+    "execution_test.go": "588221bf36c3a9eaf51f464e03ec502bdd2c5ae1e0f03f4d0755cf4f8e06647d",
+    "go.mod": "36c23b2a6a308ab112475bd5a2cf1fdbf5191c3fcaaea2e8b48036275fd414e2",
+    "inspection-spec.md": "69fb0c9fb194883b03bfa2df551640e0219bfcc77899b274c41be6d8885b2c37",
+    "qualify.py": "2ddb245af15c12719d71538189f732f293ba97b42c27864341ea2410fc5bca17"
+  },
+  "checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "./..."
+      ],
+      "elapsed_seconds": 1.644797082990408,
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-clock-inspection/acceptance/race.log",
+      "log_sha256": "ac191e79a72b68705059c83efdc4cfb87fc7692e64c6197dc9d2275055dcc51c"
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "elapsed_seconds": 1.4819057499989867,
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-clock-inspection/acceptance/vet.log",
+      "log_sha256": "68cf2108daacb58328c74d93b473ee6b336db0bc36c29619ffb110f601285459"
+    }
+  ],
+  "compiler": "go version go1.27.2 darwin/arm64",
+  "original_inputs": {
+    "clock.go": "c29a4b5cef43c06eaa4d4469f242824bce098529d2931adab3b64139cd044ac6",
+    "clock_test.go": "3b0d4a9a16bf38c57a8f8d4d431b734c966a4de00fe152ecadd52f8fdbe33f9f",
+    "execution.go": "2b46889c00f1bca909e5311f03a60aaf222a50d69ee71f1542be669c4c5cde76",
+    "execution_test.go": "588221bf36c3a9eaf51f464e03ec502bdd2c5ae1e0f03f4d0755cf4f8e06647d",
+    "go.mod": "36c23b2a6a308ab112475bd5a2cf1fdbf5191c3fcaaea2e8b48036275fd414e2"
+  },
+  "original_proof": "/private/tmp/vellum-p9-execution/clock-checks-v2.json",
+  "original_proof_sha256": "541ff9ea678affa1fa73e7e82867cdabd962cdfdb518d432aa196d600ee17306",
+  "original_unchanged": true,
+  "result": "PASS",
+  "source_inputs": {
+    "clock.go": "c29a4b5cef43c06eaa4d4469f242824bce098529d2931adab3b64139cd044ac6",
+    "clock_readiness.go": "f738665ab59659e5f131945ad43b35f629626a2642076f0b28d4de3f27a78587",
+    "clock_readiness_test.go": "8c9c083897f0fc1b45025a30bf72c0d92b426f9c92db117fde151041e4c5e990",
+    "clock_test.go": "3b0d4a9a16bf38c57a8f8d4d431b734c966a4de00fe152ecadd52f8fdbe33f9f",
+    "execution.go": "2b46889c00f1bca909e5311f03a60aaf222a50d69ee71f1542be669c4c5cde76",
+    "execution_test.go": "588221bf36c3a9eaf51f464e03ec502bdd2c5ae1e0f03f4d0755cf4f8e06647d",
+    "go.mod": "36c23b2a6a308ab112475bd5a2cf1fdbf5191c3fcaaea2e8b48036275fd414e2",
+    "inspection-spec.md": "69fb0c9fb194883b03bfa2df551640e0219bfcc77899b274c41be6d8885b2c37",
+    "qualify.py": "2ddb245af15c12719d71538189f732f293ba97b42c27864341ea2410fc5bca17"
+  },
+  "unchanged": true
+}

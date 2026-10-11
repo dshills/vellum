@@ -10,8 +10,9 @@ Windows/Linux runtime qualification is deferred.
 
 ## Remaining implementation
 
-- **Deterministic replay:** injected clock/task execution, bounded run-until-idle,
-  recording and public replay consumer are still absent from P9.
+- **Deterministic replay:** portable injected clocks/task execution and bounded owner
+  drain batches now exist. Native timer/frame/input stepping, fonts, bounded
+  run-until-idle, records and the routed public replay consumer remain open in P9.
 - **Semantic automation:** P10 needs an opt-in local typed/versioned transport,
   IDs, stale/disabled checks, cancellation, audit results and sensitive-field
   redaction. Existing in-process/native AX actions do not supply that transport.

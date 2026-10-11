@@ -141,3 +141,14 @@ uses two separate document models. See [editor contract](../specs/editor.md).
 Two native race-binary runs and a separate read-only external AX process pass
 against frozen source inputs. See [editor acceptance](reports/macos-editor/README.md).
 Human IME candidate panels and screen-reader workflows remain acceptance gates.
+
+## Explicit execution foundation
+
+The portable execution package provides bounded manually selected workers and
+manual/real timers with cancellation-visible running work. App completion
+reservations merge actual result arrivals with ordinary callbacks; DrainN uses
+an initial arrival cutoff. Tasks and document persistence accept Executor
+injection and retain separate worker/owner accounting through termination.
+Race tests cover saturation, canceled accepted work, panic/Goexit, closure,
+cleanup failure and refusal rollback. Native input/frame/timer replay and P9
+workload qualification remain open. See [contract](../specs/execution.md).

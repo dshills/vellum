@@ -18,8 +18,12 @@ allocation and runtime. The session checks payload bytes after encoding and befo
 decoding; this is not a hard heap or CPU limit on arbitrary codecs.
 
 One operation stays busy until its completion executes on the owner. IO and
-chooser calls never block the owner. `PostWait` admission is not execution or an
-acknowledgment. Completion uses the window lifetime for delivery, so operation
+chooser calls never block the owner. Completion reserves a separate bounded application ticket before submitting its
+worker, so ordinary queue saturation cannot block final result admission.
+`Config.Executor` injects real or manually stepped work. Submission refusal
+restores busy/action/operation state and refunds the ticket. State exposes
+WorkerPending and OwnerPending separately; admission remains distinct from
+owner execution. Completion uses the window lifetime for delivery, so operation
 cancellation still clears busy on a live window even under mailbox pressure.
 Window closure cancels work and discards late installation/history/user callbacks;
 it does not cancel other windows. User codecs and stores must cooperate with

@@ -1,0 +1,10 @@
+$ go test -race -count=20 ./...
+ok  	github.com/dshills/vellum/app	1.349s
+ok  	github.com/dshills/vellum/document	3.460s
+ok  	github.com/dshills/vellum/editor	2.406s
+ok  	github.com/dshills/vellum/execution	2.267s
+ok  	github.com/dshills/vellum/history	1.541s
+ok  	github.com/dshills/vellum/sdk-contract	1.685s
+ok  	github.com/dshills/vellum/tasks	1.847s
+ok  	github.com/dshills/vellum/ui	2.394s
+EXIT 0

@@ -93,3 +93,8 @@ Windows/Linux runtime performance and accessibility/input correctness remain gat
 The public `document` package ships in private SDK archives alongside app/ui/history.
 A relocated archive consumer exercises bounded file persistence after deleting
 the fixture source checkout. Session/close policies follow [document.md](document.md).
+
+The portable SDK exports `execution` alongside `tasks`, `document`, `editor` and
+`app`. The archive relocation test deletes its source fixture and consumes these
+packages through an independent module, including a manually stepped task whose
+final result is admitted while the ordinary owner queue is full.

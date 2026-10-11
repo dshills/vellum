@@ -1,0 +1,117 @@
+{
+  "event": "vellum.sdk.editor.relocated",
+  "source": {
+    "clean": true,
+    "commit": "fa5ec5a760706031428211fccd0490cc4b1d983a"
+  },
+  "archive_sha256": "f9f8c2c29703d6bd88454597c3ed2f5b3085596f861e1a8289dfa07d6403e8f9",
+  "replacements_within_sdk": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+  },
+  "path_contains_spaces": true,
+  "own_module_race_vet_build": true,
+  "native_race_binary_exit_code": 0,
+  "native_editor": {
+    "result": "pass",
+    "marker": "EDITOR_SMOKE_PASS: actual Cocoa protocol; atomic composition/history; exact UTF8/CRLF; bounded native refusal; independent windows; remount; range/wrap/bidi; settled save/close; native teardown",
+    "stages": [
+      "native-ready",
+      "settle-admission-refusal",
+      "admitted-settle-cancellation",
+      "controlled-field-focus-handoff",
+      "field-mark1",
+      "field-mark2",
+      "field-commit",
+      "field-return-to-editor",
+      "field-controlled-change",
+      "composition-one-history-entry",
+      "cancel-preedit",
+      "settled-save-exact-bytes",
+      "open-install-native-refresh",
+      "bounded-native-refusal",
+      "owner-edit-remount-and-focus-handoff",
+      "native-range-geometry-wrap-bidi",
+      "save-close-native-preedit-during-write",
+      "save-close-refusal-and-terminal-teardown"
+    ],
+    "binary_sha256": "4b6cd1b9b4b0a50d603f39b35b4c13dcb86e2f961595805ee6468c3bc028153a",
+    "scope": "actual deterministic Cocoa text protocol and native AX method injection; no human IME or performance qualification"
+  },
+  "external_ax": {
+    "event": "vellum.editor.external-ax.acceptance",
+    "result": "pass",
+    "native_command": [
+      "/private/var/folders/td/c4mswb0s037__1vkvqxf_dfc0000gn/T/Vellum editor SDK relocation 2ysivuay/editor",
+      "-ax-fixture"
+    ],
+    "native_binary_sha256": "4b6cd1b9b4b0a50d603f39b35b4c13dcb86e2f961595805ee6468c3bc028153a",
+    "native_exit_code": 0,
+    "native_elapsed_seconds": 61.22644604201196,
+    "announced_lifetime_seconds": 60,
+    "timer_lifetime_reached": true,
+    "inspector_exit_code": 0,
+    "inspector_error": null,
+    "inspector_timed_out": false,
+    "native_timed_out": false,
+    "inspector_source_sha256": "a4846a841f6fb212be13489a30f0c60f60063db97f74e284d1956f49078a8cf7",
+    "inspector_binary_sha256": "de6ef881a8f0d1a79d17e1d86962f6940379eae53e1a6efedffdbdee84a0eaf4",
+    "runner_source_sha256": "dd9ac257060f8b3595832118507092e2a0188b511f9b5faea27be5f95f66eab3",
+    "fixture": {
+      "accessibility_name": "Document text",
+      "lifetime_seconds": 60,
+      "pid": 31057,
+      "selection_scalar": [
+        1,
+        2
+      ],
+      "selection_utf16": [
+        1,
+        2
+      ],
+      "text": "A\ud83d\ude00e\u0301 \u05d0\u05d1\u05d2 \u0627\u0644\u0639\u0631\u0628\u064a\u0629\r\nwrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph wrapped paragraph \r\nterminal\r\n\r\n",
+      "title": "Vellum document editor \u2014 editor-ax",
+      "window": "editor-ax"
+    },
+    "external_ax": {
+      "accessibility_trusted": true,
+      "characters_utf16": 465,
+      "combining_range_utf16": [
+        3,
+        2
+      ],
+      "emoji_bounds_screen": [
+        1102,
+        448.3828125,
+        10,
+        22
+      ],
+      "emoji_point_range_utf16": [
+        1,
+        2
+      ],
+      "event": "vellum.editor.external-ax",
+      "exact_value": true,
+      "final_line": 4,
+      "final_line_range_utf16": [
+        465,
+        0
+      ],
+      "hebrew_visual_rtl": true,
+      "pid": 31057,
+      "result": "pass",
+      "scope": "read-only external AX process; no VoiceOver, real IME or setting changes",
+      "selected_text": "\ud83d\ude00",
+      "selection_utf16": [
+        1,
+        2
+      ],
+      "split_surrogate_error": -25212
+    },
+    "settings_changed": false
+  },
+  "canonical_checkout_clean": true,
+  "public_distribution_audit": "not certified"
+}

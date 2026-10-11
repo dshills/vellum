@@ -5,8 +5,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/dshills/vellum/execution"
 	"path/filepath"
 	"slices"
+	"sync"
 
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/history"
@@ -37,10 +39,11 @@ type Result struct {
 	Err     error
 }
 type State struct {
-	Path                string
-	Busy, Dirty, Closed bool
-	Action              Action
-	Last                Result
+	Path                        string
+	Busy, Dirty, Closed         bool
+	WorkerPending, OwnerPending bool
+	Action                      Action
+	Last                        Result
 }
 
 // Codec transfers a detached immutable snapshot to Encode on a worker. Decode
@@ -64,6 +67,7 @@ type Config[T any] struct {
 	Extensions []string
 	MaxBytes   int64
 	Store      Store
+	Executor   execution.Executor
 	// Choose overrides the native chooser for independent/headless consumers.
 	// It runs on the operation's worker and must honor cancellation.
 	Choose func(context.Context, app.FileOptions) (string, error)
@@ -76,13 +80,14 @@ type Config[T any] struct {
 // are owner-only. One operation remains busy through queued result admission.
 // Window closure cancels work and prevents late model/history/user callbacks.
 type Session[T any] struct {
-	config   Config[T]
-	lifetime context.Context
-	path     string
-	busy     bool
-	action   Action
-	cancel   context.CancelFunc
-	last     Result
+	config    Config[T]
+	lifetime  context.Context
+	path      string
+	busy      bool
+	action    Action
+	cancel    context.CancelFunc
+	last      Result
+	operation *operationState
 }
 
 type SaveOptions struct {
@@ -123,6 +128,9 @@ func New[T any](c Config[T]) (*Session[T], error) {
 	if err := (app.FileOptions{Filename: c.Filename, Extensions: c.Extensions}).Validate(); err != nil {
 		return nil, err
 	}
+	if c.Executor == nil {
+		c.Executor = &execution.Goroutine{}
+	}
 	if c.Store == nil {
 		c.Store = FileStore{}
 	}
@@ -131,7 +139,14 @@ func New[T any](c Config[T]) (*Session[T], error) {
 
 func (s *Session[T]) State() State {
 	closed := s.lifetime.Err() != nil
-	return State{Path: s.path, Busy: s.busy && !closed, Dirty: s.config.Journal.Snapshot().Dirty, Closed: closed, Action: s.action, Last: s.last}
+	workerPending, ownerPending := false, false
+	if s.operation != nil {
+		s.operation.mu.Lock()
+		workerPending = !s.operation.workerDone
+		ownerPending = !s.operation.ownerDone
+		s.operation.mu.Unlock()
+	}
+	return State{WorkerPending: workerPending, OwnerPending: ownerPending, Path: s.path, Busy: s.busy && !closed, Dirty: s.config.Journal.Snapshot().Dirty, Closed: closed, Action: s.action, Last: s.last}
 }
 func (s *Session[T]) Cancel() {
 	if s.cancel != nil {
@@ -157,37 +172,52 @@ func (s *Session[T]) ready(ctx context.Context) error {
 	}
 	return nil
 }
-func (s *Session[T]) start(ctx context.Context, action Action, work func(context.Context) (Result, func() error)) {
+
+type operationState struct {
+	mu                    sync.Mutex
+	workerDone, ownerDone bool
+}
+
+func (s *Session[T]) start(ctx context.Context, action Action, work func(context.Context) (Result, func() error)) error {
 	op, cancel := context.WithCancel(ctx)
 	stop := context.AfterFunc(s.lifetime, cancel)
-	s.busy, s.action, s.cancel = true, action, cancel
+	state := &operationState{}
+	ticket, err := s.config.Owner.ReserveCompletion(s.config.Window, func(error) {
+		cancel()
+		stop()
+		state.mu.Lock()
+		state.ownerDone = true
+		state.mu.Unlock()
+	})
+	if err != nil {
+		cancel()
+		stop()
+		return err
+	}
+	previousAction, previousOperation := s.action, s.operation
+	s.busy, s.action, s.cancel, s.operation = true, action, cancel, state
 	s.config.Owner.Invalidate(s.config.Window)
-	go func() {
+	err = s.config.Executor.Submit(func() {
 		result := Result{Action: action}
 		var commit func() error
 		returned := false
 		defer func() {
-			if !returned {
-				value := recover()
-				result.Err = fmt.Errorf("document: worker failed without returning: %v", value)
+			if p := recover(); p != nil {
+				result.Err = &execution.PanicError{Value: p}
+				commit = nil
+			} else if !returned {
+				result.Err = execution.ErrGoexit
 				commit = nil
 			}
 			if op.Err() != nil {
-				result.Err = op.Err()
+				result.Err = errors.Join(result.Err, op.Err())
 				commit = nil
 			}
-			// A canceled operation still clears busy on a live window. Keep the
-			// operation context alive until owner execution, not merely admission.
-			delivery := s.config.Owner.PostWait(s.lifetime, func() {
-				defer cancel()
-				defer stop()
+			delivery := ticket.Publish(func() {
 				s.busy = false
 				s.cancel = nil
-				if s.lifetime.Err() != nil {
-					return
-				}
 				if op.Err() != nil {
-					result.Err = op.Err()
+					result.Err = errors.Join(result.Err, op.Err())
 					commit = nil
 				}
 				if result.Err == nil && commit != nil {
@@ -206,10 +236,26 @@ func (s *Session[T]) start(ctx context.Context, action Action, work func(context
 				cancel()
 				stop()
 			}
+			state.mu.Lock()
+			state.workerDone = true
+			state.mu.Unlock()
 		}()
 		result, commit = work(op)
 		returned = true
-	}()
+	})
+	if err != nil {
+		ticket.Abort()
+		state.mu.Lock()
+		state.workerDone = true
+		state.mu.Unlock()
+		s.busy = false
+		s.action = previousAction
+		s.cancel = nil
+		s.operation = previousOperation
+		s.config.Owner.Invalidate(s.config.Window)
+		return err
+	}
+	return nil
 }
 
 // Save captures on the owner, encodes/writes on a worker and acknowledges only
@@ -242,7 +288,7 @@ func (s *Session[T]) Save(ctx context.Context, o SaveOptions) error {
 	// Copy all owner state needed by the worker, including current chooser path.
 	choosePath := s.path
 	choose := s.chooser(choosePath)
-	s.start(ctx, Save, func(op context.Context) (Result, func() error) {
+	return s.start(ctx, Save, func(op context.Context) (Result, func() error) {
 		result := Result{Action: Save, Path: path}
 		if result.Path == "" {
 			result.Path, result.Err = choose(op, app.SaveFile)
@@ -263,7 +309,6 @@ func (s *Session[T]) Save(ctx context.Context, o SaveOptions) error {
 		result.Err = err
 		return result, func() error { return s.config.Journal.MarkSavedRevision(state.Revision) }
 	})
-	return nil
 }
 
 // chooser captures the current path before starting a worker. It never reads
@@ -307,7 +352,7 @@ func (s *Session[T]) Open(ctx context.Context, o OpenOptions) error {
 		return ErrUnsaved
 	}
 	choose := s.chooser(s.path)
-	s.start(ctx, Open, func(op context.Context) (Result, func() error) {
+	return s.start(ctx, Open, func(op context.Context) (Result, func() error) {
 		result := Result{Action: Open, Path: o.Path}
 		if result.Path == "" {
 			result.Path, result.Err = choose(op, app.OpenFile)
@@ -335,5 +380,4 @@ func (s *Session[T]) Open(ctx context.Context, o OpenOptions) error {
 			return s.config.Journal.Replace(true, func() error { return s.config.Codec.Install(image) })
 		}
 	})
-	return nil
 }

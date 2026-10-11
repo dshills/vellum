@@ -20,7 +20,7 @@ var (
 	ErrClosePending = errors.New("vellum: window close callback is already executing")
 )
 
-type Config struct{ QueueCapacity int }
+type Config struct{ QueueCapacity, CompletionCapacity int }
 type Window struct {
 	ID, Title     string
 	Width, Height float32
@@ -37,21 +37,26 @@ type Driver interface {
 	Run(context.Context, *Application) error
 }
 type Application struct {
-	changed         chan struct{}
-	owner           sync.Mutex
-	mu              sync.Mutex
-	ctx             context.Context
-	cancel          context.CancelFunc
-	queue           []func()
-	capacity        int
-	windows         []Window
-	lifetimes       map[string]context.Context
-	windowCancels   map[string]context.CancelFunc
-	closeRequests   map[string]bool
-	services        Services
-	dirty           map[string]bool
-	wake            func()
-	running, closed bool
+	changed                                    chan struct{}
+	owner                                      sync.Mutex
+	mu                                         sync.Mutex
+	ctx                                        context.Context
+	cancel                                     context.CancelFunc
+	queue                                      []envelope
+	capacity                                   int
+	completionCapacity                         int
+	normalPending, dispatching, cleanupPending int
+	nextArrival, nextReservation               uint64
+	unpublished                                int
+	completions                                map[uint64]*Completion
+	windows                                    []Window
+	lifetimes                                  map[string]context.Context
+	windowCancels                              map[string]context.CancelFunc
+	closeRequests                              map[string]bool
+	services                                   Services
+	dirty                                      map[string]bool
+	wake                                       func()
+	running, closed                            bool
 }
 
 func New(c Config) (*Application, error) {
@@ -61,8 +66,14 @@ func New(c Config) (*Application, error) {
 	if c.QueueCapacity < 1 {
 		return nil, fmt.Errorf("vellum: queue capacity must be positive")
 	}
+	if c.CompletionCapacity == 0 {
+		c.CompletionCapacity = 256
+	}
+	if c.CompletionCapacity < 1 {
+		return nil, fmt.Errorf("vellum: completion capacity must be positive")
+	}
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, closeRequests: map[string]bool{}, changed: make(chan struct{})}, nil
+	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, completionCapacity: c.CompletionCapacity, completions: map[uint64]*Completion{}, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, closeRequests: map[string]bool{}, changed: make(chan struct{})}, nil
 }
 func (a *Application) Context() context.Context { return a.ctx }
 
@@ -184,13 +195,18 @@ func (a *Application) CloseWindow(id string) error {
 	a.windows = append(a.windows[:index], a.windows[index+1:]...)
 	delete(a.dirty, id)
 	wake := a.wake
+	hooks := a.revokeLocked(id, ErrWindowClosed)
 	if len(a.windows) == 0 {
 		wake = a.closeLocked()
+		hooks = append(hooks, a.revokeLocked("", ErrClosed)...)
 	}
 	a.mu.Unlock()
-	if wake != nil {
-		wake()
-	}
+	defer func() {
+		if wake != nil {
+			wake()
+		}
+	}()
+	runCompletionHooks(hooks)
 	return nil
 }
 
@@ -223,10 +239,14 @@ func (a *Application) Windows() []Window {
 // Application model state is accessed only inside Do, Drain, or View execution.
 func (a *Application) Do(fn func()) error {
 	a.owner.Lock()
+	returned := true // Validation refusal never entered the callback.
 	defer func() {
+		p := recover()
 		a.owner.Unlock()
-		if p := recover(); p != nil {
+		if !returned {
 			a.Close()
+		}
+		if p != nil {
 			panic(p)
 		}
 	}()
@@ -239,7 +259,9 @@ func (a *Application) Do(fn func()) error {
 	if fn == nil {
 		return fmt.Errorf("vellum: nil UI callback")
 	}
+	returned = false
 	fn()
+	returned = true
 	return nil
 }
 
@@ -250,47 +272,22 @@ func (a *Application) Post(fn func()) error {
 		return fmt.Errorf("vellum: nil UI callback")
 	}
 	a.mu.Lock()
-	if a.closed {
-		a.mu.Unlock()
-		return ErrClosed
-	}
-	if len(a.queue) >= a.capacity {
-		a.mu.Unlock()
-		return ErrQueueFull
-	}
-	a.queue = append(a.queue, fn)
+	err := a.postLocked(fn)
 	wake := a.wake
 	a.mu.Unlock()
-	if wake != nil {
+	if err == nil && wake != nil {
 		wake()
 	}
-	return nil
+	return err
 }
 
-// A panic in a UI callback closes the application and propagates; recovery
-// does not leave an open application with silently lost accepted work.
-// Drain consumes only the current batch, so self-posting work cannot starve input.
+// Drain consumes the initial arrival batch. Newly posted callbacks never enter
+// that batch, even if a callback removes another initial completion.
 func (a *Application) Drain() error {
-	return a.Do(func() {
-		a.mu.Lock()
-		count := len(a.queue)
-		a.mu.Unlock()
-		for i := 0; i < count; i++ {
-			a.mu.Lock()
-			if a.closed || len(a.queue) == 0 {
-				a.mu.Unlock()
-				break
-			}
-			fn := a.queue[0]
-			a.queue[0] = nil
-			a.queue = a.queue[1:]
-			close(a.changed)
-			a.changed = make(chan struct{})
-			a.mu.Unlock()
-			fn()
-		}
-	})
+	_, err := a.DrainN(math.MaxInt)
+	return err
 }
+
 func (a *Application) Invalidate(id string) error {
 	a.mu.Lock()
 	if a.closed {
@@ -345,6 +342,7 @@ func (a *Application) closeLocked() func() {
 	wake := a.wake
 	a.closed = true
 	a.queue = nil
+	a.normalPending = 0
 	close(a.changed)
 	a.changed = make(chan struct{})
 	a.wake = nil
@@ -354,10 +352,14 @@ func (a *Application) closeLocked() func() {
 func (a *Application) Close() {
 	a.mu.Lock()
 	wake := a.closeLocked()
+	hooks := a.revokeLocked("", ErrClosed)
 	a.mu.Unlock()
-	if wake != nil {
-		wake()
-	}
+	defer func() {
+		if wake != nil {
+			wake()
+		}
+	}()
+	runCompletionHooks(hooks)
 }
 func (a *Application) Run(ctx context.Context, d Driver) error {
 	if ctx == nil || d == nil {

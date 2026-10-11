@@ -1,0 +1,42 @@
+{
+  "scope": "temporary-only execution and bounded clock draft; no UI/application integration",
+  "compiler": "go version go1.27.2 darwin/arm64",
+  "source_sha256": {
+    "/private/tmp/vellum-p9-execution/README.md": "3e162ed2ce1136728c98153a3d9a7c73bcc12b3029bc2668cfb05c83c284fb34",
+    "/private/tmp/vellum-p9-execution/clock-spec.md": "d1355793e27e97999c4d503a0ec164c1faaade6b5de8d89fa149387fd86e4c40",
+    "/private/tmp/vellum-p9-execution/clock.go": "c29a4b5cef43c06eaa4d4469f242824bce098529d2931adab3b64139cd044ac6",
+    "/private/tmp/vellum-p9-execution/clock_test.go": "3b0d4a9a16bf38c57a8f8d4d431b734c966a4de00fe152ecadd52f8fdbe33f9f",
+    "/private/tmp/vellum-p9-execution/execution.go": "2b46889c00f1bca909e5311f03a60aaf222a50d69ee71f1542be669c4c5cde76",
+    "/private/tmp/vellum-p9-execution/execution_test.go": "588221bf36c3a9eaf51f464e03ec502bdd2c5ae1e0f03f4d0755cf4f8e06647d",
+    "/private/tmp/vellum-p9-execution/go.mod": "36c23b2a6a308ab112475bd5a2cf1fdbf5191c3fcaaea2e8b48036275fd414e2",
+    "/private/tmp/vellum-p9-execution/reservation-draft.md": "5128583e0980be92b4bbd7ed53747ebd8d103e29f8c7cb903b102a7a65e533c0"
+  },
+  "checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.596327500010375,
+      "log": "/private/tmp/vellum-p9-execution/clock-race-v2.txt",
+      "log_sha256": "294dbaa335201ed0a6f1f1fe200a66a0b6713e1b2f928bdb541aab67adef6086"
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.0920863339852076,
+      "log": "/private/tmp/vellum-p9-execution/clock-vet-v2.txt",
+      "log_sha256": "e9b5cae35c4984af29b345ff7259ed112e95ba774babb3a54c3b2d142ebf6dbf"
+    }
+  ],
+  "changed_inputs": [],
+  "result": "pass"
+}

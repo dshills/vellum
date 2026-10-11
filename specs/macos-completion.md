@@ -44,8 +44,11 @@ and bounded asynchronous captures. P4 still needs broader performance qualificat
 control and independent document application beyond the historical prototypes;
 its native input/geometry evidence and separate read-only external AX check pass
 against frozen sources. Human IME and VoiceOver acceptance remain separate. Semantic command/UI inspection exists through APIs
-and native accessibility; application automation transport and deterministic UI
-replay need an explicit public contract and working consumer evidence.
+and native accessibility. Portable execution now has injected real/manual
+workers and clocks, reserved owner results, bounded drain batches and separate
+worker/delivery accounting. Native timer/input/frame integration, deterministic
+fonts, replay records and a public routed consumer still need qualification;
+application automation transport also remains open.
 
 Remaining Mac acceptance includes broader external AX and human
 screen-reader workflows; candidate-panel placement through scrolling/focus/scale;
