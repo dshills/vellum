@@ -1,0 +1,73 @@
+from pathlib import Path
+import hashlib, json, re, difflib, subprocess
+
+ROOT = Path('/private/tmp/vellum-large-data')
+AUTHOR = Path('/private/tmp/vellum-grid-update-qualification/widget-regression')
+OUT = Path('/private/tmp/vellum-grid-update-review')
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+red = json.loads((AUTHOR/'red-proof.json').read_text())
+green = json.loads((AUTHOR/'green-proof.json').read_text())
+assert green['before'] == green['after'] and green['result'] == 'PASS'
+for name, digest in green['before'].items():
+    p = AUTHOR/'qualify-green.py' if name == 'producer' else ROOT/name
+    assert p.is_file() and sha(p) == digest, name
+for check in green['checks']:
+    assert check['exit_code'] == 0 and sha(Path(check['log'])) == check['log_sha256']
+assert sha(AUTHOR/'red.log') == red['log_sha256']
+assert sha(AUTHOR/'red-proof.json') == green['red_proof']['sha256']
+redlog = (AUTHOR/'red.log').read_text()
+assert redlog.count('got 2/2 want 1/1') == 1626
+other = [s for s in redlog.splitlines() if re.search(r'grid_update_offscreen_test.go:\d+:', s) and 'GRID_UPDATE_RGBA ' not in s and 'got 2/2 want 1/1' not in s]
+assert not other, other
+extract = lambda p: [s.split('GRID_UPDATE_RGBA ', 1)[1] for s in p.read_text().splitlines() if 'GRID_UPDATE_RGBA ' in s]
+assert extract(AUTHOR/'red.log') == red['raster_records']
+assert extract(AUTHOR/'green-race3.log') == red['raster_records'] * 3
+assert green['software_rgba']['corrected_records'] == red['raster_records'] * 3
+original = (AUTHOR/'original-grid.go.txt').read_bytes()
+current = (ROOT/'drivers/cogent/grid.go').read_bytes()
+old = b'\tw.Update()\n}\nfunc disposeGrid(r *record) {'
+new = b'\t// syncGrid updates the host recursively after every slot has been placed.\n\t// Updating here would run the same updater/style work a second time.\n}\nfunc disposeGrid(r *record) {'
+assert original.count(old) == 1 and original.replace(old,new) == current
+assert sha(AUTHOR/'original-grid.go.txt') == red['files']['drivers/cogent/grid.go']
+assert sha(AUTHOR/'final-grid.go.txt') == sha(ROOT/'drivers/cogent/grid.go')
+assert sha(AUTHOR/'frozen-grid_update_offscreen_test.go.txt') == sha(ROOT/'drivers/cogent/grid_update_offscreen_test.go') == red['files']['drivers/cogent/grid_update_offscreen_test.go']
+selected = [
+ 'drivers/cogent/grid.go', 'drivers/cogent/grid_update_offscreen_test.go', 'specs/grid-native.md',
+ 'drivers/cogent/grid_editing.go', 'drivers/cogent/grid_geometry.go', 'drivers/cogent/controls.go',
+ 'drivers/cogent/driver.go', 'drivers/cogent/reconcile.go', 'drivers/cogent/manual_offscreen.go',
+ 'drivers/cogent/build/upstream/core/update.go', 'drivers/cogent/build/upstream/core/widget.go',
+ 'drivers/cogent/build/upstream/core/style.go', 'drivers/cogent/build/upstream/core/text.go',
+ 'drivers/cogent/build/upstream/core/flags.go', 'drivers/cogent/build/upstream/core/typegen.go',
+ 'drivers/cogent/build/upstream/core/render.go', 'drivers/cogent/build/upstream/core/widgetevents.go'
+]
+inputs = {name: sha(ROOT/name) for name in selected}
+artifacts = {str(AUTHOR/name): sha(AUTHOR/name) for name in [
+ 'red-proof.json', 'red.log', 'green-proof.json', 'green-race3.log', 'offscreen-vet.log',
+ 'desktop-vet.log', 'original-grid.go.txt', 'final-grid.go.txt',
+ 'frozen-grid_update_offscreen_test.go.txt', 'qualify-green.py']}
+base_spec = subprocess.run(['git','show','HEAD:specs/grid-native.md'],cwd=ROOT,check=True,capture_output=True).stdout
+current_spec = (ROOT/'specs/grid-native.md').read_bytes()
+delta = ''.join(difflib.unified_diff(original.decode().splitlines(True), current.decode().splitlines(True), fromfile='original/drivers/cogent/grid.go', tofile='current/drivers/cogent/grid.go'))
+delta += ''.join(difflib.unified_diff(base_spec.decode().splitlines(True), current_spec.decode().splitlines(True), fromfile='original/specs/grid-native.md', tofile='current/specs/grid-native.md'))
+(OUT/'delta.patch.txt').write_text(delta)
+(OUT/'snapshots').mkdir(exist_ok=True)
+for name in selected[:3]:
+    dest = OUT/'snapshots'/(name.replace('/','__') + '.txt')
+    dest.write_bytes((ROOT/name).read_bytes())
+(OUT/'snapshots/original-grid.go.txt').write_bytes(original)
+(OUT/'snapshots/original-grid-native.md.txt').write_bytes(base_spec)
+result = {
+ 'result':'PASS', 'selected_current_source_count':len(inputs),
+ 'current_sources':inputs, 'author_artifacts':artifacts,
+ 'author_before_after_selected_count':len(green['before']),
+ 'author_before_after_equal':True,
+ 'independent_audit':'Read-only metadata/source review. No test, GUI, performance or profile execution.',
+ 'author_red':{'exit_code':red['exit_code'],'expected_double_pass_failures':1626,'other_test_diagnostics':[],'rgba_records':8},
+ 'author_green':{'checks':[{'name':c['name'],'exit_code':c['exit_code'],'log':c['log'],'log_sha256':c['log_sha256']} for c in green['checks']], 'rgba_records':24,'exact_original_match_each_repetition':True},
+ 'runtime_exact_delta':'Only one pooled Text.Update call removed; final host.Update and private inline field.Update preserved.',
+ 'baseline_grid_sha256':hashlib.sha256(original).hexdigest(),
+ 'baseline_spec_sha256':hashlib.sha256(base_spec).hexdigest(),
+ 'delta_sha256':sha(OUT/'delta.patch.txt')
+}
+(OUT/'audit.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({'audit_sha256':sha(OUT/'audit.json'),'delta_sha256':sha(OUT/'delta.patch.txt'),'sources':inputs},indent=2))

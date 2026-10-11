@@ -1,0 +1,50 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--format",
+    "json",
+    "--baseline",
+    "none",
+    "--fail-on",
+    "medium",
+    "--min-severity",
+    "medium",
+    "--paths",
+    "drivers/cogent/grid.go,drivers/cogent/grid_update_offscreen_test.go,specs/grid-native.md,specs/grid-performance.md,specs/macos-completion.md,docs/implementation.md,docs/reports/macos-grid-performance/README.md,docs/reports/macos-grid-update/README.md",
+    "--out",
+    "/private/tmp/vellum-grid-update-prism/prism.json"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 16.742212666984415,
+  "before": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "specs/grid-performance.md": "3adf9497eaf0bb3761baa11fe24a7aec409f11954e08adaf54f51bb19bdc158d",
+    "specs/macos-completion.md": "1c864041038ed281d75507ba81c1e561bb4de77d8643bc5d57fc651ca54c476c",
+    "docs/implementation.md": "c98015fda17e68813c5ac5c208dd44685572987ef1cb7914927b9f16371eaec8",
+    "docs/reports/macos-grid-performance/README.md": "a79b6e15db754d57bb5cf2d5115f52ce6b4ddade20845a7021fe08f8b546a843",
+    "docs/reports/macos-grid-update/README.md": "0b0ed424f149d47f362d63e6f38fad22b3a45591668691932d24e7112c7c635c"
+  },
+  "after": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "specs/grid-performance.md": "3adf9497eaf0bb3761baa11fe24a7aec409f11954e08adaf54f51bb19bdc158d",
+    "specs/macos-completion.md": "1c864041038ed281d75507ba81c1e561bb4de77d8643bc5d57fc651ca54c476c",
+    "docs/implementation.md": "c98015fda17e68813c5ac5c208dd44685572987ef1cb7914927b9f16371eaec8",
+    "docs/reports/macos-grid-performance/README.md": "a79b6e15db754d57bb5cf2d5115f52ce6b4ddade20845a7021fe08f8b546a843",
+    "docs/reports/macos-grid-update/README.md": "0b0ed424f149d47f362d63e6f38fad22b3a45591668691932d24e7112c7c635c"
+  },
+  "source_index_unchanged": true,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "prism_sha256": "e598e086eb51f7ca61ef69db237f39b0c18d24a5076683dfe584a91fc57e7786",
+  "producer_sha256": "66fce63db164236ceadd5bf38aee762b3aac739a1ed435166c79185aec715f6d"
+}

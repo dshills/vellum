@@ -103,6 +103,16 @@ Hidden oversized column definitions are checked if/when materialized. Pools
 reuse active widgets and destroy surplus slots to release private shaped-text
 caches, with no whole-source allocation.
 
+A successful native projection sync assigns every pooled cell/header's text,
+rectangle, visibility, selection and cursor state before one recursive host
+update. That traversal updates and restyles each pooled slot after its parent;
+placement does not also run a separate per-slot update. The private inline
+editor retains its existing update and focus handling. This bounds duplicate
+work within that sync, not the number of updates in an entire frame: initial
+mounting, theme changes and other parent updates may perform additional work.
+It does not skip layout, paint, rasterization or texture upload. A refused sync
+keeps the existing reconciliation failure and retirement behavior.
+
 Render/Position never read the source/model or invoke user callbacks. Completed
 native rendering publishes clipped actual ContentBBox/TotalBBox geometry. A
 changed actual content size/scale posts one checked immutable layout request to

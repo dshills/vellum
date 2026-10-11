@@ -1,0 +1,172 @@
+{
+  "schema": "vellum-independent-final-source-evidence-leaf-v1",
+  "result": "APPROVED",
+  "files": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "specs/grid-performance.md": "3adf9497eaf0bb3761baa11fe24a7aec409f11954e08adaf54f51bb19bdc158d",
+    "specs/macos-completion.md": "1c864041038ed281d75507ba81c1e561bb4de77d8643bc5d57fc651ca54c476c",
+    "docs/implementation.md": "c98015fda17e68813c5ac5c208dd44685572987ef1cb7914927b9f16371eaec8",
+    "docs/reports/macos-grid-performance/README.md": "a79b6e15db754d57bb5cf2d5115f52ce6b4ddade20845a7021fe08f8b546a843",
+    "docs/reports/macos-grid-update/README.md": "0b0ed424f149d47f362d63e6f38fad22b3a45591668691932d24e7112c7c635c"
+  },
+  "reviewer_task": "/root/platform_completion",
+  "scope": "Eight final code/test/spec/report prose files. Read-only review of the narrow one-call runtime removal, post-Prism test-only correction, existing selected author/root records and six optimized native fixed-10k raw logs. No new checks/native processes/profiles were run.",
+  "audit": {
+    "path": "/private/tmp/vellum-grid-update-review/final/audit.json",
+    "sha256": "8b12c4126114c2c0adac29bb4b52bf57c8d2ce5cb504aa5b2bd25697bac6fd40"
+  },
+  "verifier": {
+    "path": "/private/tmp/vellum-grid-update-review/final/audit.py",
+    "sha256": "092d91e54ec0e5a749d44225b7e0c523bb0757e5581666848fd32a475bcef968"
+  },
+  "runtime_review": {
+    "path": "/private/tmp/vellum-grid-update-review/review.json",
+    "sha256": "99433bc7316529ee37d5457463c953a46166b05a4333a9efe9d3c35bb4f18fea"
+  },
+  "final_author_proof": {
+    "path": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/qualification.json",
+    "sha256": "f8c65a3c24f1698a1dc078e00d508d09b4c8ba71dc7851671741984b2c7d19c0",
+    "test_sha256": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289"
+  },
+  "native_comparison": {
+    "path": "/private/tmp/vellum-grid-update-qualification/comparison.json",
+    "sha256": "416e58c115783bb7eaa3db51358a7d7134ba6757183a4b20e3ad7e800eba86e6"
+  },
+  "raw_proof_binding": {
+    "/private/tmp/vellum-grid-update-qualification/native-1-baseline/native.log": "110ac713072b5c53e3b4d63467810072fa1982eb95cecf8a7a5ea1e65ba8be1a",
+    "/private/tmp/vellum-grid-update-qualification/native-1-baseline/result.json": "53d821b49605be33ad944019ac8c98b59f4c6863bd445c035997c19c41e150cc",
+    "/private/tmp/vellum-grid-update-qualification/native-2-candidate/native.log": "e313a5fe08d711b01ee893d8ff6b38dad77e49dd58a492cfadb9e375c1a5a815",
+    "/private/tmp/vellum-grid-update-qualification/native-2-candidate/result.json": "1ce1ca4dd210e4ac1e2aa6ee63e731a3d8be41194d6ab015af83c5ab417bfccc",
+    "/private/tmp/vellum-grid-update-qualification/native-3-candidate/native.log": "7b6e30b5549b10f807ab7fe1598e129d660d1e62caadae3d38774d85773dec2f",
+    "/private/tmp/vellum-grid-update-qualification/native-3-candidate/result.json": "1992986e0a0fd6ad7fbaf4311dd65aec1397d34b3b8a3d7e7e485e745b3c51c8",
+    "/private/tmp/vellum-grid-update-qualification/native-4-baseline/native.log": "010b2a32daad54f16aba3400f0f30ab923f6a9cc0984eefbec7f46f215afa169",
+    "/private/tmp/vellum-grid-update-qualification/native-4-baseline/result.json": "3b969b6eb8278029e9ee6683e477ce6fb607744120e1697937bc718b9edaf714",
+    "/private/tmp/vellum-grid-update-qualification/native-5-baseline/native.log": "d54dfdb19d7889cc5e7c52fd01cc6e4ff30ac1cfafb4ae4a164289e38a9920ba",
+    "/private/tmp/vellum-grid-update-qualification/native-5-baseline/result.json": "da8e8c0a30dca45f194d2bf7e6451235feceb178d50478f6b6ac8bf375830c5b",
+    "/private/tmp/vellum-grid-update-qualification/native-6-candidate/native.log": "7f7eca7cb306cc18c6ee9168b1df1d29c247807c3998977de70ce25cf03d2ed6",
+    "/private/tmp/vellum-grid-update-qualification/native-6-candidate/result.json": "ec8eedebd2b86d570197d2ab8c43f601989f4ea7770b82b3861a5e091f2c7679",
+    "/private/tmp/vellum-grid-update-qualification/comparison.json": "416e58c115783bb7eaa3db51358a7d7134ba6757183a4b20e3ad7e800eba86e6",
+    "/private/tmp/vellum-grid-update-qualification/baseline-inputs.json": "3181e49f0d38bbdf7993949906f1699fae685b7e9154f7b1d6b436b4070ec256",
+    "/private/tmp/vellum-grid-update-qualification/candidate-build.json": "744222c1a9c9895fa1103592756518cbf6961a3fd52d2e69d1f94376be3e35e3",
+    "/private/tmp/vellum-grid-update-qualification/candidate-build.log": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+    "/private/tmp/vellum-grid-update-qualification/machine.json": "e6392f47a40b07d597da41bdc1c002c66fa95a0fbd50604dd33f49d0c0ba1b92",
+    "/private/tmp/vellum-grid-update-qualification/affected-checks/qualification.json": "c20e4e5cea5b5a362c1d60ee9dfe8e2c7132930fe6668c1d90d35494b6bfb7e6",
+    "/private/tmp/vellum-grid-update-qualification/affected-checks/native-grid-and-frame-race.log": "bb035560f79f151ae0618cb86a58e5317e307a33fb3067bdb5b72f816e14bd81",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/producer-initial-proof.json": "277538b8890287a40879077c351e7b368e262caa313be34a48d9e8ed2109c348",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/adjudicate.py": "02dd686c6940f64e919652c11f352ccd23a6d1c255901e0bee2ba2dbfef75595",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/qualification.json": "f8c65a3c24f1698a1dc078e00d508d09b4c8ba71dc7851671741984b2c7d19c0",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/red-overlay.log": "58cff7c8a1d8d959c3d854b8a6acd9e1446899168f78638e3d408ea754f147da",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/green-race3.log": "a77387c04e373744a1ee429f1a5c27d7dfe149d8de1fc447f7417c1f31a2ff93",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/qualify.py": "464e444568f9a130c3c12a83b686a4d601f080c3f8aa93f67267e97616350d66",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/red-overlay.json": "4f5ee496d1aae974050d20bfb26cac8812eaf4007dd17395c90bda458bcbb828",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/test-correction.diff.txt": "548a82b3ab5999ba7fa5d2da10f115a56fd0901194b7663db5f0e36e16321e4b",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/candidate-grid.go.txt": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/baseline-grid.go.txt": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/grid_update_offscreen_test.go.txt": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289",
+    "/private/tmp/vellum-grid-update-prism/prism.json": "e598e086eb51f7ca61ef69db237f39b0c18d24a5076683dfe584a91fc57e7786",
+    "/private/tmp/vellum-grid-update-prism/process.json": "3830711b502e8f9f6f913c327d448e66f5196a591534a439cbe249682ced809d",
+    "/private/tmp/vellum-grid-update-prism/inputs.json": "570b8eb9050b603b9bb2f3020ea0d721b3373a9c744d83aa429967f20a79b9a4",
+    "/private/tmp/vellum-grid-update-prism/staged.diff.txt": "6cd980445dd08674cef3c6cb2d664d0baa2106aa1b0f1b0722edfe0e3e3f5285",
+    "/private/tmp/vellum-grid-update-prism/stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-grid-update-prism/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "blocking_findings": [],
+  "prism_disposition": {
+    "finding": "49367d7573675052",
+    "severity": "medium",
+    "disposition": "FIXED_TEST_ONLY",
+    "original_report_sha256": "e598e086eb51f7ca61ef69db237f39b0c18d24a5076683dfe584a91fc57e7786",
+    "original_inputs_sha256": "570b8eb9050b603b9bb2f3020ea0d721b3373a9c744d83aa429967f20a79b9a4",
+    "original_process_sha256": "3830711b502e8f9f6f913c327d448e66f5196a591534a439cbe249682ced809d",
+    "original_process_exit_code": 1,
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 8,
+      "bytes": 19914,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 10592,
+          "output": 2221,
+          "costUSD": 0.043394
+        }
+      ],
+      "widenedFiles": 1,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "basis": "A pooled firstCursor pointer can represent a legitimately active/selected current cell after reuse. The final test removes exactly the three-line post-phase inactive assumption. Its initial warm-cursor check and all current-projection per-slot updater/style, text, selection, visibility, cursor, geometry and raster checks remain. Seven other Prism leaf files are byte-identical; runtime and native A/B binaries are unchanged. No further provider pass is claimed."
+  },
+  "producer_adjudication": {
+    "status": "APPROVED_SOURCE_BACKED_RECLASSIFICATION",
+    "basis": "The first final-test producer marked FAIL after counting eight successful t.Logf raster records as extra assertion failures. The original FAIL proof and both raw logs remain immutable. I independently parsed the raw lines: exactly 1626 expected got2/2want1/1 assertions, eight exact original raster records, and no other diagnostics. The final classifier whitelists only those eight complete known records with full grammar, never a broad prefix or unknown failure. Red actual Go exit1 and green actual Go exit0 remain unchanged; no child rerun was used to reclassify the proof.",
+    "initial_proof": {
+      "path": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/producer-initial-proof.json",
+      "sha256": "277538b8890287a40879077c351e7b368e262caa313be34a48d9e8ed2109c348"
+    },
+    "adjudicator": {
+      "path": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/adjudicate.py",
+      "sha256": "02dd686c6940f64e919652c11f352ccd23a6d1c255901e0bee2ba2dbfef75595"
+    }
+  },
+  "inheritance": [
+    "The original runtime review remains immutable. Its 17 selected source hashes describe the pre-Prism test snapshot; this leaf explicitly replaces only that test identity.",
+    "Final author proof preserves original v1 history hashes and verifies the 34 selected source entries before/after. The final red overlay replaces only grid.go with the original double-pass snapshot; final test body is identical in red and green.",
+    "Both original driver vets and the affected 54-name anchored offscreen race invocation exited0 on the same candidate runtime. That affected log is nonverbose; I verified its command, selected names, exit and raw hash, not an individual per-test verbose transcript. New test compilation/race3 is bound by its final proof.",
+    "The native candidate build before/after map equals the comparison source/prepared map. Baseline differs in exactly one selected production path, grid.go; all 252 selected current production file hashes were checked. Baseline/build/comparison recorded 6128-file prepared maps agree. This leaf does not repeat a full live prepared-tree hash or claim compiler/module-cache/SDK closure.",
+    "All three baseline and three candidate raw processes exit0. Each carries 128 warmup events and 120 uniquely tagged completed samples, zero dropped/pending, one callback per sample, profile=false, release=true, fixed10000 rows/seed7, and end-only external observations."
+  ],
+  "statistics_and_claims": {
+    "estimator": "Nearest rank; 360 same-ticket samples per build, pooled across three interleaved fresh processes. Independent phase percentiles are not added.",
+    "ui_work_ns": {
+      "baseline": {
+        "count": 360,
+        "p50": 18371542,
+        "p95": 19545458,
+        "p99": 20411583,
+        "max": 21883248
+      },
+      "candidate": {
+        "count": 360,
+        "p50": 15798834,
+        "p95": 17067501,
+        "p99": 18003666,
+        "max": 18964916
+      }
+    },
+    "p95_reduction_percent": 12.677917294135543,
+    "geometry": "All 720 samples preserve400 clipped cells/50rows/8columns,767x624logicalviewport atscale1.6875; same indexed trajectory geometry/layout hashes agree across all6processes.",
+    "software_raster": "The final offscreen red overlay emits the same8originalRGBArecords; all24finalgreenrecords equal8records repeated3times atDPI96/120/144/192. This is separate software rendering evidence, not native/GPU or physical pixel comparison.",
+    "accounting": "Every raw ui_work_ns equals input+owner+reconcile+layoutpaint+gather+rasterupload+encode-submit, with queue/acquisition/present-call excluded. This is elapsed measured work including pauses, not OS-thread CPU, GPU completion or a physical presentation timestamp.",
+    "targets": "Unchangedp95<=4ms andp99<=6ms remain failed. Threeprocesses/build and fixed10k only do not satisfy the required5-process4-casecampaign or sustainedP6acceptance.",
+    "docs": "Eight frozen leaf files accurately scope duplicate work within one successful sync, preserve inline editor/failure behavior, and keep raster/wake/memory/endurance/tree/cold-cache/external-accessibility/presentation checks open. All reported rounded pooled/per-run and reconciliation/raster values match raw logs."
+  },
+  "next_phase": {
+    "status": "INVESTIGATE_NOT_QUALIFIED",
+    "source": "grid_geometry.go:128-131 publishes changed measurement then invalidatesowner; driver.go:144-155 dirtyrefresh may reconcileunchangedgrid; grid.go:665 host.Update marks layout through core/render.go:101.",
+    "observation": "All714adjacent sample frame deltas are2 across the six raw processes, in both builds. This supports investigation but does not identify a causal frame/wake/upload origin or prove that suppressing owner invalidation is safe.",
+    "constraint": "Further optimization must instrument accepted measurement publication and subsequent frame/upload attribution first. Never mark changed scroll textures unchanged merely to skip uploads."
+  },
+  "limits": [
+    "No new runtime/GUI/performance/profile execution by this reviewer.",
+    "No complete source/compiler/dependency/SDK closure or production-readiness claim.",
+    "No fullP6, five-run, million-row/variable-height campaign, novel-string/cold-cache, tree timing, endurance, native-memory or physical-presentation qualification.",
+    "No proof that styling dominates upload/wake cost, or that this removal reduces process-wide scheduler wakeups.",
+    "Future durable archive copying/manifest creation mentioned by report is not audited by this leaf; this certificate binds the existing exact local raw artifacts instead.",
+    "Reviewer audit tooling initially expected verbose PASS labels and then failed to allow the declared old-test inheritance; those validator errors were corrected without source/test/runtime changes. They are not source/test qualification failures."
+  ]
+}

@@ -1,0 +1,210 @@
+//go:build offscreen
+
+package cogent
+
+import (
+	"crypto/sha256"
+	"fmt"
+	"html"
+	"image"
+	"math"
+	"testing"
+
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/states"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/virtual"
+)
+
+// The immutable source makes text replacement independent of widget caches.
+// Its captured selection index contains only immutable scalar projection data.
+type gridUpdateSource struct {
+	selectionNativeIndex
+	prefix string
+}
+
+func (s gridUpdateSource) Cell(key, column string) (string, error) {
+	return s.prefix + " " + key + " · " + column, nil
+}
+func (s gridUpdateSource) SelectionSnapshot() (virtual.GridRowIndex, error) {
+	return s.selectionNativeIndex, nil
+}
+
+type gridUpdatePass struct{ updates, styles int }
+
+// This measures one actual owner sync on a fully constructed manual scene, not
+// all later framework passes needed to frame/layout that accepted projection.
+// Observers only count and do not set properties or alter updater/style order.
+func TestManagedGridRetainedWidgetsUpdateOncePerSync(t *testing.T) {
+	for _, dpi := range []float32{96, 120, 144, 192} {
+		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
+			model, _ := selectionNativeGrid(t, 10_000, false, 4096)
+			config := manualConfig(t, 7)
+			config.LogicalDPI = dpi
+			m, a := gridManual(t, config, func() ui.Node { return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true} })
+			gridFrame(t, m)
+			if err := a.Do(func() {
+				if err := model.Scroll(360, 240); err != nil {
+					t.Error(err)
+				}
+				if err := model.SelectToKey("selection-10", "c6", virtual.GridSelectReplace); err != nil {
+					t.Error(err)
+				}
+				_ = a.Invalidate("one")
+			}); err != nil {
+				t.Fatal(err)
+			}
+			gridFrame(t, m)
+			var binding *gridBinding
+			counters := map[*core.Text]*gridUpdatePass{}
+			var firstCursor *core.Text
+			if err := a.Do(func() {
+				binding = m.implementation.find("one").state.root.control.grid
+				for i, w := range binding.cells {
+					if binding.projection.Cells[i].Active {
+						firstCursor = w
+					}
+					pass := &gridUpdatePass{}
+					counters[w] = pass
+					w.Updater(func() { pass.updates++ })
+					w.FinalStyler(func(*styles.Style) { pass.styles++ })
+				}
+				for _, w := range binding.headers {
+					pass := &gridUpdatePass{}
+					counters[w] = pass
+					w.Updater(func() { pass.updates++ })
+					w.FinalStyler(func(*styles.Style) { pass.styles++ })
+				}
+				if firstCursor == nil || !firstCursor.StateIs(states.Selected) || firstCursor.Styles.Border.Width.Top.Value != 1 {
+					t.Error("initial selected cursor not styled")
+				}
+			}); err != nil {
+				t.Fatal(err)
+			}
+
+			phases := []struct {
+				name   string
+				change func() error
+			}{
+				{"replace-scroll-select", func() error {
+					source := gridUpdateSource{selectionNativeIndex: selectionNativeIndex{total: 10_000, revision: 2}, prefix: "<changed & escaped>"}
+					if err := model.ReplaceSource(source); err != nil {
+						return err
+					}
+					if err := model.Scroll(90, 24); err != nil {
+						return err
+					}
+					return model.SelectToKey("selection-12", "c8", virtual.GridSelectReplace)
+				}},
+				{"clear-and-move-cursor", func() error {
+					source := gridUpdateSource{selectionNativeIndex: selectionNativeIndex{total: 10_000, revision: 3}, prefix: "final text"}
+					if err := model.ReplaceSource(source); err != nil {
+						return err
+					}
+					if err := model.SelectToKey("selection-13", "c0", virtual.GridSelectReplace); err != nil {
+						return err
+					}
+					return model.ClearSelection()
+				}},
+			}
+			for _, phase := range phases {
+				if err := a.Do(func() {
+					if err := phase.change(); err != nil {
+						t.Error(err)
+						return
+					}
+					for _, pass := range counters {
+						*pass = gridUpdatePass{}
+					}
+					if err := syncGrid(binding.r); err != nil {
+						t.Error(err)
+						return
+					}
+					retained := append(append([]*core.Text(nil), binding.cells...), binding.headers...)
+					for _, w := range retained {
+						pass, ok := counters[w]
+						if !ok {
+							t.Errorf("%s allocated instead of recycling warmed widget", phase.name)
+							continue
+						}
+						if pass.updates != 1 || pass.styles != 1 {
+							t.Errorf("%s retained widget update/style passes: got %d/%d want 1/1", phase.name, pass.updates, pass.styles)
+						}
+					}
+					assertGridUpdateStyles(t, binding, phase.name)
+					if firstCursor.StateIs(states.Selected) || firstCursor.Styles.Border.Width.Top.Value != 0 {
+						t.Errorf("%s old cursor/selected style leaked into recycled slot", phase.name)
+					}
+				}); err != nil {
+					t.Fatal(err)
+				}
+				// Counter assertion errors deliberately leave the geometry/pixel evidence
+				// running, so the original double-pass code supplies a genuine baseline.
+				if _, err := m.Frame(testContext, "one"); err != nil {
+					t.Fatal(err)
+				}
+				gridFrame(t, m)
+				measured := gridInspection(t, a, model)
+				if err := a.Do(func() {
+					assertGridUpdateStyles(t, binding, phase.name)
+					if len(measured.Cells) != len(binding.projection.Cells) || len(measured.Headers) != len(binding.projection.Headers) {
+						t.Error("current measured projection length mismatch")
+						return
+					}
+					edge := func(v int) int { return int(math.Round(float64(float32(v) * measured.Scale))) }
+					expected := func(r virtual.GridRect) image.Rectangle {
+						if r.Empty() {
+							return image.Rectangle{}
+						}
+						return image.Rect(measured.Bounds.Min.X+edge(r.X), measured.Bounds.Min.Y+edge(r.Y), measured.Bounds.Min.X+edge(r.X+r.Width), measured.Bounds.Min.Y+edge(r.Y+r.Height))
+					}
+					for i, cell := range measured.Cells {
+						source := binding.projection.Cells[i]
+						if cell.Text != source.Text || cell.Selected != source.Selected || cell.Active != source.Active || cell.Bounds != expected(source.Clip) {
+							t.Errorf("%s cell %s final semantics/geometry mismatch: got %+v projection %+v", phase.name, cell.ID, cell, source)
+						}
+					}
+					for i, header := range measured.Headers {
+						source := binding.projection.Headers[i]
+						if header.Title != source.Title || header.Bounds != expected(source.Clip) {
+							t.Errorf("%s header %s final geometry/text mismatch", phase.name, header.ID)
+						}
+					}
+				}); err != nil {
+					t.Fatal(err)
+				}
+				raster, err := m.Capture(testContext, "one")
+				if err != nil || raster == nil || raster.Bounds().Empty() {
+					t.Fatalf("%s detached software frame: %v", phase.name, err)
+				}
+				digest := sha256.Sum256(raster.Pix)
+				t.Logf("GRID_UPDATE_RGBA dpi=%g phase=%s bounds=%v stride=%d sha256=%x", dpi, phase.name, raster.Bounds(), raster.Stride, digest)
+			}
+		})
+	}
+}
+
+func assertGridUpdateStyles(t *testing.T, g *gridBinding, phase string) {
+	t.Helper()
+	for i, w := range g.cells {
+		cell := g.projection.Cells[i]
+		if w.Text != html.EscapeString(cell.Text) || w.StateIs(states.Selected) != cell.Selected || w.StateIs(states.Invisible) != cell.Clip.Empty() {
+			t.Errorf("%s cell %d text/membership/visibility style not current", phase, i)
+		}
+		cursor, _ := w.Property("vellum.grid.cursor").(bool)
+		width := float32(0)
+		if cell.Active {
+			width = 1
+		}
+		if cursor != cell.Active || w.Styles.Border.Width.Top.Value != width {
+			t.Errorf("%s cell %d cursor border not current: cursor=%t active=%t width=%g", phase, i, cursor, cell.Active, w.Styles.Border.Width.Top.Value)
+		}
+	}
+	for i, w := range g.headers {
+		header := g.projection.Headers[i]
+		if w.Text != html.EscapeString(header.Title) || w.StateIs(states.Selected) || w.Styles.Border.Width.Top.Value != 0 || w.StateIs(states.Invisible) != header.Clip.Empty() {
+			t.Errorf("%s header %d inherited recycled cell styling", phase, i)
+		}
+	}
+}

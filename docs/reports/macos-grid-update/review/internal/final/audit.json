@@ -1,0 +1,703 @@
+{
+  "result": "PASS",
+  "source_root": "/private/tmp/vellum-large-data",
+  "working_leaf_hashes": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "specs/grid-performance.md": "3adf9497eaf0bb3761baa11fe24a7aec409f11954e08adaf54f51bb19bdc158d",
+    "specs/macos-completion.md": "1c864041038ed281d75507ba81c1e561bb4de77d8643bc5d57fc651ca54c476c",
+    "docs/implementation.md": "c98015fda17e68813c5ac5c208dd44685572987ef1cb7914927b9f16371eaec8",
+    "docs/reports/macos-grid-performance/README.md": "a79b6e15db754d57bb5cf2d5115f52ce6b4ddade20845a7021fe08f8b546a843",
+    "docs/reports/macos-grid-update/README.md": "0b0ed424f149d47f362d63e6f38fad22b3a45591668691932d24e7112c7c635c"
+  },
+  "staged_leaf_hashes": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "specs/grid-performance.md": "3adf9497eaf0bb3761baa11fe24a7aec409f11954e08adaf54f51bb19bdc158d",
+    "specs/macos-completion.md": "1c864041038ed281d75507ba81c1e561bb4de77d8643bc5d57fc651ca54c476c",
+    "docs/implementation.md": "c98015fda17e68813c5ac5c208dd44685572987ef1cb7914927b9f16371eaec8",
+    "docs/reports/macos-grid-performance/README.md": "a79b6e15db754d57bb5cf2d5115f52ce6b4ddade20845a7021fe08f8b546a843",
+    "docs/reports/macos-grid-update/README.md": "0b0ed424f149d47f362d63e6f38fad22b3a45591668691932d24e7112c7c635c"
+  },
+  "expected_unstaged_post_prism_test_delta": [
+    "drivers/cogent/grid_update_offscreen_test.go"
+  ],
+  "original_prism_leaf_hashes": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "specs/grid-performance.md": "3adf9497eaf0bb3761baa11fe24a7aec409f11954e08adaf54f51bb19bdc158d",
+    "specs/macos-completion.md": "1c864041038ed281d75507ba81c1e561bb4de77d8643bc5d57fc651ca54c476c",
+    "docs/implementation.md": "c98015fda17e68813c5ac5c208dd44685572987ef1cb7914927b9f16371eaec8",
+    "docs/reports/macos-grid-performance/README.md": "a79b6e15db754d57bb5cf2d5115f52ce6b4ddade20845a7021fe08f8b546a843",
+    "docs/reports/macos-grid-update/README.md": "0b0ed424f149d47f362d63e6f38fad22b3a45591668691932d24e7112c7c635c"
+  },
+  "runtime_review": {
+    "path": "/private/tmp/vellum-grid-update-review/review.json",
+    "sha256": "99433bc7316529ee37d5457463c953a46166b05a4333a9efe9d3c35bb4f18fea"
+  },
+  "raw_evidence_hashes": {
+    "/private/tmp/vellum-grid-update-qualification/native-1-baseline/native.log": "110ac713072b5c53e3b4d63467810072fa1982eb95cecf8a7a5ea1e65ba8be1a",
+    "/private/tmp/vellum-grid-update-qualification/native-1-baseline/result.json": "53d821b49605be33ad944019ac8c98b59f4c6863bd445c035997c19c41e150cc",
+    "/private/tmp/vellum-grid-update-qualification/native-2-candidate/native.log": "e313a5fe08d711b01ee893d8ff6b38dad77e49dd58a492cfadb9e375c1a5a815",
+    "/private/tmp/vellum-grid-update-qualification/native-2-candidate/result.json": "1ce1ca4dd210e4ac1e2aa6ee63e731a3d8be41194d6ab015af83c5ab417bfccc",
+    "/private/tmp/vellum-grid-update-qualification/native-3-candidate/native.log": "7b6e30b5549b10f807ab7fe1598e129d660d1e62caadae3d38774d85773dec2f",
+    "/private/tmp/vellum-grid-update-qualification/native-3-candidate/result.json": "1992986e0a0fd6ad7fbaf4311dd65aec1397d34b3b8a3d7e7e485e745b3c51c8",
+    "/private/tmp/vellum-grid-update-qualification/native-4-baseline/native.log": "010b2a32daad54f16aba3400f0f30ab923f6a9cc0984eefbec7f46f215afa169",
+    "/private/tmp/vellum-grid-update-qualification/native-4-baseline/result.json": "3b969b6eb8278029e9ee6683e477ce6fb607744120e1697937bc718b9edaf714",
+    "/private/tmp/vellum-grid-update-qualification/native-5-baseline/native.log": "d54dfdb19d7889cc5e7c52fd01cc6e4ff30ac1cfafb4ae4a164289e38a9920ba",
+    "/private/tmp/vellum-grid-update-qualification/native-5-baseline/result.json": "da8e8c0a30dca45f194d2bf7e6451235feceb178d50478f6b6ac8bf375830c5b",
+    "/private/tmp/vellum-grid-update-qualification/native-6-candidate/native.log": "7f7eca7cb306cc18c6ee9168b1df1d29c247807c3998977de70ce25cf03d2ed6",
+    "/private/tmp/vellum-grid-update-qualification/native-6-candidate/result.json": "ec8eedebd2b86d570197d2ab8c43f601989f4ea7770b82b3861a5e091f2c7679",
+    "/private/tmp/vellum-grid-update-qualification/comparison.json": "416e58c115783bb7eaa3db51358a7d7134ba6757183a4b20e3ad7e800eba86e6",
+    "/private/tmp/vellum-grid-update-qualification/baseline-inputs.json": "3181e49f0d38bbdf7993949906f1699fae685b7e9154f7b1d6b436b4070ec256",
+    "/private/tmp/vellum-grid-update-qualification/candidate-build.json": "744222c1a9c9895fa1103592756518cbf6961a3fd52d2e69d1f94376be3e35e3",
+    "/private/tmp/vellum-grid-update-qualification/candidate-build.log": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+    "/private/tmp/vellum-grid-update-qualification/machine.json": "e6392f47a40b07d597da41bdc1c002c66fa95a0fbd50604dd33f49d0c0ba1b92",
+    "/private/tmp/vellum-grid-update-qualification/affected-checks/qualification.json": "c20e4e5cea5b5a362c1d60ee9dfe8e2c7132930fe6668c1d90d35494b6bfb7e6",
+    "/private/tmp/vellum-grid-update-qualification/affected-checks/native-grid-and-frame-race.log": "bb035560f79f151ae0618cb86a58e5317e307a33fb3067bdb5b72f816e14bd81",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/producer-initial-proof.json": "277538b8890287a40879077c351e7b368e262caa313be34a48d9e8ed2109c348",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/adjudicate.py": "02dd686c6940f64e919652c11f352ccd23a6d1c255901e0bee2ba2dbfef75595",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/qualification.json": "f8c65a3c24f1698a1dc078e00d508d09b4c8ba71dc7851671741984b2c7d19c0",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/red-overlay.log": "58cff7c8a1d8d959c3d854b8a6acd9e1446899168f78638e3d408ea754f147da",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/green-race3.log": "a77387c04e373744a1ee429f1a5c27d7dfe149d8de1fc447f7417c1f31a2ff93",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/qualify.py": "464e444568f9a130c3c12a83b686a4d601f080c3f8aa93f67267e97616350d66",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/red-overlay.json": "4f5ee496d1aae974050d20bfb26cac8812eaf4007dd17395c90bda458bcbb828",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/test-correction.diff.txt": "548a82b3ab5999ba7fa5d2da10f115a56fd0901194b7663db5f0e36e16321e4b",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/candidate-grid.go.txt": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/baseline-grid.go.txt": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/grid_update_offscreen_test.go.txt": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289",
+    "/private/tmp/vellum-grid-update-prism/prism.json": "e598e086eb51f7ca61ef69db237f39b0c18d24a5076683dfe584a91fc57e7786",
+    "/private/tmp/vellum-grid-update-prism/process.json": "3830711b502e8f9f6f913c327d448e66f5196a591534a439cbe249682ced809d",
+    "/private/tmp/vellum-grid-update-prism/inputs.json": "570b8eb9050b603b9bb2f3020ea0d721b3373a9c744d83aa429967f20a79b9a4",
+    "/private/tmp/vellum-grid-update-prism/staged.diff.txt": "6cd980445dd08674cef3c6cb2d664d0baa2106aa1b0f1b0722edfe0e3e3f5285",
+    "/private/tmp/vellum-grid-update-prism/stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-grid-update-prism/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "pooled_nearest_rank_ns": {
+    "baseline": {
+      "acquire_ns": {
+        "count": 360,
+        "p50": 30459,
+        "p95": 38875,
+        "p99": 54166,
+        "max": 61876
+      },
+      "encode_submit_ns": {
+        "count": 360,
+        "p50": 180500,
+        "p95": 207376,
+        "p99": 331250,
+        "max": 366332
+      },
+      "gather_ns": {
+        "count": 360,
+        "p50": 4333,
+        "p95": 7875,
+        "p99": 67584,
+        "max": 87084
+      },
+      "input_ns": {
+        "count": 360,
+        "p50": 5334,
+        "p95": 7000,
+        "p99": 10917,
+        "max": 37500
+      },
+      "layout_paint_ns": {
+        "count": 360,
+        "p50": 2383250,
+        "p95": 2857375,
+        "p99": 3256041,
+        "max": 3666375
+      },
+      "owner_ns": {
+        "count": 360,
+        "p50": 7417,
+        "p95": 15584,
+        "p99": 18459,
+        "max": 23000
+      },
+      "present_call_ns": {
+        "count": 360,
+        "p50": 6500,
+        "p95": 8958,
+        "p99": 12417,
+        "max": 15666
+      },
+      "queued_ns": {
+        "count": 360,
+        "p50": 1764959,
+        "p95": 2309875,
+        "p99": 9589791,
+        "max": 10761375
+      },
+      "raster_upload_ns": {
+        "count": 360,
+        "p50": 7752084,
+        "p95": 8657584,
+        "p99": 9344375,
+        "max": 9880000
+      },
+      "reconcile_ns": {
+        "count": 360,
+        "p50": 7916750,
+        "p95": 8803792,
+        "p99": 9054917,
+        "max": 10852541
+      },
+      "ui_work_ns": {
+        "count": 360,
+        "p50": 18371542,
+        "p95": 19545458,
+        "p99": 20411583,
+        "max": 21883248
+      }
+    },
+    "candidate": {
+      "acquire_ns": {
+        "count": 360,
+        "p50": 31208,
+        "p95": 41917,
+        "p99": 55000,
+        "max": 61666
+      },
+      "encode_submit_ns": {
+        "count": 360,
+        "p50": 177668,
+        "p95": 215418,
+        "p99": 332126,
+        "max": 1947417
+      },
+      "gather_ns": {
+        "count": 360,
+        "p50": 4292,
+        "p95": 7833,
+        "p99": 24625,
+        "max": 84251
+      },
+      "input_ns": {
+        "count": 360,
+        "p50": 5417,
+        "p95": 7042,
+        "p99": 10208,
+        "max": 16000
+      },
+      "layout_paint_ns": {
+        "count": 360,
+        "p50": 2406417,
+        "p95": 2931875,
+        "p99": 3261625,
+        "max": 3656250
+      },
+      "owner_ns": {
+        "count": 360,
+        "p50": 7583,
+        "p95": 15750,
+        "p99": 18667,
+        "max": 48875
+      },
+      "present_call_ns": {
+        "count": 360,
+        "p50": 6875,
+        "p95": 9042,
+        "p99": 13250,
+        "max": 14916
+      },
+      "queued_ns": {
+        "count": 360,
+        "p50": 1807916,
+        "p95": 2383708,
+        "p99": 3124542,
+        "max": 9738041
+      },
+      "raster_upload_ns": {
+        "count": 360,
+        "p50": 7899000,
+        "p95": 9032333,
+        "p99": 9669583,
+        "max": 9973084
+      },
+      "reconcile_ns": {
+        "count": 360,
+        "p50": 5168334,
+        "p95": 5907208,
+        "p99": 6256417,
+        "max": 7169000
+      },
+      "ui_work_ns": {
+        "count": 360,
+        "p50": 15798834,
+        "p95": 17067501,
+        "p99": 18003666,
+        "max": 18964916
+      }
+    }
+  },
+  "per_run": [
+    {
+      "order": 1,
+      "kind": "baseline",
+      "stats": {
+        "acquire_ns": {
+          "p50": 29334,
+          "p95": 36084,
+          "p99": 44458,
+          "max": 61876
+        },
+        "encode_submit_ns": {
+          "p50": 178500,
+          "p95": 208834,
+          "p99": 236167,
+          "max": 366332
+        },
+        "gather_ns": {
+          "p50": 4208,
+          "p95": 7541,
+          "p99": 15668,
+          "max": 67584
+        },
+        "input_ns": {
+          "p50": 5333,
+          "p95": 6834,
+          "p99": 9500,
+          "max": 10917
+        },
+        "layout_paint_ns": {
+          "p50": 2366167,
+          "p95": 2536250,
+          "p99": 3173125,
+          "max": 3239125
+        },
+        "owner_ns": {
+          "p50": 7417,
+          "p95": 16459,
+          "p99": 20583,
+          "max": 23000
+        },
+        "present_call_ns": {
+          "p50": 6459,
+          "p95": 7917,
+          "p99": 10292,
+          "max": 13209
+        },
+        "queued_ns": {
+          "p50": 1764750,
+          "p95": 2298333,
+          "p99": 9884250,
+          "max": 10146584
+        },
+        "raster_upload_ns": {
+          "p50": 7684750,
+          "p95": 8504084,
+          "p99": 8918959,
+          "max": 8983958
+        },
+        "reconcile_ns": {
+          "p50": 7992625,
+          "p95": 8815500,
+          "p99": 8962625,
+          "max": 9050500
+        },
+        "ui_work_ns": {
+          "p50": 18252624,
+          "p95": 19294544,
+          "p99": 19523084,
+          "max": 20400624
+        }
+      },
+      "adjacent_frame_deltas": [
+        2
+      ],
+      "exit_code": 0
+    },
+    {
+      "order": 2,
+      "kind": "candidate",
+      "stats": {
+        "acquire_ns": {
+          "p50": 31375,
+          "p95": 43959,
+          "p99": 55000,
+          "max": 57416
+        },
+        "encode_submit_ns": {
+          "p50": 178958,
+          "p95": 232208,
+          "p99": 332126,
+          "max": 1947417
+        },
+        "gather_ns": {
+          "p50": 4417,
+          "p95": 7875,
+          "p99": 8792,
+          "max": 84251
+        },
+        "input_ns": {
+          "p50": 5333,
+          "p95": 6833,
+          "p99": 7333,
+          "max": 12000
+        },
+        "layout_paint_ns": {
+          "p50": 2393041,
+          "p95": 2831209,
+          "p99": 3410959,
+          "max": 3480416
+        },
+        "owner_ns": {
+          "p50": 7708,
+          "p95": 15333,
+          "p99": 18042,
+          "max": 48875
+        },
+        "present_call_ns": {
+          "p50": 6959,
+          "p95": 9042,
+          "p99": 14500,
+          "max": 14916
+        },
+        "queued_ns": {
+          "p50": 1807916,
+          "p95": 2530583,
+          "p99": 8078500,
+          "max": 9738041
+        },
+        "raster_upload_ns": {
+          "p50": 7866958,
+          "p95": 9122625,
+          "p99": 9542334,
+          "max": 9777291
+        },
+        "reconcile_ns": {
+          "p50": 5169083,
+          "p95": 5794541,
+          "p99": 6005042,
+          "max": 6072250
+        },
+        "ui_work_ns": {
+          "p50": 15635999,
+          "p95": 17125748,
+          "p99": 17569001,
+          "max": 18390501
+        }
+      },
+      "adjacent_frame_deltas": [
+        2
+      ],
+      "exit_code": 0
+    },
+    {
+      "order": 3,
+      "kind": "candidate",
+      "stats": {
+        "acquire_ns": {
+          "p50": 31250,
+          "p95": 41917,
+          "p99": 48458,
+          "max": 53416
+        },
+        "encode_submit_ns": {
+          "p50": 177292,
+          "p95": 212625,
+          "p99": 246042,
+          "max": 304499
+        },
+        "gather_ns": {
+          "p50": 4291,
+          "p95": 7292,
+          "p99": 8416,
+          "max": 24625
+        },
+        "input_ns": {
+          "p50": 5458,
+          "p95": 7083,
+          "p99": 9625,
+          "max": 10208
+        },
+        "layout_paint_ns": {
+          "p50": 2412459,
+          "p95": 3149500,
+          "p99": 3214500,
+          "max": 3656250
+        },
+        "owner_ns": {
+          "p50": 7584,
+          "p95": 15166,
+          "p99": 18750,
+          "max": 19000
+        },
+        "present_call_ns": {
+          "p50": 6875,
+          "p95": 9000,
+          "p99": 11375,
+          "max": 11542
+        },
+        "queued_ns": {
+          "p50": 1806208,
+          "p95": 2315125,
+          "p99": 2669917,
+          "max": 8506041
+        },
+        "raster_upload_ns": {
+          "p50": 7843334,
+          "p95": 8875416,
+          "p99": 9071416,
+          "max": 9669583
+        },
+        "reconcile_ns": {
+          "p50": 5114708,
+          "p95": 6089208,
+          "p99": 6283875,
+          "max": 7169000
+        },
+        "ui_work_ns": {
+          "p50": 15816916,
+          "p95": 17067501,
+          "p99": 17498957,
+          "max": 18964916
+        }
+      },
+      "adjacent_frame_deltas": [
+        2
+      ],
+      "exit_code": 0
+    },
+    {
+      "order": 4,
+      "kind": "baseline",
+      "stats": {
+        "acquire_ns": {
+          "p50": 31166,
+          "p95": 42376,
+          "p99": 57416,
+          "max": 58791
+        },
+        "encode_submit_ns": {
+          "p50": 183667,
+          "p95": 209375,
+          "p99": 337126,
+          "max": 351168
+        },
+        "gather_ns": {
+          "p50": 4458,
+          "p95": 9375,
+          "p99": 83583,
+          "max": 87084
+        },
+        "input_ns": {
+          "p50": 5417,
+          "p95": 7208,
+          "p99": 32458,
+          "max": 37500
+        },
+        "layout_paint_ns": {
+          "p50": 2420500,
+          "p95": 3098500,
+          "p99": 3527583,
+          "max": 3666375
+        },
+        "owner_ns": {
+          "p50": 7542,
+          "p95": 14833,
+          "p99": 18125,
+          "max": 18208
+        },
+        "present_call_ns": {
+          "p50": 6875,
+          "p95": 9917,
+          "p99": 13917,
+          "max": 15666
+        },
+        "queued_ns": {
+          "p50": 1836666,
+          "p95": 2370709,
+          "p99": 9589791,
+          "max": 10761375
+        },
+        "raster_upload_ns": {
+          "p50": 7902083,
+          "p95": 9072584,
+          "p99": 9499500,
+          "max": 9880000
+        },
+        "reconcile_ns": {
+          "p50": 7920792,
+          "p95": 8821167,
+          "p99": 9900916,
+          "max": 10852541
+        },
+        "ui_work_ns": {
+          "p50": 18723959,
+          "p95": 20022503,
+          "p99": 21284082,
+          "max": 21883248
+        }
+      },
+      "adjacent_frame_deltas": [
+        2
+      ],
+      "exit_code": 0
+    },
+    {
+      "order": 5,
+      "kind": "baseline",
+      "stats": {
+        "acquire_ns": {
+          "p50": 30542,
+          "p95": 35666,
+          "p99": 42375,
+          "max": 54166
+        },
+        "encode_submit_ns": {
+          "p50": 180083,
+          "p95": 202959,
+          "p99": 207625,
+          "max": 331250
+        },
+        "gather_ns": {
+          "p50": 4333,
+          "p95": 7500,
+          "p99": 30042,
+          "max": 34416
+        },
+        "input_ns": {
+          "p50": 5292,
+          "p95": 6792,
+          "p99": 7125,
+          "max": 8084
+        },
+        "layout_paint_ns": {
+          "p50": 2378833,
+          "p95": 2818833,
+          "p99": 3183042,
+          "max": 3221375
+        },
+        "owner_ns": {
+          "p50": 7333,
+          "p95": 14541,
+          "p99": 15875,
+          "max": 19250
+        },
+        "present_call_ns": {
+          "p50": 6375,
+          "p95": 7584,
+          "p99": 7958,
+          "max": 11584
+        },
+        "queued_ns": {
+          "p50": 1695833,
+          "p95": 2260917,
+          "p99": 2994333,
+          "max": 5225542
+        },
+        "raster_upload_ns": {
+          "p50": 7708459,
+          "p95": 8508000,
+          "p99": 8671333,
+          "max": 9305667
+        },
+        "reconcile_ns": {
+          "p50": 7859666,
+          "p95": 8736083,
+          "p99": 8977583,
+          "max": 9054917
+        },
+        "ui_work_ns": {
+          "p50": 18253836,
+          "p95": 19088167,
+          "p99": 19539209,
+          "max": 19981043
+        }
+      },
+      "adjacent_frame_deltas": [
+        2
+      ],
+      "exit_code": 0
+    },
+    {
+      "order": 6,
+      "kind": "candidate",
+      "stats": {
+        "acquire_ns": {
+          "p50": 30667,
+          "p95": 37875,
+          "p99": 55625,
+          "max": 61666
+        },
+        "encode_submit_ns": {
+          "p50": 175999,
+          "p95": 204584,
+          "p99": 332416,
+          "max": 348500
+        },
+        "gather_ns": {
+          "p50": 4208,
+          "p95": 8333,
+          "p99": 24834,
+          "max": 28666
+        },
+        "input_ns": {
+          "p50": 5416,
+          "p95": 7500,
+          "p99": 15250,
+          "max": 16000
+        },
+        "layout_paint_ns": {
+          "p50": 2434500,
+          "p95": 2738458,
+          "p99": 3228042,
+          "max": 3261625
+        },
+        "owner_ns": {
+          "p50": 7458,
+          "p95": 15750,
+          "p99": 16833,
+          "max": 18667
+        },
+        "present_call_ns": {
+          "p50": 6708,
+          "p95": 8792,
+          "p99": 12208,
+          "max": 13917
+        },
+        "queued_ns": {
+          "p50": 1785416,
+          "p95": 2343583,
+          "p99": 2608917,
+          "max": 2617708
+        },
+        "raster_upload_ns": {
+          "p50": 7964166,
+          "p95": 9052125,
+          "p99": 9739167,
+          "max": 9973084
+        },
+        "reconcile_ns": {
+          "p50": 5187083,
+          "p95": 5947500,
+          "p99": 6124625,
+          "max": 6261041
+        },
+        "ui_work_ns": {
+          "p50": 15872083,
+          "p95": 16925374,
+          "p99": 18003666,
+          "max": 18177458
+        }
+      },
+      "adjacent_frame_deltas": [
+        2
+      ],
+      "exit_code": 0
+    }
+  ],
+  "p95_reduction_percent": 12.677917294135543,
+  "all_trajectory_geometry_equal": true,
+  "selected_current_production_hashes_checked": 252,
+  "recorded_prepared_map_count": 6128,
+  "prepared_map_equality": "Baseline/build-before/build-after/comparison byte-hash maps agree. No duplicate independent 6128-file live-tree hash run in this leaf.",
+  "known_scope": "Read-only source/evidence/statistics audit; no test, native process, profile or performance run. Existing source-bound author/root records reviewed. Three processes/build is exploratory and both target percentiles fail."
+}

@@ -1,0 +1,82 @@
+from pathlib import Path
+import json, hashlib, math, subprocess
+ROOT = Path('/private/tmp/vellum-large-data')
+RAW = Path('/private/tmp/vellum-grid-update-qualification')
+OUT = Path('/private/tmp/vellum-grid-update-review/final')
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+leaf = ['drivers/cogent/grid.go','drivers/cogent/grid_update_offscreen_test.go','specs/grid-native.md','specs/grid-performance.md','specs/macos-completion.md','docs/implementation.md','docs/reports/macos-grid-performance/README.md','docs/reports/macos-grid-update/README.md']
+source = {p:sha(ROOT/p) for p in leaf}
+index = {p:hashlib.sha256(subprocess.run(['git','show',':'+p],cwd=ROOT,check=True,capture_output=True).stdout).hexdigest() for p in leaf}
+assert source == index
+runtime = json.loads((OUT.parent/'review.json').read_text())
+for p in leaf[:3]: assert source[p] == runtime['current_source_hashes'][p]
+comparison = json.loads((RAW/'comparison.json').read_text())
+base = json.loads((RAW/'baseline-inputs.json').read_text())
+build = json.loads((RAW/'candidate-build.json').read_text())
+assert build['exit_code'] == 0 and build['inputs_before'] == build['inputs_after']
+assert base['prepared'] == build['inputs_before']['prepared'] == comparison['prepared']
+assert build['inputs_before']['source'] == comparison['source']
+assert len(base['prepared']) == 6128 and len(comparison['source']) == 252
+assert set(base['source']) == set(comparison['source'])
+assert [p for p in base['source'] if base['source'][p] != comparison['source'][p]] == ['drivers/cogent/grid.go']
+assert base['source']['drivers/cogent/grid.go'] == runtime['current_source_hashes'].get('original_grid_sha256','ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a')
+assert comparison['source']['drivers/cogent/grid.go'] == source['drivers/cogent/grid.go']
+for p,h in comparison['source'].items(): assert sha(ROOT/p) == h,p
+assert comparison['binaries'] == {'baseline':base['binary_sha256'],'candidate':build['binary_sha256']}
+assert sha(RAW/'candidate-build.log') == build['log_sha256']
+assert sha(RAW/'machine.json') == comparison['metadata_sha256']
+affected = json.loads((RAW/'affected-checks/qualification.json').read_text())
+assert affected['exit_code'] == 0 and affected['result'] == 'PASS' and affected['source_before'] == affected['source_after']
+for p,h in affected['source_before'].items(): assert sha(ROOT/p) == h
+assert sha(RAW/'affected-checks/native-grid-and-frame-race.log') == affected['log_sha256']
+assert len(affected['tests_selected']) == 54
+checklog=(RAW/'affected-checks/native-grid-and-frame-race.log').read_text()
+assert all(('--- PASS: '+t+' (') in checklog for t in affected['tests_selected'])
+metrics=list(comparison['baseline'])
+pooled={'baseline':[],'candidate':[]}; rawrefs={}; perrun=[]; trajectory={}
+for item in comparison['outcomes']:
+    path=RAW/f"native-{item['order']}-{item['kind']}"
+    result=json.loads((path/'result.json').read_text())
+    raw=(path/'native.log').read_bytes()
+    records=[json.loads(s) for s in raw.decode().splitlines()]
+    assert sha(path/'native.log') == item['log_sha256'] == result['log_sha256']
+    assert result['exit_code']==0 and result['result']=='PASS'
+    assert [s['event'] for s in records] == ['grid.perf.setup','grid.perf.ready']+['grid.perf.sample']*120+['grid.perf.end']
+    setup,ready,end=records[0],records[1],records[-1]
+    assert setup['release'] and not setup['cpu_profile'] and not setup['variable'] and not setup['novel'] and setup['rows']==10000
+    assert setup['seed']==7 and ready['warmup']==128
+    assert end['callbacks']==120 and end['dropped']==0 and end['pending']==0
+    assert [s['event'] for s in result['process_observations']] == ['grid.perf.end']
+    samples=records[2:-1]
+    for i,s in enumerate(samples):
+        assert s['index']==i and s['tag']==i+1 and s['callbacks']==1
+        n=s['native_sample']; assert n['Completed'] and not n['Failure'] and s['tag']==n['Tag'] and s['generation']==n['Generation']
+        g=s['geometry']; assert (g['cells'],g['rows'],g['columns'],g['viewport']['Width'],g['viewport']['Height'],g['scale']) == (400,50,8,767,624,1.6875)
+        assert s['metrics']['ui_work_ns'] == sum(s['metrics'][k] for k in ['input_ns','owner_ns','reconcile_ns','layout_paint_ns','gather_ns','raster_upload_ns','encode_submit_ns'])
+        if i in trajectory: assert trajectory[i] == g
+        else: trajectory[i] = g
+    pooled[item['kind']].extend(samples)
+    stats={}
+    for metric in metrics:
+        v=sorted(s['metrics'][metric] for s in samples)
+        stats[metric]={'p50':v[math.ceil(len(v)*.50)-1],'p95':v[math.ceil(len(v)*.95)-1],'p99':v[math.ceil(len(v)*.99)-1],'max':max(v)}
+        k=sum(p['kind']==item['kind'] for p in perrun)
+        for name,value in stats[metric].items(): assert value == comparison[item['kind']][metric]['per_run'][k][name]
+    perrun.append({'order':item['order'],'kind':item['kind'],'stats':stats,'adjacent_frame_deltas':sorted(set(b['frame']-a['frame'] for a,b in zip(samples,samples[1:]))),'exit_code':result['exit_code']})
+    for name in ['native.log','result.json']: rawrefs[str(path/name)]=sha(path/name)
+stats={}
+for kind,samples in pooled.items():
+    stats[kind]={}
+    for metric in metrics:
+        v=sorted(s['metrics'][metric] for s in samples)
+        stats[kind][metric]={'count':len(v),'p50':v[math.ceil(len(v)*.50)-1],'p95':v[math.ceil(len(v)*.95)-1],'p99':v[math.ceil(len(v)*.99)-1],'max':max(v)}
+        for name,value in stats[kind][metric].items(): assert value == comparison[kind][metric]['pooled'][name]
+assert [p['kind'] for p in perrun] == ['baseline','candidate','candidate','baseline','baseline','candidate']
+assert comparison['target_p95_ns']==4000000 and comparison['target_p99_ns']==6000000
+for name in ['comparison.json','baseline-inputs.json','candidate-build.json','candidate-build.log','machine.json','affected-checks/qualification.json','affected-checks/native-grid-and-frame-race.log']:
+    rawrefs[str(RAW/name)]=sha(RAW/name)
+(OUT/'snapshots').mkdir(exist_ok=True)
+for p in leaf: (OUT/'snapshots'/(p.replace('/','__')+'.txt')).write_bytes((ROOT/p).read_bytes())
+result={'result':'PASS','source_root':str(ROOT),'working_leaf_hashes':source,'staged_leaf_hashes':index,'runtime_review':{'path':str(OUT.parent/'review.json'),'sha256':sha(OUT.parent/'review.json')},'raw_evidence_hashes':rawrefs,'pooled_nearest_rank_ns':stats,'per_run':perrun,'p95_reduction_percent':100*(1-stats['candidate']['ui_work_ns']['p95']/stats['baseline']['ui_work_ns']['p95']),'all_trajectory_geometry_equal':True,'selected_current_production_hashes_checked':252,'recorded_prepared_map_count':6128,'prepared_map_equality':'Baseline/build-before/build-after/comparison byte-hash maps agree. No duplicate independent 6128-file live-tree hash run in this leaf.','known_scope':'Read-only source/evidence/statistics audit; no test, native process, profile or performance run. Existing source-bound author/root records reviewed. Three processes/build is exploratory and both target percentiles fail.'}
+(OUT/'audit.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({'audit_sha256':sha(OUT/'audit.json'),'verifier_sha256':sha(OUT/'audit.py'),'leaf':source,'p95_reduction_percent':result['p95_reduction_percent']},indent=2))

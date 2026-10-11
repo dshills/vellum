@@ -1,0 +1,468 @@
+{
+  "schema": 1,
+  "scope": "Byte-preserved scoped qualification/build/regression/native raw records, independent review and eight-path Prism records. Absolute local paths are provenance. Inert producers/sources are text; binaries are excluded and identified by hash. No full compiler/module-cache/SDK closure or P6 pass.",
+  "files": [
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/affected-checks/native-grid-and-frame-race.log",
+      "archive": "records/affected-checks/native-grid-and-frame-race.log",
+      "bytes": 154,
+      "sha256": "bb035560f79f151ae0618cb86a58e5317e307a33fb3067bdb5b72f816e14bd81"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/affected-checks/qualification.json",
+      "archive": "records/affected-checks/qualification.json",
+      "bytes": 7121,
+      "sha256": "c20e4e5cea5b5a362c1d60ee9dfe8e2c7132930fe6668c1d90d35494b6bfb7e6"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/baseline-grid.go.txt",
+      "archive": "records/baseline-grid.go.txt",
+      "bytes": 27234,
+      "sha256": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/baseline-inputs.json",
+      "archive": "records/baseline-inputs.json",
+      "bytes": 846269,
+      "sha256": "3181e49f0d38bbdf7993949906f1699fae685b7e9154f7b1d6b436b4070ec256"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/candidate-build.json",
+      "archive": "records/candidate-build.json",
+      "bytes": 1717908,
+      "sha256": "744222c1a9c9895fa1103592756518cbf6961a3fd52d2e69d1f94376be3e35e3"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/candidate-build.log",
+      "archive": "records/candidate-build.log",
+      "bytes": 100,
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/comparison.json",
+      "archive": "records/comparison.json",
+      "bytes": 882929,
+      "sha256": "416e58c115783bb7eaa3db51358a7d7134ba6757183a4b20e3ad7e800eba86e6"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/machine.json",
+      "archive": "records/machine.json",
+      "bytes": 11277,
+      "sha256": "e6392f47a40b07d597da41bdc1c002c66fa95a0fbd50604dd33f49d0c0ba1b92"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-1-baseline/native.log",
+      "archive": "records/native-1-baseline/native.log",
+      "bytes": 138017,
+      "sha256": "110ac713072b5c53e3b4d63467810072fa1982eb95cecf8a7a5ea1e65ba8be1a"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-1-baseline/result.json",
+      "archive": "records/native-1-baseline/result.json",
+      "bytes": 225150,
+      "sha256": "53d821b49605be33ad944019ac8c98b59f4c6863bd445c035997c19c41e150cc"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-2-candidate/native.log",
+      "archive": "records/native-2-candidate/native.log",
+      "bytes": 138001,
+      "sha256": "e313a5fe08d711b01ee893d8ff6b38dad77e49dd58a492cfadb9e375c1a5a815"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-2-candidate/result.json",
+      "archive": "records/native-2-candidate/result.json",
+      "bytes": 225135,
+      "sha256": "1ce1ca4dd210e4ac1e2aa6ee63e731a3d8be41194d6ab015af83c5ab417bfccc"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-3-candidate/native.log",
+      "archive": "records/native-3-candidate/native.log",
+      "bytes": 137994,
+      "sha256": "7b6e30b5549b10f807ab7fe1598e129d660d1e62caadae3d38774d85773dec2f"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-3-candidate/result.json",
+      "archive": "records/native-3-candidate/result.json",
+      "bytes": 225128,
+      "sha256": "1992986e0a0fd6ad7fbaf4311dd65aec1397d34b3b8a3d7e7e485e745b3c51c8"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-4-baseline/native.log",
+      "archive": "records/native-4-baseline/native.log",
+      "bytes": 138022,
+      "sha256": "010b2a32daad54f16aba3400f0f30ab923f6a9cc0984eefbec7f46f215afa169"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-4-baseline/result.json",
+      "archive": "records/native-4-baseline/result.json",
+      "bytes": 225155,
+      "sha256": "3b969b6eb8278029e9ee6683e477ce6fb607744120e1697937bc718b9edaf714"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-5-baseline/native.log",
+      "archive": "records/native-5-baseline/native.log",
+      "bytes": 137985,
+      "sha256": "d54dfdb19d7889cc5e7c52fd01cc6e4ff30ac1cfafb4ae4a164289e38a9920ba"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-5-baseline/result.json",
+      "archive": "records/native-5-baseline/result.json",
+      "bytes": 225118,
+      "sha256": "da8e8c0a30dca45f194d2bf7e6451235feceb178d50478f6b6ac8bf375830c5b"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-6-candidate/native.log",
+      "archive": "records/native-6-candidate/native.log",
+      "bytes": 138013,
+      "sha256": "7f7eca7cb306cc18c6ee9168b1df1d29c247807c3998977de70ce25cf03d2ed6"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/native-6-candidate/result.json",
+      "archive": "records/native-6-candidate/result.json",
+      "bytes": 225147,
+      "sha256": "ec8eedebd2b86d570197d2ab8c43f601989f4ea7770b82b3861a5e091f2c7679"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/desktop-vet.log",
+      "archive": "records/widget-regression/desktop-vet.log",
+      "bytes": 199,
+      "sha256": "d085487f95fe4b396b1ebbc70fadb6dc33c01818686ed335a49e2d1477f188b0"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-grid.go.txt",
+      "archive": "records/widget-regression/final-grid.go.txt",
+      "bytes": 27369,
+      "sha256": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/adjudicate.py",
+      "archive": "records/widget-regression/final-v2/adjudicate.py.txt",
+      "bytes": 3360,
+      "sha256": "02dd686c6940f64e919652c11f352ccd23a6d1c255901e0bee2ba2dbfef75595"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/baseline-grid.go.txt",
+      "archive": "records/widget-regression/final-v2/baseline-grid.go.txt",
+      "bytes": 27234,
+      "sha256": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/candidate-grid.go.txt",
+      "archive": "records/widget-regression/final-v2/candidate-grid.go.txt",
+      "bytes": 27369,
+      "sha256": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/green-race3.log",
+      "archive": "records/widget-regression/final-v2/green-race3.log",
+      "bytes": 9363,
+      "sha256": "a77387c04e373744a1ee429f1a5c27d7dfe149d8de1fc447f7417c1f31a2ff93"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/grid_update_offscreen_test.go.txt",
+      "archive": "records/widget-regression/final-v2/grid_update_offscreen_test.go.txt",
+      "bytes": 7512,
+      "sha256": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/producer-initial-proof.json",
+      "archive": "records/widget-regression/final-v2/producer-initial-proof.json",
+      "bytes": 20608,
+      "sha256": "277538b8890287a40879077c351e7b368e262caa313be34a48d9e8ed2109c348"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/qualification.json",
+      "archive": "records/widget-regression/final-v2/qualification.json",
+      "bytes": 25544,
+      "sha256": "f8c65a3c24f1698a1dc078e00d508d09b4c8ba71dc7851671741984b2c7d19c0"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/qualify.py",
+      "archive": "records/widget-regression/final-v2/qualify.py.txt",
+      "bytes": 5414,
+      "sha256": "464e444568f9a130c3c12a83b686a4d601f080c3f8aa93f67267e97616350d66"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/red-overlay.json",
+      "archive": "records/widget-regression/final-v2/red-overlay.json",
+      "bytes": 180,
+      "sha256": "4f5ee496d1aae974050d20bfb26cac8812eaf4007dd17395c90bda458bcbb828"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/red-overlay.log",
+      "archive": "records/widget-regression/final-v2/red-overlay.log",
+      "bytes": 191944,
+      "sha256": "58cff7c8a1d8d959c3d854b8a6acd9e1446899168f78638e3d408ea754f147da"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/final-v2/test-correction.diff.txt",
+      "archive": "records/widget-regression/final-v2/test-correction.diff.txt",
+      "bytes": 410,
+      "sha256": "548a82b3ab5999ba7fa5d2da10f115a56fd0901194b7663db5f0e36e16321e4b"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/frozen-grid_update_offscreen_test.go.txt",
+      "archive": "records/widget-regression/frozen-grid_update_offscreen_test.go.txt",
+      "bytes": 7701,
+      "sha256": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/green-proof.json",
+      "archive": "records/widget-regression/green-proof.json",
+      "bytes": 14583,
+      "sha256": "02eae2e3dd0e9ca750bc1127ceff1081bbecf68c7961c968f55d35db7a6ad1c3"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/green-race3.log",
+      "archive": "records/widget-regression/green-race3.log",
+      "bytes": 9363,
+      "sha256": "c49058f64a627c224659cc340fc39b302f4d6434dc9445e2ecb9428557e64a10"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/offscreen-vet.log",
+      "archive": "records/widget-regression/offscreen-vet.log",
+      "bytes": 215,
+      "sha256": "da0cbf087ab69123d86fd78338c71d646dde4cd5707726a5644dcbe2c0649375"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/original-grid.go.txt",
+      "archive": "records/widget-regression/original-grid.go.txt",
+      "bytes": 27234,
+      "sha256": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/qualify-green.py",
+      "archive": "records/widget-regression/qualify-green.py.txt",
+      "bytes": 3686,
+      "sha256": "bb5001c7336d9a016c417c53210931e3d4cc23bdcbe65b61ef8c64ad60baf450"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/red-proof.json",
+      "archive": "records/widget-regression/red-proof.json",
+      "bytes": 2024,
+      "sha256": "30514c4b5356959e2c55624e0c1340afcfda15a047956460a7434be7c2082ae4"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-qualification/widget-regression/red.log",
+      "archive": "records/widget-regression/red.log",
+      "bytes": 191558,
+      "sha256": "73368317d2d2b08cbbf254dcb66eb14cd965aa4cf896007387db5a89cb223001"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/audit.json",
+      "archive": "review/internal/audit.json",
+      "bytes": 5236,
+      "sha256": "85cc50985c7c2901d58c62a0afcc5b9226b4c808e2d9df54aebf395f1a480c70"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/audit.py",
+      "archive": "review/internal/audit.py.txt",
+      "bytes": 5387,
+      "sha256": "36b213149a4146dcb1548ff377aa44c7e6a5a128fb7fe320e3e0f55d298ac5f3"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/delta.patch.txt",
+      "archive": "review/internal/delta.patch.txt",
+      "bytes": 1599,
+      "sha256": "90d7dc5040b9e42963b4d810ca953d50a22109433732ad3a259a17eb38235d1c"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/audit.json",
+      "archive": "review/internal/final/audit.json",
+      "bytes": 22220,
+      "sha256": "8b12c4126114c2c0adac29bb4b52bf57c8d2ce5cb504aa5b2bd25697bac6fd40"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/audit.py",
+      "archive": "review/internal/final/audit.py.txt",
+      "bytes": 11111,
+      "sha256": "092d91e54ec0e5a749d44225b7e0c523bb0757e5581666848fd32a475bcef968"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/history/audit-first-attempt.json",
+      "archive": "review/internal/final/history/audit-first-attempt.json",
+      "bytes": 581,
+      "sha256": "d8ae749f740005266125672cb24005b3d94816e74bb8204cbd0db96c8166d693"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/history/audit-first-attempt.py.txt",
+      "archive": "review/internal/final/history/audit-first-attempt.py.txt",
+      "bytes": 7278,
+      "sha256": "521a56e1899f93abc4b896ba9ba4b82df1115054ed6dbb4525644c13d5a8b22e"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/review.json",
+      "archive": "review/internal/final/review.json",
+      "bytes": 15352,
+      "sha256": "915713f645c001a1523c7c83d90e5fef3f7f3ef55b1e97e493ac29cd347c7f51"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/docs__implementation.md.txt",
+      "archive": "review/internal/final/snapshots/docs__implementation.md.txt",
+      "bytes": 15799,
+      "sha256": "c98015fda17e68813c5ac5c208dd44685572987ef1cb7914927b9f16371eaec8"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/docs__reports__macos-grid-performance__README.md.txt",
+      "archive": "review/internal/final/snapshots/docs__reports__macos-grid-performance__README.md.txt",
+      "bytes": 3446,
+      "sha256": "a79b6e15db754d57bb5cf2d5115f52ce6b4ddade20845a7021fe08f8b546a843"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/docs__reports__macos-grid-update__README.md.txt",
+      "archive": "review/internal/final/snapshots/docs__reports__macos-grid-update__README.md.txt",
+      "bytes": 4252,
+      "sha256": "0b0ed424f149d47f362d63e6f38fad22b3a45591668691932d24e7112c7c635c"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/drivers__cogent__grid.go.txt",
+      "archive": "review/internal/final/snapshots/drivers__cogent__grid.go.txt",
+      "bytes": 27369,
+      "sha256": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/drivers__cogent__grid_update_offscreen_test.go.txt",
+      "archive": "review/internal/final/snapshots/drivers__cogent__grid_update_offscreen_test.go.txt",
+      "bytes": 7512,
+      "sha256": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/specs__grid-native.md.txt",
+      "archive": "review/internal/final/snapshots/specs__grid-native.md.txt",
+      "bytes": 15454,
+      "sha256": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/specs__grid-performance.md.txt",
+      "archive": "review/internal/final/snapshots/specs__grid-performance.md.txt",
+      "bytes": 9230,
+      "sha256": "3adf9497eaf0bb3761baa11fe24a7aec409f11954e08adaf54f51bb19bdc158d"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/final/snapshots/specs__macos-completion.md.txt",
+      "archive": "review/internal/final/snapshots/specs__macos-completion.md.txt",
+      "bytes": 8802,
+      "sha256": "1c864041038ed281d75507ba81c1e561bb4de77d8643bc5d57fc651ca54c476c"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/review.json",
+      "archive": "review/internal/review.json",
+      "bytes": 11659,
+      "sha256": "99433bc7316529ee37d5457463c953a46166b05a4333a9efe9d3c35bb4f18fea"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/snapshots/drivers__cogent__grid.go.txt",
+      "archive": "review/internal/snapshots/drivers__cogent__grid.go.txt",
+      "bytes": 27369,
+      "sha256": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/snapshots/drivers__cogent__grid_update_offscreen_test.go.txt",
+      "archive": "review/internal/snapshots/drivers__cogent__grid_update_offscreen_test.go.txt",
+      "bytes": 7701,
+      "sha256": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/snapshots/original-grid-native.md.txt",
+      "archive": "review/internal/snapshots/original-grid-native.md.txt",
+      "bytes": 14767,
+      "sha256": "b7d08067775a07d7fe0247a65d020d7776c638920c43b0f51c24c51d63fc2d5e"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/snapshots/original-grid.go.txt",
+      "archive": "review/internal/snapshots/original-grid.go.txt",
+      "bytes": 27234,
+      "sha256": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-review/snapshots/specs__grid-native.md.txt",
+      "archive": "review/internal/snapshots/specs__grid-native.md.txt",
+      "bytes": 15454,
+      "sha256": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/inputs.json",
+      "archive": "review/prism/inputs.json",
+      "bytes": 1190,
+      "sha256": "570b8eb9050b603b9bb2f3020ea0d721b3373a9c744d83aa429967f20a79b9a4"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/post-prism-delta.diff.txt",
+      "archive": "review/prism/post-prism-delta.diff.txt",
+      "bytes": 636,
+      "sha256": "76ff30f314d623186c30548021d0684afca60171b3e980475fa83daa86064902"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/prism.json",
+      "archive": "review/prism/prism.json",
+      "bytes": 2579,
+      "sha256": "e598e086eb51f7ca61ef69db237f39b0c18d24a5076683dfe584a91fc57e7786"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/process.json",
+      "archive": "review/prism/process.json",
+      "bytes": 2815,
+      "sha256": "3830711b502e8f9f6f913c327d448e66f5196a591534a439cbe249682ced809d"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/reviewed-test.go.txt",
+      "archive": "review/prism/reviewed-test.go.txt",
+      "bytes": 7701,
+      "sha256": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/staged.diff.txt",
+      "archive": "review/prism/staged.diff.txt",
+      "bytes": 18870,
+      "sha256": "6cd980445dd08674cef3c6cb2d664d0baa2106aa1b0f1b0722edfe0e3e3f5285"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/stderr.log",
+      "archive": "review/prism/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism/stdout.log",
+      "archive": "review/prism/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-measure.py",
+      "archive": "producers/vellum-grid-update-measure.py.txt",
+      "bytes": 6884,
+      "sha256": "bff25ec9a2ea6f0d18bb955ec95fe6d6382a16de0882f7c2505de0a751939578"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-check.py",
+      "archive": "producers/vellum-grid-update-check.py.txt",
+      "bytes": 2047,
+      "sha256": "ca0eb3c03d564279396c0d4145ece6d769a94cfe7bd66edef7347049f33baa26"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-prism.py",
+      "archive": "producers/vellum-grid-update-prism.py.txt",
+      "bytes": 2702,
+      "sha256": "66fce63db164236ceadd5bf38aee762b3aac739a1ed435166c79185aec715f6d"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-archive.py",
+      "archive": "producers/vellum-grid-update-archive.py.txt",
+      "bytes": 1993,
+      "sha256": "9392c5d3a768f03f9cf18cab9fbb3cbda477b8a73f88fa1a1123f4a412a28803"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-audit.py",
+      "archive": "producers/vellum-grid-update-audit.py.txt",
+      "bytes": 3730,
+      "sha256": "c79d053a3476cc81a20326e1538b016ba9ca82fb1701092f9ee859f75e889d20"
+    },
+    {
+      "original": "/private/tmp/vellum-grid-update-promote.py",
+      "archive": "producers/vellum-grid-update-promote.py.txt",
+      "bytes": 4074,
+      "sha256": "ce777efdbc7324e0bad2e2da6dd0e4e80465b80cab9a73d14f7b3ac7d5c38b67"
+    }
+  ]
+}

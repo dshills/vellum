@@ -1,0 +1,72 @@
+{
+  "result": "PASS",
+  "selected_current_source_count": 17,
+  "current_sources": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "drivers/cogent/grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "drivers/cogent/grid_geometry.go": "8d303fae6e21e49adbbb544a7a1d10763fa03ee44cf57097286ab42092581895",
+    "drivers/cogent/controls.go": "52056503c64f76dc169f8d5534f4380226840d4601c6ebe84b7ec40b5ffc3323",
+    "drivers/cogent/driver.go": "b7dc3446007514d0bc845b76daafb4960b4e475b9d7ed88f756104b5e35c22ba",
+    "drivers/cogent/reconcile.go": "f16868a2a4790988a102b2b90b918dde94af9fb083ab85cf5d4df4db1a4ca196",
+    "drivers/cogent/manual_offscreen.go": "2ba45cc4399aee2f155a76471e7df20d4d2d93f56fe161bbfa65f84cd5057e60",
+    "drivers/cogent/build/upstream/core/update.go": "16e4f84616d958d1fce8b80eaea0906a5e00c14cbec2099fda74aa87626991ca",
+    "drivers/cogent/build/upstream/core/widget.go": "a5a6f524fafdf7dbeb2e2726bfede6c6aa6a704de7e10c4d973e25634b74c98c",
+    "drivers/cogent/build/upstream/core/style.go": "50ca543d3755ec22621bb1409ff68668e45dfc82efa4f0c222f5840845a7bbeb",
+    "drivers/cogent/build/upstream/core/text.go": "247b126f88c56893329541726c37e4452a9482e16e49cde9622bdfe19ab0d02d",
+    "drivers/cogent/build/upstream/core/flags.go": "53952efdda7f239a1f6e57490e872fc10a071a63945f1b0b9084967dac5b6ba6",
+    "drivers/cogent/build/upstream/core/typegen.go": "5ed8f3bb07144bf01db2d057e128f46af7804b6769894d6530032a92e5b07822",
+    "drivers/cogent/build/upstream/core/render.go": "a3c63a4eedf85cb5a2dc519a0e56fd4a967e1e3b5e02dfecc7dde6fffabceba9",
+    "drivers/cogent/build/upstream/core/widgetevents.go": "da23687aebedf16be5ed54346966a5a366b586fc6f024905936e6d29eb70584b"
+  },
+  "author_artifacts": {
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/red-proof.json": "30514c4b5356959e2c55624e0c1340afcfda15a047956460a7434be7c2082ae4",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/red.log": "73368317d2d2b08cbbf254dcb66eb14cd965aa4cf896007387db5a89cb223001",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/green-proof.json": "02eae2e3dd0e9ca750bc1127ceff1081bbecf68c7961c968f55d35db7a6ad1c3",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/green-race3.log": "c49058f64a627c224659cc340fc39b302f4d6434dc9445e2ecb9428557e64a10",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/offscreen-vet.log": "da0cbf087ab69123d86fd78338c71d646dde4cd5707726a5644dcbe2c0649375",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/desktop-vet.log": "d085487f95fe4b396b1ebbc70fadb6dc33c01818686ed335a49e2d1477f188b0",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/original-grid.go.txt": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-grid.go.txt": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/frozen-grid_update_offscreen_test.go.txt": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/qualify-green.py": "bb5001c7336d9a016c417c53210931e3d4cc23bdcbe65b61ef8c64ad60baf450"
+  },
+  "author_before_after_selected_count": 35,
+  "author_before_after_equal": true,
+  "independent_audit": "Read-only metadata/source review. No test, GUI, performance or profile execution.",
+  "author_red": {
+    "exit_code": 1,
+    "expected_double_pass_failures": 1626,
+    "other_test_diagnostics": [],
+    "rgba_records": 8
+  },
+  "author_green": {
+    "checks": [
+      {
+        "name": "green-race3",
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-grid-update-qualification/widget-regression/green-race3.log",
+        "log_sha256": "c49058f64a627c224659cc340fc39b302f4d6434dc9445e2ecb9428557e64a10"
+      },
+      {
+        "name": "offscreen-vet",
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-grid-update-qualification/widget-regression/offscreen-vet.log",
+        "log_sha256": "da0cbf087ab69123d86fd78338c71d646dde4cd5707726a5644dcbe2c0649375"
+      },
+      {
+        "name": "desktop-vet",
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-grid-update-qualification/widget-regression/desktop-vet.log",
+        "log_sha256": "d085487f95fe4b396b1ebbc70fadb6dc33c01818686ed335a49e2d1477f188b0"
+      }
+    ],
+    "rgba_records": 24,
+    "exact_original_match_each_repetition": true
+  },
+  "runtime_exact_delta": "Only one pooled Text.Update call removed; final host.Update and private inline field.Update preserved.",
+  "baseline_grid_sha256": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a",
+  "baseline_spec_sha256": "b7d08067775a07d7fe0247a65d020d7776c638920c43b0f51c24c51d63fc2d5e",
+  "delta_sha256": "90d7dc5040b9e42963b4d810ca953d50a22109433732ad3a259a17eb38235d1c"
+}

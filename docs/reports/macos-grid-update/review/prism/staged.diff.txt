@@ -1,0 +1,398 @@
+diff --git a/docs/implementation.md b/docs/implementation.md
+index 8917dcf..81f49a8 100644
+--- a/docs/implementation.md
++++ b/docs/implementation.md
+@@ -227,5 +227,9 @@ latency. The stored-grid release runner enforces at least 400 clipped cells,
+ paired 10k/million-row geometry and five runs per case for budget qualification.
+ The first single-process exploratory probe fails the unchanged 4ms p95/6ms p99
+ targets at 20.30ms/22.77ms. See the [timing contract](../specs/grid-performance.md)
+-and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open;
+-trace-guided reconciliation and raster optimization is the next phase.
++and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open.
++The [single host-update optimization](reports/macos-grid-update/README.md)
++removes duplicate pooled updater/style work. Its interleaved fixed-10k release
++comparison observes p95 19.55→17.07ms and p99 20.41→18.00ms with matching
++geometry and software-frame pixels. This remains an exploratory comparison;
++unchanged-generation refresh and raster/upload costs are the next investigations.
+diff --git a/docs/reports/macos-grid-performance/README.md b/docs/reports/macos-grid-performance/README.md
+index 70917a4..e95d6e7 100644
+--- a/docs/reports/macos-grid-performance/README.md
++++ b/docs/reports/macos-grid-performance/README.md
+@@ -44,3 +44,9 @@ P6 remains open. The next phase optimizes the measured reconciliation and raster
+ costs, then repeats unchanged workloads and targets. Native/GPU allocation
+ attribution, novel strings/cold caches, tree latency, endurance, physical
+ presentation and external accessibility remain separate acceptance checks.
++
++The subsequent [single host-update checkpoint](../macos-grid-update/README.md)
++removes duplicate per-slot updater/style work. Its interleaved fixed-10k release
++comparison observes p95 19.55→17.07ms and p99 20.41→18.00ms while preserving
++geometry and software-frame pixels. It is a three-process-per-build exploration;
++the unchanged targets remain failed and the broader acceptance checks stay open.
+diff --git a/docs/reports/macos-grid-update/README.md b/docs/reports/macos-grid-update/README.md
+new file mode 100644
+index 0000000..60a7b95
+--- /dev/null
++++ b/docs/reports/macos-grid-update/README.md
+@@ -0,0 +1,74 @@
++# One recursive grid update per projection sync
++
++Pooled grid cells and headers previously ran their updater and style work once
++in placement and again in the final recursive host update. Placement now assigns
++all text, geometry, visibility, selection and cursor properties before that
++host traversal. The host update, private inline editor, layout/paint, raster,
++upload, frame tracing and retirement paths retain their existing behavior.
++There is no public API change or new cache of unchanged frames.
++
++The actual native offscreen regression instruments retained Core updaters and
++stylers around one owner-held sync. The original produces 1,626 assertions with
++two passes instead of one, and no other failed assertions. The corrected code
++passes three race repetitions at logical DPI 96, 120, 144 and 192. Each slot has
++one updater/style pass; escaped text, rounded clips, frozen/scrolling panes,
++selection and recycled cursor borders remain current. Eight detached software
++RGBA frame hashes match the original in all three repetitions. These are
++software frame comparisons, not GPU or physical display pixel comparisons.
++
++The affected existing grid and frame-metrics offscreen race suite and both
++default/offscreen native vets pass. This checkpoint does not repeat unrelated
++portable/tree checks or claim a complete compiler/module-cache/system SDK
++closure. The 6,128 prepared dependency files remain identical to the qualified
++timing checkpoint.
++
++## Local optimized release comparison
++
++Three fresh fixed-10k native processes per build ran in interleaved order
++baseline/candidate/candidate/baseline/baseline/candidate. Every process had
++128 warmup scrolls and 120 measured samples. All six retained the unchanged
++400 actually clipped cells, 50 rows, eight columns and 767×624 logical viewport
++at scale 1.6875. Their normalized clip hashes match at every trajectory phase.
++All native tickets complete, with one callback per sample and no dropped or
++pending tickets. Neither build is race-instrumented or CPU-profiled. External
++process observations run only after the completed end record.
++
++These nearest-rank pooled values each contain 360 same-ticket samples:
++
++| Elapsed UI work | Original | One host pass |
++| --- | ---: | ---: |
++| p50 | 18.37 ms | 15.80 ms |
++| p95 | 19.55 ms | 17.07 ms |
++| p99 | 20.41 ms | 18.00 ms |
++| maximum | 21.88 ms | 18.96 ms |
++
++Pooled p95 decreases by 12.68%. The three individual candidate p95 values are
++17.13, 17.07 and 16.93 ms; original values are 19.29, 20.02 and 19.09 ms.
++Reconciliation p95 changes from 8.80 to 5.91 ms. Raster/upload p95 changes from
++8.66 to 9.03 ms; this trial does not optimize that path or demonstrate fewer
++runtime wakeups. Independent phase percentiles are never added together.
++Timing is elapsed work including GC, not OS-thread CPU or GPU completion.
++
++The unchanged P6 targets, p95≤4 ms and p99≤6 ms, remain failed. This is an
++exploratory A/B comparison, with fewer than five fresh processes per build and
++only fixed-10k rows. It does not replace the required fixed/variable 10k/million
++campaign, tree timing, memory/endurance, cold-cache, external accessibility or
++physical presentation checks. It supports retaining this isolated removal of
++proven duplicate work; it does not certify production readiness.
++
++## Evidence and next work
++
++`archive.json` maps byte-preserved local raw logs, regression proofs, selected
++production/prepared hashes, build records, native sample records, machine
++metadata and inert producers to this directory. Binaries are identified by SHA
++and excluded from Git. The independent review and narrowly scoped Prism result
++are recorded in `review/`; the review excludes the raw evidence archive from its
++provider payload. Namespace and license remain `github.com/dshills/vellum` and
++MIT; no public release, signing or notarization occurs here.
++
++Next, investigate whether geometry publication causes a redundant owner refresh
++for an already accepted projection, and measure raster/upload invalidation
++separately. Changed scroll images must never be marked unchanged to avoid
++uploads. Any further change must preserve geometry, style resets, field focus,
++lifetime and current-generation frame attribution before repeating the same
++workload and unchanged targets.
+diff --git a/drivers/cogent/grid.go b/drivers/cogent/grid.go
+index 77b21fc..608d4b2 100644
+--- a/drivers/cogent/grid.go
++++ b/drivers/cogent/grid.go
+@@ -692,7 +692,8 @@ func (g *gridBinding) place(w *core.Text, p *gridPane, rect, clip virtual.GridRe
+ 	w.SetText(value)
+ 	w.SetState(clip.Empty(), states.Invisible)
+ 	w.SetState(selected, states.Selected)
+-	w.Update()
++	// syncGrid updates the host recursively after every slot has been placed.
++	// Updating here would run the same updater/style work a second time.
+ }
+ func disposeGrid(r *record) {
+ 	if r == nil || r.control == nil || r.control.grid == nil {
+diff --git a/drivers/cogent/grid_update_offscreen_test.go b/drivers/cogent/grid_update_offscreen_test.go
+new file mode 100644
+index 0000000..f949e88
+--- /dev/null
++++ b/drivers/cogent/grid_update_offscreen_test.go
+@@ -0,0 +1,210 @@
++//go:build offscreen
++
++package cogent
++
++import (
++	"crypto/sha256"
++	"fmt"
++	"html"
++	"image"
++	"math"
++	"testing"
++
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/states"
++	"github.com/dshills/vellum/ui"
++	"github.com/dshills/vellum/virtual"
++)
++
++// The immutable source makes text replacement independent of widget caches.
++// Its captured selection index contains only immutable scalar projection data.
++type gridUpdateSource struct {
++	selectionNativeIndex
++	prefix string
++}
++
++func (s gridUpdateSource) Cell(key, column string) (string, error) {
++	return s.prefix + " " + key + " · " + column, nil
++}
++func (s gridUpdateSource) SelectionSnapshot() (virtual.GridRowIndex, error) {
++	return s.selectionNativeIndex, nil
++}
++
++type gridUpdatePass struct{ updates, styles int }
++
++// This measures one actual owner sync on a fully constructed manual scene, not
++// all later framework passes needed to frame/layout that accepted projection.
++// Observers only count and do not set properties or alter updater/style order.
++func TestManagedGridRetainedWidgetsUpdateOncePerSync(t *testing.T) {
++	for _, dpi := range []float32{96, 120, 144, 192} {
++		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
++			model, _ := selectionNativeGrid(t, 10_000, false, 4096)
++			config := manualConfig(t, 7)
++			config.LogicalDPI = dpi
++			m, a := gridManual(t, config, func() ui.Node { return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true} })
++			gridFrame(t, m)
++			if err := a.Do(func() {
++				if err := model.Scroll(360, 240); err != nil {
++					t.Error(err)
++				}
++				if err := model.SelectToKey("selection-10", "c6", virtual.GridSelectReplace); err != nil {
++					t.Error(err)
++				}
++				_ = a.Invalidate("one")
++			}); err != nil {
++				t.Fatal(err)
++			}
++			gridFrame(t, m)
++			var binding *gridBinding
++			counters := map[*core.Text]*gridUpdatePass{}
++			var firstCursor *core.Text
++			if err := a.Do(func() {
++				binding = m.implementation.find("one").state.root.control.grid
++				for i, w := range binding.cells {
++					if binding.projection.Cells[i].Active {
++						firstCursor = w
++					}
++					pass := &gridUpdatePass{}
++					counters[w] = pass
++					w.Updater(func() { pass.updates++ })
++					w.FinalStyler(func(*styles.Style) { pass.styles++ })
++				}
++				for _, w := range binding.headers {
++					pass := &gridUpdatePass{}
++					counters[w] = pass
++					w.Updater(func() { pass.updates++ })
++					w.FinalStyler(func(*styles.Style) { pass.styles++ })
++				}
++				if firstCursor == nil || !firstCursor.StateIs(states.Selected) || firstCursor.Styles.Border.Width.Top.Value != 1 {
++					t.Error("initial selected cursor not styled")
++				}
++			}); err != nil {
++				t.Fatal(err)
++			}
++
++			phases := []struct {
++				name   string
++				change func() error
++			}{
++				{"replace-scroll-select", func() error {
++					source := gridUpdateSource{selectionNativeIndex: selectionNativeIndex{total: 10_000, revision: 2}, prefix: "<changed & escaped>"}
++					if err := model.ReplaceSource(source); err != nil {
++						return err
++					}
++					if err := model.Scroll(90, 24); err != nil {
++						return err
++					}
++					return model.SelectToKey("selection-12", "c8", virtual.GridSelectReplace)
++				}},
++				{"clear-and-move-cursor", func() error {
++					source := gridUpdateSource{selectionNativeIndex: selectionNativeIndex{total: 10_000, revision: 3}, prefix: "final text"}
++					if err := model.ReplaceSource(source); err != nil {
++						return err
++					}
++					if err := model.SelectToKey("selection-13", "c0", virtual.GridSelectReplace); err != nil {
++						return err
++					}
++					return model.ClearSelection()
++				}},
++			}
++			for _, phase := range phases {
++				if err := a.Do(func() {
++					if err := phase.change(); err != nil {
++						t.Error(err)
++						return
++					}
++					for _, pass := range counters {
++						*pass = gridUpdatePass{}
++					}
++					if err := syncGrid(binding.r); err != nil {
++						t.Error(err)
++						return
++					}
++					retained := append(append([]*core.Text(nil), binding.cells...), binding.headers...)
++					for _, w := range retained {
++						pass, ok := counters[w]
++						if !ok {
++							t.Errorf("%s allocated instead of recycling warmed widget", phase.name)
++							continue
++						}
++						if pass.updates != 1 || pass.styles != 1 {
++							t.Errorf("%s retained widget update/style passes: got %d/%d want 1/1", phase.name, pass.updates, pass.styles)
++						}
++					}
++					assertGridUpdateStyles(t, binding, phase.name)
++					if firstCursor.StateIs(states.Selected) || firstCursor.Styles.Border.Width.Top.Value != 0 {
++						t.Errorf("%s old cursor/selected style leaked into recycled slot", phase.name)
++					}
++				}); err != nil {
++					t.Fatal(err)
++				}
++				// Counter assertion errors deliberately leave the geometry/pixel evidence
++				// running, so the original double-pass code supplies a genuine baseline.
++				if _, err := m.Frame(testContext, "one"); err != nil {
++					t.Fatal(err)
++				}
++				gridFrame(t, m)
++				measured := gridInspection(t, a, model)
++				if err := a.Do(func() {
++					assertGridUpdateStyles(t, binding, phase.name)
++					if len(measured.Cells) != len(binding.projection.Cells) || len(measured.Headers) != len(binding.projection.Headers) {
++						t.Error("current measured projection length mismatch")
++						return
++					}
++					edge := func(v int) int { return int(math.Round(float64(float32(v) * measured.Scale))) }
++					expected := func(r virtual.GridRect) image.Rectangle {
++						if r.Empty() {
++							return image.Rectangle{}
++						}
++						return image.Rect(measured.Bounds.Min.X+edge(r.X), measured.Bounds.Min.Y+edge(r.Y), measured.Bounds.Min.X+edge(r.X+r.Width), measured.Bounds.Min.Y+edge(r.Y+r.Height))
++					}
++					for i, cell := range measured.Cells {
++						source := binding.projection.Cells[i]
++						if cell.Text != source.Text || cell.Selected != source.Selected || cell.Active != source.Active || cell.Bounds != expected(source.Clip) {
++							t.Errorf("%s cell %s final semantics/geometry mismatch: got %+v projection %+v", phase.name, cell.ID, cell, source)
++						}
++					}
++					for i, header := range measured.Headers {
++						source := binding.projection.Headers[i]
++						if header.Title != source.Title || header.Bounds != expected(source.Clip) {
++							t.Errorf("%s header %s final geometry/text mismatch", phase.name, header.ID)
++						}
++					}
++				}); err != nil {
++					t.Fatal(err)
++				}
++				raster, err := m.Capture(testContext, "one")
++				if err != nil || raster == nil || raster.Bounds().Empty() {
++					t.Fatalf("%s detached software frame: %v", phase.name, err)
++				}
++				digest := sha256.Sum256(raster.Pix)
++				t.Logf("GRID_UPDATE_RGBA dpi=%g phase=%s bounds=%v stride=%d sha256=%x", dpi, phase.name, raster.Bounds(), raster.Stride, digest)
++			}
++		})
++	}
++}
++
++func assertGridUpdateStyles(t *testing.T, g *gridBinding, phase string) {
++	t.Helper()
++	for i, w := range g.cells {
++		cell := g.projection.Cells[i]
++		if w.Text != html.EscapeString(cell.Text) || w.StateIs(states.Selected) != cell.Selected || w.StateIs(states.Invisible) != cell.Clip.Empty() {
++			t.Errorf("%s cell %d text/membership/visibility style not current", phase, i)
++		}
++		cursor, _ := w.Property("vellum.grid.cursor").(bool)
++		width := float32(0)
++		if cell.Active {
++			width = 1
++		}
++		if cursor != cell.Active || w.Styles.Border.Width.Top.Value != width {
++			t.Errorf("%s cell %d cursor border not current: cursor=%t active=%t width=%g", phase, i, cursor, cell.Active, w.Styles.Border.Width.Top.Value)
++		}
++	}
++	for i, w := range g.headers {
++		header := g.projection.Headers[i]
++		if w.Text != html.EscapeString(header.Title) || w.StateIs(states.Selected) || w.Styles.Border.Width.Top.Value != 0 || w.StateIs(states.Invisible) != header.Clip.Empty() {
++			t.Errorf("%s header %d inherited recycled cell styling", phase, i)
++		}
++	}
++}
+diff --git a/specs/grid-native.md b/specs/grid-native.md
+index a681ac6..ad5d53a 100644
+--- a/specs/grid-native.md
++++ b/specs/grid-native.md
+@@ -103,6 +103,16 @@ Hidden oversized column definitions are checked if/when materialized. Pools
+ reuse active widgets and destroy surplus slots to release private shaped-text
+ caches, with no whole-source allocation.
+ 
++A successful native projection sync assigns every pooled cell/header's text,
++rectangle, visibility, selection and cursor state before one recursive host
++update. That traversal updates and restyles each pooled slot after its parent;
++placement does not also run a separate per-slot update. The private inline
++editor retains its existing update and focus handling. This bounds duplicate
++work within that sync, not the number of updates in an entire frame: initial
++mounting, theme changes and other parent updates may perform additional work.
++It does not skip layout, paint, rasterization or texture upload. A refused sync
++keeps the existing reconciliation failure and retirement behavior.
++
+ Render/Position never read the source/model or invoke user callbacks. Completed
+ native rendering publishes clipped actual ContentBBox/TotalBBox geometry. A
+ changed actual content size/scale posts one checked immutable layout request to
+diff --git a/specs/grid-performance.md b/specs/grid-performance.md
+index dce525d..502056d 100644
+--- a/specs/grid-performance.md
++++ b/specs/grid-performance.md
+@@ -124,6 +124,15 @@ workload fidelity and missing GPU/presentation/native-memory/endurance evidence.
+ These scripts establish a repeatable workload and recording protocol; actual
+ Mac measurements and optimization evidence are separate from CPU tests.
+ 
++The [single host-update comparison](../docs/reports/macos-grid-update/README.md)
++removes proven duplicate pooled cell/header updater/style passes. Three
++interleaved optimized fixed-10k processes per build preserve the 400-cell
++geometry and reduce pooled elapsed UI-work p95 from 19.55 to 17.07 ms and p99
++from 20.41 to 18.00 ms. The unchanged 4/6 ms targets still fail. This scoped
++exploration neither meets the five-process requirement nor exercises the other
++three cases, so P6 remains open. It does not change raster/upload invalidation
++or prove a reduction in process-wide scheduler wakeups.
++
+ ## Diagnostic CPU profiling
+ 
+ `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide
+diff --git a/specs/macos-completion.md b/specs/macos-completion.md
+index e674625..2e5dd4f 100644
+--- a/specs/macos-completion.md
++++ b/specs/macos-completion.md
+@@ -103,6 +103,12 @@ to owner work and completed composition, including intermediate post-input
+ native paints. The unchanged warm targets require actual release measurements;
+ the existence of instrumentation and CPU tests does not establish a target pass.
+ 
++The [single host-update checkpoint](../docs/reports/macos-grid-update/README.md)
++removes duplicate pooled cell/header updater/style passes with matched
++offscreen software pixels. Three interleaved fixed-10k release processes per
++build observe p95 19.55→17.07ms and p99 20.41→18.00ms. The unchanged targets
++remain failed; the complete multi-case P6 campaign remains open.
++
+ Full P9 professional workload and large-data replay acceptance, external
+ application automation transport, native services/input/accessibility, GPU
+ presentation and sustained performance qualification remain open. This bounded

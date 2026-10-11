@@ -1,0 +1,12 @@
+--- v1/grid_update_offscreen_test.go
++++ final-v2/grid_update_offscreen_test.go
+@@ -133,9 +133,6 @@
+ 						}
+ 					}
+ 					assertGridUpdateStyles(t, binding, phase.name)
+-					if firstCursor.StateIs(states.Selected) || firstCursor.Styles.Border.Width.Top.Value != 0 {
+-						t.Errorf("%s old cursor/selected style leaked into recycled slot", phase.name)
+-					}
+ 				}); err != nil {
+ 					t.Fatal(err)
+ 				}

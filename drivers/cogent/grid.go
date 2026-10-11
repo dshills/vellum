@@ -692,7 +692,8 @@ func (g *gridBinding) place(w *core.Text, p *gridPane, rect, clip virtual.GridRe
 	w.SetText(value)
 	w.SetState(clip.Empty(), states.Invisible)
 	w.SetState(selected, states.Selected)
-	w.Update()
+	// syncGrid updates the host recursively after every slot has been placed.
+	// Updating here would run the same updater/style work a second time.
 }
 func disposeGrid(r *record) {
 	if r == nil || r.control == nil || r.control.grid == nil {

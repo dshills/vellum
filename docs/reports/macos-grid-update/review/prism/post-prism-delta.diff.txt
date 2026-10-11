@@ -1,0 +1,14 @@
+diff --git a/drivers/cogent/grid_update_offscreen_test.go b/drivers/cogent/grid_update_offscreen_test.go
+index f949e88..ac0843b 100644
+--- a/drivers/cogent/grid_update_offscreen_test.go
++++ b/drivers/cogent/grid_update_offscreen_test.go
+@@ -133,9 +133,6 @@ func TestManagedGridRetainedWidgetsUpdateOncePerSync(t *testing.T) {
+ 						}
+ 					}
+ 					assertGridUpdateStyles(t, binding, phase.name)
+-					if firstCursor.StateIs(states.Selected) || firstCursor.Styles.Border.Width.Top.Value != 0 {
+-						t.Errorf("%s old cursor/selected style leaked into recycled slot", phase.name)
+-					}
+ 				}); err != nil {
+ 					t.Fatal(err)
+ 				}

@@ -1,0 +1,75 @@
+"""Post-Prism test-only correction: original red overlay and current green."""
+from pathlib import Path
+import hashlib, json, re, shlex, subprocess, sys, time
+ROOT = Path('/private/tmp/vellum-large-data')
+OUT = Path(__file__).resolve().parent
+OLD = OUT.parent
+sys.path.insert(0, str(ROOT/'scripts'))
+from child_process import run_child
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+prior = json.loads((OLD/'green-proof.json').read_text())
+red_prior = json.loads((OLD/'red-proof.json').read_text())
+FILES = [p for p in prior['before'] if p != 'producer']
+def inputs():
+    return {p: sha(ROOT/p) for p in FILES}
+def history():
+    return {p.name: sha(p) for p in sorted(OLD.iterdir()) if p.is_file()}
+def raster(text):
+    return [line.strip().split('GRID_UPDATE_RGBA ',1)[1] for line in text.splitlines() if 'GRID_UPDATE_RGBA ' in line]
+before = inputs()
+history_before = history()
+assets_before = {p.name: sha(p) for p in sorted(OUT.iterdir()) if p.is_file()}
+changed = [p for p in before if before[p] != prior['after'][p]]
+assert changed == ['drivers/cogent/grid_update_offscreen_test.go'], changed
+assert (OUT/'candidate-grid.go.txt').read_bytes() == (ROOT/'drivers/cogent/grid.go').read_bytes()
+assert (OUT/'grid_update_offscreen_test.go.txt').read_bytes() == (ROOT/'drivers/cogent/grid_update_offscreen_test.go').read_bytes()
+assert sha(OUT/'baseline-grid.go.txt') == red_prior['files']['drivers/cogent/grid.go']
+checks = []
+commands = [
+ ('red-overlay', ['go','test','-overlay',str(OUT/'red-overlay.json'),'-tags','offscreen','-race','-count=1','-v','-run','TestManagedGridRetainedWidgetsUpdateOncePerSync','./...']),
+ ('green-race3', ['go','test','-tags','offscreen','-race','-count=3','-v','-run','TestManagedGridRetainedWidgetsUpdateOncePerSync','./...']),
+]
+for name, cmd in commands:
+    log = OUT/(name+'.log')
+    argv = ['/bin/zsh','-c','export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+shlex.quote(str(ROOT/'drivers/cogent/env.sh'))+'\nexec '+shlex.join(cmd)]
+    start = time.monotonic()
+    code, error = -1, None
+    print('START', name, flush=True)
+    with log.open('wb') as stream:
+        stream.write(('argv: '+json.dumps(argv)+'\ncwd: '+str(ROOT/'drivers/cogent')+'\n').encode()); stream.flush()
+        try:
+            code = run_child(argv, cwd=ROOT/'drivers/cogent',stdout=stream,stderr=subprocess.STDOUT,timeout=240).returncode
+        except subprocess.TimeoutExpired:
+            code, error = 124, 'timeout and owned group cleanup'
+        except Exception as e:
+            error = repr(e)
+            stream.write(('runner_error: '+error+'\n').encode())
+    item = {'name':name,'argv':argv,'exit_code':code,'error':error,'elapsed_seconds':round(time.monotonic()-start,3),'log':str(log),'log_sha256':sha(log)}
+    checks.append(item)
+    print('END', json.dumps(item), flush=True)
+after = inputs()
+history_after = history()
+assets_after = {name:sha(OUT/name) for name in assets_before}
+red_text = (OUT/'red-overlay.log').read_text()
+green_text = (OUT/'green-race3.log').read_text()
+failures = re.findall(r'grid_update_offscreen_test\.go:\d+: ([^\n]*)',red_text)
+count_failures = [f for f in failures if 'retained widget update/style passes: got 2/2 want 1/1' in f]
+other_failures = [f for f in failures if f not in count_failures]
+expected = red_prior['raster_records']
+red_raster, green_raster = raster(red_text), raster(green_text)
+red_pixels = red_raster == expected
+green_pixels = len(green_raster)==24 and set(green_raster)==set(expected) and all(green_raster.count(record)==3 for record in expected)
+passed = before==after and history_before==history_after and assets_before==assets_after and checks[0]['exit_code']==1 and checks[1]['exit_code']==0 and len(count_failures)==red_prior['expected_double_pass_failures'] and not other_failures and red_pixels and green_pixels and 'WARNING: DATA RACE' not in red_text+green_text
+proof = {
+ 'scope':'Test-only post-Prism correction removes only the pooled firstCursor post-phase assumption. Initial selected cursor validation and all per-slot current-projection style/semantic/geometry checks remain. Actual warmed Core cells/headers get one update/style pass per successful owner sync; detached softwareRGBA at96/120/144/192 equals original double-pass code. No GPU/performance proof or new native A/B run.',
+ 'before':before,'after':after,'unchanged':before==after,
+ 'inherited_v1':{'history_before':history_before,'history_after':history_after,'unchanged':history_before==history_after,'only_source_delta_from_v1':changed,'green_proof':{'path':str(OLD/'green-proof.json'),'sha256':sha(OLD/'green-proof.json')},'red_proof':{'path':str(OLD/'red-proof.json'),'sha256':sha(OLD/'red-proof.json')}},
+ 'assets_before':assets_before,'assets_after':assets_after,'assets_unchanged':assets_before==assets_after,
+ 'checks':checks,
+ 'red_counter_assertions':{'expected_count':red_prior['expected_double_pass_failures'],'actual_count':len(count_failures),'other_failures':other_failures},
+ 'software_rgba':{'original_records':expected,'final_test_original_overlay_records':red_raster,'original_overlay_matches_v1':red_pixels,'corrected_records':green_raster,'exact_original_match_each_repetition':green_pixels},
+ 'result':'PASS' if passed else 'FAIL'
+}
+(OUT/'qualification.json').write_text(json.dumps(proof,indent=2)+'\n')
+print('PROOF', sha(OUT/'qualification.json'), proof['result'], flush=True)
+sys.exit(0 if passed else 1)

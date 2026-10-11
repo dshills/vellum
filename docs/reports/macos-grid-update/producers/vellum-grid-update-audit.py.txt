@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+"""Audit scoped frozen evidence before committing this local checkpoint."""
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path('/private/tmp/vellum-large-data')
+REPORT = ROOT / 'docs/reports/macos-grid-update'
+OUT = REPORT / 'audit.json'
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def load(path):
+    return json.loads(path.read_text())
+
+manifest = load(REPORT / 'archive.json')
+for record in manifest['files']:
+    path = REPORT / record['archive']
+    assert path.stat().st_size == record['bytes'] and sha(path) == record['sha256'], path
+
+comparison = load(REPORT / 'records/comparison.json')
+assert comparison['result'] == 'OBSERVED' and comparison['source_prepared_binaries_unchanged']
+assert comparison['changed_production_inputs'] == ['drivers/cogent/grid.go']
+assert comparison['target_p95_ns'] == 4000000 and comparison['target_p99_ns'] == 6000000
+source = dict(comparison['source'])
+prism_input = load(REPORT / 'review/prism/inputs.json')
+prism = load(REPORT / 'review/prism/prism.json')
+process = load(REPORT / 'review/prism/process.json')
+assert process['source_index_unchanged'] and process['exit_code'] == 1
+assert prism['coverage']['complete'] and prism['coverage']['files'] == 8
+assert prism['coverage']['llmCalls'] == 1 and not prism['coverage']['skipped'] and not prism['coverage']['truncatedBytes']
+assert len(prism['findings']) == 1 and prism['findings'][0]['id'] == '49367d7573675052'
+disposition = load(REPORT / 'review/disposition.json')
+assert disposition['resolved'] and disposition['production_unchanged_after_review']
+for path, original in prism_input['files'].items():
+    current = sha(ROOT / path)
+    if path != 'drivers/cogent/grid_update_offscreen_test.go':
+        assert current == original, path
+    source[path] = current
+for path, digest in source.items():
+    assert sha(ROOT / path) == digest, path
+for path, digest in comparison['prepared'].items():
+    assert sha(ROOT / path) == digest, path
+assert comparison['candidate']['ui_work_ns']['pooled']['p95'] > 4000000
+assert comparison['candidate']['ui_work_ns']['pooled']['p99'] > 6000000
+review = load(REPORT / 'review/internal/final/review.json')
+assert review['result'] == 'APPROVED', review
+for path in prism_input['files']:
+    assert review['files'][path] == source[path], path
+
+audit = {'schema': 1, 'result': 'PASS_WITH_PERFORMANCE_TARGETS_UNMET',
+         'scope': 'Exact current reviewed/source/prepared bindings, archive hashes, one complete Anthropic Prism call and independently reviewed test-only correction. Exploratory fixed-10k A/B remains below required campaign scope and above unchanged latency targets.',
+         'source_bindings': source, 'prepared_bindings': comparison['prepared'],
+         'archive_files': len(manifest['files']), 'archive_sha256': sha(REPORT / 'archive.json'),
+         'comparison_sha256': sha(REPORT / 'records/comparison.json'),
+         'final_review_sha256': sha(REPORT / 'review/internal/final/review.json'),
+         'disposition_sha256': sha(REPORT / 'review/disposition.json'),
+         'producer_sha256': sha(Path(__file__)),
+         'limitations': ['No P6 acceptance: three fixed-10k processes/build only, unchanged p95/p99 targets unmet.',
+                         'Pixel equivalence is software offscreen only; no GPU/presentation/native-memory/endurance qualification.',
+                         'No complete compiler/module-cache/SDK closure; exact prepared/source bindings only.',
+                         'No publication, signing/notarization or macOS settings changes.']}
+OUT.write_text(json.dumps(audit, indent=2) + '\n')
+print(audit['result'], len(source), len(comparison['prepared']), sha(OUT), flush=True)

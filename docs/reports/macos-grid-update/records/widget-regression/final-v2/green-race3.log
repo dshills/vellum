@@ -1,0 +1,100 @@
+argv: ["/bin/zsh", "-c", "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -tags offscreen -race -count=3 -v -run TestManagedGridRetainedWidgetsUpdateOncePerSync ./..."]
+cwd: /private/tmp/vellum-large-data/drivers/cogent
+# github.com/dshills/vellum/drivers/cogent/cmd/workbench.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/gallery.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/96
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=96 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=2aff14b5fb13de6d64e48d557eb3e6d7faf0d8fd9a2d9978a81f222007915bed
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=96 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=9c2db4147fb7e74538a6907a131eb3ea648ffd5a6ce47218fd2f2a275cd86224
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/120
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=120 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=4f9c4b7574079249de9670166703da8db5afa886014a9fe366a3f653912231b6
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=120 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=3426cb8b439247a7629f550adbaf7ecd8ad99cb2854ac38c549b3019fad267a3
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/144
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=144 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=0a0717d86fdf5e70f0e2999f58b8af2f01c4d19fe21ef04e987eb5326d3587d5
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=144 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=6b76e62f6d171f4d8b790970c4593df313c656fce3be1013088789d1f2978d78
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/192
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=192 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=34d184a00dd9e15dc78a31bdd0bffe77f0cc5862ffc9b535cda01fdd82521253
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=192 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=c7e90e21f53777b4a2b1a249905f01861421e494aed5a335e2223d339e8eabd9
+--- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync (7.19s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/96 (3.03s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/120 (1.96s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/144 (1.27s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/192 (0.92s)
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/96
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=96 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=2aff14b5fb13de6d64e48d557eb3e6d7faf0d8fd9a2d9978a81f222007915bed
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=96 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=9c2db4147fb7e74538a6907a131eb3ea648ffd5a6ce47218fd2f2a275cd86224
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/120
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=120 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=4f9c4b7574079249de9670166703da8db5afa886014a9fe366a3f653912231b6
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=120 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=3426cb8b439247a7629f550adbaf7ecd8ad99cb2854ac38c549b3019fad267a3
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/144
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=144 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=0a0717d86fdf5e70f0e2999f58b8af2f01c4d19fe21ef04e987eb5326d3587d5
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=144 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=6b76e62f6d171f4d8b790970c4593df313c656fce3be1013088789d1f2978d78
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/192
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=192 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=34d184a00dd9e15dc78a31bdd0bffe77f0cc5862ffc9b535cda01fdd82521253
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=192 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=c7e90e21f53777b4a2b1a249905f01861421e494aed5a335e2223d339e8eabd9
+--- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync (7.14s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/96 (2.97s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/120 (1.97s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/144 (1.27s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/192 (0.93s)
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/96
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=96 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=2aff14b5fb13de6d64e48d557eb3e6d7faf0d8fd9a2d9978a81f222007915bed
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=96 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=9c2db4147fb7e74538a6907a131eb3ea648ffd5a6ce47218fd2f2a275cd86224
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/120
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=120 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=4f9c4b7574079249de9670166703da8db5afa886014a9fe366a3f653912231b6
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=120 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=3426cb8b439247a7629f550adbaf7ecd8ad99cb2854ac38c549b3019fad267a3
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/144
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=144 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=0a0717d86fdf5e70f0e2999f58b8af2f01c4d19fe21ef04e987eb5326d3587d5
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=144 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=6b76e62f6d171f4d8b790970c4593df313c656fce3be1013088789d1f2978d78
+=== RUN   TestManagedGridRetainedWidgetsUpdateOncePerSync/192
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=192 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=34d184a00dd9e15dc78a31bdd0bffe77f0cc5862ffc9b535cda01fdd82521253
+    grid_update_offscreen_test.go:179: GRID_UPDATE_RGBA dpi=192 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=c7e90e21f53777b4a2b1a249905f01861421e494aed5a335e2223d339e8eabd9
+--- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync (7.28s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/96 (3.09s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/120 (1.98s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/144 (1.29s)
+    --- PASS: TestManagedGridRetainedWidgetsUpdateOncePerSync/192 (0.93s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	23.272s
+?   	github.com/dshills/vellum/drivers/cogent/cmd/accessibility-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke	3.287s [no tests to run]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/file-drop-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/gallery	2.046s [no tests to run]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/history-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/mainqueue-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/multiwindow-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke	2.859s [no tests to run]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/render-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-handoff-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-lifetime-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/workbench	2.443s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/mailbox	1.180s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/platformio	3.489s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/textinput	3.685s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/transport	3.369s [no tests to run]

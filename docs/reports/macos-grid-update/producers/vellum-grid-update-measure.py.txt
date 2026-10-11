@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+"""Scoped local release A/B evidence; never a P6 acceptance campaign."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+import platform
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path('/private/tmp/vellum-large-data')
+OUT = Path('/private/tmp/vellum-grid-update-qualification')
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def write(path, value):
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
+
+def inputs():
+    paths = subprocess.check_output(['git', 'ls-files', '-z'], cwd=ROOT).decode().split('\0')
+    paths = [p for p in paths if (p.endswith('.go') and not p.endswith('_test.go')) or p.endswith(('go.mod', 'go.sum'))]
+    paths += ['scripts/benchmark-grid.py', 'scripts/child_process.py', 'scripts/sdk_environment.py', 'drivers/cogent/native/dependencies.json']
+    return {p: sha(ROOT / p) for p in sorted(set(paths))}
+
+def prepared():
+    return {str(p.relative_to(ROOT)): sha(p) for name in ('upstream', 'typesetting')
+            for p in sorted((ROOT / 'drivers/cogent/build' / name).rglob('*')) if p.is_file()}
+
+def runner():
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    spec = importlib.util.spec_from_file_location('benchmark_grid', ROOT / 'scripts/benchmark-grid.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+def freeze():
+    OUT.mkdir(exist_ok=False)
+    original = subprocess.check_output(['git', 'show', 'HEAD:drivers/cogent/grid.go'], cwd=ROOT)
+    assert original == (ROOT / 'drivers/cogent/grid.go').read_bytes()
+    (OUT / 'baseline-grid.go.txt').write_bytes(original)
+    write(OUT / 'baseline-inputs.json', {'source': inputs(), 'prepared': prepared(),
+          'binary_sha256': sha(Path('/private/tmp/vellum-grid-update-baseline')),
+          'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT).decode().strip(),
+          'scope': 'Selected repository production Go/module inputs plus pinned prepared dependency files. Not a complete compiler/module-cache/SDK closure. Release build uses go build with default optimization, no race.'})
+    print('baseline frozen', flush=True)
+
+def build():
+    binary = Path('/private/tmp/vellum-grid-update-candidate')
+    assert not binary.exists()
+    before = {'source': inputs(), 'prepared': prepared()}
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    from sdk_environment import child_environment
+    argv = ['go', 'build', '-o', str(binary), '.']
+    with (OUT / 'candidate-build.log').open('xb') as raw:
+        result = subprocess.run(argv, cwd=ROOT / 'examples/loadedgrid', env=child_environment(), stdout=raw, stderr=subprocess.STDOUT)
+    after = {'source': inputs(), 'prepared': prepared()}
+    record = {'argv': argv, 'exit_code': result.returncode, 'inputs_before': before, 'inputs_after': after,
+              'log_sha256': sha(OUT / 'candidate-build.log'),
+              'binary_sha256': sha(binary) if binary.exists() else None,
+              'producer_sha256': sha(Path(__file__)),
+              'scope': 'Optimized go build, no race, controlled child environment; selected inputs/prepared bytes unchanged.'}
+    write(OUT / 'candidate-build.json', record)
+    assert result.returncode == 0 and before == after
+    print('release built', record['binary_sha256'], flush=True)
+
+def measure():
+    base = json.loads((OUT / 'baseline-inputs.json').read_text())
+    before = {'source': inputs(), 'prepared': prepared()}
+    changes = [p for p in base['source'] if base['source'][p] != before['source'][p]]
+    assert changes == ['drivers/cogent/grid.go'], changes
+    assert base['prepared'] == before['prepared']
+    binaries = {'baseline': Path('/private/tmp/vellum-grid-update-baseline'),
+                'candidate': Path('/private/tmp/vellum-grid-update-candidate')}
+    binaries_before = {k: sha(p) for k, p in binaries.items()}
+    assert binaries_before['baseline'] == base['binary_sha256']
+    module = runner()
+    metadata = {'host': platform.platform(), 'machine': platform.machine(),
+                'build': {k: module.metadata_command(['go', 'version', '-m', str(p)]) for k, p in binaries.items()},
+                'cpu': module.metadata_command(['sysctl', '-n', 'machdep.cpu.brand_string']),
+                'ram': module.metadata_command(['sysctl', '-n', 'hw.memsize']),
+                'display': module.metadata_command(['system_profiler', 'SPDisplaysDataType', '-json'], 15),
+                'power': module.metadata_command(['pmset', '-g', 'custom'])}
+    write(OUT / 'machine.json', metadata)
+    runs = {'baseline': [], 'candidate': []}
+    outcomes = []
+    for i, name in enumerate(['baseline', 'candidate', 'candidate', 'baseline', 'baseline', 'candidate']):
+        selected, outcome = module.run_case(binaries[name], OUT / f'native-{i+1}-{name}', 10000, False, 120, 128, False, 180)
+        module.compare_geometry(runs['baseline'][0], selected) if runs['baseline'] else None
+        runs[name].append(selected)
+        outcomes.append({'order': i + 1, 'kind': name, 'result': outcome['result'],
+                         'log_sha256': outcome['log_sha256'], 'elapsed_seconds': outcome['elapsed_seconds']})
+        summary = module.summarize([selected])
+        print(name, i + 1, json.dumps(summary['ui_work_ns']['pooled']), flush=True)
+    after = {'source': inputs(), 'prepared': prepared()}
+    assert before == after, 'source/prepared changed during native measurements'
+    assert binaries_before == {k: sha(p) for k, p in binaries.items()}
+    evidence = {'schema': 1,
+                'scope': 'Three optimized native fixed-10k processes per build, interleaved. 128 warmup events and 120 samples each; unchanged 400 clipped-cell fixture and targets. No external process observer before completed end. Exploratory A/B only: fewer than five fresh processes and no fixed/variable million-row campaign, cold-cache, endurance, presentation or native-memory qualification.',
+                'target_p95_ns': 4000000, 'target_p99_ns': 6000000,
+                'source': before['source'], 'prepared': before['prepared'],
+                'changed_production_inputs': changes, 'binaries': binaries_before,
+                'metadata_sha256': sha(OUT / 'machine.json'),
+                'outcomes': outcomes,
+                'baseline': module.summarize(runs['baseline']),
+                'candidate': module.summarize(runs['candidate']),
+                'source_prepared_binaries_unchanged': True, 'result': 'OBSERVED'}
+    write(OUT / 'comparison.json', evidence)
+    print('OBSERVED', sha(OUT / 'comparison.json'), flush=True)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=['freeze', 'build', 'measure'])
+    args = parser.parse_args()
+    {'freeze': freeze, 'build': build, 'measure': measure}[args.mode]()

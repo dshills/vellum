@@ -124,6 +124,15 @@ workload fidelity and missing GPU/presentation/native-memory/endurance evidence.
 These scripts establish a repeatable workload and recording protocol; actual
 Mac measurements and optimization evidence are separate from CPU tests.
 
+The [single host-update comparison](../docs/reports/macos-grid-update/README.md)
+removes proven duplicate pooled cell/header updater/style passes. Three
+interleaved optimized fixed-10k processes per build preserve the 400-cell
+geometry and reduce pooled elapsed UI-work p95 from 19.55 to 17.07 ms and p99
+from 20.41 to 18.00 ms. The unchanged 4/6 ms targets still fail. This scoped
+exploration neither meets the five-process requirement nor exercises the other
+three cases, so P6 remains open. It does not change raster/upload invalidation
+or prove a reduction in process-wide scheduler wakeups.
+
 ## Diagnostic CPU profiling
 
 `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide

@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+import hashlib
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+SOURCE = Path('/private/tmp/vellum-large-data')
+ROOT = Path('/Users/dshills/Development/projects/Vellum')
+OUT = Path('/private/tmp/vellum-grid-update-promotion')
+BASE = '1b5d81494da3ad84700e762bb4f60b9e5c67961c'
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def git(root, *args):
+    return subprocess.check_output(['git', *args], cwd=root).decode().strip()
+
+def state(root):
+    return {'head': git(root, 'rev-parse', 'HEAD'), 'branch': git(root, 'branch', '--show-current'),
+            'status': git(root, 'status', '--porcelain=v1', '--untracked-files=all')}
+
+OUT.mkdir(exist_ok=False)
+target = git(SOURCE, 'rev-parse', 'HEAD')
+assert git(SOURCE, 'rev-parse', 'HEAD^') == BASE and not state(SOURCE)['status']
+assert state(SOURCE)['branch'] == 'codex/grid-update-pass'
+before = state(ROOT)
+assert before == {'head': BASE, 'branch': 'codex/foundation-completion', 'status': ''}, before
+audit_path = SOURCE / 'docs/reports/macos-grid-update/audit.json'
+audit = json.loads(audit_path.read_text())
+assert audit['result'] == 'PASS_WITH_PERFORMANCE_TARGETS_UNMET'
+for path, digest in audit['source_bindings'].items():
+    assert sha(SOURCE / path) == digest, path
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(SOURCE))
+from scripts.child_process import run_child
+commands = [('fetch', ['git', 'fetch', '--no-tags', str(SOURCE), 'codex/grid-update-pass'], ROOT),
+            ('fast-forward', ['git', 'merge', '--ff-only', 'FETCH_HEAD'], ROOT),
+            ('fresh-prepare', ['/bin/zsh', '-c', 'export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /Users/dshills/Development/projects/Vellum/drivers/cogent/env.sh\npython3 prepare.py'], ROOT / 'drivers/cogent')]
+checks = []
+for name, argv, cwd in commands:
+    if name == 'fast-forward':
+        assert state(ROOT) == before and git(ROOT, 'rev-parse', 'FETCH_HEAD') == target
+    start = time.monotonic()
+    error = None
+    with (OUT / (name + '.log')).open('xb') as raw:
+        try:
+            code = run_child(argv, cwd=cwd, stdout=raw, stderr=subprocess.STDOUT, timeout=300).returncode
+        except Exception as exc:
+            code = 124 if isinstance(exc, subprocess.TimeoutExpired) else 125
+            error = {'type': type(exc).__name__, 'message': str(exc)}
+    checks.append({'name': name, 'argv': argv, 'cwd': str(cwd), 'exit_code': code, 'error': error,
+                   'elapsed_seconds': time.monotonic() - start, 'log_sha256': sha(OUT / (name + '.log'))})
+    print(name, code, flush=True)
+    if code:
+        break
+after = state(ROOT)
+source_matches = all((ROOT / p).is_file() and sha(ROOT / p) == digest for p, digest in audit['source_bindings'].items())
+actual_prepared = {str(p.relative_to(ROOT)): sha(p) for dep in ('upstream', 'typesetting')
+                   for p in sorted((ROOT / 'drivers/cogent/build' / dep).rglob('*')) if p.is_file()}
+record = {'schema': 1, 'before': before, 'after': after, 'target_commit': target, 'checks': checks,
+          'scope': 'Guarded canonical local fast-forward and fresh pinned preparation. Exact reviewed/source/prepared byte equality reuses candidate tests; no canonical GUI/performance or full compiler closure claim.',
+          'source_files': len(audit['source_bindings']), 'source_bytes_match': source_matches,
+          'prepared_files': len(actual_prepared), 'prepared_bytes_match': actual_prepared == audit['prepared_bindings'],
+          'audit_sha256': sha(audit_path), 'producer_sha256': sha(Path(__file__))}
+record['result'] = 'PASS' if len(checks) == 3 and all(c['exit_code'] == 0 for c in checks) and source_matches and record['prepared_bytes_match'] and after == {'head': target, 'branch': 'codex/foundation-completion', 'status': ''} else 'FAILED'
+(OUT / 'qualification.json').write_text(json.dumps(record, indent=2) + '\n')
+(OUT / 'producer.py.txt').write_bytes(Path(__file__).read_bytes())
+print(record['result'], target, flush=True)
+raise SystemExit(0 if record['result'] == 'PASS' else 1)

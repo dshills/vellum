@@ -1,0 +1,33 @@
+{
+  "scope": "One actual owner sync on warmed retained native Core cells/headers; count observers are nondestructive. Actual softwareRGBA recorded afterexplicitmanualframes at96/120/144/192, no GPU claim.",
+  "command": [
+    "go",
+    "test",
+    "-tags",
+    "offscreen",
+    "-race",
+    "-count=1",
+    "-v",
+    "-run",
+    "TestManagedGridRetainedWidgetsUpdateOncePerSync",
+    "./..."
+  ],
+  "exit_code": 1,
+  "files": {
+    "drivers/cogent/grid.go": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a",
+    "drivers/cogent/grid_update_offscreen_test.go": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343"
+  },
+  "log_sha256": "73368317d2d2b08cbbf254dcb66eb14cd965aa4cf896007387db5a89cb223001",
+  "expected_double_pass_failures": 1626,
+  "other_failures": [],
+  "raster_records": [
+    "dpi=96 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=2aff14b5fb13de6d64e48d557eb3e6d7faf0d8fd9a2d9978a81f222007915bed",
+    "dpi=96 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=9c2db4147fb7e74538a6907a131eb3ea648ffd5a6ce47218fd2f2a275cd86224",
+    "dpi=120 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=4f9c4b7574079249de9670166703da8db5afa886014a9fe366a3f653912231b6",
+    "dpi=120 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=3426cb8b439247a7629f550adbaf7ecd8ad99cb2854ac38c549b3019fad267a3",
+    "dpi=144 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=0a0717d86fdf5e70f0e2999f58b8af2f01c4d19fe21ef04e987eb5326d3587d5",
+    "dpi=144 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=6b76e62f6d171f4d8b790970c4593df313c656fce3be1013088789d1f2978d78",
+    "dpi=192 phase=replace-scroll-select bounds=(0,0)-(860,620) stride=3440 sha256=34d184a00dd9e15dc78a31bdd0bffe77f0cc5862ffc9b535cda01fdd82521253",
+    "dpi=192 phase=clear-and-move-cursor bounds=(0,0)-(860,620) stride=3440 sha256=c7e90e21f53777b4a2b1a249905f01861421e494aed5a335e2223d339e8eabd9"
+  ]
+}

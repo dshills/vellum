@@ -103,6 +103,12 @@ to owner work and completed composition, including intermediate post-input
 native paints. The unchanged warm targets require actual release measurements;
 the existence of instrumentation and CPU tests does not establish a target pass.
 
+The [single host-update checkpoint](../docs/reports/macos-grid-update/README.md)
+removes duplicate pooled cell/header updater/style passes with matched
+offscreen software pixels. Three interleaved fixed-10k release processes per
+build observe p95 19.55→17.07ms and p99 20.41→18.00ms. The unchanged targets
+remain failed; the complete multi-case P6 campaign remains open.
+
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "resolved": true,
+  "production_unchanged_after_review": true,
+  "finding": "49367d7573675052",
+  "status": "fixed",
+  "resolution": "Removed only the three-line post-phase firstCursor inactivity assumption. Initial fixture validation and all per-slot current-projection text/style/geometry checks remain. Final-test original-code overlay still has exactly1626 count-only failures; corrected code passes race3 with24 exact softwareRGBA matches. Original Prism exit1/result retained; no second provider call for this independently approved test-only correction.",
+  "original_test_sha256": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+  "final_test_sha256": "d249623f0e8c08a9081221945a9d005382daee46695ffab23dbc25b9596c3289",
+  "delta_sha256": "76ff30f314d623186c30548021d0684afca60171b3e980475fa83daa86064902",
+  "qualification_sha256": "f8c65a3c24f1698a1dc078e00d508d09b4c8ba71dc7851671741984b2c7d19c0",
+  "independent_review_sha256": "915713f645c001a1523c7c83d90e5fef3f7f3ef55b1e97e493ac29cd347c7f51",
+  "inherited_checks": "Runtime/grid source, seven other review files, release builds, affected existing offscreen grid/frame race, native vets and six source-bound A/B processes unchanged. Test-only correction requalified separately.",
+  "producer_refusal": "Initial final-test producer misclassified known raster t.Logf records. That FAIL proof and raw logs are preserved; exact known-record/grammar classification fixes only the proof, with no test rerun or source edits."
+}

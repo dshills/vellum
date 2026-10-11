@@ -44,3 +44,9 @@ P6 remains open. The next phase optimizes the measured reconciliation and raster
 costs, then repeats unchanged workloads and targets. Native/GPU allocation
 attribution, novel strings/cold caches, tree latency, endurance, physical
 presentation and external accessibility remain separate acceptance checks.
+
+The subsequent [single host-update checkpoint](../macos-grid-update/README.md)
+removes duplicate per-slot updater/style work. Its interleaved fixed-10k release
+comparison observes p95 19.55→17.07ms and p99 20.41→18.00ms while preserving
+geometry and software-frame pixels. It is a three-process-per-build exploration;
+the unchanged targets remain failed and the broader acceptance checks stay open.

@@ -1,0 +1,10 @@
+{
+  "classification": "REVIEW-TOOL VALIDATOR ERROR, NOT SOURCE OR TEST FAILURE",
+  "script_sha256": "521a56e1899f93abc4b896ba9ba4b82df1115054ed6dbb4525644c13d5a8b22e",
+  "command": [
+    "python3",
+    "/private/tmp/vellum-grid-update-review/final/audit.py"
+  ],
+  "exit_code": 1,
+  "detail": "Validator wrongly expected per-test verbose PASS lines in the root affected-checks log. The recorded Go invocation omits -v; its log records package success. Final audit checks the exact anchored selection command and exit/log binding without claiming individual verbose transcripts."
+}

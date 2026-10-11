@@ -1,0 +1,169 @@
+{
+  "schema": "vellum-independent-source-review-v1",
+  "result": "APPROVED",
+  "reviewer_task": "/root/platform_completion",
+  "scope": "Single pooled grid Text.Update removal, new actual Core offscreen regression, and the scoped duplicate-work paragraph in specs/grid-native.md. Native A/B and final report prose require a separate evidence/docs leaf.",
+  "root": "/private/tmp/vellum-large-data",
+  "audit": {
+    "path": "/private/tmp/vellum-grid-update-review/audit.json",
+    "sha256": "85cc50985c7c2901d58c62a0afcc5b9226b4c808e2d9df54aebf395f1a480c70"
+  },
+  "verifier": {
+    "path": "/private/tmp/vellum-grid-update-review/audit.py",
+    "sha256": "36b213149a4146dcb1548ff377aa44c7e6a5a128fb7fe320e3e0f55d298ac5f3"
+  },
+  "delta": {
+    "path": "/private/tmp/vellum-grid-update-review/delta.patch.txt",
+    "sha256": "90d7dc5040b9e42963b4d810ca953d50a22109433732ad3a259a17eb38235d1c"
+  },
+  "current_source_hashes": {
+    "drivers/cogent/grid.go": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "drivers/cogent/grid_update_offscreen_test.go": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "specs/grid-native.md": "b32bdba40466c25104febfbac00c1161b6989fbe256e243246bd1ba13a84a88d",
+    "drivers/cogent/grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "drivers/cogent/grid_geometry.go": "8d303fae6e21e49adbbb544a7a1d10763fa03ee44cf57097286ab42092581895",
+    "drivers/cogent/controls.go": "52056503c64f76dc169f8d5534f4380226840d4601c6ebe84b7ec40b5ffc3323",
+    "drivers/cogent/driver.go": "b7dc3446007514d0bc845b76daafb4960b4e475b9d7ed88f756104b5e35c22ba",
+    "drivers/cogent/reconcile.go": "f16868a2a4790988a102b2b90b918dde94af9fb083ab85cf5d4df4db1a4ca196",
+    "drivers/cogent/manual_offscreen.go": "2ba45cc4399aee2f155a76471e7df20d4d2d93f56fe161bbfa65f84cd5057e60",
+    "drivers/cogent/build/upstream/core/update.go": "16e4f84616d958d1fce8b80eaea0906a5e00c14cbec2099fda74aa87626991ca",
+    "drivers/cogent/build/upstream/core/widget.go": "a5a6f524fafdf7dbeb2e2726bfede6c6aa6a704de7e10c4d973e25634b74c98c",
+    "drivers/cogent/build/upstream/core/style.go": "50ca543d3755ec22621bb1409ff68668e45dfc82efa4f0c222f5840845a7bbeb",
+    "drivers/cogent/build/upstream/core/text.go": "247b126f88c56893329541726c37e4452a9482e16e49cde9622bdfe19ab0d02d",
+    "drivers/cogent/build/upstream/core/flags.go": "53952efdda7f239a1f6e57490e872fc10a071a63945f1b0b9084967dac5b6ba6",
+    "drivers/cogent/build/upstream/core/typegen.go": "5ed8f3bb07144bf01db2d057e128f46af7804b6769894d6530032a92e5b07822",
+    "drivers/cogent/build/upstream/core/render.go": "a3c63a4eedf85cb5a2dc519a0e56fd4a967e1e3b5e02dfecc7dde6fffabceba9",
+    "drivers/cogent/build/upstream/core/widgetevents.go": "da23687aebedf16be5ed54346966a5a366b586fc6f024905936e6d29eb70584b"
+  },
+  "author_raw_references": {
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/red-proof.json": "30514c4b5356959e2c55624e0c1340afcfda15a047956460a7434be7c2082ae4",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/red.log": "73368317d2d2b08cbbf254dcb66eb14cd965aa4cf896007387db5a89cb223001",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/green-proof.json": "02eae2e3dd0e9ca750bc1127ceff1081bbecf68c7961c968f55d35db7a6ad1c3",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/green-race3.log": "c49058f64a627c224659cc340fc39b302f4d6434dc9445e2ecb9428557e64a10",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/offscreen-vet.log": "da0cbf087ab69123d86fd78338c71d646dde4cd5707726a5644dcbe2c0649375",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/desktop-vet.log": "d085487f95fe4b396b1ebbc70fadb6dc33c01818686ed335a49e2d1477f188b0",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/original-grid.go.txt": "ae697fe4a997074d0c25b7ea6bd9dba4de72aea458c981f3080dd61e5c77e06a",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/final-grid.go.txt": "19256f6949f747c0581598c8c565317ccb5be2a15961bbc2e95ecbe29520d94b",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/frozen-grid_update_offscreen_test.go.txt": "f1c2ca2ed7c355cb72b7ef0f149250f684657351133596575cdbe6373651d343",
+    "/private/tmp/vellum-grid-update-qualification/widget-regression/qualify-green.py": "bb5001c7336d9a016c417c53210931e3d4cc23bdcbe65b61ef8c64ad60baf450"
+  },
+  "blocking_findings": [],
+  "review_conclusions": [
+    {
+      "claim": "The remaining host Update provides the required parent-first updater/style traversal after all pooled text, geometry properties, invisible/member flags and cursor properties are assigned.",
+      "source": [
+        "drivers/cogent/grid.go:622",
+        "drivers/cogent/grid.go:665",
+        "drivers/cogent/grid.go:685",
+        "drivers/cogent/build/upstream/core/update.go:56",
+        "drivers/cogent/build/upstream/core/widget.go:514"
+      ]
+    },
+    {
+      "claim": "syncGridEditing derives identity/visibility/placement from the accepted portable projection and its separate TextField. It does not require the pooled labels to have updated style/layout first. Its field.Update and explicit focus paths remain unchanged. Slider state also uses portable viewport/extents.",
+      "source": [
+        "drivers/cogent/grid_editing.go:143",
+        "drivers/cogent/grid_editing.go:153",
+        "drivers/cogent/grid_editing.go:225",
+        "drivers/cogent/grid_editing.go:252",
+        "drivers/cogent/grid.go:652"
+      ]
+    },
+    {
+      "claim": "The removed call did not directly enqueue render/wake events. Update invokes NeedsLayout, which only sets sceneNeedsLayout. No texture/surface/trace/scheduler invalidation behavior is changed in this runtime delta.",
+      "source": [
+        "drivers/cogent/build/upstream/core/update.go:65",
+        "drivers/cogent/build/upstream/core/render.go:101"
+      ]
+    },
+    {
+      "claim": "The test measures one successful owner sync on warmed actual Core widget pointers. It checks retained-slot updater/style counts, recycled text/selection/cursor/visibility, measured geometry and detached software RGBA at four DPIs in two mutation phases. Its counting callbacks do not modify style/order. It intentionally preserves raster evidence after the old count-only failures.",
+      "source": [
+        "drivers/cogent/grid_update_offscreen_test.go:37",
+        "drivers/cogent/grid_update_offscreen_test.go:69",
+        "drivers/cogent/grid_update_offscreen_test.go:132",
+        "drivers/cogent/grid_update_offscreen_test.go:158",
+        "drivers/cogent/grid_update_offscreen_test.go:205"
+      ]
+    },
+    {
+      "claim": "Author original source fails with exactly 1626 double-pass count diagnostics and no other test diagnostics; the unchanged test passes race count3 on the candidate and both driver vets exit0. All 24 corrected software RGBA records are equal to the original eight records repeated three times. I independently verified the raw log/proof hashes and the selected before/after map; I did not rerun these checks.",
+      "source": [
+        "/private/tmp/vellum-grid-update-qualification/widget-regression/red-proof.json",
+        "/private/tmp/vellum-grid-update-qualification/widget-regression/green-proof.json"
+      ]
+    },
+    {
+      "claim": "The reviewed spec explicitly limits the guarantee to duplicate work within one successful sync; it preserves inline editor handling and acknowledges mounting/theme/other parent updates. It makes no skipped layout/paint/upload, total-frame update count or performance acceptance claim.",
+      "source": [
+        "specs/grid-native.md:106"
+      ]
+    }
+  ],
+  "failure_authority": [
+    {
+      "path": "drivers/cogent/grid.go:662",
+      "meaning": "syncGridEditing refusal propagates before the final successful host traversal; it is not silently treated as a completed projection."
+    },
+    {
+      "path": "drivers/cogent/controls.go:113",
+      "meaning": "A Grid mount that fails or unwinds before successful return retires binding admission, then deletes its private host; panic/Goexit are not swallowed."
+    },
+    {
+      "path": "drivers/cogent/controls.go:343",
+      "meaning": "syncControl returns syncGrid error."
+    },
+    {
+      "path": "drivers/cogent/driver.go:533",
+      "meaning": "syncRecord propagates control sync error."
+    },
+    {
+      "path": "drivers/cogent/reconcile.go:212",
+      "meaning": "Reconcile returns the retained next root with error for eventual disposal rather than reporting success."
+    },
+    {
+      "path": "drivers/cogent/driver.go:120",
+      "meaning": "Native first reconciliation failure closes the application and requests quit; refresh returns before subsequent successful binding/publication."
+    },
+    {
+      "path": "drivers/cogent/driver.go:335",
+      "meaning": "Native terminal cleanup closes text/accessibility attachments and disposes the control tree under originating root ownership, with closed-app cleanup fallback."
+    },
+    {
+      "path": "drivers/cogent/grid.go:697",
+      "meaning": "Grid disposal clears its measurement/gesture, retires editing and registry ownership, and preserves a still-live previous replacement binding."
+    },
+    {
+      "path": "drivers/cogent/manual_offscreen.go:220",
+      "meaning": "Manual mode records the terminal failure; normal future admissions refuse it. Explicit Close cleanup remains caller-owned, not automatic restoration of partial widget state."
+    },
+    {
+      "path": "drivers/cogent/manual_offscreen.go:375",
+      "meaning": "Manual cleanup disposes the root with closed-owner fallback."
+    }
+  ],
+  "next_phase_observations": [
+    {
+      "status": "SOURCE-BACKED POSSIBILITY, NOT A CONFIRMED PERFORMANCE CAUSE",
+      "topic": "Unchanged-owner duplicate frame path",
+      "source": [
+        "drivers/cogent/grid_geometry.go:128",
+        "drivers/cogent/grid_geometry.go:129",
+        "drivers/cogent/driver.go:144",
+        "drivers/cogent/driver.go:155",
+        "drivers/cogent/grid.go:665",
+        "drivers/cogent/build/upstream/core/render.go:101"
+      ],
+      "analysis": "A completed measurement whose generation/bounds changed invalidates the owner. That dirty refresh can reconcile an otherwise unchanged Grid and call host.Update again, marking layout after the frame that established the measurement. This narrow removal preserves that path. Source inspection alone does not prove how often a separate frame/upload results or which profiled wake/upload samples it explains.",
+      "required_evidence_before_change": "Instrument measurement invalidation, matching owner reconciliation and actual subsequent frame/upload, while retaining current-frame geometry/action eligibility publication. Do not suppress the invalidation or mark images unchanged based only on this hypothesis."
+    }
+  ],
+  "limits": [
+    "Selected source/artifact audit only; no complete compiler, prepared dependency or SDK closure claim.",
+    "No independent test, GUI, profile or performance execution in this review.",
+    "Software RGBA equality is scoped to the author fixture, not Cocoa/GPU pixel equivalence.",
+    "One successful sync guarantee does not promise one updater/style pass per entire frame, eliminate inline TextField update, or make every refusal atomically restore private widgets.",
+    "No claim that styling dominates raster/upload/wake cost, that this change satisfies P6, or that it changes texture/surface lifetime.",
+    "Final native A/B metadata and later report/spec prose are outside this certificate and will be reviewed separately."
+  ]
+}

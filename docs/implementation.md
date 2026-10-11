@@ -227,5 +227,9 @@ latency. The stored-grid release runner enforces at least 400 clipped cells,
 paired 10k/million-row geometry and five runs per case for budget qualification.
 The first single-process exploratory probe fails the unchanged 4ms p95/6ms p99
 targets at 20.30ms/22.77ms. See the [timing contract](../specs/grid-performance.md)
-and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open;
-trace-guided reconciliation and raster optimization is the next phase.
+and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open.
+The [single host-update optimization](reports/macos-grid-update/README.md)
+removes duplicate pooled updater/style work. Its interleaved fixed-10k release
+comparison observes p95 19.55→17.07ms and p99 20.41→18.00ms with matching
+geometry and software-frame pixels. This remains an exploratory comparison;
+unchanged-generation refresh and raster/upload costs are the next investigations.

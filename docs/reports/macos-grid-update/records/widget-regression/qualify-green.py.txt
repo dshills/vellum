@@ -1,0 +1,31 @@
+"""Bound the exact one-pass regression and legacy software-pixel equality."""
+from pathlib import Path
+import hashlib,json,shlex,subprocess,sys,time
+ROOT=Path('/private/tmp/vellum-large-data');OUT=Path(__file__).resolve().parent
+sys.path.insert(0,str(ROOT/'scripts'))
+from child_process import run_child
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+FILES=['drivers/cogent/grid.go','drivers/cogent/grid_update_offscreen_test.go','drivers/cogent/grid_offscreen_test.go','drivers/cogent/grid_selection_offscreen_test.go','drivers/cogent/manual_offscreen_test.go','drivers/cogent/env.sh','drivers/cogent/go.mod','drivers/cogent/go.sum','scripts/child_process.py','drivers/cogent/build/upstream/core/update.go','drivers/cogent/build/upstream/core/style.go','drivers/cogent/build/upstream/core/text.go']
+FILES.extend(str(p.relative_to(ROOT)) for p in sorted((ROOT/'virtual').glob('grid*.go')))
+def inputs():return {p:sha(ROOT/p) for p in FILES}
+before=inputs();before['producer']=sha(Path(__file__))
+red=json.loads((OUT/'red-proof.json').read_text());assert before['drivers/cogent/grid_update_offscreen_test.go']==red['files']['drivers/cogent/grid_update_offscreen_test.go']
+checks=[]
+commands=[('green-race3',['go','test','-tags','offscreen','-race','-count=3','-v','-run','TestManagedGridRetainedWidgetsUpdateOncePerSync','./...']),('offscreen-vet',['go','vet','-tags','offscreen','./...']),('desktop-vet',['go','vet','./...'])]
+for name,cmd in commands:
+ log=OUT/(name+'.log');argv=['/bin/zsh','-c','export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+shlex.quote(str(ROOT/'drivers/cogent/env.sh'))+'\nexec '+shlex.join(cmd)];start=time.monotonic();code=-1;error=None
+ print('START',name,flush=True)
+ with log.open('wb') as stream:
+  stream.write(('argv: '+json.dumps(argv)+'\ncwd: '+str(ROOT/'drivers/cogent')+'\n').encode());stream.flush()
+  try:code=run_child(argv,cwd=ROOT/'drivers/cogent',stdout=stream,stderr=subprocess.STDOUT,timeout=240).returncode
+  except subprocess.TimeoutExpired:code=124;error='timeout and owned group cleanup'
+  except Exception as e:error=repr(e);stream.write(('runner_error: '+error+'\n').encode())
+ item={'name':name,'argv':argv,'exit_code':code,'error':error,'elapsed_seconds':round(time.monotonic()-start,3),'log':str(log),'log_sha256':sha(log)};checks.append(item);print('END',json.dumps(item),flush=True)
+ if code!=0:break
+after=inputs();after['producer']=sha(Path(__file__))
+text=(OUT/'green-race3.log').read_text();raster=[line.strip().split('GRID_UPDATE_RGBA ',1)[1] for line in text.splitlines() if 'GRID_UPDATE_RGBA ' in line]
+expected=red['raster_records'];matches=len(raster)==24 and all(raster.count(line)==3 for line in expected) and set(raster)==set(expected)
+(OUT/'final-grid.go.txt').write_bytes((ROOT/'drivers/cogent/grid.go').read_bytes())
+proof={'scope':'Retained actual Core grid widgets get one updater/style pass per successful owner sync. Final current semantics/geometry/recycled styling and exact softwareRGBA pixels at96/120/144/192 match original double-pass code; no GPU or performance qualification.','before':before,'after':after,'unchanged':before==after,'checks':checks,'red_proof':{'path':str(OUT/'red-proof.json'),'sha256':sha(OUT/'red-proof.json')},'software_rgba':{'original_records':expected,'corrected_records':raster,'exact_original_match_each_repetition':matches},'result':'PASS' if before==after and len(checks)==3 and all(c['exit_code']==0 for c in checks) and matches and 'WARNING: DATA RACE' not in text else 'FAIL'}
+(OUT/'green-proof.json').write_text(json.dumps(proof,indent=2)+'\n');print('PROOF',sha(OUT/'green-proof.json'),proof['result'],flush=True)
+sys.exit(0 if proof['result']=='PASS' else 1)
