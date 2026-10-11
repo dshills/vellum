@@ -225,6 +225,11 @@ func desktopSmoke(ctx context.Context, p *gridProgram) error {
 			return err
 		}
 	}
+	if p.editableCells {
+		if err := desktopCellEditing(ctx, p, second); err != nil {
+			return err
+		}
+	}
 	if err = owned(p.owner, func() error { return p.owner.CloseWindow(first.id) }); err != nil {
 		return err
 	}
@@ -248,6 +253,176 @@ func desktopSmoke(ctx context.Context, p *gridProgram) error {
 		return errors.New("grid smoke: last domain window lifetime remains active")
 	}
 	emit("pass", struct{ Scope string }{"desktop measured geometry, explicit model commands, closed-binding refusal and domain lifetimes; no human input/performance claim"})
+	return nil
+}
+
+func waitCellSaved(ctx context.Context, w *gridWindow, key, column, text string, version uint64) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	ticker := time.NewTicker(5 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		var pending bool
+		var edit virtual.GridEditState
+		var value cellOverride
+		var status string
+		if err := owned(w.owner, func() error {
+			pending, status = w.cellCommitPending, w.status
+			var err error
+			edit, err = w.grid.Edit()
+			if err != nil {
+				return err
+			}
+			value, err = w.source.cellValue(key, column)
+			return err
+		}); err != nil {
+			return err
+		}
+		if !pending {
+			if edit.Active || value.text != text || value.version != version {
+				return fmt.Errorf("grid smoke: settled cell commit mismatch: edit=%+v value=%+v status=%s", edit, value, status)
+			}
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("grid smoke: cell acknowledgment: %w; edit=%+v status=%s", ctx.Err(), edit, status)
+		case <-ticker.C:
+		}
+	}
+}
+
+// Desktop editing uses public owner commands and an actual originating editor
+// settlement before Save. It does not synthesize pointer, key or human IME input.
+func desktopCellEditing(ctx context.Context, p *gridProgram, w *gridWindow) error {
+	key, column, draft := rowKey(7), columnID(1), "Saved 😀 é עברית"
+	var original *gridSource
+	var starting virtual.GridEditState
+	if err := owned(p.owner, func() error {
+		if err := w.projection(false, false); err != nil {
+			return err
+		}
+		if err := w.grid.JumpToKey(key, columnID(0)); err != nil {
+			return err
+		}
+		if err := w.beginCell(); !errors.Is(err, virtual.ErrGridEditReadOnly) {
+			return fmt.Errorf("grid smoke: read-only column admitted: %v", err)
+		}
+		if err := w.grid.JumpToKey(key, column); err != nil {
+			return err
+		}
+		if err := w.beginCell(); err != nil {
+			return err
+		}
+		original = w.source
+		var err error
+		starting, err = w.grid.Edit()
+		if err != nil {
+			return err
+		}
+		if err := w.grid.SetEditText("  "); err != nil {
+			return err
+		}
+		if err := w.commitCell(); !errors.Is(err, errCellValidation) || w.source != original {
+			return errors.New("grid smoke: validation changed source or discarded draft")
+		}
+		if err := w.grid.SetEditText(draft); err != nil {
+			return err
+		}
+		if err := w.projection(true, true); err != nil {
+			return err
+		}
+		hidden, err := w.grid.Edit()
+		if err != nil || hidden.Status != virtual.GridEditUnavailable || hidden.Text != draft || hidden.Session != starting.Session {
+			return fmt.Errorf("grid smoke: hidden recoverable draft: %+v %v", hidden, err)
+		}
+		before := w.source
+		if err := w.commitCell(); !errors.Is(err, virtual.ErrGridEditConflict) || w.source != before {
+			return errors.New("grid smoke: filtered-out draft committed")
+		}
+		if err := w.projection(true, false); err != nil {
+			return err
+		}
+		if w.heightControls {
+			wasVariable := w.variableRows
+			if err := w.setVariableRows(!wasVariable); err != nil {
+				return err
+			}
+			if err := w.setVariableRows(wasVariable); err != nil {
+				return err
+			}
+		}
+		if err := w.grid.JumpToKey(key, column); err != nil {
+			return err
+		}
+		w.report(nil)
+		return nil
+	}); err != nil {
+		return err
+	}
+	if _, err := waitInspection(ctx, w); err != nil {
+		return err
+	}
+	if err := owned(p.owner, func() error { err := w.requestCellCommit(); w.report(err); return err }); err != nil {
+		return err
+	}
+	if err := waitCellSaved(ctx, w, key, column, draft, 2); err != nil {
+		return err
+	}
+	saved, err := waitInspection(ctx, w)
+	if err != nil {
+		return err
+	}
+	matched := false
+	for _, cell := range saved.Cells {
+		matched = matched || cell.RowKey == key && cell.ColumnID == column && cell.Text == draft && !cell.Bounds.Empty()
+	}
+	if !matched {
+		return errors.New("grid smoke: accepted edited value missing from completed frame")
+	}
+	var conflicted virtual.GridEditState
+	if err := owned(p.owner, func() error {
+		old, err := original.cellValue(key, column)
+		if err != nil || old.text != starting.Original || old.version != 1 {
+			return errors.New("grid smoke: immutable pre-edit source changed")
+		}
+		if err := w.beginCell(); err != nil {
+			return err
+		}
+		if err := w.grid.SetEditText("older draft"); err != nil {
+			return err
+		}
+		if err := w.externalCell(); err != nil {
+			return err
+		}
+		conflicted, err = w.grid.Edit()
+		if err != nil || conflicted.Status != virtual.GridEditConflict || conflicted.BaseVersion != 2 || conflicted.CurrentVersion != 3 || conflicted.Text != "older draft" {
+			return fmt.Errorf("grid smoke: external conflict lost: %+v %v", conflicted, err)
+		}
+		before := w.source
+		if err := w.commitCell(); !errors.Is(err, virtual.ErrGridEditConflict) || w.source != before {
+			return errors.New("grid smoke: draft silently overwrote external version")
+		}
+		if err := w.cancelCell(); err != nil {
+			return err
+		}
+		if len(w.source.overrides) != 1 || len(p.windows[0].source.overrides) != 0 {
+			return errors.New("grid smoke: bounded/independent sparse domain edits lost")
+		}
+		w.report(nil)
+		return nil
+	}); err != nil {
+		return err
+	}
+	if _, err := waitInspection(ctx, w); err != nil {
+		return err
+	}
+	emit("editable-cells", struct {
+		Key, Column                   string
+		SavedVersion, ExternalVersion uint64
+		Conflict                      virtual.GridEditStatus
+		SparseOverrides               int
+	}{key, column, 2, 3, conflicted.Status, 1})
 	return nil
 }
 

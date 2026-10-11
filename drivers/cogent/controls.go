@@ -47,6 +47,7 @@ type controlState struct {
 	textEpoch         uint64
 	editor            *editorBinding
 	grid              *gridBinding
+	gridEdit          *gridEditBinding
 	fieldState        *core.TextFieldEditingState
 	fieldSelection    *editor.Selection
 	fieldNativeActive atomic.Bool           // native acceptance snapshot; focus callbacks may run outside the application owner
@@ -201,9 +202,9 @@ func postControl(r *record, fn func()) {
 	}
 }
 func dispatchControl(r *record, e events.Event) {
-	if r.control == nil {
+	if r.control == nil || r.control.gridEdit != nil {
 		return
-	}
+	} // private draft is synchronized only at the originating boundary/barrier
 	change := ui.ChangeEvent{ID: r.node.ID, Kind: r.node.Kind}
 	switch w := r.widget.(type) {
 	case *core.Switch:
@@ -593,6 +594,9 @@ func bindControlWake(r *record, wake func(events.Event), onError ...func(error))
 			r.control.onError = onError[0]
 		}
 	}
+	if edit := gridEditingRecord(r); edit != nil {
+		bindControlWake(edit, wake, onError...)
+	}
 	for _, c := range r.children {
 		bindControlWake(c, wake, onError...)
 	}
@@ -637,6 +641,9 @@ func applyFocus(root *record, request ui.FocusRequest, last *ui.FocusRequest) er
 // A Tabs descriptor focuses an enabled header button, never its nonfocusable
 // native container. Prefer the selected option, then the first enabled option.
 func focusWidget(r *record) (core.Widget, error) {
+	if edit := gridEditingRecord(r); edit != nil && !edit.node.Disabled {
+		return edit.widget, nil
+	}
 	if r.node.Kind != ui.Tabs {
 		return r.widget, nil
 	}

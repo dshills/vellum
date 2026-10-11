@@ -189,5 +189,10 @@ All with bounded stable-key exceptions, and permits cancellable enumeration on
 workers. The managed grid routes Shift/Command selection and exposes visible
 membership independently of its cursor. `examples/grid -row-selection` adds
 All/Clear controls and combines with `-variable-rows`.
-Native performance, editing, loaded projection integration and large-tree
+Optional [cell drafts](../specs/grid-editing.md) add per-cell versions, bounded
+recoverable drafts and atomic immutable-source completion after application
+validation. The Mac adapter uses one native inline field and settles its input
+before commit. `examples/grid -editable-cells` demonstrates sparse copy-on-write
+edits, external-cell conflicts and cancellation alongside the existing modes.
+Native performance, loaded projection integration and large-tree
 completion remain subsequent P6 work.

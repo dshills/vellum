@@ -1,0 +1,22 @@
+[
+  {
+    "name": "portable-race20",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go cell_editing_test.go",
+    "cwd": "/private/tmp/vellum-grid-cell-editing/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 2.391,
+    "log": "/private/tmp/vellum-grid-edit-example/qualified-v1/portable-race20.log",
+    "log_sha256": "a4d07f4c7eed6afdf7e01d658795524c33a82c3f8be3b3e63ea75d77bed2536a"
+  },
+  {
+    "name": "managed-race",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v ./...",
+    "cwd": "/private/tmp/vellum-grid-cell-editing/examples/grid",
+    "exit_code": 1,
+    "timed_out": false,
+    "elapsed_seconds": 320.641,
+    "log": "/private/tmp/vellum-grid-edit-example/qualified-v1/managed-race.log",
+    "log_sha256": "c040f738f2688db01c9eaeaaf2c81d2c6a9eb4f54c23213285c9fcbfcbbb2682"
+  }
+]

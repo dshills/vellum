@@ -1,0 +1,337 @@
+package virtual
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"strings"
+	"unicode/utf8"
+)
+
+var (
+	ErrGridEditBusy     = errors.New("virtual: grid already has an edit draft")
+	ErrGridEditConflict = errors.New("virtual: grid edit conflicts with its source")
+	ErrGridEditReadOnly = errors.New("virtual: grid cell is read-only")
+)
+
+// GridEditSource opts into single-cell drafts. Version identifies the exact
+// cell value and must increase on every value/editability change, including ABA.
+// Order, filter and geometry changes alone must preserve it. EditCell is bounded,
+// owner-confined, nonblocking, and agrees with Cell within each source revision.
+// A row key cannot be reused within an Identity, even after removal.
+type GridEditSource interface {
+	GridSource
+	EditCell(rowKey, columnID string) (GridEditValue, error)
+}
+
+type GridEditValue struct {
+	Text     string
+	Version  uint64
+	Editable bool
+}
+
+type GridEditStatus string
+
+const (
+	GridEditReady       GridEditStatus = "ready"
+	GridEditConflict    GridEditStatus = "conflict"
+	GridEditUnavailable GridEditStatus = "unavailable"
+	GridEditIncarnation GridEditStatus = "incarnation"
+	GridEditReadOnly    GridEditStatus = "read-only"
+)
+
+// GridEditState is a detached, bounded snapshot. Text is the recoverable draft;
+// Original is its exact baseline. CurrentText is the most recently admitted
+// source value (empty for an unavailable row or changed incarnation).
+type GridEditState struct {
+	Active                                        bool
+	RowKey, ColumnID, Original, Text, CurrentText string
+	BaseVersion, CurrentVersion, Revision         uint64
+	Status                                        GridEditStatus
+	Session                                       uint64
+}
+
+type gridEditDraft struct {
+	state    GridEditState
+	identity string
+	token    *gridRefToken
+}
+
+// GridEditRequest is an opaque, copyable proposal with no source or Grid
+// backpointer. Prepare again after any source or draft change. Construct an
+// immutable candidate source first; never mutate the live domain before
+// CompleteEdit accepts it. Domain validation belongs before PrepareEdit.
+type GridEditRequest struct {
+	token *gridRefToken
+	state GridEditState
+	stamp GridStamp
+}
+
+func (r GridEditRequest) State() GridEditState { return r.state }
+func (r GridEditRequest) Stamp() GridStamp     { return r.stamp }
+
+func (g *Grid) checkedEditCell(source GridSource, stamp GridStamp, rowKey, columnID string) (GridEditValue, bool, error) {
+	if _, err := g.columnIndex(columnID); err != nil {
+		return GridEditValue{}, false, err
+	}
+	_, found, err := checkedGridIndex(source, stamp, rowKey)
+	if err != nil || !found {
+		return GridEditValue{}, found, err
+	}
+	s, ok := source.(GridEditSource)
+	if !ok {
+		return GridEditValue{}, false, ErrGridSource
+	}
+	value, err := s.EditCell(rowKey, columnID)
+	if err != nil {
+		return GridEditValue{}, false, fmt.Errorf("%w: edit cell: %w", ErrGridSource, err)
+	}
+	if value.Version == 0 || !utf8.ValidString(value.Text) || strings.ContainsRune(value.Text, 0) {
+		return GridEditValue{}, false, ErrGridSource
+	}
+	if len(value.Text) > g.config.MaxEditBytes {
+		return GridEditValue{}, false, ErrGridCapacity
+	}
+	text, err := source.Cell(rowKey, columnID)
+	if err != nil {
+		return GridEditValue{}, false, fmt.Errorf("%w: edit baseline: %w", ErrGridSource, err)
+	}
+	if text != value.Text {
+		return GridEditValue{}, false, ErrGridSource
+	}
+	if err := sameStamp(source, stamp); err != nil {
+		return GridEditValue{}, false, err
+	}
+	value.Text = strings.Clone(value.Text)
+	return value, true, nil
+}
+
+func (g *Grid) editForSource(source GridSource, stamp GridStamp) (gridEditDraft, error) {
+	d := g.edit
+	if !d.state.Active {
+		return d, nil
+	}
+	if stamp.Identity != d.identity {
+		d.state.Status, d.state.CurrentVersion, d.state.CurrentText = GridEditIncarnation, 0, ""
+		return d, nil
+	}
+	v, found, err := g.checkedEditCell(source, stamp, d.state.RowKey, d.state.ColumnID)
+	if err != nil {
+		return d, err
+	}
+	if !found {
+		d.state.Status, d.state.CurrentVersion, d.state.CurrentText = GridEditUnavailable, 0, ""
+		return d, nil
+	}
+	d.state.CurrentVersion, d.state.CurrentText = v.Version, v.Text
+	switch {
+	case v.Version < d.state.BaseVersion:
+		return d, ErrGridSource
+	case v.Version == d.state.BaseVersion && v.Text != d.state.Original:
+		return d, ErrGridSource // version reuse violates the source contract
+	case !v.Editable:
+		d.state.Status = GridEditReadOnly
+	case v.Version != d.state.BaseVersion:
+		d.state.Status = GridEditConflict
+	default:
+		d.state.Status = GridEditReady
+	}
+	return d, nil
+}
+
+func (g *Grid) BeginEdit(ref GridCellRef) error {
+	if err := g.current(); err != nil {
+		return err
+	}
+	if !g.config.CellEditing {
+		return ErrGridEditReadOnly
+	}
+	if g.edit.state.Active {
+		return ErrGridEditBusy
+	}
+	if ref.token != g.token || ref.generation != g.generation {
+		return ErrGridStale
+	}
+	if ref.column < 0 || ref.column >= len(g.columns) || g.columns[ref.column].ID != ref.columnID {
+		return ErrGridStale
+	}
+	key, err := checkedGridRow(g.source, g.stamp, ref.row)
+	if err != nil {
+		return err
+	}
+	if key != ref.key {
+		return ErrGridStale
+	}
+	return g.beginEdit(key, ref.columnID)
+}
+
+// BeginActiveEdit is for owner-held commands such as Enter/F2. Unlike a pointer
+// command, it resolves the current active cell when admitted on the owner.
+func (g *Grid) BeginActiveEdit() error {
+	if err := g.current(); err != nil {
+		return err
+	}
+	if !g.config.CellEditing {
+		return ErrGridEditReadOnly
+	}
+	if g.edit.state.Active {
+		return ErrGridEditBusy
+	}
+	if g.active.RowKey == "" {
+		return ErrGridRange
+	}
+	return g.beginEdit(g.active.RowKey, g.active.ColumnID)
+}
+func (g *Grid) beginEdit(rowKey, columnID string) error {
+	if g.editSerial == math.MaxUint64 {
+		return ErrGridExhausted
+	}
+	v, found, err := g.checkedEditCell(g.source, g.stamp, rowKey, columnID)
+	if err != nil {
+		return err
+	}
+	if !found {
+		return ErrGridRange
+	}
+	if !v.Editable {
+		return ErrGridEditReadOnly
+	}
+	if strings.ContainsAny(v.Text, "\r\n") {
+		return ErrGridInvalid
+	}
+	if err := g.nextGeneration(); err != nil {
+		return err
+	}
+	if err := g.current(); err != nil {
+		return err
+	}
+	g.editSerial++
+	g.edit = gridEditDraft{identity: strings.Clone(g.stamp.Identity), token: new(gridRefToken), state: GridEditState{
+		Active: true, RowKey: strings.Clone(rowKey), ColumnID: strings.Clone(columnID), Original: v.Text, Text: v.Text,
+		CurrentText: v.Text, BaseVersion: v.Version, CurrentVersion: v.Version, Revision: 1, Status: GridEditReady,
+		Session: g.editSerial,
+	}}
+	g.generation++
+	return nil
+}
+
+func (g *Grid) Edit() (GridEditState, error) {
+	if err := g.valid(); err != nil {
+		return GridEditState{}, err
+	}
+	return g.edit.state, nil
+}
+func (g *Grid) SetEditText(text string) error {
+	if err := g.valid(); err != nil {
+		return err
+	}
+	if !g.edit.state.Active {
+		return ErrGridRange
+	}
+	if !utf8.ValidString(text) || strings.ContainsAny(text, "\x00\r\n") {
+		return ErrGridInvalid
+	}
+	if len(text) > g.config.MaxEditBytes {
+		return ErrGridCapacity
+	}
+	if text == g.edit.state.Text {
+		return nil
+	}
+	if g.edit.state.Revision == math.MaxUint64 {
+		return ErrGridExhausted
+	}
+	if err := g.nextGeneration(); err != nil {
+		return err
+	}
+	g.edit.state.Text = strings.Clone(text)
+	g.edit.state.Revision++
+	g.generation++
+	return nil
+}
+func (g *Grid) CancelEdit() error {
+	if err := g.valid(); err != nil {
+		return err
+	}
+	if !g.edit.state.Active {
+		return nil
+	}
+	if err := g.nextGeneration(); err != nil {
+		return err
+	}
+	g.edit = gridEditDraft{}
+	g.generation++
+	return nil
+}
+
+func (g *Grid) PrepareEdit() (GridEditRequest, error) {
+	if err := g.current(); err != nil {
+		return GridEditRequest{}, err
+	}
+	if !g.edit.state.Active {
+		return GridEditRequest{}, ErrGridRange
+	}
+	d, err := g.editForSource(g.source, g.stamp)
+	if err != nil {
+		return GridEditRequest{}, err
+	}
+	if d.state.Status == GridEditReadOnly {
+		return GridEditRequest{}, ErrGridEditReadOnly
+	}
+	if d.state.Status != GridEditReady {
+		return GridEditRequest{}, ErrGridEditConflict
+	}
+	if err := g.current(); err != nil {
+		return GridEditRequest{}, err
+	}
+	return GridEditRequest{token: d.token, state: d.state, stamp: g.stamp}, nil
+}
+func (g *Grid) checkEditRequest(r GridEditRequest) error {
+	if r.token == nil || r.token != g.edit.token || !g.edit.state.Active || r.state != g.edit.state || r.stamp != g.stamp {
+		return ErrGridStale
+	}
+	d, err := g.editForSource(g.source, g.stamp)
+	if err != nil {
+		return err
+	}
+	if d.state.Status == GridEditReadOnly {
+		return ErrGridEditReadOnly
+	}
+	if d.state.Status != GridEditReady {
+		return ErrGridEditConflict
+	}
+	return sameStamp(g.source, g.stamp)
+}
+
+// CompleteEdit atomically installs a validated immutable candidate and closes
+// the draft. A failure preserves the live source, draft, generation and refs.
+// Caller installs its domain/source pointer only after this method succeeds.
+// No user mutation/validation callback runs inside this transaction.
+func (g *Grid) CompleteEdit(request GridEditRequest, candidate GridSource) error {
+	if err := g.current(); err != nil {
+		return err
+	}
+	if err := g.checkEditRequest(request); err != nil {
+		return err
+	}
+	stamp, err := sourceStamp(candidate)
+	if err != nil {
+		return err
+	}
+	if stamp.Identity != g.stamp.Identity || stamp.Revision <= g.stamp.Revision {
+		return ErrGridStale
+	}
+	v, found, err := g.checkedEditCell(candidate, stamp, request.state.RowKey, request.state.ColumnID)
+	if err != nil {
+		return err
+	}
+	if !found {
+		return ErrGridEditConflict
+	}
+	if !v.Editable {
+		return ErrGridEditReadOnly
+	}
+	if v.Version <= request.state.BaseVersion || v.Text != request.state.Text {
+		return ErrGridEditConflict
+	}
+	return g.replaceSource(candidate, &request)
+}

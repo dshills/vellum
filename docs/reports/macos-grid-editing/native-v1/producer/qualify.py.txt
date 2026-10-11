@@ -1,0 +1,54 @@
+import hashlib,json,os,subprocess,sys,time
+from pathlib import Path
+ROOT=Path('/private/tmp/vellum-grid-cell-editing')
+OUT=Path('/private/tmp/vellum-grid-editing-native/qualified-v1')
+OWNED=['drivers/cogent/grid_editing.go','drivers/cogent/grid_editing_offscreen_test.go','drivers/cogent/grid.go','drivers/cogent/grid_geometry.go','drivers/cogent/controls.go','drivers/cogent/editor.go','drivers/cogent/editor_geometry.go','drivers/cogent/accessibility.go','drivers/cogent/accessibility_workbench.go','drivers/cogent/manual_offscreen.go','specs/grid-native.md']
+sys.path.insert(0,str(ROOT/'scripts'))
+from child_process import run_child
+
+def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def entry(path):
+ return {'sha256':digest(path),'bytes':path.stat().st_size} if path.is_file() else {'absent':True}
+def write(path,value):path.write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
+def inputs():
+ paths=set(OWNED+['go.mod','go.sum','drivers/cogent/go.mod','drivers/cogent/go.sum','drivers/cogent/native/dependencies.json','drivers/cogent/env.sh','scripts/child_process.py'])
+ for pattern in ['virtual/grid*.go','ui/*.go','app/*.go','drivers/cogent/*.go','drivers/cogent/internal/textinput/*','drivers/cogent/internal/mailbox/*.go','drivers/cogent/internal/ordered/*.go']:
+  for path in ROOT.glob(pattern):
+   if path.is_file():paths.add(str(path.relative_to(ROOT)))
+ return {p:entry(ROOT/p) for p in sorted(paths)}
+def prepared():
+ result={}
+ for name in ['upstream','typesetting']:
+  directory=(ROOT/'drivers/cogent/build'/name).resolve()
+  h=hashlib.sha256();count=0
+  for p in sorted(directory.rglob('*')):
+   if p.is_file() and '.git' not in p.relative_to(directory).parts:
+    relative=str(p.relative_to(directory));h.update(relative.encode()+b'\0'+bytes.fromhex(digest(p)));count+=1
+  result[name]={'resolved':str(directory),'files':count,'sha256':h.hexdigest(),'algorithm':'sha256(sorted relative UTF8 path + NUL + raw SHA256 of each regular file; exclude .git)'}
+ return result
+
+OUT.mkdir(exist_ok=False)
+owned={p:entry(ROOT/p) for p in OWNED}
+write(OUT/'ownership.json',{'result':'FROZEN','root':str(ROOT),'files':owned})
+for p in OWNED:
+ target=OUT/'owned-sources'/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/p).read_bytes())
+before=inputs();deps=prepared();write(OUT/'inputs-before.json',before);write(OUT/'prepared-before.json',deps)
+print(json.dumps({'frozen_ownership':str(OUT/'ownership.json'),'ownership_sha256':digest(OUT/'ownership.json'),'selected_inputs':len(before)}),flush=True)
+commands=[
+ ['go','test','-tags','offscreen','-race','-count=3','-run','^(TestManagedGridInline|TestManagedEditor|TestManagedTextField)','.' ],
+ ['go','vet','-tags','offscreen','.'],['go','vet','.'],['go','build','.']]
+results=[]
+for i,command in enumerate(commands,1):
+ log=OUT/f'check-{i}.log';started=time.monotonic()
+ with log.open('xb') as stream:
+  r=run_child(command,timeout=600,cwd=ROOT/'drivers/cogent',env=os.environ.copy(),stdout=stream,stderr=subprocess.STDOUT)
+ results.append({'argv':command,'cwd':str(ROOT/'drivers/cogent'),'timeout_seconds':600,'exit_code':r.returncode,'elapsed_seconds':time.monotonic()-started,'log':str(log.relative_to(OUT)),'log_sha256':digest(log)})
+ print(json.dumps(results[-1]),flush=True)
+ if r.returncode:break
+
+after=inputs();afterdeps=prepared();write(OUT/'inputs-after.json',after);write(OUT/'prepared-after.json',afterdeps)
+changed=[p for p in sorted(set(before)|set(after)) if before.get(p)!=after.get(p)]
+result={'schema':1,'result':'PASS' if len(results)==len(commands) and all(r['exit_code']==0 for r in results) and not changed and deps==afterdeps else 'FAIL','scope':'Selected source/interface inputs plus detached aggregate prepared-tree identities. Actual offscreen widget input/settlement/geometry and compatibility; native default compile/vet. No Cocoa GUI, external AX, physical IME, performance or complete dependency closure claim.','producer':{'path':str(Path(__file__)),'sha256':digest(Path(__file__))},'ownership':{'path':'ownership.json','sha256':digest(OUT/'ownership.json')},'inputs_before':{'path':'inputs-before.json','sha256':digest(OUT/'inputs-before.json'),'count':len(before)},'inputs_after':{'path':'inputs-after.json','sha256':digest(OUT/'inputs-after.json'),'count':len(after)},'prepared_before':{'path':'prepared-before.json','sha256':digest(OUT/'prepared-before.json')},'prepared_after':{'path':'prepared-after.json','sha256':digest(OUT/'prepared-after.json')},'changed_inputs':changed,'prepared_unchanged':deps==afterdeps,'commands':results,'environment':{k:os.environ.get(k) for k in ['GOENV','GOWORK','GOTOOLCHAIN','GOFLAGS','GOCACHE','GOMODCACHE','GOPATH','VELLUM_CACHE_DIR']},'historical':{'exploratory_logs':['/private/tmp/vellum-grid-editing-native-exploratory-'+str(i)+'.log' for i in range(1,10)],'qualification':False,'note':'Exploratory development logs were not captured against before/after maps; preserve as unqualified history. Consumer qualified-v1/v2 records separately preserve prior failed/drifting sources.'}}
+write(OUT/'qualification.json',result)
+print(json.dumps({'result':result['result'],'proof':str(OUT/'qualification.json'),'sha256':digest(OUT/'qualification.json')}),flush=True)
+sys.exit(0 if result['result']=='PASS' else 1)

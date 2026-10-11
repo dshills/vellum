@@ -1,0 +1,22 @@
+{
+  "disposition": "REFUTED_UNREACHABLE_TYPE_OR_NIL_STATE",
+  "evidence": [
+    "grid_editing.go:161-173 is the only non-nil assignment to gridBinding.editing. It constructs a private ui.TextField node, checks mountControl error, assigns returned widget, then publishes the complete binding/record. No public descriptor or extension can inject this private record.",
+    "controls.go:115-119 handles the fixed ui.TextField kind using core.NewTextField(parent), so successful private mount always stores concrete non-nil *core.TextField. The same constructor already asserts this concrete type at grid_editing.go:175.",
+    "gridEditingRecord at grid_editing.go:47-53 returns only published, visible, nonretired private records. It has no public setters and never returns generic children or pooled cell widgets.",
+    "disposeEditing at grid_editing.go:133-141 clears g.editing before disposeControl/widget.Delete; disposed controls cannot be returned through gridEditingRecord. disposeGrid marks the grid closed before disposing its editor (grid.go:668-676).",
+    "capture at grid_geometry.go:74-76 refuses retired lifetime; its field read at122-125 follows this retained-type invariant. Capture/layout and native record refresh/retirement follow the existing originating render ownership; domain callback source mutation only invalidates, never rewrites private widget/binding pointers."
+  ],
+  "finding_id": "10d5f689f7cd026c",
+  "limits": [
+    "This adjudication concerns the hypothetical nil/wrong-type internal state, not arbitrary corruption or unsupported reflection mutation of private driver records.",
+    "No production change, test relaxation or new broader thread-safety claim. Actual Cocoa acceptance remains separately recorded."
+  ],
+  "owned_source_map_sha256": "fcfc443636c80b0912a53b40b683d33bb94e5d54af67a38a998aef36ca8ced51",
+  "source_hashes": {
+    "drivers/cogent/controls.go": "8010399f76aa106f560348b44e87b79a68ed55ba4142f81a9352ba497b181fe7",
+    "drivers/cogent/grid.go": "8a959afa66ebb8e685107e4d0afadc5add3273be580c46be6252651724e4ae96",
+    "drivers/cogent/grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "drivers/cogent/grid_geometry.go": "c1841ba8b9311d8c7f4830459abd80933f509f2f1958d148de04ffcfa5687b4b"
+  }
+}

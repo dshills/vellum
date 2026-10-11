@@ -1,0 +1,89 @@
+{
+  "result": "APPROVED_SOURCE_REVIEW",
+  "base": "ed75cce",
+  "scope": "Independent portable, native managed inline cell-editor, consumer, UI/spec and core-qualifier source review. Selected input certification is distinct from final producer qualifications, actual Cocoa and broad dependency closure.",
+  "source_root": "/private/tmp/vellum-grid-cell-editing",
+  "reviewed_sources": {
+    "drivers/cogent/grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "drivers/cogent/grid_editing_offscreen_test.go": "e5750122a16a5585247d7cd3cb7cdd1c7e6afa5d5ac5b4971948c12b3d838894",
+    "drivers/cogent/grid.go": "8a959afa66ebb8e685107e4d0afadc5add3273be580c46be6252651724e4ae96",
+    "drivers/cogent/grid_geometry.go": "c1841ba8b9311d8c7f4830459abd80933f509f2f1958d148de04ffcfa5687b4b",
+    "drivers/cogent/grid_accessibility.go": "3db9d27754faa9a1643fa1ad2c4a416e482f23544f63873dcb27c77979432325",
+    "drivers/cogent/controls.go": "8010399f76aa106f560348b44e87b79a68ed55ba4142f81a9352ba497b181fe7",
+    "drivers/cogent/editor.go": "2787964ce9070389bb06dd769b6cdeb1f3e822d1c8f8c37cb39ce77d20c03ce2",
+    "drivers/cogent/editor_geometry.go": "f9928044137efddc77dba9434836bf25b1f30248f967f267aca31253690f02c5",
+    "drivers/cogent/textinput_darwin.go": "253c91ba31afa423c59a5dc4a1f4e266667c2142ae7c03c28d12096445183d77",
+    "drivers/cogent/accessibility.go": "60f5902f43e479dcb62c2296fec143125e9d38746a4cb96be8b33fa680b9797e",
+    "drivers/cogent/accessibility_workbench.go": "43890c6bc353d7c84f9191df2f0ddf5aad7b1aadf4533663177f4636fa0755be",
+    "drivers/cogent/manual_offscreen.go": "8a22ca10d6645f58aedf558df61885f05b2636e014b147dba4c6e1878520ac50",
+    "ui/node.go": "a7c157db4fe65b2481693295d2bf11c6bd11b9e7c51d4abda4c38707d070fa00",
+    "ui/grid.go": "ca82123129560ceec5045d032bd30a002f36e7499f8ed2dd67eac5ca32cacba0",
+    "ui/controls.go": "6f580d5215102e9db824a35297905ed17a6289d1604dd168879ff80c51a04fac",
+    "ui/grid_edit_test.go": "ba9b725cfcf271f73db7a695ec3aac4d827df3a9232671a57cd13f0f8d191a9c",
+    "examples/grid/source.go": "5fcd9209a8a9628860cabcf76da0f156e6229a670ad7a8f48517a4521807dedd",
+    "examples/grid/model.go": "7e08cf8e20c415146968c3810a5ef713c1c5469f7a54e78a39738ffa6969c3d9",
+    "examples/grid/main.go": "74cf182b8356e5e54b78528028d927ae4488f09c98e8e6c74930671d1b66741c",
+    "examples/grid/smoke.go": "e170809aa68c1dc3680826f434bfc9f7334a39fa2c85ead711253cedbe9d98cf",
+    "examples/grid/cell_editing_test.go": "a2f4e9b33c37f75ac78574acd9c1d3c864ae0b2d11a5ced2cf9582912f0dc72a",
+    "examples/grid/cell_editing_managed_test.go": "f6ad1359b5e33bad372587e263af92a5d4af146c60122b9fd4ab86ddf0a3d516",
+    "examples/grid/README.md": "5ff9dfd28a5995962d5c10db8347e6b7ee3ea856abbbaf4888c168918502be9a",
+    "specs/grid-native.md": "b7d08067775a07d7fe0247a65d020d7776c638920c43b0f51c24c51d63fc2d5e",
+    "specs/grid-editing.md": "a7472e8064168edd2d7420222d1b0e19d8cbf7145a8c20cd74231fe14a481bf3",
+    "specs/grid.md": "2b6c2b9df816850766bede347fe6cdc431d28f67d977418548b8ef9433278510",
+    "specs/framework.md": "d28c51c6d2529438a4629710d6b6a0f228e8c4fd5ce378a7ce6ba3397b6da4f7",
+    "specs/macos-completion.md": "a23857ac77035e74b4a1b3241d3d019ec8e5191f236cf249684ecac696992050",
+    "docs/implementation.md": "1ddbdf176914278125c1f738521f3830724a0d5bb93ffdcfab744763edb288e6",
+    "docs/reports/macos-grid-editing/qualify-core.py": "3c5ec4196f70a6bee1c3844b01d851220f73634865b0b87b431257710b095502",
+    "virtual/grid.go": "7efc01efa509b3525d84b46310851917aeb13250ec35992ab8c57a38c88284f9",
+    "virtual/grid_edit.go": "554bf34576b392c13c71f80a8996dc0412ff1ca0864f040bc15c1270e80456f1",
+    "virtual/grid_edit_test.go": "81a153c9d6ea6a4f8a49e691a4129ce8bb491d03b31bec11de88eabccbe6cb11",
+    "virtual/grid_edit_review_test.go": "e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5",
+    "virtual/grid_edit_transaction_review_test.go": "5766d3fed3d3c8fdfef88f1e6868a145e25a3af400ad9fa67d11356b08d82736"
+  },
+  "reviewed_source_count": 35,
+  "exact_inert_snapshots": "final-source/",
+  "source_and_native_frozen_copy_match": true,
+  "findings": [],
+  "assessment": [
+    "Portable source/value stamps, last admitted edited-cell version and opaque session/request clocks refuse stale/ABA/candidate admission before a single source+draft publication. Draft recovery APIs do not require healthy source metadata. Exact historical red tests are retained; added candidate CAS, drift, exhaustion and detached-string tests are meaningful.",
+    "Private TextField session identity is independent of visible-cell pools. Native accepted bytes import only at originating event/barrier under exact client/shadow epoch/session and owner+lifetime guards; compatibility Change does not read widget state from peer-window owner callbacks.",
+    "View-only hide/conflict retains already admitted same-session native records for seal/ack. Immutable Cocoa rules refuse fresh mutation, while exact old-client unmark/cancel may retire. Owner replacement, Cancel/rebegin and retired bindings invalidate old shadows. Status-derived disabled bypass is confined to accepted private records after parent/modal/tab/lifetime eligibility.",
+    "Visible writable private editor replaces the host Tab stop; hidden/nonready state restores host focusability without reappearance focus theft. Private composition cancels before whole draft Escape. Tab/focus loss preserve drafts without source commit.",
+    "Settlement reserves one originating-window request; deletes it before callback, checks context/client retirement, seals manual preedit by explicit FIFO Step and suppresses whole-application-close user dispatch. Production uses bounded existing main dispatch; no owner/main synchronous wait is added.",
+    "Theme correction applies the current TextField style before mandatory cell geometry, refreshes retained theme, preserves widget/client/session/draft and verifies current foreground/background/type size plus exact cell exterior at fractional DPI. Current header/row labels update private AX context.",
+    "Native measurement Editor pointer and cell/header slices are copied for caller inspection. Source/model reads stay on owner outside Render/Position; native pane geometry/input and AX cached text paths preserve originating lock constraints.",
+    "Consumer immutable COW candidate admission precedes domain pointer publication. Toolbar Save waits originating settlement, then reads latest acknowledged draft; operation token/session guards prevent stale cancellation/ack from overwriting a new operation.",
+    "Core qualifier uses exclusive output marker/log/proof creation and existing owned child-group timeout cleanup. Every check has argv, exit, elapsed, raw log SHA, before/current selected source map and result requiring all checks plus no drift. Current core-v3 maps all 91 selected inputs and three exit-zero raw logs exactly."
+  ],
+  "reviewed_references": {
+    "/private/tmp/vellum-grid-cell-editing-review/draft-3/review.json": "827bddc76280e8f647a7b5eb5051df31c813da7f1843a583dde740110efc9db6",
+    "/private/tmp/vellum-grid-cell-editing-review/draft-3/qualification.json": "eb2e76c6379ef333a981dfe08e7e092b58ad269d36496926eb13dfae0e96d05b",
+    "/private/tmp/vellum-grid-cell-editing-review/archive-ready/handoff.json": "0a2aed4abd0464ebfe6dab798e9d2bd18e0e50af61179e512d5586e4cc1cb3f7",
+    "/private/tmp/vellum-grid-edit-example/consumer-owned-freeze.json": "09548630b2f4e94fbc51bdd89e7fadf1e98c04bcf2b9113cf801e3cb368e8acb",
+    "/private/tmp/vellum-grid-cell-editing-review/native-consumer/consumer-source-review.json": "a37df451d924c8422c7eec6e4b645714a01623d59b0285a4abe0b4520596e161",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/ownership.json": "fcfc443636c80b0912a53b40b683d33bb94e5d54af67a38a998aef36ca8ced51",
+    "/private/tmp/vellum-grid-cell-editing/docs/reports/macos-grid-editing/core-v3/qualification.json": "c55af3a98fead9179334daea0d2fbd4e0e46c0dc9b576164efb236bee45f2f42"
+  },
+  "regression_retention": {
+    "original_three_test_bodies": "Root original review file is byte-identical to reviewer draft-1 test SHA e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5.",
+    "four_additional_test_bodies": "Root transaction file is gofmt-normalized-identical to reviewer original; raw bytes differ only due formatting. Reviewer raw SHA629983605758b2be56e33c2d230ffa4b3c7e7d79eaa3cd3a4094c0529562bc3f; root SHA5766d3fed3d3c8fdfef88f1e6868a145e25a3af400ad9fa67d11356b08d82736."
+  },
+  "withdrawn_hypothesis": {
+    "summary": "Proposed Manual registry early-error leak was independently refuted. Application retains admitted WindowContext IDs lifetime-long, so supported Close returns canceled context,nil. Deterministic isolated window Close at the exact publication seam reaches once; constructor refuses and rollback removes registry. No runtime correction warranted.",
+    "scope": "Test-only overlay inserts lifecycle scheduling hook; candidate source unchanged.",
+    "log": "../native-construction/repro-2.log",
+    "log_sha256": "79090d3aa84a60d521f34cfa0b8caac24c8a21afa98fdac866d61c7365967181",
+    "result": "PASS"
+  },
+  "qualification_status": {
+    "portable_independent": "Approved draft-3 race20 unchanged source maps, separately archived.",
+    "root_core": "core-v3 PASS; 91 selected hashes/current and three raw log digests independently verified; no rerun.",
+    "native_producer": "Frozen owned11 exact current/immutable match; final qualification is separate and pending at certification.",
+    "consumer_producer": "Owned7 approved; v1 failure and v2 source-drift FAIL remain historical; final native-dependent qualifier pending."
+  },
+  "limits": [
+    "No GUI, human IME, external accessibility, physical typing or performance qualification by this review.",
+    "No full dependency/build-source closure or blanket hidden-source provider validation.",
+    "Cell persistence, domain undo, bulk editing, loaded-data workers, sustained P6 workloads and full Mac milestone remain open."
+  ]
+}

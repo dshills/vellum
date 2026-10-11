@@ -95,8 +95,8 @@ func ValidateControl(n Node) error {
 		if _, err := n.Grid.State(); err != nil {
 			return fmt.Errorf("ui: invalid grid: %w", err)
 		}
-	} else if n.Grid != nil || n.GridChange != nil {
-		return fmt.Errorf("ui: Grid/GridChange belong only on data grids")
+	} else if n.Grid != nil || n.GridChange != nil || n.GridCommit != nil {
+		return fmt.Errorf("ui: Grid/GridChange/GridCommit belong only on data grids")
 	}
 
 	if n.Kind == MultilineText && (n.Editor == nil || n.Editor.Validate() != nil) {

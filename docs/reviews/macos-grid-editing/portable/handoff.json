@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "result": "PORTABLE_APPROVED_WITH_PRESERVED_HISTORICAL_RED",
+  "baseline": "ed75cce",
+  "files": {
+    "historical-draft-1/source/grid_edit.go.txt": {
+      "sha256": "b424744c9403aefb301d0977cf52112a3159f380d93c4e90186d2c68b46475a5",
+      "bytes": 9709,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/virtual/grid_edit.go",
+      "classification": "historical red source"
+    },
+    "historical-draft-1/source/grid.go.txt": {
+      "sha256": "7efc01efa509b3525d84b46310851917aeb13250ec35992ab8c57a38c88284f9",
+      "bytes": 23441,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/virtual/grid.go",
+      "classification": "historical red source"
+    },
+    "historical-draft-1/source/grid_edit_test.go.txt": {
+      "sha256": "1f3ed02f7fdf69c0a9e9c8959aa7a3a162109ff3ac267ac5642889bf45982959",
+      "bytes": 8474,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/virtual/grid_edit_test.go",
+      "classification": "historical fixture source"
+    },
+    "historical-draft-1/edit_review_test.go.txt": {
+      "sha256": "e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5",
+      "bytes": 2352,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/edit_review_test.go",
+      "classification": "unchanged original reviewer regressions"
+    },
+    "historical-draft-1/source-inputs.json": {
+      "sha256": "0d122f51f3e5671760d4ca554b44c76ff4e6f90ce3f806eab1a42e6eb1edcd34",
+      "bytes": 750,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/source-inputs.json",
+      "classification": "historical source identity"
+    },
+    "historical-draft-1/compiled-module-inputs.json": {
+      "sha256": "987e809dbc3f716228435c85362683b359f9bc10d281810222a49fb9822b1a67",
+      "bytes": 1882,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/module-inputs.json",
+      "classification": "historical auxiliary compiled input identities; contents not duplicated"
+    },
+    "historical-draft-1/red-qualified.log": {
+      "sha256": "d2ca94447c79369f8d5679958c1c82bcb7ffa62f39773fc4bb5ae68f89fd9523",
+      "bytes": 1760,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/red-qualified.log",
+      "classification": "historical failed regression log"
+    },
+    "historical-draft-1/review.json": {
+      "sha256": "5c1fd684c7faede32df665c8927fda316627b70ca95a06f8fa23572ff8f3281c",
+      "bytes": 2337,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/review.json",
+      "classification": "historical failed review/proof"
+    },
+    "final-draft-3/source/grid_edit.go.txt": {
+      "sha256": "554bf34576b392c13c71f80a8996dc0412ff1ca0864f040bc15c1270e80456f1",
+      "bytes": 10126,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/source/virtual/grid_edit.go",
+      "classification": "final corrected source"
+    },
+    "final-draft-3/source/grid.go.txt": {
+      "sha256": "7efc01efa509b3525d84b46310851917aeb13250ec35992ab8c57a38c88284f9",
+      "bytes": 23441,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/source/virtual/grid.go",
+      "classification": "final corrected source"
+    },
+    "final-draft-3/source/grid_edit_test.go.txt": {
+      "sha256": "81a153c9d6ea6a4f8a49e691a4129ce8bb491d03b31bec11de88eabccbe6cb11",
+      "bytes": 9490,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/source/virtual/grid_edit_test.go",
+      "classification": "final fixture source"
+    },
+    "final-draft-3/source/grid-editing.md": {
+      "sha256": "a7472e8064168edd2d7420222d1b0e19d8cbf7145a8c20cd74231fe14a481bf3",
+      "bytes": 5377,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/source/specs/grid-editing.md",
+      "classification": "final reviewed portable spec"
+    },
+    "final-draft-3/edit_review_test.go.txt": {
+      "sha256": "e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5",
+      "bytes": 2352,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/edit_review_test.go",
+      "classification": "unchanged original reviewer regressions"
+    },
+    "final-draft-3/edit_transaction_review_test.go.txt": {
+      "sha256": "629983605758b2be56e33c2d230ffa4b3c7e7d79eaa3cd3a4094c0529562bc3f",
+      "bytes": 4714,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/edit_transaction_review_test.go",
+      "classification": "additional reviewer regressions"
+    },
+    "final-draft-3/source-inputs.json": {
+      "sha256": "6bc586230730d52241dab6672b3668c1e1dfc850a8ec7f407db46f8d1712ab59",
+      "bytes": 671,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/source-inputs.json",
+      "classification": "final reviewed source identities"
+    },
+    "final-draft-3/green-race20.log": {
+      "sha256": "9dac2361407e2a975583e42b2697dd288ea31ab21f6f3e33a99b19caae50f999",
+      "bytes": 46,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/green-race20.log",
+      "classification": "final corrected regression log"
+    },
+    "final-draft-3/qualification.json": {
+      "sha256": "eb2e76c6379ef333a981dfe08e7e092b58ad269d36496926eb13dfae0e96d05b",
+      "bytes": 5660,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/qualification.json",
+      "classification": "final isolated race20 proof"
+    },
+    "final-draft-3/review.json": {
+      "sha256": "827bddc76280e8f647a7b5eb5051df31c813da7f1843a583dde740110efc9db6",
+      "bytes": 4225,
+      "original_path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/review.json",
+      "classification": "final source-bound approval"
+    },
+    "README.md": {
+      "sha256": "72e613991f2c895b135659e4f3365065a0e0a2c10d4559d8368e4eb0a3e20962",
+      "bytes": 1775,
+      "classification": "handoff scope/readme"
+    }
+  },
+  "file_count": 19,
+  "total_bytes": 118582,
+  "self_hash_excluded": true,
+  "utf8_exact_roundtrip": true,
+  "unchanged_original_regression_sha256": "e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5"
+}

@@ -68,6 +68,35 @@ array. Sparse toggles are bounded by the public Grid configuration. A detached
 or unmount. Consumers must still validate identities against current domain
 data before applying a bulk operation.
 
+Opt into bounded versioned cell editing independently, or combine all modes:
+
+```sh
+go run . -editable-cells
+go run . -variable-rows -row-selection -editable-cells
+go run . -smoke -editable-cells
+```
+
+Return/F2 begins the active cell's single-line draft. Return requests a settled
+commit; Escape cancels composition first, then the cell draft. Tab or focus loss
+preserves the draft without silently committing it. Column zero is read-only.
+The toolbar offers **Edit active cell**, **Save cell**, **Cancel edit** and
+**External update**. Save acknowledges earlier originating native editor records
+before validation and proposal creation; it does not infer completion from an
+owner model read alone.
+
+Each source revision owns at most 4,096 sparse cell overrides. Procedural cells
+start at version 1; each accepted value update increments its cell version and
+source revision. A bounded copy-on-write map makes prior source values immutable,
+without copying or indexing domain rows. Reorder/filter/height revisions keep
+cell versions. Validation requires nonblank UTF-8 text of at most 256 bytes,
+without NUL or line breaks. Validation failure preserves the draft for correction.
+**External update** changes the same domain cell version, producing an explicit
+conflict; the older draft cannot overwrite it. A filtered-out editing row retains
+its recoverable draft but cannot save until that stable key returns. The example
+publishes its domain source pointer only after `Grid.CompleteEdit` accepts the
+immutable candidate. These values are in memory: file persistence, cell undo and
+bulk editing are not implemented by this example.
+
 `go run . -smoke` is a bounded desktop check. It waits for current measured Grid
 frames, verifies both row counts and bounded cell pools, jumps to the millionth
 row and column 19, checks frozen geometry, replaces the indexed source while
@@ -89,6 +118,12 @@ two off, filters the view and checks that the captured count and hidden-key
 membership survive. It compares completed measured selected flags, clears the
 current model, and queries the earlier immutable snapshot outside the owner.
 It does not enumerate the million keys or synthesize desktop input.
+
+With `-editable-cells`, the desktop smoke checks read-only refusal, validation,
+recoverable hidden rows, reorder/optional height changes, a settled Unicode Save,
+immutable old values, an external version conflict and cancellation. It compares
+accepted values with completed measured frames. It uses explicit owner commands
+and originating settlement, rather than synthesized desktop typing.
 
 Portable tests verify indexed key inverses, immutable revisions, invalid keys,
 projection selection/ref retirement, and the same fixed viewport for 10k/1M rows.
@@ -134,6 +169,6 @@ Command+A, Escape and selection buttons, then compare completed measured flags
 at owner batches 1/7/64. The integration owner records desktop execution and
 the new checkpoint evidence separately.
 
-Cell editing/conflicts, tree expansion, loaded-data
+Bulk/multiline cell editing, cell undo, tree expansion, loaded-data
 storage, native services, human accessibility/IME checks and performance
 qualification remain outside this example's evidence. See the public [Grid specification](../../specs/grid.md).

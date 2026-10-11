@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "result": "PASS",
+  "scope": "Editable-grid independent example: exact owned7, preserved9 and selected integration/native inputs, portable race20 inherited with relevant identical inputs, complete actual public offscreen routing race1, vet, desktop race build, two actual Cocoa owner-command/settlement processes. Compact maps are not a complete build source closure.",
+  "source_root": "/private/tmp/vellum-grid-cell-editing",
+  "owned_sources": {
+    "source.go": {
+      "path": "source/source.go.txt",
+      "sha256": "5fcd9209a8a9628860cabcf76da0f156e6229a670ad7a8f48517a4521807dedd"
+    },
+    "model.go": {
+      "path": "source/model.go.txt",
+      "sha256": "7e08cf8e20c415146968c3810a5ef713c1c5469f7a54e78a39738ffa6969c3d9"
+    },
+    "main.go": {
+      "path": "source/main.go.txt",
+      "sha256": "74cf182b8356e5e54b78528028d927ae4488f09c98e8e6c74930671d1b66741c"
+    },
+    "smoke.go": {
+      "path": "source/smoke.go.txt",
+      "sha256": "e170809aa68c1dc3680826f434bfc9f7334a39fa2c85ead711253cedbe9d98cf"
+    },
+    "README.md": {
+      "path": "source/README.md.txt",
+      "sha256": "5ff9dfd28a5995962d5c10db8347e6b7ee3ea856abbbaf4888c168918502be9a"
+    },
+    "cell_editing_test.go": {
+      "path": "source/cell_editing_test.go.txt",
+      "sha256": "a2f4e9b33c37f75ac78574acd9c1d3c864ae0b2d11a5ced2cf9582912f0dc72a"
+    },
+    "cell_editing_managed_test.go": {
+      "path": "source/cell_editing_managed_test.go.txt",
+      "sha256": "f6ad1359b5e33bad372587e263af92a5d4af146c60122b9fd4ab86ddf0a3d516"
+    }
+  },
+  "preserved_sources": {
+    "model_test.go": {
+      "path": "preserved/model_test.go.txt",
+      "sha256": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa"
+    },
+    "managed_test.go": {
+      "path": "preserved/managed_test.go.txt",
+      "sha256": "be399d22ab8b39190a5fcc5c14bd60d9a1b328f3dae142d0c43dc76bda203d43"
+    },
+    "variable_rows_test.go": {
+      "path": "preserved/variable_rows_test.go.txt",
+      "sha256": "59d09ef77c346c192f7d1d033b687ac39a3a28777903b5a83577c32034d922ad"
+    },
+    "variable_rows_managed_test.go": {
+      "path": "preserved/variable_rows_managed_test.go.txt",
+      "sha256": "c35c38375b93914862b66282194ad130745542882551b05963e3d4c334198780"
+    },
+    "selection_rows_test.go": {
+      "path": "preserved/selection_rows_test.go.txt",
+      "sha256": "8d45099cc0a25f02cb0c6bd91e235d32f6801979f922da9fa153404141fcd333"
+    },
+    "selection_rows_managed_test.go": {
+      "path": "preserved/selection_rows_managed_test.go.txt",
+      "sha256": "9d312e67f4e7aded96b1b05bdf71520d87e677995e5ae0a11c3f6337423c40b7"
+    },
+    "go.mod": {
+      "path": "preserved/go.mod.txt",
+      "sha256": "a8783fc2baadfacb99cfe32918cbd292a53d24f956ae7f16a7951eda8da91309"
+    },
+    "go.sum": {
+      "path": "preserved/go.sum.txt",
+      "sha256": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14"
+    },
+    "LICENSE": {
+      "path": "preserved/LICENSE.txt",
+      "sha256": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43"
+    }
+  },
+  "consumer_qualification": {
+    "path": "consumer-v4/qualification.json",
+    "sha256": "0046f94d8c703256ab77fa9c33d177e17a4efc5fd67511cea7f365f70f38f4b9"
+  },
+  "desktop_qualification": {
+    "path": "desktop-v1/qualification.json",
+    "sha256": "13d49d8d1778562737cd20fd6692692c52173fe445680ed0f7f978e2a7f4b47c"
+  },
+  "native_ownership": {
+    "path": "native-v1/ownership.json",
+    "sha256": "fcfc443636c80b0912a53b40b683d33bb94e5d54af67a38a998aef36ca8ced51"
+  },
+  "native_qualification": {
+    "path": "native-v1/qualification.json",
+    "sha256": "18423862370263eaa1cef04a39e980aed10ed1209d698b5800cc2dff76f49558"
+  },
+  "consumer_source_review": {
+    "path": "review/consumer-source-review.json",
+    "sha256": "a37df451d924c8422c7eec6e4b645714a01623d59b0285a4abe0b4520596e161"
+  },
+  "binary": {
+    "path": "/private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop",
+    "sha256": "1e28e57555526cad03263c28a5b6dee2bcd761def20228095db021fed274a42d"
+  },
+  "binary_provenance": {
+    "path": "consumer-v4/binary-provenance.json",
+    "sha256": "29e714bf61057d59d8d6612f6af0f739e03f9e97731ff715886e8735d09bb89c"
+  },
+  "history": [
+    {
+      "version": 1,
+      "result": "FAIL",
+      "reason": "New routes reached Cancel retirement after validation/conflict and reported stale client; native inputs also moved. Old fixed/variable/selection routes passed. No final qualification."
+    },
+    {
+      "version": 2,
+      "result": "HISTORICAL_DRIFT",
+      "reason": "All individual checks0, native grid_editing.go changed while running. No final qualification."
+    },
+    {
+      "version": 3,
+      "result": "HISTORICAL_KNOWN_SOURCE_DRIFT",
+      "reason": "Endpoint automated PASS after native restoration; observed temporary manual_offscreen.go/test mutation makes run historical. Explicit adjudication is authoritative for stability scope. Raw automated proof preserved."
+    }
+  ],
+  "limitations": [
+    "Desktop smokes use public owner commands plus actual originating settlement and completed measured frames; no synthesized desktop typing or physical pointer qualification.",
+    "Offscreen primitive events route through actual public managed Core widgets; no direct UI callback surrogate.",
+    "No human IME/VoiceOver/external AX, performance, loaded million-row data, bulk edits, cell undo or persistent cell storage claim.",
+    "Logical window closure/refusal and runtime process exit are observed; no separately measured compositor/decoder-resource teardown claim.",
+    "Source files in archive are inert .txt copies; executable retained only at binary.path."
+  ],
+  "original_to_archive": {
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/source.go": "source/source.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/model.go": "source/model.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/main.go": "source/main.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/smoke.go": "source/smoke.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/README.md": "source/README.md.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/cell_editing_test.go": "source/cell_editing_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/cell_editing_managed_test.go": "source/cell_editing_managed_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/model_test.go": "preserved/model_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/managed_test.go": "preserved/managed_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/variable_rows_test.go": "preserved/variable_rows_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/variable_rows_managed_test.go": "preserved/variable_rows_managed_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/selection_rows_test.go": "preserved/selection_rows_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/selection_rows_managed_test.go": "preserved/selection_rows_managed_test.go.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/go.mod": "preserved/go.mod.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/go.sum": "preserved/go.sum.txt",
+    "/private/tmp/vellum-grid-cell-editing/examples/grid/LICENSE": "preserved/LICENSE.txt",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/qualification.json": "consumer-v4/qualification.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/compiler.log": "consumer-v4/compiler.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/managed-vet.log": "consumer-v4/managed-vet.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/checks.json": "consumer-v4/checks.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/inputs-before.json": "consumer-v4/inputs-before.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/managed-race.log": "consumer-v4/managed-race.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/native-ownership.json": "consumer-v4/native-ownership.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/binary-provenance.json": "consumer-v4/binary-provenance.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/libraries.log": "consumer-v4/libraries.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/desktop-race-build.log": "consumer-v4/desktop-race-build.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/go-version.log": "consumer-v4/go-version.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/cocoa-smokes/qualification.json": "desktop-v1/qualification.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/cocoa-smokes/fixed.log": "desktop-v1/fixed.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/cocoa-smokes/checks.json": "desktop-v1/checks.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v4/cocoa-smokes/variable.log": "desktop-v1/variable.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v1/qualification.json": "history/consumer-v1/qualification.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v1/portable-race20.log": "history/consumer-v1/portable-race20.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v1/checks.json": "history/consumer-v1/checks.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v1/inputs-before.json": "history/consumer-v1/inputs-before.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v1/managed-race.log": "history/consumer-v1/managed-race.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v2/qualification.json": "history/consumer-v2/qualification.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v2/managed-vet.log": "history/consumer-v2/managed-vet.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v2/checks.json": "history/consumer-v2/checks.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v2/inputs-before.json": "history/consumer-v2/inputs-before.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v2/managed-race.log": "history/consumer-v2/managed-race.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v2/desktop-race-build.log": "history/consumer-v2/desktop-race-build.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/qualification.json": "history/consumer-v3/qualification.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/observed-midrun-drift.json": "history/consumer-v3/observed-midrun-drift.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/adjudication.json": "history/consumer-v3/adjudication.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/managed-vet.log": "history/consumer-v3/managed-vet.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/checks.json": "history/consumer-v3/checks.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/inputs-before.json": "history/consumer-v3/inputs-before.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/managed-race.log": "history/consumer-v3/managed-race.log",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/native-ownership.json": "history/consumer-v3/native-ownership.json",
+    "/private/tmp/vellum-grid-edit-example/qualified-v3/desktop-race-build.log": "history/consumer-v3/desktop-race-build.log",
+    "/private/tmp/vellum-grid-edit-example/consumer-owned-freeze.json": "consumer-owned-freeze.json",
+    "/private/tmp/vellum-grid-edit-example/baseline/inputs.json": "preserved-baseline.json",
+    "/private/tmp/vellum-grid-cell-editing-review/native-consumer/consumer-source-review.json": "review/consumer-source-review.json",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/inputs-after.json": "native-v1/inputs-after.json",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/ownership.json": "native-v1/ownership.json",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/qualification.json": "native-v1/qualification.json",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/prepared-after.json": "native-v1/prepared-after.json",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/prepared-before.json": "native-v1/prepared-before.json",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/inputs-before.json": "native-v1/inputs-before.json",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/check-4.log": "native-v1/check-4.log",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/check-1.log": "native-v1/check-1.log",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/check-2.log": "native-v1/check-2.log",
+    "/private/tmp/vellum-grid-editing-native/qualified-v1/check-3.log": "native-v1/check-3.log",
+    "/private/tmp/vellum-grid-edit-example/qualify.py": "producers/qualify.py.txt",
+    "/private/tmp/vellum-grid-edit-example/native_smoke.py": "producers/native_smoke.py.txt"
+  }
+}

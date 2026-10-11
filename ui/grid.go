@@ -2,7 +2,7 @@ package ui
 
 import "github.com/dshills/vellum/virtual"
 
-// DataGrid is a managed, fixed-height two-dimensional viewport.
+// DataGrid is a managed indexed two-dimensional viewport.
 const DataGrid Kind = "data-grid"
 
 type GridChangeReason string
@@ -10,6 +10,7 @@ type GridChangeReason string
 const (
 	GridSelection GridChangeReason = "selection"
 	GridViewport  GridChangeReason = "viewport"
+	GridEditing   GridChangeReason = "editing"
 )
 
 // GridEvent reports an already accepted owner-held transition. It never asks
@@ -18,4 +19,12 @@ type GridEvent struct {
 	ID     string
 	Reason GridChangeReason
 	State  virtual.GridState
+}
+
+// GridEditEvent is a settled commit intent, not an accepted domain mutation.
+// The application validates the draft, prepares an immutable source candidate,
+// and calls Grid.CompleteEdit. Refused edits remain recoverable.
+type GridEditEvent struct {
+	ID    string
+	State virtual.GridEditState
 }

@@ -344,6 +344,9 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 				id = w.nextRecord
 			}
 			present[r] = id
+			if edit := gridEditingRecord(r); edit != nil {
+				recordIDs(edit)
+			}
 			for _, c := range r.children {
 				recordIDs(c)
 			}
@@ -481,6 +484,10 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 			return err
 		}
 		t.window = n
+		t.manual = true
+		textWindows.Lock()
+		textWindows.windows[n.window.ID] = t
+		textWindows.Unlock()
 		lifetime, err := p.owner.WindowContext(spec.ID)
 		if err != nil {
 			return err
@@ -816,6 +823,9 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 						result.Elements = append(result.Elements, ManualElement{ID: cell.ID, Parent: r.node.ID, Incarnation: inspection.CellIncarnation, Kind: ui.DataGrid, Name: cell.Text, Value: cell.Text, Enabled: !controlDisabled(r), Visible: visible, Selected: cell.Active, Bounds: cell.Bounds})
 					}
 				}
+			}
+			if edit := gridEditingRecord(r); edit != nil {
+				collect(edit, r.node.ID)
 			}
 			for _, c := range r.children {
 				collect(c, r.node.ID)

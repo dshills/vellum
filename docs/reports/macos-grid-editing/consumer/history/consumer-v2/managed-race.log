@@ -1,0 +1,15 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v -run '^TestActualCellEditing' ./...
+# github.com/dshills/vellum/examples/grid.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave/1
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave/7
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave/64
+--- PASS: TestActualCellEditingCommitCancelAndOriginatingSave (148.22s)
+    --- PASS: TestActualCellEditingCommitCancelAndOriginatingSave/1 (50.17s)
+    --- PASS: TestActualCellEditingCommitCancelAndOriginatingSave/7 (49.03s)
+    --- PASS: TestActualCellEditingCommitCancelAndOriginatingSave/64 (49.01s)
+=== RUN   TestActualCellEditingConflictHiddenDraftGeometryAndModal
+--- PASS: TestActualCellEditingConflictHiddenDraftGeometryAndModal (25.36s)
+PASS
+ok  	github.com/dshills/vellum/examples/grid	175.222s

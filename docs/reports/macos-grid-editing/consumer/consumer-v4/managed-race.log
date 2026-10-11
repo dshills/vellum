@@ -1,0 +1,97 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v ./...
+# github.com/dshills/vellum/examples/grid.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave/1
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave/7
+=== RUN   TestActualCellEditingCommitCancelAndOriginatingSave/64
+--- PASS: TestActualCellEditingCommitCancelAndOriginatingSave (147.99s)
+    --- PASS: TestActualCellEditingCommitCancelAndOriginatingSave/1 (50.22s)
+    --- PASS: TestActualCellEditingCommitCancelAndOriginatingSave/7 (48.86s)
+    --- PASS: TestActualCellEditingCommitCancelAndOriginatingSave/64 (48.91s)
+=== RUN   TestActualCellEditingConflictHiddenDraftGeometryAndModal
+--- PASS: TestActualCellEditingConflictHiddenDraftGeometryAndModal (25.25s)
+=== RUN   TestEditableSourceSparseImmutableVersionsAndProjection
+--- PASS: TestEditableSourceSparseImmutableVersionsAndProjection (0.00s)
+=== RUN   TestEditableSourceRefusalsAndBoundedOverrides
+--- PASS: TestEditableSourceRefusalsAndBoundedOverrides (0.01s)
+=== RUN   TestCellEditCommandAtomicSaveConflictAndHiddenRecovery
+--- PASS: TestCellEditCommandAtomicSaveConflictAndHiddenRecovery (0.00s)
+=== RUN   TestCellCommitSettlesBeforeCaptureAndRejectsRetiredSession
+--- PASS: TestCellCommitSettlesBeforeCaptureAndRejectsRetiredSession (0.00s)
+=== RUN   TestCellEditIndexedWorkIndependentOfDomainRows
+--- PASS: TestCellEditIndexedWorkIndependentOfDomainRows (0.00s)
+=== RUN   TestActualGridRouterBatchesEquivalent
+=== RUN   TestActualGridRouterBatchesEquivalent/1
+=== RUN   TestActualGridRouterBatchesEquivalent/7
+=== RUN   TestActualGridRouterBatchesEquivalent/64
+--- PASS: TestActualGridRouterBatchesEquivalent (33.44s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/1 (11.49s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/7 (10.96s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/64 (10.99s)
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/96
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/120
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/144
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/192
+--- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization (13.81s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/96 (3.31s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/120 (2.97s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/144 (3.26s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/192 (4.26s)
+=== RUN   TestActualGridStalePressDisabledModalAndRetirement
+--- PASS: TestActualGridStalePressDisabledModalAndRetirement (7.53s)
+=== RUN   TestActualGridStatusWrapDoesNotWidenLayout
+--- PASS: TestActualGridStatusWrapDoesNotWidenLayout (3.66s)
+=== RUN   TestIndexedSourceProjectionBijectionAndStableCellValues
+--- PASS: TestIndexedSourceProjectionBijectionAndStableCellValues (0.00s)
+=== RUN   TestSourceRefusalAndImmutableRevision
+--- PASS: TestSourceRefusalAndImmutableRevision (0.00s)
+=== RUN   TestCommandProjectionRetainsKeyAndRejectsStalePress
+--- PASS: TestCommandProjectionRetainsKeyAndRejectsStalePress (0.00s)
+=== RUN   TestMillionAndTenThousandSameViewportCommands
+--- PASS: TestMillionAndTenThousandSameViewportCommands (0.01s)
+=== RUN   TestProgramIndependentWindowLifetimes
+--- PASS: TestProgramIndependentWindowLifetimes (0.00s)
+=== RUN   TestProjectionPreservesHiddenActiveUntilExplicitReveal
+--- PASS: TestProjectionPreservesHiddenActiveUntilExplicitReveal (0.00s)
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse/1
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse/7
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse/64
+--- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse (48.31s)
+    --- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse/1 (16.40s)
+    --- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse/7 (15.96s)
+    --- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse/64 (15.94s)
+=== RUN   TestActualRowSelectionVariablePageControlsAndStalePress
+--- PASS: TestActualRowSelectionVariablePageControlsAndStalePress (7.40s)
+=== RUN   TestSelectionIndexImmutablePureAndConcurrent
+--- PASS: TestSelectionIndexImmutablePureAndConcurrent (0.01s)
+=== RUN   TestCapturedAllSelectionProjectionClearAndWorkerVisit
+--- PASS: TestCapturedAllSelectionProjectionClearAndWorkerVisit (0.00s)
+=== RUN   TestCapturedRangeAddsKeyOutsideBaseAndIncarnationClears
+--- PASS: TestCapturedRangeAddsKeyOutsideBaseAndIncarnationClears (0.00s)
+=== RUN   TestCapturedAllIndexedOwnerWorkDoesNotScaleWithRowCount
+--- PASS: TestCapturedAllIndexedOwnerWorkDoesNotScaleWithRowCount (0.00s)
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/96
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/120
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/144
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/192
+--- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork (11.94s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/96 (2.70s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/120 (2.52s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/144 (2.80s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/192 (3.92s)
+=== RUN   TestActualVariableGridPixelPageWheelAndHeightRevision
+--- PASS: TestActualVariableGridPixelPageWheelAndHeightRevision (9.48s)
+=== RUN   TestVariableMetricsBrutePrefixAndPixelInverse
+--- PASS: TestVariableMetricsBrutePrefixAndPixelInverse (0.01s)
+=== RUN   TestVariableMetricsMillionRowQueriesAvoidDomainEnumeration
+--- PASS: TestVariableMetricsMillionRowQueriesAvoidDomainEnumeration (0.00s)
+=== RUN   TestVariableMetricsHeightsFollowStableKeysAcrossProjection
+--- PASS: TestVariableMetricsHeightsFollowStableKeysAcrossProjection (0.00s)
+=== RUN   TestVariableModeHeightChangesAreIndependentImmutableRevisions
+--- PASS: TestVariableModeHeightChangesAreIndependentImmutableRevisions (0.00s)
+PASS
+ok  	github.com/dshills/vellum/examples/grid	310.498s

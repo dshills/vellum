@@ -1,0 +1,73 @@
+{
+  "result": "APPROVED_DELTA_SOURCE_AND_QUALIFICATION_BINDING",
+  "source_root": "/private/tmp/vellum-grid-cell-editing",
+  "scope": "Independent internal review of one post-Prism qualifier source correction and its real isolated deletion regression, final core-v4 proof/logs and source binding. No runtime/consumer source changed; no tests/GUI/Git/Prism rerun.",
+  "reviewed_source": {
+    "docs/reports/macos-grid-editing/qualify-core.py": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21"
+  },
+  "prior_source_certificate": {
+    "path": "/private/tmp/vellum-grid-cell-editing-review/native-consumer/final-source-review.json",
+    "sha256": "aa3a0bf6ceb71fee3cac58739a12e9dcb6fd8c7fbaab13d976a6165242c6b44e",
+    "remaining_34_selected_paths_current": true
+  },
+  "findings": [
+    {
+      "id": "886ef99d5eff3ebf",
+      "disposition": "FIXED",
+      "evidence": "source_entry retains absent and nonregular path markers instead of skipping or crashing; a real tracked ui/node.go deletion reproduces old FileNotFoundError/no proof then corrected compile refusal with explicit exclusive FAIL proof and absent marker.",
+      "original_sha256": "3c5ec4196f70a6bee1c3844b01d851220f73634865b0b87b431257710b095502",
+      "corrected_sha256": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21"
+    },
+    {
+      "id": "10d5f689f7cd026c",
+      "disposition": "REFUTED",
+      "independent_record": {
+        "path": "../native-consumer/prism-capture-adjudication.json",
+        "sha256": "562400d662e1ecd101d80455754a2e3d45485bafa29231cd8d6634aa8c805e3d"
+      }
+    }
+  ],
+  "deletion_regression": {
+    "path": "/private/tmp/vellum-grid-cell-editing/docs/reports/macos-grid-editing/qualifier-deletion-check/regression.json",
+    "sha256": "b417fae3e43313a166d76e94e39dfe4f8c37e47debd8b6281f2b56665ea99ce2",
+    "removed_tracked_source": "ui/node.go",
+    "before_qualification_absent": true,
+    "after_expected_failure_proof": {
+      "path": "/private/tmp/vellum-grid-cell-editing/docs/reports/macos-grid-editing/qualifier-deletion-check/after/qualification.json",
+      "sha256": "da3263ac724479f0d49d19c895f65e2863487758f2f04b1f9c658b6081a81dfd"
+    },
+    "process_log_hashes_verified": true,
+    "markers_preserved": true
+  },
+  "final_core_qualification": {
+    "path": "/private/tmp/vellum-grid-cell-editing/docs/reports/macos-grid-editing/core-v4/qualification.json",
+    "sha256": "80ae459c76277d557c98a48e7654038370803bb0a6c64d625d64846a88af218f",
+    "source_entries_verified": 91,
+    "current_source_entries_match": true,
+    "checks": [
+      {
+        "name": "portable-race3",
+        "exit_code": 0,
+        "log_sha256": "375ee3aa8921782364faf602e917c64ac721d80043b60ecd7673abcbd3ef6e61"
+      },
+      {
+        "name": "core-race",
+        "exit_code": 0,
+        "log_sha256": "c8e195c37a67f316e03a6ed1c6166a23ccb1d98ce5bbba0633bd6d33399a0825"
+      },
+      {
+        "name": "core-vet",
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "all_raw_logs_hash_verified": true,
+    "result": "PASS",
+    "unchanged": true
+  },
+  "assessment": "The delta preserves exclusive evidence directories, process/log exit recording and timeout cleanup. Missing source inputs remain visible in the proof rather than disappearing. Core-v4 retains exact source/command/log binding, and the injected missing-file compile refusal cannot masquerade as qualification success.",
+  "limits": [
+    "No complete dependency build closure, Cocoa execution, human IME, external AX, physical input or performance claim.",
+    "Historical pre-delta handoff and core-v3 evidence remain immutable; core-v4 supplies the corrected wrapper qualification."
+  ]
+}

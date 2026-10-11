@@ -1,0 +1,39 @@
+[
+  {
+    "name": "fixed",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; exec /private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop -smoke -editable-cells",
+    "cwd": "/private/tmp/vellum-grid-cell-editing/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 7.25,
+    "log": "/private/tmp/vellum-grid-edit-example/qualified-v4/cocoa-smokes/fixed.log",
+    "log_sha256": "2b80f77d544bb6c9a66df85132bd0c9b22e32b1b23f341c34a19066dfa72d3d5",
+    "stages": [
+      "ready",
+      "far-both-axes",
+      "immutable-projection",
+      "editable-cells",
+      "pass"
+    ],
+    "qualified": true
+  },
+  {
+    "name": "variable",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; exec /private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop -smoke -variable-rows -editable-cells",
+    "cwd": "/private/tmp/vellum-grid-cell-editing/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 6.502,
+    "log": "/private/tmp/vellum-grid-edit-example/qualified-v4/cocoa-smokes/variable.log",
+    "log_sha256": "2607401d33132a7c2b915c4b583831013975dc0507f233dbe73bf7708afa0ee1",
+    "stages": [
+      "ready",
+      "far-both-axes",
+      "immutable-projection",
+      "variable-pixel-page",
+      "editable-cells",
+      "pass"
+    ],
+    "qualified": true
+  }
+]

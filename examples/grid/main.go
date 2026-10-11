@@ -19,11 +19,20 @@ func runMode(smoke, variableRows bool) error {
 }
 
 func runModes(smoke, variableRows, rowSelection bool) error {
-	program, err := newProgramModes(1024, 760, variableRows, rowSelection)
+	return runOptions(smoke, variableRows, rowSelection, false)
+}
+
+func runOptions(smoke, variableRows, rowSelection, editableCells bool) error {
+	program, err := newProgramOptions(1024, 760, variableRows, rowSelection, editableCells)
 	if err != nil {
 		return err
 	}
 	defer program.owner.Close()
+	for _, window := range program.windows {
+		window.settleCell = func(ctx context.Context, callback func(error)) error {
+			return cogent.SettleGridEdit(ctx, program.owner, window.id, window.grid, callback)
+		}
+	}
 	// OnError runs under the owner: recording it must not reenter the owner.
 	nativeErrors := make(chan error, 1)
 	driver := cogent.Driver{OnError: func(err error) {
@@ -62,8 +71,9 @@ func main() {
 	smoke := flag.Bool("smoke", false, "check desktop measured geometry, model transitions and two-window lifetimes")
 	variableRows := flag.Bool("variable-rows", false, "use indexed stable-key variable row heights and per-window height toggles")
 	rowSelection := flag.Bool("row-selection", false, "enable captured row-range/all selection and per-window selection controls")
+	editableCells := flag.Bool("editable-cells", false, "enable bounded versioned cell edits with explicit validation and conflicts")
 	flag.Parse()
-	if err := runModes(*smoke, *variableRows, *rowSelection); err != nil {
+	if err := runOptions(*smoke, *variableRows, *rowSelection, *editableCells); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

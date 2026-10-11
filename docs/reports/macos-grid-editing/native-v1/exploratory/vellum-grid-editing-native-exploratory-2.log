@@ -1,0 +1,22 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestManagedGridInlineActualFieldGeometryDraftAndCommit (0.16s)
+    --- FAIL: TestManagedGridInlineActualFieldGeometryDraftAndCommit/96 (0.06s)
+        grid_editing_offscreen_test.go:108: grid draft scope stale scope=false disabled=false live=true
+        grid_offscreen_test.go:91: grid draft scope stale scope=false disabled=false live=true
+    --- FAIL: TestManagedGridInlineActualFieldGeometryDraftAndCommit/120 (0.04s)
+        grid_editing_offscreen_test.go:108: grid draft scope stale scope=false disabled=false live=true
+        grid_offscreen_test.go:91: grid draft scope stale scope=false disabled=false live=true
+    --- FAIL: TestManagedGridInlineActualFieldGeometryDraftAndCommit/144 (0.03s)
+        grid_editing_offscreen_test.go:108: grid draft scope stale scope=false disabled=false live=true
+        grid_offscreen_test.go:91: grid draft scope stale scope=false disabled=false live=true
+    --- FAIL: TestManagedGridInlineActualFieldGeometryDraftAndCommit/192 (0.03s)
+        grid_editing_offscreen_test.go:108: grid draft scope stale scope=false disabled=false live=true
+        grid_offscreen_test.go:91: grid draft scope stale scope=false disabled=false live=true
+--- FAIL: TestManagedGridInlineOrderedSettleAndCancellation (0.04s)
+    grid_editing_offscreen_test.go:175: capture bypassed earlier preedit {true row-0 c1 A😀é A😀é A😀é 1 1 1 ready 1} <nil>
+--- FAIL: TestManagedGridInlineHiddenDraftSettlesAdmittedInput (0.04s)
+    grid_editing_offscreen_test.go:279: hidden draft lost admitted text {true row-0 c1 A😀é A😀é  1 0 1 unavailable 1} <nil>
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	0.773s
+FAIL

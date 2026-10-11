@@ -85,6 +85,7 @@ func (t *textWindow) setActiveClient(id uint64, active bool) {
 	if current := t.clients[id]; current != nil && current.node.Kind == ui.TextField {
 		current.control.fieldNativeActive.Store(active)
 	}
+	t.publishGridRules()
 }
 
 // deactivateNativeClient seals the actual native preedit, without validating or
@@ -131,6 +132,13 @@ func (t *textWindow) finishFieldFocusLosses(deactivate func(*record) (bool, erro
 		r.control.fieldFocusLost.Store(false)
 		refuseOversizedFieldEditing(r) // existing controlled refusal restores invalid legacy bytes
 		field.FinishNativeFocusLost()
+		if b := r.control.gridEdit; b != nil {
+			if _, err := b.current(); err == nil && b.grid.eligible() {
+				if err := syncGridDraft(r); err != nil {
+					editorError(r, err)
+				}
+			}
+		}
 		// This outgoing client may never be chosen by publishClient again.
 		// Capture after finalization, including preserved refocus selection.
 		if cacheFieldEditingState(r, field.EditingState()) {
@@ -171,6 +179,10 @@ func (t *textWindow) publishClient(r *record, active bool) (bool, error) {
 	geometry := textGeometry(state, client.NativeTextGeometry(), scale)
 	caret := textPoints(client.NativeCaretBounds(), scale)
 	maximum := textinput.MaxDocumentBytes
+	if b := r.control.gridEdit; b != nil {
+		maximum = min(maximum, b.maximum())
+		active = active && b.writable()
+	}
 	shadow := textShadow{Text: state.Text, Epoch: r.control.textEpoch}
 	if b := r.control.editor; b != nil {
 		s := b.model.Snapshot()
@@ -199,6 +211,11 @@ func focusedManagedTextRecord(root *record) *record {
 	if root.control != nil && root.control.client != 0 && !root.control.retired && root.widget.AsWidget().StateIs(states.Focused) {
 		return root
 	}
+	if edit := gridEditingRecord(root); edit != nil {
+		if found := focusedManagedTextRecord(edit); found != nil {
+			return found
+		}
+	}
 	for _, r := range root.children {
 		if found := focusedManagedTextRecord(r); found != nil {
 			return found
@@ -224,6 +241,9 @@ func accessibilityTextGeometry(root *record) map[string]any {
 				geometry := textGeometry(state, client.NativeTextGeometry(), 1)
 				out[prefix+accessibilityManagedID(r.node.ID)] = map[string]any{"client": r.control.client, "text": state.Text, "geometry": geometry}
 			}
+		}
+		if edit := gridEditingRecord(r); edit != nil {
+			visit(edit, prefix)
 		}
 		for _, c := range r.children {
 			visit(c, prefix)

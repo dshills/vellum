@@ -6,14 +6,25 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/dshills/vellum/virtual"
 )
 
 const columnCount = 20
 const maxSourceRows = 1_000_000
+const maxCellOverrides = 4096
+const maxCellTextBytes = 256
 
 var errSourceConfig = errors.New("grid example: invalid source config")
+var errCellValidation = errors.New("grid example: cell text must be nonblank UTF-8, at most 256 bytes, without line breaks or NUL")
+var errCellConflict = errors.New("grid example: cell changed since editing began")
+
+type cellAddress struct{ key, column string }
+type cellOverride struct {
+	text    string
+	version uint64
+}
 
 type sourceCalls struct{ RowKey, IndexOf, Cell uint64 }
 type gridSource struct {
@@ -24,6 +35,9 @@ type gridSource struct {
 	// Only diagnostic counters mutate. Domain data and mapping are immutable for
 	// each source revision; the application owner serializes all reads.
 	calls *sourceCalls
+	// A source revision owns an immutable, bounded sparse map. Reprojection
+	// shares it; an edit copies it before publishing a new source revision.
+	overrides map[cellAddress]cellOverride
 }
 
 func newSource(identity string, rows int) (*gridSource, error) {
@@ -91,17 +105,64 @@ func (s *gridSource) Cell(key, column string) (string, error) {
 	if _, found := s.rowIndex(key); !found {
 		return "", virtual.ErrGridRange
 	}
-	if len(column) != 9 || !strings.HasPrefix(column, "column:") {
-		return "", virtual.ErrGridRange
+	value, err := s.cellValue(key, column)
+	return value.text, err
+}
+
+// cellValue is counter-free and resolves domain identity even while a row is
+// hidden. Grid's edit transaction separately requires its current visibility.
+func (s *gridSource) cellValue(key, column string) (cellOverride, error) {
+	if s == nil || len(key) != 13 || !strings.HasPrefix(key, "row:") || len(column) != 9 || !strings.HasPrefix(column, "column:") {
+		return cellOverride{}, virtual.ErrGridRange
 	}
-	col, err := strconv.Atoi(column[7:])
-	if err != nil || col < 0 || col >= columnCount || columnID(col) != column {
-		return "", virtual.ErrGridRange
+	row, rowErr := strconv.Atoi(key[4:])
+	col, colErr := strconv.Atoi(column[7:])
+	if rowErr != nil || colErr != nil || row < 0 || row >= s.total || col < 0 || col >= columnCount || rowKey(row) != key || columnID(col) != column {
+		return cellOverride{}, virtual.ErrGridRange
 	}
-	row, _ := strconv.Atoi(key[4:])
+	if value, found := s.overrides[cellAddress{key, column}]; found {
+		return value, nil
+	}
 	// The fixed seed and integer-only value function are independent of projection.
 	value := (uint64(row)*1103515245 + uint64(col)*12345 + 7) & 0xffffffff
-	return fmt.Sprintf("%06d · %02d · %08x", row, col, value), nil
+	return cellOverride{fmt.Sprintf("%06d · %02d · %08x", row, col, value), 1}, nil
+}
+
+func validateCellText(text string) error {
+	if !utf8.ValidString(text) || len(text) > maxCellTextBytes || strings.TrimSpace(text) == "" || strings.ContainsAny(text, "\x00\r\n") {
+		return errCellValidation
+	}
+	return nil
+}
+
+func (s *gridSource) withCell(key, column, text string, baseVersion uint64) (*gridSource, error) {
+	if err := validateCellText(text); err != nil {
+		return nil, err
+	}
+	value, err := s.cellValue(key, column)
+	if err != nil {
+		return nil, err
+	}
+	if value.version != baseVersion {
+		return nil, errCellConflict
+	}
+	if s.revision == math.MaxUint64 || value.version == math.MaxUint64 {
+		return nil, virtual.ErrGridExhausted
+	}
+	address := cellAddress{key, column}
+	if _, found := s.overrides[address]; !found && len(s.overrides) >= maxCellOverrides {
+		return nil, virtual.ErrGridCapacity
+	}
+	// Clone admitted strings as well as the map so a tiny supplied substring
+	// cannot retain a much larger caller backing allocation.
+	next := *s
+	next.overrides = make(map[cellAddress]cellOverride, len(s.overrides)+1)
+	for address, prior := range s.overrides {
+		next.overrides[address] = prior
+	}
+	next.overrides[cellAddress{strings.Clone(key), strings.Clone(column)}] = cellOverride{strings.Clone(text), value.version + 1}
+	next.revision++
+	return &next, nil
 }
 func (s *gridSource) projected(reverse, filtered bool) (*gridSource, error) {
 	if s.revision == math.MaxUint64 {
@@ -254,3 +315,27 @@ func (s *variableGridSource) RowAt(pixel int) (int, error) {
 }
 
 var _ virtual.GridSource = (*variableGridSource)(nil)
+
+// Only these opt-in wrappers implement the public edit source contract. The
+// default gridSource and variableGridSource keep their legacy behavior.
+type editableGridSource struct{ *gridSource }
+type editableVariableGridSource struct{ *variableGridSource }
+
+func editableValue(s *gridSource, key, column string) (virtual.GridEditValue, error) {
+	value, err := s.cellValue(key, column)
+	if err != nil {
+		return virtual.GridEditValue{}, err
+	}
+	// Column zero demonstrates a source-controlled read-only cell. An external
+	// domain update may still replace it; user edit admission may not.
+	return virtual.GridEditValue{Text: value.text, Version: value.version, Editable: column != columnID(0)}, nil
+}
+func (s *editableGridSource) EditCell(key, column string) (virtual.GridEditValue, error) {
+	return editableValue(s.gridSource, key, column)
+}
+func (s *editableVariableGridSource) EditCell(key, column string) (virtual.GridEditValue, error) {
+	return editableValue(s.gridSource, key, column)
+}
+
+var _ virtual.GridEditSource = (*editableGridSource)(nil)
+var _ virtual.GridEditSource = (*editableVariableGridSource)(nil)

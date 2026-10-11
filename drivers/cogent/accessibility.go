@@ -387,6 +387,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				nodes = append(nodes, child)
 			}
 		}
+		if edit := gridEditingRecord(r); edit != nil {
+			visit(edit, x.ID, disabled)
+		}
 		for _, c := range r.children {
 			if n.Kind == ui.Tabs && c.node.ID != n.SelectedID {
 				continue
@@ -484,6 +487,23 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 		if action.Kind != "set" || len(action.Value) > textinput.MaxDocumentBytes || strings.ContainsRune(action.Value, 0) {
 			return false
 		}
+		if b := r.control.gridEdit; b != nil {
+			if !b.writable() || !validGridDraft(action.Value, b.maximum()) {
+				return false
+			}
+			if err := b.grid.model.SetEditText(action.Value); err != nil {
+				return false
+			}
+			state, err := b.grid.model.State()
+			if err != nil {
+				return false
+			}
+			if cb := b.grid.r.node.GridChange; cb != nil {
+				cb(ui.GridEvent{ID: b.grid.r.node.ID, Reason: ui.GridEditing, State: state})
+			}
+			_ = b.grid.owner.Invalidate(b.grid.window)
+			return true
+		}
 		change.Text = action.Value
 	case ui.Selector, ui.Tabs:
 		if action.Kind != "set" {
@@ -561,6 +581,16 @@ func bindAccessibilityKeyboard(w *nativeWindow, a *app.Application, onError func
 				return
 			}
 			if chord == "escape" {
+				if r := focusedManagedTextRecord(w.root); r != nil && r.control.gridEdit != nil {
+					field := r.widget.(*core.TextField)
+					if _, _, marked := field.NativeCompositionRange(); marked {
+						state := field.EditingState()
+						applyGridFieldNative(r, state.Text, state.Anchor, state.Focus, -1, -1, "cancel")
+						e.SetHandled()
+						requestTextPublication(w.window.ID)
+						return
+					}
+				}
 				if r := focusedManagedTextRecord(w.root); r != nil && r.control.editor != nil && r.node.Editor.Snapshot().Composing {
 					if err := r.node.Editor.CancelComposition(); err != nil {
 						editorError(r, err)
@@ -731,6 +761,9 @@ func accessibilityBounds(root *record) map[string][4]float32 {
 		}
 		extensionAccessibilityBounds(r, out, bounds)
 		gridAccessibilityBounds(r, out)
+		if edit := gridEditingRecord(r); edit != nil {
+			visit(edit)
+		}
 		for _, c := range r.children {
 			visit(c)
 		}

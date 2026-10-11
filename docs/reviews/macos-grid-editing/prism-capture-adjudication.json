@@ -1,0 +1,52 @@
+{
+  "finding_id": "10d5f689f7cd026c",
+  "disposition": "REFUTED",
+  "severity_reported": "medium",
+  "report": {
+    "path": "/private/tmp/vellum-grid-cell-editing/docs/reviews/macos-grid-editing/prism.json",
+    "sha256": "ae23743c9da37901bb57e9f6262d9fbad96accf1988d2a53225caee79d3d313e"
+  },
+  "source_root": "/private/tmp/vellum-grid-cell-editing",
+  "reviewed_sources": {
+    "drivers/cogent/grid_geometry.go": "c1841ba8b9311d8c7f4830459abd80933f509f2f1958d148de04ffcfa5687b4b",
+    "drivers/cogent/grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "drivers/cogent/controls.go": "8010399f76aa106f560348b44e87b79a68ed55ba4142f81a9352ba497b181fe7",
+    "drivers/cogent/grid.go": "8a959afa66ebb8e685107e4d0afadc5add3273be580c46be6252651724e4ae96",
+    "drivers/cogent/grid_editing_offscreen_test.go": "e5750122a16a5585247d7cd3cb7cdd1c7e6afa5d5ac5b4971948c12b3d838894"
+  },
+  "reason": "The hypothesized wrong-type/nil transitional editing widget is unreachable through the private binding constructor, refresh or retirement paths. The interface storage does not itself permit any caller to change this private record.",
+  "source_evidence": [
+    {
+      "file": "drivers/cogent/grid_editing.go",
+      "line": 162,
+      "detail": "Private record is created with fixed Kind ui.TextField. It is not a public descriptor child, extension or reconcile target."
+    },
+    {
+      "file": "drivers/cogent/controls.go",
+      "line": 115,
+      "detail": "TextField case allocates core.NewTextField(parent), stores that exact pointer as widget, and returns only after successful control preparation/sync."
+    },
+    {
+      "file": "drivers/cogent/grid_editing.go",
+      "line": 166,
+      "detail": "mountControl error returns before publishing g.editing. On success, r.widget is assigned before the sole non-nil g.editing assignment at line173; no alternate constructor/type path exists."
+    },
+    {
+      "file": "drivers/cogent/grid_editing.go",
+      "line": 47,
+      "detail": "gridEditingRecord exposes only a published, visible, nonretired private record. Existing record widget is never reassigned during style/source/draft refresh."
+    },
+    {
+      "file": "drivers/cogent/grid_editing.go",
+      "line": 132,
+      "detail": "disposeEditing removes g.editing before marking the old record retired or deleting its widget. Replacement disposes old session before creating the next. Retirement does not publish a nil/wrongtype transitional record."
+    },
+    {
+      "file": "drivers/cogent/grid.go",
+      "line": 816,
+      "detail": "Measurement runs from the originating retained widget RenderWidget after child rendering. Reconciliation/geometry/retirement follow established originating scene/render and owner serialization; no background path changes this private widget interface."
+    }
+  ],
+  "coverage": "Read-only callsite/assignment audit plus inspected existing actual geometry, cancellation, session retirement and retained-theme tests. No new test, code edit, GUI or Prism call. Existing source approval remains exact.",
+  "recommendation": "Retain invariant assertion. A comma-ok skip would conceal unsupported private-state corruption rather than address a reachable lifecycle defect."
+}

@@ -145,3 +145,69 @@ portable State revision/extent verification, including a constant number of
 metric boundary reads for variable sources; it does not enumerate rows, perform
 pixel search or refetch Cell strings. Desktop GUI, physical input,
 external AX and performance acceptance are not proved by these offscreen checks.
+
+## Inline cell drafts
+
+`GridConfig.CellEditing` opts into one private managed `core.TextField` per live
+`GridEditState.Session`. The session is independent of pooled visible cell slots.
+The field uses the existing Cocoa text-input attachment, FIFO admission, UTF-16
+selection/range geometry and composition settlement. No separate document model
+or grid-owned source mutation is introduced. `MaxEditBytes` (default 64 KiB,
+maximum 1 MiB) bounds the single-line UTF-8 field; newline/NUL and over-budget
+native requests are refused before Cocoa mutation/reservation. Legacy widget
+refusal restores accepted draft text after the widget event; it does not claim
+atomic preservation of legacy private undo/selection.
+
+Plain Return or F2 on the grid host begins the current active cell. In the field,
+Return settles composition and earlier admitted text, then invokes the current
+`Node.GridCommit(ui.GridEditEvent)` on the owner. This is a commit intent: the
+application validates the draft, calls `PrepareEdit`, builds an immutable source
+candidate, and calls `CompleteEdit` before replacing its own source pointer.
+`GridChange` with reason `GridEditing` reports an already accepted draft/begin/
+cancel transition; callers must not apply it again. Native source callbacks stay
+on the owner, outside Render/Position.
+
+The visible writable field replaces the grid host's one Tab stop. Tab and focus
+loss preserve/synchronize the draft without committing domain data. The first
+Escape during preedit cancels composition; otherwise Escape cancels the draft.
+An active managed modal retains its existing Escape precedence. Double click,
+Tab-to-commit and spreadsheet traversal after commit are outside this checkpoint.
+While the field owns focus, text navigation/select-all/private field undo use
+ordinary text routing rather than row-selection shortcuts.
+
+Source reorder, filtering, conflict and viewport movement retain the recoverable
+portable draft. A hidden/nonready field relinquishes activation and restores the
+host Tab stop; it does not steal focus when it reappears. Already admitted
+same-session records still finish at their originating FIFO position after a
+view-only hide/conflict, followed by native deactivation acknowledgment; fresh
+mutations are refused. Owner draft replacement, Cancel/new session, retired
+binding, disabled/modal/tab scope and closed lifetime invalidate old callbacks.
+A new session always gets a new text client. Native old-client sealing may only
+acknowledge unmark/cancel; it cannot admit a new edit.
+
+`SettleGridEdit(ctx, application, originatingWindow, grid, callback)` requires
+owner-held admission and an existing exact private binding. One settlement per
+window is allowed. Immediate refusal does not invoke callback; an admitted
+request completes once on the owner while Application is open, including
+cancellation/lifetime errors. Whole-application close suppresses user dispatch.
+Do not synchronously wait on Cocoa main or the application owner. Save must use
+this barrier before validation/Prepare. A hidden/conflicting draft may settle for
+recovery; `PrepareEdit`/application validation still refuses domain commit.
+
+In `NewManual`, settlement enqueues only the originating text-pump record and is
+completed by explicit `Step`, including context cancellation. It starts no
+worker, main-queue dispatch, frame or implicit clock advance. Current Cocoa
+runtime acceptance, external accessibility and physical IME remain separate from
+actual offscreen routing/geometry qualification.
+
+`GridInspection.Edit` is the accepted portable draft at the completed frame.
+`GridInspection.Editor` (when visible) reports detached private field ID/session,
+actual preview text, focus and clipped scene-pixel bounds. The retained inline
+field receives the current managed TextField theme (typography and colors),
+then applies its mandatory cell geometry overrides without changing the draft
+or text-client identity. Its accessible name uses the visible column title and
+current display row when materialized. `GridEditorID` is a
+reserved generated target for manual/AX observations, never a descriptor ID.
+The accessibility tree publishes the inline field as a text field beneath its
+table, using the same selection/range geometry bridge and workbench namespace.
+Inspection does not render, drain, fetch hidden cells or invoke callbacks.

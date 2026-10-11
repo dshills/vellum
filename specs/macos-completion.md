@@ -65,7 +65,7 @@ Its 10k and million-row procedural fixtures have identical visible callback work
 That proves the projection cost. The [managed adapter](grid-native.md) adds
 bounded native cell pools, clipped measured geometry, routed pointer/keyboard
 navigation and visible-cell accessibility. Retained dataset memory, frame
-performance, editing and the complete P6 table/tree
+performance and the complete P6 table/tree
 workload remain open.
 
 [Captured row selection](grid-selection.md) adds range/All membership without an
@@ -73,8 +73,16 @@ owner scan, bounded key toggles and immutable worker snapshots. Mac input routes
 Shift ranges, Command toggles/All and Escape clear; accepted membership drives
 visible rendering and AX attributes separately from the active cursor. Captured
 counts describe identities in their captured scope, independently of later
-filtering. This does not complete editing, loaded projection integration or
+filtering. This does not complete loaded projection integration or
 the sustained P6 latency/memory workloads.
+
+[Versioned cell drafts](grid-editing.md) add application validation, explicit
+conflict recovery and atomic immutable-source admission. The Mac adapter uses a
+single clipped native field and originating input settlement before commit;
+the independent grid consumer exercises sparse versioned edits. Source reordering
+and unrelated updates retain drafts, while edited-cell updates refuse silent
+overwrite. This checkpoint remains separate from loaded-data workers, sustained
+P6 performance, large-tree acceptance and human IME/external AX workflows.
 
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU

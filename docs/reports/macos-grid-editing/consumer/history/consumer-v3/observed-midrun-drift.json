@@ -1,0 +1,17 @@
+{
+  "result": "HISTORICAL_OBSERVED_DRIFT",
+  "reason": "Native source changed during this run, then producer restored final ownership fcfc443\u2026ced51. Before/after equality cannot establish compile stability through the observed interval. Individual command results may be retained but this is not final frozen-source qualification.",
+  "observed_files": {
+    "drivers/cogent/manual_offscreen.go": {
+      "frozen_sha256": "8a22ca10d6645f58aedf558df61885f05b2636e014b147dba4c6e1878520ac50",
+      "observed_sha256": "1713a2cdb68274b8a70e6b2594fbd6bd08f9e9d480e751787f843194c0f575f2"
+    },
+    "drivers/cogent/grid_editing_offscreen_test.go": {
+      "frozen_sha256": "e5750122a16a5585247d7cd3cb7cdd1c7e6afa5d5ac5b4971948c12b3d838894",
+      "observed_sha256": "140d0be6e031c19a6e424170ce878eb5e960e74ec3b61930e51d857efdd09e47"
+    }
+  },
+  "consumer_sources": "Own7 and preserved9 remain unchanged. No consumer input/oracle change.",
+  "producer_explanation": "Temporary construction experiment was withdrawn after Application.WindowContext canceled-lifetime invariant was confirmed. Producer restored exact final11 source map.",
+  "next": "One final source-bound qualifier after stable freeze."
+}

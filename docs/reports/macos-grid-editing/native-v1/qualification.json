@@ -1,0 +1,120 @@
+{
+  "changed_inputs": [],
+  "commands": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-tags",
+        "offscreen",
+        "-race",
+        "-count=3",
+        "-run",
+        "^(TestManagedGridInline|TestManagedEditor|TestManagedTextField)",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-grid-cell-editing/drivers/cogent",
+      "elapsed_seconds": 87.10045416699722,
+      "exit_code": 0,
+      "log": "check-1.log",
+      "log_sha256": "5f849b0999966fdb9d5bc786c112f39ea888f65100495e38a5b0476e92a76dde",
+      "timeout_seconds": 600
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-tags",
+        "offscreen",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-grid-cell-editing/drivers/cogent",
+      "elapsed_seconds": 2.066298749996349,
+      "exit_code": 0,
+      "log": "check-2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timeout_seconds": 600
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-grid-cell-editing/drivers/cogent",
+      "elapsed_seconds": 4.959785457991529,
+      "exit_code": 0,
+      "log": "check-3.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timeout_seconds": 600
+    },
+    {
+      "argv": [
+        "go",
+        "build",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-grid-cell-editing/drivers/cogent",
+      "elapsed_seconds": 1.949791708990233,
+      "exit_code": 0,
+      "log": "check-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timeout_seconds": 600
+    }
+  ],
+  "environment": {
+    "GOCACHE": "/private/tmp/vellum-grid-cell-editing-gocache",
+    "GOENV": "off",
+    "GOFLAGS": "",
+    "GOMODCACHE": "/tmp/vellum-p0-cache/mod",
+    "GOPATH": "/tmp/vellum-p0-cache/gopath",
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "off",
+    "VELLUM_CACHE_DIR": "/tmp/vellum-p0-cache"
+  },
+  "historical": {
+    "exploratory_logs": [
+      "/private/tmp/vellum-grid-editing-native-exploratory-1.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-2.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-3.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-4.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-5.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-6.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-7.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-8.log",
+      "/private/tmp/vellum-grid-editing-native-exploratory-9.log"
+    ],
+    "note": "Exploratory development logs were not captured against before/after maps; preserve as unqualified history. Consumer qualified-v1/v2 records separately preserve prior failed/drifting sources.",
+    "qualification": false
+  },
+  "inputs_after": {
+    "count": 146,
+    "path": "inputs-after.json",
+    "sha256": "0a2b80f22e27f2e7e0ab62a072404cd857f00541b100c399834099297ad714ae"
+  },
+  "inputs_before": {
+    "count": 146,
+    "path": "inputs-before.json",
+    "sha256": "0a2b80f22e27f2e7e0ab62a072404cd857f00541b100c399834099297ad714ae"
+  },
+  "ownership": {
+    "path": "ownership.json",
+    "sha256": "fcfc443636c80b0912a53b40b683d33bb94e5d54af67a38a998aef36ca8ced51"
+  },
+  "prepared_after": {
+    "path": "prepared-after.json",
+    "sha256": "5676f2b2230897ad6f8c8d2390d4249b021af30a6d0f5038966fe576a5a5ac02"
+  },
+  "prepared_before": {
+    "path": "prepared-before.json",
+    "sha256": "5676f2b2230897ad6f8c8d2390d4249b021af30a6d0f5038966fe576a5a5ac02"
+  },
+  "prepared_unchanged": true,
+  "producer": {
+    "path": "/private/tmp/vellum-grid-editing-native/qualify.py",
+    "sha256": "efd849062918aea3a447625eefcc7024e94bedd36ff10f04e126b7177a096ae8"
+  },
+  "result": "PASS",
+  "schema": 1,
+  "scope": "Selected source/interface inputs plus detached aggregate prepared-tree identities. Actual offscreen widget input/settlement/geometry and compatibility; native default compile/vet. No Cocoa GUI, external AX, physical IME, performance or complete dependency closure claim."
+}

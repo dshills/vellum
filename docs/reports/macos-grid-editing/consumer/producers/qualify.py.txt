@@ -1,0 +1,91 @@
+"""Bounded consumer checks; selected inputs are not a full source closure."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import time
+
+parser=argparse.ArgumentParser()
+parser.add_argument('--version', type=int, required=True)
+parser.add_argument('--focused', action='store_true')
+parser.add_argument('--inherit-portable', type=Path)
+parser.add_argument('--native-ownership', type=Path)
+args=parser.parse_args()
+root=Path('/private/tmp/vellum-grid-cell-editing')
+module=root/'examples/grid'
+out=Path('/private/tmp/vellum-grid-edit-example')/('qualified-v'+str(args.version))
+out.mkdir(exist_ok=False)
+owned=['source.go','model.go','main.go','smoke.go','README.md','cell_editing_test.go','cell_editing_managed_test.go']
+preserved=['model_test.go','managed_test.go','variable_rows_test.go','variable_rows_managed_test.go','selection_rows_test.go','selection_rows_managed_test.go','go.mod','go.sum','LICENSE']
+selected=['virtual/grid.go','virtual/grid_geometry.go','virtual/grid_rows.go','virtual/grid_selection.go','virtual/grid_edit.go','ui/node.go','ui/grid.go',
+          'drivers/cogent/grid.go','drivers/cogent/grid_geometry.go','drivers/cogent/grid_accessibility.go','drivers/cogent/grid_editing.go',
+          'drivers/cogent/controls.go','drivers/cogent/editor.go','drivers/cogent/editor_geometry.go',
+          'drivers/cogent/manual.go','drivers/cogent/manual_offscreen.go','drivers/cogent/manual_desktop.go',
+          'drivers/cogent/env.sh','drivers/cogent/go.mod','drivers/cogent/native/dependencies.json']
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+native_manifest=json.loads(args.native_ownership.read_bytes()) if args.native_ownership else None
+def inputs():
+ value={'owned':{n:sha(module/n) for n in owned},'preserved':{n:sha(module/n) for n in preserved},'selected':{n:sha(root/n) for n in selected}}
+ if native_manifest:
+  value['native_owned']={n:sha(root/n) for n in native_manifest['files']}
+ return value
+before=inputs()
+if native_manifest:
+ assert native_manifest['result']=='FROZEN' and Path(native_manifest['root'])==root
+ assert all(before['native_owned'][n]==item['sha256'] for n,item in native_manifest['files'].items())
+ shutil.copyfile(args.native_ownership,out/'native-ownership.json')
+baseline=json.loads(Path('/private/tmp/vellum-grid-edit-example/baseline/inputs.json').read_bytes())
+assert all(before['preserved'][n]==baseline[n] for n in preserved)
+for n in owned:
+ (out/'owned-source').mkdir(exist_ok=True)
+ shutil.copyfile(module/n,out/'owned-source'/n)
+(out/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+commands=[('portable-race20','go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go cell_editing_test.go'),
+          ('managed-race',"go test -tags offscreen -race -count=1 -v "+("-run '^TestActualCellEditing' " if args.focused else '')+'./...'),
+          ('managed-vet','go vet -tags offscreen ./...'),
+          ('desktop-race-build','go build -race -o '+str(out/'grid-desktop')+' .')]
+prefix='export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . '+str(root/'drivers/cogent/env.sh')+'; '
+checks=[]
+if args.inherit_portable:
+ prior=json.loads(args.inherit_portable.read_bytes())
+ for n in ['source.go','model.go','cell_editing_test.go']:
+  assert before['owned'][n]==prior['after']['owned'][n]
+ for n in ['model_test.go','variable_rows_test.go','selection_rows_test.go','go.mod','go.sum']:
+  assert before['preserved'][n]==prior['after']['preserved'][n]
+ for n in selected[:7]:
+  assert before['selected'][n]==prior['after']['selected'][n]
+ inherited=prior['checks'][0]
+ assert inherited['name']=='portable-race20' and inherited['exit_code']==0 and sha(Path(inherited['log']))==inherited['log_sha256']
+ checks.append(dict(inherited,inherited_from=str(args.inherit_portable),inherited_proof_sha256=sha(args.inherit_portable),relevant_inputs_unchanged=True))
+ commands=commands[1:]
+for name,command in commands:
+ log=out/(name+'.log')
+ started=time.monotonic()
+ timed_out=False
+ print('START',name,flush=True)
+ with log.open('wb') as stream:
+  stream.write(('command: '+prefix+command+'\n').encode());stream.flush()
+  try:
+   code=subprocess.run(['/bin/zsh','-c',prefix+command],cwd=module,stdout=stream,stderr=subprocess.STDOUT,timeout=600).returncode
+  except subprocess.TimeoutExpired:
+   code,timed_out=124,True
+ check={'name':name,'command':prefix+command,'cwd':str(module),'exit_code':code,'timed_out':timed_out,'elapsed_seconds':round(time.monotonic()-started,3),'log':str(log),'log_sha256':sha(log)}
+ checks.append(check)
+ (out/'checks.json').write_text(json.dumps(checks,indent=2)+'\n')
+ print('END',json.dumps(check),flush=True)
+ if code:break
+after=inputs()
+binary=out/'grid-desktop'
+proof={'scope':'Seven owned example files, nine preserved example/module files and selected integration inputs. Not a complete build source closure, desktop execution or performance claim.',
+       'source_root':str(root),'before':before,'after':after,'unchanged':before==after,'checks':checks,
+       'mode':'focused-editor' if args.focused else 'all-consumer-tests',
+       'producer':{'path':str(Path(__file__).resolve()),'sha256':sha(Path(__file__))},
+       'native_ownership':{'path':str(args.native_ownership),'sha256':sha(args.native_ownership),'frozen_input_match':True,'owned_files':len(native_manifest['files'])} if native_manifest else None,
+       'result':'PASS' if before==after and len(checks)==len(commands)+(1 if args.inherit_portable else 0) and all(c['exit_code']==0 for c in checks) else 'FAIL',
+       'binary':{'path':str(binary),'sha256':sha(binary)} if binary.exists() else None}
+path=out/'qualification.json'
+path.write_text(json.dumps(proof,indent=2)+'\n')
+print('PROOF',str(path),sha(path),proof['result'],flush=True)
+raise SystemExit(0 if proof['result']=='PASS' else 1)

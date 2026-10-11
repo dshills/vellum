@@ -2,9 +2,9 @@
 
 This independent portable checkpoint adds a `virtual.Grid` without changing
 `Table`, `Tree`, or their source interfaces. It qualifies bounded projection,
-geometry and identity behavior. It does not qualify native rendering, frame
-performance, accessibility, editable cells,
-tree indexing, or completion of P6.
+geometry and identity behavior. Subsequent [cell drafts](grid-editing.md) add
+versioned edit admission. This portable evidence does not qualify native
+rendering, frame performance, accessibility, tree indexing, or completion of P6.
 
 ## Domain source and ownership
 
@@ -36,7 +36,7 @@ incarnation, column IDs/titles, active keys and anchor keys, so a small substrin
 does not pin a large caller backing allocation. A source may itself retain its
 domain memory; that borrowed source memory is outside the Grid payload budget.
 
-Public methods refuse changed metadata with `ErrGridStale` until `Refresh`
+Source-dependent methods refuse changed metadata with `ErrGridStale` until `Refresh`
 acknowledges a new revision. `Refresh` with unchanged metadata is a no-op after
 verifying the accepted indexed extent.
 `ReplaceSource` explicitly installs a borrowed indexed snapshot and always
@@ -165,7 +165,8 @@ this ref when arming a press and pass it to `Activate` when delivering the actio
 It must not reinterpret a pooled slot using the new viewport. Foreign refs,
 retired generations, source changes, and refs with empty current clips are
 refused. Effective viewport/active/source/selection transitions retire prior refs; no-ops
-and failed operations do not. Generation exhaustion is refused atomically.
+and failed operations do not. Optional [cell drafts](grid-editing.md) retire refs
+on effective begin/text/cancel transitions. Generation exhaustion is refused atomically.
 The [managed adapter contract](grid-native.md) covers native hit testing,
 event-origin lifetime, focus, disabled/modal routing and native widget reuse.
 Its qualification is separate from the portable acceptance below.
@@ -199,8 +200,9 @@ memory. Native and independent consumer evidence is recorded separately in the
 
 The managed adapter owns bounded measured-cell/header pools and validates refs
 through this model. The [row-selection checkpoint](grid-selection.md) adds
-immutable range/All capture and bounded stable-key exceptions. Editing draft
-conflict/settlement, background projection index preparation, hidden-cell
+immutable range/All capture and bounded stable-key exceptions. The [editing
+checkpoint](grid-editing.md) adds versioned drafts and atomic source admission.
+Background projection index preparation, hidden-cell
 accessibility navigation and full million-row native performance acceptance
 remain explicit later work. Existing Table/Tree callers need no migration for
 this checkpoint.

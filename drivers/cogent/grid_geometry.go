@@ -1,6 +1,8 @@
 package cogent
 
 import (
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/styles/states"
 	"encoding/base64"
 	"image"
 	"math"
@@ -24,6 +26,15 @@ type GridInspection struct {
 	Bounds                          image.Rectangle
 	Cells                           []GridCellGeometry
 	Headers                         []GridHeaderGeometry
+	Edit                            virtual.GridEditState
+	Editor                          *GridEditorGeometry
+}
+type GridEditorGeometry struct {
+	ID      string
+	Session uint64
+	Text    string
+	Focused bool
+	Bounds  image.Rectangle
 }
 type GridCellGeometry struct {
 	ID, RowKey, ColumnID, Text string
@@ -107,6 +118,12 @@ func (g *gridBinding) capture() {
 		}
 		m.Headers[i] = GridHeaderGeometry{gridHeaderID(m.ID, h.ColumnID), h.ColumnID, h.Title, h.ColumnIndex, h.Frozen, bounds}
 	}
+	m.Edit = s.Edit
+	if edit := gridEditingRecord(g.r); edit != nil {
+		field := edit.widget.(*core.TextField)
+		state := field.EditingState()
+		m.Editor = &GridEditorGeometry{ID: edit.node.ID, Session: s.Edit.Session, Text: state.Text, Focused: field.StateIs(states.Focused), Bounds: field.Geom.TotalBBox.Add(offset)}
+	}
 	g.measurement.Store(m)
 	if previous == nil || previous.Generation != m.Generation || previous.Bounds != m.Bounds {
 		_ = g.owner.Invalidate(g.window)
@@ -160,6 +177,10 @@ func InspectGrid(a *app.Application, model *virtual.Grid) (GridInspection, error
 		return GridInspection{}, ErrGridLayout
 	}
 	out := *m
+	if m.Editor != nil {
+		e := *m.Editor
+		out.Editor = &e
+	}
 	out.Cells = append([]GridCellGeometry(nil), m.Cells...)
 	out.Headers = append([]GridHeaderGeometry(nil), m.Headers...)
 	return out, nil

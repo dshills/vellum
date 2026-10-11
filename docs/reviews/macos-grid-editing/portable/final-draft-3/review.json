@@ -1,0 +1,63 @@
+{
+  "result": "APPROVED",
+  "scope": "Portable single-cell draft runtime, relevant existing helpers/tests, and specs/grid-editing.md only. Native adapter and independent consumer are not certified by this record.",
+  "source_root": "/private/tmp/vellum-grid-cell-editing",
+  "source_map": {
+    "virtual/grid_edit.go": "554bf34576b392c13c71f80a8996dc0412ff1ca0864f040bc15c1270e80456f1",
+    "virtual/grid.go": "7efc01efa509b3525d84b46310851917aeb13250ec35992ab8c57a38c88284f9",
+    "virtual/grid_geometry.go": "05eba3aabf57a4583fd6b0585d2cdd9b1be2e4aff28df549c141a9bba4574e5a",
+    "virtual/grid_selection.go": "39e74332ec4408030ac9ba0e82a0170f570f49f4c0fd670c8d32705bba17ea0d",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46",
+    "virtual/grid_edit_test.go": "81a153c9d6ea6a4f8a49e691a4129ce8bb491d03b31bec11de88eabccbe6cb11",
+    "specs/grid-editing.md": "a7472e8064168edd2d7420222d1b0e19d8cbf7145a8c20cd74231fe14a481bf3"
+  },
+  "source_map_sha256": "6bc586230730d52241dab6672b3668c1e1dfc850a8ec7f407db46f8d1712ab59",
+  "qualification": {
+    "path": "/private/tmp/vellum-grid-cell-editing-review/draft-3/qualification.json",
+    "sha256": "eb2e76c6379ef333a981dfe08e7e092b58ad269d36496926eb13dfae0e96d05b",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "./virtual",
+      "-run",
+      "^TestReview(GridEdit|Edit)",
+      "-count=20"
+    ],
+    "exit_code": 0,
+    "unchanged_isolated_inputs": true,
+    "unchanged_original_regression_sha256": "e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5",
+    "additional_regression_sha256": "629983605758b2be56e33c2d230ffa4b3c7e7d79eaa3cd3a4094c0529562bc3f"
+  },
+  "historical_findings": {
+    "path": "/private/tmp/vellum-grid-cell-editing-review/draft-1/review.json",
+    "sha256": "5c1fd684c7faede32df665c8927fda316627b70ca95a06f8fa23572ff8f3281c",
+    "classification": "preserved historical failing pre-correction source",
+    "resolved": [
+      {
+        "title": "Clipped overscan BeginEdit admission",
+        "correction": "Current bounded row geometry and cell clip checked before beginning."
+      },
+      {
+        "title": "Per-cell version reuse/rollback after admitted conflict or permission change",
+        "correction": "Prospective lastValue validates monotonic version and same-version exact text/editability; retained across missing rows and changed current incarnation; published only with accepted source."
+      }
+    ]
+  },
+  "checked_invariants": [
+    "Single publication of candidate source and draft removal after geometry/capacity/selection and late edited-cell/source checks.",
+    "Prepared exact source stamp rejects outdated proposals after source admission; fresh proposal retains unrelated current-domain edits; viewport-only changes preserve proposal.",
+    "Session identity plus local draft revision rejects cancel/restart and draft ABA; generation/session/draft exhaustion refuses atomically.",
+    "Recoverable draft read/set/cancel remains usable after unacknowledged source drift; Prepare/Complete require current live source.",
+    "Private token has no Grid/source backpointer; accepted baseline/current/draft/lastValue/request strings detach large caller backing allocations.",
+    "Length guard precedes UTF8 scanning for bounded edit input; positive cell versions and exact Cell/EditCell agreement checked.",
+    "All-row scans absent from new edit flow; source reads are indexed and bounded; captured requests are caller-owned retained values."
+  ],
+  "open_findings": [],
+  "limits": [
+    "Provider metadata/index/value methods must obey documented owner confinement, immutability/nonblocking and no reentry; this does not certify hidden cells or arbitrary provider side effects.",
+    "MaxEditBytes bounds each retained edit string, not all caller snapshots or total memory. MaxTextBytes remains a separate Snapshot payload admission bound; source admission does not promise every future Snapshot will succeed.",
+    "No native text/IME, external AX, physical input, GUI, performance, Git or Prism execution in this qualification.",
+    "Parent root separately qualifies the full portable/UI suite and will qualify native/consumer paths."
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "ae9499f87498a7e876e901f387a02920",
+  "repo": {
+    "root": "/private/tmp/vellum-grid-cell-editing",
+    "head": "ed75cce5a4e303b67eae4e853576b98ab41b9ce9",
+    "branch": "codex/grid-cell-editing"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "886ef99d5eff3ebf",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Input hashing crashes on tracked files deleted from the working tree",
+      "message": "`git ls-files --cached` also lists tracked files that were deleted in the working tree. `sha(root / p)` then raises FileNotFoundError. The crash happens after the exclusive `.qualification-started` marker is written, so the evidence directory is permanently burned and no qualification record is produced.",
+      "suggestion": "Skip paths that are not regular files when hashing, so a deleted tracked file cannot abort a run after the exclusive marker is written.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reports/macos-grid-editing/qualify-core.py",
+          "lines": {
+            "start": 24,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "robustness",
+        "qualification"
+      ],
+      "evidence": "    return {p: sha(root / p) for p in paths}",
+      "fix": {
+        "before": "    return {p: sha(root / p) for p in paths}",
+        "after": "    return {p: sha(root / p) for p in paths if (root / p).is_file()}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "10d5f689f7cd026c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unchecked type assertion on editor widget can panic during capture",
+      "message": "capture() runs during layout measurement and asserts `edit.widget` is a `*core.TextField` without checking. If the editing record's widget is another type, or is nil during a transitional state such as retirement or replacement, this panics and takes down the measurement path for the whole grid. `edit.widget` is typed as an interface elsewhere, which is why the assertion is needed at all.",
+      "suggestion": "Use the comma-ok form and skip filling `m.Editor` when the assertion fails: `if field, ok := edit.widget.(*core.TextField); ok \u0026\u0026 field != nil { ... }`.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/grid_geometry.go",
+          "lines": {
+            "start": 123,
+            "end": 125
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "type-assertion"
+      ],
+      "evidence": "field := edit.widget.(*core.TextField)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 95015,
+    "totalMs": 36255
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 36,
+    "bytes": 205293,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 106160,
+        "output": 12014,
+        "costUSD": 0.33246
+      }
+    ],
+    "widenedFiles": 15,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

@@ -1,0 +1,6 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; exec /private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop -smoke -editable-cells
+{"stage":"ready","data":{"Rows":[10000,1000000],"Cells":[240,240]}}
+{"stage":"far-both-axes","data":{"Viewport":{"Width":1797,"Height":344,"ScrollX":603,"ScrollY":23999684},"Cells":240,"Frames":4}}
+{"stage":"immutable-projection","data":{"Rows":500000,"Revision":2,"Active":{"RowKey":"row:000999998","ColumnID":"column:19"},"RetainedViewport":{"Width":1797,"Height":344,"ScrollX":603,"ScrollY":164},"RevealedViewport":{"Width":1797,"Height":344,"ScrollX":603,"ScrollY":0}}}
+{"stage":"editable-cells","data":{"Key":"row:000000007","Column":"column:01","SavedVersion":2,"ExternalVersion":3,"Conflict":"conflict","SparseOverrides":1}}
+{"stage":"pass","data":{"Scope":"desktop measured geometry, explicit model commands, closed-binding refusal and domain lifetimes; no human input/performance claim"}}

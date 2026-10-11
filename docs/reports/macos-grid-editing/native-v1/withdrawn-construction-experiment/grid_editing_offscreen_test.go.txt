@@ -1,0 +1,565 @@
+//go:build offscreen
+
+package cogent
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"image/color"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
+	"cogentcore.org/core/events"
+	"cogentcore.org/core/events/key"
+	"cogentcore.org/core/styles/abilities"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent/internal/mailbox"
+	"github.com/dshills/vellum/drivers/cogent/internal/textinput"
+	"github.com/dshills/vellum/execution"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/virtual"
+)
+
+type inlineSource struct {
+	nativeGridSource
+	text    string
+	version uint64
+	hidden  bool
+}
+
+func (s *inlineSource) Cell(row, col string) (string, error) {
+	if row == "row-0" && col == "c1" {
+		return s.text, nil
+	}
+	return row + col, nil
+}
+func (s *inlineSource) EditCell(row, col string) (virtual.GridEditValue, error) {
+	v, e := s.Cell(row, col)
+	return virtual.GridEditValue{Text: v, Version: s.version, Editable: true}, e
+}
+func (s *inlineSource) RowCount() int {
+	if s.hidden {
+		return s.rows - 1
+	}
+	return s.rows
+}
+func (s *inlineSource) RowKey(i int) (string, error) {
+	if s.hidden {
+		i++
+	}
+	return s.nativeGridSource.RowKey(i)
+}
+func (s *inlineSource) IndexOf(k string) (int, bool, error) {
+	if s.hidden && k == "row-0" {
+		return 0, false, nil
+	}
+	i, ok, e := s.nativeGridSource.IndexOf(k)
+	if s.hidden {
+		i--
+	}
+	return i, ok, e
+}
+func inlineFixture(t *testing.T, dpi float32) (*Manual, *app.Application, *virtual.Grid, *inlineSource, *[]ui.GridEditEvent) {
+	t.Helper()
+	s := &inlineSource{nativeGridSource: nativeGridSource{rows: 1000000, revision: 1}, text: "A😀é", version: 1}
+	g, e := virtual.NewGrid(s, []virtual.GridColumn{{ID: "c0", Width: 121}, {ID: "c1", Width: 121}, {ID: "c2", Width: 121}}, virtual.GridConfig{RowHeight: 23, HeaderHeight: 27, FrozenColumns: 1, CellEditing: true, MaxEditBytes: 32}, virtual.GridViewport{Width: 300, Height: 180})
+	if e != nil {
+		t.Fatal(e)
+	}
+	var commits []ui.GridEditEvent
+	config := manualConfig(t, 7)
+	config.LogicalDPI = dpi
+	m, a := gridManual(t, config, func() ui.Node {
+		return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: g, Grow: true, GridCommit: func(e ui.GridEditEvent) { commits = append(commits, e) }}
+	})
+	gridFrame(t, m)
+	selectionNativePointer(t, m, selectionNativeCell(t, gridInspection(t, a, g), 0, 1), 0, 0)
+	selectionNativeKey(t, m, key.CodeF2, 0)
+	return m, a, g, s, &commits
+}
+func inlineRune(t *testing.T, m *Manual, r rune) {
+	t.Helper()
+	w := selectionNativeWindow(t, m)
+	if e := m.Input(testContext, ManualInput{Window: w.ID, WindowIncarnation: w.Incarnation, Type: events.KeyChord, Rune: r}); e != nil {
+		t.Fatal(e)
+	}
+	gridFrame(t, m)
+}
+func TestManagedGridInlineActualFieldGeometryDraftAndCommit(t *testing.T) {
+	for _, dpi := range []float32{96, 120, 144, 192} {
+		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
+			m, a, g, _, commits := inlineFixture(t, dpi)
+			in := gridInspection(t, a, g)
+			if in.Editor == nil || !in.Editor.Focused || in.Editor.Session != in.Edit.Session {
+				t.Fatalf("inline client not focused %+v", in.Editor)
+			}
+			cell := selectionNativeCell(t, in, 0, 1)
+			if in.Editor.Bounds != cell.Bounds {
+				t.Fatalf("inline exterior %v cell %v", in.Editor.Bounds, cell.Bounds)
+			}
+			if err := a.Do(func() {
+				b := gBinding(t, g)
+				if b.host.Styles.Abilities.HasFlag(abilities.Focusable) {
+					t.Error("host adds Tab stop")
+				}
+			}); err != nil {
+				t.Fatal(err)
+			}
+			inlineRune(t, m, '界')
+			in = gridInspection(t, a, g)
+			if in.Edit.Text != "界" || in.Editor.Text != "界" || len(*commits) != 0 {
+				t.Fatalf("actual field failed draft-only transition %+v", in.Edit)
+			}
+			selectionNativeKey(t, m, key.CodeReturnEnter, 0)
+			if len(*commits) != 1 || (*commits)[0].State.Text != "界" {
+				t.Fatalf("settled commit intent %+v", *commits)
+			}
+			if e := a.Do(func() {
+				if edit, err := g.Edit(); err != nil || !edit.Active {
+					t.Error("native invented source/closed draft", edit, err)
+				}
+			}); e != nil {
+				t.Fatal(e)
+			}
+			selectionNativeKey(t, m, key.CodeEscape, 0)
+			if gridInspection(t, a, g).Editor != nil {
+				t.Fatal("cancel retained client")
+			}
+		})
+	}
+}
+func gBinding(t *testing.T, g *virtual.Grid) *gridBinding {
+	t.Helper()
+	gridRegistry.Lock()
+	b := gridRegistry.models[g]
+	gridRegistry.Unlock()
+	if b == nil {
+		t.Fatal("binding missing")
+	}
+	return b
+}
+func TestManagedGridInlineOrderedSettleAndCancellation(t *testing.T) {
+	m, a, g, _, _ := inlineFixture(t, 120)
+	b := gBinding(t, g)
+	tw := lookupTextWindow("one")
+	r := b.editing.record
+	callback := 0
+	var result error
+	if e := a.Do(func() {
+		tw.shadows[r.control.client] = textShadow{Text: r.node.Text, Epoch: r.control.textEpoch}
+		n := textinput.UTF16Offsets(r.node.Text)
+		last := n[len(n)-1]
+		update := textinput.Update{ClientID: r.control.client, Sequence: 1, BeforeText: r.node.Text, Text: r.node.Text + "日本", Kind: "mark", Anchor: last + 2, Focus: last + 2, MarkedStart: last, MarkedEnd: last + 2}
+		if e := tw.pump.Send(textMessage{Kind: "input", Input: update}); e != nil {
+			t.Error(e)
+		}
+		if e := SettleGridEdit(testContext, a, "one", g, func(e error) { callback++; result = e }); e != nil {
+			t.Error(e)
+		}
+		if e := SettleGridEdit(testContext, a, "one", g, func(error) {}); !errors.Is(e, mailbox.ErrFull) {
+			t.Error("unbounded settlement", e)
+		}
+		if callback != 0 {
+			t.Error("settlement dispatched implicitly")
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	gridFrame(t, m)
+	if callback != 1 || result != nil {
+		t.Fatal("settlement incomplete", callback, result)
+	}
+	if e := a.Do(func() {
+		edit, err := g.Edit()
+		if err != nil || edit.Text != "A😀é日本" {
+			t.Error("capture bypassed earlier preedit", edit, err)
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	ctx, cancel := context.WithCancel(testContext)
+	if e := a.Do(func() {
+		if e := SettleGridEdit(ctx, a, "one", g, func(e error) { callback++; result = e }); e != nil {
+			t.Error(e)
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	cancel()
+	if callback != 1 {
+		t.Fatal("manual cancellation implicitly dispatched")
+	}
+	gridFrame(t, m)
+	if callback != 2 || !errors.Is(result, context.Canceled) {
+		t.Fatal("manual cancellation completion", callback, result)
+	}
+}
+func TestManagedGridInlinePreflightBudgetsAndSessionRetirement(t *testing.T) {
+	m, a, g, _, _ := inlineFixture(t, 96)
+	b := gBinding(t, g)
+	tw := lookupTextWindow("one")
+	old := b.editing.record.control.client
+	if e := a.Do(func() { tw.publishGridRules() }); e != nil {
+		t.Fatal(e)
+	}
+	for _, text := range []string{"line\nnext", "line\rnext", strings.Repeat("x", 33), "\x00"} {
+		if tw.preflightInput(textinput.Update{ClientID: old, Kind: "insert", Text: text}) {
+			_ = tw.commitInput()
+			t.Fatal("invalid input reserved before native mutation", text)
+		}
+	}
+	if tw.pump.Stats().Queue.Outstanding != 0 {
+		t.Fatal("refused input retained credit")
+	}
+	var err error
+	if e := a.Do(func() {
+		err = g.CancelEdit()
+		if err == nil {
+			err = g.BeginActiveEdit()
+		}
+		_ = a.Invalidate("one")
+	}); e != nil || err != nil {
+		t.Fatal(e, err)
+	}
+	gridFrame(t, m)
+	next := gBinding(t, g).editing.record
+	if next.control.client == old {
+		t.Fatal("same-cell new session reused Cocoa identity")
+	}
+	if tw.preflightInput(textinput.Update{ClientID: old, Kind: "insert", Text: "stale"}) {
+		_ = tw.commitInput()
+		t.Fatal("retired client admitted mutation")
+	}
+	if e := a.Do(func() {
+		if err := SettleGridEdit(testContext, a, "one", g, func(error) {}); err != nil {
+			t.Error(err)
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	gridFrame(t, m)
+}
+func TestManagedGridInlineHiddenDraftSettlesAdmittedInput(t *testing.T) {
+	m, a, g, s, _ := inlineFixture(t, 144)
+	b := gBinding(t, g)
+	tw := lookupTextWindow("one")
+	r := b.editing.record
+	var opErr error
+	if e := a.Do(func() {
+		tw.shadows[r.control.client] = textShadow{Text: r.node.Text, Epoch: r.control.textEpoch}
+		next := r.node.Text + "日本"
+		end := textinput.UTF16Offsets(next)
+		at := end[len(end)-1]
+		opErr = tw.pump.Send(textMessage{Kind: "input", Input: textinput.Update{ClientID: r.control.client, Sequence: 1, BeforeText: r.node.Text, Text: next, Kind: "insert", Anchor: at, Focus: at, MarkedStart: -1, MarkedEnd: -1}})
+		replacement := *s
+		replacement.revision++
+		replacement.hidden = true
+		if opErr == nil {
+			opErr = g.ReplaceSource(&replacement)
+		}
+		if opErr == nil {
+			opErr = a.Invalidate("one")
+		}
+	}); e != nil || opErr != nil {
+		t.Fatal(e, opErr)
+	}
+	gridFrame(t, m)
+	var done error
+	calls := 0
+	if e := a.Do(func() { opErr = SettleGridEdit(testContext, a, "one", g, func(e error) { done = e; calls++ }) }); e != nil || opErr != nil {
+		t.Fatal(e, opErr)
+	}
+	gridFrame(t, m)
+	if calls != 1 || done != nil {
+		t.Fatal("hidden draft barrier", calls, done)
+	}
+	if e := a.Do(func() {
+		edit, err := g.Edit()
+		if err != nil || edit.Text != "A😀é日本" || edit.Status != virtual.GridEditUnavailable {
+			t.Error("hidden draft lost admitted text", edit, err)
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	if gridInspection(t, a, g).Editor != nil {
+		t.Fatal("hidden cell exposes inline field")
+	}
+}
+
+func TestManagedGridInlineConflictSealsQueuedMarkedInputAndRestoresHost(t *testing.T) {
+	m, a, g, s, _ := inlineFixture(t, 120)
+	b := gBinding(t, g)
+	tw := lookupTextWindow("one")
+	r := b.editing.record
+	var inner error
+	if e := a.Do(func() {
+		tw.shadows[r.control.client] = textShadow{Text: r.node.Text, Epoch: r.control.textEpoch}
+		offsets := textinput.UTF16Offsets(r.node.Text)
+		end := offsets[len(offsets)-1]
+		before, next := r.node.Text, r.node.Text+"日本"
+		for i, phase := range []string{"mark", "unmark"} {
+			u := textinput.Update{Sequence: uint64(i + 1), ClientID: r.control.client, Kind: phase, BeforeText: before, Text: next, Anchor: end + 2, Focus: end + 2, MarkedStart: end, MarkedEnd: end + 2}
+			if phase == "unmark" {
+				u.BeforeText = next
+				u.MarkedStart = -1
+				u.MarkedEnd = -1
+			}
+			if inner = tw.pump.Send(textMessage{Kind: "input", Input: u}); inner != nil {
+				return
+			}
+		}
+		replacement := *s
+		replacement.revision++
+		replacement.version++
+		replacement.text = "external conflict"
+		if inner = g.ReplaceSource(&replacement); inner == nil {
+			inner = a.Invalidate("one")
+		}
+	}); e != nil || inner != nil {
+		t.Fatal(e, inner)
+	}
+	gridFrame(t, m)
+	if e := a.Do(func() {
+		edit, err := g.Edit()
+		if err != nil || edit.Text != "A😀é日本" || edit.Status != virtual.GridEditConflict {
+			t.Error("conflict lost queued draft", edit, err)
+		}
+		focus, err := focusWidget(b.r)
+		if err != nil || focus != b.host {
+			t.Error("conflict targets disabled inline field", focus, err)
+		}
+		if !b.host.Styles.Abilities.HasFlag(abilities.Focusable) {
+			t.Error("conflict removed host Tab stop")
+		}
+		if tw.gridInputAllowed(textinput.Update{ClientID: r.control.client, Kind: "insert", Text: "new"}) {
+			t.Error("conflict admitted fresh mutation")
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+}
+func TestManagedGridInlineExpectedOwnerRetirementAndAXReplacement(t *testing.T) {
+	m, a, g, _, _ := inlineFixture(t, 144)
+	b := gBinding(t, g)
+	r := b.editing.record
+	var inner error
+	if e := a.Do(func() {
+		if !applyAccessibilityAction(r, accessibilityAction{Kind: "set", Value: "AX owner replacement"}) {
+			t.Error("AX replacement refused")
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	// Already queued pointer/key boundaries against old private bytes are normal
+	// retirement, not an application error or permission to undo owner changes.
+	selectionNativeKey(t, m, key.CodeRightArrow, 0)
+	if gridInspection(t, a, g).Edit.Text != "AX owner replacement" {
+		t.Fatal("old boundary overwrote owner")
+	}
+	if e := a.Do(func() {
+		inner = g.CancelEdit()
+		if inner == nil {
+			inner = a.Invalidate("one")
+		}
+	}); e != nil || inner != nil {
+		t.Fatal(e, inner)
+	}
+	selectionNativeKey(t, m, key.CodeRightArrow, 0)
+	if gridInspection(t, a, g).Editor != nil {
+		t.Fatal("owner Cancel retained editor")
+	}
+}
+
+func TestManagedGridInlineEscapeCompositionTabAndDetachedAX(t *testing.T) {
+	m, a, g, _, _ := inlineFixture(t, 96)
+	b := gBinding(t, g)
+	r := b.editing.record
+	tw := lookupTextWindow("one")
+	var inner error
+	if e := a.Do(func() {
+		tw.shadows[r.control.client] = textShadow{Text: r.node.Text, Epoch: r.control.textEpoch}
+		end := textinput.UTF16Offsets(r.node.Text)
+		n := end[len(end)-1]
+		tw.apply(textinput.Update{Sequence: 1, ClientID: r.control.client, BeforeText: r.node.Text, Text: r.node.Text + "に", Kind: "mark", Anchor: n + 1, Focus: n + 1, MarkedStart: n, MarkedEnd: n + 1})
+		nodes, _ := accessibilitySnapshot(m.implementation.find("one").state.root, &accessibilityBridge{})
+		found := false
+		for _, node := range nodes {
+			if node.DomainID == GridEditorID("g") {
+				found = true
+				if node.Role != string(ui.TextField) || node.TextClient != r.control.client || node.Value != r.node.Text+"に" {
+					t.Error("AX private field state", node)
+				}
+			}
+		}
+		if !found {
+			t.Error("AX omitted field")
+		}
+		if len(accessibilityTextGeometry(m.implementation.find("one").state.root)) == 0 {
+			t.Error("AX text geometry omitted field")
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	selectionNativeKey(t, m, key.CodeEscape, 0)
+	if in := gridInspection(t, a, g); !in.Edit.Active || in.Edit.Text != "A😀é" || in.Editor.Text != "A😀é" {
+		t.Fatal("first Escape canceled whole draft", in.Edit, in.Editor)
+	}
+	selectionNativeKey(t, m, key.CodeTab, 0)
+	if e := a.Do(func() {
+		edit, err := g.Edit()
+		if err != nil || !edit.Active {
+			t.Error("Tab committed/canceled domain", edit, err)
+		}
+	}); e != nil {
+		t.Fatal(e)
+	}
+	// Inspection is detached, including the new pointer-bearing field geometry.
+	detached := gridInspection(t, a, g)
+	detached.Editor.Text = "caller tampered"
+	if gridInspection(t, a, g).Editor.Text == "caller tampered" {
+		t.Fatal("inspection retained writable pointer")
+	}
+	if e := a.Do(func() {
+		inner = g.CancelEdit()
+		if inner == nil {
+			inner = g.BeginActiveEdit()
+		}
+		if inner == nil {
+			inner = a.Invalidate("one")
+		}
+	}); e != nil || inner != nil {
+		t.Fatal(e, inner)
+	}
+	gridFrame(t, m)
+}
+func TestManagedGridInlineSettlementRetiresWithWindowAndApp(t *testing.T) {
+	m, a, g, _, _ := inlineFixture(t, 120)
+	// Keep a second domain window live so origin retirement has an owner callback.
+	if e := a.Open(app.Window{ID: "survivor", Title: "Survivor", Width: 200, Height: 100, View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label, Text: "live"} }}); e != nil {
+		t.Fatal(e)
+	}
+	gridFrame(t, m)
+	calls := 0
+	var result error
+	var inner error
+	if e := a.Do(func() { inner = SettleGridEdit(testContext, a, "one", g, func(e error) { calls++; result = e }) }); e != nil || inner != nil {
+		t.Fatal(e, inner)
+	}
+	if e := a.CloseWindow("one"); e != nil {
+		t.Fatal(e)
+	}
+	gridFrame(t, m)
+	if calls != 1 || !errors.Is(result, app.ErrWindowClosed) {
+		t.Fatal("retired settle callback", calls, result)
+	}
+	if lookupTextWindow("one") != nil {
+		t.Fatal("private originating registry leaked")
+	}
+}
+
+func TestManagedGridInlineRetainedThemeAndGeometry(t *testing.T) {
+	m, a, g, _, _ := inlineFixture(t, 144)
+	inlineRune(t, m, '界')
+	binding := gBinding(t, g).editing
+	field := binding.record.widget.AsWidget()
+	client, session := binding.record.control.client, binding.session
+	for _, size := range []float32{14, 20} {
+		fg := color.NRGBA{R: uint8(size), G: 37, B: 91, A: 255}
+		bg := color.NRGBA{R: 240, G: uint8(size), B: 211, A: 255}
+		if err := a.Do(func() {
+			theme := m.implementation.config.Theme.Clone()
+			theme.Kinds = map[ui.Kind]ui.Style{ui.TextField: {Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: size, Weight: 600}), Foreground: ui.Some(fg), Background: ui.Some(bg), Padding: ui.Some(ui.UniformInsets(19)), Grow: ui.Some(float32(3))}}
+			m.implementation.config.Theme = theme
+			if err := a.Invalidate("one"); err != nil {
+				t.Error(err)
+			}
+		}); err != nil {
+			t.Fatal(err)
+		}
+		gridFrame(t, m)
+		if err := a.Do(func() {
+			got := gBinding(t, g).editing
+			if got != binding || got.record.widget.AsWidget() != field || got.record.control.client != client || got.session != session {
+				t.Error("theme replaced edit incarnation")
+			}
+			style := field.Styles
+			if style.Font.Size.Value != size || style.Color.At(0, 0) != fg || style.Background.At(0, 0) != bg {
+				t.Error("private field ignored current TextField theme", style.Font.Size, style.Color, style.Background)
+			}
+			if style.Padding.Left.Value != 1 || style.Grow.X != 0 || style.Grow.Y != 0 || style.Margin.Left.Value != 0 {
+				t.Error("theme bypassed grid geometry overrides")
+			}
+			if field.Name != GridEditorID("g") {
+				t.Error("private field missing stable widget name", field.Name)
+			}
+			if got.record.node.Accessibility.Name != "Edit c1, row 1" {
+				t.Error("private field missing cell context", got.record.node.Accessibility.Name)
+			}
+		}); err != nil {
+			t.Fatal(err)
+		}
+		in := gridInspection(t, a, g)
+		if in.Edit.Text != "界" || in.Editor.Text != "界" || in.Editor.Bounds != selectionNativeCell(t, in, 0, 1).Bounds {
+			t.Fatal("theme lost draft or fixed cell exterior", in.Edit, in.Editor)
+		}
+	}
+}
+
+type inlineConstructionClock struct {
+	execution.Clock
+	once   sync.Once
+	retire func()
+}
+
+func (c *inlineConstructionClock) Now() time.Time { c.once.Do(c.retire); return c.Clock.Now() }
+func TestManagedGridInlineConstructionLifetimeRefusalReleasesRegistry(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	for _, id := range []string{"one", "survivor"} {
+		if err := a.Open(app.Window{ID: id, Title: id, Width: 200, Height: 100, View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label, Text: "live"} }}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	config := manualConfig(t, 7)
+	var closeErr error
+	calls := 0
+	config.Clock = &inlineConstructionClock{Clock: config.Clock, retire: func() { calls++; closeErr = a.CloseWindow("one") }}
+	m, err := NewManual(testContext, a, config)
+	if m != nil {
+		_ = m.Close(testContext)
+		t.Fatal("constructor admitted retired lifetime")
+	}
+	if calls != 1 || closeErr != nil || !errors.Is(err, app.ErrWindowClosed) {
+		t.Fatal("construction retirement failed", calls, closeErr, err)
+	}
+	if lookupTextWindow("one") != nil {
+		t.Fatal("failed attachment retained global registry/owner/pump")
+	}
+	manualOwners.Lock()
+	active := manualOwners.active
+	claim := manualOwners.owners[a]
+	manualOwners.Unlock()
+	if active != nil || claim != nil {
+		t.Fatal("failed attachment retained exclusive owner")
+	}
+	if _, err := a.WindowContext("survivor"); err != nil {
+		t.Fatal("rollback retired surviving registration", err)
+	}
+	config = manualConfig(t, 7)
+	m, err = NewManual(testContext, a, config)
+	if err != nil {
+		t.Fatal("failed construction poisoned subsequent owner", err)
+	}
+	if err := m.Close(testContext); err != nil {
+		t.Fatal(err)
+	}
+	if lookupTextWindow("survivor") != nil {
+		t.Fatal("surviving attachment retained registry after close")
+	}
+}

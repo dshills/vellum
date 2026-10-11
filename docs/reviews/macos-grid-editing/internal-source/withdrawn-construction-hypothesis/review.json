@@ -1,0 +1,28 @@
+{
+  "classification": "Withdrawn hypothesis; passing deterministic test-only lifecycle cancellation injection. No runtime finding/fix or native GUI claim.",
+  "argv": [
+    "go",
+    "test",
+    "-tags",
+    "offscreen",
+    "-race",
+    "-overlay",
+    "/private/tmp/vellum-grid-cell-editing-review/native-construction/overlay.json",
+    "-run",
+    "^TestReviewManualCanceledTextConstructionRetiresRegistry$",
+    "-count=1",
+    "."
+  ],
+  "exit_code": 0,
+  "seam_reached_once_asserted": true,
+  "source": {
+    "original-manual_offscreen.go.txt": "8a22ca10d6645f58aedf558df61885f05b2636e014b147dba4c6e1878520ac50",
+    "injected-manual_offscreen.go.txt": "377e7c2cff51dd480784606a005d56310a490b439e5f1cf05866391c31fd53ad",
+    "construction_review_test.go.txt": "1169a6f8e2b3e3c392c179afa27b4893aa126689c16584e87ec02194906c7771"
+  },
+  "log": {
+    "path": "qualified-lifecycle-injection.log",
+    "sha256": "79090d3aa84a60d521f34cfa0b8caac24c8a21afa98fdac866d61c7365967181"
+  },
+  "note": "Application.WindowContext retains admitted IDs lifetime-long; Close returns canceled context,nil. Failed NewManual construction still publishes n.input before later owner refusal, and owned rollback removes the text registry. Overlay inserts only the lifecycle scheduling hook."
+}

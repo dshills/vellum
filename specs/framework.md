@@ -89,8 +89,10 @@ retired opaque cell refs refuse activation after a viewport/source transition.
 See the [grid contract](grid.md). This adds an indexed foundation for the P6
 million-row workload. Optional [row selection](grid-selection.md) captures
 immutable range/All membership, with bounded key toggles and detached worker
-enumeration. The active cell remains a separate cursor. Editing and native
-performance remain open. Existing Table/Tree interfaces remain supported.
+enumeration. The active cell remains a separate cursor. Optional [cell editing](grid-editing.md)
+adds one versioned draft with validation owned by the application and atomic
+immutable-source admission. Native performance and loaded-data/tree acceptance
+remain open. Existing Table/Tree interfaces remain supported.
 
 ## GPU canvas
 

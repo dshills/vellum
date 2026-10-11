@@ -1,0 +1,117 @@
+{
+  "result": "RESOLVED_PENDING_FINAL_EVIDENCE_AUDIT",
+  "scope": "One full significant batch, then focused internal review of a qualification-wrapper correction and report-only clarifications. Original Prism findings/process remain unchanged. No native runtime changes or extra broad Prism calls.",
+  "prism": {
+    "report": "prism.json",
+    "sha256": "ae23743c9da37901bb57e9f6262d9fbad96accf1988d2a53225caee79d3d313e",
+    "inputs": "prism-inputs.json",
+    "inputs_sha256": "dba29881e45cc1e7b8c4556469ad9697fe236d2af1c26b35fc712e2ddffb3f1e",
+    "process": "prism-process.json",
+    "process_sha256": "bdfdceda8da62cccfacd9297fac2e5e1fa20da70dc13366fc95517409f1bdfa8",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 36,
+      "bytes": 205293,
+      "chunks": 4,
+      "llmCalls": 4,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 106160,
+          "output": 12014,
+          "costUSD": 0.33246
+        }
+      ],
+      "widenedFiles": 15,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "original_exit_code": 1
+  },
+  "findings": [
+    {
+      "id": "886ef99d5eff3ebf",
+      "disposition": "FIXED",
+      "reason": "Retain absent and nonregular source entries rather than abort hashing. Real isolated deletion reproduces old missing-file crash; corrected wrapper records a nonzero Go compile failure with an absent marker. Final intact source passes all core checks after correction.",
+      "corrected_source": "docs/reports/macos-grid-editing/qualify-core.py",
+      "corrected_sha256": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21",
+      "regression": "docs/reports/macos-grid-editing/qualifier-deletion-check/regression.json",
+      "regression_sha256": "b417fae3e43313a166d76e94e39dfe4f8c37e47debd8b6281f2b56665ea99ce2",
+      "final_qualification": "docs/reports/macos-grid-editing/core-v4/qualification.json",
+      "qualification_sha256": "80ae459c76277d557c98a48e7654038370803bb0a6c64d625d64846a88af218f"
+    },
+    {
+      "id": "10d5f689f7cd026c",
+      "disposition": "REFUTED",
+      "reason": "The sole private edit-binding publisher constructs a fixed TextField and assigns its concrete widget before publishing; error paths return before publication. Refresh never changes its widget type. Disposal clears the grid binding before retirement/deletion, and visible nonretired measurement runs under originating lifecycle serialization. Generic descriptor widgets cannot reach this private binding.",
+      "independent_adjudication": "prism-capture-adjudication.json",
+      "adjudication_sha256": "562400d662e1ecd101d80455754a2e3d45485bafa29231cd8d6634aa8c805e3d",
+      "producer_disposition": "native-supplement/review/prism-geometry-disposition.json",
+      "producer_disposition_sha256": "04ce52b67ba3af0200fbac1d6a582162241343fbf5f6def4e20e7f0119875b85"
+    }
+  ],
+  "post_review_changed_files": {
+    "docs/reports/macos-grid-editing/README.md": {
+      "reviewed_sha256": "1687686cc15f8b6ba12e422f4ccff79f8538817a108b66187423c0aeb5e5218b",
+      "current_sha256": "02d46ff3ca0ef7ea6d78dcf7607718cfa62ea78d0b719de59cc88071a524d1a5"
+    },
+    "docs/reports/macos-grid-editing/qualify-core.py": {
+      "reviewed_sha256": "3c5ec4196f70a6bee1c3844b01d851220f73634865b0b87b431257710b095502",
+      "current_sha256": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21"
+    },
+    "docs/reviews/macos-grid-editing/README.md": {
+      "reviewed_sha256": "095f4a228fcfd4465c4f0f1ff365a140808b84a9829f23d8d7f8b54efb6bbc8d",
+      "current_sha256": "ce1a36c730f22cc83f8f8db094af63c32671c604ea64d3e36f1ba0b572feaac8"
+    }
+  },
+  "current_selected_sources": {
+    "docs/implementation.md": "1ddbdf176914278125c1f738521f3830724a0d5bb93ffdcfab744763edb288e6",
+    "drivers/cogent/accessibility.go": "60f5902f43e479dcb62c2296fec143125e9d38746a4cb96be8b33fa680b9797e",
+    "drivers/cogent/accessibility_workbench.go": "43890c6bc353d7c84f9191df2f0ddf5aad7b1aadf4533663177f4636fa0755be",
+    "drivers/cogent/controls.go": "8010399f76aa106f560348b44e87b79a68ed55ba4142f81a9352ba497b181fe7",
+    "drivers/cogent/editor.go": "2787964ce9070389bb06dd769b6cdeb1f3e822d1c8f8c37cb39ce77d20c03ce2",
+    "drivers/cogent/editor_geometry.go": "f9928044137efddc77dba9434836bf25b1f30248f967f267aca31253690f02c5",
+    "drivers/cogent/grid.go": "8a959afa66ebb8e685107e4d0afadc5add3273be580c46be6252651724e4ae96",
+    "drivers/cogent/grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "drivers/cogent/grid_editing_offscreen_test.go": "e5750122a16a5585247d7cd3cb7cdd1c7e6afa5d5ac5b4971948c12b3d838894",
+    "drivers/cogent/grid_geometry.go": "c1841ba8b9311d8c7f4830459abd80933f509f2f1958d148de04ffcfa5687b4b",
+    "drivers/cogent/manual_offscreen.go": "8a22ca10d6645f58aedf558df61885f05b2636e014b147dba4c6e1878520ac50",
+    "examples/grid/README.md": "5ff9dfd28a5995962d5c10db8347e6b7ee3ea856abbbaf4888c168918502be9a",
+    "examples/grid/cell_editing_managed_test.go": "f6ad1359b5e33bad372587e263af92a5d4af146c60122b9fd4ab86ddf0a3d516",
+    "examples/grid/cell_editing_test.go": "a2f4e9b33c37f75ac78574acd9c1d3c864ae0b2d11a5ced2cf9582912f0dc72a",
+    "examples/grid/main.go": "74cf182b8356e5e54b78528028d927ae4488f09c98e8e6c74930671d1b66741c",
+    "examples/grid/model.go": "7e08cf8e20c415146968c3810a5ef713c1c5469f7a54e78a39738ffa6969c3d9",
+    "examples/grid/smoke.go": "e170809aa68c1dc3680826f434bfc9f7334a39fa2c85ead711253cedbe9d98cf",
+    "examples/grid/source.go": "5fcd9209a8a9628860cabcf76da0f156e6229a670ad7a8f48517a4521807dedd",
+    "specs/README.md": "203c09cca5fd9ce933ad08655782159be9d81080d3e198a8fbb5374d4bc0b35f",
+    "specs/framework.md": "d28c51c6d2529438a4629710d6b6a0f228e8c4fd5ce378a7ce6ba3397b6da4f7",
+    "specs/grid-editing.md": "a7472e8064168edd2d7420222d1b0e19d8cbf7145a8c20cd74231fe14a481bf3",
+    "specs/grid-native.md": "b7d08067775a07d7fe0247a65d020d7776c638920c43b0f51c24c51d63fc2d5e",
+    "specs/grid.md": "2b6c2b9df816850766bede347fe6cdc431d28f67d977418548b8ef9433278510",
+    "specs/macos-completion.md": "a23857ac77035e74b4a1b3241d3d019ec8e5191f236cf249684ecac696992050",
+    "ui/controls.go": "6f580d5215102e9db824a35297905ed17a6289d1604dd168879ff80c51a04fac",
+    "ui/grid.go": "ca82123129560ceec5045d032bd30a002f36e7499f8ed2dd67eac5ca32cacba0",
+    "ui/grid_edit_test.go": "ba9b725cfcf271f73db7a695ec3aac4d827df3a9232671a57cd13f0f8d191a9c",
+    "ui/node.go": "a7c157db4fe65b2481693295d2bf11c6bd11b9e7c51d4abda4c38707d070fa00",
+    "virtual/grid.go": "7efc01efa509b3525d84b46310851917aeb13250ec35992ab8c57a38c88284f9",
+    "virtual/grid_edit.go": "554bf34576b392c13c71f80a8996dc0412ff1ca0864f040bc15c1270e80456f1",
+    "virtual/grid_edit_review_test.go": "e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5",
+    "virtual/grid_edit_test.go": "81a153c9d6ea6a4f8a49e691a4129ce8bb491d03b31bec11de88eabccbe6cb11",
+    "virtual/grid_edit_transaction_review_test.go": "5766d3fed3d3c8fdfef88f1e6868a145e25a3af400ad9fa67d11356b08d82736",
+    "docs/reports/macos-grid-editing/README.md": "02d46ff3ca0ef7ea6d78dcf7607718cfa62ea78d0b719de59cc88071a524d1a5",
+    "docs/reports/macos-grid-editing/qualify-core.py": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21",
+    "docs/reviews/macos-grid-editing/README.md": "ce1a36c730f22cc83f8f8db094af63c32671c604ea64d3e36f1ba0b572feaac8"
+  },
+  "internal_delta_review": "Pending separate exact-source/evidence certificate.",
+  "settings_changed": false
+}

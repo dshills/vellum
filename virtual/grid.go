@@ -52,6 +52,8 @@ type GridConfig struct {
 	MaxRows, MaxColumns, MaxCells, MaxTextBytes int
 	RowSelection                                bool
 	MaxSelectionKeys                            int
+	CellEditing                                 bool
+	MaxEditBytes                                int
 }
 
 type GridActive struct{ RowKey, ColumnID string }
@@ -65,6 +67,7 @@ type GridState struct {
 	Config                               GridConfig
 	VariableHeights                      bool
 	Selection                            GridSelectionState
+	Edit                                 GridEditState
 }
 
 // GridCellRef is an opaque, copyable press identity. A source, viewport, active
@@ -122,6 +125,8 @@ type Grid struct {
 	anchorKey    string
 	anchorOffset int
 	selection    GridSelection
+	edit         gridEditDraft
+	editSerial   uint64
 }
 
 const gridMaxDefinitions = 4096
@@ -143,9 +148,12 @@ func normalizeGridConfig(c GridConfig) (GridConfig, error) {
 	if c.MaxSelectionKeys == 0 {
 		c.MaxSelectionKeys = 4096
 	}
+	if c.MaxEditBytes == 0 {
+		c.MaxEditBytes = 64 << 10
+	}
 	if c.RowHeight <= 0 || c.HeaderHeight < 0 || c.FrozenColumns < 0 || c.OverscanRows < 0 || c.OverscanColumns < 0 ||
 		c.MaxRows < 1 || c.MaxRows > 4096 || c.MaxColumns < 1 || c.MaxColumns > gridMaxDefinitions ||
-		c.MaxCells < 1 || c.MaxCells > 1<<20 || c.MaxTextBytes < 1 || c.MaxTextBytes > 64<<20 || c.MaxSelectionKeys < 1 || c.MaxSelectionKeys > 65536 {
+		c.MaxCells < 1 || c.MaxCells > 1<<20 || c.MaxTextBytes < 1 || c.MaxTextBytes > 64<<20 || c.MaxSelectionKeys < 1 || c.MaxSelectionKeys > 65536 || c.MaxEditBytes < 1 || c.MaxEditBytes > 1<<20 {
 		return c, ErrGridInvalid
 	}
 	return c, nil
@@ -178,6 +186,11 @@ func NewGrid(source GridSource, columns []GridColumn, config GridConfig, viewpor
 	}
 	if c.RowSelection {
 		if _, ok := source.(GridSelectionSource); !ok {
+			return nil, ErrGridSource
+		}
+	}
+	if c.CellEditing {
+		if _, ok := source.(GridEditSource); !ok {
 			return nil, ErrGridSource
 		}
 	}
@@ -267,7 +280,7 @@ func (g *Grid) nextGeneration() error {
 	return nil
 }
 func (g *Grid) state() GridState {
-	return GridState{Stamp: g.stamp, Generation: g.generation, Viewport: g.viewport, Active: g.active, Columns: len(g.columns), TotalWidth: g.prefix[len(g.columns)], TotalHeight: g.rows.total, FrozenWidth: g.prefix[g.config.FrozenColumns], Config: g.config, VariableHeights: g.rows.metrics != nil, Selection: g.selection.state}
+	return GridState{Stamp: g.stamp, Generation: g.generation, Viewport: g.viewport, Active: g.active, Columns: len(g.columns), TotalWidth: g.prefix[len(g.columns)], TotalHeight: g.rows.total, FrozenWidth: g.prefix[g.config.FrozenColumns], Config: g.config, VariableHeights: g.rows.metrics != nil, Selection: g.selection.state, Edit: g.edit.state}
 }
 func (g *Grid) State() (GridState, error) {
 	if err := g.current(); err != nil {
@@ -430,6 +443,9 @@ func (g *Grid) Refresh() error {
 	return g.ReplaceSource(g.source)
 }
 func (g *Grid) ReplaceSource(source GridSource) error {
+	return g.replaceSource(source, nil)
+}
+func (g *Grid) replaceSource(source GridSource, completing *GridEditRequest) error {
 	if err := g.valid(); err != nil {
 		return err
 	}
@@ -439,6 +455,11 @@ func (g *Grid) ReplaceSource(source GridSource) error {
 	}
 	if g.config.RowSelection {
 		if _, ok := source.(GridSelectionSource); !ok {
+			return ErrGridSource
+		}
+	}
+	if g.config.CellEditing {
+		if _, ok := source.(GridEditSource); !ok {
 			return ErrGridSource
 		}
 	}
@@ -513,6 +534,10 @@ func (g *Grid) ReplaceSource(source GridSource) error {
 	if err := g.validateSelectionView(selection, source, stamp, rows, v); err != nil {
 		return err
 	}
+	edit, err := g.editForSource(source, stamp)
+	if err != nil {
+		return err
+	}
 	key, offset, err := g.anchor(source, stamp, rows, v)
 	if err != nil {
 		return err
@@ -526,9 +551,31 @@ func (g *Grid) ReplaceSource(source GridSource) error {
 	if err := sameStamp(source, stamp); err != nil {
 		return err
 	}
+	if completing != nil {
+		// Candidate callbacks cannot change the live domain underneath the
+		// transaction. Ordinary Refresh still admits explicitly advanced sources.
+		if err := g.checkEditRequest(*completing); err != nil {
+			return err
+		}
+		value, found, err := g.checkedEditCell(source, stamp, completing.state.RowKey, completing.state.ColumnID)
+		if err != nil {
+			return err
+		}
+		if !found || !value.Editable || value.Version <= completing.state.BaseVersion || value.Text != completing.state.Text {
+			return ErrGridEditConflict
+		}
+		if err := sameStamp(g.source, g.stamp); err != nil {
+			return err
+		}
+		if err := sameStamp(source, stamp); err != nil {
+			return err
+		}
+		edit = gridEditDraft{}
+	}
 	stamp.Identity = strings.Clone(stamp.Identity)
 	g.source, g.stamp, g.rows, g.active, g.viewport, g.anchorKey, g.anchorOffset = source, stamp, rows, active, v, strings.Clone(key), offset
 	g.selection = selection
+	g.edit = edit
 	g.generation++
 	return nil
 }

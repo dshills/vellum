@@ -1,0 +1,80 @@
+{
+  "result": "APPROVED_QUALIFICATION_BINDING",
+  "scope": "Mechanical independent check of frozen native source producer qualification, selected current sources, raw logs and prepared-tree aggregate identities; no tests or GUI rerun.",
+  "qualification": {
+    "path": "/private/tmp/vellum-grid-editing-native/qualified-v1/qualification.json",
+    "sha256": "18423862370263eaa1cef04a39e980aed10ed1209d698b5800cc2dff76f49558"
+  },
+  "ownership": {
+    "path": "ownership.json",
+    "sha256": "fcfc443636c80b0912a53b40b683d33bb94e5d54af67a38a998aef36ca8ced51"
+  },
+  "selected_entries_verified": 146,
+  "absent_entries": 1,
+  "prepared_current_verified": {
+    "typesetting": {
+      "files": 288,
+      "sha256": "21f8bef1115bc73a80bf2c7e99fb9a8c335a7c314f0be6a26ca784bbcca9cb6b"
+    },
+    "upstream": {
+      "files": 5832,
+      "sha256": "482d1388593483a09197233b6c97814c8ea16efbcb4c734ccf3f9f075356cee2"
+    }
+  },
+  "before_after_equal": true,
+  "checks_verified": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-tags",
+        "offscreen",
+        "-race",
+        "-count=3",
+        "-run",
+        "^(TestManagedGridInline|TestManagedEditor|TestManagedTextField)",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "check-1.log",
+      "sha256": "5f849b0999966fdb9d5bc786c112f39ea888f65100495e38a5b0476e92a76dde"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-tags",
+        "offscreen",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "check-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "check-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "go",
+        "build",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "check-4.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "limits": [
+    "Selected source map plus aggregate prepared fingerprints, not a per-file complete build closure.",
+    "Offscreen routing and compatibility/default compile/vet only; no Cocoa GUI, human IME, external AX or performance claim.",
+    "Historical exploratory logs remain explicitly unqualified; consumer earlier failure/drift proofs are not superseded by this native proof."
+  ]
+}

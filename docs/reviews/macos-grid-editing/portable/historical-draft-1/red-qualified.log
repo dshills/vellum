@@ -1,0 +1,14 @@
+--- FAIL: TestReviewGridEditHiddenReferenceRefused (0.00s)
+    edit_review_test.go:16: clipped overscan reference accepted: err=<nil> edit={Active:true RowKey:r:1 ColumnID:c:0 Original:r:1/c:0 Text:r:1/c:0 CurrentText:r:1/c:0 BaseVersion:1 CurrentVersion:1 Revision:1 Status:ready Session:1}
+--- FAIL: TestReviewGridEditCellVersionHistoryRefused (0.00s)
+    --- FAIL: TestReviewGridEditCellVersionHistoryRefused/rollback (0.00s)
+        edit_review_test.go:34: invalid accessed cell version transition accepted: err=<nil> edit={Active:true RowKey:r:0 ColumnID:c:0 Original:r:0/c:0 Text:r:0/c:0 CurrentText:remote value BaseVersion:1 CurrentVersion:2 Revision:1 Status:conflict Session:1}
+    --- FAIL: TestReviewGridEditCellVersionHistoryRefused/same-version-text (0.00s)
+        edit_review_test.go:34: invalid accessed cell version transition accepted: err=<nil> edit={Active:true RowKey:r:0 ColumnID:c:0 Original:r:0/c:0 Text:r:0/c:0 CurrentText:different remote value BaseVersion:1 CurrentVersion:3 Revision:1 Status:conflict Session:1}
+    --- FAIL: TestReviewGridEditCellVersionHistoryRefused/same-version-editability (0.00s)
+        edit_review_test.go:34: invalid accessed cell version transition accepted: err=<nil> edit={Active:true RowKey:r:0 ColumnID:c:0 Original:r:0/c:0 Text:r:0/c:0 CurrentText:remote value BaseVersion:1 CurrentVersion:3 Revision:1 Status:read-only Session:1}
+--- FAIL: TestReviewGridEditBaselineEditabilityVersionRefused (0.00s)
+    edit_review_test.go:46: editability changed without cell version: err=<nil> edit={Active:true RowKey:r:0 ColumnID:c:0 Original:r:0/c:0 Text:r:0/c:0 CurrentText:r:0/c:0 BaseVersion:1 CurrentVersion:1 Revision:1 Status:read-only Session:1}
+FAIL
+FAIL	github.com/dshills/vellum/virtual	0.188s
+FAIL

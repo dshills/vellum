@@ -1,0 +1,7 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestManagedGridInlineHiddenDraftSettlesAdmittedInput (0.04s)
+    grid_editing_offscreen_test.go:279: hidden draft lost admitted text {true row-0 c1 A😀é A😀é  1 0 1 unavailable 1} <nil>
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	0.816s
+FAIL

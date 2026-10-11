@@ -1,0 +1,185 @@
+{
+  "scope": "Selected final source/spec/report bytes only, reusing byte-identical internal snapshots. Corrected wrapper and report-only deltas are separate from original Prism inputs. Not complete dependency build-source closure.",
+  "sources": {
+    "docs/implementation.md": {
+      "sha256": "1ddbdf176914278125c1f738521f3830724a0d5bb93ffdcfab744763edb288e6",
+      "bytes": 13211,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/docs/implementation.md"
+    },
+    "drivers/cogent/accessibility.go": {
+      "sha256": "60f5902f43e479dcb62c2296fec143125e9d38746a4cb96be8b33fa680b9797e",
+      "bytes": 30373,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/accessibility.go.txt"
+    },
+    "drivers/cogent/accessibility_workbench.go": {
+      "sha256": "43890c6bc353d7c84f9191df2f0ddf5aad7b1aadf4533663177f4636fa0755be",
+      "bytes": 12783,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/accessibility_workbench.go.txt"
+    },
+    "drivers/cogent/controls.go": {
+      "sha256": "8010399f76aa106f560348b44e87b79a68ed55ba4142f81a9352ba497b181fe7",
+      "bytes": 19658,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/controls.go.txt"
+    },
+    "drivers/cogent/editor.go": {
+      "sha256": "2787964ce9070389bb06dd769b6cdeb1f3e822d1c8f8c37cb39ce77d20c03ce2",
+      "bytes": 29451,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/editor.go.txt"
+    },
+    "drivers/cogent/editor_geometry.go": {
+      "sha256": "f9928044137efddc77dba9434836bf25b1f30248f967f267aca31253690f02c5",
+      "bytes": 9298,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/editor_geometry.go.txt"
+    },
+    "drivers/cogent/grid.go": {
+      "sha256": "8a959afa66ebb8e685107e4d0afadc5add3273be580c46be6252651724e4ae96",
+      "bytes": 26362,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/grid.go.txt"
+    },
+    "drivers/cogent/grid_editing.go": {
+      "sha256": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+      "bytes": 11704,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/grid_editing.go.txt"
+    },
+    "drivers/cogent/grid_editing_offscreen_test.go": {
+      "sha256": "e5750122a16a5585247d7cd3cb7cdd1c7e6afa5d5ac5b4971948c12b3d838894",
+      "bytes": 16947,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/grid_editing_offscreen_test.go.txt"
+    },
+    "drivers/cogent/grid_geometry.go": {
+      "sha256": "c1841ba8b9311d8c7f4830459abd80933f509f2f1958d148de04ffcfa5687b4b",
+      "bytes": 7142,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/grid_geometry.go.txt"
+    },
+    "drivers/cogent/manual_offscreen.go": {
+      "sha256": "8a22ca10d6645f58aedf558df61885f05b2636e014b147dba4c6e1878520ac50",
+      "bytes": 29120,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/drivers/cogent/manual_offscreen.go.txt"
+    },
+    "examples/grid/README.md": {
+      "sha256": "5ff9dfd28a5995962d5c10db8347e6b7ee3ea856abbbaf4888c168918502be9a",
+      "bytes": 9706,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/README.md"
+    },
+    "examples/grid/cell_editing_managed_test.go": {
+      "sha256": "f6ad1359b5e33bad372587e263af92a5d4af146c60122b9fd4ab86ddf0a3d516",
+      "bytes": 8266,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/cell_editing_managed_test.go.txt"
+    },
+    "examples/grid/cell_editing_test.go": {
+      "sha256": "a2f4e9b33c37f75ac78574acd9c1d3c864ae0b2d11a5ced2cf9582912f0dc72a",
+      "bytes": 12117,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/cell_editing_test.go.txt"
+    },
+    "examples/grid/main.go": {
+      "sha256": "74cf182b8356e5e54b78528028d927ae4488f09c98e8e6c74930671d1b66741c",
+      "bytes": 2511,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/main.go.txt"
+    },
+    "examples/grid/model.go": {
+      "sha256": "7e08cf8e20c415146968c3810a5ef713c1c5469f7a54e78a39738ffa6969c3d9",
+      "bytes": 15566,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/model.go.txt"
+    },
+    "examples/grid/smoke.go": {
+      "sha256": "e170809aa68c1dc3680826f434bfc9f7334a39fa2c85ead711253cedbe9d98cf",
+      "bytes": 20494,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/smoke.go.txt"
+    },
+    "examples/grid/source.go": {
+      "sha256": "5fcd9209a8a9628860cabcf76da0f156e6229a670ad7a8f48517a4521807dedd",
+      "bytes": 10951,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/examples/grid/source.go.txt"
+    },
+    "specs/README.md": {
+      "sha256": "203c09cca5fd9ce933ad08655782159be9d81080d3e198a8fbb5374d4bc0b35f",
+      "bytes": 3207,
+      "archive": "docs/reviews/macos-grid-editing/final-input/specs/README.md"
+    },
+    "specs/framework.md": {
+      "sha256": "d28c51c6d2529438a4629710d6b6a0f228e8c4fd5ce378a7ce6ba3397b6da4f7",
+      "bytes": 10922,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/framework.md"
+    },
+    "specs/grid-editing.md": {
+      "sha256": "a7472e8064168edd2d7420222d1b0e19d8cbf7145a8c20cd74231fe14a481bf3",
+      "bytes": 5377,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid-editing.md"
+    },
+    "specs/grid-native.md": {
+      "sha256": "b7d08067775a07d7fe0247a65d020d7776c638920c43b0f51c24c51d63fc2d5e",
+      "bytes": 14767,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid-native.md"
+    },
+    "specs/grid.md": {
+      "sha256": "2b6c2b9df816850766bede347fe6cdc431d28f67d977418548b8ef9433278510",
+      "bytes": 13737,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/grid.md"
+    },
+    "specs/macos-completion.md": {
+      "sha256": "a23857ac77035e74b4a1b3241d3d019ec8e5191f236cf249684ecac696992050",
+      "bytes": 7230,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/specs/macos-completion.md"
+    },
+    "ui/controls.go": {
+      "sha256": "6f580d5215102e9db824a35297905ed17a6289d1604dd168879ff80c51a04fac",
+      "bytes": 5483,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/ui/controls.go.txt"
+    },
+    "ui/grid.go": {
+      "sha256": "ca82123129560ceec5045d032bd30a002f36e7499f8ed2dd67eac5ca32cacba0",
+      "bytes": 858,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/ui/grid.go.txt"
+    },
+    "ui/grid_edit_test.go": {
+      "sha256": "ba9b725cfcf271f73db7a695ec3aac4d827df3a9232671a57cd13f0f8d191a9c",
+      "bytes": 261,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/ui/grid_edit_test.go.txt"
+    },
+    "ui/node.go": {
+      "sha256": "a7c157db4fe65b2481693295d2bf11c6bd11b9e7c51d4abda4c38707d070fa00",
+      "bytes": 3417,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/ui/node.go.txt"
+    },
+    "virtual/grid.go": {
+      "sha256": "7efc01efa509b3525d84b46310851917aeb13250ec35992ab8c57a38c88284f9",
+      "bytes": 23441,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/virtual/grid.go.txt"
+    },
+    "virtual/grid_edit.go": {
+      "sha256": "554bf34576b392c13c71f80a8996dc0412ff1ca0864f040bc15c1270e80456f1",
+      "bytes": 10126,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/virtual/grid_edit.go.txt"
+    },
+    "virtual/grid_edit_review_test.go": {
+      "sha256": "e917df7e84790b9ab490fdf5cc5f017e829e2679c5bc102d5d1b2346d541d4e5",
+      "bytes": 2352,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/virtual/grid_edit_review_test.go.txt"
+    },
+    "virtual/grid_edit_test.go": {
+      "sha256": "81a153c9d6ea6a4f8a49e691a4129ce8bb491d03b31bec11de88eabccbe6cb11",
+      "bytes": 9490,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/virtual/grid_edit_test.go.txt"
+    },
+    "virtual/grid_edit_transaction_review_test.go": {
+      "sha256": "5766d3fed3d3c8fdfef88f1e6868a145e25a3af400ad9fa67d11356b08d82736",
+      "bytes": 5283,
+      "archive": "docs/reviews/macos-grid-editing/internal-source/selected-source/virtual/grid_edit_transaction_review_test.go.txt"
+    },
+    "docs/reports/macos-grid-editing/README.md": {
+      "sha256": "02d46ff3ca0ef7ea6d78dcf7607718cfa62ea78d0b719de59cc88071a524d1a5",
+      "bytes": 2837,
+      "archive": "docs/reviews/macos-grid-editing/final-input/docs/reports/macos-grid-editing/README.md"
+    },
+    "docs/reports/macos-grid-editing/qualify-core.py": {
+      "sha256": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21",
+      "bytes": 3166,
+      "archive": "docs/reviews/macos-grid-editing/final-input/docs/reports/macos-grid-editing/qualify-core.py.txt"
+    },
+    "docs/reviews/macos-grid-editing/README.md": {
+      "sha256": "ce1a36c730f22cc83f8f8db094af63c32671c604ea64d3e36f1ba0b572feaac8",
+      "bytes": 1817,
+      "archive": "docs/reviews/macos-grid-editing/final-input/docs/reviews/macos-grid-editing/README.md"
+    }
+  }
+}

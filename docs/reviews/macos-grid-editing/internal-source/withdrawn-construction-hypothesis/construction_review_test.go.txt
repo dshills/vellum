@@ -1,0 +1,22 @@
+//go:build offscreen
+package cogent
+import (
+ "testing"
+ "github.com/dshills/vellum/app"
+ "github.com/dshills/vellum/ui"
+)
+func TestReviewManualCanceledTextConstructionRetiresRegistry(t *testing.T) {
+ cfg:=manualConfig(t,7)
+ a,err:=app.New(app.Config{})
+ if err!=nil {t.Fatal(err)}
+ defer a.Close()
+ const id="review-canceled-construction"
+ if err=a.Open(app.Window{ID:id,Title:"cancel",Width:400,Height:240,View:func()ui.Node{return ui.Node{ID:"label",Kind:ui.Label,Text:"content"}}});err!=nil {t.Fatal(err)}
+ called:=0
+ reviewBeforeTextLifetime=func(owner *app.Application,window string){ called++; if e:=owner.CloseWindow(window);e!=nil {t.Error(e)} }
+ defer func(){reviewBeforeTextLifetime=nil}()
+ m,err:=NewManual(testContext,a,cfg)
+ if called!=1 {t.Fatalf("lifecycle seam not reached: count=%d error=%v",called,err)}
+ if err==nil || m!=nil {t.Fatal("construction did not refuse canceled domain",m,err)}
+ if tw:=lookupTextWindow(id);tw!=nil {t.Fatalf("failed construction retained originating text registry: closed=%v outstanding=%d",tw.closed.Load(),tw.pump.Stats().Queue.Outstanding)}
+}

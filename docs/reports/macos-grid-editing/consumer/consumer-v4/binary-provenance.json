@@ -1,0 +1,41 @@
+{
+  "binary": {
+    "path": "/private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop",
+    "sha256": "1e28e57555526cad03263c28a5b6dee2bcd761def20228095db021fed274a42d"
+  },
+  "checks": [
+    {
+      "name": "go-version",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; go version -m /private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop"
+      ],
+      "exit_code": 0,
+      "path": "/private/tmp/vellum-grid-edit-example/qualified-v4/go-version.log",
+      "sha256": "e5054397fe5d5164d292bf9470879ff6ecab832438848e8413f222ff01dadc42"
+    },
+    {
+      "name": "libraries",
+      "argv": [
+        "/usr/bin/otool",
+        "-L",
+        "/private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop"
+      ],
+      "exit_code": 0,
+      "path": "/private/tmp/vellum-grid-edit-example/qualified-v4/libraries.log",
+      "sha256": "b7958c90a772565daad01e75bce813637c4a6bffae02a561c14d068b4db34427"
+    },
+    {
+      "name": "compiler",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; go env GOVERSION GOOS GOARCH CC CGO_ENABLED"
+      ],
+      "exit_code": 0,
+      "path": "/private/tmp/vellum-grid-edit-example/qualified-v4/compiler.log",
+      "sha256": "3f8911e7dd0805741abef75c2376d6906d365aeb01ae9eb78997cdcf4e117e99"
+    }
+  ]
+}

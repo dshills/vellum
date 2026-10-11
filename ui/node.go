@@ -32,6 +32,9 @@ type Node struct {
 	// Grid is caller-owned. One live managed binding per Grid is supported.
 	Grid       *virtual.Grid
 	GridChange func(GridEvent)
+	// GridCommit requests application validation and candidate admission after
+	// the driver has settled the originating native cell editor. It runs on owner.
+	GridCommit func(GridEditEvent)
 	// TabInserts makes Tab insert a literal tab in MultilineText; otherwise Tab moves focus.
 	TabInserts bool
 	// SoftWrap wraps visual lines without changing document bytes.

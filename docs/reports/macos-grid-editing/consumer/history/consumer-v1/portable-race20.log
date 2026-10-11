@@ -1,0 +1,2 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-cell-editing/drivers/cogent/env.sh; go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go cell_editing_test.go
+ok  	command-line-arguments	2.021s

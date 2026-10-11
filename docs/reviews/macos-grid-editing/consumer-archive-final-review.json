@@ -1,0 +1,25 @@
+{
+  "result": "APPROVED_ARCHIVE_BINDING",
+  "scope": "Read-only exact-byte verification of final inert consumer component handoff, raw proofs/logs, original mappings and compressed archive; no extraction into source, tests/GUI/Git or source edits.",
+  "handoff": {
+    "path": "/private/tmp/vellum-grid-edit-example/handoff-v4/handoff.json",
+    "sha256": "50aae5af863c948433014ae68cf7418c77ba94d769aaae5f18b4e06b417d5ac8"
+  },
+  "archive_inputs": {
+    "path": "/private/tmp/vellum-grid-edit-example/handoff-v4/archive-inputs.json",
+    "sha256": "4b10694c695a400a6268566a31e2e22b4be2631f52f451bdb7f96072797edf3f",
+    "self_excluded_entries": 68
+  },
+  "archive": {
+    "path": "/private/tmp/vellum-grid-edit-example/handoff-v4.tar.gz",
+    "sha256": "b75af06e56c46e6953b885bc4b2f85b46be283ae04ceec8ca42da8dec552bb60",
+    "regular_files": 69
+  },
+  "all_declared_and_actual_files_match": true,
+  "all_utf8_raw_roundtrip": true,
+  "all_original_to_archive_bytes_equal": true,
+  "no_live_go_python_module_or_executable_packaged": true,
+  "qualified_consumer_and_cocoa_proof_binding_verified": true,
+  "historical_failed_or_known_drift_classifications_preserved": true,
+  "limitations": "Same selected input and actual owner-command/native-settlement scope as consumer-cocoa-evidence-review.json; no clean SDK, physical input, human IME/AX or performance claim."
+}

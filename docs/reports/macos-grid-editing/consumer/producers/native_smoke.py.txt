@@ -1,0 +1,73 @@
+"""Run two bounded actual Cocoa owner-command/settlement fixtures, not desktop input."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shlex
+import subprocess
+import time
+
+parser = argparse.ArgumentParser()
+parser.add_argument('qualification', type=Path)
+args = parser.parse_args()
+proof_path = args.qualification.resolve()
+proof = json.loads(proof_path.read_bytes())
+assert proof['result'] == 'PASS' and proof['unchanged']
+root = Path(proof['source_root'])
+module = root/'examples/grid'
+binary = Path(proof['binary']['path'])
+out = proof_path.parent/'cocoa-smokes'
+out.mkdir(exist_ok=False)
+
+def sha(path):
+ return hashlib.sha256(path.read_bytes()).hexdigest()
+def inputs():
+ return {section: {name: sha((module if section in ('owned','preserved') else root)/name) for name in values} for section,values in proof['after'].items()}
+
+before = inputs()
+assert before == proof['after'] and sha(binary) == proof['binary']['sha256']
+records = []
+for name, flags in [('fixed', ['-smoke','-editable-cells']), ('variable', ['-smoke','-variable-rows','-editable-cells'])]:
+ log = out/(name+'.log')
+ command = 'export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . '+shlex.quote(str(root/'drivers/cogent/env.sh'))+'; exec '+shlex.quote(str(binary))+' '+shlex.join(flags)
+ start = time.monotonic()
+ timed_out = False
+ print('START',name,flush=True)
+ with log.open('wb') as stream:
+  stream.write(('command: '+command+'\n').encode());stream.flush()
+  try:
+   result = subprocess.run(['/bin/zsh','-c',command],cwd=module,stdout=stream,stderr=subprocess.STDOUT,timeout=75)
+   exit_code = result.returncode
+  except subprocess.TimeoutExpired:
+   exit_code,timed_out = 124,True
+ stages = []
+ for line in log.read_text(errors='replace').splitlines():
+  if line.startswith('{'):
+   try:
+    record=json.loads(line)
+   except json.JSONDecodeError:
+    continue
+   if 'stage' in record:
+    stages.append(record['stage'])
+ required=['ready','far-both-axes','immutable-projection','editable-cells','pass']
+ if name=='variable':
+  required.append('variable-pixel-page')
+ # The fixture reports exact assertions before pass; exit/race failure remains failure.
+ qualified = exit_code==0 and not timed_out and all(stage in stages for stage in required) and 'WARNING: DATA RACE' not in log.read_text(errors='replace')
+ record={'name':name,'command':command,'cwd':str(module),'exit_code':exit_code,'timed_out':timed_out,'elapsed_seconds':round(time.monotonic()-start,3),'log':str(log),'log_sha256':sha(log),'stages':stages,'qualified':qualified}
+ records.append(record)
+ (out/'checks.json').write_text(json.dumps(records,indent=2)+'\n')
+ print('END',json.dumps(record),flush=True)
+ if not qualified:
+  break
+
+after = inputs()
+result={'scope':'Two actual Cocoa processes, explicit owner commands plus originating native editor settlement and completed measured frames. No synthesized desktop typing/pointer, human IME/accessibility, performance or separately observed compositor teardown claim.',
+        'producer':{'path':str(Path(__file__).resolve()),'sha256':sha(Path(__file__))},
+        'qualification':{'path':str(proof_path),'sha256':sha(proof_path)},'binary':{'path':str(binary),'sha256':sha(binary)},
+        'before':before,'after':after,'unchanged':before==after and sha(binary)==proof['binary']['sha256'],'checks':records}
+result['result']='PASS' if result['unchanged'] and len(records)==2 and all(r['qualified'] for r in records) else 'FAIL'
+p=out/'qualification.json'
+p.write_text(json.dumps(result,indent=2)+'\n')
+print('PROOF',str(p),sha(p),result['result'],flush=True)
+raise SystemExit(0 if result['result']=='PASS' else 1)

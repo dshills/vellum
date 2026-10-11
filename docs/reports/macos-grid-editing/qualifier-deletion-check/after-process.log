@@ -1,0 +1,2 @@
+{"name": "portable-race3", "argv": ["/bin/zsh", "-c", "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. drivers/cogent/env.sh\ngo test -race -count=3 -v ./virtual ./ui"], "exit_code": 1, "failure": null, "elapsed_seconds": 4.484, "log": "/private/tmp/vellum-grid-cell-editing/docs/reports/macos-grid-editing/qualifier-deletion-check/after/portable-race3.log", "log_sha256": "e7a066c5f034e6447039344c2ffab085c23577fdb5a61b71d8f500574bfd8ed3"}
+FAIL da3263ac724479f0d49d19c895f65e2863487758f2f04b1f9c658b6081a81dfd

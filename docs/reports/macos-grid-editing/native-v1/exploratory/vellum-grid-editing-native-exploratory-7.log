@@ -1,0 +1,7 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestManagedGridInlineEscapeCompositionTabAndDetachedAX (0.05s)
+    grid_editing_offscreen_test.go:404: first Escape canceled whole draft {true row-0 c1 A😀é A😀é A😀é 1 1 1 ready 1} &{grid:Zw:editor 1 A😀éに true (127,33)-(248,56)}
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	1.564s
+FAIL

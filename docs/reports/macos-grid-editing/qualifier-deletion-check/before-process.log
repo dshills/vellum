@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/private/tmp/vellum-grid-editing-qualifier-missing-file/docs/reports/macos-grid-editing/qualify-core.py", line 25, in <module>
+    before = inputs()
+  File "/private/tmp/vellum-grid-editing-qualifier-missing-file/docs/reports/macos-grid-editing/qualify-core.py", line 24, in inputs
+    return {p: sha(root / p) for p in paths}
+               ~~~^^^^^^^^^^
+  File "/private/tmp/vellum-grid-editing-qualifier-missing-file/docs/reports/macos-grid-editing/qualify-core.py", line 18, in <lambda>
+    sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+                                   ~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 777, in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/vellum-grid-editing-qualifier-missing-file/ui/node.go'

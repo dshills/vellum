@@ -1,0 +1,38 @@
+{
+  "result": "PASS",
+  "scope": "Real isolated tracked ui/node.go deletion reproduces the original capture crash; corrected wrapper reaches Go compile refusal and writes an exclusive FAIL proof with the absent source marker. No candidate source changes, no fake Go runner, no GUI/performance claim.",
+  "base": "ed75cce5a4e303b67eae4e853576b98ab41b9ce9",
+  "fixture": "/private/tmp/vellum-grid-editing-qualifier-missing-file",
+  "removed_tracked_file": "ui/node.go",
+  "original_wrapper_sha256": "3c5ec4196f70a6bee1c3844b01d851220f73634865b0b87b431257710b095502",
+  "corrected_wrapper_sha256": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "/private/tmp/vellum-grid-editing-qualifier-missing-file/docs/reports/macos-grid-editing/qualify-core.py",
+        "/private/tmp/vellum-grid-cell-editing/docs/reports/macos-grid-editing/qualifier-deletion-check/before"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.048,
+      "log": "before-process.log",
+      "log_sha256": "e040b1a8bbcc9cf1697dd1c7f0e809849b2e0619f2654b26f9655b18478d7e0f",
+      "qualifier_sha256": "3c5ec4196f70a6bee1c3844b01d851220f73634865b0b87b431257710b095502",
+      "qualification_exists": false
+    },
+    {
+      "argv": [
+        "python3",
+        "/private/tmp/vellum-grid-editing-qualifier-missing-file/docs/reports/macos-grid-editing/qualify-core.py",
+        "/private/tmp/vellum-grid-cell-editing/docs/reports/macos-grid-editing/qualifier-deletion-check/after"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 4.589,
+      "log": "after-process.log",
+      "log_sha256": "389cc6cf79d83854469b67382dadc25e1f1da36d9bc39d7861b9bbfd251e8762",
+      "qualifier_sha256": "754dfabe1d4c46f7202536963c1bbb49500b0e9498ebf8b585b87f7f93470a21",
+      "qualification_exists": true
+    }
+  ],
+  "failure_proof_sha256": "da3263ac724479f0d49d19c895f65e2863487758f2f04b1f9c658b6081a81dfd"
+}

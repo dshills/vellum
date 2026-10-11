@@ -1,0 +1,97 @@
+{
+  "result": "APPROVED",
+  "scope": "Final independent read-only mechanical source/evidence metadata and narrative audit before promotion. No tests, GUI, Git, Prism, canonical changes or additional runtime implementation audit.",
+  "source_root": "/private/tmp/vellum-grid-cell-editing",
+  "base": "ed75cce5a4e303b67eae4e853576b98ab41b9ce9",
+  "ledger_path": "docs/reports/macos-grid-editing/qualification.json",
+  "ledger_sha256": "a0c90e74f2d82aa5390bd70d50a4bc06a23e4fc93baca93f66cb1fea38220971",
+  "final_source_archive": {
+    "path": "docs/reviews/macos-grid-editing/final-source-archive.json",
+    "sha256": "f6193a34014c0a8042750241bc3306da374f299ce476079ab617270611664dee"
+  },
+  "finding_resolution": {
+    "path": "docs/reviews/macos-grid-editing/review-resolution.json",
+    "sha256": "780c2c6e4848898b005cd8f299d38e7d4033c14cfd85435c650cddaca494e688"
+  },
+  "counts": {
+    "final_selected_source_spec_report_files": 36,
+    "raw_artifact_files": 230,
+    "current_aggregate_self_excluded": 1,
+    "core_selected_inputs": 91,
+    "native_selected_inputs": 146,
+    "prepared_upstream_files": 5832,
+    "prepared_typesetting_files": 288
+  },
+  "verified": {
+    "all_current_final_source_hashes_match": true,
+    "all_final_source_archive_snapshots_present_and_byte_identical": true,
+    "all230_artifact_sha256_and_utf8_raw_roundtrips_match": true,
+    "artifact_tree_has_no_unmapped_file_except_aggregate": true,
+    "core_v4_current91_sources_and_three_zero_exit_raw_logs_match": true,
+    "native146_sources_absence_markers_before_after_and_four_zero_exit_logs_match": true,
+    "current_prepared288_and5832_file_aggregates_recomputed_using_frozen_producer_algorithm_match": true,
+    "consumer_own7_preserved9_selected20_native11_before_after_current_and_raw_check_logs_match": true,
+    "both_Cocoa_exact_binary_stage_sequences_and_process_zero_match": true,
+    "independent_source_delta_native_consumer_Cocoa_certificates_copied_byte_exact": true,
+    "portable_internal_native_consumer_handoff_maps_and_original_archive_roundtrips_match": true,
+    "report_links_resolve_to_actual_preserved_files": true
+  },
+  "prism": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "complete": true,
+    "files": 36,
+    "calls": 4,
+    "raw_cli_exit_code": 1,
+    "raw_medium_findings": 2,
+    "fixed": 1,
+    "refuted": 1,
+    "unresolved": 0,
+    "original_input_map_and_raw_result_preserved": true,
+    "post_review_runtime_consumer_files_unchanged": true,
+    "post_review_changes": [
+      "docs/reports/macos-grid-editing/qualify-core.py",
+      "docs/reports/macos-grid-editing/README.md",
+      "docs/reviews/macos-grid-editing/README.md"
+    ],
+    "delta_assessment": "The fixed wrapper has a real isolated tracked-file deletion red/failure-record regression and intact core-v4 repeat. Final report-only clarifications were read in this audit. Original source identities remain recorded separately from final snapshots."
+  },
+  "accepted_qualifications": {
+    "docs/reports/macos-grid-editing/core-v4/qualification.json": "80ae459c76277d557c98a48e7654038370803bb0a6c64d625d64846a88af218f",
+    "docs/reports/macos-grid-editing/native-v1/qualification.json": "18423862370263eaa1cef04a39e980aed10ed1209d698b5800cc2dff76f49558",
+    "docs/reports/macos-grid-editing/consumer/consumer-v4/qualification.json": "0046f94d8c703256ab77fa9c33d177e17a4efc5fd67511cea7f365f70f38f4b9",
+    "docs/reports/macos-grid-editing/consumer/desktop-v1/qualification.json": "13d49d8d1778562737cd20fd6692692c52173fe445680ed0f7f978e2a7f4b47c",
+    "docs/reports/macos-grid-editing/qualifier-deletion-check/regression.json": "b417fae3e43313a166d76e94e39dfe4f8c37e47debd8b6281f2b56665ea99ce2"
+  },
+  "consumer_Cocoa_independent_review": {
+    "path": "docs/reviews/macos-grid-editing/consumer-cocoa-evidence-review.json",
+    "sha256": "1437a93fe91661fd10f44f4941be0eae2f9fddd4450950d7a6c5be07733f1e4b"
+  },
+  "binary": {
+    "path": "/private/tmp/vellum-grid-edit-example/qualified-v4/grid-desktop",
+    "sha256": "1e28e57555526cad03263c28a5b6dee2bcd761def20228095db021fed274a42d"
+  },
+  "historical_classification": {
+    "portable": "Original clipped admission and cell-version-history red sources/logs and three unchanged reviewer test bodies preserved; extra four transaction bodies preserved modulo previously verified gofmt normalization only.",
+    "native": "Uncaptured development logs explicitly unqualified. Withdrawn construction hypothesis is distinct from the unqualified producer compile experiment; native final formal proof predates the transient experiment. No speculative defect/fix claimed.",
+    "consumer_v1_v2": "Historical failures/source drift, excluded from final stable native/consumer qualification. Portable race20 alone inherited via exact relevant before/after/final identities.",
+    "consumer_v3": "Raw automated endpoint PASS preserved; explicit known mid-run mutation/adjudication disqualifies stable qualification, despite restored endpoint hashes. Final v4 is the accepted stable run."
+  },
+  "report_links": [
+    "docs/reviews/macos-grid-editing/README.md",
+    "docs/reports/macos-grid-editing/core-v4/qualification.json",
+    "docs/reports/macos-grid-editing/native-v1/qualification.json",
+    "docs/reports/macos-grid-editing/native-v1/handoff.json",
+    "docs/reports/macos-grid-editing/qualifier-deletion-check/regression.json",
+    "docs/reviews/macos-grid-editing/portable/handoff.json",
+    "docs/reviews/macos-grid-editing/internal-source/final-source-review.json",
+    "docs/reviews/macos-grid-editing/prism.json"
+  ],
+  "claim_assessment": "Current report correctly identifies core-v4, native-v1, stable consumer-v4 and two actual Cocoa owner-command/native-settlement measured-frame smokes. It explicitly leaves broader Mac/P6, loaded-data workers, large-tree and sustained latency/memory work open. Selected hashes are not a complete build-source closure or continuous source monitoring. No physical desktop typing, human IME, external AX/VoiceOver, independently measured compositor destruction, settings-change or public-release claim is made.",
+  "self_binding": "Certificate written outside candidate. Its later copy as metadata-review-final.json is the intentionally excluded leaf; it binds this exact aggregate without introducing a self-hash cycle.",
+  "limitations": [
+    "No Git/index/base-clean or whitespace verification was performed in this no-Git scope; root precommit records are separate.",
+    "Original Prism input identities are read from immutable input/resolution records; final source/archive bytes and current report clarifications are independently verified.",
+    "Clean committed relocated SDK/public-release qualification is outside this checkpoint."
+  ]
+}

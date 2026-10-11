@@ -85,6 +85,8 @@ type textWindow struct {
 	owner              *app.Application
 	window             *nativeWindow
 	pump               *transport.OrderedPump[textMessage]
+	manual             bool // explicit offscreen routing; settlement never invokes Cocoa/ambient workers
+	rules              atomic.Pointer[gridTextRules]
 	native             nativeTextBackend
 	clients            map[uint64]*record    // owner only, exact mount incarnations
 	shadows            map[uint64]textShadow // owner only; publications become authoritative only on native acceptance
@@ -101,6 +103,7 @@ type textWindow struct {
 type textSettlement struct {
 	binding   *record
 	model     *editor.Model
+	gridEdit  *gridEditBinding
 	ctx       context.Context
 	callback  func(error)
 	stop      func() bool
@@ -406,6 +409,9 @@ func bindTextWindow(w *nativeWindow) error {
 		if r.control != nil && r.control.client != 0 && !r.control.retired {
 			current[r.control.client] = r
 		}
+		if edit := gridRetainedEditingRecord(r); edit != nil {
+			visit(edit)
+		}
 		for _, c := range r.children {
 			visit(c)
 		}
@@ -415,6 +421,7 @@ func bindTextWindow(w *nativeWindow) error {
 	}
 	visit(w.root)
 	t.clients = current
+	t.publishGridRules()
 	scenes := map[*core.Scene]bool{}
 	if w.body != nil {
 		scenes[w.body.Scene] = true
@@ -533,10 +540,15 @@ func (t *textWindow) apply(u textinput.Update) {
 		return
 	}
 	client, ok := r.widget.(nativeTextClient)
-	if !ok || client.IsReadOnly() || client.EditingState().Text != expanded.BeforeText {
+	if !ok || client.IsReadOnly() && r.control.gridEdit == nil || client.EditingState().Text != expanded.BeforeText {
 		return
 	}
 	if r.control.editor == nil {
+		if b := r.control.gridEdit; b != nil {
+			if _, err := b.current(); err != nil || !b.grid.eligible() || !validGridDraft(expanded.Text, b.maximum()) {
+				return
+			}
+		}
 		if shadow.Epoch != r.control.textEpoch {
 			return
 		}
@@ -548,10 +560,16 @@ func (t *textWindow) apply(u textinput.Update) {
 			selection := field.EditingState()
 			decoded.RuneAnchor, decoded.RuneFocus = selection.Anchor, selection.Focus
 		}
-		if !field.ApplyNativeEdit(expanded.Text, decoded.RuneAnchor, decoded.RuneFocus, decoded.RuneMarkedStart, decoded.RuneMarkedEnd, u.Kind) {
+		accepted := applyGridFieldNative(r, expanded.Text, decoded.RuneAnchor, decoded.RuneFocus, decoded.RuneMarkedStart, decoded.RuneMarkedEnd, u.Kind)
+		if !accepted {
 			return
 		}
 		t.shadows[u.ClientID] = textShadow{Text: expanded.Text, Epoch: r.control.textEpoch}
+		if r.control.gridEdit != nil {
+			if err := syncGridDraft(r); err != nil {
+				editorError(r, err)
+			}
+		}
 		return // Single-field Change retains its existing commit-on-change semantics.
 	}
 	b := r.control.editor
@@ -636,32 +654,41 @@ func SettleEditor(ctx context.Context, a *app.Application, window string, model 
 	if binding == nil {
 		return ErrEditorBinding
 	}
+	return t.admitSettlement(ctx, &textSettlement{binding: binding, model: model, ctx: ctx, callback: callback})
+}
+func (t *textWindow) admitSettlement(ctx context.Context, q *textSettlement) error {
 	if len(t.requests) > 0 {
 		return mailbox.ErrFull
 	}
 	if t.nextRequest == ^uint64(0) {
 		return mailbox.ErrID
 	}
-	t.nextRequest++
-	id := t.nextRequest
-	q := &textSettlement{binding: binding, model: model, ctx: ctx, callback: callback}
-	t.requests[id] = q
-	lifetime, err := a.WindowContext(window)
+	lifetime, err := t.owner.WindowContext(q.binding.control.window)
 	if err != nil {
-		delete(t.requests, id)
 		return err
 	}
-	stopCtx := context.AfterFunc(ctx, func() { _ = a.Do(func() { t.complete(id, ctx.Err()) }) })
-	stopWindow := context.AfterFunc(lifetime, func() { _ = a.Do(func() { t.complete(id, app.ErrWindowClosed) }) })
+	t.nextRequest++
+	id := t.nextRequest
+	t.requests[id] = q
+	if t.manual {
+		if err := t.pump.Send(textMessage{Kind: "settle", Request: id}); err != nil {
+			delete(t.requests, id)
+			return err
+		}
+		return nil // cancellation is observed on explicit FIFO delivery or owned teardown
+	}
+	stopCtx := context.AfterFunc(ctx, func() { _ = t.owner.Do(func() { t.complete(id, ctx.Err()) }) })
+	stopWindow := context.AfterFunc(lifetime, func() { _ = t.owner.Do(func() { t.complete(id, app.ErrWindowClosed) }) })
 	q.stop = func() bool { first := stopCtx(); second := stopWindow(); return first && second }
 	go func() {
-		err := t.settleDispatch(ctx, t, binding.control.client, id)
+		err := t.settleDispatch(ctx, t, q.binding.control.client, id)
 		if err != nil {
-			_ = a.Do(func() { t.complete(id, err) })
+			_ = t.owner.Do(func() { t.complete(id, err) })
 		}
 	}()
 	return nil
 }
+
 func (t *textWindow) complete(id uint64, err error) {
 	q := t.requests[id]
 	if q == nil || q.completed {
@@ -687,6 +714,27 @@ func (t *textWindow) settled(id uint64) {
 	}
 	if q.binding.control.retired || t.clients[q.binding.control.client] != q.binding {
 		t.complete(id, ErrTextInputStale)
+		return
+	}
+	if q.gridEdit != nil {
+		b := q.gridEdit
+		if b.grid.editing != b {
+			t.complete(id, ErrTextInputStale)
+			return
+		}
+		field := q.binding.widget.(*core.TextField)
+		if _, _, marked := field.NativeCompositionRange(); marked {
+			if !t.manual {
+				t.complete(id, editor.ErrComposition)
+				return
+			}
+			state := field.EditingState()
+			if !applyGridFieldNative(q.binding, state.Text, state.Anchor, state.Focus, -1, -1, "unmark") {
+				t.complete(id, ErrTextInputStale)
+				return
+			}
+		}
+		t.complete(id, syncGridDraft(q.binding))
 		return
 	}
 	syncEditorFromWidget(q.binding, q.binding.widget.(nativeTextClient).EditingState())
@@ -732,7 +780,16 @@ func (t *textWindow) bindBoundary(scene *core.Scene) {
 				if r.control.editor != nil {
 					syncEditorFromWidget(r, r.widget.(nativeTextClient).EditingState())
 				} else if r.node.Kind == ui.TextField {
-					refuseOversizedFieldEditing(r)
+					if b := r.control.gridEdit; b != nil {
+						if _, err := b.current(); err != nil || !b.grid.eligible() {
+							continue
+						}
+						if err := syncGridDraft(r); err != nil {
+							editorError(r, err)
+						}
+					} else {
+						refuseOversizedFieldEditing(r)
+					}
 				}
 			}
 		})
@@ -771,7 +828,7 @@ func (t *textWindow) acceptsNativeInput() bool {
 // mailbox; cancellation cannot invalidate an accepted reservation mid-mutation.
 func (t *textWindow) preflightInput(u textinput.Update) bool {
 	t.admission.Lock()
-	if !t.acceptsNativeInput() {
+	if !t.acceptsNativeInput() || !t.gridInputAllowed(u) {
 		t.admission.Unlock()
 		return false
 	}
@@ -825,4 +882,44 @@ func refuseOversizedFieldEditing(r *record) bool {
 	// Change refusal merely sets restore and leaves this to origin refresh.
 	_ = syncControl(r, r.node)
 	return true
+}
+
+// Cocoa preflight reads only immutable admission rules published on the owner.
+// The native bridge enforces prospective UTF8 size before mutation; the rule
+// also refuses newline fragments before reserving any ordered credit.
+type gridTextRule struct {
+	maximum             int
+	allowed, singleLine bool
+}
+type gridTextRules struct {
+	clients  map[uint64]gridTextRule
+	retiring uint64
+}
+
+func (t *textWindow) publishGridRules() {
+	rules := &gridTextRules{clients: map[uint64]gridTextRule{}, retiring: t.activeClient}
+	for id, r := range t.clients {
+		rule := gridTextRule{maximum: textinput.MaxDocumentBytes, allowed: !r.control.retired && !r.control.disabled}
+		if b := r.control.gridEdit; b != nil {
+			rule.maximum = b.maximum()
+			rule.allowed = b.writable()
+			rule.singleLine = true
+		}
+		rules.clients[id] = rule
+	}
+	t.rules.Store(rules)
+}
+func (t *textWindow) gridInputAllowed(u textinput.Update) bool {
+	rules := t.rules.Load()
+	if rules == nil {
+		return true
+	}
+	rule, ok := rules.clients[u.ClientID]
+	if !ok {
+		return rules.retiring == u.ClientID && (u.Kind == "unmark" || u.Kind == "cancel")
+	}
+	if !rule.allowed {
+		return rules.retiring == u.ClientID && (u.Kind == "unmark" || u.Kind == "cancel")
+	}
+	return !rule.singleLine || validGridDraft(u.Text, rule.maximum) && (u.Delta || validGridDraft(u.BeforeText, rule.maximum))
 }

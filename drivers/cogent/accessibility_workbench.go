@@ -252,6 +252,12 @@ func accessibilityFocusProjection(root *record, prefix string) ui.Node {
 		})
 		return n
 	}
+	if edit := gridEditingRecord(root); edit != nil {
+		if !edit.node.Disabled {
+			n.Kind = ui.Column
+		}
+		n.Children = append(n.Children, accessibilityFocusProjection(edit, prefix))
+	}
 	for _, child := range root.children {
 		n.Children = append(n.Children, accessibilityFocusProjection(child, prefix))
 	}
@@ -300,6 +306,9 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 			}
 			accessibilityNativeFocusTargets(w.records[g.Active], prefix+accessibilityWorkbenchNamespace(root.node.ID, g.Active), out)
 		})
+	}
+	if edit := gridEditingRecord(root); edit != nil {
+		accessibilityNativeFocusTargets(edit, prefix, out)
 	}
 	for _, child := range root.children {
 		accessibilityNativeFocusTargets(child, prefix, out)

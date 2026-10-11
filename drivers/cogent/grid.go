@@ -87,6 +87,7 @@ type gridBinding struct {
 	ancestorRefused      bool
 	wheelX, wheelY       float64
 	geometryRefused      bool
+	editing              *gridEditBinding
 }
 
 func validateNativeGrid(n ui.Node) error {
@@ -211,6 +212,9 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 		e.SetHandled()
 	})
 	host.On(events.KeyChord, func(e events.Event) {
+		if g.gridEditBeginKey(e) {
+			return
+		}
 		if g.projection.State.Config.RowSelection {
 			g.selectionKey(e)
 			return
@@ -626,6 +630,9 @@ func syncGrid(r *record) error {
 	if sy > 0 {
 		g.vertical.SetValue(float32(float64(snap.State.Viewport.ScrollY) / float64(sy)))
 	}
+	if err := syncGridEditing(g); err != nil {
+		return err
+	}
 	g.host.Update()
 	return nil
 }
@@ -664,6 +671,7 @@ func disposeGrid(r *record) {
 	}
 	g := r.control.grid
 	g.closed.Store(true)
+	g.disposeEditing()
 	g.armed = nil
 	g.measurement.Store(nil)
 	gridRegistry.Lock()
@@ -734,7 +742,7 @@ func bindGridScopes(root *record) {
 		if disabled || n.Kind == ui.Dialog && !n.Open {
 			return
 		}
-		if n.Kind == ui.DataGrid {
+		if n.Grid != nil {
 			allowed[n.Grid] = true
 		}
 		for _, c := range n.Children {
@@ -778,7 +786,8 @@ func (w *gridWidget) Init() {
 		s.Padding.Zero()
 		s.Gap.Zero()
 		s.Grow.Set(1, 1)
-		s.SetAbilities(true, abilities.Focusable, abilities.Clickable)
+		s.SetAbilities(true, abilities.Clickable)
+		s.SetAbilities(w.binding == nil || w.binding.editing == nil || !w.binding.editing.visible || w.binding.editing.record.node.Disabled, abilities.Focusable)
 	})
 }
 func (w *gridWidget) Position() {

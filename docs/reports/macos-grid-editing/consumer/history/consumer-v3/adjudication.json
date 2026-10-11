@@ -1,0 +1,14 @@
+{
+  "result": "HISTORICAL_KNOWN_SOURCE_DRIFT",
+  "automated_proof": {
+    "path": "/private/tmp/vellum-grid-edit-example/qualified-v3/qualification.json",
+    "sha256": "3fe388479a3f5e37c91ce3c5cd3ae4cb50591a626ad01a9271902398a27446e0",
+    "automated_result": "PASS"
+  },
+  "observed_drift": {
+    "path": "/private/tmp/vellum-grid-edit-example/qualified-v3/observed-midrun-drift.json",
+    "sha256": "7da1c297a40a858aabd059497cd0c077c77501c10dbcc8ac7d4dbc13688e9d3d"
+  },
+  "interpretation": "All individual checks passed and endpoint maps matched after restoration. Known mid-run mutation prevents using this as final stable compile qualification; preserve raw evidence and rerun once after final freeze.",
+  "final_qualification": "/private/tmp/vellum-grid-edit-example/qualified-v4/qualification.json"
+}
