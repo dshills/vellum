@@ -35,6 +35,15 @@ file IO/decode on a worker and commits only a matching revision on the owner.
 Window.CloseRequest permits asynchronous unsaved-change prompts; confirmed
 CloseWindow forces teardown. The workbench persists its component document.
 
+The public [editor model](editor.md) binds exact UTF-8 document bytes and directional
+scalar selection to `ui.MultilineText`. One application-owned journal records
+sparse committed edits; native preedit stays transient until composition commits.
+The Mac adapter uses the originating native event FIFO and asynchronous settlement
+before persistence or replay. The independent `examples/editor` application gives
+each of its two windows an independent model/session and preserves CRLF and final
+empty lines through Save/Open. Native protocol fixtures and external IME/assistive
+technology acceptance remain distinct evidence.
+
 ## Workbench layouts
 
 The `workbench` package owns a validated split/tab tree. Move, split and restore

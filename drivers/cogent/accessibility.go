@@ -16,29 +16,34 @@ import (
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent/internal/textinput"
+	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
 )
 
 type accessibilityNode struct {
-	ID        string   `json:"id"`
-	DomainID  string   `json:"domain_id"`
-	Parent    string   `json:"parent"`
-	Role      string   `json:"role"`
-	Name      string   `json:"name"`
-	Help      string   `json:"help"`
-	Value     any      `json:"value,omitempty"`
-	Disabled  bool     `json:"disabled"`
-	Focusable bool     `json:"focusable"`
-	Focused   bool     `json:"focused"`
-	Selected  bool     `json:"selected"`
-	Actions   []string `json:"actions"`
-	RowIndex  int      `json:"row_index,omitempty"`
-	RowCount  int      `json:"row_count,omitempty"`
-	Level     int      `json:"level,omitempty"`
-	Expanded  *bool    `json:"expanded,omitempty"`
-	Min       *float32 `json:"min,omitempty"`
-	Max       *float32 `json:"max,omitempty"`
+	ID            string   `json:"id"`
+	DomainID      string   `json:"domain_id"`
+	Parent        string   `json:"parent"`
+	Role          string   `json:"role"`
+	Name          string   `json:"name"`
+	Help          string   `json:"help"`
+	Value         any      `json:"value,omitempty"`
+	Disabled      bool     `json:"disabled"`
+	Focusable     bool     `json:"focusable"`
+	Focused       bool     `json:"focused"`
+	Selected      bool     `json:"selected"`
+	Actions       []string `json:"actions"`
+	RowIndex      int      `json:"row_index,omitempty"`
+	RowCount      int      `json:"row_count,omitempty"`
+	Level         int      `json:"level,omitempty"`
+	Expanded      *bool    `json:"expanded,omitempty"`
+	Min           *float32 `json:"min,omitempty"`
+	TextClient    uint64   `json:"text_client,omitempty"`
+	TextSelection *[2]int  `json:"text_selection,omitempty"`
+	TextFocus     int      `json:"text_focus,omitempty"`
+	Max           *float32 `json:"max,omitempty"`
 }
 type accessibilityAction struct {
 	Kind  string
@@ -255,8 +260,29 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		switch n.Kind {
-		case ui.Label, ui.TextField:
+		case ui.Label:
 			x.Value = n.Text
+		case ui.TextField, ui.MultilineText:
+			x.Value = n.Text
+			selection := editor.Selection{}
+			if n.Kind == ui.MultilineText {
+				snapshot := n.Editor.Snapshot()
+				x.Value = snapshot.VisibleText
+				selection = snapshot.Selection
+			}
+			if r.control != nil {
+				x.TextClient = r.control.client
+				if n.Kind == ui.TextField && r.control.fieldState != nil {
+					x.Value = r.control.fieldState.Text
+					selection = editor.Selection{Anchor: r.control.fieldState.Anchor, Focus: r.control.fieldState.Focus}
+				}
+			}
+			text, _ := x.Value.(string)
+			anchor, _ := textinput.UTF16Offset(text, selection.Anchor)
+			focus, _ := textinput.UTF16Offset(text, selection.Focus)
+			rangeValue := [2]int{min(anchor, focus), max(anchor, focus) - min(anchor, focus)}
+			x.TextSelection = &rangeValue
+			x.TextFocus = focus
 		case ui.Checkbox:
 			x.Value = n.Checked
 		case ui.Slider, ui.NumberField:
@@ -282,6 +308,12 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 			if n.Kind == ui.Checkbox && n.Change != nil {
 				x.Actions = append(x.Actions, "press", "set")
+			}
+			if n.Kind == ui.MultilineText {
+				x.Actions = append(x.Actions, "set", "selection")
+			}
+			if n.Kind == ui.TextField && n.Change != nil {
+				x.Actions = append(x.Actions, "selection")
 			}
 			if (n.Kind == ui.TextField || n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
 				x.Actions = append(x.Actions, "set")
@@ -376,6 +408,44 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 		n.Dismiss()
 		return true
 	}
+	if n.Kind == ui.MultilineText || (n.Kind == ui.TextField && action.Kind == "selection") {
+		if action.Kind == "selection" {
+			var request struct {
+				Text          string `json:"text"`
+				Start, Length int
+			}
+			if json.Unmarshal([]byte(action.Value), &request) != nil || request.Start < 0 || request.Length < 0 || request.Start > int(^uint(0)>>1)-request.Length {
+				return false
+			}
+			u, err := textinput.Decode(textinput.Update{Text: request.Text, BeforeText: request.Text, Anchor: request.Start, Focus: request.Start + request.Length, MarkedStart: -1, MarkedEnd: -1})
+			if err != nil {
+				return false
+			}
+			selection := editor.Selection{Anchor: u.RuneAnchor, Focus: u.RuneFocus}
+			if n.Kind == ui.MultilineText {
+				snapshot := n.Editor.Snapshot()
+				if snapshot.Composing || snapshot.VisibleText != request.Text || n.Editor.Select(selection) != nil {
+					return false
+				}
+			} else {
+				if r.control.fieldState == nil || r.control.fieldState.Text != request.Text {
+					return false
+				}
+				r.control.fieldSelection = &selection
+				r.control.textEpoch++
+			}
+			_ = r.control.a.Invalidate(r.control.window)
+			return true
+		}
+		if n.Kind == ui.MultilineText && action.Kind == "set" {
+			if err := n.Editor.Replace(action.Value, editor.Selection{}); err != nil {
+				return false
+			}
+			committedEditorChange(r)
+			return true
+		}
+		return false
+	}
 	if n.Change == nil {
 		return false
 	}
@@ -390,7 +460,7 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 			return false
 		}
 	case ui.TextField:
-		if action.Kind != "set" {
+		if action.Kind != "set" || len(action.Value) > textinput.MaxDocumentBytes || strings.ContainsRune(action.Value, 0) {
 			return false
 		}
 		change.Text = action.Value
@@ -470,6 +540,16 @@ func bindAccessibilityKeyboard(w *nativeWindow, a *app.Application, onError func
 				return
 			}
 			if chord == "escape" {
+				if r := focusedManagedTextRecord(w.root); r != nil && r.control.editor != nil && r.node.Editor.Snapshot().Composing {
+					if err := r.node.Editor.CancelComposition(); err != nil {
+						editorError(r, err)
+					} else {
+						syncEditor(r)
+					}
+					e.SetHandled()
+					requestTextPublication(w.window.ID)
+					return
+				}
 				scope := ui.FocusScope(accessibilityFocusProjection(w.root, ""))
 				if scope.Kind == ui.Dialog && scope.Dismiss != nil {
 					scope.Dismiss()
@@ -479,6 +559,9 @@ func bindAccessibilityKeyboard(w *nativeWindow, a *app.Application, onError func
 				return
 			}
 			if accessibilityExtensionFocused(w.root) {
+				return
+			}
+			if editor := focusedManagedTextRecord(w.root); editor != nil && editor.node.Kind == ui.MultilineText && editor.node.TabInserts {
 				return
 			}
 			current := accessibilityFocusedID(w.root)
@@ -582,9 +665,12 @@ func publishAccessibilityGeometry(w *nativeWindow) {
 	}
 	w.rootMu.Lock()
 	bounds := accessibilityBounds(w.root)
+	textBounds := accessibilityTextGeometry(w.root)
 	w.rootMu.Unlock()
 	payload, _ := json.Marshal(bounds)
 	nativeAccessibilityGeometry(b.token, string(payload))
+	textPayload, _ := json.Marshal(textBounds)
+	nativeAccessibilityTextGeometry(b.token, string(textPayload))
 }
 func accessibilityBounds(root *record) map[string][4]float32 {
 	out := map[string][4]float32{}
@@ -642,17 +728,19 @@ type AccessibilityInspection struct {
 	Elements     []AccessibilityElement `json:"elements"`
 }
 type AccessibilityElement struct {
-	ID        string     `json:"id"`
-	Role      string     `json:"role"`
-	Name      string     `json:"name"`
-	Value     any        `json:"value"`
-	Enabled   bool       `json:"enabled"`
-	Frame     [4]float64 `json:"frame"`
-	Selected  bool       `json:"selected"`
-	Expanded  bool       `json:"expanded"`
-	Parent    string     `json:"parent"`
-	DomainID  string     `json:"domain_id"`
-	HitTestID string     `json:"hit_test_id"`
+	ID            string     `json:"id"`
+	Role          string     `json:"role"`
+	Name          string     `json:"name"`
+	Value         any        `json:"value"`
+	Enabled       bool       `json:"enabled"`
+	TextSelection [2]int     `json:"text_selection"`
+	InsertionLine int        `json:"insertion_line"`
+	Frame         [4]float64 `json:"frame"`
+	Selected      bool       `json:"selected"`
+	Expanded      bool       `json:"expanded"`
+	Parent        string     `json:"parent"`
+	DomainID      string     `json:"domain_id"`
+	HitTestID     string     `json:"hit_test_id"`
 }
 
 func lookupAccessibility(window string) (*accessibilityBridge, error) {
@@ -697,6 +785,16 @@ func (h *accessibilityDialogHost) RenderWidget() {
 	}
 	payload, _ := json.Marshal(bounds)
 	nativeAccessibilityGeometry(b.token, string(payload))
+	textBounds := accessibilityTextGeometry(r)
+	if prefix, _ := h.Property("vellum.accessibility-namespace").(string); prefix != "" {
+		qualified := map[string]any{}
+		for id, value := range textBounds {
+			qualified[prefix+id] = value
+		}
+		textBounds = qualified
+	}
+	textPayload, _ := json.Marshal(textBounds)
+	nativeAccessibilityTextGeometry(b.token, string(textPayload))
 }
 
 func accessibilityBindFocusInvalidation(root *record, a *app.Application, window string) {

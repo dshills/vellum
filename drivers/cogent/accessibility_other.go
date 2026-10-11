@@ -19,3 +19,8 @@ func PerformAccessibilityAction(context.Context, string, string, string, string)
 }
 
 func releaseAccessibilityConfiguration() {}
+
+func nativeAccessibilityTextGeometry(uint64, string) {}
+func QueryAccessibilityText(context.Context, string, string, int, int, [2]float64) (string, error) {
+	return "", app.ErrUnavailable
+}

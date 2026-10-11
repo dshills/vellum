@@ -1,0 +1,31 @@
+{
+  "time_utc": "2026-10-11T03:54:12.432050+00:00",
+  "files": {
+    "drivers/cogent/editor_geometry.go": "e152ef3c2455e423ed63759f20260554462eafe0c7182cd354c6b7c8bed23e83",
+    "drivers/cogent/editor_test.go": "977ce656b2a5a151dd6630ebae02a9ee27bf577520270b31d5c7883426914114",
+    "drivers/cogent/editor_focus_darwin_test.go": "04a2c1d58407e975c640cb0a7ec82b0fe5ad085218893b99b2d817b14291c8f9"
+  },
+  "logs": {
+    "/private/tmp/vellum-editor-active-snapshot-before.txt": "efea03e91b8f33e8b35fa2a1270655ba01133daa762c18e5b57b970c2f7583e0",
+    "/private/tmp/vellum-editor-field-review-frozen-checks.txt": "75def5e5fee5be83ce1167860c43446e60db1934791b78298a869dfa83287c12"
+  },
+  "checks": {
+    "same_client_atomic_snapshot_pre_fix_expected_failure": 1,
+    "focus_loss_and_snapshot_race_count20": 0,
+    "actual_main_dispatch_retirement_fixture": 0,
+    "driver_race_all_count1": 0,
+    "driver_vet_all": 0
+  },
+  "dispositions": {
+    "3bd7a54de8e025c5": {
+      "result": "corrected",
+      "scope": "Same-client accepted publication writes its actual active value once. A concurrent atomic observer regression fails against the prior clear-then-set code; no claim that every production focus callback bypasses the originating render lock."
+    },
+    "022d229b2aae667c": {
+      "result": "corrected_retirement_dependency",
+      "scope": "Model revision mismatch does not apply to pending TextField records; legacy overcap refusal already restores a valid controlled descriptor. Retirement now uses an empty valid inactive client-zero publication, independent of outgoing Go text/layout. Native sequence/unmark acknowledgment still must succeed before controlled finalization. Real main-dispatch transport fixture proves oversized and NUL legacy values cannot enter retirement payload, ack rejection preserves pending loss/no Change, and ack acceptance restores valid controlled bytes without history/Change."
+    }
+  },
+  "input_and_ax_scope": "No production Input or AX source changed by this correction. The separate Input init-thread test-only correction is recorded by /private/tmp/vellum-editor-input-init-review.json.",
+  "qualification_scope": "Race/unit and actual main-dispatch transport seams only; no native window created by the retirement fixture. Fresh two-run Cocoa consumer acceptance remains required."
+}

@@ -40,12 +40,14 @@ tile uploads, alpha-safe filtering and independent-window retention evidence.
 [Advanced GPU views](advanced-gpu.md) add custom shaders and a retained 3D
 viewport with optional depth and native fault/resize/closure evidence.
 An independent imaging consumer adds ordered compute/float-target preparation
-and bounded asynchronous captures. P4 still needs broader performance qualification. Remaining framework work includes supported integration of the multiline editor
-beyond historical prototypes. Semantic command/UI inspection exists through APIs
+and bounded asynchronous captures. P4 still needs broader performance qualification. The public [multiline editor](editor.md) now provides a supported model, managed
+control and independent document application beyond the historical prototypes;
+its native input/geometry evidence and separate read-only external AX check pass
+against frozen sources. Human IME and VoiceOver acceptance remain separate. Semantic command/UI inspection exists through APIs
 and native accessibility; application automation transport and deterministic UI
 replay need an explicit public contract and working consumer evidence.
 
-Remaining Mac acceptance includes external AX client/text ranges and human
+Remaining Mac acceptance includes broader external AX and human
 screen-reader workflows; candidate-panel placement through scrolling/focus/scale;
 cross-display DPI and monitor changes; physical GPU loss policy acceptance;
 representative sustained frame/input latency, idle CPU and bounded font/native/GPU

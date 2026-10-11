@@ -1,0 +1,45 @@
+{
+  "source": {
+    "drivers/cogent/controls.go": "a2a512c0faaa4db72b593971661af74b78ecc30e775c64562a77146f9e7a615f",
+    "drivers/cogent/editor.go": "c244fb6be1e56bce4b75d194b0b46f68efa053d221fa34e072ddf9ab76bea3f0",
+    "drivers/cogent/editor_geometry.go": "afd3f095ce561d6f4eacf382fa39ec32dc0babc4dc1226be380edfff727e1e3d",
+    "drivers/cogent/editor_test.go": "43c0b8838e3f5fb27bcd0fcb179a627079b4f06145bad08436ebaacecd8a8a3a"
+  },
+  "evidence": {
+    "/private/tmp/vellum-editor-field-loss-before.txt": "96067d23ed29d5ad0ad0f993ceb3c4bf5dd7bcc242d8d2fe01e7f411971c414d",
+    "/private/tmp/vellum-editor-field-loss-refocus-before.txt": "7bd775aea183ceb3496f80d029ead00b0c4912581417481c652d5b38ff1e196f",
+    "/private/tmp/vellum-editor-field-loss-focused-20.txt": "c34d806bcbeb6b08a760dcaf985266dd31a0290801592490ea2895e3c8621ef7",
+    "/private/tmp/vellum-editor-driver-loss-full-race.txt": "f6ec698e06ea4451ce37d4cd5c02b30b8b5defd3c9811782cd7ba81064588c07",
+    "/private/tmp/vellum-editor-driver-loss-vet.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "checks": {
+    "missing_hook_red": 1,
+    "refocus_old_native_selection_red": 1,
+    "focused_race_count20": 0,
+    "driver_race_all": 0,
+    "driver_vet_all": 0
+  },
+  "scope": "Owner/render ordering unit regressions with native acknowledgment transport fixture; fresh actual Cocoa consumer acceptance remains required.",
+  "vellum-input-prism-final-source.json": {
+    "drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5",
+    "drivers/cogent/internal/textinput/input_darwin.go": "0bd59e4a468cf1eba8052c99c012a772f40a0372d6f95484bd1696b4c0381161",
+    "drivers/cogent/internal/textinput/input_darwin.m": "00b0b3d52d80960d9d24b9dab0e3f715665323b3fcbff648300b7b5a3342964f",
+    "drivers/cogent/internal/textinput/input_darwin_test.go": "db38f84f16c5d1352cc52ae05fe45b4ccec16a39c3c7b2acf7678de2d1204b03"
+  },
+  "vellum-editor-ax-review-final.json": {
+    "files": {
+      "drivers/cogent/accessibility.go": "fdddff00fb491a56f607a2b2088aa727b6067c70ac5abae50b5d7216e8ae9271",
+      "drivers/cogent/accessibility_test.go": "008db1090f4475da7262abaf1fa20de9f3890d685407a2daa530c4bfde94aeff",
+      "drivers/cogent/accessibility_darwin.go": "8dc754318a1346038b977c84fa14a1875794049206e3f13b4ba448a3810129c8",
+      "drivers/cogent/accessibility_darwin.m": "ab40417250b8035d8bd9190db096c25fc60aee68a112178030c41f5da69794be",
+      "drivers/cogent/editor_accessibility_darwin_test.go": "dddf95b0de477ab0bbfa1a6cca78728caa07087aeb9b1bd63ba6849be8dce6c2"
+    },
+    "logs": {
+      "/private/tmp/vellum-editor-ax-admission-native-before.log": "5d51e87d298de31dd680e0dd0a36afb8131203e994d5183f937c7e930d435343",
+      "/private/tmp/vellum-editor-ax-bulk-final.log": "76a8b0b1e4a84ae917067fe919ecc362d2f0de7bfcd5e41c5f6ae770c4ff6566",
+      "/private/tmp/vellum-editor-ax-bulk-vet-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-editor-ax-driver-race-final.log": "3085afc1738e56fb0cfafe302d4bb774dcf80cb23b270468203e7373a8ab315c",
+      "/private/tmp/vellum-editor-ax-driver-vet-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

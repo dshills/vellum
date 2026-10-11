@@ -57,6 +57,7 @@ type nativeWindow struct {
 	lastFocus        ui.FocusRequest
 	stopLoss         func()
 	lossMu           sync.Mutex
+	input            atomic.Pointer[textWindow]
 	source           atomic.Pointer[events.Source]
 	pending, closing atomic.Bool
 }
@@ -157,6 +158,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
 				fail(err)
 			}
+			if err := bindTextWindow(w); err != nil {
+				fail(err)
+				return
+			}
 			syncAccessibility(w, a)
 		})
 	}
@@ -177,6 +182,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
 					stopDeviceLoss(w)
+					closeTextWindow(w)
 					closeAccessibility(w)
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
@@ -257,7 +263,26 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					return
 				}
 				w.source.Store(w.body.SystemEvents())
-				a.Do(func() { w.rootMu.Lock(); defer w.rootMu.Unlock(); flushDialogs(w.root); syncAccessibility(w, a) })
+				if err := a.Do(func() {
+					w.rootMu.Lock()
+					defer w.rootMu.Unlock()
+					if err := startTextWindow(w, a); err != nil {
+						fail(err)
+					}
+				}); err != nil {
+					fail(err)
+					return
+				}
+				a.Do(func() {
+					w.rootMu.Lock()
+					defer w.rootMu.Unlock()
+					flushDialogs(w.root)
+					if err := bindTextWindow(w); err != nil {
+						fail(err)
+						return
+					}
+					syncAccessibility(w, a)
+				})
 				if ctx.Err() != nil || failure.Load() != nil {
 					quit()
 					return
@@ -290,6 +315,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				cleanup := func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
+					closeTextWindow(w)
 					closeAccessibility(w)
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
@@ -323,6 +349,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	}
 	custom = func(w *nativeWindow, e events.Event) {
 		w.pending.Store(false)
+		handleTextEvent(w, e)
 		a.Drain()
 		syncTopology()
 		refresh(w)

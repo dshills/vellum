@@ -1,0 +1,22 @@
+stage native-ready
+stage settle-admission-refusal
+stage admitted-settle-cancellation
+stage controlled-field-focus-handoff
+field_focus {"client_id":1,"sequence":0,"text":"","selected_start":0,"selected_length":0,"has_marked":false,"caret_screen":[1081,1053,0,23],"active":true,"cell_count":0,"caret_count":1,"viewport":[57,76,264,23]}
+stage field-mark1
+stage field-mark2
+stage field-commit
+field_committed_native {"client_id":1,"sequence":3,"text":"日本","selected_start":2,"selected_length":0,"has_marked":false,"caret_screen":[0,0,0,0],"active":true,"cell_count":0,"caret_count":0,"viewport":[57,76,264,23]}
+stage field-return-to-editor
+stage field-controlled-change
+stage composition-one-history-entry
+stage cancel-preedit
+stage settled-save-exact-bytes
+stage open-install-native-refresh
+stage bounded-native-refusal
+stage owner-edit-remount-and-focus-handoff
+stage native-range-geometry-wrap-bidi
+native_geometry {"bidi":{"requested":[10,3],"substring":"אבג","substring_range":[10,3],"rect_range":[10,3],"screen_rect":[1252,969.6171875,30,22],"point_index":-1},"bidiFirst":{"requested":[10,1],"substring":"א","substring_range":[10,1],"rect_range":[10,1],"screen_rect":[1272,969.6171875,10,22],"point_index":-1},"bidiSecond":{"requested":[11,1],"substring":"ב","substring_range":[11,1],"rect_range":[11,1],"screen_rect":[1262,969.6171875,10,22],"point_index":-1},"emoji":{"requested":[1,2],"substring":"😀","substring_range":[1,2],"rect_range":[1,2],"screen_rect":[1102,969.6171875,10,22],"point_index":-1},"next":{"requested":[297,1],"substring":"w","substring_range":[297,1],"rect_range":[297,1],"screen_rect":[1092,948.9453125,10,22],"point_index":-1},"point":{"requested":[1,2],"substring":"😀","substring_range":[1,2],"rect_range":[1,2],"screen_rect":[1102,969.6171875,10,22],"point_index":1},"state":{"client_id":5,"sequence":10,"text":"A😀é abc אבג العربية wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap \r\nlast\r\n\r\n","selected_start":0,"selected_length":0,"has_marked":false,"caret_screen":[1092,969.6171875,0,22],"active":true,"cell_count":427,"caret_count":429,"viewport":[68,160,2986,653]},"wrap":{"requested":[22,400],"substring":"wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap wrap ","substring_range":[22,400],"rect_range":[22,275],"screen_rect":[1292,969.6171875,2750,22],"point_index":-1}}
+stage save-close-native-preedit-during-write
+stage save-close-refusal-and-terminal-teardown
+EDITOR_SMOKE_PASS: actual Cocoa protocol; atomic composition/history; exact UTF8/CRLF; bounded native refusal; independent windows; remount; range/wrap/bidi; settled save/close; native teardown

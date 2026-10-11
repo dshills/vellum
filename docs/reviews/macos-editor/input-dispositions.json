@@ -1,0 +1,49 @@
+{
+  "source": {
+    "drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5",
+    "drivers/cogent/internal/textinput/input_darwin.go": "0bd59e4a468cf1eba8052c99c012a772f40a0372d6f95484bd1696b4c0381161",
+    "drivers/cogent/internal/textinput/input_darwin.m": "00b0b3d52d80960d9d24b9dab0e3f715665323b3fcbff648300b7b5a3342964f",
+    "drivers/cogent/internal/textinput/input_darwin_test.go": "db38f84f16c5d1352cc52ae05fe45b4ccec16a39c3c7b2acf7678de2d1204b03"
+  },
+  "findings": {
+    "e72ae427a5de32a9": {
+      "result": "specific post-Close use-after-free premise refuted; view lifetime hardened",
+      "evidence": "Go Close already sets i.native=nil after synchronous native close; all other Input calls now explicitly refuse nil/closed attachment. The state alloc retain survives view association removal, while explicit state-owned view retain now prevents raw view lifetime loss before Close. Balanced failure dealloc is tested."
+    },
+    "0b379a6a2ab803a2": {
+      "result": "fixed",
+      "evidence": "UpdateGeometry returns (bool,error) from UpdateGeometryForClient; native ack rejection returns false,nil and leaves complete native state unchanged in actual C/Go fixture."
+    },
+    "0d933b491fca84ee": {
+      "result": "per-character dispatch and redundant diff fixed; bounded whole-string copying/encoding remains",
+      "evidence": "insertText/setMarkedText preserve known replacement range/fragment; unmark is empty delta; cancel uses CFStringInlineBuffer with surrogate expansion; NUL validation uses encoded byte memchr. Incoming UTF16 count checked before encoding and prospective byte arithmetic before full mutableCopy. This is not a measured latency claim."
+    },
+    "aa6022772f220fc1": {
+      "result": "fixed",
+      "evidence": "Close restores isa only when actual class equals installed class. Foreign overlay remains and inherited methods use permanent original-parent metadata after state removal. Attach refuses stacking above an inherited retired owned layer."
+    },
+    "21cfb8a36394ff3f": {
+      "result": "discarded finding independently confirmed and fixed",
+      "evidence": "The raw Update bypass existed in exact pre-review source. Update delegates the validated client path; UTF8/NUL/budget/range/narrowing/finite rectangle and native-surrogate checks refuse invalid publication atomically."
+    }
+  },
+  "tests": [
+    {
+      "path": "/private/tmp/vellum-input-prism-native-5.txt",
+      "sha256": "8d91acefb66b90087a657a6d0629917a7144e6c717aef2b946e602b1bfacdf14",
+      "exit_code": 0
+    },
+    {
+      "path": "/private/tmp/vellum-input-prism-driver-race.txt",
+      "sha256": "72848bda5b88610d4a9b0746f2ee181e09d5c9af96d50601f431eaa1827f37e3",
+      "exit_code": 0
+    },
+    {
+      "path": "/private/tmp/vellum-input-prism-driver-vet.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exit_code": 0
+    }
+  ],
+  "native_scope": "Pure Cocoa selector/lifetime/publication fixtures on actual process main; inert NSObject attachment token; no NSWindow screen geometry, OS preference changes or user-selected IME qualification. Full driver race/vet pass. Existing consumer9/10 is historical; fresh native consumer needed for this production delta.",
+  "independent_review": "mac_history_review confirmed exact frozen hashes, no additional safety defect"
+}

@@ -53,14 +53,14 @@ class ReleaseChecks(unittest.TestCase):
             self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
             self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
 
-    def test_exported_history_and_document_are_consumable_without_the_source_checkout(self):
+    def test_exported_history_document_and_editor_are_consumable_without_the_source_checkout(self):
         with tempfile.TemporaryDirectory(prefix="vellum history SDK ") as temporary:
             base = Path(temporary)
             root = base / "source"
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
             public_files = []
-            for package in ("history", "document", "app", "ui"):
+            for package in ("history", "document", "editor", "app", "ui"):
                 (root / package).mkdir()
                 for source in (release.ROOT / package).glob("*.go"):
                     if not source.name.endswith("_test.go"):
@@ -84,12 +84,13 @@ class ReleaseChecks(unittest.TestCase):
             consumer = base / "consumer"
             consumer.mkdir()
             (consumer / "go.mod").write_text("module example.com/history-consumer\ngo 1.25.6\nrequire github.com/dshills/vellum v0.0.0\nreplace github.com/dshills/vellum => " + json.dumps(sdk.as_posix()) + "\n")
-            (consumer / "main_test.go").write_text('''package consumer
+            (consumer / "main_test.go").write_text(r'''package consumer
 import (
     "testing"
     "context"
     "path/filepath"
     "github.com/dshills/vellum/document"
+    "github.com/dshills/vellum/editor"
     "github.com/dshills/vellum/history"
 )
 func TestExportedPersistence(t *testing.T) {
@@ -97,6 +98,13 @@ func TestExportedPersistence(t *testing.T) {
     path := filepath.Join(t.TempDir(), "doc")
     if written, err := store.Write(context.Background(), path, []byte("SDK roundtrip"), 64); err != nil || !written { t.Fatal(written, err) }
     if data, err := store.Read(context.Background(), path, 64); err != nil || string(data) != "SDK roundtrip" { t.Fatal(string(data), err) }
+}
+func TestExportedEditor(t *testing.T) {
+    text := "A\r\n🙂\r\n"
+    model, err := editor.New(text, editor.Config{})
+    if err != nil { t.Fatal(err) }
+    if model.Snapshot().Text != text { t.Fatal("SDK editor normalized document bytes") }
+    if model.Journal().Snapshot().Dirty { t.Fatal("initial document is dirty") }
 }
 func TestExportedHistory(t *testing.T) {
     j, err := history.New(2)

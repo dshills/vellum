@@ -1,0 +1,97 @@
+{
+  "review": "prism.json",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "findings": {
+    "32f19b9c7fe35266": {
+      "disposition": "refuted",
+      "evidence": "Selection handlers belong to mounted text records allocated by mountControl. Disposal does not nil their control; generic snapshot nil guards also serve labels/extensions."
+    },
+    "773f62b4541610a0": {
+      "disposition": "refuted; adjacent AX admission bypass fixed",
+      "evidence": "editorError already sets restore and invalidates; syncControl restores the unchanged descriptor. New mounted/actual NSString AX tests instead exposed direct set bypassing cap/NUL and truncating at C-string conversion; owner and native guards now reject before Change."
+    },
+    "4e491c2922c423ee": {
+      "disposition": "refuted",
+      "evidence": "refresh validates model bindings before native launch using a transactional pending map. OnClose cleanup is installed before OnShow startTextWindow; failure closes app and quits, while deferred topology cleanup handles unlaunched failures."
+    },
+    "5c14a57028dd1e79": {
+      "disposition": "refuted",
+      "evidence": "Admission barrier awaits every accepted native mutation/commit. Close cancels reservations; remaining committed records are acknowledged unconditionally even for decode failure. Originating event/render lifetime serializes teardown against dispatch; reserved-close and accepted-commit regressions pass."
+    },
+    "76afab76e8dbf518": {
+      "disposition": "refuted",
+      "evidence": "Admission errors happen before mutation. Accepted private ticket remains protected by admission until immediate C emit/Commit, with identical serialized size and no concurrent Close. Panic marks an invariant breach after mutation, not ordinary full/closed refusal; shutdown race regression verifies barrier."
+    },
+    "547a2d6b8dfd2ae0": {
+      "disposition": "refuted",
+      "evidence": "nativeTextScale is reached by publication after established body/Scene plus readiness and closed guards; body is never nulled. nativeTextAttachment has a separate preconstruction discovery contract."
+    },
+    "2def3023ddb00eee": {
+      "disposition": "partially confirmed and corrected",
+      "evidence": "Do executes synchronously on its caller, so Fatal was on the test goroutine. Ignored Do/Drain errors were real diagnostic gaps; errors and session admission are now asserted explicitly after owner execution."
+    },
+    "6043bffb7e7d4fee": {
+      "disposition": "fixed",
+      "evidence": "Malformed/no/multiple inspector JSON, nonzero exit and timeout preserve logs, await normal owned native closure, and record failure. Native wait timeout records owned termination. Seven mocked end-to-end regressions pass without OS access."
+    },
+    "e72ae427a5de32a9": {
+      "disposition": "specific post-Close use-after-free premise refuted; view lifetime hardened",
+      "evidence": "Go Close already sets i.native=nil after synchronous native close; all other Input calls now explicitly refuse nil/closed attachment. The state alloc retain survives view association removal, while explicit state-owned view retain now prevents raw view lifetime loss before Close. Balanced failure dealloc is tested."
+    },
+    "0b379a6a2ab803a2": {
+      "disposition": "fixed",
+      "evidence": "UpdateGeometry returns (bool,error) from UpdateGeometryForClient; native ack rejection returns false,nil and leaves complete native state unchanged in actual C/Go fixture."
+    },
+    "0d933b491fca84ee": {
+      "disposition": "per-character dispatch and redundant diff fixed; bounded whole-string copying/encoding remains",
+      "evidence": "insertText/setMarkedText preserve known replacement range/fragment; unmark is empty delta; cancel uses CFStringInlineBuffer with surrogate expansion; NUL validation uses encoded byte memchr. Incoming UTF16 count checked before encoding and prospective byte arithmetic before full mutableCopy. This is not a measured latency claim."
+    },
+    "aa6022772f220fc1": {
+      "disposition": "fixed",
+      "evidence": "Close restores isa only when actual class equals installed class. Foreign overlay remains and inherited methods use permanent original-parent metadata after state removal. Attach refuses stacking above an inherited retired owned layer."
+    },
+    "21cfb8a36394ff3f": {
+      "disposition": "discarded finding independently confirmed and fixed",
+      "evidence": "The raw Update bypass existed in exact pre-review source. Update delegates the validated client path; UTF8/NUL/budget/range/narrowing/finite rectangle and native-surrogate checks refuse invalid publication atomically."
+    }
+  },
+  "internal_review": "mac_history_review independently adjudicated six driver findings, Input corrections and final four-file focus handoff; platform_completion approved AX corrections; workbench_completion approved tool/SDK and action-readiness fixtures. Finalizer verifies historical failures, final source/native/gate/AX identities and raw evidence hashes.",
+  "residual_limit": "Whole-document encoding/copying remains bounded linear work; no editor latency qualification claimed. Human IME/VoiceOver and public distribution remain open.",
+  "additional_corrections": [
+    "AX text setter budget/NUL validation before native C-string conversion",
+    "Native action fixture distinguishes queue admission from owner delivery; waits for current semantic publication and sends once",
+    "Controlled-field focus-loss handoff waits for acknowledged native inactivity before Change/next-client publication; stale same-visible unmark preserves refocused selection"
+  ],
+  "focus_loss_review": {
+    "source": "../../reports/macos-editor/field-focus-loss-adapter.json",
+    "red_regressions": [
+      "../../reports/macos-editor/field-focus-loss-core-red.log",
+      "../../reports/macos-editor/field-focus-loss-adapter-red.log",
+      "../../reports/macos-editor/field-focus-loss-refocus-red.log"
+    ],
+    "repeat20": "../../reports/macos-editor/field-focus-loss-repeat20.log",
+    "limits": "Native field handoff only; does not redefine programmatic focus ordering against legacy keys."
+  },
+  "correction_findings": {
+    "3bd7a54de8e025c5": {
+      "result": "corrected",
+      "scope": "Same-client accepted publication writes its actual active value once. A concurrent atomic observer regression fails against the prior clear-then-set code; no claim that every production focus callback bypasses the originating render lock."
+    },
+    "022d229b2aae667c": {
+      "result": "corrected_retirement_dependency",
+      "scope": "Model revision mismatch does not apply to pending TextField records; legacy overcap refusal already restores a valid controlled descriptor. Retirement now uses an empty valid inactive client-zero publication, independent of outgoing Go text/layout. Native sequence/unmark acknowledgment still must succeed before controlled finalization. Real main-dispatch transport fixture proves oversized and NUL legacy values cannot enter retirement payload, ack rejection preserves pending loss/no Change, and ack acceptance restores valid controlled bytes without history/Change."
+    },
+    "c0c2f57fd146864e": {
+      "result": "corrected",
+      "scope": "Lock process startup thread from test-only init before TestMain; existing real attach/update/close Cocoa main-thread assertions remain exercised. Production Input/AX unchanged.",
+      "evidence": "../../reports/macos-editor/input-init-review.json"
+    }
+  },
+  "final_internal_review": "mac_history_review approved the three final adapter files and test-only init-thread correction; root additionally required main-dispatch fixture failures return errors and Do/Drain errors be checked. Fresh final-source native/AX and repository checks follow those corrections.",
+  "review_rounds": [
+    "Initial supported editor implementation",
+    "Targeted source/backend/specification and acceptance corrections",
+    "Internal review of narrow corrections requested by targeted Prism review; no third broad Prism run"
+  ]
+}

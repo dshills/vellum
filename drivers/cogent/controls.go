@@ -3,16 +3,20 @@ package cogent
 import (
 	"errors"
 	"fmt"
+	"github.com/dshills/vellum/drivers/cogent/internal/textinput"
 	"html"
 	"reflect"
+	"strings"
 	"sync/atomic"
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
+	"cogentcore.org/core/text/textcore"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -31,17 +35,24 @@ type Semantics struct {
 	Text, SelectedID string
 }
 type controlState struct {
-	a         *app.Application
-	window    string
-	tabs      *tabState
-	dialog    *dialogState
-	wake      func(events.Event)
-	onError   func(error)
-	committed bool
-	disabled  bool                  // UI-owner snapshot; queued callbacks never inspect native ancestors.
-	retired   bool                  // UI-owner lifetime marker; native tree destruction is window-owned.
-	restore   bool                  // Restore accepted controlled value during the next native refresh.
-	refused   atomic.Pointer[error] // Native-event refusal handed to the owner refresh.
+	a                 *app.Application
+	window            string
+	tabs              *tabState
+	dialog            *dialogState
+	wake              func(events.Event)
+	onError           func(error)
+	committed         bool
+	disabled          bool // UI-owner snapshot; queued callbacks never inspect native ancestors.
+	client            uint64
+	textEpoch         uint64
+	editor            *editorBinding
+	fieldState        *core.TextFieldEditingState
+	fieldSelection    *editor.Selection
+	fieldNativeActive atomic.Bool           // native acceptance snapshot; focus callbacks may run outside the application owner
+	fieldFocusLost    atomic.Bool           // retain a loss until native acknowledged deactivation, including refocus
+	retired           bool                  // UI-owner lifetime marker; native tree destruction is window-owned.
+	restore           bool                  // Restore accepted controlled value during the next native refresh.
+	refused           atomic.Pointer[error] // Native-event refusal handed to the owner refresh.
 }
 type tabState struct {
 	pages   map[string]*core.Frame
@@ -55,6 +66,9 @@ type dialogState struct {
 }
 
 func mountControl(parent tree.Node, r *record, a *app.Application, window string) (core.Widget, bool, error) {
+	if err := validateNativeEditor(r.node); err != nil {
+		return nil, true, err
+	}
 	if err := ui.ValidateControl(r.node); err != nil {
 		return nil, true, err
 	}
@@ -71,7 +85,25 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	case ui.NumberField:
 		widget = core.NewSpinner(parent)
 	case ui.TextField:
-		widget = core.NewTextField(parent)
+		c.client = textClientID.Add(1)
+		c.textEpoch = 1
+		field := core.NewTextField(parent)
+		field.SetNativeEditingListener(func(core.TextFieldEditingState) { requestTextPublication(window) })
+		field.SetNativeFocusLostHandler(func() bool {
+			// Focus can change from either the scene loop or an owner refresh.
+			// Do not inspect widgets, records or owner-only native shadows here.
+			t := lookupTextWindow(window)
+			if t == nil || !t.nativeReady.Load() || !t.acceptsNativeInput() || (!c.fieldNativeActive.Load() && !c.fieldFocusLost.Load()) {
+				return false
+			}
+			c.fieldFocusLost.Store(true)
+			requestTextPublication(window)
+			return true
+		})
+		widget = field
+	case ui.MultilineText:
+		c.client = textClientID.Add(1)
+		widget = mountEditor(parent, r)
 	case ui.Scroll:
 		w := core.NewFrame(parent)
 		w.Styler(func(s *styles.Style) { s.Direction = styles.Column; s.Overflow.Set(styles.OverflowAuto) })
@@ -160,6 +192,11 @@ func dispatchControl(r *record, e events.Event) {
 			return
 		}
 		switch change.Kind {
+		case ui.TextField:
+			if len(change.Text) > textinput.MaxDocumentBytes || strings.ContainsRune(change.Text, 0) {
+				editorError(r, fmt.Errorf("cogent: text field native document budget/encoding refused"))
+				return
+			}
 		case ui.Selector:
 			enabled := false
 			for _, o := range r.node.Options {
@@ -270,9 +307,19 @@ func syncControl(r *record, previous ui.Node) error {
 		if previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || committed {
 			w.SetValue(r.node.Number)
 		}
+	case *textcore.Editor:
+		syncEditor(r)
 	case *core.TextField:
+		if previous.Text != r.node.Text {
+			r.control.textEpoch++
+		}
 		if previous.Text != r.node.Text || committed {
 			w.SetText(r.node.Text)
+		}
+		if r.control.fieldSelection != nil {
+			selection := r.control.fieldSelection
+			r.control.fieldSelection = nil
+			w.SetEditingSelection(selection.Anchor, selection.Focus)
 		}
 	case *core.Tabs:
 		if err := prepareControl(r, r.node); err != nil {
@@ -291,7 +338,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if restoring || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if restoring || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
 	}
 	if refused != nil {
@@ -307,6 +354,9 @@ func syncControl(r *record, previous ui.Node) error {
 // Only newly needed tabs are allocated; removed pages are disposed after their
 // managed descendants have moved, in finishControl.
 func prepareControl(r *record, n ui.Node) error {
+	if err := validateNativeEditor(n); err != nil {
+		return err
+	}
 	if r.control == nil || r.control.tabs == nil {
 		return nil
 	}
@@ -505,6 +555,13 @@ func disposeControl(r *record) {
 	}
 	if r.control != nil {
 		r.control.retired = true
+		r.control.fieldFocusLost.Store(false)
+		r.control.fieldNativeActive.Store(false)
+		if field, ok := r.widget.(*core.TextField); ok {
+			field.SetNativeFocusLostHandler(nil)
+			field.SetNativeEditingListener(nil)
+		}
+		disposeEditor(r)
 	}
 	if r.control != nil && r.control.dialog != nil {
 		closeDialog(r)

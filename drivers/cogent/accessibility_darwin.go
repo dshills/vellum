@@ -7,12 +7,16 @@ package cogent
 #cgo darwin LDFLAGS: -framework Cocoa
 #include <stdlib.h>
 #include <stdint.h>
+char *vellumAXTextFixture(const char *node,const char *geometry,int start,int length,int line);
+int vellumAXSetValueFixture(uint64_t token,uint64_t generation,const char *node,const char *value);
 int vellumAXAttach(uint64_t token, void *view, void *window);
 int vellumAXSnapshotValid(const char *json);
 char *vellumAXHitFixture(const char *json, const char *bounds, double x, double y);
 void vellumAXDetach(uint64_t token);
 void vellumAXUpdate(uint64_t token, const char *json);
 void vellumAXGeometry(uint64_t token, const char *json);
+void vellumAXTextGeometry(uint64_t token,const char *json);
+void vellumAXTextProbe(uint64_t token,uint64_t request,const char *id,int start,int length,double x,double y);
 void vellumAXProbe(uint64_t token, uint64_t request);
 void vellumAXPerform(uint64_t token, uint64_t request, const char *id, const char *action, const char *value);
 */
@@ -22,6 +26,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -31,10 +36,16 @@ import (
 	"github.com/dshills/vellum/app"
 )
 
-type accessibilityAttachment struct{ bridge *accessibilityBridge }
+type accessibilityAttachment struct {
+	bridge *accessibilityBridge
+	text   *textWindow
+}
 
 func (n *accessibilityAttachment) Focus(bool) {}
 func (n *accessibilityAttachment) Close() {
+	if n.text != nil && n.text.native != nil {
+		n.text.native.Close()
+	}
 	n.bridge.close()
 	C.vellumAXDetach(C.uint64_t(n.bridge.token))
 }
@@ -48,7 +59,13 @@ func configureAccessibility(a *app.Application) error {
 			b.close()
 			return nil, fmt.Errorf("cogent: native accessibility attachment failed")
 		}
-		return &accessibilityAttachment{bridge: b}, nil
+		text, err := attachTextInput(a, w)
+		if err != nil {
+			b.close()
+			C.vellumAXDetach(C.uint64_t(b.token))
+			return nil, err
+		}
+		return &accessibilityAttachment{bridge: b, text: text}, nil
 	}
 	return nil
 }
@@ -203,3 +220,47 @@ func PerformAccessibilityAction(ctx context.Context, window, id, kind, value str
 }
 
 func releaseAccessibilityConfiguration() { desktop.TheApp.NativeAttach = nil }
+
+func nativeAccessibilityTextGeometry(token uint64, payload string) {
+	s := C.CString(payload)
+	defer C.free(unsafe.Pointer(s))
+	C.vellumAXTextGeometry(C.uint64_t(token), s)
+}
+
+// QueryAccessibilityText probes NSAccessibility text selectors in process. It
+// does not certify external AX or screen-reader workflows. Call from a worker.
+func QueryAccessibilityText(ctx context.Context, window, id string, start, length int, point [2]float64) (string, error) {
+	if ctx == nil || start < 0 || length < 0 || start > math.MaxInt32 || length > math.MaxInt32 || math.IsNaN(point[0]) || math.IsNaN(point[1]) || math.IsInf(point[0], 0) || math.IsInf(point[1], 0) {
+		return "", fmt.Errorf("cogent: invalid accessibility text query")
+	}
+	b, err := lookupAccessibility(window)
+	if err != nil {
+		return "", err
+	}
+	b.mu.Lock()
+	if b.handlers[id] == nil {
+		id = accessibilityManagedID(id)
+	}
+	b.mu.Unlock()
+	return accessibilityRequestRun(ctx, b, func(request uint64) {
+		i := C.CString(id)
+		defer C.free(unsafe.Pointer(i))
+		C.vellumAXTextProbe(C.uint64_t(b.token), C.uint64_t(request), i, C.int(start), C.int(length), C.double(point[0]), C.double(point[1]))
+	})
+}
+
+func nativeAccessibilityTextFixture(node, geometry string, start, length, line int) string {
+	n, g := C.CString(node), C.CString(geometry)
+	defer C.free(unsafe.Pointer(n))
+	defer C.free(unsafe.Pointer(g))
+	result := C.vellumAXTextFixture(n, g, C.int(start), C.int(length), C.int(line))
+	defer C.free(unsafe.Pointer(result))
+	return C.GoString(result)
+}
+
+func nativeAccessibilitySetValueFixture(token, generation uint64, node, value string) bool {
+	n, v := C.CString(node), C.CString(value)
+	defer C.free(unsafe.Pointer(n))
+	defer C.free(unsafe.Pointer(v))
+	return C.vellumAXSetValueFixture(C.uint64_t(token), C.uint64_t(generation), n, v) != 0
+}

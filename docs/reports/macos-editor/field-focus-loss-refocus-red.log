@@ -1,0 +1,7 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestManagedTextFieldFocusLossRetainsUnmarkAndRefocusSelection (0.01s)
+    editor_test.go:823: refocus lost selection or single Change [A日本] {A日本 3 3 3 -1 (0,0)-(0,0)}
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	0.648s
+FAIL

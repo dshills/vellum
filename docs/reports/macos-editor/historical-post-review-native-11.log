@@ -1,0 +1,19 @@
+stage native-ready
+stage settle-admission-refusal
+stage admitted-settle-cancellation
+stage controlled-field-focus-handoff
+field_focus {"client_id":1,"sequence":0,"text":"","selected_start":0,"selected_length":0,"has_marked":false,"caret_screen":[1081,1053,0,23],"active":true,"cell_count":0,"caret_count":1,"viewport":[57,76,264,23]}
+stage field-mark1
+stage field-mark2
+stage field-commit
+field_committed_native {"client_id":1,"sequence":3,"text":"日本","selected_start":2,"selected_length":0,"has_marked":false,"caret_screen":[0,0,0,0],"active":true,"cell_count":0,"caret_count":0,"viewport":[57,76,264,23]}
+stage field-return-to-editor
+stage field-controlled-change
+stage composition-one-history-entry
+owner editor wait for "A😀é אבג العربية\r\nlast\r\n\r\n" composing false: got {Text:A😀é אבג العربية
+last日本
+
+ VisibleText:A😀é אבג العربية
+last日本
+
+ Selection:{Anchor:24 Focus:24} Revision:3 VisibleEpoch:4 SelectionEpoch:5 Composing:false Marked:{Start:0 End:0} History:{UndoLabel:Edit text RedoLabel: UndoCount:2 RedoCount:0 Revision:3 Dirty:true Busy:false Invalid:false}}: context deadline exceeded

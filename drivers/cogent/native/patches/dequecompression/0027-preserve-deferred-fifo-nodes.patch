@@ -1,0 +1,115 @@
+--- a/events/deque.go
++++ b/events/deque.go
+@@ -94,7 +94,11 @@
+ 	n := len(q.Back)
+ 	if !ev.IsUnique() && n > 0 {
+ 		lev := q.Back[n-1]
+-		if ev.IsSame(lev) {
++		// Deferred nodes own FIFO positions and mailbox credit. Only nextBack's
++		// Ready/Merge protocol may combine them; ordinary compression must not
++		// replace a reserved action or a coalesced publication wake.
++		_, deferred := lev.(DeferredEvent)
++		if !deferred && ev.IsSame(lev) {
+ 			q.Back[n-1] = ev // replace
+ 			switch ev.Type() {
+ 			case MouseMove, MouseDrag:
+--- /dev/null
++++ b/events/vellum_deferred_compression_test.go
+@@ -0,0 +1,97 @@
++package events
++
++import "testing"
++
++type vellumDeferredCompression struct {
++	CustomEvent
++	ready bool
++}
++
++func (e *vellumDeferredCompression) Ready() bool              { return e.ready }
++func (e *vellumDeferredCompression) Merge(DeferredEvent) bool { return false }
++func vellumDeferredWake(ready bool) *vellumDeferredCompression {
++	e := &vellumDeferredCompression{ready: ready}
++	e.Typ = Custom
++	e.Init()
++	// Deliberately not Unique: every DeferredEvent owns its reserved node.
++	return e
++}
++func vellumOrdinaryWake() *CustomEvent {
++	e := &CustomEvent{}
++	e.Typ = Custom
++	e.Init()
++	return e
++}
++func TestVellumDeferredPublicationSurvivesOrdinaryCompression(t *testing.T) {
++	var q Deque
++	first := vellumDeferredWake(true)
++	if err := q.SendDeferred(func() (DeferredEvent, error) { return first, nil }); err != nil {
++		t.Fatal(err)
++	}
++	ordinary := vellumOrdinaryWake()
++	q.Send(ordinary)
++	if got, ok := q.PollEvent(); !ok || got != first {
++		t.Fatalf("publication replaced: %T %v", got, ok)
++	}
++	if got, ok := q.PollEvent(); !ok || got != ordinary {
++		t.Fatalf("ordinary wake lost: %T %v", got, ok)
++	}
++	second := vellumDeferredWake(true)
++	if err := q.SendDeferred(func() (DeferredEvent, error) { return second, nil }); err != nil {
++		t.Fatal(err)
++	}
++	if got, ok := q.PollEvent(); !ok || got != second {
++		t.Fatalf("future publication stranded: %T %v", got, ok)
++	}
++}
++func TestVellumDeferredReservationSurvivesOrdinaryCompression(t *testing.T) {
++	var q Deque
++	reserved := vellumDeferredWake(false)
++	if err := q.SendDeferred(func() (DeferredEvent, error) { return reserved, nil }); err != nil {
++		t.Fatal(err)
++	}
++	ordinary := vellumOrdinaryWake()
++	q.Send(ordinary)
++	if got, ok := q.PollEvent(); ok {
++		t.Fatalf("unready reservation bypassed: %T", got)
++	}
++	if err := q.UpdateDeferred(func() error { reserved.ready = true; return nil }, nil); err != nil {
++		t.Fatal(err)
++	}
++	if got, ok := q.PollEvent(); !ok || got != reserved {
++		t.Fatalf("committed reservation lost: %T %v", got, ok)
++	}
++	if got, ok := q.PollEvent(); !ok || got != ordinary {
++		t.Fatalf("following ordinary wake lost: %T %v", got, ok)
++	}
++}
++func TestVellumDeferredCancellationPreservesFollowingOrdinaryWake(t *testing.T) {
++	var q Deque
++	reserved := vellumDeferredWake(false)
++	if err := q.SendDeferred(func() (DeferredEvent, error) { return reserved, nil }); err != nil {
++		t.Fatal(err)
++	}
++	ordinary := vellumOrdinaryWake()
++	q.Send(ordinary)
++	if err := q.UpdateDeferred(func() error { return nil }, func(e DeferredEvent) bool { return e == reserved }); err != nil {
++		t.Fatal(err)
++	}
++	if got, ok := q.PollEvent(); !ok || got != ordinary {
++		t.Fatalf("cancellation erased following wake: %T %v", got, ok)
++	}
++	if _, ok := q.PollEvent(); ok {
++		t.Fatal("canceled reservation remains")
++	}
++}
++func TestVellumDeferredGuardRetainsOrdinaryCompression(t *testing.T) {
++	var q Deque
++	first, second := vellumOrdinaryWake(), vellumOrdinaryWake()
++	q.Send(first)
++	q.Send(second)
++	if got, ok := q.PollEvent(); !ok || got != second {
++		t.Fatalf("ordinary compression changed: %T %v", got, ok)
++	}
++	if _, ok := q.PollEvent(); ok {
++		t.Fatal("ordinary same-type wake was not compressed")
++	}
++}

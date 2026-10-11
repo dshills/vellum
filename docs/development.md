@@ -32,8 +32,11 @@ export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
 
 The script runs root race tests and vet, native-module tests and vet, then builds
 `drivers/cogent/build/vellum-workbench`. It also race-tests, vets and builds the
-independent `examples/hello` module, validates dependency preparation inputs and race-tests the upstream multiwindow
-ownership regressions. The macOS CI workflow follows the same
+independent hello, drawing, 3D, imaging and editor modules, validates dependency
+preparation inputs and race-tests upstream lifecycle regressions. Exact text and
+shaped range fixtures run with the prepared typesetting replacement, installed
+font cache and offscreen display initialization through
+`scripts/check-text-backend.py`; native consumers separately exercise AppKit. The macOS CI workflow follows the same
 bootstrap and check sequence from a fresh checkout. Native checks need the C
 compiler, graphics libraries and GPU dependencies described in the root README.
 
@@ -50,6 +53,32 @@ are ignored. Committed
 prototype evidence and review records remain part of the repository. Capture-time
 paths and hashes in evidence are historical records; moving documentation does
 not regenerate measurements or certify additional platform behavior.
+
+## Editor native acceptance
+
+After building `examples/editor`, run its `-smoke` mode for deterministic Cocoa
+input, composition, native range geometry and document persistence checks. Run
+native desktop fixtures sequentially. The portable and offscreen tests do not
+qualify these AppKit behaviors.
+
+A separate read-only accessibility inspector can qualify exact text, UTF-16
+ranges, screen bounds, point lookup and RTL geometry using an already trusted
+caller:
+
+```sh
+python3 scripts/check-editor-accessibility.py \
+  --binary /tmp/vellum-editor \
+  --output /tmp/vellum-editor-external-ax
+```
+
+The output directory must be new. The wrapper compiles its optional Swift
+inspector, checks existing accessibility trust without prompting, and runs the
+editor's dedicated 60-second `-ax-fixture`. It records binary/source hashes and
+both process results. It refuses unsupported platforms or missing trust before
+launching the application. It never changes input sources, VoiceOver or privacy
+preferences. Swift is needed only for this acceptance tool. Human VoiceOver and
+IME candidate-panel workflows remain separate checks. See the
+[editor acceptance record](reports/macos-editor/README.md).
 
 ## Standalone applications and benchmarks
 

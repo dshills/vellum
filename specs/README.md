@@ -11,6 +11,7 @@
 - [Accessibility and keyboard workflows](accessibility.md): native macOS semantics,
   actions, focus scopes and bounded virtual data publication.
 - [External file drops](file-drop.md): bounded native file references and owner callbacks.
+- [Document editor](editor.md): exact portable text, atomic selection/editing, native composition and persistence settlement.
 - [Document persistence](document.md): asynchronous save/open, revision checks and unsaved-close policies.
 - [Document history](history.md): bounded undo/redo, save revisions and native keyboard precedence.
 - [Native dispatch](native-dispatch.md): synchronous callback failure and desktop event termination.

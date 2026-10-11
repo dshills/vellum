@@ -1,0 +1,183 @@
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -176,6 +176,7 @@
+ 	undos textFieldUndos
+ 
+ 	nativeComposition *textFieldNativeComposition
++	nativeFocusLost   func() bool
+ 	nativeListener    func(TextFieldEditingState)
+ 	nativeLastState   TextFieldEditingState
+ 
+@@ -459,6 +460,35 @@
+ 	tf.Frame.Destroy()
+ }
+ 
++// SetNativeFocusLostHandler lets a native adapter defer editDone until previously
++// admitted input has reached this field and the old native client is inactive.
++// The handler runs on the field's event/render context. Returning true stops the
++// cursor and defers the Change boundary; the adapter must eventually call
++// FinishNativeFocusLost on that context after native quiescence. It must not
++// reenter dispatch.
++// A nil handler retains the default immediate focus-loss behavior.
++func (tf *TextField) SetNativeFocusLostHandler(handler func() bool) *TextField {
++	tf.nativeFocusLost = handler
++	return tf
++}
++
++// FinishNativeFocusLost completes one deferred focus-loss Change boundary after
++// the outgoing native client is inactive and its admitted edits are applied.
++// If the field has regained focus, preserve its fresh directional selection and
++// caret and resume the cursor. Call on the field's event/render context.
++func (tf *TextField) FinishNativeFocusLost() string {
++	state := tf.EditingState()
++	focused := tf.StateIs(states.Focused)
++	tf.editDone()
++	if focused && tf.This != nil && tf.StateIs(states.Focused) && !tf.IsReadOnly() {
++		if string(tf.editText) == state.Text {
++			tf.SetEditingSelection(state.Anchor, state.Focus)
++		}
++		tf.startCursor()
++	}
++	return tf.text
++}
++
+ // Text returns the current text of the text field. It applies any unapplied changes
+ // first, and sends an [events.Change] event if applicable. This is the main end-user
+ // method to get the current value of the text field.
+@@ -1509,6 +1539,10 @@
+ 			e.SetHandled()
+ 			return
+ 		}
++		if tf.nativeFocusLost != nil && tf.nativeFocusLost() {
++			tf.stopCursor()
++			return
++		}
+ 		tf.editDone()
+ 	})
+ }
+--- /dev/null
++++ b/core/vellum_field_focus_loss_test.go
+@@ -0,0 +1,123 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/styles/states"
++	"testing"
++)
++
++func TestVellumFieldFocusLossDefaultAndDeclined(t *testing.T) {
++	for _, installed := range []bool{false, true} {
++		t.Run(map[bool]string{false: "default", true: "declined"}[installed], func(t *testing.T) {
++			field := NewTextField(NewBody("field focus loss")).SetText("A")
++			field.Update()
++			changes, requests := 0, 0
++			field.OnChange(func(events.Event) { changes++ })
++			if installed {
++				field.SetNativeFocusLostHandler(func() bool { requests++; return false })
++			}
++			if !field.ApplyNativeEdit("AB", 2, 2, -1, -1, "insert") {
++				t.Fatal("insert refused")
++			}
++			field.Send(events.FocusLost)
++			if changes != 1 || field.Text() != "AB" || requests != map[bool]int{false: 0, true: 1}[installed] {
++				t.Fatalf("default focus-loss semantics changed: changes=%d requests=%d text=%q", changes, requests, field.Text())
++			}
++		})
++	}
++}
++
++func TestVellumFieldFocusLossDefersQueuedCompositionUntilNativeQuiescence(t *testing.T) {
++	field := NewTextField(NewBody("deferred field focus loss")).SetText("A😀Z")
++	field.Update()
++	changes, requests, otherListeners := 0, 0, 0
++	field.OnChange(func(events.Event) { changes++ })
++	field.SetNativeFocusLostHandler(func() bool { requests++; return true })
++	field.OnFocusLost(func(e events.Event) {
++		otherListeners++
++		if e.IsHandled() {
++			t.Error("native deferral consumed other focus listeners")
++		}
++	})
++	if !field.ApplyNativeEdit("A😀Z!", 4, 4, -1, -1, "insert") {
++		t.Fatal("earlier edit refused")
++	}
++	// The UI may lose focus before already admitted native marked records apply.
++	field.Send(events.FocusLost)
++	if changes != 0 || requests != 1 || otherListeners != 1 || field.text != "A😀Z" {
++		t.Fatalf("focus loss committed a partial value: changes=%d requests=%d others=%d text=%q", changes, requests, otherListeners, field.text)
++	}
++	if !field.ApplyNativeEdit("A😀Z!に", 4, 5, 4, 5, "mark") {
++		t.Fatal("first mark refused")
++	}
++	if !field.ApplyNativeEdit("A😀Z!日本", 4, 6, 4, 6, "mark") {
++		t.Fatal("second mark refused")
++	}
++	if !field.ApplyNativeEdit("A😀Z!日本", 6, 6, -1, -1, "unmark") {
++		t.Fatal("commit refused")
++	}
++	field.Update()
++	if changes != 0 || !field.edited {
++		t.Fatal("queued native records emitted premature Change")
++	}
++	// Only the adapter's acknowledged inactive-client boundary finishes editing.
++	if field.FinishNativeFocusLost() != "A😀Z!日本" || changes != 1 {
++		t.Fatal("quiescent boundary lost final native text")
++	}
++	field.FinishNativeFocusLost()
++	if changes != 1 {
++		t.Fatal("quiescent boundary duplicated Change")
++	}
++	field.SetNativeFocusLostHandler(nil)
++	if !field.ApplyNativeEdit("A😀Z!日本X", 7, 7, -1, -1, "insert") {
++		t.Fatal("new edit refused")
++	}
++	field.Send(events.FocusLost)
++	if changes != 2 || requests != 1 {
++		t.Fatal("clearing native handler did not restore default")
++	}
++}
++
++func TestVellumFieldFocusLossRefocusPreservesDirectionalSelection(t *testing.T) {
++	field := NewTextField(NewBody("refocused deferred field")).SetText("A😀Z")
++	field.Update()
++	defer field.stopCursor()
++	changes := 0
++	field.OnChange(func(events.Event) { changes++ })
++	field.SetNativeFocusLostHandler(func() bool { return true })
++	field.SetState(false, states.Focused)
++	field.Send(events.FocusLost)
++	if !field.ApplyNativeEdit("A😀Z日本", 3, 5, 3, 5, "mark") {
++		t.Fatal("mark refused")
++	}
++	if !field.ApplyNativeEdit("A😀Z日本", 5, 5, -1, -1, "unmark") {
++		t.Fatal("commit refused")
++	}
++	field.SetState(true, states.Focused)
++	if !field.SetEditingSelection(5, 3) {
++		t.Fatal("fresh directional selection refused")
++	}
++	before := field.EditingState()
++	if field.FinishNativeFocusLost() != "A😀Z日本" || changes != 1 {
++		t.Fatal("refocus lost committed bytes")
++	}
++	after := field.EditingState()
++	if after.Text != before.Text || after.Anchor != before.Anchor || after.Focus != before.Focus || after.Cursor != before.Cursor || !field.StateIs(states.Focused) {
++		t.Fatalf("refocus changed fresh selection/caret: before %+v after %+v", before, after)
++	}
++	field.FinishNativeFocusLost()
++	if changes != 1 {
++		t.Fatal("refocus duplicated Change")
++	}
++}
++
++func TestVellumFieldFocusLossReadOnlyDoesNotRequestNativeDeferral(t *testing.T) {
++	field := NewTextField(NewBody("read-only field focus loss")).SetText("A")
++	field.SetReadOnly(true)
++	requests := 0
++	field.SetNativeFocusLostHandler(func() bool { requests++; return true })
++	field.Send(events.FocusLost)
++	if requests != 0 || field.Text() != "A" {
++		t.Fatal("read-only field requested native deferral")
++	}
++}

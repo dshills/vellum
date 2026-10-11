@@ -1,6 +1,6 @@
 # Mac framework completion audit
 
-Audited at the `63a369f` to imaging/asynchronous-capture transition. The current
+Audited at the `e28be2b` to supported public-editor transition. The current
 phase's exact sources, native results and review hashes belong in its acceptance
 record; the earlier commit alone does not include that work. This audit compares
 public implementation against [Mac scope](../../specs/macos-completion.md) and the
@@ -10,11 +10,6 @@ Windows/Linux runtime qualification is deferred.
 
 ## Remaining implementation
 
-- **Supported multiline editor:** public controls currently expose a single-line
-  `TextField`. Proven multiline input/geometry code remains in the foundation
-  prototype. Promote a portable editor model with explicit position units,
-  selection, atomic edits and revisions; a lifetime-safe native adapter; text AX;
-  history/document integration; an independent editor consumer and SDK contracts.
 - **Deterministic replay:** injected clock/task execution, bounded run-until-idle,
   recording and public replay consumer are still absent from P9.
 - **Semantic automation:** P10 needs an opt-in local typed/versioned transport,
@@ -25,7 +20,9 @@ Windows/Linux runtime qualification is deferred.
   multiple/all-row selection or jump-to-key. Sorting/filtering/viewport bounds
   already exist and should be retained.
 - **Custom-content semantics and service scope:** selected canvas/domain objects
-  and detailed editor text need native semantics. P10's richer clipboard MIME/image,
+  need native semantics; detailed editor text is now exposed through native text
+  selectors, with a passing read-only external AX process for the public editor.
+  Human assistive-technology workflows remain open. P10's richer clipboard MIME/image,
   outbound drag/drop, tray and notification capability reporting need explicit
   implementation or a recorded scope decision.
 
@@ -37,7 +34,11 @@ those exclusions to the baseline requirement.
 
 Presented clipping and MSAA/compositor behavior must be qualified separately from
 offscreen snapshots. Current-framework editor/input-order/range-geometry fixtures
-need an external-process AX client. P11 still requires representative integrated
+exercise deterministic Cocoa protocol and native AX method injection. The separate
+read-only external AX inspector passes against the same frozen race binary, with
+exact-byte/range/geometry checks and normal timed closure. See
+[editor acceptance](macos-editor/README.md). No OS privacy preference was changed.
+P11 still requires representative integrated
 frame/input percentiles; retained Go/native/font/GPU memory; 60-second idle,
 10-minute activity, 1,000 rendered lifecycle cycles and overnight soak. Short
 historical samples establish narrower workloads. Each new public contract needs
@@ -60,5 +61,9 @@ native-library modules currently lack their own module license declaration.
 Signing/notarization and clean-user Mac execution remain separate qualification.
 Notice collection and relocated same-host consumption do not certify those gates.
 
-Next implementation checkpoint: the supported public document editor, followed
-by deterministic replay/typed semantic automation and the complete scalable grid.
+The supported public document editor now has a portable model, managed control,
+sole document journal, persistence consumer and SDK contracts. Its source and
+fresh native evidence belong to this checkpoint; deterministic protocol injection
+does not qualify human IME or VoiceOver workflows. Next implementation
+work is deterministic replay/typed semantic automation and the complete scalable
+grid, followed by the remaining Mac workflows and sustained qualification.

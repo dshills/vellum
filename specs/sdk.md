@@ -6,6 +6,16 @@ directory. The framework namespace is `github.com/dshills/vellum` and its own co
 is MIT-licensed. Public distribution remains gated on the dependency/native audit
 and target qualification.
 
+## Public document editing
+
+The SDK includes the standard-library-only `editor` package and its managed
+`ui.MultilineText` descriptor. The independent `examples/editor` module uses
+exact document bytes, one history journal and the native input settlement API
+before persistence. SDK relocation checks remove the producing source tree and
+compile a consumer that reads the exact CRLF/Unicode document from the exported
+package. The public API contract consumer also exercises composition, stale
+content epochs and `document.Session` installation.
+
 ## Native dependency preparation
 
 `drivers/cogent/prepare.sh` and `env.sh` own preparation and Go cache setup.
@@ -25,6 +35,15 @@ A killed process can leave the lock; inspect for an active process before removi
 Driver replacements resolve to `drivers/cogent/build/upstream` and
 `drivers/cogent/build/typesetting`. Prototype modules and evidence remain historical
 and are not required to prepare, test, build or consume the framework modules.
+
+`check-text-backend.py` copies prepared upstream module metadata to a temporary
+location and explicitly resolves its typesetting dependency to the prepared
+owned tree. It runs exact-text, composition and visual geometry regressions with
+an initialized offscreen display and a driver-owned installed-font cache. Direct
+upstream tests do not inherit the driver module's replacements. The rendered
+fixtures need offscreen display initialization; those results are separate from
+native AppKit consumer runs. The helper does not mutate prepared source or OS
+preferences.
 
 ## Independent application module
 

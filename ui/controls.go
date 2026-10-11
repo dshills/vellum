@@ -6,14 +6,15 @@ import (
 )
 
 const (
-	Checkbox    Kind = "checkbox"
-	Selector    Kind = "selector"
-	Slider      Kind = "slider"
-	NumberField Kind = "number-field"
-	TextField   Kind = "text-field"
-	Tabs        Kind = "tabs"
-	Scroll      Kind = "scroll"
-	Dialog      Kind = "dialog"
+	Checkbox      Kind = "checkbox"
+	Selector      Kind = "selector"
+	Slider        Kind = "slider"
+	NumberField   Kind = "number-field"
+	TextField     Kind = "text-field"
+	MultilineText Kind = "multiline-text"
+	Tabs          Kind = "tabs"
+	Scroll        Kind = "scroll"
+	Dialog        Kind = "dialog"
 )
 
 // Option has a stable domain ID independent of its displayed label. For Tabs,
@@ -58,7 +59,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Selector, Slider, NumberField, TextField, Tabs:
+	case Button, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, Tabs:
 		return true
 	}
 	return false
@@ -87,6 +88,18 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind == MultilineText && (n.Editor == nil || n.Editor.Validate() != nil) {
+		return fmt.Errorf("ui: multiline node %q requires an editor Model", n.ID)
+	}
+	if n.Kind != MultilineText && n.Editor != nil {
+		return fmt.Errorf("ui: Editor belongs only on multiline nodes")
+	}
+	if n.Kind != MultilineText && n.SoftWrap {
+		return fmt.Errorf("ui: SoftWrap belongs only on multiline nodes")
+	}
+	if n.Kind != MultilineText && n.TabInserts {
+		return fmt.Errorf("ui: TabInserts belongs only on multiline nodes")
+	}
 	if n.Kind == Slider || n.Kind == NumberField {
 		if err := n.Numeric.Validate(n.Number); err != nil {
 			return fmt.Errorf("ui: node %q: %w", n.ID, err)

@@ -199,6 +199,50 @@
               "sha256": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/eventboundary",
+          "inputs": "native/patches/eventboundary/original-hashes.json",
+          "outputs": "native/patches/eventboundary/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/eventboundary/0026-originating-event-boundary.patch",
+              "sha256": "197e6f33f129e21ef95084928557ee1e16cb087ab0a261bdc9a35b33da92d5cb"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/dequecompression",
+          "inputs": "native/patches/dequecompression/original-hashes.json",
+          "outputs": "native/patches/dequecompression/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/dequecompression/0027-preserve-deferred-fifo-nodes.patch",
+              "sha256": "7ca29aacb4e5c8757117150180bd7530ded160a965d71dcf910ca60e4a0b1606"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/fieldrefresh",
+          "inputs": "native/patches/fieldrefresh/original-hashes.json",
+          "outputs": "native/patches/fieldrefresh/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fieldrefresh/0028-preserve-field-preedit-on-refresh.patch",
+              "sha256": "07c45c97a47abc970c9be0f6c7574502368dd434282fdf2a01421ba49294ca69"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/fieldfocusloss",
+          "inputs": "native/patches/fieldfocusloss/original-hashes.json",
+          "outputs": "native/patches/fieldfocusloss/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fieldfocusloss/0029-defer-managed-field-focus-loss.patch",
+              "sha256": "e9d3221ce8bc9e963b54f9357e9a9ac2f80b62d74f4afbb849aab13358b26c11"
+            }
+          ]
         }
       ]
     },

@@ -3,12 +3,14 @@ package cogent
 import (
 	"cogentcore.org/core/core"
 	"encoding/json"
+	"fmt"
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent/internal/textinput"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
 	"github.com/dshills/vellum/workbench"
-	"fmt"
 	"math"
+	"strings"
 	"testing"
 )
 
@@ -492,5 +494,38 @@ func TestAccessibilityDialogInitialFocusBeforeDeferredShow(t *testing.T) {
 	record.node.Open = false
 	if got := accessibilityDialogInitialFocus(record, nativeBody); got != nil {
 		t.Fatal("closed modal stole start focus")
+	}
+}
+
+func TestAccessibilityFieldSetRefusesNativeBudgetAndNULBeforeChange(t *testing.T) {
+	a, _ := newAXTest(t, 8)
+	body := core.NewBody("AX field admission")
+	var field *record
+	calls := 0
+	n := ui.Node{ID: "field", Kind: ui.TextField, Text: "accepted", Change: func(e ui.ChangeEvent) {
+		calls++
+		field.node.Text = e.Text
+	}}
+	var err error
+	field, err = reconcile(body, nil, n, a, "ax")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { disposeControlTree(field) })
+	before := field.widget.(*core.TextField).EditingState()
+	if err := a.Do(func() {
+		for _, value := range []string{strings.Repeat("x", textinput.MaxDocumentBytes+1), "prefix\x00suffix"} {
+			if applyAccessibilityAction(field, accessibilityAction{Kind: "set", Value: value}) {
+				t.Fatal("invalid native field value accepted")
+			}
+			if calls != 0 || field.node.Text != "accepted" || field.control.committed || field.widget.(*core.TextField).EditingState() != before {
+				t.Fatal("refused AX value changed controlled or native state")
+			}
+		}
+		if !applyAccessibilityAction(field, accessibilityAction{Kind: "set", Value: "valid🙂"}) || calls != 1 || field.node.Text != "valid🙂" {
+			t.Fatal("valid AX value failed after refusal")
+		}
+	}); err != nil {
+		t.Fatal(err)
 	}
 }

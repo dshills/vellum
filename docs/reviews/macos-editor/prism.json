@@ -1,0 +1,424 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "6251cde17871913af1c6face4e3cc1e9",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e28be2b8a11ec1b1ea2dcba94cb45c2459016bfc",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 11,
+      "high": 1
+    },
+    "highestSeverity": "high"
+  },
+  "findings": [
+    {
+      "id": "e72ae427a5de32a9",
+      "severity": "high",
+      "category": "bug",
+      "title": "State freed in close() while Go still holds the pointer; `closed` checks read freed memory",
+      "message": "attach returns the state with the +1 retain it got from alloc, and close drops it. After close the state is deallocated, but every other entry point (update, caret, settle, request_limit, enable_deltas, probes) still dereferences it and checks `s-\u003eclosed`. If Go calls any of them after close, it reads freed memory, so the `closed` flag cannot protect anything. The state also keeps an unretained `view` pointer. If the view is deallocated without a prior close, the associated object is released and Go is left holding a dangling handle.",
+      "suggestion": "Keep the state alive until the Go side explicitly releases the handle, for example with a separate vellum_managed_input_free(). Make close only mark the state closed and detach it from the view. Alternatively, document and enforce that no calls follow close. Also clear or nil `view` when the view goes away.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin.m",
+          "lines": {
+            "start": 324,
+            "end": 324
+          }
+        }
+      ],
+      "tags": [
+        "memory-safety",
+        "use-after-free",
+        "lifecycle"
+      ],
+      "evidence": "object_setClass(s-\u003eview,s-\u003ebaseClass);objc_setAssociatedObject(s-\u003eview,\u0026inputKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);[s release];",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "32f19b9c7fe35266",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference of r.control in selection action",
+      "message": "The new selection path dereferences r.control (fieldState, fieldSelection, textEpoch, and a.Invalidate(window)) without a nil check. The snapshot code in the same diff guards with `if r.control != nil`, so a record without a control is expected to be possible. An accessibility 'selection' action on such a record would panic.",
+      "suggestion": "Return false early when r.control is nil, before the selection branch uses it. Also guard the later `r.control.a.Invalidate(r.control.window)` call, which the MultilineText path reaches too.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 431,
+            "end": 431
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "accessibility",
+        "location-corrected"
+      ],
+      "evidence": "if r.control.fieldState == nil || r.control.fieldState.Text != request.Text {",
+      "fix": {
+        "before": "if r.control.fieldState == nil || r.control.fieldState.Text != request.Text {",
+        "after": "if r.control == nil || r.control.fieldState == nil || r.control.fieldState.Text != request.Text {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "773f62b4541610a0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Refused oversized/NUL text edit does not restore the native field",
+      "message": "When a native text field edit is refused for budget or encoding, the handler returns without restoring the controlled value. The other refusal paths all call requestControlRestore. Here r.node.Text is unchanged and `committed` is false, so syncControl will not call SetText. The widget can keep showing the refused text while the model holds the old value.",
+      "suggestion": "Call requestControlRestore(r) after reporting the error, as the other refusal paths do, so the native field returns to the model value.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls.go",
+          "lines": {
+            "start": 183,
+            "end": 186
+          }
+        }
+      ],
+      "tags": [
+        "controlled-value",
+        "state-divergence",
+        "location-corrected"
+      ],
+      "evidence": "if len(change.Text) \u003e textinput.MaxDocumentBytes || strings.ContainsRune(change.Text, 0) {\n\t\t\t\teditorError(r, fmt.Errorf(\"cogent: text field native document budget/encoding refused\"))\n\t\t\t\treturn\n\t\t\t}",
+      "fix": {
+        "before": "if len(change.Text) \u003e textinput.MaxDocumentBytes || strings.ContainsRune(change.Text, 0) {\n\t\t\t\teditorError(r, fmt.Errorf(\"cogent: text field native document budget/encoding refused\"))\n\t\t\t\treturn\n\t\t\t}",
+        "after": "if len(change.Text) \u003e textinput.MaxDocumentBytes || strings.ContainsRune(change.Text, 0) {\n\t\t\t\teditorError(r, fmt.Errorf(\"cogent: text field native document budget/encoding refused\"))\n\t\t\t\trequestControlRestore(r)\n\t\t\t\treturn\n\t\t\t}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4e491c2922c423ee",
+      "severity": "medium",
+      "category": "bug",
+      "title": "startTextWindow leaves registered state when binding fails",
+      "message": "The text window is registered in the global textWindows map, stored in w.input, and native publication is started before bindTextWindow runs. If bindTextWindow returns an error (for example ErrEditorBinding), startTextWindow reports failure but leaves the window registered and live. The caller may never run closeTextWindow for a window that failed to start. That leaks the registry entry and the pump, and leaves a half-initialised window receiving native events.",
+      "suggestion": "Run bindEditorModels before registering and starting publication, or call closeTextWindow(w) (or undo the registration) when bindTextWindow returns an error.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/editor.go",
+          "lines": {
+            "start": 383,
+            "end": 389
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "t.lifetime.Store(\u0026textLifetime{ctx: lifetime})\n\tw.input.Store(t)\n\ttextWindows.Lock()\n\ttextWindows.windows[w.window.ID] = t\n\ttextWindows.Unlock()\n\tstartNativeTextPublication(t)\n\treturn bindTextWindow(w)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "5c14a57028dd1e79",
+      "severity": "medium",
+      "category": "bug",
+      "title": "closeTextWindow drain loop can spin forever and ignores Drain errors",
+      "message": "The loop runs after the pump is closed. It ignores the error from Drain, and it holds t.admission. If Drain fails or makes no progress on a closed pump while records are still outstanding (for example, one reserved but never committed), the loop spins forever. That would hang window teardown and block every native input path waiting on admission.",
+      "suggestion": "Check the error returned by Drain and break when it reports closed or no progress. Alternatively, bound the loop or have the pump expose a Discard/Abort that releases outstanding credit.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/editor.go",
+          "lines": {
+            "start": 476,
+            "end": 478
+          }
+        }
+      ],
+      "tags": [
+        "hang",
+        "teardown",
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "for t.pump.Stats().Queue.Outstanding \u003e 0 {\n\t\t_ = t.pump.Drain(16, func(textMessage) {})\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0b379a6a2ab803a2",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "UpdateGeometry silently drops native rejection result",
+      "message": "UpdateGeometry discards the `accepted` bool from UpdateGeometryForClient. The doc comment says a rejected or stale publication leaves previous state intact, but the caller gets a nil error whether or not native accepted the update. The caller then believes the text, geometry and acknowledgement were published when they were not, which can desync the shadow state from the native view.",
+      "suggestion": "Return the accepted flag, for example `func (i *Input) UpdateGeometry(...) (bool, error)`, or return a sentinel error such as `ErrStale` when native rejects the update.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin.go",
+          "lines": {
+            "start": 128,
+            "end": 129
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "cgo",
+        "api"
+      ],
+      "evidence": "_, err := i.UpdateGeometryForClient(0, text, anchor, focus, markedStart, markedEnd, active, ack, rect, g)\n\treturn err",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "0d933b491fca84ee",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Full-document scans and copies on every keystroke",
+      "message": "Every accepted native edit does O(document) work on the main thread. insertText and setMarkedText make a full mutableCopy, and the delta path scans the common prefix and suffix one character at a time with two Objective-C messages per character. publish() calls `characters()` on the whole document and does the same per-character scan for NUL checks on every update. With documents up to the 4 MiB limit, this adds noticeable latency to each keystroke and each IME update.",
+      "suggestion": "Use bulk operations instead of per-character messaging. For the NUL check use `[text rangeOfString:@\"\\0\"].location==NSNotFound` or `CFStringGetCharactersPtr`/`getCharacters:range:` into a buffer. For diffing, fetch characters into buffers, or derive the delta from the known replacement range (range and insert length) instead of re-diffing the whole document.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin.m",
+          "lines": {
+            "start": 69,
+            "end": 69
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "main-thread",
+        "ime"
+      ],
+      "evidence": "while(prefix\u003cae \u0026\u0026 prefix\u003cbe \u0026\u0026 [s-\u003etext characterAtIndex:prefix]==[next characterAtIndex:prefix])prefix++;",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "aa6022772f220fc1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Class restoration on close guarded only by an assertion",
+      "message": "Close assumes our dynamic subclass is still the view's isa. If KVO or another swizzler has layered a class on top (e.g. NSKVONotifying_*), `object_setClass(view, baseClass)` removes that layer and corrupts its observation. NSCAssert raises an exception when assertions are enabled, and is compiled out under NS_BLOCK_ASSERTIONS. In both cases the close path is unsafe.",
+      "suggestion": "Check the class at runtime. If `object_getClass(view)!=subclass`, skip the class restore and leave the inert subclass in place. Its methods already delegate to the base class when `state(self)` is nil or not usable.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin.m",
+          "lines": {
+            "start": 323,
+            "end": 323
+          }
+        }
+      ],
+      "tags": [
+        "objc-runtime",
+        "isa-swizzling",
+        "robustness"
+      ],
+      "evidence": "NSCAssert(object_getClass(s-\u003eview)==s-\u003esubclass,@\"Unexpected native subclass changed attachment order\");",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "76afab76e8dbf518",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Panic in native commit callback crashes the process on error",
+      "message": "The native commit callback panics when commitInput fails. It runs on the Cocoa main thread through a cgo callback, so a transient error such as a closed window, a full mailbox or an exhausted clock would crash the whole process. Panicking inside a cgo callback is especially hard to recover from.",
+      "suggestion": "Handle the error without panicking. Record it, refuse the native mutation, close the text window, or report it through the application's error path.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/textinput_darwin.go",
+          "lines": {
+            "start": 50,
+            "end": 52
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "cgo",
+        "error-handling"
+      ],
+      "evidence": "if err := t.commitInput(); err != nil {\n\t\t\tpanic(err)\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "547a2d6b8dfd2ae0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference of w.body / Scene",
+      "message": "nativeTextScale only checks that w is non-nil before dereferencing w.body.Scene. The sibling function nativeTextAttachment also guards against a nil w.body and a nil Scene. A window whose body or scene is not yet set (during setup or teardown) would cause a nil-pointer panic.",
+      "suggestion": "Guard w.body and w.body.Scene against nil, as nativeTextAttachment does.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/textinput_darwin.go",
+          "lines": {
+            "start": 77,
+            "end": 77
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "darwin"
+      ],
+      "evidence": "if w != nil \u0026\u0026 w.body.Scene.RenderWindow() != nil {",
+      "fix": {
+        "before": "if w != nil \u0026\u0026 w.body.Scene.RenderWindow() != nil {",
+        "after": "if w != nil \u0026\u0026 w.body != nil \u0026\u0026 w.body.Scene != nil \u0026\u0026 w.body.Scene.RenderWindow() != nil {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "2def3023ddb00eee",
+      "severity": "medium",
+      "category": "testing",
+      "title": "a.Do error ignored and t.Fatal called inside owner closure",
+      "message": "The error returned by a.Do is discarded here and in the Open call below. If the owner refuses or never runs the closure, the test only fails later with a generic timeout. The closure also calls t.Fatal. If Do runs it on another goroutine, as the owner-based `a.Drain()` pattern suggests, t.Fatal calls runtime.Goexit on the wrong goroutine and the test fails incorrectly or hangs.",
+      "suggestion": "Check the error returned by a.Do. Inside the closure, capture the session error into a variable (use t.Error, not t.Fatal) and assert it on the test goroutine after Do returns. Apply the same change to the Open call.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/sdk-contract/editor_test.go",
+          "lines": {
+            "start": 122,
+            "end": 126
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "goroutine",
+        "t.Fatal",
+        "location-corrected"
+      ],
+      "evidence": "a.Do(func() {\n\t\tif err := session.Save(context.Background(), document.SaveOptions{Path: path}); err != nil {\n\t\t\tt.Fatal(err)\n\t\t}\n\t})",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "6043bffb7e7d4fee",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Inspector failure without JSON skips native teardown recording and acceptance.json",
+      "message": "The comment says the app is kept running after an inspector failure so native teardown status is recorded. But `report_json` raises ValueError when the inspector prints no single JSON line (crash, usage error, partial output). That skips `process.wait` and the `acceptance.json` write, and the `finally` block kills the fixture. The \"immutable run evidence\" directory then has no acceptance record, and native exit and timing data is lost. An inspector timeout in `run_child` has the same effect.",
+      "suggestion": "Catch the inspector failure (ValueError from `report_json`, and TimeoutExpired/non-zero exit), mark `result` as failure, and continue to wait for the native process and write `acceptance.json` before raising.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "scripts/check-editor-accessibility.py",
+          "lines": {
+            "start": 86,
+            "end": 86
+          }
+        }
+      ],
+      "tags": [
+        "error-handling",
+        "evidence",
+        "robustness",
+        "location-corrected"
+      ],
+      "evidence": "acceptance = report_json(inspected.stdout)",
+      "fix": {
+        "before": "acceptance = report_json(inspected.stdout)",
+        "after": "try:\n                    acceptance = report_json(inspected.stdout)\n                except ValueError:\n                    acceptance = {\"result\": \"failure\", \"error\": \"inspector produced no single JSON result\"}"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 404673,
+    "totalMs": 160000
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 73,
+    "bytes": 450599,
+    "chunks": 12,
+    "llmCalls": 13,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 265591,
+        "output": 53758,
+        "costUSD": 1.068762
+      }
+    ],
+    "widenedFiles": 12,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "21cfb8a36394ff3f",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Update bypasses input validation done by sibling methods",
+        "message": "Update passes text to C.CString and the offsets to C.int with no validation. This is unlike UpdateClient and UpdateGeometryForClient, which check UTF-8 validity, embedded NUL, size, offset range and rect finiteness. An embedded NUL silently truncates the text on the native side, so the UTF-16 ranges no longer match the native string. Offsets above MaxInt32 or below -1 are narrowed to int, and a non-finite rect goes straight to Cocoa.",
+        "suggestion": "Apply the same validation as UpdateClient: utf8.ValidString, no NUL, a length limit, offsets in [-1, MaxInt32], and a finite non-negative rect. Better still, make Update delegate to UpdateClient(0, ...) and return its bool or an error.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/internal/textinput/input_darwin.go",
+            "lines": {
+              "start": 39,
+              "end": 42
+            }
+          }
+        ],
+        "tags": [
+          "validation",
+          "cgo"
+        ],
+        "evidence": "p := C.CString(text)\n\tdefer C.free(unsafe.Pointer(p))\n\tC.vellum_managed_input_update(i.native, p, C.int(anchor), C.int(focus), C.int(markedStart), C.int(markedEnd), C.bool(active), C.uint64_t(ack)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/internal/textinput/input_darwin.go"
+    }
+  ],
+  "suppressed": []
+}

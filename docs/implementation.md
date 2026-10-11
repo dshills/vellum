@@ -130,3 +130,14 @@ patch 23. See [contract](../specs/advanced-gpu.md) and
 [evidence](reports/macos-advanced-gpu/README.md). The imaging consumer adds actual
 compute and float-color render preparation with bounded asynchronous captures.
 See [evidence](reports/macos-imaging/README.md). Broader P4/Mac qualification remains open.
+
+
+Public multiline editing now has an exact UTF-8 portable model, directional
+scalar selections, transient composition, monotonic stale-input guards and one
+sparse undo journal shared with document persistence. The managed Mac control
+reuses the prepared text renderer and originating input FIFO; asynchronous
+settlement precedes Save/Open/Close/Undo/Redo. The independent editor consumer
+uses two separate document models. See [editor contract](../specs/editor.md).
+Two native race-binary runs and a separate read-only external AX process pass
+against frozen source inputs. See [editor acceptance](reports/macos-editor/README.md).
+Human IME candidate panels and screen-reader workflows remain acceptance gates.

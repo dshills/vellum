@@ -1,0 +1,16 @@
+{
+  "finding": "c0c2f57fd146864e",
+  "disposition": "corrected",
+  "source": {
+    "drivers/cogent/internal/textinput/input_darwin_test.go": "fbda18ac00836efb167e5d35ca2fa9cd944887a0d3e2b47fbe58e213ff9f51d9"
+  },
+  "change": "Lock process startup thread from test-only init before TestMain; existing real attach/update/close Cocoa main-thread assertions remain exercised. Production Input/AX unchanged.",
+  "checks": {
+    "native_race_exit_code": 0,
+    "vet_exit_code": 0
+  },
+  "evidence": {
+    "/private/tmp/vellum-editor-input-init-native-race.log": "c956612fb5f345f98d6c0d327eaa3e06b9bb4af530a61baebd840272a0dfe0ec",
+    "/private/tmp/vellum-editor-input-init-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

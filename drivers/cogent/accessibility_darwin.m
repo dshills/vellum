@@ -5,6 +5,7 @@
 #import <objc/message.h>
 #include <stdint.h>
 #include <string.h>
+#include <math.h>
 extern int vellumAXAction(uint64_t token,uint64_t generation,char *id,char *kind,char *value);
 extern void vellumAXResult(uint64_t request,char *json);
 @class VellumAXState;
@@ -19,6 +20,7 @@ static NSMutableDictionary<NSNumber *,VellumAXState *> *vellumAXStates;
 @property NSRect pixelFrame;
 @property BOOL live;
 @property BOOL lastAdmission;
+@property (copy) NSDictionary *textGeometry;
 - (BOOL)request:(NSString *)action value:(NSString *)value;
 @end
 @interface VellumAXState : NSObject
@@ -33,6 +35,7 @@ static NSMutableDictionary<NSNumber *,VellumAXState *> *vellumAXStates;
 @property (copy) NSArray *roots;
 @property (copy) NSArray *hierarchy;
 @property (strong) NSMutableDictionary<NSString *,NSArray *> *geometry;
+@property (strong) NSMutableDictionary<NSString *,NSDictionary *> *textGeometry;
 @end
 @implementation VellumAXState
 @end
@@ -43,6 +46,7 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"button"])return NSAccessibilityButtonRole;
  if([role isEqual:@"checkbox"])return NSAccessibilityCheckBoxRole;
  if([role isEqual:@"text-field"])return NSAccessibilityTextFieldRole;
+ if([role isEqual:@"multiline-text"])return NSAccessibilityTextAreaRole;
  if([role isEqual:@"number-field"])return NSAccessibilityIncrementorRole;
  if([role isEqual:@"slider"])return NSAccessibilitySliderRole;
  if([role isEqual:@"selector"])return NSAccessibilityPopUpButtonRole;
@@ -54,7 +58,75 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"row"]||[role isEqual:@"tree-row"])return NSAccessibilityRowRole;
  return NSAccessibilityGroupRole;
 }
+static BOOL vellumAXValidRange(NSString *text,NSRange range){
+ if(!text||range.location==NSNotFound||range.location>text.length||range.length>text.length-range.location)return NO;
+ for(NSUInteger p=range.location,i=0;i<2;i++,p=NSMaxRange(range))if(p>0&&p<text.length&&CFStringIsSurrogateHighCharacter([text characterAtIndex:p-1])&&CFStringIsSurrogateLowCharacter([text characterAtIndex:p]))return NO;return YES;
+}
+static NSRect vellumAXArrayRect(NSArray *r){return r.count==4?NSMakeRect([r[0] doubleValue],[r[1] doubleValue],[r[2] doubleValue],[r[3] doubleValue]):NSZeroRect;}
+static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(r.origin.x<NSMinX(viewport)||r.origin.x>NSMaxX(viewport))return NSZeroRect;CGFloat end=MIN(NSMaxY(r),NSMaxY(viewport));r.origin.y=MAX(NSMinY(r),NSMinY(viewport));r.size.height=MAX(0,end-r.origin.y);return r;}return NSIntersectionRect(r,viewport);}
 @implementation VellumAXElement
+- (NSString *)managedText {
+ if(![self isAccessibilityEnabled]||![self.node[@"text_client"] unsignedLongLongValue]||![self.node[@"value"] isKindOfClass:NSString.class])return nil;
+ return self.node[@"value"];
+}
+- (NSDictionary *)managedGeometry {
+ NSString *text=[self managedText];NSDictionary *entry=self.textGeometry;
+ if(!text||![entry[@"client"] isEqual:self.node[@"text_client"]]||![entry[@"text"] isEqual:text])return nil;
+ return entry[@"geometry"];
+}
+- (NSInteger)accessibilityNumberOfCharacters{return [self managedText].length;}
+- (NSRange)accessibilitySelectedTextRange {
+ NSString *text=[self managedText];NSArray *range=self.node[@"text_selection"];
+ if(!text||range.count!=2)return NSMakeRange(NSNotFound,0);
+ NSRange r=NSMakeRange([range[0] unsignedIntegerValue],[range[1] unsignedIntegerValue]);
+ return vellumAXValidRange(text,r)?r:NSMakeRange(NSNotFound,0);
+}
+- (NSString *)accessibilitySelectedText {return [self accessibilityStringForRange:self.accessibilitySelectedTextRange];}
+- (void)setAccessibilitySelectedTextRange:(NSRange)range {
+ NSString *text=[self managedText];if(!text||!vellumAXValidRange(text,range))return;
+ NSData *data=[NSJSONSerialization dataWithJSONObject:@{@"text":text,@"start":@(range.location),@"length":@(range.length)} options:0 error:nil];
+ [self request:@"selection" value:[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]];
+}
+- (NSString *)accessibilityStringForRange:(NSRange)range {NSString *text=[self managedText];return text&&vellumAXValidRange(text,range)?[text substringWithRange:range]:nil;}
+- (NSAttributedString *)accessibilityAttributedStringForRange:(NSRange)range {NSString *text=[self accessibilityStringForRange:range];return text?[[NSAttributedString alloc]initWithString:text]:nil;}
+- (NSInteger)accessibilityLineForIndex:(NSInteger)index {
+ NSString *text=[self managedText];if(!text||index<0||!vellumAXValidRange(text,NSMakeRange(index,0)))return NSNotFound;
+ NSInteger line=0;for(NSUInteger i=0;i<(NSUInteger)index;i++){unichar c=[text characterAtIndex:i];if(c=='\r'){if(i+1<text.length&&[text characterAtIndex:i+1]=='\n'){if(i+1>=(NSUInteger)index)break;i++;}line++;}else if(c=='\n')line++;}return line;
+}
+- (NSInteger)accessibilityInsertionPointLineNumber {return [self accessibilityLineForIndex:[self.node[@"text_focus"] integerValue]];}
+- (NSRange)accessibilityRangeForLine:(NSInteger)line {
+ NSString *text=[self managedText];if(!text||line<0)return NSMakeRange(NSNotFound,0);
+ NSUInteger start=0;NSInteger current=0;for(NSUInteger i=0;i<text.length;i++){unichar c=[text characterAtIndex:i];if(c!='\n'&&c!='\r')continue;NSUInteger end=i+1;if(c=='\r'&&end<text.length&&[text characterAtIndex:end]=='\n')end++;
+ if(current==line)return NSMakeRange(start,end-start);current++;start=end;i=end-1;}
+ return current==line?NSMakeRange(start,text.length-start):NSMakeRange(NSNotFound,0);
+}
+- (NSRange)accessibilityRangeForIndex:(NSInteger)index {
+ NSString *text=[self managedText];if(!text||index<0||(NSUInteger)index>=text.length||!vellumAXValidRange(text,NSMakeRange(index,0)))return NSMakeRange(NSNotFound,0);
+ return [text rangeOfComposedCharacterSequenceAtIndex:index];
+}
+- (NSRect)managedScreenRect:(NSRect)pixel {
+ NSView *view=self.state.view;NSWindow *window=self.state.window;if(!view||!window)return NSZeroRect;CGFloat scale=window.backingScaleFactor;if(scale<=0)scale=1;
+ NSRect local=NSMakeRect(pixel.origin.x/scale,pixel.origin.y/scale,pixel.size.width/scale,pixel.size.height/scale);if(!view.isFlipped)local.origin.y=view.bounds.size.height-NSMaxY(local);
+ return [window convertRectToScreen:[view convertRect:local toView:nil]];
+}
+- (NSRect)accessibilityFrameForRange:(NSRange)range {
+ NSString *text=[self managedText];NSDictionary *g=[self managedGeometry];if(!g||!vellumAXValidRange(text,range))return NSZeroRect;
+ NSRect viewport=vellumAXArrayRect(g[@"viewport"]),result=NSZeroRect;BOOL found=NO;
+ if(range.length==0){NSDictionary *chosen=nil;NSInteger focusLine=[g[@"focus_line"] integerValue];
+ for(NSDictionary *caret in g[@"carets"])if([caret[@"offset"] unsignedIntegerValue]==range.location){if(!chosen||[caret[@"line"] integerValue]==focusLine)chosen=caret;if([caret[@"line"] integerValue]==focusLine)break;}
+ if(chosen){result=vellumAXClipRect(vellumAXArrayRect(chosen[@"rect"]),viewport);found=result.size.height>0;}
+ }else for(NSDictionary *cell in g[@"cells"]){if([cell[@"end"] unsignedIntegerValue]<=range.location||[cell[@"start"] unsignedIntegerValue]>=NSMaxRange(range))continue;
+ NSRect rect=vellumAXClipRect(vellumAXArrayRect(cell[@"rect"]),viewport);if(rect.size.height<=0)continue;
+ if(!found){result=rect;found=YES;}else{CGFloat x=MIN(NSMinX(result),NSMinX(rect)),y=MIN(NSMinY(result),NSMinY(rect));result=NSMakeRect(x,y,MAX(NSMaxX(result),NSMaxX(rect))-x,MAX(NSMaxY(result),NSMaxY(rect))-y);}}
+ return found?[self managedScreenRect:result]:NSZeroRect;
+}
+- (NSRange)accessibilityRangeForPosition:(NSPoint)point {
+ NSDictionary *g=[self managedGeometry];NSView *view=self.state.view;NSWindow *window=self.state.window;if(!g||!view||!window)return NSMakeRange(NSNotFound,0);
+ NSPoint p=[view convertPoint:[window convertPointFromScreen:point] fromView:nil];if(!view.isFlipped)p.y=view.bounds.size.height-p.y;CGFloat scale=window.backingScaleFactor;if(scale<=0)scale=1;p.x*=scale;p.y*=scale;
+ if(!NSPointInRect(p,vellumAXArrayRect(g[@"viewport"])))return NSMakeRange(NSNotFound,0);
+ for(NSDictionary *cell in g[@"cells"])if(NSPointInRect(p,vellumAXArrayRect(cell[@"rect"]))){NSUInteger start=[cell[@"start"] unsignedIntegerValue],end=[cell[@"end"] unsignedIntegerValue];return NSMakeRange(start,end-start);}return NSMakeRange(NSNotFound,0);
+}
+
 - (BOOL)isAccessibilityElement{return self.live&&!self.state.closed;}
 - (NSString *)accessibilityIdentifier{return self.node[@"id"];}
 - (NSString *)accessibilityRole{return vellumAXRole(self.node[@"role"]);}
@@ -94,6 +166,7 @@ static NSString *vellumAXRole(NSString *role){
  if(selector==@selector(accessibilityPerformDecrement))return vellumAXHas(self,@"decrement");
  if(selector==@selector(accessibilityPerformCancel))return vellumAXHas(self,@"cancel");
  if(selector==@selector(setAccessibilityValue:))return vellumAXHas(self,@"set");
+ if(selector==@selector(setAccessibilitySelectedTextRange:))return vellumAXHas(self,@"selection");
  if(selector==@selector(setAccessibilityFocused:))return vellumAXHas(self,@"focus");
  if(selector==@selector(setAccessibilityExpanded:))return vellumAXHas(self,@"expand")||vellumAXHas(self,@"collapse");
  return [super isAccessibilitySelectorAllowed:selector];
@@ -113,6 +186,12 @@ static NSString *vellumAXRole(NSString *role){
  if([value isKindOfClass:NSString.class])text=value;
  else if([value isKindOfClass:NSNumber.class])text=[value stringValue];
  if([self.node[@"role"] isEqual:@"checkbox"]&&[value isKindOfClass:NSNumber.class])text=[value boolValue]?@"true":@"false";
+ if([self.node[@"role"] isEqual:@"text-field"]||[self.node[@"role"] isEqual:@"multiline-text"]){
+  // Refuse before UTF8String/C.GoString can truncate NUL or queue a value that
+  // the native document cannot represent. Owner model limits still apply.
+  if(!text||text.length>(4u<<20)||[text lengthOfBytesUsingEncoding:NSUTF8StringEncoding]>(4u<<20)||![text dataUsingEncoding:NSUTF8StringEncoding])return;
+  unichar nul=0;if([text rangeOfString:[NSString stringWithCharacters:&nul length:1]].location!=NSNotFound)return;
+ }
  if(text)[self request:@"set" value:text];
 }
 @end
@@ -152,7 +231,7 @@ static Class vellumAXSubclass(Class base,Class methods,const char *prefix){
 int vellumAXAttach(uint64_t token,void *viewPtr,void *windowPtr){
  NSView *view=(__bridge NSView *)viewPtr;NSWindow *window=(__bridge NSWindow *)windowPtr;
  if(![NSThread isMainThread]||!view||!window||vellumAXState(view))return 0;
- VellumAXState *state=[VellumAXState new];state.view=view;state.window=window;state.token=token;state.elements=[NSMutableDictionary new];state.geometry=[NSMutableDictionary new];state.roots=@[];
+ VellumAXState *state=[VellumAXState new];state.view=view;state.window=window;state.token=token;state.elements=[NSMutableDictionary new];state.geometry=[NSMutableDictionary new];state.textGeometry=[NSMutableDictionary new];state.roots=@[];
  state.viewClass=object_getClass(view);
  Class viewClass=vellumAXSubclass(state.viewClass,VellumAXViewMethods.class,"VellumAXView");
  if(!viewClass)return 0;state.installedViewClass=viewClass;
@@ -166,7 +245,7 @@ void vellumAXDetach(uint64_t token){
  if(![NSThread isMainThread]){dispatch_sync(dispatch_get_main_queue(),^{vellumAXDetach(token);});return;}
  VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;state.closed=YES;
  for(VellumAXElement *x in state.elements.allValues){x.live=NO;x.parentElement=nil;x.childElements=@[];}
- [state.geometry removeAllObjects];
+ [state.geometry removeAllObjects];[state.textGeometry removeAllObjects];
  // A later observer/subclass owns its own isa change; do not overwrite it.
  if(state.view&&object_getClass(state.view)==state.installedViewClass)object_setClass(state.view,state.viewClass);
  objc_setAssociatedObject(state.view,&vellumAXKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -238,7 +317,7 @@ void vellumAXUpdate(uint64_t token,const char *json){
    NSString *id=node[@"id"];VellumAXElement *element=state.elements[id]?:[VellumAXElement new];
    NSObject *oldValue=element.node[@"value"],*newValue=node[@"value"];
    BOOL changed=element.node&&oldValue!=newValue&&![oldValue isEqual:newValue];
-   element.state=state;element.node=node;element.live=YES;next[id]=element;childLists[id]=[NSMutableArray new];
+   element.state=state;element.node=node;element.live=YES;element.textGeometry=state.textGeometry[id];next[id]=element;childLists[id]=[NSMutableArray new];
    NSArray *rect=state.geometry[id];if(rect.count==4)element.pixelFrame=NSMakeRect([rect[0] doubleValue],[rect[1] doubleValue],[rect[2] doubleValue],[rect[3] doubleValue]);
    if(changed)[changedElements addObject:element];
   }
@@ -249,6 +328,7 @@ void vellumAXUpdate(uint64_t token,const char *json){
   // Geometry may arrive before semantics during demand-rendered startup. Keep
   // it until matching elements publish, then retire IDs absent from this tree.
   for(NSString *identifier in state.geometry.allKeys)if(!next[identifier])[state.geometry removeObjectForKey:identifier];
+  for(NSString *identifier in state.textGeometry.allKeys)if(!next[identifier])[state.textGeometry removeObjectForKey:identifier];
   state.elements=next;state.roots=roots;state.hierarchy=hierarchy;state.generation=generation;
   if(![oldHierarchy isEqual:hierarchy])NSAccessibilityPostNotification(state.view,NSAccessibilityLayoutChangedNotification);
   for(VellumAXElement *changed in changedElements)NSAccessibilityPostNotification(changed,NSAccessibilityValueChangedNotification);
@@ -268,7 +348,7 @@ static void vellumAXWalk(id object,NSMutableArray *out){
   if([child isKindOfClass:VellumAXElement.class]){
    VellumAXElement *x=child;NSRect frame=x.accessibilityFrame;id value=x.accessibilityValue?:NSNull.null;NSString *parent=[x.parentElement isKindOfClass:VellumAXElement.class]?[x.parentElement accessibilityIdentifier]:@"";
    id hit=[x.state.view accessibilityHitTest:NSMakePoint(NSMidX(frame),NSMidY(frame))];NSString *hitID=[hit isKindOfClass:VellumAXElement.class]?[hit accessibilityIdentifier]:@"";
-   [out addObject:@{@"id":x.accessibilityIdentifier,@"domain_id":x.node[@"domain_id"]?:@"",@"role":x.accessibilityRole,@"name":x.accessibilityLabel?:@"",@"value":value,@"enabled":@([x isAccessibilityEnabled]),@"selected":@([x isAccessibilitySelected]),@"expanded":@([x isAccessibilityExpanded]),@"parent":parent,@"hit_test_id":hitID,@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]}];
+   [out addObject:@{@"id":x.accessibilityIdentifier,@"domain_id":x.node[@"domain_id"]?:@"",@"role":x.accessibilityRole,@"name":x.accessibilityLabel?:@"",@"value":value,@"enabled":@([x isAccessibilityEnabled]),@"selected":@([x isAccessibilitySelected]),@"expanded":@([x isAccessibilityExpanded]),@"parent":parent,@"hit_test_id":hitID,@"text_selection":@[x.accessibilitySelectedTextRange.location==NSNotFound?@(-1):@(x.accessibilitySelectedTextRange.location),@(x.accessibilitySelectedTextRange.length)],@"insertion_line":@(x.accessibilityInsertionPointLineNumber),@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]}];
   }
   vellumAXWalk(child,out);
  }
@@ -289,8 +369,61 @@ void vellumAXPerform(uint64_t token,uint64_t request,const char *id,const char *
   else if([kind isEqual:@"decrement"])accepted=[element accessibilityPerformDecrement];
   else if([kind isEqual:@"cancel"])accepted=[element accessibilityPerformCancel];
   else if([kind isEqual:@"set"]){element.lastAdmission=NO;[element setAccessibilityValue:text];accepted=element.lastAdmission;}
+  else if([kind isEqual:@"selection"]){NSDictionary *r=[NSJSONSerialization JSONObjectWithData:[text dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];if([r isKindOfClass:NSDictionary.class]&&[r[@"text"] isEqual:element.node[@"value"]]&&[r[@"start"] isKindOfClass:NSNumber.class]&&[r[@"length"] isKindOfClass:NSNumber.class]){element.lastAdmission=NO;[element setAccessibilitySelectedTextRange:NSMakeRange([r[@"start"] unsignedIntegerValue],[r[@"length"] unsignedIntegerValue])];accepted=element.lastAdmission;}}
   else if([kind isEqual:@"focus"]){element.lastAdmission=NO;[element setAccessibilityFocused:YES];accepted=element.lastAdmission;}
   else if([kind isEqual:@"expand"]||[kind isEqual:@"collapse"]){element.lastAdmission=NO;[element setAccessibilityExpanded:[kind isEqual:@"expand"]];accepted=element.lastAdmission;}
   vellumAXResult(request,accepted?"true":"false");
  });
+}
+
+// Geometry is accepted as one validated immutable payload and retained only for
+// its exact control incarnation and whole text. It cannot answer stale ranges.
+static BOOL vellumAXRectValid(id value){if(![value isKindOfClass:NSArray.class]||[value count]!=4)return NO;for(id n in value)if(![n isKindOfClass:NSNumber.class]||!isfinite([n doubleValue]))return NO;return [value[2] doubleValue]>=0&&[value[3] doubleValue]>=0;}
+static BOOL vellumAXTextEntryValid(id entry){
+ if(![entry isKindOfClass:NSDictionary.class]||![entry[@"client"] isKindOfClass:NSNumber.class]||![entry[@"text"] isKindOfClass:NSString.class])return NO;
+ NSDictionary *g=entry[@"geometry"];NSString *text=entry[@"text"];if(![g isKindOfClass:NSDictionary.class]||!vellumAXRectValid(g[@"viewport"])||![g[@"focus_line"] isKindOfClass:NSNumber.class])return NO;
+ for(NSString *kind in @[@"cells",@"carets"]){id list=g[kind];if(![list isKindOfClass:NSArray.class])return NO;for(id c in list){if(![c isKindOfClass:NSDictionary.class]||!vellumAXRectValid(c[@"rect"])||![c[@"line"] isKindOfClass:NSNumber.class])return NO;
+ if([kind isEqual:@"cells"]){if(![c[@"start"] isKindOfClass:NSNumber.class]||![c[@"end"] isKindOfClass:NSNumber.class])return NO;NSInteger start=[c[@"start"] integerValue],end=[c[@"end"] integerValue];if(start<0||end<=start||!vellumAXValidRange(text,NSMakeRange(start,end-start)))return NO;}
+ else {if(![c[@"offset"] isKindOfClass:NSNumber.class]||[c[@"offset"] integerValue]<0||!vellumAXValidRange(text,NSMakeRange([c[@"offset"] unsignedIntegerValue],0)))return NO;}}}return YES;
+}
+void vellumAXTextGeometry(uint64_t token,const char *json){NSString *payload=json?[NSString stringWithUTF8String:json]:nil;if(!payload)return;dispatch_async(dispatch_get_main_queue(),^{
+ VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;NSDictionary *entries=[NSJSONSerialization JSONObjectWithData:[payload dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];if(![entries isKindOfClass:NSDictionary.class])return;
+ for(id key in entries)if(![key isKindOfClass:NSString.class]||!vellumAXTextEntryValid(entries[key]))return;
+ for(NSString *key in entries){state.textGeometry[key]=entries[key];state.elements[key].textGeometry=entries[key];}
+ });}
+void vellumAXTextProbe(uint64_t token,uint64_t request,const char *id,int start,int length,double x,double y){NSString *identifier=id?[NSString stringWithUTF8String:id]:@"";dispatch_async(dispatch_get_main_queue(),^{
+ VellumAXState *state=vellumAXStates[@(token)];VellumAXElement *e=state.elements[identifier];NSRange r=start<0||length<0?NSMakeRange(NSNotFound,0):NSMakeRange(start,length),selected=e.accessibilitySelectedTextRange,hit=[e accessibilityRangeForPosition:NSMakePoint(x,y)];NSRect frame=[e accessibilityFrameForRange:r];
+ NSDictionary *result=@{@"available":@((BOOL)([e managedGeometry]!=nil)),@"text":[e managedText]?:@"",@"substring":[e accessibilityStringForRange:r]?:@"",@"selected_start":selected.location==NSNotFound?@(-1):@(selected.location),@"selected_length":@(selected.length),@"insertion_line":@(e.accessibilityInsertionPointLineNumber),@"line":@([e accessibilityLineForIndex:start]),@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)],@"point_start":hit.location==NSNotFound?@(-1):@(hit.location),@"point_length":@(hit.length)};
+ NSData *data=[NSJSONSerialization dataWithJSONObject:result options:0 error:nil];NSString *resultJSON=[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];vellumAXResult(request,(char *)resultJSON.UTF8String);
+ });}
+@interface VellumAXTextFixtureElement : VellumAXElement
+@end
+@implementation VellumAXTextFixtureElement
+- (NSRect)managedScreenRect:(NSRect)rect{return rect;}
+@end
+char *vellumAXTextFixture(const char *nodeJSON,const char *geometryJSON,int start,int length,int line){
+ @autoreleasepool{
+ NSString *nodeText=nodeJSON?[NSString stringWithUTF8String:nodeJSON]:nil,*geometryText=geometryJSON?[NSString stringWithUTF8String:geometryJSON]:nil;
+ NSDictionary *node=nodeText?[NSJSONSerialization JSONObjectWithData:[nodeText dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil]:nil;
+ NSDictionary *entry=geometryText?[NSJSONSerialization JSONObjectWithData:[geometryText dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil]:nil;
+ if(![node isKindOfClass:NSDictionary.class]||!vellumAXTextEntryValid(entry))return strdup("{}");
+ VellumAXState *state=[VellumAXState new];VellumAXTextFixtureElement *e=[VellumAXTextFixtureElement new];e.state=state;e.node=node;e.live=YES;e.textGeometry=entry;
+ NSRange range=start<0||length<0?NSMakeRange(NSNotFound,0):NSMakeRange(start,length),selected=e.accessibilitySelectedTextRange,lines=[e accessibilityRangeForLine:line];NSRect frame=[e accessibilityFrameForRange:range];
+ NSDictionary *out=@{@"available":@((BOOL)([e managedGeometry]!=nil)),@"substring":[e accessibilityStringForRange:range]?:@"",@"selected_start":selected.location==NSNotFound?@(-1):@(selected.location),@"selected_length":@(selected.length),@"insertion_line":@([e accessibilityInsertionPointLineNumber]),@"line_start":lines.location==NSNotFound?@(-1):@(lines.location),@"line_length":@(lines.length),@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]};
+ NSData *data=[NSJSONSerialization dataWithJSONObject:out options:0 error:nil];NSString *json=[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];return strdup(json.UTF8String);
+ }
+}
+
+// Exercise the actual Objective-C setter without an NSWindow or OS preferences.
+// JSON keeps embedded NUL visible until the setter's pre-C-string admission.
+int vellumAXSetValueFixture(uint64_t token,uint64_t generation,const char *nodeJSON,const char *valueJSON){
+ @autoreleasepool{
+  NSString *n=nodeJSON?[NSString stringWithUTF8String:nodeJSON]:nil,*v=valueJSON?[NSString stringWithUTF8String:valueJSON]:nil;
+  NSDictionary *node=n?[NSJSONSerialization JSONObjectWithData:[n dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil]:nil;
+  id value=v?[NSJSONSerialization JSONObjectWithData:[v dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingFragmentsAllowed error:nil]:nil;
+  if(![node isKindOfClass:NSDictionary.class]||!value)return 0;
+  VellumAXState *state=[VellumAXState new];state.token=token;state.generation=generation;
+  VellumAXElement *e=[VellumAXElement new];e.state=state;e.node=node;e.live=YES;
+  [e setAccessibilityValue:value];return e.lastAdmission?1:0;
+ }
 }

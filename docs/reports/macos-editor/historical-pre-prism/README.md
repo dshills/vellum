@@ -1,0 +1,1 @@
+Historical pre-Prism source9 acceptance and raw files are retained at their original relative paths. These are not final-source qualification. The original record omitted nested AX acceptance.json from its evidence hash map; the final commit proof includes that file separately.

@@ -1,7 +1,10 @@
 // Package ui describes retained, keyed UI records using ordinary Go values.
 package ui
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/dshills/vellum/editor"
+)
 
 type Kind string
 
@@ -16,9 +19,15 @@ const (
 // Node IDs are stable within one window. A View returns a fresh description;
 // callbacks run on the application owner. Custom holds driver-specific content.
 type Node struct {
-	ID                  string
-	Kind                Kind
-	Text                string
+	ID   string
+	Kind Kind
+	Text string
+	// Editor owns multiline document state and history; one live native binding is supported.
+	Editor *editor.Model
+	// TabInserts makes Tab insert a literal tab in MultilineText; otherwise Tab moves focus.
+	TabInserts bool
+	// SoftWrap wraps visual lines without changing document bytes.
+	SoftWrap            bool
 	Disabled            bool
 	Grow                bool
 	MinWidth, MinHeight float32
@@ -41,6 +50,7 @@ type Node struct {
 
 func Validate(root Node) error {
 	seen := map[string]bool{}
+	models := map[*editor.Model]bool{}
 	var walk func(Node, int) error
 	walk = func(n Node, depth int) error {
 		if depth >= 128 {
@@ -50,6 +60,12 @@ func Validate(root Node) error {
 			return fmt.Errorf("ui: empty or duplicate ID %q", n.ID)
 		}
 		seen[n.ID] = true
+		if n.Kind == MultilineText {
+			if models[n.Editor] {
+				return fmt.Errorf("ui: editor model has multiple bindings")
+			}
+			models[n.Editor] = true
+		}
 		if depth > 0 && n.Focus.ID != "" {
 			return fmt.Errorf("ui: focus requests belong on the root")
 		}
@@ -61,7 +77,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog:
-		case Label, Button, Extension, Checkbox, Selector, Slider, NumberField, TextField:
+		case Label, Button, Extension, Checkbox, Selector, Slider, NumberField, TextField, MultilineText:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

@@ -1,0 +1,85 @@
+{
+  "event": "vellum.editor.precommit.acceptance",
+  "result": "pass",
+  "parent_commit": "e28be2b8a11ec1b1ea2dcba94cb45c2459016bfc",
+  "source_state": "authorized working-tree inputs, not a clean committed SDK qualification",
+  "source_proof": "source-inputs.json",
+  "source_inputs": 212,
+  "prepared_inputs": 107,
+  "source_inputs_match_after_all_runs": true,
+  "compiler_version": "go version go1.27.2 darwin/arm64",
+  "native_binary_sha256": "2d04cb05dcc114e8a4824f234bb8eb1ec44ebb2c03fd9888c9f6916112b32efc",
+  "native_commands": [
+    [
+      "/private/tmp/vellum-editor-native",
+      "-smoke"
+    ],
+    [
+      "/private/tmp/vellum-editor-native",
+      "-smoke"
+    ]
+  ],
+  "native_exit_codes": [
+    0,
+    0
+  ],
+  "native_logs": [
+    "native-smoke-1.log",
+    "native-smoke-2.log"
+  ],
+  "checks": {
+    "consumer": "race tests, vet, race build",
+    "driver": "full race suite and vet; focused regressions; ordering/transport repeated 20 times",
+    "backend": "reproduced pinned patches26\u201328; events/core/textcore/lines race tests with offscreen initialization",
+    "repository": "./scripts/check.sh exit 0; 89 Python checks, portable packages, native driver/backend and five independent examples"
+  },
+  "external_ax": {
+    "record": "external-ax-final/acceptance.json",
+    "result": "pass",
+    "native_exit_code": 0,
+    "native_elapsed_seconds": 61.17633799999021,
+    "timer_lifetime_reached": true,
+    "same_binary": true,
+    "scope": "separate read-only AX process; exact UTF-8 bytes, UTF-16 ranges, graphemes, bounds/point lookup, final blank line, visual RTL"
+  },
+  "settings_changed": false,
+  "limits": [
+    "no human IME or VoiceOver qualification",
+    "no sustained performance or retained-memory certification",
+    "no physical monitor/GPU-loss or public distribution qualification",
+    "clean committed relocated SDK checked separately"
+  ],
+  "evidence_sha256": {
+    "backend-patch28.log": "f09c2fe42dcfcfc060fdca9a222cb136d0efdb8fbec953ef6792874c8c0b1c5b",
+    "consumer-build.log": "905a7da78c61b05fffd2fe552eb734eb8e81057a78beed8de61a626721dedec3",
+    "consumer-tests.log": "99ad5e00cc519b0e19eb2a3e36213f937ffcc450895b4c672a9d867061e9e1c1",
+    "driver-race.log": "e738906551720caf82200029717ebfbbd4e977a0603c436879745fb59e5aa4bb",
+    "driver-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "external-ax-expected.txt": "abd89b3f4dde339272321313f6da515f6338887910ab0161956448113145d8d1",
+    "external-ax-final/expected.txt": "abd89b3f4dde339272321313f6da515f6338887910ab0161956448113145d8d1",
+    "external-ax-final/inspector-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "external-ax-final/inspector.log": "78722b767b4f26016b6ecd344be49163d3dc3aab0fd5b858386cbf35419d97a4",
+    "external-ax-final/native.log": "b735f2a667bea58ab2be7cdc9f0da567b738f1fb2d39a421ff610aa51487bc46",
+    "external-ax-final/trust.log": "6b846c7b404a306fd57fc70c48130b240fa85fc9779d1993e6b6f23465dafe24",
+    "external-ax-initial.json": "b643f3de87939b73e9a7d325008fd5aa2eb4e9fb1d5c06e0316b26725f9fc683",
+    "external-ax-initial.log": "af7d18b7687ab9e2f8a2934d7338419e31d3ffa904e4f55bf7d98b81c150c930",
+    "external-ax-inspector-trust.json": "232214e17db397b0ed671860d3b286513f92dae989f42c1e4360b632b826d5fe",
+    "external-ax-native-initial.log": "eff76b0109ebaa951d9bdd343d633f69e1b00c38381ab0ea2c3815b115088813",
+    "external-ax-trust.json": "c8374fce77a7959e3f321be900eb3b9176527a31e2b44617141a2d6f2013af57",
+    "focused-driver.log": "b7dfb194098c6579a9e3a55570343bb5b48673ca359d7a60c3aacfe2404297c4",
+    "full-check.log": "b9477ef35032b049f8f5493f184f17f04b25baf87f686b4c7810a691950dd148",
+    "historical-deque-before.log": "aef4dcd24a445facaa959cc211ba113c53638578b4308020ffaa10f76354fe31",
+    "historical-external-ax-source.json": "cfa81bd1f14e0743c230daa82ada2b3a448e1bae0824e348ecb3274bc51cd947",
+    "historical-field-refresh.log": "ca6a743a71d21f1e5f4ea3c33b38cc71cad8393a2acd9059577773b18c0f5e57",
+    "historical-native-main-thread.log": "0dd5ff8defc84f744f623f40405abf1e9de9d01603b6586035bb90b09c901877",
+    "historical-native-startup.log": "bf3eb54a705946ad85147c5d36785e74be8e756d8d78c7d01b13ba990200475b",
+    "native-smoke-1.log": "6d738aa3a5ecc7caec72c48267150392ed5344c0e8d1d7e302bd75a1f8ae2336",
+    "native-smoke-2.log": "6d738aa3a5ecc7caec72c48267150392ed5344c0e8d1d7e302bd75a1f8ae2336",
+    "ordering-repeat20.log": "de2cb5b0d5edffdcc6522be40bc161ea98abd72f7701d42931a636e26418a09a",
+    "prepare-tests.log": "039285a02e89d424569abf4caa1882cf4cb7cf577912ccc53ef08fae5f78aa3f",
+    "prepare.log": "b18db7ade9e27b2349dbcd5a138537694429f84253ffcd5b5212c49f10108368",
+    "sdk-export.log": "645d8524824754b97bc4e2a2ec9ea6021228d60b223bb3bddbdbc724255e0dcb",
+    "source-inputs.json": "9d7e39180b3a571f21a23c0336b9b40b023b33af01881fd3f891675380ddc9bb",
+    "transport-repeat20.log": "39feaf4f5df98a3634326b35e6c7166ad7cad008e41780b5173f034a98b6b410"
+  }
+}

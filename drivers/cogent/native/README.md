@@ -49,3 +49,36 @@ termination; all five input-event posts use it. Its race tests cover queued/inli
 panic, nil panic, incomplete Goexit, pending callers and event lifecycle ordering.
 The barrier does not guard every GLFW operation or standalone GPU helper lifetimes.
 See [dispatch contract](../../../specs/native-dispatch.md) for supported outcomes.
+
+
+Patch 0026 supplies `Scene.EventBoundary` after normal dispatch of each accepted
+event, including consumed widget events. The managed editor publishes legacy
+text/selection changes at that originating boundary before a following Undo or
+native input action. Already-handled events skipped on entry have no boundary.
+Callbacks run under the originating render-context lock and must not retain the
+event or reenter dispatch. Input/output hashes and consumed/unhandled event
+regressions make the seam reproducible in independently prepared SDKs.
+
+Patch 0027 preserves deferred FIFO nodes when an ordinary event of the same type
+arrives. Ordinary `Send` compression must not replace a publication wake or a
+reserved input action; deferred merging remains governed by `Ready`/`Merge` at
+dequeue. Normal event compression and priority window events retain their
+existing behavior. Backend and managed-adapter regressions verify startup,
+subsequent publication, reservation commit and cancellation, with pinned
+input/output hashes for independent SDK preparation.
+
+Patch 0028 preserves an active native TextField composition across Maker refresh.
+Preedit deliberately has not marked the controlled value edited; refresh must
+also check the composition lifetime before replacing the private edit buffer.
+Repeated Update, same-visible commit, one native undo entry and cancellation
+regressions verify the seam with pinned input/output hashes.
+
+Patch 0029 exposes a managed TextField focus-loss deferral seam. The adapter can
+retain the controlled Change boundary while already admitted native records are
+still queued, quiesce the outgoing native client, and finish exactly once. Normal
+fields retain immediate focus-loss behavior. Refocusing before finalization
+preserves the fresh directional selection and resumes the caret; other focus
+listeners still receive the event. The core regressions cover default, declined,
+deferred, refocused and read-only behavior. This seam preserves accepted native
+text through a focus handoff; it does not redefine all programmatic focus and
+legacy key routing as one FIFO. Input/output hashes make the change reproducible.

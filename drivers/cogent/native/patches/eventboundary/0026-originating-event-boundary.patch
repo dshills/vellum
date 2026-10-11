@@ -1,0 +1,100 @@
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -46,6 +46,13 @@
+ 	// widgets in conjunction with [App.SceneInit].
+ 	WidgetInit func(w Widget) `json:"-" xml:"-" edit:"-"`
+ 
++	// EventBoundary runs synchronously after normal dispatch of each accepted
++	// event, including events consumed by widget handlers. It is called on the
++	// originating event loop under the render-context lock. The callback must
++	// not retain the event or reenter scene dispatch. Already-handled events
++	// skipped on entry do not produce a boundary.
++	EventBoundary func(events.Event) `copier:"-" json:"-" xml:"-" edit:"-"`
++
+ 	// Bars are functions for creating control bars,
+ 	// attached to different sides of a [Scene]. Functions
+ 	// are called in forward order so first added are called first.
+--- a/core/events.go
++++ b/core/events.go
+@@ -181,6 +181,9 @@
+ 		em.handleFocusEvent(e)
+ 	default: // eg. os events
+ 		em.scene.HandleEvent(e)
++	}
++	if boundary := em.scene.EventBoundary; boundary != nil {
++		boundary(e)
+ 	}
+ }
+ 
+--- /dev/null
++++ b/core/vellum_event_boundary_test.go
+@@ -0,0 +1,69 @@
++package core
++
++import (
++	"reflect"
++	"testing"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++)
++
++func TestVellumEventBoundaryOrdersConsumedCommands(t *testing.T) {
++	body := NewBody("event boundaries")
++	scene := body.Scene
++	scene.Stage = &Stage{Mains: &stages{}}
++	em := &Events{scene: scene}
++	var calls []string
++	text := ""
++	scene.OnFirst(events.KeyChord, func(e events.Event) {
++		if e.(*events.Key).Rune == 'x' {
++			text = "x"
++		} else {
++			text = ""
++		}
++		calls = append(calls, "handled:"+text)
++		e.SetHandled()
++	})
++	scene.OnFinal(events.KeyChord, func(e events.Event) { t.Fatal("consumed command reached final listeners") })
++	scene.EventBoundary = func(e events.Event) {
++		if !e.IsHandled() {
++			t.Fatal("boundary ran before the consuming handler")
++		}
++		calls = append(calls, "published:"+text)
++	}
++	em.handleEvent(events.NewKey(events.KeyChord, 'x', key.CodeX, 0))
++	em.handleEvent(events.NewKey(events.KeyChord, 'z', key.CodeZ, 0))
++	want := []string{"handled:x", "published:x", "handled:", "published:"}
++	if !reflect.DeepEqual(calls, want) {
++		t.Fatalf("originating boundaries crossed consecutive commands: %v", calls)
++	}
++	prior := events.NewKey(events.KeyChord, 'x', key.CodeX, 0)
++	prior.SetHandled()
++	em.handleEvent(prior)
++	if !reflect.DeepEqual(calls, want) {
++		t.Fatal("already handled event was dispatched again")
++	}
++}
++
++func TestVellumEventBoundaryPublishesUnhandledEventOnce(t *testing.T) {
++	body := NewBody("unhandled boundary")
++	scene := body.Scene
++	scene.Stage = &Stage{Mains: &stages{}}
++	em := &Events{scene: scene}
++	calls := 0
++	scene.EventBoundary = func(e events.Event) {
++		calls++
++		if e.IsHandled() {
++			t.Fatal("boundary consumed an unregistered command")
++		}
++	}
++	em.handleEvent(events.NewKey(events.KeyChord, 'q', key.CodeQ, 0))
++	if calls != 1 {
++		t.Fatal("missing or duplicate unhandled boundary", calls)
++	}
++	scene.EventBoundary = nil
++	em.handleEvent(events.NewKey(events.KeyChord, 'q', key.CodeQ, 0))
++	if calls != 1 {
++		t.Fatal("retired callback ran")
++	}
++}

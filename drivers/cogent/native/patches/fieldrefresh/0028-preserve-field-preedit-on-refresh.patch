@@ -1,0 +1,92 @@
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -356,7 +356,7 @@
+ 	})
+ 
+ 	tf.Maker(func(p *tree.Plan) {
+-		if !tf.edited { // if in edit, don't overwrite
++		if !tf.edited && tf.nativeComposition == nil { // preserve editing and native preedit
+ 			tf.editText = []rune(tf.text)
+ 		}
+ 		if tf.IsReadOnly() {
+--- /dev/null
++++ b/core/vellum_field_refresh_test.go
+@@ -0,0 +1,78 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"testing"
++)
++
++func vellumFieldRefresh(t *testing.T, tf *TextField, text string, anchor, focus, start, end int, composing bool) {
++	t.Helper()
++	for range 3 {
++		tf.Update()
++		s := tf.EditingState()
++		a, b, active := tf.NativeCompositionRange()
++		if s.Text != text || s.Anchor != anchor || s.Focus != focus || active != composing || a != start || b != end {
++			t.Fatalf("refresh changed native editing snapshot: %+v marked[%d,%d] active=%v", s, a, b, active)
++		}
++	}
++}
++func TestVellumFieldRefreshPreservesCompositionAndCommit(t *testing.T) {
++	body := NewBody("field refresh")
++	tf := NewTextField(body).SetText("A😀Z")
++	tf.Update()
++	if !tf.SetEditingSelection(1, 2) {
++		t.Fatal("initial selection rejected")
++	}
++	changes := 0
++	tf.OnChange(func(events.Event) { changes++ })
++	if !tf.ApplyNativeEdit("Aに😀Z", 1, 2, 1, 2, "mark") {
++		t.Fatal("first mark rejected")
++	}
++	vellumFieldRefresh(t, tf, "Aに😀Z", 1, 2, 1, 2, true)
++	if tf.edited || len(tf.undos.stack) != 0 || changes != 0 || tf.text != "A😀Z" {
++		t.Fatal("refresh committed preview")
++	}
++	if !tf.ApplyNativeEdit("A日本😀Z", 1, 3, 1, 3, "mark") {
++		t.Fatal("second mark rejected")
++	}
++	vellumFieldRefresh(t, tf, "A日本😀Z", 1, 3, 1, 3, true)
++	if !tf.ApplyNativeEdit("A日本😀Z", 3, 3, -1, -1, "unmark") {
++		t.Fatal("same-visible commit rejected")
++	}
++	vellumFieldRefresh(t, tf, "A日本😀Z", 3, 3, -1, -1, false)
++	if !tf.edited || len(tf.undos.stack) != 1 || changes != 0 {
++		t.Fatal("commit grouping or field Change semantics changed")
++	}
++	tf.editDone()
++	if changes != 1 || tf.text != "A日本😀Z" {
++		t.Fatal("focus loss did not deliver one committed Change")
++	}
++	tf.undo()
++	if tf.EditingState().Text != "A😀Z" {
++		t.Fatal("composition undo lost original")
++	}
++	tf.redo()
++	if tf.EditingState().Text != "A日本😀Z" {
++		t.Fatal("composition redo lost committed value")
++	}
++}
++func TestVellumFieldRefreshPreservesCompositionCancellation(t *testing.T) {
++	body := NewBody("field refresh cancellation")
++	tf := NewTextField(body).SetText("A😀Z")
++	tf.Update()
++	if !tf.SetEditingSelection(1, 2) {
++		t.Fatal("initial selection rejected")
++	}
++	before := tf.EditingState()
++	if !tf.ApplyNativeEdit("A取消😀Z", 3, 3, 1, 3, "mark") {
++		t.Fatal("mark rejected")
++	}
++	vellumFieldRefresh(t, tf, "A取消😀Z", 3, 3, 1, 3, true)
++	if !tf.ApplyNativeEdit("A😀Z", 1, 2, -1, -1, "cancel") {
++		t.Fatal("cancel rejected")
++	}
++	vellumFieldRefresh(t, tf, before.Text, before.Anchor, before.Focus, -1, -1, false)
++	if tf.edited || len(tf.undos.stack) != 0 || tf.text != before.Text {
++		t.Fatal("cancel changed dirty/history baseline")
++	}
++}

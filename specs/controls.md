@@ -1,7 +1,8 @@
 # Standard controls contract
 
 The public `ui.Node` vocabulary now includes checkbox, selector, slider, numeric
-field, single-line text field, tabs, scroll container and modal dialog. Cogent
+field, single-line text field, multiline document editor, tabs, scroll container
+and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
 of native dependencies.
 
@@ -14,8 +15,9 @@ view describes the accepted value. Programmatic setters do not emit changes.
 `Activate` continues to serve buttons. No callback is bound to an obsolete view
 closure: retained controls read the current callback when owner delivery runs.
 
-Native changes, tab choices and dialog dismissal enqueue bounded application
-owner work. Values are captured when the native event occurs; mounted state,
+Standard value changes, tab choices and dialog dismissal enqueue bounded
+application owner work. Managed native text input uses a separately bounded
+originating-window FIFO and legacy editor event boundaries before owner changes. Values are captured when the native event occurs; mounted state,
 disabled state, available options and current callbacks are rechecked on drain.
 Removed widgets do not deliver queued stale edits. Queued callbacks use owner
 snapshots for disabled/retired state; they only update model state and request
@@ -47,13 +49,42 @@ multiples. Precision/display rounding remains the native backend's behavior.
 
 Text fields use the existing native editing/input foundation. Unrelated view
 updates preserve uncommitted text, composition, selection and numeric-field
-editing. A changed model text/value replaces pending edits. After a committed Change
+editing. Active native preedit also survives the backend Maker refresh while
+the controlled value remains uncommitted. A changed model text/value replaces pending edits. After a committed Change
 callback, the next redraw reapplies the accepted model value even if it stayed
 unchanged, so rejected/normalized commits cannot leave stale native text/value. Adapter reads
 use the read-only native editing snapshot, avoiding the native `Text()` getter's
 implicit commit and change event. Display labels, option labels, tab labels and
 help tooltips are escaped before entering Cogent's markup-capable text widgets;
 editable text remains literal text.
+
+A managed Mac text field finishes a focus-loss `Change` only after the outgoing
+native client acknowledges all already-admitted input and becomes inactive.
+Native unmark may add another FIFO record; the adapter waits for its owner
+acknowledgment before finishing the field or activating the next native client.
+This handoff is asynchronous and does not block the UI owner. A refocused field
+retains its fresh directional selection when a late, same-visible native unmark
+seals the outgoing composition. Retired fields suppress completion callbacks;
+fields without an active native client retain the backend's immediate focus-loss
+behavior. This contract covers admitted native field input through handoff;
+programmatic focus requests do not impose a global order on legacy key events.
+
+The Mac native adapter refuses a single-line `TextField.Text` above 4 MiB before
+mounting; the portable descriptor has no such platform bound. Cocoa input
+preflights that native budget before mutation. A legacy field edit above the
+budget is refused as a whole pending value and restored to the accepted
+controlled value without `Change`; pending field edits and private editing state
+are reset. The document editor's stronger model/history atomic refusal contract
+is specified separately below.
+
+`MultilineText` binds `Node.Editor` to the portable document model. It updates
+that model on the application owner and reports committed bytes through `Change`.
+Preedit remains outside committed history. `TabInserts` chooses literal tab input;
+otherwise Tab participates in managed focus traversal. `SoftWrap` changes visual
+wrapping without changing document bytes. Editor input uses its
+originating native FIFO and explicit persistence settlement; see the
+[document editor contract](editor.md) for bounds, position units, history and
+lifetime rules.
 
 ## Containers, focus and semantic metadata
 
@@ -77,8 +108,9 @@ is disabled. A Tabs control with no enabled options cannot receive focus.
 text. The native adapter stores typed `cogent.Semantics` under
 `cogent.SemanticsProperty`, including stable ID, kind/role, name, help, disabled
 state and controlled value. Help also appears as a native tooltip. Platform
-screen-reader publication and acceptance remain explicit foundation gates; this
-property seam does not claim an operating-system accessibility bridge.
+screen-reader acceptance remains an explicit foundation gate. The macOS bridge
+publishes these semantics through NSAccessibility; see the
+[accessibility contract](accessibility.md) for its verified scope.
 
 ## Modal lifetime
 

@@ -1,0 +1,10 @@
+# cogentcore.org/core/core.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestVellumFieldFocusLossDefaultAndDeclined (0.01s)
+    --- FAIL: TestVellumFieldFocusLossDefaultAndDeclined/declined (0.00s)
+        vellum_field_focus_loss_test.go:24: default focus-loss semantics changed: changes=1 requests=0 text="AB"
+--- FAIL: TestVellumFieldFocusLossDefersQueuedCompositionUntilNativeQuiescence (0.00s)
+    vellum_field_focus_loss_test.go:48: focus loss committed a partial value: changes=1 requests=0 others=1 text="A😀Z!"
+FAIL
+FAIL	cogentcore.org/core/core	0.518s
+FAIL

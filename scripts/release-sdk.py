@@ -94,7 +94,7 @@ def source_files(root, include_untracked=False, dependencies=None):
     if include_untracked:
         arguments += ["--others", "--exclude-standard"]
     tracked = git_output(root, arguments[1:]).decode().split("\0")
-    allowed = {"app", "ui", "canvas", "command", "history", "document", "tasks", "virtual", "workbench", "drivers", "examples", "scripts", "release"}
+    allowed = {"app", "ui", "canvas", "command", "history", "document", "editor", "tasks", "virtual", "workbench", "drivers", "examples", "scripts", "release"}
     for name in sorted(set(filter(None, tracked))):
         path = Path(name)
         if name.startswith("drivers/cogent/build/") or "__pycache__" in path.parts:

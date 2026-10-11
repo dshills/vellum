@@ -1,0 +1,150 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "8d5d8ee4c610c809141450b1fad5d340",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "e28be2b8a11ec1b1ea2dcba94cb45c2459016bfc",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "unstaged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "3bd7a54de8e025c5",
+      "severity": "medium",
+      "category": "bug",
+      "title": "",
+      "message": "fieldNativeActive is read by focus-lost callbacks outside the owner. When the previous and current client are the same (a routine republish of the active field), setActiveClient stores false and then stores true. A focus-lost handler that runs in between sees the field as inactive with no pending loss and returns false. The field then takes the legacy immediate-commit path instead of deferring behind the native FIFO, which can emit a partial controlled Change.",
+      "suggestion": "Only clear the previous client's flag when previous != current. Otherwise store the new value once, for example `if previous != nil \u0026\u0026 t.activeClient != id { ...Store(false) }`.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/editor_geometry.go",
+          "lines": {
+            "start": 81,
+            "end": 87
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "atomics",
+        "focus",
+        "location-corrected"
+      ],
+      "evidence": "if previous := t.clients[t.activeClient]; previous != nil {\n\t\tprevious.control.fieldNativeActive.Store(false)\n\t}\n\tt.activeClient = id\n\tif current := t.clients[id]; current != nil \u0026\u0026 current.node.Kind == ui.TextField {\n\t\tcurrent.control.fieldNativeActive.Store(active)\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "022d229b2aae667c",
+      "severity": "medium",
+      "category": "bug",
+      "title": "",
+      "message": "publishClient returns (false, nil) for permanent refusals as well as transient ones: oversized field text, an invalid UTF-8 or budget failure, or a model revision mismatch. finishFieldFocusLosses treats any non-accepted result as 'retry later' and leaves fieldFocusLost set. publish() then returns before reaching the incoming client. A field that stays refused therefore blocks all native text publication for the window, and the pending Change is never delivered.",
+      "suggestion": "Have publishClient distinguish a permanent refusal from a retryable one, for example by returning a sentinel error. On a permanent refusal, clear fieldFocusLost and fall back to the legacy FinishNativeFocusLost path so the window is not wedged.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/editor_geometry.go",
+          "lines": {
+            "start": 99,
+            "end": 99
+          }
+        }
+      ],
+      "tags": [
+        "focus",
+        "native-input",
+        "liveness",
+        "location-corrected"
+      ],
+      "evidence": "if err != nil || !accepted {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "c0c2f57fd146864e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "LockOSThread in TestMain does not guarantee the process main thread",
+      "message": "The comment says the fixtures run on the process main thread, and the native code asserts `NSThread.isMainThread` in attach, publish and close. Go's main goroutine is only pinned to the main thread while package init runs. By the time TestMain executes it may have been rescheduled onto another OS thread. Locking it there pins it to the wrong thread, so the native fixtures can fail the main-thread assertion or abort nondeterministically.",
+      "suggestion": "Call `runtime.LockOSThread()` from an `init()` function in this test file, which still runs on the main thread. Remove the call from TestMain.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "drivers/cogent/internal/textinput/input_darwin_test.go",
+          "lines": {
+            "start": 20,
+            "end": 20
+          }
+        }
+      ],
+      "tags": [
+        "cgo",
+        "darwin",
+        "main-thread",
+        "testing"
+      ],
+      "evidence": "\truntime.LockOSThread()\n\tpool := fixtureInputPool()",
+      "fix": {
+        "before": "\truntime.LockOSThread()\n\tpool := fixtureInputPool()",
+        "after": "\tpool := fixtureInputPool()"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 106118,
+    "totalMs": 36513
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 29,
+    "bytes": 161117,
+    "chunks": 5,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 88984,
+        "output": 13181,
+        "costUSD": 0.309778
+      }
+    ],
+    "widenedFiles": 10,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

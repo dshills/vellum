@@ -26,6 +26,9 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	theme = theme.Clone()
 	var validateStyle func(ui.Node) error
 	validateStyle = func(node ui.Node) error {
+		if err := validateNativeEditor(node); err != nil {
+			return err
+		}
 		if _, err := ui.ResolveStyle(node, theme); err != nil {
 			return err
 		}
@@ -207,6 +210,9 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 
 func compatible(old, next ui.Node) bool {
 	if old.ID != next.ID || old.Kind != next.Kind {
+		return false
+	}
+	if next.Kind == ui.MultilineText && old.Editor != next.Editor {
 		return false
 	}
 	if next.Kind != ui.Extension {
