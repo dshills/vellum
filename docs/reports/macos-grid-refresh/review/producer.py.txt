@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+import hashlib
+import json
+import subprocess
+import time
+from pathlib import Path
+
+ROOT = Path('/private/tmp/vellum-large-data')
+OUT = Path('/private/tmp/vellum-grid-refresh-prism')
+FILES = ['drivers/cogent/grid.go', 'drivers/cogent/reconcile.go', 'virtual/grid.go',
+         'drivers/cogent/grid_projection_refresh_offscreen_test.go',
+         'drivers/cogent/reconcile_parent_test.go', 'virtual/grid_projection_current_test.go',
+         'specs/grid-native.md', 'specs/grid-projection.md', 'specs/keyed-reconciliation.md',
+         'specs/grid-performance.md', 'specs/macos-completion.md',
+         'docs/implementation.md', 'docs/reports/macos-grid-refresh/README.md']
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def inputs():
+    return {p: sha((ROOT / p).read_bytes()) for p in FILES}
+
+OUT.mkdir(exist_ok=False)
+diff = subprocess.check_output(['git', 'diff', '--cached', '--binary', '--'] + FILES, cwd=ROOT)
+indexed = subprocess.check_output(['git', 'diff', '--cached', '--name-only'], cwd=ROOT).decode().splitlines()
+assert sorted(indexed) == sorted(FILES), indexed
+before = inputs()
+(OUT / 'staged.diff.txt').write_bytes(diff)
+(OUT / 'inputs.json').write_text(json.dumps({'files': before, 'staged_diff_sha256': sha(diff), 'staged_diff_bytes': len(diff),
+    'scope': 'Explicit thirteen-path staged implementation/test/spec/report allowlist. Raw qualification records, archives, inert source snapshots and producer scripts excluded from provider payload.'}, indent=2) + '\n')
+argv = ['/Users/dshills/Development/Go/bin/prism', 'review', 'staged', '--provider', 'anthropic',
+        '--model', 'claude-sonnet-5-5', '--format', 'json', '--baseline', 'none', '--fail-on', 'medium',
+        '--min-severity', 'medium', '--paths', ','.join(FILES), '--out', str(OUT / 'prism.json')]
+start = time.monotonic()
+with (OUT / 'stdout.log').open('xb') as stdout, (OUT / 'stderr.log').open('xb') as stderr:
+    result = subprocess.run(argv, cwd=ROOT, stdout=stdout, stderr=stderr, timeout=900)
+after_diff = subprocess.check_output(['git', 'diff', '--cached', '--binary', '--'] + FILES, cwd=ROOT)
+after = inputs()
+record = {'argv': argv, 'exit_code': result.returncode, 'elapsed_seconds': time.monotonic() - start,
+          'before': before, 'after': after, 'source_index_unchanged': before == after and diff == after_diff,
+          'stdout_sha256': sha((OUT / 'stdout.log').read_bytes()), 'stderr_sha256': sha((OUT / 'stderr.log').read_bytes()),
+          'prism_sha256': sha((OUT / 'prism.json').read_bytes()) if (OUT / 'prism.json').exists() else None,
+          'producer_sha256': sha(Path(__file__).read_bytes())}
+(OUT / 'process.json').write_text(json.dumps(record, indent=2) + '\n')
+assert record['source_index_unchanged']
+print('Prism exit', result.returncode, 'seconds', round(record['elapsed_seconds'], 2), flush=True)
+raise SystemExit(result.returncode)

@@ -133,6 +133,18 @@ exploration neither meets the five-process requirement nor exercises the other
 three cases, so P6 remains open. It does not change raster/upload invalidation
 or prove a reduction in process-wide scheduler wakeups.
 
+The [unchanged-refresh comparison](../docs/reports/macos-grid-refresh/README.md)
+reuses validated grid projections and canonicalizes retained parent identity.
+Three interleaved fixed-10k processes per build observe pooled elapsed UI-work
+p95 17.233→14.624 ms (15.14%) and p99 18.954→15.566 ms with identical
+400-cell geometry. The retained baseline maximum is 71.056 ms; its cause is
+unclassified. Reconciliation p95 decreases 6.066→3.343 ms, while raster/upload
+p95 is 8.748→9.026 ms. Stage percentiles are not additive. Original-overlay
+regressions fail, final native/portable race checks pass, and eight software
+frames match the previous checkpoint's repeated pixels. This remains an
+exploratory comparison: both unchanged targets fail and the full P6 campaign
+remains open. It makes no sprite/partial-upload or process-wide wakeup claim.
+
 ## Diagnostic CPU profiling
 
 `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide

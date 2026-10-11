@@ -13,6 +13,13 @@ must first produce a genuinely immutable snapshot. The builder borrows that
 snapshot; cancellation cannot make a blocking source callback return. Callbacks
 must remain bounded, in memory, nonblocking and free of UI reentry or IO.
 
+An installed exact built-in projection validates its borrowed input stamp during
+Grid.State and other current-state operations. This also applies to fixed-height
+and empty views whose constant projection metadata cannot expose input drift.
+Changed input is refused under ErrGridSource with its ErrGridStale cause. The
+check does not enumerate rows or cells and cannot detect hidden unstamped data
+mutations; the immutable input contract remains required.
+
 `GridQuery` accepts at most four sort columns and four filters. Sort text uses
 case-sensitive UTF-8 byte order. Integer sorts accept an optional single `+` or
 `-` followed by one or more ASCII decimal digits within signed int64 range;

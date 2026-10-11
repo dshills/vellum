@@ -231,5 +231,14 @@ and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open
 The [single host-update optimization](reports/macos-grid-update/README.md)
 removes duplicate pooled updater/style work. Its interleaved fixed-10k release
 comparison observes p95 19.55→17.07ms and p99 20.41→18.00ms with matching
-geometry and software-frame pixels. This remains an exploratory comparison;
-unchanged-generation refresh and raster/upload costs are the next investigations.
+geometry and software-frame pixels. This remains an exploratory comparison.
+The [unchanged-refresh checkpoint](reports/macos-grid-refresh/README.md) now
+reuses validated projections, fixes embedded native-parent identity comparisons
+and checks borrowed source health without rematerializing unchanged cells. Actual
+private editing and style/help/disabled/scrollbar transitions remain current.
+Original-overlay regressions fail; final native adapter/portable virtual race
+suites and native default/offscreen vet pass, with eight matching software frames.
+Its three-process/build fixed-10k release comparison observes p95
+17.233→14.624ms and p99 18.954→15.566ms; the 4/6ms targets still fail.
+Raster/upload cost is the next investigation, with full P6 and broader Mac
+acceptance still open.

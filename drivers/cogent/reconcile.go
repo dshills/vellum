@@ -94,7 +94,10 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		if err := prepareControl(r, node); err != nil {
 			return nil, err
 		}
-		next := &plan{r: r, node: node, parent: p}
+		// A native host may be passed through an embedded Frame while children
+		// retain its concrete tree identity. Compare and move against that same
+		// identity, or every unchanged refresh looks like a parent transition.
+		next := &plan{r: r, node: node, parent: p.AsTree().This}
 		for _, child := range node.Children {
 			entry, err := prepare(childHost(r, child.ID), child)
 			if err != nil {

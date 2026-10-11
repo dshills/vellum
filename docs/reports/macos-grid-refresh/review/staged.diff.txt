@@ -1,0 +1,1252 @@
+diff --git a/docs/implementation.md b/docs/implementation.md
+index 81f49a8..13a72ef 100644
+--- a/docs/implementation.md
++++ b/docs/implementation.md
+@@ -231,5 +231,14 @@ and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open
+ The [single host-update optimization](reports/macos-grid-update/README.md)
+ removes duplicate pooled updater/style work. Its interleaved fixed-10k release
+ comparison observes p95 19.55→17.07ms and p99 20.41→18.00ms with matching
+-geometry and software-frame pixels. This remains an exploratory comparison;
+-unchanged-generation refresh and raster/upload costs are the next investigations.
++geometry and software-frame pixels. This remains an exploratory comparison.
++The [unchanged-refresh checkpoint](reports/macos-grid-refresh/README.md) now
++reuses validated projections, fixes embedded native-parent identity comparisons
++and checks borrowed source health without rematerializing unchanged cells. Actual
++private editing and style/help/disabled/scrollbar transitions remain current.
++Original-overlay regressions fail; final native adapter/portable virtual race
++suites and native default/offscreen vet pass, with eight matching software frames.
++Its three-process/build fixed-10k release comparison observes p95
++17.233→14.624ms and p99 18.954→15.566ms; the 4/6ms targets still fail.
++Raster/upload cost is the next investigation, with full P6 and broader Mac
++acceptance still open.
+diff --git a/docs/reports/macos-grid-refresh/README.md b/docs/reports/macos-grid-refresh/README.md
+new file mode 100644
+index 0000000..36abd2c
+--- /dev/null
++++ b/docs/reports/macos-grid-refresh/README.md
+@@ -0,0 +1,124 @@
++# Unchanged native grid refresh
++
++This checkpoint reuses a completed native grid projection when its validated
++model generation is unchanged. It also fixes a general retained-parent identity
++comparison that treated an embedded accessibility-host Frame as a different
++parent from the concrete native tree node on every refresh.
++
++The implementation keeps source-health checks, legitimate style/theme/topology
++updates, effective disabled and help-tooltip styling, constant-time canonical
++scrollbar restoration on refresh, and the private editor's independent
++selection/restore/preedit/focus lifecycle. An incomplete projection sync cannot
++be reused. Exact built-in worker projections validate their borrowed input stamp
++even when an empty or fixed-height view exposes unchanged constant metadata.
++Unstamped source mutations still violate the immutable source contract.
++
++## Correctness evidence
++
++The original grid/reconciliation overlay produces 1,497 expected regression
++assertions. The final candidate passes all five new native regression groups
++three times under the race detector with unchanged source and prepared inputs.
++These exercise actual managed refresh and completed-capture tails, zero Cell
++reads and retained update/style traversals, changed model projections,
++style/help/disabled/topology, private selection/restore/focus, and no-op/refused
++scrollbar restoration. The fixture uses the software backend; Manual still
++conservatively reports layoutPending after owner refresh, so this does not
++promise that public Capture immediately accepts a no-op refresh.
++
++A separate real embedded-host extension regression preserves the original
++Mount parent argument and Sync callbacks while eliminating fake parent moves,
++OnChildAdded and update/style work. Real style and parent changes still apply.
++Its original reconciliation overlay fails and the candidate passes. The full
++native adapter package passes the offscreen race suite and default/offscreen
++vet. All portable virtual tests pass under race and vet; the new projection
++health regression passes three times and its original overlay fails with 180
++expected assertions. Eight final software grid frames at 96/120/144/192 DPI
++match the previous checkpoint's 24 repeated pixel digests exactly.
++
++Earlier native fixture assumptions, their unmodified failure logs, diagnostic
++parent/update stacks, and strict producer-parser refusals are retained. Separate
++source-bound adjudications preserve the raw logs rather than rewriting them.
++The first portable full-suite attempt failed before compilation on a protected
++default Go cache; its successful final run uses the writable Vellum cache.
++
++## Release comparison
++
++The scoped comparison uses three fresh optimized fixed-10k processes per build,
++interleaved A/B/B/A/A/B, with 128 warm-up events and 120 measured events each.
++The baseline is the previous single-host-update executable. The candidate has
++only the grid, retained-parent and portable source-health production changes.
++All 6,128 prepared dependency files retain their exact pinned bytes.
++
++The pooled elapsed UI-work observations are nearest-rank percentiles of 360
++samples per build. Times below are milliseconds; no outlier was removed.
++
++| Build | p50 | p95 | p99 | Maximum | Mean | Sample SD |
++| --- | ---: | ---: | ---: | ---: | ---: | ---: |
++| Baseline `32e9ec9` | 15.785 | 17.233 | 18.954 | 71.056 | 15.994 | 3.025 |
++| Candidate | 13.518 | 14.624 | 15.566 | 16.161 | 13.625 | 0.571 |
++
++Pooled p95 decreases by 15.14%. Per-process p95 in execution order
++A/B/B/A/A/B is 16.334 / 15.304 / 14.194 / 18.282 / 17.148 / 14.492 ms.
++The 71.056 ms baseline outlier is retained; its cause is unclassified. The
++baseline and candidate coefficients of variation are 0.1891 and 0.0419.
++
++| Measured stage | Baseline pooled p95 | Candidate pooled p95 |
++| --- | ---: | ---: |
++| Reconciliation | 6.066 | 3.343 |
++| Layout/paint | 2.972 | 2.857 |
++| Raster/upload | 8.748 | 9.026 |
++
++These independent stage percentiles are not additive. The change reduces
++reconciliation work; raster/upload remains the largest measured stage and does
++not improve in this comparison. Both candidate latency targets still fail.
++
++Actual samples, geometry checks, stage timings and source/binary identities are
++recorded with the completed comparison. The elapsed UI-work measure includes GC
++and matching intermediate composition work; it excludes queue/surface waits and
++actual backend acquisition/present calls. It is not physical display latency.
++External process observation occurs only after the completed end record.
++
++This is an exploratory optimization comparison, not the complete P6 campaign:
++it has fewer than five processes per case and omits variable heights, million-row
++cases, cold caches, native/GPU memory attribution and endurance. The unchanged
++4 ms p95 and 6 ms p99 targets and all broader Mac acceptance gates remain in force.
++
++## Next rendering investigation
++
++Read-only renderer review identified an unconditional full-window transparent
++sprite raster/upload even when there are no drawable active sprites. That is a
++separate candidate optimization, requiring sprite activation/removal, composition
++and pixel regressions plus release measurements. This checkpoint makes no
++sprite or partial-texture-upload change and no process-wide wakeup claim.
++
++## Evidence and review
++
++[records-index.json](records-index.json) lists each raw record and SHA-256 in
++[records.tar.gz](records.tar.gz). The archive preserves UTF-8 logs/JSON and inert
++producer/source snapshots, including earlier failures and parser refusals. Extract
++it to a new temporary directory to inspect or reproduce the recipes; executable
++scripts are stored with `.txt` suffixes. Original absolute paths in raw records
++identify where the runs occurred; the index supplies their archived member paths.
++The archive contains:
++
++- `qualification/comparison.json`, `baseline-inputs.json`,
++  `candidate-build-final.json`, machine metadata and all six native run logs/results;
++- `qualification/native-regression/qualified-v1/adjudication-v1/qualification.json`,
++  its original refused proof and unchanged regression logs/source overlays;
++- `qualification/final-adapter-checks/qualification.json`, full native race/vet
++  logs and the original embedded-parent overlay failure;
++- `qualification/portable/qualification-v2.json`, original overlay failure,
++  focused/full race/vet logs and initial protected-cache failure;
++- `qualification/pixel-comparison/qualification.json`, current frame log and
++  the previous checkpoint's pinned pixel-reference log;
++- independent raw measurement verification, internal source review and
++  producer recipes. Earlier exploratory proofs are historical, not substitutes
++  for the final qualifications above.
++
++[Provider review](review/prism.json), [input scope](review/inputs.json),
++[process record](review/process.json) and [disposition](review/disposition.json)
++record the requested Anthropic Claude Sonnet 5.5 review. Raw measurement/test
++archives and historical source snapshots are excluded from its explicit staged
++implementation/test/spec/report payload. The final [internal review](final-review.json)
++and [audit](audit.json) bind current source/prepared bytes and archived evidence.
++These are checkpoint qualifications, not a public distribution certificate.
+diff --git a/drivers/cogent/grid.go b/drivers/cogent/grid.go
+index 608d4b2..4cbdd88 100644
+--- a/drivers/cogent/grid.go
++++ b/drivers/cogent/grid.go
+@@ -78,6 +78,9 @@ type gridBinding struct {
+ 	headers              []*core.Text
+ 	horizontal, vertical *core.Slider
+ 	projection           virtual.GridSnapshot // originating native scene / owner refresh only
++	projectionReady      bool                 // true only after a successful complete sync
++	projectedDisabled    bool
++	projectedHelp        string
+ 	measurement          atomic.Pointer[GridInspection]
+ 	armed                *gridPress // originating scene only; detached opaque identity and scene geometry
+ 	requestMu            sync.Mutex
+@@ -94,18 +97,22 @@ func validateNativeGrid(n ui.Node) error {
+ 	if n.Kind != ui.DataGrid {
+ 		return nil
+ 	}
++	_, err := nativeGridState(n)
++	return err
++}
++func nativeGridState(n ui.Node) (virtual.GridState, error) {
+ 	if n.Grid == nil {
+-		return ErrGridBinding
++		return virtual.GridState{}, ErrGridBinding
+ 	}
+ 	s, err := n.Grid.State()
+ 	if err != nil {
+-		return err
++		return virtual.GridState{}, err
+ 	}
+ 	c := s.Config
+ 	if s.Viewport.Width > gridNativeMaxDimension || s.Viewport.Height > gridNativeMaxDimension || !s.VariableHeights && c.RowHeight > gridNativeMaxDimension || c.HeaderHeight > gridNativeMaxDimension || c.MaxRows > gridNativeMaxRows || c.MaxColumns > gridNativeMaxColumns || c.MaxCells > gridNativeMaxCells || c.MaxTextBytes > gridNativeMaxText {
+-		return ErrGridBudget
++		return virtual.GridState{}, ErrGridBudget
+ 	}
+-	return nil
++	return s, nil
+ }
+ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (core.Widget, error) {
+ 	if err := validateNativeGrid(r.node); err != nil {
+@@ -574,9 +581,30 @@ func syncGrid(r *record) error {
+ 	if g == nil || !g.live() {
+ 		return ErrGridClosed
+ 	}
+-	if err := validateNativeGrid(r.node); err != nil {
++	state, err := nativeGridState(r.node)
++	if err != nil {
+ 		return err
+ 	}
++	if g.projectionReady && g.projection.State.Generation == state.Generation {
++		// Domain data are immutable within their stamp. Owner invalidation after
++		// capture only republishes geometry; it need not rematerialize or restyle
++		// the same cells. Descriptor/theme/topology changes retain their normal
++		// reconciliation updates, and private editing still has an independent
++		// selection, restore, preedit and focus lifecycle.
++		g.syncScrollbars(state)
++		if err := syncGridEditing(g); err != nil {
++			g.projectionReady = false
++			return err
++		}
++		if g.projectedDisabled != r.control.disabled || g.projectedHelp != r.node.Accessibility.Help {
++			g.host.Update()
++			g.projectedDisabled = r.control.disabled
++			g.projectedHelp = r.node.Accessibility.Help
++		}
++		return nil
++	}
++	// A failed partial sync cannot be reused on a later explicit retry.
++	g.projectionReady = false
+ 	snap, err := g.model.Snapshot()
+ 	if err != nil {
+ 		return err
+@@ -649,22 +677,34 @@ func syncGrid(r *record) error {
+ 		}
+ 		g.place(w, g.panes[pane], h.Rect, h.Clip, html.EscapeString(h.Title), false, false)
+ 	}
+-	sx := gridMaxX(snap.State)
+-	sy := gridMaxY(snap.State)
+-	g.horizontal.SetValue(0)
+-	if sx > 0 {
+-		g.horizontal.SetValue(float32(float64(snap.State.Viewport.ScrollX) / float64(sx)))
+-	}
+-	g.vertical.SetValue(0)
+-	if sy > 0 {
+-		g.vertical.SetValue(float32(float64(snap.State.Viewport.ScrollY) / float64(sy)))
+-	}
++	g.syncScrollbars(snap.State)
+ 	if err := syncGridEditing(g); err != nil {
+ 		return err
+ 	}
+ 	g.host.Update()
++	g.projectedDisabled = r.control.disabled
++	g.projectedHelp = r.node.Accessibility.Help
++	g.projectionReady = true
+ 	return nil
+ }
++func (g *gridBinding) syncScrollbars(s virtual.GridState) {
++	x, y := float32(0), float32(0)
++	if maximum := gridMaxX(s); maximum > 0 {
++		x = float32(float64(s.Viewport.ScrollX) / float64(maximum))
++	}
++	if maximum := gridMaxY(s); maximum > 0 {
++		y = float32(float64(s.Viewport.ScrollY) / float64(maximum))
++	}
++	// Native dragging can publish a noncanonical value while its rounded model
++	// pixel is unchanged or the intent is refused. Restore only that slider;
++	// SetValue marks it for rendering even when the supplied value is identical.
++	if g.horizontal.Value != x {
++		g.horizontal.SetValue(x)
++	}
++	if g.vertical.Value != y {
++		g.vertical.SetValue(y)
++	}
++}
+ func (g *gridBinding) installTextStyle(w *core.Text) {
+ 	w.Styler(func(s *styles.Style) {
+ 		s.Padding.Zero()
+diff --git a/drivers/cogent/grid_projection_refresh_offscreen_test.go b/drivers/cogent/grid_projection_refresh_offscreen_test.go
+new file mode 100644
+index 0000000..f3d4655
+--- /dev/null
++++ b/drivers/cogent/grid_projection_refresh_offscreen_test.go
+@@ -0,0 +1,523 @@
++//go:build offscreen
++
++package cogent
++
++import (
++	"crypto/sha256"
++	"fmt"
++	"html"
++	"image/color"
++	"sync/atomic"
++	"testing"
++
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/abilities"
++	"cogentcore.org/core/styles/states"
++	"github.com/dshills/vellum/editor"
++	"github.com/dshills/vellum/ui"
++	"github.com/dshills/vellum/virtual"
++)
++
++// Domain values stay immutable; this separate diagnostic counts materialized
++// cells, not metadata validation or state reads.
++type refreshGridSource struct {
++	selectionNativeIndex
++	calls  *atomic.Int64
++	prefix string
++}
++
++func (s refreshGridSource) Cell(row, col string) (string, error) {
++	s.calls.Add(1)
++	return s.prefix + row + " · " + col, nil
++}
++func (s refreshGridSource) SelectionSnapshot() (virtual.GridRowIndex, error) {
++	return s.selectionNativeIndex, nil
++}
++func refreshGridModel(t *testing.T) (*virtual.Grid, refreshGridSource) {
++	t.Helper()
++	s := refreshGridSource{selectionNativeIndex: selectionNativeIndex{total: 10_000, revision: 1}, calls: new(atomic.Int64)}
++	columns := make([]virtual.GridColumn, 20)
++	for i := range columns {
++		columns[i] = virtual.GridColumn{ID: fmt.Sprint("c", i), Title: fmt.Sprint("Column ", i), Width: 90}
++	}
++	g, err := virtual.NewGrid(s, columns, virtual.GridConfig{RowHeight: 24, HeaderHeight: 26, FrozenColumns: 2, OverscanRows: 1, OverscanColumns: 1, RowSelection: true}, virtual.GridViewport{Width: 300, Height: 180})
++	if err != nil {
++		t.Fatal(err)
++	}
++	return g, s
++}
++
++type refreshGridCounts struct {
++	host  gridUpdatePass
++	slots map[*core.Text]*gridUpdatePass
++}
++
++func watchRefreshGrid(g *gridBinding) *refreshGridCounts {
++	p := &refreshGridCounts{slots: map[*core.Text]*gridUpdatePass{}}
++	g.host.Updater(func() { p.host.updates++ })
++	g.host.FinalStyler(func(*styles.Style) { p.host.styles++ })
++	p.observeCurrentSlots(g)
++	return p
++}
++
++// A changed projection may legitimately grow or shrink the pool. Establish its
++// accepted retained set before measuring only the following unchanged tail.
++func (p *refreshGridCounts) observeCurrentSlots(g *gridBinding) {
++	current := make(map[*core.Text]*gridUpdatePass, len(g.cells)+len(g.headers))
++	for _, w := range append(append([]*core.Text(nil), g.cells...), g.headers...) {
++		count := p.slots[w]
++		if count == nil {
++			count = new(gridUpdatePass)
++			w.Updater(func() { count.updates++ })
++			w.FinalStyler(func(*styles.Style) { count.styles++ })
++		}
++		current[w] = count
++	}
++	p.slots = current
++}
++func (p *refreshGridCounts) reset() {
++	p.host = gridUpdatePass{}
++	for _, slot := range p.slots {
++		*slot = gridUpdatePass{}
++	}
++}
++func (p *refreshGridCounts) assertZero(t *testing.T, label string, g *gridBinding) {
++	t.Helper()
++	if p.host != (gridUpdatePass{}) {
++		t.Errorf("%s unnecessary retained host update/style: %+v", label, p.host)
++	}
++	if len(g.cells)+len(g.headers) != len(p.slots) {
++		t.Errorf("%s unchanged projection resized native pool", label)
++	}
++	for _, w := range append(append([]*core.Text(nil), g.cells...), g.headers...) {
++		pass, ok := p.slots[w]
++		if !ok || *pass != (gridUpdatePass{}) {
++			t.Errorf("%s unnecessary retained cell/header update/style: present=%t passes=%+v", label, ok, pass)
++		}
++	}
++}
++
++// This drains only eligible originating events and owner callbacks. It does not
++// force a frame, advance time, or clear Manual's conservative layoutPending.
++func refreshGridDrain(t *testing.T, m *Manual) {
++	t.Helper()
++	for range 64 {
++		result, err := m.Step(testContext, 64)
++		if err != nil {
++			t.Fatal(err)
++		}
++		if result.Events+result.OwnerCallbacks == 0 {
++			return
++		}
++	}
++	t.Fatal("bounded native/owner refresh drain exhausted")
++}
++
++func TestManagedGridUnchangedProjectionRefreshDoesNotMaterializeOrUpdate(t *testing.T) {
++	for _, dpi := range []float32{96, 144} {
++		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
++			model, source := refreshGridModel(t)
++			config := manualConfig(t, 7)
++			config.LogicalDPI = dpi
++			m, a := gridManual(t, config, func() ui.Node { return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true} })
++			gridFrame(t, m)
++			binding := gBinding(t, model)
++			var counts *refreshGridCounts
++			if err := a.Do(func() { counts = watchRefreshGrid(binding) }); err != nil {
++				t.Fatal(err)
++			}
++			before := gridInspection(t, a, model)
++			raster, err := m.Capture(testContext, "one")
++			if err != nil {
++				t.Fatal(err)
++			}
++			digest := sha256.Sum256(raster.Pix)
++			if err := a.Do(func() {
++				counts.reset()
++				source.calls.Store(0)
++				if err := a.Invalidate("one"); err != nil {
++					t.Error(err)
++				}
++			}); err != nil {
++				t.Fatal(err)
++			}
++			refreshGridDrain(t, m)
++			if err := a.Do(func() {
++				counts.assertZero(t, "same descriptor", binding)
++				if got := source.calls.Load(); got != 0 {
++					t.Errorf("same descriptor unnecessarily fetched %d source cells", got)
++				}
++				current, err := InspectGrid(a, model)
++				if err != nil || current.Generation != before.Generation || current.CellIncarnation != before.CellIncarnation || current.Bounds != before.Bounds || current.Frames != before.Frames {
++					t.Errorf("same descriptor changed measurement: generation=%d/%d incarnation=%d/%d bounds=%v/%v frames=%d/%d error=%v", before.Generation, current.Generation, before.CellIncarnation, current.CellIncarnation, before.Bounds, current.Bounds, before.Frames, current.Frames, err)
++				}
++			}); err != nil {
++				t.Fatal(err)
++			}
++			// The underlying completed software image remains unchanged even though
++			// public Manual.Capture conservatively refuses layoutPending after refresh.
++			retained, err := m.implementation.find("one").core.Image(testContext)
++			if err != nil || sha256.Sum256(retained.Pix) != digest {
++				t.Error("no-op refresh changed completed software pixels", err)
++			}
++
++			// A legitimate changed model is first rendered. Capture then invalidates
++			// the owner to republish that measurement; isolate that tail immediately.
++			if err := a.Do(func() {
++				if err := model.Scroll(90, 24); err != nil {
++					t.Error(err)
++				}
++				if err := model.SelectToKey("selection-2", "c3", virtual.GridSelectReplace); err != nil {
++					t.Error(err)
++				}
++				_ = a.Invalidate("one")
++			}); err != nil {
++				t.Fatal(err)
++			}
++			captured := false
++			for range 64 {
++				if _, err := m.Frame(testContext, "one"); err != nil {
++					t.Fatal(err)
++				}
++				if err := a.Do(func() {
++					state, err := model.State()
++					if err != nil {
++						t.Error(err)
++						return
++					}
++					in, err := InspectGrid(a, model)
++					captured = err == nil && in.Generation == state.Generation && in.Frames > before.Frames
++				}); err != nil {
++					t.Fatal(err)
++				}
++				if captured {
++					break
++				}
++			}
++			if !captured || a.Pending().DirtyWindows == 0 {
++				t.Fatal("fixture did not isolate a real completed capture invalidation")
++			}
++			before = gridInspection(t, a, model)
++			if err := a.Do(func() { counts.observeCurrentSlots(binding); counts.reset(); source.calls.Store(0) }); err != nil {
++				t.Fatal(err)
++			}
++			refreshGridDrain(t, m)
++			if err := a.Do(func() {
++				counts.assertZero(t, "capture invalidation tail", binding)
++				if got := source.calls.Load(); got != 0 {
++					t.Errorf("capture invalidation tail unnecessarily fetched %d source cells", got)
++				}
++				current, err := InspectGrid(a, model)
++				if err != nil || current.Generation != before.Generation || current.Frames != before.Frames {
++					t.Errorf("capture invalidation tail changed projection/frame: %v", err)
++				}
++			}); err != nil {
++				t.Fatal(err)
++			}
++		})
++	}
++}
++
++func TestManagedGridProjectionRefreshKeepsModelDirtyChanges(t *testing.T) {
++	model, source := refreshGridModel(t)
++	m, a := gridManual(t, manualConfig(t, 7), func() ui.Node { return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true} })
++	gridFrame(t, m)
++	binding := gBinding(t, model)
++	for _, phase := range []struct {
++		name   string
++		change func() error
++	}{
++		{"source", func() error { source.revision++; source.prefix = "<new & source>"; return model.ReplaceSource(source) }},
++		{"selection", func() error { return model.SelectToKey("selection-2", "c2", virtual.GridSelectReplace) }},
++		{"viewport", func() error { return model.Scroll(90, 24) }},
++		{"cursor-only", func() error { return model.Move(1, 1) }},
++	} {
++		before := gridInspection(t, a, model)
++		if err := a.Do(func() {
++			source.calls.Store(0)
++			if err := phase.change(); err != nil {
++				t.Error(err)
++			}
++			_ = a.Invalidate("one")
++		}); err != nil {
++			t.Fatal(err)
++		}
++		gridFrame(t, m)
++		current := gridInspection(t, a, model)
++		if source.calls.Load() == 0 || current.Generation <= before.Generation || current.Cells[0].Text != source.prefix+current.Cells[0].RowKey+" · "+current.Cells[0].ColumnID {
++			t.Errorf("%s skipped legitimate changed projection", phase.name)
++		}
++		if err := a.Do(func() { assertGridUpdateStyles(t, binding, phase.name) }); err != nil {
++			t.Fatal(err)
++		}
++	}
++}
++
++func TestManagedGridProjectionRefreshRetainsInheritedStyleDisabledAndTopology(t *testing.T) {
++	model, source := refreshGridModel(t)
++	config := manualConfig(t, 7)
++	config.LogicalDPI = 144
++	fontSize := float32(14)
++	foreground := color.NRGBA{R: 30, G: 60, B: 90, A: 255}
++	disabled, moved, resized := false, false, false
++	nodeTypography := false
++	help := ""
++	view := func() ui.Node {
++		grid := ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true, Accessibility: ui.Accessibility{Help: help}}
++		if nodeTypography {
++			grid.Style.Typography = ui.Some(ui.Typography{Family: "Noto Sans", Size: 18})
++		}
++		if resized {
++			grid.Style.MaxSize = ui.Some(ui.Size{Width: 320, Height: 200})
++		}
++		left := ui.Node{ID: "left", Kind: ui.Column, Grow: true, Disabled: disabled, Style: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: fontSize}), Foreground: ui.Some(foreground)}}
++		right := ui.Node{ID: "right", Kind: ui.Column, Grow: true, Disabled: disabled, Style: left.Style}
++		if moved {
++			right.Children = []ui.Node{grid}
++		} else {
++			left.Children = []ui.Node{grid}
++		}
++		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{left, right}}
++	}
++	m, a := gridManual(t, config, view)
++	gridFrame(t, m)
++	binding := gBinding(t, model)
++	originalHost := binding.host
++	originalCell := binding.cells[0]
++	for _, phase := range []struct {
++		name   string
++		change func()
++	}{
++		{"inherited typography", func() { fontSize = 20; foreground = color.NRGBA{R: 91, G: 23, B: 47, A: 255} }},
++		{"node typography", func() { nodeTypography = true }},
++		{"theme", func() {
++			theme := m.implementation.config.Theme.Clone()
++			theme.Kinds = map[ui.Kind]ui.Style{ui.DataGrid: {Background: ui.Some(color.NRGBA{R: 220, G: 230, B: 240, A: 255})}}
++			m.implementation.config.Theme = theme
++		}},
++		{"help added", func() { help = "Use <Grid> & rows" }},
++		{"help removed", func() { help = "" }},
++		{"ancestor disabled", func() { disabled = true }},
++		{"ancestor enabled", func() { disabled = false }},
++		{"reparent", func() { moved = true }},
++		{"resize", func() { resized = true }},
++	} {
++		before := gridInspection(t, a, model)
++		if err := a.Do(func() { source.calls.Store(0); phase.change(); _ = a.Invalidate("one") }); err != nil {
++			t.Fatal(err)
++		}
++		gridFrame(t, m)
++		current := gridInspection(t, a, model)
++		if phase.name != "reparent" && phase.name != "resize" && current.Generation != before.Generation {
++			t.Error(phase.name, "fixture must exercise native-only synchronization at unchanged model generation")
++		}
++		if err := a.Do(func() {
++			if binding.host != originalHost || binding.cells[0] != originalCell {
++				t.Error(phase.name, "replaced retained native identity")
++			}
++			// Manual requires explicit defaults. The managed grid therefore resolves
++			// its own defaults/node theme, while pooled texts inherit that host.
++			resolved, err := ui.ResolveStyle(binding.r.node, binding.r.theme)
++			if err != nil {
++				t.Error(err)
++				return
++			}
++			for _, cell := range append(append([]*core.Text(nil), binding.cells...), binding.headers...) {
++				if cell.Styles.Font.Size.Value != resolved.Typography.Value.Size || cell.Styles.Color.At(0, 0) != resolved.Foreground.Value {
++					t.Error(phase.name, "lost resolved host typography/color inheritance", cell.Styles.Font.Size, cell.Styles.Color.At(0, 0))
++					break
++				}
++			}
++			parentID := "left"
++			if moved {
++				parentID = "right"
++			}
++			parent := findRecord(m.implementation.find("one").state.root, parentID)
++			if parent == nil || parent.widget.AsWidget().Styles.Font.Size.Value != fontSize || parent.widget.AsWidget().Styles.Color.At(0, 0) != foreground {
++				t.Error(phase.name, "parent typography/color did not update")
++			}
++			if binding.host.Tooltip != html.EscapeString(help) {
++				t.Error(phase.name, "stale or unescaped accessibility help tooltip", binding.host.Tooltip)
++			}
++			if binding.host.AbilityIs(abilities.LongHoverable) != (help != "") || binding.host.AbilityIs(abilities.LongPressable) != (help != "") {
++				t.Error(phase.name, "stale tooltip-derived native abilities")
++			}
++			if binding.host.StateIs(states.Disabled) != disabled || binding.eligible() == disabled {
++				t.Error(phase.name, "effective disabled state/admission stale")
++			}
++			if current.Generation == before.Generation && source.calls.Load() != 0 {
++				t.Error(phase.name, "unchanged domain projection fetched source cells")
++			}
++			if phase.name == "theme" && binding.host.Styles.Background.At(0, 0) != (color.NRGBA{R: 220, G: 230, B: 240, A: 255}) {
++				t.Error("unchanged projection skipped current node theme")
++			}
++			assertGridUpdateStyles(t, binding, phase.name)
++		}); err != nil {
++			t.Fatal(err)
++		}
++		if phase.name == "reparent" && current.Bounds == before.Bounds {
++			t.Error("reparent did not move measured native host")
++		}
++		if phase.name == "resize" && current.Bounds.Size() == before.Bounds.Size() {
++			t.Error("resize did not change completed native viewport")
++		}
++	}
++}
++
++func TestManagedGridProjectionRefreshKeepsPrivateSelectionRestoreAndFocus(t *testing.T) {
++	m, a, model, _, _ := inlineFixture(t, 144)
++	binding := gBinding(t, model)
++	edit := binding.editing
++	r := edit.record
++	field := r.widget.(*core.TextField)
++	client, session := r.control.client, edit.session
++	var generation uint64
++	if err := a.Do(func() {
++		s, e := model.State()
++		if e != nil {
++			t.Error(e)
++		}
++		generation = s.Generation
++		initial := field.EditingState()
++		if initial.Anchor != 0 || initial.Focus != 4 || initial.Text != "A😀é" {
++			t.Error("fixture needs the initial full forward selection", initial)
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++	// Shift+Home reverses the real selection to the logical beginning without
++	// changing draft bytes; the fixture observed plain End retaining selection.
++	selectionNativeKey(t, m, key.CodeHome, gridSelectionModifiers(key.Shift))
++	if err := a.Do(func() {
++		s, e := model.State()
++		if e != nil || s.Generation != generation {
++			t.Error("selection-only key changed Grid generation", e)
++		}
++		state := field.EditingState()
++		if state.Anchor != 4 || state.Focus != 0 || state.Cursor != 0 || state.Text != "A😀é" {
++			t.Error("actual selection-only key did not reverse native selection", state)
++		}
++		r.control.fieldSelection = &editor.Selection{Anchor: 4, Focus: 1}
++		_ = a.Invalidate("one")
++	}); err != nil {
++		t.Fatal(err)
++	}
++	gridFrame(t, m)
++	if err := a.Do(func() {
++		state := field.EditingState()
++		if state.Anchor != 4 || state.Focus != 1 {
++			t.Error("same-generation queued directional selection skipped", state)
++		}
++		field.SetText("unaccepted native local bytes")
++		requestControlRestore(r)
++	}); err != nil {
++		t.Fatal(err)
++	}
++	gridFrame(t, m)
++	if err := a.Do(func() {
++		s, e := model.State()
++		state := field.EditingState()
++		if e != nil || s.Generation != generation || state.Text != s.Edit.Text {
++			t.Error("same-generation private restore skipped", state, s.Edit, e)
++		}
++		if binding.editing != edit || r.control.client != client || edit.session != session {
++			t.Error("private refresh replaced edit/native incarnation")
++		}
++		if !field.StateIs(states.Focused) || binding.host.AbilityIs(abilities.Focusable) {
++			t.Error("private restore lost current editor focus/Tab stop")
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++	// Return remains routed through the real editor and originating settle queue.
++	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: selectionNativeWindow(t, m).Incarnation, Type: events.KeyChord, Code: key.CodeReturnEnter}); err != nil {
++		t.Fatal(err)
++	}
++	gridFrame(t, m)
++}
++
++func TestManagedGridProjectionRefreshRestoresCanonicalScrollbarAfterChange(t *testing.T) {
++	model, source := refreshGridModel(t)
++	disabled, modal := false, false
++	m, a := gridManual(t, manualConfig(t, 7), func() ui.Node {
++		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
++			{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true, Disabled: disabled},
++			{ID: "dialog", Kind: ui.Dialog, Text: "Modal", Open: modal, Children: []ui.Node{{ID: "modal-close", Kind: ui.Button, Text: "Close"}}},
++		}}
++	})
++	gridFrame(t, m)
++	binding := gBinding(t, model)
++	if err := a.Do(func() {
++		if err := model.Scroll(90, 24); err != nil {
++			t.Error(err)
++		}
++		_ = a.Invalidate("one")
++	}); err != nil {
++		t.Fatal(err)
++	}
++	gridFrame(t, m)
++	var counts *refreshGridCounts
++	if err := a.Do(func() { counts = watchRefreshGrid(binding) }); err != nil {
++		t.Fatal(err)
++	}
++	for _, phase := range []struct {
++		name    string
++		prepare func()
++		value   func(float32, int) float32
++	}{
++		{"same canonical value", func() {}, func(v float32, _ int) float32 { return v }},
++		{"subpixel same logical offset", func() {}, func(v float32, extent int) float32 { return v + .2/float32(extent) }},
++		{"disabled admission", func() { disabled = true }, func(_ float32, _ int) float32 { return .8 }},
++		{"outside modal input scope", func() { disabled = false; modal = true }, func(_ float32, _ int) float32 { return .8 }},
++	} {
++		if err := a.Do(func() { phase.prepare(); _ = a.Invalidate("one") }); err != nil {
++			t.Fatal(err)
++		}
++		gridFrame(t, m)
++		var before virtual.GridState
++		var expected float32
++		if err := a.Do(func() {
++			var err error
++			before, err = model.State()
++			if err != nil {
++				t.Error(err)
++				return
++			}
++			extent := gridMaxX(before)
++			if extent == 0 {
++				t.Error("fixture requires horizontal scroll range")
++				return
++			}
++			expected = float32(float64(before.Viewport.ScrollX) / float64(extent))
++			if binding.horizontal.Value != expected {
++				t.Error("fixture slider not canonical before change")
++			}
++			counts.reset()
++			source.calls.Store(0)
++			binding.horizontal.SetValue(phase.value(expected, extent))
++			binding.horizontal.SendChange()
++			_ = a.Invalidate("one")
++		}); err != nil {
++			t.Fatal(err)
++		}
++		refreshGridDrain(t, m)
++		if err := a.Do(func() {
++			current, err := model.State()
++			if err != nil || current.Generation != before.Generation || current.Viewport != before.Viewport {
++				t.Error(phase.name, "no-op/refused scrollbar changed accepted model", current.Viewport, err)
++			}
++			if binding.horizontal.Value != expected {
++				t.Error(phase.name, "did not restore canonical accepted scrollbar", binding.horizontal.Value, expected)
++			}
++			counts.assertZero(t, phase.name, binding)
++			if source.calls.Load() != 0 {
++				t.Error(phase.name, "canonical scrollbar refresh fetched unchanged source cells")
++			}
++		}); err != nil {
++			t.Fatal(err)
++		}
++	}
++}
+diff --git a/drivers/cogent/reconcile.go b/drivers/cogent/reconcile.go
+index b728ab2..e2a6fc0 100644
+--- a/drivers/cogent/reconcile.go
++++ b/drivers/cogent/reconcile.go
+@@ -94,7 +94,10 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
+ 		if err := prepareControl(r, node); err != nil {
+ 			return nil, err
+ 		}
+-		next := &plan{r: r, node: node, parent: p}
++		// A native host may be passed through an embedded Frame while children
++		// retain its concrete tree identity. Compare and move against that same
++		// identity, or every unchanged refresh looks like a parent transition.
++		next := &plan{r: r, node: node, parent: p.AsTree().This}
+ 		for _, child := range node.Children {
+ 			entry, err := prepare(childHost(r, child.ID), child)
+ 			if err != nil {
+diff --git a/drivers/cogent/reconcile_parent_test.go b/drivers/cogent/reconcile_parent_test.go
+new file mode 100644
+index 0000000..ddbb3d4
+--- /dev/null
++++ b/drivers/cogent/reconcile_parent_test.go
+@@ -0,0 +1,79 @@
++package cogent
++
++import (
++	"testing"
++
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/tree"
++	"github.com/dshills/vellum/app"
++	"github.com/dshills/vellum/ui"
++)
++
++type parentProbeExtension struct {
++	parent        tree.Node
++	widget        *core.Frame
++	mounts, syncs int
++}
++
++func (e *parentProbeExtension) Mount(parent tree.Node) core.Widget {
++	e.parent = parent
++	e.mounts++
++	e.widget = core.NewFrame(parent)
++	return e.widget
++}
++func (e *parentProbeExtension) Sync(core.Widget) error { e.syncs++; return nil }
++
++func TestKeyedEmbeddedParentIdentityDoesNotReparentOrUpdate(t *testing.T) {
++	a, err := app.New(app.Config{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer a.Close()
++	w := &nativeWindow{body: core.NewBody("embedded parent")}
++	host := newAccessibilityHost(w)
++	defer w.body.Scene.Destroy()
++	probe := &parentProbeExtension{}
++	n := ui.Node{ID: "root", Kind: ui.Extension, Custom: probe}
++	r, err := reconcile(host, nil, n, a, "one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if probe.parent != host || r.widget.AsTree().Parent != host.AsTree().This {
++		t.Fatal("mount argument or canonical native parent changed")
++	}
++	updates, stylePasses, additions := 0, 0, 0
++	probe.widget.Updater(func() { updates++ })
++	probe.widget.FinalStyler(func(*styles.Style) { stylePasses++ })
++	host.AsTree().OnChildAdded = func(tree.Node) { additions++ }
++	for range 3 {
++		before := probe.syncs
++		next, err := reconcile(host, r, n, a, "one")
++		if err != nil {
++			t.Fatal(err)
++		}
++		if next != r || probe.mounts != 1 || probe.syncs != before+1 || updates != 0 || stylePasses != 0 || additions != 0 {
++			t.Fatalf("unchanged refresh rebuilt native parent: retained=%t mounts=%d syncs=%d/%d updates=%d styles=%d additions=%d", next == r, probe.mounts, probe.syncs, before+1, updates, stylePasses, additions)
++		}
++		if len(host.Children) != 1 || host.Children[0] != r.widget || r.widget.AsTree().Parent != host.AsTree().This {
++			t.Fatal("unchanged native topology was not retained")
++		}
++	}
++	// A real style change still updates the retained widget without reparenting.
++	n.Style.Padding = ui.Some(ui.Insets{Top: 3})
++	if _, err := reconcile(host, r, n, a, "one"); err != nil {
++		t.Fatal(err)
++	}
++	if updates == 0 || stylePasses == 0 || additions != 0 || probe.widget.Styles.Padding.Top.Value != 3 {
++		t.Fatal("style update was suppressed or treated as a parent move")
++	}
++	// A different embedded host remains a genuine topology transition.
++	other := newAccessibilityHost(w)
++	next, err := reconcile(other, r, n, a, "one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if next != r || probe.mounts != 1 || len(host.Children) != 0 || len(other.Children) != 1 || other.Children[0] != r.widget || r.widget.AsTree().Parent != other.AsTree().This {
++		t.Fatal("real embedded-host move lost retained identity or native topology")
++	}
++}
+diff --git a/specs/grid-native.md b/specs/grid-native.md
+index ad5d53a..e9389d0 100644
+--- a/specs/grid-native.md
++++ b/specs/grid-native.md
+@@ -103,15 +103,33 @@ Hidden oversized column definitions are checked if/when materialized. Pools
+ reuse active widgets and destroy surplus slots to release private shaped-text
+ caches, with no whole-source allocation.
+ 
+-A successful native projection sync assigns every pooled cell/header's text,
++A changed native projection sync assigns every pooled cell/header's text,
+ rectangle, visibility, selection and cursor state before one recursive host
+ update. That traversal updates and restyles each pooled slot after its parent;
+ placement does not also run a separate per-slot update. The private inline
+ editor retains its existing update and focus handling. This bounds duplicate
+ work within that sync, not the number of updates in an entire frame: initial
+ mounting, theme changes and other parent updates may perform additional work.
+-It does not skip layout, paint, rasterization or texture upload. A refused sync
+-keeps the existing reconciliation failure and retirement behavior.
++After a complete successful sync, an unchanged validated model generation reuses
++that projection without rereading Cell, moving pooled slots or recursively
++updating the host. State/current metadata checks still run. Effective inherited
++disabled or help-tooltip changes still update the host; descriptor styles, theme and topology
++retain normal reconciliation updates. The private editor is synchronized even
++on this reuse path, preserving its separate selection, restore, preedit and focus
++lifecycle. An incomplete sync cannot become a reusable projection.
++On refresh, scrollbars also retain constant-time canonical value restoration: a native drag
++that rounds to the same model pixel or is refused cannot leave a different local
++value. Only a differing scrollbar value is assigned and marked for rendering;
++an already canonical value does not request another paint.
++
++This relies on immutable source data within an accepted stamp. Unstamped Cell
++mutations or callback failures cannot be discovered by reusing a projection;
++callers must explicitly Refresh a changed revision or ReplaceSource. Exact
++worker-built projections additionally validate their borrowed input stamp when
++State is read, including a fixed-height or empty projection. The adapter keeps
++completed geometry publication and layout requests; source/projection reuse
++does not suppress legitimate native resize, DPI, style or editor repaint work.
++A refused sync keeps the existing reconciliation failure and retirement behavior.
+ 
+ Render/Position never read the source/model or invoke user callbacks. Completed
+ native rendering publishes clipped actual ContentBBox/TotalBBox geometry. A
+diff --git a/specs/grid-performance.md b/specs/grid-performance.md
+index 502056d..6e3d1e7 100644
+--- a/specs/grid-performance.md
++++ b/specs/grid-performance.md
+@@ -133,6 +133,18 @@ exploration neither meets the five-process requirement nor exercises the other
+ three cases, so P6 remains open. It does not change raster/upload invalidation
+ or prove a reduction in process-wide scheduler wakeups.
+ 
++The [unchanged-refresh comparison](../docs/reports/macos-grid-refresh/README.md)
++reuses validated grid projections and canonicalizes retained parent identity.
++Three interleaved fixed-10k processes per build observe pooled elapsed UI-work
++p95 17.233→14.624 ms (15.14%) and p99 18.954→15.566 ms with identical
++400-cell geometry. The retained baseline maximum is 71.056 ms; its cause is
++unclassified. Reconciliation p95 decreases 6.066→3.343 ms, while raster/upload
++p95 is 8.748→9.026 ms. Stage percentiles are not additive. Original-overlay
++regressions fail, final native/portable race checks pass, and eight software
++frames match the previous checkpoint's repeated pixels. This remains an
++exploratory comparison: both unchanged targets fail and the full P6 campaign
++remains open. It makes no sprite/partial-upload or process-wide wakeup claim.
++
+ ## Diagnostic CPU profiling
+ 
+ `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide
+diff --git a/specs/grid-projection.md b/specs/grid-projection.md
+index c1edc2f..dce764a 100644
+--- a/specs/grid-projection.md
++++ b/specs/grid-projection.md
+@@ -13,6 +13,13 @@ must first produce a genuinely immutable snapshot. The builder borrows that
+ snapshot; cancellation cannot make a blocking source callback return. Callbacks
+ must remain bounded, in memory, nonblocking and free of UI reentry or IO.
+ 
++An installed exact built-in projection validates its borrowed input stamp during
++Grid.State and other current-state operations. This also applies to fixed-height
++and empty views whose constant projection metadata cannot expose input drift.
++Changed input is refused under ErrGridSource with its ErrGridStale cause. The
++check does not enumerate rows or cells and cannot detect hidden unstamped data
++mutations; the immutable input contract remains required.
++
+ `GridQuery` accepts at most four sort columns and four filters. Sort text uses
+ case-sensitive UTF-8 byte order. Integer sorts accept an optional single `+` or
+ `-` followed by one or more ASCII decimal digits within signed int64 range;
+diff --git a/specs/keyed-reconciliation.md b/specs/keyed-reconciliation.md
+index 7bcc736..aef6238 100644
+--- a/specs/keyed-reconciliation.md
++++ b/specs/keyed-reconciliation.md
+@@ -14,6 +14,13 @@ rolled back. Extensions must return one attached root widget and own its native
+ subtree. Application views describe fresh nodes; callbacks are refreshed while
+ widgets retain focus, selection, scroll and renderer resources.
+ 
++Retained parent comparisons use the native tree's concrete identity. Passing an
++embedded Frame for an accessibility or other host must not cause unchanged
++refreshes to park, reparent, invoke OnAdd or update the managed subtree. The
++original parent argument still reaches Extension.Mount; only the reconciliation
++plan normalizes identity. Real parent, order, theme and descriptor-style changes
++retain their normal update and move behavior.
++
+ Each workbench panel is a managed tree with its own ID scope. Dock containers may
+ be rebuilt for topology changes, but panel roots are parked in the same native
+ scene, then reconciled into their new containers. Removed and incompatible roots
+diff --git a/specs/macos-completion.md b/specs/macos-completion.md
+index 2e5dd4f..8d323bf 100644
+--- a/specs/macos-completion.md
++++ b/specs/macos-completion.md
+@@ -109,6 +109,17 @@ offscreen software pixels. Three interleaved fixed-10k release processes per
+ build observe p95 19.55→17.07ms and p99 20.41→18.00ms. The unchanged targets
+ remain failed; the complete multi-case P6 campaign remains open.
+ 
++The [unchanged-refresh checkpoint](../docs/reports/macos-grid-refresh/README.md)
++reuses complete, validated grid projections and fixes embedded native-parent
++identity comparisons. Same-generation refresh retains private editing, styles,
++disabled/help semantics and canonical scrollbars without Cell reads or spurious
++host/cell updates. Built-in projections also refuse borrowed input-stamp drift.
++Original-overlay regressions fail; the final native adapter and portable virtual
++race suites pass, with matching software grid pixels. Three interleaved fixed-10k
++release processes per build observe p95 17.233→14.624 ms and p99
++18.954→15.566 ms. Both 4/6 ms targets still fail. Raster/upload cost and the
++complete multi-case P6 campaign remain open.
++
+ Full P9 professional workload and large-data replay acceptance, external
+ application automation transport, native services/input/accessibility, GPU
+ presentation and sustained performance qualification remain open. This bounded
+diff --git a/virtual/grid.go b/virtual/grid.go
+index 682aa02..d845221 100644
+--- a/virtual/grid.go
++++ b/virtual/grid.go
+@@ -272,7 +272,18 @@ func (g *Grid) current() error {
+ 	if err := g.selection.current(); err != nil {
+ 		return err
+ 	}
+-	return sameStamp(g.source, g.stamp)
++	if err := sameStamp(g.source, g.stamp); err != nil {
++		return err
++	}
++	// Built-in projections expose a fixed view stamp while borrowing an input
++	// snapshot. Validate that input even when this operation reads no rows or
++	// cells, so an unchanged view stamp cannot conceal source drift.
++	if projection, ok := g.source.(GridProjection); ok {
++		if prepared, exact := unwrapGridProjection(projection); exact {
++			return prepared.current()
++		}
++	}
++	return nil
+ }
+ func (g *Grid) nextGeneration() error {
+ 	if g.generation == math.MaxUint64 {
+diff --git a/virtual/grid_projection_current_test.go b/virtual/grid_projection_current_test.go
+new file mode 100644
+index 0000000..9cd85a4
+--- /dev/null
++++ b/virtual/grid_projection_current_test.go
+@@ -0,0 +1,201 @@
++package virtual
++
++import (
++	"context"
++	"errors"
++	"fmt"
++	"testing"
++)
++
++// These providers deliberately break the borrowed immutable-input contract
++// after construction. The built view's own metadata still stays unchanged.
++type projectionCurrentSource struct {
++	*projectionTestSource
++	identity string
++}
++
++func (s *projectionCurrentSource) Identity() string { return s.identity }
++
++type projectionCurrentMetrics struct {
++	*projectionCurrentSource
++	heights *RowHeights
++}
++
++func (s *projectionCurrentMetrics) RowOffset(i int) (int, error) {
++	return s.heights.RowOffset(i)
++}
++func (s *projectionCurrentMetrics) RowAt(i int) (int, error) {
++	return s.heights.RowAt(i)
++}
++
++type projectionCurrentEdit struct{ *projectionCurrentSource }
++
++func (s *projectionCurrentEdit) EditCell(key, column string) (GridEditValue, error) {
++	text, err := s.Cell(key, column)
++	return GridEditValue{Text: text, Version: 1, Editable: true}, err
++}
++
++type projectionCurrentMetricsEdit struct{ *projectionCurrentMetrics }
++
++func (s *projectionCurrentMetricsEdit) EditCell(key, column string) (GridEditValue, error) {
++	text, err := s.Cell(key, column)
++	return GridEditValue{Text: text, Version: 1, Editable: true}, err
++}
++
++func projectionCurrentInput(t *testing.T, rows, variant int) (*projectionCurrentSource, GridSource) {
++	t.Helper()
++	base := &projectionCurrentSource{projectionTestSource: projectionSource(rows), identity: "current-domain"}
++	heights := make([]int, rows)
++	for i := range heights {
++		heights[i] = 7 + i*2
++	}
++	index, err := NewRowHeights(heights)
++	if err != nil {
++		t.Fatal(err)
++	}
++	metrics := &projectionCurrentMetrics{projectionCurrentSource: base, heights: index}
++	switch variant {
++	case 0:
++		return base, base
++	case 1:
++		return base, metrics
++	case 2:
++		return base, &projectionCurrentEdit{base}
++	case 3:
++		return base, &projectionCurrentMetricsEdit{metrics}
++	default:
++		t.Fatal("unknown capability variant")
++		return nil, nil
++	}
++}
++
++func projectionCurrentGrid(t *testing.T, source GridSource, query GridQuery) (*Grid, GridProjection) {
++	t.Helper()
++	view, err := BuildGridProjection(context.Background(), source, 91, query, GridProjectionLimits{})
++	if err != nil {
++		t.Fatal(err)
++	}
++	_, editable := view.(GridEditSource)
++	g, err := NewGrid(view, []GridColumn{{ID: "c:0", Width: 60}}, GridConfig{RowHeight: 9, HeaderHeight: 3, RowSelection: true, CellEditing: editable}, GridViewport{Width: 80, Height: 30})
++	if err != nil {
++		t.Fatal(err)
++	}
++	return g, view
++}
++
++func TestGridProjectionCurrentRejectsBorrowedInputDrift(t *testing.T) {
++	for variant, name := range []string{"fixed", "metrics", "edit", "metrics-edit"} {
++		for _, shape := range []string{"visible", "empty-input", "empty-filter"} {
++			for _, drift := range []string{"identity", "revision", "rows"} {
++				t.Run(fmt.Sprintf("%s/%s/%s", name, shape, drift), func(t *testing.T) {
++					rows := 3
++					if shape == "empty-input" {
++						rows = 0
++					}
++					base, source := projectionCurrentInput(t, rows, variant)
++					query := GridQuery{}
++					if shape == "empty-filter" {
++						query.Filters = []GridFilter{{ColumnID: "c:0", Kind: GridFilterEquals, Text: "not present"}}
++					}
++					g, view := projectionCurrentGrid(t, source, query)
++					before, err := g.State()
++					if err != nil {
++						t.Fatal(err)
++					}
++					if shape != "visible" && before.Stamp.Rows != 0 {
++						t.Fatal("fixture did not create an empty view", before)
++					}
++					request, err := g.PrepareProjection()
++					if err != nil {
++						t.Fatal(err)
++					}
++					oldIdentity, oldRevision, oldRows := base.identity, base.revision, base.rows
++					switch drift {
++					case "identity":
++						base.identity = "different-domain"
++					case "revision":
++						base.revision++
++					case "rows":
++						base.rows = append(append([][]string(nil), base.rows...), []string{"new", "0", "keep"})
++					}
++					if got, err := sourceStamp(view); err != nil || got != before.Stamp {
++						t.Fatal("test must retain the projection's accepted view stamp", got, before.Stamp, err)
++					}
++					operations := []struct {
++						name string
++						run  func() error
++					}{
++						{"State", func() error { _, err := g.State(); return err }},
++						{"Snapshot", func() error { _, err := g.Snapshot(); return err }},
++						{"Refresh", g.Refresh},
++						{"SetViewportNoop", func() error { return g.SetViewport(before.Viewport) }},
++						{"ScrollNoop", func() error { return g.Scroll(0, 0) }},
++						{"Move", func() error { return g.Move(1, 0) }},
++						{"Page", func() error { return g.Page(1) }},
++						{"Activate", func() error { return g.Activate(GridCellRef{}) }},
++						{"Selection", func() error { _, err := g.Selection(); return err }},
++						{"SelectAll", g.SelectAll},
++						{"BeginActiveEdit", g.BeginActiveEdit},
++						{"PrepareEdit", func() error { _, err := g.PrepareEdit(); return err }},
++						{"PrepareProjection", func() error { _, err := g.PrepareProjection(); return err }},
++					}
++					for _, op := range operations {
++						t.Run(op.name, func(t *testing.T) {
++							err := op.run()
++							if !errors.Is(err, ErrGridSource) || !errors.Is(err, ErrGridStale) {
++								t.Errorf("borrowed input drift admitted or error cause lost: %v", err)
++							}
++							if g.state() != before || g.pendingProjection != request.token {
++								t.Fatal("refusal changed accepted view or pending request")
++							}
++						})
++					}
++					base.identity, base.revision, base.rows = oldIdentity, oldRevision, oldRows
++					if got, err := g.State(); err != nil || got != before {
++						t.Fatal("refusal poisoned the original accepted source", got, err)
++					}
++					if err := g.CancelProjection(request); err != nil {
++						t.Fatal("refusal retired the original request", err)
++					}
++				})
++			}
++		}
++	}
++}
++
++func TestGridProjectionCurrentMetadataOnlyAndCallbackDrift(t *testing.T) {
++	base, source := projectionCurrentInput(t, 3, 0)
++	g, _ := projectionCurrentGrid(t, source, GridQuery{})
++	before, err := g.State()
++	if err != nil {
++		t.Fatal(err)
++	}
++	indexed := 0
++	base.hook = func(string, int) error {
++		indexed++
++		return errors.New("current-state inspection must not materialize indexed data")
++	}
++	for i := 0; i < 5; i++ {
++		if got, err := g.State(); err != nil || got != before {
++			t.Fatal("valid state inspection changed state or read indexed data", got, err)
++		}
++	}
++	if indexed != 0 {
++		t.Fatal("state inspection enumerated the source", indexed)
++	}
++	// Revision returns its old value, then the metadata callback changes it.
++	// A second input-stamp observation must catch that change before publication.
++	once := false
++	base.metadata = func(operation string) {
++		if operation == "revision" && !once {
++			once = true
++			base.revision++
++		}
++	}
++	if _, err := g.State(); !errors.Is(err, ErrGridSource) || !errors.Is(err, ErrGridStale) {
++		t.Fatal("metadata callback drift escaped state publication", err)
++	}
++	if !once || indexed != 0 || g.state() != before {
++		t.Fatal("metadata drift fixture did not remain bounded and atomic", once, indexed)
++	}
++}

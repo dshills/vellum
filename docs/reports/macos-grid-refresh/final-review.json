@@ -1,0 +1,147 @@
+{
+  "additional_internal_test_files": {
+    "drivers/cogent/grid_model_identity_review_test.go": "66e2c2cdb6c1c398d6f95a6f6deb69106b3ac54e20d0555cb2dcd6041ada289e"
+  },
+  "audit": {
+    "path": "/private/tmp/vellum-grid-refresh-qualification/internal-source-review/audit.json",
+    "sha256": "4c14cf7613f58d1256755eb2da8c5f86ec7a84f5ed4f56a1a52a22c013c85199"
+  },
+  "correctness_review": [
+    "syncGrid reads checked State before completed-generation reuse. projectionReady is set only after complete successful sync; the reuse path retains private editor sync, conditional canonical sliders, inherited disabled and tooltip-derived ability updates. Normal descriptor/theme/topology reconciliation remains active.",
+    "Portable current unwraps only exact private built-in projection variants and checks the borrowed full-source stamp even for fixed-height and empty projections. It adds metadata-only validation, preserves source/stale error chaining, and leaves unstamped immutable-source violations explicitly outside detectable guarantees.",
+    "Reconciliation normalizes only the planned parent identity to tree.This, matching Core native Parent storage, while preserving the original concrete Mount argument. Real style, order and parent moves still update; the actual embedded-host/Extension regression verifies no false no-op reparent.",
+    "Public DataGrid compatibility rejects a changed model pointer before retained sync. mountGrid binds the descriptor model to a new non-ready binding. Equal local generations across two models therefore do not collide in the old projection fast path; the internally added actual reconciliation test demonstrates remount, new-source materialization and retirement.",
+    "The native regression covers no-op/completed-capture tails, legitimate model/style/theme/help/disabled/topology changes, private field selection/restore/settlement and accepted/refused scrollbar normalization. Existing full adapter race/vets and eight real software frame hashes remain bound to unchanged production sources.",
+    "Documentation reports the three-process-per-build exploratory A/B scope, preserves the 71.056335ms baseline outlier, uses elapsed-work terminology and independent phase percentile limitations, and keeps unchanged 4ms p95/6ms p99 targets and P6 acceptance open."
+  ],
+  "files": {
+    "docs/implementation.md": "60d049b33184aad47ba03cf7ac0898133f37aa47cb70e2e8a46a9d8a01fe717a",
+    "docs/reports/macos-grid-refresh/README.md": "13990edc3e075cf97a9bf685a17c10050e0f3355e2de17b2255caf1eb176a31e",
+    "drivers/cogent/grid.go": "eccea15115c37bfe88aa2353c7b149a02812fac63267e6c466aab65ec7f3f8ae",
+    "drivers/cogent/grid_model_identity_review_test.go": "66e2c2cdb6c1c398d6f95a6f6deb69106b3ac54e20d0555cb2dcd6041ada289e",
+    "drivers/cogent/grid_projection_refresh_offscreen_test.go": "a962c2414e1c843a9a435f51b9684a6f09af91da17260b54899e0ef2a1b91985",
+    "drivers/cogent/reconcile.go": "fe7f5ebf38cdb4168e9a9f6edcf20ae54658346604d9175775093cd4950161ef",
+    "drivers/cogent/reconcile_parent_test.go": "ddf5401bdbedb4e713a9f070664ffd25d739bad26137b30312c5d4b2f9b76cbc",
+    "specs/grid-native.md": "97769319d6142c40b7d78bc674928b320abd15c39eaee67b67b22d7127bfdefe",
+    "specs/grid-performance.md": "91f9d3139aabb9ccbbd57fa16ef2197989a132b75d52ec6bfd6c62559e954dc4",
+    "specs/grid-projection.md": "2bc12d90f799f960c62d08e9f498b5f6258a1fcd61712a19f395b23f5ecf2c99",
+    "specs/keyed-reconciliation.md": "4a5184d56a936840605ca378e42db8bdb0a491632d4706f028c46f7f098e6b3c",
+    "specs/macos-completion.md": "dd0a43febcbd7235b1e54e314a659ef71938b7d439d2825c846b9029e5ed5b69",
+    "virtual/grid.go": "b163fa4f4ac9bb99430b0c5214ef88c3e14a92271b4f3c7dc739c6bbbbf0c8ed",
+    "virtual/grid_projection_current_test.go": "01d440fe09d30111012defec47c55c1c8dd2cfbea06abdcc9797c59944902198"
+  },
+  "findings": [],
+  "limits": [
+    "Only selected source/proof leaves and recorded prepared-map consistency were checked here; not an exhaustive compiler/toolchain/module-cache/SDK/environment closure.",
+    "Inherited red/green and raw exits are verified as evidence; this audit did not rerun any check or native process.",
+    "Before/after observations do not prove absence of a reverted transient mutation.",
+    "Three fixed-10k native release processes per build, not five runs across fixed/variable/million/cold cases or P6 acceptance.",
+    "Measured elapsed work includes common-ticket prefix phases and GC; excludes queue wait, surface acquisition waits and PresentCall. No physical presentation, thread-CPU, GPU/native-memory attribution.",
+    "Prism reviewed the original 13 paths; separate race3 model-identity validation is internally reviewed as path14.",
+    "Public Manual LayoutPending/Capture remains conservative; no complete no-frame/no-owner-drain promise. Exact built-in input-stamp validation cannot detect mutations by an unstamped provider that violates its immutable-source contract.",
+    "This source certificate is not final staged/index archive metadata or clean relocated SDK qualification; root owns promotion and final archival checks."
+  ],
+  "measurements": {
+    "acceptance": "Exploratory A/B; unchanged target fails, no P6 gate claim.",
+    "baseline_ui_work_p95_ns": 17232750,
+    "baseline_ui_work_p99_ns": 18954291,
+    "candidate_ui_work_p95_ns": 14624081,
+    "candidate_ui_work_p99_ns": 15566084,
+    "observed_geometry": "400 clipped cells, 50 rows, 8 columns, 767x624 logical viewport, scale1.6875, six native runs, 120 samples each.",
+    "p95_reduction_percent": 15.137856697276986
+  },
+  "proofs": {
+    "exploratory_comparison": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/comparison.json",
+      "sha256": "5ce8d666efc53e38e23797031df7f1d1f072c2ff85e6b97b9f82a74e2529e353"
+    },
+    "full_adapter": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/final-adapter-checks/qualification.json",
+      "sha256": "255ddccff2ceabbf79bda2bb69d4369ead52d89cfd8aaac02be71d32ff820470"
+    },
+    "independent_measurement_audit": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/independent-measurement/audit.json",
+      "sha256": "84b6e2eb3f99b6dae80e5cb61160a3f61eabbb2f41dbfce0984ad34819cee06c"
+    },
+    "model_identity_internal_addition": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/model-identity-review/qualification.json",
+      "sha256": "0410cae1de8c877d4cc7963709f60879527e15fadd56a62f9321edb5aba29020"
+    },
+    "native_original_parser_refusal": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/native-regression/qualified-v1/qualification.json",
+      "sha256": "dc36b6165aa75f77a8ae6018e493420be29e15a190f6e016365590c69374dda1"
+    },
+    "native_regression": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/native-regression/qualified-v1/adjudication-v1/qualification.json",
+      "sha256": "35f36f7d90cd58fbbbd845c343947da97b314ec7b903d2f886654ccb0a6509ff"
+    },
+    "optimized_release_build": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/candidate-build-final.json",
+      "sha256": "9af2f000de270f00d4da5488fdb2976be988217aa9d2bd88cd7038e8dd21d258"
+    },
+    "portable": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/portable/qualification-v2.json",
+      "sha256": "aafb0c642b83d40c9fe2ad88e0c540aed3267f86a922dfb3f87c395253c0ad9e"
+    },
+    "portable_initial_refusal": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/portable/qualification-initial.json",
+      "sha256": "41cf6733ba0156bcde5254f3afbbad753c5a44a3fdebf4d86840196513b09f6f"
+    },
+    "provider_disposition": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-grid-refresh/review/disposition.json",
+      "sha256": "a5ca548fc65042cd3025d0f17b3b8a50c71a1550afaa69d3c5320f4d70439aab"
+    },
+    "provider_inputs": {
+      "path": "/private/tmp/vellum-grid-refresh-prism/inputs.json",
+      "sha256": "47a4c6e7e71d377db96eddd1c3d586a66eb26af41c143c482a2be535523eee4e"
+    },
+    "provider_output": {
+      "path": "/private/tmp/vellum-grid-refresh-prism/prism.json",
+      "sha256": "99865c320333af746072ca0f15b8dfb22f0f2394b15743bfb0228e058d64355e"
+    },
+    "provider_process": {
+      "path": "/private/tmp/vellum-grid-refresh-prism/process.json",
+      "sha256": "97718a73a8032e96bc5aa06a9deda184e8efaa3a3f16b5c8e3ce5cbb724ece4c"
+    },
+    "software_pixels": {
+      "path": "/private/tmp/vellum-grid-refresh-qualification/pixel-comparison/qualification.json",
+      "sha256": "a5cbdafcf80881a1156eea5bb3ade75f6ca2de6ca52c340ea02405400999a835"
+    }
+  },
+  "provider_disposition": {
+    "finding_id": "6f7845fa0e30a1ed",
+    "production_or_original_13_scope_changed_after_provider_review": false,
+    "raw_medium_finding_preserved": true,
+    "result": "REFUTED_ON_PUBLIC_ROUTING",
+    "source_refs": [
+      "drivers/cogent/reconcile.go:84",
+      "drivers/cogent/reconcile.go:231",
+      "drivers/cogent/grid.go:132",
+      "drivers/cogent/grid.go:588"
+    ],
+    "test": "drivers/cogent/grid_model_identity_review_test.go",
+    "test_race_executions": 3
+  },
+  "provider_reviewed_files": {
+    "docs/implementation.md": "60d049b33184aad47ba03cf7ac0898133f37aa47cb70e2e8a46a9d8a01fe717a",
+    "docs/reports/macos-grid-refresh/README.md": "13990edc3e075cf97a9bf685a17c10050e0f3355e2de17b2255caf1eb176a31e",
+    "drivers/cogent/grid.go": "eccea15115c37bfe88aa2353c7b149a02812fac63267e6c466aab65ec7f3f8ae",
+    "drivers/cogent/grid_projection_refresh_offscreen_test.go": "a962c2414e1c843a9a435f51b9684a6f09af91da17260b54899e0ef2a1b91985",
+    "drivers/cogent/reconcile.go": "fe7f5ebf38cdb4168e9a9f6edcf20ae54658346604d9175775093cd4950161ef",
+    "drivers/cogent/reconcile_parent_test.go": "ddf5401bdbedb4e713a9f070664ffd25d739bad26137b30312c5d4b2f9b76cbc",
+    "specs/grid-native.md": "97769319d6142c40b7d78bc674928b320abd15c39eaee67b67b22d7127bfdefe",
+    "specs/grid-performance.md": "91f9d3139aabb9ccbbd57fa16ef2197989a132b75d52ec6bfd6c62559e954dc4",
+    "specs/grid-projection.md": "2bc12d90f799f960c62d08e9f498b5f6258a1fcd61712a19f395b23f5ecf2c99",
+    "specs/keyed-reconciliation.md": "4a5184d56a936840605ca378e42db8bdb0a491632d4706f028c46f7f098e6b3c",
+    "specs/macos-completion.md": "dd0a43febcbd7235b1e54e314a659ef71938b7d439d2825c846b9029e5ed5b69",
+    "virtual/grid.go": "b163fa4f4ac9bb99430b0c5214ef88c3e14a92271b4f3c7dc739c6bbbbf0c8ed",
+    "virtual/grid_projection_current_test.go": "01d440fe09d30111012defec47c55c1c8dd2cfbea06abdcc9797c59944902198"
+  },
+  "recipe": {
+    "path": "/private/tmp/vellum-grid-refresh-qualification/internal-source-review/audit.py.txt",
+    "sha256": "5672558879d5d123192a5d945ac3058b772911a3ccca6e0a828d5a9bc294753b"
+  },
+  "result": "APPROVED",
+  "reviewed_root": "/private/tmp/vellum-large-data",
+  "schema": 1
+}

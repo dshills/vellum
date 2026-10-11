@@ -272,7 +272,18 @@ func (g *Grid) current() error {
 	if err := g.selection.current(); err != nil {
 		return err
 	}
-	return sameStamp(g.source, g.stamp)
+	if err := sameStamp(g.source, g.stamp); err != nil {
+		return err
+	}
+	// Built-in projections expose a fixed view stamp while borrowing an input
+	// snapshot. Validate that input even when this operation reads no rows or
+	// cells, so an unchanged view stamp cannot conceal source drift.
+	if projection, ok := g.source.(GridProjection); ok {
+		if prepared, exact := unwrapGridProjection(projection); exact {
+			return prepared.current()
+		}
+	}
+	return nil
 }
 func (g *Grid) nextGeneration() error {
 	if g.generation == math.MaxUint64 {

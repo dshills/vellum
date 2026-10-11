@@ -103,15 +103,33 @@ Hidden oversized column definitions are checked if/when materialized. Pools
 reuse active widgets and destroy surplus slots to release private shaped-text
 caches, with no whole-source allocation.
 
-A successful native projection sync assigns every pooled cell/header's text,
+A changed native projection sync assigns every pooled cell/header's text,
 rectangle, visibility, selection and cursor state before one recursive host
 update. That traversal updates and restyles each pooled slot after its parent;
 placement does not also run a separate per-slot update. The private inline
 editor retains its existing update and focus handling. This bounds duplicate
 work within that sync, not the number of updates in an entire frame: initial
 mounting, theme changes and other parent updates may perform additional work.
-It does not skip layout, paint, rasterization or texture upload. A refused sync
-keeps the existing reconciliation failure and retirement behavior.
+After a complete successful sync, an unchanged validated model generation reuses
+that projection without rereading Cell, moving pooled slots or recursively
+updating the host. State/current metadata checks still run. Effective inherited
+disabled or help-tooltip changes still update the host; descriptor styles, theme and topology
+retain normal reconciliation updates. The private editor is synchronized even
+on this reuse path, preserving its separate selection, restore, preedit and focus
+lifecycle. An incomplete sync cannot become a reusable projection.
+On refresh, scrollbars also retain constant-time canonical value restoration: a native drag
+that rounds to the same model pixel or is refused cannot leave a different local
+value. Only a differing scrollbar value is assigned and marked for rendering;
+an already canonical value does not request another paint.
+
+This relies on immutable source data within an accepted stamp. Unstamped Cell
+mutations or callback failures cannot be discovered by reusing a projection;
+callers must explicitly Refresh a changed revision or ReplaceSource. Exact
+worker-built projections additionally validate their borrowed input stamp when
+State is read, including a fixed-height or empty projection. The adapter keeps
+completed geometry publication and layout requests; source/projection reuse
+does not suppress legitimate native resize, DPI, style or editor repaint work.
+A refused sync keeps the existing reconciliation failure and retirement behavior.
 
 Render/Position never read the source/model or invoke user callbacks. Completed
 native rendering publishes clipped actual ContentBBox/TotalBBox geometry. A

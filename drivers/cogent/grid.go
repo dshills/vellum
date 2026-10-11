@@ -78,6 +78,9 @@ type gridBinding struct {
 	headers              []*core.Text
 	horizontal, vertical *core.Slider
 	projection           virtual.GridSnapshot // originating native scene / owner refresh only
+	projectionReady      bool                 // true only after a successful complete sync
+	projectedDisabled    bool
+	projectedHelp        string
 	measurement          atomic.Pointer[GridInspection]
 	armed                *gridPress // originating scene only; detached opaque identity and scene geometry
 	requestMu            sync.Mutex
@@ -94,18 +97,22 @@ func validateNativeGrid(n ui.Node) error {
 	if n.Kind != ui.DataGrid {
 		return nil
 	}
+	_, err := nativeGridState(n)
+	return err
+}
+func nativeGridState(n ui.Node) (virtual.GridState, error) {
 	if n.Grid == nil {
-		return ErrGridBinding
+		return virtual.GridState{}, ErrGridBinding
 	}
 	s, err := n.Grid.State()
 	if err != nil {
-		return err
+		return virtual.GridState{}, err
 	}
 	c := s.Config
 	if s.Viewport.Width > gridNativeMaxDimension || s.Viewport.Height > gridNativeMaxDimension || !s.VariableHeights && c.RowHeight > gridNativeMaxDimension || c.HeaderHeight > gridNativeMaxDimension || c.MaxRows > gridNativeMaxRows || c.MaxColumns > gridNativeMaxColumns || c.MaxCells > gridNativeMaxCells || c.MaxTextBytes > gridNativeMaxText {
-		return ErrGridBudget
+		return virtual.GridState{}, ErrGridBudget
 	}
-	return nil
+	return s, nil
 }
 func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (core.Widget, error) {
 	if err := validateNativeGrid(r.node); err != nil {
@@ -574,9 +581,30 @@ func syncGrid(r *record) error {
 	if g == nil || !g.live() {
 		return ErrGridClosed
 	}
-	if err := validateNativeGrid(r.node); err != nil {
+	state, err := nativeGridState(r.node)
+	if err != nil {
 		return err
 	}
+	if g.projectionReady && g.projection.State.Generation == state.Generation {
+		// Domain data are immutable within their stamp. Owner invalidation after
+		// capture only republishes geometry; it need not rematerialize or restyle
+		// the same cells. Descriptor/theme/topology changes retain their normal
+		// reconciliation updates, and private editing still has an independent
+		// selection, restore, preedit and focus lifecycle.
+		g.syncScrollbars(state)
+		if err := syncGridEditing(g); err != nil {
+			g.projectionReady = false
+			return err
+		}
+		if g.projectedDisabled != r.control.disabled || g.projectedHelp != r.node.Accessibility.Help {
+			g.host.Update()
+			g.projectedDisabled = r.control.disabled
+			g.projectedHelp = r.node.Accessibility.Help
+		}
+		return nil
+	}
+	// A failed partial sync cannot be reused on a later explicit retry.
+	g.projectionReady = false
 	snap, err := g.model.Snapshot()
 	if err != nil {
 		return err
@@ -649,21 +677,33 @@ func syncGrid(r *record) error {
 		}
 		g.place(w, g.panes[pane], h.Rect, h.Clip, html.EscapeString(h.Title), false, false)
 	}
-	sx := gridMaxX(snap.State)
-	sy := gridMaxY(snap.State)
-	g.horizontal.SetValue(0)
-	if sx > 0 {
-		g.horizontal.SetValue(float32(float64(snap.State.Viewport.ScrollX) / float64(sx)))
-	}
-	g.vertical.SetValue(0)
-	if sy > 0 {
-		g.vertical.SetValue(float32(float64(snap.State.Viewport.ScrollY) / float64(sy)))
-	}
+	g.syncScrollbars(snap.State)
 	if err := syncGridEditing(g); err != nil {
 		return err
 	}
 	g.host.Update()
+	g.projectedDisabled = r.control.disabled
+	g.projectedHelp = r.node.Accessibility.Help
+	g.projectionReady = true
 	return nil
+}
+func (g *gridBinding) syncScrollbars(s virtual.GridState) {
+	x, y := float32(0), float32(0)
+	if maximum := gridMaxX(s); maximum > 0 {
+		x = float32(float64(s.Viewport.ScrollX) / float64(maximum))
+	}
+	if maximum := gridMaxY(s); maximum > 0 {
+		y = float32(float64(s.Viewport.ScrollY) / float64(maximum))
+	}
+	// Native dragging can publish a noncanonical value while its rounded model
+	// pixel is unchanged or the intent is refused. Restore only that slider;
+	// SetValue marks it for rendering even when the supplied value is identical.
+	if g.horizontal.Value != x {
+		g.horizontal.SetValue(x)
+	}
+	if g.vertical.Value != y {
+		g.vertical.SetValue(y)
+	}
 }
 func (g *gridBinding) installTextStyle(w *core.Text) {
 	w.Styler(func(s *styles.Style) {

@@ -14,6 +14,13 @@ rolled back. Extensions must return one attached root widget and own its native
 subtree. Application views describe fresh nodes; callbacks are refreshed while
 widgets retain focus, selection, scroll and renderer resources.
 
+Retained parent comparisons use the native tree's concrete identity. Passing an
+embedded Frame for an accessibility or other host must not cause unchanged
+refreshes to park, reparent, invoke OnAdd or update the managed subtree. The
+original parent argument still reaches Extension.Mount; only the reconciliation
+plan normalizes identity. Real parent, order, theme and descriptor-style changes
+retain their normal update and move behavior.
+
 Each workbench panel is a managed tree with its own ID scope. Dock containers may
 be rebuilt for topology changes, but panel roots are parked in the same native
 scene, then reconciled into their new containers. Removed and incompatible roots

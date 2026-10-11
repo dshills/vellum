@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "run_id": "e2b8932e204d6a64cc392635e4c127e0",
+  "review_scope": "One complete provider review of13 staged implementation/test/spec/report files,3 chunks/calls, no exclusions/skips/truncation. Raw evidence archives excluded; fourteen-file final internal review additionally covers the focused model-identity regression added after the provider call.",
+  "provider_exit_code": 1,
+  "raw_summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "6f7845fa0e30a1ed",
+      "raw_severity": "medium",
+      "disposition": "REFUTED_ON_PUBLIC_ROUTING",
+      "reason": "Generations are local to a model, but compatible(old,next) refuses a DataGrid model-pointer change before retained sync. mountGrid stores that descriptor model in the new binding, whose projectionReady starts false. No production path mutates r.node.Grid outside reconcile. Meaningful same-model source/viewport/selection/cursor changes advance generation; config is fixed, and private editing is synchronized independently. Thus distinct equal-generation models cannot reach the completed-projection reuse branch of the old binding.",
+      "source_refs": [
+        "drivers/cogent/reconcile.go:84",
+        "drivers/cogent/reconcile.go:231",
+        "drivers/cogent/grid.go:132",
+        "drivers/cogent/grid.go:588",
+        "virtual/grid.go:385",
+        "virtual/grid.go:500",
+        "virtual/grid_selection.go:371"
+      ],
+      "validation": "Actual same-node-ID, distinct-model-pointer, equal-generation reconciliation remounts, materializes second-source cells, retires old binding/registration and retains one canonical child. The separate new regression passes race\u00d73. No production or provider-reviewed source/spec/report changed after review.",
+      "test_path": "drivers/cogent/grid_model_identity_review_test.go",
+      "test_sha256": "66e2c2cdb6c1c398d6f95a6f6deb69106b3ac54e20d0555cb2dcd6041ada289e",
+      "qualification_member": "qualification/model-identity-review/qualification.json",
+      "qualification_sha256": "0410cae1de8c877d4cc7963709f60879527e15fadd56a62f9321edb5aba29020"
+    }
+  ],
+  "raw_output_sha256": "99865c320333af746072ca0f15b8dfb22f0f2394b15743bfb0228e058d64355e",
+  "input_scope_sha256": "47a4c6e7e71d377db96eddd1c3d586a66eb26af41c143c482a2be535523eee4e",
+  "process_sha256": "97718a73a8032e96bc5aa06a9deda184e8efaa3a3f16b5c8e3ce5cbb724ece4c",
+  "result": "RESOLVED_WITH_NO_PRODUCTION_CHANGE"
+}

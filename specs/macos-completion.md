@@ -109,6 +109,17 @@ offscreen software pixels. Three interleaved fixed-10k release processes per
 build observe p95 19.55→17.07ms and p99 20.41→18.00ms. The unchanged targets
 remain failed; the complete multi-case P6 campaign remains open.
 
+The [unchanged-refresh checkpoint](../docs/reports/macos-grid-refresh/README.md)
+reuses complete, validated grid projections and fixes embedded native-parent
+identity comparisons. Same-generation refresh retains private editing, styles,
+disabled/help semantics and canonical scrollbars without Cell reads or spurious
+host/cell updates. Built-in projections also refuse borrowed input-stamp drift.
+Original-overlay regressions fail; the final native adapter and portable virtual
+race suites pass, with matching software grid pixels. Three interleaved fixed-10k
+release processes per build observe p95 17.233→14.624 ms and p99
+18.954→15.566 ms. Both 4/6 ms targets still fail. Raster/upload cost and the
+complete multi-case P6 campaign remain open.
+
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded
