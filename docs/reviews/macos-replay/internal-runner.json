@@ -1,0 +1,120 @@
+{
+  "disposition": "approved_scoped_portable_runner_v6",
+  "files": {
+    "/private/tmp/vellum-p9-replay/go.mod": "99ee007066964a9d64df4a52090519338a7c7b08a39654773920c654564ff441",
+    "/private/tmp/vellum-p9-replay/replay/record.go": "1f4baaef08bdeccbab8f9f19356a9b86b7c3465f762e0764cd782c095fb8c99c",
+    "/private/tmp/vellum-p9-replay/replay/record_test.go": "7bd4a70b56a6b299d8a7a8ce5a30ec1e6cb9277be9df44f2f6820f107d6e0f91",
+    "/private/tmp/vellum-p9-replay/replay/runner.go": "f48303fdd715f0c511855ee22573a99959da0caea7def88b2fde61cfc065b761",
+    "/private/tmp/vellum-p9-replay/replay/runner_test.go": "34336d0d2cc7230238e38b3ccef0137bc198f2ffd5f52740da437cf0297a211e"
+  },
+  "findings": [
+    {
+      "id": "runner-residual-erasure",
+      "resolution": "Adopt drain residual only after successful validated nonzero Now inspection. Empty/nonempty cancellation/failure tests preserve last observation and applied prefix.",
+      "severity": "medium",
+      "source": "replay/runner.go:378 and :388",
+      "status": "resolved"
+    },
+    {
+      "id": "runner-uncodable-readiness-time",
+      "resolution": "Now and nonzero NextDeadline require UTC years 1..9999. Invalid years refused; upper valid boundary serialization tested.",
+      "severity": "medium",
+      "source": "replay/runner.go:39",
+      "status": "resolved"
+    },
+    {
+      "id": "runner-report-budget-contract",
+      "resolution": "MaxCheckpointBytes bounds sum of compact checkpoint encodings including identities; explicitly excludes full Result wrapper/separators and bounded scalar metadata. Exact boundary test demonstrates this scope.",
+      "severity": "medium",
+      "source": "replay/runner.go:98",
+      "status": "resolved_by_explicit_prepublication_contract_change"
+    },
+    {
+      "id": "runner-padded-capture-retention",
+      "resolution": "Compact and retain tight make(len)+copy payload. Intermediate v5 Compact buffer retained raw-sized capacity; v6 releases it. Independent v4/v5 red and v6 twenty-run green proofs preserved.",
+      "severity": "medium",
+      "source": "replay/runner.go:337",
+      "status": "resolved"
+    }
+  ],
+  "historical_red_evidence": [
+    {
+      "classification": "preserved failing historical regression; not final acceptance",
+      "path": "/private/tmp/vellum-p9-runner-review/acceptance/review-red-proof-v4.json",
+      "sha256": "faf5592a83661e014685a9050fc2f0340ffa968f8dce5c73f86ac5bf354f58f0"
+    },
+    {
+      "classification": "preserved failing historical regression; not final acceptance",
+      "path": "/private/tmp/vellum-p9-runner-review-v5/acceptance/review-capacity-proof-v5.json",
+      "sha256": "07cdee1e1a7c2341c65e7eb76ab1db3eed74ad3ff95a91561530cb732f008590"
+    }
+  ],
+  "independent_checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "-timeout=60s",
+        "./replay",
+        "-run",
+        "^TestReview"
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-runner-review-v6/acceptance/review-regressions-green-v6.log",
+      "log_sha256": "c8c3c9da32a87fff16dbf54c4681b5f2e68da734985e109edeb13182ce513ca5",
+      "source": "/private/tmp/vellum-p9-runner-review-v6/replay/review_regression_test.go",
+      "source_sha256": "989235a250b927b018186c0852790db92d14e9d7a53140a1a6b42ae2d2e38290",
+      "working_directory": "/private/tmp/vellum-p9-runner-review-v6"
+    }
+  ],
+  "limitations": [
+    "Fake protocol backend does not qualify actual UI routing, mounted target incarnation/lifetimes, layout/images or complete P9 workloads.",
+    "Backend construction/closure and its retained storage remain caller-owned. No rollback/reset is implied.",
+    "Callbacks must honor context and budgets; Runner cannot preempt arbitrary blocking backend callbacks.",
+    "MaxCheckpointBytes is compact checkpoint encoding accounting, not byte-exact heap or whole Result serialization accounting; bounded transient encoding buffers and object/slice overhead are separate."
+  ],
+  "qualification": {
+    "all_five_current_and_isolated_source_inputs_match": true,
+    "all_logs_match": true,
+    "path": "/private/tmp/vellum-p9-replay/acceptance/qualification-v6.json",
+    "sha256": "3e66ac40135fa072eb9554eb26b5a2a208f308db409c23757455efc3a5a10823"
+  },
+  "remaining_actionable_findings": [],
+  "reported_checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "./..."
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "exit_code": 0
+    }
+  ],
+  "reported_logs": {
+    "/private/tmp/vellum-p9-replay/acceptance/runner-frozen-race20-v6.log": "be12a083fb01efc439d06a7df7b239eb6c93862e1037e8253f007a2af086ea78",
+    "/private/tmp/vellum-p9-replay/acceptance/runner-frozen-vet-v6.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "reviewed_invariants": [
+    "Whole bounded record validation/detachment before backend callbacks; owned record and checkpoint identities/payloads.",
+    "Self identity, typed-nil refusal and atomic busy gate prevent copied/concurrent/reentrant use; deferred busy release survives panic/Goexit unwinding.",
+    "One explicit UTC scheduling clock; manifest checks, steps and captures do not advance time. Worker selection/advance remain explicit operations.",
+    "Ready/running/awaiting/due/blocked remain observable; future-only timers are current-instant idle without implicit execution.",
+    "Shared operation/dispatch budget, bounded step quantum and validated partial progress preserve prefix accounting. Error residual is last successful inspection, not a new state.",
+    "Raw per-capture admission, capture count and compact checkpoint retention bounded separately; padded raw backing capacity is not retained."
+  ],
+  "reviewer": "mac_history_review",
+  "schema_version": 1,
+  "scope": "Read-only Record/Runner source, corrected retention/time/residual contract, frozen qualification graph and isolated adversarial regressions. No GUI, Prism, canonical mutations or concrete managed driver acceptance."
+}

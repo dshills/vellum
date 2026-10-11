@@ -1,0 +1,210 @@
+{
+  "result": "APPROVED",
+  "scope": "Read-only independent review of all five exact stage32 candidate Go files, their full stage31 deltas, admission/lock/lifetime call sites, historical red fixtures, final qualifier/logs and handoff. Independently verified5836 frozen inputs and reproduced all five patch outputs with fuzz0 in detached temporary files. No GUI, test rerun, Prism, Git, integration or canonical edits.",
+  "qualification": {
+    "path": "/private/tmp/vellum-p9-native-corrections/qualification.json",
+    "sha256": "2e58b0bbb0408376c71cef9f17eb90616a7f5b8ad20b46fc86bb6626264071e8"
+  },
+  "source_handoff": {
+    "path": "/private/tmp/vellum-p9-native-corrections/source-handoff.json",
+    "sha256": "a20674fd6747e76b977309c9f0aac2b2bc73c1f699fadcd0dadc9d560a041ba4"
+  },
+  "candidate_files": {
+    "core/events.go": "5913445df4fba375313828e5bbd83ae61b2c0d2a9c9fd56ca20d5a0240ee1901",
+    "core/manual_window.go": "1f3eb4ec53458961edc87998f262116b0444d41a5fb2d2995423b5e764dce06f",
+    "core/replay_corrections_vellum_test.go": "a74636156b5c6dd775680571f7b092bb65a8d4861a22e9a1b4b91c0aaff567d7",
+    "text/textcore/outputbuffer.go": "f850d80a2e3b28238a2742cf4b35ee6c39fce137841ea787dbf0eeaf5978489a",
+    "text/textcore/outputbuffer_vellum_test.go": "a20731e039ea0f929c489fc55b86567f6a168f22f91540880acf6c584b85dd43"
+  },
+  "patch": {
+    "path": "/private/tmp/vellum-p9-native-corrections/0032-replay-native-corrections-DRAFT.patch",
+    "sha256": "593be2cc9ad3eec49eadce6ba0e4428971278f4d55f6243ed201937d8c1c41f9",
+    "manifest_path": "/private/tmp/vellum-p9-native-corrections/patch32-manifest.json",
+    "manifest_sha256": "cbd927ef413cc8f43b1874c0f3b4ea3b3a74c69a8077c0139c469b1282a034ef"
+  },
+  "mechanical": {
+    "path": "/private/tmp/vellum-p9-native-corrections-review/mechanical.json",
+    "sha256": "df3c8da8fee57908cfa5e9901d2214d18991b8b86d6a0455a24751065c180498",
+    "frozen_inputs_verified": 5836,
+    "independent_patch_exit": 0,
+    "independent_patch_log": "/private/tmp/vellum-p9-native-corrections-review/independent-patch-reproduction.log",
+    "independent_patch_log_sha256": "ddd505cdd4165a10159e8591f9ef4d836ab9fcbe14ed39ef4b7596aeeb6c71db"
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "eee6829bcebd28d2",
+      "disposition": "FIXED",
+      "evidence": "Timer admission captures Scene/RC/Widget; default repeatClickTimed acquires captured RC before current target, scene liveness/context and widget visibility reads. Deferred sceneUpdating reset precedes deferred RC unlock, including callback panic/Goexit. Manual path retains existing originating event-owner serialization. Actual production method tests assert callback sees lock/updating, terminal flag/lock cleanup and no rearm."
+    },
+    {
+      "id": "independent-captured-owner",
+      "disposition": "FIXED",
+      "evidence": "Added widget.Scene==capturedScene guard refuses a retained target moved via public SetScene to another owner. Deleted/replaced/moved tests mutate while old RC is held, join callback before assertions/restoration and prove no Click/rearm."
+    },
+    {
+      "id": "43214136e97b4671",
+      "disposition": "FIXED",
+      "evidence": "RequestFrame and Frame comma-ok check private RequestPaint extension, returning ErrManualUnsupported before any enqueue/step for a Window wrapper retaining the full public Window/manual inspection contract while hiding RequestPaint. Snapshot comparison proves admission does not mutate the controller."
+    },
+    {
+      "id": "fa12649b281e1b32",
+      "disposition": "FIXED",
+      "evidence": "Invalid nil Lines now panics explicitly before BeginAmbientWork/reader/batch allocation. Fixtures prove no read/temporary batch/timer, retained checked manual ambient refusal and unchanged ordinary reader output/EOF cleanup."
+    },
+    {
+      "id": "762560ec3e480805",
+      "disposition": "REFUTED_CONCRETE_TRANSPORT_CONTRACT",
+      "evidence": "Deque.SendDeferred only returns error from prepare; this exact timer prepare always returns nil error. Every admitted state1 timer gets its origin node, and canceled queued state4 retains credit until node retirement; no independent capacity/error path drops a transitioned timer node."
+    }
+  ],
+  "checks_observed": [
+    {
+      "name": "corrections-race20",
+      "argv": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/vellum-p9-native-corrections/go.mod",
+        "-overlay=/private/tmp/vellum-p9-native-corrections/corrections-overlay.json",
+        "-tags=offscreen",
+        "-race",
+        "./core",
+        "./text/textcore",
+        "-run",
+        "TestVellumDefaultRepeatClick|TestVellumManualRequestFrameUnsupported|TestVellumOutputBuffer",
+        "-count=20",
+        "-timeout=120s"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "seconds": 19.749444374989253,
+      "log": "/private/tmp/vellum-p9-native-corrections/corrections-race20.txt",
+      "log_sha256": "7a96f18cfe256029b515381b604babbcbe128b1bcb8aac5fd003a2d64075c50e"
+    },
+    {
+      "name": "owned-regressions",
+      "argv": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/vellum-p9-native-corrections/go.mod",
+        "-overlay=/private/tmp/vellum-p9-native-corrections/corrections-overlay.json",
+        "-tags=offscreen",
+        "-race",
+        "./events",
+        "./core",
+        "./text/textcore",
+        "./text/lines",
+        "-run",
+        "TestVellumComposition|TestVellumNativeCommit|TestVellumDeferred|TestVellumEventBoundary|TestVellumField|TestVellumEditingSnapshot|TestVellumEditor|TestVellumNativeEditor|TestContractsExact|TestVellumManual|TestVellumSourceClock",
+        "-count=1",
+        "-timeout=120s"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "seconds": 5.682751707994612,
+      "log": "/private/tmp/vellum-p9-native-corrections/owned-regressions.txt",
+      "log_sha256": "99e489290046c9b86475a8e1c7e583eb8f9f2e0039933a879505b29eae42f4fd"
+    },
+    {
+      "name": "vet-baseline",
+      "argv": [
+        "go",
+        "vet",
+        "-modfile=/private/tmp/vellum-p9-native-corrections/go.mod",
+        "-tags=offscreen",
+        "./core",
+        "./events",
+        "./system",
+        "./system/driver/offscreen",
+        "./text/lines",
+        "./text/textcore"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream",
+      "exit_code": 1,
+      "seconds": 1.8686621660017408,
+      "log": "/private/tmp/vellum-p9-native-corrections/vet-baseline.txt",
+      "log_sha256": "0732eedc54071ab2e45c72f7984c8591e38d571820c4fbe3b03b94421db7dd9d"
+    },
+    {
+      "name": "vet-current",
+      "argv": [
+        "go",
+        "vet",
+        "-modfile=/private/tmp/vellum-p9-native-corrections/go.mod",
+        "-overlay=/private/tmp/vellum-p9-native-corrections/corrections-overlay.json",
+        "-tags=offscreen",
+        "./core",
+        "./events",
+        "./system",
+        "./system/driver/offscreen",
+        "./text/lines",
+        "./text/textcore"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream",
+      "exit_code": 1,
+      "seconds": 3.0872905839933082,
+      "log": "/private/tmp/vellum-p9-native-corrections/vet-current.txt",
+      "log_sha256": "0732eedc54071ab2e45c72f7984c8591e38d571820c4fbe3b03b94421db7dd9d"
+    },
+    {
+      "name": "default-build",
+      "argv": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/vellum-p9-native-corrections/go.mod",
+        "-overlay=/private/tmp/vellum-p9-native-corrections/corrections-overlay.json",
+        "./core",
+        "./events",
+        "./system/driver",
+        "./text/textcore",
+        "./text/lines",
+        "-run",
+        "^TestVellumSourceClock|^TestVellumManualLines|^TestVellumOutputBuffer",
+        "-count=1",
+        "-timeout=120s"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "seconds": 7.298624916991685,
+      "log": "/private/tmp/vellum-p9-native-corrections/default-build.txt",
+      "log_sha256": "886225db8fe5e0022652d63f1cb9243bd9368f843b5cad70023e921c8c667bfb"
+    },
+    {
+      "name": "checked-clock-consumer",
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-tags=offscreen",
+        "-overlay=/private/tmp/vellum-p9-native-corrections/corrections-overlay.json",
+        "-race",
+        "./...",
+        "-count=20",
+        "-timeout=90s"
+      ],
+      "cwd": "/private/tmp/vellum-p9-native-corrections/consumer",
+      "exit_code": 0,
+      "seconds": 4.622572542022681,
+      "log": "/private/tmp/vellum-p9-native-corrections/checked-clock-consumer.txt",
+      "log_sha256": "2b0b5ad1e58687eb3f4e801413b0265f4b57d4d6237c1316797535971d1b1d8d"
+    }
+  ],
+  "vet_disposition": {
+    "baseline_exit": 1,
+    "current_exit": 1,
+    "raw_logs_byte_identical": true,
+    "normalized_existing_diagnostics": 157,
+    "result": "No added diagnostics; stock upstream vet remains failing and is not described as vet0."
+  },
+  "historical_red": {
+    "path": "/private/tmp/vellum-p9-native-corrections/red-proof.json",
+    "sha256": "be73daaf9f137173cd3b2d8ad7ce636ee2b62c496ed708affb200df3f442d56f",
+    "scope": "prior ownership/frame/nil-buffer baseline refusals reproduced; moved-target guard added after these red runs"
+  },
+  "limits": [
+    "Repeat baseline failure uses labeled API-only extraction shim; RequestFrame/OutputBuffer baseline files are exact stage31. Selected red bodies are unchanged, but moved-target test was added later and only final qualification covers it.",
+    "Default repeat ownership tests call the exact production callback method without wall timers/GUI loops. No wall timer latency, desktop/Cocoa, GPU or arbitrary sibling Destroy guarantee.",
+    "RequestPaint extension refusal is narrow; other existing manual inspection assertions unchanged.",
+    "Full integrated pinned preparation and workload/runtime/SDK qualification remain parent-owned."
+  ]
+}

@@ -1,0 +1,1670 @@
+--- a/core/completer.go
++++ b/core/completer.go
+@@ -53,9 +53,11 @@
+ 	// stage is the popup [Stage] associated with the [Complete].
+ 	stage *Stage
+ 
+-	delayTimer *time.Timer
+-	delayMu    sync.Mutex
+-	showMu     sync.Mutex
++	delayTimer      ManualTimer
++	delayGeneration uint64
++	waitDuration    *time.Duration
++	delayMu         sync.Mutex
++	showMu          sync.Mutex
+ }
+ 
+ // NewComplete returns a new [Complete] object. It does not show it; see [Complete.Show].
+@@ -77,31 +79,50 @@
+ // After delay, Calls ShowNow, which calls MatchFunc
+ // to get a list of completions and builds the completion popup menu
+ func (c *Complete) Show(ctx Widget, pos image.Point, text string) {
+-	if c.MatchFunc == nil {
++	if c.MatchFunc == nil || ctx == nil || ctx.AsTree().This == nil {
+ 		return
+ 	}
+ 	wait := TimingSettings.CompleteWaitDuration
++	if c.waitDuration != nil {
++		wait = *c.waitDuration
++	}
+ 	if c.stage != nil {
+ 		c.Cancel()
+ 	}
+ 	if wait == 0 {
++		c.Cancel()
+ 		c.showNow(ctx, pos, text)
+ 		return
+ 	}
+-	if !ctx.AsWidget().Scene.allowWallTimer("completion") {
+-		return
+-	}
++	scene := ctx.AsWidget().Scene
+ 	c.delayMu.Lock()
+ 	if c.delayTimer != nil {
+ 		c.delayTimer.Stop()
+ 	}
+-	c.delayTimer = time.AfterFunc(wait,
+-		func() {
++	c.delayGeneration++
++	generation := c.delayGeneration
++	callback := func() {
++		c.delayMu.Lock()
++		if generation != c.delayGeneration {
++			c.delayMu.Unlock()
++			return
++		}
++		c.delayTimer = nil
++		c.delayMu.Unlock()
++		if ctx.AsTree().This == nil || ctx.AsWidget().Scene != scene || scene == nil || scene.This == nil {
++			return
++		}
++		if scene.ManualExecution() {
++			c.showNow(ctx, pos, text)
++		} else {
+ 			c.showNowAsync(ctx, pos, text)
+-			c.delayMu.Lock()
+-			c.delayTimer = nil
+-			c.delayMu.Unlock()
+-		})
++		}
++	}
++	if scene.ManualExecution() {
++		c.delayTimer = scene.afterEvent(wait, callback)
++	} else {
++		c.delayTimer = time.AfterFunc(wait, callback)
++	}
+ 	c.delayMu.Unlock()
+ }
+ 
+@@ -184,8 +205,16 @@
+ // Call when new events nullify prior completions.
+ // Returns true if canceled.
+ func (c *Complete) Cancel() bool {
++	c.delayMu.Lock()
++	pending := c.delayTimer != nil
++	if pending {
++		c.delayTimer.Stop()
++		c.delayTimer = nil
++	}
++	c.delayGeneration++
++	c.delayMu.Unlock()
+ 	if c.stage == nil {
+-		return false
++		return pending
+ 	}
+ 	st := c.stage
+ 	c.stage = nil
+@@ -251,3 +280,13 @@
+ 	ed.NewText = completion
+ 	return ed
+ }
++
++// SetWaitDuration selects an explicit per-completer delay without changing
++// process-global timing settings. Zero shows immediately; negatives refuse.
++func (c *Complete) SetWaitDuration(duration time.Duration) error {
++	if c == nil || duration < 0 {
++		return ErrManualConfig
++	}
++	c.waitDuration = &duration
++	return nil
++}
+--- a/core/manual_timer.go
++++ b/core/manual_timer.go
+@@ -165,3 +165,50 @@
+ 	sc.stopManualTimers()
+ 	sc.Frame.Destroy()
+ }
++
++// ManualExecution reports whether this scene has the explicit manual owner.
++// It does not switch driver mode or create a timer.
++func (sc *Scene) ManualExecution() bool {
++	if sc == nil {
++		return false
++	}
++	rc := sc.renderContext()
++	return rc != nil && rc.manual != nil
++}
++
++// ManualAfterFunc admits a bounded callback to this scene's originating FIFO.
++// Clock callbacks only enqueue; the callback itself runs during ManualWindow.Step.
++// This API refuses normal mode rather than silently creating a wall timer.
++func (sc *Scene) ManualAfterFunc(delay time.Duration, callback func()) (ManualTimer, error) {
++	if !sc.ManualExecution() {
++		return nil, ErrManualUnsupported
++	}
++	m := sc.renderContext().manual
++	if callback == nil || delay < 0 {
++		return nil, ErrManualConfig
++	}
++	if err := m.lifetime.Err(); err != nil {
++		return nil, err
++	}
++	timer := sc.afterEvent(delay, callback)
++	if timer != nil {
++		return timer, nil
++	}
++	m.mu.Lock()
++	err := m.failure
++	m.mu.Unlock()
++	if err == nil {
++		err = m.lifetime.Err()
++	}
++	if err == nil {
++		err = ErrManualConfig
++	}
++	return nil, err
++}
++
++// ManualFailure records a checked scheduling refusal in the manual controller.
++func (sc *Scene) ManualFailure(err error) {
++	if err != nil && sc.ManualExecution() {
++		sc.renderContext().manual.fail(err)
++	}
++}
+--- a/core/manual_window.go
++++ b/core/manual_window.go
+@@ -397,6 +397,20 @@
+ 	}
+ 	return result, nil
+ }
++
++// RequestFrame coalesces a paint request without dispatching an event. Explicit
++// Step owns all subsequent callback/frame work and accounts its event budget.
++func (m *ManualWindow) RequestFrame(ctx context.Context) error {
++	if err := m.enter(ctx, false); err != nil {
++		return err
++	}
++	defer m.leave()
++	if m.window.SystemWindow.IsClosed() {
++		return ErrManualClosed
++	}
++	m.window.SystemWindow.(interface{ RequestPaint() }).RequestPaint()
++	return nil
++}
+ func (m *ManualWindow) Frame(ctx context.Context) (ManualStepResult, error) {
+ 	if err := m.enter(ctx, false); err != nil {
+ 		return ManualStepResult{}, err
+--- a/core/popupstage.go
++++ b/core/popupstage.go
+@@ -159,15 +159,18 @@
+ 	sc.showIter = 0
+ 
+ 	if st.Timeout > 0 {
+-		if !st.Scene.allowWallTimer("popup timeout") {
+-			return st
+-		}
+-		time.AfterFunc(st.Timeout, func() {
+-			if st.Main == nil {
++		scene := st.Scene
++		callback := func() {
++			if st.Main == nil || st.Scene != scene || scene.This == nil {
+ 				return
+ 			}
+ 			st.popups.deleteStage(st)
+-		})
++		}
++		if scene.ManualExecution() {
++			scene.afterEvent(st.Timeout, callback)
++		} else {
++			time.AfterFunc(st.Timeout, callback)
++		}
+ 	}
+ 
+ 	return st
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -779,7 +779,7 @@
+ 	if w.onDemand() && w.flags.HasFlag(winGotFocus) && w.isVisible() && top.Sprites.HasActive() {
+ 		w.requestPaintAfter(spriteUpdateTime)
+ 	}
+-	if w.flags.HasFlag(winGotFocus) && w.now().Sub(w.lastSpriteDraw) > spriteUpdateTime {
++	if elapsed := w.now().Sub(w.lastSpriteDraw); w.flags.HasFlag(winGotFocus) && (elapsed > spriteUpdateTime || w.manual != nil && elapsed == spriteUpdateTime) {
+ 		spriteMods = true
+ 	}
+ 
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -108,6 +108,7 @@
+ 	// to trigger Show event and other steps at start of first show
+ 	showIter             int
+ 	manualLastAutoScroll time.Time
++	manualCursors        map[string]tree.Node
+ 
+ 	// directRenders are widgets that render directly to the [RenderWindow]
+ 	// instead of rendering into the Scene Painter.
+--- a/core/textcursor.go
++++ b/core/textcursor.go
+@@ -30,6 +30,16 @@
+ 	}
+ 	sc.requestPaint()
+ 	ms := sc.Stage.Main
++	manual := sc.ManualExecution()
++	if manual {
++		owner := ms.Scene
++		if owner.manualCursors == nil {
++			owner.manualCursors = make(map[string]tree.Node)
++		}
++		local := owner.manualCursors[name]
++		lastW = &local
++		defer func() { owner.manualCursors[name] = local }()
++	}
+ 	ms.Sprites.Lock()
+ 	defer ms.Sprites.Unlock()
+ 
+@@ -38,7 +48,7 @@
+ 		sp.Active = true
+ 		sp.Properties["turnOn"] = true
+ 		sp.Properties["on"] = true
+-		sp.Properties["lastSwitch"] = time.Now()
++		sp.Properties["lastSwitch"] = sc.Now()
+ 	}
+ 
+ 	if !on || *lastW == w.This {
+@@ -64,10 +74,10 @@
+ 		if !turnOn {
+ 			isOn := sp.Properties["on"].(bool)
+ 			lastSwitch := sp.Properties["lastSwitch"].(time.Time)
+-			if TheApp.Platform() != system.Offscreen && TimingSettings.CursorBlinkTime > 0 && time.Since(lastSwitch) > TimingSettings.CursorBlinkTime {
++			if (manual || TheApp.Platform() != system.Offscreen) && TimingSettings.CursorBlinkTime > 0 && sc.Now().Sub(lastSwitch) >= TimingSettings.CursorBlinkTime {
+ 				isOn = !isOn
+ 				sp.Properties["on"] = isOn
+-				sp.Properties["lastSwitch"] = time.Now()
++				sp.Properties["lastSwitch"] = sc.Now()
+ 			}
+ 			if !isOn {
+ 				return
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -456,6 +456,7 @@
+ }
+ 
+ func (tf *TextField) Destroy() {
++	tf.cancelComplete()
+ 	tf.stopCursor()
+ 	tf.Frame.Destroy()
+ }
+@@ -1132,6 +1133,7 @@
+ // SetCompleter sets completion functions so that completions will
+ // automatically be offered as the user types.
+ func (tf *TextField) SetCompleter(data any, matchFun complete.MatchFunc, editFun complete.EditFunc) {
++	tf.cancelComplete()
+ 	if matchFun == nil || editFun == nil {
+ 		tf.complete = nil
+ 		return
+--- /dev/null
++++ b/core/timer_vellum_test.go
+@@ -0,0 +1,185 @@
++//go:build offscreen
++
++package core
++
++import (
++	"bytes"
++	"cogentcore.org/core/text/parse/complete"
++	"context"
++	"errors"
++	"image"
++	"testing"
++	"time"
++)
++
++func TestVellumManualRequestFrameDoesNotDispatch(t *testing.T) {
++	m, _, c := manualFixture(t, nil)
++	drainManual(t, m)
++	before, err := m.Snapshot(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	for range 3 {
++		if err := m.RequestFrame(context.Background()); err != nil {
++			t.Fatal(err)
++		}
++	}
++	after, err := m.Snapshot(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	if after.Frames != before.Frames || after.Events != before.Events || !after.ReadyPaint || !after.Now.Equal(c.Now()) {
++		t.Fatalf("request dispatched %+v -> %+v", before, after)
++	}
++	result, err := m.Step(context.Background(), 1)
++	if err != nil || result.Frames != 1 || result.Events != 1 {
++		t.Fatalf("one explicit frame %+v %v", result, err)
++	}
++}
++func TestVellumManualCompletionDelayedResetCancel(t *testing.T) {
++	var field *TextField
++	m, _, clock := manualFixture(t, func(b *Body) { field = NewTextField(b).SetText("A") })
++	drainManual(t, m)
++	completion := NewComplete()
++	var matched []string
++	completion.MatchFunc = func(_ any, s string, _, _ int) complete.Matches {
++		matched = append(matched, s)
++		return complete.Matches{Seed: s, Matches: complete.Completions{{Text: s + "-option"}}}
++	}
++	wait := 200 * time.Millisecond
++	if err := completion.SetWaitDuration(wait); err != nil {
++		t.Fatal(err)
++	}
++	completion.Show(field, image.Pt(20, 20), "old")
++	clock.Advance(wait / 2)
++	completion.Show(field, image.Pt(20, 20), "new")
++	clock.Advance(wait / 2)
++	drainManual(t, m)
++	if len(matched) != 0 || !completion.IsAboutToShow() {
++		t.Fatal("reset fired old completion", matched)
++	}
++	clock.Advance(wait)
++	if len(matched) != 0 {
++		t.Fatal("clock invoked widget callback")
++	}
++	drainManual(t, m)
++	if len(matched) != 1 || matched[0] != "new" || completion.stage == nil || completion.IsAboutToShow() {
++		t.Fatal("completion not shown exactly once", matched)
++	}
++	completion.Cancel()
++	completion.Show(field, image.Pt(20, 20), "cancel")
++	clock.Advance(wait)
++	if !completion.Cancel() {
++		t.Fatal("queued cancellation not acknowledged")
++	}
++	drainManual(t, m)
++	if len(matched) != 1 {
++		t.Fatal("canceled completion shown", matched)
++	}
++}
++func TestVellumManualSnackbarTimeoutAndRetirement(t *testing.T) {
++	m, body, clock := manualFixture(t, nil)
++	drainManual(t, m)
++	first := NewBody("snackbar-one").AddSnackbarText("One").NewSnackbar(body).SetTimeout(time.Second).Run()
++	drainManual(t, m)
++	if first.Main == nil {
++		t.Fatal("snackbar not mounted")
++	}
++	clock.Advance(time.Second)
++	if first.Main == nil {
++		t.Fatal("clock retired popup outside origin")
++	}
++	drainManual(t, m)
++	if first.Main != nil {
++		t.Fatal("explicit step did not expire snackbar")
++	}
++	second := NewBody("snackbar-two").AddSnackbarText("Two").NewSnackbar(body).SetTimeout(time.Second).Run()
++	drainManual(t, m)
++	if !second.ClosePopup() {
++		t.Fatal("manual popup close refused")
++	}
++	clock.Advance(time.Second)
++	drainManual(t, m)
++	snap, err := m.Snapshot(context.Background())
++	if err != nil || snap.Failure != nil || snap.Timers != 0 {
++		t.Fatalf("retirement %+v %v", snap, err)
++	}
++}
++func TestVellumManualFieldCursorExplicitBlink(t *testing.T) {
++	var field *TextField
++	m, _, clock := manualFixture(t, func(b *Body) { field = NewTextField(b).SetText("A") })
++	drainManual(t, m)
++	clickManual(t, m, center(field))
++	first, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	interval := TimingSettings.CursorBlinkTime
++	if interval <= 0 {
++		t.Fatal("fixture needs existing positive blink interval")
++	}
++	clock.Advance(interval)
++	if err = m.RequestFrame(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	drainManual(t, m)
++	second, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	if bytes.Equal(first.Pix, second.Pix) {
++		t.Fatal("manual cursor did not blink at virtual deadline")
++	}
++	clock.Advance(interval)
++	drainManual(t, m)
++	third, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	if !bytes.Equal(first.Pix, third.Pix) {
++		t.Fatal("manual cursor did not return on explicit second deadline")
++	}
++	if err = m.Close(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	if err = m.RequestFrame(context.Background()); !errors.Is(err, ErrManualClosed) {
++		t.Fatal("closed frame request", err)
++	}
++}
++func TestVellumManualCompletionFailureAndLifetime(t *testing.T) {
++	m, b, c := manualFixture(t, nil)
++	drainManual(t, m)
++	field := NewTextField(b).SetText("A")
++	drainManual(t, m)
++	comp := NewComplete()
++	if err := comp.SetWaitDuration(time.Second); err != nil {
++		t.Fatal(err)
++	}
++	calls := 0
++	comp.MatchFunc = func(_ any, s string, _, _ int) complete.Matches { calls++; return complete.Matches{} }
++	comp.Show(field, image.Point{}, "retired")
++	if err := m.Close(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	c.Advance(time.Second)
++	if calls != 0 {
++		t.Fatal("closed completion callback")
++	}
++	m, b, c = manualFixture(t, nil)
++	drainManual(t, m)
++	field = NewTextField(b)
++	drainManual(t, m)
++	comp = NewComplete()
++	if err := comp.SetWaitDuration(time.Second); err != nil {
++		t.Fatal(err)
++	}
++	comp.MatchFunc = func(any, string, int, int) complete.Matches { panic(maliciousPanic{}) }
++	comp.Show(field, image.Point{}, "fault")
++	c.Advance(time.Second)
++	if _, err := m.Step(context.Background(), 1); !errors.Is(err, ErrManualCallback) {
++		t.Fatalf("completion panic %v", err)
++	}
++	if err := m.Close(context.Background()); err != nil && !errors.Is(err, ErrManualCallback) {
++		t.Fatal(err)
++	}
++}
+--- a/text/lines/api.go
++++ b/text/lines/api.go
+@@ -70,6 +70,10 @@
+ func (ls *Lines) NewView(width int) int {
+ 	ls.Lock()
+ 	defer ls.Unlock()
++	if ls.manualExecution != nil {
++		ls.manualExecution.Failure(ErrManualViews)
++		return -1
++	}
+ 	_, vid := ls.newView(width)
+ 	return vid
+ }
+@@ -83,6 +87,11 @@
+ 		ls.commitNativeComposition()
+ 	}
+ 	defer ls.Unlock()
++	if ls.manualExecution != nil && ls.manualView == vid {
++		ls.stopDelayedReMarkup()
++		ls.manualExecution = nil
++		ls.manualView = -1
++	}
+ 	ls.deleteView(vid)
+ }
+ 
+@@ -203,6 +212,8 @@
+ 	ls.sendClose()
+ 	ls.Lock()
+ 	ls.stopDelayedReMarkup()
++	ls.manualExecution = nil
++	ls.manualView = -1
+ 	ls.views = make(map[int]*view)
+ 	ls.nativeRevision++
+ 	ls.nativeComposition = nil
+@@ -489,9 +500,7 @@
+ 	st, _ = ls.validCharPos(st)
+ 	ed, _ = ls.validCharPos(ed)
+ 	tbe := ls.deleteText(st, ed)
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.Unlock()
+ 	ls.sendInput()
+ 	return tbe
+@@ -509,9 +518,7 @@
+ 	st, _ = ls.validCharPos(st)
+ 	ed, _ = ls.validCharPos(ed)
+ 	tbe := ls.deleteTextRect(st, ed)
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.Unlock()
+ 	ls.sendInput()
+ 	return tbe
+@@ -527,9 +534,7 @@
+ 	// positions can be off based on lock acquisition dynamics
+ 	st, _ = ls.validCharPos(st)
+ 	tbe := ls.insertText(st, []rune(string(text)))
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.Unlock()
+ 	ls.sendInput()
+ 	return tbe
+@@ -545,9 +550,7 @@
+ 	// positions can be off based on lock acquisition dynamics
+ 	st, _ = ls.validCharPos(st)
+ 	tbe := ls.insertText(st, text)
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.Unlock()
+ 	ls.sendInput()
+ 	return tbe
+@@ -563,9 +566,7 @@
+ 	// positions can be off based on lock acquisition dynamics
+ 	st, _ = ls.validCharPos(st)
+ 	tbe := ls.insertTextLines(st, text)
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.Unlock()
+ 	ls.sendInput()
+ 	return tbe
+@@ -580,9 +581,7 @@
+ 	ls.Lock()
+ 	ls.fileModCheck()
+ 	tbe = ls.insertTextRect(tbe)
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.Unlock()
+ 	ls.sendInput()
+ 	return tbe
+@@ -599,9 +598,7 @@
+ 	ls.Lock()
+ 	ls.fileModCheck()
+ 	tbe := ls.replaceText(delSt, delEd, insPos, insTxt, matchCase)
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.Unlock()
+ 	ls.sendInput()
+ 	return tbe
+@@ -614,9 +611,7 @@
+ 	ls.Lock()
+ 	ls.fileModCheck()
+ 	tbe := ls.appendTextMarkup(text, markup)
+-	if tbe != nil && ls.Autosave {
+-		go ls.autoSave()
+-	}
++	ls.startAutoSave(tbe)
+ 	ls.collectLinks()
+ 	ls.layoutViews()
+ 	ls.Unlock()
+@@ -853,7 +848,7 @@
+ 	st.Char = rng.Start
+ 	ed := pos
+ 	ed.Char = rng.End
+-	return textpos.NewRegionPos(st, ed)
++	return ls.newTimedRegion(st, ed)
+ }
+ 
+ // WordBefore returns the word before the given source position.
+@@ -988,7 +983,7 @@
+ 	}
+ 
+ 	tr := lexer.NewLex(token.KeyToken{Token: tag}, st, ed)
+-	tr.Time.Now()
++	tr.Time.SetTime(ls.now())
+ 	if len(ls.tags[ln]) == 0 {
+ 		ls.tags[ln] = append(ls.tags[ln], tr)
+ 	} else {
+--- a/text/lines/events.go
++++ b/text/lines/events.go
+@@ -54,6 +54,7 @@
+ func (ls *Lines) sendChange() {
+ 	e := &events.Base{Typ: events.Change}
+ 	e.Init()
++	ls.stampEvent(e)
+ 	for _, vw := range ls.views {
+ 		vw.listeners.Call(e)
+ 	}
+@@ -70,6 +71,7 @@
+ 	}
+ 	e := &events.Base{Typ: events.Input}
+ 	e.Init()
++	ls.stampEvent(e)
+ 	for _, vw := range ls.views {
+ 		vw.listeners.Call(e)
+ 	}
+@@ -81,6 +83,7 @@
+ func (ls *Lines) sendClose() {
+ 	e := &events.Base{Typ: events.Close}
+ 	e.Init()
++	ls.stampEvent(e)
+ 	for _, vw := range ls.views {
+ 		vw.listeners.Call(e)
+ 	}
+--- a/text/lines/lines.go
++++ b/text/lines/lines.go
+@@ -150,7 +150,12 @@
+ 	markupEdits []*textpos.Edit
+ 
+ 	// markupDelayTimer is the markup delay timer.
+-	markupDelayTimer *time.Timer
++	markupDelayTimer Timer
++	markupGeneration uint64
++	markupActive     int
++	manualExecution  *ManualExecution
++	ambientActive    int
++	manualView       int
+ 
+ 	// markupDelayMu is the mutex for updating the markup delay timer.
+ 	markupDelayMu sync.Mutex
+@@ -410,7 +415,7 @@
+ 		log.Printf("lines.region: starting position must be less than ending!: st: %v, ed: %v\n", st, ed)
+ 		return nil
+ 	}
+-	tbe := &textpos.Edit{Region: textpos.NewRegionPos(st, ed)}
++	tbe := &textpos.Edit{Region: ls.newTimedRegion(st, ed)}
+ 	if ed.Line == st.Line {
+ 		sz := ed.Char - st.Char
+ 		tbe.Text = make([][]rune, 1)
+@@ -459,7 +464,7 @@
+ 		log.Printf("core.Buf.RegionRect: starting position must be less than ending!: st: %v, ed: %v\n", st, ed)
+ 		return nil
+ 	}
+-	tbe := &textpos.Edit{Region: textpos.NewRegionPos(st, ed)}
++	tbe := &textpos.Edit{Region: ls.newTimedRegion(st, ed)}
+ 	tbe.Rect = true
+ 	nln := tbe.Region.NumLines()
+ 	nch := (ed.Char - st.Char)
+@@ -693,7 +698,7 @@
+ 	re := tbe.Clone()
+ 	re.Rect = true
+ 	re.Delete = false
+-	re.Region.TimeNow()
++	re.Region.Time.SetTime(ls.now())
+ 	ls.linesEdited(re)
+ 	return re
+ }
+--- /dev/null
++++ b/text/lines/manual_execution.go
+@@ -0,0 +1,132 @@
++package lines
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/text/textpos"
++	"errors"
++	"reflect"
++	"sync"
++	"time"
++)
++
++var ErrManualViews = errors.New("lines: manual execution requires exactly one live view")
++var ErrManualAmbient = errors.New("lines: cannot adopt pending or running ambient work or autosave")
++var ErrManualExecution = errors.New("lines: invalid or conflicting manual execution binding")
++
++type Timer interface{ Stop() bool }
++
++// ManualExecution is immutable while bound. AfterFunc must admit to the view's
++// bounded originating FIFO; callbacks execute only under that event owner.
++// A manual buffer supports one view, not implicit cross-scene scheduling.
++type ManualExecution struct {
++	Now       func() time.Time
++	AfterFunc func(time.Duration, func()) (Timer, error)
++	Failure   func(error)
++}
++
++func (ls *Lines) BindManualExecution(view int, execution *ManualExecution) error {
++	if ls == nil || execution == nil || execution.Now == nil || execution.AfterFunc == nil || execution.Failure == nil {
++		return ErrManualExecution
++	}
++	ls.Lock()
++	defer ls.Unlock()
++	ls.markupDelayMu.Lock()
++	defer ls.markupDelayMu.Unlock()
++	if len(ls.views) != 1 || ls.views[view] == nil {
++		return ErrManualViews
++	}
++	if ls.manualExecution != nil {
++		if ls.manualExecution != execution || ls.manualView != view {
++			return ErrManualExecution
++		}
++		return nil
++	}
++	if ls.markupDelayTimer != nil || ls.markupActive != 0 || ls.ambientActive != 0 || ls.Autosave {
++		return ErrManualAmbient
++	}
++	ls.manualExecution = execution
++	ls.manualView = view
++	return nil
++}
++func (ls *Lines) ReleaseManualExecution(execution *ManualExecution) {
++	if ls == nil {
++		return
++	}
++	ls.Lock()
++	defer ls.Unlock()
++	if ls.manualExecution != execution {
++		return
++	}
++	ls.stopDelayedReMarkup()
++	ls.manualExecution = nil
++	ls.manualView = -1
++}
++func (ls *Lines) now() time.Time {
++	if ls.manualExecution != nil {
++		return ls.manualExecution.Now()
++	}
++	return time.Now()
++}
++func (ls *Lines) newTimedRegion(start, end textpos.Pos) textpos.Region {
++	if ls.manualExecution == nil {
++		return textpos.NewRegionPos(start, end)
++	}
++	region := textpos.Region{Start: start, End: end}
++	region.Time.SetTime(ls.now())
++	return region
++}
++func (ls *Lines) stampEvent(event events.Event) {
++	if ls.manualExecution != nil {
++		event.AsBase().GenTime.SetTime(ls.now())
++	}
++}
++
++// A typed nil is not a usable cancellation handle.
++func invalidManualTimer(timer Timer) bool {
++	if timer == nil {
++		return true
++	}
++	value := reflect.ValueOf(timer)
++	switch value.Kind() {
++	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
++		return value.IsNil()
++	}
++	return false
++}
++
++// BeginAmbientWork reserves a real-mode worker lifetime before it starts.
++// The caller must defer the returned release until all of its worker/timer work
++// has stopped. Manual buffers refuse and record ErrManualAmbient instead of
++// launching an unclocked goroutine, reader batch timer or filesystem autosave.
++func (ls *Lines) BeginAmbientWork() (func(), error) {
++	if ls == nil {
++		return nil, ErrManualExecution
++	}
++	ls.Lock()
++	defer ls.Unlock()
++	return ls.beginAmbientWork()
++}
++
++// beginAmbientWork requires the buffer lock, shared with manual adoption.
++func (ls *Lines) beginAmbientWork() (func(), error) {
++	if ls.manualExecution != nil {
++		ls.manualExecution.Failure(ErrManualAmbient)
++		return nil, ErrManualAmbient
++	}
++	ls.ambientActive++
++	var once sync.Once
++	return func() { once.Do(func() { ls.Lock(); ls.ambientActive--; ls.Unlock() }) }, nil
++}
++
++// startAutoSave requires the buffer lock. The edit itself remains accepted;
++// unsupported manual autosave is refused before any worker/file work begins.
++func (ls *Lines) startAutoSave(edit *textpos.Edit) {
++	if edit == nil || !ls.Autosave {
++		return
++	}
++	finish, err := ls.beginAmbientWork()
++	if err != nil {
++		return
++	}
++	go func() { defer finish(); _ = ls.autoSave() }()
++}
+--- /dev/null
++++ b/text/lines/manual_execution_test.go
+@@ -0,0 +1,156 @@
++package lines
++
++import (
++	"errors"
++	"testing"
++	"time"
++)
++
++type manualTestTimer struct{ stopped bool }
++
++func (t *manualTestTimer) Stop() bool {
++	if t == nil {
++		panic("typed nil timer used")
++	}
++	prior := !t.stopped
++	t.stopped = true
++	return prior
++}
++func testExecution(failure *error) *ManualExecution {
++	return &ManualExecution{Now: func() time.Time { return time.Unix(1700000000, 0) }, AfterFunc: func(time.Duration, func()) (Timer, error) { return &manualTestTimer{}, nil }, Failure: func(err error) { *failure = err }}
++}
++func TestVellumManualLinesAdoptionAndLease(t *testing.T) {
++	var failure error
++	ls := NewLinesExact()
++	view := ls.NewView(80)
++	execution := testExecution(&failure)
++	if err := ls.BindManualExecution(view, execution); err != nil {
++		t.Fatal(err)
++	}
++	if err := ls.BindManualExecution(view, execution); err != nil {
++		t.Fatal("same lease refused", err)
++	}
++	other := testExecution(&failure)
++	if err := ls.BindManualExecution(view, other); !errors.Is(err, ErrManualExecution) {
++		t.Fatal("foreign lease accepted", err)
++	}
++	ls.ReleaseManualExecution(other)
++	if got := ls.NewView(80); got != -1 || !errors.Is(failure, ErrManualViews) {
++		t.Fatal("foreign release removed lease", got, failure)
++	}
++	ls.DeleteView(view)
++	replacement := ls.NewView(60)
++	if replacement < 0 {
++		t.Fatal("retired lease retained")
++	}
++	if err := ls.BindManualExecution(replacement, other); err != nil {
++		t.Fatal("new origin could not adopt retired buffer", err)
++	}
++	ls.Close()
++	if ls.manualExecution != nil || len(ls.views) != 0 {
++		t.Fatal("close retained lease/views")
++	}
++}
++func TestVellumManualLinesRefusesAmbientAndSharedAdoption(t *testing.T) {
++	for _, kind := range []string{"pending", "running", "autosave", "two-views"} {
++		t.Run(kind, func(t *testing.T) {
++			ls := NewLinesExact()
++			view := ls.NewView(80)
++			var failure error
++			execution := testExecution(&failure)
++			switch kind {
++			case "pending":
++				ls.markupDelayTimer = &manualTestTimer{}
++			case "running":
++				ls.markupActive = 1
++			case "autosave":
++				ls.Autosave = true
++			case "two-views":
++				ls.NewView(80)
++			}
++			want := ErrManualAmbient
++			if kind == "two-views" {
++				want = ErrManualViews
++			}
++			if err := ls.BindManualExecution(view, execution); !errors.Is(err, want) {
++				t.Fatal(kind, err)
++			}
++			if ls.manualExecution != nil {
++				t.Fatal("refused adoption mutated origin")
++			}
++			ls.markupActive = 0
++			ls.Autosave = false
++			ls.Close()
++		})
++	}
++}
++func TestVellumManualLinesSchedulingRefusalAndTypedNil(t *testing.T) {
++	for _, kind := range []string{"error", "nil", "typed-nil"} {
++		t.Run(kind, func(t *testing.T) {
++			ls := NewLinesExact()
++			view := ls.NewView(80)
++			var failure error
++			execution := testExecution(&failure)
++			refused := errors.New("owned timer capacity")
++			execution.AfterFunc = func(time.Duration, func()) (Timer, error) {
++				switch kind {
++				case "error":
++					return nil, refused
++				case "typed-nil":
++					var timer *manualTestTimer
++					return timer, nil
++				default:
++					return nil, nil
++				}
++			}
++			if err := ls.BindManualExecution(view, execution); err != nil {
++				t.Fatal(err)
++			}
++			ls.SetString("abc")
++			ls.Highlighter.Has = true
++			ls.StartDelayedReMarkup()
++			want := ErrManualExecution
++			if kind == "error" {
++				want = refused
++			}
++			if !errors.Is(failure, want) || ls.markupDelayTimer != nil {
++				t.Fatal("refusal not recorded", failure)
++			}
++			// Nothing may later fire or call Stop through an unusable timer.
++			ls.Close()
++		})
++	}
++}
++
++func TestVellumManualLinesAmbientWorkAndAutosaveRefusal(t *testing.T) {
++	ls := NewLinesExact()
++	view := ls.NewView(80)
++	var failure error
++	execution := testExecution(&failure)
++	finish, err := ls.BeginAmbientWork()
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := ls.BindManualExecution(view, execution); !errors.Is(err, ErrManualAmbient) {
++		t.Fatal("running ambient worker adopted", err)
++	}
++	finish()
++	finish() // release is idempotent, not a capacity underflow
++	if err := ls.BindManualExecution(view, execution); err != nil {
++		t.Fatal(err)
++	}
++	if release, err := ls.BeginAmbientWork(); release != nil || !errors.Is(err, ErrManualAmbient) {
++		t.Fatal("manual ambient worker accepted", err)
++	}
++	failure = nil
++	// An unsupported flag set after adoption must not launch a filesystem worker.
++	ls.Autosave = true
++	edit := ls.InsertTextBytes(ls.EndPos(), []byte("accepted"))
++	if edit == nil || !errors.Is(failure, ErrManualAmbient) || ls.ambientActive != 0 {
++		t.Fatal("autosave worker not refused", edit, failure, ls.ambientActive)
++	}
++	if ls.String() != "accepted" {
++		t.Fatal("worker refusal corrupted accepted edit")
++	}
++	ls.Close()
++}
+--- a/text/lines/markup.go
++++ b/text/lines/markup.go
+@@ -51,7 +51,6 @@
+ func (ls *Lines) startDelayedReMarkup() {
+ 	ls.markupDelayMu.Lock()
+ 	defer ls.markupDelayMu.Unlock()
+-
+ 	if !ls.Highlighter.Has || ls.numLines() == 0 || ls.numLines() > maxMarkupLines {
+ 		ls.collectLinks()
+ 		ls.layoutViews()
+@@ -61,47 +60,108 @@
+ 		ls.markupDelayTimer.Stop()
+ 		ls.markupDelayTimer = nil
+ 	}
+-	ls.markupDelayTimer = time.AfterFunc(markupDelay, func() {
++	ls.markupGeneration++
++	generation := ls.markupGeneration
++	execution := ls.manualExecution
++	callback := func() {
++		ls.markupDelayMu.Lock()
++		if ls.markupGeneration != generation {
++			ls.markupDelayMu.Unlock()
++			return
++		}
+ 		ls.markupDelayTimer = nil
+-		ls.asyncMarkup() // already in a goroutine
+-	})
+-}
+-
+-// stopDelayedReMarkup stops timer for doing markup after an interval
++		ls.markupActive++
++		ls.markupDelayMu.Unlock()
++		defer func() { ls.markupDelayMu.Lock(); ls.markupActive--; ls.markupDelayMu.Unlock() }()
++		ls.asyncMarkup()
++	}
++	if execution != nil {
++		timer, err := execution.AfterFunc(markupDelay, callback)
++		if err != nil {
++			execution.Failure(err)
++			return
++		}
++		if invalidManualTimer(timer) {
++			execution.Failure(ErrManualExecution)
++			return
++		}
++		ls.markupDelayTimer = timer
++	} else {
++		ls.markupDelayTimer = time.AfterFunc(markupDelay, callback)
++	}
++}
++
+ func (ls *Lines) stopDelayedReMarkup() {
+ 	ls.markupDelayMu.Lock()
+ 	defer ls.markupDelayMu.Unlock()
+-
++	ls.markupGeneration++
+ 	if ls.markupDelayTimer != nil {
+ 		ls.markupDelayTimer.Stop()
+ 		ls.markupDelayTimer = nil
+ 	}
+ }
+ 
+-// reMarkup runs re-markup on text in background
++// Manual explicit remarkup is also an owned zero-delay operation. It never
++// launches a parser goroutine; due-at-now work still needs explicit clock/Step.
+ func (ls *Lines) reMarkup() {
+ 	if !ls.Highlighter.Has || ls.numLines() == 0 || ls.numLines() > maxMarkupLines {
+ 		return
+ 	}
+ 	ls.stopDelayedReMarkup()
+-	go ls.asyncMarkup()
+-}
+-
+-// asyncMarkup does the markupTags from a separate goroutine.
+-// Does not start or end with lock, but acquires at end to apply.
++	if execution := ls.manualExecution; execution != nil {
++		ls.markupDelayMu.Lock()
++		defer ls.markupDelayMu.Unlock()
++		generation := ls.markupGeneration
++		timer, err := execution.AfterFunc(0, func() {
++			ls.markupDelayMu.Lock()
++			if generation != ls.markupGeneration {
++				ls.markupDelayMu.Unlock()
++				return
++			}
++			ls.markupDelayTimer = nil
++			ls.markupActive++
++			ls.markupDelayMu.Unlock()
++			defer func() { ls.markupDelayMu.Lock(); ls.markupActive--; ls.markupDelayMu.Unlock() }()
++			ls.asyncMarkup()
++		})
++		if err != nil {
++			execution.Failure(err)
++		} else if invalidManualTimer(timer) {
++			execution.Failure(ErrManualExecution)
++		} else {
++			ls.markupDelayTimer = timer
++		}
++		return
++	}
++	ls.markupDelayMu.Lock()
++	ls.markupActive++
++	ls.markupDelayMu.Unlock()
++	go func() {
++		defer func() { ls.markupDelayMu.Lock(); ls.markupActive--; ls.markupDelayMu.Unlock() }()
++		ls.asyncMarkup()
++	}()
++}
++
++// asyncMarkup parses outside the buffer lock. Real mode runs it in a
++// goroutine; manual mode runs it only in the originating owner's Step.
+ func (ls *Lines) asyncMarkup() {
+-	ls.Lock()
+-	txt := ls.bytes(0)
+-	ls.markupEdits = nil // only accumulate after this point; very rare
+-	ls.Unlock()
++	var txt []byte
++	func() {
++		ls.Lock()
++		defer ls.Unlock()
++		txt = ls.bytes(0)
++		ls.markupEdits = nil // only accumulate after this point; very rare
++	}()
+ 
+ 	tags, err := ls.markupTags(txt)
+ 	if err != nil {
+ 		return
+ 	}
+-	ls.Lock()
+-	ls.markupApplyTags(tags)
+-	ls.Unlock()
++	func() {
++		ls.Lock()
++		defer ls.Unlock()
++		ls.markupApplyTags(tags)
++	}()
+ 	ls.sendInput()
+ }
+ 
+@@ -302,7 +362,7 @@
+ 		reg = ls.undos.AdjustRegion(reg)
+ 		if !reg.IsNil() {
+ 			ntr := ntags.AddLex(tg.Token, reg.Start.Char, reg.End.Char)
+-			ntr.Time.Now()
++			ntr.Time.SetTime(ls.now())
+ 		}
+ 	}
+ 	return ntags
+--- a/text/lines/undo.go
++++ b/text/lines/undo.go
+@@ -219,6 +219,9 @@
+ func (ls *Lines) saveUndo(tbe *textpos.Edit) {
+ 	if tbe == nil {
+ 		return
++	}
++	if ls.manualExecution != nil {
++		tbe.Region.Time.SetTime(ls.now())
+ 	}
+ 	ls.undos.Save(tbe)
+ }
+--- a/text/textcore/base.go
++++ b/text/textcore/base.go
+@@ -9,6 +9,7 @@
+ import (
+ 	"image"
+ 	"sync"
++	"time"
+ 
+ 	"cogentcore.org/core/base/reflectx"
+ 	"cogentcore.org/core/colors"
+@@ -192,6 +193,8 @@
+ 	nativeText                             string
+ 	nativeRunes                            []rune
+ 	nativeDocument                         *lines.Lines
++	manualLines                            *lines.Lines
++	manualExecution                        *lines.ManualExecution
+ 	nativeRevision, nativeLayoutRevision   uint64
+ 	nativeOffsets                          []int
+ 	nativeGraphemes                        []int
+@@ -261,6 +264,13 @@
+ }
+ 
+ func (ed *Base) Destroy() {
++	if ed.manualLines != nil {
++		ed.releaseManualLines()
++		if ed.Lines != nil {
++			ed.Lines.DeleteView(ed.viewId)
++			ed.viewId = -1
++		}
++	}
+ 	ed.stopCursor()
+ 	ed.Frame.Destroy()
+ }
+@@ -333,6 +343,7 @@
+ 		return ed
+ 	}
+ 	if oldln != nil {
++		ed.releaseManualLines()
+ 		oldln.DeleteView(ed.viewId)
+ 		ed.viewId = -1
+ 	}
+@@ -372,12 +383,14 @@
+ 			ed.SetCursorShow(textpos.Pos{})
+ 		}
+ 	}
++	ed.bindManualLines()
+ 	ed.NeedsRender()
+ 	return ed
+ }
+ 
+ // styleBase applies the editor styles.
+ func (ed *Base) styleBase() {
++	ed.bindManualLines()
+ 	if ed.NeedsRebuild() {
+ 		highlighting.UpdateFromTheme()
+ 		if ed.Lines != nil {
+@@ -392,3 +405,33 @@
+ 	ed.styleBase()
+ 	ed.styleSizes()
+ }
++
++// Bind before style/highlighting or user input can schedule markup. Larger
++// standalone Lines features (reader batching/autosave/multi-view) are not
++// silently mapped to this single-origin manual editor contract.
++func (ed *Base) bindManualLines() {
++	if ed.Lines == nil || ed.Scene == nil || !ed.Scene.ManualExecution() {
++		return
++	}
++	if ed.manualLines == ed.Lines {
++		return
++	}
++	ed.releaseManualLines()
++	scene := ed.Scene
++	execution := &lines.ManualExecution{Now: scene.Now, Failure: scene.ManualFailure, AfterFunc: func(delay time.Duration, callback func()) (lines.Timer, error) {
++		return scene.ManualAfterFunc(delay, callback)
++	}}
++	if err := ed.Lines.BindManualExecution(ed.viewId, execution); err != nil {
++		scene.ManualFailure(err)
++		return
++	}
++	ed.manualLines = ed.Lines
++	ed.manualExecution = execution
++}
++func (ed *Base) releaseManualLines() {
++	if ed.manualLines != nil {
++		ed.manualLines.ReleaseManualExecution(ed.manualExecution)
++	}
++	ed.manualLines = nil
++	ed.manualExecution = nil
++}
+--- a/text/textcore/editor.go
++++ b/text/textcore/editor.go
+@@ -145,6 +145,9 @@
+ 			return
+ 		}
+ 		if ed.AbilityIs(abilities.Focusable) {
++			if ed.Scene.ManualExecution() {
++				ed.stopCursor()
++			}
+ 			ed.editDone()
+ 			ed.SetState(false, states.Focused)
+ 		}
+@@ -794,3 +797,8 @@
+ 	ed.SetCursorShow(textpos.Pos{Line: ln - 1})
+ 	ed.savePosHistory(ed.CursorPos)
+ }
++
++func (ed *Editor) Destroy() {
++	ed.deleteCompleter()
++	ed.Base.Destroy()
++}
+--- /dev/null
++++ b/text/textcore/manual_timer_vellum_test.go
+@@ -0,0 +1,297 @@
++//go:build offscreen
++
++package textcore
++
++import (
++	"bytes"
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/styles/states"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/lines"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"context"
++	"errors"
++	"image"
++	"io/fs"
++	"runtime"
++	"strings"
++	"testing"
++	"time"
++)
++
++type ownedFixtureClock struct {
++	now    time.Time
++	timers []*ownedFixtureTimer
++}
++type ownedFixtureTimer struct {
++	due      time.Time
++	callback func()
++	stopped  bool
++}
++
++func (t *ownedFixtureTimer) Stop() bool { was := !t.stopped; t.stopped = true; return was }
++func (c *ownedFixtureClock) After(ctx context.Context, delay time.Duration, fn func()) (core.ManualTimer, error) {
++	if err := ctx.Err(); err != nil {
++		return nil, err
++	}
++	t := &ownedFixtureTimer{due: c.now.Add(delay), callback: fn}
++	c.timers = append(c.timers, t)
++	return t, nil
++}
++func (c *ownedFixtureClock) Advance(delay time.Duration) {
++	c.now = c.now.Add(delay)
++	var callbacks []func()
++	for _, t := range c.timers {
++		if !t.stopped && !t.due.After(c.now) {
++			t.stopped = true
++			callbacks = append(callbacks, t.callback)
++		}
++	}
++	for _, fn := range callbacks {
++		fn()
++	}
++}
++func ownedEditorFixture(t *testing.T) (*core.ManualWindow, *Editor, *core.Body, *ownedFixtureClock) {
++	t.Helper()
++	c := &ownedFixtureClock{now: time.Unix(1730000000, 0).UTC()}
++	b := core.NewBody("manual editor timers")
++	ed := NewEditor(b)
++	old := ed.Lines
++	ed.SetLines(lines.NewLinesExact())
++	old.Close()
++	m, err := b.NewWindow().RunManual(context.Background(), core.ManualWindowConfig{Size: image.Pt(600, 300), LogicalDPI: 160, EventCapacity: 64, Now: func() time.Time { return c.now }, AfterFunc: c.After, NewShaper: func() (shaped.Shaper, error) { return shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default}), nil }})
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() {
++		if err := m.Close(context.Background()); err != nil && !errors.Is(err, core.ErrManualCallback) && !errors.Is(err, lines.ErrManualViews) {
++			t.Error(err)
++		}
++	})
++	ownedDrain(t, m)
++	return m, ed, b, c
++}
++func ownedDrain(t *testing.T, m *core.ManualWindow) {
++	t.Helper()
++	for range 256 {
++		s, err := m.Snapshot(context.Background())
++		if err != nil {
++			t.Fatal(err)
++		}
++		if s.Events == 0 && !s.ReadyPaint {
++			return
++		}
++		if s.Blocked && !s.ReadyPaint {
++			t.Fatal("blocked owner FIFO")
++		}
++		if _, err = m.Step(context.Background(), 1); err != nil {
++			t.Fatal(err)
++		}
++	}
++	t.Fatal("event budget exhausted")
++}
++func TestVellumManualTextCoreMarkupDebounceAndRetirement(t *testing.T) {
++	m, ed, _, c := ownedEditorFixture(t)
++	if ed.manualLines != ed.Lines {
++		t.Fatal("buffer not bound before style")
++	}
++	ed.Lines.SetString("{\"a\":1}\n")
++	ed.Lines.SetFileExt("json")
++	if !ed.Lines.Highlighter.Has {
++		t.Fatal("real highlighter not enabled")
++	}
++	inputs := 0
++	var inputTimes []time.Time
++	ed.Lines.OnInput(ed.viewId, func(e events.Event) { inputs++; inputTimes = append(inputTimes, e.Time()) })
++	c.Advance(250 * time.Millisecond)
++	edit := ed.Lines.InsertTextBytes(ed.Lines.EndPos(), []byte(" "))
++	if edit == nil || !edit.Region.Time.Time().Equal(c.now) {
++		t.Fatalf("edit stamp %+v now%v", edit, c.now)
++	}
++	before := inputs
++	c.Advance(250 * time.Millisecond)
++	ownedDrain(t, m)
++	if inputs != before {
++		t.Fatal("superseded markup debounce fired", inputs, before)
++	}
++	c.Advance(250 * time.Millisecond)
++	if inputs != before {
++		t.Fatal("clock ran parser/widget work")
++	}
++	ownedDrain(t, m)
++	if len(ed.Lines.HiTags(0)) == 0 {
++		t.Fatal("owned parser produced no real highlighting tags")
++	}
++	if inputs != before+1 || !inputTimes[len(inputTimes)-1].Equal(c.now) {
++		t.Fatal("one owned markup update missing", inputs, before, inputTimes)
++	}
++	before = inputs
++	ed.Lines.ReMarkup()
++	if inputs != before {
++		t.Fatal("zero-delay reparse ran inline")
++	}
++	c.Advance(0)
++	if inputs != before {
++		t.Fatal("clock invoked reparse work")
++	}
++	ownedDrain(t, m)
++	if inputs != before+1 {
++		t.Fatal("explicit reparse not delivered", inputs, before)
++	}
++	ed.Lines.StartDelayedReMarkup()
++	ed.SetLines(lines.NewLinesExact())
++	before = inputs
++	c.Advance(time.Second)
++	ownedDrain(t, m)
++	if inputs != before {
++		t.Fatal("retired buffer emitted input")
++	}
++	snap, err := m.Snapshot(context.Background())
++	if err != nil || snap.Failure != nil {
++		t.Fatalf("buffer retirement %+v %v", snap, err)
++	}
++}
++func TestVellumManualTextCoreRealInputClockCursorAndFocus(t *testing.T) {
++	m, ed, b, c := ownedEditorFixture(t)
++	ed.Lines.SetString("A😀é\r\n\r\n")
++	ownedDrain(t, m)
++	box := ed.Geom.TotalBBox
++	point := box.Min.Add(box.Size().Div(2))
++	for _, kind := range []events.Types{events.MouseDown, events.MouseUp} {
++		if err := m.Input(context.Background(), core.ManualInput{Type: kind, Button: events.Left, Position: point}); err != nil {
++			t.Fatal(err)
++		}
++	}
++	ownedDrain(t, m)
++	if !ed.StateIs(states.Focused) {
++		t.Fatal("actual pointer route did not focus editor")
++	}
++	times := []time.Time{}
++	ed.On(events.Input, func(e events.Event) { times = append(times, e.Time()) })
++	if err := m.Input(context.Background(), core.ManualInput{Type: events.KeyChord, Rune: 'x', Code: key.CodeX}); err != nil {
++		t.Fatal(err)
++	}
++	ownedDrain(t, m)
++	if len(times) != 1 || !times[0].Equal(c.now) {
++		t.Fatal("real editor generated input clock", times)
++	}
++	first, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	c.Advance(core.TimingSettings.CursorBlinkTime)
++	ownedDrain(t, m)
++	second, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	if bytes.Equal(first.Pix, second.Pix) {
++		t.Fatal("textcore cursor ignored virtual blink")
++	}
++	replacement := core.NewButton(b).SetText("Next")
++	ownedDrain(t, m)
++	replacement.SetFocus()
++	ownedDrain(t, m)
++	if s, err := m.Snapshot(context.Background()); err != nil || s.Failure != nil {
++		t.Fatalf("focus loss %+v %v", s, err)
++	}
++}
++func TestVellumManualTextCoreSecondViewRefuses(t *testing.T) {
++	m, ed, _, _ := ownedEditorFixture(t)
++	if vid := ed.Lines.NewView(80); vid != -1 {
++		t.Fatal("manual shared view accepted", vid)
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || !errors.Is(s.Failure, lines.ErrManualViews) {
++		t.Fatalf("multi-view refusal %+v %v", s, err)
++	}
++}
++
++func TestVellumManualTextCoreMarkupCallbackFaultUnwinds(t *testing.T) {
++	for _, kind := range []string{"panic", "goexit"} {
++		t.Run(kind, func(t *testing.T) {
++			m, ed, _, clock := ownedEditorFixture(t)
++			ed.Lines.SetString("{\"a\":1}\n")
++			ed.Lines.SetFileExt("json")
++			ed.Lines.StopDelayedReMarkup()
++			ownedDrain(t, m)
++			ed.Lines.OnInput(ed.viewId, func(events.Event) {
++				if kind == "goexit" {
++					runtime.Goexit()
++				}
++				panic("parser listener")
++			})
++			ed.Lines.ReMarkup()
++			clock.Advance(0)
++			done := make(chan struct{})
++			var stepErr error
++			go func() { defer close(done); _, stepErr = m.Step(context.Background(), 64) }()
++			select {
++			case <-done:
++			case <-time.After(5 * time.Second):
++				t.Fatal("callback ownership did not unwind")
++			}
++			snap, err := m.Snapshot(context.Background())
++			if err != nil || !errors.Is(snap.Failure, core.ErrManualCallback) {
++				t.Fatal("fault not terminal", snap, err, stepErr)
++			}
++			// Buffer and window lock ownership must have unwound before cleanup.
++			done = make(chan struct{})
++			go func() { defer close(done); ed.Lines.StopDelayedReMarkup(); _ = m.Close(context.Background()) }()
++			select {
++			case <-done:
++			case <-time.After(5 * time.Second):
++				t.Fatal("buffer/window remained locked after fault")
++			}
++		})
++	}
++}
++
++type refusingReader struct{ reads int }
++
++func (r *refusingReader) Read([]byte) (int, error) {
++	r.reads++
++	return 0, errors.New("reader should not be touched")
++}
++func TestVellumManualTextCoreOutputReaderRefusesBeforeRead(t *testing.T) {
++	m, ed, _, _ := ownedEditorFixture(t)
++	reader := &refusingReader{}
++	ob := &OutputBuffer{Lines: ed.Lines, Output: reader}
++	ob.MonitorOutput()
++	snap, err := m.Snapshot(context.Background())
++	if err != nil || !errors.Is(snap.Failure, lines.ErrManualAmbient) || reader.reads != 0 || ob.afterTimer != nil || len(ob.bufferedLines) != 0 {
++		t.Fatal("unsupported reader ran ambient work", snap, err, reader.reads)
++	}
++}
++
++func TestVellumManualTextCoreAmbientReaderFaultReleasesAdoption(t *testing.T) {
++	for _, kind := range []string{"panic", "goexit"} {
++		t.Run(kind, func(t *testing.T) {
++			ls := lines.NewLinesExact()
++			view := ls.NewView(80)
++			ob := &OutputBuffer{Lines: ls, Output: strings.NewReader("one\n"), MarkupFunc: func(*lines.Lines, []rune) rich.Text {
++				if kind == "goexit" {
++					runtime.Goexit()
++				}
++				panic("ambient markup")
++			}}
++			done := make(chan struct{})
++			go func() { defer close(done); defer func() { _ = recover() }(); ob.MonitorOutput() }()
++			select {
++			case <-done:
++			case <-time.After(5 * time.Second):
++				t.Fatal("reader fault retained batch mutex/lifetime")
++			}
++			var failure error
++			execution := &lines.ManualExecution{Now: func() time.Time { return time.Unix(1700000000, 0) }, AfterFunc: func(time.Duration, func()) (lines.Timer, error) { return nil, errors.New("unexpected timer") }, Failure: func(err error) { failure = err }}
++			if err := ls.BindManualExecution(view, execution); err != nil || failure != nil {
++				t.Fatal("reader worker did not retire", err, failure)
++			}
++			ls.Close()
++		})
++	}
++}
+--- a/text/textcore/outputbuffer.go
++++ b/text/textcore/outputbuffer.go
+@@ -50,7 +50,8 @@
+ 
+ 	// time.AfterFunc that is started after new input is received and not
+ 	// immediately output. Ensures that it will get output if no further burst happens.
+-	afterTimer *time.Timer
++	afterTimer      *time.Timer
++	batchGeneration uint64
+ 
+ 	// mutex protecting updates
+ 	sync.Mutex
+@@ -58,6 +59,22 @@
+ 
+ // MonitorOutput monitors the output and updates the [Buffer].
+ func (ob *OutputBuffer) MonitorOutput() {
++	// Reader batching is ambient work, not a manual clock timer. Refuse before
++	// reading or allocating a batch if the Lines buffer has a manual owner.
++	finish, err := ob.Lines.BeginAmbientWork()
++	if err != nil {
++		return
++	}
++	defer func() {
++		ob.Lock()
++		ob.batchGeneration++
++		if ob.afterTimer != nil {
++			ob.afterTimer.Stop()
++			ob.afterTimer = nil
++		}
++		ob.Unlock()
++		finish()
++	}()
+ 	if ob.Batch == 0 {
+ 		ob.Batch = 200 * time.Millisecond
+ 	}
+@@ -66,40 +83,49 @@
+ 	ob.bufferedMarkup = make([]rich.Text, 0, 100)
+ 	outscan := bufio.NewScanner(ob.Output) // line at a time
+ 	for outscan.Scan() {
+-		ob.Lock()
+-		b := outscan.Bytes()
+-		rln := []rune(string(b))
++		func() {
++			ob.Lock()
++			defer ob.Unlock()
++			b := outscan.Bytes()
++			rln := []rune(string(b))
+ 
+-		if ob.afterTimer != nil {
+-			ob.afterTimer.Stop()
+-			ob.afterTimer = nil
+-		}
+-		ob.bufferedLines = append(ob.bufferedLines, rln)
+-		if ob.MarkupFunc != nil {
+-			mup := ob.MarkupFunc(ob.Lines, rln)
+-			ob.bufferedMarkup = append(ob.bufferedMarkup, mup)
+-		} else {
+-			mup := rich.NewText(sty, rln)
+-			ob.bufferedMarkup = append(ob.bufferedMarkup, mup)
+-		}
+-		lag := time.Since(ob.lastOutput)
+-		if lag > ob.Batch {
+-			ob.lastOutput = time.Now()
+-			ob.outputToBuffer()
+-		} else {
+-			ob.afterTimer = time.AfterFunc(ob.Batch*2, func() {
+-				ob.Lock()
++			ob.batchGeneration++
++			if ob.afterTimer != nil {
++				ob.afterTimer.Stop()
++				ob.afterTimer = nil
++			}
++			ob.bufferedLines = append(ob.bufferedLines, rln)
++			if ob.MarkupFunc != nil {
++				mup := ob.MarkupFunc(ob.Lines, rln)
++				ob.bufferedMarkup = append(ob.bufferedMarkup, mup)
++			} else {
++				mup := rich.NewText(sty, rln)
++				ob.bufferedMarkup = append(ob.bufferedMarkup, mup)
++			}
++			lag := time.Since(ob.lastOutput)
++			if lag > ob.Batch {
+ 				ob.lastOutput = time.Now()
+ 				ob.outputToBuffer()
+-				ob.afterTimer = nil
+-				ob.Unlock()
+-			})
+-		}
+-		ob.Unlock()
++			} else {
++				generation := ob.batchGeneration
++				ob.afterTimer = time.AfterFunc(ob.Batch*2, func() {
++					ob.Lock()
++					defer ob.Unlock()
++					if generation != ob.batchGeneration {
++						return
++					}
++					ob.lastOutput = time.Now()
++					ob.outputToBuffer()
++					ob.afterTimer = nil
++				})
++			}
++		}()
+ 	}
+-	ob.Lock()
+-	ob.outputToBuffer()
+-	ob.Unlock()
++	func() {
++		ob.Lock()
++		defer ob.Unlock()
++		ob.outputToBuffer()
++	}()
+ }
+ 
+ // outputToBuffer sends the current output to Buffer.

@@ -1,0 +1,35 @@
+{
+  "result": "APPROVED",
+  "scope": "independent exact-source read plus focused actual offscreen replay/lifetime race check",
+  "historical_initial_review_sha256": "993cdedc952f896a3be02a8335e20a97349c226a923b981bf21800e573961ec0",
+  "inputs": {
+    "/private/tmp/vellum-p9-backend/native.go": "ea99fd5a27d429afc7cd9c8f43d372034c47df08d4911e4af61c7d8547cb0dd5",
+    "/private/tmp/vellum-p9-backend/native_test.go": "3c5f4d8f7645a28a4cd54bc54414e39ba9c4a01ce4312cfe70952dbcabfc9f18",
+    "/private/tmp/vellum-p9-backend/native_record.go": "197b944a7b754e378542050e3eff88ffbd7813fb94a935e24cff0e2aedc2d42e",
+    "/private/tmp/vellum-p9-backend/native-record.json": "3333282e53a0fa10cfd0c563e844a371d56f6cd7865a656901d1f2a875ca7fef",
+    "/private/tmp/vellum-p9-backend/cmd/native/main.go": "d142ddfac5b5ce0bea1f1d25f469e1f0f98a6db6c53ea7a3d41e8c7dc8c4ba95"
+  },
+  "dispositions": [
+    {
+      "finding": "global operation closed-owner bypass",
+      "status": "fixed",
+      "evidence": "checkLive checks owner.Context before empty-window branch; actual valid windowless Worker refusal preserves executor/clock/cleanup, then explicit caller-owned canceled job cleanup finishes",
+      "clarification": "Initial report called windowless Advance valid; portable Advance requires Window. The valid global Worker variant demonstrates the actual lifetime bug."
+    },
+    {
+      "finding": "manifest current incarnation check",
+      "status": "fixed",
+      "evidence": "CheckManifest snapshots current initialized driver windows and compares identity/incarnation/closed state before app dimensions and lifetime validation"
+    }
+  ],
+  "check": {
+    "command": "go test -tags offscreen -overlay /private/tmp/vellum-p9-timers/timer-overlay.json -race ./... -run ^TestNative(WindowlessWorkerRefusesClosedOwner|ManifestAndLiveRevisionRefusals|CaptureFrameAndStaleAdmission)$|^TestActualNativeRecordReplaysAcrossEventBatches$ -count=1 -timeout=60s",
+    "cwd": "/private/tmp/vellum-p9-backend",
+    "log": "/private/tmp/vellum-p9-backend-followup-check.txt",
+    "log_sha256": "ca3f76c2db5551e1cfae7a745ef3dfa04bacc5a184a53b66c0e0d32f0f09d39d",
+    "exit_code": 0
+  },
+  "remaining_findings": [],
+  "stage31_proof_sha256": "a90064e6ec14ba919400c3de31686f6ea381cf0d2b3b52effc0a8bad08b5c518",
+  "input_mapping_scope": "Read-reviewed current frozen files, rehashed after targeted check. This review does not assert its own full build-input drift snapshot; final integrated qualification owns that provenance."
+}

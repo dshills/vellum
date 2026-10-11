@@ -134,5 +134,21 @@ license, and remaining distribution audit/qualification gates for public release
 [Execution](execution.md) adds selected/FIFO manual workers and bounded real/manual
 timers, plus separate reserved completion admission. Tasks and document sessions
 accept an injected Executor; owner batches retain an initial arrival cutoff.
-Worker and owner delivery termination remain independently visible. Native Scene
-clock/input/frame integration and the complete P9 replay workload remain open.
+Worker and owner delivery termination remain independently visible.
+
+The internally qualified [managed replay checkpoint](replay.md) supplies explicit
+fonts/theme and routes actual pointer/key input through retained controls, focus
+and modal hit testing on the offscreen backend. Its fixed 51-operation record
+and nine captures match exact model state, measured semantics/geometry, focus,
+UTF-16 selection and completed software image identities at batches 1, 7 and 64.
+Input admission, frame requests, bounded dispatch, selected workers and clock
+advancement remain separate operations; originating widget timers do not dispatch
+implicitly. Readiness distinguishes due/running/blocked work from future timers.
+One active managed application per process may own multiple windows on its shared
+clock. The caller keeps Cogent global configuration fixed and injects that same
+borrowed executor into task/document managers. See the
+[checkpoint report](../docs/reports/macos-replay/README.md).
+
+The complete P9 professional workloads, large-data replay, external automation
+transport, native services/IME/accessibility, GPU presentation and sustained
+performance acceptance remain open.

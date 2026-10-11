@@ -1,0 +1,25 @@
+{
+  "result": "APPROVED",
+  "scope": "read-only combined integration metadata/API/test/release coverage; no repeat source review, test execution, canonical edits, Git or GUI",
+  "inputs": {
+    "/private/tmp/vellum-p9-integration/scripts/check.sh": "946c3aff99aff2e42983b83286a110b5f6a716fa0c8d65af1680f027b6d40428",
+    "/private/tmp/vellum-p9-integration/scripts/release-sdk.py": "d6d9c3ca7b4896b31e6218cc80056da3908d39cb83a41077f5c0f61bfeaab777",
+    "/private/tmp/vellum-p9-integration/scripts/release-sdk_test.py": "5d22850a01149123f0a177482fcb0cde7252618ea1a14f77e574fb0ba67a757f",
+    "/private/tmp/vellum-p9-integration/examples/sdk-contract/replay_test.go": "f9a5b3d1e2591207509435342ea5d1616ce78710c4b948ce898c82a416fef8ba",
+    "/private/tmp/vellum-p9-integration/examples/replay/go.mod": "6eb26388bb7d370e7874380bfb2bb64f850c6ec467ac1ed05401fd0cc3e661f6",
+    "/private/tmp/vellum-p9-integration/examples/replay/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "/private/tmp/vellum-p9-integration/examples/replay/README.md": "4a19284cec7e73eb94255943c5a2c2fce61a5e2364d76dff437ce040b642657e",
+    "/private/tmp/vellum-p9-integration/examples/replay/managed_test.go": "67569bb0222d7350acc8ff4d6c3545cf96966aec147eb40fdd15b014bb535f60",
+    "/private/tmp/vellum-p9-integration/specs/replay.md": "43de5c0b76aa824c690493f1a408043bed1be83dae689192b825879651158e31"
+  },
+  "verified": [
+    "new offscreen driver/Core/independent-example gates follow the existing portable and native gates",
+    "SDK allowlist includes replay; source-deleted consumer fixture packages non-test exported files and imports Recorder/Runner API",
+    "independent example module uses selected public github.com/dshills/vellum namespace and relative SDK-compatible replacements; no temporary workspace paths or draft namespace in public Go sources",
+    "managed qualification is now a valid external replayconsumer_test package and imports public consumer/driver APIs",
+    "same bundled native record identity remains separate from authoring and command-only tests",
+    "spec documents borrowed executor injection, stable Cogent globals, current-vs-future readiness, enqueue-only Frame operation, manager-key refusal, single-view timer lease, unsupported autosave/reader paths, and scoped software-only acceptance"
+  ],
+  "actionable_findings": [],
+  "qualification_limit": "Read review of the recorded file bytes; final integrated test/relocated SDK proof is owned by root and is still required."
+}

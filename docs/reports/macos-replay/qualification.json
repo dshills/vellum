@@ -1,0 +1,176 @@
+{
+  "result": "PASS",
+  "root": "/private/tmp/vellum-p9-integration",
+  "base_commit": "bf42811c127cec212f3a5523d84366ac06d60b43",
+  "compiler": "go version go1.27.2 darwin/arm64",
+  "collector_sha256": "6999f2a59993fbb05afd4214116f8c8005d27e439159dc3ecd5651577dd92168",
+  "input_count": 6982,
+  "source_before_sha256": "ddc4803fb106cbac81fff9f95ea37eeb839b33ec4e9721a224c780ee63221716",
+  "source_after_sha256": "ddc4803fb106cbac81fff9f95ea37eeb839b33ec4e9721a224c780ee63221716",
+  "changed_inputs": {},
+  "checks": [
+    {
+      "name": "full-gate",
+      "command": [
+        "./scripts/check.sh"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 157.777,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/full-gate.log",
+      "log_sha256": "1b4b14e94ac319510f65f970a96c4e83902e02fb5df92625a84f1c3c40f39da0"
+    },
+    {
+      "name": "runner-race20",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "./replay"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 2.311,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/runner-race20.log",
+      "log_sha256": "154848d9ede55c71b6396b3e8e1e43ff5edfb9ba02bd3428920352abac206082"
+    },
+    {
+      "name": "actual-consumer-race3",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-count=3",
+        "-timeout=180s",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/examples/replay",
+      "exit_code": 0,
+      "elapsed_seconds": 48.478,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/actual-consumer-race3.log",
+      "log_sha256": "fcc5b900b6b581d23a7e0d004265f302a770b0a0230286f3a7eb4af3bc86bc80"
+    },
+    {
+      "name": "native-editor-build",
+      "command": [
+        "go",
+        "build",
+        "-race",
+        "-o",
+        "/private/tmp/vellum-p9-integration-qualification-final/editor",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/examples/editor",
+      "exit_code": 0,
+      "elapsed_seconds": 2.977,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/native-editor-build.log",
+      "log_sha256": "228adc0edea7fbc160372659dd370f90757655566060763a329c4851b66107ff"
+    },
+    {
+      "name": "native-editor-smoke",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification-final/editor",
+        "-smoke"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration-qualification-final",
+      "exit_code": 0,
+      "elapsed_seconds": 7.999,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/native-editor-smoke.log",
+      "log_sha256": "1fd542f38b29bdad613e7065e46b506860987ee3af32284c90a1a68cdaf62739"
+    },
+    {
+      "name": "native-replay-build",
+      "command": [
+        "go",
+        "build",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-o",
+        "/private/tmp/vellum-p9-integration-qualification-final/replay-native",
+        "./cmd/native"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/examples/replay",
+      "exit_code": 0,
+      "elapsed_seconds": 3.262,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/native-replay-build.log",
+      "log_sha256": "31049f427a345a4465eda17a4de695f7bc0ac1eb74eda4bd891f5c7ab557cf55"
+    },
+    {
+      "name": "native-replay-1",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification-final/replay-native",
+        "-batch",
+        "1"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 3.174,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/native-replay-1.log",
+      "log_sha256": "220bbc98667fbeb78f50fbca5bdc624be0c3756503e24cfadea1317a92f8075c"
+    },
+    {
+      "name": "native-replay-7",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification-final/replay-native",
+        "-batch",
+        "7"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 2.45,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/native-replay-7.log",
+      "log_sha256": "f965c04a719fd4023e2f40b1414d70cd6ac500eb50e5c6f5ceca928f4c1db78f"
+    },
+    {
+      "name": "native-replay-64",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification-final/replay-native",
+        "-batch",
+        "64"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 2.464,
+      "log": "/private/tmp/vellum-p9-integration-qualification-final/native-replay-64.log",
+      "log_sha256": "f2b4b961a583b2f20bb4108464ae4c68c6a643e9cbbf50f60a3099da6846aff2"
+    }
+  ],
+  "prepared_files": 36,
+  "independent_foundation_proofs": [
+    {
+      "path": "/private/tmp/vellum-p9-native/qualification-v2.json",
+      "sha256": "a44dfdba49e1e6c920f7a108b9885900950f496e2ec1fdeaaed06d9f26edd1b1"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-timers/qualification-v2.json",
+      "sha256": "a90064e6ec14ba919400c3de31686f6ea381cf0d2b3b52effc0a8bad08b5c518"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-managed/acceptance-v2/qualification.json",
+      "sha256": "f3ec6ae9042565d5c9192c7043ac033bbe5c26828f7138531bb48162293cfcc9"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-replay/acceptance/qualification-v6.json",
+      "sha256": "3e66ac40135fa072eb9554eb26b5a2a208f308db409c23757455efc3a5a10823"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-native-corrections/qualification.json",
+      "sha256": "2e58b0bbb0408376c71cef9f17eb90616a7f5b8ad20b46fc86bb6626264071e8"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-capture-followup/qualification.json",
+      "sha256": "9976a601132b7e1735bb31ea1454afa8ec8dbf7591c897c9f62253e3054cace1"
+    }
+  ],
+  "scope": "one bounded fixed actual software UI replay; explicit owned widget timers; existing Cocoa editor regression; full P9/native services/GPU/performance remain open",
+  "historical_sandbox_gate": {
+    "path": "/private/tmp/vellum-p9-integration-check.log",
+    "sha256": "c98dcedeb7b1fca60aa6d0505ca885fdcb30714842ed946f2499c5d2d3fb4243",
+    "exit_code": 1,
+    "reason": "ps forbidden by sandbox in existing child_process_test.py"
+  }
+}

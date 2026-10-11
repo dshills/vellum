@@ -1,0 +1,503 @@
+{
+  "manifest": {
+    "version": 1,
+    "fixture_sha256": "9dbd7db38c6f5dbfa39bb0b65afd37dfa7cb8e2ecafede5cf73520ae794b584b",
+    "layout_version": "vellum-managed-layout-1",
+    "renderer_version": "cogent-manual-software-1",
+    "theme_sha256": "c624177fb33479a7b80bc53207cdfdf1dfde92fe2ddfd49adf31a9557e9621da",
+    "start": "2024-10-27T03:33:20Z",
+    "seed": 1,
+    "windows": [
+      {
+        "id": "replay",
+        "incarnation": 1,
+        "width": 860,
+        "height": 620,
+        "dpi": 160
+      }
+    ],
+    "fonts": [
+      {
+        "family": "noto/NotoSans-Bold.ttf",
+        "sha256": "1b07286b38cd198342ec25549d04721004c562c857097cbf988065ff0594ad0e"
+      },
+      {
+        "family": "noto/NotoSans-BoldItalic.ttf",
+        "sha256": "36aa1aac6b8b232e0eb0ebdba31aa87400eafe13f3828607921985081dad8aa8"
+      },
+      {
+        "family": "noto/NotoSans-Italic.ttf",
+        "sha256": "2c63aa26551fabddc3e6f54f042f63cf07aa9b0ea2072f5a07b824a1de6577f3"
+      },
+      {
+        "family": "noto/NotoSans-Medium.ttf",
+        "sha256": "3ebd444d4edf1b98e0f33b0caecebefdd14cba1a55ea9507269689023819770b"
+      },
+      {
+        "family": "noto/NotoSans-MediumItalic.ttf",
+        "sha256": "95b428bd509827c94b586ffa3049ed5e74cb6f9799fb21faf68f8993697443e8"
+      },
+      {
+        "family": "noto/NotoSans-Regular.ttf",
+        "sha256": "e2597ff33b199739c26852f12da62f9fd250a838f8c3894a1a561541622963b3"
+      },
+      {
+        "family": "robotomono/RobotoMono-Bold.ttf",
+        "sha256": "3f4e0cd7747df32a34748a66c1274d76712cab429c75e75f5f0167319b97fccb"
+      },
+      {
+        "family": "robotomono/RobotoMono-BoldItalic.ttf",
+        "sha256": "c06fe92ae6e3eae20c1d40a312160ba8c1fc6c1fc39a136a837836e40563ce33"
+      },
+      {
+        "family": "robotomono/RobotoMono-Italic.ttf",
+        "sha256": "d357b7530d41b1562745a9fad9239565b83e1f1d81164a27c225e936450ad39f"
+      },
+      {
+        "family": "robotomono/RobotoMono-Medium.ttf",
+        "sha256": "f1c247bde0eed1e58e3b9eee89b2188dc5dfa44b8c2716044556662dd70cb7b1"
+      },
+      {
+        "family": "robotomono/RobotoMono-MediumItalic.ttf",
+        "sha256": "d28a27e622729e0968ba48a6799e7e0b89394822aceb4d4c7ccbbd7cadce7410"
+      },
+      {
+        "family": "robotomono/RobotoMono-Regular.ttf",
+        "sha256": "8d9a1fa4dfe5a5deea780f6513996141425ef782d7cc5665d4d459146fd3a71c"
+      }
+    ]
+  },
+  "operations": [
+    {
+      "sequence": 1,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 2,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "initial"
+    },
+    {
+      "sequence": 3,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "replay",
+      "window_incarnation": 1,
+      "target": "project-open",
+      "target_incarnation": 3,
+      "x": 86,
+      "y": 35,
+      "button": 1
+    },
+    {
+      "sequence": 4,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "replay",
+      "window_incarnation": 1,
+      "x": 86,
+      "y": 35,
+      "button": 1
+    },
+    {
+      "sequence": 5,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 6,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "opened"
+    },
+    {
+      "sequence": 7,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "replay",
+      "window_incarnation": 1,
+      "target": "property-1",
+      "target_incarnation": 9,
+      "x": 184,
+      "y": 98,
+      "button": 1
+    },
+    {
+      "sequence": 8,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "replay",
+      "window_incarnation": 1,
+      "x": 184,
+      "y": 98,
+      "button": 1
+    },
+    {
+      "sequence": 9,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 10,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "a",
+      "modifiers": 2
+    },
+    {
+      "sequence": 11,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 12,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "H"
+    },
+    {
+      "sequence": 13,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 14,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "a"
+    },
+    {
+      "sequence": 15,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 16,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "r"
+    },
+    {
+      "sequence": 17,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 18,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "b"
+    },
+    {
+      "sequence": 19,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 20,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "o"
+    },
+    {
+      "sequence": 21,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 22,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "r"
+    },
+    {
+      "sequence": 23,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 24,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "replay",
+      "window_incarnation": 1,
+      "key": "Enter"
+    },
+    {
+      "sequence": 25,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 26,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "edited"
+    },
+    {
+      "sequence": 27,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "replay",
+      "window_incarnation": 1,
+      "target": "table-sort",
+      "target_incarnation": 13,
+      "x": 81,
+      "y": 161,
+      "button": 1
+    },
+    {
+      "sequence": 28,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "replay",
+      "window_incarnation": 1,
+      "x": 81,
+      "y": 161,
+      "button": 1
+    },
+    {
+      "sequence": 29,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 30,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "replay",
+      "window_incarnation": 1,
+      "target": "table-row-0",
+      "target_incarnation": 26,
+      "x": 326,
+      "y": 257,
+      "button": 1
+    },
+    {
+      "sequence": 31,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "replay",
+      "window_incarnation": 1,
+      "x": 326,
+      "y": 257,
+      "button": 1
+    },
+    {
+      "sequence": 32,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 33,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "sorted-selected"
+    },
+    {
+      "sequence": 34,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "replay",
+      "window_incarnation": 1,
+      "target": "task-start",
+      "target_incarnation": 20,
+      "x": 75,
+      "y": 382,
+      "button": 1
+    },
+    {
+      "sequence": 35,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "replay",
+      "window_incarnation": 1,
+      "x": 75,
+      "y": 382,
+      "button": 1
+    },
+    {
+      "sequence": 36,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 37,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "worker-admitted"
+    },
+    {
+      "sequence": 38,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "replay",
+      "window_incarnation": 1,
+      "target": "task-cancel",
+      "target_incarnation": 21,
+      "x": 217,
+      "y": 382,
+      "button": 1
+    },
+    {
+      "sequence": 39,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "replay",
+      "window_incarnation": 1,
+      "x": 217,
+      "y": 382,
+      "button": 1
+    },
+    {
+      "sequence": 40,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 41,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "cancel-requested"
+    },
+    {
+      "sequence": 42,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 1
+    },
+    {
+      "sequence": 43,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 44,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "worker-delivered"
+    },
+    {
+      "sequence": 45,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "replay",
+      "window_incarnation": 1,
+      "target": "undo",
+      "target_incarnation": 4,
+      "x": 224,
+      "y": 35,
+      "button": 1
+    },
+    {
+      "sequence": 46,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "replay",
+      "window_incarnation": 1,
+      "x": 224,
+      "y": 35,
+      "button": 1
+    },
+    {
+      "sequence": 47,
+      "at": 0,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 48,
+      "at": 0,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "undone"
+    },
+    {
+      "sequence": 49,
+      "at": 0,
+      "kind": "advance",
+      "window": "replay",
+      "window_incarnation": 1,
+      "delta": 1000000000
+    },
+    {
+      "sequence": 50,
+      "at": 1000000000,
+      "kind": "frame",
+      "window": "replay",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 51,
+      "at": 1000000000,
+      "kind": "capture",
+      "window": "replay",
+      "window_incarnation": 1,
+      "label": "final"
+    }
+  ]
+}

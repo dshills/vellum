@@ -1,0 +1,292 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "f9e1f6fd243ccad7f875269667a39ac4",
+  "repo": {
+    "root": "/private/tmp/vellum-p9-integration",
+    "head": "bf42811c127cec212f3a5523d84366ac06d60b43",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "59db1ef4ce8fc7f1",
+      "severity": "medium",
+      "category": "bug",
+      "title": "No upper bound on window size before allocating the software surface",
+      "message": "Window dimensions are checked only for being positive integers. There is no upper bound, even though the config bounds every other resource. A very large integral width or height reaches `RunManual` and the software compositor, which allocate an image of that size and can cause an out-of-memory failure.",
+      "suggestion": "Add a maximum window dimension, or a total-pixel cap, to `ManualConfig` and enforce it here.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/manual_offscreen.go",
+          "lines": {
+            "start": 419,
+            "end": 419
+          }
+        }
+      ],
+      "tags": [
+        "resource-limits",
+        "validation",
+        "location-corrected"
+      ],
+      "evidence": "if spec.Width \u003c 1 || spec.Height \u003c 1 || float32(int(spec.Width)) != spec.Width || float32(int(spec.Height)) != spec.Height {",
+      "fix": {
+        "before": "if spec.Width \u003c 1 || spec.Height \u003c 1 || float32(int(spec.Width)) != spec.Width || float32(int(spec.Height)) != spec.Height {",
+        "after": "if spec.Width \u003c 1 || spec.Height \u003c 1 || spec.Width \u003e 16384 || spec.Height \u003e 16384 || float32(int(spec.Width)) != spec.Width || float32(int(spec.Height)) != spec.Height {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "498198e2a305b730",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Quadratic lookup of accessibility nodes per element",
+      "message": "For every control, `collect` linearly scans every accessibility node. Capture cost is O(controls × nodes), and the configuration allows up to 65536 controls. Capture runs on each frame during Step and Frame, so large windows can make replay very slow.",
+      "suggestion": "Build a `map[string]*accessNode` keyed by DomainID once, before `collect`, and look controls up in it.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/manual_offscreen.go",
+          "lines": {
+            "start": 772,
+            "end": 773
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "quadratic",
+        "location-corrected"
+      ],
+      "evidence": "for _, node := range nodes {\n\t\t\t\tif node.DomainID == r.node.ID {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b82f2705a6e6b2c7",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unchecked type assertion can panic during capture",
+      "message": "The code asserts `r.widget` to `*core.TextField` whenever `r.node.Kind == ui.TextField`. If reconcile ever backs that kind with another widget type, such as a disabled or read-only variant, the assertion panics inside `owner.Do` during capture. The earlier block already handles the checked case, so this one is also redundant.",
+      "suggestion": "Use the checked form `field, ok := r.widget.(*core.TextField)` and skip the branch when `ok` is false, or remove the duplicate block.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/manual_offscreen.go",
+          "lines": {
+            "start": 784,
+            "end": 784
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "type-assertion",
+        "location-corrected"
+      ],
+      "evidence": "state := r.widget.(*core.TextField).EditingState()",
+      "fix": {
+        "before": "if r.node.Kind == ui.TextField {\n\t\t\t\tstate := r.widget.(*core.TextField).EditingState()",
+        "after": "if field, ok := r.widget.(*core.TextField); ok \u0026\u0026 r.node.Kind == ui.TextField {\n\t\t\t\tstate := field.EditingState()"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 315366,
+    "totalMs": 128700
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 46,
+    "bytes": 405262,
+    "chunks": 10,
+    "llmCalls": 11,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 270508,
+        "output": 40908,
+        "costUSD": 0.950096
+      }
+    ],
+    "widenedFiles": 7,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "eee6829bcebd28d2",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Repeat-click timer drops AsyncLock safety checks in non-manual mode",
+        "message": "The repeat-click timer callback no longer uses rw.AsyncLock/AsyncUnlock on the non-manual path. It now locks the render context directly. That drops the post-lock check that the widget was not deleted while waiting for the lock. It also drops the sceneUpdating flag set and cleared around the callout. The only liveness check (`tree.IsNil(em.repeatClick)`) runs before the lock is taken. The production path can therefore send Click to a widget deleted in that window. It also skips the scene-updating bookkeeping other code relies on.",
+        "suggestion": "Keep rw.AsyncLock()/rw.AsyncUnlock() on the non-manual path. Use the direct ownership shortcut only when rc.manual != nil. Re-check widget liveness after acquiring the lock in both modes.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/manualrouting/0030-manual-routing.patch",
+            "lines": {
+              "start": 148,
+              "end": 160
+            }
+          }
+        ],
+        "tags": [
+          "regression",
+          "concurrency",
+          "timer"
+        ],
+        "evidence": "rc := em.scene.renderContext()\n\t\tif rc == nil {\n\t\t\treturn\n\t\t}\n\t\tif rc.manual == nil {\n\t\t\trc.Lock()\n\t\t\tdefer rc.Unlock()\n\t\t}\n\t\trw.Send(events.Click)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/manualrouting/0030-manual-routing.patch"
+    },
+    {
+      "finding": {
+        "id": "762560ec3e480805",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Ignored SendDeferred error silently loses timer and leaks credit",
+        "message": "The error from SendDeferred is discarded inside the clock callback. If admission fails, the timer stays in state 0 and keeps its credit in m.timers. Its callback never runs and no manual failure is recorded. The caller sees a silently lost deadline. Repeated failures also exhaust EventCapacity credits that nothing releases until the window retires.",
+        "suggestion": "Check the returned error. On failure, call m.fail(err) and retire the timer: set state 3 and delete it from m.timers under m.mu.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/manualrouting/0030-manual-routing.patch",
+            "lines": {
+              "start": 328,
+              "end": 330
+            }
+          }
+        ],
+        "tags": [
+          "error-handling",
+          "timer"
+        ],
+        "evidence": "_ = q.SendDeferred(func() (events.DeferredEvent, error) {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/manualrouting/0030-manual-routing.patch"
+    },
+    {
+      "finding": {
+        "id": "13abc298cdceb60d",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Manual timer refusal is ignored in Complete.Show and popup timeout",
+        "message": "The result of scene.afterEvent is stored or discarded without checking for a refusal. Scene.ManualAfterFunc shows that afterEvent can return nil on capacity, lifetime or failure. In that case the completion is silently never shown, and nothing is recorded through ManualFailure. The popup timeout path in popupstage.go has the same problem: the popup would never auto-dismiss and the failure would go unreported. This breaks the checked-refusal behaviour the rest of the patch is built around.",
+        "suggestion": "In manual mode use `scene.ManualAfterFunc(wait, callback)`. On error call `scene.ManualFailure(err)` and leave delayTimer nil. Apply the same change to the popup timeout in popupstage.go.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/ownedtimers/0031-owned-widget-timers.patch",
+            "lines": {
+              "start": 75,
+              "end": 75
+            }
+          }
+        ],
+        "tags": [
+          "error-handling",
+          "manual-timer"
+        ],
+        "evidence": "c.delayTimer = scene.afterEvent(wait, callback)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/ownedtimers/0031-owned-widget-timers.patch"
+    },
+    {
+      "finding": {
+        "id": "43214136e97b4671",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unchecked interface type assertion in RequestFrame can panic",
+        "message": "The unchecked type assertion panics if the system window does not implement RequestPaint(). A panic here would escape a public API that is meant to return an error. The offscreen test driver implements it, but the manual-window contract does not guarantee that every driver does.",
+        "suggestion": "Use the comma-ok form, for example `p, ok := m.window.SystemWindow.(interface{ RequestPaint() }); if !ok { return ErrManualUnsupported }; p.RequestPaint()`.",
+        "confidence": 0.45,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/ownedtimers/0031-owned-widget-timers.patch",
+            "lines": {
+              "start": 205,
+              "end": 205
+            }
+          }
+        ],
+        "tags": [
+          "panic",
+          "type-assertion"
+        ],
+        "evidence": "m.window.SystemWindow.(interface{ RequestPaint() }).RequestPaint()",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/ownedtimers/0031-owned-widget-timers.patch"
+    },
+    {
+      "finding": {
+        "id": "fa12649b281e1b32",
+        "severity": "medium",
+        "category": "bug",
+        "title": "MonitorOutput silently swallows BeginAmbientWork errors, including nil Lines",
+        "message": "BeginAmbientWork returns ErrManualExecution when ob.Lines is nil, and MonitorOutput swallows every error and returns. Output monitoring then silently does nothing for a nil Lines, and the caller never learns that the reader was not consumed. Previously this was a loud nil-pointer failure. The manual-refusal case is reported through the Failure callback, but this nil path is not reported anywhere.",
+        "suggestion": "Distinguish a nil Lines (programmer error) from a manual refusal. For example, check ob.Lines == nil up front and panic or log, and only return silently on ErrManualAmbient.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/ownedtimers/0031-owned-widget-timers.patch",
+            "lines": {
+              "start": 1640,
+              "end": 1640
+            }
+          }
+        ],
+        "tags": [
+          "error-handling"
+        ],
+        "evidence": "finish, err := ob.Lines.BeginAmbientWork()\n+\tif err != nil {\n+\t\treturn\n+\t}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/ownedtimers/0031-owned-widget-timers.patch"
+    }
+  ],
+  "suppressed": []
+}

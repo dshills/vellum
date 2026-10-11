@@ -1,0 +1,329 @@
+--- a/core/events.go
++++ b/core/events.go
+@@ -805,27 +805,37 @@
+ 	if em.repeatClickTimer == nil {
+ 		delay *= 8
+ 	}
+-	em.repeatClickTimer = em.scene.afterEvent(delay, func() {
+-		if tree.IsNil(em.repeatClick) || !em.repeatClick.AsWidget().IsVisible() {
+-			return
+-		}
+-		// note: we are not in event loop here anymore!
+-		rw := em.repeatClick.AsWidget()
+-		rc := em.scene.renderContext()
+-		if rc == nil {
+-			return
+-		}
+-		if rc.manual == nil {
+-			rc.Lock()
+-			defer rc.Unlock()
+-		}
+-		rw.Send(events.Click)
+-		// A Click callback may close this scene. Never dereference its retired
+-		// stage or rearm a deadline after the callout.
+-		if em.scene.renderContext() == rc && em.scene.This != nil {
+-			em.startRepeatClickTimer()
+-		}
++	scene, rc, widget := em.scene, em.scene.renderContext(), em.repeatClick
++	if rc == nil {
++		return
++	}
++	em.repeatClickTimer = scene.afterEvent(delay, func() {
++		em.repeatClickTimed(scene, rc, widget)
+ 	})
++}
++
++// repeatClickTimed uses the ownership captured at admission. Default timers
++// acquire that context before reading widget state; manual timers already run
++// under the originating event owner. Retired or replaced widgets cannot inherit
++// an earlier timer, and default callouts retain AsyncLock's updating flag.
++func (em *Events) repeatClickTimed(scene *Scene, rc *renderContext, widget Widget) {
++	if rc.manual == nil {
++		rc.Lock()
++		defer rc.Unlock()
++	}
++	if em.scene != scene || scene.This == nil || scene.renderContext() != rc || em.repeatClick != widget || tree.IsNil(widget) || widget.AsWidget().Scene != scene || !widget.AsWidget().IsVisible() {
++		return
++	}
++	if rc.manual == nil {
++		scene.setFlag(true, sceneUpdating)
++		defer scene.setFlag(false, sceneUpdating)
++	}
++	widget.AsWidget().Send(events.Click)
++	// A Click callback may close this scene. Never dereference its retired
++	// stage or rearm a deadline after the callout.
++	if scene.renderContext() == rc && scene.This != nil {
++		em.startRepeatClickTimer()
++	}
+ }
+ 
+ func (em *Events) dragStartCheck(e events.Event, dur time.Duration, dist int) bool {
+--- a/core/manual_window.go
++++ b/core/manual_window.go
+@@ -408,7 +408,11 @@
+ 	if m.window.SystemWindow.IsClosed() {
+ 		return ErrManualClosed
+ 	}
+-	m.window.SystemWindow.(interface{ RequestPaint() }).RequestPaint()
++	requester, ok := m.window.SystemWindow.(interface{ RequestPaint() })
++	if !ok {
++		return ErrManualUnsupported
++	}
++	requester.RequestPaint()
+ 	return nil
+ }
+ func (m *ManualWindow) Frame(ctx context.Context) (ManualStepResult, error) {
+@@ -421,7 +425,11 @@
+ 	}
+ 	// The normal queue prioritizes WindowPaint over back input. Use that same
+ 	// route rather than calling a widget render method or draining owner posts.
+-	m.window.SystemWindow.(interface{ RequestPaint() }).RequestPaint()
++	requester, ok := m.window.SystemWindow.(interface{ RequestPaint() })
++	if !ok {
++		return ManualStepResult{}, ErrManualUnsupported
++	}
++	requester.RequestPaint()
+ 	return m.stepOwned()
+ }
+ func (m *ManualWindow) Image(ctx context.Context) (*image.RGBA, error) {
+--- /dev/null
++++ b/core/replay_corrections_vellum_test.go
+@@ -0,0 +1,156 @@
++//go:build offscreen
++
++package core
++
++import (
++	"context"
++	"errors"
++	"reflect"
++	"runtime"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/system"
++)
++
++func TestVellumDefaultRepeatClickOwnership(t *testing.T) {
++	for _, mode := range []string{"normal", "panic", "goexit"} {
++		t.Run(mode, func(t *testing.T) {
++			var button *Button
++			m, body, _ := manualFixture(t, func(b *Body) { button = NewButton(b).SetText("repeat") })
++			drainManual(t, m)
++			scene, rc := body.Scene, body.Scene.renderContext()
++			// The same production callback is exercised with default ownership.
++			// No real-time timer or background render/event loop is constructed.
++			rc.manual = nil
++			defer func() { rc.manual = m }()
++			em := &scene.Events
++			em.repeatClick = button
++			var clicks int
++			var updating, locked bool
++			button.OnClick(func(events.Event) {
++				clicks++
++				updating = scene.hasFlag(sceneUpdating)
++				locked = !rc.TryLock()
++				if !locked {
++					rc.Unlock()
++				}
++				em.cancelRepeatClick()
++				switch mode {
++				case "panic":
++					panic("expected repeat callback panic")
++				case "goexit":
++					runtime.Goexit()
++				}
++			})
++			done := make(chan struct{})
++			var panicValue any
++			go func() {
++				defer close(done)
++				defer func() { panicValue = recover() }()
++				em.repeatClickTimed(scene, rc, button)
++			}()
++			select {
++			case <-done:
++			case <-time.After(5 * time.Second):
++				t.Fatal("repeat ownership remained locked")
++			}
++			if clicks != 1 || !updating || !locked || scene.hasFlag(sceneUpdating) {
++				t.Fatal("default callout ownership changed", clicks, updating, locked, scene.hasFlag(sceneUpdating))
++			}
++			if !rc.TryLock() {
++				t.Fatal("default context not released after callout")
++			}
++			rc.Unlock()
++			if mode == "panic" && panicValue != "expected repeat callback panic" {
++				t.Fatal("panic was lost", panicValue)
++			}
++			if em.repeatClickTimer != nil {
++				t.Fatal("canceled repeat rearmed a wall timer")
++			}
++		})
++	}
++}
++
++func TestVellumDefaultRepeatClickRevalidatesCapturedWidget(t *testing.T) {
++	for _, mode := range []string{"deleted", "replaced", "moved"} {
++		t.Run(mode, func(t *testing.T) {
++			var old, replacement *Button
++			m, body, _ := manualFixture(t, func(b *Body) {
++				old = NewButton(b).SetText("old")
++				replacement = NewButton(b).SetText("new")
++			})
++			drainManual(t, m)
++			scene, rc := body.Scene, body.Scene.renderContext()
++			rc.manual = nil
++			defer func() { rc.manual = m }()
++			em := &scene.Events
++			em.repeatClick = old
++			clicks := 0
++			old.OnClick(func(events.Event) { clicks++; em.cancelRepeatClick() })
++			done := make(chan struct{})
++			rc.Lock()
++			go func() { defer close(done); em.repeatClickTimed(scene, rc, old) }()
++			// Mutation completes under the same context before a previously
++			// admitted callback can take ownership. No callback reads em/widget
++			// state outside that context.
++			switch mode {
++			case "deleted":
++				old.Delete()
++			case "moved":
++				old.SetScene(NewScene("other-owner"))
++			case "replaced":
++				em.repeatClick = replacement
++			}
++			rc.Unlock()
++			select {
++			case <-done:
++			case <-time.After(5 * time.Second):
++				t.Fatal("retired repeat callback blocked")
++			}
++			if mode == "moved" {
++				old.SetScene(scene)
++			}
++			if clicks != 0 || em.repeatClickTimer != nil || scene.hasFlag(sceneUpdating) {
++				t.Fatal("stale repeat target dispatched/rearmed", clicks, em.repeatClickTimer)
++			}
++		})
++	}
++}
++
++// Embedding the public Window interface hides the implementation-only
++// RequestPaint method while preserving the manual inspection/flush contract.
++type noPaintManualWindow struct{ system.Window }
++
++func (w *noPaintManualWindow) ManualExecution() bool {
++	return w.Window.(manualSystemWindow).ManualExecution()
++}
++func (w *noPaintManualWindow) ManualState() system.ManualWindowState {
++	return w.Window.(manualSystemWindow).ManualState()
++}
++func (w *noPaintManualWindow) FlushReadyPaint() bool {
++	return w.Window.(manualSystemWindow).FlushReadyPaint()
++}
++
++func TestVellumManualRequestFrameUnsupportedWindowRefuses(t *testing.T) {
++	m, _, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	before, err := m.Snapshot(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	original := m.window.SystemWindow
++	m.window.SystemWindow = &noPaintManualWindow{Window: original}
++	defer func() { m.window.SystemWindow = original }()
++	if err := m.RequestFrame(context.Background()); !errors.Is(err, ErrManualUnsupported) {
++		t.Fatal("unsupported RequestFrame did not refuse", err)
++	}
++	if step, err := m.Frame(context.Background()); !errors.Is(err, ErrManualUnsupported) || step.Events != 0 || step.Frames != 0 {
++		t.Fatal("unsupported Frame dispatched work", step, err)
++	}
++	after, err := m.Snapshot(context.Background())
++	if err != nil || !reflect.DeepEqual(before, after) {
++		t.Fatal("unsupported frame admission mutated controller", before, after, err)
++	}
++}
+--- a/text/textcore/outputbuffer.go
++++ b/text/textcore/outputbuffer.go
+@@ -59,6 +59,9 @@
+ 
+ // MonitorOutput monitors the output and updates the [Buffer].
+ func (ob *OutputBuffer) MonitorOutput() {
++	if ob.Lines == nil {
++		panic("textcore: OutputBuffer.MonitorOutput requires nonnil Lines")
++	}
+ 	// Reader batching is ambient work, not a manual clock timer. Refuse before
+ 	// reading or allocating a batch if the Lines buffer has a manual owner.
+ 	finish, err := ob.Lines.BeginAmbientWork()
+--- /dev/null
++++ b/text/textcore/outputbuffer_vellum_test.go
+@@ -0,0 +1,67 @@
++package textcore
++
++import (
++	"errors"
++	"strings"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/text/lines"
++)
++
++type outputAdmissionReader struct{ reads int }
++
++func (r *outputAdmissionReader) Read([]byte) (int, error) {
++	r.reads++
++	return 0, errors.New("reader must not start")
++}
++
++func TestVellumOutputBufferNilLinesFailsBeforeRead(t *testing.T) {
++	reader := &outputAdmissionReader{}
++	buffer := &OutputBuffer{Output: reader}
++	var failure any
++	func() {
++		defer func() { failure = recover() }()
++		buffer.MonitorOutput()
++	}()
++	if failure != "textcore: OutputBuffer.MonitorOutput requires nonnil Lines" {
++		t.Fatal("invalid buffer was silently accepted", failure)
++	}
++	if reader.reads != 0 || buffer.afterTimer != nil || len(buffer.bufferedLines) != 0 || buffer.Batch != 0 {
++		t.Fatal("invalid monitoring allocated or consumed work", reader.reads)
++	}
++}
++
++func TestVellumOutputBufferManualRefusalStillChecked(t *testing.T) {
++	ls := lines.NewLinesExact()
++	defer ls.Close()
++	view := ls.NewView(80)
++	var failure error
++	execution := &lines.ManualExecution{
++		Now:       func() time.Time { return time.Unix(1700000000, 0) },
++		AfterFunc: func(time.Duration, func()) (lines.Timer, error) { return nil, errors.New("unexpected timer") },
++		Failure:   func(err error) { failure = err },
++	}
++	if err := ls.BindManualExecution(view, execution); err != nil {
++		t.Fatal(err)
++	}
++	reader := &outputAdmissionReader{}
++	buffer := &OutputBuffer{Lines: ls, Output: reader}
++	buffer.MonitorOutput()
++	if !errors.Is(failure, lines.ErrManualAmbient) || reader.reads != 0 || buffer.afterTimer != nil || len(buffer.bufferedLines) != 0 || buffer.Batch != 0 {
++		t.Fatal("manual ambient refusal changed", failure, reader.reads)
++	}
++}
++
++func TestVellumOutputBufferDefaultMonitoringStillWrites(t *testing.T) {
++	ls := lines.NewLinesExact()
++	defer ls.Close()
++	buffer := &OutputBuffer{Lines: ls, Output: strings.NewReader("one\ntwo\n"), Batch: time.Hour}
++	buffer.MonitorOutput()
++	if text := ls.String(); text != "one\ntwo\n" {
++		t.Fatal("default output was lost", text)
++	}
++	if buffer.afterTimer != nil || len(buffer.bufferedLines) != 0 {
++		t.Fatal("EOF retained worker timer or batch")
++	}
++}

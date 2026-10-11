@@ -15,6 +15,7 @@
 - [Document persistence](document.md): asynchronous save/open, revision checks and unsaved-close policies.
 - [Document history](history.md): bounded undo/redo, save revisions and native keyboard precedence.
 - [Explicit execution](execution.md): bounded real/manual workers and clocks, reserved owner results and terminal accounting.
+- [Managed UI replay](replay.md): explicit native input/frame scheduling, checked fonts and bounded record execution.
 - [Native dispatch](native-dispatch.md): synchronous callback failure and desktop event termination.
 - [macOS completion](macos-completion.md): remaining framework and target acceptance work.
 - [Retained GPU drawing](drawing.md): immutable meshes, strokes, waveform reduction, indexed culling and resource accounting.

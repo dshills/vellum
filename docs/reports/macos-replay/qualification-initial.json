@@ -1,0 +1,168 @@
+{
+  "result": "PASS",
+  "root": "/private/tmp/vellum-p9-integration",
+  "base_commit": "bf42811c127cec212f3a5523d84366ac06d60b43",
+  "compiler": "go version go1.27.2 darwin/arm64",
+  "collector_sha256": "712d731c3f291a3fceef9ccf4ac4d69b3364c2874e188cc63ffd2bbd9664c9e0",
+  "input_count": 6977,
+  "source_before_sha256": "c7ba3bcbbb5f9601927d1a79bacb4a25d59406602fd4ecc7c8fbd4a789ed64cb",
+  "source_after_sha256": "c7ba3bcbbb5f9601927d1a79bacb4a25d59406602fd4ecc7c8fbd4a789ed64cb",
+  "changed_inputs": {},
+  "checks": [
+    {
+      "name": "full-gate",
+      "command": [
+        "./scripts/check.sh"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 23.272,
+      "log": "/private/tmp/vellum-p9-integration-qualification/full-gate.log",
+      "log_sha256": "83c1205ea938ce94f6223aa9d15e48cf171af7b08b636458147cdfdcf8e3f55b"
+    },
+    {
+      "name": "runner-race20",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "./replay"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 2.224,
+      "log": "/private/tmp/vellum-p9-integration-qualification/runner-race20.log",
+      "log_sha256": "fa689bda460dbfdddf411baa2ecab28e9b2c8c8357b28aab26af7a36c56b66c4"
+    },
+    {
+      "name": "actual-consumer-race3",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-count=3",
+        "-timeout=180s",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/examples/replay",
+      "exit_code": 0,
+      "elapsed_seconds": 45.492,
+      "log": "/private/tmp/vellum-p9-integration-qualification/actual-consumer-race3.log",
+      "log_sha256": "aeabee56e8f74091fb9cde7ac39c78bf5317a2d72bacf007c509d6e1f7c52b03"
+    },
+    {
+      "name": "native-editor-build",
+      "command": [
+        "go",
+        "build",
+        "-race",
+        "-o",
+        "/private/tmp/vellum-p9-integration-qualification/editor",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/examples/editor",
+      "exit_code": 0,
+      "elapsed_seconds": 0.468,
+      "log": "/private/tmp/vellum-p9-integration-qualification/native-editor-build.log",
+      "log_sha256": "f1402765fad2319470bf3bf7254fbcdf41dfdccb89b13bb2c66a64d18c308e0c"
+    },
+    {
+      "name": "native-editor-smoke",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification/editor",
+        "-smoke"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration-qualification",
+      "exit_code": 0,
+      "elapsed_seconds": 7.892,
+      "log": "/private/tmp/vellum-p9-integration-qualification/native-editor-smoke.log",
+      "log_sha256": "8ac23371224af3ef59a7bb68c5dd20ef127706fdcce58b971cffae633f26674d"
+    },
+    {
+      "name": "native-replay-build",
+      "command": [
+        "go",
+        "build",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-o",
+        "/private/tmp/vellum-p9-integration-qualification/replay-native",
+        "./cmd/native"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration/examples/replay",
+      "exit_code": 0,
+      "elapsed_seconds": 0.519,
+      "log": "/private/tmp/vellum-p9-integration-qualification/native-replay-build.log",
+      "log_sha256": "14c50cc468d6fb2b5dd89d118ccddd0b374bb0da27d040202f12e9daeef397c0"
+    },
+    {
+      "name": "native-replay-1",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification/replay-native",
+        "-batch",
+        "1"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 2.918,
+      "log": "/private/tmp/vellum-p9-integration-qualification/native-replay-1.log",
+      "log_sha256": "0b46585a6554bcb5b3408d1b13807691701fbe0c332ff705d9f0d1ec29fa2ca2"
+    },
+    {
+      "name": "native-replay-7",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification/replay-native",
+        "-batch",
+        "7"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 2.459,
+      "log": "/private/tmp/vellum-p9-integration-qualification/native-replay-7.log",
+      "log_sha256": "67b782636f54c65e3a6337d365d258d4dd405679bc1d7081071442ae4d5dfd9c"
+    },
+    {
+      "name": "native-replay-64",
+      "command": [
+        "/private/tmp/vellum-p9-integration-qualification/replay-native",
+        "-batch",
+        "64"
+      ],
+      "cwd": "/private/tmp/vellum-p9-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 2.51,
+      "log": "/private/tmp/vellum-p9-integration-qualification/native-replay-64.log",
+      "log_sha256": "160e3c2a6aad420126a1cc8c287b76d74ab748d9a235123353471bff23fd18b7"
+    }
+  ],
+  "prepared_files": 34,
+  "independent_foundation_proofs": [
+    {
+      "path": "/private/tmp/vellum-p9-native/qualification-v2.json",
+      "sha256": "a44dfdba49e1e6c920f7a108b9885900950f496e2ec1fdeaaed06d9f26edd1b1"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-timers/qualification-v2.json",
+      "sha256": "a90064e6ec14ba919400c3de31686f6ea381cf0d2b3b52effc0a8bad08b5c518"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-managed/acceptance-v2/qualification.json",
+      "sha256": "f3ec6ae9042565d5c9192c7043ac033bbe5c26828f7138531bb48162293cfcc9"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-replay/acceptance/qualification-v6.json",
+      "sha256": "3e66ac40135fa072eb9554eb26b5a2a208f308db409c23757455efc3a5a10823"
+    }
+  ],
+  "scope": "one bounded fixed actual software UI replay; explicit owned widget timers; existing Cocoa editor regression; full P9/native services/GPU/performance remain open",
+  "historical_sandbox_gate": {
+    "path": "/private/tmp/vellum-p9-integration-check.log",
+    "sha256": "c98dcedeb7b1fca60aa6d0505ca885fdcb30714842ed946f2499c5d2d3fb4243",
+    "exit_code": 1,
+    "reason": "ps forbidden by sandbox in existing child_process_test.py"
+  }
+}

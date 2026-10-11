@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "audit": "independent source-only native Prism disposition",
+  "created_at_utc": "2026-10-11T05:35:05.227693+00:00",
+  "root": "/private/tmp/vellum-p9-integration",
+  "review_report": {
+    "path": "/private/tmp/vellum-p9-prism.json",
+    "sha256": "7ab90503e57aa91812b8aae0be8ea95166310d6962aedb0828ff51626e588726"
+  },
+  "scope": "First retained window-size finding and all5 discarded native stage30/31 findings. Carrier quote mismatch was not used as a reason to dismiss. Other2 retained managed-capture findings are separately assigned. No tests/builds/Git/GUI/Prism/code edits performed.",
+  "source_hashes": {
+    "drivers/cogent/manual_offscreen.go": "23469c2ac3dcedfadbb2107e9aee34f60dea6c543e9510571081fe732ebd5329",
+    "drivers/cogent/build/upstream/core/manual_window.go": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+    "drivers/cogent/build/upstream/core/manual_timer.go": "992b089f25f4249ee41a778247b88fc542d1034acf8706ce5a2f07ccfad77b80",
+    "drivers/cogent/build/upstream/core/events.go": "36d7c91485420b1fdbad38e59277035d6c920ae508b1f75be3117bae967928c4",
+    "drivers/cogent/build/upstream/core/render.go": "a3c63a4eedf85cb5a2dc519a0e56fd4a967e1e3b5e02dfecc7dde6fffabceba9",
+    "drivers/cogent/build/upstream/core/widgetevents.go": "da23687aebedf16be5ed54346966a5a366b586fc6f024905936e6d29eb70584b",
+    "drivers/cogent/build/upstream/core/renderwindow.go": "ddfa2060ea2106117dac672f027a51c2cb89bdf9a80ed7324cf49bcd941c93f7",
+    "drivers/cogent/build/upstream/core/completer.go": "95c904230ef62e9e4567f8ac9c7c8cb0f457f1ea8865ce15db809eee5fcdb095",
+    "drivers/cogent/build/upstream/core/popupstage.go": "5510845154c02ec81fd5ee2fe1099c414232cf7a3ba1d1c969767677bec6307a",
+    "drivers/cogent/build/upstream/events/deque.go": "705839419660f22cefe819028cc4f2cbfa6bec5cba74607cfb835ad10b0e14c4",
+    "drivers/cogent/build/upstream/system/window.go": "0398a60151222a08ac97fdd3547cb64333f3f483c054bd3d738ec1c6e1073236",
+    "drivers/cogent/build/upstream/system/driver/offscreen/app.go": "a487919744c5a95feb254828e16d67c4a4d47e1cab1e559ce3d884bee357ed47",
+    "drivers/cogent/build/upstream/system/driver/offscreen/window.go": "f98b35df37b5c44778628a4e2aa651c110c5a1845c7b15a379b0f4b7f090ab1a",
+    "drivers/cogent/build/upstream/system/driver/offscreen/drawer.go": "b381aa4dfc8d3078c34bbcf6f71977797511d3035cf14a69d1d694e3be859504",
+    "drivers/cogent/build/upstream/text/textcore/outputbuffer.go": "edb2f0ac9303be4ff6913403b8613186d5d07bebbefcb9916de3bdb994cc3314",
+    "drivers/cogent/build/upstream/text/lines/manual_execution.go": "f54d82e0195a89e27ebbf76a6d5fbf772e4dc3aa4bfcd96caa1aba797bcb5568",
+    "drivers/cogent/build/upstream/text/lines/api.go": "1b85f36f4a462680eb3557c72bfaa49d4ee97b0d4483bf957a6755555be46789",
+    "drivers/cogent/build/upstream/core/manual_window_test.go": "fca5edb2b039a995e66cf417e6a6c14a84d00bc9657655c3d837cac357f8025d",
+    "drivers/cogent/build/upstream/core/timer_vellum_test.go": "061c0cfc49e5c41c56cfd22ce1b042138cdbf39e58ae08e74bcfd522a404077f",
+    "drivers/cogent/build/upstream/text/textcore/manual_timer_vellum_test.go": "b64032aca991339fa77d74bf457dca68024f2d9c6bcfb25d983eff6ed0fbcdc7"
+  },
+  "dispositions": [
+    {
+      "id": "59db1ef4ce8fc7f1",
+      "title": "No upper bound on window size before allocating the software surface",
+      "disposition": "refuted",
+      "reason": "Managed dimensions reach Core.RunManual, whose validateManualConfig refuses X/Y >32768 or X >16*1024*1024/Y. RunManual calls validation before NewShaper, Scene.Resize or offscreen factory creation. Thus the software-surface allocation alleged by this finding is bounded to16,777,216pixels. Managed positive-integral conversion also refuses nonsensical overflow results; Core checks positive dimensions independently. This does not promise global-memory sufficiency for64windows, merely refutes unbounded single-surface allocation.",
+      "evidence": [
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/manual_offscreen.go",
+          "sha256": "23469c2ac3dcedfadbb2107e9aee34f60dea6c543e9510571081fe732ebd5329",
+          "start": 419,
+          "end": 471
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window.go",
+          "sha256": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+          "start": 112,
+          "end": 142
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window.go",
+          "sha256": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+          "start": 161,
+          "end": 179
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/system/driver/offscreen/drawer.go",
+          "sha256": "b381aa4dfc8d3078c34bbcf6f71977797511d3035cf14a69d1d694e3be859504",
+          "start": 20,
+          "end": 25
+        }
+      ],
+      "required_change": null
+    },
+    {
+      "id": "eee6829bcebd28d2",
+      "title": "Repeat-click timer drops AsyncLock safety checks in non-manual mode",
+      "disposition": "partially_applicable",
+      "reason": "Actual production callback now holds captured renderContext directly and no longer sets/clears sceneUpdating around the callout; this is a real change to the prior AsyncLock contract. However the claim that a deleted widget receives Click is false: WidgetBase.Send returns immediately if This==nil, and the captured renderContext mutex excludes competing destructive event/render work during Send. The pre-lock repeat/visibility check can become stale; preserving default bookkeeping and rechecking current repeat widget/Scene/liveness under the lock is a narrow correction. Literal AsyncLock restoration is unsafe as its documented deleted-widget behavior blocks forever. No runtime wrong-output reproduction was executed in this read-only audit.",
+      "evidence": [
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/events.go",
+          "sha256": "36d7c91485420b1fdbad38e59277035d6c920ae508b1f75be3117bae967928c4",
+          "start": 800,
+          "end": 827
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/render.go",
+          "sha256": "a3c63a4eedf85cb5a2dc519a0e56fd4a967e1e3b5e02dfecc7dde6fffabceba9",
+          "start": 29,
+          "end": 84
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/widgetevents.go",
+          "sha256": "da23687aebedf16be5ed54346966a5a366b586fc6f024905936e6d29eb70584b",
+          "start": 163,
+          "end": 189
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/renderwindow.go",
+          "sha256": "ddfa2060ea2106117dac672f027a51c2cb89bdf9a80ed7324cf49bcd941c93f7",
+          "start": 499,
+          "end": 528
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/renderwindow.go",
+          "sha256": "ddfa2060ea2106117dac672f027a51c2cb89bdf9a80ed7324cf49bcd941c93f7",
+          "start": 682,
+          "end": 687
+        }
+      ],
+      "required_change": "Restore non-manual sceneUpdating callout semantics using the captured Scene/renderContext and defer cleanup, with a post-lock same-widget/live check; keep manual callback ownership shortcut."
+    },
+    {
+      "id": "762560ec3e480805",
+      "title": "Ignored SendDeferred error silently loses timer and leaks credit",
+      "disposition": "refuted",
+      "reason": "Deque.SendDeferred has no capacity or closed-admission failure of its own: it returns only the prepare callback error. This timer prepare callback returns (nil,nil) for retired/canceled work or (event,nil) after state0\u21921. Every normal return therefore yields nil error, so the alleged failure/armed-credit leak cannot occur from ignoring this return. Provider scheduling errors and typednil handles call Stop+fail; queued cancellation keeps credit until dispatch or controller retirement. The external checked Clock admits its bounded slot before callback dispatch. Panic during source.Now is a distinct callback-fault policy, not a SendDeferred error path claimed here.",
+      "evidence": [
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_timer.go",
+          "sha256": "992b089f25f4249ee41a778247b88fc542d1034acf8706ce5a2f07ccfad77b80",
+          "start": 96,
+          "end": 139
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/events/deque.go",
+          "sha256": "705839419660f22cefe819028cc4f2cbfa6bec5cba74607cfb835ad10b0e14c4",
+          "start": 159,
+          "end": 173
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_timer.go",
+          "sha256": "992b089f25f4249ee41a778247b88fc542d1034acf8706ce5a2f07ccfad77b80",
+          "start": 27,
+          "end": 70
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window_test.go",
+          "sha256": "fca5edb2b039a995e66cf417e6a6c14a84d00bc9657655c3d837cac357f8025d",
+          "start": 337,
+          "end": 368
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window_test.go",
+          "sha256": "fca5edb2b039a995e66cf417e6a6c14a84d00bc9657655c3d837cac357f8025d",
+          "start": 515,
+          "end": 544
+        }
+      ],
+      "required_change": null
+    },
+    {
+      "id": "13abc298cdceb60d",
+      "title": "Manual timer refusal ignored in Complete.Show and popup timeout",
+      "disposition": "refuted",
+      "reason": "Scene.afterEvent already records all reachable unsupported startup, local capacity, provider-error and typednil-provider refusals through m.fail. The only unrecorded nil return is canceled/retired window lifetime, whose callbacks must not activate/dismiss live UI after retirement. Complete.Show and popup timeout run through this exact helper, so they do not silently lose an active checked scheduling failure. ManualAfterFunc returns the same stored failure to external callers rather than being the only place which records it.",
+      "evidence": [
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_timer.go",
+          "sha256": "992b089f25f4249ee41a778247b88fc542d1034acf8706ce5a2f07ccfad77b80",
+          "start": 83,
+          "end": 139
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_timer.go",
+          "sha256": "992b089f25f4249ee41a778247b88fc542d1034acf8706ce5a2f07ccfad77b80",
+          "start": 182,
+          "end": 206
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window.go",
+          "sha256": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+          "start": 232,
+          "end": 237
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/completer.go",
+          "sha256": "95c904230ef62e9e4567f8ac9c7c8cb0f457f1ea8865ce15db809eee5fcdb095",
+          "start": 97,
+          "end": 125
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/popupstage.go",
+          "sha256": "5510845154c02ec81fd5ee2fe1099c414232cf7a3ba1d1c969767677bec6307a",
+          "start": 161,
+          "end": 173
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window_test.go",
+          "sha256": "fca5edb2b039a995e66cf417e6a6c14a84d00bc9657655c3d837cac357f8025d",
+          "start": 361,
+          "end": 368
+        }
+      ],
+      "required_change": null
+    },
+    {
+      "id": "43214136e97b4671",
+      "title": "Unchecked interface type assertion in RequestFrame can panic",
+      "disposition": "applicable_to_extension_contract",
+      "reason": "Bundled offscreen.Window always implements RequestPaint, so this assertion is safe for the normal verified driver route. However public Core.RunManual accepts any system.TheApp reporting Offscreen and implementing manualSystemFactory. That contract returns only system.Window and neither it nor manualSystemWindow includes RequestPaint. The constructor publishes a returned window without checking RequestPaint/manualSystemWindow. A delegating offscreen factory may return a wrapper embedding system.Window, implementing existing manual inspection/flush methods, but omitting RequestPaint; construction meets the declared contract yet public RequestFrame/Frame panic. No custom-factory runtime fixture was executed in this read-only audit.",
+      "evidence": [
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window.go",
+          "sha256": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+          "start": 57,
+          "end": 65
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window.go",
+          "sha256": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+          "start": 135,
+          "end": 140
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window.go",
+          "sha256": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+          "start": 174,
+          "end": 200
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/core/manual_window.go",
+          "sha256": "c25b04045a9cd3c26390e9eedf4761537496dec226be6bcdee0a847cc67bd13f",
+          "start": 401,
+          "end": 425
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/system/window.go",
+          "sha256": "0398a60151222a08ac97fdd3547cb64333f3f483c054bd3d738ec1c6e1073236",
+          "start": 33,
+          "end": 195
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/system/driver/offscreen/app.go",
+          "sha256": "a487919744c5a95feb254828e16d67c4a4d47e1cab1e559ce3d884bee357ed47",
+          "start": 119,
+          "end": 151
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/system/driver/offscreen/window.go",
+          "sha256": "f98b35df37b5c44778628a4e2aa651c110c5a1845c7b15a379b0f4b7f090ab1a",
+          "start": 58,
+          "end": 69
+        }
+      ],
+      "required_change": "Validate the complete manual-window extension contract before controller publication (including RequestPaint/ManualExecution/state/flush), or use checked assertions and return ErrManualUnsupported. Cover a custom factory/wrapper missing RequestPaint; cover Frame too, which has the same assertion."
+    },
+    {
+      "id": "fa12649b281e1b32",
+      "title": "MonitorOutput silently swallows BeginAmbientWork errors, including nil Lines",
+      "disposition": "applicable",
+      "reason": "Nil Lines returns ErrManualExecution from BeginAmbientWork, then MonitorOutput silently returns with no failure sink/caller result. Previously Lines.FontStyle attempted its embedded mutex on nil and failed loudly. This is an actual default-mode programmer-error behavior regression. The valid manual refusal path is intentionally observable through manualExecution.Failure(ErrManualAmbient) and must still refuse before Reader.Read/batch allocation; that part is correct. All nonnil real-mode BeginAmbientWork calls currently succeed.",
+      "evidence": [
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/text/textcore/outputbuffer.go",
+          "sha256": "edb2f0ac9303be4ff6913403b8613186d5d07bebbefcb9916de3bdb994cc3314",
+          "start": 60,
+          "end": 84
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/text/lines/manual_execution.go",
+          "sha256": "f54d82e0195a89e27ebbf76a6d5fbf772e4dc3aa4bfcd96caa1aba797bcb5568",
+          "start": 97,
+          "end": 118
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/text/lines/api.go",
+          "sha256": "1b85f36f4a462680eb3557c72bfaa49d4ee97b0d4483bf957a6755555be46789",
+          "start": 152,
+          "end": 157
+        },
+        {
+          "path": "/private/tmp/vellum-p9-integration/drivers/cogent/build/upstream/text/textcore/manual_timer_vellum_test.go",
+          "sha256": "b64032aca991339fa77d74bf457dca68024f2d9c6bcfb25d983eff6ed0fbcdc7",
+          "start": 260,
+          "end": 268
+        }
+      ],
+      "baseline": {
+        "path": "/private/tmp/vellum-p9-timers/original/text/textcore/outputbuffer.go",
+        "sha256": "515060aad248ca831d325a5a40527f9c0a0f8905efdf633df439d2205f996c53",
+        "start": 59,
+        "end": 67
+      },
+      "required_change": "Make nil Lines explicitly observable before ambient adoption, e.g. preserve loud programmer-error panic or add a checked monitoring entrypoint/result. Keep ErrManualAmbient refusal reported through its existing sink. Add nil-buffer and valid-manual-before-Read fixtures."
+    }
+  ],
+  "summary": {
+    "refuted": 3,
+    "partially_applicable": 1,
+    "applicable_to_extension_contract": 1,
+    "applicable": 1
+  }
+}

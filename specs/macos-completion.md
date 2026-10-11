@@ -46,9 +46,23 @@ its native input/geometry evidence and separate read-only external AX check pass
 against frozen sources. Human IME and VoiceOver acceptance remain separate. Semantic command/UI inspection exists through APIs
 and native accessibility. Portable execution now has injected real/manual
 workers and clocks, reserved owner results, bounded drain batches and separate
-worker/delivery accounting. Native timer/input/frame integration, deterministic
-fonts, replay records and a public routed consumer still need qualification;
-application automation transport also remains open.
+worker/delivery accounting.
+
+The [managed replay checkpoint](replay.md) is internally qualified on the
+offscreen software backend with supplied, digest-checked fonts and a declared
+theme. It uses actual retained-widget pointer/key routing, focus/modal behavior,
+measured geometry and completed software frames. One fixed 51-operation record
+with nine captures matches exact model, semantics, focus, UTF-16 selection,
+geometry and image identities at batches 1, 7 and 64. Explicit worker selection,
+clock advancement and originating timer dispatch preserve observable pending
+work; future-only timers do not force an implicit advance. The scope is one
+active managed application per process, with multiple windows sharing its clock.
+See the [checkpoint report](../docs/reports/macos-replay/README.md).
+
+Full P9 professional workload and large-data replay acceptance, external
+application automation transport, native services/input/accessibility, GPU
+presentation and sustained performance qualification remain open. This bounded
+software fixture does not complete the macOS milestone.
 
 Remaining Mac acceptance includes broader external AX and human
 screen-reader workflows; candidate-panel placement through scrolling/focus/scale;

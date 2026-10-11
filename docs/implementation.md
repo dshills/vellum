@@ -150,5 +150,20 @@ reservations merge actual result arrivals with ordinary callbacks; DrainN uses
 an initial arrival cutoff. Tasks and document persistence accept Executor
 injection and retain separate worker/owner accounting through termination.
 Race tests cover saturation, canceled accepted work, panic/Goexit, closure,
-cleanup failure and refusal rollback. Native input/frame/timer replay and P9
-workload qualification remain open. See [contract](../specs/execution.md).
+cleanup failure and refusal rollback. See [contract](../specs/execution.md).
+
+The managed [replay checkpoint](../specs/replay.md) is now internally qualified
+with supplied, digest-checked fonts and a declared theme. The offscreen adapter
+routes real pointer/key events through retained widgets, focus and modal hit
+testing, and captures measured semantics/layout and completed software frames.
+One fixed 51-operation record with nine captures produces identical model state,
+focus, UTF-16 selection, geometry and image identities at batches 1, 7 and 64;
+event/frame counts are reported separately. Workers, clock advancement and
+originating widget timers require explicit steps. Future timers remain visible
+without forcing time forward. This checkpoint permits one active managed
+application per process, with multiple windows sharing its supplied clock.
+See the [checkpoint report](reports/macos-replay/README.md).
+
+The full P9 professional workloads, large-data replay, external automation
+transport, native services/IME/accessibility, GPU presentation and sustained
+performance acceptance remain open. Software replay does not certify those gates.

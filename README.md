@@ -16,11 +16,13 @@ open. The workbench does not change system input sources.
 | --- | --- |
 | `app/`, `ui/` | Application lifecycle, UI ownership and keyed widget descriptions |
 | `command/`, `tasks/`, `history/`, `document/` | Commands, asynchronous work, undo/redo and document persistence |
+| `replay/` | Bounded input records, explicit draining and deterministic checkpoint capture |
 | `execution/` | Bounded explicit worker and timer stepping, plus real schedulers |
 | `editor/` | Exact UTF-8 document editing, composition, sparse history and input epochs |
 | `workbench/`, `virtual/`, `canvas/` | Dock layouts, large-data views and canvas models |
 | `drivers/cogent/` | Separate native driver module |
 | `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |
+| `examples/replay/` | Independent fixed-record consumer using routed controls and software frames |
 | `examples/editor/` | Independent managed multiline editor with exact-byte save/open and native input settling |
 | `examples/drawing/` | Independent retained GPU mesh/image drawing and scalable workload consumer |
 | `examples/imaging/` | Independent compute, HDR float rendering and asynchronous frame capture consumer |

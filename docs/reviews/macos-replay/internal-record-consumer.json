@@ -1,0 +1,173 @@
+{
+  "canonical_mutations": false,
+  "consumer": {
+    "actionable_findings": [],
+    "checks": [
+      {
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-count=20",
+          "./..."
+        ],
+        "elapsed_seconds": 1.5730456670280546,
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-p9-consumer/acceptance/race.log",
+        "log_sha256": "c93b58cc83f8783e3c7341dd647a7b4194db7241a5f05815bfba4e126f816601"
+      },
+      {
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "elapsed_seconds": 0.5044121659884695,
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-p9-consumer/acceptance/vet.log",
+        "log_sha256": "68cf2108daacb58328c74d93b473ee6b336db0bc36c29619ffb110f601285459"
+      },
+      {
+        "command": [
+          "go",
+          "build",
+          "-race",
+          "-o",
+          "/private/tmp/vellum-p9-consumer-portable",
+          "./cmd/portable"
+        ],
+        "elapsed_seconds": 0.19426887499867007,
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-p9-consumer/acceptance/build.log",
+        "log_sha256": "3139226b091a21e027cc8b9ea5d449ec0448d8e65632ee96bd55bfb3b6e185f9"
+      }
+    ],
+    "dependency_inputs": {
+      "vellum/app/app.go": "b70e7dac15367c2999679880f72c90ebf8a8404a9cf05a33ed63f319c1af2487",
+      "vellum/app/app_test.go": "81bbb95c6e740f5d35bb91a557441a90e8407e885a9079a231d0ee720d6735dc",
+      "vellum/app/completion.go": "cc0991f1521ef45b4e9d3dff70d439b2ad3386f76f45bda4bacaf02868cc79a3",
+      "vellum/app/completion_test.go": "a4c2a5bd141355421ed1fdbe13cf2c179c3c10dba96b8e0a2ec63cf3fe0713e9",
+      "vellum/app/postwait.go": "9f99dac362669cf22ff5efc4354394c52915618b5467269a765898b213e818af",
+      "vellum/app/postwait_test.go": "728a704dd14c81d20f8331f55053d5e160aa35a14acba648ade9712e7c3fe82d",
+      "vellum/app/services.go": "39dca49207455e9783483a970aec067a51fa776fc908d6bb7f07c421d6ed5193",
+      "vellum/app/windows_test.go": "7259d1784538c3e905059488e794f710f7a5084cb53cbc69827d4aea072f6ae0",
+      "vellum/command/command.go": "3d5c6c43ce79f12cf66abcfc6bdce1fe83846d4866270bbba2fce3a9d1fad4f7",
+      "vellum/command/command_test.go": "19e0f51697b321e3b73bd2ba3bd79a11aa33759ef1420b5ad62ee782466849ae",
+      "vellum/editor/document_test.go": "4650227af801bad33f3ce1ebd61df0022c95f87fd56ab0a644856fe7b0859de0",
+      "vellum/editor/editor.go": "2eae32e9135394fcef32eb18e77bbb7e36207339ac1643c3555e82818d9aea3c",
+      "vellum/editor/editor_test.go": "f9a2e25cad7e12c69625ecd5fe6ef3423f138fd4667cd8bbff822ef40329a2c6",
+      "vellum/execution/clock.go": "c29a4b5cef43c06eaa4d4469f242824bce098529d2931adab3b64139cd044ac6",
+      "vellum/execution/clock_readiness.go": "f738665ab59659e5f131945ad43b35f629626a2642076f0b28d4de3f27a78587",
+      "vellum/execution/clock_readiness_test.go": "8c9c083897f0fc1b45025a30bf72c0d92b426f9c92db117fde151041e4c5e990",
+      "vellum/execution/clock_test.go": "3b0d4a9a16bf38c57a8f8d4d431b734c966a4de00fe152ecadd52f8fdbe33f9f",
+      "vellum/execution/execution.go": "2b46889c00f1bca909e5311f03a60aaf222a50d69ee71f1542be669c4c5cde76",
+      "vellum/execution/execution_test.go": "588221bf36c3a9eaf51f464e03ec502bdd2c5ae1e0f03f4d0755cf4f8e06647d",
+      "vellum/go.mod": "99ee007066964a9d64df4a52090519338a7c7b08a39654773920c654564ff441",
+      "vellum/history/history.go": "474e6093dc1d0d1c3a588a3942d01ded1b7ccec5b938bf99f6220fbd9a7a3220",
+      "vellum/history/history_test.go": "ef992abe0733fb209423025fe4f006926f69eec63e1b50b3c0ef1552e30a9ce2",
+      "vellum/tasks/execution_test.go": "98d3e42bfc4fee79d12e03671e2821c7074cd8ba05a7c369d8e8b13b152bf378",
+      "vellum/tasks/tasks.go": "f95a8cbb4726f14d25f454fdf71bcf767d2407d6079575b58c44adfc06c3fea2",
+      "vellum/tasks/tasks_test.go": "e7a9915d5546e2d1531a7011bf48ed4b79ae24f3553e60c17bf7aac6def50e15",
+      "vellum/ui/controls.go": "6a5b3be48abefe7791f4449843e89cc52f60345eb92d617293dba97ec0de0573",
+      "vellum/ui/controls_test.go": "4cbe13a47722b2672d1d87dc3bb64712df1980ce7d09d48ef677eb7942a7d972",
+      "vellum/ui/editor_test.go": "aaa5ce49277d2e964e61653f0078b0e8b635bf04851f6dc567829b782e51b493",
+      "vellum/ui/file_drop.go": "35def8f566eac67884d55301f01cc2dd08417d1cef385c21a6c919a5bba10504",
+      "vellum/ui/file_drop_test.go": "438747637de47210c07a65c877fb3230d2875123283b1c3fe73bf57d67aa9397",
+      "vellum/ui/focus.go": "9f1ddc0b5448928a609870c5635bbb92dbc3bd0eb1dd9b263d3b196576b723e5",
+      "vellum/ui/focus_test.go": "a48c8d2adcbe651d459a05870c690f1cfced0cd4ef4fb6d0a627cd0701edd207",
+      "vellum/ui/node.go": "b974513d50eac3b22f96329ac2ace4ce7f5e8b72aa09f5460cbf2028a5d0dfbc",
+      "vellum/ui/node_test.go": "afaafc4ba87f51d4441e27ead41873f1ba2ade3dcf78df2d1f46462dec32aa6f",
+      "vellum/ui/style.go": "804222ca4030a13a124d7cbadde03afddf227eae81ffd872989b5edc00b1042b",
+      "vellum/ui/style_test.go": "14da87b1fc905c0d18612630fde83c50b0fe18345c241c3875bb83aba47e32ac",
+      "vellum/virtual/table.go": "f0e3eff0098647a59b8a73ea508053fc493a7c522f3290db5a45865f1fdbfb11",
+      "vellum/virtual/tree.go": "e0f4ba824cf13e9366d7aee9c8693935c0bbd0a55fc7a14f210e4f82e2057ebe",
+      "vellum/virtual/virtual_test.go": "0d25afc860878fd3133f5b88231cb79b146c94be01b2593d9459473871e8a1d1"
+    },
+    "proof": "/private/tmp/vellum-p9-consumer/acceptance/qualification.json",
+    "proof_sha256": "acb998fa176f3fffc3ad7240d404e2246c52d48f63aa6d537a044c3698ea0142",
+    "reviewed_invariants": [
+      "Immutable worker capture and stale result classification",
+      "Reserved completion survives ordinary queue saturation",
+      "Canceled accepted Manual job still runs cleanup",
+      "Command-only batches 1/7/64 never invoke declared widget callbacks",
+      "Detached declared semantic/model snapshots",
+      "DirtyWindows remains nonzero and no render quiescence is claimed",
+      "Native handoff reserves actual adapter wiring, mount identity, hit routing, focus/layout/image assertions"
+    ],
+    "root": "/private/tmp/vellum-p9-consumer",
+    "runs": [
+      {
+        "batch": 1,
+        "elapsed_seconds": 1.2531335419917013,
+        "exit_code": 0,
+        "kind": "portable-command-only",
+        "output": "/private/tmp/vellum-p9-consumer/acceptance/commands-batch1.json",
+        "output_sha256": "f3b4e915545f1dfdb93b391a0d301ec871290017896c7eaca2934202a4342d30",
+        "reported_kind": "portable-command-only"
+      },
+      {
+        "batch": 7,
+        "elapsed_seconds": 1.033722583000781,
+        "exit_code": 0,
+        "kind": "portable-command-only",
+        "output": "/private/tmp/vellum-p9-consumer/acceptance/commands-batch7.json",
+        "output_sha256": "8a8a92a1635948a6cf32c4b8815616925e238eac0e14b5d9571beb1ea89c2981",
+        "reported_kind": "portable-command-only"
+      },
+      {
+        "batch": 64,
+        "elapsed_seconds": 1.0333309590059798,
+        "exit_code": 0,
+        "kind": "portable-command-only",
+        "output": "/private/tmp/vellum-p9-consumer/acceptance/commands-batch64.json",
+        "output_sha256": "fc3bda58b221b51224ef804324d163800c86917e7583fd20097582483130e37c",
+        "reported_kind": "portable-command-only"
+      }
+    ],
+    "scope": "command-only portable proof; declared semantics/minimum layout, no actual native input/focus/layout/image/OS/GUI qualification",
+    "source_inputs": {
+      "README.md": "d962c46b721b472ae217bf27977fe6f07a21b5558108ab98b95000369b9f383f",
+      "cmd/portable/main.go": "cecccc62e681777142898a1af30258c4791cfbd503a069e079dafdb85d60fe14",
+      "fixture.go": "4ee4bce76d9abc35d252da9fab9dd31ee37913c9bff2e820521eab31e75b8e19",
+      "fixture.json": "9dbd7db38c6f5dbfa39bb0b65afd37dfa7cb8e2ecafede5cf73520ae794b584b",
+      "fixture_test.go": "5e3b2a2a551c4aa819508222d89fe508dfd87ecd744ea86f1f6c9a1fdd902200",
+      "go.mod": "db15da191034a828608e2db98c047168f1efb0ff5e76d58c0425e3d7a1825695",
+      "native-plan.md": "92cb5505b01359113bb66b506caa2c278275bacda8803e1a093fcc1a0a06b21c",
+      "qualify.py": "5ccccd668349cfe26be50744a47bf137929fb2533c6a1d45cba24020994457a9",
+      "scenario.go": "d9c5cc92cbd3b68e2c557ae1a71b46c9dd59b8b9c75fa520eb6feede025e1a21",
+      "view.go": "2a8a9407be471fbd12f4fabc6debe01febc5adca9da0eaf30e9169b1263c679e"
+    },
+    "verified_binary": {
+      "path": "/private/tmp/vellum-p9-consumer-portable",
+      "sha256": "b4c7d65a38ce284c0fba7e81bd2b01ac0ce940b9734e8fa8df4962caad3f1f53"
+    }
+  },
+  "gui_or_os_settings": false,
+  "new_test_execution": false,
+  "record": {
+    "actionable_findings": [],
+    "files": {
+      "go.mod": "99ee007066964a9d64df4a52090519338a7c7b08a39654773920c654564ff441",
+      "replay/record.go": "1f4baaef08bdeccbab8f9f19356a9b86b7c3465f762e0764cd782c095fb8c99c",
+      "replay/record_test.go": "7bd4a70b56a6b299d8a7a8ce5a30ec1e6cb9277be9df44f2f6820f107d6e0f91"
+    },
+    "proof": "/private/tmp/vellum-p9-replay/acceptance/qualification-v3.json",
+    "proof_sha256": "4f90194e745dd790fa6cee4d06a59e45506797ec78fcefa79222810de9e5a190",
+    "reviewed_resolutions": [
+      "Manifest prevalidation precedes cloning",
+      "Hash byte length checked before DecodeString allocation",
+      "Retained Manifest/Operation strings including Kind cloned from caller storage",
+      "Failed admission preserves sequence and bytes",
+      "Strict variant fields, finite coordinates, lifetime and monotone sequence/time checks",
+      "Copied Recorder refuses before locking"
+    ],
+    "root": "/private/tmp/vellum-p9-replay",
+    "scope": "temporary portable record admission and encoding only; no decoder, backend runner or UI replay qualification",
+    "verified_logs": {
+      "acceptance/race-frozen-v3.log": "24ff70ae4baa095125d4a15b8f25d0a7ad566c956605478f2a62c3bd5e7c33e0",
+      "acceptance/vet-frozen-v3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "result": "APPROVED_WITH_EXPLICIT_SCOPE",
+  "review_type": "independent read-only internal source and qualification-graph review"
+}

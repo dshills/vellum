@@ -53,14 +53,14 @@ class ReleaseChecks(unittest.TestCase):
             self.assertEqual((destination / "LICENSE").read_bytes(), (template / "LICENSE").read_bytes())
             self.assertIn("module example.com/my-application", (destination / "go.mod").read_text())
 
-    def test_exported_history_document_editor_and_execution_are_consumable_without_the_source_checkout(self):
+    def test_exported_history_document_editor_execution_and_replay_are_consumable_without_the_source_checkout(self):
         with tempfile.TemporaryDirectory(prefix="vellum history SDK ") as temporary:
             base = Path(temporary)
             root = base / "source"
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
             public_files = []
-            for package in ("history", "document", "editor", "execution", "tasks", "app", "ui"):
+            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui"):
                 (root / package).mkdir()
                 for source in (release.ROOT / package).glob("*.go"):
                     if not source.name.endswith("_test.go"):
@@ -89,13 +89,26 @@ import (
     "testing"
     "context"
     "path/filepath"
+    "errors"
+    "strings"
+    "time"
     "github.com/dshills/vellum/document"
     "github.com/dshills/vellum/editor"
     "github.com/dshills/vellum/history"
     "github.com/dshills/vellum/app"
     "github.com/dshills/vellum/execution"
     "github.com/dshills/vellum/tasks"
+    "github.com/dshills/vellum/replay"
 )
+func TestExportedReplay(t *testing.T) {
+    manifest := replay.Manifest{Version: replay.Version, FixtureSHA256: strings.Repeat("a",64), ThemeSHA256: strings.Repeat("b",64), LayoutVersion:"sdk-1", RendererVersion:"sdk-1", Start:time.Unix(0,0).UTC(), Windows:[]replay.Window{{ID:"main",Incarnation:1,Width:640,Height:480,DPI:160}}, Fonts:[]replay.Font{{Family:"fixture",SHA256:strings.Repeat("c",64)}}}
+    recorder, err := replay.NewRecorder(manifest, replay.Limits{})
+    if err != nil { t.Fatal(err) }
+    if err := recorder.Append(replay.Operation{Kind:replay.Frame,Window:"main",WindowIncarnation:1}); err != nil { t.Fatal(err) }
+    record, err := recorder.Snapshot()
+    if err != nil || len(record.Operations)!=1 || record.Validate(replay.Limits{})!=nil { t.Fatal(record,err) }
+    if _, err := replay.NewRunner(replay.RunnerConfig{}, nil); !errors.Is(err,replay.ErrInvalid) { t.Fatal(err) }
+}
 func TestExportedExecution(t *testing.T) {
     a, err := app.New(app.Config{QueueCapacity: 1, CompletionCapacity: 1})
     if err != nil { t.Fatal(err) }; defer a.Close()

@@ -243,6 +243,39 @@
               "sha256": "e9d3221ce8bc9e963b54f9357e9a9ac2f80b62d74f4afbb849aab13358b26c11"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/manualrouting",
+          "inputs": "native/patches/manualrouting/original-hashes.json",
+          "outputs": "native/patches/manualrouting/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/manualrouting/0030-manual-routing.patch",
+              "sha256": "cf002ec08ecd511f98cad430427dcfaccb3e8c94c9c02117ec411e19a9809bee"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/ownedtimers",
+          "inputs": "native/patches/ownedtimers/original-hashes.json",
+          "outputs": "native/patches/ownedtimers/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/ownedtimers/0031-owned-widget-timers.patch",
+              "sha256": "3da3782e9deabe16e6f7d27c903555727df3d55357ef1da9fe19a496f0aadefe"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/checkedmanual",
+          "inputs": "native/patches/checkedmanual/original-hashes.json",
+          "outputs": "native/patches/checkedmanual/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/checkedmanual/0032-replay-native-corrections.patch",
+              "sha256": "593be2cc9ad3eec49eadce6ba0e4428971278f4d55f6243ed201937d8c1c41f9"
+            }
+          ]
         }
       ]
     },

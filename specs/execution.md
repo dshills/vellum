@@ -3,9 +3,10 @@
 The portable `execution` package supplies real and manually stepped executors and
 clocks. Applications inject `execution.Executor` through `tasks.Config.Executor`
 and `document.Config.Executor`; absent injection uses a real goroutine executor.
-These hooks control worker execution and portable timers. Native Scene timers,
-input, layout and frame scheduling require the separate replay adapter before
-P9 can be qualified.
+These hooks control worker execution and portable timers. Explicit Cogent Scene
+timer, input, layout and frame control uses the separately scoped
+[managed replay adapter](replay.md). Its offscreen software checkpoint is
+internally qualified; full P9 workload acceptance remains open.
 
 ## Accepted work and terminal ownership
 
@@ -127,3 +128,32 @@ defer finishes. A document OnComplete can start a new operation and replace the
 Session's currently reported operation. Aggregate quiescence must therefore also
 inspect the chosen Executor.Snapshot; task/session status alone cannot certify
 that every accepted callback has terminated.
+
+## Managed replay checkpoint
+
+The offscreen adapter uses supplied, digest-checked fonts and a declared theme,
+real originating pointer/key events, retained-widget focus/modal routing and
+completed software frames. One fixed 51-operation record and nine captures match
+exact model state, measured semantics/layout, focus, UTF-16 selection and image
+identities at batches 1, 7 and 64. Dispatch event/frame counts are separate from
+those checkpoint comparisons.
+
+The managed checkpoint permits one active application per process, with multiple
+windows sharing one explicit clock. The adapter borrows the Manual executor as a
+readiness handle; callers inject that same executor into task/document managers.
+It does not rebind existing managers or account for unrelated caller goroutines.
+Caller-owned Cogent settings, palette, keymap and highlighting configuration stay
+fixed during replay.
+
+Construction and inspection never choose a worker, advance time or render a
+frame. Input and frame requests enqueue work; bounded steps dispatch it. Widget
+timer callbacks enqueue originating events, with actual widget work occurring
+only during explicit dispatch. Due, future, running, awaiting-owner and blocked
+work remain distinct; future-only timers can be quiescent at the current instant
+without being terminal. See [replay](replay.md) and the
+[checkpoint report](../docs/reports/macos-replay/README.md).
+
+The full P9 professional workloads and large-data replay, native services/input/
+accessibility, external automation transport, GPU presentation and sustained
+performance acceptance remain open. The software checkpoint does not qualify
+those capabilities.

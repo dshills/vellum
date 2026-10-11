@@ -1,0 +1,243 @@
+{
+  "reviewer": "mac_history_review",
+  "disposition": "APPROVED_TEMPORARY_MANAGED_CHECKPOINT",
+  "scope": "Read-only actual managed Manual source, standalone public consumer qualification, call-site contracts and immutable source/evidence identity; independent isolated offscreen race regression tests. No canonical promotion, GUI, native Cocoa/IME/AX/GPU or Prism run.",
+  "qualification": {
+    "path": "/private/tmp/vellum-p9-managed/acceptance-v2/qualification.json",
+    "sha256": "f3ec6ae9042565d5c9192c7043ac033bbe5c26828f7138531bb48162293cfcc9",
+    "input_count": 6219,
+    "changed_inputs": {}
+  },
+  "reviewed_files": {
+    "/private/tmp/vellum-p9-managed/cogent/manual.go": "3f4f3c9bd6d10e0e1e3cc68f6206e7f4732be65cce473d570b4599d7399d404a",
+    "/private/tmp/vellum-p9-managed/cogent/manual_offscreen.go": "21730e3c8f7660a79bb23d624f158fc46e016eb1a248bd43fa2f5e990e987ea7",
+    "/private/tmp/vellum-p9-managed/cogent/manual_desktop.go": "19e2b3740ee612848df77a79da2e6968bde0831ace22371bfcf6d95c23120458",
+    "/private/tmp/vellum-p9-managed/cogent/manual_offscreen_test.go": "03c9e190498c96e035adf33b874e157dec03acebcb2e59658134634df1586c03",
+    "/private/tmp/vellum-p9-managed/cogent/manual_desktop_test.go": "689bc137fd803329f4d76a7b12e10e9c179c7f446c1adcff0f9c4c238472c317",
+    "/private/tmp/vellum-p9-managed/qualification/managed_test.go": "7ca68e2dcefe8ccbf3925bf504310b90f3be91640b26c7e86690e70b3951abe7",
+    "/private/tmp/vellum-p9-managed/README.md": "d6aa27d6b1728782c0b864e8af2d58364a6a40f88e9c4ce91fda8f8fe7d92b8e",
+    "/private/tmp/vellum-p9-managed/qualify.py": "17afaab36999cd6d991359055c6d10dc2f6717861c20cedb911b28b8003acb29",
+    "/private/tmp/vellum-p9-managed/scope.md": "8f5eef35a9a429abbfd01d7462a7aad7f2647b477d77800e741b270cbab8ddf7"
+  },
+  "public_consumer_review": "Previously approved portable fixture/views/scenario plus current standalone managed_test.go actual router and software frame qualification.",
+  "supplement": {
+    "path": "/private/tmp/vellum-p9-managed/scope.md",
+    "sha256": "8f5eef35a9a429abbfd01d7462a7aad7f2647b477d77800e741b270cbab8ddf7",
+    "runtime_changed": false
+  },
+  "backend_review": {
+    "path": "/private/tmp/vellum-p9-timers-internal-review-v2.json",
+    "sha256": "a9536acd1d170d5ce78f30489dd16120d216a8a5c0cefe3dbb2194af0dfe26e2"
+  },
+  "verified_checks": [
+    {
+      "name": "driver-race20",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-timers/timer-overlay.json",
+        "-race",
+        "-count=20",
+        "-timeout=120s",
+        "-v",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-managed/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 21.364,
+      "log": "/private/tmp/vellum-p9-managed/acceptance-v2/driver-race20.log",
+      "log_sha256": "60f83b6b08920940a66b5abbed8f670945776463927045f2c0c725f17025bf41"
+    },
+    {
+      "name": "consumer-race3",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-timers/timer-overlay.json",
+        "-race",
+        "-count=3",
+        "-timeout=120s",
+        "-v",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-managed/qualification",
+      "exit_code": 0,
+      "elapsed_seconds": 27.826,
+      "log": "/private/tmp/vellum-p9-managed/acceptance-v2/consumer-race3.log",
+      "log_sha256": "354cf9d7285c62025b684059a4395dd45f8ff76e7200913cfc8ca2af1dcef4c6"
+    },
+    {
+      "name": "driver-vet",
+      "command": [
+        "go",
+        "vet",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-timers/timer-overlay.json",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-managed/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 2.201,
+      "log": "/private/tmp/vellum-p9-managed/acceptance-v2/driver-vet.log",
+      "log_sha256": "044e6d73739ea2ef2a01ff0ec7467cb34ec725ffddd0f8a7e0c0df63b206929c"
+    },
+    {
+      "name": "consumer-vet",
+      "command": [
+        "go",
+        "vet",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-timers/timer-overlay.json",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-managed/qualification",
+      "exit_code": 0,
+      "elapsed_seconds": 2.919,
+      "log": "/private/tmp/vellum-p9-managed/acceptance-v2/consumer-vet.log",
+      "log_sha256": "c7b1098871f0ec6b6a385f64fabe6d3d1b6875b953a3d3f702e3ff373c9887a2"
+    },
+    {
+      "name": "desktop-refusal",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-count=1",
+        "-run",
+        "^TestManualDesktopRefusesBeforeConstruction$",
+        "-v",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-managed/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 3.618,
+      "log": "/private/tmp/vellum-p9-managed/acceptance-v2/desktop-refusal.log",
+      "log_sha256": "4e14864958ae23e7860f273196ded9f00501a5a999c7057be4dc0fee326bdb42"
+    },
+    {
+      "name": "consumer-build",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-timers/timer-overlay.json",
+        "-race",
+        "-c",
+        "-o",
+        "/private/tmp/vellum-p9-managed/acceptance-v2/managed-qualification.test"
+      ],
+      "cwd": "/private/tmp/vellum-p9-managed/qualification",
+      "exit_code": 0,
+      "elapsed_seconds": 3.095,
+      "log": "/private/tmp/vellum-p9-managed/acceptance-v2/consumer-build.log",
+      "log_sha256": "fe95333f6c07c3fd8bb7678fcbe97258204d98faa7a9a4a1cbd23c79437c84ed"
+    }
+  ],
+  "binary": {
+    "path": "/private/tmp/vellum-p9-managed/acceptance-v2/managed-qualification.test",
+    "sha256": "1032d2f060758237151a2db56d25ddb27d68589ce51263707dc2ddb5e7678909"
+  },
+  "independent_checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-overlay=../backend-overlay.json",
+        "-tags=offscreen",
+        "-race",
+        "-count=20",
+        "-timeout=120s",
+        ".",
+        "-run",
+        "^TestReviewManual|^TestReviewSecond"
+      ],
+      "cwd": "/private/tmp/vellum-p9-managed-review-v3/cogent",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-managed-review-v3/independent-review-race20.log",
+      "log_sha256": "a686a9a15700aef98ae3379d11464f8a74ec21ffdfb93d088384472f6bc64d93",
+      "test_inputs": {
+        "/private/tmp/vellum-p9-managed-review-v3/cogent/review_manual_lifetime_test.go": "5481535eebb2a76c6f281356714b32874e73574c0e860d360c886ff11a0b03cb",
+        "/private/tmp/vellum-p9-managed-review-v3/cogent/review_manual_manager_test.go": "3a2c172e73df5929b5c208674055b8dd18532ec23e61f1a0acc3d892350ed561"
+      },
+      "driver_inputs": {
+        "path": "/private/tmp/vellum-p9-managed-review-v3/source-at-review.json",
+        "sha256": "69f96a904edda8ebfdffa51f7d50656f4b7aaa29092e718c86570eceba185659"
+      },
+      "backend_inputs": {
+        "path": "/private/tmp/vellum-p9-managed-review-v3/backend-at-review.json",
+        "sha256": "9259321a3358d8ed33e040d05317072355140fb10b32a3a9f698db3401d27502"
+      },
+      "scope": "Four focused copied-source regressions: abnormal construction, closed-domain admission, process owner claim, and actual-mapped ambient manager key refusal; go.mod absolute replacement is mechanical only."
+    }
+  ],
+  "findings": [
+    {
+      "id": "managed-abnormal-construction",
+      "severity": "P1",
+      "status": "RESOLVED",
+      "resolution": "Deferred rollback attempts all partial/mounted native windows and releases process claim through panic/Goexit; preserves ordinary domain registration on returned errors."
+    },
+    {
+      "id": "managed-closed-domain-admission",
+      "severity": "P1",
+      "status": "RESOLVED",
+      "resolution": "Captured WindowContext guards capture/input/frame/request before pending native topology retirement; detached Snapshot reports domain cancellation and retirement pending."
+    },
+    {
+      "id": "managed-process-owner",
+      "severity": "P1",
+      "status": "RESOLVED",
+      "resolution": "One active managed application claim before widgets/native creation, released on error/abnormal rollback/completed close; independent regression proves second View not called."
+    },
+    {
+      "id": "managed-ambient-manager-input",
+      "severity": "P1",
+      "status": "RESOLVED",
+      "resolution": "Configured clipboard/PasteHist and screenshot/zoom/refresh/unmanaged Find/Menu/WinFocusNext refused before reconciliation/queue admission; ordinary model commands and navigation remain admitted."
+    }
+  ],
+  "historical_red_evidence": [
+    {
+      "path": "/private/tmp/vellum-p9-managed-review/acceptance/process-owner-red-proof.json",
+      "sha256": "7d65e94c0ee89f1ad7faaeeba2587d144f3633f321da3ff24e84ec624d4c83f3"
+    },
+    {
+      "path": "/private/tmp/vellum-p9-managed-review-v2/manager-admission-red-proof.json",
+      "sha256": "bdebd327865077e2c29c9533fca02692fdc64a5d809373589f93ce785f4615bf"
+    }
+  ],
+  "reasoning": [
+    "Actual Core event/paint routing occurs outside Application.Do, while descriptor/model publication and callback consumption use the production owner controllers; combined Step event+owner units bounded with DrainN arrival cutoff.",
+    "Lifecycle, mount/current identity and measured-incarnation routing reject stale/disabled/modal targets; raw coordinates are separately qualified by actual hit/focus routing.",
+    "Supplied parsed fonts are detached and private shaper reads only the in-memory FS; captures and semantic/frame snapshots are detached and refusal is read-only when layout or queue work remains.",
+    "Offscreen bootstrap uses fresh TempDataDir for settings/defaults and no OS appearance callback. Caller global palette/keymap/highlighting/settings mutation is explicitly outside qualified contract, without a reset-global workflow.",
+    "Config.Clock/Executor remain borrowed, not implicitly advanced/stepped/closed. Existing task/document managers must explicitly use the supplied executor for truthful readiness."
+  ],
+  "limits": [
+    "One active managed application per process; multiple independent windows share explicit clock.",
+    "Software image equivalence proven for fixed source/fonts/theme batch1/7/64, not cross-OS/global pixel golden or performance.",
+    "Frame convenience can spend one native event plus OwnerBatch callbacks; strict replay budgets use enqueue-only RequestFrame and Step.",
+    "Snapshot represents last completed frame plus current readiness; Capture refuses pending/dirty state rather than rendering implicitly.",
+    "Future timers/jobs and accepted canceled workers need caller explicit advance/step; arbitrary caller goroutines and blocking callbacks are not preempted/accounted.",
+    "Native editor SettleEditor/IME/AX, OS chooser/menu/clipboard, extensions/GPU/workbench/file-drop descriptors remain outside this checkpoint.",
+    "Arbitrary custom Destroy sibling continuation is not qualified by backend; no complete P9 workload claim."
+  ]
+}

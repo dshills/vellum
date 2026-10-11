@@ -1,0 +1,127 @@
+{
+  "result": "APPROVED",
+  "scope": "Read-only review of three frozen capture-followup source files, complete before/after diffs, four affected check logs and proof hashes; no GUI, new test invocation, canonical mutation or unchanged broad re-review. Full integrated dependency/compiler qualification remains parent-owned.",
+  "qualification": {
+    "path": "/private/tmp/vellum-p9-capture-followup/qualification.json",
+    "sha256": "9976a601132b7e1735bb31ea1454afa8ec8dbf7591c897c9f62253e3054cace1"
+  },
+  "verified_files": {
+    "/private/tmp/vellum-p9-capture-followup/before/drivers/cogent/manual_offscreen.go": "21730e3c8f7660a79bb23d624f158fc46e016eb1a248bd43fa2f5e990e987ea7",
+    "/private/tmp/vellum-p9-capture-followup/before/drivers/cogent/manual_offscreen_test.go": "03c9e190498c96e035adf33b874e157dec03acebcb2e59658134634df1586c03",
+    "/private/tmp/vellum-p9-capture-followup/before/examples/replay/managed_test.go": "67569bb0222d7350acc8ff4d6c3545cf96966aec147eb40fdd15b014bb535f60",
+    "/private/tmp/vellum-p9-capture-followup/after/drivers/cogent/manual_offscreen.go": "23469c2ac3dcedfadbb2107e9aee34f60dea6c543e9510571081fe732ebd5329",
+    "/private/tmp/vellum-p9-integration/drivers/cogent/manual_offscreen.go": "23469c2ac3dcedfadbb2107e9aee34f60dea6c543e9510571081fe732ebd5329",
+    "/private/tmp/vellum-p9-capture-followup/after/drivers/cogent/manual_offscreen_test.go": "661f763fe11b2dccb8a89f2bc5f548dcac82190a6b10e2d38df53418d16b1749",
+    "/private/tmp/vellum-p9-integration/drivers/cogent/manual_offscreen_test.go": "661f763fe11b2dccb8a89f2bc5f548dcac82190a6b10e2d38df53418d16b1749",
+    "/private/tmp/vellum-p9-capture-followup/after/examples/replay/managed_test.go": "08fbe6e958d9219d712078d9fd1d37447e0b6c5cba12ab2a3b52505ce4d9a850",
+    "/private/tmp/vellum-p9-integration/examples/replay/managed_test.go": "08fbe6e958d9219d712078d9fd1d37447e0b6c5cba12ab2a3b52505ce4d9a850",
+    "/private/tmp/vellum-p9-capture-followup/focused-race20.log": "056e5b8c5af8ddff69fe7441f524ffd1990e757d0864e1cf73e57bfe78f92f3c",
+    "/private/tmp/vellum-p9-capture-followup/driver-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-p9-capture-followup/record-batches-race.log": "1a2b168d1ee1693041ef689bfe118bb86159fa2b51b8441c45b684131ecb820b",
+    "/private/tmp/vellum-p9-capture-followup/consumer-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-p9-capture-followup/changes.diff": "05debe6179ccafddc47744ffc3a95a6321f18d351bd5d06201082135a43e323b",
+    "/private/tmp/vellum-p9-capture-followup/managed-imports.diff": "88ad56c07a06bd88aef1d28beb9d3fc0c2def3802cd9e43aa9a40080ba9ca881"
+  },
+  "source_after": {
+    "drivers/cogent/manual_offscreen.go": "23469c2ac3dcedfadbb2107e9aee34f60dea6c543e9510571081fe732ebd5329",
+    "drivers/cogent/manual_offscreen_test.go": "661f763fe11b2dccb8a89f2bc5f548dcac82190a6b10e2d38df53418d16b1749",
+    "examples/replay/managed_test.go": "08fbe6e958d9219d712078d9fd1d37447e0b6c5cba12ab2a3b52505ce4d9a850"
+  },
+  "findings": [],
+  "dispositions": [
+    {
+      "id": "498198e2a305b730",
+      "result": "FIXED",
+      "evidence": "manualAccessibilityIndex builds once and preserves the former first-match DomainID semantics; each record uses a map lookup instead of a whole AX-node scan. Regression retains first duplicate metadata and absent visibility. This removes this quadratic lookup only; it does not establish linear complexity for all snapshot/layout work."
+    },
+    {
+      "id": "b82f2705a6e6b2c7",
+      "result": "BASELINE_PREMISE_REFUTED_AND_DUPLICATION_REMOVED",
+      "evidence": "Mounted managed TextField widgets already have the concrete core.TextField type, including disabled/read-only controls. New code nevertheless uses one checked EditingState read after AX lookup and updates live text/directional UTF16 selection together. Actual stale AX-cache regression verifies non-BMP/combining/bidi text, focus/visibility/incarnation, no Change and cache refresh."
+    },
+    {
+      "id": "59db1ef4ce8fc7f1",
+      "result": "REFUTED_EXISTING_BACKEND_ADMISSION",
+      "evidence": "Managed integral dimensions are passed to Core.RunManual, whose validateManualConfig rejects dimensions beyond32768 or more than16Mi pixels before NewShaper/native window/image allocation. No new arbitrary16384 policy is required."
+    }
+  ],
+  "checks_observed": [
+    {
+      "name": "focused-race20",
+      "cwd": "/private/tmp/vellum-p9-integration/drivers/cogent",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-run",
+        "^TestManual(AccessibilityIndex|CaptureKeepsLiveField)",
+        "-count=20",
+        "-timeout=60s",
+        "-v",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-capture-followup/focused-race20.log",
+      "log_sha256": "056e5b8c5af8ddff69fe7441f524ffd1990e757d0864e1cf73e57bfe78f92f3c"
+    },
+    {
+      "name": "driver-vet",
+      "cwd": "/private/tmp/vellum-p9-integration/drivers/cogent",
+      "command": [
+        "go",
+        "vet",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-capture-followup/driver-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "record-batches-race",
+      "cwd": "/private/tmp/vellum-p9-integration/examples/replay",
+      "command": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-run",
+        "^TestActualNativeRecordReplaysAcrossEventBatches$",
+        "-count=1",
+        "-timeout=60s",
+        "-v",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-capture-followup/record-batches-race.log",
+      "log_sha256": "1a2b168d1ee1693041ef689bfe118bb86159fa2b51b8441c45b684131ecb820b"
+    },
+    {
+      "name": "consumer-vet",
+      "cwd": "/private/tmp/vellum-p9-integration/examples/replay",
+      "command": [
+        "go",
+        "vet",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "."
+      ],
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-capture-followup/consumer-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "limits": [
+    "The third file changes import order only; exact regenerated diff is verified.",
+    "Recorded batch1/7/64 actual offscreen record checks agree on all nine capture comparisons and final image7d0d9b4d916ae98957aca1dd50d8593a0e426f2bacc371e35f53c1dd872d9957.",
+    "This evidence is focused followup, not full default-backend/Cocoa/OS qualification."
+  ]
+}

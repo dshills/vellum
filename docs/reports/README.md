@@ -3,6 +3,7 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Managed software UI replay](macos-replay/README.md)
 - [macOS retained image drawing](macos-images/README.md)
 - [macOS retained GPU meshes and scalable workloads](macos-drawing/README.md)
 - [macOS document persistence and unsaved close](macos-document/README.md)

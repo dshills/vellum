@@ -1,0 +1,240 @@
+{
+  "actionable_findings": [],
+  "candidate_files": {
+    "core/animate.go": "682bbceab9a0f7ca0fe29610e60294b922f5f19bc74f60ba7a753427d1ef1d98",
+    "core/completer.go": "6282f9fc89666afd2a1a1b35888727b09b689bf8f18c63c422062fa478b0a2fd",
+    "core/events.go": "36d7c91485420b1fdbad38e59277035d6c920ae508b1f75be3117bae967928c4",
+    "core/mainstage.go": "0e313d3fdf0b2b9b56a7786c04f28faa8aa8a4932059df743d746e3071162071",
+    "core/manual_timer.go": "a48d0d8f1a674cd8b7ec4d9920aaa7cb4afac0780131300681f4fb2da2fc21b2",
+    "core/manual_window.go": "6f8c81d40fd91327eb420c6752053b036fbad49d61539e14ad90b3e172524ec6",
+    "core/manual_window_test.go": "fca5edb2b039a995e66cf417e6a6c14a84d00bc9657655c3d837cac357f8025d",
+    "core/popupstage.go": "769ec2fbe4e8405e160b5451271026a08b1e370bb066b7ebe466f1d749cab16b",
+    "core/renderwindow.go": "ae64e3b9b127b482f127e41a0dbfd526b68c3e09f8bcac9a0b4a648521aba1e7",
+    "core/scene.go": "669c2ca87ffd8843c50c6da806168b09bf8c539a2c994defa2ad8ec33621e6d4",
+    "core/scroll.go": "f03e939891967c92e2efec476b47fe37c9b4418095a6fb9b78f97dd0d0c9b321",
+    "core/stage.go": "7d4f3aeb158cca36222f919d9e9e277b7944f57f2d5dc5dd7896d83936828b2a",
+    "core/textfield.go": "a2e3caf7730edf25bb49755381b3f049b30094414f60e320105bfe60184e354e",
+    "core/widgetevents.go": "da23687aebedf16be5ed54346966a5a366b586fc6f024905936e6d29eb70584b",
+    "core/windowgeometry.go": "4d506b97d425f7fcfe9ec93884c111aa8048578f30e6367b059845e1be7d9afa",
+    "events/source.go": "cbe7f6d519c5d27799b02ba25113c8b17b664344634cbe3e5dfe035932e0643b",
+    "events/source_clock_test.go": "818789265bec1110c9271fb690b61d64c18deb4a3a277c2e9d739fa8b3abf94e",
+    "system/driver/driver_desktop.go": "0c099858471a69e3a771ed2796940e3401b45f7c0a54f52bf924351e40ff8977",
+    "system/driver/offscreen/app.go": "a487919744c5a95feb254828e16d67c4a4d47e1cab1e559ce3d884bee357ed47",
+    "system/driver/offscreen/window.go": "f98b35df37b5c44778628a4e2aa651c110c5a1845c7b15a379b0f4b7f090ab1a",
+    "system/manual_window.go": "147f7d00a8103724569ef77adf7de57dc9210d34c0085eeb80574590613a44e7"
+  },
+  "canonical_mutations": false,
+  "changes_from_preserved_v1": {
+    "core/manual_window_test.go": {
+      "after": "fca5edb2b039a995e66cf417e6a6c14a84d00bc9657655c3d837cac357f8025d",
+      "before": "5eeb377d0aac4153e9fe59d07bacddb02f1cd850f1add25590eaeb44304bb205"
+    },
+    "core/renderwindow.go": {
+      "after": "ae64e3b9b127b482f127e41a0dbfd526b68c3e09f8bcac9a0b4a648521aba1e7",
+      "before": "698a3a8e1fa10cf44ebb2dde94973ce7c5bbe4bc695ca818b08a3aa7728d4e67"
+    }
+  },
+  "checks": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/vellum-p9-native/go.mod",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-native/foundation-overlay.json",
+        "-race",
+        "./core",
+        "./events",
+        "./system/driver/offscreen",
+        "-run",
+        "^TestVellumManual|^TestVellumSourceClock",
+        "-count=20",
+        "-timeout=90s"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-native/foundation-race20-v2.txt",
+      "log_sha256": "2ffd6c81d477e7cbb36f488ddf979170b9c798a5829b07a36b3db6411339f37c",
+      "name": "foundation-race20-v2",
+      "seconds": 31.404245541983983
+    },
+    {
+      "argv": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/vellum-p9-native/go.mod",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-native/foundation-overlay.json",
+        "-race",
+        "./events",
+        "./core",
+        "./text/textcore",
+        "./text/lines",
+        "-run",
+        "TestVellumComposition|TestVellumNativeCommit|TestVellumDeferred|TestVellumEventBoundary|TestVellumField|TestVellumEditingSnapshot|TestVellumEditor|TestVellumNativeEditor|TestContractsExact|TestVellumManual|TestVellumSourceClock",
+        "-count=1",
+        "-timeout=90s"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-native/backend-regressions-v2.txt",
+      "log_sha256": "77b93ef69270bd8ab042543640098e246420b5e964ab0d94fea80716f020a411",
+      "name": "backend-regressions-v2",
+      "seconds": 11.611090374994092
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-modfile=/private/tmp/vellum-p9-native/go.mod",
+        "-tags",
+        "offscreen",
+        "./core",
+        "./events",
+        "./system",
+        "./system/driver/offscreen"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "exit_code": 1,
+      "log": "/private/tmp/vellum-p9-native/foundation-vet-baseline-v2.txt",
+      "log_sha256": "dea3231306e03253d953bc32786a6241b50e6a24381bf261de940149a5e9cba3",
+      "name": "foundation-vet-baseline-v2",
+      "seconds": 0.6641558750125114
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-modfile=/private/tmp/vellum-p9-native/go.mod",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-native/foundation-overlay.json",
+        "./core",
+        "./events",
+        "./system",
+        "./system/driver/offscreen"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "exit_code": 1,
+      "log": "/private/tmp/vellum-p9-native/foundation-vet-v2.txt",
+      "log_sha256": "0a69bc58585b19e4fb2172aa2bf18354002098006095baac8346b263fce14be0",
+      "name": "foundation-vet-v2",
+      "seconds": 0.8178253330115695
+    },
+    {
+      "argv": [
+        "go",
+        "test",
+        "-modfile=/private/tmp/vellum-p9-native/go.mod",
+        "-overlay",
+        "/private/tmp/vellum-p9-native/foundation-overlay.json",
+        "./core",
+        "./events",
+        "./system/driver",
+        "-run",
+        "^TestVellumSourceClock",
+        "-count=1"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-native/default-build-v2.txt",
+      "log_sha256": "001fc1654a10850ebda4cf2bcb6dc462dca4306e2b1785d2ee039b6e3e4372f4",
+      "name": "default-build-v2",
+      "seconds": 4.304227458022069
+    },
+    {
+      "argv": [
+        "go",
+        "test",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-native/foundation-overlay.json",
+        "-race",
+        "./...",
+        "-count=20",
+        "-timeout=90s"
+      ],
+      "cwd": "/private/tmp/vellum-p9-native/consumer",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-native/consumer-race20-v2.txt",
+      "log_sha256": "0c45f0a935cad6e939200a4c74d5c0f3591bd151388bbbab17cb8202459609b5",
+      "name": "consumer-race20-v2",
+      "seconds": 4.61799883301137
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-mod=readonly",
+        "-tags",
+        "offscreen",
+        "-overlay",
+        "/private/tmp/vellum-p9-native/foundation-overlay.json",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p9-native/consumer",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p9-native/consumer-vet-v2.txt",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "consumer-vet-v2",
+      "seconds": 2.982901415991364
+    }
+  ],
+  "frozen_inputs_sha256": "13084592c211e29867fb358dd9c0a07962151489ce7fb6e2c1b0425d9c5f5f30",
+  "gui_or_os_settings": false,
+  "limits": [
+    "No public managed Vellum replay wrapper or authoritative three workload replay yet",
+    "No native Cocoa/AX/GPU acceptance by software frame",
+    "No all-scenes atomic preflight; accepted Scene.Close is destructive",
+    "No guarantee arbitrary custom Destroy failure attempts every sibling hook"
+  ],
+  "manifest_sha256": "3c1b81dae35dce205aa2a21bac5bd085c5884b88fca1092dd62f5f4095e74363",
+  "new_test_execution": false,
+  "open_requirements": [
+    "public managed-driver replay wrapper and incarnation/target validation",
+    "P9 three authoritative application workloads",
+    "completion/snackbar/widget-specific textcore timers",
+    "Cocoa/AX/native services/GPU timing not virtualized",
+    "arbitrary widget Destroy panic can stop later sibling callback cleanup"
+  ],
+  "patch": "/private/tmp/vellum-p9-native/0030-manual-routing-DRAFT-v2.patch",
+  "patch_sha256": "cf002ec08ecd511f98cad430427dcfaccb3e8c94c9c02117ec411e19a9809bee",
+  "proof": "/private/tmp/vellum-p9-native/qualification-v2.json",
+  "proof_sha256": "a44dfdba49e1e6c920f7a108b9885900950f496e2ec1fdeaaed06d9f26edd1b1",
+  "result": "APPROVED_WITH_EXPLICIT_SCOPE",
+  "review_type": "independent read-only implementation and qualification-graph review",
+  "reviewed_resolutions": [
+    "Canceled queued timers retain origin credit until dispatch/unlink",
+    "Close-policy and gather/Compose lock/counter defers unwind on panic/Goexit",
+    "New source/widget/Close events use explicit window clock; clones retain source origin time",
+    "AutoScroll uses scene-owned state without reading ambient global in manual mode",
+    "Repeat callback can retire originating dialog without nil context/rearming",
+    "Startup timer requests fail observably before window publication",
+    "Copied ManualWindow handles refuse via self identity",
+    "CloseReq snapshots stage/scene identities topmost-to-main, revalidates live identity/member and invokes callbacks without stack mutex"
+  ],
+  "root": "/private/tmp/vellum-p9-native",
+  "scope": "real Cogent offscreen widget routing and software composition only",
+  "upstream_vet": {
+    "baseline_exit_code": 1,
+    "comparison": "exact normalized filename/message/count; no new warnings, not vet exit0",
+    "current_exit_code": 1,
+    "diagnostic_count": 12
+  },
+  "verified_input_count": 1599,
+  "verified_supporting_evidence": {
+    "close-policy-after-v2.txt": "0904164e87ce14509e1f9c57b6ccfbe2bf037c5484e59adb973a26c3ba05d034",
+    "close-policy-before-v2.txt": "f93b69b7bf0b975de84039f0968b0c2a2fb5efc649e468841c27399b82f5cff1",
+    "driver-default-files-v2.json": "7c6fc40cf922d3d4bfb3c818a56f571df8ab19e068b45986fae241bc249ffa67",
+    "driver-offscreen-files-v2.json": "3ad3b6a2211cf1c4ad15d23bddc9df09919dfe07beb3cc27a8739f21206a0184",
+    "patch-reproduction-v2.txt": "d2f259bfbfa9b256652f72ec958d546073621c8f9b3324458180b550632d0d69",
+    "vet-baseline-comparison-v2.json": "6d4b769196ccac779ac20f74a103b8ae53167bb96c24a32705c678db5834c279"
+  }
+}

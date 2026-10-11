@@ -1,0 +1,2687 @@
+--- a/core/animate.go
++++ b/core/animate.go
+@@ -64,11 +64,14 @@
+ 		}
+ 		if a.lastTime.IsZero() {
+ 			a.Dt = 16.66666667 // 60 FPS fallback
++			if rc := sc.renderContext(); rc != nil && rc.manual != nil {
++				a.Dt = 0
++			}
+ 		} else {
+-			a.Dt = float32(time.Since(a.lastTime).Seconds()) * 1000
++			a.Dt = float32(sc.Now().Sub(a.lastTime).Seconds()) * 1000
+ 		}
+ 		a.Func(a)
+-		a.lastTime = time.Now()
++		a.lastTime = sc.Now()
+ 	}
+ 
+ 	sc.Animations = slices.DeleteFunc(sc.Animations, func(a *Animation) bool {
+--- a/core/completer.go
++++ b/core/completer.go
+@@ -86,6 +86,9 @@
+ 	}
+ 	if wait == 0 {
+ 		c.showNow(ctx, pos, text)
++		return
++	}
++	if !ctx.AsWidget().Scene.allowWallTimer("completion") {
+ 		return
+ 	}
+ 	c.delayMu.Lock()
+--- a/core/events.go
++++ b/core/events.go
+@@ -88,7 +88,7 @@
+ 	longHoverPos image.Point
+ 
+ 	// the timer for the LongHover event, started with time.AfterFunc.
+-	longHoverTimer *time.Timer
++	longHoverTimer ManualTimer
+ 
+ 	// the current candidate for a long press event.
+ 	longPressWidget Widget
+@@ -97,7 +97,7 @@
+ 	longPressPos image.Point
+ 
+ 	// the timer for the LongPress event, started with time.AfterFunc.
+-	longPressTimer *time.Timer
++	longPressTimer ManualTimer
+ 
+ 	// stack of drag-hovered widgets: have mouse pointer in BBox and have Droppable flag.
+ 	dragHovers []Widget
+@@ -126,7 +126,7 @@
+ 	repeatClick Widget
+ 
+ 	// the timer for RepeatClickable items.
+-	repeatClickTimer *time.Timer
++	repeatClickTimer ManualTimer
+ 
+ 	// widget receiving keyboard events. Use SetFocus.
+ 	focus Widget
+@@ -291,11 +291,11 @@
+ 		}
+ 	case events.Scroll:
+ 		if !tree.IsNil(em.scroll) {
+-			scInTime := time.Since(em.lastScrollTime) < TimingSettings.ScrollFocusTime
++			scInTime := em.scene.Now().Sub(em.lastScrollTime) < TimingSettings.ScrollFocusTime
+ 			if scInTime {
+ 				em.scroll.AsWidget().HandleEvent(e)
+ 				if e.IsHandled() {
+-					em.lastScrollTime = time.Now()
++					em.lastScrollTime = em.scene.Now()
+ 				}
+ 				em.setCursorFromStyle()
+ 				return
+@@ -386,7 +386,7 @@
+ 			if e.IsHandled() {
+ 				if tree.IsNil(em.scroll) {
+ 					em.scroll = w
+-					em.lastScrollTime = time.Now()
++					em.lastScrollTime = em.scene.Now()
+ 				}
+ 			}
+ 		}
+@@ -519,8 +519,8 @@
+ 					em.setCursorFromStyle()
+ 					return
+ 				}
+-				dcInTime := time.Since(em.lastClickTime) < TimingSettings.DoubleClickInterval
+-				em.lastClickTime = time.Now()
++				dcInTime := em.scene.Now().Sub(em.lastClickTime) < TimingSettings.DoubleClickInterval
++				em.lastClickTime = em.scene.Now()
+ 				sentMulti := false
+ 				switch {
+ 				case em.lastDoubleClickWidget == up && dcInTime:
+@@ -647,7 +647,7 @@
+ // long events using the given pointers to event manager fields and
+ // constant type, time, and distance properties. It should not need to
+ // be called by anything except for the aforementioned functions.
+-func (em *Events) handleLong(e events.Event, deep Widget, w *Widget, pos *image.Point, t **time.Timer, styp, etyp events.Types, stime time.Duration, sdist int) {
++func (em *Events) handleLong(e events.Event, deep Widget, w *Widget, pos *image.Point, t *ManualTimer, styp, etyp events.Types, stime time.Duration, sdist int) {
+ 	em.timerMu.Lock()
+ 	defer em.timerMu.Unlock()
+ 
+@@ -724,14 +724,16 @@
+ 	*w = deep
+ 	// fmt.Println("setting new:", deep)
+ 	*pos = e.WindowPos()
+-	*t = time.AfterFunc(stime, func() {
++	*t = em.scene.afterEvent(stime, func() {
+ 		win := em.RenderWindow()
+ 		if win == nil {
+ 			return
+ 		}
+ 		rc := win.renderContext() // have to get this one first
+-		rc.Lock()
+-		defer rc.Unlock()
++		if win.manual == nil {
++			rc.Lock()
++			defer rc.Unlock()
++		}
+ 
+ 		em.timerMu.Lock() // then can get this
+ 		defer em.timerMu.Unlock()
+@@ -803,16 +805,26 @@
+ 	if em.repeatClickTimer == nil {
+ 		delay *= 8
+ 	}
+-	em.repeatClickTimer = time.AfterFunc(delay, func() {
++	em.repeatClickTimer = em.scene.afterEvent(delay, func() {
+ 		if tree.IsNil(em.repeatClick) || !em.repeatClick.AsWidget().IsVisible() {
+ 			return
+ 		}
+ 		// note: we are not in event loop here anymore!
+ 		rw := em.repeatClick.AsWidget()
+-		rw.AsyncLock()
++		rc := em.scene.renderContext()
++		if rc == nil {
++			return
++		}
++		if rc.manual == nil {
++			rc.Lock()
++			defer rc.Unlock()
++		}
+ 		rw.Send(events.Click)
+-		rw.AsyncUnlock()
+-		em.startRepeatClickTimer()
++		// A Click callback may close this scene. Never dereference its retired
++		// stage or rearm a deadline after the callout.
++		if em.scene.renderContext() == rc && em.scene.This != nil {
++			em.startRepeatClickTimer()
++		}
+ 	})
+ }
+ 
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -349,6 +349,9 @@
+ 	ms := ctx.Scene.Stage.Mains
+ 
+ 	sc := st.Scene
++	if ms.renderContext.manual != nil {
++		st.setMains(ms)
++	}
+ 	st.configMainStage()
+ 	st.addSceneParts()
+ 	sc.SceneGeom.Pos = st.Pos
+--- /dev/null
++++ b/core/manual_timer.go
+@@ -0,0 +1,167 @@
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"context"
++	"time"
++)
++
++// ManualTimer is the checked timer seam's cancellation handle. Native defaults
++// still use time.AfterFunc. A replay adapter wraps its bounded Clock.AfterFunc.
++type ManualTimer interface{ Stop() bool }
++
++type manualTimer struct {
++	owner      *ManualWindow
++	scene      *Scene
++	callback   func()
++	underlying ManualTimer
++	state      uint8 // 0 armed; 1 queued; 2 running; 3 retired; 4 canceled queued
++}
++type manualTimerEvent struct {
++	events.CustomEvent
++	timer *manualTimer
++}
++
++func (e *manualTimerEvent) Ready() bool                     { return true }
++func (e *manualTimerEvent) Merge(events.DeferredEvent) bool { return false }
++func (e *manualTimerEvent) runOwned() {
++	t := e.timer
++	m := t.owner
++	m.mu.Lock()
++	if t.state == 4 {
++		t.state = 3
++		delete(m.timers, t)
++		m.mu.Unlock()
++		return
++	}
++	if t.state != 1 {
++		m.mu.Unlock()
++		return
++	}
++	t.state = 2
++	m.mu.Unlock()
++	defer func() { m.mu.Lock(); t.state = 3; delete(m.timers, t); m.mu.Unlock() }()
++	if m.lifetime.Err() != nil || t.scene == nil || t.scene.This == nil {
++		return
++	}
++	t.callback()
++	e.SetHandled()
++}
++func (t *manualTimer) Stop() bool {
++	m := t.owner
++	m.mu.Lock()
++	if t.state >= 2 {
++		m.mu.Unlock()
++		return false
++	}
++	if t.state == 1 {
++		// Its origin node still exists. Retain credit until dispatch/unlink so
++		// repeated fire/cancel cannot create unbounded tombstones.
++		t.state = 4
++	} else {
++		t.state = 3
++		delete(m.timers, t)
++	}
++	underlying := t.underlying
++	m.mu.Unlock()
++	if underlying != nil {
++		underlying.Stop()
++	}
++	return true
++}
++func (m *ManualWindow) stopTimers() {
++	m.mu.Lock()
++	timers := make([]*manualTimer, 0, len(m.timers))
++	for t := range m.timers {
++		timers = append(timers, t)
++	}
++	m.mu.Unlock()
++	for _, t := range timers {
++		t.Stop()
++	}
++}
++func (sc *Scene) afterEvent(delay time.Duration, callback func()) ManualTimer {
++	rc := sc.renderContext()
++	if rc == nil || rc.manual == nil {
++		return time.AfterFunc(delay, callback)
++	}
++	m := rc.manual
++	if m.lifetime.Err() != nil {
++		return nil
++	}
++	if m.window == nil {
++		m.fail(ErrManualStartupTimer)
++		return nil
++	}
++	t := &manualTimer{owner: m, scene: sc, callback: callback}
++	m.mu.Lock()
++	if len(m.timers) >= m.config.EventCapacity {
++		m.mu.Unlock()
++		m.fail(ErrManualCapacity)
++		return nil
++	}
++	m.timers[t] = struct{}{}
++	m.mu.Unlock()
++	source := m.window.SystemWindow.Events()
++	underlying, err := m.config.AfterFunc(m.lifetime, delay, func() {
++		// No widget/owner callout. Admission consumes this timer's already-owned
++		// credit and places work behind previously admitted ordinary native input.
++		q := &source.Deque
++		_ = q.SendDeferred(func() (events.DeferredEvent, error) {
++			m.mu.Lock()
++			defer m.mu.Unlock()
++			if t.state != 0 || m.lifetime.Err() != nil {
++				return nil, nil
++			}
++			t.state = 1
++			event := &manualTimerEvent{timer: t}
++			event.Typ = events.Custom
++			event.SetUnique()
++			event.GenTime.SetTime(m.config.Now())
++			return event, nil
++		})
++	})
++	if err != nil || manualNil(underlying) {
++		t.Stop()
++		if err == nil {
++			err = ErrManualConfig
++		}
++		m.fail(err)
++		return nil
++	}
++	m.mu.Lock()
++	t.underlying = underlying
++	retired := t.state == 3
++	m.mu.Unlock()
++	if retired {
++		underlying.Stop()
++	}
++	return t
++}
++
++// Compile-time signature documentation for adapter authors. Conversion is
++// explicit because Go method return types are invariant across timer interfaces.
++var _ func(context.Context, time.Duration, func()) (ManualTimer, error)
++
++// Scene retirement cancels that scene's pending manual deadlines even when its
++// originating native window and another dialog remain alive.
++func (sc *Scene) stopManualTimers() {
++	if rc := sc.renderContext(); rc != nil && rc.manual != nil {
++		m := rc.manual
++		m.mu.Lock()
++		var timers []*manualTimer
++		for timer := range m.timers {
++			if timer.scene == sc {
++				timers = append(timers, timer)
++			}
++		}
++		m.mu.Unlock()
++		for _, timer := range timers {
++			timer.Stop()
++		}
++	}
++}
++func (sc *Scene) Destroy() {
++	sc.stopManualTimers()
++	sc.Frame.Destroy()
++}
+--- /dev/null
++++ b/core/manual_window.go
+@@ -0,0 +1,546 @@
++package core
++
++import (
++	"context"
++	"errors"
++	"fmt"
++	"image"
++	"math"
++	"reflect"
++	"slices"
++	"sync"
++	"sync/atomic"
++	"time"
++	"unicode/utf8"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/composer"
++	"cogentcore.org/core/text/shaped"
++)
++
++var (
++	ErrManualConfig           = errors.New("core: invalid manual window configuration")
++	ErrManualUnsupported      = errors.New("core: driver does not support manual windows")
++	ErrManualBusy             = errors.New("core: concurrent or reentrant manual operation")
++	ErrManualClosed           = errors.New("core: manual window closed")
++	ErrManualInput            = errors.New("core: invalid manual input")
++	ErrManualCapacity         = errors.New("core: manual input capacity exhausted")
++	ErrManualBudget           = errors.New("core: manual step budget exhausted")
++	ErrManualAsyncCreation    = errors.New("core: asynchronous window construction is unsupported in manual mode")
++	ErrManualTimerUnsupported = errors.New("core: timed widget callback requires the next manual timer integration checkpoint")
++	ErrManualNoFrame          = errors.New("core: no manual software frame captured")
++	ErrManualStartupTimer     = errors.New("core: timer admission before manual window publication is unsupported")
++	ErrManualCallback         = errors.New("core: manual callback terminated abnormally")
++)
++
++// ManualWindowConfig is immutable after admission. No implicit time advance or
++// first frame occurs. Shaper must contain the caller's explicit fixture fonts.
++type ManualCallbackError struct{ Value any }
++
++func (*ManualCallbackError) Error() string { return ErrManualCallback.Error() }
++func (*ManualCallbackError) Unwrap() error { return ErrManualCallback }
++
++type ManualWindowConfig struct {
++	Size          image.Point
++	LogicalDPI    float32
++	EventCapacity int
++	Now           func() time.Time
++	NewShaper     func() (shaped.Shaper, error)
++	// AfterFunc must be checked/bounded and use the same clock as Now. It only
++	// enqueues a callback; Step owns actual widget execution.
++	AfterFunc func(context.Context, time.Duration, func()) (ManualTimer, error)
++}
++
++type manualSystemFactory interface {
++	ManualWindowsOnly() bool
++	NewManualWindow(*system.NewWindowOptions, system.ManualWindowOptions) (system.Window, error)
++}
++type manualSystemWindow interface {
++	ManualExecution() bool
++	ManualState() system.ManualWindowState
++	FlushReadyPaint() bool
++}
++
++// ManualWindow is the sole event/frame owner. A backend must never also launch
++// its eventLoop/WinLoop. Public operations refuse concurrent/reentrant use.
++type ManualWindow struct {
++	self     *ManualWindow
++	window   *renderWindow
++	config   ManualWindowConfig
++	lifetime context.Context
++	cancel   context.CancelFunc
++	busy     atomic.Bool
++	mu       sync.Mutex
++	failure  error
++	frames   uint64
++	timers   map[*manualTimer]struct{}
++}
++
++type ManualInput struct {
++	Type      events.Types
++	Rune      rune
++	Code      key.Codes
++	Modifiers key.Modifiers
++	Button    events.Buttons
++	Position  image.Point
++	Delta     math32.Vector2
++}
++
++type ManualSnapshot struct {
++	Now         time.Time
++	Events      int
++	Blocked     bool
++	ReadyPaint  bool
++	FuturePaint bool
++	NextPaint   time.Time
++	Frames      uint64
++	Closed      bool
++	Failure     error
++	Timers      int
++}
++
++type ManualStepResult struct {
++	Events      int
++	Frames      int
++	LastType    events.Types
++	LastHandled bool
++}
++
++func validateManualConfig(config ManualWindowConfig) error {
++	if config.Size.X <= 0 || config.Size.Y <= 0 || config.Size.X > 32768 || config.Size.Y > 32768 || config.Size.X > 16*1024*1024/config.Size.Y || config.LogicalDPI <= 0 || config.LogicalDPI > 1920 || math.IsNaN(float64(config.LogicalDPI)) || math.IsInf(float64(config.LogicalDPI), 0) || config.EventCapacity < 4 || config.EventCapacity > 1<<20 || config.Now == nil || config.NewShaper == nil || config.AfterFunc == nil {
++		return ErrManualConfig
++	}
++	return nil
++}
++
++func (st *Stage) RunManual(ctx context.Context, config ManualWindowConfig) (*ManualWindow, error) {
++	if ctx == nil {
++		return nil, ErrManualConfig
++	}
++	if err := ctx.Err(); err != nil {
++		return nil, err
++	}
++	if err := validateManualConfig(config); err != nil {
++		return nil, err
++	}
++	if st == nil || st.Scene == nil || st.Scene.This == nil || st.Mains != nil {
++		return nil, ErrManualConfig
++	}
++	if system.OnSystemWindowCreated != nil {
++		return nil, ErrManualAsyncCreation
++	}
++	factory, ok := system.TheApp.(manualSystemFactory)
++	if !ok || system.TheApp.Platform() != system.Offscreen {
++		return nil, ErrManualUnsupported
++	}
++	if !factory.ManualWindowsOnly() {
++		return nil, system.ErrManualWindowMode
++	}
++	shaper, err := config.NewShaper()
++	if err != nil {
++		return nil, err
++	}
++	if manualNil(shaper) {
++		return nil, ErrManualConfig
++	}
++	lifetime, cancel := context.WithCancel(ctx)
++	m := &ManualWindow{config: config, lifetime: lifetime, cancel: cancel, timers: make(map[*manualTimer]struct{})}
++	m.self = m
++	rc := &renderContext{geom: math32.Geom2DInt{Size: config.Size}, logicalDPI: config.LogicalDPI, visible: true, textShaper: shaper, manual: m}
++	temporary := &stages{renderContext: rc}
++	st.Type = WindowStage
++	st.NewWindow = true
++	st.FullWindow = true
++	st.Mains = nil
++	st.setMains(temporary)
++	st.configMainStage()
++	st.addSceneParts()
++	st.Scene.Resize(rc.geom)
++	m.mu.Lock()
++	constructionFailure := m.failure
++	m.mu.Unlock()
++	if constructionFailure == nil {
++		constructionFailure = ctx.Err()
++	}
++	if constructionFailure != nil {
++		cancel()
++		st.Mains = nil
++		st.renderContext = nil
++		return nil, constructionFailure
++	}
++	opts := &system.NewWindowOptions{Title: st.Title, Size: config.Size, StdPixels: false}
++	var createErr error
++	win := newRenderWindow(st.Name, st.Title, opts, func(opts *system.NewWindowOptions) (system.Window, error) {
++		systemWindow, err := factory.NewManualWindow(opts, system.ManualWindowOptions{Now: config.Now, LogicalDPI: config.LogicalDPI})
++		createErr = err
++		return systemWindow, err
++	})
++	if win == nil {
++		cancel()
++		st.Mains = nil
++		st.renderContext = nil
++		if createErr != nil {
++			return nil, createErr
++		}
++		return nil, ErrManualUnsupported
++	}
++	m.window = win
++	win.manual = m
++	win.mains.renderWindow = win
++	win.mains.renderContext = rc
++	win.mains.push(st)
++	st.setMains(&win.mains)
++	AllRenderWindows.add(win)
++	mainRenderWindows.add(win)
++	setCurrentRenderWindow(win)
++	// Intentionally no goStartEventLoop, WinLoop, WindowWait or first frame.
++	return m, nil
++}
++
++func (m *ManualWindow) enter(ctx context.Context, cleanup bool) error {
++	if m == nil || m.self != m || ctx == nil || m.config.Now == nil || m.lifetime == nil {
++		return ErrManualConfig
++	}
++	if err := ctx.Err(); err != nil {
++		return err
++	}
++	if !m.busy.CompareAndSwap(false, true) {
++		return ErrManualBusy
++	}
++	if m.window == nil && !cleanup {
++		m.busy.Store(false)
++		return ErrManualClosed
++	}
++	if !cleanup {
++		if err := m.lifetime.Err(); err != nil {
++			m.busy.Store(false)
++			return err
++		}
++		m.mu.Lock()
++		failure := m.failure
++		m.mu.Unlock()
++		if failure != nil {
++			m.busy.Store(false)
++			return failure
++		}
++	}
++	return nil
++}
++func (m *ManualWindow) fail(err error) {
++	m.mu.Lock()
++	if m.failure == nil {
++		m.failure = err
++	}
++	m.mu.Unlock()
++}
++func (m *ManualWindow) leave() { m.busy.Store(false) }
++func (m *ManualWindow) snapshotOwned() ManualSnapshot {
++	s := ManualSnapshot{Now: m.config.Now(), Frames: m.frames}
++	m.mu.Lock()
++	s.Failure = m.failure
++	s.Timers = len(m.timers)
++	m.mu.Unlock()
++	if m.window == nil {
++		s.Closed = true
++		return s
++	}
++	q := &m.window.SystemWindow.Events().Deque
++	q.Mu.Lock()
++	s.Events = len(q.Front) + len(q.Back)
++	if len(q.Front) == 0 && len(q.Back) > 0 {
++		if deferred, ok := q.Back[0].(events.DeferredEvent); ok {
++			s.Blocked = !deferred.Ready()
++		}
++	}
++	q.Mu.Unlock()
++	native := m.window.SystemWindow.(manualSystemWindow).ManualState()
++	s.ReadyPaint = native.ReadyPaint
++	s.NextPaint = native.NextPaint
++	s.FuturePaint = !native.NextPaint.IsZero() && s.Now.Before(native.NextPaint)
++	s.Closed = native.Closed
++	return s
++}
++func (m *ManualWindow) Snapshot(ctx context.Context) (ManualSnapshot, error) {
++	if err := m.enter(ctx, true); err != nil {
++		return ManualSnapshot{}, err
++	}
++	defer m.leave()
++	return m.snapshotOwned(), nil
++}
++
++func (m *ManualWindow) Input(ctx context.Context, input ManualInput) error {
++	if err := m.enter(ctx, false); err != nil {
++		return err
++	}
++	defer m.leave()
++	if m.window.SystemWindow.IsClosed() {
++		return ErrManualClosed
++	}
++	if !utf8.ValidRune(input.Rune) || input.Modifiers < 0 || input.Modifiers & ^(key.Modifiers(1<<key.ModifiersN)-1) != 0 || input.Position.X < math.MinInt32 || input.Position.X > math.MaxInt32 || input.Position.Y < math.MinInt32 || input.Position.Y > math.MaxInt32 {
++		return ErrManualInput
++	}
++	units := 1
++	switch input.Type {
++	case events.KeyDown, events.KeyUp, events.KeyChord:
++		valid := false
++		for _, code := range key.CodesValues() {
++			if input.Code == code {
++				valid = true
++				break
++			}
++		}
++		if !valid {
++			return ErrManualInput
++		}
++		if input.Type == events.KeyDown {
++			units = 2
++		}
++	case events.MouseDown, events.MouseUp:
++		if input.Button < 0 || input.Button >= events.ButtonsN {
++			return ErrManualInput
++		}
++	case events.MouseMove:
++	case events.Scroll:
++		if math.IsNaN(float64(input.Delta.X)) || math.IsNaN(float64(input.Delta.Y)) || math.IsInf(float64(input.Delta.X), 0) || math.IsInf(float64(input.Delta.Y), 0) || math.Abs(float64(input.Delta.X)) > 1e6 || math.Abs(float64(input.Delta.Y)) > 1e6 {
++			return ErrManualInput
++		}
++	default:
++		return ErrManualInput
++	}
++	source := m.window.SystemWindow.Events()
++	source.Deque.Mu.Lock()
++	queued := len(source.Deque.Front) + len(source.Deque.Back)
++	source.Deque.Mu.Unlock()
++	if queued > m.config.EventCapacity-units {
++		return ErrManualCapacity
++	}
++	switch input.Type {
++	case events.KeyDown, events.KeyUp, events.KeyChord:
++		source.Key(input.Type, input.Rune, input.Code, input.Modifiers)
++	case events.MouseDown, events.MouseUp:
++		source.MouseButton(input.Type, input.Button, input.Position, input.Modifiers)
++	case events.MouseMove:
++		source.MouseMove(input.Position)
++	case events.Scroll:
++		source.Scroll(input.Position, input.Delta)
++	}
++	return nil
++}
++
++func (m *ManualWindow) stepOwned() (result ManualStepResult, err error) {
++	completed := false
++	defer func() {
++		if !completed {
++			err = &ManualCallbackError{Value: recover()}
++			m.fail(err)
++		}
++	}()
++	w := m.window
++	w.SystemWindow.(manualSystemWindow).FlushReadyPaint()
++	event, ok := w.SystemWindow.Events().Deque.PollEvent()
++	if !ok {
++		completed = true
++		return result, nil
++	}
++	result.Events = 1
++	result.LastType = event.Type()
++	if w.SystemWindow.IsClosed() {
++		closing, ok := event.(*events.WindowEvent)
++		if !ok || closing.Action != events.WinClose {
++			completed = true
++			return result, nil
++		}
++	}
++	w.handleEvent(event)
++	result.LastHandled = event.IsHandled()
++	if event.Type() == events.WindowPaint {
++		m.frames++
++		result.Frames = 1
++	}
++	if w.flags.HasFlag(winStopEventLoop) {
++		m.retireOwned()
++	}
++	m.mu.Lock()
++	err = m.failure
++	m.mu.Unlock()
++	completed = true
++	return result, err
++}
++func (m *ManualWindow) Step(ctx context.Context, maximum int) (ManualStepResult, error) {
++	if maximum <= 0 {
++		return ManualStepResult{}, ErrManualBudget
++	}
++	if err := m.enter(ctx, false); err != nil {
++		return ManualStepResult{}, err
++	}
++	defer m.leave()
++	var result ManualStepResult
++	for range maximum {
++		if err := ctx.Err(); err != nil {
++			return result, err
++		}
++		step, err := m.stepOwned()
++		result.Events += step.Events
++		result.Frames += step.Frames
++		if step.Events > 0 {
++			result.LastType, result.LastHandled = step.LastType, step.LastHandled
++		}
++		if err != nil {
++			return result, err
++		}
++		if step.Events == 0 || m.window == nil {
++			return result, nil
++		}
++	}
++	return result, nil
++}
++func (m *ManualWindow) Frame(ctx context.Context) (ManualStepResult, error) {
++	if err := m.enter(ctx, false); err != nil {
++		return ManualStepResult{}, err
++	}
++	defer m.leave()
++	if m.window.SystemWindow.IsClosed() {
++		return ManualStepResult{}, ErrManualClosed
++	}
++	// The normal queue prioritizes WindowPaint over back input. Use that same
++	// route rather than calling a widget render method or draining owner posts.
++	m.window.SystemWindow.(interface{ RequestPaint() }).RequestPaint()
++	return m.stepOwned()
++}
++func (m *ManualWindow) Image(ctx context.Context) (*image.RGBA, error) {
++	if err := m.enter(ctx, false); err != nil {
++		return nil, err
++	}
++	defer m.leave()
++	if m.frames == 0 {
++		return nil, ErrManualNoFrame
++	}
++	drawer, ok := m.window.SystemWindow.Composer().(*composer.ComposerDrawer)
++	if !ok {
++		return nil, ErrManualUnsupported
++	}
++	imager, ok := drawer.Drawer.(getImager)
++	if !ok {
++		return nil, ErrManualUnsupported
++	}
++	source := imager.GetImage()
++	if source == nil {
++		return nil, ErrManualNoFrame
++	}
++	return &image.RGBA{Pix: slices.Clone(source.Pix), Stride: source.Stride, Rect: source.Rect}, nil
++}
++func (m *ManualWindow) retireOwned() {
++	w := m.window
++	if w == nil {
++		return
++	}
++	m.cancel()
++	m.stopTimers()
++	defer func() {
++		q := &w.SystemWindow.Events().Deque
++		q.Mu.Lock()
++		q.Front = nil
++		q.Back = nil
++		q.Mu.Unlock()
++		m.mu.Lock()
++		clear(m.timers)
++		m.mu.Unlock()
++		m.window = nil
++	}()
++	rc := w.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	w.mains.deleteAll()
++}
++
++// Close force-retires an owned manual window even after a callback failure or
++// canceled window lifetime. It creates no consumer goroutine or native loop.
++func (m *ManualWindow) Close(ctx context.Context) (err error) {
++	if m == nil {
++		return ErrManualConfig
++	}
++	if err := m.enter(ctx, true); err != nil {
++		return err
++	}
++	defer m.leave()
++	if m.window == nil {
++		return nil
++	}
++	completed := false
++	defer func() {
++		if !completed {
++			err = &ManualCallbackError{Value: recover()}
++			m.fail(err)
++			if m.window != nil {
++				m.window.closed()
++				m.retireOwned()
++			}
++		}
++	}()
++	m.window.SystemWindow.Close()
++	// Dispatch actual WinClose for registry/current-window behavior, then perform
++	// the eventLoop's terminal scene/resource action exactly once.
++	for m.window != nil {
++		step, err := m.stepOwned()
++		if err != nil && m.window != nil {
++			m.window.closed()
++			m.retireOwned()
++			completed = true
++			return err
++		}
++		if step.Events == 0 && m.window != nil {
++			m.window.closed()
++			m.retireOwned()
++		}
++	}
++	completed = true
++	return nil
++}
++func (w *renderWindow) now() time.Time {
++	if w.manual != nil {
++		return w.manual.config.Now()
++	}
++	return time.Now()
++}
++func (sc *Scene) Now() time.Time {
++	if sc != nil {
++		if rc := sc.renderContext(); rc != nil && rc.manual != nil {
++			return rc.manual.config.Now()
++		}
++	}
++	return time.Now()
++}
++func (sc *Scene) allowWallTimer(name string) bool {
++	if sc != nil {
++		if rc := sc.renderContext(); rc != nil && rc.manual != nil {
++			rc.manual.fail(fmt.Errorf("%w: %s", ErrManualTimerUnsupported, name))
++			return false
++		}
++	}
++	return true
++}
++
++// Newly generated scene events use the scene's clock; events cloned from an
++// admitted source retain that original timestamp and origin by design.
++func (sc *Scene) stampManualEvent(e events.Event) {
++	if sc != nil {
++		if rc := sc.renderContext(); rc != nil && rc.manual != nil {
++			e.AsBase().GenTime.SetTime(rc.manual.config.Now())
++		}
++	}
++}
++
++func manualNil(value any) bool {
++	if value == nil {
++		return true
++	}
++	v := reflect.ValueOf(value)
++	switch v.Kind() {
++	case reflect.Pointer, reflect.Func, reflect.Chan, reflect.Interface, reflect.Map, reflect.Slice:
++		return v.IsNil()
++	}
++	return false
++}
+--- /dev/null
++++ b/core/manual_window_test.go
+@@ -0,0 +1,881 @@
++//go:build offscreen
++
++package core
++
++import (
++	"bytes"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/states"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/system/composer"
++	"cogentcore.org/core/system/driver/offscreen"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"context"
++	"errors"
++	"fmt"
++	"image"
++	"io/fs"
++	"reflect"
++	"runtime"
++	"slices"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++type fixtureClock struct {
++	mu     sync.Mutex
++	now    time.Time
++	timers []*fixtureTimer
++	refuse error
++}
++type fixtureTimer struct {
++	clock    *fixtureClock
++	due      time.Time
++	callback func()
++	stopped  bool
++}
++
++func (t *fixtureTimer) Stop() bool {
++	t.clock.mu.Lock()
++	defer t.clock.mu.Unlock()
++	was := !t.stopped
++	t.stopped = true
++	return was
++}
++func (c *fixtureClock) Now() time.Time { c.mu.Lock(); defer c.mu.Unlock(); return c.now }
++func (c *fixtureClock) After(ctx context.Context, d time.Duration, f func()) (ManualTimer, error) {
++	c.mu.Lock()
++	defer c.mu.Unlock()
++	if err := ctx.Err(); err != nil {
++		return nil, err
++	}
++	if c.refuse != nil {
++		return nil, c.refuse
++	}
++	timer := &fixtureTimer{clock: c, due: c.now.Add(d), callback: f}
++	c.timers = append(c.timers, timer)
++	return timer, nil
++}
++func (c *fixtureClock) Advance(d time.Duration) {
++	c.mu.Lock()
++	c.now = c.now.Add(d)
++	var callbacks []func()
++	for _, t := range c.timers {
++		if !t.stopped && !t.due.After(c.now) {
++			t.stopped = true
++			callbacks = append(callbacks, t.callback)
++		}
++	}
++	c.mu.Unlock()
++	for _, callback := range callbacks {
++		callback()
++	}
++}
++func manualFixture(t *testing.T, build func(*Body), capacity ...int) (*ManualWindow, *Body, *fixtureClock) {
++	t.Helper()
++	limit := 64
++	if len(capacity) > 0 {
++		limit = capacity[0]
++	}
++	clock := &fixtureClock{now: time.Unix(1730000000, 0).UTC()}
++	body := NewBody("manual-fixture")
++	if build != nil {
++		build(body)
++	}
++	manual, err := body.NewWindow().RunManual(context.Background(), ManualWindowConfig{Size: image.Pt(400, 260), LogicalDPI: 160, EventCapacity: limit, Now: clock.Now, AfterFunc: clock.After, NewShaper: func() (shaped.Shaper, error) { return shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default}), nil }})
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() {
++		if err := manual.Close(context.Background()); err != nil && !errors.Is(err, ErrManualCallback) && !errors.Is(err, ErrManualCapacity) && !errors.Is(err, ErrManualTimerUnsupported) {
++			t.Error(err)
++		}
++	})
++	return manual, body, clock
++}
++func drainManual(t *testing.T, m *ManualWindow) {
++	t.Helper()
++	for range 256 {
++		snap, err := m.Snapshot(context.Background())
++		if err != nil {
++			t.Fatal(err)
++		}
++		if snap.Events == 0 && !snap.ReadyPaint {
++			return
++		}
++		if snap.Blocked && !snap.ReadyPaint {
++			t.Fatal("blocked source")
++		}
++		if _, err = m.Step(context.Background(), 1); err != nil {
++			t.Fatal(err)
++		}
++	}
++	t.Fatal("explicit step budget exhausted")
++}
++func inputManual(t *testing.T, m *ManualWindow, input ManualInput) {
++	t.Helper()
++	if err := m.Input(context.Background(), input); err != nil {
++		t.Fatal(err)
++	}
++}
++func clickManual(t *testing.T, m *ManualWindow, pos image.Point) {
++	t.Helper()
++	inputManual(t, m, ManualInput{Type: events.MouseDown, Button: events.Left, Position: pos})
++	inputManual(t, m, ManualInput{Type: events.MouseUp, Button: events.Left, Position: pos})
++	drainManual(t, m)
++}
++func center(w Widget) image.Point {
++	box := w.AsWidget().Geom.TotalBBox
++	return box.Min.Add(box.Size().Div(2))
++}
++func TestVellumManualConstructionAndExplicitInput(t *testing.T) {
++	var field *TextField
++	var boundaries []rune
++	m, b, c := manualFixture(t, func(b *Body) {
++		field = NewTextField(b).SetText("A")
++		field.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(160), units.Dp(40)) })
++	})
++	if _, err := m.Image(context.Background()); !errors.Is(err, ErrManualNoFrame) {
++		t.Fatalf("hidden frame: %v", err)
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || s.Frames != 0 || s.Events == 0 || !s.ReadyPaint {
++		t.Fatalf("construction %+v %v", s, err)
++	}
++	// No worker/loop can consume these messages. Explicit stepping alone delivers.
++	runtime.Gosched()
++	again, _ := m.Snapshot(context.Background())
++	if again.Events != s.Events || again.Frames != 0 {
++		t.Fatalf("background progress %+v -> %+v", s, again)
++	}
++	drainManual(t, m)
++	if !b.Scene.IsVisible() || field.Scene != b.Scene {
++		t.Fatalf("not shown/linked after frames")
++	}
++	b.Scene.EventBoundary = func(e events.Event) {
++		if e.Type() == events.KeyChord {
++			boundaries = append(boundaries, e.AsBase().Rune)
++			if !e.Time().Equal(c.Now()) {
++				t.Errorf("time %v", e.Time())
++			}
++		}
++	}
++	// Actual click hit-tests focus; typing is not a direct TextField.Send call.
++	clickManual(t, m, center(field))
++	if b.Scene.Events.focus != field {
++		t.Fatalf("focus %T; field box %v", b.Scene.Events.focus, field.Geom.TotalBBox)
++	}
++	inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'x', Code: key.CodeX})
++	drainManual(t, m)
++	if field.EditingState().Text != "Ax" || len(boundaries) != 1 {
++		t.Fatalf("actual key routing: %+v boundaries %v", field.EditingState(), boundaries)
++	}
++	image1, err := m.Image(context.Background())
++	if err != nil || image1.Bounds().Size() != image.Pt(400, 260) {
++		t.Fatalf("image %v %v", image1, err)
++	}
++	old := image1.Pix[0]
++	image1.Pix[0] ^= 255
++	image2, err := m.Image(context.Background())
++	if err != nil || image2.Pix[0] != old {
++		t.Fatal("image aliases composer")
++	}
++	if !b.Scene.Now().Equal(c.Now()) {
++		t.Fatal("scene clock differs")
++	}
++}
++func TestVellumManualDisabledAndModalRouting(t *testing.T) {
++	clicks := 0
++	var disabled, live *Button
++	m, b, c := manualFixture(t, func(b *Body) {
++		disabled = NewButton(b).SetText("disabled")
++		disabled.SetState(true, states.Disabled)
++		disabled.OnClick(func(events.Event) { clicks += 100 })
++		live = NewButton(b).SetText("live")
++		live.OnClick(func(events.Event) { clicks++ })
++	})
++	drainManual(t, m)
++	clickManual(t, m, center(disabled))
++	if clicks != 0 {
++		t.Fatal("disabled activated")
++	}
++	clickManual(t, m, center(live))
++	if clicks != 1 {
++		t.Fatalf("clicks %d", clicks)
++	}
++	dialog := NewBody("manual modal")
++	NewText(dialog).SetText("Modal")
++	dialog.NewFullDialog(b).Run()
++	drainManual(t, m)
++	if !dialog.Scene.Now().Equal(c.Now()) || dialog.Scene.textShaper != nil {
++		t.Fatal("dialog clock/font did not inherit")
++	}
++	clickManual(t, m, center(live))
++	if clicks != 1 {
++		t.Fatal("modal allowed background button")
++	}
++	dialog.Close()
++	drainManual(t, m)
++	clickManual(t, m, center(live))
++	if clicks != 2 {
++		t.Fatalf("after modal %d", clicks)
++	}
++}
++func TestVellumManualFixedSoftwarePixels(t *testing.T) {
++	build := func(b *Body) { NewText(b).SetText("Noto fixture 123"); NewButton(b).SetText("Apply") }
++	first, _, _ := manualFixture(t, build)
++	drainManual(t, first)
++	a, err := first.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	second, _, _ := manualFixture(t, build)
++	drainManual(t, second)
++	b, err := second.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	if a.Rect != b.Rect || a.Stride != b.Stride || !bytes.Equal(a.Pix, b.Pix) {
++		t.Fatal("same explicit fonts/viewport/time produced different software pixels")
++	}
++}
++
++type blockedManualEvent struct {
++	events.CustomEvent
++	ready bool
++}
++
++func (e *blockedManualEvent) Ready() bool                     { return e.ready }
++func (e *blockedManualEvent) Merge(events.DeferredEvent) bool { return false }
++func TestVellumManualBudgetBlockedAndFuturePaint(t *testing.T) {
++	m, _, c := manualFixture(t, nil)
++	drainManual(t, m)
++	q := &m.window.SystemWindow.Events().Deque
++	e := &blockedManualEvent{}
++	e.Typ = events.Custom
++	e.SetUnique()
++	if err := q.SendDeferred(func() (events.DeferredEvent, error) { return e, nil }); err != nil {
++		t.Fatal(err)
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || !s.Blocked || s.Events != 1 {
++		t.Fatalf("blocked %+v %v", s, err)
++	}
++	r, err := m.Step(context.Background(), 1)
++	if err != nil || r.Events != 0 {
++		t.Fatalf("blocked step %+v %v", r, err)
++	}
++	if _, err = m.Step(context.Background(), 0); !errors.Is(err, ErrManualBudget) {
++		t.Fatal(err)
++	}
++	q.UpdateDeferred(func() error { e.ready = true; return nil }, nil)
++	drainManual(t, m)
++	m.window.SystemWindow.(interface{ RequestPaintAfter(time.Duration) }).RequestPaintAfter(time.Second)
++	s, _ = m.Snapshot(context.Background())
++	if !s.FuturePaint || s.ReadyPaint {
++		t.Fatalf("future %+v", s)
++	}
++	r, err = m.Step(context.Background(), 20)
++	if err != nil || r.Events != 0 || !c.Now().Equal(s.Now) {
++		t.Fatalf("implicit advance %+v %v", r, err)
++	}
++	c.Advance(time.Second)
++	s, _ = m.Snapshot(context.Background())
++	if !s.ReadyPaint {
++		t.Fatal("explicit advance did not ready paint")
++	}
++	if r, err = m.Step(context.Background(), 1); err != nil || r.Frames != 1 {
++		t.Fatalf("due paint %+v %v", r, err)
++	}
++	for range m.config.EventCapacity {
++		inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'a', Code: key.CodeA})
++	}
++	before, _ := m.Snapshot(context.Background())
++	if err = m.Input(context.Background(), ManualInput{Type: events.KeyChord, Rune: 'b', Code: key.CodeB}); !errors.Is(err, ErrManualCapacity) {
++		t.Fatal(err)
++	}
++	after, _ := m.Snapshot(context.Background())
++	if before.Events != after.Events {
++		t.Fatal("capacity refusal mutated queue")
++	}
++}
++
++type maliciousPanic struct{}
++
++func (maliciousPanic) String() string { panic("formatter invoked") }
++func TestVellumManualRouterPanicUnwindsAndClose(t *testing.T) {
++	m, b, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	b.Scene.OnFirst(events.KeyChord, func(events.Event) { panic(maliciousPanic{}) })
++	inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'x', Code: key.CodeX})
++	if _, err := m.Step(context.Background(), 1); !errors.Is(err, ErrManualCallback) {
++		t.Fatalf("panic %T %v", err, err)
++	}
++	if _, err := m.Step(context.Background(), 1); !errors.Is(err, ErrManualCallback) {
++		t.Fatal("failed controller reused")
++	}
++	if err := m.Close(context.Background()); err != nil && !errors.Is(err, ErrManualCallback) {
++		t.Fatal(err)
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || !s.Closed {
++		t.Fatalf("terminal %+v %v", s, err)
++	}
++	for _, w := range AllRenderWindows.snapshot() {
++		if w == m.window {
++			t.Fatal("registry retained")
++		}
++	}
++}
++func TestVellumManualTimerDeliveryFIFOAndCancellation(t *testing.T) {
++	m, b, c := manualFixture(t, nil)
++	drainManual(t, m)
++	var order []string
++	b.Scene.On(events.Custom, func(events.Event) { order = append(order, "ordinary") })
++	timer := b.Scene.afterEvent(time.Second, func() { order = append(order, "timer") })
++	if timer == nil {
++		t.Fatal("timer refused")
++	}
++	m.window.SystemWindow.Events().Custom(nil)
++	c.Advance(time.Second)
++	if len(order) != 0 {
++		t.Fatal("clock callback mutated widget outside Step")
++	}
++	drainManual(t, m)
++	if len(order) != 2 || order[0] != "ordinary" || order[1] != "timer" {
++		t.Fatalf("FIFO %v", order)
++	}
++	timer = b.Scene.afterEvent(time.Second, func() { t.Error("canceled timer fired") })
++	if !timer.Stop() {
++		t.Fatal("stop refused")
++	}
++	c.Advance(time.Second)
++	drainManual(t, m)
++	c.refuse = errors.New("clock capacity")
++	if timer = b.Scene.afterEvent(time.Second, func() {}); timer != nil {
++		t.Fatal("clock refusal hidden")
++	}
++	s, _ := m.Snapshot(context.Background())
++	if !errors.Is(s.Failure, c.refuse) || s.Timers != 0 {
++		t.Fatalf("timer refusal %+v", s)
++	}
++}
++func TestVellumManualAsyncConstructionRefused(t *testing.T) {
++	m, b, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	before := len(AllRenderWindows.snapshot())
++	st := NewBody("child").NewWindowDialog(b)
++	st.Run()
++	if len(AllRenderWindows.snapshot()) != before || st.Mains != nil {
++		t.Fatal("child window created implicit loops")
++	}
++	s, _ := m.Snapshot(context.Background())
++	if !errors.Is(s.Failure, ErrManualAsyncCreation) {
++		t.Fatal(s.Failure)
++	}
++}
++func TestVellumManualConfigurationRefusal(t *testing.T) {
++	body := NewBody("invalid manual")
++	st := body.NewWindow()
++	system.OnSystemWindowCreated = make(chan struct{})
++	defer func() { system.OnSystemWindowCreated = nil }()
++	config := ManualWindowConfig{Size: image.Pt(400, 260), LogicalDPI: 160, EventCapacity: 64, Now: time.Now, AfterFunc: func(context.Context, time.Duration, func()) (ManualTimer, error) { return nil, nil }, NewShaper: func() (shaped.Shaper, error) {
++		t.Fatal("shaper called despite async preflight refusal")
++		return nil, nil
++	}}
++	if _, err := st.RunManual(context.Background(), config); !errors.Is(err, ErrManualAsyncCreation) {
++		t.Fatal(err)
++	}
++	if st.Mains != nil {
++		t.Fatal("refusal mutated stage")
++	}
++}
++
++func TestVellumManualBusyCancellationAndGoexit(t *testing.T) {
++	m, b, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	entered, release, finished := make(chan struct{}), make(chan struct{}), make(chan error, 1)
++	b.Scene.OnFirst(events.KeyChord, func(events.Event) { close(entered); <-release })
++	inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'x', Code: key.CodeX})
++	ctx, cancel := context.WithCancel(context.Background())
++	go func() { _, err := m.Step(ctx, 1); finished <- err }()
++	<-entered
++	cancel()
++	if _, err := m.Snapshot(context.Background()); !errors.Is(err, ErrManualBusy) {
++		t.Fatal("canceled wait released routing owner", err)
++	}
++	select {
++	case err := <-finished:
++		t.Fatal("callback returned before release", err)
++	default:
++	}
++	close(release)
++	if err := <-finished; err != nil {
++		t.Fatal(err)
++	}
++	// The router is synchronous on its caller; no internal executor goroutine
++	// relocates GUI work. This offscreen test caller owns its goroutine explicitly.
++	m, b, _ = manualFixture(t, nil)
++	drainManual(t, m)
++	b.Scene.OnFirst(events.KeyChord, func(events.Event) { runtime.Goexit() })
++	inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'g', Code: key.CodeG})
++	exited := make(chan struct{})
++	go func() { defer close(exited); _, _ = m.Step(context.Background(), 1) }()
++	<-exited
++	s, err := m.Snapshot(context.Background())
++	if err != nil || !errors.Is(s.Failure, ErrManualCallback) {
++		t.Fatalf("Goexit terminal snapshot %+v %v", s, err)
++	}
++	if err = m.Close(context.Background()); err != nil && !errors.Is(err, ErrManualCallback) {
++		t.Fatal(err)
++	}
++}
++func TestVellumManualCleanupFailureStillRetires(t *testing.T) {
++	m, _, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	w := m.window
++	calls := 0
++	w.SystemWindow.SetCloseCleanFunc(func(system.Window) { calls++; panic(maliciousPanic{}) })
++	if err := m.Close(context.Background()); !errors.Is(err, ErrManualCallback) {
++		t.Fatalf("cleanup panic %T %v", err, err)
++	}
++	if calls != 1 {
++		t.Fatal(calls)
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || !s.Closed {
++		t.Fatalf("terminal %+v %v", s, err)
++	}
++	for _, candidate := range AllRenderWindows.snapshot() {
++		if candidate == w {
++			t.Fatal("render registry retained")
++		}
++	}
++	if err = m.Close(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	if calls != 1 {
++		t.Fatal("duplicate close callback")
++	}
++}
++
++func TestVellumManualSceneRetirementCancelsDeadlines(t *testing.T) {
++	m, b, c := manualFixture(t, nil)
++	drainManual(t, m)
++	dialog := NewBody("retired scene timer")
++	NewText(dialog).SetText("Close me")
++	dialog.NewFullDialog(b).Run()
++	drainManual(t, m)
++	fired := 0
++	timer := dialog.Scene.afterEvent(time.Second, func() { fired++ })
++	if timer == nil {
++		t.Fatal("timer refused")
++	}
++	dialog.Close()
++	drainManual(t, m)
++	s, err := m.Snapshot(context.Background())
++	if err != nil || s.Timers != 0 {
++		t.Fatalf("retired scene retained timer %+v %v", s, err)
++	}
++	c.Advance(time.Second)
++	drainManual(t, m)
++	if fired != 0 {
++		t.Fatal("retired scene timer mutated UI")
++	}
++}
++func TestVellumManualVirtualFieldUndoGrouping(t *testing.T) {
++	m, b, c := manualFixture(t, nil)
++	drainManual(t, m)
++	// Save grouping consumes the field's scene clock, independently of wall time.
++	field := NewTextField(b)
++	field.Scene = b.Scene
++	field.editText = []rune("a")
++	field.saveUndo()
++	c.Advance(100 * time.Millisecond)
++	field.editText = []rune("ab")
++	field.saveUndo()
++	if len(field.undos.stack) != 1 {
++		t.Fatal("virtual within-window edit did not group")
++	}
++	c.Advance(300 * time.Millisecond)
++	field.editText = []rune("abc")
++	field.saveUndo()
++	if len(field.undos.stack) != 2 {
++		t.Fatal("virtual elapsed edit still grouped by wall time")
++	}
++}
++
++func TestVellumManualQueuedTimerCancellationRetainsCredit(t *testing.T) {
++	m, b, c := manualFixture(t, nil, 4)
++	drainManual(t, m)
++	for range 4 {
++		timer := b.Scene.afterEvent(time.Second, func() { t.Error("canceled timer executed") })
++		if timer == nil {
++			t.Fatal("premature refusal")
++		}
++		c.Advance(time.Second)
++		if !timer.Stop() {
++			t.Fatal("queued cancellation refused")
++		}
++	}
++	before, err := m.Snapshot(context.Background())
++	if err != nil || before.Events != 4 || before.Timers != 4 {
++		t.Fatalf("lost queued credits %+v %v", before, err)
++	}
++	if timer := b.Scene.afterEvent(time.Second, func() {}); timer != nil {
++		t.Fatal("reused outstanding canceled credits")
++	}
++	after, _ := m.Snapshot(context.Background())
++	if after.Events != 4 || after.Timers != 4 || !errors.Is(after.Failure, ErrManualCapacity) {
++		t.Fatalf("unbounded cancel nodes %+v", after)
++	}
++	if err = m.Close(context.Background()); err != nil && !errors.Is(err, ErrManualCapacity) {
++		t.Fatal(err)
++	}
++	terminal, err := m.Snapshot(context.Background())
++	if err != nil || terminal.Events != 0 || terminal.Timers != 0 || !terminal.Closed {
++		t.Fatalf("force close retained credits %+v %v", terminal, err)
++	}
++}
++
++func TestVellumManualClosePolicyPanicUnwinds(t *testing.T) {
++	m, b, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	b.Scene.OnClose(func(events.Event) { panic(maliciousPanic{}) })
++	b.Scene.OnFirst(events.KeyChord, func(events.Event) { m.window.closeReq() })
++	inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'w', Code: key.CodeW})
++	if _, err := m.Step(context.Background(), 1); !errors.Is(err, ErrManualCallback) {
++		t.Fatalf("close policy panic %v", err)
++	}
++	if err := m.Close(context.Background()); err != nil && !errors.Is(err, ErrManualCallback) {
++		t.Fatal(err)
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || !s.Closed {
++		t.Fatalf("close policy lock did not unwind %+v %v", s, err)
++	}
++}
++
++type panicManualComposer struct {
++	composer.Composer
++	start  bool
++	called bool
++}
++
++func (c *panicManualComposer) Start() {
++	if c.start {
++		c.called = true
++		panic(maliciousPanic{})
++	}
++	c.Composer.Start()
++}
++func (c *panicManualComposer) Compose() { c.called = true; panic(maliciousPanic{}) }
++
++type panicManualWindow struct {
++	system.Window
++	fault composer.Composer
++}
++
++func (w *panicManualWindow) Composer() composer.Composer { return w.fault }
++func (w *panicManualWindow) ManualExecution() bool {
++	return w.Window.(manualSystemWindow).ManualExecution()
++}
++func (w *panicManualWindow) ManualState() system.ManualWindowState {
++	return w.Window.(manualSystemWindow).ManualState()
++}
++func (w *panicManualWindow) FlushReadyPaint() bool {
++	return w.Window.(manualSystemWindow).FlushReadyPaint()
++}
++func (w *panicManualWindow) RequestPaint() { w.Window.(interface{ RequestPaint() }).RequestPaint() }
++
++func TestVellumManualCompositionFaultUnwinds(t *testing.T) {
++	for _, start := range []bool{false, true} {
++		t.Run(fmt.Sprint(start), func(t *testing.T) {
++			m, _, _ := manualFixture(t, nil)
++			drainManual(t, m)
++			w := m.window
++			w.SystemWindow = &panicManualWindow{Window: w.SystemWindow, fault: &panicManualComposer{Composer: w.SystemWindow.Composer(), start: start}}
++			w.flags.SetFlag(true, winRenderSkipped)
++			if _, err := m.Frame(context.Background()); !errors.Is(err, ErrManualCallback) {
++				t.Fatalf("composition fault %v", err)
++			}
++			if !w.SystemWindow.(*panicManualWindow).fault.(*panicManualComposer).called {
++				t.Fatal("did not reach actual composer callback")
++			}
++			if atomic.LoadInt32(&w.winRenderCounter) != 0 {
++				t.Fatal("composition running counter retained")
++			}
++			if err := m.Close(context.Background()); err != nil && !errors.Is(err, ErrManualCallback) {
++				t.Fatal(err)
++			}
++			if s, err := m.Snapshot(context.Background()); err != nil || !s.Closed {
++				t.Fatalf("composition native lock retained %+v %v", s, err)
++			}
++		})
++	}
++}
++
++func TestVellumManualGeneratedWidgetEventTimes(t *testing.T) {
++	var field *TextField
++	var button *Button
++	m, b, c := manualFixture(t, func(b *Body) { field = NewTextField(b); button = NewButton(b).SetText("Done") })
++	drainManual(t, m)
++	var kinds []events.Types
++	check := func(e events.Event) {
++		kinds = append(kinds, e.Type())
++		if !e.Time().Equal(c.Now()) {
++			t.Errorf("generated %v time %v != virtual %v", e.Type(), e.Time(), c.Now())
++		}
++	}
++	field.On(events.Focus, check)
++	field.On(events.Input, check)
++	field.On(events.Change, check)
++	button.OnClick(check)
++	clickManual(t, m, center(field))
++	inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'x', Code: key.CodeX})
++	drainManual(t, m)
++	clickManual(t, m, center(button))
++	if !slices.Contains(kinds, events.Input) || !slices.Contains(kinds, events.Change) {
++		t.Fatalf("actual field callbacks missing %v", kinds)
++	}
++	c.Advance(time.Second)
++	if timer := b.Scene.afterEvent(time.Second, func() { button.Send(events.Click) }); timer == nil {
++		t.Fatal("timer refused")
++	}
++	c.Advance(time.Second)
++	drainManual(t, m)
++}
++func TestVellumManualRepeatCallbackCanCloseDialog(t *testing.T) {
++	m, b, c := manualFixture(t, nil)
++	drainManual(t, m)
++	dialog := NewBody("repeat close dialog")
++	button := NewButton(dialog).SetText("Close")
++	clicks := 0
++	button.OnClick(func(events.Event) { clicks++; dialog.Close() })
++	dialog.NewFullDialog(b).Run()
++	drainManual(t, m)
++	em := &dialog.Scene.Events
++	em.repeatClick = button
++	em.startRepeatClickTimer()
++	c.Advance(coreRepeatDeadline())
++	drainManual(t, m)
++	if clicks != 1 {
++		t.Fatal("repeat click callback not delivered", clicks)
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || s.Failure != nil || s.Timers != 0 {
++		t.Fatalf("closed dialog repeat rearmed/faulted %+v %v", s, err)
++	}
++	if b.Scene.Stage.Mains == nil {
++		t.Fatal("main window retired with dialog")
++	}
++}
++func coreRepeatDeadline() time.Duration { return TimingSettings.RepeatClickTime * 8 }
++
++func TestVellumManualConstructionTimerRefusesBeforeWindow(t *testing.T) {
++	clock := &fixtureClock{now: time.Unix(1730000000, 0).UTC()}
++	body := NewBody("startup timer")
++	calls := 0
++	body.Updater(func() {
++		if body.Scene.renderContext() != nil && body.Scene.renderContext().manual != nil {
++			calls++
++			body.Scene.afterEvent(time.Second, func() { t.Error("lost startup timer fired") })
++		}
++	})
++	before := len(AllRenderWindows.snapshot())
++	stage := body.NewWindow()
++	manual, err := stage.RunManual(context.Background(), ManualWindowConfig{Size: image.Pt(400, 260), LogicalDPI: 160, EventCapacity: 64, Now: clock.Now, AfterFunc: clock.After, NewShaper: func() (shaped.Shaper, error) { return shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default}), nil }})
++	if !errors.Is(err, ErrManualStartupTimer) || manual != nil || calls == 0 {
++		t.Fatalf("startup admission %v %v calls%d", manual, err, calls)
++	}
++	if stage.Mains != nil || len(AllRenderWindows.snapshot()) != before {
++		t.Fatal("refused constructor published window")
++	}
++}
++func TestVellumManualZeroControllerRefuses(t *testing.T) {
++	var manual ManualWindow
++	if _, err := manual.Snapshot(context.Background()); !errors.Is(err, ErrManualConfig) {
++		t.Fatal(err)
++	}
++	if err := manual.Close(context.Background()); !errors.Is(err, ErrManualConfig) {
++		t.Fatal(err)
++	}
++}
++
++func TestVellumManualAnimationUsesExplicitTime(t *testing.T) {
++	var widget *Text
++	m, _, c := manualFixture(t, func(b *Body) { widget = NewText(b).SetText("animation") })
++	drainManual(t, m)
++	var dt []float32
++	widget.Animate(func(a *Animation) { dt = append(dt, a.Dt) })
++	for range 2 {
++		widget.UpdateRender()
++		if _, err := m.Frame(context.Background()); err != nil {
++			t.Fatal(err)
++		}
++	}
++	c.Advance(250 * time.Millisecond)
++	widget.UpdateRender()
++	if _, err := m.Frame(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	if len(dt) != 3 || dt[0] != 0 || dt[1] != 0 || dt[2] != 250 {
++		t.Fatalf("implicit animation time %v", dt)
++	}
++}
++func TestVellumManualIndependentWindowsClockAndDPI(t *testing.T) {
++	first, a, c1 := manualFixture(t, nil)
++	drainManual(t, first)
++	second, b, c2 := manualFixture(t, nil)
++	drainManual(t, second)
++	c1.Advance(time.Second)
++	if !a.Scene.Now().Equal(c1.Now()) || !b.Scene.Now().Equal(c2.Now()) || a.Scene.Now().Equal(b.Scene.Now()) {
++		t.Fatal("window clocks coupled")
++	}
++	if first.window.SystemWindow.Screen() == second.window.SystemWindow.Screen() {
++		t.Fatal("manual windows borrow global screen")
++	}
++	first.window.SystemWindow.SetLogicalDPI(120)
++	if second.window.SystemWindow.LogicalDPI() != 160 {
++		t.Fatal("window DPI coupled")
++	}
++}
++func TestVellumManualCanceledLifetimeRetiresInputAndTimers(t *testing.T) {
++	m, b, c := manualFixture(t, nil)
++	drainManual(t, m)
++	called := 0
++	b.Scene.afterEvent(time.Second, func() { called++ })
++	m.cancel()
++	c.Advance(time.Second)
++	if err := m.Input(context.Background(), ManualInput{Type: events.KeyChord, Rune: 'x', Code: key.CodeX}); !errors.Is(err, context.Canceled) {
++		t.Fatal(err)
++	}
++	if _, err := m.Step(context.Background(), 1); !errors.Is(err, context.Canceled) {
++		t.Fatal(err)
++	}
++	if err := m.Close(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	if called != 0 {
++		t.Fatal("canceled window dispatched widget callback")
++	}
++	s, err := m.Snapshot(context.Background())
++	if err != nil || s.Timers != 0 || s.Events != 0 || !s.Closed {
++		t.Fatalf("canceled lifetime cleanup %+v %v", s, err)
++	}
++}
++
++func TestVellumManualMixedModeRefusesBeforeShaper(t *testing.T) {
++	a := system.TheApp.(*offscreen.App)
++	ordinary := &offscreen.Window{}
++	a.Mu.Lock()
++	a.Windows = append(a.Windows, ordinary)
++	a.Mu.Unlock()
++	defer a.RemoveWindow(ordinary)
++	body := NewBody("mixed manual")
++	config := ManualWindowConfig{Size: image.Pt(400, 260), LogicalDPI: 160, EventCapacity: 64, Now: time.Now, AfterFunc: func(context.Context, time.Duration, func()) (ManualTimer, error) { return nil, nil }, NewShaper: func() (shaped.Shaper, error) {
++		t.Fatal("preflight ran shaper despite automatic window")
++		return nil, nil
++	}}
++	if _, err := body.NewWindow().RunManual(context.Background(), config); !errors.Is(err, system.ErrManualWindowMode) {
++		t.Fatal(err)
++	}
++}
++
++func TestVellumManualCopiedControllerRefuses(t *testing.T) {
++	m, _, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	// Reflection creates a mistaken value copy without hiding it from admission.
++	copy := reflect.New(reflect.TypeOf(m).Elem()).Interface().(*ManualWindow)
++	reflect.ValueOf(copy).Elem().Set(reflect.ValueOf(m).Elem())
++	if _, err := copy.Snapshot(context.Background()); !errors.Is(err, ErrManualConfig) {
++		t.Fatal(err)
++	}
++	if err := copy.Close(context.Background()); !errors.Is(err, ErrManualConfig) {
++		t.Fatal(err)
++	}
++	if s, err := m.Snapshot(context.Background()); err != nil || s.Closed {
++		t.Fatalf("copy refusal affected owner %+v %v", s, err)
++	}
++}
++
++// An OS close request must visit a stable top-to-bottom policy snapshot. Each
++// accepted Scene.Close deletes and shifts the live stack while its callback runs.
++func TestVellumManualClosePolicySceneSnapshot(t *testing.T) {
++	for _, mode := range []string{"veto", "accept", "retire-other"} {
++		t.Run(mode, func(t *testing.T) {
++			m, body, _ := manualFixture(t, nil)
++			drainManual(t, m)
++			w := m.window
++			mainScene := body.Scene
++			mainStage := mainScene.Stage
++			dialog := NewBody("close-policy dialog")
++			NewText(dialog).SetText("Unsaved changes")
++			dialog.NewFullDialog(body).Run()
++			drainManual(t, m)
++			dialogScene := dialog.Scene
++			dialogStage := dialogScene.Stage
++			beforeRegistry := AllRenderWindows.snapshot()
++			beforeMainRegistry := mainRenderWindows.snapshot()
++			var order []string
++			mainScene.OnClose(func(events.Event) { order = append(order, "main") })
++			dialogScene.OnClose(func(e events.Event) {
++				order = append(order, "dialog")
++				if mode == "veto" {
++					e.SetHandled()
++				}
++				if mode == "retire-other" && !mainScene.Close() {
++					t.Error("callback main close refused")
++				}
++			})
++			dialogScene.OnFirst(events.KeyChord, func(e events.Event) {
++				e.SetHandled()
++				w.closeReq()
++			})
++			inputManual(t, m, ManualInput{Type: events.KeyChord, Rune: 'w', Code: key.CodeW})
++			if _, err := m.Step(context.Background(), 1); err != nil {
++				t.Fatal(err)
++			}
++			if mode == "veto" {
++				if !slices.Equal(order, []string{"dialog"}) {
++					t.Fatalf("veto callback order %v", order)
++				}
++				if w.SystemWindow.IsClosed() || m.window != w || w.flags.HasFlag(winClosing) {
++					t.Fatal("veto closed native window")
++				}
++				if mainScene.This == nil || mainStage.Scene != mainScene || mainStage.Mains != &w.mains || dialogStage.Scene != dialogScene || dialogStage.Mains != &w.mains {
++					t.Fatal("veto destroyed a live scene")
++				}
++				if len(w.mains.stack.Order) != 2 || w.mains.stack.Order[0].Value != mainStage || w.mains.stack.Order[1].Value != dialogStage {
++					t.Fatal("veto changed live stack")
++				}
++				if !slices.Equal(beforeRegistry, AllRenderWindows.snapshot()) || !slices.Equal(beforeMainRegistry, mainRenderWindows.snapshot()) {
++					t.Fatal("veto changed window registry")
++				}
++				if s, err := m.Snapshot(context.Background()); err != nil || s.Closed || s.Failure != nil {
++					t.Fatalf("veto terminalized controller %+v %v", s, err)
++				}
++				return
++			}
++			if !slices.Equal(order, []string{"dialog", "main"}) {
++				t.Fatalf("accepted callback order %v", order)
++			}
++			drainManual(t, m)
++			if s, err := m.Snapshot(context.Background()); err != nil || !s.Closed {
++				t.Fatalf("accepted close incomplete %+v %v", s, err)
++			}
++			for _, rw := range AllRenderWindows.snapshot() {
++				if rw == w {
++					t.Fatal("accepted close retained window")
++				}
++			}
++		})
++	}
++}
+--- a/core/popupstage.go
++++ b/core/popupstage.go
+@@ -57,6 +57,9 @@
+ 		return st
+ 	}
+ 
++	if rc := ctx.Scene.renderContext(); rc != nil && rc.manual != nil {
++		st.setPopups(ctx.Scene.Stage.Main)
++	}
+ 	if st.Type == SnackbarStage {
+ 		st.Scene.makeSceneBars()
+ 	}
+@@ -156,6 +159,9 @@
+ 	sc.showIter = 0
+ 
+ 	if st.Timeout > 0 {
++		if !st.Scene.allowWallTimer("popup timeout") {
++			return st
++		}
+ 		time.AfterFunc(st.Timeout, func() {
+ 			if st.Main == nil {
+ 				return
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -101,6 +101,9 @@
+ 	// The [RenderContext] in this manager is the original source for all Stages.
+ 	mains stages
+ 
++	// manual is fixed before registry publication; nil keeps normal loops.
++	manual *ManualWindow
++
+ 	// noEventsChan is a channel on which a signal is sent when there are
+ 	// no events left in the window [events.Deque]. It is used internally
+ 	// for event handling in tests.
+@@ -127,12 +130,16 @@
+ // newRenderWindow creates a new window with given internal name handle,
+ // display name, and options.  This is called by Stage.newRenderWindow
+ // which handles setting the opts and other infrastructure.
+-func newRenderWindow(name, title string, opts *system.NewWindowOptions) *renderWindow {
++func newRenderWindow(name, title string, opts *system.NewWindowOptions, create ...func(*system.NewWindowOptions) (system.Window, error)) *renderWindow {
+ 	w := &renderWindow{}
+ 	w.name = name
+ 	w.title = title
+ 	var err error
+-	w.SystemWindow, err = system.TheApp.NewWindow(opts)
++	if len(create) != 0 {
++		w.SystemWindow, err = create[0](opts)
++	} else {
++		w.SystemWindow, err = system.TheApp.NewWindow(opts)
++	}
+ 	if err != nil {
+ 		fmt.Printf("Cogent Core NewRenderWindow error: %v \n", err)
+ 		return nil
+@@ -141,21 +148,54 @@
+ 	w.SystemWindow.SetTitleBarIsDark(matcolor.SchemeIsDark)
+ 	w.SystemWindow.SetCloseReqFunc(func(win system.Window) {
+ 		rc := w.renderContext()
+-		rc.Lock()
+-		w.flags.SetFlag(true, winClosing)
+-		// ensure that everyone is closed first
+-		for _, kv := range w.mains.stack.Order {
+-			if kv.Value == nil || kv.Value.Scene == nil || kv.Value.Scene.This == nil {
+-				continue
+-			}
+-			if !kv.Value.Scene.Close() {
+-				w.flags.SetFlag(false, winClosing)
+-				rc.Unlock()
+-				return
+-			}
+-		}
+-		rc.Unlock()
+-		win.Close()
++		accepted := func() bool {
++			rc.Lock()
++			defer rc.Unlock()
++			w.flags.SetFlag(true, winClosing)
++			// Scene.Close deletes from the live stack. Snapshot identities before
++			// callouts and visit the topmost policy first, so a dialog veto cannot
++			// be skipped or destroy the underlying main scene first.
++			type closeIdentity struct {
++				stage *Stage
++				scene *Scene
++			}
++			w.mains.Lock()
++			identities := make([]closeIdentity, 0, len(w.mains.stack.Order))
++			for i := len(w.mains.stack.Order) - 1; i >= 0; i-- {
++				stage := w.mains.stack.Order[i].Value
++				if stage != nil {
++					identities = append(identities, closeIdentity{stage, stage.Scene})
++				}
++			}
++			w.mains.Unlock()
++			for _, identity := range identities {
++				stage, scene := identity.stage, identity.scene
++				if scene == nil || scene.This == nil || stage.Scene != scene || stage.Mains != &w.mains {
++					continue
++				}
++				w.mains.Lock()
++				present := false
++				for _, kv := range w.mains.stack.Order {
++					if kv.Value == stage {
++						present = true
++						break
++					}
++				}
++				w.mains.Unlock()
++				if !present {
++					continue
++				}
++				// The stack mutex is never held across widget callbacks/deletion.
++				if !scene.Close() {
++					w.flags.SetFlag(false, winClosing)
++					return false
++				}
++			}
++			return true
++		}()
++		if accepted {
++			win.Close()
++		}
+ 	})
+ 	return w
+ }
+@@ -369,8 +409,8 @@
+ func (w *renderWindow) closeReq() {
+ 	rc := w.renderContext()
+ 	rc.Unlock()
++	defer rc.Lock()
+ 	w.SystemWindow.CloseReq()
+-	rc.Lock()
+ }
+ 
+ // closed frees any resources after the window has been closed.
+@@ -406,6 +446,9 @@
+ // goroutine, and returns immediately.  Adds to WindowWait wait group so a main
+ // thread can wait on that for all windows to close.
+ func (w *renderWindow) goStartEventLoop() {
++	if w.manual != nil {
++		return
++	}
+ 	windowWait.Add(1)
+ 	go w.eventLoop()
+ }
+@@ -456,7 +499,9 @@
+ func (w *renderWindow) handleEvent(e events.Event) {
+ 	rc := w.renderContext()
+ 	rc.Lock()
+-	// we manually handle Unlock's in this function instead of deferring
++	defer rc.Unlock()
++	// Event ownership unwinds even when a widget callback panics.
++	// we previously manually handled Unlock's in this function instead of deferring
+ 	// it to avoid a cryptic "sync: can't unlock an already unlocked Mutex"
+ 	// error when panicking in the rendering goroutine. This is critical for
+ 	// debugging on Android. TODO: maybe figure out a more sustainable approach to this.
+@@ -467,7 +512,6 @@
+ 	}
+ 	if et >= events.Window && et <= events.WindowPaint {
+ 		w.handleWindowEvents(e)
+-		rc.Unlock()
+ 		return
+ 	}
+ 	if DebugSettings.EventTrace && (!w.isVisible() || w.SystemWindow.Is(system.Minimized)) {
+@@ -475,8 +519,11 @@
+ 		log.Println("w.isClosed:", w.isClosed(), "winClosing flag:", w.flags.HasFlag(winClosing), "syswin !isvis:", !w.SystemWindow.IsVisible(), "minimized:", w.SystemWindow.Is(system.Minimized))
+ 	}
+ 	// fmt.Printf("got event type: %v: %v\n", et.BitIndexString(), evi)
+-	w.mains.mainHandleEvent(e)
+-	rc.Unlock()
++	if timer, ok := e.(*manualTimerEvent); ok && w.manual != nil {
++		timer.runOwned()
++	} else {
++		w.mains.mainHandleEvent(e)
++	}
+ 	w.requestPaintAfter(0)
+ }
+ 
+@@ -490,8 +537,10 @@
+ 		e.SetHandled()
+ 		rc := w.renderContext()
+ 		rc.Unlock() // one case where we need to break lock
+-		w.renderWindow()
+-		rc.Lock()
++		func() {
++			defer rc.Lock()
++			w.renderWindow()
++		}()
+ 		w.mains.runDeferred() // note: must be outside of locks in renderWindow
+ 
+ 	case events.WindowResize:
+@@ -558,6 +607,10 @@
+ 			w.flags.SetFlag(false, winGotFocus)
+ 			w.sendWinFocusEvent(events.WinFocusLost)
+ 		case events.ScreenUpdate:
++			if w.manual != nil {
++				w.resized()
++				break
++			}
+ 			if DebugSettings.WindowEventTrace {
+ 				log.Println("Win: ScreenUpdate", w.name, screenConfig())
+ 			}
+@@ -623,6 +676,8 @@
+ 	// TextShaper is the text shaping system for the render context,
+ 	// for doing text layout.
+ 	textShaper shaped.Shaper
++
++	manual *ManualWindow
+ 
+ 	// render mutex for locking out rendering and any destructive updates.
+ 	// It is locked at the [renderWindow] level during rendering and
+@@ -683,7 +738,7 @@
+ 
+ 	offscreen := TheApp.Platform() == system.Offscreen
+ 
+-	sinceResize := time.Since(w.lastResize)
++	sinceResize := w.now().Sub(w.lastResize)
+ 	if !offscreen && sinceResize < 100*time.Millisecond {
+ 		// get many rapid updates during resizing, so just rerender last one if so.
+ 		// this works best in practice after a lot of experimentation.
+@@ -724,7 +779,7 @@
+ 	if w.onDemand() && w.flags.HasFlag(winGotFocus) && w.isVisible() && top.Sprites.HasActive() {
+ 		w.requestPaintAfter(spriteUpdateTime)
+ 	}
+-	if w.flags.HasFlag(winGotFocus) && time.Since(w.lastSpriteDraw) > spriteUpdateTime {
++	if w.flags.HasFlag(winGotFocus) && w.now().Sub(w.lastSpriteDraw) > spriteUpdateTime {
+ 		spriteMods = true
+ 	}
+ 
+@@ -754,6 +809,12 @@
+ 		return
+ 	}
+ 
++	systemLocked := true
++	defer func() {
++		if systemLocked {
++			w.SystemWindow.Unlock()
++		}
++	}()
+ 	// now we go in the proper bottom-up order to generate the [render.Scene]
+ 	cp := w.SystemWindow.Composer()
+ 	cp.Start()
+@@ -802,14 +863,15 @@
+ 		}
+ 	}
+ 	cp.Add(SpritesSource(top, winScene), &top.Sprites)
+-	w.lastSpriteDraw = time.Now()
++	w.lastSpriteDraw = w.now()
+ 
+ 	w.SystemWindow.Unlock()
++	systemLocked = false
+ 	if offscreen || w.flags.HasFlag(winResize) || sinceResize < 500*time.Millisecond {
+ 		atomic.AddInt32(&w.winRenderCounter, 1)
+ 		w.renderAsyncOwned(cp)
+ 		if w.flags.HasFlag(winResize) {
+-			w.lastResize = time.Now()
++			w.lastResize = w.now()
+ 		}
+ 		w.flags.SetFlag(false, winResize)
+ 	} else {
+@@ -834,17 +896,12 @@
+ // renderAsyncOwned requires renderContext ownership through the entire batch,
+ // including lazy raster and direct sources. The inline resize path already owns it.
+ func (w *renderWindow) renderAsyncOwned(cp composer.Composer) {
++	defer atomic.AddInt32(&w.winRenderCounter, -1)
+ 	if !w.SystemWindow.Lock() {
+-		atomic.AddInt32(&w.winRenderCounter, -1)
+-		// fmt.Println("renderAsync SystemWindow lock fail")
+ 		return
+ 	}
+-	// pr := profile.Start("Compose")
+-	// fmt.Println("start compose")
++	defer w.SystemWindow.Unlock()
+ 	cp.Compose()
+-	// pr.End()
+-	w.SystemWindow.Unlock()
+-	atomic.AddInt32(&w.winRenderCounter, -1)
+ }
+ 
+ // RenderSource returns the [render.Render] state from the [Scene.Painter].
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -7,6 +7,7 @@
+ import (
+ 	"image"
+ 	"slices"
++	"time"
+ 
+ 	"cogentcore.org/core/colors"
+ 	"cogentcore.org/core/cursors"
+@@ -105,7 +106,8 @@
+ 
+ 	// showIter counts up at start of showing a Scene
+ 	// to trigger Show event and other steps at start of first show
+-	showIter int
++	showIter             int
++	manualLastAutoScroll time.Time
+ 
+ 	// directRenders are widgets that render directly to the [RenderWindow]
+ 	// instead of rendering into the Scene Painter.
+@@ -278,7 +280,11 @@
+ // if not already in place.
+ func (sc *Scene) MakeTextShaper() shaped.Shaper {
+ 	if sc.textShaper == nil {
+-		sc.textShaper = shaped.NewShaper()
++		if rc := sc.renderContext(); rc != nil && rc.manual != nil {
++			sc.textShaper = rc.textShaper
++		} else {
++			sc.textShaper = shaped.NewShaper()
++		}
+ 	}
+ 	return sc.textShaper
+ }
+@@ -447,6 +453,7 @@
+ 	}
+ 	e := &events.Base{Typ: events.Close}
+ 	e.Init()
++	sc.stampManualEvent(e)
+ 	sc.WidgetWalkDown(func(cw Widget, cwb *WidgetBase) bool {
+ 		cw.AsWidget().HandleEvent(e)
+ 		return tree.Continue
+--- a/core/scroll.go
++++ b/core/scroll.go
+@@ -346,8 +346,15 @@
+ // AutoScroll scrolls the layout based on given position in scroll
+ // coordinates (i.e., already subtracing the BBox Min for a mouse event).
+ func (fr *Frame) AutoScroll(pos math32.Vector2) bool {
+-	now := time.Now()
+-	lag := now.Sub(lastAutoScroll)
++	now := fr.Scene.Now()
++	var last time.Time
++	manual := fr.Scene != nil && fr.Scene.renderContext() != nil && fr.Scene.renderContext().manual != nil
++	if manual {
++		last = fr.Scene.manualLastAutoScroll
++	} else {
++		last = lastAutoScroll
++	}
++	lag := now.Sub(last)
+ 	if lag < TimingSettings.LayoutAutoScrollDelay {
+ 		return false
+ 	}
+@@ -361,7 +368,11 @@
+ 		did = fr.autoScrollDim(math32.X, pos.X)
+ 	}
+ 	if did {
+-		lastAutoScroll = time.Now()
++		if manual {
++			fr.Scene.manualLastAutoScroll = now
++		} else {
++			lastAutoScroll = now
++		}
+ 	}
+ 	return did
+ }
+--- a/core/stage.go
++++ b/core/stage.go
+@@ -320,6 +320,38 @@
+ 
+ // Run runs the stage using the default run behavior based on the type of stage.
+ func (st *Stage) Run() *Stage {
++	// Contextual stages inherit the originating manual window. A new system
++	// window must be constructed explicitly through RunManual at this checkpoint.
++	var manual *ManualWindow
++	if st.renderContext != nil {
++		manual = st.renderContext.manual
++	}
++	if st.Context != nil && st.Context.AsWidget().Scene != nil {
++		if rc := st.Context.AsWidget().Scene.renderContext(); rc != nil {
++			manual = rc.manual
++		}
++	}
++	if manual == nil && st.Context == nil {
++		if current := currentRenderWindowSnapshot(); current != nil {
++			manual = current.manual
++		}
++	}
++	if manual != nil {
++		if st.Mains != nil || st.NewWindow || system.OnSystemWindowCreated != nil {
++			manual.fail(ErrManualAsyncCreation)
++			return st
++		}
++		// Let the manual Step recover router failures; do not invoke global
++		// terminal recovery or create an asynchronous construction waiter.
++		switch st.Type {
++		case WindowStage:
++			return st.runWindow()
++		case DialogStage:
++			return st.runDialog()
++		default:
++			return st.runPopup()
++		}
++	}
+ 	if system.OnSystemWindowCreated == nil {
+ 		return st.run()
+ 	}
+@@ -386,6 +418,7 @@
+ 		st.spritePainter = nil
+ 	}
+ 	if st.Scene != nil {
++		st.Scene.stopManualTimers()
+ 		st.Scene.DeleteChildren()
+ 	}
+ 	st.Scene = nil
+--- a/core/textfield.go
++++ b/core/textfield.go
+@@ -1057,9 +1057,12 @@
+ 	lastSave time.Time
+ }
+ 
+-func (us *textFieldUndos) saveUndo(txt []rune, curpos int) {
++func (us *textFieldUndos) saveUndo(txt []rune, curpos int, timestamp ...time.Time) {
+ 	n := len(us.stack)
+ 	now := time.Now()
++	if len(timestamp) > 0 {
++		now = timestamp[0]
++	}
+ 	ts := now.Sub(us.lastSave)
+ 	if n > 0 && ts < 250*time.Millisecond {
+ 		r := us.stack[n-1]
+@@ -1075,7 +1078,7 @@
+ }
+ 
+ func (tf *TextField) saveUndo() {
+-	tf.undos.saveUndo(tf.editText, tf.cursorPos)
++	tf.undos.saveUndo(tf.editText, tf.cursorPos, tf.Scene.Now())
+ }
+ 
+ func (us *textFieldUndos) undo(txt []rune, curpos int) *textFieldUndoRecord {
+--- a/core/widgetevents.go
++++ b/core/widgetevents.go
+@@ -184,6 +184,7 @@
+ 	} else {
+ 		e = &events.Base{Typ: typ}
+ 		e.Init()
++		wb.Scene.stampManualEvent(e)
+ 	}
+ 	wb.HandleEvent(e)
+ }
+@@ -238,6 +239,7 @@
+ 		ke.ClearHandled()
+ 	} else {
+ 		ke.Init()
++		wb.Scene.stampManualEvent(ke)
+ 	}
+ 	ke.Typ = events.KeyChord
+ 	wb.HandleEvent(ke)
+--- a/core/windowgeometry.go
++++ b/core/windowgeometry.go
+@@ -243,6 +243,9 @@
+ 
+ // record records current state of window as preference
+ func (ws *windowGeometrySaver) record(win *renderWindow) {
++	if win.manual != nil {
++		return
++	}
+ 	if !ws.shouldSave() || !win.isVisible() || win.SystemWindow.Is(system.Fullscreen) {
+ 		return
+ 	}
+--- a/events/source.go
++++ b/events/source.go
+@@ -7,6 +7,7 @@
+ import (
+ 	"fmt"
+ 	"image"
++	"time"
+ 
+ 	"cogentcore.org/core/base/fileinfo/mimedata"
+ 	"cogentcore.org/core/base/nptime"
+@@ -24,6 +25,11 @@
+ // It caches state as needed to generate derived events such
+ // as [MouseDrag].
+ type Source struct {
++	// Now overrides event generation time for this source. Install before the
++	// first event and do not change it while dispatch is active. Nil uses the
++	// existing wall clock. No time is advanced by event construction.
++	Now func() time.Time
++
+ 	// Deque is the event queue
+ 	Deque Deque
+ 
+@@ -71,6 +77,7 @@
+ 	es.Last.Mods = mods
+ 	es.Last.Key = code
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ 
+ 	mrn, mapped := key.CodeRuneMap[code]
+@@ -85,6 +92,7 @@
+ 		}
+ 		che := NewKey(KeyChord, rn, code, mods)
+ 		che.Init()
++		es.stamp(&che.Base)
+ 		es.Deque.Send(che)
+ 		return
+ 	}
+@@ -92,6 +100,7 @@
+ 	if ev.Code < key.CodeLeftControl && (ev.HasAnyModifier(key.Control, key.Meta) || !mapped || ev.Code == key.CodeTab) {
+ 		che := NewKey(KeyChord, rn, code, mods)
+ 		che.Init()
++		es.stamp(&che.Base)
+ 		es.Deque.Send(che)
+ 		return
+ 	}
+@@ -102,6 +111,7 @@
+ 	ev := NewKey(KeyChord, rn, code, mods)
+ 	// no further processing of these
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ }
+ 
+@@ -119,6 +129,7 @@
+ 	es.Last.MouseButton = but
+ 	es.Last.MousePos = where
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	if typ == MouseDown {
+ 		es.Last.MouseDownPos = where
+ 		es.Last.MouseDownTime = ev.GenTime
+@@ -140,6 +151,7 @@
+ 		ev.PrvTime = es.Last.MouseMoveTime
+ 	}
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Last.MouseMoveTime = ev.GenTime
+ 	// if em.Win.IsCursorEnabled() {
+ 	es.Last.MousePos = where
+@@ -154,6 +166,7 @@
+ func (es *Source) Scroll(where image.Point, delta math32.Vector2) {
+ 	ev := NewScroll(where, delta, es.Last.Mods)
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ }
+ 
+@@ -162,6 +175,7 @@
+ 	ev := NewExternalDrop(Drop, es.Last.MouseButton, where, es.Last.Mods, md)
+ 	es.Last.MousePos = where
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ }
+ 
+@@ -170,6 +184,7 @@
+ func (es *Source) Touch(typ Types, seq Sequence, where image.Point) {
+ 	ev := NewTouch(typ, seq, where)
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ 
+ 	if typ == TouchStart {
+@@ -185,6 +200,7 @@
+ func (es *Source) Magnify(scaleFactor float32, where image.Point) {
+ 	ev := NewMagnify(scaleFactor, where)
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ }
+ 
+@@ -198,6 +214,7 @@
+ func (es *Source) Window(act WinActions) {
+ 	ev := NewWindow(act)
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	if TraceWindowPaint {
+ 		fmt.Printf("-")
+ 	}
+@@ -208,6 +225,7 @@
+ func (es *Source) WindowPaint() {
+ 	ev := NewWindowPaint()
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 
+ 	if TraceWindowPaint {
+ 		fmt.Printf(".")
+@@ -223,6 +241,7 @@
+ func (es *Source) WindowResize() {
+ 	ev := NewWindowResize()
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	if TraceWindowPaint {
+ 		fmt.Printf("r")
+ 	}
+@@ -232,6 +251,7 @@
+ func (es *Source) OSOpenFiles(files []string) {
+ 	ev := NewOSFiles(OSOpenFiles, files)
+ 	ev.Init()
++	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ }
+ 
+@@ -240,5 +260,12 @@
+ 	ce.Typ = Custom
+ 	ce.Data = data
+ 	ce.Init()
++	es.stamp(&ce.Base)
+ 	es.Deque.Send(ce)
+ }
++
++func (es *Source) stamp(base *Base) {
++	if es.Now != nil {
++		base.GenTime.SetTime(es.Now())
++	}
++}
+--- /dev/null
++++ b/events/source_clock_test.go
+@@ -0,0 +1,86 @@
++package events
++
++import (
++	"image"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/events/key"
++)
++
++func sourceClockTake(t *testing.T, source *Source) Event {
++	t.Helper()
++	event, ok := source.Deque.PollEvent()
++	if !ok {
++		t.Fatal("missing originating event")
++	}
++	return event
++}
++
++func TestVellumSourceClockKeyAndDerivedChord(t *testing.T) {
++	now := time.Unix(1700000000, 12)
++	source := Source{Now: func() time.Time { return now }}
++	var mods key.Modifiers
++	mods.SetFlag(true, key.Control)
++	source.Key(KeyDown, 'a', key.CodeA, mods)
++	for _, typ := range []Types{KeyDown, KeyChord} {
++		event := sourceClockTake(t, &source)
++		if event.Type() != typ || !event.Time().Equal(now) {
++			t.Fatal("event type/time", event.Type(), event.Time(), typ, now)
++		}
++	}
++	if _, ok := source.Deque.PollEvent(); ok {
++		t.Fatal("unexpected derived event")
++	}
++	if !source.Now().Equal(now) {
++		t.Fatal("source advanced time")
++	}
++}
++
++func TestVellumSourceClockDragCompressionRetainsVirtualOrigins(t *testing.T) {
++	anchor := time.Unix(1700000000, 0)
++	now := anchor
++	source := Source{Now: func() time.Time { return now }}
++	source.MouseButton(MouseDown, Left, image.Pt(1, 2), 0)
++	now = anchor.Add(10 * time.Millisecond)
++	source.MouseMove(image.Pt(2, 3))
++	now = anchor.Add(20 * time.Millisecond)
++	source.MouseMove(image.Pt(3, 4))
++	down := sourceClockTake(t, &source)
++	drag := sourceClockTake(t, &source)
++	if !down.Time().Equal(anchor) || drag.Type() != MouseDrag || !drag.Time().Equal(now) || !drag.StartTime().Equal(anchor) || !drag.PrevTime().Equal(anchor) || drag.SinceStart() != 20*time.Millisecond || drag.SincePrev() != 20*time.Millisecond {
++		t.Fatal("derived compressed drag lost virtual timing", down, drag, drag.StartTime(), drag.PrevTime())
++	}
++	if _, ok := source.Deque.PollEvent(); ok {
++		t.Fatal("ordinary drag compression changed")
++	}
++}
++
++func TestVellumSourceClockWindowAndTouch(t *testing.T) {
++	now := time.Unix(1700000000, 0)
++	source := Source{Now: func() time.Time { return now }}
++	source.Window(WinFocus)
++	source.WindowResize()
++	for range 2 {
++		if event := sourceClockTake(t, &source); !event.Time().Equal(now) {
++			t.Fatal("window timestamp", event)
++		}
++	}
++	source.Touch(TouchStart, 1, image.Pt(3, 4))
++	for _, typ := range []Types{TouchStart, MouseDown} {
++		if event := sourceClockTake(t, &source); event.Type() != typ || !event.Time().Equal(now) {
++			t.Fatal("touch derivation", event)
++		}
++	}
++}
++
++func TestVellumSourceClockNilRetainsProductionTime(t *testing.T) {
++	before := time.Now()
++	source := Source{}
++	source.Custom("production")
++	after := time.Now()
++	event := sourceClockTake(t, &source)
++	if event.Time().Before(before) || event.Time().After(after) {
++		t.Fatal("nil clock changed wall timestamp", event.Time(), before, after)
++	}
++}
+--- a/system/driver/driver_desktop.go
++++ b/system/driver/driver_desktop.go
+@@ -7,7 +7,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-//go:build !(android || ios || js)
++//go:build !(android || ios || js || offscreen)
+ 
+ package driver
+ 
+--- a/system/driver/offscreen/app.go
++++ b/system/driver/offscreen/app.go
+@@ -7,7 +7,9 @@
+ package offscreen
+ 
+ import (
++	"fmt"
+ 	"image"
++	"math"
+ 	"os"
+ 
+ 	"cogentcore.org/core/base/errors"
+@@ -46,12 +48,18 @@
+ func (a *App) NewWindow(opts *system.NewWindowOptions) (system.Window, error) {
+ 	defer func() { system.HandleRecover(recover()) }()
+ 
+-	w := &Window{base.NewWindowMulti[*App, *composer.ComposerDrawer](a, opts)}
++	w := &Window{WindowMulti: base.NewWindowMulti[*App, *composer.ComposerDrawer](a, opts)}
+ 	w.This = w
+ 	w.Compose = &composer.ComposerDrawer{Drawer: &Drawer{Window: w}}
+ 	w.PixelSize = opts.Size
+ 
+ 	a.Mu.Lock()
++	for _, existing := range a.Windows {
++		if existing.manual {
++			a.Mu.Unlock()
++			return nil, system.ErrManualWindowMode
++		}
++	}
+ 	a.Windows = append(a.Windows, w)
+ 	a.GetScreens()
+ 	a.Mu.Unlock()
+@@ -107,3 +115,50 @@
+ func (a *App) Platform() system.Platforms {
+ 	return system.Offscreen
+ }
++
++// NewManualWindow creates no WinLoop. All event/frame work is explicit, and the
++// window's immutable screen is independent of the app's ambient screen state.
++func (a *App) NewManualWindow(opts *system.NewWindowOptions, execution system.ManualWindowOptions) (system.Window, error) {
++	if opts == nil || opts.Size.X <= 0 || opts.Size.Y <= 0 || execution.Now == nil || execution.LogicalDPI <= 0 || math.IsNaN(float64(execution.LogicalDPI)) || math.IsInf(float64(execution.LogicalDPI), 0) {
++		return nil, fmt.Errorf("offscreen: invalid manual window options")
++	}
++	w := &Window{WindowMulti: base.NewWindowMulti[*App, *composer.ComposerDrawer](a, opts), manual: true}
++	w.This = w
++	w.Compose = &composer.ComposerDrawer{Drawer: &Drawer{Window: w}}
++	w.PixelSize = opts.Size
++	w.WnSize = opts.Size
++	w.DevicePixelRatio = 1
++	w.PhysDPI = execution.LogicalDPI
++	w.LogDPI = execution.LogicalDPI
++	w.Event.Now = execution.Now
++	w.manualScreen = system.Screen{Name: "vellum-manual", PixelSize: opts.Size, DevicePixelRatio: 1, LogicalDPI: execution.LogicalDPI, PhysicalDPI: execution.LogicalDPI}
++	w.manualScreen.Geometry.Max = opts.Size
++	w.Paint.Demand.Store(true)
++	a.Mu.Lock()
++	for _, existing := range a.Windows {
++		if !existing.manual {
++			a.Mu.Unlock()
++			return nil, system.ErrManualWindowMode
++		}
++	}
++	a.Windows = append(a.Windows, w)
++	a.Mu.Unlock()
++	w.Event.WindowResize()
++	w.Event.Window(events.WinShow)
++	w.Event.Window(events.ScreenUpdate)
++	w.Event.Window(events.WinFocus)
++	w.RequestPaint()
++	return w, nil
++}
++
++// ManualWindowsOnly refuses mixing hidden-loop and explicitly owned windows.
++func (a *App) ManualWindowsOnly() bool {
++	a.Mu.Lock()
++	defer a.Mu.Unlock()
++	for _, window := range a.Windows {
++		if !window.manual {
++			return false
++		}
++	}
++	return true
++}
+--- a/system/driver/offscreen/window.go
++++ b/system/driver/offscreen/window.go
+@@ -5,16 +5,105 @@
+ package offscreen
+ 
+ import (
++	"cogentcore.org/core/events"
+ 	"cogentcore.org/core/system"
+ 	"cogentcore.org/core/system/composer"
+ 	"cogentcore.org/core/system/driver/base"
++	"sync"
++	"sync/atomic"
++	"time"
+ )
+ 
+ // Window is the implementation of [system.Window] for the offscreen platform.
+ type Window struct {
+ 	base.WindowMulti[*App, *composer.ComposerDrawer]
++	manual       bool
++	manualClosed atomic.Bool
++	manualScreen system.Screen
++	manualMu     sync.Mutex
++	readyPaint   bool
++	nextPaint    time.Time
+ }
+ 
+ func (w *Window) Screen() *system.Screen {
++	if w.manual {
++		return &w.manualScreen
++	}
+ 	return TheApp.Screen(0)
+ }
++
++func (w *Window) ManualExecution() bool { return w.manual }
++func (w *Window) ManualState() system.ManualWindowState {
++	w.manualMu.Lock()
++	defer w.manualMu.Unlock()
++	return system.ManualWindowState{ReadyPaint: w.readyPaint || !w.nextPaint.IsZero() && !w.Event.Now().Before(w.nextPaint), NextPaint: w.nextPaint, Closed: w.manualClosed.Load()}
++}
++func (w *Window) FlushReadyPaint() bool {
++	if !w.manual || w.manualClosed.Load() {
++		return false
++	}
++	w.manualMu.Lock()
++	if !w.nextPaint.IsZero() && !w.Event.Now().Before(w.nextPaint) {
++		w.readyPaint = true
++		w.nextPaint = time.Time{}
++	}
++	ready := w.readyPaint
++	w.readyPaint = false
++	w.manualMu.Unlock()
++	if ready {
++		w.Event.WindowPaint()
++	}
++	return ready
++}
++func (w *Window) RequestPaint() {
++	if !w.manual {
++		w.WindowMulti.Window.RequestPaint()
++		return
++	}
++	if w.manualClosed.Load() {
++		return
++	}
++	w.manualMu.Lock()
++	w.readyPaint = true
++	w.manualMu.Unlock()
++}
++func (w *Window) RequestPaintAfter(delay time.Duration) {
++	if !w.manual {
++		w.WindowMulti.Window.RequestPaintAfter(delay)
++		return
++	}
++	if w.manualClosed.Load() {
++		return
++	}
++	if delay <= 0 {
++		w.RequestPaint()
++		return
++	}
++	deadline := w.Event.Now().Add(delay)
++	w.manualMu.Lock()
++	if w.nextPaint.IsZero() || deadline.Before(w.nextPaint) {
++		w.nextPaint = deadline
++	}
++	w.manualMu.Unlock()
++}
++func (w *Window) IsClosed() bool {
++	if w.manual {
++		return w.manualClosed.Load()
++	}
++	return w.WindowMulti.Window.IsClosed()
++}
++func (w *Window) Close() {
++	if !w.manual {
++		w.WindowMulti.Window.Close()
++		return
++	}
++	if !w.manualClosed.CompareAndSwap(false, true) {
++		return
++	}
++	w.Paint.Close()
++	w.Event.Window(events.WinClose)
++	w.Mu.Lock()
++	defer w.Mu.Unlock()
++	defer func() { w.App.RemoveWindow(w); w.Compose = nil }()
++	w.CloseClean()
++}
+--- /dev/null
++++ b/system/manual_window.go
+@@ -0,0 +1,21 @@
++package system
++
++import (
++	"errors"
++	"time"
++)
++
++// ManualWindowOptions explicitly constructs an offscreen window with no paint
++// or event goroutine. Unsupported drivers expose no NewManualWindow factory.
++type ManualWindowOptions struct {
++	Now        func() time.Time
++	LogicalDPI float32
++}
++
++type ManualWindowState struct {
++	ReadyPaint bool
++	NextPaint  time.Time
++	Closed     bool
++}
++
++var ErrManualWindowMode = errors.New("system: automatic and manual windows cannot share one app")
