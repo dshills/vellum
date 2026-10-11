@@ -7,6 +7,7 @@ package cogent
 #cgo darwin LDFLAGS: -framework Cocoa
 #include <stdlib.h>
 #include <stdint.h>
+char *vellumAXScopedFixture(const char *json);
 char *vellumAXGridFixture(const char *json,const char *tableID,int column,int row);
 char *vellumAXTextFixture(const char *node,const char *geometry,int start,int length,int line);
 int vellumAXSetValueFixture(uint64_t token,uint64_t generation,const char *node,const char *value);
@@ -271,6 +272,16 @@ func nativeAccessibilityGridFixture(payload, table string, column, row int) stri
 	defer C.free(unsafe.Pointer(p))
 	defer C.free(unsafe.Pointer(t))
 	result := C.vellumAXGridFixture(p, t, C.int(column), C.int(row))
+	defer C.free(unsafe.Pointer(result))
+	return C.GoString(result)
+}
+
+// nativeAccessibilityScopedFixture runs only the inert production transaction
+// fixture; it has no native attachment/main-queue or successful action callback.
+func nativeAccessibilityScopedFixture(steps string) string {
+	s := C.CString(steps)
+	defer C.free(unsafe.Pointer(s))
+	result := C.vellumAXScopedFixture(s)
 	defer C.free(unsafe.Pointer(result))
 	return C.GoString(result)
 }

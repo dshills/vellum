@@ -1,5 +1,12 @@
 # Loaded stored-data grid
 
+The separate `-accessibility-smoke -rows 10000` (optionally `-variable-rows`)
+acceptance mode uses the same stored performance fixture with at least 400 actual
+clipped cells. It queries Cocoa values, indices, screen frames and opaque object
+identity across routed scrolls, replaces the binding under the same node ID and
+exercises a current native cell action. It runs separately from `-perf` and
+`-smoke`; its queries are not latency measurements or screen-reader certification.
+
 This independent module starts with two usable empty DataGrid windows. **Load records** generates an immutable array of signed numeric records and builds its initial projections on a bounded task worker. The large window uses one million stored records by default; the small window uses the first 10,000 records from the same initial backing array. Each record contains twenty actual `int64` values, generated with seed 7. Subsequent edits produce independent immutable domain revisions for the affected window.
 
 From a prepared checkout, run:

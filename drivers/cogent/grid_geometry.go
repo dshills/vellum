@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"image"
 	"math"
+	"slices"
 
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/virtual"
@@ -77,7 +78,7 @@ func (g *gridBinding) capture() {
 		return
 	}
 	if g.frames == math.MaxUint64 {
-		g.measurement.Store(nil)
+		g.withdrawMeasurement()
 		return
 	}
 	g.frames++
@@ -95,7 +96,7 @@ func (g *gridBinding) capture() {
 	g.requestMu.Unlock()
 	s := g.projection.State
 	if request.width != s.Viewport.Width || request.height != s.Viewport.Height {
-		g.measurement.Store(nil)
+		g.withdrawMeasurement()
 		return
 	}
 	previous := g.measurement.Load()
@@ -126,9 +127,47 @@ func (g *gridBinding) capture() {
 		m.Editor = &GridEditorGeometry{ID: edit.node.ID, Session: s.Edit.Session, Text: state.Text, Focused: field.StateIs(states.Focused), Bounds: field.Geom.TotalBBox.Add(offset)}
 	}
 	g.measurement.Store(m)
-	if previous == nil || previous.Generation != m.Generation || previous.Bounds != m.Bounds {
+	if !sameGridAccessibilityMeasurement(previous, m) {
 		_ = g.owner.Invalidate(g.window)
 	}
+}
+
+// Notify once when a completed frame becomes unavailable, even when a viewport
+// request is refused or is a no-op. This revokes its owner/native AX actions.
+func (g *gridBinding) withdrawMeasurement() {
+	if g.measurement.Swap(nil) != nil {
+		_ = g.owner.Invalidate(g.window)
+	}
+}
+
+// Frame ordinals advance on every render. Only changed completed data/geometry
+// need an owner publication; resize, scale and editor movement also matter when
+// the portable grid generation is unchanged.
+func sameGridAccessibilityMeasurement(previous, current *GridInspection) bool {
+	if previous == nil || current == nil {
+		return previous == current
+	}
+	// Check scalar provenance first: an ordinary scroll changes generation and
+	// can return before visiting any cell. Keep every publication field except
+	// Frames here when extending GridInspection.
+	if previous.Window != current.Window || previous.ID != current.ID ||
+		previous.Incarnation != current.Incarnation || previous.Generation != current.Generation ||
+		previous.CellIncarnation != current.CellIncarnation || previous.Stamp != current.Stamp ||
+		previous.Viewport != current.Viewport || previous.Columns != current.Columns ||
+		previous.RetainedCells != current.RetainedCells || previous.RetainedHeaders != current.RetainedHeaders ||
+		previous.RowSelection != current.RowSelection || previous.Selection != current.Selection ||
+		previous.Scale != current.Scale || previous.Bounds != current.Bounds || previous.Edit != current.Edit {
+		return false
+	}
+	if (previous.Editor == nil) != (current.Editor == nil) ||
+		previous.Editor != nil && *previous.Editor != *current.Editor {
+		return false
+	}
+	// Preserve nil/empty distinctions from the previous comparison, without a
+	// reflective walk over completed cell/header geometry on the render thread.
+	return (previous.Cells == nil) == (current.Cells == nil) &&
+		(previous.Headers == nil) == (current.Headers == nil) &&
+		slices.Equal(previous.Cells, current.Cells) && slices.Equal(previous.Headers, current.Headers)
 }
 
 // Current retained geometry is also checked by native hit/AX projection. A

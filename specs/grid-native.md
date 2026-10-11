@@ -1,6 +1,14 @@
 # Managed grid adapter checkpoint
 
 This specification adds `ui.DataGrid` to the portable Grid contract in grid.md.
+
+Grid accessibility now follows the scoped pending/completed publication contract
+in [accessibility.md](accessibility.md#managed-grid-publication). Last-completed
+cells remain readable while current layout is pending; their actions are revoked.
+Current semantics and measured frames publish together, retaining overlapping
+native objects only within the same binding incarnation and parent. Inspection
+exposes pending provenance; this does not change `InspectGrid`'s current-layout
+requirement or qualify the P6 targets.
 It does not replace the Table/Tree extensions, implement editable cells, qualify
 P 6 performance targets, or certify Windows/Linux or screen-reader workflows.
 

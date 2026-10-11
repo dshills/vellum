@@ -42,6 +42,9 @@ func namespaceAccessibility(nodes []accessibilityNode, handlers map[string]acces
 	for i := range nodes {
 		old := nodes[i].ID
 		nodes[i].ID = prefix + old
+		if nodes[i].GridScope != "" {
+			nodes[i].GridScope = prefix + nodes[i].GridScope
+		}
 		if nodes[i].Parent != "" {
 			nodes[i].Parent = prefix + nodes[i].Parent
 		}
@@ -157,7 +160,7 @@ func workbenchAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 				}
 				if disabled {
 					childNodes[i].Disabled = true
-					childNodes[i].Actions = nil
+					childNodes[i].Actions = []string{}
 					delete(childHandlers, childNodes[i].ID)
 				}
 			}

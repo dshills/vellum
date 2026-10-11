@@ -1,0 +1,147 @@
+{
+  "changes": {
+    "drivers/cogent/accessibility_darwin.m": {
+      "after": "7c426ad554a5627b786acdc464c0ac23ca08f1de31b0a1988f221ca895440877",
+      "before": "f797b6def13601bac56e2adee33acd1813dcae04301a8c005f21212d62e5f7b5"
+    },
+    "drivers/cogent/accessibility_grid_publication_test.go": {
+      "after": "b01dcc5e4571a15f0c23c78c90a616d1648c0ce838d87ce626d5a34cbc8d894c",
+      "before": "6cc2aa44e4d81f944d68d4b79b70a013e9d34c5a51a2df7b7824bfa44126f63a"
+    },
+    "drivers/cogent/grid_accessibility_envelope_darwin_test.go": {
+      "after": "e96ce37ddbf714d6fab6faecf33a1e095212ed6c71942ae997a2b15699bddb2b",
+      "before": "319779e4d15fc069e1ae67a307d1cbb80b46980f316028b83cd00d96387fd8d4"
+    },
+    "drivers/cogent/grid_geometry.go": {
+      "after": "80cec072a8b9ddd01af3b87f7b5a198f244a9d3b5b68bb3b0e16320fa0914e54",
+      "before": "c78200402d6185273163c2c87897d31d6a7bd549f8aa6b3f105d2280879264e8"
+    }
+  },
+  "corrective_diff_sha256": "15d03fd296705c5a2646c5469c99c9a2fae3415087e30220ed7be86db5747118",
+  "current_files": {
+    "docs/implementation.md": "1f869e1753d204d3721cae4837d17760705b1b43685282290517f1d864884106",
+    "drivers/cogent/accessibility.go": "036500e527f6e00048342d3b631974cd54823e0954e38f1fa18148d7d323a844",
+    "drivers/cogent/accessibility_darwin.go": "37a4d1abc4956243bd95a47b24d8033669dc6210f6b96f3604c56d882af8934c",
+    "drivers/cogent/accessibility_darwin.m": "7c426ad554a5627b786acdc464c0ac23ca08f1de31b0a1988f221ca895440877",
+    "drivers/cogent/accessibility_grid_publication.go": "e5cc299680af372349063a063a7e9939ec1a6fb8b58290970f1727aaca508afa",
+    "drivers/cogent/accessibility_grid_publication_test.go": "b01dcc5e4571a15f0c23c78c90a616d1648c0ce838d87ce626d5a34cbc8d894c",
+    "drivers/cogent/accessibility_workbench.go": "22fbf705b4f70c2817eaf7e2212b4e81f4354ed000dbf19547da88d5b8c166f4",
+    "drivers/cogent/grid.go": "e01d0c298c30a47d56a15b3aa8510ba49db0936ed4518864757b7d708d4570d7",
+    "drivers/cogent/grid_accessibility_envelope_darwin_test.go": "e96ce37ddbf714d6fab6faecf33a1e095212ed6c71942ae997a2b15699bddb2b",
+    "drivers/cogent/grid_accessibility_workbench_envelope_darwin_offscreen_test.go": "2b1f29f115e95c986200a603d7bb0a652833f83f3ac9e0b342eb87680663735c",
+    "drivers/cogent/grid_geometry.go": "80cec072a8b9ddd01af3b87f7b5a198f244a9d3b5b68bb3b0e16320fa0914e54",
+    "examples/loadedgrid/README.md": "5b3bbe0a105d19330ba21028194a67dc8c918ada86026096236b1c6aa30126fb",
+    "examples/loadedgrid/accessibility_smoke.go": "2be7abda7d588f196f682b575901e70b9f8ffc4709acd061e36efed4e7b6d6d5",
+    "examples/loadedgrid/main.go": "1ad87097d4a6de98135b62157ad0b10c10d794d7742c353bf98b4100dcffda48",
+    "specs/accessibility.md": "7ebf79f055bc085461fc3ddde85e7efc1baaa538ef78c61500bab640fb6158a7",
+    "specs/grid-native.md": "3b147bf53aefe68a591fb74e25ec6314c6e130361dbf7d4f0e7fa2e6c910c4fd",
+    "specs/macos-completion.md": "5e6ed8b314fb8508dd52b31af4a0077a90b094659e42b81949fd87cc57d1b0dc"
+  },
+  "findings": [
+    {
+      "disposition": "REFUTED",
+      "evidence": [
+        {
+          "lines": [
+            158,
+            159,
+            160,
+            161,
+            170,
+            185,
+            218
+          ],
+          "path": "drivers/cogent/accessibility_grid_publication.go",
+          "sha256": "e5cc299680af372349063a063a7e9939ec1a6fb8b58290970f1727aaca508afa"
+        },
+        {
+          "lines": [
+            101,
+            107,
+            109,
+            161,
+            170,
+            171
+          ],
+          "path": "drivers/cogent/accessibility.go",
+          "sha256": "036500e527f6e00048342d3b631974cd54823e0954e38f1fa18148d7d323a844"
+        }
+      ],
+      "id": "d41047ea8423cd30",
+      "reason": "prepareGridPublication takes b.mu at line 159, defers unlock, and checks closed at 161 before reading or assigning gridPublications. All cache writes target a fresh local nonnil map, then assign it under that lock at 218. close marks closed, takes the same mutex, and clears the cache at accessibility.go107\u2013111; update rechecks closed under that mutex at170\u2013174 before handler publication. If close wins first, preparation refuses; if preparation already holds the mutex, close clears its result before returning. The alleged unlocked nil-map write/cache resurrection is absent."
+    },
+    {
+      "disposition": "ACCEPTED_FIXED_SOURCE",
+      "execution_claim": false,
+      "files": [
+        "drivers/cogent/accessibility_darwin.m",
+        "drivers/cogent/grid_accessibility_envelope_darwin_test.go"
+      ],
+      "id": "1afbd870ca34d120",
+      "reason": "The original parent check refused ordinary live same-ID reparenting and replacement discarded cached pixel/text geometry. The correction checks live first, preserves legacy reuse when both records are unscoped, and retains strict direct parent/scope/incarnation/scope-host-parent checks for Grid records. Removal/readd and scoped/unscoped transitions still retire. Existing production transaction fixture now requires stable nonzero object identity and frame across generic reparent, changed value, and absence of prior-object retirement.",
+      "test": "TestNativeGridAccessibilityEnvelopeGeometryCompatibility"
+    },
+    {
+      "disposition": "ACCEPTED_FIXED_SOURCE",
+      "execution_claim": false,
+      "files": [
+        "drivers/cogent/grid_geometry.go",
+        "drivers/cogent/accessibility_grid_publication_test.go"
+      ],
+      "id": "8e74f4f989c69df1",
+      "reason": "The per-frame reflective walk is replaced with typed scalar provenance comparisons, Editor pointee equality, explicit nil/empty slice presence checks, and slices.Equal for comparable cell/header values. All current GridInspection fields except Frames are covered; generation changes short-circuit before visiting slices. Current types contain no func fields, so the hypothetical future func-field assertion is not an existing defect. No latency/allocation benefit is claimed. Expanded existing mutation table covers all scalar provenance plus cell/header/editor data and geometry.",
+      "test": "TestAccessibilityGridPublicationCompletedMeasurementChanges"
+    }
+  ],
+  "limits": [
+    "Source-only independent adjudication; no new tests/builds/prepare/native/GUI/Git/provider calls or production edits.",
+    "Original external review exited1 with three findings and remains immutable; corrected bytes are independently reviewed here, not asserted externally reviewed.",
+    "Post-Prism qualification receipts and corrected report prose are separate pending evidence.",
+    "No performance pass, speedup, P6 target attainment, Human VoiceOver/full Mac qualification, release or OS preference changes certified."
+  ],
+  "raw_prism": {
+    "counts": {
+      "high": 0,
+      "low": 0,
+      "medium": 3
+    },
+    "coverage": {
+      "bytes": 156294,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "chunks": 8,
+      "complete": true,
+      "excluded": [],
+      "files": 18,
+      "llmCalls": 8,
+      "reviewer": [
+        {
+          "model": "claude-sonnet-5-5",
+          "provider": "anthropic"
+        }
+      ],
+      "skipped": [],
+      "tokens": [
+        {
+          "costUSD": 0.340148,
+          "input": 91579,
+          "model": "claude-sonnet-5-5",
+          "output": 15699,
+          "provider": "anthropic"
+        }
+      ],
+      "truncatedBytes": 0,
+      "widenedFiles": 6
+    },
+    "exit_code": 1,
+    "original_payload_bytes": 129268,
+    "original_payload_sha256": "243a2f0236bffaadac23e0098c222c1997c99ced9a60232161d248da7ba189b0",
+    "original_selected_files": 18,
+    "original_source_before_after_equal": true,
+    "path": "/private/tmp/vellum-grid-publication-prism/prism.json",
+    "sha256": "80cfdeaf2a3ec566f0b411a1dbf3eb0c41c102d59ed0f427b786f3c144ec06f1"
+  },
+  "result": "ADJUDICATED_SOURCE_APPROVED",
+  "schema": 1,
+  "version": "post-prism-v4"
+}

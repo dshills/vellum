@@ -25,31 +25,36 @@ import (
 type accessibilityNode struct {
 	// pressFocusID is Go-only metadata for the managed Grid cell action.
 	// Workbench namespace wrapping qualifies this exact pending host focus.
-	pressFocusID   string
-	ID             string   `json:"id"`
-	DomainID       string   `json:"domain_id"`
-	Parent         string   `json:"parent"`
-	Role           string   `json:"role"`
-	Name           string   `json:"name"`
-	Help           string   `json:"help"`
-	Value          any      `json:"value,omitempty"`
-	Disabled       bool     `json:"disabled"`
-	Focusable      bool     `json:"focusable"`
-	Focused        bool     `json:"focused"`
-	Selected       bool     `json:"selected"`
-	Actions        []string `json:"actions"`
-	RowIndex       int      `json:"row_index,omitempty"`
-	RowCount       int      `json:"row_count,omitempty"`
-	ColumnIndex    int      `json:"column_index,omitempty"`
-	ColumnCount    int      `json:"column_count,omitempty"`
-	GridGeneration uint64   `json:"grid_generation,omitempty"`
-	Level          int      `json:"level,omitempty"`
-	Expanded       *bool    `json:"expanded,omitempty"`
-	Min            *float32 `json:"min,omitempty"`
-	TextClient     uint64   `json:"text_client,omitempty"`
-	TextSelection  *[2]int  `json:"text_selection,omitempty"`
-	TextFocus      int      `json:"text_focus,omitempty"`
-	Max            *float32 `json:"max,omitempty"`
+	pressFocusID         string
+	ID                   string      `json:"id"`
+	DomainID             string      `json:"domain_id"`
+	Parent               string      `json:"parent"`
+	Role                 string      `json:"role"`
+	Name                 string      `json:"name"`
+	Help                 string      `json:"help"`
+	Value                any         `json:"value,omitempty"`
+	Disabled             bool        `json:"disabled"`
+	Focusable            bool        `json:"focusable"`
+	Focused              bool        `json:"focused"`
+	Selected             bool        `json:"selected"`
+	Actions              []string    `json:"actions"`
+	RowIndex             int         `json:"row_index,omitempty"`
+	RowCount             int         `json:"row_count,omitempty"`
+	ColumnIndex          int         `json:"column_index,omitempty"`
+	ColumnCount          int         `json:"column_count,omitempty"`
+	GridGeneration       uint64      `json:"grid_generation,omitempty"`
+	GridScope            string      `json:"grid_scope,omitempty"`
+	GridIncarnation      uint64      `json:"grid_incarnation,omitempty"`
+	GridPending          bool        `json:"grid_pending,omitempty"`
+	GridTargetGeneration uint64      `json:"grid_target_generation,omitempty"`
+	GridFrame            *[4]float32 `json:"grid_frame,omitempty"`
+	Level                int         `json:"level,omitempty"`
+	Expanded             *bool       `json:"expanded,omitempty"`
+	Min                  *float32    `json:"min,omitempty"`
+	TextClient           uint64      `json:"text_client,omitempty"`
+	TextSelection        *[2]int     `json:"text_selection,omitempty"`
+	TextFocus            int         `json:"text_focus,omitempty"`
+	Max                  *float32    `json:"max,omitempty"`
 }
 type accessibilityAction struct {
 	Kind  string
@@ -58,16 +63,17 @@ type accessibilityAction struct {
 type accessibilityHandler func(accessibilityAction) bool
 
 type accessibilityBridge struct {
-	token        uint64
-	owner        *app.Application
-	mu           sync.Mutex
-	window       string
-	handlers     map[string]accessibilityHandler
-	lastSnapshot string
-	generation   atomic.Uint64
-	closed       atomic.Bool
-	pendingFocus atomic.Pointer[string]
-	done         chan struct{}
+	token            uint64
+	owner            *app.Application
+	mu               sync.Mutex
+	window           string
+	handlers         map[string]accessibilityHandler
+	lastSnapshot     string
+	gridPublications map[string][]accessibilityNode
+	generation       atomic.Uint64
+	closed           atomic.Bool
+	pendingFocus     atomic.Pointer[string]
+	done             chan struct{}
 }
 
 var accessibilityToken atomic.Uint64
@@ -100,6 +106,7 @@ func (b *accessibilityBridge) close() {
 	b.generation.Add(1)
 	b.mu.Lock()
 	b.handlers = nil
+	b.gridPublications = nil
 	window := b.window
 	b.mu.Unlock()
 	accessibilityRegistry.Lock()
@@ -142,9 +149,23 @@ func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[str
 	if b.closed.Load() {
 		return
 	}
+	// Reject unencodable records before they can become a retained grid view.
 	semantic, err := json.Marshal(nodes)
 	if err != nil {
 		return
+	}
+	pendingGrid := false
+	for _, node := range nodes {
+		pendingGrid = pendingGrid || node.GridPending
+	}
+	nodes, handlers = b.prepareGridPublication(nodes, handlers)
+	if pendingGrid {
+		// Ready records are unchanged by the scoped cache. Only pending records
+		// replace input semantics with their last-completed read-only subtree.
+		semantic, err = json.Marshal(nodes)
+		if err != nil {
+			return
+		}
 	}
 	b.mu.Lock()
 	if b.closed.Load() {
@@ -163,9 +184,9 @@ func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[str
 	}
 	generation := b.generation.Add(1)
 	payload, _ := json.Marshal(struct {
-		Generation uint64              `json:"generation"`
-		Nodes      []accessibilityNode `json:"nodes"`
-	}{generation, nodes})
+		Generation uint64          `json:"generation"`
+		Nodes      json.RawMessage `json:"nodes"`
+	}{generation, semantic})
 	nativeAccessibilityUpdate(b.token, string(payload))
 }
 func accessibilityFocus(b *accessibilityBridge, id string) {
@@ -234,6 +255,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 	}
 	var visit func(*record, string, bool)
 	visit = func(r *record, parent string, disabled bool) {
+		start := len(nodes)
 		n := r.node
 		disabled = disabled || n.Disabled
 		if n.Kind == ui.Dialog && (!n.Open || disabled || (r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed)) {
@@ -407,6 +429,10 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				continue
 			}
 			visit(c, x.ID, disabled)
+		}
+		if n.Kind == ui.DataGrid && r.control != nil && r.control.grid != nil {
+			stampGridAccessibility(r, nodes[start:])
+			guardGridAccessibility(r.control.grid, nodes[start:], handlers)
 		}
 	}
 	visit(scoped, "", inheritedDisabled)
@@ -796,23 +822,31 @@ type AccessibilityInspection struct {
 	Elements     []AccessibilityElement `json:"elements"`
 }
 type AccessibilityElement struct {
-	ID            string     `json:"id"`
-	Role          string     `json:"role"`
-	Name          string     `json:"name"`
-	Value         any        `json:"value"`
-	Enabled       bool       `json:"enabled"`
-	RowCount      int        `json:"row_count"`
-	ColumnCount   int        `json:"column_count"`
-	RowIndex      [2]int     `json:"row_index"`
-	ColumnIndex   [2]int     `json:"column_index"`
-	TextSelection [2]int     `json:"text_selection"`
-	InsertionLine int        `json:"insertion_line"`
-	Frame         [4]float64 `json:"frame"`
-	Selected      bool       `json:"selected"`
-	Expanded      bool       `json:"expanded"`
-	Parent        string     `json:"parent"`
-	DomainID      string     `json:"domain_id"`
-	HitTestID     string     `json:"hit_test_id"`
+	// Pending grid records describe the last completed view, with actions
+	// revoked. Target generation is distinct from that completed generation.
+	GridScope            string     `json:"grid_scope"`
+	GridIncarnation      uint64     `json:"grid_incarnation"`
+	GridPending          bool       `json:"grid_pending"`
+	GridTargetGeneration uint64     `json:"grid_target_generation"`
+	GridGeneration       uint64     `json:"grid_generation"`
+	ObjectIdentity       uint64     `json:"object_identity"`
+	ID                   string     `json:"id"`
+	Role                 string     `json:"role"`
+	Name                 string     `json:"name"`
+	Value                any        `json:"value"`
+	Enabled              bool       `json:"enabled"`
+	RowCount             int        `json:"row_count"`
+	ColumnCount          int        `json:"column_count"`
+	RowIndex             [2]int     `json:"row_index"`
+	ColumnIndex          [2]int     `json:"column_index"`
+	TextSelection        [2]int     `json:"text_selection"`
+	InsertionLine        int        `json:"insertion_line"`
+	Frame                [4]float64 `json:"frame"`
+	Selected             bool       `json:"selected"`
+	Expanded             bool       `json:"expanded"`
+	Parent               string     `json:"parent"`
+	DomainID             string     `json:"domain_id"`
+	HitTestID            string     `json:"hit_test_id"`
 }
 
 func lookupAccessibility(window string) (*accessibilityBridge, error) {

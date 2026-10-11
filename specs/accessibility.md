@@ -18,6 +18,57 @@ Tabs publish enabled header choices and the selected page. Closed or dismissed d
 
 Virtual tables and outlines publish a bounded materialized viewport, total/index metadata, stable domain IDs, selection, outline depth/expansion and previous/next page actions. Both table and outline pagers have real native button targets and completed geometry. Accessible page and row actions operate on the owner. Table paging clamps to the last valid viewport and refuses stale viewport counts or model errors. Outline press selects only; independent native expand/collapse actions preserve selection, reread current materialized child/expansion state and refuse leaves, offscreen rows or unadvertised actions. Cocoa uses `setAccessibilityExpanded:` and publishes `isAccessibilityExpanded`. A stale row action never selects a different domain row when a native slot is recycled. Offscreen rows are reached through paging; this implementation does not claim arbitrary offscreen row loading through the system accessibility table API.
 
+## Managed grid publication
+
+Each visible managed grid publishes a scope identified by the native attachment,
+namespaced table ID, binding incarnation and table parent. Its ready transaction
+contains the complete bounded semantic subtree and copied pixel frames from one
+matching completed measurement. Every scoped node carries that same incarnation,
+completed generation and target generation. Native validation rejects malformed
+scope ancestry, mixed metadata and invalid frames before changing retained state.
+Ready generation equals target generation; a layout-only transition may be pending
+at the same portable generation. On the JSON wire, absent `grid_pending` means
+false and absent `grid_generation` means zero, matching Go's zero-value omission;
+present values must have their declared Boolean/unsigned integer types.
+`InspectGrid` continues to refuse pending layout.
+
+Owner publication of a new accepted projection replaces its action handlers and
+advances the bridge semantic generation. Delivery guards also refuse model or
+measurement drift before that publication. While its completed frame is pending,
+the bridge retains only the last completed subtree for the same scope, incarnation
+and parent. Those records remain readable with their previous values, selection,
+counts and frames, but are disabled, unfocused and advertise no actions or managed
+text client. Native selectors and request admission also refuse pending records.
+Inspection explicitly reports pending, target/completed generation and incarnation;
+last-completed records never count as current geometry. Initial pending layout
+publishes only a disabled table host. An unchanged pending transaction does not
+advance the global generation; a newer target supersedes it.
+
+Other controls and other grids publish independently during a pending transition.
+Actual scope removal, modal/tab isolation, replacement, namespace or parent change,
+and window closure discard the old completed cache. Native objects are reused only
+for a still-live identifier in the same scope/incarnation/parent; real retirement
+cannot resurrect an object under the same textual ID. The owner cache contains
+copied bounded records, no model pointers or action closures. Completed publication
+restores current handlers and atomically updates native semantics and frames on
+the main queue, reusing overlapping visible objects and retiring departing IDs.
+
+Legacy asynchronous rectangle updates never change managed-grid frames. A changed
+completed measurement, including scale, cell/editor bounds or same-generation
+layout changes, invalidates the owner for a new atomic transaction. Frame ordinals
+alone do not cause another publication. Detailed managed text-range geometry
+retains its independent exact-client/text acceptance contract.
+
+`AccessibilityElement.ObjectIdentity` is an opaque monotonic native identity for
+acceptance inspection, not a pointer or action capability. The separate loaded-grid
+`-accessibility-smoke` workflow uses stored input and at least 400 actually clipped
+cells to check routed scroll reuse, pixel-to-screen frames, domain values/indexes,
+binding replacement and a current native cell action. Its queries and diagnostics
+are excluded from ordinary performance qualification. Fixture/race checks cover
+the deterministic pending interval, stale queued actions, mixed scopes, malformed
+transaction refusal and lifecycle retirement. Human screen-reader certification
+and the existing P6 latency/memory targets remain separate gates.
+
 ## Geometry and notifications
 
 A managed host publishes bounds after its children render with completed layout; the modal retained host publishes from its own Scene. Geometry publication copies widget state under the originating native render lock and never reenters the application owner or reads domain models. Completed geometry is cached independently of semantic publication so demand-rendered startup can publish bounds before matching native elements exist. A modal Scene shares the originating window render context, which excludes concurrent native reconciliation throughout its render pass. Cocoa converts pixel bounds through the current content view/backing scale/window screen transform, including clipped scrolled bounds. Native hit testing walks retained descendants before their parent and later siblings first, including descendants of zero-frame synthetic containers; equal-frame ties are deterministic. An active modal snapshot already excludes underlying content. Moving a native window keeps screen coordinates current. Value, tree-layout and focused-element notifications are posted after native snapshot publication.

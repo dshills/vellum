@@ -269,3 +269,11 @@ The pinned native raster scanner now offers explicit row tracking for renderer-o
 accumulation. Scene and private glyph-mask renderers select it; the general scanner
 keeps its full-row behavior. Pending cells, clip changes, clearing and resize
 initialization preserve the existing span stream. See [rendering](../specs/rendering.md).
+
+Managed grids publish one copied completed accessibility subtree per visible
+binding scope. Pending scroll/layout revokes actions while retaining read-only
+last-completed records; ready semantics and copied frames apply atomically in
+Cocoa. Stable overlapping objects survive that transition, while replacement,
+scope removal and closure retire them. See [the publication contract](../specs/accessibility.md#managed-grid-publication).
+This addresses accessibility continuity and allocation churn; it does not claim
+that the 4/6 ms UI-work targets have been met.

@@ -61,6 +61,7 @@ func main() {
 	rows := flag.Int("rows", maxRows, "stored record count (1..1000000); first window shows at most10000")
 	variable := flag.Bool("variable-rows", false, "preserve indexed stable-key variable heights through projections")
 	smoke := flag.Bool("smoke", false, "bounded Cocoa model-command/settlement smoke, no synthesized desktop input")
+	axSmoke := flag.Bool("accessibility-smoke", false, "separate stored400-cell Cocoa publication/identity/action smoke; no performance qualification")
 	perf := flag.Bool("perf", false, "opt-in release-only stored-table native scroll measurements")
 	perfSamples := flag.Int("perf-samples", 120, "measured native scroll frames (120..2048)")
 	perfWarmup := flag.Int("perf-warmup", 128, "unmeasured closed-trajectory frames (multiple64)")
@@ -68,6 +69,17 @@ func main() {
 	perfProfile := flag.String("perf-cpu-profile", "", "diagnostic process-wide CPU profile to a new file (64MiB cap); excluded from warm qualification")
 	perfSources := flag.Bool("perf-source-details", false, "diagnostic nested source costs and image API attempts; excluded from warm qualification")
 	flag.Parse()
+	if *axSmoke {
+		if *smoke || *perf || *perfSources || *perfProfile != "" {
+			fmt.Fprintln(os.Stderr, "loadedgrid: accessibility smoke is a separate workflow")
+			os.Exit(1)
+		}
+		if err := runGridAccessibilitySmoke(*rows, *variable); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if err := validatePerfModes(*perf, *smoke, *perfSources, *perfProfile); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

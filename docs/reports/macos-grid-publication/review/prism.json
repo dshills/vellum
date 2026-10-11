@@ -1,0 +1,175 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e419157df9d2b5ed1559e865352a4817",
+  "repo": {
+    "root": "/private/tmp/vellum-large-data",
+    "head": "f68941bf8db129784aa7a137c9d84a3dee69370d",
+    "branch": "codex/native-grid-publication"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 3,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "d41047ea8423cd30",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Grid publication cache mutated outside lock; can race with close() and a nil map",
+      "message": "prepareGridPublication runs outside b.mu, after the first closed check and before the second one. Its body is not in this part of the diff. If it writes b.gridPublications without re-checking closed under the lock, a concurrent close() can nil the map first. That would panic on a write to a nil map, or repopulate the retained grid cache on a closed bridge and leak the retained subtrees.",
+      "suggestion": "Inside prepareGridPublication, take b.mu, re-check b.closed, and lazily allocate b.gridPublications before writing. Alternatively, run the preparation under the same lock section as the handler swap.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility.go",
+          "lines": {
+            "start": 161,
+            "end": 161
+          }
+        }
+      ],
+      "tags": [
+        "concurrency",
+        "nil-map",
+        "location-corrected"
+      ],
+      "evidence": "nodes, handlers = b.prepareGridPublication(nodes, handlers)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1afbd870ca34d120",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Cached geometry dropped when a non-grid element is replaced after a parent change",
+      "message": "When an element is replaced by a new object, its cached pixel geometry and text geometry are deleted. This also happens for ordinary non-grid nodes that only changed parent, because vellumAXCanReuse returns NO for any parent change. The replacement element then gets a zero pixelFrame until the next render callback. Before this change such an element was reused and kept its frame. In demand-rendered mode that callback may never come, leaving the node with an empty accessibility frame and broken hit-testing and text-range geometry.",
+      "suggestion": "Only discard cached geometry when the replacement crosses a grid scope or incarnation boundary. For a non-grid node that merely changed parent, keep state.geometry and state.textGeometry for the new element.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_darwin.m",
+          "lines": {
+            "start": 410,
+            "end": 410
+          }
+        }
+      ],
+      "tags": [
+        "accessibility",
+        "macos",
+        "regression",
+        "geometry"
+      ],
+      "evidence": "if(old\u0026\u0026old!=element){vellumAXRetire(old);[state.geometry removeObjectForKey:identifier];[state.textGeometry removeObjectForKey:identifier];}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "8e74f4f989c69df1",
+      "severity": "medium",
+      "category": "performance",
+      "title": "reflect.DeepEqual over all cells on every rendered frame",
+      "message": "capture() runs once per completed render frame. The new sameGridAccessibilityMeasurement copies two GridInspection structs and compares them with reflect.DeepEqual, which walks every Cell and Header, each with strings and rectangles, using reflection. With a bounded but large visible set (400+ cells) this is a per-frame reflective traversal in the scroll hot path. The repository separately qualifies native scroll performance. DeepEqual also returns false for any non-nil func field, so a future func-valued field would silently make every frame look changed and trigger an Invalidate on every frame.",
+      "suggestion": "Write a typed comparison: scalar fields first, then slices.Equal over Cells and Headers using comparable element structs. Short-circuit on the first difference. Alternatively, compute a cheap change counter or hash while building the measurement.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/grid_geometry.go",
+          "lines": {
+            "start": 152,
+            "end": 152
+          }
+        }
+      ],
+      "tags": [
+        "performance",
+        "hot-path",
+        "reflection",
+        "location-corrected"
+      ],
+      "evidence": "return reflect.DeepEqual(a, b)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 128843,
+    "totalMs": 35513
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 18,
+    "bytes": 156294,
+    "chunks": 8,
+    "llmCalls": 8,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 91579,
+        "output": 15699,
+        "costUSD": 0.340148
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "26962a45e1fb3db7",
+        "severity": "medium",
+        "category": "docs",
+        "title": "Stated check count does not match the enumerated checks",
+        "message": "The report says ten checks pass, but the sentence lists only six (portable race, native driver race, new test groups, native vet, consumer race, loaded-grid vet). A verification claim that cannot be reconciled with its own enumeration weakens the audit trail, and a reader cannot tell which checks were run.",
+        "suggestion": "Either list all ten checks explicitly (for example, split the vet and race runs per package or platform) or change the count to match the checks actually named.",
+        "confidence": 0.35,
+        "locations": [
+          {
+            "path": "docs/reports/macos-grid-publication/README.md",
+            "lines": {
+              "start": 57,
+              "end": 59
+            }
+          }
+        ],
+        "tags": [
+          "docs",
+          "verification",
+          "consistency"
+        ],
+        "evidence": "Ten checks pass: portable\nrace, full offscreen/native driver race, 17 new test groups each run three times,\noffscreen/native vet, loaded-grid/grid/replay consumer race, and loaded-grid vet.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-grid-publication/README.md"
+    }
+  ],
+  "suppressed": []
+}

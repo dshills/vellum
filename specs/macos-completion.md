@@ -14,6 +14,13 @@ measured sustained performance; independently consumable SDK and Mac packaging.
 The research/prototype plan and detailed subsystem contracts remain authoritative
 for their acceptance workloads. Historical claims are not current qualification.
 
+Managed-grid accessibility now has an explicit per-grid pending/completed
+transaction: stale actions are revoked immediately, last-completed cells remain
+readable, and matching semantics/frames publish atomically with stable native
+identity. Replacement and real removal retire old objects. The separate stored
+400-cell Cocoa acceptance mode and scoped lifecycle/race fixtures qualify this
+behavior. Full-frame latency targets and human screen-reader checks remain open.
+
 ## Current implementation and remaining work
 
 Application ownership, cancellable tasks, commands, controlled standard controls,

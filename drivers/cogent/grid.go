@@ -570,7 +570,7 @@ func validGridScale(scale float32) bool {
 	return scale > 0 && scale <= gridNativeMaxScale && !math.IsNaN(float64(scale)) && !math.IsInf(float64(scale), 0)
 }
 func (g *gridBinding) refuseGeometry() {
-	g.measurement.Store(nil)
+	g.withdrawMeasurement()
 	if !g.geometryRefused {
 		g.geometryRefused = true
 		postControl(g.r, func() { g.fail(ErrGridBudget) })

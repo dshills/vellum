@@ -1,0 +1,2589 @@
+diff --git a/docs/implementation.md b/docs/implementation.md
+index 9a6e918..b8681e2 100644
+--- a/docs/implementation.md
++++ b/docs/implementation.md
+@@ -269,3 +269,11 @@ The pinned native raster scanner now offers explicit row tracking for renderer-o
+ accumulation. Scene and private glyph-mask renderers select it; the general scanner
+ keeps its full-row behavior. Pending cells, clip changes, clearing and resize
+ initialization preserve the existing span stream. See [rendering](../specs/rendering.md).
++
++Managed grids publish one copied completed accessibility subtree per visible
++binding scope. Pending scroll/layout revokes actions while retaining read-only
++last-completed records; ready semantics and copied frames apply atomically in
++Cocoa. Stable overlapping objects survive that transition, while replacement,
++scope removal and closure retire them. See [the publication contract](../specs/accessibility.md#managed-grid-publication).
++This addresses accessibility continuity and allocation churn; it does not claim
++that the 4/6 ms UI-work targets have been met.
+diff --git a/docs/reports/macos-grid-publication/README.md b/docs/reports/macos-grid-publication/README.md
+new file mode 100644
+index 0000000..cc54968
+--- /dev/null
++++ b/docs/reports/macos-grid-publication/README.md
+@@ -0,0 +1,103 @@
++# macOS grid accessibility publication checkpoint
++
++Managed grids now keep their last completed accessibility subtree readable while
++new layout is pending. Pending objects refuse actions; a completed frame publishes
++matching cell semantics and bounds together. Overlapping cells retain native
++identity within the same live binding. Replacement, reparenting and actual removal
++retire old objects. Race, native and consumer checks pass. The ordinary performance
++campaign was refused for unequal rendered workloads, so this checkpoint makes no
++latency improvement claim. Mac completion and the unchanged 4ms p95 / 6ms p99
++targets remain open.
++
++## Behavior and implementation
++
++At `f68941b`, a scroll's pre-frame refresh could publish an empty grid subtree,
++retiring visible Cocoa objects before completed layout republished them. This is
++a source-backed control-flow diagnosis; historical CPU samples do not isolate
++asynchronous Cocoa parsing or establish a promised saving.
++
++The owner now stamps each visible grid scope with binding incarnation, target and
++completed generation, pending state and copied completed pixel frames. A detached
++cache holds one completed subtree per currently visible scope, retaining no model
++or action callback. Pending publication removes focus, text-client authority and
++all actions. Unrelated controls and other ready grids publish independently.
++Namespace, parent, incarnation, visibility and close boundaries clear old cache
++eligibility. Startup without a completed frame publishes only a disabled host.
++
++Queued actions recheck owner lifetime, current model generation, measurement
++incarnation/epoch, viewport/stamp and private editor session/text. Eligible stale
++cell actions preserve the existing `ErrGridStale` error callback; pending, retired
++and geometry-only refusals remain quiet. Geometry withdrawal requests publication
++once. Same-generation geometry or editor changes invalidate completion, while an
++unchanged frame ordinal does not.
++
++Cocoa validates the entire scoped envelope before commit. Native objects reuse
++only matching live identifiers, scope/incarnation and parent. Pending state also
++refuses native action and focus selectors independently of Go. Scoped pixel frames
++commit with semantics; legacy unversioned geometry updates cannot overwrite them.
++Transport retains copied UTF-8 data directly. Detailed native text-range geometry
++keeps its separate client/text contract. Opaque object serials support inspection
++without exposing pointer addresses.
++
++## Verification
++
++Final source-bound receipts have equal before/after maps: 642 selected source and
++specification files, and 6,139 prepared dependency files. Ten checks pass: portable
++race, full offscreen/native driver race, 17 new test groups each run three times,
++offscreen/native vet, loaded-grid/grid/replay consumer race, and loaded-grid vet.
++The new groups cover detached caches, mixed scopes, startup and retirement,
++namespace/lifecycle changes, queued actions, editor previews, geometry withdrawal,
++actual completed cell/header/row frames, malformed native transactions and the
++production Go JSON encoding. Disabled workbench encoding is tested through the
++real semantic wrapper; it does not claim full Manual Extension routing.
++
++Three faulty source overlays fail behavioral assertions: missing completed-subtree
++retention, obsolete private-editor actions, and silent geometry withdrawal.
++Production source remains unchanged during these checks.
++
++The optimized native artifact is bound to the same source/prepared map. Separate
++stored-data acceptance processes query actual attached Cocoa objects with at least
++400 clipped cells. They check values, indices, hit testing, pixel-to-screen cell
++frames, six routed scrolls, replacement, exact owner selection after a native press,
++and attachment refusal after close. Fixed-10k runs retain 2,268 overlapping cell
++identities and replace 459 scoped identities each. The variable-million run retains
++2,290 and replaces 468. Generic native accessibility smoke also passes. These are
++in-process Cocoa assertions, separate from human VoiceOver acceptance.
++
++The first full gate caught suppression of three existing stale-cell error tests.
++That failed receipt is preserved; the guard and narrow new test were corrected
++before the final full gate passed. Earlier fixture/setup failures, a source-drifted
++native interval and superseded review maps remain historical evidence.
++
++## Refused performance campaign
++
++The same optimized artifact ran ten fresh ordinary processes: five fixed-10k and
++five fixed-million, each with 120 samples after 128 warmups. Individual native
++record validation and child exits pass. The parent campaign exits 1 and records
++`FAILED: 10k/million rendered workload differs` before launching either variable
++case. Fixed pairs 1–3 match all clips; pairs 4–5 differ at all 120 samples each.
++Bounds, scale and column count match, but starting vertical offsets differ:
++43 versus 12 in pair 4, and 12 versus 33 in pair 5. These yield 50 versus 51
++visible rows and 400 versus 408 cells. The cause of the offset discrepancy is
++unproven. No runs are removed or selected, and no retry is represented as a pass.
++
++All 1,200 observations, outliers, refused summary and raw child records are
++retained. They do not establish matched four-case performance or a speedup.
++The latest qualified preceding checkpoint still misses the unchanged targets.
++Full P6 table/tree, memory, cold-cache and endurance qualification remains open.
++
++## Evidence and review
++
++[records.tar.gz](records.tar.gz) preserves final and historical receipts, exact
++logs/maps, faulty overlays, inert source/producer copies, diagnostics and internal
++reviews. [records-index.json](records-index.json) binds regular-file membership;
++[audit.json](audit.json) verifies current source, prepared inputs and evidence
++linkage. Binary identity is recorded without claiming full compiler/cache/SDK
++closure or a second canonical native measurement.
++
++Independent reviews approve the exact 17 source/specification/document inputs and
++audit the final checks separately. The significant 18-file source/test/spec/report
++batch receives one Prism review using Anthropic Claude Sonnet 5.5. The
++[review records](review/process.json) preserve its payload, raw findings and local
++triage. The public namespace remains `github.com/dshills/vellum` under MIT. No
++public release or operating-system preference change is part of this checkpoint.
+diff --git a/drivers/cogent/accessibility.go b/drivers/cogent/accessibility.go
+index 248b971..3cbe464 100644
+--- a/drivers/cogent/accessibility.go
++++ b/drivers/cogent/accessibility.go
+@@ -25,31 +25,36 @@ import (
+ type accessibilityNode struct {
+ 	// pressFocusID is Go-only metadata for the managed Grid cell action.
+ 	// Workbench namespace wrapping qualifies this exact pending host focus.
+-	pressFocusID   string
+-	ID             string   `json:"id"`
+-	DomainID       string   `json:"domain_id"`
+-	Parent         string   `json:"parent"`
+-	Role           string   `json:"role"`
+-	Name           string   `json:"name"`
+-	Help           string   `json:"help"`
+-	Value          any      `json:"value,omitempty"`
+-	Disabled       bool     `json:"disabled"`
+-	Focusable      bool     `json:"focusable"`
+-	Focused        bool     `json:"focused"`
+-	Selected       bool     `json:"selected"`
+-	Actions        []string `json:"actions"`
+-	RowIndex       int      `json:"row_index,omitempty"`
+-	RowCount       int      `json:"row_count,omitempty"`
+-	ColumnIndex    int      `json:"column_index,omitempty"`
+-	ColumnCount    int      `json:"column_count,omitempty"`
+-	GridGeneration uint64   `json:"grid_generation,omitempty"`
+-	Level          int      `json:"level,omitempty"`
+-	Expanded       *bool    `json:"expanded,omitempty"`
+-	Min            *float32 `json:"min,omitempty"`
+-	TextClient     uint64   `json:"text_client,omitempty"`
+-	TextSelection  *[2]int  `json:"text_selection,omitempty"`
+-	TextFocus      int      `json:"text_focus,omitempty"`
+-	Max            *float32 `json:"max,omitempty"`
++	pressFocusID         string
++	ID                   string      `json:"id"`
++	DomainID             string      `json:"domain_id"`
++	Parent               string      `json:"parent"`
++	Role                 string      `json:"role"`
++	Name                 string      `json:"name"`
++	Help                 string      `json:"help"`
++	Value                any         `json:"value,omitempty"`
++	Disabled             bool        `json:"disabled"`
++	Focusable            bool        `json:"focusable"`
++	Focused              bool        `json:"focused"`
++	Selected             bool        `json:"selected"`
++	Actions              []string    `json:"actions"`
++	RowIndex             int         `json:"row_index,omitempty"`
++	RowCount             int         `json:"row_count,omitempty"`
++	ColumnIndex          int         `json:"column_index,omitempty"`
++	ColumnCount          int         `json:"column_count,omitempty"`
++	GridGeneration       uint64      `json:"grid_generation,omitempty"`
++	GridScope            string      `json:"grid_scope,omitempty"`
++	GridIncarnation      uint64      `json:"grid_incarnation,omitempty"`
++	GridPending          bool        `json:"grid_pending,omitempty"`
++	GridTargetGeneration uint64      `json:"grid_target_generation,omitempty"`
++	GridFrame            *[4]float32 `json:"grid_frame,omitempty"`
++	Level                int         `json:"level,omitempty"`
++	Expanded             *bool       `json:"expanded,omitempty"`
++	Min                  *float32    `json:"min,omitempty"`
++	TextClient           uint64      `json:"text_client,omitempty"`
++	TextSelection        *[2]int     `json:"text_selection,omitempty"`
++	TextFocus            int         `json:"text_focus,omitempty"`
++	Max                  *float32    `json:"max,omitempty"`
+ }
+ type accessibilityAction struct {
+ 	Kind  string
+@@ -58,16 +63,17 @@ type accessibilityAction struct {
+ type accessibilityHandler func(accessibilityAction) bool
+ 
+ type accessibilityBridge struct {
+-	token        uint64
+-	owner        *app.Application
+-	mu           sync.Mutex
+-	window       string
+-	handlers     map[string]accessibilityHandler
+-	lastSnapshot string
+-	generation   atomic.Uint64
+-	closed       atomic.Bool
+-	pendingFocus atomic.Pointer[string]
+-	done         chan struct{}
++	token            uint64
++	owner            *app.Application
++	mu               sync.Mutex
++	window           string
++	handlers         map[string]accessibilityHandler
++	lastSnapshot     string
++	gridPublications map[string][]accessibilityNode
++	generation       atomic.Uint64
++	closed           atomic.Bool
++	pendingFocus     atomic.Pointer[string]
++	done             chan struct{}
+ }
+ 
+ var accessibilityToken atomic.Uint64
+@@ -100,6 +106,7 @@ func (b *accessibilityBridge) close() {
+ 	b.generation.Add(1)
+ 	b.mu.Lock()
+ 	b.handlers = nil
++	b.gridPublications = nil
+ 	window := b.window
+ 	b.mu.Unlock()
+ 	accessibilityRegistry.Lock()
+@@ -142,10 +149,24 @@ func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[str
+ 	if b.closed.Load() {
+ 		return
+ 	}
++	// Reject unencodable records before they can become a retained grid view.
+ 	semantic, err := json.Marshal(nodes)
+ 	if err != nil {
+ 		return
+ 	}
++	pendingGrid := false
++	for _, node := range nodes {
++		pendingGrid = pendingGrid || node.GridPending
++	}
++	nodes, handlers = b.prepareGridPublication(nodes, handlers)
++	if pendingGrid {
++		// Ready records are unchanged by the scoped cache. Only pending records
++		// replace input semantics with their last-completed read-only subtree.
++		semantic, err = json.Marshal(nodes)
++		if err != nil {
++			return
++		}
++	}
+ 	b.mu.Lock()
+ 	if b.closed.Load() {
+ 		b.mu.Unlock()
+@@ -163,9 +184,9 @@ func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[str
+ 	}
+ 	generation := b.generation.Add(1)
+ 	payload, _ := json.Marshal(struct {
+-		Generation uint64              `json:"generation"`
+-		Nodes      []accessibilityNode `json:"nodes"`
+-	}{generation, nodes})
++		Generation uint64          `json:"generation"`
++		Nodes      json.RawMessage `json:"nodes"`
++	}{generation, semantic})
+ 	nativeAccessibilityUpdate(b.token, string(payload))
+ }
+ func accessibilityFocus(b *accessibilityBridge, id string) {
+@@ -234,6 +255,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
+ 	}
+ 	var visit func(*record, string, bool)
+ 	visit = func(r *record, parent string, disabled bool) {
++		start := len(nodes)
+ 		n := r.node
+ 		disabled = disabled || n.Disabled
+ 		if n.Kind == ui.Dialog && (!n.Open || disabled || (r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed)) {
+@@ -408,6 +430,10 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
+ 			}
+ 			visit(c, x.ID, disabled)
+ 		}
++		if n.Kind == ui.DataGrid && r.control != nil && r.control.grid != nil {
++			stampGridAccessibility(r, nodes[start:])
++			guardGridAccessibility(r.control.grid, nodes[start:], handlers)
++		}
+ 	}
+ 	visit(scoped, "", inheritedDisabled)
+ 	return namespaceAccessibility(nodes, handlers, namespace, b)
+@@ -796,23 +822,31 @@ type AccessibilityInspection struct {
+ 	Elements     []AccessibilityElement `json:"elements"`
+ }
+ type AccessibilityElement struct {
+-	ID            string     `json:"id"`
+-	Role          string     `json:"role"`
+-	Name          string     `json:"name"`
+-	Value         any        `json:"value"`
+-	Enabled       bool       `json:"enabled"`
+-	RowCount      int        `json:"row_count"`
+-	ColumnCount   int        `json:"column_count"`
+-	RowIndex      [2]int     `json:"row_index"`
+-	ColumnIndex   [2]int     `json:"column_index"`
+-	TextSelection [2]int     `json:"text_selection"`
+-	InsertionLine int        `json:"insertion_line"`
+-	Frame         [4]float64 `json:"frame"`
+-	Selected      bool       `json:"selected"`
+-	Expanded      bool       `json:"expanded"`
+-	Parent        string     `json:"parent"`
+-	DomainID      string     `json:"domain_id"`
+-	HitTestID     string     `json:"hit_test_id"`
++	// Pending grid records describe the last completed view, with actions
++	// revoked. Target generation is distinct from that completed generation.
++	GridScope            string     `json:"grid_scope"`
++	GridIncarnation      uint64     `json:"grid_incarnation"`
++	GridPending          bool       `json:"grid_pending"`
++	GridTargetGeneration uint64     `json:"grid_target_generation"`
++	GridGeneration       uint64     `json:"grid_generation"`
++	ObjectIdentity       uint64     `json:"object_identity"`
++	ID                   string     `json:"id"`
++	Role                 string     `json:"role"`
++	Name                 string     `json:"name"`
++	Value                any        `json:"value"`
++	Enabled              bool       `json:"enabled"`
++	RowCount             int        `json:"row_count"`
++	ColumnCount          int        `json:"column_count"`
++	RowIndex             [2]int     `json:"row_index"`
++	ColumnIndex          [2]int     `json:"column_index"`
++	TextSelection        [2]int     `json:"text_selection"`
++	InsertionLine        int        `json:"insertion_line"`
++	Frame                [4]float64 `json:"frame"`
++	Selected             bool       `json:"selected"`
++	Expanded             bool       `json:"expanded"`
++	Parent               string     `json:"parent"`
++	DomainID             string     `json:"domain_id"`
++	HitTestID            string     `json:"hit_test_id"`
+ }
+ 
+ func lookupAccessibility(window string) (*accessibilityBridge, error) {
+diff --git a/drivers/cogent/accessibility_darwin.go b/drivers/cogent/accessibility_darwin.go
+index 4fac606..45ab127 100644
+--- a/drivers/cogent/accessibility_darwin.go
++++ b/drivers/cogent/accessibility_darwin.go
+@@ -7,6 +7,7 @@ package cogent
+ #cgo darwin LDFLAGS: -framework Cocoa
+ #include <stdlib.h>
+ #include <stdint.h>
++char *vellumAXScopedFixture(const char *json);
+ char *vellumAXGridFixture(const char *json,const char *tableID,int column,int row);
+ char *vellumAXTextFixture(const char *node,const char *geometry,int start,int length,int line);
+ int vellumAXSetValueFixture(uint64_t token,uint64_t generation,const char *node,const char *value);
+@@ -274,3 +275,13 @@ func nativeAccessibilityGridFixture(payload, table string, column, row int) stri
+ 	defer C.free(unsafe.Pointer(result))
+ 	return C.GoString(result)
+ }
++
++// nativeAccessibilityScopedFixture runs only the inert production transaction
++// fixture; it has no native attachment/main-queue or successful action callback.
++func nativeAccessibilityScopedFixture(steps string) string {
++	s := C.CString(steps)
++	defer C.free(unsafe.Pointer(s))
++	result := C.vellumAXScopedFixture(s)
++	defer C.free(unsafe.Pointer(result))
++	return C.GoString(result)
++}
+diff --git a/drivers/cogent/accessibility_darwin.m b/drivers/cogent/accessibility_darwin.m
+index 5e7d934..8e66e68 100644
+--- a/drivers/cogent/accessibility_darwin.m
++++ b/drivers/cogent/accessibility_darwin.m
+@@ -6,6 +6,7 @@
+ #include <stdint.h>
+ #include <string.h>
+ #include <math.h>
++#include <stdatomic.h>
+ extern int vellumAXAction(uint64_t token,uint64_t generation,char *id,char *kind,char *value);
+ extern void vellumAXResult(uint64_t request,char *json);
+ @class VellumAXState;
+@@ -20,6 +21,7 @@ static NSMutableDictionary<NSNumber *,VellumAXState *> *vellumAXStates;
+ @property NSRect pixelFrame;
+ @property BOOL live;
+ @property BOOL lastAdmission;
++@property uint64_t objectIdentity;
+ @property (copy) NSDictionary *textGeometry;
+ - (BOOL)request:(NSString *)action value:(NSString *)value;
+ @end
+@@ -40,7 +42,15 @@ static NSMutableDictionary<NSNumber *,VellumAXState *> *vellumAXStates;
+ @implementation VellumAXState
+ @end
+ static VellumAXState *vellumAXState(id object){return objc_getAssociatedObject(object,&vellumAXKey);}
+-static BOOL vellumAXHas(VellumAXElement *element,NSString *action){return [element.node[@"actions"] containsObject:action];}
++static BOOL vellumAXPending(VellumAXElement *element){return element.node[@"grid_scope"]&&[element.node[@"grid_pending"] boolValue];}
++static BOOL vellumAXHas(VellumAXElement *element,NSString *action){return element.live&&!element.state.closed&&!vellumAXPending(element)&&[element.node[@"actions"] containsObject:action];}
++// IDs are process-local monotonic values, never addresses. Retired objects keep
++// their identity; new same-ID objects cannot inherit a former identity.
++static _Atomic(uint64_t) vellumAXNextIdentity=1;
++static uint64_t vellumAXIdentity(void){
++ uint64_t next=atomic_load(&vellumAXNextIdentity);
++ while(next!=UINT64_MAX){if(atomic_compare_exchange_weak(&vellumAXNextIdentity,&next,next+1))return next;}return 0;
++}
+ static NSString *vellumAXRole(NSString *role){
+  if([role isEqual:@"label"])return NSAccessibilityStaticTextRole;
+  if([role isEqual:@"button"])return NSAccessibilityButtonRole;
+@@ -67,6 +77,7 @@ static BOOL vellumAXValidRange(NSString *text,NSRange range){
+ static NSRect vellumAXArrayRect(NSArray *r){return r.count==4?NSMakeRect([r[0] doubleValue],[r[1] doubleValue],[r[2] doubleValue],[r[3] doubleValue]):NSZeroRect;}
+ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(r.origin.x<NSMinX(viewport)||r.origin.x>NSMaxX(viewport))return NSZeroRect;CGFloat end=MIN(NSMaxY(r),NSMaxY(viewport));r.origin.y=MAX(NSMinY(r),NSMinY(viewport));r.size.height=MAX(0,end-r.origin.y);return r;}return NSIntersectionRect(r,viewport);}
+ @implementation VellumAXElement
++- (instancetype)init{self=[super init];if(self){self.objectIdentity=vellumAXIdentity();if(!self.objectIdentity)return nil;}return self;}
+ - (NSString *)managedText {
+  if(![self isAccessibilityEnabled]||![self.node[@"text_client"] unsignedLongLongValue]||![self.node[@"value"] isKindOfClass:NSString.class])return nil;
+  return self.node[@"value"];
+@@ -139,8 +150,8 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
+ - (id)accessibilityValue {id value=self.node[@"value"];return value==NSNull.null?nil:value;}
+ - (id)accessibilityMinValue{return self.node[@"min"];}
+ - (id)accessibilityMaxValue{return self.node[@"max"];}
+-- (BOOL)isAccessibilityEnabled{return [self isAccessibilityElement]&&![self.node[@"disabled"] boolValue];}
+-- (BOOL)isAccessibilityFocused{return [self.node[@"focused"] boolValue];}
++- (BOOL)isAccessibilityEnabled{return [self isAccessibilityElement]&&!vellumAXPending(self)&&![self.node[@"disabled"] boolValue];}
++- (BOOL)isAccessibilityFocused{return [self isAccessibilityElement]&&!vellumAXPending(self)&&[self.node[@"focused"] boolValue];}
+ - (BOOL)isAccessibilitySelected{return [self.node[@"selected"] boolValue];}
+ - (BOOL)isAccessibilityModal{return [self.node[@"role"] isEqual:@"dialog"];}
+ - (BOOL)isAccessibilityExpanded{return [self.node[@"expanded"] boolValue];}
+@@ -264,28 +275,63 @@ void vellumAXDetach(uint64_t token){
+  objc_setAssociatedObject(state.view,&vellumAXKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  [vellumAXStates removeObjectForKey:@(token)];
+ }
++// JSON bytes are copied before async publication; no NSString UTF8 roundtrip.
++static NSData *vellumAXJSONData(const char *json){return json?[NSData dataWithBytes:json length:strlen(json)]:nil;}
++static BOOL vellumAXUInt(id value,BOOL positive){
++ if(![value isKindOfClass:NSNumber.class]||CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID())return NO;
++ NSString *digits=[value stringValue];if(digits.length==0||digits.length>20)return NO;
++ for(NSUInteger i=0;i<digits.length;i++){unichar c=[digits characterAtIndex:i];if(c<'0'||c>'9')return NO;}
++ if(digits.length==20&&[digits compare:@"18446744073709551615"]==NSOrderedDescending)return NO;
++ return !positive||[value unsignedLongLongValue]!=0;
++}
++static BOOL vellumAXBool(id value){return [value isKindOfClass:NSNumber.class]&&CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID();}
++static BOOL vellumAXValidRect(id value){
++ if(![value isKindOfClass:NSArray.class]||[value count]!=4)return NO;
++ for(id n in value)if(![n isKindOfClass:NSNumber.class]||CFGetTypeID((__bridge CFTypeRef)n)==CFBooleanGetTypeID()||!isfinite([n doubleValue]))return NO;
++ double x=[value[0] doubleValue],y=[value[1] doubleValue],w=[value[2] doubleValue],h=[value[3] doubleValue];
++ return w>=0&&h>=0&&isfinite(x+w)&&isfinite(y+h);
++}
+ // Validate the whole immutable payload before any retained element changes.
+ static BOOL vellumAXValidSnapshot(NSDictionary *snapshot){
+- if(![snapshot isKindOfClass:NSDictionary.class]||![snapshot[@"generation"] isKindOfClass:NSNumber.class]||![snapshot[@"nodes"] isKindOfClass:NSArray.class])return NO;
+- NSMutableDictionary *parents=[NSMutableDictionary new];
++ if(![snapshot isKindOfClass:NSDictionary.class]||!vellumAXUInt(snapshot[@"generation"],YES)||![snapshot[@"nodes"] isKindOfClass:NSArray.class])return NO;
++ NSMutableDictionary *nodes=[NSMutableDictionary new];
+  for(id value in snapshot[@"nodes"]){
+   if(![value isKindOfClass:NSDictionary.class])return NO;NSDictionary *node=value;
+   NSString *identifier=node[@"id"],*parent=node[@"parent"];
+-  if(![identifier isKindOfClass:NSString.class]||identifier.length==0||parents[identifier]||![parent isKindOfClass:NSString.class]||![node[@"role"] isKindOfClass:NSString.class]||![node[@"actions"] isKindOfClass:NSArray.class])return NO;
++  if(![identifier isKindOfClass:NSString.class]||identifier.length==0||nodes[identifier]||![parent isKindOfClass:NSString.class]||![node[@"role"] isKindOfClass:NSString.class]||![node[@"actions"] isKindOfClass:NSArray.class])return NO;
+   for(id action in node[@"actions"])if(![action isKindOfClass:NSString.class])return NO;
+   for(NSString *key in @[@"domain_id",@"name",@"help"])if(node[key]&&![node[key] isKindOfClass:NSString.class])return NO;
+   for(NSString *key in @[@"disabled",@"focusable",@"focused",@"selected",@"min",@"max",@"row_index",@"row_count",@"column_count",@"column_index",@"grid_generation",@"level",@"expanded"])if(node[key]&&![node[key] isKindOfClass:NSNumber.class])return NO;
+   id accepted=node[@"value"];if(accepted&&![accepted isKindOfClass:NSString.class]&&![accepted isKindOfClass:NSNumber.class])return NO;
+-  parents[identifier]=parent;
++  id scope=node[@"grid_scope"];
++  if(scope){
++   if(![scope isKindOfClass:NSString.class]||[scope length]==0||!vellumAXUInt(node[@"grid_incarnation"],YES)||(node[@"grid_pending"]&&!vellumAXBool(node[@"grid_pending"]))||!vellumAXUInt(node[@"grid_target_generation"],YES)||(node[@"grid_generation"]&&!vellumAXUInt(node[@"grid_generation"],NO)))return NO;
++   uint64_t completed=[node[@"grid_generation"] unsignedLongLongValue],target=[node[@"grid_target_generation"] unsignedLongLongValue];BOOL pending=[node[@"grid_pending"] boolValue];
++   if(completed>target||(!pending&&completed!=target))return NO;
++   if(pending&&([node[@"actions"] count]!=0||!vellumAXBool(node[@"disabled"])||![node[@"disabled"] boolValue]||[node[@"focused"] boolValue]))return NO;
++   if(node[@"grid_frame"]&&!vellumAXValidRect(node[@"grid_frame"]))return NO;
++   if(!pending&&!node[@"grid_frame"])return NO;
++  }else for(NSString *key in @[@"grid_incarnation",@"grid_pending",@"grid_target_generation",@"grid_frame"])if(node[key])return NO;
++  nodes[identifier]=node;
+  }
+- for(NSString *identifier in parents){
+-  NSMutableSet *ancestors=[NSMutableSet new];NSString *cursor=identifier;
+-  while(cursor.length){if([ancestors containsObject:cursor]||!parents[cursor])return NO;[ancestors addObject:cursor];cursor=parents[cursor];}
++ for(NSString *identifier in nodes){
++  NSMutableSet *ancestors=[NSMutableSet new];NSString *cursor=identifier;NSDictionary *node=nodes[identifier];NSString *scope=node[@"grid_scope"];
++  while(cursor.length){if([ancestors containsObject:cursor]||!nodes[cursor])return NO;[ancestors addObject:cursor];cursor=nodes[cursor][@"parent"];}
++  NSDictionary *parent=nodes[node[@"parent"]];
++  if(scope){
++   NSDictionary *host=nodes[scope];if(!host||![host[@"grid_scope"] isEqual:scope]||![host[@"role"] isEqual:@"table"])return NO;
++   for(NSString *key in @[@"grid_incarnation",@"grid_target_generation"])if(![node[key] isEqual:host[key]])return NO;
++   // Go's ordinary omitempty encoding omits ready false and startup zero.
++   // Missing values normalize only here; present values were type-validated.
++   if([node[@"grid_pending"] boolValue]!=[host[@"grid_pending"] boolValue]||[node[@"grid_generation"] unsignedLongLongValue]!=[host[@"grid_generation"] unsignedLongLongValue])return NO;
++   if([identifier isEqual:scope]){if(parent[@"grid_scope"])return NO;}
++   else if(![parent[@"grid_scope"] isEqual:scope]||![ancestors containsObject:scope])return NO;
++  }else if(parent[@"grid_scope"])return NO;
+  }
+  return YES;
+ }
+ int vellumAXSnapshotValid(const char *json){
+- @autoreleasepool{NSString *payload=json?[NSString stringWithUTF8String:json]:nil;if(!payload)return 0;NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:[payload dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];return vellumAXValidSnapshot(snapshot);}
++ @autoreleasepool{NSData *data=vellumAXJSONData(json);NSDictionary *snapshot=data?[NSJSONSerialization JSONObjectWithData:data options:0 error:nil]:nil;return vellumAXValidSnapshot(snapshot);}
+ }
+ 
+ // Native unit fixtures use the production retained-tree traversal with pixel
+@@ -334,53 +380,112 @@ char *vellumAXGridFixture(const char *json,const char *tableID,int column,int ro
+  }
+ }
+ 
+-void vellumAXUpdate(uint64_t token,const char *json){
+- NSString *payload=json?[NSString stringWithUTF8String:json]:nil;if(!payload)return;
+- dispatch_async(dispatch_get_main_queue(),^{
+-  VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;
+-  NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:[payload dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+-  if(!vellumAXValidSnapshot(snapshot))return;
+-  uint64_t generation=[snapshot[@"generation"] unsignedLongLongValue];if(generation<=state.generation)return;
+-  id oldFocus=vellumAXFocused(state);NSString *oldFocusedID=[oldFocus isKindOfClass:VellumAXElement.class]?[oldFocus accessibilityIdentifier]:@"";
+-  NSArray *oldHierarchy=state.hierarchy;NSMutableArray *hierarchy=[NSMutableArray new];NSMutableArray *changedElements=[NSMutableArray new];
+-  NSMutableDictionary *next=[NSMutableDictionary new];NSMutableDictionary *childLists=[NSMutableDictionary new];NSMutableArray *roots=[NSMutableArray new];
+-  for(NSDictionary *node in snapshot[@"nodes"]){
+-   [hierarchy addObject:@[node[@"id"],node[@"parent"]?:@"",node[@"role"]?:@""]];
+-   NSString *id=node[@"id"];VellumAXElement *element=state.elements[id]?:[VellumAXElement new];
+-   NSObject *oldValue=element.node[@"value"],*newValue=node[@"value"];
+-   BOOL changed=element.node&&oldValue!=newValue&&![oldValue isEqual:newValue];
+-   element.state=state;element.node=node;element.live=YES;element.textGeometry=state.textGeometry[id];next[id]=element;childLists[id]=[NSMutableArray new];
+-   NSArray *rect=state.geometry[id];if(rect.count==4)element.pixelFrame=NSMakeRect([rect[0] doubleValue],[rect[1] doubleValue],[rect[2] doubleValue],[rect[3] doubleValue]);
+-   if(changed)[changedElements addObject:element];
+-  }
+-  // Attach in descriptor order in a single pass, preserving navigation order.
+-  for(NSDictionary *node in snapshot[@"nodes"]){VellumAXElement *element=next[node[@"id"]];NSString *parent=node[@"parent"];VellumAXElement *ancestor=next[parent];element.parentElement=ancestor?:state.view;if(ancestor)[childLists[parent] addObject:element];else [roots addObject:element];}
+-  for(NSString *identifier in next){VellumAXElement *element=next[identifier];element.childElements=childLists[identifier];}
+-  for(NSString *id in state.elements)if(!next[id]){VellumAXElement *old=state.elements[id];old.live=NO;old.childElements=@[];old.parentElement=nil;}
+-  // Geometry may arrive before semantics during demand-rendered startup. Keep
+-  // it until matching elements publish, then retire IDs absent from this tree.
+-  for(NSString *identifier in state.geometry.allKeys)if(!next[identifier])[state.geometry removeObjectForKey:identifier];
+-  for(NSString *identifier in state.textGeometry.allKeys)if(!next[identifier])[state.textGeometry removeObjectForKey:identifier];
+-  state.elements=next;state.roots=roots;state.hierarchy=hierarchy;state.generation=generation;
++static void vellumAXRetire(VellumAXElement *element){element.live=NO;element.parentElement=nil;element.childElements=@[];element.textGeometry=nil;}
++// Scope host Parent is part of an incarnation's native ownership boundary.
++static BOOL vellumAXCanReuse(VellumAXElement *old,NSDictionary *node,NSDictionary *nodes,NSDictionary *oldNodes){
++ if(!old.live||![old.node[@"parent"] isEqual:node[@"parent"]])return NO;
++ NSString *scope=node[@"grid_scope"],*oldScope=old.node[@"grid_scope"];
++ if(!scope&&!oldScope)return YES;
++ if(![scope isEqual:oldScope]||![node[@"grid_incarnation"] isEqual:old.node[@"grid_incarnation"]])return NO;
++ return [nodes[scope][@"parent"] isEqual:oldNodes[scope][@"parent"]];
++}
++// Called synchronously on the native owner by publication; inert fixtures use
++// the same transaction without NSWindow creation or notifications.
++static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,BOOL notify){
++ if(!state||state.closed||!vellumAXValidSnapshot(snapshot))return NO;
++ uint64_t generation=[snapshot[@"generation"] unsignedLongLongValue];if(generation<=state.generation)return NO;
++ NSMutableDictionary *nodes=[NSMutableDictionary new],*oldNodes=[NSMutableDictionary new];
++ for(NSDictionary *node in snapshot[@"nodes"])nodes[node[@"id"]]=node;
++ for(NSString *identifier in state.elements)oldNodes[identifier]=state.elements[identifier].node;
++ // Allocate every required object before mutating the retained tree. Identity
++ // exhaustion refuses the complete transaction and cannot wrap old IDs.
++ NSMutableDictionary<NSString *,VellumAXElement *> *next=[NSMutableDictionary new];NSMutableDictionary *childLists=[NSMutableDictionary new];
++ for(NSDictionary *node in snapshot[@"nodes"]){NSString *identifier=node[@"id"];VellumAXElement *old=state.elements[identifier];VellumAXElement *element=vellumAXCanReuse(old,node,nodes,oldNodes)?old:[VellumAXElement new];if(!element)return NO;next[identifier]=element;childLists[identifier]=[NSMutableArray new];}
++ id oldFocus=vellumAXFocused(state);NSString *oldFocusedID=[oldFocus isKindOfClass:VellumAXElement.class]?[oldFocus accessibilityIdentifier]:@"";
++ NSArray *oldHierarchy=state.hierarchy;NSMutableArray *hierarchy=[NSMutableArray new],*changedElements=[NSMutableArray new],*roots=[NSMutableArray new];
++ for(NSDictionary *node in snapshot[@"nodes"]){
++  NSString *identifier=node[@"id"];VellumAXElement *element=next[identifier],*old=state.elements[identifier];
++  [hierarchy addObject:@[identifier,node[@"parent"],node[@"role"],@(element.objectIdentity)]];
++  NSObject *oldValue=element.node[@"value"],*newValue=node[@"value"];BOOL changed=element.node&&oldValue!=newValue&&![oldValue isEqual:newValue];
++  if(old&&old!=element){vellumAXRetire(old);[state.geometry removeObjectForKey:identifier];[state.textGeometry removeObjectForKey:identifier];}
++  element.state=state;element.node=node;element.live=YES;element.textGeometry=state.textGeometry[identifier];
++  if(node[@"grid_scope"]){element.pixelFrame=node[@"grid_frame"]?vellumAXArrayRect(node[@"grid_frame"]):NSZeroRect;[state.geometry removeObjectForKey:identifier];}
++  else {NSArray *rect=state.geometry[identifier];element.pixelFrame=rect.count==4?vellumAXArrayRect(rect):NSZeroRect;}
++  if(changed)[changedElements addObject:element];
++ }
++ for(NSDictionary *node in snapshot[@"nodes"]){VellumAXElement *element=next[node[@"id"]];NSString *parent=node[@"parent"];VellumAXElement *ancestor=next[parent];element.parentElement=ancestor?:state.view;if(ancestor)[childLists[parent] addObject:element];else [roots addObject:element];}
++ for(NSString *identifier in next)next[identifier].childElements=childLists[identifier];
++ for(NSString *identifier in state.elements)if(!next[identifier])vellumAXRetire(state.elements[identifier]);
++ for(NSString *identifier in state.geometry.allKeys)if(!next[identifier])[state.geometry removeObjectForKey:identifier];
++ for(NSString *identifier in state.textGeometry.allKeys)if(!next[identifier])[state.textGeometry removeObjectForKey:identifier];
++ state.elements=next;state.roots=roots;state.hierarchy=hierarchy;state.generation=generation;
++ if(notify){
+   if(![oldHierarchy isEqual:hierarchy])NSAccessibilityPostNotification(state.view,NSAccessibilityLayoutChangedNotification);
+   for(VellumAXElement *changed in changedElements)NSAccessibilityPostNotification(changed,NSAccessibilityValueChangedNotification);
+   id focused=vellumAXFocused(state);NSString *focusedID=focused?[focused accessibilityIdentifier]:@"";if(![focusedID isEqual:oldFocusedID])NSAccessibilityPostNotification(focused?:state.view,NSAccessibilityFocusedUIElementChangedNotification);
+- });
++ }
++ return YES;
++}
++void vellumAXUpdate(uint64_t token,const char *json){
++ NSData *payload=vellumAXJSONData(json);if(!payload)return;
++ dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXCommitSnapshot(vellumAXStates[@(token)],snapshot,YES);}});
++}
++static void vellumAXApplyGeometry(VellumAXState *state,NSDictionary *bounds){
++ if(!state||state.closed||![bounds isKindOfClass:NSDictionary.class])return;
++ for(NSString *identifier in bounds){
++  // Grid frames arrive only with their semantic generation. An unversioned
++  // render callback cannot overwrite the completed or pending envelope.
++  if(state.elements[identifier].node[@"grid_scope"])continue;
++  NSArray *rect=bounds[identifier];if(!vellumAXValidRect(rect))continue;state.geometry[identifier]=rect;state.elements[identifier].pixelFrame=vellumAXArrayRect(rect);
++ }
+ }
+ void vellumAXGeometry(uint64_t token,const char *json){
+- NSString *payload=json?[NSString stringWithUTF8String:json]:nil;if(!payload)return;
+- dispatch_async(dispatch_get_main_queue(),^{
+-  VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;
+-  NSDictionary *bounds=[NSJSONSerialization JSONObjectWithData:[payload dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];if(![bounds isKindOfClass:NSDictionary.class])return;
+-  for(NSString *id in bounds){NSArray *rect=bounds[id];if(![rect isKindOfClass:NSArray.class]||rect.count!=4)continue;state.geometry[id]=rect;state.elements[id].pixelFrame=NSMakeRect([rect[0] doubleValue],[rect[1] doubleValue],[rect[2] doubleValue],[rect[3] doubleValue]);}
+- });
++ NSData *payload=vellumAXJSONData(json);if(!payload)return;
++ dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *bounds=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXApplyGeometry(vellumAXStates[@(token)],bounds);}});
++}
++// Synchronous CGO transaction fixture. It never registers an attachment, creates
++// an OS window, or invokes a successful owner action. Retained references expose
++// retirement independently of the new same-ID dictionary entry.
++static NSDictionary *vellumAXFixtureElement(VellumAXElement *element){
++ NSRect frame=element.pixelFrame;
++ return @{@"id":element.accessibilityIdentifier?:@"",@"object_identity":@(element.objectIdentity),@"live":@(element.live),@"enabled":@([element isAccessibilityEnabled]),@"focused":@([element isAccessibilityFocused]),@"press_allowed":@([element isAccessibilitySelectorAllowed:@selector(accessibilityPerformPress)]),@"grid_scope":element.node[@"grid_scope"]?:@"",@"grid_incarnation":element.node[@"grid_incarnation"]?:@0,@"grid_pending":@([element.node[@"grid_pending"] boolValue]),@"grid_target_generation":element.node[@"grid_target_generation"]?:@0,@"grid_generation":element.node[@"grid_generation"]?:@0,@"value":element.accessibilityValue?:NSNull.null,@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]};
++}
++char *vellumAXScopedFixture(const char *json){
++ @autoreleasepool{
++  NSData *data=vellumAXJSONData(json);id steps=data?[NSJSONSerialization JSONObjectWithData:data options:0 error:nil]:nil;
++  if(![steps isKindOfClass:NSArray.class]||[steps count]>512)return strdup("");
++  VellumAXState *state=[VellumAXState new];state.elements=[NSMutableDictionary new];state.geometry=[NSMutableDictionary new];state.textGeometry=[NSMutableDictionary new];state.roots=@[];
++  NSMutableArray *held=[NSMutableArray new],*results=[NSMutableArray new];
++  for(id step in steps){
++   if(![step isKindOfClass:NSDictionary.class])return strdup("");BOOL accepted=NO;
++   if([step[@"kind"] isEqual:@"update"]){accepted=vellumAXCommitSnapshot(state,step[@"snapshot"],NO);if(accepted)for(VellumAXElement *element in state.elements.allValues)if(![held containsObject:element])[held addObject:element];}
++   else if([step[@"kind"] isEqual:@"geometry"])vellumAXApplyGeometry(state,step[@"bounds"]);
++   else if([step[@"kind"] isEqual:@"close"]){state.closed=YES;for(VellumAXElement *element in state.elements.allValues)vellumAXRetire(element);}
++   else return strdup("");
++   NSMutableArray *elements=[NSMutableArray new],*retired=[NSMutableArray new],*guards=[NSMutableArray new];
++   for(NSString *identifier in [state.elements.allKeys sortedArrayUsingSelector:@selector(compare:)]){
++    VellumAXElement *element=state.elements[identifier];[elements addObject:vellumAXFixtureElement(element)];
++    if(vellumAXPending(element)){
++     // Defense-in-depth check: real pending selectors refuse independently of
++     // the owner's disabled/empty-actions/unfocused presentation flags.
++     VellumAXElement *probe=[VellumAXElement new];NSMutableDictionary *node=[element.node mutableCopy];node[@"disabled"]=@NO;node[@"focused"]=@YES;node[@"actions"]=@[@"press",@"focus",@"set",@"selection",@"increment",@"decrement",@"cancel",@"expand",@"collapse"];
++     probe.state=state;probe.node=node;probe.live=YES;
++     NSMutableDictionary *guard=[vellumAXFixtureElement(probe) mutableCopy];guard[@"admitted"]=@([probe request:@"press" value:@""]);
++     guard[@"set_allowed"]=@([probe isAccessibilitySelectorAllowed:@selector(setAccessibilityValue:)]);guard[@"focus_allowed"]=@([probe isAccessibilitySelectorAllowed:@selector(setAccessibilityFocused:)]);[guards addObject:guard];
++    }
++   }
++   for(VellumAXElement *element in held)if(!element.live){NSMutableDictionary *record=[vellumAXFixtureElement(element) mutableCopy];record[@"admitted"]=@([element request:@"press" value:@""]);[retired addObject:record];}
++   [results addObject:@{@"accepted":@(accepted),@"generation":@(state.generation),@"elements":elements,@"retired":retired,@"pending_guards":guards}];
++  }
++  NSData *result=[NSJSONSerialization dataWithJSONObject:results options:0 error:nil];if(!result)return strdup("");return strdup([[NSString alloc]initWithData:result encoding:NSUTF8StringEncoding].UTF8String?:"");
++ }
+ }
+ static void vellumAXWalk(id object,NSMutableArray *out){
+  for(id child in [object accessibilityChildren]){
+   if([child isKindOfClass:VellumAXElement.class]){
+    VellumAXElement *x=child;NSRect frame=x.accessibilityFrame;id value=x.accessibilityValue?:NSNull.null;NSString *parent=[x.parentElement isKindOfClass:VellumAXElement.class]?[x.parentElement accessibilityIdentifier]:@"";
+    id hit=[x.state.view accessibilityHitTest:NSMakePoint(NSMidX(frame),NSMidY(frame))];NSString *hitID=[hit isKindOfClass:VellumAXElement.class]?[hit accessibilityIdentifier]:@"";
+-   [out addObject:@{@"id":x.accessibilityIdentifier,@"domain_id":x.node[@"domain_id"]?:@"",@"role":x.accessibilityRole,@"name":x.accessibilityLabel?:@"",@"value":value,@"enabled":@([x isAccessibilityEnabled]),@"selected":@([x isAccessibilitySelected]),@"expanded":@([x isAccessibilityExpanded]),@"parent":parent,@"hit_test_id":hitID,@"text_selection":@[x.accessibilitySelectedTextRange.location==NSNotFound?@(-1):@(x.accessibilitySelectedTextRange.location),@(x.accessibilitySelectedTextRange.length)],@"insertion_line":@(x.accessibilityInsertionPointLineNumber),@"row_count":@(x.accessibilityRowCount),@"column_count":@(x.accessibilityColumnCount),@"row_index":@[x.accessibilityRowIndexRange.location==NSNotFound?@(-1):@(x.accessibilityRowIndexRange.location),@(x.accessibilityRowIndexRange.length)],@"column_index":@[x.accessibilityColumnIndexRange.location==NSNotFound?@(-1):@(x.accessibilityColumnIndexRange.location),@(x.accessibilityColumnIndexRange.length)],@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]}];
++   [out addObject:@{@"id":x.accessibilityIdentifier,@"domain_id":x.node[@"domain_id"]?:@"",@"role":x.accessibilityRole,@"name":x.accessibilityLabel?:@"",@"value":value,@"enabled":@([x isAccessibilityEnabled]),@"object_identity":@(x.objectIdentity),@"grid_scope":x.node[@"grid_scope"]?:@"",@"grid_incarnation":x.node[@"grid_incarnation"]?:@0,@"grid_pending":@([x.node[@"grid_pending"] boolValue]),@"grid_target_generation":x.node[@"grid_target_generation"]?:@0,@"grid_generation":x.node[@"grid_generation"]?:@0,@"selected":@([x isAccessibilitySelected]),@"expanded":@([x isAccessibilityExpanded]),@"parent":parent,@"hit_test_id":hitID,@"text_selection":@[x.accessibilitySelectedTextRange.location==NSNotFound?@(-1):@(x.accessibilitySelectedTextRange.location),@(x.accessibilitySelectedTextRange.length)],@"insertion_line":@(x.accessibilityInsertionPointLineNumber),@"row_count":@(x.accessibilityRowCount),@"column_count":@(x.accessibilityColumnCount),@"row_index":@[x.accessibilityRowIndexRange.location==NSNotFound?@(-1):@(x.accessibilityRowIndexRange.location),@(x.accessibilityRowIndexRange.length)],@"column_index":@[x.accessibilityColumnIndexRange.location==NSNotFound?@(-1):@(x.accessibilityColumnIndexRange.location),@(x.accessibilityColumnIndexRange.length)],@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]}];
+   }
+   vellumAXWalk(child,out);
+  }
+diff --git a/drivers/cogent/accessibility_grid_publication.go b/drivers/cogent/accessibility_grid_publication.go
+new file mode 100644
+index 0000000..a21d316
+--- /dev/null
++++ b/drivers/cogent/accessibility_grid_publication.go
+@@ -0,0 +1,220 @@
++package cogent
++
++import (
++	"image"
++
++	"github.com/dshills/vellum/virtual"
++)
++
++// The native action may already be queued when render withdraws geometry but
++// before the owner publishes pending. Check readiness again at owner delivery.
++func guardGridAccessibility(g *gridBinding, nodes []accessibilityNode, handlers map[string]accessibilityHandler) {
++	for _, node := range nodes {
++		if handler := handlers[node.ID]; handler != nil {
++			generation, incarnation := node.GridGeneration, node.GridIncarnation
++			pending, cell := node.GridPending, node.Role == "grid-cell"
++			handlers[node.ID] = func(action accessibilityAction) bool {
++				if pending || !g.eligible() {
++					return false
++				}
++				state, err := g.model.State()
++				if err != nil {
++					return false
++				}
++				if state.Generation != generation {
++					// Cell refs already reported this typed refusal before the
++					// publication guard was added. Preserve that error callback.
++					if cell {
++						g.fail(virtual.ErrGridStale)
++					}
++					return false
++				}
++				m := g.currentMeasurement()
++				if m == nil || m.Generation != generation || m.Incarnation != incarnation || m.CellIncarnation != g.epoch {
++					return false
++				}
++				if !currentGridAccessibilityEditor(g, m) {
++					return false
++				}
++				if state.Stamp != m.Stamp || state.Viewport != m.Viewport {
++					return false
++				}
++				return handler(action)
++			}
++		}
++	}
++}
++
++// Private marked previews can change the owner-held field cache without a new
++// portable grid generation. They also revoke actions from the older frame.
++func currentGridAccessibilityEditor(g *gridBinding, m *GridInspection) bool {
++	edit := gridEditingRecord(g.r)
++	if (edit == nil) != (m.Editor == nil) {
++		return false
++	}
++	if edit == nil {
++		return true
++	}
++	return g.editing != nil && m.Editor.ID == edit.node.ID && m.Editor.Session == g.editing.session && edit.control.fieldState != nil && edit.control.fieldState.Text == m.Editor.Text
++}
++
++// stampGridAccessibility runs on the owner. The frame was copied by render;
++// a pending layout never reads live widget rectangles or accepts old actions.
++func stampGridAccessibility(r *record, nodes []accessibilityNode) {
++	if len(nodes) == 0 {
++		return
++	}
++	g := r.control.grid
++	m := g.currentMeasurement()
++	pending := m == nil || !g.live() || !g.projectionReady || m.Incarnation != g.incarnation || m.CellIncarnation != g.epoch
++	if !pending {
++		edit := gridEditingRecord(r)
++		if !currentGridAccessibilityEditor(g, m) {
++			pending = true
++		} else if edit != nil {
++			for _, node := range nodes {
++				if node.ID == accessibilityManagedID(edit.node.ID) && (node.Value != m.Editor.Text || node.Focused != m.Editor.Focused) {
++					pending = true
++				}
++			}
++		}
++	}
++	frames := map[string][4]float32{}
++	if !pending {
++		put := func(id string, rect image.Rectangle) {
++			frames[id] = [4]float32{float32(rect.Min.X), float32(rect.Min.Y), float32(rect.Dx()), float32(rect.Dy())}
++		}
++		put(nodes[0].ID, m.Bounds)
++		rows := map[string]image.Rectangle{}
++		for _, c := range m.Cells {
++			put(accessibilityManagedID(c.ID), c.Bounds)
++			rows[c.RowKey] = rows[c.RowKey].Union(c.Bounds)
++		}
++		for key, bounds := range rows {
++			put(accessibilityRowID(r.node.ID, key), bounds)
++		}
++		for _, h := range m.Headers {
++			put(accessibilityManagedID(h.ID), h.Bounds)
++		}
++		if m.Editor != nil {
++			put(accessibilityManagedID(m.Editor.ID), m.Editor.Bounds)
++		}
++		// An editor mounted after capture also needs a completed frame. Avoid
++		// combining current semantics with an earlier editor's geometry.
++		for _, node := range nodes {
++			if _, ok := frames[node.ID]; !ok {
++				pending = true
++				break
++			}
++		}
++	}
++	for i := range nodes {
++		n := &nodes[i]
++		n.GridScope = nodes[0].ID
++		n.GridIncarnation = g.incarnation
++		n.GridPending = pending
++		n.GridTargetGeneration = g.projection.State.Generation
++		n.GridGeneration = 0
++		if !pending {
++			n.GridGeneration = m.Generation
++			frame := frames[n.ID]
++			n.GridFrame = &frame
++		}
++	}
++}
++
++func cloneAccessibilityNodes(nodes []accessibilityNode) []accessibilityNode {
++	out := append([]accessibilityNode(nil), nodes...)
++	for i := range out {
++		n := &out[i]
++		n.Actions = append([]string{}, n.Actions...)
++		if n.GridFrame != nil {
++			value := *n.GridFrame
++			n.GridFrame = &value
++		}
++		if n.TextSelection != nil {
++			value := *n.TextSelection
++			n.TextSelection = &value
++		}
++		if n.Expanded != nil {
++			value := *n.Expanded
++			n.Expanded = &value
++		}
++		if n.Min != nil {
++			value := *n.Min
++			n.Min = &value
++		}
++		if n.Max != nil {
++			value := *n.Max
++			n.Max = &value
++		}
++	}
++	return out
++}
++
++// prepareGridPublication retains one completed subtree per currently visible
++// grid, scoped by binding incarnation and parent. It never retains handlers or
++// a grid/model pointer. Actual removal drops the cache immediately.
++func (b *accessibilityBridge) prepareGridPublication(nodes []accessibilityNode, handlers map[string]accessibilityHandler) ([]accessibilityNode, map[string]accessibilityHandler) {
++	b.mu.Lock()
++	defer b.mu.Unlock()
++	if b.closed.Load() {
++		return nil, nil
++	}
++	scopes := map[string][]accessibilityNode{}
++	for _, node := range nodes {
++		if node.GridScope != "" {
++			scopes[node.GridScope] = append(scopes[node.GridScope], node)
++		}
++	}
++	cache := map[string][]accessibilityNode{}
++	replacements := map[string][]accessibilityNode{}
++	actions := make(map[string]accessibilityHandler, len(handlers))
++	for id, handler := range handlers {
++		actions[id] = handler
++	}
++	for scope, group := range scopes {
++		host := group[0]
++		if host.ID != scope {
++			continue // Framework traversal always emits the table host first.
++		}
++		if !host.GridPending {
++			cache[scope] = cloneAccessibilityNodes(group)
++			continue
++		}
++		previous := b.gridPublications[scope]
++		retained := group[:1]
++		if len(previous) > 0 && previous[0].GridIncarnation == host.GridIncarnation && previous[0].Parent == host.Parent {
++			cache[scope] = previous
++			retained = previous
++		}
++		retained = cloneAccessibilityNodes(retained)
++		for i := range retained {
++			n := &retained[i]
++			n.GridPending = true
++			n.GridTargetGeneration = host.GridTargetGeneration
++			n.Disabled, n.Focused = true, false
++			n.Actions = []string{}
++			n.TextClient, n.TextSelection, n.TextFocus = 0, nil, 0
++			delete(actions, n.ID)
++		}
++		// Descriptor labels/help remain current even while cell data are read-only.
++		retained[0].Name, retained[0].Help = host.Name, host.Help
++		for _, node := range group {
++			delete(actions, node.ID)
++		}
++		replacements[scope] = retained
++	}
++	out := make([]accessibilityNode, 0, len(nodes))
++	for _, node := range nodes {
++		if replacement, pending := replacements[node.GridScope]; pending {
++			if node.ID == node.GridScope {
++				out = append(out, replacement...)
++			}
++			continue
++		}
++		out = append(out, node)
++	}
++	b.gridPublications = cache
++	return out, actions
++}
+diff --git a/drivers/cogent/accessibility_grid_publication_test.go b/drivers/cogent/accessibility_grid_publication_test.go
+new file mode 100644
+index 0000000..74d7e62
+--- /dev/null
++++ b/drivers/cogent/accessibility_grid_publication_test.go
+@@ -0,0 +1,816 @@
++//go:build offscreen
++
++package cogent
++
++import (
++	"encoding/json"
++	"errors"
++	"image"
++	"math"
++	"testing"
++
++	"cogentcore.org/core/core"
++	"github.com/dshills/vellum/ui"
++	"github.com/dshills/vellum/virtual"
++)
++
++// These tests exercise owner publications and actual software-rendered managed
++// grids. They do not measure Cocoa delivery, screen-reader behavior, or GPU work.
++func gridAXCompleted(scope, parent string, incarnation, generation uint64) []accessibilityNode {
++	frame := func(x, y, w, h float32) *[4]float32 { v := [4]float32{x, y, w, h}; return &v }
++	selection, expanded, minimum, maximum := [2]int{1, 2}, true, float32(0), float32(100)
++	nodes := []accessibilityNode{
++		{ID: scope, Parent: parent, Role: "table", Name: "Completed table", RowCount: 10000, ColumnCount: 20, Focusable: true, Focused: true, Actions: []string{"focus"}, GridFrame: frame(10, 20, 300, 180)},
++		{ID: scope + ":row", Parent: scope, Role: "grid-row", Name: "row-7", RowIndex: 8, Selected: true, Actions: []string{}, GridFrame: frame(10, 70, 240, 24)},
++		{ID: scope + ":cell", Parent: scope + ":row", Role: "grid-cell", Value: "old cell", Selected: true, Actions: []string{"press"}, GridFrame: frame(10, 70, 90, 24)},
++		{ID: scope + ":header", Parent: scope, Role: "grid-column", Name: "Column 1", Actions: []string{}, GridFrame: frame(10, 20, 90, 26)},
++		{ID: scope + ":editor", Parent: scope, Role: string(ui.TextField), Value: "A😀", Focused: true, Focusable: true, Actions: []string{"focus", "set", "selection"}, TextClient: 9, TextSelection: &selection, TextFocus: 3, Expanded: &expanded, Min: &minimum, Max: &maximum, GridFrame: frame(10, 70, 90, 24)},
++	}
++	for i := range nodes {
++		nodes[i].GridScope = scope
++		nodes[i].GridIncarnation = incarnation
++		nodes[i].GridGeneration = generation
++		nodes[i].GridTargetGeneration = generation
++	}
++	return nodes
++}
++
++func gridAXPending(scope, parent string, incarnation, target uint64) []accessibilityNode {
++	n := gridAXCompleted(scope, parent, incarnation, target)[0]
++	n.GridPending, n.GridGeneration, n.GridFrame = true, 0, nil
++	return []accessibilityNode{n}
++}
++
++func gridAXHandlers(nodes []accessibilityNode, calls *int) map[string]accessibilityHandler {
++	handlers := map[string]accessibilityHandler{}
++	for _, n := range nodes {
++		if len(n.Actions) > 0 {
++			handlers[n.ID] = func(accessibilityAction) bool {
++				if calls != nil {
++					*calls++
++				}
++				return true
++			}
++		}
++	}
++	return handlers
++}
++
++func gridAXByID(t *testing.T, nodes []accessibilityNode) map[string]accessibilityNode {
++	t.Helper()
++	out := map[string]accessibilityNode{}
++	for _, n := range nodes {
++		if _, duplicate := out[n.ID]; duplicate {
++			t.Fatalf("duplicate published ID %q", n.ID)
++		}
++		out[n.ID] = n
++	}
++	return out
++}
++
++func gridAXLast(t *testing.T, b *accessibilityBridge) []accessibilityNode {
++	t.Helper()
++	b.mu.Lock()
++	payload := b.lastSnapshot
++	b.mu.Unlock()
++	var nodes []accessibilityNode
++	if err := json.Unmarshal([]byte(payload), &nodes); err != nil {
++		t.Fatal(err)
++	}
++	return nodes
++}
++
++func gridAXAssertPending(t *testing.T, nodes []accessibilityNode, scope string, completed, target uint64, handlers map[string]accessibilityHandler) {
++	t.Helper()
++	count := 0
++	for _, n := range nodes {
++		if n.GridScope != scope {
++			continue
++		}
++		count++
++		if !n.GridPending || n.GridGeneration != completed || n.GridTargetGeneration != target || !n.Disabled || n.Focused || len(n.Actions) != 0 || n.TextClient != 0 || n.TextSelection != nil || n.TextFocus != 0 || handlers[n.ID] != nil {
++			t.Errorf("pending node retained action/current-text authority: %+v", n)
++		}
++	}
++	if count == 0 {
++		t.Fatal("pending host vanished")
++	}
++}
++
++func TestAccessibilityGridPublicationRetainsCompletedAndDetachesCache(t *testing.T) {
++	b := &accessibilityBridge{}
++	ready := gridAXCompleted("grid-one", "root", 11, 5)
++	_, _ = b.prepareGridPublication(ready, gridAXHandlers(ready, nil))
++	// Mutating an input retained by the caller must not mutate the completed cache.
++	ready[0].Name = "caller mutation"
++	ready[2].Actions[0] = "caller action"
++	ready[2].GridFrame[0] = 900
++	ready[4].TextSelection[0] = 900
++	*ready[4].Expanded = false
++	*ready[4].Min, *ready[4].Max = 900, 901
++	pending := gridAXPending("grid-one", "root", 11, 6)
++	pending[0].Name, pending[0].Help = "Current label", "Current help"
++	out, handlers := b.prepareGridPublication(pending, gridAXHandlers(pending, nil))
++	gridAXAssertPending(t, out, "grid-one", 5, 6, handlers)
++	if len(out) != 5 || out[0].Name != "Current label" || out[0].Help != "Current help" || out[0].RowCount != 10000 || out[2].Value != "old cell" || *out[2].GridFrame != [4]float32{10, 70, 90, 24} {
++		t.Fatalf("completed data/geometry were replaced by pending data: %+v", out)
++	}
++	if !*out[4].Expanded || *out[4].Min != 0 || *out[4].Max != 100 {
++		t.Fatal("completed pointer fields alias input")
++	}
++	// Returned read-only records also cannot corrupt the next retained publication.
++	out[2].GridFrame[0] = 800
++	*out[4].Expanded = false
++	*out[4].Min, *out[4].Max = 800, 801
++	again, _ := b.prepareGridPublication(pending, nil)
++	if *again[2].GridFrame != [4]float32{10, 70, 90, 24} || !*again[4].Expanded || *again[4].Min != 0 || *again[4].Max != 100 {
++		t.Fatal("returned pending pointers alias completed cache")
++	}
++	cached := b.gridPublications["grid-one"]
++	if cached[2].Actions[0] != "press" || *cached[4].TextSelection != [2]int{1, 2} || cached[4].TextClient != 9 || cached[0].GridPending {
++		t.Fatal("pending transformation mutated completed cache")
++	}
++}
++
++func TestAccessibilityGridPublicationStartupAndScopeRetirement(t *testing.T) {
++	for _, tc := range []struct {
++		name    string
++		pending func() []accessibilityNode
++		remove  bool
++	}{
++		{"startup", func() []accessibilityNode { return gridAXPending("g", "root", 1, 2) }, true},
++		{"incarnation", func() []accessibilityNode { return gridAXPending("g", "root", 2, 2) }, false},
++		{"parent", func() []accessibilityNode { return gridAXPending("g", "other", 1, 2) }, false},
++		{"namespace", func() []accessibilityNode { return gridAXPending("panel-b:g", "panel-b:root", 1, 2) }, false},
++		{"removed", func() []accessibilityNode { return gridAXPending("g", "root", 1, 2) }, true},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			b := &accessibilityBridge{}
++			if tc.name != "startup" {
++				ready := gridAXCompleted("g", "root", 1, 1)
++				b.prepareGridPublication(ready, gridAXHandlers(ready, nil))
++			}
++			if tc.remove {
++				b.prepareGridPublication([]accessibilityNode{{ID: "button", Role: "button"}}, nil)
++			}
++			pending := tc.pending()
++			out, handlers := b.prepareGridPublication(pending, gridAXHandlers(pending, nil))
++			gridAXAssertPending(t, out, pending[0].GridScope, 0, 2, handlers)
++			if len(out) != 1 || out[0].GridFrame != nil || len(b.gridPublications) != 0 || out[0].GridIncarnation != pending[0].GridIncarnation || out[0].Parent != pending[0].Parent {
++				t.Fatalf("retired or foreign subtree resurrected: %+v cache=%v", out, b.gridPublications)
++			}
++		})
++	}
++}
++
++func TestAccessibilityGridPublicationMixedScopesAndLatestCompletion(t *testing.T) {
++	b := &accessibilityBridge{}
++	one := gridAXCompleted("one", "root", 10, 1)
++	two := gridAXCompleted("two", "root", 20, 1)
++	button := accessibilityNode{ID: "button", Role: "button", Name: "Old", Actions: []string{"press"}}
++	initial := append(append(one, two...), button)
++	b.prepareGridPublication(initial, gridAXHandlers(initial, nil))
++	two = gridAXCompleted("two", "root", 20, 2)
++	two[2].Value = "current second grid"
++	button.Name = "Current"
++	input := append(append(gridAXPending("one", "root", 10, 3), two...), button)
++	out, handlers := b.prepareGridPublication(input, gridAXHandlers(input, nil))
++	gridAXAssertPending(t, out, "one", 1, 3, handlers)
++	byID := gridAXByID(t, out)
++	if byID["two:cell"].Value != "current second grid" || byID["two:cell"].GridPending || handlers["two:cell"] == nil || byID["button"].Name != "Current" || handlers["button"] == nil {
++		t.Fatal("pending grid starved ready grid or ordinary controls")
++	}
++	// Completing a new visible range must replace, rather than append to, the cache.
++	completed := gridAXCompleted("one", "root", 10, 3)
++	completed[1].ID = "one:new-row"
++	completed[2].ID, completed[2].Parent = "one:new-cell", "one:new-row"
++	completed[2].Value = "new cell"
++	input = append(append(completed, two...), button)
++	out, handlers = b.prepareGridPublication(input, gridAXHandlers(input, nil))
++	byID = gridAXByID(t, out)
++	if _, stale := byID["one:cell"]; stale || handlers["one:cell"] != nil || byID["one:new-cell"].Value != "new cell" || handlers["one:new-cell"] == nil {
++		t.Fatal("older completed cell/handler survived a new completion")
++	}
++	out, handlers = b.prepareGridPublication(append(two, button), gridAXHandlers(append(two, button), nil))
++	if len(b.gridPublications) != 1 || len(out) != len(two)+1 || handlers["one:new-cell"] != nil {
++		t.Fatal("removed scope retained cache or action")
++	}
++}
++
++func TestAccessibilityGridPublicationDuplicatePendingAndQueuedActions(t *testing.T) {
++	a, b := newAXTest(t, 16)
++	calls, readyCalls := 0, 0
++	one := gridAXCompleted("g", "root", 7, 4)
++	control := accessibilityNode{ID: "button", Role: "button", Actions: []string{"press"}}
++	ready := append(one, control)
++	b.update(ready, gridAXHandlers(ready, &calls))
++	completedGeneration := b.generation.Load()
++	for _, id := range []string{"g", "g:cell", "g:editor"} {
++		if !accessibilityDeliver(b.token, completedGeneration, id, accessibilityAction{Kind: "press"}) {
++			t.Fatalf("completed fixture action %q not admitted", id)
++		}
++	}
++	pending := append(gridAXPending("g", "root", 7, 5), control)
++	b.update(pending, map[string]accessibilityHandler{"button": func(accessibilityAction) bool { readyCalls++; return true }})
++	pendingGeneration := b.generation.Load()
++	if pendingGeneration == completedGeneration {
++		t.Fatal("pending transition did not retire admitted completed actions")
++	}
++	for _, id := range []string{"g", "g:cell", "g:editor"} {
++		if accessibilityDeliver(b.token, pendingGeneration, id, accessibilityAction{Kind: "press"}) {
++			t.Errorf("read-only retained action %q admitted", id)
++		}
++	}
++	if !accessibilityDeliver(b.token, pendingGeneration, "button", accessibilityAction{Kind: "press"}) {
++		t.Fatal("ordinary action blocked by pending grid")
++	}
++	before := b.lastSnapshot
++	b.update(pending, map[string]accessibilityHandler{"button": func(accessibilityAction) bool { readyCalls++; return true }})
++	if b.generation.Load() != pendingGeneration || b.lastSnapshot != before {
++		t.Fatal("identical pending target churned semantic/global generation")
++	}
++	if err := a.Drain(); err != nil {
++		t.Fatal(err)
++	}
++	if calls != 0 || readyCalls != 1 {
++		t.Fatalf("queued pending transition: retired=%d ordinary=%d", calls, readyCalls)
++	}
++	newer := append(gridAXPending("g", "root", 7, 6), control)
++	b.update(newer, gridAXHandlers(newer, nil))
++	if b.generation.Load() == pendingGeneration {
++		t.Fatal("new pending target did not supersede old publication")
++	}
++	nodes := gridAXLast(t, b)
++	gridAXAssertPending(t, nodes, "g", 4, 6, b.handlers)
++	if nodes[2].Value != "old cell" {
++		t.Fatal("pending target overwrote last completed data")
++	}
++	b.close()
++	if len(b.gridPublications) != 0 {
++		t.Fatal("closed bridge retained completed grid")
++	}
++	if out, handlers := b.prepareGridPublication(one, gridAXHandlers(one, nil)); out != nil || handlers != nil || len(b.gridPublications) != 0 {
++		t.Fatal("closed bridge resurrected cache")
++	}
++}
++
++func TestAccessibilityGridPublicationRejectedEncodingDoesNotPoisonCache(t *testing.T) {
++	_, b := newAXTest(t, 4)
++	ready := gridAXCompleted("g", "root", 1, 1)
++	b.update(ready, nil)
++	generation := b.generation.Load()
++	bad := gridAXCompleted("g", "root", 2, 2)
++	bad = append(bad, accessibilityNode{ID: "bad", Value: math.NaN()})
++	b.update(bad, nil)
++	if b.generation.Load() != generation || b.gridPublications["g"][0].GridIncarnation != 1 {
++		t.Fatal("unencodable publication changed completed cache or generation")
++	}
++	b.update(gridAXPending("g", "root", 1, 3), nil)
++	gridAXAssertPending(t, gridAXLast(t, b), "g", 1, 3, b.handlers)
++}
++
++func TestAccessibilityGridPublicationNamespaceMetadata(t *testing.T) {
++	ready := gridAXCompleted("g", "root", 4, 8)
++	prefix := accessibilityWorkbenchNamespace("workbench", "panel")
++	nodes, handlers := namespaceAccessibility(ready, gridAXHandlers(ready, nil), prefix, &accessibilityBridge{})
++	for _, n := range nodes {
++		if n.GridScope != prefix+"g" || n.ID[:len(prefix)] != prefix || n.Parent[:len(prefix)] != prefix || n.GridGeneration != 8 || n.GridIncarnation != 4 || n.GridFrame == nil {
++			t.Errorf("namespace separated grid provenance from node identity: %+v", n)
++		}
++	}
++	if handlers[prefix+"g:cell"] == nil || handlers["g:cell"] != nil {
++		t.Fatal("namespace left an unqualified grid action")
++	}
++	b := &accessibilityBridge{}
++	b.prepareGridPublication(nodes, handlers)
++	pending := gridAXPending("g", "root", 4, 9)
++	pending, actions := namespaceAccessibility(pending, gridAXHandlers(pending, nil), prefix, nil)
++	out, actions := b.prepareGridPublication(pending, actions)
++	gridAXAssertPending(t, out, prefix+"g", 8, 9, actions)
++	if len(out) != 5 {
++		t.Fatal("qualified scope did not retain its own completed rows")
++	}
++}
++
++func TestAccessibilityGridPublicationCompletedMeasurementChanges(t *testing.T) {
++	baseline := &GridInspection{Window: "one", ID: "g", Generation: 3, Incarnation: 4, CellIncarnation: 5, Frames: 10, Bounds: image.Rect(10, 20, 310, 200), Scale: 1,
++		Cells:   []GridCellGeometry{{ID: "cell", RowKey: "row-1", ColumnID: "c1", Text: "text", Bounds: image.Rect(10, 40, 100, 64)}},
++		Headers: []GridHeaderGeometry{{ID: "header", Title: "Column", Bounds: image.Rect(10, 20, 100, 40)}},
++		Editor:  &GridEditorGeometry{ID: "editor", Session: 6, Text: "draft", Focused: true, Bounds: image.Rect(10, 40, 100, 64)}}
++	clone := func() *GridInspection {
++		out := *baseline
++		out.Cells = append([]GridCellGeometry(nil), baseline.Cells...)
++		out.Headers = append([]GridHeaderGeometry(nil), baseline.Headers...)
++		e := *baseline.Editor
++		out.Editor = &e
++		return &out
++	}
++	frames := clone()
++	frames.Frames++
++	if !sameGridAccessibilityMeasurement(baseline, frames) || !sameGridAccessibilityMeasurement(nil, nil) || sameGridAccessibilityMeasurement(nil, baseline) || sameGridAccessibilityMeasurement(baseline, nil) {
++		t.Fatal("frame ordinal/no-frame comparison is wrong")
++	}
++	for _, tc := range []struct {
++		name   string
++		change func(*GridInspection)
++	}{
++		{"host movement", func(m *GridInspection) { m.Bounds = m.Bounds.Add(image.Pt(1, 0)) }},
++		{"cell movement", func(m *GridInspection) { m.Cells[0].Bounds = m.Cells[0].Bounds.Add(image.Pt(0, 1)) }},
++		{"header movement", func(m *GridInspection) { m.Headers[0].Bounds = m.Headers[0].Bounds.Add(image.Pt(0, 1)) }},
++		{"scale", func(m *GridInspection) { m.Scale = 1.25 }},
++		{"cell value", func(m *GridInspection) { m.Cells[0].Text = "new" }},
++		{"selection", func(m *GridInspection) { m.Cells[0].Selected = true }},
++		{"editor movement", func(m *GridInspection) { m.Editor.Bounds = m.Editor.Bounds.Add(image.Pt(1, 0)) }},
++		{"editor text", func(m *GridInspection) { m.Editor.Text = "new" }},
++		{"editor focus", func(m *GridInspection) { m.Editor.Focused = false }},
++		{"editor retirement", func(m *GridInspection) { m.Editor = nil }},
++		{"binding", func(m *GridInspection) { m.Incarnation++ }},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			changed := clone()
++			tc.change(changed)
++			if changed.Generation != baseline.Generation || sameGridAccessibilityMeasurement(baseline, changed) {
++				t.Fatal("same-generation completed metadata change was suppressed")
++			}
++		})
++	}
++}
++
++func TestAccessibilityGridPublicationActualCompletedFramesAndEditor(t *testing.T) {
++	m, a, g, _, _ := inlineFixture(t, 120)
++	gridFrame(t, m)
++	inspection := gridInspection(t, a, g)
++	if inspection.Editor == nil || inspection.Editor.Bounds.Empty() {
++		t.Fatal("fixture has no completed inline editor")
++	}
++	if err := a.Do(func() {
++		binding := gBinding(t, g)
++		nodes, handlers := accessibilitySnapshot(binding.r, nil)
++		frames := map[string][4]float32{}
++		put := func(id string, rect image.Rectangle) {
++			frames[id] = [4]float32{float32(rect.Min.X), float32(rect.Min.Y), float32(rect.Dx()), float32(rect.Dy())}
++		}
++		put(accessibilityManagedID("g"), inspection.Bounds)
++		rows := map[string]image.Rectangle{}
++		for _, c := range inspection.Cells {
++			if c.Bounds.Empty() {
++				continue
++			}
++			put(accessibilityManagedID(c.ID), c.Bounds)
++			rows[c.RowKey] = rows[c.RowKey].Union(c.Bounds)
++		}
++		for key, rect := range rows {
++			put(accessibilityRowID("g", key), rect)
++		}
++		for _, h := range inspection.Headers {
++			if !h.Bounds.Empty() {
++				put(accessibilityManagedID(h.ID), h.Bounds)
++			}
++		}
++		put(accessibilityManagedID(inspection.Editor.ID), inspection.Editor.Bounds)
++		if len(nodes) != len(frames) {
++			t.Errorf("completed scope rows/header/editor mismatch: nodes=%d frames=%d", len(nodes), len(frames))
++		}
++		for _, n := range nodes {
++			frame, found := frames[n.ID]
++			if !found || n.GridFrame == nil || *n.GridFrame != frame || n.GridScope != accessibilityManagedID("g") || n.GridPending || n.GridGeneration != inspection.Generation || n.GridTargetGeneration != inspection.Generation || n.GridIncarnation != inspection.Incarnation {
++				t.Errorf("node does not describe its completed measured frame: %+v expected=%v", n, frame)
++			}
++		}
++		editorNode := gridAXByID(t, nodes)[accessibilityManagedID(inspection.Editor.ID)]
++		if editorNode.TextSelection == nil || editorNode.Value != inspection.Editor.Text || handlers[editorNode.ID] == nil {
++			t.Error("completed inline editor semantics/actions missing")
++		}
++		// Frame metadata must be a copy, not a writable reference into measurement.
++		nodes[0].GridFrame[0]++
++		if binding.measurement.Load().Bounds != inspection.Bounds {
++			t.Error("published frame pointer mutated measurement")
++		}
++		previous := binding.measurement.Load()
++		withoutEditor := *previous
++		withoutEditor.Editor = nil
++		binding.measurement.Store(&withoutEditor)
++		pending, pendingActions := accessibilitySnapshot(binding.r, nil)
++		for _, n := range pending {
++			if !n.GridPending || n.GridGeneration != 0 || n.GridFrame != nil {
++				t.Errorf("unmeasured editor mixed into completed grid: %+v", n)
++			}
++		}
++		b := &accessibilityBridge{}
++		// Obtain the unmodified completed snapshot before priming the cache.
++		binding.measurement.Store(previous)
++		complete, completeActions := accessibilitySnapshot(binding.r, nil)
++		b.prepareGridPublication(complete, completeActions)
++		retained, actions := b.prepareGridPublication(pending, pendingActions)
++		gridAXAssertPending(t, retained, accessibilityManagedID("g"), inspection.Generation, inspection.Generation, actions)
++		if len(retained) != len(complete) {
++			t.Error("pending editor measurement lost completed subtree")
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestAccessibilityGridPublicationActualReconcilePendingAndCompletion(t *testing.T) {
++	g, _ := testNativeGrid(t, 10000)
++	m, a := gridManual(t, manualConfig(t, 7), func() ui.Node {
++		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "button", Kind: ui.Button, Text: "Current control", Activate: func() {}}, {ID: "g", Kind: ui.DataGrid, Grid: g, Grow: true}}}
++	})
++	gridFrame(t, m)
++	b := newAccessibilityBridge(a)
++	b.bind("one")
++	t.Cleanup(b.close)
++	window := m.implementation.find("one")
++	var complete []accessibilityNode
++	if err := a.Do(func() {
++		var handlers map[string]accessibilityHandler
++		complete, handlers = accessibilitySnapshot(window.state.root, b)
++		b.update(complete, handlers)
++	}); err != nil {
++		t.Fatal(err)
++	}
++	scope := accessibilityManagedID("g")
++	oldCells := map[string]bool{}
++	var cellID string
++	for _, n := range complete {
++		if n.GridScope == scope && n.Role == "grid-cell" {
++			oldCells[n.ID] = true
++			cellID = n.ID
++		}
++	}
++	if len(oldCells) == 0 {
++		t.Fatalf("fixture completed no native cells: measurement=%+v nodes=%+v", gridInspection(t, a, g), complete)
++	}
++	completedGeneration := b.generation.Load()
++	if !accessibilityDeliver(b.token, completedGeneration, cellID, accessibilityAction{Kind: "press"}) {
++		t.Fatal("completed actual cell action not queued")
++	}
++	if err := a.Do(func() {
++		if e := g.Scroll(270, 2400); e != nil {
++			t.Error(e)
++		}
++		_ = a.Invalidate("one")
++	}); err != nil {
++		t.Fatal(err)
++	}
++	// Use the actual Manual owner reconciliation boundary, before an explicit
++	// frame, rather than fabricating a pending model or invoking an action directly.
++	if err := m.implementation.refresh(window); err != nil {
++		t.Fatal(err)
++	}
++	var inspectErr error
++	var targetGeneration uint64
++	if err := a.Do(func() {
++		_, inspectErr = InspectGrid(a, g)
++		targetGeneration = gBinding(t, g).projection.State.Generation
++		nodes, handlers := accessibilitySnapshot(window.state.root, b)
++		b.update(nodes, handlers)
++	}); err != nil {
++		t.Fatal(err)
++	}
++	if !errors.Is(inspectErr, ErrGridLayout) {
++		t.Fatal("pending InspectGrid returned old completed geometry", inspectErr)
++	}
++	pending := gridAXLast(t, b)
++	var completedGridGeneration uint64
++	for _, n := range complete {
++		if n.ID == scope {
++			completedGridGeneration = n.GridGeneration
++		}
++	}
++	gridAXAssertPending(t, pending, scope, completedGridGeneration, targetGeneration, b.handlers)
++	if targetGeneration <= completedGridGeneration {
++		t.Fatal("scroll did not advance accepted target generation")
++	}
++	for id := range oldCells {
++		if _, ok := gridAXByID(t, pending)[id]; !ok {
++			t.Errorf("last drawn cell %q withdrawn during pending", id)
++		}
++	}
++	if b.handlers[accessibilityManagedID("button")] == nil {
++		t.Fatal("pending projection removed ordinary control")
++	}
++	if err := a.Drain(); err != nil {
++		t.Fatal(err)
++	}
++	if err := a.Do(func() {
++		state, e := g.State()
++		if e != nil || state.Active.RowKey != "" {
++			t.Error("queued old cell changed pending selection", state.Active, e)
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++	gridFrame(t, m)
++	inspection := gridInspection(t, a, g)
++	if err := a.Do(func() { nodes, handlers := accessibilitySnapshot(window.state.root, b); b.update(nodes, handlers) }); err != nil {
++		t.Fatal(err)
++	}
++	completed := gridAXByID(t, gridAXLast(t, b))
++	if completed[scope].GridPending || completed[scope].GridGeneration != inspection.Generation || completed[scope].GridFrame == nil {
++		t.Fatal("completed actual frame did not replace pending publication")
++	}
++	for id := range oldCells {
++		if _, retained := completed[id]; retained || b.handlers[id] != nil {
++			t.Errorf("old range cell %q resurrected after new frame", id)
++		}
++	}
++	// Cache retirement is keyed to the currently traversed scopes, including an
++	// otherwise still-live grid that leaves the visible accessibility tree.
++	b.update([]accessibilityNode{{ID: accessibilityManagedID("button"), Role: "button", Actions: []string{"press"}}}, nil)
++	if len(b.gridPublications) != 0 {
++		t.Fatal("actual scope removal retained completed grid")
++	}
++}
++
++func TestAccessibilityGridPublicationPrivateEditorSameGenerationCoherence(t *testing.T) {
++	m, a, g, _, _ := inlineFixture(t, 120)
++	gridFrame(t, m)
++	binding := gBinding(t, g)
++	if err := a.Do(func() {
++		previous := binding.measurement.Load()
++		if previous == nil || previous.Editor == nil {
++			t.Fatal("no completed editor fixture")
++		}
++		generation := binding.projection.State.Generation
++		for _, tc := range []struct {
++			name   string
++			change func(*GridInspection)
++		}{
++			{"session", func(v *GridInspection) { v.Editor.Session++ }},
++			{"identity", func(v *GridInspection) { v.Editor.ID = "retired-editor" }},
++			{"focus", func(v *GridInspection) { v.Editor.Focused = !v.Editor.Focused }},
++			{"preview", func(v *GridInspection) { v.Editor.Text = "previous preview" }},
++		} {
++			changed := *previous
++			editor := *previous.Editor
++			changed.Editor = &editor
++			tc.change(&changed)
++			binding.measurement.Store(&changed)
++			nodes, _ := accessibilitySnapshot(binding.r, nil)
++			for _, n := range nodes {
++				if !n.GridPending || n.GridGeneration != 0 || n.GridFrame != nil {
++					t.Errorf("%s mixed stale editor metadata into completed scope: %+v", tc.name, n)
++				}
++			}
++			binding.measurement.Store(previous)
++		}
++		binding.editing.visible = false
++		nodes, _ := accessibilitySnapshot(binding.r, nil)
++		for _, n := range nodes {
++			if !n.GridPending {
++				t.Errorf("hidden editor reused visible editor measurement: %+v", n)
++			}
++		}
++		binding.editing.visible = true
++		nodes, _ = accessibilitySnapshot(binding.r, nil)
++		for _, n := range nodes {
++			if n.GridPending || n.GridGeneration != generation {
++				t.Errorf("restored exact editor measurement remained pending: %+v", n)
++			}
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++
++	var completed []accessibilityNode
++	var completedGeneration uint64
++	b := newAccessibilityBridge(a)
++	b.bind("one")
++	t.Cleanup(b.close)
++	if err := a.Do(func() {
++		var handlers map[string]accessibilityHandler
++		completed, handlers = accessibilitySnapshot(binding.r, b)
++		b.update(completed, handlers)
++		completedGeneration = binding.projection.State.Generation
++		edit := gridEditingRecord(binding.r)
++		field := edit.widget.(*core.TextField)
++		if !accessibilityDeliver(b.token, b.generation.Load(), accessibilityManagedID(edit.node.ID), accessibilityAction{Kind: "set", Value: "old admitted value"}) {
++			t.Fatal("old completed editor action was not admitted")
++		}
++		// Use Core's actual field preedit seam. The marked preview is private:
++		// the committed portable draft and generation do not advance yet.
++		if !field.ApplyNativeEdit("preedit", 7, 7, 0, 7, "mark") {
++			t.Fatal("real field rejected marked fixture")
++		}
++		cacheFieldEditingState(edit, field.EditingState())
++		for _, n := range completed {
++			if h := handlers[n.ID]; h != nil && len(n.Actions) > 0 && h(accessibilityAction{Kind: n.Actions[0], Value: "old admitted value"}) {
++				t.Errorf("old %s handler accepted before pending publication", n.Role)
++			}
++		}
++		pending, handlers := accessibilitySnapshot(binding.r, nil)
++		for _, n := range pending {
++			if !n.GridPending {
++				t.Errorf("new private preview published against old frame: %+v", n)
++			}
++		}
++		retained, handlers := b.prepareGridPublication(pending, handlers)
++		gridAXAssertPending(t, retained, accessibilityManagedID("g"), completedGeneration, completedGeneration, handlers)
++		oldEditor := gridAXByID(t, retained)[accessibilityManagedID(edit.node.ID)]
++		if oldEditor.Value != binding.measurement.Load().Editor.Text || oldEditor.Value == "preedit" {
++			t.Error("pending preedit replaced last-completed text")
++		}
++		state, e := g.State()
++		if e != nil || state.Generation != completedGeneration {
++			t.Error("private preedit changed portable generation", state.Generation, e)
++		}
++		_ = a.Invalidate("one")
++	}); err != nil {
++		t.Fatal(err)
++	}
++	// The old callback runs before a new bridge publication. A same-generation
++	// native preview must revoke it through the captured handler's live guard.
++	if err := a.Drain(); err != nil {
++		t.Fatal(err)
++	}
++	if err := a.Do(func() {
++		state, e := g.State()
++		if e != nil || state.Generation != completedGeneration || state.Edit.Text == "old admitted value" {
++			t.Error("queued old editor action changed marked draft before pending publication", state.Edit, e)
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++	gridFrame(t, m)
++	if err := a.Do(func() {
++		measurement := binding.currentMeasurement()
++		if measurement == nil || measurement.Editor == nil || measurement.Editor.Text != "preedit" || measurement.Generation != completedGeneration {
++			t.Fatalf("actual completed preview frame missing: %+v", measurement)
++		}
++		nodes, handlers := accessibilitySnapshot(binding.r, nil)
++		for _, n := range nodes {
++			if n.GridPending || n.GridGeneration != completedGeneration {
++				t.Errorf("completed same-generation preview stayed pending: %+v", n)
++			}
++		}
++		nodes, _ = b.prepareGridPublication(nodes, handlers)
++		if gridAXByID(t, nodes)[accessibilityManagedID(measurement.Editor.ID)].Value != "preedit" {
++			t.Error("new complete frame did not publish actual preview")
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestAccessibilityGridPublicationWithdrawnMeasurementRevokesCapturedHandlers(t *testing.T) {
++	m, a, g, _, _ := inlineFixture(t, 120)
++	gridFrame(t, m)
++	binding := gBinding(t, g)
++	if err := a.Do(func() {
++		measurement := binding.currentMeasurement()
++		if measurement == nil {
++			t.Fatal("fixture has no completed frame")
++		}
++		nodes, handlers := accessibilitySnapshot(binding.r, &accessibilityBridge{})
++		if len(handlers) < 3 {
++			t.Fatal("fixture lacks host, cell, and editor handlers")
++		}
++		_ = a.TakeDirty("one")
++		binding.withdrawMeasurement()
++		if binding.measurement.Load() != nil || !a.TakeDirty("one") {
++			t.Error("withdrawal did not request pending publication")
++		}
++		binding.withdrawMeasurement()
++		if a.TakeDirty("one") {
++			t.Error("already-nil measurement repeatedly invalidated owner")
++		}
++		for _, n := range nodes {
++			if h := handlers[n.ID]; h != nil && len(n.Actions) > 0 && h(accessibilityAction{Kind: n.Actions[0], Value: "obsolete"}) {
++				t.Errorf("withdrawn %s handler accepted before owner publication", n.Role)
++			}
++		}
++		state, e := g.State()
++		if e != nil || state.Generation != measurement.Generation {
++			t.Error("withdrawal/captured handler mutated portable state", state.Generation, e)
++		}
++		// Even a nonnil measurement may describe an already retired native binding.
++		for _, tc := range []struct {
++			name   string
++			change func(*GridInspection)
++		}{
++			{"incarnation", func(v *GridInspection) { v.Incarnation++ }},
++			{"cell incarnation", func(v *GridInspection) { v.CellIncarnation++ }},
++		} {
++			v := *measurement
++			tc.change(&v)
++			binding.measurement.Store(&v)
++			for _, n := range nodes {
++				if h := handlers[n.ID]; h != nil && len(n.Actions) > 0 && h(accessibilityAction{Kind: n.Actions[0], Value: "obsolete"}) {
++					t.Errorf("%s mismatch admitted %s", tc.name, n.Role)
++				}
++			}
++		}
++		binding.measurement.Store(measurement)
++		if e := g.Scroll(0, 23); e != nil {
++			t.Fatal(e)
++		}
++		beforeStale, e := g.State()
++		if e != nil {
++			t.Fatal(e)
++		}
++		func() {
++			originalOnError, originalChange := binding.r.control.onError, binding.r.node.GridChange
++			defer func() {
++				binding.r.control.onError = originalOnError
++				binding.r.node.GridChange = originalChange
++			}()
++			staleErrors, expectedErrors, notifications := 0, 0, 0
++			binding.r.control.onError = func(err error) {
++				staleErrors++
++				if !errors.Is(err, virtual.ErrGridStale) {
++					t.Errorf("captured cell handler reported %v, want ErrGridStale", err)
++				}
++			}
++			binding.r.node.GridChange = func(ui.GridEvent) { notifications++ }
++			for _, n := range nodes {
++				h := handlers[n.ID]
++				if h == nil || len(n.Actions) == 0 {
++					continue
++				}
++				beforeErrors, wantErrors := staleErrors, 0
++				if n.Role == "grid-cell" {
++					wantErrors = 1
++					expectedErrors++
++				}
++				if h(accessibilityAction{Kind: n.Actions[0], Value: "obsolete"}) {
++					t.Errorf("changed owner model admitted old %s before reconciliation", n.Role)
++				}
++				if got := staleErrors - beforeErrors; got != wantErrors {
++					t.Errorf("captured %s handler reported %d errors, want %d", n.Role, got, wantErrors)
++				}
++			}
++			if expectedErrors == 0 || staleErrors != expectedErrors {
++				t.Errorf("captured cell stale errors=%d, advertised handlers=%d", staleErrors, expectedErrors)
++			}
++			afterStale, err := g.State()
++			if err != nil || afterStale.Generation != beforeStale.Generation || afterStale.Active != beforeStale.Active || afterStale.Selection != beforeStale.Selection || notifications != 0 {
++				t.Errorf("stale handlers changed selection or notified: before=%+v after=%+v notifications=%d error=%v", beforeStale, afterStale, notifications, err)
++			}
++		}()
++		_ = a.Invalidate("one")
++	}); err != nil {
++		t.Fatal(err)
++	}
++	gridFrame(t, m)
++}
++
++func TestAccessibilityGridPublicationCaptureWithdrawalPaths(t *testing.T) {
++	g, _ := testNativeGrid(t, 10000)
++	m, a := gridManual(t, manualConfig(t, 7), func() ui.Node { return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: g, Grow: true} })
++	gridFrame(t, m)
++	binding := gBinding(t, g)
++	if err := a.Do(func() {
++		measurement := binding.currentMeasurement()
++		if measurement == nil || len(measurement.Cells) == 0 {
++			t.Fatal("fixture lacks completed cells")
++		}
++		frames, box := binding.frames, binding.host.Geom.ContentBBox
++		viewport := binding.projection.State.Viewport
++		defer func() {
++			binding.frames = frames
++			binding.host.Geom.ContentBBox = box
++			binding.projection.State.Viewport = viewport
++			binding.measurement.Store(measurement)
++		}()
++		_ = a.TakeDirty("one")
++		binding.frames = math.MaxUint64
++		binding.capture()
++		if binding.measurement.Load() != nil || !a.TakeDirty("one") {
++			t.Error("frame exhaustion silently withdrew last completed publication")
++		}
++		binding.capture()
++		if a.TakeDirty("one") {
++			t.Error("frame exhaustion repeated pending invalidation")
++		}
++		binding.frames = frames
++		binding.measurement.Store(measurement)
++		// No new viewport post is generated: native request is already equal to
++		// the measured rectangle, but the accepted projection has not caught up.
++		before := a.Pending().Ordinary
++		binding.projection.State.Viewport.Width--
++		binding.capture()
++		if binding.measurement.Load() != nil || !a.TakeDirty("one") || a.Pending().Ordinary != before {
++			t.Error("no-op viewport request failed to publish pending withdrawal")
++		}
++		binding.capture()
++		if a.TakeDirty("one") {
++			t.Error("viewport mismatch repeatedly invalidated owner")
++		}
++		binding.projection.State.Viewport = viewport
++		binding.measurement.Store(measurement)
++		binding.host.Geom.ContentBBox = image.Rect(0, 0, gridNativeMaxDimension*4, 120)
++		binding.geometryRefused = false
++		binding.capture()
++		if binding.measurement.Load() != nil || !a.TakeDirty("one") {
++			t.Error("refused geometry silently withdrew completed frame")
++		}
++		queued := a.Pending().Ordinary
++		binding.capture()
++		if a.TakeDirty("one") || a.Pending().Ordinary != queued {
++			t.Error("refused geometry repeatedly notified owner/error queue")
++		}
++	}); err != nil {
++		t.Fatal(err)
++	}
++}
+diff --git a/drivers/cogent/accessibility_workbench.go b/drivers/cogent/accessibility_workbench.go
+index 1bbad2b..653f544 100644
+--- a/drivers/cogent/accessibility_workbench.go
++++ b/drivers/cogent/accessibility_workbench.go
+@@ -42,6 +42,9 @@ func namespaceAccessibility(nodes []accessibilityNode, handlers map[string]acces
+ 	for i := range nodes {
+ 		old := nodes[i].ID
+ 		nodes[i].ID = prefix + old
++		if nodes[i].GridScope != "" {
++			nodes[i].GridScope = prefix + nodes[i].GridScope
++		}
+ 		if nodes[i].Parent != "" {
+ 			nodes[i].Parent = prefix + nodes[i].Parent
+ 		}
+@@ -157,7 +160,7 @@ func workbenchAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
+ 				}
+ 				if disabled {
+ 					childNodes[i].Disabled = true
+-					childNodes[i].Actions = nil
++					childNodes[i].Actions = []string{}
+ 					delete(childHandlers, childNodes[i].ID)
+ 				}
+ 			}
+diff --git a/drivers/cogent/grid.go b/drivers/cogent/grid.go
+index 4cbdd88..81e3a05 100644
+--- a/drivers/cogent/grid.go
++++ b/drivers/cogent/grid.go
+@@ -570,7 +570,7 @@ func validGridScale(scale float32) bool {
+ 	return scale > 0 && scale <= gridNativeMaxScale && !math.IsNaN(float64(scale)) && !math.IsInf(float64(scale), 0)
+ }
+ func (g *gridBinding) refuseGeometry() {
+-	g.measurement.Store(nil)
++	g.withdrawMeasurement()
+ 	if !g.geometryRefused {
+ 		g.geometryRefused = true
+ 		postControl(g.r, func() { g.fail(ErrGridBudget) })
+diff --git a/drivers/cogent/grid_accessibility_envelope_darwin_test.go b/drivers/cogent/grid_accessibility_envelope_darwin_test.go
+new file mode 100644
+index 0000000..c456ec0
+--- /dev/null
++++ b/drivers/cogent/grid_accessibility_envelope_darwin_test.go
+@@ -0,0 +1,334 @@
++//go:build darwin && cgo
++
++package cogent
++
++import (
++	"encoding/json"
++	"reflect"
++	"testing"
++)
++
++type axEnvelopeElement struct {
++	ID                     string `json:"id"`
++	ObjectIdentity         uint64 `json:"object_identity"`
++	Live, Enabled, Focused bool
++	PressAllowed           bool   `json:"press_allowed"`
++	GridScope              string `json:"grid_scope"`
++	GridIncarnation        uint64 `json:"grid_incarnation"`
++	GridPending            bool   `json:"grid_pending"`
++	GridTargetGeneration   uint64 `json:"grid_target_generation"`
++	GridGeneration         uint64 `json:"grid_generation"`
++	Frame                  [4]float64
++	Value                  any
++	Admitted               bool
++	SetAllowed             bool `json:"set_allowed"`
++	FocusAllowed           bool `json:"focus_allowed"`
++}
++type axEnvelopeResult struct {
++	Accepted      bool
++	Generation    uint64
++	Elements      []axEnvelopeElement
++	Retired       []axEnvelopeElement
++	PendingGuards []axEnvelopeElement `json:"pending_guards"`
++}
++
++func axEnvelopeNodes(incarnation, target, completed uint64, pending bool, parent, value string) []map[string]any {
++	nodes := []map[string]any{
++		{"id": "grid", "parent": parent, "role": "table", "name": "Grid", "actions": []string{}},
++		{"id": "row", "parent": "grid", "role": "grid-row", "actions": []string{}},
++		{"id": "cell", "parent": "row", "role": "grid-cell", "actions": []string{"press", "focus"}, "focused": true, "value": value},
++	}
++	for i, n := range nodes {
++		n["grid_scope"] = "grid"
++		n["grid_incarnation"] = incarnation
++		n["grid_pending"] = pending
++		n["grid_target_generation"] = target
++		n["grid_generation"] = completed
++		n["grid_frame"] = [4]float64{float64(i * 10), 20, 90, 40}
++		if pending {
++			n["actions"] = []string{}
++			n["disabled"] = true
++			n["focused"] = false
++		}
++	}
++	return nodes
++}
++func axEnvelopeSnapshot(generation uint64, nodes []map[string]any) map[string]any {
++	return map[string]any{"generation": generation, "nodes": nodes}
++}
++func axEnvelopeUpdate(generation uint64, nodes []map[string]any) map[string]any {
++	return map[string]any{"kind": "update", "snapshot": axEnvelopeSnapshot(generation, nodes)}
++}
++func axEnvelopeRun(t *testing.T, steps ...map[string]any) []axEnvelopeResult {
++	t.Helper()
++	payload, err := json.Marshal(steps)
++	if err != nil {
++		t.Fatal(err)
++	}
++	raw := nativeAccessibilityScopedFixture(string(payload))
++	var out []axEnvelopeResult
++	if err := json.Unmarshal([]byte(raw), &out); err != nil {
++		t.Fatalf("native transaction fixture: %v: %q", err, raw)
++	}
++	if len(out) != len(steps) {
++		t.Fatal("lost fixture operations", len(out), len(steps))
++	}
++	return out
++}
++func axEnvelopeFind(t *testing.T, result axEnvelopeResult, id string) axEnvelopeElement {
++	t.Helper()
++	for _, e := range result.Elements {
++		if e.ID == id {
++			return e
++		}
++	}
++	t.Fatal("missing native element", id)
++	return axEnvelopeElement{}
++}
++func TestNativeGridAccessibilityEnvelopeTransactions(t *testing.T) {
++	button := func(value string) map[string]any {
++		return map[string]any{"id": "button", "parent": "", "role": "button", "actions": []string{"press"}, "value": value}
++	}
++	startup := axEnvelopeNodes(1, 1, 0, true, "", "old")[:1]
++	delete(startup[0], "grid_frame")
++	ready := append(axEnvelopeNodes(1, 1, 1, false, "", "A日本"), button("old"))
++	pending := append(axEnvelopeNodes(1, 2, 1, true, "", "A日本"), button("updated"))
++	completed := append(axEnvelopeNodes(1, 2, 2, false, "", "B🙂"), button("updated"))
++	completed[2]["grid_frame"] = [4]float64{120, 140, 90, 40}
++	sameGeneration := append(axEnvelopeNodes(1, 2, 2, true, "", "B🙂"), button("updated"))
++	sameGeneration[2]["grid_frame"] = [4]float64{120, 140, 90, 40}
++	replacement := append(axEnvelopeNodes(2, 1, 1, false, "", "replacement"), button("updated"))
++	moved := append(axEnvelopeNodes(2, 1, 1, false, "parent", "moved"), button("updated"), map[string]any{"id": "parent", "parent": "", "role": "column", "actions": []string{}})
++	readded := append(axEnvelopeNodes(2, 1, 1, false, "", "readded"), button("updated"))
++	ordinary := []map[string]any{{"id": "grid", "parent": "", "role": "button", "actions": []string{"press"}}, button("updated")}
++	results := axEnvelopeRun(t,
++		axEnvelopeUpdate(1, startup), axEnvelopeUpdate(2, ready), axEnvelopeUpdate(3, pending),
++		map[string]any{"kind": "geometry", "bounds": map[string]any{"cell": [4]float64{999, 999, 4, 4}, "grid": [4]float64{999, 999, 4, 4}, "button": [4]float64{7, 8, 9, 10}}},
++		axEnvelopeUpdate(4, completed), axEnvelopeUpdate(5, sameGeneration), axEnvelopeUpdate(6, replacement), axEnvelopeUpdate(7, moved),
++		axEnvelopeUpdate(8, []map[string]any{button("updated")}), axEnvelopeUpdate(9, readded), axEnvelopeUpdate(9, ready), axEnvelopeUpdate(10, ordinary),
++		map[string]any{"kind": "close"}, axEnvelopeUpdate(11, readded),
++	)
++	for _, i := range []int{0, 1, 2, 4, 5, 6, 7, 8, 9, 11} {
++		if !results[i].Accepted {
++			t.Fatal("valid transaction refused", i)
++		}
++	}
++	if results[10].Accepted || results[13].Accepted {
++		t.Fatal("stale/closed native transaction admitted")
++	}
++	start := axEnvelopeFind(t, results[0], "grid")
++	host := axEnvelopeFind(t, results[1], "grid")
++	if start.ObjectIdentity == 0 || start.ObjectIdentity != host.ObjectIdentity || start.Frame != ([4]float64{}) {
++		t.Fatal("startup host lost identity or imported ambient frame", start, host)
++	}
++	cell := axEnvelopeFind(t, results[1], "cell")
++	if cell.Value != "A日本" || !cell.Enabled || !cell.Focused || !cell.PressAllowed {
++		t.Fatal("ready semantics not installed", cell)
++	}
++	for _, i := range []int{2, 3, 5} {
++		e := axEnvelopeFind(t, results[i], "cell")
++		if e.ObjectIdentity != cell.ObjectIdentity || e.Enabled || e.Focused || e.PressAllowed || !e.GridPending {
++			t.Fatal("pending reused element remains actionable", i, e)
++		}
++		for _, guard := range results[i].PendingGuards {
++			if guard.Enabled || guard.Focused || guard.PressAllowed || guard.SetAllowed || guard.FocusAllowed || guard.Admitted {
++				t.Fatal("pending guard trusts presentation flags", guard)
++			}
++		}
++	}
++	if axEnvelopeFind(t, results[3], "cell").Frame != cell.Frame || axEnvelopeFind(t, results[3], "grid").Frame != host.Frame {
++		t.Fatal("unversioned geometry overwrote grid envelope")
++	}
++	b := axEnvelopeFind(t, results[3], "button")
++	if b.Value != "updated" || b.Frame != ([4]float64{7, 8, 9, 10}) {
++		t.Fatal("unrelated control publication stalled", b)
++	}
++	e := axEnvelopeFind(t, results[4], "cell")
++	if e.ObjectIdentity != cell.ObjectIdentity || e.Value != "B🙂" || e.Frame != ([4]float64{120, 140, 90, 40}) || e.GridGeneration != 2 || e.GridTargetGeneration != 2 || e.GridPending || !e.Enabled {
++		t.Fatal("completed semantics/frame not installed together", e)
++	}
++	previous := e.ObjectIdentity
++	for _, i := range []int{6, 7, 9} {
++		e = axEnvelopeFind(t, results[i], "cell")
++		if e.ObjectIdentity <= previous {
++			t.Fatal("replacement/reparent/removal resurrected object", i, e)
++		}
++		previous = e.ObjectIdentity
++	}
++	if !reflect.DeepEqual(results[9].Elements, results[10].Elements) || results[10].Generation != 9 {
++		t.Fatal("stale global generation mutated tree")
++	}
++	if axEnvelopeFind(t, results[11], "grid").ObjectIdentity <= host.ObjectIdentity {
++		t.Fatal("removing scope resurrected its object")
++	}
++	for _, result := range results {
++		for _, old := range result.Retired {
++			if old.Live || old.Enabled || old.Focused || old.PressAllowed || old.Admitted {
++				t.Fatal("retired reference remained actionable", old)
++			}
++		}
++	}
++}
++func TestNativeGridAccessibilityEnvelopeValidationIsAtomic(t *testing.T) {
++	mutations := []struct {
++		name   string
++		mutate func([]map[string]any)
++	}{
++		{"missing host", func(n []map[string]any) { n[0]["id"] = "other" }},
++		{"mixed scope", func(n []map[string]any) { n[2]["grid_scope"] = "other" }},
++		{"mixed incarnation", func(n []map[string]any) { n[2]["grid_incarnation"] = uint64(2) }},
++		{"mixed pending", func(n []map[string]any) { n[2]["grid_pending"] = true }},
++		{"mixed target", func(n []map[string]any) { n[2]["grid_target_generation"] = uint64(2) }},
++		{"mixed completed", func(n []map[string]any) { n[2]["grid_generation"] = uint64(0) }},
++		{"ready no frame", func(n []map[string]any) { delete(n[2], "grid_frame") }},
++		{"negative width", func(n []map[string]any) { n[2]["grid_frame"] = [4]float64{0, 0, -1, 2} }},
++		{"negative height", func(n []map[string]any) { n[2]["grid_frame"] = [4]float64{0, 0, 1, -2} }},
++		{"frame type", func(n []map[string]any) { n[2]["grid_frame"] = []any{0, 0, "1", 2} }},
++		{"frame bool", func(n []map[string]any) { n[2]["grid_frame"] = []any{0, 0, true, 2} }},
++		{"scope type", func(n []map[string]any) { n[2]["grid_scope"] = 3 }},
++		{"zero incarnation", func(n []map[string]any) { n[2]["grid_incarnation"] = 0 }},
++		{"fractional incarnation", func(n []map[string]any) { n[2]["grid_incarnation"] = 1.5 }},
++		{"boolean incarnation", func(n []map[string]any) { n[2]["grid_incarnation"] = true }},
++		{"negative generation", func(n []map[string]any) { n[2]["grid_generation"] = -1 }},
++		{"fractional generation", func(n []map[string]any) { n[2]["grid_generation"] = 0.5 }},
++		{"boolean generation", func(n []map[string]any) { n[2]["grid_generation"] = true }},
++		{"null generation", func(n []map[string]any) { n[2]["grid_generation"] = nil }},
++		{"numeric pending", func(n []map[string]any) { n[2]["grid_pending"] = 0 }},
++		{"string pending", func(n []map[string]any) { n[2]["grid_pending"] = "false" }},
++		{"null pending", func(n []map[string]any) { n[2]["grid_pending"] = nil }},
++		{"unscoped descendant", func(n []map[string]any) {
++			for _, k := range []string{"grid_scope", "grid_incarnation", "grid_pending", "grid_target_generation", "grid_frame"} {
++				delete(n[2], k)
++			}
++		}},
++		{"outside scoped ancestry", func(n []map[string]any) { n[2]["parent"] = "" }},
++		{"pending actions", func(n []map[string]any) {
++			for _, v := range n {
++				v["grid_pending"] = true
++				v["disabled"] = true
++				v["focused"] = false
++			}
++		}},
++		{"pending enabled", func(n []map[string]any) {
++			for _, v := range n {
++				v["grid_pending"] = true
++				v["actions"] = []string{}
++				v["disabled"] = false
++				v["focused"] = false
++			}
++		}},
++		{"pending focused", func(n []map[string]any) {
++			for _, v := range n {
++				v["grid_pending"] = true
++				v["actions"] = []string{}
++				v["disabled"] = true
++				v["focused"] = true
++			}
++		}},
++	}
++	for _, test := range mutations {
++		t.Run(test.name, func(t *testing.T) {
++			valid := axEnvelopeNodes(1, 1, 1, false, "", "accepted")
++			invalid := axEnvelopeNodes(1, 1, 1, false, "", "bad")
++			test.mutate(invalid)
++			r := axEnvelopeRun(t, axEnvelopeUpdate(1, valid), axEnvelopeUpdate(2, invalid))
++			if !r[0].Accepted || r[1].Accepted || r[1].Generation != 1 || !reflect.DeepEqual(r[0].Elements, r[1].Elements) {
++				t.Fatal("malformed envelope partly mutated native tree", r)
++			}
++		})
++	}
++	// Encoding failures cannot install a non-finite frame/global generation.
++	for _, payload := range []string{
++		`{"generation":-1,"nodes":[]}`, `{"generation":true,"nodes":[]}`, `{"generation":1.5,"nodes":[]}`,
++		`{"generation":18446744073709551616,"nodes":[]}`,
++	} {
++		if nativeAccessibilitySnapshotValid(payload) {
++			t.Fatal("invalid global generation admitted", payload)
++		}
++	}
++	good := axEnvelopeNodes(^uint64(0), ^uint64(0), ^uint64(0), false, "", "uint64 exact")
++	r := axEnvelopeRun(t, axEnvelopeUpdate(^uint64(0), good))
++	if !r[0].Accepted || axEnvelopeFind(t, r[0], "cell").GridGeneration != ^uint64(0) {
++		t.Fatal("valid uint64 lost precision", r)
++	}
++}
++func TestNativeGridAccessibilityEnvelopeGeometryCompatibility(t *testing.T) {
++	generic := []map[string]any{{"id": "button", "parent": "", "role": "button", "actions": []string{"press"}, "grid_generation": 7}}
++	ready := axEnvelopeNodes(1, 1, 1, false, "", "ready")
++	r := axEnvelopeRun(t, map[string]any{"kind": "geometry", "bounds": map[string]any{"grid": [4]float64{999, 999, 1, 1}, "button": [4]float64{4, 5, 6, 7}}}, axEnvelopeUpdate(1, generic), axEnvelopeUpdate(2, ready))
++	if !r[1].Accepted || axEnvelopeFind(t, r[1], "button").Frame != ([4]float64{4, 5, 6, 7}) || !r[2].Accepted || axEnvelopeFind(t, r[2], "grid").Frame != ([4]float64{0, 20, 90, 40}) {
++		t.Fatal("generic compatibility or scoped frame ownership changed", r)
++	}
++}
++
++func TestNativeGridAccessibilityEnvelopeProductionEncoding(t *testing.T) {
++	// Use the actual owner publication transformation and accessibilityNode
++	// encoding, rather than explicit false/zero fields in hand-written JSON.
++	b := &accessibilityBridge{}
++	frame := [4]float32{3, 5, 91, 43}
++	group := func(target, completed uint64, pending bool) []accessibilityNode {
++		nodes := []accessibilityNode{
++			{ID: "grid", Role: "table", Actions: []string{}},
++			{ID: "row", Parent: "grid", Role: "grid-row", Actions: []string{}},
++			{ID: "cell", Parent: "row", Role: "grid-cell", Value: "日本🙂", Focused: true, Actions: []string{"press"}},
++		}
++		for i := range nodes {
++			n := &nodes[i]
++			n.GridScope, n.GridIncarnation = "grid", 1
++			n.GridTargetGeneration, n.GridGeneration, n.GridPending = target, completed, pending
++			if !pending {
++				n.GridFrame = &frame
++			}
++		}
++		return nodes
++	}
++	inputs := [][]accessibilityNode{group(1, 0, true), group(1, 1, false), group(2, 0, true)}
++	steps := make([]map[string]any, 0, len(inputs))
++	for i, input := range inputs {
++		nodes, _ := b.prepareGridPublication(input, nil)
++		payload, err := json.Marshal(struct {
++			Generation uint64              `json:"generation"`
++			Nodes      []accessibilityNode `json:"nodes"`
++		}{uint64(i + 1), nodes})
++		if err != nil {
++			t.Fatal(err)
++		}
++		if !nativeAccessibilitySnapshotValid(string(payload)) {
++			t.Fatalf("production encoding refused at stage %d: %s", i, payload)
++		}
++		var snapshot map[string]any
++		if err := json.Unmarshal(payload, &snapshot); err != nil {
++			t.Fatal(err)
++		}
++		encoded := snapshot["nodes"].([]any)
++		for _, value := range encoded {
++			node := value.(map[string]any)
++			if i == 0 {
++				if _, present := node["grid_generation"]; present {
++					t.Fatal("fixture did not exercise omitted startup zero")
++				}
++			}
++			if i == 1 {
++				if _, present := node["grid_pending"]; present {
++					t.Fatal("fixture did not exercise omitted ready false")
++				}
++			}
++		}
++		// Both explicit and omitted representations must compare consistently.
++		if i == 1 {
++			encoded[2].(map[string]any)["grid_pending"] = false
++		}
++		if i == 0 {
++			encoded[0].(map[string]any)["grid_generation"] = 0
++		}
++		steps = append(steps, map[string]any{"kind": "update", "snapshot": snapshot})
++	}
++	r := axEnvelopeRun(t, steps...)
++	if !r[0].Accepted || !r[1].Accepted || !r[2].Accepted || len(r[0].Elements) != 1 {
++		t.Fatal("production startup/ready/pending envelope refused", r)
++	}
++	ready, pending := axEnvelopeFind(t, r[1], "cell"), axEnvelopeFind(t, r[2], "cell")
++	if ready.GridPending || ready.GridGeneration != 1 || ready.Frame != ([4]float64{3, 5, 91, 43}) || !pending.GridPending || pending.GridGeneration != 1 || pending.GridTargetGeneration != 2 || pending.ObjectIdentity != ready.ObjectIdentity || pending.Frame != ready.Frame {
++		t.Fatal("production cached publication metadata/frame drifted", ready, pending)
++	}
++}
+diff --git a/drivers/cogent/grid_accessibility_workbench_envelope_darwin_offscreen_test.go b/drivers/cogent/grid_accessibility_workbench_envelope_darwin_offscreen_test.go
+new file mode 100644
+index 0000000..0eb8777
+--- /dev/null
++++ b/drivers/cogent/grid_accessibility_workbench_envelope_darwin_offscreen_test.go
+@@ -0,0 +1,80 @@
++//go:build darwin && cgo && offscreen
++
++package cogent
++
++import (
++	"encoding/json"
++	"strings"
++	"testing"
++
++	"github.com/dshills/vellum/ui"
++	"github.com/dshills/vellum/workbench"
++)
++
++func TestNativeGridAccessibilityDisabledWorkbenchProductionEncoding(t *testing.T) {
++	g, _ := testNativeGrid(t, 10000)
++	m, a := gridManual(t, manualConfig(t, 7), func() ui.Node {
++		return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: g, Grow: true}
++	})
++	gridFrame(t, m)
++	measured := gridInspection(t, a, g)
++	if len(measured.Cells) == 0 || measured.Generation == 0 {
++		t.Fatal("fixture has no actual completed Grid frame")
++	}
++	layout := workbench.Layout{Version: workbench.Version, Root: &workbench.Group{ID: "group", Tabs: []string{"panel"}, Active: "panel"}}
++	workspace, err := workbench.New(layout, []string{"panel"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	var nodes []accessibilityNode
++	var handlers map[string]accessibilityHandler
++	var payload []byte
++	var marshalErr error
++	if err := a.Do(func() {
++		// Manual intentionally refuses Extension descriptors. Exercise the real
++		// Workbench semantic adapter with an actually rendered managed Grid as
++		// its active panel record, without claiming manual Workbench routing.
++		panel := m.implementation.find("one").state.root
++		w := &Workbench{Owner: a, Window: "one", Workspace: workspace, layoutSnapshot: workspace.Layout().Root,
++			records: map[string]*record{"panel": panel}, Panels: []Panel{{ID: "panel", Title: "Grid panel"}}}
++		root := &record{node: ui.Node{ID: "workbench", Kind: ui.Extension, Custom: w, Disabled: true}}
++		bridge := &accessibilityBridge{owner: a}
++		nodes, handlers = accessibilitySnapshot(root, bridge)
++		nodes, handlers = bridge.prepareGridPublication(nodes, handlers)
++		payload, marshalErr = json.Marshal(struct {
++			Generation uint64              `json:"generation"`
++			Nodes      []accessibilityNode `json:"nodes"`
++		}{1, nodes})
++	}); err != nil {
++		t.Fatal(err)
++	}
++	if marshalErr != nil {
++		t.Fatal(marshalErr)
++	}
++	if len(handlers) != 0 {
++		t.Fatal("disabled Workbench retained action handlers")
++	}
++	prefix := accessibilityWorkbenchNamespace("workbench", "panel")
++	scope := prefix + accessibilityManagedID("g")
++	cells := 0
++	for _, n := range nodes {
++		if !n.Disabled || n.Actions == nil || len(n.Actions) != 0 {
++			t.Fatalf("disabled node did not encode an empty action array: %+v", n)
++		}
++		if n.GridScope == "" {
++			continue
++		}
++		if n.GridScope != scope || !strings.HasPrefix(n.ID, prefix) || n.GridPending || n.GridGeneration != measured.Generation || n.GridTargetGeneration != measured.Generation || n.GridFrame == nil {
++			t.Fatalf("completed namespaced Grid envelope changed: %+v", n)
++		}
++		if n.Role == "grid-cell" {
++			cells++
++		}
++	}
++	if cells == 0 {
++		t.Fatal("actual completed Grid cells missing from Workbench publication")
++	}
++	if !nativeAccessibilitySnapshotValid(string(payload)) {
++		t.Fatalf("production disabled Workbench encoding refused by native validator: %s", payload)
++	}
++}
+diff --git a/drivers/cogent/grid_geometry.go b/drivers/cogent/grid_geometry.go
+index abafd89..7a9b564 100644
+--- a/drivers/cogent/grid_geometry.go
++++ b/drivers/cogent/grid_geometry.go
+@@ -6,6 +6,7 @@ import (
+ 	"encoding/base64"
+ 	"image"
+ 	"math"
++	"reflect"
+ 
+ 	"github.com/dshills/vellum/app"
+ 	"github.com/dshills/vellum/virtual"
+@@ -77,7 +78,7 @@ func (g *gridBinding) capture() {
+ 		return
+ 	}
+ 	if g.frames == math.MaxUint64 {
+-		g.measurement.Store(nil)
++		g.withdrawMeasurement()
+ 		return
+ 	}
+ 	g.frames++
+@@ -95,7 +96,7 @@ func (g *gridBinding) capture() {
+ 	g.requestMu.Unlock()
+ 	s := g.projection.State
+ 	if request.width != s.Viewport.Width || request.height != s.Viewport.Height {
+-		g.measurement.Store(nil)
++		g.withdrawMeasurement()
+ 		return
+ 	}
+ 	previous := g.measurement.Load()
+@@ -126,11 +127,31 @@ func (g *gridBinding) capture() {
+ 		m.Editor = &GridEditorGeometry{ID: edit.node.ID, Session: s.Edit.Session, Text: state.Text, Focused: field.StateIs(states.Focused), Bounds: field.Geom.TotalBBox.Add(offset)}
+ 	}
+ 	g.measurement.Store(m)
+-	if previous == nil || previous.Generation != m.Generation || previous.Bounds != m.Bounds {
++	if !sameGridAccessibilityMeasurement(previous, m) {
+ 		_ = g.owner.Invalidate(g.window)
+ 	}
+ }
+ 
++// Notify once when a completed frame becomes unavailable, even when a viewport
++// request is refused or is a no-op. This revokes its owner/native AX actions.
++func (g *gridBinding) withdrawMeasurement() {
++	if g.measurement.Swap(nil) != nil {
++		_ = g.owner.Invalidate(g.window)
++	}
++}
++
++// Frame ordinals advance on every render. Only changed completed data/geometry
++// need an owner publication; resize, scale and editor movement also matter when
++// the portable grid generation is unchanged.
++func sameGridAccessibilityMeasurement(previous, current *GridInspection) bool {
++	if previous == nil || current == nil {
++		return previous == current
++	}
++	a, b := *previous, *current
++	a.Frames, b.Frames = 0, 0
++	return reflect.DeepEqual(a, b)
++}
++
+ // Current retained geometry is also checked by native hit/AX projection. A
+ // pending layout request cannot reuse a last-frame cell merely because its
+ // portable generation has not changed yet.
+diff --git a/examples/loadedgrid/README.md b/examples/loadedgrid/README.md
+index 5dbbca9..0e073b6 100644
+--- a/examples/loadedgrid/README.md
++++ b/examples/loadedgrid/README.md
+@@ -1,5 +1,12 @@
+ # Loaded stored-data grid
+ 
++The separate `-accessibility-smoke -rows 10000` (optionally `-variable-rows`)
++acceptance mode uses the same stored performance fixture with at least 400 actual
++clipped cells. It queries Cocoa values, indices, screen frames and opaque object
++identity across routed scrolls, replaces the binding under the same node ID and
++exercises a current native cell action. It runs separately from `-perf` and
++`-smoke`; its queries are not latency measurements or screen-reader certification.
++
+ This independent module starts with two usable empty DataGrid windows. **Load records** generates an immutable array of signed numeric records and builds its initial projections on a bounded task worker. The large window uses one million stored records by default; the small window uses the first 10,000 records from the same initial backing array. Each record contains twenty actual `int64` values, generated with seed 7. Subsequent edits produce independent immutable domain revisions for the affected window.
+ 
+ From a prepared checkout, run:
+diff --git a/examples/loadedgrid/accessibility_smoke.go b/examples/loadedgrid/accessibility_smoke.go
+new file mode 100644
+index 0000000..4a29356
+--- /dev/null
++++ b/examples/loadedgrid/accessibility_smoke.go
+@@ -0,0 +1,228 @@
++package main
++
++import (
++	"context"
++	"errors"
++	"fmt"
++	"image/color"
++	"math"
++	"time"
++
++	"github.com/dshills/vellum/drivers/cogent"
++	"github.com/dshills/vellum/ui"
++	"github.com/dshills/vellum/virtual"
++)
++
++// This separate acceptance process queries actual Cocoa objects. Its queries,
++// identity records and waits are excluded from the ordinary performance mode.
++func gridAccessibilityReady(ctx context.Context, p *perfProgram) (cogent.GridInspection, map[string]cogent.AccessibilityElement, error) {
++	for {
++		g, err := p.inspect(ctx)
++		if err != nil {
++			return g, nil, err
++		}
++		s, err := cogent.InspectAccessibility(ctx, "perf")
++		if err == nil && s.Reachable && s.NativeWindow {
++			byDomain := map[string]cogent.AccessibilityElement{}
++			for _, x := range s.Elements {
++				byDomain[x.DomainID] = x
++			}
++			host := byDomain["data"]
++			if host.GridIncarnation == g.Incarnation && host.GridGeneration == g.Generation && !host.GridPending && host.Frame[2] > 0 {
++				if _, err := checkPerfGeometry(g); err != nil {
++					return g, nil, err
++				}
++				scale := float64(g.Bounds.Dx()) / host.Frame[2]
++				visible, actual := 0, 0
++				for _, x := range s.Elements {
++					if x.Role == "AXCell" && x.GridScope == host.ID {
++						actual++
++					}
++				}
++				for _, cell := range g.Cells {
++					if cell.Bounds.Empty() {
++						continue
++					}
++					visible++
++					x, found := byDomain[cell.ID]
++					if !found || x.GridPending || x.GridIncarnation != g.Incarnation || x.GridGeneration != g.Generation || x.GridTargetGeneration != g.Generation || x.GridScope != host.ID || x.ObjectIdentity == 0 || x.Value != cell.Text || x.Name != cell.Text || x.RowIndex != [2]int{cell.Row, 1} || x.ColumnIndex != [2]int{cell.Column, 1} || x.HitTestID != x.ID {
++						return g, nil, fmt.Errorf("grid AX cell semantics/identity mismatch: %s %+v", cell.ID, x)
++					}
++					want := [4]float64{host.Frame[0] + float64(cell.Bounds.Min.X-g.Bounds.Min.X)/scale, host.Frame[1] + float64(g.Bounds.Max.Y-cell.Bounds.Max.Y)/scale, float64(cell.Bounds.Dx()) / scale, float64(cell.Bounds.Dy()) / scale}
++					for i := range want {
++						if math.Abs(want[i]-x.Frame[i]) > .001 {
++							return g, nil, fmt.Errorf("grid AX atomic frame mismatch: %s got%v want%v", cell.ID, x.Frame, want)
++						}
++					}
++				}
++				if actual != visible || visible < perfMinCells || host.RowCount != g.Stamp.Rows || host.ColumnCount != g.Columns {
++					return g, nil, fmt.Errorf("grid AX bounded visible cardinality: native%d measured%d", actual, visible)
++				}
++				return g, byDomain, nil
++			}
++		}
++		select {
++		case <-ctx.Done():
++			return g, nil, fmt.Errorf("grid AX readiness: %w; query%v", ctx.Err(), err)
++		case <-time.After(5 * time.Millisecond):
++		}
++	}
++}
++
++func (p *perfProgram) checkGridAccessibility(ctx context.Context, metrics *cogent.FrameMetrics) error {
++	g, before, err := gridAccessibilityReady(ctx, p)
++	if err != nil {
++		return err
++	}
++	if err := verifyPerfCells(p.source, g); err != nil {
++		return err
++	}
++	reused := 0
++	for i, delta := range [][2]int{{0, 12}, {0, 12}, {96, 0}, {0, -12}, {-96, 0}, {0, -12}} {
++		_, _, err = p.scroll(ctx, metrics, delta[0], delta[1], uint64(i+1))
++		if err != nil {
++			return err
++		}
++		g, after, err := gridAccessibilityReady(ctx, p)
++		if err != nil {
++			return err
++		}
++		if err := verifyPerfCells(p.source, g); err != nil {
++			return err
++		}
++		for id, previous := range before {
++			if previous.Role != "AXCell" {
++				continue
++			}
++			if current, found := after[id]; found {
++				if current.ObjectIdentity != previous.ObjectIdentity {
++					return fmt.Errorf("grid AX recreated overlapping cell %s", id)
++				}
++				reused++
++			}
++		}
++		before = after
++	}
++	if reused < perfMinCells {
++		return fmt.Errorf("grid AX reuse fixture too small: %d", reused)
++	}
++	// Replacing the binding under the same textual Node.ID must create fresh
++	// objects, even for the same domain cell IDs and unchanged source values.
++	oldIncarnation := before["data"].GridIncarnation
++	err = p.owned(func() error {
++		state, err := p.grid.State()
++		if err != nil {
++			return err
++		}
++		p.grid, err = virtual.NewGrid(p.projection, perfColumns(), state.Config, state.Viewport)
++		if err != nil {
++			return err
++		}
++		return p.owner.Invalidate("perf")
++	})
++	if err != nil {
++		return err
++	}
++	g, after, err := gridAccessibilityReady(ctx, p)
++	if err != nil {
++		return err
++	}
++	if g.Incarnation == oldIncarnation {
++		return errors.New("grid AX replacement reused binding incarnation")
++	}
++	replaced := 0
++	for id, old := range before {
++		if old.GridScope == "" {
++			continue
++		}
++		if current, found := after[id]; found {
++			if current.ObjectIdentity == old.ObjectIdentity {
++				return fmt.Errorf("grid AX replacement resurrected native object %s", id)
++			}
++			replaced++
++		}
++	}
++	if replaced < perfMinCells {
++		return fmt.Errorf("grid AX replacement fixture too small: %d", replaced)
++	}
++	var target cogent.AccessibilityElement
++	var targetRow, targetColumn string
++	for _, cell := range g.Cells {
++		if !cell.Bounds.Empty() {
++			target = after[cell.ID]
++			targetRow, targetColumn = cell.RowKey, cell.ColumnID
++			break
++		}
++	}
++	accepted, err := cogent.PerformAccessibilityAction(ctx, "perf", target.ID, "press", "")
++	if err != nil || !accepted {
++		return fmt.Errorf("grid AX current cell press refused: %t %v", accepted, err)
++	}
++	var selected bool
++	for !selected {
++		err = p.owned(func() error {
++			state, e := p.grid.State()
++			selected = state.Active.RowKey == targetRow && state.Active.ColumnID == targetColumn && state.Generation > g.Generation
++			return e
++		})
++		if err != nil {
++			return err
++		}
++		if selected {
++			break
++		}
++		select {
++		case <-ctx.Done():
++			return errors.New("grid AX press did not reach model before deadline")
++		case <-time.After(5 * time.Millisecond):
++		}
++	}
++	_, _, err = gridAccessibilityReady(ctx, p)
++	if err != nil {
++		return err
++	}
++	return perfEmit("grid.accessibility.pass", map[string]any{"rows": g.Stamp.Rows, "visible_minimum": perfMinCells, "overlap_objects_reused": reused, "replacement_objects_retired": replaced, "native_press_admitted": accepted, "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification"})
++}
++
++func runGridAccessibilitySmoke(rows int, variable bool) error {
++	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
++	defer cancel()
++	p, _, err := newPerfProgram(ctx, perfConfig{Rows: rows, Variable: variable, Samples: 120, Warmup: 128})
++	if err != nil {
++		return err
++	}
++	defer p.owner.Close()
++	metrics, err := cogent.NewFrameMetrics(16)
++	if err != nil {
++		return err
++	}
++	failure := make(chan error, 1)
++	driver := cogent.Driver{FrameMetrics: metrics, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 15}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(e error) {
++		select {
++		case failure <- e:
++		default:
++		}
++		cancel()
++	}}
++	result := make(chan error, 1)
++	go func() { result <- p.checkGridAccessibility(ctx, metrics); p.owner.Close() }()
++	native := p.owner.Run(ctx, driver)
++	var checked error
++	select {
++	case checked = <-result:
++	case <-time.After(2 * time.Second):
++		checked = errors.New("grid AX worker did not complete before native closure")
++	}
++	select {
++	case err := <-failure:
++		native = errors.Join(native, err)
++	default:
++	}
++	if result := errors.Join(native, checked); result != nil {
++		return result
++	}
++	if _, err := cogent.InspectAccessibility(context.Background(), "perf"); err == nil {
++		return errors.New("grid AX closed attachment remained queryable")
++	}
++	return perfEmit("grid.accessibility.closed", map[string]any{"attachment_query_refused": true})
++}
+diff --git a/examples/loadedgrid/main.go b/examples/loadedgrid/main.go
+index d71c74c..577cb78 100644
+--- a/examples/loadedgrid/main.go
++++ b/examples/loadedgrid/main.go
+@@ -61,6 +61,7 @@ func main() {
+ 	rows := flag.Int("rows", maxRows, "stored record count (1..1000000); first window shows at most10000")
+ 	variable := flag.Bool("variable-rows", false, "preserve indexed stable-key variable heights through projections")
+ 	smoke := flag.Bool("smoke", false, "bounded Cocoa model-command/settlement smoke, no synthesized desktop input")
++	axSmoke := flag.Bool("accessibility-smoke", false, "separate stored400-cell Cocoa publication/identity/action smoke; no performance qualification")
+ 	perf := flag.Bool("perf", false, "opt-in release-only stored-table native scroll measurements")
+ 	perfSamples := flag.Int("perf-samples", 120, "measured native scroll frames (120..2048)")
+ 	perfWarmup := flag.Int("perf-warmup", 128, "unmeasured closed-trajectory frames (multiple64)")
+@@ -68,6 +69,17 @@ func main() {
+ 	perfProfile := flag.String("perf-cpu-profile", "", "diagnostic process-wide CPU profile to a new file (64MiB cap); excluded from warm qualification")
+ 	perfSources := flag.Bool("perf-source-details", false, "diagnostic nested source costs and image API attempts; excluded from warm qualification")
+ 	flag.Parse()
++	if *axSmoke {
++		if *smoke || *perf || *perfSources || *perfProfile != "" {
++			fmt.Fprintln(os.Stderr, "loadedgrid: accessibility smoke is a separate workflow")
++			os.Exit(1)
++		}
++		if err := runGridAccessibilitySmoke(*rows, *variable); err != nil {
++			fmt.Fprintln(os.Stderr, err)
++			os.Exit(1)
++		}
++		return
++	}
+ 	if err := validatePerfModes(*perf, *smoke, *perfSources, *perfProfile); err != nil {
+ 		fmt.Fprintln(os.Stderr, err)
+ 		os.Exit(1)
+diff --git a/specs/accessibility.md b/specs/accessibility.md
+index 0057910..d1c6c79 100644
+--- a/specs/accessibility.md
++++ b/specs/accessibility.md
+@@ -18,6 +18,57 @@ Tabs publish enabled header choices and the selected page. Closed or dismissed d
+ 
+ Virtual tables and outlines publish a bounded materialized viewport, total/index metadata, stable domain IDs, selection, outline depth/expansion and previous/next page actions. Both table and outline pagers have real native button targets and completed geometry. Accessible page and row actions operate on the owner. Table paging clamps to the last valid viewport and refuses stale viewport counts or model errors. Outline press selects only; independent native expand/collapse actions preserve selection, reread current materialized child/expansion state and refuse leaves, offscreen rows or unadvertised actions. Cocoa uses `setAccessibilityExpanded:` and publishes `isAccessibilityExpanded`. A stale row action never selects a different domain row when a native slot is recycled. Offscreen rows are reached through paging; this implementation does not claim arbitrary offscreen row loading through the system accessibility table API.
+ 
++## Managed grid publication
++
++Each visible managed grid publishes a scope identified by the native attachment,
++namespaced table ID, binding incarnation and table parent. Its ready transaction
++contains the complete bounded semantic subtree and copied pixel frames from one
++matching completed measurement. Every scoped node carries that same incarnation,
++completed generation and target generation. Native validation rejects malformed
++scope ancestry, mixed metadata and invalid frames before changing retained state.
++Ready generation equals target generation; a layout-only transition may be pending
++at the same portable generation. On the JSON wire, absent `grid_pending` means
++false and absent `grid_generation` means zero, matching Go's zero-value omission;
++present values must have their declared Boolean/unsigned integer types.
++`InspectGrid` continues to refuse pending layout.
++
++Owner publication of a new accepted projection replaces its action handlers and
++advances the bridge semantic generation. Delivery guards also refuse model or
++measurement drift before that publication. While its completed frame is pending,
++the bridge retains only the last completed subtree for the same scope, incarnation
++and parent. Those records remain readable with their previous values, selection,
++counts and frames, but are disabled, unfocused and advertise no actions or managed
++text client. Native selectors and request admission also refuse pending records.
++Inspection explicitly reports pending, target/completed generation and incarnation;
++last-completed records never count as current geometry. Initial pending layout
++publishes only a disabled table host. An unchanged pending transaction does not
++advance the global generation; a newer target supersedes it.
++
++Other controls and other grids publish independently during a pending transition.
++Actual scope removal, modal/tab isolation, replacement, namespace or parent change,
++and window closure discard the old completed cache. Native objects are reused only
++for a still-live identifier in the same scope/incarnation/parent; real retirement
++cannot resurrect an object under the same textual ID. The owner cache contains
++copied bounded records, no model pointers or action closures. Completed publication
++restores current handlers and atomically updates native semantics and frames on
++the main queue, reusing overlapping visible objects and retiring departing IDs.
++
++Legacy asynchronous rectangle updates never change managed-grid frames. A changed
++completed measurement, including scale, cell/editor bounds or same-generation
++layout changes, invalidates the owner for a new atomic transaction. Frame ordinals
++alone do not cause another publication. Detailed managed text-range geometry
++retains its independent exact-client/text acceptance contract.
++
++`AccessibilityElement.ObjectIdentity` is an opaque monotonic native identity for
++acceptance inspection, not a pointer or action capability. The separate loaded-grid
++`-accessibility-smoke` workflow uses stored input and at least 400 actually clipped
++cells to check routed scroll reuse, pixel-to-screen frames, domain values/indexes,
++binding replacement and a current native cell action. Its queries and diagnostics
++are excluded from ordinary performance qualification. Fixture/race checks cover
++the deterministic pending interval, stale queued actions, mixed scopes, malformed
++transaction refusal and lifecycle retirement. Human screen-reader certification
++and the existing P6 latency/memory targets remain separate gates.
++
+ ## Geometry and notifications
+ 
+ A managed host publishes bounds after its children render with completed layout; the modal retained host publishes from its own Scene. Geometry publication copies widget state under the originating native render lock and never reenters the application owner or reads domain models. Completed geometry is cached independently of semantic publication so demand-rendered startup can publish bounds before matching native elements exist. A modal Scene shares the originating window render context, which excludes concurrent native reconciliation throughout its render pass. Cocoa converts pixel bounds through the current content view/backing scale/window screen transform, including clipped scrolled bounds. Native hit testing walks retained descendants before their parent and later siblings first, including descendants of zero-frame synthetic containers; equal-frame ties are deterministic. An active modal snapshot already excludes underlying content. Moving a native window keeps screen coordinates current. Value, tree-layout and focused-element notifications are posted after native snapshot publication.
+diff --git a/specs/grid-native.md b/specs/grid-native.md
+index e9389d0..292dc84 100644
+--- a/specs/grid-native.md
++++ b/specs/grid-native.md
+@@ -1,6 +1,14 @@
+ # Managed grid adapter checkpoint
+ 
+ This specification adds `ui.DataGrid` to the portable Grid contract in grid.md.
++
++Grid accessibility now follows the scoped pending/completed publication contract
++in [accessibility.md](accessibility.md#managed-grid-publication). Last-completed
++cells remain readable while current layout is pending; their actions are revoked.
++Current semantics and measured frames publish together, retaining overlapping
++native objects only within the same binding incarnation and parent. Inspection
++exposes pending provenance; this does not change `InspectGrid`'s current-layout
++requirement or qualify the P6 targets.
+ It does not replace the Table/Tree extensions, implement editable cells, qualify
+ P 6 performance targets, or certify Windows/Linux or screen-reader workflows.
+ 
+diff --git a/specs/macos-completion.md b/specs/macos-completion.md
+index edae1ae..a44823e 100644
+--- a/specs/macos-completion.md
++++ b/specs/macos-completion.md
+@@ -14,6 +14,13 @@ measured sustained performance; independently consumable SDK and Mac packaging.
+ The research/prototype plan and detailed subsystem contracts remain authoritative
+ for their acceptance workloads. Historical claims are not current qualification.
+ 
++Managed-grid accessibility now has an explicit per-grid pending/completed
++transaction: stale actions are revoked immediately, last-completed cells remain
++readable, and matching semantics/frames publish atomically with stable native
++identity. Replacement and real removal retire old objects. The separate stored
++400-cell Cocoa acceptance mode and scoped lifecycle/race fixtures qualify this
++behavior. Full-frame latency targets and human screen-reader checks remain open.
++
+ ## Current implementation and remaining work
+ 
+ Application ownership, cancellable tasks, commands, controlled standard controls,
