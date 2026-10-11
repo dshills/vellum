@@ -1,0 +1,95 @@
+{
+  "coverage": {
+    "bytes": 55801,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "chunks": 3,
+    "complete": true,
+    "excluded": [],
+    "files": 13,
+    "llmCalls": 3,
+    "reviewer": [
+      {
+        "model": "claude-sonnet-5-5",
+        "provider": "anthropic"
+      }
+    ],
+    "skipped": [],
+    "tokens": [
+      {
+        "costUSD": 0.131798,
+        "input": 33034,
+        "model": "claude-sonnet-5-5",
+        "output": 6573,
+        "provider": "anthropic"
+      }
+    ],
+    "truncatedBytes": 0,
+    "widenedFiles": 1
+  },
+  "disposition": "Provider finding overlooks existing persistent line21. No source change or repeated provider call warranted; original finding and configured exit1 remain intact.",
+  "finding_id": "86cfa0c35772c81c",
+  "findings": [],
+  "limits": [
+    "Assesses this specific working-directory regression only. Does not claim every check command completed, all toolchain/environment behavior, compile closure or native/performance acceptance.",
+    "No tests, Go/native commands, Git/provider calls, production or report edits performed. Only this own triage artifact written."
+  ],
+  "provider_process": {
+    "exit_code": 1,
+    "path": "/private/tmp/vellum-raster-rows-prism/process.json",
+    "preserved_unchanged": true,
+    "sha256": "68279396cd1b5792014af0d192d22c1b584b44d80f77d7e8ac189f25efb8822f"
+  },
+  "raw_prism_path": "/private/tmp/vellum-raster-rows-prism/prism.json",
+  "raw_prism_sha256": "b7c9cf19221e241276cb2e8b8817743b6bee1d868481815caf15fad369c4f2d2",
+  "reasoning": [
+    {
+      "conclusion": "The script first enters its resolved repository root. Line21 is a top-level cd drivers/cogent, not a subshell, so it changes the working directory of the shell executing line28. The earlier root directory does not remain current at the reported command.",
+      "file": "scripts/check.sh",
+      "lines": [
+        3,
+        4,
+        21,
+        28
+      ]
+    },
+    {
+      "conclusion": "Between the persistent cd and line28 are external go/mkdir calls and comments. They do not change their parent shell working directory. set -e means failed cd aborts before the affected command; the command is not reached in an unintended root fallback.",
+      "file": "scripts/check.sh",
+      "lines": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "conclusion": "The sourced environment helper sets cache and Go environment variables and has no cd. Its mktemp command substitution also cannot change the caller working directory. It executes before the later driver cd.",
+      "file": "drivers/cogent/env.sh"
+    },
+    {
+      "conclusion": "The actual originating driver module requires Cogent Core and replaces both Cogent Core and typesetting with its pinned prepared paths. Running line28 from that module applies the intended replacements.",
+      "file": "drivers/cogent/go.mod",
+      "lines": [
+        6,
+        48,
+        50,
+        51
+      ]
+    }
+  ],
+  "result": "REFUTED_REGRESSION",
+  "routing_probe": {
+    "scope": "Source-based shell flow triage. Root may retain a separate non-Go stub routing observation; no Go/native/routing probe executed by this reviewer.",
+    "status": "NOT_BOUND"
+  },
+  "schema": "vellum.raster-row-tracking-prism-triage.v1",
+  "source_hashes": {
+    "drivers/cogent/env.sh": "8d008bd388bb856ac993bab286ab32fb2d1a02ccceb525097be55f60888491b3",
+    "drivers/cogent/go.mod": "27998a50e1f6b5b7f95e21c1f7ab5ab8672e557ed4438be427bf0aecd4d35fe2",
+    "scripts/check.sh": "c647c9d463cb2138a450fbabd732f783802675d02838554b2a367e6dfd8dd195"
+  },
+  "source_root": "/private/tmp/vellum-large-data"
+}

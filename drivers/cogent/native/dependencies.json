@@ -320,6 +320,17 @@
               "sha256": "fc501328d61b76269f0d54ec55dcae3b269a06cdaf5e1b25aca85fd9dbea2ea9"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/rowtracking",
+          "inputs": "native/patches/rowtracking/original-hashes.json",
+          "outputs": "native/patches/rowtracking/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/rowtracking/0037-renderer-row-tracking.patch",
+              "sha256": "82d3a2cd22746962333a8daf64d656fd61842d9e96636653b70ade2592409965"
+            }
+          ]
         }
       ]
     },

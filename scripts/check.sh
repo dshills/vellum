@@ -24,6 +24,8 @@ go vet ./...
 mkdir -p build
 go build -o build/vellum-workbench ./cmd/workbench
 # Replacement dependency tests do not run transitively with driver tests.
+# Use the driver module so both pinned replacement modules are applied.
+go test -race -tags offscreen cogentcore.org/core/paint/renderers/rasterx/scan cogentcore.org/core/paint/renderers/rasterx
 (cd build/upstream && go test -race ./system ./system/driver/base ./system/driver/desktop ./system/composer ./gpu ./gpu/gpudraw ./core ./xyz/xyzcore -run 'TestVellumSourceTiming|TestVellumFrameTrace|TestVellumMeasuredComposition|TestVellumReviewTextCursor|TestComposerPublicationAndWithdrawal|TestLockRechecksAfterWaitingForNativeTeardown|TestSceneShowUsesOwnWindowTitle|TestQueuedCloseStopsLoopAfterComposerWithdrawal|TestNewWindowSizingOwnsContextDuringOtherWindowResize|TestSameWindowStageSizingUsesExistingContext|TestScreenSnapshotDuringCacheRebuild|TestWindowOptionsFixupUsesScreenSnapshot|TestMainQueuePublicationDuringStartupDispatch|TestMainQueueInitializationPreservesIdentityAndCompletion|TestMainThreadRequiredCallbackWaitsForLoopPublication|TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW|TestDeviceLoss|TestSurfaceAcquisition|TestRetiredDirectRenderSource|TestComposition|TestInlineComposition|TestIdleBarrier|TestVellumScreenPoll|TestVellumScreenAccessors|TestVellumCurrentWindowSnapshot|TestVellumRedraw|TestVellumComposer|TestVellumUnsafeResizeReplay|TestVellumRenderedGeometryScrollAndWrap|TestVellumFocuslessShortcutPhases|TestVellumMainQueueStop|TestVellumMainQueueFailure|TestVellumNativeEventLifecycle|TestVellumTerminalMainRecovery|TestVellumQuitClean|TestVellumTextureCopy|TestVellumWindowList')
 
 "$VELLUM_REPO_ROOT/scripts/check-example.sh"

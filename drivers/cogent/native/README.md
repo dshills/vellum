@@ -117,3 +117,9 @@ intervals never add to UI-work totals. GPU counters report cache hits and API
 attempts with checked logical RGBA input bytes, while upload success/failure
 remains unavailable. See [the patch contract](patches/sourcecost/README.md) and
 [the measurement specification](../../../specs/grid-performance.md).
+
+Stage 37 enables bounding-row scans for exclusively owned native raster and
+private glyph-mask scanners. General scanner construction retains full-row and
+direct-cell behavior. Exact span/lifecycle differentials and independent
+baseline oracles accompany the pinned patch. See
+[row tracking](patches/rowtracking/README.md).

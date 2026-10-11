@@ -1,0 +1,880 @@
+--- a/paint/renderers/rasterx/scan/scan.go
++++ b/paint/renderers/rasterx/scan/scan.go
+@@ -58,6 +58,11 @@
+ 	// Linked list of cells, one per row.
+ 	CellIndex []int
+ 
++	// Row tracking is opt-in for renderers that exclusively own accumulation.
++	// The default scanner continues to honor direct Cell/CellIndex writes.
++	trackRows            bool
++	firstCellY, endCellY int
++
+ 	// The spanner that we use.
+ 	Spanner Spanner
+ 
+@@ -130,6 +135,14 @@
+ 			return i
+ 		}
+ 		i, prev = s.Cell[i].Next, i
++	}
++	if s.trackRows {
++		if s.endCellY == 0 {
++			s.firstCellY, s.endCellY = yi, yi+1
++		} else {
++			s.firstCellY = min(s.firstCellY, yi)
++			s.endCellY = max(s.endCellY, yi+1)
++		}
+ 	}
+ 	c := len(s.Cell)
+ 	s.Cell = append(s.Cell, Cell{xi, 0, 0, i})
+@@ -397,6 +410,12 @@
+ 		b = b.Intersect(s.Clip)
+ 	}
+ 	s.SaveCell()
++	// Flush the last pending row before deriving the bounds. Clipping does
++	// not constrain accumulation or the rows that Clear must reset.
++	if s.trackRows {
++		b.Min.Y = max(b.Min.Y, s.firstCellY)
++		b.Max.Y = min(b.Max.Y, s.endCellY)
++	}
+ 	span := s.Spanner.GetSpanFunc()
+ 	for yi := b.Min.Y; yi < b.Max.Y; yi++ {
+ 		xi, cover := 0, 0
+@@ -450,9 +469,14 @@
+ 	s.Area = 0
+ 	s.Cover = 0
+ 	s.Cell = s.Cell[:0]
+-	for i := 0; i < len(s.CellIndex); i++ {
++	first, end := 0, len(s.CellIndex)
++	if s.trackRows {
++		first, end = s.firstCellY, s.endCellY
++	}
++	for i := first; i < end; i++ {
+ 		s.CellIndex[i] = -1
+ 	}
++	s.firstCellY, s.endCellY = 0, 0
+ 	const mxfi = fixed.Int26_6(math.MaxInt32)
+ 	s.MinX, s.MinY, s.MaxX, s.MaxY = mxfi, mxfi, -mxfi, -mxfi
+ }
+@@ -474,6 +498,11 @@
+ 	// Make sure length of cellIndex = height
+ 	s.CellIndex = s.CellIndex[0:height]
+ 	s.Width = width
++	// Resize may expose zero-initialized or previously truncated row heads.
++	// Initialize the complete current range before resuming local clears.
++	if s.trackRows {
++		s.firstCellY, s.endCellY = 0, len(s.CellIndex)
++	}
+ 	s.Clear()
+ }
+ 
+@@ -484,6 +513,17 @@
+ 	return
+ }
+ 
++// NewScannerWithRowTracking creates a scanner for an exclusively owned
++// renderer. Draw and Clear visit the bounding range of rows allocated by
++// scanner methods.
++// Callers must not modify Cell or CellIndex directly; use NewScanner when
++// directly supplying accumulated cells. SetBounds always initializes all rows.
++func NewScannerWithRowTracking(xs Spanner, width, height int) *Scanner {
++	sc := &Scanner{Spanner: xs, UseNonZeroWinding: true, trackRows: true}
++	sc.SetBounds(width, height)
++	return sc
++}
++
+ // SetClip will not affect accumulation of scans, but it will
+ // clip drawing of the spans int the Draw func by the clip rectangle.
+ func (s *Scanner) SetClip(r image.Rectangle) {
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -56,7 +56,7 @@
+ 	psz := size.ToPointCeil()
+ 	rs.image = image.NewRGBA(image.Rectangle{Max: psz})
+ 	rs.ImgSpanner = scan.NewImgSpanner(rs.image)
+-	rs.Scanner = scan.NewScanner(rs.ImgSpanner, psz.X, psz.Y)
++	rs.Scanner = scan.NewScannerWithRowTracking(rs.ImgSpanner, psz.X, psz.Y)
+ 	rs.Raster = NewDasher(psz.X, psz.Y, rs.Scanner)
+ }
+ 
+--- a/paint/renderers/rasterx/glyphcache.go
++++ b/paint/renderers/rasterx/glyphcache.go
+@@ -75,7 +75,7 @@
+ 	sz := fc.maxSize
+ 	fc.image = image.NewRGBA(image.Rectangle{Max: sz})
+ 	fc.imgSpanner = scan.NewImgSpanner(fc.image)
+-	fc.scanner = scan.NewScanner(fc.imgSpanner, sz.X, sz.Y)
++	fc.scanner = scan.NewScannerWithRowTracking(fc.imgSpanner, sz.X, sz.Y)
+ 	fc.filler = NewFiller(sz.X, sz.Y, fc.scanner)
+ 	fc.filler.SetWinding(true)
+ 	fc.filler.SetColor(colors.Uniform(color.Black))
+--- /dev/null
++++ b/paint/renderers/rasterx/scan/touched_rows_vellum_test.go
+@@ -0,0 +1,496 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++//
++// The test harness is MIT. The independently copied full-row oracle below
++// retains the baseline scan.go algorithm's attribution: Copyright (c) 2023
++// Cogent Core (BSD-style LICENSE), Copyright 2018 scanx Authors (S.R.Wiley),
++// and Copyright 2010 Freetype-Go Authors (FreeType License or GPLv2+).
++
++package scan
++
++import (
++	"fmt"
++	"image"
++	"math"
++	"math/rand"
++	"reflect"
++	"testing"
++
++	"golang.org/x/image/math/fixed"
++)
++
++// The oracle copies Draw, Clear, SetBounds and AreaToAlpha from the original
++// full-row scan.go SHA256 3fff7c692cbb2847cc28703af39f1abe8911eac62a19dac25442d08cfac274c2.
++// Path accumulation still uses the actual Scanner Start/Line/Scan/FindCell.
++// This differential isolates row traversal/reset and initialization; it does
++// not independently qualify the unchanged curve algorithm or image compositor.
++// In particular, the oracle NEVER calls Scanner.Draw/Clear/SetBounds or reads
++// its private row-tracking fields.
++type vellumFullRowOracle struct{ *Scanner }
++
++func (o *vellumFullRowOracle) Draw() {
++	s := o.Scanner
++	b := image.Rect(0, 0, s.Width, len(s.CellIndex))
++	if s.Clip.Dx() != 0 && s.Clip.Dy() != 0 {
++		b = b.Intersect(s.Clip)
++	}
++	s.SaveCell()
++	span := s.Spanner.GetSpanFunc()
++	for yi := b.Min.Y; yi < b.Max.Y; yi++ {
++		xi, cover := 0, 0
++		for c := s.CellIndex[yi]; c != -1; c = s.Cell[c].Next {
++			if cover != 0 && s.Cell[c].Xi > xi {
++				alpha := vellumFullRowAlpha(cover*64*2, s.UseNonZeroWinding)
++				if alpha != 0 {
++					xi0, xi1 := xi, s.Cell[c].Xi
++					if xi0 < b.Min.X {
++						xi0 = b.Min.X
++					}
++					if xi1 > b.Max.X {
++						xi1 = b.Max.X
++					}
++					if xi0 < xi1 {
++						span(yi, xi0, xi1, alpha)
++					}
++				}
++			}
++			cover += s.Cell[c].Cover
++			alpha := vellumFullRowAlpha(cover*64*2-s.Cell[c].Area, s.UseNonZeroWinding)
++			xi = s.Cell[c].Xi + 1
++			if alpha != 0 {
++				xi0, xi1 := s.Cell[c].Xi, xi
++				if xi0 < b.Min.X {
++					xi0 = b.Min.X
++				}
++				if xi1 > b.Max.X {
++					xi1 = b.Max.X
++				}
++				if xi0 < xi1 {
++					span(yi, xi0, xi1, alpha)
++				}
++			}
++		}
++	}
++}
++
++func vellumFullRowAlpha(area int, nonZero bool) uint32 {
++	a := (area + 1) >> 1
++	if a < 0 {
++		a = -a
++	}
++	alpha := uint32(a)
++	if nonZero {
++		if alpha > 0x0fff {
++			alpha = 0x0fff
++		}
++	} else {
++		alpha &= 0x1fff
++		if alpha > 0x1000 {
++			alpha = 0x2000 - alpha
++		} else if alpha == 0x1000 {
++			alpha = 0x0fff
++		}
++	}
++	return alpha<<4 | alpha>>8
++}
++
++func (o *vellumFullRowOracle) Clear() {
++	s := o.Scanner
++	s.A = fixed.Point26_6{}
++	s.Xi, s.Yi, s.Area, s.Cover = 0, 0, 0, 0
++	s.Cell = s.Cell[:0]
++	for i := 0; i < len(s.CellIndex); i++ {
++		s.CellIndex[i] = -1
++	}
++	const mxfi = fixed.Int26_6(math.MaxInt32)
++	s.MinX, s.MinY, s.MaxX, s.MaxY = mxfi, mxfi, -mxfi, -mxfi
++}
++
++func (o *vellumFullRowOracle) SetBounds(width, height int) {
++	s := o.Scanner
++	if width < 0 {
++		width = 0
++	}
++	if height < 0 {
++		height = 0
++	}
++	s.Width = width
++	s.Cell = s.Cell[:0]
++	if height > cap(s.CellIndex) {
++		s.CellIndex = make([]int, height)
++	}
++	s.CellIndex = s.CellIndex[:height]
++	s.Width = width
++	o.Clear()
++}
++
++type vellumCapturedSpan struct {
++	Y, X0, X1 int
++	Alpha     uint32
++}
++
++type vellumSpanCollector struct {
++	spans []vellumCapturedSpan
++	fn    SpanFunc
++}
++
++func vellumNewCollector() *vellumSpanCollector {
++	c := &vellumSpanCollector{}
++	c.fn = func(y, x0, x1 int, alpha uint32) {
++		c.spans = append(c.spans, vellumCapturedSpan{y, x0, x1, alpha})
++	}
++	return c
++}
++func (*vellumSpanCollector) SetColor(image.Image)    {}
++func (c *vellumSpanCollector) GetSpanFunc() SpanFunc { return c.fn }
++
++type vellumScannerPath interface {
++	Start(fixed.Point26_6)
++	Line(fixed.Point26_6)
++	SetClip(image.Rectangle)
++	SetWinding(bool)
++	Clear()
++	SetBounds(int, int)
++	Draw()
++}
++
++type vellumScannerPair struct {
++	tracked   *Scanner
++	original  *vellumFullRowOracle
++	got, want *vellumSpanCollector
++}
++
++func vellumNewScannerPair(width, height int) vellumScannerPair {
++	got, want := vellumNewCollector(), vellumNewCollector()
++	return vellumScannerPair{
++		tracked:  NewScannerWithRowTracking(got, width, height),
++		original: &vellumFullRowOracle{NewScanner(want, width, height)},
++		got:      got, want: want,
++	}
++}
++
++func (p vellumScannerPair) both(fn func(vellumScannerPath)) {
++	fn(p.tracked)
++	fn(p.original)
++}
++
++func (p vellumScannerPair) draw(t *testing.T) []vellumCapturedSpan {
++	t.Helper()
++	p.got.spans, p.want.spans = p.got.spans[:0], p.want.spans[:0]
++	p.tracked.Draw()
++	p.original.Draw()
++	if !reflect.DeepEqual(p.got.spans, p.want.spans) {
++		t.Fatalf("span stream differs:\ntracked %v\nfull-row %v", p.got.spans, p.want.spans)
++	}
++	vellumCompareSavedState(t, p.tracked, p.original.Scanner)
++	for i, span := range p.got.spans {
++		if span.Y < 0 || span.Y >= len(p.tracked.CellIndex) || span.X0 < 0 || span.X0 >= span.X1 || span.X1 > p.tracked.Width || span.Alpha == 0 || span.Alpha > 0xffff {
++			t.Fatalf("invalid actual span %d: %+v", i, span)
++		}
++		if i > 0 {
++			prev := p.got.spans[i-1]
++			if span.Y < prev.Y || span.Y == prev.Y && span.X0 < prev.X1 {
++				t.Fatalf("unordered/overlapping spans %d: %+v followed by %+v", i, prev, span)
++			}
++		}
++	}
++	return append([]vellumCapturedSpan(nil), p.got.spans...)
++}
++
++func vellumCompareSavedState(t *testing.T, got, want *Scanner) {
++	t.Helper()
++	if !reflect.DeepEqual(got.Cell, want.Cell) || !reflect.DeepEqual(got.CellIndex, want.CellIndex) {
++		t.Fatalf("saved cells differ:\ntracked Cell=%v Index=%v\nfull-row Cell=%v Index=%v", got.Cell, got.CellIndex, want.Cell, want.CellIndex)
++	}
++	if got.Width != want.Width || got.A != want.A || got.Xi != want.Xi || got.Yi != want.Yi || got.Area != want.Area || got.Cover != want.Cover || got.Clip != want.Clip || got.GetPathExtent() != want.GetPathExtent() {
++		t.Fatalf("scanner public state differs: tracked %+v, full-row %+v", got, want)
++	}
++}
++
++func vellumContour(s vellumScannerPath, points ...fixed.Point26_6) {
++	s.Start(points[0])
++	for _, p := range points[1:] {
++		s.Line(p)
++	}
++	s.Line(points[0])
++}
++
++func vellumRectangle(s vellumScannerPath, x0, y0, x1, y1 int) {
++	vellumContour(s, fixed.P(x0, y0), fixed.P(x1, y0), fixed.P(x1, y1), fixed.P(x0, y1))
++}
++
++func TestVellumRowTrackingDifferential(t *testing.T) {
++	shapes := []struct {
++		name string
++		draw func(vellumScannerPath)
++	}{
++		{"empty", func(vellumScannerPath) {}},
++		{"integer-small", func(s vellumScannerPath) { vellumRectangle(s, 3, 7, 19, 16) }},
++		{"fractional-diagonal", func(s vellumScannerPath) {
++			vellumContour(s, fixed.Point26_6{X: 91, Y: 217}, fixed.Point26_6{X: 2117, Y: 1301}, fixed.Point26_6{X: 331, Y: 2329})
++		}},
++		{"negative-crossing", func(s vellumScannerPath) { vellumRectangle(s, -17, -8, 25, 23) }},
++		{"entirely-offscreen", func(s vellumScannerPath) { vellumRectangle(s, -23, -19, -7, -2) }},
++		{"right-and-bottom", func(s vellumScannerPath) { vellumRectangle(s, 29, 51, 71, 99) }},
++		{"disjoint-rows", func(s vellumScannerPath) {
++			vellumRectangle(s, 2, 1, 15, 4)
++			vellumRectangle(s, 21, 58, 38, 63)
++		}},
++		{"self-intersection", func(s vellumScannerPath) {
++			vellumContour(s, fixed.P(2, 2), fixed.P(31, 39), fixed.P(2, 39), fixed.P(31, 2))
++		}},
++	}
++	clips := []image.Rectangle{
++		{}, image.Rect(4, 5, 29, 37), image.Rect(-9, 11, 12, 73),
++		image.Rect(100, 100, 130, 150), image.Rect(-30, -20, -1, -1),
++		image.Rect(8, 3, 8, 11), // Baseline zero-width clip means no additional clip.
++	}
++	for _, height := range []int{0, 8, 64, 1152} {
++		for _, nonZero := range []bool{false, true} {
++			for i, clip := range clips {
++				for _, shape := range shapes {
++					t.Run(fmt.Sprintf("h%d/nonzero%t/clip%d/%s", height, nonZero, i, shape.name), func(t *testing.T) {
++						p := vellumNewScannerPair(40, height)
++						p.both(func(s vellumScannerPath) { s.SetWinding(nonZero); s.SetClip(clip); shape.draw(s) })
++						first := p.draw(t)
++						if again := p.draw(t); !reflect.DeepEqual(first, again) {
++							t.Fatalf("repeated Draw changed the span stream: %v versus %v", first, again)
++						}
++						p.both(func(s vellumScannerPath) { s.Clear() })
++						if spans := p.draw(t); len(spans) != 0 {
++							t.Fatalf("Clear retained spans: %v", spans)
++						}
++					})
++				}
++			}
++		}
++	}
++}
++
++func TestVellumRowTrackingSeededContours(t *testing.T) {
++	r := rand.New(rand.NewSource(61427))
++	p := vellumNewScannerPair(64, 8192)
++	for round := 0; round < 96; round++ {
++		nonZero := round%2 == 0
++		points := make([]fixed.Point26_6, 3+r.Intn(6))
++		row := r.Intn(8208) - 8
++		for i := range points {
++			points[i] = fixed.Point26_6{X: fixed.Int26_6(r.Intn(6144) - 1024), Y: fixed.Int26_6(row*64 + r.Intn(1024) - 512)}
++		}
++		p.both(func(s vellumScannerPath) {
++			s.Clear()
++			s.SetWinding(nonZero)
++			s.SetClip(image.Rect(-3, round%32, 53, 8180))
++			vellumContour(s, points...)
++		})
++		p.draw(t)
++	}
++}
++
++func TestVellumRowTrackingPendingFinalCell(t *testing.T) {
++	p := vellumNewScannerPair(32, 1152)
++	for _, s := range []*Scanner{p.tracked, p.original.Scanner} {
++		s.SetCell(9, 1109)
++		s.Scan(1109, 9*64+13, 0, 9*64+13, 47)
++		if len(s.Cell) != 0 || s.Area == 0 || s.Cover == 0 {
++			t.Fatalf("fixture must have only an unsaved final cell: %+v", s)
++		}
++	}
++	spans := p.draw(t)
++	if len(spans) != 1 || spans[0].Y != 1109 || spans[0].X0 != 9 || spans[0].X1 != 10 {
++		t.Fatalf("Draw omitted/changed final pending cell: %v", spans)
++	}
++	if len(p.tracked.Cell) != 1 || p.tracked.Area != 0 || p.tracked.Cover != 0 {
++		t.Fatal("Draw did not save and consume the final cell")
++	}
++	p.both(func(s vellumScannerPath) { s.Clear() })
++	if got := p.draw(t); len(got) != 0 {
++		t.Fatalf("cleared final-cell row survived: %v", got)
++	}
++}
++
++func TestVellumRowTrackingClipWidenAndReverseInsertion(t *testing.T) {
++	p := vellumNewScannerPair(32, 1152)
++	p.both(func(s vellumScannerPath) {
++		// Allocate the high range first, then extend the interval downward.
++		vellumRectangle(s, 18, 1000, 29, 1006)
++		vellumRectangle(s, 3, 2, 13, 7)
++		s.SetClip(image.Rect(0, 0, 32, 10))
++	})
++	narrow := p.draw(t)
++	if len(narrow) == 0 {
++		t.Fatal("narrow clip must retain the visible low contour")
++	}
++	for _, span := range narrow {
++		if span.Y >= 10 {
++			t.Fatal("narrow clip exposed a hidden contour")
++		}
++	}
++	p.both(func(s vellumScannerPath) { s.SetClip(image.Rectangle{}) })
++	wide := p.draw(t)
++	if len(wide) <= len(narrow) || wide[len(wide)-1].Y < 1000 {
++		t.Fatal("widening clip lost previously accumulated hidden rows")
++	}
++	// Clear while that high contour is clipped out; it must still retire its
++	// saved links before the same backing rows are exposed by a later clip.
++	p.both(func(s vellumScannerPath) {
++		s.SetClip(image.Rect(0, 0, 32, 10))
++		s.Clear()
++		s.SetClip(image.Rectangle{})
++	})
++	if spans := p.draw(t); len(spans) != 0 {
++		t.Fatalf("Clear missed clip-hidden saved rows: %v", spans)
++	}
++}
++
++func TestVellumRowTrackingFindCellAndWinding(t *testing.T) {
++	p := vellumNewScannerPair(24, 64)
++	for _, s := range []*Scanner{p.tracked, p.original.Scanner} {
++		s.Xi, s.Yi = -100, 31
++		first := s.FindCell()
++		if first < 0 || s.FindCell() != first || len(s.Cell) != 1 || s.Cell[first].Xi != -1 {
++			t.Fatal("duplicate negative-X FindCell must reuse the same saved cell")
++		}
++		s.Xi = 100
++		if next := s.FindCell(); next == first || len(s.Cell) != 2 || s.Cell[next].Xi != s.Width {
++			t.Fatal("right-offscreen cell must clamp to Width")
++		}
++		for _, row := range []int{-1, 64} {
++			s.Yi = row
++			if s.FindCell() != -1 || len(s.Cell) != 2 {
++				t.Fatal("offscreen FindCell altered stored cells")
++			}
++		}
++	}
++	p.draw(t)
++	p.both(func(s vellumScannerPath) { s.Clear() })
++	vellumCompareSavedState(t, p.tracked, p.original.Scanner)
++	for _, index := range p.tracked.CellIndex {
++		if index != -1 {
++			t.Fatal("Clear did not retire a FindCell row with zero accumulated coverage")
++		}
++	}
++	var nonZero []vellumCapturedSpan
++	for _, winding := range []bool{true, false} {
++		p.both(func(s vellumScannerPath) {
++			s.Clear()
++			s.SetWinding(winding)
++			vellumRectangle(s, 4, 8, 17, 13)
++			vellumRectangle(s, 4, 8, 17, 13)
++		})
++		spans := p.draw(t)
++		if winding {
++			nonZero = spans
++		} else if len(spans) != 0 {
++			t.Fatalf("even-odd duplicate rectangle did not cancel: %v", spans)
++		}
++	}
++	if len(nonZero) == 0 {
++		t.Fatal("nonzero duplicate rectangle fixture did not render")
++	}
++}
++
++func TestVellumRowTrackingBoundsReuse(t *testing.T) {
++	p := vellumNewScannerPair(32, 1152)
++	p.both(func(s vellumScannerPath) { vellumRectangle(s, 3, 1100, 21, 1110) })
++	if len(p.draw(t)) == 0 {
++		t.Fatal("high-row fixture is empty")
++	}
++	capacity := cap(p.tracked.CellIndex)
++	// Shrink while old cells still exist; regrow into exactly the same backing
++	// capacity. Initializing only a new touched interval would retain old links.
++	for _, bounds := range []image.Point{
++		image.Pt(32, 8), image.Pt(32, 1152), image.Pt(0, 0),
++		image.Pt(-7, -3), image.Pt(0, 64), image.Pt(32, 1152), image.Pt(40, 8192),
++	} {
++		p.both(func(s vellumScannerPath) { s.SetBounds(bounds.X, bounds.Y) })
++		vellumCompareSavedState(t, p.tracked, p.original.Scanner)
++		for y, index := range p.tracked.CellIndex {
++			if index != -1 {
++				t.Fatalf("SetBounds(%v) retained/zero-initialized link at row%d: %d", bounds, y, index)
++			}
++		}
++		if got := p.draw(t); len(got) != 0 {
++			t.Fatalf("SetBounds(%v) retained spans: %v", bounds, got)
++		}
++		if bounds == image.Pt(32, 1152) && cap(p.tracked.CellIndex) != capacity {
++			t.Fatal("fixture unexpectedly reallocated rather than regrowing retained capacity")
++		}
++		p.both(func(s vellumScannerPath) { vellumRectangle(s, 2, 1, 7, 5) })
++		p.draw(t)
++	}
++	if cap(p.tracked.CellIndex) <= capacity {
++		t.Fatal("large SetBounds did not exercise reallocation")
++	}
++	// Clear must also discard unflushed area/coverage, not save it into a new path.
++	for _, s := range []*Scanner{p.tracked, p.original.Scanner} {
++		s.SetCell(7, 8180)
++		s.Scan(8180, 7*64+11, 0, 7*64+11, 29)
++	}
++	p.both(func(s vellumScannerPath) { s.Clear() })
++	if got := p.draw(t); len(got) != 0 {
++		t.Fatalf("Clear preserved pending old area/coverage: %v", got)
++	}
++}
++
++func TestVellumRowTrackingDefaultDirectMutation(t *testing.T) {
++	got, want := vellumNewCollector(), vellumNewCollector()
++	actual := NewScanner(got, 24, 1152)
++	original := &vellumFullRowOracle{NewScanner(want, 24, 1152)}
++	for _, s := range []*Scanner{actual, original.Scanner} {
++		s.Cell = []Cell{{Xi: 4, Cover: 64, Next: 1}, {Xi: 17, Cover: -64, Next: -1}}
++		s.CellIndex[1107] = 0 // Exported slices can be populated without FindCell.
++	}
++	actual.Draw()
++	original.Draw()
++	if len(got.spans) == 0 || !reflect.DeepEqual(got.spans, want.spans) {
++		t.Fatalf("ordinary constructor narrowed direct mutation behavior: %v vs %v", got.spans, want.spans)
++	}
++	actual.Clear()
++	original.Clear()
++	vellumCompareSavedState(t, actual, original.Scanner)
++	got.spans, want.spans = nil, nil
++	actual.Draw()
++	original.Draw()
++	if len(got.spans) != 0 || len(want.spans) != 0 {
++		t.Fatal("ordinary constructor Clear left a directly installed row")
++	}
++}
++
++var vellumTouchedRowsBenchmarkSink uint64
++
++func BenchmarkVellumRowTrackingSmallShape(b *testing.B) {
++	for _, height := range []int{64, 1152, 8192} {
++		for _, tracked := range []bool{true, false} {
++			name := "full-row-reference"
++			if tracked {
++				name = "tracked"
++			}
++			b.Run(fmt.Sprintf("height%d/%s", height, name), func(b *testing.B) {
++				var checksum uint64
++				spanner := &vellumSpanCollector{fn: func(y, x0, x1 int, alpha uint32) {
++					checksum += uint64(y) + uint64(x0) + uint64(x1) + uint64(alpha)
++				}}
++				var s vellumScannerPath
++				if tracked {
++					s = NewScannerWithRowTracking(spanner, 64, height)
++				} else {
++					s = &vellumFullRowOracle{NewScanner(spanner, 64, height)}
++				}
++				// Warm saved-cell capacity outside measurement. Same tiny shape,
++				// same span consumer, no image allocation at any surface height.
++				vellumRectangle(s, 5, 7, 21, 16)
++				s.Draw()
++				s.Clear()
++				b.ReportAllocs()
++				b.ResetTimer()
++				for i := 0; i < b.N; i++ {
++					s.Clear()
++					vellumRectangle(s, 5, 7, 21, 16)
++					s.Draw()
++				}
++				vellumTouchedRowsBenchmarkSink = checksum
++			})
++		}
++	}
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/owned_pixels_vellum_test.go
+@@ -0,0 +1,268 @@
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"fmt"
++	"image"
++	"image/color"
++	"image/draw"
++	"io/fs"
++	"testing"
++
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/ppath"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++)
++
++// The production Renderer constructor owns a row-tracked scanner. The reference
++// is a separately constructed renderer whose scanner and both raster pipelines
++// are replaced with ordinary full-row components. All tested drawing goes
++// through Renderer.Render, including Fill, Stroke, path transforms and clipping.
++func TestVellumRowTrackingOwnedRendererPixels(t *testing.T) {
++	tracked := New(math32.Vec2(96, 64)).(*Renderer)
++	full := New(math32.Vec2(96, 64)).(*Renderer)
++	frames := 0
++	// Shrink, regrow and a tall target exercise actual SetSize caller rebuilding.
++	for _, height := range []int{64, 1152, 32, 8192, 64} {
++		size := math32.Vec2(96, float32(height))
++		tracked.SetSize(units.UnitDot, size)
++		full.SetSize(units.UnitDot, size)
++		vellumOwnedFullRowRenderer(full)
++		for _, scenario := range vellumOwnedPathScenes(height) {
++			t.Run(fmt.Sprintf("height-%d/%s/frame-%d", height, scenario.name, frames), func(t *testing.T) {
++				draw.Draw(tracked.image, tracked.image.Bounds(), image.Transparent, image.Point{}, draw.Src)
++				draw.Draw(full.image, full.image.Bounds(), image.Transparent, image.Point{}, draw.Src)
++				for replay := range 2 {
++					tracked.Render(scenario.items)
++					full.Render(scenario.items)
++					vellumOwnedEqualRGBA(t, tracked.image, full.image)
++					if vellumOwnedNonzero(full.image.Pix) == 0 {
++						t.Fatal("reference drawing unexpectedly blank")
++					}
++					if scenario.clip != nil {
++						for y := range full.image.Bounds().Dy() {
++							for x := range full.image.Bounds().Dx() {
++								if !(image.Pt(x, y).In(*scenario.clip)) && full.image.RGBAAt(x, y) != (color.RGBA{}) {
++									t.Fatalf("drawing escaped clip at (%d,%d)", x, y)
++								}
++							}
++						}
++					}
++					t.Logf("owned-renderer height=%d case=%s replay=%d rgba_sha256=%x", height, scenario.name, replay, sha256.Sum256(full.image.Pix))
++				}
++			})
++			frames++
++		}
++	}
++	if frames != 35 {
++		t.Fatalf("expected all 35 renderer scenes, got %d", frames)
++	}
++}
++
++func vellumOwnedFullRowRenderer(rs *Renderer) {
++	size := rs.image.Bounds().Size()
++	rs.Scanner = scan.NewScanner(rs.ImgSpanner, size.X, size.Y)
++	rs.Raster = NewDasher(size.X, size.Y, rs.Scanner)
++}
++
++type vellumOwnedPathScene struct {
++	name  string
++	items render.Render
++	clip  *image.Rectangle
++}
++
++func vellumOwnedPathItem(path *ppath.Path, clip image.Rectangle, transform math32.Matrix2, fill, stroke color.Color, rule ppath.FillRules, dash bool) *render.Path {
++	style := styles.NewPaint()
++	style.Transform = transform
++	style.Fill.Color = nil
++	style.Stroke.Color = nil
++	style.Fill.Rule = rule
++	if fill != nil {
++		style.Fill.Color = colors.Uniform(fill)
++	}
++	if stroke != nil {
++		style.Stroke.Color = colors.Uniform(stroke)
++		style.Stroke.Width = units.Dot(2.75)
++		style.Stroke.Width.Dots = 2.75
++		style.Stroke.Cap = ppath.CapRound
++		style.Stroke.Join = ppath.JoinRound
++		if dash {
++			style.Stroke.Dashes = []float32{4.5, 2.25, 1.5, 2.25}
++		}
++	}
++	parent := &render.Context{}
++	parent.Init(styles.NewPaint(), &render.Bounds{Rect: math32.B2FromRect(clip)}, nil)
++	return render.NewPath(*path, style, parent)
++}
++
++func vellumOwnedPathScenes(height int) []vellumOwnedPathScene {
++	bounds := image.Rect(0, 0, 96, height)
++	identity := math32.Identity2()
++	blue := color.NRGBA{R: 30, G: 75, B: 210, A: 220}
++	red := color.NRGBA{R: 220, G: 25, B: 45, A: 180}
++	green := color.NRGBA{R: 10, G: 130, B: 65, A: 255}
++	item := func(p *ppath.Path, fill, stroke color.Color, rule ppath.FillRules, dash bool) *render.Path {
++		return vellumOwnedPathItem(p, bounds, identity, fill, stroke, rule, dash)
++	}
++	rect := ppath.New().Rectangle(3.25, 2.5, 24.5, 13.75)
++	compound := ppath.New()
++	for _, r := range [][4]float32{{6, 3, 48, 23}, {18, 8, 22, 11}} {
++		compound.MoveTo(r[0], r[1])
++		compound.LineTo(r[0]+r[2], r[1])
++		compound.LineTo(r[0]+r[2], r[1]+r[3])
++		compound.LineTo(r[0], r[1]+r[3])
++		compound.Close()
++	}
++	curve := ppath.New()
++	curve.MoveTo(7.5, 5.25)
++	curve.QuadTo(28.25, -7.5, 48.75, 9.5)
++	curve.CubeTo(80.5, 3.25, 77.75, 32.5, 41.5, 25.75)
++	curve.QuadTo(9.25, 30.5, 7.5, 5.25)
++	curve.Close()
++	open := ppath.New()
++	open.MoveTo(2.25, 8.5)
++	open.QuadTo(28.5, 29.5, 51.5, 5.25)
++	open.CubeTo(60.75, -3.5, 80.25, 21.25, 91.5, 11.75)
++	transform := math32.Translate2D(12.25, 4.5).Rotate(0.17).Scale(0.72, 0.65)
++	clip := image.Rect(9, 4, 47, min(height, 24))
++	clipped := ppath.New().Rectangle(-30, -12, 130, 52)
++	bottom := ppath.New().Rectangle(53.5, float32(height)-12.25, 31.75, 9.5)
++	return []vellumOwnedPathScene{
++		{name: "fill-fractional", items: render.Render{item(rect, blue, nil, ppath.NonZero, false)}},
++		{name: "compound-nonzero", items: render.Render{item(compound, green, red, ppath.NonZero, false)}},
++		{name: "compound-evenodd", items: render.Render{item(compound, green, red, ppath.EvenOdd, false)}},
++		{name: "quadratic-cubic-fill-stroke", items: render.Render{item(curve, blue, red, ppath.NonZero, false)}},
++		{name: "open-dashed-transformed-curves", items: render.Render{vellumOwnedPathItem(open, bounds, transform, nil, green, ppath.NonZero, true)}},
++		{name: "negative-clipped", items: render.Render{vellumOwnedPathItem(clipped, clip, identity, blue, nil, ppath.NonZero, false)}, clip: &clip},
++		{name: "disjoint-high-then-low", items: render.Render{item(bottom, red, green, ppath.NonZero, true), item(rect, blue, nil, ppath.NonZero, false)}},
++	}
++}
++
++// These are independent caches, not copies of the global cache or its mutex.
++// The reference uses full-row accumulation but the same real font outlines,
++// mask generation and lookup methods as the production-owned cache.
++func TestVellumRowTrackingOwnedGlyphColdWarmPixels(t *testing.T) {
++	var tracked, full glyphCache
++	tracked.init()
++	full.init()
++	full.scanner = scan.NewScanner(full.imgSpanner, full.maxSize.X, full.maxSize.Y)
++	full.filler = NewFiller(full.maxSize.X, full.maxSize.Y, full.scanner)
++	full.filler.SetWinding(true)
++	full.filler.SetColor(colors.Uniform(color.Black))
++	full.scanner.SetClip(full.image.Bounds())
++	shaper := shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default})
++	positions := []math32.Vector2{math32.Vec2(20, 60), math32.Vec2(20.25, 60.5), math32.Vec2(20.5, 60.25), math32.Vec2(-6.25, 44.75)}
++	cold := 0
++	for _, size := range []float32{24, 48} {
++		unitContext := units.Context{}
++		unitContext.Defaults()
++		textStyle := text.NewStyle()
++		textStyle.FontSize = units.Dot(size)
++		textStyle.WhiteSpace = text.WrapNever
++		textStyle.ToDots(&unitContext)
++		style := rich.NewStyle()
++		runs := shaper.Shape(rich.NewText(style, []rune("AgQjpMWé")), textStyle)
++		if len(runs) == 0 {
++			t.Fatal("embedded real font produced no shaped runs")
++		}
++		for _, shapedRun := range runs {
++			run, ok := shapedRun.(*shapedgt.Run)
++			if !ok || run.Face == nil {
++				t.Fatal("embedded shaper did not provide a real outline face")
++			}
++			scale := math32.FromFixed(run.Size) / float32(run.Face.Upem())
++			for i := range run.Glyphs {
++				glyph := &run.Glyphs[i]
++				outline, ok := run.Face.GlyphDataOutline(glyph.GlyphID)
++				if !ok || len(outline.Segments) == 0 {
++					t.Fatalf("real text glyph %d has no outline", glyph.GlyphID)
++				}
++				for _, pos := range positions {
++					beforeTracked, beforeFull := tracked.CacheSize(), full.CacheSize()
++					mask, placement := tracked.Glyph(run.Face, glyph, outline, scale, pos)
++					reference, referencePlacement := full.Glyph(run.Face, glyph, outline, scale, pos)
++					if mask == nil || reference == nil {
++						t.Fatalf("expected cacheable real glyph %d at size %g", glyph.GlyphID, size)
++					}
++					if mask == reference {
++						t.Fatal("independent caches shared a mask")
++					}
++					vellumOwnedEqualAlpha(t, mask, reference)
++					if vellumOwnedNonzero(reference.Pix) == 0 {
++						t.Fatalf("blank real glyph mask %d", glyph.GlyphID)
++					}
++					wantPlacement := image.Pt(int(math32.Floor(pos.X))-2+glyph.XBearing.Round(), int(math32.Floor(pos.Y))-2-glyph.YBearing.Round())
++					if placement != referencePlacement || placement != wantPlacement {
++						t.Fatalf("glyph placement got %v reference %v want %v", placement, referencePlacement, wantPlacement)
++					}
++					cost := mask.Bounds().Dx() * mask.Bounds().Dy()
++					if tracked.CacheSize() != beforeTracked+cost || full.CacheSize() != beforeFull+cost {
++						t.Fatal("cold lookup did not add exactly one independent mask")
++					}
++					warm, warmPlacement := tracked.Glyph(run.Face, glyph, outline, scale, pos)
++					warmReference, warmReferencePlacement := full.Glyph(run.Face, glyph, outline, scale, pos)
++					translatedPos := pos.Add(math32.Vec2(7, -5))
++					translated, translatedPlacement := tracked.Glyph(run.Face, glyph, outline, scale, translatedPos)
++					translatedReference, translatedReferencePlacement := full.Glyph(run.Face, glyph, outline, scale, translatedPos)
++					if warm != mask || warmReference != reference || translated != mask || translatedReference != reference {
++						t.Fatal("warm lookup or integer translation replaced cached mask")
++					}
++					if warmPlacement != placement || warmReferencePlacement != referencePlacement || translatedPlacement != placement.Add(image.Pt(7, -5)) || translatedReferencePlacement != translatedPlacement {
++						t.Fatal("warm or translated placement changed subpixel semantics")
++					}
++					if tracked.CacheSize() != beforeTracked+cost || full.CacheSize() != beforeFull+cost {
++						t.Fatal("warm lookup grew cache")
++					}
++					vellumOwnedEqualAlpha(t, warm, warmReference)
++					vellumOwnedEqualAlpha(t, translated, translatedReference)
++					canvas := image.NewRGBA(image.Rect(0, 0, 100, 100))
++					referenceCanvas := image.NewRGBA(canvas.Bounds())
++					draw.DrawMask(canvas, mask.Bounds().Add(placement), colors.Uniform(color.NRGBA{R: 30, G: 60, B: 180, A: 220}), image.Point{}, mask, image.Point{}, draw.Over)
++					draw.DrawMask(referenceCanvas, reference.Bounds().Add(referencePlacement), colors.Uniform(color.NRGBA{R: 30, G: 60, B: 180, A: 220}), image.Point{}, reference, image.Point{}, draw.Over)
++					vellumOwnedEqualRGBA(t, canvas, referenceCanvas)
++					t.Logf("owned-glyph size=%g gid=%d pos=(%g,%g) placement=%v alpha_sha256=%x", size, glyph.GlyphID, pos.X, pos.Y, placement, sha256.Sum256(reference.Pix))
++					cold++
++				}
++			}
++		}
++	}
++	if cold != 64 || tracked.CacheSize() == 0 || tracked.CacheSize() != full.CacheSize() {
++		t.Fatalf("expected 64 cold and 128 warm/translated real glyph lookups, got %d cold, cache %d vs %d", cold, tracked.CacheSize(), full.CacheSize())
++	}
++}
++
++func vellumOwnedEqualRGBA(t *testing.T, actual, reference *image.RGBA) {
++	t.Helper()
++	if actual.Bounds() != reference.Bounds() || actual.Stride != reference.Stride || !bytes.Equal(actual.Pix, reference.Pix) {
++		t.Fatalf("RGBA differs: bounds %v vs %v stride %d vs %d sha256 %x vs %x", actual.Bounds(), reference.Bounds(), actual.Stride, reference.Stride, sha256.Sum256(actual.Pix), sha256.Sum256(reference.Pix))
++	}
++}
++
++func vellumOwnedEqualAlpha(t *testing.T, actual, reference *image.Alpha) {
++	t.Helper()
++	if actual.Bounds() != reference.Bounds() || actual.Stride != reference.Stride || !bytes.Equal(actual.Pix, reference.Pix) {
++		t.Fatalf("glyph alpha differs: bounds %v vs %v stride %d vs %d sha256 %x vs %x", actual.Bounds(), reference.Bounds(), actual.Stride, reference.Stride, sha256.Sum256(actual.Pix), sha256.Sum256(reference.Pix))
++	}
++}
++
++func vellumOwnedNonzero(pixels []uint8) int {
++	n := 0
++	for _, value := range pixels {
++		if value != 0 {
++			n++
++		}
++	}
++	return n
++}

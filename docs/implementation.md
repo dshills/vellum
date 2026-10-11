@@ -264,3 +264,8 @@ source Draw time, compared with about 21% in Copy/image API work. The next
 performance experiment should reduce unnecessary raster work while preserving
 paint/composition correctness. Detailed timings cannot qualify warm targets;
 full P6 and broader Mac acceptance remain open.
+
+The pinned native raster scanner now offers explicit row tracking for renderer-owned
+accumulation. Scene and private glyph-mask renderers select it; the general scanner
+keeps its full-row behavior. Pending cells, clip changes, clearing and resize
+initialization preserve the existing span stream. See [rendering](../specs/rendering.md).

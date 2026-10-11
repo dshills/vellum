@@ -193,3 +193,14 @@ setup/ready/end records expose `cpu_profile`, and ordinary five-run validation
 refuses profiled records. The benchmark CLI never enables this flag. Profiled
 exploration has its own raw records, source/binary/profile hashes and scope;
 its timing samples are not pooled with the unprofiled qualification runs.
+
+## Renderer row-range comparison
+
+The [row-range checkpoint](../docs/reports/macos-raster-rows/README.md) removes
+surface-height-dependent index work for small paths in owned raster scanners.
+Five optimized processes per build across all four ordinary table cases retain
+4,800 samples and matching paired geometry. Native UI-work differences are small
+and mixed; the variable-million case rises slightly and every run still fails
+the unchanged targets. Software span/mask/pixel evidence and microbenchmarks are
+separate from frame timings. This qualifies the comparison's table protocol,
+while P6 tree latency, broader memory, cold caches and sustained work remain open.

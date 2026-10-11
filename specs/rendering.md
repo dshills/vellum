@@ -141,3 +141,25 @@ path. Early cached resize replay and borrowed-texture admission are unchanged.
 Software copy observations prove composition requests and pixels, not physical
 GPU upload counts, immediate texture reclamation or display latency. Partial
 uploads and process-wide wakeup reductions require separate evidence.
+
+## Owned raster scanner row ranges
+
+Native raster renderers and the private glyph-mask cache use the pinned scanner's
+explicit row-tracking constructor. Its accumulation buffers belong exclusively
+to that renderer; callers never directly supply Cell or CellIndex. General
+NewScanner retains the original complete-row Draw/Clear behavior, including
+externally supplied cell lists.
+
+Tracked scanners retain the bounding half-open interval of in-range rows where
+scanner methods allocated cells, independently of the current clip. Draw first
+flushes the pending final cell, then intersects traversal with that interval.
+Repeated drawing and subsequent clip changes keep the accumulated state. Clear
+resets every row in the interval, including clipped-out rows, and all pending
+accumulation. SetBounds initializes all current row heads even after capacity
+reuse, shrink/regrowth or allocation, before resuming local clears.
+
+Winding, coverage arithmetic, span order, transforms, glyphs, clipping and
+composition are unchanged. This bounds per-path row-index work without retaining
+another image, changing widget invalidation, or making a partial GPU upload.
+Differential ordered-span and rendered-pixel checks establish software parity;
+small-path microbenchmarks do not establish a native frame-latency improvement.

@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""One significant-batch source/test/spec review; raw evidence excluded."""
+import hashlib,json,subprocess,sys,time
+from pathlib import Path
+ROOT=Path('/private/tmp/vellum-large-data');OUT=Path('/private/tmp/vellum-raster-rows-prism')
+sys.path.insert(0,str(ROOT/'scripts'))
+from child_process import run_child
+FILES=['drivers/cogent/native/dependencies.json', 'drivers/cogent/native/README.md', 'drivers/cogent/native/patches/rowtracking/0037-renderer-row-tracking.patch', 'drivers/cogent/native/patches/rowtracking/README.md', 'drivers/cogent/native/patches/rowtracking/original-hashes.json', 'drivers/cogent/native/patches/rowtracking/output-hashes.json', 'drivers/cogent/prepare_test.py', 'scripts/check.sh', 'specs/rendering.md', 'specs/grid-performance.md', 'specs/macos-completion.md', 'docs/implementation.md', 'docs/reports/macos-raster-rows/README.md']
+def sha(data):return hashlib.sha256(data).hexdigest()
+def inputs():return {p:sha((ROOT/p).read_bytes()) for p in FILES}
+def main():
+ OUT.mkdir(exist_ok=False)
+ indexed=subprocess.check_output(['git','diff','--cached','--name-only'],cwd=ROOT).decode().splitlines();assert sorted(indexed)==sorted(FILES),indexed
+ diff=subprocess.check_output(['git','diff','--cached','--binary','--']+FILES,cwd=ROOT);before=inputs()
+ (OUT/'staged.diff.txt').write_bytes(diff);(OUT/'producer.py.txt').write_bytes(Path(__file__).read_bytes())
+ (OUT/'inputs.json').write_text(json.dumps({'files':before,'staged_diff_sha256':sha(diff),'staged_diff_bytes':len(diff),'scope':'Explicit13-file implementation/patch/test/spec/report allowlist. Raw qualification/archive/audit/review records and historical inert source/producer copies excluded from provider payload.'},indent=2)+'\n')
+ argv=['/Users/dshills/Development/Go/bin/prism','review','staged','--provider','anthropic','--model','claude-sonnet-5-5','--format','json','--baseline','none','--fail-on','medium','--min-severity','medium','--no-auto-exclude','--paths',','.join(FILES),'--out',str(OUT/'prism.json')]
+ started=time.monotonic();error=None
+ with (OUT/'stdout.log').open('xb') as stdout,(OUT/'stderr.log').open('xb') as stderr:
+  try:code=run_child(argv,cwd=ROOT,stdout=stdout,stderr=stderr,timeout=900).returncode
+  except Exception as exc:code=125;error={'type':type(exc).__name__,'message':str(exc)}
+ afterdiff=subprocess.check_output(['git','diff','--cached','--binary','--']+FILES,cwd=ROOT);after=inputs()
+ record={'argv':argv,'exit_code':code,'error':error,'elapsed_seconds':time.monotonic()-started,'before':before,'after':after,'source_index_unchanged':before==after and diff==afterdiff,'stdout_sha256':sha((OUT/'stdout.log').read_bytes()),'stderr_sha256':sha((OUT/'stderr.log').read_bytes()),'prism_sha256':sha((OUT/'prism.json').read_bytes()) if (OUT/'prism.json').exists() else None,'producer_sha256':sha(Path(__file__).read_bytes())}
+ (OUT/'process.json').write_text(json.dumps(record,indent=2)+'\n');assert record['source_index_unchanged'];print('Prism',code,'seconds',round(record['elapsed_seconds'],2),flush=True);sys.exit(code)
+if __name__=='__main__':main()

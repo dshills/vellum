@@ -141,6 +141,15 @@ nested CPU-side diagnostics; upload failures, physical transfers, GPU execution
 and presentation remain unavailable. This guides a bounded repaint investigation
 without qualifying an ordinary latency improvement or closing P6.
 
+The [row-range checkpoint](../docs/reports/macos-raster-rows/README.md) bounds
+per-path scanner row work for exclusively owned native raster and glyph-cache
+callers. General scanners retain direct-cell and complete-row behavior. Exact
+span/state differentials and small-path benchmarks qualify that bounded change.
+The ordinary four-case comparison uses five release processes per build and
+4,800 validated samples. Native latency differences are small and mixed, with
+every run still failing the unchanged targets; no general frame improvement or
+full P6/Mac completion is inferred.
+
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded
