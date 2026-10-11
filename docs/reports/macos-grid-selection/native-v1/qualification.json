@@ -1,0 +1,130 @@
+{
+  "result": "PASS",
+  "root": "/private/tmp/vellum-grid-selection",
+  "producer": {
+    "path": "/private/tmp/vellum-grid-selection-native/qualify.py",
+    "sha256": "14f832edebd45acb95492258fba56e19d45a2c41fc2728e1a22aa6a790bd3f7c"
+  },
+  "owned_files": {
+    "drivers/cogent/grid.go": "e3b491d7dd1fb25b7f92ac8550059ffc5b009e83eeaccfdfd3d59707b8713e95",
+    "drivers/cogent/grid_geometry.go": "2f5d8eb351251135114fc5978c6ef3aba7064cf28ba718bf0134b919489193e5",
+    "drivers/cogent/grid_accessibility.go": "3db9d27754faa9a1643fa1ad2c4a416e482f23544f63873dcb27c77979432325",
+    "drivers/cogent/grid_selection_test.go": "fb4067f65f3da1274fff1c71ea106aaaff19881a594d226bce891296cb392261",
+    "drivers/cogent/grid_selection_offscreen_test.go": "1abca21f8fab17216bbc91462ba0a149e54aa0887deabed37b9a1b2e4970b287",
+    "drivers/cogent/grid_selection_accessibility_darwin_test.go": "aae1a12b367497ab4a098490a14c7a4852ca6bee165cc4d702f68cbd59307923",
+    "specs/grid-native.md": "5f2b12eecc565124d431373fac9f14b37b377127254eafb84bcc5268b8270844"
+  },
+  "input_count": 140,
+  "inputs_before": {
+    "file": "inputs-before.json",
+    "sha256": "265585777dc24cc152b0625626421a08e29a7ffb740009aacfd90d9b8ef15045"
+  },
+  "inputs_after": {
+    "file": "inputs-after.json",
+    "sha256": "265585777dc24cc152b0625626421a08e29a7ffb740009aacfd90d9b8ef15045"
+  },
+  "changed_inputs": [],
+  "dependencies_before": {
+    "file": "dependencies-before.json",
+    "sha256": "ea268c4fcd40e0b11d4ba9c8dc6b2fa139017708426410b91452dc3c2cd10c45"
+  },
+  "dependencies_after": {
+    "file": "dependencies-after.json",
+    "sha256": "ea268c4fcd40e0b11d4ba9c8dc6b2fa139017708426410b91452dc3c2cd10c45"
+  },
+  "dependencies_unchanged": true,
+  "checks": [
+    {
+      "name": "selection-offscreen-race",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-count=3",
+        "-run",
+        "TestManagedGrid(RowSelection|SelectionPointerModifiers|LegacySelection)",
+        "-v",
+        "."
+      ],
+      "cwd": "drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 73.11,
+      "log": "selection-offscreen-race.log",
+      "log_sha256": "f60c56580c74c0f562a598301de6f20c5cdeee7ae6a4dedf9da9547276391200"
+    },
+    {
+      "name": "offscreen-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "."
+      ],
+      "cwd": "drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 2.065,
+      "log": "offscreen-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "default-vet",
+      "argv": [
+        "go",
+        "vet",
+        "."
+      ],
+      "cwd": "drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 4.917,
+      "log": "default-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "default-modifiers-race",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-run",
+        "TestManagedGridSelectionPointerModifiers",
+        "-v",
+        "."
+      ],
+      "cwd": "drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 13.687,
+      "log": "default-modifiers-race.log",
+      "log_sha256": "f7aa64aeb675141f9e812678fc7ba2e3386b8ffaf6afa842c22bfd6e2836edb7"
+    }
+  ],
+  "exploratory_history": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-native-exploratory-1.log",
+      "sha256": "63b2087c546b7e48b7d3bc79c11f7f9be3d29eb963f6f51116ed9ebb37e539bc",
+      "scope": "preliminary fixture iterations; not final qualification"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-native-exploratory-2.log",
+      "sha256": "5f6ca003ac813b1837527e5140a28db3c8cfac43d028f266101433b0494eabad",
+      "scope": "preliminary fixture iterations; not final qualification"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-native-exploratory-3.log",
+      "sha256": "7321fd0c352f680b02bfe66ed6fe1517497fb48d967f0d7be0dac03e6db5d7fc",
+      "scope": "preliminary fixture iterations; not final qualification"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-native-exploratory-4.log",
+      "sha256": "914ffb2db08cb3ccd33d873d7dba461de27ee4c84bf3e55c05ef593060fec1e0",
+      "scope": "preliminary fixture iterations; not final qualification"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-native-exploratory-5.log",
+      "sha256": "f2212ce5041c822b99949a8d7e9cee978f7f28c9133aa3bc1a8b0c8cb991ff3a",
+      "scope": "preliminary fixture iterations; not final qualification"
+    }
+  ],
+  "scope": "Actual offscreen Cogent primitive pointer/key routing, software frame projection and production Cocoa table selector fixture with no native NSWindow. No GUI, external AX, physical keyboard/Command mapping, performance, full P6 or cross-platform runtime qualification."
+}

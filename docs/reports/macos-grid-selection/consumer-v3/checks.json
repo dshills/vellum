@@ -1,0 +1,45 @@
+[
+  {
+    "name": "portable-race20",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go",
+    "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 2.597,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v1/portable-race20.log",
+    "log_sha256": "8bbaff4f4baacded242c8eedac741e8a1e490b1e6f76fabcf64519347b0d3e1e",
+    "inherited_from": "/private/tmp/vellum-grid-selection-example/qualified-v1/qualification.json",
+    "inherited_proof_sha256": "42ae8e83d693d2e414e3fd1a2bcb7c7dab24a047e0fa7002ccd21a38d3de0b7d",
+    "current_portable_inputs_unchanged": true
+  },
+  {
+    "name": "selection-managed-race",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -run '^TestActualRowSelection' -v ./...",
+    "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 61.254,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/selection-managed-race.log",
+    "log_sha256": "787d09b8efbfc2d64e2b1b79672f6cfd18f87660a7058016e71337dc93018373"
+  },
+  {
+    "name": "managed-vet",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go vet -tags offscreen ./...",
+    "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 6.581,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/managed-vet.log",
+    "log_sha256": "ddc2d6ab21449c2e9ac0664c535cdef2c7f607ef265f3996059f50e00dab64cb"
+  },
+  {
+    "name": "desktop-race-build",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go build -race -o /private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop .",
+    "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 13.14,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/desktop-race-build.log",
+    "log_sha256": "548fabdc6b84d762ba8ba9992596c2347c3bf331e96c23bb1b6a8f7e6e6e2e7e"
+  }
+]

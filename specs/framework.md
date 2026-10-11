@@ -87,7 +87,9 @@ Source revisions preserve the active key and top-row anchor where still present,
 subject to viewport extent clamping;
 retired opaque cell refs refuse activation after a viewport/source transition.
 See the [grid contract](grid.md). This adds an indexed foundation for the P6
-million-row workload; editing, all-row selection and native
+million-row workload. Optional [row selection](grid-selection.md) captures
+immutable range/All membership, with bounded key toggles and detached worker
+enumeration. The active cell remains a separate cursor. Editing and native
 performance remain open. Existing Table/Tree interfaces remain supported.
 
 ## GPU canvas

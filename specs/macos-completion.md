@@ -65,8 +65,16 @@ Its 10k and million-row procedural fixtures have identical visible callback work
 That proves the projection cost. The [managed adapter](grid-native.md) adds
 bounded native cell pools, clipped measured geometry, routed pointer/keyboard
 navigation and visible-cell accessibility. Retained dataset memory, frame
-performance, selection/editing and the complete P6 table/tree
+performance, editing and the complete P6 table/tree
 workload remain open.
+
+[Captured row selection](grid-selection.md) adds range/All membership without an
+owner scan, bounded key toggles and immutable worker snapshots. Mac input routes
+Shift ranges, Command toggles/All and Escape clear; accepted membership drives
+visible rendering and AX attributes separately from the active cursor. Captured
+counts describe identities in their captured scope, independently of later
+filtering. This does not complete editing, loaded projection integration or
+the sustained P6 latency/memory workloads.
 
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU

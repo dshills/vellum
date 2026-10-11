@@ -3,7 +3,7 @@
 This independent portable checkpoint adds a `virtual.Grid` without changing
 `Table`, `Tree`, or their source interfaces. It qualifies bounded projection,
 geometry and identity behavior. It does not qualify native rendering, frame
-performance, accessibility, editable cells, all-row selection,
+performance, accessibility, editable cells,
 tree indexing, or completion of P6.
 
 ## Domain source and ownership
@@ -156,13 +156,15 @@ For indexed variable rows, it maps the current row's top plus/minus
 max(1, bodyHeight) pixels to a row, with at least one row of progress except at
 the corresponding endpoint. Tall rows align their top when revealed. Empty sources and
 unknown keys/columns return `ErrGridRange`. Navigation does not materialize cell
-strings. Single active cell is the entire selection scope of this draft.
+strings. The default mode retains a single active cell. Optional captured row
+selection is specified in [row selection](grid-selection.md); the active cell
+remains a separate navigation cursor in that mode.
 
 Each materialized cell carries opaque `GridCellRef`. The renderer must capture
 this ref when arming a press and pass it to `Activate` when delivering the action.
 It must not reinterpret a pooled slot using the new viewport. Foreign refs,
 retired generations, source changes, and refs with empty current clips are
-refused. Effective viewport/active/source transitions retire prior refs; no-ops
+refused. Effective viewport/active/source/selection transitions retire prior refs; no-ops
 and failed operations do not. Generation exhaustion is refused atomically.
 The [managed adapter contract](grid-native.md) covers native hit testing,
 event-origin lifetime, focus, disabled/modal routing and native widget reuse.
@@ -196,7 +198,8 @@ memory. Native and independent consumer evidence is recorded separately in the
 [variable-row report](../docs/reports/macos-grid-variable/README.md).
 
 The managed adapter owns bounded measured-cell/header pools and validates refs
-through this model. Selection universes, editing draft
+through this model. The [row-selection checkpoint](grid-selection.md) adds
+immutable range/All capture and bounded stable-key exceptions. Editing draft
 conflict/settlement, background projection index preparation, hidden-cell
 accessibility navigation and full million-row native performance acceptance
 remain explicit later work. Existing Table/Tree callers need no migration for

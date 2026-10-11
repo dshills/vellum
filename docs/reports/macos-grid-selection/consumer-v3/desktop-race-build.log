@@ -1,0 +1,3 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go build -race -o /private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop .
+# github.com/dshills/vellum/examples/grid
+ld: warning: ignoring duplicate libraries: '-lobjc'

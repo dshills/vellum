@@ -23,6 +23,7 @@ type gridWindow struct {
 	selectionEvents, viewportEvents uint64
 	disabled, modal                 bool
 	variableRows, heightControls    bool
+	rowSelection                    bool
 	metricCalls                     *rowMetricCalls
 }
 
@@ -31,6 +32,10 @@ func newGridWindow(owner *app.Application, id string, rows int) (*gridWindow, er
 }
 
 func newGridWindowMode(owner *app.Application, id string, rows int, variableRows bool) (*gridWindow, error) {
+	return newGridWindowModes(owner, id, rows, variableRows, false)
+}
+
+func newGridWindowModes(owner *app.Application, id string, rows int, variableRows, rowSelection bool) (*gridWindow, error) {
 	if owner == nil || id == "" {
 		return nil, errSourceConfig
 	}
@@ -39,11 +44,26 @@ func newGridWindowMode(owner *app.Application, id string, rows int, variableRows
 		return nil, err
 	}
 	metrics := &rowMetricCalls{}
-	g, err := virtual.NewGrid(rowSource(source, metrics, variableRows), sourceColumns(), virtual.GridConfig{RowHeight: 24, HeaderHeight: 28, FrozenColumns: 2, OverscanRows: 1, OverscanColumns: 1}, virtual.GridViewport{Width: 800, Height: 508})
+	g, err := virtual.NewGrid(rowSource(source, metrics, variableRows), sourceColumns(), virtual.GridConfig{RowHeight: 24, HeaderHeight: 28, FrozenColumns: 2, OverscanRows: 1, OverscanColumns: 1, RowSelection: rowSelection}, virtual.GridViewport{Width: 800, Height: 508})
 	if err != nil {
 		return nil, err
 	}
-	return &gridWindow{owner: owner, id: id, source: source, grid: g, status: "Ready", variableRows: variableRows, heightControls: variableRows, metricCalls: metrics}, nil
+	return &gridWindow{owner: owner, id: id, source: source, grid: g, status: "Ready", variableRows: variableRows, heightControls: variableRows, metricCalls: metrics, rowSelection: rowSelection}, nil
+}
+
+func (w *gridWindow) selectAllRows() error {
+	if err := w.grid.SelectAll(); err != nil {
+		return err
+	}
+	w.status = "Selected all identities in the current captured view"
+	return nil
+}
+func (w *gridWindow) clearRows() error {
+	if err := w.grid.ClearSelection(); err != nil {
+		return err
+	}
+	w.status = "Cleared row selection"
+	return nil
 }
 func (w *gridWindow) report(err error) {
 	if err != nil {
@@ -149,6 +169,9 @@ func (w *gridWindow) view() ui.Node {
 		text = err.Error()
 	} else {
 		text = fmt.Sprintf("%s · %d rows × %d columns · revision %d · active %s/%s", w.status, state.Stamp.Rows, state.Columns, state.Stamp.Revision, state.Active.RowKey, state.Active.ColumnID)
+		if w.rowSelection {
+			text += fmt.Sprintf(" · %d captured selected identities · %d sparse overrides", state.Selection.CapturedRows, state.Selection.Overrides)
+		}
 	}
 	button := func(id, label string, fn func() error) ui.Node {
 		return ui.Node{ID: id, Kind: ui.Button, Text: label, Activate: func() { w.report(fn()) }}
@@ -162,7 +185,13 @@ func (w *gridWindow) view() ui.Node {
 	if w.heightControls {
 		moreButtons = append(moreButtons, button("row-heights", "Toggle row heights", func() error { return w.setVariableRows(!w.variableRows) }))
 	}
-	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
+	var selectionControls []ui.Node
+	if w.rowSelection {
+		selectionControls = []ui.Node{{ID: "selection-tools", Kind: ui.Row, Children: []ui.Node{
+			button("select-all", "Select all rows", w.selectAllRows), button("clear-selection", "Clear row selection", w.clearRows),
+		}}}
+	}
+	children := []ui.Node{
 		{ID: "title", Kind: ui.Label, Text: fmt.Sprintf("%s · %d domain rows · procedural seed 7", w.id, w.source.total)},
 		{ID: "tools", Kind: ui.Row, Children: []ui.Node{
 			button("reverse", "Reverse rows", func() error { return w.projection(!w.source.reverse, w.source.filtered) }),
@@ -170,13 +199,17 @@ func (w *gridWindow) view() ui.Node {
 			button("first", "First", w.first), button("last", "Last + column 19", w.last), button("pan", "Pan", w.pan),
 		}},
 		{ID: "more", Kind: ui.Row, Children: moreButtons},
-		{ID: "data", Kind: ui.DataGrid, Grow: true, Grid: w.grid, GridChange: w.onGrid, Disabled: w.disabled, Accessibility: ui.Accessibility{Name: "Procedural data grid"}},
-		{ID: "status", Kind: ui.Label, Text: text, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: statusMaxWidth})}},
-		{ID: "modal", Kind: ui.Dialog, Open: w.modal, Text: "Grid is covered by a modal", Dismiss: func() { w.modal = false; w.report(nil) }, Children: []ui.Node{
+	}
+	children = append(children, selectionControls...)
+	children = append(children,
+		ui.Node{ID: "data", Kind: ui.DataGrid, Grow: true, Grid: w.grid, GridChange: w.onGrid, Disabled: w.disabled, Accessibility: ui.Accessibility{Name: "Procedural data grid"}},
+		ui.Node{ID: "status", Kind: ui.Label, Text: text, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: statusMaxWidth})}},
+		ui.Node{ID: "modal", Kind: ui.Dialog, Open: w.modal, Text: "Grid is covered by a modal", Dismiss: func() { w.modal = false; w.report(nil) }, Children: []ui.Node{
 			{ID: "modal-label", Kind: ui.Label, Text: "Background grid input must be refused while this modal is open."},
 			button("modal-close", "Dismiss", func() error { w.modal = false; return nil }),
 		}},
-	}}
+	)
+	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: children}
 }
 
 type gridProgram struct {
@@ -184,6 +217,7 @@ type gridProgram struct {
 	windows []*gridWindow
 	// Startup mode is immutable; per-window toggles belong to gridWindow.
 	variableRows bool
+	rowSelection bool
 }
 
 func newProgram() (*gridProgram, error) { return newProgramSize(1024, 760) }
@@ -193,16 +227,20 @@ func newProgramSize(width, height int) (*gridProgram, error) {
 }
 
 func newProgramMode(width, height int, variableRows bool) (*gridProgram, error) {
+	return newProgramModes(width, height, variableRows, false)
+}
+
+func newProgramModes(width, height int, variableRows, rowSelection bool) (*gridProgram, error) {
 	a, err := app.New(app.Config{QueueCapacity: 64})
 	if err != nil {
 		return nil, err
 	}
-	p := &gridProgram{owner: a, variableRows: variableRows}
+	p := &gridProgram{owner: a, variableRows: variableRows, rowSelection: rowSelection}
 	for _, config := range []struct {
 		id   string
 		rows int
 	}{{"small", 10_000}, {"large", 1_000_000}} {
-		w, err := newGridWindowMode(a, config.id, config.rows, variableRows)
+		w, err := newGridWindowModes(a, config.id, config.rows, variableRows, rowSelection)
 		if err != nil {
 			a.Close()
 			return nil, err

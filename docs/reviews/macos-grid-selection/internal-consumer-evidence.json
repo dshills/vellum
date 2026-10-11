@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "result": "APPROVED_FROZEN_CONSUMER_EVIDENCE",
+  "reviewer": "mac_history_review",
+  "handoff": {
+    "path": "/private/tmp/vellum-grid-selection-example/handoff-v3.json",
+    "sha256": "c7dafff0caac0fb863c556300c03d559f1cc02e6157008ce54f59ecd26304db5"
+  },
+  "base_proof": {
+    "path": "/private/tmp/vellum-grid-selection-example/qualified-v3/qualification.json",
+    "sha256": "6603883b281147097ad2a0192ce0e7bb436710c94605b295fd6a618cb6bce07c"
+  },
+  "legacy_proof": {
+    "path": "/private/tmp/vellum-grid-selection-example/qualified-v3-legacy/qualification.json",
+    "sha256": "03b8fb1cec39a5b38fbe3254524c8ebf8950bbdd98c2556eb67161fdb7af98ac"
+  },
+  "owned_source_map": {
+    "path": "/private/tmp/vellum-grid-selection-example/owned-final-v3.json",
+    "sha256": "5616ac3db0f8d56f36dc5e7ab88bbd8a55fadcdeb30a3df1a2f14ce4f77d67fc"
+  },
+  "native_freeze": {
+    "path": "/private/tmp/vellum-grid-selection-native-owned-freeze-v2.json",
+    "sha256": "7089d5154ee2495e6a4454b0c9195f42b6eb96390195524c538060425086dae7"
+  },
+  "selected_input_counts": {
+    "owned_example": 7,
+    "preserved_example": 7,
+    "integration": 13
+  },
+  "current_source_and_maps_verified": true,
+  "raw_check_logs_verified": [
+    {
+      "name": "portable-race20",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.597,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v1/portable-race20.log",
+      "log_sha256": "8bbaff4f4baacded242c8eedac741e8a1e490b1e6f76fabcf64519347b0d3e1e",
+      "inherited_from": "/private/tmp/vellum-grid-selection-example/qualified-v1/qualification.json",
+      "inherited_proof_sha256": "42ae8e83d693d2e414e3fd1a2bcb7c7dab24a047e0fa7002ccd21a38d3de0b7d",
+      "current_portable_inputs_unchanged": true
+    },
+    {
+      "name": "selection-managed-race",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -run '^TestActualRowSelection' -v ./...",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 61.254,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/selection-managed-race.log",
+      "log_sha256": "787d09b8efbfc2d64e2b1b79672f6cfd18f87660a7058016e71337dc93018373"
+    },
+    {
+      "name": "managed-vet",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go vet -tags offscreen ./...",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 6.581,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/managed-vet.log",
+      "log_sha256": "ddc2d6ab21449c2e9ac0664c535cdef2c7f607ef265f3996059f50e00dab64cb"
+    },
+    {
+      "name": "desktop-race-build",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go build -race -o /private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop .",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 13.14,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/desktop-race-build.log",
+      "log_sha256": "548fabdc6b84d762ba8ba9992596c2347c3bf331e96c23bb1b6a8f7e6e6e2e7e"
+    },
+    {
+      "name": "legacy-geometry-race",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v -run 'TestActual(Grid|VariableGrid)' ./...",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 82.676,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3-legacy/legacy-geometry-race.log",
+      "log_sha256": "a45f82e75612580fb9be51cb8b70471dea9198d3c0af7770a6e5914282ff8fb8"
+    }
+  ],
+  "six_preserved_actual_router_tests_passed": [
+    "TestActualGridRouterBatchesEquivalent",
+    "TestActualGridFrozenGeometryAndIndexedMaterialization",
+    "TestActualGridStalePressDisabledModalAndRetirement",
+    "TestActualGridStatusWrapDoesNotWidenLayout",
+    "TestActualVariableGridGeometryAndBoundedIndexedWork",
+    "TestActualVariableGridPixelPageWheelAndHeightRevision"
+  ],
+  "historical_failures": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-example/qualified-v1/qualification.json",
+      "sha256": "42ae8e83d693d2e414e3fd1a2bcb7c7dab24a047e0fa7002ccd21a38d3de0b7d",
+      "result": "FAIL",
+      "description": "Portable race20 PASS, then managed fixture compile refusal before execution; fixed only per-flag SetFlag helper."
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-example/qualified-v2/qualification.json",
+      "sha256": "563aa84f1e433c12e6b026f95f1a2c58b67759b4dbed65ee309e29c0b35998fc",
+      "result": "FAIL",
+      "description": "All preserved fixed/variable and new selection modifier batch tests PASS; variable selection geometry FAIL from native cursor exterior adding two pixels, with assertion unchanged."
+    }
+  ],
+  "binary_sha256": "81751a214ab48e10c2c5316c6e49c1e67a7dc22f1b2aff8099bf8ed0e205c56d",
+  "assessment": [
+    "Consumer source unchanged since v2; failure oracle was not altered. Final corrected native cell/header exterior source is the only runtime change enabling the formerly failing measured-variable-clip test.",
+    "Final base proof passes actual row-selection routes at batch1/7/64, portable20 inherited with exact relevant maps, both vet/runtime build evidence and raw logs/source hashes match.",
+    "Supplementary legacy proof reruns all six unchanged fixed/variable actual-router tests after shared Position correction; source before/after is identical to final base proof.",
+    "V1 compile-red and v2 native geometry-red remain separate immutable failed histories."
+  ],
+  "limits": [
+    "Compact selected-source evidence, not complete build source closure.",
+    "Built/race binary hash verified, but no actual desktop/physical input/externalAX/performance execution inferred. Parent owns actual Cocoa and final metadata qualification.",
+    "No new tests/GUI/Git/Prism/candidate/canonical writes by reviewer."
+  ]
+}

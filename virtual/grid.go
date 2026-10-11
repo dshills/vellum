@@ -26,11 +26,7 @@ var (
 // The owner serializes Grid and source changes. Sources may prepare their indices
 // on workers; Grid never builds or validates a whole-row index on the owner.
 type GridSource interface {
-	Identity() string
-	Revision() uint64
-	RowCount() int
-	RowKey(index int) (string, error)
-	IndexOf(key string) (index int, found bool, err error)
+	GridRowIndex
 	Cell(rowKey, columnID string) (string, error)
 }
 
@@ -54,6 +50,8 @@ type GridConfig struct {
 	RowHeight, HeaderHeight, FrozenColumns      int
 	OverscanRows, OverscanColumns               int
 	MaxRows, MaxColumns, MaxCells, MaxTextBytes int
+	RowSelection                                bool
+	MaxSelectionKeys                            int
 }
 
 type GridActive struct{ RowKey, ColumnID string }
@@ -66,6 +64,7 @@ type GridState struct {
 	TotalWidth, TotalHeight, FrozenWidth int
 	Config                               GridConfig
 	VariableHeights                      bool
+	Selection                            GridSelectionState
 }
 
 // GridCellRef is an opaque, copyable press identity. A source, viewport, active
@@ -91,6 +90,7 @@ type GridCell struct {
 	RowKey, ColumnID, Text string
 	Rect, Clip             GridRect
 	Frozen, Active         bool
+	Selected               bool
 	Ref                    GridCellRef
 }
 type GridHeader struct {
@@ -121,6 +121,7 @@ type Grid struct {
 	generation   uint64
 	anchorKey    string
 	anchorOffset int
+	selection    GridSelection
 }
 
 const gridMaxDefinitions = 4096
@@ -139,15 +140,18 @@ func normalizeGridConfig(c GridConfig) (GridConfig, error) {
 	if c.MaxTextBytes == 0 {
 		c.MaxTextBytes = 8 << 20
 	}
+	if c.MaxSelectionKeys == 0 {
+		c.MaxSelectionKeys = 4096
+	}
 	if c.RowHeight <= 0 || c.HeaderHeight < 0 || c.FrozenColumns < 0 || c.OverscanRows < 0 || c.OverscanColumns < 0 ||
 		c.MaxRows < 1 || c.MaxRows > 4096 || c.MaxColumns < 1 || c.MaxColumns > gridMaxDefinitions ||
-		c.MaxCells < 1 || c.MaxCells > 1<<20 || c.MaxTextBytes < 1 || c.MaxTextBytes > 64<<20 {
+		c.MaxCells < 1 || c.MaxCells > 1<<20 || c.MaxTextBytes < 1 || c.MaxTextBytes > 64<<20 || c.MaxSelectionKeys < 1 || c.MaxSelectionKeys > 65536 {
 		return c, ErrGridInvalid
 	}
 	return c, nil
 }
 
-func sourceStamp(s GridSource) (GridStamp, error) {
+func sourceStamp(s GridRowIndex) (GridStamp, error) {
 	if s == nil {
 		return GridStamp{}, ErrGridSource
 	}
@@ -171,6 +175,11 @@ func NewGrid(source GridSource, columns []GridColumn, config GridConfig, viewpor
 	stamp, err := sourceStamp(source)
 	if err != nil {
 		return nil, err
+	}
+	if c.RowSelection {
+		if _, ok := source.(GridSelectionSource); !ok {
+			return nil, ErrGridSource
+		}
 	}
 	if len(columns) < 1 || len(columns) > gridMaxDefinitions || c.FrozenColumns > len(columns) {
 		return nil, ErrGridInvalid
@@ -229,7 +238,7 @@ func (g *Grid) valid() error {
 	}
 	return nil
 }
-func sameStamp(source GridSource, want GridStamp) error {
+func sameStamp(source GridRowIndex, want GridStamp) error {
 	got, err := sourceStamp(source)
 	if err != nil {
 		return err
@@ -243,7 +252,13 @@ func (g *Grid) current() error {
 	if err := g.valid(); err != nil {
 		return err
 	}
-	return checkedGridRows(g.source, g.stamp, g.rows)
+	if err := checkedGridRows(g.source, g.stamp, g.rows); err != nil {
+		return err
+	}
+	if err := g.selection.current(); err != nil {
+		return err
+	}
+	return sameStamp(g.source, g.stamp)
 }
 func (g *Grid) nextGeneration() error {
 	if g.generation == math.MaxUint64 {
@@ -252,7 +267,7 @@ func (g *Grid) nextGeneration() error {
 	return nil
 }
 func (g *Grid) state() GridState {
-	return GridState{Stamp: g.stamp, Generation: g.generation, Viewport: g.viewport, Active: g.active, Columns: len(g.columns), TotalWidth: g.prefix[len(g.columns)], TotalHeight: g.rows.total, FrozenWidth: g.prefix[g.config.FrozenColumns], Config: g.config, VariableHeights: g.rows.metrics != nil}
+	return GridState{Stamp: g.stamp, Generation: g.generation, Viewport: g.viewport, Active: g.active, Columns: len(g.columns), TotalWidth: g.prefix[len(g.columns)], TotalHeight: g.rows.total, FrozenWidth: g.prefix[g.config.FrozenColumns], Config: g.config, VariableHeights: g.rows.metrics != nil, Selection: g.selection.state}
 }
 func (g *Grid) State() (GridState, error) {
 	if err := g.current(); err != nil {
@@ -281,7 +296,7 @@ func (g *Grid) clampViewport(v GridViewport, rows gridRows) (GridViewport, error
 	return v, nil
 }
 
-func checkedGridRow(s GridSource, stamp GridStamp, index int) (string, error) {
+func checkedGridRow(s GridRowIndex, stamp GridStamp, index int) (string, error) {
 	if index < 0 || index >= stamp.Rows {
 		return "", ErrGridRange
 	}
@@ -301,7 +316,7 @@ func checkedGridRow(s GridSource, stamp GridStamp, index int) (string, error) {
 	}
 	return key, nil
 }
-func checkedGridIndex(s GridSource, stamp GridStamp, key string) (int, bool, error) {
+func checkedGridIndex(s GridRowIndex, stamp GridStamp, key string) (int, bool, error) {
 	if key == "" || len(key) > gridMaxIdentityBytes || !utf8.ValidString(key) {
 		return 0, false, ErrGridRange
 	}
@@ -356,6 +371,9 @@ func (g *Grid) SetViewport(v GridViewport) error {
 	if _, err = g.layout(view, g.rows); err != nil {
 		return err
 	}
+	if err := g.validateSelectionView(g.selection, g.source, g.stamp, g.rows, view); err != nil {
+		return err
+	}
 	if err = g.nextGeneration(); err != nil {
 		return err
 	}
@@ -364,6 +382,12 @@ func (g *Grid) SetViewport(v GridViewport) error {
 		return err
 	}
 	if err = checkedGridRows(g.source, g.stamp, g.rows); err != nil {
+		return err
+	}
+	if err := g.selection.current(); err != nil {
+		return err
+	}
+	if err := sameStamp(g.source, g.stamp); err != nil {
 		return err
 	}
 	g.viewport, g.anchorKey, g.anchorOffset = view, strings.Clone(key), offset
@@ -411,6 +435,25 @@ func (g *Grid) ReplaceSource(source GridSource) error {
 	}
 	stamp, err := sourceStamp(source)
 	if err != nil {
+		return err
+	}
+	if g.config.RowSelection {
+		if _, ok := source.(GridSelectionSource); !ok {
+			return ErrGridSource
+		}
+	}
+	selection := g.selection
+	if stamp.Identity != g.stamp.Identity {
+		empty := GridSelection{}
+		empty.state.Revision = selection.state.Revision
+		if !sameGridSelection(empty, selection) {
+			if selection.state.Revision == math.MaxUint64 {
+				return ErrGridExhausted
+			}
+			empty.state.Revision++
+		}
+		selection = empty
+	} else if err := selection.current(); err != nil {
 		return err
 	}
 	if stamp.Identity == g.stamp.Identity {
@@ -467,6 +510,9 @@ func (g *Grid) ReplaceSource(source GridSource) error {
 	if _, err = g.layout(v, rows); err != nil {
 		return err
 	}
+	if err := g.validateSelectionView(selection, source, stamp, rows, v); err != nil {
+		return err
+	}
 	key, offset, err := g.anchor(source, stamp, rows, v)
 	if err != nil {
 		return err
@@ -474,8 +520,15 @@ func (g *Grid) ReplaceSource(source GridSource) error {
 	if err = checkedGridRows(source, stamp, rows); err != nil {
 		return err
 	}
+	if err := selection.current(); err != nil {
+		return err
+	}
+	if err := sameStamp(source, stamp); err != nil {
+		return err
+	}
 	stamp.Identity = strings.Clone(stamp.Identity)
 	g.source, g.stamp, g.rows, g.active, g.viewport, g.anchorKey, g.anchorOffset = source, stamp, rows, active, v, strings.Clone(key), offset
+	g.selection = selection
 	g.generation++
 	return nil
 }
@@ -517,6 +570,22 @@ func (g *Grid) reveal(row, col int) (GridViewport, error) {
 	return g.clampViewport(v, g.rows)
 }
 func (g *Grid) activateKey(key string, row, col int, reveal bool) error {
+	return g.activateKeyMode(key, row, col, reveal, GridSelectReplace)
+}
+func (g *Grid) activateKeyMode(key string, row, col int, reveal bool, mode GridSelectMode) error {
+	selection, err := g.prepareSelection(key, row, mode)
+	if err != nil {
+		return err
+	}
+	selectionChanged := !sameGridSelection(selection, g.selection)
+	if !selectionChanged {
+		selection = g.selection
+	} else {
+		if g.selection.state.Revision == math.MaxUint64 {
+			return ErrGridExhausted
+		}
+		selection.state.Revision = g.selection.state.Revision + 1
+	}
 	v := g.viewport
 	if reveal {
 		var err error
@@ -526,10 +595,13 @@ func (g *Grid) activateKey(key string, row, col int, reveal bool) error {
 		}
 	}
 	active := GridActive{key, g.columns[col].ID}
-	if active == g.active && v == g.viewport {
-		return checkedGridRows(g.source, g.stamp, g.rows)
+	if active == g.active && v == g.viewport && !selectionChanged {
+		return g.current()
 	}
 	if _, err := g.layout(v, g.rows); err != nil {
+		return err
+	}
+	if err := g.validateSelectionView(selection, g.source, g.stamp, g.rows, v); err != nil {
 		return err
 	}
 	if err := g.nextGeneration(); err != nil {
@@ -542,12 +614,22 @@ func (g *Grid) activateKey(key string, row, col int, reveal bool) error {
 	if err = checkedGridRows(g.source, g.stamp, g.rows); err != nil {
 		return err
 	}
+	if err := selection.current(); err != nil {
+		return err
+	}
+	if err := sameStamp(g.source, g.stamp); err != nil {
+		return err
+	}
 	active.RowKey = strings.Clone(active.RowKey)
 	g.active, g.viewport, g.anchorKey, g.anchorOffset = active, v, strings.Clone(anchor), offset
+	g.selection = selection
 	g.generation++
 	return nil
 }
 func (g *Grid) JumpToKey(key, columnID string) error {
+	return g.SelectToKey(key, columnID, GridSelectReplace)
+}
+func (g *Grid) SelectToKey(key, columnID string, mode GridSelectMode) error {
 	if err := g.current(); err != nil {
 		return err
 	}
@@ -562,7 +644,7 @@ func (g *Grid) JumpToKey(key, columnID string) error {
 	if !found {
 		return ErrGridRange
 	}
-	return g.activateKey(key, row, col, true)
+	return g.activateKeyMode(key, row, col, true, mode)
 }
 
 // navigationOrigin resolves the active identity or the viewport's first row.
@@ -589,6 +671,9 @@ func (g *Grid) navigationOrigin() (row, col int, err error) {
 // Move clamps directional row/column deltas. With no active cell it starts at
 // the viewport's first row and first column, then applies the deltas.
 func (g *Grid) Move(rows, columns int) error {
+	return g.MoveSelection(rows, columns, GridSelectReplace)
+}
+func (g *Grid) MoveSelection(rows, columns int, mode GridSelectMode) error {
 	if err := g.current(); err != nil {
 		return err
 	}
@@ -602,13 +687,16 @@ func (g *Grid) Move(rows, columns int) error {
 	if err != nil {
 		return err
 	}
-	return g.activateKey(key, row, col, true)
+	return g.activateKeyMode(key, row, col, true, mode)
 }
 
 // Page moves a body-height distance from the active row's top. Fixed-height
 // sources retain whole-row paging. Variable heights use indexed pixel lookup,
 // with at least one row of progress unless already at the corresponding end.
 func (g *Grid) Page(direction int) error {
+	return g.PageSelection(direction, GridSelectReplace)
+}
+func (g *Grid) PageSelection(direction int, mode GridSelectMode) error {
 	if err := g.current(); err != nil {
 		return err
 	}
@@ -616,7 +704,7 @@ func (g *Grid) Page(direction int) error {
 		return ErrGridInvalid
 	}
 	if g.rows.metrics == nil {
-		return g.Move(direction*max(1, (g.viewport.Height-g.config.HeaderHeight)/g.config.RowHeight), 0)
+		return g.MoveSelection(direction*max(1, (g.viewport.Height-g.config.HeaderHeight)/g.config.RowHeight), 0, mode)
 	}
 	row, col, err := g.navigationOrigin()
 	if err != nil {
@@ -638,12 +726,15 @@ func (g *Grid) Page(direction int) error {
 	if err != nil {
 		return err
 	}
-	return g.activateKey(key, target, col, true)
+	return g.activateKeyMode(key, target, col, true, mode)
 }
 
 // Activate accepts only a currently visible cell from this exact Grid generation.
 // An overscan record with an empty clip cannot be activated.
 func (g *Grid) Activate(ref GridCellRef) error {
+	return g.SelectCell(ref, GridSelectReplace)
+}
+func (g *Grid) SelectCell(ref GridCellRef, mode GridSelectMode) error {
 	if err := g.current(); err != nil {
 		return err
 	}
@@ -664,5 +755,5 @@ func (g *Grid) Activate(ref GridCellRef) error {
 	if g.cellClip(g.viewport, start, height, ref.column).Empty() {
 		return ErrGridStale
 	}
-	return g.activateKey(key, ref.row, ref.column, false)
+	return g.activateKeyMode(key, ref.row, ref.column, false, mode)
 }

@@ -1,0 +1,76 @@
+package virtual
+
+import (
+	"errors"
+	"strconv"
+	"sync/atomic"
+	"testing"
+)
+
+type reviewLateSelectionSource struct {
+	revision atomic.Uint64
+	armed    atomic.Bool
+}
+
+func (s *reviewLateSelectionSource) Identity() string { return "late-selection" }
+func (s *reviewLateSelectionSource) Revision() uint64 { return s.revision.Load() }
+func (s *reviewLateSelectionSource) RowCount() int    { return 10 }
+func (s *reviewLateSelectionSource) RowKey(i int) (string, error) {
+	if i < 0 || i >= 10 {
+		return "", ErrGridRange
+	}
+	return strconv.Itoa(i), nil
+}
+func (s *reviewLateSelectionSource) IndexOf(k string) (int, bool, error) {
+	i, e := strconv.Atoi(k)
+	return i, e == nil && i >= 0 && i < 10, nil
+}
+func (s *reviewLateSelectionSource) Cell(k, c string) (string, error) {
+	if k == "4" {
+		s.armed.Store(true)
+	}
+	return k, nil
+}
+func (s *reviewLateSelectionSource) SelectionSnapshot() (GridRowIndex, error) {
+	return reviewLateSelectionIndex{live: s, revision: s.revision.Load()}, nil
+}
+
+type reviewLateSelectionIndex struct {
+	live     *reviewLateSelectionSource
+	revision uint64
+}
+
+func (s reviewLateSelectionIndex) Identity() string {
+	if s.live.armed.CompareAndSwap(true, false) {
+		s.live.revision.Add(1)
+	}
+	return "late-selection"
+}
+func (s reviewLateSelectionIndex) Revision() uint64 { return s.revision }
+func (s reviewLateSelectionIndex) RowCount() int    { return 10 }
+func (s reviewLateSelectionIndex) RowKey(i int) (string, error) {
+	if i < 0 || i >= 10 {
+		return "", ErrGridRange
+	}
+	return strconv.Itoa(i), nil
+}
+func (s reviewLateSelectionIndex) IndexOf(k string) (int, bool, error) {
+	i, e := strconv.Atoi(k)
+	return i, e == nil && i >= 0 && i < 10, nil
+}
+
+func TestReviewSelectionFinalGuardCannotHideLiveSourceDrift(t *testing.T) {
+	s := &reviewLateSelectionSource{}
+	s.revision.Store(1)
+	g, err := NewGrid(s, []GridColumn{{ID: "c", Width: 10}}, GridConfig{RowHeight: 10, RowSelection: true}, GridViewport{Width: 10, Height: 50})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = g.SelectAll(); err != nil {
+		t.Fatal(err)
+	}
+	snap, err := g.Snapshot()
+	if !errors.Is(err, ErrGridStale) {
+		t.Fatalf("source drift during final selection guard accepted: err=%v returnedRevision=%d actualRevision=%d", err, snap.State.Stamp.Revision, s.Revision())
+	}
+}

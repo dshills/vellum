@@ -184,5 +184,10 @@ pixel paging; `RowHeights` offers cancellable prefix preparation outside the UI
 owner. The independent Grid example opts in with `-variable-rows`, retaining
 stable-key heights through reverse/filter and source-revision toggles. See the
 [variable-row report](reports/macos-grid-variable/README.md).
-Native performance, all-row selection,
-editing and large-tree completion remain subsequent P6 work.
+Optional [row selection](../specs/grid-selection.md) captures immutable ranges or
+All with bounded stable-key exceptions, and permits cancellable enumeration on
+workers. The managed grid routes Shift/Command selection and exposes visible
+membership independently of its cursor. `examples/grid -row-selection` adds
+All/Clear controls and combines with `-variable-rows`.
+Native performance, editing, loaded projection integration and large-tree
+completion remain subsequent P6 work.

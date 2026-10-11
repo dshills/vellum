@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "result": "APPROVED_CORRECTIVE_SOURCE",
+  "source_root": "/private/tmp/vellum-grid-selection",
+  "source_map": {
+    "drivers/cogent/grid.go": "6fc85e1d6f400f8bdd7ce25816c4f58d29e396f48069c59375261088896b5cd8",
+    "drivers/cogent/grid_geometry.go": "2f5d8eb351251135114fc5978c6ef3aba7064cf28ba718bf0134b919489193e5",
+    "drivers/cogent/grid_accessibility.go": "3db9d27754faa9a1643fa1ad2c4a416e482f23544f63873dcb27c77979432325",
+    "drivers/cogent/grid_selection_test.go": "fb4067f65f3da1274fff1c71ea106aaaff19881a594d226bce891296cb392261",
+    "drivers/cogent/grid_selection_offscreen_test.go": "8e38905898f87ab2bcc04fe7bd23283554533464d6baa72aa88d1adbf197ba83",
+    "drivers/cogent/grid_selection_accessibility_darwin_test.go": "aae1a12b367497ab4a098490a14c7a4852ca6bee165cc4d702f68cbd59307923",
+    "specs/grid-native.md": "5f2b12eecc565124d431373fac9f14b37b377127254eafb84bcc5268b8270844"
+  },
+  "freeze_map": {
+    "path": "/private/tmp/vellum-grid-selection-native-owned-freeze-v2.json",
+    "sha256": "7089d5154ee2495e6a4454b0c9195f42b6eb96390195524c538060425086dae7"
+  },
+  "changed_files": [
+    "drivers/cogent/grid.go",
+    "drivers/cogent/grid_selection_offscreen_test.go"
+  ],
+  "evidence": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-native/cursor-correction/red-overlay.json",
+      "sha256": "8226a13be44972018002eb92458ba9225c61fa6f8317246d35bb787f49d50a6e"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-native/cursor-correction/red.log",
+      "sha256": "79db419e34a2a7fdf81839b8223a3223e73e142c6273584c85fbc604e5820ed8"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-native/cursor-correction/preliminary-green.log",
+      "sha256": "f6d7b9ae635a1c799cea3b3c67008e3bdb714eca035ea32e27acab2ce1974bd5"
+    }
+  ],
+  "finding": {
+    "severity": "medium",
+    "status": "FIXED",
+    "cause": "Indexed cell exterior dimensions were installed as Content, so the newly styled active border expanded TotalBBox via GeomSize.Space. The actual unchanged consumer measured-clip oracle failed by two pixels.",
+    "correction": "Only gridPane child cells/headers now preserve shared rounded indexed exterior as Actual/Alloc.Total and derive clamped inner Content; pane/scrollbar content contracts remain unchanged.",
+    "meaningful_regression": "Every materialized cell matches globally rounded portable Clip at 96/120/144/192 DPI through selection changes, including a one-pixel indexed row; content dimensions cannot become negative. Exact same new test fails preserved native v1 source at all four DPIs and passes current corrected source."
+  },
+  "source_rationale": [
+    "Pinned Style.TotalMargin/BoxSpace accounts border width in content/total sizing.",
+    "Pinned ApplyScenePos uses Actual.Total for clipped TotalBBox and StandardBox renders border inside the fixed Total.",
+    "The correction is restricted to cell/header children of gridPane; setGridGeometryOrigin, scrollbar and pane callers preserve their established contract."
+  ],
+  "limitations": [
+    "Review and producer preliminary red/green evidence only; final native qualifier and actual Cocoa remain root/producer responsibilities.",
+    "No new GUI or test execution by this reviewer."
+  ]
+}

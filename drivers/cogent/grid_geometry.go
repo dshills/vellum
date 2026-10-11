@@ -18,6 +18,8 @@ type GridInspection struct {
 	Stamp                           virtual.GridStamp
 	Viewport                        virtual.GridViewport
 	Columns                         int
+	RowSelection                    bool
+	Selection                       virtual.GridSelectionState
 	Scale                           float32
 	Bounds                          image.Rectangle
 	Cells                           []GridCellGeometry
@@ -26,7 +28,7 @@ type GridInspection struct {
 type GridCellGeometry struct {
 	ID, RowKey, ColumnID, Text string
 	Row, Column                int
-	Frozen, Active             bool
+	Frozen, Active, Selected   bool
 	Bounds                     image.Rectangle
 }
 type GridHeaderGeometry struct {
@@ -85,7 +87,7 @@ func (g *gridBinding) capture() {
 		return
 	}
 	previous := g.measurement.Load()
-	m := &GridInspection{Window: g.window, ID: g.r.node.ID, Incarnation: g.incarnation, Generation: s.Generation, CellIncarnation: g.epoch, Frames: g.frames, Stamp: s.Stamp, Viewport: s.Viewport, Columns: s.Columns, Scale: g.host.Styles.UnitContext.Px(1), Bounds: g.host.Geom.ContentBBox, Cells: make([]GridCellGeometry, len(g.projection.Cells)), Headers: make([]GridHeaderGeometry, len(g.projection.Headers))}
+	m := &GridInspection{Window: g.window, ID: g.r.node.ID, Incarnation: g.incarnation, Generation: s.Generation, CellIncarnation: g.epoch, Frames: g.frames, Stamp: s.Stamp, Viewport: s.Viewport, Columns: s.Columns, RowSelection: s.Config.RowSelection, Selection: s.Selection, Scale: g.host.Styles.UnitContext.Px(1), Bounds: g.host.Geom.ContentBBox, Cells: make([]GridCellGeometry, len(g.projection.Cells)), Headers: make([]GridHeaderGeometry, len(g.projection.Headers))}
 	offset := image.Point{}
 	if g.host.Scene != nil {
 		offset = g.host.Scene.SceneGeom.Pos
@@ -96,7 +98,7 @@ func (g *gridBinding) capture() {
 		if c.Clip.Empty() {
 			bounds = image.Rectangle{}
 		}
-		m.Cells[i] = GridCellGeometry{ID: GridCellID(m.ID, c.RowKey, c.ColumnID), RowKey: c.RowKey, ColumnID: c.ColumnID, Text: c.Text, Row: c.RowIndex, Column: c.ColumnIndex, Frozen: c.Frozen, Active: c.Active, Bounds: bounds}
+		m.Cells[i] = GridCellGeometry{ID: GridCellID(m.ID, c.RowKey, c.ColumnID), RowKey: c.RowKey, ColumnID: c.ColumnID, Text: c.Text, Row: c.RowIndex, Column: c.ColumnIndex, Frozen: c.Frozen, Active: c.Active, Selected: c.Selected, Bounds: bounds}
 	}
 	for i, h := range g.projection.Headers {
 		bounds := g.headers[i].Geom.TotalBBox.Add(offset)

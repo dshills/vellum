@@ -1,0 +1,86 @@
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import time
+
+root = Path('/private/tmp/vellum-grid-selection')
+module = root / 'examples/grid'
+out = Path('/private/tmp/vellum-grid-selection-example/qualified-v1')
+out.mkdir(parents=True, exist_ok=False)
+owned = ['source.go', 'model.go', 'main.go', 'smoke.go', 'README.md',
+         'selection_rows_test.go', 'selection_rows_managed_test.go']
+unchanged = ['model_test.go', 'managed_test.go', 'variable_rows_test.go', 'variable_rows_managed_test.go', 'go.mod', 'go.sum', 'LICENSE']
+runtime = ['virtual/grid.go', 'virtual/grid_geometry.go', 'virtual/grid_rows.go', 'virtual/grid_selection.go',
+           'drivers/cogent/grid.go', 'drivers/cogent/grid_geometry.go',
+           'drivers/cogent/grid_accessibility.go', 'drivers/cogent/manual.go',
+           'drivers/cogent/manual_offscreen.go', 'drivers/cogent/manual_desktop.go',
+           'drivers/cogent/env.sh', 'drivers/cogent/go.mod',
+           'drivers/cogent/native/dependencies.json']
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def inputs():
+    return {
+        'owned': {name: sha(module / name) for name in owned},
+        'preserved_example': {name: sha(module / name) for name in unchanged},
+        'integration_inputs': {name: sha(root / name) for name in runtime},
+    }
+
+before = inputs()
+snapshot = out / 'owned-source'
+snapshot.mkdir()
+for name in owned:
+    shutil.copyfile(module / name, snapshot / name)
+(out / 'inputs-before.json').write_text(json.dumps(before, indent=2) + '\n')
+
+commands = [
+    ('portable-race20', 'go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go'),
+    ('managed-race', 'go test -tags offscreen -race -count=1 -v ./...'),
+    ('managed-vet', 'go vet -tags offscreen ./...'),
+    ('desktop-race-build', 'go build -race -o ' + str(out / 'grid-desktop') + ' .'),
+]
+results = []
+prefix = 'export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . ' + str(root / 'drivers/cogent/env.sh') + '; '
+for name, command in commands:
+    log = out / (name + '.log')
+    print('START', name, flush=True)
+    started = time.monotonic()
+    timed_out = False
+    with log.open('wb') as stream:
+        stream.write(('command: ' + prefix + command + '\n').encode())
+        stream.flush()
+        try:
+            run = subprocess.run(['/bin/zsh', '-c', prefix + command], cwd=module,
+                                 stdout=stream, stderr=subprocess.STDOUT, timeout=600)
+            code = run.returncode
+        except subprocess.TimeoutExpired:
+            code, timed_out = 124, True
+    result = {'name': name, 'command': prefix + command, 'cwd': str(module),
+              'exit_code': code, 'timed_out': timed_out,
+              'elapsed_seconds': round(time.monotonic() - started, 3),
+              'log': str(log), 'log_sha256': sha(log)}
+    results.append(result)
+    print('END', json.dumps(result), flush=True)
+    (out / 'checks.json').write_text(json.dumps(results, indent=2) + '\n')
+    if code:
+        break
+
+after = inputs()
+binary = out / 'grid-desktop'
+proof = {
+    'scope': 'Seven owned example files, seven preserved module/test files and thirteen selected integration inputs; not a complete build source closure or a desktop execution claim.',
+    'source_root': str(root), 'module': str(module),
+    'before': before, 'after': after, 'unchanged': before == after,
+    'checks': results,
+    'result': 'PASS' if before == after and len(results) == len(commands) and all(r['exit_code'] == 0 for r in results) else 'FAIL',
+    'binary': {'path': str(binary), 'sha256': sha(binary)} if binary.exists() else None,
+    'exploratory_logs': {str(path): sha(path) for path in sorted(out.parent.glob('*initial.log')) + sorted(out.parent.glob('*followup.log'))},
+    'desktop_invocation': str(binary) + ' -smoke -row-selection',
+}
+(out / 'qualification.json').write_text(json.dumps(proof, indent=2) + '\n')
+print('PROOF', str(out / 'qualification.json'), sha(out / 'qualification.json'), proof['result'], flush=True)
+raise SystemExit(0 if proof['result'] == 'PASS' else 1)

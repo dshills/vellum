@@ -1,0 +1,22 @@
+[
+  {
+    "name": "portable-race20",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go",
+    "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 2.597,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v1/portable-race20.log",
+    "log_sha256": "8bbaff4f4baacded242c8eedac741e8a1e490b1e6f76fabcf64519347b0d3e1e"
+  },
+  {
+    "name": "managed-race",
+    "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v ./...",
+    "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+    "exit_code": 1,
+    "timed_out": false,
+    "elapsed_seconds": 14.092,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v1/managed-race.log",
+    "log_sha256": "31404ed09bd7cbaa41b8ea94ef7f41559970b60b74a7df7b721366d8e4054300"
+  }
+]

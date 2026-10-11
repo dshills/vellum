@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "result": "CHANGES_REQUIRED",
+  "reviewer": "mac_history_review",
+  "created_utc": "2026-10-11T10:32:51.680283+00:00",
+  "scope": "Exact copied portable selection runtime3 plus unchanged row profile; read-only candidate. Two isolated adversarial race regressions; no broad qualifiers, canonical/source mutations, GUI, Prism or Git.",
+  "source_inputs": {
+    "path": "/private/tmp/vellum-grid-selection-review/draft-1/source-inputs.json",
+    "sha256": "c477d5849dc163fe9d4568a742cdb8692521a0e6ccf1dd9e72f8bbcdf53aad4a"
+  },
+  "source_hashes": {
+    "virtual/grid_selection.go": "728992a26d5a8d88a65982bf65ff2ff3bf7ae9a3e8665b31bf33bbe6b31dd1f8",
+    "virtual/grid.go": "e5740bb52417fd8ec8f3d889ddb66cbdab332f0efc7ac06f688fab6650bd4972",
+    "virtual/grid_geometry.go": "d7a42f16eb09e35a7523aacbb6afba84ef2c5d70c6053c90b884b1e3bc8e5f98",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46"
+  },
+  "findings": [
+    {
+      "id": "selection-captured-interior-order",
+      "severity": "high",
+      "file": "virtual/grid_selection.go",
+      "line": 342,
+      "related_file": "virtual/grid_geometry.go",
+      "related_line": 152,
+      "problem": "Same-stamp captured membership only validates presence, not agreement with the current accessed row. A valid immutable index can swap admitted interior row2 with hidden row8 while range endpoints1/3 agree, so Shift1\u21923 accepts row2 unselected and hidden row8 selected.",
+      "fix": "For same Scope/current stamp, verify captured row identity/index equals each bounded admitted current row before transition commit and Snapshot. Later-revision view keys retain normal captured membership semantics.",
+      "test": {
+        "path": "/private/tmp/vellum-grid-selection-review/draft-1/selection_review_test.go",
+        "sha256": "cfd821d9af874e608597f518a34aacac6121c828ca31a235b6d07eb869fe2146"
+      },
+      "overlay": {
+        "path": "/private/tmp/vellum-grid-selection-review/draft-1/overlay.json",
+        "sha256": "a54e637b7b4b5071c2328f24cf698b2fa989c5c80a8ec6001e11757bae0d0642"
+      },
+      "log": {
+        "path": "/private/tmp/vellum-grid-selection-review/draft-1/interior-regression.log",
+        "sha256": "8c1361bceb03c44d43261a222db96efab754bdd4b9862daed7653b1fe747bfc3"
+      },
+      "command": "GOCACHE=/private/tmp/vellum-grid-selection-review/go-cache GOWORK=off go test -race -count=1 -overlay=/private/tmp/vellum-grid-selection-review/draft-1/overlay.json -run ^TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow$ ./virtual",
+      "exit_code": 1
+    },
+    {
+      "id": "selection-snapshot-final-live-stamp",
+      "severity": "medium",
+      "file": "virtual/grid_geometry.go",
+      "line": 179,
+      "problem": "Snapshot checks live row/stamp then calls captured-index metadata without a final live stamp check. That later callback can coincide with live source revision advancement while the captured index itself remains immutable; Snapshot returns stale revision1 against live revision2.",
+      "fix": "After final selection.current(), recheck sameStamp(live source,current stamp), matching the added commit-path guard ordering.",
+      "test": {
+        "path": "/private/tmp/vellum-grid-selection-review/draft-1/selection_late_review_test.go",
+        "sha256": "70e1d73c34bffda9c947b5205aa01b8ce79ae8c3dd26a27c8b762520d2462eab"
+      },
+      "overlay": {
+        "path": "/private/tmp/vellum-grid-selection-review/draft-1/late-overlay.json",
+        "sha256": "8117e4b43a2f2fa5981b8ffbee8216b0d448a31dad4a59b117d3b9b525ac8eea"
+      },
+      "log": {
+        "path": "/private/tmp/vellum-grid-selection-review/draft-1/late-guard-regression.log",
+        "sha256": "616c365eeef2da7e0b0086a3cd28d3c53eaf3ec46c72b3005043db73df37dde9"
+      },
+      "command": "GOCACHE=/private/tmp/vellum-grid-selection-review/go-cache GOWORK=off go test -race -count=1 -overlay=/private/tmp/vellum-grid-selection-review/draft-1/late-overlay.json -run ^TestReviewSelectionFinalGuardCannotHideLiveSourceDrift$ ./virtual",
+      "exit_code": 1
+    }
+  ],
+  "positive_assessment": [
+    "Representation supports stable-key additions outside the original index with bounded detached sparse maps, checked MaxInt count and deterministic worker iteration.",
+    "Clear valid-only recovery and new-incarnation reset avoid reading a broken old capture; same-incarnation replacement preserves captured membership explicitly.",
+    "Range/All reads endpoints plus capacity-admitted visible/overscan rows without scanning hidden rows. Selection snapshots have no Grid/application backpointer; retained index memory is explicitly borrowed."
+  ],
+  "limitations": [
+    "Full new producer tests/spec/native/consumer are not covered by this early portable runtime review. Candidate is still developing; these exact original copies and RED evidence remain immutable."
+  ]
+}

@@ -18,8 +18,9 @@ the abnormal return; a prior remount binding is restored on refused preparation.
 Four clipped native panes render frozen/scrolling headers and frozen/scrolling
 body cells. Header Y and frozen X stay fixed. The host is the only Tab stop;
 pooled cell text and scrollbars cannot take keyboard focus. Arrow and PageUp/
-PageDown navigation are supported. Home/End/modified variants, editable cells,
-range selection, sorting headers and a double-click action are outside this
+PageDown navigation are supported. Optional row selection adds the exact
+modifiers described below. Home/End/other modified variants, editable cells,
+cell-range selection, sorting headers and a double-click action are outside this
 checkpoint. Tab/ShiftTab and modal Escape keep the existing managed behavior.
 A left press captures an opaque current cell reference, binding incarnation,
 scale and clipped scene rectangles at MouseDown. MouseUp
@@ -33,6 +34,46 @@ scene lock. Wheel input accumulates fractional logical
 pixels independently on each axis, refuses nonfinite input and bounds a single
 issued delta. Sliders use finite normalized ranges accounting for frozen/header
 panes; they do not create a second independent scroll offset.
+
+`GridConfig.RowSelection` defaults to false, preserving the existing active-cell
+cursor and keyboard behavior. Opt-in grids bind portable row membership to the
+accepted visible projection: a plain left click replaces membership, exact
+Shift-click extends from the portable stable-key anchor, and exact macOS
+Command-click toggles the clicked row. The modifier intent is captured at
+MouseDown, together with the existing cell, lifetime and scene-rectangle guards;
+MouseUp never reinterprets it. Control, Option and combined Command+Shift are
+unsupported selection modifiers. CapsLock/NumLock do not change semantic intent.
+Plain arrow/Page navigation replaces selection; exact Shift-arrow/Page extends;
+Command+A captures All, and plain Escape clears selection in the main scene.
+Existing modal Escape handling takes precedence and never clears an underlying
+grid. Native command handlers and focus/modal/disabled routing remain in force.
+Native input requires valid current Grid state. If a source violates its captured
+immutable-index contract, the explicit owner `ClearSelection` recovery API is
+separate from keyboard Escape; recovery must precede renewed native delivery.
+No failed or no-op request emits `GridChange`, and one accepted intent does not
+ask the caller to apply the model mutation again.
+
+Row membership and the active cursor are separate. The accepted row-member flags
+paint the normal selection background across materialized frozen and scrolling
+cells; the active cell has its own inside border even when toggled out. Render,
+Position and accessibility publication consume these flags without querying
+selection indices or domain rows. `GridInspection` adds `RowSelection`, detached
+`GridSelectionState` metadata and `Cells[].Selected`; `Active` retains cursor
+meaning. Selection changes advance portable generation and retire measured cell
+refs exactly as other effective transitions do. Inspections refuse a pending
+selection projection until its completed native frame.
+
+All/range capture uses the source's immutable `GridRowIndex`; no native widget
+enumerates the captured domain. Visible row/cell accessibility selected attributes
+use row membership in row mode, while legacy cell selection remains active-cell
+based. Native SelectedCells returns only materialized visible cells, not every
+captured key. Ordinary AX press replaces with its accepted row and preserves the
+existing generation/lifetime/tab guards. The captured selection count can differ
+from a later filtered live row count; the inspection publishes the portable
+captured scope honestly. Sparse toggle key retention remains bounded by the
+portable `MaxSelectionKeys` and text budget; native pools/local geometry limits
+are unchanged. Enumeration for a domain action belongs on a worker through the
+immutable snapshot, with current domain identity validation before application.
 
 Grid dimensions are integer logical pixels via Core units.Px (DPI/96). Existing
 Node Min sizes remain Dp. Shared rounded edges map logical coordinates to scene

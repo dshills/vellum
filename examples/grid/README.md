@@ -10,7 +10,7 @@ The Grid uses 24 logical-pixel rows, a frozen 28-pixel header and two frozen
 leading columns. Reverse/filter replaces the immutable indexed source revision
 in constant time. The buttons also demonstrate first/last key jumps, paging and
 panning; the managed Grid handles pointer selection, two-axis scrolling and
-focused arrow/page keys. Selection is a single active cell. The two models and
+focused arrow/page keys. The default tracks one active cell. The two models and
 window lifetimes are independent.
 
 From the repository root, prepare the pinned native dependency as described in
@@ -42,6 +42,32 @@ revision, including toggling back to the fixed 24-pixel height; it retains an
 independent active key and best-effort viewport anchor through `ReplaceSource`.
 The old immutable metric revision remains unchanged.
 
+Opt into captured row selection independently, or together with variable rows:
+
+```sh
+go run . -row-selection
+go run . -variable-rows -row-selection
+go run . -smoke -row-selection
+```
+
+Both windows then offer **Select all rows** and **Clear row selection**. Plain
+cell clicks/arrows replace the row selection; Shift extends from its anchor,
+Command-click toggles a row, Command+A captures all rows in the current view,
+and Escape clears it while the grid is focused. The active cell remains a
+separate cursor, including when that row is toggled off. Modal Escape retains
+its dialog behavior.
+
+Selection counts describe identities in a captured immutable view, not the
+number of selected rows currently visible after filtering. Reverse, filter and
+height revisions preserve those captured identities within one source
+incarnation; a new source incarnation clears the current selection. Range/all
+capture copies only lightweight identity/revision/projection metadata into a
+counter-free concurrent-read index. It does not scan or retain a million-row
+array. Sparse toggles are bounded by the public Grid configuration. A detached
+`Grid.Selection()` snapshot remains valid after Clear, projection replacement
+or unmount. Consumers must still validate identities against current domain
+data before applying a bulk operation.
+
 `go run . -smoke` is a bounded desktop check. It waits for current measured Grid
 frames, verifies both row counts and bounded cell pools, jumps to the millionth
 row and column 19, checks frozen geometry, replaces the indexed source while
@@ -57,6 +83,12 @@ With `-variable-rows`, the desktop smoke additionally computes a Page destinatio
 from the active row's top plus the current body height in logical pixels. It
 checks the resulting stable selection and completed measured frame. This is
 still an explicit owner command, without synthesized desktop input.
+
+With `-row-selection`, the desktop smoke captures all million identities, toggles
+two off, filters the view and checks that the captured count and hidden-key
+membership survive. It compares completed measured selected flags, clears the
+current model, and queries the earlier immutable snapshot outside the owner.
+It does not enumerate the million keys or synthesize desktop input.
 
 Portable tests verify indexed key inverses, immutable revisions, invalid keys,
 projection selection/ref retirement, and the same fixed viewport for 10k/1M rows.
@@ -94,6 +126,14 @@ These tests do not use UI callbacks as an input surrogate. The previously
 published report above describes the fixed-height checkpoint; variable-mode
 acceptance is recorded separately by the integration owner.
 
-All-row/range selection, cell editing/conflicts, tree expansion, loaded-data
+Row-selection portable tests cover counter-free concurrent index reads,
+captured range/all membership, projection/height/incarnation transitions, sparse
+keys outside a captured view, and bounded worker-visit cancellation. Additional
+offscreen tests route real modifier clicks, Shift arrows/pixel Page,
+Command+A, Escape and selection buttons, then compare completed measured flags
+at owner batches 1/7/64. The integration owner records desktop execution and
+the new checkpoint evidence separately.
+
+Cell editing/conflicts, tree expansion, loaded-data
 storage, native services, human accessibility/IME checks and performance
 qualification remain outside this example's evidence. See the public [Grid specification](../../specs/grid.md).

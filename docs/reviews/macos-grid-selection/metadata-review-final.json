@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "reviewer": "mac_history_review",
+  "created_utc": "2026-10-11T11:06:18.566912+00:00",
+  "candidate_root": "/private/tmp/vellum-grid-selection",
+  "baseline": "3313e0868c867624bcaab5b43d2183345c0a06e8",
+  "ledger_path": "/private/tmp/vellum-grid-selection/docs/reports/macos-grid-selection/qualification.json",
+  "ledger_sha256": "6c649e7b0212e4018a1700fbfacc0f37e1eb3e8aea607addb28ac1c114070eb0",
+  "scope": "Independent read-only final mechanical metadata/source/proof/raw-log/archive/link audit for captured Grid row selection before promotion. No Git/index command, test rerun, GUI, Prism or candidate/canonical mutation by reviewer.",
+  "findings": [],
+  "verified": {
+    "artifact_files": 172,
+    "artifact_bytes": 1055932,
+    "artifact_utf8_json_string_roundtrip": "All172 raw files decode/re-encode and JSON string serialize/deserialize to exactly the original bytes; no normalization.",
+    "artifact_leaf_set": "Exact current report/review leaf set equals artifact map plus the excluded root aggregate qualification.",
+    "externally_reviewed_sources": 30,
+    "internally_reviewed_sources": 31,
+    "source_difference": "Only unchanged virtual/grid_rows.go context is internal31 but omitted from the external30 changed-input ledger.",
+    "source_review_records": {
+      "source31": "7089c27f591d73760ce3f64a746b6d7fe08010a9bc85742f6a13924268b171f4",
+      "source29": "a06207619da21e8dfe601ca914b0a054b1c5b48ab232069cd1616c018c500080",
+      "native_evidence": "d6fcb4be5c6abed489937a42a625d0ec87e2e80b3a433c6276a6b1d4581841b4",
+      "consumer_evidence": "e51f1ae6a66a3254cea959fd05deaa214b3775089af0ee3e334494e690f4c406",
+      "prism": "44d3579e67c5ed1d6c52c0c3ed975ee003ac6d5ddb0a49720dbf17acf85d5456",
+      "resolution": "dfa471c72ef6c80a27abeea371feec5d6a9a31a9edf1e31d749b8052f5b59705"
+    },
+    "component_qualifications": {
+      "core-qualification.json": "b26c48191c68b9181272a4d191078ed9332d8096adcd7480eb67b4eab38d23b0",
+      "native-v2/qualification.json": "7accc4fc1b8559e33a864bf81f95338e9310890d6346d4f7a9bdbe54060366f2",
+      "consumer-handoff-v3.json": "c7dafff0caac0fb863c556300c03d559f1cc02e6157008ce54f59ecd26304db5",
+      "consumer-v3/qualification.json": "6603883b281147097ad2a0192ce0e7bb436710c94605b295fd6a618cb6bce07c",
+      "consumer-v3-legacy/qualification.json": "03b8fb1cec39a5b38fbe3254524c8ebf8950bbdd98c2556eb67161fdb7af98ac",
+      "desktop-qualification.json": "63dbc403829e5573483d3c49c0796b73aad1ef427678cbec505297f64c9b22db",
+      "qualifier-core-failure-check.json": "47ca666296ba8af85f7dbb74092ec072522a78dfdcab80300a42435425371679",
+      "qualifier-desktop-failure-check.json": "aaa311d306ec9aefd436cc6b8c0dbb263e8c329cd2d20a37f0ab4581c7fa110c",
+      "qualifier-helper-check.json": "3d19e76097386a871c3ce27e2b12fc610b83abde25b74baea441755f19248226"
+    },
+    "core_selected_source_inputs": 84,
+    "native_selected_inputs": {
+      "existing_files": 139,
+      "absent_go_sum_marker": 1,
+      "total": 140
+    },
+    "consumer_selected_inputs": {
+      "owned_example": 7,
+      "preserved_example": 7,
+      "selected_integration": 13
+    },
+    "portable20_inheritance": "V1 portable check0/log identity retained and all11 actually compiled relevant source/model/tests/manifests/portable-runtime identities agree with v3. V1 overall FAIL remains explicit.",
+    "native_dependencies": "Current full5832 upstream/288 typesetting path/hash-line fingerprints independently recomputed earlier; desktop JSON-map fingerprints independently recomputed now, both exact.",
+    "historical_bindings": {
+      "original_review_source_and_log_bindings": 20,
+      "final_source_archive": 29,
+      "draft_source_maps_each": 4,
+      "consumer_archived_sources_each": 7,
+      "native_historical_source_map": 7
+    },
+    "all_archived_component_logs": "Nativev1/v2 four logs each, consumer1/2/3/legacy check logs, core logs, actual Cocoa logs and original red/green regressions match recorded hashes.",
+    "markdown_links": "Current report/review/example README and selection spec local links resolve. Original private paths in immutable proofs are execution provenance; inert tracked archives preserve referenced source/log bytes.",
+    "self_exclusion": "The root aggregate and later metadata certificate are intentionally outside its artifact map. Component qualifications are included and hashed; no self hash cycle.",
+    "qualification_failure_simulations": "Current core/desktop script hashes match explicit injected FAIL proofs (one TimeoutExpired/124 each), fresh output and overwrite-refusal PASS records. Their original empty raw log paths exist and hash-match. Helper source hashes/tool-output4checks0 retained; preliminary wrong-import/sandbox attempts remain classified.",
+    "prism": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5",
+      "files": 30,
+      "staged_diff_bytes": 163687,
+      "widened_review_bytes": 196080,
+      "chunks": 4,
+      "llm_calls": 4,
+      "complete": true,
+      "findings": 0,
+      "discarded": 0,
+      "suppressed": 0,
+      "excluded": 0,
+      "skipped": 0,
+      "truncated_bytes": 0,
+      "process_exit": 0,
+      "process_records_source_diff_unchanged": true,
+      "raw_sha256": "44d3579e67c5ed1d6c52c0c3ed975ee003ac6d5ddb0a49720dbf17acf85d5456",
+      "input_map_sha256": "b1b3c5fd4ea7898ab401c11b5504d03216357f0a469d54364e7aa38f3c3f3af6"
+    },
+    "actual_cocoa": {
+      "proof_sha256": "63dbc403829e5573483d3c49c0796b73aad1ef427678cbec505297f64c9b22db",
+      "binary_path": "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop",
+      "binary_sha256": "81751a214ab48e10c2c5316c6e49c1e67a7dc22f1b2aff8099bf8ed0e205c56d",
+      "binary_current_hash_verified": true,
+      "checks": [
+        {
+          "name": "fixed-selection",
+          "exit_code": 0,
+          "failure": null,
+          "stages": [
+            "ready",
+            "far-both-axes",
+            "immutable-projection",
+            "captured-row-selection",
+            "pass"
+          ],
+          "raw_log_sha256": "0a2bda67fa1cec2537a9b3ded2f33f31110e3be6ac4262f3e4ef5ec2764dde92"
+        },
+        {
+          "name": "variable-selection",
+          "exit_code": 0,
+          "failure": null,
+          "stages": [
+            "ready",
+            "far-both-axes",
+            "immutable-projection",
+            "variable-pixel-page",
+            "captured-row-selection",
+            "pass"
+          ],
+          "raw_log_sha256": "73b715cbef8528503765d383246c76eb6ca3b3fae5027f9af67c82a90212f7ce"
+        }
+      ],
+      "raw_json_records_match_proof": true,
+      "source_binary_prepared_before_after_match": true,
+      "captured_scope_observation": "Both modes record CapturedRows999998, later filtered view500000 and Clear0; completed frame geometry and independent logical window lifetimes are separately exercised."
+    }
+  },
+  "historical_classification": [
+    "Draft1 two genuine portable regressions and exact source bodies/logs retained; draft2 exact unchanged originals pass the final portable runtime.",
+    "Nativev1 PASS is historical before the cursor exterior oracle; final new four-scale/one-pixel test fails the old grid source then passes corrected nativev2.",
+    "Consumerv1 overall FAIL from modifier helper compilation; its earlier portable20 check PASS inherited only after source equality.",
+    "Consumerv2 overall FAIL is the genuine native cursor border geometry failure; its preserved geometry oracle and consumer7 bytes remain unchanged in finalv3.",
+    "Consumerv3 plus supplementary six unchanged fixed/variable router checks PASS against corrected native source; no historical failure was rewritten as final acceptance.",
+    "Qualifier simulations are deliberately injected FAIL results testing metadata/cleanup behavior; they do not claim an actual Go/GUI child ran."
+  ],
+  "claim_assessment": [
+    "Report/runtime/source counts, callback work numbers and historical correction narrative agree with raw fixtures. Core3 repetitions log exact liveRowKey10/liveIndexOf10/Cell0/capture1 and shared fixture-index19/19 reads at both10k/1M; no timing or allocation result inferred.",
+    "Actual Cocoa qualification is completed-frame software/native adapter evidence with explicit owner commands and exact process0/stages, separate from offscreen routed modifiers and pure Cocoa selected-cells selector fixtures.",
+    "CapturedRows honestly counts immutable captured identities, including hidden/removed keys, instead of the later filtered view. Domain actions must validate live identities.",
+    "External AX, physical desktop input, human IME/VoiceOver, compositor teardown, loaded-million-row storage, sustained performance/fullP6/fullMac and public release remain explicitly unqualified.",
+    "Current31 source certificate remains unchanged; aggregate external30 and retained source maps agree. The raw Prism batch is complete and zero-finding, without equating internal/mechanical artifact review to external Prism review."
+  ],
+  "limits": [
+    "Content/source/proof maps were mechanically verified. No independent Git/index or staged-diff reexecution is claimed; the retained Prism process record documents unchanged staged diff and source maps independently match current bytes.",
+    "Source borrowed immutable-index/worker callback contracts remain caller responsibilities; qualification does not globally validate hidden source interiors or preempt callbacks.",
+    "Negative OS preference/public release claims reflect the scoped recorded operations and explicit report limits; no operating-system setting audit was performed."
+  ]
+}

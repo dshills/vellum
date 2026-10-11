@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "result": "APPROVED_IMPLEMENTATION_SOURCE",
+  "reviewer": "mac_history_review",
+  "created_utc": "2026-10-11T10:57:41.745240+00:00",
+  "baseline": "3313e08",
+  "source_root": "/private/tmp/vellum-grid-selection",
+  "source_count": 29,
+  "source_map": {
+    "path": "/private/tmp/vellum-grid-selection-review/final-batch-v2/source-map.json",
+    "sha256": "c100203139b642f3bf67076465a37c9eb295d90efd183b8dc9a29842aca34e3b"
+  },
+  "source_hashes": {
+    "virtual/grid_selection.go": "39e74332ec4408030ac9ba0e82a0170f570f49f4c0fd670c8d32705bba17ea0d",
+    "virtual/grid.go": "7110d7e7b5f419cca98b99a483c8be56f20fa631cbf09b0a5f271873216f2462",
+    "virtual/grid_geometry.go": "05eba3aabf57a4583fd6b0585d2cdd9b1be2e4aff28df549c141a9bba4574e5a",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46",
+    "virtual/grid_selection_test.go": "54f8a121512ed7aaf887a89ae6a5fcd9d21e4de4ee2d9f5da4acafd6be5899ea",
+    "virtual/grid_selection_admission_test.go": "5e2a5157c619009c287b39ba069a06d872ff78e211ce0c0b6fa0e4cc48a7a4a2",
+    "virtual/grid_selection_late_admission_test.go": "66600df8dd388c50ae5abf8aeb5736ff54f22b77cbdbfdcbbcb1a6bdc93cfe89",
+    "specs/grid-selection.md": "451ccab9cdf82c1f0cbd1d3c07b5868a0b949cb9a0b6faca48c4f73e1431a356",
+    "specs/grid.md": "4c17ce5f035a896cf173edcaa0b77f3bf6e86b87f166891f3b93d2dfeb3a053d",
+    "specs/framework.md": "0a084522d7c97e84af87299ce6ea0745220d58f29b357fdd9acb1f012905c7d6",
+    "specs/macos-completion.md": "d2c447c23f6991c25c6161c3c862e38247c27c4c84ae4fbb0d4fe97d5c35d1eb",
+    "specs/README.md": "8be334342ed9d841f536952484edce9796607c04a1e80f48d7f0dcce28eecd01",
+    "docs/implementation.md": "b95b80082f5fa708ea67f501185ee77014e84434e59d8e70a67da7c6dd5dcf01",
+    "drivers/cogent/grid.go": "6fc85e1d6f400f8bdd7ce25816c4f58d29e396f48069c59375261088896b5cd8",
+    "drivers/cogent/grid_geometry.go": "2f5d8eb351251135114fc5978c6ef3aba7064cf28ba718bf0134b919489193e5",
+    "drivers/cogent/grid_accessibility.go": "3db9d27754faa9a1643fa1ad2c4a416e482f23544f63873dcb27c77979432325",
+    "drivers/cogent/grid_selection_test.go": "fb4067f65f3da1274fff1c71ea106aaaff19881a594d226bce891296cb392261",
+    "drivers/cogent/grid_selection_offscreen_test.go": "8e38905898f87ab2bcc04fe7bd23283554533464d6baa72aa88d1adbf197ba83",
+    "drivers/cogent/grid_selection_accessibility_darwin_test.go": "aae1a12b367497ab4a098490a14c7a4852ca6bee165cc4d702f68cbd59307923",
+    "specs/grid-native.md": "5f2b12eecc565124d431373fac9f14b37b377127254eafb84bcc5268b8270844",
+    "examples/grid/source.go": "4ced91186b2f5e87920da492ba0f2bb8ba0541722071ecbdf10c3c38726639d8",
+    "examples/grid/model.go": "66461a0526a70313cc673834233ee15d99797c88ba17b3a3dc517b79985f329f",
+    "examples/grid/main.go": "8855a587af9d678eea639925b3d7c74349ec09c944d97fd063a209de0c763dc0",
+    "examples/grid/smoke.go": "78ab892c733773276882b0d9c133e607fa0e6a5512c1d10050f13afec1126764",
+    "examples/grid/README.md": "a61473d3a7d674811672afbc01eb8ba0855364488d97f6f2ccc36ed9ceb056ca",
+    "examples/grid/selection_rows_test.go": "8d45099cc0a25f02cb0c6bd91e235d32f6801979f922da9fa153404141fcd333",
+    "examples/grid/selection_rows_managed_test.go": "9d312e67f4e7aded96b1b05bdf71520d87e677995e5ae0a11c3f6337423c40b7",
+    "docs/reports/macos-grid-selection/qualify-core.py": "f34d01be6e9fe903e4d0763ffcb05052f32f3f0a16ab3f3b12fbd7bc3bca5518",
+    "docs/reports/macos-grid-selection/qualify-desktop.py": "e5c7f5e9cade9926a3d21c9aa40374817fdb3fb0cbf0e79b7527860e8927f09c"
+  },
+  "copied_and_current_hashes_match": true,
+  "scope": "Read-only independent review of portable captured row selection, native input/AX/style integration, independent Grid example, tests and specifications, plus root core/desktop qualification utilities. Includes one unchanged indexed-row context source. Final acceptance/review ledgers and prose evidence claims are separate metadata approval inputs.",
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "selection-captured-interior-order",
+      "status": "FIXED",
+      "resolution": "Same-Scope membership now compares the single checked captured ordinal with each admitted live row. Exact original malformed-interior regression is retained and passes corrected source."
+    },
+    {
+      "id": "selection-snapshot-final-live-stamp",
+      "status": "FIXED",
+      "resolution": "Snapshot/common State guard and transition commits recheck live stamp after captured-index validation. Exact original late-source-drift regression retained and passes."
+    },
+    {
+      "id": "native-cursor-border-exterior",
+      "status": "FIXED",
+      "resolution": "Indexed cell/header exterior becomes Actual/Alloc.Total before deriving nonnegative Content. Current border no longer expands outer shared edges; same new four-DPI/one-pixel-row test fails old source and passes corrected source."
+    },
+    {
+      "id": "qualification-owned-timeout-and-failure-evidence",
+      "status": "FIXED",
+      "resolution": "Both current utilities use owned process-group child cleanup, exclusive output markers and refusal to overwrite prior proof/logs; launch/timeout exceptions produce FAIL evidence. Desktop logs support absolute fresh output directories and final producer-v3, with optional producer path."
+    }
+  ],
+  "prior_reviews": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/design-review.json",
+      "sha256": "143bbdac9313fce23144d2fa0e4fc572bc9521d525ab5a8df6e14c7187aaffa3"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/draft-1/review.json",
+      "sha256": "bb41c254e004ced7a83c4ab9e66cc76d9eeaaf905c3e4855de582d34d7590e89"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/draft-2/review.json",
+      "sha256": "ea1db946cdf3c554660d24e8f90795b89d87dbee2453de33715935483c2b0033"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/historicalbatch-v1.json",
+      "sha256": "38cbf17ef94dc3b127b2cc9fecabfde4dfec67ebd80c90c882a5a5a189e5350b"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/native-cursor-correction/review.json",
+      "sha256": "96687a7f14ba1e0ea1fbab1af4aeadcef54934de797076c2db72af1885682df7"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/native-cursor-correction/final-proof-review.json",
+      "sha256": "d6fcb4be5c6abed489937a42a625d0ec87e2e80b3a433c6276a6b1d4581841b4"
+    }
+  ],
+  "qualified_evidence": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-native/qualified-v2/qualification.json",
+      "sha256": "7accc4fc1b8559e33a864bf81f95338e9310890d6346d4f7a9bdbe54060366f2",
+      "scope": "Four checks0; source7 and selected139+one absent marker, raw logs and before/after identities verified; prepared5832/288 fingerprints independently recomputed exact."
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-example/qualified-v3/qualification.json",
+      "sha256": "6603883b281147097ad2a0192ce0e7bb436710c94605b295fd6a618cb6bce07c",
+      "scope": "Inherited portable-race20 with exact relevant input checks; fresh affected row-selection router race/vet/race desktop build0. All selected27 input hashes and raw logs independently verified. Native binary built and hashed, no desktop execution implied.",
+      "selected_inputs_verified": 27,
+      "binary_sha256": "81751a214ab48e10c2c5316c6e49c1e67a7dc22f1b2aff8099bf8ed0e205c56d"
+    }
+  ],
+  "assessment": [
+    "Immutable bounded range/sparse-map representation, captured-scope counting and explicit hidden/removed-key retention match the API. Cloned retained payloads, independent captured index and no model backpointer preserve documented ownership.",
+    "Prospective source/geometry/membership reads and final guards preserve atomic cursor, viewport, selection revision and reference-generation admission. Counter/payload/capacity failures do not partially publish. Clear/new-incarnation recovery deliberately bypass broken old snapshots.",
+    "No owner selection operation or native accessibility path enumerates a hidden million-row source; bounded visible membership and explicit worker Visit are separately documented.",
+    "Native pointer modifiers are captured with press identity, keyboard modes preserve modal/unsupported propagation, and selected state remains separate from the active cursor. Native tab/lifetime/disabled guards and bounded visible AX exposure remain intact.",
+    "The example prepared index contains detached identity/scalar projection metadata; owner mutations, immutable worker queries and exact runtime failure oracles are separate. Its only consumer correction was the typed modifier helper; no geometry oracle was relaxed.",
+    "Current qualification utilities stream raw current-run output, refuse evidence overwrite, record bounded child failure, verify source/binary/prepared identity, and require exact completed stages/exit0."
+  ],
+  "limitations": [
+    "This source approval does not certify the later report/review metadata graph or declare actual Cocoa, physical desktop input, external AX, human IME/VoiceOver, compositor teardown, sustained performance, loaded-million-row storage or full P6 complete.",
+    "The source index immutable/concurrent-read/bounded-method contract remains caller-owned; hidden source interiors are not globally certified. Snapshot Visit permits partial callback delivery on cancellation/errors and cannot preempt arbitrary callback work.",
+    "Additional preserved fixed/variable actual-router tests against the shared cell Position correction are currently running separately; their final proof may supplement evidence without source changes.",
+    "No GUI/Git/Prism/candidate or canonical writes by this reviewer. Native/consumer broad qualifiers were not duplicated; original portable adversarial regressions were independently executed earlier. Final wrapper failure simulations and metadata are parent-owned separate evidence."
+  ]
+}

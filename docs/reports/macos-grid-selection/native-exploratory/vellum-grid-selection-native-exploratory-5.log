@@ -1,0 +1,46 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestManagedGridRowSelectionCocoaSelectedCells
+--- PASS: TestManagedGridRowSelectionCocoaSelectedCells (0.06s)
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true
+--- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging (0.45s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false (0.13s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true (0.10s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false (0.12s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true (0.10s)
+=== RUN   TestManagedGridRowSelectionSourceReplaceAndStalePress
+--- PASS: TestManagedGridRowSelectionSourceReplaceAndStalePress (0.06s)
+=== RUN   TestManagedGridRowSelectionRefusalAndEligibility
+--- PASS: TestManagedGridRowSelectionRefusalAndEligibility (0.10s)
+=== RUN   TestManagedGridLegacySelectionKeepsActiveCellBehavior
+--- PASS: TestManagedGridLegacySelectionKeepsActiveCellBehavior (0.03s)
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close
+--- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose (0.04s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab (0.02s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close (0.02s)
+=== RUN   TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX
+--- PASS: TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX (0.05s)
+=== RUN   TestManagedGridSelectionPointerModifiers
+=== RUN   TestManagedGridSelectionPointerModifiers/replace
+=== RUN   TestManagedGridSelectionPointerModifiers/shift
+=== RUN   TestManagedGridSelectionPointerModifiers/command
+=== RUN   TestManagedGridSelectionPointerModifiers/lock-flags
+=== RUN   TestManagedGridSelectionPointerModifiers/control
+=== RUN   TestManagedGridSelectionPointerModifiers/option
+=== RUN   TestManagedGridSelectionPointerModifiers/mixed
+--- PASS: TestManagedGridSelectionPointerModifiers (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/replace (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/shift (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/command (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/lock-flags (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/control (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/option (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/mixed (0.00s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	1.306s

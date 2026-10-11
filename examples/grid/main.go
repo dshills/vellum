@@ -15,7 +15,11 @@ import (
 func run(smoke bool) error { return runMode(smoke, false) }
 
 func runMode(smoke, variableRows bool) error {
-	program, err := newProgramMode(1024, 760, variableRows)
+	return runModes(smoke, variableRows, false)
+}
+
+func runModes(smoke, variableRows, rowSelection bool) error {
+	program, err := newProgramModes(1024, 760, variableRows, rowSelection)
 	if err != nil {
 		return err
 	}
@@ -57,8 +61,9 @@ func runMode(smoke, variableRows bool) error {
 func main() {
 	smoke := flag.Bool("smoke", false, "check desktop measured geometry, model transitions and two-window lifetimes")
 	variableRows := flag.Bool("variable-rows", false, "use indexed stable-key variable row heights and per-window height toggles")
+	rowSelection := flag.Bool("row-selection", false, "enable captured row-range/all selection and per-window selection controls")
 	flag.Parse()
-	if err := runMode(*smoke, *variableRows); err != nil {
+	if err := runModes(*smoke, *variableRows, *rowSelection); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

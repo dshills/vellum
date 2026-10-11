@@ -1,0 +1,455 @@
+=== RUN   TestGridUTF8AndWrappedSourceErrors
+--- PASS: TestGridUTF8AndWrappedSourceErrors (0.00s)
+=== RUN   TestGridMaximumCoordinateBoundary
+--- PASS: TestGridMaximumCoordinateBoundary (0.00s)
+=== RUN   TestGridNoOpAndFailureDoNotRetireReferences
+--- PASS: TestGridNoOpAndFailureDoNotRetireReferences (0.00s)
+=== RUN   TestGridRefreshFailuresAndEmptyRevisionTransitions
+--- PASS: TestGridRefreshFailuresAndEmptyRevisionTransitions (0.00s)
+=== RUN   TestGridMidRefreshSourceChangeNeverInstallsPartialState
+--- PASS: TestGridMidRefreshSourceChangeNeverInstallsPartialState (0.00s)
+=== RUN   TestGridAnchorRetentionClampsNearSourceEnd
+--- PASS: TestGridAnchorRetentionClampsNearSourceEnd (0.00s)
+=== RUN   TestGridOverscanAndCapacityProperty
+--- PASS: TestGridOverscanAndCapacityProperty (0.04s)
+=== RUN   TestGridIndependentOwnersParallel
+=== RUN   TestGridIndependentOwnersParallel/A
+=== PAUSE TestGridIndependentOwnersParallel/A
+=== RUN   TestGridIndependentOwnersParallel/B
+=== PAUSE TestGridIndependentOwnersParallel/B
+=== RUN   TestGridIndependentOwnersParallel/C
+=== PAUSE TestGridIndependentOwnersParallel/C
+=== RUN   TestGridIndependentOwnersParallel/D
+=== PAUSE TestGridIndependentOwnersParallel/D
+=== RUN   TestGridIndependentOwnersParallel/E
+=== PAUSE TestGridIndependentOwnersParallel/E
+=== RUN   TestGridIndependentOwnersParallel/F
+=== PAUSE TestGridIndependentOwnersParallel/F
+=== RUN   TestGridIndependentOwnersParallel/G
+=== PAUSE TestGridIndependentOwnersParallel/G
+=== RUN   TestGridIndependentOwnersParallel/H
+=== PAUSE TestGridIndependentOwnersParallel/H
+=== CONT  TestGridIndependentOwnersParallel/C
+=== CONT  TestGridIndependentOwnersParallel/D
+=== CONT  TestGridIndependentOwnersParallel/B
+=== CONT  TestGridIndependentOwnersParallel/E
+=== CONT  TestGridIndependentOwnersParallel/A
+=== CONT  TestGridIndependentOwnersParallel/G
+=== CONT  TestGridIndependentOwnersParallel/H
+=== CONT  TestGridIndependentOwnersParallel/F
+--- PASS: TestGridIndependentOwnersParallel (0.00s)
+    --- PASS: TestGridIndependentOwnersParallel/D (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/A (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/B (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/C (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/E (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/H (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/F (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/G (0.01s)
+=== RUN   TestGridReferenceDetachesDomainAndSeparatesIdenticalModels
+--- PASS: TestGridReferenceDetachesDomainAndSeparatesIdenticalModels (0.00s)
+=== RUN   TestGridAcceptedStringsDetachLargeCallerBacking
+--- PASS: TestGridAcceptedStringsDetachLargeCallerBacking (0.00s)
+=== RUN   TestGridEmptyStringsDoNotRetainBacking
+--- PASS: TestGridEmptyStringsDoNotRetainBacking (0.00s)
+=== RUN   TestGridVariableMetricsFailureIsAtomic
+=== RUN   TestGridVariableMetricsFailureIsAtomic/viewport
+=== RUN   TestGridVariableMetricsFailureIsAtomic/jump
+=== RUN   TestGridVariableMetricsFailureIsAtomic/page
+=== RUN   TestGridVariableMetricsFailureIsAtomic/move
+=== RUN   TestGridVariableMetricsFailureIsAtomic/activate
+=== RUN   TestGridVariableMetricsFailureIsAtomic/snapshot
+--- PASS: TestGridVariableMetricsFailureIsAtomic (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/viewport (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/jump (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/page (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/move (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/activate (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/snapshot (0.00s)
+=== RUN   TestGridVariableMetricsRevisionDriftIsAtomic
+--- PASS: TestGridVariableMetricsRevisionDriftIsAtomic (0.00s)
+=== RUN   TestGridVariableUnchangedRevisionRejectsGeometryChange
+--- PASS: TestGridVariableUnchangedRevisionRejectsGeometryChange (0.00s)
+=== RUN   TestGridVariableEmptyAndMalformedMetadata
+--- PASS: TestGridVariableEmptyAndMalformedMetadata (0.00s)
+=== RUN   TestGridVariableMillionRowsHasSameBoundedWork
+    grid_rows_failure_test.go:171: 10k/1M identical snapshot work: {gridCalls:{RowKey:24 IndexOf:24 Cell:240} offsets:154 pixels:102 cells:240 headers:10}
+--- PASS: TestGridVariableMillionRowsHasSameBoundedWork (0.00s)
+=== RUN   TestReviewVariableRowsDirectBoundsRequireInverse
+--- PASS: TestReviewVariableRowsDirectBoundsRequireInverse (0.00s)
+=== RUN   TestReviewVariableRowsPageCannotReverseDirection
+--- PASS: TestReviewVariableRowsPageCannotReverseDirection (0.00s)
+=== RUN   TestReviewVariableRowsProspectiveInteriorGeometry
+--- PASS: TestReviewVariableRowsProspectiveInteriorGeometry (0.00s)
+=== RUN   TestRowHeightsImmutableBoundariesAndInverse
+--- PASS: TestRowHeightsImmutableBoundariesAndInverse (0.01s)
+=== RUN   TestRowHeightsPreparationRefusalAndCancellation
+--- PASS: TestRowHeightsPreparationRefusalAndCancellation (0.00s)
+=== RUN   TestGridVariableRowsBruteGeometry
+--- PASS: TestGridVariableRowsBruteGeometry (0.04s)
+=== RUN   TestGridVariableAnchorShrinkGrowAndReorder
+--- PASS: TestGridVariableAnchorShrinkGrowAndReorder (0.00s)
+=== RUN   TestGridVariablePixelPagingTallRowsAndIntBoundary
+--- PASS: TestGridVariablePixelPagingTallRowsAndIntBoundary (0.00s)
+=== RUN   TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow
+--- PASS: TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow (0.00s)
+=== RUN   TestReviewSelectionFinalGuardCannotHideLiveSourceDrift
+--- PASS: TestReviewSelectionFinalGuardCannotHideLiveSourceDrift (0.00s)
+=== RUN   TestGridSelectionRandomRangesAndToggles
+--- PASS: TestGridSelectionRandomRangesAndToggles (0.52s)
+=== RUN   TestGridSelectionSnapshotRetentionAndNewKeys
+--- PASS: TestGridSelectionSnapshotRetentionAndNewKeys (0.00s)
+=== RUN   TestGridSelectionCapsFailuresAndRecovery
+--- PASS: TestGridSelectionCapsFailuresAndRecovery (0.00s)
+=== RUN   TestGridSelectionVisitCancellationErrorsAndGeneration
+--- PASS: TestGridSelectionVisitCancellationErrorsAndGeneration (0.00s)
+=== RUN   TestGridSelectionMillionRowsUsesBoundedWork
+    grid_selection_test.go:355: 10k/1M SelectAll identical bounded work: {calls:{RowKey:10 IndexOf:10 Cell:0} keys:19 lookups:19 captures:1}
+--- PASS: TestGridSelectionMillionRowsUsesBoundedWork (0.00s)
+=== RUN   TestGridSelectionCountOverflowAndAtomicDrift
+--- PASS: TestGridSelectionCountOverflowAndAtomicDrift (0.00s)
+=== RUN   TestGridSelectionPayloadDetachmentAndBudget
+--- PASS: TestGridSelectionPayloadDetachmentAndBudget (0.00s)
+=== RUN   TestGridSelectionOptInAndEmptySource
+--- PASS: TestGridSelectionOptInAndEmptySource (0.00s)
+=== RUN   TestGridTwoAxisGeometryAndFrozenRegions
+--- PASS: TestGridTwoAxisGeometryAndFrozenRegions (0.00s)
+=== RUN   TestGridCapacitiesRefuseBeforeMaterializationAndPreserveRefs
+--- PASS: TestGridCapacitiesRefuseBeforeMaterializationAndPreserveRefs (0.00s)
+=== RUN   TestGridRefsRejectPoolingSourceAndForeignIdentity
+--- PASS: TestGridRefsRejectPoolingSourceAndForeignIdentity (0.00s)
+=== RUN   TestGridNavigationAndIndexedRefresh
+--- PASS: TestGridNavigationAndIndexedRefresh (0.00s)
+=== RUN   TestGridSourceFailuresAreBoundedAndAtomic
+--- PASS: TestGridSourceFailuresAreBoundedAndAtomic (0.00s)
+=== RUN   TestGridTextBudgetAndDetachedRecords
+--- PASS: TestGridTextBudgetAndDetachedRecords (0.00s)
+=== RUN   TestGridInvalidExhaustedEmptyAndHiddenPanes
+--- PASS: TestGridInvalidExhaustedEmptyAndHiddenPanes (0.00s)
+=== RUN   TestGridGeometryPropertyOracle
+--- PASS: TestGridGeometryPropertyOracle (0.12s)
+=== RUN   TestGridWorkloadCallbacks
+    grid_test.go:504: GRID_WORKLOAD [{"Rows":10000,"Columns":20,"VisibleCells":400,"MaterializedCells":520,"Headers":10,"Calls":{"RowKey":52,"IndexOf":52,"Cell":520},"NavigationCalls":{"RowKey":2,"IndexOf":2,"Cell":0}},{"Rows":1000000,"Columns":20,"VisibleCells":400,"MaterializedCells":520,"Headers":10,"Calls":{"RowKey":52,"IndexOf":52,"Cell":520},"NavigationCalls":{"RowKey":2,"IndexOf":2,"Cell":0}}]
+--- PASS: TestGridWorkloadCallbacks (0.00s)
+=== RUN   TestMillionRowsMaterializesOnlyViewport
+--- PASS: TestMillionRowsMaterializesOnlyViewport (0.00s)
+=== RUN   TestTreeHundredThousandNodesAndCycles
+--- PASS: TestTreeHundredThousandNodesAndCycles (0.15s)
+=== RUN   TestProjectionKeepsSelectionAndRejectsMalformedIndices
+--- PASS: TestProjectionKeepsSelectionAndRejectsMalformedIndices (0.00s)
+=== RUN   TestSourceShrinkClearsStaleProjection
+--- PASS: TestSourceShrinkClearsStaleProjection (0.00s)
+=== RUN   TestSourceGrowthPreservesViewportBound
+--- PASS: TestSourceGrowthPreservesViewportBound (0.00s)
+=== RUN   TestSameLengthRevisionInvalidatesOrder
+--- PASS: TestSameLengthRevisionInvalidatesOrder (0.00s)
+=== RUN   TestStaleWorkerProjectionRejected
+--- PASS: TestStaleWorkerProjectionRejected (0.00s)
+=== RUN   TestReplacedSourceRejectsProjectionToken
+--- PASS: TestReplacedSourceRejectsProjectionToken (0.00s)
+=== RUN   TestProjectRejectsNegativeSource
+--- PASS: TestProjectRejectsNegativeSource (0.00s)
+=== RUN   TestGridUTF8AndWrappedSourceErrors
+--- PASS: TestGridUTF8AndWrappedSourceErrors (0.00s)
+=== RUN   TestGridMaximumCoordinateBoundary
+--- PASS: TestGridMaximumCoordinateBoundary (0.00s)
+=== RUN   TestGridNoOpAndFailureDoNotRetireReferences
+--- PASS: TestGridNoOpAndFailureDoNotRetireReferences (0.00s)
+=== RUN   TestGridRefreshFailuresAndEmptyRevisionTransitions
+--- PASS: TestGridRefreshFailuresAndEmptyRevisionTransitions (0.00s)
+=== RUN   TestGridMidRefreshSourceChangeNeverInstallsPartialState
+--- PASS: TestGridMidRefreshSourceChangeNeverInstallsPartialState (0.00s)
+=== RUN   TestGridAnchorRetentionClampsNearSourceEnd
+--- PASS: TestGridAnchorRetentionClampsNearSourceEnd (0.00s)
+=== RUN   TestGridOverscanAndCapacityProperty
+--- PASS: TestGridOverscanAndCapacityProperty (0.04s)
+=== RUN   TestGridIndependentOwnersParallel
+=== RUN   TestGridIndependentOwnersParallel/A
+=== PAUSE TestGridIndependentOwnersParallel/A
+=== RUN   TestGridIndependentOwnersParallel/B
+=== PAUSE TestGridIndependentOwnersParallel/B
+=== RUN   TestGridIndependentOwnersParallel/C
+=== PAUSE TestGridIndependentOwnersParallel/C
+=== RUN   TestGridIndependentOwnersParallel/D
+=== PAUSE TestGridIndependentOwnersParallel/D
+=== RUN   TestGridIndependentOwnersParallel/E
+=== PAUSE TestGridIndependentOwnersParallel/E
+=== RUN   TestGridIndependentOwnersParallel/F
+=== PAUSE TestGridIndependentOwnersParallel/F
+=== RUN   TestGridIndependentOwnersParallel/G
+=== PAUSE TestGridIndependentOwnersParallel/G
+=== RUN   TestGridIndependentOwnersParallel/H
+=== PAUSE TestGridIndependentOwnersParallel/H
+=== CONT  TestGridIndependentOwnersParallel/D
+=== CONT  TestGridIndependentOwnersParallel/F
+=== CONT  TestGridIndependentOwnersParallel/E
+=== CONT  TestGridIndependentOwnersParallel/B
+=== CONT  TestGridIndependentOwnersParallel/C
+=== CONT  TestGridIndependentOwnersParallel/H
+=== CONT  TestGridIndependentOwnersParallel/A
+=== CONT  TestGridIndependentOwnersParallel/G
+--- PASS: TestGridIndependentOwnersParallel (0.00s)
+    --- PASS: TestGridIndependentOwnersParallel/D (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/F (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/E (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/B (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/C (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/G (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/H (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/A (0.01s)
+=== RUN   TestGridReferenceDetachesDomainAndSeparatesIdenticalModels
+--- PASS: TestGridReferenceDetachesDomainAndSeparatesIdenticalModels (0.00s)
+=== RUN   TestGridAcceptedStringsDetachLargeCallerBacking
+--- PASS: TestGridAcceptedStringsDetachLargeCallerBacking (0.00s)
+=== RUN   TestGridEmptyStringsDoNotRetainBacking
+--- PASS: TestGridEmptyStringsDoNotRetainBacking (0.00s)
+=== RUN   TestGridVariableMetricsFailureIsAtomic
+=== RUN   TestGridVariableMetricsFailureIsAtomic/viewport
+=== RUN   TestGridVariableMetricsFailureIsAtomic/jump
+=== RUN   TestGridVariableMetricsFailureIsAtomic/page
+=== RUN   TestGridVariableMetricsFailureIsAtomic/move
+=== RUN   TestGridVariableMetricsFailureIsAtomic/activate
+=== RUN   TestGridVariableMetricsFailureIsAtomic/snapshot
+--- PASS: TestGridVariableMetricsFailureIsAtomic (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/viewport (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/jump (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/page (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/move (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/activate (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/snapshot (0.00s)
+=== RUN   TestGridVariableMetricsRevisionDriftIsAtomic
+--- PASS: TestGridVariableMetricsRevisionDriftIsAtomic (0.00s)
+=== RUN   TestGridVariableUnchangedRevisionRejectsGeometryChange
+--- PASS: TestGridVariableUnchangedRevisionRejectsGeometryChange (0.00s)
+=== RUN   TestGridVariableEmptyAndMalformedMetadata
+--- PASS: TestGridVariableEmptyAndMalformedMetadata (0.00s)
+=== RUN   TestGridVariableMillionRowsHasSameBoundedWork
+    grid_rows_failure_test.go:171: 10k/1M identical snapshot work: {gridCalls:{RowKey:24 IndexOf:24 Cell:240} offsets:154 pixels:102 cells:240 headers:10}
+--- PASS: TestGridVariableMillionRowsHasSameBoundedWork (0.00s)
+=== RUN   TestReviewVariableRowsDirectBoundsRequireInverse
+--- PASS: TestReviewVariableRowsDirectBoundsRequireInverse (0.00s)
+=== RUN   TestReviewVariableRowsPageCannotReverseDirection
+--- PASS: TestReviewVariableRowsPageCannotReverseDirection (0.00s)
+=== RUN   TestReviewVariableRowsProspectiveInteriorGeometry
+--- PASS: TestReviewVariableRowsProspectiveInteriorGeometry (0.00s)
+=== RUN   TestRowHeightsImmutableBoundariesAndInverse
+--- PASS: TestRowHeightsImmutableBoundariesAndInverse (0.01s)
+=== RUN   TestRowHeightsPreparationRefusalAndCancellation
+--- PASS: TestRowHeightsPreparationRefusalAndCancellation (0.01s)
+=== RUN   TestGridVariableRowsBruteGeometry
+--- PASS: TestGridVariableRowsBruteGeometry (0.04s)
+=== RUN   TestGridVariableAnchorShrinkGrowAndReorder
+--- PASS: TestGridVariableAnchorShrinkGrowAndReorder (0.00s)
+=== RUN   TestGridVariablePixelPagingTallRowsAndIntBoundary
+--- PASS: TestGridVariablePixelPagingTallRowsAndIntBoundary (0.00s)
+=== RUN   TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow
+--- PASS: TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow (0.00s)
+=== RUN   TestReviewSelectionFinalGuardCannotHideLiveSourceDrift
+--- PASS: TestReviewSelectionFinalGuardCannotHideLiveSourceDrift (0.00s)
+=== RUN   TestGridSelectionRandomRangesAndToggles
+--- PASS: TestGridSelectionRandomRangesAndToggles (0.51s)
+=== RUN   TestGridSelectionSnapshotRetentionAndNewKeys
+--- PASS: TestGridSelectionSnapshotRetentionAndNewKeys (0.00s)
+=== RUN   TestGridSelectionCapsFailuresAndRecovery
+--- PASS: TestGridSelectionCapsFailuresAndRecovery (0.00s)
+=== RUN   TestGridSelectionVisitCancellationErrorsAndGeneration
+--- PASS: TestGridSelectionVisitCancellationErrorsAndGeneration (0.00s)
+=== RUN   TestGridSelectionMillionRowsUsesBoundedWork
+    grid_selection_test.go:355: 10k/1M SelectAll identical bounded work: {calls:{RowKey:10 IndexOf:10 Cell:0} keys:19 lookups:19 captures:1}
+--- PASS: TestGridSelectionMillionRowsUsesBoundedWork (0.00s)
+=== RUN   TestGridSelectionCountOverflowAndAtomicDrift
+--- PASS: TestGridSelectionCountOverflowAndAtomicDrift (0.00s)
+=== RUN   TestGridSelectionPayloadDetachmentAndBudget
+--- PASS: TestGridSelectionPayloadDetachmentAndBudget (0.00s)
+=== RUN   TestGridSelectionOptInAndEmptySource
+--- PASS: TestGridSelectionOptInAndEmptySource (0.00s)
+=== RUN   TestGridTwoAxisGeometryAndFrozenRegions
+--- PASS: TestGridTwoAxisGeometryAndFrozenRegions (0.00s)
+=== RUN   TestGridCapacitiesRefuseBeforeMaterializationAndPreserveRefs
+--- PASS: TestGridCapacitiesRefuseBeforeMaterializationAndPreserveRefs (0.00s)
+=== RUN   TestGridRefsRejectPoolingSourceAndForeignIdentity
+--- PASS: TestGridRefsRejectPoolingSourceAndForeignIdentity (0.00s)
+=== RUN   TestGridNavigationAndIndexedRefresh
+--- PASS: TestGridNavigationAndIndexedRefresh (0.00s)
+=== RUN   TestGridSourceFailuresAreBoundedAndAtomic
+--- PASS: TestGridSourceFailuresAreBoundedAndAtomic (0.00s)
+=== RUN   TestGridTextBudgetAndDetachedRecords
+--- PASS: TestGridTextBudgetAndDetachedRecords (0.00s)
+=== RUN   TestGridInvalidExhaustedEmptyAndHiddenPanes
+--- PASS: TestGridInvalidExhaustedEmptyAndHiddenPanes (0.00s)
+=== RUN   TestGridGeometryPropertyOracle
+--- PASS: TestGridGeometryPropertyOracle (0.14s)
+=== RUN   TestGridWorkloadCallbacks
+    grid_test.go:504: GRID_WORKLOAD [{"Rows":10000,"Columns":20,"VisibleCells":400,"MaterializedCells":520,"Headers":10,"Calls":{"RowKey":52,"IndexOf":52,"Cell":520},"NavigationCalls":{"RowKey":2,"IndexOf":2,"Cell":0}},{"Rows":1000000,"Columns":20,"VisibleCells":400,"MaterializedCells":520,"Headers":10,"Calls":{"RowKey":52,"IndexOf":52,"Cell":520},"NavigationCalls":{"RowKey":2,"IndexOf":2,"Cell":0}}]
+--- PASS: TestGridWorkloadCallbacks (0.00s)
+=== RUN   TestMillionRowsMaterializesOnlyViewport
+--- PASS: TestMillionRowsMaterializesOnlyViewport (0.00s)
+=== RUN   TestTreeHundredThousandNodesAndCycles
+--- PASS: TestTreeHundredThousandNodesAndCycles (0.15s)
+=== RUN   TestProjectionKeepsSelectionAndRejectsMalformedIndices
+--- PASS: TestProjectionKeepsSelectionAndRejectsMalformedIndices (0.00s)
+=== RUN   TestSourceShrinkClearsStaleProjection
+--- PASS: TestSourceShrinkClearsStaleProjection (0.00s)
+=== RUN   TestSourceGrowthPreservesViewportBound
+--- PASS: TestSourceGrowthPreservesViewportBound (0.00s)
+=== RUN   TestSameLengthRevisionInvalidatesOrder
+--- PASS: TestSameLengthRevisionInvalidatesOrder (0.00s)
+=== RUN   TestStaleWorkerProjectionRejected
+--- PASS: TestStaleWorkerProjectionRejected (0.00s)
+=== RUN   TestReplacedSourceRejectsProjectionToken
+--- PASS: TestReplacedSourceRejectsProjectionToken (0.00s)
+=== RUN   TestProjectRejectsNegativeSource
+--- PASS: TestProjectRejectsNegativeSource (0.00s)
+=== RUN   TestGridUTF8AndWrappedSourceErrors
+--- PASS: TestGridUTF8AndWrappedSourceErrors (0.00s)
+=== RUN   TestGridMaximumCoordinateBoundary
+--- PASS: TestGridMaximumCoordinateBoundary (0.00s)
+=== RUN   TestGridNoOpAndFailureDoNotRetireReferences
+--- PASS: TestGridNoOpAndFailureDoNotRetireReferences (0.00s)
+=== RUN   TestGridRefreshFailuresAndEmptyRevisionTransitions
+--- PASS: TestGridRefreshFailuresAndEmptyRevisionTransitions (0.00s)
+=== RUN   TestGridMidRefreshSourceChangeNeverInstallsPartialState
+--- PASS: TestGridMidRefreshSourceChangeNeverInstallsPartialState (0.00s)
+=== RUN   TestGridAnchorRetentionClampsNearSourceEnd
+--- PASS: TestGridAnchorRetentionClampsNearSourceEnd (0.00s)
+=== RUN   TestGridOverscanAndCapacityProperty
+--- PASS: TestGridOverscanAndCapacityProperty (0.04s)
+=== RUN   TestGridIndependentOwnersParallel
+=== RUN   TestGridIndependentOwnersParallel/A
+=== PAUSE TestGridIndependentOwnersParallel/A
+=== RUN   TestGridIndependentOwnersParallel/B
+=== PAUSE TestGridIndependentOwnersParallel/B
+=== RUN   TestGridIndependentOwnersParallel/C
+=== PAUSE TestGridIndependentOwnersParallel/C
+=== RUN   TestGridIndependentOwnersParallel/D
+=== PAUSE TestGridIndependentOwnersParallel/D
+=== RUN   TestGridIndependentOwnersParallel/E
+=== PAUSE TestGridIndependentOwnersParallel/E
+=== RUN   TestGridIndependentOwnersParallel/F
+=== PAUSE TestGridIndependentOwnersParallel/F
+=== RUN   TestGridIndependentOwnersParallel/G
+=== PAUSE TestGridIndependentOwnersParallel/G
+=== RUN   TestGridIndependentOwnersParallel/H
+=== PAUSE TestGridIndependentOwnersParallel/H
+=== CONT  TestGridIndependentOwnersParallel/A
+=== CONT  TestGridIndependentOwnersParallel/D
+=== CONT  TestGridIndependentOwnersParallel/F
+=== CONT  TestGridIndependentOwnersParallel/G
+=== CONT  TestGridIndependentOwnersParallel/E
+=== CONT  TestGridIndependentOwnersParallel/H
+=== CONT  TestGridIndependentOwnersParallel/C
+=== CONT  TestGridIndependentOwnersParallel/B
+--- PASS: TestGridIndependentOwnersParallel (0.00s)
+    --- PASS: TestGridIndependentOwnersParallel/F (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/C (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/D (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/B (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/H (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/G (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/E (0.01s)
+    --- PASS: TestGridIndependentOwnersParallel/A (0.01s)
+=== RUN   TestGridReferenceDetachesDomainAndSeparatesIdenticalModels
+--- PASS: TestGridReferenceDetachesDomainAndSeparatesIdenticalModels (0.00s)
+=== RUN   TestGridAcceptedStringsDetachLargeCallerBacking
+--- PASS: TestGridAcceptedStringsDetachLargeCallerBacking (0.00s)
+=== RUN   TestGridEmptyStringsDoNotRetainBacking
+--- PASS: TestGridEmptyStringsDoNotRetainBacking (0.00s)
+=== RUN   TestGridVariableMetricsFailureIsAtomic
+=== RUN   TestGridVariableMetricsFailureIsAtomic/viewport
+=== RUN   TestGridVariableMetricsFailureIsAtomic/jump
+=== RUN   TestGridVariableMetricsFailureIsAtomic/page
+=== RUN   TestGridVariableMetricsFailureIsAtomic/move
+=== RUN   TestGridVariableMetricsFailureIsAtomic/activate
+=== RUN   TestGridVariableMetricsFailureIsAtomic/snapshot
+--- PASS: TestGridVariableMetricsFailureIsAtomic (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/viewport (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/jump (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/page (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/move (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/activate (0.00s)
+    --- PASS: TestGridVariableMetricsFailureIsAtomic/snapshot (0.00s)
+=== RUN   TestGridVariableMetricsRevisionDriftIsAtomic
+--- PASS: TestGridVariableMetricsRevisionDriftIsAtomic (0.00s)
+=== RUN   TestGridVariableUnchangedRevisionRejectsGeometryChange
+--- PASS: TestGridVariableUnchangedRevisionRejectsGeometryChange (0.00s)
+=== RUN   TestGridVariableEmptyAndMalformedMetadata
+--- PASS: TestGridVariableEmptyAndMalformedMetadata (0.00s)
+=== RUN   TestGridVariableMillionRowsHasSameBoundedWork
+    grid_rows_failure_test.go:171: 10k/1M identical snapshot work: {gridCalls:{RowKey:24 IndexOf:24 Cell:240} offsets:154 pixels:102 cells:240 headers:10}
+--- PASS: TestGridVariableMillionRowsHasSameBoundedWork (0.00s)
+=== RUN   TestReviewVariableRowsDirectBoundsRequireInverse
+--- PASS: TestReviewVariableRowsDirectBoundsRequireInverse (0.00s)
+=== RUN   TestReviewVariableRowsPageCannotReverseDirection
+--- PASS: TestReviewVariableRowsPageCannotReverseDirection (0.00s)
+=== RUN   TestReviewVariableRowsProspectiveInteriorGeometry
+--- PASS: TestReviewVariableRowsProspectiveInteriorGeometry (0.00s)
+=== RUN   TestRowHeightsImmutableBoundariesAndInverse
+--- PASS: TestRowHeightsImmutableBoundariesAndInverse (0.01s)
+=== RUN   TestRowHeightsPreparationRefusalAndCancellation
+--- PASS: TestRowHeightsPreparationRefusalAndCancellation (0.00s)
+=== RUN   TestGridVariableRowsBruteGeometry
+--- PASS: TestGridVariableRowsBruteGeometry (0.04s)
+=== RUN   TestGridVariableAnchorShrinkGrowAndReorder
+--- PASS: TestGridVariableAnchorShrinkGrowAndReorder (0.00s)
+=== RUN   TestGridVariablePixelPagingTallRowsAndIntBoundary
+--- PASS: TestGridVariablePixelPagingTallRowsAndIntBoundary (0.00s)
+=== RUN   TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow
+--- PASS: TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow (0.00s)
+=== RUN   TestReviewSelectionFinalGuardCannotHideLiveSourceDrift
+--- PASS: TestReviewSelectionFinalGuardCannotHideLiveSourceDrift (0.00s)
+=== RUN   TestGridSelectionRandomRangesAndToggles
+--- PASS: TestGridSelectionRandomRangesAndToggles (0.51s)
+=== RUN   TestGridSelectionSnapshotRetentionAndNewKeys
+--- PASS: TestGridSelectionSnapshotRetentionAndNewKeys (0.00s)
+=== RUN   TestGridSelectionCapsFailuresAndRecovery
+--- PASS: TestGridSelectionCapsFailuresAndRecovery (0.00s)
+=== RUN   TestGridSelectionVisitCancellationErrorsAndGeneration
+--- PASS: TestGridSelectionVisitCancellationErrorsAndGeneration (0.00s)
+=== RUN   TestGridSelectionMillionRowsUsesBoundedWork
+    grid_selection_test.go:355: 10k/1M SelectAll identical bounded work: {calls:{RowKey:10 IndexOf:10 Cell:0} keys:19 lookups:19 captures:1}
+--- PASS: TestGridSelectionMillionRowsUsesBoundedWork (0.00s)
+=== RUN   TestGridSelectionCountOverflowAndAtomicDrift
+--- PASS: TestGridSelectionCountOverflowAndAtomicDrift (0.00s)
+=== RUN   TestGridSelectionPayloadDetachmentAndBudget
+--- PASS: TestGridSelectionPayloadDetachmentAndBudget (0.00s)
+=== RUN   TestGridSelectionOptInAndEmptySource
+--- PASS: TestGridSelectionOptInAndEmptySource (0.00s)
+=== RUN   TestGridTwoAxisGeometryAndFrozenRegions
+--- PASS: TestGridTwoAxisGeometryAndFrozenRegions (0.00s)
+=== RUN   TestGridCapacitiesRefuseBeforeMaterializationAndPreserveRefs
+--- PASS: TestGridCapacitiesRefuseBeforeMaterializationAndPreserveRefs (0.00s)
+=== RUN   TestGridRefsRejectPoolingSourceAndForeignIdentity
+--- PASS: TestGridRefsRejectPoolingSourceAndForeignIdentity (0.00s)
+=== RUN   TestGridNavigationAndIndexedRefresh
+--- PASS: TestGridNavigationAndIndexedRefresh (0.00s)
+=== RUN   TestGridSourceFailuresAreBoundedAndAtomic
+--- PASS: TestGridSourceFailuresAreBoundedAndAtomic (0.00s)
+=== RUN   TestGridTextBudgetAndDetachedRecords
+--- PASS: TestGridTextBudgetAndDetachedRecords (0.00s)
+=== RUN   TestGridInvalidExhaustedEmptyAndHiddenPanes
+--- PASS: TestGridInvalidExhaustedEmptyAndHiddenPanes (0.00s)
+=== RUN   TestGridGeometryPropertyOracle
+--- PASS: TestGridGeometryPropertyOracle (0.12s)
+=== RUN   TestGridWorkloadCallbacks
+    grid_test.go:504: GRID_WORKLOAD [{"Rows":10000,"Columns":20,"VisibleCells":400,"MaterializedCells":520,"Headers":10,"Calls":{"RowKey":52,"IndexOf":52,"Cell":520},"NavigationCalls":{"RowKey":2,"IndexOf":2,"Cell":0}},{"Rows":1000000,"Columns":20,"VisibleCells":400,"MaterializedCells":520,"Headers":10,"Calls":{"RowKey":52,"IndexOf":52,"Cell":520},"NavigationCalls":{"RowKey":2,"IndexOf":2,"Cell":0}}]
+--- PASS: TestGridWorkloadCallbacks (0.00s)
+=== RUN   TestMillionRowsMaterializesOnlyViewport
+--- PASS: TestMillionRowsMaterializesOnlyViewport (0.00s)
+=== RUN   TestTreeHundredThousandNodesAndCycles
+--- PASS: TestTreeHundredThousandNodesAndCycles (0.14s)
+=== RUN   TestProjectionKeepsSelectionAndRejectsMalformedIndices
+--- PASS: TestProjectionKeepsSelectionAndRejectsMalformedIndices (0.00s)
+=== RUN   TestSourceShrinkClearsStaleProjection
+--- PASS: TestSourceShrinkClearsStaleProjection (0.00s)
+=== RUN   TestSourceGrowthPreservesViewportBound
+--- PASS: TestSourceGrowthPreservesViewportBound (0.00s)
+=== RUN   TestSameLengthRevisionInvalidatesOrder
+--- PASS: TestSameLengthRevisionInvalidatesOrder (0.00s)
+=== RUN   TestStaleWorkerProjectionRejected
+--- PASS: TestStaleWorkerProjectionRejected (0.00s)
+=== RUN   TestReplacedSourceRejectsProjectionToken
+--- PASS: TestReplacedSourceRejectsProjectionToken (0.00s)
+=== RUN   TestProjectRejectsNegativeSource
+--- PASS: TestProjectRejectsNegativeSource (0.00s)
+PASS
+ok  	github.com/dshills/vellum/virtual	3.952s

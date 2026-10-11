@@ -1,0 +1,23 @@
+[
+  {
+    "command": [
+      "otool",
+      "-L",
+      "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/binary-libraries.log",
+    "log_sha256": "0616108b44230b5790fe16196d8ab29b13b8bf6c3b4bb32c191e712ef1a52530"
+  },
+  {
+    "command": [
+      "go",
+      "version",
+      "-m",
+      "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/binary-go-version.log",
+    "log_sha256": "0467371f3cf621a2155ec769a08eecb8ccc8e036ecd1a1ad56402735034259b6"
+  }
+]

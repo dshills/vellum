@@ -220,6 +220,11 @@ func desktopSmoke(ctx context.Context, p *gridProgram) error {
 			return err
 		}
 	}
+	if p.rowSelection {
+		if err := desktopRowSelection(ctx, p, second); err != nil {
+			return err
+		}
+	}
 	if err = owned(p.owner, func() error { return p.owner.CloseWindow(first.id) }); err != nil {
 		return err
 	}
@@ -320,5 +325,116 @@ func desktopVariablePage(ctx context.Context, p *gridProgram, w *gridWindow) err
 		MetricCalls  rowMetricCalls
 		SourcePolicy string
 	}{after.Stamp.Rows, after.TotalHeight, expected, measured.Viewport, metricCounts, "stable-key periodic heights 23/35/47/29; indexed prefix/inverse; explicit owner Page"})
+	return nil
+}
+
+// Capturing all rows is an owner command over immutable indexed metadata, not
+// an enumeration or an input surrogate. The detached snapshot survives Clear.
+func desktopRowSelection(ctx context.Context, p *gridProgram, w *gridWindow) error {
+	var captured virtual.GridSelection
+	var scope virtual.GridSelectionState
+	var current virtual.GridState
+	if err := owned(p.owner, func() error {
+		// The earlier projection check used the even-only reversed view. Capture
+		// the full million-key universe explicitly before filtering it again.
+		if err := w.projection(false, false); err != nil {
+			return err
+		}
+		if err := w.grid.SelectAll(); err != nil {
+			return err
+		}
+		for _, key := range []string{rowKey(1), rowKey(2)} {
+			if err := w.grid.SelectToKey(key, columnID(0), virtual.GridSelectToggle); err != nil {
+				return err
+			}
+		}
+		var err error
+		captured, err = w.grid.Selection()
+		if err != nil {
+			return err
+		}
+		scope = captured.State()
+		if scope.CapturedRows != 999_998 || scope.Scope.Rows != 1_000_000 || scope.Overrides != 2 {
+			return errors.New("grid smoke: all-minus-two captured selection count/scope mismatch")
+		}
+		if err := w.projection(true, true); err != nil {
+			return err
+		}
+		current, err = w.grid.State()
+		if err != nil {
+			return err
+		}
+		if current.Stamp.Rows != 500_000 || current.Selection != scope {
+			return errors.New("grid smoke: projection changed captured selection universe")
+		}
+		// A filtered-out odd key remains selected in the earlier captured view.
+		for key, want := range map[string]bool{rowKey(0): true, rowKey(1): false, rowKey(2): false, rowKey(3): true, rowKey(999_999): true} {
+			got, err := captured.Contains(key)
+			if err != nil || got != want {
+				return fmt.Errorf("grid smoke: captured membership %s = %t, want %t: %v", key, got, want, err)
+			}
+		}
+		w.report(nil)
+		return nil
+	}); err != nil {
+		return err
+	}
+	measured, err := waitInspection(ctx, w)
+	if err != nil {
+		return err
+	}
+	if measured.Selection != scope || !measured.RowSelection {
+		return errors.New("grid smoke: completed selection inspection disagrees with owner")
+	}
+	for _, cell := range measured.Cells {
+		want, err := captured.Contains(cell.RowKey)
+		if err != nil || cell.Selected != want {
+			return errors.New("grid smoke: measured selected flags disagree with captured identities")
+		}
+	}
+	if err := owned(p.owner, func() error {
+		if err := w.grid.ClearSelection(); err != nil {
+			return err
+		}
+		var err error
+		current, err = w.grid.State()
+		if err != nil {
+			return err
+		}
+		if current.Selection.CapturedRows != 0 {
+			return errors.New("grid smoke: Clear did not clear current selection")
+		}
+		other, err := p.windows[0].grid.State()
+		if err != nil || other.Selection.CapturedRows != 0 {
+			return errors.New("grid smoke: selecting one window changed independent window")
+		}
+		w.report(nil)
+		return nil
+	}); err != nil {
+		return err
+	}
+	// Query the immutable snapshot outside the owner after its source was
+	// replaced and current selection cleared. No full-million visit is needed.
+	if selected, err := captured.Contains(rowKey(999_999)); err != nil || !selected || captured.State() != scope {
+		return errors.New("grid smoke: cleared owner invalidated detached captured selection")
+	}
+	cleared, err := waitInspection(ctx, w)
+	if err != nil {
+		return err
+	}
+	if cleared.Selection.CapturedRows != 0 {
+		return errors.New("grid smoke: completed Clear frame retained selected rows")
+	}
+	for _, cell := range cleared.Cells {
+		if cell.Selected {
+			return errors.New("grid smoke: completed Clear frame retained selected cell flags")
+		}
+	}
+	emit("captured-row-selection", struct {
+		Captured     virtual.GridSelectionState
+		CurrentView  virtual.GridStamp
+		ClearedCount int
+		Scope        string
+	}{scope, current.Stamp, current.Selection.CapturedRows, "owner All1M minus two; stable captured identities across filter; detached snapshot after Clear; no full enumeration/desktop input"})
 	return nil
 }

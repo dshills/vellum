@@ -8,8 +8,10 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"cogentcore.org/core/colors"
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
+	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/keymap"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/abilities"
@@ -173,6 +175,13 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 			return
 		}
 		if ref, ok := g.refAt(e.Pos()); ok {
+			if g.projection.State.Config.RowSelection {
+				mode, accepted := gridPointerSelectionMode(e.Modifiers())
+				if !accepted {
+					return
+				}
+				ref.rowSelection, ref.mode = true, mode
+			}
 			g.armed = &ref
 			host.SetFocus()
 			e.SetHandled()
@@ -185,14 +194,27 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 			return
 		}
 		at, ok := g.refAt(e.Pos())
+		// Selection intent belongs to the down event. Releasing Shift/Command,
+		// or adding one before release, cannot reinterpret an admitted press.
+		at.rowSelection, at.mode = ref.rowSelection, ref.mode
 		if !ok || at != *ref {
 			return
 		}
 		captured := ref.ref
-		g.post(ui.GridSelection, func() error { return g.model.Activate(captured) })
+		mode, rowSelection := ref.mode, ref.rowSelection
+		g.post(ui.GridSelection, func() error {
+			if rowSelection {
+				return g.model.SelectCell(captured, mode)
+			}
+			return g.model.Activate(captured)
+		})
 		e.SetHandled()
 	})
 	host.On(events.KeyChord, func(e events.Event) {
+		if g.projection.State.Config.RowSelection {
+			g.selectionKey(e)
+			return
+		}
 		rows, cols, page := 0, 0, 0
 		switch keymap.Of(e.KeyChord()) {
 		case keymap.MoveUp:
@@ -239,6 +261,85 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 		e.SetHandled()
 	})
 	return host, nil
+}
+
+func gridSemanticModifiers(mods key.Modifiers) key.Modifiers {
+	mods.SetFlag(false, key.CapsLock, key.NumLock)
+	return mods
+}
+
+func gridPointerSelectionMode(mods key.Modifiers) (virtual.GridSelectMode, bool) {
+	mods = gridSemanticModifiers(mods)
+	var shift, command key.Modifiers
+	shift.SetFlag(true, key.Shift)
+	command.SetFlag(true, key.Meta)
+	switch mods {
+	case 0:
+		return virtual.GridSelectReplace, true
+	case shift:
+		return virtual.GridSelectExtend, true
+	case command:
+		return virtual.GridSelectToggle, true
+	default:
+		return virtual.GridSelectReplace, false
+	}
+}
+
+// Row selection uses exact primitive chords rather than configurable keymap
+// aliases that might reinterpret Control/Option as selection modifiers.
+func (g *gridBinding) selectionKey(e events.Event) {
+	if e.IsHandled() {
+		return
+	}
+	mods := gridSemanticModifiers(e.Modifiers())
+	var shift, command key.Modifiers
+	shift.SetFlag(true, key.Shift)
+	command.SetFlag(true, key.Meta)
+	if e.KeyCode() == key.CodeA && mods == command {
+		g.post(ui.GridSelection, g.model.SelectAll)
+		e.SetHandled()
+		return
+	}
+	if e.KeyCode() == key.CodeEscape && mods == 0 {
+		// The existing scene-level modal handler owns Escape. An undismissable
+		// modal also must not reinterpret it as a row-selection command.
+		if scene := g.host.Scene; scene != nil && scene.Stage != nil && scene.Stage.Type == core.DialogStage {
+			return
+		}
+		g.post(ui.GridSelection, g.model.ClearSelection)
+		e.SetHandled()
+		return
+	}
+	mode := virtual.GridSelectReplace
+	if mods == shift {
+		mode = virtual.GridSelectExtend
+	} else if mods != 0 {
+		return
+	}
+	rows, cols, page := 0, 0, 0
+	switch e.KeyCode() {
+	case key.CodeUpArrow:
+		rows = -1
+	case key.CodeDownArrow:
+		rows = 1
+	case key.CodeLeftArrow:
+		cols = -1
+	case key.CodeRightArrow:
+		cols = 1
+	case key.CodePageUp:
+		page = -1
+	case key.CodePageDown:
+		page = 1
+	default:
+		return
+	}
+	g.post(ui.GridSelection, func() error {
+		if page != 0 {
+			return g.model.PageSelection(page, mode)
+		}
+		return g.model.MoveSelection(rows, cols, mode)
+	})
+	e.SetHandled()
 }
 func gridMaxX(s virtual.GridState) int {
 	pane := max(0, s.Viewport.Width-s.FrozenWidth)
@@ -497,7 +598,11 @@ func syncGrid(r *record) error {
 		if !c.Frozen {
 			pane = 3
 		}
-		g.place(w, g.panes[pane], c.Rect, c.Clip, html.EscapeString(c.Text), c.Active)
+		selected := c.Active
+		if snap.State.Config.RowSelection {
+			selected = c.Selected
+		}
+		g.place(w, g.panes[pane], c.Rect, c.Clip, html.EscapeString(c.Text), selected, c.Active && snap.State.Config.RowSelection)
 	}
 	for i, w := range g.headers {
 		if i >= len(snap.Headers) {
@@ -509,7 +614,7 @@ func syncGrid(r *record) error {
 		if !h.Frozen {
 			pane = 1
 		}
-		g.place(w, g.panes[pane], h.Rect, h.Clip, html.EscapeString(h.Title), false)
+		g.place(w, g.panes[pane], h.Rect, h.Clip, html.EscapeString(h.Title), false, false)
 	}
 	sx := gridMaxX(snap.State)
 	sy := gridMaxY(snap.State)
@@ -529,20 +634,28 @@ func (g *gridBinding) installTextStyle(w *core.Text) {
 		s.Padding.Zero()
 		s.Margin.Zero()
 		s.Border.Width.Zero()
+		// Membership uses the normal selected background; the active cell has
+		// a separate inside border even when its row is toggled out of the set.
+		if cursor, _ := w.Property("vellum.grid.cursor").(bool); cursor {
+			s.Border.Style.Set(styles.BorderSolid)
+			s.Border.Width.Set(units.Px(1))
+			s.Border.Color.Set(colors.Scheme.Primary.Base)
+		}
 		s.Grow.SetZero()
 		s.Text.WhiteSpace = text.WhiteSpacePre
 		s.SetAbilities(false, abilities.Focusable, abilities.Selectable, abilities.Clickable, abilities.Activatable, abilities.DoubleClickable, abilities.TripleClickable, abilities.Draggable, abilities.LongPressable, abilities.LongHoverable, abilities.Slideable)
 	})
 }
-func (g *gridBinding) place(w *core.Text, p *gridPane, rect, clip virtual.GridRect, value string, active bool) {
+func (g *gridBinding) place(w *core.Text, p *gridPane, rect, clip virtual.GridRect, value string, selected, cursor bool) {
 	if w.Parent != p {
 		tree.MoveToParent(w, p)
 		w.SetScene(p.Scene)
 	}
 	w.SetProperty("vellum.grid.rect", rect)
+	w.SetProperty("vellum.grid.cursor", cursor)
 	w.SetText(value)
 	w.SetState(clip.Empty(), states.Invisible)
-	w.SetState(active, states.Selected)
+	w.SetState(selected, states.Selected)
 	w.Update()
 }
 func disposeGrid(r *record) {
@@ -719,6 +832,16 @@ func (p *gridPane) Position() {
 	p.ForWidgetChildren(func(_ int, w core.Widget, wb *core.WidgetBase) bool {
 		r, _ := w.AsTree().Property("vellum.grid.rect").(virtual.GridRect)
 		setGridGeometryOrigin(wb, r, p.rect.X, p.rect.Y, scale)
+		// A cell's indexed natural rectangle is its exterior, not its text
+		// content. Keep the active border inside those shared rounded edges.
+		// Panes and scrollbars retain their existing content geometry contract.
+		size := &wb.Geom.Size
+		size.Actual.Total = size.Actual.Content
+		size.Alloc.Total = size.Alloc.Content
+		size.SetContentFromTotal(&size.Actual)
+		size.SetContentFromTotal(&size.Alloc)
+		size.Actual.Content.Set(max(0, size.Actual.Content.X), max(0, size.Actual.Content.Y))
+		size.Alloc.Content.Set(max(0, size.Alloc.Content.X), max(0, size.Alloc.Content.Y))
 		return tree.Continue
 	})
 	p.Frame.Position()
@@ -746,6 +869,8 @@ type gridPress struct {
 	bounds, hostBounds image.Rectangle
 	incarnation        uint64
 	scale              float32
+	rowSelection       bool
+	mode               virtual.GridSelectMode
 }
 
 func (g *gridBinding) refAt(point image.Point) (gridPress, bool) {

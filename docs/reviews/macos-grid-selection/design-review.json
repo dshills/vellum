@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "result": "DESIGN_REVIEW_ONLY",
+  "reviewer": "mac_history_review",
+  "created_utc": "2026-10-11T10:21:40.410071+00:00",
+  "candidate": "/private/tmp/vellum-grid-selection",
+  "baseline_inputs_read": {
+    "virtual/grid.go": "1f02cbc62f3e3200820f3d1e10d388deb786cf59b87c3535cbcea67f3f5374bf",
+    "virtual/grid_geometry.go": "7437e5ab904c55f1dc446e9664fbd6eca55996ea0f8927a2dc8d0521019e8c72",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46",
+    "virtual/table.go": "f0e3eff0098647a59b8a73ea508053fc493a7c522f3290db5a45865f1fdbfb11",
+    "virtual/tree.go": "e0f4ba824cf13e9366d7aee9c8693935c0bbd0a55fc7a14f210e4f82e2057ebe",
+    "drivers/cogent/grid.go": "04d0a6299ae33dd05ce82b89845f6bfd01eeb1f46c14392d2e97c9dfd730ea57",
+    "specs/grid-native.md": "bd825b0d539e8765aca9efffb1bbbf78ba20003e16eb1605f3a4586e99574ec5",
+    "specs/grid.md": "663f8201c391a76eefb99bd15e20a4580f99bf7d44a95a8d20f6d38e65b98afc"
+  },
+  "runtime_status": "Only pre-selection Grid implementation existed at first read. This record approves no new selection source bytes.",
+  "assessment": "Single immutable indexed range plus finitely bounded stable-key exceptions is suitable for opt-in portable selection without hidden owner scans, provided set membership/count/iteration and selection/cursor transitions share atomic admission.",
+  "required_contracts": [
+    "Current-view selected range captures an immutable concurrency-readable indexed revision; filtering/sorting preserves captured membership and does not imply domain deletion.",
+    "Toggling a newly added current key absent from the captured index needs an explicit bounded additive-key representation or an explicitly documented recapture policy. Count arithmetic must handle retained old keys plus new additions without overflow.",
+    "Shift anchor absent from current filtered view requires deterministic documented fallback.",
+    "Sparse key retention is capped by count and per-key bytes; retained stamp/anchor/override strings are detached. Captured source-index memory is borrowed and separately scoped, not claimed bounded by Grid viewport payload.",
+    "Detached Selection values retain immutable state/index without a Grid/application backpointer. Default legacy mode never requests SelectionSnapshot.",
+    "Contains validates accessed row/index/stamp before and after bounded reads; errors cannot mutate selection. Clear/new-incarnation reset do not read a broken old capture.",
+    "Visit runs only explicitly on caller workers, is cancellable before/among reads, allocates no whole selection list, visits each key once in deterministic order and documents partial callback delivery on cancellation/error.",
+    "Row-selected is computed once per materialized row. Selection-only and combined cursor-selection admission refuse atomically on source/capacity/revision/generation failure, preserving gesture refs."
+  ],
+  "recommended_adversarial_tests": [
+    "Capture All over a million-row procedural index and assert bounded owner callbacks and zero row enumeration.",
+    "Toggle new keys after same-incarnation membership changes, then verify Contains/Count/Visit exact set and detached old selection.",
+    "Shift with removed anchor; same-incarnation reverse/filter/height changes; new incarnation reset.",
+    "Failure during selection capture, current/captured index lookup and final revision checks preserves cursor, viewport, selection, generation and refs.",
+    "Corrupted captured index causes Contains/Visit refusal but Clear succeeds without querying it.",
+    "MaxSelectionKeys/counted-byte refusal, MaxInt selected-count overflow, sparse override cancellation and generation exhaustion.",
+    "Concurrent Contains/Visit on detached old snapshot while owner replaces/clears/extends selection; copy identity and retention type graph tests.",
+    "Default Grid tests/counters, variable-height Page and opaque stale press identity remain unchanged."
+  ],
+  "limits": [
+    "No candidate writes, canonical writes, Git, GUI, Prism or tests. Exact selection implementation needs a later source-bound review."
+  ]
+}

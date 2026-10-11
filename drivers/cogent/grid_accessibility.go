@@ -15,6 +15,7 @@ func gridAccessibility(r *record, parent string, b *accessibilityBridge, disable
 		return nodes, handlers
 	}
 	rows := map[string]string{}
+	rowSelection := m.RowSelection
 	for i, c := range m.Cells {
 		if c.Bounds.Empty() {
 			continue
@@ -22,10 +23,14 @@ func gridAccessibility(r *record, parent string, b *accessibilityBridge, disable
 		rowID := accessibilityRowID(r.node.ID, c.RowKey)
 		if rows[c.RowKey] == "" {
 			rows[c.RowKey] = rowID
-			nodes = append(nodes, accessibilityNode{ID: rowID, DomainID: gridRowID(r.node.ID, c.RowKey), Parent: parent, Role: "grid-row", Name: c.RowKey, RowIndex: c.Row + 1, RowCount: m.Stamp.Rows, Disabled: disabled, Actions: []string{}})
+			nodes = append(nodes, accessibilityNode{ID: rowID, DomainID: gridRowID(r.node.ID, c.RowKey), Parent: parent, Role: "grid-row", Name: c.RowKey, RowIndex: c.Row + 1, RowCount: m.Stamp.Rows, Selected: rowSelection && c.Selected, Disabled: disabled, Actions: []string{}})
 		}
 		id := accessibilityManagedID(c.ID)
-		x := accessibilityNode{pressFocusID: parent, ID: id, DomainID: c.ID, Parent: rowID, Role: "grid-cell", Name: c.Text, Value: c.Text, Disabled: disabled, Selected: c.Active, RowIndex: c.Row + 1, ColumnIndex: c.Column + 1, Actions: []string{}}
+		selected := c.Active
+		if rowSelection {
+			selected = c.Selected
+		}
+		x := accessibilityNode{pressFocusID: parent, ID: id, DomainID: c.ID, Parent: rowID, Role: "grid-cell", Name: c.Text, Value: c.Text, Disabled: disabled, Selected: selected, RowIndex: c.Row + 1, ColumnIndex: c.Column + 1, Actions: []string{}}
 		if !disabled {
 			x.Actions = []string{"press"}
 			ref := g.projection.Cells[i].Ref

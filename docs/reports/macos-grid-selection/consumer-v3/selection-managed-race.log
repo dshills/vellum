@@ -1,0 +1,15 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -run '^TestActualRowSelection' -v ./...
+# github.com/dshills/vellum/examples/grid.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse/1
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse/7
+=== RUN   TestActualRowSelectionModifiersKeysAndCapturedUniverse/64
+--- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse (47.88s)
+    --- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse/1 (16.28s)
+    --- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse/7 (15.79s)
+    --- PASS: TestActualRowSelectionModifiersKeysAndCapturedUniverse/64 (15.81s)
+=== RUN   TestActualRowSelectionVariablePageControlsAndStalePress
+--- PASS: TestActualRowSelectionVariablePageControlsAndStalePress (7.39s)
+PASS
+ok  	github.com/dshills/vellum/examples/grid	56.842s

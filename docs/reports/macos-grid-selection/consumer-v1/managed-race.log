@@ -1,0 +1,5 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v ./...
+# github.com/dshills/vellum/examples/grid [github.com/dshills/vellum/examples/grid.test]
+./selection_rows_managed_test.go:38:21: cannot use flags (variable of type []key.Modifiers) as []enums.BitFlag value in argument to mods.SetFlag
+FAIL	github.com/dshills/vellum/examples/grid [build failed]
+FAIL

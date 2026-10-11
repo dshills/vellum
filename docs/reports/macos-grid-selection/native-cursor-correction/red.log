@@ -1,0 +1,19 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry
+=== RUN   TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/96
+    grid_selection_offscreen_test.go:762: cell border changed indexed shared edges: cell={RowIndex:0 ColumnIndex:0 RowKey:selection-0 ColumnID:c0 Text:selection-0 · c0 Rect:{X:0 Y:27 Width:121 Height:1} Clip:{X:0 Y:27 Width:121 Height:1} Frozen:true Active:true Selected:true Ref:{token:0x5f16dc4128d8 generation:3 row:0 column:0 key:selection-0 columnID:c0}} got=(6,33)-(127,36) want=(6,33)-(127,34)
+=== RUN   TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/120
+    grid_selection_offscreen_test.go:762: cell border changed indexed shared edges: cell={RowIndex:0 ColumnIndex:0 RowKey:selection-0 ColumnID:c0 Text:selection-0 · c0 Rect:{X:0 Y:27 Width:121 Height:1} Clip:{X:0 Y:27 Width:121 Height:1} Frozen:true Active:true Selected:true Ref:{token:0x5f16dd516ef8 generation:3 row:0 column:0 key:selection-0 columnID:c0}} got=(7,41)-(158,44) want=(7,41)-(158,42)
+=== RUN   TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/144
+    grid_selection_offscreen_test.go:762: cell border changed indexed shared edges: cell={RowIndex:0 ColumnIndex:0 RowKey:selection-0 ColumnID:c0 Text:selection-0 · c0 Rect:{X:0 Y:27 Width:121 Height:1} Clip:{X:0 Y:27 Width:121 Height:1} Frozen:true Active:true Selected:true Ref:{token:0x5f16dcd53390 generation:3 row:0 column:0 key:selection-0 columnID:c0}} got=(8,49)-(190,54) want=(8,49)-(190,50)
+=== RUN   TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/192
+    grid_selection_offscreen_test.go:762: cell border changed indexed shared edges: cell={RowIndex:0 ColumnIndex:0 RowKey:selection-0 ColumnID:c0 Text:selection-0 · c0 Rect:{X:0 Y:27 Width:121 Height:1} Clip:{X:0 Y:27 Width:121 Height:1} Frozen:true Active:true Selected:true Ref:{token:0x5f16dd52cc80 generation:3 row:0 column:0 key:selection-0 columnID:c0}} got=(11,65)-(253,71) want=(11,65)-(253,67)
+--- FAIL: TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry (0.11s)
+    --- FAIL: TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/96 (0.05s)
+    --- FAIL: TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/120 (0.02s)
+    --- FAIL: TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/144 (0.02s)
+    --- FAIL: TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry/192 (0.02s)
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	0.673s
+FAIL

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "result": "HISTORICAL_SOURCE_REVIEW",
+  "classification": "Pre-cursor-correction final batch; immutable copied source, not final acceptance",
+  "source_map": {
+    "path": "/private/tmp/vellum-grid-selection-review/final-batch/source-map.json",
+    "sha256": "1a2fc4ea9a7d2169578ac8d8f4a269d057905d570e6f7d61a1781f88b96292e0"
+  },
+  "scope": "27 reviewed runtime/test/spec/example files; source bytes preserved unchanged. Portable corrections already approved. Native cursor border later failed actual example geometry; two native files supersede these historical bytes. Qualifier scripts are not part of this historical map.",
+  "superseded_files": [
+    "drivers/cogent/grid.go",
+    "drivers/cogent/grid_selection_offscreen_test.go"
+  ],
+  "failure_evidence": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-example/qualified-v2/qualification.json",
+      "sha256": "563aa84f1e433c12e6b026f95f1a2c58b67759b4dbed65ee309e29c0b35998fc",
+      "classification": "historical actual geometry failure"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-example/qualified-v2/managed-race.log",
+      "sha256": "4825053270262296be339f453b83cef8278cab31cb060bfe9e35d90b412511f6",
+      "classification": "historical actual geometry failure"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-native/qualified-v1/qualification.json",
+      "sha256": "235ce0ecf94f518a7d945c29d55d6c03a1320f57076dc0dd3131fce11ddddc85",
+      "classification": "historical pass without cursor geometry oracle"
+    }
+  ]
+}

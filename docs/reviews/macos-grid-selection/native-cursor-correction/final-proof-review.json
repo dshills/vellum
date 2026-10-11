@@ -1,0 +1,55 @@
+{
+  "result": "APPROVED_FROZEN_CORRECTIVE_EVIDENCE",
+  "proof": {
+    "path": "/private/tmp/vellum-grid-selection-native/qualified-v2/qualification.json",
+    "sha256": "7accc4fc1b8559e33a864bf81f95338e9310890d6346d4f7a9bdbe54060366f2"
+  },
+  "source_map_sha256": "7089d5154ee2495e6a4454b0c9195f42b6eb96390195524c538060425086dae7",
+  "selected_inputs_verified": {
+    "existing_files": 139,
+    "absent_go_sum_marker": 1,
+    "total_entries": 140
+  },
+  "prepared_fingerprints_recomputed": {
+    "upstream": {
+      "path": "/private/tmp/vellum-grid-selection/drivers/cogent/build/upstream",
+      "resolved_path": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "files": 5832,
+      "sha256_of_path_digest_lines": "ac55ab413d8e575ab5c78cd920e9f6a271f24c523b613291018b1c2c09edb1db"
+    },
+    "typesetting": {
+      "path": "/private/tmp/vellum-grid-selection/drivers/cogent/build/typesetting",
+      "resolved_path": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/typesetting",
+      "files": 288,
+      "sha256_of_path_digest_lines": "ce9ffe418e002e7103da68b637a119f32fadb395932de75c348649575d4abf8a"
+    }
+  },
+  "check_logs_verified": [
+    {
+      "name": "selection-offscreen-race",
+      "exit_code": 0,
+      "sha256": "98b73790ddc9ad317515bdeb5263e5e8e9ec9e323d186c072dbb3505ae399fed"
+    },
+    {
+      "name": "offscreen-vet",
+      "exit_code": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "default-vet",
+      "exit_code": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "default-modifiers-race",
+      "exit_code": 0,
+      "sha256": "89d9041e6d8708ee3a7888f82998461c51ea091a0be59e75c739c339795fec1e"
+    }
+  ],
+  "notes": [
+    "Exact final source bytes and before/after selected maps match independently. All four raw logs match recorded hashes and exit zero, including the new cursor exterior regression repeated three times at all four DPIs.",
+    "Producer full prepared fingerprints independently recomputed; no dependency contents copied.",
+    "Historical native-v1 PASS and consumer-v2 runtime-red remain distinct from final proof-v2.",
+    "No GUI, external AX, physical input or performance qualification inferred. No new test execution by reviewer."
+  ]
+}

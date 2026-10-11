@@ -1,0 +1,35 @@
+{
+  "scope": "Existing owned-process helper regression checks required by corrected qualifier wrappers; command was run with sandbox escalation for read-only ps inspection.",
+  "argv": [
+    "python3",
+    "scripts/child_process_test.py"
+  ],
+  "exit_code": 0,
+  "tests": 4,
+  "tool_output": "....\n----------------------------------------------------------------------\nRan 4 tests in 0.576s\n\nOK\n",
+  "source_inputs": {
+    "scripts/child_process.py": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc",
+    "scripts/child_process_test.py": "645ffcf8754791c8bcff8ef45f0805568620d8813b771ca2636d34962a0191da"
+  },
+  "result": "PASS",
+  "preliminary_attempts": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "scripts.child_process_test"
+      ],
+      "exit_code": 1,
+      "reason": "wrong import path for this existing standalone test runner"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/child_process_test.py"
+      ],
+      "exit_code": 1,
+      "reason": "sandbox blocked read-only ps inspection; rerun with authorized escalation passed"
+    }
+  ]
+}

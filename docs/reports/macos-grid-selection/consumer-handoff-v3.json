@@ -1,0 +1,131 @@
+{
+  "result": "PASS",
+  "scope": "Row-selection consumer checkpoint. Compact owned7/preserved7/selectedintegration13 input maps and independently frozen native7 map, not full source closure or performance qualification.",
+  "source_root": "/private/tmp/vellum-grid-selection",
+  "module": "/private/tmp/vellum-grid-selection/examples/grid",
+  "owned_source": {
+    "path": "/private/tmp/vellum-grid-selection-example/owned-final-v3.json",
+    "sha256": "5616ac3db0f8d56f36dc5e7ab88bbd8a55fadcdeb30a3df1a2f14ce4f77d67fc"
+  },
+  "base_qualification": {
+    "path": "/private/tmp/vellum-grid-selection-example/qualified-v3/qualification.json",
+    "sha256": "6603883b281147097ad2a0192ce0e7bb436710c94605b295fd6a618cb6bce07c"
+  },
+  "legacy_geometry_qualification": {
+    "path": "/private/tmp/vellum-grid-selection-example/qualified-v3-legacy/qualification.json",
+    "sha256": "03b8fb1cec39a5b38fbe3254524c8ebf8950bbdd98c2556eb67161fdb7af98ac"
+  },
+  "native_freeze": {
+    "path": "/private/tmp/vellum-grid-selection-native-owned-freeze-v2.json",
+    "sha256": "7089d5154ee2495e6a4454b0c9195f42b6eb96390195524c538060425086dae7",
+    "files": {
+      "drivers/cogent/grid.go": "6fc85e1d6f400f8bdd7ce25816c4f58d29e396f48069c59375261088896b5cd8",
+      "drivers/cogent/grid_geometry.go": "2f5d8eb351251135114fc5978c6ef3aba7064cf28ba718bf0134b919489193e5",
+      "drivers/cogent/grid_accessibility.go": "3db9d27754faa9a1643fa1ad2c4a416e482f23544f63873dcb27c77979432325",
+      "drivers/cogent/grid_selection_test.go": "fb4067f65f3da1274fff1c71ea106aaaff19881a594d226bce891296cb392261",
+      "drivers/cogent/grid_selection_offscreen_test.go": "8e38905898f87ab2bcc04fe7bd23283554533464d6baa72aa88d1adbf197ba83",
+      "drivers/cogent/grid_selection_accessibility_darwin_test.go": "aae1a12b367497ab4a098490a14c7a4852ca6bee165cc4d702f68cbd59307923",
+      "specs/grid-native.md": "5f2b12eecc565124d431373fac9f14b37b377127254eafb84bcc5268b8270844"
+    }
+  },
+  "checks": [
+    {
+      "name": "portable-race20",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -race -count=20 source.go model.go model_test.go variable_rows_test.go selection_rows_test.go",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 2.597,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v1/portable-race20.log",
+      "log_sha256": "8bbaff4f4baacded242c8eedac741e8a1e490b1e6f76fabcf64519347b0d3e1e",
+      "inherited_from": "/private/tmp/vellum-grid-selection-example/qualified-v1/qualification.json",
+      "inherited_proof_sha256": "42ae8e83d693d2e414e3fd1a2bcb7c7dab24a047e0fa7002ccd21a38d3de0b7d",
+      "current_portable_inputs_unchanged": true
+    },
+    {
+      "name": "selection-managed-race",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -run '^TestActualRowSelection' -v ./...",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 61.254,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/selection-managed-race.log",
+      "log_sha256": "787d09b8efbfc2d64e2b1b79672f6cfd18f87660a7058016e71337dc93018373"
+    },
+    {
+      "name": "managed-vet",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go vet -tags offscreen ./...",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 6.581,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/managed-vet.log",
+      "log_sha256": "ddc2d6ab21449c2e9ac0664c535cdef2c7f607ef265f3996059f50e00dab64cb"
+    },
+    {
+      "name": "desktop-race-build",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go build -race -o /private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop .",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 13.14,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3/desktop-race-build.log",
+      "log_sha256": "548fabdc6b84d762ba8ba9992596c2347c3bf331e96c23bb1b6a8f7e6e6e2e7e"
+    },
+    {
+      "name": "legacy-geometry-race",
+      "command": "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v -run 'TestActual(Grid|VariableGrid)' ./...",
+      "cwd": "/private/tmp/vellum-grid-selection/examples/grid",
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 82.676,
+      "log": "/private/tmp/vellum-grid-selection-example/qualified-v3-legacy/legacy-geometry-race.log",
+      "log_sha256": "a45f82e75612580fb9be51cb8b70471dea9198d3c0af7770a6e5914282ff8fb8"
+    }
+  ],
+  "history": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-example/qualified-v1/qualification.json",
+      "sha256": "42ae8e83d693d2e414e3fd1a2bcb7c7dab24a047e0fa7002ccd21a38d3de0b7d",
+      "result": "FAIL",
+      "description": "Portable race20 PASS, then managed fixture compile refusal before execution; fixed only per-flag SetFlag helper."
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-example/qualified-v2/qualification.json",
+      "sha256": "563aa84f1e433c12e6b026f95f1a2c58b67759b4dbed65ee309e29c0b35998fc",
+      "result": "FAIL",
+      "description": "All preserved fixed/variable and new selection modifier batch tests PASS; variable selection geometry FAIL from native cursor exterior adding two pixels, with assertion unchanged."
+    }
+  ],
+  "binary": {
+    "path": "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop",
+    "sha256": "81751a214ab48e10c2c5316c6e49c1e67a7dc22f1b2aff8099bf8ed0e205c56d"
+  },
+  "binary_metadata": {
+    "path": "/private/tmp/vellum-grid-selection-example/qualified-v3/binary-metadata.json",
+    "sha256": "2bf518bc915cb49606687e6be8f60623fa6c58cde6294cb6546bc9e137bdc022"
+  },
+  "desktop_commands": [
+    "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop -smoke",
+    "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop -smoke -variable-rows",
+    "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop -smoke -row-selection",
+    "/private/tmp/vellum-grid-selection-example/qualified-v3/grid-desktop -smoke -variable-rows -row-selection"
+  ],
+  "desktop_execution": "Not run by this producer. Parent owns sequential Cocoa checks. Desktop smoke routes owner model commands and compares completed measured grid frames, not physical desktop input.",
+  "input_evidence": "Fresh actual offscreen primitive pointer/key routes qualify selection replace/extend/toggle, modifier intent at Down, arrow/Page, All/Clear, captured hidden keys, stale target refusal and independent windows at batches1/7/64. Preserved six fixed/variable router tests rerun unchanged after native shared-position correction.",
+  "portable_evidence": "Portable race20 inherited from v1 only after exact source/model/portable test/module and four virtual runtime hashes match. Indexed captured source is immutable lightweight scalar metadata and counter-free concurrent-read, with canceled bounded Visit proof. No million-row UI enumeration.",
+  "lifetime_limits": "Public model lifetime/inspection refusal and independent models; no separate compositor teardown or private cleanup measurement.",
+  "out_of_scope": [
+    "Cell editing and conflicts",
+    "Tree expansion",
+    "Loaded-million-row storage",
+    "Native services",
+    "Human accessibility/IME",
+    "Performance"
+  ],
+  "unchanged_consumer_since_v2": true,
+  "new_files_for_integration": [
+    "examples/grid/selection_rows_test.go",
+    "examples/grid/selection_rows_managed_test.go"
+  ]
+}

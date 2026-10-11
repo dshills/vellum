@@ -1,0 +1,61 @@
+import hashlib,json,os,sys,time
+from pathlib import Path
+sys.dont_write_bytecode=True
+ROOT=Path('/private/tmp/vellum-grid-selection')
+OUT=Path('/private/tmp/vellum-grid-selection-native/qualified-v2')
+sys.path.insert(0,str(ROOT))
+from scripts.child_process import run_child
+
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def tree_fingerprint(p):
+    files=sorted(f for f in p.rglob('*') if f.is_file() and '.git' not in f.parts)
+    h=hashlib.sha256()
+    for f in files:
+        h.update(f.relative_to(p).as_posix().encode());h.update(b'\0');h.update(sha(f).encode());h.update(b'\n')
+    return {'path':str(p),'resolved_path':str(p.resolve()),'files':len(files),'sha256_of_path_digest_lines':h.hexdigest()}
+owned=json.loads(Path('/private/tmp/vellum-grid-selection-native-owned-freeze-v2.json').read_text())['files']
+paths=set(owned)
+paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT/'virtual').glob('grid*.go'))
+paths.update(['go.mod','go.sum','drivers/cogent/go.mod','drivers/cogent/go.sum','drivers/cogent/env.sh','drivers/cogent/native/dependencies.json','scripts/child_process.py'])
+paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT/'drivers/cogent').glob('*.go'))
+paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT/'drivers/cogent').glob('*.m'))
+paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT/'drivers/cogent').glob('*.h'))
+paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT/'ui').glob('*.go'))
+paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT/'drivers/cogent/internal').rglob('*') if p.is_file() and p.suffix in ('.go','.m','.h'))
+def inputs(): return {p:sha(ROOT/p) if (ROOT/p).is_file() else None for p in sorted(paths)}
+def dependencies(): return {name:tree_fingerprint(ROOT/'drivers/cogent/build'/name) for name in ('upstream','typesetting')}
+before=inputs();deps_before=dependencies()
+assert all(before[p]==h for p,h in owned.items())
+(OUT/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+(OUT/'dependencies-before.json').write_text(json.dumps(deps_before,indent=2)+'\n')
+checks=[]
+commands=[
+('selection-offscreen-race',['go','test','-race','-tags=offscreen','-count=3','-run','TestManagedGrid(RowSelection|SelectionPointerModifiers|LegacySelection)','-v','.']),
+('offscreen-vet',['go','vet','-tags=offscreen','.']),
+('default-vet',['go','vet','.']),
+('default-modifiers-race',['go','test','-race','-count=1','-run','TestManagedGridSelectionPointerModifiers','-v','.'])]
+for name,args in commands:
+    p=OUT/(name+'.log');start=time.monotonic()
+    with p.open('x') as f: result=run_child(args,timeout=240,cwd=ROOT/'drivers/cogent',env=dict(os.environ),stdout=f,stderr=f)
+    checks.append({'name':name,'argv':args,'cwd':'drivers/cogent','exit_code':result.returncode,'elapsed_seconds':round(time.monotonic()-start,3),'log':p.name,'log_sha256':sha(p)})
+    print(name,result.returncode,flush=True)
+after=inputs();deps_after=dependencies()
+(OUT/'inputs-after.json').write_text(json.dumps(after,indent=2)+'\n')
+(OUT/'dependencies-after.json').write_text(json.dumps(deps_after,indent=2)+'\n')
+drift=[p for p,h in before.items() if after[p]!=h]
+exploratory=[]
+for n in range(1,6):
+    p=Path('/private/tmp')/f'vellum-grid-selection-native-exploratory-{n}.log'
+    exploratory.append({'path':str(p),'sha256':sha(p),'scope':'preliminary fixture iterations; not final qualification'})
+proof={'result':'PASS' if all(c['exit_code']==0 for c in checks) and not drift and deps_before==deps_after else 'FAIL',
+       'root':str(ROOT),'producer':{'path':str(Path(__file__)),'sha256':sha(Path(__file__))},
+       'owned_files':owned,'input_count':len(before),'inputs_before':{'file':'inputs-before.json','sha256':sha(OUT/'inputs-before.json')},
+       'inputs_after':{'file':'inputs-after.json','sha256':sha(OUT/'inputs-after.json')},'changed_inputs':drift,
+       'dependencies_before':{'file':'dependencies-before.json','sha256':sha(OUT/'dependencies-before.json')},
+       'dependencies_after':{'file':'dependencies-after.json','sha256':sha(OUT/'dependencies-after.json')},'dependencies_unchanged':deps_before==deps_after,
+       'checks':checks,'exploratory_history':exploratory,
+       'historical_cursor_correction':{'previous_qualification':{'path':'/private/tmp/vellum-grid-selection-native/qualified-v1/qualification.json','sha256':sha(Path('/private/tmp/vellum-grid-selection-native/qualified-v1/qualification.json'))},'old_grid_source':{'path':'/private/tmp/vellum-grid-selection-native/history-v1/drivers/cogent/grid.go.txt','sha256':sha(Path('/private/tmp/vellum-grid-selection-native/history-v1/drivers/cogent/grid.go.txt'))},'red_overlay':{'path':'/private/tmp/vellum-grid-selection-native/cursor-correction/red-overlay.json','sha256':sha(Path('/private/tmp/vellum-grid-selection-native/cursor-correction/red-overlay.json'))},'red_log':{'path':'/private/tmp/vellum-grid-selection-native/cursor-correction/red.log','sha256':sha(Path('/private/tmp/vellum-grid-selection-native/cursor-correction/red.log')),'exit_code':1},'preliminary_green':{'path':'/private/tmp/vellum-grid-selection-native/cursor-correction/preliminary-green.log','sha256':sha(Path('/private/tmp/vellum-grid-selection-native/cursor-correction/preliminary-green.log')),'exit_code':0},'unchanged_test':'TestManagedGridRowSelectionCursorBorderInsideIndexedGeometry at96/120/144/192; red changed only grid.go via overlay; proof-v1 predates the new regression and is superseded'},
+       'scope':'Actual offscreen Cogent primitive pointer/key routing, software frame projection and production Cocoa table selector fixture with no native NSWindow. No GUI, external AX, physical keyboard/Command mapping, performance, full P6 or cross-platform runtime qualification.'}
+(OUT/'qualification.json').write_text(json.dumps(proof,indent=2)+'\n')
+print(json.dumps({'result':proof['result'],'path':str(OUT/'qualification.json'),'sha256':sha(OUT/'qualification.json'),'input_count':len(before)},indent=2),flush=True)
+sys.exit(0 if proof['result']=='PASS' else 1)

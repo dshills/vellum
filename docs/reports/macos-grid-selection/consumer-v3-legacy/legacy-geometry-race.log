@@ -1,0 +1,39 @@
+command: export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v -run 'TestActual(Grid|VariableGrid)' ./...
+# github.com/dshills/vellum/examples/grid.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestActualGridRouterBatchesEquivalent
+=== RUN   TestActualGridRouterBatchesEquivalent/1
+=== RUN   TestActualGridRouterBatchesEquivalent/7
+=== RUN   TestActualGridRouterBatchesEquivalent/64
+--- PASS: TestActualGridRouterBatchesEquivalent (33.26s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/1 (11.38s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/7 (10.95s)
+    --- PASS: TestActualGridRouterBatchesEquivalent/64 (10.93s)
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/96
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/120
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/144
+=== RUN   TestActualGridFrozenGeometryAndIndexedMaterialization/192
+--- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization (13.70s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/96 (3.29s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/120 (2.99s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/144 (3.22s)
+    --- PASS: TestActualGridFrozenGeometryAndIndexedMaterialization/192 (4.20s)
+=== RUN   TestActualGridStalePressDisabledModalAndRetirement
+--- PASS: TestActualGridStalePressDisabledModalAndRetirement (7.55s)
+=== RUN   TestActualGridStatusWrapDoesNotWidenLayout
+--- PASS: TestActualGridStatusWrapDoesNotWidenLayout (3.71s)
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/96
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/120
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/144
+=== RUN   TestActualVariableGridGeometryAndBoundedIndexedWork/192
+--- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork (11.84s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/96 (2.67s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/120 (2.48s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/144 (2.80s)
+    --- PASS: TestActualVariableGridGeometryAndBoundedIndexedWork/192 (3.88s)
+=== RUN   TestActualVariableGridPixelPageWheelAndHeightRevision
+--- PASS: TestActualVariableGridPixelPageWheelAndHeightRevision (9.48s)
+PASS
+ok  	github.com/dshills/vellum/examples/grid	81.186s

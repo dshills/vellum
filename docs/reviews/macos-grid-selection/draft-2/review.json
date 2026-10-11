@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "result": "APPROVED_CORRECTIVE_RUNTIME",
+  "reviewer": "mac_history_review",
+  "created_utc": "2026-10-11T10:34:54.508797+00:00",
+  "scope": "Source-bound read-only review of corrected portable runtime3 plus unchanged indexed rows. This is not final native/consumer/specification/evidence approval.",
+  "source_inputs": {
+    "path": "/private/tmp/vellum-grid-selection-review/draft-2/source-inputs.json",
+    "sha256": "a045a6127069d20d8ac48e1d832b54b7976ef8129cb39fac741e66884cbf4f05"
+  },
+  "source_hashes": {
+    "virtual/grid_selection.go": "39e74332ec4408030ac9ba0e82a0170f570f49f4c0fd670c8d32705bba17ea0d",
+    "virtual/grid.go": "7110d7e7b5f419cca98b99a483c8be56f20fa631cbf09b0a5f271873216f2462",
+    "virtual/grid_geometry.go": "05eba3aabf57a4583fd6b0585d2cdd9b1be2e4aff28df549c141a9bba4574e5a",
+    "virtual/grid_rows.go": "dfb4569453942d4a1e008233920e1b8b9bb00aa8ec44bed7795203155b0d7a46"
+  },
+  "current_and_copied_hashes_match": true,
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "selection-captured-interior-order",
+      "resolution": "selectedRow performs a single checked immutable index lookup and compares the captured row number with the live admitted row for identical Scope; Snapshot and bounded candidate validation share the helper. Later-revision key absence/additions remain valid."
+    },
+    {
+      "id": "selection-snapshot-final-live-stamp",
+      "resolution": "Snapshot and common current guard now recheck live source stamp after the final captured-index metadata guard. Commit paths retain the equivalent final ordering."
+    }
+  ],
+  "immutable_initial_red_review": {
+    "path": "/private/tmp/vellum-grid-selection-review/draft-1/review.json",
+    "sha256": "bb41c254e004ced7a83c4ab9e66cc76d9eeaaf905c3e4855de582d34d7590e89"
+  },
+  "original_tests": [
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/draft-1/selection_review_test.go",
+      "sha256": "cfd821d9af874e608597f518a34aacac6121c828ca31a235b6d07eb869fe2146"
+    },
+    {
+      "path": "/private/tmp/vellum-grid-selection-review/draft-1/selection_late_review_test.go",
+      "sha256": "70e1d73c34bffda9c947b5205aa01b8ce79ae8c3dd26a27c8b762520d2462eab"
+    }
+  ],
+  "corrective_regression": {
+    "argv": [
+      "go",
+      "test",
+      "-race",
+      "-count=1",
+      "-overlay=/private/tmp/vellum-grid-selection-review/draft-2/overlay.json",
+      "-run",
+      "^TestReviewSelection(CaptureMustAgreeWithAdmittedInteriorRow|FinalGuardCannotHideLiveSourceDrift)$",
+      "./virtual"
+    ],
+    "cwd": "/private/tmp/vellum-grid-selection",
+    "env": {
+      "GOCACHE": "/private/tmp/vellum-grid-selection-review/go-cache",
+      "GOWORK": "off"
+    },
+    "exit_code": 0,
+    "overlay": {
+      "path": "/private/tmp/vellum-grid-selection-review/draft-2/overlay.json",
+      "sha256": "b622b465f202009995e34bbe25cbe8c87333f3d6b575b3980fe6c326d0bc9f4e"
+    },
+    "log": {
+      "path": "/private/tmp/vellum-grid-selection-review/draft-2/original-regressions.log",
+      "sha256": "22b164fe32fad72e450adce1a58716da5ed27fe4abb769cb761b444a634b78c9"
+    },
+    "scope": "Both exact unchanged original test files replace the permanent formatted copies, avoiding duplicate declarations."
+  },
+  "assessment": [
+    "Selection transition admission retains atomic cursor/viewport/selection publication, bounded accessed rows and generation/refusal semantics.",
+    "Sparse additions outside capture, counted-set arithmetic, cloned immutable maps and deterministic partial worker iteration agree with the proposed captured-membership contract.",
+    "Clear and new-incarnation recovery bypass the old captured index; same-incarnation source changes preserve frozen membership.",
+    "No additional material runtime issue found in the checked source."
+  ],
+  "limits": [
+    "Producer broad qualification was not repeated. New root tests were read but are still separate final-batch approval inputs.",
+    "Source-index immutability/concurrent readability and bounded provider methods remain caller contracts; hidden rows are not certified.",
+    "Native modifiers/AX, example wiring, final specs and evidence require their own final source-bound batch review."
+  ]
+}

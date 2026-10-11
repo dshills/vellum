@@ -1,0 +1,84 @@
+package virtual
+
+import (
+	"errors"
+	"strconv"
+	"testing"
+)
+
+type reviewSelectionSource struct{ wrong bool }
+
+func (s *reviewSelectionSource) Identity() string { return "review-selection" }
+func (s *reviewSelectionSource) Revision() uint64 { return 1 }
+func (s *reviewSelectionSource) RowCount() int    { return 10 }
+func (s *reviewSelectionSource) RowKey(i int) (string, error) {
+	if i < 0 || i >= 10 {
+		return "", ErrGridRange
+	}
+	return strconv.Itoa(i), nil
+}
+func (s *reviewSelectionSource) IndexOf(k string) (int, bool, error) {
+	i, e := strconv.Atoi(k)
+	return i, e == nil && i >= 0 && i < 10, nil
+}
+func (s *reviewSelectionSource) Cell(k, c string) (string, error) { return k, nil }
+func (s *reviewSelectionSource) SelectionSnapshot() (GridRowIndex, error) {
+	return reviewSelectionIndex{wrong: s.wrong}, nil
+}
+
+type reviewSelectionIndex struct{ wrong bool }
+
+func (s reviewSelectionIndex) Identity() string { return "review-selection" }
+func (s reviewSelectionIndex) Revision() uint64 { return 1 }
+func (s reviewSelectionIndex) RowCount() int    { return 10 }
+func (s reviewSelectionIndex) swap(i int) int {
+	if s.wrong {
+		if i == 2 {
+			return 8
+		}
+		if i == 8 {
+			return 2
+		}
+	}
+	return i
+}
+func (s reviewSelectionIndex) RowKey(i int) (string, error) {
+	if i < 0 || i >= 10 {
+		return "", ErrGridRange
+	}
+	return strconv.Itoa(s.swap(i)), nil
+}
+func (s reviewSelectionIndex) IndexOf(k string) (int, bool, error) {
+	i, e := strconv.Atoi(k)
+	return s.swap(i), e == nil && i >= 0 && i < 10, nil
+}
+
+func TestReviewSelectionCaptureMustAgreeWithAdmittedInteriorRow(t *testing.T) {
+	s := &reviewSelectionSource{}
+	g, err := NewGrid(s, []GridColumn{{ID: "c", Width: 10}}, GridConfig{RowHeight: 10, RowSelection: true}, GridViewport{Width: 10, Height: 50})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = g.SelectToKey("1", "c", GridSelectReplace); err != nil {
+		t.Fatal(err)
+	}
+	before, err := g.State()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.wrong = true
+	err = g.SelectToKey("3", "c", GridSelectExtend)
+	if !errors.Is(err, ErrGridSource) {
+		selected, _ := g.Selection()
+		two, _ := selected.Contains("2")
+		eight, _ := selected.Contains("8")
+		t.Fatalf("inconsistent current-view capture accepted: err=%v currentRow2Selected=%v hiddenRow8Selected=%v", err, two, eight)
+	}
+	after, err := g.State()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if after != before {
+		t.Fatalf("refused capture changed state: before=%+v after=%+v", before, after)
+	}
+}

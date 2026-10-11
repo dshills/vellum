@@ -146,6 +146,13 @@ func (g *Grid) Snapshot() (GridSnapshot, error) {
 		}
 		// One detached key per row is shared by its cells and opaque refs.
 		key = strings.Clone(key)
+		selected := false
+		if g.config.RowSelection {
+			selected, err = g.selection.selectedRow(key, row, g.stamp)
+			if err != nil {
+				return GridSnapshot{}, err
+			}
+		}
 		for _, col := range l.columns {
 			id := g.columns[col].ID
 			text, err := g.source.Cell(key, id)
@@ -159,10 +166,16 @@ func (g *Grid) Snapshot() (GridSnapshot, error) {
 				return GridSnapshot{}, ErrGridSource
 			}
 			ref := GridCellRef{g.token, g.generation, row, col, key, id}
-			out.Cells = append(out.Cells, GridCell{row, col, key, id, strings.Clone(text), g.cellRect(g.viewport, start, height, col), g.cellClip(g.viewport, start, height, col), col < g.config.FrozenColumns, g.active == (GridActive{key, id}), ref})
+			out.Cells = append(out.Cells, GridCell{row, col, key, id, strings.Clone(text), g.cellRect(g.viewport, start, height, col), g.cellClip(g.viewport, start, height, col), col < g.config.FrozenColumns, g.active == (GridActive{key, id}), selected, ref})
 		}
 	}
 	if err := checkedGridRows(g.source, g.stamp, g.rows); err != nil {
+		return GridSnapshot{}, err
+	}
+	if err := g.selection.current(); err != nil {
+		return GridSnapshot{}, err
+	}
+	if err := sameStamp(g.source, g.stamp); err != nil {
 		return GridSnapshot{}, err
 	}
 	return out, nil

@@ -1,0 +1,130 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestManagedGridRowSelectionCocoaSelectedCells
+--- PASS: TestManagedGridRowSelectionCocoaSelectedCells (0.79s)
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true
+--- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging (9.84s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false (2.68s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true (2.23s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false (2.68s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true (2.24s)
+=== RUN   TestManagedGridRowSelectionSourceReplaceAndStalePress
+--- PASS: TestManagedGridRowSelectionSourceReplaceAndStalePress (1.32s)
+=== RUN   TestManagedGridRowSelectionRefusalAndEligibility
+--- PASS: TestManagedGridRowSelectionRefusalAndEligibility (2.17s)
+=== RUN   TestManagedGridLegacySelectionKeepsActiveCellBehavior
+--- PASS: TestManagedGridLegacySelectionKeepsActiveCellBehavior (0.67s)
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close
+--- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose (0.62s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab (0.26s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close (0.37s)
+=== RUN   TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX
+--- PASS: TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX (1.03s)
+=== RUN   TestManagedGridSelectionPointerModifiers
+=== RUN   TestManagedGridSelectionPointerModifiers/replace
+=== RUN   TestManagedGridSelectionPointerModifiers/shift
+=== RUN   TestManagedGridSelectionPointerModifiers/command
+=== RUN   TestManagedGridSelectionPointerModifiers/lock-flags
+=== RUN   TestManagedGridSelectionPointerModifiers/control
+=== RUN   TestManagedGridSelectionPointerModifiers/option
+=== RUN   TestManagedGridSelectionPointerModifiers/mixed
+--- PASS: TestManagedGridSelectionPointerModifiers (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/replace (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/shift (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/command (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/lock-flags (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/control (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/option (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/mixed (0.00s)
+=== RUN   TestManagedGridRowSelectionCocoaSelectedCells
+--- PASS: TestManagedGridRowSelectionCocoaSelectedCells (0.76s)
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true
+--- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging (9.89s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false (2.70s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true (2.25s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false (2.68s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true (2.27s)
+=== RUN   TestManagedGridRowSelectionSourceReplaceAndStalePress
+--- PASS: TestManagedGridRowSelectionSourceReplaceAndStalePress (1.32s)
+=== RUN   TestManagedGridRowSelectionRefusalAndEligibility
+--- PASS: TestManagedGridRowSelectionRefusalAndEligibility (2.19s)
+=== RUN   TestManagedGridLegacySelectionKeepsActiveCellBehavior
+--- PASS: TestManagedGridLegacySelectionKeepsActiveCellBehavior (0.68s)
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close
+--- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose (0.62s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab (0.26s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close (0.37s)
+=== RUN   TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX
+--- PASS: TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX (1.03s)
+=== RUN   TestManagedGridSelectionPointerModifiers
+=== RUN   TestManagedGridSelectionPointerModifiers/replace
+=== RUN   TestManagedGridSelectionPointerModifiers/shift
+=== RUN   TestManagedGridSelectionPointerModifiers/command
+=== RUN   TestManagedGridSelectionPointerModifiers/lock-flags
+=== RUN   TestManagedGridSelectionPointerModifiers/control
+=== RUN   TestManagedGridSelectionPointerModifiers/option
+=== RUN   TestManagedGridSelectionPointerModifiers/mixed
+--- PASS: TestManagedGridSelectionPointerModifiers (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/replace (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/shift (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/command (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/lock-flags (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/control (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/option (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/mixed (0.00s)
+=== RUN   TestManagedGridRowSelectionCocoaSelectedCells
+--- PASS: TestManagedGridRowSelectionCocoaSelectedCells (0.77s)
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false
+=== RUN   TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true
+--- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging (9.78s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-false (2.65s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/10000/variable-true (2.24s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-false (2.66s)
+    --- PASS: TestManagedGridRowSelectionActualPointerKeysAllAndPaging/1000000/variable-true (2.23s)
+=== RUN   TestManagedGridRowSelectionSourceReplaceAndStalePress
+--- PASS: TestManagedGridRowSelectionSourceReplaceAndStalePress (1.29s)
+=== RUN   TestManagedGridRowSelectionRefusalAndEligibility
+--- PASS: TestManagedGridRowSelectionRefusalAndEligibility (2.19s)
+=== RUN   TestManagedGridLegacySelectionKeepsActiveCellBehavior
+--- PASS: TestManagedGridLegacySelectionKeepsActiveCellBehavior (0.68s)
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab
+=== RUN   TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close
+--- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose (0.62s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/native-tab (0.26s)
+    --- PASS: TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose/logical-close (0.37s)
+=== RUN   TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX
+--- PASS: TestManagedGridRowSelectionOnlyTransitionRetiresPressAndAX (1.03s)
+=== RUN   TestManagedGridSelectionPointerModifiers
+=== RUN   TestManagedGridSelectionPointerModifiers/replace
+=== RUN   TestManagedGridSelectionPointerModifiers/shift
+=== RUN   TestManagedGridSelectionPointerModifiers/command
+=== RUN   TestManagedGridSelectionPointerModifiers/lock-flags
+=== RUN   TestManagedGridSelectionPointerModifiers/control
+=== RUN   TestManagedGridSelectionPointerModifiers/option
+=== RUN   TestManagedGridSelectionPointerModifiers/mixed
+--- PASS: TestManagedGridSelectionPointerModifiers (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/replace (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/shift (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/command (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/lock-flags (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/control (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/option (0.00s)
+    --- PASS: TestManagedGridSelectionPointerModifiers/mixed (0.00s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	51.200s

@@ -1,0 +1,47 @@
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import time
+
+root = Path('/private/tmp/vellum-grid-selection')
+module = root / 'examples/grid'
+out = Path('/private/tmp/vellum-grid-selection-example/qualified-v3-legacy')
+out.mkdir(parents=True, exist_ok=False)
+base_path = out.parent / 'qualified-v3/qualification.json'
+base = json.loads(base_path.read_bytes())
+def sha(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+def inputs():
+    return {category: {name: sha((module if category in ('owned', 'preserved_example') else root) / name) for name in names}
+            for category, names in base['after'].items()}
+before = inputs()
+assert before == base['after'] and base['result'] == 'PASS'
+native = base['native_freeze']
+assert sha(Path(native['path'])) == native['sha256']
+assert all(sha(root / name) == value for name, value in native['files'].items())
+command = "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; . /private/tmp/vellum-grid-selection/drivers/cogent/env.sh; go test -tags offscreen -race -count=1 -v -run 'TestActual(Grid|VariableGrid)' ./..."
+log = out / 'legacy-geometry-race.log'
+start = time.monotonic()
+timed_out = False
+print('START legacy-geometry-race', flush=True)
+with log.open('wb') as stream:
+    stream.write(('command: ' + command + '\n').encode())
+    stream.flush()
+    try:
+        code = subprocess.run(['/bin/zsh', '-c', command], cwd=module, stdout=stream, stderr=subprocess.STDOUT, timeout=600).returncode
+    except subprocess.TimeoutExpired:
+        code, timed_out = 124, True
+check = {'name': 'legacy-geometry-race', 'command': command, 'cwd': str(module), 'exit_code': code,
+         'timed_out': timed_out, 'elapsed_seconds': round(time.monotonic()-start, 3), 'log': str(log), 'log_sha256': sha(log)}
+after = inputs()
+unchanged = before == after == base['after'] and all(sha(root / name) == value for name, value in native['files'].items())
+proof = {'scope': 'Supplemental preserved six fixed/variable actual-router tests on final native positioning correction. Compact selected inputs, not a full source closure or desktop execution claim.',
+         'source_root': str(root), 'base_qualification': {'path': str(base_path), 'sha256': sha(base_path)},
+         'native_freeze': native, 'before': before, 'after': after, 'unchanged': unchanged, 'checks': [check],
+         'result': 'PASS' if not code and unchanged else 'FAIL'}
+path = out / 'qualification.json'
+path.write_text(json.dumps(proof, indent=2)+'\n')
+print('CHECK', json.dumps(check), flush=True)
+print('PROOF', str(path), sha(path), proof['result'], flush=True)
+raise SystemExit(0 if proof['result'] == 'PASS' else 1)

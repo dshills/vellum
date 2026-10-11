@@ -112,6 +112,53 @@ func (s *gridSource) projected(reverse, filtered bool) (*gridSource, error) {
 	next.revision++
 	return &next, nil
 }
+
+// selectionRowIndex owns only immutable metadata. It does not borrow the
+// owner's source pointer or its diagnostic counters, so detached selections may
+// visit their captured identities concurrently after projection or unmount.
+type selectionRowIndex struct {
+	identity          string
+	revision          uint64
+	total             int
+	reverse, filtered bool
+}
+
+func (s *gridSource) SelectionSnapshot() (virtual.GridRowIndex, error) {
+	if s == nil || s.identity == "" || s.revision == 0 || s.total < 1 || s.total > maxSourceRows {
+		return nil, errSourceConfig
+	}
+	return selectionRowIndex{identity: strings.Clone(s.identity), revision: s.revision, total: s.total, reverse: s.reverse, filtered: s.filtered}, nil
+}
+
+func (s selectionRowIndex) Identity() string { return s.identity }
+func (s selectionRowIndex) Revision() uint64 { return s.revision }
+func (s selectionRowIndex) RowCount() int {
+	if s.filtered {
+		return (s.total + 1) / 2
+	}
+	return s.total
+}
+func (s selectionRowIndex) RowKey(index int) (string, error) {
+	if index < 0 || index >= s.RowCount() {
+		return "", virtual.ErrGridRange
+	}
+	if s.reverse {
+		index = s.RowCount() - 1 - index
+	}
+	if s.filtered {
+		index *= 2
+	}
+	return rowKey(index), nil
+}
+func (s selectionRowIndex) IndexOf(key string) (int, bool, error) {
+	// The existing inverse is pure; this value contains no owner/counter pointer.
+	index, found := (&gridSource{total: s.total, reverse: s.reverse, filtered: s.filtered}).rowIndex(key)
+	return index, found, nil
+}
+
+var _ virtual.GridSelectionSource = (*gridSource)(nil)
+var _ virtual.GridRowIndex = selectionRowIndex{}
+
 func sourceColumns() []virtual.GridColumn {
 	columns := make([]virtual.GridColumn, columnCount)
 	for i := range columns {
