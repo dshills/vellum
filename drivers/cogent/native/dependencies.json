@@ -331,6 +331,17 @@
               "sha256": "82d3a2cd22746962333a8daf64d656fd61842d9e96636653b70ade2592409965"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/coveredfills",
+          "inputs": "native/patches/coveredfills/original-hashes.json",
+          "outputs": "native/patches/coveredfills/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/coveredfills/0038-covered-uniform-draws.patch",
+              "sha256": "56a959fc89b1bc747d6555aacca30f37069d4e528fd9e13395bb2584263bd9c8"
+            }
+          ]
         }
       ]
     },

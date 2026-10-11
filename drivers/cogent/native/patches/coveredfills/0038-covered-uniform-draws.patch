@@ -1,0 +1,452 @@
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -6,6 +6,8 @@
+ 
+ import (
+ 	"image"
++	"image/color"
++	"image/draw"
+ 	"slices"
+ 
+ 	"cogentcore.org/core/colors/gradient"
+@@ -62,17 +64,56 @@
+ 
+ // Render is the main rendering function.
+ func (rs *Renderer) Render(r render.Render) render.Renderer {
+-	for _, ri := range r {
++	for i, ri := range r {
+ 		switch x := ri.(type) {
+ 		case *render.Path:
+ 			rs.RenderPath(x)
+ 		case *pimage.Params:
++			if i+1 < len(r) {
++				if next, ok := r[i+1].(*pimage.Params); ok && coveredUniformDraw(x, next) {
++					continue
++				}
++			}
+ 			x.Render(rs.image)
+ 		case *render.Text:
+ 			rs.RenderText(x)
+ 		}
+ 	}
+ 	return rs
++}
++
++// coveredUniformDraw recognizes an immediately overwritten rectangular clear.
++// Check the live image values at replay, not while recording borrowed sources.
++// Keep unknown image/color implementations on their original call path, and
++// leave the render items intact for subsequent replay and other renderers.
++func coveredUniformDraw(clear, fill *pimage.Params) bool {
++	if clear == nil || fill == nil || clear.Cmd != pimage.Draw || fill.Cmd != pimage.Draw ||
++		clear.Op != draw.Src || fill.Op != draw.Over || clear.Mask != nil || fill.Mask != nil ||
++		clear.Rect.Empty() || clear.Rect != fill.Rect || clear.SourcePos != fill.SourcePos {
++		return false
++	}
++	if _, ok := valueUniform(clear.Source); !ok {
++		return false
++	}
++	u, ok := valueUniform(fill.Source)
++	if !ok {
++		return false
++	}
++	_, _, _, alpha := u.C.RGBA()
++	return alpha == 0xffff
++}
++
++func valueUniform(src image.Image) (*image.Uniform, bool) {
++	u, ok := src.(*image.Uniform)
++	if !ok || u == nil {
++		return nil, false
++	}
++	switch u.C.(type) {
++	case color.RGBA, color.RGBA64, color.NRGBA, color.NRGBA64,
++		color.Alpha, color.Alpha16, color.Gray, color.Gray16:
++		return u, true
++	}
++	return nil, false
+ }
+ 
+ func (rs *Renderer) RenderPath(pt *render.Path) {
+--- /dev/null
++++ b/paint/renderers/rasterx/covered_draw_test.go
+@@ -0,0 +1,380 @@
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"fmt"
++	"image"
++	"image/color"
++	"image/draw"
++	"reflect"
++	"testing"
++
++	"cogentcore.org/core/colors/gradient"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/sides"
++	"cogentcore.org/core/styles/units"
++)
++
++// Replay the pre-elision dispatch: an independent pixel oracle, not a copy of
++// the eligibility predicate. Captured items get shallow copies because legacy
++// full-image draws mutate their zero-rectangle sentinel on first use.
++func coveredDrawReference(rs *Renderer, items render.Render) {
++	for _, item := range items {
++		switch x := item.(type) {
++		case *render.Path:
++			rs.RenderPath(x)
++		case *pimage.Params:
++			x.Render(rs.image)
++		case *render.Text:
++			rs.RenderText(x)
++		}
++	}
++}
++
++func coveredDrawCopies(items render.Render) render.Render {
++	copy := append(render.Render(nil), items...)
++	for i, item := range copy {
++		if p, ok := item.(*pimage.Params); ok {
++			value := *p
++			copy[i] = &value
++		}
++	}
++	return copy
++}
++
++func coveredDrawTarget(rect image.Rectangle) *image.RGBA {
++	// Dirty premultiplied pixels, padded stride, and guard bytes exercise the
++	// overwrite proof without depending on a fresh transparent destination.
++	stride := rect.Dx()*4 + 16
++	pix := make([]byte, stride*rect.Dy()+32)
++	for i := range pix {
++		pix[i] = byte((i*37 + 11) % 128)
++	}
++	for y := 0; y < rect.Dy(); y++ {
++		for x := 0; x < rect.Dx(); x++ {
++			pix[y*stride+x*4+3] = 192
++		}
++	}
++	return &image.RGBA{Pix: pix, Stride: stride, Rect: rect}
++}
++
++func coveredDrawCompare(t *testing.T, bounds image.Rectangle, items render.Render) {
++	t.Helper()
++	coveredDrawCompareFrom(t, coveredDrawTarget(bounds), items)
++}
++
++func coveredDrawRenderer(target *image.RGBA) *Renderer {
++	rs := New(math32.FromPoint(target.Rect.Size())).(*Renderer)
++	rs.image = target
++	rs.ImgSpanner = scan.NewImgSpanner(target)
++	rs.Scanner = scan.NewScannerWithRowTracking(rs.ImgSpanner, target.Rect.Dx(), target.Rect.Dy())
++	rs.Raster = NewDasher(target.Rect.Dx(), target.Rect.Dy(), rs.Scanner)
++	return rs
++}
++
++func coveredDrawCompareFrom(t *testing.T, seed *image.RGBA, items render.Render) {
++	t.Helper()
++	actual, expected := *seed, *seed
++	actual.Pix = append([]byte(nil), seed.Pix...)
++	expected.Pix = append([]byte(nil), seed.Pix...)
++	optimized, original := coveredDrawRenderer(&actual), coveredDrawRenderer(&expected)
++	originalItems, optimizedItems := coveredDrawCopies(items), coveredDrawCopies(items)
++	coveredDrawReference(original, originalItems)
++	optimized.Render(optimizedItems)
++	if !bytes.Equal(actual.Pix, expected.Pix) {
++		t.Fatalf("optimized replay differs from original pixels/stride guards: bounds=%v items=%v", seed.Rect, items)
++	}
++	if !reflect.DeepEqual(optimizedItems, originalItems) {
++		t.Fatal("optimized replay changed captured item state")
++	}
++}
++
++func coveredDrawPair(rect image.Rectangle, sourcePos image.Point, foreground color.Color) render.Render {
++	return render.Render{
++		&pimage.Params{Cmd: pimage.Draw, Rect: rect, SourcePos: sourcePos, Op: draw.Src, Source: image.NewUniform(color.NRGBA{12, 44, 81, 97})},
++		&pimage.Params{Cmd: pimage.Draw, Rect: rect, SourcePos: sourcePos, Op: draw.Over, Source: image.NewUniform(foreground)},
++	}
++}
++
++func TestCoveredUniformDrawDirtyPixelParity(t *testing.T) {
++	colors := []color.Color{color.RGBA{9, 40, 83, 255}, color.RGBA64{900, 1300, 60000, 65535}, color.NRGBA{12, 83, 244, 255}, color.NRGBA64{192, 4096, 12288, 65535}, color.Alpha{255}, color.Alpha16{65535}, color.Gray{85}, color.Gray16{30001}}
++	bounds := []image.Rectangle{image.Rect(0, 0, 23, 19), image.Rect(-7, -3, 16, 16), image.Rect(11, 17, 34, 36)}
++	rects := []image.Rectangle{image.Rect(0, 0, 23, 19), image.Rect(-4, -6, 15, 11), image.Rect(8, 4, 40, 35), image.Rect(-100, -100, 100, 100), image.Rect(0, 0, 1, 1)}
++	positions := []image.Point{{}, {-17, 29}, {1 << 30, -(1 << 30)}}
++	eligible := 0
++	for ci, c := range colors {
++		for bi, bound := range bounds {
++			for ri, rect := range rects {
++				for pi, position := range positions {
++					t.Run(fmt.Sprintf("%d-%d-%d-%d", ci, bi, ri, pi), func(t *testing.T) {
++						items := coveredDrawPair(rect, position, c)
++						if !coveredUniformDraw(items[0].(*pimage.Params), items[1].(*pimage.Params)) {
++							t.Fatal("genuinely covered uniform pair was not eligible")
++						}
++						eligible++
++						coveredDrawCompare(t, bound, items)
++					})
++				}
++			}
++		}
++	}
++	if eligible != 360 {
++		t.Fatalf("eligible replay count=%d", eligible)
++	}
++}
++
++type coveredDrawColor struct{ calls *int }
++
++func (c coveredDrawColor) RGBA() (uint32, uint32, uint32, uint32) {
++	*c.calls++
++	return 20000, 30000, 40000, 65535
++}
++
++func TestCoveredUniformDrawLiveSourcesAndFallbacks(t *testing.T) {
++	bound, rect := image.Rect(0, 0, 23, 19), image.Rect(2, 3, 19, 17)
++	items := coveredDrawPair(rect, rect.Min, color.RGBA{41, 73, 99, 255})
++	fill := items[1].(*pimage.Params).Source.(*image.Uniform)
++	for _, c := range []color.Color{color.RGBA{41, 73, 99, 255}, color.NRGBA{71, 33, 12, 127}, color.RGBA{11, 29, 31, 255}} {
++		fill.C = c // The borrowed source changes after recording, before replay.
++		coveredDrawCompare(t, bound, items)
++	}
++	calls := 0
++	fill.C = coveredDrawColor{&calls}
++	if coveredUniformDraw(items[0].(*pimage.Params), items[1].(*pimage.Params)) || calls != 0 {
++		t.Fatal("unknown color was evaluated or elided during eligibility")
++	}
++	coveredDrawCompare(t, bound, items)
++	if calls != 2 {
++		t.Fatalf("unknown color must keep each original replay call: got%d", calls)
++	}
++
++	mask := image.NewAlpha(bound)
++	for i := range mask.Pix {
++		mask.Pix[i] = byte(i * 17)
++	}
++	imageSource := coveredDrawTarget(bound)
++	cases := []struct {
++		name   string
++		change func(clear, fill *pimage.Params)
++	}{
++		{"translucent", func(_, b *pimage.Params) { b.Source = image.NewUniform(color.NRGBA{71, 33, 12, 127}) }},
++		{"different-rect", func(_, b *pimage.Params) { b.Rect.Max.X-- }},
++		{"different-source-origin", func(_, b *pimage.Params) { b.SourcePos = image.Pt(1<<30, 1<<30) }},
++		{"clear-mask", func(a, _ *pimage.Params) { a.Mask = mask }},
++		{"fill-mask", func(_, b *pimage.Params) { b.Mask = mask }},
++		{"clear-over", func(a, _ *pimage.Params) { a.Op = draw.Over }},
++		{"fill-src", func(_, b *pimage.Params) { b.Op = draw.Src }},
++		{"clear-image", func(a, _ *pimage.Params) { a.Source = imageSource }},
++		{"fill-image", func(_, b *pimage.Params) { b.Source = imageSource }},
++		{"full-image-sentinel", func(a, b *pimage.Params) { a.Rect, b.Rect = image.Rectangle{}, image.Rectangle{} }},
++		{"empty-region", func(a, b *pimage.Params) { a.Rect, b.Rect = image.Rect(2, 3, 2, 17), image.Rect(2, 3, 2, 17) }},
++		{"clear-pixel", func(a, _ *pimage.Params) { a.Cmd, a.SourcePos = pimage.SetPixel, image.Pt(3, 4) }},
++		{"fill-transform", func(_, b *pimage.Params) { b.Cmd, b.Cumulative = pimage.Transform, math32.Scale2D(1.25, 1.5) }},
++	}
++	for _, test := range cases {
++		t.Run(test.name, func(t *testing.T) {
++			items := coveredDrawPair(rect, rect.Min, color.RGBA{41, 73, 99, 255})
++			a, b := items[0].(*pimage.Params), items[1].(*pimage.Params)
++			test.change(a, b)
++			if coveredUniformDraw(a, b) {
++				t.Fatal("operation boundary was elided")
++			}
++			coveredDrawCompare(t, bound, items)
++		})
++	}
++	if coveredUniformDraw(nil, &pimage.Params{}) || coveredUniformDraw(&pimage.Params{}, nil) {
++		t.Fatal("nil draw was eligible")
++	}
++	if _, ok := valueUniform((*image.Uniform)(nil)); ok {
++		t.Fatal("nil uniform was eligible")
++	}
++}
++
++func TestCoveredUniformDrawFallbackPixelAndCallParity(t *testing.T) {
++	bound := image.Rect(0, 0, 23, 19)
++	items := coveredDrawPair(image.Rect(2, 3, 19, 17), image.Point{}, color.RGBA{41, 73, 99, 255})
++	items[1].(*pimage.Params).Rect.Max.X--
++	coveredDrawCompare(t, bound, items) // The unmatched strip must retain the clear.
++	calls := 0
++	items = coveredDrawPair(image.Rect(2, 3, 19, 17), image.Point{}, color.RGBA{41, 73, 99, 255})
++	items[0].(*pimage.Params).Source = image.NewUniform(coveredDrawColor{&calls})
++	coveredDrawCompare(t, bound, items) // Unknown clear colors may have observable calls.
++	if calls != 2 {
++		t.Fatalf("custom clear color original calls lost: got %d", calls)
++	}
++}
++
++func TestCoveredUniformDrawKeepsOrderedChains(t *testing.T) {
++	bound := image.Rect(0, 0, 48, 40)
++	items := coveredDrawPair(image.Rect(1, 2, 24, 18), image.Point{}, color.RGBA{17, 51, 79, 255})
++	items = append(items, &pimage.Params{Cmd: pimage.SetPixel, SourcePos: image.Pt(5, 8), Source: image.NewUniform(color.RGBA{255, 0, 0, 255})})
++	items = append(items, coveredDrawPair(image.Rect(15, 9, 39, 28), image.Point{}, color.RGBA{11, 77, 31, 255})...)
++	items = append(items, &pimage.Params{Cmd: pimage.Blur, Rect: image.Rect(8, 6, 33, 25), BlurRadius: 1})
++	items = append(items, coveredDrawPair(image.Rect(3, 13, 43, 32), image.Point{}, color.NRGBA{111, 53, 90, 133})...)
++	for i := 0; i < 3; i++ {
++		coveredDrawCompare(t, bound, items)
++	}
++}
++
++// Exercise the actual widget box painter, not fabricated draw parameters.
++func coveredDrawStandardBox(scale float32, clip image.Rectangle, decorated bool, parent image.Image) render.Render {
++	pc := paint.NewPainter(math32.Vec2(128, 96))
++	pc.Transform = math32.Scale2D(scale, scale)
++	pc.Context().Bounds.Rect = math32.B2FromRect(clip)
++	var style styles.Style
++	style.Defaults()
++	style.ZeroSpace()
++	style.ActualBackground = image.NewUniform(color.RGBA{27, 83, 119, 255})
++	if decorated {
++		style.Border.Width.Set(units.Dot(2))
++		style.Border.Radius.Set(units.Dot(5))
++		style.Border.Style.Set(styles.BorderSolid)
++		style.Border.Color.Set(image.NewUniform(color.RGBA{220, 30, 50, 255}))
++		style.BoxShadow = []styles.Shadow{{OffsetX: units.Dot(2), OffsetY: units.Dot(1), Blur: units.Dot(4), Color: image.NewUniform(color.NRGBA{1, 2, 3, 180})}}
++	}
++	style.ToDots()
++	pc.StandardBox(&style, math32.Vec2(3.25, 4.75), math32.Vec2(40.5, 26.25), parent)
++	return pc.RenderDone()
++}
++
++func coveredDrawEligibleCount(items render.Render) int {
++	count := 0
++	for i := 0; i+1 < len(items); i++ {
++		a, aok := items[i].(*pimage.Params)
++		b, bok := items[i+1].(*pimage.Params)
++		if aok && bok && coveredUniformDraw(a, b) {
++			count++
++		}
++	}
++	return count
++}
++
++func TestCoveredUniformDrawStandardBox(t *testing.T) {
++	parent := image.NewUniform(color.NRGBA{10, 19, 44, 83})
++	for _, scale := range []float32{1, 1.25, 1.5, 1.6875, 2} {
++		for _, clip := range []image.Rectangle{image.Rect(0, 0, 128, 96), image.Rect(13, 9, 69, 47)} {
++			t.Run(fmt.Sprintf("scale-%g/clip-%v", scale, clip), func(t *testing.T) {
++				plain := coveredDrawStandardBox(scale, clip, false, parent)
++				if coveredDrawEligibleCount(plain) != 1 {
++					t.Fatal("real plain StandardBox did not emit a covered pair")
++				}
++				bounds := image.Rect(0, 0, 128, 96)
++				coveredDrawCompare(t, bounds, plain)
++				decorated := coveredDrawStandardBox(scale, clip, true, parent)
++				if coveredDrawEligibleCount(decorated) != 0 {
++					t.Fatal("decorated box unexpectedly elided")
++				}
++				coveredDrawCompare(t, bounds, decorated)
++				// Replay the undecorated replacement on a real prior border/shadow frame.
++				seed := coveredDrawTarget(bounds)
++				previous := coveredDrawRenderer(seed)
++				coveredDrawReference(previous, coveredDrawCopies(decorated))
++				coveredDrawCompareFrom(t, seed, plain)
++				// The same captured items are replayable following resize/regrowth.
++				rs := New(math32.Vec2(128, 96)).(*Renderer)
++				for _, size := range []math32.Vector2{math32.Vec2(128, 96), math32.Vec2(32, 24), math32.Vec2(128, 96)} {
++					rs.SetSize(units.UnitDot, size)
++					draw.Draw(rs.image, rs.image.Bounds(), parent, image.Point{}, draw.Src)
++					expected := image.NewRGBA(rs.image.Bounds())
++					copy(expected.Pix, rs.image.Pix)
++					reference := coveredDrawRenderer(expected)
++					coveredDrawReference(reference, coveredDrawCopies(plain))
++					rs.Render(coveredDrawCopies(plain))
++					if !bytes.Equal(rs.image.Pix, expected.Pix) {
++						t.Fatal("resized replay differs from original")
++					}
++				}
++			})
++		}
++	}
++}
++
++type coveredDrawGradient struct {
++	*gradient.Linear
++	updates, reads int
++}
++
++func (g *coveredDrawGradient) Update(opacity float32, box math32.Box2, transform math32.Matrix2) {
++	g.updates++
++	g.Linear.Update(opacity, box, transform)
++}
++func (g *coveredDrawGradient) At(x, y int) color.Color { g.reads++; return g.Linear.At(x, y) }
++
++func TestCoveredUniformDrawPreservesPainterGradientAndPath(t *testing.T) {
++	g := &coveredDrawGradient{Linear: gradient.NewLinear().AddStop(color.RGBA{9, 21, 43, 255}, 0).AddStop(color.RGBA{61, 71, 91, 255}, 1)}
++	clip := image.Rect(13, 9, 69, 47)
++	items := coveredDrawStandardBox(1.25, clip, false, g)
++	if g.updates != 1 || g.reads != 0 || coveredDrawEligibleCount(items) != 0 {
++		t.Fatal("gradient recording/evaluation contract changed")
++	}
++	coveredDrawCompare(t, image.Rect(0, 0, 128, 96), items)
++	area := items[0].(*pimage.Params).Rect
++	if g.updates != 1 || g.reads != 2*area.Dx()*area.Dy() {
++		t.Fatalf("gradient original calls lost: updates=%d reads=%d area=%v", g.updates, g.reads, area)
++	}
++	// A path between clear and fill must retain all three ordered operations.
++	pc := paint.NewPainter(math32.Vec2(128, 96))
++	pc.Fill.Color = image.NewUniform(color.RGBA{211, 19, 31, 255})
++	pc.Stroke.Color = nil
++	pc.Rectangle(7, 8, 20, 11)
++	pc.Draw()
++	pathItems := pc.RenderDone()
++	if len(pathItems) == 0 {
++		t.Fatal("real path recording empty")
++	}
++	pair := coveredDrawPair(image.Rect(3, 4, 53, 43), image.Point{}, color.RGBA{27, 83, 119, 255})
++	interrupted := append(render.Render{pair[0]}, pathItems...)
++	interrupted = append(interrupted, pair[1])
++	if coveredDrawEligibleCount(interrupted) != 0 {
++		t.Fatal("path boundary was ignored")
++	}
++	coveredDrawCompare(t, image.Rect(0, 0, 128, 96), interrupted)
++	// Rounded parent clipping produces paths and must stay on original dispatch.
++	pc.PushContext(pc.Paint, render.NewBoundsRect(clip, sides.NewFloats(5)))
++	var style styles.Style
++	style.Defaults()
++	style.ZeroSpace()
++	style.ToDots()
++	style.ActualBackground = image.NewUniform(color.RGBA{21, 43, 81, 255})
++	pc.PushContext(pc.Paint, render.NewBoundsRect(clip, sides.Floats{}))
++	pc.StandardBox(&style, math32.Vec2(13, 9), math32.Vec2(40, 26), image.Black)
++	pc.PopContext()
++	pc.PopContext()
++	rounded := pc.RenderDone()
++	if coveredDrawEligibleCount(rounded) != 0 {
++		t.Fatal("rounded parent clipping was elided")
++	}
++	coveredDrawCompare(t, image.Rect(0, 0, 128, 96), rounded)
++}
++
++func BenchmarkCoveredUniformDraw(b *testing.B) {
++	items := make(render.Render, 0, 1000)
++	for y := 0; y < 50; y++ {
++		for x := 0; x < 10; x++ {
++			r := image.Rect(x*96, y*12, (x+1)*96, (y+1)*12)
++			items = append(items, coveredDrawPair(r, r.Min, color.RGBA{41, 73, 99, 255})...)
++		}
++	}
++	for _, optimized := range []bool{false, true} {
++		b.Run(fmt.Sprint(optimized), func(b *testing.B) {
++			rs := New(math32.Vec2(960, 600)).(*Renderer)
++			b.ReportAllocs()
++			b.ResetTimer()
++			for i := 0; i < b.N; i++ {
++				if optimized {
++					rs.Render(items)
++				} else {
++					coveredDrawReference(rs, items)
++				}
++			}
++		})
++	}
++}

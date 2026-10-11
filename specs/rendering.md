@@ -163,3 +163,19 @@ composition are unchanged. This bounds per-path row-index work without retaining
 another image, changing widget invalidation, or making a partial GPU upload.
 Differential ordered-span and rendered-pixel checks establish software parity;
 small-path microbenchmarks do not establish a native frame-latency improvement.
+
+## Adjacent uniform rectangle replay
+
+The raster backend may omit a Draw/Src item immediately covered by a Draw/Over
+item. Both must have identical nonempty rectangles and source positions, nil
+masks, and exact image.Uniform sources with built-in value color types; the
+second color must have full alpha. Eligibility is evaluated at replay so a
+borrowed uniform changed after recording is respected. Captured items and
+painter/gradient recording remain unchanged. Other image implementations and
+operation boundaries use the original replay path. Dirty-buffer differential
+tests and actual StandardBox replay establish pixel and observable-call parity,
+including clipping, fractional scales and border/shadow removal. This is CPU
+rectangle write elision and does not establish GPU upload or native memory gains.
+
+Qualification and ordinary latency results are recorded in
+[the covered-fill report](../docs/reports/macos-covered-fills/README.md).

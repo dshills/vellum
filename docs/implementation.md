@@ -225,7 +225,7 @@ are reported separately. The elapsed work total includes GC and excludes
 actual backend acquisition/present calls. It does not measure physical display
 latency. The stored-grid release runner enforces at least 400 clipped cells,
 paired 10k/million-row geometry and five runs per case for budget qualification.
-The first single-process exploratory probe fails the unchanged 4ms p95/6ms p99
+The first single-process exploratory probe fails the unchanged 4ms p95/ 6 ms p99
 targets at 20.30ms/22.77ms. See the [timing contract](../specs/grid-performance.md)
 and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open.
 The [single host-update optimization](reports/macos-grid-update/README.md)
@@ -239,7 +239,7 @@ private editing and style/help/disabled/scrollbar transitions remain current.
 Original-overlay regressions fail; final native adapter/portable virtual race
 suites and native default/offscreen vet pass, with eight matching software frames.
 Its three-process/build fixed-10k release comparison observes p95
-17.233→14.624ms and p99 18.954→15.566ms; the 4/6ms targets still fail.
+17.233→14.624ms and p99 18.954→15.566ms; the 4/ 6 ms targets still fail.
 Raster/upload cost is the next investigation, with full P6 and broader Mac
 acceptance still open.
 
@@ -285,3 +285,17 @@ including untraced input, scrollbar and layout changes. Exclusive trace files
 preserve failed runs after native retirement. Diagnostics remain separate from
 ordinary latency qualification; the earlier offset mismatch is still unproven.
 See [the measurement contract](../specs/grid-performance.md).
+
+## Covered uniform raster fills
+
+Stage 38 omits only adjacent, fully covered uniform Src clears during raster
+replay. Dirty-buffer and actual widget pixels/call behavior match the original
+dispatch; 12 preparation/race/vet checks, three meaningful faulty-overlay
+proofs, eight retained-grid image comparisons and two 400-cell Cocoa checks pass.
+The isolated 500-cell replay median improves by 43.3% with zero allocations.
+Fresh matched ordinary baseline/candidate processes retain 4,800 samples;
+pooled candidate p95 UI work is 6.0–6.7% lower across the four cases on this host.
+40 of 40 processes still fail 4 ms p95 / 6 ms p99. This does not complete Mac/P6
+acceptance or establish GPU upload/native memory gains. See
+[the report](reports/macos-covered-fills/README.md) for all distributions, source
+bindings and reviews.

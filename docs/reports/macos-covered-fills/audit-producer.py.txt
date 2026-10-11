@@ -1,0 +1,72 @@
+import importlib.util,json,tarfile,hashlib,re,statistics
+from pathlib import Path
+s=importlib.util.spec_from_file_location('q','/private/tmp/vellum-grid-publication-qualify.py');q=importlib.util.module_from_spec(s);s.loader.exec_module(q)
+base=Path('/private/tmp/vellum-raster-coverage');out=q.ROOT/'docs/reports/macos-covered-fills';current={'source':q.source(),'prepared':q.prepared()}
+proofs={}
+for name in ['checks-v3','negative','microbenchmark','widget-pixels','native-v2','performance']:
+ d=json.loads((base/name/'qualification.json').read_text());assert d['before']==d['after']==current
+ for r in d.get('checks',[]):assert q.sha(base/name/(r['name']+'.log'))==r['log_sha256']
+ proofs[name]={'result':d['result'],'sha256':q.sha(base/name/'qualification.json')}
+checks=json.loads((base/'checks-v3/qualification.json').read_text());assert checks['result']=='PASS' and len(checks['checks'])==12 and all(r['exit_code']==0 for r in checks['checks'])
+negative=json.loads((base/'negative/qualification.json').read_text());assert negative['result']=='PASS' and len(negative['checks'])==3 and all(r['meaningful_pixel_or_call_assertion_failure'] and r['exit_code']==1 for r in negative['checks'])
+pixels=json.loads((base/'widget-pixels/qualification.json').read_text());assert pixels['result']=='PASS_EXACT_WIDGET_RGBA_PARITY' and len(pixels['frames'])==8
+native=json.loads((base/'native-v2/qualification.json').read_text());assert native['result']=='PASS' and len(native['checks'])==4 and all(r['exit_code']==0 for r in native['checks'])
+for case in ['fixed-10k-ax','variable-million-ax']:
+ records=[json.loads(l) for l in (base/'native-v2'/(case+'.log')).read_text().splitlines() if l.startswith('{')]
+ assert any(r.get('event')=='grid.accessibility.pass' and r.get('visible_minimum')==400 for r in records)
+ assert any(r.get('event')=='grid.accessibility.closed' and r.get('attachment_query_refused') for r in records)
+perf=json.loads((base/'performance/qualification.json').read_text());assert perf['result']=='PASS_MATCHED_COMPARISON' and len(perf['runs'])==40 and perf['samples']==4800
+assert q.sha(base/'performance/summary.json')==perf['summary_sha256']
+s=importlib.util.spec_from_file_location('b',q.ROOT/'scripts/benchmark-grid.py');b=importlib.util.module_from_spec(s);s.loader.exec_module(b)
+measured={name:{} for name in ['baseline','candidate']}
+for entry in perf['runs']:
+ name,case,rep=entry['build'],entry['case'],entry['repetition'];folder=base/'performance'/name/case/f'run-{rep}'
+ assert q.sha(folder/'result.json')==entry['outcome_sha256'];r=json.loads((folder/'result.json').read_text());assert r['result']=='PASS' and r['exit_code']==0 and q.sha(folder/'native.log')==r['log_sha256']
+ raw=[]
+ for line in (folder/'native.log').read_text().splitlines():
+  try:v=json.loads(line)
+  except ValueError:continue
+  if isinstance(v,dict) and str(v.get('event','')).startswith('grid.perf.'):raw.append(v)
+ assert raw==r['records']
+ samples=b.validate_records(raw,int(case.split('-')[1]),case.startswith('variable'),120,False)
+ assert all(v.get('warmup_guard')==1 for v in raw)
+ assert raw[1]['warmup']==128 and raw[1]['warm_callbacks']==128
+ assert all(not v.get(k,False) for v in raw for k in ['input_details','cpu_profile','source_details'])
+ measured[name].setdefault(case,{})[rep]=samples
+for case in measured['baseline']:
+ for rep in range(1,6):
+  a,c=measured['baseline'][case][rep],measured['candidate'][case][rep];assert all(x['geometry']==y['geometry'] for x,y in zip(a,c))
+for name in measured:
+ for prefix in ['fixed','variable']:
+  for rep in range(1,6):assert all(x['geometry']==y['geometry'] for x,y in zip(measured[name][prefix+'-10000'][rep],measured[name][prefix+'-1000000'][rep]))
+ recomputed={case:{'timings_ns':b.summarize([runs[i] for i in range(1,6)])} for case,runs in measured[name].items()}
+ assert recomputed==json.loads((base/'performance/summary.json').read_text())[name]
+ assert b.warm_target_met(recomputed)==perf['warm_target_met'][name]
+baseline=json.loads((base/'source/qualification.json').read_text());delta={p for p in set(current['prepared'])|set(baseline['before']['prepared']) if current['prepared'].get(p)!=baseline['before']['prepared'].get(p)}
+assert delta=={'drivers/cogent/build/upstream/paint/renderers/rasterx/renderer.go','drivers/cogent/build/upstream/paint/renderers/rasterx/covered_draw_test.go'}
+review=json.loads((base/'internal-source-review.json').read_text());assert review['decision']=='APPROVED_SOURCE' and not review['findings']
+for path,v in review['reviewed_files'].items():assert q.sha(q.ROOT/path)==v['sha256']
+receipt_path=base/'internal-receipt-review.json';receipt=json.loads(receipt_path.read_text());assert receipt['decision'].startswith('APPROVED') and not receipt['findings']
+prism=json.loads((out/'review/prism.json').read_text());process=json.loads((out/'review/process.json').read_text());assert process['exit_code']==0 and process['source_index_unchanged']
+assert prism['coverage']['complete'] is True and prism['coverage']['files']==11
+assert prism['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]
+assert not prism['coverage']['skipped'] and prism['coverage']['truncatedBytes']==0
+assert not prism.get('findings') and q.sha(out/'review/prism.json')==process['prism_sha256']
+correction=json.loads((base/'post-prism-correction/correction.json').read_text())
+assert set(correction['files'])=={'docs/implementation.md','docs/reports/macos-covered-fills/README.md'}
+for path,h in process['before'].items():
+ if path in correction['files']:
+  r=correction['files'][path];old=base/'post-prism-correction'/r['before_copy'];new=base/'post-prism-correction'/r['after_copy']
+  assert q.sha(old)==r['before_sha256']==h and q.sha(new)==r['after_sha256']==q.sha(q.ROOT/path)
+  assert old.read_text().count(correction['old_text'])==1 and old.read_text().replace(correction['old_text'],correction['new_text'])==new.read_text()
+ else:assert q.sha(q.ROOT/path)==h
+index=json.loads((out/'records-index.json').read_text());assert q.sha(out/'records.tar.gz')==index['archive_sha256']
+with tarfile.open(out/'records.tar.gz','r:gz') as archive:
+ names=archive.getnames();assert len(names)==len(set(names)) and set(names)==set(index['members'])
+ for info in archive.getmembers():
+  assert info.isfile() and not info.name.startswith('/') and '..' not in Path(info.name).parts
+  data=archive.extractfile(info).read();assert {'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}==index['members'][info.name]
+bindings=dict(current['source'])
+for rel in ['docs/implementation.md','docs/reports/macos-covered-fills/README.md','docs/reports/macos-covered-fills/records-index.json','docs/reports/macos-covered-fills/records.tar.gz','docs/reports/macos-covered-fills/review/prism.json','docs/reports/macos-covered-fills/review/process.json']:bindings[rel]=q.sha(q.ROOT/rel)
+record={'schema':1,'result':'PASS_COVERED_FILL_COMPARISON','scope':'Exact selected/current prepared source, software/native/ordinary receipts, independent internal reviews, Prism11-file batch plus exact two-doc numeric rounding correction, and byte-audited evidence. Not full compiler/SDK closure, GPU/display/memory, human screen-reader or completeMac/P6 acceptance.','bindings':bindings,'prepared':current['prepared'],'proofs':proofs,'ordinary_samples':4800,'warm_target_met':perf['warm_target_met'],'binaries':perf['binaries'],'source_review_sha256':q.sha(base/'internal-source-review.json'),'receipt_review_sha256':q.sha(receipt_path),'prism':{'reviewer':[{'provider':'anthropic','model':'claude-sonnet-5-5'}],'complete':True,'process_sha256':q.sha(out/'review/process.json'),'post_review_numeric_doc_correction_sha256':q.sha(base/'post-prism-correction/correction.json')},'archive_members':len(index['members']),'archive_sha256':index['archive_sha256'],'producer_sha256':q.sha(Path(__file__))}
+q.write(out/'audit.json',record);(out/'audit-producer.py.txt').write_bytes(Path(__file__).read_bytes());print(record['result'],len(bindings),len(current['prepared']),flush=True)

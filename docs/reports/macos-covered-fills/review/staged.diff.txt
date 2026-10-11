@@ -1,0 +1,734 @@
+diff --git a/docs/implementation.md b/docs/implementation.md
+index b216ff6..20039cb 100644
+--- a/docs/implementation.md
++++ b/docs/implementation.md
+@@ -225,7 +225,7 @@ are reported separately. The elapsed work total includes GC and excludes
+ actual backend acquisition/present calls. It does not measure physical display
+ latency. The stored-grid release runner enforces at least 400 clipped cells,
+ paired 10k/million-row geometry and five runs per case for budget qualification.
+-The first single-process exploratory probe fails the unchanged 4ms p95/6ms p99
++The first single-process exploratory probe fails the unchanged 4ms p95/ 6 ms p99
+ targets at 20.30ms/22.77ms. See the [timing contract](../specs/grid-performance.md)
+ and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open.
+ The [single host-update optimization](reports/macos-grid-update/README.md)
+@@ -239,7 +239,7 @@ private editing and style/help/disabled/scrollbar transitions remain current.
+ Original-overlay regressions fail; final native adapter/portable virtual race
+ suites and native default/offscreen vet pass, with eight matching software frames.
+ Its three-process/build fixed-10k release comparison observes p95
+-17.233→14.624ms and p99 18.954→15.566ms; the 4/6ms targets still fail.
++17.233→14.624ms and p99 18.954→15.566ms; the 4/ 6 ms targets still fail.
+ Raster/upload cost is the next investigation, with full P6 and broader Mac
+ acceptance still open.
+ 
+@@ -285,3 +285,17 @@ including untraced input, scrollbar and layout changes. Exclusive trace files
+ preserve failed runs after native retirement. Diagnostics remain separate from
+ ordinary latency qualification; the earlier offset mismatch is still unproven.
+ See [the measurement contract](../specs/grid-performance.md).
++
++## Covered uniform raster fills
++
++Stage 38 omits only adjacent, fully covered uniform Src clears during raster
++replay. Dirty-buffer and actual widget pixels/call behavior match the original
++dispatch; 12 preparation/race/vet checks, three meaningful faulty-overlay
++proofs, eight retained-grid image comparisons and two 400-cell Cocoa checks pass.
++The isolated 500-cell replay median improves by 43.3% with zero allocations.
++Fresh matched ordinary baseline/candidate processes retain 4,800 samples;
++pooled candidate p95 UI work is 5.9–6.7% lower across the four cases on this host.
++40 of 40 processes still fail 4 ms p95 / 6 ms p99. This does not complete Mac/P6
++acceptance or establish GPU upload/native memory gains. See
++[the report](reports/macos-covered-fills/README.md) for all distributions, source
++bindings and reviews.
+diff --git a/docs/reports/macos-covered-fills/README.md b/docs/reports/macos-covered-fills/README.md
+new file mode 100644
+index 0000000..94d1cbb
+--- /dev/null
++++ b/docs/reports/macos-covered-fills/README.md
+@@ -0,0 +1,87 @@
++# macOS covered uniform fill checkpoint
++
++Stage 38 skips an immediately overwritten rectangular clear during raster replay.
++Software pixels and observable source calls match the original dispatch. The
++isolated 500-cell CPU replay median falls from 129.916 to 73.617
++microseconds (43.3% less elapsed work), with zero allocations in all ten
++benchmark observations. Across the four native cases, pooled p95 UI work is 5.9–6.7% lower for the
++candidate on this host/workload. Native timing results below are separate from
++the microbenchmark;
++40 of 40 ordinary processes fail the unchanged 4 ms p95 / 6 ms p99 targets.
++Mac/P6 completion remains open.
++
++## Implementation and checks
++
++Only adjacent image Draw/Src then Draw/Over items with identical nonempty
++rectangles and source positions, nil masks, exact nonnil Uniform sources and
++built-in value colors qualify. The second color must be opaque. Checks run at
++replay, so changed borrowed colors are respected. Captured items, painter
++recording, gradient updates and operation order are retained. Unknown/custom
++sources, translucent fills, masks and operation boundaries use original replay.
++This changes CPU rectangle writes without adding a retained image, changing
++native resources or implementing partial GPU uploads.
++
++Twelve source-bound preparation/race/vet checks pass. The repeated new suite
++executes the elision branch 1,254 times. Its pre-change dispatch oracle compares
++whole dirty/strided RGBA buffers, 360 eligible color/coverage combinations,
++borrowed-color changes, custom color calls, masks, transforms, blur/pixel/path
++ordering and actual StandardBox painting at fractional scales. Decorated-to-plain
++replacement, resize/regrowth, rounded-parent clipping and gradient Update/At
++calls are covered. Three deliberately faulty overlays fail meaningful pixel or
++call-count assertions. Eight actual retained-grid RGBA frames at 96/120/144/192DPI
++match the Stage37 renderer overlay exactly. Baseline file/overlay hashes bind
++before and after replay/builds and the comparison.
++
++Fresh pinned preparation reproduces 6,140 files. Compared with the baseline
++prepared map, only renderer.go changes and covered_draw_test.go is added.
++Actual Cocoa 400-cell accessibility publication/identity/action/close checks
++pass for fixed10k and variable-million data. These checks do not establish human
++screen-reader behavior or display latency.
++
++## Ordinary native comparison
++
++Forty fresh ordinary processes retain 4,800 samples: four cases, five repetitions
++per build, 120 samples following 128 guarded warmup callbacks. Baseline/candidate
++order alternates within each case. Every sample has matching full geometry
++across builds and paired 10k/million cases. Diagnostics are off; no observation
++is discarded or selectively rerun. These are elapsed CPU-side UI-work
++measurements; phase percentiles cannot be added and physical GPU execution and
++compositor presentation are unavailable.
++
++| Case | Build | p50 ms | p95 ms | p99 ms | Max ms |
++| --- | --- | ---: | ---: | ---: | ---: |
++| fixed-10000 | baseline | 12.870 | 13.714 | 13.936 | 14.512 |
++| fixed-10000 | candidate | 12.023 | 12.860 | 13.103 | 13.317 |
++| fixed-1000000 | baseline | 12.507 | 13.512 | 14.085 | 15.560 |
++| fixed-1000000 | candidate | 11.761 | 12.613 | 12.922 | 13.528 |
++| variable-10000 | baseline | 13.020 | 13.925 | 14.128 | 14.749 |
++| variable-10000 | candidate | 12.180 | 13.097 | 13.497 | 15.537 |
++| variable-1000000 | baseline | 12.739 | 13.526 | 13.958 | 14.419 |
++| variable-1000000 | candidate | 11.878 | 12.720 | 13.333 | 13.533 |
++
++Baseline release SHA256: `16c7276e76fa07d558480b65e7b5905302c4b57c1706549c86971b9725b65c06`. Candidate release SHA256:
++`ed650c66156a4cf784be1db7f93583f22fc1fe3dff5f4392007ef792d602c2cb`. The baseline is a fresh build with only the
++renderer replaced by exact Stage37 bytes. Selected source/prepared endpoint
++maps bind both builds, tests and measurements; they do not establish a complete
++compiler, SDK or ambient runtime closure. Raw per-run distributions and all
++maxima are retained. Observed differences support only this host/workload;
++a microbenchmark gain does not qualify overall warm latency. Table/tree
++endurance, broader native/font/GPU memory and professional Mac acceptance remain
++open. Initial baseline CPU/source-cost diagnostics are kept separately.
++
++## Evidence and review
++
++[records.tar.gz](records.tar.gz) and [records-index.json](records-index.json)
++retain raw observations, final receipts, source snapshots, diagnostics and inert
++producers. Earlier failed development/cache/generated-output and sandbox Cocoa
++attempts are historical records, not accepted qualification. The full raster
++suite's 17 generated PNG files are copied into evidence and removed from the
++prepared tree before checking source endpoints. The checks-v3 producer note
++explicitly distinguishes its end-state copy from loaded-script byte identity.
++
++Internal source and protocol reviews approve the change; final receipt review
++binds this report and completed measurements. One significant 11-file patch/test/
++spec/report batch is reviewed by Prism using Anthropic Claude Sonnet5.5; raw
++review records are in [review](review/process.json). [audit.json](audit.json)
++binds reviewed sources, current prepared bytes and the archive. No public
++release, push/tag or macOS preference change is included.
+diff --git a/drivers/cogent/native/README.md b/drivers/cogent/native/README.md
+index 4325686..5d14e4b 100644
+--- a/drivers/cogent/native/README.md
++++ b/drivers/cogent/native/README.md
+@@ -123,3 +123,9 @@ private glyph-mask scanners. General scanner construction retains full-row and
+ direct-cell behavior. Exact span/lifecycle differentials and independent
+ baseline oracles accompany the pinned patch. See
+ [row tracking](patches/rowtracking/README.md).
++
++Stage 38 (`patches/coveredfills`) checks adjacent uniform rectangle coverage
++during raster replay and skips only a completely overwritten Src clear.
++Exact input/output pins and differential tests preserve captured items, painter
++recording, clipping, borrowed colors and original fallback call behavior.
++It adds no native image cache, resource ownership or partial GPU upload.
+diff --git a/drivers/cogent/native/dependencies.json b/drivers/cogent/native/dependencies.json
+index 8a766d0..4ff1d11 100644
+--- a/drivers/cogent/native/dependencies.json
++++ b/drivers/cogent/native/dependencies.json
+@@ -331,6 +331,17 @@
+               "sha256": "82d3a2cd22746962333a8daf64d656fd61842d9e96636653b70ade2592409965"
+             }
+           ]
++        },
++        {
++          "origin": "drivers/cogent/native/patches/coveredfills",
++          "inputs": "native/patches/coveredfills/original-hashes.json",
++          "outputs": "native/patches/coveredfills/output-hashes.json",
++          "patches": [
++            {
++              "file": "native/patches/coveredfills/0038-covered-uniform-draws.patch",
++              "sha256": "56a959fc89b1bc747d6555aacca30f37069d4e528fd9e13395bb2584263bd9c8"
++            }
++          ]
+         }
+       ]
+     },
+diff --git a/drivers/cogent/native/patches/coveredfills/0038-covered-uniform-draws.patch b/drivers/cogent/native/patches/coveredfills/0038-covered-uniform-draws.patch
+new file mode 100644
+index 0000000..356c647
+--- /dev/null
++++ b/drivers/cogent/native/patches/coveredfills/0038-covered-uniform-draws.patch
+@@ -0,0 +1,452 @@
++--- a/paint/renderers/rasterx/renderer.go
+++++ b/paint/renderers/rasterx/renderer.go
++@@ -6,6 +6,8 @@
++ 
++ import (
++ 	"image"
+++	"image/color"
+++	"image/draw"
++ 	"slices"
++ 
++ 	"cogentcore.org/core/colors/gradient"
++@@ -62,17 +64,56 @@
++ 
++ // Render is the main rendering function.
++ func (rs *Renderer) Render(r render.Render) render.Renderer {
++-	for _, ri := range r {
+++	for i, ri := range r {
++ 		switch x := ri.(type) {
++ 		case *render.Path:
++ 			rs.RenderPath(x)
++ 		case *pimage.Params:
+++			if i+1 < len(r) {
+++				if next, ok := r[i+1].(*pimage.Params); ok && coveredUniformDraw(x, next) {
+++					continue
+++				}
+++			}
++ 			x.Render(rs.image)
++ 		case *render.Text:
++ 			rs.RenderText(x)
++ 		}
++ 	}
++ 	return rs
+++}
+++
+++// coveredUniformDraw recognizes an immediately overwritten rectangular clear.
+++// Check the live image values at replay, not while recording borrowed sources.
+++// Keep unknown image/color implementations on their original call path, and
+++// leave the render items intact for subsequent replay and other renderers.
+++func coveredUniformDraw(clear, fill *pimage.Params) bool {
+++	if clear == nil || fill == nil || clear.Cmd != pimage.Draw || fill.Cmd != pimage.Draw ||
+++		clear.Op != draw.Src || fill.Op != draw.Over || clear.Mask != nil || fill.Mask != nil ||
+++		clear.Rect.Empty() || clear.Rect != fill.Rect || clear.SourcePos != fill.SourcePos {
+++		return false
+++	}
+++	if _, ok := valueUniform(clear.Source); !ok {
+++		return false
+++	}
+++	u, ok := valueUniform(fill.Source)
+++	if !ok {
+++		return false
+++	}
+++	_, _, _, alpha := u.C.RGBA()
+++	return alpha == 0xffff
+++}
+++
+++func valueUniform(src image.Image) (*image.Uniform, bool) {
+++	u, ok := src.(*image.Uniform)
+++	if !ok || u == nil {
+++		return nil, false
+++	}
+++	switch u.C.(type) {
+++	case color.RGBA, color.RGBA64, color.NRGBA, color.NRGBA64,
+++		color.Alpha, color.Alpha16, color.Gray, color.Gray16:
+++		return u, true
+++	}
+++	return nil, false
++ }
++ 
++ func (rs *Renderer) RenderPath(pt *render.Path) {
++--- /dev/null
+++++ b/paint/renderers/rasterx/covered_draw_test.go
++@@ -0,0 +1,380 @@
+++// Copyright (c) 2026 Vellum contributors.
+++// SPDX-License-Identifier: MIT
+++
+++package rasterx
+++
+++import (
+++	"bytes"
+++	"fmt"
+++	"image"
+++	"image/color"
+++	"image/draw"
+++	"reflect"
+++	"testing"
+++
+++	"cogentcore.org/core/colors/gradient"
+++	"cogentcore.org/core/math32"
+++	"cogentcore.org/core/paint"
+++	"cogentcore.org/core/paint/pimage"
+++	"cogentcore.org/core/paint/render"
+++	"cogentcore.org/core/paint/renderers/rasterx/scan"
+++	"cogentcore.org/core/styles"
+++	"cogentcore.org/core/styles/sides"
+++	"cogentcore.org/core/styles/units"
+++)
+++
+++// Replay the pre-elision dispatch: an independent pixel oracle, not a copy of
+++// the eligibility predicate. Captured items get shallow copies because legacy
+++// full-image draws mutate their zero-rectangle sentinel on first use.
+++func coveredDrawReference(rs *Renderer, items render.Render) {
+++	for _, item := range items {
+++		switch x := item.(type) {
+++		case *render.Path:
+++			rs.RenderPath(x)
+++		case *pimage.Params:
+++			x.Render(rs.image)
+++		case *render.Text:
+++			rs.RenderText(x)
+++		}
+++	}
+++}
+++
+++func coveredDrawCopies(items render.Render) render.Render {
+++	copy := append(render.Render(nil), items...)
+++	for i, item := range copy {
+++		if p, ok := item.(*pimage.Params); ok {
+++			value := *p
+++			copy[i] = &value
+++		}
+++	}
+++	return copy
+++}
+++
+++func coveredDrawTarget(rect image.Rectangle) *image.RGBA {
+++	// Dirty premultiplied pixels, padded stride, and guard bytes exercise the
+++	// overwrite proof without depending on a fresh transparent destination.
+++	stride := rect.Dx()*4 + 16
+++	pix := make([]byte, stride*rect.Dy()+32)
+++	for i := range pix {
+++		pix[i] = byte((i*37 + 11) % 128)
+++	}
+++	for y := 0; y < rect.Dy(); y++ {
+++		for x := 0; x < rect.Dx(); x++ {
+++			pix[y*stride+x*4+3] = 192
+++		}
+++	}
+++	return &image.RGBA{Pix: pix, Stride: stride, Rect: rect}
+++}
+++
+++func coveredDrawCompare(t *testing.T, bounds image.Rectangle, items render.Render) {
+++	t.Helper()
+++	coveredDrawCompareFrom(t, coveredDrawTarget(bounds), items)
+++}
+++
+++func coveredDrawRenderer(target *image.RGBA) *Renderer {
+++	rs := New(math32.FromPoint(target.Rect.Size())).(*Renderer)
+++	rs.image = target
+++	rs.ImgSpanner = scan.NewImgSpanner(target)
+++	rs.Scanner = scan.NewScannerWithRowTracking(rs.ImgSpanner, target.Rect.Dx(), target.Rect.Dy())
+++	rs.Raster = NewDasher(target.Rect.Dx(), target.Rect.Dy(), rs.Scanner)
+++	return rs
+++}
+++
+++func coveredDrawCompareFrom(t *testing.T, seed *image.RGBA, items render.Render) {
+++	t.Helper()
+++	actual, expected := *seed, *seed
+++	actual.Pix = append([]byte(nil), seed.Pix...)
+++	expected.Pix = append([]byte(nil), seed.Pix...)
+++	optimized, original := coveredDrawRenderer(&actual), coveredDrawRenderer(&expected)
+++	originalItems, optimizedItems := coveredDrawCopies(items), coveredDrawCopies(items)
+++	coveredDrawReference(original, originalItems)
+++	optimized.Render(optimizedItems)
+++	if !bytes.Equal(actual.Pix, expected.Pix) {
+++		t.Fatalf("optimized replay differs from original pixels/stride guards: bounds=%v items=%v", seed.Rect, items)
+++	}
+++	if !reflect.DeepEqual(optimizedItems, originalItems) {
+++		t.Fatal("optimized replay changed captured item state")
+++	}
+++}
+++
+++func coveredDrawPair(rect image.Rectangle, sourcePos image.Point, foreground color.Color) render.Render {
+++	return render.Render{
+++		&pimage.Params{Cmd: pimage.Draw, Rect: rect, SourcePos: sourcePos, Op: draw.Src, Source: image.NewUniform(color.NRGBA{12, 44, 81, 97})},
+++		&pimage.Params{Cmd: pimage.Draw, Rect: rect, SourcePos: sourcePos, Op: draw.Over, Source: image.NewUniform(foreground)},
+++	}
+++}
+++
+++func TestCoveredUniformDrawDirtyPixelParity(t *testing.T) {
+++	colors := []color.Color{color.RGBA{9, 40, 83, 255}, color.RGBA64{900, 1300, 60000, 65535}, color.NRGBA{12, 83, 244, 255}, color.NRGBA64{192, 4096, 12288, 65535}, color.Alpha{255}, color.Alpha16{65535}, color.Gray{85}, color.Gray16{30001}}
+++	bounds := []image.Rectangle{image.Rect(0, 0, 23, 19), image.Rect(-7, -3, 16, 16), image.Rect(11, 17, 34, 36)}
+++	rects := []image.Rectangle{image.Rect(0, 0, 23, 19), image.Rect(-4, -6, 15, 11), image.Rect(8, 4, 40, 35), image.Rect(-100, -100, 100, 100), image.Rect(0, 0, 1, 1)}
+++	positions := []image.Point{{}, {-17, 29}, {1 << 30, -(1 << 30)}}
+++	eligible := 0
+++	for ci, c := range colors {
+++		for bi, bound := range bounds {
+++			for ri, rect := range rects {
+++				for pi, position := range positions {
+++					t.Run(fmt.Sprintf("%d-%d-%d-%d", ci, bi, ri, pi), func(t *testing.T) {
+++						items := coveredDrawPair(rect, position, c)
+++						if !coveredUniformDraw(items[0].(*pimage.Params), items[1].(*pimage.Params)) {
+++							t.Fatal("genuinely covered uniform pair was not eligible")
+++						}
+++						eligible++
+++						coveredDrawCompare(t, bound, items)
+++					})
+++				}
+++			}
+++		}
+++	}
+++	if eligible != 360 {
+++		t.Fatalf("eligible replay count=%d", eligible)
+++	}
+++}
+++
+++type coveredDrawColor struct{ calls *int }
+++
+++func (c coveredDrawColor) RGBA() (uint32, uint32, uint32, uint32) {
+++	*c.calls++
+++	return 20000, 30000, 40000, 65535
+++}
+++
+++func TestCoveredUniformDrawLiveSourcesAndFallbacks(t *testing.T) {
+++	bound, rect := image.Rect(0, 0, 23, 19), image.Rect(2, 3, 19, 17)
+++	items := coveredDrawPair(rect, rect.Min, color.RGBA{41, 73, 99, 255})
+++	fill := items[1].(*pimage.Params).Source.(*image.Uniform)
+++	for _, c := range []color.Color{color.RGBA{41, 73, 99, 255}, color.NRGBA{71, 33, 12, 127}, color.RGBA{11, 29, 31, 255}} {
+++		fill.C = c // The borrowed source changes after recording, before replay.
+++		coveredDrawCompare(t, bound, items)
+++	}
+++	calls := 0
+++	fill.C = coveredDrawColor{&calls}
+++	if coveredUniformDraw(items[0].(*pimage.Params), items[1].(*pimage.Params)) || calls != 0 {
+++		t.Fatal("unknown color was evaluated or elided during eligibility")
+++	}
+++	coveredDrawCompare(t, bound, items)
+++	if calls != 2 {
+++		t.Fatalf("unknown color must keep each original replay call: got%d", calls)
+++	}
+++
+++	mask := image.NewAlpha(bound)
+++	for i := range mask.Pix {
+++		mask.Pix[i] = byte(i * 17)
+++	}
+++	imageSource := coveredDrawTarget(bound)
+++	cases := []struct {
+++		name   string
+++		change func(clear, fill *pimage.Params)
+++	}{
+++		{"translucent", func(_, b *pimage.Params) { b.Source = image.NewUniform(color.NRGBA{71, 33, 12, 127}) }},
+++		{"different-rect", func(_, b *pimage.Params) { b.Rect.Max.X-- }},
+++		{"different-source-origin", func(_, b *pimage.Params) { b.SourcePos = image.Pt(1<<30, 1<<30) }},
+++		{"clear-mask", func(a, _ *pimage.Params) { a.Mask = mask }},
+++		{"fill-mask", func(_, b *pimage.Params) { b.Mask = mask }},
+++		{"clear-over", func(a, _ *pimage.Params) { a.Op = draw.Over }},
+++		{"fill-src", func(_, b *pimage.Params) { b.Op = draw.Src }},
+++		{"clear-image", func(a, _ *pimage.Params) { a.Source = imageSource }},
+++		{"fill-image", func(_, b *pimage.Params) { b.Source = imageSource }},
+++		{"full-image-sentinel", func(a, b *pimage.Params) { a.Rect, b.Rect = image.Rectangle{}, image.Rectangle{} }},
+++		{"empty-region", func(a, b *pimage.Params) { a.Rect, b.Rect = image.Rect(2, 3, 2, 17), image.Rect(2, 3, 2, 17) }},
+++		{"clear-pixel", func(a, _ *pimage.Params) { a.Cmd, a.SourcePos = pimage.SetPixel, image.Pt(3, 4) }},
+++		{"fill-transform", func(_, b *pimage.Params) { b.Cmd, b.Cumulative = pimage.Transform, math32.Scale2D(1.25, 1.5) }},
+++	}
+++	for _, test := range cases {
+++		t.Run(test.name, func(t *testing.T) {
+++			items := coveredDrawPair(rect, rect.Min, color.RGBA{41, 73, 99, 255})
+++			a, b := items[0].(*pimage.Params), items[1].(*pimage.Params)
+++			test.change(a, b)
+++			if coveredUniformDraw(a, b) {
+++				t.Fatal("operation boundary was elided")
+++			}
+++			coveredDrawCompare(t, bound, items)
+++		})
+++	}
+++	if coveredUniformDraw(nil, &pimage.Params{}) || coveredUniformDraw(&pimage.Params{}, nil) {
+++		t.Fatal("nil draw was eligible")
+++	}
+++	if _, ok := valueUniform((*image.Uniform)(nil)); ok {
+++		t.Fatal("nil uniform was eligible")
+++	}
+++}
+++
+++func TestCoveredUniformDrawFallbackPixelAndCallParity(t *testing.T) {
+++	bound := image.Rect(0, 0, 23, 19)
+++	items := coveredDrawPair(image.Rect(2, 3, 19, 17), image.Point{}, color.RGBA{41, 73, 99, 255})
+++	items[1].(*pimage.Params).Rect.Max.X--
+++	coveredDrawCompare(t, bound, items) // The unmatched strip must retain the clear.
+++	calls := 0
+++	items = coveredDrawPair(image.Rect(2, 3, 19, 17), image.Point{}, color.RGBA{41, 73, 99, 255})
+++	items[0].(*pimage.Params).Source = image.NewUniform(coveredDrawColor{&calls})
+++	coveredDrawCompare(t, bound, items) // Unknown clear colors may have observable calls.
+++	if calls != 2 {
+++		t.Fatalf("custom clear color original calls lost: got %d", calls)
+++	}
+++}
+++
+++func TestCoveredUniformDrawKeepsOrderedChains(t *testing.T) {
+++	bound := image.Rect(0, 0, 48, 40)
+++	items := coveredDrawPair(image.Rect(1, 2, 24, 18), image.Point{}, color.RGBA{17, 51, 79, 255})
+++	items = append(items, &pimage.Params{Cmd: pimage.SetPixel, SourcePos: image.Pt(5, 8), Source: image.NewUniform(color.RGBA{255, 0, 0, 255})})
+++	items = append(items, coveredDrawPair(image.Rect(15, 9, 39, 28), image.Point{}, color.RGBA{11, 77, 31, 255})...)
+++	items = append(items, &pimage.Params{Cmd: pimage.Blur, Rect: image.Rect(8, 6, 33, 25), BlurRadius: 1})
+++	items = append(items, coveredDrawPair(image.Rect(3, 13, 43, 32), image.Point{}, color.NRGBA{111, 53, 90, 133})...)
+++	for i := 0; i < 3; i++ {
+++		coveredDrawCompare(t, bound, items)
+++	}
+++}
+++
+++// Exercise the actual widget box painter, not fabricated draw parameters.
+++func coveredDrawStandardBox(scale float32, clip image.Rectangle, decorated bool, parent image.Image) render.Render {
+++	pc := paint.NewPainter(math32.Vec2(128, 96))
+++	pc.Transform = math32.Scale2D(scale, scale)
+++	pc.Context().Bounds.Rect = math32.B2FromRect(clip)
+++	var style styles.Style
+++	style.Defaults()
+++	style.ZeroSpace()
+++	style.ActualBackground = image.NewUniform(color.RGBA{27, 83, 119, 255})
+++	if decorated {
+++		style.Border.Width.Set(units.Dot(2))
+++		style.Border.Radius.Set(units.Dot(5))
+++		style.Border.Style.Set(styles.BorderSolid)
+++		style.Border.Color.Set(image.NewUniform(color.RGBA{220, 30, 50, 255}))
+++		style.BoxShadow = []styles.Shadow{{OffsetX: units.Dot(2), OffsetY: units.Dot(1), Blur: units.Dot(4), Color: image.NewUniform(color.NRGBA{1, 2, 3, 180})}}
+++	}
+++	style.ToDots()
+++	pc.StandardBox(&style, math32.Vec2(3.25, 4.75), math32.Vec2(40.5, 26.25), parent)
+++	return pc.RenderDone()
+++}
+++
+++func coveredDrawEligibleCount(items render.Render) int {
+++	count := 0
+++	for i := 0; i+1 < len(items); i++ {
+++		a, aok := items[i].(*pimage.Params)
+++		b, bok := items[i+1].(*pimage.Params)
+++		if aok && bok && coveredUniformDraw(a, b) {
+++			count++
+++		}
+++	}
+++	return count
+++}
+++
+++func TestCoveredUniformDrawStandardBox(t *testing.T) {
+++	parent := image.NewUniform(color.NRGBA{10, 19, 44, 83})
+++	for _, scale := range []float32{1, 1.25, 1.5, 1.6875, 2} {
+++		for _, clip := range []image.Rectangle{image.Rect(0, 0, 128, 96), image.Rect(13, 9, 69, 47)} {
+++			t.Run(fmt.Sprintf("scale-%g/clip-%v", scale, clip), func(t *testing.T) {
+++				plain := coveredDrawStandardBox(scale, clip, false, parent)
+++				if coveredDrawEligibleCount(plain) != 1 {
+++					t.Fatal("real plain StandardBox did not emit a covered pair")
+++				}
+++				bounds := image.Rect(0, 0, 128, 96)
+++				coveredDrawCompare(t, bounds, plain)
+++				decorated := coveredDrawStandardBox(scale, clip, true, parent)
+++				if coveredDrawEligibleCount(decorated) != 0 {
+++					t.Fatal("decorated box unexpectedly elided")
+++				}
+++				coveredDrawCompare(t, bounds, decorated)
+++				// Replay the undecorated replacement on a real prior border/shadow frame.
+++				seed := coveredDrawTarget(bounds)
+++				previous := coveredDrawRenderer(seed)
+++				coveredDrawReference(previous, coveredDrawCopies(decorated))
+++				coveredDrawCompareFrom(t, seed, plain)
+++				// The same captured items are replayable following resize/regrowth.
+++				rs := New(math32.Vec2(128, 96)).(*Renderer)
+++				for _, size := range []math32.Vector2{math32.Vec2(128, 96), math32.Vec2(32, 24), math32.Vec2(128, 96)} {
+++					rs.SetSize(units.UnitDot, size)
+++					draw.Draw(rs.image, rs.image.Bounds(), parent, image.Point{}, draw.Src)
+++					expected := image.NewRGBA(rs.image.Bounds())
+++					copy(expected.Pix, rs.image.Pix)
+++					reference := coveredDrawRenderer(expected)
+++					coveredDrawReference(reference, coveredDrawCopies(plain))
+++					rs.Render(coveredDrawCopies(plain))
+++					if !bytes.Equal(rs.image.Pix, expected.Pix) {
+++						t.Fatal("resized replay differs from original")
+++					}
+++				}
+++			})
+++		}
+++	}
+++}
+++
+++type coveredDrawGradient struct {
+++	*gradient.Linear
+++	updates, reads int
+++}
+++
+++func (g *coveredDrawGradient) Update(opacity float32, box math32.Box2, transform math32.Matrix2) {
+++	g.updates++
+++	g.Linear.Update(opacity, box, transform)
+++}
+++func (g *coveredDrawGradient) At(x, y int) color.Color { g.reads++; return g.Linear.At(x, y) }
+++
+++func TestCoveredUniformDrawPreservesPainterGradientAndPath(t *testing.T) {
+++	g := &coveredDrawGradient{Linear: gradient.NewLinear().AddStop(color.RGBA{9, 21, 43, 255}, 0).AddStop(color.RGBA{61, 71, 91, 255}, 1)}
+++	clip := image.Rect(13, 9, 69, 47)
+++	items := coveredDrawStandardBox(1.25, clip, false, g)
+++	if g.updates != 1 || g.reads != 0 || coveredDrawEligibleCount(items) != 0 {
+++		t.Fatal("gradient recording/evaluation contract changed")
+++	}
+++	coveredDrawCompare(t, image.Rect(0, 0, 128, 96), items)
+++	area := items[0].(*pimage.Params).Rect
+++	if g.updates != 1 || g.reads != 2*area.Dx()*area.Dy() {
+++		t.Fatalf("gradient original calls lost: updates=%d reads=%d area=%v", g.updates, g.reads, area)
+++	}
+++	// A path between clear and fill must retain all three ordered operations.
+++	pc := paint.NewPainter(math32.Vec2(128, 96))
+++	pc.Fill.Color = image.NewUniform(color.RGBA{211, 19, 31, 255})
+++	pc.Stroke.Color = nil
+++	pc.Rectangle(7, 8, 20, 11)
+++	pc.Draw()
+++	pathItems := pc.RenderDone()
+++	if len(pathItems) == 0 {
+++		t.Fatal("real path recording empty")
+++	}
+++	pair := coveredDrawPair(image.Rect(3, 4, 53, 43), image.Point{}, color.RGBA{27, 83, 119, 255})
+++	interrupted := append(render.Render{pair[0]}, pathItems...)
+++	interrupted = append(interrupted, pair[1])
+++	if coveredDrawEligibleCount(interrupted) != 0 {
+++		t.Fatal("path boundary was ignored")
+++	}
+++	coveredDrawCompare(t, image.Rect(0, 0, 128, 96), interrupted)
+++	// Rounded parent clipping produces paths and must stay on original dispatch.
+++	pc.PushContext(pc.Paint, render.NewBoundsRect(clip, sides.NewFloats(5)))
+++	var style styles.Style
+++	style.Defaults()
+++	style.ZeroSpace()
+++	style.ToDots()
+++	style.ActualBackground = image.NewUniform(color.RGBA{21, 43, 81, 255})
+++	pc.PushContext(pc.Paint, render.NewBoundsRect(clip, sides.Floats{}))
+++	pc.StandardBox(&style, math32.Vec2(13, 9), math32.Vec2(40, 26), image.Black)
+++	pc.PopContext()
+++	pc.PopContext()
+++	rounded := pc.RenderDone()
+++	if coveredDrawEligibleCount(rounded) != 0 {
+++		t.Fatal("rounded parent clipping was elided")
+++	}
+++	coveredDrawCompare(t, image.Rect(0, 0, 128, 96), rounded)
+++}
+++
+++func BenchmarkCoveredUniformDraw(b *testing.B) {
+++	items := make(render.Render, 0, 1000)
+++	for y := 0; y < 50; y++ {
+++		for x := 0; x < 10; x++ {
+++			r := image.Rect(x*96, y*12, (x+1)*96, (y+1)*12)
+++			items = append(items, coveredDrawPair(r, r.Min, color.RGBA{41, 73, 99, 255})...)
+++		}
+++	}
+++	for _, optimized := range []bool{false, true} {
+++		b.Run(fmt.Sprint(optimized), func(b *testing.B) {
+++			rs := New(math32.Vec2(960, 600)).(*Renderer)
+++			b.ReportAllocs()
+++			b.ResetTimer()
+++			for i := 0; i < b.N; i++ {
+++				if optimized {
+++					rs.Render(items)
+++				} else {
+++					coveredDrawReference(rs, items)
+++				}
+++			}
+++		})
+++	}
+++}
+diff --git a/drivers/cogent/native/patches/coveredfills/README.md b/drivers/cogent/native/patches/coveredfills/README.md
+new file mode 100644
+index 0000000..f4a3e19
+--- /dev/null
++++ b/drivers/cogent/native/patches/coveredfills/README.md
+@@ -0,0 +1,24 @@
++# Covered uniform rectangle draws
++
++Stage 38 changes raster replay and adds differential tests, with exact input,
++patch and output hashes. An adjacent Draw/Src clear can be skipped only when
++the next item is Draw/Over with identical nonempty rectangles and source
++positions, no masks, and exact nonnil image.Uniform sources backed by built-in
++value colors. The second color must be fully opaque. Replay checks live colors;
++it leaves captured items, painter recording and gradient updates intact.
++
++Unknown image/color implementations, gradients, wrappers, translucent fills,
++transforms, blur, pixel operations, intervening paths and the legacy zero-rect
++full-image sentinel follow the original dispatch. Borrowed images retain their
++existing lifetime and concurrency contract. No additional retained resources,
++invalidation, native upload, GPU image or submission behavior is introduced.
++
++Tests replay the pre-change dispatch as an independent pixel oracle against
++dirty, padded, nonzero-origin RGBA destinations. They cover built-in colors,
++clipped and extreme source coordinates, borrowed-color mutation and observable
++custom-color calls, masks, transforms, ordered blur/pixel/path operations and
++the actual StandardBox painter at fractional scales. Border/shadow replacement,
++resize/regrowth, rounded-parent clipping and gradient Update/At calls are
++checked separately. New Vellum tests are MIT; upstream renderer attribution
++and BSD license remain in force. A pure 500-cell microbenchmark isolates draw
++work; only fresh ordinary native observations can assess complete UI latency.
+diff --git a/drivers/cogent/native/patches/coveredfills/original-hashes.json b/drivers/cogent/native/patches/coveredfills/original-hashes.json
+new file mode 100644
+index 0000000..33956e4
+--- /dev/null
++++ b/drivers/cogent/native/patches/coveredfills/original-hashes.json
+@@ -0,0 +1,4 @@
++{
++  "paint/renderers/rasterx/covered_draw_test.go": null,
++  "paint/renderers/rasterx/renderer.go": "86b3c23477642b4d3ef5d82cab87a6fae12392bd3e1162a41270f333c1356cc9"
++}
+diff --git a/drivers/cogent/native/patches/coveredfills/output-hashes.json b/drivers/cogent/native/patches/coveredfills/output-hashes.json
+new file mode 100644
+index 0000000..7f3cafa
+--- /dev/null
++++ b/drivers/cogent/native/patches/coveredfills/output-hashes.json
+@@ -0,0 +1,4 @@
++{
++  "paint/renderers/rasterx/covered_draw_test.go": "f112fee4efb130da91bbcef0785edb276a0e451e8958247ea59fc2fcb11ad062",
++  "paint/renderers/rasterx/renderer.go": "124e38cf69f7bc25f5ffbc9764db8a7581522665dc06236aeeae3d279702fe1a"
++}
+diff --git a/drivers/cogent/prepare_test.py b/drivers/cogent/prepare_test.py
+index 8af9c00..04f41c4 100644
+--- a/drivers/cogent/prepare_test.py
++++ b/drivers/cogent/prepare_test.py
+@@ -280,7 +280,7 @@ class PreparationChecks(unittest.TestCase):
+         core, font = manifest["dependencies"]
+         self.assertEqual(core["module"], "cogentcore.org/core")
+         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
+-        self.assertEqual(numbers, list(range(1, 38)))
++        self.assertEqual(numbers, list(range(1, 39)))
+         self.assertEqual(len(font["stages"]), 2)
+         import hashlib
+         for dependency in manifest["dependencies"]:
+diff --git a/specs/grid-performance.md b/specs/grid-performance.md
+index 3416316..77fb632 100644
+--- a/specs/grid-performance.md
++++ b/specs/grid-performance.md
+@@ -246,3 +246,15 @@ failed warmup runs. Setup/ready/sample/end identify this diagnostic mode.
+ Ordinary validation refuses input-detail samples, even if profile or source
+ diagnostics are separately allowed. Explicit diagnostic validation and elapsed
+ observations never qualify the unchanged warm latency targets.
++
++## Covered-fill comparison
++
++Stage 38 measures adjacent uniform rectangle write elision separately from
++complete native frame latency. A same-work pure replay microbenchmark compares
++the original dispatch and optimized backend. The native comparison uses fresh
++ordinary baseline and candidate processes with identical cases, closed guarded
++warmups, 120 measured samples and five repetitions per case/build. Every raw
++observation is retained; actual geometry must match across builds and between
++10,000 and 1,000,000 row cases. Instrumented source/CPU diagnostics remain
++separate. Targets stay p95 <= 4 ms and p99 <= 6 ms; a CPU microbenchmark gain
++cannot qualify those targets. See [results](../docs/reports/macos-covered-fills/README.md).
+diff --git a/specs/rendering.md b/specs/rendering.md
+index 52769d9..6e5d52e 100644
+--- a/specs/rendering.md
++++ b/specs/rendering.md
+@@ -163,3 +163,19 @@ composition are unchanged. This bounds per-path row-index work without retaining
+ another image, changing widget invalidation, or making a partial GPU upload.
+ Differential ordered-span and rendered-pixel checks establish software parity;
+ small-path microbenchmarks do not establish a native frame-latency improvement.
++
++## Adjacent uniform rectangle replay
++
++The raster backend may omit a Draw/Src item immediately covered by a Draw/Over
++item. Both must have identical nonempty rectangles and source positions, nil
++masks, and exact image.Uniform sources with built-in value color types; the
++second color must have full alpha. Eligibility is evaluated at replay so a
++borrowed uniform changed after recording is respected. Captured items and
++painter/gradient recording remain unchanged. Other image implementations and
++operation boundaries use the original replay path. Dirty-buffer differential
++tests and actual StandardBox replay establish pixel and observable-call parity,
++including clipping, fractional scales and border/shadow removal. This is CPU
++rectangle write elision and does not establish GPU upload or native memory gains.
++
++Qualification and ordinary latency results are recorded in
++[the covered-fill report](../docs/reports/macos-covered-fills/README.md).

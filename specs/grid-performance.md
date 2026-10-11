@@ -246,3 +246,15 @@ failed warmup runs. Setup/ready/sample/end identify this diagnostic mode.
 Ordinary validation refuses input-detail samples, even if profile or source
 diagnostics are separately allowed. Explicit diagnostic validation and elapsed
 observations never qualify the unchanged warm latency targets.
+
+## Covered-fill comparison
+
+Stage 38 measures adjacent uniform rectangle write elision separately from
+complete native frame latency. A same-work pure replay microbenchmark compares
+the original dispatch and optimized backend. The native comparison uses fresh
+ordinary baseline and candidate processes with identical cases, closed guarded
+warmups, 120 measured samples and five repetitions per case/build. Every raw
+observation is retained; actual geometry must match across builds and between
+10,000 and 1,000,000 row cases. Instrumented source/CPU diagnostics remain
+separate. Targets stay p95 <= 4 ms and p99 <= 6 ms; a CPU microbenchmark gain
+cannot qualify those targets. See [results](../docs/reports/macos-covered-fills/README.md).

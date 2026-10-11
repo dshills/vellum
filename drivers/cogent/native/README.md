@@ -123,3 +123,9 @@ private glyph-mask scanners. General scanner construction retains full-row and
 direct-cell behavior. Exact span/lifecycle differentials and independent
 baseline oracles accompany the pinned patch. See
 [row tracking](patches/rowtracking/README.md).
+
+Stage 38 (`patches/coveredfills`) checks adjacent uniform rectangle coverage
+during raster replay and skips only a completely overwritten Src clear.
+Exact input/output pins and differential tests preserve captured items, painter
+recording, clipping, borrowed colors and original fallback call behavior.
+It adds no native image cache, resource ownership or partial GPU upload.
