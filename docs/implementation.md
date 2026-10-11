@@ -299,3 +299,15 @@ pooled candidate p95 UI work is 6.0–6.7% lower across the four cases on this h
 acceptance or establish GPU upload/native memory gains. See
 [the report](reports/macos-covered-fills/README.md) for all distributions, source
 bindings and reviews.
+
+## Native accessibility publication work
+
+Native render callbacks omit managed Grid legacy rectangles already ignored by
+Cocoa; full inspection, atomic scoped semantic/frame publication and editor text
+geometry remain intact. Native commit reuses the validated node map, and async
+payload producers/consumers have explicit Cocoa pool lifetimes. Eleven
+preparation/race/vet/build checks and three live Cocoa processes pass. Pooled p95 changes are mixed across these four matched cases; the distributions below are the observation, without a general speedup claim.
+All 40 ordinary processes still fail both unchanged warm UI-work targets. The
+bounded payload fixture does not qualify native/GPU memory or complete Mac/P6.
+See [the report](reports/macos-ax-publication/README.md) for full distributions,
+source/artifact bindings, reviews and coverage limits.

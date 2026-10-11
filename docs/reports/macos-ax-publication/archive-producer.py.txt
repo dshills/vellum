@@ -1,0 +1,23 @@
+import hashlib,json,tarfile,io,shutil
+from pathlib import Path
+base=Path('/private/tmp/vellum-ax-publication-cost');out=Path('/private/tmp/vellum-large-data/docs/reports/macos-ax-publication');archive=out/'records.tar.gz';assert not archive.exists()
+# Preserve the separate profiling attempt exactly; never merge diagnostic samples.
+profile=base/'diagnostic-profile';shutil.copytree('/private/tmp/vellum-text-parse-profile',profile)
+shutil.copytree('/private/tmp/vellum-ax-publication-protocol-review',base/'protocol-review')
+helper=Path('/private/tmp/vellum-raster-coverage-protocol-review/final-receipts/audit.py')
+receipt=json.loads((base/'internal-receipt-review.json').read_text())
+assert hashlib.sha256(helper.read_bytes()).hexdigest()==receipt['independent_reviewer_helpers_sha256']
+(base/'protocol-review/final-receipts/prior-independent-helper.py.txt').write_bytes(helper.read_bytes())
+files=[]
+for folder in ['checks','native','baseline-build','baseline-build-v2','performance','diagnostic-profile','prism','resolution','protocol-review']:
+ files.extend(p for p in sorted((base/folder).rglob('*')) if p.is_file())
+for name in ['internal-review-inputs.json','internal-source-review.json','internal-receipt-review.json','internal-prism-finding-review.json','internal-resolution-review.json','report-values.json','report-producer.py.txt']:
+ files.append(base/name)
+for p in [Path('/private/tmp/vellum-grid-publication-qualify.py'),Path('/private/tmp/vellum-ax-publication-qualify.py'),Path('/private/tmp/vellum-ax-publication-qualify-v2.py'),Path('/private/tmp/vellum-ax-baseline-build.py'),Path('/private/tmp/vellum-ax-publication-performance.py'),Path('/private/tmp/vellum-ax-publication-report.py')]:
+ target=base/('producer-'+p.name+'.txt');target.write_bytes(p.read_bytes());files.append(target)
+index={}
+with tarfile.open(archive,'w:gz') as tar:
+ for p in files:
+  assert p.is_file() and not p.is_symlink();name=str(p.relative_to(base));assert name not in index and '..' not in Path(name).parts
+  data=p.read_bytes();info=tarfile.TarInfo(name);info.size=len(data);info.mode=0o644;info.mtime=0;tar.addfile(info,io.BytesIO(data));index[name]={'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}
+record={'schema':1,'archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'archive_bytes':archive.stat().st_size,'uncompressed_bytes':sum(v['bytes'] for v in index.values()),'members':index,'producer_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()};(out/'records-index.json').write_text(json.dumps(record,indent=2,sort_keys=True)+'\n');(out/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes());print('archive',len(index),record['archive_bytes'],flush=True)

@@ -8,6 +8,7 @@ package cogent
 #include <stdlib.h>
 #include <stdint.h>
 char *vellumAXScopedFixture(const char *json);
+char *vellumAXPayloadFixture(const char *json,int consume);
 char *vellumAXGridFixture(const char *json,const char *tableID,int column,int row);
 char *vellumAXTextFixture(const char *node,const char *geometry,int start,int length,int line);
 int vellumAXSetValueFixture(uint64_t token,uint64_t generation,const char *node,const char *value);
@@ -282,6 +283,20 @@ func nativeAccessibilityScopedFixture(steps string) string {
 	s := C.CString(steps)
 	defer C.free(unsafe.Pointer(s))
 	result := C.vellumAXScopedFixture(s)
+	defer C.free(unsafe.Pointer(result))
+	return C.GoString(result)
+}
+
+// nativeAccessibilityPayloadFixture tests the real JSON producer without an
+// attachment, queue scheduling, or OS settings changes.
+func nativeAccessibilityPayloadFixture(payload string, consume bool) string {
+	s := C.CString(payload)
+	defer C.free(unsafe.Pointer(s))
+	delivery := C.int(0)
+	if consume {
+		delivery = 1
+	}
+	result := C.vellumAXPayloadFixture(s, delivery)
 	defer C.free(unsafe.Pointer(result))
 	return C.GoString(result)
 }

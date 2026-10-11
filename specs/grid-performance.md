@@ -258,3 +258,20 @@ observation is retained; actual geometry must match across builds and between
 10,000 and 1,000,000 row cases. Instrumented source/CPU diagnostics remain
 separate. Targets stay p95 <= 4 ms and p99 <= 6 ms; a CPU microbenchmark gain
 cannot qualify those targets. See [results](../docs/reports/macos-covered-fills/README.md).
+
+## Native accessibility publication comparison
+
+Compare the complete native accessibility work reduction against the preceding
+committed release build, with all source changes included and no diagnostics in
+either measured process. The native benchmark retains 400 clipped cells, atomic
+scoped geometry publication and current action guards. Omitting the legacy
+geometry that Cocoa already discards does not reduce the semantic workload.
+Separate Cocoa acceptance verifies live values, frames, stable identities,
+replacement, actions and closure. Payload ownership fixtures do not qualify
+process/native/GPU memory or establish an ordinary frame improvement.
+
+Matched baseline/candidate timing uses all four stored-table cases, five fresh
+interleaved processes per case/build, 120 samples and 128 guarded warmups per
+process. Preserve every raw record and require exact paired geometry; CPU
+profiling remains separately labelled diagnostic evidence. Existing 4 ms p95 /
+6 ms p99 targets and the full P6/Mac acceptance scope remain unchanged.

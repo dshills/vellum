@@ -1,0 +1,13 @@
+import importlib.util,hashlib,json,subprocess,time,sys
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');out=Path('/private/tmp/vellum-ax-publication-cost/prism');out.mkdir(exist_ok=False);producer=Path(__file__).read_bytes();sys.path.insert(0,str(root/'scripts'));from child_process import run_child
+files=sorted(json.loads(Path('/private/tmp/vellum-ax-publication-cost/internal-review-inputs.json').read_text()))+['docs/implementation.md','docs/reports/macos-ax-publication/README.md'];files=sorted(files)
+def sha(data):return hashlib.sha256(data).hexdigest()
+def inputs():return {p:sha((root/p).read_bytes()) for p in files}
+assert sorted(subprocess.check_output(['git','diff','--cached','--name-only'],cwd=root).decode().splitlines())==files
+before=inputs();diff=subprocess.check_output(['git','diff','--cached','--binary','--']+files,cwd=root);(out/'staged.diff.txt').write_bytes(diff);(out/'producer.py.txt').write_bytes(producer);(out/'inputs.json').write_text(json.dumps({'files':before,'staged_diff_sha256':sha(diff),'staged_diff_bytes':len(diff),'scope':'Explicit11-file implementation/test/spec/report payload. Raw evidence, archive and inert source copies excluded.'},indent=2)+'\n')
+argv=['/Users/dshills/Development/Go/bin/prism','review','staged','--provider','anthropic','--model','claude-sonnet-5-5','--format','json','--baseline','none','--fail-on','medium','--min-severity','medium','--no-auto-exclude','--paths',','.join(files),'--out',str(out/'prism.json')];started=time.monotonic();error=None
+with (out/'stdout.log').open('xb') as stdout,(out/'stderr.log').open('xb') as stderr:
+ try:code=run_child(argv,cwd=root,stdout=stdout,stderr=stderr,timeout=900).returncode
+ except Exception as exc:code=125;error={'type':type(exc).__name__,'message':str(exc)}
+after=inputs();afterdiff=subprocess.check_output(['git','diff','--cached','--binary','--']+files,cwd=root);proof={'argv':argv,'exit_code':code,'error':error,'elapsed_seconds':time.monotonic()-started,'before':before,'after':after,'source_index_unchanged':before==after and diff==afterdiff,'stdout_sha256':sha((out/'stdout.log').read_bytes()),'stderr_sha256':sha((out/'stderr.log').read_bytes()),'prism_sha256':sha((out/'prism.json').read_bytes()) if (out/'prism.json').exists() else None,'producer_sha256':sha(producer)};(out/'process.json').write_text(json.dumps(proof,indent=2)+'\n');assert proof['source_index_unchanged'];print('Prism',code,round(proof['elapsed_seconds'],2),flush=True);sys.exit(code)

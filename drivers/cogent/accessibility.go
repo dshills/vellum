@@ -753,7 +753,7 @@ func publishAccessibilityGeometry(w *nativeWindow) {
 		return
 	}
 	w.rootMu.Lock()
-	bounds := accessibilityBounds(w.root)
+	bounds := nativeAccessibilityBounds(w.root)
 	textBounds := accessibilityTextGeometry(w.root)
 	w.rootMu.Unlock()
 	payload, _ := json.Marshal(bounds)
@@ -762,6 +762,18 @@ func publishAccessibilityGeometry(w *nativeWindow) {
 	nativeAccessibilityTextGeometry(b.token, string(textPayload))
 }
 func accessibilityBounds(root *record) map[string][4]float32 {
+	return accessibilityBoundsIncludingGrids(root, true)
+}
+
+// Scoped grid frames are published atomically with their semantics. Cocoa
+// deliberately ignores these IDs in the unversioned geometry channel, so do
+// not construct or encode a second copy of them on every render. Inspection
+// keeps the full projection above, including private grid editor bounds.
+func nativeAccessibilityBounds(root *record) map[string][4]float32 {
+	return accessibilityBoundsIncludingGrids(root, false)
+}
+
+func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[string][4]float32 {
 	out := map[string][4]float32{}
 	var bounds func(string, core.Widget)
 	bounds = func(id string, widget core.Widget) {
@@ -782,6 +794,9 @@ func accessibilityBounds(root *record) map[string][4]float32 {
 		if r == nil {
 			return
 		}
+		if !includeGrids && r.node.Kind == ui.DataGrid && r.control != nil && r.control.grid != nil {
+			return // Host, rows, cells, headers and private editor share the scope.
+		}
 		widget := r.widget
 		if r.control != nil && r.control.dialog != nil {
 			widget = r.control.dialog.host
@@ -797,7 +812,7 @@ func accessibilityBounds(root *record) map[string][4]float32 {
 				bounds(accessibilityOptionID(r.node.ID, o.ID), r.widget)
 			}
 		}
-		extensionAccessibilityBounds(r, out, bounds)
+		extensionAccessibilityBounds(r, out, bounds, includeGrids)
 		gridAccessibilityBounds(r, out)
 		treeAccessibilityBounds(r, out)
 		if edit := gridEditingRecord(r); edit != nil {
@@ -881,7 +896,7 @@ func (h *accessibilityDialogHost) RenderWidget() {
 	if err != nil {
 		return
 	}
-	bounds := accessibilityBounds(r)
+	bounds := nativeAccessibilityBounds(r)
 	if prefix, _ := h.Property("vellum.accessibility-namespace").(string); prefix != "" {
 		qualified := make(map[string][4]float32, len(bounds))
 		for id, rect := range bounds {

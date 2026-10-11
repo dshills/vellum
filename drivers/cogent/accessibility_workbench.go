@@ -172,7 +172,7 @@ func workbenchAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 	})
 	return nodes, handlers
 }
-func workbenchAccessibilityBounds(r *record, bounds func(string, core.Widget), out map[string][4]float32) {
+func workbenchAccessibilityBounds(r *record, bounds func(string, core.Widget), out map[string][4]float32, includeGrids bool) {
 	w, ok := r.node.Custom.(*Workbench)
 	if !ok || w == nil {
 		return
@@ -184,7 +184,7 @@ func workbenchAccessibilityBounds(r *record, bounds func(string, core.Widget), o
 		}
 		if active := w.records[group.Active]; active != nil {
 			prefix := accessibilityWorkbenchNamespace(r.node.ID, group.Active)
-			for id, rect := range accessibilityBounds(active) {
+			for id, rect := range accessibilityBoundsIncludingGrids(active, includeGrids) {
 				out[prefix+id] = rect
 			}
 		}

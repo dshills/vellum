@@ -82,3 +82,29 @@ These in-process native assertions are not a full screen-reader certification. H
 Source basis: [Apple custom-control accessibility guide](https://developer.apple.com/library/archive/documentation/Accessibility/Conceptual/AccessibilityMacOSX/ImplementingAccessibilityforCustomControls.html) and [native expanded-state setter](https://developer.apple.com/documentation/appkit/nsaccessibilityprotocol/setaccessibilityexpanded%28_%3A%29), with the installed AppKit SDK headers checked for actual selectors and role/notification constants.
 
 The owned native adapter snapshots the current-window global under its publication mutex. Screen targeting and temporary sizing read one stable window snapshot; raising a stage updates its own window title. Concurrent publication and screen targeting have a race regression in the prepared dependency.
+
+## Native publication work and payload ownership
+
+The unversioned native geometry channel omits the complete subtree of a bound
+managed DataGrid: host, rows, cells, headers and private editor. Their frames
+already commit with the validated semantic scope envelope; Cocoa continues to
+refuse any legacy rectangle attempting to overwrite them. Full manual inspection
+still exposes those bounds. Ordinary controls, virtual tables/trees, managed
+trees and active workbench/dialog namespaces retain their legacy geometry.
+Detailed text-range geometry remains a separate exact-client/text channel and
+includes the private grid editor.
+
+Snapshot validation returns its checked ID-to-node map for the native commit.
+Identity reuse reads previous scope ownership from the old element dictionary
+before any element is mutated. Whole-snapshot validation, monotonic epochs,
+allocation before mutation, hierarchy order and notifications retain their
+existing rules; this does not introduce a delta or partial commit protocol.
+
+Asynchronous JSON producers copy C bytes and enqueue their strongly capturing
+blocks inside an explicit producer autorelease pool. Consumer blocks establish
+separate pools for native parsing, queries and actions. String-based action and
+text-query producers also copy inside their own pools. No C pointer survives a
+return to Go. Owned transport payloads remain alive while queued and can be
+released after consumption or discard without an ambient producer pool. This
+lifetime rule does not bound the total queued work or prove process/native/GPU
+memory reclamation; those remain separate acceptance measurements.

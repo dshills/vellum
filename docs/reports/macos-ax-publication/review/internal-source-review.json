@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "status": "APPROVED",
+  "review_kind": "independent read-only source/test/spec review",
+  "reviewed_at_utc": "2026-10-11T21:40:40.170120+00:00",
+  "root": "/private/tmp/vellum-large-data",
+  "base": "b995782",
+  "receipt_path": "/private/tmp/vellum-ax-publication-cost/internal-review-inputs.json",
+  "receipt_sha256": "d3bef9087da4462e842cca28e4830636f00ab0680c9191c4da4b6e9032a0c249",
+  "reviewed_files": {
+    "drivers/cogent/accessibility.go": "76c4b1adce00b21a992e2bdfa599b3f25c6b3adba1336f5c620b68404bb7143a",
+    "drivers/cogent/accessibility_darwin.go": "a745af3d8046deee71312410688ab2a0f7c40cde2a429b84a23b148eeedf1cb9",
+    "drivers/cogent/accessibility_darwin.m": "93a7801ee12286beba61e744416c5ebc4af0283671c0684c9ba7ec99ea9af095",
+    "drivers/cogent/accessibility_geometry_offscreen_test.go": "57bade86d13be68bc50309f491288c6c0f55f69f4c93f11a45200d169282e41b",
+    "drivers/cogent/accessibility_payload_darwin_test.go": "6906b6a24f7ebce0fb4c5541fb329b84672a648a7d0a5984188168da2f7bf38d",
+    "drivers/cogent/accessibility_virtual.go": "bc0291e447a6f567aad2420496eda53a329173dbfad7032383de955d4069a14f",
+    "drivers/cogent/accessibility_workbench.go": "47b13556e46dd840b3eed7580699c86728b4cb35570360055b4622cff29c4363",
+    "specs/accessibility.md": "9c85abb0213491a3c7f12f6db88c8eaad0d0494ed8d998b55aa472048d004512",
+    "specs/grid-performance.md": "d638927285da0fb30b7bafd9f0b7bfd882aa67775333160daaf6f936a39680f9"
+  },
+  "supporting_context_files": {
+    "drivers/cogent/accessibility_grid_publication.go": "e5cc299680af372349063a063a7e9939ec1a6fb8b58290970f1727aaca508afa",
+    "drivers/cogent/editor_geometry.go": "f9928044137efddc77dba9434836bf25b1f30248f967f267aca31253690f02c5",
+    "drivers/cogent/grid_editing.go": "c70a39637c02e2e9576a1ae3d0b2d4a043af9fc92d1ea493847d3c42abf403d3",
+    "drivers/cogent/accessibility_darwin_test.go": "16e8b86a61f8a56b247789e1714fd7192eb26401a8ceb3f68d3f5ca1e6a1ea8a",
+    "drivers/cogent/grid_accessibility_envelope_darwin_test.go": "e96ce37ddbf714d6fab6faecf33a1e095212ed6c71942ae997a2b15699bddb2b",
+    "ui/node.go": "793eb9a2b105eef68d6b131b82ae0e21944d54cccc5d07d1503b98b810545c3d"
+  },
+  "input_hash_mismatches": [],
+  "findings": [],
+  "verification": {
+    "all_allowlisted_current_bytes_match_receipt": true,
+    "validation_predicate_equivalent_to_base_after_return_type_normalization": true,
+    "validation_normalization": "Only signature rename/type, refusal nil\u2192NO, and returned checked nodes\u2192YES were normalized.",
+    "runtime_commands_executed": [],
+    "repository_mutations": []
+  },
+  "source_assessment": [
+    {
+      "area": "native-only geometry",
+      "evidence": [
+        "accessibility.go:756,764-826,899",
+        "accessibility_virtual.go:142-145",
+        "accessibility_workbench.go:175-190",
+        "accessibility_darwin.m:440-446"
+      ],
+      "conclusion": "Bound managed DataGrid records are leaves. Early return omits host, generated rows/cells/headers and private editor only from unversioned native bounds. The includeGrids option is propagated through active Workbench recursion; full inspection and separate text geometry retain previous traversal. Dialog publication applies the same native-only projection before its namespace prefix."
+    },
+    {
+      "area": "native checked index reuse",
+      "evidence": [
+        "accessibility_darwin.m:300-338,391-427"
+      ],
+      "conclusion": "Validation decisions are mechanically unchanged. The checked ID map is reused only within one native-owned commit; every identity-reuse decision reads prior state.elements before the first element mutation. Ordinary reparent identity/geometry behavior and strict scoped ownership rules remain unchanged. Epoch, allocation-before-mutation, hierarchy/order and notification code are retained."
+    },
+    {
+      "area": "payload and pool ownership",
+      "evidence": [
+        "accessibility_darwin.m:279-284,435-452,501-547,583-601",
+        "accessibility_darwin.go:286-303"
+      ],
+      "conclusion": "All three asynchronous JSON channels construct copied NSData within the producer pool and strongly capture it in the enqueued block; parsing has an independent consumer pool. Perform and TextProbe copy their strings inside a producer pool and use consumer pools; Probe now has a consumer pool. Go may free CString after the C producer returns without leaving a queued raw pointer."
+    },
+    {
+      "area": "test meaning",
+      "evidence": [
+        "accessibility_geometry_offscreen_test.go",
+        "accessibility_payload_darwin_test.go"
+      ],
+      "conclusion": "Geometry oracle derives omitted IDs from actual scoped semantic projection, preserves the independent full map and unrelated toolbar rectangles, uses actual routed Grid geometry at 96/120/144/192 DPI, and checks inline editor text geometry plus pending/scrolled/disabled states and one Workbench namespace. Payload fixture mutates/frees its C input before delayed consumption; copy/decode and weak retention/release are checked for small Unicode and large payloads on consumption and discard while the outer pool remains undrained."
+    },
+    {
+      "area": "spec precision",
+      "evidence": [
+        "specs/accessibility.md",
+        "specs/grid-performance.md"
+      ],
+      "conclusion": "Specs state full atomic semantic workload, distinct text geometry, queued-work/native-memory limits, and matched ordinary benchmark requirements without claiming a measured latency gain."
+    }
+  ],
+  "coverage_limits": [
+    "This review executed no Go/native tests, builds, GUI processes or provider reviews; producer qualification remains separate.",
+    "The new exact native-bounds differential fixture covers one Workbench wrapper, but not a Grid inside a Dialog, recursive Workbench wrappers, or a mixed DataTree/virtual table/tree in the same fixture. Those paths were source-reviewed; existing dialog/tree behavior tests remain relevant.",
+    "The inert delayed-payload fixture proves shared JSON-helper ownership, not production main-queue scheduling or delayed NSString action/text-query payload consumption.",
+    "Explicit pools provide a local lifetime boundary; the fixture does not establish the amount of autorelease pressure avoided, bound total queued work, or quantify process/native/GPU memory.",
+    "No performance gain, full screen-reader qualification, or full Mac/P6 completion is certified."
+  ]
+}

@@ -1,0 +1,75 @@
+import importlib.util,hashlib,json,tarfile
+from pathlib import Path
+s=importlib.util.spec_from_file_location('q','/private/tmp/vellum-grid-publication-qualify.py');q=importlib.util.module_from_spec(s);s.loader.exec_module(q)
+s=importlib.util.spec_from_file_location('b',q.ROOT/'scripts/benchmark-grid.py');b=importlib.util.module_from_spec(s);s.loader.exec_module(b)
+base=Path('/private/tmp/vellum-ax-publication-cost');out=q.ROOT/'docs/reports/macos-ax-publication';current={'source':q.source(),'prepared':q.prepared()};proofs={}
+for name in ['checks','native','performance']:
+ d=json.loads((base/name/'qualification.json').read_text());assert d['before']==d['after']==current
+ assert d['result']==('PASS_MATCHED_COMPARISON' if name=='performance' else 'PASS')
+ for r in d.get('checks',[]):assert r['exit_code']==0 and q.sha(base/name/(r['name']+'.log'))==r['log_sha256']
+ assert q.sha(base/name/'producer.py.txt')==d['producer_sha256'];proofs[name]={'result':d['result'],'sha256':q.sha(base/name/'qualification.json')}
+checks=json.loads((base/'checks/qualification.json').read_text());native=json.loads((base/'native/qualification.json').read_text());perf=json.loads((base/'performance/qualification.json').read_text());baseline=json.loads((base/'baseline-build-v2/qualification.json').read_text())
+assert len(checks['checks'])==11 and len(native['checks'])==3 and baseline['result']=='PASS' and baseline['before']==baseline['after'] and baseline['after']['prepared']==current['prepared']
+assert q.sha(base/'baseline-build-v2/build.log')==baseline['check']['log_sha256'] and baseline['check']['exit_code']==0 and q.sha(base/'baseline-build-v2/producer.py.txt')==baseline['producer_sha256']
+assert baseline['head']=='b995782de24d472b2a45727e75b60301c20bf8d8' and perf['baseline_head']==baseline['head']
+approved=json.loads((base/'internal-review-inputs.json').read_text());review=json.loads((base/'internal-source-review.json').read_text());assert review['status']=='APPROVED' and not review['findings'] and review['reviewed_files']==approved and all(current['source'][p]==h for p,h in approved.items())
+delta={p for p in set(current['source'])|set(baseline['after']['source']) if current['source'].get(p)!=baseline['after']['source'].get(p)};assert delta==set(approved)==set(perf['baseline_changed_paths'])
+assert native['binaries']==checks['binaries'] and perf['binaries']['baseline']==baseline['binary_sha256'] and perf['binaries']['candidate']==native['binaries']['vellum-ax-publication-candidate']
+for name,h in perf['binaries'].items():assert q.sha(Path('/private/tmp/vellum-ax-publication-'+name))==h
+for case in ['fixed10k-ax','variable-million-ax']:
+ records=[json.loads(l) for l in (base/'native'/(case+'.log')).read_text().splitlines() if l.startswith('{')]
+ assert any(r.get('event')=='grid.accessibility.pass' and r.get('visible_minimum')==400 for r in records) and any(r.get('event')=='grid.accessibility.closed' and r.get('attachment_query_refused') for r in records)
+assert len(perf['runs'])==40 and perf['samples']==4800 and q.sha(base/'performance/summary.json')==perf['summary_sha256']
+measured={name:{} for name in ['baseline','candidate']}
+for entry in perf['runs']:
+ name,case,rep=entry['build'],entry['case'],entry['repetition'];folder=base/'performance'/name/case/f'run-{rep}';result=json.loads((folder/'result.json').read_text())
+ assert q.sha(folder/'result.json')==entry['result_sha256'] and result['result']=='PASS' and result['exit_code']==0 and q.sha(folder/'native.log')==result['log_sha256']
+ raw=[]
+ for line in (folder/'native.log').read_text().splitlines():
+  try:v=json.loads(line)
+  except ValueError:continue
+  if isinstance(v,dict) and str(v.get('event','')).startswith('grid.perf.'):raw.append(v)
+ assert raw==result['records'] and all(v.get('warmup_guard')==1 and not any(v.get(k,False) for k in ['input_details','cpu_profile','source_details']) for v in raw)
+ assert raw[1]['warmup']==128 and raw[1]['warm_callbacks']==128
+ samples=b.validate_records(raw,int(case.split('-')[1]),case.startswith('variable'),120,False);measured[name].setdefault(case,{})[rep]=samples
+summary=json.loads((base/'performance/summary.json').read_text())
+for name in measured:
+ recomputed={case:{'timings_ns':b.summarize([runs[i] for i in range(1,6)])} for case,runs in measured[name].items()};assert recomputed==summary[name] and b.warm_target_met(recomputed)==perf['warm_target_met'][name]
+ for prefix in ['fixed','variable']:
+  for rep in range(1,6):assert all(a['geometry']==c['geometry'] for a,c in zip(measured[name][prefix+'-10000'][rep],measured[name][prefix+'-1000000'][rep]))
+for case in measured['baseline']:
+ for rep in range(1,6):assert all(a['geometry']==c['geometry'] for a,c in zip(measured['baseline'][case][rep],measured['candidate'][case][rep]))
+process=json.loads((base/'prism/process.json').read_text());prism=json.loads((base/'prism/prism.json').read_text());assert process['exit_code']==1 and process['error'] is None and process['source_index_unchanged'] and q.sha(base/'prism/prism.json')==process['prism_sha256']
+assert prism['coverage']['complete'] and prism['coverage']['files']==11 and not prism['coverage']['skipped'] and not prism['coverage']['excluded'] and prism['coverage']['truncatedBytes']==0 and prism['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]
+assert len(prism['findings'])==1 and prism['findings'][0]['id']=='eb6ac100ffff8f63' and prism['findings'][0]['severity']=='medium' and prism['findings'][0]['confidence']==0.3
+assert process['before']==process['after']
+for p,key in [('stdout.log','stdout_sha256'),('stderr.log','stderr_sha256'),('producer.py.txt','producer_sha256')]:assert q.sha(base/'prism'/p)==process[key]
+resolution=json.loads((base/'internal-prism-finding-review.json').read_text());assert resolution['status']=='REFUTED' and not resolution['source_changes_required'] and resolution['finding_id']==prism['findings'][0]['id']
+assert resolution['raw_review']['finding']==prism['findings'][0] and resolution['raw_review']['sha256']==process['prism_sha256'] and resolution['provider_process']['sha256']==q.sha(base/'prism/process.json')
+assert all(current['source'][p]==h for p,h in resolution['source_sha256'].items())
+correction=json.loads((base/'resolution/correction.json').read_text());assert correction['result']=='DOC_ONLY_ADDENDUM' and correction['selected_source_unchanged'] and correction['selected_source_map_sha256']==hashlib.sha256(json.dumps(current['source'],sort_keys=True).encode()).hexdigest()
+assert correction['path']=='docs/reports/macos-ax-publication/README.md' and correction['before_sha256']==process['before'][correction['path']] and correction['after_sha256']==q.sha(q.ROOT/correction['path'])
+assert correction['before_sha256']==q.sha(base/'resolution/report-before.md') and correction['after_sha256']==q.sha(base/'resolution/report-after.md')
+assert correction['producer_sha256']==q.sha(base/'resolution/producer.py.txt') and correction['finding_review_sha256']==q.sha(base/'internal-prism-finding-review.json') and correction['prism_process_sha256']==q.sha(base/'prism/process.json')
+assert all(q.sha(q.ROOT/p)==h for p,h in process['before'].items() if p!=correction['path'])
+supplement=json.loads((base/'internal-resolution-review.json').read_text());assert supplement['status']=='APPROVED' and not supplement['findings']
+assert all(q.sha(Path(p))==h for p,h in supplement['reviewed_file_sha256'].items())
+receipt=json.loads((base/'internal-receipt-review.json').read_text());assert str(receipt.get('decision',receipt.get('status',''))).startswith('APPROVED') and not receipt['findings']
+for p,h in receipt['reviewed_file_sha256'].items():
+ checked=base/'resolution/report-before.md' if p==str(q.ROOT/correction['path']) else Path(p)
+ assert q.sha(checked)==h,p
+index=json.loads((out/'records-index.json').read_text());assert q.sha(out/'records.tar.gz')==index['archive_sha256']
+with tarfile.open(out/'records.tar.gz','r:gz') as tar:
+ names=tar.getnames();assert len(names)==len(set(names)) and set(names)==set(index['members'])
+ for info in tar.getmembers():
+  assert info.isfile() and not info.name.startswith('/') and '..' not in Path(info.name).parts
+  data=tar.extractfile(info).read();assert {'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}==index['members'][info.name] and data==(base/info.name).read_bytes()
+for p in (out/'review').iterdir():
+ if p.is_file():
+  original=base/'prism'/p.name if (base/'prism'/p.name).is_file() else base/p.name
+  assert p.read_bytes()==original.read_bytes(),p
+(out/'audit-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+bindings=dict(current['source'])
+for rel in ['docs/implementation.md']+[str(p.relative_to(q.ROOT)) for p in sorted(out.rglob('*')) if p.is_file() and p.name!='audit.json']:
+ bindings[rel]=q.sha(q.ROOT/rel)
+record={'schema':1,'result':'PASS_AX_PUBLICATION_COMPARISON','bindings':bindings,'prepared':current['prepared'],'proofs':proofs,'binaries':perf['binaries'],'baseline_head':baseline['head'],'ordinary_samples':4800,'warm_target_met':perf['warm_target_met'],'internal_source_review_sha256':q.sha(base/'internal-source-review.json'),'internal_receipt_review_sha256':q.sha(base/'internal-receipt-review.json'),'prism':{'reviewer':prism['coverage']['reviewer'],'complete':True,'raw_exit_code':1,'raw_findings':1,'finding_id':'eb6ac100ffff8f63','local_disposition':'REFUTED','unresolved_findings':0,'finding_review_sha256':q.sha(base/'internal-prism-finding-review.json'),'resolution_review_sha256':q.sha(base/'internal-resolution-review.json'),'doc_addendum_sha256':q.sha(base/'resolution/correction.json'),'process_sha256':q.sha(base/'prism/process.json')},'archive_members':len(index['members']),'archive_sha256':index['archive_sha256'],'producer_sha256':q.sha(Path(__file__)),'scope':'Selected source/prepared endpoint identity, matched ordinary/native receipts, independent reviews and exact evidence archive. Raw provider exit1 and one conditional finding retained, separately refuted by source-bound review. Not whole compiler/SDK closure, physical GPU/display/native memory, screen-reader or full Mac/P6 acceptance.'};q.write(out/'audit.json',record);(out/'audit-producer.py.txt').write_bytes(Path(__file__).read_bytes());print(record['result'],len(bindings),len(current['prepared']),flush=True)

@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "finding_id": "eb6ac100ffff8f63",
+  "status": "REFUTED",
+  "source_changes_required": false,
+  "reviewed_at_utc": "2026-10-11T21:54:58.921528+00:00",
+  "review_kind": "independent read-only conditional-finding adjudication",
+  "source_root": "/private/tmp/vellum-large-data",
+  "source_sha256": {
+    "app/app.go": "b70e7dac15367c2999679880f72c90ebf8a8404a9cf05a33ed63f319c1af2487",
+    "drivers/cogent/accessibility_geometry_offscreen_test.go": "57bade86d13be68bc50309f491288c6c0f55f69f4c93f11a45200d169282e41b"
+  },
+  "raw_review": {
+    "path": "/private/tmp/vellum-ax-publication-cost/prism/prism.json",
+    "sha256": "86c71ac11a2ab180229a97c13008caeccfa33fb89d1ce72c2b7234697594471c",
+    "finding": {
+      "id": "eb6ac100ffff8f63",
+      "severity": "medium",
+      "category": "testing",
+      "title": "t.Fatal called from inside a.Do callback",
+      "message": "assertNativeGeometryProjection is called from inside a.Do(func(){...}). If a.Do runs the callback on a different goroutine (such as the UI/main thread), t.Fatal and t.Fatalf call runtime.Goexit on that goroutine, not the test goroutine. That can hang the driver's loop or leave the test in an undefined state instead of failing cleanly.",
+      "suggestion": "Use t.Error plus an early return inside the helper when it may run off the test goroutine. Alternatively, have the callback return a failure and call t.Fatal on the test goroutine after a.Do returns.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/accessibility_geometry_offscreen_test.go",
+          "lines": {
+            "start": 37,
+            "end": 37
+          }
+        }
+      ],
+      "tags": [
+        "testing",
+        "goroutine",
+        "t.Fatal",
+        "location-corrected"
+      ],
+      "evidence": "t.Fatal(\"fixture has no scoped grid semantics\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 11,
+      "bytes": 57915,
+      "chunks": 3,
+      "llmCalls": 3,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 33085,
+          "output": 3590,
+          "costUSD": 0.10207
+        }
+      ],
+      "widenedFiles": 3,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    }
+  },
+  "provider_process": {
+    "path": "/private/tmp/vellum-ax-publication-cost/prism/process.json",
+    "sha256": "f592321846b70a954bff3069f9ae58376a150954baa8e7381d04a40a762170f5",
+    "exit_code": 1,
+    "source_index_unchanged": true,
+    "error": null
+  },
+  "reason": "The conditional premise is false for every current helper invocation. Application.Do acquires the owner mutex and invokes fn() synchronously on the caller at app/app.go:263; it creates no goroutine and performs no UI/main-thread dispatch. Every assertion helper call is reached synchronously from the body of the t.Run subtest using that subtest\u2019s *testing.T.",
+  "evidence": [
+    {
+      "file": "app/app.go",
+      "lines": [
+        240,
+        241,
+        243,
+        245,
+        247,
+        262,
+        263,
+        264,
+        266
+      ],
+      "detail": "Do owns serialization only. The callback is called directly. Deferred cleanup unlocks the owner and closes the app on an abnormal callback exit; there is no goroutine or dispatch mechanism."
+    },
+    {
+      "file": "drivers/cogent/accessibility_geometry_offscreen_test.go",
+      "lines": [
+        52,
+        54,
+        71,
+        73,
+        75,
+        86,
+        106,
+        107,
+        124,
+        135,
+        141,
+        146,
+        147
+      ],
+      "detail": "All three helper calls are synchronous. Line75 is inside local check\u2192a.Do, with check directly invoked by the subtest. Lines124 and135 are inside a.Do called directly by the same subtest. No helper call is registered with Post, Drain, native callbacks, or a spawned goroutine."
+    },
+    {
+      "file": "drivers/cogent/accessibility_geometry_offscreen_test.go",
+      "lines": [
+        18,
+        37,
+        41,
+        46
+      ],
+      "detail": "The fatal assertions use the same *testing.T passed by the currently executing subtest. A failure exits that subtest goroutine and unwinds Do\u2019s defer, rather than exiting an unrelated event loop."
+    }
+  ],
+  "all_helper_call_lines": [
+    75,
+    124,
+    135
+  ],
+  "mechanical_checks": {
+    "current_test_matches_prism_before_and_after": true,
+    "raw_prism_matches_recorded_sha256": true,
+    "all_helper_calls_enumerated": true
+  },
+  "limits": [
+    "This disposition applies to the exact listed source hashes and current direct call sites. Fatal assertions would be inappropriate if a future invocation ran in a separately spawned, queued-owner or native-main callback.",
+    "t.Run may use its own subtest goroutine; that goroutine owns the passed subtest *testing.T, and Do stays on it.",
+    "Do\u2019s abnormal-exit application-close policy is existing behavior; this narrow adjudication does not certify arbitrary resource cleanup callbacks.",
+    "No tests, GUI/native processes, builds or provider review were executed.",
+    "The original provider result remains one medium conditional finding at confidence0.3 with CLI exit1; this adjudication does not rewrite it as a zero-finding provider pass."
+  ]
+}
