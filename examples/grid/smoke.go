@@ -1,0 +1,242 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"image"
+	"time"
+
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/virtual"
+)
+
+func owned(a *app.Application, fn func() error) error {
+	var result error
+	if err := a.Do(func() { result = fn() }); err != nil {
+		return err
+	}
+	return result
+}
+func emit(stage string, data any) {
+	record, err := json.Marshal(struct {
+		Stage string `json:"stage"`
+		Data  any    `json:"data"`
+	}{stage, data})
+	if err != nil {
+		fmt.Println("grid smoke record encoding failed:", err)
+		return
+	}
+	fmt.Println(string(record))
+}
+func waitInspection(ctx context.Context, w *gridWindow) (cogent.GridInspection, error) {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	ticker := time.NewTicker(5 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		var out cogent.GridInspection
+		err := owned(w.owner, func() error { var e error; out, e = cogent.InspectGrid(w.owner, w.grid); return e })
+		if err == nil && out.Frames > 0 && !out.Bounds.Empty() && len(out.Cells) > 0 {
+			return out, nil
+		}
+		if err != nil && !errors.Is(err, cogent.ErrGridClosed) && !errors.Is(err, cogent.ErrGridLayout) {
+			return out, err
+		}
+		select {
+		case <-ctx.Done():
+			return out, fmt.Errorf("grid smoke: %s completed frame: %w", w.id, ctx.Err())
+		case <-ticker.C:
+		}
+	}
+}
+func checkInspection(g cogent.GridInspection) error {
+	if g.Columns != columnCount || g.Stamp.Rows < 1 || g.Scale <= 0 || g.Bounds.Empty() || g.Incarnation == 0 || g.CellIncarnation == 0 || g.Frames == 0 {
+		return fmt.Errorf("grid smoke: invalid measured grid: %+v", g)
+	}
+	if len(g.Cells) > 4096 || len(g.Headers) > columnCount {
+		return fmt.Errorf("grid smoke: source-sized native pool: %d cells, %d headers", len(g.Cells), len(g.Headers))
+	}
+	seen := make(map[string]bool, len(g.Cells))
+	for _, c := range g.Cells {
+		if c.ID != cogent.GridCellID(g.ID, c.RowKey, c.ColumnID) || seen[c.ID] || c.Row < 0 || c.Row >= g.Stamp.Rows || c.Column < 0 || c.Column >= columnCount || c.Frozen != (c.Column < 2) {
+			return fmt.Errorf("grid smoke: invalid measured cell %+v", c)
+		}
+		seen[c.ID] = true
+		if !c.Bounds.Empty() && !c.Bounds.In(g.Bounds) {
+			return fmt.Errorf("grid smoke: cell %s escaped grid: %v / %v", c.ID, c.Bounds, g.Bounds)
+		}
+	}
+	for _, h := range g.Headers {
+		if h.Column < 0 || h.Column >= columnCount || h.Frozen != (h.Column < 2) || !h.Bounds.Empty() && !h.Bounds.In(g.Bounds) {
+			return fmt.Errorf("grid smoke: invalid measured header %+v", h)
+		}
+	}
+	return nil
+}
+func firstFrozen(g cogent.GridInspection) (image.Rectangle, image.Rectangle, error) {
+	var cell, header image.Rectangle
+	for _, c := range g.Cells {
+		if c.Column == 0 && !c.Bounds.Empty() {
+			cell = c.Bounds
+			break
+		}
+	}
+	for _, h := range g.Headers {
+		if h.Column == 0 && !h.Bounds.Empty() {
+			header = h.Bounds
+			break
+		}
+	}
+	if cell.Empty() || header.Empty() {
+		return cell, header, errors.New("grid smoke: frozen leading column/header not measured")
+	}
+	return cell, header, nil
+}
+func measuredActive(g cogent.GridInspection, want virtual.GridActive) bool {
+	for _, c := range g.Cells {
+		if c.Active && c.RowKey == want.RowKey && c.ColumnID == want.ColumnID && !c.Bounds.Empty() {
+			return true
+		}
+	}
+	return false
+}
+
+// Desktop smoke uses explicit model commands, not synthesized human input.
+// Actual key/pointer routing is separately exercised by offscreen tests.
+func desktopSmoke(ctx context.Context, p *gridProgram) error {
+	first, second := p.windows[0], p.windows[1]
+	firstLifetime, err := p.owner.WindowContext(first.id)
+	if err != nil {
+		return err
+	}
+	secondLifetime, err := p.owner.WindowContext(second.id)
+	if err != nil {
+		return err
+	}
+	initial := make([]cogent.GridInspection, len(p.windows))
+	expectedRows := []int{10_000, 1_000_000}
+	for i, w := range p.windows {
+		initial[i], err = waitInspection(ctx, w)
+		if err != nil {
+			return err
+		}
+		if err = checkInspection(initial[i]); err != nil {
+			return err
+		}
+		if initial[i].Stamp.Rows != expectedRows[i] {
+			return errors.New("grid smoke: domain row count mismatch")
+		}
+	}
+	emit("ready", struct {
+		Rows  []int
+		Cells []int
+	}{[]int{10_000, 1_000_000}, []int{len(initial[0].Cells), len(initial[1].Cells)}})
+	frozenCell, frozenHeader, err := firstFrozen(initial[1])
+	if err != nil {
+		return err
+	}
+	if err = owned(p.owner, func() error { err := second.last(); second.report(err); return err }); err != nil {
+		return err
+	}
+	far, err := waitInspection(ctx, second)
+	if err != nil {
+		return err
+	}
+	if err = checkInspection(far); err != nil {
+		return err
+	}
+	if !measuredActive(far, virtual.GridActive{RowKey: rowKey(999_999), ColumnID: columnID(19)}) || far.Viewport.ScrollX <= 0 || far.Viewport.ScrollY <= 0 {
+		return errors.New("grid smoke: far row/column not in measured frame")
+	}
+	farCell, farHeader, err := firstFrozen(far)
+	if err != nil {
+		return err
+	}
+	if farCell.Min.X != frozenCell.Min.X || farHeader.Min.Y != frozenHeader.Min.Y {
+		return errors.New("grid smoke: frozen leading column/header moved with far scroll")
+	}
+	emit("far-both-axes", struct {
+		Viewport virtual.GridViewport
+		Cells    int
+		Frames   uint64
+	}{far.Viewport, len(far.Cells), far.Frames})
+	wantRetained := virtual.GridActive{RowKey: rowKey(999_998), ColumnID: columnID(19)}
+	var retained virtual.GridState
+	if err = owned(p.owner, func() error {
+		if err := second.grid.JumpToKey(wantRetained.RowKey, wantRetained.ColumnID); err != nil {
+			return err
+		}
+		if err := second.projection(true, true); err != nil {
+			return err
+		}
+		var err error
+		retained, err = second.grid.State()
+		if err != nil {
+			return err
+		}
+		if retained.Stamp.Rows != 500_000 || retained.Stamp.Revision != 2 || retained.Active != wantRetained {
+			return errors.New("grid smoke: projection lost stable selected identity")
+		}
+		// Retaining the active key is independent of the best-effort top-row
+		// anchor. A reordered active row may be outside the current viewport.
+		// Explicitly reveal it before asserting measured visibility.
+		err = second.grid.JumpToKey(wantRetained.RowKey, wantRetained.ColumnID)
+		second.report(err)
+		return err
+	}); err != nil {
+		return err
+	}
+	projected, err := waitInspection(ctx, second)
+	if err != nil {
+		return err
+	}
+	if projected.Stamp != retained.Stamp || !measuredActive(projected, wantRetained) {
+		return errors.New("grid smoke: explicit retained-key jump not in measured frame")
+	}
+	if err = owned(p.owner, func() error {
+		state, err := first.grid.State()
+		if err != nil {
+			return err
+		}
+		if state.Active != (virtual.GridActive{}) || state.Stamp.Rows != 10_000 || state.Stamp.Revision != 1 {
+			return errors.New("grid smoke: independent window changed")
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	emit("immutable-projection", struct {
+		Rows             int
+		Revision         uint64
+		Active           virtual.GridActive
+		RetainedViewport virtual.GridViewport
+		RevealedViewport virtual.GridViewport
+	}{projected.Stamp.Rows, projected.Stamp.Revision, retained.Active, retained.Viewport, projected.Viewport})
+	if err = owned(p.owner, func() error { return p.owner.CloseWindow(first.id) }); err != nil {
+		return err
+	}
+	if firstLifetime.Err() == nil || secondLifetime.Err() != nil || p.owner.Context().Err() != nil {
+		return errors.New("grid smoke: closing one domain window affected survivor")
+	}
+	if _, err = waitInspection(ctx, second); err != nil {
+		return err
+	}
+	// InspectGrid refuses after logical close. This observation does not claim
+	// that the native registry or compositor has already completed teardown.
+	err = owned(p.owner, func() error { _, err := cogent.InspectGrid(p.owner, first.grid); return err })
+	if !errors.Is(err, cogent.ErrGridClosed) {
+		return fmt.Errorf("grid smoke: logically closed binding inspection: %v", err)
+	}
+
+	if err = owned(p.owner, func() error { return p.owner.CloseWindow(second.id) }); err != nil {
+		return err
+	}
+	if secondLifetime.Err() == nil || p.owner.Context().Err() == nil {
+		return errors.New("grid smoke: last domain window lifetime remains active")
+	}
+	emit("pass", struct{ Scope string }{"desktop measured geometry, explicit model commands, closed-binding refusal and domain lifetimes; no human input/performance claim"})
+	return nil
+}

@@ -24,6 +24,7 @@ open. The workbench does not change system input sources.
 | `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |
 | `examples/replay/` | Independent fixed-record consumer using routed controls and software frames |
 | `examples/editor/` | Independent managed multiline editor with exact-byte save/open and native input settling |
+| `examples/grid/` | Independent managed two-axis grid with procedural 10k/million-row windows and routed-input checks |
 | `examples/drawing/` | Independent retained GPU mesh/image drawing and scalable workload consumer |
 | `examples/imaging/` | Independent compute, HDR float rendering and asynchronous frame capture consumer |
 | `examples/viewport3d/` | Independent custom GPU shader/depth viewport with retained camera and geometry |
@@ -34,9 +35,10 @@ open. The workbench does not change system input sources.
 | `prototypes/` | Independent experimental modules and historical foundation evidence |
 
 The [indexed grid foundation](specs/grid.md) adds fixed-height two-axis
-virtualization and frozen regions through `virtual.Grid`. Its bounded portable
-source work is qualified; native rendering and the complete large-data workload
-remain under development.
+virtualization and frozen regions through `virtual.Grid`. The
+[managed grid adapter](specs/grid-native.md) connects it to `ui.DataGrid`, with
+bounded native cell pools, pointer/key navigation and measured cell geometry.
+Performance and the complete large-data workload remain under development.
 
 Public packages stay at the module root so framework consumers can import them
 directly. Executable code lives under `cmd/` in the module that owns its native

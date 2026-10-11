@@ -32,7 +32,7 @@ export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
 
 The script runs root race tests and vet, native-module tests and vet, then builds
 `drivers/cogent/build/vellum-workbench`. It also race-tests, vets and builds the
-independent hello, drawing, 3D, imaging and editor modules, validates dependency
+independent hello, drawing, 3D, imaging, editor and grid modules, validates dependency
 preparation inputs and race-tests upstream lifecycle regressions. Exact text and
 shaped range fixtures run with the prepared typesetting replacement, installed
 font cache and offscreen display initialization through
@@ -79,6 +79,20 @@ launching the application. It never changes input sources, VoiceOver or privacy
 preferences. Swift is needed only for this acceptance tool. Human VoiceOver and
 IME candidate-panel workflows remain separate checks. See the
 [editor acceptance record](reports/macos-editor/README.md).
+
+## Grid acceptance
+
+`examples/grid` is a separate consumer module with independent 10,000-row and
+million-row procedural windows. Its offscreen tests route primitive pointer,
+wheel and keyboard events through the managed widgets and compare completed
+software frames at different owner drain batches. `scripts/check.sh` includes
+these tests; `scripts/check-example.sh` race-tests, vets and builds the module.
+
+After preparing dependencies, source `drivers/cogent/env.sh` and run
+`go run . -smoke` from `examples/grid` for sequential Cocoa measurement and
+two-window lifecycle checks. This desktop smoke uses explicit owner commands;
+offscreen routing, desktop rendering and physical input are separate evidence.
+See the [grid example acceptance](reports/macos-grid-example/README.md).
 
 ## Standalone applications and benchmarks
 

@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "result": "PASS_BOUNDED_LIVE_AX_AND_KEYS",
+  "source_qualification_sha256": "8d7305b0a4c94cae9bebae6382416545f11282798fa3e8317a8af9eceb49ad53",
+  "binary_sha256": "93debd1943afc425b49df7ff6ee5a5c12fda9601bb1f1188edf7a79dc72b4599",
+  "bundle_manifest_sha256": "29d9a065646b9669c7b564416abb7bfdd7d60fbe3f64c020667d857f2ffb38cf",
+  "native_ownership_map_sha256": "b97076343e989262a63a36e9de9cb185f51a72baaa0b992a42aca7e88df7be2c",
+  "window": "Vellum Grid \u00b7 large",
+  "tool": "cua_repl native app",
+  "observations": [
+    {
+      "action": "getApp by exact private app path; then getAXStateAndScreenshot",
+      "observed": "Real visible native table, rows0..14 and columns0..14; title large \u00b7 1000000 domain rows \u00b7 procedural seed 7; status Ready \u00b7 1000000 rows \u00d7 20 columns \u00b7 revision 1 \u00b7 active /"
+    },
+    {
+      "action": "coordinate click [460,330]",
+      "observed": "No selection change. Coordinate pointer routing is NOT qualified by this attempt."
+    },
+    {
+      "action": "click current visible cell AX index51 (000002 \u00b7 02 \u00b7 838cfd53)",
+      "observed": "Selected row:000000002 / column:02 \u00b7 1000000 rows \u00d7 20 columns \u00b7 revision 1 \u00b7 active row:000000002/column:02"
+    },
+    {
+      "action": "pressKey Down",
+      "observed": "Selected row:000000003 / column:02 \u00b7 1000000 rows \u00d7 20 columns \u00b7 revision 1 \u00b7 active row:000000003/column:02"
+    },
+    {
+      "action": "pressKey Next (PageDown)",
+      "observed": "Selected row:000000017 / column:02 \u00b7 1000000 rows \u00d7 20 columns \u00b7 revision 1 \u00b7 active row:000000017/column:02"
+    },
+    {
+      "action": "pressKey super+q",
+      "observed": "Post-quit AX read timed out; independent pgrep exact private bundle executable exited1 with no process matches. No process exit status or compositor teardown claim."
+    }
+  ],
+  "limits": [
+    "Numeric cell activation may use native AX action; no physical pointer acceptance inferred.",
+    "Live native key navigation and externally observed AX semantics qualify this one window only.",
+    "Initial native UI tool call reported6925.581s wall time; this tool latency is not an application startup/performance measurement.",
+    "No IME/VoiceOver/input-source/privacy/preferences changed; no human assistive workflow, fullP6, public distribution or sustained performance acceptance."
+  ],
+  "binary_path": "/private/tmp/VellumGridAcceptanceFinal.app/Contents/MacOS/VellumGridAcceptanceFinal",
+  "bundle_path": "/private/tmp/VellumGridAcceptanceFinal.app"
+}

@@ -176,5 +176,8 @@ stale press identities. Active keys and top-row anchors survive indexed source
 reordering, subject to viewport extent clamping, without a full-row owner scan. The procedural 10k and million-row ×20
 fixtures expose 400 visible cells with identical bounded source-call counts.
 See [contract](../specs/grid.md) and [portable evidence](reports/macos-grid-model/README.md).
-Native rendering/performance, variable-height rows, all-row selection, editing
-and large-tree completion remain subsequent P6 work.
+The [managed adapter](../specs/grid-native.md) exposes `ui.DataGrid` with bounded
+native cell/header pools, a single keyboard focus target, routed pointer/wheel/
+arrow/page navigation, completed-frame geometry inspection and visible-cell
+accessibility. Native performance, variable-height rows, all-row selection,
+editing and large-tree completion remain subsequent P6 work.
