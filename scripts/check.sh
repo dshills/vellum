@@ -32,7 +32,7 @@ go build -o build/vellum-workbench ./cmd/workbench
 
 # Explicit routing uses the offscreen driver; these processes do not open GUI windows.
 (cd "$VELLUM_REPO_ROOT/drivers/cogent" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
-(cd "$VELLUM_REPO_ROOT/drivers/cogent/build/upstream" && go test -race -tags offscreen ./core ./events ./text/lines ./text/textcore ./system/driver/offscreen -run 'TestVellumReviewTextCursor|TestManual|TestVellumManual|TestVellumSourceClock|TestVellumDefaultRepeatClick|TestVellumOutputBuffer')
+(cd "$VELLUM_REPO_ROOT/drivers/cogent/build/upstream" && go test -race -tags offscreen ./core ./events ./text/lines ./text/textcore ./system/driver/offscreen -run 'TestVellumSpriteSource|TestVellumReviewTextCursor|TestManual|TestVellumManual|TestVellumSourceClock|TestVellumDefaultRepeatClick|TestVellumOutputBuffer')
 (cd "$VELLUM_REPO_ROOT/examples/replay" && go test -race ./... && go vet ./... && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 (cd "$VELLUM_REPO_ROOT/examples/grid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 (cd "$VELLUM_REPO_ROOT/examples/loadedgrid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)

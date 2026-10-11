@@ -1,0 +1,319 @@
+--- a/core/rendersource.go
++++ b/core/rendersource.go
+@@ -64,6 +64,23 @@
+ 	stage.Sprites.Lock()
+ 	defer stage.Sprites.Unlock()
+ 
++	// Fresh composition replaces the source list. Omitting an empty layer
++	// removes old sprites without another scene-sized clear/raster/upload.
++	// Active callbacks still run on every pass, including blink-off draws.
++	drawable := false
++	stage.Sprites.Do(func(sl *SpriteList) {
++		for _, sp := range sl.Values {
++			if sp != nil && sp.Active && sp.Draw != nil {
++				drawable = true
++				return
++			}
++		}
++	})
++	if !drawable {
++		stage.Sprites.modified = false
++		return nil
++	}
++
+ 	sz := math32.FromPoint(mainScene.SceneGeom.Size)
+ 	if stage.spritePainter == nil || stage.spritePainter.State.Size != sz {
+ 		stage.spritePainter = paint.NewPainter(sz)
+--- a/core/sprite.go
++++ b/core/sprite.go
+@@ -307,7 +307,7 @@
+ 	active := false
+ 	ss.Do(func(sl *SpriteList) {
+ 		for _, sp := range sl.Values {
+-			if sp.Active {
++			if sp != nil && sp.Active {
+ 				active = true
+ 			}
+ 		}
+--- /dev/null
++++ b/core/rendersource_vellum_sprites_test.go
+@@ -0,0 +1,279 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build !js
++
++package core
++
++import (
++	"bytes"
++	"fmt"
++	"image"
++	"image/color"
++	"slices"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint"
++	"cogentcore.org/core/system/composer"
++	"golang.org/x/image/draw"
++)
++
++type spriteCopyRecord struct {
++	pos    image.Point
++	image  image.Image
++	bounds image.Rectangle
++	op     draw.Op
++}
++type spriteSourceDrawer struct {
++	composer.DrawerBase
++	copies          int
++	current, cached []spriteCopyRecord
++}
++
++func (d *spriteSourceDrawer) Start() { d.copies = 0; d.current = nil }
++func (d *spriteSourceDrawer) Copy(pos image.Point, src image.Image, bounds image.Rectangle, op draw.Op, unchanged bool) {
++	d.copies++
++	// Store the actual composition operations using detached image bytes,
++	// as an owned texture replay would. No GPU transfer is measured here.
++	copy := image.NewRGBA(src.Bounds())
++	draw.Draw(copy, copy.Bounds(), src, src.Bounds().Min, draw.Src)
++	d.current = append(d.current, spriteCopyRecord{pos, copy, bounds, op})
++	d.DrawerBase.Copy(pos, src, bounds, op, unchanged)
++}
++func (d *spriteSourceDrawer) End() { d.cached = slices.Clone(d.current) }
++func (d *spriteSourceDrawer) Redraw() {
++	for _, op := range d.cached {
++		d.DrawerBase.Copy(op.pos, op.image, op.bounds, op.op, composer.Unchanged)
++	}
++}
++
++type spriteBackgroundSource struct{ image *image.RGBA }
++
++func (s spriteBackgroundSource) Draw(cp composer.Composer) {
++	cp.(*composer.ComposerDrawer).Drawer.Copy(image.Point{}, s.image, s.image.Bounds(), draw.Src, composer.Unchanged)
++}
++func spriteTestComposer(size image.Point) (*composer.ComposerDrawer, *spriteSourceDrawer) {
++	d := &spriteSourceDrawer{DrawerBase: composer.DrawerBase{Image: image.NewRGBA(image.Rectangle{Max: size})}}
++	return &composer.ComposerDrawer{Drawer: d}, d
++}
++func spriteTestCompose(cp *composer.ComposerDrawer, st *Stage, sc *Scene, source func(*Stage, *Scene) composer.Source) {
++	base := image.NewRGBA(image.Rectangle{Max: sc.SceneGeom.Size})
++	draw.Draw(base, base.Bounds(), image.NewUniform(color.RGBA{R: 21, G: 39, B: 57, A: 255}), image.Point{}, draw.Src)
++	cp.Start()
++	cp.Add(spriteBackgroundSource{base}, sc)
++	cp.Add(source(st, sc), &st.Sprites)
++	cp.Compose()
++}
++
++func TestVellumSpriteSourceEmptyTiersDoNotAllocate(t *testing.T) {
++	for _, tier := range []string{"First", "Normal", "Final"} {
++		for _, kind := range []string{"empty", "nil", "inactive", "event-only"} {
++			t.Run(tier+"/"+kind, func(t *testing.T) {
++				st := &Stage{}
++				sc := &Scene{}
++				sc.SceneGeom.Size = image.Pt(32, 24)
++				lists := map[string]*SpriteList{"First": &st.Sprites.First, "Normal": &st.Sprites.Normal, "Final": &st.Sprites.Final}
++				calls := 0
++				switch kind {
++				case "nil":
++					lists[tier].Set("nil", nil)
++				case "inactive":
++					lists[tier].Set("inactive", &Sprite{Name: "inactive", Draw: func(*paint.Painter) { calls++ }})
++				case "event-only":
++					lists[tier].Set("event-only", &Sprite{Name: "event-only", Active: true})
++				}
++				st.Sprites.SetModified()
++				for range 3 {
++					if source := SpritesSource(st, sc); source != nil {
++						t.Error("empty sprite layer produced a composition source")
++					}
++					if st.spritePainter != nil || st.spriteRenderer != nil {
++						t.Error("empty sprite layer allocated scene-sized rendering resources")
++					}
++					if st.Sprites.IsModified() || calls != 0 {
++						t.Error("empty layer failed to settle its modification or called an inactive draw")
++					}
++				}
++				if st.Sprites.HasActive() != (kind == "event-only") {
++					t.Error("active event-only sprite deadline semantics changed")
++				}
++			})
++		}
++	}
++}
++
++func TestVellumSpriteSourceActiveTierOrderAndEveryPass(t *testing.T) {
++	st := &Stage{}
++	sc := &Scene{}
++	sc.SceneGeom.Size = image.Pt(32, 24)
++	cp, d := spriteTestComposer(sc.SceneGeom.Size)
++	var order []string
++	for _, item := range []struct {
++		name string
++		list *SpriteList
++		clr  color.RGBA
++	}{
++		{"first", &st.Sprites.First, color.RGBA{R: 255, A: 255}},
++		{"normal", &st.Sprites.Normal, color.RGBA{G: 255, A: 255}},
++		{"final", &st.Sprites.Final, color.RGBA{B: 255, A: 255}},
++	} {
++		item := item
++		item.list.Set(item.name, &Sprite{Name: item.name, Active: true, Draw: func(pc *paint.Painter) {
++			order = append(order, item.name)
++			pc.FillBox(math32.Vec2(3, 4), math32.Vec2(8, 8), image.NewUniform(item.clr))
++		}})
++	}
++	for pass := range 3 {
++		spriteTestCompose(cp, st, sc, SpritesSource)
++		if st.Sprites.IsModified() || d.copies != 2 || d.Image.RGBAAt(5, 6) != (color.RGBA{B: 255, A: 255}) {
++			t.Fatalf("active tier composition changed on pass%d", pass)
++		}
++	}
++	if !slices.Equal(order, []string{"first", "normal", "final", "first", "normal", "final", "first", "normal", "final"}) {
++		t.Fatalf("active callbacks skipped or reordered: %v", order)
++	}
++}
++
++func TestVellumSpriteSourceRemovalResizeMatchesOriginalPixels(t *testing.T) {
++	for _, dpi := range []float32{96, 120, 144, 192} {
++		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
++			current, reference := &Stage{}, &Stage{}
++			sc := &Scene{}
++			sc.SceneGeom.Size = image.Pt(int(64*dpi/96), int(48*dpi/96))
++			sc.Styles.UnitContext.DPI = dpi
++			cp, d := spriteTestComposer(sc.SceneGeom.Size)
++			rp, rd := spriteTestComposer(sc.SceneGeom.Size)
++			pos := image.Pt(4, 5)
++			makeSprite := func() *Sprite {
++				return &Sprite{Name: "moving", Active: true, Draw: func(pc *paint.Painter) {
++					pc.FillBox(math32.FromPoint(pos), math32.Vec2(8, 8), image.NewUniform(color.NRGBA{R: 230, G: 80, B: 20, A: 128}))
++				}}
++			}
++			var retained *paint.Painter
++			for _, phase := range []string{"empty", "active", "unmodified", "move", "inactive", "reactivate", "delete", "event-only", "reset", "empty-resize", "resize-reactivate"} {
++				for _, st := range []*Stage{current, reference} {
++					switch phase {
++					case "active", "reactivate", "resize-reactivate":
++						st.Sprites.Add(makeSprite())
++					case "inactive":
++						st.Sprites.InactivateSprite("moving")
++					case "delete":
++						st.Sprites.Delete("moving")
++					case "event-only":
++						st.Sprites.Add(&Sprite{Name: "event-only", Active: true})
++					case "reset":
++						st.Sprites.reset()
++					}
++				}
++				if phase == "move" {
++					pos = image.Pt(19, 17)
++				}
++				if phase == "empty-resize" {
++					sc.SceneGeom.Size = sc.SceneGeom.Size.Add(image.Pt(17, 11))
++					d.Image = image.NewRGBA(image.Rectangle{Max: sc.SceneGeom.Size})
++					rd.Image = image.NewRGBA(image.Rectangle{Max: sc.SceneGeom.Size})
++				}
++				spriteTestCompose(cp, current, sc, SpritesSource)
++				spriteTestCompose(rp, reference, sc, spriteSourceOriginal)
++				if !bytes.Equal(d.Image.Pix, rd.Image.Pix) {
++					t.Fatalf("%s pixels differ from original transparent-clear composition", phase)
++				}
++				drawable := phase == "active" || phase == "unmodified" || phase == "move" || phase == "reactivate" || phase == "resize-reactivate"
++				expected := 1
++				if drawable {
++					expected = 2
++				}
++				if d.copies != expected || rd.copies != 2 {
++					t.Fatalf("%s copy requests candidate%d/reference%d expected%d/2", phase, d.copies, rd.copies, expected)
++				}
++				if drawable && d.Image.RGBAAt(pos.X+2, pos.Y+2) == (color.RGBA{R: 21, G: 39, B: 57, A: 255}) {
++					t.Fatal("active sprite never changed actual pixels")
++				}
++				if phase == "active" {
++					retained = current.spritePainter
++				}
++				if phase == "empty-resize" && current.spritePainter != retained {
++					t.Fatal("empty resize recreated inactive sprite resources")
++				}
++				if phase == "resize-reactivate" && (current.spritePainter == retained || current.spriteRenderer.Image().Bounds().Size() != sc.SceneGeom.Size || current.spritePainter.Paint.UnitContext.DPI != dpi) {
++					t.Fatal("reactivation did not install size-correct sprite resources and unit context")
++				}
++				// Spoil the target then replay only the actual last composition
++				// operations; an omitted colored sprite must stay omitted.
++				draw.Draw(d.Image, d.Image.Bounds(), image.NewUniform(color.RGBA{R: 255, B: 255, A: 255}), image.Point{}, draw.Src)
++				cp.Redraw()
++				if !bytes.Equal(d.Image.Pix, rd.Image.Pix) {
++					t.Fatalf("%s cached composition resurrected old sprite pixels", phase)
++				}
++			}
++		})
++	}
++}
++
++func TestVellumSpriteSourceManualCursorBlinkStillClearsOffPass(t *testing.T) {
++	old := TimingSettings.CursorBlinkTime
++	TimingSettings.CursorBlinkTime = 250 * time.Millisecond
++	t.Cleanup(func() { TimingSettings.CursorBlinkTime = old })
++	sc, st := reviewCursorScene()
++	sc.SceneGeom.Size = image.Pt(120, 120)
++	now := time.Date(2035, 1, 2, 3, 4, 5, 0, time.UTC)
++	manual := &ManualWindow{config: ManualWindowConfig{Now: func() time.Time { return now }}}
++	st.Mains = &stages{renderContext: &renderContext{manual: manual}}
++	field := reviewCursorField(sc)
++	reviewCursorOn(field, nil, "sprite-source-cursor", image.Pt(10, 11))
++	sp := reviewCursorSprite(t, st, "sprite-source-cursor")
++	cp, d := spriteTestComposer(sc.SceneGeom.Size)
++	spriteTestCompose(cp, st, sc, SpritesSource)
++	on := slices.Clone(d.Image.Pix)
++	if d.copies != 2 || !sp.Properties["on"].(bool) {
++		t.Fatal("cursor on source missing")
++	}
++	now = now.Add(TimingSettings.CursorBlinkTime)
++	spriteTestCompose(cp, st, sc, SpritesSource)
++	off := slices.Clone(d.Image.Pix)
++	if d.copies != 2 || sp.Properties["on"].(bool) || bytes.Equal(on, off) {
++		t.Fatal("active blink-off callback skipped or did not clear prior cursor pixels")
++	}
++	now = now.Add(TimingSettings.CursorBlinkTime)
++	spriteTestCompose(cp, st, sc, SpritesSource)
++	if d.copies != 2 || !bytes.Equal(d.Image.Pix, on) {
++		t.Fatal("manual blink-on failed to restore cursor pixels")
++	}
++	TextCursor(false, &field.WidgetBase, nil, "sprite-source-cursor", 2, 10, nil, nil)
++	spriteTestCompose(cp, st, sc, SpritesSource)
++	if d.copies != 1 || !bytes.Equal(d.Image.Pix, off) || st.Sprites.HasActive() {
++		t.Fatal("deactivated cursor source was retained")
++	}
++}
++
++// spriteSourceOriginal is appended by the stage producer from the exact frozen
++// pre-change SpritesSource body. Its purpose is a differential pixel oracle.
++
++func spriteSourceOriginal(stage *Stage, mainScene *Scene) composer.Source {
++	stage.Sprites.Lock()
++	defer stage.Sprites.Unlock()
++
++	sz := math32.FromPoint(mainScene.SceneGeom.Size)
++	if stage.spritePainter == nil || stage.spritePainter.State.Size != sz {
++		stage.spritePainter = paint.NewPainter(sz)
++		stage.spritePainter.Paint.UnitContext = mainScene.Styles.UnitContext
++		stage.spriteRenderer = paint.NewSourceRenderer(sz)
++	}
++	pc := stage.spritePainter
++	pc.Fill.Color = colors.Uniform(colors.Transparent)
++	pc.Clear()
++	stage.Sprites.Do(func(sl *SpriteList) {
++		for _, sp := range sl.Values {
++			if sp == nil || !sp.Active || sp.Draw == nil {
++				continue
++			}
++			sp.Draw(stage.spritePainter)
++		}
++	})
++	stage.Sprites.modified = false
++	render := stage.spritePainter.RenderDone()
++	return &paintSource{render: render, renderer: stage.spriteRenderer, drawOp: draw.Over, drawPos: image.Point{}}
++}

@@ -100,3 +100,12 @@ acquisition and presentation calls are separate from configuration, view creatio
 and cleanup costs. Default composition order remains unchanged. See
 [the patch contract](patches/frametrace/README.md) and
 [the measurement specification](../../../specs/grid-performance.md).
+
+Patch 0035 omits the scene-sized sprite source before allocation/clear when no
+active sprite has a Draw callback. Fresh composition replaces the previous
+source/operation list. Active callbacks retain their tier order and run on every
+pass, including blink-off; event-only sprites retain their Active-only deadline
+criterion. HasActive skips nil entries. Existing resources remain retained and
+reactivation follows the existing size-correct path. See
+[the patch contract](patches/emptysprites/README.md) and
+[the rendering specification](../../../specs/rendering.md).

@@ -242,3 +242,14 @@ Its three-process/build fixed-10k release comparison observes p95
 17.233→14.624ms and p99 18.954→15.566ms; the 4/6ms targets still fail.
 Raster/upload cost is the next investigation, with full P6 and broader Mac
 acceptance still open.
+
+The [empty-sprite checkpoint](reports/macos-empty-sprites/README.md) now omits
+the scene-sized transparent sprite source when no active sprite can draw, before
+allocation or clear. Active callbacks retain tier order and every-composition
+blink behavior; event-only sprites keep Active-only deadlines. Original overlays
+fail and final core/managed/full adapter race checks pass, including software
+cursor, overlays, drag/drop, resize/reactivation and matched grid pixels. Three
+interleaved optimized fixed-10k processes per build observe pooled p95
+14.178→13.090 ms and p99 14.891→13.294 ms. The unchanged 4/6 ms targets still fail.
+The full P6 campaign and broader Mac acceptance remain open; further raster/upload
+attribution and any bounded damage policy require separate work and evidence.

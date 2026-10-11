@@ -298,6 +298,17 @@
               "sha256": "b1d64103808aafc9aa86a961682864c799018a4981810eea99731c976c31f20c"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/emptysprites",
+          "inputs": "native/patches/emptysprites/original-hashes.json",
+          "outputs": "native/patches/emptysprites/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/emptysprites/0035-empty-sprite-layer.patch",
+              "sha256": "681971064e8fe4dd202e2cdc6272297c94a5c9475f9a2a5cbffd974c7ef96ad7"
+            }
+          ]
         }
       ]
     },

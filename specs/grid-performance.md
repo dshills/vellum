@@ -145,6 +145,16 @@ frames match the previous checkpoint's repeated pixels. This remains an
 exploratory comparison: both unchanged targets fail and the full P6 campaign
 remains open. It makes no sprite/partial-upload or process-wide wakeup claim.
 
+The [empty-sprite checkpoint](../docs/reports/macos-empty-sprites/README.md)
+omits a scene-sized transparent layer when no active sprite can draw. Active
+cursor and drag callbacks retain their every-composition behavior. Three
+interleaved fixed-10k processes per build observe pooled UI-work p95
+14.178→13.090 ms and p99 14.891→13.294 ms with identical 400-cell geometry;
+raster/upload p95 is 8.907→7.406 ms. Other recorded stages increase, and their
+percentiles are not additive. Both unchanged 4/6 ms targets still fail. Software
+pixel/copy proofs do not measure native GPU upload counts, partial uploads or
+process-wide wakeups. Full P6 remains open.
+
 ## Diagnostic CPU profiling
 
 `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide

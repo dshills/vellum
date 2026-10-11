@@ -1,0 +1,1113 @@
+diff --git a/docs/implementation.md b/docs/implementation.md
+index 13a72ef..e29ad3e 100644
+--- a/docs/implementation.md
++++ b/docs/implementation.md
+@@ -242,3 +242,14 @@ Its three-process/build fixed-10k release comparison observes p95
+ 17.233→14.624ms and p99 18.954→15.566ms; the 4/6ms targets still fail.
+ Raster/upload cost is the next investigation, with full P6 and broader Mac
+ acceptance still open.
++
++The [empty-sprite checkpoint](reports/macos-empty-sprites/README.md) now omits
++the scene-sized transparent sprite source when no active sprite can draw, before
++allocation or clear. Active callbacks retain tier order and every-composition
++blink behavior; event-only sprites keep Active-only deadlines. Original overlays
++fail and final core/managed/full adapter race checks pass, including software
++cursor, overlays, drag/drop, resize/reactivation and matched grid pixels. Three
++interleaved optimized fixed-10k processes per build observe pooled p95
++14.178→13.090 ms and p99 14.891→13.294 ms. The unchanged 4/6 ms targets still fail.
++The full P6 campaign and broader Mac acceptance remain open; further raster/upload
++attribution and any bounded damage policy require separate work and evidence.
+diff --git a/docs/reports/macos-empty-sprites/README.md b/docs/reports/macos-empty-sprites/README.md
+new file mode 100644
+index 0000000..bc33fc4
+--- /dev/null
++++ b/docs/reports/macos-empty-sprites/README.md
+@@ -0,0 +1,120 @@
++# Empty sprite layer rendering
++
++The native renderer previously cleared, rasterized and submitted a full-window
++transparent sprite image on every fresh composition, including windows with no
++drawable sprite. Stage 35 now omits that source before allocation or clear when
++all three tiers lack a nonnil active sprite with a Draw callback. Fresh
++composition replaces its source/operation list, restoring underlying content
++after sprite retirement.
++
++Active callbacks keep First/Normal/Final ordering and run on every composition,
++even with an unchanged modification bit or a cursor's blink-off state. Active
++event-only sprites keep their existing input/deadline semantics. HasActive skips
++nil entries while retaining its Active-only criterion. Existing resources remain
++retained for reuse; empty resize allocates no replacement, and reactivation uses
++the existing size-correct allocation path. No paint scheduling, early cached
++resize replay, partial upload or immediate GPU-resource reclamation policy changes.
++
++## Correctness
++
++The exact frozen original renderer fails the new allocation/source assertions;
++the original liveness scan panics at a nil entry. Final core regressions and
++existing cursor/manual/event/text checks pass three times under race. A
++byte-identical original function body supplies the differential software pixel
++oracle. Checks cover empty/nil/inactive/event-only tiers, repeated active callback
++order, removal/movement/reactivation, 96/120/144/192 DPI resize, retained resources,
++cached operation replay and an explicitly advanced actual TextCursor callback.
++
++Managed software regressions wrap and forward the actual ComposerDrawer. They
++check strict copy counts and detached pixels through 96/144 DPI retirement,
++software resize/reactivation, actual field pointer focus and explicit-clock
++blink/focus loss, controlled dialog/scrim, direct-scene popup and primitive
++pointer drag/drop. The original renderer fails the managed empty-layer copy
++assertions; the final four groups pass three times under race.
++
++The full native adapter/commands pass offscreen race and default/offscreen vet.
++Replay, grid, loaded-grid and loaded-tree consumers pass offscreen race; replay
++also passes offscreen vet. Pinned preparation, preparation unit tests and SDK
++producer/verifier unit tests pass. Eight detached grid frames at
++96/120/144/192 DPI match the prior checkpoint's geometry, stride and RGBA digest.
++The final prepared dependency inventory contains 6,129 exact files: only
++core/rendersource.go and core/sprite.go change, and one core test is added.
++
++Earlier managed fixture compile errors and zero-size popup fixture failures are
++preserved with their source versions and raw logs. The final popup uses Core's
++direct Scene construction and requires a nonempty rendered overlay. Historical
++attempts do not substitute for the final frozen-source qualification.
++
++These observations measure real software composition requests and pixels.
++Managed frames deliberately invalidate their scene so a zero-composition pass
++cannot succeed. They do not prove zero-paint scheduling, actual GPU upload
++counts, window-manager resize, physical blink timing or display latency.
++
++## Optimized native comparison
++
++Three fresh optimized fixed-10k processes per build run interleaved A/B/B/A/A/B,
++with 128 warm-up events and 120 measured events each. The baseline is the previous
++unchanged-grid-refresh executable at `292ae67`. The candidate has the stage 35 patch
++and the same framework Go production bytes and 400 clipped-cell geometry.
++Build/source/prepared/binary identities remain stable across all measurements.
++No race instrumentation, CPU profiler or external process observer runs during
++the measured frames; the runner collects process observations only after end.
++
++The table gives nearest-rank pooled elapsed UI-work percentiles from 360 samples
++per build, in milliseconds. Every raw sample and outlier remains included.
++
++| Build | p50 | p95 | p99 | Maximum | Mean | Sample SD |
++| --- | ---: | ---: | ---: | ---: | ---: | ---: |
++| Baseline `292ae67` | 13.407 | 14.178 | 14.891 | 18.912 | 13.512 | 0.508 |
++| Candidate | 12.386 | 13.090 | 13.294 | 13.408 | 12.420 | 0.415 |
++
++Pooled p95 decreases 7.67%. Per-process p95 in A/B/B/A/A/B order is
++14.119/13.030/13.185/14.287/14.157/13.081 ms. The baseline maximum 18.912 ms
++is retained, with cause unclassified. Coefficients of variation are 0.0376 and
++0.0334 for baseline and candidate.
++
++| Recorded stage | Baseline pooled p95 | Candidate pooled p95 |
++| --- | ---: | ---: |
++| Reconciliation | 3.007 | 3.692 |
++| Layout/paint | 2.779 | 3.037 |
++| Raster/upload | 8.907 | 7.406 |
++
++Independent stage percentiles are not additive. Raster/upload cost decreases
++in this scoped comparison; reconciliation and layout/paint observations increase.
++Total elapsed UI work includes GC and matching intermediate post-input paints,
++and excludes queue/surface waits and backend acquire/present calls. It is not
++OS-thread CPU time or physical display latency.
++
++Both unchanged targets still fail: 4 ms p95 and 6 ms p99. This exploratory campaign
++has fewer than five fresh processes per case and omits variable heights,
++million-row cases, 500-visible-row tree timing, cold caches, native/GPU memory
++attribution and endurance. Full P6 and broader Mac acceptance remain open.
++Next work is source-level raster/upload attribution and a separately specified
++bounded damage/repair policy if the evidence supports it.
++
++## Evidence and review
++
++[records-index.json](records-index.json) lists exact raw members and SHA256
++digests in [records.tar.gz](records.tar.gz). Source/producer snapshots are inert
++text, including failed attempts. Extract to a new directory to inspect the
++recipes. Original absolute paths identify where records were produced; the
++index supplies archive member paths. Final evidence includes:
++
++- qualification/core-qualification/qualification.json and original overlays,
++  assertion failures, nil panic and final race logs;
++- qualification/integration-qualification/qualification.json, fresh preparation,
++  frozen managed original/candidate runs, full adapter and consumer race/vet,
++  preparation and SDK unit checks;
++- qualification/pixel-comparison/qualification.json and current/previous frame logs;
++- qualification/comparison.json, baseline/build identities, host metadata and
++  all six native run logs/results;
++- internal core/managed reviews, independent raw measurement verification,
++  frozen-source handoff, historical fixture attempts and inert producer recipes.
++
++[Prism review](review/prism.json), [input scope](review/inputs.json) and
++[process record](review/process.json) retain one significant-batch review using
++Anthropic Claude Sonnet 5.5. Its explicit staged implementation/test/spec/report
++payload excludes raw archives, historical source copies and producer records.
++The final [internal review](final-review.json) and [audit](audit.json) bind reviewed
++files, exact prepared bytes and archived checks. These checkpoint records do not
++qualify public distribution, signing/notarization or the full Mac milestone.
+diff --git a/drivers/cogent/native/README.md b/drivers/cogent/native/README.md
+index 3bc8c9a..4a702c7 100644
+--- a/drivers/cogent/native/README.md
++++ b/drivers/cogent/native/README.md
+@@ -100,3 +100,12 @@ acquisition and presentation calls are separate from configuration, view creatio
+ and cleanup costs. Default composition order remains unchanged. See
+ [the patch contract](patches/frametrace/README.md) and
+ [the measurement specification](../../../specs/grid-performance.md).
++
++Patch 0035 omits the scene-sized sprite source before allocation/clear when no
++active sprite has a Draw callback. Fresh composition replaces the previous
++source/operation list. Active callbacks retain their tier order and run on every
++pass, including blink-off; event-only sprites retain their Active-only deadline
++criterion. HasActive skips nil entries. Existing resources remain retained and
++reactivation follows the existing size-correct path. See
++[the patch contract](patches/emptysprites/README.md) and
++[the rendering specification](../../../specs/rendering.md).
+diff --git a/drivers/cogent/native/dependencies.json b/drivers/cogent/native/dependencies.json
+index c8dc03d..1e549a6 100644
+--- a/drivers/cogent/native/dependencies.json
++++ b/drivers/cogent/native/dependencies.json
+@@ -298,6 +298,17 @@
+               "sha256": "b1d64103808aafc9aa86a961682864c799018a4981810eea99731c976c31f20c"
+             }
+           ]
++        },
++        {
++          "origin": "drivers/cogent/native/patches/emptysprites",
++          "inputs": "native/patches/emptysprites/original-hashes.json",
++          "outputs": "native/patches/emptysprites/output-hashes.json",
++          "patches": [
++            {
++              "file": "native/patches/emptysprites/0035-empty-sprite-layer.patch",
++              "sha256": "681971064e8fe4dd202e2cdc6272297c94a5c9475f9a2a5cbffd974c7ef96ad7"
++            }
++          ]
+         }
+       ]
+     },
+diff --git a/drivers/cogent/native/patches/emptysprites/0035-empty-sprite-layer.patch b/drivers/cogent/native/patches/emptysprites/0035-empty-sprite-layer.patch
+new file mode 100644
+index 0000000..da1ac3f
+--- /dev/null
++++ b/drivers/cogent/native/patches/emptysprites/0035-empty-sprite-layer.patch
+@@ -0,0 +1,319 @@
++--- a/core/rendersource.go
+++++ b/core/rendersource.go
++@@ -64,6 +64,23 @@
++ 	stage.Sprites.Lock()
++ 	defer stage.Sprites.Unlock()
++ 
+++	// Fresh composition replaces the source list. Omitting an empty layer
+++	// removes old sprites without another scene-sized clear/raster/upload.
+++	// Active callbacks still run on every pass, including blink-off draws.
+++	drawable := false
+++	stage.Sprites.Do(func(sl *SpriteList) {
+++		for _, sp := range sl.Values {
+++			if sp != nil && sp.Active && sp.Draw != nil {
+++				drawable = true
+++				return
+++			}
+++		}
+++	})
+++	if !drawable {
+++		stage.Sprites.modified = false
+++		return nil
+++	}
+++
++ 	sz := math32.FromPoint(mainScene.SceneGeom.Size)
++ 	if stage.spritePainter == nil || stage.spritePainter.State.Size != sz {
++ 		stage.spritePainter = paint.NewPainter(sz)
++--- a/core/sprite.go
+++++ b/core/sprite.go
++@@ -307,7 +307,7 @@
++ 	active := false
++ 	ss.Do(func(sl *SpriteList) {
++ 		for _, sp := range sl.Values {
++-			if sp.Active {
+++			if sp != nil && sp.Active {
++ 				active = true
++ 			}
++ 		}
++--- /dev/null
+++++ b/core/rendersource_vellum_sprites_test.go
++@@ -0,0 +1,279 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++//go:build !js
+++
+++package core
+++
+++import (
+++	"bytes"
+++	"fmt"
+++	"image"
+++	"image/color"
+++	"slices"
+++	"testing"
+++	"time"
+++
+++	"cogentcore.org/core/colors"
+++	"cogentcore.org/core/math32"
+++	"cogentcore.org/core/paint"
+++	"cogentcore.org/core/system/composer"
+++	"golang.org/x/image/draw"
+++)
+++
+++type spriteCopyRecord struct {
+++	pos    image.Point
+++	image  image.Image
+++	bounds image.Rectangle
+++	op     draw.Op
+++}
+++type spriteSourceDrawer struct {
+++	composer.DrawerBase
+++	copies          int
+++	current, cached []spriteCopyRecord
+++}
+++
+++func (d *spriteSourceDrawer) Start() { d.copies = 0; d.current = nil }
+++func (d *spriteSourceDrawer) Copy(pos image.Point, src image.Image, bounds image.Rectangle, op draw.Op, unchanged bool) {
+++	d.copies++
+++	// Store the actual composition operations using detached image bytes,
+++	// as an owned texture replay would. No GPU transfer is measured here.
+++	copy := image.NewRGBA(src.Bounds())
+++	draw.Draw(copy, copy.Bounds(), src, src.Bounds().Min, draw.Src)
+++	d.current = append(d.current, spriteCopyRecord{pos, copy, bounds, op})
+++	d.DrawerBase.Copy(pos, src, bounds, op, unchanged)
+++}
+++func (d *spriteSourceDrawer) End() { d.cached = slices.Clone(d.current) }
+++func (d *spriteSourceDrawer) Redraw() {
+++	for _, op := range d.cached {
+++		d.DrawerBase.Copy(op.pos, op.image, op.bounds, op.op, composer.Unchanged)
+++	}
+++}
+++
+++type spriteBackgroundSource struct{ image *image.RGBA }
+++
+++func (s spriteBackgroundSource) Draw(cp composer.Composer) {
+++	cp.(*composer.ComposerDrawer).Drawer.Copy(image.Point{}, s.image, s.image.Bounds(), draw.Src, composer.Unchanged)
+++}
+++func spriteTestComposer(size image.Point) (*composer.ComposerDrawer, *spriteSourceDrawer) {
+++	d := &spriteSourceDrawer{DrawerBase: composer.DrawerBase{Image: image.NewRGBA(image.Rectangle{Max: size})}}
+++	return &composer.ComposerDrawer{Drawer: d}, d
+++}
+++func spriteTestCompose(cp *composer.ComposerDrawer, st *Stage, sc *Scene, source func(*Stage, *Scene) composer.Source) {
+++	base := image.NewRGBA(image.Rectangle{Max: sc.SceneGeom.Size})
+++	draw.Draw(base, base.Bounds(), image.NewUniform(color.RGBA{R: 21, G: 39, B: 57, A: 255}), image.Point{}, draw.Src)
+++	cp.Start()
+++	cp.Add(spriteBackgroundSource{base}, sc)
+++	cp.Add(source(st, sc), &st.Sprites)
+++	cp.Compose()
+++}
+++
+++func TestVellumSpriteSourceEmptyTiersDoNotAllocate(t *testing.T) {
+++	for _, tier := range []string{"First", "Normal", "Final"} {
+++		for _, kind := range []string{"empty", "nil", "inactive", "event-only"} {
+++			t.Run(tier+"/"+kind, func(t *testing.T) {
+++				st := &Stage{}
+++				sc := &Scene{}
+++				sc.SceneGeom.Size = image.Pt(32, 24)
+++				lists := map[string]*SpriteList{"First": &st.Sprites.First, "Normal": &st.Sprites.Normal, "Final": &st.Sprites.Final}
+++				calls := 0
+++				switch kind {
+++				case "nil":
+++					lists[tier].Set("nil", nil)
+++				case "inactive":
+++					lists[tier].Set("inactive", &Sprite{Name: "inactive", Draw: func(*paint.Painter) { calls++ }})
+++				case "event-only":
+++					lists[tier].Set("event-only", &Sprite{Name: "event-only", Active: true})
+++				}
+++				st.Sprites.SetModified()
+++				for range 3 {
+++					if source := SpritesSource(st, sc); source != nil {
+++						t.Error("empty sprite layer produced a composition source")
+++					}
+++					if st.spritePainter != nil || st.spriteRenderer != nil {
+++						t.Error("empty sprite layer allocated scene-sized rendering resources")
+++					}
+++					if st.Sprites.IsModified() || calls != 0 {
+++						t.Error("empty layer failed to settle its modification or called an inactive draw")
+++					}
+++				}
+++				if st.Sprites.HasActive() != (kind == "event-only") {
+++					t.Error("active event-only sprite deadline semantics changed")
+++				}
+++			})
+++		}
+++	}
+++}
+++
+++func TestVellumSpriteSourceActiveTierOrderAndEveryPass(t *testing.T) {
+++	st := &Stage{}
+++	sc := &Scene{}
+++	sc.SceneGeom.Size = image.Pt(32, 24)
+++	cp, d := spriteTestComposer(sc.SceneGeom.Size)
+++	var order []string
+++	for _, item := range []struct {
+++		name string
+++		list *SpriteList
+++		clr  color.RGBA
+++	}{
+++		{"first", &st.Sprites.First, color.RGBA{R: 255, A: 255}},
+++		{"normal", &st.Sprites.Normal, color.RGBA{G: 255, A: 255}},
+++		{"final", &st.Sprites.Final, color.RGBA{B: 255, A: 255}},
+++	} {
+++		item := item
+++		item.list.Set(item.name, &Sprite{Name: item.name, Active: true, Draw: func(pc *paint.Painter) {
+++			order = append(order, item.name)
+++			pc.FillBox(math32.Vec2(3, 4), math32.Vec2(8, 8), image.NewUniform(item.clr))
+++		}})
+++	}
+++	for pass := range 3 {
+++		spriteTestCompose(cp, st, sc, SpritesSource)
+++		if st.Sprites.IsModified() || d.copies != 2 || d.Image.RGBAAt(5, 6) != (color.RGBA{B: 255, A: 255}) {
+++			t.Fatalf("active tier composition changed on pass%d", pass)
+++		}
+++	}
+++	if !slices.Equal(order, []string{"first", "normal", "final", "first", "normal", "final", "first", "normal", "final"}) {
+++		t.Fatalf("active callbacks skipped or reordered: %v", order)
+++	}
+++}
+++
+++func TestVellumSpriteSourceRemovalResizeMatchesOriginalPixels(t *testing.T) {
+++	for _, dpi := range []float32{96, 120, 144, 192} {
+++		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
+++			current, reference := &Stage{}, &Stage{}
+++			sc := &Scene{}
+++			sc.SceneGeom.Size = image.Pt(int(64*dpi/96), int(48*dpi/96))
+++			sc.Styles.UnitContext.DPI = dpi
+++			cp, d := spriteTestComposer(sc.SceneGeom.Size)
+++			rp, rd := spriteTestComposer(sc.SceneGeom.Size)
+++			pos := image.Pt(4, 5)
+++			makeSprite := func() *Sprite {
+++				return &Sprite{Name: "moving", Active: true, Draw: func(pc *paint.Painter) {
+++					pc.FillBox(math32.FromPoint(pos), math32.Vec2(8, 8), image.NewUniform(color.NRGBA{R: 230, G: 80, B: 20, A: 128}))
+++				}}
+++			}
+++			var retained *paint.Painter
+++			for _, phase := range []string{"empty", "active", "unmodified", "move", "inactive", "reactivate", "delete", "event-only", "reset", "empty-resize", "resize-reactivate"} {
+++				for _, st := range []*Stage{current, reference} {
+++					switch phase {
+++					case "active", "reactivate", "resize-reactivate":
+++						st.Sprites.Add(makeSprite())
+++					case "inactive":
+++						st.Sprites.InactivateSprite("moving")
+++					case "delete":
+++						st.Sprites.Delete("moving")
+++					case "event-only":
+++						st.Sprites.Add(&Sprite{Name: "event-only", Active: true})
+++					case "reset":
+++						st.Sprites.reset()
+++					}
+++				}
+++				if phase == "move" {
+++					pos = image.Pt(19, 17)
+++				}
+++				if phase == "empty-resize" {
+++					sc.SceneGeom.Size = sc.SceneGeom.Size.Add(image.Pt(17, 11))
+++					d.Image = image.NewRGBA(image.Rectangle{Max: sc.SceneGeom.Size})
+++					rd.Image = image.NewRGBA(image.Rectangle{Max: sc.SceneGeom.Size})
+++				}
+++				spriteTestCompose(cp, current, sc, SpritesSource)
+++				spriteTestCompose(rp, reference, sc, spriteSourceOriginal)
+++				if !bytes.Equal(d.Image.Pix, rd.Image.Pix) {
+++					t.Fatalf("%s pixels differ from original transparent-clear composition", phase)
+++				}
+++				drawable := phase == "active" || phase == "unmodified" || phase == "move" || phase == "reactivate" || phase == "resize-reactivate"
+++				expected := 1
+++				if drawable {
+++					expected = 2
+++				}
+++				if d.copies != expected || rd.copies != 2 {
+++					t.Fatalf("%s copy requests candidate%d/reference%d expected%d/2", phase, d.copies, rd.copies, expected)
+++				}
+++				if drawable && d.Image.RGBAAt(pos.X+2, pos.Y+2) == (color.RGBA{R: 21, G: 39, B: 57, A: 255}) {
+++					t.Fatal("active sprite never changed actual pixels")
+++				}
+++				if phase == "active" {
+++					retained = current.spritePainter
+++				}
+++				if phase == "empty-resize" && current.spritePainter != retained {
+++					t.Fatal("empty resize recreated inactive sprite resources")
+++				}
+++				if phase == "resize-reactivate" && (current.spritePainter == retained || current.spriteRenderer.Image().Bounds().Size() != sc.SceneGeom.Size || current.spritePainter.Paint.UnitContext.DPI != dpi) {
+++					t.Fatal("reactivation did not install size-correct sprite resources and unit context")
+++				}
+++				// Spoil the target then replay only the actual last composition
+++				// operations; an omitted colored sprite must stay omitted.
+++				draw.Draw(d.Image, d.Image.Bounds(), image.NewUniform(color.RGBA{R: 255, B: 255, A: 255}), image.Point{}, draw.Src)
+++				cp.Redraw()
+++				if !bytes.Equal(d.Image.Pix, rd.Image.Pix) {
+++					t.Fatalf("%s cached composition resurrected old sprite pixels", phase)
+++				}
+++			}
+++		})
+++	}
+++}
+++
+++func TestVellumSpriteSourceManualCursorBlinkStillClearsOffPass(t *testing.T) {
+++	old := TimingSettings.CursorBlinkTime
+++	TimingSettings.CursorBlinkTime = 250 * time.Millisecond
+++	t.Cleanup(func() { TimingSettings.CursorBlinkTime = old })
+++	sc, st := reviewCursorScene()
+++	sc.SceneGeom.Size = image.Pt(120, 120)
+++	now := time.Date(2035, 1, 2, 3, 4, 5, 0, time.UTC)
+++	manual := &ManualWindow{config: ManualWindowConfig{Now: func() time.Time { return now }}}
+++	st.Mains = &stages{renderContext: &renderContext{manual: manual}}
+++	field := reviewCursorField(sc)
+++	reviewCursorOn(field, nil, "sprite-source-cursor", image.Pt(10, 11))
+++	sp := reviewCursorSprite(t, st, "sprite-source-cursor")
+++	cp, d := spriteTestComposer(sc.SceneGeom.Size)
+++	spriteTestCompose(cp, st, sc, SpritesSource)
+++	on := slices.Clone(d.Image.Pix)
+++	if d.copies != 2 || !sp.Properties["on"].(bool) {
+++		t.Fatal("cursor on source missing")
+++	}
+++	now = now.Add(TimingSettings.CursorBlinkTime)
+++	spriteTestCompose(cp, st, sc, SpritesSource)
+++	off := slices.Clone(d.Image.Pix)
+++	if d.copies != 2 || sp.Properties["on"].(bool) || bytes.Equal(on, off) {
+++		t.Fatal("active blink-off callback skipped or did not clear prior cursor pixels")
+++	}
+++	now = now.Add(TimingSettings.CursorBlinkTime)
+++	spriteTestCompose(cp, st, sc, SpritesSource)
+++	if d.copies != 2 || !bytes.Equal(d.Image.Pix, on) {
+++		t.Fatal("manual blink-on failed to restore cursor pixels")
+++	}
+++	TextCursor(false, &field.WidgetBase, nil, "sprite-source-cursor", 2, 10, nil, nil)
+++	spriteTestCompose(cp, st, sc, SpritesSource)
+++	if d.copies != 1 || !bytes.Equal(d.Image.Pix, off) || st.Sprites.HasActive() {
+++		t.Fatal("deactivated cursor source was retained")
+++	}
+++}
+++
+++// spriteSourceOriginal is appended by the stage producer from the exact frozen
+++// pre-change SpritesSource body. Its purpose is a differential pixel oracle.
+++
+++func spriteSourceOriginal(stage *Stage, mainScene *Scene) composer.Source {
+++	stage.Sprites.Lock()
+++	defer stage.Sprites.Unlock()
+++
+++	sz := math32.FromPoint(mainScene.SceneGeom.Size)
+++	if stage.spritePainter == nil || stage.spritePainter.State.Size != sz {
+++		stage.spritePainter = paint.NewPainter(sz)
+++		stage.spritePainter.Paint.UnitContext = mainScene.Styles.UnitContext
+++		stage.spriteRenderer = paint.NewSourceRenderer(sz)
+++	}
+++	pc := stage.spritePainter
+++	pc.Fill.Color = colors.Uniform(colors.Transparent)
+++	pc.Clear()
+++	stage.Sprites.Do(func(sl *SpriteList) {
+++		for _, sp := range sl.Values {
+++			if sp == nil || !sp.Active || sp.Draw == nil {
+++				continue
+++			}
+++			sp.Draw(stage.spritePainter)
+++		}
+++	})
+++	stage.Sprites.modified = false
+++	render := stage.spritePainter.RenderDone()
+++	return &paintSource{render: render, renderer: stage.spriteRenderer, drawOp: draw.Over, drawPos: image.Point{}}
+++}
+diff --git a/drivers/cogent/native/patches/emptysprites/README.md b/drivers/cogent/native/patches/emptysprites/README.md
+new file mode 100644
+index 0000000..4de82b6
+--- /dev/null
++++ b/drivers/cogent/native/patches/emptysprites/README.md
+@@ -0,0 +1,28 @@
++# Empty sprite layers
++
++Stage 35 follows optional native frame-work tracing. Preparation verifies exact
++input, patch and output bytes. `SpritesSource` checks all three sprite tiers
++under the existing lock before allocating a painter/renderer or clearing an
++image. With no nonnil active drawable sprite, it settles the modification and
++returns no source. Fresh composition replaces the previous source/operation
++list, so removing that layer restores underlying content without uploading a
++transparent scene-sized image.
++
++Active callbacks still run on every composition in First/Normal/Final order,
++even when the modified bit is false or a blink callback emits no paint. Active
++event-only sprites retain their existing deadline and input semantics. The
++related `HasActive` scan skips nil entries, matching the source's existing nil
++handling; its Active-only deadline criterion is unchanged.
++
++Previously allocated sprite resources remain available for reuse. Empty resize
++does not allocate replacement sprite resources; reactivation creates size-correct
++resources through the existing path. This does not change the early cached
++resize replay policy, introduce partial uploads, release inactive GPU textures
++immediately or alter native event/paint scheduling.
++
++Differential software regressions compare the exact frozen original
++transparent-clear path with removal, movement, reactivation and resize. They
++check allocation refusal, composition copy requests, tier order, cached operation
++replay and an explicitly advanced real TextCursor blink callback. Managed
++integration and actual release measurements are separate qualifications; a
++software copy count is not a measured GPU upload count or display latency.
+diff --git a/drivers/cogent/native/patches/emptysprites/original-hashes.json b/drivers/cogent/native/patches/emptysprites/original-hashes.json
+new file mode 100644
+index 0000000..7156311
+--- /dev/null
++++ b/drivers/cogent/native/patches/emptysprites/original-hashes.json
+@@ -0,0 +1,5 @@
++{
++  "core/rendersource.go": "1c2491778c8f77f48991379dff39dcc63610555cf04c4c40f25fe22e1b548a1f",
++  "core/sprite.go": "ec2c6b9872a5c6a9a1400ac9f730be8052642f20898a08cbc31c79bafe5b13a7",
++  "core/rendersource_vellum_sprites_test.go": null
++}
+diff --git a/drivers/cogent/native/patches/emptysprites/output-hashes.json b/drivers/cogent/native/patches/emptysprites/output-hashes.json
+new file mode 100644
+index 0000000..32cd707
+--- /dev/null
++++ b/drivers/cogent/native/patches/emptysprites/output-hashes.json
+@@ -0,0 +1,5 @@
++{
++  "core/rendersource.go": "9435ff9ed8f9aee12937bf58e40f6de20b512dc3db824298786f39dbdb149378",
++  "core/sprite.go": "632f0f2c338f9d727fdcdbd2ab0fa8c62f3a5d47547b286678017ff369d14d7d",
++  "core/rendersource_vellum_sprites_test.go": "26e4d5b8f6ee8670d90697d6a1ae23a731d6114c4c3bafeb6565624a30b1bed8"
++}
+diff --git a/drivers/cogent/prepare_test.py b/drivers/cogent/prepare_test.py
+index c1c5d69..bded80d 100644
+--- a/drivers/cogent/prepare_test.py
++++ b/drivers/cogent/prepare_test.py
+@@ -280,7 +280,7 @@ class PreparationChecks(unittest.TestCase):
+         core, font = manifest["dependencies"]
+         self.assertEqual(core["module"], "cogentcore.org/core")
+         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
+-        self.assertEqual(numbers, list(range(1, 35)))
++        self.assertEqual(numbers, list(range(1, 36)))
+         self.assertEqual(len(font["stages"]), 2)
+         import hashlib
+         for dependency in manifest["dependencies"]:
+diff --git a/drivers/cogent/sprites_offscreen_test.go b/drivers/cogent/sprites_offscreen_test.go
+new file mode 100644
+index 0000000..08b5feb
+--- /dev/null
++++ b/drivers/cogent/sprites_offscreen_test.go
+@@ -0,0 +1,445 @@
++//go:build offscreen
++
++package cogent
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"fmt"
++	"image"
++	"image/color"
++	"image/draw"
++	"slices"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/paint"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/abilities"
++	"cogentcore.org/core/styles/states"
++	"cogentcore.org/core/system/composer"
++	"cogentcore.org/core/system/driver/offscreen"
++	"github.com/dshills/vellum/app"
++	"github.com/dshills/vellum/ui"
++)
++
++// Observe real software composition without retaining source images or changing
++// copy/cache policy. Full-scene RGBA Over identifies the sprite layer in these
++// fixtures: popup/dialog scenes are explicitly required to be smaller, and the
++// scrim uses Uniform. These are copy requests, never measured GPU uploads.
++type spriteCopyObservation struct {
++	composer.Drawer
++	compositions, spriteCopies, scrims, overlays int
++	mainSize                                     image.Point
++}
++
++func (d *spriteCopyObservation) Start() { d.compositions++; d.Drawer.Start() }
++func (d *spriteCopyObservation) Copy(dp image.Point, src image.Image, sr image.Rectangle, op draw.Op, unchanged bool) {
++	if op == draw.Over {
++		switch src.(type) {
++		case *image.Uniform:
++			d.scrims++
++		case *image.RGBA:
++			if src.Bounds().Size() == d.mainSize && dp == (image.Point{}) {
++				d.spriteCopies++
++			} else {
++				d.overlays++
++			}
++		}
++	}
++	d.Drawer.Copy(dp, src, sr, op, unchanged)
++}
++func (d *spriteCopyObservation) GetImage() *image.RGBA {
++	return d.Drawer.(interface{ GetImage() *image.RGBA }).GetImage()
++}
++func (d *spriteCopyObservation) CanRedraw() bool {
++	if original, ok := d.Drawer.(interface{ CanRedraw() bool }); ok {
++		return original.CanRedraw()
++	}
++	return true
++}
++func (d *spriteCopyObservation) reset(size image.Point) {
++	d.mainSize = size
++	d.compositions, d.spriteCopies, d.scrims, d.overlays = 0, 0, 0, 0
++}
++func watchSpriteCopies(t *testing.T, m *Manual) *spriteCopyObservation {
++	t.Helper()
++	w := m.implementation.find("one").state
++	native := w.body.Scene.RenderWindow().SystemWindow
++	if !native.Lock() {
++		t.Fatal("fixture native window closed")
++	}
++	defer native.Unlock()
++	cp, ok := native.Composer().(*composer.ComposerDrawer)
++	if !ok {
++		t.Fatal("fixture has no actual ComposerDrawer")
++	}
++	if _, ok := cp.Drawer.(interface{ GetImage() *image.RGBA }); !ok {
++		t.Fatal("fixture drawer has no software image")
++	}
++	p := &spriteCopyObservation{Drawer: cp.Drawer}
++	cp.Drawer = p
++	return p
++}
++func spriteFrame(t *testing.T, m *Manual, p *spriteCopyObservation, label string) *image.RGBA {
++	t.Helper()
++	w := m.implementation.find("one").state
++	p.reset(w.body.Scene.SceneGeom.Size)
++	// A real scene invalidation ensures the test observes composition rather
++	// than passing vacuously on an unchanged Frame that draws nothing.
++	w.body.Scene.NeedsRender()
++	if _, err := m.Frame(testContext, "one"); err != nil {
++		t.Fatal(err)
++	}
++	unitSettle(t, m)
++	im, err := m.Capture(testContext, "one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if p.compositions == 0 {
++		t.Fatal(label, "did not execute actual composition")
++	}
++	t.Logf("SPRITE_SOFTWARE label=%s size=%dx%d compositions=%d sprite_copy_requests=%d scrim_copies=%d overlay_copies=%d rgba_sha256=%x", label, im.Rect.Dx(), im.Rect.Dy(), p.compositions, p.spriteCopies, p.scrims, p.overlays, sha256.Sum256(im.Pix))
++	return im
++}
++func requireNoSpriteCopies(t *testing.T, p *spriteCopyObservation, label string) {
++	t.Helper()
++	if p.spriteCopies != 0 {
++		t.Errorf("%s emitted %d unnecessary full-scene RGBA sprite copy requests", label, p.spriteCopies)
++	}
++}
++func requireSameSpritePixels(t *testing.T, label string, got, want *image.RGBA) {
++	t.Helper()
++	if got.Rect != want.Rect || got.Stride != want.Stride || !bytes.Equal(got.Pix, want.Pix) {
++		t.Error(label, "failed exact detached software pixel restoration")
++	}
++}
++func spriteImage(name string, c color.RGBA, trace *[]string) *core.Sprite {
++	im := image.NewRGBA(image.Rect(0, 0, 12, 12))
++	draw.Draw(im, im.Bounds(), image.NewUniform(c), image.Point{}, draw.Src)
++	sp := core.NewImageSprite(name, image.Pt(250, 180), im)
++	original := sp.Draw
++	sp.Draw = func(p *paint.Painter) {
++		if trace != nil {
++			*trace = append(*trace, name)
++		}
++		original(p)
++	}
++	sp.Active = true
++	return sp
++}
++func spriteClick(t *testing.T, m *Manual, id string) {
++	t.Helper()
++	snapshot, err := m.Snapshot(testContext)
++	if err != nil || len(snapshot.Windows) != 1 {
++		t.Fatal("sprite click window", err)
++	}
++	w := snapshot.Windows[0]
++	var found *ManualElement
++	for i := range w.Elements {
++		if w.Elements[i].ID == id {
++			found = &w.Elements[i]
++			break
++		}
++	}
++	if found == nil || !found.Enabled || !found.Visible || found.Bounds.Empty() {
++		t.Fatal("sprite click target unavailable", id)
++	}
++	pos := found.Bounds.Min.Add(found.Bounds.Size().Div(2))
++	for _, typ := range []events.Types{events.MouseDown, events.MouseUp} {
++		if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.Incarnation, Type: typ, Button: events.Left, Position: pos}); err != nil {
++			t.Fatal(err)
++		}
++	}
++	unitSettle(t, m)
++}
++
++func TestManagedSpriteEmptyAndRetiredLayersUseNoCopy(t *testing.T) {
++	for _, dpi := range []float32{96, 144} {
++		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
++			config := manualConfig(t, 7)
++			config.LogicalDPI = dpi
++			m, _ := simpleManual(t, config, func() ui.Node {
++				return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "label", Kind: ui.Label, Text: "Sprite composition fixture"}}}
++			})
++			unitSettle(t, m)
++			probe := watchSpriteCopies(t, m)
++			stage := m.implementation.find("one").state.body.Scene.Stage
++			baseline := spriteFrame(t, m, probe, "empty")
++			requireNoSpriteCopies(t, probe, "empty")
++
++			inactive := spriteImage("fixture-inactive", color.RGBA{R: 255, A: 255}, nil)
++			inactive.Active = false
++			noDraw := &core.Sprite{Name: "fixture-no-draw", Active: true}
++			stage.Sprites.Add(inactive)
++			stage.Sprites.Add(noDraw)
++			got := spriteFrame(t, m, probe, "inactive-and-no-draw")
++			requireNoSpriteCopies(t, probe, "inactive and nil Draw")
++			requireSameSpritePixels(t, "inactive and nil Draw", got, baseline)
++			if !stage.Sprites.HasActive() {
++				t.Error("nil-Draw active sprite lost its existing deadline eligibility")
++			}
++
++			var trace []string
++			first := spriteImage("first", color.RGBA{R: 255, A: 255}, &trace)
++			normal := spriteImage("normal", color.RGBA{G: 255, A: 255}, &trace)
++			final := spriteImage("final", color.RGBA{B: 255, A: 255}, &trace)
++			stage.Sprites.Lock()
++			stage.Sprites.First.Set(first.Name, first)
++			stage.Sprites.AddNoLock(normal)
++			stage.Sprites.Final.Set(final.Name, final)
++			stage.Sprites.SetModifiedNoLock()
++			stage.Sprites.Unlock()
++			got = spriteFrame(t, m, probe, "active-tiers")
++			if probe.spriteCopies != probe.compositions || len(trace) != 3*probe.compositions {
++				t.Error("active sprites did not draw once per real composition", probe.spriteCopies, probe.compositions, trace)
++			}
++			for i := 0; i+3 <= len(trace); i += 3 {
++				if !slices.Equal(trace[i:i+3], []string{"first", "normal", "final"}) {
++					t.Error("active tier callback order changed", trace)
++				}
++			}
++			if got.RGBAAt(255, 185) != (color.RGBA{B: 255, A: 255}) {
++				t.Error("final tier did not overlay earlier colors", got.RGBAAt(255, 185))
++			}
++
++			stage.Sprites.InactivateSprite("first", "normal", "final")
++			got = spriteFrame(t, m, probe, "deactivated")
++			requireNoSpriteCopies(t, probe, "deactivated")
++			requireSameSpritePixels(t, "deactivated", got, baseline)
++			for _, name := range []string{"first", "normal", "final", "fixture-inactive", "fixture-no-draw"} {
++				if !stage.Sprites.Delete(name) {
++					t.Error("sprite deletion missing", name)
++				}
++			}
++			got = spriteFrame(t, m, probe, "deleted")
++			requireNoSpriteCopies(t, probe, "deleted")
++			requireSameSpritePixels(t, "deleted", got, baseline)
++
++			// Resize the owned software native backend, then route its ordinary
++			// WindowResize event. No window-manager or cached GPU claim is made.
++			native := m.implementation.find("one").state.body.Scene.RenderWindow().SystemWindow.(*offscreen.Window)
++			if !native.Lock() {
++				t.Fatal("resize native window closed")
++			}
++			native.PixelSize, native.WnSize = image.Pt(480, 300), image.Pt(480, 300)
++			native.Unlock()
++			native.Events().WindowResize()
++			unitSettle(t, m)
++			resized := spriteFrame(t, m, probe, "resized-empty")
++			if resized.Rect.Size() != image.Pt(480, 300) {
++				t.Fatal("resize event did not change actual software target", resized.Rect)
++			}
++			requireNoSpriteCopies(t, probe, "resized empty")
++			stage.Sprites.Add(normal)
++			stage.Sprites.ActivateSprite("normal")
++			got = spriteFrame(t, m, probe, "resized-reactivated")
++			if probe.spriteCopies != probe.compositions || got.RGBAAt(255, 185) != (color.RGBA{G: 255, A: 255}) {
++				t.Error("resized retained sprite layer failed reactivation", probe.spriteCopies, got.RGBAAt(255, 185))
++			}
++			stage.Sprites.Delete("normal")
++			got = spriteFrame(t, m, probe, "resized-deleted")
++			requireNoSpriteCopies(t, probe, "resized deleted")
++			requireSameSpritePixels(t, "resized deleted", got, resized)
++		})
++	}
++}
++
++func TestManagedSpriteTextCursorExplicitBlinkAndFocusLoss(t *testing.T) {
++	config := manualConfig(t, 7)
++	config.LogicalDPI = 96
++	m, _ := simpleManual(t, config, func() ui.Node {
++		return ui.Node{ID: "root", Kind: ui.Column, Focus: ui.FocusRequest{ID: "away", Sequence: 1}, Children: []ui.Node{{ID: "away", Kind: ui.Button, Text: "Away"}, {ID: "field", Kind: ui.TextField, Text: "Caret 😀", Change: func(ui.ChangeEvent) {}}}}
++	})
++	unitSettle(t, m)
++	probe := watchSpriteCopies(t, m)
++	stage := m.implementation.find("one").state.body.Scene.Stage
++	spriteFrame(t, m, probe, "cursor-unfocused")
++	requireNoSpriteCopies(t, probe, "unfocused cursor")
++	spriteClick(t, m, "field")
++	on := spriteFrame(t, m, probe, "cursor-on")
++	cursor, ok := stage.Sprites.SpriteByName("TextField.Cursor")
++	if !ok || cursor == nil || !cursor.Active || probe.spriteCopies == 0 {
++		t.Fatal("actual field focus did not activate cursor composition")
++	}
++	blink := core.TimingSettings.CursorBlinkTime
++	if blink <= 0 {
++		t.Fatal("fixture requires the existing positive blink interval")
++	}
++	before, err := m.Snapshot(testContext)
++	if err != nil || len(before.Windows) != 1 {
++		t.Fatal("cursor deadline snapshot", err)
++	}
++	if !before.Windows[0].FuturePaint || !before.Windows[0].NextPaint.After(config.Clock.Now()) {
++		t.Fatal("active cursor lost future paint deadline")
++	}
++	if _, err := config.Clock.Advance(blink); err != nil {
++		t.Fatal(err)
++	}
++	off := spriteFrame(t, m, probe, "cursor-off")
++	stage.Sprites.Lock()
++	isOn, _ := cursor.Properties["on"].(bool)
++	active := cursor.Active
++	stage.Sprites.Unlock()
++	if isOn || !active || probe.spriteCopies == 0 || bytes.Equal(on.Pix, off.Pix) {
++		t.Error("explicit clock did not blink actual active cursor pixels off", isOn, active, probe.spriteCopies)
++	}
++	if _, err := config.Clock.Advance(blink); err != nil {
++		t.Fatal(err)
++	}
++	onAgain := spriteFrame(t, m, probe, "cursor-on-again")
++	requireSameSpritePixels(t, "cursor on again", onAgain, on)
++	spriteClick(t, m, "away")
++	spriteFrame(t, m, probe, "cursor-focus-lost")
++	requireNoSpriteCopies(t, probe, "cursor focus lost")
++	stage.Sprites.Lock()
++	active = cursor.Active
++	stage.Sprites.Unlock()
++	if active {
++		t.Error("actual focus handoff retained active outgoing cursor")
++	}
++}
++
++func TestManagedSpriteDialogScrimAndPopupWithoutSpriteLayer(t *testing.T) {
++	config := manualConfig(t, 7)
++	config.LogicalDPI = 96
++	var a *app.Application
++	open := false
++	var popup *core.Stage
++	var m *Manual
++	m, a = simpleManual(t, config, func() ui.Node {
++		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{
++			{ID: "open", Kind: ui.Button, Text: "Open dialog", Activate: func() {
++				open = true
++				if err := a.Invalidate("one"); err != nil {
++					t.Error(err)
++				}
++			}},
++			{ID: "popup", Kind: ui.Button, Text: "Open popup", Activate: func() {
++				ctx := findRecord(m.implementation.find("one").state.root, "popup").widget
++				scene := core.NewScene("sprite-popup")
++				core.NewText(scene).SetText("Contextual popup")
++				popup = core.NewPopupStage(core.TooltipStage, scene, ctx).SetPos(image.Pt(180, 100)).Run()
++			}},
++			{ID: "dialog", Kind: ui.Dialog, Text: "Dialog", Open: open, Children: []ui.Node{{ID: "close", Kind: ui.Button, Text: "Close", Activate: func() {
++				open = false
++				if err := a.Invalidate("one"); err != nil {
++					t.Error(err)
++				}
++			}}}},
++		}}
++	})
++	unitSettle(t, m)
++	probe := watchSpriteCopies(t, m)
++	base := spriteFrame(t, m, probe, "dialog-baseline")
++	requireNoSpriteCopies(t, probe, "dialog baseline")
++	spriteClick(t, m, "open")
++	dialog := findRecord(m.implementation.find("one").state.root, "dialog").control.dialog.body
++	if dialog == nil || dialog.Scene.SceneGeom.Size == probe.mainSize {
++		t.Fatal("fixture requires a smaller real dialog scene")
++	}
++	shown := spriteFrame(t, m, probe, "dialog-open")
++	requireNoSpriteCopies(t, probe, "dialog open")
++	if probe.scrims == 0 || probe.overlays == 0 || shown.RGBAAt(2, 2) == base.RGBAAt(2, 2) {
++		t.Error("actual dialog/scrim composition missing", probe.scrims, probe.overlays)
++	}
++	spriteClick(t, m, "close")
++	closed := spriteFrame(t, m, probe, "dialog-closed")
++	requireNoSpriteCopies(t, probe, "dialog closed")
++	if probe.scrims != 0 || probe.overlays != 0 || closed.RGBAAt(2, 2) != base.RGBAAt(2, 2) {
++		t.Error("dialog/scrim pixels were retained after real close", probe.scrims, probe.overlays)
++	}
++	spriteClick(t, m, "popup")
++	if popup == nil || popup.Scene.SceneGeom.Size == probe.mainSize {
++		t.Fatal("fixture requires a smaller real popup scene")
++	}
++	spriteFrame(t, m, probe, "popup-open")
++	requireNoSpriteCopies(t, probe, "popup open")
++	if probe.overlays == 0 {
++		t.Errorf("actual popup did not compose: scene=%v renderer=%T painter=%v main=%p originating=%p", popup.Scene.SceneGeom, popup.Scene.Renderer, popup.Scene.Painter.State != nil, popup.Main, m.implementation.find("one").state.body.Scene.Stage)
++	}
++	if !popup.ClosePopup() {
++		t.Fatal("actual popup close refused")
++	}
++	spriteFrame(t, m, probe, "popup-closed")
++	requireNoSpriteCopies(t, probe, "popup closed")
++	if probe.overlays != 0 || probe.scrims != 0 {
++		t.Error("closed popup still composed", probe.overlays, probe.scrims)
++	}
++}
++
++func TestManagedSpriteActualDragMoveDropRetiresLayer(t *testing.T) {
++	config := manualConfig(t, 7)
++	config.LogicalDPI = 96
++	m, _ := simpleManual(t, config, func() ui.Node {
++		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "source", Kind: ui.Button, Text: "Drag source"}, {ID: "target", Kind: ui.Button, Text: "Drop target"}}}
++	})
++	unitSettle(t, m)
++	w := m.implementation.find("one")
++	source := findRecord(w.state.root, "source").widget
++	target := findRecord(w.state.root, "target").widget
++	starts, moves, drops := 0, 0, 0
++	source.AsWidget().FinalStyler(func(s *styles.Style) { s.SetAbilities(true, abilities.Draggable) })
++	target.AsWidget().FinalStyler(func(s *styles.Style) { s.SetAbilities(true, abilities.Droppable) })
++	source.AsWidget().On(events.DragStart, func(e events.Event) { starts++; source.AsWidget().Scene.Events.DragStart(source, "sprite payload", e) })
++	source.AsWidget().On(events.DragMove, func(events.Event) { moves++ })
++	target.AsWidget().On(events.Drop, func(e events.Event) {
++		de, ok := e.(*events.DragDrop)
++		if !ok || de.Data != "sprite payload" || de.Source != source || de.Target != target {
++			t.Error("actual drop identity/data mismatch")
++			return
++		}
++		drops++
++		de.SetHandled()
++	})
++	source.AsWidget().Update()
++	target.AsWidget().Update()
++	unitSettle(t, m)
++	probe := watchSpriteCopies(t, m)
++	from := source.AsWidget().Geom.TotalBBox
++	to := target.AsWidget().Geom.TotalBBox
++	start := from.Min.Add(from.Size().Div(2))
++	end := to.Min.Add(to.Size().Div(2))
++	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.MouseDown, Button: events.Left, Position: start}); err != nil {
++		t.Fatal(err)
++	}
++	unitSettle(t, m)
++	if _, err := config.Clock.Advance(core.TimingSettings.DragStartTime + time.Nanosecond); err != nil {
++		t.Fatal(err)
++	}
++	first := start.Add(image.Pt(core.TimingSettings.DragStartDistance+8, 0))
++	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.MouseMove, Position: first}); err != nil {
++		t.Fatal(err)
++	}
++	unitSettle(t, m)
++	stage := w.state.body.Scene.Stage
++	sp, ok := stage.Sprites.SpriteByName("__DragSprite__")
++	if starts != 1 || !ok || sp == nil || !sp.Active {
++		t.Fatal("actual pointer drag did not create sprite", starts, ok)
++	}
++	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.MouseMove, Position: end}); err != nil {
++		t.Fatal(err)
++	}
++	unitSettle(t, m)
++	spriteFrame(t, m, probe, "drag-moving")
++	if moves == 0 || probe.spriteCopies == 0 || sp.EventBBox.Min != end {
++		t.Error("actual drag move failed sprite composition/location", moves, probe.spriteCopies, sp.EventBBox.Min, end)
++	}
++	if err := m.Input(testContext, ManualInput{Window: "one", WindowIncarnation: w.incarnation, Type: events.MouseUp, Button: events.Left, Position: end}); err != nil {
++		t.Fatal(err)
++	}
++	unitSettle(t, m)
++	spriteFrame(t, m, probe, "drag-dropped")
++	requireNoSpriteCopies(t, probe, "drag dropped")
++	if drops != 1 {
++		t.Error("actual drag/drop did not deliver once", drops)
++	}
++	if _, ok = stage.Sprites.SpriteByName("__DragSprite__"); ok {
++		t.Error("completed actual drop retained drag sprite")
++	}
++	if source.AsWidget().StateIs(states.Dragging) {
++		t.Error("source drag state retained after drop")
++	}
++}
+diff --git a/scripts/check.sh b/scripts/check.sh
+index 6d1a226..3a25412 100755
+--- a/scripts/check.sh
++++ b/scripts/check.sh
+@@ -32,7 +32,7 @@ go build -o build/vellum-workbench ./cmd/workbench
+ 
+ # Explicit routing uses the offscreen driver; these processes do not open GUI windows.
+ (cd "$VELLUM_REPO_ROOT/drivers/cogent" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+-(cd "$VELLUM_REPO_ROOT/drivers/cogent/build/upstream" && go test -race -tags offscreen ./core ./events ./text/lines ./text/textcore ./system/driver/offscreen -run 'TestVellumReviewTextCursor|TestManual|TestVellumManual|TestVellumSourceClock|TestVellumDefaultRepeatClick|TestVellumOutputBuffer')
++(cd "$VELLUM_REPO_ROOT/drivers/cogent/build/upstream" && go test -race -tags offscreen ./core ./events ./text/lines ./text/textcore ./system/driver/offscreen -run 'TestVellumSpriteSource|TestVellumReviewTextCursor|TestManual|TestVellumManual|TestVellumSourceClock|TestVellumDefaultRepeatClick|TestVellumOutputBuffer')
+ (cd "$VELLUM_REPO_ROOT/examples/replay" && go test -race ./... && go vet ./... && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+ (cd "$VELLUM_REPO_ROOT/examples/grid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+ (cd "$VELLUM_REPO_ROOT/examples/loadedgrid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+diff --git a/specs/grid-performance.md b/specs/grid-performance.md
+index 6e3d1e7..f8808e0 100644
+--- a/specs/grid-performance.md
++++ b/specs/grid-performance.md
+@@ -145,6 +145,16 @@ frames match the previous checkpoint's repeated pixels. This remains an
+ exploratory comparison: both unchanged targets fail and the full P6 campaign
+ remains open. It makes no sprite/partial-upload or process-wide wakeup claim.
+ 
++The [empty-sprite checkpoint](../docs/reports/macos-empty-sprites/README.md)
++omits a scene-sized transparent layer when no active sprite can draw. Active
++cursor and drag callbacks retain their every-composition behavior. Three
++interleaved fixed-10k processes per build observe pooled UI-work p95
++14.178→13.090 ms and p99 14.891→13.294 ms with identical 400-cell geometry;
++raster/upload p95 is 8.907→7.406 ms. Other recorded stages increase, and their
++percentiles are not additive. Both unchanged 4/6 ms targets still fail. Software
++pixel/copy proofs do not measure native GPU upload counts, partial uploads or
++process-wide wakeups. Full P6 remains open.
++
+ ## Diagnostic CPU profiling
+ 
+ `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide
+diff --git a/specs/macos-completion.md b/specs/macos-completion.md
+index 8d323bf..fd88d85 100644
+--- a/specs/macos-completion.md
++++ b/specs/macos-completion.md
+@@ -120,6 +120,16 @@ release processes per build observe p95 17.233→14.624 ms and p99
+ 18.954→15.566 ms. Both 4/6 ms targets still fail. Raster/upload cost and the
+ complete multi-case P6 campaign remain open.
+ 
++The [empty-sprite checkpoint](../docs/reports/macos-empty-sprites/README.md)
++removes the transparent full-window source on fresh composition without a
++drawable sprite. Original overlays fail meaningful assertions; core/manual and
++managed retirement/cursor/dialog/popup/drag/resize regressions pass under race,
++as do the full offscreen native adapter and affected consumers. Software grid
++pixels remain matched. Three interleaved fixed-10k release processes per build
++observe p95 14.178→13.090 ms and p99 14.891→13.294 ms. Both targets still fail;
++source-level raster/upload attribution and full P6 remain open. No physical GPU
++upload-count, partial-upload, memory-reclamation or new scheduling claim follows.
++
+ Full P9 professional workload and large-data replay acceptance, external
+ application automation transport, native services/input/accessibility, GPU
+ presentation and sustained performance qualification remain open. This bounded
+diff --git a/specs/rendering.md b/specs/rendering.md
+index 746c37a..cc63556 100644
+--- a/specs/rendering.md
++++ b/specs/rendering.md
+@@ -88,3 +88,24 @@ Snapshot does not flush an outstanding native resize. A caller needing a newly
+ requested size waits for Render to update Model.View; then image dimensions match
+ that completed owner viewport. An immediate owner-held center/zoom edit is
+ reflected in Snapshot without waiting for another native Render callback.
++
++## Empty sprite composition
++
++Fresh composition omits the sprite source when every tier has no nonnil active
++sprite with a Draw callback. The predicate and modification reset run under the
++existing sprite lock before allocating, clearing or rasterizing sprite resources.
++Replacing the composition source/operation list restores underlying scenes when
++the last drawable sprite is removed or inactivated.
++
++Active Draw callbacks still run on every composition in First/Normal/Final order,
++including an unmodified layer and an active cursor's blink-off callback. Active
++event-only sprites retain existing input and delayed-paint eligibility; HasActive
++skips nil entries without requiring a Draw callback. This guard introduces no
++new wake, deadline or event policy.
++
++Previously allocated sprite resources remain retained for reuse. Empty resize
++does not replace them; reactivation uses the existing size-correct allocation
++path. Early cached resize replay and borrowed-texture admission are unchanged.
++Software copy observations prove composition requests and pixels, not physical
++GPU upload counts, immediate texture reclamation or display latency. Partial
++uploads and process-wide wakeup reductions require separate evidence.

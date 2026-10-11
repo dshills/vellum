@@ -120,6 +120,16 @@ release processes per build observe p95 17.233→14.624 ms and p99
 18.954→15.566 ms. Both 4/6 ms targets still fail. Raster/upload cost and the
 complete multi-case P6 campaign remain open.
 
+The [empty-sprite checkpoint](../docs/reports/macos-empty-sprites/README.md)
+removes the transparent full-window source on fresh composition without a
+drawable sprite. Original overlays fail meaningful assertions; core/manual and
+managed retirement/cursor/dialog/popup/drag/resize regressions pass under race,
+as do the full offscreen native adapter and affected consumers. Software grid
+pixels remain matched. Three interleaved fixed-10k release processes per build
+observe p95 14.178→13.090 ms and p99 14.891→13.294 ms. Both targets still fail;
+source-level raster/upload attribution and full P6 remain open. No physical GPU
+upload-count, partial-upload, memory-reclamation or new scheduling claim follows.
+
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded

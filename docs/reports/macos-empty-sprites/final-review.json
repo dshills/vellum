@@ -1,0 +1,123 @@
+{
+  "audit": {
+    "path": "/private/tmp/vellum-empty-sprites-qualification/internal-final-review/audit.json",
+    "sha256": "e8db89802bf58ef7825639056ef7119723c0a25bdb330527e6d5db540a03f9f3"
+  },
+  "files": {
+    "docs/implementation.md": "5c8aec450637e5f915512485610fcf9df6c8953db0a58d9a2faee9537accb589",
+    "docs/reports/macos-empty-sprites/README.md": "f9b4af8d21a915b43e5018aa0f2ff536583ab61ce5670ad2d1869b7396e7454c",
+    "drivers/cogent/native/README.md": "9aa975336b1eda0bca574bbd28f25626c7b69a418ef549cdcb0c16f8ac43a3e2",
+    "drivers/cogent/native/dependencies.json": "03fbf3d32984634925a4209639436f46b01f7dd8870e2a6921984e4ddb72af4b",
+    "drivers/cogent/native/patches/emptysprites/0035-empty-sprite-layer.patch": "681971064e8fe4dd202e2cdc6272297c94a5c9475f9a2a5cbffd974c7ef96ad7",
+    "drivers/cogent/native/patches/emptysprites/README.md": "f7d5dbacaf8ed1e1befa1bcf9f459a95ad69e490cf584233714149739f453aff",
+    "drivers/cogent/native/patches/emptysprites/original-hashes.json": "15a2358f44c53f077f3c0e94334d4829fefdfa70fbc6f2582958ab24f3e8262e",
+    "drivers/cogent/native/patches/emptysprites/output-hashes.json": "a050598139074afe3ce9b851f34a0fd86d6e47ad7ce57acb60b407ded7ae6d97",
+    "drivers/cogent/prepare_test.py": "90ff1ce1c08e21e8eedb11c96bd539bf338d1f6c4c95da13eefee48b3a1f0901",
+    "drivers/cogent/sprites_offscreen_test.go": "85b102db3bb13e93ee4e81571e0a1a2c3548503ca7c45a548b1f8e56d208ceea",
+    "scripts/check.sh": "db2e909e0461bf373fb4668700c2c61156184073ce2df954a82900d2aacbc58b",
+    "specs/grid-performance.md": "dd752d3c00d94bf8f3c7654c927051c11d491f687012c045a54e083b9942bbbe",
+    "specs/macos-completion.md": "f52d5eb3d85e327836fdf374fe21c1ea44d10b5183ae9d38d14c722084c04727",
+    "specs/rendering.md": "1822863ba8e3631cebb166cbddb082b5114264d7be34f76330ecdd68105ced50"
+  },
+  "findings": [],
+  "historical_scope": "Earlier managed compile and popup failures remain bound by source versions/raw records; previous selected certificates remain immutable. They do not substitute for final frozen-source checks.",
+  "limits": [
+    "Selected source review and recorded prepared-map consistency, with three current stage35 outputs freshly hashed; not complete compiler/toolchain/module-cache/environment/SDK closure.",
+    "Recorded checks, overlays and native processes were not rerun. Before/after observations cannot exclude a restored transient mutation.",
+    "Core and managed source certificates were earlier selected-source approvals; final registration/fresh-prepare and aggregate execution proofs separately close their stated integration followups.",
+    "Composition Copy requests/software pixels do not measure physical GPU transfers, window-manager resize, wall-time cursor blink, display latency, immediate resource reclamation or idle scheduling.",
+    "Three fixed-10k native release processes per build: exploratory comparison, not five-process/four-case P6. Both unchanged4/6ms targets fail; other cases, memory/endurance and broad Mac acceptance stay open.",
+    "Common-ticket elapsed work includes prefix/GC; queue and surface waits/acquire/present retained separately. Independent stage percentiles are not additive.",
+    "This certificate covers the14 changed meaningful paths and supporting behavior; it is not final staged/index/archive/promotion metadata or clean relocated SDK acceptance."
+  ],
+  "measurements": {
+    "actual_fixture": "400 clipped cells,50 rows,8 columns,767x624 viewport@1.6875;6 processes,120 measured samples each;128 warmup",
+    "baseline_max_ns": 18912042,
+    "baseline_p95_ns": 14177791,
+    "baseline_p99_ns": 14890625,
+    "candidate_max_ns": 13408418,
+    "candidate_p95_ns": 13089876,
+    "candidate_p99_ns": 13294292,
+    "p95_reduction_percent": 7.673374505238506,
+    "result": "OBSERVED, not P6 acceptance"
+  },
+  "provider_scope": {
+    "calls": 4,
+    "coverage_complete": true,
+    "meaningful_staged_paths": 14,
+    "nested_patch_includes_production_and_core_tests": true,
+    "no_findings_at_configured_medium_or_higher_threshold": true,
+    "raw_exit_code": 0
+  },
+  "qualification_bindings": {
+    "baseline_inherited_audit": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/baseline-inherited-audit.json",
+      "sha256": "a154616c5030d3d6ed2b7782da896803e23237e622f9e0e4e745a41f63f52ffb"
+    },
+    "baseline_inherited_build": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/baseline-inherited-build.json",
+      "sha256": "9af2f000de270f00d4da5488fdb2976be988217aa9d2bd88cd7038e8dd21d258"
+    },
+    "baseline_input_identity": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/baseline-inputs.json",
+      "sha256": "6addfaccd0c17f40d6604c8e1d1e6b871c491b1db7f52c50307c5dec5a7af791"
+    },
+    "core-qualification": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/core-qualification/qualification.json",
+      "sha256": "99784a65c74e7b77017fcbaad669445854f51031f1f3ec482bb2b8b0c43f925d"
+    },
+    "exploratory_comparison": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/comparison.json",
+      "sha256": "01a03accefbf9957f109f1aa3f075df8422c5d6dcbf2b5f747fb615fe609837a"
+    },
+    "integration-qualification": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/integration-qualification/qualification.json",
+      "sha256": "9b9f088cadb3f8be0de7910c84c98da2a3d16602e406d254e7c3bc459bc9ae37"
+    },
+    "internal-core-review": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/internal-core-review/review.json",
+      "sha256": "cfab82d8c7cea30cc395fc4c008e4f50713df4c68cb0915dc8df2ceb729e564d"
+    },
+    "internal-managed-review": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/internal-managed-review/review.json",
+      "sha256": "570b37c4176259dada160625b04014137f523f9c67ef30e8413ef20cedc93464"
+    },
+    "optimized_candidate_build": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/candidate-build.json",
+      "sha256": "c0277cd9e841f3a1f8d0aad5fbc218e0136e5447b09d686c9f9ca0c31fd69a13"
+    },
+    "pixel-comparison": {
+      "path": "/private/tmp/vellum-empty-sprites-qualification/pixel-comparison/qualification.json",
+      "sha256": "ceb3d622678ec8ae3263011cd3bf08ed5b4e17692e69a379bf7f36e0fef282b6"
+    },
+    "provider_inputs": {
+      "path": "/private/tmp/vellum-empty-sprites-prism/inputs.json",
+      "sha256": "83513b8f86c352549ddada1850c82e95ca61113b20111c7aa47cf92eb24db681"
+    },
+    "provider_output": {
+      "path": "/private/tmp/vellum-empty-sprites-prism/prism.json",
+      "sha256": "7e22ce2ca7ba962fc6207aa305bda192b23aad068902af1db86e2e16882e3724"
+    },
+    "provider_process": {
+      "path": "/private/tmp/vellum-empty-sprites-prism/process.json",
+      "sha256": "96b84f9217797105a2f117e9f77bc69c3a205c0a85c25a7967c0237802800d4e"
+    }
+  },
+  "recipe": {
+    "path": "/private/tmp/vellum-empty-sprites-qualification/internal-final-review/audit.py.txt",
+    "sha256": "323d523dcc4c6f5c5a05ae7374a2ea645270c9498b1b48cf7f4632349baafc53"
+  },
+  "result": "APPROVED",
+  "reviewed_root": "/private/tmp/vellum-large-data",
+  "schema": 1,
+  "source_review": [
+    "SpritesSource checks all three tiers under the existing sprite lock, and returns nil before painter/renderer allocation or image clear only when no nonnil Active sprite has Draw. The modification reset preserves the old settled behavior and leaves existing resources owned for reuse.",
+    "The original active rendering path and tier order are unchanged. Active Draw callbacks execute every composition even if unmodified or blink-off. HasActive adds only a nil skip and preserves Active-only input/deadline eligibility for event-only sprites; no scheduling/timer policy changes.",
+    "Actual fresh composer Start/Add/End replaces the source list and GPU drawer operation count. Dropping a nil layer removes prior sprite operations in later cached replay, without changing early cached resize or borrowed-source admission. No immediate retained-image/texture release claim is made.",
+    "Pinned stage metadata and all37 patch hashes match. An independent in-memory exact-context reproduction matches all3 current prepared outputs, and the original differential oracle function body is byte-identical after its name is normalized.",
+    "Core tests assert no empty allocation, real active pixels/order/copy counts, every-pass callback behavior, retirement/reactivation/resize and cached operation replay, plus an explicitly advanced real TextCursor callback. Managed tests forward the real drawer and force actual composition; real pointer focus, blink/focus-loss, smaller dialog/scrim/popup and primitive drag/drop are exercised without claiming GPU transfers.",
+    "Current stage35 patch-order and backend selector registrations resolve the earlier core selected-source certificate followups. Final recorded core3 and integration14 expected checks pass, including meaningful original-renderer/liveness/managed red overlays, final race/vet, consumers, preparation and SDK unit checks.",
+    "Eight actual detached grid frames exactly match prior bounds/stride/digest records. Report/spec values match recalculated raw360-sample-per-build nearest-rank statistics; unchanged framework Go production and only2 prepared runtime changes+1 new core test match the recorded source/dependency deltas.",
+    "Report and specs scope p95 reduction to three interleaved optimized fixed10k processes per build, retain all samples/outliers, show increased reconcile/layout phases separately, preserve failed targets and open P6/Mac criteria, and distinguish elapsed UI-work from thread CPU/display/presentation/native memory."
+  ]
+}

@@ -88,3 +88,24 @@ Snapshot does not flush an outstanding native resize. A caller needing a newly
 requested size waits for Render to update Model.View; then image dimensions match
 that completed owner viewport. An immediate owner-held center/zoom edit is
 reflected in Snapshot without waiting for another native Render callback.
+
+## Empty sprite composition
+
+Fresh composition omits the sprite source when every tier has no nonnil active
+sprite with a Draw callback. The predicate and modification reset run under the
+existing sprite lock before allocating, clearing or rasterizing sprite resources.
+Replacing the composition source/operation list restores underlying scenes when
+the last drawable sprite is removed or inactivated.
+
+Active Draw callbacks still run on every composition in First/Normal/Final order,
+including an unmodified layer and an active cursor's blink-off callback. Active
+event-only sprites retain existing input and delayed-paint eligibility; HasActive
+skips nil entries without requiring a Draw callback. This guard introduces no
+new wake, deadline or event policy.
+
+Previously allocated sprite resources remain retained for reuse. Empty resize
+does not replace them; reactivation uses the existing size-correct allocation
+path. Early cached resize replay and borrowed-texture admission are unchanged.
+Software copy observations prove composition requests and pixels, not physical
+GPU upload counts, immediate texture reclamation or display latency. Partial
+uploads and process-wide wakeup reductions require separate evidence.

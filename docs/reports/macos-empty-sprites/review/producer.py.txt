@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""One explicit significant-batch provider review; raw qualification excluded."""
+import hashlib
+import json
+import subprocess
+import time
+from pathlib import Path
+
+ROOT = Path('/private/tmp/vellum-large-data')
+OUT = Path('/private/tmp/vellum-empty-sprites-prism')
+FILES = ['drivers/cogent/native/dependencies.json', 'drivers/cogent/native/README.md',
+         'drivers/cogent/native/patches/emptysprites/0035-empty-sprite-layer.patch',
+         'drivers/cogent/native/patches/emptysprites/original-hashes.json',
+         'drivers/cogent/native/patches/emptysprites/output-hashes.json',
+         'drivers/cogent/native/patches/emptysprites/README.md',
+         'drivers/cogent/prepare_test.py', 'scripts/check.sh', 'drivers/cogent/sprites_offscreen_test.go',
+         'specs/rendering.md', 'specs/grid-performance.md', 'specs/macos-completion.md',
+         'docs/implementation.md', 'docs/reports/macos-empty-sprites/README.md']
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def inputs():
+    return {p: sha((ROOT / p).read_bytes()) for p in FILES}
+
+OUT.mkdir(exist_ok=False)
+diff = subprocess.check_output(['git', 'diff', '--cached', '--binary', '--'] + FILES, cwd=ROOT)
+indexed = subprocess.check_output(['git', 'diff', '--cached', '--name-only'], cwd=ROOT).decode().splitlines()
+assert sorted(indexed) == sorted(FILES), indexed
+before = inputs()
+(OUT / 'staged.diff.txt').write_bytes(diff)
+(OUT / 'producer.py.txt').write_bytes(Path(__file__).read_bytes())
+(OUT / 'inputs.json').write_text(json.dumps({'files': before, 'staged_diff_sha256': sha(diff), 'staged_diff_bytes': len(diff),
+    'scope': 'Explicit14-file implementation/patch/test/spec/report staged allowlist. Raw measurement/test archives, historical source/producer copies and review records excluded from provider payload.'}, indent=2) + '\n')
+argv = ['/Users/dshills/Development/Go/bin/prism', 'review', 'staged', '--provider', 'anthropic',
+        '--model', 'claude-sonnet-5-5', '--format', 'json', '--baseline', 'none', '--fail-on', 'medium',
+        '--min-severity', 'medium', '--paths', ','.join(FILES), '--out', str(OUT / 'prism.json')]
+start = time.monotonic()
+with (OUT / 'stdout.log').open('xb') as stdout, (OUT / 'stderr.log').open('xb') as stderr:
+    result = subprocess.run(argv, cwd=ROOT, stdout=stdout, stderr=stderr, timeout=900)
+after_diff = subprocess.check_output(['git', 'diff', '--cached', '--binary', '--'] + FILES, cwd=ROOT)
+after = inputs()
+record = {'argv': argv, 'exit_code': result.returncode, 'elapsed_seconds': time.monotonic() - start,
+          'before': before, 'after': after, 'source_index_unchanged': before == after and diff == after_diff,
+          'stdout_sha256': sha((OUT / 'stdout.log').read_bytes()), 'stderr_sha256': sha((OUT / 'stderr.log').read_bytes()),
+          'prism_sha256': sha((OUT / 'prism.json').read_bytes()) if (OUT / 'prism.json').exists() else None,
+          'producer_sha256': sha(Path(__file__).read_bytes())}
+(OUT / 'process.json').write_text(json.dumps(record, indent=2) + '\n')
+assert record['source_index_unchanged']
+print('Prism exit', result.returncode, 'seconds', round(record['elapsed_seconds'], 2), flush=True)
+raise SystemExit(result.returncode)
