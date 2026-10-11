@@ -54,6 +54,19 @@ type controlState struct {
 	restore           bool                  // Restore accepted controlled value during the next native refresh.
 	refused           atomic.Pointer[error] // Native-event refusal handed to the owner refresh.
 }
+
+// cacheFieldEditingState copies the accepted widget state on the owner. Native
+// publication can coalesce or select another client after a focus handoff; the
+// semantic cache must also follow completed local/controlled transitions.
+func cacheFieldEditingState(r *record, state core.TextFieldEditingState) bool {
+	if r.control.fieldState != nil && *r.control.fieldState == state {
+		return false
+	}
+	copy := state
+	r.control.fieldState = &copy
+	return true
+}
+
 type tabState struct {
 	pages   map[string]*core.Frame
 	buttons map[string]*core.Tab
@@ -321,6 +334,9 @@ func syncControl(r *record, previous ui.Node) error {
 			r.control.fieldSelection = nil
 			w.SetEditingSelection(selection.Anchor, selection.Focus)
 		}
+		// Reconciliation is followed by the current semantic publication. Read
+		// editing state, rather than descriptor text, to preserve live preedit.
+		cacheFieldEditingState(r, w.EditingState())
 	case *core.Tabs:
 		if err := prepareControl(r, r.node); err != nil {
 			return err

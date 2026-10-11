@@ -1,0 +1,25 @@
+{
+  "base_commit": "03c39415df56ae14f82b2757607390380c7b59bc",
+  "files": {
+    "docs/reports/macos-field-state/README.md": "be7f38a572177909f7206d337b732e5f78b763066d46ee149cf60ef3a1e74ace",
+    "docs/reviews/macos-field-state/README.md": "2f7fa94032f850c2c289845b87e589fc6aad7aac9e7a0bcb1ec817b403198bb9",
+    "drivers/cogent/controls.go": "d42cdb1f7937860bc7ff5d3dedfa16f6e85724990d620534f617b07c8c0ee500",
+    "drivers/cogent/editor_geometry.go": "0744d3d45f1f20a762b92c7a1345a17c32e5bb7aa6843af8cc46b203f80da425",
+    "drivers/cogent/editor_test.go": "0e66df12e419938f75aba7a89855a5e7c3ce87180cec1e530e3803dad2737c83",
+    "drivers/cogent/field_accessibility_test.go": "49db1f55b0ed8a34a95c18e673db8a48afcf6806802ec2783f485873d56a434c",
+    "examples/editor/smoke.go": "a1331f71ad02a183bdaccb7cce5b4debc3f7bbefe0745459fbc630e3c86d2744",
+    "specs/accessibility.md": "25a9e251c45e80547e0d6b5c4fa8e82578fe654404197d52c2868ac6ea93b568"
+  },
+  "evidence_files": {
+    "docs/reports/macos-field-state/evidence.json": "d64f4c49bd6bc2d550cf1f0cff034364508dad5c78549c0b8bd113dbe52367f9",
+    "docs/reports/macos-field-state/qualification.json": "28dd75eb55ece45667c98487c1ef8b4a6a1c40a153a021f3c57fdf6264ac1616",
+    "docs/reviews/macos-field-state/internal-review-initial.json": "d48fee8671b83dbcba92f5339e7f5b40e35c8d9c5a27ef7c8c4b1234c78605d5",
+    "docs/reviews/macos-field-state/internal-review.json": "e2725e314c8ac80ac56854cfc1a848ae59b57b732337b2aaad2f73c1e7837a1f",
+    "docs/reviews/macos-field-state/prism-inputs.json": "25f1767da8966c762339ef802c1b389a823150fb9051aef4473399d097538757",
+    "docs/reviews/macos-field-state/prism.json": "c613419486b60208b0b4f00a713a2403cad8fbc00b618cf8e2c1f0556fc83d6b"
+  },
+  "source_review": "Prism Anthropic claude-sonnet-5-5 complete 8files, 1call, no findings; independent internal runtime/source review approved6inputs",
+  "evidence_review": "Mechanical exact-byte UTF-8 JSON log roundtrip and source/proof/hash checks; final independent metadata verification covers the complete staged scope before commit.",
+  "self_exclusion": "this ledger is excluded from its own digest map",
+  "scope": "small native field semantic cache correction; no P9 manual UI/replay completion or public release qualification"
+}

@@ -613,9 +613,10 @@ func TestManagedTextFieldOversizedLegacyEditingRestoresControlledValueWithoutCha
 			t.Fatal("overcap legacy edit accepted")
 		}
 	})
-	if native.EditingState().Text != "controlled" || field.control.fieldState.Text != "local" || calls != 0 || m.Snapshot().History.UndoCount != 0 || field.control.restore {
-		t.Fatal("refused edit changed accepted shadow/callback/model or left a restore loop")
+	if native.EditingState().Text != "controlled" || field.control.fieldState == nil || *field.control.fieldState != native.EditingState() || calls != 0 || m.Snapshot().History.UndoCount != 0 || field.control.restore {
+		t.Fatal("refused edit failed controlled state/cache restoration or changed callback/model")
 	}
+	_ = a.Do(func() { requireFieldSemanticState(t, field, native.EditingState()) })
 	// A field is still controlled: after refusing all pending edit bytes, the
 	// next valid edit can commit by focus loss using the normal Change path.
 	if !native.ApplyNativeEdit("valid", 5, 5, -1, -1, "insert") {

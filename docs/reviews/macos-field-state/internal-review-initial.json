@@ -1,0 +1,48 @@
+{
+  "result": "runtime correction approved; one affected existing test expectation requires update",
+  "review_type": "independent read-only source and supplied regression evidence review",
+  "canonical_head": "03c3941",
+  "reviewed_sources": {
+    "drivers/cogent/controls.go": "d42cdb1f7937860bc7ff5d3dedfa16f6e85724990d620534f617b07c8c0ee500",
+    "drivers/cogent/editor_geometry.go": "0744d3d45f1f20a762b92c7a1345a17c32e5bb7aa6843af8cc46b203f80da425",
+    "drivers/cogent/field_accessibility_test.go": "49db1f55b0ed8a34a95c18e673db8a48afcf6806802ec2783f485873d56a434c",
+    "examples/editor/smoke.go": "a1331f71ad02a183bdaccb7cce5b4debc3f7bbefe0745459fbc630e3c86d2744",
+    "specs/accessibility.md": "25a9e251c45e80547e0d6b5c4fa8e82578fe654404197d52c2868ac6ea93b568"
+  },
+  "supporting_sources": {
+    "drivers/cogent/editor_test.go": "977ce656b2a5a151dd6630ebae02a9ee27bf577520270b31d5c7883426914114"
+  },
+  "evidence": {
+    "/private/tmp/vellum-field-ax-before.log": {
+      "sha256": "a1e2a751a04ad0027c45b81bb85b0a04f444b56216922585f5c2376da3919480",
+      "observed": "before fails exact outgoing/refocused/controlled semantic cases"
+    },
+    "/private/tmp/vellum-field-ax-after.log": {
+      "sha256": "8e887fa3286e4d38f57d0b3d07907dd6320b2c276b63dd24124ad2157f6632ba",
+      "observed": "focused field/focus-loss suite passes as reported by root"
+    }
+  },
+  "findings": [
+    {
+      "severity": "medium",
+      "category": "affected_test_expectation",
+      "file": "drivers/cogent/editor_test.go",
+      "line": 616,
+      "title": "Oversized-refusal regression currently requires a stale semantic cache",
+      "detail": "refuseOversizedFieldEditing restores controlled widget bytes through syncControl. The correction now also caches that restored editing state, but the existing test requires fieldState.Text == local. Update the assertion to controlled/cache equals actual restored editing state, retaining no-Change/history/restore and subsequent valid-edit checks."
+    }
+  ],
+  "runtime_findings": [],
+  "invariants_checked": [
+    "helper stores an immutable editing-state copy under existing owner/originating render-context callers",
+    "syncControl snapshots after controlled text and pending selection mutations; unchanged descriptor reads visible preedit rather than replacing it",
+    "outgoing cache refresh happens after native acknowledgment/deactivation and FinishNativeFocusLost; it neither activates outgoing client nor invokes another Change",
+    "refocus directional selection is captured after FinishNativeFocusLost preservation",
+    "oversized refusal restores descriptor via syncControl before final cache snapshot",
+    "diagnostic-only failure output preserves last successful native inspection without extra owner reads or retries on success path"
+  ],
+  "limits": [
+    "No independent build/test/GUI execution performed; supplied before/after logs inspected.",
+    "Full driver tests must include the corrected affected oversized-refusal expectation before final approval."
+  ]
+}

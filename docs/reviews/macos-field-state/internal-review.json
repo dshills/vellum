@@ -1,0 +1,63 @@
+{
+  "result": "approved",
+  "review_type": "independent read-only source review and mechanical supplied evidence verification",
+  "canonical_base": "03c3941",
+  "reviewed_sources": {
+    "drivers/cogent/controls.go": "d42cdb1f7937860bc7ff5d3dedfa16f6e85724990d620534f617b07c8c0ee500",
+    "drivers/cogent/editor_geometry.go": "0744d3d45f1f20a762b92c7a1345a17c32e5bb7aa6843af8cc46b203f80da425",
+    "drivers/cogent/field_accessibility_test.go": "49db1f55b0ed8a34a95c18e673db8a48afcf6806802ec2783f485873d56a434c",
+    "drivers/cogent/editor_test.go": "0e66df12e419938f75aba7a89855a5e7c3ce87180cec1e530e3803dad2737c83",
+    "examples/editor/smoke.go": "a1331f71ad02a183bdaccb7cce5b4debc3f7bbefe0745459fbc630e3c86d2744",
+    "specs/accessibility.md": "25a9e251c45e80547e0d6b5c4fa8e82578fe654404197d52c2868ac6ea93b568"
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "prior_review": "/private/tmp/vellum-field-ax-internal-review.json",
+      "prior_sha256": "d48fee8671b83dbcba92f5339e7f5b40e35c8d9c5a27ef7c8c4b1234c78605d5",
+      "file": "drivers/cogent/editor_test.go",
+      "resolution": "Obsolete stale-cache expectation replaced by nil-guarded exact restored native EditingState and owner-held semantic text/UTF16 selection assertion. Existing no-Change/history/refusal, valid subsequent input and oversized deferred-delivery protections remain."
+    }
+  ],
+  "evidence": {
+    "qualification": {
+      "path": "/private/tmp/vellum-field-ax-qualification-v2/qualification.json",
+      "sha256": "28dd75eb55ece45667c98487c1ef8b4a6a1c40a153a021f3c57fdf6264ac1616",
+      "checks": 9,
+      "go_checks": 6,
+      "native_smoke_passes": 3,
+      "all_exit_codes_zero": true,
+      "source_hashes_match_current": true,
+      "binary_sha256": "b22dfa1af3c4302dc6d094df4e377b7cac2de261d4e1c6021e56e3eb5868b1d5",
+      "logs": {
+        "/private/tmp/vellum-field-ax-qualification-v2/native-editor-1.log": "24de822353dce106c74ada5e07505ef754750970040d3f60b2cd6d9dda34a274",
+        "/private/tmp/vellum-field-ax-qualification-v2/native-editor-3.log": "6d738aa3a5ecc7caec72c48267150392ed5344c0e8d1d7e302bd75a1f8ae2336",
+        "/private/tmp/vellum-field-ax-qualification-v2/native-editor-2.log": "6d738aa3a5ecc7caec72c48267150392ed5344c0e8d1d7e302bd75a1f8ae2336",
+        "/private/tmp/vellum-field-ax-qualification-v2/editor-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/private/tmp/vellum-field-ax-qualification-v2/editor-race.log": "0ba35456bf143ceafd2fcf3739c833d9cab0aca575c4f9dbe90b75a008c6d6c1",
+        "/private/tmp/vellum-field-ax-qualification-v2/editor-build.log": "905a7da78c61b05fffd2fe552eb734eb8e81057a78beed8de61a626721dedec3",
+        "/private/tmp/vellum-field-ax-qualification-v2/focused-race20.log": "cddb1cb0748529d44e708fed9f4977c531607dfb96170197b2e9823a4c445f75",
+        "/private/tmp/vellum-field-ax-qualification-v2/driver-race.log": "96494b92a3e2f664a72b0779bb3671ab9d2028d13875d537d500a848e11d833f",
+        "/private/tmp/vellum-field-ax-qualification-v2/driver-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "before": {
+      "path": "/private/tmp/vellum-field-ax-before.log",
+      "sha256": "a1e2a751a04ad0027c45b81bb85b0a04f444b56216922585f5c2376da3919480",
+      "observed": "The regression fails exact outgoing/refocused/controlled semantic cases without the correction."
+    }
+  },
+  "invariants_checked": [
+    "helper stores an immutable editing-state copy under existing owner/originating render-context callers",
+    "syncControl snapshots after controlled text and pending selection mutations; unchanged descriptor reads visible preedit rather than replacing it",
+    "outgoing cache refresh happens after native acknowledgment/deactivation and FinishNativeFocusLost; it neither activates outgoing client nor invokes another Change",
+    "refocus directional selection is captured after FinishNativeFocusLost preservation",
+    "oversized refusal restores descriptor via syncControl before final cache snapshot",
+    "diagnostic-only failure output preserves last successful native inspection without extra owner reads or retries on success path"
+  ],
+  "scope": "Accepted field accessibility editing-state cache follows outgoing finalization and inactive controlled text/selection without replacing preview, reactivating a client, or emitting another Change. Failure diagnostics preserve last successful tree without success-path owner reads or action retries.",
+  "limits": [
+    "Reviewer performed no GUI, canonical mutations, independent build/test execution or OS settings changes. Supplied root qualification/logs mechanically verified.",
+    "Native runs qualify deterministic in-process Cocoa protocol on current canonical source; final relocated SDK rerun and human IME/VoiceOver qualification are separate."
+  ]
+}

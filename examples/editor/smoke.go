@@ -280,11 +280,17 @@ func waitActionReady(ctx context.Context, w *editorWindow, id string) (actionSta
 	var expected, current actionState
 	var inspection cogent.AccessibilityInspection
 	var inspectionErr error
+	var lastSuccessful cogent.AccessibilityInspection
+	successfulInspections := 0
 	for {
 		if err := owner(w.application, func() error { expected = w.actionState(); return nil }); err != nil {
 			return expected, err
 		}
 		inspection, inspectionErr = cogent.InspectAccessibility(ctx, w.id)
+		if inspectionErr == nil {
+			lastSuccessful = inspection
+			successfulInspections++
+		}
 		if inspectionErr == nil && actionReady(inspection, expected, id) {
 			if err := owner(w.application, func() error { current = w.actionState(); return nil }); err != nil {
 				return expected, err
@@ -295,6 +301,9 @@ func waitActionReady(ctx context.Context, w *editorWindow, id string) (actionSta
 		}
 		select {
 		case <-ctx.Done():
+			// A final timed-out query returns a zero tree; preserve the actual
+			// prior publication so readiness failures identify stale fields.
+			fmt.Printf("EDITOR_ACTION_READINESS_DIAGNOSTIC %s\n", mustJSON(map[string]any{"action": id, "owner": expected, "successful_inspections": successfulInspections, "last_successful": lastSuccessful, "last_inspection_error": fmt.Sprint(inspectionErr)}))
 			return expected, fmt.Errorf("native action %q publication not ready: owner %+v generation %d: %w", id, expected, inspection.Generation, errors.Join(inspectionErr, ctx.Err()))
 		case <-ticker.C:
 		}

@@ -131,6 +131,11 @@ func (t *textWindow) finishFieldFocusLosses(deactivate func(*record) (bool, erro
 		r.control.fieldFocusLost.Store(false)
 		refuseOversizedFieldEditing(r) // existing controlled refusal restores invalid legacy bytes
 		field.FinishNativeFocusLost()
+		// This outgoing client may never be chosen by publishClient again.
+		// Capture after finalization, including preserved refocus selection.
+		if cacheFieldEditingState(r, field.EditingState()) {
+			_ = r.control.a.Invalidate(r.control.window)
+		}
 	}
 	return true
 }
@@ -144,12 +149,8 @@ func (t *textWindow) publishClient(r *record, active bool) (bool, error) {
 	if r.node.Kind == ui.TextField && refuseOversizedFieldEditing(r) {
 		return false, nil
 	}
-	if r.node.Kind == ui.TextField {
-		if r.control.fieldState == nil || *r.control.fieldState != state {
-			copy := state
-			r.control.fieldState = &copy
-			_ = r.control.a.Invalidate(r.control.window)
-		}
+	if r.node.Kind == ui.TextField && cacheFieldEditingState(r, state) {
+		_ = r.control.a.Invalidate(r.control.window)
 	}
 	if r.control.editor != nil {
 		syncEditorFromWidget(r, state)

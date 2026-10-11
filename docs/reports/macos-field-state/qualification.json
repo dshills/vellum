@@ -1,0 +1,131 @@
+{
+  "files": {
+    "drivers/cogent/controls.go": "d42cdb1f7937860bc7ff5d3dedfa16f6e85724990d620534f617b07c8c0ee500",
+    "drivers/cogent/editor_geometry.go": "0744d3d45f1f20a762b92c7a1345a17c32e5bb7aa6843af8cc46b203f80da425",
+    "drivers/cogent/field_accessibility_test.go": "49db1f55b0ed8a34a95c18e673db8a48afcf6806802ec2783f485873d56a434c",
+    "drivers/cogent/editor_test.go": "0e66df12e419938f75aba7a89855a5e7c3ce87180cec1e530e3803dad2737c83",
+    "examples/editor/smoke.go": "a1331f71ad02a183bdaccb7cce5b4debc3f7bbefe0745459fbc630e3c86d2744",
+    "specs/accessibility.md": "25a9e251c45e80547e0d6b5c4fa8e82578fe654404197d52c2868ac6ea93b568"
+  },
+  "checks": [
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=20",
+        "-run",
+        "TestFieldAccessibility|TestManagedTextFieldFocusLoss",
+        "."
+      ],
+      "cwd": "drivers/cogent",
+      "exit_code": 0,
+      "seconds": 6.189621500001522,
+      "log": "focused-race20.log"
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./..."
+      ],
+      "cwd": "drivers/cogent",
+      "exit_code": 0,
+      "seconds": 18.139619833993493,
+      "log": "driver-race.log"
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "cwd": "drivers/cogent",
+      "exit_code": 0,
+      "seconds": 2.691456458007451,
+      "log": "driver-vet.log"
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "./..."
+      ],
+      "cwd": "examples/editor",
+      "exit_code": 0,
+      "seconds": 3.2383394589996897,
+      "log": "editor-race.log"
+    },
+    {
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "cwd": "examples/editor",
+      "exit_code": 0,
+      "seconds": 0.6581921670003794,
+      "log": "editor-vet.log"
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-race",
+        "-o",
+        "/private/tmp/vellum-field-ax-qualification-v2/editor",
+        "."
+      ],
+      "cwd": "examples/editor",
+      "exit_code": 0,
+      "seconds": 2.893669916986255,
+      "log": "editor-build.log"
+    },
+    {
+      "command": [
+        "/private/tmp/vellum-field-ax-qualification-v2/editor",
+        "-smoke"
+      ],
+      "exit_code": 0,
+      "seconds": 8.42368395801168,
+      "log": "native-editor-1.log",
+      "complete_marker": true
+    },
+    {
+      "command": [
+        "/private/tmp/vellum-field-ax-qualification-v2/editor",
+        "-smoke"
+      ],
+      "exit_code": 0,
+      "seconds": 7.24998029199196,
+      "log": "native-editor-2.log",
+      "complete_marker": true
+    },
+    {
+      "command": [
+        "/private/tmp/vellum-field-ax-qualification-v2/editor",
+        "-smoke"
+      ],
+      "exit_code": 0,
+      "seconds": 7.792456416005734,
+      "log": "native-editor-3.log",
+      "complete_marker": true
+    }
+  ],
+  "scope": "native field semantic cache correction, actual native editor protocol; no OS settings/human IME change",
+  "binary_sha256": "b22dfa1af3c4302dc6d094df4e377b7cac2de261d4e1c6021e56e3eb5868b1d5",
+  "inputs_unchanged": true,
+  "logs": {
+    "native-editor-1.log": "24de822353dce106c74ada5e07505ef754750970040d3f60b2cd6d9dda34a274",
+    "native-editor-3.log": "6d738aa3a5ecc7caec72c48267150392ed5344c0e8d1d7e302bd75a1f8ae2336",
+    "native-editor-2.log": "6d738aa3a5ecc7caec72c48267150392ed5344c0e8d1d7e302bd75a1f8ae2336",
+    "editor-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "editor-race.log": "0ba35456bf143ceafd2fcf3739c833d9cab0aca575c4f9dbe90b75a008c6d6c1",
+    "editor-build.log": "905a7da78c61b05fffd2fe552eb734eb8e81057a78beed8de61a626721dedec3",
+    "focused-race20.log": "cddb1cb0748529d44e708fed9f4977c531607dfb96170197b2e9823a4c445f75",
+    "driver-race.log": "96494b92a3e2f664a72b0779bb3671ab9d2028d13875d537d500a848e11d833f",
+    "driver-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
