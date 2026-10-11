@@ -1,0 +1,87 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "598949d2d890611f00cf4d4113a0c00f",
+  "repo": {
+    "root": "/private/tmp/vellum-large-data",
+    "head": "381f0310d7904dc7754ab9bf8d11a922a66fc660",
+    "branch": "codex/render-source-metrics"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 62284,
+    "totalMs": 26540
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 23,
+    "bytes": 141200,
+    "chunks": 7,
+    "llmCalls": 7,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 80135,
+        "output": 7251,
+        "costUSD": 0.23278
+      }
+    ],
+    "widenedFiles": 8,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "6e7a58da88c9a5c0",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Unchecked type assertions in DrawMeasured can panic the render path",
+        "message": "DrawMeasured uses unchecked type assertions on the composer and on `ps.renderer`. Any other composer or renderer implementation panics inside the render/compose path, and only when diagnostics are enabled. The opt-in diagnostic path should not be able to crash the UI. The same pattern is repeated in scrimSource and fillInsetsSource.",
+        "suggestion": "Use the comma-ok form. If the assertion fails, fall back to `ps.Draw(c)` and return a SourceTiming with the availability flags false, so the source is still drawn exactly once and nothing panics.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "core/render_source_timing.go",
+            "lines": {
+              "start": 21,
+              "end": 22
+            }
+          }
+        ],
+        "tags": [
+          "panic",
+          "type-assertion",
+          "diagnostics"
+        ],
+        "evidence": "cd := c.(*composer.ComposerDrawer)\n\trd := ps.renderer.(*rasterx.Renderer)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "path not in diff"
+    }
+  ],
+  "suppressed": []
+}

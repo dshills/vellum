@@ -44,7 +44,93 @@ def distribution(values):
             "coefficient_of_variation": sd / mean if mean else 0.0}
 
 
-def validate_records(records, rows, variable, samples, novel, *, allow_profile=False):
+SOURCE_RECORD_FIELDS = {
+    "Composition", "Source", "Kind", "DrawNS", "RasterNS", "CopyNS",
+    "RasterAvailable", "CopyAvailable", "ImageWidth", "ImageHeight", "ImageChanged",
+    "ImageUploadTimingAvailable", "SetFromGoImageNS", "SetFromGoImageAttempts",
+    "ImageCacheHits", "LogicalUploadRGBABytes",
+}
+INT64_MAX = (1 << 63) - 1
+UINT64_MAX = (1 << 64) - 1
+MAX_SOURCE_RECORDS = 32
+MAX_SOURCE_CAPACITY = 4096
+
+
+def source_integer(record, field, maximum):
+    value = record.get(field)
+    if type(value) is not int or not 0 <= value <= maximum:
+        raise ValueError(f"invalid bounded source integer {field}")
+    return value
+
+
+def validate_source_details(details, raster_upload_ns):
+    """Scalar diagnostics nested inside the ticket, never additional UI work."""
+    if type(details) is not dict or set(details) != {"Compositions", "UploadFailuresAvailable", "Records"}:
+        raise ValueError("invalid source details schema")
+    if details["UploadFailuresAvailable"] is not False:
+        raise ValueError("source upload success/failures are unavailable")
+    compositions = source_integer(details, "Compositions", MAX_SOURCE_RECORDS)
+    records = details["Records"]
+    if compositions == 0 or type(records) is not list or not 1 <= len(records) <= MAX_SOURCE_RECORDS:
+        raise ValueError("source record/composition capacity exceeded or empty")
+    composition, source, draw_total = 0, 0, 0
+    totals = {name: 0 for name in ("SetFromGoImageAttempts", "ImageCacheHits", "LogicalUploadRGBABytes")}
+    for record in records:
+        if type(record) is not dict or set(record) != SOURCE_RECORD_FIELDS:
+            raise ValueError("invalid source record scalar schema")
+        current = source_integer(record, "Composition", MAX_SOURCE_RECORDS)
+        ordinal = source_integer(record, "Source", MAX_SOURCE_RECORDS - 1)
+        if current == 0:
+            raise ValueError("source composition ordinal must start at one")
+        if current == composition + 1:
+            composition, source = current, 0
+        if current != composition or ordinal != source:
+            raise ValueError("unordered, missing or repeated source/composition ordinal")
+        source += 1
+        source_integer(record, "Kind", 4)
+        for flag in ("RasterAvailable", "CopyAvailable", "ImageChanged", "ImageUploadTimingAvailable"):
+            if type(record[flag]) is not bool:
+                raise ValueError(f"invalid source availability/change flag {flag}")
+        draw, raster, copy, upload = (source_integer(record, name, INT64_MAX) for name in
+                                      ("DrawNS", "RasterNS", "CopyNS", "SetFromGoImageNS"))
+        if raster + copy > draw or upload > draw or record["CopyAvailable"] and upload > copy:
+            raise ValueError("source nested interval exceeds enclosing draw/copy")
+        if not record["RasterAvailable"] and raster or not record["CopyAvailable"] and copy:
+            raise ValueError("unavailable source interval fabricated")
+        width = source_integer(record, "ImageWidth", INT64_MAX)
+        height = source_integer(record, "ImageHeight", INT64_MAX)
+        attempts, hits, logical_bytes = (source_integer(record, name, UINT64_MAX) for name in totals)
+        if not record["ImageUploadTimingAvailable"] and (upload or attempts or hits or logical_bytes):
+            raise ValueError("unavailable image API counters fabricated")
+        if attempts == 0 and (upload or logical_bytes):
+            raise ValueError("image API time/bytes without an attempt")
+        if logical_bytes % 4:
+            raise ValueError("logical input RGBA bytes must be a multiple of four")
+        if record["RasterAvailable"] and record["CopyAvailable"]:
+            # Known paint sources make one Copy of the reported full image.
+            # Unknown/custom sources can copy multiple different images; their
+            # aggregate counters must not be inferred from a fabricated extent.
+            if attempts + hits > 1:
+                raise ValueError("known source made more than one image API use")
+            if record["ImageChanged"] and hits:
+                raise ValueError("changed source image cannot take unchanged image cache hit")
+            extent_bytes = 4 * width * height
+            if extent_bytes > UINT64_MAX or extent_bytes * attempts > UINT64_MAX:
+                raise ValueError("logical image extent overflow")
+            if logical_bytes != extent_bytes * attempts:
+                raise ValueError("logical image attempt bytes differ from full extent")
+        for name, value in zip(totals, (attempts, hits, logical_bytes)):
+            totals[name] += value
+            if totals[name] > UINT64_MAX:
+                raise ValueError("source ticket counter/byte sum overflow")
+        draw_total += draw
+    if composition != compositions:
+        raise ValueError("source composition count differs from records")
+    if draw_total > raster_upload_ns:
+        raise ValueError("source draw sum exceeds ticket raster/upload interval")
+
+
+def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False):
     """Require exact case, current completed geometry and one sample per tag."""
     if len(records) != samples + 3 or [r.get("event") for r in records[:2]] != ["grid.perf.setup", "grid.perf.ready"] or records[-1].get("event") != "grid.perf.end":
         raise ValueError("missing, repeated or unordered benchmark stages")
@@ -57,6 +143,15 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
         raise ValueError("diagnostic CPU profile cannot qualify warm timing")
     if any(r.get("cpu_profile", False) is not profiled for r in (ready, end)):
         raise ValueError("CPU profiling case identity mismatch")
+    detailed = setup.get("source_details", False)
+    if type(detailed) is not bool or detailed and not allow_source_details:
+        raise ValueError("diagnostic source details cannot qualify warm timing")
+    if any(r.get("source_details", False) is not detailed for r in (ready, end)):
+        raise ValueError("source detail case identity mismatch")
+    if detailed:
+        warmup = ready.get("warmup")
+        if type(warmup) is not int or not 64 <= warmup <= 2048 or warmup % 64 or type(samples) is not int or not 120 <= samples <= 2048 or warmup + samples + 2 > MAX_SOURCE_CAPACITY:
+            raise ValueError("detailed recorder warmup/sample capacity invalid")
     if setup.get("release") is not True or setup.get("stored_value_bytes") != rows * 20 * 8 or setup.get("seed") != 7:
         raise ValueError("release stored-data fixture required")
     if end.get("samples") != samples or end.get("dropped") != 0 or end.get("pending") != 0 or end.get("callbacks") != samples:
@@ -64,7 +159,7 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
     result = []
     last_generation = last_frame = 0
     for i, record in enumerate(records[2:-1]):
-        if record.get("event") != "grid.perf.sample" or record.get("index") != i or record.get("tag") != i + 1:
+        if record.get("event") != "grid.perf.sample" or type(record.get("index")) is not int or record.get("index") != i or type(record.get("tag")) is not int or record.get("tag") != i + 1:
             raise ValueError("sample ordering/tag mismatch")
         geometry = record.get("geometry", {})
         counts = [geometry.get(k) for k in ("cells", "rows", "columns")]
@@ -77,25 +172,32 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
         if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
             raise ValueError("invalid measured layout identity")
         identities = [record.get(k) for k in ("generation", "frame")]
-        if any(isinstance(n, bool) or not isinstance(n, int) or n <= 0 for n in identities):
+        if any(isinstance(n, bool) or not isinstance(n, int) or not 0 < n <= UINT64_MAX for n in identities):
             raise ValueError("missing completed native generation/frame")
         if record["generation"] <= last_generation or record["frame"] <= last_frame:
             raise ValueError("repeated or backward native generation/frame")
         last_generation, last_frame = record["generation"], record["frame"]
         native = record.get("native_sample", {})
-        if native.get("Tag") != i+1 or native.get("Generation") != record["generation"] or native.get("Window") != "perf" or native.get("Completed") is not True or native.get("Failure"):
+        if record.get("source_details", False) is not detailed:
+            raise ValueError("sample source detail mode identity mismatch")
+        details = native.get("SourceDetails")
+        if not detailed and details is not None:
+            raise ValueError("diagnostic source details cannot qualify warm timing")
+        if type(native.get("Tag")) is not int or native.get("Tag") != i+1 or type(native.get("Generation")) is not int or native.get("Generation") != record["generation"] or native.get("Window") != "perf" or native.get("Completed") is not True or native.get("Failure") != "":
             raise ValueError("raw native ticket/frame mismatch")
-        if record.get("callbacks") != 1:
+        if type(record.get("callbacks")) is not int or record.get("callbacks") != 1:
             raise ValueError("scroll failed or callback executed more than once")
         metrics = record.get("metrics", {})
         if any(k not in metrics for k in METRICS):
             raise ValueError("incomplete actual timing phases")
         for name in METRICS:
             value = metrics[name]
-            if isinstance(value, bool) or not isinstance(value, int) or value < 0 or value != native.get(NATIVE_PHASES[name]):
+            if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= INT64_MAX or type(native.get(NATIVE_PHASES[name])) is not int or value != native.get(NATIVE_PHASES[name]):
                 raise ValueError("reported timing differs from raw native sample")
         if metrics["ui_work_ns"] != sum(metrics[k] for k in WORK_PHASES):
             raise ValueError("same-ticket total does not match measured work phases")
+        if detailed:
+            validate_source_details(details, metrics["raster_upload_ns"])
         result.append(record)
     return result
 
@@ -132,11 +234,14 @@ def process_sample(pid):
             "cpu_quantum_seconds": quantum, "source": "ps; RSS is process-wide"}
 
 
-def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None):
+def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None, source_details=False):
+    if type(source_details) is not bool or source_details and (type(samples) is not int or type(warmup) is not int or warmup + samples + 2 > MAX_SOURCE_CAPACITY):
+        raise ValueError("invalid source detail mode/recorder capacity")
     directory.mkdir(parents=True, exist_ok=False)
     argv = [str(binary), "-perf", f"-rows={rows}", f"-perf-samples={samples}", f"-perf-warmup={warmup}"]
     if cpu_profile is not None:
         argv.append(f"-perf-cpu-profile={cpu_profile}")
+    if source_details: argv.append("-perf-source-details")
     if variable: argv.append("-variable-rows")
     if novel: argv.append("-perf-novel")
     process_options = {"start_new_session": True} if os.name != "nt" else {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
@@ -187,9 +292,14 @@ def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout,
             returncode = process.wait(timeout=max(.01, timeout - (time.monotonic() - started)))
             if pending: raise ValueError("incomplete benchmark record at EOF")
             if returncode != 0: raise RuntimeError(f"native benchmark exited {returncode}")
-            selected = validate_records(records, rows, variable, samples, novel, allow_profile=cpu_profile is not None)
+            selected = validate_records(records, rows, variable, samples, novel, allow_profile=cpu_profile is not None,
+                                        allow_source_details=source_details)
             if records[0].get("cpu_profile", False) is not (cpu_profile is not None):
                 raise ValueError("requested CPU profile case mismatch")
+            if records[0].get("source_details", False) is not source_details:
+                raise ValueError("requested source detail case mismatch")
+            if source_details and records[1]["warmup"] != warmup:
+                raise ValueError("requested detailed warmup count mismatch")
         except BaseException as error:
             failure = f"{type(error).__name__}: {error}"
             raise
@@ -250,10 +360,20 @@ def selected_inputs():
     root = HERE.parent
     candidates = list((root / "examples/loadedgrid").glob("*.go"))
     candidates += list((root / "drivers/cogent").glob("frame_metrics*.go"))
+    candidates += list((root / "drivers/cogent").glob("frame_source_metrics*.go"))
     candidates += list((root / "drivers/cogent").glob("grid*.go"))
     candidates += [root / path for path in ("go.mod", "go.sum", "examples/loadedgrid/go.mod", "examples/loadedgrid/go.sum",
                     "drivers/cogent/driver.go", "drivers/cogent/native/dependencies.json", "scripts/benchmark-grid.py")]
     return {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(set(candidates)) if path.is_file()}
+
+
+def warm_target_met(cases, *, novel=False, source_details=False):
+    # Explicit instrumentation is diagnostic even if its observed intervals
+    # happen to be below the unchanged normal warm-work targets.
+    return (not novel and not source_details and bool(cases) and
+            all(bool(case["timings_ns"]["ui_work_ns"]["per_run"]) and
+                all(run["p95"] <= 4_000_000 and run["p99"] <= 6_000_000
+                    for run in case["timings_ns"]["ui_work_ns"]["per_run"]) for case in cases.values()))
 
 
 def main():
@@ -265,12 +385,15 @@ def main():
     parser.add_argument("--samples", type=int, default=120)
     parser.add_argument("--warmup", type=int, default=128)
     parser.add_argument("--novel", action="store_true", help="separate newly visited row strings; not a cold-font claim")
+    parser.add_argument("--source-details", action="store_true", help="diagnostic nested source/image API costs; excluded from warm targets")
     parser.add_argument("--timeout", type=float, default=180)
     args = parser.parse_args()
     if not args.run: parser.error("--run is required; this tool launches visible native windows")
     if platform.system() != "Darwin": parser.error("this checkpoint measures the actual Mac backend")
     if not 5 <= args.runs <= 20 or not 120 <= args.samples <= 2048 or not 64 <= args.warmup <= 2048 or args.warmup % 64 or not math.isfinite(args.timeout) or not 10 <= args.timeout <= 600:
         parser.error("runs5..20, samples120..2048, warmup64..2048 in multiples64, timeout10..600 required")
+    if args.source_details and args.warmup + args.samples + 2 > MAX_SOURCE_CAPACITY:
+        parser.error("detailed recorder warmup+samples+2 must not exceed4096")
     binary = args.binary.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=False)
     source_before = selected_inputs()
@@ -284,7 +407,8 @@ def main():
               "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
               "host": platform.platform(), "machine": platform.machine(), "machine_metadata": "machine.json",
               "selected_inputs_before": source_before, "input_scope": "selected sources, not complete compiler/dependency closure", "runs": args.runs,
-              "samples_per_run": args.samples, "warmup": args.warmup, "novel": args.novel, "cases": {},
+              "samples_per_run": args.samples, "warmup": args.warmup, "novel": args.novel,
+              "source_details": args.source_details, "diagnostic": args.source_details, "cases": {},
               "scope": "release actual widget routing/frame elapsed work; end-only process-wide RSS/CPU and staged Go observations; baseline/warm process RSS, process CPU deltas, native/GPU allocations and compositor presentation unavailable"}
     try:
         for variable in (False, True):
@@ -293,7 +417,8 @@ def main():
                 case = f"{'variable' if variable else 'fixed'}-{rows}"
                 all_runs, raw = [], []
                 for index in range(args.runs):
-                    measured, outcome = run_case(binary, args.output / case / f"run-{index+1}", rows, variable, args.samples, args.warmup, args.novel, args.timeout)
+                    measured, outcome = run_case(binary, args.output / case / f"run-{index+1}", rows, variable, args.samples, args.warmup, args.novel, args.timeout,
+                                                source_details=args.source_details)
                     all_runs.append(measured); raw.append(outcome)
                     if hashlib.sha256(binary.read_bytes()).hexdigest() != report["binary_sha256"]:
                         raise ValueError("binary changed during measurement")
@@ -306,10 +431,10 @@ def main():
         source_after = selected_inputs()
         report["selected_inputs_after"] = source_after
         if source_before != source_after: raise ValueError("selected source changed during measurement")
-        report["result"] = "MEASURED"
+        report["result"] = "DIAGNOSTIC" if args.source_details else "MEASURED"
         # Targets are fixed provisional P6 thresholds, not changed by this tool.
         report["warm_targets_ns"] = {"p95": 4_000_000, "p99": 6_000_000}
-        report["warm_target_met"] = (not args.novel and all(all(r["p95"] <= 4_000_000 and r["p99"] <= 6_000_000 for r in v["timings_ns"]["ui_work_ns"]["per_run"]) for v in report["cases"].values()))
+        report["warm_target_met"] = warm_target_met(report["cases"], novel=args.novel, source_details=args.source_details)
         report["rowcount_p95_ratios"] = {}
         for heights in ("fixed", "variable"):
             small = report["cases"][f"{heights}-10000"]["timings_ns"]["ui_work_ns"]["pooled"]["p95"]

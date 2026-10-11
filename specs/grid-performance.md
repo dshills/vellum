@@ -155,6 +155,32 @@ percentiles are not additive. Both unchanged 4/6 ms targets still fail. Software
 pixel/copy proofs do not measure native GPU upload counts, partial uploads or
 process-wide wakeups. Full P6 remains open.
 
+## Diagnostic source costs
+
+`-perf-source-details` requires `-perf` and selects the separate detailed frame
+recorder. Setup/ready/sample/end agree on `source_details`; ordinary historical
+records missing that flag mean false. Warmup+samples+2 must fit the 4096-ticket
+diagnostic capacity. Each successful Native sample exposes at most 32 scalar
+source records across its complete ticket. Availability, ordinals, nested
+intervals, full-input logical bytes and aggregate counters are validated.
+Source details are rejected by ordinary warm-budget validation even when CPU
+profile records are separately allowed. The explicit CLI mode always reports
+DIAGNOSTIC with warm_target_met false.
+
+All nested costs follow [the rendering contract](rendering.md). Image API time
+and attempted logical RGBA input bytes cannot identify confirmed upload success,
+physical transfer bytes or GPU completion. Unknown/custom sources may copy
+multiple differently sized images; their aggregate bytes must not be inferred
+from a fabricated common extent. Detail elapsed timings include diagnostic
+overhead and remain separate from ordinary release comparisons and the full
+five-process P6 qualification.
+
+```sh
+python3 scripts/benchmark-grid.py --run --source-details \
+  --binary /private/tmp/vellum-loadedgrid-perf \
+  --output /private/tmp/vellum-grid-source-costs --runs 5 --samples 120 --warmup 128
+```
+
 ## Diagnostic CPU profiling
 
 `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide

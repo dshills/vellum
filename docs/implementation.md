@@ -253,3 +253,14 @@ interleaved optimized fixed-10k processes per build observe pooled p95
 14.178→13.090 ms and p99 14.891→13.294 ms. The unchanged 4/6 ms targets still fail.
 The full P6 campaign and broader Mac acceptance remain open; further raster/upload
 attribution and any bounded damage policy require separate work and evidence.
+
+The [source-cost checkpoint](reports/macos-source-costs/README.md) now exposes
+explicit scalar source diagnostics with shared ticket bounds and deep snapshots.
+Default ComposeMeasured and normal Draw bodies retain their calls; opt-in costs
+remain nested, with unavailable GPU success/failure stated explicitly. Final
+race/vet/packaging and meaningful mutation regressions pass. Three optimized
+fixed-10k detailed processes identify CPU scene rasterization as about 79% of
+source Draw time, compared with about 21% in Copy/image API work. The next
+performance experiment should reduce unnecessary raster work while preserving
+paint/composition correctness. Detailed timings cannot qualify warm targets;
+full P6 and broader Mac acceptance remain open.

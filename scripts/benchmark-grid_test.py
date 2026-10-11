@@ -33,6 +33,149 @@ def records(samples=120):
     return result
 
 
+def source_record(**overrides):
+    value = {"Composition": 1, "Source": 0, "Kind": 1, "DrawNS": 90, "RasterNS": 40, "CopyNS": 30,
+             "RasterAvailable": True, "CopyAvailable": True, "ImageWidth": 10, "ImageHeight": 20,
+             "ImageChanged": True, "ImageUploadTimingAvailable": True, "SetFromGoImageNS": 20,
+             "SetFromGoImageAttempts": 1, "ImageCacheHits": 0, "LogicalUploadRGBABytes": 800}
+    value.update(overrides)
+    return value
+
+
+def detailed_records(samples=120, warmup=128):
+    data = records(samples)
+    for record in data: record["source_details"] = True
+    data[1]["warmup"] = warmup
+    for sample in data[2:-1]:
+        sample["metrics"]["raster_upload_ns"] = 100
+        sample["metrics"]["ui_work_ns"] = sum(sample["metrics"][field] for field in benchmark.WORK_PHASES)
+        sample["native_sample"].update({native: sample["metrics"][name] for name, native in benchmark.NATIVE_PHASES.items()})
+        sample["native_sample"]["SourceDetails"] = {"Compositions": 1, "UploadFailuresAvailable": False,
+                                                   "Records": [source_record()]}
+    return data
+
+
+class SourceDetailTests(unittest.TestCase):
+    def validate(self, data):
+        return benchmark.validate_records(data, 10000, False, 120, False, allow_source_details=True)
+
+    def test_historical_ordinary_records_and_explicit_false_remain_ordinary(self):
+        data = records()
+        self.assertEqual(len(benchmark.validate_records(data, 10000, False, 120, False)), 120)
+        for r in data: r["source_details"] = False
+        for r in data[2:-1]: r["native_sample"]["SourceDetails"] = None
+        self.assertEqual(len(benchmark.validate_records(data, 10000, False, 120, False)), 120)
+
+    def test_explicit_diagnostic_is_separate_from_profile_and_ui_total(self):
+        data = detailed_records()
+        for options in ({}, {"allow_profile": True}):
+            with self.assertRaisesRegex(ValueError, "diagnostic"):
+                benchmark.validate_records(data, 10000, False, 120, False, **options)
+        selected = self.validate(data)
+        first = selected[0]
+        self.assertEqual(first["metrics"]["ui_work_ns"], 106)
+        self.assertEqual(first["native_sample"]["SourceDetails"]["Records"][0]["LogicalUploadRGBABytes"], 800)
+        # Nested90/40/30/20 durations remain raw diagnostics; none are added to
+        # the original100 raster/upload interval or106 total work sample.
+        self.assertEqual(benchmark.summarize([selected])["ui_work_ns"]["pooled"]["min"], 106)
+
+    def test_known_skipped_raster_cache_hit_and_unknown_multiple_image_calls(self):
+        data = detailed_records()
+        detail = data[2]["native_sample"]["SourceDetails"]
+        detail["Records"] = [source_record(DrawNS=40, RasterNS=0, CopyNS=20, ImageChanged=False,
+                                          SetFromGoImageNS=0, SetFromGoImageAttempts=0, ImageCacheHits=1,
+                                          LogicalUploadRGBABytes=0),
+                             source_record(Source=1, Kind=0, DrawNS=50, RasterNS=0, CopyNS=0,
+                                          RasterAvailable=False, CopyAvailable=False, ImageWidth=0, ImageHeight=0,
+                                          SetFromGoImageNS=20, SetFromGoImageAttempts=2, ImageCacheHits=3,
+                                          LogicalUploadRGBABytes=1600)]
+        self.assertEqual(len(self.validate(data)), 120)
+
+    def test_prefix_compositions_share_exact32_ticket_cap(self):
+        rows = [source_record(Composition=i//16+1, Source=i%16, DrawNS=1, RasterNS=0, CopyNS=0,
+                              ImageUploadTimingAvailable=False, SetFromGoImageNS=0,
+                              SetFromGoImageAttempts=0, ImageCacheHits=0, LogicalUploadRGBABytes=0)
+                for i in range(32)]
+        detail = {"Compositions": 2, "UploadFailuresAvailable": False, "Records": rows}
+        benchmark.validate_source_details(detail, 32)
+        rows.append(source_record(Composition=3))
+        detail["Compositions"] = 3
+        with self.assertRaisesRegex(ValueError, "capacity"):
+            benchmark.validate_source_details(detail, 1000)
+
+    def test_mode_metadata_and_presence_corruption_refuse(self):
+        changes = [lambda d:d[0].update(source_details="true"), lambda d:d[1].update(source_details=False),
+                   lambda d:d[-1].update(source_details=False), lambda d:d[3].update(source_details=False),
+                   lambda d:d[2]["native_sample"].pop("SourceDetails"),
+                   lambda d:d[1].update(warmup=2049), lambda d:d[1].update(warmup=True)]
+        for change in changes:
+            data = detailed_records(); change(data)
+            with self.assertRaises(ValueError): self.validate(data)
+        ordinary = records()
+        ordinary[2]["native_sample"]["SourceDetails"] = {"Compositions": 1, "UploadFailuresAvailable": False, "Records": []}
+        with self.assertRaisesRegex(ValueError, "diagnostic"):
+            benchmark.validate_records(ordinary, 10000, False, 120, False, allow_source_details=True)
+
+    def test_detailed_capacity_counts_both_warmup_and_sample_tickets(self):
+        data = detailed_records(samples=2048, warmup=2048)
+        with self.assertRaisesRegex(ValueError, "capacity"):
+            benchmark.validate_records(data, 10000, False, 2048, False, allow_source_details=True)
+
+    def test_missing_repeated_skipped_and_invalid_ordinals_refuse(self):
+        changes = [lambda d:d.update(Compositions=0), lambda d:d.update(Compositions=2),
+                   lambda d:d["Records"][0].update(Composition=0), lambda d:d["Records"][0].update(Composition=2),
+                   lambda d:d["Records"][0].update(Source=1), lambda d:d["Records"][0].update(Source=32),
+                   lambda d:d["Records"].append(copy.deepcopy(d["Records"][0]))]
+        for change in changes:
+            data = detailed_records(); detail = data[2]["native_sample"]["SourceDetails"]; change(detail)
+            with self.assertRaises(ValueError): self.validate(data)
+
+    def test_scalar_schema_availability_and_nested_interval_corruption_refuse(self):
+        changes = [{"Kind": 5}, {"DrawNS": True}, {"DrawNS": -1}, {"DrawNS": 1<<63}, {"ImageChanged": 1},
+                   {"DrawNS": 60}, {"CopyNS": 10}, {"RasterAvailable": False}, {"CopyAvailable": False},
+                   {"ImageUploadTimingAvailable": False}, {"SetFromGoImageAttempts": 0},
+                   {"ImageWidth": -1}, {"ImageWidth": 1<<63}, {"ImageWidth": 1<<62},
+                   {"LogicalUploadRGBABytes": 804}, {"LogicalUploadRGBABytes": 801},
+                   {"ImageCacheHits": 1}, {"SetFromGoImageAttempts": 1<<64}, {"user_text": "forbidden"}]
+        changes.append({"SetFromGoImageAttempts": 0, "SetFromGoImageNS": 0,
+                        "LogicalUploadRGBABytes": 0, "ImageCacheHits": 1})
+        for change in changes:
+            data = detailed_records(); data[2]["native_sample"]["SourceDetails"]["Records"][0].update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError): self.validate(data)
+        for change in (lambda d:d.update(UploadFailuresAvailable=True), lambda d:d.update(Records=None),
+                       lambda d:d.update(Records=[]), lambda d:d.update(Image=None)):
+            data = detailed_records(); change(data[2]["native_sample"]["SourceDetails"])
+            with self.assertRaises(ValueError): self.validate(data)
+
+    def test_native_ticket_scalar_corruption_cannot_hide_behind_numeric_equality(self):
+        for field, value in (("Tag", True), ("Generation", 1.0), ("InputNS", True), ("InputNS", 1.0)):
+            data = detailed_records(); data[2]["native_sample"][field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError): self.validate(data)
+        for field, value in (("tag", True), ("index", False), ("callbacks", True)):
+            data = detailed_records(); data[2][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError): self.validate(data)
+
+    def test_ticket_draw_and_counter_overflow_refuse(self):
+        detail = {"Compositions": 1, "UploadFailuresAvailable": False, "Records": [source_record()]}
+        with self.assertRaisesRegex(ValueError, "draw sum"):
+            benchmark.validate_source_details(detail, 89)
+        for field in ("SetFromGoImageAttempts", "ImageCacheHits", "LogicalUploadRGBABytes"):
+            rows = [source_record(Source=i, Kind=0, DrawNS=1, RasterNS=0, CopyNS=0, RasterAvailable=False,
+                                  CopyAvailable=False, ImageWidth=0, ImageHeight=0, SetFromGoImageNS=0,
+                                  SetFromGoImageAttempts=1, ImageCacheHits=0, LogicalUploadRGBABytes=0) for i in range(2)]
+            for row in rows: row[field] = benchmark.UINT64_MAX - (3 if field=="LogicalUploadRGBABytes" else 0)
+            detail["Records"] = rows
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "sum overflow"):
+                benchmark.validate_source_details(detail, 2)
+
+    def test_nested_mode_cannot_claim_normal_warm_targets(self):
+        cases = {"fixed-10000": {"timings_ns": {"ui_work_ns": {"per_run": [{"p95": 1, "p99": 1}]}}}}
+        self.assertTrue(benchmark.warm_target_met(cases))
+        self.assertFalse(benchmark.warm_target_met(cases, source_details=True))
+        self.assertFalse(benchmark.warm_target_met(cases, novel=True))
+        self.assertFalse(benchmark.warm_target_met({}))
+
+
 class StatisticsTests(unittest.TestCase):
     def test_nearest_rank_outliers_are_retained(self):
         result = benchmark.distribution(list(range(1, 100))+[10000])
@@ -112,19 +255,20 @@ class FakeProcess:
 
 
 class ProcessTests(unittest.TestCase):
-    def run_fixture(self, data):
+    def run_fixture(self, data, *, source_details=False):
         payload = b"native ordinary log\n" + b"\n".join(json.dumps(v).encode() for v in data)+b"\n"
         process = FakeProcess(payload)
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)/"run"
             with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group") as kill:
-                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5)
+                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5, source_details=source_details)
                 except Exception as error: result = error
             raw = (directory/"native.log").read_bytes()
             outcome = json.loads((directory/"result.json").read_text())
             self.assertEqual(raw, payload)
             self.assertEqual(launch.call_args.kwargs["bufsize"], 0)
             self.assertTrue(launch.call_args.kwargs["start_new_session"])
+            self.assertEqual("-perf-source-details" in launch.call_args.args[0], source_details)
             observe.assert_called_once_with(process.pid)
             return result, outcome
 
@@ -177,6 +321,38 @@ class ProcessTests(unittest.TestCase):
         self.assertIn("completion mismatch", outcome["error"])
         self.assertEqual(len(outcome["log_sha256"]), 64)
 
+    def test_detailed_flag_and_exact_nested_raw_records_are_preserved(self):
+        data = detailed_records()
+        result, outcome = self.run_fixture(data, source_details=True)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(outcome["records"], data)
+        self.assertEqual(outcome["result"], "PASS")
+
+    def test_requested_detail_mode_refuses_ordinary_result_even_when_other_fields_match(self):
+        result, outcome = self.run_fixture(records(), source_details=True)
+        self.assertIsInstance(result, ValueError)
+        self.assertIn("requested source detail", outcome["error"])
+
+    def test_requested_detailed_warmup_must_match_ready_metadata(self):
+        result, outcome = self.run_fixture(detailed_records(warmup=64), source_details=True)
+        self.assertIsInstance(result, ValueError)
+        self.assertIn("warmup count mismatch", outcome["error"])
+
+    def test_corrupt_detailed_result_retains_raw_failure_without_warm_fallback(self):
+        data = detailed_records()
+        data[2]["native_sample"]["SourceDetails"]["Records"][0]["LogicalUploadRGBABytes"] = 0
+        result, outcome = self.run_fixture(data, source_details=True)
+        self.assertIsInstance(result, ValueError)
+        self.assertEqual(outcome["result"], "FAILED")
+        self.assertEqual(outcome["records"], data)
+
+    def test_detail_capacity_refusal_happens_before_any_launch(self):
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(benchmark.subprocess, "Popen") as launch:
+            with self.assertRaisesRegex(ValueError, "capacity"):
+                benchmark.run_case(Path("fake"), Path(temp)/"run", 10000, False, 2048, 2048, False, 5, source_details=True)
+            launch.assert_not_called()
+            self.assertFalse((Path(temp)/"run").exists())
+
 
 class SetupFailureTests(unittest.TestCase):
     def test_launch_failure_records_terminal_failure(self):
@@ -214,6 +390,41 @@ class SetupFailureTests(unittest.TestCase):
                 self.assertIn('fixture selector unavailable',result['error'])
         finally:
             process.stdout.close()
+
+
+class DiagnosticReportTests(unittest.TestCase):
+    def test_cli_detailed_campaign_is_labeled_diagnostic_even_below_warm_targets(self):
+        selected = benchmark.validate_records(detailed_records(), 10000, False, 120, False, allow_source_details=True)
+        for sample in selected:
+            sample.update(go_process_alloc_bytes=1, go_process_mallocs=1, source_callbacks={"Keys": 1, "Inverse": 1, "Cells": 1})
+        with tempfile.TemporaryDirectory() as temp:
+            binary = Path(temp)/"binary"; binary.write_bytes(b"CPU-only test fixture, never launched")
+            output = Path(temp)/"results"
+            argv = ["benchmark-grid.py", "--run", "--binary", str(binary), "--output", str(output), "--source-details"]
+            with mock.patch.object(benchmark.sys, "argv", argv), mock.patch.object(benchmark.platform, "system", return_value="Darwin"), \
+                 mock.patch.object(benchmark, "metadata_command", return_value={}), mock.patch.object(benchmark, "selected_inputs", return_value={}), \
+                 mock.patch.object(benchmark, "run_case", return_value=(selected, {"result": "PASS"})) as run, \
+                 mock.patch("sys.stdout", new_callable=io.StringIO):
+                benchmark.main()
+            self.assertEqual(run.call_count, 20)
+            self.assertTrue(all(call.kwargs["source_details"] for call in run.call_args_list))
+            summary = json.loads((output/"summary.json").read_text())
+            self.assertEqual(summary["result"], "DIAGNOSTIC")
+            self.assertTrue(summary["diagnostic"])
+            self.assertTrue(summary["source_details"])
+            self.assertFalse(summary["warm_target_met"])
+            self.assertEqual(summary["warm_targets_ns"], {"p95": 4_000_000, "p99": 6_000_000})
+
+    def test_cli_detailed_capacity_refusal_precedes_output_or_process(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp)/"results"
+            argv = ["benchmark-grid.py", "--run", "--binary", str(Path(temp)/"missing"), "--output", str(output),
+                    "--source-details", "--warmup", "2048", "--samples", "2048"]
+            with mock.patch.object(benchmark.sys, "argv", argv), mock.patch.object(benchmark.platform, "system", return_value="Darwin"), \
+                 mock.patch.object(benchmark, "run_case") as run, mock.patch("sys.stderr", new_callable=io.StringIO):
+                with self.assertRaises(SystemExit): benchmark.main()
+            run.assert_not_called()
+            self.assertFalse(output.exists())
 
 
 if __name__ == "__main__": unittest.main()

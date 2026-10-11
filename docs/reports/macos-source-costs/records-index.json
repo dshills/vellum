@@ -1,0 +1,868 @@
+{
+  "archive_bytes": 6054574,
+  "archive_sha256": "8a03681a42923daacab566ced393717208bba9ae65170856dd9275cfa1b63ecd",
+  "members": {
+    "baseline-inherited-audit.json": {
+      "bytes": 882624,
+      "sha256": "c068691e297ee0244ee93702a630f192f9ab9b60af38eae2074d7203a49311ba"
+    },
+    "design-review/design.json": {
+      "bytes": 13497,
+      "sha256": "3912019d25fcd34ea177ad738b38d8be384ead5d800dcb207747b02b9992cdcd"
+    },
+    "design-review/source-inputs.json": {
+      "bytes": 3000,
+      "sha256": "742fa52c4b97a070372fa1f182b5e0b9d029815cd2c78ec02e8480571a22e877"
+    },
+    "design-review/verify.py.txt": {
+      "bytes": 536,
+      "sha256": "86c8e9b7050c0c8d0eb53283d075665862f30b127b0a7cf28424de4bd79c6b1a"
+    },
+    "final-source/docs/implementation.md.txt": {
+      "bytes": 17983,
+      "sha256": "3dce6ca4f4752180ca694c4161070adb2c6132f7c94fafb174a2fa12e1741773"
+    },
+    "final-source/drivers/cogent/build/upstream/core/frame_source_details.go.txt": {
+      "bytes": 1828,
+      "sha256": "c292616cf42911593bec66f7f2a2ddb7249500e82a8e41eff223dfab3d24f9ee"
+    },
+    "final-source/drivers/cogent/build/upstream/core/frame_source_details_test.go.txt": {
+      "bytes": 3652,
+      "sha256": "4a274d85418333cf771b28cc6341bd2da078b1cd16eface02ed6d6e0f5fce448"
+    },
+    "final-source/drivers/cogent/build/upstream/core/frame_trace.go.txt": {
+      "bytes": 9497,
+      "sha256": "a2591565da1ac7936639850d1fc6a2a6792aa7692927405b188f2e44642953a6"
+    },
+    "final-source/drivers/cogent/build/upstream/core/render_source_timing.go.txt": {
+      "bytes": 2218,
+      "sha256": "40930d58981ee2153f4565e9be753f61dc7002455d7253b716d74e88389b52de"
+    },
+    "final-source/drivers/cogent/build/upstream/core/render_source_timing_test.go.txt": {
+      "bytes": 4076,
+      "sha256": "12f6f7b187b8f4a28a925f07ca9b638c4b20c2feff83c88493ae0536b0720aee"
+    },
+    "final-source/drivers/cogent/build/upstream/core/rendersource.go.txt": {
+      "bytes": 3207,
+      "sha256": "8c0a9ff855e80fd6efe81803fce766cae0819cedf25855098ea8a91deaa2fc46"
+    },
+    "final-source/drivers/cogent/build/upstream/core/renderwindow.go.txt": {
+      "bytes": 32885,
+      "sha256": "81974eacc77240959de8d70b3c2da2d08986bdb19f931ba18e5c5fca73745c71"
+    },
+    "final-source/drivers/cogent/build/upstream/gpu/gpudraw/drawer.go.txt": {
+      "bytes": 4831,
+      "sha256": "52017b8da2a12fdefbf5573a66b5a584723efc1ee934a3f77ff27307d06f6155"
+    },
+    "final-source/drivers/cogent/build/upstream/gpu/gpudraw/drawused.go.txt": {
+      "bytes": 4614,
+      "sha256": "8428f5238f7d425dc6ce835a6d711a7b6716d83dcbc81356a208364119cb1c5f"
+    },
+    "final-source/drivers/cogent/build/upstream/gpu/gpudraw/source_timing.go.txt": {
+      "bytes": 1618,
+      "sha256": "1516efbfd78a44805ad3e949c920377605bd298780a57edcac12959693a1c306"
+    },
+    "final-source/drivers/cogent/build/upstream/gpu/gpudraw/source_timing_test.go.txt": {
+      "bytes": 2505,
+      "sha256": "3b308c59bcc76bdd80c320ae9e2dd84f861f37aa8a59db532ae9d07edd797372"
+    },
+    "final-source/drivers/cogent/build/upstream/system/composer/source_timing.go.txt": {
+      "bytes": 4348,
+      "sha256": "ed9b933ca79c57fa0e89a1299f800ffa8d73d114e90311de0d051d8bfc8a6ca1"
+    },
+    "final-source/drivers/cogent/build/upstream/system/composer/source_timing_test.go.txt": {
+      "bytes": 5593,
+      "sha256": "17684dda537c039a7413ea68c4e2f943f0b3548926dd35c60fdaad91c36f45ba"
+    },
+    "final-source/drivers/cogent/build/upstream/system/composer/timing.go.txt": {
+      "bytes": 1158,
+      "sha256": "6fe538ebbb4d9507af74579de8ccefdf48d63697a57e304598afcdd78b303816"
+    },
+    "final-source/drivers/cogent/frame_metrics.go.txt": {
+      "bytes": 10408,
+      "sha256": "e3f482051333f0dda4aa21f22a9e2517574b12ad5f5d64b167c4b7cc60910bbe"
+    },
+    "final-source/drivers/cogent/frame_source_metrics.go.txt": {
+      "bytes": 3050,
+      "sha256": "d8933382682d3d852b77505375e4e59276f06fa39fcd8e867516350b86bf1fb0"
+    },
+    "final-source/drivers/cogent/frame_source_metrics_test.go.txt": {
+      "bytes": 2673,
+      "sha256": "5347448f43b2f0ce147812a2f8def5550a5cf4fdd5e28af731f422889d38a45e"
+    },
+    "final-source/drivers/cogent/native/dependencies.json.txt": {
+      "bytes": 14982,
+      "sha256": "45cc871b66de411449f2e4d9c6de4742ce8c278eba638dc80c2cf3a18dd4bb94"
+    },
+    "final-source/drivers/cogent/native/patches/sourcecost/0036-source-cost-measurement.patch.txt": {
+      "bytes": 32757,
+      "sha256": "fc501328d61b76269f0d54ec55dcae3b269a06cdaf5e1b25aca85fd9dbea2ea9"
+    },
+    "final-source/drivers/cogent/native/patches/sourcecost/README.md.txt": {
+      "bytes": 2524,
+      "sha256": "b1b24b2fc580f7e4f364c2ec154a84342a11d0dcf111ba43b8876afb8c447366"
+    },
+    "final-source/drivers/cogent/native/patches/sourcecost/original-hashes.json.txt": {
+      "bytes": 923,
+      "sha256": "1938ca1a4f2a89380876fd6e544187ce1c2644159ba78eb86c968d4aa36778b1"
+    },
+    "final-source/drivers/cogent/native/patches/sourcecost/output-hashes.json.txt": {
+      "bytes": 1419,
+      "sha256": "1dea440eb660de3a93f764a50986d0f16b9d9c61c3ef5696f3a6ca9f9473bc65"
+    },
+    "final-source/drivers/cogent/prepare_test.py.txt": {
+      "bytes": 16346,
+      "sha256": "7d42d6cceb1f94b13b022f115105a3d010d9cc2baf6acf63b093a58a476e5b39"
+    },
+    "final-source/examples/loadedgrid/README.md.txt": {
+      "bytes": 6840,
+      "sha256": "5bf28ef9885e5d4e4e9a596338f6355989fadebe16dda00a5cea20a9bb693ced"
+    },
+    "final-source/examples/loadedgrid/main.go.txt": {
+      "bytes": 2928,
+      "sha256": "ebe290dc81204e52e8183fe5761d2cdeff8af38b2bc643e9072fe5802123ae6a"
+    },
+    "final-source/examples/loadedgrid/perf.go.txt": {
+      "bytes": 6543,
+      "sha256": "614ae37ff66d55130f1b855dd40a2c0268caaa5cc81b2a727ce0f692eb5866df"
+    },
+    "final-source/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12926,
+      "sha256": "f206e48ad600bc3f56b72a7e78836c0f8efc4c0a9cf9885081465f6ff87f8022"
+    },
+    "final-source/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 6008,
+      "sha256": "e4421b21de6a2ae1fe5ebfbb91e0d28fed6702cd296c75b650b1545116e02e9a"
+    },
+    "final-source/scripts/benchmark-grid.py.txt": {
+      "bytes": 28961,
+      "sha256": "503f752164d3902434dd500faefb1edf3784c9aa70db189f44c655b005e375c5"
+    },
+    "final-source/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 26051,
+      "sha256": "7cb2a8a1d4a65bb32a15b9b2542e04324e78a4c43c08d636bf7c3c69a90471d9"
+    },
+    "final-source/scripts/check.sh.txt": {
+      "bytes": 3385,
+      "sha256": "da7e667ace1e70b36a0ceb5fd0018d1d5d58f6a9a99cbf638aa96c41b0400b22"
+    },
+    "final-source/scripts/child_process.py.txt": {
+      "bytes": 3933,
+      "sha256": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc"
+    },
+    "final-source/scripts/sdk_environment.py.txt": {
+      "bytes": 1356,
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311"
+    },
+    "final-source/specs/grid-performance.md.txt": {
+      "bytes": 12130,
+      "sha256": "c6da06afb37d946d0418fa0ed3de6d83919b9418485f172e4f49a0d65b7784f6"
+    },
+    "final-source/specs/macos-completion.md.txt": {
+      "bytes": 11040,
+      "sha256": "31fe0c40d9abb9b8c52f512f13d82284da7781f050cbc296219938843848846d"
+    },
+    "final-source/specs/rendering.md.txt": {
+      "bytes": 9082,
+      "sha256": "a2afb327db81f960e12eb414bc18c81e1bf11571231bbe7cfc97ab92b449c746"
+    },
+    "producers/vellum-source-cost-archive.py.txt": {
+      "bytes": 3105,
+      "sha256": "0547178ef89f3476887a627e4bfb2dbb95d906c164b1184c72f743a82c6f806c"
+    },
+    "producers/vellum-source-cost-audit.py.txt": {
+      "bytes": 8626,
+      "sha256": "cc0b6f7355b68778738aee6edea061a04da2f3a36e64c7bd52d6f13e504ec1bb"
+    },
+    "producers/vellum-source-cost-check.py.txt": {
+      "bytes": 4245,
+      "sha256": "25ad5b227c05ccb68153d231987452d02309fc552f69e44af49b7bbc966f19d9"
+    },
+    "producers/vellum-source-cost-measure.py.txt": {
+      "bytes": 5097,
+      "sha256": "01f57e468f6fffb467c85f3127a8707bfc36abceaa7fc571fe9bb28bdef690ab"
+    },
+    "producers/vellum-source-cost-negative.py.txt": {
+      "bytes": 3048,
+      "sha256": "1b5bf76ec3a5d2600fe52bad1222727fe545b64eef556a38128b711ae24f141b"
+    },
+    "producers/vellum-source-cost-patch.py.txt": {
+      "bytes": 2562,
+      "sha256": "939645ccdf4139574bb1db3a76957f599ccfa268e43656dbfd8b95b42fb7511e"
+    },
+    "qualification/archive-audit-attempts/v1/attempt.json": {
+      "bytes": 241,
+      "sha256": "56ec1f359481b1bece62800a733e52d429c9366507915bfb7ae82a26efbee039"
+    },
+    "qualification/archive-audit-attempts/v1/producer.py.txt": {
+      "bytes": 7132,
+      "sha256": "aa915f32b0af2c98555cea4e108e0b268ace39506539b005b078e597282f0406"
+    },
+    "qualification/baseline-inputs.json": {
+      "bytes": 878821,
+      "sha256": "bb7a8c2b514311319d5db34e1f9532497d65ed3d540e94d5785db0b59891eae2"
+    },
+    "qualification/consumer-regression/final-v1/handoff.json": {
+      "bytes": 5739,
+      "sha256": "45342957bb581abcba0771982b1d8f9159ac135e05634af33b5755e17d67bb55"
+    },
+    "qualification/consumer-regression/final-v1/owned-sources/examples/loadedgrid/main.go.txt": {
+      "bytes": 2928,
+      "sha256": "ebe290dc81204e52e8183fe5761d2cdeff8af38b2bc643e9072fe5802123ae6a"
+    },
+    "qualification/consumer-regression/final-v1/owned-sources/examples/loadedgrid/perf.go.txt": {
+      "bytes": 6543,
+      "sha256": "614ae37ff66d55130f1b855dd40a2c0268caaa5cc81b2a727ce0f692eb5866df"
+    },
+    "qualification/consumer-regression/final-v1/owned-sources/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12926,
+      "sha256": "f206e48ad600bc3f56b72a7e78836c0f8efc4c0a9cf9885081465f6ff87f8022"
+    },
+    "qualification/consumer-regression/final-v1/owned-sources/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 6008,
+      "sha256": "e4421b21de6a2ae1fe5ebfbb91e0d28fed6702cd296c75b650b1545116e02e9a"
+    },
+    "qualification/consumer-regression/final-v1/owned-sources/scripts/benchmark-grid.py.txt": {
+      "bytes": 28961,
+      "sha256": "503f752164d3902434dd500faefb1edf3784c9aa70db189f44c655b005e375c5"
+    },
+    "qualification/consumer-regression/final-v1/owned-sources/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 26051,
+      "sha256": "7cb2a8a1d4a65bb32a15b9b2542e04324e78a4c43c08d636bf7c3c69a90471d9"
+    },
+    "qualification/consumer-regression/frozen-v1/freeze.json": {
+      "bytes": 3524,
+      "sha256": "1d69f570ee59fc965bc5c49071258943287f50206efa0784c92a5d8b6afce8fc"
+    },
+    "qualification/consumer-regression/frozen-v1/sources/examples/loadedgrid/main.go.txt": {
+      "bytes": 2928,
+      "sha256": "ebe290dc81204e52e8183fe5761d2cdeff8af38b2bc643e9072fe5802123ae6a"
+    },
+    "qualification/consumer-regression/frozen-v1/sources/examples/loadedgrid/perf.go.txt": {
+      "bytes": 6543,
+      "sha256": "614ae37ff66d55130f1b855dd40a2c0268caaa5cc81b2a727ce0f692eb5866df"
+    },
+    "qualification/consumer-regression/frozen-v1/sources/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12926,
+      "sha256": "f206e48ad600bc3f56b72a7e78836c0f8efc4c0a9cf9885081465f6ff87f8022"
+    },
+    "qualification/consumer-regression/frozen-v1/sources/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 4456,
+      "sha256": "a130f617f9055e611efbc388bd3b16791ad44b3c458989ea2fe7dee5864d201e"
+    },
+    "qualification/consumer-regression/frozen-v1/sources/scripts/benchmark-grid.py.txt": {
+      "bytes": 28961,
+      "sha256": "503f752164d3902434dd500faefb1edf3784c9aa70db189f44c655b005e375c5"
+    },
+    "qualification/consumer-regression/frozen-v1/sources/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 26051,
+      "sha256": "7cb2a8a1d4a65bb32a15b9b2542e04324e78a4c43c08d636bf7c3c69a90471d9"
+    },
+    "qualification/consumer-regression/go-v1/qualification.json": {
+      "bytes": 376,
+      "sha256": "f081d66c1220097674c46f49fe2ba0aaeee7596f682c5f6b55d9a5a935a00c80"
+    },
+    "qualification/consumer-regression/go-v1/setup-failure.log": {
+      "bytes": 305,
+      "sha256": "9e0541c541d01df77faf73d4508c2c314b2a70416db27850898146b2a8264357"
+    },
+    "qualification/consumer-regression/go-v1/wrapper.py.txt": {
+      "bytes": 4053,
+      "sha256": "1e73eb0a464ad2cd3ecb928da35282757b2f267c96bf620152580eeab76b8754"
+    },
+    "qualification/consumer-regression/go-v2/go-tests.log": {
+      "bytes": 2064,
+      "sha256": "d1cfeab71f346b377e6121cdee98070dcea222d3db9b715941ba213a9fd7bb1c"
+    },
+    "qualification/consumer-regression/go-v2/owned-sources/examples/loadedgrid/main.go.txt": {
+      "bytes": 2928,
+      "sha256": "ebe290dc81204e52e8183fe5761d2cdeff8af38b2bc643e9072fe5802123ae6a"
+    },
+    "qualification/consumer-regression/go-v2/owned-sources/examples/loadedgrid/perf.go.txt": {
+      "bytes": 6543,
+      "sha256": "614ae37ff66d55130f1b855dd40a2c0268caaa5cc81b2a727ce0f692eb5866df"
+    },
+    "qualification/consumer-regression/go-v2/owned-sources/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12926,
+      "sha256": "f206e48ad600bc3f56b72a7e78836c0f8efc4c0a9cf9885081465f6ff87f8022"
+    },
+    "qualification/consumer-regression/go-v2/owned-sources/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 6008,
+      "sha256": "e4421b21de6a2ae1fe5ebfbb91e0d28fed6702cd296c75b650b1545116e02e9a"
+    },
+    "qualification/consumer-regression/go-v2/owned-sources/scripts/benchmark-grid.py.txt": {
+      "bytes": 28961,
+      "sha256": "503f752164d3902434dd500faefb1edf3784c9aa70db189f44c655b005e375c5"
+    },
+    "qualification/consumer-regression/go-v2/owned-sources/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 26051,
+      "sha256": "7cb2a8a1d4a65bb32a15b9b2542e04324e78a4c43c08d636bf7c3c69a90471d9"
+    },
+    "qualification/consumer-regression/go-v2/qualification.json": {
+      "bytes": 1744401,
+      "sha256": "ac2a01ac4a7c56ba7a07e6040383863ac3be8ff765d2f0ee5164fe67c44f33d4"
+    },
+    "qualification/consumer-regression/initial/examples/loadedgrid/main.go.txt": {
+      "bytes": 2858,
+      "sha256": "2174d1d36f50c4d5436ff7d0457c2da4779669326adb467e843b68120faf2088"
+    },
+    "qualification/consumer-regression/initial/examples/loadedgrid/perf.go.txt": {
+      "bytes": 5958,
+      "sha256": "66224a5fe0ec25926a57b4ed7ac2ffa307068f8c8eceeed7d9a5d19cb3d5eaa2"
+    },
+    "qualification/consumer-regression/initial/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12432,
+      "sha256": "eebb07b19802963d60759c408c3282ef8b9bcb955f9f90ea6be917b4b3eef1c1"
+    },
+    "qualification/consumer-regression/initial/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 3238,
+      "sha256": "5cebd36ab18948032ec7768926bad94213f30223b4ad7cef01acd5e7cd7f4f1a"
+    },
+    "qualification/consumer-regression/initial/scripts/benchmark-grid.py.txt": {
+      "bytes": 20784,
+      "sha256": "288465d8a7515e75ac733592c964fdab0479ea7c467ffc18d16bcd3d114a73ff"
+    },
+    "qualification/consumer-regression/initial/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 12020,
+      "sha256": "2ebebd93b87d5e810b3bf11b2f610c33a60fbe32f484a230a8231000f8f8c88e"
+    },
+    "qualification/consumer-regression/initial/sources.json": {
+      "bytes": 623,
+      "sha256": "f81507bffcde0862394463619cbea918cae1f6e3d3baa56a847b650d87fc6892"
+    },
+    "qualification/consumer-regression/python-v1/python-tests.log": {
+      "bytes": 4195,
+      "sha256": "f36c4f6cdb9e572d90de624f4e2a0d814be845be25f6a7450ff079f067abf45f"
+    },
+    "qualification/consumer-regression/python-v1/qualification.json": {
+      "bytes": 2437,
+      "sha256": "34a2fdb4e664324bd03c69c0819e009b1dc616d740b8675699ebc6bc96e10442"
+    },
+    "qualification/consumer-regression/python-v1/sources/examples/loadedgrid/main.go.txt": {
+      "bytes": 2928,
+      "sha256": "ebe290dc81204e52e8183fe5761d2cdeff8af38b2bc643e9072fe5802123ae6a"
+    },
+    "qualification/consumer-regression/python-v1/sources/examples/loadedgrid/perf.go.txt": {
+      "bytes": 6543,
+      "sha256": "614ae37ff66d55130f1b855dd40a2c0268caaa5cc81b2a727ce0f692eb5866df"
+    },
+    "qualification/consumer-regression/python-v1/sources/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12926,
+      "sha256": "f206e48ad600bc3f56b72a7e78836c0f8efc4c0a9cf9885081465f6ff87f8022"
+    },
+    "qualification/consumer-regression/python-v1/sources/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 4456,
+      "sha256": "a130f617f9055e611efbc388bd3b16791ad44b3c458989ea2fe7dee5864d201e"
+    },
+    "qualification/consumer-regression/python-v1/sources/scripts/benchmark-grid.py.txt": {
+      "bytes": 28395,
+      "sha256": "15fdeb863a4fd237c4a401a05a4f0626a301f4469692f00aa848548452e96b1d"
+    },
+    "qualification/consumer-regression/python-v1/sources/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 22448,
+      "sha256": "b8cb92007bce949107da0654a3c8e8a03ea245ca117573a13271c2e2a9d7c95b"
+    },
+    "qualification/consumer-regression/python-v1/sources/scripts/child_process.py.txt": {
+      "bytes": 3933,
+      "sha256": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc"
+    },
+    "qualification/consumer-regression/python-v1/sources/scripts/sdk_environment.py.txt": {
+      "bytes": 1356,
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311"
+    },
+    "qualification/consumer-regression/python-v2/python-tests.log": {
+      "bytes": 4522,
+      "sha256": "8639314da108616a46c56705bb4f65f6bde4fa9d8dd26c1d57190fd8e8370310"
+    },
+    "qualification/consumer-regression/python-v2/qualification.json": {
+      "bytes": 2437,
+      "sha256": "e3e9f128e22b04a06c996da369ce3945e40eb3f57d43c189ec21271707c7a08c"
+    },
+    "qualification/consumer-regression/python-v2/sources/examples/loadedgrid/main.go.txt": {
+      "bytes": 2928,
+      "sha256": "ebe290dc81204e52e8183fe5761d2cdeff8af38b2bc643e9072fe5802123ae6a"
+    },
+    "qualification/consumer-regression/python-v2/sources/examples/loadedgrid/perf.go.txt": {
+      "bytes": 6543,
+      "sha256": "614ae37ff66d55130f1b855dd40a2c0268caaa5cc81b2a727ce0f692eb5866df"
+    },
+    "qualification/consumer-regression/python-v2/sources/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12926,
+      "sha256": "f206e48ad600bc3f56b72a7e78836c0f8efc4c0a9cf9885081465f6ff87f8022"
+    },
+    "qualification/consumer-regression/python-v2/sources/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 4456,
+      "sha256": "a130f617f9055e611efbc388bd3b16791ad44b3c458989ea2fe7dee5864d201e"
+    },
+    "qualification/consumer-regression/python-v2/sources/scripts/benchmark-grid.py.txt": {
+      "bytes": 28961,
+      "sha256": "503f752164d3902434dd500faefb1edf3784c9aa70db189f44c655b005e375c5"
+    },
+    "qualification/consumer-regression/python-v2/sources/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 23500,
+      "sha256": "09b783992638f88a8382960fa802429d15050d21fca7878dd140a35b1e34da8f"
+    },
+    "qualification/consumer-regression/python-v2/sources/scripts/child_process.py.txt": {
+      "bytes": 3933,
+      "sha256": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc"
+    },
+    "qualification/consumer-regression/python-v2/sources/scripts/sdk_environment.py.txt": {
+      "bytes": 1356,
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311"
+    },
+    "qualification/consumer-regression/python-v3/python-tests.log": {
+      "bytes": 4872,
+      "sha256": "05afce1615737c68947611a162cfe114aab7e76632ab07133856ff769dd80dae"
+    },
+    "qualification/consumer-regression/python-v3/qualification.json": {
+      "bytes": 2437,
+      "sha256": "ce13d4cb502dc742171b5e089f4c51eac82a347a81fae9f50f5118508641d407"
+    },
+    "qualification/consumer-regression/python-v3/sources/examples/loadedgrid/main.go.txt": {
+      "bytes": 2928,
+      "sha256": "ebe290dc81204e52e8183fe5761d2cdeff8af38b2bc643e9072fe5802123ae6a"
+    },
+    "qualification/consumer-regression/python-v3/sources/examples/loadedgrid/perf.go.txt": {
+      "bytes": 6543,
+      "sha256": "614ae37ff66d55130f1b855dd40a2c0268caaa5cc81b2a727ce0f692eb5866df"
+    },
+    "qualification/consumer-regression/python-v3/sources/examples/loadedgrid/perf_runtime.go.txt": {
+      "bytes": 12926,
+      "sha256": "f206e48ad600bc3f56b72a7e78836c0f8efc4c0a9cf9885081465f6ff87f8022"
+    },
+    "qualification/consumer-regression/python-v3/sources/examples/loadedgrid/perf_test.go.txt": {
+      "bytes": 4456,
+      "sha256": "a130f617f9055e611efbc388bd3b16791ad44b3c458989ea2fe7dee5864d201e"
+    },
+    "qualification/consumer-regression/python-v3/sources/scripts/benchmark-grid.py.txt": {
+      "bytes": 28961,
+      "sha256": "503f752164d3902434dd500faefb1edf3784c9aa70db189f44c655b005e375c5"
+    },
+    "qualification/consumer-regression/python-v3/sources/scripts/benchmark-grid_test.py.txt": {
+      "bytes": 26051,
+      "sha256": "7cb2a8a1d4a65bb32a15b9b2542e04324e78a4c43c08d636bf7c3c69a90471d9"
+    },
+    "qualification/consumer-regression/python-v3/sources/scripts/child_process.py.txt": {
+      "bytes": 3933,
+      "sha256": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc"
+    },
+    "qualification/consumer-regression/python-v3/sources/scripts/sdk_environment.py.txt": {
+      "bytes": 1356,
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311"
+    },
+    "qualification/consumer-regression/qualify-go.py.txt": {
+      "bytes": 4099,
+      "sha256": "50f188a2410b4fbc48ef2cae72f0d492b8f27a97f96b44aef2aa03b04c0fe088"
+    },
+    "qualification/consumer-regression/qualify-python.py.txt": {
+      "bytes": 2253,
+      "sha256": "6eb226453c28fc608e7651241bebb44d76db5bf367bd697ea5efa9e90e583ad6"
+    },
+    "qualification/core-v1/core-composer-gpudraw-race3.log": {
+      "bytes": 16746,
+      "sha256": "b6652451a46bd5b5e66196d6e62efcb37c643fec7de66f9b1a4c4b82cbd0b59d"
+    },
+    "qualification/core-v1/progress.json": {
+      "bytes": 1179,
+      "sha256": "b97377990250e389c0b8691e9af521b29c532831c14a251d0460520149a7d5a4"
+    },
+    "qualification/core-v1/public-source-details-race3.log": {
+      "bytes": 2612,
+      "sha256": "a9a55381d1fbe60a9da4a16393064d8a064be9b455144d381e79e77c1e35b397"
+    },
+    "qualification/core-v1/qualification.json": {
+      "bytes": 1774262,
+      "sha256": "82839f9d672c3bd081a5d5c79178ba6352f94e9a97512f4ad91fb3376b0e0202"
+    },
+    "qualification/core-v2/core-composer-gpudraw-race3.log": {
+      "bytes": 17622,
+      "sha256": "604ee801a093ac431bc98b625a992e46cd36f874932bff39fcb758fd6edaa83c"
+    },
+    "qualification/core-v2/progress.json": {
+      "bytes": 1177,
+      "sha256": "89c02d21b8c430ddeac32f1eeb48f3dd3ef7de5c41e021e679149426bdb6465c"
+    },
+    "qualification/core-v2/public-source-details-race3.log": {
+      "bytes": 3050,
+      "sha256": "8e6f0dc85ecc293b2c0a9865f11321ef18a8a7e7d2592537283fff87334f0ec5"
+    },
+    "qualification/core-v2/qualification.json": {
+      "bytes": 1774512,
+      "sha256": "ef1ae4f91ffa84476556dffabffa7cf00742399be7fb4825c092e1a98e0f414f"
+    },
+    "qualification/independent-diagnostics/v1/audit-1.log": {
+      "bytes": 1057,
+      "sha256": "436708a80d9dbaab1cd1dc4e9796c24991cca6e1189a7504d20067a9af6905fa"
+    },
+    "qualification/independent-diagnostics/v1/audit.json": {
+      "bytes": 62182,
+      "sha256": "62fb15512fe4277270c9fba39a1f85e76c27413c10e335138ec2b0d24f8c279f"
+    },
+    "qualification/independent-diagnostics/v1/audit_recipe.py.txt": {
+      "bytes": 28957,
+      "sha256": "86a635380c0363ed962c09dbaf35fabb098d6288f77e01255568427dcc76b672"
+    },
+    "qualification/integration-v1/all-adapter-offscreen-race.log": {
+      "bytes": 1848,
+      "sha256": "1412a91a0b51ac978f471fd2676e266c0c04768bc90b8942b5ac3095725a2cd9"
+    },
+    "qualification/integration-v1/loadedgrid-offscreen-race.log": {
+      "bytes": 164,
+      "sha256": "93cc22a2d7a96e34cca19867dcb7b14fc2a3e2495402994949f9d881fe9af537"
+    },
+    "qualification/integration-v1/loadedgrid-vet.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "qualification/integration-v1/progress.json": {
+      "bytes": 2997,
+      "sha256": "33e1c145dd66c75eccb2947def64dfa4b4c55f2cdb3371656c39adb35642d678"
+    },
+    "qualification/integration-v1/qualification.json": {
+      "bytes": 1776482,
+      "sha256": "330e4ec4b3f4f81f37561ec50da1dc24879eb50cad7696676971ee0df10f6a36"
+    },
+    "qualification/integration-v1/runner-tests.log": {
+      "bytes": 131,
+      "sha256": "0d69d13410324cb1988eb945cdf7f74e6414c76315bb2f13dca0340b02ab7661"
+    },
+    "qualification/integration-v1/sdk-check-tests.log": {
+      "bytes": 119,
+      "sha256": "8ab861d011f684def609597f873d869d8e4b594af4b5154d7bc7f4fc393c5f58"
+    },
+    "qualification/integration-v1/sdk-packaging-tests.log": {
+      "bytes": 391,
+      "sha256": "3fee235472abbfa492f002b383f20c9b440d82f05c94e594832d2cb95fbcebc7"
+    },
+    "qualification/integration-v1/vet-default.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "qualification/integration-v1/vet-offscreen.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "qualification/internal-final-review/v1/audit.json": {
+      "bytes": 19660,
+      "sha256": "4ce0728b7d242fb8d3069a45c180ff81a295c5e6dd923fe587319b5df124dee4"
+    },
+    "qualification/internal-final-review/v1/review.json": {
+      "bytes": 11897,
+      "sha256": "857df0ecb7cd8d53c922c5c831fc913e62bf64eed006276a0644489b3f5d98a1"
+    },
+    "qualification/internal-final-review/v1/verify.py.txt": {
+      "bytes": 18043,
+      "sha256": "b61ae5ec56549b296fd6357d49b456b381845a61fa077baf330c902f4d7fcb0e"
+    },
+    "qualification/internal-source-review/v1/review.json": {
+      "bytes": 13958,
+      "sha256": "576adc6e688d897e248ac16adb23166c545592f2380d4acc7ae823b877aa0ca0"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/frame_source_details.go.txt": {
+      "bytes": 1828,
+      "sha256": "c292616cf42911593bec66f7f2a2ddb7249500e82a8e41eff223dfab3d24f9ee"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/frame_source_details_test.go.txt": {
+      "bytes": 3652,
+      "sha256": "4a274d85418333cf771b28cc6341bd2da078b1cd16eface02ed6d6e0f5fce448"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/frame_trace.go.txt": {
+      "bytes": 9497,
+      "sha256": "a2591565da1ac7936639850d1fc6a2a6792aa7692927405b188f2e44642953a6"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/render_notjs.go.txt": {
+      "bytes": 2570,
+      "sha256": "87f9cd56902fe9805c92089765c711aa6429a8d2027d42f887ede4077b4eede3"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/render_source_timing.go.txt": {
+      "bytes": 2218,
+      "sha256": "40930d58981ee2153f4565e9be753f61dc7002455d7253b716d74e88389b52de"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/render_source_timing_test.go.txt": {
+      "bytes": 4076,
+      "sha256": "12f6f7b187b8f4a28a925f07ca9b638c4b20c2feff83c88493ae0536b0720aee"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/rendersource.go.txt": {
+      "bytes": 3207,
+      "sha256": "8c0a9ff855e80fd6efe81803fce766cae0819cedf25855098ea8a91deaa2fc46"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/core/renderwindow.go.txt": {
+      "bytes": 32885,
+      "sha256": "81974eacc77240959de8d70b3c2da2d08986bdb19f931ba18e5c5fca73745c71"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/gpu/gpudraw/drawer.go.txt": {
+      "bytes": 4831,
+      "sha256": "52017b8da2a12fdefbf5573a66b5a584723efc1ee934a3f77ff27307d06f6155"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/gpu/gpudraw/drawused.go.txt": {
+      "bytes": 4614,
+      "sha256": "8428f5238f7d425dc6ce835a6d711a7b6716d83dcbc81356a208364119cb1c5f"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/gpu/gpudraw/source_timing.go.txt": {
+      "bytes": 1618,
+      "sha256": "1516efbfd78a44805ad3e949c920377605bd298780a57edcac12959693a1c306"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/gpu/gpudraw/source_timing_test.go.txt": {
+      "bytes": 2505,
+      "sha256": "3b308c59bcc76bdd80c320ae9e2dd84f861f37aa8a59db532ae9d07edd797372"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/gpu/texture.go.txt": {
+      "bytes": 10396,
+      "sha256": "3b9eb6ce2a33d5b510ef2cfd1d07fcaa0449d00b6b992c958fbd358e28e56400"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/gpu/value.go.txt": {
+      "bytes": 17013,
+      "sha256": "2e466c3ee8189046b9379b7aee1fb79557f0bbe11053f4a1d2129ab0abd889fc"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/system/composer/source_timing.go.txt": {
+      "bytes": 4348,
+      "sha256": "ed9b933ca79c57fa0e89a1299f800ffa8d73d114e90311de0d051d8bfc8a6ca1"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/system/composer/source_timing_test.go.txt": {
+      "bytes": 5593,
+      "sha256": "17684dda537c039a7413ea68c4e2f943f0b3548926dd35c60fdaad91c36f45ba"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/build/upstream/system/composer/timing.go.txt": {
+      "bytes": 1158,
+      "sha256": "6fe538ebbb4d9507af74579de8ccefdf48d63697a57e304598afcdd78b303816"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/frame_metrics.go.txt": {
+      "bytes": 10408,
+      "sha256": "e3f482051333f0dda4aa21f22a9e2517574b12ad5f5d64b167c4b7cc60910bbe"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/frame_source_metrics.go.txt": {
+      "bytes": 3050,
+      "sha256": "d8933382682d3d852b77505375e4e59276f06fa39fcd8e867516350b86bf1fb0"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/frame_source_metrics_test.go.txt": {
+      "bytes": 2673,
+      "sha256": "5347448f43b2f0ce147812a2f8def5550a5cf4fdd5e28af731f422889d38a45e"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/native/patches/sourcecost/0036-source-cost-measurement.patch.txt": {
+      "bytes": 32757,
+      "sha256": "fc501328d61b76269f0d54ec55dcae3b269a06cdaf5e1b25aca85fd9dbea2ea9"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/native/patches/sourcecost/README.md.txt": {
+      "bytes": 2524,
+      "sha256": "b1b24b2fc580f7e4f364c2ec154a84342a11d0dcf111ba43b8876afb8c447366"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/native/patches/sourcecost/original-hashes.json.txt": {
+      "bytes": 923,
+      "sha256": "1938ca1a4f2a89380876fd6e544187ce1c2644159ba78eb86c968d4aa36778b1"
+    },
+    "qualification/internal-source-review/v1/snapshots/drivers/cogent/native/patches/sourcecost/output-hashes.json.txt": {
+      "bytes": 1419,
+      "sha256": "1dea440eb660de3a93f764a50986d0f16b9d9c61c3ef5696f3a6ca9f9473bc65"
+    },
+    "qualification/internal-source-review/v1/snapshots/specs/rendering.md.txt": {
+      "bytes": 9082,
+      "sha256": "a2afb327db81f960e12eb414bc18c81e1bf11571231bbe7cfc97ab92b449c746"
+    },
+    "qualification/internal-source-review/v1/verify.py.txt": {
+      "bytes": 449,
+      "sha256": "d1f50de7bbbef46e201e689555e66c12cb8000a35f9ac8846bb19cba11c0d42c"
+    },
+    "qualification/native-diagnostics-v1/attempt.json": {
+      "bytes": 395,
+      "sha256": "bc87b25c781590a4646985f60c991be7edbfb1e6f5cda2be7cbb46c42f9ded70"
+    },
+    "qualification/native-diagnostics-v1/machine.json": {
+      "bytes": 6766,
+      "sha256": "fc4335bf38b689b20dfc82672a5584d5fe1c96d1bc33e9abae5097fc93fbc95d"
+    },
+    "qualification/native-diagnostics-v1/ordinary-default/native.log": {
+      "bytes": 140556,
+      "sha256": "cb118810ccf2b78b9769ce5978507f2a2ef0779c27e1346f491f465813e62ef1"
+    },
+    "qualification/native-diagnostics-v1/ordinary-default/result.json": {
+      "bytes": 228671,
+      "sha256": "5dd2cea7b4603a4219bb41d7af2537fd5a4d97ce4617c4b378310a232842d6c4"
+    },
+    "qualification/native-diagnostics-v1/producer.py.txt": {
+      "bytes": 4977,
+      "sha256": "a29063ec3b3dec4845f693e13d01c64182a31084a0bc73d535e5f0032a939936"
+    },
+    "qualification/native-diagnostics-v2/detailed-1/native.log": {
+      "bytes": 189791,
+      "sha256": "dec13a57efd6ec7507b970945412110b3680aae08d67406363cddca7fc47bdc9"
+    },
+    "qualification/native-diagnostics-v2/detailed-1/result.json": {
+      "bytes": 319694,
+      "sha256": "9b93e3be7e1badd2f54ba1d62e790faefd07d387b70e878833c524abc70459b1"
+    },
+    "qualification/native-diagnostics-v2/detailed-2/native.log": {
+      "bytes": 190647,
+      "sha256": "82bcf1c1fa696fee76f26e671c91cc2022e76629a33f0be8813d595c865acec3"
+    },
+    "qualification/native-diagnostics-v2/detailed-2/result.json": {
+      "bytes": 320832,
+      "sha256": "32eb72a92c36df49e0b28bf6b866795e167b7f30af7c6a499f16ac52bfff8883"
+    },
+    "qualification/native-diagnostics-v2/detailed-3/native.log": {
+      "bytes": 189803,
+      "sha256": "50c78bc2d9d3a3f211a394bea974e49709f3c093441ae0f6e8c653064ab0947d"
+    },
+    "qualification/native-diagnostics-v2/detailed-3/result.json": {
+      "bytes": 319706,
+      "sha256": "502e55b74428c5ca15a5945358791adb8914860956140e4aff302699cf940b02"
+    },
+    "qualification/native-diagnostics-v2/inputs-before.json": {
+      "bytes": 886443,
+      "sha256": "64c7b3cb683450825ba50da2524800aa26f05a44b11e73e423afbeebea4291bb"
+    },
+    "qualification/native-diagnostics-v2/machine.json": {
+      "bytes": 6766,
+      "sha256": "fc4335bf38b689b20dfc82672a5584d5fe1c96d1bc33e9abae5097fc93fbc95d"
+    },
+    "qualification/native-diagnostics-v2/observation.json": {
+      "bytes": 916731,
+      "sha256": "b5cb52c5878a86325d76eeae311ac17e86a402f63e227d330160d23541d1acb1"
+    },
+    "qualification/native-diagnostics-v2/ordinary-default/native.log": {
+      "bytes": 140534,
+      "sha256": "a7e44d7aab9459409c4e7a71449424acc377c45fa61864f1824b623985f5b13e"
+    },
+    "qualification/native-diagnostics-v2/ordinary-default/result.json": {
+      "bytes": 228649,
+      "sha256": "c0c7616f734424ff8533b8b88ace2bd077ec23fbb14cd95e20060838c4f50f02"
+    },
+    "qualification/native-diagnostics-v2/producer.py.txt": {
+      "bytes": 5097,
+      "sha256": "01f57e468f6fffb467c85f3127a8707bfc36abceaa7fc571fe9bb28bdef690ab"
+    },
+    "qualification/negative-v1/double-draw-overlay.json": {
+      "bytes": 203,
+      "sha256": "f7af9d76b061bcc8fd5862941df1d55d87a03def28488f7127232d8d6787714a"
+    },
+    "qualification/negative-v1/double-draw.go.txt": {
+      "bytes": 4365,
+      "sha256": "1984c45d6b0d4a660f653d28edad66c25f95472ecfb763fad7e205fe07233eb5"
+    },
+    "qualification/negative-v1/double-draw.log": {
+      "bytes": 426,
+      "sha256": "94876a1f0b35ca87efd3514e8faa6467d26507fe43490a723c64c2e8da11c16f"
+    },
+    "qualification/negative-v1/missing-cache-hit-overlay.json": {
+      "bytes": 200,
+      "sha256": "a753645d54447c42631565844e7d792d07dc5cebc806c325bfacf02622b65ef1"
+    },
+    "qualification/negative-v1/missing-cache-hit.go.txt": {
+      "bytes": 4600,
+      "sha256": "0fb4f01d26c1550d81002547aebdccef4b1d7c84d57a79b8cc5770ecb4223293"
+    },
+    "qualification/negative-v1/missing-cache-hit.log": {
+      "bytes": 336,
+      "sha256": "303a99d6400ea33df2d336fb1290695399ec546ba736bd03726cbea75b1cc58b"
+    },
+    "qualification/negative-v1/progress.json": {
+      "bytes": 3495,
+      "sha256": "676392ba85a8fbdbdecc4a802a01b2c873fa9a8d5f97bdc237546b4e7c52b21e"
+    },
+    "qualification/negative-v1/qualification.json": {
+      "bytes": 1777011,
+      "sha256": "ad0786a8166dd2965d8f8d13d3892b851112c5518d9a0140bb3ac179b47be47a"
+    },
+    "qualification/negative-v1/retained-timer-overlay.json": {
+      "bytes": 206,
+      "sha256": "c315788cab2a53e8b6b0986941c8569d48ee5fd0e193efd04a627618e5d347fa"
+    },
+    "qualification/negative-v1/retained-timer.go.txt": {
+      "bytes": 4323,
+      "sha256": "2987a134352bf217024e04e18bb839fb2364fbc43a59025f18935e46ce2a9254"
+    },
+    "qualification/negative-v1/retained-timer.log": {
+      "bytes": 457,
+      "sha256": "bf2f7f58c92c6076d788d919678b34e3afd54d5244fe118a3c9f9d0516524fc4"
+    },
+    "qualification/negative-v1/unbounded-ticket-overlay.json": {
+      "bytes": 204,
+      "sha256": "cea7aee867089aaa731827df72855e695d89c100e022c8d93874bf058e9afbe7"
+    },
+    "qualification/negative-v1/unbounded-ticket.go.txt": {
+      "bytes": 1766,
+      "sha256": "0c33fbd035983d24e797c1d0ee7c55ae4d6a8d48668bf39a14ba67d4572cf7d6"
+    },
+    "qualification/negative-v1/unbounded-ticket.log": {
+      "bytes": 245,
+      "sha256": "de1a2f2981476c719497b56325b4dbc30d84c5f95a1441ad8307cb8a40e20421"
+    },
+    "qualification/original/core/frame_trace.go.txt": {
+      "bytes": 8877,
+      "sha256": "66cbd323497c1a539baed29521a7b8dd75522e14c10cf97610186acf242327cd"
+    },
+    "qualification/original/core/render_notjs.go.txt": {
+      "bytes": 2570,
+      "sha256": "87f9cd56902fe9805c92089765c711aa6429a8d2027d42f887ede4077b4eede3"
+    },
+    "qualification/original/core/rendersource.go.txt": {
+      "bytes": 3064,
+      "sha256": "9435ff9ed8f9aee12937bf58e40f6de20b512dc3db824298786f39dbdb149378"
+    },
+    "qualification/original/core/renderwindow.go.txt": {
+      "bytes": 32540,
+      "sha256": "8915acf34471ff1a4fcb0c8f8d3ee28d5c6088e054562239859e2e9e2569d2ee"
+    },
+    "qualification/original/gpu/gpudraw/drawer.go.txt": {
+      "bytes": 4675,
+      "sha256": "0e463001e4cd2b1f5599d248f70966ef52961f2cfafae28e692418c1bbe58450"
+    },
+    "qualification/original/gpu/gpudraw/drawused.go.txt": {
+      "bytes": 4328,
+      "sha256": "269a9498ab99bc0a1254f6abb42e70cd2526df2ffe4bcba6768bd95ad1334970"
+    },
+    "qualification/original/gpu/gpudraw/timing.go.txt": {
+      "bytes": 743,
+      "sha256": "2e877710cd2b2d9d5a52fb440766bb9255f42cfc83e2c620fa28a7750850b93b"
+    },
+    "qualification/original/system/composer/timing.go.txt": {
+      "bytes": 1085,
+      "sha256": "b77880f9ef4466f4ecb286e000df00ccd3c2d5e1530b290bc062d8b6392f3963"
+    },
+    "qualification/prepare-v1/fresh-prepare.log": {
+      "bytes": 10301,
+      "sha256": "5f080799b8e61bc90f106cb41db6f4eb5e405502c80639c5e95111b28e487cb2"
+    },
+    "qualification/prepare-v1/prepare-tests.log": {
+      "bytes": 110,
+      "sha256": "eb415a59e21c0a977f3222b774d2913fad2c6faacf6b862e57bf55b374dd5f74"
+    },
+    "qualification/prepare-v1/progress.json": {
+      "bytes": 700,
+      "sha256": "9f22bde573c05ac122ef47d51134d1d8f9ddbc0556aee12c7c48157b90040909"
+    },
+    "qualification/prepare-v1/qualification.json": {
+      "bytes": 1773747,
+      "sha256": "5c574d334e9da793528d5ae25c40d64df6e75e2dd03bebd0902a296b412d3420"
+    },
+    "qualification/prepare-v2/fresh-prepare.log": {
+      "bytes": 10301,
+      "sha256": "5f080799b8e61bc90f106cb41db6f4eb5e405502c80639c5e95111b28e487cb2"
+    },
+    "qualification/prepare-v2/prepare-tests.log": {
+      "bytes": 110,
+      "sha256": "5d6a2ed72d8a1044039f59b095e83dd79012334938689baf3ff6307d63217d0d"
+    },
+    "qualification/prepare-v2/progress.json": {
+      "bytes": 700,
+      "sha256": "31746717f8c8d223cdee99d1f9fe82d3156b877325446c1803ab0f15ec8876db"
+    },
+    "qualification/prepare-v2/qualification.json": {
+      "bytes": 1773999,
+      "sha256": "b194aa1a4ac3b50ec8d49fbf800bd3512ef72ca98ca703fd0e806be1c7e69748"
+    },
+    "qualification/release-build-v1/producer.py.txt": {
+      "bytes": 4977,
+      "sha256": "a29063ec3b3dec4845f693e13d01c64182a31084a0bc73d535e5f0032a939936"
+    },
+    "qualification/release-build-v1/qualification.json": {
+      "bytes": 1800606,
+      "sha256": "9729e645a382439b73e428b72e2d490f8d08d1170e6e56170c0b59e4133b9fb4"
+    },
+    "qualification/release-build-v1/release-build.log": {
+      "bytes": 100,
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0"
+    }
+  },
+  "schema": 1,
+  "scope": "Exact regular-file raw observations, historical failures, selected input/prepared maps, inert source/producer snapshots and review certificates. No native binary/full compiler closure."
+}

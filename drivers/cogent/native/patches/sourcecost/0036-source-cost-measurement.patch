@@ -1,0 +1,947 @@
+--- /dev/null
++++ b/core/frame_source_details.go
+@@ -0,0 +1,48 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package core
++
++import (
++	"cogentcore.org/core/system/composer"
++	"math"
++)
++
++// Copy scalar observations into ticket-owned storage. Prefix and final frames
++// share one cap; ordinal assignment is based on the claimed ticket, never a
++// currently active scene or an arm state observed at completion.
++func appendFrameSourceDetails(dst, src *composer.SourceDetails) string {
++	if dst == nil || src == nil || src.Compositions != 1 || len(src.Records) == 0 {
++		return "source diagnostic composition details unavailable"
++	}
++	if dst.Compositions == math.MaxUint32 {
++		return "source diagnostic composition ordinal overflow"
++	}
++	dst.Compositions++
++	if len(dst.Records)+len(src.Records) > composer.MaxSourceTimingRecords {
++		return "source diagnostic ticket record capacity exceeded"
++	}
++	for i, record := range src.Records {
++		if record.Composition != 1 || record.Source != uint32(i) || record.Kind > composer.SourceInsets {
++			return "source diagnostic composition order invalid"
++		}
++	}
++	// The public observations have uint64 counts. Refuse a ticket whose sums
++	// cannot be represented, even when each composition's counters fit.
++	var attempts, hits, bytes uint64
++	for _, records := range [][]composer.SourceTiming{dst.Records, src.Records} {
++		for _, record := range records {
++			if attempts > math.MaxUint64-record.SetFromGoImageAttempts || hits > math.MaxUint64-record.ImageCacheHits || bytes > math.MaxUint64-record.LogicalUploadRGBABytes {
++				return "source diagnostic ticket counter overflow"
++			}
++			attempts += record.SetFromGoImageAttempts
++			hits += record.ImageCacheHits
++			bytes += record.LogicalUploadRGBABytes
++		}
++	}
++	for _, record := range src.Records {
++		record.Composition = dst.Compositions
++		dst.Records = append(dst.Records, record)
++	}
++	return ""
++}
+--- /dev/null
++++ b/core/frame_source_details_test.go
+@@ -0,0 +1,110 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package core
++
++import (
++	"cogentcore.org/core/system/composer"
++	"math"
++	"testing"
++)
++
++func sourceTraceComposition(n int) composer.ComposeTiming {
++	d := &composer.SourceDetails{Compositions: 1}
++	for i := 0; i < n; i++ {
++		d.Records = append(d.Records, composer.SourceTiming{Composition: 1, Source: uint32(i), Kind: composer.SourceScene, DrawNS: 2, RasterNS: 1, RasterAvailable: true})
++	}
++	return composer.ComposeTiming{Supported: true, Submitted: true, RasterUploadNS: 100, EncodeSubmitNS: 20, SourceDetails: d}
++}
++
++func TestVellumSourceTimingTraceRejectsUnavailableOrderAndCounterOverflow(t *testing.T) {
++	for _, src := range []*composer.SourceDetails{nil, {Compositions: 1}, {Compositions: 1, Records: []composer.SourceTiming{{Composition: 1, Source: 1}}}} {
++		if appendFrameSourceDetails(&composer.SourceDetails{}, src) == "" {
++			t.Fatal("accepted incomplete diagnostic")
++		}
++	}
++	dst := sourceTraceComposition(1).SourceDetails
++	dst.Records[0].LogicalUploadRGBABytes = math.MaxUint64 - 3
++	src := sourceTraceComposition(1).SourceDetails
++	src.Records[0].LogicalUploadRGBABytes = 4
++	if appendFrameSourceDetails(dst, src) == "" || len(dst.Records) != 1 {
++		t.Fatal("accepted ticket byte overflow")
++	}
++}
++
++func TestVellumSourceTimingTracePrefixSharedCapAndDetach(t *testing.T) {
++	for _, overflow := range []bool{false, true} {
++		trace := NewFrameTraceWithSourceDetails()
++		e := traceScroll()
++		if err := trace.Begin(9, e); err != nil {
++			t.Fatal(err)
++		}
++		tag, start := trace.startEvent(e)
++		trace.ExpectOwner(tag)
++		trace.endEvent(tag, start)
++		if trace.startFrame() != 9 {
++			t.Fatal("prefix missing")
++		}
++		prefix := sourceTraceComposition(20)
++		// Arm while prefix is in progress. It must not finalize this ticket.
++		trace.Transition(9, 3)
++		trace.OwnerWork(9, 7)
++		trace.Reconciled(9, 11)
++		trace.finishFrame(9, prefix)
++		prefix.SourceDetails.Records[0].DrawNS = 999999
++		if _, ok := trace.Take(); ok {
++			t.Fatal("prefix finalized late arm")
++		}
++		if trace.startFrame() != 9 {
++			t.Fatal("final missing")
++		}
++		n := 12
++		if overflow {
++			n = 13
++		}
++		trace.finishFrame(9, sourceTraceComposition(n))
++		s, ok := trace.Take()
++		if !ok || s.SourceDetails == nil || s.SourceDetails.Compositions != 2 || s.SourceDetails.Records[0].DrawNS != 2 || s.TotalUIWorkNS != s.InputNS+7+11+200+40 {
++			t.Fatalf("wrong detached/nested totals: %+v", s)
++		}
++		if overflow {
++			if s.Completed || s.Failure == "" || len(s.SourceDetails.Records) > 32 {
++				t.Fatal("qualified overflowing ticket")
++			}
++		} else {
++			if !s.Completed || s.Failure != "" || len(s.SourceDetails.Records) != 32 || s.SourceDetails.Records[20].Composition != 2 || s.SourceDetails.Records[20].Source != 0 {
++				t.Fatal("lost composition order")
++			}
++		}
++	}
++}
++
++func TestVellumSourceTimingTraceCancellationAndFailureSticky(t *testing.T) {
++	trace := NewFrameTraceWithSourceDetails()
++	e := traceScroll()
++	trace.Begin(1, e)
++	tag, start := trace.startEvent(e)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	trace.Transition(1, 1)
++	trace.OwnerWork(1, 1)
++	trace.Reconciled(1, 1)
++	trace.startFrame()
++	trace.Fail(1, "cancelled")
++	if _, ok := trace.Take(); ok {
++		t.Fatal("released live native claim")
++	}
++	trace.finishFrame(1, sourceTraceComposition(1))
++	s, ok := trace.Take()
++	if !ok || s.Completed || s.Failure != "cancelled" || len(s.SourceDetails.Records) != 0 {
++		t.Fatal("late result overwrote cancellation")
++	}
++	if err := trace.Begin(2, traceScroll()); err != nil {
++		t.Fatal(err)
++	}
++	trace.Retire(2, "retired")
++	s, ok = trace.Take()
++	if !ok || s.SourceDetails == nil || s.Tag != 2 {
++		t.Fatal("detailed retirement lost")
++	}
++}
+--- a/core/frame_trace.go
++++ b/core/frame_trace.go
+@@ -23,6 +23,7 @@
+ 	AcquireNS, PresentCallNS, TotalUIWorkNS                 int64
+ 	Completed                                               bool
+ 	Failure                                                 string
++	SourceDetails                                           *composer.SourceDetails
+ }
+ 
+ type frameTracePending struct {
+@@ -36,10 +37,14 @@
+ // FrameTrace retains at most one interaction and owns no callback. Install it
+ // explicitly; the ordinary event/render path does no timing when absent.
+ type FrameTrace struct {
+-	mu      sync.Mutex
+-	pending *frameTracePending
+-	active  atomic.Uint64
+-}
++	mu            sync.Mutex
++	pending       *frameTracePending
++	active        atomic.Uint64
++	sourceDetails bool // immutable; the zero value preserves ordinary tracing
++}
++
++// NewFrameTraceWithSourceDetails opts into bounded per-source diagnostics.
++func NewFrameTraceWithSourceDetails() *FrameTrace { return &FrameTrace{sourceDetails: true} }
+ 
+ func (sc *Scene) SetFrameTrace(trace *FrameTrace) { sc.frameTrace.Store(trace) }
+ func (sc *Scene) FrameTrace() *FrameTrace         { return sc.frameTrace.Load() }
+@@ -63,6 +68,9 @@
+ 		return ErrFrameTraceBusy
+ 	}
+ 	trace.pending = &frameTracePending{FrameTraceSample: FrameTraceSample{Tag: tag}, event: event, queued: time.Now()}
++	if trace.sourceDetails {
++		trace.pending.SourceDetails = &composer.SourceDetails{}
++	}
+ 	return nil
+ }
+ func (trace *FrameTrace) CurrentTag() uint64 {
+@@ -217,6 +225,11 @@
+ 		p.EncodeSubmitNS += timing.EncodeSubmitNS
+ 		p.AcquireNS += timing.AcquireNS
+ 		p.PresentCallNS += timing.PresentCallNS
++		if trace.sourceDetails {
++			if failure := appendFrameSourceDetails(p.SourceDetails, timing.SourceDetails); failure != "" && timing.Failure == "" {
++				timing.Failure = failure
++			}
++		}
+ 		submitted := timing.Supported && timing.Submitted && timing.Failure == ""
+ 		p.Completed = p.frameArmed && submitted
+ 		p.Failure = timing.Failure
+--- /dev/null
++++ b/core/render_source_timing.go
+@@ -0,0 +1,65 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build !js
++
++package core
++
++import (
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/paint/renderers/rasterx"
++	"cogentcore.org/core/system/composer"
++	"golang.org/x/image/draw"
++	"image"
++	"time"
++)
++
++// The explicit diagnostic path executes the same Render/Copy calls as Draw.
++// Raster, Copy, and image API durations remain nested in the outer DrawNS.
++func (ps *paintSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
++	cd := c.(*composer.ComposerDrawer)
++	rd := ps.renderer.(*rasterx.Renderer)
++	unchanged := len(ps.render) == 0
++	record := composer.SourceTiming{Kind: ps.kind, RasterAvailable: true, CopyAvailable: true, ImageChanged: !unchanged}
++	if !unchanged {
++		start := time.Now()
++		rd.Render(ps.render)
++		record.RasterNS = time.Since(start).Nanoseconds()
++	}
++	img := rd.Image()
++	bounds := img.Bounds()
++	record.ImageWidth, record.ImageHeight = bounds.Dx(), bounds.Dy()
++	start := time.Now()
++	cd.Drawer.Copy(ps.drawPos, img, bounds, ps.drawOp, unchanged)
++	record.CopyNS = time.Since(start).Nanoseconds()
++	return record
++}
++
++func (ss *scrimSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
++	cd := c.(*composer.ComposerDrawer)
++	clr := colors.Uniform(colors.ApplyOpacity(colors.ToUniform(colors.Scheme.Scrim), 0.5))
++	start := time.Now()
++	cd.Drawer.Copy(image.Point{}, clr, ss.bbox, draw.Over, composer.Unchanged)
++	return composer.SourceTiming{Kind: composer.SourceScrim, CopyAvailable: true, CopyNS: time.Since(start).Nanoseconds()}
++}
++
++func (ss *fillInsetsSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
++	cd := c.(*composer.ComposerDrawer)
++	clr := colors.Scheme.Surface
++	record := composer.SourceTiming{Kind: composer.SourceInsets, CopyAvailable: true}
++	fill := func(x0, y0, x1, y1 int) {
++		r := image.Rect(x0, y0, x1, y1)
++		if r.Dx() == 0 || r.Dy() == 0 {
++			return
++		}
++		start := time.Now()
++		cd.Drawer.Copy(image.Point{}, clr, r, draw.Src, composer.Unchanged)
++		record.CopyNS += time.Since(start).Nanoseconds()
++	}
++	rb, wb := ss.rbb, ss.wbb
++	fill(0, 0, wb.Max.X, rb.Min.Y)
++	fill(0, rb.Max.Y, wb.Max.X, wb.Max.Y)
++	fill(rb.Max.X, 0, wb.Max.X, wb.Max.Y)
++	fill(0, 0, rb.Min.X, wb.Max.Y)
++	return record
++}
+--- /dev/null
++++ b/core/render_source_timing_test.go
+@@ -0,0 +1,102 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build !js
++
++package core
++
++import (
++	"bytes"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint"
++	"cogentcore.org/core/system/composer"
++	"golang.org/x/image/draw"
++	"image"
++	"image/color"
++	"reflect"
++	"testing"
++)
++
++type sourceCopyObservation struct {
++	Pos       image.Point
++	Bounds    image.Rectangle
++	Op        draw.Op
++	Unchanged bool
++}
++type sourcePixelsDrawer struct {
++	composer.DrawerBase
++	copies []sourceCopyObservation
++	ends   int
++}
++
++func (d *sourcePixelsDrawer) End()    { d.ends++ }
++func (d *sourcePixelsDrawer) Redraw() {}
++func (d *sourcePixelsDrawer) EndMeasured() composer.ComposeTiming {
++	d.End()
++	return composer.ComposeTiming{Supported: true, Submitted: true}
++}
++func (d *sourcePixelsDrawer) Copy(pos image.Point, img image.Image, bounds image.Rectangle, op draw.Op, unchanged bool) {
++	d.copies = append(d.copies, sourceCopyObservation{pos, bounds, op, unchanged})
++	draw.Draw(d.Image, image.Rectangle{Min: pos, Max: pos.Add(bounds.Size())}, img, bounds.Min, op)
++}
++
++func TestVellumSourceTimingRealPaintAndUniformPixels(t *testing.T) {
++	for _, kind := range []uint8{composer.SourceScene, composer.SourceSprites} {
++		makeScene := func() *Scene {
++			sc := &Scene{}
++			size := math32.Vec2(32, 24)
++			sc.Painter = *paint.NewPainter(size)
++			sc.Renderer = paint.NewSourceRenderer(size)
++			sc.Painter.FillBox(math32.Vec2(3, 4), math32.Vec2(10, 11), image.NewUniform(color.NRGBA{R: 200, G: 40, B: 70, A: 128}))
++			return sc
++		}
++		reference, candidate := makeScene(), makeScene()
++		if SceneSource(makeScene(), draw.Src).(*paintSource).kind != composer.SourceScene {
++			t.Fatal("scene kind not captured at gathering")
++		}
++		st := &Stage{}
++		st.Sprites.Add(&Sprite{Name: "kind", Active: true, Draw: func(*paint.Painter) {}})
++		sc := &Scene{}
++		sc.SceneGeom.Size = image.Pt(32, 24)
++		if SpritesSource(st, sc).(*paintSource).kind != composer.SourceSprites {
++			t.Fatal("sprite kind inferred incorrectly")
++		}
++		rd := &sourcePixelsDrawer{DrawerBase: composer.DrawerBase{Image: image.NewRGBA(image.Rect(0, 0, 40, 32))}}
++		cd := &sourcePixelsDrawer{DrawerBase: composer.DrawerBase{Image: image.NewRGBA(image.Rect(0, 0, 40, 32))}}
++		rc, cc := &composer.ComposerDrawer{Drawer: rd}, &composer.ComposerDrawer{Drawer: cd}
++		for _, changed := range []bool{true, false} {
++			ref := SceneSource(reference, draw.Over).(*paintSource)
++			ref.kind = kind
++			ref.drawPos = image.Pt(2, 1)
++			cand := SceneSource(candidate, draw.Over).(*paintSource)
++			cand.kind = kind
++			cand.drawPos = image.Pt(2, 1)
++			rc.Sources = []composer.Source{ref}
++			cc.Sources = []composer.Source{cand}
++			rc.ComposeMeasured()
++			result := cc.ComposeMeasuredWithSourceDetails()
++			r := result.SourceDetails.Records[0]
++			if !bytes.Equal(rd.Image.Pix, cd.Image.Pix) || !reflect.DeepEqual(rd.copies, cd.copies) || rd.ends != cd.ends {
++				t.Fatal("diagnostic changed actual paint/copy/pixels")
++			}
++			if result.Failure != "" || r.Kind != kind || !r.RasterAvailable || !r.CopyAvailable || r.ImageChanged != changed || r.ImageWidth != 32 || r.ImageHeight != 24 || r.ImageUploadTimingAvailable || r.RasterNS+r.CopyNS > r.DrawNS || !changed && r.RasterNS != 0 {
++				t.Fatalf("wrong real paint details: %+v", r)
++			}
++		}
++		// Uniform scrim/insets must preserve copy order and pixel composition,
++		// without pretending a software drawer performs Go-image GPU uploads.
++		sources := []composer.Source{ScrimSource(image.Rect(0, 0, 40, 32)), &fillInsetsSource{rbb: image.Rect(3, 4, 35, 28), wbb: image.Rect(0, 0, 40, 32)}}
++		rc.Sources = sources
++		cc.Sources = sources
++		rc.ComposeMeasured()
++		result := cc.ComposeMeasuredWithSourceDetails()
++		if !bytes.Equal(rd.Image.Pix, cd.Image.Pix) || !reflect.DeepEqual(rd.copies, cd.copies) {
++			t.Fatal("diagnostic changed uniform copies/pixels")
++		}
++		for i, r := range result.SourceDetails.Records {
++			if r.Kind != composer.SourceScrim+uint8(i) || !r.CopyAvailable || r.RasterAvailable || r.ImageUploadTimingAvailable || r.CopyNS > r.DrawNS {
++				t.Fatal("uniform availability/timing wrong")
++			}
++		}
++	}
++}
+--- a/core/rendersource.go
++++ b/core/rendersource.go
+@@ -24,11 +24,13 @@
+ 		return nil
+ 	}
+ 	render := sc.Painter.RenderDone()
+-	return &paintSource{render: render, renderer: sc.Renderer, drawOp: op, drawPos: sc.SceneGeom.Pos}
++	return &paintSource{kind: composer.SourceScene, render: render, renderer: sc.Renderer, drawOp: op, drawPos: sc.SceneGeom.Pos}
+ }
+ 
+ // paintSource is the [composer.Source] for [paint.Painter] content, such as for a [Scene].
+ type paintSource struct {
++	// kind is immutable value metadata captured when gathering the source.
++	kind uint8
+ 
+ 	// render is the render content.
+ 	render render.Render
+@@ -100,5 +102,5 @@
+ 	})
+ 	stage.Sprites.modified = false
+ 	render := stage.spritePainter.RenderDone()
+-	return &paintSource{render: render, renderer: stage.spriteRenderer, drawOp: draw.Over, drawPos: image.Point{}}
++	return &paintSource{kind: composer.SourceSprites, render: render, renderer: stage.spriteRenderer, drawOp: draw.Over, drawPos: image.Point{}}
+ }
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -1031,7 +1031,14 @@
+ 		return
+ 	}
+ 	defer w.SystemWindow.Unlock()
+-	if measured, ok := cp.(interface{ ComposeMeasured() composer.ComposeTiming }); ok {
++	if trace.sourceDetails {
++		if measured, ok := cp.(interface{ ComposeMeasuredWithSourceDetails() composer.ComposeTiming }); ok {
++			trace.finishFrame(tag, measured.ComposeMeasuredWithSourceDetails())
++		} else {
++			cp.Compose()
++			trace.finishFrame(tag, composer.ComposeTiming{Failure: "composer does not support source diagnostics"})
++		}
++	} else if measured, ok := cp.(interface{ ComposeMeasured() composer.ComposeTiming }); ok {
+ 		trace.finishFrame(tag, measured.ComposeMeasured())
+ 	} else {
+ 		cp.Compose()
+--- a/gpu/gpudraw/drawer.go
++++ b/gpu/gpudraw/drawer.go
+@@ -13,6 +13,7 @@
+ 
+ 	"cogentcore.org/core/colors"
+ 	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/system/composer"
+ )
+ 
+ // These draw.Op constants are provided so that users of this package don't
+@@ -59,6 +60,9 @@
+ 
+ 	// size of current image, set via Use* methods
+ 	curImageSize image.Point
++
++	// nil on the ordinary path; diagnostic scalars only, protected by Mutex.
++	sourceImageTiming *composer.ImageTiming
+ 
+ 	// use Lock, Unlock on Drawer for all impl routines
+ 	sync.Mutex
+--- a/gpu/gpudraw/drawused.go
++++ b/gpu/gpudraw/drawused.go
+@@ -7,6 +7,7 @@
+ import (
+ 	"image"
+ 	"image/draw"
++	"time"
+ 
+ 	"cogentcore.org/core/base/errors"
+ 	"cogentcore.org/core/gpu"
+@@ -24,6 +25,9 @@
+ 	dw.curImageSize = img.Bounds().Size()
+ 	idx, exists := dw.images.use(img)
+ 	if exists && unchanged {
++		if timing := dw.sourceImageTiming; timing != nil {
++			addImageCacheHit(timing)
++		}
+ 		return
+ 	}
+ 	tvr := errors.Log1(dw.System.Vars().VarByName(1, "TexSampler"))
+@@ -32,7 +36,13 @@
+ 		tvr.SetNValues(dw.System.Device(), dw.images.capacity)
+ 	}
+ 	tvv := tvr.Values.Values[idx]
+-	tvv.SetFromGoImage(img, 0)
++	if timing := dw.sourceImageTiming; timing != nil {
++		start := time.Now()
++		tvv.SetFromGoImage(img, 0)
++		addImageAttempt(timing, dw.curImageSize, time.Since(start).Nanoseconds())
++	} else {
++		tvv.SetFromGoImage(img, 0)
++	}
+ }
+ 
+ // UseTexture uses the given GPU resident Texture as the source image
+--- /dev/null
++++ b/gpu/gpudraw/source_timing.go
+@@ -0,0 +1,68 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpudraw
++
++import (
++	"cogentcore.org/core/system/composer"
++	"image"
++	"math"
++)
++
++// Begin/Read/End acquire separate drawer locks. Composition ownership must
++// serialize the complete draw batch; holding this lock across Draw deadlocks.
++func (dw *Drawer) BeginSourceImageTiming() bool {
++	dw.Lock()
++	defer dw.Unlock()
++	if dw.sourceImageTiming != nil {
++		return false
++	}
++	dw.sourceImageTiming = &composer.ImageTiming{}
++	return true
++}
++
++func (dw *Drawer) ReadSourceImageTiming() composer.ImageTiming {
++	dw.Lock()
++	defer dw.Unlock()
++	if dw.sourceImageTiming == nil {
++		return composer.ImageTiming{Invalid: true}
++	}
++	return *dw.sourceImageTiming
++}
++
++func (dw *Drawer) EndSourceImageTiming() {
++	dw.Lock()
++	defer dw.Unlock()
++	dw.sourceImageTiming = nil
++}
++
++func logicalRGBABytes(size image.Point) (uint64, bool) {
++	if size.X < 0 || size.Y < 0 {
++		return 0, false
++	}
++	w, h := uint64(size.X), uint64(size.Y)
++	if h != 0 && w > math.MaxUint64/4/h {
++		return 0, false
++	}
++	return w * h * 4, true
++}
++
++func addImageCacheHit(t *composer.ImageTiming) {
++	if t.ImageCacheHits == math.MaxUint64 {
++		t.Invalid = true
++		return
++	}
++	t.ImageCacheHits++
++}
++
++func addImageAttempt(t *composer.ImageTiming, size image.Point, duration int64) {
++	bytes, ok := logicalRGBABytes(size)
++	if !ok || duration < 0 || t.SetFromGoImageNS > math.MaxInt64-duration ||
++		t.SetFromGoImageAttempts == math.MaxUint64 || t.LogicalUploadRGBABytes > math.MaxUint64-bytes {
++		t.Invalid = true
++		return
++	}
++	t.SetFromGoImageNS += duration
++	t.SetFromGoImageAttempts++
++	t.LogicalUploadRGBABytes += bytes
++}
+--- /dev/null
++++ b/gpu/gpudraw/source_timing_test.go
+@@ -0,0 +1,78 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpudraw
++
++import (
++	"cogentcore.org/core/system/composer"
++	"image"
++	"math"
++	"testing"
++)
++
++func TestVellumSourceTimingActualCacheBranchAndLifecycle(t *testing.T) {
++	dw := &Drawer{}
++	dw.images.init()
++	img := image.NewRGBA(image.Rect(0, 0, 8, 9))
++	dw.images.use(img)
++	// A real existing/unchanged image returns before System access. A nil
++	// System makes accidental upload routing fail, instead of using a fake GPU.
++	dw.UseGoImage(img, true)
++	if dw.sourceImageTiming != nil {
++		t.Fatal("ordinary branch allocated timing")
++	}
++	if !dw.BeginSourceImageTiming() || dw.BeginSourceImageTiming() {
++		t.Fatal("nested measurement admitted")
++	}
++	dw.UseGoImage(img, true)
++	stats := dw.ReadSourceImageTiming()
++	if stats.Invalid || stats.ImageCacheHits != 1 || stats.SetFromGoImageAttempts != 0 || stats.LogicalUploadRGBABytes != 0 {
++		t.Fatalf("actual cache hit: %+v", stats)
++	}
++	stats.ImageCacheHits = 77
++	if dw.ReadSourceImageTiming().ImageCacheHits != 1 {
++		t.Fatal("snapshot aliases state")
++	}
++	dw.EndSourceImageTiming()
++	dw.EndSourceImageTiming()
++	if dw.sourceImageTiming != nil || !dw.ReadSourceImageTiming().Invalid || !dw.BeginSourceImageTiming() || dw.ReadSourceImageTiming().ImageCacheHits != 0 {
++		t.Fatal("stale measurement")
++	}
++	dw.EndSourceImageTiming()
++}
++
++func TestVellumSourceTimingCheckedFullImageBytes(t *testing.T) {
++	for _, v := range []struct {
++		size  image.Point
++		bytes uint64
++		valid bool
++	}{
++		{image.Pt(8, 9), 288, true}, {image.Pt(0, 9), 0, true}, {image.Pt(-1, 9), 0, false}, {image.Pt(math.MaxInt, 2), 0, false},
++	} {
++		b, ok := logicalRGBABytes(v.size)
++		if ok != v.valid || ok && b != v.bytes {
++			t.Fatalf("%v: %d %v", v.size, b, ok)
++		}
++	}
++	var stats composer.ImageTiming
++	addImageAttempt(&stats, image.Pt(8, 9), 11)
++	addImageAttempt(&stats, image.Pt(8, 9), 13)
++	if stats.Invalid || stats.SetFromGoImageNS != 24 || stats.SetFromGoImageAttempts != 2 || stats.LogicalUploadRGBABytes != 576 {
++		t.Fatal("wrong attempted input accounting")
++	}
++	stats.LogicalUploadRGBABytes = math.MaxUint64 - 1
++	addImageAttempt(&stats, image.Pt(1, 1), 1)
++	if !stats.Invalid {
++		t.Fatal("byte overflow accepted")
++	}
++	stats = composer.ImageTiming{ImageCacheHits: math.MaxUint64}
++	addImageCacheHit(&stats)
++	if !stats.Invalid {
++		t.Fatal("hit overflow accepted")
++	}
++	stats = composer.ImageTiming{SetFromGoImageNS: math.MaxInt64}
++	addImageAttempt(&stats, image.Pt(1, 1), 1)
++	if !stats.Invalid {
++		t.Fatal("time overflow accepted")
++	}
++}
+--- /dev/null
++++ b/system/composer/source_timing.go
+@@ -0,0 +1,122 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package composer
++
++import "time"
++
++// Source observations are diagnostic only. All intervals are nested within
++// RasterUploadNS; they never add to UI-work accounting. Kinds are value metadata,
++// not references to a source, widget, scene, image, or user text.
++const MaxSourceTimingRecords = 32
++
++const (
++	SourceOther uint8 = iota
++	SourceScene
++	SourceSprites
++	SourceScrim
++	SourceInsets
++)
++
++type SourceTiming struct {
++	Composition, Source                    uint32
++	Kind                                   uint8
++	DrawNS, RasterNS, CopyNS               int64
++	RasterAvailable, CopyAvailable         bool
++	ImageWidth, ImageHeight                int
++	ImageChanged                           bool
++	ImageUploadTimingAvailable             bool
++	SetFromGoImageNS                       int64
++	SetFromGoImageAttempts, ImageCacheHits uint64
++	LogicalUploadRGBABytes                 uint64
++}
++
++type SourceDetails struct {
++	Compositions uint32
++	Records      []SourceTiming
++}
++
++// ImageTiming counts API attempts, not successful transfers. The existing
++// Value API logs errors without returning them. Logical bytes are checked 4WH
++// input bytes, not physical GPU traffic or bytes confirmed queued.
++type ImageTiming struct {
++	SetFromGoImageNS                       int64
++	SetFromGoImageAttempts, ImageCacheHits uint64
++	LogicalUploadRGBABytes                 uint64
++	Invalid                                bool
++}
++
++type sourceImageTimer interface {
++	BeginSourceImageTiming() bool
++	ReadSourceImageTiming() ImageTiming
++	EndSourceImageTiming()
++}
++
++// ComposeMeasuredWithSourceDetails draws every source exactly once, even when
++// bounded diagnostic storage overflows. Drawer locks are acquired only by its
++// counter methods; no drawer lock is held across Draw/DrawMeasured.
++func (cd *ComposerDrawer) ComposeMeasuredWithSourceDetails() ComposeTiming {
++	start := time.Now()
++	cd.Drawer.Start()
++	details := &SourceDetails{Compositions: 1, Records: make([]SourceTiming, 0, min(len(cd.Sources), MaxSourceTimingRecords))}
++	failure := ""
++	if len(cd.Sources) == 0 {
++		failure = "source diagnostic composition has no sources"
++	}
++	if len(cd.Sources) > MaxSourceTimingRecords {
++		failure = "source diagnostic record capacity exceeded"
++	}
++	timer, hasTimer := cd.Drawer.(sourceImageTimer)
++	if hasTimer {
++		hasTimer = timer.BeginSourceImageTiming()
++		if hasTimer {
++			defer timer.EndSourceImageTiming() // including panic and Goexit
++		} else {
++			failure = "source diagnostic image timing already active"
++		}
++	}
++	for i, source := range cd.Sources {
++		var before ImageTiming
++		if hasTimer {
++			before = timer.ReadSourceImageTiming()
++		}
++		drawStart := time.Now()
++		var record SourceTiming
++		if measured, ok := source.(interface{ DrawMeasured(Composer) SourceTiming }); ok {
++			record = measured.DrawMeasured(cd)
++		} else {
++			source.Draw(cd)
++		}
++		record.DrawNS = time.Since(drawStart).Nanoseconds()
++		record.Composition, record.Source = 1, uint32(i)
++		record.ImageUploadTimingAvailable = hasTimer
++		if hasTimer {
++			after := timer.ReadSourceImageTiming()
++			if before.Invalid || after.Invalid || after.SetFromGoImageNS < before.SetFromGoImageNS ||
++				after.SetFromGoImageAttempts < before.SetFromGoImageAttempts || after.ImageCacheHits < before.ImageCacheHits || after.LogicalUploadRGBABytes < before.LogicalUploadRGBABytes {
++				failure = "source diagnostic image counter overflow"
++			} else {
++				record.SetFromGoImageNS = after.SetFromGoImageNS - before.SetFromGoImageNS
++				record.SetFromGoImageAttempts = after.SetFromGoImageAttempts - before.SetFromGoImageAttempts
++				record.ImageCacheHits = after.ImageCacheHits - before.ImageCacheHits
++				record.LogicalUploadRGBABytes = after.LogicalUploadRGBABytes - before.LogicalUploadRGBABytes
++			}
++		}
++		if len(details.Records) < MaxSourceTimingRecords {
++			details.Records = append(details.Records, record)
++		}
++	}
++	timing := ComposeTiming{RasterUploadNS: time.Since(start).Nanoseconds(), SourceDetails: details}
++	if drawer, ok := cd.Drawer.(interface{ EndMeasured() ComposeTiming }); ok {
++		end := drawer.EndMeasured()
++		end.RasterUploadNS += timing.RasterUploadNS
++		end.SourceDetails = details
++		if end.Failure == "" {
++			end.Failure = failure
++		}
++		return end
++	}
++	cd.Drawer.End()
++	timing.Failure = "composition drawer does not support encoding timing"
++	return timing
++}
+--- /dev/null
++++ b/system/composer/source_timing_test.go
+@@ -0,0 +1,172 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package composer
++
++import (
++	"reflect"
++	"runtime"
++	"testing"
++)
++
++type sourceTimingDrawer struct {
++	measuredTimingDrawer
++	active bool
++	stats  ImageTiming
++}
++
++func (d *sourceTimingDrawer) BeginSourceImageTiming() bool {
++	if d.active {
++		return false
++	}
++	d.active = true
++	d.stats = ImageTiming{}
++	return true
++}
++func (d *sourceTimingDrawer) ReadSourceImageTiming() ImageTiming { return d.stats }
++func (d *sourceTimingDrawer) EndSourceImageTiming()              { d.active = false }
++
++type measuredSource struct {
++	draw, measured int
++	action         func()
++}
++
++type unwindingSourceDrawer struct {
++	*sourceTimingDrawer
++	action func()
++}
++
++func (d *unwindingSourceDrawer) EndMeasured() ComposeTiming {
++	d.action()
++	return d.sourceTimingDrawer.EndMeasured()
++}
++
++func TestVellumSourceTimingDrawerUnwindClearsCounters(t *testing.T) {
++	for _, goexit := range []bool{false, true} {
++		var order []string
++		d := &unwindingSourceDrawer{sourceTimingDrawer: newSourceTimingDrawer(&order), action: func() {
++			if goexit {
++				runtime.Goexit()
++			}
++			panic("drawer panic")
++		}}
++		done := make(chan bool, 1)
++		go func() {
++			returned := false
++			defer func() { p := recover(); done <- !returned && (goexit && p == nil || !goexit && p == "drawer panic") }()
++			(&ComposerDrawer{Drawer: d, Sources: []Source{timingSource{"draw", &order}}}).ComposeMeasuredWithSourceDetails()
++			returned = true
++		}()
++		if !<-done || d.active {
++			t.Fatal("drawer unwind retained timing or hid abnormal exit")
++		}
++	}
++}
++
++func (s *measuredSource) Draw(Composer) {
++	s.draw++
++	if s.action != nil {
++		s.action()
++	}
++}
++func (s *measuredSource) DrawMeasured(Composer) SourceTiming {
++	s.measured++
++	if s.action != nil {
++		s.action()
++	}
++	return SourceTiming{Kind: SourceScene}
++}
++
++func newSourceTimingDrawer(order *[]string) *sourceTimingDrawer {
++	return &sourceTimingDrawer{measuredTimingDrawer: measuredTimingDrawer{timingDrawer: timingDrawer{order: order}, result: ComposeTiming{Supported: true, Submitted: true, EncodeSubmitNS: 19}}}
++}
++
++func TestVellumSourceTimingOptInOrderBoundsAndNoDoubleCounting(t *testing.T) {
++	for _, detailed := range []bool{false, true} {
++		var order []string
++		d := newSourceTimingDrawer(&order)
++		s := &measuredSource{action: func() { order = append(order, "known") }}
++		cd := &ComposerDrawer{Drawer: d, Sources: []Source{s, timingSource{"unknown", &order}}}
++		var result ComposeTiming
++		if detailed {
++			result = cd.ComposeMeasuredWithSourceDetails()
++		} else {
++			result = cd.ComposeMeasured()
++		}
++		if !reflect.DeepEqual(order, []string{"start", "known", "unknown", "measured-end"}) || d.active || result.EncodeSubmitNS != 19 || !result.Submitted {
++			t.Fatalf("rendering changed: %+v %v", result, order)
++		}
++		if !detailed {
++			if result.SourceDetails != nil || s.draw != 1 || s.measured != 0 {
++				t.Fatal("ordinary path acquired details")
++			}
++			continue
++		}
++		if s.draw != 0 || s.measured != 1 || result.Failure != "" || len(result.SourceDetails.Records) != 2 {
++			t.Fatal("diagnostic drew source twice or lost records")
++		}
++		var draws int64
++		for i, r := range result.SourceDetails.Records {
++			if r.Composition != 1 || r.Source != uint32(i) || !r.ImageUploadTimingAvailable {
++				t.Fatalf("order/timing: %+v", r)
++			}
++			draws += r.DrawNS
++		}
++		if draws > result.RasterUploadNS || result.SourceDetails.Records[1].RasterAvailable || result.SourceDetails.Records[1].CopyAvailable {
++			t.Fatal("nested/unknown timing fabricated")
++		}
++	}
++	var order []string
++	d := newSourceTimingDrawer(&order)
++	s := &measuredSource{}
++	cd := &ComposerDrawer{Drawer: d}
++	for i := 0; i < 33; i++ {
++		cd.Sources = append(cd.Sources, s)
++	}
++	r := cd.ComposeMeasuredWithSourceDetails()
++	if s.measured != 33 || len(r.SourceDetails.Records) != 32 || r.Failure == "" || !r.Submitted || d.active || order[len(order)-1] != "measured-end" {
++		t.Fatal("overflow altered full draw/submit")
++	}
++}
++
++func TestVellumSourceTimingUnknownDrawerAndCounterOverflow(t *testing.T) {
++	var order []string
++	d := &measuredTimingDrawer{timingDrawer: timingDrawer{order: &order}, result: ComposeTiming{Supported: true, Submitted: true}}
++	r := (&ComposerDrawer{Drawer: d, Sources: []Source{timingSource{"draw", &order}}}).ComposeMeasuredWithSourceDetails()
++	if r.Failure != "" || r.SourceDetails.Records[0].ImageUploadTimingAvailable {
++		t.Fatal("unknown drawer fabricated image counters")
++	}
++	timer := newSourceTimingDrawer(&order)
++	s := &measuredSource{action: func() { timer.stats.Invalid = true }}
++	r = (&ComposerDrawer{Drawer: timer, Sources: []Source{s}}).ComposeMeasuredWithSourceDetails()
++	if r.Failure == "" || !r.Submitted || timer.active {
++		t.Fatal("masked overflow or altered submission")
++	}
++}
++
++func TestVellumSourceTimingUnwindClearsCounters(t *testing.T) {
++	for _, goexit := range []bool{false, true} {
++		var order []string
++		d := newSourceTimingDrawer(&order)
++		done := make(chan bool, 1)
++		go func() {
++			returned := false
++			defer func() { p := recover(); done <- !returned && (goexit && p == nil || !goexit && p == "source panic") }()
++			s := &measuredSource{action: func() {
++				if goexit {
++					runtime.Goexit()
++				}
++				panic("source panic")
++			}}
++			(&ComposerDrawer{Drawer: d, Sources: []Source{s}}).ComposeMeasuredWithSourceDetails()
++			returned = true
++		}()
++		if !<-done || d.active {
++			t.Fatal("abnormal unwind masked or measurement retained")
++		}
++		r := (&ComposerDrawer{Drawer: d, Sources: []Source{timingSource{"next", &order}}}).ComposeMeasuredWithSourceDetails()
++		if r.Failure != "" || d.active {
++			t.Fatal("next batch inherited stale measurement")
++		}
++	}
++}
+--- a/system/composer/timing.go
++++ b/system/composer/timing.go
+@@ -8,6 +8,7 @@
+ 	RasterUploadNS, EncodeSubmitNS, AcquireNS, PresentCallNS int64
+ 	Supported, Submitted                                     bool
+ 	Failure                                                  string
++	SourceDetails                                            *SourceDetails
+ }
+ 
+ // ComposeMeasured preserves the ordinary draw order and opts into a drawer's

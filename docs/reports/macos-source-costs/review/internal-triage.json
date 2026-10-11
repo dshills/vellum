@@ -1,0 +1,67 @@
+{
+  "schema": "vellum.independent-finding-triage.v1",
+  "result": "REFUTED_REGRESSION",
+  "finding_id": "6e7a58da88c9a5c0",
+  "finding_title": "Unchecked type assertions in DrawMeasured can panic the render path",
+  "raw_prism_sha256": "24f118f16c08ce78e803c1a59925f8e932d9021fd4bd8ebc19d3fb64ffc132de",
+  "scope": "Read-only finding-specific source inspection; no tests, edits, builds, native processes, Git or provider calls. Prism discarded the finding for path mapping; this independent disposition is based on actual source contracts, not discard reason.",
+  "inputs": {
+    "drivers/cogent/build/upstream/core/render_notjs.go": "87f9cd56902fe9805c92089765c711aa6429a8d2027d42f887ede4077b4eede3",
+    "drivers/cogent/build/upstream/core/render_source_timing.go": "40930d58981ee2153f4565e9be753f61dc7002455d7253b716d74e88389b52de",
+    "drivers/cogent/build/upstream/system/composer/source_timing.go": "ed9b933ca79c57fa0e89a1299f800ffa8d73d114e90311de0d051d8bfc8a6ca1",
+    "drivers/cogent/build/upstream/core/rendersource.go": "8c0a9ff855e80fd6efe81803fce766cae0819cedf25855098ea8a91deaa2fc46"
+  },
+  "evidence": [
+    {
+      "file": "drivers/cogent/build/upstream/core/render_notjs.go",
+      "lines": [
+        36,
+        37,
+        38
+      ],
+      "fact": "Ordinary paintSource.Draw already asserts c.(*composer.ComposerDrawer) and ps.renderer.(*rasterx.Renderer) before rendering. Its current SHA matches the frozen pre-stage36 render_notjs.go baseline."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/core/render_source_timing.go",
+      "lines": [
+        19,
+        20,
+        21
+      ],
+      "fact": "DrawMeasured performs exactly the same composer and renderer assertions at the same pre-render boundary; it does not introduce a new accepted input type or a diagnostics-only renderer requirement."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/system/composer/source_timing.go",
+      "lines": [
+        58,
+        85,
+        86
+      ],
+      "fact": "The detailed method receiver is *ComposerDrawer and passes cd directly to measured.DrawMeasured(cd), so framework dispatch supplies the required composer type."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/core/render_notjs.go",
+      "lines": [
+        48,
+        49,
+        61,
+        62
+      ],
+      "fact": "Ordinary scrimSource.Draw and fillInsetsSource.Draw likewise assert *ComposerDrawer, matching their detailed counterparts."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/core/rendersource.go",
+      "lines": [
+        22,
+        27,
+        105
+      ],
+      "fact": "Both paths use the same paintSource instances and captured Scene/sprite renderer; diagnostics does not replace the renderer."
+    }
+  ],
+  "disposition": "No demonstrated regression. A custom non-rasterx renderer passed to this native paint source already panics in ordinary Draw; the composer assertion is satisfied by the actual detailed ComposerDrawer dispatch. The suggested fallback to ps.Draw(c) would repeat the same assertions and cannot make unsupported renderer/composer inputs safe. Extending the native paint-source renderer contract is separate work, not warranted by this finding.",
+  "limits": [
+    "This adjudication does not promise arbitrary custom renderer/composer compatibility or suppress existing panic semantics.",
+    "No independent runtime test is claimed."
+  ]
+}

@@ -109,3 +109,11 @@ criterion. HasActive skips nil entries. Existing resources remain retained and
 reactivation follows the existing size-correct path. See
 [the patch contract](patches/emptysprites/README.md) and
 [the rendering specification](../../../specs/rendering.md).
+
+Patch 0036 adds explicit per-source diagnostic composition. Ordinary measured
+composition retains its path. Detailed tickets retain at most 32 scalar source
+records across intermediate/final compositions; nested raster/copy/image-API
+intervals never add to UI-work totals. GPU counters report cache hits and API
+attempts with checked logical RGBA input bytes, while upload success/failure
+remains unavailable. See [the patch contract](patches/sourcecost/README.md) and
+[the measurement specification](../../../specs/grid-performance.md).

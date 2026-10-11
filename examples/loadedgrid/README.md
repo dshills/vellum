@@ -50,3 +50,10 @@ For an explicitly separate diagnostic, `-perf -rows 10000 -perf-cpu-profile
 /private/tmp/new-grid-profile.pprof` records a bounded process-wide Go CPU profile
 after warm-up. The output file must be new. Profiled samples are labeled and
 rejected by the ordinary warm-budget runner; they are not qualification timings.
+
+`-perf -rows 10000 -perf-source-details` enables bounded scalar native source
+costs. The runner's matching `--source-details` mode reports DIAGNOSTIC and always
+leaves warm_target_met false. Nested raster/Copy/image-API times do not add to
+the existing UI-work total. Image counters mean API attempts and logical full
+RGBA input bytes; upload success/failure and physical GPU traffic are unavailable.
+See [the source-cost evidence](../../docs/reports/macos-source-costs/README.md).

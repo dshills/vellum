@@ -1,5 +1,37 @@
 # Rendering and resource failure contract
 
+## Optional source diagnostics
+
+`NewFrameMetricsWithSourceDetails` explicitly enables per-source native work
+observations with recorder capacity 1..4096. Ordinary `NewFrameMetrics` keeps
+its existing 1..65536 bound and no source clocks/counter collection. Detailed
+composition preserves source order and each actual raster/Copy/End call. The
+whole draw batch retains originating renderContext and native-window ownership.
+Separate drawer counter locks never cross source callbacks; deferred cleanup
+clears diagnostic state through panic and Goexit.
+
+One ticket may include intermediate compositions before its final armed frame.
+At most 32 scalar records span that complete ticket, identified by one-based
+Composition and zero-based Source ordinals. Numeric Kind values distinguish
+other/scene/sprites/scrim/insets as 0/1/2/3/4. No source/image/widget/user-text
+references are retained. Snapshot returns deeply detached records. Missing
+details, record/count/byte overflow or unsupported measured composition refuses
+diagnostic completion without omitting source rendering or submission.
+
+DrawNS encloses the actual source. Known paint sources expose lazy RasterNS
+and CopyNS; scrim/insets expose CopyNS. Unknown breakdowns have explicit false
+availability. Existing-and-unchanged Go images count cache hits. The backend
+SetFromGoImage API is timed only when called, with attempts and checked logical
+4×full-input-width×height RGBA bytes. Uniform Fill and resident textures need no
+Go-image attempts. Unknown drawers have unavailable image counters.
+
+These counters do not claim successful queue writes, physical transfer bytes,
+GPU execution, or presentation. Upload failures remain unavailable because the
+existing Value API logs errors without returning them; this checkpoint does not
+change that policy. Raster/Copy/API durations are nested subsets of DrawNS and
+RasterUploadNS, never additions to TotalUIWorkNS. Diagnostic overhead affects
+elapsed time; detailed samples cannot qualify ordinary latency targets.
+
 Native windows default to requested painting instead of refresh-rate ticks.
 `Driver.ContinuousRendering` explicitly restores continuous ticks for applications
 that require them. Model invalidation and native input/resize events request

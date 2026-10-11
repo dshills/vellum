@@ -130,6 +130,17 @@ observe p95 14.178→13.090 ms and p99 14.891→13.294 ms. Both targets still fa
 source-level raster/upload attribution and full P6 remain open. No physical GPU
 upload-count, partial-upload, memory-reclamation or new scheduling claim follows.
 
+The [source-cost checkpoint](../docs/reports/macos-source-costs/README.md) adds an
+explicit detailed recorder with at most 32 scalar records across a complete
+ticket and separate 4096-ticket capacity. Default rendering retains its call
+path. Race, pixel/copy parity, bounded/unwind/mutation-oracle and full adapter
+checks pass. Three optimized fixed-10k diagnostic processes preserve the
+400-cell geometry; CPU scene rasterization is about 79% of source Draw time.
+The remaining roughly 21% is primarily the image API's elapsed work. These are
+nested CPU-side diagnostics; upload failures, physical transfers, GPU execution
+and presentation remain unavailable. This guides a bounded repaint investigation
+without qualifying an ordinary latency improvement or closing P6.
+
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded

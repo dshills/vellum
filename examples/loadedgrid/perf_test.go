@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"image"
 	"testing"
 
@@ -31,6 +32,83 @@ func TestPerfConfigAndClosedWarmTrajectory(t *testing.T) {
 		t.Fatalf("warm trajectory does not return%d,%d", x, y)
 	}
 }
+
+func TestPerfSourceDetailsRequireExplicitPerfAndBoundedRecorder(t *testing.T) {
+	for _, mode := range []struct {
+		perf, smoke, details bool
+		profile              string
+	}{
+		{details: true}, {smoke: true, details: true}, {profile: "profile.pprof"},
+		{perf: true, smoke: true, details: true},
+	} {
+		if err := validatePerfModes(mode.perf, mode.smoke, mode.details, mode.profile); err == nil {
+			t.Fatalf("accepted incompatible mode%+v", mode)
+		}
+	}
+	if err := validatePerfModes(true, false, true, ""); err != nil {
+		t.Fatal(err)
+	}
+	// These values exercise the shared recorder reservation, including warmup
+	// tickets and two setup slots, rather than merely capping measured samples.
+	cfg := perfConfig{Rows: 10_000, Samples: 2046, Warmup: 2048, SourceDetails: true}
+	if err := cfg.validate(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := newPerfFrameMetrics(cfg); err != nil {
+		t.Fatal(err)
+	}
+	cfg.Samples++
+	if err := cfg.validate(); err == nil {
+		t.Fatal("accepted detailed recorder capacity4097")
+	}
+	cfg.SourceDetails = false
+	if err := cfg.validate(); err != nil {
+		t.Fatalf("detailed cap changed ordinary mode: %v", err)
+	}
+	if _, err := newPerfFrameMetrics(cfg); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPerfNestedSourceCostsDoNotBecomeAdditionalUIWork(t *testing.T) {
+	sample := cogent.FrameSample{TotalUIWorkNS: 7, InputNS: 1, OwnerNS: 1, ReconcileNS: 1,
+		LayoutPaintNS: 1, GatherNS: 1, RasterUploadNS: 1, EncodeSubmitNS: 1}
+	ordinary, err := json.Marshal(sample)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var record map[string]json.RawMessage
+	if err = json.Unmarshal(ordinary, &record); err != nil {
+		t.Fatal(err)
+	}
+	if _, present := record["SourceDetails"]; present {
+		t.Fatal("ordinary sample emitted source diagnostic payload")
+	}
+	sample.SourceDetails = &cogent.FrameSourceDetails{Compositions: 1, Records: []cogent.FrameSourceSample{{
+		Composition: 1, Kind: cogent.FrameSourceScene, DrawNS: 1, CopyNS: 1, CopyAvailable: true,
+		ImageWidth: 10, ImageHeight: 20, ImageUploadTimingAvailable: true, SetFromGoImageNS: 1,
+		SetFromGoImageAttempts: 1, LogicalUploadRGBABytes: 800,
+	}}}
+	metrics := perfMetrics(sample)
+	if metrics["ui_work_ns"] != 7 || metrics["raster_upload_ns"] != 1 || len(metrics) != 11 {
+		t.Fatalf("nested costs changed frame work%+v", metrics)
+	}
+	diagnostic, err := json.Marshal(sample)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = json.Unmarshal(diagnostic, &record); err != nil {
+		t.Fatal(err)
+	}
+	var detail cogent.FrameSourceDetails
+	if err = json.Unmarshal(record["SourceDetails"], &detail); err != nil {
+		t.Fatal(err)
+	}
+	if detail.UploadFailuresAvailable || len(detail.Records) != 1 || detail.Records[0].LogicalUploadRGBABytes != 800 {
+		t.Fatalf("raw diagnostic attempts lost%+v", detail)
+	}
+}
+
 func TestPerfVariableRowsUseStoredSourceAndExactIndex(t *testing.T) {
 	s := &perfVariableSource{&fullSource{rows: 10_000}}
 	for i := 0; i < 10_000; i++ {

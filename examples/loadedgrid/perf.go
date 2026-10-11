@@ -23,6 +23,20 @@ type perfConfig struct {
 	Samples, Warmup int
 	Novel           bool
 	CPUProfile      string
+	SourceDetails   bool
+}
+
+func validatePerfModes(perf, smoke, sourceDetails bool, profile string) error {
+	if !perf && sourceDetails {
+		return errors.New("loadedgrid: -perf-source-details requires -perf")
+	}
+	if !perf && profile != "" {
+		return errors.New("loadedgrid: -perf-cpu-profile requires -perf")
+	}
+	if perf && smoke {
+		return errors.New("loadedgrid: -perf and -smoke are separate workflows")
+	}
+	return nil
 }
 
 func (c perfConfig) validate() error {
@@ -31,6 +45,9 @@ func (c perfConfig) validate() error {
 	}
 	if c.Rows != 10_000 && c.Rows != 1_000_000 || c.Samples < 120 || c.Samples > 2048 || c.Warmup < perfPeriod || c.Warmup > 2048 || c.Warmup%perfPeriod != 0 {
 		return errors.New("loadedgrid perf: rows must be10000 or1000000, samples120..2048 and warmup64..2048")
+	}
+	if c.SourceDetails && c.Warmup+c.Samples+2 > cogent.MaxSourceFrameMetricsCapacity {
+		return errors.New("loadedgrid perf: detailed recorder capacity exceeds4096")
 	}
 	return nil
 }

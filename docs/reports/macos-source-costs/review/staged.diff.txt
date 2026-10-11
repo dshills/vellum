@@ -1,0 +1,2375 @@
+diff --git a/docs/implementation.md b/docs/implementation.md
+index e29ad3e..4cb9b3b 100644
+--- a/docs/implementation.md
++++ b/docs/implementation.md
+@@ -253,3 +253,14 @@ interleaved optimized fixed-10k processes per build observe pooled p95
+ 14.178→13.090 ms and p99 14.891→13.294 ms. The unchanged 4/6 ms targets still fail.
+ The full P6 campaign and broader Mac acceptance remain open; further raster/upload
+ attribution and any bounded damage policy require separate work and evidence.
++
++The [source-cost checkpoint](reports/macos-source-costs/README.md) now exposes
++explicit scalar source diagnostics with shared ticket bounds and deep snapshots.
++Default ComposeMeasured and normal Draw bodies retain their calls; opt-in costs
++remain nested, with unavailable GPU success/failure stated explicitly. Final
++race/vet/packaging and meaningful mutation regressions pass. Three optimized
++fixed-10k detailed processes identify CPU scene rasterization as about 79% of
++source Draw time, compared with about 21% in Copy/image API work. The next
++performance experiment should reduce unnecessary raster work while preserving
++paint/composition correctness. Detailed timings cannot qualify warm targets;
++full P6 and broader Mac acceptance remain open.
+diff --git a/docs/reports/macos-source-costs/README.md b/docs/reports/macos-source-costs/README.md
+new file mode 100644
+index 0000000..e1312f3
+--- /dev/null
++++ b/docs/reports/macos-source-costs/README.md
+@@ -0,0 +1,116 @@
++# macOS source cost checkpoint
++
++Vellum now has an explicit native source diagnostic mode. Ordinary frame metrics
++retain their call path. The source measurements locate the current fixed-grid
++cost primarily in CPU scene rasterization, guiding the next bounded repaint
++experiment. This checkpoint implements measurement, not a latency optimization
++or completion of the Mac framework milestone.
++
++## Implementation
++
++Pinned stage 36 follows the committed empty-sprite baseline `381f031` and binds
++six changed and eight new prepared files. Known scene/sprite sources time their
++actual lazy raster and Copy calls. Scrim/insets time actual Copy calls; unknown
++sources and drawers expose explicit unavailable breakdowns. Source kinds are
++captured numeric metadata. The detailed composer draws every source once in its
++original order and submits once even if diagnostic capacity is exceeded.
++
++An opt-in GPUDrawer pointer collects actual existing-and-unchanged cache hits,
++SetFromGoImage API attempts/time, and checked logical full-input 4WH RGBA bytes.
++Begin/Read/End use separate mutex acquisitions; the originating renderContext
++and native-window ownership serialize the batch. Deferred cleanup covers source
++and drawer panic/Goexit. The backend Value API logs errors without returning them;
++the instrumentation does not invent successful uploads or failure counts.
++
++`NewFrameMetricsWithSourceDetails` accepts 1..4096 tickets. At most 32 scalar
++records span each complete ticket, including intermediate composition before
++its final armed frame. Records have composition/source ordinals and retain no
++source/widget/image/user-text references. Overflow refuses diagnostic completion
++without changing drawing. Snapshots deeply detach the nested records. Ordinary
++`NewFrameMetrics` retains its 1..65536 bound and no per-source collection.
++
++The loaded-grid flag `-perf-source-details` requires `-perf`; all record stages
++agree on the mode. The runner checks scalar schema, bounds, order, nested
++intervals, full-image attempt bytes and ticket sums. Normal warm-budget validation
++refuses detailed records, independently of profiling. Diagnostic CLI results
++always leave warm_target_met false. Raster/Copy/API costs never add to UI work.
++
++## Validation
++
++Fresh prepare and manifest/order tests pass with 6,137 prepared files. Focused
++core/composer/GPUDrawer and public recorder race checks pass three times, including
++unchanged/changed real paint pixels and copy order, actual gathered kinds,
++default-path selection, unknown availability, shared prefix/final bounds,
++cancellation/retirement, aggregate overflow, and detached snapshots. Source and
++drawer panic/Goexit tests require the exact abnormal terminal, rather than merely
++accepting an arbitrary exit.
++
++Four mutation overlays produce real assertion failures when source drawing is
++duplicated, timer cleanup is removed, the whole-ticket bound is disabled, or an
++actual cache hit is omitted. They demonstrate regression sensitivity; the old
++stage35 did not expose these diagnostic APIs. Full native adapter/commands and
++loaded-grid offscreen race, native default/offscreen vet, loaded-grid vet, runner
++and SDK packaging/check unit suites pass. These software tests do not measure
++GPU transfer or physical display behavior.
++
++Consumer author checks independently preserve 32 Python tests and 15 focused
++Go race occurrences. A qualification wrapper initially refused setup because it
++incorrectly required a root go.sum; no Go child ran. The first native reporting
++helper then used `native` instead of `native_sample` after a passing ordinary
++child. That attempt is retained and excluded from the final combined observation;
++the corrected helper completed all four final native processes.
++
++## Native observation
++
++An optimized Go 1.27.2 arm64 executable ran on the local M4 Pro with macOS 26.6.2.
++One ordinary default-mode process and three fresh detailed processes each ran
++128 warmup interactions and 120 measured fixed-10k scrolls. All retained the
++same 400 clipped cells, stored values and geometry. The ordinary samples omit
++SourceDetails. Detailed samples are independent of ordinary warm qualification.
++
++The 360 detailed tickets retain 361 compositions/source records, all scene kind.
++One intermediate unchanged composition contributes an actual image-cache hit;
++the 360 changed scene images each enter SetFromGoImage. Each input is 3072×1152,
++or 14,155,776 logical RGBA bytes. The total 5,096,079,360 bytes describes attempted
++inputs across all API calls, not successful or physical GPU transfers.
++
++| Same-ticket/source observation | Pooled value |
++| --- | ---: |
++| CPU raster share of source Draw | 78.91% |
++| Copy share of source Draw | 21.08% |
++| Image API share of source Draw | 21.02% |
++| Mean CPU raster per detailed ticket | 5.383 ms |
++| Mean Copy per detailed ticket | 1.438 ms |
++| Mean image API work per detailed ticket | 1.434 ms |
++| Ordinary single-process UI-work p95 / p99 | 13.213 / 13.333 ms |
++| Detailed three-process UI-work p95 / p99 | 13.136 / 13.602 ms |
++
++Shares divide pooled nested interval sums by pooled source Draw, with all prefix
++work retained. Percentiles of distinct phases are not additive. The one ordinary
++probe is not a paired overhead/optimization comparison; elapsed detailed samples
++include extra clocks and observation effects. Both unchanged 4ms p95/6ms p99
++targets remain unmet. These fixed-10k observations do not meet the five-process,
++four-case full P6 protocol or qualify native/GPU memory, cold caches, long strings,
++tree latency, endurance or physical presentation.
++
++This native fixture exercises scene rasterization, image API attempts and one
++cache hit. It does not qualify detailed counters under actual sprite, uniform,
++resident-texture or custom-source GPU workloads. Those paths have separately
++scoped software/source proofs and remain broader native acceptance work.
++
++## Evidence and review
++
++Raw logs, original attempts, selected source/prepared maps, exact patch inputs,
++inert producer/source copies and internal review certificates are preserved in
++[records.tar.gz](records.tar.gz), with member hashes in
++[records-index.json](records-index.json). Source snapshots use text suffixes;
++the archive is evidence rather than another compiled package tree. The selected
++bindings are not a complete compiler, module cache or SDK closure.
++
++[Independent audit](audit.json) records the final checks and evidence bindings.
++Internal source review approved the implementation after the unwind-test fix.
++The significant implementation/test/spec/report batch receives one Prism review
++using Anthropic Claude Sonnet 5.5; [review records](review/process.json) preserve
++the exact payload and coverage. Public module namespace github.com/dshills/vellum
++and root MIT license remain in place. No source push, release tag, signing,
++notarization, OS input source, VoiceOver or preference change occurs here.
+diff --git a/drivers/cogent/frame_metrics.go b/drivers/cogent/frame_metrics.go
+index 7c02bc4..748196f 100644
+--- a/drivers/cogent/frame_metrics.go
++++ b/drivers/cogent/frame_metrics.go
+@@ -35,6 +35,7 @@ type FrameSample struct {
+ 	AcquireNS, PresentCallNS, TotalUIWorkNS                 int64
+ 	Completed                                               bool
+ 	Failure                                                 string
++	SourceDetails                                           *FrameSourceDetails `json:"SourceDetails,omitempty"`
+ }
+ type FrameMetricsSnapshot struct {
+ 	Samples []FrameSample
+@@ -61,13 +62,14 @@ type frameWindowMetrics struct {
+ // work attribution requires one active native window. Up to 64 sequential
+ // window lifetimes may bind one recorder. Snapshot returns detached values.
+ type FrameMetrics struct {
+-	self     *FrameMetrics
+-	mu       sync.Mutex
+-	capacity int
+-	samples  []FrameSample
+-	tags     map[uint64]bool
+-	windows  []*frameWindowMetrics
+-	dropped  uint64
++	self          *FrameMetrics
++	mu            sync.Mutex
++	capacity      int
++	samples       []FrameSample
++	tags          map[uint64]bool
++	windows       []*frameWindowMetrics
++	dropped       uint64
++	sourceDetails bool // immutable configuration
+ }
+ 
+ var frameMetricsRegistry = struct {
+@@ -76,15 +78,37 @@ var frameMetricsRegistry = struct {
+ }{windows: map[frameWindowKey]*frameWindowMetrics{}}
+ 
+ func NewFrameMetrics(capacity int) (*FrameMetrics, error) {
+-	if capacity < 1 || capacity > 65536 {
++	return newFrameMetrics(capacity, false)
++}
++
++// NewFrameMetricsWithSourceDetails opts into per-source timing and image API
++// attempt counters. Its additional clocks affect elapsed time; these samples
++// are diagnostic and cannot qualify ordinary frame latency targets.
++func NewFrameMetricsWithSourceDetails(capacity int) (*FrameMetrics, error) {
++	return newFrameMetrics(capacity, true)
++}
++
++func newFrameMetrics(capacity int, sourceDetails bool) (*FrameMetrics, error) {
++	limit := 65536
++	if sourceDetails {
++		limit = MaxSourceFrameMetricsCapacity
++	}
++	if capacity < 1 || capacity > limit {
+ 		return nil, ErrFrameMetricsConfig
+ 	}
+-	m := &FrameMetrics{capacity: capacity, samples: make([]FrameSample, 0, capacity), tags: make(map[uint64]bool)}
++	m := &FrameMetrics{capacity: capacity, sourceDetails: sourceDetails, samples: make([]FrameSample, 0, capacity), tags: make(map[uint64]bool)}
+ 	m.self = m
+ 	return m, nil
+ }
+ func (m *FrameMetrics) valid() bool {
+-	return m != nil && m.self == m && m.capacity >= 1 && m.capacity <= 65536
++	if m == nil || m.self != m {
++		return false
++	}
++	limit := 65536
++	if m.sourceDetails {
++		limit = MaxSourceFrameMetricsCapacity
++	}
++	return m.capacity >= 1 && m.capacity <= limit
+ }
+ func (m *FrameMetrics) bind(a *app.Application, w *nativeWindow) (*frameWindowMetrics, error) {
+ 	if !m.valid() {
+@@ -110,6 +134,9 @@ func (m *FrameMetrics) bind(a *app.Application, w *nativeWindow) (*frameWindowMe
+ 		return nil, ErrFrameMetricsBusy
+ 	}
+ 	b := &frameWindowMetrics{metrics: m, window: w, key: key, trace: &core.FrameTrace{}}
++	if m.sourceDetails {
++		b.trace = core.NewFrameTraceWithSourceDetails()
++	}
+ 	m.windows = append(m.windows, b)
+ 	frameMetricsRegistry.windows[key] = b
+ 	w.body.Scene.SetFrameTrace(b.trace)
+@@ -131,7 +158,8 @@ func (m *FrameMetrics) collectLocked() {
+ 				QueuedNS: sample.QueuedNS, InputNS: sample.InputNS, OwnerNS: sample.OwnerNS, ReconcileNS: sample.ReconcileNS,
+ 				LayoutPaintNS: sample.LayoutPaintNS, GatherNS: sample.GatherNS, RasterUploadNS: sample.RasterUploadNS,
+ 				EncodeSubmitNS: sample.EncodeSubmitNS, AcquireNS: sample.AcquireNS, PresentCallNS: sample.PresentCallNS,
+-				TotalUIWorkNS: sample.TotalUIWorkNS, Completed: sample.Completed, Failure: sample.Failure})
++				TotalUIWorkNS: sample.TotalUIWorkNS, Completed: sample.Completed, Failure: sample.Failure,
++				SourceDetails: frameSourceDetails(sample.SourceDetails)})
+ 		}
+ 	}
+ }
+@@ -143,6 +171,9 @@ func (m *FrameMetrics) Snapshot() FrameMetricsSnapshot {
+ 	defer m.mu.Unlock()
+ 	m.collectLocked()
+ 	out := FrameMetricsSnapshot{Samples: append([]FrameSample(nil), m.samples...), Dropped: m.dropped}
++	for i := range out.Samples {
++		out.Samples[i].SourceDetails = cloneFrameSourceDetails(out.Samples[i].SourceDetails)
++	}
+ 	for _, window := range m.windows {
+ 		if window.tag != 0 {
+ 			out.Pending++
+diff --git a/drivers/cogent/frame_source_metrics.go b/drivers/cogent/frame_source_metrics.go
+new file mode 100644
+index 0000000..144663e
+--- /dev/null
++++ b/drivers/cogent/frame_source_metrics.go
+@@ -0,0 +1,75 @@
++package cogent
++
++import "cogentcore.org/core/system/composer"
++
++// MaxFrameSourceRecords bounds source observations across every intermediate
++// composition and the final armed composition of one traced interaction.
++const MaxFrameSourceRecords = 32
++
++// MaxSourceFrameMetricsCapacity bounds diagnostic retention independently of
++// the larger capacity allowed by ordinary frame metrics.
++const MaxSourceFrameMetricsCapacity = 4096
++
++const (
++	FrameSourceOther uint8 = iota
++	FrameSourceScene
++	FrameSourceSprites
++	FrameSourceScrim
++	FrameSourceInsets
++)
++
++// FrameSourceSample is a scalar observation of one composition source. Nested
++// intervals are subsets of DrawNS and RasterUploadNS, never additional UI work.
++// SetFromGoImageNS includes conversion/allocation/queue API/sampler CPU work.
++// LogicalUploadRGBABytes counts attempted image dimensions at four bytes/pixel,
++// not successful texture writes, physical transfer bytes or GPU execution.
++type FrameSourceSample struct {
++	Composition, Source                    uint32
++	Kind                                   uint8
++	DrawNS, RasterNS, CopyNS               int64
++	RasterAvailable, CopyAvailable         bool
++	ImageWidth, ImageHeight                int
++	ImageChanged                           bool
++	ImageUploadTimingAvailable             bool
++	SetFromGoImageNS                       int64
++	SetFromGoImageAttempts, ImageCacheHits uint64
++	LogicalUploadRGBABytes                 uint64
++}
++
++// FrameSourceDetails is available only through the explicit diagnostic
++// constructor. Source order is local to its Composition ordinal. Records retain
++// no source/widget/image pointers or user text. Upload failures are unavailable
++// because the existing backend image API logs errors without returning them.
++type FrameSourceDetails struct {
++	Compositions            uint32
++	UploadFailuresAvailable bool
++	Records                 []FrameSourceSample
++}
++
++func cloneFrameSourceDetails(details *FrameSourceDetails) *FrameSourceDetails {
++	if details == nil {
++		return nil
++	}
++	copy := *details
++	copy.Records = append([]FrameSourceSample(nil), details.Records...)
++	return &copy
++}
++
++func frameSourceDetails(details *composer.SourceDetails) *FrameSourceDetails {
++	if details == nil {
++		return nil
++	}
++	out := &FrameSourceDetails{Compositions: details.Compositions, Records: make([]FrameSourceSample, len(details.Records))}
++	for i, record := range details.Records {
++		out.Records[i] = FrameSourceSample{
++			Composition: record.Composition, Source: record.Source, Kind: record.Kind,
++			DrawNS: record.DrawNS, RasterNS: record.RasterNS, CopyNS: record.CopyNS,
++			RasterAvailable: record.RasterAvailable, CopyAvailable: record.CopyAvailable,
++			ImageWidth: record.ImageWidth, ImageHeight: record.ImageHeight, ImageChanged: record.ImageChanged,
++			ImageUploadTimingAvailable: record.ImageUploadTimingAvailable, SetFromGoImageNS: record.SetFromGoImageNS,
++			SetFromGoImageAttempts: record.SetFromGoImageAttempts, ImageCacheHits: record.ImageCacheHits,
++			LogicalUploadRGBABytes: record.LogicalUploadRGBABytes,
++		}
++	}
++	return out
++}
+diff --git a/drivers/cogent/frame_source_metrics_test.go b/drivers/cogent/frame_source_metrics_test.go
+new file mode 100644
+index 0000000..7c7a60d
+--- /dev/null
++++ b/drivers/cogent/frame_source_metrics_test.go
+@@ -0,0 +1,74 @@
++package cogent
++
++import (
++	"cogentcore.org/core/core"
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/system/composer"
++	"errors"
++	"github.com/dshills/vellum/app"
++	"image"
++	"reflect"
++	"testing"
++)
++
++func TestFrameSourceMetricsExplicitCapacityAndDetachedSnapshot(t *testing.T) {
++	for _, n := range []int{0, -1, 4097, 65536} {
++		if _, err := NewFrameMetricsWithSourceDetails(n); !errors.Is(err, ErrFrameMetricsConfig) {
++			t.Fatalf("capacity%d: %v", n, err)
++		}
++	}
++	m, err := NewFrameMetricsWithSourceDetails(4096)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var copied FrameMetrics
++	reflect.ValueOf(&copied).Elem().Set(reflect.ValueOf(m).Elem())
++	if copied.valid() {
++		t.Fatal("copied diagnostic accepted")
++	}
++	upstream := &composer.SourceDetails{Compositions: 1, Records: []composer.SourceTiming{{Composition: 1, Kind: composer.SourceScene, DrawNS: 100, CopyNS: 40, ImageWidth: 10, ImageHeight: 20, SetFromGoImageAttempts: 1, LogicalUploadRGBABytes: 800}}}
++	m.samples = append(m.samples, FrameSample{Tag: 7, SourceDetails: frameSourceDetails(upstream)})
++	upstream.Records[0].DrawNS = 999
++	first := m.Snapshot()
++	first.Samples[0].SourceDetails.Compositions = 99
++	first.Samples[0].SourceDetails.Records[0].DrawNS = 888
++	second := m.Snapshot()
++	d := second.Samples[0].SourceDetails
++	if d.Compositions != 1 || len(d.Records) != 1 || d.Records[0].DrawNS != 100 || d.UploadFailuresAvailable {
++		t.Fatal("source details alias input or snapshot, or invent error status")
++	}
++	ordinary, err := NewFrameMetrics(65536)
++	if err != nil || ordinary.sourceDetails || frameSourceDetails(nil) != nil {
++		t.Fatal("ordinary metrics changed")
++	}
++}
++
++func TestFrameSourceMetricsBindingRetirementKeepsDiagnosticMode(t *testing.T) {
++	m, err := NewFrameMetricsWithSourceDetails(2)
++	if err != nil {
++		t.Fatal(err)
++	}
++	a := &app.Application{}
++	w := &nativeWindow{window: app.Window{ID: "source-metrics-retire"}, body: core.NewBody("source-metrics-retire")}
++	b, err := m.bind(a, w)
++	if err != nil {
++		t.Fatal(err)
++	}
++	e := events.NewScroll(image.Pt(1, 2), math32.Vector2{Y: 12}, 0)
++	e.Init()
++	if err = b.trace.Begin(1, e); err != nil {
++		t.Fatal(err)
++	}
++	b.tag = 1
++	m.tags[1] = true
++	b.retire()
++	s := m.Snapshot()
++	if s.Pending != 0 || len(s.Samples) != 1 || s.Samples[0].Completed || s.Samples[0].Failure != "native window retired" || s.Samples[0].SourceDetails == nil || s.Samples[0].SourceDetails.UploadFailuresAvailable || len(s.Samples[0].SourceDetails.Records) != 0 {
++		t.Fatal("wrong diagnostic mode/retirement")
++	}
++	s.Samples[0].SourceDetails.Compositions = 99
++	if m.Snapshot().Samples[0].SourceDetails.Compositions != 0 {
++		t.Fatal("retired details alias observer")
++	}
++}
+diff --git a/drivers/cogent/native/README.md b/drivers/cogent/native/README.md
+index 4a702c7..6b9c9a0 100644
+--- a/drivers/cogent/native/README.md
++++ b/drivers/cogent/native/README.md
+@@ -109,3 +109,11 @@ criterion. HasActive skips nil entries. Existing resources remain retained and
+ reactivation follows the existing size-correct path. See
+ [the patch contract](patches/emptysprites/README.md) and
+ [the rendering specification](../../../specs/rendering.md).
++
++Patch 0036 adds explicit per-source diagnostic composition. Ordinary measured
++composition retains its path. Detailed tickets retain at most 32 scalar source
++records across intermediate/final compositions; nested raster/copy/image-API
++intervals never add to UI-work totals. GPU counters report cache hits and API
++attempts with checked logical RGBA input bytes, while upload success/failure
++remains unavailable. See [the patch contract](patches/sourcecost/README.md) and
++[the measurement specification](../../../specs/grid-performance.md).
+diff --git a/drivers/cogent/native/dependencies.json b/drivers/cogent/native/dependencies.json
+index 1e549a6..37feb90 100644
+--- a/drivers/cogent/native/dependencies.json
++++ b/drivers/cogent/native/dependencies.json
+@@ -309,6 +309,17 @@
+               "sha256": "681971064e8fe4dd202e2cdc6272297c94a5c9475f9a2a5cbffd974c7ef96ad7"
+             }
+           ]
++        },
++        {
++          "origin": "drivers/cogent/native/patches/sourcecost",
++          "inputs": "native/patches/sourcecost/original-hashes.json",
++          "outputs": "native/patches/sourcecost/output-hashes.json",
++          "patches": [
++            {
++              "file": "native/patches/sourcecost/0036-source-cost-measurement.patch",
++              "sha256": "fc501328d61b76269f0d54ec55dcae3b269a06cdaf5e1b25aca85fd9dbea2ea9"
++            }
++          ]
+         }
+       ]
+     },
+diff --git a/drivers/cogent/native/patches/sourcecost/0036-source-cost-measurement.patch b/drivers/cogent/native/patches/sourcecost/0036-source-cost-measurement.patch
+new file mode 100644
+index 0000000..6538720
+--- /dev/null
++++ b/drivers/cogent/native/patches/sourcecost/0036-source-cost-measurement.patch
+@@ -0,0 +1,947 @@
++--- /dev/null
+++++ b/core/frame_source_details.go
++@@ -0,0 +1,48 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++package core
+++
+++import (
+++	"cogentcore.org/core/system/composer"
+++	"math"
+++)
+++
+++// Copy scalar observations into ticket-owned storage. Prefix and final frames
+++// share one cap; ordinal assignment is based on the claimed ticket, never a
+++// currently active scene or an arm state observed at completion.
+++func appendFrameSourceDetails(dst, src *composer.SourceDetails) string {
+++	if dst == nil || src == nil || src.Compositions != 1 || len(src.Records) == 0 {
+++		return "source diagnostic composition details unavailable"
+++	}
+++	if dst.Compositions == math.MaxUint32 {
+++		return "source diagnostic composition ordinal overflow"
+++	}
+++	dst.Compositions++
+++	if len(dst.Records)+len(src.Records) > composer.MaxSourceTimingRecords {
+++		return "source diagnostic ticket record capacity exceeded"
+++	}
+++	for i, record := range src.Records {
+++		if record.Composition != 1 || record.Source != uint32(i) || record.Kind > composer.SourceInsets {
+++			return "source diagnostic composition order invalid"
+++		}
+++	}
+++	// The public observations have uint64 counts. Refuse a ticket whose sums
+++	// cannot be represented, even when each composition's counters fit.
+++	var attempts, hits, bytes uint64
+++	for _, records := range [][]composer.SourceTiming{dst.Records, src.Records} {
+++		for _, record := range records {
+++			if attempts > math.MaxUint64-record.SetFromGoImageAttempts || hits > math.MaxUint64-record.ImageCacheHits || bytes > math.MaxUint64-record.LogicalUploadRGBABytes {
+++				return "source diagnostic ticket counter overflow"
+++			}
+++			attempts += record.SetFromGoImageAttempts
+++			hits += record.ImageCacheHits
+++			bytes += record.LogicalUploadRGBABytes
+++		}
+++	}
+++	for _, record := range src.Records {
+++		record.Composition = dst.Compositions
+++		dst.Records = append(dst.Records, record)
+++	}
+++	return ""
+++}
++--- /dev/null
+++++ b/core/frame_source_details_test.go
++@@ -0,0 +1,110 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++package core
+++
+++import (
+++	"cogentcore.org/core/system/composer"
+++	"math"
+++	"testing"
+++)
+++
+++func sourceTraceComposition(n int) composer.ComposeTiming {
+++	d := &composer.SourceDetails{Compositions: 1}
+++	for i := 0; i < n; i++ {
+++		d.Records = append(d.Records, composer.SourceTiming{Composition: 1, Source: uint32(i), Kind: composer.SourceScene, DrawNS: 2, RasterNS: 1, RasterAvailable: true})
+++	}
+++	return composer.ComposeTiming{Supported: true, Submitted: true, RasterUploadNS: 100, EncodeSubmitNS: 20, SourceDetails: d}
+++}
+++
+++func TestVellumSourceTimingTraceRejectsUnavailableOrderAndCounterOverflow(t *testing.T) {
+++	for _, src := range []*composer.SourceDetails{nil, {Compositions: 1}, {Compositions: 1, Records: []composer.SourceTiming{{Composition: 1, Source: 1}}}} {
+++		if appendFrameSourceDetails(&composer.SourceDetails{}, src) == "" {
+++			t.Fatal("accepted incomplete diagnostic")
+++		}
+++	}
+++	dst := sourceTraceComposition(1).SourceDetails
+++	dst.Records[0].LogicalUploadRGBABytes = math.MaxUint64 - 3
+++	src := sourceTraceComposition(1).SourceDetails
+++	src.Records[0].LogicalUploadRGBABytes = 4
+++	if appendFrameSourceDetails(dst, src) == "" || len(dst.Records) != 1 {
+++		t.Fatal("accepted ticket byte overflow")
+++	}
+++}
+++
+++func TestVellumSourceTimingTracePrefixSharedCapAndDetach(t *testing.T) {
+++	for _, overflow := range []bool{false, true} {
+++		trace := NewFrameTraceWithSourceDetails()
+++		e := traceScroll()
+++		if err := trace.Begin(9, e); err != nil {
+++			t.Fatal(err)
+++		}
+++		tag, start := trace.startEvent(e)
+++		trace.ExpectOwner(tag)
+++		trace.endEvent(tag, start)
+++		if trace.startFrame() != 9 {
+++			t.Fatal("prefix missing")
+++		}
+++		prefix := sourceTraceComposition(20)
+++		// Arm while prefix is in progress. It must not finalize this ticket.
+++		trace.Transition(9, 3)
+++		trace.OwnerWork(9, 7)
+++		trace.Reconciled(9, 11)
+++		trace.finishFrame(9, prefix)
+++		prefix.SourceDetails.Records[0].DrawNS = 999999
+++		if _, ok := trace.Take(); ok {
+++			t.Fatal("prefix finalized late arm")
+++		}
+++		if trace.startFrame() != 9 {
+++			t.Fatal("final missing")
+++		}
+++		n := 12
+++		if overflow {
+++			n = 13
+++		}
+++		trace.finishFrame(9, sourceTraceComposition(n))
+++		s, ok := trace.Take()
+++		if !ok || s.SourceDetails == nil || s.SourceDetails.Compositions != 2 || s.SourceDetails.Records[0].DrawNS != 2 || s.TotalUIWorkNS != s.InputNS+7+11+200+40 {
+++			t.Fatalf("wrong detached/nested totals: %+v", s)
+++		}
+++		if overflow {
+++			if s.Completed || s.Failure == "" || len(s.SourceDetails.Records) > 32 {
+++				t.Fatal("qualified overflowing ticket")
+++			}
+++		} else {
+++			if !s.Completed || s.Failure != "" || len(s.SourceDetails.Records) != 32 || s.SourceDetails.Records[20].Composition != 2 || s.SourceDetails.Records[20].Source != 0 {
+++				t.Fatal("lost composition order")
+++			}
+++		}
+++	}
+++}
+++
+++func TestVellumSourceTimingTraceCancellationAndFailureSticky(t *testing.T) {
+++	trace := NewFrameTraceWithSourceDetails()
+++	e := traceScroll()
+++	trace.Begin(1, e)
+++	tag, start := trace.startEvent(e)
+++	trace.ExpectOwner(tag)
+++	trace.endEvent(tag, start)
+++	trace.Transition(1, 1)
+++	trace.OwnerWork(1, 1)
+++	trace.Reconciled(1, 1)
+++	trace.startFrame()
+++	trace.Fail(1, "cancelled")
+++	if _, ok := trace.Take(); ok {
+++		t.Fatal("released live native claim")
+++	}
+++	trace.finishFrame(1, sourceTraceComposition(1))
+++	s, ok := trace.Take()
+++	if !ok || s.Completed || s.Failure != "cancelled" || len(s.SourceDetails.Records) != 0 {
+++		t.Fatal("late result overwrote cancellation")
+++	}
+++	if err := trace.Begin(2, traceScroll()); err != nil {
+++		t.Fatal(err)
+++	}
+++	trace.Retire(2, "retired")
+++	s, ok = trace.Take()
+++	if !ok || s.SourceDetails == nil || s.Tag != 2 {
+++		t.Fatal("detailed retirement lost")
+++	}
+++}
++--- a/core/frame_trace.go
+++++ b/core/frame_trace.go
++@@ -23,6 +23,7 @@
++ 	AcquireNS, PresentCallNS, TotalUIWorkNS                 int64
++ 	Completed                                               bool
++ 	Failure                                                 string
+++	SourceDetails                                           *composer.SourceDetails
++ }
++ 
++ type frameTracePending struct {
++@@ -36,10 +37,14 @@
++ // FrameTrace retains at most one interaction and owns no callback. Install it
++ // explicitly; the ordinary event/render path does no timing when absent.
++ type FrameTrace struct {
++-	mu      sync.Mutex
++-	pending *frameTracePending
++-	active  atomic.Uint64
++-}
+++	mu            sync.Mutex
+++	pending       *frameTracePending
+++	active        atomic.Uint64
+++	sourceDetails bool // immutable; the zero value preserves ordinary tracing
+++}
+++
+++// NewFrameTraceWithSourceDetails opts into bounded per-source diagnostics.
+++func NewFrameTraceWithSourceDetails() *FrameTrace { return &FrameTrace{sourceDetails: true} }
++ 
++ func (sc *Scene) SetFrameTrace(trace *FrameTrace) { sc.frameTrace.Store(trace) }
++ func (sc *Scene) FrameTrace() *FrameTrace         { return sc.frameTrace.Load() }
++@@ -63,6 +68,9 @@
++ 		return ErrFrameTraceBusy
++ 	}
++ 	trace.pending = &frameTracePending{FrameTraceSample: FrameTraceSample{Tag: tag}, event: event, queued: time.Now()}
+++	if trace.sourceDetails {
+++		trace.pending.SourceDetails = &composer.SourceDetails{}
+++	}
++ 	return nil
++ }
++ func (trace *FrameTrace) CurrentTag() uint64 {
++@@ -217,6 +225,11 @@
++ 		p.EncodeSubmitNS += timing.EncodeSubmitNS
++ 		p.AcquireNS += timing.AcquireNS
++ 		p.PresentCallNS += timing.PresentCallNS
+++		if trace.sourceDetails {
+++			if failure := appendFrameSourceDetails(p.SourceDetails, timing.SourceDetails); failure != "" && timing.Failure == "" {
+++				timing.Failure = failure
+++			}
+++		}
++ 		submitted := timing.Supported && timing.Submitted && timing.Failure == ""
++ 		p.Completed = p.frameArmed && submitted
++ 		p.Failure = timing.Failure
++--- /dev/null
+++++ b/core/render_source_timing.go
++@@ -0,0 +1,65 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++//go:build !js
+++
+++package core
+++
+++import (
+++	"cogentcore.org/core/colors"
+++	"cogentcore.org/core/paint/renderers/rasterx"
+++	"cogentcore.org/core/system/composer"
+++	"golang.org/x/image/draw"
+++	"image"
+++	"time"
+++)
+++
+++// The explicit diagnostic path executes the same Render/Copy calls as Draw.
+++// Raster, Copy, and image API durations remain nested in the outer DrawNS.
+++func (ps *paintSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
+++	cd := c.(*composer.ComposerDrawer)
+++	rd := ps.renderer.(*rasterx.Renderer)
+++	unchanged := len(ps.render) == 0
+++	record := composer.SourceTiming{Kind: ps.kind, RasterAvailable: true, CopyAvailable: true, ImageChanged: !unchanged}
+++	if !unchanged {
+++		start := time.Now()
+++		rd.Render(ps.render)
+++		record.RasterNS = time.Since(start).Nanoseconds()
+++	}
+++	img := rd.Image()
+++	bounds := img.Bounds()
+++	record.ImageWidth, record.ImageHeight = bounds.Dx(), bounds.Dy()
+++	start := time.Now()
+++	cd.Drawer.Copy(ps.drawPos, img, bounds, ps.drawOp, unchanged)
+++	record.CopyNS = time.Since(start).Nanoseconds()
+++	return record
+++}
+++
+++func (ss *scrimSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
+++	cd := c.(*composer.ComposerDrawer)
+++	clr := colors.Uniform(colors.ApplyOpacity(colors.ToUniform(colors.Scheme.Scrim), 0.5))
+++	start := time.Now()
+++	cd.Drawer.Copy(image.Point{}, clr, ss.bbox, draw.Over, composer.Unchanged)
+++	return composer.SourceTiming{Kind: composer.SourceScrim, CopyAvailable: true, CopyNS: time.Since(start).Nanoseconds()}
+++}
+++
+++func (ss *fillInsetsSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
+++	cd := c.(*composer.ComposerDrawer)
+++	clr := colors.Scheme.Surface
+++	record := composer.SourceTiming{Kind: composer.SourceInsets, CopyAvailable: true}
+++	fill := func(x0, y0, x1, y1 int) {
+++		r := image.Rect(x0, y0, x1, y1)
+++		if r.Dx() == 0 || r.Dy() == 0 {
+++			return
+++		}
+++		start := time.Now()
+++		cd.Drawer.Copy(image.Point{}, clr, r, draw.Src, composer.Unchanged)
+++		record.CopyNS += time.Since(start).Nanoseconds()
+++	}
+++	rb, wb := ss.rbb, ss.wbb
+++	fill(0, 0, wb.Max.X, rb.Min.Y)
+++	fill(0, rb.Max.Y, wb.Max.X, wb.Max.Y)
+++	fill(rb.Max.X, 0, wb.Max.X, wb.Max.Y)
+++	fill(0, 0, rb.Min.X, wb.Max.Y)
+++	return record
+++}
++--- /dev/null
+++++ b/core/render_source_timing_test.go
++@@ -0,0 +1,102 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++//go:build !js
+++
+++package core
+++
+++import (
+++	"bytes"
+++	"cogentcore.org/core/math32"
+++	"cogentcore.org/core/paint"
+++	"cogentcore.org/core/system/composer"
+++	"golang.org/x/image/draw"
+++	"image"
+++	"image/color"
+++	"reflect"
+++	"testing"
+++)
+++
+++type sourceCopyObservation struct {
+++	Pos       image.Point
+++	Bounds    image.Rectangle
+++	Op        draw.Op
+++	Unchanged bool
+++}
+++type sourcePixelsDrawer struct {
+++	composer.DrawerBase
+++	copies []sourceCopyObservation
+++	ends   int
+++}
+++
+++func (d *sourcePixelsDrawer) End()    { d.ends++ }
+++func (d *sourcePixelsDrawer) Redraw() {}
+++func (d *sourcePixelsDrawer) EndMeasured() composer.ComposeTiming {
+++	d.End()
+++	return composer.ComposeTiming{Supported: true, Submitted: true}
+++}
+++func (d *sourcePixelsDrawer) Copy(pos image.Point, img image.Image, bounds image.Rectangle, op draw.Op, unchanged bool) {
+++	d.copies = append(d.copies, sourceCopyObservation{pos, bounds, op, unchanged})
+++	draw.Draw(d.Image, image.Rectangle{Min: pos, Max: pos.Add(bounds.Size())}, img, bounds.Min, op)
+++}
+++
+++func TestVellumSourceTimingRealPaintAndUniformPixels(t *testing.T) {
+++	for _, kind := range []uint8{composer.SourceScene, composer.SourceSprites} {
+++		makeScene := func() *Scene {
+++			sc := &Scene{}
+++			size := math32.Vec2(32, 24)
+++			sc.Painter = *paint.NewPainter(size)
+++			sc.Renderer = paint.NewSourceRenderer(size)
+++			sc.Painter.FillBox(math32.Vec2(3, 4), math32.Vec2(10, 11), image.NewUniform(color.NRGBA{R: 200, G: 40, B: 70, A: 128}))
+++			return sc
+++		}
+++		reference, candidate := makeScene(), makeScene()
+++		if SceneSource(makeScene(), draw.Src).(*paintSource).kind != composer.SourceScene {
+++			t.Fatal("scene kind not captured at gathering")
+++		}
+++		st := &Stage{}
+++		st.Sprites.Add(&Sprite{Name: "kind", Active: true, Draw: func(*paint.Painter) {}})
+++		sc := &Scene{}
+++		sc.SceneGeom.Size = image.Pt(32, 24)
+++		if SpritesSource(st, sc).(*paintSource).kind != composer.SourceSprites {
+++			t.Fatal("sprite kind inferred incorrectly")
+++		}
+++		rd := &sourcePixelsDrawer{DrawerBase: composer.DrawerBase{Image: image.NewRGBA(image.Rect(0, 0, 40, 32))}}
+++		cd := &sourcePixelsDrawer{DrawerBase: composer.DrawerBase{Image: image.NewRGBA(image.Rect(0, 0, 40, 32))}}
+++		rc, cc := &composer.ComposerDrawer{Drawer: rd}, &composer.ComposerDrawer{Drawer: cd}
+++		for _, changed := range []bool{true, false} {
+++			ref := SceneSource(reference, draw.Over).(*paintSource)
+++			ref.kind = kind
+++			ref.drawPos = image.Pt(2, 1)
+++			cand := SceneSource(candidate, draw.Over).(*paintSource)
+++			cand.kind = kind
+++			cand.drawPos = image.Pt(2, 1)
+++			rc.Sources = []composer.Source{ref}
+++			cc.Sources = []composer.Source{cand}
+++			rc.ComposeMeasured()
+++			result := cc.ComposeMeasuredWithSourceDetails()
+++			r := result.SourceDetails.Records[0]
+++			if !bytes.Equal(rd.Image.Pix, cd.Image.Pix) || !reflect.DeepEqual(rd.copies, cd.copies) || rd.ends != cd.ends {
+++				t.Fatal("diagnostic changed actual paint/copy/pixels")
+++			}
+++			if result.Failure != "" || r.Kind != kind || !r.RasterAvailable || !r.CopyAvailable || r.ImageChanged != changed || r.ImageWidth != 32 || r.ImageHeight != 24 || r.ImageUploadTimingAvailable || r.RasterNS+r.CopyNS > r.DrawNS || !changed && r.RasterNS != 0 {
+++				t.Fatalf("wrong real paint details: %+v", r)
+++			}
+++		}
+++		// Uniform scrim/insets must preserve copy order and pixel composition,
+++		// without pretending a software drawer performs Go-image GPU uploads.
+++		sources := []composer.Source{ScrimSource(image.Rect(0, 0, 40, 32)), &fillInsetsSource{rbb: image.Rect(3, 4, 35, 28), wbb: image.Rect(0, 0, 40, 32)}}
+++		rc.Sources = sources
+++		cc.Sources = sources
+++		rc.ComposeMeasured()
+++		result := cc.ComposeMeasuredWithSourceDetails()
+++		if !bytes.Equal(rd.Image.Pix, cd.Image.Pix) || !reflect.DeepEqual(rd.copies, cd.copies) {
+++			t.Fatal("diagnostic changed uniform copies/pixels")
+++		}
+++		for i, r := range result.SourceDetails.Records {
+++			if r.Kind != composer.SourceScrim+uint8(i) || !r.CopyAvailable || r.RasterAvailable || r.ImageUploadTimingAvailable || r.CopyNS > r.DrawNS {
+++				t.Fatal("uniform availability/timing wrong")
+++			}
+++		}
+++	}
+++}
++--- a/core/rendersource.go
+++++ b/core/rendersource.go
++@@ -24,11 +24,13 @@
++ 		return nil
++ 	}
++ 	render := sc.Painter.RenderDone()
++-	return &paintSource{render: render, renderer: sc.Renderer, drawOp: op, drawPos: sc.SceneGeom.Pos}
+++	return &paintSource{kind: composer.SourceScene, render: render, renderer: sc.Renderer, drawOp: op, drawPos: sc.SceneGeom.Pos}
++ }
++ 
++ // paintSource is the [composer.Source] for [paint.Painter] content, such as for a [Scene].
++ type paintSource struct {
+++	// kind is immutable value metadata captured when gathering the source.
+++	kind uint8
++ 
++ 	// render is the render content.
++ 	render render.Render
++@@ -100,5 +102,5 @@
++ 	})
++ 	stage.Sprites.modified = false
++ 	render := stage.spritePainter.RenderDone()
++-	return &paintSource{render: render, renderer: stage.spriteRenderer, drawOp: draw.Over, drawPos: image.Point{}}
+++	return &paintSource{kind: composer.SourceSprites, render: render, renderer: stage.spriteRenderer, drawOp: draw.Over, drawPos: image.Point{}}
++ }
++--- a/core/renderwindow.go
+++++ b/core/renderwindow.go
++@@ -1031,7 +1031,14 @@
++ 		return
++ 	}
++ 	defer w.SystemWindow.Unlock()
++-	if measured, ok := cp.(interface{ ComposeMeasured() composer.ComposeTiming }); ok {
+++	if trace.sourceDetails {
+++		if measured, ok := cp.(interface{ ComposeMeasuredWithSourceDetails() composer.ComposeTiming }); ok {
+++			trace.finishFrame(tag, measured.ComposeMeasuredWithSourceDetails())
+++		} else {
+++			cp.Compose()
+++			trace.finishFrame(tag, composer.ComposeTiming{Failure: "composer does not support source diagnostics"})
+++		}
+++	} else if measured, ok := cp.(interface{ ComposeMeasured() composer.ComposeTiming }); ok {
++ 		trace.finishFrame(tag, measured.ComposeMeasured())
++ 	} else {
++ 		cp.Compose()
++--- a/gpu/gpudraw/drawer.go
+++++ b/gpu/gpudraw/drawer.go
++@@ -13,6 +13,7 @@
++ 
++ 	"cogentcore.org/core/colors"
++ 	"cogentcore.org/core/gpu"
+++	"cogentcore.org/core/system/composer"
++ )
++ 
++ // These draw.Op constants are provided so that users of this package don't
++@@ -59,6 +60,9 @@
++ 
++ 	// size of current image, set via Use* methods
++ 	curImageSize image.Point
+++
+++	// nil on the ordinary path; diagnostic scalars only, protected by Mutex.
+++	sourceImageTiming *composer.ImageTiming
++ 
++ 	// use Lock, Unlock on Drawer for all impl routines
++ 	sync.Mutex
++--- a/gpu/gpudraw/drawused.go
+++++ b/gpu/gpudraw/drawused.go
++@@ -7,6 +7,7 @@
++ import (
++ 	"image"
++ 	"image/draw"
+++	"time"
++ 
++ 	"cogentcore.org/core/base/errors"
++ 	"cogentcore.org/core/gpu"
++@@ -24,6 +25,9 @@
++ 	dw.curImageSize = img.Bounds().Size()
++ 	idx, exists := dw.images.use(img)
++ 	if exists && unchanged {
+++		if timing := dw.sourceImageTiming; timing != nil {
+++			addImageCacheHit(timing)
+++		}
++ 		return
++ 	}
++ 	tvr := errors.Log1(dw.System.Vars().VarByName(1, "TexSampler"))
++@@ -32,7 +36,13 @@
++ 		tvr.SetNValues(dw.System.Device(), dw.images.capacity)
++ 	}
++ 	tvv := tvr.Values.Values[idx]
++-	tvv.SetFromGoImage(img, 0)
+++	if timing := dw.sourceImageTiming; timing != nil {
+++		start := time.Now()
+++		tvv.SetFromGoImage(img, 0)
+++		addImageAttempt(timing, dw.curImageSize, time.Since(start).Nanoseconds())
+++	} else {
+++		tvv.SetFromGoImage(img, 0)
+++	}
++ }
++ 
++ // UseTexture uses the given GPU resident Texture as the source image
++--- /dev/null
+++++ b/gpu/gpudraw/source_timing.go
++@@ -0,0 +1,68 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++package gpudraw
+++
+++import (
+++	"cogentcore.org/core/system/composer"
+++	"image"
+++	"math"
+++)
+++
+++// Begin/Read/End acquire separate drawer locks. Composition ownership must
+++// serialize the complete draw batch; holding this lock across Draw deadlocks.
+++func (dw *Drawer) BeginSourceImageTiming() bool {
+++	dw.Lock()
+++	defer dw.Unlock()
+++	if dw.sourceImageTiming != nil {
+++		return false
+++	}
+++	dw.sourceImageTiming = &composer.ImageTiming{}
+++	return true
+++}
+++
+++func (dw *Drawer) ReadSourceImageTiming() composer.ImageTiming {
+++	dw.Lock()
+++	defer dw.Unlock()
+++	if dw.sourceImageTiming == nil {
+++		return composer.ImageTiming{Invalid: true}
+++	}
+++	return *dw.sourceImageTiming
+++}
+++
+++func (dw *Drawer) EndSourceImageTiming() {
+++	dw.Lock()
+++	defer dw.Unlock()
+++	dw.sourceImageTiming = nil
+++}
+++
+++func logicalRGBABytes(size image.Point) (uint64, bool) {
+++	if size.X < 0 || size.Y < 0 {
+++		return 0, false
+++	}
+++	w, h := uint64(size.X), uint64(size.Y)
+++	if h != 0 && w > math.MaxUint64/4/h {
+++		return 0, false
+++	}
+++	return w * h * 4, true
+++}
+++
+++func addImageCacheHit(t *composer.ImageTiming) {
+++	if t.ImageCacheHits == math.MaxUint64 {
+++		t.Invalid = true
+++		return
+++	}
+++	t.ImageCacheHits++
+++}
+++
+++func addImageAttempt(t *composer.ImageTiming, size image.Point, duration int64) {
+++	bytes, ok := logicalRGBABytes(size)
+++	if !ok || duration < 0 || t.SetFromGoImageNS > math.MaxInt64-duration ||
+++		t.SetFromGoImageAttempts == math.MaxUint64 || t.LogicalUploadRGBABytes > math.MaxUint64-bytes {
+++		t.Invalid = true
+++		return
+++	}
+++	t.SetFromGoImageNS += duration
+++	t.SetFromGoImageAttempts++
+++	t.LogicalUploadRGBABytes += bytes
+++}
++--- /dev/null
+++++ b/gpu/gpudraw/source_timing_test.go
++@@ -0,0 +1,78 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++package gpudraw
+++
+++import (
+++	"cogentcore.org/core/system/composer"
+++	"image"
+++	"math"
+++	"testing"
+++)
+++
+++func TestVellumSourceTimingActualCacheBranchAndLifecycle(t *testing.T) {
+++	dw := &Drawer{}
+++	dw.images.init()
+++	img := image.NewRGBA(image.Rect(0, 0, 8, 9))
+++	dw.images.use(img)
+++	// A real existing/unchanged image returns before System access. A nil
+++	// System makes accidental upload routing fail, instead of using a fake GPU.
+++	dw.UseGoImage(img, true)
+++	if dw.sourceImageTiming != nil {
+++		t.Fatal("ordinary branch allocated timing")
+++	}
+++	if !dw.BeginSourceImageTiming() || dw.BeginSourceImageTiming() {
+++		t.Fatal("nested measurement admitted")
+++	}
+++	dw.UseGoImage(img, true)
+++	stats := dw.ReadSourceImageTiming()
+++	if stats.Invalid || stats.ImageCacheHits != 1 || stats.SetFromGoImageAttempts != 0 || stats.LogicalUploadRGBABytes != 0 {
+++		t.Fatalf("actual cache hit: %+v", stats)
+++	}
+++	stats.ImageCacheHits = 77
+++	if dw.ReadSourceImageTiming().ImageCacheHits != 1 {
+++		t.Fatal("snapshot aliases state")
+++	}
+++	dw.EndSourceImageTiming()
+++	dw.EndSourceImageTiming()
+++	if dw.sourceImageTiming != nil || !dw.ReadSourceImageTiming().Invalid || !dw.BeginSourceImageTiming() || dw.ReadSourceImageTiming().ImageCacheHits != 0 {
+++		t.Fatal("stale measurement")
+++	}
+++	dw.EndSourceImageTiming()
+++}
+++
+++func TestVellumSourceTimingCheckedFullImageBytes(t *testing.T) {
+++	for _, v := range []struct {
+++		size  image.Point
+++		bytes uint64
+++		valid bool
+++	}{
+++		{image.Pt(8, 9), 288, true}, {image.Pt(0, 9), 0, true}, {image.Pt(-1, 9), 0, false}, {image.Pt(math.MaxInt, 2), 0, false},
+++	} {
+++		b, ok := logicalRGBABytes(v.size)
+++		if ok != v.valid || ok && b != v.bytes {
+++			t.Fatalf("%v: %d %v", v.size, b, ok)
+++		}
+++	}
+++	var stats composer.ImageTiming
+++	addImageAttempt(&stats, image.Pt(8, 9), 11)
+++	addImageAttempt(&stats, image.Pt(8, 9), 13)
+++	if stats.Invalid || stats.SetFromGoImageNS != 24 || stats.SetFromGoImageAttempts != 2 || stats.LogicalUploadRGBABytes != 576 {
+++		t.Fatal("wrong attempted input accounting")
+++	}
+++	stats.LogicalUploadRGBABytes = math.MaxUint64 - 1
+++	addImageAttempt(&stats, image.Pt(1, 1), 1)
+++	if !stats.Invalid {
+++		t.Fatal("byte overflow accepted")
+++	}
+++	stats = composer.ImageTiming{ImageCacheHits: math.MaxUint64}
+++	addImageCacheHit(&stats)
+++	if !stats.Invalid {
+++		t.Fatal("hit overflow accepted")
+++	}
+++	stats = composer.ImageTiming{SetFromGoImageNS: math.MaxInt64}
+++	addImageAttempt(&stats, image.Pt(1, 1), 1)
+++	if !stats.Invalid {
+++		t.Fatal("time overflow accepted")
+++	}
+++}
++--- /dev/null
+++++ b/system/composer/source_timing.go
++@@ -0,0 +1,122 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++package composer
+++
+++import "time"
+++
+++// Source observations are diagnostic only. All intervals are nested within
+++// RasterUploadNS; they never add to UI-work accounting. Kinds are value metadata,
+++// not references to a source, widget, scene, image, or user text.
+++const MaxSourceTimingRecords = 32
+++
+++const (
+++	SourceOther uint8 = iota
+++	SourceScene
+++	SourceSprites
+++	SourceScrim
+++	SourceInsets
+++)
+++
+++type SourceTiming struct {
+++	Composition, Source                    uint32
+++	Kind                                   uint8
+++	DrawNS, RasterNS, CopyNS               int64
+++	RasterAvailable, CopyAvailable         bool
+++	ImageWidth, ImageHeight                int
+++	ImageChanged                           bool
+++	ImageUploadTimingAvailable             bool
+++	SetFromGoImageNS                       int64
+++	SetFromGoImageAttempts, ImageCacheHits uint64
+++	LogicalUploadRGBABytes                 uint64
+++}
+++
+++type SourceDetails struct {
+++	Compositions uint32
+++	Records      []SourceTiming
+++}
+++
+++// ImageTiming counts API attempts, not successful transfers. The existing
+++// Value API logs errors without returning them. Logical bytes are checked 4WH
+++// input bytes, not physical GPU traffic or bytes confirmed queued.
+++type ImageTiming struct {
+++	SetFromGoImageNS                       int64
+++	SetFromGoImageAttempts, ImageCacheHits uint64
+++	LogicalUploadRGBABytes                 uint64
+++	Invalid                                bool
+++}
+++
+++type sourceImageTimer interface {
+++	BeginSourceImageTiming() bool
+++	ReadSourceImageTiming() ImageTiming
+++	EndSourceImageTiming()
+++}
+++
+++// ComposeMeasuredWithSourceDetails draws every source exactly once, even when
+++// bounded diagnostic storage overflows. Drawer locks are acquired only by its
+++// counter methods; no drawer lock is held across Draw/DrawMeasured.
+++func (cd *ComposerDrawer) ComposeMeasuredWithSourceDetails() ComposeTiming {
+++	start := time.Now()
+++	cd.Drawer.Start()
+++	details := &SourceDetails{Compositions: 1, Records: make([]SourceTiming, 0, min(len(cd.Sources), MaxSourceTimingRecords))}
+++	failure := ""
+++	if len(cd.Sources) == 0 {
+++		failure = "source diagnostic composition has no sources"
+++	}
+++	if len(cd.Sources) > MaxSourceTimingRecords {
+++		failure = "source diagnostic record capacity exceeded"
+++	}
+++	timer, hasTimer := cd.Drawer.(sourceImageTimer)
+++	if hasTimer {
+++		hasTimer = timer.BeginSourceImageTiming()
+++		if hasTimer {
+++			defer timer.EndSourceImageTiming() // including panic and Goexit
+++		} else {
+++			failure = "source diagnostic image timing already active"
+++		}
+++	}
+++	for i, source := range cd.Sources {
+++		var before ImageTiming
+++		if hasTimer {
+++			before = timer.ReadSourceImageTiming()
+++		}
+++		drawStart := time.Now()
+++		var record SourceTiming
+++		if measured, ok := source.(interface{ DrawMeasured(Composer) SourceTiming }); ok {
+++			record = measured.DrawMeasured(cd)
+++		} else {
+++			source.Draw(cd)
+++		}
+++		record.DrawNS = time.Since(drawStart).Nanoseconds()
+++		record.Composition, record.Source = 1, uint32(i)
+++		record.ImageUploadTimingAvailable = hasTimer
+++		if hasTimer {
+++			after := timer.ReadSourceImageTiming()
+++			if before.Invalid || after.Invalid || after.SetFromGoImageNS < before.SetFromGoImageNS ||
+++				after.SetFromGoImageAttempts < before.SetFromGoImageAttempts || after.ImageCacheHits < before.ImageCacheHits || after.LogicalUploadRGBABytes < before.LogicalUploadRGBABytes {
+++				failure = "source diagnostic image counter overflow"
+++			} else {
+++				record.SetFromGoImageNS = after.SetFromGoImageNS - before.SetFromGoImageNS
+++				record.SetFromGoImageAttempts = after.SetFromGoImageAttempts - before.SetFromGoImageAttempts
+++				record.ImageCacheHits = after.ImageCacheHits - before.ImageCacheHits
+++				record.LogicalUploadRGBABytes = after.LogicalUploadRGBABytes - before.LogicalUploadRGBABytes
+++			}
+++		}
+++		if len(details.Records) < MaxSourceTimingRecords {
+++			details.Records = append(details.Records, record)
+++		}
+++	}
+++	timing := ComposeTiming{RasterUploadNS: time.Since(start).Nanoseconds(), SourceDetails: details}
+++	if drawer, ok := cd.Drawer.(interface{ EndMeasured() ComposeTiming }); ok {
+++		end := drawer.EndMeasured()
+++		end.RasterUploadNS += timing.RasterUploadNS
+++		end.SourceDetails = details
+++		if end.Failure == "" {
+++			end.Failure = failure
+++		}
+++		return end
+++	}
+++	cd.Drawer.End()
+++	timing.Failure = "composition drawer does not support encoding timing"
+++	return timing
+++}
++--- /dev/null
+++++ b/system/composer/source_timing_test.go
++@@ -0,0 +1,172 @@
+++// Copyright (c) 2026, Davin Hills.
+++// SPDX-License-Identifier: MIT
+++
+++package composer
+++
+++import (
+++	"reflect"
+++	"runtime"
+++	"testing"
+++)
+++
+++type sourceTimingDrawer struct {
+++	measuredTimingDrawer
+++	active bool
+++	stats  ImageTiming
+++}
+++
+++func (d *sourceTimingDrawer) BeginSourceImageTiming() bool {
+++	if d.active {
+++		return false
+++	}
+++	d.active = true
+++	d.stats = ImageTiming{}
+++	return true
+++}
+++func (d *sourceTimingDrawer) ReadSourceImageTiming() ImageTiming { return d.stats }
+++func (d *sourceTimingDrawer) EndSourceImageTiming()              { d.active = false }
+++
+++type measuredSource struct {
+++	draw, measured int
+++	action         func()
+++}
+++
+++type unwindingSourceDrawer struct {
+++	*sourceTimingDrawer
+++	action func()
+++}
+++
+++func (d *unwindingSourceDrawer) EndMeasured() ComposeTiming {
+++	d.action()
+++	return d.sourceTimingDrawer.EndMeasured()
+++}
+++
+++func TestVellumSourceTimingDrawerUnwindClearsCounters(t *testing.T) {
+++	for _, goexit := range []bool{false, true} {
+++		var order []string
+++		d := &unwindingSourceDrawer{sourceTimingDrawer: newSourceTimingDrawer(&order), action: func() {
+++			if goexit {
+++				runtime.Goexit()
+++			}
+++			panic("drawer panic")
+++		}}
+++		done := make(chan bool, 1)
+++		go func() {
+++			returned := false
+++			defer func() { p := recover(); done <- !returned && (goexit && p == nil || !goexit && p == "drawer panic") }()
+++			(&ComposerDrawer{Drawer: d, Sources: []Source{timingSource{"draw", &order}}}).ComposeMeasuredWithSourceDetails()
+++			returned = true
+++		}()
+++		if !<-done || d.active {
+++			t.Fatal("drawer unwind retained timing or hid abnormal exit")
+++		}
+++	}
+++}
+++
+++func (s *measuredSource) Draw(Composer) {
+++	s.draw++
+++	if s.action != nil {
+++		s.action()
+++	}
+++}
+++func (s *measuredSource) DrawMeasured(Composer) SourceTiming {
+++	s.measured++
+++	if s.action != nil {
+++		s.action()
+++	}
+++	return SourceTiming{Kind: SourceScene}
+++}
+++
+++func newSourceTimingDrawer(order *[]string) *sourceTimingDrawer {
+++	return &sourceTimingDrawer{measuredTimingDrawer: measuredTimingDrawer{timingDrawer: timingDrawer{order: order}, result: ComposeTiming{Supported: true, Submitted: true, EncodeSubmitNS: 19}}}
+++}
+++
+++func TestVellumSourceTimingOptInOrderBoundsAndNoDoubleCounting(t *testing.T) {
+++	for _, detailed := range []bool{false, true} {
+++		var order []string
+++		d := newSourceTimingDrawer(&order)
+++		s := &measuredSource{action: func() { order = append(order, "known") }}
+++		cd := &ComposerDrawer{Drawer: d, Sources: []Source{s, timingSource{"unknown", &order}}}
+++		var result ComposeTiming
+++		if detailed {
+++			result = cd.ComposeMeasuredWithSourceDetails()
+++		} else {
+++			result = cd.ComposeMeasured()
+++		}
+++		if !reflect.DeepEqual(order, []string{"start", "known", "unknown", "measured-end"}) || d.active || result.EncodeSubmitNS != 19 || !result.Submitted {
+++			t.Fatalf("rendering changed: %+v %v", result, order)
+++		}
+++		if !detailed {
+++			if result.SourceDetails != nil || s.draw != 1 || s.measured != 0 {
+++				t.Fatal("ordinary path acquired details")
+++			}
+++			continue
+++		}
+++		if s.draw != 0 || s.measured != 1 || result.Failure != "" || len(result.SourceDetails.Records) != 2 {
+++			t.Fatal("diagnostic drew source twice or lost records")
+++		}
+++		var draws int64
+++		for i, r := range result.SourceDetails.Records {
+++			if r.Composition != 1 || r.Source != uint32(i) || !r.ImageUploadTimingAvailable {
+++				t.Fatalf("order/timing: %+v", r)
+++			}
+++			draws += r.DrawNS
+++		}
+++		if draws > result.RasterUploadNS || result.SourceDetails.Records[1].RasterAvailable || result.SourceDetails.Records[1].CopyAvailable {
+++			t.Fatal("nested/unknown timing fabricated")
+++		}
+++	}
+++	var order []string
+++	d := newSourceTimingDrawer(&order)
+++	s := &measuredSource{}
+++	cd := &ComposerDrawer{Drawer: d}
+++	for i := 0; i < 33; i++ {
+++		cd.Sources = append(cd.Sources, s)
+++	}
+++	r := cd.ComposeMeasuredWithSourceDetails()
+++	if s.measured != 33 || len(r.SourceDetails.Records) != 32 || r.Failure == "" || !r.Submitted || d.active || order[len(order)-1] != "measured-end" {
+++		t.Fatal("overflow altered full draw/submit")
+++	}
+++}
+++
+++func TestVellumSourceTimingUnknownDrawerAndCounterOverflow(t *testing.T) {
+++	var order []string
+++	d := &measuredTimingDrawer{timingDrawer: timingDrawer{order: &order}, result: ComposeTiming{Supported: true, Submitted: true}}
+++	r := (&ComposerDrawer{Drawer: d, Sources: []Source{timingSource{"draw", &order}}}).ComposeMeasuredWithSourceDetails()
+++	if r.Failure != "" || r.SourceDetails.Records[0].ImageUploadTimingAvailable {
+++		t.Fatal("unknown drawer fabricated image counters")
+++	}
+++	timer := newSourceTimingDrawer(&order)
+++	s := &measuredSource{action: func() { timer.stats.Invalid = true }}
+++	r = (&ComposerDrawer{Drawer: timer, Sources: []Source{s}}).ComposeMeasuredWithSourceDetails()
+++	if r.Failure == "" || !r.Submitted || timer.active {
+++		t.Fatal("masked overflow or altered submission")
+++	}
+++}
+++
+++func TestVellumSourceTimingUnwindClearsCounters(t *testing.T) {
+++	for _, goexit := range []bool{false, true} {
+++		var order []string
+++		d := newSourceTimingDrawer(&order)
+++		done := make(chan bool, 1)
+++		go func() {
+++			returned := false
+++			defer func() { p := recover(); done <- !returned && (goexit && p == nil || !goexit && p == "source panic") }()
+++			s := &measuredSource{action: func() {
+++				if goexit {
+++					runtime.Goexit()
+++				}
+++				panic("source panic")
+++			}}
+++			(&ComposerDrawer{Drawer: d, Sources: []Source{s}}).ComposeMeasuredWithSourceDetails()
+++			returned = true
+++		}()
+++		if !<-done || d.active {
+++			t.Fatal("abnormal unwind masked or measurement retained")
+++		}
+++		r := (&ComposerDrawer{Drawer: d, Sources: []Source{timingSource{"next", &order}}}).ComposeMeasuredWithSourceDetails()
+++		if r.Failure != "" || d.active {
+++			t.Fatal("next batch inherited stale measurement")
+++		}
+++	}
+++}
++--- a/system/composer/timing.go
+++++ b/system/composer/timing.go
++@@ -8,6 +8,7 @@
++ 	RasterUploadNS, EncodeSubmitNS, AcquireNS, PresentCallNS int64
++ 	Supported, Submitted                                     bool
++ 	Failure                                                  string
+++	SourceDetails                                            *SourceDetails
++ }
++ 
++ // ComposeMeasured preserves the ordinary draw order and opts into a drawer's
+diff --git a/drivers/cogent/native/patches/sourcecost/README.md b/drivers/cogent/native/patches/sourcecost/README.md
+new file mode 100644
+index 0000000..1ef0ea9
+--- /dev/null
++++ b/drivers/cogent/native/patches/sourcecost/README.md
+@@ -0,0 +1,39 @@
++# Source cost diagnostics
++
++Stage 36 follows empty-sprite omission. Exact input, patch and output hashes
++bind the optional native path. Ordinary ComposeMeasured and zero-value FrameTrace
++keep their existing draw path. The explicit detailed composer invokes Start once,
++each source once in the original order, and measured End once. Overflow refuses
++diagnostic completion after drawing and submitting every source.
++
++Known scene/sprite paint sources time the actual lazy raster Render and Copy
++calls. Scrim/insets time their actual Copy calls. Unknown sources retain Draw
++time with unavailable raster/copy breakdowns. Immutable numeric source kinds
++are captured at gathering, not inferred from blending operations or live scenes.
++
++GPUDrawer keeps a nil diagnostic pointer on the ordinary path. An explicit
++composition begins cumulative scalar image counters after Start. Begin/Read/End
++take separate mutex acquisitions; no drawer lock crosses source Draw. Deferred
++End clears the diagnostic pointer on normal return, panic and Goexit. Existing
++renderContext and native-window ownership serialize the full batch.
++
++The actual existing-and-unchanged branch counts a cache hit. The existing Value
++SetFromGoImage call records attempted input dimensions at checked four bytes per
++pixel and elapsed API time, including conversion/allocation/queue/sampler work.
++This is not confirmed transfer success, queue-write count, physical GPU bytes,
++GPU execution, or display latency. The existing API logs errors without returning
++them, so upload success/failure remains unavailable. Uniform Fill and resident
++UseTexture need no Go-image attempts; unknown drawers expose unavailable counters.
++
++Each ticket retains at most 32 scalar source records across intermediate and
++final compositions, with composition and source ordinals. Aggregate count/byte
++overflow refuses completion. Ticket-owned records detach from composer storage;
++public Snapshot clones the nested details. Source records retain no images,
++widgets, sources, arbitrary names, errors or user text. All source intervals are
++nested inside RasterUploadNS and do not add to TotalUIWorkNS.
++
++The separate public constructor accepts capacity 1..4096, while ordinary
++NewFrameMetrics retains 1..65536. The loaded-grid source-details mode is explicit,
++and ordinary warm-budget validation refuses it. Extra clocks and scalar checks
++affect detailed elapsed time. Software pixel/copy tests and actual GPU diagnostic
++observations have different scopes; neither qualifies the full P6 workload.
+diff --git a/drivers/cogent/native/patches/sourcecost/original-hashes.json b/drivers/cogent/native/patches/sourcecost/original-hashes.json
+new file mode 100644
+index 0000000..23236c4
+--- /dev/null
++++ b/drivers/cogent/native/patches/sourcecost/original-hashes.json
+@@ -0,0 +1,16 @@
++{
++  "core/frame_source_details.go": null,
++  "core/frame_source_details_test.go": null,
++  "core/frame_trace.go": "66cbd323497c1a539baed29521a7b8dd75522e14c10cf97610186acf242327cd",
++  "core/render_source_timing.go": null,
++  "core/render_source_timing_test.go": null,
++  "core/rendersource.go": "9435ff9ed8f9aee12937bf58e40f6de20b512dc3db824298786f39dbdb149378",
++  "core/renderwindow.go": "8915acf34471ff1a4fcb0c8f8d3ee28d5c6088e054562239859e2e9e2569d2ee",
++  "gpu/gpudraw/drawer.go": "0e463001e4cd2b1f5599d248f70966ef52961f2cfafae28e692418c1bbe58450",
++  "gpu/gpudraw/drawused.go": "269a9498ab99bc0a1254f6abb42e70cd2526df2ffe4bcba6768bd95ad1334970",
++  "gpu/gpudraw/source_timing.go": null,
++  "gpu/gpudraw/source_timing_test.go": null,
++  "system/composer/source_timing.go": null,
++  "system/composer/source_timing_test.go": null,
++  "system/composer/timing.go": "b77880f9ef4466f4ecb286e000df00ccd3c2d5e1530b290bc062d8b6392f3963"
++}
+diff --git a/drivers/cogent/native/patches/sourcecost/output-hashes.json b/drivers/cogent/native/patches/sourcecost/output-hashes.json
+new file mode 100644
+index 0000000..53bcadd
+--- /dev/null
++++ b/drivers/cogent/native/patches/sourcecost/output-hashes.json
+@@ -0,0 +1,16 @@
++{
++  "core/frame_source_details.go": "c292616cf42911593bec66f7f2a2ddb7249500e82a8e41eff223dfab3d24f9ee",
++  "core/frame_source_details_test.go": "4a274d85418333cf771b28cc6341bd2da078b1cd16eface02ed6d6e0f5fce448",
++  "core/frame_trace.go": "a2591565da1ac7936639850d1fc6a2a6792aa7692927405b188f2e44642953a6",
++  "core/render_source_timing.go": "40930d58981ee2153f4565e9be753f61dc7002455d7253b716d74e88389b52de",
++  "core/render_source_timing_test.go": "12f6f7b187b8f4a28a925f07ca9b638c4b20c2feff83c88493ae0536b0720aee",
++  "core/rendersource.go": "8c0a9ff855e80fd6efe81803fce766cae0819cedf25855098ea8a91deaa2fc46",
++  "core/renderwindow.go": "81974eacc77240959de8d70b3c2da2d08986bdb19f931ba18e5c5fca73745c71",
++  "gpu/gpudraw/drawer.go": "52017b8da2a12fdefbf5573a66b5a584723efc1ee934a3f77ff27307d06f6155",
++  "gpu/gpudraw/drawused.go": "8428f5238f7d425dc6ce835a6d711a7b6716d83dcbc81356a208364119cb1c5f",
++  "gpu/gpudraw/source_timing.go": "1516efbfd78a44805ad3e949c920377605bd298780a57edcac12959693a1c306",
++  "gpu/gpudraw/source_timing_test.go": "3b308c59bcc76bdd80c320ae9e2dd84f861f37aa8a59db532ae9d07edd797372",
++  "system/composer/source_timing.go": "ed9b933ca79c57fa0e89a1299f800ffa8d73d114e90311de0d051d8bfc8a6ca1",
++  "system/composer/source_timing_test.go": "17684dda537c039a7413ea68c4e2f943f0b3548926dd35c60fdaad91c36f45ba",
++  "system/composer/timing.go": "6fe538ebbb4d9507af74579de8ccefdf48d63697a57e304598afcdd78b303816"
++}
+diff --git a/drivers/cogent/prepare_test.py b/drivers/cogent/prepare_test.py
+index bded80d..867e650 100644
+--- a/drivers/cogent/prepare_test.py
++++ b/drivers/cogent/prepare_test.py
+@@ -280,7 +280,7 @@ class PreparationChecks(unittest.TestCase):
+         core, font = manifest["dependencies"]
+         self.assertEqual(core["module"], "cogentcore.org/core")
+         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
+-        self.assertEqual(numbers, list(range(1, 36)))
++        self.assertEqual(numbers, list(range(1, 37)))
+         self.assertEqual(len(font["stages"]), 2)
+         import hashlib
+         for dependency in manifest["dependencies"]:
+diff --git a/examples/loadedgrid/README.md b/examples/loadedgrid/README.md
+index 17757c9..5dbbca9 100644
+--- a/examples/loadedgrid/README.md
++++ b/examples/loadedgrid/README.md
+@@ -50,3 +50,10 @@ For an explicitly separate diagnostic, `-perf -rows 10000 -perf-cpu-profile
+ /private/tmp/new-grid-profile.pprof` records a bounded process-wide Go CPU profile
+ after warm-up. The output file must be new. Profiled samples are labeled and
+ rejected by the ordinary warm-budget runner; they are not qualification timings.
++
++`-perf -rows 10000 -perf-source-details` enables bounded scalar native source
++costs. The runner's matching `--source-details` mode reports DIAGNOSTIC and always
++leaves warm_target_met false. Nested raster/Copy/image-API times do not add to
++the existing UI-work total. Image counters mean API attempts and logical full
++RGBA input bytes; upload success/failure and physical GPU traffic are unavailable.
++See [the source-cost evidence](../../docs/reports/macos-source-costs/README.md).
+diff --git a/examples/loadedgrid/main.go b/examples/loadedgrid/main.go
+index c9a282c..d71c74c 100644
+--- a/examples/loadedgrid/main.go
++++ b/examples/loadedgrid/main.go
+@@ -66,17 +66,14 @@ func main() {
+ 	perfWarmup := flag.Int("perf-warmup", 128, "unmeasured closed-trajectory frames (multiple64)")
+ 	perfNovel := flag.Bool("perf-novel", false, "separate newly visited row strings; not cold-font or warm P6 results")
+ 	perfProfile := flag.String("perf-cpu-profile", "", "diagnostic process-wide CPU profile to a new file (64MiB cap); excluded from warm qualification")
++	perfSources := flag.Bool("perf-source-details", false, "diagnostic nested source costs and image API attempts; excluded from warm qualification")
+ 	flag.Parse()
+-	if !*perf && *perfProfile != "" {
+-		fmt.Fprintln(os.Stderr, "loadedgrid: -perf-cpu-profile requires -perf")
++	if err := validatePerfModes(*perf, *smoke, *perfSources, *perfProfile); err != nil {
++		fmt.Fprintln(os.Stderr, err)
+ 		os.Exit(1)
+ 	}
+ 	if *perf {
+-		if *smoke {
+-			fmt.Fprintln(os.Stderr, "loadedgrid: -perf and -smoke are separate workflows")
+-			os.Exit(1)
+-		}
+-		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile}); err != nil {
++		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, SourceDetails: *perfSources}); err != nil {
+ 			fmt.Fprintln(os.Stderr, err)
+ 			os.Exit(1)
+ 		}
+diff --git a/examples/loadedgrid/perf.go b/examples/loadedgrid/perf.go
+index e4ceec8..df30194 100644
+--- a/examples/loadedgrid/perf.go
++++ b/examples/loadedgrid/perf.go
+@@ -23,6 +23,20 @@ type perfConfig struct {
+ 	Samples, Warmup int
+ 	Novel           bool
+ 	CPUProfile      string
++	SourceDetails   bool
++}
++
++func validatePerfModes(perf, smoke, sourceDetails bool, profile string) error {
++	if !perf && sourceDetails {
++		return errors.New("loadedgrid: -perf-source-details requires -perf")
++	}
++	if !perf && profile != "" {
++		return errors.New("loadedgrid: -perf-cpu-profile requires -perf")
++	}
++	if perf && smoke {
++		return errors.New("loadedgrid: -perf and -smoke are separate workflows")
++	}
++	return nil
+ }
+ 
+ func (c perfConfig) validate() error {
+@@ -32,6 +46,9 @@ func (c perfConfig) validate() error {
+ 	if c.Rows != 10_000 && c.Rows != 1_000_000 || c.Samples < 120 || c.Samples > 2048 || c.Warmup < perfPeriod || c.Warmup > 2048 || c.Warmup%perfPeriod != 0 {
+ 		return errors.New("loadedgrid perf: rows must be10000 or1000000, samples120..2048 and warmup64..2048")
+ 	}
++	if c.SourceDetails && c.Warmup+c.Samples+2 > cogent.MaxSourceFrameMetricsCapacity {
++		return errors.New("loadedgrid perf: detailed recorder capacity exceeds4096")
++	}
+ 	return nil
+ }
+ 
+diff --git a/examples/loadedgrid/perf_runtime.go b/examples/loadedgrid/perf_runtime.go
+index 29d084c..a5bbf26 100644
+--- a/examples/loadedgrid/perf_runtime.go
++++ b/examples/loadedgrid/perf_runtime.go
+@@ -96,7 +96,7 @@ func newPerfProgram(ctx context.Context, c perfConfig) (*perfProgram, map[string
+ 		a.Close()
+ 		return nil, nil, err
+ 	}
+-	metadata := map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "cpu_profile_path": c.CPUProfile, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
++	metadata := map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "cpu_profile_path": c.CPUProfile, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
+ 	return p, metadata, nil
+ }
+ func (p *perfProgram) describe() ui.Node {
+@@ -225,7 +225,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 	if err != nil {
+ 		return err
+ 	}
+-	if err = perfEmit("grid.perf.ready", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds}); err != nil {
++	if err = perfEmit("grid.perf.ready", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds}); err != nil {
+ 		return err
+ 	}
+ 	stopProfile, err := startPerfCPUProfile(c.CPUProfile)
+@@ -270,7 +270,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 		if afterMemory.TotalAlloc < beforeMemory.TotalAlloc || afterMemory.Mallocs < beforeMemory.Mallocs {
+ 			return errors.New("loadedgrid perf: allocation counter overflow")
+ 		}
+-		if err = perfEmit("grid.perf.sample", map[string]any{"index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
++		if err = perfEmit("grid.perf.sample", map[string]any{"source_details": c.SourceDetails, "index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
+ 			return err
+ 		}
+ 	}
+@@ -286,7 +286,17 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 		return err
+ 	}
+ 	runtime.GC()
+-	return perfEmit("grid.perf.end", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
++	return perfEmit("grid.perf.end", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
++}
++
++// Detailed records are diagnostic instrumentation. The ordinary constructor
++// and its larger capacity remain unchanged when the mode is off.
++func newPerfFrameMetrics(c perfConfig) (*cogent.FrameMetrics, error) {
++	capacity := c.Warmup + c.Samples + 2
++	if c.SourceDetails {
++		return cogent.NewFrameMetricsWithSourceDetails(capacity)
++	}
++	return cogent.NewFrameMetrics(capacity)
+ }
+ func runPerf(c perfConfig) error {
+ 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+@@ -296,7 +306,7 @@ func runPerf(c perfConfig) error {
+ 		return err
+ 	}
+ 	defer p.owner.Close()
+-	m, err := cogent.NewFrameMetrics(c.Warmup + c.Samples + 2)
++	m, err := newPerfFrameMetrics(c)
+ 	if err != nil {
+ 		return err
+ 	}
+diff --git a/examples/loadedgrid/perf_test.go b/examples/loadedgrid/perf_test.go
+index ed1bfc2..26ac378 100644
+--- a/examples/loadedgrid/perf_test.go
++++ b/examples/loadedgrid/perf_test.go
+@@ -1,6 +1,7 @@
+ package main
+ 
+ import (
++	"encoding/json"
+ 	"image"
+ 	"testing"
+ 
+@@ -31,6 +32,83 @@ func TestPerfConfigAndClosedWarmTrajectory(t *testing.T) {
+ 		t.Fatalf("warm trajectory does not return%d,%d", x, y)
+ 	}
+ }
++
++func TestPerfSourceDetailsRequireExplicitPerfAndBoundedRecorder(t *testing.T) {
++	for _, mode := range []struct {
++		perf, smoke, details bool
++		profile              string
++	}{
++		{details: true}, {smoke: true, details: true}, {profile: "profile.pprof"},
++		{perf: true, smoke: true, details: true},
++	} {
++		if err := validatePerfModes(mode.perf, mode.smoke, mode.details, mode.profile); err == nil {
++			t.Fatalf("accepted incompatible mode%+v", mode)
++		}
++	}
++	if err := validatePerfModes(true, false, true, ""); err != nil {
++		t.Fatal(err)
++	}
++	// These values exercise the shared recorder reservation, including warmup
++	// tickets and two setup slots, rather than merely capping measured samples.
++	cfg := perfConfig{Rows: 10_000, Samples: 2046, Warmup: 2048, SourceDetails: true}
++	if err := cfg.validate(); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := newPerfFrameMetrics(cfg); err != nil {
++		t.Fatal(err)
++	}
++	cfg.Samples++
++	if err := cfg.validate(); err == nil {
++		t.Fatal("accepted detailed recorder capacity4097")
++	}
++	cfg.SourceDetails = false
++	if err := cfg.validate(); err != nil {
++		t.Fatalf("detailed cap changed ordinary mode: %v", err)
++	}
++	if _, err := newPerfFrameMetrics(cfg); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestPerfNestedSourceCostsDoNotBecomeAdditionalUIWork(t *testing.T) {
++	sample := cogent.FrameSample{TotalUIWorkNS: 7, InputNS: 1, OwnerNS: 1, ReconcileNS: 1,
++		LayoutPaintNS: 1, GatherNS: 1, RasterUploadNS: 1, EncodeSubmitNS: 1}
++	ordinary, err := json.Marshal(sample)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var record map[string]json.RawMessage
++	if err = json.Unmarshal(ordinary, &record); err != nil {
++		t.Fatal(err)
++	}
++	if _, present := record["SourceDetails"]; present {
++		t.Fatal("ordinary sample emitted source diagnostic payload")
++	}
++	sample.SourceDetails = &cogent.FrameSourceDetails{Compositions: 1, Records: []cogent.FrameSourceSample{{
++		Composition: 1, Kind: cogent.FrameSourceScene, DrawNS: 1, CopyNS: 1, CopyAvailable: true,
++		ImageWidth: 10, ImageHeight: 20, ImageUploadTimingAvailable: true, SetFromGoImageNS: 1,
++		SetFromGoImageAttempts: 1, LogicalUploadRGBABytes: 800,
++	}}}
++	metrics := perfMetrics(sample)
++	if metrics["ui_work_ns"] != 7 || metrics["raster_upload_ns"] != 1 || len(metrics) != 11 {
++		t.Fatalf("nested costs changed frame work%+v", metrics)
++	}
++	diagnostic, err := json.Marshal(sample)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err = json.Unmarshal(diagnostic, &record); err != nil {
++		t.Fatal(err)
++	}
++	var detail cogent.FrameSourceDetails
++	if err = json.Unmarshal(record["SourceDetails"], &detail); err != nil {
++		t.Fatal(err)
++	}
++	if detail.UploadFailuresAvailable || len(detail.Records) != 1 || detail.Records[0].LogicalUploadRGBABytes != 800 {
++		t.Fatalf("raw diagnostic attempts lost%+v", detail)
++	}
++}
++
+ func TestPerfVariableRowsUseStoredSourceAndExactIndex(t *testing.T) {
+ 	s := &perfVariableSource{&fullSource{rows: 10_000}}
+ 	for i := 0; i < 10_000; i++ {
+diff --git a/scripts/benchmark-grid.py b/scripts/benchmark-grid.py
+index ee17941..94931a2 100644
+--- a/scripts/benchmark-grid.py
++++ b/scripts/benchmark-grid.py
+@@ -44,7 +44,93 @@ def distribution(values):
+             "coefficient_of_variation": sd / mean if mean else 0.0}
+ 
+ 
+-def validate_records(records, rows, variable, samples, novel, *, allow_profile=False):
++SOURCE_RECORD_FIELDS = {
++    "Composition", "Source", "Kind", "DrawNS", "RasterNS", "CopyNS",
++    "RasterAvailable", "CopyAvailable", "ImageWidth", "ImageHeight", "ImageChanged",
++    "ImageUploadTimingAvailable", "SetFromGoImageNS", "SetFromGoImageAttempts",
++    "ImageCacheHits", "LogicalUploadRGBABytes",
++}
++INT64_MAX = (1 << 63) - 1
++UINT64_MAX = (1 << 64) - 1
++MAX_SOURCE_RECORDS = 32
++MAX_SOURCE_CAPACITY = 4096
++
++
++def source_integer(record, field, maximum):
++    value = record.get(field)
++    if type(value) is not int or not 0 <= value <= maximum:
++        raise ValueError(f"invalid bounded source integer {field}")
++    return value
++
++
++def validate_source_details(details, raster_upload_ns):
++    """Scalar diagnostics nested inside the ticket, never additional UI work."""
++    if type(details) is not dict or set(details) != {"Compositions", "UploadFailuresAvailable", "Records"}:
++        raise ValueError("invalid source details schema")
++    if details["UploadFailuresAvailable"] is not False:
++        raise ValueError("source upload success/failures are unavailable")
++    compositions = source_integer(details, "Compositions", MAX_SOURCE_RECORDS)
++    records = details["Records"]
++    if compositions == 0 or type(records) is not list or not 1 <= len(records) <= MAX_SOURCE_RECORDS:
++        raise ValueError("source record/composition capacity exceeded or empty")
++    composition, source, draw_total = 0, 0, 0
++    totals = {name: 0 for name in ("SetFromGoImageAttempts", "ImageCacheHits", "LogicalUploadRGBABytes")}
++    for record in records:
++        if type(record) is not dict or set(record) != SOURCE_RECORD_FIELDS:
++            raise ValueError("invalid source record scalar schema")
++        current = source_integer(record, "Composition", MAX_SOURCE_RECORDS)
++        ordinal = source_integer(record, "Source", MAX_SOURCE_RECORDS - 1)
++        if current == 0:
++            raise ValueError("source composition ordinal must start at one")
++        if current == composition + 1:
++            composition, source = current, 0
++        if current != composition or ordinal != source:
++            raise ValueError("unordered, missing or repeated source/composition ordinal")
++        source += 1
++        source_integer(record, "Kind", 4)
++        for flag in ("RasterAvailable", "CopyAvailable", "ImageChanged", "ImageUploadTimingAvailable"):
++            if type(record[flag]) is not bool:
++                raise ValueError(f"invalid source availability/change flag {flag}")
++        draw, raster, copy, upload = (source_integer(record, name, INT64_MAX) for name in
++                                      ("DrawNS", "RasterNS", "CopyNS", "SetFromGoImageNS"))
++        if raster + copy > draw or upload > draw or record["CopyAvailable"] and upload > copy:
++            raise ValueError("source nested interval exceeds enclosing draw/copy")
++        if not record["RasterAvailable"] and raster or not record["CopyAvailable"] and copy:
++            raise ValueError("unavailable source interval fabricated")
++        width = source_integer(record, "ImageWidth", INT64_MAX)
++        height = source_integer(record, "ImageHeight", INT64_MAX)
++        attempts, hits, logical_bytes = (source_integer(record, name, UINT64_MAX) for name in totals)
++        if not record["ImageUploadTimingAvailable"] and (upload or attempts or hits or logical_bytes):
++            raise ValueError("unavailable image API counters fabricated")
++        if attempts == 0 and (upload or logical_bytes):
++            raise ValueError("image API time/bytes without an attempt")
++        if logical_bytes % 4:
++            raise ValueError("logical input RGBA bytes must be a multiple of four")
++        if record["RasterAvailable"] and record["CopyAvailable"]:
++            # Known paint sources make one Copy of the reported full image.
++            # Unknown/custom sources can copy multiple different images; their
++            # aggregate counters must not be inferred from a fabricated extent.
++            if attempts + hits > 1:
++                raise ValueError("known source made more than one image API use")
++            if record["ImageChanged"] and hits:
++                raise ValueError("changed source image cannot take unchanged image cache hit")
++            extent_bytes = 4 * width * height
++            if extent_bytes > UINT64_MAX or extent_bytes * attempts > UINT64_MAX:
++                raise ValueError("logical image extent overflow")
++            if logical_bytes != extent_bytes * attempts:
++                raise ValueError("logical image attempt bytes differ from full extent")
++        for name, value in zip(totals, (attempts, hits, logical_bytes)):
++            totals[name] += value
++            if totals[name] > UINT64_MAX:
++                raise ValueError("source ticket counter/byte sum overflow")
++        draw_total += draw
++    if composition != compositions:
++        raise ValueError("source composition count differs from records")
++    if draw_total > raster_upload_ns:
++        raise ValueError("source draw sum exceeds ticket raster/upload interval")
++
++
++def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False):
+     """Require exact case, current completed geometry and one sample per tag."""
+     if len(records) != samples + 3 or [r.get("event") for r in records[:2]] != ["grid.perf.setup", "grid.perf.ready"] or records[-1].get("event") != "grid.perf.end":
+         raise ValueError("missing, repeated or unordered benchmark stages")
+@@ -57,6 +143,15 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
+         raise ValueError("diagnostic CPU profile cannot qualify warm timing")
+     if any(r.get("cpu_profile", False) is not profiled for r in (ready, end)):
+         raise ValueError("CPU profiling case identity mismatch")
++    detailed = setup.get("source_details", False)
++    if type(detailed) is not bool or detailed and not allow_source_details:
++        raise ValueError("diagnostic source details cannot qualify warm timing")
++    if any(r.get("source_details", False) is not detailed for r in (ready, end)):
++        raise ValueError("source detail case identity mismatch")
++    if detailed:
++        warmup = ready.get("warmup")
++        if type(warmup) is not int or not 64 <= warmup <= 2048 or warmup % 64 or type(samples) is not int or not 120 <= samples <= 2048 or warmup + samples + 2 > MAX_SOURCE_CAPACITY:
++            raise ValueError("detailed recorder warmup/sample capacity invalid")
+     if setup.get("release") is not True or setup.get("stored_value_bytes") != rows * 20 * 8 or setup.get("seed") != 7:
+         raise ValueError("release stored-data fixture required")
+     if end.get("samples") != samples or end.get("dropped") != 0 or end.get("pending") != 0 or end.get("callbacks") != samples:
+@@ -64,7 +159,7 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
+     result = []
+     last_generation = last_frame = 0
+     for i, record in enumerate(records[2:-1]):
+-        if record.get("event") != "grid.perf.sample" or record.get("index") != i or record.get("tag") != i + 1:
++        if record.get("event") != "grid.perf.sample" or type(record.get("index")) is not int or record.get("index") != i or type(record.get("tag")) is not int or record.get("tag") != i + 1:
+             raise ValueError("sample ordering/tag mismatch")
+         geometry = record.get("geometry", {})
+         counts = [geometry.get(k) for k in ("cells", "rows", "columns")]
+@@ -77,25 +172,32 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
+         if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+             raise ValueError("invalid measured layout identity")
+         identities = [record.get(k) for k in ("generation", "frame")]
+-        if any(isinstance(n, bool) or not isinstance(n, int) or n <= 0 for n in identities):
++        if any(isinstance(n, bool) or not isinstance(n, int) or not 0 < n <= UINT64_MAX for n in identities):
+             raise ValueError("missing completed native generation/frame")
+         if record["generation"] <= last_generation or record["frame"] <= last_frame:
+             raise ValueError("repeated or backward native generation/frame")
+         last_generation, last_frame = record["generation"], record["frame"]
+         native = record.get("native_sample", {})
+-        if native.get("Tag") != i+1 or native.get("Generation") != record["generation"] or native.get("Window") != "perf" or native.get("Completed") is not True or native.get("Failure"):
++        if record.get("source_details", False) is not detailed:
++            raise ValueError("sample source detail mode identity mismatch")
++        details = native.get("SourceDetails")
++        if not detailed and details is not None:
++            raise ValueError("diagnostic source details cannot qualify warm timing")
++        if type(native.get("Tag")) is not int or native.get("Tag") != i+1 or type(native.get("Generation")) is not int or native.get("Generation") != record["generation"] or native.get("Window") != "perf" or native.get("Completed") is not True or native.get("Failure") != "":
+             raise ValueError("raw native ticket/frame mismatch")
+-        if record.get("callbacks") != 1:
++        if type(record.get("callbacks")) is not int or record.get("callbacks") != 1:
+             raise ValueError("scroll failed or callback executed more than once")
+         metrics = record.get("metrics", {})
+         if any(k not in metrics for k in METRICS):
+             raise ValueError("incomplete actual timing phases")
+         for name in METRICS:
+             value = metrics[name]
+-            if isinstance(value, bool) or not isinstance(value, int) or value < 0 or value != native.get(NATIVE_PHASES[name]):
++            if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= INT64_MAX or type(native.get(NATIVE_PHASES[name])) is not int or value != native.get(NATIVE_PHASES[name]):
+                 raise ValueError("reported timing differs from raw native sample")
+         if metrics["ui_work_ns"] != sum(metrics[k] for k in WORK_PHASES):
+             raise ValueError("same-ticket total does not match measured work phases")
++        if detailed:
++            validate_source_details(details, metrics["raster_upload_ns"])
+         result.append(record)
+     return result
+ 
+@@ -132,11 +234,14 @@ def process_sample(pid):
+             "cpu_quantum_seconds": quantum, "source": "ps; RSS is process-wide"}
+ 
+ 
+-def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None):
++def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None, source_details=False):
++    if type(source_details) is not bool or source_details and (type(samples) is not int or type(warmup) is not int or warmup + samples + 2 > MAX_SOURCE_CAPACITY):
++        raise ValueError("invalid source detail mode/recorder capacity")
+     directory.mkdir(parents=True, exist_ok=False)
+     argv = [str(binary), "-perf", f"-rows={rows}", f"-perf-samples={samples}", f"-perf-warmup={warmup}"]
+     if cpu_profile is not None:
+         argv.append(f"-perf-cpu-profile={cpu_profile}")
++    if source_details: argv.append("-perf-source-details")
+     if variable: argv.append("-variable-rows")
+     if novel: argv.append("-perf-novel")
+     process_options = {"start_new_session": True} if os.name != "nt" else {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+@@ -187,9 +292,14 @@ def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout,
+             returncode = process.wait(timeout=max(.01, timeout - (time.monotonic() - started)))
+             if pending: raise ValueError("incomplete benchmark record at EOF")
+             if returncode != 0: raise RuntimeError(f"native benchmark exited {returncode}")
+-            selected = validate_records(records, rows, variable, samples, novel, allow_profile=cpu_profile is not None)
++            selected = validate_records(records, rows, variable, samples, novel, allow_profile=cpu_profile is not None,
++                                        allow_source_details=source_details)
+             if records[0].get("cpu_profile", False) is not (cpu_profile is not None):
+                 raise ValueError("requested CPU profile case mismatch")
++            if records[0].get("source_details", False) is not source_details:
++                raise ValueError("requested source detail case mismatch")
++            if source_details and records[1]["warmup"] != warmup:
++                raise ValueError("requested detailed warmup count mismatch")
+         except BaseException as error:
+             failure = f"{type(error).__name__}: {error}"
+             raise
+@@ -250,12 +360,22 @@ def selected_inputs():
+     root = HERE.parent
+     candidates = list((root / "examples/loadedgrid").glob("*.go"))
+     candidates += list((root / "drivers/cogent").glob("frame_metrics*.go"))
++    candidates += list((root / "drivers/cogent").glob("frame_source_metrics*.go"))
+     candidates += list((root / "drivers/cogent").glob("grid*.go"))
+     candidates += [root / path for path in ("go.mod", "go.sum", "examples/loadedgrid/go.mod", "examples/loadedgrid/go.sum",
+                     "drivers/cogent/driver.go", "drivers/cogent/native/dependencies.json", "scripts/benchmark-grid.py")]
+     return {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(set(candidates)) if path.is_file()}
+ 
+ 
++def warm_target_met(cases, *, novel=False, source_details=False):
++    # Explicit instrumentation is diagnostic even if its observed intervals
++    # happen to be below the unchanged normal warm-work targets.
++    return (not novel and not source_details and bool(cases) and
++            all(bool(case["timings_ns"]["ui_work_ns"]["per_run"]) and
++                all(run["p95"] <= 4_000_000 and run["p99"] <= 6_000_000
++                    for run in case["timings_ns"]["ui_work_ns"]["per_run"]) for case in cases.values()))
++
++
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("--run", action="store_true", help="explicitly launch visible Mac benchmark processes")
+@@ -265,12 +385,15 @@ def main():
+     parser.add_argument("--samples", type=int, default=120)
+     parser.add_argument("--warmup", type=int, default=128)
+     parser.add_argument("--novel", action="store_true", help="separate newly visited row strings; not a cold-font claim")
++    parser.add_argument("--source-details", action="store_true", help="diagnostic nested source/image API costs; excluded from warm targets")
+     parser.add_argument("--timeout", type=float, default=180)
+     args = parser.parse_args()
+     if not args.run: parser.error("--run is required; this tool launches visible native windows")
+     if platform.system() != "Darwin": parser.error("this checkpoint measures the actual Mac backend")
+     if not 5 <= args.runs <= 20 or not 120 <= args.samples <= 2048 or not 64 <= args.warmup <= 2048 or args.warmup % 64 or not math.isfinite(args.timeout) or not 10 <= args.timeout <= 600:
+         parser.error("runs5..20, samples120..2048, warmup64..2048 in multiples64, timeout10..600 required")
++    if args.source_details and args.warmup + args.samples + 2 > MAX_SOURCE_CAPACITY:
++        parser.error("detailed recorder warmup+samples+2 must not exceed4096")
+     binary = args.binary.resolve(strict=True)
+     args.output.mkdir(parents=True, exist_ok=False)
+     source_before = selected_inputs()
+@@ -284,7 +407,8 @@ def main():
+               "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
+               "host": platform.platform(), "machine": platform.machine(), "machine_metadata": "machine.json",
+               "selected_inputs_before": source_before, "input_scope": "selected sources, not complete compiler/dependency closure", "runs": args.runs,
+-              "samples_per_run": args.samples, "warmup": args.warmup, "novel": args.novel, "cases": {},
++              "samples_per_run": args.samples, "warmup": args.warmup, "novel": args.novel,
++              "source_details": args.source_details, "diagnostic": args.source_details, "cases": {},
+               "scope": "release actual widget routing/frame elapsed work; end-only process-wide RSS/CPU and staged Go observations; baseline/warm process RSS, process CPU deltas, native/GPU allocations and compositor presentation unavailable"}
+     try:
+         for variable in (False, True):
+@@ -293,7 +417,8 @@ def main():
+                 case = f"{'variable' if variable else 'fixed'}-{rows}"
+                 all_runs, raw = [], []
+                 for index in range(args.runs):
+-                    measured, outcome = run_case(binary, args.output / case / f"run-{index+1}", rows, variable, args.samples, args.warmup, args.novel, args.timeout)
++                    measured, outcome = run_case(binary, args.output / case / f"run-{index+1}", rows, variable, args.samples, args.warmup, args.novel, args.timeout,
++                                                source_details=args.source_details)
+                     all_runs.append(measured); raw.append(outcome)
+                     if hashlib.sha256(binary.read_bytes()).hexdigest() != report["binary_sha256"]:
+                         raise ValueError("binary changed during measurement")
+@@ -306,10 +431,10 @@ def main():
+         source_after = selected_inputs()
+         report["selected_inputs_after"] = source_after
+         if source_before != source_after: raise ValueError("selected source changed during measurement")
+-        report["result"] = "MEASURED"
++        report["result"] = "DIAGNOSTIC" if args.source_details else "MEASURED"
+         # Targets are fixed provisional P6 thresholds, not changed by this tool.
+         report["warm_targets_ns"] = {"p95": 4_000_000, "p99": 6_000_000}
+-        report["warm_target_met"] = (not args.novel and all(all(r["p95"] <= 4_000_000 and r["p99"] <= 6_000_000 for r in v["timings_ns"]["ui_work_ns"]["per_run"]) for v in report["cases"].values()))
++        report["warm_target_met"] = warm_target_met(report["cases"], novel=args.novel, source_details=args.source_details)
+         report["rowcount_p95_ratios"] = {}
+         for heights in ("fixed", "variable"):
+             small = report["cases"][f"{heights}-10000"]["timings_ns"]["ui_work_ns"]["pooled"]["p95"]
+diff --git a/scripts/benchmark-grid_test.py b/scripts/benchmark-grid_test.py
+index 9710d0b..6ce9418 100644
+--- a/scripts/benchmark-grid_test.py
++++ b/scripts/benchmark-grid_test.py
+@@ -33,6 +33,149 @@ def records(samples=120):
+     return result
+ 
+ 
++def source_record(**overrides):
++    value = {"Composition": 1, "Source": 0, "Kind": 1, "DrawNS": 90, "RasterNS": 40, "CopyNS": 30,
++             "RasterAvailable": True, "CopyAvailable": True, "ImageWidth": 10, "ImageHeight": 20,
++             "ImageChanged": True, "ImageUploadTimingAvailable": True, "SetFromGoImageNS": 20,
++             "SetFromGoImageAttempts": 1, "ImageCacheHits": 0, "LogicalUploadRGBABytes": 800}
++    value.update(overrides)
++    return value
++
++
++def detailed_records(samples=120, warmup=128):
++    data = records(samples)
++    for record in data: record["source_details"] = True
++    data[1]["warmup"] = warmup
++    for sample in data[2:-1]:
++        sample["metrics"]["raster_upload_ns"] = 100
++        sample["metrics"]["ui_work_ns"] = sum(sample["metrics"][field] for field in benchmark.WORK_PHASES)
++        sample["native_sample"].update({native: sample["metrics"][name] for name, native in benchmark.NATIVE_PHASES.items()})
++        sample["native_sample"]["SourceDetails"] = {"Compositions": 1, "UploadFailuresAvailable": False,
++                                                   "Records": [source_record()]}
++    return data
++
++
++class SourceDetailTests(unittest.TestCase):
++    def validate(self, data):
++        return benchmark.validate_records(data, 10000, False, 120, False, allow_source_details=True)
++
++    def test_historical_ordinary_records_and_explicit_false_remain_ordinary(self):
++        data = records()
++        self.assertEqual(len(benchmark.validate_records(data, 10000, False, 120, False)), 120)
++        for r in data: r["source_details"] = False
++        for r in data[2:-1]: r["native_sample"]["SourceDetails"] = None
++        self.assertEqual(len(benchmark.validate_records(data, 10000, False, 120, False)), 120)
++
++    def test_explicit_diagnostic_is_separate_from_profile_and_ui_total(self):
++        data = detailed_records()
++        for options in ({}, {"allow_profile": True}):
++            with self.assertRaisesRegex(ValueError, "diagnostic"):
++                benchmark.validate_records(data, 10000, False, 120, False, **options)
++        selected = self.validate(data)
++        first = selected[0]
++        self.assertEqual(first["metrics"]["ui_work_ns"], 106)
++        self.assertEqual(first["native_sample"]["SourceDetails"]["Records"][0]["LogicalUploadRGBABytes"], 800)
++        # Nested90/40/30/20 durations remain raw diagnostics; none are added to
++        # the original100 raster/upload interval or106 total work sample.
++        self.assertEqual(benchmark.summarize([selected])["ui_work_ns"]["pooled"]["min"], 106)
++
++    def test_known_skipped_raster_cache_hit_and_unknown_multiple_image_calls(self):
++        data = detailed_records()
++        detail = data[2]["native_sample"]["SourceDetails"]
++        detail["Records"] = [source_record(DrawNS=40, RasterNS=0, CopyNS=20, ImageChanged=False,
++                                          SetFromGoImageNS=0, SetFromGoImageAttempts=0, ImageCacheHits=1,
++                                          LogicalUploadRGBABytes=0),
++                             source_record(Source=1, Kind=0, DrawNS=50, RasterNS=0, CopyNS=0,
++                                          RasterAvailable=False, CopyAvailable=False, ImageWidth=0, ImageHeight=0,
++                                          SetFromGoImageNS=20, SetFromGoImageAttempts=2, ImageCacheHits=3,
++                                          LogicalUploadRGBABytes=1600)]
++        self.assertEqual(len(self.validate(data)), 120)
++
++    def test_prefix_compositions_share_exact32_ticket_cap(self):
++        rows = [source_record(Composition=i//16+1, Source=i%16, DrawNS=1, RasterNS=0, CopyNS=0,
++                              ImageUploadTimingAvailable=False, SetFromGoImageNS=0,
++                              SetFromGoImageAttempts=0, ImageCacheHits=0, LogicalUploadRGBABytes=0)
++                for i in range(32)]
++        detail = {"Compositions": 2, "UploadFailuresAvailable": False, "Records": rows}
++        benchmark.validate_source_details(detail, 32)
++        rows.append(source_record(Composition=3))
++        detail["Compositions"] = 3
++        with self.assertRaisesRegex(ValueError, "capacity"):
++            benchmark.validate_source_details(detail, 1000)
++
++    def test_mode_metadata_and_presence_corruption_refuse(self):
++        changes = [lambda d:d[0].update(source_details="true"), lambda d:d[1].update(source_details=False),
++                   lambda d:d[-1].update(source_details=False), lambda d:d[3].update(source_details=False),
++                   lambda d:d[2]["native_sample"].pop("SourceDetails"),
++                   lambda d:d[1].update(warmup=2049), lambda d:d[1].update(warmup=True)]
++        for change in changes:
++            data = detailed_records(); change(data)
++            with self.assertRaises(ValueError): self.validate(data)
++        ordinary = records()
++        ordinary[2]["native_sample"]["SourceDetails"] = {"Compositions": 1, "UploadFailuresAvailable": False, "Records": []}
++        with self.assertRaisesRegex(ValueError, "diagnostic"):
++            benchmark.validate_records(ordinary, 10000, False, 120, False, allow_source_details=True)
++
++    def test_detailed_capacity_counts_both_warmup_and_sample_tickets(self):
++        data = detailed_records(samples=2048, warmup=2048)
++        with self.assertRaisesRegex(ValueError, "capacity"):
++            benchmark.validate_records(data, 10000, False, 2048, False, allow_source_details=True)
++
++    def test_missing_repeated_skipped_and_invalid_ordinals_refuse(self):
++        changes = [lambda d:d.update(Compositions=0), lambda d:d.update(Compositions=2),
++                   lambda d:d["Records"][0].update(Composition=0), lambda d:d["Records"][0].update(Composition=2),
++                   lambda d:d["Records"][0].update(Source=1), lambda d:d["Records"][0].update(Source=32),
++                   lambda d:d["Records"].append(copy.deepcopy(d["Records"][0]))]
++        for change in changes:
++            data = detailed_records(); detail = data[2]["native_sample"]["SourceDetails"]; change(detail)
++            with self.assertRaises(ValueError): self.validate(data)
++
++    def test_scalar_schema_availability_and_nested_interval_corruption_refuse(self):
++        changes = [{"Kind": 5}, {"DrawNS": True}, {"DrawNS": -1}, {"DrawNS": 1<<63}, {"ImageChanged": 1},
++                   {"DrawNS": 60}, {"CopyNS": 10}, {"RasterAvailable": False}, {"CopyAvailable": False},
++                   {"ImageUploadTimingAvailable": False}, {"SetFromGoImageAttempts": 0},
++                   {"ImageWidth": -1}, {"ImageWidth": 1<<63}, {"ImageWidth": 1<<62},
++                   {"LogicalUploadRGBABytes": 804}, {"LogicalUploadRGBABytes": 801},
++                   {"ImageCacheHits": 1}, {"SetFromGoImageAttempts": 1<<64}, {"user_text": "forbidden"}]
++        changes.append({"SetFromGoImageAttempts": 0, "SetFromGoImageNS": 0,
++                        "LogicalUploadRGBABytes": 0, "ImageCacheHits": 1})
++        for change in changes:
++            data = detailed_records(); data[2]["native_sample"]["SourceDetails"]["Records"][0].update(change)
++            with self.subTest(change=change), self.assertRaises(ValueError): self.validate(data)
++        for change in (lambda d:d.update(UploadFailuresAvailable=True), lambda d:d.update(Records=None),
++                       lambda d:d.update(Records=[]), lambda d:d.update(Image=None)):
++            data = detailed_records(); change(data[2]["native_sample"]["SourceDetails"])
++            with self.assertRaises(ValueError): self.validate(data)
++
++    def test_native_ticket_scalar_corruption_cannot_hide_behind_numeric_equality(self):
++        for field, value in (("Tag", True), ("Generation", 1.0), ("InputNS", True), ("InputNS", 1.0)):
++            data = detailed_records(); data[2]["native_sample"][field] = value
++            with self.subTest(field=field, value=value), self.assertRaises(ValueError): self.validate(data)
++        for field, value in (("tag", True), ("index", False), ("callbacks", True)):
++            data = detailed_records(); data[2][field] = value
++            with self.subTest(field=field), self.assertRaises(ValueError): self.validate(data)
++
++    def test_ticket_draw_and_counter_overflow_refuse(self):
++        detail = {"Compositions": 1, "UploadFailuresAvailable": False, "Records": [source_record()]}
++        with self.assertRaisesRegex(ValueError, "draw sum"):
++            benchmark.validate_source_details(detail, 89)
++        for field in ("SetFromGoImageAttempts", "ImageCacheHits", "LogicalUploadRGBABytes"):
++            rows = [source_record(Source=i, Kind=0, DrawNS=1, RasterNS=0, CopyNS=0, RasterAvailable=False,
++                                  CopyAvailable=False, ImageWidth=0, ImageHeight=0, SetFromGoImageNS=0,
++                                  SetFromGoImageAttempts=1, ImageCacheHits=0, LogicalUploadRGBABytes=0) for i in range(2)]
++            for row in rows: row[field] = benchmark.UINT64_MAX - (3 if field=="LogicalUploadRGBABytes" else 0)
++            detail["Records"] = rows
++            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "sum overflow"):
++                benchmark.validate_source_details(detail, 2)
++
++    def test_nested_mode_cannot_claim_normal_warm_targets(self):
++        cases = {"fixed-10000": {"timings_ns": {"ui_work_ns": {"per_run": [{"p95": 1, "p99": 1}]}}}}
++        self.assertTrue(benchmark.warm_target_met(cases))
++        self.assertFalse(benchmark.warm_target_met(cases, source_details=True))
++        self.assertFalse(benchmark.warm_target_met(cases, novel=True))
++        self.assertFalse(benchmark.warm_target_met({}))
++
++
+ class StatisticsTests(unittest.TestCase):
+     def test_nearest_rank_outliers_are_retained(self):
+         result = benchmark.distribution(list(range(1, 100))+[10000])
+@@ -112,19 +255,20 @@ class FakeProcess:
+ 
+ 
+ class ProcessTests(unittest.TestCase):
+-    def run_fixture(self, data):
++    def run_fixture(self, data, *, source_details=False):
+         payload = b"native ordinary log\n" + b"\n".join(json.dumps(v).encode() for v in data)+b"\n"
+         process = FakeProcess(payload)
+         with tempfile.TemporaryDirectory() as temp:
+             directory = Path(temp)/"run"
+             with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group") as kill:
+-                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5)
++                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5, source_details=source_details)
+                 except Exception as error: result = error
+             raw = (directory/"native.log").read_bytes()
+             outcome = json.loads((directory/"result.json").read_text())
+             self.assertEqual(raw, payload)
+             self.assertEqual(launch.call_args.kwargs["bufsize"], 0)
+             self.assertTrue(launch.call_args.kwargs["start_new_session"])
++            self.assertEqual("-perf-source-details" in launch.call_args.args[0], source_details)
+             observe.assert_called_once_with(process.pid)
+             return result, outcome
+ 
+@@ -177,6 +321,38 @@ class ProcessTests(unittest.TestCase):
+         self.assertIn("completion mismatch", outcome["error"])
+         self.assertEqual(len(outcome["log_sha256"]), 64)
+ 
++    def test_detailed_flag_and_exact_nested_raw_records_are_preserved(self):
++        data = detailed_records()
++        result, outcome = self.run_fixture(data, source_details=True)
++        self.assertIsInstance(result, tuple)
++        self.assertEqual(outcome["records"], data)
++        self.assertEqual(outcome["result"], "PASS")
++
++    def test_requested_detail_mode_refuses_ordinary_result_even_when_other_fields_match(self):
++        result, outcome = self.run_fixture(records(), source_details=True)
++        self.assertIsInstance(result, ValueError)
++        self.assertIn("requested source detail", outcome["error"])
++
++    def test_requested_detailed_warmup_must_match_ready_metadata(self):
++        result, outcome = self.run_fixture(detailed_records(warmup=64), source_details=True)
++        self.assertIsInstance(result, ValueError)
++        self.assertIn("warmup count mismatch", outcome["error"])
++
++    def test_corrupt_detailed_result_retains_raw_failure_without_warm_fallback(self):
++        data = detailed_records()
++        data[2]["native_sample"]["SourceDetails"]["Records"][0]["LogicalUploadRGBABytes"] = 0
++        result, outcome = self.run_fixture(data, source_details=True)
++        self.assertIsInstance(result, ValueError)
++        self.assertEqual(outcome["result"], "FAILED")
++        self.assertEqual(outcome["records"], data)
++
++    def test_detail_capacity_refusal_happens_before_any_launch(self):
++        with tempfile.TemporaryDirectory() as temp, mock.patch.object(benchmark.subprocess, "Popen") as launch:
++            with self.assertRaisesRegex(ValueError, "capacity"):
++                benchmark.run_case(Path("fake"), Path(temp)/"run", 10000, False, 2048, 2048, False, 5, source_details=True)
++            launch.assert_not_called()
++            self.assertFalse((Path(temp)/"run").exists())
++
+ 
+ class SetupFailureTests(unittest.TestCase):
+     def test_launch_failure_records_terminal_failure(self):
+@@ -216,4 +392,39 @@ class SetupFailureTests(unittest.TestCase):
+             process.stdout.close()
+ 
+ 
++class DiagnosticReportTests(unittest.TestCase):
++    def test_cli_detailed_campaign_is_labeled_diagnostic_even_below_warm_targets(self):
++        selected = benchmark.validate_records(detailed_records(), 10000, False, 120, False, allow_source_details=True)
++        for sample in selected:
++            sample.update(go_process_alloc_bytes=1, go_process_mallocs=1, source_callbacks={"Keys": 1, "Inverse": 1, "Cells": 1})
++        with tempfile.TemporaryDirectory() as temp:
++            binary = Path(temp)/"binary"; binary.write_bytes(b"CPU-only test fixture, never launched")
++            output = Path(temp)/"results"
++            argv = ["benchmark-grid.py", "--run", "--binary", str(binary), "--output", str(output), "--source-details"]
++            with mock.patch.object(benchmark.sys, "argv", argv), mock.patch.object(benchmark.platform, "system", return_value="Darwin"), \
++                 mock.patch.object(benchmark, "metadata_command", return_value={}), mock.patch.object(benchmark, "selected_inputs", return_value={}), \
++                 mock.patch.object(benchmark, "run_case", return_value=(selected, {"result": "PASS"})) as run, \
++                 mock.patch("sys.stdout", new_callable=io.StringIO):
++                benchmark.main()
++            self.assertEqual(run.call_count, 20)
++            self.assertTrue(all(call.kwargs["source_details"] for call in run.call_args_list))
++            summary = json.loads((output/"summary.json").read_text())
++            self.assertEqual(summary["result"], "DIAGNOSTIC")
++            self.assertTrue(summary["diagnostic"])
++            self.assertTrue(summary["source_details"])
++            self.assertFalse(summary["warm_target_met"])
++            self.assertEqual(summary["warm_targets_ns"], {"p95": 4_000_000, "p99": 6_000_000})
++
++    def test_cli_detailed_capacity_refusal_precedes_output_or_process(self):
++        with tempfile.TemporaryDirectory() as temp:
++            output = Path(temp)/"results"
++            argv = ["benchmark-grid.py", "--run", "--binary", str(Path(temp)/"missing"), "--output", str(output),
++                    "--source-details", "--warmup", "2048", "--samples", "2048"]
++            with mock.patch.object(benchmark.sys, "argv", argv), mock.patch.object(benchmark.platform, "system", return_value="Darwin"), \
++                 mock.patch.object(benchmark, "run_case") as run, mock.patch("sys.stderr", new_callable=io.StringIO):
++                with self.assertRaises(SystemExit): benchmark.main()
++            run.assert_not_called()
++            self.assertFalse(output.exists())
++
++
+ if __name__ == "__main__": unittest.main()
+diff --git a/scripts/check.sh b/scripts/check.sh
+index 3a25412..fc30db6 100755
+--- a/scripts/check.sh
++++ b/scripts/check.sh
+@@ -24,7 +24,7 @@ go vet ./...
+ mkdir -p build
+ go build -o build/vellum-workbench ./cmd/workbench
+ # Replacement dependency tests do not run transitively with driver tests.
+-(cd build/upstream && go test -race ./system ./system/driver/base ./system/driver/desktop ./system/composer ./gpu ./gpu/gpudraw ./core ./xyz/xyzcore -run 'TestVellumFrameTrace|TestVellumMeasuredComposition|TestVellumReviewTextCursor|TestComposerPublicationAndWithdrawal|TestLockRechecksAfterWaitingForNativeTeardown|TestSceneShowUsesOwnWindowTitle|TestQueuedCloseStopsLoopAfterComposerWithdrawal|TestNewWindowSizingOwnsContextDuringOtherWindowResize|TestSameWindowStageSizingUsesExistingContext|TestScreenSnapshotDuringCacheRebuild|TestWindowOptionsFixupUsesScreenSnapshot|TestMainQueuePublicationDuringStartupDispatch|TestMainQueueInitializationPreservesIdentityAndCompletion|TestMainThreadRequiredCallbackWaitsForLoopPublication|TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW|TestDeviceLoss|TestSurfaceAcquisition|TestRetiredDirectRenderSource|TestComposition|TestInlineComposition|TestIdleBarrier|TestVellumScreenPoll|TestVellumScreenAccessors|TestVellumCurrentWindowSnapshot|TestVellumRedraw|TestVellumComposer|TestVellumUnsafeResizeReplay|TestVellumRenderedGeometryScrollAndWrap|TestVellumFocuslessShortcutPhases|TestVellumMainQueueStop|TestVellumMainQueueFailure|TestVellumNativeEventLifecycle|TestVellumTerminalMainRecovery|TestVellumQuitClean|TestVellumTextureCopy|TestVellumWindowList')
++(cd build/upstream && go test -race ./system ./system/driver/base ./system/driver/desktop ./system/composer ./gpu ./gpu/gpudraw ./core ./xyz/xyzcore -run 'TestVellumSourceTiming|TestVellumFrameTrace|TestVellumMeasuredComposition|TestVellumReviewTextCursor|TestComposerPublicationAndWithdrawal|TestLockRechecksAfterWaitingForNativeTeardown|TestSceneShowUsesOwnWindowTitle|TestQueuedCloseStopsLoopAfterComposerWithdrawal|TestNewWindowSizingOwnsContextDuringOtherWindowResize|TestSameWindowStageSizingUsesExistingContext|TestScreenSnapshotDuringCacheRebuild|TestWindowOptionsFixupUsesScreenSnapshot|TestMainQueuePublicationDuringStartupDispatch|TestMainQueueInitializationPreservesIdentityAndCompletion|TestMainThreadRequiredCallbackWaitsForLoopPublication|TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW|TestDeviceLoss|TestSurfaceAcquisition|TestRetiredDirectRenderSource|TestComposition|TestInlineComposition|TestIdleBarrier|TestVellumScreenPoll|TestVellumScreenAccessors|TestVellumCurrentWindowSnapshot|TestVellumRedraw|TestVellumComposer|TestVellumUnsafeResizeReplay|TestVellumRenderedGeometryScrollAndWrap|TestVellumFocuslessShortcutPhases|TestVellumMainQueueStop|TestVellumMainQueueFailure|TestVellumNativeEventLifecycle|TestVellumTerminalMainRecovery|TestVellumQuitClean|TestVellumTextureCopy|TestVellumWindowList')
+ 
+ "$VELLUM_REPO_ROOT/scripts/check-example.sh"
+ 
+@@ -32,7 +32,7 @@ go build -o build/vellum-workbench ./cmd/workbench
+ 
+ # Explicit routing uses the offscreen driver; these processes do not open GUI windows.
+ (cd "$VELLUM_REPO_ROOT/drivers/cogent" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+-(cd "$VELLUM_REPO_ROOT/drivers/cogent/build/upstream" && go test -race -tags offscreen ./core ./events ./text/lines ./text/textcore ./system/driver/offscreen -run 'TestVellumSpriteSource|TestVellumReviewTextCursor|TestManual|TestVellumManual|TestVellumSourceClock|TestVellumDefaultRepeatClick|TestVellumOutputBuffer')
++(cd "$VELLUM_REPO_ROOT/drivers/cogent/build/upstream" && go test -race -tags offscreen ./core ./events ./text/lines ./text/textcore ./system/driver/offscreen -run 'TestVellumSourceTiming|TestVellumSpriteSource|TestVellumReviewTextCursor|TestManual|TestVellumManual|TestVellumSourceClock|TestVellumDefaultRepeatClick|TestVellumOutputBuffer')
+ (cd "$VELLUM_REPO_ROOT/examples/replay" && go test -race ./... && go vet ./... && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+ (cd "$VELLUM_REPO_ROOT/examples/grid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+ (cd "$VELLUM_REPO_ROOT/examples/loadedgrid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+diff --git a/specs/grid-performance.md b/specs/grid-performance.md
+index f8808e0..54c5586 100644
+--- a/specs/grid-performance.md
++++ b/specs/grid-performance.md
+@@ -155,6 +155,32 @@ percentiles are not additive. Both unchanged 4/6 ms targets still fail. Software
+ pixel/copy proofs do not measure native GPU upload counts, partial uploads or
+ process-wide wakeups. Full P6 remains open.
+ 
++## Diagnostic source costs
++
++`-perf-source-details` requires `-perf` and selects the separate detailed frame
++recorder. Setup/ready/sample/end agree on `source_details`; ordinary historical
++records missing that flag mean false. Warmup+samples+2 must fit the 4096-ticket
++diagnostic capacity. Each successful Native sample exposes at most 32 scalar
++source records across its complete ticket. Availability, ordinals, nested
++intervals, full-input logical bytes and aggregate counters are validated.
++Source details are rejected by ordinary warm-budget validation even when CPU
++profile records are separately allowed. The explicit CLI mode always reports
++DIAGNOSTIC with warm_target_met false.
++
++All nested costs follow [the rendering contract](rendering.md). Image API time
++and attempted logical RGBA input bytes cannot identify confirmed upload success,
++physical transfer bytes or GPU completion. Unknown/custom sources may copy
++multiple differently sized images; their aggregate bytes must not be inferred
++from a fabricated common extent. Detail elapsed timings include diagnostic
++overhead and remain separate from ordinary release comparisons and the full
++five-process P6 qualification.
++
++```sh
++python3 scripts/benchmark-grid.py --run --source-details \
++  --binary /private/tmp/vellum-loadedgrid-perf \
++  --output /private/tmp/vellum-grid-source-costs --runs 5 --samples 120 --warmup 128
++```
++
+ ## Diagnostic CPU profiling
+ 
+ `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide
+diff --git a/specs/macos-completion.md b/specs/macos-completion.md
+index fd88d85..53a8b52 100644
+--- a/specs/macos-completion.md
++++ b/specs/macos-completion.md
+@@ -130,6 +130,17 @@ observe p95 14.178→13.090 ms and p99 14.891→13.294 ms. Both targets still fa
+ source-level raster/upload attribution and full P6 remain open. No physical GPU
+ upload-count, partial-upload, memory-reclamation or new scheduling claim follows.
+ 
++The [source-cost checkpoint](../docs/reports/macos-source-costs/README.md) adds an
++explicit detailed recorder with at most 32 scalar records across a complete
++ticket and separate 4096-ticket capacity. Default rendering retains its call
++path. Race, pixel/copy parity, bounded/unwind/mutation-oracle and full adapter
++checks pass. Three optimized fixed-10k diagnostic processes preserve the
++400-cell geometry; CPU scene rasterization is about 79% of source Draw time.
++The remaining roughly 21% is primarily the image API's elapsed work. These are
++nested CPU-side diagnostics; upload failures, physical transfers, GPU execution
++and presentation remain unavailable. This guides a bounded repaint investigation
++without qualifying an ordinary latency improvement or closing P6.
++
+ Full P9 professional workload and large-data replay acceptance, external
+ application automation transport, native services/input/accessibility, GPU
+ presentation and sustained performance qualification remain open. This bounded
+diff --git a/specs/rendering.md b/specs/rendering.md
+index cc63556..b094b5b 100644
+--- a/specs/rendering.md
++++ b/specs/rendering.md
+@@ -1,5 +1,37 @@
+ # Rendering and resource failure contract
+ 
++## Optional source diagnostics
++
++`NewFrameMetricsWithSourceDetails` explicitly enables per-source native work
++observations with recorder capacity 1..4096. Ordinary `NewFrameMetrics` keeps
++its existing 1..65536 bound and no source clocks/counter collection. Detailed
++composition preserves source order and each actual raster/Copy/End call. The
++whole draw batch retains originating renderContext and native-window ownership.
++Separate drawer counter locks never cross source callbacks; deferred cleanup
++clears diagnostic state through panic and Goexit.
++
++One ticket may include intermediate compositions before its final armed frame.
++At most 32 scalar records span that complete ticket, identified by one-based
++Composition and zero-based Source ordinals. Numeric Kind values distinguish
++other/scene/sprites/scrim/insets as 0/1/2/3/4. No source/image/widget/user-text
++references are retained. Snapshot returns deeply detached records. Missing
++details, record/count/byte overflow or unsupported measured composition refuses
++diagnostic completion without omitting source rendering or submission.
++
++DrawNS encloses the actual source. Known paint sources expose lazy RasterNS
++and CopyNS; scrim/insets expose CopyNS. Unknown breakdowns have explicit false
++availability. Existing-and-unchanged Go images count cache hits. The backend
++SetFromGoImage API is timed only when called, with attempts and checked logical
++4×full-input-width×height RGBA bytes. Uniform Fill and resident textures need no
++Go-image attempts. Unknown drawers have unavailable image counters.
++
++These counters do not claim successful queue writes, physical transfer bytes,
++GPU execution, or presentation. Upload failures remain unavailable because the
++existing Value API logs errors without returning them; this checkpoint does not
++change that policy. Raster/Copy/API durations are nested subsets of DrawNS and
++RasterUploadNS, never additions to TotalUIWorkNS. Diagnostic overhead affects
++elapsed time; detailed samples cannot qualify ordinary latency targets.
++
+ Native windows default to requested painting instead of refresh-rate ticks.
+ `Driver.ContinuousRendering` explicitly restores continuous ticks for applications
+ that require them. Model invalidation and native input/resize events request

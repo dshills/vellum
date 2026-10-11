@@ -309,6 +309,17 @@
               "sha256": "681971064e8fe4dd202e2cdc6272297c94a5c9475f9a2a5cbffd974c7ef96ad7"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/sourcecost",
+          "inputs": "native/patches/sourcecost/original-hashes.json",
+          "outputs": "native/patches/sourcecost/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/sourcecost/0036-source-cost-measurement.patch",
+              "sha256": "fc501328d61b76269f0d54ec55dcae3b269a06cdaf5e1b25aca85fd9dbea2ea9"
+            }
+          ]
         }
       ]
     },

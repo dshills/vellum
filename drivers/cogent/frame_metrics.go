@@ -35,6 +35,7 @@ type FrameSample struct {
 	AcquireNS, PresentCallNS, TotalUIWorkNS                 int64
 	Completed                                               bool
 	Failure                                                 string
+	SourceDetails                                           *FrameSourceDetails `json:"SourceDetails,omitempty"`
 }
 type FrameMetricsSnapshot struct {
 	Samples []FrameSample
@@ -61,13 +62,14 @@ type frameWindowMetrics struct {
 // work attribution requires one active native window. Up to 64 sequential
 // window lifetimes may bind one recorder. Snapshot returns detached values.
 type FrameMetrics struct {
-	self     *FrameMetrics
-	mu       sync.Mutex
-	capacity int
-	samples  []FrameSample
-	tags     map[uint64]bool
-	windows  []*frameWindowMetrics
-	dropped  uint64
+	self          *FrameMetrics
+	mu            sync.Mutex
+	capacity      int
+	samples       []FrameSample
+	tags          map[uint64]bool
+	windows       []*frameWindowMetrics
+	dropped       uint64
+	sourceDetails bool // immutable configuration
 }
 
 var frameMetricsRegistry = struct {
@@ -76,15 +78,37 @@ var frameMetricsRegistry = struct {
 }{windows: map[frameWindowKey]*frameWindowMetrics{}}
 
 func NewFrameMetrics(capacity int) (*FrameMetrics, error) {
-	if capacity < 1 || capacity > 65536 {
+	return newFrameMetrics(capacity, false)
+}
+
+// NewFrameMetricsWithSourceDetails opts into per-source timing and image API
+// attempt counters. Its additional clocks affect elapsed time; these samples
+// are diagnostic and cannot qualify ordinary frame latency targets.
+func NewFrameMetricsWithSourceDetails(capacity int) (*FrameMetrics, error) {
+	return newFrameMetrics(capacity, true)
+}
+
+func newFrameMetrics(capacity int, sourceDetails bool) (*FrameMetrics, error) {
+	limit := 65536
+	if sourceDetails {
+		limit = MaxSourceFrameMetricsCapacity
+	}
+	if capacity < 1 || capacity > limit {
 		return nil, ErrFrameMetricsConfig
 	}
-	m := &FrameMetrics{capacity: capacity, samples: make([]FrameSample, 0, capacity), tags: make(map[uint64]bool)}
+	m := &FrameMetrics{capacity: capacity, sourceDetails: sourceDetails, samples: make([]FrameSample, 0, capacity), tags: make(map[uint64]bool)}
 	m.self = m
 	return m, nil
 }
 func (m *FrameMetrics) valid() bool {
-	return m != nil && m.self == m && m.capacity >= 1 && m.capacity <= 65536
+	if m == nil || m.self != m {
+		return false
+	}
+	limit := 65536
+	if m.sourceDetails {
+		limit = MaxSourceFrameMetricsCapacity
+	}
+	return m.capacity >= 1 && m.capacity <= limit
 }
 func (m *FrameMetrics) bind(a *app.Application, w *nativeWindow) (*frameWindowMetrics, error) {
 	if !m.valid() {
@@ -110,6 +134,9 @@ func (m *FrameMetrics) bind(a *app.Application, w *nativeWindow) (*frameWindowMe
 		return nil, ErrFrameMetricsBusy
 	}
 	b := &frameWindowMetrics{metrics: m, window: w, key: key, trace: &core.FrameTrace{}}
+	if m.sourceDetails {
+		b.trace = core.NewFrameTraceWithSourceDetails()
+	}
 	m.windows = append(m.windows, b)
 	frameMetricsRegistry.windows[key] = b
 	w.body.Scene.SetFrameTrace(b.trace)
@@ -131,7 +158,8 @@ func (m *FrameMetrics) collectLocked() {
 				QueuedNS: sample.QueuedNS, InputNS: sample.InputNS, OwnerNS: sample.OwnerNS, ReconcileNS: sample.ReconcileNS,
 				LayoutPaintNS: sample.LayoutPaintNS, GatherNS: sample.GatherNS, RasterUploadNS: sample.RasterUploadNS,
 				EncodeSubmitNS: sample.EncodeSubmitNS, AcquireNS: sample.AcquireNS, PresentCallNS: sample.PresentCallNS,
-				TotalUIWorkNS: sample.TotalUIWorkNS, Completed: sample.Completed, Failure: sample.Failure})
+				TotalUIWorkNS: sample.TotalUIWorkNS, Completed: sample.Completed, Failure: sample.Failure,
+				SourceDetails: frameSourceDetails(sample.SourceDetails)})
 		}
 	}
 }
@@ -143,6 +171,9 @@ func (m *FrameMetrics) Snapshot() FrameMetricsSnapshot {
 	defer m.mu.Unlock()
 	m.collectLocked()
 	out := FrameMetricsSnapshot{Samples: append([]FrameSample(nil), m.samples...), Dropped: m.dropped}
+	for i := range out.Samples {
+		out.Samples[i].SourceDetails = cloneFrameSourceDetails(out.Samples[i].SourceDetails)
+	}
 	for _, window := range m.windows {
 		if window.tag != 0 {
 			out.Pending++
