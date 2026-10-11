@@ -81,25 +81,29 @@ type GPUInput struct {
 // MaxGPUBytes covers targets, readback and helper resources, not raw allocations,
 // pipeline/driver overhead or process-wide memory. Background is opaque or zero.
 type GPUView struct {
-	Owner       *app.Application
-	Window      string
-	Program     *GPUProgram
-	Revision    uint64
-	Depth       bool
-	Background  color.NRGBA
-	MaxGPUBytes uint64
-	OnError     func(error)
-	Input       func(GPUInput) bool
-	widget      *gpuViewWidget
+	Owner            *app.Application
+	Window           string
+	Program          *GPUProgram
+	Revision         uint64
+	Depth            bool
+	Background       color.NRGBA
+	MaxGPUBytes      uint64
+	MaxSnapshotBytes uint64
+	OnError          func(error)
+	Input            func(GPUInput) bool
+	widget           *gpuViewWidget
+	snapshotActive   atomic.Bool
 }
 
 type GPUViewStats struct {
-	Ready                                                                   bool
-	RenderVisits, Frames, Prepares, Draws, SnapshotReadbacks                uint64
-	ResourceGeneration, TargetGeneration                                    uint64
-	TargetBytes, BufferBytes, TextureBytes, ReadbackBytes                   uint64
-	HelperUploads, HelperUploadBytes, BufferAllocations, TextureAllocations uint64
-	Size                                                                    image.Point
+	Ready                                                                                                        bool
+	SnapshotPending                                                                                              bool
+	AsyncReadbackBytes, AsyncSnapshotRequests, AsyncSnapshotCompleted, AsyncSnapshotCanceled, AsyncSnapshotPolls uint64
+	RenderVisits, Frames, Prepares, Draws, SnapshotReadbacks                                                     uint64
+	ResourceGeneration, TargetGeneration                                                                         uint64
+	TargetBytes, BufferBytes, TextureBytes, ReadbackBytes                                                        uint64
+	HelperUploads, HelperUploadBytes, BufferAllocations, TextureAllocations                                      uint64
+	Size                                                                                                         image.Point
 }
 
 func (g *GPUView) validate() error {
@@ -223,6 +227,7 @@ func (g *GPUView) Stats() (GPUViewStats, error) {
 	defer r.mu.Unlock()
 	s := r.stats
 	s.Ready = r.ready
+	s.SnapshotPending = g.snapshotActive.Load()
 	return s, nil
 }
 func (g *GPUView) RebuildResources() error {
@@ -276,7 +281,7 @@ func (g *GPUView) Snapshot() (*image.NRGBA, error) {
 	}
 	size := r.target.Size()
 	bytes := uint64((size.X*4+255)/256*256) * uint64(size.Y)
-	if err := gpuBudget(g.budget(), r.stats.TargetBytes, r.stats.BufferBytes, r.stats.TextureBytes, bytes); err != nil {
+	if err := gpuBudget(g.budget(), r.stats.TargetBytes, r.stats.BufferBytes, r.stats.TextureBytes, r.stats.AsyncReadbackBytes, bytes); err != nil {
 		return nil, err
 	}
 	if bytes > r.limits.MaxBufferSize {
@@ -484,6 +489,7 @@ type gpuViewResources struct {
 	ready        bool
 	key          gpuFrameKey
 	stats        GPUViewStats
+	capture      *gpuSnapshotJob
 }
 
 func (r *gpuViewResources) releaseTarget() {
@@ -505,6 +511,7 @@ func (r *gpuViewResources) releaseTarget() {
 	r.stats.Size = image.Point{}
 }
 func (r *gpuViewResources) reset() {
+	r.cancelSnapshot()
 	r.ready = false
 	r.pool.lease.Store(0)
 	r.stats.ResourceGeneration++
@@ -582,7 +589,7 @@ func (r *gpuViewResources) render(surface *gpu.Surface, key gpuFrameKey, depth b
 	if r.target == nil || r.target.Size() != key.size {
 		readback = 0
 	}
-	if e := gpuBudget(budget, targetBytes, r.stats.BufferBytes, r.stats.TextureBytes, readback); e != nil {
+	if e := gpuBudget(budget, targetBytes, r.stats.BufferBytes, r.stats.TextureBytes, readback, r.stats.AsyncReadbackBytes); e != nil {
 		return e
 	}
 	if r.ready && r.key == key {

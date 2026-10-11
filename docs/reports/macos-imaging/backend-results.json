@@ -1,0 +1,52 @@
+{
+  "results": [
+    {
+      "check": "initial race fixtures",
+      "log": "vellum-windowlist-25-initial.txt",
+      "exit_code": 0,
+      "sha256": "c2663d1a38d2f2fe6da9b214d6851bd16471aad78063d98ed9b5dcdd90459d15",
+      "raw_log": "/private/tmp/vellum-windowlist-25-initial.txt"
+    },
+    {
+      "check": "pinned prepare reproduction",
+      "log": "vellum-windowlist-25-reproduce.txt",
+      "exit_code": 0,
+      "sha256": "06ac842c5b60c595ecc248203970cd593d598d5175bc6275fb17513a5c0f9000",
+      "raw_log": "/private/tmp/vellum-windowlist-25-reproduce.txt"
+    },
+    {
+      "check": "prepare tests (11)",
+      "log": "vellum-windowlist-25-prepare-tests.txt",
+      "exit_code": 0,
+      "sha256": "6b928bbf3af87b096e8f448a5553795c3b854c3c8f8138380c99d587e6fcb8c9",
+      "raw_log": "/private/tmp/vellum-windowlist-25-prepare-tests.txt"
+    },
+    {
+      "check": "fresh five lifecycle fixtures, race count 20",
+      "log": "vellum-windowlist-25-race20.txt",
+      "exit_code": 0,
+      "sha256": "2b58169b57b068eb6e0a0f6ad58165eb685d930fce7055fd9e4efe29cf292653",
+      "raw_log": "/private/tmp/vellum-windowlist-25-race20.txt"
+    },
+    {
+      "check": "stock upstream core vet",
+      "log": "vellum-windowlist-25-vet.txt",
+      "exit_code": 1,
+      "sha256": "3fb7701a094c0fd3ea9e885bbb5be9833ceaffad908a6829bee5d8005d2c8ed8",
+      "raw_log": "/private/tmp/vellum-windowlist-25-vet.txt"
+    },
+    {
+      "check": "upstream core vet excluding existing composites/unreachable warnings",
+      "log": "vellum-windowlist-25-vet-scoped.txt",
+      "exit_code": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_log": "/private/tmp/vellum-windowlist-25-vet-scoped.txt"
+    }
+  ],
+  "source_proof": "backend-source-proof.json",
+  "stock_vet_scope": "The recorded stock vet output has pinned upstream composite-literal and unreachable benchmark diagnostics. Patch 25 changes neither the diagnostic expressions nor their behavior. These warning classes remain present and are not claimed as a clean stock vet result.",
+  "independent_read_only_review": "mac_history_review checked atomic absent-member promotion, detached storage, one-snapshot focus traversal, native callouts after registry unlock, post-initialization publication, the five tests, and all seven prepared output hashes; no blocking regression found.",
+  "native_acceptance": "Actual GPU/native consumer run is delegated to root/workbench after this stable preparation, not claimed by these backend fixtures.",
+  "raw_source_proof": "/private/tmp/vellum-windowlist-25-source-proof.json",
+  "path_basis": "log and source_proof are relative to this record. raw_log/raw_source_proof are informational producing-machine origins."
+}

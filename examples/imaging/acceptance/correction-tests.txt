@@ -1,0 +1,8 @@
+Command: go test -race -count=1 ./...
+Working directory: examples/imaging
+VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; sourced drivers/cogent/env.sh
+# github.com/dshills/vellum/examples/imaging.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+ok  	github.com/dshills/vellum/examples/imaging	1.568s
+
+Exit: 0

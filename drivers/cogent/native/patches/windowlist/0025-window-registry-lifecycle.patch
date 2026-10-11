@@ -1,0 +1,423 @@
+--- a/core/windowlists.go
++++ b/core/windowlists.go
+@@ -32,6 +32,41 @@
+ 	})
+ }
+ 
++// snapshot detaches collection membership from concurrent adds/removals. It
++// does not acquire the individual windows' render contexts or extend their
++// native lifetimes. Callers retain each window's normal ownership checks.
++func (wl *renderWindowList) snapshot() renderWindowList {
++	renderWindowGlobalMu.Lock()
++	defer renderWindowGlobalMu.Unlock()
++	return slices.Clone(*wl)
++}
++
++// last reads the focus-restoration candidate under the collection mutex.
++// Native methods on the returned window must run after releasing that mutex.
++func (wl *renderWindowList) last() *renderWindow {
++	renderWindowGlobalMu.Lock()
++	defer renderWindowGlobalMu.Unlock()
++	if len(*wl) == 0 {
++		return nil
++	}
++	return (*wl)[len(*wl)-1]
++}
++
++// promoteExisting moves a registered window to the end in one transaction.
++// A delayed focus event for a removed window cannot reinsert it. No native
++// methods or render-context locks are acquired while holding the registry lock.
++func (wl *renderWindowList) promoteExisting(w *renderWindow) bool {
++	renderWindowGlobalMu.Lock()
++	defer renderWindowGlobalMu.Unlock()
++	i := slices.Index(*wl, w)
++	if i < 0 {
++		return false
++	}
++	copy((*wl)[i:], (*wl)[i+1:])
++	(*wl)[len(*wl)-1] = w
++	return true
++}
++
+ // FindName finds the window with the given name or title
+ // on the list (case sensitive).
+ // It returns the window if found and nil otherwise.
+@@ -58,9 +93,7 @@
+ 		fmt.Printf("programmer error in RenderWinList.FindData: Scene.Data type %s not comparable (value: %v)\n", typ.String(), data)
+ 		return nil, false
+ 	}
+-	renderWindowGlobalMu.Lock()
+-	defer renderWindowGlobalMu.Unlock()
+-	for _, wi := range *wl {
++	for _, wi := range wl.snapshot() {
+ 		msc := wi.MainScene()
+ 		if msc == nil {
+ 			continue
+@@ -75,10 +108,7 @@
+ // focused returns the (first) window in this list that has the WinGotFocus flag set
+ // and the index in the list (nil, -1 if not present)
+ func (wl *renderWindowList) focused() (*renderWindow, int) {
+-	renderWindowGlobalMu.Lock()
+-	defer renderWindowGlobalMu.Unlock()
+-
+-	for i, fw := range *wl {
++	for i, fw := range wl.snapshot() {
+ 		if fw.flags.HasFlag(winGotFocus) {
+ 			return fw, i
+ 		}
+@@ -89,13 +119,21 @@
+ // focusNext focuses on the next window in the list, after the current Focused() one.
+ // It skips minimized windows.
+ func (wl *renderWindowList) focusNext() (*renderWindow, int) {
+-	fw, i := wl.focused()
++	// Focus and its index must come from the same detached list: a removal
++	// between separate lock sections can invalidate the former focused index.
++	windows := wl.snapshot()
++	var fw *renderWindow
++	i := -1
++	for index, window := range windows {
++		if window.flags.HasFlag(winGotFocus) {
++			fw, i = window, index
++			break
++		}
++	}
+ 	if fw == nil {
+ 		return nil, -1
+ 	}
+-	renderWindowGlobalMu.Lock()
+-	defer renderWindowGlobalMu.Unlock()
+-	sz := len(*wl)
++	sz := len(windows)
+ 	if sz == 1 {
+ 		return nil, -1
+ 	}
+@@ -106,13 +144,13 @@
+ 		} else {
+ 			i++
+ 		}
+-		fw = (*wl)[i]
+-		if !fw.SystemWindow.Is(system.Minimized) {
++		fw = windows[i]
++		if fw.SystemWindow != nil && !fw.SystemWindow.Is(system.Minimized) {
+ 			fw.SystemWindow.Raise()
+-			break
++			return fw, i
+ 		}
+ 	}
+-	return fw, i
++	return nil, -1
+ }
+ 
+ // AllRenderWindows is the list of all [renderWindow]s that have been created
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -381,8 +381,7 @@
+ 	if DebugSettings.WindowEventTrace {
+ 		fmt.Printf("Win: %v Closed\n", w.name)
+ 	}
+-	if len(AllRenderWindows) > 0 {
+-		pfw := AllRenderWindows[len(AllRenderWindows)-1]
++	if pfw := AllRenderWindows.last(); pfw != nil {
+ 		if DebugSettings.WindowEventTrace {
+ 			fmt.Printf("Win: %v getting restored focus after: %v closed\n", pfw.name, w.name)
+ 		}
+@@ -535,11 +534,10 @@
+ 			w.SystemWindow.ConstrainFrame(true) // top only
+ 			theWindowGeometrySaver.record(w)
+ 		case events.WinFocus:
+-			// if we are not already the last in AllRenderWins, we go there,
+-			// as this allows focus to be restored to us in the future
+-			if len(AllRenderWindows) > 0 && AllRenderWindows[len(AllRenderWindows)-1] != w {
+-				AllRenderWindows.delete(w)
+-				AllRenderWindows.add(w)
++			// Preserve focus order atomically, without resurrecting a window
++			// already removed by a closing event.
++			if !AllRenderWindows.promoteExisting(w) {
++				return
+ 			}
+ 			if !w.flags.HasFlag(winGotFocus) {
+ 				w.flags.SetFlag(true, winGotFocus)
+--- a/core/menu.go
++++ b/core/menu.go
+@@ -311,7 +311,7 @@
+ 		s.Grow.Set(1, 0)
+ 	})
+ 	w.AddItemsFunc(func() {
+-		for _, rw := range AllRenderWindows {
++		for _, rw := range AllRenderWindows.snapshot() {
+ 			for _, kv := range rw.mains.stack.Order {
+ 				st := kv.Value
+ 				// we do not include ourself
+--- a/core/settings.go
++++ b/core/settings.go
+@@ -218,7 +218,7 @@
+ 	clear(gradient.Cache)
+ 	clear(cursorimg.Cursors)
+ 
+-	for _, w := range AllRenderWindows {
++	for _, w := range AllRenderWindows.snapshot() {
+ 		rc := w.mains.renderContext
+ 		rc.logicalDPI = w.logicalDPI()
+ 		rc.rebuild = true // trigger full rebuild
+@@ -414,7 +414,7 @@
+ // settings and zoom factor, and then updates all open windows as well.
+ func (as *AppearanceSettingsData) applyDPI() {
+ 	as.updateLogicalDPI()
+-	for _, w := range AllRenderWindows {
++	for _, w := range AllRenderWindows.snapshot() {
+ 		w.SystemWindow.SetLogicalDPI(w.SystemWindow.Screen().LogicalDPI)
+ 		// this isn't DPI-related, but this is the most efficient place to do it
+ 		w.SystemWindow.SetTitleBarIsDark(matcolor.SchemeIsDark)
+--- a/core/windowgeometry.go
++++ b/core/windowgeometry.go
+@@ -415,13 +415,11 @@
+ 	if !ws.shouldSave() {
+ 		return
+ 	}
+-	renderWindowGlobalMu.Lock()
+-	defer renderWindowGlobalMu.Unlock()
+ 	if DebugSettings.WindowGeometryTrace {
+ 		log.Printf("WindowGeometry: RestoreAll: starting\n")
+ 	}
+ 	ws.settingStart()
+-	for _, w := range AllRenderWindows {
++	for _, w := range AllRenderWindows.snapshot() {
+ 		wgp, sc := ws.get(w.title, "")
+ 		if wgp != nil && !w.SystemWindow.Is(system.Fullscreen) {
+ 			if DebugSettings.WindowGeometryTrace {
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -431,7 +431,6 @@
+ 	if win == nil {
+ 		return nil
+ 	}
+-	AllRenderWindows.add(win)
+ 	// initialize Mains
+ 	win.mains.renderWindow = win
+ 	win.mains.renderContext = newRenderContext() // sets defaults according to Screen
+@@ -439,6 +438,8 @@
+ 	// or dpi.
+ 	win.mains.push(st)
+ 	st.setMains(&win.mains)
++	// Publish only after snapshot readers can observe initialized window state.
++	AllRenderWindows.add(win)
+ 	return win
+ }
+ 
+--- /dev/null
++++ b/core/windowlists_vellum_test.go
+@@ -0,0 +1,214 @@
++package core
++
++import (
++	"slices"
++	"sync"
++	"sync/atomic"
++	"testing"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/system"
++)
++
++type vellumWindowListNative struct {
++	system.Window
++	is    func(system.WindowFlags) bool
++	raise func()
++}
++
++func (w *vellumWindowListNative) Is(flag system.WindowFlags) bool {
++	if w.is != nil {
++		return w.is(flag)
++	}
++	return false
++}
++func (w *vellumWindowListNative) Raise() {
++	if w.raise != nil {
++		w.raise()
++	}
++}
++func (*vellumWindowListNative) Lock() bool { return false }
++func (*vellumWindowListNative) Unlock()    { panic("closed window unlock") }
++
++func TestVellumWindowListPromotionAndDetachedSnapshot(t *testing.T) {
++	a, b, c := &renderWindow{}, &renderWindow{}, &renderWindow{}
++	list := make(renderWindowList, 3, 32)
++	copy(list, renderWindowList{a, b, c})
++	before := list.snapshot()
++	if !list.promoteExisting(b) || !slices.Equal(list.snapshot(), renderWindowList{a, c, b}) {
++		t.Fatal("focus promotion changed membership or order")
++	}
++	if !list.promoteExisting(b) || !slices.Equal(list.snapshot(), renderWindowList{a, c, b}) {
++		t.Fatal("last-window promotion was not idempotent")
++	}
++	list.delete(b)
++	if list.promoteExisting(b) || list.last() != c {
++		t.Fatal("late focus resurrected a removed window")
++	}
++	if !slices.Equal(before, renderWindowList{a, b, c}) {
++		t.Fatal("membership mutation changed an existing snapshot")
++	}
++	before[0] = nil
++	if !slices.Equal(list.snapshot(), renderWindowList{a, c}) {
++		t.Fatal("caller modified registry through snapshot backing storage")
++	}
++	list.delete(a)
++	list.delete(c)
++	if list.last() != nil || list.promoteExisting(a) || len(list.snapshot()) != 0 {
++		t.Fatal("empty registry retained or resurrected a window")
++	}
++}
++
++func TestVellumWindowListConcurrentDeletePromotion(t *testing.T) {
++	for round := 0; round < 32; round++ {
++		a, closing, b := &renderWindow{}, &renderWindow{}, &renderWindow{}
++		list := renderWindowList{a, closing, b}
++		start := make(chan struct{})
++		var workers sync.WaitGroup
++		workers.Add(3)
++		go func() {
++			defer workers.Done()
++			<-start
++			for i := 0; i < 512; i++ {
++				list.promoteExisting(closing)
++				list.promoteExisting(a)
++			}
++		}()
++		go func() {
++			defer workers.Done()
++			<-start
++			list.delete(closing)
++			for i := 0; i < 512; i++ {
++				list.promoteExisting(b)
++			}
++		}()
++		go func() {
++			defer workers.Done()
++			<-start
++			for i := 0; i < 512; i++ {
++				snapshot := list.snapshot()
++				if len(snapshot) > 0 {
++					snapshot[0] = nil
++				}
++				_ = list.last()
++			}
++		}()
++		close(start)
++		workers.Wait()
++		got := list.snapshot()
++		if len(got) != 2 || slices.Contains(got, closing) || slices.Contains(got, nil) || !slices.Contains(got, a) || !slices.Contains(got, b) {
++			t.Fatal("concurrent focus/delete changed membership", got)
++		}
++	}
++}
++
++func TestVellumWindowListFocusNextCalloutsAndRemoval(t *testing.T) {
++	focused, minimized, target := &renderWindow{}, &renderWindow{}, &renderWindow{}
++	focused.flags.SetFlag(true, winGotFocus)
++	list := renderWindowList{focused, minimized, target}
++	var held, raises atomic.Int32
++	minimized.SystemWindow = &vellumWindowListNative{is: func(flag system.WindowFlags) bool {
++		if !renderWindowGlobalMu.TryLock() {
++			held.Add(1)
++			return true
++		}
++		// Removal during a native callout must not change the candidate indices
++		// in the caller's detached snapshot, even when the focused one disappears.
++		list = slices.DeleteFunc(list, func(w *renderWindow) bool { return w == focused || w == minimized })
++		renderWindowGlobalMu.Unlock()
++		return flag == system.Minimized
++	}}
++	target.SystemWindow = &vellumWindowListNative{raise: func() {
++		if !renderWindowGlobalMu.TryLock() {
++			held.Add(1)
++			return
++		}
++		renderWindowGlobalMu.Unlock()
++		raises.Add(1)
++	}}
++	got, index := list.focusNext()
++	if got != target || index != 2 || raises.Load() != 1 || held.Load() != 0 || !slices.Equal(list.snapshot(), renderWindowList{target}) {
++		t.Fatal("focus selection lost snapshot order or held registry across native methods", got, index, raises.Load(), held.Load())
++	}
++	list = renderWindowList{focused, minimized}
++	minimized.SystemWindow = &vellumWindowListNative{is: func(system.WindowFlags) bool { return true }}
++	if got, index := list.focusNext(); got != nil || index != -1 {
++		t.Fatal("all minimized candidates must not become focus targets")
++	}
++}
++
++func TestVellumWindowListConcurrentFocusNextDelete(t *testing.T) {
++	for round := 0; round < 128; round++ {
++		native := &vellumWindowListNative{}
++		a, b, focused := &renderWindow{SystemWindow: native}, &renderWindow{SystemWindow: native}, &renderWindow{SystemWindow: native}
++		focused.flags.SetFlag(true, winGotFocus)
++		list := renderWindowList{a, b, focused}
++		start := make(chan struct{})
++		var workers sync.WaitGroup
++		workers.Add(2)
++		go func() {
++			defer workers.Done()
++			<-start
++			for i := 0; i < 64; i++ {
++				list.focusNext()
++			}
++		}()
++		go func() {
++			defer workers.Done()
++			<-start
++			list.delete(a)
++			list.delete(b)
++			list.delete(focused)
++		}()
++		close(start)
++		workers.Wait()
++		if len(list.snapshot()) != 0 {
++			t.Fatal("focus traversal resurrected a deleted window")
++		}
++	}
++}
++
++func TestVellumWindowListNativeFocusCloseEvents(t *testing.T) {
++	renderWindowGlobalMu.Lock()
++	previousAll, previousMain, previousDialogs, previousCurrent := AllRenderWindows, mainRenderWindows, dialogRenderWindows, currentRenderWindow
++	renderWindowGlobalMu.Unlock()
++	t.Cleanup(func() {
++		renderWindowGlobalMu.Lock()
++		AllRenderWindows, mainRenderWindows, dialogRenderWindows, currentRenderWindow = previousAll, previousMain, previousDialogs, previousCurrent
++		renderWindowGlobalMu.Unlock()
++	})
++	focused := &renderWindow{SystemWindow: &vellumWindowListNative{}}
++	closing := &renderWindow{SystemWindow: &vellumWindowListNative{}}
++	renderWindowGlobalMu.Lock()
++	AllRenderWindows = renderWindowList{focused, closing}
++	mainRenderWindows = slices.Clone(AllRenderWindows)
++	dialogRenderWindows = nil
++	renderWindowGlobalMu.Unlock()
++	start := make(chan struct{})
++	var workers sync.WaitGroup
++	workers.Add(2)
++	go func() {
++		defer workers.Done()
++		<-start
++		for i := 0; i < 1024; i++ {
++			focused.handleWindowEvents(events.NewWindow(events.WinFocus))
++		}
++	}()
++	go func() {
++		defer workers.Done()
++		<-start
++		closing.handleWindowEvents(events.NewWindow(events.WinClose))
++	}()
++	close(start)
++	workers.Wait()
++	if !slices.Equal(AllRenderWindows.snapshot(), renderWindowList{focused}) || !slices.Equal(mainRenderWindows.snapshot(), renderWindowList{focused}) || !closing.flags.HasFlag(winStopEventLoop) {
++		t.Fatal("actual focus/close hooks corrupted registration")
++	}
++	AllRenderWindows.delete(focused)
++	focused.flags.SetFlag(false, winGotFocus)
++	setCurrentRenderWindow(closing)
++	focused.handleWindowEvents(events.NewWindow(events.WinFocus))
++	if len(AllRenderWindows.snapshot()) != 0 || focused.flags.HasFlag(winGotFocus) || currentRenderWindowSnapshot() != closing {
++		t.Fatal("late native focus reactivated a removed window")
++	}
++}

@@ -74,8 +74,8 @@ counts successful helper uploads. Each Prepare and Draw gets a distinct helper
 lease; a saved Prepare helper is rejected even during Draw in the same frame.
 
 `MaxGPUBytes` defaults to 512 MiB. The estimate covers resolve + MSAA (20 bytes
-per pixel), optional depth (16 more), retained readback staging and helper resource
-bytes. It excludes pipeline/view/bind-group/driver overhead, raw allocations,
+per pixel), optional depth (16 more), retained synchronous readback staging, active asynchronous staging and helper
+resource bytes. It excludes pipeline/view/bind-group/driver overhead, raw allocations,
 foreign writes and process-wide memory. The estimate counts currently owned
 helper handles; retired objects retained by in-flight queue work or native
 references are excluded. It is not a hard physical-memory or driver high-water
@@ -89,6 +89,46 @@ resources and requires preparation again; failed work never advances the cache.
 `Snapshot` synchronously copies the last completed target and returns straight
 NRGBA, with linear-space unpremultiplication. It does not flush pending updates.
 Readback has device/budget admission and is absent from normal composition.
+
+`SnapshotAsync(ctx, callback)` admits one capture per `GPUView` through callback
+return or canceled worker cleanup. Admission, like all view methods, belongs to
+`Owner.Do`. Nil arguments and pre-canceled contexts fail immediately. A busy
+view returns `ErrSnapshotBusy`; remount does not evade that reservation.
+`MaxSnapshotBytes` defaults to 64 MiB, bounding padded staging and one tightly
+packed CPU image separately. Delivered images retained by the application are
+outside that bound. Staging is included in every `MaxGPUBytes` admission path,
+including synchronous readback and target/helper replacement.
+
+The worker calls nonblocking `Poll(false)` under the originating native window
+teardown lock and resource mutex, independently of paint, visibility and widget
+geometry. Successful mapping copies padded rows directly into one owned image,
+then unmaps/releases staging before linear alpha decoding on the worker. No
+mapped native memory reaches decoding or delivery. The bounded row copy retains
+those locks so cancellation/teardown cannot unmap its borrowed range. It can delay
+paint/resize while copying; `MaxSnapshotBytes` permits a lower application limit.
+This checkpoint establishes byte bounds, not a copy-latency guarantee.
+A spontaneous map callback
+only notifies a bounded, never-closed channel. Active requests alone poll; there
+is no idle repaint or polling loop after completion.
+
+Delivery waits for bounded owner mailbox credit without holding GPU/native locks.
+The callback receives `GPUSnapshot` with detached `Image`, capture-time `Frame`,
+`Revision`, `ResourceGeneration` and `TargetGeneration`. Pending changes are not
+flushed. Normal resize/revision changes preserve the captured old frame; rebuild,
+render failure, caller/window cancellation, retirement, native closure or a changed
+mount/resource generation quietly drop it. Canceled queued closures release their
+image even if the owner never drains again. Cancellation retains the reservation
+until a decoder or running callback relinquishes image ownership. A callback may
+query `Stats`, but must not nest `Do`/`Drain`; recursive capture remains busy until
+that callback returns. Error callbacks count as completed deliveries. Async stats
+report pending reservation, polls, admissions, deliveries, cancellations and owned
+GPU staging bytes. They are diagnostics, not timings.
+
+A failed native-window lock forbids access to the released window device. The
+worker can still abort/unmap/release its independently owned staging buffer, which
+retains its private native device reference. This fallback does not depend on
+later widget destruction following forced native closure.
+
 `RebuildResources` explicitly retires resources and requests another frame.
 `RequestFrameAfter` requests one paint; it does not create a permanent ticker.
 Closed, retired or remounted adapters reject stale input, sources and resource
@@ -105,6 +145,13 @@ preparation/drawing fault repair, budgets, rebuild, three resizes, empty-frame
 clearing, expired helpers and closure. Offscreen snapshots do not prove presented
 clipping, MSAA edge quality, input/presentation latency or sustained performance.
 
+Reproducible backend patch25 synchronizes render-window registry snapshots and
+existing-member focus promotion, and publishes newly created windows after their
+main stage is initialized. Native focus/geometry calls run after the registry mutex
+is released. Detached snapshots protect collection membership; they do not extend
+native lifetimes or synchronize all mutable scene state. Concurrent registry and
+actual focus/close-hook race regressions accompany native teardown acceptance.
+
 The fixture also exposed concurrent window removal during the backend's cached
 quit-loop indexing. Patch 23 snapshots callbacks and window handles under the app
 mutex, invokes callbacks unlocked, skips already removed windows, and checks the
@@ -112,7 +159,9 @@ final list under lock. A veto or window created during closing prevents a clean
 quit. Deterministic concurrent-remove, veto/new-window and reentrant callback
 checks accompany the real native shutdown acceptance.
 
-Compute workloads, floating-point presentation, asynchronous readback, advanced
-GPU timestamps, physical device loss, cross-display geometry and broader P4/Mac
-qualification remain open. A helper allocating RGBA16Float does not certify a
-floating-point rendering workflow. See [macOS completion](macos-completion.md).
+The independent [imaging consumer](../examples/imaging/README.md) encodes ordered
+compute, an RGBA16Float preparation render pass and straight-linear tone mapping
+into the main sRGB pass. Quantitative HDR/alpha and asynchronous lifecycle evidence
+is recorded separately from general compute/float feature support. Advanced GPU
+timestamps, physical device loss, cross-display geometry and broader P4/Mac
+performance qualification remain open. See [macOS completion](macos-completion.md).

@@ -1,0 +1,159 @@
+{
+  "parent_commit": "63a369f4b96b5dfcca460574d58b9bd3e7316b96",
+  "host": "macOS26.6.2 darwin/arm64 AppleM4Pro",
+  "go_version": "go version go1.27.2 darwin/arm64",
+  "environment": "VELLUM_CACHE_DIR=/tmp/vellum-p0-cache; source drivers/cogent/env.sh; GOWORK=off",
+  "initial_evidence": "initial-acceptance.json; initial native source hashes and logs retained in examples/imaging/acceptance",
+  "checks": [
+    {
+      "cwd": ".",
+      "command": "./scripts/check.sh",
+      "exit_code": 0,
+      "log": "final-full-check.log",
+      "scope": "Final source: 89 Python checks, root/native/backend/four examples/SDK contracts race/vet/build gates"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "python3 prepare.py",
+      "exit_code": 0,
+      "log": "vellum-windowlist-25-reproduce.txt",
+      "scope": "Reproduce every pinned stage1\u201325 output"
+    },
+    {
+      "cwd": ".",
+      "command": "python3 drivers/cogent/prepare_test.py",
+      "exit_code": 0,
+      "log": "vellum-windowlist-25-prepare-tests.txt",
+      "scope": "All11 preparation tests with stage25 registered"
+    },
+    {
+      "cwd": "drivers/cogent/build/upstream",
+      "command": "go test -race ./core -run TestVellumWindowList -count=20",
+      "exit_code": 0,
+      "log": "vellum-windowlist-25-race20.txt",
+      "scope": "Five meaningful registry/lifecycle fixtures repeated20 times"
+    },
+    {
+      "cwd": "drivers/cogent/build/upstream",
+      "command": "go vet ./core",
+      "exit_code": 1,
+      "log": "vellum-windowlist-25-vet.txt",
+      "scope": "Existing pinned upstream composite-literal/unreachable benchmark diagnostics; not claimed clean"
+    },
+    {
+      "cwd": "drivers/cogent/build/upstream",
+      "command": "go vet -composites=false -unreachable=false ./core",
+      "exit_code": 0,
+      "log": "vellum-windowlist-25-vet-scoped.txt",
+      "scope": "Remaining analyzers after the existing warning classes are excluded"
+    },
+    {
+      "cwd": "examples/imaging",
+      "commands": [
+        "go test -race ./...",
+        "go vet ./...",
+        "go build -race -o /private/tmp/vellum-imaging-smoke-corrected ."
+      ],
+      "exit_code": 0,
+      "scope": "Final corrected consumer proof/logs in linked correction-source-hashes.json",
+      "logs": [
+        "../../../examples/imaging/acceptance/correction-tests.txt",
+        "../../../examples/imaging/acceptance/correction-vet.txt",
+        "../../../examples/imaging/acceptance/correction-build.txt"
+      ]
+    },
+    {
+      "cwd": "examples/imaging",
+      "command": "/private/tmp/vellum-imaging-smoke-corrected -smoke",
+      "exit_codes": [
+        0,
+        0
+      ],
+      "binary_sha256": "4df60a03752343152d8004ae8fab84e3647b350039431c59fef92151a2e4f231",
+      "scope": "Two consecutive final corrected native runs; see linked consumer acceptance",
+      "logs": [
+        "../../../examples/imaging/acceptance/correction-native-smoke-1.txt",
+        "../../../examples/imaging/acceptance/correction-native-smoke-2.txt"
+      ]
+    },
+    {
+      "cwd": "examples/viewport3d",
+      "command": "go build -race -o /private/tmp/vellum-viewport3d-imaging .",
+      "exit_code": 0,
+      "log": "3d-build.log"
+    },
+    {
+      "cwd": "examples/viewport3d",
+      "command": "/private/tmp/vellum-viewport3d-imaging -smoke",
+      "exit_code": 0,
+      "log": "3d-native.log",
+      "scope": "Existing depth, retention, faults, budget and multiwindow lifecycle regression on stage25",
+      "binary_sha256": "cb53be3b1f0f265c77e52df7f5aab71180a226841e836e585a71bfcdf9281c6d"
+    }
+  ],
+  "source_sha256": {
+    "drivers/cogent/gpu_view.go": "3e6d070a610a6786441fedda37296e602cdc26dbe975025faee83ae1277ffb96",
+    "drivers/cogent/gpu_resources.go": "97460d2d0dd0311d92aed135263ed866ec756e6fb0e2c59d271d4a8406ebaf42",
+    "drivers/cogent/gpu_snapshot.go": "387c1cacdc2e68527816c0ab37ecc93f9c2cd7da10e306be55beccb76b2a5fd1",
+    "drivers/cogent/gpu_snapshot_test.go": "76480572fd718050a6d0d9244c42b463aabca3e0ed427929ce13575677fa7d6e",
+    "drivers/cogent/native/dependencies.json": "0a97a24a25663172f60cdf6d83b43772cecd2885a09b0f1e136d5d61f4b7424e",
+    "drivers/cogent/prepare_test.py": "967aee214b01d807364cfa4f7f71912b1708b680b02f9aa4b5f8d4c7fad71fcb",
+    "scripts/check.sh": "04b04f46ffb6aeb3811c82a1661789d6a2568590b9f37b4c914947bfae8caa70",
+    "scripts/check-example.sh": "5e254578bbeb4adf503c4ca9746dadc061131fe89b8a84f2b33451babebd4bc2",
+    "drivers/cogent/native/patches/readback/0024-independent-texture-readback.patch": "2bff3bdffc53a5817d0cbc6c2901d9d63bb6967e830b1cd684c2b8bd499990c8",
+    "drivers/cogent/native/patches/readback/original-hashes.json": "b99a3dbc2da7fc3caf18e539e7d514e2cac1c3f56d272e62de85e630e7f76400",
+    "drivers/cogent/native/patches/readback/output-hashes.json": "c14be58db4180c648c38d2a5c147c8b86ea77a80980dad3d921631c507d573be",
+    "examples/imaging/README.md": "9004120283298f9735de3c88a398716c38302c54fc9d0a2192b846d896209d35",
+    "examples/imaging/go.mod": "32cdd4ac98409d6982fab74f599679a544d350d81fae4f56ca2706d0287ad912",
+    "examples/imaging/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/imaging/imaging.wgsl": "e855bcb032246ce3a99541443098e5e80fab41e182450487c711d1fbfec900ad",
+    "examples/imaging/main.go": "ac70b0e164ab3ed7df32c768f846e1a247da24d8c7d7324001b1deb03b95550a",
+    "examples/imaging/model.go": "94668b772c94040949e1fad1dafa52b1ecc9a13494fb4aa1352fac2589752336",
+    "examples/imaging/model_test.go": "7ad154592c9dd14995394fc46fc1a9418c713fa64bcb6fba46cf71a6b506cd98",
+    "examples/imaging/save.go": "372425831e580337f5d96f84acbfaad20921393b67bee73cd03ce054ccd65c70",
+    "examples/imaging/save_test.go": "3271f47fdd29bc3ffe894a1744c8aa605bf82852c719c7bc351bee1330d07dda",
+    "examples/imaging/smoke.go": "665e163304648deaa4cbbd9c53b5ead90531781c0e4bf2180b684c630eecaaf4",
+    "examples/imaging/smoke_test.go": "4e9ca268c32e996b26a4bc1b944945ec79cbec1aff2bdd33c70f58c0f15d2d92",
+    "examples/imaging/main_test.go": "22ba1a5381b80180c839edda55980aff0360ba8703dd13eea06050526859581b",
+    "drivers/cogent/native/patches/windowlist/0025-window-registry-lifecycle.patch": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69",
+    "drivers/cogent/native/patches/windowlist/original-hashes.json": "40b61598934147345dbf9dc9379df02945a0f476c99a5092e9c45085a8a5900b",
+    "drivers/cogent/native/patches/windowlist/output-hashes.json": "f4a3c43f22c13f9662435654ce1abbbc92723178863501566353d5197518cd9f"
+  },
+  "backend_reproduced_outputs": {
+    "core/windowlists.go": "506fc80e0aabe70ad0d29bdc19891b21bbc5f5fa30cbf8f1610c872e9f121cb6",
+    "core/renderwindow.go": "ed5ec3bb8bfb5a9d51800daed16bc2d859e72f3b4b19dd853f1621ab1aca7fab",
+    "core/menu.go": "2982628f5d581e57c94b7b65f304c3674de8c2dd332c6eb24c0fe090887b729e",
+    "core/settings.go": "8ceeedc038b67cc3dd054d5a5d08bb527d2d4a350fc5e83d89a9d95c7b0b9176",
+    "core/windowgeometry.go": "063ea1d34d25f7eab9752ef87f9b4944b87d4f7f52dc8da896e937af79b70376",
+    "core/mainstage.go": "dc8b728086e7415ed9a9db60b9f8970496fcb65cd8e44255189620d673a86d9d",
+    "core/windowlists_vellum_test.go": "6e9a2f622f2a2a33fcb4d0fa31469afabe8b9a6c8b5f9f55858cbe6e94d0bf1f"
+  },
+  "log_sha256": {
+    "../../../examples/imaging/acceptance/correction-build.txt": "28c46835ed01abc343084c2d1a846acb92f8de33d09edab30689492e393d82be",
+    "../../../examples/imaging/acceptance/correction-native-smoke-1.txt": "0e0632910e09a9dd6ee3ec690453729334618ba5e82a03f1662913b0885f6cf8",
+    "../../../examples/imaging/acceptance/correction-native-smoke-2.txt": "8fb43e02320f9fb6d6b8e480554ea2a08cd756160d243d00feec3839ff0e84f7",
+    "../../../examples/imaging/acceptance/correction-tests.txt": "96b4c6be3b0a85e100b3e674d977de7c432aab092425b36b850c5f63b1243075",
+    "../../../examples/imaging/acceptance/correction-vet.txt": "50c072cd200c759bda1de8f4057353873adc754b1e02455578c2d2d37be47c4a",
+    "3d-build.log": "2d5326b808d9f5ec37cb3b950491498e5b8b5461678450d812809deec86a53bd",
+    "3d-native.log": "7cba9073e4e41e2186c9a610bcc32d4103bdbd41e8a8e243b68d847a56ee6ff6",
+    "final-full-check.log": "8bbe9e36fc8ba0a8059b2de99da3595e8e2eedf92539fb2c801978c4ed42684f",
+    "vellum-windowlist-25-prepare-tests.txt": "6b928bbf3af87b096e8f448a5553795c3b854c3c8f8138380c99d587e6fcb8c9",
+    "vellum-windowlist-25-race20.txt": "2b58169b57b068eb6e0a0f6ad58165eb685d930fce7055fd9e4efe29cf292653",
+    "vellum-windowlist-25-reproduce.txt": "06ac842c5b60c595ecc248203970cd593d598d5175bc6275fb17513a5c0f9000",
+    "vellum-windowlist-25-vet-scoped.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vellum-windowlist-25-vet.txt": "3fb7701a094c0fd3ea9e885bbb5be9833ceaffad908a6829bee5d8005d2c8ed8"
+  },
+  "scope": "Compute/HDR consumer and bounded asynchronous capture with corrected registry/closure acceptance. Broader Mac/P4 qualification and public distribution remain open.",
+  "historical_log_sha256": {
+    "prepare-tests.log": "5e765c14cb31806ec19aa555dca730c7006c90817928b2b8c24f5e110aab020a",
+    "final-driver-race.log": "d3ba6dcd035537cd25882dd1049f789450549ab92959096b0af0cf5555ba8bdf",
+    "final-driver-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused-race.log": "073a29baf70dd17ca7dcdb3d9c65352fbcbf17575ceae1962a05af95106ec8f2",
+    "prepare.log": "7fa1aa1d3a8d6c35fb5c6a5e33e99bb691ba44f35772c09a6bd437a155c469f1",
+    "vellum-windowlist-25-initial.txt": "c2663d1a38d2f2fe6da9b214d6851bd16471aad78063d98ed9b5dcdd90459d15",
+    "full-check.log": "2363c0b0e8b3aff2bdb1f2bc2af41886a1e23e131fb25992c29fbcf8ac2aca41",
+    "backend-race.log": "019079affb1f8e3160731019b38ba0862ed64ec529cef846c3798ca5e4c3b104"
+  },
+  "historical_log_scope": "Initial or bootstrap checks; see initial-acceptance.json and backend-results.json. These are not final gate claims.",
+  "cache_policy": "Go content-addressed test caching is retained for unchanged root packages. check.sh specifies -race explicitly; Go includes source/dependency/configuration inputs in the cache key. Changed native/backend/example packages and the separate race20/native checks executed. A cached pass is not claimed as a fresh execution."
+}

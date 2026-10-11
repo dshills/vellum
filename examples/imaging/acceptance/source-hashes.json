@@ -1,0 +1,35 @@
+{
+  "adapter_inputs": {
+    "drivers/cogent/gpu_resources.go": "97460d2d0dd0311d92aed135263ed866ec756e6fb0e2c59d271d4a8406ebaf42",
+    "drivers/cogent/gpu_snapshot.go": "387c1cacdc2e68527816c0ab37ecc93f9c2cd7da10e306be55beccb76b2a5fd1",
+    "drivers/cogent/gpu_view.go": "3e6d070a610a6786441fedda37296e602cdc26dbe975025faee83ae1277ffb96"
+  },
+  "binary": {
+    "path": "/private/tmp/vellum-imaging-smoke",
+    "sha256": "757a9cd0480c62f80a6a87e649f6077f4fbde9b0da5841bea721fcc524b100ed"
+  },
+  "compiler_inputs": {
+    "examples/imaging/go.mod": "32cdd4ac98409d6982fab74f599679a544d350d81fae4f56ca2706d0287ad912",
+    "examples/imaging/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/imaging/imaging.wgsl": "e855bcb032246ce3a99541443098e5e80fab41e182450487c711d1fbfec900ad",
+    "examples/imaging/main.go": "12393acb64fc7d84deb92126d6c1b20a92174765cbb04e2346843045b72f83d7",
+    "examples/imaging/model.go": "94668b772c94040949e1fad1dafa52b1ecc9a13494fb4aa1352fac2589752336",
+    "examples/imaging/model_test.go": "7ad154592c9dd14995394fc46fc1a9418c713fa64bcb6fba46cf71a6b506cd98",
+    "examples/imaging/save.go": "372425831e580337f5d96f84acbfaad20921393b67bee73cd03ce054ccd65c70",
+    "examples/imaging/save_test.go": "3271f47fdd29bc3ffe894a1744c8aa605bf82852c719c7bc351bee1330d07dda",
+    "examples/imaging/smoke.go": "477698d1d59ccaa25fd9deca01b9e465a4384ec9d88a6f232180c0a7882729e4",
+    "examples/imaging/smoke_test.go": "4e9ca268c32e996b26a4bc1b944945ec79cbec1aff2bdd33c70f58c0f15d2d92"
+  },
+  "native_results": [
+    {
+      "exit": 0,
+      "raw_log": "/private/tmp/vellum-imaging-live-4.txt",
+      "tracked_log": "examples/imaging/acceptance/native-smoke-1.txt"
+    },
+    {
+      "exit": 0,
+      "raw_log": "/private/tmp/vellum-imaging-live-5.txt",
+      "tracked_log": "examples/imaging/acceptance/native-smoke-2.txt"
+    }
+  ]
+}

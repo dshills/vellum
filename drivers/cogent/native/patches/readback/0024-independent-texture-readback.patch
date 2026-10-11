@@ -1,0 +1,70 @@
+--- /dev/null
++++ b/gpu/texture_vellum_copy.go
+@@ -0,0 +1,28 @@
++package gpu
++
++import (
++	"fmt"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// CopyToBuffer encodes a checked copy of a single-layer RGBA8/BGRA8 resolve
++// texture into an independently owned staging buffer. It exposes no texture
++// ownership and performs no map, poll, wait or submission.
++func (tx *Texture) CopyToBuffer(cmd *wgpu.CommandEncoder, buffer *wgpu.Buffer, stride uint32) error {
++	if tx == nil || !tx.texture.IsValid() || !cmd.IsValid() || !buffer.IsValid() {
++		return fmt.Errorf("gpu.Texture.CopyToBuffer: texture, encoder and buffer required")
++	}
++	if tx.Format.Size.X < 1 || tx.Format.Size.Y < 1 || tx.Format.Layers != 1 || tx.Format.Samples != 1 {
++		return fmt.Errorf("gpu.Texture.CopyToBuffer: single-layer resolve required")
++	}
++	switch tx.Format.Format {
++	case wgpu.TextureFormatRGBA8Unorm, wgpu.TextureFormatRGBA8UnormSrgb, wgpu.TextureFormatBGRA8Unorm, wgpu.TextureFormatBGRA8UnormSrgb:
++	default:
++		return fmt.Errorf("gpu.Texture.CopyToBuffer: unsupported texel format")
++	}
++	if stride%256 != 0 || uint64(stride) < uint64(tx.Format.Size.X)*4 || uint64(stride)*uint64(tx.Format.Size.Y) > buffer.GetSize() || buffer.GetUsage()&wgpu.BufferUsageCopyDst == 0 {
++		return fmt.Errorf("gpu.Texture.CopyToBuffer: invalid staging layout/usage")
++	}
++	size := tx.Format.Extent3D()
++	return cmd.TryCopyTextureToBuffer(tx.texture.AsImageCopy(), &wgpu.TexelCopyBufferInfo{Buffer: buffer, Layout: wgpu.TexelCopyBufferLayout{BytesPerRow: stride, RowsPerImage: uint32(tx.Format.Size.Y)}}, &size)
++}
+--- /dev/null
++++ b/gpu/texture_vellum_copy_test.go
+@@ -0,0 +1,36 @@
++package gpu
++
++import (
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"image"
++	"testing"
++)
++
++func TestVellumTextureCopyRejectsMissingNativeInputs(t *testing.T) {
++	for _, texture := range []*Texture{nil, {}} {
++		if texture.CopyToBuffer(nil, nil, 256) == nil {
++			t.Fatal("missing native inputs accepted")
++		}
++	}
++	// Fake borrowed handles must not reach native code when descriptor admission fails.
++	texture := &Texture{texture: &wgpu.Texture{}, Format: TextureFormat{Size: image.Pt(10, 10), Layers: 1, Samples: 4, Format: wgpu.TextureFormatRGBA8UnormSrgb}}
++	if texture.CopyToBuffer(&wgpu.CommandEncoder{}, &wgpu.Buffer{}, 256) == nil {
++		t.Fatal("multisampled copy accepted")
++	}
++	texture.Format.Samples = 1
++	texture.Format.Format = wgpu.TextureFormatRGBA16Float
++	if texture.CopyToBuffer(&wgpu.CommandEncoder{}, &wgpu.Buffer{}, 256) == nil {
++		t.Fatal("unsupported staging format accepted")
++	}
++}
++
++func TestVellumTextureCopyRejectsReleasedWrappers(t *testing.T) {
++	tex, encoder, buffer := &wgpu.Texture{}, &wgpu.CommandEncoder{}, &wgpu.Buffer{}
++	tex.Release()
++	encoder.Release()
++	buffer.Release()
++	texture := &Texture{texture: tex, Format: TextureFormat{Size: image.Pt(10, 10), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}}
++	if err := texture.CopyToBuffer(encoder, buffer, 256); err == nil {
++		t.Fatal("released native handles accepted")
++	}
++}

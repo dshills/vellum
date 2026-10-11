@@ -84,7 +84,8 @@ nearest/linear filtering in that adapter, including image-only canvases.
 [Advanced GPU views](advanced-gpu.md) expose a versioned shared-device context,
 ordered preparation and custom shader/draw callbacks, retained targets and optional
 depth. An independent 3D viewport exercises camera-only uploads and native depth
-pixels. Compute/float-target/asynchronous-readback qualification and automatic
+pixels. An independent imaging consumer adds compute/float-target preparation and
+bounded asynchronous captures. Broader performance qualification and automatic
 physical-device recreation remain future work.
 Demand painting, live resource rebuilding and actionable device-loss shutdown are
 implemented; see [rendering](rendering.md). Runtime verification

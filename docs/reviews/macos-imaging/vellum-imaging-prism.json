@@ -1,0 +1,326 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "dc5b247fa1ddc9057408f96054950eb3",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "63a369f4b96b5dfcca460574d58b9bd3e7316b96",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 6,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "460bbca52a683399",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Large pixel copy performed while holding native window lock and resource mutex",
+      "message": "The full-frame row copy (up to 64 MiB by default) runs inside pollSnapshot while both the native window lock and the resource mutex are held. That blocks paint, resize, teardown and any other window or resource operation for the whole copy. It contradicts the documented intent of not holding the native lock for long work. The copy is not hidden behind the 5 ms polling cadence, and large frames could stall the UI thread.",
+      "suggestion": "Hold the locks only long enough to confirm the map succeeded, then run the copy without them. For example, obtain the mapped range and copy under a short lock into a preallocated image in row chunks, releasing and re-acquiring the locks between chunks and re-checking r.capture and ctx each time. Alternatively, make the copy cheap enough by handling it in bounded slices.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/gpu_snapshot.go",
+          "lines": {
+            "start": 250,
+            "end": 250
+          }
+        }
+      ],
+      "tags": [
+        "locking",
+        "latency",
+        "gpu-readback",
+        "location-corrected"
+      ],
+      "evidence": "job.result.Image, err = copySnapshot(job.ctx, job.buffer.GetMappedRange(0, uint(job.bytes)), job.size, job.stride)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1f7c2908427cf878",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Acceptance evidence produced from a dirty build and cannot be tied to a commit",
+      "message": "The acceptance binary was built from a dirty working tree (vcs.modified=true) at a revision that does not contain the tested sources. The per-file SHA256 list only covers a hand-picked set of files. Other uncommitted changes (the go.mod replace targets under drivers/cogent/build/*, native patches) are not pinned. The 'pass' result cannot be reproduced from the commit. The binary was also built with -race and cgo, so it differs from a release build.",
+      "suggestion": "Rebuild and re-run the acceptance smoke from a clean, committed tree so vcs.modified=false. Record the final commit hash, and include the checksums of the patched/vendored build/upstream and build/typesetting inputs.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/imaging/acceptance/native-smoke-1.txt",
+          "lines": {
+            "start": 78,
+            "end": 78
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "acceptance",
+        "build"
+      ],
+      "evidence": "build\tvcs.modified=true",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7f093e2a8dcc51f1",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Acceptance evidence generated from a modified (dirty) build",
+      "message": "The acceptance smoke binary was built from a dirty working tree (vcs.modified=true) and with -race. The recorded source SHA256s are the only link between the evidence and the code, and vcs.revision 63a369f4 does not describe what was actually built. The acceptance claim therefore cannot be reproduced from a commit.",
+      "suggestion": "Commit the sources first, rebuild the smoke binary from a clean tree, and re-record the log so vcs.modified=false and the revision matches the tracked files.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "examples/imaging/acceptance/native-smoke-2.txt",
+          "lines": {
+            "start": 78,
+            "end": 78
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "acceptance"
+      ],
+      "evidence": "\tbuild\tvcs.modified=true",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "1f6028788d6b81e8",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Hardcoded row stride in fs_float disagrees with compute stride",
+      "message": "fs_float hardcodes the row stride as 256, while cs_main writes with stride `size.x` taken from `params.source.yz`. If the source width is not 256, fs_float reads the wrong pixels or goes out of bounds.",
+      "suggestion": "Derive the stride from the uniform (`u32(params.source.y)`) so the read stride matches the compute write stride.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/imaging/imaging.wgsl",
+          "lines": {
+            "start": 25,
+            "end": 25
+          }
+        }
+      ],
+      "tags": [
+        "wgsl",
+        "magic-number",
+        "location-corrected"
+      ],
+      "evidence": "return pixels_read[p.y * 256u + p.x];",
+      "fix": {
+        "before": "return pixels_read[p.y * 256u + p.x];",
+        "after": "let width = u32(params.source.y);\n return pixels_read[p.y * width + p.x];"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "b0e69adb004067dd",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Blocking channel send on UI owner in capture error path",
+      "message": "The error paths do a blocking send on the capacity-1 `captureResults` channel from the UI-owner callback, while the success path uses a non-blocking select. If a prior result has not been drained, or the callback also fires after a synchronous SnapshotAsync error, the UI thread blocks forever and the smoke test hangs.",
+      "suggestion": "Use a non-blocking select with a default case for every send to captureResults, as the success path does.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "examples/imaging/main.go",
+          "lines": {
+            "start": 108,
+            "end": 112
+          }
+        }
+      ],
+      "tags": [
+        "deadlock",
+        "channel",
+        "ui-thread",
+        "location-corrected"
+      ],
+      "evidence": "if !w.interactive {\n\t\t\t\tw.captureResults \u003c- captureResult{err: err}\n\t\t\t}\n\t\t\t_ = w.application.Invalidate(w.view.Window)\n\t\t\treturn",
+      "fix": {
+        "before": "if !w.interactive {\n\t\t\t\tw.captureResults \u003c- captureResult{err: err}\n\t\t\t}\n\t\t\t_ = w.application.Invalidate(w.view.Window)\n\t\t\treturn",
+        "after": "if !w.interactive {\n\t\t\t\tselect {\n\t\t\t\tcase w.captureResults \u003c- captureResult{err: err}:\n\t\t\t\tdefault:\n\t\t\t\t}\n\t\t\t}\n\t\t\t_ = w.application.Invalidate(w.view.Window)\n\t\t\treturn"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "e67fb1fb46f415a8",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Close-with-pending-capture check can pass vacuously before the close completes",
+      "message": "After `a.CloseWindow(first.view.Window)` the smoke test only does a non-blocking read of `nativeErrors` and then reads `dropped`. It does not drain the app or wait for the window to close or the pending capture to be resolved. If the capture callback would fire during or after close, it can run after this check, so the smoke test can print \"pass\" without exercising the lifetime-cancellation path it claims to verify.",
+      "suggestion": "Wait for the window to be closed and for the pending capture to be dropped. For example, use `waitCondition` on the native window's `IsClosed`, drain the app a few times or until the poll counters settle, then check `dropped.Load()`.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/imaging/smoke.go",
+          "lines": {
+            "start": 539,
+            "end": 539
+          }
+        }
+      ],
+      "tags": [
+        "test-reliability",
+        "lifetime",
+        "race",
+        "location-corrected"
+      ],
+      "evidence": "return errors.New(\"lifetime cancellation delivered capture\")",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 138396,
+    "totalMs": 36892
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 45,
+    "bytes": 191546,
+    "chunks": 11,
+    "llmCalls": 18,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 160383,
+        "output": 19036,
+        "costUSD": 0.511126
+      }
+    ],
+    "widenedFiles": 4,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 7,
+      "refuted": 1
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "b723610fd7195db5",
+        "severity": "medium",
+        "category": "testing",
+        "title": "Force-close acceptance check is a hard-coded narrative, not a verified result",
+        "message": "The force-close scenario is recorded as a free-form prose string, not as measured output. It says no callback ran and closed Stats were unavailable, and it defers to a separate regression test and a manual review. The artifact still reports \"result\":\"pass\", so the log gives no evidence that force-close was exercised and may overstate acceptance coverage.",
+        "suggestion": "Make the smoke test assert force-close behaviour and emit a boolean (e.g. \"forceClose\":true) only when it was actually exercised. If the scenario cannot be exercised natively, report it as \"skipped\" or \"not covered\" so it does not feed into an overall pass.",
+        "confidence": 0.55,
+        "locations": [
+          {
+            "path": "examples/imaging/acceptance/native-smoke-1.txt",
+            "lines": {
+              "start": 79,
+              "end": 79
+            }
+          }
+        ],
+        "tags": [
+          "acceptance",
+          "test-coverage",
+          "evidence"
+        ],
+        "evidence": "\"forceClose\":\"no callback, closed Stats unavailable, survivor capture passes; private reservation control flow covered by adapter regression; buffer ownership reviewed\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/imaging/acceptance/native-smoke-1.txt"
+    },
+    {
+      "finding": {
+        "id": "24bdbf47c429de26",
+        "severity": "medium",
+        "category": "testing",
+        "title": "forceClose acceptance check is a hand-written note, not an asserted result",
+        "message": "The forceClose field is a free-text note rather than a measured result. It says Stats are unavailable and the control flow is covered elsewhere, yet the overall \"result\":\"pass\" counts it as passing. The force-close path was not verified by this native smoke run, and a regression there would not fail the run.",
+        "suggestion": "Make forceClose a boolean that the smoke test asserts, or mark it explicitly as not exercised and exclude it from the pass criteria. Link to the adapter regression test by name.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "examples/imaging/acceptance/native-smoke-2.txt",
+            "lines": {
+              "start": 79,
+              "end": 79
+            }
+          }
+        ],
+        "tags": [
+          "acceptance",
+          "test-coverage"
+        ],
+        "evidence": "\"forceClose\":\"no callback, closed Stats unavailable, survivor capture passes; private reservation control flow covered by adapter regression; buffer ownership reviewed\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/imaging/acceptance/native-smoke-2.txt"
+    },
+    {
+      "finding": {
+        "id": "70cd6104a26b2ffa",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Ignored PostWait error can leave capture permanently busy",
+        "message": "The error from PostWait is discarded. If posting fails, for example because the mailbox is closed or admission fails while ctx is still live, `captureBusy` is never reset. The Capture button then stays disabled permanently.",
+        "suggestion": "Check PostWait's error. On failure, log it and, if the window is still alive, reset the busy state through another path, or surface the error via Invalidate.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "examples/imaging/main.go",
+            "lines": {
+              "start": 153,
+              "end": 153
+            }
+          }
+        ],
+        "tags": [
+          "error-handling",
+          "state",
+          "location-corrected"
+        ],
+        "evidence": "_ = w.application.PostWait(ctx, func() {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "refuted by anthropic:claude-sonnet-5-5: PostWait fails only when the window context is canceled or the app mailbox is closed, and both mean the window or app is shutting down. The posted callback also deliberately skips the reset when ctx.Err() != nil. The code never reopens the window, so a permanently disabled button cannot be observed; the finding is theoretical."
+    }
+  ],
+  "suppressed": []
+}

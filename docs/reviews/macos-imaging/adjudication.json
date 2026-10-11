@@ -1,0 +1,87 @@
+{
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "independent_reviewer": "/root/mac_history_review",
+  "findings": [
+    {
+      "id": "460bbca52a683399",
+      "decision": "performance limitation documented; unsafe suggested unlock rejected",
+      "reason": "The bounded allocation and row copy hold native/resource locks so reset or native teardown cannot unmap/release the borrowed mapped slice. CPU alpha decoding and delivery run after unmap/release and outside these locks. The specification now explicitly states the copy can delay paint/resize, permits a lower MaxSnapshotBytes limit, and makes no latency guarantee. Chunked copying needs a separately tested ownership redesign and timing qualification."
+    },
+    {
+      "id": "1f7c2908427cf878",
+      "decision": "precommit provenance honestly retained; clean committed SDK verification follows commit",
+      "reason": "These are explicitly precommit race-binary acceptance runs tied to source hashes, checked patch manifests and pinned preparation, not release-build claims. A fresh private SDK from the clean commit will reproduce and hash every prepared native input, match every reviewed source hash, verify every archive file and run generated/API/imaging consumers after relocation. The archive and proof live outside the repository to avoid a self-referential commit record. Public distribution qualification remains open."
+    },
+    {
+      "id": "7f093e2a8dcc51f1",
+      "decision": "duplicate provenance follow-up",
+      "reason": "Same disposition as 1f7c2908427cf878; historical precommit/race evidence is preserved rather than rewritten as clean-release evidence."
+    },
+    {
+      "id": "1f6028788d6b81e8",
+      "decision": "refuted for the fixed-size independent consumer",
+      "reason": "Private imageSize=256 controls storage allocation, single-sample float texture dimensions, uniform source dimensions and workgroup dispatch. The consumer exposes exposure and viewport controls, not a configurable source width. Its model regression asserts the exact source uniform and allocation sizes."
+    },
+    {
+      "id": "b0e69adb004067dd",
+      "decision": "confirmed and fixed",
+      "reason": "Success and both synchronous/asynchronous error paths now share a nonblocking bounded smoke-diagnostic reporter. An unread prior diagnostic retains precedence. The regression fills the channel and exercises real admission rejection and owner-held completion state without blocking or leaving the Capture button busy."
+    },
+    {
+      "id": "e67fb1fb46f415a8",
+      "decision": "fixture strengthened",
+      "reason": "The final fixture verifies explicit domain lifetime cancellation and registration removal, observes program release and native closure, then requires native.Lock to return false outside the owner. The lock round-trip serializes with completed native teardown. A separate terminal context and process watchdog cover shutdown. It does not claim to observe private decoder/reservation destruction."
+    }
+  ],
+  "discarded_findings_independently_checked": [
+    {
+      "ids": [
+        "b723610fd7195db5",
+        "24bdbf47c429de26"
+      ],
+      "decision": "refuted",
+      "reason": "The native fixture actually admits capture and directly closes that native window in one owner-held seam, waits native closure, asserts Stats unavailable and no callback, and verifies surviving-window pixels. The prose field states the separate private-cleanup limitation; it is not the fixture assertion itself."
+    },
+    {
+      "id": "70cd6104a26b2ffa",
+      "decision": "refuted",
+      "reason": "PostWait completion admission fails only when the captured window context is canceled or the application closes. Both end the relevant UI lifetime; no surviving Capture button remains disabled. A full live mailbox waits for credit, covered by the deterministic production save-flow regression."
+    }
+  ],
+  "native_failure_follow_up": "The strengthened native run exposed a real backend registry race and a fixture assumption that raw native.Close automatically unregisters the domain window. Reproducible patch25 synchronizes registry snapshots/promotion and avoids native callouts under its mutex; the fixture explicitly performs subsequent domain cleanup. Both failures remain in acceptance evidence.",
+  "unchanged_broad_review_repeated": false,
+  "correction_findings": [
+    {
+      "id": "a8c8dfe67f2567df",
+      "decision": "confirmed and fixed",
+      "reason": "Final and historical log digest fields are separate; final check entries reference the corrected backend and current native consumer evidence."
+    },
+    {
+      "id": "e7531a6b4daba6d7",
+      "decision": "confirmed and fixed",
+      "reason": "Backend result log/source references are now tracked relative paths. Raw temporary paths are explicitly informational origins."
+    },
+    {
+      "id": "35373827f41c2d7d",
+      "decision": "refuted by independent review",
+      "reason": "Unchanged root package tests use valid Go content-addressed caching with explicit race settings. Changed driver/backend/example inputs executed; fresh affected consumer and native fixtures separately passed. No cached pass is described as fresh execution."
+    },
+    {
+      "id": "be4b90cb006fa91c",
+      "decision": "confirmed and fixed",
+      "reason": "The correction source manifest resolves its tracked backend proof and describes the uncommitted binary path as an informational build output, with rebuild commands and no byte-identical rebuild claim."
+    },
+    {
+      "id": "2582ebe6a50349b6",
+      "decision": "baseline attribution independently verified; existing failure retained explicitly",
+      "reason": "A private stage25 copy had patch25 reversed and original hashes verified, including absence of its new test. Stock core vet exit1 produced a byte-identical full diagnostic log before/after patch25. vet-baseline.json records expected_exit_code1 and the known-failure role. Existing reviewed metadata already preserves exit1 and explicitly says stock vet is not clean; there is no all-pass schema. Scoped vet excludes two analyzers and does not certify their coverage."
+    }
+  ],
+  "review_rounds": [
+    "initial implementation batch",
+    "targeted source/backend/evidence corrections",
+    "three-file metadata correction only"
+  ],
+  "further_prism_not_repeated": "Only immutable review records and baseline evidence added after the final review. No implementation or already reviewed metadata changed. Internal independent review verified attribution and final input hashes."
+}

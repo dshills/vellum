@@ -19,6 +19,7 @@ open. The workbench does not change system input sources.
 | `drivers/cogent/` | Separate native driver module |
 | `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |
 | `examples/drawing/` | Independent retained GPU mesh/image drawing and scalable workload consumer |
+| `examples/imaging/` | Independent compute, HDR float rendering and asynchronous frame capture consumer |
 | `examples/viewport3d/` | Independent custom GPU shader/depth viewport with retained camera and geometry |
 | `examples/hello/` | Standalone application module consuming the local SDK |
 | [docs/](docs/README.md) | Development guide, research, decisions, reports and review evidence |

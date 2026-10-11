@@ -127,5 +127,6 @@ helpers. The independent 3D viewport provides orbit/dolly controls and native
 depth, retention, fault repair, resize and closure evidence. The shutdown check
 exposed and fixed concurrent removal during backend quit through reproducible
 patch 23. See [contract](../specs/advanced-gpu.md) and
-[evidence](reports/macos-advanced-gpu/README.md). Compute, float presentation,
-asynchronous readback and broader P4/Mac qualification remain open.
+[evidence](reports/macos-advanced-gpu/README.md). The imaging consumer adds actual
+compute and float-color render preparation with bounded asynchronous captures.
+See [evidence](reports/macos-imaging/README.md). Broader P4/Mac qualification remains open.

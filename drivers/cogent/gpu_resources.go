@@ -55,7 +55,7 @@ func (h *GPUResources) active() (*gpuResourcePool, error) {
 	return h.pool, nil
 }
 func (p *gpuResourcePool) admit(extra uint64) error {
-	return gpuBudget(p.budget, p.stats.TargetBytes, p.stats.BufferBytes, p.stats.TextureBytes, p.stats.ReadbackBytes, extra)
+	return gpuBudget(p.budget, p.stats.TargetBytes, p.stats.BufferBytes, p.stats.TextureBytes, p.stats.ReadbackBytes, p.stats.AsyncReadbackBytes, extra)
 }
 func (h *GPUResources) Buffer(name string, desc wgpu.BufferDescriptor) (*wgpu.Buffer, error) {
 	p, err := h.active()

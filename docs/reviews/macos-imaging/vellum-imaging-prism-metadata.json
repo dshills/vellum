@@ -1,0 +1,98 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "7e7688604c403be822aa396e98018646",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "63a369f4b96b5dfcca460574d58b9bd3e7316b96",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "unstaged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "2582ebe6a50349b6",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Failing vet check is recorded as a gate entry and its attribution is unproven",
+      "message": "The acceptance record includes a failing `go vet ./core` entry with exit_code 1 among the gate checks. It is attributed to pre-existing upstream diagnostics. The record does not show that the diagnostics are unchanged by patch 25, which adds a new core test file and changes several core files. The scoped vet run then disables the composites and unreachable analyzers, so it cannot catch new findings of those kinds. Any tooling that treats the checks array as all-pass will misread this entry.",
+      "suggestion": "Record a baseline `go vet ./core` output from the unpatched pinned upstream and show that the diagnostic set is identical after patch 25. Put the known-failing check in a separate field such as `known_failures` or `expected_exit_code`, so that exit_code 1 is not mixed in with the passing gates.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "docs/reports/macos-imaging/acceptance.json",
+          "lines": {
+            "start": 38,
+            "end": 41
+          }
+        }
+      ],
+      "tags": [
+        "acceptance",
+        "vet",
+        "evidence"
+      ],
+      "evidence": "\"scope\": \"Existing pinned upstream composite-literal/unreachable benchmark diagnostics; not claimed clean\"",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 15241,
+    "totalMs": 17869
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 3,
+    "bytes": 22358,
+    "chunks": 1,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 19940,
+        "output": 2204,
+        "costUSD": 0.06192
+      }
+    ],
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 1,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

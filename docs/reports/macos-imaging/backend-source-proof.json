@@ -1,0 +1,48 @@
+{
+  "stage": {
+    "origin": "drivers/cogent/native/patches/windowlist",
+    "inputs": "native/patches/windowlist/original-hashes.json",
+    "outputs": "native/patches/windowlist/output-hashes.json",
+    "patches": [
+      {
+        "file": "native/patches/windowlist/0025-window-registry-lifecycle.patch",
+        "sha256": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69"
+      }
+    ]
+  },
+  "tracked_inputs": {
+    "drivers/cogent/native/dependencies.json": "0a97a24a25663172f60cdf6d83b43772cecd2885a09b0f1e136d5d61f4b7424e",
+    "drivers/cogent/prepare_test.py": "967aee214b01d807364cfa4f7f71912b1708b680b02f9aa4b5f8d4c7fad71fcb",
+    "scripts/check.sh": "04b04f46ffb6aeb3811c82a1661789d6a2568590b9f37b4c914947bfae8caa70",
+    "drivers/cogent/native/patches/windowlist/0025-window-registry-lifecycle.patch": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69",
+    "drivers/cogent/native/patches/windowlist/original-hashes.json": "40b61598934147345dbf9dc9379df02945a0f476c99a5092e9c45085a8a5900b",
+    "drivers/cogent/native/patches/windowlist/output-hashes.json": "f4a3c43f22c13f9662435654ce1abbbc92723178863501566353d5197518cd9f"
+  },
+  "stage24_original_inputs": {
+    "core/windowlists.go": "46c34fb0ed3cdac6076cfabb862473bc41d85cafca37911909a1f170ba2c730f",
+    "core/renderwindow.go": "dfe60645b85d6e55e112a00155451f2ce30b638b5ca1459ea5f75fb9e0566c08",
+    "core/menu.go": "24d6542885b575071e02d80994b59d09d9e93206cb9b813d942e3b07c32eb764",
+    "core/settings.go": "b8061794f59991eed67de5d0d2f9be50c48151a02fbe909392edcb535a574b3d",
+    "core/windowgeometry.go": "d8a770291a26fec44fd22f25bcf5f54795e53e76afdc6e2344fc45c0b9ad5722",
+    "core/mainstage.go": "0fe228a505fd38d6f8589c03add4c6dc73954c495bd55ac3079e60890d893500",
+    "core/windowlists_vellum_test.go": null
+  },
+  "reproduced_native_outputs": {
+    "core/windowlists.go": "506fc80e0aabe70ad0d29bdc19891b21bbc5f5fa30cbf8f1610c872e9f121cb6",
+    "core/renderwindow.go": "ed5ec3bb8bfb5a9d51800daed16bc2d859e72f3b4b19dd853f1621ab1aca7fab",
+    "core/menu.go": "2982628f5d581e57c94b7b65f304c3674de8c2dd332c6eb24c0fe090887b729e",
+    "core/settings.go": "8ceeedc038b67cc3dd054d5a5d08bb527d2d4a350fc5e83d89a9d95c7b0b9176",
+    "core/windowgeometry.go": "063ea1d34d25f7eab9752ef87f9b4944b87d4f7f52dc8da896e937af79b70376",
+    "core/mainstage.go": "dc8b728086e7415ed9a9db60b9f8970496fcb65cd8e44255189620d673a86d9d",
+    "core/windowlists_vellum_test.go": "6e9a2f622f2a2a33fcb4d0fa31469afabe8b9a6c8b5f9f55858cbe6e94d0bf1f"
+  },
+  "prepared_outputs_verified": true,
+  "tests": [
+    "TestVellumWindowListPromotionAndDetachedSnapshot",
+    "TestVellumWindowListConcurrentDeletePromotion",
+    "TestVellumWindowListFocusNextCalloutsAndRemoval",
+    "TestVellumWindowListConcurrentFocusNextDelete",
+    "TestVellumWindowListNativeFocusCloseEvents"
+  ],
+  "scope": "Window registry membership, detached snapshots, initialization publication and avoiding native/render callouts under registry mutex. Mutable per-window widget/RC contents retain existing ownership."
+}

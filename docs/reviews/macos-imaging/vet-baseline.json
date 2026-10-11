@@ -1,0 +1,15 @@
+{
+  "stage24": "Pinned prepared stage25 copied privately, patch25 reversed, original manifest hashes verified",
+  "baseline_exit_code": 1,
+  "stage25_exit_code": 1,
+  "diagnostic_lines_identical": true,
+  "baseline_log": "vellum-imaging-stage24-vet.txt",
+  "baseline_sha256": "3fb7701a094c0fd3ea9e885bbb5be9833ceaffad908a6829bee5d8005d2c8ed8",
+  "stage25_log": "../../reports/macos-imaging/vellum-windowlist-25-vet.txt",
+  "stage25_sha256": "3fb7701a094c0fd3ea9e885bbb5be9833ceaffad908a6829bee5d8005d2c8ed8",
+  "patch25_sha256": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69",
+  "scope": "Stock go vet ./core remains a known upstream failure, not an all-pass gate. Exact diagnostic lines match before and after patch25. Other pinned patches stay applied.",
+  "expected_exit_code": 1,
+  "role": "Known upstream baseline failure; diagnostic comparison, not a passing gate",
+  "excluded_analyzers": "The separate scoped vet run excludes composites and unreachable; it does not claim coverage of these analyzers."
+}

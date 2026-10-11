@@ -1,0 +1,73 @@
+{
+  "adapter_inputs": {
+    "drivers/cogent/gpu_resources.go": "97460d2d0dd0311d92aed135263ed866ec756e6fb0e2c59d271d4a8406ebaf42",
+    "drivers/cogent/gpu_snapshot.go": "387c1cacdc2e68527816c0ab37ecc93f9c2cd7da10e306be55beccb76b2a5fd1",
+    "drivers/cogent/gpu_view.go": "3e6d070a610a6786441fedda37296e602cdc26dbe975025faee83ae1277ffb96"
+  },
+  "backend_source_proof": {
+    "raw_path": "/private/tmp/vellum-windowlist-25-source-proof.json",
+    "sha256": "6a51dedf9c1587726eaaceb9d4a153418b4063192fba62986794f4aef994ca3a",
+    "tracked_path": "../../../docs/reports/macos-imaging/backend-source-proof.json"
+  },
+  "binary": {
+    "path": "/private/tmp/vellum-imaging-smoke-corrected",
+    "sha256": "4df60a03752343152d8004ae8fab84e3647b350039431c59fef92151a2e4f231",
+    "path_role": "Informational producing-machine output; binary not committed. Build command reproduces the workflow, not a promise of identical bytes across build environments or changed VCS metadata.",
+    "rebuild_cwd": "examples/imaging",
+    "rebuild_command": [
+      "go",
+      "build",
+      "-race",
+      "-o",
+      "/private/tmp/vellum-imaging-smoke-corrected",
+      "."
+    ]
+  },
+  "compiler_inputs": {
+    "examples/imaging/go.mod": "32cdd4ac98409d6982fab74f599679a544d350d81fae4f56ca2706d0287ad912",
+    "examples/imaging/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/imaging/imaging.wgsl": "e855bcb032246ce3a99541443098e5e80fab41e182450487c711d1fbfec900ad",
+    "examples/imaging/main.go": "ac70b0e164ab3ed7df32c768f846e1a247da24d8c7d7324001b1deb03b95550a",
+    "examples/imaging/main_test.go": "22ba1a5381b80180c839edda55980aff0360ba8703dd13eea06050526859581b",
+    "examples/imaging/model.go": "94668b772c94040949e1fad1dafa52b1ecc9a13494fb4aa1352fac2589752336",
+    "examples/imaging/model_test.go": "7ad154592c9dd14995394fc46fc1a9418c713fa64bcb6fba46cf71a6b506cd98",
+    "examples/imaging/save.go": "372425831e580337f5d96f84acbfaad20921393b67bee73cd03ce054ccd65c70",
+    "examples/imaging/save_test.go": "3271f47fdd29bc3ffe894a1744c8aa605bf82852c719c7bc351bee1330d07dda",
+    "examples/imaging/smoke.go": "665e163304648deaa4cbbd9c53b5ead90531781c0e4bf2180b684c630eecaaf4",
+    "examples/imaging/smoke_test.go": "4e9ca268c32e996b26a4bc1b944945ec79cbec1aff2bdd33c70f58c0f15d2d92"
+  },
+  "native_preparation_inputs": {
+    "drivers/cogent/go.mod": "27998a50e1f6b5b7f95e21c1f7ab5ab8672e557ed4438be427bf0aecd4d35fe2",
+    "drivers/cogent/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "drivers/cogent/native/dependencies.json": "0a97a24a25663172f60cdf6d83b43772cecd2885a09b0f1e136d5d61f4b7424e",
+    "drivers/cogent/native/patches/readback/0024-independent-texture-readback.patch": "2bff3bdffc53a5817d0cbc6c2901d9d63bb6967e830b1cd684c2b8bd499990c8",
+    "drivers/cogent/native/patches/readback/original-hashes.json": "b99a3dbc2da7fc3caf18e539e7d514e2cac1c3f56d272e62de85e630e7f76400",
+    "drivers/cogent/native/patches/readback/output-hashes.json": "c14be58db4180c648c38d2a5c147c8b86ea77a80980dad3d921631c507d573be",
+    "drivers/cogent/native/patches/windowlist/0025-window-registry-lifecycle.patch": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69",
+    "drivers/cogent/native/patches/windowlist/original-hashes.json": "40b61598934147345dbf9dc9379df02945a0f476c99a5092e9c45085a8a5900b",
+    "drivers/cogent/native/patches/windowlist/output-hashes.json": "f4a3c43f22c13f9662435654ce1abbbc92723178863501566353d5197518cd9f",
+    "go.mod": "99ee007066964a9d64df4a52090519338a7c7b08a39654773920c654564ff441"
+  },
+  "native_results": [
+    {
+      "exit": 0,
+      "raw_log": "/private/tmp/vellum-imaging-live-corrected-2.txt",
+      "tracked_log": "examples/imaging/acceptance/correction-native-smoke-1.txt"
+    },
+    {
+      "exit": 0,
+      "raw_log": "/private/tmp/vellum-imaging-live-corrected-3.txt",
+      "tracked_log": "examples/imaging/acceptance/correction-native-smoke-2.txt"
+    }
+  ],
+  "reproduced_stage25_outputs": {
+    "drivers/cogent/build/upstream/core/mainstage.go": "dc8b728086e7415ed9a9db60b9f8970496fcb65cd8e44255189620d673a86d9d",
+    "drivers/cogent/build/upstream/core/menu.go": "2982628f5d581e57c94b7b65f304c3674de8c2dd332c6eb24c0fe090887b729e",
+    "drivers/cogent/build/upstream/core/renderwindow.go": "ed5ec3bb8bfb5a9d51800daed16bc2d859e72f3b4b19dd853f1621ab1aca7fab",
+    "drivers/cogent/build/upstream/core/settings.go": "8ceeedc038b67cc3dd054d5a5d08bb527d2d4a350fc5e83d89a9d95c7b0b9176",
+    "drivers/cogent/build/upstream/core/windowgeometry.go": "063ea1d34d25f7eab9752ef87f9b4944b87d4f7f52dc8da896e937af79b70376",
+    "drivers/cogent/build/upstream/core/windowlists.go": "506fc80e0aabe70ad0d29bdc19891b21bbc5f5fa30cbf8f1610c872e9f121cb6",
+    "drivers/cogent/build/upstream/core/windowlists_vellum_test.go": "6e9a2f622f2a2a33fcb4d0fa31469afabe8b9a6c8b5f9f55858cbe6e94d0bf1f"
+  },
+  "path_basis": "compiler/adapter/native inputs and tracked_log are repository-relative. backend_source_proof.tracked_path is relative to this record. raw_path/raw_log/binary.path are informational local origins."
+}

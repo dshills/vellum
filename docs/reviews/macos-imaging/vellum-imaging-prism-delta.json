@@ -1,0 +1,261 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "4507713fe6eeb03eae0656e695040a8e",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "63a369f4b96b5dfcca460574d58b9bd3e7316b96",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "unstaged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "a8c8dfe67f2567df",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Stale log hashes retained for checks that no longer exist in the acceptance record",
+      "message": "log_sha256 still lists logs whose checks were removed from `checks` (final-driver-race.log, final-driver-vet.log, focused-race.log, backend-race.log, prepare.log, prepare-tests.log, full-check.log). Nothing in the acceptance record references them, so a verifier cannot tell which hashes belong to the final evidence. Some of them are the superseded pre-correction results the README now calls historical. final-driver-vet.log's hash is the SHA-256 of an empty file, which looks like proof of a passing check when no command produces it anymore.",
+      "suggestion": "Remove hashes with no matching check, or move them under an explicit `historical_logs` key. Keep log_sha256 limited to logs referenced by `checks`. Also add `log` fields and hashes for the corrected consumer entries, which currently have none.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reports/macos-imaging/acceptance.json",
+          "lines": {
+            "start": 118,
+            "end": 131
+          }
+        }
+      ],
+      "tags": [
+        "evidence-integrity",
+        "stale-data"
+      ],
+      "evidence": "\"final-driver-race.log\": \"d3ba6dcd035537cd25882dd1049f789450549ab92959096b0af0cf5555ba8bdf\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "e7531a6b4daba6d7",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "Evidence references non-committed absolute /private/tmp paths",
+      "message": "The result records point at machine-local /private/tmp paths for every log and for the source proof. None of these exist in the repository. The committed file is named backend-source-proof.json, not vellum-windowlist-25-source-proof.json, so a reader cannot resolve the reference. The log names also differ from the repo-relative names used in acceptance.json. The hashes cannot be verified from the checkout.",
+      "suggestion": "Use repo-relative paths that match the committed files (for example `vellum-windowlist-25-race20.txt` and `backend-source-proof.json`), so the recorded hashes can be checked against the committed artifacts.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reports/macos-imaging/backend-results.json",
+          "lines": {
+            "start": 4,
+            "end": 40
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "paths"
+      ],
+      "evidence": "\"source_proof\": \"/private/tmp/vellum-windowlist-25-source-proof.json\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "35373827f41c2d7d",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Final full-check log relies on cached test results",
+      "message": "The root-module package results in this final full-check log are all `(cached)`, so those tests did not run in this session. The log also shows no `-race` flag, although the acceptance record describes `check.sh` as running race tests. A cached pass cannot show that the final tree passes, and the log is used as final acceptance evidence for the window-registry change.",
+      "suggestion": "Regenerate the final log with `go clean -testcache` or `-count=1`, and with `-race` where the acceptance record claims it, so every package actually executes. Record the commit or tree hash the log was produced against.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "docs/reports/macos-imaging/final-full-check.log",
+          "lines": {
+            "start": 33,
+            "end": 42
+          }
+        }
+      ],
+      "tags": [
+        "acceptance-evidence",
+        "test-cache",
+        "reproducibility"
+      ],
+      "evidence": "ok  \tgithub.com/dshills/vellum\t(cached)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "be4b90cb006fa91c",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "Manifest references non-committed /private/tmp artifacts",
+      "message": "The hash manifest cites machine-local /private/tmp paths for the binary, the backend source proof and the raw logs. Those files are not in the repository, so the recorded SHA256s (binary, source-proof) cannot be checked by anyone else. The acceptance evidence is only partly verifiable.",
+      "suggestion": "Commit the referenced artifacts (for example the source-proof JSON and raw logs under docs/reports/...) and reference them by repo-relative path. Alternatively, document that the paths are informational only and give a reproducible build command.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "examples/imaging/acceptance/correction-source-hashes.json",
+          "lines": {
+            "start": 8,
+            "end": 8
+          }
+        }
+      ],
+      "tags": [
+        "reproducibility",
+        "acceptance"
+      ],
+      "evidence": "\"raw_path\": \"/private/tmp/vellum-windowlist-25-source-proof.json\",",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 97203,
+    "totalMs": 33914
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 31,
+    "bytes": 134207,
+    "chunks": 7,
+    "llmCalls": 11,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 102353,
+        "output": 13135,
+        "costUSD": 0.336056
+      }
+    ],
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "05898d4e8946f609",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "",
+        "message": "When the window is not registered, the WinFocus handler now returns from the whole event handler. Everything after the promotion is skipped: setting winGotFocus, updating the current window, and any other focus bookkeeping. A window that is legitimately focused but not yet registered, or one whose registration is delayed, would never record its focus state. The patch moves AllRenderWindows.add to the end of newMainStage window creation, so the window now enters the list later than before.",
+        "suggestion": "Skip only the reordering when promoteExisting returns false and keep the remaining focus handling. If a late focus event for a removed window must be ignored, gate that on an explicit closed/stopped flag rather than on list membership.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/windowlist/0025-window-registry-lifecycle.patch",
+            "lines": {
+              "start": 197,
+              "end": 423
+            }
+          }
+        ],
+        "tags": [
+          "focus",
+          "lifecycle",
+          "concurrency"
+        ],
+        "evidence": "if !AllRenderWindows.promoteExisting(w) {\n+\t\t\t\treturn\n+\t\t\t}",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/windowlist/0025-window-registry-lifecycle.patch"
+    },
+    {
+      "finding": {
+        "id": "4772918a23853391",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Acceptance binary built from a dirty tree; provenance not fully pinned",
+        "message": "The acceptance binary was built from a dirty working tree (vcs.revision=63a369f... with vcs.modified=true). The per-file SHA256 list partly compensates for this, but the `drivers/cogent/build/typesetting` replace target and the rest of the `build/upstream` tree are not hashed. The inputs are therefore not fully pinned, and the revision cannot reproduce the binary.",
+        "suggestion": "Rebuild the acceptance binary from a clean, committed tree so vcs.modified=false. Also hash the replaced module trees (build/typesetting and all of build/upstream), or record the commit that contains the patched sources.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "examples/imaging/acceptance/correction-native-smoke-2.txt",
+            "lines": {
+              "start": 97,
+              "end": 97
+            }
+          }
+        ],
+        "tags": [
+          "reproducibility",
+          "acceptance",
+          "provenance"
+        ],
+        "evidence": "vcs.modified=true",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/imaging/acceptance/correction-native-smoke-2.txt"
+    },
+    {
+      "finding": {
+        "id": "ebfdba8825897020",
+        "severity": "medium",
+        "category": "testing",
+        "title": "Close/cleanup behavior is asserted by prose, not measured",
+        "message": "The force-close and normal-close cleanup results are free-text claims, not measured assertions. The log itself says `privateSnapshotCleanup` was \"not measured by public consumer\", `Stats unavailable` after close, and buffer ownership was only \"reviewed\". Yet the overall result is \"pass\". Leaks or lifetime bugs in snapshot readback buffers on window close would go undetected by this smoke test.",
+        "suggestion": "Add an observable check for cleanup, for example counters for outstanding readback buffers/snapshots exposed via test hooks. Alternatively, label these items explicitly as not covered by the smoke test instead of reporting \"result\":\"pass\" for them.",
+        "confidence": 0.6,
+        "locations": [
+          {
+            "path": "examples/imaging/acceptance/correction-native-smoke-2.txt",
+            "lines": {
+              "start": 98,
+              "end": 98
+            }
+          }
+        ],
+        "tags": [
+          "testing",
+          "resource-leak",
+          "acceptance"
+        ],
+        "evidence": "\"forceClose\":\"no callback, closed Stats unavailable, survivor capture passes; private reservation control flow covered by adapter regression; buffer ownership reviewed\"",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in examples/imaging/acceptance/correction-native-smoke-2.txt"
+    }
+  ],
+  "suppressed": []
+}

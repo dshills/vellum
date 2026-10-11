@@ -177,6 +177,28 @@
               "sha256": "74e2822221d9f00db66339659ae7def402c28eb6e2a984ee4c5d79014ff5f796"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/readback",
+          "inputs": "native/patches/readback/original-hashes.json",
+          "outputs": "native/patches/readback/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/readback/0024-independent-texture-readback.patch",
+              "sha256": "2bff3bdffc53a5817d0cbc6c2901d9d63bb6967e830b1cd684c2b8bd499990c8"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/windowlist",
+          "inputs": "native/patches/windowlist/original-hashes.json",
+          "outputs": "native/patches/windowlist/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/windowlist/0025-window-registry-lifecycle.patch",
+              "sha256": "c0c07a6949d8b3c8639ee8af25aa04e01cdc601b290ccd1a08a12d0ac3ec7e69"
+            }
+          ]
         }
       ]
     },
