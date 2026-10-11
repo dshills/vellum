@@ -44,6 +44,15 @@ multiwindow/integrated frame attribution remains open. The consumer requires one
 completed tag/generation before the next event. It does not directly mutate the
 viewport during measured scrolling or call descriptor callbacks.
 
+New records declare `warmup_guard: 1`. The initial viewport must start at zero
+offset, and the complete warm trajectory must return to the same viewport,
+bounds and scale with exactly one notification per admitted warm event. Extra
+transitions, offset drift and layout changes refuse the run before measurements;
+the consumer never resets offsets to hide drift. Ready records retain start/end
+viewports and generations plus the observed warm callback count. Stage and sample
+guard/mode identities must agree. Historical records lacking this guard remain
+historical observations; adding this check does not qualify an earlier refusal.
+
 `-perf-novel` is a separate workload: after warm-up it jumps, unmeasured, into an
 untouched row range and scrolls forward to newly visited numeric strings.
 Fonts/device state are warm and numeric strings can coincide. It is not a
@@ -204,3 +213,36 @@ and mixed; the variable-million case rises slightly and every run still fails
 the unchanged targets. Software span/mask/pixel evidence and microbenchmarks are
 separate from frame timings. This qualifies the comparison's table protocol,
 while P6 tree latency, broader memory, cold caches and sustained work remain open.
+
+## Diagnostic grid input provenance
+
+`-perf-input-details=/new/path.json` requires `-perf` and a new exclusive file.
+It cannot combine with CPU profiling or source-detail timing. The separate
+`NewFrameMetricsWithGridInputDetails` recorder admits at most 4096 frame tickets
+and preallocates `3*tickets+256` scalar input records. Grid/window identifiers
+are at most4096 bytes. No record is overwritten; identifier/capacity refusal
+is explicit and failed diagnostic evidence is still saved. Ordinary
+`NewFrameMetrics` allocates no input ledger and adds no input clocks.
+
+The recorder binds before native grid mount. Admissions copy requested logical
+deltas, encoded physical deltas, completed scale, viewport and generation.
+Actual wheel dispatch copies the current event tag, handler scale, physical
+deltas, bounded integer steps and signed remainder before/after arithmetic.
+Owner transitions reuse their existing state reads to report origin, input
+sequence, generation, viewport and changed/unchanged/refused result. Scrollbar
+and layout origins remain distinct. Records contain no event/model/widget,
+callback, cell values or native pointer. Native wheel/style reads stay at the
+originating scene boundary; owner observers never read those mutable fields.
+
+The independent ledger mutex is released before posting, application callbacks
+or trace calls. Admission records append after releasing the metrics mutex;
+native delivery can append first. Tags and ingress sequences establish links;
+append order is not wall-clock time or native FIFO ordering. Tag zero means
+untraced input, not a claim about desktop/user origin. A snapshot does not prove
+FIFO exhaustion; last-delivered remainder is not an independent native barrier.
+
+After native Run retires, the exclusive file saves the detached ledger, including
+failed warmup runs. Setup/ready/sample/end identify this diagnostic mode.
+Ordinary validation refuses input-detail samples, even if profile or source
+diagnostics are separately allowed. Explicit diagnostic validation and elapsed
+observations never qualify the unchanged warm latency targets.

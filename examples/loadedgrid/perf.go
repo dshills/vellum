@@ -24,6 +24,7 @@ type perfConfig struct {
 	Novel           bool
 	CPUProfile      string
 	SourceDetails   bool
+	InputDetails    string
 }
 
 func validatePerfModes(perf, smoke, sourceDetails bool, profile string) error {
@@ -43,11 +44,17 @@ func (c perfConfig) validate() error {
 	if !validPerfProfilePath(c.CPUProfile) {
 		return errors.New("loadedgrid perf: invalid CPU profile path")
 	}
+	if !validPerfProfilePath(c.InputDetails) || c.InputDetails != "" && (c.SourceDetails || c.CPUProfile != "") {
+		return errors.New("loadedgrid perf: input details require a valid separate diagnostic path and mode")
+	}
 	if c.Rows != 10_000 && c.Rows != 1_000_000 || c.Samples < 120 || c.Samples > 2048 || c.Warmup < perfPeriod || c.Warmup > 2048 || c.Warmup%perfPeriod != 0 {
 		return errors.New("loadedgrid perf: rows must be10000 or1000000, samples120..2048 and warmup64..2048")
 	}
 	if c.SourceDetails && c.Warmup+c.Samples+2 > cogent.MaxSourceFrameMetricsCapacity {
 		return errors.New("loadedgrid perf: detailed recorder capacity exceeds4096")
+	}
+	if c.InputDetails != "" && c.Warmup+c.Samples+2 > cogent.MaxSourceFrameMetricsCapacity {
+		return errors.New("loadedgrid perf: input recorder capacity exceeds4096")
 	}
 	return nil
 }
@@ -117,6 +124,13 @@ func perfDelta(index int) (x, y int) {
 		x = -96
 	}
 	return
+}
+
+func checkPerfWarmup(initial, final cogent.GridInspection, callbacks uint64, expected int) error {
+	if initial.Viewport.ScrollX != 0 || initial.Viewport.ScrollY != 0 || final.Viewport != initial.Viewport || final.Bounds != initial.Bounds || final.Scale != initial.Scale || callbacks != uint64(expected) {
+		return fmt.Errorf("loadedgrid perf: warmup did not preserve the closed workload: start%+v end%+v callbacks%d expected%d", initial.Viewport, final.Viewport, callbacks, expected)
+	}
+	return nil
 }
 
 type perfGeometry struct {

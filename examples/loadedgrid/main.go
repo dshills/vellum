@@ -68,9 +68,10 @@ func main() {
 	perfNovel := flag.Bool("perf-novel", false, "separate newly visited row strings; not cold-font or warm P6 results")
 	perfProfile := flag.String("perf-cpu-profile", "", "diagnostic process-wide CPU profile to a new file (64MiB cap); excluded from warm qualification")
 	perfSources := flag.Bool("perf-source-details", false, "diagnostic nested source costs and image API attempts; excluded from warm qualification")
+	perfInputs := flag.String("perf-input-details", "", "new diagnostic scalar input ledger file; excluded from warm qualification")
 	flag.Parse()
 	if *axSmoke {
-		if *smoke || *perf || *perfSources || *perfProfile != "" {
+		if *smoke || *perf || *perfSources || *perfProfile != "" || *perfInputs != "" {
 			fmt.Fprintln(os.Stderr, "loadedgrid: accessibility smoke is a separate workflow")
 			os.Exit(1)
 		}
@@ -80,12 +81,16 @@ func main() {
 		}
 		return
 	}
+	if !*perf && *perfInputs != "" {
+		fmt.Fprintln(os.Stderr, "loadedgrid: -perf-input-details requires -perf")
+		os.Exit(1)
+	}
 	if err := validatePerfModes(*perf, *smoke, *perfSources, *perfProfile); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	if *perf {
-		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, SourceDetails: *perfSources}); err != nil {
+		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, SourceDetails: *perfSources, InputDetails: *perfInputs}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}

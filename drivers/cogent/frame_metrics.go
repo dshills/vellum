@@ -69,7 +69,8 @@ type FrameMetrics struct {
 	tags          map[uint64]bool
 	windows       []*frameWindowMetrics
 	dropped       uint64
-	sourceDetails bool // immutable configuration
+	sourceDetails bool               // immutable configuration
+	gridInputs    *gridInputRecorder // immutable optional diagnostic configuration
 }
 
 var frameMetricsRegistry = struct {
@@ -105,7 +106,7 @@ func (m *FrameMetrics) valid() bool {
 		return false
 	}
 	limit := 65536
-	if m.sourceDetails {
+	if m.sourceDetails || m.gridInputs != nil {
 		limit = MaxSourceFrameMetricsCapacity
 	}
 	return m.capacity >= 1 && m.capacity <= limit
@@ -227,6 +228,16 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
 	if !g.eligible() {
 		return ErrFrameMetricsDisabled
 	}
+	// The ledger mutex is acquired only after metrics.mu is released. Native
+	// delivery can append first; Tag, not append order, links the admission.
+	var admission *GridInputRecord
+	if g.inputs != nil {
+		defer func() {
+			if admission != nil {
+				g.inputs.record(*admission)
+			}
+		}()
+	}
 	s, err := model.State()
 	if err != nil {
 		return err
@@ -276,6 +287,10 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
 	b.stop = context.AfterFunc(ctx, func() { b.trace.Fail(tag, ctx.Err().Error()) })
 	// A deferred node owns its FIFO position even when a later ordinary scroll
 	// would normally replace/combine the preceding same-type event.
+	if g.inputs != nil {
+		admission = &GridInputRecord{Kind: "enqueue", Tag: tag, Scale: measurement.Scale, RequestedX: dx, RequestedY: dy,
+			PhysicalX: event.Delta.X, PhysicalY: event.Delta.Y, GenerationBefore: s.Generation, ViewportBefore: s.Viewport}
+	}
 	source.Deque.Send(&tracedScrollEvent{MouseScroll: event})
 	return nil
 }

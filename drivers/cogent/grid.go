@@ -91,6 +91,7 @@ type gridBinding struct {
 	wheelX, wheelY       float64
 	geometryRefused      bool
 	editing              *gridEditBinding
+	inputs               *gridInputBinding // immutable optional scalar diagnostic sink
 }
 
 func validateNativeGrid(n ui.Node) error {
@@ -136,6 +137,7 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 	host := tree.New[gridWidget](parent)
 	host.binding = g
 	g.host = host
+	g.inputs = bindGridInputDetails(g)
 	for i := range g.panes {
 		p := tree.New[gridPane](host)
 		p.binding = g
@@ -149,7 +151,7 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 	g.vertical.Styler(func(s *styles.Style) { s.Direction = styles.Column; s.SetAbilities(false, abilities.Focusable) })
 	g.horizontal.OnChange(func(events.Event) {
 		value := g.horizontal.Value
-		g.post(ui.GridViewport, func() error {
+		g.postObserved(ui.GridViewport, gridInputOrigin{name: "scrollbar-x"}, func() error {
 			s, e := g.model.State()
 			if e != nil {
 				return e
@@ -164,7 +166,7 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 	})
 	g.vertical.OnChange(func(events.Event) {
 		value := g.vertical.Value
-		g.post(ui.GridViewport, func() error {
+		g.postObserved(ui.GridViewport, gridInputOrigin{name: "scrollbar-y"}, func() error {
 			s, e := g.model.State()
 			if e != nil {
 				return e
@@ -263,12 +265,23 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 		if math.IsNaN(float64(s.Delta.X)) || math.IsNaN(float64(s.Delta.Y)) || math.IsInf(float64(s.Delta.X), 0) || math.IsInf(float64(s.Delta.Y), 0) {
 			return
 		}
+		var observed GridInputRecord
+		if g.inputs != nil {
+			_, tag := tracedGridIntent(g)
+			observed = GridInputRecord{Kind: "wheel", Tag: tag, Scale: scale, PhysicalX: s.Delta.X, PhysicalY: s.Delta.Y, RemainderBefore: [2]float64{g.wheelX, g.wheelY}}
+		}
 		g.wheelX += float64(s.Delta.X) / float64(scale)
 		g.wheelY += float64(s.Delta.Y) / float64(scale)
 		dx, dy := boundedWheel(g.wheelX), boundedWheel(g.wheelY)
 		g.wheelX -= math.Trunc(g.wheelX)
 		g.wheelY -= math.Trunc(g.wheelY)
-		g.post(ui.GridViewport, func() error { return g.model.Scroll(dx, dy) })
+		origin := gridInputOrigin{name: "wheel"}
+		if g.inputs != nil {
+			observed.DeltaX, observed.DeltaY = dx, dy
+			observed.RemainderAfter = [2]float64{g.wheelX, g.wheelY}
+			origin.sequence = g.inputs.record(observed)
+		}
+		g.postObserved(ui.GridViewport, origin, func() error { return g.model.Scroll(dx, dy) })
 		e.SetHandled()
 	})
 	return host, nil
@@ -442,37 +455,47 @@ func (g *gridBinding) fail(err error) {
 		g.r.control.onError(err)
 	}
 }
-func (g *gridBinding) applyIntent(reason ui.GridChangeReason, interaction bool, fn func() error) {
+func (g *gridBinding) applyIntentObserved(reason ui.GridChangeReason, interaction bool, origin gridInputOrigin, fn func() error) {
 	if !g.live() || g.r.control.retired || g.r.node.Grid != g.model || interaction && !g.eligible() {
+		g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "refused")
 		return
 	}
 	before, e := g.model.State()
 	if e != nil {
+		g.observeTransition(origin, reason, before, virtual.GridState{}, "before-state-error")
 		g.fail(e)
 		return
 	}
 	if e = fn(); e != nil {
+		g.observeTransition(origin, reason, before, virtual.GridState{}, "operation-error")
 		g.fail(e)
 		return
 	}
 	after, e := g.model.State()
 	if e != nil {
+		g.observeTransition(origin, reason, before, after, "after-state-error")
 		g.fail(e)
 		return
 	}
 	if before.Generation == after.Generation {
+		g.observeTransition(origin, reason, before, after, "unchanged")
 		return
 	}
+	g.observeTransition(origin, reason, before, after, "changed")
 	if callback := g.r.node.GridChange; callback != nil {
 		callback(ui.GridEvent{ID: g.r.node.ID, Reason: reason, State: after})
 	}
 	_ = g.owner.Invalidate(g.window)
 }
 func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
+	if g.inputs != nil {
+		g.postObserved(reason, gridInputOrigin{name: "input"}, fn)
+		return
+	}
 	if g.live() {
 		trace, tag := tracedGridIntent(g)
 		if tag == 0 {
-			postControl(g.r, func() { g.applyIntent(reason, true, fn) })
+			postControl(g.r, func() { g.applyIntentObserved(reason, true, gridInputOrigin{}, fn) })
 			return
 		}
 		trace.ExpectOwner(tag)
@@ -485,7 +508,7 @@ func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
 				}
 			}()
 			before, beforeErr := g.model.State()
-			g.applyIntent(reason, true, fn)
+			g.applyIntentObserved(reason, true, gridInputOrigin{}, fn)
 			after, afterErr := g.model.State()
 			if beforeErr != nil || afterErr != nil || !g.live() || after.Generation == before.Generation {
 				trace.Fail(tag, "traced grid input did not publish an owner transition")
@@ -496,6 +519,46 @@ func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
 			returned = true
 		})
 		if err != nil {
+			trace.Fail(tag, "traced grid owner posting refused")
+			trace.Transition(tag, 0)
+			trace.OwnerWork(tag, 0) // no owner callback was accepted
+		}
+	}
+}
+func (g *gridBinding) postObserved(reason ui.GridChangeReason, origin gridInputOrigin, fn func() error) {
+	if g.inputs == nil {
+		g.post(reason, fn)
+		return
+	}
+	if g.live() {
+		trace, tag := tracedGridIntent(g)
+		origin.tag = tag
+		if tag == 0 {
+			g.postInputControl(origin, reason, func() { g.applyIntentObserved(reason, true, origin, fn) })
+			return
+		}
+		trace.ExpectOwner(tag)
+		err := g.owner.PostWindow(g.window, func() {
+			returned := false
+			defer func() {
+				if !returned {
+					trace.Fail(tag, "traced owner transition did not return")
+					trace.Transition(tag, 0)
+				}
+			}()
+			before, beforeErr := g.model.State()
+			g.applyIntentObserved(reason, true, origin, fn)
+			after, afterErr := g.model.State()
+			if beforeErr != nil || afterErr != nil || !g.live() || after.Generation == before.Generation {
+				trace.Fail(tag, "traced grid input did not publish an owner transition")
+				trace.Transition(tag, 0)
+			} else {
+				trace.Transition(tag, after.Generation)
+			}
+			returned = true
+		})
+		if err != nil {
+			g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "post-refused")
 			trace.Fail(tag, "traced grid owner posting refused")
 			trace.Transition(tag, 0)
 			trace.OwnerWork(tag, 0) // no owner callback was accepted
@@ -516,7 +579,7 @@ func (g *gridBinding) requestViewport(request gridRequest) {
 	// Layout owns geometry even when the control is disabled or outside modal
 	// input scope. No widget/source reads occur in this native admission path.
 	err := g.owner.PostWindow(g.window, func() {
-		g.applyIntent(ui.GridViewport, false, func() error {
+		g.applyIntentObserved(ui.GridViewport, false, gridInputOrigin{name: "layout"}, func() error {
 			s, e := g.model.State()
 			if e != nil {
 				return e
@@ -527,6 +590,7 @@ func (g *gridBinding) requestViewport(request gridRequest) {
 		})
 	})
 	if err != nil {
+		g.observeTransition(gridInputOrigin{name: "layout"}, ui.GridViewport, virtual.GridState{}, virtual.GridState{}, "post-refused")
 		// Queue pressure is transient; allow the next actual frame to retry.
 		// A model capacity refusal occurs on the owner and remains remembered,
 		// without an invalidate loop until a different measured size is requested.

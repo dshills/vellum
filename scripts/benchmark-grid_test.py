@@ -427,4 +427,36 @@ class DiagnosticReportTests(unittest.TestCase):
             self.assertFalse(output.exists())
 
 
+
+class WarmupAndInputDetailTests(unittest.TestCase):
+    def guarded(self):
+        data = records()
+        for record in data: record["warmup_guard"] = 1
+        data[1].update(warmup=128, warm_callbacks=128,
+                       warm_start_viewport={"Width":768,"Height":624,"ScrollX":0,"ScrollY":0},
+                       warm_end_viewport={"Width":768,"Height":624,"ScrollX":0,"ScrollY":0})
+        return data
+
+    def test_closed_warmup_guard_rejects_offset_callback_and_version_drift(self):
+        self.assertEqual(len(benchmark.validate_records(self.guarded(),10000,False,120,False)),120)
+        for change in (lambda d:d[1]["warm_end_viewport"].update(ScrollY=31),
+                       lambda d:d[1].update(warm_callbacks=129),
+                       lambda d:d[1]["warm_start_viewport"].update(ScrollX=True),
+                       lambda d:d[0].update(warmup_guard=True),
+                       lambda d:d[-1].update(warmup_guard=2),
+                       lambda d:d[2].update(warmup_guard=True),
+                       lambda d:d[3].update(input_details=True)):
+            data=self.guarded();change(data)
+            with self.assertRaises(ValueError):benchmark.validate_records(data,10000,False,120,False)
+
+    def test_input_details_never_silently_qualify_as_ordinary(self):
+        data=self.guarded()
+        for record in data:record["input_details"]=True
+        for options in ({},{"allow_profile":True},{"allow_source_details":True}):
+            with self.assertRaisesRegex(ValueError,"diagnostic input"):
+                benchmark.validate_records(data,10000,False,120,False,**options)
+        self.assertEqual(len(benchmark.validate_records(data,10000,False,120,False,allow_input_details=True)),120)
+        data[1]["input_details"]=False
+        with self.assertRaises(ValueError):benchmark.validate_records(data,10000,False,120,False,allow_input_details=True)
+
 if __name__ == "__main__": unittest.main()

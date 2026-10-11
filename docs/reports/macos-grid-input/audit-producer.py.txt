@@ -1,0 +1,199 @@
+"""Read-only final linkage audit; no tests, native launches or provider calls."""
+import hashlib
+import importlib.util
+import json
+import re
+import sys
+import tarfile
+from pathlib import Path, PurePosixPath
+
+ROOT = Path('/private/tmp/vellum-large-data')
+REPORT = ROOT / 'docs/reports/macos-grid-input'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+read = lambda p: json.loads(p.read_text())
+sys.dont_write_bytecode = True
+
+def main():
+    index = read(REPORT / 'records-index.json')
+    assert sha(REPORT / 'records.tar.gz') == index['archive_sha256']
+    assert (REPORT / 'records.tar.gz').stat().st_size == index['compressed_bytes']
+    with tarfile.open(REPORT / 'records.tar.gz', 'r:gz') as arc:
+        names = arc.getnames()
+        assert len(names) == len(set(names)) and set(names) == set(index['members'])
+        for name, meta in index['members'].items():
+            item = arc.getmember(name)
+            assert item.isfile() and item.mode == 0o644 and not PurePosixPath(name).is_absolute() and '..' not in PurePosixPath(name).parts
+            data = arc.extractfile(item).read()
+            assert len(data) == meta['bytes'] and hashlib.sha256(data).hexdigest() == meta['sha256'], name
+        def data(name): return arc.extractfile(name).read()
+        def record(name): return json.loads(data(name))
+        def digest(name): return index['members'][name]['sha256']
+        def logcheck(folder, row):
+            assert row['error'] is None and digest(folder + '/' + row['name'] + '.log') == row['log_sha256']
+        def rows(name):
+            result = []
+            for line in data(name).decode().splitlines():
+                try: value = json.loads(line)
+                except ValueError: continue
+                if isinstance(value, dict) and str(value.get('event', '')).startswith('grid.perf.'):
+                    result.append(value)
+            return result
+
+        proofs = {name: record('qualification/' + name + '/qualification.json') for name in ('checks', 'native', 'campaign', 'negative', 'performance')}
+        state = proofs['checks']['before']
+        assert len(state['source']) == 647 and len(state['prepared']) == 6139
+        expected = {'checks': 'PASS', 'native': 'PASS', 'campaign': 'PASS_DIAGNOSTIC_NO_MISMATCH_REPRODUCED', 'negative': 'PASS_BEHAVIORAL_RED_PROOFS', 'performance': 'PASS_MEASUREMENT_TARGETS_UNMET'}
+        for name, proof in proofs.items():
+            assert proof['result'] == expected[name] and proof['before'] == proof['after'] == state
+            assert proof['producer_sha256'] == digest('qualification/' + name + '/producer.py.txt')
+        for group, count in (('checks', 10), ('native', 2)):
+            assert len(proofs[group]['checks']) == count
+            assert proofs[group]['helper_sha256'] == digest('producers/vellum-grid-publication-qualify.py.txt')
+            for row in proofs[group]['checks']:
+                assert row['exit_code'] == 0
+                logcheck('qualification/' + group, row)
+        for name, value in state['source'].items(): assert sha(ROOT / name) == value, name
+        for name, value in state['prepared'].items(): assert sha(ROOT / name) == value, name
+        actual_prepared = {str(p.relative_to(ROOT)): sha(p) for dep in ('upstream', 'typesetting') for p in sorted((ROOT / 'drivers/cogent/build' / dep).rglob('*')) if p.is_file()}
+        assert actual_prepared == state['prepared']
+
+        declarations = []
+        for p in ('drivers/cogent/grid_input_details_test.go', 'drivers/cogent/grid_input_details_offscreen_test.go'):
+            declarations += re.findall(r'^func (TestGridInputDetails\w+)\(', (ROOT / p).read_text(), re.M)
+        testlog = data('qualification/checks/input-details-race3.log').decode()
+        assert len(declarations) == 3 and all(len(re.findall(r'^--- PASS: ' + re.escape(n) + r' ', testlog, re.M)) == 3 for n in declarations)
+        assert re.search(r'Ran 34 tests', data('qualification/checks/benchmark-python.log').decode())
+        failures = {'warmup-bypass': 'accepted changed warm workload', 'drop-delivery-tag': 'tagged scalar provenance differs', 'alias-snapshot': 'snapshot aliases recorder'}
+        assert len(proofs['negative']['proofs']) == 3
+        for proof in proofs['negative']['proofs']:
+            folder = 'qualification/negative/' + proof['mutation']
+            row = proof['check']
+            assert row['exit_code'] == 1 and proof['detected'] is True
+            logcheck(folder, row)
+            text = data(folder + '/test.log').decode()
+            assert failures[proof['mutation']] in text and '--- FAIL:' in text and '[build failed]' not in text and 'panic:' not in text
+            assert proof['overlay_sha256'] == digest(folder + '/faulty.go.txt')
+
+        binary = sha(Path('/private/tmp/vellum-grid-input-diagnostic'))
+        assert all(proofs[n]['binary_sha256'] == binary for n in ('native', 'campaign', 'performance'))
+        spec = importlib.util.spec_from_file_location('grid_benchmark', ROOT / 'scripts/benchmark-grid.py')
+        benchmark = importlib.util.module_from_spec(spec); spec.loader.exec_module(benchmark)
+        def check_diagnostic(folder, logfile, rows_count):
+            raw = rows(folder + '/' + logfile)
+            benchmark.validate_records(raw, rows_count, False, 120, False, allow_input_details=True)
+            value = record(folder + '/input.json')
+            assert value['Schema'] == 'vellum-grid-input-v1' and value['Result'] == 'CAPTURED_DIAGNOSTIC'
+            details = value['Details']; ledger = details['Records']
+            assert details['Capacity'] == 1006 and details['Dropped'] == 0 and not details['Failure'] and len(ledger) == 745
+            assert [r['Sequence'] for r in ledger] == list(range(1, 746))
+            tags = {}
+            for row in ledger:
+                if row['Tag']: tags.setdefault(row['Tag'], []).append(row)
+            assert len(tags) == 248 and set(tags) == set(range(1, 121)) | set(range((1 << 32) + 1, (1 << 32) + 129))
+            for tagged in tags.values():
+                kinds = {r['Kind']: r for r in tagged}
+                assert len(tagged) == 3 and set(kinds) == {'enqueue', 'wheel', 'transition'}
+                a, w, t = (kinds[k] for k in ('enqueue', 'wheel', 'transition'))
+                assert (a['Scale'], a['PhysicalX'], a['PhysicalY']) == (w['Scale'], w['PhysicalX'], w['PhysicalY'])
+                assert w['RemainderBefore'] == w['RemainderAfter'] == [0, 0]
+                assert t['Input'] == w['Sequence'] and t['Origin'] == 'wheel' and t['Result'] == 'changed'
+                assert t['GenerationAfter'] == t['GenerationBefore'] + 1
+            untraced = [r for r in ledger if not r['Tag']]
+            assert len(untraced) == 1 and untraced[0]['Origin'] == 'layout' and untraced[0]['Result'] == 'changed'
+            assert raw[1]['warm_callbacks'] == 128 and raw[1]['warm_start_generation'] == 2 and raw[1]['warm_end_generation'] == 130
+            return raw
+        check_diagnostic('qualification/native', 'fixed-10k-input.log', 10000)
+        assert len(proofs['campaign']['checks']) == 10 and proofs['campaign']['error'] is None
+        for row in proofs['campaign']['checks']:
+            assert row['exit_code'] == 0
+            folder = 'qualification/campaign/' + str(Path(row['argv'][-1].split('=', 1)[1]).parent.relative_to('/private/tmp/vellum-grid-input-final/campaign'))
+            logcheck(folder, row)
+            count = int(next(v.split('=', 1)[1] for v in row['argv'] if v.startswith('-rows=')))
+            check_diagnostic(folder, 'native.log', count)
+            validation = record(folder + '/validation.json')
+            assert validation['result'] == 'PASS_DIAGNOSTIC_PROVENANCE' and validation['records'] == 745 and validation['tagged_events'] == 248
+            assert validation['input_sha256'] == digest(folder + '/input.json') and validation['raw_sha256'] == digest(folder + '/native.log')
+
+        perf = proofs['performance']; row = perf['check']
+        assert row['exit_code'] == 0 and perf['warm_target_met'] is False
+        logcheck('qualification/performance', row)
+        summary = record('qualification/performance/raw/summary.json')
+        assert perf['summary_sha256'] == digest('qualification/performance/raw/summary.json')
+        assert summary['result'] == 'MEASURED' and summary['binary_sha256'] == binary
+        assert (summary['runs'], summary['samples_per_run'], summary['warmup']) == (5, 120, 128)
+        assert not any(summary[k] for k in ('novel', 'source_details', 'diagnostic', 'warm_target_met'))
+        assert summary['warm_targets_ns'] == {'p95': 4000000, 'p99': 6000000}
+        samples = {}; statistics = {}
+        assert set(summary['cases']) == {'fixed-10000', 'fixed-1000000', 'variable-10000', 'variable-1000000'}
+        for case, declared in summary['cases'].items():
+            height, count = case.split('-'); runs = []
+            assert len(declared['runs']) == 5
+            for i, outcome in enumerate(declared['runs'], 1):
+                folder = f'qualification/performance/raw/{case}/run-{i}'
+                result = record(folder + '/result.json')
+                assert result == outcome and result['exit_code'] == 0 and result['result'] == 'PASS' and result['error'] is None
+                assert result['log_sha256'] == digest(folder + '/native.log')
+                raw = rows(folder + '/native.log'); assert result['records'] == raw
+                assert all(r['warmup_guard'] == 1 and r['input_details'] is False for r in raw)
+                runs.append(benchmark.validate_records(raw, int(count), height == 'variable', 120, False))
+            assert benchmark.summarize(runs) == declared['timings_ns']
+            samples[case] = runs; statistics[case] = declared['timings_ns']['ui_work_ns']
+            assert all(s['p95'] > 4000000 and s['p99'] > 6000000 for s in [statistics[case]['pooled'], *statistics[case]['per_run']])
+        for height in ('fixed', 'variable'):
+            for a, b in zip(samples[height + '-10000'], samples[height + '-1000000']): benchmark.compare_geometry(a, b)
+
+        source = record('source-review/review.json')
+        assert source['result'] == 'APPROVED_SOURCE_REVIEW' and not source['findings'] and source['source_unchanged_during_capture']
+        assert len(source['source_files_sha256']) == 15 and source['source_files_sha256'] == source['source_after_sha256']
+        for p, h in (source['source_files_sha256'] | source['context_files_sha256']).items():
+            assert sha(ROOT / p) == h and digest('source-review/source-v2/' + p + '.txt') == h
+        report_review = record('source-review/report-v1/review.json')
+        assert report_review['result'].startswith('APPROVED') and not report_review['findings']
+        report_hash = sha(REPORT / 'README.md')
+        assert report_hash == report_review['report_sha256']
+        independent = [record('receipt-review/' + version + '/audit.json') for version in ('v1', 'v2')]
+        assert independent[0]['result'] == 'APPROVED_DIAGNOSTIC_RECEIPT_AUDIT' and independent[1]['result'] == 'APPROVED_MEASUREMENT_AUDIT_TARGETS_UNMET'
+        assert all(not a['findings'] for a in independent)
+        for a in independent:
+            for p, h in a['artifact_sha256'].items(): assert sha(Path(p)) == h, p
+        assert independent[1]['prior_diagnostic_audit_sha256'] == digest('receipt-review/v1/audit.json')
+        assert independent[0]['source_review_sha256'] == digest('source-review/review.json')
+        historical = record('diagnosis/certificate.json')
+        assert historical['result'] == 'READ_ONLY_DIAGNOSIS_CAUSE_UNPROVEN' and historical['diagnosis']['sha256'] == digest('diagnosis/diagnosis.json')
+        assert historical['recipe']['sha256'] == digest('diagnosis/diagnose.py.txt')
+        for p, h in historical['source_sha256'].items(): assert digest('diagnosis/historical-source/' + p) == h
+
+        process = read(REPORT / 'review/process.json'); prism = read(REPORT / 'review/prism.json'); inputs = read(REPORT / 'review/inputs.json')
+        assert process['exit_code'] == 0 and process['error'] is None and process['source_index_unchanged']
+        assert process['before'] == process['after'] == inputs['files'] == source['source_files_sha256'] | {'docs/reports/macos-grid-input/README.md': report_hash}
+        assert process['prism_sha256'] == sha(REPORT / 'review/prism.json') and inputs['staged_diff_sha256'] == sha(REPORT / 'review/staged.diff.txt')
+        assert not prism['findings'] and not prism['discarded'] and not prism['suppressed']
+        coverage = prism['coverage']
+        assert coverage['complete'] and coverage['files'] == 16 and coverage['reviewer'] == [{'provider': 'anthropic', 'model': 'claude-sonnet-5-5'}]
+        assert not coverage['excluded'] and not coverage['skipped'] and coverage['truncatedBytes'] == 0
+        for p, h in inputs['files'].items(): assert sha(ROOT / p) == h
+        for filename, key in (('stdout.log', 'stdout_sha256'), ('stderr.log', 'stderr_sha256'), ('producer.py.txt', 'producer_sha256')):
+            assert sha(REPORT / 'review' / filename) == process[key]
+        for link in re.findall(r'\]\(([^)]+)\)', (REPORT / 'README.md').read_text()):
+            assert link == 'audit.json' or (REPORT / link).is_file(), link
+
+        bindings = dict(state['source'])
+        for p in source['source_files_sha256']: bindings[p] = sha(ROOT / p)
+        for path in REPORT.rglob('*'):
+            if path.is_file() and path.name != 'audit.json': bindings[str(path.relative_to(ROOT))] = sha(path)
+        audit = {'schema': 1, 'result': 'PASS_GRID_INPUT_WORKLOAD_TARGETS_UNMET', 'baseline_head': '19a175510b7444793cf3e06da738358e446b0aaf',
+            'scope': 'Exact selected source/prepared byte linkage and all archived regular members. Final tests/red proofs, bounded diagnostic provenance and 20 ordinary native processes/2400 matched samples validated separately; targets fail. No native launches/provider calls by this audit, historical cause assignment, A/B benefit, full compiler/cache/SDK closure, native/GPU memory, presentation, human workflows, P6 or complete Mac qualification.',
+            'bindings': bindings, 'prepared': state['prepared'], 'source_files': 647, 'prepared_files': 6139,
+            'binary_sha256': binary, 'checks': 10, 'new_test_groups': declarations, 'new_test_repetitions': 3, 'python_tests': 34, 'meaningful_negative_checks': 3,
+            'diagnostic_processes': 11, 'diagnostic_records_per_process': 745, 'diagnostic_tagged_triples_per_process': 248,
+            'performance_qualified': True, 'performance_target_met': False, 'performance_processes': 20, 'performance_samples': 2400, 'warm_targets_ns': summary['warm_targets_ns'], 'warm_target_met': False,
+            'performance_ui_work_ns': statistics, 'performance_summary_sha256': perf['summary_sha256'], 'archive_sha256': index['archive_sha256'], 'archive_bytes': index['compressed_bytes'], 'archive_members': len(names),
+            'source_review_sha256': digest('source-review/review.json'), 'report_review_sha256': digest('source-review/report-v1/review.json'),
+            'diagnostic_receipt_audit_sha256': digest('receipt-review/v1/audit.json'), 'performance_receipt_audit_sha256': digest('receipt-review/v2/audit.json'),
+            'prism': {**coverage, 'provider_exit_code': 0, 'raw_findings': 0, 'actionable_findings': 0}, 'producer_sha256': sha(Path(__file__)),
+            'initial_audit_recipe_sha256': digest('producers/vellum-grid-input-audit.py.txt'), 'initial_audit_refusal_sha256': sha(REPORT / 'audit-initial-refusal.json')}
+        assert sha(REPORT / 'audit-producer.py.txt') == audit['producer_sha256']
+        with (REPORT / 'audit.json').open('x') as out: out.write(json.dumps(audit, indent=2, sort_keys=True) + '\n')
+        print(audit['result'], len(bindings), 'bindings', len(names), 'members')
+
+if __name__ == '__main__': main()

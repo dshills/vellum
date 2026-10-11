@@ -277,3 +277,11 @@ Cocoa. Stable overlapping objects survive that transition, while replacement,
 scope removal and closure retire them. See [the publication contract](../specs/accessibility.md#managed-grid-publication).
 This addresses accessibility continuity and allocation churn; it does not claim
 that the 4/6 ms UI-work targets have been met.
+
+Stored-table qualification now refuses a warmup that fails to return to its
+starting viewport or has extra callbacks. Optional bounded input diagnostics
+capture admission/delivery scale, signed wheel remainder and owner transitions,
+including untraced input, scrollbar and layout changes. Exclusive trace files
+preserve failed runs after native retirement. Diagnostics remain separate from
+ordinary latency qualification; the earlier offset mismatch is still unproven.
+See [the measurement contract](../specs/grid-performance.md).

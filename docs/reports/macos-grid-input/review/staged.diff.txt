@@ -1,0 +1,1175 @@
+diff --git a/docs/implementation.md b/docs/implementation.md
+index b8681e2..b216ff6 100644
+--- a/docs/implementation.md
++++ b/docs/implementation.md
+@@ -277,3 +277,11 @@ Cocoa. Stable overlapping objects survive that transition, while replacement,
+ scope removal and closure retire them. See [the publication contract](../specs/accessibility.md#managed-grid-publication).
+ This addresses accessibility continuity and allocation churn; it does not claim
+ that the 4/6 ms UI-work targets have been met.
++
++Stored-table qualification now refuses a warmup that fails to return to its
++starting viewport or has extra callbacks. Optional bounded input diagnostics
++capture admission/delivery scale, signed wheel remainder and owner transitions,
++including untraced input, scrollbar and layout changes. Exclusive trace files
++preserve failed runs after native retirement. Diagnostics remain separate from
++ordinary latency qualification; the earlier offset mismatch is still unproven.
++See [the measurement contract](../specs/grid-performance.md).
+diff --git a/docs/reports/macos-grid-input/README.md b/docs/reports/macos-grid-input/README.md
+new file mode 100644
+index 0000000..ece59df
+--- /dev/null
++++ b/docs/reports/macos-grid-input/README.md
+@@ -0,0 +1,114 @@
++# macOS grid input and workload qualification
++
++Stored-table warmup now refuses nonzero starting offsets, incomplete closed
++trajectories, extra callbacks and changed completed geometry/scale before ordinary
++measurements. A separate bounded scalar ledger makes admission, delivered wheel
++arithmetic and owner transitions inspectable. This advances reliable Mac
++performance qualification; it does not repair an established framework input
++ordering defect or claim a rendering speedup.
++
++## Implementation
++
++The opt-in `NewFrameMetricsWithGridInputDetails` constructor preallocates
++`3*tickets+256` records for at most4096 frame tickets. Ordinary metrics allocate
++no ledger or additional input clocks. Bindings copy identifiers up to4096 bytes.
++Records contain no model, widget, event, callback, cell values or native pointer.
++Exhaustion/oversized identifiers explicitly refuse diagnostic evidence; normal
++grid input continues with its existing behavior.
++
++Admissions copy logical requests, encoded physical deltas, completed scale and
++owner state. Actual native wheel handlers copy their current tag, handler scale,
++integer steps and signed remainder. Posted owner transitions reuse existing state
++reads and link the originating wheel sequence; scrollbar and layout paths remain
++distinct. Native style/remainder reads never move into a peer-window owner callback.
++An independent ledger mutex releases before posting and callouts. Admission
++appends happen after the metrics lock releases; tags/ingress sequences establish
++correlation, and append order is not FIFO or clock order. Tag zero means untraced,
++not desktop/user origin. A ledger snapshot is not a native barrier.
++
++`loadedgrid -perf-input-details=/new/path.json` saves the detached ledger after
++native Run retires, including failed warmups. Files are exclusive and capped at
++64MiB; overflow produces nonzero finalization. This diagnostic mode cannot combine
++with CPU/source profiling. Stage/sample flags agree and ordinary validation
++rejects diagnostic samples. Ordinary ready records now retain warm start/end
++viewports and generations plus callback count under `warmup_guard: 1`.
++See [the contract](../../../specs/grid-performance.md).
++
++## Verification
++
++Ten final source-bound checks pass: full offscreen/native driver race and vet,
++three new input-ledger groups repeated three times, loaded-grid race/vet,
++34 Python record/process/statistical tests, and grid/replay consumer race.
++The input tests exercise actual untraced fractional wheel routing followed by a
++reserved tagged FIFO event, detached concurrent snapshots, capacity refusal and
++identifier bounds. Consumer tests refuse warm offset/layout/callback drift and
++preserve exclusive failed-run evidence. The fractional fixture accounts for
++float32 encoding precision and excludes the prior initial-layout notification.
++
++Three faulty Go overlays fail explicit assertions: bypassing the closed warmup
++guard, dropping the delivered wheel tag, and aliasing ledger snapshots. These
++are behavioral failures, not build errors or panics. Final endpoints bind647
++selected runtime/specification files and6139 prepared dependency files exactly.
++Selected source/prepared identity is not a complete compiler/cache/SDK closure.
++
++One initial release diagnostic and ten further fresh fixed-table diagnostic
++processes (five10k/five million) each retain745 records within capacity1006:
++248 admission/wheel/owner triples and one untraced startup layout transition.
++All tags correlate; admission and handler scales/deltas agree; wheel remainders
++are zero; warmup returns to zero offsets with128 callbacks and generation2→130.
++At least400 cells are actually clipped after completion; recorder loss/pending
++state is zero. These are diagnostic provenance assertions, not latency evidence.
++
++The [preceding campaign](../macos-grid-publication/README.md) remains refused.
++Its measured offset oscillation fits a prior signed wheel remainder, but its
++warmup lacks delivered-scale and event-provenance records. The new diagnostic
++runs do not reproduce that discrepancy, so its cause remains unproven. No
++historical failure is relabeled and no viewport reset hides it.
++
++## Ordinary performance
++
++After regression/diagnostic children ended, the same optimized release artifact
++ran with input/source diagnostics and CPU profiling disabled. Four fixed/variable
++10k/million cases each use five fresh processes,128 unmeasured warmups and120
++measured samples. All20 child exits and record validations pass. Every warmup
++closes, and paired10k/million sample cardinalities/scales/normalized clips match.
++All2400 observations, outliers and per-run statistics remain in the evidence.
++
++Nearest-rank pooled elapsed UI-work milliseconds are:
++
++| Case | p50 | p95 | p99 | Max |
++| --- | ---: | ---: | ---: | ---: |
++| fixed-10000 | 12.644 | 13.479 | 14.533 | 66.204 |
++| fixed-1000000 | 12.334 | 13.274 | 13.880 | 24.570 |
++| variable-10000 | 12.818 | 13.682 | 14.400 | 18.444 |
++| variable-1000000 | 12.509 | 13.367 | 13.906 | 14.765 |
++
++Every run still exceeds the unchanged4ms p95 /6ms p99 targets. The maximum is
++retained and its cause is unclassified. No A/B speedup is inferred: this is a
++current guarded workload measurement, separate from the preceding refused
++artifact/campaign. Phase percentiles are not additive. CPU-side measured work
++excludes queue delay/acquire/present-call waits; GPU execution and compositor
++presentation remain unavailable. Process-wide Go allocations, retained pool
++counts and end-only RSS/CPU observations do not attribute native/GPU memory.
++
++Current release binary SHA256: `f8feeacb6d653a9d1042f76a3effc2314b531de8e5224581bdb6a1df7d918ecf`.
++Mac completion, sustained table/tree P6, font/native/GPU memory, endurance,
++human screen-reader/input workflows and broader professional acceptance remain
++open. The next optimization must reduce actual rendering/owner work while
++preserving this matched workload and its unchanged targets.
++
++## Evidence and review
++
++[records.tar.gz](records.tar.gz) contains final check/native/diagnostic/negative/
++ordinary receipts, raw records, source snapshots, diagnostic historical evidence
++and inert producer copies. [records-index.json](records-index.json) binds archive
++membership; [audit.json](audit.json) binds current source/prepared inputs and
++review/evidence linkage. Binaries are identified by hashes, not stored or claimed
++byte-identical to a second canonical build.
++
++Independent source review corrected sample-mode validation and diagnostic ID
++retention before the final gate. Receipt reviews separately audit diagnostic and
++ordinary workload evidence. One significant source/test/spec/report batch is
++reviewed with Prism using Anthropic Claude Sonnet5.5; [raw review records](review/process.json)
++preserve coverage, findings and process status, with local triage if needed.
++No public release, Git push/tag or macOS preference change is part of this checkpoint.
+diff --git a/drivers/cogent/frame_metrics.go b/drivers/cogent/frame_metrics.go
+index 748196f..a5a53d4 100644
+--- a/drivers/cogent/frame_metrics.go
++++ b/drivers/cogent/frame_metrics.go
+@@ -69,7 +69,8 @@ type FrameMetrics struct {
+ 	tags          map[uint64]bool
+ 	windows       []*frameWindowMetrics
+ 	dropped       uint64
+-	sourceDetails bool // immutable configuration
++	sourceDetails bool               // immutable configuration
++	gridInputs    *gridInputRecorder // immutable optional diagnostic configuration
+ }
+ 
+ var frameMetricsRegistry = struct {
+@@ -105,7 +106,7 @@ func (m *FrameMetrics) valid() bool {
+ 		return false
+ 	}
+ 	limit := 65536
+-	if m.sourceDetails {
++	if m.sourceDetails || m.gridInputs != nil {
+ 		limit = MaxSourceFrameMetricsCapacity
+ 	}
+ 	return m.capacity >= 1 && m.capacity <= limit
+@@ -227,6 +228,16 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
+ 	if !g.eligible() {
+ 		return ErrFrameMetricsDisabled
+ 	}
++	// The ledger mutex is acquired only after metrics.mu is released. Native
++	// delivery can append first; Tag, not append order, links the admission.
++	var admission *GridInputRecord
++	if g.inputs != nil {
++		defer func() {
++			if admission != nil {
++				g.inputs.record(*admission)
++			}
++		}()
++	}
+ 	s, err := model.State()
+ 	if err != nil {
+ 		return err
+@@ -276,6 +287,10 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
+ 	b.stop = context.AfterFunc(ctx, func() { b.trace.Fail(tag, ctx.Err().Error()) })
+ 	// A deferred node owns its FIFO position even when a later ordinary scroll
+ 	// would normally replace/combine the preceding same-type event.
++	if g.inputs != nil {
++		admission = &GridInputRecord{Kind: "enqueue", Tag: tag, Scale: measurement.Scale, RequestedX: dx, RequestedY: dy,
++			PhysicalX: event.Delta.X, PhysicalY: event.Delta.Y, GenerationBefore: s.Generation, ViewportBefore: s.Viewport}
++	}
+ 	source.Deque.Send(&tracedScrollEvent{MouseScroll: event})
+ 	return nil
+ }
+diff --git a/drivers/cogent/grid.go b/drivers/cogent/grid.go
+index 81e3a05..2fbe5b3 100644
+--- a/drivers/cogent/grid.go
++++ b/drivers/cogent/grid.go
+@@ -91,6 +91,7 @@ type gridBinding struct {
+ 	wheelX, wheelY       float64
+ 	geometryRefused      bool
+ 	editing              *gridEditBinding
++	inputs               *gridInputBinding // immutable optional scalar diagnostic sink
+ }
+ 
+ func validateNativeGrid(n ui.Node) error {
+@@ -136,6 +137,7 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
+ 	host := tree.New[gridWidget](parent)
+ 	host.binding = g
+ 	g.host = host
++	g.inputs = bindGridInputDetails(g)
+ 	for i := range g.panes {
+ 		p := tree.New[gridPane](host)
+ 		p.binding = g
+@@ -149,7 +151,7 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
+ 	g.vertical.Styler(func(s *styles.Style) { s.Direction = styles.Column; s.SetAbilities(false, abilities.Focusable) })
+ 	g.horizontal.OnChange(func(events.Event) {
+ 		value := g.horizontal.Value
+-		g.post(ui.GridViewport, func() error {
++		g.postObserved(ui.GridViewport, gridInputOrigin{name: "scrollbar-x"}, func() error {
+ 			s, e := g.model.State()
+ 			if e != nil {
+ 				return e
+@@ -164,7 +166,7 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
+ 	})
+ 	g.vertical.OnChange(func(events.Event) {
+ 		value := g.vertical.Value
+-		g.post(ui.GridViewport, func() error {
++		g.postObserved(ui.GridViewport, gridInputOrigin{name: "scrollbar-y"}, func() error {
+ 			s, e := g.model.State()
+ 			if e != nil {
+ 				return e
+@@ -263,12 +265,23 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
+ 		if math.IsNaN(float64(s.Delta.X)) || math.IsNaN(float64(s.Delta.Y)) || math.IsInf(float64(s.Delta.X), 0) || math.IsInf(float64(s.Delta.Y), 0) {
+ 			return
+ 		}
++		var observed GridInputRecord
++		if g.inputs != nil {
++			_, tag := tracedGridIntent(g)
++			observed = GridInputRecord{Kind: "wheel", Tag: tag, Scale: scale, PhysicalX: s.Delta.X, PhysicalY: s.Delta.Y, RemainderBefore: [2]float64{g.wheelX, g.wheelY}}
++		}
+ 		g.wheelX += float64(s.Delta.X) / float64(scale)
+ 		g.wheelY += float64(s.Delta.Y) / float64(scale)
+ 		dx, dy := boundedWheel(g.wheelX), boundedWheel(g.wheelY)
+ 		g.wheelX -= math.Trunc(g.wheelX)
+ 		g.wheelY -= math.Trunc(g.wheelY)
+-		g.post(ui.GridViewport, func() error { return g.model.Scroll(dx, dy) })
++		origin := gridInputOrigin{name: "wheel"}
++		if g.inputs != nil {
++			observed.DeltaX, observed.DeltaY = dx, dy
++			observed.RemainderAfter = [2]float64{g.wheelX, g.wheelY}
++			origin.sequence = g.inputs.record(observed)
++		}
++		g.postObserved(ui.GridViewport, origin, func() error { return g.model.Scroll(dx, dy) })
+ 		e.SetHandled()
+ 	})
+ 	return host, nil
+@@ -442,37 +455,86 @@ func (g *gridBinding) fail(err error) {
+ 		g.r.control.onError(err)
+ 	}
+ }
+-func (g *gridBinding) applyIntent(reason ui.GridChangeReason, interaction bool, fn func() error) {
++func (g *gridBinding) applyIntentObserved(reason ui.GridChangeReason, interaction bool, origin gridInputOrigin, fn func() error) {
+ 	if !g.live() || g.r.control.retired || g.r.node.Grid != g.model || interaction && !g.eligible() {
++		g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "refused")
+ 		return
+ 	}
+ 	before, e := g.model.State()
+ 	if e != nil {
++		g.observeTransition(origin, reason, before, virtual.GridState{}, "before-state-error")
+ 		g.fail(e)
+ 		return
+ 	}
+ 	if e = fn(); e != nil {
++		g.observeTransition(origin, reason, before, virtual.GridState{}, "operation-error")
+ 		g.fail(e)
+ 		return
+ 	}
+ 	after, e := g.model.State()
+ 	if e != nil {
++		g.observeTransition(origin, reason, before, after, "after-state-error")
+ 		g.fail(e)
+ 		return
+ 	}
+ 	if before.Generation == after.Generation {
++		g.observeTransition(origin, reason, before, after, "unchanged")
+ 		return
+ 	}
++	g.observeTransition(origin, reason, before, after, "changed")
+ 	if callback := g.r.node.GridChange; callback != nil {
+ 		callback(ui.GridEvent{ID: g.r.node.ID, Reason: reason, State: after})
+ 	}
+ 	_ = g.owner.Invalidate(g.window)
+ }
+ func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
++	if g.inputs != nil {
++		g.postObserved(reason, gridInputOrigin{name: "input"}, fn)
++		return
++	}
++	if g.live() {
++		trace, tag := tracedGridIntent(g)
++		if tag == 0 {
++			postControl(g.r, func() { g.applyIntentObserved(reason, true, gridInputOrigin{}, fn) })
++			return
++		}
++		trace.ExpectOwner(tag)
++		err := g.owner.PostWindow(g.window, func() {
++			returned := false
++			defer func() {
++				if !returned {
++					trace.Fail(tag, "traced owner transition did not return")
++					trace.Transition(tag, 0)
++				}
++			}()
++			before, beforeErr := g.model.State()
++			g.applyIntentObserved(reason, true, gridInputOrigin{}, fn)
++			after, afterErr := g.model.State()
++			if beforeErr != nil || afterErr != nil || !g.live() || after.Generation == before.Generation {
++				trace.Fail(tag, "traced grid input did not publish an owner transition")
++				trace.Transition(tag, 0)
++			} else {
++				trace.Transition(tag, after.Generation)
++			}
++			returned = true
++		})
++		if err != nil {
++			trace.Fail(tag, "traced grid owner posting refused")
++			trace.Transition(tag, 0)
++			trace.OwnerWork(tag, 0) // no owner callback was accepted
++		}
++	}
++}
++func (g *gridBinding) postObserved(reason ui.GridChangeReason, origin gridInputOrigin, fn func() error) {
++	if g.inputs == nil {
++		g.post(reason, fn)
++		return
++	}
+ 	if g.live() {
+ 		trace, tag := tracedGridIntent(g)
++		origin.tag = tag
+ 		if tag == 0 {
+-			postControl(g.r, func() { g.applyIntent(reason, true, fn) })
++			g.postInputControl(origin, reason, func() { g.applyIntentObserved(reason, true, origin, fn) })
+ 			return
+ 		}
+ 		trace.ExpectOwner(tag)
+@@ -485,7 +547,7 @@ func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
+ 				}
+ 			}()
+ 			before, beforeErr := g.model.State()
+-			g.applyIntent(reason, true, fn)
++			g.applyIntentObserved(reason, true, origin, fn)
+ 			after, afterErr := g.model.State()
+ 			if beforeErr != nil || afterErr != nil || !g.live() || after.Generation == before.Generation {
+ 				trace.Fail(tag, "traced grid input did not publish an owner transition")
+@@ -496,6 +558,7 @@ func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
+ 			returned = true
+ 		})
+ 		if err != nil {
++			g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "post-refused")
+ 			trace.Fail(tag, "traced grid owner posting refused")
+ 			trace.Transition(tag, 0)
+ 			trace.OwnerWork(tag, 0) // no owner callback was accepted
+@@ -516,7 +579,7 @@ func (g *gridBinding) requestViewport(request gridRequest) {
+ 	// Layout owns geometry even when the control is disabled or outside modal
+ 	// input scope. No widget/source reads occur in this native admission path.
+ 	err := g.owner.PostWindow(g.window, func() {
+-		g.applyIntent(ui.GridViewport, false, func() error {
++		g.applyIntentObserved(ui.GridViewport, false, gridInputOrigin{name: "layout"}, func() error {
+ 			s, e := g.model.State()
+ 			if e != nil {
+ 				return e
+@@ -527,6 +590,7 @@ func (g *gridBinding) requestViewport(request gridRequest) {
+ 		})
+ 	})
+ 	if err != nil {
++		g.observeTransition(gridInputOrigin{name: "layout"}, ui.GridViewport, virtual.GridState{}, virtual.GridState{}, "post-refused")
+ 		// Queue pressure is transient; allow the next actual frame to retry.
+ 		// A model capacity refusal occurs on the owner and remains remembered,
+ 		// without an invalidate loop until a different measured size is requested.
+diff --git a/drivers/cogent/grid_input_details.go b/drivers/cogent/grid_input_details.go
+new file mode 100644
+index 0000000..ae4de22
+--- /dev/null
++++ b/drivers/cogent/grid_input_details.go
+@@ -0,0 +1,157 @@
++package cogent
++
++import (
++	"cogentcore.org/core/tree"
++	"errors"
++	"github.com/dshills/vellum/app"
++	"strings"
++	"sync"
++
++	"github.com/dshills/vellum/ui"
++	"github.com/dshills/vellum/virtual"
++)
++
++// GridInputRecord contains copied scalar provenance, never an event, model,
++// widget or callback. Tag zero means untraced; it does not identify a producer.
++// Sequence orders recorder appends, not native delivery or wall-clock time.
++type GridInputRecord struct {
++	Sequence, Input, Tag, Incarnation  uint64
++	Window, Grid, Kind, Origin, Result string
++	Reason                             ui.GridChangeReason
++	Scale                              float32
++	RequestedX, RequestedY             float64
++	PhysicalX, PhysicalY               float32
++	RemainderBefore, RemainderAfter    [2]float64
++	DeltaX, DeltaY                     int
++	GenerationBefore, GenerationAfter  uint64
++	ViewportBefore, ViewportAfter      virtual.GridViewport
++}
++
++type GridInputDetails struct {
++	Capacity int
++	Records  []GridInputRecord
++	Dropped  uint64
++	Failure  string
++}
++
++type gridInputRecorder struct {
++	mu       sync.Mutex
++	capacity int
++	records  []GridInputRecord
++	dropped  uint64
++	failure  string
++}
++
++type gridInputBinding struct {
++	recorder     *gridInputRecorder
++	window, grid string
++	incarnation  uint64
++}
++
++// NewFrameMetricsWithGridInputDetails records admissions, actual wheel
++// arithmetic and owner transitions, including untraced input and layout.
++// Extra synchronization makes these diagnostic samples ineligible for ordinary
++// latency qualification. The ordinary constructor allocates no input ledger.
++func NewFrameMetricsWithGridInputDetails(capacity int) (*FrameMetrics, error) {
++	if capacity < 1 || capacity > MaxSourceFrameMetricsCapacity {
++		return nil, ErrFrameMetricsConfig
++	}
++	m, err := newFrameMetrics(capacity, false)
++	if err != nil {
++		return nil, err
++	}
++	n := 3*capacity + 256
++	m.gridInputs = &gridInputRecorder{capacity: n, records: make([]GridInputRecord, 0, n)}
++	return m, nil
++}
++
++// GridInputDetails returns a detached snapshot. A full ledger refuses further
++// records and reports loss; it never overwrites evidence or alters grid input.
++func (m *FrameMetrics) GridInputDetails() GridInputDetails {
++	if !m.valid() {
++		return GridInputDetails{Failure: ErrFrameMetricsConfig.Error()}
++	}
++	r := m.gridInputs
++	if r == nil {
++		return GridInputDetails{}
++	}
++	r.mu.Lock()
++	defer r.mu.Unlock()
++	out := GridInputDetails{Capacity: r.capacity, Records: append([]GridInputRecord(nil), r.records...), Dropped: r.dropped, Failure: r.failure}
++	if r.dropped != 0 && out.Failure == "" {
++		out.Failure = "cogent: grid input details capacity exhausted"
++	}
++	return out
++}
++
++func bindGridInputDetails(g *gridBinding) *gridInputBinding {
++	frameMetricsRegistry.Lock()
++	b := frameMetricsRegistry.windows[frameWindowKey{g.owner, g.window}]
++	frameMetricsRegistry.Unlock()
++	if b == nil || b.metrics.gridInputs == nil {
++		return nil
++	}
++	if len(g.r.node.ID) > 4096 {
++		r := b.metrics.gridInputs
++		r.mu.Lock()
++		r.failure = "cogent: grid input identifier exceeds4096 bytes"
++		r.mu.Unlock()
++		return nil
++	}
++	return &gridInputBinding{recorder: b.metrics.gridInputs, window: strings.Clone(g.window), grid: strings.Clone(g.r.node.ID), incarnation: g.incarnation}
++}
++
++func (b *gridInputBinding) record(v GridInputRecord) uint64 {
++	if b == nil {
++		return 0
++	}
++	r := b.recorder
++	r.mu.Lock()
++	defer r.mu.Unlock()
++	if len(r.records) >= r.capacity {
++		if r.dropped != ^uint64(0) {
++			r.dropped++
++		}
++		return 0
++	}
++	v.Sequence = uint64(len(r.records)) + 1
++	v.Window, v.Grid, v.Incarnation = b.window, b.grid, b.incarnation
++	r.records = append(r.records, v)
++	return v.Sequence
++}
++
++type gridInputOrigin struct {
++	name          string
++	sequence, tag uint64
++}
++
++func (g *gridBinding) observeTransition(origin gridInputOrigin, reason ui.GridChangeReason, before, after virtual.GridState, result string) {
++	if g.inputs != nil {
++		g.inputs.record(GridInputRecord{Kind: "transition", Origin: origin.name, Input: origin.sequence, Tag: origin.tag, Reason: reason, Result: result,
++			GenerationBefore: before.Generation, GenerationAfter: after.Generation, ViewportBefore: before.Viewport, ViewportAfter: after.Viewport})
++	}
++}
++
++// Diagnostic equivalent of postControl: preserve its retirement/refusal
++// behavior while making an absent delivery distinguishable from admission.
++func (g *gridBinding) postInputControl(origin gridInputOrigin, reason ui.GridChangeReason, fn func()) {
++	r := g.r
++	if tree.IsNil(r.widget) {
++		g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "widget-refused")
++		return
++	}
++	if err := r.control.a.PostWindow(r.control.window, func() {
++		if !r.control.retired {
++			fn()
++		} else {
++			g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "retired")
++		}
++	}); err != nil {
++		g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "post-refused")
++		if errors.Is(err, app.ErrClosed) || errors.Is(err, app.ErrWindowClosed) {
++			return
++		}
++		r.control.refused.Store(&err)
++		r.control.a.Invalidate(r.control.window)
++	}
++}
+diff --git a/drivers/cogent/grid_input_details_offscreen_test.go b/drivers/cogent/grid_input_details_offscreen_test.go
+new file mode 100644
+index 0000000..833394b
+--- /dev/null
++++ b/drivers/cogent/grid_input_details_offscreen_test.go
+@@ -0,0 +1,85 @@
++//go:build offscreen
++
++package cogent
++
++import (
++	"image"
++	"math"
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"github.com/dshills/vellum/ui"
++)
++
++// Observe real untraced fractional delivery followed by reserved FIFO input.
++// This is an event/owner proof, never a software/native timing qualification.
++func TestGridInputDetailsActualFractionalAndTaggedRouting(t *testing.T) {
++	grid, _ := testNativeGrid(t, 1000)
++	notifications := 0
++	m, a := gridManual(t, manualConfig(t, 1), func() ui.Node {
++		return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: grid, Grow: true, GridChange: func(ui.GridEvent) { notifications++ }}
++	})
++	gridFrame(t, m)
++	metrics, err := NewFrameMetricsWithGridInputDetails(2)
++	if err != nil {
++		t.Fatal(err)
++	}
++	w := m.implementation.find("one").state
++	b, err := metrics.bind(a, w)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer b.retire()
++	g := w.root.control.grid
++	if g == nil {
++		t.Fatal("missing grid binding")
++	}
++	// Manual binds its observer after construction; desktop binds before mount.
++	g.inputs = bindGridInputDetails(g)
++	first := gridInspection(t, a, grid)
++	position := image.Pt((first.Bounds.Min.X+first.Bounds.Max.X)/2, (first.Bounds.Min.Y+first.Bounds.Max.Y)/2)
++	notifications = 0 // Initial viewport notification precedes these inputs.
++	for i := 0; i < 4; i++ {
++		w.source.Load().Scroll(position, math32.Vector2{Y: .25 * first.Scale})
++		gridFrame(t, m)
++	}
++	var enqueue error
++	if err := a.Do(func() { enqueue = EnqueueGridScroll(testContext, a, grid, 0, 12.25, 42) }); err != nil || enqueue != nil {
++		t.Fatal(err, enqueue)
++	}
++	gridFrame(t, m)
++	b.trace.OwnerWork(42, 0)
++	s := metrics.GridInputDetails()
++	if s.Failure != "" || s.Dropped != 0 {
++		t.Fatal(s)
++	}
++	var wheels, transitions []GridInputRecord
++	var admission GridInputRecord
++	for _, r := range s.Records {
++		switch r.Kind {
++		case "wheel":
++			wheels = append(wheels, r)
++		case "enqueue":
++			admission = r
++		case "transition":
++			if r.Origin == "wheel" {
++				transitions = append(transitions, r)
++			}
++		}
++	}
++	if len(wheels) != 5 || len(transitions) != 5 || notifications != 2 {
++		t.Fatalf("missing actual event/owner evidence: wheels%d transitions%d callbacks%d", len(wheels), len(transitions), notifications)
++	}
++	for i, r := range wheels[:4] {
++		if r.Tag != 0 || r.Scale != first.Scale || r.RemainderBefore[1] != float64(i)*.25 || r.RemainderAfter[1] != float64((i+1)%4)*.25 || r.DeltaY != i/3 {
++			t.Fatalf("fractional input%d %+v", i, r)
++		}
++		if transitions[i].Input != r.Sequence || transitions[i].Tag != 0 {
++			t.Fatal("untraced correlation lost")
++		}
++	}
++	last := wheels[4]
++	if admission.Tag != 42 || admission.RequestedY != 12.25 || admission.Scale != first.Scale || admission.PhysicalY != last.PhysicalY || last.Tag != 42 || last.DeltaY != 12 || math.Abs(last.RemainderAfter[1]-.25) > 1e-6 || transitions[4].Input != last.Sequence || transitions[4].Tag != 42 || transitions[4].ViewportBefore.ScrollY != 1 || transitions[4].ViewportAfter.ScrollY != 13 {
++		t.Fatalf("tagged scalar provenance differs: %+v %+v %+v", admission, last, transitions[4])
++	}
++}
+diff --git a/drivers/cogent/grid_input_details_test.go b/drivers/cogent/grid_input_details_test.go
+new file mode 100644
+index 0000000..11d81b2
+--- /dev/null
++++ b/drivers/cogent/grid_input_details_test.go
+@@ -0,0 +1,75 @@
++package cogent
++
++import (
++	"cogentcore.org/core/core"
++	"errors"
++	"github.com/dshills/vellum/app"
++	"github.com/dshills/vellum/ui"
++	"strings"
++	"sync"
++	"testing"
++)
++
++func TestGridInputDetailsBoundedDetachedAndConcurrent(t *testing.T) {
++	for _, n := range []int{0, -1, 4097} {
++		if _, err := NewFrameMetricsWithGridInputDetails(n); !errors.Is(err, ErrFrameMetricsConfig) {
++			t.Fatalf("capacity%d: %v", n, err)
++		}
++	}
++	ordinary, _ := NewFrameMetrics(1)
++	if ordinary.gridInputs != nil || ordinary.GridInputDetails().Capacity != 0 {
++		t.Fatal("ordinary recorder allocated input ledger")
++	}
++	m, err := NewFrameMetricsWithGridInputDetails(1)
++	if err != nil {
++		t.Fatal(err)
++	}
++	b := &gridInputBinding{recorder: m.gridInputs, window: "one", grid: "g", incarnation: 7}
++	var workers sync.WaitGroup
++	for i := 0; i < 4; i++ {
++		workers.Add(1)
++		go func() {
++			defer workers.Done()
++			for n := 0; n < 100; n++ {
++				b.record(GridInputRecord{Kind: "wheel", Tag: 2})
++				_ = m.GridInputDetails()
++			}
++		}()
++	}
++	workers.Wait()
++	s := m.GridInputDetails()
++	if s.Capacity != 259 || len(s.Records) != 259 || s.Dropped != 141 || s.Failure == "" {
++		t.Fatalf("lost bounded evidence%+v", s)
++	}
++	for i, r := range s.Records {
++		if r.Sequence != uint64(i+1) || r.Window != "one" || r.Grid != "g" || r.Incarnation != 7 {
++			t.Fatalf("invalid binding/sequence%+v", r)
++		}
++	}
++	s.Records[0].Tag = 99
++	if m.GridInputDetails().Records[0].Tag != 2 {
++		t.Fatal("snapshot aliases recorder")
++	}
++	if (&FrameMetrics{}).GridInputDetails().Failure == "" {
++		t.Fatal("invalid recorder accepted")
++	}
++}
++
++func TestGridInputDetailsRefusesUnboundedIdentifierRetention(t *testing.T) {
++	m, _ := NewFrameMetricsWithGridInputDetails(1)
++	a := &app.Application{}
++	w := &nativeWindow{window: app.Window{ID: "input-id"}, body: core.NewBody("input-id")}
++	b, err := m.bind(a, w)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer b.retire()
++	g := &gridBinding{owner: a, window: "input-id", r: &record{node: ui.Node{ID: strings.Repeat("x", 4097)}}}
++	if bindGridInputDetails(g) != nil || m.GridInputDetails().Failure == "" {
++		t.Fatal("retained unbounded descriptor identifier")
++	}
++	ordinary, _ := NewFrameMetrics(1)
++	if ordinary.GridInputDetails().Failure != "" {
++		t.Fatal("diagnostic refusal altered ordinary metrics")
++	}
++}
+diff --git a/examples/loadedgrid/README.md b/examples/loadedgrid/README.md
+index 0e073b6..5327b4d 100644
+--- a/examples/loadedgrid/README.md
++++ b/examples/loadedgrid/README.md
+@@ -64,3 +64,11 @@ leaves warm_target_met false. Nested raster/Copy/image-API times do not add to
+ the existing UI-work total. Image counters mean API attempts and logical full
+ RGBA input bytes; upload success/failure and physical GPU traffic are unavailable.
+ See [the source-cost evidence](../../docs/reports/macos-source-costs/README.md).
++
++Warmup must return to its zero-offset starting viewport with one callback per
++admitted event. Offset, scale, geometry or callback drift refuses the run without
++resetting the model. `-perf -rows=10000 -perf-input-details=/private/tmp/new-input.json`
++selects a separate bounded scalar input ledger saved after native teardown,
++including failed warmups. It observes admissions, actual wheel remainder/scale
++and owner transitions; untraced means tag zero, not a desktop-origin assertion.
++The file must be new. These diagnostic samples cannot qualify warm latency.
+diff --git a/examples/loadedgrid/main.go b/examples/loadedgrid/main.go
+index 577cb78..27885bb 100644
+--- a/examples/loadedgrid/main.go
++++ b/examples/loadedgrid/main.go
+@@ -68,9 +68,10 @@ func main() {
+ 	perfNovel := flag.Bool("perf-novel", false, "separate newly visited row strings; not cold-font or warm P6 results")
+ 	perfProfile := flag.String("perf-cpu-profile", "", "diagnostic process-wide CPU profile to a new file (64MiB cap); excluded from warm qualification")
+ 	perfSources := flag.Bool("perf-source-details", false, "diagnostic nested source costs and image API attempts; excluded from warm qualification")
++	perfInputs := flag.String("perf-input-details", "", "new diagnostic scalar input ledger file; excluded from warm qualification")
+ 	flag.Parse()
+ 	if *axSmoke {
+-		if *smoke || *perf || *perfSources || *perfProfile != "" {
++		if *smoke || *perf || *perfSources || *perfProfile != "" || *perfInputs != "" {
+ 			fmt.Fprintln(os.Stderr, "loadedgrid: accessibility smoke is a separate workflow")
+ 			os.Exit(1)
+ 		}
+@@ -80,12 +81,16 @@ func main() {
+ 		}
+ 		return
+ 	}
++	if !*perf && *perfInputs != "" {
++		fmt.Fprintln(os.Stderr, "loadedgrid: -perf-input-details requires -perf")
++		os.Exit(1)
++	}
+ 	if err := validatePerfModes(*perf, *smoke, *perfSources, *perfProfile); err != nil {
+ 		fmt.Fprintln(os.Stderr, err)
+ 		os.Exit(1)
+ 	}
+ 	if *perf {
+-		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, SourceDetails: *perfSources}); err != nil {
++		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, SourceDetails: *perfSources, InputDetails: *perfInputs}); err != nil {
+ 			fmt.Fprintln(os.Stderr, err)
+ 			os.Exit(1)
+ 		}
+diff --git a/examples/loadedgrid/perf.go b/examples/loadedgrid/perf.go
+index df30194..8034f71 100644
+--- a/examples/loadedgrid/perf.go
++++ b/examples/loadedgrid/perf.go
+@@ -24,6 +24,7 @@ type perfConfig struct {
+ 	Novel           bool
+ 	CPUProfile      string
+ 	SourceDetails   bool
++	InputDetails    string
+ }
+ 
+ func validatePerfModes(perf, smoke, sourceDetails bool, profile string) error {
+@@ -43,12 +44,18 @@ func (c perfConfig) validate() error {
+ 	if !validPerfProfilePath(c.CPUProfile) {
+ 		return errors.New("loadedgrid perf: invalid CPU profile path")
+ 	}
++	if !validPerfProfilePath(c.InputDetails) || c.InputDetails != "" && (c.SourceDetails || c.CPUProfile != "") {
++		return errors.New("loadedgrid perf: input details require a valid separate diagnostic path and mode")
++	}
+ 	if c.Rows != 10_000 && c.Rows != 1_000_000 || c.Samples < 120 || c.Samples > 2048 || c.Warmup < perfPeriod || c.Warmup > 2048 || c.Warmup%perfPeriod != 0 {
+ 		return errors.New("loadedgrid perf: rows must be10000 or1000000, samples120..2048 and warmup64..2048")
+ 	}
+ 	if c.SourceDetails && c.Warmup+c.Samples+2 > cogent.MaxSourceFrameMetricsCapacity {
+ 		return errors.New("loadedgrid perf: detailed recorder capacity exceeds4096")
+ 	}
++	if c.InputDetails != "" && c.Warmup+c.Samples+2 > cogent.MaxSourceFrameMetricsCapacity {
++		return errors.New("loadedgrid perf: input recorder capacity exceeds4096")
++	}
+ 	return nil
+ }
+ 
+@@ -119,6 +126,13 @@ func perfDelta(index int) (x, y int) {
+ 	return
+ }
+ 
++func checkPerfWarmup(initial, final cogent.GridInspection, callbacks uint64, expected int) error {
++	if initial.Viewport.ScrollX != 0 || initial.Viewport.ScrollY != 0 || final.Viewport != initial.Viewport || final.Bounds != initial.Bounds || final.Scale != initial.Scale || callbacks != uint64(expected) {
++		return fmt.Errorf("loadedgrid perf: warmup did not preserve the closed workload: start%+v end%+v callbacks%d expected%d", initial.Viewport, final.Viewport, callbacks, expected)
++	}
++	return nil
++}
++
+ type perfGeometry struct {
+ 	MaterializedCells int                  `json:"materialized_cells"`
+ 	RetainedCells     int                  `json:"retained_cells"`
+diff --git a/examples/loadedgrid/perf_input.go b/examples/loadedgrid/perf_input.go
+new file mode 100644
+index 0000000..1037a1b
+--- /dev/null
++++ b/examples/loadedgrid/perf_input.go
+@@ -0,0 +1,48 @@
++package main
++
++import (
++	"encoding/json"
++	"errors"
++	"os"
++	"sync"
++
++	"github.com/dshills/vellum/drivers/cogent"
++)
++
++// Write only after Run has retired native dispatch, including failed warmups.
++// O_EXCL preserves prior evidence and refuses existing files and symlinks.
++func startPerfInputDetails(path string, metrics *cogent.FrameMetrics) (func(error) error, error) {
++	if path == "" {
++		return func(error) error { return nil }, nil
++	}
++	if !validPerfProfilePath(path) {
++		return nil, errors.New("loadedgrid perf: invalid input details path")
++	}
++	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
++	if err != nil {
++		return nil, err
++	}
++	var once sync.Once
++	var terminal error
++	return func(runError error) error {
++		once.Do(func() {
++			result := "CAPTURED_DIAGNOSTIC"
++			if runError != nil {
++				result = "FAILED_RUN_DIAGNOSTIC"
++			}
++			details := metrics.GridInputDetails()
++			var detailError error
++			if details.Failure != "" {
++				result = "REFUSED_INPUT_DETAILS"
++				detailError = errors.New(details.Failure)
++			}
++			w := &perfProfileWriter{target: f, remaining: perfProfileMaxBytes}
++			err := json.NewEncoder(w).Encode(struct {
++				Schema, Result string
++				Details        cogent.GridInputDetails
++			}{"vellum-grid-input-v1", result, details})
++			terminal = errors.Join(detailError, err, w.failure(), f.Close())
++		})
++		return terminal
++	}, nil
++}
+diff --git a/examples/loadedgrid/perf_input_test.go b/examples/loadedgrid/perf_input_test.go
+new file mode 100644
+index 0000000..562977e
+--- /dev/null
++++ b/examples/loadedgrid/perf_input_test.go
+@@ -0,0 +1,75 @@
++package main
++
++import (
++	"encoding/json"
++	"errors"
++	"image"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/dshills/vellum/drivers/cogent"
++	"github.com/dshills/vellum/virtual"
++)
++
++func TestPerfWarmupRefusesOffsetsExtraCallbacksAndLayoutDrift(t *testing.T) {
++	initial := cogent.GridInspection{Viewport: virtual.GridViewport{Width: 768, Height: 624}, Bounds: image.Rect(0, 0, 1296, 1053), Scale: 1.6875}
++	if err := checkPerfWarmup(initial, initial, 128, 128); err != nil {
++		t.Fatal(err)
++	}
++	for _, mutate := range []func(*cogent.GridInspection){func(g *cogent.GridInspection) { g.Viewport.ScrollY = 31 }, func(g *cogent.GridInspection) { g.Viewport.ScrollX = 1 }, func(g *cogent.GridInspection) { g.Scale = 2 }, func(g *cogent.GridInspection) { g.Bounds.Max.Y++ }, func(g *cogent.GridInspection) { g.Viewport.Height++ }} {
++		final := initial
++		mutate(&final)
++		if checkPerfWarmup(initial, final, 128, 128) == nil {
++			t.Fatal("accepted changed warm workload")
++		}
++	}
++	if checkPerfWarmup(initial, initial, 129, 128) == nil {
++		t.Fatal("accepted extra transition")
++	}
++	initial.Viewport.ScrollY = 31
++	if checkPerfWarmup(initial, initial, 128, 128) == nil {
++		t.Fatal("accepted noncanonical starting offset")
++	}
++}
++
++func TestPerfInputLedgerExclusiveFailureEvidence(t *testing.T) {
++	m, _ := cogent.NewFrameMetricsWithGridInputDetails(130)
++	path := filepath.Join(t.TempDir(), "input.json")
++	finish, err := startPerfInputDetails(path, m)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err = startPerfInputDetails(path, m); err == nil {
++		t.Fatal("overwrote existing evidence")
++	}
++	if err = finish(errors.New("warmup refused")); err != nil {
++		t.Fatal(err)
++	}
++	before, _ := os.ReadFile(path)
++	if err = finish(nil); err != nil {
++		t.Fatal(err)
++	}
++	after, _ := os.ReadFile(path)
++	if string(before) != string(after) {
++		t.Fatal("repeated finish altered failed evidence")
++	}
++	var saved struct {
++		Schema, Result string
++		Details        cogent.GridInputDetails
++	}
++	if err = json.Unmarshal(before, &saved); err != nil || saved.Schema != "vellum-grid-input-v1" || saved.Result != "FAILED_RUN_DIAGNOSTIC" || saved.Details.Capacity != 646 {
++		t.Fatal(err, saved)
++	}
++	c := perfConfig{Rows: 10000, Samples: 120, Warmup: 128, InputDetails: path}
++	if err = c.validate(); err != nil {
++		t.Fatal(err)
++	}
++	if _, err = newPerfFrameMetrics(c); err != nil {
++		t.Fatal(err)
++	}
++	c.SourceDetails = true
++	if c.validate() == nil {
++		t.Fatal("combined diagnostic modes accepted")
++	}
++}
+diff --git a/examples/loadedgrid/perf_runtime.go b/examples/loadedgrid/perf_runtime.go
+index a5bbf26..681a3b2 100644
+--- a/examples/loadedgrid/perf_runtime.go
++++ b/examples/loadedgrid/perf_runtime.go
+@@ -96,7 +96,7 @@ func newPerfProgram(ctx context.Context, c perfConfig) (*perfProgram, map[string
+ 		a.Close()
+ 		return nil, nil, err
+ 	}
+-	metadata := map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "cpu_profile_path": c.CPUProfile, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
++	metadata := map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "cpu_profile_path": c.CPUProfile, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
+ 	return p, metadata, nil
+ }
+ func (p *perfProgram) describe() ui.Node {
+@@ -191,6 +191,11 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 	if _, err = checkPerfGeometry(initial); err != nil {
+ 		return err
+ 	}
++	var warmStartCallbacks uint64
++	if err = p.owned(func() error { warmStartCallbacks = p.callbacks; return nil }); err != nil {
++		return err
++	}
++	warmFinal := initial
+ 	for i := 0; i < c.Warmup; i++ {
+ 		dx, dy := perfDelta(i)
+ 		_, g, err := p.scroll(ctx, m, dx, dy, (1<<32)+uint64(i+1))
+@@ -200,6 +205,14 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 		if _, err = checkPerfGeometry(g); err != nil {
+ 			return err
+ 		}
++		warmFinal = g
++	}
++	var warmCallbacks uint64
++	if err = p.owned(func() error { warmCallbacks = p.callbacks - warmStartCallbacks; return nil }); err != nil {
++		return err
++	}
++	if err = checkPerfWarmup(initial, warmFinal, warmCallbacks, c.Warmup); err != nil {
++		return err
+ 	}
+ 	if c.Novel {
+ 		// A distinct, untouched source range. This setup frame is unmeasured; each
+@@ -225,7 +238,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 	if err != nil {
+ 		return err
+ 	}
+-	if err = perfEmit("grid.perf.ready", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds}); err != nil {
++	if err = perfEmit("grid.perf.ready", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
+ 		return err
+ 	}
+ 	stopProfile, err := startPerfCPUProfile(c.CPUProfile)
+@@ -270,7 +283,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 		if afterMemory.TotalAlloc < beforeMemory.TotalAlloc || afterMemory.Mallocs < beforeMemory.Mallocs {
+ 			return errors.New("loadedgrid perf: allocation counter overflow")
+ 		}
+-		if err = perfEmit("grid.perf.sample", map[string]any{"source_details": c.SourceDetails, "index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
++		if err = perfEmit("grid.perf.sample", map[string]any{"source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
+ 			return err
+ 		}
+ 	}
+@@ -286,7 +299,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
+ 		return err
+ 	}
+ 	runtime.GC()
+-	return perfEmit("grid.perf.end", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
++	return perfEmit("grid.perf.end", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
+ }
+ 
+ // Detailed records are diagnostic instrumentation. The ordinary constructor
+@@ -296,9 +309,12 @@ func newPerfFrameMetrics(c perfConfig) (*cogent.FrameMetrics, error) {
+ 	if c.SourceDetails {
+ 		return cogent.NewFrameMetricsWithSourceDetails(capacity)
+ 	}
++	if c.InputDetails != "" {
++		return cogent.NewFrameMetricsWithGridInputDetails(capacity)
++	}
+ 	return cogent.NewFrameMetrics(capacity)
+ }
+-func runPerf(c perfConfig) error {
++func runPerf(c perfConfig) (terminal error) {
+ 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+ 	defer cancel()
+ 	p, metadata, err := newPerfProgram(ctx, c)
+@@ -310,6 +326,11 @@ func runPerf(c perfConfig) error {
+ 	if err != nil {
+ 		return err
+ 	}
++	finishInput, err := startPerfInputDetails(c.InputDetails, m)
++	if err != nil {
++		return err
++	}
++	defer func() { terminal = errors.Join(terminal, finishInput(terminal)) }()
+ 	if err = perfEmit("grid.perf.setup", metadata); err != nil {
+ 		return err
+ 	}
+diff --git a/scripts/benchmark-grid.py b/scripts/benchmark-grid.py
+index 94931a2..c1a38e5 100644
+--- a/scripts/benchmark-grid.py
++++ b/scripts/benchmark-grid.py
+@@ -130,7 +130,7 @@ def validate_source_details(details, raster_upload_ns):
+         raise ValueError("source draw sum exceeds ticket raster/upload interval")
+ 
+ 
+-def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False):
++def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False, allow_input_details=False):
+     """Require exact case, current completed geometry and one sample per tag."""
+     if len(records) != samples + 3 or [r.get("event") for r in records[:2]] != ["grid.perf.setup", "grid.perf.ready"] or records[-1].get("event") != "grid.perf.end":
+         raise ValueError("missing, repeated or unordered benchmark stages")
+@@ -138,6 +138,23 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
+     for r in (setup, ready, end):
+         if r.get("rows") != rows or r.get("variable") is not variable or r.get("novel") is not novel:
+             raise ValueError("benchmark case identity mismatch")
++    inputs = setup.get("input_details", False)
++    if type(inputs) is not bool or inputs and not allow_input_details:
++        raise ValueError("diagnostic input details cannot qualify warm timing")
++    if any(r.get("input_details", False) is not inputs for r in (ready, end)):
++        raise ValueError("input detail case identity mismatch")
++    if setup.get("warmup_guard") == 1:
++        if any(type(r.get("warmup_guard")) is not int or r["warmup_guard"] != 1 for r in (setup, ready, end)):
++            raise ValueError("warmup guard identity mismatch")
++        start, final = ready.get("warm_start_viewport"), ready.get("warm_end_viewport")
++        fields = {"Width", "Height", "ScrollX", "ScrollY"}
++        if type(start) is not dict or type(final) is not dict or set(start) != fields or set(final) != fields or any(type(v) is not int for v in (*start.values(), *final.values())) or start != final or start["ScrollX"] != 0 or start["ScrollY"] != 0:
++            raise ValueError("warmup closed viewport mismatch")
++        warmup = ready.get("warmup")
++        if type(warmup) is not int or not 64 <= warmup <= 2048 or warmup % 64 or type(ready.get("warm_callbacks")) is not int or ready["warm_callbacks"] != warmup:
++            raise ValueError("warmup callback mismatch")
++    elif any(r.get("warmup_guard") is not None for r in (setup, ready, end)):
++        raise ValueError("unknown warmup guard version")
+     profiled = setup.get("cpu_profile", False)
+     if not isinstance(profiled, bool) or profiled and not allow_profile:
+         raise ValueError("diagnostic CPU profile cannot qualify warm timing")
+@@ -159,6 +176,8 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
+     result = []
+     last_generation = last_frame = 0
+     for i, record in enumerate(records[2:-1]):
++        if record.get("input_details", False) is not inputs or record.get("warmup_guard") != setup.get("warmup_guard") or "warmup_guard" in record and type(record["warmup_guard"]) is not int:
++            raise ValueError("sample input diagnostic/guard identity mismatch")
+         if record.get("event") != "grid.perf.sample" or type(record.get("index")) is not int or record.get("index") != i or type(record.get("tag")) is not int or record.get("tag") != i + 1:
+             raise ValueError("sample ordering/tag mismatch")
+         geometry = record.get("geometry", {})
+diff --git a/scripts/benchmark-grid_test.py b/scripts/benchmark-grid_test.py
+index 6ce9418..f741283 100644
+--- a/scripts/benchmark-grid_test.py
++++ b/scripts/benchmark-grid_test.py
+@@ -427,4 +427,36 @@ class DiagnosticReportTests(unittest.TestCase):
+             self.assertFalse(output.exists())
+ 
+ 
++
++class WarmupAndInputDetailTests(unittest.TestCase):
++    def guarded(self):
++        data = records()
++        for record in data: record["warmup_guard"] = 1
++        data[1].update(warmup=128, warm_callbacks=128,
++                       warm_start_viewport={"Width":768,"Height":624,"ScrollX":0,"ScrollY":0},
++                       warm_end_viewport={"Width":768,"Height":624,"ScrollX":0,"ScrollY":0})
++        return data
++
++    def test_closed_warmup_guard_rejects_offset_callback_and_version_drift(self):
++        self.assertEqual(len(benchmark.validate_records(self.guarded(),10000,False,120,False)),120)
++        for change in (lambda d:d[1]["warm_end_viewport"].update(ScrollY=31),
++                       lambda d:d[1].update(warm_callbacks=129),
++                       lambda d:d[1]["warm_start_viewport"].update(ScrollX=True),
++                       lambda d:d[0].update(warmup_guard=True),
++                       lambda d:d[-1].update(warmup_guard=2),
++                       lambda d:d[2].update(warmup_guard=True),
++                       lambda d:d[3].update(input_details=True)):
++            data=self.guarded();change(data)
++            with self.assertRaises(ValueError):benchmark.validate_records(data,10000,False,120,False)
++
++    def test_input_details_never_silently_qualify_as_ordinary(self):
++        data=self.guarded()
++        for record in data:record["input_details"]=True
++        for options in ({},{"allow_profile":True},{"allow_source_details":True}):
++            with self.assertRaisesRegex(ValueError,"diagnostic input"):
++                benchmark.validate_records(data,10000,False,120,False,**options)
++        self.assertEqual(len(benchmark.validate_records(data,10000,False,120,False,allow_input_details=True)),120)
++        data[1]["input_details"]=False
++        with self.assertRaises(ValueError):benchmark.validate_records(data,10000,False,120,False,allow_input_details=True)
++
+ if __name__ == "__main__": unittest.main()
+diff --git a/specs/grid-performance.md b/specs/grid-performance.md
+index 138e20d..3416316 100644
+--- a/specs/grid-performance.md
++++ b/specs/grid-performance.md
+@@ -44,6 +44,15 @@ multiwindow/integrated frame attribution remains open. The consumer requires one
+ completed tag/generation before the next event. It does not directly mutate the
+ viewport during measured scrolling or call descriptor callbacks.
+ 
++New records declare `warmup_guard: 1`. The initial viewport must start at zero
++offset, and the complete warm trajectory must return to the same viewport,
++bounds and scale with exactly one notification per admitted warm event. Extra
++transitions, offset drift and layout changes refuse the run before measurements;
++the consumer never resets offsets to hide drift. Ready records retain start/end
++viewports and generations plus the observed warm callback count. Stage and sample
++guard/mode identities must agree. Historical records lacking this guard remain
++historical observations; adding this check does not qualify an earlier refusal.
++
+ `-perf-novel` is a separate workload: after warm-up it jumps, unmeasured, into an
+ untouched row range and scrolls forward to newly visited numeric strings.
+ Fonts/device state are warm and numeric strings can coincide. It is not a
+@@ -204,3 +213,36 @@ and mixed; the variable-million case rises slightly and every run still fails
+ the unchanged targets. Software span/mask/pixel evidence and microbenchmarks are
+ separate from frame timings. This qualifies the comparison's table protocol,
+ while P6 tree latency, broader memory, cold caches and sustained work remain open.
++
++## Diagnostic grid input provenance
++
++`-perf-input-details=/new/path.json` requires `-perf` and a new exclusive file.
++It cannot combine with CPU profiling or source-detail timing. The separate
++`NewFrameMetricsWithGridInputDetails` recorder admits at most 4096 frame tickets
++and preallocates `3*tickets+256` scalar input records. Grid/window identifiers
++are at most4096 bytes. No record is overwritten; identifier/capacity refusal
++is explicit and failed diagnostic evidence is still saved. Ordinary
++`NewFrameMetrics` allocates no input ledger and adds no input clocks.
++
++The recorder binds before native grid mount. Admissions copy requested logical
++deltas, encoded physical deltas, completed scale, viewport and generation.
++Actual wheel dispatch copies the current event tag, handler scale, physical
++deltas, bounded integer steps and signed remainder before/after arithmetic.
++Owner transitions reuse their existing state reads to report origin, input
++sequence, generation, viewport and changed/unchanged/refused result. Scrollbar
++and layout origins remain distinct. Records contain no event/model/widget,
++callback, cell values or native pointer. Native wheel/style reads stay at the
++originating scene boundary; owner observers never read those mutable fields.
++
++The independent ledger mutex is released before posting, application callbacks
++or trace calls. Admission records append after releasing the metrics mutex;
++native delivery can append first. Tags and ingress sequences establish links;
++append order is not wall-clock time or native FIFO ordering. Tag zero means
++untraced input, not a claim about desktop/user origin. A snapshot does not prove
++FIFO exhaustion; last-delivered remainder is not an independent native barrier.
++
++After native Run retires, the exclusive file saves the detached ledger, including
++failed warmup runs. Setup/ready/sample/end identify this diagnostic mode.
++Ordinary validation refuses input-detail samples, even if profile or source
++diagnostics are separately allowed. Explicit diagnostic validation and elapsed
++observations never qualify the unchanged warm latency targets.

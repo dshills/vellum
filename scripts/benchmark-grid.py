@@ -130,7 +130,7 @@ def validate_source_details(details, raster_upload_ns):
         raise ValueError("source draw sum exceeds ticket raster/upload interval")
 
 
-def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False):
+def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False, allow_input_details=False):
     """Require exact case, current completed geometry and one sample per tag."""
     if len(records) != samples + 3 or [r.get("event") for r in records[:2]] != ["grid.perf.setup", "grid.perf.ready"] or records[-1].get("event") != "grid.perf.end":
         raise ValueError("missing, repeated or unordered benchmark stages")
@@ -138,6 +138,23 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
     for r in (setup, ready, end):
         if r.get("rows") != rows or r.get("variable") is not variable or r.get("novel") is not novel:
             raise ValueError("benchmark case identity mismatch")
+    inputs = setup.get("input_details", False)
+    if type(inputs) is not bool or inputs and not allow_input_details:
+        raise ValueError("diagnostic input details cannot qualify warm timing")
+    if any(r.get("input_details", False) is not inputs for r in (ready, end)):
+        raise ValueError("input detail case identity mismatch")
+    if setup.get("warmup_guard") == 1:
+        if any(type(r.get("warmup_guard")) is not int or r["warmup_guard"] != 1 for r in (setup, ready, end)):
+            raise ValueError("warmup guard identity mismatch")
+        start, final = ready.get("warm_start_viewport"), ready.get("warm_end_viewport")
+        fields = {"Width", "Height", "ScrollX", "ScrollY"}
+        if type(start) is not dict or type(final) is not dict or set(start) != fields or set(final) != fields or any(type(v) is not int for v in (*start.values(), *final.values())) or start != final or start["ScrollX"] != 0 or start["ScrollY"] != 0:
+            raise ValueError("warmup closed viewport mismatch")
+        warmup = ready.get("warmup")
+        if type(warmup) is not int or not 64 <= warmup <= 2048 or warmup % 64 or type(ready.get("warm_callbacks")) is not int or ready["warm_callbacks"] != warmup:
+            raise ValueError("warmup callback mismatch")
+    elif any(r.get("warmup_guard") is not None for r in (setup, ready, end)):
+        raise ValueError("unknown warmup guard version")
     profiled = setup.get("cpu_profile", False)
     if not isinstance(profiled, bool) or profiled and not allow_profile:
         raise ValueError("diagnostic CPU profile cannot qualify warm timing")
@@ -159,6 +176,8 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
     result = []
     last_generation = last_frame = 0
     for i, record in enumerate(records[2:-1]):
+        if record.get("input_details", False) is not inputs or record.get("warmup_guard") != setup.get("warmup_guard") or "warmup_guard" in record and type(record["warmup_guard"]) is not int:
+            raise ValueError("sample input diagnostic/guard identity mismatch")
         if record.get("event") != "grid.perf.sample" or type(record.get("index")) is not int or record.get("index") != i or type(record.get("tag")) is not int or record.get("tag") != i + 1:
             raise ValueError("sample ordering/tag mismatch")
         geometry = record.get("geometry", {})

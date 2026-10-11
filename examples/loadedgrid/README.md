@@ -64,3 +64,11 @@ leaves warm_target_met false. Nested raster/Copy/image-API times do not add to
 the existing UI-work total. Image counters mean API attempts and logical full
 RGBA input bytes; upload success/failure and physical GPU traffic are unavailable.
 See [the source-cost evidence](../../docs/reports/macos-source-costs/README.md).
+
+Warmup must return to its zero-offset starting viewport with one callback per
+admitted event. Offset, scale, geometry or callback drift refuses the run without
+resetting the model. `-perf -rows=10000 -perf-input-details=/private/tmp/new-input.json`
+selects a separate bounded scalar input ledger saved after native teardown,
+including failed warmups. It observes admissions, actual wheel remainder/scale
+and owner transitions; untraced means tag zero, not a desktop-origin assertion.
+The file must be new. These diagnostic samples cannot qualify warm latency.
