@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+import hashlib,json,os,subprocess,time
+from pathlib import Path
+ROOT=Path('/private/tmp/vellum-large-data')
+OUT=Path('/private/tmp/vellum-outline-portable/qualified-v1')
+OUT.mkdir(parents=True,exist_ok=True)
+with (OUT/'started.json').open('x') as f:json.dump({'started_unix':time.time()},f)
+OWN=Path('/private/tmp/vellum-outline-portable/owned-source-v1.json')
+checks=[]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def inputs():
+    paths=list((ROOT/'virtual').glob('*.go'))+[ROOT/'go.mod',ROOT/'specs/tree.md',ROOT/'drivers/cogent/env.sh']
+    if (ROOT/'go.sum').exists():paths.append(ROOT/'go.sum')
+    return {str(p.relative_to(ROOT)):sha(p) for p in sorted(paths)}
+def write(p,v):
+    with p.open('x') as f:json.dump(v,f,indent=2);f.write('\n')
+before=inputs();write(OUT/'inputs-before.json',before)
+owned=json.loads(OWN.read_text())
+for rel,e in owned['files'].items():
+    if sha(ROOT/rel)!=e['sha256'] or sha(Path(e['snapshot']))!=e['sha256']:raise RuntimeError(f'owned source drift: {rel}')
+commands=[
+('toolchain','go version\ngo env GOCACHE GOMODCACHE GOWORK'),
+('portable-tree-race20',"go test -race ./virtual -run 'TestTree|TestOutline' -count=20"),
+('whole-virtual-race1','go test -race ./virtual -count=1'),
+('whole-virtual-vet','go vet ./virtual'),
+]
+try:
+    for name,cmd in commands:
+        log=OUT/(name+'.log');begin=time.monotonic()
+        r={'name':name,'command':cmd,'cwd':str(ROOT),'log':str(log),'timeout_seconds':180}
+        checks.append(r)
+        try:
+            with log.open('xb') as f:
+                child=subprocess.run(['zsh','-f','-c','export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\n'+cmd],cwd=ROOT,stdout=f,stderr=subprocess.STDOUT,timeout=180,check=False)
+            r['exit_code']=child.returncode
+            if child.returncode!=0:break
+        except (OSError,subprocess.SubprocessError) as e:
+            r['error']=repr(e);r['exit_code']=None;break
+        finally:
+            r['elapsed_seconds']=time.monotonic()-begin
+            if log.exists():r['log_sha256']=sha(log)
+finally:
+    after=inputs();write(OUT/'inputs-after.json',after)
+    drift={k:[before.get(k),after.get(k)] for k in sorted(set(before)|set(after)) if before.get(k)!=after.get(k)}
+    outcome='PASS' if len(checks)==len(commands) and all(c.get('exit_code')==0 for c in checks) and not drift else 'FAIL'
+    proof={'schema':1,'result':outcome,'scope':'Owned portable TreeData/TreeIndex/Outline CPU qualification; selected virtual source and module/compiler identity, no native UI/GPU/external AX/performance or full P6 acceptance.', 'owned_source_map':{'path':str(OWN),'sha256':sha(OWN)},'producer':{'path':str(Path(__file__)),'sha256':sha(Path(__file__))},'inputs_before':{'path':str(OUT/'inputs-before.json'),'sha256':sha(OUT/'inputs-before.json'),'files':before},'inputs_after':{'path':str(OUT/'inputs-after.json'),'sha256':sha(OUT/'inputs-after.json'),'files':after},'input_drift':drift,'checks':checks,'source_count':len(before)}
+    write(OUT/'qualification.json',proof)
+    print(json.dumps({'result':outcome,'proof':str(OUT/'qualification.json'),'sha256':sha(OUT/'qualification.json'),'drift_count':len(drift),'checks':[{k:v for k,v in c.items() if k in ['name','exit_code','error','elapsed_seconds']} for c in checks]},indent=2),flush=True)
+    if outcome!='PASS':raise SystemExit(1)

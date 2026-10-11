@@ -1,0 +1,66 @@
+from pathlib import Path
+import hashlib,json,subprocess
+R=Path('/private/tmp/vellum-large-data');O=R/'docs/reviews/macos-large-data'
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+load=lambda p:json.loads(Path(p).read_text())
+refs={
+ 'portable-qualification':'/private/tmp/vellum-outline-portable/qualified-v2/qualification.json',
+ 'portable-independent-review':'/private/tmp/vellum-outline-portable/root-review-v2.json',
+ 'native-ui-qualification':'/private/tmp/vellum-large-tree-qualification/qualified-v1/qualification.json',
+ 'consumer-qualification':'/private/tmp/vellum-large-tree-qualification/qualified-v3/qualification.json',
+ 'tree-cocoa':'/private/tmp/vellum-large-tree-qualification/qualified-v3/cocoa-smokes/qualification.json',
+ 'native-independent-review':'/private/tmp/vellum-outline-native-review/final-v1/review.json',
+ 'consumer-independent-review':'/private/tmp/vellum-large-tree-consumer-independent-review/review.json',
+ 'metrics-independent-review':'/private/tmp/vellum-grid-frame-metrics-review/final-v1/review.json',
+ 'stage34-reproduction':'/private/tmp/vellum-large-data-pin34/qualification.json',
+ 'root-qualification':'/private/tmp/vellum-large-data-qualification/qualification.json',
+ 'tooling-final-qualification':'/private/tmp/vellum-grid-performance-qualification/qualified-v4/qualification.json',
+ 'prism-correction-independent-review':'/private/tmp/vellum-grid-performance-review/observer-followup/final-v4/review.json',
+ 'native-grid-observation':'/private/tmp/vellum-grid-perf-exploratory-native-1/exploratory.json',
+ 'profile-diagnostic':'/private/tmp/vellum-grid-perf-profile-native-1/diagnostic.json',
+ 'profile-readout':'/private/tmp/vellum-grid-perf-profile-native-1/analysis-v1/qualification.json',
+}
+bindings={}
+def bind(files):
+ for p,item in files.items():
+  h=item['sha256'] if isinstance(item,dict) else item
+  assert sha(R/p)==h,('current source drift',p)
+  if p in bindings:assert bindings[p]==h,('conflicting gate source',p)
+  bindings[p]=h
+bind(load('/private/tmp/vellum-outline-portable/owned-source-v2.json')['files'])
+bind(load('/private/tmp/vellum-large-tree-owned/frozen-v3/ownership.json')['files'])
+bind(load('/private/tmp/vellum-grid-frame-metrics-review/final-v1/inputs.json')['sha256'])
+bind(load('/private/tmp/vellum-grid-performance-qualification/qualified-v4/ownership.json')['files'])
+bind(load('/private/tmp/vellum-large-data-qualification/inputs-after.json'))
+bind(load('/private/tmp/vellum-grid-performance-qualification/qualified-v4/inputs-after.json')['selected'])
+expected=load('/private/tmp/vellum-large-data-pin34/prepared-after.json')
+B=R/'drivers/cogent/build'
+actual={str(p.relative_to(B)):sha(p) for dep in ('upstream','typesetting') for p in sorted((B/dep).rglob('*')) if p.is_file() and '.git' not in p.relative_to(B/dep).parts}
+assert expected==actual
+archives={}
+for name in ('macos-large-tree','macos-grid-performance'):
+ A=R/'docs/reports'/name; index=load(A/'archive.json'); listed=set(index['files'])
+ actual_files={str(p.relative_to(A)) for p in (A/'records').rglob('*') if p.is_file()}
+ assert listed==actual_files,('unindexed archived evidence',name)
+ for p,entry in index['files'].items():assert sha(A/p)==entry['sha256']
+ archives[name]={'path':str((A/'archive.json').relative_to(R)),'sha256':sha(A/'archive.json'),'files':len(listed)}
+prism=load(O/'prism.json'); original=load(O/'prism-inputs.json'); process=load(O/'prism-process.json')
+assert prism['coverage']['complete'] and prism['coverage']['truncatedBytes']==0 and not prism['coverage']['skipped']
+assert process['selected_staged_and_working_bytes_unchanged'] and process['exit_code']==1
+assert len(prism['findings'])==1 and prism['findings'][0]['id']=='f73fb71427938d97'
+for p,h in original['files'].items():assert sha(O/'reviewed-sources'/(p+'.txt'))==h
+delta={p:{'reviewed':h,'final':sha(R/p)} for p,h in original['files'].items() if sha(R/p)!=h}
+assert set(delta)=={'scripts/benchmark-grid.py','scripts/benchmark-grid_test.py','examples/loadedgrid/README.md','specs/grid-performance.md'}
+correction=load(refs['prism-correction-independent-review'])
+assert correction['result']=='APPROVED' and not correction['unresolved_material_findings']
+entries={name:{'original_path':path,'sha256':sha(Path(path)),'result':load(path).get('result')} for name,path in refs.items()}
+v={'schema':1,'result':'PASS_WITH_DECLARED_OPEN_ACCEPTANCE','scope':'Final current selected project/prepared inputs and byte-preserving evidence archives; source-bound checks/reviews reconciled with one Prism correction. No full compiler/module-cache/system SDK closure or completed P6 claim.',
+   'references':entries,'source_bindings':bindings,'prepared_files':len(actual),'prepared_byte_equality':True,'archives':archives,
+   'prism':{'provider':'anthropic','model':'claude-sonnet-5-5','report_sha256':sha(O/'prism.json'),'inputs_sha256':sha(O/'prism-inputs.json'),'process_sha256':sha(O/'prism-process.json'),
+    'coverage':prism['coverage'],'original_findings':1,'resolved_findings':1,'unresolved_material_findings':0,'post_review_delta':delta,'correction_review_sha256':sha(Path(refs['prism-correction-independent-review']))},
+   'discarded_nil_render_pass':{'result':'NO_SOURCE_CHANGE_WARRANTED','evidence':'drawAllMeasured rp==nil guard returns before bind/end; timing.Submitted remains false. Physical fault recovery not certified.', 'source_sha256':sha(B/'upstream/gpu/gpudraw/system.go')},
+   'limits':['Stock upstream vet fails with identical baseline composites/unreachable diagnostics; other analyzers pass with those two disabled.','Native grid unprofiled exploratory p95/p99 20.30/22.77ms fails unchanged4/6ms targets; no five-run/P6 acceptance.','Old native/profile records include setup/ready process observers and remain historical. Final runner uses end-only ps.','Human IME/VoiceOver/externalAX, physical input, tree latency, process/native/GPU memory, endurance and release remain open.'],
+   'producer_sha256':sha(Path(__file__))}
+(O/'audit.json').write_text(json.dumps(v,indent=2)+'\n')
+(O/'audit-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+print(v['result'],sha(O/'audit.json'),len(bindings),len(actual),flush=True)

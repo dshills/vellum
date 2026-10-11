@@ -1,0 +1,38 @@
+{
+  "result": "FIXED_AND_INDEPENDENTLY_APPROVED",
+  "finding_id": "f73fb71427938d97",
+  "disposition": "Valid: inline ready-stage external ps overlaps initial measurement; delayed setup-stage parsing can also overlap. All external process sampling now occurs only after completed end record.",
+  "source_changes": [
+    "examples/loadedgrid/README.md",
+    "scripts/benchmark-grid.py",
+    "scripts/benchmark-grid_test.py",
+    "specs/grid-performance.md"
+  ],
+  "qualification": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/qualified-v4/qualification.json",
+    "sha256": "dc43296bfac2f9c629424514d2986c2f701b0d68d2051c8ffdd46be7b6fea9e5"
+  },
+  "owned_sources": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/qualified-v4/ownership.json",
+    "sha256": "0ce76abd77ebbef7fa404e681b1eb4322a475a4974c7400e05d01072f603aa1d"
+  },
+  "delta": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/observer-correction-v4.diff",
+    "sha256": "623bd08fb329c78b4803260a621afb942892a053862b476c5b75e45e9bdb84a1"
+  },
+  "independent_review": {
+    "path": "/private/tmp/vellum-grid-performance-review/observer-followup/final-v4/review.json",
+    "sha256": "7e4a4c97ceed7b8b0a262b21fdca8583911fb9c9b8fbe52a72e95559bff9533d"
+  },
+  "original_prism_archive": {
+    "path": "/private/tmp/vellum-grid-performance-review/observer-followup/history-prism/manifest.json",
+    "sha256": "0e499df636f9a41b219c72106ccd580f2753dcb48e26d29f4b8d4fa9b9f4dfe1"
+  },
+  "tests": {
+    "historical_script_with_final_regression": "EXPECTED_RED_EXIT1_3_OBSERVER_CALLS",
+    "current_protocol": "PASS_14_TESTS",
+    "original_setup_regressions": "PASS_2_TESTS",
+    "Go_source_and_build": "UNCHANGED_EXACT_INHERITANCE"
+  },
+  "limits": "No runtime/Go code changes, GUI, new performance run or broad Prism rerun. Earlier baseline/profile records preserve setup/ready/end ps and profiling scope as historical observations; warm/baseline process RSS and CPU deltas remain unavailable. No P6 timing or optimization acceptance inferred."
+}

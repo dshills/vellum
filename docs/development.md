@@ -106,6 +106,19 @@ sequentially for the bounded Cocoa workflow. See the
 [loaded-data report](reports/macos-grid-loaded/README.md) for qualification scope
 and the remaining sustained performance and large-tree gates.
 
+`examples/loadedtree` uses `ui.DataTree` and a worker-built `virtual.Outline` with
+100,000 actual stored nodes. Load, expansion and ancestor filtering run on bounded
+workers; owner navigation and admission use accepted indexes. Run its offscreen
+tests for deterministic routing or `go run -race . -nodes 100000 -smoke` for the
+bounded Cocoa owner workflow. This does not qualify tree frame latency or human
+screen-reader workflows.
+
+`examples/loadedgrid -perf` and `scripts/benchmark-grid.py` opt into one-window
+native work tracing for a 400-cell stored table. See the
+[measurement contract](../specs/grid-performance.md) for exact work boundaries,
+raw records, paired 10k/million geometry and the unchanged 4 ms/6 ms warm targets.
+Performance runs use optimized builds, separately from race-instrumented checks.
+
 ## Standalone applications and benchmarks
 
 `examples/hello` is a separately versioned consumer module. To create a consumer

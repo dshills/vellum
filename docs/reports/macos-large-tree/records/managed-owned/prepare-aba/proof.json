@@ -1,0 +1,38 @@
+{
+  "scope": "Exact canceled failed-Prepare worker delivery must not retire a newer pending request; scratch-only portable consumer regression, no GUI/performance claim.",
+  "old_model_sha256": "e542d22453e70d4d4b346651d306a2fc03c0a7fe6e0f8b90b0e939b0a4e8e9da",
+  "red": {
+    "command": [
+      "go",
+      "test",
+      "-overlay",
+      "/private/tmp/vellum-large-tree-owned/prepare-aba/overlay.json",
+      "-race",
+      "-count=1",
+      "-v",
+      "-run",
+      "TestFailedPreparationCannotRetire",
+      "./..."
+    ],
+    "exit_code": 1,
+    "log_sha256": "1bd1c0cabbb9e0c8db89c9bfef545a722d184a33b2919f86557ea1027cd3b2f3",
+    "overlay_sha256": "6dcaf61481ee4d965bdf01677add8b9ed4b27acd14d1feff0131b48ccd5386b4",
+    "test_input_sha256": "193f89a1f18806c538d6558c471d04aef8265706932da15a5ec35d292d86bb46"
+  },
+  "green": {
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=20",
+      "-v",
+      "-run",
+      "TestFailedPreparationCannotRetire",
+      "./..."
+    ],
+    "exit_code": 0,
+    "log_sha256": "03b360e1a5f0e9cade7e57fdf7ff5cb4813574fcadd88d1d51e390ef02014fa3",
+    "model_sha256": "bc0b8d1e64874bf7021999df18155ef98ed7a83023e1a71e068157e612f6b186",
+    "test_sha256": "980d8a01fa3412cfccc494cef3a9919e58ad665fb77aced4671f6fd6e5abe923"
+  }
+}

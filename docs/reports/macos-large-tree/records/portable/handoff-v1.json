@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "result": "IMPLEMENTED_AND_CPU_QUALIFIED_PENDING_INDEPENDENT_REVIEW",
+  "candidate_root": "/private/tmp/vellum-large-data",
+  "owned_files": {
+    "virtual/tree_data.go": {
+      "sha256": "9a75823100995d03444b10010cae048ee54ccb2ea291c3a6f1d6abbc9b5068e2",
+      "bytes": 7590,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v1/virtual/tree_data.go.txt"
+    },
+    "virtual/tree_index.go": {
+      "sha256": "29e31ecce6c85e72746ba46e5bc8c19855e59343d2f98e9e3dccb3febd49aee6",
+      "bytes": 8836,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v1/virtual/tree_index.go.txt"
+    },
+    "virtual/tree_outline.go": {
+      "sha256": "8eb51b29a0d32b258c572307ab784c0bd2461d8e13bb98b42b479230a8ec33c1",
+      "bytes": 13828,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v1/virtual/tree_outline.go.txt"
+    },
+    "virtual/tree_data_test.go": {
+      "sha256": "439f7697fa6298e2d5daedfa1c0ae45c64b0070aa5819db4094d6622a6d6b587",
+      "bytes": 12834,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v1/virtual/tree_data_test.go.txt"
+    },
+    "virtual/tree_outline_test.go": {
+      "sha256": "cef359e85b0300742ea1f2c50a1774094b19d4ea7cc2541a46144483f8e5ac0d",
+      "bytes": 15872,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v1/virtual/tree_outline_test.go.txt"
+    },
+    "specs/tree.md": {
+      "sha256": "ffe7f68a8ca842dce68b3dc1b6f657a89a98fd134e85f7a74d8dd9e33014aa53",
+      "bytes": 9304,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v1/specs/tree.md.txt"
+    }
+  },
+  "ownership": "Only virtual/tree_data.go, tree_index.go, tree_outline.go, their two new tests, and specs/tree.md; legacy virtual/tree.go unchanged. No native/ui/app/example edits.",
+  "qualification": {
+    "path": "/private/tmp/vellum-outline-portable/qualified-v1/qualification.json",
+    "sha256": "442fd16ca18d3ac801e3611f92a55a20aca15e44c6a0524f02c9fb12c922d5ab"
+  },
+  "checks": [
+    {
+      "name": "toolchain",
+      "command": "go version\ngo env GOCACHE GOMODCACHE GOWORK",
+      "cwd": "/private/tmp/vellum-large-data",
+      "log": "/private/tmp/vellum-outline-portable/qualified-v1/toolchain.log",
+      "timeout_seconds": 180,
+      "exit_code": 0,
+      "elapsed_seconds": 0.021270916011417285,
+      "log_sha256": "393a1758d97ea7c7e772edfc49bad457f9cbefa16b1abbb022ee1fb7bfcdaa8d"
+    },
+    {
+      "name": "portable-tree-race20",
+      "command": "go test -race ./virtual -run 'TestTree|TestOutline' -count=20",
+      "cwd": "/private/tmp/vellum-large-data",
+      "log": "/private/tmp/vellum-outline-portable/qualified-v1/portable-tree-race20.log",
+      "timeout_seconds": 180,
+      "exit_code": 0,
+      "elapsed_seconds": 25.88914862499223,
+      "log_sha256": "8a0175bd2212c91e1783d77754e0326d713edc3e888f117e42d10ca1b46485af"
+    },
+    {
+      "name": "whole-virtual-race1",
+      "command": "go test -race ./virtual -count=1",
+      "cwd": "/private/tmp/vellum-large-data",
+      "log": "/private/tmp/vellum-outline-portable/qualified-v1/whole-virtual-race1.log",
+      "timeout_seconds": 180,
+      "exit_code": 0,
+      "elapsed_seconds": 3.631909459014423,
+      "log_sha256": "f20008eda1ddecf71f5b6fa132da0f4e0550dcf867af4c9455748dbe71e6788c"
+    },
+    {
+      "name": "whole-virtual-vet",
+      "command": "go vet ./virtual",
+      "cwd": "/private/tmp/vellum-large-data",
+      "log": "/private/tmp/vellum-outline-portable/qualified-v1/whole-virtual-vet.log",
+      "timeout_seconds": 180,
+      "exit_code": 0,
+      "elapsed_seconds": 0.1917096659890376,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "input_map_count": 35,
+  "limits": [
+    "100000-node wide branch and deep chain tested at bounded Step quanta 1/7/4096",
+    "Portable immutable worker/index model and owner admission only",
+    "No native window, external AX, physical, performance, or full P6 acceptance",
+    "Logical array/payload/work budgets exclude allocator/map overhead, borrowed prior indexes/data and caller retained jobs/results; not process heap bound",
+    "32-bit extent guard is present; darwin/arm64 qualification does not execute the conditional 32-bit regression"
+  ],
+  "scope": "Successful CPU qualification is producer evidence, not independent source approval. Parent performs independent review before Prism/commit."
+}

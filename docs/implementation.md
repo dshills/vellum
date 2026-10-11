@@ -201,5 +201,31 @@ stored records, separate domain/view revisions and cancellable tasks.
 Its Apply action uses ordinary text-field settlement to read the final controlled
 filter value after all preceding admitted input. Repeated unchanged settlement
 does not emit duplicate changes before redraw.
-Native sustained performance, large-tree completion and broader Mac acceptance
-remain subsequent P6 work.
+Native sustained performance and broader Mac acceptance remain subsequent P6 work.
+
+## Indexed tree and native timing foundation
+
+`virtual.TreeData`, `TreeIndex` and `Outline` add sealed stored-tree data and
+worker-built expansion/filter indexes. The owner navigates a bounded viewport
+and admits request-bound results while keeping the last accepted view usable.
+`ui.DataTree` adds managed native rows, clipped completed-frame geometry,
+keyboard/pointer navigation and visible-row accessibility. The independent
+`examples/loadedtree` consumer holds separate 10k and 100k stored domains.
+Portable and native race checks pass, including actual offscreen input at
+owner batches 1/7/64. A Cocoa race binary passes the bounded owner-command and
+geometry workflow. See the [tree contract](../specs/tree.md),
+[native contract](../specs/tree-native.md) and
+[large-tree evidence](reports/macos-large-tree/README.md). Human accessibility,
+500-visible-row latency and sustained retention remain acceptance work.
+
+Opt-in native frame tracing records each initialized grid scroll through its
+owner transition, reconciliation and completed native composition. The same
+ticket includes intermediate post-input frame work; queue and surface waits
+are reported separately. The elapsed work total includes GC and excludes
+actual backend acquisition/present calls. It does not measure physical display
+latency. The stored-grid release runner enforces at least 400 clipped cells,
+paired 10k/million-row geometry and five runs per case for budget qualification.
+The first single-process exploratory probe fails the unchanged 4ms p95/6ms p99
+targets at 20.30ms/22.77ms. See the [timing contract](../specs/grid-performance.md)
+and [timing evidence](reports/macos-grid-performance/README.md). P6 remains open;
+trace-guided reconciliation and raster optimization is the next phase.

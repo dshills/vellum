@@ -1,0 +1,31 @@
+from pathlib import Path
+import importlib.util,json,hashlib,time
+root=Path('/private/tmp/vellum-large-data'); out=Path(__file__).parent
+spec=importlib.util.spec_from_file_location('benchmark_grid',root/'scripts/benchmark-grid.py')
+benchmark=importlib.util.module_from_spec(spec);spec.loader.exec_module(benchmark)
+binary=out/'loadedgrid-perf'
+record={'schema':'vellum-grid-performance-exploratory-v1','scope':'one release fixed10k native process; no five-run/P6 acceptance','binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest()}
+try:
+ samples,result=benchmark.run_case(binary,out/'run',10000,False,120,128,False,180)
+ record['result']='OBSERVED'
+ record['geometry_first']=samples[0]['geometry'];record['geometry_last']=samples[-1]['geometry']
+ record['timings_ns']=benchmark.summarize([samples])
+ record['native_result']=result
+except BaseException as error:
+ record['result']='FAILED';record['error']=f'{type(error).__name__}: {error}'
+ raise
+finally:
+ before=json.loads((out/'before.json').read_text()); selected={p:hashlib.sha256((root/p).read_bytes()).hexdigest() if (root/p).is_file() else None for p in before['selected']}
+ prepared={}
+ for directory in before['prepared']:
+  base=root/directory
+  files={str(p.relative_to(base)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(base.rglob('*')) if p.is_file() and '.git' not in p.relative_to(base).parts}
+  encoded=json.dumps(files,sort_keys=True,separators=(',',':')).encode(); prepared[directory]={'files':len(files),'map_sha256':hashlib.sha256(encoded).hexdigest()}
+  (out/(base.name+'-after-map.json')).write_bytes(encoded+b'\n')
+ record['selected_after']=selected;record['prepared_after']=prepared
+ record['changed_selected']=[p for p in before['selected'] if before['selected'][p]!=selected[p]]
+ record['changed_prepared']=[p for p in before['prepared'] if before['prepared'][p]!=prepared[p]]
+ record['binary_after_sha256']=hashlib.sha256(binary.read_bytes()).hexdigest()
+ record['raw_log_sha256']=hashlib.sha256((out/'run/native.log').read_bytes()).hexdigest() if (out/'run/native.log').exists() else None
+ (out/'exploratory.json').write_text(json.dumps(record,indent=2)+'\n')
+ print(json.dumps({k:record.get(k) for k in ['result','error','binary_sha256','changed_selected','changed_prepared','geometry_first']},indent=2))

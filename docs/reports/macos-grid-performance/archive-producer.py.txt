@@ -1,0 +1,54 @@
+from pathlib import Path
+import hashlib, json, sys
+R=Path('/private/tmp/vellum-large-data')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+inert={'.go','.py','.sh','.m','.h'}
+binary_magic={b'\xcf\xfa\xed\xfe',b'\xfe\xed\xfa\xcf',b'\xca\xfe\xba\xbe',b'\x7fELF'}
+groups={
+ 'macos-large-tree':{
+  'portable':Path('/private/tmp/vellum-outline-portable'),
+  'managed-owned':Path('/private/tmp/vellum-large-tree-owned'),
+  'managed-qualification':Path('/private/tmp/vellum-large-tree-qualification'),
+  'native-review':Path('/private/tmp/vellum-outline-native-review'),
+  'consumer-review':Path('/private/tmp/vellum-large-tree-consumer-independent-review'),
+ },
+ 'macos-grid-performance':{
+  'pinned-stage34':Path('/private/tmp/vellum-large-data-pin34'),
+  'root-qualification':Path('/private/tmp/vellum-large-data-qualification'),
+  'metrics-review':Path('/private/tmp/vellum-grid-frame-metrics-review'),
+  'exploratory-baseline':Path('/private/tmp/vellum-grid-perf-exploratory-native-1'),
+  'tooling-qualification':Path('/private/tmp/vellum-grid-performance-qualification'),
+  'tooling-review':Path('/private/tmp/vellum-grid-performance-review'),
+  'exploratory-profile':Path('/private/tmp/vellum-grid-perf-profile-native-1'),
+ }
+}
+for label,roots in groups.items():
+ O=R/'docs/reports'/label; saved={}; excluded={}
+ for name,root in roots.items():
+  assert root.is_dir(),root
+  for p in sorted(root.rglob('*')):
+   if not p.is_file():continue
+   rel=p.relative_to(root)
+   if root.name=='vellum-large-tree-qualification' and rel.parts[0]=='handoff-v3' and rel.name not in {'manifest.json','producer.py.txt'}:
+    excluded[str(p)]={'reason':'Compact handoff duplicate; original evidence is archived by its scratch provenance path'};continue
+   if p.suffix=='.pyc' or '__pycache__' in rel.parts:
+    excluded[str(p)]={'reason':'Python generated cache'};continue
+   with p.open('rb') as f: magic=f.read(4)
+   if magic in binary_magic or p.suffix in {'.dylib','.so'}:
+    excluded[str(p)]={'reason':'Executable/native library omitted; identity preserved','sha256':sha(p),'bytes':p.stat().st_size};continue
+   dest=O/'records'/name/rel
+   if p.suffix in inert: dest=dest.with_name(dest.name+'.txt')
+   dest.parent.mkdir(parents=True,exist_ok=True)
+   expected=sha(p)
+   if dest.exists(): assert sha(dest)==expected,('archive collision',dest)
+   else: dest.write_bytes(p.read_bytes())
+   assert sha(dest)==expected
+   saved[str(dest.relative_to(O))]={'original_path':str(p),'sha256':expected,'bytes':p.stat().st_size}
+ for dest in sorted((O/'records').rglob('*')):
+  if dest.is_file() and str(dest.relative_to(O)) not in saved:
+   dest.unlink()  # Only this producer's surplus copies of preserved scratch evidence.
+ v={'schema':1,'scope':'Byte-preserving scratch evidence archive; source scripts/files made inert with .txt. Original absolute paths remain provenance and are mapped here. Historical records retain their original limitations; a PASS is local to each declared gate.',
+    'files':saved,'excluded':excluded,'producer_sha256':sha(Path(__file__))}
+ (O/'archive.json').write_text(json.dumps(v,indent=2)+'\n')
+ (O/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+ print(label,len(saved),sum(p['bytes'] for p in saved.values()),sha(O/'archive.json'),flush=True)

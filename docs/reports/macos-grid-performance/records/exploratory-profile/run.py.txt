@@ -1,0 +1,26 @@
+import hashlib,importlib.util,json,pathlib,sys,time
+sys.dont_write_bytecode=True
+R=pathlib.Path('/private/tmp/vellum-large-data');O=pathlib.Path(__file__).parent;h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+sys.path.insert(0,str(R/'scripts'));sp=importlib.util.spec_from_file_location('benchmark_grid',R/'scripts/benchmark-grid.py');b=importlib.util.module_from_spec(sp);sp.loader.exec_module(b)
+q=pathlib.Path('/private/tmp/vellum-grid-performance-qualification/qualified-v2');p=json.loads((q/'qualification.json').read_text());baseline=json.loads((q/'inputs-after.json').read_text());binary=pathlib.Path(p['binary']['path']);profile=O/'scroll.pprof'
+def inputs():
+ selected={x:h(R/x) for x in baseline['selected']};prepared={}
+ for n in ['upstream','typesetting']:
+  base=R/'drivers/cogent/build'/n;mp={str(x.relative_to(base)):h(x) for x in sorted(base.rglob('*')) if x.is_file() and '.git' not in x.parts};data=json.dumps(mp,sort_keys=True,separators=(',',':')).encode();prepared[n]={'count':len(mp),'canonical_sha256':hashlib.sha256(data).hexdigest()}
+ return {'selected':selected,'prepared':prepared,'binary_sha256':h(binary),'producer_sha256':h(pathlib.Path(__file__))}
+before=inputs();(O/'before.json').write_text(json.dumps(before,indent=2)+'\n');assert before['binary_sha256']==p['binary']['sha256'];assert before['prepared']==p['prepared']
+assert [x for x,s in baseline['selected'].items() if before['selected'][x]!=s]==['examples/loadedgrid/README.md']
+record={'scope':'ONE separate optimized Cocoa fixed10k warm CPU-profile process; diagnostic process-wide Go CPU samples and elapsed phases only, not five-run budget/native allocation/threadCPU/GPU presentation/full P6 acceptance.','case':{'rows':10000,'variable':False,'samples':120,'warmup':128,'profiled':True},'producer':{'path':str(pathlib.Path(__file__)),'sha256':before['producer_sha256']},'binary':{'path':str(binary),'sha256':before['binary_sha256']},'before':{'path':'before.json','sha256':h(O/'before.json')},'source_scope':'278 selected inputs plus complete enumerated5840+288 prepared byte fingerprints; compiler/system SDK/module-cache closure not claimed.'}
+started=time.monotonic();error=None
+try:
+ samples,outcome=b.run_case(binary,O/'run',10000,False,120,128,False,90,cpu_profile=profile)
+ record['run']=outcome;record['timings_ns']=b.summarize([samples]);record['rendered_cells']=sorted(set(s['geometry']['cells'] for s in samples));record['rows']=sorted(set(s['geometry']['rows'] for s in samples));record['columns']=sorted(set(s['geometry']['columns'] for s in samples));record['scale']=sorted(set(s['geometry']['scale'] for s in samples));record['profile']={'path':str(profile),'sha256':h(profile),'bytes':profile.stat().st_size};assert record['profile']['bytes']>0 and record['profile']['bytes']<=64<<20
+ record['result']='DIAGNOSTIC_COMPLETED'
+except BaseException as e:
+ error=repr(e);record['result']='DIAGNOSTIC_FAILED';record['error']=error
+finally:
+ after=inputs();(O/'after.json').write_text(json.dumps(after,indent=2)+'\n');record['after']={'path':'after.json','sha256':h(O/'after.json')};record['unchanged']=before==after;record['elapsed_seconds']=time.monotonic()-started
+ if before!=after:record['result']='INPUT_DRIFT'
+ path=O/'diagnostic.json';path.write_text(json.dumps(record,indent=2)+'\n');print(path,h(path),record['result'],flush=True)
+ if not error and before==after:print(json.dumps({'ui_work_ns':record['timings_ns']['ui_work_ns'],'profile':record['profile'],'cells':record['rendered_cells']}),flush=True)
+if error or before!=after:sys.exit(1)

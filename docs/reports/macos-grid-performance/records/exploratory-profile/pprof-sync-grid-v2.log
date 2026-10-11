@@ -1,0 +1,102 @@
+Total: 5.83s
+ROUTINE ======================== github.com/dshills/vellum/drivers/cogent.syncGrid in /private/tmp/vellum-large-data/drivers/cogent/grid.go
+         0      120ms (flat, cum)  2.06% of Total
+         .          .    572:func syncGrid(r *record) error {
+         .          .    573:	g := r.control.grid
+         .          .    574:	if g == nil || !g.live() {
+         .          .    575:		return ErrGridClosed
+         .          .    576:	}
+         .          .    577:	if err := validateNativeGrid(r.node); err != nil {
+         .          .    578:		return err
+         .          .    579:	}
+         .       10ms    580:	snap, err := g.model.Snapshot()
+         .          .    581:	if err != nil {
+         .          .    582:		return err
+         .          .    583:	}
+         .          .    584:	if err := validateGridProjection(snap); err != nil {
+         .          .    585:		return err
+         .          .    586:	}
+         .          .    587:	if g.projection.State.Generation != snap.State.Generation {
+         .          .    588:		gridRegistry.Lock()
+         .          .    589:		if gridRegistry.next == math.MaxUint64 {
+         .          .    590:			gridRegistry.Unlock()
+         .          .    591:			return ErrGridBinding
+         .          .    592:		}
+         .          .    593:		gridRegistry.next++
+         .          .    594:		g.epoch = gridRegistry.next
+         .          .    595:		gridRegistry.Unlock()
+         .          .    596:	}
+         .          .    597:	g.projection = snap
+         .          .    598:	// Retired slots must release shaped text as well as strings. Destroy surplus
+         .          .    599:	// widgets rather than retaining private Core text caches for old projections.
+         .          .    600:	if len(g.cells) > len(snap.Cells) {
+         .          .    601:		for _, w := range g.cells[len(snap.Cells):] {
+         .          .    602:			w.Delete()
+         .          .    603:		}
+         .          .    604:		clear(g.cells[len(snap.Cells):])
+         .          .    605:		g.cells = g.cells[:len(snap.Cells)]
+         .          .    606:	}
+         .          .    607:	if len(g.headers) > len(snap.Headers) {
+         .          .    608:		for _, w := range g.headers[len(snap.Headers):] {
+         .          .    609:			w.Delete()
+         .          .    610:		}
+         .          .    611:		clear(g.headers[len(snap.Headers):])
+         .          .    612:		g.headers = g.headers[:len(snap.Headers)]
+         .          .    613:	}
+         .          .    614:	for len(g.cells) < len(snap.Cells) {
+         .          .    615:		w := core.NewText(g.panes[2])
+         .          .    616:		g.installTextStyle(w)
+         .          .    617:		g.cells = append(g.cells, w)
+         .          .    618:	}
+         .          .    619:	for len(g.headers) < len(snap.Headers) {
+         .          .    620:		w := core.NewText(g.panes[0])
+         .          .    621:		g.installTextStyle(w)
+         .          .    622:		g.headers = append(g.headers, w)
+         .          .    623:	}
+         .          .    624:	for i, w := range g.cells {
+         .          .    625:		if i >= len(snap.Cells) {
+         .          .    626:			w.SetState(true, states.Invisible)
+         .          .    627:			continue
+         .          .    628:		}
+         .          .    629:		c := snap.Cells[i]
+         .          .    630:		pane := 2
+         .          .    631:		if !c.Frozen {
+         .          .    632:			pane = 3
+         .          .    633:		}
+         .          .    634:		selected := c.Active
+         .          .    635:		if snap.State.Config.RowSelection {
+         .          .    636:			selected = c.Selected
+         .          .    637:		}
+         .       30ms    638:		g.place(w, g.panes[pane], c.Rect, c.Clip, html.EscapeString(c.Text), selected, c.Active && snap.State.Config.RowSelection)
+         .          .    639:	}
+         .          .    640:	for i, w := range g.headers {
+         .          .    641:		if i >= len(snap.Headers) {
+         .          .    642:			w.SetState(true, states.Invisible)
+         .          .    643:			continue
+         .          .    644:		}
+         .          .    645:		h := snap.Headers[i]
+         .          .    646:		pane := 0
+         .          .    647:		if !h.Frozen {
+         .          .    648:			pane = 1
+         .          .    649:		}
+         .          .    650:		g.place(w, g.panes[pane], h.Rect, h.Clip, html.EscapeString(h.Title), false, false)
+         .          .    651:	}
+         .          .    652:	sx := gridMaxX(snap.State)
+         .          .    653:	sy := gridMaxY(snap.State)
+         .          .    654:	g.horizontal.SetValue(0)
+         .          .    655:	if sx > 0 {
+         .          .    656:		g.horizontal.SetValue(float32(float64(snap.State.Viewport.ScrollX) / float64(sx)))
+         .          .    657:	}
+         .          .    658:	g.vertical.SetValue(0)
+         .          .    659:	if sy > 0 {
+         .          .    660:		g.vertical.SetValue(float32(float64(snap.State.Viewport.ScrollY) / float64(sy)))
+         .          .    661:	}
+         .          .    662:	if err := syncGridEditing(g); err != nil {
+         .          .    663:		return err
+         .          .    664:	}
+         .       80ms    665:	g.host.Update()
+         .          .    666:	return nil
+         .          .    667:}
+         .          .    668:func (g *gridBinding) installTextStyle(w *core.Text) {
+         .          .    669:	w.Styler(func(s *styles.Style) {
+         .          .    670:		s.Padding.Zero()

@@ -7,6 +7,9 @@
 - [Worker-built grid views](grid-projection.md): bounded immutable sort/filter indexes, cancellation and latest-result owner admission.
 - [Versioned grid cell drafts](grid-editing.md): recoverable bounded drafts, per-cell conflict detection and atomic immutable-source completion.
 - [Managed grid adapter](grid-native.md): bounded native cells, measured geometry, routed input and viewport accessibility.
+- [Indexed trees](tree.md): sealed worker-built indexes and bounded Outline navigation.
+- [Managed tree adapter](tree-native.md): bounded native rows, measured geometry, routed input and visible-row accessibility.
+- [Stored-table timing](grid-performance.md): actual native scroll recording and unchanged warm performance targets.
 - [Keyed reconciliation](keyed-reconciliation.md): retained native identity.
 - [Layout and themes](layout-theme.md): portable style values and local themes.
 - [Standard controls](controls.md): interaction, focus and semantic metadata.

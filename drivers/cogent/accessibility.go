@@ -266,6 +266,11 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		switch n.Kind {
+		case ui.DataTree:
+			x.Role = "outline"
+			if r.control != nil && r.control.outline != nil {
+				x.RowCount = r.control.outline.projection.State.VisibleRows
+			}
 		case ui.DataGrid:
 			x.Role = "table"
 			if r.control != nil && r.control.grid != nil {
@@ -354,6 +359,13 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					return true
 				}
 				return applyAccessibilityAction(r, action)
+			}
+		}
+		if n.Kind == ui.DataTree && r.control != nil && r.control.outline != nil {
+			extra, actions := treeAccessibility(r, x.ID, b, disabled)
+			nodes = append(nodes, extra...)
+			for id, action := range actions {
+				handlers[id] = action
 			}
 		}
 		if n.Kind == ui.DataGrid && r.control != nil && r.control.grid != nil {
@@ -761,6 +773,7 @@ func accessibilityBounds(root *record) map[string][4]float32 {
 		}
 		extensionAccessibilityBounds(r, out, bounds)
 		gridAccessibilityBounds(r, out)
+		treeAccessibilityBounds(r, out)
 		if edit := gridEditingRecord(r); edit != nil {
 			visit(edit)
 		}

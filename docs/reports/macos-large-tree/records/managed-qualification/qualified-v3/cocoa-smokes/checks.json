@@ -1,0 +1,29 @@
+[
+  {
+    "name": "stored-100k",
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec /private/tmp/vellum-large-tree-qualification/qualified-v3/loadedtree-desktop -nodes 100000 -smoke"
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedtree",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 4.175,
+    "log": "/private/tmp/vellum-large-tree-qualification/qualified-v3/cocoa-smokes/stored-100k.log",
+    "log_sha256": "a94bfc901a2b2ae2780e8c208d10bbc8f049fe969d38b7cf2ae56f28daa79e82",
+    "stages": [
+      "empty-ready",
+      "stored-loaded",
+      "deep-chain-visible",
+      "hidden-selection-retained",
+      "filter-reveals-ancestors",
+      "settled-filter-empty",
+      "canceled-worker-dual-terminal",
+      "survivor-independent",
+      "pass"
+    ],
+    "qualified": true
+  }
+]

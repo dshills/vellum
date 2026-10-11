@@ -37,6 +37,9 @@ type Driver struct {
 	Theme    ui.Theme
 	// ContinuousRendering opts into refresh-rate paint ticks; default uses invalidation.
 	ContinuousRendering bool
+	// FrameMetrics opts into bounded diagnostic samples for explicitly tagged
+	// routed grid input; ordinary frames do not pay for timing calls.
+	FrameMetrics *FrameMetrics
 }
 type record struct {
 	widget   core.Widget
@@ -58,11 +61,15 @@ type nativeWindow struct {
 	stopLoss         func()
 	lossMu           sync.Mutex
 	input            atomic.Pointer[textWindow]
+	metrics          *frameWindowMetrics
 	source           atomic.Pointer[events.Source]
 	pending, closing atomic.Bool
 }
 
 func (d Driver) Run(ctx context.Context, a *app.Application) error {
+	if d.FrameMetrics != nil && !d.FrameMetrics.valid() {
+		return ErrFrameMetricsConfig
+	}
 	if err := d.Theme.Validate(); err != nil {
 		return err
 	}
@@ -137,6 +144,8 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			if !a.TakeDirty(w.window.ID) {
 				return
 			}
+			metricTag, metricStart := w.metrics.reconcileStart()
+			defer w.metrics.reconcileEnd(metricTag, metricStart)
 			n := w.window.View()
 			if err := ui.Validate(n); err != nil {
 				fail(err)
@@ -155,6 +164,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			nativeRefreshServices(w.body)
 			bindControlWake(w.root, func(e events.Event) { custom(w, e) }, d.OnError)
 			bindGridScopes(w.root)
+			bindTreeScopes(w.root)
 			flushDialogs(w.root)
 			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
 				fail(err)
@@ -185,6 +195,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					stopDeviceLoss(w)
 					closeTextWindow(w)
 					closeAccessibility(w)
+					w.metrics.retire()
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
 					// NewBody assigns a Scene parent before adding the body to
@@ -224,6 +235,14 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w := &nativeWindow{window: spec}
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
+				if d.FrameMetrics != nil {
+					var metricErr error
+					w.metrics, metricErr = d.FrameMetrics.bind(a, w)
+					if metricErr != nil {
+						fail(metricErr)
+						return
+					}
+				}
 				nativeMountServices(w.body, services)
 				w.body.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(spec.Width), units.Dp(spec.Height)); s.Grow.Set(1, 1) })
 				w.host = newAccessibilityHost(w)
@@ -318,6 +337,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					defer w.rootMu.Unlock()
 					closeTextWindow(w)
 					closeAccessibility(w)
+					w.metrics.retire()
 					nativeUnmountServices(w.body)
 					disposeControlTree(w.root)
 				}
@@ -350,9 +370,13 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	}
 	custom = func(w *nativeWindow, e events.Event) {
 		w.pending.Store(false)
-		handleTextEvent(w, e)
-		a.Drain()
-		syncTopology()
+		metricTag, metricStart := w.metrics.ownerStart()
+		func() {
+			defer w.metrics.ownerEnd(metricTag, metricStart)
+			handleTextEvent(w, e)
+			a.Drain()
+			syncTopology()
+		}()
 		refresh(w)
 		if ce, ok := e.(*events.CustomEvent); ok && ce.Data == "vellum.wake" {
 			e.SetHandled()

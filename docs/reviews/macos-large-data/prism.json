@@ -1,0 +1,127 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "1ab06f2b2afc84b98976b346e77cd886",
+  "repo": {
+    "root": "/private/tmp/vellum-large-data",
+    "head": "8293b1a39804ace5aa5098ad5e9d5c40b95c7b43",
+    "branch": "codex/large-data"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "f73fb71427938d97",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Spawning `ps` inline during the measured window perturbs the benchmark",
+      "message": "The runner forks and execs `ps` synchronously when it reads the `grid.perf.ready` record. That is the moment the native process starts the measured scroll samples, so the `ps` spawn competes for CPU on the same machine and can inflate the first measured samples, which feed the p95/p99 targets. The 2-second `ps` timeout also stalls the pipe-reading loop. The measurement-integrity claims in the spec do not account for this perturbation.",
+      "suggestion": "Take the `ready` observation before the native process is released to measure, for example through a handshake. Alternatively, sample RSS and CPU only at `setup` and `end`, or from a separate thread that is not active during the measured window. Record the sampling cost if it stays inline.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "scripts/benchmark-grid.py",
+          "lines": {
+            "start": 175,
+            "end": 175
+          }
+        }
+      ],
+      "tags": [
+        "measurement",
+        "benchmark",
+        "perturbation",
+        "location-corrected"
+      ],
+      "evidence": "try: observation = process_sample(process.pid)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 206250,
+    "totalMs": 40835
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 65,
+    "bytes": 395140,
+    "chunks": 8,
+    "llmCalls": 8,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 209197,
+        "output": 25467,
+        "costUSD": 0.673064
+      }
+    ],
+    "widenedFiles": 11,
+    "excluded": [
+      {
+        "path": "examples/loadedtree/go.sum",
+        "reason": "lockfile"
+      }
+    ],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "4a57746e275aca0e",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Nil render pass used when surface texture is unavailable in measured path",
+        "message": "BeginRenderPassMeasured returns (nil, acquire, nil) when no surface texture is available. This happens when GetCurrentTextureMeasured yields a nil view without an error, for example when surface acquisition is skipped. drawAllMeasured only checks err, so it goes on to use a nil RenderPassEncoder (rp.End() and the pipeline binds) and will panic. The panic is caught by the new unwind handlers in the trace, but it is still a crash on a diagnostic-only path, and it can leave the surface lock state inconsistent.",
+        "suggestion": "Return an explicit error from BeginRenderPassMeasured when view == nil \u0026\u0026 err == nil, for example errors.New(\"no surface texture available\"). Alternatively, have drawAllMeasured check rp == nil and set timing.Failure before returning.",
+        "confidence": 0.4,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/frametrace/0034-native-frame-work-tracing.patch",
+            "lines": {
+              "start": 1126,
+              "end": 1130
+            }
+          }
+        ],
+        "tags": [
+          "nil-deref",
+          "gpu",
+          "error-handling"
+        ],
+        "evidence": "rp, timing.AcquireNS, err = sy.BeginRenderPassMeasured()",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/frametrace/0034-native-frame-work-tracing.patch"
+    }
+  ],
+  "suppressed": []
+}

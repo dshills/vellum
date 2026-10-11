@@ -1,0 +1,34 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestManagedTreeActualGeometryAndKeyboard
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192
+--- PASS: TestManagedTreeActualGeometryAndKeyboard (12.79s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96 (1.41s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120 (1.12s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144 (1.00s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192 (0.96s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96 (1.17s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120 (1.06s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144 (1.00s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192 (0.95s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144 (0.98s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192 (0.95s)
+=== RUN   TestManualNestedGridTreeSnapshotDetached
+--- PASS: TestManualNestedGridTreeSnapshotDetached (0.30s)
+=== RUN   TestManagedTreeRefusedPayloadDoesNotGrowOrPublish
+--- PASS: TestManagedTreeRefusedPayloadDoesNotGrowOrPublish (0.22s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	14.939s

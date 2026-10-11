@@ -1,0 +1,265 @@
+package virtual
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"strings"
+	"unicode/utf8"
+)
+
+var (
+	ErrTreeInvalid   = errors.New("virtual: invalid outline value")
+	ErrTreeSource    = errors.New("virtual: malformed tree data")
+	ErrTreeCapacity  = errors.New("virtual: tree capacity exceeded")
+	ErrTreeRange     = errors.New("virtual: tree row or key outside range")
+	ErrTreeHidden    = errors.New("virtual: selected tree key is hidden")
+	ErrTreeStale     = errors.New("virtual: stale outline request or reference")
+	ErrTreeBusy      = errors.New("virtual: concurrent tree builder operation")
+	ErrTreeNotReady  = errors.New("virtual: tree index is not complete")
+	ErrTreeExhausted = errors.New("virtual: tree generation exhausted")
+)
+
+const (
+	MaxTreeNodes          = 1_000_000
+	MaxTreeDepth          = 100_000
+	MaxTreeStorageBytes   = 256 << 20
+	MaxTreeWorkOperations = 64_000_000
+	MaxTreeQueryBytes     = 4096
+	MaxTreeNodeTextBytes  = 65536
+	MaxTreeViewRows       = 512
+	MaxTreeStepOperations = 4096
+)
+
+// TreeLimits bounds logical arrays, retained UTF-8 payload and counted work.
+// Zero fields use defaults. Allocator/map overhead, borrowed prior indexes and
+// caller-retained results are excluded; this is not a process heap limit.
+type TreeLimits struct {
+	MaxNodes          int
+	MaxDepth          int
+	MaxVisibleNodes   int
+	MaxStorageBytes   int64
+	MaxWorkOperations uint64
+	MaxQueryBytes     int
+	MaxNodeTextBytes  int
+}
+
+func checkedTreeLimits(l TreeLimits) (TreeLimits, error) {
+	if l.MaxNodes == 0 {
+		l.MaxNodes = MaxTreeNodes
+	}
+	if l.MaxDepth == 0 {
+		l.MaxDepth = MaxTreeDepth
+	}
+	if l.MaxVisibleNodes == 0 {
+		l.MaxVisibleNodes = MaxTreeNodes
+	}
+	if l.MaxStorageBytes == 0 {
+		l.MaxStorageBytes = 64 << 20
+	}
+	if l.MaxWorkOperations == 0 {
+		l.MaxWorkOperations = 16_000_000
+	}
+	if l.MaxQueryBytes == 0 {
+		l.MaxQueryBytes = MaxTreeQueryBytes
+	}
+	if l.MaxNodeTextBytes == 0 {
+		l.MaxNodeTextBytes = MaxTreeNodeTextBytes
+	}
+	if l.MaxNodes < 1 || l.MaxNodes > MaxTreeNodes || l.MaxDepth < 1 || l.MaxDepth > MaxTreeDepth || l.MaxVisibleNodes < 1 || l.MaxVisibleNodes > MaxTreeNodes || l.MaxStorageBytes < 1 || l.MaxStorageBytes > MaxTreeStorageBytes || l.MaxWorkOperations > MaxTreeWorkOperations || l.MaxQueryBytes < 1 || l.MaxQueryBytes > MaxTreeQueryBytes || l.MaxNodeTextBytes < 1 || l.MaxNodeTextBytes > MaxTreeNodeTextBytes {
+		return TreeLimits{}, ErrTreeCapacity
+	}
+	return l, nil
+}
+
+type TreeStamp struct {
+	Identity string
+	Revision uint64
+	Nodes    int
+}
+
+type treeOwnedNode struct {
+	TreeNode
+	parent, first, next, depth int
+}
+
+type TreeDataStats struct {
+	Nodes                  int
+	Depth                  int
+	StorageBytes           int64
+	ConstructionOperations uint64
+}
+
+// TreeData is an immutable, sealed tree. Construct it on a worker with frozen
+// caller input. After return it retains no caller slice/map or string backing.
+// Copies of the struct are invalid; pass its pointer to concurrent readers.
+type TreeData struct {
+	self     *TreeData
+	stamp    TreeStamp
+	limits   TreeLimits
+	nodes    []treeOwnedNode
+	byID     map[string]int
+	first    int
+	preorder []int
+	stats    TreeDataStats
+}
+
+func (d *TreeData) valid() error {
+	if d == nil || d.self != d {
+		return ErrTreeInvalid
+	}
+	return nil
+}
+func (d *TreeData) Stamp() TreeStamp {
+	if d.valid() != nil {
+		return TreeStamp{}
+	}
+	return d.stamp
+}
+func (d *TreeData) Len() int {
+	if d.valid() != nil {
+		return 0
+	}
+	return len(d.nodes)
+}
+func (d *TreeData) Stats() TreeDataStats {
+	if d.valid() != nil {
+		return TreeDataStats{}
+	}
+	return d.stats
+}
+func (d *TreeData) Node(id string) (TreeNode, error) {
+	if err := d.valid(); err != nil {
+		return TreeNode{}, err
+	}
+	i, ok := d.byID[id]
+	if !ok {
+		return TreeNode{}, ErrTreeRange
+	}
+	return d.nodes[i].TreeNode, nil
+}
+
+func validTreeText(s string, max int, empty bool) bool {
+	return (empty || len(s) != 0) && len(s) <= max && utf8.ValidString(s) && !strings.ContainsRune(s, 0)
+}
+
+// NewTreeData performs bounded O(N) worker construction and iterative parent,
+// cycle and depth validation. Sibling/root order follows the supplied slice.
+// Context cancellation is checked before allocation and every counted operation.
+func NewTreeData(ctx context.Context, identity string, revision uint64, nodes []TreeNode, limits TreeLimits) (*TreeData, error) {
+	if ctx == nil {
+		return nil, ErrTreeInvalid
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	l, err := checkedTreeLimits(limits)
+	if err != nil {
+		return nil, err
+	}
+	if !validTreeText(identity, l.MaxQueryBytes, false) || revision == 0 {
+		return nil, ErrTreeSource
+	}
+	if len(nodes) > l.MaxNodes {
+		return nil, ErrTreeCapacity
+	}
+	// Per-node accounting covers owned node/index/preorder references and the
+	// construction stack/last-child slots; map/allocator headers are excluded.
+	storage := int64(len(nodes))*144 + int64(len(identity)) + 32
+	if storage > l.MaxStorageBytes {
+		return nil, ErrTreeCapacity
+	}
+	d := &TreeData{stamp: TreeStamp{strings.Clone(identity), revision, len(nodes)}, limits: l, nodes: make([]treeOwnedNode, len(nodes)), byID: make(map[string]int, len(nodes)), first: -1, preorder: make([]int, 0, len(nodes))}
+	last := make([]int, len(nodes)) // zero denotes no child; stored indexes are one-based
+	var operations uint64
+	work := func() error {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		if operations >= l.MaxWorkOperations {
+			return ErrTreeCapacity
+		}
+		operations++
+		return nil
+	}
+	for i, n := range nodes {
+		if err := work(); err != nil {
+			return nil, err
+		}
+		if !validTreeText(n.ID, l.MaxNodeTextBytes, false) || !validTreeText(n.Parent, l.MaxNodeTextBytes, true) || !validTreeText(n.Label, l.MaxNodeTextBytes, true) {
+			return nil, ErrTreeSource
+		}
+		if _, ok := d.byID[n.ID]; ok {
+			return nil, fmt.Errorf("%w: duplicate ID", ErrTreeSource)
+		}
+		payload := int64(len(n.ID)) + int64(len(n.Parent)) + int64(len(n.Label))
+		if payload > l.MaxStorageBytes-storage {
+			return nil, ErrTreeCapacity
+		}
+		storage += payload
+		owned := TreeNode{strings.Clone(n.ID), strings.Clone(n.Parent), strings.Clone(n.Label)}
+		d.nodes[i] = treeOwnedNode{TreeNode: owned, parent: -1, first: -1, next: -1}
+		d.byID[owned.ID] = i
+	}
+	rootLast := -1
+	for i := range d.nodes {
+		if err := work(); err != nil {
+			return nil, err
+		}
+		n := &d.nodes[i]
+		if n.Parent == "" {
+			if rootLast < 0 {
+				d.first = i
+			} else {
+				d.nodes[rootLast].next = i
+			}
+			rootLast = i
+			continue
+		}
+		parent, ok := d.byID[n.Parent]
+		if !ok {
+			return nil, fmt.Errorf("%w: missing parent", ErrTreeSource)
+		}
+		n.parent = parent
+		if last[parent] == 0 {
+			d.nodes[parent].first = i
+		} else {
+			d.nodes[last[parent]-1].next = i
+		}
+		last[parent] = i + 1
+	}
+	type frame struct{ next, depth int }
+	stack := make([]frame, 1, min(len(nodes)+1, l.MaxDepth+2))
+	stack[0].next = d.first
+	depth := 0
+	for len(stack) > 0 {
+		if err := work(); err != nil {
+			return nil, err
+		}
+		top := &stack[len(stack)-1]
+		if top.next < 0 {
+			stack = stack[:len(stack)-1]
+			continue
+		}
+		i, level := top.next, top.depth
+		top.next = d.nodes[i].next
+		if level > l.MaxDepth {
+			return nil, fmt.Errorf("%w: depth", ErrTreeCapacity)
+		}
+		d.nodes[i].depth = level
+		depth = max(depth, level)
+		d.preorder = append(d.preorder, i)
+		if d.nodes[i].first >= 0 {
+			stack = append(stack, frame{d.nodes[i].first, level + 1})
+		}
+	}
+	if len(d.preorder) != len(nodes) {
+		return nil, fmt.Errorf("%w: parent cycle", ErrTreeSource)
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	d.stats = TreeDataStats{len(nodes), depth, storage, operations}
+	d.self = d
+	return d, nil
+}

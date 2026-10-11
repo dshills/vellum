@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "scope": "Final documentation-only leaf supplement to independent eleven-file performance/profile/protocol source approval; prior review/evidence immutable.",
+  "parent_source_review": {
+    "path": "/private/tmp/vellum-grid-performance-review/final-v2/review.json",
+    "sha256": "2b16241fbc7c701c97e24ff2b4d755b8c1a31a4906dd603aaa75f4d4a23a8272"
+  },
+  "final_ownership": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/final-freeze-v3/ownership.json",
+    "sha256": "4d9bd57036066b6e218f4e485439c86d33bc8790e56a10fefd84cb97c450d88c",
+    "files": {
+      "examples/loadedgrid/perf.go": "66224a5fe0ec25926a57b4ed7ac2ffa307068f8c8eceeed7d9a5d19cb3d5eaa2",
+      "examples/loadedgrid/perf_runtime.go": "eebb07b19802963d60759c408c3282ef8b9bcb955f9f90ea6be917b4b3eef1c1",
+      "examples/loadedgrid/perf_profile.go": "6ff46b8a2284b7c13677c568118cb555e7dedce7837f82fbdf87419468458453",
+      "examples/loadedgrid/perf_test.go": "5cebd36ab18948032ec7768926bad94213f30223b4ad7cef01acd5e7cd7f4f1a",
+      "examples/loadedgrid/perf_profile_test.go": "87d2a766f796b3ce1c042d284ff54bb803bb73a630503273a0b748f06554a36c",
+      "examples/loadedgrid/perf_offscreen_test.go": "80e828d66106257f6318d982158abb4f99525e2e955f9cf48ae912be0ccce295",
+      "examples/loadedgrid/main.go": "2174d1d36f50c4d5436ff7d0457c2da4779669326adb467e843b68120faf2088",
+      "examples/loadedgrid/README.md": "97511d2cac30d160d9d4adfb1b464cebef6ac3214b64ca37be8edf31df84f1e4",
+      "scripts/benchmark-grid.py": "fc3f551e384fbe89ec2e7a4c626586f630d351890aadc4b639a7621238e01e03",
+      "scripts/benchmark-grid_test.py": "215148e4edbb93a9b70030a136f9381f74b036cc0fbf40dd184cbc2ce0c0c118",
+      "specs/grid-performance.md": "201d3a91d80d6037e5f0bfcb1ba87b2c0b25c052ad1779672826ebf90babc656"
+    }
+  },
+  "producer_supplement": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/final-freeze-v3/qualification-supplement.json",
+    "sha256": "875041c37c125beaab51a880999b5f34c00fd6f18afae4fe9945731a810cc4ed"
+  },
+  "delta": {
+    "path": "examples/loadedgrid/README.md",
+    "before_sha256": "015e4687163e806bf30822062f78059c0cce3c9b29dba0d015ff96bfddd52c37",
+    "after_sha256": "97511d2cac30d160d9d4adfb1b464cebef6ac3214b64ca37be8edf31df84f1e4",
+    "exact_change": "One same-frame UI work phases phrase replaced by same-ticket UI work phases.",
+    "reason": "Declared total may accumulate prefix frames for one originating ticket; wording matches authoritative spec.",
+    "inert_snapshot": "/private/tmp/vellum-grid-performance-qualification/final-freeze-v3/README.md.txt"
+  },
+  "mechanical_verification": {
+    "all11_current_hashes_match_final_map": true,
+    "all10_nonREADME_sources_unchanged": true,
+    "current_selected_v2_differences": [
+      "examples/loadedgrid/README.md"
+    ],
+    "unchanged_selected_inputs": 277,
+    "new_tests_needed": false
+  },
+  "findings": [],
+  "limits": "Prior source certificate scope remains unchanged. No native performance/fullP6 qualification, profiler observation or instrumentation-region approval is implied."
+}

@@ -1,0 +1,14 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestManagedTreeRefusedPayloadDoesNotGrowOrPublish
+--- PASS: TestManagedTreeRefusedPayloadDoesNotGrowOrPublish (0.24s)
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total
+--- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation (0.08s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key (0.03s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id (0.03s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total (0.03s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	1.879s

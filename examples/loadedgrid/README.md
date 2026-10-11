@@ -33,3 +33,20 @@ go run -race . -smoke -variable-rows
 ```
 
 It starts empty, loads the stored million records, checks completed current-stamp/frame geometry, runs worker sort/filter/clear, preserves captured selection, saves through the actual originating cell-field settlement and tests an external conflict. Its commands are owner operations, rather than physical desktop typing/pointer automation. Its terminal check closes domain windows; it does not independently measure private decoder cleanup or compositor teardown. Human IME, VoiceOver, broad accessibility, peak memory and end-to-end professional workload performance remain separate acceptance work. Source-bound qualification and preserved exploratory failures are handed to the integration owner for [the durable report](../../docs/reports/macos-grid-loaded/README.md).
+
+The separate release-only performance mode compares actual stored 10k/million
+fixed/variable tables at ≥400 measured visible cells. Its bounded originating
+scroll trace records same-ticket UI work phases, source callbacks, Go allocation
+observations and end-only process RSS. External `ps` runs after the completed
+end record, outside measured native frames; baseline/warm process RSS and process
+CPU deltas are unavailable. The native post-warm Go heap snapshot remains.
+It excludes dataset generation and projection
+building from warm UI work. See [the measurement contract](../../specs/grid-performance.md)
+for the explicit five-run command, boundaries and unchanged P6 targets.
+`-perf-novel` reports newly visited row strings separately from warm scrolling;
+no screenshot/readback duration is presented as UI CPU work.
+
+For an explicitly separate diagnostic, `-perf -rows 10000 -perf-cpu-profile
+/private/tmp/new-grid-profile.pprof` records a bounded process-wide Go CPU profile
+after warm-up. The output file must be new. Profiled samples are labeled and
+rejected by the ordinary warm-budget runner; they are not qualification timings.

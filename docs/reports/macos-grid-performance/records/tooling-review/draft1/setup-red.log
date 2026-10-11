@@ -1,0 +1,25 @@
+FF
+======================================================================
+FAIL: test_launch_failure_records_terminal_failure (__main__.SetupFailureTests.test_launch_failure_records_terminal_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py", line 24, in test_launch_failure_records_terminal_failure
+    self.assertTrue(result.is_file(),'launch failure lost per-run result metadata')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : launch failure lost per-run result metadata
+
+======================================================================
+FAIL: test_selector_setup_failure_retires_child_and_records_failure (__main__.SetupFailureTests.test_selector_setup_failure_retires_child_and_records_failure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py", line 45, in test_selector_setup_failure_retires_child_and_records_failure
+    retire.assert_called_once_with(process)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/mock.py", line 997, in assert_called_once_with
+    raise AssertionError(msg)
+AssertionError: Expected 'terminate_owned_group' to be called once. Called 0 times.
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.003s
+
+FAILED (failures=2)

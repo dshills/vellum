@@ -1,0 +1,12 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+--- FAIL: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation (7.38s)
+    --- FAIL: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key (0.02s)
+        zz_reviewer_tree_payload_test.go:64: native payload key admitted, expected ErrTreeBudget; err=<nil>
+    --- FAIL: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id (0.01s)
+        zz_reviewer_tree_payload_test.go:64: native payload control-id admitted, expected ErrTreeBudget; err=<nil>
+    --- FAIL: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total (7.35s)
+        zz_reviewer_tree_payload_test.go:64: native payload escaped-total admitted, expected ErrTreeBudget; err=<nil>
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	7.917s
+FAIL

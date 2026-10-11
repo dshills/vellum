@@ -20,6 +20,7 @@ type GridInspection struct {
 	Stamp                           virtual.GridStamp
 	Viewport                        virtual.GridViewport
 	Columns                         int
+	RetainedCells, RetainedHeaders  int
 	RowSelection                    bool
 	Selection                       virtual.GridSelectionState
 	Scale                           float32
@@ -98,7 +99,7 @@ func (g *gridBinding) capture() {
 		return
 	}
 	previous := g.measurement.Load()
-	m := &GridInspection{Window: g.window, ID: g.r.node.ID, Incarnation: g.incarnation, Generation: s.Generation, CellIncarnation: g.epoch, Frames: g.frames, Stamp: s.Stamp, Viewport: s.Viewport, Columns: s.Columns, RowSelection: s.Config.RowSelection, Selection: s.Selection, Scale: g.host.Styles.UnitContext.Px(1), Bounds: g.host.Geom.ContentBBox, Cells: make([]GridCellGeometry, len(g.projection.Cells)), Headers: make([]GridHeaderGeometry, len(g.projection.Headers))}
+	m := &GridInspection{Window: g.window, ID: g.r.node.ID, Incarnation: g.incarnation, Generation: s.Generation, CellIncarnation: g.epoch, Frames: g.frames, Stamp: s.Stamp, Viewport: s.Viewport, Columns: s.Columns, RetainedCells: len(g.cells), RetainedHeaders: len(g.headers), RowSelection: s.Config.RowSelection, Selection: s.Selection, Scale: g.host.Styles.UnitContext.Px(1), Bounds: g.host.Geom.ContentBBox, Cells: make([]GridCellGeometry, len(g.projection.Cells)), Headers: make([]GridHeaderGeometry, len(g.projection.Headers))}
 	offset := image.Point{}
 	if g.host.Scene != nil {
 		offset = g.host.Scene.SceneGeom.Pos

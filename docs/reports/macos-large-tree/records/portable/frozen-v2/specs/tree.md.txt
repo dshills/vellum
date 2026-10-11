@@ -1,0 +1,156 @@
+# Immutable large-tree index and Outline
+
+This checkpoint adds `virtual.TreeData`, `TreeIndex`, `TreeIndexBuilder`, and
+`Outline` for large managed trees. The existing `Tree` and `VirtualTree` APIs keep
+their existing behavior. Their synchronous expansion and `VisibleLen` rebuild
+are not the supported owner path for the 100,000-node workload.
+
+## Construction and source identity
+
+`NewTreeData(ctx, identity, revision, nodes, limits)` is worker work. The caller
+keeps the input slice and its strings immutable until it returns. Construction
+copies the slice and every retained string; no caller map, slice, or oversized
+string backing survives successful construction. The resulting pointer is
+immutable and concurrent-readable. Value copies of sealed data, indexes,
+builders, and owner models refuse use.
+
+Identity is a nonempty UTF-8 incarnation key; revision is positive. Every change
+to IDs, labels, parents, or input ordering uses a higher revision in the same
+incarnation. A new incarnation can start at revision one. IDs are unique,
+nonempty UTF-8 keys. Parents name an existing ID or are empty for roots. Labels
+may be empty. Embedded NUL, malformed UTF-8, missing parents, cycles, and excess
+depth refuse the whole construction. Root and sibling order follows input order,
+including when children precede their parent in the input slice.
+
+Construction uses iterative parent linking and preorder validation, with no
+recursive descent. Each node validation, parent link, traversal node, and stack
+pop consumes a checked construction operation. Context cancellation is observed
+before allocation and every counted operation. Allocation and copying are
+bounded worker work; these checks do not preempt the Go allocator or a running
+string operation.
+
+## Worker index execution
+
+Initial indexing uses `NewTreeIndexBuilder(ctx, data, options)` or the worker
+convenience `BuildTreeIndex`. `TreeIndexOptions.ExpandAll` controls initial stored
+expansion. `Filter` is a bounded, case-sensitive UTF-8 substring matched against
+ID or label. A match includes its ancestors. A nonempty filter temporarily opens
+matching paths without changing stored expansion; clearing it restores stored
+collapse state. `OutlineRow.Expanded` reports that stored state.
+
+`Step(maxOperations)` accepts 1 through 4,096 operations. Expansion-state copies,
+stable-key remaps, filter tests, reverse-preorder ancestor propagation, visible
+traversal, phase transitions, and stack pops all consume operations. One step
+never hides a full child-fan-out loop or repeated ancestor climb. A filter test
+can examine one bounded node text value; operation count is not a wall-time
+promise. Work and cancellation are checked before each operation. A failed or
+canceled build publishes no result. `Result` refuses before completion and when
+its context is canceled. Invalid step budgets can be corrected; terminal work,
+visibility, or cancellation failures require a new builder.
+
+Builder constructors allocate checked work arrays on the worker. Builders are
+single-worker objects; concurrent or reentrant `Step`, `Progress`, and `Result`
+calls refuse with `ErrTreeBusy`. Completed `TreeIndex` owns its visible order,
+inverse positions, and expansion state. It retains immutable data and small
+identity tokens, without a prior index or model chain. Its counts are constant
+time. `TreeIndexStats.Operations` counts performed index work;
+`StorageBytes` reports admitted logical peak work/index storage, including
+temporary filter and traversal arrays, even after they are released.
+
+## Owner model and admission
+
+`NewOutline(index, config, viewport)` accepts only a sealed completed index.
+`Outline` belongs to one application owner. `State` and `VisibleLen` read accepted
+counts without traversal. `Snapshot` materializes the accepted pixel viewport;
+`View(start, count)` materializes a bounded arbitrary row window without changing
+the viewport. Both perform work proportional to returned rows. Rows expose
+stable IDs, labels, parent IDs, full semantic depth, stored expansion, child
+presence, accepted visible index, selection, logical integer rectangles/clips,
+and opaque references.
+
+`Prepare(change)` captures the accepted index and one bounded expansion/filter
+intent. `PrepareData(newData, change)` also captures a sealed replacement data
+snapshot. Distinct same-incarnation data must have a higher revision. Each
+successful preparation supersedes older pending requests; a malformed request
+preserves the current pending request. Preparation does not change accepted
+rows, generation, selection, viewport, or existing references. It does not
+allocate or build the full visible index.
+
+`NewOutlineBuilder(ctx, request)` executes the captured request on a worker.
+Stable-key expansion remapping on same-incarnation data replacement happens on
+that worker. The request is immutable and can be handed across goroutines. It
+borrows captured immutable data and the prior accepted index; callers must bound
+their outstanding jobs and release obsolete requests/results.
+
+`Complete(request, result)` requires the current latest request, its exact
+accepted base identity, and its exact sealed worker result. Admission performs
+constant-time checks and a small number of indexed lookups, with no source
+callbacks, scan, index copy, or recursive validation. It checks candidate total
+extent and visible viewport capacity before publication. A refused completion
+changes nothing and keeps the pending request recoverable. `Cancel(request)`
+invalidates only the latest request without needing a worker or source read.
+
+Selection and scrolling remain usable while indexing runs. Completion preserves
+the current selected stable key if it exists in the same incarnation, including
+when it is collapsed or filtered out. Removing a key or changing incarnation
+clears it. Completion retains the current top stable row and its intra-row
+offset when that row remains visible; otherwise it clamps the current pixel
+offset. It then publishes one new generation. Source/filter/expansion admission
+is separate from domain pointer publication; the application installs its domain
+pointer only after successful completion.
+
+## Navigation, geometry, and references
+
+Rows have a fixed positive height. `SetViewport` clamps scroll to accepted total
+height, checks dimensions and returned-row capacity, and publishes atomically.
+`Select` can preserve a hidden stable key; `Reveal` requires a visible key and
+scrolls it into view. `Current` returns the selected visible row even when outside
+the current viewport; hidden selection returns `ErrTreeHidden`. `Move`, `Page`,
+`Home`, `End`, `Parent`, and `FirstChild` use accepted inverse/adjacency indexes,
+without rebuilding or scanning. `Page` advances by at least one viewport row.
+Integer extreme movement saturates to an accepted endpoint.
+
+Public `TreeData.Node`, `Outline.Select`, and `Reveal` check caller key length
+before UTF-8/NUL validation or map hashing. Excess length returns
+`ErrTreeCapacity`; malformed bounded UTF-8 or NUL returns `ErrTreeSource`.
+Unknown valid bounded keys, including an empty lookup, return `ErrTreeRange`.
+Refusal leaves accepted selection, viewport, generation, and pending work intact.
+
+Real selection, viewport, or index changes increment generation once and retire
+old row references. No-op selection/viewport calls preserve generation. Foreign,
+stale, or copied-model references refuse. A reference retains only a nonzero
+identity token, generation, visible index, and an owned key; it has no model,
+source, index, closure, or interface backpointer. Native hit testing additionally
+checks actual clipped, eligible measured rows. Full semantic depth remains
+available while native indentation must be capped separately.
+
+Portable coordinates are checked integers. Total content extent may exceed
+native local geometry limits; native adapters must bound viewport, rendered
+rectangles, and materialized payload before allocation. `OutlineState.Config`
+permits those checks without first materializing an overbudget snapshot.
+
+## Limits and qualification boundary
+
+Zero `TreeLimits` fields select defaults: 1,000,000 nodes, depth 100,000,
+1,000,000 visible rows, 64 MiB logical storage per construction/build, 16,000,000
+counted operations per construction/build, 4,096 query/identity bytes, and
+65,536 bytes per ID, parent, or label. Hard maxima are 1,000,000 nodes/visible
+rows, depth 100,000, 256 MiB logical storage, 64,000,000 operations, and those same
+text limits. `OutlineConfig` defaults to row height 24 and 256 viewport rows;
+hard bounds are row height 1 through 1,048,576 and 1 through 512 returned rows.
+
+Logical storage covers owned arrays, payload, indexed references, and bounded
+work stacks. Map/allocator headers and implementation overhead, borrowed
+immutable data/prior indexes, caller-retained snapshots/jobs/results, and native
+resources are excluded. Requests add at most one bounded ID and filter payload;
+owner selection adds at most one bounded key. These are explicit logical
+admission limits, not a process heap limit. The application bounds concurrent
+jobs and retained historical results independently.
+
+Portable tests exercise 100,000-node wide branches and deep chains, exact
+operation accounting at step budgets 1/7/4,096, ancestor filtering, detached
+payloads, cancellation, malformed graph refusal, bounded views, newest request
+admission, hidden selection, data replacement, extreme navigation, stale refs,
+and atomic capacity/exhaustion refusal. Native rendering, accessibility,
+physical interaction, and performance qualification are separate checkpoints;
+these portable checks do not certify them or full P6 completion.

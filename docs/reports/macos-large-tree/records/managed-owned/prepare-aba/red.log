@@ -1,0 +1,16 @@
+# github.com/dshills/vellum/examples/loadedtree.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestFailedPreparationCannotRetireNewerAdmission
+=== RUN   TestFailedPreparationCannotRetireNewerAdmission/batch-1
+    model_test.go:394: failed-preparation cleanup retired newer pending request {{loadedtree:large:stored 1 128} 2 2 50  false  true {25 500} {900 450 0}} <nil> {<nil> <nil> <nil> <nil> {0  }}
+=== RUN   TestFailedPreparationCannotRetireNewerAdmission/batch-7
+    model_test.go:394: failed-preparation cleanup retired newer pending request {{loadedtree:large:stored 1 128} 2 2 50  false  true {25 500} {900 450 0}} <nil> {<nil> <nil> <nil> <nil> {0  }}
+=== RUN   TestFailedPreparationCannotRetireNewerAdmission/batch-64
+    model_test.go:394: failed-preparation cleanup retired newer pending request {{loadedtree:large:stored 1 128} 2 2 50  false  true {25 500} {900 450 0}} <nil> {<nil> <nil> <nil> <nil> {0  }}
+--- FAIL: TestFailedPreparationCannotRetireNewerAdmission (0.01s)
+    --- FAIL: TestFailedPreparationCannotRetireNewerAdmission/batch-1 (0.00s)
+    --- FAIL: TestFailedPreparationCannotRetireNewerAdmission/batch-7 (0.00s)
+    --- FAIL: TestFailedPreparationCannotRetireNewerAdmission/batch-64 (0.00s)
+FAIL
+FAIL	github.com/dshills/vellum/examples/loadedtree	0.613s
+FAIL

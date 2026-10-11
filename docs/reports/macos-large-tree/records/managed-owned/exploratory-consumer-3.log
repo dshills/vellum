@@ -1,0 +1,22 @@
+# github.com/dshills/vellum/examples/loadedtree.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestStoredTreeDataHugeBranchDeepChain
+=== RUN   TestStoredTreeDataHugeBranchDeepChain/1
+=== RUN   TestStoredTreeDataHugeBranchDeepChain/10000
+=== RUN   TestStoredTreeDataHugeBranchDeepChain/100000
+--- PASS: TestStoredTreeDataHugeBranchDeepChain (0.41s)
+    --- PASS: TestStoredTreeDataHugeBranchDeepChain/1 (0.00s)
+    --- PASS: TestStoredTreeDataHugeBranchDeepChain/10000 (0.04s)
+    --- PASS: TestStoredTreeDataHugeBranchDeepChain/100000 (0.38s)
+=== RUN   TestWorkerLatestCancellationHiddenSelection
+=== RUN   TestWorkerLatestCancellationHiddenSelection/batch-1
+=== RUN   TestWorkerLatestCancellationHiddenSelection/batch-7
+=== RUN   TestWorkerLatestCancellationHiddenSelection/batch-64
+--- PASS: TestWorkerLatestCancellationHiddenSelection (0.01s)
+    --- PASS: TestWorkerLatestCancellationHiddenSelection/batch-1 (0.00s)
+    --- PASS: TestWorkerLatestCancellationHiddenSelection/batch-7 (0.00s)
+    --- PASS: TestWorkerLatestCancellationHiddenSelection/batch-64 (0.00s)
+=== RUN   TestCanceledLoadAndWindowResultRefusal
+--- PASS: TestCanceledLoadAndWindowResultRefusal (0.00s)
+PASS
+ok  	github.com/dshills/vellum/examples/loadedtree	2.025s

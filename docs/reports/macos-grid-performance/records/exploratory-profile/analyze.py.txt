@@ -1,0 +1,29 @@
+import hashlib,json,pathlib,subprocess,sys,time
+sys.dont_write_bytecode=True
+R=pathlib.Path('/private/tmp/vellum-large-data');D=pathlib.Path(__file__).parent;O=D/'analysis-v1';O.mkdir(exist_ok=False);sys.path.insert(0,str(R/'scripts'))
+from child_process import run_child
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+profile=D/'scroll.pprof';native=D/'diagnostic.json';proof=json.loads(native.read_text());binary=pathlib.Path(proof['binary']['path']);tool=D/'pprof-tool'
+assert h(binary)==proof['binary']['sha256'] and h(profile)==proof['profile']['sha256']
+rels=['drivers/cogent/grid.go','drivers/cogent/grid_geometry.go','drivers/cogent/build/upstream/core/update.go','drivers/cogent/build/upstream/core/text.go','drivers/cogent/build/upstream/core/render_notjs.go','drivers/cogent/build/upstream/gpu/gpudraw/drawused.go','drivers/cogent/build/upstream/gpu/texture.go']
+def inputs():return {'sources':{p:h(R/p) for p in rels},'profile_sha256':h(profile),'binary_sha256':h(binary),'pprof_tool_sha256':h(tool),'producer_sha256':h(pathlib.Path(__file__))}
+before=inputs();(O/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n');(O/'analyze.py.txt').write_bytes(pathlib.Path(__file__).read_bytes())
+for p in rels:
+ q=O/'source-snapshots'/(p+'.txt');q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes((R/p).read_bytes())
+cmds=[('top',[str(tool),'-top','-nodecount=55',str(binary),str(profile)]),('cumulative',[str(tool),'-top','-cum','-nodecount=55',str(binary),str(profile)]),('sync-grid',[str(tool),'-list=syncGrid',str(binary),str(profile)]),('place',[str(tool),'-list=gridBinding.*place',str(binary),str(profile)]),('paint',[str(tool),'-list=paintSource.*Draw',str(binary),str(profile)]),('tool-metadata',['/opt/homebrew/bin/go','version','-m',str(tool)])]
+checks=[]
+for name,argv in cmds:
+ p=O/(name+'.log');start=time.monotonic();code=-1;err=None
+ with p.open('xb') as log:
+  try:code=run_child(argv,cwd=R,stdout=log,stderr=subprocess.STDOUT,timeout=60).returncode
+  except Exception as e:err=repr(e);log.write((err+'\n').encode())
+ checks.append({'name':name,'argv':argv,'cwd':str(R),'exit_code':code,'elapsed_seconds':time.monotonic()-start,'runner_error':err,'log':p.name,'sha256':h(p)});print(name,code,flush=True)
+ if code:break
+after=inputs();(O/'inputs-after.json').write_text(json.dumps(after,indent=2)+'\n')
+failed=[{'command':['/opt/homebrew/bin/go','tool','pprof',option,str(binary),str(profile)],'exit_code':2,'log':str(D/name),'sha256':h(D/name),'scope':'Historical initial readout attempt: local Go installation had no precompiled pprof tool.'} for name,option in [('pprof-top.log','-top'),('pprof-cumulative.log','-top -cum'),('pprof-sync-grid.log','-list=syncGrid')]]
+# Earlier commands' exact option vectors are retained correctly here.
+failed[1]['command']=['/opt/homebrew/bin/go','tool','pprof','-top','-cum','-nodecount=55',str(binary),str(profile)]
+failed[0]['command']=['/opt/homebrew/bin/go','tool','pprof','-top','-nodecount=55',str(binary),str(profile)]
+record={'schema':'vellum-grid-profile-readout-v1','scope':'Offline diagnostic profile readout, no new native process; no warm timing/P6 acceptance or optimization. Sampled process-wide Go CPU differs from same-ticket wall-work phases.','producer':{'path':str(pathlib.Path(__file__)),'sha256':h(pathlib.Path(__file__))},'before':{'path':'inputs-before.json','sha256':h(O/'inputs-before.json')},'after':{'path':'inputs-after.json','sha256':h(O/'inputs-after.json')},'unchanged':before==after,'native_diagnostic':{'path':str(native),'sha256':h(native),'observer_scope':'Historical setup/ready/end ps observations, including ready observer overlap; immutable record does not claim external-observer-free timings.'},'profile':{'path':str(profile),'sha256':h(profile)},'binary':proof['binary'],'checks':checks,'failed_prior_readouts':failed,'fallback_tool':{'path':str(tool),'sha256':h(tool),'build_command':['/opt/homebrew/bin/go','build','-o',str(tool),'cmd/pprof'],'build_exit_code':0,'build_log':str(D/'pprof-tool-build.log'),'build_log_sha256':h(D/'pprof-tool-build.log'),'scope':'Compiled locally from installed Go stdlib cmd/pprof and bundled vendor sources; no download/install. Build source closure was not independently recorded.'},'result':'PASS_DIAGNOSTIC_READOUT' if before==after and len(checks)==len(cmds) and all(c['exit_code']==0 and c['runner_error'] is None for c in checks) else 'FAIL'}
+p=O/'qualification.json';p.write_text(json.dumps(record,indent=2)+'\n');print('PROOF',p,h(p),record['result'],flush=True)
+sys.exit(record['result']!='PASS_DIAGNOSTIC_READOUT')

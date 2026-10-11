@@ -1,0 +1,308 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "reviewer": "/root/mac_history_review",
+  "scope": "Independent exact-source review of eleven owned loadedgrid performance/profile/protocol/docs files, current immutable map and CPU qualification evidence. No native runtime instrumentation ownership, GUI execution or performance acceptance.",
+  "source_root": "/private/tmp/vellum-large-data",
+  "ownership": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/ownership.json",
+    "sha256": "eeb5859bd4a260839dd125c024faa05ac7b14d9fb2f49a79345dafbca85aa14f",
+    "count": 11
+  },
+  "files": {
+    "examples/loadedgrid/perf.go": {
+      "sha256": "66224a5fe0ec25926a57b4ed7ac2ffa307068f8c8eceeed7d9a5d19cb3d5eaa2",
+      "bytes": 5958,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/perf.go.txt"
+    },
+    "examples/loadedgrid/perf_runtime.go": {
+      "sha256": "eebb07b19802963d60759c408c3282ef8b9bcb955f9f90ea6be917b4b3eef1c1",
+      "bytes": 12432,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/perf_runtime.go.txt"
+    },
+    "examples/loadedgrid/perf_profile.go": {
+      "sha256": "6ff46b8a2284b7c13677c568118cb555e7dedce7837f82fbdf87419468458453",
+      "bytes": 1794,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/perf_profile.go.txt"
+    },
+    "examples/loadedgrid/perf_test.go": {
+      "sha256": "5cebd36ab18948032ec7768926bad94213f30223b4ad7cef01acd5e7cd7f4f1a",
+      "bytes": 3238,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/perf_test.go.txt"
+    },
+    "examples/loadedgrid/perf_profile_test.go": {
+      "sha256": "87d2a766f796b3ce1c042d284ff54bb803bb73a630503273a0b748f06554a36c",
+      "bytes": 1666,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/perf_profile_test.go.txt"
+    },
+    "examples/loadedgrid/perf_offscreen_test.go": {
+      "sha256": "80e828d66106257f6318d982158abb4f99525e2e955f9cf48ae912be0ccce295",
+      "bytes": 4346,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/perf_offscreen_test.go.txt"
+    },
+    "examples/loadedgrid/main.go": {
+      "sha256": "2174d1d36f50c4d5436ff7d0457c2da4779669326adb467e843b68120faf2088",
+      "bytes": 2858,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/main.go.txt"
+    },
+    "examples/loadedgrid/README.md": {
+      "sha256": "015e4687163e806bf30822062f78059c0cce3c9b29dba0d015ff96bfddd52c37",
+      "bytes": 6151,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/examples/loadedgrid/README.md.txt"
+    },
+    "scripts/benchmark-grid.py": {
+      "sha256": "fc3f551e384fbe89ec2e7a4c626586f630d351890aadc4b639a7621238e01e03",
+      "bytes": 20084,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/scripts/benchmark-grid.py.txt"
+    },
+    "scripts/benchmark-grid_test.py": {
+      "sha256": "215148e4edbb93a9b70030a136f9381f74b036cc0fbf40dd184cbc2ce0c0c118",
+      "bytes": 11216,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/scripts/benchmark-grid_test.py.txt"
+    },
+    "specs/grid-performance.md": {
+      "sha256": "201d3a91d80d6037e5f0bfcb1ba87b2c0b25c052ad1779672826ebf90babc656",
+      "bytes": 8341,
+      "immutable_snapshot": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/owned-sources/specs/grid-performance.md.txt"
+    }
+  },
+  "contracts_reviewed": [
+    "Real stored10k/million20-column input and indexed variable-height wrapper; warmed zero-sum trace separate from novel range.",
+    "Actual current clipped >=400-cell,50-row,8-column workload and stored-value verification; paired same-scale/cardinality/relative-clip geometry.",
+    "Same native tag/generation rawphase equality and measured work sum; separate queue/acquire/present observations.",
+    "Nearest-rank pooled/per-run percentiles, variation and outliers; strict recorded cardinality/terminal state.",
+    "Default-off profile: exclusive new0600file path,64MiB sticky-error writer, process-wide Start/Stop and once-only cleanup; labeling/refusal by ordinary warm runner.",
+    "Owned process timeout/failure cleanup, streamed bounded raw output, exact failed-result retention and corrected launch/selector setup unwind.",
+    "Honest report/docs: MEASURED and provisional warm-target boolean, no completeP6/GPU/compositor/native-memory/endurance claim."
+  ],
+  "findings": [
+    {
+      "id": "benchmark-process-setup-unwind",
+      "severity": "medium",
+      "status": "RESOLVED",
+      "file": "scripts/benchmark-grid.py",
+      "original_line": 150,
+      "correction": "Launch and selector allocation/register now occur inside failure/finalization boundary; optional handles permit a launch failure record and retire an already-launched child if setup fails. Selector/stdout cleanup errors retain terminal metadata and fail loudly.",
+      "historical_source_map": {
+        "path": "/private/tmp/vellum-grid-performance-review/draft1/source-map.json",
+        "sha256": "38e8a413417dbc98dbec615a1d401d945a081bb61ec3805989d08737c568041c"
+      },
+      "historical_record": {
+        "path": "/private/tmp/vellum-grid-performance-review/draft1/review.json",
+        "sha256": "6645c3f966f7b25ff50386937297d7f63d392f9213439745ff9568b80bbc9671"
+      },
+      "unchanged_authoritative_regression": {
+        "path": "/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py",
+        "sha256": "c21b0fb52fa123aac6f4ff40671904151094fc9b08c9a8a357288ad2253b0ccf"
+      },
+      "red": {
+        "path": "/private/tmp/vellum-grid-performance-review/draft1/setup-red.log",
+        "sha256": "d198a594d5dbbf4f7ffedfb759ecd1545d453ce98b590e4abc5d73d45d1256f9",
+        "exit_code": 1,
+        "failed_tests": 2,
+        "classification": "CPU-only mocked product process/evidence failure; no actual subprocess launch or GUI."
+      },
+      "independent_final_green": {
+        "path": "/private/tmp/vellum-grid-performance-review/setup-green-final.log",
+        "sha256": "24adda79e21044fef19cdc7f0606a9cd7770fc9a99c705a8622ee923c13bce5d",
+        "exit_code": 0,
+        "passed_tests": 2
+      }
+    }
+  ],
+  "unresolved_material_findings": [],
+  "qualification": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/qualified-v2/qualification.json",
+    "sha256": "5651e635136e811ccd48aca5c10bab434bbf1c6893f3c4f46aa07023c51945d4",
+    "result": "PASS",
+    "input_maps_before_after_equal": true,
+    "all278_current_selected_input_hashes_verified": true,
+    "owned11_current_and_immutable_snapshots_verified": true,
+    "prepared_current_fingerprints_verified": {
+      "upstream": {
+        "count": 5840,
+        "canonical_sha256": "0d752dd814a9e106c1c12875ad4b5ff45a4743b1ba99e69f1b6d0e398b3beb82"
+      },
+      "typesetting": {
+        "count": 288,
+        "canonical_sha256": "6ba9b5825ef3d4214c7bb0c31455ce0c80bd6b5ac175f8adddd0c5d2deefce07"
+      }
+    },
+    "current_checks": [
+      {
+        "name": "protocol-python",
+        "command": [
+          "python3",
+          "-B",
+          "scripts/benchmark-grid_test.py"
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec python3 -B scripts/benchmark-grid_test.py"
+        ],
+        "cwd": "/private/tmp/vellum-large-data",
+        "exit_code": 0,
+        "runner_error": null,
+        "elapsed_seconds": 0.1323733750032261,
+        "log": "protocol-python.log",
+        "sha256": "3fcac7762459c77cf136eb29b980734b79c81505e0d41749e27db0aee3eca0df"
+      },
+      {
+        "name": "original-reviewer-setup-regressions",
+        "command": [
+          "python3",
+          "-B",
+          "/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py",
+          "/private/tmp/vellum-large-data/scripts/benchmark-grid.py"
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec python3 -B /private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py /private/tmp/vellum-large-data/scripts/benchmark-grid.py"
+        ],
+        "cwd": "/private/tmp/vellum-large-data",
+        "exit_code": 0,
+        "runner_error": null,
+        "elapsed_seconds": 0.12736745798611082,
+        "log": "original-reviewer-setup-regressions.log",
+        "sha256": "cb07d41a7b33ed0e0492b77ab5a9c835fc7a9954606f1e8d6d085c6cf63d3f1d"
+      }
+    ],
+    "five_go_checks_inherited": [
+      {
+        "name": "perf-default-race3",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-count=3",
+          "-v",
+          "-run",
+          "^TestPerf",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -race -count=3 -v -run '^TestPerf' ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+        "exit_code": 0,
+        "runner_error": null,
+        "elapsed_seconds": 3.454311667010188,
+        "log": "perf-default-race3.log",
+        "sha256": "f70f96573a50744811aa8fbf4403fddecdbbdeb70f1e1f71d3f76eb552a12d1b"
+      },
+      {
+        "name": "perf-actual-offscreen-race1",
+        "command": [
+          "go",
+          "test",
+          "-tags",
+          "offscreen",
+          "-race",
+          "-count=1",
+          "-v",
+          "-run",
+          "^TestPerf",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -tags offscreen -race -count=1 -v -run '^TestPerf' ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+        "exit_code": 0,
+        "runner_error": null,
+        "elapsed_seconds": 7.358427165978355,
+        "log": "perf-actual-offscreen-race1.log",
+        "sha256": "c902e65e57b9915a0be61035c36430b910d735fad9854ca4a08abdd5be5d9214"
+      },
+      {
+        "name": "consumer-offscreen-vet",
+        "command": [
+          "go",
+          "vet",
+          "-tags",
+          "offscreen",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet -tags offscreen ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+        "exit_code": 0,
+        "runner_error": null,
+        "elapsed_seconds": 0.7108376669930294,
+        "log": "consumer-offscreen-vet.log",
+        "sha256": "96a13c343ba3e7cf4be134a98acd1ef8fb5b3df54244317d549e548c4bb77f17"
+      },
+      {
+        "name": "consumer-default-vet",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+        "exit_code": 0,
+        "runner_error": null,
+        "elapsed_seconds": 0.7329331670189276,
+        "log": "consumer-default-vet.log",
+        "sha256": "e5fac32d8d0ccb34832be56500a34167097610bc3b15b67cfe4d57813b04a734"
+      },
+      {
+        "name": "optimized-desktop-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+          "."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go build -o /private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release ."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+        "exit_code": 0,
+        "runner_error": null,
+        "elapsed_seconds": 2.9899524170032237,
+        "log": "optimized-desktop-build.log",
+        "sha256": "7e45e67d991e4f905a536d82bdaac131038715012e0dfd480546772f17219265"
+      }
+    ],
+    "inheritance_proof": {
+      "path": "/private/tmp/vellum-grid-performance-qualification/qualified-v1/qualification.json",
+      "sha256": "0a74e86e2b5cc113f971b85fd4fe5ddd758580f6ae21cc99481ac0d15a8b3ea5",
+      "scope": "Historical six-check PASS before launcher setup gap was fixed; only Go checks reused; Python acceptance superseded."
+    },
+    "inheritance_verified": "Only benchmark-grid.py and benchmark-grid_test.py differ between exact v1 and v2 input dictionaries; prepared fingerprints identical. All new and inherited raw log digests and success codes verified. Only Go checks inherited; former Python acceptance remains historical.",
+    "optimized_release_binary_digest_verified": {
+      "path": "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+      "sha256": "19ed865d996762466c53be13e01f84f77fdfc07bb6e194200207ddb8dc15a539"
+    },
+    "producer_digest_current_and_snapshot_verified": {
+      "path": "/private/tmp/vellum-grid-performance-qualification/qualify_v2.py",
+      "sha256": "52c159d214e09c28f5b3cdf305addb81b084e05d9d420dc2bf2d899f19125ef8"
+    }
+  },
+  "limitations": [
+    "CPU/offscreen correctness and optimized executable build do not qualify native timing targets. No five-run Mac result or exploratory CPU-profile observation is approved by this source certificate.",
+    "This is grid protocol/profile source review, not independent approval of FrameMetrics/ownedbackend instrumented timing regions; parent reviews that source separately.",
+    "P6 tree/fulltable, fullprofessional workload, P11 endurance, physical input-to-photon, native/GPU allocation and compositor presentation remain open.",
+    "Timing totals measure declared wall work regions; process allocation/RSS observers include other goroutines/helpers and profiling itself includes observer/runtime work.",
+    "Selected source plus enumerated prepared fingerprints are not a complete compiler/module-cache/OSSDK dependency closure."
+  ],
+  "actions_this_review": "Read exact sources/docs/tests and corrective diff, verified immutable hashes/logs/proof inheritance; only ran two unchanged CPU-only mocked regressions red/green in reviewer scratch. No shared source/prepared mutations, GUI, Git or Prism."
+}

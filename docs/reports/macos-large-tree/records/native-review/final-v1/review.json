@@ -1,0 +1,312 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "reviewer": "/root/mac_history_review",
+  "scope": "Independent selected managed DataTree UI/native/spec source review only. Portable Outline authored by this reviewer and loadedtree consumer are excluded from independent approval. No canonical promotion or desktop execution claim.",
+  "source_root": "/private/tmp/vellum-large-data",
+  "ownership": {
+    "path": "/private/tmp/vellum-large-tree-owned/frozen-v3/ownership.json",
+    "sha256": "bc17a07b7ca52b53fa7f7b320d3258ee09a91c72dd18e7ad99d49542e0a8c286",
+    "native_file_count": 16,
+    "native_files_identical_to_frozen_v1": true
+  },
+  "files": {
+    "ui/tree.go": {
+      "sha256": "8e8d90df158b45a124619ca407637119ff919c50923f501ebf28d463976b71a1",
+      "bytes": 1221,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/ui/tree.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "8e8d90df158b45a124619ca407637119ff919c50923f501ebf28d463976b71a1"
+    },
+    "ui/tree_test.go": {
+      "sha256": "2f5354aeb59ab9b78ee849d653d75f852f634a6c9be211b1dfd738d061363e5b",
+      "bytes": 2018,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/ui/tree_test.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "2f5354aeb59ab9b78ee849d653d75f852f634a6c9be211b1dfd738d061363e5b"
+    },
+    "ui/node.go": {
+      "sha256": "793eb9a2b105eef68d6b131b82ae0e21944d54cccc5d07d1503b98b810545c3d",
+      "bytes": 4001,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/ui/node.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "793eb9a2b105eef68d6b131b82ae0e21944d54cccc5d07d1503b98b810545c3d"
+    },
+    "ui/controls.go": {
+      "sha256": "fb0354f29745def85ddb9955dcad11fefe740feac71346b168ab093244d2aab3",
+      "bytes": 5867,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/ui/controls.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "fb0354f29745def85ddb9955dcad11fefe740feac71346b168ab093244d2aab3"
+    },
+    "drivers/cogent/tree.go": {
+      "sha256": "2ec1aaa59df49382f400d600cdde01fc4e1bfb916d0d8900e17ae464f75a5bec",
+      "bytes": 19705,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/tree.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "2ec1aaa59df49382f400d600cdde01fc4e1bfb916d0d8900e17ae464f75a5bec"
+    },
+    "drivers/cogent/tree_geometry.go": {
+      "sha256": "5e752b83f88981b8b5a5ff8fd5b127c68f1f284e069062853afac205b13ac268",
+      "bytes": 10084,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/tree_geometry.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "5e752b83f88981b8b5a5ff8fd5b127c68f1f284e069062853afac205b13ac268"
+    },
+    "drivers/cogent/tree_accessibility.go": {
+      "sha256": "35ea67d9d50fb2ca9370d2af0918bcd24666ed1354537ede58d4036415e2d89a",
+      "bytes": 3393,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/tree_accessibility.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "35ea67d9d50fb2ca9370d2af0918bcd24666ed1354537ede58d4036415e2d89a"
+    },
+    "drivers/cogent/tree_offscreen_test.go": {
+      "sha256": "b21ab888c4e856e19b195236c7b77ec1545160c1519bcaf192c369e00429591c",
+      "bytes": 20294,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/tree_offscreen_test.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "a36abf08be61bc6c14f5464e89b6b9e5d83f4d2f0ecce346fa64327d39b0b12a"
+    },
+    "drivers/cogent/tree_budget_test.go": {
+      "sha256": "59f0786974ebbbd26974279a4d87842e4c50c35a772da032aac608b3f7870cdd",
+      "bytes": 1904,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/tree_budget_test.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "59f0786974ebbbd26974279a4d87842e4c50c35a772da032aac608b3f7870cdd"
+    },
+    "drivers/cogent/tree_payload_review_test.go": {
+      "sha256": "e8f23be4717d340b87bec6b85d6d5038a9b43637a10dcb06b530e7ccce874b92",
+      "bytes": 2155,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/tree_payload_review_test.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "e8f23be4717d340b87bec6b85d6d5038a9b43637a10dcb06b530e7ccce874b92"
+    },
+    "drivers/cogent/controls.go": {
+      "sha256": "52056503c64f76dc169f8d5534f4380226840d4601c6ebe84b7ec40b5ffc3323",
+      "bytes": 21023,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/controls.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "52056503c64f76dc169f8d5534f4380226840d4601c6ebe84b7ec40b5ffc3323"
+    },
+    "drivers/cogent/reconcile.go": {
+      "sha256": "f16868a2a4790988a102b2b90b918dde94af9fb083ab85cf5d4df4db1a4ca196",
+      "bytes": 6810,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/reconcile.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "f16868a2a4790988a102b2b90b918dde94af9fb083ab85cf5d4df4db1a4ca196"
+    },
+    "drivers/cogent/accessibility.go": {
+      "sha256": "62e7647ade54c59639cb72006f5a2cb1a3ed221c41052d24386b8e01dcaca05c",
+      "bytes": 30816,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/accessibility.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "62e7647ade54c59639cb72006f5a2cb1a3ed221c41052d24386b8e01dcaca05c"
+    },
+    "drivers/cogent/manual.go": {
+      "sha256": "158bcd90c411f30a1c031dac330493c543290d2ec70f9c4d254afa5cd7bb52c9",
+      "bytes": 4368,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/manual.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "158bcd90c411f30a1c031dac330493c543290d2ec70f9c4d254afa5cd7bb52c9"
+    },
+    "drivers/cogent/manual_offscreen.go": {
+      "sha256": "2ba45cc4399aee2f155a76471e7df20d4d2d93f56fe161bbfa65f84cd5057e60",
+      "bytes": 31199,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/drivers/cogent/manual_offscreen.go.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "2ba45cc4399aee2f155a76471e7df20d4d2d93f56fe161bbfa65f84cd5057e60"
+    },
+    "specs/tree-native.md": {
+      "sha256": "143cbbf168748261ec08ca8580c8fd080b7a7ee5f67e5f758d22ccd8986a0eb5",
+      "bytes": 3990,
+      "immutable_snapshot": "/private/tmp/vellum-large-tree-owned/frozen-v3/owned-sources/specs/tree-native.md.txt",
+      "matches_current_source": true,
+      "matches_native_v1_qualification": true,
+      "prior_source_review_sha256": "143cbbf168748261ec08ca8580c8fd080b7a7ee5f67e5f758d22ccd8986a0eb5"
+    }
+  },
+  "source_review": {
+    "prior_record": {
+      "path": "/private/tmp/vellum-outline-native-review/provisional-v2/review.json",
+      "sha256": "c0936ceb6457c744a7b83b41aabb62e9b4cbc171901cf83fe74c8bbd75eb5893"
+    },
+    "final_delta": "Only tree_offscreen_test.go differs from prior provisional review: adds panic/Goexit construction cleanup and remount native/AX identity retirement tests. Final native16 all identical to producer frozen v1; no production delta from reviewed payload correction.",
+    "contracts_reviewed": [
+      "Single-live model registry with provisional rollback and remount",
+      "Owner-held model callbacks without cross-window RC acquisition",
+      "Captured Tabs.CurrentTab mutex admission plus controlled modal/disabled scope",
+      "Opaque generation-bound pointer/AX references and down/up geometry equality",
+      "Local viewport/row/clip preallocation caps and fractional-DPI shared geometry helper",
+      "One host focus stop; private labels/pagers/scrollbar focus disabled",
+      "Generated reserved namespace and nested Manual snapshot slice detachment"
+    ],
+    "additional_test_review": "Abnormal construction completes through joined goroutine barrier before registry/lifetime/panic assertions; remount checks changed incarnation/targets and refuses captured old AX action and manual target. Tests use synchronous owner serialization and do not launch native GUI."
+  },
+  "findings": [
+    {
+      "id": "native-tree-payload-budget",
+      "severity": "medium",
+      "status": "RESOLVED",
+      "correction": "Before native pool growth, keys/parents/control ID are capped at4096 bytes, labels at64KiB, and conservative raw/escaped/generated identity payload at8MiB. Failed bounded synchronization invalidates completed measurement/actions, and later paints cannot republish old rows.",
+      "historical_evidence": {
+        "path": "/private/tmp/vellum-outline-native-review/budget/evidence-v1.json",
+        "sha256": "22ccc6d7484bfeac45e07904d4de3da4f8d1935c1482ea8ce9d0ac938168eceb",
+        "classification": "Initial overlay compilation failure is fixture-only; exact old tree.go with diagnostic test-symbol shim demonstrates three admission failures; provisional green is distinct from final frozen race3 proof."
+      },
+      "unchanged_reviewer_test_sha256": "e8f23be4717d340b87bec6b85d6d5038a9b43637a10dcb06b530e7ccce874b92",
+      "final_frozen_test_passes": 3
+    }
+  ],
+  "unresolved_material_findings": [],
+  "qualification": {
+    "path": "/private/tmp/vellum-large-tree-qualification/qualified-v1/qualification.json",
+    "sha256": "b107c5dd75c1e7b05f8a22f2508ba3bea74fcc5b3ef912e795ff3cfcf6a337c0",
+    "result": "PASS",
+    "native16_matches_before_after": true,
+    "all_recorded_before_after_maps_equal": true,
+    "recorded_prepared_input_count": 6128,
+    "all_ten_raw_log_digests_verified": true,
+    "selected_native_ui_checks": [
+      {
+        "name": "ui-race1",
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "-count=1",
+          "-v",
+          "./ui"
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -race -count=1 -v ./ui"
+        ],
+        "cwd": "/private/tmp/vellum-large-data",
+        "exit_code": 0,
+        "timed_out": false,
+        "runner_error": null,
+        "elapsed_seconds": 1.631,
+        "log": "/private/tmp/vellum-large-tree-qualification/qualified-v1/ui-race1.log",
+        "log_sha256": "92fbd07d43aaea79d0b42d99439902a69a4ae26ed9657500737d99ca8456eca2"
+      },
+      {
+        "name": "native-tree-race3",
+        "command": [
+          "go",
+          "test",
+          "-tags",
+          "offscreen",
+          "-race",
+          "-count=3",
+          "-v",
+          "-run",
+          "TestManagedTree|TestManualNestedGridTree|TestTreeNative|TestTreeNavigation|TestReviewerTree",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -tags offscreen -race -count=3 -v -run 'TestManagedTree|TestManualNestedGridTree|TestTreeNative|TestTreeNavigation|TestReviewerTree' ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+        "exit_code": 0,
+        "timed_out": false,
+        "runner_error": null,
+        "elapsed_seconds": 54.527,
+        "log": "/private/tmp/vellum-large-tree-qualification/qualified-v1/native-tree-race3.log",
+        "log_sha256": "c2c4e22e838904802b6a8f9a4021391110a3f0eef124090d7643986cbaade780"
+      },
+      {
+        "name": "native-all-offscreen-race1",
+        "command": [
+          "go",
+          "test",
+          "-tags",
+          "offscreen",
+          "-race",
+          "-count=1",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -tags offscreen -race -count=1 ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+        "exit_code": 0,
+        "timed_out": false,
+        "runner_error": null,
+        "elapsed_seconds": 96.718,
+        "log": "/private/tmp/vellum-large-tree-qualification/qualified-v1/native-all-offscreen-race1.log",
+        "log_sha256": "2aaaf3fedbd064ba7c7d95c9f4c79344c3f2668dc9b35f77083b7647938c3e1e"
+      },
+      {
+        "name": "native-offscreen-vet",
+        "command": [
+          "go",
+          "vet",
+          "-tags",
+          "offscreen",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet -tags offscreen ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+        "exit_code": 0,
+        "timed_out": false,
+        "runner_error": null,
+        "elapsed_seconds": 5.659,
+        "log": "/private/tmp/vellum-large-tree-qualification/qualified-v1/native-offscreen-vet.log",
+        "log_sha256": "da0cbf087ab69123d86fd78338c71d646dde4cd5707726a5644dcbe2c0649375"
+      },
+      {
+        "name": "native-desktop-vet",
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "argv": [
+          "/bin/zsh",
+          "-c",
+          "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet ./..."
+        ],
+        "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+        "exit_code": 0,
+        "timed_out": false,
+        "runner_error": null,
+        "elapsed_seconds": 1.76,
+        "log": "/private/tmp/vellum-large-tree-qualification/qualified-v1/native-desktop-vet.log",
+        "log_sha256": "d085487f95fe4b396b1ebbc70fadb6dc33c01818686ed335a49e2d1477f188b0"
+      }
+    ],
+    "provenance_limit": "The v1 proof records source/prepared stability during its own checks. This certificate verifies current selected16 and immutable snapshots; it does not assert the entire current prepared closure is unchanged during parent stage34 pin regeneration."
+  },
+  "limitations": [
+    "No independent self-approval of portable Outline and no consumer ABA/lifecycle approval in this certificate.",
+    "No GUI, physical input, external AX client, human VoiceOver or performance qualification.",
+    "8MiB budget is logical admitted raw/escaped/generated payload; sealed indexes, allocator/shaping overhead and transient AX JSON/process heap are excluded.",
+    "Native pool is limited to500 rows, local geometry/coordinate limits and4096-byte keys may refuse portable-valid data.",
+    "Actual newly pinned backend/output equality, integrated gate and desktop qualification remain parent-owned."
+  ],
+  "actions_this_turn": "Read-only source/diff/hash/log review; wrote only this certificate in reviewer scratch. No test rerun, shared writes, Git, GUI, settings changes or Prism."
+}

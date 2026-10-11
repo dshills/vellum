@@ -1,0 +1,52 @@
+import hashlib,json,pathlib,shlex,subprocess,sys,time
+sys.dont_write_bytecode=True
+R=pathlib.Path('/private/tmp/vellum-large-data');D=pathlib.Path(__file__).parent;O=D/'qualified-v4';O.mkdir(exist_ok=False);M=R/'examples/loadedgrid';sys.path.insert(0,str(R/'scripts'))
+from child_process import run_child
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+OWNED=['examples/loadedgrid/'+p for p in ['perf.go','perf_runtime.go','perf_profile.go','perf_test.go','perf_profile_test.go','perf_offscreen_test.go','main.go','README.md']]+['scripts/benchmark-grid.py','scripts/benchmark-grid_test.py','specs/grid-performance.md']
+def collect():
+ ps=set(R/p for p in OWNED)
+ ps.update(p for p in M.iterdir() if p.is_file() and(p.suffix=='.go' or p.name in ['go.mod','go.sum','LICENSE']))
+ for package in ['app','tasks','execution','ui','virtual']:ps.update((R/package).rglob('*.go'))
+ ps.update(R/p for p in ['go.mod','vellum.go','scripts/child_process.py','scripts/sdk_environment.py','drivers/cogent/go.mod','drivers/cogent/go.sum','drivers/cogent/env.sh','drivers/cogent/prepare.sh','drivers/cogent/prepare_test.py','drivers/cogent/native/dependencies.json'])
+ ps.update((R/'drivers/cogent').glob('*.go'));ps.update((R/'drivers/cogent').glob('*.m'));ps.update((R/'drivers/cogent').glob('*.h'))
+ ps.update(p for p in (R/'drivers/cogent/native/patches').rglob('*') if p.is_file())
+ selected={str(p.relative_to(R)):h(p) for p in sorted(ps)}
+ prepared={}
+ for n in ['upstream','typesetting']:
+  base=R/'drivers/cogent/build'/n;mp={str(p.relative_to(base)):h(p) for p in sorted(base.rglob('*')) if p.is_file() and '.git' not in p.parts};data=json.dumps(mp,sort_keys=True,separators=(',',':')).encode();prepared[n]={'count':len(mp),'canonical_sha256':hashlib.sha256(data).hexdigest()}
+ return {'owned':{p:selected[p] for p in OWNED},'selected':selected,'prepared_fingerprints':prepared,'producer_sha256':h(pathlib.Path(__file__))}
+
+
+before=collect();(O/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+prior=D/'qualified-v2';old=json.loads((prior/'inputs-before.json').read_text());oldproof=json.loads((prior/'qualification.json').read_text())
+oldfinal=json.loads((D/'final-freeze-v3/ownership.json').read_text())
+changed={p for p in old['selected']|before['selected'] if old['selected'].get(p)!=before['selected'].get(p)}
+expected={'scripts/benchmark-grid.py','scripts/benchmark-grid_test.py','examples/loadedgrid/README.md','specs/grid-performance.md'}
+assert changed==expected,changed
+assert old['prepared_fingerprints']==before['prepared_fingerprints']
+assert all(before['owned'][p]==oldfinal['files'][p] for p in OWNED if p not in expected)
+for p in OWNED:
+ q=O/'owned-sources'/(p+'.txt');q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes((R/p).read_bytes())
+(O/'ownership.json').write_text(json.dumps({'root':str(R),'scope':'Eleven owned files after end-only external observer correction; Go inputs unchanged. No native runtime ownership or GUI acceptance.','files':before['owned']},indent=2)+'\n')
+(O/'qualify.py.txt').write_bytes(pathlib.Path(__file__).read_bytes())
+# Historical code and the new fixture execute in a private overlay only.
+red=O/'historical-red';red.mkdir();oldscript=D/'ps-observer-before-v4/scripts/benchmark-grid.py.txt'
+(red/'benchmark-grid.py').write_bytes(oldscript.read_bytes());(red/'benchmark-grid_test.py').write_bytes((R/'scripts/benchmark-grid_test.py').read_bytes())
+commands=[('observer-regression-before',red,['python3','-B',str(red/'benchmark-grid_test.py'),'ProcessTests.test_setup_and_ready_validate_without_external_process_observers'],1),('protocol-python',R,['python3','-B','scripts/benchmark-grid_test.py'],0),('original-reviewer-setup-regressions',R,['python3','-B','/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py',str(R/'scripts/benchmark-grid.py')],0)]
+checks=[]
+for name,cwd,cmd,expected_exit in commands:
+ p=O/(name+'.log');start=time.monotonic();code=-1;err=None
+ argv=['/bin/zsh','-c','export PYTHONPATH='+shlex.quote(str(R/'scripts'))+'\nexec '+shlex.join(cmd)]
+ with p.open('xb') as log:
+  log.write((json.dumps({'argv':argv,'cwd':str(cwd),'expected_exit_code':expected_exit})+'\n').encode());log.flush()
+  try:code=run_child(argv,cwd=cwd,stdout=log,stderr=subprocess.STDOUT,timeout=60).returncode
+  except Exception as e:err=repr(e);log.write((err+'\n').encode())
+ checks.append({'name':name,'command':cmd,'argv':argv,'cwd':str(cwd),'exit_code':code,'expected_exit_code':expected_exit,'runner_error':err,'elapsed_seconds':time.monotonic()-start,'log':p.name,'sha256':h(p)});print(name,code,flush=True)
+ if code!=expected_exit:break
+origin=D/'qualified-v1';originproof=json.loads((origin/'qualification.json').read_text())
+inherited=[c for c in originproof['checks'] if c['name']!='protocol-python']
+for c in inherited:assert h(origin/c['log'])==c['sha256']
+after=collect();(O/'inputs-after.json').write_text(json.dumps(after,indent=2)+'\n');binary=pathlib.Path(oldproof['binary']['path']);assert h(binary)==oldproof['binary']['sha256']
+data={'schema':'vellum-grid-performance-selected-qualification-v4','scope':'Python-only end observer correction plus memory-scope docs, qualified anew; five unchanged Go/offscreen/vet/build checks inherited by exact selected non-Python/non-doc inputs and complete prepared byte fingerprints. No compiler/module-cache/OS SDK closure or native performance acceptance.','source_root':str(R),'producer':{'path':str(pathlib.Path(__file__)),'sha256':h(pathlib.Path(__file__))},'before':{'path':'inputs-before.json','sha256':h(O/'inputs-before.json')},'after':{'path':'inputs-after.json','sha256':h(O/'inputs-after.json')},'unchanged':before==after,'owned':before['owned'],'selected_count':len(before['selected']),'prepared':before['prepared_fingerprints'],'checks':checks,'inherited_go_checks':inherited,'inherited_proof':{'path':str(origin/'qualification.json'),'sha256':h(origin/'qualification.json'),'scope':'Only exact unchanged Go checks/build reused; Python acceptance superseded.'},'prior_python_proof':{'path':str(prior/'qualification.json'),'sha256':h(prior/'qualification.json')},'prior_doc_supplement':{'path':str(D/'final-freeze-v3/qualification-supplement.json'),'sha256':h(D/'final-freeze-v3/qualification-supplement.json')},'changed_inputs':sorted(changed),'preserved_pre_correction':{'path':str(D/'ps-observer-before-v4/ownership.json'),'sha256':h(D/'ps-observer-before-v4/ownership.json'),'scope':'Old baseline/profile raw observations used setup/ready/end ps. They remain historical, without observer-free timing claims.'},'observer_policy':'External ps only after completed end record. Baseline/warm process RSS and process CPU deltas unavailable. Native post-warm Go heap retained.','binary':oldproof['binary'],'result':'PASS' if before==after and len(checks)==len(commands) and all(c['exit_code']==c['expected_exit_code'] and c['runner_error'] is None for c in checks) and all(c['exit_code']==0 for c in inherited) else 'FAIL'}
+p=O/'qualification.json';p.write_text(json.dumps(data,indent=2)+'\n');print('PROOF',p,h(p),data['result'],flush=True);sys.exit(data['result']!='PASS')

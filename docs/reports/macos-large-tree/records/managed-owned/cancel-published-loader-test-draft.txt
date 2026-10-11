@@ -1,0 +1,18 @@
+func TestCancelPublishedLoaderRejectsOlderToken(t *testing.T) {
+ for _,batch:=range []int{1,7,64} {
+  t.Run(fmt.Sprintf("batch-%d",batch),func(t *testing.T) {
+   p,ex:=fixture(t,128)
+   if e:=owned(p,p.load); e!=nil {t.Fatal(e)}
+   old:=ex.PendingIDs()[0]
+   runWorker(t,ex,old)
+   if p.loader.Pending().Active!=1 {t.Fatal("owner delivery was not retained")}
+   if e:=owned(p,p.cancelLoad); e!=nil {t.Fatal(e)}
+   drain(t,p,batch)
+   if !p.loader.Pending().Idle() || len(ex.PendingIDs())!=0 {t.Fatal("published canceled load kept credit or admitted index jobs")}
+   if e:=owned(p,func()error {if p.loadTask!=nil || p.base[0]!=nil || p.base[1]!=nil {t.Fatal("old token published stored data")};return nil}); e!=nil {t.Fatal(e)}
+   for _,w:=range p.windows {if s:=state(t,w);s.Stamp.Nodes!=0 || s.Pending {t.Fatal("old canceled loader changed outline",s)}}
+   loadFixture(t,p,ex,batch)
+   if s:=state(t,p.windows[1]);s.Stamp.Nodes!=128 || s.Pending {t.Fatal("retry after terminal cleanup failed",s)}
+  })
+ }
+}

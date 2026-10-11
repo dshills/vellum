@@ -11,6 +11,7 @@ python3 drivers/cogent/prepare_test.py
 python3 scripts/check-text-backend.py
 python3 scripts/check-editor-accessibility_test.py
 python3 scripts/benchmark-native_test.py
+python3 scripts/benchmark-grid_test.py
 python3 scripts/child_process_test.py
 python3 scripts/release-sdk_test.py
 python3 scripts/check-sdk_test.py
@@ -23,7 +24,7 @@ go vet ./...
 mkdir -p build
 go build -o build/vellum-workbench ./cmd/workbench
 # Replacement dependency tests do not run transitively with driver tests.
-(cd build/upstream && go test -race ./system ./system/driver/base ./system/driver/desktop ./system/composer ./gpu ./gpu/gpudraw ./core ./xyz/xyzcore -run 'TestVellumReviewTextCursor|TestComposerPublicationAndWithdrawal|TestLockRechecksAfterWaitingForNativeTeardown|TestSceneShowUsesOwnWindowTitle|TestQueuedCloseStopsLoopAfterComposerWithdrawal|TestNewWindowSizingOwnsContextDuringOtherWindowResize|TestSameWindowStageSizingUsesExistingContext|TestScreenSnapshotDuringCacheRebuild|TestWindowOptionsFixupUsesScreenSnapshot|TestMainQueuePublicationDuringStartupDispatch|TestMainQueueInitializationPreservesIdentityAndCompletion|TestMainThreadRequiredCallbackWaitsForLoopPublication|TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW|TestDeviceLoss|TestSurfaceAcquisition|TestRetiredDirectRenderSource|TestComposition|TestInlineComposition|TestIdleBarrier|TestVellumScreenPoll|TestVellumScreenAccessors|TestVellumCurrentWindowSnapshot|TestVellumRedraw|TestVellumComposer|TestVellumUnsafeResizeReplay|TestVellumRenderedGeometryScrollAndWrap|TestVellumFocuslessShortcutPhases|TestVellumMainQueueStop|TestVellumMainQueueFailure|TestVellumNativeEventLifecycle|TestVellumTerminalMainRecovery|TestVellumQuitClean|TestVellumTextureCopy|TestVellumWindowList')
+(cd build/upstream && go test -race ./system ./system/driver/base ./system/driver/desktop ./system/composer ./gpu ./gpu/gpudraw ./core ./xyz/xyzcore -run 'TestVellumFrameTrace|TestVellumMeasuredComposition|TestVellumReviewTextCursor|TestComposerPublicationAndWithdrawal|TestLockRechecksAfterWaitingForNativeTeardown|TestSceneShowUsesOwnWindowTitle|TestQueuedCloseStopsLoopAfterComposerWithdrawal|TestNewWindowSizingOwnsContextDuringOtherWindowResize|TestSameWindowStageSizingUsesExistingContext|TestScreenSnapshotDuringCacheRebuild|TestWindowOptionsFixupUsesScreenSnapshot|TestMainQueuePublicationDuringStartupDispatch|TestMainQueueInitializationPreservesIdentityAndCompletion|TestMainThreadRequiredCallbackWaitsForLoopPublication|TestComposerWithdrawnBeforeNativeTeardownEvenWithoutGLFW|TestDeviceLoss|TestSurfaceAcquisition|TestRetiredDirectRenderSource|TestComposition|TestInlineComposition|TestIdleBarrier|TestVellumScreenPoll|TestVellumScreenAccessors|TestVellumCurrentWindowSnapshot|TestVellumRedraw|TestVellumComposer|TestVellumUnsafeResizeReplay|TestVellumRenderedGeometryScrollAndWrap|TestVellumFocuslessShortcutPhases|TestVellumMainQueueStop|TestVellumMainQueueFailure|TestVellumNativeEventLifecycle|TestVellumTerminalMainRecovery|TestVellumQuitClean|TestVellumTextureCopy|TestVellumWindowList')
 
 "$VELLUM_REPO_ROOT/scripts/check-example.sh"
 
@@ -35,3 +36,4 @@ go build -o build/vellum-workbench ./cmd/workbench
 (cd "$VELLUM_REPO_ROOT/examples/replay" && go test -race ./... && go vet ./... && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 (cd "$VELLUM_REPO_ROOT/examples/grid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
 (cd "$VELLUM_REPO_ROOT/examples/loadedgrid" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)
+(cd "$VELLUM_REPO_ROOT/examples/loadedtree" && go test -race -tags offscreen ./... && go vet -tags offscreen ./...)

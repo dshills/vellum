@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "scope": "Root portable and native driver tests, tagged frame accounting and affected upstream packages; enumerated project/prepared source plus toolchain identity. No full compiler/module-cache/system SDK closure, performance budgets or physical GPU/human accessibility certification.",
+  "checks": [
+    {
+      "name": "toolchain",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo version\ngo env GOOS GOARCH GOVERSION GOCACHE GOMODCACHE GOWORK"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 0.04101437499048188,
+      "log_sha256": "30838153488603e6e4e4c5f15e11de5b7fdcb477acc26cd43e3547f456d2b9c3"
+    },
+    {
+      "name": "root-race",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo test -race ./... -count=1"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 6.393969666998601,
+      "log_sha256": "a8c2d565471178e57824dd825fe7a02888a5681d0235c0ba7d5ce9c0f6c849dd"
+    },
+    {
+      "name": "root-vet",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo vet ./..."
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 0.6645072500105016,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "native-default-race",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo test -race ./... -count=1"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 24.364617624989478,
+      "log_sha256": "e951ca67bda20cac23a25f1f5a036a7b8c9fb3d87bff085e664b21fe70897290"
+    },
+    {
+      "name": "native-default-vet",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo vet ./..."
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 0.9247416250000242,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "frame-metrics-offscreen-race20",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo test -race -tags offscreen ./... -run 'TestFrameMetrics' -count=20"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 28.302063791983528,
+      "log_sha256": "cfaf568426fa199fdd9c6f2d05f4e17735c88a1012d4412d9d35684ef0d6c204"
+    },
+    {
+      "name": "native-offscreen-vet",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo vet -tags offscreen ./..."
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 0.7177420830121264,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "upstream-timing-race20",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo test -race ./core ./system/composer ./gpu ./gpu/gpudraw -run 'TestVellumFrameTrace|TestVellumMeasuredComposition|TestSurfaceAcquisition' -count=20"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 4.59026383300079,
+      "log_sha256": "5cca73d09b80513805e75013953d0a750a544cde5f04836ad77d4f1c3059a67e"
+    },
+    {
+      "name": "upstream-vet-observation",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo vet ./core ./system/composer ./gpu ./gpu/gpudraw"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent/build/upstream",
+      "exit_code": 1,
+      "error": null,
+      "elapsed_seconds": 0.608447333012009,
+      "log_sha256": "3355df84d3f00852c31b06c3f1d672e79a7b2d65c5ae22ad66aea32fb668290e"
+    },
+    {
+      "name": "baseline-upstream-vet-observation",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo vet ./core ./system/composer ./gpu ./gpu/gpudraw"
+      ],
+      "cwd": "/Users/dshills/Development/projects/Vellum/drivers/cogent/build/upstream",
+      "exit_code": 1,
+      "error": null,
+      "elapsed_seconds": 3.193794541002717,
+      "log_sha256": "3355df84d3f00852c31b06c3f1d672e79a7b2d65c5ae22ad66aea32fb668290e"
+    },
+    {
+      "name": "upstream-vet-other-analyzers",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\ngo vet -composites=false -unreachable=false ./core ./system/composer ./gpu ./gpu/gpudraw"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent/build/upstream",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 1.0871514170139562,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "prepare-tests",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\npython3 prepare_test.py"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 0.12695908400928602,
+      "log_sha256": "e41f5b5abb045943ad8cdeaf6888b08e484050b9a2af42746411083a598e0cff"
+    },
+    {
+      "name": "text-backend-policy",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\npython3 scripts/check-text-backend.py"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 12.20413804097916,
+      "log_sha256": "cba6fb26d902084c634c67f25c30571724ddeea8a9b63e8bd42514b1dd915466"
+    },
+    {
+      "name": "shell-syntax",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexport GOFLAGS=-mod=readonly\nsh -n scripts/check.sh"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 0.039638749993173406,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "project_inputs_unchanged": true,
+  "prepared_inputs_unchanged": true,
+  "baseline_prepared_unchanged": true,
+  "source_files": 339,
+  "prepared_files": 6128,
+  "baseline_vet_diagnostics_equal": true,
+  "baseline_vet_limits": "Stock upstream vet fails in both baseline and corrected inputs with identical composites/unreachable diagnostics. Other analyzers pass with only those two analyzers disabled; no full upstream vet PASS claim.",
+  "independent_review_manifest_sha256": "7d21d85eeb5873a5d4cf448bae23c52877d151323adeb7176d726430b490f3c1",
+  "artifacts": {
+    "baseline-prepared-after.json": "128434fa0b5b03aaf4631d827d710d51c5879cd60a253193560b4da2e3984f5e",
+    "baseline-prepared-before.json": "128434fa0b5b03aaf4631d827d710d51c5879cd60a253193560b4da2e3984f5e",
+    "inputs-after.json": "d595976430509bb510064442d484a6f6630c347bc9f16adfd5625a0a88e7f992",
+    "inputs-before.json": "d595976430509bb510064442d484a6f6630c347bc9f16adfd5625a0a88e7f992",
+    "prepared-after.json": "28dacd87e91a8b44839ed3cd2bbe8e42fe907f44ec3a70c9e5bec3ae57a0f777",
+    "prepared-before.json": "28dacd87e91a8b44839ed3cd2bbe8e42fe907f44ec3a70c9e5bec3ae57a0f777"
+  },
+  "producer_sha256": "bfbb83203af064d4e717ee00a10eed3849a958de166ca78d1a71fe51de3d3fe7",
+  "result": "PASS_WITH_MATCHED_BASELINE_VET_FAILURE"
+}

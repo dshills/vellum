@@ -1,0 +1,115 @@
+[
+  {
+    "name": "consumer-portable-race3",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=3",
+      "-v",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -race -count=3 -v ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedtree",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 4.23,
+    "log": "/private/tmp/vellum-large-tree-qualification/qualified-v3/consumer-portable-race3.log",
+    "log_sha256": "8a2bd59fd08f1bbeba2f6dab1c07327cb4f562e8953e1815725c94dc5a99218d"
+  },
+  {
+    "name": "consumer-offscreen-all-race1",
+    "command": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      "-count=1",
+      "-v",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -tags offscreen -race -count=1 -v ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedtree",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 29.792,
+    "log": "/private/tmp/vellum-large-tree-qualification/qualified-v3/consumer-offscreen-all-race1.log",
+    "log_sha256": "2c2b8e37321b731c80583f0688d1c8eeb527d9be56922cbeb64a5686def4c76a"
+  },
+  {
+    "name": "consumer-offscreen-vet",
+    "command": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet -tags offscreen ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedtree",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 0.706,
+    "log": "/private/tmp/vellum-large-tree-qualification/qualified-v3/consumer-offscreen-vet.log",
+    "log_sha256": "390ee0ac9cfcce4aeeba57210473d1a5c0db71f50a6c2b85f5e79b5cc29e7afa"
+  },
+  {
+    "name": "consumer-desktop-vet",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedtree",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 0.709,
+    "log": "/private/tmp/vellum-large-tree-qualification/qualified-v3/consumer-desktop-vet.log",
+    "log_sha256": "a459b41fbe6d637a2a39f8983a283f38ae563f4eb0fbef2f6c230ae029d4c818"
+  },
+  {
+    "name": "desktop-race-build",
+    "command": [
+      "go",
+      "build",
+      "-race",
+      "-o",
+      "/private/tmp/vellum-large-tree-qualification/qualified-v3/loadedtree-desktop",
+      "."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go build -race -o /private/tmp/vellum-large-tree-qualification/qualified-v3/loadedtree-desktop ."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedtree",
+    "exit_code": 0,
+    "timed_out": false,
+    "runner_error": null,
+    "elapsed_seconds": 3.265,
+    "log": "/private/tmp/vellum-large-tree-qualification/qualified-v3/desktop-race-build.log",
+    "log_sha256": "1961d396d9b735b390ca0a4884771ba12da04bd288401794d3c468cda6bcc2c6"
+  }
+]

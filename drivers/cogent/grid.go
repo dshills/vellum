@@ -463,7 +463,36 @@ func (g *gridBinding) applyIntent(reason ui.GridChangeReason, interaction bool, 
 }
 func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
 	if g.live() {
-		postControl(g.r, func() { g.applyIntent(reason, true, fn) })
+		trace, tag := tracedGridIntent(g)
+		if tag == 0 {
+			postControl(g.r, func() { g.applyIntent(reason, true, fn) })
+			return
+		}
+		trace.ExpectOwner(tag)
+		err := g.owner.PostWindow(g.window, func() {
+			returned := false
+			defer func() {
+				if !returned {
+					trace.Fail(tag, "traced owner transition did not return")
+					trace.Transition(tag, 0)
+				}
+			}()
+			before, beforeErr := g.model.State()
+			g.applyIntent(reason, true, fn)
+			after, afterErr := g.model.State()
+			if beforeErr != nil || afterErr != nil || !g.live() || after.Generation == before.Generation {
+				trace.Fail(tag, "traced grid input did not publish an owner transition")
+				trace.Transition(tag, 0)
+			} else {
+				trace.Transition(tag, after.Generation)
+			}
+			returned = true
+		})
+		if err != nil {
+			trace.Fail(tag, "traced grid owner posting refused")
+			trace.Transition(tag, 0)
+			trace.OwnerWork(tag, 0) // no owner callback was accepted
+		}
 	}
 }
 func (g *gridBinding) requestViewport(request gridRequest) {

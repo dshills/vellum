@@ -1,0 +1,132 @@
+[
+  {
+    "name": "protocol-python",
+    "command": [
+      "python3",
+      "-B",
+      "scripts/benchmark-grid_test.py"
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec python3 -B scripts/benchmark-grid_test.py"
+    ],
+    "cwd": "/private/tmp/vellum-large-data",
+    "exit_code": 0,
+    "runner_error": null,
+    "elapsed_seconds": 0.1322342920175288,
+    "log": "protocol-python.log",
+    "sha256": "8bcea9980087e1783db95a4945e0d294e8c5f54d118fe613a8801d5c26ccfe36"
+  },
+  {
+    "name": "perf-default-race3",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-count=3",
+      "-v",
+      "-run",
+      "^TestPerf",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -race -count=3 -v -run '^TestPerf' ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+    "exit_code": 0,
+    "runner_error": null,
+    "elapsed_seconds": 3.454311667010188,
+    "log": "perf-default-race3.log",
+    "sha256": "f70f96573a50744811aa8fbf4403fddecdbbdeb70f1e1f71d3f76eb552a12d1b"
+  },
+  {
+    "name": "perf-actual-offscreen-race1",
+    "command": [
+      "go",
+      "test",
+      "-tags",
+      "offscreen",
+      "-race",
+      "-count=1",
+      "-v",
+      "-run",
+      "^TestPerf",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -tags offscreen -race -count=1 -v -run '^TestPerf' ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+    "exit_code": 0,
+    "runner_error": null,
+    "elapsed_seconds": 7.358427165978355,
+    "log": "perf-actual-offscreen-race1.log",
+    "sha256": "c902e65e57b9915a0be61035c36430b910d735fad9854ca4a08abdd5be5d9214"
+  },
+  {
+    "name": "consumer-offscreen-vet",
+    "command": [
+      "go",
+      "vet",
+      "-tags",
+      "offscreen",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet -tags offscreen ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+    "exit_code": 0,
+    "runner_error": null,
+    "elapsed_seconds": 0.7108376669930294,
+    "log": "consumer-offscreen-vet.log",
+    "sha256": "96a13c343ba3e7cf4be134a98acd1ef8fb5b3df54244317d549e548c4bb77f17"
+  },
+  {
+    "name": "consumer-default-vet",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go vet ./..."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+    "exit_code": 0,
+    "runner_error": null,
+    "elapsed_seconds": 0.7329331670189276,
+    "log": "consumer-default-vet.log",
+    "sha256": "e5fac32d8d0ccb34832be56500a34167097610bc3b15b67cfe4d57813b04a734"
+  },
+  {
+    "name": "optimized-desktop-build",
+    "command": [
+      "go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+      "."
+    ],
+    "argv": [
+      "/bin/zsh",
+      "-c",
+      "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go build -o /private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release ."
+    ],
+    "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid",
+    "exit_code": 0,
+    "runner_error": null,
+    "elapsed_seconds": 2.9899524170032237,
+    "log": "optimized-desktop-build.log",
+    "sha256": "7e45e67d991e4f905a536d82bdaac131038715012e0dfd480546772f17219265"
+  }
+]

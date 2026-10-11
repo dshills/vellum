@@ -1,0 +1,44 @@
+import hashlib,json,pathlib,shlex,subprocess,sys,time
+sys.dont_write_bytecode=True
+R=pathlib.Path('/private/tmp/vellum-large-data');D=pathlib.Path(__file__).parent;O=D/'qualified-v2';O.mkdir(exist_ok=False);M=R/'examples/loadedgrid';sys.path.insert(0,str(R/'scripts'))
+from child_process import run_child
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+OWNED=['examples/loadedgrid/'+p for p in ['perf.go','perf_runtime.go','perf_profile.go','perf_test.go','perf_profile_test.go','perf_offscreen_test.go','main.go','README.md']]+['scripts/benchmark-grid.py','scripts/benchmark-grid_test.py','specs/grid-performance.md']
+def collect():
+ ps=set(R/p for p in OWNED)
+ ps.update(p for p in M.iterdir() if p.is_file() and(p.suffix=='.go' or p.name in ['go.mod','go.sum','LICENSE']))
+ for package in ['app','tasks','execution','ui','virtual']:ps.update((R/package).rglob('*.go'))
+ ps.update(R/p for p in ['go.mod','vellum.go','scripts/child_process.py','scripts/sdk_environment.py','drivers/cogent/go.mod','drivers/cogent/go.sum','drivers/cogent/env.sh','drivers/cogent/prepare.sh','drivers/cogent/prepare_test.py','drivers/cogent/native/dependencies.json'])
+ ps.update((R/'drivers/cogent').glob('*.go'));ps.update((R/'drivers/cogent').glob('*.m'));ps.update((R/'drivers/cogent').glob('*.h'))
+ ps.update(p for p in (R/'drivers/cogent/native/patches').rglob('*') if p.is_file())
+ selected={str(p.relative_to(R)):h(p) for p in sorted(ps)}
+ prepared={}
+ for n in ['upstream','typesetting']:
+  base=R/'drivers/cogent/build'/n;mp={str(p.relative_to(base)):h(p) for p in sorted(base.rglob('*')) if p.is_file() and '.git' not in p.parts};data=json.dumps(mp,sort_keys=True,separators=(',',':')).encode();prepared[n]={'count':len(mp),'canonical_sha256':hashlib.sha256(data).hexdigest()}
+ return {'owned':{p:selected[p] for p in OWNED},'selected':selected,'prepared_fingerprints':prepared,'producer_sha256':h(pathlib.Path(__file__))}
+
+before=collect();(O/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+prior=D/'qualified-v1';old=json.loads((prior/'inputs-before.json').read_text());oldproof=json.loads((prior/'qualification.json').read_text())
+changed={p for p in old['selected']|before['selected'] if old['selected'].get(p)!=before['selected'].get(p)}
+assert changed=={'scripts/benchmark-grid.py','scripts/benchmark-grid_test.py'},changed
+assert old['prepared_fingerprints']==before['prepared_fingerprints']
+for p in OWNED:
+ q=O/'owned-sources'/(p+'.txt');q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes((R/p).read_bytes())
+(O/'ownership.json').write_text(json.dumps({'root':str(R),'scope':'Eleven owned performance consumer/protocol/docs files; no native runtime ownership or GUI acceptance.','files':before['owned']},indent=2)+'\n')
+(O/'qualify.py.txt').write_bytes(pathlib.Path(__file__).read_bytes())
+commands=[('protocol-python',R,['python3','-B','scripts/benchmark-grid_test.py']),('original-reviewer-setup-regressions',R,['python3','-B','/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py',str(R/'scripts/benchmark-grid.py')])]
+checks=[];prefix='export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+shlex.quote(str(R/'drivers/cogent/env.sh'))+'\nexec '
+for name,cwd,cmd in commands:
+ p=O/(name+'.log');start=time.monotonic();code=-1;err=None;argv=['/bin/zsh','-c',prefix+shlex.join(cmd)]
+ with p.open('xb') as log:
+  log.write((json.dumps({'argv':argv,'cwd':str(cwd)})+'\n').encode());log.flush()
+  try:code=run_child(argv,cwd=cwd,stdout=log,stderr=subprocess.STDOUT,timeout=60).returncode
+  except Exception as e:err=repr(e);log.write((err+'\n').encode())
+ checks.append({'name':name,'command':cmd,'argv':argv,'cwd':str(cwd),'exit_code':code,'runner_error':err,'elapsed_seconds':time.monotonic()-start,'log':p.name,'sha256':h(p)});print(name,code,flush=True)
+ if code:break
+for c in oldproof['checks']:
+ assert h(prior/c['log'])==c['sha256']
+after=collect();(O/'inputs-after.json').write_text(json.dumps(after,indent=2)+'\n');binary=pathlib.Path(oldproof['binary']['path']);assert h(binary)==oldproof['binary']['sha256']
+inherited=[c for c in oldproof['checks'] if c['name']!='protocol-python']
+data={'schema':'vellum-grid-performance-selected-qualification-v2','scope':'Python-only setup-retirement correction qualified anew; five unchanged Go/offscreen/vet/build checks inherited by exact selected non-Python inputs and complete prepared byte fingerprints. No compiler/module-cache/OS SDK closure or native performance acceptance.','source_root':str(R),'producer':{'path':str(pathlib.Path(__file__)),'sha256':h(pathlib.Path(__file__))},'before':{'path':'inputs-before.json','sha256':h(O/'inputs-before.json')},'after':{'path':'inputs-after.json','sha256':h(O/'inputs-after.json')},'unchanged':before==after,'owned':before['owned'],'selected_count':len(before['selected']),'prepared':before['prepared_fingerprints'],'checks':checks,'inherited_go_checks':inherited,'inherited_proof':{'path':str(prior/'qualification.json'),'sha256':h(prior/'qualification.json'),'scope':'Historical six-check PASS before launcher setup gap was fixed; only Go checks reused; Python acceptance superseded.'},'changed_inputs':sorted(changed),'regression':{'original_test':{'path':'/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py','sha256':h(pathlib.Path('/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py'))},'red_log':{'path':'/private/tmp/vellum-grid-performance-review/draft1/setup-red.log','sha256':h(pathlib.Path('/private/tmp/vellum-grid-performance-review/draft1/setup-red.log'))}},'binary':oldproof['binary'],'result':'PASS' if before==after and len(checks)==len(commands) and all(c['exit_code']==0 for c in checks+inherited) else 'FAIL'}
+p=O/'qualification.json';p.write_text(json.dumps(data,indent=2)+'\n');print('PROOF',p,h(p),data['result'],flush=True);sys.exit(data['result']!='PASS')

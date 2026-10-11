@@ -287,6 +287,17 @@
               "sha256": "727d379112f0a835727daf4e4024ead3ce853c7a6d7a0385e4b5081d92d0bd70"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/frametrace",
+          "inputs": "native/patches/frametrace/original-hashes.json",
+          "outputs": "native/patches/frametrace/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/frametrace/0034-native-frame-work-tracing.patch",
+              "sha256": "b1d64103808aafc9aa86a961682864c799018a4981810eea99731c976c31f20c"
+            }
+          ]
         }
       ]
     },

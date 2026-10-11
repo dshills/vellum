@@ -1,0 +1,62 @@
+from pathlib import Path
+import difflib, hashlib, json, subprocess, sys, time
+R = Path('/private/tmp/vellum-large-data')
+D = R / 'drivers/cogent'
+P = D / 'native/patches/frametrace'
+B = Path('/private/tmp/vellum-large-data-native-before')
+O = Path('/private/tmp/vellum-large-data-pin34')
+O.mkdir(exist_ok=False)
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+paths = list(json.loads((P / 'output-hashes.json').read_text()))
+originals = {}; outputs = {}; patch = []
+for name in paths:
+    old = B / name; new = D / 'build/upstream' / name
+    originals[name] = sha(old) if old.exists() else None
+    outputs[name] = sha(new)
+    patch.extend(difflib.unified_diff(old.read_text().splitlines(True) if old.exists() else [],
+                 new.read_text().splitlines(True), fromfile='a/'+name if old.exists() else '/dev/null', tofile='b/'+name))
+patchfile = P / '0034-native-frame-work-tracing.patch'
+patchfile.write_text(''.join(patch))
+(P / 'original-hashes.json').write_text(json.dumps(originals, indent=2)+'\n')
+(P / 'output-hashes.json').write_text(json.dumps(outputs, indent=2)+'\n')
+m = D / 'native/dependencies.json'; manifest = json.loads(m.read_text())
+stage = manifest['dependencies'][0]['stages'][-1]
+assert stage['origin'].endswith('/frametrace')
+stage['patches'][0]['sha256'] = sha(patchfile)
+m.write_text(json.dumps(manifest, indent=2)+'\n')
+def prepared():
+    return {str(p.relative_to(D/'build')): sha(p)
+            for dep in ('upstream','typesetting') for p in sorted((D/'build'/dep).rglob('*'))
+            if p.is_file() and '.git' not in p.relative_to(D/'build'/dep).parts}
+def inputs():
+    files = [D/'prepare.py', D/'prepare.sh', D/'env.sh', m, D/'prepare_test.py']
+    files += [p for p in sorted((D/'native/patches').rglob('*')) if p.is_file()]
+    return {str(p.relative_to(R)): sha(p) for p in files}
+before = prepared(); ib = inputs()
+(O/'prepared-before.json').write_text(json.dumps(before, indent=2)+'\n')
+(O/'inputs-before.json').write_text(json.dumps(ib, indent=2)+'\n')
+sys.dont_write_bytecode=True; sys.path.insert(0,str(R))
+from scripts.child_process import run_child
+checks=[]
+for name, command in [('prepare-tests', 'python3 prepare_test.py'),('fresh-prepare', 'python3 prepare.py')]:
+    argv=['/bin/zsh','-c','export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+str(D/'env.sh')+'\n'+command]
+    start=time.monotonic(); error=None
+    with (O/(name+'.log')).open('xb') as f:
+        try: code=run_child(argv,cwd=D,stdout=f,stderr=subprocess.STDOUT,timeout=600).returncode
+        except Exception as e: code=124 if isinstance(e,subprocess.TimeoutExpired) else 125; error={'type':type(e).__name__,'message':str(e)}
+    checks.append(dict(name=name,argv=argv,cwd=str(D),exit_code=code,error=error,elapsed_seconds=time.monotonic()-start,log_sha256=sha(O/(name+'.log'))))
+    print(name,code,flush=True)
+after=prepared(); ia=inputs()
+(O/'prepared-after.json').write_text(json.dumps(after,indent=2)+'\n')
+(O/'inputs-after.json').write_text(json.dumps(ia,indent=2)+'\n')
+actual={n:sha(D/'build/upstream'/n) for n in paths}
+v={'schema':1,'scope':'Stage34 pinned reproduction: fresh cached module copies and ordered patch checks, entire prepared core/typesetting file fingerprints. Not a full compiler/module-cache closure or physical GPU acceptance.',
+   'checks':checks,'prepared_files':len(after),'prepared_bytes_unchanged':before==after,'preparation_inputs_unchanged':ib==ia,
+   'stage_outputs':outputs,'actual_outputs':actual,'outputs_match':outputs==actual,
+   'patch_sha256':sha(patchfile),'producer_sha256':sha(Path(__file__)),
+   'artifacts':{n:sha(O/n) for n in ('inputs-before.json','inputs-after.json','prepared-before.json','prepared-after.json')}}
+v['result']='PASS' if all(c['exit_code']==0 for c in checks) and before==after and ib==ia and outputs==actual else 'FAIL'
+(O/'qualification.json').write_text(json.dumps(v,indent=2)+'\n')
+(O/'producer.py.txt').write_bytes(Path(__file__).read_bytes())
+print(v['result'],sha(O/'qualification.json'),flush=True)
+sys.exit(0 if v['result']=='PASS' else 1)

@@ -1,0 +1,286 @@
+package cogent
+
+import (
+	"encoding/base64"
+	"image"
+	"math"
+
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/styles"
+	"cogentcore.org/core/styles/abilities"
+	"cogentcore.org/core/styles/states"
+	"cogentcore.org/core/tree"
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/virtual"
+)
+
+// TreeInspection is detached completed-frame geometry. No source traversal or
+// widget mutation occurs in InspectTree. Native coordinates are scene pixels;
+// the accepted portable viewport uses logical pixels.
+type TreeInspection struct {
+	Window, ID                                      string
+	Incarnation, RowIncarnation, Generation, Frames uint64
+	Stamp                                           virtual.TreeStamp
+	Viewport                                        virtual.OutlineViewport
+	Selected                                        string
+	SelectedVisible, Pending                        bool
+	VisibleRows, TotalNodes, RetainedRows           int
+	Scale                                           float32
+	Bounds                                          image.Rectangle
+	Rows                                            []TreeRowGeometry
+	Pages                                           []TreePageGeometry
+}
+type TreeRowGeometry struct {
+	ID, DisclosureID, Key, Parent, Label string
+	Index, Depth                         int
+	Expanded, HasChildren, Selected      bool
+	Bounds, DisclosureBounds             image.Rectangle
+}
+type TreePageGeometry struct {
+	ID, Name  string
+	Direction int
+	Enabled   bool
+	Bounds    image.Rectangle
+}
+
+func TreeRowID(outline, key string) string {
+	return "tree:" + base64.RawURLEncoding.EncodeToString([]byte(outline)) + ":row:" + base64.RawURLEncoding.EncodeToString([]byte(key))
+}
+func TreeDisclosureID(outline, key string) string {
+	return "tree:" + base64.RawURLEncoding.EncodeToString([]byte(outline)) + ":disclosure:" + base64.RawURLEncoding.EncodeToString([]byte(key))
+}
+func TreePageID(outline string, direction int) string {
+	name := "previous"
+	if direction > 0 {
+		name = "next"
+	}
+	return "tree:" + base64.RawURLEncoding.EncodeToString([]byte(outline)) + ":page:" + name
+}
+func treeViewportRequest(bounds image.Rectangle, scale float32) (outlineRequest, error) {
+	if !validGridScale(scale) || bounds.Dx() < 0 || bounds.Dy() < 0 {
+		return outlineRequest{}, ErrTreeBudget
+	}
+	width := math.Floor(float64(bounds.Dx())/float64(scale)) - gridScrollbar
+	height := math.Floor(float64(bounds.Dy())/float64(scale)) - treeFooter
+	if width > gridNativeMaxDimension || height > gridNativeMaxDimension {
+		return outlineRequest{}, ErrTreeBudget
+	}
+	return outlineRequest{width: max(1, int(width)), height: max(1, int(height)), scale: scale}, nil
+}
+func (t *outlineBinding) capture() {
+	if !t.live() || t.projection.State.Generation == 0 {
+		return
+	}
+	if t.frames == math.MaxUint64 {
+		t.measurement.Store(nil)
+		return
+	}
+	t.frames++
+	scale := t.host.Styles.UnitContext.Px(1)
+	bounds := t.host.Geom.ContentBBox
+	request, err := treeViewportRequest(bounds, scale)
+	if err != nil {
+		t.refuseGeometry()
+		return
+	}
+	t.geometryRefused = false
+	t.requestViewport(request)
+	t.requestMu.Lock()
+	requested := t.requested
+	t.requestMu.Unlock()
+	s := t.projection.State
+	if requested.width != s.Viewport.Width || requested.height != s.Viewport.Height {
+		t.measurement.Store(nil)
+		return
+	}
+	m := &TreeInspection{Window: t.window, ID: t.r.node.ID, Incarnation: t.incarnation, RowIncarnation: t.epoch, Generation: s.Generation, Frames: t.frames, Stamp: s.Stamp, Viewport: s.Viewport, Selected: s.Selected, SelectedVisible: s.SelectedVisible, Pending: s.Pending, VisibleRows: s.VisibleRows, TotalNodes: s.Stamp.Nodes, RetainedRows: len(t.rows), Scale: scale, Bounds: bounds, Rows: make([]TreeRowGeometry, len(t.projection.Rows)), Pages: make([]TreePageGeometry, 2)}
+	origin := image.Point{}
+	if t.host.Scene != nil {
+		origin = t.host.Scene.SceneGeom.Pos
+	}
+	m.Bounds = m.Bounds.Add(origin)
+	for i, row := range t.projection.Rows {
+		native := t.rows[i]
+		box := native.Geom.TotalBBox.Add(origin)
+		arrow := native.arrow.Geom.TotalBBox.Add(origin)
+		if row.Clip.Width <= 0 || row.Clip.Height <= 0 {
+			box, arrow = image.Rectangle{}, image.Rectangle{}
+		}
+		if !row.HasChildren {
+			arrow = image.Rectangle{}
+		}
+		m.Rows[i] = TreeRowGeometry{ID: TreeRowID(m.ID, row.ID), DisclosureID: TreeDisclosureID(m.ID, row.ID), Key: row.ID, Parent: row.Parent, Label: row.Label, Index: row.Index, Depth: row.Depth, Expanded: row.Expanded, HasChildren: row.HasChildren, Selected: row.Selected, Bounds: box, DisclosureBounds: arrow}
+	}
+	for i, b := range t.pager {
+		direction := i*2 - 1
+		m.Pages[i] = TreePageGeometry{ID: TreePageID(m.ID, direction), Name: b.Text, Direction: direction, Enabled: !b.StateIs(states.Disabled), Bounds: b.Geom.TotalBBox.Add(origin)}
+	}
+	old := t.measurement.Load()
+	t.measurement.Store(m)
+	if old == nil || old.Generation != m.Generation || old.Bounds != m.Bounds {
+		_ = t.owner.Invalidate(t.window)
+	}
+}
+func (t *outlineBinding) currentMeasurement() *TreeInspection {
+	m := t.measurement.Load()
+	if m == nil || m.Generation != t.projection.State.Generation || m.Stamp != t.projection.State.Stamp || m.Viewport != t.projection.State.Viewport {
+		return nil
+	}
+	t.requestMu.Lock()
+	request := t.requested
+	t.requestMu.Unlock()
+	if request.width != m.Viewport.Width || request.height != m.Viewport.Height || request.scale != m.Scale {
+		return nil
+	}
+	return m
+}
+func InspectTree(a *app.Application, model *virtual.Outline) (TreeInspection, error) {
+	outlineRegistry.Lock()
+	t := outlineRegistry.models[model]
+	outlineRegistry.Unlock()
+	if t == nil {
+		return TreeInspection{}, ErrTreeClosed
+	}
+	if t.owner != a {
+		return TreeInspection{}, ErrTreeBinding
+	}
+	if !t.live() || t.r.control.retired {
+		return TreeInspection{}, ErrTreeClosed
+	}
+	state, err := model.State()
+	if err != nil {
+		return TreeInspection{}, err
+	}
+	m := t.currentMeasurement()
+	if m == nil || state.Generation != m.Generation || state.Stamp != m.Stamp || state.Viewport != m.Viewport || state.Pending != m.Pending {
+		return TreeInspection{}, ErrTreeLayout
+	}
+	out := *m
+	out.Rows = append([]TreeRowGeometry(nil), m.Rows...)
+	out.Pages = append([]TreePageGeometry(nil), m.Pages...)
+	return out, nil
+}
+
+type outlinePress struct {
+	ref                virtual.OutlineRef
+	bounds, hostBounds image.Rectangle
+	incarnation        uint64
+	scale              float32
+	disclosure         bool
+}
+
+func (t *outlineBinding) refAt(point image.Point) (outlinePress, bool) {
+	measured := t.currentMeasurement()
+	if measured == nil || !t.live() {
+		return outlinePress{}, false
+	}
+	for i, row := range measured.Rows {
+		if point.In(row.Bounds) && i < len(t.projection.Rows) {
+			return outlinePress{ref: t.projection.Rows[i].Ref, bounds: row.Bounds, hostBounds: measured.Bounds, incarnation: measured.Incarnation, scale: measured.Scale, disclosure: row.HasChildren && point.In(row.DisclosureBounds)}, true
+		}
+	}
+	return outlinePress{}, false
+}
+
+type outlineWidget struct {
+	core.Frame
+	binding *outlineBinding
+}
+
+func (w *outlineWidget) Init() {
+	w.Frame.Init()
+	w.Styler(func(s *styles.Style) {
+		s.Display = styles.Custom
+		s.Overflow.Set(styles.OverflowHidden)
+		s.Padding.Zero()
+		s.Gap.Zero()
+		s.Grow.Set(1, 1)
+		s.SetAbilities(true, abilities.Focusable, abilities.Clickable)
+	})
+}
+func (w *outlineWidget) Position() {
+	t := w.binding
+	if t == nil {
+		w.Frame.Position()
+		return
+	}
+	v := t.projection.State.Viewport
+	scale := w.Styles.UnitContext.Px(1)
+	if !validGridScale(scale) {
+		t.refuseGeometry()
+		return
+	}
+	setGridGeometry(&t.pane.WidgetBase, virtual.GridRect{Width: v.Width, Height: v.Height}, scale)
+	setGridGeometry(&t.vertical.WidgetBase, virtual.GridRect{X: v.Width, Width: gridScrollbar, Height: v.Height}, scale)
+	pageWidth := min(112, v.Width/3)
+	for i, b := range t.pager {
+		setGridGeometry(&b.WidgetBase, virtual.GridRect{X: i * pageWidth, Y: v.Height, Width: pageWidth, Height: treeFooter}, scale)
+	}
+	setGridGeometry(&t.status.WidgetBase, virtual.GridRect{X: pageWidth * 2, Y: v.Height, Width: max(0, v.Width-pageWidth*2), Height: treeFooter}, scale)
+	w.Frame.Position()
+}
+func (w *outlineWidget) RenderWidget() {
+	w.Frame.RenderWidget()
+	if w.binding != nil {
+		w.binding.capture()
+	}
+}
+
+type outlinePane struct {
+	core.Frame
+	binding *outlineBinding
+}
+
+func (p *outlinePane) Init() {
+	p.Frame.Init()
+	p.Styler(func(s *styles.Style) {
+		s.Display = styles.Custom
+		s.Overflow.Set(styles.OverflowHidden)
+		s.Padding.Zero()
+		s.Gap.Zero()
+		s.Grow.SetZero()
+	})
+}
+func (p *outlinePane) Position() {
+	scale := p.Styles.UnitContext.Px(1)
+	for _, row := range p.binding.rows {
+		r := row.row.Rect
+		setGridGeometry(&row.WidgetBase, virtual.GridRect{X: r.X, Y: r.Y, Width: r.Width, Height: r.Height}, scale)
+	}
+	p.Frame.Position()
+}
+
+type outlineNativeRow struct {
+	core.Frame
+	binding      *outlineBinding
+	row          virtual.OutlineRow
+	arrow, label *core.Text
+}
+
+func (r *outlineNativeRow) Init() {
+	r.Frame.Init()
+	r.Styler(func(s *styles.Style) {
+		s.Display = styles.Custom
+		s.Overflow.Set(styles.OverflowHidden)
+		s.Padding.Zero()
+		s.Margin.Zero()
+		s.Gap.Zero()
+		s.Border.Width.Zero()
+		s.Grow.SetZero()
+		s.SetAbilities(false, abilities.Focusable, abilities.Selectable, abilities.Clickable, abilities.Activatable)
+	})
+}
+func (r *outlineNativeRow) Position() {
+	rect := r.row.Rect
+	scale := r.Styles.UnitContext.Px(1)
+	indent := min(max(0, r.row.Depth), treeMaxIndentDepth) * treeIndent
+	indent = min(indent, max(0, rect.Width-treeDisclosureWidth))
+	arrowWidth := min(treeDisclosureWidth, max(0, rect.Width-indent))
+	labelX := indent + arrowWidth
+	setGridGeometryOrigin(&r.arrow.WidgetBase, virtual.GridRect{X: rect.X + indent, Y: rect.Y, Width: arrowWidth, Height: rect.Height}, rect.X, rect.Y, scale)
+	setGridGeometryOrigin(&r.label.WidgetBase, virtual.GridRect{X: rect.X + labelX, Y: rect.Y, Width: max(0, rect.Width-labelX), Height: rect.Height}, rect.X, rect.Y, scale)
+	r.Frame.Position()
+}
+
+var _ core.Widget = (*outlineWidget)(nil)
+var _ tree.Node = (*outlineNativeRow)(nil)

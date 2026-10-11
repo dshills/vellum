@@ -1,0 +1,18 @@
+Total: 5.83s
+ROUTINE ======================== cogentcore.org/core/core.(*paintSource).Draw in /private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/render_notjs.go
+         0      1.66s (flat, cum) 28.47% of Total
+         .          .     36:func (ps *paintSource) Draw(c composer.Composer) {
+         .          .     37:	cd := c.(*composer.ComposerDrawer)
+         .          .     38:	rd := ps.renderer.(*rasterx.Renderer)
+         .          .     39:
+         .          .     40:	unchanged := len(ps.render) == 0
+         .          .     41:	if !unchanged {
+         .      210ms     42:		rd.Render(ps.render)
+         .          .     43:	}
+         .          .     44:	img := rd.Image()
+         .      1.45s     45:	cd.Drawer.Copy(ps.drawPos, img, img.Bounds(), ps.drawOp, unchanged)
+         .          .     46:}
+         .          .     47:
+         .          .     48:func (ss *scrimSource) Draw(c composer.Composer) {
+         .          .     49:	cd := c.(*composer.ComposerDrawer)
+         .          .     50:	clr := colors.Uniform(colors.ApplyOpacity(colors.ToUniform(colors.Scheme.Scrim), 0.5))

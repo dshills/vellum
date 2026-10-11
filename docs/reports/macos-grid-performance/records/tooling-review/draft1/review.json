@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "result": "FINDING_PENDING_CORRECTION",
+  "scope": "Eleven grid performance/profile/protocol/docs files; independent source review plus mocked CPU-only launch/setup failure regression. No GUI or real process launched.",
+  "source_map": {
+    "path": "/private/tmp/vellum-grid-performance-review/draft1/source-map.json",
+    "sha256": "38e8a413417dbc98dbec615a1d401d945a081bb61ec3805989d08737c568041c"
+  },
+  "finding": {
+    "id": "benchmark-process-setup-unwind",
+    "severity": "medium",
+    "file": "scripts/benchmark-grid.py",
+    "line": 150,
+    "description": "Popen and selector setup precede cleanup/terminal-record guard. A selector setup OSError after successful launch does not retire child; launch failure leaves no per-run result.json.",
+    "regression": {
+      "path": "/private/tmp/vellum-grid-performance-review/benchmark_setup_review_test.py",
+      "sha256": "c21b0fb52fa123aac6f4ff40671904151094fc9b08c9a8a357288ad2253b0ccf",
+      "raw_log": "/private/tmp/vellum-grid-performance-review/draft1/setup-red.log",
+      "raw_log_sha256": "d198a594d5dbbf4f7ffedfb759ecd1545d453ce98b590e4abc5d73d45d1256f9",
+      "exit_code": 1,
+      "tests_failed": 2,
+      "classification": "Demonstrated product process-ownership/failure-evidence gap under mocked launch/selector OSError, not a compiler/fixture failure."
+    }
+  },
+  "provisional_other_contracts": [
+    "Actual clip-count workload >=400 cells,50rows,8columns; paired layouts normalized and exact scale/cardinality checked.",
+    "Same native ticket generation/rawphase values and total work sum required; nonnegative integer phases and monotonic generation/frame.",
+    "Nearest-rank percentiles preserve outliers and per-run distributions; no independent percentile sum or full P6 completion claim.",
+    "Optional profile uses new O_EXCL0600 path,64MiB sticky-error writer, process-wide diagnostic labels and ordinary budget-run refusal.",
+    "Normal timed-out/invalid-output runs retire owned process groups and preserve raw output; setup boundary correction is pending."
+  ]
+}

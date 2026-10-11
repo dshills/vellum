@@ -1,0 +1,138 @@
+# Stored-table performance measurement
+
+This workload measures the P6 warm table-scroll target on the local macOS
+backend. It does not establish the complete P6 table/tree gate, P11 endurance,
+physical input-to-photon latency or professional application performance.
+The unchanged provisional warm target is total UI work p95 ≤4 ms and p99 ≤6 ms.
+A failed target remains failed; neither this runner nor its consumer adjusts it.
+
+## Fixture and operation
+
+`examples/loadedgrid -perf` constructs one native window with twenty stored
+numeric columns, two frozen leading columns and a fixed header. Four separate
+cases compare 10,000 and 1,000,000 actual stored rows at the same native viewport,
+with fixed or stable-key indexed variable heights. Every record contains twenty
+`int64` values generated with seed 7. Generation and worker-built initial
+projection precede native scrolling and have separately reported durations.
+The borrowed domain payload and projection order/inverse/prefix are excluded
+from UI-retention interpretation and retain their own logical byte counts.
+
+The intended content viewport is 768×624 logical grid pixels, with 96-pixel
+columns, a 24-pixel header and fixed 12-pixel rows. The variable pattern is
+9/11/13/15 pixels per four stable row keys, also averaging 12. The host's public
+Style size uses device-independent pixels (Dp, 1/160in), rather than grid Px
+(1/96in): 1299×1060 Dp includes the 12-pixel scrollbars. Small numeric typography
+fits these compact cells. This is a numeric-table fixture, not the text-editor
+or 1,000-control baseline. Window dimensions, actual scale, measured viewport
+and clipped cell rectangles are retained.
+
+At least 400 cells, 50 row identities and eight column identities must have
+nonempty measured clips after each completed native frame. Empty overscan
+records and pool capacity do not count. A display/layout that cannot satisfy
+this workload is refused instead of reducing it. Paired 10k/million cases must
+have identical actual cell cardinalities, scale and normalized clip hashes at
+each trajectory phase.
+
+A 64-event zero-sum trajectory scrolls vertically by ±12 logical pixels and
+horizontally by ±96 pixels at four positions in each direction. At least 64
+unmeasured events, in complete cycles, warm this bounded working set; the
+default is 128. Each measured event is an initialized MouseScroll admitted to
+the originating native event deque and routed through the actual grid handler,
+owner callback and native reconciliation. There is one traced event outstanding
+per window. Recorder attribution requires one active native window;
+multiwindow/integrated frame attribution remains open. The consumer requires one GridChange notification and the matching
+completed tag/generation before the next event. It does not directly mutate the
+viewport during measured scrolling or call descriptor callbacks.
+
+`-perf-novel` is a separate workload: after warm-up it jumps, unmeasured, into an
+untouched row range and scrolls forward to newly visited numeric strings.
+Fonts/device state are warm and numeric strings can coincide. It is not a
+cold-font, shader-cache or guaranteed cache-miss qualification, and its samples
+are not pooled into the warm P6 target.
+
+## Timing boundaries
+
+The opt-in bounded `FrameMetrics` recorder reports raw same-ticket durations:
+input processing, owner transition, reconciliation, combined native layout/paint,
+composition gathering, raster/upload and encoding/submission. `TotalUIWorkNS`
+sums measured work regions after the routed event through its matching armed composition, including priority frames that run before owner reconciliation. These are wall
+durations of measured work, not kernel/thread CPU accounting. Queue delay,
+surface acquire wait and present-call duration are retained separately and
+excluded from the total. The acquire observation includes surface mutex wait
+and native acquisition attempts; reconfiguration/status/view work is charged
+to encoding/submission. Only the native Present call is excluded there; texture
+release/cleanup is charged to encoding/submission. The initial render-context
+lock wait is part of queue delay, and asynchronous render/window/drawer lock
+waits are not charged as UI work. No independent phase percentiles are added together.
+The JSON summary key is `ui_work_ns`; it is the raw `TotalUIWorkNS`, not an
+OS-thread CPU estimate. GPU execution, compositor presentation and photons are unavailable.
+
+A current `InspectGrid` publication must match the completed recorder generation.
+Inspection, JSON output, recorder polling and memory snapshots happen outside
+the recorded work regions. No synchronous screenshot/readback is used. Dropped,
+failed, missing, duplicate or pending recorder tickets invalidate the run.
+
+## Memory and callback observations
+
+Each sample distinguishes actually clipped visible cells, materialized
+projection records and retained native cell/header pool counts. Native pool
+counts are source-free observations, not byte attribution.
+
+Each sample retains source RowKey/IndexOf/Cell counter deltas, exactly one grid
+notification, process-wide Go TotalAlloc/Mallocs/GC deltas and measured geometry.
+The process Go allocation interval includes observation helpers and other Go
+runtime/native-adapter goroutines; it is not a precise framework-only allocation
+counter. Domain generation and projection building are absent from these warm
+intervals. Retained Go HeapAlloc/Inuse/Sys and goroutines are reported before data,
+after data/index plus an explicit pre-mount GC, after warm-up plus an explicit GC,
+and after measurement plus an explicit GC. These GC calls are outside measured
+frames. The mount/warm delta includes Go caches and measurement state; it cannot
+be attributed solely to retained controls. Native/GPU allocation attribution is
+unknown. Host `ps` runs only after the completed end record, outside measured
+native frames. Its end-only RSS and aggregate CPU sample are process-wide
+observations, with the finite CPU accounting quantum retained. Baseline/warm
+process RSS and process CPU deltas are unavailable; the native post-warm Go heap
+snapshot remains. Setup/ready records still validate the workload, but never
+spawn an external process observer. No subtraction of logical data bytes from
+RSS pretends to measure private UI bytes.
+
+## Reproducibility and results
+
+Build an optimized release executable without `-race` or disabled optimization,
+then explicitly opt into windows:
+
+```sh
+export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache
+. drivers/cogent/env.sh
+(cd examples/loadedgrid && go build -o /private/tmp/vellum-loadedgrid-perf .)
+python3 scripts/benchmark-grid.py --run --binary /private/tmp/vellum-loadedgrid-perf \
+  --output /private/tmp/vellum-grid-performance-run --runs 5 --samples 120 --warmup 128
+```
+
+The output directory must be new. The runner preserves all raw stdout/stderr,
+per-run JSON records, binary SHA, compact selected source hashes and build/host
+metadata. The integration qualification separately binds prepared dependency
+bytes; selected inputs are not a complete compiler/module-cache/SDK closure.
+CPU/GPU/display/power metadata collection is read-only and may be unavailable.
+It changes no power mode, scale, input source, permissions or OS preferences.
+
+At least five release processes per case are required. Raw samples accompany
+nearest-rank p50/p95/p99/max, counts, means, sample standard deviations,
+coefficients of variation and the variation of per-run p95. Results retain every
+outlier. A measurement report must distinguish observed target pass/failure,
+workload fidelity and missing GPU/presentation/native-memory/endurance evidence.
+These scripts establish a repeatable workload and recording protocol; actual
+Mac measurements and optimization evidence are separate from CPU tests.
+
+## Diagnostic CPU profiling
+
+`-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide
+Go CPU diagnostic. The path must be new; the writer has a 64 MiB byte cap and
+reports truncation/write failure. Profiling begins after warm-up and stops after
+measured samples, before the final GC. It includes measurement observers and
+concurrent runtime/adapter work; native C/GPU/compositor costs are not reliably
+attributed by Go samples. The flagged process is never a warm-budget result:
+setup/ready/end records expose `cpu_profile`, and ordinary five-run validation
+refuses profiled records. The benchmark CLI never enables this flag. Profiled
+exploration has its own raw records, source/binary/profile hashes and scope;
+its timing samples are not pooled with the unprofiled qualification runs.

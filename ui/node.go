@@ -20,7 +20,8 @@ const (
 )
 
 // Node IDs are stable within one window. The grid: prefix is reserved for
-// generated grid cell/row/header identities and is refused in descriptions.
+// generated grid cell/row/header identities. The tree: prefix similarly reserves
+// managed outline row/disclosure/page targets. Both are refused in descriptions.
 // A View returns a fresh description;
 // callbacks run on the application owner. Custom holds driver-specific content.
 type Node struct {
@@ -35,6 +36,10 @@ type Node struct {
 	// GridCommit requests application validation and candidate admission after
 	// the driver has settled the originating native cell editor. It runs on owner.
 	GridCommit func(GridEditEvent)
+	// Tree owns an indexed outline. One live managed binding per Outline is supported.
+	Tree           *virtual.Outline
+	TreeChange     func(TreeEvent)
+	TreeDisclosure func(TreeDisclosureEvent)
 	// TabInserts makes Tab insert a literal tab in MultilineText; otherwise Tab moves focus.
 	TabInserts bool
 	// SoftWrap wraps visual lines without changing document bytes.
@@ -63,6 +68,7 @@ func Validate(root Node) error {
 	seen := map[string]bool{}
 	models := map[*editor.Model]bool{}
 	grids := map[*virtual.Grid]bool{}
+	trees := map[*virtual.Outline]bool{}
 	var walk func(Node, int) error
 	walk = func(n Node, depth int) error {
 		if depth >= 128 {
@@ -73,6 +79,9 @@ func Validate(root Node) error {
 		}
 		if strings.HasPrefix(n.ID, "grid:") {
 			return fmt.Errorf("ui: ID %q uses reserved grid: prefix", n.ID)
+		}
+		if strings.HasPrefix(n.ID, "tree:") {
+			return fmt.Errorf("ui: ID %q uses reserved tree: prefix", n.ID)
 		}
 		seen[n.ID] = true
 		if n.Kind == MultilineText {
@@ -87,6 +96,12 @@ func Validate(root Node) error {
 			}
 			grids[n.Grid] = true
 		}
+		if n.Kind == DataTree {
+			if trees[n.Tree] {
+				return fmt.Errorf("ui: outline model has multiple bindings")
+			}
+			trees[n.Tree] = true
+		}
 		if depth > 0 && n.Focus.ID != "" {
 			return fmt.Errorf("ui: focus requests belong on the root")
 		}
@@ -98,7 +113,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog:
-		case Label, Button, Extension, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, DataGrid:
+		case Label, Button, Extension, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

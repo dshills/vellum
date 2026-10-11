@@ -1,0 +1,84 @@
+{
+  "schema": "vellum-frame-metrics-source-review-v1",
+  "result": "APPROVED_WITH_SCOPED_MEASUREMENT_LIMITS",
+  "input_manifest": {
+    "path": "/private/tmp/vellum-grid-frame-metrics-review/final-v1/inputs.json",
+    "sha256": "7d21d85eeb5873a5d4cf448bae23c52877d151323adeb7176d726430b490f3c1",
+    "files": 17
+  },
+  "review_method": "Independent read-only source and original/default-path comparison; no duplicated runtime tests, no shared source edits, no settings changes. One separately authorized release native exploratory process is referenced below.",
+  "findings": [],
+  "corrected_findings": [
+    {
+      "issue": "retirement before input/owner terminals retained a ticket",
+      "evidence": "frame_metrics.go retire uses trace.Retire; Take accepts retired lifetime terminal; registry/native/owner pointers detach"
+    },
+    {
+      "issue": "composition panic/Goexit left an active rendering claim",
+      "evidence": "renderAsyncMeasuredOwned guarded defer calls frameFailed without panic formatting, while preserving counter/RC/SystemWindow unwind; actual production-function panic/Goexit test covers both asynchronous and owned paths"
+    },
+    {
+      "issue": "priority pre-owner paint work omitted or prematurely finalized after late arm",
+      "evidence": "startFrame claims post-input work; frameArmed latches at frame start; prefix composition and unchanged update costs accumulate; only armed final composition qualifies"
+    },
+    {
+      "issue": "ordinary scroll compression could replace the tagged input",
+      "evidence": "tracedScrollEvent implements DeferredEvent, remains a nonmergeable immutable origin node, and unwrapFrameTraceEvent extracts the original pointer only at actual handleEvent dispatch"
+    },
+    {
+      "issue": "no handler/no-op/refused or abnormal owner work could strand ticket",
+      "evidence": "ExpectOwner posting handshake plus endEvent no-handler terminal, checked traced PostWindow refusal/no-op/abnormal terminal and ownerEnd defer"
+    },
+    {
+      "issue": "surface view/reconfigure/release CPU omitted along with acquisition/present",
+      "evidence": "GetCurrentTextureMeasured excludes only mutex wait and backend acquire calls, PresentMeasured excludes only backend present call; reconfig/status/view creation/texture cleanup remain in encompassing EncodeSubmit elapsed"
+    },
+    {
+      "issue": "Scene generator directive and copied-mutex test",
+      "evidence": "core:no-new remains on Scene type; forbidden fresh recorder copy uses pointer-derived reflection instead of direct mutex assignment"
+    }
+  ],
+  "accounting": {
+    "sum": [
+      "InputNS",
+      "OwnerNS",
+      "ReconcileNS",
+      "LayoutPaintNS",
+      "GatherNS",
+      "RasterUploadNS",
+      "EncodeSubmitNS"
+    ],
+    "same_ticket": true,
+    "prefix_native_frames_included": true,
+    "excluded": [
+      "queue/initial RC acquisition wait (reported QueuedNS)",
+      "native rendering RC/SystemWindow/Drawer ownership waits",
+      "surface ownership wait and actual acquire calls (reported AcquireNS)",
+      "actual backend present call (reported PresentCallNS)",
+      "benchmark injection/admission and post-completion observers",
+      "GPU execution/compositor scheduling/presentation/photons"
+    ],
+    "elapsed_work_not_kernel_thread_cpu": true,
+    "single_active_native_window_required": true
+  },
+  "qualification_limits": [
+    "This certificate approves inspected source, not the pending pinned stage34 reproduction or full gate.",
+    "Upstream stock vet has preexisting unkeyed/unreachable diagnostics; no broad upstream vet0 claim. Root reports focused race20/driver vet independently.",
+    "Actual surface/Metal timings require native acceptance; source-level unsupported renderers and failed/occluded/submission paths cannot qualify completed samples.",
+    "No full P6, multiview/multiwindow performance, native-memory attribution, physical latency or endurance acceptance."
+  ],
+  "actual_exploratory": {
+    "path": "/private/tmp/vellum-grid-perf-exploratory-native-1/exploratory.json",
+    "sha256": "7f49074d2eeb63364dd3daddc413815c76c37d61cd32963446239923f9bf36af",
+    "classification": "one release fixed10k functional/timing probe; budget failure evidence, not five-run acceptance",
+    "exit_code": 0,
+    "samples": 120,
+    "ui_work_p95_ns": 20298334,
+    "ui_work_p99_ns": 22768789,
+    "warm_targets_ns": {
+      "p95": 4000000,
+      "p99": 6000000
+    },
+    "targets_observed_met": false
+  }
+}

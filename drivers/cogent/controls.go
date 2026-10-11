@@ -52,6 +52,7 @@ type controlState struct {
 	textEpoch         uint64
 	editor            *editorBinding
 	grid              *gridBinding
+	outline           *outlineBinding
 	gridEdit          *gridEditBinding
 	fieldChanges      atomic.Pointer[fieldChangeEpoch]
 	fieldDelivered    string // owner: last delivered value, or controlled value applied by reconciliation
@@ -97,13 +98,19 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	c := &controlState{a: a, window: window, fieldDelivered: r.node.Text}
 	r.control = c
 	var widget core.Widget
-	gridReturned := false
+	managedReturned := false
 	defer func() {
 		// A source callback can panic or Goexit after registry admission but
 		// before reconcile owns this record. Retire admission first even if
 		// private widget deletion itself has an abnormal return. Do not recover
 		// the caller's panic/Goexit or alter its portable Grid state.
-		if !gridReturned && c.grid != nil {
+		if !managedReturned && c.outline != nil {
+			disposeTree(r)
+			if host := c.outline.host; !tree.IsNil(host) {
+				host.AsTree().Delete()
+			}
+		}
+		if !managedReturned && c.grid != nil {
 			disposeGrid(r)
 			if host := c.grid.host; !tree.IsNil(host) {
 				host.AsTree().Delete()
@@ -137,6 +144,12 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			return true
 		})
 		widget = field
+	case ui.DataTree:
+		var err error
+		widget, err = mountTree(parent, r, a, window)
+		if err != nil {
+			return nil, true, err
+		}
 	case ui.DataGrid:
 		var err error
 		widget, err = mountGrid(parent, r, a, window)
@@ -176,7 +189,10 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	if c.grid != nil && !c.grid.live() {
 		return nil, true, ErrGridClosed
 	}
-	gridReturned = true
+	if c.outline != nil && !c.outline.live() {
+		return nil, true, ErrTreeClosed
+	}
+	managedReturned = true
 	return widget, true, nil
 }
 
@@ -314,12 +330,15 @@ func syncControl(r *record, previous ui.Node) error {
 	committed := r.control.committed || restoring
 	r.control.committed = false
 	r.control.restore = false
-	if r.node.Kind == ui.DataGrid {
+	if r.node.Kind == ui.DataGrid || r.node.Kind == ui.DataTree {
 		if refused != nil {
 			r.widget.AsTree().SetProperty("vellum.control-error", *refused)
 			if r.control.onError != nil {
 				r.control.onError(*refused)
 			}
+		}
+		if r.node.Kind == ui.DataTree {
+			return syncTree(r)
 		}
 		return syncGrid(r)
 	}
@@ -472,6 +491,9 @@ func childHost(r *record, id string) tree.Node {
 	return r.widget
 }
 func finishControl(r *record, n ui.Node) {
+	if r.control != nil && r.control.outline != nil {
+		r.control.outline.previous = nil
+	}
 	if r.control != nil && r.control.grid != nil {
 		r.control.grid.previous = nil
 	}
@@ -635,6 +657,7 @@ func disposeControl(r *record) {
 		}
 		disposeEditor(r)
 		disposeGrid(r)
+		disposeTree(r)
 	}
 	if r.control != nil && r.control.dialog != nil {
 		closeDialog(r)

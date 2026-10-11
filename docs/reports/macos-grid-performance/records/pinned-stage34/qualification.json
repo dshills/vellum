@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "scope": "Stage34 pinned reproduction: fresh cached module copies and ordered patch checks, entire prepared core/typesetting file fingerprints. Not a full compiler/module-cache closure or physical GPU acceptance.",
+  "checks": [
+    {
+      "name": "prepare-tests",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\npython3 prepare_test.py"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 0.13056479202350602,
+      "log_sha256": "add621e08278bcc09f3f6bc6213a7468fb9e2b505407e195f16aadfc3afaccd3"
+    },
+    {
+      "name": "fresh-prepare",
+      "argv": [
+        "/bin/zsh",
+        "-c",
+        "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\npython3 prepare.py"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "error": null,
+      "elapsed_seconds": 1.722967708017677,
+      "log_sha256": "38ab386c991333a8fccb517f49b78bce01eddf8cfef93ad084debca4fae27860"
+    }
+  ],
+  "prepared_files": 6128,
+  "prepared_bytes_unchanged": true,
+  "preparation_inputs_unchanged": true,
+  "stage_outputs": {
+    "core/frame_trace.go": "66cbd323497c1a539baed29521a7b8dd75522e14c10cf97610186acf242327cd",
+    "core/frame_trace_test.go": "fb8723062af035d5c5b307f402fe4ac951f394d9a6cda7f7a484bb3e8817d5a6",
+    "core/scene.go": "1d9e0698d4370127440b6cc36591031a27a98f053594fdd927702389ccd6643b",
+    "core/renderwindow.go": "8915acf34471ff1a4fcb0c8f8d3ee28d5c6088e054562239859e2e9e2569d2ee",
+    "system/composer/timing.go": "b77880f9ef4466f4ecb286e000df00ccd3c2d5e1530b290bc062d8b6392f3963",
+    "system/composer/timing_test.go": "3243d502e772df00ab19e703711657f2c893a541e64f2554648fc5753391741a",
+    "gpu/gsystem_timing.go": "1ad9625d1f07901be04056be50083f58dacc9891b0a6894ba018ef9f74a5ebb5",
+    "gpu/surface_timing.go": "715982921e55d76c7cb0954d24abddbf240d7de3398463b15dbcf86425c7d03a",
+    "gpu/gpudraw/timing.go": "2e877710cd2b2d9d5a52fb440766bb9255f42cfc83e2c620fa28a7750850b93b",
+    "gpu/gpudraw/system.go": "a47aea0b73daf2bf39f91ac5ee45fa96893d5cc83af5a1036d82df4f2ba1db28"
+  },
+  "actual_outputs": {
+    "core/frame_trace.go": "66cbd323497c1a539baed29521a7b8dd75522e14c10cf97610186acf242327cd",
+    "core/frame_trace_test.go": "fb8723062af035d5c5b307f402fe4ac951f394d9a6cda7f7a484bb3e8817d5a6",
+    "core/scene.go": "1d9e0698d4370127440b6cc36591031a27a98f053594fdd927702389ccd6643b",
+    "core/renderwindow.go": "8915acf34471ff1a4fcb0c8f8d3ee28d5c6088e054562239859e2e9e2569d2ee",
+    "system/composer/timing.go": "b77880f9ef4466f4ecb286e000df00ccd3c2d5e1530b290bc062d8b6392f3963",
+    "system/composer/timing_test.go": "3243d502e772df00ab19e703711657f2c893a541e64f2554648fc5753391741a",
+    "gpu/gsystem_timing.go": "1ad9625d1f07901be04056be50083f58dacc9891b0a6894ba018ef9f74a5ebb5",
+    "gpu/surface_timing.go": "715982921e55d76c7cb0954d24abddbf240d7de3398463b15dbcf86425c7d03a",
+    "gpu/gpudraw/timing.go": "2e877710cd2b2d9d5a52fb440766bb9255f42cfc83e2c620fa28a7750850b93b",
+    "gpu/gpudraw/system.go": "a47aea0b73daf2bf39f91ac5ee45fa96893d5cc83af5a1036d82df4f2ba1db28"
+  },
+  "outputs_match": true,
+  "patch_sha256": "b1d64103808aafc9aa86a961682864c799018a4981810eea99731c976c31f20c",
+  "producer_sha256": "0b884dd7d1e7c9c2790548979e894b3f992cdf5e5fb4c1bb539d8b4a8f678e13",
+  "artifacts": {
+    "inputs-before.json": "d97cb6dfdf7389a1d12c390048f383b3af10ad2641f31cd96dd052299ff1bd0d",
+    "inputs-after.json": "d97cb6dfdf7389a1d12c390048f383b3af10ad2641f31cd96dd052299ff1bd0d",
+    "prepared-before.json": "28dacd87e91a8b44839ed3cd2bbe8e42fe907f44ec3a70c9e5bec3ae57a0f777",
+    "prepared-after.json": "28dacd87e91a8b44839ed3cd2bbe8e42fe907f44ec3a70c9e5bec3ae57a0f777"
+  },
+  "result": "PASS"
+}

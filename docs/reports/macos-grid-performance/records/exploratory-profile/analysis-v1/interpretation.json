@@ -1,0 +1,154 @@
+{
+  "result": "DIAGNOSTIC_ONLY_NO_OPTIMIZATION",
+  "profile_readout_qualification": {
+    "path": "/private/tmp/vellum-grid-perf-profile-native-1/analysis-v1/qualification.json",
+    "sha256": "d5d2280841bd47458d73e653c40efb873086269c395daaf4d510810d901d1966"
+  },
+  "native_diagnostic": {
+    "path": "/private/tmp/vellum-grid-perf-profile-native-1/diagnostic.json",
+    "sha256": "1d7d92d9c817b75caf132824acef90d07d255d3f16225743cb0aa50f60d3062c"
+  },
+  "scope": "One optimized fixed10k,120-sample,400-actual-cell diagnostic with Go CPU profiling enabled and historical setup/ready/end external ps observers. Not observer-free, not five runs, not a P6 budget qualification, not GPU/presentation or thread-CPU attribution. No runtime changes or new native run during readout.",
+  "elapsed_work_ns": {
+    "count": 120,
+    "p50": 19002666,
+    "p95": 20944539,
+    "p99": 22283791,
+    "max": 22720958,
+    "min": 17123166,
+    "mean": 19221296.183333334,
+    "sample_stddev": 958587.1848147628,
+    "coefficient_of_variation": 0.049871100037777255
+  },
+  "phase_p95_ns": {
+    "ui_work_ns": 20944539,
+    "input_ns": 8541,
+    "owner_ns": 16000,
+    "reconcile_ns": 8989958,
+    "layout_paint_ns": 2952542,
+    "gather_ns": 9417,
+    "raster_upload_ns": 9269209,
+    "encode_submit_ns": 230873,
+    "queued_ns": 2357542,
+    "acquire_ns": 45084,
+    "present_call_ns": 10709
+  },
+  "go_process_alloc_bytes": {
+    "count": 120,
+    "p50": 41725368,
+    "p95": 42743880,
+    "p99": 43245984,
+    "max": 43595728
+  },
+  "go_process_mallocs": {
+    "count": 120,
+    "p50": 423132,
+    "p95": 438692,
+    "p99": 441956,
+    "max": 443223
+  },
+  "cpu_profile": {
+    "duration_seconds": 7.61,
+    "sampled_cpu_seconds": 5.83,
+    "flat": [
+      {
+        "function": "runtime.pthread_cond_signal",
+        "seconds": 1.95,
+        "percent": 33.45
+      },
+      {
+        "function": "runtime.cgocall",
+        "seconds": 1.84,
+        "percent": 31.56
+      }
+    ],
+    "cumulative": [
+      {
+        "function": "paintSource.Draw",
+        "seconds": 1.66,
+        "percent": 28.47
+      },
+      {
+        "function": "Drawer.Copy -> UseGoImage -> Texture.SetFromGoImage -> Queue.TryWriteTexture",
+        "seconds": 1.45,
+        "percent": 24.87
+      },
+      {
+        "function": "syncGrid",
+        "seconds": 0.12,
+        "percent": 2.06
+      }
+    ],
+    "warning": "Cumulative categories overlap; never add these percentages. Sampled process-wide CPU includes observers, runtime scheduling and CGo boundaries, and does not map directly to phase wall-work durations."
+  },
+  "source_evidence": [
+    {
+      "file": "drivers/cogent/grid.go",
+      "lines": [
+        638,
+        650,
+        665,
+        695
+      ],
+      "fact": "Every materialized cell/header calls place, which calls Text.Update; syncGrid subsequently calls host.Update over the same descendants."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/core/update.go",
+      "lines": [
+        56,
+        61,
+        64,
+        67
+      ],
+      "fact": "WidgetBase.Update traverses the subtree, running UpdateWidget and Style, then marks layout needed."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/core/text.go",
+      "lines": [
+        314,
+        322
+      ],
+      "fact": "Text updater parses rich text and configures allocation."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/core/render_notjs.go",
+      "lines": [
+        36,
+        40,
+        42,
+        45
+      ],
+      "fact": "Changed paintSource rasterizes commands and passes the complete scene image bounds to Drawer.Copy."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/gpu/gpudraw/drawused.go",
+      "lines": [
+        21,
+        28,
+        37
+      ],
+      "fact": "UseGoImage skips an existing image upload only when unchanged; otherwise it uploads it."
+    },
+    {
+      "file": "drivers/cogent/build/upstream/gpu/texture.go",
+      "lines": [
+        78,
+        97,
+        100
+      ],
+      "fact": "SetFromGoImage writes the complete RGBA image extent from origin zero."
+    }
+  ],
+  "next_checkpoint_proposal": [
+    "First instrument/count per-cell update/style, host traversal, scene raster calls and uploaded byte extents using opt-in bounded diagnostics. Preserve ordinary budget runs with diagnostics disabled.",
+    "Trial a single host update after the batch rather than per-cell plus host traversals. Verify theme/cursor/selection/edit-field styles, source replacements, pane movement, stale refs and fractional-DPI image equality. This is a source-backed redundant-work candidate, but syncGrid is only2.06% of sampled CPU; it is not established as the dominant bottleneck.",
+    "Investigate changed-scene image upload/raster invalidation separately: the texture-write call chain is24.87% cumulative in this profile. A bounded dirty-region or grid-specific rendering path would need independent pixel/clip correctness, cache retirement and precise uploaded-byte evidence; do not change generic rendering based solely on one profile.",
+    "After any qualified runtime optimization, use the corrected end-only observer launcher and unchanged\u2265400-cell workload/thresholds. Compare\u22655 release runs per10k/million fixed/variable case. Preserve this baseline failure rather than lowering the target."
+  ],
+  "limitations": [
+    "No optimization implemented.",
+    "Historical diagnostic timings remain affected by profiling and setup/ready ps observers.",
+    "Go allocation deltas include measurement helpers and other Go goroutines, not framework-only allocation.",
+    "No dominant-source inference from phase percentiles or sums of cumulative CPU categories."
+  ]
+}

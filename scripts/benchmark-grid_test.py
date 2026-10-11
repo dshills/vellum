@@ -1,0 +1,219 @@
+"""CPU-only statistical/record/owned-process fixture; never creates a window."""
+import copy
+import importlib.util
+import io
+import json
+import os
+from pathlib import Path
+import tempfile
+import threading
+import types
+import unittest
+from unittest import mock
+
+spec = importlib.util.spec_from_file_location("benchmark_grid", Path(__file__).with_name("benchmark-grid.py"))
+benchmark = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(benchmark)
+
+
+def records(samples=120):
+    identity = {"rows": 10000, "variable": False, "novel": False}
+    result = [{"event": "grid.perf.setup", **identity, "release": True, "seed": 7, "stored_value_bytes": 10000*160},
+              {"event": "grid.perf.ready", **identity}]
+    for index in range(samples):
+        result.append({"event": "grid.perf.sample", "index": index, "tag": index+1, "generation": index+1,
+                       "frame": index+1, "callbacks": 1,
+                       "native_sample": {"Tag":index+1,"Generation":index+1,"Window":"perf","Completed":True,"Failure":""},
+                       "geometry": {"cells": 400, "rows": 50, "columns": 8, "scale": 1,"materialized_cells":432,"retained_cells":440,"retained_headers":9, "layout_sha256": "a"*64},
+                       "metrics": {key: index+1 for key in benchmark.METRICS}})
+    for sample in result[2:]:
+        sample["metrics"]["ui_work_ns"] *= len(benchmark.WORK_PHASES)
+        sample["native_sample"].update({native: sample["metrics"][name] for name, native in benchmark.NATIVE_PHASES.items()})
+    result.append({"event": "grid.perf.end", **identity, "samples": samples, "callbacks": samples, "pending": 0, "dropped": 0})
+    return result
+
+
+class StatisticsTests(unittest.TestCase):
+    def test_nearest_rank_outliers_are_retained(self):
+        result = benchmark.distribution(list(range(1, 100))+[10000])
+        self.assertEqual((result["p50"], result["p95"], result["p99"], result["max"]), (50, 95, 99, 10000))
+        self.assertGreater(result["coefficient_of_variation"], 1)
+
+    def test_nonfinite_boolean_and_negative_samples_refuse(self):
+        for invalid in ([], [True], [-1], [float("nan")], [float("inf")]):
+            with self.assertRaises(ValueError): benchmark.distribution(invalid)
+
+    def test_run_variation_uses_actual_per_run_p95(self):
+        one = benchmark.validate_records(records(), 10000, False, 120, False)
+        two = copy.deepcopy(one)
+        for sample in two: sample["metrics"]["ui_work_ns"] *= 2
+        result = benchmark.summarize([one, two])["ui_work_ns"]
+        self.assertEqual([v["p95"] for v in result["per_run"]], [798, 1596])
+        self.assertEqual(result["run_p95_variation"]["count"], 2)
+        # Phase percentiles are separately reported, never substituted for the
+        # actual same-ticket total work sample.
+        self.assertEqual(result["pooled"]["max"], 1680)
+
+
+class RecordTests(unittest.TestCase):
+    def test_exact_order_and_geometry_validate(self):
+        selected = benchmark.validate_records(records(), 10000, False, 120, False)
+        self.assertEqual(len(selected), 120)
+        benchmark.compare_geometry(selected, copy.deepcopy(selected))
+
+    def test_profiled_run_is_diagnostic_and_cannot_qualify_warm_budget(self):
+        profiled = records()
+        for record in (profiled[0], profiled[1], profiled[-1]): record["cpu_profile"] = True
+        with self.assertRaisesRegex(ValueError, "diagnostic"):
+            benchmark.validate_records(profiled, 10000, False, 120, False)
+        self.assertEqual(len(benchmark.validate_records(profiled, 10000, False, 120, False, allow_profile=True)), 120)
+        profiled[-1]["cpu_profile"] = False
+        with self.assertRaisesRegex(ValueError, "identity"):
+            benchmark.validate_records(profiled, 10000, False, 120, False, allow_profile=True)
+
+    def test_pooled_capacity_is_not_rendered_cell_workload(self):
+        bad = records();bad[3]["geometry"]["cells"] = 399
+        with self.assertRaisesRegex(ValueError, "rendered"): benchmark.validate_records(bad, 10000, False, 120, False)
+
+    def test_stale_duplicate_missing_and_dropped_samples_refuse(self):
+        mutations = [lambda r:r.pop(3), lambda r:r[3].update(tag=1), lambda r:r[3].update(generation=0),
+                     lambda r:r[3].update(callbacks=2), lambda r:r[-1].update(pending=1), lambda r:r[-1].update(dropped=1),
+                     lambda r:r[0].update(release=False), lambda r:r[0].update(rows=1000000),
+                     lambda r:r[3]["metrics"].pop("ui_work_ns"),lambda r:r[3]["native_sample"].update(Generation=999),
+                     lambda r:r[3]["native_sample"].update(TotalUIWorkNS=1),
+                     lambda r:r[3]["metrics"].update(input_ns=True),
+                     lambda r:r[3].update(frame=1), lambda r:r[3].update(generation=1)]
+        for change in mutations:
+            bad = records();change(bad)
+            with self.assertRaises(ValueError): benchmark.validate_records(bad, 10000, False, 120, False)
+
+    def test_rowcount_pairs_must_have_same_actual_workload(self):
+        one = benchmark.validate_records(records(), 10000, False, 120, False)
+        two = copy.deepcopy(one);two[8]["geometry"]["columns"] = 9
+        with self.assertRaisesRegex(ValueError, "differs"): benchmark.compare_geometry(one, two)
+
+
+class FakeProcess:
+    def __init__(self, payload):
+        reader, writer = os.pipe()
+        self.stdout = os.fdopen(reader, "rb", buffering=0)
+        self.pid, self.returncode = 123, None
+        def emit():
+            try:
+                for first in range(0, len(payload), 127): os.write(writer, payload[first:first+127])
+            finally: os.close(writer)
+        self.thread = threading.Thread(target=emit)
+        self.thread.start()
+    def poll(self): return self.returncode
+    def wait(self, timeout=None):
+        self.thread.join(timeout)
+        self.returncode = 0
+        return 0
+
+
+class ProcessTests(unittest.TestCase):
+    def run_fixture(self, data):
+        payload = b"native ordinary log\n" + b"\n".join(json.dumps(v).encode() for v in data)+b"\n"
+        process = FakeProcess(payload)
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)/"run"
+            with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group") as kill:
+                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5)
+                except Exception as error: result = error
+            raw = (directory/"native.log").read_bytes()
+            outcome = json.loads((directory/"result.json").read_text())
+            self.assertEqual(raw, payload)
+            self.assertEqual(launch.call_args.kwargs["bufsize"], 0)
+            self.assertTrue(launch.call_args.kwargs["start_new_session"])
+            observe.assert_called_once_with(process.pid)
+            return result, outcome
+
+    def test_chunked_pipe_exact_raw_transcript_and_terminal_samples(self):
+        result, outcome = self.run_fixture(records())
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result[0]), 120)
+        self.assertEqual(outcome["exit_code"], 0)
+        self.assertEqual(len(outcome["process_observations"]), 1)
+        self.assertEqual(outcome["result"], "PASS")
+
+    def test_setup_and_ready_validate_without_external_process_observers(self):
+        result, outcome = self.run_fixture(records())
+        self.assertIsInstance(result, tuple)
+        self.assertEqual([r["event"] for r in outcome["records"][:2]],
+                         ["grid.perf.setup", "grid.perf.ready"])
+        self.assertEqual([r["event"] for r in outcome["process_observations"]], ["grid.perf.end"])
+        self.assertEqual(outcome["process_observation_scope"]["warm_rss"], "unavailable")
+        self.assertEqual(outcome["process_observation_scope"]["baseline_rss"], "unavailable")
+        self.assertEqual(outcome["process_observation_scope"]["cpu_delta"], "unavailable")
+        self.assertEqual(len(result[0]), 120)
+
+    def test_timeout_retires_group_even_after_direct_child_exit(self):
+        reader, writer = os.pipe()
+        process = types.SimpleNamespace(stdout=os.fdopen(reader, "rb", buffering=0), pid=123,
+                                        returncode=0, poll=lambda: 0, wait=lambda timeout: 0)
+        # Simulate a descendant holding the inherited pipe: direct child is
+        # terminal, but no EOF is available. Existing owned-group helper has
+        # separate real POSIX grandchild cleanup coverage.
+        try:
+            with tempfile.TemporaryDirectory() as temp:
+                directory = Path(temp)/"run"
+                with mock.patch.object(benchmark.subprocess, "Popen", return_value=process), mock.patch.object(benchmark, "terminate_owned_group") as kill:
+                    with self.assertRaises(benchmark.subprocess.TimeoutExpired):
+                        benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, .01)
+                kill.assert_called_once_with(process)
+                outcome = json.loads((directory/"result.json").read_text())
+                self.assertEqual(outcome["result"], "FAILED")
+                self.assertEqual(outcome["exit_code"], 0)
+                self.assertIn("TimeoutExpired", outcome["error"])
+        finally:
+            os.close(writer)
+            process.stdout.close()
+
+    def test_failure_retains_exact_raw_output_and_error(self):
+        bad = records();bad[-1]["callbacks"] = 119
+        result, outcome = self.run_fixture(bad)
+        self.assertIsInstance(result, ValueError)
+        self.assertEqual(outcome["result"], "FAILED")
+        self.assertIn("completion mismatch", outcome["error"])
+        self.assertEqual(len(outcome["log_sha256"]), 64)
+
+
+class SetupFailureTests(unittest.TestCase):
+    def test_launch_failure_records_terminal_failure(self):
+        with tempfile.TemporaryDirectory() as temp:
+            directory=Path(temp)/'run'
+            with mock.patch.object(benchmark.subprocess,'Popen',side_effect=OSError('fixture launch unavailable')):
+                with self.assertRaises(OSError):
+                    benchmark.run_case(Path('fake'),directory,10000,False,120,128,False,5)
+            result=directory/'result.json'
+            self.assertTrue(result.is_file(),'launch failure lost per-run result metadata')
+            record=json.loads(result.read_text())
+            self.assertEqual(record['result'],'FAILED')
+            self.assertIsNone(record['exit_code'])
+            self.assertIn('fixture launch unavailable',record['error'])
+
+    def test_selector_setup_failure_retires_child_and_records_failure(self):
+        process=mock.Mock()
+        process.stdout=io.BytesIO()
+        process.pid=123
+        process.returncode=-9
+        process.poll.return_value=None
+        process.wait.return_value=-9
+        selector=mock.Mock()
+        selector.register.side_effect=OSError('fixture selector unavailable')
+        try:
+            with tempfile.TemporaryDirectory() as temp:
+                directory=Path(temp)/'run'
+                with mock.patch.object(benchmark.subprocess,'Popen',return_value=process), mock.patch.object(benchmark.selectors,'DefaultSelector',return_value=selector), mock.patch.object(benchmark,'terminate_owned_group') as retire:
+                    with self.assertRaises(OSError):
+                        benchmark.run_case(Path('fake'),directory,10000,False,120,128,False,5)
+                    retire.assert_called_once_with(process)
+                selector.close.assert_called_once_with()
+                result=json.loads((directory/'result.json').read_text())
+                self.assertEqual(result['result'],'FAILED')
+                self.assertIn('fixture selector unavailable',result['error'])
+        finally:
+            process.stdout.close()
+
+
+if __name__ == "__main__": unittest.main()

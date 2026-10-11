@@ -91,3 +91,12 @@ compatibility but ignores it. Independent cursor names and manual scene clocks
 retain their behavior. Pinned input/output hashes and concurrent-scene regression
 tests accompany the fix; the loaded-data Cocoa report records the triggering
 race and the subsequent acceptance scope.
+
+Patch 0034 adds optional tagged native work recording. Protected deferred scroll
+nodes unwrap before real event dispatch. A ticket includes intermediate native
+update/composition work and the final armed owner generation; cancellation and
+abnormal return retain exact input/owner/frame terminal ownership. Surface
+acquisition and presentation calls are separate from configuration, view creation
+and cleanup costs. Default composition order remains unchanged. See
+[the patch contract](patches/frametrace/README.md) and
+[the measurement specification](../../../specs/grid-performance.md).

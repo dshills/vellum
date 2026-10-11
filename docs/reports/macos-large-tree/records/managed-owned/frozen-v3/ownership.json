@@ -1,0 +1,73 @@
+{
+  "root": "/private/tmp/vellum-large-data",
+  "scope": "Scratch-only additive managed DataTree UI/native plus independent stored loadedtree consumer; existing shared seam changes listed explicitly. No canonical or GUI acceptance claim.",
+  "files": {
+    "ui/tree.go": "8e8d90df158b45a124619ca407637119ff919c50923f501ebf28d463976b71a1",
+    "ui/tree_test.go": "2f5354aeb59ab9b78ee849d653d75f852f634a6c9be211b1dfd738d061363e5b",
+    "ui/node.go": "793eb9a2b105eef68d6b131b82ae0e21944d54cccc5d07d1503b98b810545c3d",
+    "ui/controls.go": "fb0354f29745def85ddb9955dcad11fefe740feac71346b168ab093244d2aab3",
+    "drivers/cogent/tree.go": "2ec1aaa59df49382f400d600cdde01fc4e1bfb916d0d8900e17ae464f75a5bec",
+    "drivers/cogent/tree_geometry.go": "5e752b83f88981b8b5a5ff8fd5b127c68f1f284e069062853afac205b13ac268",
+    "drivers/cogent/tree_accessibility.go": "35ea67d9d50fb2ca9370d2af0918bcd24666ed1354537ede58d4036415e2d89a",
+    "drivers/cogent/tree_offscreen_test.go": "b21ab888c4e856e19b195236c7b77ec1545160c1519bcaf192c369e00429591c",
+    "drivers/cogent/tree_budget_test.go": "59f0786974ebbbd26974279a4d87842e4c50c35a772da032aac608b3f7870cdd",
+    "drivers/cogent/tree_payload_review_test.go": "e8f23be4717d340b87bec6b85d6d5038a9b43637a10dcb06b530e7ccce874b92",
+    "drivers/cogent/controls.go": "52056503c64f76dc169f8d5534f4380226840d4601c6ebe84b7ec40b5ffc3323",
+    "drivers/cogent/reconcile.go": "f16868a2a4790988a102b2b90b918dde94af9fb083ab85cf5d4df4db1a4ca196",
+    "drivers/cogent/accessibility.go": "62e7647ade54c59639cb72006f5a2cb1a3ed221c41052d24386b8e01dcaca05c",
+    "drivers/cogent/manual.go": "158bcd90c411f30a1c031dac330493c543290d2ec70f9c4d254afa5cd7bb52c9",
+    "drivers/cogent/manual_offscreen.go": "2ba45cc4399aee2f155a76471e7df20d4d2d93f56fe161bbfa65f84cd5057e60",
+    "specs/tree-native.md": "143cbbf168748261ec08ca8580c8fd080b7a7ee5f67e5f758d22ccd8986a0eb5",
+    "examples/loadedtree/go.mod": "eed162dc05fc9bc82c83cc689698b67bad715f730eddc7c601c60178f6f03f79",
+    "examples/loadedtree/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/loadedtree/LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+    "examples/loadedtree/source.go": "bb7ad0376fa53e8e66f6be7b207bac872d81adf754b81ca7928fc133849f6595",
+    "examples/loadedtree/model.go": "bc0b8d1e64874bf7021999df18155ef98ed7a83023e1a71e068157e612f6b186",
+    "examples/loadedtree/main.go": "f04aea4c80de1e1ecfd64ce7dafb3e2f9cd65cdb340eb305532995d17e1321cf",
+    "examples/loadedtree/smoke.go": "4ee969273bc61aebad2aacfae7cf04d5a65911ab21543e341c4bb1525e1d60f8",
+    "examples/loadedtree/model_test.go": "980d8a01fa3412cfccc494cef3a9919e58ad665fb77aced4671f6fd6e5abe923",
+    "examples/loadedtree/managed_test.go": "872ad87c9fc612a900d2c471c126d202f8a9c8dca529c05a1bd537275f640fef",
+    "examples/loadedtree/README.md": "d5be1246f1df9b09eec32c41a753013d4c1ca4f7566075ee24e58486f99ad514"
+  },
+  "groups": {
+    "ui_native_spec": [
+      "ui/tree.go",
+      "ui/tree_test.go",
+      "ui/node.go",
+      "ui/controls.go",
+      "drivers/cogent/tree.go",
+      "drivers/cogent/tree_geometry.go",
+      "drivers/cogent/tree_accessibility.go",
+      "drivers/cogent/tree_offscreen_test.go",
+      "drivers/cogent/tree_budget_test.go",
+      "drivers/cogent/tree_payload_review_test.go",
+      "drivers/cogent/controls.go",
+      "drivers/cogent/reconcile.go",
+      "drivers/cogent/accessibility.go",
+      "drivers/cogent/manual.go",
+      "drivers/cogent/manual_offscreen.go",
+      "specs/tree-native.md"
+    ],
+    "consumer": [
+      "examples/loadedtree/go.mod",
+      "examples/loadedtree/go.sum",
+      "examples/loadedtree/LICENSE",
+      "examples/loadedtree/source.go",
+      "examples/loadedtree/model.go",
+      "examples/loadedtree/main.go",
+      "examples/loadedtree/smoke.go",
+      "examples/loadedtree/model_test.go",
+      "examples/loadedtree/managed_test.go",
+      "examples/loadedtree/README.md"
+    ]
+  },
+  "prior": {
+    "path": "/private/tmp/vellum-large-tree-owned/frozen-v2/ownership.json",
+    "sha256": "b43149f77a86a87ac84b7c06cdd7c2058b057af6165a3976ffce5a72b9e50a1b",
+    "status": "Historical producer PASS: failed-Prepare task admission ABA subsequently reproduced; native16 unchanged."
+  },
+  "changed_from_v2": [
+    "examples/loadedtree/model.go",
+    "examples/loadedtree/model_test.go"
+  ]
+}

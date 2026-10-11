@@ -1,0 +1,45 @@
+{
+  "result": "PASS",
+  "reviewer": "root; independent from portable author",
+  "owned_map_sha256": "13ddeed2b28b4400706465ee6fd88fdd68392dfb8bc29715111fb4ad094402ef",
+  "qualified_map_sha256": "d957871e604ba998847f0c9d5dd5132a5a06edbada1ed1133d2be54738b7c81f",
+  "files": {
+    "virtual/tree_data.go": {
+      "sha256": "0a2a55ec00f21a7a670ee50942aaafb432d5af14ffdd1baa6377275c547db532",
+      "bytes": 8018,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v2/virtual/tree_data.go.txt"
+    },
+    "virtual/tree_index.go": {
+      "sha256": "29e31ecce6c85e72746ba46e5bc8c19855e59343d2f98e9e3dccb3febd49aee6",
+      "bytes": 8836,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v2/virtual/tree_index.go.txt"
+    },
+    "virtual/tree_outline.go": {
+      "sha256": "8a6d88e32fcadafe852d5f25e36f6f9dedda25b017faa36e297948b5bde282e9",
+      "bytes": 14024,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v2/virtual/tree_outline.go.txt"
+    },
+    "virtual/tree_data_test.go": {
+      "sha256": "439f7697fa6298e2d5daedfa1c0ae45c64b0070aa5819db4094d6622a6d6b587",
+      "bytes": 12834,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v2/virtual/tree_data_test.go.txt"
+    },
+    "virtual/tree_outline_test.go": {
+      "sha256": "3ae1aa5a00179fe73bc139741169533a58a79b62bc56595db65e3320e838a886",
+      "bytes": 17392,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v2/virtual/tree_outline_test.go.txt"
+    },
+    "specs/tree.md": {
+      "sha256": "1e3326132dbc5795b4b7bfbde35b12e730b1a489f7c1612a8a26e73d0528bcc5",
+      "bytes": 9685,
+      "snapshot": "/private/tmp/vellum-outline-portable/frozen-v2/specs/tree.md.txt"
+    }
+  },
+  "source_review": "Read all TreeData/TreeIndex/Outline runtime and contract, plus key-bound correction and focused tests. Bounded counted worker phases, sealed detached payloads, O(visible) snapshots and indexed owner navigation/admission reviewed. No full-tree scan/copy in owner admission. All current bytes match frozen v2.",
+  "finding": {
+    "issue": "unbounded external-key map hashing",
+    "status": "FIXED",
+    "evidence": "Node/Select/Reveal length-first validation; TestOutlinePublicKeysBoundBeforeOwnerLookup includes8MiB input and atomic preserved pending/selection"
+  },
+  "scope": "Portable source review and verified producer race20/fullvirtual/vet proof. No native/GPU/AX, wall-time or fullP6 acceptance."
+}

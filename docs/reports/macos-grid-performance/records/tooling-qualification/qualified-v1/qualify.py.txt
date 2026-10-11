@@ -1,0 +1,35 @@
+import hashlib,json,pathlib,shlex,subprocess,sys,time
+sys.dont_write_bytecode=True
+R=pathlib.Path('/private/tmp/vellum-large-data');D=pathlib.Path(__file__).parent;O=D/'qualified-v1';O.mkdir(exist_ok=False);M=R/'examples/loadedgrid';sys.path.insert(0,str(R/'scripts'))
+from child_process import run_child
+h=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+OWNED=['examples/loadedgrid/'+p for p in ['perf.go','perf_runtime.go','perf_profile.go','perf_test.go','perf_profile_test.go','perf_offscreen_test.go','main.go','README.md']]+['scripts/benchmark-grid.py','scripts/benchmark-grid_test.py','specs/grid-performance.md']
+def collect():
+ ps=set(R/p for p in OWNED)
+ ps.update(p for p in M.iterdir() if p.is_file() and(p.suffix=='.go' or p.name in ['go.mod','go.sum','LICENSE']))
+ for package in ['app','tasks','execution','ui','virtual']:ps.update((R/package).rglob('*.go'))
+ ps.update(R/p for p in ['go.mod','vellum.go','scripts/child_process.py','scripts/sdk_environment.py','drivers/cogent/go.mod','drivers/cogent/go.sum','drivers/cogent/env.sh','drivers/cogent/prepare.sh','drivers/cogent/prepare_test.py','drivers/cogent/native/dependencies.json'])
+ ps.update((R/'drivers/cogent').glob('*.go'));ps.update((R/'drivers/cogent').glob('*.m'));ps.update((R/'drivers/cogent').glob('*.h'))
+ ps.update(p for p in (R/'drivers/cogent/native/patches').rglob('*') if p.is_file())
+ selected={str(p.relative_to(R)):h(p) for p in sorted(ps)}
+ prepared={}
+ for n in ['upstream','typesetting']:
+  base=R/'drivers/cogent/build'/n;mp={str(p.relative_to(base)):h(p) for p in sorted(base.rglob('*')) if p.is_file() and '.git' not in p.parts};data=json.dumps(mp,sort_keys=True,separators=(',',':')).encode();prepared[n]={'count':len(mp),'canonical_sha256':hashlib.sha256(data).hexdigest()}
+ return {'owned':{p:selected[p] for p in OWNED},'selected':selected,'prepared_fingerprints':prepared,'producer_sha256':h(pathlib.Path(__file__))}
+before=collect();(O/'inputs-before.json').write_text(json.dumps(before,indent=2)+'\n')
+for p in OWNED:
+ q=O/'owned-sources'/(p+'.txt');q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes((R/p).read_bytes())
+(O/'ownership.json').write_text(json.dumps({'root':str(R),'scope':'Eleven owned performance consumer/protocol/docs files; no native runtime ownership or GUI acceptance.','files':before['owned']},indent=2)+'\n')
+(O/'qualify.py.txt').write_bytes(pathlib.Path(__file__).read_bytes())
+commands=[('protocol-python',R,['python3','-B','scripts/benchmark-grid_test.py']),('perf-default-race3',M,['go','test','-race','-count=3','-v','-run','^TestPerf','./...']),('perf-actual-offscreen-race1',M,['go','test','-tags','offscreen','-race','-count=1','-v','-run','^TestPerf','./...']),('consumer-offscreen-vet',M,['go','vet','-tags','offscreen','./...']),('consumer-default-vet',M,['go','vet','./...']),('optimized-desktop-build',M,['go','build','-o',str(O/'loadedgrid-release'),'.'])]
+checks=[];prefix='export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+shlex.quote(str(R/'drivers/cogent/env.sh'))+'\nexec '
+for name,cwd,cmd in commands:
+ p=O/(name+'.log');start=time.monotonic();code=-1;err=None;argv=['/bin/zsh','-c',prefix+shlex.join(cmd)];print('START',name,flush=True)
+ with p.open('xb') as log:
+  log.write((json.dumps({'argv':argv,'cwd':str(cwd)})+'\n').encode());log.flush()
+  try:code=run_child(argv,cwd=cwd,stdout=log,stderr=subprocess.STDOUT,timeout=600).returncode
+  except Exception as e:err=repr(e);log.write((err+'\n').encode())
+ checks.append({'name':name,'command':cmd,'argv':argv,'cwd':str(cwd),'exit_code':code,'runner_error':err,'elapsed_seconds':time.monotonic()-start,'log':p.name,'sha256':h(p)});(O/'checks.json').write_text(json.dumps(checks,indent=2)+'\n');print('END',name,code,flush=True)
+ if code:break
+after=collect();(O/'inputs-after.json').write_text(json.dumps(after,indent=2)+'\n');binary=O/'loadedgrid-release';data={'schema':'vellum-grid-performance-selected-qualification-v1','scope':'Selected source+complete enumerated prepared byte fingerprints, source-bound CPU tests and optimized native binary build only. No compiler/module-cache/OS SDK closure or native performance acceptance.','source_root':str(R),'producer':{'path':str(pathlib.Path(__file__)),'sha256':h(pathlib.Path(__file__))},'before':{'path':'inputs-before.json','sha256':h(O/'inputs-before.json')},'after':{'path':'inputs-after.json','sha256':h(O/'inputs-after.json')},'unchanged':before==after,'owned':before['owned'],'selected_count':len(before['selected']),'prepared':before['prepared_fingerprints'],'checks':checks,'binary':{'path':str(binary),'sha256':h(binary)} if binary.exists() else None,'result':'PASS' if before==after and len(checks)==len(commands) and all(c['exit_code']==0 for c in checks) else 'FAIL'}
+p=O/'qualification.json';p.write_text(json.dumps(data,indent=2)+'\n');print('PROOF',p,h(p),data['result'],flush=True);sys.exit(data['result']!='PASS')

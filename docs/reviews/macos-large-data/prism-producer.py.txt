@@ -1,0 +1,35 @@
+from pathlib import Path
+import hashlib,json,subprocess,sys,time
+R=Path('/private/tmp/vellum-large-data');O=R/'docs/reviews/macos-large-data'
+O.mkdir(parents=True,exist_ok=False)
+sys.dont_write_bytecode=True;sys.path.insert(0,str(R))
+from scripts.child_process import run_child
+sha=lambda b:hashlib.sha256(b).hexdigest()
+def git(*args):return subprocess.check_output(['git',*args],cwd=R)
+paths=set(git('diff','--name-only').decode().splitlines())
+paths.update(git('ls-files','--others','--exclude-standard').decode().splitlines())
+paths=sorted(p for p in paths if not p.startswith('docs/reviews/') and
+             (not p.startswith('docs/reports/') or p in ('docs/reports/README.md','docs/reports/macos-large-tree/README.md','docs/reports/macos-grid-performance/README.md')))
+assert all((R/p).is_file() for p in paths)
+assert not git('diff','--cached','--name-only').strip(),'unexpected pre-existing index'
+subprocess.run(['git','add','--',*paths],cwd=R,check=True)
+assert paths==git('diff','--cached','--name-only').decode().splitlines()
+sources={p:sha((R/p).read_bytes()) for p in paths}
+for p,h in sources.items():
+ assert sha(git('show',':'+p))==h
+ q=O/'reviewed-sources'/(p+'.txt');q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes((R/p).read_bytes())
+diff=git('diff','--cached','--binary')
+assert len(diff)<=1048576,('review diff exceeds selected limit',len(diff))
+def save(name,value):(O/name).write_text(json.dumps(value,indent=2)+'\n')
+save('prism-inputs.json',{'schema':1,'scope':'Worker-built portable tree, managed native DataTree and independent consumer; opt-in native frame tracing stage34 and stored-grid release timing/profiling tooling; tests, contracts and selected guides. Historical raw evidence excluded from provider payload. Selected staged byte identity, not compiler dependency closure.',
+ 'provider':'anthropic','model':'claude-sonnet-5-5','base':git('rev-parse','HEAD').decode().strip(),'files':sources,'file_count':len(paths),'staged_diff_bytes':len(diff),'staged_diff_sha256':sha(diff)})
+argv=['/Users/dshills/Development/Go/bin/prism','review','staged','--provider','anthropic','--model','claude-sonnet-5-5','--format','json','--out',str(O/'prism.json'),'--min-severity','medium','--fail-on','medium','--baseline','none','--max-diff-bytes','1048576','--chunk-bytes','65536','--context-lines','3','--max-findings','12','--paths',','.join(paths)]
+start=time.monotonic();error=None
+with (O/'prism-process.log').open('xb') as f:
+ try: code=run_child(argv,cwd=R,stdout=f,stderr=subprocess.STDOUT,timeout=900).returncode
+ except Exception as e:code=124 if isinstance(e,subprocess.TimeoutExpired) else 125;error={'type':type(e).__name__,'message':str(e)}
+unchanged=diff==git('diff','--cached','--binary') and sources=={p:sha((R/p).read_bytes()) for p in paths}
+save('prism-process.json',{'argv':argv,'exit_code':code,'error':error,'elapsed_seconds':time.monotonic()-start,'selected_staged_and_working_bytes_unchanged':unchanged,'log_sha256':sha((O/'prism-process.log').read_bytes()),'producer_sha256':sha(Path(__file__).read_bytes())})
+(O/'prism-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'exit_code':code,'unchanged':unchanged,'report_exists':(O/'prism.json').is_file(),'files':len(paths),'diff_bytes':len(diff)}),flush=True)
+sys.exit(code if code else 0 if unchanged else 1)

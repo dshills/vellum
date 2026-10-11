@@ -1,0 +1,188 @@
+{
+  "schema": "vellum-grid-profile-readout-v1",
+  "scope": "Offline diagnostic profile readout, no new native process; no warm timing/P6 acceptance or optimization. Sampled process-wide Go CPU differs from same-ticket wall-work phases.",
+  "producer": {
+    "path": "/private/tmp/vellum-grid-perf-profile-native-1/analyze.py",
+    "sha256": "0293e0917e8f89fb9d21e00e1d4fbac2e21ad1ac046169ac77fe282e150529e7"
+  },
+  "before": {
+    "path": "inputs-before.json",
+    "sha256": "8673dacc6b742589a47724c9caac9cb60e4450c95b52ea2e13919c6931e4c919"
+  },
+  "after": {
+    "path": "inputs-after.json",
+    "sha256": "8673dacc6b742589a47724c9caac9cb60e4450c95b52ea2e13919c6931e4c919"
+  },
+  "unchanged": true,
+  "native_diagnostic": {
+    "path": "/private/tmp/vellum-grid-perf-profile-native-1/diagnostic.json",
+    "sha256": "1d7d92d9c817b75caf132824acef90d07d255d3f16225743cb0aa50f60d3062c",
+    "observer_scope": "Historical setup/ready/end ps observations, including ready observer overlap; immutable record does not claim external-observer-free timings."
+  },
+  "profile": {
+    "path": "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof",
+    "sha256": "6dce1ff1b2d5a3320128363001edbc19ba5f39f051428422c10aae4b344e28fb"
+  },
+  "binary": {
+    "path": "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+    "sha256": "19ed865d996762466c53be13e01f84f77fdfc07bb6e194200207ddb8dc15a539"
+  },
+  "checks": [
+    {
+      "name": "top",
+      "argv": [
+        "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool",
+        "-top",
+        "-nodecount=55",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "elapsed_seconds": 0.01923925001756288,
+      "runner_error": null,
+      "log": "top.log",
+      "sha256": "698b610a7988062c0c1711ecd64e581926eaa1c821c84a935581f70a4c5e0def"
+    },
+    {
+      "name": "cumulative",
+      "argv": [
+        "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool",
+        "-top",
+        "-cum",
+        "-nodecount=55",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "elapsed_seconds": 0.01938183300080709,
+      "runner_error": null,
+      "log": "cumulative.log",
+      "sha256": "eed8f68950e8366baea95d83981d8054cb7d179b74ede487eb2dc34248f4b8cf"
+    },
+    {
+      "name": "sync-grid",
+      "argv": [
+        "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool",
+        "-list=syncGrid",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "elapsed_seconds": 0.01997008398757316,
+      "runner_error": null,
+      "log": "sync-grid.log",
+      "sha256": "2d04da3433ee180f6993d447dd3fff3a347ad6442c323bc47a18de738ba2800f"
+    },
+    {
+      "name": "place",
+      "argv": [
+        "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool",
+        "-list=gridBinding.*place",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "elapsed_seconds": 0.020324833021732047,
+      "runner_error": null,
+      "log": "place.log",
+      "sha256": "549d22d0f72073dd165030dfe124df1f2350f97aae3a7177e0d82bdd26e7d390"
+    },
+    {
+      "name": "paint",
+      "argv": [
+        "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool",
+        "-list=paintSource.*Draw",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "elapsed_seconds": 0.020455958001548424,
+      "runner_error": null,
+      "log": "paint.log",
+      "sha256": "e7992d415f57599d06258869faebd9f6cf70277e84a87f534ac69af5d1c9ef2c"
+    },
+    {
+      "name": "tool-metadata",
+      "argv": [
+        "/opt/homebrew/bin/go",
+        "version",
+        "-m",
+        "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool"
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "elapsed_seconds": 0.009591708017978817,
+      "runner_error": null,
+      "log": "tool-metadata.log",
+      "sha256": "0aa94a1aa28092fa07ce0e14b57e4b365503c1a94ef951e985db250dcc50e1e6"
+    }
+  ],
+  "failed_prior_readouts": [
+    {
+      "command": [
+        "/opt/homebrew/bin/go",
+        "tool",
+        "pprof",
+        "-top",
+        "-nodecount=55",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "exit_code": 2,
+      "log": "/private/tmp/vellum-grid-perf-profile-native-1/pprof-top.log",
+      "sha256": "4308abf66b47ce645acf1f57b071e436a27088a652c493a0b951dc612ffec55d",
+      "scope": "Historical initial readout attempt: local Go installation had no precompiled pprof tool."
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/go",
+        "tool",
+        "pprof",
+        "-top",
+        "-cum",
+        "-nodecount=55",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "exit_code": 2,
+      "log": "/private/tmp/vellum-grid-perf-profile-native-1/pprof-cumulative.log",
+      "sha256": "4308abf66b47ce645acf1f57b071e436a27088a652c493a0b951dc612ffec55d",
+      "scope": "Historical initial readout attempt: local Go installation had no precompiled pprof tool."
+    },
+    {
+      "command": [
+        "/opt/homebrew/bin/go",
+        "tool",
+        "pprof",
+        "-list=syncGrid",
+        "/private/tmp/vellum-grid-performance-qualification/qualified-v1/loadedgrid-release",
+        "/private/tmp/vellum-grid-perf-profile-native-1/scroll.pprof"
+      ],
+      "exit_code": 2,
+      "log": "/private/tmp/vellum-grid-perf-profile-native-1/pprof-sync-grid.log",
+      "sha256": "4308abf66b47ce645acf1f57b071e436a27088a652c493a0b951dc612ffec55d",
+      "scope": "Historical initial readout attempt: local Go installation had no precompiled pprof tool."
+    }
+  ],
+  "fallback_tool": {
+    "path": "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool",
+    "sha256": "c2da8e725ac847bc7e006e3ddf581069b97e70fc0f3e08e7bf960aba96fa2146",
+    "build_command": [
+      "/opt/homebrew/bin/go",
+      "build",
+      "-o",
+      "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool",
+      "cmd/pprof"
+    ],
+    "build_exit_code": 0,
+    "build_log": "/private/tmp/vellum-grid-perf-profile-native-1/pprof-tool-build.log",
+    "build_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scope": "Compiled locally from installed Go stdlib cmd/pprof and bundled vendor sources; no download/install. Build source closure was not independently recorded."
+  },
+  "result": "PASS_DIAGNOSTIC_READOUT"
+}

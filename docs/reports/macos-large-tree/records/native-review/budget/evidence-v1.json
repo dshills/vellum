@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "finding": "Native preallocation charged only labels, allowing long generated IDs and cumulative escaped/native/semantic text to bypass the intended bounded payload admission.",
+  "scope": "Isolated unchanged constructor regression; no GUI. Red-v2 substitutes exact draft1 tree.go only, plus removes newly introduced budget tests that refer to new-only symbols. Other driver/prepared sources use the current mutable scratch; this is not a fully frozen historical closure.",
+  "test_sha256": "e8f23be4717d340b87bec6b85d6d5038a9b43637a10dcb06b530e7ccce874b92",
+  "historical_red_runtime": {
+    "path": "/private/tmp/vellum-outline-native-review/draft1/drivers/cogent/tree.go.txt",
+    "sha256": "88b72fbd5ad1cc2f82b7f4b574b3042099ff840c28821e8cc34dcaa42f546d60"
+  },
+  "checks": [
+    {
+      "name": "initial-overlay-fixture",
+      "exit_code": 1,
+      "classification": "historical fixture compilation failure: producer new budget tests cannot compile with old helper-free runtime"
+    },
+    {
+      "name": "old-runtime-unchanged-body",
+      "exit_code": 1,
+      "classification": "historical demonstrated product refusal failure for long key, long control ID, and escaped aggregate labels"
+    },
+    {
+      "name": "corrected-runtime-race3",
+      "exit_code": 0,
+      "classification": "provisional green; final producer frozen qualification pending"
+    }
+  ],
+  "files": {
+    "tree_payload_review_test.go": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/tree_payload_review_test.go",
+      "sha256": "e8f23be4717d340b87bec6b85d6d5038a9b43637a10dcb06b530e7ccce874b92",
+      "bytes": 2155
+    },
+    "red-overlay.json": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/red-overlay.json",
+      "sha256": "db2630c68348aab54a7d0dcad742619574bb29274ddcff20e6f20df69b02cc07",
+      "bytes": 328
+    },
+    "red.log": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/red.log",
+      "sha256": "c1ad5ed444879c312e9c2d6dc73fdaf67df9ee76608ae7b17ed1824feb1d9e9c",
+      "bytes": 458
+    },
+    "red-overlay-v2.json": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/red-overlay-v2.json",
+      "sha256": "6f9a2655522ad2df67f37e07754e6716743c20de5592ee3b222c99666a66bf5e",
+      "bytes": 474
+    },
+    "empty_budget_test.go": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/empty_budget_test.go",
+      "sha256": "07cbd055d56c6688f1035f020c7f62757e4872719088426d5e38694eb78c0cdb",
+      "bytes": 37
+    },
+    "red-v2.log": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/red-v2.log",
+      "sha256": "e6d916a8c14ce59438c935e96dcaeb0d874f08e5c6bce3ef552ab98c98e0e1c8",
+      "bytes": 841
+    },
+    "green-overlay.json": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/green-overlay.json",
+      "sha256": "ef6cd573047abbe333d0aee254ef1d9b4882f389d5ad7ea37155937cb099410b",
+      "bytes": 188
+    },
+    "green.log": {
+      "path": "/private/tmp/vellum-outline-native-review/budget/green.log",
+      "sha256": "f56c888748c4d3cc7f162f8213ad2138e5d844e848e31378235bf83a4e33a185",
+      "bytes": 153
+    }
+  }
+}

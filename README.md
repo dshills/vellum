@@ -25,6 +25,7 @@ open. The workbench does not change system input sources.
 | `examples/replay/` | Independent fixed-record consumer using routed controls and software frames |
 | `examples/editor/` | Independent managed multiline editor with exact-byte save/open and native input settling |
 | `examples/loadedgrid/` | Independent stored-data grid with cancellable worker sort/filter and separate domain/view revisions |
+| `examples/loadedtree/` | Independent stored 100k-node tree with worker-built indexes and bounded managed navigation |
 | `examples/grid/` | Independent managed two-axis grid with procedural 10k/million-row windows and routed-input checks |
 | `examples/drawing/` | Independent retained GPU mesh/image drawing and scalable workload consumer |
 | `examples/imaging/` | Independent compute, HDR float rendering and asynchronous frame capture consumer |

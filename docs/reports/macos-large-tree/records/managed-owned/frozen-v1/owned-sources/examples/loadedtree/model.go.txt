@@ -1,0 +1,360 @@
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"math"
+
+	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/execution"
+	"github.com/dshills/vellum/tasks"
+	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/virtual"
+)
+
+var errBusy = errors.New("loadedtree: work or settlement already pending")
+var errStale = errors.New("loadedtree: worker result superseded")
+
+type window struct {
+	p                   *program
+	id                  string
+	outline             *virtual.Outline
+	data                *virtual.TreeData
+	manager             *tasks.Manager
+	task                *tasks.Task
+	request             virtual.OutlineRequest
+	token               uint64
+	filterText, message string
+	settling            bool
+	filterToken         uint64
+	filterCancel        context.CancelFunc
+	settleFilter        func(context.Context, func(error)) error
+}
+type program struct {
+	owner     *app.Application
+	windows   [2]*window
+	nodes     int
+	loader    *tasks.Manager
+	loadTask  *tasks.Task
+	loadToken uint64
+	base      [2]*virtual.TreeData
+}
+
+func newProgram(nodes int, executor execution.Executor) (*program, error) {
+	if nodes < 1 || nodes > maxNodes {
+		return nil, errData
+	}
+	a, e := app.New(app.Config{QueueCapacity: 64, CompletionCapacity: 8})
+	if e != nil {
+		return nil, e
+	}
+	p := &program{owner: a, nodes: nodes}
+	failed := true
+	defer func() {
+		if failed {
+			a.Close()
+		}
+	}()
+	// Only the empty bootstrap is constructed synchronously. Both stored datasets
+	// and all nonempty indexes are worker-built; owner admission remains bounded.
+	for i, id := range []string{"small", "large"} {
+		data, e := virtual.NewTreeData(context.Background(), "loadedtree:"+id, 1, nil, treeLimits())
+		if e != nil {
+			return nil, e
+		}
+		index, e := virtual.BuildTreeIndex(context.Background(), data, virtual.TreeIndexOptions{})
+		if e != nil {
+			return nil, e
+		}
+		outline, e := virtual.NewOutline(index, virtual.OutlineConfig{RowHeight: 25, MaxRows: 500}, virtual.OutlineViewport{Width: 900, Height: 450})
+		if e != nil {
+			return nil, e
+		}
+		w := &window{p: p, id: id, outline: outline, data: data, message: "Empty view; Load builds stored nodes and indexes on workers"}
+		p.windows[i] = w
+		if e = a.Open(app.Window{ID: id, Title: "Vellum Loaded Tree · " + id, Width: 1000, Height: 740, View: w.describe}); e != nil {
+			return nil, e
+		}
+		w.manager, e = tasks.NewWithConfig(tasks.Config{Owner: a, Window: id, Limit: 2, Executor: executor, Invalidate: func() { _ = a.Invalidate(id) }})
+		if e != nil {
+			return nil, e
+		}
+	}
+	p.loader, e = tasks.NewWithConfig(tasks.Config{Owner: a, Limit: 1, Executor: executor, Invalidate: func() {
+		for _, w := range p.windows {
+			_ = a.Invalidate(w.id)
+		}
+	}})
+	if e != nil {
+		return nil, e
+	}
+	failed = false
+	return p, nil
+}
+func (w *window) lifetime() (context.Context, error) {
+	ctx, e := w.p.owner.WindowContext(w.id)
+	if e != nil {
+		return nil, e
+	}
+	if ctx.Err() != nil {
+		return nil, app.ErrWindowClosed
+	}
+	return ctx, nil
+}
+func (w *window) report(e error) {
+	if e != nil {
+		w.message = e.Error()
+	}
+	_ = w.p.owner.Invalidate(w.id)
+}
+func (p *program) load() error {
+	if p.loadTask != nil {
+		return errBusy
+	}
+	if p.loadToken == math.MaxUint64 {
+		return virtual.ErrTreeExhausted
+	}
+	if p.base[1] != nil {
+		for i, w := range p.windows {
+			if _, e := w.lifetime(); e == nil {
+				if e = w.changeData(p.base[i], virtual.OutlineChange{Kind: virtual.OutlineKeep}); e != nil {
+					return e
+				}
+			}
+		}
+		return nil
+	}
+	token := p.loadToken + 1
+	count := p.nodes
+	task, e := tasks.Start(p.loader, p.owner.Context(), func(ctx context.Context, progress func(float64, string)) ([2]*virtual.TreeData, error) {
+		var out [2]*virtual.TreeData
+		progress(0, "Allocating stored nodes and immutable parent/key indexes")
+		for i, id := range []string{"small", "large"} {
+			n := count
+			if i == 0 {
+				n = min(n, smallNodes)
+			}
+			data, e := makeData(ctx, "loadedtree:"+id+":stored", n)
+			if e != nil {
+				return out, e
+			}
+			out[i] = data
+		}
+		return out, nil
+	}, func(out [2]*virtual.TreeData, e error) {
+		if token != p.loadToken {
+			return
+		}
+		p.loadTask = nil
+		if e != nil {
+			for _, w := range p.windows {
+				w.report(e)
+			}
+			return
+		}
+		p.base = out
+		for i, w := range p.windows {
+			if _, e = w.lifetime(); e == nil {
+				w.report(w.changeData(out[i], virtual.OutlineChange{Kind: virtual.OutlineKeep}))
+			}
+		}
+	})
+	if e != nil {
+		return e
+	}
+	p.loadToken = token
+	p.loadTask = task
+	for _, w := range p.windows {
+		w.message = "Generating stored nodes off-owner"
+		w.report(nil)
+	}
+	return nil
+}
+
+// Admission obtains both worker and completion credit before superseding an
+// earlier accepted request. The buffered handoff makes the worker read exactly
+// the owner-prepared immutable request, without inline execution or UI waiting.
+func (w *window) changeData(data *virtual.TreeData, change virtual.OutlineChange) error {
+	ctx, e := w.lifetime()
+	if e != nil {
+		return e
+	}
+	if w.settling {
+		return errBusy
+	}
+	if data == nil {
+		return errData
+	}
+	if w.manager.Pending().Active >= 2 {
+		return tasks.ErrCapacity
+	}
+	if w.token == math.MaxUint64 {
+		return virtual.ErrTreeExhausted
+	}
+	token := w.token + 1
+	base, model := w.data, w.outline
+	input := make(chan virtual.OutlineRequest, 1)
+	var req virtual.OutlineRequest
+	task, e := tasks.Start(w.manager, ctx, func(ctx context.Context, progress func(float64, string)) (*virtual.TreeIndex, error) {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case captured := <-input:
+			return buildIndex(ctx, captured, progress)
+		}
+	}, func(index *virtual.TreeIndex, e error) {
+		if token != w.token {
+			return
+		}
+		w.task = nil
+		if w.data != base || w.outline != model {
+			_ = model.Cancel(req)
+			w.request = virtual.OutlineRequest{}
+			w.report(errStale)
+			return
+		}
+		if e != nil {
+			_ = model.Cancel(req)
+			w.request = virtual.OutlineRequest{}
+			w.report(e)
+			return
+		}
+		if e = model.Complete(req, index); e != nil {
+			// Recoverable admission refusal keeps the exact request for Cancel.
+			// Obsolete requests no longer carry cancellation authority or data.
+			if !errors.Is(e, virtual.ErrTreeCapacity) && !errors.Is(e, virtual.ErrTreeExhausted) {
+				w.request = virtual.OutlineRequest{}
+			}
+			w.report(e)
+			return
+		}
+		w.request = virtual.OutlineRequest{}
+		w.data = data
+		state, e := model.State()
+		if e != nil {
+			w.report(e)
+			return
+		}
+		w.message = fmt.Sprintf("Accepted %d visible / %d stored; filter %q", state.VisibleRows, state.Stamp.Nodes, state.Filter)
+		w.report(nil)
+	})
+	if e != nil {
+		return e
+	}
+	req, e = model.PrepareData(data, change)
+	if e != nil {
+		task.Cancel()
+		return e
+	}
+	if w.task != nil {
+		w.task.Cancel()
+	}
+	w.token = token
+	w.task, w.request = task, req
+	input <- req
+	w.message = "Index worker admitted; accepted view remains usable"
+	w.report(nil)
+	return nil
+}
+func (w *window) change(change virtual.OutlineChange) error { return w.changeData(w.data, change) }
+func (w *window) cancel() error {
+	if w.token == math.MaxUint64 || w.filterToken == math.MaxUint64 {
+		return virtual.ErrTreeExhausted
+	}
+	w.token++
+	w.filterToken++
+	if w.filterCancel != nil {
+		w.filterCancel()
+		w.filterCancel = nil
+	}
+	w.settling = false
+	if w.task != nil {
+		w.task.Cancel()
+		w.task = nil
+	}
+	err := w.outline.Cancel(w.request)
+	w.request = virtual.OutlineRequest{}
+	if err != nil && !errors.Is(err, virtual.ErrTreeStale) {
+		return err
+	}
+	w.message = "Canceled; accepted worker credit remains until both terminals"
+	w.report(nil)
+	return nil
+}
+func (p *program) cancelLoad() error {
+	if p.loadToken == math.MaxUint64 {
+		return virtual.ErrTreeExhausted
+	}
+	p.loadToken++
+	if p.loadTask != nil {
+		p.loadTask.Cancel()
+		p.loadTask = nil
+	}
+	for _, w := range p.windows {
+		if e := w.cancel(); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+func (w *window) applyFilter() error {
+	if w.settling {
+		return errBusy
+	}
+	if w.settleFilter == nil {
+		return errData
+	}
+	ctx, e := w.lifetime()
+	if e != nil {
+		return e
+	}
+	if w.filterToken == math.MaxUint64 {
+		return virtual.ErrTreeExhausted
+	}
+	token := w.filterToken + 1
+	workToken, model, data := w.token, w.outline, w.data
+	ctx, cancel := context.WithCancel(ctx)
+	w.filterToken = token
+	w.filterCancel = cancel
+	w.settling = true
+	e = w.settleFilter(ctx, func(e error) {
+		if token != w.filterToken || !w.settling {
+			return
+		}
+		w.settling = false
+		w.filterCancel = nil
+		cancel()
+		if e != nil {
+			w.report(e)
+			return
+		}
+		if model != w.outline || data != w.data || workToken != w.token {
+			w.report(errStale)
+			return
+		}
+		w.report(w.change(virtual.OutlineChange{Kind: virtual.OutlineFilter, Filter: w.filterText}))
+	})
+	if e != nil {
+		w.settling = false
+		w.filterCancel = nil
+		cancel()
+		return e
+	}
+	w.message = "Settling originating filter field"
+	w.report(nil)
+	return nil
+}
+func (w *window) describe() ui.Node {
+	s, e := w.outline.State()
+	if e != nil {
+		panic(e)
+	}
+	button := func(id, text string, fn func() error) ui.Node {
+		return ui.Node{ID: id, Kind: ui.Button, Text: text, Activate: func() { w.report(fn()) }}
+	}
+	tools := []ui.Node{button("load", "Load stored nodes", w.p.load), button("expand", "Expand all", func() error { return w.change(virtual.OutlineChange{Kind: virtual.OutlineExpandAll}) }), button("collapse", "Collapse all", func() error { return w.change(virtual.OutlineChange{Kind: virtual.OutlineCollapseAll}) }), button("cancel", "Cancel work", w.cancel)}
+	filters := []ui.Node{{ID: "filter", Kind: ui.TextField, Text: w.filterText, Accessibility: ui.Accessibility{Name: "Tree filter"}, Change: func(e ui.ChangeEvent) { w.filterText = e.Text; w.report(nil) }}, button("apply", "Apply filter", w.applyFilter), button("clear", "Clear filter", func() error { return w.change(virtual.OutlineChange{Kind: virtual.OutlineFilter}) })}
+	status := fmt.Sprintf("%s\nSelected %q; visible %t; pending %t; worker credits %d/2", w.message, s.Selected, s.SelectedVisible, s.Pending, w.manager.Pending().Active)
+	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Style: ui.Style{Gap: ui.Some(float32(6)), Padding: ui.Some(ui.UniformInsets(8))}, Children: []ui.Node{{ID: "tools", Kind: ui.Row, Style: ui.Style{Gap: ui.Some(float32(4))}, Children: tools}, {ID: "filters", Kind: ui.Row, Style: ui.Style{Gap: ui.Some(float32(4))}, Children: filters}, {ID: "status", Kind: ui.Label, Text: status, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 980})}}, {ID: "outline", Kind: ui.DataTree, Tree: w.outline, Grow: true, Accessibility: ui.Accessibility{Name: "Stored tree"}, TreeChange: func(ui.TreeEvent) { w.report(nil) }, TreeDisclosure: func(e ui.TreeDisclosureEvent) { w.report(w.change(e.Change)) }}}}
+}

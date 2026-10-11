@@ -320,6 +320,7 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		}
 		bindControlWake(n.root, func(e events.Event) { p.custom(n, e) }, p.fail)
 		bindGridScopes(n.root)
+		bindTreeScopes(n.root)
 		flushDialogs(n.root)
 		if updateErr = applyFocus(n.root, view.Focus, &n.lastFocus); updateErr != nil {
 			return
@@ -806,6 +807,30 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 			}
 			result.Elements = append(result.Elements, ManualElement{ID: r.node.ID, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
 
+			if r.control != nil && r.control.outline != nil && visible {
+				inspection, treeErr := InspectTree(p.owner, r.node.Tree)
+				if treeErr != nil {
+					if errors.Is(treeErr, ErrTreeLayout) {
+						gridPending = true
+					} else {
+						gridCaptureErr = errors.Join(gridCaptureErr, treeErr)
+					}
+				} else {
+					result.Trees = append(result.Trees, inspection)
+					for _, row := range inspection.Rows {
+						if row.Bounds.Empty() {
+							continue
+						}
+						result.Elements = append(result.Elements, ManualElement{ID: row.ID, Parent: r.node.ID, Incarnation: inspection.RowIncarnation, Kind: ui.DataTree, Name: row.Label, Value: row.Label, Enabled: !controlDisabled(r), Visible: true, Selected: row.Selected, Bounds: row.Bounds})
+						if row.HasChildren && !row.DisclosureBounds.Empty() {
+							result.Elements = append(result.Elements, ManualElement{ID: row.DisclosureID, Parent: row.ID, Incarnation: inspection.RowIncarnation, Kind: ui.Button, Name: "Toggle expansion", Enabled: !controlDisabled(r) && r.node.TreeDisclosure != nil, Visible: true, Bounds: row.DisclosureBounds})
+						}
+					}
+					for _, page := range inspection.Pages {
+						result.Elements = append(result.Elements, ManualElement{ID: page.ID, Parent: r.node.ID, Incarnation: inspection.RowIncarnation, Kind: ui.Button, Name: page.Name, Enabled: !controlDisabled(r) && page.Enabled, Visible: true, Bounds: page.Bounds})
+					}
+				}
+			}
 			if r.control != nil && r.control.grid != nil {
 				inspection, gridErr := InspectGrid(p.owner, r.node.Grid)
 				if gridErr != nil {
@@ -882,6 +907,8 @@ func (m *Manual) Snapshot(ctx context.Context) (ManualSnapshot, error) {
 		}
 		captured := w.lastSnapshot
 		captured.Elements = slices.Clone(captured.Elements)
+		captured.Grids = cloneManualGrids(captured.Grids)
+		captured.Trees = cloneManualTrees(captured.Trees)
 		captured.ID = w.state.window.ID
 		captured.Incarnation = w.incarnation
 		captured.Events = native.Events
@@ -952,4 +979,25 @@ func (m *Manual) Close(ctx context.Context) error {
 		manualOwners.Unlock()
 	}
 	return errors.Join(err, p.error())
+}
+
+func cloneManualGrids(grids []GridInspection) []GridInspection {
+	out := slices.Clone(grids)
+	for i := range out {
+		out[i].Cells = slices.Clone(out[i].Cells)
+		out[i].Headers = slices.Clone(out[i].Headers)
+		if out[i].Editor != nil {
+			editor := *out[i].Editor
+			out[i].Editor = &editor
+		}
+	}
+	return out
+}
+func cloneManualTrees(trees []TreeInspection) []TreeInspection {
+	out := slices.Clone(trees)
+	for i := range out {
+		out[i].Rows = slices.Clone(out[i].Rows)
+		out[i].Pages = slices.Clone(out[i].Pages)
+	}
+	return out
 }

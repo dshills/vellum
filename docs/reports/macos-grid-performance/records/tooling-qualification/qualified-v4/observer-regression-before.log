@@ -1,0 +1,21 @@
+{"argv": ["/bin/zsh", "-c", "export PYTHONPATH=/private/tmp/vellum-large-data/scripts\nexec python3 -B /private/tmp/vellum-grid-performance-qualification/qualified-v4/historical-red/benchmark-grid_test.py ProcessTests.test_setup_and_ready_validate_without_external_process_observers"], "cwd": "/private/tmp/vellum-grid-performance-qualification/qualified-v4/historical-red", "expected_exit_code": 1}
+F
+======================================================================
+FAIL: test_setup_and_ready_validate_without_external_process_observers (__main__.ProcessTests.test_setup_and_ready_validate_without_external_process_observers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/vellum-grid-performance-qualification/qualified-v4/historical-red/benchmark-grid_test.py", line 140, in test_setup_and_ready_validate_without_external_process_observers
+    result, outcome = self.run_fixture(records())
+                      ~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/private/tmp/vellum-grid-performance-qualification/qualified-v4/historical-red/benchmark-grid_test.py", line 128, in run_fixture
+    observe.assert_called_once_with(process.pid)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/mock.py", line 997, in assert_called_once_with
+    raise AssertionError(msg)
+AssertionError: Expected 'process_sample' to be called once. Called 3 times.
+Calls: [call(123), call(123), call(123)].
+
+----------------------------------------------------------------------
+Ran 1 test in 0.006s
+
+FAILED (failures=1)

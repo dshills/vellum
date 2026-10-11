@@ -1,0 +1,69 @@
+from pathlib import Path
+import concurrent.futures, hashlib, json, subprocess, sys, time
+R=Path('/private/tmp/vellum-large-data'); D=R/'drivers/cogent'
+B=Path('/Users/dshills/Development/projects/Vellum/drivers/cogent/build')
+O=Path('/private/tmp/vellum-large-data-qualification'); O.mkdir(exist_ok=False)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+sys.dont_write_bytecode=True;sys.path.insert(0,str(R))
+from scripts.child_process import run_child
+def inputs():
+    files=[R/'go.mod',D/'go.mod',D/'go.sum',D/'env.sh',D/'native/dependencies.json',D/'prepare.py',D/'prepare.sh',D/'prepare_test.py',R/'scripts/check.sh',R/'scripts/check-text-backend.py']
+    for folder in ('app','canvas','command','document','editor','execution','history','replay','tasks','ui','virtual','workbench'):
+        files.extend((R/folder).glob('*.go'))
+    files.extend(R.glob('*.go'))
+    files.extend(p for p in D.rglob('*') if p.is_file() and p.suffix in ('.go','.m','.h') and 'build' not in p.relative_to(D).parts)
+    files.extend(p for p in (D/'native/patches').rglob('*') if p.is_file())
+    return {str(p.relative_to(R)):sha(p) for p in sorted(set(files))}
+def prepared(base):
+    return {str(p.relative_to(base)):sha(p) for dep in ('upstream','typesetting')
+            for p in sorted((base/dep).rglob('*')) if p.is_file() and '.git' not in p.relative_to(base/dep).parts}
+before=inputs(); pb=prepared(D/'build'); bb=prepared(B)
+for name,value in [('inputs-before',before),('prepared-before',pb),('baseline-prepared-before',bb)]:
+    (O/(name+'.json')).write_text(json.dumps(value,indent=2)+'\n')
+review=json.loads(Path('/private/tmp/vellum-grid-frame-metrics-review/final-v1/inputs.json').read_text())
+assert all(sha(R/p)==h for p,h in review['sha256'].items())
+for p in review['sha256']:
+    q=O/'reviewed-source'/(p+'.txt');q.parent.mkdir(parents=True,exist_ok=True);q.write_bytes((R/p).read_bytes())
+checks=[
+ ('toolchain',R,'go version\ngo env GOOS GOARCH GOVERSION GOCACHE GOMODCACHE GOWORK'),
+ ('root-race',R,'go test -race ./... -count=1'),
+ ('root-vet',R,'go vet ./...'),
+ ('native-default-race',D,'go test -race ./... -count=1'),
+ ('native-default-vet',D,'go vet ./...'),
+ ('frame-metrics-offscreen-race20',D,"go test -race -tags offscreen ./... -run 'TestFrameMetrics' -count=20"),
+ ('native-offscreen-vet',D,'go vet -tags offscreen ./...'),
+ ('upstream-timing-race20',D/'build/upstream',"go test -race ./core ./system/composer ./gpu ./gpu/gpudraw -run 'TestVellumFrameTrace|TestVellumMeasuredComposition|TestSurfaceAcquisition' -count=20"),
+ ('upstream-vet-observation',D/'build/upstream','go vet ./core ./system/composer ./gpu ./gpu/gpudraw'),
+ ('baseline-upstream-vet-observation',B/'upstream','go vet ./core ./system/composer ./gpu ./gpu/gpudraw'),
+ ('upstream-vet-other-analyzers',D/'build/upstream','go vet -composites=false -unreachable=false ./core ./system/composer ./gpu ./gpu/gpudraw'),
+ ('prepare-tests',D,'python3 prepare_test.py'),
+ ('text-backend-policy',R,'python3 scripts/check-text-backend.py'),
+ ('shell-syntax',R,'sh -n scripts/check.sh'),
+]
+def run(check):
+    name,cwd,cmd=check; argv=['/bin/zsh','-c','export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. '+str(D/'env.sh')+'\nexport GOFLAGS=-mod=readonly\n'+cmd]
+    start=time.monotonic(); error=None
+    with (O/(name+'.log')).open('xb') as f:
+        try: code=run_child(argv,cwd=cwd,stdout=f,stderr=subprocess.STDOUT,timeout=600).returncode
+        except Exception as e: code=124 if isinstance(e,subprocess.TimeoutExpired) else 125;error={'type':type(e).__name__,'message':str(e)}
+    result=dict(name=name,argv=argv,cwd=str(cwd),exit_code=code,error=error,elapsed_seconds=time.monotonic()-start,log_sha256=sha(O/(name+'.log')))
+    print(name,code,flush=True);return result
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+    results=list(pool.map(run,checks))
+after=inputs();pa=prepared(D/'build');ba=prepared(B)
+for name,value in [('inputs-after',after),('prepared-after',pa),('baseline-prepared-after',ba)]:
+    (O/(name+'.json')).write_text(json.dumps(value,indent=2)+'\n')
+currentvet=(O/'upstream-vet-observation.log').read_text();baselinevet=(O/'baseline-upstream-vet-observation.log').read_text()
+vet_equal=currentvet==baselinevet
+negative={'upstream-vet-observation','baseline-upstream-vet-observation'}
+passed=all(c['exit_code']==(1 if c['name'] in negative else 0) for c in results)
+v={'schema':1,'scope':'Root portable and native driver tests, tagged frame accounting and affected upstream packages; enumerated project/prepared source plus toolchain identity. No full compiler/module-cache/system SDK closure, performance budgets or physical GPU/human accessibility certification.',
+   'checks':results,'project_inputs_unchanged':before==after,'prepared_inputs_unchanged':pb==pa,'baseline_prepared_unchanged':bb==ba,
+   'source_files':len(before),'prepared_files':len(pa),'baseline_vet_diagnostics_equal':vet_equal,
+   'baseline_vet_limits':'Stock upstream vet fails in both baseline and corrected inputs with identical composites/unreachable diagnostics. Other analyzers pass with only those two analyzers disabled; no full upstream vet PASS claim.',
+   'independent_review_manifest_sha256':sha(Path('/private/tmp/vellum-grid-frame-metrics-review/final-v1/inputs.json')),
+   'artifacts':{p.name:sha(p) for p in sorted(O.glob('*.json'))},'producer_sha256':sha(Path(__file__))}
+v['result']='PASS_WITH_MATCHED_BASELINE_VET_FAILURE' if passed and before==after and pb==pa and bb==ba and vet_equal else 'FAIL'
+(O/'qualification.json').write_text(json.dumps(v,indent=2)+'\n');(O/'producer.py.txt').write_bytes(Path(__file__).read_bytes())
+print(v['result'],sha(O/'qualification.json'),flush=True)
+sys.exit(0 if v['result']!='FAIL' else 1)

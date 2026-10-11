@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "scope": "Provisional read-only managed DataTree/native/UI source review of exact selected files; portable Outline authored by this reviewer is excluded from independent approval. Frozen peer handoff/qualification pending.",
+  "files": {
+    "ui/tree.go": {
+      "sha256": "8e8d90df158b45a124619ca407637119ff919c50923f501ebf28d463976b71a1",
+      "bytes": 1221,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/ui/tree.go.txt"
+    },
+    "ui/tree_test.go": {
+      "sha256": "2f5354aeb59ab9b78ee849d653d75f852f634a6c9be211b1dfd738d061363e5b",
+      "bytes": 2018,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/ui/tree_test.go.txt"
+    },
+    "ui/node.go": {
+      "sha256": "793eb9a2b105eef68d6b131b82ae0e21944d54cccc5d07d1503b98b810545c3d",
+      "bytes": 4001,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/ui/node.go.txt"
+    },
+    "ui/controls.go": {
+      "sha256": "fb0354f29745def85ddb9955dcad11fefe740feac71346b168ab093244d2aab3",
+      "bytes": 5867,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/ui/controls.go.txt"
+    },
+    "drivers/cogent/tree.go": {
+      "sha256": "2ec1aaa59df49382f400d600cdde01fc4e1bfb916d0d8900e17ae464f75a5bec",
+      "bytes": 19705,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/tree.go.txt"
+    },
+    "drivers/cogent/tree_geometry.go": {
+      "sha256": "5e752b83f88981b8b5a5ff8fd5b127c68f1f284e069062853afac205b13ac268",
+      "bytes": 10084,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/tree_geometry.go.txt"
+    },
+    "drivers/cogent/tree_accessibility.go": {
+      "sha256": "35ea67d9d50fb2ca9370d2af0918bcd24666ed1354537ede58d4036415e2d89a",
+      "bytes": 3393,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/tree_accessibility.go.txt"
+    },
+    "drivers/cogent/tree_offscreen_test.go": {
+      "sha256": "a36abf08be61bc6c14f5464e89b6b9e5d83f4d2f0ecce346fa64327d39b0b12a",
+      "bytes": 17212,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/tree_offscreen_test.go.txt"
+    },
+    "drivers/cogent/tree_budget_test.go": {
+      "sha256": "59f0786974ebbbd26974279a4d87842e4c50c35a772da032aac608b3f7870cdd",
+      "bytes": 1904,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/tree_budget_test.go.txt"
+    },
+    "drivers/cogent/tree_payload_review_test.go": {
+      "sha256": "e8f23be4717d340b87bec6b85d6d5038a9b43637a10dcb06b530e7ccce874b92",
+      "bytes": 2155,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/tree_payload_review_test.go.txt"
+    },
+    "drivers/cogent/controls.go": {
+      "sha256": "52056503c64f76dc169f8d5534f4380226840d4601c6ebe84b7ec40b5ffc3323",
+      "bytes": 21023,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/controls.go.txt"
+    },
+    "drivers/cogent/reconcile.go": {
+      "sha256": "f16868a2a4790988a102b2b90b918dde94af9fb083ab85cf5d4df4db1a4ca196",
+      "bytes": 6810,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/reconcile.go.txt"
+    },
+    "drivers/cogent/accessibility.go": {
+      "sha256": "62e7647ade54c59639cb72006f5a2cb1a3ed221c41052d24386b8e01dcaca05c",
+      "bytes": 30816,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/accessibility.go.txt"
+    },
+    "drivers/cogent/manual.go": {
+      "sha256": "158bcd90c411f30a1c031dac330493c543290d2ec70f9c4d254afa5cd7bb52c9",
+      "bytes": 4368,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/manual.go.txt"
+    },
+    "drivers/cogent/manual_offscreen.go": {
+      "sha256": "2ba45cc4399aee2f155a76471e7df20d4d2d93f56fe161bbfa65f84cd5057e60",
+      "bytes": 31199,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/drivers/cogent/manual_offscreen.go.txt"
+    },
+    "specs/tree-native.md": {
+      "sha256": "143cbbf168748261ec08ca8580c8fd080b7a7ee5f67e5f758d22ccd8986a0eb5",
+      "bytes": 3990,
+      "snapshot": "/private/tmp/vellum-outline-native-review/provisional-v2/specs/tree-native.md.txt"
+    }
+  },
+  "findings": [
+    {
+      "id": "native-tree-payload-budget",
+      "severity": "medium",
+      "status": "corrected_pending_frozen_gate",
+      "initial_tree_go_sha256": "88b72fbd5ad1cc2f82b7f4b574b3042099ff840c28821e8cc34dcaa42f546d60",
+      "evidence": "/private/tmp/vellum-outline-native-review/budget/evidence-v1.json",
+      "correction": "Native4096-byte keys/control IDs and conservative8MiB logical raw/escaped/generated payload admission before pool growth; failed projection withdraws measurement and cannot reappear on later capture. Transient AX JSON/heap expressly excluded."
+    }
+  ],
+  "reviewed_contracts": [
+    "Single-live model registry with provisional rollback and remount",
+    "Owner-held model callbacks without cross-window RC acquisition",
+    "Captured Tabs.CurrentTab mutex admission plus controlled modal/disabled scope",
+    "Opaque generation-bound pointer/AX references and down/up geometry equality",
+    "Local viewport/row/clip preallocation caps and fractional-DPI shared geometry helper",
+    "One host focus stop; private labels/pagers/scrollbar focus disabled",
+    "Generated reserved namespace and nested Manual snapshot slice detachment"
+  ],
+  "limitations": [
+    "No native GUI/physical/externalAX/VoiceOver test by reviewer",
+    "Mutable peer source may change before final freeze",
+    "No standalone consumer or frame metrics review in this record",
+    "Producer final qualification remains independent from source approval"
+  ]
+}

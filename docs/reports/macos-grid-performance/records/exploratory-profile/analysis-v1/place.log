@@ -1,0 +1,19 @@
+Total: 5.83s
+ROUTINE ======================== github.com/dshills/vellum/drivers/cogent.(*gridBinding).place in /private/tmp/vellum-large-data/drivers/cogent/grid.go
+         0       30ms (flat, cum)  0.51% of Total
+         .          .    685:func (g *gridBinding) place(w *core.Text, p *gridPane, rect, clip virtual.GridRect, value string, selected, cursor bool) {
+         .          .    686:	if w.Parent != p {
+         .          .    687:		tree.MoveToParent(w, p)
+         .          .    688:		w.SetScene(p.Scene)
+         .          .    689:	}
+         .          .    690:	w.SetProperty("vellum.grid.rect", rect)
+         .          .    691:	w.SetProperty("vellum.grid.cursor", cursor)
+         .          .    692:	w.SetText(value)
+         .          .    693:	w.SetState(clip.Empty(), states.Invisible)
+         .          .    694:	w.SetState(selected, states.Selected)
+         .       30ms    695:	w.Update()
+         .          .    696:}
+         .          .    697:func disposeGrid(r *record) {
+         .          .    698:	if r == nil || r.control == nil || r.control.grid == nil {
+         .          .    699:		return
+         .          .    700:	}

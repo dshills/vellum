@@ -1,0 +1,58 @@
+{
+  "result": "APPROVED_SOURCE_REVIEW",
+  "ownership": {
+    "path": "/private/tmp/vellum-large-tree-owned/frozen-v3/ownership.json",
+    "sha256": "bc17a07b7ca52b53fa7f7b320d3258ee09a91c72dd18e7ad99d49542e0a8c286"
+  },
+  "consumer_sources": {
+    "examples/loadedtree/go.mod": "eed162dc05fc9bc82c83cc689698b67bad715f730eddc7c601c60178f6f03f79",
+    "examples/loadedtree/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/loadedtree/LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+    "examples/loadedtree/source.go": "bb7ad0376fa53e8e66f6be7b207bac872d81adf754b81ca7928fc133849f6595",
+    "examples/loadedtree/model.go": "bc0b8d1e64874bf7021999df18155ef98ed7a83023e1a71e068157e612f6b186",
+    "examples/loadedtree/main.go": "f04aea4c80de1e1ecfd64ce7dafb3e2f9cd65cdb340eb305532995d17e1321cf",
+    "examples/loadedtree/smoke.go": "4ee969273bc61aebad2aacfae7cf04d5a65911ab21543e341c4bb1525e1d60f8",
+    "examples/loadedtree/model_test.go": "980d8a01fa3412cfccc494cef3a9919e58ad665fb77aced4671f6fd6e5abe923",
+    "examples/loadedtree/managed_test.go": "872ad87c9fc612a900d2c471c126d202f8a9c8dca529c05a1bd537275f640fef",
+    "examples/loadedtree/README.md": "d5be1246f1df9b09eec32c41a753013d4c1ca4f7566075ee24e58486f99ad514"
+  },
+  "supporting_selected_sources": {
+    "tasks/tasks.go": "f95a8cbb4726f14d25f454fdf71bcf767d2407d6079575b58c44adfc06c3fea2",
+    "app/app.go": "b70e7dac15367c2999679880f72c90ebf8a8404a9cf05a33ed63f319c1af2487",
+    "virtual/tree_outline.go": "8a6d88e32fcadafe852d5f25e36f6f9dedda25b017faa36e297948b5bde282e9",
+    "virtual/tree_data.go": "0a2a55ec00f21a7a670ee50942aaafb432d5af14ffdd1baa6377275c547db532",
+    "virtual/tree_index.go": "29e31ecce6c85e72746ba46e5bc8c19855e59343d2f98e9e3dccb3febd49aee6"
+  },
+  "scope": "Read-only independent review of the exact frozen ten-file stored-tree consumer; no tests, GUI, dependency preparation, Git, or source mutation by this reviewer.",
+  "findings": [],
+  "resolved_findings": [
+    {
+      "issue": "Initial loader not canceled by the shared toolbar",
+      "resolution": "Dynamic Cancel load label and invocation-time p.loadTask guard call program.cancelLoad; ordinary Cancel work remains per-window. Actual primitive before-worker cancellation and already-published older loader tests are present."
+    },
+    {
+      "issue": "Failed PrepareData admitted task callback could reuse the next numeric token and retire newer task/request",
+      "resolution": "Callback checks both captured numeric token and exact *tasks.Task identity before clearing any latest owner state. Failed preparation never installs its task. Original scenario red across batches1/7/64 and corrected repeated green recorded by producer.",
+      "evidence": {
+        "path": "/private/tmp/vellum-large-tree-owned/prepare-aba/proof.json",
+        "sha256": "7d2a74ec984f59986842a7cf57cf8bf373a937292ba1688f478a4aa96a02af19",
+        "red_log_sha256": "1bd1c0cabbb9e0c8db89c9bfef545a722d184a33b2919f86557ea1027cd3b2f3",
+        "green_log_sha256": "03b360e1a5f0e9cade7e57fdf7ff5cb4813574fcadd88d1d51e390ef02014fa3"
+      }
+    }
+  ],
+  "observations": [
+    "Stored source generation produces actual TreeNode labels, stable keys and parents; immutable TreeData owns detached storage. No procedural native domain substitute.",
+    "Task worker and reserved owner completion credits remain bounded and dual-terminal. Buffered request handoff occurs after admission; Prepare failure cancels the admitted worker without changing prior accepted request.",
+    "Latest callback retires its task before domain/model CAS. Accepted/error/cancel paths clear retained request; capacity/exhaustion Complete refusal keeps the exact recoverable request until Cancel.",
+    "Window lifetimes suppress closed-window publication; shared initial loader is application-scoped and checks each target lifetime before indexing. Independent surviving window remains a supported smoke assertion.",
+    "Apply filter acknowledges the real ordinary-field originating FIFO before capturing controlled filter text. Cancellation revokes settlement token/context and request authority.",
+    "Actual offscreen routing tests use measured IDs/incarnations, primitive events and explicit worker/owner quanta; smoke accurately describes owner-command geometry/settlement scope.",
+    "README separates logical stored/index bytes from process/native memory and does not claim frame performance, external AX, physical IME/VoiceOver, joined native/private-worker teardown or full P6."
+  ],
+  "limitations": [
+    "Source review is not final formal qualifier, compiler/SDK closure, Cocoa or physical workflow acceptance. Producer qualification is being run separately.",
+    "Source/index logical memory caps exclude allocator and maps, previous borrowed snapshots, shaped text and process RSS.",
+    "This independent review does not re-audit the managed DataTree native runtime owned by the other reviewer."
+  ]
+}

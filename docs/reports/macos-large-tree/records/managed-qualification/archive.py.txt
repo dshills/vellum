@@ -1,0 +1,41 @@
+"""Archive selected scratch evidence inertly, preserving original byte hashes."""
+from pathlib import Path
+import json,hashlib,shutil
+BASE=Path('/private/tmp/vellum-large-tree-qualification')
+OWN=Path('/private/tmp/vellum-large-tree-owned')
+OUT=BASE/'handoff-v3'
+OUT.mkdir(exist_ok=False)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+files=[]
+def copy(src,rel,scope):
+ src=Path(src);dest=OUT/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,dest);dest.chmod(0o644)
+ files.append({'original':str(src),'archival':rel,'sha256':sha(dest),'bytes':dest.stat().st_size,'scope':scope})
+for version in [1,2,3]:
+ d=OWN/f'frozen-v{version}';prefix='source-final' if version==3 else f'history/source-v{version}'
+ copy(d/'ownership.json',prefix+'/ownership.json','Exact owned input map; historical versions are not final consumer acceptance.')
+ for p in sorted((d/'owned-sources').rglob('*')):
+  if p.is_file() and (version==3 or 'examples' in p.relative_to(d/'owned-sources').parts):
+   copy(p,prefix+'/owned-sources/'+str(p.relative_to(d/'owned-sources')),'Exact inert source snapshot, native16 identical across versions; historical consumer issues documented separately.')
+for version in [1,2,3]:
+ d=BASE/f'qualified-v{version}'
+ for p in sorted(d.iterdir()):
+  if p.is_file() and p.suffix in ['.json','.log','.txt']:
+   copy(p,f'qualified-v{version}/'+p.name,'Selected source-bound producer checks. v1/v2 historical consumer sources; v1 native/UI exact gates inherited by final v3.')
+for p in sorted((BASE/'qualified-v3').glob('cocoa-*')):
+ for src in sorted(p.rglob('*')):
+  if src.is_file():copy(src,'qualified-v3/'+str(src.relative_to(BASE/'qualified-v3')),'Actual Cocoa owner-command/current-frame proof, or clearly marked preflight refusal before any native launch.')
+for p in sorted(BASE.glob('*.py')):
+ copy(p,'producers/'+p.name+'.txt','Exact inert producer/wrapper source; not an executable or runtime dependency closure.')
+for p in sorted(OWN.glob('exploratory-*.log')):
+ copy(p,'history/exploratory/'+p.name,'Exploratory only: partial/old/unbound input interval; includes setup/compile/earlier vet failures and explicit no-tests attempt. No final-source claim.')
+for p in sorted((OWN/'history-baseline').rglob('*')):
+ if p.is_file():copy(p,'history/baseline/'+str(p.relative_to(OWN/'history-baseline')),'Exact preserved pre-edit shared seam source map/snapshots.')
+for p in sorted((OWN/'prepare-aba').iterdir()):
+ if p.is_file():copy(p,'history/prepare-aba/'+p.name+('.txt' if p.suffix=='.go' else ''),'Immutable failed-Prepare old-worker/new-admission red and focused green20 regression; active Go source archived inertly.')
+for p,rel in [('/private/tmp/vellum-outline-native-review/final-v1/review.json','reviews/native-ui-internal.json'),('/private/tmp/vellum-large-tree-consumer-independent-review/review.json','reviews/consumer-internal.json'),('/private/tmp/vellum-large-data-pin34/qualification.json','prepared-pin34-equality.json')]:
+ copy(p,rel,'Independent exact-source review or fresh pinned preparation proof; unchanged prepared6128 byte equality connects compiled source to final pin metadata.')
+readme='''# Loaded tree managed checkpoint handoff\n\nFinal sources are the26 files in source-final/ownership.json:16 UI/native/spec and10 independent loadedtree module files. The native16 are identical to the version1 full native/UI gate. Final consumer-v3 passes portable race3, actual offscreen router race1, both vets and race build; inheritance checks exact root/native/prepared maps match v1.\n\nThe actual Cocoa100k smoke passes with independent stored10k/100k domains, deep-chain reveal, hidden selection, filtered ancestors, originating ordinary-field settlement, canceled-worker dual terminals and survivor after logical domain closure. Exit0/no race is bound to the unchanged race binary7f2705845f4a022b110b6b222460ad5c52253d0e414c81070771a5e6c9c245fb. Final pin34 preparation confirms all6128 prepared files byte-identical. Pin metadata and unrelated parallel loadedgrid example edits are explicitly recorded in Cocoa prebuild_transition; no old loadedgrid unchanged claim is made at Cocoa time.\n\nHistory remains separate: consumer-v1 producerPASS missed initial loader toolbar cancellation; v2 producerPASS missed failed-Prepare task admission ABA. Original false or narrow checks remain unchanged evidence, not final consumer approval. The exact old ABA regression fails all batches1/7/64 before the exact-task guard and passes race20 afterward. Two wrapper preflight refusals launched no GUI process; actual Cocoa runs only once afterward. Exploratory logs retain setup/compile/obsolete vet failures and a no-tests attempt without final source qualification.\n\nNative pool is bounded500 rows and logical retained text/target payload8MiB, not process heap/RSS. Routes at batches1/7/64 use actual Core input and explicit supplied fonts/theme/software frames. Cocoa uses owner commands plus actual measured current frames/field settlement. Human IME/VoiceOver/external AX, desktop physical input, services/GPU, private worker/compositor teardown, frame latency, full P6 and full Mac target completion remain open. No canonical files, Git, Prism, GUI settings or old loadedgrid runtime were mutated by this producer.\n\nSources/producers are inert.txt, binaries are excluded, and every preserved file maps original absolute path to exact archival bytes in manifest.json. Raw Go compiler logs may contain trailing tab characters; preserve hashes when transforming into repository-safe wire evidence. Original source/log proofs refer to scratch paths by design.\n'''
+(OUT/'README.md').write_text(readme)
+manifest={'schema':1,'result':'PASS','scope':'Compact inert selected evidence handoff; no module-cache/toolchain/system SDK source closure or full P6/performance qualification.','files':files,'owned_final':{'path':'source-final/ownership.json','sha256':sha(OUT/'source-final/ownership.json')},'native_ui_gate':{'path':'qualified-v1/qualification.json','sha256':sha(OUT/'qualified-v1/qualification.json')},'consumer_gate':{'path':'qualified-v3/qualification.json','sha256':sha(OUT/'qualified-v3/qualification.json')},'cocoa_gate':{'path':'qualified-v3/cocoa-smokes/qualification.json','sha256':sha(OUT/'qualified-v3/cocoa-smokes/qualification.json')},'readme_sha256':sha(OUT/'README.md')}
+(OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print(str(OUT/'manifest.json'),sha(OUT/'manifest.json'),'files',len(files))

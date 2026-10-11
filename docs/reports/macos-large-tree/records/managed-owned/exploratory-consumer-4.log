@@ -1,0 +1,14 @@
+# github.com/dshills/vellum/examples/loadedtree.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestActualStoredTreeRoutesAndWorkers
+=== RUN   TestActualStoredTreeRoutesAndWorkers/batch-1
+=== RUN   TestActualStoredTreeRoutesAndWorkers/batch-7
+=== RUN   TestActualStoredTreeRoutesAndWorkers/batch-64
+--- PASS: TestActualStoredTreeRoutesAndWorkers (15.76s)
+    --- PASS: TestActualStoredTreeRoutesAndWorkers/batch-1 (5.79s)
+    --- PASS: TestActualStoredTreeRoutesAndWorkers/batch-7 (5.00s)
+    --- PASS: TestActualStoredTreeRoutesAndWorkers/batch-64 (4.97s)
+=== RUN   TestActualTreeDisclosureUsesWorker
+--- PASS: TestActualTreeDisclosureUsesWorker (3.15s)
+PASS
+ok  	github.com/dshills/vellum/examples/loadedtree	20.523s

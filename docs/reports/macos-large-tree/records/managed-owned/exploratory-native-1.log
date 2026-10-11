@@ -1,0 +1,51 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestManagedTreeActualGeometryAndKeyboard
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192
+    tree_offscreen_test.go:101: cogent: stale manual window or control incarnation
+--- FAIL: TestManagedTreeActualGeometryAndKeyboard (0.21s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96 (0.04s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120 (0.02s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144 (0.02s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192 (0.01s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96 (0.02s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120 (0.02s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144 (0.01s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192 (0.01s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96 (0.02s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120 (0.02s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144 (0.01s)
+    --- FAIL: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192 (0.02s)
+=== RUN   TestManagedTreePointerDisclosureAndRetiredPress
+    tree_offscreen_test.go:156: cogent: stale manual window or control incarnation
+--- FAIL: TestManagedTreePointerDisclosureAndRetiredPress (0.01s)
+=== RUN   TestManualNestedGridTreeSnapshotDetached
+--- PASS: TestManualNestedGridTreeSnapshotDetached (0.02s)
+=== RUN   TestManagedTreeBindingCloseAndCaps
+    tree_offscreen_test.go:254: cogent: focus target "outline" is hidden, absent, disabled, or not focusable
+--- FAIL: TestManagedTreeBindingCloseAndCaps (0.00s)
+FAIL
+FAIL	github.com/dshills/vellum/drivers/cogent	0.690s
+FAIL

@@ -91,6 +91,18 @@ fields and uses separate domain/view revisions with worker-built edit candidates
 This advances loaded projection integration; sustained latency/memory, large-tree
 workloads and broader Mac acceptance remain open.
 
+The additive [large-tree contract](tree.md) moves stored-data construction,
+expansion and filtering onto bounded workers and admits sealed indexes through
+`Outline`. `ui.DataTree` provides a bounded managed native row pool, opaque
+captured input and completed-frame inspection. Its stored 100k-node consumer
+exercises wide branches and deep paths; tree latency, native memory and human
+accessibility acceptance remain separate.
+
+[Stored-table timing](grid-performance.md) links protected actual scroll input
+to owner work and completed composition, including intermediate post-input
+native paints. The unchanged warm targets require actual release measurements;
+the existence of instrumentation and CPU tests does not establish a target pass.
+
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded

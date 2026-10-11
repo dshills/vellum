@@ -1,0 +1,21 @@
+
+func TestFailedPreparationCannotRetireNewerAdmission(t *testing.T) {
+ for _,batch:=range []int{1,7,64} { t.Run(fmt.Sprintf("batch-%d",batch),func(t *testing.T) {
+  p,ex:=fixture(t,128);loadFixture(t,p,ex,batch);w:=p.windows[1]
+  if e:=owned(p,func()error{return w.change(virtual.OutlineChange{Kind:virtual.OutlineFilter,Filter:strings.Repeat("x",4097)})});e==nil {t.Fatal("oversized request preparation accepted")}
+  failed:=ex.PendingIDs()[0]
+  if e:=owned(p,func()error{return w.change(virtual.OutlineChange{Kind:virtual.OutlineKeep})});e!=nil {t.Fatal(e)}
+  ids:=ex.PendingIDs(); if len(ids)!=2 {t.Fatal("expected failed and latest accepted workers",ids)}
+  var latest *tasks.Task;var req virtual.OutlineRequest
+  if e:=owned(p,func()error{latest=w.task;req=w.request;return nil});e!=nil{t.Fatal(e)}
+  runWorker(t,ex,failed);drain(t,p,batch)
+  if e:=owned(p,func()error {
+   s,e:=w.outline.State();if e!=nil{return e}
+   if w.task!=latest || w.request!=req || !s.Pending {t.Fatal("failed-preparation cleanup retired newer pending request",s,w.task,w.request)}
+   return w.cancel()
+  });e!=nil{t.Fatal(e)}
+  if s:=state(t,w);s.Pending {t.Fatal("Cancel lost authority for newest request",s)}
+  runWorker(t,ex,ids[1]);drain(t,p,batch)
+  if !w.manager.Pending().Idle(){t.Fatal("dual terminal credits stranded after canceled newest worker")}
+ }) }
+}

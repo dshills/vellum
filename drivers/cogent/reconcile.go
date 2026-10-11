@@ -26,6 +26,9 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	theme = theme.Clone()
 	var validateStyle func(ui.Node) error
 	validateStyle = func(node ui.Node) error {
+		if err := validateNativeTree(node); err != nil {
+			return err
+		}
 		if err := validateNativeGrid(node); err != nil {
 			return err
 		}
@@ -65,6 +68,8 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	collect(previous)
 	releaseGrids := prepareGridReplacements(previous, n)
 	defer releaseGrids()
+	releaseTrees := prepareTreeReplacements(previous, n)
+	defer releaseTrees()
 	type plan struct {
 		r        *record
 		node     ui.Node
@@ -215,6 +220,9 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 
 func compatible(old, next ui.Node) bool {
 	if old.ID != next.ID || old.Kind != next.Kind {
+		return false
+	}
+	if next.Kind == ui.DataTree && old.Tree != next.Tree {
 		return false
 	}
 	if next.Kind == ui.DataGrid && old.Grid != next.Grid {

@@ -1,0 +1,63 @@
+File: loadedgrid-release
+Type: cpu
+Time: 2026-10-11 09:41:19 CDT
+Duration: 7.61s, Total samples = 5830ms (76.64%)
+Showing nodes accounting for 4190ms, 71.87% of 5830ms total
+Dropped 246 nodes (cum <= 29.15ms)
+Showing top 55 nodes out of 215
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%     2380ms 40.82%  runtime.systemstack
+         0     0%     0%     1950ms 33.45%  runtime.notewakeup
+    1950ms 33.45% 33.45%     1950ms 33.45%  runtime.pthread_cond_signal
+         0     0% 33.45%     1950ms 33.45%  runtime.semawakeup
+         0     0% 33.45%     1950ms 33.45%  runtime.wakep
+         0     0% 33.45%     1940ms 33.28%  runtime.startm
+    1840ms 31.56% 65.01%     1840ms 31.56%  runtime.cgocall
+         0     0% 65.01%     1800ms 30.87%  _.goready.func1
+         0     0% 65.01%     1800ms 30.87%  runtime.ready
+         0     0% 65.01%     1660ms 28.47%  cogentcore.org/core/core.(*paintSource).Draw
+         0     0% 65.01%     1450ms 24.87%  cogentcore.org/core/gpu.(*Texture).SetFromGoImage
+         0     0% 65.01%     1450ms 24.87%  cogentcore.org/core/gpu.(*Value).SetFromGoImage
+         0     0% 65.01%     1450ms 24.87%  cogentcore.org/core/gpu/gpudraw.(*Drawer).Copy
+         0     0% 65.01%     1450ms 24.87%  cogentcore.org/core/gpu/gpudraw.(*Drawer).UseGoImage
+         0     0% 65.01%     1450ms 24.87%  github.com/oliverbestmann/webgpu/wgpu.(*Queue).TryWriteTexture
+         0     0% 65.01%     1450ms 24.87%  github.com/oliverbestmann/webgpu/wgpu.(*Queue).TryWriteTexture.func2 (inline)
+         0     0% 65.01%     1450ms 24.87%  github.com/oliverbestmann/webgpu/wgpu.(*Queue).WriteTexture (inline)
+         0     0% 65.01%     1450ms 24.87%  github.com/oliverbestmann/webgpu/wgpu._Cfunc_go_wgpuQueueWriteTexture
+         0     0% 65.01%      950ms 16.30%  cogentcore.org/core/core.(*renderWindow).renderAsyncMeasured
+         0     0% 65.01%      950ms 16.30%  cogentcore.org/core/core.(*renderWindow).renderAsyncMeasuredOwned
+         0     0% 65.01%      950ms 16.30%  cogentcore.org/core/system/composer.(*ComposerDrawer).ComposeMeasured
+         0     0% 65.01%      750ms 12.86%  cogentcore.org/core/core.(*renderWindow).renderAsync
+         0     0% 65.01%      750ms 12.86%  cogentcore.org/core/core.(*renderWindow).renderAsyncOwned
+         0     0% 65.01%      750ms 12.86%  cogentcore.org/core/system/composer.(*ComposerDrawer).Compose
+         0     0% 65.01%      750ms 12.86%  runtime.mcall
+         0     0% 65.01%      750ms 12.86%  runtime.schedule
+         0     0% 65.01%      740ms 12.69%  runtime.park_m
+         0     0% 65.01%      720ms 12.35%  runtime.findRunnable
+         0     0% 65.01%      630ms 10.81%  cogentcore.org/core/core.(*renderWindow).eventLoop
+         0     0% 65.01%      630ms 10.81%  cogentcore.org/core/core.(*renderWindow).handleEvent
+         0     0% 65.01%      400ms  6.86%  runtime.mPark (inline)
+         0     0% 65.01%      400ms  6.86%  runtime.notesleep
+     400ms  6.86% 71.87%      400ms  6.86%  runtime.pthread_cond_wait
+         0     0% 71.87%      400ms  6.86%  runtime.semasleep
+         0     0% 71.87%      400ms  6.86%  runtime.stopm
+         0     0% 71.87%      340ms  5.83%  cogentcore.org/core/core.(*Scene).LayoutRenderScene
+         0     0% 71.87%      340ms  5.83%  cogentcore.org/core/core.(*Scene).doUpdate
+         0     0% 71.87%      340ms  5.83%  cogentcore.org/core/core.(*Stage).doUpdate
+         0     0% 71.87%      340ms  5.83%  cogentcore.org/core/core.(*renderWindow).handleWindowEvents
+         0     0% 71.87%      340ms  5.83%  cogentcore.org/core/core.(*renderWindow).handleWindowEvents.func1
+         0     0% 71.87%      340ms  5.83%  cogentcore.org/core/core.(*renderWindow).renderWindow
+         0     0% 71.87%      340ms  5.83%  cogentcore.org/core/core.(*stages).updateAll
+         0     0% 71.87%      290ms  4.97%  cogentcore.org/core/base/tiered.(*Tiered[go.shape.map[cogentcore.org/core/events.Types][]func(cogentcore.org/core/events.Event)]).Do (inline)
+         0     0% 71.87%      290ms  4.97%  cogentcore.org/core/core.(*Events).handleEvent
+         0     0% 71.87%      290ms  4.97%  cogentcore.org/core/core.(*Stage).mainHandleEvent
+         0     0% 71.87%      290ms  4.97%  cogentcore.org/core/core.(*WidgetBase).HandleEvent
+         0     0% 71.87%      290ms  4.97%  cogentcore.org/core/core.(*WidgetBase).HandleEvent.func1 (inline)
+         0     0% 71.87%      290ms  4.97%  cogentcore.org/core/core.(*stages).mainHandleEvent
+         0     0% 71.87%      290ms  4.97%  cogentcore.org/core/events.(*Listeners).Call
+         0     0% 71.87%      290ms  4.97%  github.com/dshills/vellum/app.(*Application).Do
+         0     0% 71.87%      290ms  4.97%  github.com/dshills/vellum/drivers/cogent.Driver.Run.func7
+         0     0% 71.87%      290ms  4.97%  github.com/dshills/vellum/drivers/cogent.Driver.Run.func7.1
+         0     0% 71.87%      290ms  4.97%  github.com/dshills/vellum/drivers/cogent.Driver.Run.func8.4
+         0     0% 71.87%      290ms  4.97%  github.com/dshills/vellum/drivers/cogent.Driver.Run.func9
+         0     0% 71.87%      260ms  4.46%  cogentcore.org/core/core.(*Scene).LayoutScene

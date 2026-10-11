@@ -1,0 +1,46 @@
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestTreeNativePayloadBudgetIncludesGeneratedIdentities
+--- PASS: TestTreeNativePayloadBudgetIncludesGeneratedIdentities (0.00s)
+=== RUN   TestTreeNavigationBoundariesAreNoop
+--- PASS: TestTreeNavigationBoundariesAreNoop (0.00s)
+=== RUN   TestManagedTreeActualGeometryAndKeyboard
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192
+--- PASS: TestManagedTreeActualGeometryAndKeyboard (12.73s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96 (1.36s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120 (1.06s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144 (1.05s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192 (1.00s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96 (1.17s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144 (0.98s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192 (0.95s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144 (0.99s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192 (0.95s)
+=== RUN   TestManagedTreePointerDisclosureAndRetiredPress
+--- PASS: TestManagedTreePointerDisclosureAndRetiredPress (0.53s)
+=== RUN   TestManualNestedGridTreeSnapshotDetached
+--- PASS: TestManualNestedGridTreeSnapshotDetached (0.29s)
+=== RUN   TestManagedTreeBindingCloseAndCaps
+--- PASS: TestManagedTreeBindingCloseAndCaps (0.26s)
+=== RUN   TestManagedTreeModalDisabledAndInactiveTab
+--- PASS: TestManagedTreeModalDisabledAndInactiveTab (1.11s)
+=== RUN   TestManagedTreeAccessibilityBoundedRowsAndRetirement
+--- PASS: TestManagedTreeAccessibilityBoundedRowsAndRetirement (0.48s)
+=== RUN   TestManagedTreeBindingRefusalAndConstructionRollback
+--- PASS: TestManagedTreeBindingRefusalAndConstructionRollback (0.20s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	17.230s

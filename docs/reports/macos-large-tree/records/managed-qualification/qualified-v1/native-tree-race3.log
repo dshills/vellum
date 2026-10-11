@@ -1,0 +1,226 @@
+argv: ["/bin/zsh", "-c", "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -tags offscreen -race -count=3 -v -run 'TestManagedTree|TestManualNestedGridTree|TestTreeNative|TestTreeNavigation|TestReviewerTree' ./..."]
+cwd: /private/tmp/vellum-large-data/drivers/cogent
+# github.com/dshills/vellum/drivers/cogent.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/gallery.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+# github.com/dshills/vellum/drivers/cogent/cmd/workbench.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestTreeNativePayloadBudgetIncludesGeneratedIdentities
+--- PASS: TestTreeNativePayloadBudgetIncludesGeneratedIdentities (0.00s)
+=== RUN   TestTreeNavigationBoundariesAreNoop
+--- PASS: TestTreeNavigationBoundariesAreNoop (0.00s)
+=== RUN   TestManagedTreeActualGeometryAndKeyboard
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192
+--- PASS: TestManagedTreeActualGeometryAndKeyboard (12.43s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96 (1.20s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144 (0.99s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192 (0.95s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120 (1.05s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144 (0.98s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192 (0.96s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96 (1.14s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144 (0.98s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192 (0.95s)
+=== RUN   TestManagedTreePointerDisclosureAndRetiredPress
+--- PASS: TestManagedTreePointerDisclosureAndRetiredPress (0.54s)
+=== RUN   TestManualNestedGridTreeSnapshotDetached
+--- PASS: TestManualNestedGridTreeSnapshotDetached (0.30s)
+=== RUN   TestManagedTreeBindingCloseAndCaps
+--- PASS: TestManagedTreeBindingCloseAndCaps (0.26s)
+=== RUN   TestManagedTreeModalDisabledAndInactiveTab
+--- PASS: TestManagedTreeModalDisabledAndInactiveTab (1.08s)
+=== RUN   TestManagedTreeAccessibilityBoundedRowsAndRetirement
+--- PASS: TestManagedTreeAccessibilityBoundedRowsAndRetirement (0.46s)
+=== RUN   TestManagedTreeBindingRefusalAndConstructionRollback
+--- PASS: TestManagedTreeBindingRefusalAndConstructionRollback (0.20s)
+=== RUN   TestManagedTreeRefusedPayloadDoesNotGrowOrPublish
+--- PASS: TestManagedTreeRefusedPayloadDoesNotGrowOrPublish (0.22s)
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim/panic
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim/goexit
+--- PASS: TestManagedTreeAbnormalConstructionRetiresClaim (0.11s)
+    --- PASS: TestManagedTreeAbnormalConstructionRetiresClaim/panic (0.06s)
+    --- PASS: TestManagedTreeAbnormalConstructionRetiresClaim/goexit (0.06s)
+=== RUN   TestManagedTreeRemountRetiresNativeIdentities
+--- PASS: TestManagedTreeRemountRetiresNativeIdentities (0.36s)
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total
+--- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation (0.07s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key (0.02s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id (0.02s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total (0.03s)
+=== RUN   TestTreeNativePayloadBudgetIncludesGeneratedIdentities
+--- PASS: TestTreeNativePayloadBudgetIncludesGeneratedIdentities (0.00s)
+=== RUN   TestTreeNavigationBoundariesAreNoop
+--- PASS: TestTreeNavigationBoundariesAreNoop (0.00s)
+=== RUN   TestManagedTreeActualGeometryAndKeyboard
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192
+--- PASS: TestManagedTreeActualGeometryAndKeyboard (12.40s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144 (0.98s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192 (0.96s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144 (0.99s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192 (0.96s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144 (0.98s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192 (0.95s)
+=== RUN   TestManagedTreePointerDisclosureAndRetiredPress
+--- PASS: TestManagedTreePointerDisclosureAndRetiredPress (0.54s)
+=== RUN   TestManualNestedGridTreeSnapshotDetached
+--- PASS: TestManualNestedGridTreeSnapshotDetached (0.30s)
+=== RUN   TestManagedTreeBindingCloseAndCaps
+--- PASS: TestManagedTreeBindingCloseAndCaps (0.25s)
+=== RUN   TestManagedTreeModalDisabledAndInactiveTab
+--- PASS: TestManagedTreeModalDisabledAndInactiveTab (1.07s)
+=== RUN   TestManagedTreeAccessibilityBoundedRowsAndRetirement
+--- PASS: TestManagedTreeAccessibilityBoundedRowsAndRetirement (0.47s)
+=== RUN   TestManagedTreeBindingRefusalAndConstructionRollback
+--- PASS: TestManagedTreeBindingRefusalAndConstructionRollback (0.20s)
+=== RUN   TestManagedTreeRefusedPayloadDoesNotGrowOrPublish
+--- PASS: TestManagedTreeRefusedPayloadDoesNotGrowOrPublish (0.22s)
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim/panic
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim/goexit
+--- PASS: TestManagedTreeAbnormalConstructionRetiresClaim (0.11s)
+    --- PASS: TestManagedTreeAbnormalConstructionRetiresClaim/panic (0.06s)
+    --- PASS: TestManagedTreeAbnormalConstructionRetiresClaim/goexit (0.06s)
+=== RUN   TestManagedTreeRemountRetiresNativeIdentities
+--- PASS: TestManagedTreeRemountRetiresNativeIdentities (0.36s)
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total
+--- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation (0.07s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key (0.02s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id (0.02s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total (0.02s)
+=== RUN   TestTreeNativePayloadBudgetIncludesGeneratedIdentities
+--- PASS: TestTreeNativePayloadBudgetIncludesGeneratedIdentities (0.00s)
+=== RUN   TestTreeNavigationBoundariesAreNoop
+--- PASS: TestTreeNavigationBoundariesAreNoop (0.00s)
+=== RUN   TestManagedTreeActualGeometryAndKeyboard
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144
+=== RUN   TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192
+--- PASS: TestManagedTreeActualGeometryAndKeyboard (12.48s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-120 (1.07s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-144 (1.03s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-1/dpi-192 (0.95s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-144 (0.99s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-7/dpi-192 (0.95s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-96 (1.15s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-120 (1.04s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-144 (0.99s)
+    --- PASS: TestManagedTreeActualGeometryAndKeyboard/batch-64/dpi-192 (0.96s)
+=== RUN   TestManagedTreePointerDisclosureAndRetiredPress
+--- PASS: TestManagedTreePointerDisclosureAndRetiredPress (0.54s)
+=== RUN   TestManualNestedGridTreeSnapshotDetached
+--- PASS: TestManualNestedGridTreeSnapshotDetached (0.30s)
+=== RUN   TestManagedTreeBindingCloseAndCaps
+--- PASS: TestManagedTreeBindingCloseAndCaps (0.26s)
+=== RUN   TestManagedTreeModalDisabledAndInactiveTab
+--- PASS: TestManagedTreeModalDisabledAndInactiveTab (1.10s)
+=== RUN   TestManagedTreeAccessibilityBoundedRowsAndRetirement
+--- PASS: TestManagedTreeAccessibilityBoundedRowsAndRetirement (0.46s)
+=== RUN   TestManagedTreeBindingRefusalAndConstructionRollback
+--- PASS: TestManagedTreeBindingRefusalAndConstructionRollback (0.20s)
+=== RUN   TestManagedTreeRefusedPayloadDoesNotGrowOrPublish
+--- PASS: TestManagedTreeRefusedPayloadDoesNotGrowOrPublish (0.22s)
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim/panic
+=== RUN   TestManagedTreeAbnormalConstructionRetiresClaim/goexit
+--- PASS: TestManagedTreeAbnormalConstructionRetiresClaim (0.12s)
+    --- PASS: TestManagedTreeAbnormalConstructionRetiresClaim/panic (0.06s)
+    --- PASS: TestManagedTreeAbnormalConstructionRetiresClaim/goexit (0.06s)
+=== RUN   TestManagedTreeRemountRetiresNativeIdentities
+--- PASS: TestManagedTreeRemountRetiresNativeIdentities (0.37s)
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id
+=== RUN   TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total
+--- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation (0.07s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/key (0.02s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/control-id (0.02s)
+    --- PASS: TestReviewerTreeGeneratedPayloadRefusedBeforeAllocation/escaped-total (0.03s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	49.733s
+?   	github.com/dshills/vellum/drivers/cogent/cmd/accessibility-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/docking-smoke	1.665s [no tests to run]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/file-drop-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/gallery	2.071s [no tests to run]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/history-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/mainqueue-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/multiwindow-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/platform-smoke	2.482s [no tests to run]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/render-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-handoff-smoke	[no test files]
+?   	github.com/dshills/vellum/drivers/cogent/cmd/window-lifetime-smoke	[no test files]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/workbench	2.996s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/mailbox	2.539s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/platformio	3.109s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/textinput	3.495s [no tests to run]
+testing: warning: no tests to run
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/internal/transport	3.273s [no tests to run]

@@ -1,0 +1,1151 @@
+--- /dev/null
++++ b/core/frame_trace.go
+@@ -0,0 +1,322 @@
++package core
++
++import (
++	"errors"
++	"reflect"
++	"sync"
++	"sync/atomic"
++	"time"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/system/composer"
++)
++
++var ErrFrameTraceBusy = errors.New("core: traced interaction pending")
++
++// FrameTraceSample is one tagged input and the first composition armed after
++// its owner transition/reconciliation. These are elapsed work intervals, not
++// OS thread CPU counters or compositor presentation timestamps.
++type FrameTraceSample struct {
++	Tag, Generation                                         uint64
++	QueuedNS, InputNS, OwnerNS, ReconcileNS                 int64
++	LayoutPaintNS, GatherNS, RasterUploadNS, EncodeSubmitNS int64
++	AcquireNS, PresentCallNS, TotalUIWorkNS                 int64
++	Completed                                               bool
++	Failure                                                 string
++}
++
++type frameTracePending struct {
++	FrameTraceSample
++	event                                                                                         events.Event
++	queued                                                                                        time.Time
++	inputDone, ownerExpected, transition, ownerDone, reconciled, armed, rendering, ready, retired bool
++	frameArmed                                                                                    bool // captured at composition start, never inferred at finish
++}
++
++// FrameTrace retains at most one interaction and owns no callback. Install it
++// explicitly; the ordinary event/render path does no timing when absent.
++type FrameTrace struct {
++	mu      sync.Mutex
++	pending *frameTracePending
++	active  atomic.Uint64
++}
++
++func (sc *Scene) SetFrameTrace(trace *FrameTrace) { sc.frameTrace.Store(trace) }
++func (sc *Scene) FrameTrace() *FrameTrace         { return sc.frameTrace.Load() }
++
++// A reserved diagnostic FIFO node unwraps only at actual dispatch. The deque
++// still sees a DeferredEvent, preserving identity against ordinary compression.
++func unwrapFrameTraceEvent(event events.Event) events.Event {
++	if reserved, ok := event.(interface{ FrameTraceEvent() events.Event }); ok {
++		return reserved.FrameTraceEvent()
++	}
++	return event
++}
++
++func (trace *FrameTrace) Begin(tag uint64, event events.Event) error {
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if tag == 0 || event == nil || reflect.ValueOf(event).Kind() != reflect.Pointer || reflect.ValueOf(event).IsNil() {
++		return errors.New("core: invalid traced input")
++	}
++	if trace.pending != nil {
++		return ErrFrameTraceBusy
++	}
++	trace.pending = &frameTracePending{FrameTraceSample: FrameTraceSample{Tag: tag}, event: event, queued: time.Now()}
++	return nil
++}
++func (trace *FrameTrace) CurrentTag() uint64 {
++	if trace == nil {
++		return 0
++	}
++	return trace.active.Load()
++}
++func (trace *FrameTrace) startEvent(event events.Event) (uint64, time.Time) {
++	if trace == nil {
++		return 0, time.Time{}
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	p := trace.pending
++	if p == nil || p.event != event {
++		return 0, time.Time{}
++	}
++	start := time.Now()
++	p.QueuedNS = start.Sub(p.queued).Nanoseconds()
++	trace.active.Store(p.Tag)
++	return p.Tag, start
++}
++func (trace *FrameTrace) endEvent(tag uint64, start time.Time) {
++	if tag == 0 {
++		return
++	}
++	trace.active.Store(0)
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag {
++		p.InputNS = time.Since(start).Nanoseconds()
++		p.inputDone = true
++		if !p.ownerExpected {
++			p.ownerDone = true
++			if !p.ready {
++				p.Failure = "traced input did not post owner work"
++				p.ready = true
++			}
++		}
++	}
++}
++
++// ExpectOwner records a handler's checked asynchronous owner-post handshake.
++// The caller explicitly closes the owner terminal if posting is refused.
++func (trace *FrameTrace) ExpectOwner(tag uint64) {
++	if trace == nil || tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag {
++		p.ownerExpected = true
++	}
++}
++
++// OwnerTag identifies a received input awaiting its posted owner work.
++func (trace *FrameTrace) OwnerTag() uint64 {
++	if trace == nil {
++		return 0
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.inputDone && !p.ownerDone {
++		return p.Tag
++	}
++	return 0
++}
++func (trace *FrameTrace) Transition(tag, generation uint64) {
++	if trace == nil || tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag {
++		p.Generation = generation
++		p.transition = true
++	}
++}
++func (trace *FrameTrace) OwnerWork(tag uint64, duration int64) {
++	if trace == nil || tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag {
++		p.OwnerNS += duration
++		if p.transition {
++			p.ownerDone = true
++		}
++	}
++}
++func (trace *FrameTrace) ReconcileTag() uint64 {
++	if trace == nil {
++		return 0
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.ownerDone && !p.reconciled && !p.ready {
++		return p.Tag
++	}
++	return 0
++}
++func (trace *FrameTrace) Reconciled(tag uint64, duration int64) {
++	if trace == nil || tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag && p.ownerDone && !p.ready {
++		p.ReconcileNS += duration
++		p.reconciled = true
++		p.armed = true
++	}
++}
++func (trace *FrameTrace) startFrame() uint64 {
++	if trace == nil {
++		return 0
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.inputDone && !p.rendering && !p.ready {
++		p.rendering = true
++		p.frameArmed = p.armed
++		return p.Tag
++	}
++	return 0
++}
++func (trace *FrameTrace) frameWork(tag uint64, layout, gather int64) {
++	if tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag && !p.ready {
++		p.LayoutPaintNS += layout
++		p.GatherNS += gather
++	}
++}
++func (trace *FrameTrace) finishFrame(tag uint64, timing composer.ComposeTiming) {
++	if tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag && p.rendering {
++		p.rendering = false
++		if p.ready {
++			return
++		}
++		p.RasterUploadNS += timing.RasterUploadNS
++		p.EncodeSubmitNS += timing.EncodeSubmitNS
++		p.AcquireNS += timing.AcquireNS
++		p.PresentCallNS += timing.PresentCallNS
++		submitted := timing.Supported && timing.Submitted && timing.Failure == ""
++		p.Completed = p.frameArmed && submitted
++		p.Failure = timing.Failure
++		if !submitted && p.Failure == "" {
++			p.Failure = "composition did not submit a measured frame"
++		}
++		p.TotalUIWorkNS = p.InputNS + p.OwnerNS + p.ReconcileNS + p.LayoutPaintNS + p.GatherNS + p.RasterUploadNS + p.EncodeSubmitNS
++		p.ready = p.frameArmed || !submitted
++	}
++}
++
++// noComposition accounts for an intermediate native update without GPU work.
++// A final armed update must compose; an earlier unchanged paint may simply end.
++func (trace *FrameTrace) noComposition(tag uint64, layout, gather int64) {
++	if tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag && p.rendering {
++		p.rendering = false
++		if p.ready {
++			return
++		}
++		p.LayoutPaintNS += layout
++		p.GatherNS += gather
++		if p.frameArmed {
++			p.Failure = "armed frame did not reach composition"
++			p.ready = true
++		}
++	}
++}
++
++func (trace *FrameTrace) frameFailed(tag uint64, message string) {
++	if tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag {
++		p.rendering = false
++		if !p.ready {
++			p.Failure = message
++			p.ready = true
++		}
++	}
++}
++func (trace *FrameTrace) Fail(tag uint64, message string) {
++	if trace == nil || tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag && !p.ready {
++		p.Failure = message
++		p.ready = true
++	}
++}
++func (trace *FrameTrace) Take() (FrameTraceSample, bool) {
++	if trace == nil {
++		return FrameTraceSample{}, false
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.ready && (p.retired || p.inputDone && p.ownerDone && !p.rendering) {
++		out := p.FrameTraceSample
++		trace.pending = nil
++		return out, true
++	}
++	return FrameTraceSample{}, false
++}
++
++// Retire ends diagnostic ownership after the native window lifetime stops.
++// Ordinary cancellation retains the pending ticket through input/owner terminals.
++func (trace *FrameTrace) Retire(tag uint64, message string) {
++	if trace == nil || tag == 0 {
++		return
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	if p := trace.pending; p != nil && p.Tag == tag {
++		if !p.ready {
++			p.Failure = message
++			p.ready = true
++		}
++		p.retired = true
++	}
++}
++func (trace *FrameTrace) Pending() bool {
++	if trace == nil {
++		return false
++	}
++	trace.mu.Lock()
++	defer trace.mu.Unlock()
++	return trace.pending != nil
++}
++
++func (w *renderWindow) frameTrace() *FrameTrace {
++	if stage := w.mains.windowStage(); stage != nil && stage.Scene != nil {
++		return stage.Scene.FrameTrace()
++	}
++	return nil
++}
+--- /dev/null
++++ b/core/frame_trace_test.go
+@@ -0,0 +1,347 @@
++package core
++
++import (
++	"errors"
++	"image"
++	"runtime"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/system/composer"
++)
++
++func traceScroll() *events.MouseScroll {
++	e := events.NewScroll(image.Pt(8, 12), math32.Vector2{Y: 12}, 0)
++	e.Init()
++	return e
++}
++
++type testTraceReserved struct{ *events.MouseScroll }
++
++func (e *testTraceReserved) FrameTraceEvent() events.Event { return e.MouseScroll }
++func TestVellumFrameTraceDispatchUnwrapsOriginalInput(t *testing.T) {
++	scroll := traceScroll()
++	if unwrapFrameTraceEvent(&testTraceReserved{scroll}) != scroll || unwrapFrameTraceEvent(scroll) != scroll {
++		t.Fatal("dispatch altered event identity")
++	}
++}
++
++func TestVellumFrameTracePrefixCompositionCannotFinalizeAfterLateArm(t *testing.T) {
++	trace := &FrameTrace{}
++	e := traceScroll()
++	if err := trace.Begin(3, e); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := trace.startEvent(e)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	if trace.startFrame() != 3 {
++		t.Fatal("prefix not claimed")
++	}
++	trace.frameWork(3, 11, 13)
++	// The owner and native refresh may finish while earlier composition waits.
++	trace.Transition(3, 9)
++	trace.OwnerWork(3, 17)
++	trace.Reconciled(3, 19)
++	trace.finishFrame(3, composer.ComposeTiming{Supported: true, Submitted: true, RasterUploadNS: 23, EncodeSubmitNS: 29, AcquireNS: 100, PresentCallNS: 200})
++	if _, ok := trace.Take(); ok {
++		t.Fatal("prefix completed the newly armed generation")
++	}
++	if trace.startFrame() != 3 {
++		t.Fatal("final armed frame missing")
++	}
++	trace.frameWork(3, 31, 37)
++	trace.finishFrame(3, composer.ComposeTiming{Supported: true, Submitted: true, RasterUploadNS: 41, EncodeSubmitNS: 43, AcquireNS: 300, PresentCallNS: 400})
++	s, ok := trace.Take()
++	if !ok || !s.Completed || s.Generation != 9 || s.LayoutPaintNS != 42 || s.GatherNS != 50 || s.RasterUploadNS != 64 || s.EncodeSubmitNS != 72 || s.AcquireNS != 400 || s.PresentCallNS != 600 || s.TotalUIWorkNS != s.InputNS+17+19+42+50+64+72 {
++		t.Fatalf("lost prefix work: %+v", s)
++	}
++}
++
++func TestVellumFrameTraceCancelledRenderingKeepsClaimUntilTerminal(t *testing.T) {
++	trace := &FrameTrace{}
++	e := traceScroll()
++	if err := trace.Begin(3, e); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := trace.startEvent(e)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	trace.Transition(3, 9)
++	trace.OwnerWork(3, 1)
++	trace.Reconciled(3, 1)
++	trace.startFrame()
++	trace.Fail(3, "cancelled")
++	if _, ok := trace.Take(); ok {
++		t.Fatal("released running native frame")
++	}
++	trace.frameFailed(3, "compose unwound")
++	s, ok := trace.Take()
++	if !ok || s.Completed || s.Failure != "cancelled" {
++		t.Fatalf("terminal lost: %+v", s)
++	}
++}
++
++func TestVellumFrameTraceSameTicketAndWorkExclusions(t *testing.T) {
++	trace := &FrameTrace{}
++	e := traceScroll()
++	if trace.Begin(0, e) == nil || trace.Begin(1, (*events.MouseScroll)(nil)) == nil {
++		t.Fatal("accepted invalid input")
++	}
++	if err := trace.Begin(7, e); err != nil {
++		t.Fatal(err)
++	}
++	if !errors.Is(trace.Begin(8, traceScroll()), ErrFrameTraceBusy) {
++		t.Fatal("overwrote ticket")
++	}
++	if tag, _ := trace.startEvent(traceScroll()); tag != 0 {
++		t.Fatal("attributed another event")
++	}
++	if trace.startFrame() != 0 || trace.OwnerTag() != 0 {
++		t.Fatal("armed before input")
++	}
++	tag, start := trace.startEvent(e)
++	if tag != 7 || trace.CurrentTag() != 7 {
++		t.Fatal("missing routed tag")
++	}
++	trace.Transition(77, 90)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	if trace.CurrentTag() != 0 || trace.OwnerTag() != 7 {
++		t.Fatal("input terminal not owned")
++	}
++	trace.OwnerWork(7, 11)
++	if trace.ReconcileTag() != 0 || trace.startFrame() != 7 {
++		t.Fatal("missing pre-owner frame attribution")
++	}
++	trace.noComposition(7, 3, 5)
++	trace.Transition(7, 91)
++	trace.OwnerWork(7, 13)
++	if trace.ReconcileTag() != 7 {
++		t.Fatal("owner not complete")
++	}
++	trace.Reconciled(77, 999)
++	trace.Reconciled(7, 17)
++	if trace.startFrame() != 7 || trace.startFrame() != 0 {
++		t.Fatal("more than one frame claimed")
++	}
++	trace.frameWork(77, 999, 999)
++	trace.frameWork(7, 19, 23)
++	trace.finishFrame(7, composer.ComposeTiming{RasterUploadNS: 29, EncodeSubmitNS: 31, AcquireNS: 1000, PresentCallNS: 2000, Supported: true, Submitted: true})
++	sample, ok := trace.Take()
++	if !ok || !sample.Completed || sample.Tag != 7 || sample.Generation != 91 || sample.OwnerNS != 24 || sample.ReconcileNS != 17 || sample.LayoutPaintNS != 22 || sample.GatherNS != 28 {
++		t.Fatalf("wrong linked sample: %+v", sample)
++	}
++	if sample.TotalUIWorkNS != sample.InputNS+24+17+22+28+29+31 || sample.AcquireNS != 1000 || sample.PresentCallNS != 2000 {
++		t.Fatalf("mixed/excluded work: %+v", sample)
++	}
++	if _, ok := trace.Take(); ok || trace.Pending() {
++		t.Fatal("sample not retired once")
++	}
++}
++
++func TestVellumFrameTraceCancellationKeepsInputOwnerOwnership(t *testing.T) {
++	trace := &FrameTrace{}
++	e := traceScroll()
++	if err := trace.Begin(1, e); err != nil {
++		t.Fatal(err)
++	}
++	trace.Fail(1, "cancelled")
++	if _, ok := trace.Take(); ok {
++		t.Fatal("released still queued input")
++	}
++	if !errors.Is(trace.Begin(2, traceScroll()), ErrFrameTraceBusy) {
++		t.Fatal("new ticket admitted before old input")
++	}
++	tag, start := trace.startEvent(e)
++	if tag != 1 {
++		t.Fatal("cancelled input lost its tag")
++	}
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	if _, ok := trace.Take(); ok {
++		t.Fatal("released outstanding owner transition")
++	}
++	trace.Transition(tag, 9)
++	trace.OwnerWork(tag, 12)
++	if trace.ReconcileTag() != 0 || trace.startFrame() != 0 {
++		t.Fatal("rendered cancelled measurement")
++	}
++	sample, ok := trace.Take()
++	if !ok || sample.Completed || sample.Failure != "cancelled" || sample.Generation != 9 {
++		t.Fatalf("lost cancellation: %+v", sample)
++	}
++	if err := trace.Begin(2, traceScroll()); err != nil {
++		t.Fatal(err)
++	}
++	trace.Retire(2, "closed")
++	if sample, ok := trace.Take(); !ok || sample.Failure != "closed" || sample.Completed {
++		t.Fatalf("window terminal: %+v", sample)
++	}
++}
++
++func TestVellumFrameTraceConcurrentObservationAndFailure(t *testing.T) {
++	trace := &FrameTrace{}
++	e := traceScroll()
++	if err := trace.Begin(1, e); err != nil {
++		t.Fatal(err)
++	}
++	var wg sync.WaitGroup
++	wg.Add(2)
++	go func() {
++		defer wg.Done()
++		for range 1000 {
++			trace.Pending()
++			trace.CurrentTag()
++			trace.OwnerTag()
++			trace.ReconcileTag()
++			trace.Take()
++		}
++	}()
++	go func() {
++		defer wg.Done()
++		for range 1000 {
++			trace.Fail(1, "cancelled")
++		}
++	}()
++	tag, start := trace.startEvent(e)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	trace.Transition(tag, 8)
++	trace.OwnerWork(tag, 1)
++	wg.Wait()
++	// Observer may already have consumed the failed terminal. It cannot have
++	// opened a different ticket or changed the event's lifetime.
++	trace.Take()
++	if trace.Pending() || trace.CurrentTag() != 0 {
++		t.Fatal("pending after terminals")
++	}
++}
++
++func TestVellumFrameTraceUnsupportedCompositionFails(t *testing.T) {
++	trace := &FrameTrace{}
++	e := traceScroll()
++	if err := trace.Begin(1, e); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := trace.startEvent(e)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	trace.Transition(tag, 2)
++	trace.OwnerWork(tag, 1)
++	trace.Reconciled(tag, 1)
++	if trace.startFrame() != tag {
++		t.Fatal("not armed")
++	}
++	trace.finishFrame(tag, composer.ComposeTiming{})
++	sample, ok := trace.Take()
++	if !ok || sample.Completed || sample.Failure == "" {
++		t.Fatal("qualified unsupported composer")
++	}
++	var absent *FrameTrace
++	if absent.CurrentTag() != 0 || absent.OwnerTag() != 0 || absent.ReconcileTag() != 0 || absent.startFrame() != 0 || absent.Pending() {
++		t.Fatal("nil observer changed default route")
++	}
++	if tag, start := absent.startEvent(e); tag != 0 || start != (time.Time{}) {
++		t.Fatal("nil observer started timing")
++	}
++	absent.endEvent(0, time.Time{})
++}
++
++func TestVellumFrameTraceNoHandlerEndsWithoutWindowRetirement(t *testing.T) {
++	trace := &FrameTrace{}
++	e := traceScroll()
++	if err := trace.Begin(1, e); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := trace.startEvent(e)
++	trace.endEvent(tag, start) // no handler posted anything
++	s, ok := trace.Take()
++	if !ok || s.Completed || s.Failure != "traced input did not post owner work" || trace.Pending() {
++		t.Fatalf("lost unhandled input terminal: %+v", s)
++	}
++	if err := trace.Begin(2, traceScroll()); err != nil {
++		t.Fatal("blocked subsequent admission", err)
++	}
++	trace.Retire(2, "test complete")
++	trace.Take()
++}
++
++type traceFaultComposer struct {
++	composer.Composer
++	goexit  bool
++	entered chan struct{}
++}
++
++func (c *traceFaultComposer) ComposeMeasured() composer.ComposeTiming {
++	close(c.entered)
++	if c.goexit {
++		runtime.Goexit()
++	}
++	panic("test-composition-fault")
++}
++
++func TestVellumFrameTraceProductionComposeUnwindRetiresClaimAndLocks(t *testing.T) {
++	for _, goexit := range []bool{false, true} {
++		for _, owned := range []bool{false, true} {
++			trace := &FrameTrace{}
++			e := traceScroll()
++			if err := trace.Begin(1, e); err != nil {
++				t.Fatal(err)
++			}
++			tag, start := trace.startEvent(e)
++			trace.ExpectOwner(tag)
++			trace.endEvent(tag, start)
++			trace.Transition(tag, 2)
++			trace.OwnerWork(tag, 1)
++			trace.Reconciled(tag, 1)
++			if trace.startFrame() != tag {
++				t.Fatal("not armed")
++			}
++			native := &contextTestWindow{}
++			w := &renderWindow{SystemWindow: native, winRenderCounter: 1}
++			w.mains.renderContext = &renderContext{}
++			cp := &traceFaultComposer{goexit: goexit, entered: make(chan struct{})}
++			done := make(chan struct{})
++			var caught any
++			go func() {
++				defer close(done)
++				defer func() { caught = recover() }()
++				if owned {
++					w.renderAsyncMeasuredOwned(cp, trace, tag)
++				} else {
++					w.renderAsyncMeasured(cp, trace, tag)
++				}
++			}()
++			select {
++			case <-done:
++			case <-time.After(time.Second):
++				t.Fatal("composition unwind stuck")
++			}
++			select {
++			case <-cp.entered:
++			default:
++				t.Fatal("production composer never called")
++			}
++			if !goexit && caught != "test-composition-fault" || goexit && caught != nil {
++				t.Fatalf("changed original unwind: %v", caught)
++			}
++			if atomic.LoadInt32(&w.winRenderCounter) != 0 || !native.mu.TryLock() {
++				t.Fatal("retained native render ownership")
++			}
++			native.mu.Unlock()
++			if !w.renderContext().TryLock() {
++				t.Fatal("retained render context")
++			}
++			w.renderContext().Unlock()
++			s, ok := trace.Take()
++			if !ok || s.Completed || s.Failure != "composition terminated before diagnostic completion" || trace.Pending() {
++				t.Fatalf("missing abnormal terminal: %+v", s)
++			}
++		}
++	}
++}
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -7,6 +7,7 @@
+ import (
+ 	"image"
+ 	"slices"
++	"sync/atomic"
+ 	"time"
+ 
+ 	"cogentcore.org/core/colors"
+@@ -33,6 +34,7 @@
+ // within a given [Stage] and overall rendering context, representing the unit
+ // of rendering in the Cogent Core framework.
+ type Scene struct { //core:no-new
++	frameTrace atomic.Pointer[FrameTrace]
+ 	Frame
+ 
+ 	// Body provides the main contents of scenes that use control Bars
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -497,9 +497,13 @@
+ // is redundant in this case, but other non-event-driven updates require
+ // the lock protection.
+ func (w *renderWindow) handleEvent(e events.Event) {
++	e = unwrapFrameTraceEvent(e)
+ 	rc := w.renderContext()
+ 	rc.Lock()
+ 	defer rc.Unlock()
++	trace := w.frameTrace()
++	traceTag, traceStart := trace.startEvent(e)
++	defer trace.endEvent(traceTag, traceStart)
+ 	// Event ownership unwinds even when a widget callback panics.
+ 	// we previously manually handled Unlock's in this function instead of deferring
+ 	// it to avoid a cryptic "sync: can't unlock an already unlocked Mutex"
+@@ -764,8 +768,33 @@
+ 		rc.Unlock()
+ 	}()
+ 	rebuild := rc.rebuild
+-
+-	stageMods, sceneMods := w.mains.updateAll() // handles all Scene / Widget updates!
++	trace := w.frameTrace()
++	traceTag := trace.startFrame()
++	var layoutStart, gatherStart time.Time
++	var layoutNS, gatherNS int64
++	traceDispatched := false
++	traceUnchanged := false
++	if traceTag != 0 {
++		layoutStart = time.Now()
++		defer func() {
++			if !traceDispatched {
++				if !gatherStart.IsZero() {
++					gatherNS += time.Since(gatherStart).Nanoseconds()
++				}
++				if traceUnchanged {
++					trace.noComposition(traceTag, layoutNS, gatherNS)
++				} else {
++					trace.frameFailed(traceTag, "native update did not reach composition")
++				}
++			}
++		}()
++	}
++
++	stageMods, sceneMods := w.mains.updateAll()
++	if traceTag != 0 {
++		layoutNS = time.Since(layoutStart).Nanoseconds()
++		gatherStart = time.Now()
++	} // handles all Scene / Widget updates!
+ 	top := w.mains.top()
+ 	if top == nil || w.mains.stack.Len() == 0 {
+ 		return
+@@ -787,6 +816,7 @@
+ 		if w.flags.HasFlag(winRenderSkipped) {
+ 			w.flags.SetFlag(false, winRenderSkipped)
+ 		} else {
++			traceUnchanged = true
+ 			return
+ 		}
+ 	}
+@@ -802,6 +832,10 @@
+ 		log.Println("rebuild:", rebuild, "stageMods:", stageMods, "sceneMods:", sceneMods)
+ 	}
+ 
++	if traceTag != 0 {
++		gatherNS += time.Since(gatherStart).Nanoseconds()
++		gatherStart = time.Time{}
++	}
+ 	if !w.SystemWindow.Lock() {
+ 		if DebugSettings.WindowRenderTrace {
+ 			log.Printf("RenderWindow: window was closed: %v\n", w.name)
+@@ -809,6 +843,9 @@
+ 		return
+ 	}
+ 
++	if traceTag != 0 {
++		gatherStart = time.Now()
++	}
+ 	systemLocked := true
+ 	defer func() {
+ 		if systemLocked {
+@@ -864,12 +901,21 @@
+ 	}
+ 	cp.Add(SpritesSource(top, winScene), &top.Sprites)
+ 	w.lastSpriteDraw = w.now()
++	if traceTag != 0 {
++		gatherNS += time.Since(gatherStart).Nanoseconds()
++		trace.frameWork(traceTag, layoutNS, gatherNS)
++		traceDispatched = true
++	}
+ 
+ 	w.SystemWindow.Unlock()
+ 	systemLocked = false
+ 	if offscreen || w.flags.HasFlag(winResize) || sinceResize < 500*time.Millisecond {
+ 		atomic.AddInt32(&w.winRenderCounter, 1)
+-		w.renderAsyncOwned(cp)
++		if traceTag != 0 {
++			w.renderAsyncMeasuredOwned(cp, trace, traceTag)
++		} else {
++			w.renderAsyncOwned(cp)
++		}
+ 		if w.flags.HasFlag(winResize) {
+ 			w.lastResize = w.now()
+ 		}
+@@ -879,7 +925,11 @@
+ 		// because otherwise we can lose an entire pass before the goroutine starts!
+ 		// function will turn flag off when it finishes.
+ 		atomic.AddInt32(&w.winRenderCounter, 1)
+-		go w.renderAsync(cp)
++		if traceTag != 0 {
++			go w.renderAsyncMeasured(cp, trace, traceTag)
++		} else {
++			go w.renderAsync(cp)
++		}
+ 	}
+ }
+ 
+@@ -957,3 +1007,35 @@
+ 	cp.Redraw()
+ 	return true
+ }
++
++// renderAsyncMeasured keeps the ordinary ownership boundaries and excludes
++// waiting to acquire those locks from CPU-side composition intervals.
++func (w *renderWindow) renderAsyncMeasured(cp composer.Composer, trace *FrameTrace, tag uint64) {
++	rc := w.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	w.renderAsyncMeasuredOwned(cp, trace, tag)
++}
++func (w *renderWindow) renderAsyncMeasuredOwned(cp composer.Composer, trace *FrameTrace, tag uint64) {
++	defer atomic.AddInt32(&w.winRenderCounter, -1)
++	returned := false
++	// Preserve panic/Goexit unwind while retiring a claimed frame segment.
++	defer func() {
++		if !returned {
++			trace.frameFailed(tag, "composition terminated before diagnostic completion")
++		}
++	}()
++	if !w.SystemWindow.Lock() {
++		trace.frameFailed(tag, "native window closed before composition")
++		returned = true
++		return
++	}
++	defer w.SystemWindow.Unlock()
++	if measured, ok := cp.(interface{ ComposeMeasured() composer.ComposeTiming }); ok {
++		trace.finishFrame(tag, measured.ComposeMeasured())
++	} else {
++		cp.Compose()
++		trace.finishFrame(tag, composer.ComposeTiming{Failure: "composer does not support measured composition"})
++	}
++	returned = true
++}
+--- /dev/null
++++ b/system/composer/timing.go
+@@ -0,0 +1,30 @@
++package composer
++
++import "time"
++
++// ComposeTiming describes wall time in CPU-side composition work. Acquisition
++// and the present call are separate; no GPU execution/presentation time is implied.
++type ComposeTiming struct {
++	RasterUploadNS, EncodeSubmitNS, AcquireNS, PresentCallNS int64
++	Supported, Submitted                                     bool
++	Failure                                                  string
++}
++
++// ComposeMeasured preserves the ordinary draw order and opts into a drawer's
++// checked timing path. Unknown drawers cannot qualify an encoding measurement.
++func (cd *ComposerDrawer) ComposeMeasured() ComposeTiming {
++	start := time.Now()
++	cd.Drawer.Start()
++	for _, source := range cd.Sources {
++		source.Draw(cd)
++	}
++	timing := ComposeTiming{RasterUploadNS: time.Since(start).Nanoseconds()}
++	if drawer, ok := cd.Drawer.(interface{ EndMeasured() ComposeTiming }); ok {
++		end := drawer.EndMeasured()
++		end.RasterUploadNS += timing.RasterUploadNS
++		return end
++	}
++	cd.Drawer.End()
++	timing.Failure = "composition drawer does not support encoding timing"
++	return timing
++}
+--- /dev/null
++++ b/system/composer/timing_test.go
+@@ -0,0 +1,65 @@
++package composer
++
++import (
++	"reflect"
++	"testing"
++)
++
++type timingDrawer struct {
++	DrawerBase
++	order *[]string
++}
++
++func (d *timingDrawer) Start()  { *d.order = append(*d.order, "start") }
++func (d *timingDrawer) End()    { *d.order = append(*d.order, "end") }
++func (d *timingDrawer) Redraw() {}
++
++type measuredTimingDrawer struct {
++	timingDrawer
++	result ComposeTiming
++}
++
++func (d *measuredTimingDrawer) EndMeasured() ComposeTiming {
++	*d.order = append(*d.order, "measured-end")
++	return d.result
++}
++
++type timingSource struct {
++	label string
++	order *[]string
++}
++
++func (s timingSource) Draw(Composer) { *s.order = append(*s.order, s.label) }
++
++func TestVellumMeasuredCompositionKeepsOrderAndSingleEnd(t *testing.T) {
++	for _, supported := range []bool{false, true} {
++		var order []string
++		base := timingDrawer{order: &order}
++		var drawer Drawer = &base
++		last := "end"
++		if supported {
++			drawer = &measuredTimingDrawer{timingDrawer: base, result: ComposeTiming{Supported: true, Submitted: true, EncodeSubmitNS: 31, AcquireNS: 1000, PresentCallNS: 2000}}
++			last = "measured-end"
++		}
++		cd := &ComposerDrawer{Drawer: drawer, Sources: []Source{timingSource{"first", &order}, timingSource{"second", &order}}}
++		result := cd.ComposeMeasured()
++		if !reflect.DeepEqual(order, []string{"start", "first", "second", last}) {
++			t.Fatalf("changed rendering: %v", order)
++		}
++		if supported && (!result.Supported || !result.Submitted || result.EncodeSubmitNS != 31 || result.AcquireNS != 1000 || result.PresentCallNS != 2000) {
++			t.Fatalf("lost drawer result: %+v", result)
++		}
++		if !supported && (result.Supported || result.Submitted || result.Failure == "") {
++			t.Fatal("qualified unknown drawer")
++		}
++	}
++}
++
++func TestVellumMeasuredCompositionPropagatesSubmissionFailure(t *testing.T) {
++	var order []string
++	d := &measuredTimingDrawer{timingDrawer: timingDrawer{order: &order}, result: ComposeTiming{Supported: true, Failure: "submit failed"}}
++	result := (&ComposerDrawer{Drawer: d}).ComposeMeasured()
++	if result.Submitted || result.Failure != "submit failed" || len(order) != 2 {
++		t.Fatalf("masked failed submission: %+v %v", result, order)
++	}
++}
+--- /dev/null
++++ b/gpu/gsystem_timing.go
+@@ -0,0 +1,46 @@
++package gpu
++
++import (
++	"errors"
++	"time"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// BeginRenderPassMeasured is the normal clear pass with surface acquisition
++// separated from encoder creation. Only the renderer's acquisition wait and
++// acquisition lock wait are excluded; reconfiguration and view work are charged.
++func (sy *GraphicsSystem) BeginRenderPassMeasured() (*wgpu.RenderPassEncoder, int64, error) {
++	rd := sy.Renderer
++	measured, ok := rd.(interface {
++		GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error)
++		AbortCurrentTexture()
++		PresentMeasured() int64
++	})
++	if !ok {
++		return nil, 0, errors.New("renderer does not support measured acquisition")
++	}
++	view, acquire, err := measured.GetCurrentTextureMeasured()
++	if view == nil || err != nil {
++		return nil, acquire, err
++	}
++	cmd, err := sy.NewCommandEncoder()
++	if err != nil {
++		measured.AbortCurrentTexture()
++		return nil, acquire, err
++	}
++	sy.CommandEncoder = cmd
++	return rd.Render().BeginRenderPass(cmd, view), acquire, nil
++}
++
++// EndRenderPassMeasured separates the renderer present call from encoding and
++// queue submission. It reports submission failure rather than qualifying a frame.
++func (sy *GraphicsSystem) EndRenderPassMeasured(rp *wgpu.RenderPassEncoder) (int64, error) {
++	err := sy.SubmitRender(rp)
++	if measured, ok := sy.Renderer.(interface{ PresentMeasured() int64 }); ok {
++		return measured.PresentMeasured(), err
++	}
++	start := time.Now()
++	sy.Renderer.Present()
++	return time.Since(start).Nanoseconds(), errors.New("renderer lost measured presentation support")
++}
+--- /dev/null
++++ b/gpu/surface_timing.go
+@@ -0,0 +1,74 @@
++package gpu
++
++import (
++	"time"
++
++	"cogentcore.org/core/base/errors"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// GetCurrentTextureMeasured preserves the ordinary acquisition/retry order.
++// Only waiting for ownership and the backend acquisition calls are excluded.
++// Reconfiguration, status checks and texture view creation remain UI work.
++func (sf *Surface) GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error) {
++	start := time.Now()
++	sf.Lock()
++	acquireNS := time.Since(start).Nanoseconds()
++	stexture, err := acquireSurfaceFrame(func() (wgpu.SurfaceTexture, error) {
++		start := time.Now()
++		frame, err := sf.surface.TryGetCurrentTexture()
++		acquireNS += time.Since(start).Nanoseconds()
++		return frame, err
++	}, sf.Config)
++	if errors.Log(err) != nil {
++		sf.Unlock()
++		return nil, acquireNS, err
++	}
++	texture, ok := stexture.Get()
++	if !ok || texture == nil {
++		sf.Unlock()
++		return nil, acquireNS, nil
++	}
++	view, err := texture.TryCreateView(&wgpu.TextureViewDescriptor{
++		MipLevelCount: texture.GetMipLevelCount(), ArrayLayerCount: texture.GetDepthOrArrayLayers(), Format: sf.Format.Format,
++	})
++	if errors.Log(err) != nil {
++		texture.Release()
++		sf.Unlock()
++		return nil, acquireNS, err
++	}
++	sf.curTextureOwner, sf.curTexture = texture, view
++	return view, acquireNS, nil
++}
++
++// AbortCurrentTexture withdraws an acquired diagnostic frame without presenting
++// unsubmitted contents. The caller must own a successful texture acquisition.
++func (sf *Surface) AbortCurrentTexture() {
++	if sf.curTexture != nil {
++		sf.curTexture.Release()
++		sf.curTexture = nil
++	}
++	if sf.curTextureOwner != nil {
++		sf.curTextureOwner.Release()
++		sf.curTextureOwner = nil
++	}
++	sf.Unlock()
++}
++
++// PresentMeasured excludes only the backend presentation call. Texture cleanup
++// and ownership release remain charged in the encompassing encoding interval.
++func (sf *Surface) PresentMeasured() int64 {
++	start := time.Now()
++	sf.surface.Present()
++	presentNS := time.Since(start).Nanoseconds()
++	sf.AbortCurrentTexture()
++	return presentNS
++}
++
++// A render texture has no surface acquisition or presentation wait.
++func (rt *RenderTexture) GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error) {
++	view, err := rt.GetCurrentTexture()
++	return view, 0, err
++}
++func (rt *RenderTexture) AbortCurrentTexture()   {}
++func (rt *RenderTexture) PresentMeasured() int64 { return 0 }
+--- /dev/null
++++ b/gpu/gpudraw/timing.go
+@@ -0,0 +1,27 @@
++package gpudraw
++
++import (
++	"cogentcore.org/core/system/composer"
++	"time"
++)
++
++// EndMeasured is the opt-in normal End path. No readback, queue wait or extra
++// draw is inserted. Acquisition and the present call remain explicit exclusions.
++func (dw *Drawer) EndMeasured() composer.ComposeTiming {
++	dw.Lock()
++	defer dw.Unlock()
++	timing := composer.ComposeTiming{Supported: true}
++	dw.lastOpN = len(dw.opList)
++	if dw.lastOpN == 0 {
++		timing.Failure = "no composition operations"
++		return timing
++	}
++	start := time.Now()
++	err := dw.drawAllMeasured(&timing)
++	timing.EncodeSubmitNS = time.Since(start).Nanoseconds() - timing.AcquireNS - timing.PresentCallNS
++	if err != nil {
++		timing.Failure = err.Error()
++	}
++	dw.opList = dw.opList[:0]
++	return timing
++}
+--- a/gpu/gpudraw/system.go
++++ b/gpu/gpudraw/system.go
+@@ -14,6 +14,7 @@
+ 	"cogentcore.org/core/base/slicesx"
+ 	"cogentcore.org/core/gpu"
+ 	"cogentcore.org/core/gpu/drawmatrix"
++	"cogentcore.org/core/system/composer"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ )
+ 
+@@ -108,7 +109,9 @@
+ 	img.SetFromGoImage(dimg, 0)
+ }
+ 
+-func (dw *Drawer) drawAll() error {
++func (dw *Drawer) drawAll() error { return dw.drawAllMeasured(nil) }
++
++func (dw *Drawer) drawAllMeasured(timing *composer.ComposeTiming) error {
+ 	sy := dw.System
+ 
+ 	vars := sy.Vars()
+@@ -120,7 +123,13 @@
+ 	tvr := errors.Log1(vars.VarByName(1, "TexSampler"))
+ 	tvr.SetCurrentValue(0)
+ 
+-	rp, err := sy.BeginRenderPass() // NoClear() // TODO: NoClear not working!
++	var rp *wgpu.RenderPassEncoder
++	var err error
++	if timing != nil {
++		rp, timing.AcquireNS, err = sy.BeginRenderPassMeasured()
++	} else {
++		rp, err = sy.BeginRenderPass()
++	}
+ 	if errors.Log(err) != nil {
+ 		return err
+ 	}
+@@ -157,6 +166,11 @@
+ 		pl.BindDrawIndexed(rp)
+ 	}
+ 	rp.End()
++	if timing != nil {
++		timing.PresentCallNS, err = sy.EndRenderPassMeasured(rp)
++		timing.Submitted = err == nil
++		return err
++	}
+ 	sy.EndRenderPass(rp)
+ 	return nil
+ }

@@ -1,0 +1,107 @@
+--- a/examples/loadedgrid/README.md
++++ b/examples/loadedgrid/README.md
+@@ -37,7 +37,10 @@
+ The separate release-only performance mode compares actual stored 10k/million
+ fixed/variable tables at ≥400 measured visible cells. Its bounded originating
+ scroll trace records same-ticket UI work phases, source callbacks, Go allocation
+-observations and process RSS. It excludes dataset generation and projection
++observations and end-only process RSS. External `ps` runs after the completed
++end record, outside measured native frames; baseline/warm process RSS and process
++CPU deltas are unavailable. The native post-warm Go heap snapshot remains.
++It excludes dataset generation and projection
+ building from warm UI work. See [the measurement contract](../../specs/grid-performance.md)
+ for the explicit five-run command, boundaries and unchanged P6 targets.
+ `-perf-novel` reports newly visited row strings separately from warm scrolling;
+--- a/scripts/benchmark-grid.py
++++ b/scripts/benchmark-grid.py
+@@ -171,7 +171,11 @@
+                         except (ValueError, UnicodeDecodeError): continue
+                         if isinstance(record, dict) and str(record.get("event", "")).startswith("grid.perf."):
+                             records.append(record)
+-                            if record["event"] in ("grid.perf.setup", "grid.perf.ready", "grid.perf.end"):
++                            # Pipe parsing can lag the child: even a setup-stage
++                            # observer could overlap measured native frames.
++                            # End is emitted after every measured sample, so no
++                            # external observer is spawned before completion.
++                            if record["event"] == "grid.perf.end":
+                                 try: observation = process_sample(process.pid)
+                                 except (OSError, subprocess.SubprocessError, ValueError) as error:
+                                     observation = {"unavailable": type(error).__name__}
+@@ -221,6 +225,9 @@
+                 failure = (failure + "; " if failure else "") + f"cleanup failed: {type(cleanup_error).__name__}"
+             outcome = {"argv": argv, "exit_code": returncode, "elapsed_seconds": time.monotonic() - started,
+                        "records": records, "process_observations": observations,
++                       "process_observation_scope": {"stages": ["grid.perf.end"],
++                           "baseline_rss": "unavailable", "warm_rss": "unavailable", "cpu_delta": "unavailable",
++                           "note": "External ps runs only after the completed end record; no external process observer runs during measured native frames."},
+                        "result": "FAILED" if failure else "PASS", "error": failure,
+                        "log_sha256": hashlib.sha256((directory / "native.log").read_bytes()).hexdigest()}
+             (directory / "result.json").write_text(json.dumps(outcome, indent=2) + "\n")
+@@ -278,7 +285,7 @@
+               "host": platform.platform(), "machine": platform.machine(), "machine_metadata": "machine.json",
+               "selected_inputs_before": source_before, "input_scope": "selected sources, not complete compiler/dependency closure", "runs": args.runs,
+               "samples_per_run": args.samples, "warmup": args.warmup, "novel": args.novel, "cases": {},
+-              "scope": "release actual widget routing/frame elapsed work; process-wide RSS/Go observations; native/GPU allocations and compositor presentation unavailable"}
++              "scope": "release actual widget routing/frame elapsed work; end-only process-wide RSS/CPU and staged Go observations; baseline/warm process RSS, process CPU deltas, native/GPU allocations and compositor presentation unavailable"}
+     try:
+         for variable in (False, True):
+             results = {}
+--- a/scripts/benchmark-grid_test.py
++++ b/scripts/benchmark-grid_test.py
+@@ -117,7 +117,7 @@
+         process = FakeProcess(payload)
+         with tempfile.TemporaryDirectory() as temp:
+             directory = Path(temp)/"run"
+-            with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}), mock.patch.object(benchmark, "terminate_owned_group") as kill:
++            with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group") as kill:
+                 try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5)
+                 except Exception as error: result = error
+             raw = (directory/"native.log").read_bytes()
+@@ -125,6 +125,7 @@
+             self.assertEqual(raw, payload)
+             self.assertEqual(launch.call_args.kwargs["bufsize"], 0)
+             self.assertTrue(launch.call_args.kwargs["start_new_session"])
++            observe.assert_called_once_with(process.pid)
+             return result, outcome
+ 
+     def test_chunked_pipe_exact_raw_transcript_and_terminal_samples(self):
+@@ -132,8 +133,19 @@
+         self.assertIsInstance(result, tuple)
+         self.assertEqual(len(result[0]), 120)
+         self.assertEqual(outcome["exit_code"], 0)
+-        self.assertEqual(len(outcome["process_observations"]), 3)
++        self.assertEqual(len(outcome["process_observations"]), 1)
+         self.assertEqual(outcome["result"], "PASS")
++
++    def test_setup_and_ready_validate_without_external_process_observers(self):
++        result, outcome = self.run_fixture(records())
++        self.assertIsInstance(result, tuple)
++        self.assertEqual([r["event"] for r in outcome["records"][:2]],
++                         ["grid.perf.setup", "grid.perf.ready"])
++        self.assertEqual([r["event"] for r in outcome["process_observations"]], ["grid.perf.end"])
++        self.assertEqual(outcome["process_observation_scope"]["warm_rss"], "unavailable")
++        self.assertEqual(outcome["process_observation_scope"]["baseline_rss"], "unavailable")
++        self.assertEqual(outcome["process_observation_scope"]["cpu_delta"], "unavailable")
++        self.assertEqual(len(result[0]), 120)
+ 
+     def test_timeout_retires_group_even_after_direct_child_exit(self):
+         reader, writer = os.pipe()
+--- a/specs/grid-performance.md
++++ b/specs/grid-performance.md
+@@ -88,9 +88,13 @@
+ and after measurement plus an explicit GC. These GC calls are outside measured
+ frames. The mount/warm delta includes Go caches and measurement state; it cannot
+ be attributed solely to retained controls. Native/GPU allocation attribution is
+-unknown. Host `ps` RSS and aggregate CPU samples are process-wide observations,
+-with their finite CPU accounting quantum retained. No subtraction of logical
+-data bytes from RSS pretends to measure private UI bytes.
++unknown. Host `ps` runs only after the completed end record, outside measured
++native frames. Its end-only RSS and aggregate CPU sample are process-wide
++observations, with the finite CPU accounting quantum retained. Baseline/warm
++process RSS and process CPU deltas are unavailable; the native post-warm Go heap
++snapshot remains. Setup/ready records still validate the workload, but never
++spawn an external process observer. No subtraction of logical data bytes from
++RSS pretends to measure private UI bytes.
+ 
+ ## Reproducibility and results
+ 

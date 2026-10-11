@@ -1,0 +1,41 @@
+{"argv": ["/bin/zsh", "-c", "export VELLUM_CACHE_DIR=/tmp/vellum-p0-cache\n. /private/tmp/vellum-large-data/drivers/cogent/env.sh\nexec go test -race -count=3 -v -run '^TestPerf' ./..."], "cwd": "/private/tmp/vellum-large-data/examples/loadedgrid"}
+# github.com/dshills/vellum/examples/loadedgrid.test
+ld: warning: ignoring duplicate libraries: '-lobjc'
+=== RUN   TestPerfProfileWriterBudgetAndStickyFailure
+--- PASS: TestPerfProfileWriterBudgetAndStickyFailure (0.00s)
+=== RUN   TestPerfProfileExclusiveAdmissionAndDisabled
+--- PASS: TestPerfProfileExclusiveAdmissionAndDisabled (0.00s)
+=== RUN   TestPerfConfigAndClosedWarmTrajectory
+--- PASS: TestPerfConfigAndClosedWarmTrajectory (0.00s)
+=== RUN   TestPerfVariableRowsUseStoredSourceAndExactIndex
+--- PASS: TestPerfVariableRowsUseStoredSourceAndExactIndex (0.00s)
+=== RUN   TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal
+--- PASS: TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal (0.01s)
+=== RUN   TestPerfSourceCounterOverflowRefuses
+--- PASS: TestPerfSourceCounterOverflowRefuses (0.00s)
+=== RUN   TestPerfProfileWriterBudgetAndStickyFailure
+--- PASS: TestPerfProfileWriterBudgetAndStickyFailure (0.00s)
+=== RUN   TestPerfProfileExclusiveAdmissionAndDisabled
+--- PASS: TestPerfProfileExclusiveAdmissionAndDisabled (0.00s)
+=== RUN   TestPerfConfigAndClosedWarmTrajectory
+--- PASS: TestPerfConfigAndClosedWarmTrajectory (0.00s)
+=== RUN   TestPerfVariableRowsUseStoredSourceAndExactIndex
+--- PASS: TestPerfVariableRowsUseStoredSourceAndExactIndex (0.00s)
+=== RUN   TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal
+--- PASS: TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal (0.01s)
+=== RUN   TestPerfSourceCounterOverflowRefuses
+--- PASS: TestPerfSourceCounterOverflowRefuses (0.00s)
+=== RUN   TestPerfProfileWriterBudgetAndStickyFailure
+--- PASS: TestPerfProfileWriterBudgetAndStickyFailure (0.00s)
+=== RUN   TestPerfProfileExclusiveAdmissionAndDisabled
+--- PASS: TestPerfProfileExclusiveAdmissionAndDisabled (0.00s)
+=== RUN   TestPerfConfigAndClosedWarmTrajectory
+--- PASS: TestPerfConfigAndClosedWarmTrajectory (0.00s)
+=== RUN   TestPerfVariableRowsUseStoredSourceAndExactIndex
+--- PASS: TestPerfVariableRowsUseStoredSourceAndExactIndex (0.00s)
+=== RUN   TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal
+--- PASS: TestPerfGeometryCountsRenderedClipsAndIgnoresDomainOrdinal (0.01s)
+=== RUN   TestPerfSourceCounterOverflowRefuses
+--- PASS: TestPerfSourceCounterOverflowRefuses (0.00s)
+PASS
+ok  	github.com/dshills/vellum/examples/loadedgrid	1.665s

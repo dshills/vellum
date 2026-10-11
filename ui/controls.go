@@ -59,7 +59,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, Tabs:
+	case Button, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs:
 		return true
 	}
 	return false
@@ -88,6 +88,17 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind == DataTree {
+		if n.Tree == nil {
+			return fmt.Errorf("ui: data tree requires an Outline")
+		}
+		if _, err := n.Tree.State(); err != nil {
+			return fmt.Errorf("ui: invalid outline: %w", err)
+		}
+	} else if n.Tree != nil || n.TreeChange != nil || n.TreeDisclosure != nil {
+		return fmt.Errorf("ui: Tree/TreeChange/TreeDisclosure belong only on data trees")
+	}
+
 	if n.Kind == DataGrid {
 		if n.Grid == nil {
 			return fmt.Errorf("ui: data grid requires a Grid")

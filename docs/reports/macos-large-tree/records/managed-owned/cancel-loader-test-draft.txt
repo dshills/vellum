@@ -1,0 +1,30 @@
+func TestActualCancelInitialLoaderBeforeWorker(t *testing.T) {
+ for _, batch := range []int{1, 7, 64} {
+  t.Run(fmt.Sprintf("batch-%d", batch), func(t *testing.T) {
+   p, m, ex := manualFixture(t, batch)
+   press(t,m,batch,"large","load")
+   ids := ex.PendingIDs()
+   if len(ids)!=1 { t.Fatal("initial load did not remain explicit",ids) }
+   var token uint64
+   if e := owned(p,func()error { token=p.loadToken; if p.loadTask==nil { t.Fatal("missing admitted loader") }; return nil }); e!=nil { t.Fatal(e) }
+   press(t,m,batch,"small","cancel")
+   if e := owned(p,func()error {
+    if p.loadTask!=nil || p.loadToken==token || p.loader.Pending().Active!=1 { t.Fatal("Cancel load did not revoke latest token while retaining worker credit",p.loadToken,p.loader.Pending()) }
+    for _,w:= range p.windows { s,e:=w.outline.State(); if e!=nil {return e}; if s.Stamp.Nodes!=0 || s.Pending || w.request!=(virtual.OutlineRequest{}) || w.task!=nil {t.Fatal("canceled initial load changed window",w.id,s)} }
+    return nil
+   }); e!=nil {t.Fatal(e)}
+   work(t,ex,ids[0],m,batch)
+   if e:=owned(p,func()error {
+    if !p.loader.Pending().Idle() || p.base[0]!=nil || p.base[1]!=nil {t.Fatal("canceled loader published or retained terminal credit",p.loader.Pending())}
+    return nil
+   }); e!=nil {t.Fatal(e)}
+   if len(ex.PendingIDs())!=0 {t.Fatal("canceled loader admitted child workers")}
+   press(t,m,batch,"large","load")
+   work(t,ex,ex.PendingIDs()[0],m,batch)
+   ids=ex.PendingIDs()
+   if len(ids)!=2 {t.Fatal("load retry did not admit independent indexes",ids)}
+   for _, id:=range ids {work(t,ex,id,m,batch)}
+   if treeInspect(t,p.windows[1]).TotalNodes!=maxNodes || !p.loader.Pending().Idle() {t.Fatal("load retry failed after canceled credit retirement")}
+  })
+ }
+}
