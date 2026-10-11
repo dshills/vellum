@@ -1,0 +1,90 @@
+{
+  "parent_commit": "97f99cad5d562fa13212e3e14dd32b6e0a1ca9a2",
+  "host": "macOS26.6.2 darwin/arm64 AppleM4Pro",
+  "go_version": "go version go1.27.2 darwin/arm64",
+  "checks": [
+    {
+      "command": "VELLUM_CACHE_DIR=/tmp/vellum-p0-cache ./drivers/cogent/prepare.sh",
+      "exit_code": 0,
+      "log": "prepare.log"
+    },
+    {
+      "cwd": "drivers/cogent/build/upstream",
+      "command": "go test -race ./system/driver/base -run TestVellumQuitClean -count=20",
+      "exit_code": 0,
+      "log": "quit-race.log"
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go test -race . -run 'TestGPU(Tracked|FrameHelper|ProgramMount|ClosedAdapter|CallbackLease|InputPropagates)' -count=5",
+      "exit_code": 0,
+      "log": "focused-race.log"
+    },
+    {
+      "command": "./scripts/check.sh",
+      "exit_code": 0,
+      "log": "check.log",
+      "scope": "89 Python checks; root/native/backend/hello/drawing/viewport3d/SDK race tests, vet and builds. Later smoke-only resize changes verified by affected module checks below."
+    },
+    {
+      "cwd": "drivers/cogent",
+      "command": "go test -race ./...; go vet ./...",
+      "exit_code": 0,
+      "logs": [
+        "affected-driver-tests.log",
+        "affected-driver-vet.log"
+      ],
+      "scope": "Affected full native-driver checks after the Prism input correction."
+    },
+    {
+      "cwd": "examples/viewport3d",
+      "command": "go test -race ./...; go vet ./...; go build -race -o /private/tmp/vellum-viewport3d-race .",
+      "exit_code": 0,
+      "logs": [
+        "viewport-tests.log",
+        "viewport-vet.log",
+        "viewport-build.log"
+      ]
+    },
+    {
+      "command": "/private/tmp/vellum-viewport3d-race -smoke",
+      "exit_code": 0,
+      "logs": [
+        "viewport-native.json",
+        "viewport-native.log"
+      ],
+      "binary_sha256": "6ffb43a0aa296f1d6e6d5fceac43fab77d57cd07785d123d14a7fdcbe6277690"
+    },
+    {
+      "command": "go build -race -o /private/tmp/vellum-drawing-gpu-regression .; /private/tmp/vellum-drawing-gpu-regression -smoke",
+      "cwd": "examples/drawing",
+      "exit_code": 0,
+      "logs": [
+        "drawing-build.log",
+        "drawing-native.json",
+        "drawing-native.log"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "drivers/cogent/gpu_resources.go": "48bc102774acd8245ba7204263c19df64aa0334d0b5880e0d45e0f036b3b2ee1",
+    "drivers/cogent/gpu_view.go": "2afa612676107f4ddf279933e22c77a920082e5fe0c3d3f3e4ceb91f811732c7",
+    "drivers/cogent/gpu_view_test.go": "f731e748a2519d6a45fd389107e788a6f1448e8491b16f3205e5fa44671376d3",
+    "drivers/cogent/native/dependencies.json": "c7587d50949e24bce6dc61beb0352abf9678a0d2311cc17461715b7975ebbe51",
+    "drivers/cogent/native/patches/quit/0023-concurrent-window-quit.patch": "74e2822221d9f00db66339659ae7def402c28eb6e2a984ee4c5d79014ff5f796",
+    "drivers/cogent/native/patches/quit/original-hashes.json": "e63ed5f1f9ed471cc38769a650692f84429cc38e8e920a661368a442af94073d",
+    "drivers/cogent/native/patches/quit/output-hashes.json": "445849c7480afa41c996ee9a860f89018ffad82d4d6374a5398531aa3ce1b8bc",
+    "drivers/cogent/prepare_test.py": "8ae8d4f2302906d7869d05f543296be78daa5bdfb13e07abf8b00ffdf6718b3a",
+    "examples/viewport3d/README.md": "af55fcd180206a88efdf96e1cfa2a6b617a5a689aec2c6bb77778e878c80a7a0",
+    "examples/viewport3d/cube.wgsl": "17a2059d4fa70866fd7590af0cdc925e013095103600bde639397d0a803b497e",
+    "examples/viewport3d/go.mod": "7a5c111648dfcb3375ad34c16e9571ffa23de3c317dff96c5b8c310bbded3ec6",
+    "examples/viewport3d/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/viewport3d/main.go": "02dbf0dfc1da7037db9c8c8b1ce80b57b71fc30240be065d2b7187d95936434f",
+    "examples/viewport3d/model.go": "ce6dbf1d6a051dbb3569b77738b4b9f758877ad947d1f450e73391290d80adcc",
+    "examples/viewport3d/model_test.go": "c5343c7d5339f2794f1ea2c9044917c3247987973abf8120ea4f5cee631ca59a",
+    "examples/viewport3d/smoke.go": "8d18e3d265ee044c1cc271ba338a910c41c485d14fbb18dc06a9881b74f3f9b8",
+    "scripts/check-example.sh": "cf4930bad7543c5d9096accce97a64d754ef8c041e23452e422c34acfed8e584",
+    "scripts/check.sh": "a43df5fe58d9ca1732af61e4a1b227944968aeb5970f42c6a81aa62299121a0b"
+  },
+  "scope": "Bounded native advanced-GPU API and 3D depth/lifetime acceptance; full Mac/P4 qualification remains open."
+}

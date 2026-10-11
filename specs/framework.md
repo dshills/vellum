@@ -81,7 +81,10 @@ adds immutable arbitrary indexed 2D meshes, strokes, waveform reduction and a
 rectangle spatial index through the shared-device `MeshCanvas` adapter.
 [Retained images](images.md) add immutable RGBA tiles, changed-tile uploads and
 nearest/linear filtering in that adapter, including image-only canvases.
-Arbitrary shaders, 3D/compute qualification and automatic
+[Advanced GPU views](advanced-gpu.md) expose a versioned shared-device context,
+ordered preparation and custom shader/draw callbacks, retained targets and optional
+depth. An independent 3D viewport exercises camera-only uploads and native depth
+pixels. Compute/float-target/asynchronous-readback qualification and automatic
 physical-device recreation remain future work.
 Demand painting, live resource rebuilding and actionable device-loss shutdown are
 implemented; see [rendering](rendering.md). Runtime verification

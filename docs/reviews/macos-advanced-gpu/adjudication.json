@@ -1,0 +1,29 @@
+{
+  "reviewer": "internal agent /root/mac_history_review",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "findings": [
+    {
+      "id": "bd80cae5e5f7cf6e",
+      "decision": "confirmed and fixed",
+      "reason": "Input returns a consumed bool; nil/false keys and scrolling propagate. Actual KeyChord/Scroll tests pass five race repetitions and affected native-driver/consumer/native acceptance pass."
+    },
+    {
+      "id": "dcfa4bbe40fd3ca7",
+      "decision": "refuted",
+      "reason": "The chrome callback and all smoke model/camera mutations run inside owner(a,...), which calls Application.Do. Driver View and button callbacks and GPU Prepare/Draw use the same serialized owner."
+    },
+    {
+      "id": "028cac6661c3be48",
+      "decision": "refuted",
+      "reason": "Every resource-generation change goes through reset, invoking captured release before another Prepare. Cube release releases/nils group and pipeline including partial initialization. Resize changes target generation only and intentionally retains program resources."
+    },
+    {
+      "id": "98acbec588c108fd",
+      "decision": "physical-retention limitation clarified; proposed Destroy rejected",
+      "reason": "Budget estimates current framework-owned helper handles and checks old+new replacement peak, requiring program reference retirement. In-flight encoder/queue/native references and driver high-water are explicitly excluded. Destroy before submitting valid preparation commands could invalidate them."
+    }
+  ],
+  "final_delta_findings": 0,
+  "broad_unchanged_review_repeated": false
+}

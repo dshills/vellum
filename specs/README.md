@@ -17,6 +17,7 @@
 - [macOS completion](macos-completion.md): remaining framework and target acceptance work.
 - [Retained GPU drawing](drawing.md): immutable meshes, strokes, waveform reduction, indexed culling and resource accounting.
 - [Retained image drawing](images.md): immutable tile patches, native texture retention and alpha-safe filtering.
+- [Advanced GPU views](advanced-gpu.md): versioned shared-device contexts, custom shaders, retained 3D/depth and scoped resource helpers.
 - [Rendering](rendering.md): demand painting, resource lifetimes and device loss.
 - [Platform support](platform-support.md): Windows/Linux services and target gates.
 - [Release artifacts](release.md): alpha API, private SDK integrity and packaging.

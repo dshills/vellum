@@ -120,3 +120,12 @@ independent upload baselines, retention, removal, rebuild and resize. See
 [image contract](../specs/images.md) and [evidence](reports/macos-images/README.md).
 The source patch benchmark measures portable allocation/work only; sustained
 GPU/frame/input and broader Mac/P4 acceptance remain open.
+
+Advanced GPU views expose the window's shared device/queue, ordered preparation
+and custom draw callbacks, optional four-sample depth and scoped tracked resource
+helpers. The independent 3D viewport provides orbit/dolly controls and native
+depth, retention, fault repair, resize and closure evidence. The shutdown check
+exposed and fixed concurrent removal during backend quit through reproducible
+patch 23. See [contract](../specs/advanced-gpu.md) and
+[evidence](reports/macos-advanced-gpu/README.md). Compute, float presentation,
+asynchronous readback and broader P4/Mac qualification remain open.

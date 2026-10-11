@@ -166,6 +166,17 @@
               "sha256": "e3fc27c44cbb06b420b8d8a35bbaa77a23628fc288f96e42e060f064e0acf648"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/quit",
+          "inputs": "native/patches/quit/original-hashes.json",
+          "outputs": "native/patches/quit/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/quit/0023-concurrent-window-quit.patch",
+              "sha256": "74e2822221d9f00db66339659ae7def402c28eb6e2a984ee4c5d79014ff5f796"
+            }
+          ]
         }
       ]
     },

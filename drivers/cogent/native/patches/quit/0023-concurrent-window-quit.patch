@@ -1,0 +1,118 @@
+--- a/system/driver/base/app_multi.go
++++ b/system/driver/base/app_multi.go
+@@ -117,17 +117,22 @@
+ 
+ func (a *AppMulti[W]) QuitClean() bool {
+ 	a.Mu.Lock()
+-	defer a.Mu.Unlock()
+-	for _, qf := range a.QuitCleanFuncs {
++	callbacks := slices.Clone(a.QuitCleanFuncs)
++	a.Mu.Unlock()
++	for _, qf := range callbacks {
+ 		qf()
+ 	}
+-	nwin := len(a.Windows)
+-	for i := nwin - 1; i >= 0; i-- {
+-		win := a.Windows[i]
+-		// CloseReq calls RemoveWindow, which also Locks, so we must Unlock
++	a.Mu.Lock()
++	windows := slices.Clone(a.Windows)
++	a.Mu.Unlock()
++	for i := len(windows) - 1; i >= 0; i-- {
++		win := windows[i]
++		a.Mu.Lock()
++		present := slices.ContainsFunc(a.Windows, func(candidate W) bool { return system.Window(candidate) == system.Window(win) })
+ 		a.Mu.Unlock()
+-		win.CloseReq()
+-		a.Mu.Lock()
++		if present {
++			win.CloseReq()
++		}
+ 	}
+-	return len(a.Windows) == 0
++	return a.NWindows() == 0
+ }
+--- /dev/null
++++ b/system/driver/base/app_multi_vellum_quit_test.go
+@@ -0,0 +1,81 @@
++package base
++
++import (
++	"cogentcore.org/core/system"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++type vellumQuitWindow struct {
++	system.Window
++	closeReq func()
++	calls    atomic.Int32
++}
++
++func (w *vellumQuitWindow) CloseReq() {
++	w.calls.Add(1)
++	if w.closeReq != nil {
++		w.closeReq()
++	}
++}
++func TestVellumQuitCleanConcurrentRemoval(t *testing.T) {
++	a := &AppMulti[*vellumQuitWindow]{}
++	first, last := &vellumQuitWindow{}, &vellumQuitWindow{}
++	a.Windows = []*vellumQuitWindow{first, last}
++	entered, release := make(chan struct{}), make(chan struct{})
++	last.closeReq = func() { close(entered); <-release; a.RemoveWindow(last) }
++	done := make(chan bool, 1)
++	go func() { done <- a.QuitClean() }()
++	select {
++	case <-entered:
++	case <-time.After(time.Second):
++		t.Fatal("CloseReq not reached")
++	}
++	a.RemoveWindow(first)
++	close(release)
++	select {
++	case clean := <-done:
++		if !clean {
++			t.Fatal("removed windows survived quit")
++		}
++	case <-time.After(time.Second):
++		t.Fatal("quit/remove deadlock")
++	}
++	if first.calls.Load() != 0 || last.calls.Load() != 1 {
++		t.Fatal("removed window requested or duplicate request")
++	}
++}
++func TestVellumQuitCleanVetoAndNewWindows(t *testing.T) {
++	a := &AppMulti[*vellumQuitWindow]{}
++	first, last, added := &vellumQuitWindow{}, &vellumQuitWindow{}, &vellumQuitWindow{}
++	a.Windows = []*vellumQuitWindow{first, last}
++	last.closeReq = func() { a.RemoveWindow(last); a.Mu.Lock(); a.Windows = append(a.Windows, added); a.Mu.Unlock() }
++	if a.QuitClean() {
++		t.Fatal("veto/new window incorrectly reported clean")
++	}
++	if first.calls.Load() != 1 || last.calls.Load() != 1 || added.calls.Load() != 0 || a.NWindows() != 2 {
++		t.Fatal("quit snapshot semantics")
++	}
++}
++func TestVellumQuitCleanCallbacksMayInspectAndRemove(t *testing.T) {
++	a := &AppMulti[*vellumQuitWindow]{}
++	w := &vellumQuitWindow{}
++	a.Windows = []*vellumQuitWindow{w}
++	a.QuitCleanFuncs = []func(){func() {
++		if a.NWindows() != 1 {
++			t.Error("callback lost window")
++		}
++		a.RemoveWindow(w)
++	}}
++	done := make(chan bool, 1)
++	go func() { done <- a.QuitClean() }()
++	select {
++	case clean := <-done:
++		if !clean || w.calls.Load() != 0 {
++			t.Fatal("callback removal ignored")
++		}
++	case <-time.After(time.Second):
++		t.Fatal("quit callback held app mutex")
++	}
++}

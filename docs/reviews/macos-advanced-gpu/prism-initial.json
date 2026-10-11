@@ -1,0 +1,183 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "84f87c854082abab4b81ffc9956619fe",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "97f99cad5d562fa13212e3e14dd32b6e0a1ca9a2",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "98acbec588c108fd",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Budget accounting released before GPU memory is actually freed",
+      "message": "Budget bytes are decremented as soon as the handle is Released. Release only drops the Go reference. Memory is not freed until the native object is destroyed. Command buffers or bind groups that are still in flight can keep it alive, and a missed Release leaves it live indefinitely. The same pattern applies to buffer replacement, Drop, and release(). The budget can therefore understate real GPU usage, and the old+new peak that replacement is meant to admit is not actually enforced. This is a risk if the program-owned bind group has not been retired yet.",
+      "suggestion": "Call Destroy() on replaced or dropped buffers and textures before Release, so memory is reclaimed deterministically. Alternatively, defer the budget decrement until the frame's queue work is known to be complete.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/gpu_resources.go",
+          "lines": {
+            "start": 173,
+            "end": 174
+          }
+        }
+      ],
+      "tags": [
+        "gpu",
+        "resource-accounting",
+        "lifetime",
+        "location-corrected"
+      ],
+      "evidence": "\t\told.handle.Release()\n\t\tp.stats.TextureBytes -= old.bytes",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "bd80cae5e5f7cf6e",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Key chord and scroll handlers swallow all input, breaking focus navigation and shortcuts",
+      "message": "The KeyChord handler is registered with OnFirst and its dispatch helper calls e.SetHandled() unconditionally. Every key chord on a focused GPU view is therefore consumed, even when g.Input is nil. This blocks Tab focus traversal, Escape, window shortcuts and other default handling. The same applies to Scroll, which is marked handled even if the program does not use it, so it no longer reaches an enclosing scroll container.",
+      "suggestion": "Only mark the event handled when the view actually consumes it, e.g. when g.Input != nil. Let navigation keys such as Tab and Escape, and unrelated chords, propagate. Alternatively use OnKeyChord rather than OnFirst so that other handlers get a chance first.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "drivers/cogent/gpu_view.go",
+          "lines": {
+            "start": 183,
+            "end": 183
+          }
+        }
+      ],
+      "tags": [
+        "events",
+        "input",
+        "focus",
+        "location-corrected"
+      ],
+      "evidence": "w.OnFirst(events.KeyChord, func(e events.Event) { dispatch(e, func() GPUInput { return GPUInput{Key: string(e.KeyChord())} }) })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "dcfa4bbe40fd3ca7",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unsynchronized shared `status` written from smoke goroutine",
+      "message": "The callback writes `status` from the smoke goroutine, while the View closure reads it from the UI/render thread. There is no synchronization, so this is a data race, and the same applies to `m.camera` being mutated from other goroutines. `go test -race` or a race-enabled smoke run may flag it.",
+      "suggestion": "Guard `status` with a mutex or atomic.Value, or marshal the update onto the UI thread via the app's dispatch mechanism before calling Invalidate.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/viewport3d/main.go",
+          "lines": {
+            "start": 95,
+            "end": 95
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "concurrency",
+        "location-corrected"
+      ],
+      "evidence": "result \u003c- viewportSmoke(ctx, a, g, other, m, otherModel, nativeErrors, func() { status = \"Chrome remains responsive\" })",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "028cac6661c3be48",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Previous pipeline and bind group leaked when rebuilt",
+      "message": "When the pipeline is rebuilt (new resource generation, or a retry after a partial failure), `m.pipeline` and `m.group` are overwritten without releasing the previous objects. Each device-loss or resize that bumps ResourceGeneration therefore leaks GPU objects. This matters especially in an example that checks resource accounting.",
+      "suggestion": "Release and nil the existing bind group and pipeline before recreating them. Do not call `m.release()` directly if the `releases` counter is asserted elsewhere.",
+      "confidence": 0.6,
+      "locations": [
+        {
+          "path": "examples/viewport3d/model.go",
+          "lines": {
+            "start": 110,
+            "end": 112
+          }
+        }
+      ],
+      "tags": [
+        "resource-leak",
+        "gpu",
+        "location-corrected"
+      ],
+      "evidence": "if m.pipeline == nil || m.generation != f.ResourceGeneration {\n\t\tv, i := cube()\n\t\tvar err error",
+      "fix": {
+        "before": "if m.pipeline == nil || m.generation != f.ResourceGeneration {\n\t\tv, i := cube()\n\t\tvar err error",
+        "after": "if m.pipeline == nil || m.generation != f.ResourceGeneration {\n\t\tif m.group != nil {\n\t\t\tm.group.Release()\n\t\t\tm.group = nil\n\t\t}\n\t\tif m.pipeline != nil {\n\t\t\tm.pipeline.Release()\n\t\t\tm.pipeline = nil\n\t\t}\n\t\tv, i := cube()\n\t\tvar err error"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 101362,
+    "totalMs": 43447
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 37,
+    "bytes": 125624,
+    "chunks": 7,
+    "llmCalls": 11,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 100093,
+        "output": 13177,
+        "costUSD": 0.33195600000000003
+      }
+    ],
+    "widenedFiles": 3,
+    "excluded": [],
+    "confirm": {
+      "reviewer": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "checked": 4,
+      "refuted": 0
+    },
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
