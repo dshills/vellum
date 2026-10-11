@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "result": "REFUTED_NO_CHANGE",
+  "created_utc": "2026-10-11T09:28:13.612799+00:00",
+  "scope": "Independent source-bound adjudication of one conditional targeted Prism finding. Read-only, no code/test/GUI/Prism/Git changes.",
+  "prism": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-integration/prism-correction.json",
+    "sha256": "7a049e7bf6070f06626a5c86c4c5bae2b8455bf342056775f822618bd944f661",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 4,
+      "bytes": 29252,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 15975,
+          "output": 1924,
+          "costUSD": 0.05119
+        }
+      ],
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    }
+  },
+  "finding_id": "9d5b020c58d16e15",
+  "reviewed_source_hashes": {
+    "drivers/cogent/manual_offscreen.go": "9594a8afb8d8d97a91b5a06f666c445f159c520121ccb4909490fddfbeb330af",
+    "drivers/cogent/grid_offscreen_test.go": "2d7825b37e31726c63cefb07dd874557418609513f23129f6e29ee16e758b5b4"
+  },
+  "rationale": [
+    "Manual.Close calls enter(ctx,true), whose cleanup mode intentionally bypasses closed/application-lifetime rejection (manual_offscreen.go231-260). The noncancelled testContext and sequential calls admit cleanup; Close then returns nil immediately for closed=true (919-926).",
+    "A successful first Close sets closed and releases only its own process-wide active claim (935-942). The later cleanup call returns before touching any active successor, native window or owner.",
+    "NewManual claims the single process-wide active application before construction (147-179). The source-size test creates two Manual applications in one parent loop. Explicit Close after each iteration (grid_offscreen_test.go332) is necessary to release the first claim before the next NewManual; parent t.Cleanup callbacks run only after the whole test, so replacing explicit Close with cleanup would break the second iteration.",
+    "gridManual registers t.Cleanup (89-94) to close on early assertion exits. On successful iterations, its later sequential idempotent Close is deliberate. Existing full driver race gates execute this exact two-source loop and all cleanup callbacks; current correction does not change these semantics."
+  ],
+  "source_refs": [
+    {
+      "file": "drivers/cogent/manual_offscreen.go",
+      "lines": [
+        147,
+        174,
+        231,
+        242,
+        919,
+        925,
+        935,
+        939
+      ]
+    },
+    {
+      "file": "drivers/cogent/grid_offscreen_test.go",
+      "lines": [
+        89,
+        307,
+        332
+      ]
+    }
+  ],
+  "findings": [],
+  "limits": [
+    "Idempotence described for sequential Close with a valid noncancelled context; concurrent or canceled-context calls retain explicit admission/error contracts.",
+    "No new tests are needed to resolve the false conditional premise; no broader lifecycle changes."
+  ]
+}

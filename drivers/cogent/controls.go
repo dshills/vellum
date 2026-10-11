@@ -46,6 +46,7 @@ type controlState struct {
 	client            uint64
 	textEpoch         uint64
 	editor            *editorBinding
+	grid              *gridBinding
 	fieldState        *core.TextFieldEditingState
 	fieldSelection    *editor.Selection
 	fieldNativeActive atomic.Bool           // native acceptance snapshot; focus callbacks may run outside the application owner
@@ -88,6 +89,19 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	c := &controlState{a: a, window: window}
 	r.control = c
 	var widget core.Widget
+	gridReturned := false
+	defer func() {
+		// A source callback can panic or Goexit after registry admission but
+		// before reconcile owns this record. Retire admission first even if
+		// private widget deletion itself has an abnormal return. Do not recover
+		// the caller's panic/Goexit or alter its portable Grid state.
+		if !gridReturned && c.grid != nil {
+			disposeGrid(r)
+			if host := c.grid.host; !tree.IsNil(host) {
+				host.AsTree().Delete()
+			}
+		}
+	}()
 	switch r.node.Kind {
 	case ui.Checkbox:
 		widget = core.NewSwitch(parent).SetType(core.SwitchCheckbox)
@@ -114,6 +128,12 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			return true
 		})
 		widget = field
+	case ui.DataGrid:
+		var err error
+		widget, err = mountGrid(parent, r, a, window)
+		if err != nil {
+			return nil, true, err
+		}
 	case ui.MultilineText:
 		c.client = textClientID.Add(1)
 		widget = mountEditor(parent, r)
@@ -144,6 +164,10 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	if err := syncControl(r, ui.Node{}); err != nil {
 		return nil, true, err
 	}
+	if c.grid != nil && !c.grid.live() {
+		return nil, true, ErrGridClosed
+	}
+	gridReturned = true
 	return widget, true, nil
 }
 
@@ -274,6 +298,15 @@ func syncControl(r *record, previous ui.Node) error {
 	committed := r.control.committed || restoring
 	r.control.committed = false
 	r.control.restore = false
+	if r.node.Kind == ui.DataGrid {
+		if refused != nil {
+			r.widget.AsTree().SetProperty("vellum.control-error", *refused)
+			if r.control.onError != nil {
+				r.control.onError(*refused)
+			}
+		}
+		return syncGrid(r)
+	}
 	switch w := r.widget.(type) {
 	case *core.Switch:
 		w.SetText(html.EscapeString(r.node.Text)).SetChecked(r.node.Checked)
@@ -422,6 +455,9 @@ func childHost(r *record, id string) tree.Node {
 	return r.widget
 }
 func finishControl(r *record, n ui.Node) {
+	if r.control != nil && r.control.grid != nil {
+		r.control.grid.previous = nil
+	}
 	if r.control == nil || r.control.tabs == nil {
 		return
 	}
@@ -578,6 +614,7 @@ func disposeControl(r *record) {
 			field.SetNativeEditingListener(nil)
 		}
 		disposeEditor(r)
+		disposeGrid(r)
 	}
 	if r.control != nil && r.control.dialog != nil {
 		closeDialog(r)

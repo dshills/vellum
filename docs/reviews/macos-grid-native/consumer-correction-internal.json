@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "result": "APPROVED_SOURCE_PENDING_FINAL_AFFECTED_QUALIFICATION",
+  "created_utc": "2026-10-11T07:14:38.103908+00:00",
+  "scope": "Only frozen four-file consumer correction delta after actual desktop fixture failure; earlier ten-file consumer/wiring review retained. Independent new portable and actual offscreen status tests; no GUI/Git/Prism/canonical edits.",
+  "source_root": "/private/tmp/vellum-p6-example/examples/grid",
+  "approved_source_hashes": {
+    "LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+    "README.md": "94a671a731a8e42fdd372da6e7a0bcf70e6bac549101ad6f3d72e8cf72a41b9a",
+    "go.mod": "a8783fc2baadfacb99cfe32918cbd292a53d24f956ae7f16a7951eda8da91309",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "main.go": "148f5037c04c960eecf0bb5025174f9ed112a63e1b7aba14ff991553a8849c3d",
+    "managed_test.go": "be399d22ab8b39190a5fcc5c14bd60d9a1b328f3dae142d0c43dc76bda203d43",
+    "model.go": "b1d57ec4912b1b383cc6369a5009e5ef0dd11d5e6c8eb01e7ca72d0e7437180d",
+    "model_test.go": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa",
+    "smoke.go": "0e47902579189376594f640151f35f60f302fbb0de77da4d8b3221c31c596f95",
+    "source.go": "fc94075d4d7e6587ecdcd88459917645108e7a0a3d205d95e61dc77444e1545e"
+  },
+  "changed_source_hashes": {
+    "managed_test.go": {
+      "after": "be399d22ab8b39190a5fcc5c14bd60d9a1b328f3dae142d0c43dc76bda203d43",
+      "before": "53de861ea26916aa208d975a66fb6e516b7d28676742c8b868686e4387bbf267"
+    },
+    "model.go": {
+      "after": "b1d57ec4912b1b383cc6369a5009e5ef0dd11d5e6c8eb01e7ca72d0e7437180d",
+      "before": "174161f20ec96d0c30d077fe3c5992a4d0f4f725011d11a54855c7b9bc6549a6"
+    },
+    "model_test.go": {
+      "after": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa",
+      "before": "030ecf9e195589cb2eacdb8fde7eca081804d3af4c64f2956892731e298805ee"
+    },
+    "smoke.go": {
+      "after": "0e47902579189376594f640151f35f60f302fbb0de77da4d8b3221c31c596f95",
+      "before": "34e0973617aa97a13f62f2da980bb593a7d510f6248cb3bcea77a51539f3a2b9"
+    }
+  },
+  "original_source_review": {
+    "path": "/private/tmp/vellum-p6-grid-native-review/consumer-source-review-v2.json",
+    "sha256": "3a3b6fbb4a9f678b4e7265c5e47deb2f12fe9b3f0323cb79456a594f8cf95136"
+  },
+  "delta": {
+    "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/correction-v4/source-delta.json",
+    "sha256": "90b0247799c31ba890b51e3520ac89039d96db0f708ea6992f22b25e3ab8eda1",
+    "diff_path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/correction-v4/source.diff",
+    "diff_sha256": "4fce103339990502d5926a8ba6aaff8c5f4308c50772e1371c4ab6ed85eb0b03"
+  },
+  "historical_preservation": {
+    "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/history-v3/preservation.json",
+    "sha256": "4ae53ef3873a7e328dfcbd4ef7f913cec4509970c12e71fa6684bc9394434c2a",
+    "desktop_failure": {
+      "copy_path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/history-v3/grid-desktop-smoke-failed.log",
+      "log_sha256": "d4d206a8a45ff1df3c554cfa6c261a4315834fc1a1b5e8c63df2ba9c282f66ad",
+      "original_log": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-integration/qualified-v4-final/grid-desktop-smoke.log",
+      "result": "FAIL",
+      "stage": "projection lost stable selected identity after ready/far-both-axes"
+    },
+    "classification": "CPU v3 PASS and actual desktop smoke FAIL preserved separately. Old measured-active assertion conflated stable selection with viewport visibility."
+  },
+  "source_judgments": [
+    "Smoke now checks exact owner-held stable Active and new Stamp before JumpToKey, then checks current measured visible active only after an explicit reveal. This preserves both distinct contracts and cannot disguise a failed identity transition.",
+    "New portable regression explicitly keeps odd top row999979, removes it with even filtering, reverses active row999998 to index0, proves retained active absent from bounded Snapshot until reveal, then verifies identical Active/Stamp and visible clip.",
+    "Status label uses existing default wrapping/public MaxSize.Width640. Actual offscreen fixture verifies complete semantic text, nonempty bounded status width and unchanged actual Grid viewport width; no underlying adapter/layout policy changed.",
+    "Test-local owner helper keeps the selected source/model/model_test qualification independent of smoke.go. Earlier helper-scope compile failure remains historical red evidence."
+  ],
+  "independent_regressions": {
+    "record_path": "/private/tmp/vellum-p6-grid-native-review/consumer-v4-correction-regressions.json",
+    "record_sha256": "aae44d0606bc7fa304217f1d79bd84661273fc33e027d1c7de741cc273a48142",
+    "command": [
+      "go",
+      "test",
+      "-modfile=development.mod",
+      "-overlay=overlay.json",
+      "-tags",
+      "offscreen",
+      "-race",
+      "-count=3",
+      "-run",
+      "^Test(ProjectionPreservesHiddenActiveUntilExplicitReveal|ActualGridStatusWrapDoesNotWidenLayout)$",
+      "."
+    ],
+    "exit_code": 0,
+    "count": 3,
+    "log": {
+      "path": "/private/tmp/vellum-p6-grid-native-review/consumer-v4-correction-regressions.log",
+      "sha256": "51d802e15e7f99d136197d3221cec9865673218ed79714b2b2a59f46116bb268"
+    },
+    "inputs": {
+      "LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+      "README.md": "94a671a731a8e42fdd372da6e7a0bcf70e6bac549101ad6f3d72e8cf72a41b9a",
+      "go.mod": "a8783fc2baadfacb99cfe32918cbd292a53d24f956ae7f16a7951eda8da91309",
+      "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+      "main.go": "148f5037c04c960eecf0bb5025174f9ed112a63e1b7aba14ff991553a8849c3d",
+      "managed_test.go": "be399d22ab8b39190a5fcc5c14bd60d9a1b328f3dae142d0c43dc76bda203d43",
+      "model.go": "b1d57ec4912b1b383cc6369a5009e5ef0dd11d5e6c8eb01e7ca72d0e7437180d",
+      "model_test.go": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa",
+      "smoke.go": "0e47902579189376594f640151f35f60f302fbb0de77da4d8b3221c31c596f95",
+      "source.go": "fc94075d4d7e6587ecdcd88459917645108e7a0a3d205d95e61dc77444e1545e",
+      "development.mod": "be182c804a8af61b682c5877dab1fde5b126e4d3d0b3e4530d5cf36fd58b7d68",
+      "development.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+      "overlay.json": "9fed1ddcc999ac79f2b6fb80fe3f954d2acd309c74fdcace7ffb65ed4214800c"
+    }
+  },
+  "findings": [],
+  "native_source_approval_unchanged": {
+    "path": "/private/tmp/vellum-p6-grid-native-review/review-v4-final.json",
+    "sha256": "9bb291b46aac621c9b6872fac8289cfa08833bceca53a481706ce285554449b8"
+  },
+  "limits": [
+    "Full affected consumer qualification and parent live desktop evidence are pending; independent tests are portable + actual offscreen software routes.",
+    "No physical human input/external AX/VoiceOver/GPU/performance qualification, full P6 remains open."
+  ]
+}

@@ -73,6 +73,7 @@ type ManualElement struct {
 type ManualWindowSnapshot struct {
 	ID                                                      string
 	Incarnation                                             uint64
+	Grids                                                   []GridInspection
 	Elements                                                []ManualElement
 	FocusedID                                               string
 	Frames                                                  uint64

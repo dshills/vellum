@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "created_utc": "2026-10-11T07:16:39.761204+00:00",
+  "scope": "Final native-v4-bound consumer source/CPU evidence approval after preserved actual desktop fixture failure. Frozen consumer four-file correction and ten-source map approved; unchanged root wiring review retained. No GUI/Git/Prism/canonical mutation.",
+  "source_review": {
+    "path": "/private/tmp/vellum-p6-grid-native-review/consumer-correction-source-review-v4.json",
+    "sha256": "44678e5bf6118bac67c5fa2bc81fad009a5a851430434a9654128acd51bcd9ed"
+  },
+  "approved_source_hashes": {
+    "LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+    "README.md": "94a671a731a8e42fdd372da6e7a0bcf70e6bac549101ad6f3d72e8cf72a41b9a",
+    "go.mod": "a8783fc2baadfacb99cfe32918cbd292a53d24f956ae7f16a7951eda8da91309",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "main.go": "148f5037c04c960eecf0bb5025174f9ed112a63e1b7aba14ff991553a8849c3d",
+    "managed_test.go": "be399d22ab8b39190a5fcc5c14bd60d9a1b328f3dae142d0c43dc76bda203d43",
+    "model.go": "b1d57ec4912b1b383cc6369a5009e5ef0dd11d5e6c8eb01e7ca72d0e7437180d",
+    "model_test.go": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa",
+    "smoke.go": "0e47902579189376594f640151f35f60f302fbb0de77da4d8b3221c31c596f95",
+    "source.go": "fc94075d4d7e6587ecdcd88459917645108e7a0a3d205d95e61dc77444e1545e"
+  },
+  "approved_integration_hashes": {
+    "scripts/check-example.sh": "34b01bf791336e74f78ef667717bcb82a69fba76d1666f65bceb7685d8268d79",
+    "scripts/check.sh": "535120278a676b7e16dcf87844ead3d7b9a56d9955cd65b767c60a47818369d0",
+    "docs/development.md": "2482d120750109ad7c882601c9eb852dca26ffed2f912fc6e9820b97be48a489"
+  },
+  "native_approval": {
+    "path": "/private/tmp/vellum-p6-grid-native-review/review-v4-final.json",
+    "sha256": "9bb291b46aac621c9b6872fac8289cfa08833bceca53a481706ce285554449b8"
+  },
+  "verification": {
+    "all_10_current_and_frozen_production_files": true,
+    "all_14_owned_inputs": true,
+    "all_6037_dependency_inputs": true,
+    "all_2_overlay_inputs": true,
+    "all_26_native_owned_files_current": true,
+    "all_four_checks_zero": true,
+    "four_qualification_logs_hash_verified": true,
+    "race_desktop_binary_hash_verified": true,
+    "historical_v3_cpu_pass_and_desktop_fail_distinct": true,
+    "historical_helper_scope_compile_failure_preserved": true,
+    "historical_14_owned_snapshot_hashes_verified": true,
+    "independent_two_new_regressions_race_count3_pass": true
+  },
+  "verified_artifacts": {
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v4/qualification.json": "ab1734b9de1978b5cfa72390aad70cf8fd53e24b5739cee6d1233d52a41aa92f",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/handoff-v4.json": "4a79363f2a2fbfe9a1fb8be8952c951795942205dd159f49bfc3a46a909ede5e",
+    "/private/tmp/vellum-p6-grid-native-review/consumer-correction-source-review-v4.json": "44678e5bf6118bac67c5fa2bc81fad009a5a851430434a9654128acd51bcd9ed",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v4/portable-race20.log": "f5f8f426aec63f474c4ebffb7689e2845891cff71d103dbea132a98ff5866bda",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v4/offscreen-router-race.log": "cbd7b167aef949d353cbf3352b960c71b5ce09157419b8c6344e2f20fb91dbc9",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v4/offscreen-vet.log": "a40d598dd4256d5ba5576d8b73253b0a81d160ae0838e88195a5e90d51622692",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v4/desktop-build.log": "ef38d1cee40597bf57309d5354574fa6e2ded54c9b7ed96e71255d938f282970",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v4/grid-desktop": "b308b6153a1dbee651d9a0caa074fc0cfd37c0211f8f17d90560a1aed748f809",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualify-consumer-correction.py": "95d4c60c09e2c8c378c52d72ef0b0b6a1e84d061150ccb72264a14db1391e7b0",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v3/qualification.json": "f7205dd865b0029b78d3176c9e2d7b4236e14cd534fb30accd7cac2faa081cae",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/correction-v4/source-delta.json": "90b0247799c31ba890b51e3520ac89039d96db0f708ea6992f22b25e3ab8eda1",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/history-v3/preservation.json": "4ae53ef3873a7e328dfcbd4ef7f913cec4509970c12e71fa6684bc9394434c2a",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/history-v3/grid-desktop-smoke-failed.log": "d4d206a8a45ff1df3c554cfa6c261a4315834fc1a1b5e8c63df2ba9c282f66ad",
+    "/private/tmp/vellum-p6-example/examples/grid/acceptance/portable-hidden-active-race20.log": "15cf4b2dbac78d6a3e2c4d6e873b9a3b082c974524ea746e53ac6d15f5a8e449"
+  },
+  "findings": [],
+  "limits": [
+    "No desktop primitive input/native GUI/GPU/performance qualification by this child.",
+    "Desktop smoke logical lifetime/inspection refusal is not private registry/compositor teardown proof.",
+    "Variable heights, multi/all selection, editablecell conflicts, expandedtree/loaded data and fullP6 remain open."
+  ],
+  "qualification_scope": "Consumer-only hidden-active/reveal smoke correction plus status wrapping; portable regression, actual offscreen router checks and desktop race build against unchanged native v4. No desktop GUI or performance qualification.",
+  "parent_live_evidence": "Not executed/reviewed in this approval. Parent owns actual Cocoa rerun and integrated final qualification."
+}

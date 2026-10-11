@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "created_utc": "2026-10-11T09:22:58.966164+00:00",
+  "scope": "Independent read-only review of one test-only Prism State-error correction and its exact source-bound affected checks. No runtime/transport/Cocoa/consumer changes or new broad audit.",
+  "finding_id": "4b4a9370fe7a4f88",
+  "original": {
+    "path": "/private/tmp/vellum-p6-native-v4/drivers/cogent/grid_offscreen_test.go",
+    "sha256": "44b67c77aaf9050bf00c02f80ff644cf73a427d3ec646ad0e46dc50e3ba8aead"
+  },
+  "approved_source": {
+    "path": "/private/tmp/vellum-p6-grid-test-correction/drivers/cogent/grid_offscreen_test.go",
+    "sha256": "2d7825b37e31726c63cefb07dd874557418609513f23129f6e29ee16e758b5b4"
+  },
+  "patch": {
+    "path": "/private/tmp/vellum-p6-grid-test-correction/test-errors.patch",
+    "sha256": "f8a612b22cda6256c3a0d8d39b8096cc6fb62a9ad553bf0b12ec789e15e2eae8"
+  },
+  "qualification": {
+    "path": "/private/tmp/vellum-p6-grid-test-correction/qualification.json",
+    "sha256": "4e8616fbfbcd29f9dd22aa18b919bc5f9ebea41dbed2de1c8fc2694cdb39edd4",
+    "result": "PASS"
+  },
+  "checks": [
+    {
+      "name": "affected-offscreen-race3",
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-race",
+        "-count=3",
+        "-overlay=/private/tmp/vellum-p6-grid-test-correction/overlay.json",
+        "-run",
+        "TestManagedGridActualGeometryAndPools|TestManagedGridActualInputAndStalePress|TestManagedGridActualFractionalWheelAndAX|TestManagedGridFiniteExtremeWheelThenNormal",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-p6-native-v4/drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 38.576973791990895,
+      "log": "/private/tmp/vellum-p6-grid-test-correction/affected-offscreen-race3.log",
+      "log_sha256": "944a11ad14030d57be2f20c9027ce5de5cdc67d0e187db084fa5ed521b07b4ec"
+    },
+    {
+      "name": "offscreen-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "-overlay=/private/tmp/vellum-p6-grid-test-correction/overlay.json",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-p6-native-v4/drivers/cogent",
+      "exit_code": 0,
+      "elapsed_seconds": 1.6281832910026424,
+      "log": "/private/tmp/vellum-p6-grid-test-correction/offscreen-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "verification": {
+    "all_8425_current_inputs_match": true,
+    "all_8424_prior_inputs_identical": true,
+    "corrected_source_overlay_and_verifier_hashes_match": true,
+    "two_zero_exit_logs_exact": true
+  },
+  "judgment": "Separate stateErr is captured inside synchronous owner Do and checked after Do returns. This removes assignment overwriting State failures, preserves owner-held State reads and ensures geometry/selection/wheel assertions cannot silently accept an unavailable model. The first already-checked inner error is moved to the same test-goroutine pattern; no source behavior changed.",
+  "findings": [],
+  "source_qualification_precision": "Prior final integrated6533 and producer8424 proofs qualified the original test bytes. This separate affected race3/vet proof qualifies the current corrected test; runtime identities and previous GUI evidence stay unchanged. Final report/ledger must retain this explicit override rather than claim all current files equal the old qualification maps."
+}

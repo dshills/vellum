@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "result": "APPROVED_SOURCE_PENDING_FINAL_DEPENDENCY_QUALIFICATION",
+  "created_utc": "2026-10-11T06:58:20.454091+00:00",
+  "scope": "Independent read-only source review of10 public Grid example files plus3 root integration wiring changes. No GUI launch; finalnativev4 dependency qualification remains pending.",
+  "source_root": "/private/tmp/vellum-p6-example/examples/grid",
+  "approved_source_hashes": {
+    "LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+    "README.md": "94a671a731a8e42fdd372da6e7a0bcf70e6bac549101ad6f3d72e8cf72a41b9a",
+    "go.mod": "a8783fc2baadfacb99cfe32918cbd292a53d24f956ae7f16a7951eda8da91309",
+    "go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "main.go": "148f5037c04c960eecf0bb5025174f9ed112a63e1b7aba14ff991553a8849c3d",
+    "managed_test.go": "53de861ea26916aa208d975a66fb6e516b7d28676742c8b868686e4387bbf267",
+    "model.go": "174161f20ec96d0c30d077fe3c5992a4d0f4f725011d11a54855c7b9bc6549a6",
+    "model_test.go": "030ecf9e195589cb2eacdb8fde7eca081804d3af4c64f2956892731e298805ee",
+    "smoke.go": "34e0973617aa97a13f62f2da980bb593a7d510f6248cb3bcea77a51539f3a2b9",
+    "source.go": "fc94075d4d7e6587ecdcd88459917645108e7a0a3d205d95e61dc77444e1545e"
+  },
+  "integration_root": "/private/tmp/vellum-p6-native-root-v1",
+  "approved_integration_hashes": {
+    "scripts/check-example.sh": "34b01bf791336e74f78ef667717bcb82a69fba76d1666f65bceb7685d8268d79",
+    "scripts/check.sh": "535120278a676b7e16dcf87844ead3d7b9a56d9955cd65b767c60a47818369d0",
+    "docs/development.md": "2482d120750109ad7c882601c9eb852dca26ffed2f912fc6e9820b97be48a489"
+  },
+  "new_files_diff": {
+    "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/review-v2/new-files.diff",
+    "sha256": "2f96d65b2a7fe14b10d821148a6e484bbda2ff3c4ed7acfeb223fe899850acca"
+  },
+  "readme_followup": {
+    "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/review-v2/readme-link-followup.json",
+    "sha256": "ed0aae881f0ba09abb1a74da665a264de3726f36ec238beb5db0aea5c11b9056"
+  },
+  "findings": [],
+  "source_review": [
+    "Procedural indexed stable keys and constant-time immutable reverse/even projection; only owner-held diagnostic counters mutate. No million-row storage/index claim.",
+    "Model command/controller callbacks use public Grid/app APIs; successful source replacement commits source pointer only after Grid acceptance. Source failures preserve old source/model.",
+    "Native smoke gets immutable per-window identities and all mutable model/geometry via Application.Do. Its bounded worker/error channels cannot block the owner; context/error/exit paths determine success.",
+    "Independent close observations are domain lifetime/refused inspection; desktop compositor cleanup is not inferred from those observations.",
+    "Actual public Manual tests dispatch primitive input to measured target geometry, assert stable/stale identities, navigation, frozen joins, bounded indexed work, retired window refusal and1/7/64 state/image equivalence.",
+    "Fractional fixture compares actual shared cell/header/row edges and integer-scale absolute projection geometry; it does not fabricate unknown fractional scene origin.",
+    "Root script changes add normal example race/vet/build and separate offscreen router race/vet; docs distinguish explicit desktop commands from offscreen routing/physical input."
+  ],
+  "mechanical_verification": {
+    "qualified_v2": {
+      "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v2/qualification.json",
+      "sha256": "6c68b131aefffdc25c63edce20111d9144773a93b2e43df01eb6773711d139f2"
+    },
+    "handoff_v2": {
+      "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/handoff-v2.json",
+      "sha256": "6a5756b7136a5301d9f2fdbc1717c165977a39acee41566eead30b451df93e4e"
+    },
+    "before_after_equal": true,
+    "bound_input_counts": {
+      "dependency_inputs": 6034,
+      "overlay_inputs": 2,
+      "owned_inputs": 14
+    },
+    "all_current_dependency_overlay_hashes_verified": true,
+    "all_frozen_owned_hashes_verified": true,
+    "logs": [
+      {
+        "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v2/portable-race20.log",
+        "sha256": "594487f5ef950ddf862403c613e58435fc76ba0eea706f331e8cf3d3d728adeb"
+      },
+      {
+        "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v2/offscreen-race.log",
+        "sha256": "43c9e541195020648d2792b3dc87bdbeec752b6cb2d2363eca551edde8c9a694"
+      },
+      {
+        "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v2/offscreen-vet.log",
+        "sha256": "47168fe51230a1c7f4159b3db114b4dc7316439653d3e0f89cf37387038dd8a0"
+      },
+      {
+        "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v2/desktop-build.log",
+        "sha256": "96350962153a49406fd1f31a24ddcdd090d69afa5230d8e15a5179d0158c0e08"
+      }
+    ],
+    "binary": {
+      "path": "/private/tmp/vellum-p6-example/examples/grid/acceptance/qualified-v2/grid-desktop",
+      "sha256": "a057b77db918272f9fb58063814f753870513922af30134083d43c5ffbb5d7ec"
+    },
+    "new_files_diff_reconstruction": "All10 added file contents reconstruct exactly to frozen-v2 inputs; current README differs only via recorded durable-link followup. Other9 current files match frozen-v2.",
+    "prior_dependency_scope": "native v3 only; later fixes require additive affected-module qualification on final adapter bytes."
+  },
+  "limits": [
+    "No HumanIME, VoiceOver, physical input, external AX, latency/memory performance, fullP6 or desktop execution proof added by this reviewer.",
+    "Modal coverage includes managed target admission refusal plus real dialog dismissal; raw background physical modal-click refusal is not a distinct consumer assertion.",
+    "Captured images are software offscreen; built desktop race binary is not a live execution proof.",
+    "README durable report path is an integration destination and becomes available after root creates/promotes reports."
+  ],
+  "actions": "Read-only source/diff and mechanical hashes only; no source/test changes, Git, Prism, GUI or canonical writes."
+}

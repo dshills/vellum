@@ -1,0 +1,174 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "70757e98254960151607cd80c49198b3",
+  "repo": {
+    "root": "/private/tmp/vellum-p6-native-root-v1",
+    "head": "e91ba101e154601fd4a07347dbbbd67f9ef6b558",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "4606dcd2c3b979b7",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Unchecked index into projection cells when building accessibility handlers",
+      "message": "The accessibility loop indexes g.projection.Cells[i] using the index of the measurement's m.Cells. refAt guards the same pairing with `i \u003c len(g.projection.Cells)`, but this path does not. If the two slices ever differ in length for the same generation, the accessibility snapshot panics.",
+      "suggestion": "Skip any cell whose index is outside the projection, as refAt does, before reading g.projection.Cells[i].",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "drivers/cogent/grid_accessibility.go",
+          "lines": {
+            "start": 18,
+            "end": 19
+          }
+        }
+      ],
+      "tags": [
+        "panic",
+        "bounds",
+        "accessibility"
+      ],
+      "evidence": "for i, c := range m.Cells {\n\t\tif c.Bounds.Empty() {",
+      "fix": {
+        "before": "for i, c := range m.Cells {\n\t\tif c.Bounds.Empty() {",
+        "after": "for i, c := range m.Cells {\n\t\tif c.Bounds.Empty() || i \u003e= len(g.projection.Cells) {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "674f10d345b75be5",
+      "severity": "medium",
+      "category": "testing",
+      "title": "Namespace collision test passes vacuously when validation refuses the ID",
+      "message": "When ui.Validate rejects the colliding ID, the test logs and returns, so it passes without exercising any of the aliasing behavior. A regression that makes the guard weaker or stricter would not be caught on the code path the test claims to cover.",
+      "suggestion": "Assert explicitly that Validate refuses the reserved `grid:` prefix, for example with errors.Is on a specific error. Move the post-mount collision scenario into a separate test that does not depend on the first outcome.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "drivers/cogent/grid_namespace_review_test.go",
+          "lines": {
+            "start": 21,
+            "end": 24
+          }
+        }
+      ],
+      "tags": [
+        "test",
+        "vacuous-pass"
+      ],
+      "evidence": "t.Log(\"safe validation refusal\", err)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "4b4a9370fe7a4f88",
+      "severity": "medium",
+      "category": "testing",
+      "title": "State() error overwritten by a.Do result, so the check is dead",
+      "message": "The closure assigns the State() error to the outer `e`, and then `e = a.Do(...)` overwrites it with Do's return value, which is nil. The later `if e != nil { t.Fatal(e) }` checks are dead code. The same pattern appears in TestManagedGridActualInputAndStalePress (`state, e = g.State()`), TestManagedGridActualFractionalWheelAndAX, and the `after, e = g.State()` call in this test. A failing State() call is silently ignored, and the test then asserts on a zero-value state.",
+      "suggestion": "Use a separate variable for the closure's error, for example `var stateErr error; if err := a.Do(func() { before, stateErr = g.State() }); err != nil { t.Fatal(err) }; if stateErr != nil { t.Fatal(stateErr) }`.",
+      "confidence": 0.8,
+      "locations": [
+        {
+          "path": "drivers/cogent/grid_offscreen_test.go",
+          "lines": {
+            "start": 507,
+            "end": 507
+          }
+        }
+      ],
+      "tags": [
+        "test",
+        "shadowing",
+        "error-handling",
+        "location-corrected"
+      ],
+      "evidence": "if e = a.Do(func() { before, e = g.State() }); e != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "45392310a3321c9a",
+      "severity": "medium",
+      "category": "testing",
+      "title": "t.Fatal called from owner-executed callbacks",
+      "message": "Several tests call t.Fatal inside the callback passed to p.owner.Do. If the callback runs on the owner goroutine rather than the test goroutine, t.Fatal's runtime.Goexit terminates the owner goroutine instead of failing the test. That can hang or deadlock Do/Close and hide the actual failure. The same file already has a safer pattern, withModelOwner, which returns the error.",
+      "suggestion": "Run the body through withModelOwner (or capture errors in a variable inside Do) and call t.Fatal/t.Fatalf on the test goroutine after Do returns. Do this for TestCommandProjectionRetainsKeyAndRejectsStalePress, TestMillionAndTenThousandSameViewportCommands and TestProgramIndependentWindowLifetimes.",
+      "confidence": 0.4,
+      "locations": [
+        {
+          "path": "examples/grid/model_test.go",
+          "lines": {
+            "start": 92,
+            "end": 94
+          }
+        }
+      ],
+      "tags": [
+        "tests",
+        "goroutine",
+        "t.Fatal",
+        "location-corrected"
+      ],
+      "evidence": "if err := w.grid.JumpToKey(rowKey(999_998), columnID(19)); err != nil {\n\t\t\tt.Fatal(err)\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 105844,
+    "totalMs": 51746
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 50,
+    "bytes": 253833,
+    "chunks": 3,
+    "llmCalls": 3,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 132033,
+        "output": 14086,
+        "costUSD": 0.404926
+      }
+    ],
+    "widenedFiles": 13,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

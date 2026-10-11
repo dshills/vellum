@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "result": "CHANGES_REQUIRED_PENDING_FINAL_V4",
+  "created_utc": "2026-10-11T06:55:08.533833+00:00",
+  "scope": "Final historical finding ledger after complete initial native Grid audit; all9 concrete independent red regressions. v1/v3 proofs are historical, no GUI/P6/final-correction acceptance.",
+  "reviewed_source_versions": {
+    "v1": {
+      "source_map": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/original-owned-map.json",
+        "sha256": "8482ccc8e2961ca787fc3931c37971033951a0dedf60bd856fbda322ce598d38"
+      },
+      "source_count": 19,
+      "complete_independent_review": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-v1-complete.json",
+        "sha256": "ddb15b9090a3a10615e7f8483c112822f7066ae5562ab508a2d9a4d1e4d544c5"
+      }
+    },
+    "v3": {
+      "source_map": {
+        "path": "/private/tmp/vellum-p6-native-ownership-v3.json",
+        "sha256": "4639b5d3b2416c2209590823e59b2b0f55fefc199b3422e8cfb54d0f19cb85e8"
+      },
+      "source_count": 22,
+      "verified_snapshot": "/private/tmp/vellum-p6-native-frozen-v3",
+      "independent_copy_inputs": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/independent-v3-inputs.json",
+        "sha256": "bfa7c8183e722ff8347cfe30f49b56e2597f22798e57ed688381645d9fa4023f"
+      }
+    }
+  },
+  "findings": [
+    {
+      "id": "GRID_NATIVE_LOCAL_VIEWPORT_BOUND",
+      "severity": "medium",
+      "reviewed_source_version": "v1",
+      "test_function": "TestReviewGridEmptyHugeViewportRefusedBeforeMount",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.json",
+        "sha256": "35d22851a97e8120e13266c7733036e74c0e73272275cccab5217e6af3a8684f"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_PRESS_SCENE_GEOMETRY_IDENTITY",
+      "severity": "medium",
+      "reviewed_source_version": "v1",
+      "test_function": "TestReviewGridMovedHostRetiresArmedSceneRect",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.json",
+        "sha256": "35d22851a97e8120e13266c7733036e74c0e73272275cccab5217e6af3a8684f"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_FRACTIONAL_SHARED_EDGES",
+      "severity": "medium",
+      "reviewed_source_version": "v1",
+      "test_function": "TestReviewGridFractionalGlobalEdges",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.json",
+        "sha256": "35d22851a97e8120e13266c7733036e74c0e73272275cccab5217e6af3a8684f"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_FINITE_WHEEL_OVERFLOW",
+      "severity": "medium",
+      "reviewed_source_version": "v1",
+      "test_function": "TestReviewGridFiniteExtremeWheelDoesNotPoisonRemainder",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.json",
+        "sha256": "35d22851a97e8120e13266c7733036e74c0e73272275cccab5217e6af3a8684f"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_DYNAMIC_ID_NAMESPACE_COLLISION",
+      "severity": "medium",
+      "reviewed_source_version": "v1",
+      "test_function": "TestReviewGridDynamicIDCannotAliasOrdinaryButton",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_namespace_review_test.go",
+        "sha256": "5897344e2571bb71ab2c1cd1963ef33ba0c32baa21dd0be15c9fb0cff4fa489d"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/namespace-red-v1-final.log",
+        "sha256": "2afb8eefaf6e31c80b302b103c8778b9d75994b0b82ed812a3e3a48d0f57ac0d"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/namespace-red-v1-final.json",
+        "sha256": "f1cfbf2d5cf9544bb5567631fb6bfd14d07ca4dd9546dc6fa3ea55e21cedb502"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_ROW_DOMAIN_ALIAS_CAPTURE",
+      "severity": "medium",
+      "reviewed_source_version": "v1",
+      "test_function": "TestReviewGridRowDomainCannotReplaceManagedCheckboxCapture",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_row_namespace_review_test.go",
+        "sha256": "85ec7232ac50fa51f7641d342e48d5bd79b1c1ec0ba35e28fdcb5493ff43532d"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/row-namespace-red-v1.log",
+        "sha256": "8dcebcd12dc80c55fe0585e95ba1408cd18689d9e035233f7e76d1f80e84e96f"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/row-namespace-red-v1.json",
+        "sha256": "2b9b17b78c82463529c5e0cbbe7e768fb5548a5523b9731ea25517c71b2f53be"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_ACTUAL_TAB_INTENT_SCOPE",
+      "severity": "medium",
+      "reviewed_source_version": "v3",
+      "test_function": "TestReviewGridRetiredTabCannotApplyAXPress",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/grid_tab_scope_review_test.go",
+        "sha256": "b498b3d7715bf440b87c43733c1b71996c80797c35fadad2dee11c7c69c9891b"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/tab-scope-review-sized.log",
+        "sha256": "f74c4560a7406381e16c1aa404fe79d65e6f79f8ac42220286679226d6f1bc25"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/tab-scope-review-sized.json",
+        "sha256": "abf7aae0d65e9d6e05a95d1cbcdd81f3cd163f2cce76973fe2685e6e53b11f81"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_INTERRUPTED_MOUNT_CLAIM",
+      "severity": "medium",
+      "reviewed_source_version": "v3",
+      "test_function": "TestReviewGridMountPanicRetiresRegistry",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/grid_mount_panic_review_test_red_original.txt",
+        "sha256": "ec77f712d8395ff22735f054cdc8f0c2f2447da109882935a7f2b62bd90e21ba"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/mount-panic-review.log",
+        "sha256": "b2232c0aad30e6ac0a81040a4d62c0907c1b366fb138e8b4591faa1057cb55f5"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/mount-panic-review.json",
+        "sha256": "d2981dac659e83262bead14000f2dab51861f462dd4b40fd6f8b3e54565ba03f"
+      },
+      "exit_code": 1
+    },
+    {
+      "id": "GRID_WORKBENCH_PRESS_HOST_FOCUS",
+      "severity": "medium",
+      "reviewed_source_version": "v3",
+      "test_function": "TestReviewGridNamespacedPressFocusesQualifiedHost",
+      "test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/grid_workbench_focus_review_test.go",
+        "sha256": "171673bc7d09c1379a6ee4a885b74fd4fd466fb0572d26ddafbd6a839dbcad36"
+      },
+      "red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/workbench-focus-review.log",
+        "sha256": "1be76a218e601791cc9cdaed91c8a240c612f24f242e4481ef6abb0e248ce263"
+      },
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/workbench-focus-review.json",
+        "sha256": "044ace111b95af029cca102f277f588dee93ef1469b809227925f5d5e5662ba2"
+      },
+      "exit_code": 1
+    }
+  ],
+  "prior_six_correction_verification": {
+    "record": {
+      "path": "/private/tmp/vellum-p6-grid-native-review/independent-v3-regressions.json",
+      "sha256": "490420aa867a2dc6e474bcd642b649179adac83f98e66137c94c40c2bd2b4de5"
+    },
+    "log": {
+      "path": "/private/tmp/vellum-p6-grid-native-review/independent-v3-regressions.log",
+      "sha256": "54e951943f99b6d242dbeb43919296d02e51c11c561009cbbc9a588cef9948ec"
+    },
+    "exit_code": 0,
+    "count": 3,
+    "scope": "unchanged original6 tests on exact copied/hash-verified corrected22-filev3"
+  },
+  "limits": [
+    "Workbench regression combines production namespace wrapper with actual completed Grid handler; it is not full Workbench native routing qualification.",
+    "Earlier incomplete unsized namespace/tab fixture attempts remain historical raw logs and are not product-failure proofs.",
+    "The interrupted-mount original red test is retained exactly as .txt; a later hygiene-only variant adds successful-remount disposal. Final original regression must use the preserved original body.",
+    "Final v4 source/qualification and corrected original9 rerun are pending."
+  ],
+  "actions": "Isolated temp/source/overlay/test/read artifacts only; no canonical/integration mutation, Git, native GUI, OS preference or Prism."
+}

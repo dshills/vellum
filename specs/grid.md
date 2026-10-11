@@ -129,8 +129,9 @@ It must not reinterpret a pooled slot using the new viewport. Foreign refs,
 retired generations, source changes, and refs with empty current clips are
 refused. Effective viewport/active/source transitions retire prior refs; no-ops
 and failed operations do not. Generation exhaustion is refused atomically.
-Native hit testing, event-origin lifetime, focus, disabled/modal routing, and
-native widget reuse still require an independent adapter qualification.
+The [managed adapter contract](grid-native.md) covers native hit testing,
+event-origin lifetime, focus, disabled/modal routing and native widget reuse.
+Its qualification is separate from the portable acceptance below.
 
 ## Portable acceptance and next seams
 
@@ -149,8 +150,9 @@ and 520 Cell calls in both datasets. A far jump makes two RowKey and two IndexOf
 calls and zero Cell calls. This is a callback/geometry workload proof, not a
 stored-dataset memory test, allocation benchmark or native performance result.
 
-The native adapter can own its bounded measured-cell/header pools and validate
-refs through this model. Variable-height indices, selection universes, editing
-draft conflict/settlement, background projection index preparation, native
-accessibility ranges, and full million-row native acceptance remain explicit
-later work. Existing Table/Tree callers need no migration for this checkpoint.
+The managed adapter owns bounded measured-cell/header pools and validates refs
+through this model. Variable-height indices, selection universes, editing draft
+conflict/settlement, background projection index preparation, hidden-cell
+accessibility navigation and full million-row native performance acceptance
+remain explicit later work. Existing Table/Tree callers need no migration for
+this checkpoint.

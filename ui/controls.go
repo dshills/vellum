@@ -59,7 +59,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, Tabs:
+	case Button, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, Tabs:
 		return true
 	}
 	return false
@@ -88,6 +88,17 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind == DataGrid {
+		if n.Grid == nil {
+			return fmt.Errorf("ui: data grid requires a Grid")
+		}
+		if _, err := n.Grid.State(); err != nil {
+			return fmt.Errorf("ui: invalid grid: %w", err)
+		}
+	} else if n.Grid != nil || n.GridChange != nil {
+		return fmt.Errorf("ui: Grid/GridChange belong only on data grids")
+	}
+
 	if n.Kind == MultilineText && (n.Editor == nil || n.Editor.Validate() != nil) {
 		return fmt.Errorf("ui: multiline node %q requires an editor Model", n.ID)
 	}

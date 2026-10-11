@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "result": "APPROVED_WITH_SOURCE_BACKED_ADJUDICATION",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "reviews": [
+    {
+      "report": "prism-initial.json",
+      "report_sha256": "d9342d5f57bf97d2464c3839c13d22f1a6d9c3324e1f74dac48a0f998a545b28",
+      "input_ledger": "prism-initial-inputs.json",
+      "input_ledger_sha256": "905d26568b8542d1cdd5c5fcc8c8496899cd7ecb0d8fbb6123019285732dffeb",
+      "cli_exit_code": 1,
+      "medium_findings": 4,
+      "coverage_complete": true
+    },
+    {
+      "report": "prism-correction.json",
+      "report_sha256": "7a049e7bf6070f06626a5c86c4c5bae2b8455bf342056775f822618bd944f661",
+      "input_ledger": "prism-correction-inputs.json",
+      "input_ledger_sha256": "c2892c3e590bf99af8418b7d6e3e7c4ccb7302cf2944860b2febabf4b067b3e2",
+      "cli_exit_code": 1,
+      "medium_findings": 1,
+      "coverage_complete": true
+    }
+  ],
+  "decisions": {
+    "fixed": [
+      "4b4a9370fe7a4f88"
+    ],
+    "refuted": [
+      "4606dcd2c3b979b7",
+      "674f10d345b75be5",
+      "45392310a3321c9a",
+      "9d5b020c58d16e15"
+    ],
+    "pending": []
+  },
+  "adjudication_files": {
+    "prism-adjudication.json": "0da552bfb3a58baca62b7938689ecd2b2d0705136471a04d507577a8dc681195",
+    "independent-prism-adjudication.json": "34769abfff3c49e4ae898c2b61bef2e21bf74f00e5e8149e4032912692e1a17e",
+    "independent-test-error-correction-review.json": "37e854997fffbb1b9b3c33a9f63b003565c836d5bce7b39e894163b1f50a663a",
+    "prism-correction-adjudication.json": "77b0958442bf639a01722406c88953733848e4bbcf2be2c256fdf86c7196dccf",
+    "independent-prism-correction-adjudication.json": "64ff8302290c3e3f3442f4f6239f77269ffe2e424a6ea59a02c5a4e6e4a60ef5"
+  },
+  "externally_reviewed_final_files": {
+    "README.md": "f2d428ead0a6685fb862bc56a643f4b37670b9bf969a252fca1f5d9a21cdaa78",
+    "docs/development.md": "2482d120750109ad7c882601c9eb852dca26ffed2f912fc6e9820b97be48a489",
+    "docs/implementation.md": "39ed472186dc7bea1f5cd7db524b745f2569ef8681254efcc7fba4be6f4b6806",
+    "docs/reports/README.md": "5bdc59cb1f64bad9af631817ddf73439a986599861fa63a64e97d8f04cfe5fee",
+    "docs/reports/macos-grid-example/README.md": "8b7720b286557dd0c7da61a1752d29a1c7175cb4ec676ac9d6710ac905197d3a",
+    "docs/reports/macos-grid-native/README.md": "0e0666da95c026c9cbbbb6f3a4c9bc0912ac9c339f8c2cd8e41a6656f066d001",
+    "docs/reviews/macos-grid-native/README.md": "5cf96d2f532be181e96ec8bb7a8bb7ef581b163f8e0cf94c306f6bc9d2107de3",
+    "drivers/cogent/accessibility.go": "828a18f68e83d5c6b237080f0025963f66a476b3f1bcb357d89a0776baec12a0",
+    "drivers/cogent/accessibility_darwin.go": "d513d99d76624ca50eb6d97945f0e678e98b0eba11b066aa5104836e5fb5d19a",
+    "drivers/cogent/accessibility_darwin.m": "37f5ebc9c17b27b718a2c59017683daaef8e23442184a5eea51563c52d7c3895",
+    "drivers/cogent/accessibility_workbench.go": "cb19718e08bee11ea97d5a7803586ad26f3cc1ab5060c49b88acc64328ec9c25",
+    "drivers/cogent/controls.go": "b0af70ce552bd8d8e71830773573a4cb227cd1d95c2ee0c59203698fb58bd59b",
+    "drivers/cogent/driver.go": "dea0e1e8aec1a58f510510b44a3ee7b4bdfa11f53de9e92eac235d604d0a95b7",
+    "drivers/cogent/grid.go": "6e6f75e8dee86722dc8b584975943671d1ae409bea57be350af2b789cb332e15",
+    "drivers/cogent/grid_accessibility.go": "3dc8d299b5f210b9c911e30e0fd4e18d9ab7e02dbf112cac3641f434c2d44b79",
+    "drivers/cogent/grid_accessibility_darwin_test.go": "e9ced20df159ba4a5ef44a9da985c28f0f5843c26760aeeaf8f74a4903451e5f",
+    "drivers/cogent/grid_contract_test.go": "5f7eef40a7cdd10f7f6132a49e5e53421f0c0c6e93cd24eb48c396335f5bfb26",
+    "drivers/cogent/grid_geometry.go": "1fd281781debc97d6578612139b6aa5bcec4b9f592d4aff2d5aab735a81135c3",
+    "drivers/cogent/grid_mount_panic_review_test.go": "908b926f5b3efa53768fe68796cdb1b2e67c46cad86daff0c7663cf3ac4b68e8",
+    "drivers/cogent/grid_namespace_review_test.go": "c9b85559dc70f1dbe8b30436be0d0d959b2f38f4084b911b826f75355d10d69b",
+    "drivers/cogent/grid_offscreen_test.go": "2d7825b37e31726c63cefb07dd874557418609513f23129f6e29ee16e758b5b4",
+    "drivers/cogent/grid_review_test.go": "ba44f7ec8ed7cc3077e8b3e55b2c76b860ea404090e8ac05dd00d5f79f2f7ce6",
+    "drivers/cogent/grid_row_namespace_review_test.go": "1b5e59f4bd76890fcef55635c99d23e9b55fea98f48f8df020ff6b91066bf370",
+    "drivers/cogent/grid_tab_scope_review_test.go": "23f1a1429a02ade235e5fc0786a0d56c10115ca6a085065897eacdda064b1472",
+    "drivers/cogent/grid_workbench_focus_review_test.go": "355f3053b0962be829c4edd4ae8e8e924732a7a9672c5bf3da07f99265e46894",
+    "drivers/cogent/manual.go": "b56386e5e60b70566977c19a8362645ff9f783e62b725755add59504effd222e",
+    "drivers/cogent/manual_offscreen.go": "9594a8afb8d8d97a91b5a06f666c445f159c520121ccb4909490fddfbeb330af",
+    "drivers/cogent/reconcile.go": "cbe09ace8ab53a928f6353d681efdf6c4d19b87cf21ec95699ded4c269614df9",
+    "examples/grid/LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43",
+    "examples/grid/README.md": "94a671a731a8e42fdd372da6e7a0bcf70e6bac549101ad6f3d72e8cf72a41b9a",
+    "examples/grid/go.mod": "a8783fc2baadfacb99cfe32918cbd292a53d24f956ae7f16a7951eda8da91309",
+    "examples/grid/go.sum": "b2e6f478ea44ceacd079f61e26e13c035609404cc037fb264ab5a858092bbc14",
+    "examples/grid/main.go": "148f5037c04c960eecf0bb5025174f9ed112a63e1b7aba14ff991553a8849c3d",
+    "examples/grid/managed_test.go": "be399d22ab8b39190a5fcc5c14bd60d9a1b328f3dae142d0c43dc76bda203d43",
+    "examples/grid/model.go": "b1d57ec4912b1b383cc6369a5009e5ef0dd11d5e6c8eb01e7ca72d0e7437180d",
+    "examples/grid/model_test.go": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa",
+    "examples/grid/smoke.go": "0e47902579189376594f640151f35f60f302fbb0de77da4d8b3221c31c596f95",
+    "examples/grid/source.go": "fc94075d4d7e6587ecdcd88459917645108e7a0a3d205d95e61dc77444e1545e",
+    "scripts/check-example.sh": "34b01bf791336e74f78ef667717bcb82a69fba76d1666f65bceb7685d8268d79",
+    "scripts/check.sh": "535120278a676b7e16dcf87844ead3d7b9a56d9955cd65b767c60a47818369d0",
+    "specs/README.md": "8d4adf636c91f48bd87a34d1227a2b82f1ebf37d7b0a9a26eb52eda68575c6c8",
+    "specs/controls.md": "ab1f79ed2a34c72aefef634091d7887aa3f2358b7fbba561c6758537200a68ee",
+    "specs/framework.md": "6bd3b2edb138dcda4de14bc0ea7be6590fa116708029f0afb732241f3d5c6278",
+    "specs/grid-native.md": "04fef20c8cbbc2b3c60398a07443ecbfb7694150e576a9e19f5538248153c136",
+    "specs/grid.md": "c78ecabadca34de06ba1e06cf7f75dcd4982e08f747ab5d761f5fec4a31eb70c",
+    "specs/macos-completion.md": "9c5d9a8a34be8f7deffb1b148d4b156ab49b013faf6b7db10fc68e7514ce5fff",
+    "ui/controls.go": "4430e8530a84bcdd1a5d1a66a476e2c1b31ba4da85948a04fb356dfd91680f38",
+    "ui/grid.go": "8d6fed2d7ededad116a0a7c5dcf70df4e82212449e13610c33cd197c476759d4",
+    "ui/grid_test.go": "9cd10a6901a8987357e6096c0e14059ae091f827322467a9ce073f9155f43723",
+    "ui/node.go": "95dce677b5a607846c2e3cc2b3cf6c53e98e9f4f001a70fe428bfb03e298237a",
+    "docs/reviews/macos-grid-native/prism-adjudication.json": "0da552bfb3a58baca62b7938689ecd2b2d0705136471a04d507577a8dc681195"
+  },
+  "scope": "Two source-bound external reviews plus independent internal adjudication. The final artifact preserves both CLI findings/exits rather than representing a zero-finding tool pass. Raw historical proof files are mechanically verified separately."
+}

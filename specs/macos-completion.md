@@ -62,9 +62,11 @@ See the [checkpoint report](../docs/reports/macos-replay/README.md).
 The [indexed grid foundation](grid.md) now provides bounded fixed-height,
 two-axis portable geometry with frozen headers/columns and stable cell identity.
 Its 10k and million-row procedural fixtures have identical visible callback work.
-That proves the projection cost, rather than native rendering, retained dataset
-memory or frame performance. Native cell pools, accessibility, variable heights,
-selection/editing and the complete P6 table/tree workload remain open.
+That proves the projection cost. The [managed adapter](grid-native.md) adds
+bounded native cell pools, clipped measured geometry, routed pointer/keyboard
+navigation and visible-cell accessibility. Retained dataset memory, frame
+performance, variable heights, selection/editing and the complete P6 table/tree
+workload remain open.
 
 Full P9 professional workload and large-data replay acceptance, external
 application automation transport, native services/input/accessibility, GPU

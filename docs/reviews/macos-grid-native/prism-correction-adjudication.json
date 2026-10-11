@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "result": "REFUTED",
+  "finding_id": "9d5b020c58d16e15",
+  "review_sha256": "7a049e7bf6070f06626a5c86c4c5bae2b8455bf342056775f822618bd944f661",
+  "reason": "Manual.Close explicitly returns nil on sequential completed close. Its cleanup=true enter path permits already closed owners; initial successful Close marks closed and releases the single active manual application reservation. Explicit loop close is necessary before the next row-count iteration mounts another Manual; t.Cleanup guarantees retirement after any earlier failed assertion. The same final offscreen suite already executes both closes successfully. No runtime or test change is needed.",
+  "source_evidence": [
+    {
+      "path": "drivers/cogent/manual_offscreen.go",
+      "sha256": "9594a8afb8d8d97a91b5a06f666c445f159c520121ccb4909490fddfbeb330af",
+      "lines": [
+        233,
+        243,
+        919,
+        925,
+        936
+      ]
+    },
+    {
+      "path": "drivers/cogent/grid_offscreen_test.go",
+      "sha256": "2d7825b37e31726c63cefb07dd874557418609513f23129f6e29ee16e758b5b4",
+      "lines": [
+        90,
+        303,
+        332
+      ]
+    },
+    {
+      "path": "drivers/cogent/manual_offscreen_test.go",
+      "sha256": "661f763fe11b2dccb8a89f2bc5f548dcac82190a6b10e2d38df53418d16b1749",
+      "lines": [
+        457,
+        483
+      ]
+    }
+  ],
+  "qualified_full_driver_suite": "docs/reports/macos-grid-native/native-qualification.json",
+  "limits": "No claim that concurrent/reentrant Close succeeds; those operations remain bounded refusals.",
+  "independent_adjudication": {
+    "path": "independent-prism-correction-adjudication.json",
+    "sha256": "64ff8302290c3e3f3442f4f6239f77269ffe2e424a6ea59a02c5a4e6e4a60ef5"
+  }
+}

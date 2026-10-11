@@ -319,6 +319,7 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 			return
 		}
 		bindControlWake(n.root, func(e events.Event) { p.custom(n, e) }, p.fail)
+		bindGridScopes(n.root)
 		flushDialogs(n.root)
 		if updateErr = applyFocus(n.root, view.Focus, &n.lastFocus); updateErr != nil {
 			return
@@ -754,6 +755,8 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 		return err
 	}
 	var result ManualWindowSnapshot
+	gridPending := false
+	var gridCaptureErr error
 	err = p.owner.Do(func() {
 		result = ManualWindowSnapshot{ID: n.window.ID, Incarnation: w.incarnation, Frames: native.Frames, Events: native.Events, Timers: native.Timers, Blocked: native.Blocked, ReadyPaint: native.ReadyPaint, FuturePaint: native.FuturePaint, Closed: native.Closed, Failure: native.Failure, Now: native.Now, NextPaint: native.NextPaint, Elements: []ManualElement{}}
 		bounds := accessibilityBounds(n.root)
@@ -795,6 +798,25 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				result.FocusedID = r.node.ID
 			}
 			result.Elements = append(result.Elements, ManualElement{ID: r.node.ID, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
+
+			if r.control != nil && r.control.grid != nil {
+				inspection, gridErr := InspectGrid(p.owner, r.node.Grid)
+				if gridErr != nil {
+					if errors.Is(gridErr, ErrGridLayout) {
+						gridPending = true
+					} else {
+						gridCaptureErr = errors.Join(gridCaptureErr, gridErr)
+					}
+				} else {
+					result.Grids = append(result.Grids, inspection)
+					for _, cell := range inspection.Cells {
+						if cell.Bounds.Empty() {
+							continue
+						}
+						result.Elements = append(result.Elements, ManualElement{ID: cell.ID, Parent: r.node.ID, Incarnation: inspection.CellIncarnation, Kind: ui.DataGrid, Name: cell.Text, Value: cell.Text, Enabled: !controlDisabled(r), Visible: visible, Selected: cell.Active, Bounds: cell.Bounds})
+					}
+				}
+			}
 			for _, c := range r.children {
 				collect(c, r.node.ID)
 			}
@@ -802,9 +824,10 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 		collect(n.root, "")
 		sort.Slice(result.Elements, func(i, j int) bool { return result.Elements[i].ID < result.Elements[j].ID })
 	})
+	err = errors.Join(err, gridCaptureErr)
 	if err == nil {
 		w.lastSnapshot = result
-		w.layoutPending = false
+		w.layoutPending = gridPending
 	}
 	return err
 }

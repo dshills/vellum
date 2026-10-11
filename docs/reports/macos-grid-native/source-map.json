@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "base_commit": "bcac9dc1d057acde979d3ad7e47396e02685d65d",
+  "portable_commit": "e91ba101e154601fd4a07347dbbbd67f9ef6b558",
+  "portable_qualification_sha256": "38da28a8782ce73bdd8c46a5fd3654fa576ca5934a307268480e9a8aa597c679",
+  "scope": "bounded managed Grid adapter; 26 frozen owned files. Actual offscreen Core/software frames and inert Cocoa table selectors; desktop GUI/external AX/P6 performance remain unqualified. Final v4 corrects nine independently reproduced findings; exact original fixtures run through explicit overlay.",
+  "root": "/private/tmp/vellum-p6-native-v4",
+  "owned_sources": {
+    "ui/node.go": "95dce677b5a607846c2e3cc2b3cf6c53e98e9f4f001a70fe428bfb03e298237a",
+    "ui/controls.go": "4430e8530a84bcdd1a5d1a66a476e2c1b31ba4da85948a04fb356dfd91680f38",
+    "ui/grid.go": "8d6fed2d7ededad116a0a7c5dcf70df4e82212449e13610c33cd197c476759d4",
+    "ui/grid_test.go": "9cd10a6901a8987357e6096c0e14059ae091f827322467a9ce073f9155f43723",
+    "drivers/cogent/controls.go": "b0af70ce552bd8d8e71830773573a4cb227cd1d95c2ee0c59203698fb58bd59b",
+    "drivers/cogent/reconcile.go": "cbe09ace8ab53a928f6353d681efdf6c4d19b87cf21ec95699ded4c269614df9",
+    "drivers/cogent/driver.go": "dea0e1e8aec1a58f510510b44a3ee7b4bdfa11f53de9e92eac235d604d0a95b7",
+    "drivers/cogent/accessibility.go": "828a18f68e83d5c6b237080f0025963f66a476b3f1bcb357d89a0776baec12a0",
+    "drivers/cogent/accessibility_darwin.go": "d513d99d76624ca50eb6d97945f0e678e98b0eba11b066aa5104836e5fb5d19a",
+    "drivers/cogent/accessibility_darwin.m": "37f5ebc9c17b27b718a2c59017683daaef8e23442184a5eea51563c52d7c3895",
+    "drivers/cogent/grid.go": "6e6f75e8dee86722dc8b584975943671d1ae409bea57be350af2b789cb332e15",
+    "drivers/cogent/grid_geometry.go": "1fd281781debc97d6578612139b6aa5bcec4b9f592d4aff2d5aab735a81135c3",
+    "drivers/cogent/grid_accessibility.go": "3dc8d299b5f210b9c911e30e0fd4e18d9ab7e02dbf112cac3641f434c2d44b79",
+    "drivers/cogent/grid_contract_test.go": "5f7eef40a7cdd10f7f6132a49e5e53421f0c0c6e93cd24eb48c396335f5bfb26",
+    "drivers/cogent/grid_offscreen_test.go": "44b67c77aaf9050bf00c02f80ff644cf73a427d3ec646ad0e46dc50e3ba8aead",
+    "drivers/cogent/grid_accessibility_darwin_test.go": "e9ced20df159ba4a5ef44a9da985c28f0f5843c26760aeeaf8f74a4903451e5f",
+    "drivers/cogent/grid_review_test.go": "ba44f7ec8ed7cc3077e8b3e55b2c76b860ea404090e8ac05dd00d5f79f2f7ce6",
+    "drivers/cogent/grid_namespace_review_test.go": "c9b85559dc70f1dbe8b30436be0d0d959b2f38f4084b911b826f75355d10d69b",
+    "drivers/cogent/grid_row_namespace_review_test.go": "1b5e59f4bd76890fcef55635c99d23e9b55fea98f48f8df020ff6b91066bf370",
+    "drivers/cogent/manual.go": "b56386e5e60b70566977c19a8362645ff9f783e62b725755add59504effd222e",
+    "drivers/cogent/manual_offscreen.go": "9594a8afb8d8d97a91b5a06f666c445f159c520121ccb4909490fddfbeb330af",
+    "specs/grid-native.md": "04fef20c8cbbc2b3c60398a07443ecbfb7694150e576a9e19f5538248153c136",
+    "drivers/cogent/accessibility_workbench.go": "cb19718e08bee11ea97d5a7803586ad26f3cc1ab5060c49b88acc64328ec9c25",
+    "drivers/cogent/grid_tab_scope_review_test.go": "23f1a1429a02ade235e5fc0786a0d56c10115ca6a085065897eacdda064b1472",
+    "drivers/cogent/grid_mount_panic_review_test.go": "908b926f5b3efa53768fe68796cdb1b2e67c46cad86daff0c7663cf3ac4b68e8",
+    "drivers/cogent/grid_workbench_focus_review_test.go": "355f3053b0962be829c4edd4ae8e8e924732a7a9672c5bf3da07f99265e46894"
+  },
+  "canonical_originals": {
+    "ui/node.go": "b974513d50eac3b22f96329ac2ace4ce7f5e8b72aa09f5460cbf2028a5d0dfbc",
+    "ui/controls.go": "6a5b3be48abefe7791f4449843e89cc52f60345eb92d617293dba97ec0de0573",
+    "ui/grid.go": null,
+    "ui/grid_test.go": null,
+    "drivers/cogent/controls.go": "d42cdb1f7937860bc7ff5d3dedfa16f6e85724990d620534f617b07c8c0ee500",
+    "drivers/cogent/reconcile.go": "e0e8b6070432bd2370d3f4a90ed50c528344f0806435fa72cd26a7f50685f196",
+    "drivers/cogent/driver.go": "b919dc78ad72395625655d597fbace5a44926e730e14c5b808dca11b69fade0a",
+    "drivers/cogent/accessibility.go": "fdddff00fb491a56f607a2b2088aa727b6067c70ac5abae50b5d7216e8ae9271",
+    "drivers/cogent/accessibility_darwin.go": "8dc754318a1346038b977c84fa14a1875794049206e3f13b4ba448a3810129c8",
+    "drivers/cogent/accessibility_darwin.m": "ab40417250b8035d8bd9190db096c25fc60aee68a112178030c41f5da69794be",
+    "drivers/cogent/grid.go": null,
+    "drivers/cogent/grid_geometry.go": null,
+    "drivers/cogent/grid_accessibility.go": null,
+    "drivers/cogent/grid_contract_test.go": null,
+    "drivers/cogent/grid_offscreen_test.go": null,
+    "drivers/cogent/grid_accessibility_darwin_test.go": null,
+    "drivers/cogent/grid_review_test.go": null,
+    "drivers/cogent/grid_namespace_review_test.go": null,
+    "drivers/cogent/grid_row_namespace_review_test.go": null,
+    "drivers/cogent/manual.go": "3f4f3c9bd6d10e0e1e3cc68f6206e7f4732be65cce473d570b4599d7399d404a",
+    "drivers/cogent/manual_offscreen.go": "23469c2ac3dcedfadbb2107e9aee34f60dea6c543e9510571081fe732ebd5329",
+    "specs/grid-native.md": null,
+    "drivers/cogent/accessibility_workbench.go": "6b12544ed0f98be90f8b9d8e6c956ae90483a92a145071a0c1430792a53a14bc",
+    "drivers/cogent/grid_tab_scope_review_test.go": null,
+    "drivers/cogent/grid_mount_panic_review_test.go": null,
+    "drivers/cogent/grid_workbench_focus_review_test.go": null
+  },
+  "qualification_path": "/private/tmp/vellum-p6-native-v4/acceptance-v4/qualification.json",
+  "historical_v1_qualification_sha256": "ce1e1c958819697b564c0cadaa39333ead900fc7bb708d9c53170db6f6741302",
+  "historical_v2_qualification_sha256": "c046e42b37fa55de4319360d9aea39a1171487e4f6a82bc1ab1012ee18db4069",
+  "frozen_copy": "/private/tmp/vellum-p6-native-frozen-v4",
+  "changes_from_v3": {
+    "drivers/cogent/controls.go": {
+      "v3": "5249cb58f5ef8e7dfff7983819ee59414cebb31e0625427162fd6f32986493cf",
+      "v4": "b0af70ce552bd8d8e71830773573a4cb227cd1d95c2ee0c59203698fb58bd59b"
+    },
+    "drivers/cogent/accessibility.go": {
+      "v3": "d18b1a457d08b828f2a0318e31472328e095eb48ed2626b7bf221749bf4019aa",
+      "v4": "828a18f68e83d5c6b237080f0025963f66a476b3f1bcb357d89a0776baec12a0"
+    },
+    "drivers/cogent/grid.go": {
+      "v3": "3ee76b7432ca54cf71cdb8cf475a50f97a68fa2abd9e32afb2cc151837aea35b",
+      "v4": "6e6f75e8dee86722dc8b584975943671d1ae409bea57be350af2b789cb332e15"
+    },
+    "drivers/cogent/grid_accessibility.go": {
+      "v3": "9aac78ca468f3e6bd5e3e6bd62cf4678f7a6617118fcfd4476e45d80a53271fa",
+      "v4": "3dc8d299b5f210b9c911e30e0fd4e18d9ab7e02dbf112cac3641f434c2d44b79"
+    },
+    "drivers/cogent/grid_contract_test.go": {
+      "v3": "0f3d1a2b0c6537b5916566499fa1124c2fe2483464a27ceb80694752b88c815f",
+      "v4": "5f7eef40a7cdd10f7f6132a49e5e53421f0c0c6e93cd24eb48c396335f5bfb26"
+    },
+    "specs/grid-native.md": {
+      "v3": "a8d266b470104d38395cc36b8b345f305e69d632857af2de68a6c4400faddfd7",
+      "v4": "04fef20c8cbbc2b3c60398a07443ecbfb7694150e576a9e19f5538248153c136"
+    },
+    "drivers/cogent/accessibility_workbench.go": {
+      "v3": null,
+      "v4": "cb19718e08bee11ea97d5a7803586ad26f3cc1ab5060c49b88acc64328ec9c25"
+    },
+    "drivers/cogent/grid_tab_scope_review_test.go": {
+      "v3": null,
+      "v4": "23f1a1429a02ade235e5fc0786a0d56c10115ca6a085065897eacdda064b1472"
+    },
+    "drivers/cogent/grid_mount_panic_review_test.go": {
+      "v3": null,
+      "v4": "908b926f5b3efa53768fe68796cdb1b2e67c46cad86daff0c7663cf3ac4b68e8"
+    },
+    "drivers/cogent/grid_workbench_focus_review_test.go": {
+      "v3": null,
+      "v4": "355f3053b0962be829c4edd4ae8e8e924732a7a9672c5bf3da07f99265e46894"
+    }
+  },
+  "historical_v3_qualification_path": "/private/tmp/vellum-p6-native/acceptance-v3/qualification.json",
+  "historical_v3_qualification_sha256": "a5f80b55a4a7104fe7f4d1548277c2a0372b165f2d2a6d9657aca0aaf4f7c101",
+  "historical_findings_path": "/private/tmp/vellum-p6-grid-native-review/historical-findings-final.json",
+  "historical_findings_sha256": "ed95252ff5fdd4c4dce3ba0e158cc7b25b05e4345ec3a44f810782557977ef34"
+}

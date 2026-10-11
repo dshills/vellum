@@ -23,27 +23,33 @@ import (
 )
 
 type accessibilityNode struct {
-	ID            string   `json:"id"`
-	DomainID      string   `json:"domain_id"`
-	Parent        string   `json:"parent"`
-	Role          string   `json:"role"`
-	Name          string   `json:"name"`
-	Help          string   `json:"help"`
-	Value         any      `json:"value,omitempty"`
-	Disabled      bool     `json:"disabled"`
-	Focusable     bool     `json:"focusable"`
-	Focused       bool     `json:"focused"`
-	Selected      bool     `json:"selected"`
-	Actions       []string `json:"actions"`
-	RowIndex      int      `json:"row_index,omitempty"`
-	RowCount      int      `json:"row_count,omitempty"`
-	Level         int      `json:"level,omitempty"`
-	Expanded      *bool    `json:"expanded,omitempty"`
-	Min           *float32 `json:"min,omitempty"`
-	TextClient    uint64   `json:"text_client,omitempty"`
-	TextSelection *[2]int  `json:"text_selection,omitempty"`
-	TextFocus     int      `json:"text_focus,omitempty"`
-	Max           *float32 `json:"max,omitempty"`
+	// pressFocusID is Go-only metadata for the managed Grid cell action.
+	// Workbench namespace wrapping qualifies this exact pending host focus.
+	pressFocusID   string
+	ID             string   `json:"id"`
+	DomainID       string   `json:"domain_id"`
+	Parent         string   `json:"parent"`
+	Role           string   `json:"role"`
+	Name           string   `json:"name"`
+	Help           string   `json:"help"`
+	Value          any      `json:"value,omitempty"`
+	Disabled       bool     `json:"disabled"`
+	Focusable      bool     `json:"focusable"`
+	Focused        bool     `json:"focused"`
+	Selected       bool     `json:"selected"`
+	Actions        []string `json:"actions"`
+	RowIndex       int      `json:"row_index,omitempty"`
+	RowCount       int      `json:"row_count,omitempty"`
+	ColumnIndex    int      `json:"column_index,omitempty"`
+	ColumnCount    int      `json:"column_count,omitempty"`
+	GridGeneration uint64   `json:"grid_generation,omitempty"`
+	Level          int      `json:"level,omitempty"`
+	Expanded       *bool    `json:"expanded,omitempty"`
+	Min            *float32 `json:"min,omitempty"`
+	TextClient     uint64   `json:"text_client,omitempty"`
+	TextSelection  *[2]int  `json:"text_selection,omitempty"`
+	TextFocus      int      `json:"text_focus,omitempty"`
+	Max            *float32 `json:"max,omitempty"`
 }
 type accessibilityAction struct {
 	Kind  string
@@ -260,6 +266,14 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		switch n.Kind {
+		case ui.DataGrid:
+			x.Role = "table"
+			if r.control != nil && r.control.grid != nil {
+				state := r.control.grid.projection.State
+				x.RowCount = state.Stamp.Rows
+				x.ColumnCount = state.Columns
+				x.GridGeneration = state.Generation
+			}
 		case ui.Label:
 			x.Value = n.Text
 		case ui.TextField, ui.MultilineText:
@@ -340,6 +354,13 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					return true
 				}
 				return applyAccessibilityAction(r, action)
+			}
+		}
+		if n.Kind == ui.DataGrid && r.control != nil && r.control.grid != nil {
+			extra, actions := gridAccessibility(r, x.ID, b, disabled)
+			nodes = append(nodes, extra...)
+			for id, action := range actions {
+				handlers[id] = action
 			}
 		}
 		if n.Kind == ui.Extension {
@@ -709,6 +730,7 @@ func accessibilityBounds(root *record) map[string][4]float32 {
 			}
 		}
 		extensionAccessibilityBounds(r, out, bounds)
+		gridAccessibilityBounds(r, out)
 		for _, c := range r.children {
 			visit(c)
 		}
@@ -733,6 +755,10 @@ type AccessibilityElement struct {
 	Name          string     `json:"name"`
 	Value         any        `json:"value"`
 	Enabled       bool       `json:"enabled"`
+	RowCount      int        `json:"row_count"`
+	ColumnCount   int        `json:"column_count"`
+	RowIndex      [2]int     `json:"row_index"`
+	ColumnIndex   [2]int     `json:"column_index"`
 	TextSelection [2]int     `json:"text_selection"`
 	InsertionLine int        `json:"insertion_line"`
 	Frame         [4]float64 `json:"frame"`

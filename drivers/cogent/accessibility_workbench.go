@@ -49,6 +49,10 @@ func namespaceAccessibility(nodes []accessibilityNode, handlers map[string]acces
 			id := nodes[i].ID
 			canFocus := nodes[i].Focusable && !nodes[i].Disabled && containsAccessibilityAction(nodes[i].Actions, "focus")
 			handler := handler
+			pressFocus := nodes[i].pressFocusID
+			if pressFocus != "" {
+				nodes[i].pressFocusID = prefix + pressFocus
+			}
 			remapped[id] = func(action accessibilityAction) bool {
 				if action.Kind == "focus" {
 					// Preserve the original permission/lifetime validation before
@@ -59,7 +63,15 @@ func namespaceAccessibility(nodes []accessibilityNode, handlers map[string]acces
 					accessibilityFocus(b, id)
 					return true
 				}
-				return handler(action)
+				accepted := handler(action)
+				if accepted && action.Kind == "press" && pressFocus != "" && b != nil {
+					// Only Grid cell metadata permits this rewrite, and only when
+					// its validated handler published the exact raw host target.
+					if pending := b.pendingFocus.Load(); pending != nil && *pending == pressFocus {
+						accessibilityFocus(b, prefix+pressFocus)
+					}
+				}
+				return accepted
 			}
 		}
 	}

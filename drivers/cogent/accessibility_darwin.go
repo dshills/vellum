@@ -7,6 +7,7 @@ package cogent
 #cgo darwin LDFLAGS: -framework Cocoa
 #include <stdlib.h>
 #include <stdint.h>
+char *vellumAXGridFixture(const char *json,const char *tableID,int column,int row);
 char *vellumAXTextFixture(const char *node,const char *geometry,int start,int length,int line);
 int vellumAXSetValueFixture(uint64_t token,uint64_t generation,const char *node,const char *value);
 int vellumAXAttach(uint64_t token, void *view, void *window);
@@ -263,4 +264,13 @@ func nativeAccessibilitySetValueFixture(token, generation uint64, node, value st
 	defer C.free(unsafe.Pointer(n))
 	defer C.free(unsafe.Pointer(v))
 	return C.vellumAXSetValueFixture(C.uint64_t(token), C.uint64_t(generation), n, v) != 0
+}
+
+func nativeAccessibilityGridFixture(payload, table string, column, row int) string {
+	p, t := C.CString(payload), C.CString(table)
+	defer C.free(unsafe.Pointer(p))
+	defer C.free(unsafe.Pointer(t))
+	result := C.vellumAXGridFixture(p, t, C.int(column), C.int(row))
+	defer C.free(unsafe.Pointer(result))
+	return C.GoString(result)
 }

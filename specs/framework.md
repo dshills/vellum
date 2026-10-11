@@ -81,11 +81,12 @@ The separate `virtual.Grid` projects an owner-confined indexed source in two axe
 with fixed row/header heights, frozen leading columns, bounded overscan and stable
 row-key/column-ID active cells. It validates accessed indices instead of copying
 or scanning the full row source. Snapshot rectangles and clips are portable model
-geometry; native rendering and accessibility need separate adapter qualification.
+geometry. The [managed adapter](grid-native.md) separately owns bounded native
+cell pools, clipped measured geometry, routed input and viewport accessibility.
 Source revisions preserve the active key and top-row anchor where still present,
 subject to viewport extent clamping;
 retired opaque cell refs refuse activation after a viewport/source transition.
-See the [grid contract](grid.md). This adds a portable foundation for the P6
+See the [grid contract](grid.md). This adds an indexed foundation for the P6
 million-row workload; variable heights, editing, all-row selection and native
 performance remain open. Existing Table/Tree interfaces remain supported.
 

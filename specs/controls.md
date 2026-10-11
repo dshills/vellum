@@ -1,10 +1,14 @@
 # Standard controls contract
 
 The public `ui.Node` vocabulary now includes checkbox, selector, slider, numeric
-field, single-line text field, multiline document editor, tabs, scroll container
-and modal dialog. Cogent
+field, single-line text field, multiline document editor, managed data grid,
+tabs, scroll container and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
 of native dependencies.
+
+Managed node IDs beginning with `grid:` are reserved for generated grid rows,
+cells and headers. Descriptor validation rejects that prefix before mounting controls,
+so ordinary controls cannot alias a generated input or accessibility target.
 
 ## Controlled values and events
 
@@ -14,6 +18,11 @@ node ID and kind. A callback changes application-owned model state; the next
 view describes the accepted value. Programmatic setters do not emit changes.
 `Activate` continues to serve buttons. No callback is bound to an obsolete view
 closure: retained controls read the current callback when owner delivery runs.
+
+`DataGrid` binds `Node.Grid` to the portable indexed model. Its `GridChange`
+callback reports an already accepted owner-held selection or viewport change;
+the caller does not apply it again. See the [managed grid contract](grid-native.md)
+for native bounds, input, focus and measured geometry.
 
 Standard value changes, tab choices and dialog dismissal enqueue bounded
 application owner work. Managed native text input uses a separately bounded

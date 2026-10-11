@@ -154,6 +154,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			}
 			nativeRefreshServices(w.body)
 			bindControlWake(w.root, func(e events.Event) { custom(w, e) }, d.OnError)
+			bindGridScopes(w.root)
 			flushDialogs(w.root)
 			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
 				fail(err)

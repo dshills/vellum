@@ -55,7 +55,9 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"scroll"])return NSAccessibilityScrollAreaRole;
  if([role isEqual:@"table"])return NSAccessibilityTableRole;
  if([role isEqual:@"outline"])return NSAccessibilityOutlineRole;
- if([role isEqual:@"row"]||[role isEqual:@"tree-row"])return NSAccessibilityRowRole;
+ if([role isEqual:@"row"]||[role isEqual:@"tree-row"]||[role isEqual:@"grid-row"])return NSAccessibilityRowRole;
+ if([role isEqual:@"grid-cell"])return NSAccessibilityCellRole;
+ if([role isEqual:@"grid-column"])return NSAccessibilityColumnRole;
  return NSAccessibilityGroupRole;
 }
 static BOOL vellumAXValidRange(NSString *text,NSRange range){
@@ -148,8 +150,19 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
 - (id)accessibilityParent{return self.parentElement;}
 - (NSArray *)accessibilityChildren{return self.childElements?:@[];}
 - (NSArray *)accessibilityVisibleChildren{return self.accessibilityChildren;}
-- (NSArray *)accessibilityRows{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x.node[@"role"] isEqual:@"row"]||[x.node[@"role"] isEqual:@"tree-row"];}]];}
-- (NSInteger)accessibilityRowCount{NSInteger count=0;for(VellumAXElement *row in self.accessibilityRows)count=MAX(count,[row.node[@"row_count"] integerValue]);return count;}
+- (NSArray *)accessibilityRows{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x.node[@"role"] isEqual:@"row"]||[x.node[@"role"] isEqual:@"tree-row"]||[x.node[@"role"] isEqual:@"grid-row"];}]];}
+- (NSInteger)accessibilityRowCount{if(self.node[@"row_count"])return [self.node[@"row_count"] integerValue];NSInteger count=0;for(VellumAXElement *row in self.accessibilityRows)count=MAX(count,[row.node[@"row_count"] integerValue]);return count;}
+- (NSInteger)accessibilityColumnCount{return [self.node[@"column_count"] integerValue];}
+- (BOOL)isAccessibilityOrderedByRow{return YES;}
+- (NSRange)accessibilityRowIndexRange{return self.node[@"row_index"]?NSMakeRange(MAX(0,[self.node[@"row_index"] integerValue]-1),1):NSMakeRange(NSNotFound,0);}
+- (NSRange)accessibilityColumnIndexRange{return self.node[@"column_index"]?NSMakeRange(MAX(0,[self.node[@"column_index"] integerValue]-1),1):NSMakeRange(NSNotFound,0);}
+- (NSArray *)accessibilityVisibleRows{return self.accessibilityRows;}
+- (NSArray *)accessibilityColumns{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x.node[@"role"] isEqual:@"grid-column"];}]];}
+- (NSArray *)accessibilityVisibleColumns{return self.accessibilityColumns;}
+- (NSArray *)accessibilityColumnHeaderUIElements{return self.accessibilityColumns;}
+- (NSArray *)accessibilityVisibleCells{NSMutableArray *cells=[NSMutableArray new];for(VellumAXElement *row in self.accessibilityRows)for(VellumAXElement *cell in row.childElements)if([cell.node[@"role"] isEqual:@"grid-cell"])[cells addObject:cell];return cells;}
+- (NSArray *)accessibilitySelectedCells{return [self.accessibilityVisibleCells filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x isAccessibilitySelected];}]];}
+- (id)accessibilityCellForColumn:(NSInteger)column row:(NSInteger)row{for(VellumAXElement *cell in self.accessibilityVisibleCells)if(cell.accessibilityColumnIndexRange.location==column&&cell.accessibilityRowIndexRange.location==row)return cell;return nil;}
 - (NSArray *)accessibilitySelectedChildren{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x isAccessibilitySelected];}]];}
 - (id)accessibilityWindow{return self.state.window;}
 - (id)accessibilityTopLevelUIElement{return self.state.window;}
@@ -261,7 +274,7 @@ static BOOL vellumAXValidSnapshot(NSDictionary *snapshot){
   if(![identifier isKindOfClass:NSString.class]||identifier.length==0||parents[identifier]||![parent isKindOfClass:NSString.class]||![node[@"role"] isKindOfClass:NSString.class]||![node[@"actions"] isKindOfClass:NSArray.class])return NO;
   for(id action in node[@"actions"])if(![action isKindOfClass:NSString.class])return NO;
   for(NSString *key in @[@"domain_id",@"name",@"help"])if(node[key]&&![node[key] isKindOfClass:NSString.class])return NO;
-  for(NSString *key in @[@"disabled",@"focusable",@"focused",@"selected",@"min",@"max",@"row_index",@"row_count",@"level",@"expanded"])if(node[key]&&![node[key] isKindOfClass:NSNumber.class])return NO;
+  for(NSString *key in @[@"disabled",@"focusable",@"focused",@"selected",@"min",@"max",@"row_index",@"row_count",@"column_count",@"column_index",@"grid_generation",@"level",@"expanded"])if(node[key]&&![node[key] isKindOfClass:NSNumber.class])return NO;
   id accepted=node[@"value"];if(accepted&&![accepted isKindOfClass:NSString.class]&&![accepted isKindOfClass:NSNumber.class])return NO;
   parents[identifier]=parent;
  }
@@ -299,6 +312,25 @@ char *vellumAXHitFixture(const char *json,const char *boundsJSON,double x,double
   for(NSDictionary *node in snapshot[@"nodes"]){VellumAXElement *element=elements[node[@"id"]],*parent=elements[node[@"parent"]];element.parentElement=parent;if(parent)[children[node[@"parent"]] addObject:element];else [roots addObject:element];}
   for(NSString *identifier in elements)((VellumAXElement *)elements[identifier]).childElements=children[identifier];
   NSString *identifier=[vellumAXHitTree(roots,NSMakePoint(x,y)) accessibilityIdentifier];return strdup((identifier?:@"").UTF8String);
+ }
+}
+
+// Inert retained-tree fixture: invokes production table selectors without an
+// NSWindow, native dispatcher, screen permissions, or synthetic action delivery.
+char *vellumAXGridFixture(const char *json,const char *tableID,int column,int row){
+ @autoreleasepool{
+  NSString *payload=json?[NSString stringWithUTF8String:json]:nil;
+  NSDictionary *snapshot=payload?[NSJSONSerialization JSONObjectWithData:[payload dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil]:nil;
+  if(!vellumAXValidSnapshot(snapshot))return strdup("");
+  NSMutableDictionary *elements=[NSMutableDictionary new],*children=[NSMutableDictionary new];
+  for(NSDictionary *node in snapshot[@"nodes"]){VellumAXElement *element=[VellumAXElement new];element.node=node;element.live=YES;elements[node[@"id"]]=element;children[node[@"id"]]=[NSMutableArray new];}
+  for(NSDictionary *node in snapshot[@"nodes"]){VellumAXElement *element=elements[node[@"id"]],*parent=elements[node[@"parent"]];element.parentElement=parent;if(parent)[children[node[@"parent"]] addObject:element];}
+  for(NSString *identifier in elements)((VellumAXElement *)elements[identifier]).childElements=children[identifier];
+  VellumAXElement *table=elements[tableID?[NSString stringWithUTF8String:tableID]:@""];
+  if(!table)return strdup("");
+  VellumAXElement *cell=[table accessibilityCellForColumn:column row:row];
+  NSDictionary *result=@{@"role":[table accessibilityRole]?:@"",@"rows":@([table accessibilityRowCount]),@"columns":@([table accessibilityColumnCount]),@"visible_rows":@(table.accessibilityVisibleRows.count),@"visible_columns":@(table.accessibilityVisibleColumns.count),@"visible_cells":@(table.accessibilityVisibleCells.count),@"selected_cells":@(table.accessibilitySelectedCells.count),@"cell":cell.accessibilityIdentifier?:@"",@"cell_role":cell.accessibilityRole?:@"",@"row":cell?@(cell.accessibilityRowIndexRange.location):@(-1),@"column":cell?@(cell.accessibilityColumnIndexRange.location):@(-1)};
+  NSData *data=[NSJSONSerialization dataWithJSONObject:result options:0 error:nil];return strdup([[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding].UTF8String?:"");
  }
 }
 
@@ -348,7 +380,7 @@ static void vellumAXWalk(id object,NSMutableArray *out){
   if([child isKindOfClass:VellumAXElement.class]){
    VellumAXElement *x=child;NSRect frame=x.accessibilityFrame;id value=x.accessibilityValue?:NSNull.null;NSString *parent=[x.parentElement isKindOfClass:VellumAXElement.class]?[x.parentElement accessibilityIdentifier]:@"";
    id hit=[x.state.view accessibilityHitTest:NSMakePoint(NSMidX(frame),NSMidY(frame))];NSString *hitID=[hit isKindOfClass:VellumAXElement.class]?[hit accessibilityIdentifier]:@"";
-   [out addObject:@{@"id":x.accessibilityIdentifier,@"domain_id":x.node[@"domain_id"]?:@"",@"role":x.accessibilityRole,@"name":x.accessibilityLabel?:@"",@"value":value,@"enabled":@([x isAccessibilityEnabled]),@"selected":@([x isAccessibilitySelected]),@"expanded":@([x isAccessibilityExpanded]),@"parent":parent,@"hit_test_id":hitID,@"text_selection":@[x.accessibilitySelectedTextRange.location==NSNotFound?@(-1):@(x.accessibilitySelectedTextRange.location),@(x.accessibilitySelectedTextRange.length)],@"insertion_line":@(x.accessibilityInsertionPointLineNumber),@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]}];
+   [out addObject:@{@"id":x.accessibilityIdentifier,@"domain_id":x.node[@"domain_id"]?:@"",@"role":x.accessibilityRole,@"name":x.accessibilityLabel?:@"",@"value":value,@"enabled":@([x isAccessibilityEnabled]),@"selected":@([x isAccessibilitySelected]),@"expanded":@([x isAccessibilityExpanded]),@"parent":parent,@"hit_test_id":hitID,@"text_selection":@[x.accessibilitySelectedTextRange.location==NSNotFound?@(-1):@(x.accessibilitySelectedTextRange.location),@(x.accessibilitySelectedTextRange.length)],@"insertion_line":@(x.accessibilityInsertionPointLineNumber),@"row_count":@(x.accessibilityRowCount),@"column_count":@(x.accessibilityColumnCount),@"row_index":@[x.accessibilityRowIndexRange.location==NSNotFound?@(-1):@(x.accessibilityRowIndexRange.location),@(x.accessibilityRowIndexRange.length)],@"column_index":@[x.accessibilityColumnIndexRange.location==NSNotFound?@(-1):@(x.accessibilityColumnIndexRange.location),@(x.accessibilityColumnIndexRange.length)],@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]}];
   }
   vellumAXWalk(child,out);
  }

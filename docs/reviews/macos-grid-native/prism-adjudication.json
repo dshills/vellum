@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "initial_review_sha256": "d9342d5f57bf97d2464c3839c13d22f1a6d9c3324e1f74dac48a0f998a545b28",
+  "initial_input_ledger_sha256": "905d26568b8542d1cdd5c5fcc8c8496899cd7ecb0d8fbb6123019285732dffeb",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "findings": [
+    {
+      "id": "4606dcd2c3b979b7",
+      "decision": "REFUTED",
+      "reason": "No reachable same-generation slice-length mismatch: capture allocates and fills measured Cells using the retained projection length; currentMeasurement rejects different generation/stamp/viewport. Snapshot cardinality is deterministic from immutable columns/config and stamped row count/viewport. Geometry/source/model changes cannot install differently shaped same-generation projections through the managed owner contract. Arbitrary private-state corruption is outside that contract.",
+      "evidence": [
+        "drivers/cogent/grid_geometry.go:62",
+        "drivers/cogent/grid_geometry.go:90",
+        "drivers/cogent/grid_geometry.go:127",
+        "drivers/cogent/grid.go:438",
+        "virtual/grid_geometry.go:94"
+      ]
+    },
+    {
+      "id": "674f10d345b75be5",
+      "decision": "REFUTED",
+      "reason": "The preserved original adversarial regression deliberately allows either safe preallocation validation refusal or a safe non-aliasing mounted result. Explicit TestDataGridGeneratedNamespaceReserved already requires refusal of generated cell/header/row prefixes in nested modal descriptors and accepts the unreserved ordinary grid ID. Weakening validation reaches the adversarial alias assertions; overbroad refusal fails the explicit acceptance check. Original reviewer regression bodies are retained unchanged.",
+      "evidence": [
+        "ui/grid_test.go:50",
+        "drivers/cogent/grid_namespace_review_test.go:11"
+      ]
+    },
+    {
+      "id": "4b4a9370fe7a4f88",
+      "decision": "FIXED",
+      "reason": "Separate stateErr from Do return values in all five State reads in grid_offscreen_test.go; assertions occur after checking both errors. Four affected actual offscreen routing/geometry/wheel tests pass with race count3 and driver offscreen vet passes. Runtime inputs and original reviewer bodies remain unchanged.",
+      "file": "drivers/cogent/grid_offscreen_test.go",
+      "before_sha256": "44b67c77aaf9050bf00c02f80ff644cf73a427d3ec646ad0e46dc50e3ba8aead",
+      "after_sha256": "2d7825b37e31726c63cefb07dd874557418609513f23129f6e29ee16e758b5b4",
+      "qualification_sha256": "4e8616fbfbcd29f9dd22aa18b919bc5f9ebea41dbed2de1c8fc2694cdb39edd4"
+    },
+    {
+      "id": "45392310a3321c9a",
+      "decision": "REFUTED",
+      "reason": "Application.Do locks owner state and directly invokes fn inline on the calling goroutine; it does not dispatch to another goroutine. These callbacks therefore run on the test goroutine, where t.Fatal is permitted. Do has deferred owner unlock and owner-close handling for interrupted callbacks, so Goexit cannot leak the lock. A hypothetical future asynchronous Do implementation is not the current API.",
+      "evidence": [
+        "app/app.go:240",
+        "examples/grid/model_test.go:85"
+      ]
+    }
+  ],
+  "result": "ALL_FINDINGS_RESOLVED",
+  "independent_adjudication": {
+    "path": "independent-prism-adjudication.json",
+    "sha256": "34769abfff3c49e4ae898c2b61bef2e21bf74f00e5e8149e4032912692e1a17e"
+  },
+  "independent_correction_review": {
+    "path": "independent-test-error-correction-review.json",
+    "sha256": "37e854997fffbb1b9b3c33a9f63b003565c836d5bce7b39e894163b1f50a663a"
+  }
+}

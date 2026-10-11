@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "result": "PASS-local-affected-gates",
+  "ownership_map": {
+    "path": "/private/tmp/vellum-p6-native-ownership-v4.json",
+    "sha256": "b97076343e989262a63a36e9de9cb185f51a72baaa0b992a42aca7e88df7be2c"
+  },
+  "qualification": {
+    "path": "/private/tmp/vellum-p6-native-v4/acceptance-v4/qualification.json",
+    "sha256": "d555badc3f42013d5da2af9d6adcb9a87c2b5704096d55b04b2b3bacdb2be970"
+  },
+  "source_root": "/private/tmp/vellum-p6-native-v4",
+  "immutable_owned_copy": "/private/tmp/vellum-p6-native-frozen-v4",
+  "owned_file_count": 26,
+  "effective_input_count": 8424,
+  "source_changed_inputs": {},
+  "review_fixture_changed_inputs": {},
+  "checks": [
+    {
+      "name": "reviewer-exact-regressions",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-native-v4/acceptance-v4/reviewer-exact-regressions.log",
+      "log_sha256": "c12aac1083642d0afb23b4c57797d21d12ec4fcc491bd6b958da32bb8c4648c9",
+      "elapsed_seconds": 12.45628262500395
+    },
+    {
+      "name": "affected-race20",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-native-v4/acceptance-v4/affected-race20.log",
+      "log_sha256": "deca5b32747122af2e9edf05880216ad6c94c521d18e5654150dcfec66a4ab9f",
+      "elapsed_seconds": 21.455741875019157
+    },
+    {
+      "name": "driver-race",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-native-v4/acceptance-v4/driver-race.log",
+      "log_sha256": "6c7884f06e1d86941980b8c61c462d1a9a5fbeb7c8e38baddbf58ce39dceae07",
+      "elapsed_seconds": 42.4967662919953
+    },
+    {
+      "name": "driver-vet",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-native-v4/acceptance-v4/driver-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 7.48020349998842
+    },
+    {
+      "name": "desktop-build",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-native-v4/acceptance-v4/desktop-build.log",
+      "log_sha256": "4ca20437bcbc0b513ae845cc3811598f7deb8097361d56d241a2cb052a063721",
+      "elapsed_seconds": 10.97410233298433
+    },
+    {
+      "name": "portable-ui-race",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-native-v4/acceptance-v4/portable-ui-race.log",
+      "log_sha256": "4a26b9a4e306e355f54c8ee668f8f758d75474741101e22ffffed954374088f5",
+      "elapsed_seconds": 2.183806208980968
+    },
+    {
+      "name": "portable-ui-vet",
+      "exit_code": 0,
+      "log": "/private/tmp/vellum-p6-native-v4/acceptance-v4/portable-ui-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsed_seconds": 0.24526333299581893
+    }
+  ],
+  "changed_owned_paths_from_v3": [
+    "drivers/cogent/controls.go",
+    "drivers/cogent/accessibility.go",
+    "drivers/cogent/grid.go",
+    "drivers/cogent/grid_accessibility.go",
+    "drivers/cogent/grid_contract_test.go",
+    "specs/grid-native.md",
+    "drivers/cogent/accessibility_workbench.go",
+    "drivers/cogent/grid_tab_scope_review_test.go",
+    "drivers/cogent/grid_mount_panic_review_test.go",
+    "drivers/cogent/grid_workbench_focus_review_test.go"
+  ],
+  "historical_v3_qualification": {
+    "path": "/private/tmp/vellum-p6-native/acceptance-v3/qualification.json",
+    "sha256": "a5f80b55a4a7104fe7f4d1548277c2a0372b165f2d2a6d9657aca0aaf4f7c101",
+    "scope": "PASS intermediate before correcting native tab eligibility, abnormal construction rollback and Workbench press-focus namespacing"
+  },
+  "open_acceptance": [
+    "root integrated full framework gate",
+    "actual macOS desktop grid rendered geometry and lifetime acceptance",
+    "external-process grid accessibility acceptance",
+    "P6 sustained performance workloads and physical input workflow"
+  ],
+  "limits": [
+    "Single live binding per caller-owned Grid; native checked local geometry and pool budgets are narrower than portable Grid.",
+    "Actual offscreen router/software frame and inert Cocoa selectors prove their recorded scope; desktop build is not runtime qualification.",
+    "Default managed tab ownership safety depends on fully constructed nonclosable tabs and owner-serialized topology; CurrentTab is not a universal arbitrary-tree concurrency primitive.",
+    "Source callback panic/Goexit unwinds provisional registry admission before private widget deletion. Arbitrary custom Destroy callouts are not guaranteed all attempted."
+  ],
+  "canonical_modified": false,
+  "gui_launched": false,
+  "prism_invoked": false,
+  "committed": false
+}

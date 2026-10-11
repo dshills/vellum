@@ -1,0 +1,258 @@
+{
+  "schema": 1,
+  "result": "APPROVED",
+  "created_utc": "2026-10-11T07:08:14.220377+00:00",
+  "scope": "Independent final source-bound native Grid correction review and unchanged original nine regression verification. Initial full audit is preserved as historical reviews; final v4 changed bytes and added focused tests reviewed. No GUI, Git, Prism or canonical/integration mutation.",
+  "ownership": {
+    "path": "/private/tmp/vellum-p6-native-ownership-v4.json",
+    "sha256": "b97076343e989262a63a36e9de9cb185f51a72baaa0b992a42aca7e88df7be2c",
+    "source_root": "/private/tmp/vellum-p6-native-v4",
+    "frozen_copy": "/private/tmp/vellum-p6-native-frozen-v4",
+    "approved_source_hashes": {
+      "ui/node.go": "95dce677b5a607846c2e3cc2b3cf6c53e98e9f4f001a70fe428bfb03e298237a",
+      "ui/controls.go": "4430e8530a84bcdd1a5d1a66a476e2c1b31ba4da85948a04fb356dfd91680f38",
+      "ui/grid.go": "8d6fed2d7ededad116a0a7c5dcf70df4e82212449e13610c33cd197c476759d4",
+      "ui/grid_test.go": "9cd10a6901a8987357e6096c0e14059ae091f827322467a9ce073f9155f43723",
+      "drivers/cogent/controls.go": "b0af70ce552bd8d8e71830773573a4cb227cd1d95c2ee0c59203698fb58bd59b",
+      "drivers/cogent/reconcile.go": "cbe09ace8ab53a928f6353d681efdf6c4d19b87cf21ec95699ded4c269614df9",
+      "drivers/cogent/driver.go": "dea0e1e8aec1a58f510510b44a3ee7b4bdfa11f53de9e92eac235d604d0a95b7",
+      "drivers/cogent/accessibility.go": "828a18f68e83d5c6b237080f0025963f66a476b3f1bcb357d89a0776baec12a0",
+      "drivers/cogent/accessibility_darwin.go": "d513d99d76624ca50eb6d97945f0e678e98b0eba11b066aa5104836e5fb5d19a",
+      "drivers/cogent/accessibility_darwin.m": "37f5ebc9c17b27b718a2c59017683daaef8e23442184a5eea51563c52d7c3895",
+      "drivers/cogent/grid.go": "6e6f75e8dee86722dc8b584975943671d1ae409bea57be350af2b789cb332e15",
+      "drivers/cogent/grid_geometry.go": "1fd281781debc97d6578612139b6aa5bcec4b9f592d4aff2d5aab735a81135c3",
+      "drivers/cogent/grid_accessibility.go": "3dc8d299b5f210b9c911e30e0fd4e18d9ab7e02dbf112cac3641f434c2d44b79",
+      "drivers/cogent/grid_contract_test.go": "5f7eef40a7cdd10f7f6132a49e5e53421f0c0c6e93cd24eb48c396335f5bfb26",
+      "drivers/cogent/grid_offscreen_test.go": "44b67c77aaf9050bf00c02f80ff644cf73a427d3ec646ad0e46dc50e3ba8aead",
+      "drivers/cogent/grid_accessibility_darwin_test.go": "e9ced20df159ba4a5ef44a9da985c28f0f5843c26760aeeaf8f74a4903451e5f",
+      "drivers/cogent/grid_review_test.go": "ba44f7ec8ed7cc3077e8b3e55b2c76b860ea404090e8ac05dd00d5f79f2f7ce6",
+      "drivers/cogent/grid_namespace_review_test.go": "c9b85559dc70f1dbe8b30436be0d0d959b2f38f4084b911b826f75355d10d69b",
+      "drivers/cogent/grid_row_namespace_review_test.go": "1b5e59f4bd76890fcef55635c99d23e9b55fea98f48f8df020ff6b91066bf370",
+      "drivers/cogent/manual.go": "b56386e5e60b70566977c19a8362645ff9f783e62b725755add59504effd222e",
+      "drivers/cogent/manual_offscreen.go": "9594a8afb8d8d97a91b5a06f666c445f159c520121ccb4909490fddfbeb330af",
+      "specs/grid-native.md": "04fef20c8cbbc2b3c60398a07443ecbfb7694150e576a9e19f5538248153c136",
+      "drivers/cogent/accessibility_workbench.go": "cb19718e08bee11ea97d5a7803586ad26f3cc1ab5060c49b88acc64328ec9c25",
+      "drivers/cogent/grid_tab_scope_review_test.go": "23f1a1429a02ade235e5fc0786a0d56c10115ca6a085065897eacdda064b1472",
+      "drivers/cogent/grid_mount_panic_review_test.go": "908b926f5b3efa53768fe68796cdb1b2e67c46cad86daff0c7663cf3ac4b68e8",
+      "drivers/cogent/grid_workbench_focus_review_test.go": "355f3053b0962be829c4edd4ae8e8e924732a7a9672c5bf3da07f99265e46894"
+    },
+    "source_count": 26
+  },
+  "historical_findings": {
+    "path": "/private/tmp/vellum-p6-grid-native-review/historical-findings-final.json",
+    "sha256": "ed95252ff5fdd4c4dce3ba0e158cc7b25b05e4345ec3a44f810782557977ef34",
+    "classification": "v1/v3 historical red evidence retained unchanged; v2/v3 partial corrected passes are intermediate, not final acceptance."
+  },
+  "resolved_findings": [
+    {
+      "id": "GRID_NATIVE_LOCAL_VIEWPORT_BOUND",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridEmptyHugeViewportRefusedBeforeMount",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "correction": "Local viewport and native local geometry are refused before allocation; total indexed domain extent remains portable and unrestricted."
+    },
+    {
+      "id": "GRID_PRESS_SCENE_GEOMETRY_IDENTITY",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridMovedHostRetiresArmedSceneRect",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "correction": "Armed press now includes host/cell clipped scene rectangles, scale and incarnation; moved/resized host cannot reinterpret the old opaque ref."
+    },
+    {
+      "id": "GRID_FRACTIONAL_SHARED_EDGES",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridFractionalGlobalEdges",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "correction": "Each global edge is rounded once, then pane origin is subtracted in native pixels; odd fractional-DPI joins remain shared."
+    },
+    {
+      "id": "GRID_FINITE_WHEEL_OVERFLOW",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridFiniteExtremeWheelDoesNotPoisonRemainder",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_review_test.go",
+        "sha256": "23c52fea2004bf7ff2c5a786002758f82c80b01019cfd9f33a03357a81623ada"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/review-red-v1-exact.log",
+        "sha256": "582bbd3133f0fa98147ffedb464aaadb260b90ab4e77170c3379f669f23d5ebc"
+      },
+      "correction": "Finite float32 deltas are divided in float64 with checked scale and bounded issued delta, keeping the retained remainder finite."
+    },
+    {
+      "id": "GRID_DYNAMIC_ID_NAMESPACE_COLLISION",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridDynamicIDCannotAliasOrdinaryButton",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_namespace_review_test.go",
+        "sha256": "5897344e2571bb71ab2c1cd1963ef33ba0c32baa21dd0be15c9fb0cff4fa489d"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/namespace-red-v1-final.log",
+        "sha256": "2afb8eefaf6e31c80b302b103c8778b9d75994b0b82ed812a3e3a48d0f57ac0d"
+      },
+      "correction": "Ordinary Node descriptors reserve grid: before native allocation; generated cell/header identities cannot alias them without hidden-row scanning."
+    },
+    {
+      "id": "GRID_ROW_DOMAIN_ALIAS_CAPTURE",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridRowDomainCannotReplaceManagedCheckboxCapture",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_row_namespace_review_test.go",
+        "sha256": "85ec7232ac50fa51f7641d342e48d5bd79b1c1ec0ba35e28fdcb5493ff43532d"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/row-namespace-red-v1.log",
+        "sha256": "8dcebcd12dc80c55fe0585e95ba1408cd18689d9e035233f7e76d1f80e84e96f"
+      },
+      "correction": "Grid row DomainID uses generated reserved row identity; raw source key remains semantic Name and cannot overwrite ordinary manual lookup."
+    },
+    {
+      "id": "GRID_ACTUAL_TAB_INTENT_SCOPE",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridRetiredTabCannotApplyAXPress",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/grid_tab_scope_review_test.go",
+        "sha256": "b498b3d7715bf440b87c43733c1b71996c80797c35fadad2dee11c7c69c9891b"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/tab-scope-review-sized.log",
+        "sha256": "f74c4560a7406381e16c1aa404fe79d65e6f79f8ac42220286679226d6f1bc25"
+      },
+      "correction": "Owner-captured bounded stable tab/page ancestry is checked against current page on delivery, preventing optimistic native switch from applying retained AX or queued intents. No owner-to-origin RC acquisition or geometry/tree traversal during delivery."
+    },
+    {
+      "id": "GRID_INTERRUPTED_MOUNT_CLAIM",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridMountPanicRetiresRegistry",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/grid_mount_panic_review_test_red_original.txt",
+        "sha256": "ec77f712d8395ff22735f054cdc8f0c2f2447da109882935a7f2b62bd90e21ba"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/mount-panic-review.log",
+        "sha256": "b2232c0aad30e6ac0a81040a4d62c0907c1b366fb138e8b4591faa1057cb55f5"
+      },
+      "correction": "Grid-specific mountControl defer retires provisional registry admission before deleting private widgets on error/panic/Goexit. Original panic identity/Goexit propagates, portable caller state survives, valid later app can remount."
+    },
+    {
+      "id": "GRID_WORKBENCH_PRESS_HOST_FOCUS",
+      "status": "RESOLVED",
+      "test_function": "TestReviewGridNamespacedPressFocusesQualifiedHost",
+      "exact_original_test": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/grid_workbench_focus_review_test.go",
+        "sha256": "171673bc7d09c1379a6ee4a885b74fd4fd466fb0572d26ddafbd6a839dbcad36"
+      },
+      "original_red_log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/workbench-focus-review.log",
+        "sha256": "1be76a218e601791cc9cdaed91c8a240c612f24f242e4481ef6abb0e248ce263"
+      },
+      "correction": "Private Grid-only pressFocusID qualifies validated ensuing host focus through Workbench namespace wrappers; ordinary press destinations retain existing behavior."
+    }
+  ],
+  "findings": [],
+  "independent_verification": {
+    "original_nine": {
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/independent-v4-regressions.json",
+        "sha256": "8d13a1fd5eab89df579ac00c8bf61ff2feef2ad4fb20331e96ee84e6435472c0"
+      },
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-count=1",
+        "-run",
+        "^TestReviewGrid(EmptyHugeViewportRefusedBeforeMount|MovedHostRetiresArmedSceneRect|FractionalGlobalEdges|FiniteExtremeWheelDoesNotPoisonRemainder|DynamicIDCannotAliasOrdinaryButton|RowDomainCannotReplaceManagedCheckboxCapture|RetiredTabCannotApplyAXPress|MountPanicRetiresRegistry|NamespacedPressFocusesQualifiedHost)$",
+        "."
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/independent-v4-regressions.log",
+        "sha256": "a34c5538264ead8994cc32c96bf42850ffbc4abcd916f697e6c93cc60d716373"
+      },
+      "count": 1,
+      "reason": "Exact original interrupted-mount body omits later successful-remount cleanup; final delivered fixture has the epilogue for repetition hygiene. All six original test-file digests match historical red ledger."
+    },
+    "added_tests": {
+      "record": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/independent-v4-added-regressions.json",
+        "sha256": "c04b6a062e9e6820b99f3f94099144373ebf1b67276893c03af89a1c449bface"
+      },
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-count=3",
+        "-overlay",
+        "/private/tmp/vellum-p6-grid-native-review/independent-v4-added-overlay.json",
+        "-run",
+        "^TestManagedGrid(MountGoexitRetiresRegistry|QueuedIntentRefusesOptimisticNativeTab|NamespaceDoesNotRewriteOrdinaryPressFocus)$",
+        "."
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/independent-v4-added-regressions.log",
+        "sha256": "fd7419dfd4309e0864ce5ccd69a210dc227cb7a439479336389abf6621edd703"
+      },
+      "count": 3,
+      "cases": [
+        "Goexit cleanup + portable state/remount",
+        "queued native tab selection without scope refresh",
+        "ordinary press pending focus unchanged"
+      ]
+    },
+    "scratch_inputs": {
+      "path": "/private/tmp/vellum-p6-grid-native-review/independent-v4-inputs.json",
+      "sha256": "63b7a7e5eb5b5b3e351b6c01c7515ab79e6139d7f0848aab9098df45ec23fc7c",
+      "all_before_after_inputs_identical": true
+    }
+  },
+  "producer_evidence_verification": {
+    "path": "/private/tmp/vellum-p6-grid-native-review/formal-v4-evidence-verification.json",
+    "sha256": "1e48e911effc4d782153b06c6cf0ec201ea045e71d17fade6030cbb20dffdbf9",
+    "qualification": {
+      "path": "/private/tmp/vellum-p6-native-v4/acceptance-v4/qualification.json",
+      "sha256": "d555badc3f42013d5da2af9d6adcb9a87c2b5704096d55b04b2b3bacdb2be970"
+    },
+    "effective_inputs": 8424,
+    "all_current_hashes_verified": true,
+    "all_seven_checks_zero": true,
+    "independent_backend_twin_files_verified": 1738
+  },
+  "lock_and_lifecycle_assessment": [
+    "Delivery checks native CurrentTab under tab mutex while retaining owner-serialized nonclosable managed/workbench topology. Pinned CurrentTab NumTabs precheck is not universally locked; this is not permission to call it against arbitrary concurrently mutated/deleted native Tabs. Lifetime and control retirement refuse before page check; capture occurs on owner after reconciliation.",
+    "Source callback abnormal return cleanup retires Grid admission before private host deletion; no recover, extra worker, caller-model teardown or cross-scene lock was introduced. Own Goexit regression and original panic regression exercise actual admission paths.",
+    "Workbench focus rewrite is limited to accepted press with nonempty private Grid metadata and exact expected pending target; metadata is not exported/serialized. Ordinary action focus behavior is explicitly tested."
+  ],
+  "limits": [
+    "No desktop GUI/external AX/VoiceOver/human input/performance qualification in this independent review. Producer desktop build is a build result only; parent owns live evidence.",
+    "No global focus FIFO redesign or arbitrary mutable Cogent tab topology guarantee.",
+    "Variable-height/multiple selection/editable cell/full P6 scalability and remaining framework roadmap stay open."
+  ]
+}

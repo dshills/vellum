@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "base_commit": "e91ba101e154601fd4a07347dbbbd67f9ef6b558",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "scope": "Follow-up to initial combined review: corrected test file and updated explanation/adjudication only; untouched runtime and consumer retain initial external coverage. Large raw proof files remain separately mechanically verified.",
+  "initial_review_sha256": "d9342d5f57bf97d2464c3839c13d22f1a6d9c3324e1f74dac48a0f998a545b28",
+  "paths_filter": "drivers/cogent/grid_offscreen_test.go,docs/reviews/macos-grid-native/README.md,docs/reviews/macos-grid-native/prism-adjudication.json,docs/reports/macos-grid-native/README.md",
+  "files": {
+    "drivers/cogent/grid_offscreen_test.go": "2d7825b37e31726c63cefb07dd874557418609513f23129f6e29ee16e758b5b4",
+    "docs/reviews/macos-grid-native/README.md": "5cf96d2f532be181e96ec8bb7a8bb7ef581b163f8e0cf94c306f6bc9d2107de3",
+    "docs/reviews/macos-grid-native/prism-adjudication.json": "0da552bfb3a58baca62b7938689ecd2b2d0705136471a04d507577a8dc681195",
+    "docs/reports/macos-grid-native/README.md": "0e0666da95c026c9cbbbb6f3a4c9bc0912ac9c339f8c2cd8e41a6656f066d001"
+  },
+  "file_count": 4,
+  "staged_diff_bytes": 29252,
+  "staged_diff_sha256": "1320b99aab7c7f8491c1f8864a58db4bb08f457eb87bad683a3f32c194324a9a"
+}

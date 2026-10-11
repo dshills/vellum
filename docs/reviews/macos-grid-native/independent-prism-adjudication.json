@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "result": "THREE_REFUTED_ONE_TEST_ONLY_FIX_APPROVED",
+  "created_utc": "2026-10-11T09:24:53.146694+00:00",
+  "scope": "Independent source-backed adjudication of combined Prism findings. No runtime changes, GUI, Git, Prism rerun or canonical mutation. Original reviewer regressions preserved.",
+  "prism": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-integration/prism.json",
+    "sha256": "d9342d5f57bf97d2464c3839c13d22f1a6d9c3324e1f74dac48a0f998a545b28",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 50,
+      "bytes": 253833,
+      "chunks": 3,
+      "llmCalls": 3,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 132033,
+          "output": 14086,
+          "costUSD": 0.404926
+        }
+      ],
+      "widenedFiles": 13,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "counts": {
+      "low": 0,
+      "medium": 4,
+      "high": 0
+    }
+  },
+  "reviewed_source_hashes": {
+    "drivers/cogent/grid_accessibility.go": "3dc8d299b5f210b9c911e30e0fd4e18d9ab7e02dbf112cac3641f434c2d44b79",
+    "drivers/cogent/grid_geometry.go": "1fd281781debc97d6578612139b6aa5bcec4b9f592d4aff2d5aab735a81135c3",
+    "drivers/cogent/grid.go": "6e6f75e8dee86722dc8b584975943671d1ae409bea57be350af2b789cb332e15",
+    "drivers/cogent/grid_namespace_review_test.go": "c9b85559dc70f1dbe8b30436be0d0d959b2f38f4084b911b826f75355d10d69b",
+    "ui/node.go": "95dce677b5a607846c2e3cc2b3cf6c53e98e9f4f001a70fe428bfb03e298237a",
+    "ui/grid_test.go": "9cd10a6901a8987357e6096c0e14059ae091f827322467a9ce073f9155f43723",
+    "app/app.go": "b70e7dac15367c2999679880f72c90ebf8a8404a9cf05a33ed63f319c1af2487",
+    "examples/grid/model_test.go": "4d4bc721be55d7fb9ad9629787d19f90a1a87120ca07a6d6bdd026e8f6a7f7aa"
+  },
+  "findings": [
+    {
+      "id": "4606dcd2c3b979b7",
+      "status": "REFUTED",
+      "rationale": "The sole nonnil publication constructs m.Cells with len(g.projection.Cells) and iterates that projection one-to-one (grid_geometry.go:88,94-99,108). currentMeasurement rejects mismatched generation, stamp, viewport and requested geometry (118-129). Geometry-changing portable transitions advance an exhaustion-checked monotonic generation; repeated snapshots of the same generation retain cardinality/order. Projection write is owner/origin refresh, measurement capture is origin scene serialization, and AX construction is owner-held. Public InspectGrid copies Cells/Headers (160-162), so callers cannot mutate internal lengths. No source-supported path publishes differing slices at a matching state; an extra bounds guard would mask unsupported private corruption.",
+      "source_refs": [
+        {
+          "file": "drivers/cogent/grid_geometry.go",
+          "lines": [
+            88,
+            94,
+            108,
+            118,
+            160
+          ]
+        },
+        {
+          "file": "drivers/cogent/grid.go",
+          "lines": [
+            434,
+            463
+          ]
+        },
+        {
+          "file": "drivers/cogent/grid_accessibility.go",
+          "lines": [
+            14,
+            18,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "id": "674f10d345b75be5",
+      "status": "REFUTED",
+      "rationale": "The original reviewer regression intentionally permits safe refusal before allocation as an alternative to nonaliasing admission, matching the authorized reserved-prefix resolution. Its pre-fix native alias failure is preserved and original exact body rerun unchanged. Dedicated TestDataGridGeneratedNamespaceReserved in ui/grid_test.go exercises four grid: prefix shapes through nested modal descriptors and verifies ordinary ID grid remains allowed; TestDataGridDescriptor verifies a valid g descriptor. A weaker namespace guard allowing generated IDs fails the dedicated cases; overbroad rejection of the checked ordinary IDs fails positive controls. ui.Validate intentionally returns formatted errors without a namespace sentinel, so errors.Is on a nonexistent specific error would require an unrelated API change.",
+      "source_refs": [
+        {
+          "file": "ui/grid_test.go",
+          "lines": [
+            21,
+            61
+          ]
+        },
+        {
+          "file": "ui/node.go",
+          "lines": [
+            59,
+            71
+          ]
+        },
+        {
+          "file": "drivers/cogent/grid_namespace_review_test.go",
+          "lines": [
+            11,
+            22
+          ]
+        }
+      ],
+      "original_regression_preserved": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/v1/drivers/cogent/grid_namespace_review_test.go",
+        "sha256": "5897344e2571bb71ab2c1cd1963ef33ba0c32baa21dd0be15c9fb0cff4fa489d"
+      }
+    },
+    {
+      "id": "45392310a3321c9a",
+      "status": "REFUTED",
+      "rationale": "Application.Do synchronously acquires the owner mutex and invokes fn() directly in the calling goroutine (app/app.go:240-265). It neither posts nor starts an owner goroutine. The cited model tests invoke Do from the test goroutine, so t.Fatal/t.Fatalf terminates and fails that same test; Do deferred unlocking and abnormal-return Close also run. withModelOwner is an error-result convenience with identical execution, not a different goroutine boundary. The hypothetical worker-executed callback premise is false for these callsites.",
+      "source_refs": [
+        {
+          "file": "app/app.go",
+          "lines": [
+            240,
+            244,
+            262
+          ]
+        },
+        {
+          "file": "examples/grid/model_test.go",
+          "lines": [
+            83,
+            90,
+            142
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4b4a9370fe7a4f88",
+      "status": "REAL_FIXED_TEST_ONLY",
+      "rationale": "Do result assignment could overwrite the separately produced State error in affected tests. One isolated test-only correction separates stateErr and verifies it after inline Do; source/runtime/consumer bytes remain unchanged. Independent source and proof review approves the targeted race3/vet qualification.",
+      "review": {
+        "path": "/private/tmp/vellum-p6-grid-native-review/test-error-correction-review.json",
+        "sha256": "37e854997fffbb1b9b3c33a9f63b003565c836d5bce7b39e894163b1f50a663a"
+      }
+    }
+  ],
+  "packaged_live_binary_verified": {
+    "path": "/private/tmp/VellumGridAcceptanceFinal.app/Contents/MacOS/VellumGridAcceptanceFinal",
+    "sha256": "93debd1943afc425b49df7ff6ee5a5c12fda9601bb1f1188edf7a79dc72b4599",
+    "matches_final_integrated_race_binary": true
+  },
+  "limits": [
+    "No repeated live observation or broad new native audit; current final source/test ledger remains parent-owned.",
+    "Initial 50-file Prism input map covers pre-correction test; targeted independently reviewed test override must be explicit in final ledger."
+  ]
+}
