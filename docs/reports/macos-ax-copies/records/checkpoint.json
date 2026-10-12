@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "checkpoint": "Accessibility publication copies",
+  "base_commit": "da99925b3ef9f5ec3e78d8f4d28338aa6254de57",
+  "prepared_files": 6171,
+  "selected_source_files": 600,
+  "source_review": {
+    "path": "source-review-v1.json",
+    "sha256": "b0b305f87b1d2a5ae0d19f00367163c9ac6cd21df915ad30b5eeb94339af5304"
+  },
+  "plan_review": {
+    "path": "plan-review-v2.json",
+    "sha256": "31a90d59dd4d4a736f85844f1465f1552c6fe9f336b18e9c45b9792af7efb008"
+  },
+  "evidence_review": {
+    "path": "evidence-review-v1.json",
+    "sha256": "1a9ee599f8175ae8b8546dc560a1603401525f36ea9eef39c3db40dbd1716417"
+  },
+  "prism": {
+    "path": "prism-v1/prism.json",
+    "sha256": "8a6b109692a89514f728a3291838625122ccfcb01a78cb38189d302accc07a04"
+  },
+  "prism_process": {
+    "path": "prism-v1/process.json",
+    "sha256": "afe2aec49944dbee1fa1e30674574ba4ebc0c85bd03bf7757f3526911477397e"
+  },
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "checks": {
+    "path": "checks-v2/qualification.json",
+    "sha256": "0003a0a6a9a5945001594445fcfe3fd402895ba1cee7b2fd5698a30d62caadb7"
+  },
+  "native_fixtures": {
+    "path": "native-checks-v2/native-fixtures.json",
+    "sha256": "d676b35f1dda04bac74634f939c2a668b1c11d2c51d4667e2c236f73fe52f7e9"
+  },
+  "native_fixture_groups": 12,
+  "native_smokes": {
+    "path": "native-smokes-v4/qualification.json",
+    "sha256": "33c99366c1fcf24fa46cef4c336998603d77a50f14eed55aaa3cac727cba9846"
+  },
+  "native_smoke_processes": 6,
+  "microbenchmarks": {
+    "path": "native-checks-v2/microbenchmarks.json",
+    "sha256": "5b97c81415d002ec1f62b4b2523fdabcebb860c928c782ac8d12f3ce60cebbc1"
+  },
+  "baseline_build": {
+    "path": "build-baseline/qualification.json",
+    "sha256": "bd0fe9078b11b1fc3b8791c2b7e525157e846249fdaccf1539580d006eaa698d"
+  },
+  "candidate_build": {
+    "path": "build-candidate/qualification.json",
+    "sha256": "9f764ac3a3d1d203a9214aa390d651b8967050ebab4752e997b9373161fac5d1"
+  },
+  "ordinary_campaign": {
+    "path": "ordinary-campaign-v1/qualification.json",
+    "sha256": "84c1db8fd6b1e4a090547d5e524389868cde7674ca2a11375fbbf0e9dd99513f"
+  },
+  "campaign_validation": {
+    "path": "campaign-validation.json",
+    "sha256": "f21811521978de560e83cf99216ad59fef302044cfa203fe85c92fceea303e0d"
+  },
+  "ordinary_processes": 80,
+  "ordinary_events": 9600,
+  "runs_per_case": 5,
+  "samples_per_run": 120,
+  "warmup": 128,
+  "warm_target_met": {
+    "baseline": {
+      "cpu": false,
+      "gpu": false
+    },
+    "candidate": {
+      "cpu": false,
+      "gpu": false
+    }
+  },
+  "allocation": {
+    "path": "allocation-v1/qualification.json",
+    "sha256": "be358e49b78c2dcbee9ff6ac21ee5b5b554eda99b9c637af5b5fdcbd7c5dd572"
+  },
+  "allocation_processes": 4,
+  "allocation_profiles": 8,
+  "pprof_commands": 20,
+  "default_gpu_scene_rendering": false,
+  "shared_host_diagnostics": true,
+  "performance_acceptance_eligible": false,
+  "live_testing_deferred_by_user": true,
+  "report_sha256": "8b8a2d470810065f42516515856825c82034f9b19a18ac92b1a7dea0f04cbc3d",
+  "spec_sha256": {
+    "specs/accessibility.md": "c11a951fc52d9c077a5ae9dfb1a5fcb3cac7251547d7db47ca2a4f22a7ae4a24",
+    "specs/macos-completion.md": "3a0508cfa54e5c17310c4adc6a66c7d0818ec6ba54c56c6082003cc510d1c3dc"
+  },
+  "os_preferences_changed": false,
+  "earlier_candidate_control_failure_fixed": false,
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "b0eb27fea1eec587ba3a2e988ba67989e1a9203d2cd30091770210ae37c10e19",
+    "files": 381,
+    "index_sha256": "3daa26efa0ea79818562d60ebbeed7cfab0e50edea16f5302ea0b93acf589e08"
+  },
+  "scope": "Verified AX envelope/container optimization with exact complete native semantics and detached caches. Shared-host diagnostic timing is mixed, performance acceptance is ineligible, and unchanged warm targets fail. Earlier candidate paging wait failure has unproved origin and remains failed. Live tests are deferred until user says the computer is free. Full Mac/sustained/human/native/GPU/font memory and public distribution gates remain open; Windows/Linux deferred."
+}

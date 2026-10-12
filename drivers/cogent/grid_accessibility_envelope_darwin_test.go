@@ -298,14 +298,12 @@ func TestNativeGridAccessibilityEnvelopeProductionEncoding(t *testing.T) {
 	inputs := [][]accessibilityNode{group(1, 0, true), group(1, 1, false), group(2, 0, true)}
 	steps := make([]map[string]any, 0, len(inputs))
 	for i, input := range inputs {
-		nodes, _ := b.prepareGridPublication(input, nil)
-		payload, err := json.Marshal(struct {
-			Generation uint64              `json:"generation"`
-			Nodes      []accessibilityNode `json:"nodes"`
-		}{uint64(i + 1), nodes})
+		nodes, _ := b.prepareGridPublicationSnapshot(input, nil, true)
+		semantic, err := json.Marshal(nodes)
 		if err != nil {
 			t.Fatal(err)
 		}
+		payload := []byte(accessibilityPayload(uint64(i+1), string(semantic)))
 		if !nativeAccessibilitySnapshotValid(string(payload)) {
 			t.Fatalf("production encoding refused at stage %d: %s", i, payload)
 		}

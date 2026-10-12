@@ -124,66 +124,88 @@ func stampGridAccessibility(r *record, nodes []accessibilityNode) {
 }
 
 func cloneAccessibilityNodes(nodes []accessibilityNode) []accessibilityNode {
-	out := append([]accessibilityNode(nil), nodes...)
+	if len(nodes) == 0 {
+		return nil
+	}
+	out := make([]accessibilityNode, len(nodes))
 	for i := range out {
-		n := &out[i]
-		n.Actions = append([]string{}, n.Actions...)
-		if n.GridFrame != nil {
-			value := *n.GridFrame
-			n.GridFrame = &value
-		}
-		if n.TextSelection != nil {
-			value := *n.TextSelection
-			n.TextSelection = &value
-		}
-		if n.Expanded != nil {
-			value := *n.Expanded
-			n.Expanded = &value
-		}
-		if n.Min != nil {
-			value := *n.Min
-			n.Min = &value
-		}
-		if n.Max != nil {
-			value := *n.Max
-			n.Max = &value
-		}
+		out[i] = cloneAccessibilityNode(nodes[i])
 	}
 	return out
+}
+
+func cloneAccessibilityNode(n accessibilityNode) accessibilityNode {
+	n.Actions = append([]string{}, n.Actions...)
+	if n.GridFrame != nil {
+		value := *n.GridFrame
+		n.GridFrame = &value
+	}
+	if n.TextSelection != nil {
+		value := *n.TextSelection
+		n.TextSelection = &value
+	}
+	if n.Expanded != nil {
+		value := *n.Expanded
+		n.Expanded = &value
+	}
+	if n.Min != nil {
+		value := *n.Min
+		n.Min = &value
+	}
+	if n.Max != nil {
+		value := *n.Max
+		n.Max = &value
+	}
+	return n
 }
 
 // prepareGridPublication retains one completed subtree per currently visible
 // grid, scoped by binding incarnation and parent. It never retains handlers or
 // a grid/model pointer. Actual removal drops the cache immediately.
 func (b *accessibilityBridge) prepareGridPublication(nodes []accessibilityNode, handlers map[string]accessibilityHandler) ([]accessibilityNode, map[string]accessibilityHandler) {
+	return b.prepareGridPublicationSnapshot(nodes, handlers, false)
+}
+
+// owned admits only freshly created snapshot containers whose caller relinquishes
+// them. Borrowed callers still receive separate output and handler containers.
+func (b *accessibilityBridge) prepareGridPublicationSnapshot(nodes []accessibilityNode, handlers map[string]accessibilityHandler, owned bool) ([]accessibilityNode, map[string]accessibilityHandler) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if b.closed.Load() {
 		return nil, nil
 	}
-	scopes := map[string][]accessibilityNode{}
-	for _, node := range nodes {
+	// Group input indices, rather than repeatedly copying large node records
+	// while each scope grows. Completed cache records are still fully detached.
+	scopes := map[string][]int{}
+	for index, node := range nodes {
 		if node.GridScope != "" {
-			scopes[node.GridScope] = append(scopes[node.GridScope], node)
+			scopes[node.GridScope] = append(scopes[node.GridScope], index)
 		}
 	}
 	cache := map[string][]accessibilityNode{}
 	replacements := map[string][]accessibilityNode{}
-	actions := make(map[string]accessibilityHandler, len(handlers))
-	for id, handler := range handlers {
-		actions[id] = handler
+	actions := handlers
+	if !owned {
+		actions = make(map[string]accessibilityHandler, len(handlers))
+		for id, handler := range handlers {
+			actions[id] = handler
+		}
 	}
-	for scope, group := range scopes {
-		host := group[0]
+	for scope, indices := range scopes {
+		host := nodes[indices[0]]
 		if host.ID != scope {
 			continue // Framework traversal always emits the table host first.
 		}
 		if !host.GridPending {
-			cache[scope] = cloneAccessibilityNodes(group)
+			group := make([]accessibilityNode, len(indices))
+			for i, index := range indices {
+				group[i] = cloneAccessibilityNode(nodes[index])
+			}
+			cache[scope] = group
 			continue
 		}
 		previous := b.gridPublications[scope]
-		retained := group[:1]
+		retained := nodes[indices[0] : indices[0]+1]
 		if len(previous) > 0 && previous[0].GridIncarnation == host.GridIncarnation && previous[0].Parent == host.Parent {
 			cache[scope] = previous
 			retained = previous
@@ -200,10 +222,14 @@ func (b *accessibilityBridge) prepareGridPublication(nodes []accessibilityNode, 
 		}
 		// Descriptor labels/help remain current even while cell data are read-only.
 		retained[0].Name, retained[0].Help = host.Name, host.Help
-		for _, node := range group {
-			delete(actions, node.ID)
+		for _, index := range indices {
+			delete(actions, nodes[index].ID)
 		}
 		replacements[scope] = retained
+	}
+	if owned && len(replacements) == 0 {
+		b.gridPublications = cache
+		return nodes, actions
 	}
 	out := make([]accessibilityNode, 0, len(nodes))
 	for _, node := range nodes {

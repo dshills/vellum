@@ -1,0 +1,64 @@
+"""Archive the reviewed AX copy checkpoint; never run native/provider work."""
+import hashlib,json,tarfile
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');phase=Path('/private/tmp/vellum-ax-payload')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(n):return json.loads((phase/n).read_text())
+def receipt(n):return {'path':n,'sha256':sha(phase/n)}
+source=read('source-review-v1.json');evidence=read('evidence-review-v1.json');plan=read('plan-review-v2.json')
+assert source['status']=='APPROVED'and not source['findings']
+assert evidence.get('status',evidence.get('result'))in ['APPROVED','APPROVED_EVIDENCE']and not evidence['findings']
+assert evidence['archive_producer_sha256']==sha(Path(__file__))
+for n,h in evidence['reviewed_document_sha256'].items():assert sha(root/n)==h
+for n,h in evidence['reviewed_receipt_sha256'].items():assert sha(phase/n)==h
+for n,h in source['reviewed_source_sha256'].items():assert sha(Path(n))==h
+assert plan['result']=='APPROVED_EXECUTION_PLAN_PENDING_FINAL_EVIDENCE'and not plan['findings']
+for n,h in plan['reviewed_file_sha256'].items():assert sha(Path(n))==h
+prism=read('prism-v1/prism.json');process=read('prism-v1/process.json')
+assert prism['coverage']['complete']and not prism['coverage']['skipped']and not prism['coverage']['excluded']and prism['coverage']['truncatedBytes']==0 and not prism['findings']
+assert prism['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]and prism['coverage']['files']==6
+assert process['exit_code']==0 and process['source_index_stable']and process['before']==process['after']
+for n,h in process['after'].items():assert sha(root/n)==h
+campaign=read('ordinary-campaign-v1/qualification.json');validated=read('campaign-validation.json');terminal=read('campaign-terminal.json')
+assert campaign['result']=='MEASURED'and campaign['failure']is None and campaign['before']==campaign['after']and campaign['processes']==80
+assert validated['result']=='PASS_CAMPAIGN_VALIDATION'and validated['campaign_sha256']==sha(phase/'ordinary-campaign-v1/qualification.json')and validated['producer_sha256']==sha(phase/'campaign.py')
+assert terminal['exit_code']==0 and validated['observed_terminal_sha256']==sha(phase/'campaign-terminal.json')and validated['raw_processes']==80 and validated['samples']==9600
+assert validated['build_artifacts_exact']and validated['closed_warmup_guard_all_80']and validated['paired_and_rowcount_geometry_match']and validated['statistics_recomputed']
+for label in ['baseline','candidate']:
+ record=read('build-'+label+'/qualification.json');assert record['result']=='PASS_BUILD_ONLY'and record['exit_code']==0 and record['before']==record['after']and sha(phase/('build-'+label)/'loadedgrid')==record['binary_sha256']==campaign['binary_sha256'][label]
+assert len(campaign['after']['source'])==600 and len(campaign['after']['prepared'])==6171
+for n,h in campaign['after']['source'].items():assert sha(root/n)==h
+for n,h in campaign['after']['prepared'].items():assert sha(root/'drivers/cogent/build'/n)==h
+assert read('checks-v1/process.json')['exit_code']==0 and read('checks-v2/qualification.json')['result']=='PASS'
+native=read('native-smokes-v4/qualification.json');assert native['result']=='PASS_NATIVE_AX_SMOKES'and native['error']is None and native['before']==native['after']==campaign['after']and len(native['commands'])==6 and all(c['exit_code']==0 and c['error']is None for c in native['commands'])
+fixtures=read('native-checks-v2/native-fixtures.json');assert fixtures['exit_code']==0 and fixtures['error']is None
+raw=(phase/'native-checks-v2/native-fixtures.stdout.log').read_text();assert len([line for line in raw.splitlines()if line.startswith('--- PASS: ')])==12 and '--- SKIP:'not in raw
+assert read('native-checks-v2/microbenchmarks.json')['exit_code']==0 and read('baseline-controls-v1/controls-smoke-1.json')['exit_code']==0
+alloc=read('allocation-v1/qualification.json');assert alloc['result']=='PASS_ALLOCATION_DIAGNOSTIC'and alloc['error']is None and alloc['before']==alloc['after']==campaign['after']and len(alloc['cases'])==4 and len(alloc['profile_steps'])==16
+assert all(case['samples']==120 and case['warmup']==128 and case['warm_target_eligible']is False for case in alloc['cases'].values())
+assert read('allocation-terminal.json')['exit_code']==0 and read('allocation-v1/focus-commands.json')['result']=='PASS_PPROF_FILTER'
+admission=read('allocation-v1/admission.json');assert admission['campaign_terminal_sha256']==sha(phase/'campaign-terminal.json')and admission['campaign_validation_sha256']==sha(phase/'campaign-validation.json')
+# Include only explicit evidence directories and inert recipes/source snapshots.
+# Executables, compiler caches, app bundles and prepared trees are excluded.
+selected={}
+folders=['build-baseline','build-candidate','checks-v1','checks-v2','native-checks-v1','native-checks-v2','native-smokes-v3','native-smokes-v4','baseline-controls-v1','prism-v1','ordinary-campaign-v1','allocation-v1','source-review-v1-sources','original','audit-history']
+for folder in folders:
+ for p in (phase/folder).rglob('*'):
+  if p.is_file()and not p.is_symlink()and p.name not in ['loadedgrid','accessibility-smoke']:selected[p.relative_to(phase).as_posix()]=p
+names=['testing-context.json','original-hashes.json','source-review-v1.json','plan-review-v1.json','plan-review-v2.json','ordinary-review-v1.json','evidence-review-v1.json','evidence-review.py.txt','campaign-validation.json','campaign-terminal.json','campaign-v1.stdout.log','campaign-v1.stderr.log','allocation-terminal.json','allocation-v1.stdout.log','allocation-v1.stderr.log','native-observer-correction.json','benchmark-overlay.json','legacy-benchmark.go.txt','virtual-table-investigation.md','virtual-table-investigation.json']
+for name in names:selected[name]=phase/name
+recipes=['build.py','checks.py','full-checks.py','native-checks.py','native-checks-v2.py','native-smokes-v3.py','native-smokes-v4.py','baseline-controls-v1.py','prism.py','campaign.py','validate-campaign.py','allocation.py','focus-profiles.py','report.py','archive.py','campaign.py.v1.txt','allocation.py.v1.txt','focus-profiles.py.v1.txt']
+for name in recipes:selected['recipes/'+name+'.txt']=phase/name
+for name,p in selected.items():assert p.is_file()and not p.is_symlink()and not Path(name).is_absolute()and '..'not in Path(name).parts
+out=root/'docs/reports/macos-ax-copies/records';out.mkdir(exist_ok=False)
+index={name:{'sha256':sha(p),'bytes':p.stat().st_size}for name,p in sorted(selected.items())};archive=out/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tar:
+ for name,p in sorted(selected.items()):tar.add(p,arcname=name,recursive=False)
+(out/'evidence-index.json').write_text(json.dumps({'archive_sha256':sha(archive),'entries':index},indent=2)+'\n')
+record={'schema':1,'checkpoint':'Accessibility publication copies','base_commit':'da99925b3ef9f5ec3e78d8f4d28338aa6254de57','prepared_files':6171,'selected_source_files':600,'source_review':receipt('source-review-v1.json'),'plan_review':receipt('plan-review-v2.json'),'evidence_review':receipt('evidence-review-v1.json'),'prism':receipt('prism-v1/prism.json'),'prism_process':receipt('prism-v1/process.json'),'prism_provider':'anthropic','prism_model':'claude-sonnet-5-5','prism_coverage_complete':True,'prism_findings':0,'checks':receipt('checks-v2/qualification.json'),'native_fixtures':receipt('native-checks-v2/native-fixtures.json'),'native_fixture_groups':12,'native_smokes':receipt('native-smokes-v4/qualification.json'),'native_smoke_processes':6,'microbenchmarks':receipt('native-checks-v2/microbenchmarks.json'),'baseline_build':receipt('build-baseline/qualification.json'),'candidate_build':receipt('build-candidate/qualification.json'),'ordinary_campaign':receipt('ordinary-campaign-v1/qualification.json'),'campaign_validation':receipt('campaign-validation.json'),'ordinary_processes':80,'ordinary_events':9600,'runs_per_case':5,'samples_per_run':120,'warmup':128,'warm_target_met':campaign['warm_target_met'],'allocation':receipt('allocation-v1/qualification.json'),'allocation_processes':4,'allocation_profiles':8,'pprof_commands':20,'default_gpu_scene_rendering':False,'shared_host_diagnostics':True,'performance_acceptance_eligible':False,'live_testing_deferred_by_user':True,'report_sha256':sha(root/'docs/reports/macos-ax-copies/README.md'),'spec_sha256':{n:sha(root/n)for n in ['specs/accessibility.md','specs/macos-completion.md']},'os_preferences_changed':False,'earlier_candidate_control_failure_fixed':False,'archive':{'path':'evidence.tar.gz','sha256':sha(archive),'files':len(index),'index_sha256':sha(out/'evidence-index.json')},'scope':'Verified AX envelope/container optimization with exact complete native semantics and detached caches. Shared-host diagnostic timing is mixed, performance acceptance is ineligible, and unchanged warm targets fail. Earlier candidate paging wait failure has unproved origin and remains failed. Live tests are deferred until user says the computer is free. Full Mac/sustained/human/native/GPU/font memory and public distribution gates remain open; Windows/Linux deferred.'}
+(out/'checkpoint.json').write_text(json.dumps(record,indent=2)+'\n');(out/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+with tarfile.open(archive)as tar:
+ assert len(tar.getmembers())==len(index)
+ for member in tar.getmembers():
+  assert member.isfile();data=tar.extractfile(member).read();assert len(data)==index[member.name]['bytes']and hashlib.sha256(data).hexdigest()==index[member.name]['sha256']
+print('EVIDENCE VERIFIED',len(index),'members',archive.stat().st_size,'bytes')

@@ -260,3 +260,16 @@ cannot relax the source support, per-glyph or logical work bounds. New cache
 payload/reference limits are per renderer and do not qualify total font/native
 memory. Unchanged latency targets and broader Mac acceptance remain open until
 representative evidence passes them.
+
+## Accessibility publication allocation work
+
+The owner may consume its newly constructed semantic snapshot containers and
+group grid records by indices to reduce intermediate copying. Last-completed
+cache records remain detached, and borrowed internal entries retain their prior
+container ownership. The complete native JSON envelope must remain byte-identical
+to the validated stdlib envelope. Encoding refusal, pending/completed scope
+transactions, callback replacement, stale queued actions and retirement require
+their existing checks plus owned/borrowed parity. No publication may be skipped
+solely because a portable grid generation is unchanged. Actual Cocoa and matched
+ordinary CPU/GPU measurements remain separate from local lookup benchmarks and
+from broader Mac/performance/native-memory acceptance.

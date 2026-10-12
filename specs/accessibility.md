@@ -108,3 +108,21 @@ return to Go. Owned transport payloads remain alive while queued and can be
 released after consumption or discard without an ambient producer pool. This
 lifetime rule does not bound the total queued work or prove process/native/GPU
 memory reclamation; those remain separate acceptance measurements.
+
+The ordinary owner refresh consumes the fresh node and callback containers
+produced by its semantic traversal. A ready publication may reuse those
+containers, but the last-completed grid cache still detaches records, actions and
+pointer fields. Borrowed internal update/prepare entries retain separate output
+and callback containers. Pending replacement keeps the original scope/incarnation,
+parent, disabled-state and stale-action rules, including independent ready grids
+and ordinary controls. Removal and closure still retire cache references.
+
+Scope grouping records input indices rather than growing copied node arrays.
+After successful whole-node JSON encoding (and a second encoding when pending
+replacement changes nodes), the native envelope surrounds those exact encoded
+bytes with fixed delimiters and a generated decimal generation. Application text
+never enters the envelope unencoded. This avoids another RawMessage encoding
+without changing complete wire records, ordering, semantic-generation equality,
+callback replacement or native validation/commit/notification behavior. Ownership
+transfer and fewer intermediate copies do not qualify total retained, native or
+GPU memory, or sustained latency by themselves.

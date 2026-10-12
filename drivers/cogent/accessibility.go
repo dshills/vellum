@@ -146,6 +146,17 @@ func accessibilityDeliver(token, generation uint64, id string, action accessibil
 	return err == nil
 }
 func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[string]accessibilityHandler) {
+	b.updateSnapshot(nodes, handlers, false)
+}
+
+// updateOwned consumes fresh owner snapshot records and callbacks. Its caller
+// must not read or mutate them afterward. The completed grid cache is detached
+// even on this route, and native transport owns encoded bytes rather than nodes.
+func (b *accessibilityBridge) updateOwned(nodes []accessibilityNode, handlers map[string]accessibilityHandler) {
+	b.updateSnapshot(nodes, handlers, true)
+}
+
+func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers map[string]accessibilityHandler, owned bool) {
 	if b.closed.Load() {
 		return
 	}
@@ -158,7 +169,7 @@ func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[str
 	for _, node := range nodes {
 		pendingGrid = pendingGrid || node.GridPending
 	}
-	nodes, handlers = b.prepareGridPublication(nodes, handlers)
+	nodes, handlers = b.prepareGridPublicationSnapshot(nodes, handlers, owned)
 	if pendingGrid {
 		// Ready records are unchanged by the scoped cache. Only pending records
 		// replace input semantics with their last-completed read-only subtree.
@@ -173,8 +184,9 @@ func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[str
 		return
 	}
 	b.handlers = handlers
-	unchanged := b.lastSnapshot == string(semantic)
-	b.lastSnapshot = string(semantic)
+	snapshot := string(semantic)
+	unchanged := b.lastSnapshot == snapshot
+	b.lastSnapshot = snapshot
 	b.mu.Unlock()
 	// Focus handlers can enqueue a duplicate invalidation after the originating
 	// key event already published the same tree. An identical refresh must not
@@ -183,11 +195,15 @@ func (b *accessibilityBridge) update(nodes []accessibilityNode, handlers map[str
 		return
 	}
 	generation := b.generation.Add(1)
-	payload, _ := json.Marshal(struct {
-		Generation uint64          `json:"generation"`
-		Nodes      json.RawMessage `json:"nodes"`
-	}{generation, semantic})
-	nativeAccessibilityUpdate(b.token, string(payload))
+	nativeAccessibilityUpdate(b.token, accessibilityPayload(generation, snapshot))
+}
+
+// semantic is the complete successful json.Marshal result above, including the
+// second validation after a pending-grid replacement. Only a generated decimal
+// integer and fixed delimiters surround it; no raw application text is appended.
+// This preserves the full envelope without re-encoding/copying its RawMessage.
+func accessibilityPayload(generation uint64, semantic string) string {
+	return `{"generation":` + strconv.FormatUint(generation, 10) + `,"nodes":` + semantic + `}`
 }
 func accessibilityFocus(b *accessibilityBridge, id string) {
 	copy := id
@@ -231,7 +247,7 @@ func syncAccessibility(w *nativeWindow, a *app.Application) {
 	accessibilityStampVirtualGeometry(w.root)
 	accessibilityStampDialogNamespaces(w.root, "")
 	nodes, handlers := accessibilitySnapshot(w.root, b)
-	b.update(nodes, handlers)
+	b.updateOwned(nodes, handlers)
 }
 func closeAccessibility(w *nativeWindow) {
 	if b := windowAccessibilityBridge(w); b != nil {
