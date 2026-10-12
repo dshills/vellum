@@ -9,6 +9,55 @@ repository directories. Root and module-local LICENSE files record this choice.
 The third-party/native distribution audit remains pending. The Go module graph notice inventory does not establish
 complete embedded Rust/native binary/font redistribution rights.
 
+## Mac distribution input inventory
+
+`scripts/distribution-inventory.py --output <new.json>` records the actual SDK
+source-file inventory, verified Go module notice graph and the local macOS
+workbench's selected Go package inputs. It creates no native window, executes no
+application and changes no clipboard, input-source or OS preferences. Collection
+requires Darwin with cgo enabled and uses the same controlled child environment,
+graph download/verification and command deadlines as the SDK producer.
+
+Every SDK source file is size/SHA256 recorded, including prepared dependencies.
+Resolved `EmbedFiles` are recorded separately with package/module identity and
+font classification. Listed cgo source files, linker flags and framework
+references are retained. Module-owned conventional native library filenames in
+declared `-L` search directories are hashed as candidates for each `-l` reference.
+Direct module-owned native file arguments are also hashed as candidates. Missing
+or external native files/search paths, `-F` framework searches and unparsed
+options (including `-Wl,` forms) produce explicit unresolved-input records.
+Framework names retain unverified resolution and do not imply system ownership.
+That observation does not establish which file the final linker selected, dynamic
+dependency closure or a prebuilt archive's embedded Rust/C component provenance.
+Installed Go declaration candidates are recorded from GOROOT and its parent;
+they do not establish a complete toolchain component audit.
+
+Nearby license/notice paths are declaration candidates, not evidence that their
+terms apply to an asset. All embedded asset/native rights remain review-required,
+and the distribution audit remains pending. The JSON neither approves rights nor
+updates release gates. Module notice records preserve existing pinned version/
+checksum provenance. The pin manifest and every shipped source-file hash bind
+the observed prepared bytes; collection does not regenerate private replacements.
+
+Hashes stream with a 1 GiB per-file bound. SDK and build-asset/cgo source lists
+each have a 20,000-entry admission bound, checked before surplus file hashing.
+Notice collection uses bounded streaming metadata mode and retains no notice
+contents; the SDK producer's existing notice-copy mode is separate.
+Sources must be regular files without traversal
+or source symlinks. Byte identities are reread, SDK source names are re-enumerated
+and selected Go build metadata is resolved again before return; observed drift
+refuses the report. Go cache/staleness flags are excluded from that comparison.
+These sampled checks are not filesystem isolation or an atomic source snapshot.
+
+Output must be new and outside the source checkout. Publication uses the existing
+exclusive hardlink/copy mechanism and its completion/checksum semantics.
+`--include-untracked` explicitly records whitelisted private precommit files;
+otherwise source names come from tracked Git entries. Source revision and
+cleanliness describe capture, not a later commit. Equivalent input bytes,
+configuration and source state produce equivalent reports across relocated
+module/cache paths for the recorded conventional linker paths. Unknown absolute
+linker flags remain literal evidence rather than being guessed or resolved.
+
 ## API compatibility
 
 The root package identifies the version; focused `app`, `ui`, `command`, `tasks`,

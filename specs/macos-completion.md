@@ -176,6 +176,14 @@ The selected namespace and MIT license resolve owner choices but do not certify
 that audit, signing/notarization or production qualification. Existing version is
 v0.1.0-alpha.1 and macOS remains experimental until acceptance is complete.
 
+The Mac distribution input collector adds size/hash identities for the complete
+SDK source payload, resolved workbench embed assets, listed cgo sources and
+module-owned native linker-search candidates. It retains actual target/Go
+configuration, notice candidates and source/pin identity without running an
+application. See [release contract](release.md). This prepares review of actual
+fonts/native inputs; it does not approve their rights, reconstruct a static
+archive's embedded component closure or close the distribution/runtime gates.
+
 ## Review and stop points
 
 Use internal agent review during implementation. Run Prism on significant completed

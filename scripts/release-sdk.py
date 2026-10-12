@@ -173,7 +173,7 @@ def module_license(path):
     return declared_notice(path) and re.match(r"^(?:licen[cs]e|copying)(?:[._-]|$)", path.name.lower()) is not None and (len(path.parts) == 1 or len(path.parts) == 2 and path.parts[0].lower() in {"license", "licenses", "licence", "licences"})
 
 
-def license_inventory(root, dependencies=None):
+def verified_module_graph(root, dependencies=None):
     env = child_environment()
     # Listing the module graph alone leaves Dir absent for cold-cache modules.
     # Materialize and verify every external source before collecting declarations.
@@ -189,7 +189,11 @@ def license_inventory(root, dependencies=None):
         run_child(["go", "mod", "download", "all"], cwd=graph, env=env, check=True, timeout=COMMAND_TIMEOUT_SECONDS)
         run_child(["go", "mod", "verify"], cwd=graph, env=env, check=True, stdout=subprocess.PIPE, timeout=COMMAND_TIMEOUT_SECONDS)
         raw = check_child_output(["go", "list", "-m", "-json", "all"], cwd=graph, text=True, env=env, timeout=COMMAND_TIMEOUT_SECONDS)
-    modules = decode_objects(raw)
+    return decode_objects(raw)
+
+
+def license_inventory(root, dependencies=None, modules=None, *, copy_notices=True, max_notice_bytes=None):
+    modules = verified_module_graph(root, dependencies) if modules is None else modules
     pinned_file = root / "drivers/cogent/native/dependencies.json"
     pinned = {item["module"]: item for item in json.loads(pinned_file.read_text())["dependencies"]} if pinned_file.is_file() else {}
     inventory = []
@@ -207,16 +211,31 @@ def license_inventory(root, dependencies=None):
             if path.is_file() and not path.is_symlink() and declared_notice(path.relative_to(directory)):
                 relative = path.relative_to(directory).as_posix()
                 key = hashlib.sha256(module["Path"].encode()).hexdigest()[:16] + "/" + relative
-                content = path.read_bytes()
-                notices["THIRD_PARTY_NOTICES/" + key] = content
-                copies.append({"file": relative, "notice": key, "sha256": hashlib.sha256(content).hexdigest()})
+                if copy_notices:
+                    content = path.read_bytes()
+                    notices["THIRD_PARTY_NOTICES/" + key] = content
+                    record = {"file": relative, "notice": key, "sha256": hashlib.sha256(content).hexdigest()}
+                else:
+                    require_regular_source(directory, path)
+                    digest, size = hashlib.sha256(), 0
+                    with path.open("rb") as stream:
+                        while chunk := stream.read(64 * 1024):
+                            size += len(chunk)
+                            if max_notice_bytes is not None and size > max_notice_bytes:
+                                raise ValueError("notice exceeds inventory file bound: " + relative)
+                            digest.update(chunk)
+                    record = {"file": relative, "bytes": size, "sha256": digest.hexdigest()}
+                copies.append(record)
                 if module_license(Path(relative)):
                     own_licenses.append(relative)
         source_pin = pinned.get(module["Path"]) if module.get("Replace") and effective.get("Dir") and not effective.get("Version") else None
         version = source_pin["version"] if source_pin else effective.get("Version", module.get("Version"))
         source_sum = source_pin["sum"] if source_pin else effective.get("Sum", module.get("Sum"))
-        inventory.append({"module": module["Path"], "version": version, "sum": source_sum, "license_files": copies, "module_license_files": own_licenses, "status": "declared-files-copied" if own_licenses else "manual-review-required"})
-    return {"schema": 1, "scope": "Go module graph and declared license/notice files; not a legal approval or complete embedded native/Rust/font audit", "distribution_audit": "pending", "modules": inventory}, notices
+        inventory.append({"module": module["Path"], "version": version, "sum": source_sum, "license_files": copies, "module_license_files": own_licenses, "status": ("declared-files-copied" if copy_notices else "declared-file-identities") if own_licenses else "manual-review-required"})
+    result = {"schema": 1, "scope": "Go module graph and declared license/notice files; not a legal approval or complete embedded native/Rust/font audit", "distribution_audit": "pending", "modules": inventory}
+    if not copy_notices:
+        result["notice_contents_included"] = False
+    return result, notices
 
 
 def add_member(archive, name, data, executable=False):

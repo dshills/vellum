@@ -132,6 +132,18 @@ to launch three desktop processes and measure verified GPU startup, synchronous
 render/readback, RSS and sampled idle CPU. The [SDK contract](../specs/sdk.md)
 defines measurement boundaries and residual release/platform gates.
 
+Collect Mac SDK distribution inputs without launching a window:
+
+```sh
+python3 scripts/distribution-inventory.py --output /tmp/vellum-distribution.json
+```
+
+Use a new output path outside the checkout. The report records SDK file hashes,
+resolved embedded assets, listed cgo sources and native linker-search candidates
+against the verified module notice graph. Review-required asset/native rights
+and prebuilt archive component provenance remain separate from this inventory.
+The collector does not approve or publish a distribution.
+
 Set `VELLUM_CACHE_DIR` to reuse a chosen Go cache across preparation/check commands.
 The legacy `P0_CACHE_DIR` variable is accepted for existing local environments.
 Without either variable, sourcing the environment creates an isolated temporary cache.
