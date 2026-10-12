@@ -228,3 +228,24 @@ selection or installed menu activation. Physical Finder drag acceptance remains
 open. The text-only clipboard restoration flag is not preservation-safe for an
 ordinary general pasteboard; a full roundtrip requires bounded flavor preservation
 and interference handling. No gate closes from this inventory alone.
+
+## Actual document chooser workflow
+
+[Native chooser acceptance](../docs/reports/macos-native-choosers/README.md) now
+verifies real Open and Save As selections, native cancellation for both modes,
+exact temporary-file persistence, restored controls, an unchanged surviving
+window and normal native closure of both editor windows. The ordinary consumer
+uses real FileStore/ChooseFile services, without injected paths or chooser results.
+Unique directory/file/content identities and exact output bytes qualify the
+observed workflow; private session path/revision counters remain unobserved.
+Earlier failed automation attempts are historical, not acceptance. This closes
+this editor's selected-panel workflow, while native menus, general clipboard,
+physical Finder drag and broader Mac/performance acceptance remain open.
+
+The current `live-v20` qualification has 47 command receipts, 11 stages, exact
+original/input/saved byte identity, and normal exit in 8.49 seconds. Internal
+source review corrected the external acceptance harness; eight fault probes
+exercise its failure records and bounds. Native focused-window observations
+match both shortcuts, while foreground checking and global posting remain
+non-atomic. Earlier full workflows remain historical observations, and later
+failed attempts remain failed. These harness changes are not production fixes.

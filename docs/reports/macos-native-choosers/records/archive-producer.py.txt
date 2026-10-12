@@ -1,0 +1,70 @@
+"""Selective native chooser evidence archive. No native/UI execution."""
+import hashlib,json,tarfile
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');phase=Path('/private/tmp/vellum-native-choosers')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(name):return json.loads((phase/name).read_text())
+def receipt(name):return {'path':name,'sha256':sha(phase/name)}
+source=read('source-review-v20.json');evidence=read('evidence-review-v20.json');native=read('live-v20/qualification.json');compile=read('compile-v20.json');build=read('build-v2.json');faults=read('harness-faults.json')
+assert source['status']=='APPROVED'and not source['findings']
+assert evidence.get('status',evidence.get('result'))in['APPROVED','APPROVED_EVIDENCE']and not evidence['findings']
+assert set(evidence['reviewed_document_sha256'])=={'docs/reports/macos-native-choosers/README.md','specs/document.md','specs/macos-completion.md'}
+for name,expected in evidence['reviewed_document_sha256'].items():assert sha(root/name)==expected
+assert sha(Path(__file__))==evidence['archive_producer_sha256']
+assert 'live-v20/qualification.json'in evidence['reviewed_receipt_sha256']
+for name,expected in evidence['reviewed_receipt_sha256'].items():assert sha(phase/name)==expected
+assert native['result']=='PASS_NATIVE_CHOOSER_WORKFLOW'and native['failure']is None and native['exit_code']==0
+assert native['before']==native['after']==build['after']==build['before']and len(native['after']['prepared'])==6167
+assert native['binary_stable']and sha(phase/'editor-rebuilt')==native['binary_sha256']==build['binary_sha256']
+assert native['input_unchanged']and native['saved_exists']and native['saved_matches']
+assert native['fixture_expected_sha256']==native['fixture_input_sha256']==native['fixture_saved_sha256']
+assert len(native['commands'])==47 and len(native['stages'])==11
+assert not(phase/'live-v20/native.stderr.log').read_bytes()
+assert json.loads((phase/'live-v20/commands.json').read_text())==native['commands']
+for n,h in source['reviewed_source_sha256'].items():assert sha(Path(n))==h
+assert sha(phase/'ax.swift')==compile['source_sha256']==native['helper_source_sha256']
+assert sha(phase/'ax')==compile['binary_sha256']==native['helper_sha256']and compile['source_stable']
+assert sha(phase/'drive.py')==native['driver_source_sha256']==faults['driver_source_sha256']
+assert faults['result']=='PASS'and faults['tests']==8 and sha(phase/'test-harness.py')==faults['test_source_sha256']
+for c in native['commands']:
+ for k in ['stdout','stderr']:assert sha(phase/'live-v20'/c[k])==c[k+'_sha256']
+ if c['argv'][2]=='key':
+  value=json.loads((phase/'live-v20'/c['stdout']).read_bytes())
+  assert value['foreground_pid_checks']==[native['pid'],native['pid']]
+  assert value['focused_window']['status']==0 and value['focused_window']['id']==value['target']
+  assert value['posted_key_down_states']==[True,False]
+for n,h in native['after']['source'].items():assert sha(root/n)==h
+for n,h in native['after']['prepared'].items():assert sha(root/'drivers/cogent/build'/n)==h
+# Explicit allowlist: no broad historical UI dumps, app bundles, executable
+# helpers/editor, compiler module cache or unrelated ephemeral files.
+names=['build-v2.json','build-v2.stdout.log','build-v2.stderr.log','original-build-info.log','rebuilt-build-info.log','compile-v20.json','compile-v20.stdout.log','compile-v20.stderr.log','trust-v20.stdout.log','trust-v20.stderr.log','harness-faults.json','harness-faults-v20.stdout.log','harness-faults-v20.stderr.log','validation-v20.json','history-summary.json','source-review-final.json','source-review-v20.json','evidence-review-v20.json','live-v20.driver.stdout.log','live-v20.driver.stderr.log']
+selected={name:phase/name for name in names}
+for name in ['ax.swift','drive.py','test-harness.py','build-v2.py','compile-v20.py','archive-producer.py']:
+ selected['recipes/'+name+'.txt']=phase/name
+for name in ['ax-v17.swift.txt','ax-v18.swift.txt','ax-v19.swift.txt','drive-v17.py.txt','drive-v18.py.txt','drive-v19.py.txt']:
+ selected['history-recipes/'+name]=phase/name
+run=phase/'live-v20'
+for name in ['qualification.json','launch.json','commands.json','native.stdout.log','native.stderr.log']:
+ selected['live-v20/'+name]=run/name
+for c in native['commands']:
+ for k in ['stdout','stderr']:selected['live-v20/'+c[k]]=run/c[k]
+fixtures=run/'owned-live-v20'
+for p in fixtures.iterdir():
+ assert p.is_file()and not p.is_symlink()and sha(p)==native['fixture_expected_sha256']
+ selected['live-v20/owned-live-v20/'+p.name]=p
+assert len(list(fixtures.iterdir()))==2
+for name,p in selected.items():assert p.is_file()and not p.is_symlink()and not name.startswith('/')and '..'not in Path(name).parts
+record={'schema':1,'checkpoint':'Actual native editor Open/Save As/Cancel and two-window closure','base_commit':'41a48887289caaced45601c1e399fc5d488069ca','production_scope':'Evidence/specs plus inert optional external acceptance recipes; no Go/native production code or runtime dependency change.','qualifying_run':'live-v20','native':receipt('live-v20/qualification.json'),'build':receipt('build-v2.json'),'source_review':receipt('source-review-v20.json'),'evidence_review':receipt('evidence-review-v20.json'),'fault_checks':receipt('harness-faults.json'),'validation':receipt('validation-v20.json'),'history':receipt('history-summary.json'),'commands':47,'stages':11,'elapsed_seconds':native['elapsed_seconds'],'process_exit_code':0,'fixture_sha256':native['fixture_expected_sha256'],'binary_sha256':native['binary_sha256'],'helper_sha256':native['helper_sha256'],'report_sha256':sha(root/'docs/reports/macos-native-choosers/README.md'),'spec_sha256':{n:sha(root/n)for n in['specs/document.md','specs/macos-completion.md']},'prism_in_this_checkpoint':False,'review_policy':'Internal source/evidence reviews for native acceptance harness between significant Prism changes.','os_preferences_changed':False,'scope':'Actual ordinary-editor native panel workflow and normal two-window teardown. No private session path/revision/result counts, native menu, clipboard, physical Finder drag, human IME/VoiceOver, display, memory/performance/fullMac or public distribution qualification. Global foreground check/event posting is non-atomic. Windows/Linux deferred.'}
+out=root/'docs/reports/macos-native-choosers/records';out.mkdir(exist_ok=False)
+index={name:{'sha256':sha(p),'bytes':p.stat().st_size}for name,p in sorted(selected.items())};archive=out/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tar:
+ for name,p in sorted(selected.items()):tar.add(p,arcname=name,recursive=False)
+(out/'evidence-index.json').write_text(json.dumps({'archive_sha256':sha(archive),'entries':index},indent=2)+'\n')
+record['archive']={'path':'evidence.tar.gz','sha256':sha(archive),'files':len(index),'index_sha256':sha(out/'evidence-index.json')}
+(out/'checkpoint.json').write_text(json.dumps(record,indent=2)+'\n');(out/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+with tarfile.open(archive)as tar:
+ assert len(tar.getmembers())==len(index)
+ for member in tar.getmembers():
+  assert member.isfile();data=tar.extractfile(member).read()
+  assert len(data)==index[member.name]['bytes']and hashlib.sha256(data).hexdigest()==index[member.name]['sha256']
+print('ARCHIVE VERIFIED',len(index),'members',archive.stat().st_size,'bytes')

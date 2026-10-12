@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "checkpoint": "Actual native editor Open/Save As/Cancel and two-window closure",
+  "base_commit": "41a48887289caaced45601c1e399fc5d488069ca",
+  "production_scope": "Evidence/specs plus inert optional external acceptance recipes; no Go/native production code or runtime dependency change.",
+  "qualifying_run": "live-v20",
+  "native": {
+    "path": "live-v20/qualification.json",
+    "sha256": "2e74f7a5ba15df8310f4321db6c7db6d48cd24ba81711c20ddc1a6c2bf115965"
+  },
+  "build": {
+    "path": "build-v2.json",
+    "sha256": "532021a272d1b9ce4853b01ff25f6013a3d1c63beab88a65f7300db59b68e260"
+  },
+  "source_review": {
+    "path": "source-review-v20.json",
+    "sha256": "a7db52543b3fa1029287143b9c0e615f4ba6814044496ab49249c0c34423e154"
+  },
+  "evidence_review": {
+    "path": "evidence-review-v20.json",
+    "sha256": "decf11ed96fbb7aa377fe9a1432ff526f66f66573f810506f4bf78cd4cf48356"
+  },
+  "fault_checks": {
+    "path": "harness-faults.json",
+    "sha256": "c8d3d7d4d3a796ef8a752d6ac72b78459c278545c98a6f52733a3dab194fc317"
+  },
+  "validation": {
+    "path": "validation-v20.json",
+    "sha256": "1416cdbfd08bfafd49390fbb3ff22a4bf250dba07104f9c04c7f2d4089b01d52"
+  },
+  "history": {
+    "path": "history-summary.json",
+    "sha256": "96c63ad94cb13b1653da1bbc3ec53bbfd4815c35f11d01eb94bf10ffc550cadc"
+  },
+  "commands": 47,
+  "stages": 11,
+  "elapsed_seconds": 8.490491417003796,
+  "process_exit_code": 0,
+  "fixture_sha256": "25ca7e57649f084306220aca9db1446da6885d068f86e6d113ae3c3cded5dec8",
+  "binary_sha256": "e755e8c2d643b6b0636e8a0d51e820c657803173b811090a3e94cbc6955ca9c7",
+  "helper_sha256": "fab110d5fa0b258023497f20fec5c0bff1e6afa375f2248cdc1fc334939e6d0d",
+  "report_sha256": "9f7cc788568a16a45c6b9ce7bf6bac90481914292ec547fb1d75c92baeea8c5a",
+  "spec_sha256": {
+    "specs/document.md": "90b7eb86243d7141f9a4e355671dd4a21f6446bdaee6db4fb15022fe614c5f53",
+    "specs/macos-completion.md": "972a7de067991c909b8e2787df651b3ffe8e9ec0548096040928b8a156f34b0a"
+  },
+  "prism_in_this_checkpoint": false,
+  "review_policy": "Internal source/evidence reviews for native acceptance harness between significant Prism changes.",
+  "os_preferences_changed": false,
+  "scope": "Actual ordinary-editor native panel workflow and normal two-window teardown. No private session path/revision/result counts, native menu, clipboard, physical Finder drag, human IME/VoiceOver, display, memory/performance/fullMac or public distribution qualification. Global foreground check/event posting is non-atomic. Windows/Linux deferred.",
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "0b104a0cb790001d6225ef3d826311299e9306c792b9b686933561c497f849b4",
+    "files": 133,
+    "index_sha256": "7f39cecb9643ab9c0a0b50b58931634f6e133a716f1a4fd145350bcd6ce4d9f9"
+  }
+}

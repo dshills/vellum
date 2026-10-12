@@ -97,3 +97,23 @@ SDK includes document and is tested after archive relocation/source deletion.
 real native CloseReq, Cocoa accessibility dialog actions and temporary file IO.
 Its deterministic chooser does not certify actual file-panel selection or human
 accessibility workflows. See [phase evidence](../docs/reports/macos-document/README.md).
+
+## Real macOS panel acceptance
+
+The ordinary independent editor has externally verified Open, Save As, and both
+native Cancel routes on uniquely identified owned temporary files. Successful
+Save As creates exact expected bytes at the selected absolute destination; native
+cancel creates none and preserves document text/path label. Controls recover,
+the untouched second window survives the first native close, and both windows
+close normally with process exit 0. See [receipt and scope](../docs/reports/macos-native-choosers/README.md).
+This is real Cocoa selection plus FileStore persistence, separate from injected
+chooser/model smokes. It does not expose private session revision/path telemetry
+or qualify menu, clipboard, Finder, human input or performance acceptance.
+
+The qualifying `live-v20` receipt compares both files to immutable original
+UTF-8 bytes, binds the unchanged build inputs, and records 11 completed stages.
+The external client preserves critical window-read errors and every attempted
+command, bounds retries before action admission, and checks foreground focus
+before file-panel shortcuts. Those checks and global event posts are not atomic.
+Eight fault probes cover harness failure records, retry bounds and byte mutation;
+earlier harness generations do not replace the current qualification.
