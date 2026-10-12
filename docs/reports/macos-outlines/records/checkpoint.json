@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "checkpoint": "Renderer-owned static outline reuse",
+  "base_commit": "61a7ca2b8fad42041d5b108e5af025bdfef71659",
+  "upstream_stage": 43,
+  "font_stage": 4,
+  "prepared_files": 6171,
+  "stage": {
+    "path": "stage.json",
+    "sha256": "40dcb8df962f94d18e6f0743d6c00eedd5938f19c28fe2964dacf4d365684a85"
+  },
+  "preparation": {
+    "path": "preparation-v2/process.json",
+    "sha256": "d38cd8e6264d063d429a64f8f0b0161f261e41b38c0548d4200d2cd35765ff46"
+  },
+  "source_review": {
+    "path": "source-review-v2.json",
+    "sha256": "5bfbb8cdf42135819520a4b47495897d96099d0796eda380f1dca295e18a072d"
+  },
+  "evidence_review": {
+    "path": "evidence-review-v1.json",
+    "sha256": "b4cf34eb33c8b14b3390563a5e6e8ba953bdd8373845f03cd9b51acbcc2e6401"
+  },
+  "prism": {
+    "path": "prism-v1/prism.json",
+    "sha256": "45a5827b779a8fdcd8a2d35e652a750b7c94509b5345e18d85469be3e9759a67"
+  },
+  "prism_process": {
+    "path": "prism-v1/process.json",
+    "sha256": "f3168c64bed64fac29ad0386a68f9fc3148ab7f4107242283c92e5933fae09dd"
+  },
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "native_gpu": {
+    "path": "native-gpu-v2/qualification.json",
+    "sha256": "5237b86750db80c4a671c200c006eb33e1cc2ec024476fa6dc2fb8ba2440ec25"
+  },
+  "checks": {
+    "path": "checks-v4/qualification.json",
+    "sha256": "02323edc3424847b7a36963e161190ce6bfc5b60f2ec97f24a870c3c6cc77c22"
+  },
+  "aux_checks": {
+    "path": "aux-checks-v1/qualification.json",
+    "sha256": "82813ede035d9f3ff45956bf09887fc41a13ccfb250d53811538401499c2af53"
+  },
+  "baseline_build": {
+    "path": "build-baseline/qualification.json",
+    "sha256": "c93e5897ad7f500326405ce86f6b3959355bdf1a2cc16ad064ff5b60c2846bf6"
+  },
+  "candidate_build": {
+    "path": "build-candidate-v2/qualification.json",
+    "sha256": "a86aa396ebd7f7fbe588383bb98d34e3c65283f69f29d41083af0cb0c3f1fc09"
+  },
+  "ordinary_campaign": {
+    "path": "ordinary-campaign-v1/qualification.json",
+    "sha256": "93a6e5f6689ef5ea96ff84934164f5a1ff43632749631a7289b74a2919543315"
+  },
+  "campaign_validation": {
+    "path": "campaign-validation.json",
+    "sha256": "17e107af7d89e793870a91f6ec6bc51b598220d09d69c5944023a17f87802d41"
+  },
+  "ordinary_processes": 80,
+  "ordinary_events": 9600,
+  "runs_per_case": 5,
+  "samples_per_run": 120,
+  "warmup": 128,
+  "warm_target_met": {
+    "baseline": {
+      "cpu": false,
+      "gpu": false
+    },
+    "candidate": {
+      "cpu": false,
+      "gpu": false
+    }
+  },
+  "allocation": {
+    "path": "allocation-v1/qualification.json",
+    "sha256": "8bc575f9ec1c5ffec383436dade0b7c609e67834b1a1db42090d7647f5221727"
+  },
+  "allocation_processes": 4,
+  "allocation_profiles": 8,
+  "allocation_pprof_commands": 20,
+  "outline_payload_bytes_per_renderer": 2097152,
+  "outline_entries_per_renderer": 1024,
+  "outline_font_references_per_renderer": 8,
+  "outline_payload_bytes_per_entry": 65536,
+  "default_gpu_scene_rendering": false,
+  "report_sha256": "0ce09416f989dad281696f6360e005de5d33ab025a77f2bd0d400f4931bc558c",
+  "spec_sha256": {
+    "specs/rendering.md": "7c317b918f3a28ce87dd375ce5cae4571679ba3c3be80ceb927b7adea5f78c00",
+    "specs/macos-completion.md": "3309f620d320020437cdfad5430dff060614459ea9b24e9a54660f82f99a9ee8"
+  },
+  "os_preferences_changed": false,
+  "scope": "Raw outline reuse only; exact original geometry/pixels/public ownership and full logical GPU budget replay. Per-renderer payload/reference limits do not bound total font/process/native/GPU memory. Warm latency remains failing; full Mac/public distribution/tree/workbench/physical presentation gates remain open. Windows/Linux deferred.",
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "6fe071a4411617b8245f03d11deb69d3e9f472ef0918eb6d8d0e7cc930f28f96",
+    "files": 346,
+    "index_sha256": "80ac90b12982883cb5a0d0ea9b92d3fcbbff50e383aa77ffb88c6c7fd3283b6d"
+  }
+}

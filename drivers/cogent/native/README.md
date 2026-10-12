@@ -157,3 +157,10 @@ scanner spans. Sealing retains the preceding relative-row packet/encoding and
 shader arithmetic, including arbitrary row arrival and overlap. The accompanying
 reference/byte, allocation and native multi-row fixtures bind this change; full
 Mac performance/memory acceptance remains separate.
+
+Patch 0043 retains renderer-owned static glyph outlines with capacity/entry/Font
+bounds and exact successful cost replay supplied by typesetting stage 0004.
+Private scene/scroll captures share only immutable cache entries; aggregate
+budgets remain caller-owned. CPU fallback and public outline ownership are
+preserved. CPU/GPU retirement drops the new cache while keeping snapshot pixels.
+See [outline cache contract](patches/outlinecache/README.md).

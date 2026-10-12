@@ -1,0 +1,163 @@
+--- /dev/null
++++ b/font/glyph_outline_cost.go
+@@ -0,0 +1,44 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package font
++
++// GlyphOutlineCost is the opaque logical work charged by a successful bounded
++// static outline retrieval. It contains no font/face/outline references. It is
++// reusable only with that exact immutable outline; it is not a byte measurement.
++// The zero value is invalid. Ordinary GlyphDataOutline ownership is unchanged.
++type GlyphOutlineCost struct {
++	points, operations int
++	valid              bool
++}
++
++// Charge applies the original successful retrieval's aggregate logical cost.
++// Exhaustion or an invalid cost latches refusal, as with bounded retrieval.
++// A failed batch performs no further work. Partial charges on failure need not
++// match a fresh traversal, since that batch is already terminal.
++func (cost GlyphOutlineCost) Charge(budget *GlyphOutlineBudget) bool {
++	if budget == nil {
++		return false
++	}
++	if !cost.valid {
++		budget.failed = true
++		return false
++	}
++	return budget.take(cost.points, cost.operations)
++}
++
++// GlyphDataOutlineBoundedCost returns the ordinary bounded result and its exact
++// successful work charge. The caller owns the new segment slice. A renderer can
++// privately retain it and replay the cost before reading a cached immutable
++// outline. Refused retrievals never produce a valid cost or negative cache entry.
++func (f *Face) GlyphDataOutlineBoundedCost(gid GID, budget *GlyphOutlineBudget) (GlyphOutline, GlyphOutlineCost, bool) {
++	if budget == nil {
++		return GlyphOutline{}, GlyphOutlineCost{}, false
++	}
++	points, operations := budget.points, budget.operations
++	outline, ok := f.GlyphDataOutlineBounded(gid, budget)
++	if !ok {
++		return GlyphOutline{}, GlyphOutlineCost{}, false
++	}
++	return outline, GlyphOutlineCost{points - budget.points, operations - budget.operations, true}, true
++}
+--- /dev/null
++++ b/font/glyph_outline_cost_test.go
+@@ -0,0 +1,113 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package font
++
++import (
++	"github.com/go-text/typesetting/font/cff"
++	"github.com/go-text/typesetting/font/opentype/tables"
++	"reflect"
++	"testing"
++)
++
++func TestVellumOutlineCostExactSuccessfulBudgetReplay(t *testing.T) {
++	face := vellumBoundedTestFace(t)
++	for i := 0; i < face.glyfCount(); i++ {
++		gid := GID(i)
++		fresh := NewGlyphOutlineBudget(1<<20, 1<<20)
++		outline, cost, ok := face.GlyphDataOutlineBoundedCost(gid, fresh)
++		want, accepted := face.GlyphDataOutline(gid)
++		if ok != accepted || !reflect.DeepEqual(outline, want) || !cost.valid {
++			t.Fatalf("outline/cost parity glyph %d", i)
++		}
++		replayed := NewGlyphOutlineBudget(1<<20, 1<<20)
++		if !cost.Charge(replayed) || *replayed != *fresh {
++			t.Fatalf("lost composite/point/traversal charge for glyph %d", i)
++		}
++		for _, budget := range []*GlyphOutlineBudget{
++			NewGlyphOutlineBudget(cost.points, cost.operations),
++			NewGlyphOutlineBudget(cost.points-1, cost.operations),
++			NewGlyphOutlineBudget(cost.points, cost.operations-1),
++		} {
++			if budget == nil {
++				continue
++			}
++			cold := *budget
++			_, coldOK := face.GlyphDataOutlineBounded(gid, &cold)
++			warmOK := cost.Charge(budget)
++			if coldOK != warmOK || (!warmOK && !budget.failed) {
++				t.Fatalf("cache warmth changed boundary admission for glyph %d", i)
++			}
++		}
++	}
++}
++
++func TestVellumOutlineCostFailureAndAggregateLatch(t *testing.T) {
++	face := vellumBoundedTestFace(t)
++	gid, _ := face.NominalGlyph('A')
++	_, cost, ok := face.GlyphDataOutlineBoundedCost(gid, NewGlyphOutlineBudget(1<<20, 1<<20))
++	if !ok || cost.points == 0 || cost.operations == 0 {
++		t.Fatal("fixture did not charge work")
++	}
++	budget := NewGlyphOutlineBudget(cost.points*2-1, cost.operations*2)
++	if !cost.Charge(budget) || cost.Charge(budget) || !budget.failed {
++		t.Fatal("warm hit bypassed aggregate limit")
++	}
++	remaining := *budget
++	if cost.Charge(budget) || *budget != remaining {
++		t.Fatal("failed budget resumed work")
++	}
++	invalid := NewGlyphOutlineBudget(100, 100)
++	if (GlyphOutlineCost{}).Charge(invalid) || !invalid.failed || cost.Charge(nil) {
++		t.Fatal("invalid cost or nil budget admitted")
++	}
++	for _, limited := range []*GlyphOutlineBudget{nil, NewGlyphOutlineBudget(1, 1), NewGlyphOutlineBudget(100, 100)} {
++		_, refusedCost, accepted := face.GlyphDataOutlineBoundedCost(EmptyGlyph, limited)
++		if accepted || refusedCost.valid || refusedCost.Charge(NewGlyphOutlineBudget(100, 100)) {
++			t.Fatal("refused retrieval published usable cost")
++		}
++	}
++}
++
++func TestVellumOutlineCostUnsupportedAndCompositeExpansion(t *testing.T) {
++	for _, kind := range []string{"variable", "CFF", "CFF2", "SVG", "bitmap", "sbix", "lazy-sbix"} {
++		face := vellumBoundedTestFace(t)
++		switch kind {
++		case "variable":
++			face.fvar = make(fvar, 1)
++		case "CFF":
++			face.Font = loadFont(t, "toys/CFFTest.otf")
++		case "CFF2":
++			face.cff2 = &cff.CFF2{}
++		case "SVG":
++			face.svg = make(svg, 1)
++		case "bitmap":
++			face.bitmap = make(bitmap, 1)
++		case "sbix":
++			face.sbix = make(sbix, 1)
++		case "lazy-sbix":
++			face.lazySbix = &lazySbix{}
++		}
++		budget := NewGlyphOutlineBudget(1000, 1000)
++		if _, cost, ok := face.GlyphDataOutlineBoundedCost(0, budget); ok || cost.valid || !budget.failed || budget.points != 1000 || budget.operations != 1000 {
++			t.Fatal("unsupported font decoded or published cost", kind)
++		}
++	}
++	face := vellumBoundedTestFace(t)
++	face.lazyGlyf = nil
++	face.glyf = make(tables.Glyf, 12)
++	face.glyf[0] = tables.Glyph{Data: tables.SimpleGlyph{Points: []tables.GlyphContourPoint{{X: 0, Y: 0, Flag: 1}, {X: 100, Y: 0, Flag: 1}, {X: 0, Y: 100, Flag: 1}}, EndPtsOfContours: []uint16{2}}}
++	for i := 1; i < len(face.glyf); i++ {
++		face.glyf[i] = tables.Glyph{Data: tables.CompositeGlyph{Glyphs: []tables.CompositeGlyphPart{{GlyphIndex: tables.GlyphID(i - 1)}, {GlyphIndex: tables.GlyphID(i - 1)}}}}
++	}
++	budget := NewGlyphOutlineBudget(1<<20, 1<<20)
++	outline, cost, ok := face.GlyphDataOutlineBoundedCost(11, budget)
++	if !ok || len(outline.Segments) < 2000 || cost.operations <= len(outline.Segments)*3 {
++		t.Fatal("composite cost omitted traversal/point work")
++	}
++	cold, warm := NewGlyphOutlineBudget(cost.points-1, cost.operations), NewGlyphOutlineBudget(cost.points-1, cost.operations)
++	_, coldOK := face.GlyphDataOutlineBounded(11, cold)
++	if coldOK || cost.Charge(warm) || !cold.failed || !warm.failed {
++		t.Fatal("expanded warm outline bypassed original admission")
++	}
++}

@@ -330,3 +330,28 @@ CPU Raster/Copy breakdowns. CPU fallback timings measure the current ordinary
 render/copy calls; earlier journal reconstruction is also in outer Draw. No
 physical upload bytes, GPU completion, presentation, whole-scene eligibility or
 latency acceptance follows from these routing counts or bounded native readbacks.
+
+## Renderer-owned static outline reuse
+
+The Rasterx renderer and its private scene/scroll captures may reuse immutable
+font-unit outlines keyed by Font identity and full GID. Entries are admitted only
+from successful bounded static TrueType retrieval; variable/CFF and encoded
+bitmap/SVG resources retain existing routes. Ordinary public font outputs remain
+independently mutable. CPU admission refusal falls back to ordinary retrieval;
+cache capacity alone does not reject a successful GPU outline.
+
+Every cached bounded hit consumes the opaque exact successful retrieval cost in
+the caller's aggregate outline budget, including composite point/traversal work.
+Later per-glyph, segment, finite-coordinate and extent-product checks still run.
+Cache warmth must not change successful budget admission or revive a failed batch.
+
+Each renderer retains at most 2MiB segment capacity, 1024 entries, 8 Font references,
+and 64KiB segment capacity per entry. These bounds exclude metadata, transient
+retrieval, Font/backing storage and existing glyph-mask caches. Resize retains
+size-independent geometry; replacement Font identity gets a distinct entry.
+CPU/GPU Release drops new outline references while preserving image snapshots.
+Faces remain generally unsafe for concurrent mutation; Font/backing resource
+immutability and the renderer's existing owner serialization remain required.
+Matched original geometry/pixels, budget/refusal and native measurements must
+qualify this optimization. It does not itself establish performance or memory
+acceptance or enable the GPU scene path by default.

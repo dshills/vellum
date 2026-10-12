@@ -1,0 +1,54 @@
+"""Archive verified outline-cache evidence only; no native/provider execution."""
+import hashlib,json,tarfile
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');phase=Path('/private/tmp/vellum-outline-cache')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(n):return json.loads((phase/n).read_text())
+def receipt(n):return {'path':n,'sha256':sha(phase/n)}
+source=read('source-review-v2.json');evidence=read('evidence-review-v1.json');native=read('native-gpu-v2/qualification.json');campaign=read('ordinary-campaign-v1/qualification.json');validated=read('campaign-validation.json');alloc=read('allocation-v1/qualification.json');prism=read('prism-v1/prism.json')
+assert source['status']=='APPROVED'and not source['findings']
+assert evidence.get('status',evidence.get('result'))in['APPROVED','APPROVED_EVIDENCE']and not evidence['findings']
+assert sha(Path(__file__))==evidence['archive_producer_sha256']
+for name,h in evidence['reviewed_document_sha256'].items():assert sha(root/name)==h
+for name,h in evidence['reviewed_receipt_sha256'].items():assert sha(phase/name)==h
+for group in['reviewed_source_sha256','reviewed_metadata_sha256']:
+ for name,h in source[group].items():assert sha(Path(name))==h
+assert prism['coverage']['complete']and not prism['coverage']['skipped']and not prism['coverage']['excluded']and prism['coverage']['truncatedBytes']==0 and not prism['findings']
+assert prism['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]
+assert read('prism-v1/process.json')['exit_code']==0 and read('prism-v1/process.json')['source_index_stable']
+assert native['result']=='PASS_NATIVE_GPU'and native['before']==native['after']and native['exit_code']==0 and native['main_groups']==3
+assert campaign['result']=='MEASURED'and campaign['failure']is None and campaign['before']==campaign['after']and campaign['processes']==80
+assert validated['result']=='PASS_CAMPAIGN_VALIDATION'and validated['campaign_sha256']==sha(phase/'ordinary-campaign-v1/qualification.json')and validated['raw_processes']==80 and validated['samples']==9600
+assert validated['build_artifacts_exact']and validated['closed_warmup_guard_all_80']and validated['paired_and_rowcount_geometry_match']and validated['statistics_recomputed']
+assert alloc['result']=='PASS_ALLOCATION_DIAGNOSTIC'and alloc['before']==alloc['after']==campaign['before']
+assert len(alloc['cases'])==4 and all(case['samples']==120 and case['warmup']==128 and case['warm_target_eligible']is False for case in alloc['cases'].values())
+assert read('checks-v4/qualification.json')['result']=='PASS'and read('aux-checks-v1/qualification.json')['result']=='PASS'
+for folder in['build-baseline','build-candidate-v2']:
+ record=read(folder+'/qualification.json');assert record['result']=='PASS_BUILD_ONLY'and record['before']==record['after']and sha(phase/folder/'loadedgrid')==record['binary_sha256']
+assert len(campaign['after']['prepared'])==6171
+for n,h in campaign['after']['source'].items():assert sha(root/n)==h
+for n,h in campaign['after']['prepared'].items():assert sha(root/'drivers/cogent/build'/n)==h
+# Explicit evidence directories; no executables, module caches, app bundles,
+# prepared source trees, or broad unrelated UI snapshots.
+selected={}
+for folder in['checks-v1','checks-v2','checks-v3','checks-v4','aux-checks-v1','preparation-v1','preparation-v2','native-gpu-v1','native-gpu-v2','prism-v1','ordinary-campaign-v1','allocation-v1','build-baseline-failed-v1','build-baseline','build-candidate','build-candidate-v2']:
+ for p in(phase/folder).rglob('*'):
+  if p.is_file()and not p.is_symlink()and p.name!='loadedgrid':selected[p.relative_to(phase).as_posix()]=p
+names=['original-hashes.json','stage.json','stage-generation-correction.json','source-review-v1.json','source-review-v2.json','plan-review-v1.json','evidence-review-v1.json','campaign-validation.json','campaign-terminal.json','native-gpu-counter-correction.json','campaign-v1.stdout.log','campaign-v1.stderr.log','allocation-v1.stdout.log','allocation-v1.stderr.log','prepare-tests.stdout.log','prepare-tests.stderr.log','prepare-tests-v2.stdout.log','prepare-tests-v2.stderr.log','evidence-review.py.txt']
+for name in names:selected[name]=phase/name
+for name in['build.py','checks.py','checks-v2.py','checks-v3.py','full-checks.py','prepare.py','prepare-v2.py','stage.py','prism.py','native-gpu.py','native-gpu-v2.py','campaign.py','validate-campaign.py','aux-checks.py','allocation.py','focus-profiles.py','report.py','archive.py']:selected['recipes/'+name+'.txt']=phase/name
+for p in(phase/'original').rglob('*'):
+ if p.is_file():selected['original-sources/'+p.relative_to(phase/'original').as_posix()+'.txt']=p
+for item in read('stage.json')['stages']:
+ for name in item['after']:selected['reviewed-sources/'+item['module']+'/'+name+'.txt']=root/'drivers/cogent/build'/item['module']/name
+for name,p in selected.items():assert p.is_file()and not p.is_symlink()and not name.startswith('/')and '..'not in Path(name).parts
+record={'schema':1,'checkpoint':'Renderer-owned static outline reuse','base_commit':'61a7ca2b8fad42041d5b108e5af025bdfef71659','upstream_stage':43,'font_stage':4,'prepared_files':6171,'stage':receipt('stage.json'),'preparation':receipt('preparation-v2/process.json'),'source_review':receipt('source-review-v2.json'),'evidence_review':receipt('evidence-review-v1.json'),'prism':receipt('prism-v1/prism.json'),'prism_process':receipt('prism-v1/process.json'),'prism_provider':'anthropic','prism_model':'claude-sonnet-5-5','prism_coverage_complete':True,'prism_findings':0,'native_gpu':receipt('native-gpu-v2/qualification.json'),'checks':receipt('checks-v4/qualification.json'),'aux_checks':receipt('aux-checks-v1/qualification.json'),'baseline_build':receipt('build-baseline/qualification.json'),'candidate_build':receipt('build-candidate-v2/qualification.json'),'ordinary_campaign':receipt('ordinary-campaign-v1/qualification.json'),'campaign_validation':receipt('campaign-validation.json'),'ordinary_processes':80,'ordinary_events':9600,'runs_per_case':5,'samples_per_run':120,'warmup':128,'warm_target_met':campaign['warm_target_met'],'allocation':receipt('allocation-v1/qualification.json'),'allocation_processes':4,'allocation_profiles':8,'allocation_pprof_commands':20,'outline_payload_bytes_per_renderer':2<<20,'outline_entries_per_renderer':1024,'outline_font_references_per_renderer':8,'outline_payload_bytes_per_entry':64<<10,'default_gpu_scene_rendering':False,'report_sha256':sha(root/'docs/reports/macos-outlines/README.md'),'spec_sha256':{n:sha(root/n)for n in['specs/rendering.md','specs/macos-completion.md']},'os_preferences_changed':False,'scope':'Raw outline reuse only; exact original geometry/pixels/public ownership and full logical GPU budget replay. Per-renderer payload/reference limits do not bound total font/process/native/GPU memory. Warm latency remains failing; full Mac/public distribution/tree/workbench/physical presentation gates remain open. Windows/Linux deferred.'}
+out=root/'docs/reports/macos-outlines/records';out.mkdir(exist_ok=False);index={name:{'sha256':sha(p),'bytes':p.stat().st_size}for name,p in sorted(selected.items())};archive=out/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tar:
+ for name,p in sorted(selected.items()):tar.add(p,arcname=name,recursive=False)
+(out/'evidence-index.json').write_text(json.dumps({'archive_sha256':sha(archive),'entries':index},indent=2)+'\n');record['archive']={'path':'evidence.tar.gz','sha256':sha(archive),'files':len(index),'index_sha256':sha(out/'evidence-index.json')};(out/'checkpoint.json').write_text(json.dumps(record,indent=2)+'\n');(out/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+with tarfile.open(archive)as tar:
+ assert len(tar.getmembers())==len(index)
+ for m in tar.getmembers():
+  assert m.isfile();data=tar.extractfile(m).read();assert len(data)==index[m.name]['bytes']and hashlib.sha256(data).hexdigest()==index[m.name]['sha256']
+print('EVIDENCE VERIFIED',len(index),'members',archive.stat().st_size,'bytes')

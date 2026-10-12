@@ -249,3 +249,14 @@ exercise its failure records and bounds. Native focused-window observations
 match both shortcuts, while foreground checking and global posting remain
 non-atomic. Earlier full workflows remain historical observations, and later
 failed attempts remain failed. These harness changes are not production fixes.
+
+## Static outline allocation work
+
+Renderer-owned outline reuse addresses the repeated construction identified by
+the allocation diagnostic. It requires independent original geometry/pixels,
+private ownership, cache retention limits, aggregate cold/warm GPU admission and
+retirement checks, plus matched actual native CPU/GPU measurements. Cache hits
+cannot relax the source support, per-glyph or logical work bounds. New cache
+payload/reference limits are per renderer and do not qualify total font/native
+memory. Unchanged latency targets and broader Mac acceptance remain open until
+representative evidence passes them.

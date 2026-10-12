@@ -1,0 +1,563 @@
+--- a/paint/renderers/gpuscene/native_test.go
++++ b/paint/renderers/gpuscene/native_test.go
+@@ -22,6 +22,7 @@
+ 	"io/fs"
+ 	"math/rand"
+ 	"os"
++	"reflect"
+ 	"testing"
+ 	"time"
+ 
+@@ -348,6 +349,16 @@
+ 			if !ok {
+ 				t.Fatal("real scene encoding refused")
+ 			}
++			warmPacket := rs.ScenePacket(commands)
++			if warmPacket == nil {
++				t.Fatal("cache warmth changed real scene admission")
++			}
++			warmEncoded, warmOK := warmPacket.Encode()
++			if !warmOK || !reflect.DeepEqual(encoded, warmEncoded) {
++				t.Fatal("cold/warm real scene encoded bytes differ")
++			}
++			// Submit the warm-cache packet to the actual native compute path.
++			encoded = warmEncoded
+ 			if err := res.render(encoded, reserve); err != nil {
+ 				t.Fatal(err)
+ 			}
+--- a/paint/renderers/gpuscene/renderer.go
++++ b/paint/renderers/gpuscene/renderer.go
+@@ -119,12 +119,14 @@
+ }
+ func (r *Renderer) Release() {
+ 	if r.closed {
++		r.cpu.Release()
+ 		return
+ 	}
+ 	r.closed = true
+ 	r.closeLease()
+ 	// Preserve the usual explicit CPU snapshot semantics after destruction.
+ 	r.materialize()
++	r.cpu.Release()
+ }
+ func (r *Renderer) ensureLease(dw *gpudraw.Drawer) error {
+ 	if r.closed {
+--- /dev/null
++++ b/paint/renderers/rasterx/outline_cache.go
+@@ -0,0 +1,126 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"container/list"
++	"sync"
++	"unsafe"
++
++	"github.com/go-text/typesetting/font"
++)
++
++const (
++	outlineCacheBytes   = 2 << 20
++	outlineCacheEntries = 1024
++	outlineCacheFonts   = 8
++	outlineCacheGlyph   = 64 << 10
++	outlineSegmentBytes = int(unsafe.Sizeof(font.Segment{}))
++)
++
++type outlineKey struct {
++	font *font.Font
++	gid  font.GID
++}
++
++type outlineEntry struct {
++	key     outlineKey
++	outline font.GlyphOutline
++	cost    font.GlyphOutlineCost
++	bytes   int
++}
++
++// staticOutlineCache belongs to one renderer and its private paint captures.
++// All returned segments are private borrowed read-only data: GlyphOutline only
++// reads them. Never return them through the public font retrieval methods (whose
++// outputs can be mutated with Sideways). Static Font tables/backing snapshots
++// are immutable; a replacement Font has a different key. Size, DPI, paint and
++// transforms do not change font-unit outlines. Variable/encoded/CFF fonts bypass.
++// Limits bound segment capacity, entry count and font references per renderer,
++// not total process/native/font bytes or allocator/map metadata. Renderer GC
++// releases its cache; resizing keeps these size-independent outlines reusable.
++type staticOutlineCache struct {
++	mu      sync.Mutex
++	entries map[outlineKey]*list.Element
++	fonts   map[*font.Font]int
++	lru     list.List
++	bytes   int
++}
++
++func (rs *Renderer) staticOutlines() *staticOutlineCache {
++	if rs.outlineCache == nil {
++		rs.outlineCache = &staticOutlineCache{}
++	}
++	return rs.outlineCache
++}
++
++func (cache *staticOutlineCache) ordinary(face *font.Face, gid font.GID) (font.GlyphOutline, bool) {
++	if face.SupportsBoundedOutlines() {
++		budget := font.NewGlyphOutlineBudget(1<<20, 1<<20)
++		if outline, ok := cache.bounded(face, gid, budget); ok {
++			return outline, true
++		}
++	}
++	// Cache admission must not change CPU font support or cause dropped glyphs.
++	return face.GlyphDataOutline(gid)
++}
++
++func (cache *staticOutlineCache) bounded(face *font.Face, gid font.GID, budget *font.GlyphOutlineBudget) (font.GlyphOutline, bool) {
++	if !face.SupportsBoundedOutlines() {
++		return face.GlyphDataOutlineBounded(gid, budget)
++	}
++	key := outlineKey{face.Font, gid}
++	cache.mu.Lock()
++	defer cache.mu.Unlock()
++	if element := cache.entries[key]; element != nil {
++		entry := element.Value.(outlineEntry)
++		// Warmth must not bypass composite/point/traversal admission or the
++		// caller's shared batch budget. Later geometry/scanner checks remain.
++		if !entry.cost.Charge(budget) {
++			return font.GlyphOutline{}, false
++		}
++		cache.lru.MoveToFront(element)
++		return entry.outline, true
++	}
++	outline, cost, ok := face.GlyphDataOutlineBoundedCost(gid, budget)
++	if !ok {
++		return font.GlyphOutline{}, false
++	}
++	cache.retain(key, outline, cost)
++	return outline, true
++}
++
++// retain is called under mu only with a successful getter's owned result.
++func (cache *staticOutlineCache) retain(key outlineKey, outline font.GlyphOutline, cost font.GlyphOutlineCost) {
++	// Check capacity before multiplication and before retaining the allocation.
++	// Oversized-but-admitted outlines still render; cache limits never cause a
++	// new GPU refusal. Store the getter's own allocation without an extra copy.
++	if cap(outline.Segments) > outlineCacheGlyph/outlineSegmentBytes {
++		return
++	}
++	weight := cap(outline.Segments) * outlineSegmentBytes
++	if cache.entries == nil {
++		cache.entries = make(map[outlineKey]*list.Element)
++		cache.fonts = make(map[*font.Font]int)
++	}
++	for cache.bytes+weight > outlineCacheBytes || len(cache.entries) >= outlineCacheEntries ||
++		(cache.fonts[key.font] == 0 && len(cache.fonts) >= outlineCacheFonts) {
++		cache.evict()
++	}
++	cache.entries[key] = cache.lru.PushFront(outlineEntry{key, outline, cost, weight})
++	cache.fonts[key.font]++
++	cache.bytes += weight
++}
++
++func (cache *staticOutlineCache) evict() {
++	element := cache.lru.Back()
++	entry := element.Value.(outlineEntry)
++	cache.bytes -= entry.bytes
++	delete(cache.entries, entry.key)
++	cache.fonts[entry.key.font]--
++	if cache.fonts[entry.key.font] == 0 {
++		delete(cache.fonts, entry.key.font)
++	}
++	cache.lru.Remove(element)
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/outline_cache_test.go
+@@ -0,0 +1,324 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"os"
++	"reflect"
++	"sync"
++	"testing"
++
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"github.com/go-text/typesetting/font"
++)
++
++func vellumOutlineFace(t testing.TB) *font.Face {
++	t.Helper()
++	file, err := os.Open("../../../../typesetting/font/testdata/UbuntuMono-R.ttf")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer file.Close()
++	face, err := font.ParseTTF(file)
++	if err != nil || !face.SupportsBoundedOutlines() {
++		t.Fatal("static fixture", err)
++	}
++	return face
++}
++
++func vellumOutlineBounds(t *testing.T, cache *staticOutlineCache) {
++	t.Helper()
++	if cache.bytes < 0 || cache.bytes > outlineCacheBytes || len(cache.entries) > outlineCacheEntries || len(cache.fonts) > outlineCacheFonts || cache.lru.Len() != len(cache.entries) {
++		t.Fatal("cache exceeded retained bounds")
++	}
++	weight := 0
++	fonts := map[*font.Font]int{}
++	for key, element := range cache.entries {
++		entry := element.Value.(outlineEntry)
++		if entry.key != key || entry.bytes != cap(entry.outline.Segments)*outlineSegmentBytes || entry.bytes > outlineCacheGlyph {
++			t.Fatal("capacity accounting differs")
++		}
++		weight += entry.bytes
++		fonts[key.font]++
++	}
++	if weight != cache.bytes || !reflect.DeepEqual(fonts, cache.fonts) {
++		t.Fatal("retained byte/font accounting differs")
++	}
++}
++
++func TestVellumOutlineCacheGeometryPublicOwnershipAndFontIdentity(t *testing.T) {
++	face := vellumOutlineFace(t)
++	cache := &staticOutlineCache{}
++	for _, letter := range " AgéÅfj" {
++		gid, _ := face.NominalGlyph(letter)
++		want, ok := face.GlyphDataOutline(gid)
++		cold, coldOK := cache.ordinary(face, gid)
++		warm, warmOK := cache.ordinary(face, gid)
++		if !ok || !coldOK || !warmOK || !reflect.DeepEqual(want, cold) || !reflect.DeepEqual(want, warm) {
++			t.Fatal("cold/warm simple/composite/empty geometry differs", letter)
++		}
++		if len(want.Segments) > 0 {
++			if &want.Segments[0] == &cold.Segments[0] || &cold.Segments[0] != &warm.Segments[0] {
++				t.Fatal("public ownership or private reuse violated")
++			}
++			want.Sideways(37)
++			after, _ := cache.ordinary(face, gid)
++			fresh, _ := face.GlyphDataOutline(gid)
++			if !reflect.DeepEqual(after, fresh) {
++				t.Fatal("public mutation reached cache")
++			}
++		}
++	}
++	gid, _ := face.NominalGlyph('A')
++	a, _ := cache.ordinary(face, gid)
++	otherFace := font.NewFace(face.Font)
++	otherFace.SetPpem(120, 240)
++	b, _ := cache.ordinary(otherFace, gid)
++	if &a.Segments[0] != &b.Segments[0] {
++		t.Fatal("same immutable Font did not reuse font-unit outline")
++	}
++	replacement := vellumOutlineFace(t)
++	otherFace.Font = replacement.Font
++	c, _ := cache.ordinary(otherFace, gid)
++	if &a.Segments[0] == &c.Segments[0] || len(cache.fonts) != 2 {
++		t.Fatal("replacement Font shared old identity")
++	}
++	vellumOutlineBounds(t, cache)
++}
++
++func TestVellumOutlineCacheAggregateColdWarmAdmission(t *testing.T) {
++	face := vellumOutlineFace(t)
++	for _, letter := range " AéÅ" {
++		gid, _ := face.NominalGlyph(letter)
++		cache := &staticOutlineCache{}
++		if _, ok := cache.ordinary(face, gid); !ok {
++			t.Fatal("warm fixture refused")
++		}
++		for _, limit := range []int{1, 10, 50, 100, 1000, 10000} {
++			coldBudget := font.NewGlyphOutlineBudget(limit, limit)
++			warmBudget := font.NewGlyphOutlineBudget(limit, limit)
++			for n := 0; n < 32; n++ {
++				want, coldOK := face.GlyphDataOutlineBounded(gid, coldBudget)
++				got, warmOK := cache.bounded(face, gid, warmBudget)
++				if coldOK != warmOK || !reflect.DeepEqual(want, got) {
++					t.Fatal("warmth changed aggregate admission", letter, limit, n)
++				}
++			}
++		}
++		if _, ok := cache.bounded(face, gid, nil); ok {
++			t.Fatal("nil shared budget admitted warm outline")
++		}
++	}
++}
++
++func TestVellumOutlineCacheEvictionAndRefusedRetrieval(t *testing.T) {
++	cache := &staticOutlineCache{}
++	face := vellumOutlineFace(t)
++	accepted := 0
++	for gid := font.GID(0); gid < 4096; gid++ {
++		if _, ok := cache.ordinary(face, gid); ok {
++			accepted++
++			vellumOutlineBounds(t, cache)
++		}
++	}
++	if accepted <= outlineCacheEntries || len(cache.entries) >= accepted {
++		t.Fatal("fixture did not exercise bounded eviction", accepted)
++	}
++	for n := 0; n < outlineCacheFonts+2; n++ {
++		face = vellumOutlineFace(t)
++		gid, _ := face.NominalGlyph('A')
++		if _, ok := cache.ordinary(face, gid); !ok {
++			t.Fatal("new font refused")
++		}
++		vellumOutlineBounds(t, cache)
++	}
++	entries, weight := len(cache.entries), cache.bytes
++	if _, ok := cache.bounded(face, font.EmptyGlyph, font.NewGlyphOutlineBudget(100, 100)); ok || len(cache.entries) != entries || cache.bytes != weight {
++		t.Fatal("failed retrieval retained an entry")
++	}
++}
++
++func TestVellumOutlineCacheRendererCapturesResizeAndRelease(t *testing.T) {
++	rs := New(math32.Vec2(240, 80)).(*Renderer)
++	txt := vellumSceneText(t)
++	commands := render.Render{txt}
++	packet := rs.ScenePacket(commands)
++	if packet == nil || rs.outlineCache == nil || len(rs.outlineCache.entries) == 0 {
++		t.Fatal("scene capture did not populate parent cache")
++	}
++	cache := rs.outlineCache
++	if rs.scrollPlan(commands) == nil || rs.outlineCache != cache {
++		t.Fatal("scroll capture changed cache owner")
++	}
++	rs.Render(commands)
++	before := bytes.Clone(rs.image.Pix)
++	warm := rs.ScenePacket(commands)
++	dst := image.NewRGBA(rs.image.Bounds())
++	if warm == nil || !warm.Replay(dst) || !bytes.Equal(dst.Pix, before) {
++		t.Fatal("warm packet/ordinary exact pixels differ")
++	}
++	rs.SetSize(units.UnitDot, math32.Vec2(260, 90))
++	if rs.outlineCache != cache {
++		t.Fatal("size change lost size-independent cache")
++	}
++	rs.Render(commands)
++	imageBefore := bytes.Clone(rs.image.Pix)
++	rs.Release()
++	rs.Release()
++	if rs.outlineCache != nil || !bytes.Equal(rs.image.Pix, imageBefore) {
++		t.Fatal("retirement retained font cache or dropped snapshot pixels")
++	}
++	rs.Render(commands)
++	if rs.outlineCache == nil || rs.outlineCache == cache {
++		t.Fatal("reused renderer did not create fresh cache")
++	}
++	other := New(math32.Vec2(240, 80)).(*Renderer)
++	other.Render(commands)
++	if other.outlineCache == rs.outlineCache {
++		t.Fatal("separate renderers shared cache ownership")
++	}
++}
++
++func TestVellumOutlineCacheOriginalRasterPixelsAcrossTransforms(t *testing.T) {
++	prior := UseGlyphCache
++	UseGlyphCache = false
++	defer func() { UseGlyphCache = prior }()
++	for _, size := range []float32{12, 24, 48, 96} {
++		for _, matrix := range []math32.Matrix2{math32.Identity2(), math32.Translate2D(2, 1).Scale(.9, .9)} {
++			for _, stroke := range []image.Image{nil, colors.Uniform(color.NRGBA{90, 40, 100, 180})} {
++				txt := vellumSceneText(t)
++				run := txt.Text.Lines[0].Runs[0].(*shapedgt.Run)
++				run.Size = math32.ToFixed(size)
++				glyph := &run.Glyphs[0]
++				want, ok := run.Face.GlyphDataOutline(glyph.GlyphID)
++				cache := &staticOutlineCache{}
++				_, _ = cache.ordinary(run.Face, glyph.GlyphID)
++				got, cached := cache.ordinary(run.Face, glyph.GlyphID)
++				if !ok || !cached {
++					t.Fatal("real glyph refused")
++				}
++				txt.Context.Cumulative = matrix
++				a, b := New(math32.Vec2(240, 180)).(*Renderer), New(math32.Vec2(240, 180)).(*Renderer)
++				pos := math32.Vec2(20.25, 130.5)
++				box := run.GlyphBoundsBox(glyph).Translate(pos)
++				fill := colors.Uniform(color.NRGBA{30, 90, 60, 210})
++				a.GlyphOutline(&txt.Context, run, glyph, want, fill, stroke, box, pos, matrix == math32.Identity2())
++				b.GlyphOutline(&txt.Context, run, glyph, got, fill, stroke, box, pos, matrix == math32.Identity2())
++				if !bytes.Equal(a.image.Pix, b.image.Pix) || vellumOwnedNonzero(a.image.Pix) == 0 {
++					t.Fatal("original/cached raster pixels differ", size, matrix, stroke)
++				}
++			}
++		}
++	}
++}
++
++func TestVellumOutlineCacheConcurrentReadOnlyFaces(t *testing.T) {
++	cache := &staticOutlineCache{}
++	face := vellumOutlineFace(t)
++	gid, _ := face.NominalGlyph('é')
++	want, _ := face.GlyphDataOutline(gid)
++	var workers sync.WaitGroup
++	for n := 0; n < 8; n++ {
++		workers.Add(1)
++		go func() {
++			defer workers.Done()
++			for i := 0; i < 100; i++ {
++				got, ok := cache.ordinary(face, gid)
++				if !ok || !reflect.DeepEqual(got, want) {
++					t.Error("concurrent read-only retrieval differs")
++					return
++				}
++			}
++		}()
++	}
++	workers.Wait()
++	vellumOutlineBounds(t, cache)
++}
++
++func TestVellumOutlineCachePayloadCapacityAndLargeRetentionRefusal(t *testing.T) {
++	face := vellumOutlineFace(t)
++	_, cost, ok := face.GlyphDataOutlineBoundedCost(0, font.NewGlyphOutlineBudget(1<<20, 1<<20))
++	if !ok {
++		t.Fatal("cost fixture refused")
++	}
++	cache := &staticOutlineCache{}
++	// Exercise retention independently of parser layout. The slice has a small
++	// length but a large backing capacity, which must be fully charged. These
++	// storage fixtures are never used as glyph geometry or admitted by rendering.
++	capacity := outlineCacheGlyph / outlineSegmentBytes
++	for i := 0; i < 80; i++ {
++		cache.retain(outlineKey{face.Font, font.GID(i)}, font.GlyphOutline{Segments: make([]font.Segment, 1, capacity)}, cost)
++		vellumOutlineBounds(t, cache)
++	}
++	if cache.bytes < outlineCacheBytes-outlineCacheGlyph || len(cache.entries) >= 80 {
++		t.Fatal("byte-capacity fixture did not evict before retaining")
++	}
++	entries, weight := len(cache.entries), cache.bytes
++	cache.retain(outlineKey{face.Font, font.GID(100)}, font.GlyphOutline{Segments: make([]font.Segment, 1, capacity+1)}, cost)
++	if len(cache.entries) != entries || cache.bytes != weight {
++		t.Fatal("oversized backing capacity was retained")
++	}
++}
++
++func TestVellumOutlineCacheVariableCPUFallback(t *testing.T) {
++	file, err := os.Open("../../../../typesetting/font/testdata/Selawik-VF-Subset.ttf")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer file.Close()
++	face, err := font.ParseTTF(file)
++	if err != nil || face.SupportsBoundedOutlines() {
++		t.Fatal("variable fixture", err)
++	}
++	cache := &staticOutlineCache{}
++	for _, letter := range " ABC" {
++		gid, found := face.NominalGlyph(letter)
++		if !found {
++			continue
++		}
++		want, originalOK := face.GlyphDataOutline(gid)
++		got, cachedOK := cache.ordinary(face, gid)
++		if originalOK != cachedOK || !reflect.DeepEqual(want, got) || len(cache.entries) != 0 || len(cache.fonts) != 0 {
++			t.Fatal("ordinary variable fallback changed")
++		}
++		if _, ok := cache.bounded(face, gid, font.NewGlyphOutlineBudget(1<<20, 1<<20)); ok {
++			t.Fatal("variable outline admitted on GPU route")
++		}
++	}
++}
++
++func BenchmarkVellumOutlineCacheRepeatedStaticGlyph(b *testing.B) {
++	face := vellumOutlineFace(b)
++	gid, _ := face.NominalGlyph('é')
++	for _, cached := range []bool{false, true} {
++		name := "ordinary"
++		if cached {
++			name = "warm-cache"
++		}
++		b.Run(name, func(b *testing.B) {
++			cache := &staticOutlineCache{}
++			_, _ = cache.ordinary(face, gid)
++			b.ReportAllocs()
++			b.ResetTimer()
++			for n := 0; n < b.N; n++ {
++				var ok bool
++				if cached {
++					_, ok = cache.ordinary(face, gid)
++				} else {
++					_, ok = face.GlyphDataOutline(gid)
++				}
++				if !ok {
++					b.Fatal("fixture refused")
++				}
++			}
++		})
++	}
++}
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -45,6 +45,7 @@
+ 	sceneRecord     *sceneplan.Builder
+ 	sceneWork       *sceneWorkBudget
+ 	scrollRecord    *scrollPaintPlan
++	outlineCache    *staticOutlineCache
+ }
+ 
+ func New(size math32.Vector2) render.Renderer {
+@@ -55,6 +56,11 @@
+ 
+ func (rs *Renderer) Image() image.Image { return rs.image }
+ func (rs *Renderer) Source() []byte     { return nil }
++
++// Release drops derived outline/font references at scene retirement. Keep the
++// CPU image available to existing snapshot callers; a reused renderer can build
++// a fresh cache on its next paint. Calls share the renderer's owner serialization.
++func (rs *Renderer) Release() { rs.outlineCache = nil }
+ 
+ func (rs *Renderer) Size() (units.Units, math32.Vector2) {
+ 	return units.UnitDot, rs.size
+--- a/paint/renderers/rasterx/scene_packet.go
++++ b/paint/renderers/rasterx/scene_packet.go
+@@ -86,7 +86,7 @@
+ 		}
+ 	}
+ 	spanner := &sceneSpanner{builder: b, op: int(rs.ImgSpanner.Op)}
+-	capture := &Renderer{size: rs.size, sceneRecord: b, sceneWork: work}
++	capture := &Renderer{size: rs.size, sceneRecord: b, sceneWork: work, outlineCache: rs.staticOutlines()}
+ 	capture.Scanner = scan.NewScannerWithRowTracking(spanner, rs.image.Bounds().Dx(), rs.image.Bounds().Dy())
+ 	capture.Raster = NewDasher(rs.image.Bounds().Dx(), rs.image.Bounds().Dy(), capture.Scanner)
+ 	// NewDasher initializes nonzero winding; restore the captured value afterward.
+--- a/paint/renderers/rasterx/scroll_plan.go
++++ b/paint/renderers/rasterx/scroll_plan.go
+@@ -169,6 +169,7 @@
+ func (rs *Renderer) scrollPlan(commands render.Render) *scrollPaintPlan {
+ 	p := &scrollPaintPlan{bytes: int(unsafe.Sizeof(scrollPaintPlan{})), winding: rs.Scanner.UseNonZeroWinding}
+ 	capture := *rs
++	capture.outlineCache = rs.staticOutlines()
+ 	capture.Path = nil
+ 	capture.scrollRecord = p
+ 	for _, item := range commands {
+--- a/paint/renderers/rasterx/text.go
++++ b/paint/renderers/rasterx/text.go
+@@ -302,7 +302,7 @@
+ 			if !rs.sceneTakeWork(1) {
+ 				return
+ 			}
+-			data, ok := run.Face.GlyphDataOutlineBounded(g.GlyphID, rs.sceneWork.outlines)
++			data, ok := rs.staticOutlines().bounded(run.Face, g.GlyphID, rs.sceneWork.outlines)
+ 			if !ok {
+ 				rs.sceneRecord.Refuse()
+ 				return
+@@ -312,7 +312,7 @@
+ 			rs.GlyphSVG(ctx, run, g, data.Source, bb, pos, identity)
+ 		} else if data, ok := run.Face.GlyphDataBitmap(g.GlyphID); ok {
+ 			rs.GlyphBitmap(ctx, run, g, data, fill, stroke, bb, pos, identity)
+-		} else if data, ok := run.Face.GlyphDataOutline(g.GlyphID); ok {
++		} else if data, ok := rs.staticOutlines().ordinary(run.Face, g.GlyphID); ok {
+ 			rs.GlyphOutline(ctx, run, g, data, fill, stroke, bb, pos, identity)
+ 		} else {
+ 			fmt.Printf("unrecognized glyph data for glyphID: %v, face: %v\n", g.GlyphID, run.Face.Describe().Family)

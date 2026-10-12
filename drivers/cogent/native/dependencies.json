@@ -386,6 +386,17 @@
               "sha256": "cfa4e54b7b455a5669d6622e13add20162d9cc0845805d24a3113d49473a6c6e"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/outlinecache",
+          "inputs": "native/patches/outlinecache/original-hashes.json",
+          "outputs": "native/patches/outlinecache/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/outlinecache/0043-bounded-outline-cache.patch",
+              "sha256": "cc0973f00c4920127819cfec9ad5dd98914b0101aa9838335a44d87e5418d0e8"
+            }
+          ]
         }
       ]
     },
@@ -423,6 +434,17 @@
             {
               "file": "native/patches/boundedoutlines/0003-bounded-static-outlines.patch",
               "sha256": "f4c1550bdb15eb32d4eba8dc68cb59a7018197ff00045bda1c61c8886b28856d"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/outlinecost",
+          "inputs": "native/patches/outlinecost/original-hashes.json",
+          "outputs": "native/patches/outlinecost/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/outlinecost/0004-outline-work-cost.patch",
+              "sha256": "d49f8008779ea6496268ac8daa04fbd3353b4de0e845d003ee553a0fdd0d7f78"
             }
           ]
         }
