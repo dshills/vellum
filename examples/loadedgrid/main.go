@@ -67,6 +67,7 @@ func main() {
 	perfWarmup := flag.Int("perf-warmup", 128, "unmeasured closed-trajectory frames (multiple64)")
 	perfNovel := flag.Bool("perf-novel", false, "separate newly visited row strings; not cold-font or warm P6 results")
 	perfProfile := flag.String("perf-cpu-profile", "", "diagnostic process-wide CPU profile to a new file (64MiB cap); excluded from warm qualification")
+	perfAlloc := flag.String("perf-alloc-profile", "", "diagnostic cumulative Go allocation snapshots to new PREFIX.before.pprof and PREFIX.after.pprof files (64MiB each); excluded from warm qualification")
 	perfSources := flag.Bool("perf-source-details", false, "diagnostic nested source costs and image API attempts; excluded from warm qualification")
 	perfInputs := flag.String("perf-input-details", "", "new diagnostic scalar input ledger file; excluded from warm qualification")
 	gpuScene := flag.Bool("gpu-scene", false, "opt-in ordered shared-device scene candidate; requires -perf")
@@ -76,7 +77,7 @@ func main() {
 		os.Exit(1)
 	}
 	if *axSmoke {
-		if *smoke || *perf || *perfSources || *perfProfile != "" || *perfInputs != "" {
+		if *smoke || *perf || *perfSources || *perfProfile != "" || *perfInputs != "" || *perfAlloc != "" {
 			fmt.Fprintln(os.Stderr, "loadedgrid: accessibility smoke is a separate workflow")
 			os.Exit(1)
 		}
@@ -90,12 +91,12 @@ func main() {
 		fmt.Fprintln(os.Stderr, "loadedgrid: -perf-input-details requires -perf")
 		os.Exit(1)
 	}
-	if err := validatePerfModes(*perf, *smoke, *perfSources, *perfProfile); err != nil {
+	if err := validatePerfModes(*perf, *smoke, *perfSources, *perfProfile, *perfAlloc); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	if *perf {
-		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, SourceDetails: *perfSources, InputDetails: *perfInputs, GPUSceneRendering: *gpuScene}); err != nil {
+		if err := runPerf(perfConfig{Rows: *rows, Variable: *variable, Samples: *perfSamples, Warmup: *perfWarmup, Novel: *perfNovel, CPUProfile: *perfProfile, AllocationProfile: *perfAlloc, SourceDetails: *perfSources, InputDetails: *perfInputs, GPUSceneRendering: *gpuScene}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}

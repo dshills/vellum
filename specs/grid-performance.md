@@ -286,3 +286,28 @@ interleaved processes per case/build, 120 samples and 128 guarded warmups per
 process. Preserve every raw record and require exact paired geometry; CPU
 profiling remains separately labelled diagnostic evidence. Existing 4 ms p95 /
 6 ms p99 targets and the full P6/Mac acceptance scope remain unchanged.
+
+## Differential allocation diagnostics
+
+`-perf-alloc-profile=/new/prefix` requires `-perf` and a separate process from
+CPU profiling, source timing and input-ledger diagnostics. It reserves new
+exclusive `prefix.before.pprof` and `prefix.after.pprof` files with mode0600
+and a64MiB cap per snapshot. Refusal never overwrites existing files; failed
+captures preserve their owned empty/partial outputs and fail the run.
+
+The baseline captures the cumulative Go `allocs` profile after guarded warmup;
+the final snapshot follows the measured events and observer work, before the
+end record. Each capture forces two GCs outside frame timing because Go memory
+profiles can lag two GC cycles. The process's `runtime.MemProfileRate` stays
+unchanged and is recorded in setup. Use `go tool pprof -base before.pprof
+-alloc_space after.pprof` (or `-alloc_objects`) to subtract startup/warmup.
+
+Setup, ready, every sample and end explicitly identify `alloc_profile`.
+Ordinary validation refuses these records, independently of CPU/source/input
+permissions. Only explicit allocation-diagnostic validation admits them, and
+`warm_target_met(..., alloc_profile=True)` always returns false. The ordinary
+benchmark CLI never enables this diagnostic. Preserve exact source/binary,
+snapshot hashes and raw records for attribution. These are sampled process-wide
+Go allocations, including observers, concurrent adapter work and profile
+encoding; they cannot establish framework-only, native/GPU or retained-memory
+cost, or satisfy P6 latency targets.

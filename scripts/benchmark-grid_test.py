@@ -274,13 +274,13 @@ class FakeProcess:
 
 
 class ProcessTests(unittest.TestCase):
-    def run_fixture(self, data, *, source_details=False, gpu_scene_rendering=False):
+    def run_fixture(self, data, *, source_details=False, alloc_profile=None, gpu_scene_rendering=False):
         payload = b"native ordinary log\n" + b"\n".join(json.dumps(v).encode() for v in data)+b"\n"
         process = FakeProcess(payload)
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)/"run"
             with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group") as kill:
-                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5, source_details=source_details, gpu_scene_rendering=gpu_scene_rendering)
+                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5, source_details=source_details, alloc_profile=alloc_profile, gpu_scene_rendering=gpu_scene_rendering)
                 except Exception as error: result = error
             raw = (directory/"native.log").read_bytes()
             outcome = json.loads((directory/"result.json").read_text())
@@ -288,6 +288,7 @@ class ProcessTests(unittest.TestCase):
             self.assertEqual(launch.call_args.kwargs["bufsize"], 0)
             self.assertTrue(launch.call_args.kwargs["start_new_session"])
             self.assertEqual("-perf-source-details" in launch.call_args.args[0], source_details)
+            self.assertEqual(any(v.startswith("-perf-alloc-profile=") for v in launch.call_args.args[0]), alloc_profile is not None)
             self.assertEqual("-gpu-scene" in launch.call_args.args[0], gpu_scene_rendering)
             observe.assert_called_once_with(process.pid)
             return result, outcome
@@ -311,6 +312,43 @@ class ProcessTests(unittest.TestCase):
         self.assertIsInstance(result, ValueError)
         self.assertEqual(outcome["result"], "FAILED")
         self.assertIn("GPU scene", outcome["error"])
+
+    def test_allocation_launch_identity_and_diagnostic_refusal(self):
+        data = records()
+        for record in data: record["alloc_profile"] = True
+        data[1]["warmup"] = 128
+        result, outcome = self.run_fixture(data, alloc_profile=Path("fixture"))
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(outcome["records"], data)
+        result, outcome = self.run_fixture(records(), alloc_profile=Path("fixture"))
+        self.assertIsInstance(result, ValueError)
+        self.assertIn("requested allocation", outcome["error"])
+        for options in ({}, {"allow_profile": True}, {"allow_source_details": True}, {"allow_input_details": True}):
+            with self.assertRaisesRegex(ValueError, "diagnostic allocation"):
+                benchmark.validate_records(data, 10000, False, 120, False, **options)
+        for index in (0, 1, 4, -1):
+            corrupted = copy.deepcopy(data)
+            corrupted[index]["alloc_profile"] = False
+            with self.assertRaisesRegex(ValueError, "identity mismatch"):
+                benchmark.validate_records(corrupted, 10000, False, 120, False, allow_alloc_profile=True)
+        for field in ("cpu_profile", "source_details", "input_details"):
+            corrupted = copy.deepcopy(data)
+            for record in corrupted: record[field] = True
+            with self.assertRaisesRegex(ValueError, "diagnostic mode"):
+                benchmark.validate_records(corrupted, 10000, False, 120, False,
+                                           allow_alloc_profile=True, allow_input_details=True)
+        cases = {"fixture": {"timings_ns": {"ui_work_ns": {"per_run": [{"p95": 1, "p99": 1}]}}}}
+        self.assertFalse(benchmark.warm_target_met(cases, alloc_profile=True))
+
+    def test_allocation_invalid_modes_refuse_before_launch(self):
+        for options in ({"alloc_profile": ""}, {"alloc_profile": "bad\x00prefix"},
+                        {"alloc_profile": "p"*4096}, {"alloc_profile": "alloc", "cpu_profile": "cpu"},
+                        {"alloc_profile": "alloc", "source_details": True}):
+            with tempfile.TemporaryDirectory() as temp, mock.patch.object(benchmark.subprocess, "Popen") as launch:
+                with self.assertRaisesRegex(ValueError, "allocation diagnostic"):
+                    benchmark.run_case(Path("fake"), Path(temp)/"run", 10000, False, 120, 128, False, 5, **options)
+                launch.assert_not_called()
+                self.assertFalse((Path(temp)/"run").exists())
 
     def test_invalid_gpu_scene_mode_refuses_before_any_launch(self):
         with tempfile.TemporaryDirectory() as temp, mock.patch.object(benchmark.subprocess, "Popen") as launch:

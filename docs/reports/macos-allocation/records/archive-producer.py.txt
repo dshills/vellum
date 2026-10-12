@@ -1,0 +1,33 @@
+import hashlib,json,tarfile
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');phase=Path('/private/tmp/vellum-mac-allocation');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(name):return json.loads((phase/name).read_text())
+def receipt(name):return {'path':name,'sha256':sha(phase/name)}
+source=read('source-review-v1.json');evidence=read('evidence-review-v1.json');native=read('native-v1/qualification.json');closure=read('current-closure.json');checks=read('checks-v1/initial-checks.json')
+assert source['status']=='APPROVED'and not source['findings']
+assert evidence.get('status',evidence.get('result')) in ['APPROVED','APPROVED_EVIDENCE']and not evidence['findings']
+assert native['result']=='PASS_DIAGNOSTIC'and native['before']==native['after']and len(native['after']['prepared'])==6167
+assert all(sha(root/n)==v for n,v in source['reviewed_source_sha256'].items())
+for key in ['reviewed_source_current','compiled_inputs_current','binary_current']:assert closure[key]
+assert sha(phase/'loadedgrid')==native['binary_sha256']
+for mode in ['cpu','gpu']:
+ case=native['cases'][mode];assert case['samples']==120 and case['warmup']==128 and case['warm_target_eligible']is False and case['mem_profile_rate']==524288
+ process=read('native-v1/'+mode+'-process/result.json');assert process['result']=='PASS'and process['exit_code']==0 and len(process['records'])==123
+ assert all(r['alloc_profile']is True for r in process['records'])
+ for suffix,record in case['profiles'].items():assert sha(phase/'native-v1'/(mode+suffix))==record['sha256']
+assert all(checks[k]==0 for k in ['python_final_exit_code','loadedgrid_race_exit_code','build_exit_code','vet_exit_code'])
+services=phase/'services-audit';services.mkdir(exist_ok=False)
+for name in ['review.json','plan.md','existing-editor-plan.md']:(services/name).write_bytes((Path('/private/tmp/vellum-macos-services-gap')/name).read_bytes())
+record={'schema':1,'checkpoint':'Differential native process Go allocation diagnostics','base_commit':'495260e940994cae19457928fc80141421354858','production_scope':'Consumer-only opt-in observer and validator; no production renderer/dependency/public API change.','binary_sha256':native['binary_sha256'],'native':receipt('native-v1/qualification.json'),'profiles':4,'pprof_commands':8,'native_processes':2,'samples_per_process':120,'closed_warmup_per_process':128,'diagnostic_only':True,'ordinary_latency_qualified':False,'source_review':receipt('source-review-v1.json'),'evidence_review':receipt('evidence-review-v1.json'),'current_source':receipt('current-closure.json'),'checks':receipt('checks-v1/initial-checks.json'),'vet_exit_code':0,'report_sha256':sha(root/'docs/reports/macos-allocation/README.md'),'spec_sha256':{n:sha(root/n)for n in ['specs/grid-performance.md','specs/macos-completion.md']},'services_inventory':receipt('services-audit/review.json'),'services_live_gates_closed':False,'prism_in_this_checkpoint':False,'review_policy':'Internal reviews for diagnostic checkpoint between significant Prism reviews; preceding sparse bands495260e reviewed with Anthropicclaude-sonnet-5-5.','os_preferences_changed':False,'scope':'Sampled process-wide allocations include observers/profile encoding/concurrent adapter work. Not retained/native/GPU memory, ordinary latency, presentation, broad Mac/P4/P6/P9 or public-release qualification. Windows/Linux deferred.'}
+(phase/'closure.json').write_text(json.dumps(record,indent=2)+'\n');(phase/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes());(phase/'native-producer.py.txt').write_bytes(Path('/private/tmp/vellum-mac-allocation-native.py').read_bytes())
+out=root/'docs/reports/macos-allocation/records';out.mkdir(exist_ok=False)
+selected=[(p,p.relative_to(phase).as_posix())for p in phase.rglob('*')if p.is_file()and not p.is_symlink()and p.name!='loadedgrid']
+index={name:{'sha256':sha(p),'bytes':p.stat().st_size}for p,name in selected};archive=out/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tar:
+ for p,name in sorted(selected,key=lambda item:item[1]):tar.add(p,arcname=name,recursive=False)
+(out/'evidence-index.json').write_text(json.dumps({'archive_sha256':sha(archive),'entries':index},indent=2)+'\n');record['archive']={'path':'evidence.tar.gz','sha256':sha(archive),'files':len(index),'index_sha256':sha(out/'evidence-index.json')};(out/'checkpoint.json').write_text(json.dumps(record,indent=2)+'\n');(out/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+with tarfile.open(archive)as tar:
+ assert len(tar.getmembers())==len(index)
+ for member in tar.getmembers():
+  data=tar.extractfile(member).read();assert len(data)==index[member.name]['bytes']and hashlib.sha256(data).hexdigest()==index[member.name]['sha256']
+print('ARCHIVE',len(index),'files',archive.stat().st_size,'bytes; VERIFIED')

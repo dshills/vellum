@@ -23,17 +23,21 @@ type perfConfig struct {
 	Samples, Warmup   int
 	Novel             bool
 	CPUProfile        string
+	AllocationProfile string
 	SourceDetails     bool
 	InputDetails      string
 	GPUSceneRendering bool
 }
 
-func validatePerfModes(perf, smoke, sourceDetails bool, profile string) error {
+func validatePerfModes(perf, smoke, sourceDetails bool, profile, allocation string) error {
 	if !perf && sourceDetails {
 		return errors.New("loadedgrid: -perf-source-details requires -perf")
 	}
 	if !perf && profile != "" {
 		return errors.New("loadedgrid: -perf-cpu-profile requires -perf")
+	}
+	if !perf && allocation != "" {
+		return errors.New("loadedgrid: -perf-alloc-profile requires -perf")
 	}
 	if perf && smoke {
 		return errors.New("loadedgrid: -perf and -smoke are separate workflows")
@@ -42,6 +46,9 @@ func validatePerfModes(perf, smoke, sourceDetails bool, profile string) error {
 }
 
 func (c perfConfig) validate() error {
+	if !validPerfAllocationPrefix(c.AllocationProfile) || c.AllocationProfile != "" && (c.CPUProfile != "" || c.SourceDetails || c.InputDetails != "") {
+		return errors.New("loadedgrid perf: allocation profiling requires a valid separate diagnostic prefix and mode")
+	}
 	if !validPerfProfilePath(c.CPUProfile) {
 		return errors.New("loadedgrid perf: invalid CPU profile path")
 	}

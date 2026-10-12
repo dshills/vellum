@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "checkpoint": "Differential native process Go allocation diagnostics",
+  "base_commit": "495260e940994cae19457928fc80141421354858",
+  "production_scope": "Consumer-only opt-in observer and validator; no production renderer/dependency/public API change.",
+  "binary_sha256": "fc2bc8d3910b17a1d580080dd23bf0f12142013ca3c6be9b0dd60ef4d919fbe7",
+  "native": {
+    "path": "native-v1/qualification.json",
+    "sha256": "a812d9c18977da59653b7fe15893c8c3ef4c2d2322ff01887671b9e6d9fcf330"
+  },
+  "profiles": 4,
+  "pprof_commands": 8,
+  "native_processes": 2,
+  "samples_per_process": 120,
+  "closed_warmup_per_process": 128,
+  "diagnostic_only": true,
+  "ordinary_latency_qualified": false,
+  "source_review": {
+    "path": "source-review-v1.json",
+    "sha256": "e0dd57c0ceaa3ff8bf1eb73a034d197d0d6866e52b911515786c918369f8728e"
+  },
+  "evidence_review": {
+    "path": "evidence-review-v1.json",
+    "sha256": "609e5148fc55e082fb70cd8027c798b85da1dddd27995033b8217574653e232e"
+  },
+  "current_source": {
+    "path": "current-closure.json",
+    "sha256": "43bb03ca37ec71a412e783e3a5ad7144159f4bbe98642dbb200a17c739714fc8"
+  },
+  "checks": {
+    "path": "checks-v1/initial-checks.json",
+    "sha256": "9c5340311d3978f07c41e0dc3d55ddf3e6f7570aa84b810a1ba2ba136c429c92"
+  },
+  "vet_exit_code": 0,
+  "report_sha256": "cb6979e38ac656cd73bfbc7f16a842c718aabb0eb6f1fb68b4b8434f273e5e09",
+  "spec_sha256": {
+    "specs/grid-performance.md": "36e75159955fb6ce9f37dc2270a71c47131db495f3cc8a57741fdbf1f49b20ab",
+    "specs/macos-completion.md": "82239c8abd30f49ba4be7517a9b0ebf631d9e5ef2344583a4886915d8e6f075e"
+  },
+  "services_inventory": {
+    "path": "services-audit/review.json",
+    "sha256": "13ae088e4711525b50c596f755b6249daace900427080412d38f206f0aa32b06"
+  },
+  "services_live_gates_closed": false,
+  "prism_in_this_checkpoint": false,
+  "review_policy": "Internal reviews for diagnostic checkpoint between significant Prism reviews; preceding sparse bands495260e reviewed with Anthropicclaude-sonnet-5-5.",
+  "os_preferences_changed": false,
+  "scope": "Sampled process-wide allocations include observers/profile encoding/concurrent adapter work. Not retained/native/GPU memory, ordinary latency, presentation, broad Mac/P4/P6/P9 or public-release qualification. Windows/Linux deferred.",
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "c006627d58f2d950adfb301e09f20ed847f52d35ef57db2a26683e7fc00eb3e7",
+    "files": 70,
+    "index_sha256": "2e58c726e0893026653706f51fa1d2c21e3a4992fad6874b6d021aa29297c37a"
+  }
+}

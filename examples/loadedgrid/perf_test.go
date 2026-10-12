@@ -33,6 +33,35 @@ func TestPerfConfigAndClosedWarmTrajectory(t *testing.T) {
 	}
 }
 
+func TestPerfAllocationModeRequiresSeparateExplicitPerf(t *testing.T) {
+	if err := validatePerfModes(false, false, false, "", "alloc"); err == nil {
+		t.Fatal("allocation profile admitted outside perf")
+	}
+	if err := validatePerfModes(true, false, false, "", "alloc"); err != nil {
+		t.Fatal(err)
+	}
+	base := perfConfig{Rows: 10_000, Samples: 120, Warmup: 128, AllocationProfile: "alloc"}
+	if err := base.validate(); err != nil {
+		t.Fatal(err)
+	}
+	for _, other := range []string{"cpu", "source", "input", "invalid"} {
+		cfg := base
+		switch other {
+		case "cpu":
+			cfg.CPUProfile = "cpu"
+		case "source":
+			cfg.SourceDetails = true
+		case "input":
+			cfg.InputDetails = "input"
+		case "invalid":
+			cfg.AllocationProfile = "bad\x00prefix"
+		}
+		if err := cfg.validate(); err == nil {
+			t.Fatal("accepted combined/invalid allocation mode", other)
+		}
+	}
+}
+
 func TestPerfSourceDetailsRequireExplicitPerfAndBoundedRecorder(t *testing.T) {
 	for _, mode := range []struct {
 		perf, smoke, details bool
@@ -41,11 +70,11 @@ func TestPerfSourceDetailsRequireExplicitPerfAndBoundedRecorder(t *testing.T) {
 		{details: true}, {smoke: true, details: true}, {profile: "profile.pprof"},
 		{perf: true, smoke: true, details: true},
 	} {
-		if err := validatePerfModes(mode.perf, mode.smoke, mode.details, mode.profile); err == nil {
+		if err := validatePerfModes(mode.perf, mode.smoke, mode.details, mode.profile, ""); err == nil {
 			t.Fatalf("accepted incompatible mode%+v", mode)
 		}
 	}
-	if err := validatePerfModes(true, false, true, ""); err != nil {
+	if err := validatePerfModes(true, false, true, "", ""); err != nil {
 		t.Fatal(err)
 	}
 	// These values exercise the shared recorder reservation, including warmup

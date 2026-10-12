@@ -130,7 +130,7 @@ def validate_source_details(details, raster_upload_ns):
         raise ValueError("source draw sum exceeds ticket raster/upload interval")
 
 
-def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False, allow_input_details=False, gpu_scene_rendering=False):
+def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False, allow_input_details=False, allow_alloc_profile=False, gpu_scene_rendering=False):
     """Require exact case, current completed geometry and one sample per tag."""
     if len(records) != samples + 3 or [r.get("event") for r in records[:2]] != ["grid.perf.setup", "grid.perf.ready"] or records[-1].get("event") != "grid.perf.end":
         raise ValueError("missing, repeated or unordered benchmark stages")
@@ -157,6 +157,13 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
             raise ValueError("warmup callback mismatch")
     elif any(r.get("warmup_guard") is not None for r in (setup, ready, end)):
         raise ValueError("unknown warmup guard version")
+    allocated = setup.get("alloc_profile", False)
+    if type(allocated) is not bool or allocated and not allow_alloc_profile:
+        raise ValueError("diagnostic allocation profile cannot qualify warm timing")
+    if any(r.get("alloc_profile", False) is not allocated for r in records):
+        raise ValueError("allocation profiling case identity mismatch")
+    if allocated and (inputs or setup.get("cpu_profile", False) or setup.get("source_details", False)):
+        raise ValueError("allocation profiling requires a separate diagnostic mode")
     profiled = setup.get("cpu_profile", False)
     if not isinstance(profiled, bool) or profiled and not allow_profile:
         raise ValueError("diagnostic CPU profile cannot qualify warm timing")
@@ -255,15 +262,18 @@ def process_sample(pid):
             "cpu_quantum_seconds": quantum, "source": "ps; RSS is process-wide"}
 
 
-def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None, source_details=False, gpu_scene_rendering=False):
+def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None, alloc_profile=None, source_details=False, gpu_scene_rendering=False):
     if type(gpu_scene_rendering) is not bool:
         raise ValueError("invalid GPU scene rendering mode")
     if type(source_details) is not bool or source_details and (type(samples) is not int or type(warmup) is not int or warmup + samples + 2 > MAX_SOURCE_CAPACITY):
         raise ValueError("invalid source detail mode/recorder capacity")
+    if alloc_profile is not None and (not str(alloc_profile) or len(str(alloc_profile) + ".before.pprof") > 4096 or "\x00" in str(alloc_profile) or cpu_profile is not None or source_details):
+        raise ValueError("invalid separate allocation diagnostic mode/prefix")
     directory.mkdir(parents=True, exist_ok=False)
     argv = [str(binary), "-perf", f"-rows={rows}", f"-perf-samples={samples}", f"-perf-warmup={warmup}"]
     if cpu_profile is not None:
         argv.append(f"-perf-cpu-profile={cpu_profile}")
+    if alloc_profile is not None: argv.append(f"-perf-alloc-profile={alloc_profile}")
     if source_details: argv.append("-perf-source-details")
     if gpu_scene_rendering: argv.append("-gpu-scene")
     if variable: argv.append("-variable-rows")
@@ -317,12 +327,14 @@ def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout,
             if pending: raise ValueError("incomplete benchmark record at EOF")
             if returncode != 0: raise RuntimeError(f"native benchmark exited {returncode}")
             selected = validate_records(records, rows, variable, samples, novel, allow_profile=cpu_profile is not None,
-                                        allow_source_details=source_details, gpu_scene_rendering=gpu_scene_rendering)
+                                        allow_source_details=source_details, allow_alloc_profile=alloc_profile is not None, gpu_scene_rendering=gpu_scene_rendering)
+            if records[0].get("alloc_profile", False) is not (alloc_profile is not None):
+                raise ValueError("requested allocation profile case mismatch")
             if records[0].get("cpu_profile", False) is not (cpu_profile is not None):
                 raise ValueError("requested CPU profile case mismatch")
             if records[0].get("source_details", False) is not source_details:
                 raise ValueError("requested source detail case mismatch")
-            if source_details and records[1]["warmup"] != warmup:
+            if (source_details or alloc_profile is not None) and records[1].get("warmup") != warmup:
                 raise ValueError("requested detailed warmup count mismatch")
         except BaseException as error:
             failure = f"{type(error).__name__}: {error}"
@@ -391,10 +403,10 @@ def selected_inputs():
     return {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(set(candidates)) if path.is_file()}
 
 
-def warm_target_met(cases, *, novel=False, source_details=False):
+def warm_target_met(cases, *, novel=False, source_details=False, alloc_profile=False):
     # Explicit instrumentation is diagnostic even if its observed intervals
     # happen to be below the unchanged normal warm-work targets.
-    return (not novel and not source_details and bool(cases) and
+    return (not novel and not source_details and not alloc_profile and bool(cases) and
             all(bool(case["timings_ns"]["ui_work_ns"]["per_run"]) and
                 all(run["p95"] <= 4_000_000 and run["p99"] <= 6_000_000
                     for run in case["timings_ns"]["ui_work_ns"]["per_run"]) for case in cases.values()))

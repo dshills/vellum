@@ -212,3 +212,19 @@ native parity and forty matched stored-table processes qualify that bounded
 change. Observed process-wide Go allocation falls about 5.7–5.9 MB per observation;
 both builds still miss unchanged warm targets. This closes neither sustained
 performance nor native/GPU memory acceptance, and the renderer stays opt-in.
+
+## Current allocation and native-service evidence
+
+[Separate allocation diagnostics](../docs/reports/macos-allocation/README.md)
+identify repeated static glyph-outline construction, scene-packet allocation and
+accessibility publication as measured candidates for further Mac performance
+work. Their process-wide sampled figures include measurement helpers and do not
+qualify ordinary latency or retained/native/GPU memory. The next optimization
+must retain bounded font admission and exact geometry/pixel/fallback behavior.
+
+A read-only native-service inventory confirms that panel cancellation/installation
+and injected document chooser smokes do not establish actual Open/Save path
+selection or installed menu activation. Physical Finder drag acceptance remains
+open. The text-only clipboard restoration flag is not preservation-safe for an
+ordinary general pasteboard; a full roundtrip requires bounded flavor preservation
+and interference handling. No gate closes from this inventory alone.
