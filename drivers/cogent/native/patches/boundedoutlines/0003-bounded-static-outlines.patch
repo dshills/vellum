@@ -1,0 +1,280 @@
+--- /dev/null
++++ b/font/glyph_outline_bounded.go
+@@ -0,0 +1,68 @@
++// SPDX-License-Identifier: Unlicense OR BSD-3-Clause
++package font
++
++// GlyphOutlineBudget bounds aggregate logical point/segment slots and traversal
++// operations across a batch. It is caller-owned, not safe for concurrent use.
++// Slice-capacity/allocator overhead is not an exact byte counter.
++// Refusal latches: subsequent calls do no resource work. Limits are at most 1M.
++type GlyphOutlineBudget struct {
++	points, operations int
++	failed             bool
++}
++
++func NewGlyphOutlineBudget(points, operations int) *GlyphOutlineBudget {
++	if points <= 0 || operations <= 0 || points > 1<<20 || operations > 1<<20 {
++		return nil
++	}
++	return &GlyphOutlineBudget{points: points, operations: operations}
++}
++func (b *GlyphOutlineBudget) take(points, operations int) bool {
++	if b == nil {
++		return true
++	} // The ordinary public outline path retains its behavior.
++	if b.failed || points < 0 || operations < 0 || points > b.points || operations > b.operations {
++		b.failed = true
++		return false
++	}
++	b.points -= points
++	b.operations -= operations
++	return true
++}
++
++// HasEncodedGlyphResources reports any font bitmap/SVG resources without
++// retrieving, decompressing or allocating them. Presence requires fallback for
++// callers without a separately bounded decoder, even if a particular glyph is
++// an outline in that font.
++func (f *Font) HasEncodedGlyphResources() bool {
++	return f == nil || len(f.svg) > 0 || len(f.bitmap) > 0 || len(f.sbix) > 0 || f.lazySbix != nil
++}
++
++// SupportsBoundedOutlines reports the static TrueType retrieval path supported
++// by GlyphDataOutlineBounded. CFF and variable outline expansion are refused.
++func (f *Face) SupportsBoundedOutlines() bool {
++	return f != nil && f.Font != nil && f.Upem() != 0 && !f.HasEncodedGlyphResources() && f.cff == nil && f.cff2 == nil && len(f.fvar) == 0
++}
++
++// GlyphDataOutlineBounded preserves ordinary static TrueType outlines, charging
++// every composite traversal and point allocation/copy before growth. Deferred
++// records additionally have the parser's 64KiB/8192-point bounds; eager data is
++// borrowed and checked before conversion. No bitmap/SVG/CFF decoder is called.
++func (f *Face) GlyphDataOutlineBounded(gid GID, budget *GlyphOutlineBudget) (GlyphOutline, bool) {
++	if budget == nil || budget.failed || !f.SupportsBoundedOutlines() {
++		if budget != nil {
++			budget.failed = true
++		}
++		return GlyphOutline{}, false
++	}
++	var points []contourPoint
++	if !f.getPointsForGlyphRecBudget(gID(gid), 0, make(glyphSet), &points, budget) || len(points) < phantomCount {
++		budget.failed = true
++		return GlyphOutline{}, false
++	}
++	n := len(points) - phantomCount
++	// buildSegments emits no more than three segments per input contour point.
++	if !budget.take(3*n+2, 3*n+2) {
++		return GlyphOutline{}, false
++	}
++	return GlyphOutline{Segments: buildSegments(points[:n])}, true
++}
+--- /dev/null
++++ b/font/glyph_outline_bounded_test.go
+@@ -0,0 +1,106 @@
++// SPDX-License-Identifier: Unlicense OR BSD-3-Clause
++package font
++
++import (
++	"github.com/go-text/typesetting/font/opentype/tables"
++	"os"
++	"reflect"
++	"testing"
++)
++
++func vellumBoundedTestFace(t *testing.T) *Face {
++	t.Helper()
++	f, e := os.Open("testdata/UbuntuMono-R.ttf")
++	if e != nil {
++		t.Fatal(e)
++	}
++	defer f.Close()
++	face, e := ParseTTF(f)
++	if e != nil {
++		t.Fatal(e)
++	}
++	return face
++}
++func TestVellumBoundedOutlineOrdinaryParity(t *testing.T) {
++	face := vellumBoundedTestFace(t)
++	if !face.SupportsBoundedOutlines() || face.HasEncodedGlyphResources() {
++		t.Fatal("ordinary static outline font refused")
++	}
++	composites := 0
++	for i := 0; i < face.glyfCount(); i++ {
++		gid := GID(i)
++		want, ok := face.GlyphDataOutline(gid)
++		got, gok := face.GlyphDataOutlineBounded(gid, NewGlyphOutlineBudget(1<<20, 1<<20))
++		if ok != gok || !reflect.DeepEqual(got, want) {
++			t.Fatalf("outline parity gid=%d", i)
++		}
++		g, _ := face.glyfGlyph(gID(i))
++		if _, ok := g.Data.(tables.CompositeGlyph); ok {
++			composites++
++		}
++	}
++	if composites == 0 {
++		t.Fatal("font did not exercise composites")
++	}
++}
++func TestVellumBoundedOutlineAggregateCompositeAndLatch(t *testing.T) {
++	face := vellumBoundedTestFace(t)
++	face.lazyGlyf = nil
++	face.glyf = make(tables.Glyf, 12)
++	face.glyf[0] = tables.Glyph{Data: tables.SimpleGlyph{Points: []tables.GlyphContourPoint{{X: 0, Y: 0, Flag: 1}, {X: 100, Y: 0, Flag: 1}, {X: 0, Y: 100, Flag: 1}}, EndPtsOfContours: []uint16{2}}}
++	for i := 1; i < len(face.glyf); i++ {
++		face.glyf[i] = tables.Glyph{Data: tables.CompositeGlyph{Glyphs: []tables.CompositeGlyphPart{{GlyphIndex: tables.GlyphID(i - 1)}, {GlyphIndex: tables.GlyphID(i - 1)}}}}
++	}
++	ordinary, ok := face.GlyphDataOutline(11)
++	if !ok || len(ordinary.Segments) < 1000 {
++		t.Fatal("fixture did not expand composite")
++	}
++	budget := NewGlyphOutlineBudget(1000, 1000)
++	if _, ok := face.GlyphDataOutlineBounded(11, budget); ok || !budget.failed {
++		t.Fatal("aggregate composite expansion admitted")
++	}
++	points, operations := budget.points, budget.operations
++	if _, ok := face.GlyphDataOutlineBounded(0, budget); ok || points != budget.points || operations != budget.operations {
++		t.Fatal("failed budget resumed work")
++	}
++	shared := NewGlyphOutlineBudget(50, 1000)
++	accepted := 0
++	for i := 0; i < 100; i++ {
++		if _, ok := face.GlyphDataOutlineBounded(0, shared); !ok {
++			break
++		}
++		accepted++
++	}
++	if accepted == 0 || accepted >= 100 || !shared.failed {
++		t.Fatal("per-glyph reset bypassed aggregate budget", accepted)
++	}
++	for _, n := range []int{-1, 0, 1<<20 + 1} {
++		if NewGlyphOutlineBudget(n, 100) != nil {
++			t.Fatal("invalid admission", n)
++		}
++	}
++}
++func TestVellumBoundedOutlineEncodedPresenceRefuses(t *testing.T) {
++	for _, kind := range []string{"svg", "bitmap", "sbix", "lazySbix"} {
++		t.Run(kind, func(t *testing.T) {
++			face := vellumBoundedTestFace(t)
++			switch kind {
++			case "svg":
++				face.svg = make(svg, 1)
++			case "bitmap":
++				face.bitmap = make(bitmap, 1)
++			case "sbix":
++				face.sbix = make(sbix, 1)
++			case "lazySbix":
++				face.lazySbix = &lazySbix{}
++			}
++			if !face.HasEncodedGlyphResources() || face.SupportsBoundedOutlines() {
++				t.Fatal("encoded resource not detected")
++			}
++			budget := NewGlyphOutlineBudget(100, 100)
++			if _, ok := face.GlyphDataOutlineBounded(0, budget); ok || !budget.failed || budget.points != 100 || budget.operations != 100 {
++				t.Fatal("encoded retrieval performed work")
++			}
++		})
++	}
++}
+--- a/font/glyphs.go
++++ b/font/glyphs.go
+@@ -59,9 +59,13 @@
+ // applying variation if needed.
+ // for composite, recursively calls itself; allPoints includes phantom points and will be at least of length 4
+ func (f *Face) getPointsForGlyphRec(gid tables.GlyphID, currentDepth int, currentGlyphs glyphSet, allPoints *[]contourPoint /* OUT */) bool {
++	return f.getPointsForGlyphRecBudget(gid, currentDepth, currentGlyphs, allPoints, nil)
++}
++
++func (f *Face) getPointsForGlyphRecBudget(gid tables.GlyphID, currentDepth int, currentGlyphs glyphSet, allPoints *[]contourPoint /* OUT */, budget *GlyphOutlineBudget) bool {
+ 	// adapted from harfbuzz/src/OT/glyf/Glyph.hh
+ 
+-	if currentDepth > maxCompositeNesting || int(gid) >= f.glyfCount() {
++	if !budget.take(0, 1) || currentDepth > maxCompositeNesting || int(gid) >= f.glyfCount() {
+ 		return false
+ 	}
+ 
+@@ -70,6 +74,22 @@
+ 		return false
+ 	}
+ 
++	// Charge decoded traversal and every temporary/retained point copy before growth.
++	n := pointNumbersCount(g)
++	if !budget.take(n+phantomCount, n+phantomCount) {
++		return false
++	}
++	if data, ok := g.Data.(tables.SimpleGlyph); ok && budget != nil {
++		if !budget.take(0, len(data.EndPtsOfContours)) {
++			return false
++		}
++		for _, end := range data.EndPtsOfContours {
++			if int(end) >= len(data.Points) {
++				budget.failed = true
++				return false
++			}
++		}
++	}
+ 	var points []contourPoint
+ 	if data, ok := g.Data.(tables.SimpleGlyph); ok {
+ 		points = getContourPoints(data) // fetch the "real" points
+@@ -96,9 +116,15 @@
+ 
+ 	switch data := g.Data.(type) {
+ 	case tables.SimpleGlyph:
++		if !budget.take(len(points), len(points)) {
++			return false
++		}
+ 		*allPoints = append(*allPoints, points...)
+ 	case tables.CompositeGlyph:
+ 		for compIndex, item := range data.Glyphs {
++			if !budget.take(0, 1) {
++				return false
++			}
+ 			if _, has := currentGlyphs[item.GlyphIndex]; has {
+ 				continue
+ 			}
+@@ -107,7 +133,7 @@
+ 			// recurse on component
+ 			var compPoints []contourPoint
+ 
+-			if !f.getPointsForGlyphRec(item.GlyphIndex, currentDepth+1, currentGlyphs, &compPoints) {
++			if !f.getPointsForGlyphRecBudget(item.GlyphIndex, currentDepth+1, currentGlyphs, &compPoints, budget) {
+ 				return false
+ 			}
+ 
+@@ -117,6 +143,9 @@
+ 				return false
+ 			}
+ 
++			if !budget.take(LC-phantomCount, 3*LC) {
++				return false
++			}
+ 			/* Copy phantom points from component if USE_MY_METRICS flag set */
+ 			if item.HasUseMyMetrics() {
+ 				copy(phantoms, compPoints[LC-phantomCount:])
+@@ -146,8 +175,14 @@
+ 			delete(currentGlyphs, item.GlyphIndex)
+ 		}
+ 
++		if !budget.take(phantomCount, phantomCount) {
++			return false
++		}
+ 		*allPoints = append(*allPoints, phantoms...)
+ 	default: // no data for the glyph
++		if !budget.take(phantomCount, phantomCount) {
++			return false
++		}
+ 		*allPoints = append(*allPoints, phantoms...)
+ 	}
+ 
+@@ -155,6 +190,9 @@
+ 	if currentDepth == 0 {
+ 		/* Undocumented rasterizer behavior:
+ 		 * Shift points horizontally by the updated left side bearing */
++		if !budget.take(0, len(*allPoints)) {
++			return false
++		}
+ 		tx := -phantoms[phantomLeft].X
+ 		for i := range *allPoints {
+ 			(*allPoints)[i].translate(tx, 0)

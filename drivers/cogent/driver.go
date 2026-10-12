@@ -41,6 +41,10 @@ type Driver struct {
 	// grid scenes. Default replay is retained: current table workloads are slower
 	// with this experiment. It does not reduce GPU uploads. Copied at Run startup.
 	ExperimentalGridScrollReuse bool
+	// GPUSceneRendering enables ordered compute paint on main-window scenes.
+	// Unsupported paint uses the current CPU image. This candidate is opt-in
+	// while representative native performance and lifecycle checks are ongoing.
+	GPUSceneRendering bool
 	// FrameMetrics opts into bounded diagnostic samples for explicitly tagged
 	// routed grid input; ordinary frames do not pay for timing calls.
 	FrameMetrics *FrameMetrics
@@ -239,6 +243,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w := &nativeWindow{window: spec}
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
+				w.body.Scene.GPUSceneRendering = d.GPUSceneRendering
 				setGridScrollReuse(w.body.Scene, d.ExperimentalGridScrollReuse)
 				if d.FrameMetrics != nil {
 					var metricErr error

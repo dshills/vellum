@@ -245,3 +245,80 @@ matched stored-table experiments regress latency even though pixels agree, so
 normal managed rendering emits no cache hints and retains no pane cache. The
 experimental mode remains available for further renderer work; this is not a
 recommended performance setting or completed latency acceptance.
+
+## Ordered GPU scene candidate
+
+`Driver.GPUSceneRendering` and `ManualConfig.GPUSceneRendering` opt main scenes
+into a shared-device scene adapter. The candidate remains disabled by default
+pending representative native eligibility, latency and memory qualification.
+The software drawer exercises the same routing with CPU fallback and creates no
+GPU device. Popup/modal/sprite sources retain their existing independent policy.
+
+The adapter executes at the scene source's existing composition ordinal, before
+later siblings, scrims, popups and sprites. Ordinary and measured source drawing
+share the same adapter dispatch; renderers are no longer assumed to be rasterx.
+Size checks use Renderer.Size rather than exposing an image. Scene destruction
+optionally retires its renderer after stopping owned timers.
+
+A supplied paint batch may update only a dirty subtree. The compiler preflights
+all commands, built-in source/colors, destination aliases, aggregate path/text/
+selection work and finite transformed coordinates before capture. It uses a
+private scanner/Dasher and the reference text placement/mask cache, producing
+owned ordered uniform/image/mask and exact 16-bit coverage operations. Unknown
+callbacks, self-blits (including destination subimages), unsafe encoded fonts,
+CFF/variable outlines, and unsupported operations refuse the complete batch.
+Static TrueType composite traversal/point growth is bounded before allocation;
+the normal font API retains its existing behavior. Pre-rasterized RGBA icons and
+supported ordinary outline text remain accepted. A failed capture changes no CPU
+pixels, scanner clip or winding, and invokes no unknown source/color hooks.
+
+Packets have zero-origin targets, at most 8192 pixels per axis and 16 million
+pixels, 65,536 operations, 32 MiB of detached retained payload, and two million
+ordered tile references. Encoding preflights exact aligned sizes and allocates
+exact output capacities. Coverage keeps the scanner's full 16-bit alpha and span
+order. A first accepted full-target Src or opaque uniform operation establishes
+an independent reset; command count alone never establishes a complete frame.
+
+Compute composites packed premultiplied RGBA bytes with the reference Go/scan
+u32 blend and truncation rules, then copies the storage buffer to a sampled
+RGBA8UnormSrgb texture. The final source uses the existing drawer composition
+pipeline; no floating-point blend or separate logical device substitutes for the
+reference byte math. An empty batch reuses only a current live source. Checked
+allocation/uploads/copy/finish errors and device loss take CPU fallback. The
+pinned API's BeginComputePass, dispatch and Submit are not error-returning or
+completion measurements; successful submission is not proof of presentation.
+
+A distinct CPU base plus at most 256 sealed packets/32 MiB of packet payload
+reconstructs accepted partial work without GPU readback. An independent reset
+retires old history; journal limits materialize it into the CPU base. Unsupported
+paint reconstructs prior work before the normal CPU render. A recovered partial
+GPU batch seeds that current base once. GPU readiness and CPU materialization are
+separate. Explicit Image returns the usual mutable image: after exposure, accepted
+packets update the retained pointer immediately, later partial GPU packets seed
+possible caller mutations, and empty batches use a current CPU copy. This
+conservative compatibility mode lasts until resize; it gives up deferred replay
+and full-image-upload elision. Concurrent unsynchronized image mutation is no
+more supported than with the original raster renderer.
+
+Drawer-owned leases serialize GPU preparation and checked source append on the
+originating device. Capacity is 64 sources, 128 MiB of source-requested GPU
+allocations each and 256 MiB aggregate. Retained plus transient/in-flight replaced
+input buffers remain charged until completion flags are observed; growth uses
+charged geometric capacity and at most 16 pending retired buffers. Retirement
+drains queue references before returning credit. These limits exclude legacy
+drawer/surface allocations, pipeline/driver metadata, CPU base/packet scratch and
+opaque GPU-driver caching; they are not a total native/process memory limit.
+Callbacks add no source-owned UI/model/font references and never enter
+Scene/application ownership; borrowed device health remains owner-managed. Copied, stale, reentrant or over-budget leases/contexts refuse.
+Close during a pending composition or another resource scope requests retirement;
+registry ownership and credit remain until a safe End/scope drain or drawer
+teardown. A request arriving after selection waits for a later drain. Cleanup is
+idempotent and preserves callback unwind behavior. Borrowed batches still refuse
+cached Redraw. A later owned Go-image batch can replay normally; recycling a
+borrowed texture slot must allocate independent owned storage before uploading.
+
+GPU source diagnostics expose outer host Draw time and explicit unavailable
+CPU Raster/Copy breakdowns. CPU fallback timings measure the current ordinary
+render/copy calls; earlier journal reconstruction is also in outer Draw. No
+physical upload bytes, GPU completion, presentation, whole-scene eligibility or
+latency acceptance follows from these routing counts or bounded native readbacks.

@@ -364,6 +364,17 @@
               "sha256": "8ee95909824c5ce5309c901be8372a45cb8b9d9c9402fb19a17f556ee2136ca3"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/gpuscenes",
+          "inputs": "native/patches/gpuscenes/original-hashes.json",
+          "outputs": "native/patches/gpuscenes/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/gpuscenes/0041-ordered-gpu-scenes.patch",
+              "sha256": "ef8606923f8645d9c7b006395000f0fcc2645f002a84fd3ed66b93a3c0fe5c69"
+            }
+          ]
         }
       ]
     },
@@ -390,6 +401,17 @@
             {
               "file": "native/patches/fontresources/0002-deferred-static-outlines.patch",
               "sha256": "8cd046c233dc65eadbb1812d5f94a432be8e8a2d35537d94748ed5db9fd46be1"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/boundedoutlines",
+          "inputs": "native/patches/boundedoutlines/original-hashes.json",
+          "outputs": "native/patches/boundedoutlines/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/boundedoutlines/0003-bounded-static-outlines.patch",
+              "sha256": "f4c1550bdb15eb32d4eba8dc68cb59a7018197ff00045bda1c61c8886b28856d"
             }
           ]
         }

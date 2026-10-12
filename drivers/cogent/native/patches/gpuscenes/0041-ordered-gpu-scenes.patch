@@ -1,0 +1,4294 @@
+--- a/core/manual_timer.go
++++ b/core/manual_timer.go
+@@ -167,6 +167,9 @@
+ 	sc.clearLocalLayouts()
+ 	defer sc.clearLocalLayouts()
+ 	sc.stopManualTimers()
++	if rd, ok := sc.Renderer.(interface{ Release() }); ok {
++		rd.Release()
++	}
+ 	sc.Frame.Destroy()
+ }
+ 
+--- a/core/render_notjs.go
++++ b/core/render_notjs.go
+@@ -11,9 +11,10 @@
+ 
+ 	"cogentcore.org/core/colors"
+ 	"cogentcore.org/core/math32"
+-	"cogentcore.org/core/paint/renderers/rasterx"
++	"cogentcore.org/core/paint/render"
+ 	"cogentcore.org/core/system/composer"
+ 	"golang.org/x/image/draw"
++	"time"
+ )
+ 
+ // grabRenderFrom grabs the rendered image from the given widget.
+@@ -35,14 +36,45 @@
+ 
+ func (ps *paintSource) Draw(c composer.Composer) {
+ 	cd := c.(*composer.ComposerDrawer)
+-	rd := ps.renderer.(*rasterx.Renderer)
++	ps.drawSceneSource(cd.Drawer, false)
++}
+ 
++// sceneDrawer is optional; ordinary and diagnostic paths share the same source
++// routing and preserve this paintSource's existing composition ordinal.
++type sceneDrawer interface {
++	DrawScene(composer.Drawer, render.Render, image.Point, draw.Op, bool) composer.SourceTiming
++}
++
++func (ps *paintSource) drawSceneSource(dw composer.Drawer, measured bool) composer.SourceTiming {
++	if rd, ok := ps.renderer.(sceneDrawer); ok {
++		record := rd.DrawScene(dw, ps.render, ps.drawPos, ps.drawOp, measured)
++		record.Kind = ps.kind
++		return record
++	}
+ 	unchanged := len(ps.render) == 0
++	record := composer.SourceTiming{Kind: ps.kind, RasterAvailable: true, CopyAvailable: true, ImageChanged: !unchanged}
+ 	if !unchanged {
+-		rd.Render(ps.render)
++		if measured {
++			start := time.Now()
++			ps.renderer.Render(ps.render)
++			record.RasterNS = time.Since(start).Nanoseconds()
++		} else {
++			ps.renderer.Render(ps.render)
++		}
+ 	}
+-	img := rd.Image()
+-	cd.Drawer.Copy(ps.drawPos, img, img.Bounds(), ps.drawOp, unchanged)
++	img := ps.renderer.Image()
++	if img == nil {
++		return record
++	}
++	record.ImageWidth, record.ImageHeight = img.Bounds().Dx(), img.Bounds().Dy()
++	if measured {
++		start := time.Now()
++		dw.Copy(ps.drawPos, img, img.Bounds(), ps.drawOp, unchanged)
++		record.CopyNS = time.Since(start).Nanoseconds()
++	} else {
++		dw.Copy(ps.drawPos, img, img.Bounds(), ps.drawOp, unchanged)
++	}
++	return record
+ }
+ 
+ func (ss *scrimSource) Draw(c composer.Composer) {
+--- a/core/render_source_timing.go
++++ b/core/render_source_timing.go
+@@ -7,7 +7,6 @@
+ 
+ import (
+ 	"cogentcore.org/core/colors"
+-	"cogentcore.org/core/paint/renderers/rasterx"
+ 	"cogentcore.org/core/system/composer"
+ 	"golang.org/x/image/draw"
+ 	"image"
+@@ -18,21 +17,7 @@
+ // Raster, Copy, and image API durations remain nested in the outer DrawNS.
+ func (ps *paintSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
+ 	cd := c.(*composer.ComposerDrawer)
+-	rd := ps.renderer.(*rasterx.Renderer)
+-	unchanged := len(ps.render) == 0
+-	record := composer.SourceTiming{Kind: ps.kind, RasterAvailable: true, CopyAvailable: true, ImageChanged: !unchanged}
+-	if !unchanged {
+-		start := time.Now()
+-		rd.Render(ps.render)
+-		record.RasterNS = time.Since(start).Nanoseconds()
+-	}
+-	img := rd.Image()
+-	bounds := img.Bounds()
+-	record.ImageWidth, record.ImageHeight = bounds.Dx(), bounds.Dy()
+-	start := time.Now()
+-	cd.Drawer.Copy(ps.drawPos, img, bounds, ps.drawOp, unchanged)
+-	record.CopyNS = time.Since(start).Nanoseconds()
+-	return record
++	return ps.drawSceneSource(cd.Drawer, true)
+ }
+ 
+ func (ss *scrimSource) DrawMeasured(c composer.Composer) composer.SourceTiming {
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -102,6 +102,10 @@
+ 	// source renderer for rendering the scene
+ 	Renderer render.Renderer `copier:"-" json:"-" xml:"-" display:"-" set:"-"`
+ 
++	// GPUSceneRendering opts this scene into ordered GPU paint on a capable
++	// native drawer. Configure before first layout; unsupported batches use CPU.
++	GPUSceneRendering bool `copier:"-" json:"-" xml:"-" display:"-" set:"-"`
++
+ 	// lastRender captures key params from last render.
+ 	// If different then a new ApplyStyleScene is needed.
+ 	lastRender renderParams
+@@ -360,15 +364,12 @@
+ 	}
+ 	sc.SceneGeom.Pos = geom.Pos
+ 	if sc.Renderer != nil {
+-		img := sc.Renderer.Image()
+-		if img != nil {
+-			isz := img.Bounds().Size()
+-			if isz == geom.Size {
+-				return false
+-			}
++		un, currentSize := sc.Renderer.Size()
++		if un == units.UnitDot && currentSize.ToPointCeil() == geom.Size {
++			return false
+ 		}
+ 	} else {
+-		sc.Renderer = paint.NewSourceRenderer(sz)
++		sc.Renderer = newSceneRenderer(sz, sc.GPUSceneRendering)
+ 	}
+ 	sc.Painter.Paint.UnitContext = sc.Styles.UnitContext
+ 	sc.Painter.State.Init(sc.Painter.Paint, sz)
+--- /dev/null
++++ b/core/scene_renderer_js.go
+@@ -0,0 +1,16 @@
++//go:build js
++
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++//
++package core
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint"
++	"cogentcore.org/core/paint/render"
++)
++
++func newSceneRenderer(size math32.Vector2, orderedGPU bool) render.Renderer {
++	return paint.NewSourceRenderer(size)
++}
+--- /dev/null
++++ b/core/scene_renderer_notjs.go
+@@ -0,0 +1,20 @@
++//go:build !js
++
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++//
++package core
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/gpuscene"
++)
++
++func newSceneRenderer(size math32.Vector2, orderedGPU bool) render.Renderer {
++	if orderedGPU {
++		return gpuscene.New(size)
++	}
++	return paint.NewSourceRenderer(size)
++}
+--- a/go.mod
++++ b/go.mod
+@@ -81,3 +81,6 @@
+ 	modernc.org/knuth v0.5.5 // indirect
+ 	modernc.org/token v1.1.0 // indirect
+ )
++
++// The driver-owned scene compiler uses the pinned bounded-outline extension.
++replace github.com/go-text/typesetting => ../typesetting
+--- a/gpu/gpudraw/drawer.go
++++ b/gpu/gpudraw/drawer.go
+@@ -10,6 +10,7 @@
+ 	"image"
+ 	"image/draw"
+ 	"sync"
++	"sync/atomic"
+ 
+ 	"cogentcore.org/core/colors"
+ 	"cogentcore.org/core/gpu"
+@@ -64,6 +65,12 @@
+ 	// nil on the ordinary path; diagnostic scalars only, protected by Mutex.
+ 	sourceImageTiming *composer.ImageTiming
+ 
++	sceneSources  sceneSourceRegistry
++	sceneBusy     atomic.Bool
++	sceneClosing  atomic.Bool
++	sceneRetiring atomic.Bool
++	sceneBatch    bool
++
+ 	// use Lock, Unlock on Drawer for all impl routines
+ 	sync.Mutex
+ }
+@@ -90,11 +97,17 @@
+ }
+ 
+ func (dw *Drawer) Release() {
+-	if dw.System == nil {
+-		return
+-	}
+-	dw.System.Release()
+-	dw.System = nil
++	dw.sceneClosing.Store(true)
++	dw.Lock()
++	defer dw.Unlock()
++	defer func() {
++		system := dw.System
++		dw.System = nil
++		if system != nil {
++			system.Release()
++		}
++	}()
++	dw.retireSceneSourcesOwned()
+ }
+ 
+ func (dw *Drawer) Renderer() any {
+@@ -126,12 +139,14 @@
+ 
+ 	dw.opList = dw.opList[:0]
+ 	dw.images.start()
++	dw.sceneBatch = true
+ }
+ 
+ // End ends image drawing rendering process on render target.
+ func (dw *Drawer) End() {
+ 	dw.Lock()
+ 	defer dw.Unlock()
++	defer func() { dw.sceneBatch = false; dw.drainRequestedSceneSourcesOwned() }()
+ 	dw.lastOpN = len(dw.opList)
+ 	if dw.lastOpN == 0 {
+ 		return
+--- a/gpu/gpudraw/images.go
++++ b/gpu/gpudraw/images.go
+@@ -40,6 +40,7 @@
+ // init does initialization for AllocChunk total images
+ func (im *images) init() {
+ 	n := AllocChunk
++	im.capacity = n
+ 	im.all = make(map[any]*imgrec, n)
+ 	im.free = make([]int, n)
+ 	for i := range n {
+@@ -78,8 +79,8 @@
+ 	if nf == 0 {
+ 		ni = im.capacity
+ 		im.capacity += AllocChunk
+-		for i := ni + 1; i < im.capacity; i++ {
+-			im.free = append(im.free, im.capacity-1-i)
++		for i := im.capacity - 1; i > ni; i-- {
++			im.free = append(im.free, i)
+ 		}
+ 	} else {
+ 		ni = im.free[nf-1]
+--- /dev/null
++++ b/gpu/gpudraw/scene_source.go
+@@ -0,0 +1,521 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpudraw
++
++import (
++	"errors"
++	"fmt"
++	"image"
++	"image/draw"
++	"math"
++	"sort"
++	"sync"
++	"sync/atomic"
++
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/gpu/drawmatrix"
++	"cogentcore.org/core/math32"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++const (
++	sceneSourceLimit    = 64
++	sceneSourceBytes    = uint64(128 << 20)
++	sceneAggregateBytes = uint64(256 << 20)
++	sceneDrawSlots      = 4096
++	sceneDrawCoordinate = 1 << 24
++)
++
++var (
++	ErrSceneSourceInvalid  = errors.New("gpudraw: invalid scene source")
++	ErrSceneSourceBusy     = errors.New("gpudraw: scene source callback busy")
++	ErrSceneSourceRetired  = errors.New("gpudraw: scene source retired")
++	ErrSceneSourceCapacity = errors.New("gpudraw: scene source capacity exceeded")
++)
++
++// SceneDraw describes one source's exact position in the current composition.
++// Size is the expected single-layer sampled texture size. Zero SR means all of
++// it; OP is Src or Over. The source callback must not call legacy Drawer APIs.
++type SceneDraw struct {
++	Size image.Point
++	DP   image.Point
++	SR   image.Rectangle
++	Op   draw.Op
++}
++
++type sceneSourceRegistry struct {
++	owner   *Drawer
++	next    uint64
++	bytes   uint64
++	closed  bool
++	entries map[uint64]*SceneSourceLease
++}
++
++// SceneSourceLease is an originating drawer-owned source resource lifetime.
++// Use the returned pointer; copies are refused. Callbacks are serialized with
++// ordinary composition and drawer teardown. Retirement callbacks must release
++// only private GPU handles, never acquire a render context or call application
++// code. They may drain the borrowed queue before releasing handles; GPU loss
++// and completion callbacks must remain nonblocking and never enter these locks.
++// Retirement callbacks must not invoke any Drawer method.
++type SceneSourceLease struct {
++	self           *SceneSourceLease
++	drawer         *Drawer
++	id             uint64
++	bytes          uint64
++	retired        atomic.Bool
++	closeRequested atomic.Bool
++	retire         func()
++}
++
++// SceneGPUContext is valid only within the admitted callback. Device is
++// borrowed: never release or retain the context's Device pointer. Resource-owned
++// handle wrappers may copy the borrowed Device value like gpu.Texture, using it
++// only inside subsequent lease callbacks or the retirement hook. GPU resources
++// created from it remain lease-owned and must be retired through the lease.
++// Context methods are checked; copying the context or using it later refuses.
++type SceneGPUContext struct {
++	Device *gpu.Device
++	self   *SceneGPUContext
++	lease  *SceneSourceLease
++	active bool
++	mu     sync.Mutex
++}
++
++// SetBudget reserves the actual total retained + transient replacement bytes
++// BEFORE allocating. Refusals do not change credits. Failed prepare callbacks
++// do not auto-refund: release their handles and then reduce the reservation.
++func (c *SceneGPUContext) SetBudget(bytes uint64) error {
++	if c == nil || c.self != c {
++		return ErrSceneSourceInvalid
++	}
++	c.mu.Lock()
++	defer c.mu.Unlock()
++	if !c.active || c.lease == nil || c.lease.retired.Load() {
++		return ErrSceneSourceRetired
++	}
++	if c.lease.closeRequested.Load() && bytes > c.lease.bytes {
++		return ErrSceneSourceRetired
++	}
++	return c.lease.setBudgetOwned(bytes)
++}
++
++// Budget returns the reservation held by this source in the admitted scope.
++func (c *SceneGPUContext) Budget() (uint64, error) {
++	if c == nil || c.self != c {
++		return 0, ErrSceneSourceInvalid
++	}
++	c.mu.Lock()
++	defer c.mu.Unlock()
++	if !c.active || c.lease == nil || c.lease.retired.Load() {
++		return 0, ErrSceneSourceRetired
++	}
++	return c.lease.bytes, nil
++}
++
++func (s *SceneSourceLease) setBudgetOwned(bytes uint64) error {
++	r := &s.drawer.sceneSources
++	if bytes > sceneSourceBytes || r.bytes > sceneAggregateBytes || r.bytes < s.bytes || bytes > sceneAggregateBytes-(r.bytes-s.bytes) {
++		return ErrSceneSourceCapacity
++	}
++	r.bytes = r.bytes - s.bytes + bytes
++	s.bytes = bytes
++	return nil
++}
++
++func (dw *Drawer) sceneDeviceOwned() (*gpu.Device, error) {
++	if dw.sceneSources.owner != dw || dw.sceneSources.closed || dw.System == nil || dw.System.Renderer == nil {
++		return nil, ErrSceneSourceRetired
++	}
++	d := dw.System.Device()
++	if d == nil || !d.Device.IsValid() || !d.Queue.IsValid() {
++		return nil, ErrSceneSourceRetired
++	}
++	if err := d.LossError(); err != nil {
++		return nil, fmt.Errorf("%w: %v", ErrSceneSourceRetired, err)
++	}
++	return d, nil
++}
++
++func (dw *Drawer) enterScene() error {
++	if dw == nil {
++		return ErrSceneSourceInvalid
++	}
++	if dw.sceneClosing.Load() {
++		return ErrSceneSourceRetired
++	}
++	if dw.sceneRetiring.Load() {
++		return ErrSceneSourceBusy
++	}
++	if !dw.sceneBusy.CompareAndSwap(false, true) {
++		return ErrSceneSourceBusy
++	}
++	dw.Lock()
++	if dw.sceneSources.owner != nil && dw.sceneSources.owner != dw {
++		dw.Unlock()
++		dw.sceneBusy.Store(false)
++		return ErrSceneSourceInvalid
++	}
++	return nil
++}
++
++func (dw *Drawer) leaveScene() {
++	defer dw.Unlock()
++	defer dw.sceneBusy.Store(false)
++	if !dw.sceneBatch {
++		dw.drainRequestedSceneSourcesOwned()
++	}
++}
++
++// NewSceneSource registers a bounded source lifetime on the existing window
++// device. It creates no device and no GPU allocation.
++func (dw *Drawer) NewSceneSource(retire func()) (*SceneSourceLease, error) {
++	if retire == nil {
++		return nil, ErrSceneSourceInvalid
++	}
++	if err := dw.enterScene(); err != nil {
++		return nil, err
++	}
++	defer dw.leaveScene()
++	if _, err := dw.sceneDeviceOwned(); err != nil {
++		return nil, err
++	}
++	return dw.newSceneSourceOwned(retire)
++}
++
++func (dw *Drawer) newSceneSourceOwned(retire func()) (*SceneSourceLease, error) {
++	r := &dw.sceneSources
++	if r.owner == nil {
++		r.owner = dw
++	}
++	if r.owner != dw {
++		return nil, ErrSceneSourceInvalid
++	}
++	if r.closed {
++		return nil, ErrSceneSourceRetired
++	}
++	if len(r.entries) == sceneSourceLimit || r.next == math.MaxUint64 {
++		return nil, ErrSceneSourceCapacity
++	}
++	if r.entries == nil {
++		r.entries = make(map[uint64]*SceneSourceLease)
++	}
++	r.next++
++	s := &SceneSourceLease{drawer: dw, id: r.next, retire: retire}
++	s.self = s
++	r.entries[s.id] = s
++	return s, nil
++}
++
++func (s *SceneSourceLease) enter() error {
++	if s == nil || s.self != s || s.drawer == nil {
++		return ErrSceneSourceInvalid
++	}
++	if s.retired.Load() || s.closeRequested.Load() {
++		return ErrSceneSourceRetired
++	}
++	if err := s.drawer.enterScene(); err != nil {
++		return err
++	}
++	if s.drawer.sceneSources.closed || s.drawer.sceneSources.entries[s.id] != s || s.retired.Load() || s.closeRequested.Load() {
++		s.drawer.leaveScene()
++		return ErrSceneSourceRetired
++	}
++	return nil
++}
++
++func (s *SceneSourceLease) context(dev *gpu.Device) *SceneGPUContext {
++	c := &SceneGPUContext{Device: dev, lease: s, active: true}
++	c.self = c
++	return c
++}
++
++func (c *SceneGPUContext) finish() {
++	c.mu.Lock()
++	c.active = false
++	c.Device = nil
++	c.mu.Unlock()
++}
++
++// WithResources owns allocation/submission or explicit source resource cleanup.
++// A callback panic/Goexit is preserved while context/lock admission is unwound.
++func (s *SceneSourceLease) WithResources(fn func(*SceneGPUContext) error) error {
++	if fn == nil {
++		return ErrSceneSourceInvalid
++	}
++	if err := s.enter(); err != nil {
++		return err
++	}
++	defer s.drawer.leaveScene()
++	dev, err := s.drawer.sceneDeviceOwned()
++	if err != nil {
++		return err
++	}
++	c := s.context(dev)
++	defer c.finish()
++	return fn(c)
++}
++
++func sceneDrawValid(desc SceneDraw, target image.Point, limit uint32) bool {
++	if desc.Op != draw.Src && desc.Op != draw.Over || desc.Size.X <= 0 || desc.Size.Y <= 0 || uint64(desc.Size.X) > uint64(limit) || uint64(desc.Size.Y) > uint64(limit) || target.X <= 0 || target.Y <= 0 {
++		return false
++	}
++	sr := desc.SR
++	if sr == (image.Rectangle{}) {
++		sr = image.Rectangle{Max: desc.Size}
++	}
++	if sr.Empty() || !sr.In(image.Rectangle{Max: desc.Size}) {
++		return false
++	}
++	// Matrix coordinates are float32. Refuse overflow/rounded giant integers
++	// before subtraction, addition, staging or any source callback.
++	for _, v := range []int{desc.DP.X, desc.DP.Y, sr.Min.X, sr.Min.Y, sr.Max.X, sr.Max.Y, target.X, target.Y} {
++		if v < -sceneDrawCoordinate || v > sceneDrawCoordinate {
++			return false
++		}
++	}
++	for _, v := range []int64{int64(desc.DP.X) - int64(sr.Min.X), int64(desc.DP.Y) - int64(sr.Min.Y), int64(desc.DP.X) + int64(sr.Dx()), int64(desc.DP.Y) + int64(sr.Dy())} {
++		if v < -sceneDrawCoordinate || v > sceneDrawCoordinate {
++			return false
++		}
++	}
++	return true
++}
++
++// Draw preflights destination, staging/texture binding capacity and samplers,
++// then lends the device to prepare. The callback may encode+submit only within
++// that scope, returning one live same-device texture. Only successful validation
++// appends the image and operation; error/panic/Goexit appends nothing. Budget
++// reservations remain until released explicitly or retired.
++func (s *SceneSourceLease) Draw(desc SceneDraw, prepare func(*SceneGPUContext) (*gpu.Texture, error)) error {
++	if prepare == nil {
++		return ErrSceneSourceInvalid
++	}
++	if err := s.enter(); err != nil {
++		return err
++	}
++	defer s.drawer.leaveScene()
++	dw := s.drawer
++	dev, err := dw.sceneDeviceOwned()
++	if err != nil {
++		return err
++	}
++	if !dw.sceneBatch {
++		return ErrSceneSourceInvalid
++	}
++	limits := dev.Device.GetLimits()
++	if !sceneDrawValid(desc, dw.DestSize(), limits.MaxTextureDimension2D) {
++		return ErrSceneSourceInvalid
++	}
++	if len(dw.opList) >= sceneDrawSlots || dw.images.capacity >= sceneDrawSlots && len(dw.images.free) == 0 {
++		return ErrSceneSourceCapacity
++	}
++	tvr, err := dw.System.Vars().VarByName(1, "TexSampler")
++	if err != nil {
++		return err
++	}
++	// Returned texture may reuse an old key or need one new slot. Prepare
++	// every possible destination sampler before the callback can submit.
++	n := dw.images.capacity
++	if len(dw.images.free) == 0 {
++		n += AllocChunk
++	}
++	if n <= 0 || n > sceneDrawSlots {
++		return ErrSceneSourceCapacity
++	}
++	if len(tvr.Values.Values) < n {
++		tvr.SetNValues(dev, n)
++	}
++	for _, v := range tvr.Values.Values {
++		if v == nil || v.Texture == nil {
++			return ErrSceneSourceInvalid
++		}
++		if err := v.Texture.Sampler.Config(dev); err != nil {
++			return err
++		}
++	}
++	mvl, err := dw.System.Vars().ValueByIndex(0, "Matrix", 0)
++	if err != nil {
++		return err
++	}
++	i := len(dw.opList)
++	if i >= mvl.DynamicN() {
++		mvl.SetDynamicN(min(sceneDrawSlots, i+AllocChunk))
++	}
++	sr := desc.SR
++	if sr == (image.Rectangle{}) {
++		sr = image.Rectangle{Max: desc.Size}
++	}
++	mat := math32.Matrix3{1, 0, 0, 0, 1, 0, float32(desc.DP.X - sr.Min.X), float32(desc.DP.Y - sr.Min.Y), 1}
++	matrix := drawmatrix.Config(dw.DestSize(), mat, desc.Size, sr, false)
++	if err := gpu.SetDynamicValueFrom(mvl, i, []drawmatrix.Matrix{*matrix}); err != nil {
++		return err
++	}
++	c := s.context(dev)
++	defer c.finish()
++	tx, err := prepare(c)
++	if err != nil {
++		return err
++	}
++	if s.closeRequested.Load() {
++		return ErrSceneSourceRetired
++	}
++	if !tx.LiveFor(dev) || tx.Format.Size != desc.Size || tx.Format.Layers != 1 || tx.Format.Samples != 1 || tx.Format.Format != wgpu.TextureFormatRGBA8UnormSrgb {
++		return ErrSceneSourceInvalid
++	}
++	if s.bytes < uint64(desc.Size.X)*uint64(desc.Size.Y)*4 {
++		return ErrSceneSourceCapacity
++	}
++	// No image.use or operation is visible before all descriptor/device/view
++	// checks. SetShared only borrows; sampler construction already succeeded.
++	index := 0
++	if record, ok := dw.images.all[tx]; ok {
++		index = record.index
++	} else if len(dw.images.free) > 0 {
++		index = dw.images.free[len(dw.images.free)-1]
++	} else {
++		index = dw.images.capacity
++	}
++	if index < 0 || index >= len(tvr.Values.Values) {
++		return ErrSceneSourceCapacity
++	}
++	changed, err := tvr.Values.Values[index].Texture.BindSharedChecked(tx, dev)
++	if err != nil {
++		return err
++	}
++	if changed {
++		tvr.VarGroup.ValuesUpdated()
++	}
++	actual, _ := dw.images.use(tx)
++	if actual != index {
++		panic("gpudraw: scene texture slot changed while drawer owned")
++	}
++	dw.curImageSize = desc.Size
++	dw.opList = append(dw.opList, desc.Op)
++	return nil
++}
++
++// Close retires one source exactly once. Reentrant/concurrent callback attempts
++// refuse rather than waiting behind the lock they already own.
++func (s *SceneSourceLease) Close() error {
++	if s == nil || s.self != s || s.drawer == nil {
++		return ErrSceneSourceInvalid
++	}
++	if s.retired.Load() {
++		return nil
++	}
++	if err := s.drawer.enterScene(); err != nil {
++		if errors.Is(err, ErrSceneSourceRetired) {
++			return nil
++		}
++		return err
++	}
++	defer s.drawer.leaveScene()
++	if s.drawer.sceneSources.entries[s.id] != s || s.retired.Load() {
++		return nil
++	}
++	if s.drawer.sceneBatch {
++		s.closeRequested.Store(true)
++		return ErrSceneSourceBusy
++	}
++	s.retireOwned()
++	return nil
++}
++
++// RequestClose is a checked nonblocking retirement request. It never invokes a
++// callback or takes the drawer lock, including inside an admitted scope. The
++// registry keeps ownership after the caller drops its wrapper. Retirement runs
++// after the pending batch submits, after a non-batch scope ends, or at Release.
++func (s *SceneSourceLease) RequestClose() error {
++	if s == nil || s.self != s || s.drawer == nil {
++		return ErrSceneSourceInvalid
++	}
++	if !s.retired.Load() {
++		s.closeRequested.Store(true)
++	}
++	return nil
++}
++
++func (s *SceneSourceLease) retireOwned() {
++	if s.retired.Swap(true) {
++		return
++	}
++	dw := s.drawer
++	delete(dw.sceneSources.entries, s.id)
++	dw.sceneSources.bytes -= s.bytes
++	s.bytes = 0
++	f := s.retire
++	s.retire = nil
++	if f != nil {
++		f()
++	}
++}
++
++// retireSceneSourcesOwned cannot enter render-context ownership. The deferred
++// tail attempts remaining hooks even during a panic/Goexit; unwinding survives.
++func (dw *Drawer) retireSceneSourcesOwned() {
++	dw.sceneSources.closed = true
++	dw.retireSelectedSceneSourcesOwned(true)
++}
++
++func (dw *Drawer) drainRequestedSceneSourcesOwned() {
++	if dw.sceneBatch {
++		return
++	}
++	dw.retireSelectedSceneSourcesOwned(false)
++}
++
++func (dw *Drawer) retireSelectedSceneSourcesOwned(all bool) {
++	if len(dw.sceneSources.entries) == 0 {
++		return
++	}
++	if !all {
++		requested := false
++		for _, source := range dw.sceneSources.entries {
++			if source.closeRequested.Load() {
++				requested = true
++				break
++			}
++		}
++		if !requested {
++			return
++		}
++	}
++	dw.sceneRetiring.Store(true)
++	defer dw.sceneRetiring.Store(false)
++	ids := make([]uint64, 0, len(dw.sceneSources.entries))
++	for id, source := range dw.sceneSources.entries {
++		if all || source.closeRequested.Load() {
++			ids = append(ids, id)
++		}
++	}
++	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
++	var retire func(int)
++	retire = func(i int) {
++		if i == len(ids) {
++			return
++		}
++		defer retire(i + 1)
++		if s := dw.sceneSources.entries[ids[i]]; s != nil {
++			s.retireOwned()
++		}
++	}
++	retire(0)
++}
++
++// SceneSourceBudgetSnapshot observes only registered source reservations, not
++// all memory owned by the legacy drawer or GPU driver.
++type SceneSourceBudgetSnapshot struct {
++	Sources int
++	Bytes   uint64
++	Closed  bool
++}
++
++func (dw *Drawer) SceneSourceBudget() (SceneSourceBudgetSnapshot, error) {
++	if err := dw.enterScene(); err != nil {
++		return SceneSourceBudgetSnapshot{}, err
++	}
++	defer dw.leaveScene()
++	return SceneSourceBudgetSnapshot{len(dw.sceneSources.entries), dw.sceneSources.bytes, dw.sceneSources.closed}, nil
++}
+--- /dev/null
++++ b/gpu/gpudraw/scene_source_native_test.go
+@@ -0,0 +1,191 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build !js
++
++package gpudraw
++
++import (
++	"errors"
++	"image"
++	"image/color"
++	"image/draw"
++	"os"
++	"time"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"testing"
++
++	"cogentcore.org/core/gpu"
++)
++
++// This opt-in fixture creates an owned headless render target, not a native
++// window or a production compute device. Actual device execution/readback is
++// explicit test work; the ordinary scene callback never waits or reads back.
++func TestVellumSceneSourceNativeThreeBatchSharedToOwned(t *testing.T) {
++	if os.Getenv("VELLUM_GPU_SCENE_TEST") != "1" {
++		t.Skip("explicit real GPU fixture required: VELLUM_GPU_SCENE_TEST=1")
++	}
++	gp, dev, err := gpu.NoDisplayGPU()
++	if err != nil || gp == nil || dev == nil {
++		t.Fatal("headless device unavailable", err)
++	}
++	defer gp.Release()
++	defer dev.Release()
++	size := image.Pt(8, 8)
++	target := gpu.NewRenderTexture(gp, dev, size, 1, gpu.UndefinedType)
++	defer target.Release()
++	dw := NewDrawer(gp, target)
++	defer dw.Release()
++	owner := gpu.NewTexture(dev)
++	red := image.NewRGBA(image.Rectangle{Max: size})
++	wantRed := color.RGBA{R: 197, G: 29, B: 47, A: 255}
++	draw.Draw(red, red.Bounds(), image.NewUniform(wantRed), image.Point{}, draw.Src)
++	owner.ConfigGoImage(size, 1)
++	if err := owner.CreateTexture(wgpu.TextureUsageTextureBinding | wgpu.TextureUsageCopyDst | wgpu.TextureUsageCopySrc); err != nil {
++		t.Fatal(err)
++	}
++	if err := owner.SetFromGoImage(red, 0); err != nil {
++		t.Fatal(err)
++	}
++	if changed, err := owner.BindSharedChecked(owner, dev); err == nil || changed || !owner.LiveFor(dev) {
++		t.Fatal("live native self binding released owner", changed, err)
++	}
++	source, err := dw.NewSceneSource(owner.Release)
++	if err != nil {
++		t.Fatal(err)
++	}
++	dw.Start()
++	var escaped *SceneGPUContext
++	if err := source.Draw(SceneDraw{Size: size, Op: draw.Src}, func(c *SceneGPUContext) (*gpu.Texture, error) {
++		escaped = c
++		if c.Device.Device != dev.Device {
++			t.Error("scene callback borrowed another device")
++		}
++		if err := source.Close(); !errors.Is(err, ErrSceneSourceBusy) {
++			t.Error("reentrant source close", err)
++		}
++		if err := c.SetBudget(4 * uint64(size.X) * uint64(size.Y)); err != nil {
++			return nil, err
++		}
++		return owner, nil
++	}); err != nil {
++		t.Fatal(err)
++	}
++	if escaped.Device != nil {
++		t.Fatal("callback retained device pointer")
++	}
++	if err := escaped.SetBudget(0); !errors.Is(err, ErrSceneSourceRetired) {
++		t.Fatal("expired callback changed budget", err)
++	}
++	if len(dw.opList) != 1 || len(dw.images.used) != 1 || dw.CanRedraw() {
++		t.Fatal("checked append/order or borrowed redraw guard")
++	}
++	old := dw.images.used[0].index
++	dw.End()
++	dev.WaitDone()
++	// A uniform-only batch uses no image slot. On batch three the original
++	// source key is absent from the previous batch and its slot is recycled.
++	dw.Start()
++	dw.Fill(color.RGBA{R: 11, G: 21, B: 31, A: 255}, image.Rectangle{Max: size}, draw.Src)
++	if len(dw.images.used) != 0 {
++		t.Fatal("uniform-only batch retained an image use")
++	}
++	dw.End()
++	dev.WaitDone()
++	blue := image.NewRGBA(image.Rectangle{Max: size})
++	wantBlue := color.RGBA{R: 23, G: 31, B: 199, A: 255}
++	draw.Draw(blue, blue.Bounds(), image.NewUniform(wantBlue), image.Point{}, draw.Src)
++	dw.Start()
++	dw.Copy(image.Point{}, blue, blue.Bounds(), draw.Src, false)
++	if dw.images.used[0].index != old {
++		t.Fatal("fixture did not reuse original shared slot")
++	}
++	dw.End()
++	dev.WaitDone()
++	if got := sceneReadTexture(t, dev, owner).RGBAAt(4, 4); got != wantRed {
++		t.Fatal("recycled upload modified original GPU source", got, wantRed)
++	}
++	if got := sceneReadTexture(t, dev, target.CurrentFrame()).RGBAAt(4, 4); got != wantBlue {
++		t.Fatal("recycled upload missed actual GPU target", got, wantBlue)
++	}
++	tvr, err := dw.System.Vars().VarByName(1, "TexSampler")
++	if err != nil {
++		t.Fatal(err)
++	}
++	reused := tvr.Values.Values[old].Texture
++	if !reused.LiveFor(dev) {
++		t.Fatal("replacement texture is not live")
++	}
++	if err := source.Close(); err != nil {
++		t.Fatal(err)
++	}
++	if owner.LiveFor(dev) || !reused.LiveFor(dev) {
++		t.Fatal("source retirement released reused upload storage")
++	}
++	// Cached unchanged image reuse must also work after original retirement.
++	dw.Start()
++	dw.Copy(image.Point{}, blue, blue.Bounds(), draw.Src, true)
++	dw.End()
++	dev.WaitDone()
++	if got := sceneReadTexture(t, dev, target.CurrentFrame()).RGBAAt(4, 4); got != wantBlue {
++		t.Fatal("retired source broke unchanged owned image", got, wantBlue)
++	}
++	if !dw.CanRedraw() {
++		t.Fatal("owned replacement retained obsolete borrowed redraw restriction")
++	}
++}
++
++// Explicit test readback with nonblocking polls and an actual wall deadline.
++func sceneReadTexture(t *testing.T, dev *gpu.Device, tex *gpu.Texture) *image.RGBA {
++	t.Helper()
++	stride := uint32((tex.Format.Size.X*4 + 255) &^ 255)
++	n := uint64(stride) * uint64(tex.Format.Size.Y)
++	buffer, err := dev.Device.TryCreateBuffer(&wgpu.BufferDescriptor{Size: n, Usage: wgpu.BufferUsageCopyDst | wgpu.BufferUsageMapRead})
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer buffer.Release()
++	cmd, err := dev.Device.TryCreateCommandEncoder(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer cmd.Release()
++	if err := tex.CopyToBuffer(cmd, buffer, stride); err != nil {
++		t.Fatal(err)
++	}
++	commands, err := cmd.TryFinish(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer commands.Release()
++	dev.Queue.Submit(commands)
++	status := make(chan wgpu.MapAsyncStatus, 1)
++	if err := buffer.TryMapAsync(wgpu.MapModeRead, 0, n, func(s wgpu.MapAsyncStatus) { status <- s }); err != nil {
++		t.Fatal(err)
++	}
++	deadline := time.NewTimer(5 * time.Second)
++	defer deadline.Stop()
++	for {
++		dev.Device.Poll(false, nil)
++		select {
++		case s := <-status:
++			if s != wgpu.MapAsyncStatusSuccess {
++				t.Fatal("native readback map failed", s)
++			}
++			raw := buffer.GetMappedRange(0, uint(n))
++			pixels := image.NewRGBA(image.Rectangle{Max: tex.Format.Size})
++			for y := 0; y < pixels.Rect.Dy(); y++ {
++				copy(pixels.Pix[y*pixels.Stride:], raw[uint32(y)*stride:][:pixels.Stride])
++			}
++			if err := buffer.TryUnmap(); err != nil {
++				t.Fatal(err)
++			}
++			return pixels
++		case <-deadline.C:
++			t.Fatal("bounded native readback timeout")
++		default:
++			time.Sleep(time.Millisecond)
++		}
++	}
++}
+--- /dev/null
++++ b/gpu/gpudraw/scene_source_test.go
+@@ -0,0 +1,277 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpudraw
++
++import (
++	"errors"
++	"image"
++	"image/draw"
++	"reflect"
++	"runtime"
++	"testing"
++
++	"cogentcore.org/core/gpu"
++)
++
++func TestVellumImageSlotsExhaustionAndThreeBatchRecycling(t *testing.T) {
++	var im images
++	im.init()
++	seen := map[int]bool{}
++	for i := 0; i < 3*AllocChunk; i++ {
++		index, exists := im.use(image.NewRGBA(image.Rect(0, 0, 2, 3)))
++		if exists || seen[index] || index != i {
++			t.Fatal("overlapping image slots after exhaustion", i, index, exists)
++		}
++		seen[index] = true
++	}
++	var batches images
++	batches.init()
++	borrowed := &struct{}{}
++	old, _ := batches.use(borrowed)
++	batches.start()
++	second, _ := batches.use(image.NewRGBA(image.Rect(0, 0, 2, 3)))
++	if old == second {
++		t.Fatal("previous batch slot recycled too early")
++	}
++	batches.start()
++	third, _ := batches.use(image.NewRGBA(image.Rect(0, 0, 2, 3)))
++	if third != old {
++		t.Fatal("three-batch test failed to recycle old source slot", old, third)
++	}
++}
++
++func TestVellumSceneSourceBudgetLimitsCopiesAndRetirement(t *testing.T) {
++	dw := &Drawer{}
++	retired := 0
++	sources := make([]*SceneSourceLease, sceneSourceLimit)
++	for i := range sources {
++		s, err := dw.newSceneSourceOwned(func() { retired++ })
++		if err != nil {
++			t.Fatal(err)
++		}
++		sources[i] = s
++	}
++	if _, err := dw.newSceneSourceOwned(func() {}); !errors.Is(err, ErrSceneSourceCapacity) {
++		t.Fatal("unbounded source registry", err)
++	}
++	var copiedDrawer Drawer
++	reflect.ValueOf(&copiedDrawer).Elem().Set(reflect.ValueOf(dw).Elem())
++	if _, err := copiedDrawer.SceneSourceBudget(); !errors.Is(err, ErrSceneSourceInvalid) {
++		t.Fatal("copied drawer inspected shared registry under a new lock", err)
++	}
++	if copiedDrawer.sceneBusy.Load() || !copiedDrawer.TryLock() {
++		t.Fatal("copied drawer refusal retained the admission token or mutex")
++	}
++	copiedDrawer.Unlock()
++	c := sources[0].context(nil)
++	if err := c.SetBudget(sceneSourceBytes); err != nil {
++		t.Fatal(err)
++	}
++	c2 := sources[1].context(nil)
++	if err := c2.SetBudget(sceneSourceBytes); err != nil {
++		t.Fatal(err)
++	}
++	c3 := sources[2].context(nil)
++	if err := c3.SetBudget(1); !errors.Is(err, ErrSceneSourceCapacity) {
++		t.Fatal("aggregate over-capacity accepted", err)
++	}
++	if err := c.SetBudget(sceneSourceBytes + 1); !errors.Is(err, ErrSceneSourceCapacity) {
++		t.Fatal("source over-capacity accepted", err)
++	}
++	if dw.sceneSources.bytes != sceneAggregateBytes {
++		t.Fatal("refusal changed reservation")
++	}
++	var copied SceneSourceLease
++	reflect.ValueOf(&copied).Elem().Set(reflect.ValueOf(sources[0]).Elem())
++	if err := copied.Close(); !errors.Is(err, ErrSceneSourceInvalid) {
++		t.Fatal("copied source retired original", err)
++	}
++	var cc SceneGPUContext
++	reflect.ValueOf(&cc).Elem().Set(reflect.ValueOf(c).Elem())
++	if err := cc.SetBudget(0); !errors.Is(err, ErrSceneSourceInvalid) {
++		t.Fatal("copied context changed reservation", err)
++	}
++	c.finish()
++	c2.finish()
++	c3.finish()
++	if err := c.SetBudget(0); !errors.Is(err, ErrSceneSourceRetired) {
++		t.Fatal("expired context changed reservation", err)
++	}
++	if err := sources[0].Close(); err != nil {
++		t.Fatal(err)
++	}
++	if err := sources[0].Close(); err != nil {
++		t.Fatal(err)
++	}
++	if retired != 1 || dw.sceneSources.bytes != sceneSourceBytes {
++		t.Fatal("source retirement credit/once", retired, dw.sceneSources.bytes)
++	}
++	dw.Release()
++	if retired != sceneSourceLimit || len(dw.sceneSources.entries) != 0 || dw.sceneSources.bytes != 0 {
++		t.Fatal("drawer retirement leaked registered sources", retired)
++	}
++}
++
++func TestVellumSceneSourceRefusesBeforeCalloutAndReentrantClose(t *testing.T) {
++	dw := &Drawer{}
++	var s *SceneSourceLease
++	var err error
++	s, err = dw.newSceneSourceOwned(func() {
++		if _, e := dw.NewSceneSource(func() {}); !errors.Is(e, ErrSceneSourceBusy) {
++			t.Error("reentrant registration reached backend", e)
++		}
++	})
++	if err != nil {
++		t.Fatal(err)
++	}
++	calls := 0
++	if err := s.WithResources(func(*SceneGPUContext) error { calls++; return nil }); !errors.Is(err, ErrSceneSourceRetired) || calls != 0 {
++		t.Fatal("missing device reached resource callback", err, calls)
++	}
++	if err := s.Draw(SceneDraw{Size: image.Pt(2, 3), Op: draw.Src}, nil); !errors.Is(err, ErrSceneSourceInvalid) {
++		t.Fatal("nil prepare accepted", err)
++	}
++	if err := s.Close(); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.WithResources(func(*SceneGPUContext) error { calls++; return nil }); !errors.Is(err, ErrSceneSourceRetired) || calls != 0 {
++		t.Fatal("retired source callback ran", err, calls)
++	}
++}
++
++func TestVellumSceneSourceRetirementUnwindAttemptsAllHooks(t *testing.T) {
++	for _, mode := range []string{"panic", "goexit"} {
++		t.Run(mode, func(t *testing.T) {
++			// The real System.Release control flow is observable without native
++			// device creation: it clears this nonnil empty pipeline registry.
++			system := &gpu.GraphicsSystem{GraphicsPipelines: make(map[string]*gpu.GraphicsPipeline)}
++			dw := &Drawer{System: system}
++			calls := 0
++			for i := 0; i < 3; i++ {
++				i := i
++				_, err := dw.newSceneSourceOwned(func() {
++					calls++
++					if i == 0 {
++						if mode == "panic" {
++							panic("source-retirement")
++						}
++						runtime.Goexit()
++					}
++				})
++				if err != nil {
++					t.Fatal(err)
++				}
++			}
++			done := make(chan struct{})
++			var payload any
++			returned := false
++			go func() { defer close(done); defer func() { payload = recover() }(); dw.Release(); returned = true }()
++			<-done
++			if returned || calls != 3 || len(dw.sceneSources.entries) != 0 || dw.sceneSources.bytes != 0 {
++				t.Fatal("retirement unwind skipped source", returned, calls)
++			}
++			if dw.System != nil || system.GraphicsPipelines != nil {
++				t.Fatal("source abnormal return skipped actual system cleanup")
++			}
++			if mode == "panic" && payload != "source-retirement" || mode == "goexit" && payload != nil {
++				t.Fatal("retirement abnormal return altered", payload)
++			}
++			// Both admission and mutex ownership must be terminal/unwound.
++			if _, err := dw.NewSceneSource(func() {}); !errors.Is(err, ErrSceneSourceRetired) {
++				t.Fatal("retired drawer accepted source", err)
++			}
++			dw.Lock()
++			dw.Unlock()
++		})
++	}
++}
++
++func TestVellumSceneDrawDescriptorLimits(t *testing.T) {
++	good := SceneDraw{Size: image.Pt(20, 30), DP: image.Pt(2, 3), Op: draw.Over}
++	if !sceneDrawValid(good, image.Pt(100, 100), 1024) {
++		t.Fatal("valid source refused")
++	}
++	for _, bad := range []SceneDraw{{Size: image.Pt(-1, 3), Op: draw.Src}, {Size: image.Pt(20, 30), Op: draw.Op(55)}, {Size: image.Pt(20, 30), SR: image.Rect(-1, 0, 4, 5), Op: draw.Src}, {Size: image.Pt(20, 30), DP: image.Pt(sceneDrawCoordinate, 0), Op: draw.Src}, {Size: image.Pt(1025, 30), Op: draw.Src}} {
++		if sceneDrawValid(bad, image.Pt(100, 100), 1024) {
++			t.Fatal("invalid source descriptor accepted", bad)
++		}
++	}
++}
++
++func TestVellumSceneSourceCloseWaitsForPendingBatch(t *testing.T) {
++	dw := &Drawer{}
++	called := 0
++	s, err := dw.newSceneSourceOwned(func() { called++ })
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := s.setBudgetOwned(99); err != nil {
++		t.Fatal(err)
++	}
++	dw.sceneBatch = true
++	if err := s.Close(); !errors.Is(err, ErrSceneSourceBusy) {
++		t.Fatal("close did not defer pending batch", err)
++	}
++	if called != 0 || s.retired.Load() || dw.sceneSources.bytes != 99 || len(dw.sceneSources.entries) != 1 {
++		t.Fatal("pending batch released source ownership")
++	}
++	if err := s.RequestClose(); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.enter(); !errors.Is(err, ErrSceneSourceRetired) {
++		if err == nil {
++			dw.leaveScene()
++		}
++		t.Fatal("requested source admitted another callback", err)
++	}
++	// Actual End with no operations needs no backend. Its terminal defer is
++	// also the retirement boundary when acquisition or composition was empty.
++	dw.End()
++	if called != 1 || !s.retired.Load() || dw.sceneSources.bytes != 0 || len(dw.sceneSources.entries) != 0 {
++		t.Fatal("batch terminal did not retire requested source")
++	}
++	if err := s.Close(); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestVellumSceneSourceNonblockingRequestDuringOwnedScope(t *testing.T) {
++	dw := &Drawer{}
++	called := 0
++	s, err := dw.newSceneSourceOwned(func() {
++		called++
++		if _, err := dw.NewSceneSource(func() {}); !errors.Is(err, ErrSceneSourceBusy) {
++			t.Error("cleanup reentrancy admitted", err)
++		}
++	})
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := s.enter(); err != nil {
++		t.Fatal(err)
++	}
++	c := s.context(nil)
++	if err := c.SetBudget(41); err != nil {
++		t.Fatal(err)
++	}
++	done := make(chan error, 1)
++	go func() { done <- s.RequestClose() }()
++	if err := <-done; err != nil {
++		t.Fatal(err)
++	}
++	if called != 0 || s.retired.Load() {
++		t.Fatal("request ran cleanup during admitted callback")
++	}
++	if err := c.SetBudget(42); !errors.Is(err, ErrSceneSourceRetired) {
++		t.Fatal("closing scope increased reservation", err)
++	}
++	if err := s.Close(); !errors.Is(err, ErrSceneSourceBusy) {
++		t.Fatal("close entered its own held lock", err)
++	}
++	c.finish()
++	dw.leaveScene()
++	if called != 1 || !s.retired.Load() || dw.sceneSources.bytes != 0 {
++		t.Fatal("non-batch scope failed deferred retirement")
++	}
++}
+--- a/gpu/gpudraw/system.go
++++ b/gpu/gpudraw/system.go
+@@ -31,6 +31,7 @@
+ 
+ // configSystem configures GPUDraw sytem
+ func (dw *Drawer) configSystem(gp *gpu.GPU, rd gpu.Renderer) {
++	dw.sceneSources.owner = dw
+ 	dw.opList = slicesx.SetLength(dw.opList, AllocChunk) // allocate
+ 	dw.opList = dw.opList[:0]
+ 	dw.images.init()
+--- a/gpu/gpudraw/timing.go
++++ b/gpu/gpudraw/timing.go
+@@ -10,6 +10,7 @@
+ func (dw *Drawer) EndMeasured() composer.ComposeTiming {
+ 	dw.Lock()
+ 	defer dw.Unlock()
++	defer func() { dw.sceneBatch = false; dw.drainRequestedSceneSourcesOwned() }()
+ 	timing := composer.ComposeTiming{Supported: true}
+ 	dw.lastOpN = len(dw.opList)
+ 	if dw.lastOpN == 0 {
+--- a/gpu/texture.go
++++ b/gpu/texture.go
+@@ -5,6 +5,7 @@
+ package gpu
+ 
+ import (
++	"fmt"
+ 	"image"
+ 
+ 	"cogentcore.org/core/base/errors"
+@@ -76,6 +77,14 @@
+ // formats will be converted as necessary.
+ // This starts the full WriteTexture call to upload to device.
+ func (tx *Texture) SetFromGoImage(img image.Image, layer int) error {
++	// A recycled drawer Value may still borrow its last owner's texture.
++	// Detach even for an identical format; never upload into borrowed storage.
++	if tx.shared {
++		tx.ReleaseTexture()
++	}
++	if !tx.device.Device.IsValid() || !tx.device.Queue.IsValid() {
++		return fmt.Errorf("gpu.Texture.SetFromGoImage: live device and queue required")
++	}
+ 	rimg := imagex.AsRGBA(img)
+ 	sz := rimg.Rect.Size()
+ 
+@@ -92,7 +101,7 @@
+ 	size := tx.Format.Extent3D()
+ 
+ 	// https://www.w3.org/TR/webgpu/#gpuimagecopytexture
+-	tx.device.Queue.WriteTexture(
++	return tx.device.Queue.TryWriteTexture(
+ 		&wgpu.TexelCopyTextureInfo{
+ 			Aspect:   wgpu.TextureAspectAll,
+ 			Texture:  tx.texture,
+@@ -107,13 +116,15 @@
+ 		},
+ 		&size,
+ 	)
+-	return nil
+ }
+ 
+ // CreateTexture creates the texture based on current settings,
+ // and a view of that texture.  Calls release first.
+ func (tx *Texture) CreateTexture(usage wgpu.TextureUsage) error {
+ 	tx.ReleaseTexture()
++	if !tx.device.Device.IsValid() || !tx.device.Queue.IsValid() {
++		return fmt.Errorf("gpu.Texture.CreateTexture: live device and queue required")
++	}
+ 
+ 	size := tx.Format.Extent3D()
+ 	t, err := tx.device.Device.TryCreateTexture(&wgpu.TextureDescriptor{
+--- a/gpu/texture_vellum_copy.go
++++ b/gpu/texture_vellum_copy.go
+@@ -3,6 +3,7 @@
+ import (
+ 	"fmt"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
++	"math"
+ )
+ 
+ // CopyToBuffer encodes a checked copy of a single-layer RGBA8/BGRA8 resolve
+@@ -26,3 +27,53 @@
+ 	size := tx.Format.Extent3D()
+ 	return cmd.TryCopyTextureToBuffer(tx.texture.AsImageCopy(), &wgpu.TexelCopyBufferInfo{Buffer: buffer, Layout: wgpu.TexelCopyBufferLayout{BytesPerRow: stride, RowsPerImage: uint32(tx.Format.Size.Y)}}, &size)
+ }
++
++// CopyFromBuffer encodes a checked upload from a packed RGBA/BGRA buffer on
++// this texture's device. It performs no mapping, polling or queue submission.
++func (tx *Texture) CopyFromBuffer(cmd *wgpu.CommandEncoder, buffer *wgpu.Buffer, stride uint32) error {
++	if tx == nil || !tx.texture.IsValid() || !cmd.IsValid() || !buffer.IsValid() {
++		return fmt.Errorf("gpu.Texture.CopyFromBuffer: texture, encoder and buffer required")
++	}
++	if tx.shared || tx.Format.Size.X < 1 || tx.Format.Size.Y < 1 || tx.Format.Layers != 1 || tx.Format.Samples != 1 {
++		return fmt.Errorf("gpu.Texture.CopyFromBuffer: owned single-layer resolve required")
++	}
++	switch tx.Format.Format {
++	case wgpu.TextureFormatRGBA8Unorm, wgpu.TextureFormatRGBA8UnormSrgb, wgpu.TextureFormatBGRA8Unorm, wgpu.TextureFormatBGRA8UnormSrgb:
++	default:
++		return fmt.Errorf("gpu.Texture.CopyFromBuffer: unsupported texel format")
++	}
++	if tx.Format.Size.X > math.MaxUint32 || tx.Format.Size.Y > math.MaxUint32 || stride == 0 || stride%256 != 0 || uint64(stride) < uint64(tx.Format.Size.X)*4 || uint64(tx.Format.Size.Y) > math.MaxUint64/uint64(stride) || uint64(stride)*uint64(tx.Format.Size.Y) > buffer.GetSize() || buffer.GetUsage()&wgpu.BufferUsageCopySrc == 0 || tx.texture.GetUsage()&wgpu.TextureUsageCopyDst == 0 {
++		return fmt.Errorf("gpu.Texture.CopyFromBuffer: invalid upload layout/usage")
++	}
++	size := tx.Format.Extent3D()
++	return cmd.TryCopyBufferToTexture(&wgpu.TexelCopyBufferInfo{Buffer: buffer, Layout: wgpu.TexelCopyBufferLayout{BytesPerRow: stride, RowsPerImage: uint32(tx.Format.Size.Y)}}, tx.texture.AsImageCopy(), &size)
++}
++
++// LiveFor checks a sampled texture's originating device and live handles.
++// Caller must serialize device and texture retirement with their owning drawer.
++func (tx *Texture) LiveFor(dev *Device) bool {
++	return tx != nil && dev != nil && dev.Device.IsValid() && dev.Queue.IsValid() && dev.LossError() == nil && tx.device.Device == dev.Device && tx.device.Queue == dev.Queue && tx.texture.IsValid() && tx.view.IsValid()
++}
++
++// BindSharedChecked validates device/lifetime and sampler before replacing a
++// drawer value's borrowed binding. Neither method releases the source's handles.
++func (tx *Texture) BindSharedChecked(source *Texture, dev *Device) (bool, error) {
++	if tx == nil || source == nil || tx.sharedBindingAliasesOwner(source) {
++		return false, fmt.Errorf("gpu.Texture.BindSharedChecked: distinct non-owning destination required")
++	}
++	if !source.LiveFor(dev) || tx.device.Device != dev.Device || tx.device.Queue != dev.Queue || source.texture.GetUsage()&wgpu.TextureUsageTextureBinding == 0 {
++		return false, fmt.Errorf("gpu.Texture.BindSharedChecked: live same-device sampled texture required")
++	}
++	if err := tx.Sampler.Config(dev); err != nil {
++		return false, err
++	}
++	changed := !tx.shared || tx.texture != source.texture || tx.view != source.view
++	if changed {
++		tx.SetShared(source)
++	}
++	return changed, nil
++}
++
++func (tx *Texture) sharedBindingAliasesOwner(source *Texture) bool {
++	return tx == source || !tx.shared && tx.texture != nil && tx.texture == source.texture
++}
+--- /dev/null
++++ b/gpu/texture_vellum_safety_test.go
+@@ -0,0 +1,73 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import (
++	"image"
++	"testing"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++func TestVellumTextureSharedUploadDetachesBeforeRefusedAllocation(t *testing.T) {
++	// Empty native wrappers deliberately refuse allocation. The ownership
++	// transition must precede that refusal without releasing borrowed handles.
++	owner := &Texture{texture: &wgpu.Texture{}, view: &wgpu.TextureView{}, Format: TextureFormat{Size: image.Pt(2, 3), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}}
++	tex, view := owner.texture, owner.view
++	value := NewTexture(&Device{})
++	value.SetShared(owner)
++	if err := value.SetFromGoImage(image.NewRGBA(image.Rect(0, 0, 2, 3)), 0); err == nil {
++		t.Fatal("missing upload device accepted")
++	}
++	if value.shared || value.texture != nil || value.view != nil || owner.texture != tex || owner.view != view {
++		t.Fatal("same-format upload retained or released borrowed ownership")
++	}
++}
++
++func TestVellumTextureUploadCopyRejectsMissingAndReleasedInputs(t *testing.T) {
++	for _, tex := range []*Texture{nil, {}} {
++		if tex.CopyFromBuffer(nil, nil, 256) == nil {
++			t.Fatal("missing upload inputs accepted")
++		}
++	}
++	tex := &Texture{texture: &wgpu.Texture{}, Format: TextureFormat{Size: image.Pt(2, 3), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}}
++	buffer, encoder := &wgpu.Buffer{}, &wgpu.CommandEncoder{}
++	buffer.Release()
++	encoder.Release()
++	tex.texture.Release()
++	if tex.CopyFromBuffer(encoder, buffer, 256) == nil {
++		t.Fatal("released upload wrappers accepted")
++	}
++	if tex.LiveFor(&Device{}) {
++		t.Fatal("released texture/device eligible for source append")
++	}
++	if _, err := NewTexture(&Device{}).BindSharedChecked(tex, &Device{}); err == nil {
++		t.Fatal("invalid shared binding accepted")
++	}
++}
++
++func TestVellumTextureSharedBindingRejectsSelfAndOwnedAlias(t *testing.T) {
++	handle := &wgpu.Texture{}
++	source := &Texture{texture: handle}
++	if !source.sharedBindingAliasesOwner(source) {
++		t.Fatal("self alias not classified before native admission")
++	}
++	if changed, err := source.BindSharedChecked(source, &Device{}); err == nil || changed {
++		t.Fatal("self alias accepted", changed, err)
++	}
++	alias := &Texture{texture: handle}
++	if !alias.sharedBindingAliasesOwner(source) {
++		t.Fatal("duplicate owned handle not classified")
++	}
++	if changed, err := alias.BindSharedChecked(source, &Device{}); err == nil || changed {
++		t.Fatal("owned handle alias accepted", changed, err)
++	}
++	if source.texture != handle || alias.texture != handle {
++		t.Fatal("refused alias changed handles")
++	}
++	alias.shared = true
++	if alias.sharedBindingAliasesOwner(source) {
++		t.Fatal("ordinary borrowed rebind misclassified as owning alias")
++	}
++}
+--- a/gpu/value.go
++++ b/gpu/value.go
+@@ -427,10 +427,14 @@
+ // so set those before making this call.  It will not be re-configured
+ // without manually releasing it.
+ func (vl *Value) SetFromGoImage(img image.Image, layer int) *Texture {
++	texture, view := vl.Texture.texture, vl.Texture.view
+ 	err := vl.Texture.SetFromGoImage(img, layer)
+ 	errors.Log(err)
+ 	err = vl.Texture.Sampler.Config(&vl.device)
+ 	errors.Log(err)
++	if texture != vl.Texture.texture || view != vl.Texture.view {
++		vl.varGroupDirty()
++	}
+ 	return vl.Texture
+ }
+ 
+@@ -439,9 +443,13 @@
+ // with the current settings, so set those before making this call.
+ // It will not be re-configured without manually releasing it.
+ func (vl *Value) SetFromTexture(tx *Texture) *Texture {
++	texture, view := vl.Texture.texture, vl.Texture.view
+ 	vl.Texture.SetShared(tx)
+ 	err := vl.Texture.Sampler.Config(&vl.device)
+ 	errors.Log(err)
++	if texture != vl.Texture.texture || view != vl.Texture.view {
++		vl.varGroupDirty()
++	}
+ 	return vl.Texture
+ }
+ 
+--- /dev/null
++++ b/paint/renderers/gpuscene/native_test.go
+@@ -0,0 +1,357 @@
++//go:build !js
++
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpuscene
++
++import (
++	"bytes"
++	"cogentcore.org/core/paint/ppath"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++	"cogentcore.org/core/text/textpos"
++	"fmt"
++	"image"
++	"image/color"
++	"image/draw"
++	"io/fs"
++	"math/rand"
++	"os"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/gpu/gpudraw"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// Native checks require explicit admission. Ordinary offscreen tests never open
++// a GPU device, change desktop settings, or silently skip an admitted failure.
++func nativeDevice(t *testing.T) (*gpu.GPU, *gpu.Device) {
++	t.Helper()
++	if os.Getenv("VELLUM_GPU_SCENE_TEST") != "1" {
++		t.Skip("explicit native GPU admission required")
++	}
++	gp, dev, err := gpu.NoDisplayGPU()
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { dev.Release(); gp.Release() })
++	return gp, dev
++}
++func readTexture(t *testing.T, dev *gpu.Device, tx *gpu.Texture) *image.RGBA {
++	t.Helper()
++	stride, n, ok := outputLayout(tx.Format.Size)
++	if !ok {
++		t.Fatal("invalid readback layout")
++	}
++	buffer, err := dev.Device.TryCreateBuffer(&wgpu.BufferDescriptor{Size: n, Usage: wgpu.BufferUsageCopyDst | wgpu.BufferUsageMapRead})
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer buffer.Release()
++	encoder, err := dev.Device.TryCreateCommandEncoder(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer encoder.Release()
++	if err = tx.CopyToBuffer(encoder, buffer, stride); err != nil {
++		t.Fatal(err)
++	}
++	command, err := encoder.TryFinish(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer command.Release()
++	dev.Queue.Submit(command)
++	status := make(chan wgpu.MapAsyncStatus, 1)
++	if err = buffer.TryMapAsync(wgpu.MapModeRead, 0, n, func(s wgpu.MapAsyncStatus) { status <- s }); err != nil {
++		t.Fatal(err)
++	}
++	dev.Device.Poll(true, nil)
++	select {
++	case s := <-status:
++		if s != wgpu.MapAsyncStatusSuccess {
++			t.Fatal("native map failed", s)
++		}
++	case <-time.After(5 * time.Second):
++		t.Fatal("native readback timed out")
++	}
++	raw := buffer.GetMappedRange(0, uint(n))
++	out := image.NewRGBA(image.Rectangle{Max: tx.Format.Size})
++	for y := 0; y < out.Rect.Dy(); y++ {
++		copy(out.Pix[y*out.Stride:], raw[uint32(y)*stride:][:out.Stride])
++	}
++	if err = buffer.TryUnmap(); err != nil {
++		t.Fatal(err)
++	}
++	return out
++}
++func TestVellumGPUSceneNativeIntegerCompositor(t *testing.T) {
++	_, dev := nativeDevice(t)
++	random := rand.New(rand.NewSource(481))
++	for _, size := range []image.Point{{23, 19}, {257, 3}, {64, 32}} {
++		t.Run(fmt.Sprint(size), func(t *testing.T) {
++			res := &resources{}
++			defer res.release()
++			reserve := func(n uint64) error {
++				if n > 128<<20 {
++					return fmt.Errorf("test source budget exceeded")
++				}
++				return nil
++			}
++			if err := res.initialize(dev, size, reserve); err != nil {
++				t.Fatal(err)
++			}
++			expected := image.NewRGBA(image.Rectangle{Max: size})
++			random.Read(expected.Pix)
++			if err := res.seed(expected); err != nil {
++				t.Fatal(err)
++			}
++			for batch := 0; batch < 32; batch++ {
++				b := sceneplan.New(expected.Rect)
++				if batch%8 == 0 {
++					b.Draw(expected.Rect, image.NewUniform(color.RGBA{13, 31, 59, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++				}
++				for step := 0; step < 9; step++ {
++					rect := image.Rect(random.Intn(size.X+4)-2, random.Intn(size.Y+4)-2, random.Intn(size.X+3)+1, random.Intn(size.Y+3)+1)
++					if rect.Empty() {
++						rect = expected.Rect
++					}
++					op := draw.Op(step % 2)
++					c := image.NewUniform(color.NRGBA64{uint16(random.Uint32()), uint16(random.Uint32()), uint16(random.Uint32()), uint16(random.Uint32())})
++					mask := image.NewAlpha(image.Rect(-1, -2, size.X+3, size.Y+4))
++					random.Read(mask.Pix)
++					pixels := image.NewRGBA(image.Rect(-2, -1, size.X+4, size.Y+3))
++					random.Read(pixels.Pix)
++					switch step % 3 {
++					case 0:
++						b.Draw(rect, c, image.Point{}, nil, image.Point{}, op)
++					case 1:
++						b.Draw(rect, c, image.Point{}, mask, image.Pt(-1, -1), op)
++					case 2:
++						b.Draw(rect, pixels, image.Pt(-1, -1), mask, image.Pt(0, -1), op)
++					}
++					b.BeginSpans(color.RGBA{13, 29, 51, 77}, op)
++					y := random.Intn(size.Y)
++					// Cover overlapping span order and 16-bit edge values.
++					for j, a := range []uint32{0, 1, 257, 32768, 65534, 65535} {
++						b.Span(y, j, min(size.X, j+7), a)
++					}
++				}
++				packet := b.Seal(false)
++				if packet == nil {
++					t.Fatal("native fixture refused", batch)
++				}
++				encoded, ok := packet.Encode()
++				if !ok {
++					t.Fatal("native fixture encoding refused")
++				}
++				if err := res.render(encoded, reserve); err != nil {
++					t.Fatal(err)
++				}
++				packet.Replay(expected)
++				got := readTexture(t, dev, res.texture)
++				if !bytes.Equal(got.Pix, expected.Pix) {
++					for i, v := range expected.Pix {
++						if got.Pix[i] != v {
++							t.Fatalf("exact integer mismatch batch=%d byte=%d GPU=%d CPU=%d", batch, i, got.Pix[i], v)
++						}
++					}
++				}
++			}
++		})
++	}
++}
++
++func TestVellumGPUSceneNativeSharedDrawerOrderAndFallback(t *testing.T) {
++	gp, dev := nativeDevice(t)
++	size := image.Pt(61, 43)
++	makeDrawer := func() (*gpudraw.Drawer, *gpu.RenderTexture) {
++		rt := gpu.NewRenderTexture(gp, dev, size, 1, gpu.UndefinedType)
++		dw := gpudraw.NewDrawer(gp, rt)
++		t.Cleanup(func() { dw.Release(); rt.Release() })
++		return dw, rt
++	}
++	dw, target := makeDrawer()
++	reference, refTarget := makeDrawer()
++	r := New(math32.Vec2(23, 19)).(*Renderer)
++	defer r.Release()
++	expected := rasterx.New(math32.Vec2(23, 19)).(*rasterx.Renderer)
++	clearSource := func(c color.RGBA) render.Render {
++		return render.Render{&pimage.Params{Cmd: pimage.Draw, Source: image.NewUniform(c), Op: draw.Src}}
++	}
++	background := image.NewUniform(color.RGBA{37, 79, 113, 255})
++	later := image.NewUniform(color.RGBA{11, 23, 41, 83})
++	renderFrame := func(commands render.Render, measured bool) {
++		dw.Start()
++		reference.Start()
++		dw.Copy(image.Point{}, background, image.Rectangle{Max: size}, draw.Src, false)
++		reference.Copy(image.Point{}, background, image.Rectangle{Max: size}, draw.Src, false)
++		record := r.DrawScene(dw, commands, image.Pt(7, 5), draw.Over, measured)
++		if len(commands) != 0 {
++			expected.Render(commands)
++		}
++		reference.Copy(image.Pt(7, 5), expected.Image(), expected.Image().Bounds(), draw.Over, false)
++		// A later scrim-like sibling remains after this source in both batches.
++		dw.Copy(image.Point{}, later, image.Rect(12, 8, 40, 35), draw.Over, false)
++		reference.Copy(image.Point{}, later, image.Rect(12, 8, 40, 35), draw.Over, false)
++		dw.End()
++		reference.End()
++		got, want := readTexture(t, dev, target.CurrentFrame()), readTexture(t, dev, refTarget.CurrentFrame())
++		if !bytes.Equal(got.Pix, want.Pix) {
++			t.Fatal("shared-device ordered composition differs", r.Stats())
++		}
++		if r.Stats().CPUFallbacks == 0 && (record.RasterAvailable || record.CopyAvailable) {
++			t.Fatal("GPU path claims CPU raster/copy or completion timings")
++		}
++	}
++	renderFrame(clearSource(color.RGBA{23, 47, 71, 139}), false)
++	if dw.CanRedraw() {
++		t.Fatal("borrowed GPU source was admitted for cached replay")
++	}
++	if r.Stats().Submitted != 1 || r.Stats().CPUFallbacks != 0 || r.resources.device.Device != dw.System.Device().Device || r.imageExposed || len(r.journal) != 1 {
++		t.Fatal("main route did not use deferred same-device GPU paint", r.Stats())
++	}
++	renderFrame(nil, true)
++	if r.Stats().Reused != 1 {
++		t.Fatal("unchanged source did not reuse")
++	}
++	partial := render.Render{&pimage.Params{Cmd: pimage.Draw, Rect: image.Rect(3, 4, 17, 15), Source: image.NewUniform(color.RGBA{11, 29, 59, 103}), Op: draw.Over}}
++	renderFrame(partial, true)
++	// Unknown paint must reconstruct old accepted history before normal render.
++	unknown := &nativeUnknownImage{Image: image.NewUniform(color.RGBA{7, 13, 31, 83})}
++	renderFrame(render.Render{&pimage.Params{Cmd: pimage.Draw, Rect: image.Rect(5, 1, 19, 13), Source: unknown, Op: draw.Over}}, false)
++	if r.Stats().CPUFallbacks != 1 || len(r.journal) != 0 {
++		t.Fatal("unsupported batch did not reconstruct fallback", r.Stats())
++	}
++	renderFrame(partial, false)
++	if r.Stats().Submitted != 3 {
++		t.Fatal("accepted packet did not recover after fallback", r.Stats())
++	}
++	// Retained mutable snapshot stays current and authoritative across GPU paint.
++	exposed := r.Image().(*image.RGBA)
++	if !bytes.Equal(exposed.Pix, expected.Image().(*image.RGBA).Pix) {
++		t.Fatal("snapshot differs")
++	}
++	exposed.SetRGBA(0, 0, color.RGBA{101, 127, 151, 173})
++	expected.Image().(*image.RGBA).SetRGBA(0, 0, color.RGBA{101, 127, 151, 173})
++	renderFrame(partial, false)
++	if !bytes.Equal(exposed.Pix, expected.Image().(*image.RGBA).Pix) {
++		t.Fatal("retained snapshot stopped updating")
++	}
++	exposed.SetRGBA(1, 1, color.RGBA{31, 43, 53, 255})
++	expected.Image().(*image.RGBA).SetRGBA(1, 1, color.RGBA{31, 43, 53, 255})
++	renderFrame(nil, false)
++	if r.Stats().CPUFallbacks != 2 {
++		t.Fatal("empty exposed image reused stale texture", r.Stats())
++	}
++	if !dw.CanRedraw() {
++		t.Fatal("later owned CPU batch was refused for cached replay")
++	}
++	r.SetSize(units.UnitDot, math32.Vec2(31, 27))
++	expected.SetSize(units.UnitDot, math32.Vec2(31, 27))
++	if r.imageExposed {
++		t.Fatal("resize retained mutable exposure from retired image")
++	}
++	renderFrame(clearSource(color.RGBA{31, 47, 59, 113}), false)
++	if r.Stats().CPUFallbacks != 2 || len(r.journal) != 1 {
++		t.Fatal("resize did not restart deferred GPU paint", r.Stats())
++	}
++	if err := r.lease.WithResources(func(ctx *gpudraw.SceneGPUContext) error {
++		if r.resources.device.Device != ctx.Device.Device {
++			return fmt.Errorf("drawer device identity mismatch")
++		}
++		return nil
++	}); err != nil {
++		t.Fatal(err)
++	}
++	r.Release()
++	if budget, err := dw.SceneSourceBudget(); err != nil || budget.Sources != 0 || budget.Bytes != 0 {
++		t.Fatal("source retirement retained resources", budget)
++	}
++}
++
++type nativeUnknownImage struct{ image.Image }
++
++func TestVellumGPUSceneNativeActualTextAndPaths(t *testing.T) {
++	_, dev := nativeDevice(t)
++	size := image.Pt(240, 80)
++	res := &resources{}
++	defer res.release()
++	reserve := func(n uint64) error {
++		if n > 128<<20 {
++			return fmt.Errorf("test budget")
++		}
++		return nil
++	}
++	if err := res.initialize(dev, size, reserve); err != nil {
++		t.Fatal(err)
++	}
++	rs := rasterx.New(math32.FromPoint(size)).(*rasterx.Renderer)
++	shaper := shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default})
++	uc := units.Context{}
++	uc.Defaults()
++	ts := text.NewStyle()
++	ts.FontSize = units.Dot(24)
++	ts.WhiteSpace = text.WrapNever
++	ts.ToDots(&uc)
++	source := rich.NewText(rich.NewStyle(), []rune("Ag é שלום"))
++	runs := shaper.Shape(source, ts)
++	if len(runs) == 0 {
++		t.Fatal("default outline text missing")
++	}
++	for _, transform := range []math32.Matrix2{math32.Identity2(), math32.Translate2D(2, 1).Scale(.9, .9)} {
++		for repeat := 0; repeat < 2; repeat++ {
++			lines := &shaped.Lines{Source: source, Color: color.NRGBA{20, 40, 100, 230}, Lines: []shaped.Line{{Runs: runs, Offset: math32.Vec2(0, 30), Selections: []textpos.Range{{Start: 1, End: 5}}}}, SelectionColor: image.NewUniform(color.NRGBA{30, 80, 20, 100})}
++			ctx := &render.Context{}
++			ctx.Init(styles.NewPaint(), &render.Bounds{Rect: math32.B2FromRect(image.Rectangle{Max: size})}, nil)
++			txt := render.NewText(lines, styles.NewPaint(), ctx, math32.Vec2(7.25, 2.5))
++			txt.Context.Cumulative = transform
++			path := ppath.New()
++			path.MoveTo(150.25, 13.5)
++			path.CubeTo(174.75, 4.5, 192.25, 49.5, 211.5, 37.25)
++			path.LineTo(164.25, 51.75)
++			path.Close()
++			sty := styles.NewPaint()
++			sty.Fill.Color = image.NewUniform(color.RGBA{41, 13, 29, 83})
++			sty.Stroke.Color = image.NewUniform(color.RGBA{7, 17, 29, 103})
++			sty.Stroke.Width = units.Dot(2.5)
++			sty.UnitContext = uc
++			sty.ToDots()
++			pathCtx := &render.Context{}
++			pathCtx.Init(sty, &render.Bounds{Rect: math32.B2FromRect(image.Rect(147, 8, 218, 57))}, nil)
++			pathCtx.Cumulative = transform
++			pt := &render.Path{Path: *path, Context: *pathCtx}
++			icon := image.NewRGBA(image.Rect(0, 0, 7, 9))
++			draw.Draw(icon, icon.Rect, image.NewUniform(color.NRGBA{180, 20, 30, 180}), image.Point{}, draw.Src)
++			commands := render.Render{&pimage.Params{Cmd: pimage.Draw, Rect: image.Rectangle{Max: size}, Source: image.NewUniform(color.RGBA{19, 37, 61, 255}), Op: draw.Src}, pt, txt, pimage.NewDraw(image.Rect(226, 10, 233, 19), icon, nil, image.Point{}, draw.Over)}
++			packet := rs.ScenePacket(commands)
++			if packet == nil {
++				t.Fatal("real outline/path scene refused", transform, repeat)
++			}
++			encoded, ok := packet.Encode()
++			if !ok {
++				t.Fatal("real scene encoding refused")
++			}
++			if err := res.render(encoded, reserve); err != nil {
++				t.Fatal(err)
++			}
++			rs.Render(commands)
++			got := readTexture(t, dev, res.texture)
++			if !bytes.Equal(got.Pix, rs.Image().(*image.RGBA).Pix) {
++				t.Fatal("actual path/text/selection/icon native bytes differ", transform, repeat)
++			}
++		}
++	}
++}
+--- /dev/null
++++ b/paint/renderers/gpuscene/renderer.go
+@@ -0,0 +1,275 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpuscene
++
++import (
++	"fmt"
++	"image"
++	"image/draw"
++	"time"
++
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/gpu/gpudraw"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/system/composer"
++)
++
++const maxJournalPackets = 256
++
++// Stats contains host-side routing counts only. A submitted packet is not a
++// GPU-completion timestamp or proof that a presentation succeeded.
++type Stats struct {
++	Submitted, Reused, CPUFallbacks, Materializations uint64
++	JournalBytes, JournalPackets                      int
++	LastFallback                                      string
++}
++
++// Renderer is owned and serialized by the same Scene RC as rasterx.Renderer.
++// Its CPU base plus bounded immutable journal reconstruct every accepted paint
++// batch without readback. Only resources (GPU handles) are registered with the
++// drawer; its retirement callback holds no widget, font or application state.
++type Renderer struct {
++	cpu          *rasterx.Renderer
++	journal      []*sceneplan.Packet
++	journalBytes int
++	resources    *resources
++	drawer       *gpudraw.Drawer
++	lease        *gpudraw.SceneSourceLease
++	closed       bool
++	imageExposed bool
++	stats        Stats
++}
++
++func New(size math32.Vector2) render.Renderer {
++	return &Renderer{cpu: rasterx.New(size).(*rasterx.Renderer)}
++}
++func (r *Renderer) Size() (units.Units, math32.Vector2) { return r.cpu.Size() }
++func (r *Renderer) Source() []byte                      { return nil }
++func (r *Renderer) Stats() Stats {
++	s := r.stats
++	s.JournalBytes = r.journalBytes
++	s.JournalPackets = len(r.journal)
++	return s
++}
++func (r *Renderer) materialize() {
++	if len(r.journal) == 0 {
++		return
++	}
++	dst := r.cpu.Image().(*image.RGBA)
++	for _, p := range r.journal {
++		p.Replay(dst)
++		r.cpu.Scanner.SetWinding(p.Winding())
++	}
++	clear(r.journal)
++	r.journal = r.journal[:0]
++	r.journalBytes = 0
++	r.stats.Materializations++
++}
++func (r *Renderer) invalidate() {
++	if r.lease != nil {
++		if err := r.lease.WithResources(func(*gpudraw.SceneGPUContext) error { r.resources.ready = false; return nil }); err != nil {
++			r.closeLease()
++		}
++	}
++}
++
++// Image returns the usual mutable CPU image. Conservatively invalidate GPU
++// reuse because a caller may modify those bytes after this explicit snapshot.
++func (r *Renderer) Image() image.Image {
++	r.materialize()
++	r.imageExposed = true
++	r.invalidate()
++	return r.cpu.Image()
++}
++func (r *Renderer) Render(commands render.Render) render.Renderer {
++	r.materialize()
++	r.invalidate()
++	r.cpu.Render(commands)
++	return r
++}
++func (r *Renderer) SetSize(un units.Units, size math32.Vector2) {
++	_, old := r.cpu.Size()
++	if old == size {
++		return
++	}
++	r.closeLease()
++	clear(r.journal)
++	r.journal = nil
++	r.journalBytes = 0
++	r.imageExposed = false
++	r.cpu.SetSize(un, size)
++}
++func (r *Renderer) closeLease() error {
++	if r.lease != nil {
++		if err := r.lease.Close(); err != nil {
++			// A pending composition or another admitted resource scope keeps
++			// registry ownership until its safe drain point. The callback
++			// retains private resources only, so the Scene can retire now.
++			if requestErr := r.lease.RequestClose(); requestErr != nil {
++				return requestErr
++			}
++		}
++	}
++	r.lease, r.drawer, r.resources = nil, nil, nil
++	return nil
++}
++func (r *Renderer) Release() {
++	if r.closed {
++		return
++	}
++	r.closed = true
++	r.closeLease()
++	// Preserve the usual explicit CPU snapshot semantics after destruction.
++	r.materialize()
++}
++func (r *Renderer) ensureLease(dw *gpudraw.Drawer) error {
++	if r.closed {
++		return fmt.Errorf("gpuscene: renderer retired")
++	}
++	if r.drawer == dw && r.lease != nil {
++		return nil
++	}
++	// A new window/device cannot inherit a texture from the previous drawer.
++	r.materialize()
++	if err := r.closeLease(); err != nil {
++		return err
++	}
++	res := &resources{}
++	lease, err := dw.NewSceneSource(res.release)
++	if err != nil {
++		return err
++	}
++	r.drawer, r.lease, r.resources = dw, lease, res
++	return nil
++}
++func (r *Renderer) remember(p *sceneplan.Packet) {
++	if p.Independent() {
++		clear(r.journal)
++		r.journal = r.journal[:0]
++		r.journalBytes = 0
++	} else if len(r.journal) == maxJournalPackets || r.journalBytes+p.Bytes() > sceneplan.MaxBytes {
++		r.materialize()
++	}
++	if p.Operations() != 0 {
++		r.journal = append(r.journal, p)
++		r.journalBytes += p.Bytes()
++	}
++	r.cpu.Scanner.SetWinding(p.Winding())
++	// A retained mutable Image pointer has the original rasterx semantics:
++	// subsequent accepted paint updates it, and later partial GPU paint must
++	// conservatively seed any caller modifications from this same CPU base.
++	if r.imageExposed {
++		r.materialize()
++	}
++}
++func (r *Renderer) fallback(dw composer.Drawer, commands render.Render, dp image.Point, op draw.Op, measured bool, reason error) composer.SourceTiming {
++	r.materialize()
++	// Keep an admitted pool across unsupported paint. Mark its bytes stale so
++	// the next partial accepted batch seeds the reconstructed CPU base once.
++	r.invalidate()
++	r.stats.CPUFallbacks++
++	if reason != nil {
++		message := reason.Error()
++		if len(message) > 256 {
++			message = message[:256]
++		}
++		r.stats.LastFallback = message
++	}
++	changed := len(commands) != 0
++	record := composer.SourceTiming{RasterAvailable: true, CopyAvailable: true, ImageChanged: changed}
++	if changed {
++		if measured {
++			start := time.Now()
++			r.cpu.Render(commands)
++			record.RasterNS = time.Since(start).Nanoseconds()
++		} else {
++			r.cpu.Render(commands)
++		}
++	}
++	img := r.cpu.Image()
++	record.ImageWidth, record.ImageHeight = img.Bounds().Dx(), img.Bounds().Dy()
++	// A fallback's owned Go texture may occupy a former borrowed GPU slot.
++	// Force upload; checked slot conversion establishes independent ownership.
++	if measured {
++		start := time.Now()
++		dw.Copy(dp, img, img.Bounds(), op, false)
++		record.CopyNS = time.Since(start).Nanoseconds()
++	} else {
++		dw.Copy(dp, img, img.Bounds(), op, false)
++	}
++	return record
++}
++
++// DrawScene executes at the original paintSource ordinal, using the originating
++// drawer's device. Both ordinary and diagnostic Core paths call this method.
++// GPU host work remains inside outer Draw timing; CPU Raster/Copy timings are
++// available only on fallback, without pretending Submit measures GPU execution.
++func (r *Renderer) DrawScene(dw composer.Drawer, commands render.Render, dp image.Point, op draw.Op, measured bool) composer.SourceTiming {
++	as, ok := dw.(gpudraw.AsGPUDrawer)
++	if !ok || as.AsGPUDrawer() == nil {
++		return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: drawer has no GPU scene support"))
++	}
++	gpuDrawer := as.AsGPUDrawer()
++	if err := r.ensureLease(gpuDrawer); err != nil {
++		return r.fallback(dw, commands, dp, op, measured, err)
++	}
++	_, size := r.cpu.Size()
++	bounds := image.Rectangle{Max: size.ToPointCeil()}
++	if len(commands) == 0 && r.imageExposed {
++		return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: mutable CPU image exposure requires current copy"))
++	}
++	var packet *sceneplan.Packet
++	var encoded *sceneplan.Encoded
++	if len(commands) != 0 {
++		packet = r.cpu.ScenePacket(commands)
++		if packet == nil {
++			return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: unsupported or over-budget paint batch"))
++		}
++		encoded, ok = packet.Encode()
++		if !ok {
++			return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: encoded paint exceeds limits"))
++		}
++	}
++	err := r.lease.Draw(gpudraw.SceneDraw{Size: bounds.Size(), DP: dp, SR: bounds, Op: op}, func(ctx *gpudraw.SceneGPUContext) (*gpu.Texture, error) {
++		res := r.resources
++		if res.device.Device != ctx.Device.Device || res.size != bounds.Size() || res.texture == nil {
++			res.release()
++			if err := ctx.SetBudget(0); err != nil {
++				return nil, err
++			}
++			if err := res.initialize(ctx.Device, bounds.Size(), ctx.SetBudget); err != nil {
++				return nil, err
++			}
++		}
++		if packet == nil {
++			if !res.ready {
++				return nil, fmt.Errorf("gpuscene: empty batch has no current GPU source")
++			}
++			return res.texture, nil
++		}
++		if (!res.ready || r.imageExposed) && !packet.Independent() {
++			r.materialize()
++			if err := res.seed(r.cpu.Image().(*image.RGBA)); err != nil {
++				return nil, err
++			}
++		}
++		if err := res.render(encoded, ctx.SetBudget); err != nil {
++			return nil, err
++		}
++		return res.texture, nil
++	})
++	if err != nil {
++		return r.fallback(dw, commands, dp, op, measured, err)
++	}
++	if packet != nil {
++		r.remember(packet)
++		r.stats.Submitted++
++	} else {
++		r.stats.Reused++
++	}
++	return composer.SourceTiming{ImageWidth: bounds.Dx(), ImageHeight: bounds.Dy(), ImageChanged: len(commands) != 0}
++}
+--- /dev/null
++++ b/paint/renderers/gpuscene/renderer_test.go
+@@ -0,0 +1,101 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpuscene
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/system/composer"
++)
++
++type cpuDrawer struct{ composer.DrawerBase }
++
++func (*cpuDrawer) End()    {}
++func (*cpuDrawer) Redraw() {}
++
++func TestVellumGPUScenePartialJournalAndSnapshot(t *testing.T) {
++	bounds := image.Rect(0, 0, 23, 19)
++	r := New(math32.FromPoint(bounds.Size())).(*Renderer)
++	want := image.NewRGBA(bounds)
++	for i := 0; i < maxJournalPackets*3+7; i++ {
++		rect := image.Rect(i%21, i%17, i%21+2, i%17+2)
++		c := image.NewUniform(color.NRGBA{uint8(i), uint8(i * 3), uint8(i * 5), 123})
++		builder := sceneplan.New(bounds)
++		builder.Draw(rect, c, image.Point{}, nil, image.Point{}, draw.Over)
++		packet := builder.Seal(i%2 == 0)
++		if packet == nil {
++			t.Fatal("partial capture failed")
++		}
++		r.remember(packet)
++		draw.Draw(want, rect, c, image.Point{}, draw.Over)
++		if len(r.journal) > maxJournalPackets || r.journalBytes > sceneplan.MaxBytes {
++			t.Fatal("journal exceeded bound")
++		}
++	}
++	if r.stats.Materializations < 2 {
++		t.Fatal("bounded journal did not materialize")
++	}
++	got := r.Image().(*image.RGBA)
++	if !bytes.Equal(got.Pix, want.Pix) || len(r.journal) != 0 || r.journalBytes != 0 {
++		t.Fatal("partial reconstruction/snapshot differs")
++	}
++	// A mutable Image is the base for later accepted partial paint.
++	got.SetRGBA(0, 0, color.RGBA{7, 11, 13, 255})
++	want.SetRGBA(0, 0, color.RGBA{7, 11, 13, 255})
++	builder := sceneplan.New(bounds)
++	builder.Draw(image.Rect(0, 0, 3, 3), image.NewUniform(color.RGBA{3, 5, 7, 9}), image.Point{}, nil, image.Point{}, draw.Over)
++	r.remember(builder.Seal(false))
++	draw.Draw(want, image.Rect(0, 0, 3, 3), image.NewUniform(color.RGBA{3, 5, 7, 9}), image.Point{}, draw.Over)
++	if !bytes.Equal(r.Image().(*image.RGBA).Pix, want.Pix) {
++		t.Fatal("mutable CPU base lost")
++	}
++}
++func TestVellumGPUSceneIndependentResetFallbackResize(t *testing.T) {
++	r := New(math32.Vec2(17, 13)).(*Renderer)
++	bounds := image.Rect(0, 0, 17, 13)
++	partial := sceneplan.New(bounds)
++	partial.Draw(image.Rect(2, 2, 7, 7), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++	r.remember(partial.Seal(true))
++	independent := sceneplan.New(bounds)
++	independent.Draw(bounds, image.NewUniform(color.RGBA{19, 37, 61, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	r.remember(independent.Seal(false))
++	if len(r.journal) != 1 {
++		t.Fatal("full clear retained stale history")
++	}
++	dw := &cpuDrawer{composer.DrawerBase{Image: image.NewRGBA(bounds)}}
++	commands := render.Render{&pimage.Params{Cmd: pimage.Draw, Rect: image.Rect(3, 1, 9, 8), Source: image.NewUniform(color.RGBA{3, 7, 11, 13}), Op: draw.Over}}
++	timing := r.DrawScene(dw, commands, image.Point{}, draw.Src, true)
++	want := image.NewRGBA(bounds)
++	draw.Draw(want, bounds, image.NewUniform(color.RGBA{19, 37, 61, 255}), image.Point{}, draw.Src)
++	draw.Draw(want, image.Rect(3, 1, 9, 8), commands[0].(*pimage.Params).Source, image.Point{}, draw.Over)
++	if !bytes.Equal(dw.Image.Pix, want.Pix) || len(r.journal) != 0 || !timing.RasterAvailable || !timing.CopyAvailable || timing.ImageWidth != 17 {
++		t.Fatal("ordered CPU fallback differs")
++	}
++	r.SetSize(units.UnitDot, math32.Vec2(11, 9))
++	if r.Image().Bounds() != image.Rect(0, 0, 11, 9) || r.journalBytes != 0 {
++		t.Fatal("resize retained old state")
++	}
++	r.Release()
++	r.Release()
++	r.DrawScene(&cpuDrawer{composer.DrawerBase{Image: image.NewRGBA(image.Rect(0, 0, 11, 9))}}, nil, image.Point{}, draw.Src, false)
++}
++func TestVellumGPUSceneOutputBounds(t *testing.T) {
++	for _, size := range []image.Point{{0, 2}, {2, 0}, {-1, 2}, {8193, 2}, {8192, 8192}} {
++		if _, _, ok := outputLayout(size); ok {
++			t.Fatal("unsafe output size accepted", size)
++		}
++	}
++	stride, size, ok := outputLayout(image.Pt(257, 3))
++	if !ok || stride != 1280 || size != 3840 {
++		t.Fatal("padded output layout differs", stride, size, ok)
++	}
++}
+--- /dev/null
++++ b/paint/renderers/gpuscene/resources.go
+@@ -0,0 +1,282 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++// Package gpuscene compiles detached scene paint batches and composites their
++// exact premultiplied bytes on the window drawer's existing logical GPU device.
++package gpuscene
++
++import (
++	_ "embed"
++	"encoding/binary"
++	"fmt"
++	"image"
++	"sync/atomic"
++
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++//go:embed scene.wgsl
++var shader string
++
++// resources holds GPU handles only. All methods run inside the owning drawer's
++// lease callback; retirement must never enter a Scene RC or application lock.
++type resources struct {
++	device   gpu.Device // borrowed handles, never released here
++	size     image.Point
++	stride   uint32
++	output   *wgpu.Buffer
++	texture  *gpu.Texture
++	pipeline *wgpu.ComputePipeline
++	buffers  [5]*wgpu.Buffer // config, ops, tile rows, references, packed input
++	retired  []retiredBuffer
++	ready    bool
++}
++type retiredBuffer struct {
++	buffer *wgpu.Buffer
++	done   *atomic.Bool
++}
++
++func (r *resources) release() {
++	// Teardown drains queue uses, including later scene composition, before
++	// retiring budget. GPU callbacks only publish flags and never enter locks.
++	if r.device.Device.IsValid() && r.device.LossError() == nil {
++		r.device.WaitDone()
++	}
++	for _, retired := range r.retired {
++		retired.buffer.Release()
++	}
++	r.retired = nil
++	for i, b := range r.buffers {
++		if b != nil {
++			b.Release()
++			r.buffers[i] = nil
++		}
++	}
++	if r.output != nil {
++		r.output.Release()
++		r.output = nil
++	}
++	if r.texture != nil {
++		r.texture.Release()
++		r.texture = nil
++	}
++	if r.pipeline != nil {
++		r.pipeline.Release()
++		r.pipeline = nil
++	}
++	r.device = gpu.Device{}
++	r.size = image.Point{}
++	r.stride = 0
++	r.ready = false
++}
++func (r *resources) bytes() uint64 {
++	var n uint64
++	if r.output != nil {
++		n += r.output.GetSize()
++	}
++	for _, b := range r.buffers {
++		if b != nil {
++			n += b.GetSize()
++		}
++	}
++	for _, retired := range r.retired {
++		n += retired.buffer.GetSize()
++	}
++	if r.texture != nil {
++		n += uint64(r.size.X) * uint64(r.size.Y) * 4
++	}
++	return n
++}
++func outputLayout(size image.Point) (uint32, uint64, bool) {
++	if size.X <= 0 || size.Y <= 0 || size.X > sceneplan.MaxDimension || size.Y > sceneplan.MaxDimension || size.X*size.Y > sceneplan.MaxPixels {
++		return 0, 0, false
++	}
++	stride := uint32((size.X*4 + 255) / 256 * 256)
++	return stride, uint64(stride) * uint64(size.Y), true
++}
++func (r *resources) initialize(dev *gpu.Device, size image.Point, reserve func(uint64) error) (err error) {
++	if r.output != nil || r.texture != nil || r.pipeline != nil || r.device.Device.IsValid() {
++		return fmt.Errorf("gpuscene: initialization requires retired resources")
++	}
++	if dev == nil || !dev.Device.IsValid() || !dev.Queue.IsValid() {
++		return fmt.Errorf("gpuscene: live borrowed device required")
++	}
++	if err = dev.LossError(); err != nil {
++		return err
++	}
++	stride, n, valid := outputLayout(size)
++	if !valid {
++		return fmt.Errorf("gpuscene: source dimensions exceed limits")
++	}
++	limits := dev.Device.GetLimits()
++	if n > limits.MaxStorageBufferBindingSize || n > limits.MaxBufferSize {
++		return fmt.Errorf("gpuscene: output exceeds device buffer limits")
++	}
++	if err = reserve(n + uint64(size.X)*uint64(size.Y)*4 + 16); err != nil {
++		return err
++	}
++	defer func() {
++		if err != nil {
++			r.release()
++			_ = reserve(0)
++		}
++	}()
++	r.device, r.size, r.stride = *dev, size, stride
++	module, err := dev.Device.TryCreateShaderModule(&wgpu.ShaderModuleDescriptor{Label: "Vellum ordered scene", WGSLSource: &wgpu.ShaderSourceWGSL{Code: shader}})
++	if err != nil {
++		return err
++	}
++	defer module.Release()
++	r.pipeline, err = dev.Device.TryCreateComputePipeline(&wgpu.ComputePipelineDescriptor{Label: "Vellum ordered scene", Compute: wgpu.ProgrammableStageDescriptor{Module: module, EntryPoint: "main"}})
++	if err != nil {
++		return err
++	}
++	r.output, err = dev.Device.TryCreateBuffer(&wgpu.BufferDescriptor{Label: "Vellum scene RGBA bytes", Size: n, Usage: wgpu.BufferUsageStorage | wgpu.BufferUsageCopySrc | wgpu.BufferUsageCopyDst})
++	if err != nil {
++		return err
++	}
++	r.texture = gpu.NewTexture(dev)
++	r.texture.Name = "Vellum scene sampled RGBA"
++	r.texture.ConfigGoImage(size, 1)
++	if err = r.texture.CreateTexture(wgpu.TextureUsageTextureBinding | wgpu.TextureUsageCopyDst | wgpu.TextureUsageCopySrc); err != nil {
++		return err
++	}
++	r.buffers[0], err = dev.Device.TryCreateBuffer(&wgpu.BufferDescriptor{Label: "Vellum scene config", Size: 16, Usage: wgpu.BufferUsageUniform | wgpu.BufferUsageCopyDst})
++	if err != nil {
++		return err
++	}
++	return reserve(r.bytes())
++}
++
++// uploadInput admits retained plus transient replacement allocation before any
++// allocation. Old buffers survive failed replacement; a successful replacement
++// releases only our reference (queued WebGPU work retains its own references).
++func (r *resources) uploadInput(e *sceneplan.Encoded, reserve func(uint64) error) error {
++	retained := r.retired[:0]
++	for _, retired := range r.retired {
++		if retired.done.Load() {
++			retired.buffer.Release()
++		} else {
++			retained = append(retained, retired)
++		}
++	}
++	clear(r.retired[len(retained):])
++	r.retired = retained
++	if err := reserve(r.bytes()); err != nil {
++		return err
++	}
++	inputs := [4][]byte{e.Ops, e.Rows, e.Refs, e.Data}
++	limits := r.device.Device.GetLimits()
++	for i, data := range inputs {
++		n := uint64(len(data))
++		if n < 4 || n%4 != 0 || n > limits.MaxStorageBufferBindingSize || n > limits.MaxBufferSize {
++			return fmt.Errorf("gpuscene: input exceeds device buffer limits")
++		}
++		slot := i + 1
++		if r.buffers[slot] == nil || r.buffers[slot].GetSize() < n {
++			capacity := uint64(4)
++			for capacity < n {
++				capacity *= 2
++			}
++			if capacity > limits.MaxStorageBufferBindingSize || capacity > limits.MaxBufferSize || len(r.retired) >= 16 {
++				return fmt.Errorf("gpuscene: input replacement exceeds limits")
++			}
++			if err := reserve(r.bytes() + capacity); err != nil {
++				return err
++			}
++			b, err := r.device.Device.TryCreateBuffer(&wgpu.BufferDescriptor{Label: "Vellum scene paint input", Size: capacity, Usage: wgpu.BufferUsageStorage | wgpu.BufferUsageCopyDst})
++			if err != nil {
++				_ = reserve(r.bytes())
++				return err
++			}
++			if r.buffers[slot] != nil {
++				done := &atomic.Bool{}
++				r.retired = append(r.retired, retiredBuffer{r.buffers[slot], done})
++				r.device.Queue.OnSubmittedWorkDone(func(status wgpu.QueueWorkDoneStatus) {
++					if status == wgpu.QueueWorkDoneStatusSuccess {
++						done.Store(true)
++					}
++				})
++			}
++			r.buffers[slot] = b
++			if err := reserve(r.bytes()); err != nil {
++				return err
++			}
++		}
++		if err := r.device.Queue.TryWriteBuffer(r.buffers[slot], 0, data); err != nil {
++			return err
++		}
++	}
++	cfg := make([]byte, 16)
++	for i, v := range []uint32{uint32(r.size.X), uint32(r.size.Y), r.stride / 4, uint32(e.Tiles.X)} {
++		binary.LittleEndian.PutUint32(cfg[i*4:], v)
++	}
++	return r.device.Queue.TryWriteBuffer(r.buffers[0], 0, cfg)
++}
++func (r *resources) seed(img *image.RGBA) error {
++	if img == nil || img.Bounds() != (image.Rectangle{Max: r.size}) {
++		return fmt.Errorf("gpuscene: seed bounds differ")
++	}
++	// Only used after CPU fallback/device replacement; never an ordinary accepted
++	// packet's full-image upload. Queue writes remain in submission order.
++	row := make([]byte, r.stride)
++	for y := 0; y < r.size.Y; y++ {
++		copy(row, img.Pix[img.PixOffset(0, y):][:r.size.X*4])
++		if err := r.device.Queue.TryWriteBuffer(r.output, uint64(y)*uint64(r.stride), row); err != nil {
++			return err
++		}
++	}
++	return nil
++}
++func (r *resources) render(e *sceneplan.Encoded, reserve func(uint64) error) error {
++	if err := r.device.LossError(); err != nil {
++		return err
++	}
++	if err := r.uploadInput(e, reserve); err != nil {
++		return err
++	}
++	layout := r.pipeline.GetBindGroupLayout(0)
++	defer layout.Release()
++	entries := make([]wgpu.BindGroupEntry, 6)
++	for i, b := range r.buffers {
++		entries[i] = wgpu.BindGroupEntry{Binding: uint32(i), Buffer: b, Size: b.GetSize()}
++	}
++	entries[5] = wgpu.BindGroupEntry{Binding: 5, Buffer: r.output, Size: r.output.GetSize()}
++	group, err := r.device.Device.TryCreateBindGroup(&wgpu.BindGroupDescriptor{Layout: layout, Entries: entries})
++	if err != nil {
++		return err
++	}
++	defer group.Release()
++	encoder, err := r.device.Device.TryCreateCommandEncoder(nil)
++	if err != nil {
++		return err
++	}
++	defer encoder.Release()
++	// This pinned WebGPU API has no TryBeginComputePass/Dispatch/Submit methods.
++	// Checked resource creation and encoding do not claim GPU completion.
++	pass := encoder.BeginComputePass(nil)
++	pass.SetPipeline(r.pipeline)
++	pass.SetBindGroup(0, group, nil)
++	pass.DispatchWorkgroups(uint32((r.size.X+7)/8), uint32((r.size.Y+7)/8), 1)
++	err = pass.TryEnd()
++	pass.Release()
++	if err != nil {
++		return err
++	}
++	if err = r.texture.CopyFromBuffer(encoder, r.output, r.stride); err != nil {
++		return err
++	}
++	command, err := encoder.TryFinish(nil)
++	if err != nil {
++		return err
++	}
++	defer command.Release()
++	r.device.Queue.Submit(command)
++	if err = r.device.LossError(); err != nil {
++		return err
++	}
++	r.ready = true
++	return nil
++}
+--- /dev/null
++++ b/paint/renderers/gpuscene/scene.wgsl
+@@ -0,0 +1,71 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++// Packed premultiplied RGBA bytes use the reference rasterizer's u32 math.
++// No floating point blend, sRGB conversion, or lossy 8-bit span coverage.
++struct Config { width: u32, height: u32, stride: u32, tiles_x: u32 }
++@group(0) @binding(0) var<uniform> cfg: Config;
++@group(0) @binding(1) var<storage, read> ops: array<u32>;
++@group(0) @binding(2) var<storage, read> rows: array<u32>;
++@group(0) @binding(3) var<storage, read> refs: array<u32>;
++@group(0) @binding(4) var<storage, read> data: array<u32>;
++@group(0) @binding(5) var<storage, read_write> output: array<u32>;
++fn unpack(v: u32) -> vec4<u32> {
++    return vec4<u32>(v & 255u, (v >> 8u) & 255u, (v >> 16u) & 255u, v >> 24u);
++}
++fn pack(v: vec4<u32>) -> u32 {
++    let p = v & vec4<u32>(255u);
++    return p.x | (p.y << 8u) | (p.z << 16u) | (p.w << 24u);
++}
++fn covered(dst: vec4<u32>, src: vec4<u32>, coverage: u32, over: bool) -> vec4<u32> {
++    if !over { return (src * coverage) / 16776960u; }
++    let a = (65535u - src.w * coverage / 65535u) * 257u;
++    return (dst * a + src * coverage) / 16776960u;
++}
++@compute @workgroup_size(8, 8)
++fn main(@builtin(global_invocation_id) id: vec3<u32>) {
++    let x = id.x;
++    let y = id.y;
++    if x >= cfg.width || y >= cfg.height { return; }
++    let at = y * cfg.stride + x;
++    var pixel = unpack(output[at]);
++    let tile = (y / 16u) * cfg.tiles_x + x / 16u;
++    let start = rows[tile * 2u];
++    let end = start + rows[tile * 2u + 1u];
++    for (var ri = start; ri < end; ri++) {
++        let oi = refs[ri] * 16u;
++        let min_x = ops[oi];
++        let min_y = ops[oi + 1u];
++        if x < min_x || y < min_y || x >= ops[oi + 2u] || y >= ops[oi + 3u] { continue; }
++        let kind = ops[oi + 8u];
++        let over = ops[oi + 9u] == 0u;
++        var src = vec4<u32>(ops[oi + 4u], ops[oi + 5u], ops[oi + 6u], ops[oi + 7u]);
++        if kind == 3u {
++            let row = ops[oi + 10u] + (y - min_y) * 2u;
++            let spans_start = data[row];
++            let spans_end = spans_start + data[row + 1u] * 3u;
++            for (var si = spans_start; si < spans_end; si += 3u) {
++                if x >= data[si] && x < data[si + 1u] {
++                    pixel = covered(pixel, src, data[si + 2u], over) & vec4<u32>(255u);
++                }
++            }
++            continue;
++        }
++        if kind == 2u {
++            let index = ops[oi + 10u] + (y - min_y) * ops[oi + 11u] + x - min_x;
++            src = unpack(data[index]) * 257u;
++        }
++        let mask_offset = ops[oi + 12u];
++        if mask_offset != 0xffffffffu {
++            let mx = x - min_x + ops[oi + 14u];
++            let my = y - min_y + ops[oi + 15u];
++            let byte_at = my * ops[oi + 13u] + mx;
++            let alpha = ((data[mask_offset + byte_at / 4u] >> ((byte_at % 4u) * 8u)) & 255u) * 257u;
++            pixel = covered(pixel, src, alpha, over) & vec4<u32>(255u);
++        } else if over {
++            let a = (65535u - src.w) * 257u;
++            pixel = ((pixel * a / 65535u + src) >> vec4<u32>(8u)) & vec4<u32>(255u);
++        } else {
++            pixel = src >> vec4<u32>(8u);
++        }
++    }
++    output[at] = pack(pixel);
++}
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -16,6 +16,7 @@
+ 	"cogentcore.org/core/paint/ppath"
+ 	"cogentcore.org/core/paint/render"
+ 	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/paint/renderers/sceneplan"
+ 	"cogentcore.org/core/styles/units"
+ )
+ 
+@@ -41,6 +42,8 @@
+ 	scrollClock     uint64
+ 	scrollStats     ScrollStats
+ 	scrollPlanBytes int
++	sceneRecord     *sceneplan.Builder
++	sceneWork       *sceneWorkBudget
+ 	scrollRecord    *scrollPaintPlan
+ }
+ 
+--- /dev/null
++++ b/paint/renderers/rasterx/scene_packet.go
+@@ -0,0 +1,349 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/ppath"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/textpos"
++	"github.com/go-text/typesetting/font"
++	"image"
++	"image/draw"
++	"math"
++	"reflect"
++)
++
++type sceneSpanner struct {
++	builder *sceneplan.Builder
++	source  image.Image
++	op      int
++}
++
++func (s *sceneSpanner) SetColor(source image.Image) {
++	if _, ok := sceneplan.Color(source); !ok {
++		s.builder.Refuse()
++		return
++	}
++	s.source = source
++}
++func (s *sceneSpanner) GetSpanFunc() scan.SpanFunc {
++	if s.builder.Failed() {
++		return func(int, int, int, uint32) {}
++	}
++	u, ok := s.source.(*image.Uniform)
++	if !ok || u == nil {
++		s.builder.Refuse()
++		return func(int, int, int, uint32) {}
++	}
++	s.builder.BeginSpans(colors.AsRGBA(u.C), draw.Op(s.op))
++	return s.builder.Span
++}
++
++// ScenePacket compiles a whole supplied batch before GPU submission. A supplied
++// batch may be a partial widget repaint; Packet.Independent proves a full reset.
++// Its scanner/Dasher are private so a refused capture cannot change fallback
++// winding, clip, pending cells or pixels. Source/color hooks are preflighted first.
++func (rs *Renderer) ScenePacket(commands render.Render) *sceneplan.Packet {
++	if rs == nil || rs.image == nil {
++		return nil
++	}
++	b := sceneplan.New(rs.image.Bounds())
++	if b.Failed() || len(commands) > sceneplan.MaxOps {
++		return nil
++	}
++	work := &sceneWorkBudget{remaining: sceneMaxWork, outlines: font.NewGlyphOutlineBudget(1<<20, 1<<20)}
++	if !work.take(len(commands)) {
++		return nil
++	}
++	for _, item := range commands {
++		switch x := item.(type) {
++		case *render.ContextPush, *render.ContextPop:
++			if reflect.ValueOf(x).IsNil() {
++				return nil
++			}
++		case *pimage.Params:
++			if x == nil || x.Cmd != pimage.Draw || !sceneplan.Known(x.Source) || !sceneplan.Known(x.Mask) || sceneplan.Aliases(x.Source, rs.image) || sceneplan.Aliases(x.Mask, rs.image) {
++				return nil
++			}
++		case *render.Path:
++			if x == nil || !sceneColorOK(x.Context.Style.Fill.Color) || !sceneColorOK(x.Context.Style.Stroke.Color) || !sceneContextFinite(&x.Context) || !work.path(x.Path, x.Context.Cumulative, math32.Vector2{}, scenePathFactor(&x.Context)) {
++				return nil
++			}
++		case *render.Text:
++			if !work.text(x) {
++				return nil
++			}
++		default:
++			return nil
++		}
++	}
++	spanner := &sceneSpanner{builder: b, op: int(rs.ImgSpanner.Op)}
++	capture := &Renderer{size: rs.size, sceneRecord: b, sceneWork: work}
++	capture.Scanner = scan.NewScannerWithRowTracking(spanner, rs.image.Bounds().Dx(), rs.image.Bounds().Dy())
++	capture.Raster = NewDasher(rs.image.Bounds().Dx(), rs.image.Bounds().Dy(), capture.Scanner)
++	// NewDasher initializes nonzero winding; restore the captured value afterward.
++	capture.Scanner.SetWinding(rs.Scanner.UseNonZeroWinding)
++	for _, item := range commands {
++		switch x := item.(type) {
++		case *pimage.Params:
++			b.Draw(x.Rect, x.Source, x.SourcePos, x.Mask, x.MaskPos, x.Op)
++		case *render.Path:
++			capture.RenderPath(x)
++		case *render.Text:
++			capture.RenderText(x)
++		}
++		if b.Failed() {
++			return nil
++		}
++	}
++	return b.Seal(capture.Scanner.UseNonZeroWinding)
++}
++func sceneContextFinite(c *render.Context) bool {
++	for _, v := range []float32{c.Cumulative.XX, c.Cumulative.YX, c.Cumulative.XY, c.Cumulative.YY, c.Cumulative.X0, c.Cumulative.Y0, c.Bounds.Rect.Min.X, c.Bounds.Rect.Min.Y, c.Bounds.Rect.Max.X, c.Bounds.Rect.Max.Y, c.Style.Fill.Opacity, c.Style.Stroke.Opacity, c.Style.Stroke.Width.Dots, c.Style.Stroke.MiterLimit} {
++		if math.IsNaN(float64(v)) || math.IsInf(float64(v), 0) || math.Abs(float64(v)) > 1<<20 {
++			return false
++		}
++	}
++	if len(c.Style.Stroke.Dashes) > 256 {
++		return false
++	}
++	if c.Style.Stroke.Width.Dots < 0 || c.Style.Stroke.MiterLimit < 0 || !sceneScalar(c.Style.Stroke.Width.Dots*MeanScale(c.Cumulative)) || !sceneScalar(c.Style.Stroke.Width.Dots*MeanScale(c.Cumulative)*c.Style.Stroke.MiterLimit) {
++		return false
++	}
++	scale := MeanScale(c.Cumulative)
++	for _, v := range c.Style.Stroke.Dashes {
++		effective := v * scale
++		if !sceneScalar(v) || !sceneScalar(effective) || v < 0 || (v > 0 && effective < 1.0/64) {
++			return false
++		}
++	}
++	return true
++}
++
++// sceneMaxWork bounds aggregate source traversal and scanner preparation, not
++// elapsed time. Packet bytes/spans have their separate Builder limits. Refusal
++// selects unchanged CPU rendering; no source/color callbacks run in preflight.
++const sceneMaxWork = 8 << 20
++const sceneMaxItems = 64 << 10
++const sceneMaxCoordinate = 1 << 16
++
++type sceneWorkBudget struct {
++	remaining int
++	outlines  *font.GlyphOutlineBudget
++}
++
++func (w *sceneWorkBudget) take(n int) bool {
++	if w == nil || n < 0 || n > w.remaining {
++		return false
++	}
++	w.remaining -= n
++	return true
++}
++func (w *sceneWorkBudget) product(a, b int) bool {
++	if a < 0 || b < 0 || (a != 0 && b > w.remaining/a) {
++		return false
++	}
++	return w.take(a * b)
++}
++func scenePathFactor(c *render.Context) int {
++	factor := 1
++	if c.Style.HasStroke() {
++		scale := MeanScale(c.Cumulative)
++		for _, v := range c.Style.Stroke.Dashes {
++			if v > 0 {
++				factor = max(factor, int(math.Ceil(1/float64(v*scale))))
++			}
++		}
++	}
++	return factor
++}
++func sceneColorOK(source image.Image) bool {
++	_, ok := sceneplan.Color(source)
++	return source == nil || ok
++}
++func sceneScalar(v float32) bool {
++	return !math.IsNaN(float64(v)) && !math.IsInf(float64(v), 0) && math.Abs(float64(v)) <= sceneMaxCoordinate
++}
++func scenePoint(p math32.Vector2) bool { return sceneScalar(p.X) && sceneScalar(p.Y) }
++func sceneBox(b math32.Box2, m math32.Matrix2, off math32.Vector2) bool {
++	for _, p := range []math32.Vector2{b.Min, b.Max, math32.Vec2(b.Min.X, b.Max.Y), math32.Vec2(b.Max.X, b.Min.Y)} {
++		if !scenePoint(p) || !scenePoint(m.MulPoint(p.Add(off))) {
++			return false
++		}
++	}
++	return true
++}
++func sceneRanges(rs []textpos.Range) bool {
++	for _, r := range rs {
++		if r.Start < 0 || r.End < r.Start || r.End > 1<<30 {
++			return false
++		}
++	}
++	return true
++}
++func (w *sceneWorkBudget) path(p ppath.Path, m math32.Matrix2, off math32.Vector2, factor int) bool {
++	if len(p) > sceneMaxItems || !w.take(len(p)) {
++		return false
++	}
++	var bounds math32.Box2
++	points := 0
++	for i := 0; i < len(p); {
++		cmd := p[i]
++		var n int
++		switch cmd {
++		case ppath.MoveTo, ppath.LineTo, ppath.Close:
++			n = 4
++		case ppath.QuadTo:
++			n = 6
++		case ppath.CubeTo:
++			n = 8
++		default:
++			return false
++		}
++		if i+n > len(p) || p[i+n-1] != cmd || (i == 0 && cmd != ppath.MoveTo) {
++			return false
++		}
++		for j := i + 1; j < i+n-1; j += 2 {
++			v := math32.Vec2(p[j], p[j+1])
++			q := m.MulPoint(v).Add(off)
++			if !scenePoint(v) || !scenePoint(q) {
++				return false
++			}
++			if points == 0 {
++				bounds = math32.Box2{Min: q, Max: q}
++			} else {
++				bounds.ExpandByPoint(q)
++			}
++			points++
++		}
++		i += n
++	}
++	// Curve/stroke preparation is bounded even for paths mostly outside the clip.
++	return w.product(points, factor*(1+int(bounds.Size().X)+int(bounds.Size().Y)))
++}
++func sceneOutlineFont(face *font.Face) bool { return face.SupportsBoundedOutlines() }
++func (w *sceneWorkBudget) text(x *render.Text) bool {
++	if x == nil || x.Text == nil || !sceneContextFinite(&x.Context) || !scenePoint(x.Position) || !scenePoint(x.Text.Offset) {
++		return false
++	}
++	lns := x.Text
++	if _, ok := sceneplan.Color(image.NewUniform(lns.Color)); !ok {
++		return false
++	}
++	if !sceneColorOK(lns.SelectionColor) || !sceneColorOK(lns.HighlightColor) || len(lns.Lines) > sceneMaxItems || !w.take(len(lns.Lines)) {
++		return false
++	}
++	var cells []shaped.Cell
++	if x.Geometry != nil {
++		cells = x.Geometry.Cells
++		if len(cells) > sceneMaxItems || len(x.Geometry.Carets) > sceneMaxItems || len(x.Geometry.Lines) > sceneMaxItems || !w.take(len(cells)+len(x.Geometry.Carets)+len(x.Geometry.Lines)) {
++			return false
++		}
++		last := -1
++		for _, c := range cells {
++			if c.Line < last || c.Line < 0 || c.Line >= len(lns.Lines) || !sceneRanges([]textpos.Range{c.Range}) || !sceneBox(c.Rect, x.Context.Cumulative, x.Position) {
++				return false
++			}
++			last = c.Line
++		}
++	}
++	cellAt := 0
++	for li := range lns.Lines {
++		ln := &lns.Lines[li]
++		ranges := len(ln.Selections) + len(ln.Highlights)
++		if len(ln.Runs) > sceneMaxItems || ranges > sceneMaxItems || !w.take(len(ln.Runs)+ranges) || !sceneRanges(ln.Selections) || !sceneRanges(ln.Highlights) {
++			return false
++		}
++		off := x.Position.Add(lns.Offset).Add(ln.Offset)
++		if !scenePoint(off) || !sceneBox(ln.Bounds, x.Context.Cumulative, off) {
++			return false
++		}
++		start := cellAt
++		for cellAt < len(cells) && cells[cellAt].Line == li {
++			cellAt++
++		}
++		if !w.product(cellAt-start, ranges) {
++			return false
++		}
++		for _, raw := range ln.Runs {
++			run, ok := raw.(*shapedgt.Run)
++			if !ok || run == nil || !sceneColorOK(run.Background) || !sceneColorOK(run.FillColor) || !sceneColorOK(run.StrokeColor) || !sceneBox(run.MaxBounds, x.Context.Cumulative, off) || len(run.Glyphs) > sceneMaxItems || !w.take(len(run.Glyphs)) {
++				return false
++			}
++			if run.Output.Runes.Offset < 0 || run.Output.Runes.Count < 0 || run.Output.Runes.Offset > 1<<30-run.Output.Runes.Count {
++				return false
++			}
++			if !sceneScalar(math32.FromFixed(run.Size)) || run.Size < 0 || !sceneScalar(run.Advance()) {
++				return false
++			}
++			if run.Math.Path != nil {
++				if !w.path(run.Math.Path, x.Context.Cumulative, off, 1) {
++					return false
++				}
++			} else if len(run.Glyphs) > 0 && !sceneOutlineFont(run.Face) {
++				return false
++			}
++			if (run.Math.Path != nil || run.Direction.IsVertical()) && !w.product(len(run.Glyphs), ranges) {
++				return false
++			}
++			glyphOff := off
++			// The renderer applies super/sub baseline offsets after the run background.
++			sty := run.Font.Style(&x.Context.Style.Text)
++			if sty.Special == rich.Super {
++				glyphOff.Y -= .25 * math32.FromFixed(run.Size)
++			} // rich.Super
++			if sty.Special == rich.Sub {
++				glyphOff.Y += .14 * math32.FromFixed(run.Size)
++			} // rich.Sub
++			for _, g := range run.Glyphs {
++				for _, v := range []float32{math32.FromFixed(g.XOffset), math32.FromFixed(g.YOffset), math32.FromFixed(g.XBearing), math32.FromFixed(g.YBearing), math32.FromFixed(g.Width), math32.FromFixed(g.Height), math32.FromFixed(g.Advance)} {
++					if !sceneScalar(v) {
++						return false
++					}
++				}
++				pos := glyphOff.Add(math32.Vec2(math32.FromFixed(g.XOffset), -math32.FromFixed(g.YOffset)))
++				if !scenePoint(pos) || !scenePoint(x.Context.Cumulative.MulPoint(pos)) || !sceneBox(run.GlyphBoundsBox(&g), x.Context.Cumulative, glyphOff) {
++					return false
++				}
++				if run.Direction.IsVertical() {
++					glyphOff.Y -= math32.FromFixed(g.Advance)
++				} else {
++					glyphOff.X += math32.FromFixed(g.Advance)
++				}
++				if !scenePoint(glyphOff) {
++					return false
++				}
++			}
++			if run.Direction.IsVertical() {
++				off.Y += run.Advance()
++			} else {
++				off.X += run.Advance()
++			}
++			if !scenePoint(off) {
++				return false
++			}
++		}
++	}
++	return true
++}
++func (rs *Renderer) recordingFailed() bool {
++	return (rs.scrollRecord != nil && rs.scrollRecord.failed) || (rs.sceneRecord != nil && rs.sceneRecord.Failed())
++}
++func (rs *Renderer) sceneTakeWork(n int) bool {
++	if rs.sceneRecord == nil {
++		return true
++	}
++	if rs.sceneRecord.Failed() || !rs.sceneWork.take(n) {
++		rs.sceneRecord.Refuse()
++		return false
++	}
++	return true
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/scene_packet_test.go
+@@ -0,0 +1,294 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"bytes"
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/ppath"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++	"cogentcore.org/core/text/textpos"
++	"github.com/go-text/typesetting/font"
++	"github.com/go-text/typesetting/font/opentype"
++	"github.com/go-text/typesetting/shaping"
++	"image"
++	"image/color"
++	"image/draw"
++	"io/fs"
++	"math"
++	"testing"
++)
++
++func TestVellumScenePacketMissingSpanSourceRefuses(t *testing.T) {
++	for _, source := range []image.Image{nil, (*image.Uniform)(nil), image.NewRGBA(image.Rect(0, 0, 2, 2))} {
++		b := sceneplan.New(image.Rect(0, 0, 8, 8))
++		s := &sceneSpanner{builder: b, source: source, op: int(draw.Over)}
++		s.GetSpanFunc()(0, 0, 8, 65535)
++		if !b.Failed() || b.Seal(false) != nil {
++			t.Fatal("missing or nonuniform scanner source admitted", source)
++		}
++	}
++}
++
++func TestVellumScenePacketActualPathCoverageParity(t *testing.T) {
++	for _, height := range []int{64, 1152} {
++		for _, scene := range vellumOwnedPathScenes(height) {
++			rs := New(math32.Vec2(96, float32(height))).(*Renderer)
++			got := image.NewRGBA(rs.image.Rect)
++			draw.Draw(got, got.Rect, image.NewUniform(color.RGBA{13, 22, 31, 91}), image.Point{}, draw.Src)
++			copy(rs.image.Pix, got.Pix)
++			packet := rs.ScenePacket(scene.items)
++			if packet == nil {
++				t.Fatal("standard path scene refused", scene.name, height)
++			}
++			if _, ok := packet.Encode(); !ok {
++				t.Fatal("standard path packet encoding refused", scene.name, height)
++			}
++			if !packet.Replay(got) {
++				t.Fatal("replay refused")
++			}
++			rs.Render(scene.items)
++			if !bytes.Equal(got.Pix, rs.image.Pix) {
++				t.Fatal("exact original path/stroke/clip pixels differ", scene.name, height)
++			}
++		}
++	}
++}
++
++type sceneHookImage struct{ calls *int }
++
++func (s sceneHookImage) ColorModel() color.Model { *s.calls++; return color.RGBAModel }
++func (s sceneHookImage) Bounds() image.Rectangle { *s.calls++; return image.Rect(0, 0, 20, 20) }
++func (s sceneHookImage) At(int, int) color.Color { *s.calls++; return color.White }
++func TestVellumScenePacketRefusalLeavesOriginalState(t *testing.T) {
++	rs := New(math32.Vec2(64, 64)).(*Renderer)
++	calls := 0
++	rs.Scanner.SetWinding(false)
++	rs.Scanner.SetClip(image.Rect(2, 3, 41, 42))
++	before := append([]byte(nil), rs.image.Pix...)
++	commands := append(render.Render(nil), vellumOwnedPathScenes(64)[0].items...)
++	commands = append(commands, &pimage.Params{Cmd: pimage.Draw, Rect: image.Rect(0, 0, 20, 20), Source: sceneHookImage{&calls}})
++	if rs.ScenePacket(commands) != nil || calls != 0 || rs.Scanner.UseNonZeroWinding || !bytes.Equal(before, rs.image.Pix) {
++		t.Fatal("refused source changed caller state or invoked custom hook")
++	}
++	alias := rs.image.SubImage(image.Rect(3, 3, 9, 9))
++	if rs.ScenePacket(render.Render{pimage.NewDraw(image.Rect(4, 4, 10, 10), alias, nil, image.Pt(3, 3), draw.Src)}) != nil {
++		t.Fatal("destination subimage self-blit admitted")
++	}
++	clear := &pimage.Params{Cmd: pimage.Draw, Source: image.NewUniform(color.RGBA{13, 22, 31, 255}), Op: draw.Src}
++	packet := rs.ScenePacket(render.Render{clear})
++	if packet == nil || !packet.Independent() || clear.Rect != (image.Rectangle{}) {
++		t.Fatal("complete reset proof/immutable params missing")
++	}
++}
++
++func TestVellumScenePacketInitialWinding(t *testing.T) {
++	rs := New(math32.Vec2(32, 32)).(*Renderer)
++	for _, winding := range []bool{false, true} {
++		rs.Scanner.SetWinding(winding)
++		for _, commands := range []render.Render{nil, {&pimage.Params{Cmd: pimage.Draw, Source: colors.Uniform(color.White), Op: draw.Src}}} {
++			p := rs.ScenePacket(commands)
++			if p == nil || p.Winding() != winding {
++				t.Fatal("captured winding overwritten", winding)
++			}
++		}
++	}
++}
++func vellumSceneText(t *testing.T) *render.Text {
++	t.Helper()
++	shaper := shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default})
++	uc := units.Context{}
++	uc.Defaults()
++	ts := text.NewStyle()
++	ts.FontSize = units.Dot(24)
++	ts.WhiteSpace = text.WrapNever
++	ts.ToDots(&uc)
++	src := rich.NewText(rich.NewStyle(), []rune("Ag é שלום"))
++	runs := shaper.Shape(src, ts)
++	if len(runs) == 0 {
++		t.Fatal("no real shaped text")
++	}
++	lns := &shaped.Lines{Source: src, Color: color.NRGBA{20, 40, 100, 230}, Lines: []shaped.Line{{Runs: runs, Offset: math32.Vec2(0, 30), Selections: []textpos.Range{{Start: 1, End: 5}}}}, SelectionColor: colors.Uniform(color.NRGBA{30, 80, 20, 100})}
++	c := &render.Context{}
++	c.Init(styles.NewPaint(), &render.Bounds{Rect: math32.B2FromRect(image.Rect(0, 0, 240, 80))}, nil)
++	return render.NewText(lns, styles.NewPaint(), c, math32.Vec2(7.25, 2.5))
++}
++func TestVellumScenePacketActualOutlineTextAndIconParity(t *testing.T) {
++	for _, transform := range []math32.Matrix2{math32.Identity2(), math32.Translate2D(2, 1).Scale(.9, .9)} {
++		for replay := 0; replay < 2; replay++ {
++			rs := New(math32.Vec2(240, 80)).(*Renderer)
++			txt := vellumSceneText(t)
++			txt.Context.Cumulative = transform
++			icon := image.NewRGBA(image.Rect(0, 0, 7, 9))
++			draw.Draw(icon, icon.Bounds(), colors.Uniform(color.NRGBA{180, 20, 30, 180}), image.Point{}, draw.Src)
++			commands := render.Render{txt, pimage.NewDraw(image.Rect(200, 10, 207, 19), icon, nil, image.Point{}, draw.Over)}
++			p := rs.ScenePacket(commands)
++			if p == nil {
++				t.Fatal("default outline text or RGBA icon refused", transform, replay)
++			}
++			got := image.NewRGBA(rs.image.Bounds())
++			if !p.Replay(got) {
++				t.Fatal("replay failed")
++			}
++			rs.Render(commands)
++			if !bytes.Equal(got.Pix, rs.image.Pix) || vellumOwnedNonzero(got.Pix) == 0 {
++				t.Fatal("text/selection/icon exact pixels differ", transform, replay)
++			}
++		}
++	}
++}
++func TestVellumScenePacketAggregateAndFinitePreflight(t *testing.T) {
++	rs := New(math32.Vec2(240, 80)).(*Renderer)
++	cases := map[string]render.Render{}
++	path := ppath.New().Rectangle(0, 0, 100, 100)
++	item := vellumOwnedPathItem(path, image.Rect(0, 0, 240, 80), math32.Identity2(), color.Black, nil, ppath.NonZero, false)
++	cases["aggregate-path"] = make(render.Render, 10000)
++	for i := range cases["aggregate-path"] {
++		cases["aggregate-path"][i] = item
++	}
++	malformed := *item
++	malformed.Path = ppath.Path{ppath.MoveTo, 1, 1, ppath.MoveTo, ppath.CubeTo, 2}
++	cases["malformed-path"] = render.Render{&malformed}
++	huge := *item
++	huge.Context.Cumulative = math32.Scale2D(1<<16, 1<<16)
++	cases["transformed-path"] = render.Render{&huge}
++	tinyDash := *item
++	tinyDash.Context.Style = *styles.NewPaint()
++	tinyDash.Context.Style.Stroke.Dashes = []float32{1e-8, 1e-8}
++	cases["unbounded-dash"] = render.Render{&tinyDash}
++	scaledDash := *item
++	scaledDash.Context.Cumulative = math32.Scale2D(1e-6, 1e-6)
++	scaledDash.Context.Style.Stroke.Dashes = []float32{2, 2}
++	cases["transformed-tiny-dash"] = render.Render{&scaledDash}
++	miter := *item
++	miter.Context.Style.Stroke.Width.Dots = 100
++	miter.Context.Style.Stroke.MiterLimit = 1 << 20
++	cases["miter-product"] = render.Render{&miter}
++	txt := vellumSceneText(t)
++	txt.Position.X = float32(math.Inf(1))
++	cases["position"] = render.Render{txt}
++	txt = vellumSceneText(t)
++	txt.Text.Lines[0].Offset.Y = float32(math.NaN())
++	cases["line-offset"] = render.Render{txt}
++	txt = vellumSceneText(t)
++	r := *txt.Text.Lines[0].Runs[0].(*shapedgt.Run)
++	r.Math.Path = make(ppath.Path, sceneMaxItems+1)
++	txt.Text.Lines[0].Runs = []shaped.Run{&r}
++	cases["math-path"] = render.Render{txt}
++	txt = vellumSceneText(t)
++	txt.Text.Lines[0].Selections = make([]textpos.Range, 4096)
++	for i := range txt.Text.Lines[0].Selections {
++		txt.Text.Lines[0].Selections[i] = textpos.Range{Start: 0, End: 1}
++	}
++	txt.Geometry = &shaped.Interaction{Cells: make([]shaped.Cell, 4096)}
++	for i := range txt.Geometry.Cells {
++		txt.Geometry.Cells[i] = shaped.Cell{Range: textpos.Range{Start: 0, End: 1}, Line: 0}
++	}
++	cases["selection-product"] = render.Render{txt}
++	txt = vellumSceneText(t)
++	txt.Text.Lines = make([]shaped.Line, sceneMaxItems+1)
++	cases["line-count"] = render.Render{txt}
++	txt = vellumSceneText(t)
++	r = *txt.Text.Lines[0].Runs[0].(*shapedgt.Run)
++	r.Glyphs = make([]shaping.Glyph, sceneMaxItems+1)
++	txt.Text.Lines[0].Runs = []shaped.Run{&r}
++	cases["glyph-count"] = render.Render{txt}
++	for name, commands := range cases {
++		t.Run(name, func(t *testing.T) {
++			if rs.ScenePacket(commands) != nil {
++				t.Fatal("unsafe aggregate/source admitted")
++			}
++		})
++	}
++	calls := 0
++	txt = vellumSceneText(t)
++	txt.Text.SelectionColor = sceneHookImage{&calls}
++	if rs.ScenePacket(render.Render{item, txt}) != nil || calls != 0 {
++		t.Fatal("selection callback invoked before complete preflight")
++	}
++}
++func TestVellumScenePacketFailureStopsTextResources(t *testing.T) {
++	b := sceneplan.New(image.Rect(0, 0, 64, 64))
++	rs := &Renderer{sceneRecord: b, sceneWork: &sceneWorkBudget{remaining: sceneMaxWork, outlines: font.NewGlyphOutlineBudget(1024, 1024)}}
++	sp := &sceneSpanner{builder: b, op: int(draw.Over)}
++	rs.Scanner = scan.NewScannerWithRowTracking(sp, 64, 64)
++	rs.Raster = NewDasher(64, 64, rs.Scanner)
++	ctx := &render.Context{}
++	ctx.Init(styles.NewPaint(), &render.Bounds{Rect: math32.B2FromRect(image.Rect(0, 0, 64, 64))}, nil)
++	calls := 0
++	run := &shapedgt.Run{}
++	run.Background = sceneHookImage{&calls}
++	run.MaxBounds = math32.Box2{Max: math32.Vec2(20, 20)}
++	lns := &shaped.Lines{Lines: []shaped.Line{{Runs: []shaped.Run{run, (*shapedgt.Run)(nil)}}}, Color: color.Black}
++	rs.TextLinesWithGeometry(ctx, lns, math32.Vector2{}, nil)
++	if !b.Failed() || calls != 0 {
++		t.Fatal("failed background did not stop next nil run or called source hook")
++	}
++	// Already-failed entry points must not touch invalid downstream arguments.
++	rs.TextLines(nil, nil, math32.Vector2{})
++	rs.TextRun(nil, nil, nil, nil, nil, math32.Vector2{}, false)
++	beforeBitmap, beforeSVG := len(bitmapGlyphCache), len(svgGlyphCache)
++	b2 := sceneplan.New(image.Rect(0, 0, 64, 64))
++	rs.sceneRecord = b2
++	rs.GlyphBitmap(nil, nil, nil, font.GlyphBitmap{}, nil, nil, math32.Box2{}, math32.Vector2{}, false)
++	if !b2.Failed() || len(bitmapGlyphCache) != beforeBitmap {
++		t.Fatal("bitmap capture allocated before refusal")
++	}
++	b3 := sceneplan.New(image.Rect(0, 0, 64, 64))
++	rs.sceneRecord = b3
++	rs.GlyphSVG(nil, nil, nil, []byte("invalid"), math32.Box2{}, math32.Vector2{}, false)
++	if !b3.Failed() || len(svgGlyphCache) != beforeSVG {
++		t.Fatal("SVG capture decoded before refusal")
++	}
++}
++
++func TestVellumScenePacketMathAndOutlineWorkBounds(t *testing.T) {
++	rs := New(math32.Vec2(240, 80)).(*Renderer)
++	txt := vellumSceneText(t)
++	run := *txt.Text.Lines[0].Runs[0].(*shapedgt.Run)
++	run.Math.Path = *ppath.New().Rectangle(5, 6, 18, 13)
++	run.Glyphs = nil
++	txt.Text.Lines[0].Selections = nil
++	txt.Text.Lines[0].Runs = []shaped.Run{&run}
++	txt.Geometry = nil
++	p := rs.ScenePacket(render.Render{txt})
++	if p == nil {
++		t.Fatal("bounded ordinary math path refused")
++	}
++	got := image.NewRGBA(rs.image.Bounds())
++	if !p.Replay(got) {
++		t.Fatal("math replay failed")
++	}
++	rs.Render(render.Render{txt})
++	if !bytes.Equal(got.Pix, rs.image.Pix) || vellumOwnedNonzero(got.Pix) == 0 {
++		t.Fatal("math path replay pixels differ")
++	}
++	realRun := vellumSceneText(t).Text.Lines[0].Runs[0].(*shapedgt.Run)
++	glyph := &realRun.Glyphs[0]
++	outline := font.GlyphOutline{Segments: []font.Segment{{Op: opentype.SegmentOpMoveTo, Args: [3]font.SegmentPoint{{X: float32(math.NaN())}}}}}
++	b := sceneplan.New(rs.image.Bounds())
++	capture := &Renderer{sceneRecord: b, sceneWork: &sceneWorkBudget{remaining: sceneMaxWork}}
++	before := theGlyphCache.CacheSize()
++	capture.GlyphOutline(&txt.Context, realRun, glyph, outline, colors.Uniform(color.Black), nil, math32.Box2{}, math32.Vector2{}, true)
++	if !b.Failed() || theGlyphCache.CacheSize() != before || len(capture.Path) != 0 {
++		t.Fatal("nonfinite outline reached cache/scanner")
++	}
++	b = sceneplan.New(rs.image.Bounds())
++	capture.sceneRecord = b
++	outline.Segments = make([]font.Segment, sceneMaxItems+1)
++	capture.GlyphOutline(&txt.Context, realRun, glyph, outline, colors.Uniform(color.Black), nil, math32.Box2{}, math32.Vector2{}, true)
++	if !b.Failed() || theGlyphCache.CacheSize() != before || len(capture.Path) != 0 {
++		t.Fatal("oversized outline reached cache/scanner")
++	}
++}
+--- a/paint/renderers/rasterx/text.go
++++ b/paint/renderers/rasterx/text.go
+@@ -29,6 +29,9 @@
+ 
+ // RenderText rasterizes the given Text
+ func (rs *Renderer) RenderText(txt *render.Text) {
++	if rs.recordingFailed() {
++		return
++	}
+ 	// pr := profile.Start("RenderText")
+ 	rs.TextLinesWithGeometry(&txt.Context, txt.Text, txt.Position, txt.Geometry)
+ 	// pr.End()
+@@ -38,11 +41,20 @@
+ // The text will be drawn starting at the start pixel position, which specifies the
+ // left baseline location of the first text item..
+ func (rs *Renderer) TextLines(ctx *render.Context, lns *shaped.Lines, pos math32.Vector2) {
++	if rs.recordingFailed() {
++		return
++	}
+ 	// Direct callers have no render item. Capture once here; normal replay uses
+ 	// geometry published by NewText/NewTextWithGeometry on the UI owner.
+ 	var geometry *shaped.Interaction
+ 	for _, ln := range lns.Lines {
+ 		if len(ln.Selections) > 0 || len(ln.Highlights) > 0 {
++			// Packet replay requires owner-published bounded geometry; never
++			// synthesize grapheme/layout work from arbitrary source text here.
++			if rs.sceneRecord != nil {
++				rs.sceneRecord.Refuse()
++				return
++			}
+ 			geometry = lns.InteractionLayout()
+ 			break
+ 		}
+@@ -50,6 +62,9 @@
+ 	rs.TextLinesWithGeometry(ctx, lns, pos, geometry)
+ }
+ func (rs *Renderer) TextLinesWithGeometry(ctx *render.Context, lns *shaped.Lines, pos math32.Vector2, geometry *shaped.Interaction) {
++	if rs.recordingFailed() {
++		return
++	}
+ 	m := ctx.Cumulative
+ 	identity := m == math32.Identity2()
+ 	off := pos.Add(lns.Offset)
+@@ -59,7 +74,7 @@
+ 	clr := colors.Uniform(lns.Color)
+ 	cellIndex := 0
+ 	for li := range lns.Lines {
+-		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++		if rs.recordingFailed() {
+ 			return
+ 		}
+ 		var cells []shaped.Cell
+@@ -77,12 +92,15 @@
+ 
+ // TextLine rasterizes the given shaped.Line.
+ func (rs *Renderer) TextLine(ctx *render.Context, ln *shaped.Line, lns *shaped.Lines, clr image.Image, off math32.Vector2, identity bool, cells []shaped.Cell, origin math32.Vector2) {
++	if rs.recordingFailed() {
++		return
++	}
+ 	start := off.Add(ln.Offset)
+ 	off = start
+ 	// tbb := ln.Bounds.Translate(off)
+ 	// rs.StrokeBounds(ctx, tbb, colors.Blue)
+ 	for ri := range ln.Runs {
+-		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++		if rs.recordingFailed() {
+ 			return
+ 		}
+ 		run := ln.Runs[ri].(*shapedgt.Run)
+@@ -104,7 +122,7 @@
+ 	rs.TextRegionFill(ctx, cells, origin, lns.SelectionColor, ln.Selections)
+ 	off = start
+ 	for ri := range ln.Runs {
+-		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++		if rs.recordingFailed() {
+ 			return
+ 		}
+ 		run := ln.Runs[ri].(*shapedgt.Run)
+@@ -175,11 +193,11 @@
+ 
+ // TextRegionFill fills selected advance fragments and avoids offscreen raster work.
+ func (rs *Renderer) TextRegionFill(ctx *render.Context, cells []shaped.Cell, origin math32.Vector2, fill image.Image, ranges []textpos.Range) {
+-	if fill == nil || len(ranges) == 0 {
++	if rs.recordingFailed() || fill == nil || len(ranges) == 0 {
+ 		return
+ 	}
+ 	for _, box := range textRegionRects(cells, ranges) {
+-		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++		if rs.recordingFailed() {
+ 			return
+ 		}
+ 		box = box.Translate(origin)
+@@ -197,10 +215,13 @@
+ 
+ // TextLegacyRegionFill retains the earlier renderer behavior for vertical/math runs.
+ func (rs *Renderer) TextLegacyRegionFill(ctx *render.Context, run *shapedgt.Run, off math32.Vector2, fill image.Image, ranges []textpos.Range) {
+-	if fill == nil {
++	if rs.recordingFailed() || fill == nil {
+ 		return
+ 	}
+ 	for _, sel := range ranges {
++		if rs.recordingFailed() {
++			return
++		}
+ 		selected := sel.Intersect(run.Runes())
+ 		if selected.Len() == 0 {
+ 			continue
+@@ -216,6 +237,9 @@
+ // font face set in the shaping.
+ // The text will be drawn starting at the start pixel position.
+ func (rs *Renderer) TextRun(ctx *render.Context, run *shapedgt.Run, ln *shaped.Line, lns *shaped.Lines, clr image.Image, off math32.Vector2, identity bool) {
++	if rs.recordingFailed() {
++		return
++	}
+ 	// dir := run.Direction
+ 	rbb := run.MaxBounds.Translate(off)
+ 	fill := clr
+@@ -267,14 +291,24 @@
+ 	}
+ 
+ 	for gi := range run.Glyphs {
+-		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++		if rs.recordingFailed() {
+ 			return
+ 		}
+ 		g := &run.Glyphs[gi]
+ 		pos := off.Add(math32.Vec2(math32.FromFixed(g.XOffset), -math32.FromFixed(g.YOffset)))
+ 		bb := run.GlyphBoundsBox(g).Translate(off)
+ 		// rs.StrokeBounds(ctx, bb, colors.Yellow)
+-		if data, ok := run.Face.GlyphDataSVG(g.GlyphID); ok {
++		if rs.sceneRecord != nil {
++			if !rs.sceneTakeWork(1) {
++				return
++			}
++			data, ok := run.Face.GlyphDataOutlineBounded(g.GlyphID, rs.sceneWork.outlines)
++			if !ok {
++				rs.sceneRecord.Refuse()
++				return
++			}
++			rs.GlyphOutline(ctx, run, g, data, fill, stroke, bb, pos, identity)
++		} else if data, ok := run.Face.GlyphDataSVG(g.GlyphID); ok {
+ 			rs.GlyphSVG(ctx, run, g, data.Source, bb, pos, identity)
+ 		} else if data, ok := run.Face.GlyphDataBitmap(g.GlyphID); ok {
+ 			rs.GlyphBitmap(ctx, run, g, data, fill, stroke, bb, pos, identity)
+@@ -300,6 +334,9 @@
+ }
+ 
+ func (rs *Renderer) GlyphOutline(ctx *render.Context, run *shapedgt.Run, g *shaping.Glyph, outline font.GlyphOutline, fill, stroke image.Image, bb math32.Box2, pos math32.Vector2, identity bool) {
++	if rs.recordingFailed() {
++		return
++	}
+ 	scale := math32.FromFixed(run.Size) / float32(run.Face.Upem())
+ 	x := pos.X // note: has offsets already added
+ 	y := pos.Y
+@@ -321,6 +358,48 @@
+ 		rs.scrollRecord.failed = true
+ 		return
+ 	}
++	if rs.sceneRecord != nil {
++		if len(outline.Segments) > sceneMaxItems || !rs.sceneTakeWork(len(outline.Segments)) {
++			rs.sceneRecord.Refuse()
++			return
++		}
++		// Validate transformed outline coordinates before cache or scanner work.
++		var bounds math32.Box2
++		points := 0
++		for _, segment := range outline.Segments {
++			var n int
++			switch segment.Op {
++			case opentype.SegmentOpMoveTo, opentype.SegmentOpLineTo:
++				n = 1
++			case opentype.SegmentOpQuadTo:
++				n = 2
++			case opentype.SegmentOpCubeTo:
++				n = 3
++			default:
++				rs.sceneRecord.Refuse()
++				return
++			}
++			for _, arg := range segment.Args[:n] {
++				p := math32.Vec2(arg.X*scale+x, -arg.Y*scale+y)
++				q := ctx.Cumulative.MulPoint(p)
++				if points == 0 {
++					bounds = math32.Box2{Min: q, Max: q}
++				} else {
++					bounds.ExpandByPoint(q)
++				}
++				points++
++				if !scenePoint(p) || !scenePoint(ctx.Cumulative.MulPoint(p)) {
++					rs.sceneRecord.Refuse()
++					return
++				}
++			}
++		}
++		extent := 1 + int(bounds.Size().X) + int(bounds.Size().Y)
++		if !rs.sceneWork.product(len(outline.Segments), extent) {
++			rs.sceneRecord.Refuse()
++			return
++		}
++	}
+ 	if UseGlyphCache && identity && stroke == nil {
+ 		mask, pi := theGlyphCache.Glyph(run.Face, g, outline, scale, pos)
+ 		if mask != nil {
+@@ -332,6 +411,9 @@
+ 	rs.Path.Clear()
+ 	m := ctx.Cumulative
+ 	for _, s := range outline.Segments {
++		if rs.recordingFailed() {
++			return
++		}
+ 		p0 := m.MulPoint(math32.Vec2(s.Args[0].X*scale+x, -s.Args[0].Y*scale+y))
+ 		switch s.Op {
+ 		case opentype.SegmentOpMoveTo:
+@@ -378,8 +460,21 @@
+ }
+ 
+ func (rs *Renderer) GlyphMask(ctx *render.Context, run *shapedgt.Run, g *shaping.Glyph, fill, stroke image.Image, bb math32.Box2, pos image.Point, mask *image.Alpha) error {
++	if rs.recordingFailed() {
++		return nil
++	}
+ 	if rs.scrollRecord != nil {
+ 		rs.scrollRecord.addMask(mask, pos, ctx.Bounds.Rect.ToRect(), fill)
++		return nil
++	}
++	if rs.sceneRecord != nil {
++		dbb := mask.Bounds().Add(pos)
++		ibb := dbb.Intersect(ctx.Bounds.Rect.ToRect())
++		if !ibb.Empty() {
++			// Match the original GlyphMask mask position, including its unusual
++			// nonzero-origin behavior, before the owned builder clips it.
++			rs.sceneRecord.Draw(ibb, fill, image.Point{}, mask, ibb.Min.Sub(dbb.Min), draw.Over)
++		}
+ 		return nil
+ 	}
+ 	mbb := mask.Bounds()
+@@ -413,10 +508,19 @@
+ 
+ // StrokeTextLine strokes a line for text decoration.
+ func (rs *Renderer) StrokeTextLine(ctx *render.Context, sp, ep math32.Vector2, width float32, clr image.Image, dash []float32) {
++	if rs.recordingFailed() {
++		return
++	}
+ 	m := ctx.Cumulative
+ 	sp = m.MulPoint(sp)
+ 	ep = m.MulPoint(ep)
+ 	width *= MeanScale(m)
++	if rs.sceneRecord != nil {
++		if !scenePoint(sp) || !scenePoint(ep) || !sceneScalar(width) || !sceneColorOK(clr) || !rs.sceneTakeWork(1+int(math32.Abs(ep.X-sp.X))+int(math32.Abs(ep.Y-sp.Y))) {
++			rs.sceneRecord.Refuse()
++			return
++		}
++	}
+ 	rs.Raster.SetStroke(
+ 		math32.ToFixed(width),
+ 		math32.ToFixed(10),
+@@ -432,6 +536,19 @@
+ 
+ // FillBounds fills a bounding box in the given color.
+ func (rs *Renderer) FillBounds(ctx *render.Context, bb math32.Box2, clr image.Image) {
++	if rs.recordingFailed() {
++		return
++	}
++	if rs.sceneRecord != nil {
++		if !sceneBox(bb, ctx.Cumulative, math32.Vector2{}) || !sceneColorOK(clr) {
++			rs.sceneRecord.Refuse()
++			return
++		}
++		a, b := ctx.Cumulative.MulPoint(bb.Min), ctx.Cumulative.MulPoint(bb.Max)
++		if !rs.sceneTakeWork(4 * (1 + int(math32.Abs(b.X-a.X)) + int(math32.Abs(b.Y-a.Y)))) {
++			return
++		}
++	}
+ 	if rs.scrollRecord != nil {
+ 		var path Path
+ 		m := ctx.Cumulative
+--- a/paint/renderers/rasterx/textbitmap.go
++++ b/paint/renderers/rasterx/textbitmap.go
+@@ -22,6 +22,12 @@
+ var bitmapGlyphCache map[glyphKey]*image.RGBA
+ 
+ func (rs *Renderer) GlyphBitmap(ctx *render.Context, run *shapedgt.Run, g *shaping.Glyph, bitmap font.GlyphBitmap, fill, stroke image.Image, bb math32.Box2, pos math32.Vector2, identity bool) error {
++	// Scene capture has no bounded encoded-font decoder. Refuse before any
++	// cache construction, decoding or image allocation; CPU behavior is unchanged.
++	if rs.sceneRecord != nil {
++		rs.sceneRecord.Refuse()
++		return nil
++	}
+ 	if rs.scrollRecord != nil {
+ 		rs.scrollRecord.failed = true
+ 		return nil
+@@ -69,7 +75,11 @@
+ 	}
+ 
+ 	sp := ibb.Min.Sub(dbb.Min)
+-	draw.Draw(rs.image, ibb, img, sp, draw.Over)
++	if rs.sceneRecord != nil {
++		rs.sceneRecord.Draw(ibb, img, sp, nil, image.Point{}, draw.Over)
++	} else {
++		draw.Draw(rs.image, ibb, img, sp, draw.Over)
++	}
+ 
+ 	if bitmap.Outline != nil {
+ 		rs.GlyphOutline(ctx, run, g, *bitmap.Outline, fill, stroke, bb, pos, identity)
+--- a/paint/renderers/rasterx/textsvg.go
++++ b/paint/renderers/rasterx/textsvg.go
+@@ -22,6 +22,12 @@
+ var svgGlyphCache map[glyphKey]image.Image
+ 
+ func (rs *Renderer) GlyphSVG(ctx *render.Context, run *shapedgt.Run, g *shaping.Glyph, svgCmds []byte, bb math32.Box2, pos math32.Vector2, identity bool) {
++	// Scene capture has no bounded encoded-font decoder. Refuse before any
++	// cache construction, decoding or image allocation; CPU behavior is unchanged.
++	if rs.sceneRecord != nil {
++		rs.sceneRecord.Refuse()
++		return
++	}
+ 	if rs.scrollRecord != nil {
+ 		rs.scrollRecord.failed = true
+ 		return
+@@ -60,5 +66,9 @@
+ 		return
+ 	}
+ 	sp := ibb.Min.Sub(dbb.Min)
+-	draw.Draw(rs.image, ibb, img, sp, draw.Over)
++	if rs.sceneRecord != nil {
++		rs.sceneRecord.Draw(ibb, img, sp, nil, image.Point{}, draw.Over)
++	} else {
++		draw.Draw(rs.image, ibb, img, sp, draw.Over)
++	}
+ }
+--- /dev/null
++++ b/paint/renderers/sceneplan/builder.go
+@@ -0,0 +1,296 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"unsafe"
++)
++
++// Builder is an originating-render-context-only construction object. Seal drops
++// every borrowed lookup; retained packets hold only copied value colors/bytes.
++type Builder struct {
++	packet Packet
++	failed bool
++	masks  map[*image.Alpha]*image.Alpha
++	stream *operation
++}
++
++func New(bounds image.Rectangle) *Builder {
++	b := &Builder{packet: Packet{bounds: bounds, bytes: int(unsafe.Sizeof(Packet{}))}}
++	if bounds.Min != (image.Point{}) || bounds.Empty() || bounds.Dx() > MaxDimension || bounds.Dy() > MaxDimension || bounds.Dx()*bounds.Dy() > MaxPixels {
++		b.failed = true
++	}
++	return b
++}
++func (b *Builder) Failed() bool { return b.failed }
++func (b *Builder) Refuse()      { b.failed = true }
++func (b *Builder) reserve(n int) bool {
++	if b.failed || n < 0 || n > MaxBytes-b.packet.bytes {
++		b.failed = true
++		return false
++	}
++	b.packet.bytes += n
++	return true
++}
++func Color(source image.Image) ([4]uint32, bool) {
++	var out [4]uint32
++	u, ok := source.(*image.Uniform)
++	if !ok || u == nil {
++		return out, false
++	}
++	switch u.C.(type) {
++	case color.RGBA, color.RGBA64, color.NRGBA, color.NRGBA64, color.Alpha, color.Alpha16, color.Gray, color.Gray16:
++	default:
++		return out, false
++	}
++	out[0], out[1], out[2], out[3] = u.C.RGBA()
++	return out, true
++}
++func (b *Builder) add(o operation) {
++	if b.failed || o.rect.Empty() {
++		return
++	}
++	if len(b.packet.ops) == MaxOps || !b.reserve(int(unsafe.Sizeof(operation{}))) {
++		b.failed = true
++		return
++	}
++	if len(b.packet.ops) == 0 && o.rect == b.packet.bounds && (o.kind == Uniform && (o.op == draw.Src || o.color[3] == 65535)) {
++		b.packet.independent = true
++	}
++	b.packet.ops = append(b.packet.ops, o)
++}
++func (b *Builder) flush() {
++	if b.stream == nil {
++		return
++	}
++	o := *b.stream
++	b.stream = nil
++	if o.rect.Empty() {
++		return
++	}
++	b.packet.bytes -= (len(o.rows) - o.rect.Dy()) * int(unsafe.Sizeof([]span{}))
++	o.rows = o.rows[o.rect.Min.Y:o.rect.Max.Y]
++	// Compact each row to exactly its retained capacity; replacement transients
++	// and the construction row index are accounted separately from owned packets.
++	exact := make([][]span, len(o.rows))
++	for i, row := range o.rows {
++		exact[i] = make([]span, len(row))
++		copy(exact[i], row)
++	}
++	o.rows = exact
++	b.add(o)
++}
++func (b *Builder) BeginSpans(c color.RGBA, op draw.Op) {
++	b.flush()
++	if b.failed {
++		return
++	}
++	if op != draw.Src && op != draw.Over {
++		b.Refuse()
++		return
++	}
++	r, g, bl, a := c.RGBA()
++	if !b.reserve(b.packet.bounds.Dy() * int(unsafe.Sizeof([]span{}))) {
++		return
++	}
++	b.stream = &operation{kind: Spans, op: op, color: [4]uint32{r, g, bl, a}, rows: make([][]span, b.packet.bounds.Dy())}
++}
++func (b *Builder) Span(y, x0, x1 int, alpha uint32) {
++	if b.failed || b.stream == nil {
++		return
++	}
++	if alpha > 65535 {
++		b.failed = true
++		return
++	}
++	if y < 0 || y >= b.packet.bounds.Dy() {
++		return
++	}
++	x0 = max(0, x0)
++	x1 = min(b.packet.bounds.Dx(), x1)
++	if x0 >= x1 || alpha == 0 && b.stream.op == draw.Over {
++		return
++	}
++	if !b.reserve(int(unsafe.Sizeof(span{}))) {
++		return
++	}
++	b.stream.rows[y] = append(b.stream.rows[y], span{x0, x1, alpha})
++	r := image.Rect(x0, y, x1, y+1)
++	if b.stream.rect.Empty() {
++		b.stream.rect = r
++	} else {
++		b.stream.rect = b.stream.rect.Union(r)
++	}
++}
++func (b *Builder) ownMask(mask *image.Alpha) *image.Alpha {
++	if mask == nil || !validAlpha(mask) {
++		b.failed = true
++		return nil
++	}
++	r := mask.Bounds()
++	prior := b.masks[mask]
++	if prior != nil && prior.Rect.Size() == r.Size() {
++		same := true
++		for y := 0; y < r.Dy(); y++ {
++			if !bytes.Equal(prior.Pix[y*prior.Stride:][:r.Dx()], mask.Pix[mask.PixOffset(r.Min.X, r.Min.Y+y):][:r.Dx()]) {
++				same = false
++				break
++			}
++		}
++		if same {
++			return prior
++		}
++	}
++	if !b.reserve(r.Dx()*r.Dy() + int(unsafe.Sizeof(image.Alpha{}))) {
++		return nil
++	}
++	own := image.NewAlpha(image.Rectangle{Max: r.Size()})
++	for y := 0; y < r.Dy(); y++ {
++		copy(own.Pix[y*own.Stride:], mask.Pix[mask.PixOffset(r.Min.X, r.Min.Y+y):][:r.Dx()])
++	}
++	if b.masks == nil {
++		b.masks = make(map[*image.Alpha]*image.Alpha)
++	}
++	b.masks[mask] = own
++	return own
++}
++func validRect(r image.Rectangle) bool {
++	return !r.Empty() && r.Dx() <= MaxDimension && r.Dy() <= MaxDimension && r.Min.X >= -1<<20 && r.Min.Y >= -1<<20 && r.Max.X <= 1<<20 && r.Max.Y <= 1<<20
++}
++func validImageLayout(r image.Rectangle, stride, length, bpp int) bool {
++	if !validRect(r) || stride < r.Dx()*bpp || length < r.Dx()*bpp {
++		return false
++	}
++	return r.Dy() == 1 || stride <= (length-r.Dx()*bpp)/(r.Dy()-1)
++}
++func validAlpha(a *image.Alpha) bool { return validImageLayout(a.Rect, a.Stride, len(a.Pix), 1) }
++func validRGBA(a *image.RGBA) bool   { return validImageLayout(a.Rect, a.Stride, len(a.Pix), 4) }
++
++// Known performs no image/color callback. It is also usable for full-source
++// preflight before scanner or glyph-cache work begins.
++func Known(source image.Image) bool {
++	if _, ok := Color(source); ok {
++		return true
++	}
++	switch s := source.(type) {
++	case *image.RGBA:
++		return s != nil && validRGBA(s)
++	case *image.Alpha:
++		return s != nil && validAlpha(s)
++	}
++	return source == nil
++}
++func overlaps(a, b []byte) bool {
++	if len(a) == 0 || len(b) == 0 {
++		return false
++	}
++	ap, bp := uintptr(unsafe.Pointer(unsafe.SliceData(a))), uintptr(unsafe.Pointer(unsafe.SliceData(b)))
++	return ap < bp+uintptr(len(b)) && bp < ap+uintptr(len(a))
++}
++func Aliases(source image.Image, dst *image.RGBA) bool {
++	if dst == nil {
++		return false
++	}
++	switch s := source.(type) {
++	case *image.RGBA:
++		return s != nil && overlaps(s.Pix, dst.Pix)
++	case *image.Alpha:
++		return s != nil && overlaps(s.Pix, dst.Pix)
++	}
++	return false
++}
++
++// Draw preserves image/draw clipping and source/mask positions. Only uniform or
++// RGBA sources and Alpha masks are currently accepted; unknown inputs refuse.
++func (b *Builder) Draw(rect image.Rectangle, source image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
++	b.flush()
++	if sp.X < -1<<20 || sp.X > 1<<20 || sp.Y < -1<<20 || sp.Y > 1<<20 || mp.X < -1<<20 || mp.X > 1<<20 || mp.Y < -1<<20 || mp.Y > 1<<20 {
++		b.failed = true
++		return
++	}
++	if b.failed || (op != draw.Src && op != draw.Over) {
++		b.failed = true
++		return
++	}
++	if source == nil {
++		if mask != nil {
++			b.failed = true
++		}
++		return
++	}
++	if rect == (image.Rectangle{}) {
++		rect = b.packet.bounds
++	}
++	original := rect
++	rect = rect.Intersect(b.packet.bounds)
++	if !validRect(original) {
++		b.failed = true
++		return
++	}
++	c, uniform := Color(source)
++	var rgba *image.RGBA
++	if !uniform {
++		var ok bool
++		rgba, ok = source.(*image.RGBA)
++		if !ok || rgba == nil || !validRGBA(rgba) {
++			b.failed = true
++			return
++		}
++		rect = rect.Intersect(rgba.Rect.Add(original.Min.Sub(sp)))
++	}
++	var alpha *image.Alpha
++	if mask != nil {
++		var ok bool
++		alpha, ok = mask.(*image.Alpha)
++		if !ok || alpha == nil || !validAlpha(alpha) {
++			b.failed = true
++			return
++		}
++		rect = rect.Intersect(alpha.Rect.Add(original.Min.Sub(mp)))
++	}
++	if rect.Empty() {
++		return
++	}
++	o := operation{rect: rect, kind: Uniform, color: c, op: op}
++	if alpha != nil {
++		own := b.ownMask(alpha)
++		if own == nil {
++			return
++		}
++		o.mask = own
++		o.maskPos = mp.Add(rect.Min.Sub(original.Min)).Sub(alpha.Rect.Min)
++		o.kind = Mask
++	}
++	if !uniform {
++		if !b.reserve(rect.Dx()*rect.Dy()*4 + int(unsafe.Sizeof(image.RGBA{}))) {
++			return
++		}
++		own := image.NewRGBA(image.Rectangle{Max: rect.Size()})
++		sourcePoint := sp.Add(rect.Min.Sub(original.Min))
++		for y := 0; y < rect.Dy(); y++ {
++			copy(own.Pix[y*own.Stride:], rgba.Pix[rgba.PixOffset(sourcePoint.X, sourcePoint.Y+y):][:rect.Dx()*4])
++		}
++		o.image = own
++		o.kind = Pixels
++	}
++	b.add(o)
++}
++func (b *Builder) Seal(winding bool) *Packet {
++	b.flush()
++	b.masks = nil
++	if b.failed {
++		return nil
++	}
++	exact := make([]operation, len(b.packet.ops))
++	copy(exact, b.packet.ops)
++	b.packet.ops = exact
++	b.packet.winding = winding
++	packet := b.packet
++	b.packet = Packet{}
++	b.failed = true // construction callbacks cannot mutate the sealed result
++	return &packet
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/packet.go
+@@ -0,0 +1,235 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++// Package sceneplan owns detached, bounded painter-ordered scene operations.
++// It has no GPU, font, widget or application references. CPU replay is the
++// reconstruction path for explicit snapshots and a later unsupported batch.
++package sceneplan
++
++import (
++	"encoding/binary"
++	"image"
++	"image/color"
++	"image/draw"
++)
++
++const (
++	TileSize          = 16
++	MaxDimension      = 8192
++	MaxPixels         = 16 << 20
++	MaxBytes          = 32 << 20
++	MaxOps            = 65536
++	MaxTileReferences = 2 << 20
++	opWords           = 16
++)
++
++// Kind selects the reference renderer's arithmetic, not a GPU blend state.
++const (
++	Uniform uint32 = iota
++	Mask
++	Pixels
++	Spans
++)
++
++type operation struct {
++	rect    image.Rectangle
++	kind    uint32
++	op      draw.Op
++	color   [4]uint32
++	image   *image.RGBA
++	mask    *image.Alpha
++	maskPos image.Point
++	rows    [][]span
++}
++type span struct {
++	x0, x1 int
++	alpha  uint32
++}
++
++type Packet struct {
++	bounds      image.Rectangle
++	ops         []operation
++	bytes       int
++	winding     bool
++	independent bool
++}
++
++func (p *Packet) Bounds() image.Rectangle { return p.bounds }
++func (p *Packet) Bytes() int              { return p.bytes }
++func (p *Packet) Operations() int         { return len(p.ops) }
++func (p *Packet) Winding() bool           { return p.winding }
++
++// Independent means the accepted first operation replaces every target pixel.
++// Nonempty commands alone do not establish a complete frame.
++func (p *Packet) Independent() bool { return p.independent }
++
++// Replay applies this packet to an existing image, preserving partial batches.
++// The image must have the exact packet bounds; no caller callbacks are invoked.
++func (p *Packet) Replay(dst *image.RGBA) bool {
++	if p == nil || dst == nil || dst.Bounds() != p.bounds {
++		return false
++	}
++	for _, o := range p.ops {
++		c := color.RGBA64{uint16(o.color[0]), uint16(o.color[1]), uint16(o.color[2]), uint16(o.color[3])}
++		switch o.kind {
++		case Uniform:
++			draw.Draw(dst, o.rect, image.NewUniform(c), image.Point{}, o.op)
++		case Mask:
++			draw.DrawMask(dst, o.rect, image.NewUniform(c), image.Point{}, o.mask, o.maskPos, o.op)
++		case Pixels:
++			if o.mask == nil {
++				draw.Draw(dst, o.rect, o.image, image.Point{}, o.op)
++			} else {
++				draw.DrawMask(dst, o.rect, o.image, image.Point{}, o.mask, o.maskPos, o.op)
++			}
++		case Spans:
++			for row, spans := range o.rows {
++				for _, s := range spans {
++					for x := s.x0; x < s.x1; x++ {
++						offset := dst.PixOffset(x, o.rect.Min.Y+row)
++						alpha := (65535 - o.color[3]*s.alpha/65535) * 257
++						for ch := 0; ch < 4; ch++ {
++							if o.op == draw.Over {
++								dst.Pix[offset+ch] = uint8((uint32(dst.Pix[offset+ch])*alpha + o.color[ch]*s.alpha) / 16776960)
++							} else {
++								dst.Pix[offset+ch] = uint8(o.color[ch] * s.alpha / 16776960)
++							}
++						}
++					}
++				}
++			}
++		}
++	}
++	return true
++}
++
++// Encoded is a detached packet for one integer compute pass. Rows has two words
++// per tile (offset,count); Refs preserves original painter order within tiles.
++// Ops has 16 words per operation; Data holds tightly packed masks/pixels/spans.
++// All byte slices are owned by this result and have 4-byte alignment.
++type Encoded struct {
++	Ops, Rows, Refs, Data []byte
++	Tiles                 image.Point
++}
++
++func appendWord(out []byte, value uint32) []byte { return binary.LittleEndian.AppendUint32(out, value) }
++func packMask(dst []byte, mask *image.Alpha) []byte {
++	word := uint32(0)
++	n := 0
++	for y := mask.Rect.Min.Y; y < mask.Rect.Max.Y; y++ {
++		for x := mask.Rect.Min.X; x < mask.Rect.Max.X; x++ {
++			word |= uint32(mask.Pix[mask.PixOffset(x, y)]) << uint(n*8)
++			n++
++			if n == 4 {
++				dst = appendWord(dst, word)
++				word = 0
++				n = 0
++			}
++		}
++	}
++	if n != 0 {
++		dst = appendWord(dst, word)
++	}
++	return dst
++}
++func (p *Packet) Encode() (*Encoded, bool) {
++	if p == nil || len(p.ops) > MaxOps {
++		return nil, false
++	}
++	tiles := image.Pt((p.bounds.Dx()+TileSize-1)/TileSize, (p.bounds.Dy()+TileSize-1)/TileSize)
++	counts := make([]int, tiles.X*tiles.Y)
++	masks := make(map[*image.Alpha]uint32)
++	dataBytes, refs := 0, 0
++	// Validate exact encoded sizes and bin counts before allocating any output.
++	for _, o := range p.ops {
++		if o.mask != nil {
++			if _, ok := masks[o.mask]; !ok {
++				masks[o.mask] = uint32(dataBytes / 4)
++				dataBytes += (len(o.mask.Pix) + 3) / 4 * 4
++			}
++		}
++		switch o.kind {
++		case Pixels:
++			dataBytes += o.rect.Dx() * o.rect.Dy() * 4
++		case Spans:
++			dataBytes += len(o.rows) * 8
++			for _, row := range o.rows {
++				dataBytes += len(row) * 12
++			}
++		}
++		for y := o.rect.Min.Y / TileSize; y <= (o.rect.Max.Y-1)/TileSize; y++ {
++			for x := o.rect.Min.X / TileSize; x <= (o.rect.Max.X-1)/TileSize; x++ {
++				if refs == MaxTileReferences {
++					return nil, false
++				}
++				counts[y*tiles.X+x]++
++				refs++
++			}
++		}
++		if len(p.ops)*opWords*4+len(counts)*8+refs*4+dataBytes > MaxBytes {
++			return nil, false
++		}
++	}
++	e := &Encoded{Tiles: tiles, Ops: make([]byte, 0, max(4, len(p.ops)*opWords*4)), Rows: make([]byte, 0, len(counts)*8), Refs: make([]byte, max(4, refs*4)), Data: make([]byte, 0, max(4, dataBytes))}
++	positions := make([]int, len(counts))
++	offset := 0
++	for i, count := range counts {
++		positions[i] = offset
++		e.Rows = appendWord(e.Rows, uint32(offset))
++		e.Rows = appendWord(e.Rows, uint32(count))
++		offset += count
++	}
++	clear(masks)
++	for i, o := range p.ops {
++		words := [opWords]uint32{uint32(o.rect.Min.X), uint32(o.rect.Min.Y), uint32(o.rect.Max.X), uint32(o.rect.Max.Y), o.color[0], o.color[1], o.color[2], o.color[3], o.kind, uint32(o.op), 0, 0, ^uint32(0), 0, 0, 0}
++		if o.mask != nil {
++			at, ok := masks[o.mask]
++			if !ok {
++				at = uint32(len(e.Data) / 4)
++				e.Data = packMask(e.Data, o.mask)
++				masks[o.mask] = at
++			}
++			words[12], words[13], words[14], words[15] = at, uint32(o.mask.Stride), uint32(o.maskPos.X), uint32(o.maskPos.Y)
++		}
++		if o.kind == Pixels {
++			words[10], words[11] = uint32(len(e.Data)/4), uint32(o.rect.Dx())
++			for y := 0; y < o.image.Rect.Dy(); y++ {
++				for x := 0; x < o.image.Rect.Dx(); x++ {
++					at := o.image.PixOffset(x, y)
++					e.Data = appendWord(e.Data, binary.LittleEndian.Uint32(o.image.Pix[at:at+4]))
++				}
++			}
++		}
++		if o.kind == Spans {
++			words[10] = uint32(len(e.Data) / 4)
++			base := len(e.Data)
++			e.Data = append(e.Data, make([]byte, len(o.rows)*8)...)
++			for y, row := range o.rows {
++				binary.LittleEndian.PutUint32(e.Data[base+y*8:], uint32(len(e.Data)/4))
++				binary.LittleEndian.PutUint32(e.Data[base+y*8+4:], uint32(len(row)))
++				for _, s := range row {
++					e.Data = appendWord(e.Data, uint32(s.x0))
++					e.Data = appendWord(e.Data, uint32(s.x1))
++					e.Data = appendWord(e.Data, s.alpha)
++				}
++			}
++		}
++		for _, w := range words {
++			e.Ops = appendWord(e.Ops, w)
++		}
++		for y := o.rect.Min.Y / TileSize; y <= (o.rect.Max.Y-1)/TileSize; y++ {
++			for x := o.rect.Min.X / TileSize; x <= (o.rect.Max.X-1)/TileSize; x++ {
++				bin := y*tiles.X + x
++				binary.LittleEndian.PutUint32(e.Refs[positions[bin]*4:], uint32(i))
++				positions[bin]++
++			}
++		}
++	}
++	if len(e.Ops) == 0 {
++		e.Ops = e.Ops[:4]
++	}
++	if len(e.Data) == 0 {
++		e.Data = e.Data[:4]
++	}
++	return e, true
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/packet_test.go
+@@ -0,0 +1,141 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"testing"
++)
++
++func TestVellumScenePlanOwnedImageMaskAndPartialReplay(t *testing.T) {
++	random := rand.New(rand.NewSource(41))
++	for trial := 0; trial < 1000; trial++ {
++		bounds := image.Rect(0, 0, 19, 17)
++		want := image.NewRGBA(bounds)
++		random.Read(want.Pix)
++		got := image.NewRGBA(bounds)
++		copy(got.Pix, want.Pix)
++		source := image.NewRGBA(image.Rect(-3, 2, 15, 20))
++		random.Read(source.Pix)
++		mask := image.NewAlpha(image.Rect(4, -6, 27, 14))
++		random.Read(mask.Pix)
++		builder := New(bounds)
++		for step := 0; step < 8; step++ {
++			rect := image.Rect(random.Intn(15)-4, random.Intn(15)-4, random.Intn(10)+12, random.Intn(10)+12)
++			sp := image.Pt(random.Intn(8)-4, random.Intn(8))
++			mp := image.Pt(random.Intn(8)+2, random.Intn(10)-6)
++			op := draw.Op(step % 2)
++			var src image.Image = source
++			if step%2 == 0 {
++				src = image.NewUniform(color.NRGBA64{uint16(random.Uint32()), uint16(random.Uint32()), uint16(random.Uint32()), uint16(random.Uint32())})
++			}
++			var m image.Image
++			if step%3 != 0 {
++				m = mask
++			}
++			builder.Draw(rect, src, sp, m, mp, op)
++			draw.DrawMask(want, rect, src, sp, m, mp, op)
++		}
++		packet := builder.Seal(false)
++		if packet == nil {
++			t.Fatal("admitted image batch refused", trial)
++		}
++		// Mutating borrowed buffers cannot change any previously sealed operation.
++		clear(source.Pix)
++		clear(mask.Pix)
++		if !packet.Replay(got) || !bytes.Equal(got.Pix, want.Pix) {
++			t.Fatal("owned clipped partial image/mask replay differs", trial)
++		}
++		encoded, ok := packet.Encode()
++		if !ok || len(encoded.Rows) != encoded.Tiles.X*encoded.Tiles.Y*8 {
++			t.Fatal("tile encoding failed", trial)
++		}
++	}
++}
++func TestVellumScenePlanExactScannerCoverage(t *testing.T) {
++	for _, alpha := range []uint32{0, 1, 2, 127, 255, 256, 257, 32767, 32768, 65534, 65535} {
++		for _, op := range []draw.Op{draw.Src, draw.Over} {
++			for _, c := range []color.RGBA{{1, 2, 3, 4}, {33, 75, 112, 127}, {19, 107, 211, 255}} {
++				initial := color.RGBA{63, 109, 201, 211}
++				want := image.NewRGBA(image.Rect(0, 0, 5, 3))
++				draw.Draw(want, want.Rect, image.NewUniform(initial), image.Point{}, draw.Src)
++				got := image.NewRGBA(want.Rect)
++				copy(got.Pix, want.Pix)
++				spanner := scan.NewImgSpanner(want)
++				spanner.Op = op
++				spanner.SetColor(image.NewUniform(c))
++				spanner.GetSpanFunc()(1, 1, 4, alpha)
++				builder := New(want.Rect)
++				builder.BeginSpans(c, op)
++				builder.Span(1, 1, 4, alpha)
++				packet := builder.Seal(true)
++				if packet == nil || !packet.Replay(got) || !bytes.Equal(got.Pix, want.Pix) {
++					t.Fatalf("coverage differs alpha=%d op=%d color=%v", alpha, op, c)
++				}
++			}
++		}
++	}
++}
++func TestVellumScenePlanUnknownSpanOperatorRefusesWholeBatch(t *testing.T) {
++	for _, op := range []draw.Op{-1, 2, 255} {
++		b := New(image.Rect(0, 0, 8, 8))
++		b.Draw(image.Rect(0, 0, 8, 8), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++		b.BeginSpans(color.RGBA{1, 2, 3, 255}, op)
++		b.Span(0, 0, 8, 65535)
++		if !b.Failed() || b.Seal(false) != nil {
++			t.Fatal("unknown span operator admitted a partial batch", op)
++		}
++	}
++}
++
++func TestVellumScenePlanMaskSnapshotsAndBounds(t *testing.T) {
++	builder := New(image.Rect(0, 0, 32, 32))
++	mask := image.NewAlpha(image.Rect(0, 0, 4, 4))
++	for i := range mask.Pix {
++		mask.Pix[i] = 33
++	}
++	builder.Draw(image.Rect(1, 1, 5, 5), image.NewUniform(color.RGBA{255, 255, 255, 255}), image.Point{}, mask, image.Point{}, draw.Over)
++	mask.Pix[0] = 219
++	builder.Draw(image.Rect(7, 7, 11, 11), image.NewUniform(color.RGBA{255, 255, 255, 255}), image.Point{}, mask, image.Point{}, draw.Over)
++	packet := builder.Seal(false)
++	if packet == nil || packet.ops[0].mask == packet.ops[1].mask || packet.ops[0].mask.Pix[0] != 33 || packet.ops[1].mask.Pix[0] != 219 {
++		t.Fatal("A/B mask capture lost owned bytes")
++	}
++	for _, bounds := range []image.Rectangle{image.Rect(1, 1, 8, 8), image.Rect(0, 0, MaxDimension+1, 2), image.Rect(0, 0, 8192, 8192)} {
++		if !New(bounds).Failed() {
++			t.Fatal("oversized/nonzero-origin target admitted", bounds)
++		}
++	}
++	alias := image.NewRGBA(image.Rect(0, 0, 32, 32))
++	sub := alias.SubImage(image.Rect(5, 5, 12, 12))
++	if !Aliases(sub, alias) {
++		t.Fatal("distinct destination subimage alias missed")
++	}
++	malformed := &image.RGBA{Pix: make([]byte, 4), Stride: int(^uint(0) >> 1), Rect: image.Rect(0, 0, 1, 3)}
++	if Known(malformed) {
++		t.Fatal("overflowing stride admitted")
++	}
++}
++
++func TestVellumScenePlanSealRetiresBuilder(t *testing.T) {
++	b := New(image.Rect(0, 0, 8, 8))
++	b.Draw(image.Rect(0, 0, 8, 8), image.NewUniform(color.RGBA{1, 2, 3, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	p := b.Seal(false)
++	if p == nil {
++		t.Fatal("first seal failed")
++	}
++	b.Draw(image.Rect(0, 0, 8, 8), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++	if b.Seal(false) != nil || p.Operations() != 1 {
++		t.Fatal("builder reuse changed sealed packet")
++	}
++	dst := image.NewRGBA(p.Bounds())
++	p.Replay(dst)
++	if dst.RGBAAt(0, 0) != (color.RGBA{1, 2, 3, 255}) {
++		t.Fatal("sealed data changed")
++	}
++}

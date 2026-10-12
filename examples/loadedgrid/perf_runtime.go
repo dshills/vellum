@@ -96,7 +96,7 @@ func newPerfProgram(ctx context.Context, c perfConfig) (*perfProgram, map[string
 		a.Close()
 		return nil, nil, err
 	}
-	metadata := map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "cpu_profile_path": c.CPUProfile, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
+	metadata := map[string]any{"rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "cpu_profile_path": c.CPUProfile, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
 	return p, metadata, nil
 }
 func (p *perfProgram) describe() ui.Node {
@@ -238,7 +238,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 	if err != nil {
 		return err
 	}
-	if err = perfEmit("grid.perf.ready", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
+	if err = perfEmit("grid.perf.ready", map[string]any{"rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
 		return err
 	}
 	stopProfile, err := startPerfCPUProfile(c.CPUProfile)
@@ -299,7 +299,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 		return err
 	}
 	runtime.GC()
-	return perfEmit("grid.perf.end", map[string]any{"rows": c.Rows, "variable": c.Variable, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
+	return perfEmit("grid.perf.end", map[string]any{"rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
 }
 
 // Detailed records are diagnostic instrumentation. The ordinary constructor
@@ -335,7 +335,7 @@ func runPerf(c perfConfig) (terminal error) {
 		return err
 	}
 	failure := make(chan error, 1)
-	d := cogent.Driver{FrameMetrics: m, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 15}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(err error) {
+	d := cogent.Driver{FrameMetrics: m, GPUSceneRendering: c.GPUSceneRendering, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 15}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(err error) {
 		select {
 		case failure <- err:
 		default:

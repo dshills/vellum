@@ -143,3 +143,11 @@ and timer-safe retirement. Slider painting no longer invalidates itself; setters
 retain their existing painting requests. See
 [the contract](patches/locallayout/README.md) and
 [Grid integration](../../../specs/grid-native.md).
+
+Patch 0041 adds the opt-in ordered GPU scene adapter, detached paint packets,
+shared-device compute/checked append, bounded CPU reconstruction and safe source
+retirement. Bounded-outline font stage 0003 supplies pre-allocation static TrueType
+limits. Stage input/output pins bind every changed file; direct upstream checks
+resolve the adjacent prepared font module. The GPU scene path is disabled by
+default pending representative latency/eligibility and native memory acceptance.
+See [rendering contract](../../../specs/rendering.md).

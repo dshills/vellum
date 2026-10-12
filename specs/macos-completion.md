@@ -183,3 +183,13 @@ batches using the user's selected Anthropic Claude Sonnet 5.5, resolve findings,
 run affected tests and commit stable checkpoints. Avoid repeated unchanged Prism
 runs. Native acceptance must record source identity, command and exit status;
 qualification remains open wherever evidence is absent.
+
+The ordered GPU scene candidate now compiles detached paint into exact integer
+compute on the originating window device, preserving the scene's existing source
+ordinal and reconstructing partial work for CPU fallback/snapshots. It remains
+opt-in through the native driver. Shader, real outline text/path and shared-drawer
+pixel checks exercise the native GPU backend; the actual stored-table source
+route is separately observed through diagnostic Cocoa frames. These bounded
+checks establish their tested behavior; representative ordinary latency, broader
+source eligibility, native/GPU memory and full P4/P6/Mac acceptance remain open.
+See the [rendering contract](rendering.md).

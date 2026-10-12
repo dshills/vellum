@@ -42,6 +42,9 @@ type ManualConfig struct {
 	MaxControls                           int // zero uses 4096; each window descriptor is checked before allocation.
 	// ExperimentalGridScrollReuse mirrors Driver's main-scene opt-in.
 	ExperimentalGridScrollReuse bool
+	// GPUSceneRendering exercises the same scene adapter with CPU fallback on
+	// the deterministic software drawer; it opens no native GPU device.
+	GPUSceneRendering bool
 }
 
 // ManualInput either supplies physical coordinates or resolves a current target

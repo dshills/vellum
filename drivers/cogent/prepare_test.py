@@ -280,8 +280,8 @@ class PreparationChecks(unittest.TestCase):
         core, font = manifest["dependencies"]
         self.assertEqual(core["module"], "cogentcore.org/core")
         numbers = [int(Path(patch["file"]).name[:4]) for stage in core["stages"] for patch in stage["patches"]]
-        self.assertEqual(numbers, list(range(1, 41)))
-        self.assertEqual(len(font["stages"]), 2)
+        self.assertEqual(numbers, list(range(1, 42)))
+        self.assertEqual(len(font["stages"]), 3)
         import hashlib
         for dependency in manifest["dependencies"]:
             self.assertTrue(dependency["sum"].startswith("h1:"))

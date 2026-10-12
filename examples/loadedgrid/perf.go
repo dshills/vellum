@@ -18,13 +18,14 @@ const perfPeriod = 64
 const perfMinCells = 400
 
 type perfConfig struct {
-	Rows            int
-	Variable        bool
-	Samples, Warmup int
-	Novel           bool
-	CPUProfile      string
-	SourceDetails   bool
-	InputDetails    string
+	Rows              int
+	Variable          bool
+	Samples, Warmup   int
+	Novel             bool
+	CPUProfile        string
+	SourceDetails     bool
+	InputDetails      string
+	GPUSceneRendering bool
 }
 
 func validatePerfModes(perf, smoke, sourceDetails bool, profile string) error {

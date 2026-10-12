@@ -434,6 +434,7 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 		n := w.state
 		if err := p.owner.Do(func() {
 			n.body = core.NewBody(spec.Title)
+			n.body.Scene.GPUSceneRendering = p.config.GPUSceneRendering
 			setGridScrollReuse(n.body.Scene, p.config.ExperimentalGridScrollReuse)
 			n.host = newAccessibilityHost(n)
 			n.body.Styler(func(s *styles.Style) {

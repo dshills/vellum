@@ -1,0 +1,252 @@
+{
+  "schema": 1,
+  "checkpoint": "Ordered GPU scene implementation; macOS completion remains active",
+  "base_commit": "0c0c41fd1a3c943d336b1857c22e141e53e3de5f",
+  "public_identity": {
+    "module": "github.com/dshills/vellum",
+    "license": "MIT",
+    "prior_committed_choice": true,
+    "public_release": false
+  },
+  "implementation": {
+    "default_enabled": false,
+    "upstream_stage": 41,
+    "upstream_files": 32,
+    "font_stage": 3,
+    "font_files": 3,
+    "prepared_files": 6166,
+    "stage": {
+      "path": "stage.json",
+      "sha256": "459e8e3b6b8ed1dc5a21c5fafc3fc6ab9e6592a32af1f8ab9f9ddaed48734b03"
+    },
+    "prepared_map_sha256": "e6e40717b98585a6acfbf250ade93cb6ac220f1ae33fcd0ecfdc2b9201d5b4de",
+    "scope": "Detached bounded painter-ordered packet compilation and integer GPU composition on the original window device/source ordinal; CPU journal fallback/snapshots; source lifetime, budget and shared-to-owned image safety."
+  },
+  "qualification": {
+    "fresh_preparation": {
+      "path": "preparation-v2/process.json",
+      "sha256": "7a8a2725114a1dce22426161ed98bec36b17492789b460d0097f5ac18402679a"
+    },
+    "checks": {
+      "path": "checks-v3/qualification.json",
+      "sha256": "f565f160398f2541c6b3c1814f7d4892306bf6da1c1c495cef91a9d0d7a06183"
+    },
+    "check_names": [
+      "preparation-integrity",
+      "portable-race",
+      "portable-vet",
+      "compiler-plan-renderer-race",
+      "gpu-seam-race",
+      "driver-default-race",
+      "driver-default-vet",
+      "driver-offscreen-race",
+      "driver-offscreen-vet",
+      "core-regression-race",
+      "renderer-gpu-vet",
+      "grid-consumer-race",
+      "loadedgrid-consumer-race",
+      "loadedtree-consumer-race",
+      "replay-consumer-race",
+      "sdk-contract-consumer-race",
+      "imaging-consumer-race"
+    ],
+    "native": {
+      "path": "native-admitted-v3/process.json",
+      "sha256": "66f75fe76ed9458957e8d9d45d6a40018dec9dfd3e78dd72e7a4e51c2bae5b00",
+      "groups": [
+        "TestVellumGPUSceneNativeIntegerCompositor",
+        "TestVellumGPUSceneNativeSharedDrawerOrderAndFallback",
+        "TestVellumGPUSceneNativeActualTextAndPaths",
+        "TestVellumSceneSourceNativeThreeBatchSharedToOwned"
+      ],
+      "individual_run_pass": true,
+      "skips": false,
+      "backend_adapter_type": "not recorded",
+      "kernel_packets": 96
+    },
+    "cocoa": {
+      "path": "cocoa-final-v2/qualification.json",
+      "sha256": "a01bd84e6c03eb17481a84da0a5e6db90ab7809cf2aa5cc80c546b60336a8492",
+      "samples": 120,
+      "scene_records": 124,
+      "zero_scene_go_image_attempts": true,
+      "physical_transfer_count_available": false
+    },
+    "private_sdk": {
+      "path": "sdk-v2/relocated-consumer.process.json",
+      "sha256": "14a35d6b7f58db7b133c46e3c5898bf79af185090a1ffcf0c8c5b6ee19143a3e",
+      "archive_sha256": "ecfd73233614ca618847aa13b2d71a97c3d3711760f30806e623006d6c21aaa9",
+      "verified_files": 6868,
+      "prepared_graph_matches": true,
+      "native_runtime": false,
+      "scope": "Private archive/relocated consumer only. Later report/spec wording changes do not change the verified implementation/module graph. No current public-release archive or native-runtime qualification."
+    }
+  },
+  "reviews": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "runs": [
+      {
+        "path": "prism/prism.json",
+        "sha256": "6a81e7736fd2e523e08b61ca4034cf155dc7ca1272b6fc433b8df01f001e945b",
+        "exit_code": 1,
+        "coverage": {
+          "reviewer": [
+            {
+              "provider": "anthropic",
+              "model": "claude-sonnet-5-5"
+            }
+          ],
+          "files": 22,
+          "bytes": 214113,
+          "chunks": 6,
+          "llmCalls": 7,
+          "cacheHit": false,
+          "cachedChunks": 0,
+          "tokens": [
+            {
+              "provider": "anthropic",
+              "model": "claude-sonnet-5-5",
+              "input": 122449,
+              "output": 15249,
+              "costUSD": 0.397388
+            }
+          ],
+          "widenedFiles": 5,
+          "excluded": [],
+          "truncatedBytes": 0,
+          "skipped": [
+            {
+              "target": "chunk 3/6 (drivers/cogent/native/patches/gpuscenes/0041-ordered-gpu-scenes.patch)",
+              "reason": "review failed: sending request: Post \"https://api.anthropic.com/v1/messages\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+            }
+          ],
+          "complete": false
+        },
+        "counts": {
+          "low": 0,
+          "medium": 1,
+          "high": 0
+        }
+      },
+      {
+        "path": "prism-recovery/prism.json",
+        "sha256": "b8dd767c3cec5dbd73ffe263b35dab949678a280c086ce35d12ca02404040577",
+        "exit_code": 1,
+        "coverage": {
+          "reviewer": [
+            {
+              "provider": "anthropic",
+              "model": "claude-sonnet-5-5"
+            }
+          ],
+          "files": 22,
+          "bytes": 214113,
+          "chunks": 6,
+          "llmCalls": 2,
+          "cacheHit": false,
+          "cachedChunks": 5,
+          "tokens": [
+            {
+              "provider": "anthropic",
+              "model": "claude-sonnet-5-5",
+              "input": 79315,
+              "output": 8192,
+              "costUSD": 0.24055
+            }
+          ],
+          "widenedFiles": 5,
+          "excluded": [],
+          "truncatedBytes": 0,
+          "skipped": [
+            {
+              "target": "chunk 3/6 (drivers/cogent/native/patches/gpuscenes/0041-ordered-gpu-scenes.patch)",
+              "reason": "review failed: sending request: Post \"https://api.anthropic.com/v1/messages\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+            }
+          ],
+          "complete": false
+        },
+        "counts": {
+          "low": 0,
+          "medium": 1,
+          "high": 0
+        }
+      },
+      {
+        "path": "prism-missing-source/prism.json",
+        "sha256": "22d1dfacc49bda991ff8c56da45926b6d8a9ff2fc7b6f8dd4786752f1994c5cc",
+        "exit_code": 1,
+        "coverage": {
+          "reviewer": [
+            {
+              "provider": "anthropic",
+              "model": "claude-sonnet-5-5"
+            }
+          ],
+          "files": 32,
+          "bytes": 168359,
+          "chunks": 10,
+          "llmCalls": 12,
+          "cacheHit": false,
+          "cachedChunks": 0,
+          "tokens": [
+            {
+              "provider": "anthropic",
+              "model": "claude-sonnet-5-5",
+              "input": 133232,
+              "output": 40591,
+              "costUSD": 0.672374
+            }
+          ],
+          "widenedFiles": 14,
+          "splits": 1,
+          "excluded": [],
+          "truncatedBytes": 0,
+          "skipped": [],
+          "complete": true
+        },
+        "counts": {
+          "low": 0,
+          "medium": 7,
+          "high": 1
+        }
+      }
+    ],
+    "combined_pre_guard_coverage_complete": true,
+    "scope": "Successful outer chunks plus complete exact32 constituent-source review recover the literal-patch timeout. Narrow six-file guards afterward were independently reviewed and tested, not rerun through the provider. Raw high/medium findings and exit1 receipts retained.",
+    "disposition": {
+      "path": "prism-disposition-final.json",
+      "sha256": "8059f6d2c840e5584b731bc99ed651eb0c2ee42c5aa70bcbd062d8894419868e"
+    },
+    "independent_delta": {
+      "path": "delta-review/review.json",
+      "sha256": "0195a0bedaa0c18f08086df66c674d8bb9d44472b231007467058e83381682be"
+    },
+    "independent_evidence": {
+      "path": "evidence-review-final-v2.json",
+      "sha256": "76374da60ad3cf35cac523a2a91e64f083068604ca29f6fe3d1726e9f8c91291"
+    }
+  },
+  "historical_failures": [
+    "Early native runners filtered opt-in admission and skipped; historical only.",
+    "Initial gate cache permission failure; preserved.",
+    "Broader inherited Core desktop run-and-show offscreen test timed out; full Core pass not claimed.",
+    "Two literal stage41 Prism chunks timed out; complete constituent recovery is separate."
+  ],
+  "open_acceptance": [
+    "Representative native scene eligibility across windows/popups/modals/sprites",
+    "Ordinary matched sustained performance and unchanged P4/P6 targets",
+    "Native/GPU/font memory lifecycle and physical GPU loss",
+    "GPU completion and presentation measurements",
+    "Human input/accessibility and real native services workflows",
+    "Cross-display scale and monitor changes",
+    "Third-party public distribution audit and signing/notarization"
+  ],
+  "os_settings_changed": false,
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "8905079744dfe8ec9ee25f037b339453ef292001cbd6b2568c1a644a5fd676c1",
+    "files": 337,
+    "index_sha256": "d22e5c62e87788f002ad0cccc2430748a707b97a6d2ee6e825c235b7d3e0067a"
+  }
+}

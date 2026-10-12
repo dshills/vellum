@@ -1,0 +1,21 @@
+import hashlib,json,shutil,tarfile
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');phase=Path('/private/tmp/vellum-gpu-scenes')
+records=root/'docs/reports/macos-gpu-scenes/records';records.mkdir(exist_ok=False)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+selected=[]
+for p in phase.rglob('*'):
+ if 'repository' not in p.relative_to(phase).parts and p.is_file()and p.suffix in('.json','.log','.txt','.patch')and p.name!='staged.diff.txt':selected.append((p,'phase/'+p.relative_to(phase).as_posix()))
+external=[('/private/tmp/vellum-gpu-scene-compiler-review-v2','compiler-review'),('/private/tmp/vellum-gpu-scene-development/renderer-review-v2','renderer-review'),('/private/tmp/vellum-gpu-seam-review-v2','gpu-seam-review'),('/private/tmp/vellum-gpu-scene-development/native-admitted-v2','native-admitted'),('/private/tmp/vellum-gpu-scene-development/kernel-v1','historical-skipped/kernel-v1'),('/private/tmp/vellum-gpu-scene-development/integration-v2','historical-skipped/integration-v2'),('/private/tmp/vellum-gpu-scene-development/native-scene-v1','historical-skipped/native-scene-v1'),('/private/tmp/vellum-gpu-scene-development/native-final-v1','historical-skipped/native-final-v1')]
+for directory,prefix in external:
+ directory=Path(directory)
+ for p in directory.rglob('*'):
+  if p.is_file():selected.append((p,prefix+'/'+p.relative_to(directory).as_posix()))
+index={name:{'sha256':sha(p),'bytes':p.stat().st_size}for p,name in selected}
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tar:
+ for p,name in sorted(selected,key=lambda x:x[1]):tar.add(p,arcname=name,recursive=False)
+(records/'evidence-index.json').write_text(json.dumps({'archive_sha256':sha(archive),'entries':index},indent=2)+'\n')
+closure=json.loads((phase/'closure.json').read_text());closure['archive']={'path':'evidence.tar.gz','sha256':sha(archive),'files':len(index),'index_sha256':sha(records/'evidence-index.json')}
+(records/'checkpoint.json').write_text(json.dumps(closure,indent=2)+'\n')
+(records/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes());print('ARCHIVE',len(index),'bytes',archive.stat().st_size)
