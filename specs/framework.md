@@ -151,6 +151,11 @@ PNG icons, accessible naming and shared command validation. Native object/menu
 interaction and real shutdown acceptance remain deferred; offscreen fixtures
 and the patched desktop cleanup lifecycle establish their tested source behavior.
 
+The optional [notification service](notifications.md) adds explicit Mac permission
+queries/requests, immediate local delivery and targeted ID withdrawal in app
+bundles. Bounded shared dispatch and offscreen content/settings fixtures remain
+separate from real permission, presentation and packaged runtime acceptance.
+
 Windows/Linux service adapters implement clipboard, chooser transports and
 window-local menu widgets. Actual target runtime, native IME/accessibility and
 native Wayland acceptance remain open; [platform support](platform-support.md)

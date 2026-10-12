@@ -44,6 +44,11 @@ admission and a main-loop cleanup hook retire actions and native resources befor
 termination. Offscreen parser/bitmap/ownership and injected cleanup tests remain
 separate from actual tray interaction, VoiceOver and native loop teardown.
 
+The optional [notification service](notifications.md) implements explicit
+permission snapshots/requests, immediate local delivery and scoped ID withdrawal
+in Mac app bundles. Offscreen content/settings fixtures remain separate from
+OS prompts, presentation, removal and restart. Notify never requests permission.
+
 Document history adds bounded sparse undo/redo, revision-aware dirty/save handling
 and focused native text precedence. [Document persistence](document.md) adds asynchronous save/open and native
 unsaved-close prompts with a working component-document consumer. Its bounded

@@ -179,3 +179,14 @@ application's item. Provide a descriptive tooltip/accessibility name for an
 icon-only item. See [the contract](../specs/tray.md). The focused native-module
 tests `TestTray` and `TestNativeService` exercise injected routing/admission and
 offscreen Cocoa data/bitmap conversion without creating status items or panels.
+
+## Mac notifications
+
+Obtain `Application.Notifications()` from a worker after services are published.
+Inspect capabilities and `NotificationSettings` before delivery. Only an explicit
+`RequestNotificationPermission` may show a permission prompt; `Notify` does not.
+Use a stable ID for replacement, and `WithdrawNotifications` for targeted removal.
+Run through an app bundle with its own identifier; ordinary Go binaries return
+Unavailable. See [the contract](../specs/notifications.md). Focused `TestNotification`
+checks with `-tags offscreen` in `drivers/cogent` build data objects and injected
+settings/results; they never access the center, send messages or request permission.

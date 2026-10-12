@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "base_commit": "df3accc5ade8a524996e285a5f6b34ffaea7beeb",
+  "source_freeze": {
+    "path": "/private/tmp/vellum-macos-notifications/source-v1.json",
+    "sha256": "bd8e2b2ce126d7ad68727286ed852f6efe6b86f04833aada30f7f580371fe0bf",
+    "directory": "/private/tmp/vellum-macos-notifications/source-v1",
+    "selected_files": 15
+  },
+  "files": {
+    "app/notifications.go": "ec56b8d0cefc35cc7cbf3c349b2463ff35db09f9f15b2d6936f804a94f4320de",
+    "app/notifications_test.go": "ab4946485bf91a80298c9c223471801c4e792d29486e278418ae9c3eccd58dc8",
+    "docs/development.md": "b53ce96ccd5086ffc6f8e88eaf0c02d858cd25ce506a11e5d4b98235ac9d459c",
+    "drivers/cogent/notifications.go": "f1f18aa230d8aca2a45c6781c23630d8c32656ba22bbe406e049641ff24f3236",
+    "drivers/cogent/notifications_darwin.go": "00a3c2d8b6749abec96f0a148e10e0acaaff0fdcbec2d18d775b5ca122ae7bb4",
+    "drivers/cogent/notifications_darwin.m": "bc331d3d45adef7bf563f0a80f588cf8f9c89d0adee195a8531bee0081a6ba4b",
+    "drivers/cogent/notifications_darwin_test.go": "32e5f0f8e79d86613f38ff9e1769888362c765a328a072cf55c61ab32841762d",
+    "drivers/cogent/notifications_other.go": "5bcf1fee834019b884d93f78da1b88262570c0e8a664bfb2bcd3cb45a0d5de7f",
+    "drivers/cogent/notifications_test.go": "bc2478a7265262b2f9282cecbe7848499d23f92dea36a28d30a0b6d670c374d4",
+    "drivers/cogent/services_darwin.go": "76d71709cf3d8983b65a725b83fa97b6d27ec6425adc7f1fdcd82702298e270b",
+    "examples/sdk-contract/notifications_test.go": "e392358bc35359489434c0f438e7c0c7c58353e128dc67dd03001c161a3a9c7e",
+    "specs/README.md": "d93cd1500a90e2381a3599eed1c1e32047a5c60aec8191de2bfecb2e30905ff5",
+    "specs/framework.md": "003b6ebb2470538f0fd392a587f98f0f60b7a2f35a6e584d753227aa32709db5",
+    "specs/macos-completion.md": "35dec9a193688969979a50a82c16fbe8c7567ff1b1011a63b3f1eb5aec107d52",
+    "specs/notifications.md": "9c34d0722048223374d2bd7048d9c83ab45c8f0c3dbd0a3bca5eadb717100d19"
+  },
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/app/notifications.go": "ec56b8d0cefc35cc7cbf3c349b2463ff35db09f9f15b2d6936f804a94f4320de",
+    "/private/tmp/vellum-macos-notifications/source-v1/app/notifications.go": "ec56b8d0cefc35cc7cbf3c349b2463ff35db09f9f15b2d6936f804a94f4320de",
+    "/private/tmp/vellum-large-data/app/notifications_test.go": "ab4946485bf91a80298c9c223471801c4e792d29486e278418ae9c3eccd58dc8",
+    "/private/tmp/vellum-macos-notifications/source-v1/app/notifications_test.go": "ab4946485bf91a80298c9c223471801c4e792d29486e278418ae9c3eccd58dc8",
+    "/private/tmp/vellum-large-data/docs/development.md": "b53ce96ccd5086ffc6f8e88eaf0c02d858cd25ce506a11e5d4b98235ac9d459c",
+    "/private/tmp/vellum-macos-notifications/source-v1/docs/development.md": "b53ce96ccd5086ffc6f8e88eaf0c02d858cd25ce506a11e5d4b98235ac9d459c",
+    "/private/tmp/vellum-large-data/drivers/cogent/notifications.go": "f1f18aa230d8aca2a45c6781c23630d8c32656ba22bbe406e049641ff24f3236",
+    "/private/tmp/vellum-macos-notifications/source-v1/drivers/cogent/notifications.go": "f1f18aa230d8aca2a45c6781c23630d8c32656ba22bbe406e049641ff24f3236",
+    "/private/tmp/vellum-large-data/drivers/cogent/notifications_darwin.go": "00a3c2d8b6749abec96f0a148e10e0acaaff0fdcbec2d18d775b5ca122ae7bb4",
+    "/private/tmp/vellum-macos-notifications/source-v1/drivers/cogent/notifications_darwin.go": "00a3c2d8b6749abec96f0a148e10e0acaaff0fdcbec2d18d775b5ca122ae7bb4",
+    "/private/tmp/vellum-large-data/drivers/cogent/notifications_darwin.m": "bc331d3d45adef7bf563f0a80f588cf8f9c89d0adee195a8531bee0081a6ba4b",
+    "/private/tmp/vellum-macos-notifications/source-v1/drivers/cogent/notifications_darwin.m": "bc331d3d45adef7bf563f0a80f588cf8f9c89d0adee195a8531bee0081a6ba4b",
+    "/private/tmp/vellum-large-data/drivers/cogent/notifications_darwin_test.go": "32e5f0f8e79d86613f38ff9e1769888362c765a328a072cf55c61ab32841762d",
+    "/private/tmp/vellum-macos-notifications/source-v1/drivers/cogent/notifications_darwin_test.go": "32e5f0f8e79d86613f38ff9e1769888362c765a328a072cf55c61ab32841762d",
+    "/private/tmp/vellum-large-data/drivers/cogent/notifications_other.go": "5bcf1fee834019b884d93f78da1b88262570c0e8a664bfb2bcd3cb45a0d5de7f",
+    "/private/tmp/vellum-macos-notifications/source-v1/drivers/cogent/notifications_other.go": "5bcf1fee834019b884d93f78da1b88262570c0e8a664bfb2bcd3cb45a0d5de7f",
+    "/private/tmp/vellum-large-data/drivers/cogent/notifications_test.go": "bc2478a7265262b2f9282cecbe7848499d23f92dea36a28d30a0b6d670c374d4",
+    "/private/tmp/vellum-macos-notifications/source-v1/drivers/cogent/notifications_test.go": "bc2478a7265262b2f9282cecbe7848499d23f92dea36a28d30a0b6d670c374d4",
+    "/private/tmp/vellum-large-data/drivers/cogent/services_darwin.go": "76d71709cf3d8983b65a725b83fa97b6d27ec6425adc7f1fdcd82702298e270b",
+    "/private/tmp/vellum-macos-notifications/source-v1/drivers/cogent/services_darwin.go": "76d71709cf3d8983b65a725b83fa97b6d27ec6425adc7f1fdcd82702298e270b",
+    "/private/tmp/vellum-large-data/examples/sdk-contract/notifications_test.go": "e392358bc35359489434c0f438e7c0c7c58353e128dc67dd03001c161a3a9c7e",
+    "/private/tmp/vellum-macos-notifications/source-v1/examples/sdk-contract/notifications_test.go": "e392358bc35359489434c0f438e7c0c7c58353e128dc67dd03001c161a3a9c7e",
+    "/private/tmp/vellum-large-data/specs/README.md": "d93cd1500a90e2381a3599eed1c1e32047a5c60aec8191de2bfecb2e30905ff5",
+    "/private/tmp/vellum-macos-notifications/source-v1/specs/README.md": "d93cd1500a90e2381a3599eed1c1e32047a5c60aec8191de2bfecb2e30905ff5",
+    "/private/tmp/vellum-large-data/specs/framework.md": "003b6ebb2470538f0fd392a587f98f0f60b7a2f35a6e584d753227aa32709db5",
+    "/private/tmp/vellum-macos-notifications/source-v1/specs/framework.md": "003b6ebb2470538f0fd392a587f98f0f60b7a2f35a6e584d753227aa32709db5",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "35dec9a193688969979a50a82c16fbe8c7567ff1b1011a63b3f1eb5aec107d52",
+    "/private/tmp/vellum-macos-notifications/source-v1/specs/macos-completion.md": "35dec9a193688969979a50a82c16fbe8c7567ff1b1011a63b3f1eb5aec107d52",
+    "/private/tmp/vellum-large-data/specs/notifications.md": "9c34d0722048223374d2bd7048d9c83ab45c8f0c3dbd0a3bca5eadb717100d19",
+    "/private/tmp/vellum-macos-notifications/source-v1/specs/notifications.md": "9c34d0722048223374d2bd7048d9c83ab45c8f0c3dbd0a3bca5eadb717100d19"
+  },
+  "supporting_files": {
+    "drivers/cogent/services.go": {
+      "sha256": "6d9844fc146cc1cd2a330898713a31c32fb3aef530813d007e4417e7b4fcf396",
+      "bytes": 5016
+    },
+    "drivers/cogent/services_native.h": {
+      "sha256": "17e11f71ee761caf6b100e153752790fadd26e128ee30596058fe527364ada61",
+      "bytes": 316
+    },
+    "drivers/cogent/services_darwin.m": {
+      "sha256": "ebee5b038b547fdf443d685c5daf84598a234f25a5a80e14df46b29578bc473f",
+      "bytes": 10690
+    }
+  },
+  "endpoint_verification": {
+    "frozen_hashes_match": true,
+    "current_hashes_match": true,
+    "shared_services_delta": "Only the added native status 4 -> app.ErrNotificationPermission branch relative to the independently approved tray V5 services_darwin.go."
+  },
+  "assessment": [
+    {
+      "topic": "Consent and capability",
+      "locations": [
+        "app/notifications.go:98",
+        "drivers/cogent/notifications_darwin.m:91-123",
+        "specs/notifications.md"
+      ],
+      "conclusion": "Settings does not request authorization. Only the explicitly named permission method requests alert and sound. Notify queries authorization and refuses denied/not-determined without prompting. Darwin flags describe implemented transport, not current bundled/authorized/runtime availability; delivered acceptance is not a display guarantee."
+    },
+    {
+      "topic": "Namespace and removal",
+      "locations": [
+        "app/notifications.go:63",
+        "drivers/cogent/notifications_darwin.m:13",
+        "drivers/cogent/notifications_darwin.m:56-61",
+        "drivers/cogent/notifications_darwin.m:124-129"
+      ],
+      "conclusion": "Validated caller IDs are prefixed in both delivery and withdrawal. Only supplied IDs are removed; no global remove-all path. The reservation is within the application notification center, and concurrent OS delivery/removal is explicitly not transactional."
+    },
+    {
+      "topic": "Wire admission and ownership",
+      "locations": [
+        "app/notifications.go:43",
+        "drivers/cogent/notifications_darwin.go:26",
+        "drivers/cogent/notifications_darwin.m:27-55",
+        "drivers/cogent/services_darwin.go:121-151"
+      ],
+      "conclusion": "Public byte caps precede UTF-8 validation, IDs and payload structure are independently validated by native parsing, the detached shared producer bounds/copies input before asynchronous consumption, and C-to-Go reply bounds precede copying. Native callback pools and exception-to-terminal-result handling are present."
+    },
+    {
+      "topic": "Cancellation, credits, shutdown",
+      "locations": [
+        "drivers/cogent/services.go:30-63",
+        "drivers/cogent/services_darwin.go:62-174",
+        "drivers/cogent/notifications_darwin.m:73-134"
+      ],
+      "conclusion": "The new branch inherits shared eight-credit admission, monotonic tokens and once-only terminal map removal. Origin context/application lifetime checks precede asynchronous actions and terminal publication. Cancellation releases the waiting caller but cannot undo executing authorization/delivery/removal; accepted credit is retained until native terminal acknowledgment or shutdown. The notification bridge does not install or replace a delegate."
+    },
+    {
+      "topic": "Meaningful fixture scope",
+      "locations": [
+        "drivers/cogent/notifications_darwin_test.go:22",
+        "drivers/cogent/notifications_darwin_test.go:60",
+        "drivers/cogent/notifications_darwin.m:137-150",
+        "examples/sdk-contract/notifications_test.go"
+      ],
+      "conclusion": "Fixtures validate malformed/bounded wire, real content/request data objects, injected authorization enum normalization, shared producer ownership, actual C-to-Go permission error, optional service compatibility, and an in-memory public consumer. These fixtures do not access UNUserNotificationCenter, request permission, deliver, play sound, or alter settings."
+    }
+  ],
+  "existing_headless_receipts": {
+    "driver-notifications-v2": {
+      "record_sha256": "69ca6606145a71eeb7e16eaf697177607c18050146d19528e546100aaf24a721",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags",
+        "offscreen",
+        "-run",
+        "TestNotification",
+        "."
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "live_tests": false,
+      "stdout_sha256": "3529d8675585324bf1d48aa01e9f5223f947887542ee316a7a99be5b23e5cf35",
+      "stderr_sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "scope": "Producer-reported existing headless run; not executed by reviewer; selected source review does not independently attest full compiled closure."
+    },
+    "native-build-final": {
+      "record_sha256": "ee876ba1540d44ad3431eaf1f544c3ab7cfeb09dd4f9f13b72cf196deca6c880",
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-notifications/workbench-final",
+        "./cmd/workbench"
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "live_tests": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5e6c50b7e8c7a5fe2644ca4c4783227c747ebf2399245250c6dadf3925a1aca3",
+      "scope": "Producer-reported existing headless run; not executed by reviewer; selected source review does not independently attest full compiled closure."
+    },
+    "driver-final": {
+      "record_sha256": "f1a1a7c93803cbfe92ee4740c7b8b6f3a1b21ff5e9122fae1a9ad35833197ec4",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags",
+        "offscreen",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "live_tests": false,
+      "stdout_sha256": "a7597ff0e0433c2cd72cc4406b50cc9c663e9d12bd20d267667c9c51feb5db76",
+      "stderr_sha256": "9031e85a2d496c2dfddc18c72ceed925dd3299441bfc077d70e6bd2865228121",
+      "scope": "Producer-reported existing headless run; not executed by reviewer; selected source review does not independently attest full compiled closure."
+    },
+    "root-final": {
+      "record_sha256": "4c271b5164fbe344bf6d1b094a5df9002e5a0d226eae80385c20261094702775",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-large-data",
+      "exit_code": 0,
+      "live_tests": false,
+      "stdout_sha256": "3cf0d3d0db43401dbac6f55546b8523df0d39cae71de42f6b1059199a5e916de",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Producer-reported existing headless run; not executed by reviewer; selected source review does not independently attest full compiled closure."
+    },
+    "sdk-final-authorized": {
+      "record_sha256": "11842c06dbe0ebc027569a7206131091be4f9a095d0e51f66291dfdc9fe289ff",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-large-data/examples/sdk-contract",
+      "exit_code": 0,
+      "live_tests": false,
+      "stdout_sha256": "072b6b6f38ba2f3e2ca834ef62cc0eabd83b3fe91631fc97e7ba94181366f1d1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Producer-reported existing headless run; not executed by reviewer; selected source review does not independently attest full compiled closure."
+    },
+    "driver-vet": {
+      "record_sha256": "29af2b72d675528c82e1bd6d24310a3ba9e604304f1c42a1b0ca7f13d8a1a702",
+      "argv": [
+        "go",
+        "vet",
+        "-tags",
+        "offscreen",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+      "exit_code": 0,
+      "live_tests": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": "Producer-reported existing headless run; not executed by reviewer; selected source review does not independently attest full compiled closure."
+    }
+  },
+  "prior_supporting_review": {
+    "path": "/private/tmp/vellum-macos-tray/source-review-v5.json",
+    "sha256": "442d939b74404131a8f2ea29ca39b246691ce2094c871f4eba074cb217992d12",
+    "scope": "Shared service admission/ACK/lifetime and pooled JSON producer source inheritance only."
+  },
+  "limits": [
+    "Read-only source review; no reviewer test, build, prepare, native service, UI, OS preference, clipboard, sound, prompt, delivery, provider or Git invocation.",
+    "Headless receipt raw hashes and recorded exits were checked; no full compiler, SDK, dependency or installed-app closure attestation.",
+    "Packaged real permission, denial, notification presentation, sound, targeted removal, cancellation/ordering and foreground/restart acceptance remain deferred.",
+    "No guarantee that an OS callback completes within the caller deadline; retained work stays bounded and shutdown retires tokens. Cancellation is not rollback.",
+    "No human accessibility, runtime availability, Mac completion, performance or Windows/Linux acceptance claim.",
+    "The planned provider review is outside this source approval and is not certified here."
+  ],
+  "notes_sha256": "36efd2138d68deaabbcbfa326e0aa560e211876c123064b26a4c8d51d977294a"
+}
