@@ -323,3 +323,15 @@ integer translation and intentionally changes some prior antialias edge pixels.
 Pixel/race/native checks and all 9,600 experimental observations are retained in
 [the report](reports/macos-scroll-surfaces/README.md). The 4/6 ms targets and full
 Mac acceptance remain open; no default performance gain is claimed.
+
+## Keyed Grid and fixed-allocation layout
+
+Native cells now retain overlapping row/column identity and shaped text in their
+bounded current projection. A verified fixed-allocation boundary sizes changed
+text and repositions descendants, then paints the complete scene in original
+order. Full-layout fences, callback requeue and private preview/tree completion
+remain coherent and quiescent. Final preparation/race/vet/build and three Cocoa
+checks pass. The ordinary matched comparison and open Mac/P6 targets are in
+[the checkpoint report](reports/macos-keyed-grid-layout/README.md). The default
+renderer still uses full raster replay and image upload; ordered GPU scene-source
+rendering remains the next architecture step.

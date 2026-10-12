@@ -1,0 +1,1144 @@
+--- a/core/scene.go
++++ b/core/scene.go
+@@ -121,6 +121,11 @@
+ 	// this is our own text shaper in case we don't have a render context
+ 	textShaper shaped.Shaper
+ 
++	// localLayouts is owned by this scene's originating render context.
++	localLayouts        []localLayoutRequest
++	localLayoutClosed   bool
++	globalLayoutPending atomic.Bool
++
+ 	// flags are atomic bit flags for [Scene] state.
+ 	flags sceneFlags
+ }
+@@ -168,7 +173,22 @@
+ 
+ // setFlag sets the given flags to the given value.
+ func (sc *Scene) setFlag(on bool, f ...enums.BitFlag) {
++	layout := false
++	for _, flag := range f {
++		if flag == sceneNeedsLayout {
++			layout = true
++			break
++		}
++	}
++	if layout && on {
++		// Publish the inspection fence before native layout state can change.
++		sc.globalLayoutPending.Store(true)
++	}
+ 	sc.flags.SetFlag(on, f...)
++	if layout && !on {
++		// Full-paint callers clear this only after normal layout/render completion.
++		sc.globalLayoutPending.Store(false)
++	}
+ 	if on {
+ 		for _, flag := range f {
+ 			if flag == sceneNeedsRender || flag == sceneNeedsLayout || flag == sceneHasDeferred || flag == sceneImageUpdated {
+--- a/core/render.go
++++ b/core/render.go
+@@ -177,6 +177,50 @@
+ 	sc.RenderWidget()
+ }
+ 
++// layoutRenderUpdate completes one admitted full-layout pass. Requests from
++// sizing or styling are kept, while rendering consumes the work it is about to
++// perform before callbacks can request another pass.
++func (sc *Scene) layoutRenderUpdate() {
++	sc.LayoutScene()
++	sc.renderUpdate(sc.RenderWidget)
++}
++
++// fullLayoutUpdate consumes only the layout request admitted to this pass.
++// The atomic inspection fence remains set throughout callback work. A later
++// request, including one made during Render after sizing, belongs to the next
++// pass and keeps the fence set. An abnormal callback restores retry admission.
++func (sc *Scene) fullLayoutUpdate(work func()) {
++	sc.globalLayoutPending.Store(true)
++	sc.flags.SetFlag(false, sceneNeedsLayout) // do not clear the inspection fence
++	returned := false
++	defer func() {
++		if !returned {
++			sc.setFlag(true, sceneNeedsLayout)
++		}
++	}()
++	work()
++	if !sc.hasFlag(sceneNeedsLayout) {
++		sc.globalLayoutPending.Store(false)
++	}
++	returned = true
++}
++
++// renderUpdate consumes the existing scene render request before painting,
++// preserving requests made by Render callbacks and abnormal-return retries.
++func (sc *Scene) renderUpdate(paint func()) {
++	sc.setFlag(false, sceneNeedsRender)
++	returned := false
++	defer func() {
++		if !returned {
++			// StartRender has already consumed widget flags and the painter
++			// may contain a partial subtree. Retry the complete scene.
++			sc.setFlag(true, sceneNeedsLayout, sceneNeedsRender)
++		}
++	}()
++	paint()
++	returned = true
++}
++
+ func (sc *Scene) Render() {
+ 	if TheApp.Platform() == system.Web {
+ 		sc.Painter.Fill.Color = colors.Uniform(colors.Transparent)
+@@ -219,7 +263,13 @@
+ 		return false
+ 	}
+ 	sc.setFlag(true, sceneUpdating) // prevent rendering
+-	defer func() { sc.setFlag(false, sceneUpdating) }()
++	defer func() {
++		sc.setFlag(false, sceneUpdating)
++		// Requests made by layout or render callbacks belong to the next pass.
++		if !sc.localLayoutClosed && len(sc.localLayouts) > 0 {
++			sc.requestPaint()
++		}
++	}()
+ 
+ 	sc.runAnimations()
+ 	rc := sc.renderContext()
+@@ -231,29 +281,46 @@
+ 
+ 	switch {
+ 	case rc.rebuild:
++		sc.clearLocalLayouts()
+ 		// pr := profile.Start("rebuild")
+-		sc.doRebuild()
+-		sc.setFlag(false, sceneNeedsLayout, sceneNeedsRender)
++		sc.fullLayoutUpdate(sc.doRebuild)
+ 		sc.setFlag(true, sceneImageUpdated)
+ 		// pr.End()
+ 	case sc.lastRender.needsRestyle(rc):
++		sc.clearLocalLayouts()
+ 		// pr := profile.Start("restyle")
+-		sc.applyStyleScene()
+-		sc.LayoutRenderScene()
+-		sc.setFlag(false, sceneNeedsLayout, sceneNeedsRender)
++		sc.fullLayoutUpdate(func() {
++			sc.styleScene()
++			sc.layoutRenderUpdate()
++		})
+ 		sc.setFlag(true, sceneImageUpdated)
+ 		sc.lastRender.saveRender(rc)
+ 		// pr.End()
+ 	case sc.hasFlag(sceneNeedsLayout):
++		sc.clearLocalLayouts()
+ 		// pr := profile.Start("layout")
+-		sc.LayoutRenderScene()
+-		sc.setFlag(false, sceneNeedsLayout, sceneNeedsRender)
++		sc.fullLayoutUpdate(sc.layoutRenderUpdate)
+ 		sc.setFlag(true, sceneImageUpdated)
+ 		// pr.End()
++	case len(sc.localLayouts) > 0:
++		applied, fallback := sc.drainLocalLayouts()
++		if sc.localLayoutClosed || sc.This == nil {
++			return false
++		}
++		if fallback || sc.hasFlag(sceneNeedsLayout) {
++			sc.fullLayoutUpdate(sc.layoutRenderUpdate)
++		} else if applied || sc.hasFlag(sceneNeedsRender) {
++			// Record the whole scene in painter order, without scene sizing.
++			// Replaying just a moved root could cover later overlapping siblings
++			// and leave old-position pixels in the retained scene image.
++			sc.renderUpdate(sc.RenderWidget)
++		} else {
++			return false
++		}
++		sc.setFlag(true, sceneImageUpdated)
+ 	case sc.hasFlag(sceneNeedsRender):
+ 		// pr := profile.Start("render")
+-		sc.doNeedsRender()
+-		sc.setFlag(false, sceneNeedsRender)
++		sc.renderUpdate(sc.doNeedsRender)
+ 		sc.setFlag(true, sceneImageUpdated)
+ 		// pr.End()
+ 	default:
+@@ -283,6 +350,14 @@
+ // This is needed whenever the window geometry, DPI,
+ // etc is updated, which affects styling.
+ func (sc *Scene) applyStyleScene() {
++	sc.styleScene()
++	sc.setFlag(true, sceneNeedsLayout)
++}
++
++// styleScene is the styling work without an unconditional future layout
++// request. Full-layout callers already have their inspection fence and size
++// immediately afterward; callback requests still remain independently queued.
++func (sc *Scene) styleScene() {
+ 	sc.setFlag(true, sceneUpdating) // prevent rendering
+ 	defer func() { sc.setFlag(false, sceneUpdating) }()
+ 
+@@ -290,7 +365,6 @@
+ 	if sc.Painter.Paint != nil {
+ 		sc.Painter.Paint.UnitContext = sc.Styles.UnitContext
+ 	}
+-	sc.setFlag(true, sceneNeedsLayout)
+ }
+ 
+ // doRebuild does the full re-render and RenderContext Rebuild flag
+@@ -299,8 +373,8 @@
+ func (sc *Scene) doRebuild() {
+ 	sc.Stage.Sprites.reset()
+ 	sc.updateScene()
+-	sc.applyStyleScene()
+-	sc.LayoutRenderScene()
++	sc.styleScene()
++	sc.layoutRenderUpdate()
+ }
+ 
+ // contentSize computes the size of the scene based on current content.
+--- a/core/manual_timer.go
++++ b/core/manual_timer.go
+@@ -162,6 +162,10 @@
+ 	}
+ }
+ func (sc *Scene) Destroy() {
++	// Retire local roots before any timer/child cleanup can call back.
++	sc.localLayoutClosed = true
++	sc.clearLocalLayouts()
++	defer sc.clearLocalLayouts()
+ 	sc.stopManualTimers()
+ 	sc.Frame.Destroy()
+ }
+--- a/core/slider.go
++++ b/core/slider.go
+@@ -429,9 +429,17 @@
+ // setPosFromValue sets the slider position based on the given value
+ // (typically rs.Value)
+ func (sr *Slider) setPosFromValue(val float32) {
++	if sr.updatePosFromValue(val) {
++		sr.NeedsRender()
++	}
++}
++
++// updatePosFromValue also serves Render, where recomputing the position is
++// part of the paint already in progress and must not request another paint.
++func (sr *Slider) updatePosFromValue(val float32) bool {
+ 	sz := sr.Geom.Size.Actual.Content.Dim(sr.Styles.Direction.Dim())
+ 	if sz <= 0 {
+-		return
++		return false
+ 	}
+ 
+ 	effmax := sr.effectiveMax()
+@@ -441,7 +449,7 @@
+ 	thszh := .5 * thsz
+ 	sr.pos = 0.5*thsz + prel*(sz-thsz)
+ 	sr.pos = math32.Clamp(sr.pos, thszh, sz-thszh)
+-	sr.NeedsRender()
++	return true
+ }
+ 
+ // setVisiblePercent sets the [Slider.visiblePercent] value for a [SliderScrollbar].
+@@ -509,7 +517,7 @@
+ }
+ 
+ func (sr *Slider) Render() {
+-	sr.setPosFromValue(sr.Value)
++	sr.updatePosFromValue(sr.Value)
+ 
+ 	pc := &sr.Scene.Painter
+ 	st := &sr.Styles
+--- /dev/null
++++ b/core/local_layout.go
+@@ -0,0 +1,166 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package core
++
++import (
++	"reflect"
++
++	"cogentcore.org/core/tree"
++)
++
++const localLayoutCapacity = 64
++const localLayoutMaxAncestors = 256
++
++// LocalLayoutRoot is an explicitly fixed-allocation widget subtree. LayoutLocal
++// updates its descendants within its existing allocated outer rectangle and
++// applies their scene positions. It must return false when ordinary scene
++// sizing, styling or layout is required. It must not change its own allocation,
++// position or outer bounds, run another scene's work, or dispatch events.
++//
++// LayoutLocal runs under the existing originating render-context ownership.
++// Its ordinary Go panic/Goexit behavior is preserved. A successful local pass
++// records the complete scene in painter order, without sizing the whole scene.
++type LocalLayoutRoot interface {
++	Widget
++	LayoutLocal() bool
++}
++
++type localLayoutRequest struct {
++	root   LocalLayoutRoot
++	parent *tree.NodeBase
++}
++
++// NeedsLocalLayout requests bounded local layout followed by scene repaint.
++// Requests coalesce by actual initialized tree identity, not name. Call only
++// while owning this scene's originating render context, or during exclusive
++// construction before its loop starts; this method does not acquire any lock.
++// A callback may request another pass, including one for itself.
++//
++// It returns false for retired, detached, foreign, or excessively deep roots.
++// At capacity it also returns false and promotes work to ordinary scene layout.
++// Full scene rebuild/restyle/layout takes precedence over preexisting requests.
++func (sc *Scene) NeedsLocalLayout(root LocalLayoutRoot) bool {
++	actual, wb := sc.localLayoutIdentity(root)
++	if wb == nil || !sc.localLayoutAttached(wb) {
++		return false
++	}
++	parent := wb.Parent.AsTree()
++	for i := range sc.localLayouts {
++		if sc.localLayouts[i].root.AsWidget() == wb {
++			sc.localLayouts[i] = localLayoutRequest{actual, parent}
++			sc.requestPaint() // repeat requests must also restore paint admission
++			return true
++		}
++	}
++	if len(sc.localLayouts) == localLayoutCapacity {
++		sc.clearLocalLayouts()
++		sc.setFlag(true, sceneNeedsLayout)
++		return false
++	}
++	sc.localLayouts = append(sc.localLayouts, localLayoutRequest{actual, parent})
++	sc.requestPaint()
++	return true
++}
++
++func (sc *Scene) localLayoutIdentity(root LocalLayoutRoot) (LocalLayoutRoot, *WidgetBase) {
++	if sc == nil || sc.This == nil || sc.localLayoutClosed || root == nil {
++		return nil, nil
++	}
++	value := reflect.ValueOf(root)
++	if value.Kind() != reflect.Pointer || value.IsNil() {
++		return nil, nil
++	}
++	wb := root.AsWidget()
++	if wb == nil || wb.This == nil || wb.Scene != sc {
++		return nil, nil
++	}
++	actual, ok := wb.This.(LocalLayoutRoot)
++	if !ok || actual.AsWidget() != wb {
++		return nil, nil
++	}
++	return actual, wb
++}
++
++// Parent pointers may survive detachment. Require live membership on every
++// bounded ancestor edge, including the Core parts/scrollbar ownership edges.
++func (sc *Scene) localLayoutAttached(wb *WidgetBase) bool {
++	for depth := 0; depth < localLayoutMaxAncestors; depth++ {
++		if wb == nil || wb.This == nil || wb.Scene != sc || wb.Parent == nil {
++			return false
++		}
++		parent, ok := wb.Parent.(Widget)
++		if !ok || parent.AsTree().This == nil {
++			return false
++		}
++		pw := parent.AsWidget()
++		member := wb.IndexInParent() >= 0
++		if !member && pw.Parts != nil {
++			member = pw.Parts.AsWidget() == wb
++		}
++		if !member {
++			if frame := AsFrame(parent); frame != nil {
++				for _, scrollbar := range frame.Scrolls {
++					if scrollbar != nil && scrollbar.AsWidget() == wb {
++						member = true
++					}
++				}
++			}
++		}
++		if !member {
++			return false
++		}
++		if pw == sc.AsWidget() {
++			return true
++		}
++		wb = pw
++	}
++	return false
++}
++
++func (sc *Scene) clearLocalLayouts() {
++	clear(sc.localLayouts)
++	sc.localLayouts = nil
++}
++
++func (sc *Scene) drainLocalLayouts() (applied, fallback bool) {
++	batch := sc.localLayouts
++	sc.localLayouts = nil // detach before callouts; new requests belong to next pass
++	defer clear(batch)    // no retired or abnormal-callback root survives the batch
++	for _, request := range batch {
++		_, wb := sc.localLayoutIdentity(request.root)
++		if wb == nil || !sc.localLayoutAttached(wb) || wb.Parent.AsTree() != request.parent {
++			continue
++		}
++		allocation, actual, position, bounds := wb.Geom.Size.Alloc.Total, wb.Geom.Size.Actual.Total, wb.Geom.RelPos, wb.Geom.TotalBBox
++		if !request.root.LayoutLocal() {
++			return applied, true
++		}
++		if sc.localLayoutClosed || sc.This == nil {
++			return applied, false
++		}
++		if !sc.localLayoutAttached(wb) || wb.Parent.AsTree() != request.parent {
++			continue
++		}
++		if wb.Geom.Size.Alloc.Total != allocation || wb.Geom.Size.Actual.Total != actual || wb.Geom.RelPos != position || wb.Geom.TotalBBox != bounds {
++			return applied, true
++		}
++		applied = true
++		if sc.hasFlag(sceneNeedsLayout) {
++			return applied, true
++		}
++	}
++	return applied, false
++}
++
++// GlobalLayoutPending reports the ordinary requested full-scene layout fence.
++// Unlike native geometry or scene flags, this query is safe without owning the
++// scene's render context, including from another application owner/window. It
++// does not make arbitrary foreign geometry/style mutation safe or observable.
++// Inspectors must still verify their own lifetime and publication identity.
++// Full layout/rebuild/restyle clears the fence only after normal full paint
++// when no newer layout request arose during callback work;
++// panic/Goexit leaves it set rather than admitting an incomplete publication.
++func (sc *Scene) GlobalLayoutPending() bool {
++	return sc != nil && sc.globalLayoutPending.Load()
++}
+--- /dev/null
++++ b/core/local_layout_test.go
+@@ -0,0 +1,725 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build offscreen
++
++package core
++
++import (
++	"bytes"
++	"context"
++	"image"
++	"image/color"
++	"runtime"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/system"
++	"cogentcore.org/core/tree"
++)
++
++type localLayoutFixture struct {
++	Frame
++	calls, sizes int
++	accept       bool
++	onLocal      func()
++	onSized      func()
++	onDestroyed  func()
++	afterLocal   func()
++	onRendered   func()
++	moving       *Frame
++	x            float32
++}
++
++func (f *localLayoutFixture) Init() {
++	f.Frame.Init()
++	f.accept = true
++	f.Styler(func(s *styles.Style) {
++		s.Display = styles.Custom
++		s.Min.Set(units.Dp(120), units.Dp(80))
++		s.Max.Set(units.Dp(120), units.Dp(80))
++		s.Padding.Zero()
++		s.Margin.Zero()
++		s.Gap.Zero()
++		s.Background = image.NewUniform(color.RGBA{R: 241, G: 237, B: 231, A: 255})
++	})
++}
++func (f *localLayoutFixture) SizeUp() {
++	f.sizes++
++	if f.onSized != nil {
++		f.onSized()
++	}
++	f.Frame.SizeUp()
++}
++func (f *localLayoutFixture) Position() {
++	f.Frame.Position()
++	if f.moving != nil {
++		f.moving.Geom.RelPos = math32.Vec2(f.x, 9)
++	}
++}
++func (f *localLayoutFixture) LayoutLocal() bool {
++	f.calls++
++	if f.onLocal != nil {
++		f.onLocal()
++	}
++	if !f.accept {
++		return false
++	}
++	f.Position()
++	f.ApplyScenePos()
++	if f.afterLocal != nil {
++		f.afterLocal()
++	}
++	return true
++}
++func (f *localLayoutFixture) Render() {
++	if f.onRendered != nil {
++		f.onRendered()
++	}
++	f.Frame.Render()
++}
++func (f *localLayoutFixture) Destroy() {
++	if f.onDestroyed != nil {
++		f.onDestroyed()
++	}
++	f.Frame.Destroy()
++}
++
++func localFixture(t *testing.T, count int) (*ManualWindow, *Scene, []*localLayoutFixture) {
++	t.Helper()
++	roots := make([]*localLayoutFixture, count)
++	m, b, _ := manualFixture(t, func(b *Body) {
++		for i := range roots {
++			roots[i] = tree.New[localLayoutFixture](b)
++		}
++	})
++	drainManual(t, m)
++	return m, b.Scene, roots
++}
++
++// These calls own the originating RC on an actual manual scene. No event loop
++// or native/GPU window can advance it in the background.
++func localOwnedUpdate(sc *Scene) bool {
++	rc := sc.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	return sc.doUpdate()
++}
++func localOwnedRequest(sc *Scene, root LocalLayoutRoot) bool {
++	rc := sc.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	return sc.NeedsLocalLayout(root)
++}
++
++type localPaintCounter struct {
++	system.Window
++	requests int
++}
++
++func (w *localPaintCounter) RequestPaint()                     { w.requests++ }
++func (w *localPaintCounter) RequestPaintAfter(_ time.Duration) {}
++func (w *localPaintCounter) IsOnDemand() bool                  { return true }
++
++func TestVellumLocalLayoutBoundIdentityAndPaint(t *testing.T) {
++	_, sc, roots := localFixture(t, localLayoutCapacity+1)
++	if !localOwnedRequest(sc, roots[0]) || !localOwnedRequest(sc, roots[0]) || len(sc.localLayouts) != 1 {
++		t.Fatal("same initialized identity did not coalesce")
++	}
++	// Names are deliberately equal; a different actual tree must not coalesce.
++	for i := 1; i < localLayoutCapacity; i++ {
++		roots[i].SetName(roots[0].Name)
++		if !localOwnedRequest(sc, roots[i]) {
++			t.Fatal("valid root refused before bound", i)
++		}
++	}
++	if len(sc.localLayouts) != localLayoutCapacity {
++		t.Fatal("queue did not admit exact bound")
++	}
++	if localOwnedRequest(sc, roots[localLayoutCapacity]) || len(sc.localLayouts) != 0 || !sc.hasFlag(sceneNeedsLayout) {
++		t.Fatal("capacity refusal did not retire queue/promote full layout")
++	}
++	localOwnedUpdate(sc)
++	for _, root := range roots {
++		if root.calls != 0 {
++			t.Fatal("capacity fallback still called local roots")
++		}
++	}
++}
++
++func TestVellumLocalLayoutRequestsPaintOnEveryCoalescedAdmission(t *testing.T) {
++	sc := NewScene()
++	defer sc.Destroy()
++	root := tree.New[localLayoutFixture](sc)
++	counter := &localPaintCounter{}
++	sc.Stage = &Stage{Mains: &stages{renderWindow: &renderWindow{SystemWindow: counter}}}
++	if !sc.NeedsLocalLayout(root) || !sc.NeedsLocalLayout(root) || counter.requests != 2 {
++		t.Fatal("coalesced admission did not request paint again", counter.requests)
++	}
++}
++
++func TestVellumLocalLayoutFullPrecedenceAndReentrantRequests(t *testing.T) {
++	for _, mode := range []string{"layout", "restyle", "rebuild"} {
++		t.Run(mode, func(t *testing.T) {
++			_, sc, roots := localFixture(t, 1)
++			root := roots[0]
++			if !localOwnedRequest(sc, root) {
++				t.Fatal("request refused")
++			}
++			rc := sc.renderContext()
++			before := root.sizes
++			func() {
++				rc.Lock()
++				defer rc.Unlock()
++				switch mode {
++				case "layout":
++					sc.setFlag(true, sceneNeedsLayout)
++				case "restyle":
++					sc.lastRender.logicalDPI = -1
++				case "rebuild":
++					rc.rebuild = true
++				}
++				root.onSized = func() {
++					root.onSized = nil
++					if !sc.NeedsLocalLayout(root) {
++						t.Error("full-layout callback request refused")
++					}
++				}
++				sc.doUpdate()
++				rc.rebuild = false
++			}()
++			if root.calls != 0 || root.sizes <= before || len(sc.localLayouts) != 1 {
++				t.Fatal("full precedence lost callback request", root.calls, root.sizes, before, len(sc.localLayouts))
++			}
++			sc.Painter.RenderDone()
++			localOwnedUpdate(sc)
++			if root.calls != 1 || len(sc.localLayouts) != 0 {
++				t.Fatal("reentrant full-pass request did not run next pass", root.calls)
++			}
++		})
++	}
++}
++
++func TestVellumLocalLayoutReentrantLocalAndFailedFallback(t *testing.T) {
++	_, sc, roots := localFixture(t, 1)
++	root := roots[0]
++	before := root.sizes
++	root.onLocal = func() {
++		root.onLocal = nil
++		if !sc.NeedsLocalLayout(root) {
++			t.Error("local callback request refused")
++		}
++	}
++	if !localOwnedRequest(sc, root) || !localOwnedUpdate(sc) || root.calls != 1 || root.sizes != before || len(sc.localLayouts) != 1 {
++		t.Fatal("local pass did not isolate sizing/preserve next request")
++	}
++	sc.Painter.RenderDone()
++	localOwnedUpdate(sc)
++	if root.calls != 2 || root.sizes != before || len(sc.localLayouts) != 0 {
++		t.Fatal("next local pass mismatch")
++	}
++	sc.Painter.RenderDone()
++	root.accept = false
++	root.onSized = func() {
++		root.onSized = nil
++		if !sc.NeedsLocalLayout(root) {
++			t.Error("fallback callback request refused")
++		}
++	}
++	localOwnedRequest(sc, root)
++	localOwnedUpdate(sc)
++	if root.calls != 3 || root.sizes <= before || len(sc.localLayouts) != 1 {
++		t.Fatal("failed local did not full-layout/preserve reentrant work")
++	}
++}
++
++func TestVellumLocalLayoutFixedEnvelopeViolationFallsBack(t *testing.T) {
++	_, sc, roots := localFixture(t, 1)
++	root := roots[0]
++	before := root.sizes
++	allocation := root.Geom.Size.Alloc.Total
++	root.afterLocal = func() { root.Geom.Size.Alloc.Total.X++ }
++	localOwnedRequest(sc, root)
++	localOwnedUpdate(sc)
++	if root.sizes <= before || root.Geom.Size.Alloc.Total != allocation {
++		t.Fatal("changing root allocation did not ordinary-layout repair", root.Geom.Size.Alloc.Total, allocation)
++	}
++}
++
++func TestVellumLocalLayoutRetiresDetachedDestroyedAndForeignRoots(t *testing.T) {
++	for _, mode := range []string{"detach", "destroy", "foreign", "same-scene-parent"} {
++		t.Run(mode, func(t *testing.T) {
++			_, sc, roots := localFixture(t, 1)
++			root := roots[0]
++			localOwnedRequest(sc, root)
++			rc := sc.renderContext()
++			rc.Lock()
++			other := NewScene()
++			switch mode {
++			case "detach":
++				// Parent can outlive membership; don't merely test root.Parent=nil.
++				parent := root.Parent.AsTree()
++				parent.Children = parent.Children[:0]
++			case "destroy":
++				root.Delete()
++			case "foreign":
++				tree.MoveToParent(root, other)
++				root.SetScene(other)
++			case "same-scene-parent":
++				parent := NewFrame(sc.Body)
++				tree.MoveToParent(root, parent)
++				root.SetScene(sc)
++			}
++			sc.doUpdate()
++			rc.Unlock()
++			if root.calls != 0 || len(sc.localLayouts) != 0 {
++				t.Fatal("retired request invoked", mode)
++			}
++			if mode == "detach" {
++				root.Destroy()
++			}
++			other.Destroy()
++		})
++	}
++	_, sc, roots := localFixture(t, 1)
++	var nilRoot *localLayoutFixture
++	if localOwnedRequest(sc, nilRoot) {
++		t.Fatal("typed nil admitted")
++	}
++	other := NewScene()
++	defer other.Destroy()
++	foreign := tree.New[localLayoutFixture](other)
++	if localOwnedRequest(sc, foreign) || sc.NeedsLocalLayout(roots[0]) == false {
++		t.Fatal("foreign admission affected valid root")
++	}
++}
++
++func TestVellumLocalLayoutSceneDestructionClosesAdmission(t *testing.T) {
++	sc := NewScene()
++	root := tree.New[localLayoutFixture](sc)
++	if !sc.NeedsLocalLayout(root) {
++		t.Fatal("valid synthetic root refused")
++	}
++	admitted := true
++	root.onDestroyed = func() { admitted = sc.NeedsLocalLayout(root) }
++	batch := sc.localLayouts
++	sc.Destroy()
++	if admitted || len(sc.localLayouts) != 0 || !sc.localLayoutClosed || batch[0].root != nil {
++		t.Fatal("scene destruction retained/reaccepted root")
++	}
++}
++
++func TestVellumLocalLayoutAbnormalCallUnwindsAndClearsBatch(t *testing.T) {
++	for _, mode := range []string{"panic", "goexit"} {
++		t.Run(mode, func(t *testing.T) {
++			_, sc, roots := localFixture(t, 2)
++			root := roots[0]
++			root.onLocal = func() {
++				if mode == "panic" {
++					panic("local-layout-payload")
++				}
++				runtime.Goexit()
++			}
++			localOwnedRequest(sc, root)
++			localOwnedRequest(sc, roots[1])
++			batch := sc.localLayouts
++			done := make(chan struct{})
++			var recovered any
++			returned := false
++			go func() {
++				defer close(done)
++				defer func() { recovered = recover() }()
++				localOwnedUpdate(sc)
++				returned = true
++			}()
++			<-done
++			if returned || sc.hasFlag(sceneUpdating) || len(sc.localLayouts) != 0 || batch[0].root != nil || batch[1].root != nil || roots[1].calls != 0 {
++				t.Fatal("abnormal callback stranded batch/update state")
++			}
++			if mode == "panic" && recovered != "local-layout-payload" || mode == "goexit" && recovered != nil {
++				t.Fatal("callback abnormal return not preserved", recovered)
++			}
++		})
++	}
++}
++
++func TestVellumLocalLayoutOriginalPainterOrderAndRealGeometry(t *testing.T) {
++	var root *localLayoutFixture
++	var overlap *Frame
++	m, b, _ := manualFixture(t, func(b *Body) {
++		host := NewFrame(b)
++		host.Styler(func(s *styles.Style) {
++			s.Display = styles.Custom
++			s.Min.Set(units.Dp(220), units.Dp(140))
++			s.Grow.SetZero()
++			s.Padding.Zero()
++		})
++		root = tree.New[localLayoutFixture](host)
++		root.x = 8
++		root.moving = NewFrame(root)
++		root.moving.Styler(func(s *styles.Style) {
++			s.Min.Set(units.Dp(24), units.Dp(24))
++			s.Max.Set(units.Dp(24), units.Dp(24))
++			s.Grow.SetZero()
++			s.Padding.Zero()
++			s.Background = image.NewUniform(color.RGBA{R: 193, G: 31, B: 23, A: 255})
++		})
++		overlap = NewFrame(host)
++		overlap.Styler(func(s *styles.Style) {
++			s.Pos.Set(units.Dp(24), units.Dp(8))
++			s.Min.Set(units.Dp(18), units.Dp(18))
++			s.Max.Set(units.Dp(18), units.Dp(18))
++			s.Grow.SetZero()
++			s.Padding.Zero()
++			s.Background = image.NewUniform(color.RGBA{R: 29, G: 53, B: 197, A: 255})
++		})
++	})
++	drainManual(t, m)
++	sc := b.Scene
++	beforeSizes := root.sizes
++	previous := root.moving.Geom.TotalBBox
++	root.x += 19
++	if !localOwnedRequest(sc, root) {
++		t.Fatal("request refused")
++	}
++	drainManual(t, m)
++	actual, err := m.Image(context.Background())
++	if err != nil {
++		t.Fatal(err)
++	}
++	if root.calls != 1 || root.sizes != beforeSizes || root.moving.Geom.TotalBBox == previous {
++		t.Fatal("local did not move geometry without full sizing", root.calls, root.sizes, beforeSizes, root.moving.Geom.TotalBBox, previous)
++	}
++	moved := root.moving.Geom.TotalBBox
++	intersection := moved.Intersect(overlap.Geom.TotalBBox)
++	if intersection.Empty() {
++		t.Fatal("fixture later peer did not overlap moved content", moved, overlap.Geom.TotalBBox)
++	}
++	point := intersection.Min.Add(intersection.Size().Div(2))
++	if actual.RGBAAt(point.X, point.Y) != (color.RGBA{R: 29, G: 53, B: 197, A: 255}) {
++		t.Fatal("local render covered later peer", point, actual.RGBAAt(point.X, point.Y))
++	}
++	// Independently run ordinary full layout/paint; equality checks stale old
++	// pixels as well as later overlap, rather than consulting queue counters only.
++	rc := sc.renderContext()
++	rc.Lock()
++	sc.LayoutRenderScene()
++	expected := sc.Renderer.Render(sc.Painter.RenderDone()).Image().(*image.RGBA)
++	if root.moving.Geom.TotalBBox != moved || actual.Bounds() != expected.Bounds() || !bytes.Equal(actual.Pix, expected.Pix) {
++		t.Error("local geometry/pixels differ from ordinary full layout")
++	}
++	rc.Unlock()
++}
++
++func TestVellumLocalLayoutGlobalFenceTransitionsAndCompletion(t *testing.T) {
++	_, sc, roots := localFixture(t, 1)
++	if sc.GlobalLayoutPending() {
++		t.Fatal("initial full layout never released fence")
++	}
++	rc := sc.renderContext()
++	root := roots[0]
++	observedSizing, observedPaint := false, false
++	func() {
++		rc.Lock()
++		defer rc.Unlock()
++		sc.setFlag(true, sceneNeedsLayout)
++		sc.setFlag(false, sceneNeedsRender)
++		if !sc.GlobalLayoutPending() || !sc.hasFlag(sceneNeedsLayout) {
++			t.Fatal("unrelated flag cleared requested layout fence")
++		}
++		root.onSized = func() { observedSizing = sc.GlobalLayoutPending() }
++		root.onRendered = func() { observedPaint = sc.GlobalLayoutPending() }
++		sc.doUpdate()
++	}()
++	if !observedSizing || !observedPaint || sc.GlobalLayoutPending() || sc.hasFlag(sceneNeedsLayout) {
++		t.Fatal("full layout fence did not cover sizing/paint through completion")
++	}
++	// A declined local callback also enters ordinary full layout with the fence,
++	// even when it did not request sceneNeedsLayout itself.
++	root.accept = false
++	observedSizing, observedPaint = false, false
++	localOwnedRequest(sc, root)
++	localOwnedUpdate(sc)
++	if !observedSizing || !observedPaint || sc.GlobalLayoutPending() {
++		t.Fatal("local fallback omitted full-layout inspection fence")
++	}
++}
++
++func TestVellumLocalLayoutGlobalFenceConcurrentRead(t *testing.T) {
++	sc := NewScene()
++	defer sc.Destroy()
++	done := make(chan struct{})
++	observed := make(chan struct{})
++	go func() {
++		defer close(observed)
++		for {
++			_ = sc.GlobalLayoutPending()
++			select {
++			case <-done:
++				return
++			default:
++			}
++		}
++	}()
++	for range 10000 {
++		sc.setFlag(true, sceneNeedsLayout)
++		if !sc.GlobalLayoutPending() {
++			t.Error("requested layout missing fence")
++		}
++		sc.setFlag(false, sceneNeedsLayout)
++	}
++	close(done)
++	<-observed
++	if sc.GlobalLayoutPending() {
++		t.Fatal("terminal clear missing fence")
++	}
++}
++
++func TestVellumLocalLayoutGlobalFenceAbnormalFullPaint(t *testing.T) {
++	for _, mode := range []string{"panic", "goexit"} {
++		t.Run(mode, func(t *testing.T) {
++			_, sc, roots := localFixture(t, 1)
++			roots[0].onRendered = func() {
++				if !sc.GlobalLayoutPending() {
++					t.Error("full paint lacked fence")
++				}
++				if mode == "panic" {
++					panic("full-paint-payload")
++				}
++				runtime.Goexit()
++			}
++			rc := sc.renderContext()
++			rc.Lock()
++			sc.setFlag(true, sceneNeedsLayout)
++			rc.Unlock()
++			done := make(chan struct{})
++			var recovered any
++			returned := false
++			go func() {
++				defer close(done)
++				defer func() { recovered = recover() }()
++				localOwnedUpdate(sc)
++				returned = true
++			}()
++			<-done
++			if returned || !sc.GlobalLayoutPending() || !sc.hasFlag(sceneNeedsLayout) || sc.hasFlag(sceneUpdating) {
++				t.Fatal("abnormal full paint released incomplete publication fence")
++			}
++			if mode == "panic" && recovered != "full-paint-payload" || mode == "goexit" && recovered != nil {
++				t.Fatal("abnormal paint return changed", recovered)
++			}
++		})
++	}
++}
++
++func TestVellumLocalLayoutFullPaintPreservesLaterGlobalRequest(t *testing.T) {
++	for _, mode := range []string{"layout", "restyle", "rebuild", "fallback"} {
++		t.Run(mode, func(t *testing.T) {
++			var root *localLayoutFixture
++			m, b, _ := manualFixture(t, func(b *Body) {
++				root = tree.New[localLayoutFixture](b)
++				root.x = 8
++				root.moving = NewFrame(root)
++				root.moving.Styler(func(s *styles.Style) {
++					s.Min.Set(units.Dp(16), units.Dp(16))
++					s.Max.Set(units.Dp(16), units.Dp(16))
++					s.Padding.Zero()
++					s.Background = image.NewUniform(color.RGBA{R: 193, G: 31, B: 23, A: 255})
++				})
++			})
++			drainManual(t, m)
++			sc := b.Scene
++			rc := sc.renderContext()
++			before := root.moving.Geom.TotalBBox
++			paints := 0
++			root.onRendered = func() {
++				paints++
++				if !sc.GlobalLayoutPending() {
++					t.Error("full painting released the inspection fence before callback")
++				}
++				if paints == 1 {
++					// Sizing and positioning have already finished. This change can
++					// only take effect in the next ordinary layout, not this paint.
++					root.x = 27
++					root.NeedsLayout()
++				}
++			}
++			func() {
++				rc.Lock()
++				defer rc.Unlock()
++				switch mode {
++				case "layout":
++					root.NeedsLayout()
++				case "restyle":
++					sc.lastRender.logicalDPI = -1
++				case "rebuild":
++					rc.rebuild = true
++					defer func() { rc.rebuild = false }()
++				case "fallback":
++					root.accept = false
++					if !sc.NeedsLocalLayout(root) {
++						t.Fatal("fallback request refused")
++					}
++				}
++				if !sc.doUpdate() {
++					t.Fatal("initial full pass did not run")
++				}
++			}()
++			if paints != 1 || root.moving.Geom.TotalBBox != before || !sc.hasFlag(sceneNeedsLayout) || !sc.GlobalLayoutPending() {
++				t.Fatal("later global layout request was erased after full painting", paints, root.moving.Geom.TotalBBox, before, sc.hasFlag(sceneNeedsLayout), sc.GlobalLayoutPending())
++			}
++			first := sc.Renderer.Render(sc.Painter.RenderDone()).Image().(*image.RGBA)
++			firstPixels := bytes.Clone(first.Pix)
++			if !localOwnedUpdate(sc) || paints != 2 || root.moving.Geom.TotalBBox == before || sc.hasFlag(sceneNeedsLayout) || sc.GlobalLayoutPending() {
++				t.Fatal("next full pass did not apply geometry and retire the fence", paints, root.moving.Geom.TotalBBox, before)
++			}
++			second := sc.Renderer.Render(sc.Painter.RenderDone()).Image().(*image.RGBA)
++			if bytes.Equal(firstPixels, second.Pix) {
++				t.Fatal("next full pass did not change actual scene pixels")
++			}
++			if localOwnedUpdate(sc) {
++				t.Fatal("completed second pass left unrequested scene work")
++			}
++		})
++	}
++}
++
++func TestVellumLocalLayoutPaintPreservesLaterRenderRequest(t *testing.T) {
++	for _, mode := range []string{"layout", "restyle", "rebuild", "fallback", "local", "render"} {
++		t.Run(mode, func(t *testing.T) {
++			_, sc, roots := localFixture(t, 1)
++			root := roots[0]
++			paints := 0
++			root.onRendered = func() {
++				paints++
++				if paints == 1 {
++					root.NeedsRender()
++				}
++			}
++			rc := sc.renderContext()
++			func() {
++				rc.Lock()
++				defer rc.Unlock()
++				switch mode {
++				case "layout":
++					root.NeedsLayout()
++				case "restyle":
++					sc.lastRender.logicalDPI = -1
++				case "rebuild":
++					rc.rebuild = true
++					defer func() { rc.rebuild = false }()
++				case "fallback", "local":
++					root.accept = mode == "local"
++					if !sc.NeedsLocalLayout(root) {
++						t.Fatal("local request refused")
++					}
++				case "render":
++					root.NeedsRender()
++				}
++				if !sc.doUpdate() {
++					t.Fatal("initial paint did not run")
++				}
++			}()
++			if paints != 1 || !sc.hasFlag(sceneNeedsRender) || !root.hasFlag(widgetNeedsRender) {
++				t.Fatal("later render request was erased after painting", paints, sc.hasFlag(sceneNeedsRender), root.hasFlag(widgetNeedsRender))
++			}
++			sc.Painter.RenderDone()
++			if !localOwnedUpdate(sc) || paints != 2 || sc.hasFlag(sceneNeedsRender) || root.hasFlag(widgetNeedsRender) {
++				t.Fatal("next render request did not run exactly once", paints)
++			}
++			sc.Painter.RenderDone()
++			if localOwnedUpdate(sc) {
++				t.Fatal("completed render left unrequested scene work")
++			}
++		})
++	}
++}
++
++func TestVellumLocalLayoutSliderRenderReachesQuiescence(t *testing.T) {
++	var slider *Slider
++	m, b, _ := manualFixture(t, func(b *Body) {
++		slider = NewSlider(b)
++		slider.SetValue(0.1)
++	})
++	drainManual(t, m)
++	sc := b.Scene
++	before := slider.pos
++	rc := sc.renderContext()
++	func() {
++		rc.Lock()
++		defer rc.Unlock()
++		slider.SetValue(0.9)
++		if !sc.hasFlag(sceneNeedsRender) || !slider.hasFlag(widgetNeedsRender) {
++			t.Fatal("external slider change did not request painting")
++		}
++		if !sc.doUpdate() {
++			t.Fatal("slider paint did not run")
++		}
++	}()
++	if slider.pos == before || sc.hasFlag(sceneNeedsRender) || slider.hasFlag(widgetNeedsRender) {
++		t.Fatal("slider paint did not consume its position update", before, slider.pos)
++	}
++	sc.Painter.RenderDone()
++	if localOwnedUpdate(sc) {
++		t.Fatal("slider render requested another paint for work it just completed")
++	}
++	// Existing setter semantics also request a repaint for an unchanged value.
++	func() {
++		rc.Lock()
++		defer rc.Unlock()
++		slider.SetValue(slider.Value)
++		if !sc.hasFlag(sceneNeedsRender) || !sc.doUpdate() {
++			t.Fatal("unchanged external setter lost its existing repaint contract")
++		}
++	}()
++	sc.Painter.RenderDone()
++	if localOwnedUpdate(sc) {
++		t.Fatal("unchanged-value slider repaint did not become idle")
++	}
++}
++
++func TestVellumLocalLayoutAbnormalRenderRetriesFullScene(t *testing.T) {
++	for _, mode := range []string{"panic", "goexit"} {
++		t.Run(mode, func(t *testing.T) {
++			_, sc, roots := localFixture(t, 1)
++			root := roots[0]
++			beforeSizes := root.sizes
++			root.onRendered = func() {
++				if mode == "panic" {
++					panic("render-only-payload")
++				}
++				runtime.Goexit()
++			}
++			rc := sc.renderContext()
++			rc.Lock()
++			root.NeedsRender()
++			rc.Unlock()
++			done := make(chan struct{})
++			var recovered any
++			returned := false
++			go func() {
++				defer close(done)
++				defer func() { recovered = recover() }()
++				localOwnedUpdate(sc)
++				returned = true
++			}()
++			<-done
++			if returned || !sc.GlobalLayoutPending() || !sc.hasFlag(sceneNeedsLayout) || !sc.hasFlag(sceneNeedsRender) || sc.hasFlag(sceneUpdating) {
++				t.Fatal("abnormal render did not preserve complete-scene retry and fence")
++			}
++			if mode == "panic" && recovered != "render-only-payload" || mode == "goexit" && recovered != nil {
++				t.Fatal("abnormal render payload/return changed", recovered)
++			}
++			// Remove the fault and discard the incomplete painter commands;
++			// the queued full pass must rerun sizing and release its fence.
++			root.onRendered = nil
++			sc.Painter.RenderDone()
++			if !localOwnedUpdate(sc) || root.sizes <= beforeSizes || sc.GlobalLayoutPending() || sc.hasFlag(sceneNeedsLayout) || sc.hasFlag(sceneNeedsRender) {
++				t.Fatal("recovered render did not complete the full-scene retry")
++			}
++		})
++	}
++}

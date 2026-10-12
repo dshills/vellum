@@ -1,0 +1,149 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "3ef652329bc5d02a6928282a5479a88d",
+  "repo": {
+    "root": "/private/tmp/vellum-large-data",
+    "head": "391a50f3b101688b5d49bfb0afcec08f464f0377",
+    "branch": "codex/macos-render-path"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "ae8c1c21bf94d204",
+      "severity": "medium",
+      "category": "bug",
+      "title": "LayoutLocal bails out mid-loop without invalidating layout state",
+      "message": "Inside the loop over layoutDirty, a stale or foreign-scene text makes LayoutLocal return false. Earlier texts may already have had SizeUp/SizeDown/SizeFinal run. Unlike the earlier stamp-mismatch branch, this return does not set g.layout.valid = false, does not schedule host.Update(), and does not clear layoutDirty. The stale entry therefore stays in layoutDirty, and the next local layout attempt hits the same failure. If the caller does not guarantee a full layout after a false return, the grid keeps a half-updated layout.",
+      "suggestion": "On this failure path, invalidate the local layout the same way as the stamp-mismatch branch: set g.layout.valid = false, clear g.layoutDirty, and call g.host.Update() before returning false. Alternatively, validate every entry in layoutDirty before sizing any of them.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/grid_retained.go",
+          "lines": {
+            "start": 197,
+            "end": 199
+          }
+        }
+      ],
+      "tags": [
+        "layout",
+        "error-handling",
+        "state",
+        "location-corrected"
+      ],
+      "evidence": "if text.This == nil || text.Scene != w.Scene {\n\t\t\treturn false\n\t\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 92465,
+    "totalMs": 40741
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 20,
+    "bytes": 117499,
+    "chunks": 5,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 67410,
+        "output": 11385,
+        "costUSD": 0.24867
+      }
+    ],
+    "widenedFiles": 5,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "79eca28635fad4c5",
+        "severity": "medium",
+        "category": "bug",
+        "title": "atomic.Bool is used without a visible sync/atomic import",
+        "message": "The Scene struct now uses atomic.Bool, but the patch to core/scene.go adds no import hunk for sync/atomic. If scene.go does not already import it, the package will not compile.",
+        "suggestion": "Confirm that scene.go already imports \"sync/atomic\". If it does not, add an import hunk for it to the patch.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/locallayout/0040-fixed-allocation-local-layout.patch",
+            "lines": {
+              "start": 10,
+              "end": 10
+            }
+          }
+        ],
+        "tags": [
+          "build",
+          "patch"
+        ],
+        "evidence": "globalLayoutPending atomic.Bool",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/locallayout/0040-fixed-allocation-local-layout.patch"
+    },
+    {
+      "finding": {
+        "id": "1665f4eecd18bcd2",
+        "severity": "medium",
+        "category": "correctness",
+        "title": "Layout fence and flag are updated non-atomically as a pair",
+        "message": "The fence is documented as readable from any thread without the render context. In setFlag the atomic and the flag word are updated separately, with the set path storing the fence first and the clear path storing it last. Concurrent set and clear can interleave to leave sceneNeedsLayout set while the fence reads false. An inspector would then treat native geometry as stable during a pending layout. Any other code path that clears sceneNeedsLayout through setFlag also drops the fence prematurely.",
+        "suggestion": "Serialize fence updates, for example with a mutex or a single atomic state word. Alternatively, restrict fence clearing to fullLayoutUpdate and never clear it from setFlag.",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "drivers/cogent/native/patches/locallayout/0040-fixed-allocation-local-layout.patch",
+            "lines": {
+              "start": 26,
+              "end": 34
+            }
+          }
+        ],
+        "tags": [
+          "concurrency",
+          "race"
+        ],
+        "evidence": "sc.globalLayoutPending.Store(true)\n\t}\n \tsc.flags.SetFlag(on, f...)\n \tif layout \u0026\u0026 !on {",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/locallayout/0040-fixed-allocation-local-layout.patch"
+    }
+  ],
+  "suppressed": []
+}

@@ -1,0 +1,40 @@
+{
+  "archive": {
+    "bytes": 17036602,
+    "files": 391,
+    "index_sha256": "4606fc1f0fd857b67ab438aa1bff667cb66b31eb6b41615687c8e8a6857217f4",
+    "sha256": "be3d06872388fabf471cbbc99b4ffac839d0e4b8a8f23eaf833b99a19f08dfb5"
+  },
+  "base_commit": "391a50f3b101688b5d49bfb0afcec08f464f0377",
+  "binaries": {
+    "vellum-grid-local-candidate-v2": "f3c19fc7af748d13d8202c99311817255c6f23ec4b7dca5873163c4d68267402",
+    "vellum-grid-local-generic-v2": "69ac0bfa3937e7aef203900f7a3336206f37db0c56a59abcdd75dbef9f1cd075"
+  },
+  "checks": {
+    "final": 20,
+    "native_processes": 3,
+    "ordinary_processes": 40,
+    "ordinary_samples": 4800
+  },
+  "gates_review_sha256": "f04fd73c4fdb9320a73bced3cee23dc6daf7edc506cd09cc7ccb47e9b35cc1fd",
+  "implementation_sha256": "ed91fc61aafac71d99b0cec81a182868a1dcd44ccd9001617ceab73eaaf00293",
+  "prepared_files": 6148,
+  "prism": {
+    "discarded_findings": 2,
+    "disposition_sha256": "6819ae8612d99436389ff440f6ccb1848b601d7faa5bbaa5e2debedcac6baf72",
+    "exit_code": 1,
+    "files": 20,
+    "process_sha256": "19327398e6e2d5458aab9f570cbb9c5cc5797282ee7322ccf3657f229eab8b06",
+    "raw_sha256": "6310bccbc1e01dce2e18c3bbd8e295ae60411c7fd0d50576e95ba3b9921d8804",
+    "retained_findings": 1
+  },
+  "producer_sha256": "112f300fdb052bf6267f143f019aeb7ab39e49183f0e30a2e3c1023ddefe5255",
+  "qualified_receipt_sha256": "13f3b2544220e68d2b25920589fe1669a27f7eab9fcf440a8f31885301605d68",
+  "receipt_review_sha256": "72f97395b0d54209e1bb6e386b807c663c7eb136a49404f156c0678365e5f55c",
+  "report_sha256": "f0ec6c2073300f7d755d7257c5ee766243e2aaf29cfd999e009acbc7727c458e",
+  "result": "PASS",
+  "schema": 1,
+  "scope": "Exact selected source/prepared/artifact/recorded-gate identities and archived raw evidence. Mixed full-frame tails and failed unchanged targets remain explicit. No complete compiler/SDK/native-memory/human/GPU-display/full Mac acceptance; independent final closure separate to avoid hash cycles.",
+  "source_files": 666,
+  "source_review_sha256": "485adb0c6f1c15af07c40e6055805e793befbe19581041130450c6681c7f7523"
+}

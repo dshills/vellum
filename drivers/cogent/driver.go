@@ -513,6 +513,10 @@ func syncRecord(r *record, n ui.Node) error {
 	previous := r.node
 	r.node = n
 	if previous.Style != n.Style || previous.Grow != n.Grow || previous.MinWidth != n.MinWidth || previous.MinHeight != n.MinHeight {
+		if r.control != nil && r.control.grid != nil {
+			r.control.grid.layoutPending.Store(true)
+			r.control.grid.layout.valid = false
+		}
 		r.widget.AsWidget().Update()
 	}
 	switch n.Kind {

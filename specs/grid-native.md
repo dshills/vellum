@@ -111,13 +111,14 @@ Hidden oversized column definitions are checked if/when materialized. Pools
 reuse active widgets and destroy surplus slots to release private shaped-text
 caches, with no whole-source allocation.
 
-A changed native projection sync assigns every pooled cell/header's text,
-rectangle, visibility, selection and cursor state before one recursive host
-update. That traversal updates and restyles each pooled slot after its parent;
-placement does not also run a separate per-slot update. The private inline
-editor retains its existing update and focus handling. This bounds duplicate
-work within that sync, not the number of updates in an entire frame: initial
-mounting, theme changes and other parent updates may perform additional work.
+A changed native projection retains overlapping domain identities and assigns
+current text, rectangle, visibility, selection and cursor state in accepted
+snapshot order. The ordinary full fallback performs one recursive host update
+after placement; an admitted local pass updates only changed cells as described
+below. Placement does not independently repeat either path. Private editing
+synchronization and focus handling always run, while an unchanged field skips
+its redundant full Update. Initial mounting, theme changes and other parent
+updates may perform additional work.
 After a complete successful sync, an unchanged validated model generation reuses
 that projection without rereading Cell, moving pooled slots or recursively
 updating the host. State/current metadata checks still run. Effective inherited
@@ -247,3 +248,52 @@ reserved generated target for manual/AX observations, never a descriptor ID.
 The accessibility tree publishes the inline field as a text field beneath its
 table, using the same selection/range geometry bridge and workbench namespace.
 Inspection does not render, drain, fetch hidden cells or invoke callbacks.
+
+
+## Retained viewport layout
+
+The private cell pool matches `(RowKey, ColumnID)` and headers match `ColumnID`.
+Overlapping identities keep their widgets and shaped text. Departing widgets are
+bounded donors for entering identities; surplus widgets are destroyed and their
+private caches retired. No off-viewport row cache is introduced. `g.cells` and
+headers remain in accepted snapshot order, and each owned pane's child order
+matches that order. A private inline field stays last, above cells. Opaque model
+refs and completed-frame incarnations keep their existing generation/lifetime
+rules independently of widget retention. Source callbacks still materialize the
+bounded accepted snapshot on the owner; layout calls no source callbacks.
+
+An admitted fixed-allocation Grid update runs updater/style only for changed
+content, selection/cursor/visibility or newly created cells. On the originating
+render context, the local pass sizes changed allocations/text and repositions
+all pane descendants, including clipped absolute bounds. Integer physical edge
+rounding is unchanged. Unchanged text keeps its actual shaped output when its
+physical allocation and styling are stable. Complete scene painting follows;
+there is no partial scene image, altered painter order or GPU upload change.
+
+Core admits at most 64 live local-layout roots per scene and coalesces actual
+initialized tree identities. A full rebuild/restyle/layout overrides previously
+queued local work. Capacity or local-layout refusal promotes ordinary full scene
+layout. Requests raised during a pass remain for a later frame. Root/scene
+retirement clears queued references; mutation requires the originating render
+context or exclusive construction, never a foreign window lock under the owner.
+
+Initial construction, changed external descriptor/theme/topology/allocation,
+DPI/shaper context, uncertain guards and inline-editor layout changes retain
+the full path. Private editing synchronization always runs; an unchanged field
+publication skips only its redundant full Update. Creation/session, theme,
+accepted text/revision/restore, queued selection, actual visibility/disabled/focus,
+parent/scene/rectangle and tooltip changes still request full field layout.
+Native preedit/selection/caret APIs keep their existing rendering requests. Core's atomic `GlobalLayoutPending` reports ordinary
+requested full layout safely to inspections; it does not authorize foreign
+geometry mutation. Grid also fences queued local geometry. Current hit/AX
+inspection refuses pending geometry even at unchanged portable generation;
+last-completed data remain available to the existing pending/completed AX
+transaction. A completed frame republishes that transaction, including a full
+layout that leaves its public geometry unchanged. Public inspections remain
+fully detached from native scene objects.
+
+This contract does not promise the unchanged 4 ms p95 / 6 ms p99 targets. The
+ordinary complete-frame campaign and the broader macOS acceptance workloads
+remain authoritative; unchanged full-scene raster/upload is subsequent work.
+
+A private inline field may repaint preedit without requesting layout. When its actual editor text, focus, visibility, session or completed bounds differs from the last Grid publication, owner synchronization requests one bounded host repaint so capture follows the field render. The unchanged completion refresh schedules no further paint or layout. Other controls in the same scene must also quiesce: the native tree compares its complete bounded snapshot (including same-generation pending status), effective disabled state and help before requesting full updates, while still restoring a noncanonical native scrollbar value.

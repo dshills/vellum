@@ -136,3 +136,10 @@ curve subdivision. Opted-in native Grid main scenes emit checked hints; the comp
 paint stream and full GPU upload remain intact. See
 [the contract](patches/scrollsurfaces/README.md) and
 [rendering specification](../../../specs/rendering.md).
+
+Stage 40 (`patches/locallayout`) adds bounded fixed-allocation local layout with
+complete scene painting, safe global pending inspection, retained reentrant work
+and timer-safe retirement. Slider painting no longer invalidates itself; setters
+retain their existing painting requests. See
+[the contract](patches/locallayout/README.md) and
+[Grid integration](../../../specs/grid-native.md).

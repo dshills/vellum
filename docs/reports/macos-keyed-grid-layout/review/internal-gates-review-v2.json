@@ -1,0 +1,459 @@
+{
+  "all_current_endpoint_source_and_prepared_file_hashes_match": true,
+  "artifact_sha256": {
+    "/private/tmp/vellum-grid-local-layout/checks-v2/core-default-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/core-local-race.log": "09ad1a72be31910aa96131c6eab17fafd1560289456d0722f23332877435fcf1",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/core-offscreen-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/drawing-race.log": "e6d917c355c0e9554bd49964978e06d058f75346c183a5e89a7bb10b33593553",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/driver-native-race.log": "c9d0adb1d3e65b41df6ecc738db7e3089edfa37e2b6b552e1ac421c790015259",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/driver-native-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/driver-offscreen-race.log": "99a592fb700a8ba3da43d94dfb4790b32d62a5b8a3d0690b1495594285e08e64",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/driver-offscreen-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/editor-race.log": "df9f37643545b767f9c3a4635f97c0695cd688425d5434e6c6d441823805d622",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/fresh-prepare.log": "b524cb11830dec0f42745ec1afcf52708f286a8dc67b6e3fc7faef619229d809",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/generic-build.log": "6f9ed08bde9a6d02c495b43364c4f18229108fe7c1353b81d950a446dd4b1819",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/grid-race.log": "f1e11505801a0f25a80feb3ad1f3142d20a3fc0e2b2accac7a1b91dc8d19a43b",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/imaging-race.log": "2425741ee58507847eed8c71d2f098df932734de8ed571af965ba51b584a8d6e",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/loadedgrid-race.log": "66f6be614d092211277410cb815a1ba1d2a9f457d84ec3e6780eee5484fab562",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/loadedtree-race.log": "bc23dcadd01402ceca53b0f6c029b886f2a8abd9e8213dd23bd42b98ab5d7cfc",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/portable-race.log": "267c32daf92c219dfa52086ae48c62ad815d5f9ce4f6ae91ec8c44174443eeea",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/prepare-tests.log": "5d6a2ed72d8a1044039f59b095e83dd79012334938689baf3ff6307d63217d0d",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/producer.py.txt": "1eeb23e293fcd6b2ee2a2919240a5b3c2e00e90d71290741919ec4b43c93c499",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/qualification.json": "13f3b2544220e68d2b25920589fe1669a27f7eab9fcf440a8f31885301605d68",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/release-build.log": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/replay-race.log": "5a632e432c128e37b3e7427b5ae1a52f6c5de286d47aaf6e520230a543149127",
+    "/private/tmp/vellum-grid-local-layout/checks-v2/viewport3d-race.log": "e47542617ce8d1bfabe4f0d5f8b412c55c44f0295ed590b30e9cdc11b27219dc",
+    "/private/tmp/vellum-grid-local-layout/internal-integration-review-v2.json": "485adb0c6f1c15af07c40e6055805e793befbe19581041130450c6681c7f7523",
+    "/private/tmp/vellum-grid-local-layout/native-v2/fixed-10k.log": "2dd935f6c0541610b0564f6d634cd6fc30948b3fd58d2ccf4c56302a87847d9c",
+    "/private/tmp/vellum-grid-local-layout/native-v2/generic-ax.log": "855cb44feab35f97f5e1dff00a3a96bfbde40a3f848575c61ffa1a97f23149b4",
+    "/private/tmp/vellum-grid-local-layout/native-v2/producer.py.txt": "9177266ce4eb2c7c21eba5a20877c182742437426f995864bff1d824cbaa1785",
+    "/private/tmp/vellum-grid-local-layout/native-v2/qualification.json": "b896a274c13c3478bf41292c49fb8003099fab3d287b6c43ed10ced2631c50d4",
+    "/private/tmp/vellum-grid-local-layout/native-v2/variable-million.log": "0d641907c363c68bd4f7f2c84e89eb2f6c58709ec509ff097c0304e28caf5866",
+    "/private/tmp/vellum-grid-local-layout/source-v2.json": "f2917e95fc56efc7a018b6d927165e5c0b08333a95eb7eb3783b80b5a5a79582"
+  },
+  "assessment": [
+    "All20 recorded controlled children exit0 with no error, raw log hashes match and failed/race/build markers absent. Full offscreen driver integration now passes the two v1 failure groups; historical v1 remains REFUSED.",
+    "The three live Cocoa commands use exact artifacts from the qualifying build; native qualification references the actual build receipt hash. Fixed10k and variable1M records retain400 minimum clipped cells, positive overlapping-object reuse and replacement retirement, native press admission and closed attachment refusal.",
+    "Generic Cocoa accessibility mode records controlled roles/hit/focus/modal/dock/outline checks and explicitly leaves VoiceOver untested.",
+    "All source666/prepared6148 endpoint bytes were independently hashed against current files, plus the24 owned frozen inputs and both current binaries."
+  ],
+  "binary_files_current_match": true,
+  "binary_sha256": {
+    "vellum-grid-local-candidate-v2": "f3c19fc7af748d13d8202c99311817255c6f23ec4b7dca5873163c4d68267402",
+    "vellum-grid-local-generic-v2": "69ac0bfa3937e7aef203900f7a3336206f37db0c56a59abcdd75dbef9f1cd075"
+  },
+  "checks": {
+    "checks-v2": [
+      {
+        "argv": [
+          "python3",
+          "prepare_test.py"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "5d6a2ed72d8a1044039f59b095e83dd79012334938689baf3ff6307d63217d0d",
+        "name": "prepare-tests",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "python3",
+          "prepare.py"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "b524cb11830dec0f42745ec1afcf52708f286a8dc67b6e3fc7faef619229d809",
+        "name": "fresh-prepare",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "267c32daf92c219dfa52086ae48c62ad815d5f9ce4f6ae91ec8c44174443eeea",
+        "name": "portable-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "-run",
+          "^TestVellumLocalLayout|^TestVellumManualTimerDeliveryFIFOAndCancellation$|^TestVellumManualCanceledLifetimeRetiresInputAndTimers$",
+          "cogentcore.org/core/core"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "09ad1a72be31910aa96131c6eab17fafd1560289456d0722f23332877435fcf1",
+        "name": "core-local-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "-tags",
+          "offscreen",
+          "-composites=false",
+          "-unreachable=false",
+          "cogentcore.org/core/core"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "name": "core-offscreen-vet",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "-composites=false",
+          "-unreachable=false",
+          "cogentcore.org/core/core"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "name": "core-default-vet",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "99a592fb700a8ba3da43d94dfb4790b32d62a5b8a3d0690b1495594285e08e64",
+        "name": "driver-offscreen-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "c9d0adb1d3e65b41df6ecc738db7e3089edfa37e2b6b552e1ac421c790015259",
+        "name": "driver-native-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "-tags",
+          "offscreen",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "name": "driver-offscreen-vet",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "name": "driver-native-vet",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "66f6be614d092211277410cb815a1ba1d2a9f457d84ec3e6780eee5484fab562",
+        "name": "loadedgrid-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "bc23dcadd01402ceca53b0f6c029b886f2a8abd9e8213dd23bd42b98ab5d7cfc",
+        "name": "loadedtree-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "f1e11505801a0f25a80feb3ad1f3142d20a3fc0e2b2accac7a1b91dc8d19a43b",
+        "name": "grid-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "df9f37643545b767f9c3a4635f97c0695cd688425d5434e6c6d441823805d622",
+        "name": "editor-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "5a632e432c128e37b3e7427b5ae1a52f6c5de286d47aaf6e520230a543149127",
+        "name": "replay-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "e6d917c355c0e9554bd49964978e06d058f75346c183a5e89a7bb10b33593553",
+        "name": "drawing-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "2425741ee58507847eed8c71d2f098df932734de8ed571af965ba51b584a8d6e",
+        "name": "imaging-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=1",
+          "./..."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "e47542617ce8d1bfabe4f0d5f8b412c55c44f0295ed590b30e9cdc11b27219dc",
+        "name": "viewport3d-race",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/private/tmp/vellum-grid-local-candidate-v2",
+          "."
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+        "name": "release-build",
+        "runtime": false
+      },
+      {
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/private/tmp/vellum-grid-local-generic-v2",
+          "./cmd/accessibility-smoke"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "6f9ed08bde9a6d02c495b43364c4f18229108fe7c1353b81d950a446dd4b1819",
+        "name": "generic-build",
+        "runtime": false
+      }
+    ],
+    "native-v2": [
+      {
+        "argv": [
+          "/private/tmp/vellum-grid-local-candidate-v2",
+          "-accessibility-smoke",
+          "-rows",
+          "10000"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "2dd935f6c0541610b0564f6d634cd6fc30948b3fd58d2ccf4c56302a87847d9c",
+        "name": "fixed-10k",
+        "runtime": true
+      },
+      {
+        "argv": [
+          "/private/tmp/vellum-grid-local-candidate-v2",
+          "-accessibility-smoke",
+          "-rows",
+          "1000000",
+          "-variable-rows"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "0d641907c363c68bd4f7f2c84e89eb2f6c58709ec509ff097c0304e28caf5866",
+        "name": "variable-million",
+        "runtime": true
+      },
+      {
+        "argv": [
+          "/private/tmp/vellum-grid-local-generic-v2"
+        ],
+        "error": null,
+        "exit_code": 0,
+        "log_sha256": "855cb44feab35f97f5e1dff00a3a96bfbde40a3f848575c61ffa1a97f23149b4",
+        "name": "generic-ax",
+        "runtime": true
+      }
+    ]
+  },
+  "checks20_and_native3_endpoint_maps_equal": true,
+  "findings": [],
+  "frozen24_current_and_snapshot_hashes_match": true,
+  "generic_native_record": {
+    "checks": [
+      "reachable Cocoa tree",
+      "native NSWindow identity and AXWindow role",
+      "roles labels values native hit testing",
+      "deterministic equal-frame descendant and sibling hit testing",
+      "controlled native actions",
+      "disabled refusal",
+      "Tab order",
+      "selected tab visibility",
+      "bounded stable virtual rows and paging",
+      "real outline pager geometry and native hit testing",
+      "independent outline selection disclosure and leaf refusal",
+      "modal isolation Tab wrap Escape",
+      "live dock panel namespaces activation focus modal geometry and retirement"
+    ],
+    "native": "macOS NSAccessibility",
+    "preferences_changed": false,
+    "reachable_elements": 27,
+    "result": "PASS",
+    "voiceover_tested": false
+  },
+  "limits": [
+    "Read-only standard-library receipt/raw-log/hash audit; no test/build/prepare/native/UI/provider or parent producer executed by reviewer.",
+    "Native scope is recorded semantics/geometry/object identity and controlled action/lifetime checks. Admission counts alone are not human screen-reader/input or GPU/display/memory qualification.",
+    "Ordinary performance campaign is separately running/pending and is not qualified by these successful functional gates. No latency/target/speedup or fullP6/Mac acceptance claim.",
+    "Endpoint equality binds recorded inputs; it is not an entire compiler/cache/SDK/source distribution closure."
+  ],
+  "native_grid_records": [
+    {
+      "name": "fixed-10k",
+      "records": [
+        {
+          "event": "grid.accessibility.pass",
+          "native_press_admitted": true,
+          "overlap_objects_reused": 2268,
+          "replacement_objects_retired": 459,
+          "rows": 10000,
+          "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification",
+          "visible_minimum": 400
+        },
+        {
+          "attachment_query_refused": true,
+          "event": "grid.accessibility.closed"
+        }
+      ]
+    },
+    {
+      "name": "variable-million",
+      "records": [
+        {
+          "event": "grid.accessibility.pass",
+          "native_press_admitted": true,
+          "overlap_objects_reused": 2307,
+          "replacement_objects_retired": 468,
+          "rows": 1000000,
+          "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification",
+          "visible_minimum": 400
+        },
+        {
+          "attachment_query_refused": true,
+          "event": "grid.accessibility.closed"
+        }
+      ]
+    }
+  ],
+  "prepared_count": 6148,
+  "result": "APPROVED_RECORDED_GATES",
+  "schema": "vellum-grid-local-gates-review-v2",
+  "source_approval_certificate_sha256": "485adb0c6f1c15af07c40e6055805e793befbe19581041130450c6681c7f7523",
+  "source_approval_kept_byte_identical": true,
+  "source_count": 666
+}

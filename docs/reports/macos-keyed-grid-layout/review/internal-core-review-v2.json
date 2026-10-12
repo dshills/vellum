@@ -1,0 +1,119 @@
+{
+  "bindings": {
+    "/private/tmp/vellum-grid-local-layout/internal-core-review.json": "d24746ad237aa7296efdf35673d64eef19613af1088060642ee5b513a9ffd4b5",
+    "/private/tmp/vellum-local-layout-handoff-v2/checks/qualification.json": "6dcf4329423e4a6ec4335fc7aff8c92666288f2e606d824d289bda3334d0337d",
+    "/private/tmp/vellum-local-layout-handoff-v2/checks/qualify.py.txt": "c69d5e2f061f9b824c8f7cdc70900252bcd0114d229bb64e8ff41c700f8b8c13",
+    "/private/tmp/vellum-local-layout-handoff-v2/handoff.json": "9bdca35b24692e8939bcb4695f70eb761cef3687b39c26a4f6f871764f3e0b85",
+    "/private/tmp/vellum-local-layout-handoff-v2/history/old-slider-red.log": "5cbda4862fdc2d3eaa6ab3b5b35fedbbe9bed4bf0b4decde1a71a3702e44a81a",
+    "/private/tmp/vellum-local-layout-handoff-v2/history/reentrant-before.log": "91bb3c1a38f0340e3c3cf06c910b30a36aed45afdb457d2ceedccc230d7c88af",
+    "/private/tmp/vellum-local-layout-handoff-v2/history/reentrant-red.json": "a5d5fb121367dc6ea7f24468fc9262454955c0233a541ab60fe2fa0e57d79b9a",
+    "/private/tmp/vellum-local-layout-handoff-v2/history/targeted-first.log": "5d3a1fc314703a36290d1dcb92117ade51987a7ebb74e6f9cdb84d4c099404e2",
+    "/private/tmp/vellum-local-layout-handoff-v2/manifest.json": "b1832902849e106a9d5d1bc7087be2da031da7f4bc7a2425600e419b47aef743",
+    "/private/tmp/vellum-local-layout-handoff-v2/source-delta.diff.txt": "f1c469c45e4e91febb44b78a929d6778bfa82bc747aa38291b9465f42875df69"
+  },
+  "evidence_verified": {
+    "all_handoff_hashes_match": true,
+    "author_selected_group_scope": "16 new top-level groups plus 2 legacy timer/lifetime groups selected by the recorded race3 command; no independent runtime rerun.",
+    "checks": [
+      {
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags",
+          "offscreen",
+          "-count=3",
+          "-run",
+          "^TestVellumLocalLayout|^TestVellumManualTimerDeliveryFIFOAndCancellation$|^TestVellumManualCanceledLifetimeRetiresInputAndTimers$",
+          "cogentcore.org/core/core"
+        ],
+        "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+        "elapsed_seconds": 5.436717416043393,
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-local-layout-v2/final-race3.log",
+        "log_sha256": "1af4fea98de797e81b4ad376bc74c1dc804dd19e2cde8c03b47557fecc4573b0",
+        "name": "final-race3",
+        "timeout_seconds": 60
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "-tags",
+          "offscreen",
+          "-composites=false",
+          "-unreachable=false",
+          "cogentcore.org/core/core"
+        ],
+        "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+        "elapsed_seconds": 0.8112676659948193,
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-local-layout-v2/final-vet-offscreen.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "name": "final-vet-offscreen",
+        "timeout_seconds": 60
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "-composites=false",
+          "-unreachable=false",
+          "cogentcore.org/core/core"
+        ],
+        "cwd": "/private/tmp/vellum-large-data/drivers/cogent",
+        "elapsed_seconds": 0.8063504999736324,
+        "exit_code": 0,
+        "log": "/private/tmp/vellum-local-layout-v2/final-vet-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "name": "final-vet-default",
+        "timeout_seconds": 60
+      }
+    ],
+    "handoff_manifest_members": 28,
+    "historical_red_classification": "Four explicit global-request assertion failures and six explicit render-request assertion failures on V1; original-slider overlay fails actual bounded-step quiescence. All raw failure artifacts retained.",
+    "original_v1_certificate_unchanged_sha256": "d24746ad237aa7296efdf35673d64eef19613af1088060642ee5b513a9ffd4b5",
+    "qualification_before_after_equal_owned_map": true,
+    "six_current_inputs_equal_frozen_handoff": true,
+    "unchanged_red_green_test_bodies": {
+      "TestVellumLocalLayoutFullPaintPreservesLaterGlobalRequest": "8ecec2d1f842f85b50a09a9e6998689b04bcebedb093ed72dcce2b49892ec51e",
+      "TestVellumLocalLayoutPaintPreservesLaterRenderRequest": "e4d8057692d53df81071d9ddaae142e4516dae08396566e8a9f0459cb11c0253"
+    },
+    "v1_test_file_is_byte_identical_prefix": true
+  },
+  "files": {
+    "core/local_layout.go": "2c230d13cf20651f2a7e02f28a8084f37de89a2ecfcec635bc55b2b8fe0f7187",
+    "core/local_layout_test.go": "3532b5cabfee3d3dca1d4eab8b6975215bfbc8bc0763c497c6255fbdce1cf36d",
+    "core/manual_timer.go": "069941c1fb295ab6ae952159d3ae08128dfed420c69d4a7f26c0cfdd08021693",
+    "core/render.go": "056a7ece05171a8685484ec2acacf011122732336e8dbec7b5b3490e1abb19aa",
+    "core/scene.go": "3922dc6324fb091c1dfd6352c64e24f42f101d253334fbe8057e6778cc76b94a",
+    "core/slider.go": "0d92f62d3d0e476c93977bf3ab2cae5ee9f3e51c14c4bc5f9215c3e8078b1f3c"
+  },
+  "findings": [],
+  "frozen_source_root": "/private/tmp/vellum-local-layout-handoff-v2/sources",
+  "limits": [
+    "Approval covers only the six selected frozen Core sources, supporting control flow, and recorded selected receipt identities.",
+    "Grid integration, global prepared/compiler closure, pinned patch reconstruction, full default widget/raster regression, native GUI/GPU acceptance, provider review, performance, and distribution qualification remain outside this certificate.",
+    "Both author vet commands explicitly disable composites and unreachable analyzers; their zero exits are not stock all-analyzer vet acceptance.",
+    "No executable checks, builds, prepare, provider, GUI, Git operation, repository or dependency mutation ran during this independent review. Only this certificate and an inert recipe were written outside the repository."
+  ],
+  "resolved_v1_finding": {
+    "disposition": "RESOLVED_IN_V2",
+    "id": "CORE_LOCAL_LAYOUT_GLOBAL_REQUEST_CONSUMPTION",
+    "reason": "fullLayoutUpdate publishes/retains the atomic fence, consumes only the admitted native layout bit before callouts, and clears the fence only after normal completion without a newer layout request. Its abnormal-return defer restores a fenced full request. V1 remains NEEDS_FIX at its original digest.",
+    "regression": "Four owned full-work modes (layout/restyle/rebuild/local-decline fallback) request layout during Render, verify that unresolved geometry retains both the flag and fence, then verify next-pass geometry and actual pixel changes. Exact red test bodies are unchanged in final green source."
+  },
+  "result": "APPROVED",
+  "reviewed_at_utc": "2026-10-12T00:54:00.827627+00:00",
+  "schema": 1,
+  "source_assessment": [
+    "Global requests made during sizing/styling/rendering survive because consumption precedes all full-work callbacks. Sizing/styling render requests are consumed only when painting is about to perform the requested work; Render-time requests survive for a later pass.",
+    "Render-only, local-repaint and full-layout paint use renderUpdate. Abnormal paint preserves the original panic/Goexit and promotes complete-scene layout/render retry, covering consumed widget flags and partial painter commands. The test explicitly discards incomplete painter commands before recovery; arbitrary reuse without that cleanup is not newly promised.",
+    "Private styleScene omits only the unconditional future layout request when its caller immediately sizes the scene under the full fence. Existing applyStyleScene retains its ordinary NeedsLayout admission; actual callback requests remain queued.",
+    "Slider position arithmetic is unchanged in updatePosFromValue. Render uses that pure update without requesting another render. setPosFromValue and SetValue preserve external request behavior, including unchanged SetValue repaint, and actual position changes/quiescence are tested.",
+    "Previously reviewed capacity, identity/membership/envelope checks, next-pass local reentrancy, complete ordered scene repaint, and Scene.Destroy admission/timer/queue cleanup are retained. The new API requires originating render ownership; atomic inspection does not authorize arbitrary foreign widget mutation."
+  ],
+  "source_root": "/private/tmp/vellum-large-data/drivers/cogent/build/upstream",
+  "verifier": "/private/tmp/vellum-grid-local-layout/internal-core-review-v2-verify.py.txt",
+  "version": "frozen Core local-layout v2"
+}

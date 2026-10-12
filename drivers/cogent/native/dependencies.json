@@ -353,6 +353,17 @@
               "sha256": "5826bb188061429e650a877744c1d0ed1d9ec3726897c9a059fa2089ac4c7249"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/locallayout",
+          "inputs": "native/patches/locallayout/original-hashes.json",
+          "outputs": "native/patches/locallayout/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/locallayout/0040-fixed-allocation-local-layout.patch",
+              "sha256": "8ee95909824c5ce5309c901be8372a45cb8b9d9c9402fb19a17f556ee2136ca3"
+            }
+          ]
         }
       ]
     },

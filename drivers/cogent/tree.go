@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html"
 	"math"
+	"slices"
 	"sync"
 	"sync/atomic"
 
@@ -67,6 +68,8 @@ type outlineBinding struct {
 	status                     *core.Text
 	vertical                   *core.Slider
 	projection                 virtual.OutlineSnapshot
+	projectedDisabled          bool
+	projectedHelp              string
 	measurement                atomic.Pointer[TreeInspection]
 	armed                      *outlinePress
 	requestMu                  sync.Mutex
@@ -472,6 +475,10 @@ func syncTree(r *record) (result error) {
 		t.epoch = outlineRegistry.next
 		outlineRegistry.Unlock()
 	}
+	// State.Pending can change without a new generation. Compare all validated
+	// state and bounded rows; a completed owner publication must not schedule
+	// another full scene layout when the projection is unchanged.
+	dirty := !t.projectionValid.Load() || t.projection.State != snap.State || !slices.Equal(t.projection.Rows, snap.Rows) || t.projectedDisabled != r.control.disabled || t.projectedHelp != r.node.Accessibility.Help
 	t.projection = snap
 	if len(t.rows) > len(snap.Rows) {
 		for _, row := range t.rows[len(snap.Rows):] {
@@ -491,6 +498,7 @@ func syncTree(r *record) (result error) {
 	}
 	for i, row := range snap.Rows {
 		native := t.rows[i]
+		rowDirty := dirty || native.row != row
 		native.row = row
 		value := ""
 		if row.HasChildren {
@@ -504,11 +512,18 @@ func syncTree(r *record) (result error) {
 		native.SetState((row.Clip.Width <= 0 || row.Clip.Height <= 0), states.Invisible)
 		native.SetState(row.Selected, states.Selected)
 		native.label.SetState(row.Selected, states.Selected)
-		native.Update()
+		if rowDirty {
+			native.Update()
+		}
 	}
-	t.vertical.SetValue(0)
+	value := float32(0)
 	if maximum := treeMaxY(snap.State); maximum > 0 {
-		t.vertical.SetValue(float32(float64(snap.State.Viewport.ScrollY) / float64(maximum)))
+		value = float32(float64(snap.State.Viewport.ScrollY) / float64(maximum))
+	}
+	// SetValue requests paint even for an identical value. A native drag may
+	// leave a noncanonical value despite an unchanged accepted model pixel.
+	if t.vertical.Value != value {
+		t.vertical.SetValue(value)
 	}
 	t.pager[0].SetState(snap.State.Viewport.ScrollY == 0, states.Disabled)
 	t.pager[1].SetState(snap.State.Viewport.ScrollY == treeMaxY(snap.State), states.Disabled)
@@ -526,7 +541,11 @@ func syncTree(r *record) (result error) {
 		suffix = " · building"
 	}
 	t.status.SetText(fmtTreeRange(first, last, snap.State.VisibleRows, suffix))
-	t.host.Update()
+	if dirty {
+		t.host.Update()
+	}
+	t.projectedDisabled = r.control.disabled
+	t.projectedHelp = r.node.Accessibility.Help
 	t.projectionValid.Store(true)
 	return nil
 }

@@ -33,6 +33,12 @@ func (s gridUpdateSource) SelectionSnapshot() (virtual.GridRowIndex, error) {
 
 type gridUpdatePass struct{ updates, styles int }
 
+type gridUpdateBefore struct {
+	text                        string
+	selected, invisible, cursor bool
+	parent                      any
+}
+
 // This measures one actual owner sync on a fully constructed manual scene, not
 // all later framework passes needed to frame/layout that accepted projection.
 // Observers only count and do not set properties or alter updater/style order.
@@ -114,8 +120,11 @@ func TestManagedGridRetainedWidgetsUpdateOncePerSync(t *testing.T) {
 						t.Error(err)
 						return
 					}
-					for _, pass := range counters {
+					before := make(map[*core.Text]gridUpdateBefore)
+					for w, pass := range counters {
 						*pass = gridUpdatePass{}
+						cursor, _ := w.Property("vellum.grid.cursor").(bool)
+						before[w] = gridUpdateBefore{w.Text, w.StateIs(states.Selected), w.StateIs(states.Invisible), cursor, w.Parent}
 					}
 					if err := syncGrid(binding.r); err != nil {
 						t.Error(err)
@@ -128,8 +137,14 @@ func TestManagedGridRetainedWidgetsUpdateOncePerSync(t *testing.T) {
 							t.Errorf("%s allocated instead of recycling warmed widget", phase.name)
 							continue
 						}
-						if pass.updates != 1 || pass.styles != 1 {
-							t.Errorf("%s retained widget update/style passes: got %d/%d want 1/1", phase.name, pass.updates, pass.styles)
+						cursor, _ := w.Property("vellum.grid.cursor").(bool)
+						current := gridUpdateBefore{w.Text, w.StateIs(states.Selected), w.StateIs(states.Invisible), cursor, w.Parent}
+						want := 0
+						if !binding.layout.valid || before[w] != current {
+							want = 1
+						}
+						if pass.updates != want || pass.styles != want {
+							t.Errorf("%s retained widget update/style passes: got %d/%d want %d/%d", phase.name, pass.updates, pass.styles, want, want)
 						}
 					}
 					assertGridUpdateStyles(t, binding, phase.name)

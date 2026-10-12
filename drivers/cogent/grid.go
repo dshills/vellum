@@ -2,7 +2,6 @@ package cogent
 
 import (
 	"errors"
-	"html"
 	"image"
 	"math"
 	"sync"
@@ -79,9 +78,13 @@ type gridBinding struct {
 	horizontal, vertical *core.Slider
 	projection           virtual.GridSnapshot // originating native scene / owner refresh only
 	projectionReady      bool                 // true only after a successful complete sync
+	layout               gridLayoutStamp
+	layoutDirty          map[*core.Text]bool
+	layoutPending        atomic.Bool
 	projectedDisabled    bool
 	projectedHelp        string
 	measurement          atomic.Pointer[GridInspection]
+	measurementScene     atomic.Pointer[core.Scene]
 	armed                *gridPress // originating scene only; detached opaque identity and scene geometry
 	requestMu            sync.Mutex
 	requested            gridRequest
@@ -662,6 +665,8 @@ func syncGrid(r *record) error {
 			return err
 		}
 		if g.projectedDisabled != r.control.disabled || g.projectedHelp != r.node.Accessibility.Help {
+			g.layoutPending.Store(true)
+			g.layout.valid = false
 			g.host.Update()
 			g.projectedDisabled = r.control.disabled
 			g.projectedHelp = r.node.Accessibility.Help
@@ -669,6 +674,7 @@ func syncGrid(r *record) error {
 		return nil
 	}
 	// A failed partial sync cannot be reused on a later explicit retry.
+	wasReady := g.projectionReady
 	g.projectionReady = false
 	snap, err := g.model.Snapshot()
 	if err != nil {
@@ -687,37 +693,33 @@ func syncGrid(r *record) error {
 		g.epoch = gridRegistry.next
 		gridRegistry.Unlock()
 	}
+	g.projectionReady = wasReady
+	local := g.canLayoutLocally(snap)
+	g.projectionReady = false
+	cells, retiredCells, err := g.retainCells(snap)
+	if err != nil {
+		return err
+	}
+	headers, retiredHeaders, err := g.retainHeaders(snap)
+	if err != nil {
+		return err
+	}
+	g.layoutPending.Store(true)
 	g.projection = snap
-	// Retired slots must release shaped text as well as strings. Destroy surplus
-	// widgets rather than retaining private Core text caches for old projections.
-	if len(g.cells) > len(snap.Cells) {
-		for _, w := range g.cells[len(snap.Cells):] {
+	g.cells, g.headers = cells, headers
+	for _, list := range [][]*core.Text{retiredCells, retiredHeaders} {
+		for _, w := range list {
+			delete(g.layoutDirty, w)
 			w.Delete()
 		}
-		clear(g.cells[len(snap.Cells):])
-		g.cells = g.cells[:len(snap.Cells)]
 	}
-	if len(g.headers) > len(snap.Headers) {
-		for _, w := range g.headers[len(snap.Headers):] {
-			w.Delete()
-		}
-		clear(g.headers[len(snap.Headers):])
-		g.headers = g.headers[:len(snap.Headers)]
-	}
-	for len(g.cells) < len(snap.Cells) {
-		w := core.NewText(g.panes[2])
-		g.installTextStyle(w)
-		g.cells = append(g.cells, w)
-	}
-	for len(g.headers) < len(snap.Headers) {
-		w := core.NewText(g.panes[0])
-		g.installTextStyle(w)
-		g.headers = append(g.headers, w)
-	}
+	styleDirty := make(map[*core.Text]bool)
 	for i, w := range g.cells {
-		if i >= len(snap.Cells) {
-			w.SetState(true, states.Invisible)
-			continue
+		created := w == nil
+		if created {
+			w = core.NewText(g.panes[2])
+			g.installTextStyle(w)
+			g.cells[i] = w
 		}
 		c := snap.Cells[i]
 		pane := 2
@@ -728,25 +730,60 @@ func syncGrid(r *record) error {
 		if snap.State.Config.RowSelection {
 			selected = c.Selected
 		}
-		g.place(w, g.panes[pane], c.Rect, c.Clip, html.EscapeString(c.Text), selected, c.Active && snap.State.Config.RowSelection)
+		sty, size, moved := g.placeRetained(w, g.panes[pane], c.Rect, c.Clip, c.Text, selected, c.Active && snap.State.Config.RowSelection)
+		if moved && !created {
+			local = false
+		}
+		if sty || created {
+			styleDirty[w] = true
+		}
+		if size {
+			if g.layoutDirty == nil {
+				g.layoutDirty = make(map[*core.Text]bool)
+			}
+			g.layoutDirty[w] = true
+		}
 	}
 	for i, w := range g.headers {
-		if i >= len(snap.Headers) {
-			w.SetState(true, states.Invisible)
-			continue
+		created := w == nil
+		if created {
+			w = core.NewText(g.panes[0])
+			g.installTextStyle(w)
+			g.headers[i] = w
 		}
 		h := snap.Headers[i]
 		pane := 0
 		if !h.Frozen {
 			pane = 1
 		}
-		g.place(w, g.panes[pane], h.Rect, h.Clip, html.EscapeString(h.Title), false, false)
+		sty, size, moved := g.placeRetained(w, g.panes[pane], h.Rect, h.Clip, h.Title, false, false)
+		if moved && !created {
+			local = false
+		}
+		if sty || created {
+			styleDirty[w] = true
+		}
+		if size {
+			if g.layoutDirty == nil {
+				g.layoutDirty = make(map[*core.Text]bool)
+			}
+			g.layoutDirty[w] = true
+		}
 	}
 	g.syncScrollbars(snap.State)
 	if err := syncGridEditing(g); err != nil {
 		return err
 	}
-	g.host.Update()
+	g.orderPanes()
+	if local && g.host.Scene.NeedsLocalLayout(g.host) {
+		for w := range styleDirty {
+			w.UpdateWidget()
+			w.Style()
+		}
+	} else {
+		g.layout.valid = false
+		g.host.Update()
+	}
 	g.projectedDisabled = r.control.disabled
 	g.projectedHelp = r.node.Accessibility.Help
 	g.projectionReady = true
@@ -797,8 +834,8 @@ func (g *gridBinding) place(w *core.Text, p *gridPane, rect, clip virtual.GridRe
 	w.SetText(value)
 	w.SetState(clip.Empty(), states.Invisible)
 	w.SetState(selected, states.Selected)
-	// syncGrid updates the host recursively after every slot has been placed.
-	// Updating here would run the same updater/style work a second time.
+	// The retained sync chooses a local update or the full host update after
+	// all placements are complete.
 }
 func disposeGrid(r *record) {
 	if r == nil || r.control == nil || r.control.grid == nil {
@@ -809,6 +846,9 @@ func disposeGrid(r *record) {
 	g.disposeEditing()
 	g.armed = nil
 	g.measurement.Store(nil)
+	g.measurementScene.Store(nil)
+	clear(g.layoutDirty)
+	g.layout = gridLayoutStamp{}
 	gridRegistry.Lock()
 	if gridRegistry.models[g.model] == g {
 		if old := g.previous; old != nil && !old.closed.Load() && !old.r.control.retired {
@@ -947,6 +987,7 @@ func (w *gridWidget) Position() {
 	setGridGeometry(&g.horizontal.WidgetBase, virtual.GridRect{Y: v.Height, Width: v.Width, Height: gridScrollbar}, scale)
 	setGridGeometry(&g.vertical.WidgetBase, virtual.GridRect{X: v.Width, Width: gridScrollbar, Height: v.Height}, scale)
 	w.Frame.Position()
+	clear(g.layoutDirty)
 }
 func (w *gridWidget) RenderWidget() {
 	w.Frame.RenderWidget()

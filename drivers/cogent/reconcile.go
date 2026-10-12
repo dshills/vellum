@@ -158,6 +158,10 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	var attach func(*plan)
 	attach = func(p *plan) {
 		if !reflect.DeepEqual(p.r.theme, theme) {
+			if p.r.control != nil && p.r.control.grid != nil {
+				p.r.control.grid.layoutPending.Store(true)
+				p.r.control.grid.layout.valid = false
+			}
 			p.r.theme = theme
 			if ext, ok := p.node.Custom.(ThemeExtension); p.node.Kind == ui.Extension && ok {
 				ext.SetTheme(theme.Clone())
@@ -166,6 +170,10 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 			changed = true
 		}
 		if p.r.widget.AsTree().Parent != p.parent {
+			if p.r.control != nil && p.r.control.grid != nil {
+				p.r.control.grid.layoutPending.Store(true)
+				p.r.control.grid.layout.valid = false
+			}
 			tree.MoveToParent(p.r.widget, p.parent)
 			p.r.widget.AsWidget().SetScene(p.parent.(core.Widget).AsWidget().Scene)
 		}

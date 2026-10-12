@@ -1,0 +1,132 @@
+# Independent read-only stdlib closure verifier. Does not import/run parent producers.
+from pathlib import Path, PurePosixPath
+import hashlib, json, re, tarfile, math
+ROOT = Path('/private/tmp/vellum-large-data')
+PHASE = Path('/private/tmp/vellum-grid-local-layout')
+REPORT = ROOT/'docs/reports/macos-keyed-grid-layout'
+def sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def read(path): return json.loads(Path(path).read_text())
+index = read(REPORT/'records-index.json')
+audit = read(REPORT/'audit.json')
+assert audit['result'] == 'PASS'
+assert len(index['files']) == audit['archive']['files'] == 391
+assert sha(REPORT/'records.tar.gz') == index['archive_sha256'] == audit['archive']['sha256']
+assert (REPORT/'records.tar.gz').stat().st_size == index['archive_bytes'] == audit['archive']['bytes']
+assert sha(REPORT/'records-index.json') == audit['archive']['index_sha256']
+phase_names = {str(p.relative_to(PHASE)) for p in PHASE.rglob('*') if p.is_file()}
+assert phase_names == set(index['files'])
+for name, digest in index['files'].items(): assert sha(PHASE/name) == digest, name
+with tarfile.open(REPORT/'records.tar.gz', 'r:gz') as archive:
+    members = archive.getmembers()
+    assert len(members) == 391 and all(m.isfile() for m in members)
+    assert len({m.name for m in members}) == 391
+    names = set()
+    for member in members:
+        path = PurePosixPath(member.name)
+        assert not path.is_absolute() and '..' not in path.parts and path.parts[0] == 'records'
+        name = str(PurePosixPath(*path.parts[1:])); names.add(name)
+        assert hashlib.sha256(archive.extractfile(member).read()).hexdigest() == index['files'][name]
+    assert names == set(index['files'])
+    uncompressed_bytes = sum(m.size for m in members)
+assert 'records-index.json' not in index['files'] and 'audit.json' not in index['files']
+assert not any('internal-closure-review-v2' in name for name in index['files'])
+source = read(PHASE/'source-v2.json')
+assert len(source['source_sha256']) == 24
+for name, digest in source['source_sha256'].items():
+    live = ROOT/('drivers/cogent/build/upstream/'+name if name.startswith('core/') else name)
+    assert sha(live) == sha(PHASE/'source-v2'/name) == digest
+checks = read(PHASE/'checks-v2/qualification.json')
+native = read(PHASE/'native-v2/qualification.json')
+performance = read(PHASE/'performance-v2-qualified/qualification.json')
+assert checks['result'] == native['result'] == 'PASS'
+assert checks['before'] == checks['after'] == native['before'] == native['after'] == performance['before'] == performance['after']
+assert len(checks['before']['source']) == audit['source_files'] == 666
+assert len(checks['before']['prepared']) == audit['prepared_files'] == 6148
+for group in checks['after'].values():
+    for name, digest in group.items(): assert sha(ROOT/name) == digest
+assert len(checks['checks']) == audit['checks']['final'] == 20
+assert len(native['checks']) == audit['checks']['native_processes'] == 3
+for folder, receipt in [('checks-v2', checks), ('native-v2', native)]:
+    assert sha(PHASE/folder/'producer.py.txt') == receipt['producer_sha256']
+    for check in receipt['checks']:
+        assert check['exit_code'] == 0 and check['error'] is None
+        assert sha(PHASE/folder/(check['name']+'.log')) == check['log_sha256']
+assert checks['binaries'] == native['binaries'] == audit['binaries']
+for name, digest in checks['binaries'].items(): assert sha(Path('/private/tmp')/name) == digest
+assert sha(PHASE/'checks-v2/qualification.json') == native['qualified_build_sha256'] == audit['qualified_receipt_sha256']
+assert performance['result'] == 'PASS_MATCHED_COMPARISON' and len(performance['runs']) == 40
+assert audit['checks']['ordinary_processes'] == 40 and audit['checks']['ordinary_samples'] == 4800
+assert performance['source_review_sha256'] == sha(REPORT/'review/internal-integration-review-v2.json')
+pooled = {}; per_run = []; geometry = {}; raw_samples = 0
+for run in performance['runs']:
+    folder = PHASE/'performance-v2-qualified'/run['build']/run['case']/('run-'+str(run['repetition']))
+    result = read(folder/'result.json')
+    assert sha(folder/'result.json') == run['result_sha256']
+    assert result['result'] == 'PASS' and result['exit_code'] == 0 and result['error'] is None
+    assert sha(folder/'native.log') == result['log_sha256']
+    events = [json.loads(line) for line in (folder/'native.log').read_text().splitlines() if line.startswith('{')]
+    assert events == result['records'] and len(events) == 123
+    setup, ready, end = events[0], events[1], events[-1]
+    assert setup['event'] == 'grid.perf.setup' and ready['event'] == 'grid.perf.ready' and end['event'] == 'grid.perf.end'
+    assert all(not setup[key] for key in ['input_details','source_details','novel','cpu_profile'])
+    samples = [record for record in events if record['event'] == 'grid.perf.sample']; assert len(samples) == 120
+    values = [record['metrics']['ui_work_ns'] for record in samples]
+    for sample in samples:
+        assert sample['metrics']['ui_work_ns'] == sample['native_sample']['TotalUIWorkNS']
+        assert sample['callbacks'] == 1 and not sample['input_details'] and not sample['source_details']
+        assert sample['metrics']['ui_work_ns'] == sum(sample['metrics'][key] for key in ['input_ns','owner_ns','reconcile_ns','layout_paint_ns','gather_ns','raster_upload_ns','encode_submit_ns'])
+    raw_samples += len(samples); pooled.setdefault((run['build'],run['case']), []).extend(values)
+    def percentile(xs,p): return sorted(xs)[math.ceil(len(xs)*p)-1]
+    assert percentile(values,.95) > 4_000_000 and percentile(values,.99) > 6_000_000
+    per_run.append({'build':run['build'],'case':run['case'],'repetition':run['repetition'],'p95_ns':percentile(values,.95),'p99_ns':percentile(values,.99)})
+    geometry[(run['build'],run['case'],run['repetition'])] = [{k:record['geometry'][k] for k in ['materialized_cells','retained_cells','retained_headers','cells','rows','columns','viewport','bounds','scale','layout_sha256']} for record in samples]
+assert raw_samples == 4800
+summary = read(PHASE/'performance-v2-qualified/summary.json')
+values = {}
+for case in ['fixed-10000','fixed-1000000','variable-10000','variable-1000000']:
+    row = {}
+    for build in ['baseline','candidate']:
+        series = pooled[(build,case)]; assert len(series) == 600
+        row[build] = {label:percentile(series,p) for label,p in [('p50',.50),('p95',.95),('p99',.99)]}
+        for label,value in row[build].items(): assert summary[build][case]['timings_ns']['ui_work_ns']['pooled'][label] == value
+        for repetition in range(1,6): assert geometry[('baseline',case,repetition)] == geometry[('candidate',case,repetition)]
+    row['p95_change_percent'] = 100*(row['candidate']['p95']-row['baseline']['p95'])/row['baseline']['p95']; values[case] = row
+for build in ['baseline','candidate']:
+    for variant in ['fixed','variable']:
+        for repetition in range(1,6): assert geometry[(build,variant+'-10000',repetition)] == geometry[(build,variant+'-1000000',repetition)]
+process = read(REPORT/'review/process.json'); provider = read(REPORT/'review/prism.json'); inputs = read(REPORT/'review/inputs.json'); disposition = read(REPORT/'review/prism-disposition-v2.json')
+assert process['exit_code'] == 1 and process['error'] is None and process['before'] == process['after'] == inputs['files']
+assert len(inputs['files']) == provider['coverage']['files'] == 20 and provider['coverage']['complete']
+assert len(provider['findings']) == 1 and len(provider['discarded']) == 2
+assert disposition['result'] == 'APPROVED_DISPOSITION' and not disposition['unresolved_defects']
+assert disposition['provider_exit_code'] == 1 and disposition['provider_sha256'] == sha(REPORT/'review/prism.json')
+assert len(disposition['comment_dispositions']) == 3
+for name,digest in inputs['files'].items(): assert sha(ROOT/name) == digest
+for leaf, original in [('internal-core-review-v2.json','internal-core-review-v2.json'),('internal-integration-review-v2.json','internal-integration-review-v2.json'),('internal-gates-review-v2.json','internal-gates-review-v2.json'),('internal-receipt-review-v2.json','internal-receipt-review-v2.json'),('prism-disposition-v2.json','prism-disposition-v2.json'),('process.json','prism-v2/process.json'),('prism.json','prism-v2/prism.json'),('inputs.json','prism-v2/inputs.json')]:
+    assert sha(REPORT/'review'/leaf) == sha(PHASE/original)
+assert audit['source_review_sha256'] == sha(REPORT/'review/internal-integration-review-v2.json')
+assert audit['gates_review_sha256'] == sha(REPORT/'review/internal-gates-review-v2.json')
+assert audit['receipt_review_sha256'] == sha(REPORT/'review/internal-receipt-review-v2.json')
+assert audit['prism']['disposition_sha256'] == sha(REPORT/'review/prism-disposition-v2.json')
+assert audit['prism']['raw_sha256'] == sha(REPORT/'review/prism.json') and audit['prism']['exit_code'] == 1
+assert sha(REPORT/'README.md') == audit['report_sha256'] == 'f0ec6c2073300f7d755d7257c5ee766243e2aaf29cfd999e009acbc7727c458e'
+assert sha(ROOT/'docs/implementation.md') == audit['implementation_sha256']
+assert sha(PHASE/'producer-vellum-grid-local-final-audit-v2.py.txt') == audit['producer_sha256']
+reviewed = {str(path):sha(path) for path in REPORT.rglob('*') if path.is_file() and path.name != 'internal-closure-review-v2.json'}
+for name in inputs['files']: reviewed[str(ROOT/name)] = sha(ROOT/name)
+for name in source['source_sha256']:
+    path=ROOT/('drivers/cogent/build/upstream/'+name if name.startswith('core/') else name); reviewed[str(path)] = sha(path)
+for name in ['source-v2.json','checks-v2/qualification.json','native-v2/qualification.json','performance-v2-qualified/qualification.json','performance-v2-qualified/summary.json','fallback-proof-v2/qualification.json','producer-vellum-grid-local-final-audit-v2.py.txt','producer-vellum-grid-local-archive-v2.py.txt','producer-vellum-grid-local-commit-v2.py.txt','producer-vellum-grid-local-promote-v2.py.txt']:
+    reviewed[str(PHASE/name)] = sha(PHASE/name)
+link_files = [REPORT/'README.md', REPORT/'review/README.md', ROOT/'docs/implementation.md', ROOT/'specs/grid-native.md', ROOT/'drivers/cogent/native/README.md', ROOT/'drivers/cogent/native/patches/locallayout/README.md']
+links = []
+for path in link_files:
+    for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)',path.read_text()):
+        target=target.strip().strip('<>')
+        if target.startswith(('https://','http://','mailto:','#')): continue
+        target=target.split('#')[0]; target=re.sub(r':\d+$','',target)
+        destination=Path(target) if target.startswith('/') else path.parent/target
+        assert destination.exists(),(str(path),target)
+        links.append({'source':str(path),'target':target,'exists':True})
+output={'schema':'vellum-grid-local-final-closure-review-v2','result':'APPROVED_CLOSURE','findings':[],'reviewed_file_sha256':reviewed,'aggregate_audit_sha256':sha(REPORT/'audit.json'),'archive':{'sha256':sha(REPORT/'records.tar.gz'),'index_sha256':sha(REPORT/'records-index.json'),'regular_members':391,'compressed_bytes':index['archive_bytes'],'uncompressed_bytes':uncompressed_bytes},'verification':{'all391_archive_members_equal_index_and_frozen_phase':True,'no_duplicate_special_or_traversal_members':True,'phase_has_no_unindexed_files':True,'archive_index_audit_and_closure_are_acyclic':True,'source666_prepared6148_endpoints_and_current_bytes_match':True,'frozen24_sources_and_binaries_match':True,'final_checks20_and_native3_exit0_log_hashes_match':True,'ordinary_processes':40,'ordinary_raw_samples':4800,'all_paired_geometry_equal':True,'all40_runs_fail_both_unchanged_targets':True,'raw_ui_pooled_percentiles_match_summary':True,'original_provider_exit1_retained1_discarded2_preserved':True,'all_three_comments_have_source_backed_disposition':True,'review_certificate_copies_byte_identical':True,'planned_commit_promotion_producers_inspected_not_executed':True},'independent_ui_statistics_ns':values,'local_markdown_links':links,'limits':['Read-only stdlib closure/receipt/archive/hash/source-link audit; no parent producers/tests/build/native/prepare/provider/Git execution or source changes. Only this helper and certificate were written in report/review, outside frozen391-file phase/archive.','Closure approves this bounded functional checkpoint and honest local matched measurement report. Mixed full-frame tails and0/40 unchanged targets remain explicit; no general full-frame speedup or fullP6/Mac acceptance.','No physical GPU/display/upload, native memory, human IME/VoiceOver, complete compiler/dependency/SDK or distribution qualification.','Archived producers and source history are inert evidence; planned commit/promotion steps remain parent-owned and unexecuted by reviewer.']}
+print(json.dumps(output,indent=2,sort_keys=True))

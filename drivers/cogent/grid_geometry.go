@@ -100,6 +100,7 @@ func (g *gridBinding) capture() {
 		return
 	}
 	previous := g.measurement.Load()
+	wasPending := g.layoutPending.Load() || g.host.Scene != nil && g.host.Scene.GlobalLayoutPending()
 	m := &GridInspection{Window: g.window, ID: g.r.node.ID, Incarnation: g.incarnation, Generation: s.Generation, CellIncarnation: g.epoch, Frames: g.frames, Stamp: s.Stamp, Viewport: s.Viewport, Columns: s.Columns, RetainedCells: len(g.cells), RetainedHeaders: len(g.headers), RowSelection: s.Config.RowSelection, Selection: s.Selection, Scale: g.host.Styles.UnitContext.Px(1), Bounds: g.host.Geom.ContentBBox, Cells: make([]GridCellGeometry, len(g.projection.Cells)), Headers: make([]GridHeaderGeometry, len(g.projection.Headers))}
 	offset := image.Point{}
 	if g.host.Scene != nil {
@@ -126,8 +127,11 @@ func (g *gridBinding) capture() {
 		state := field.EditingState()
 		m.Editor = &GridEditorGeometry{ID: edit.node.ID, Session: s.Edit.Session, Text: state.Text, Focused: field.StateIs(states.Focused), Bounds: field.Geom.TotalBBox.Add(offset)}
 	}
+	g.layout = g.layoutStamp()
+	g.measurementScene.Store(g.host.Scene)
 	g.measurement.Store(m)
-	if !sameGridAccessibilityMeasurement(previous, m) {
+	g.layoutPending.Store(false)
+	if wasPending || !sameGridAccessibilityMeasurement(previous, m) {
 		_ = g.owner.Invalidate(g.window)
 	}
 }
@@ -175,7 +179,15 @@ func sameGridAccessibilityMeasurement(previous, current *GridInspection) bool {
 // portable generation has not changed yet.
 func (g *gridBinding) currentMeasurement() *GridInspection {
 	m := g.measurement.Load()
-	if m == nil || m.Generation != g.projection.State.Generation || m.Stamp != g.projection.State.Stamp || m.Viewport != g.projection.State.Viewport {
+	if g.layoutPending.Load() || m == nil || m.Generation != g.projection.State.Generation || m.Stamp != g.projection.State.Stamp || m.Viewport != g.projection.State.Viewport {
+		return nil
+	}
+	if scene := g.measurementScene.Load(); scene != nil && scene.GlobalLayoutPending() {
+		return nil
+	}
+	// Publication precedes clearing local pending. Refuse an older pointer if a
+	// concurrent completed frame changed it while the fences were inspected.
+	if g.measurement.Load() != m {
 		return nil
 	}
 	g.requestMu.Lock()

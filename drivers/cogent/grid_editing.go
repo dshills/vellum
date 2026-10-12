@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"reflect"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -158,7 +159,8 @@ func syncGridEditing(g *gridBinding) error {
 			break
 		}
 	}
-	if g.editing == nil {
+	created := g.editing == nil
+	if created {
 		r := &record{node: ui.Node{ID: GridEditorID(g.r.node.ID), Kind: ui.TextField, Text: edit.Text, Accessibility: ui.Accessibility{Name: "Edit " + edit.ColumnID}}, theme: g.r.theme}
 		// Change is a controlled compatibility seam. Origin boundaries/settlement
 		// publish the draft first; a later focus-loss callback is therefore a no-op.
@@ -190,9 +192,14 @@ func syncGridEditing(g *gridBinding) error {
 	b := g.editing
 	r := b.record
 	field := r.widget.(*core.TextField)
+	dirty := created || !reflect.DeepEqual(r.theme, g.r.theme)
+	oldInvisible, oldDisabled, oldFocused := field.StateIs(states.Invisible), field.StateIs(states.Disabled), field.StateIs(states.Focused)
+	oldParent, oldScene, oldTooltip := field.Parent, field.Scene, field.Tooltip
+	oldRect, hasRect := field.Property("vellum.grid.rect").(virtual.GridRect)
 	r.theme = g.r.theme
 	b.visible = cell != nil
 	if b.revision != edit.Revision || b.accepted != edit.Text || r.control.restore {
+		dirty = true
 		// An external owner draft replacement invalidates every old shadow. Never
 		// import a later native preedit into that replacement.
 		r.control.textEpoch++
@@ -218,6 +225,7 @@ func syncGridEditing(g *gridBinding) error {
 	syncSemantics(r)
 
 	if r.control.fieldSelection != nil {
+		dirty = true
 		sel := r.control.fieldSelection
 		r.control.fieldSelection = nil
 		field.SetEditingSelection(sel.Anchor, sel.Focus)
@@ -249,7 +257,33 @@ func syncGridEditing(g *gridBinding) error {
 	if (!b.visible || r.node.Disabled) && field.StateIs(states.Focused) {
 		g.host.SetFocus()
 	}
-	field.Update()
+	dirty = dirty || oldInvisible != field.StateIs(states.Invisible) || oldDisabled != field.StateIs(states.Disabled) || oldFocused != field.StateIs(states.Focused) || oldParent != field.Parent || oldScene != field.Scene || oldTooltip != field.Tooltip
+	if cell != nil && (!hasRect || oldRect != cell.Rect) {
+		dirty = true
+	}
+	// A stable owner publication must not schedule another full frame. Native
+	// text/preedit/selection APIs already request their needed rendering. Keep
+	// their synchronization above; full field layout is for an actual change.
+	if dirty {
+		field.Update()
+	}
+	// A private field can repaint its preedit without a layout or ancestor
+	// render. Repaint the bounded host once when completed editor data differs,
+	// so its capture runs after the field and publishes the actual preview.
+	// An unchanged owner publication must not request another frame.
+	measured := g.measurement.Load()
+	var editor *GridEditorGeometry
+	if b.visible {
+		state := field.EditingState()
+		bounds := field.Geom.TotalBBox
+		if field.Scene != nil {
+			bounds = bounds.Add(field.Scene.SceneGeom.Pos)
+		}
+		editor = &GridEditorGeometry{ID: r.node.ID, Session: edit.Session, Text: state.Text, Focused: field.StateIs(states.Focused), Bounds: bounds}
+	}
+	if measured == nil || (measured.Editor == nil) != (editor == nil) || editor != nil && *measured.Editor != *editor {
+		g.host.NeedsRender()
+	}
 	return nil
 }
 
