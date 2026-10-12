@@ -397,6 +397,17 @@
               "sha256": "cc0973f00c4920127819cfec9ad5dd98914b0101aa9838335a44d87e5418d0e8"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/operationblocks",
+          "inputs": "native/patches/operationblocks/original-hashes.json",
+          "outputs": "native/patches/operationblocks/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/operationblocks/0044-bounded-operation-staging.patch",
+              "sha256": "2b103de8f7e2ba2ac371ec5efaebb882e5dd9f69549f5cda0ec300aaf337866b"
+            }
+          ]
         }
       ]
     },

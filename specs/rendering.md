@@ -287,6 +287,21 @@ streams allocate no row headers. Sealing refunds spare headers and emits the
 unchanged exact relative-row format, without exposing staging growth capacity.
 The shader, encoded packet arithmetic and retained payload limits remain fixed.
 
+Operation construction uses private blocks of 64 records. Accepted operation
+count and logical payload bytes are checked before a block is allocated. At
+most 1024 blocks can exist per builder; only the last block has unused slots,
+at most 63. Seal copies painter order once into an exact-capacity operation
+slice and retires all construction blocks, borrowed lookups and stream state
+on success or refusal. First-operation reset detection uses accepted count.
+An already refused stream allocates no compact rows. Operation admission after
+span-header refund preserves the preceding retained payload boundary.
+
+Tile encoding reuses the count scratch array as write positions only after each
+original count is recorded in the output row table. Encoded results own their
+buffers, and the operation/row/reference/data byte format remains unchanged.
+Block metadata, spare slots, construction/flattening overlap and encoder scratch
+are separate from `Packet.Bytes`; the packet limit is not a process-memory cap.
+
 Compute composites packed premultiplied RGBA bytes with the reference Go/scan
 u32 blend and truncation rules, then copies the storage buffer to a sampled
 RGBA8UnormSrgb texture. The final source uses the existing drawer composition

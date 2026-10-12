@@ -1,0 +1,103 @@
+{
+  "base_commit": "fdb67bc645ab25d64409faf06b0dc0191bef23e7",
+  "scope": "Offscreen-only scene staging and encoder scratch checkpoint. Live native/GPU/full-frame performance tests deferred until the user says computer is free. Whole Mac acceptance remains open.",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "qualification_sha256": "ea2ddf9bfc42d088733204e649da82be788208e387bb4a27f21807761ab8e71b",
+  "source_review_sha256": "aca63756581883df9b4dbc1fa321e4d4f9ba7b4c0bdec7adb0ad33f27f108786",
+  "prism_process_sha256": "b570d0525ffb1398be02a3a9d60d393a96edfc5af87add34c0fe17b9242a412d",
+  "archive": {
+    "sha256": "3ffe7ea4e75729acc8a625877301184a10122d41962da7ad08b02cea14e4dda6",
+    "members": 96,
+    "index_sha256": "7c48f6c7752059cecdcb9a0d9bb187de1ccc31776aa3a8993937baf274fc0a1a"
+  },
+  "prepared_files": 6172,
+  "allocation": {
+    "baseline": {
+      "BenchmarkVellumScenePlanOperationStaging/512": {
+        "bytes_per_op": [
+          198948,
+          198962
+        ],
+        "allocs_per_op": [
+          529,
+          529
+        ]
+      },
+      "BenchmarkVellumScenePlanOperationStaging/8192": {
+        "bytes_per_op": [
+          5726753,
+          5727139
+        ],
+        "allocs_per_op": [
+          8220,
+          8222
+        ]
+      },
+      "BenchmarkVellumScenePlanTileScratch": {
+        "bytes_per_op": [
+          393414,
+          393427
+        ],
+        "allocs_per_op": [
+          7,
+          7
+        ]
+      },
+      "BenchmarkVellumScenePlanSpanBandsTallTarget": {
+        "bytes_per_op": [
+          874680,
+          874711
+        ],
+        "allocs_per_op": [
+          12413,
+          12413
+        ]
+      }
+    },
+    "candidate": {
+      "BenchmarkVellumScenePlanOperationStaging/512": {
+        "bytes_per_op": [
+          133601,
+          133601
+        ],
+        "allocs_per_op": [
+          527,
+          527
+        ]
+      },
+      "BenchmarkVellumScenePlanOperationStaging/8192": {
+        "bytes_per_op": [
+          2064867,
+          2064883
+        ],
+        "allocs_per_op": [
+          8327,
+          8327
+        ]
+      },
+      "BenchmarkVellumScenePlanTileScratch": {
+        "bytes_per_op": [
+          262341,
+          262343
+        ],
+        "allocs_per_op": [
+          6,
+          6
+        ]
+      },
+      "BenchmarkVellumScenePlanSpanBandsTallTarget": {
+        "bytes_per_op": [
+          801106,
+          801111
+        ],
+        "allocs_per_op": [
+          12410,
+          12410
+        ]
+      }
+    }
+  }
+}

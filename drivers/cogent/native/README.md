@@ -164,3 +164,10 @@ Private scene/scroll captures share only immutable cache entries; aggregate
 budgets remain caller-owned. CPU fallback and public outline ownership are
 preserved. CPU/GPU retirement drops the new cache while keeping snapshot pixels.
 See [outline cache contract](patches/outlinecache/README.md).
+
+Patch 0044 replaces growing scene-operation slices with private 64-record
+staging blocks, flattens once at seal, retires refused construction state and
+reuses tile-count scratch after writing the count table. Packet ownership,
+logical limits and encoded bytes remain fixed. Qualification is offscreen;
+live native/performance checks are deferred.
+See [operation staging contract](patches/operationblocks/README.md).

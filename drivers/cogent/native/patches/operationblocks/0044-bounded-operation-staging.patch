@@ -1,0 +1,456 @@
+--- a/paint/renderers/sceneplan/builder.go
++++ b/paint/renderers/sceneplan/builder.go
+@@ -15,9 +15,21 @@
+ type Builder struct {
+ 	packet       Packet
+ 	failed       bool
++	head, tail   *operationBlock
++	count        int
+ 	masks        map[*image.Alpha]*image.Alpha
+ 	stream       *operation
+ 	streamRowMin int
++}
++
++// Fixed blocks avoid copying the operation prefix on each slice growth. The
++// accepted count bounds staging to ceil(MaxOps/operationBlockSize) blocks;
++// only the last block may have unused slots. Seal owns one exact final slice.
++const operationBlockSize = 64
++
++type operationBlock struct {
++	ops  [operationBlockSize]operation
++	next *operationBlock
+ }
+ 
+ func New(bounds image.Rectangle) *Builder {
+@@ -55,14 +67,24 @@
+ 	if b.failed || o.rect.Empty() {
+ 		return
+ 	}
+-	if len(b.packet.ops) == MaxOps || !b.reserve(int(unsafe.Sizeof(operation{}))) {
+-		b.failed = true
+-		return
+-	}
+-	if len(b.packet.ops) == 0 && o.rect == b.packet.bounds && (o.kind == Uniform && (o.op == draw.Src || o.color[3] == 65535)) {
++	if b.count == MaxOps || !b.reserve(int(unsafe.Sizeof(operation{}))) {
++		b.failed = true
++		return
++	}
++	if b.count == 0 && o.rect == b.packet.bounds && (o.kind == Uniform && (o.op == draw.Src || o.color[3] == 65535)) {
+ 		b.packet.independent = true
+ 	}
+-	b.packet.ops = append(b.packet.ops, o)
++	if b.count%operationBlockSize == 0 {
++		block := new(operationBlock)
++		if b.tail == nil {
++			b.head = block
++		} else {
++			b.tail.next = block
++		}
++		b.tail = block
++	}
++	b.tail.ops[b.count%operationBlockSize] = o
++	b.count++
+ }
+ func (b *Builder) flush() {
+ 	if b.stream == nil {
+@@ -72,10 +94,16 @@
+ 	rowMin := b.streamRowMin
+ 	b.stream = nil
+ 	b.streamRowMin = 0
+-	if o.rect.Empty() {
++	if b.failed || o.rect.Empty() {
+ 		return
+ 	}
+ 	b.packet.bytes -= (len(o.rows) - o.rect.Dy()) * int(unsafe.Sizeof([]span{}))
++	// Refund spare row headers before checking the unchanged operation charge.
++	// A refused stream need not allocate compact rows that can never be retained.
++	if b.count == MaxOps || int(unsafe.Sizeof(operation{})) > MaxBytes-b.packet.bytes {
++		b.failed = true
++		return
++	}
+ 	o.rows = o.rows[o.rect.Min.Y-rowMin : o.rect.Max.Y-rowMin]
+ 	// Compact each row to exactly its retained capacity; replacement transients
+ 	// and the construction row index are accounted separately from owned packets.
+@@ -308,17 +336,27 @@
+ 	b.add(o)
+ }
+ func (b *Builder) Seal(winding bool) *Packet {
++	defer b.retire()
+ 	b.flush()
+-	b.masks = nil
+ 	if b.failed {
+ 		return nil
+ 	}
+-	exact := make([]operation, len(b.packet.ops))
+-	copy(exact, b.packet.ops)
++	exact := make([]operation, b.count)
++	for block, offset := b.head, 0; block != nil; block = block.next {
++		offset += copy(exact[offset:], block.ops[:])
++	}
+ 	b.packet.ops = exact
+ 	b.packet.winding = winding
+ 	packet := b.packet
++	return &packet
++}
++
++func (b *Builder) retire() {
+ 	b.packet = Packet{}
++	b.head, b.tail = nil, nil
++	b.count = 0
++	b.masks = nil
++	b.stream = nil
++	b.streamRowMin = 0
+ 	b.failed = true // construction callbacks cannot mutate the sealed result
+-	return &packet
+-}
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/operation_blocks_test.go
+@@ -0,0 +1,335 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"crypto/sha256"
++	"encoding/binary"
++	"fmt"
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++	"unsafe"
++)
++
++func stagingFixture(n int, mixed bool) *Packet {
++	b := New(image.Rect(0, 0, 35, 33))
++	source := image.NewRGBA(image.Rect(2, 3, 7, 8))
++	mask := image.NewAlpha(source.Rect)
++	for i := range source.Pix {
++		source.Pix[i] = byte(i*37 + 11)
++	}
++	for i := range mask.Pix {
++		mask.Pix[i] = byte(i*19 + 7)
++	}
++	for i := 0; i < n; i++ {
++		c := color.RGBA{byte(i * 3), byte(i * 5), byte(i * 7), 255}
++		x, y := i%31, (i*11)%29
++		r := image.Rect(x, y, x+5, y+5)
++		if i == 0 {
++			b.Draw(b.packet.bounds, image.NewUniform(c), image.Point{}, nil, image.Point{}, draw.Src)
++			continue
++		}
++		if !mixed {
++			b.Draw(r, image.NewUniform(c), image.Point{}, nil, image.Point{}, draw.Op(i%2))
++			continue
++		}
++		switch i % 4 {
++		case 0:
++			b.Draw(r, image.NewUniform(c), image.Point{}, nil, image.Point{}, draw.Over)
++		case 1:
++			b.Draw(r, image.NewUniform(c), image.Point{}, mask, mask.Rect.Min, draw.Over)
++		case 2:
++			b.Draw(r, source, source.Rect.Min, mask, mask.Rect.Min, draw.Src)
++		default:
++			b.BeginSpans(c, draw.Over)
++			b.Span(y+4, x+1, x+5, 32767)
++			b.Span(y, x, x+3, 65535)
++			b.Span(y+4, x, x+2, 12345)
++		}
++		// Existing operations must keep their previous source/mask snapshots.
++		mask.Pix[0]++
++		source.Pix[0]++
++	}
++	p := b.Seal(true)
++	clear(source.Pix)
++	clear(mask.Pix)
++	return p
++}
++
++func stagingDigest(p *Packet) string {
++	e, ok := p.Encode()
++	if !ok {
++		panic("fixture encode refused")
++	}
++	h := sha256.New()
++	for _, value := range []int{e.Tiles.X, e.Tiles.Y} {
++		var b [8]byte
++		binary.LittleEndian.PutUint64(b[:], uint64(value))
++		h.Write(b[:])
++	}
++	for _, part := range [][]byte{e.Ops, e.Rows, e.Refs, e.Data} {
++		var b [8]byte
++		binary.LittleEndian.PutUint64(b[:], uint64(len(part)))
++		h.Write(b[:])
++		h.Write(part)
++	}
++	return fmt.Sprintf("%x", h.Sum(nil))
++}
++
++// Digests captured from unchanged fdb67bc before the staging/encoding edits.
++var originalStagingDigests = map[string]string{
++	"uniform-0":     "380c03491f7fff5743aa87fde71576ab4248a9f2ae17a479cc7d56bb1a10fd44",
++	"uniform-1":     "8a498f84f3743f34ec0a25567ef375ecb0413fa0a8a74b1347ea3b2a07ac1f36",
++	"uniform-63":    "3c4fd0e1c66adfac6d11a20ee39daf5e8eae4091ea7856b7ef3bec2b20a4fe1c",
++	"uniform-64":    "6c19fc3f5b04443d7fd667f8849760778e3819f69bf7657f0c1320699dc09fa3",
++	"uniform-65":    "31b4c9ecc987308173937bb8d23d0cb220dd0127f363c9abf5f9a3bab35e6148",
++	"uniform-127":   "2d38e44c19eabbb0c632fa6e58983ca34cbd1f5dd5475838efec663226752c1a",
++	"uniform-128":   "a88a7178cb1a1725b39a3d988c3c3dec3ddecd695364ce351c655d2db8f2e99a",
++	"uniform-129":   "b2593ecaea3626963773bd1dbb94be53d71a786368ddedc886bbbaf2e59dba28",
++	"uniform-1024":  "f079303693ece55bd28fba295a8a8c9fcbbf268b3be5886d72b16d0917f049dd",
++	"uniform-65536": "a976ae02c220bc061621808b2dfe9350ec1f5184e2e99ea491beafee6780367d",
++	"mixed-129":     "92d138e7354d980b93a910e9b207d4d616873cb65811e15676b21c794033d363",
++}
++
++func TestVellumScenePlanStagingOriginalEncoding(t *testing.T) {
++	for _, n := range []int{0, 1, 63, 64, 65, 127, 128, 129, 1024, MaxOps} {
++		p := stagingFixture(n, false)
++		if p == nil || p.Operations() != n {
++			t.Fatalf("fixture %d refused", n)
++		}
++		if stagingDigest(p) != originalStagingDigests[fmt.Sprint("uniform-", n)] {
++			t.Fatal("original encoded bytes changed", n)
++		}
++	}
++	p := stagingFixture(129, true)
++	if p == nil {
++		t.Fatal("mixed fixture refused")
++	}
++	if stagingDigest(p) != originalStagingDigests["mixed-129"] {
++		t.Fatal("original mixed encoded bytes changed")
++	}
++}
++
++func TestVellumScenePlanStagingIndependentTileOracle(t *testing.T) {
++	p := stagingFixture(129, true)
++	e, ok := p.Encode()
++	if !ok {
++		t.Fatal("encode refused")
++	}
++	// Tile-outer traversal is independent of the encoder's operation-outer bin fill.
++	ref := 0
++	for y := 0; y < e.Tiles.Y; y++ {
++		for x := 0; x < e.Tiles.X; x++ {
++			tile := image.Rect(x*TileSize, y*TileSize, (x+1)*TileSize, (y+1)*TileSize)
++			var want []uint32
++			for i, op := range p.ops {
++				if op.rect.Overlaps(tile) {
++					want = append(want, uint32(i))
++				}
++			}
++			at := (y*e.Tiles.X + x) * 8
++			if binary.LittleEndian.Uint32(e.Rows[at:]) != uint32(ref) || binary.LittleEndian.Uint32(e.Rows[at+4:]) != uint32(len(want)) {
++				t.Fatal("tile row differs", x, y)
++			}
++			for _, index := range want {
++				if binary.LittleEndian.Uint32(e.Refs[ref*4:]) != index {
++					t.Fatal("painter order differs", x, y, ref)
++				}
++				ref++
++			}
++		}
++	}
++	if len(e.Refs) != ref*4 {
++		t.Fatal("unused reference bytes")
++	}
++	first := stagingDigest(p)
++	for _, part := range [][]byte{e.Ops, e.Rows, e.Refs, e.Data} {
++		clear(part)
++	}
++	if stagingDigest(p) != first {
++		t.Fatal("encoded outputs alias packet")
++	}
++	got, want := image.NewRGBA(p.Bounds()), image.NewRGBA(p.Bounds())
++	if !p.Replay(want) || !p.Replay(got) || !bytes.Equal(got.Pix, want.Pix) {
++		t.Fatal("replay changed after output mutation")
++	}
++}
++
++var stagingPacketSink *Packet
++var stagingEncodedSink *Encoded
++
++func assertStagingRetired(t *testing.T, b *Builder) {
++	t.Helper()
++	if !b.Failed() || b.head != nil || b.tail != nil || b.count != 0 || b.masks != nil || b.stream != nil || b.streamRowMin != 0 || b.packet.ops != nil || b.packet.bounds != (image.Rectangle{}) || b.packet.bytes != 0 || b.packet.winding || b.packet.independent {
++		t.Fatal("sealed/refused builder retains construction references")
++	}
++}
++
++func TestVellumScenePlanStagingBoundsOrderAndRetirement(t *testing.T) {
++	for _, n := range []int{0, 1, 63, 64, 65, 127, 128, 129, 1024, MaxOps} {
++		t.Run(fmt.Sprint(n), func(t *testing.T) {
++			b := New(image.Rect(0, 0, 4, 4))
++			baseBytes := b.packet.bytes
++			b.Draw(image.Rect(10, 10, 11, 11), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++			if b.head != nil || b.count != 0 {
++				t.Fatal("clipped operation reserves staging")
++			}
++			for i := 0; i < n; i++ {
++				b.Draw(b.packet.bounds, image.NewUniform(color.RGBA{byte(i), 0, 0, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++			}
++			blocks := 0
++			for block := b.head; block != nil; block = block.next {
++				blocks++
++			}
++			if b.count != n || blocks != (n+63)/64 || blocks*64-n > 63 || blocks > 1024 {
++				t.Fatal("staging bound", n, blocks, b.count)
++			}
++			p := b.Seal(true)
++			if p == nil || len(p.ops) != n || cap(p.ops) != n || p.Bytes() != baseBytes+n*int(unsafe.Sizeof(operation{})) || p.Independent() != (n > 0) || !p.Winding() {
++				t.Fatal("sealed capacity/charge/reset changed", n)
++			}
++			for i, o := range p.ops {
++				if o.color[0] != uint32(byte(i))*257 {
++					t.Fatal("operation order changed", i)
++				}
++			}
++			assertStagingRetired(t, b)
++			before := stagingDigest(p)
++			b.BeginSpans(color.RGBA{}, draw.Src)
++			b.Span(0, 0, 1, 65535)
++			b.Draw(p.Bounds(), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++			if b.Seal(false) != nil || stagingDigest(p) != before {
++				t.Fatal("retired callback changed sealed packet")
++			}
++			assertStagingRetired(t, b)
++		})
++	}
++}
++
++func TestVellumScenePlanStagingAdmissionBeforeAllocation(t *testing.T) {
++	b := New(image.Rect(0, 0, 1, 1))
++	for i := 0; i < MaxOps; i++ {
++		b.Draw(b.packet.bounds, image.White, image.Point{}, nil, image.Point{}, draw.Src)
++	}
++	head, tail, charge := b.head, b.tail, b.packet.bytes
++	b.Draw(b.packet.bounds, image.White, image.Point{}, nil, image.Point{}, draw.Src)
++	if !b.Failed() || b.count != MaxOps || b.head != head || b.tail != tail || tail.next != nil || b.packet.bytes != charge {
++		t.Fatal("operation limit allocated/charged one more operation")
++	}
++	if b.Seal(false) != nil {
++		t.Fatal("operation overflow accepted a partial batch")
++	}
++	assertStagingRetired(t, b)
++	for _, short := range []int{0, 1} {
++		b = New(image.Rect(0, 0, 1, 1))
++		b.packet.bytes = MaxBytes - int(unsafe.Sizeof(operation{})) + short
++		b.Draw(b.packet.bounds, image.White, image.Point{}, nil, image.Point{}, draw.Src)
++		if short == 0 {
++			if b.count != 1 || b.packet.bytes != MaxBytes {
++				t.Fatal("exact operation budget refused")
++			}
++			p := b.Seal(false)
++			if p == nil || p.Bytes() != MaxBytes {
++				t.Fatal("exact sealed budget changed")
++			}
++		} else {
++			if !b.Failed() || b.head != nil || b.count != 0 {
++				t.Fatal("byte limit allocated staging before refusal")
++			}
++			if b.Seal(false) != nil {
++				t.Fatal("byte limit retained packet")
++			}
++		}
++		assertStagingRetired(t, b)
++	}
++}
++
++func TestVellumScenePlanStagingRefusedStreamDoesNotCompact(t *testing.T) {
++	for _, mode := range []string{"failed", "ops", "bytes"} {
++		t.Run(mode, func(t *testing.T) {
++			b := New(image.Rect(0, 0, 4, 4))
++			op := operation{kind: Spans, op: draw.Src, rect: image.Rect(0, 0, 1, 1), rows: [][]span{{{0, 1, 65535}}}}
++			allocs := testing.AllocsPerRun(10, func() {
++				b.failed = mode == "failed"
++				b.count = 0
++				b.packet.bytes = 0
++				if mode == "ops" {
++					b.count = MaxOps
++				}
++				if mode == "bytes" {
++					b.packet.bytes = MaxBytes
++				}
++				b.stream = &op
++				b.flush()
++			})
++			if allocs != 0 || !b.Failed() || b.stream != nil {
++				t.Fatal("refused flush allocates compact rows", allocs)
++			}
++			if b.Seal(false) != nil {
++				t.Fatal("refused stream retained partial packet")
++			}
++			assertStagingRetired(t, b)
++		})
++	}
++	// Admission happens after spare construction row headers are refunded.
++	b := New(image.Rect(0, 0, 4, 16))
++	b.BeginSpans(color.RGBA{1, 2, 3, 255}, draw.Src)
++	for y := 0; y < 5; y++ {
++		b.Span(y, 0, 1, 65535)
++	}
++	spare := (len(b.stream.rows) - b.stream.rect.Dy()) * int(unsafe.Sizeof([]span{}))
++	if spare == 0 {
++		t.Fatal("fixture has no spare headers")
++	}
++	b.packet.bytes = MaxBytes - int(unsafe.Sizeof(operation{})) + spare
++	p := b.Seal(false)
++	if p == nil || p.Bytes() != MaxBytes || p.Operations() != 1 {
++		t.Fatal("refunded budget boundary changed")
++	}
++	assertStagingRetired(t, b)
++}
++
++func TestVellumScenePlanStagingResetRequiresFirstAcceptedOperation(t *testing.T) {
++	b := New(image.Rect(0, 0, 4, 4))
++	b.Draw(image.Rect(0, 0, 1, 1), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++	b.Draw(b.packet.bounds, image.White, image.Point{}, nil, image.Point{}, draw.Src)
++	if p := b.Seal(false); p == nil || p.Independent() {
++		t.Fatal("later reset incorrectly establishes independence")
++	}
++	b = New(image.Rect(0, 0, 4, 4))
++	b.Draw(b.packet.bounds, image.NewUniform(color.RGBA{1, 2, 3, 4}), image.Point{}, nil, image.Point{}, draw.Over)
++	if p := b.Seal(false); p == nil || p.Independent() {
++		t.Fatal("partial alpha Over establishes independence")
++	}
++}
++
++func BenchmarkVellumScenePlanOperationStaging(b *testing.B) {
++	for _, n := range []int{512, 8192} {
++		b.Run(fmt.Sprint(n), func(b *testing.B) {
++			b.ReportAllocs()
++			for i := 0; i < b.N; i++ {
++				stagingPacketSink = stagingFixture(n, false)
++				if stagingPacketSink == nil {
++					b.Fatal("refused")
++				}
++			}
++		})
++	}
++}
++func BenchmarkVellumScenePlanTileScratch(b *testing.B) {
++	p := New(image.Rect(0, 0, 2048, 2048))
++	p.Draw(image.Rect(100, 100, 116, 116), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++	packet := p.Seal(false)
++	b.ReportAllocs()
++	b.ResetTimer()
++	for i := 0; i < b.N; i++ {
++		var ok bool
++		stagingEncodedSink, ok = packet.Encode()
++		if !ok {
++			b.Fatal("refused")
++		}
++	}
++}
+--- a/paint/renderers/sceneplan/packet.go
++++ b/paint/renderers/sceneplan/packet.go
+@@ -171,7 +171,8 @@
+ 		}
+ 	}
+ 	e := &Encoded{Tiles: tiles, Ops: make([]byte, 0, max(4, len(p.ops)*opWords*4)), Rows: make([]byte, 0, len(counts)*8), Refs: make([]byte, max(4, refs*4)), Data: make([]byte, 0, max(4, dataBytes))}
+-	positions := make([]int, len(counts))
++	// Once each count has been copied into Rows, its slot becomes fill scratch.
++	positions := counts
+ 	offset := 0
+ 	for i, count := range counts {
+ 		positions[i] = offset

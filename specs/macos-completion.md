@@ -273,3 +273,18 @@ their existing checks plus owned/borrowed parity. No publication may be skipped
 solely because a portable grid generation is unchanged. Actual Cocoa and matched
 ordinary CPU/GPU measurements remain separate from local lookup benchmarks and
 from broader Mac/performance/native-memory acceptance.
+
+## Scene construction allocation work
+
+Fixed operation staging blocks and reusable tile-count scratch must preserve
+the preceding encoded bytes, painter order, independent-reset detection,
+operation/payload refusal boundaries and source ownership. Checks include
+original encoding digests, an independent tile-bin oracle, block boundaries
+through 65,536 operations, exact retained capacities, and successful/refused
+builder retirement. Offscreen allocation benchmarks describe those local
+fixtures only. Live native GPU parity, full-frame allocation/latency and broader
+Mac acceptance remain separate gates.
+
+Live windows, input and performance checks are deferred while the user is using
+the computer. They resume only after the user explicitly says it is free.
+Code, preparation, offscreen checks, reviews and local commits may continue.
