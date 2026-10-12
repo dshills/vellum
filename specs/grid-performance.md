@@ -133,6 +133,17 @@ workload fidelity and missing GPU/presentation/native-memory/endurance evidence.
 These scripts establish a repeatable workload and recording protocol; actual
 Mac measurements and optimization evidence are separate from CPU tests.
 
+The runner's `--gpu-scene` selects the opt-in scene renderer through the consumer's
+`-gpu-scene` switch. Setup, ready, every sample and end must declare the requested
+boolean `gpu_scene_rendering` mode. Missing historical fields mean false; a GPU
+campaign therefore requires explicit true on every record and cannot reuse older
+unmarked samples. Ordinary target thresholds remain unchanged. The mode selects
+the renderer, whose unsupported batches may fall back to CPU; it does not prove
+that every batch was submitted on the GPU. Source-detail eligibility checks remain
+separate diagnostic processes. A matched comparison uses the same optimized
+binary, viewport and guarded trajectory, varying only this renderer option and
+alternating process order. CPU/GPU measurements are separate populations.
+
 The [single host-update comparison](../docs/reports/macos-grid-update/README.md)
 removes proven duplicate pooled cell/header updater/style passes. Three
 interleaved optimized fixed-10k processes per build preserve the 400-cell

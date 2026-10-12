@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "checkpoint": "Native CPU/GPU scene measurement protocol and matched campaign",
+  "base_commit": "1f8d93a5cfa426543573492b60f5b5e8ff661d60",
+  "default_gpu_scene_rendering": false,
+  "qualified_binary_sha256": "543dfacba27b6842d7759dc6615375b06bafdc07faf8b9f4997b3f5a17177e4a",
+  "prepared_files": 6166,
+  "source_files": 452,
+  "checks": {
+    "path": "build-v1/qualification.json",
+    "sha256": "d98fca98a2945f66b72a8650f4399fb5b19d076529a2b887348dc6cddd95c551"
+  },
+  "reviews": {
+    "protocol": {
+      "path": "protocol-review-v1.json",
+      "sha256": "7907d980da777b69e28d59f5784d45366683901d8bf94fd3117ad8c56a8dca5f"
+    },
+    "ordinary_raw_evidence": {
+      "path": "campaign-review-v1.json",
+      "sha256": "7ec46edd359476425aa7fd18259294d779f76f322c66fd7db4e4c0032a207225"
+    },
+    "interpretation_report": {
+      "path": "interpretation-review-v1.json",
+      "sha256": "83e9c6cd5866965b1ac2c6a7e9330ce9f2a9493614bf63dc538f58b695e54804"
+    },
+    "structural_hotpaths": {
+      "path": "hotpaths-review.json",
+      "sha256": "752271017ddc7cd92f8bda88577542a515fc648490219c4c1f87892db822176c"
+    },
+    "new_prism_run": false,
+    "prior_renderer_prism_checkpoint": "1f8d93a; Anthropic Claude Sonnet 5.5"
+  },
+  "campaign": {
+    "path": "ordinary-campaign-v1/qualification.json",
+    "sha256": "af45c5f9fea4aec72b26b159f51dcae54c65911a4e0558de628c303a10077db3"
+  },
+  "ordinary_observations": 4800,
+  "ordinary_processes": 40,
+  "warmup_per_process": 128,
+  "samples_per_process": 120,
+  "warm_targets_ns": {
+    "p95": 4000000,
+    "p99": 6000000
+  },
+  "warm_target_met": {
+    "cpu": false,
+    "gpu": false
+  },
+  "eligibility": {
+    "path": "eligibility-v1/qualification.json",
+    "sha256": "a9de4551a863db0a1069fd641cca9dc0adf979b0160a20a9b19c8830c3c45084"
+  },
+  "diagnostic_main_scene_records": 480,
+  "profiles": {
+    "path": "cpu-profiles-v1/qualification.json",
+    "sha256": "1e3c8c498b785a95e6007f5bd3a6e3a3706a002d6ef81a4c5c4af05703fcfc37"
+  },
+  "profile_scope": "Separate host CPU sampling, no ordinary timing/Go allocation or native GPU memory attribution. Cgo includes event waits.",
+  "report_sha256": "43e1ec0425fdf1abdaf663ec403d6b561b3d0021621466c90690a3583b6297de",
+  "completion_spec_sha256": "8d79808f6a6f391aef989453c498a27bb7dde4106dd44fadbe1f596b7977a7b5",
+  "next_implementation": "Bounded span storage for touched rows, preserving packet ownership/pixel ordering/refusal/fallback, then measured allocation and native parity qualification. Benefit is a hypothesis.",
+  "os_settings_changed": false,
+  "open_acceptance": [
+    "Unchanged sustained Mac/P4/P6 targets",
+    "Native/GPU/font memory and device-loss lifecycle",
+    "Broader scene/window/modal/sprite/workbench/tree eligibility",
+    "Human native services/input/accessibility and cross-display behavior",
+    "Physical GPU execution/presentation and public distribution audit"
+  ],
+  "scope": "Source/spec/report implementation advances framework measurement and chooses the next allocation work. Goal remains active; no general speedup or complete Mac acceptance.",
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "d3fe4c3e0ff49abc0bf857389a3bd725ecdbf3cb1aa640b868b2630710927160",
+    "files": 149,
+    "index_sha256": "89e95143cdf3721506220aa92e723fbdba055e4aa0a766c91880553dbf83588c"
+  }
+}

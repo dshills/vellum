@@ -199,6 +199,25 @@ class StatisticsTests(unittest.TestCase):
 
 
 class RecordTests(unittest.TestCase):
+    def test_gpu_scene_mode_must_match_every_stage_and_sample(self):
+        data = records()
+        for record in data: record["gpu_scene_rendering"] = True
+        with self.assertRaisesRegex(ValueError, "GPU scene"):
+            benchmark.validate_records(data, 10000, False, 120, False)
+        self.assertEqual(len(benchmark.validate_records(data, 10000, False, 120, False, gpu_scene_rendering=True)), 120)
+        for index in (0, 1, 2, 65, -1):
+            for value in (False, "true", 1, None):
+                bad = copy.deepcopy(data);bad[index]["gpu_scene_rendering"] = value
+                with self.subTest(index=index, value=value), self.assertRaisesRegex(ValueError, "GPU scene"):
+                    benchmark.validate_records(bad, 10000, False, 120, False, gpu_scene_rendering=True)
+            bad = copy.deepcopy(data);bad[index].pop("gpu_scene_rendering")
+            with self.assertRaisesRegex(ValueError, "GPU scene"):
+                benchmark.validate_records(bad, 10000, False, 120, False, gpu_scene_rendering=True)
+        for record in data: record["gpu_scene_rendering"] = False
+        self.assertEqual(len(benchmark.validate_records(data, 10000, False, 120, False)), 120)
+        with self.assertRaisesRegex(ValueError, "GPU scene"):
+            benchmark.validate_records(records(), 10000, False, 120, False, gpu_scene_rendering=True)
+
     def test_exact_order_and_geometry_validate(self):
         selected = benchmark.validate_records(records(), 10000, False, 120, False)
         self.assertEqual(len(selected), 120)
@@ -255,13 +274,13 @@ class FakeProcess:
 
 
 class ProcessTests(unittest.TestCase):
-    def run_fixture(self, data, *, source_details=False):
+    def run_fixture(self, data, *, source_details=False, gpu_scene_rendering=False):
         payload = b"native ordinary log\n" + b"\n".join(json.dumps(v).encode() for v in data)+b"\n"
         process = FakeProcess(payload)
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)/"run"
             with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group") as kill:
-                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5, source_details=source_details)
+                try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5, source_details=source_details, gpu_scene_rendering=gpu_scene_rendering)
                 except Exception as error: result = error
             raw = (directory/"native.log").read_bytes()
             outcome = json.loads((directory/"result.json").read_text())
@@ -269,6 +288,7 @@ class ProcessTests(unittest.TestCase):
             self.assertEqual(launch.call_args.kwargs["bufsize"], 0)
             self.assertTrue(launch.call_args.kwargs["start_new_session"])
             self.assertEqual("-perf-source-details" in launch.call_args.args[0], source_details)
+            self.assertEqual("-gpu-scene" in launch.call_args.args[0], gpu_scene_rendering)
             observe.assert_called_once_with(process.pid)
             return result, outcome
 
@@ -279,6 +299,25 @@ class ProcessTests(unittest.TestCase):
         self.assertEqual(outcome["exit_code"], 0)
         self.assertEqual(len(outcome["process_observations"]), 1)
         self.assertEqual(outcome["result"], "PASS")
+
+    def test_gpu_scene_launch_flag_and_mismatched_child_result(self):
+        data = records()
+        for record in data: record["gpu_scene_rendering"] = True
+        result, outcome = self.run_fixture(data, gpu_scene_rendering=True)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(outcome["records"], data)
+        self.assertEqual(outcome["result"], "PASS")
+        result, outcome = self.run_fixture(records(), gpu_scene_rendering=True)
+        self.assertIsInstance(result, ValueError)
+        self.assertEqual(outcome["result"], "FAILED")
+        self.assertIn("GPU scene", outcome["error"])
+
+    def test_invalid_gpu_scene_mode_refuses_before_any_launch(self):
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(benchmark.subprocess, "Popen") as launch:
+            with self.assertRaisesRegex(ValueError, "GPU scene"):
+                benchmark.run_case(Path("fake"), Path(temp)/"run", 10000, False, 120, 128, False, 5, gpu_scene_rendering="true")
+            launch.assert_not_called()
+            self.assertFalse((Path(temp)/"run").exists())
 
     def test_setup_and_ready_validate_without_external_process_observers(self):
         result, outcome = self.run_fixture(records())
@@ -393,6 +432,28 @@ class SetupFailureTests(unittest.TestCase):
 
 
 class DiagnosticReportTests(unittest.TestCase):
+    def test_cli_gpu_scene_mode_is_preserved_and_forwarded(self):
+        data = records()
+        for record in data: record["gpu_scene_rendering"] = True
+        selected = benchmark.validate_records(data, 10000, False, 120, False, gpu_scene_rendering=True)
+        for sample in selected:
+            sample.update(go_process_alloc_bytes=1, go_process_mallocs=1, source_callbacks={"Keys": 1, "Inverse": 1, "Cells": 1})
+        with tempfile.TemporaryDirectory() as temp:
+            binary = Path(temp)/"binary";binary.write_bytes(b"CPU-only fixture; never launched")
+            output = Path(temp)/"results"
+            argv = ["benchmark-grid.py", "--run", "--binary", str(binary), "--output", str(output), "--gpu-scene"]
+            with mock.patch.object(benchmark.sys, "argv", argv), mock.patch.object(benchmark.platform, "system", return_value="Darwin"), \
+                 mock.patch.object(benchmark, "metadata_command", return_value={}), mock.patch.object(benchmark, "selected_inputs", return_value={}), \
+                 mock.patch.object(benchmark, "run_case", return_value=(selected, {"result": "PASS"})) as run, \
+                 mock.patch("sys.stdout", new_callable=io.StringIO):
+                benchmark.main()
+            self.assertEqual(run.call_count, 20)
+            self.assertTrue(all(call.kwargs["gpu_scene_rendering"] for call in run.call_args_list))
+            summary = json.loads((output/"summary.json").read_text())
+            self.assertTrue(summary["gpu_scene_rendering"])
+            self.assertFalse(summary["diagnostic"])
+            self.assertEqual(summary["warm_targets_ns"], {"p95": 4_000_000, "p99": 6_000_000})
+
     def test_cli_detailed_campaign_is_labeled_diagnostic_even_below_warm_targets(self):
         selected = benchmark.validate_records(detailed_records(), 10000, False, 120, False, allow_source_details=True)
         for sample in selected:

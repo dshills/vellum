@@ -283,7 +283,7 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 		if afterMemory.TotalAlloc < beforeMemory.TotalAlloc || afterMemory.Mallocs < beforeMemory.Mallocs {
 			return errors.New("loadedgrid perf: allocation counter overflow")
 		}
-		if err = perfEmit("grid.perf.sample", map[string]any{"source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
+		if err = perfEmit("grid.perf.sample", map[string]any{"gpu_scene_rendering": c.GPUSceneRendering, "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "index": i, "tag": sample.Tag, "generation": sample.Generation, "frame": g.Frames, "callbacks": changed, "geometry": geometry, "metrics": perfMetrics(sample), "native_sample": sample, "source_callbacks": counts, "go_process_alloc_bytes": afterMemory.TotalAlloc - beforeMemory.TotalAlloc, "go_process_mallocs": afterMemory.Mallocs - beforeMemory.Mallocs, "go_gc_cycles": afterMemory.NumGC - beforeMemory.NumGC}); err != nil {
 			return err
 		}
 	}

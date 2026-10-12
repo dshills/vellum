@@ -1,0 +1,35 @@
+import hashlib,json,tarfile
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');phase=Path('/private/tmp/vellum-gpu-performance')
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def read(name):return json.loads((phase/name).read_text())
+def receipt(name):return {'path':name,'sha256':sha(phase/name)}
+campaign=read('ordinary-campaign-v1/qualification.json');build=read('build-v1/qualification.json');protocol=read('protocol-review-v1.json');audit=read('campaign-review-v1.json');interpretation=read('interpretation-review-v1.json')
+assert campaign['result']=='PASS_MATCHED_COMPARISON'and build['result']=='PASS'and protocol['status']==audit['status']=='APPROVED'
+assert interpretation.get('result',interpretation.get('status'))=='APPROVED_INTERPRETATION'and not interpretation['findings']
+assert campaign['samples']==4800 and len(campaign['runs'])==40 and campaign['warm_target_met']=={'cpu':False,'gpu':False}
+assert campaign['before']==campaign['after']and campaign['before']['prepared']==build['prepared']
+assert build['source']==protocol['reviewed_source_sha256']
+for name,digest in campaign['after']['source'].items():assert sha(root/name)==digest
+current={str(p.relative_to(root/'drivers/cogent/build')):sha(p)for name in ['upstream','typesetting']for p in sorted((root/'drivers/cogent/build'/name).rglob('*'))if p.is_file()}
+assert current==build['prepared']and len(current)==6166
+eligibility=read('eligibility-v1/qualification.json');assert eligibility['result']=='PASS_SCOPED_ELIGIBILITY'
+assert len(eligibility['cases'])==4 and all(c['result']=='PASS'and c['samples']==c['main_scene_records']==120 for c in eligibility['cases'].values())
+profiles=read('cpu-profiles-v1/qualification.json');assert profiles['result']=='PASS_DIAGNOSTIC'
+closure={'schema':1,'checkpoint':'Native CPU/GPU scene measurement protocol and matched campaign','base_commit':'1f8d93a5cfa426543573492b60f5b5e8ff661d60','default_gpu_scene_rendering':False,'qualified_binary_sha256':campaign['binary_sha256'],'prepared_files':len(current),'source_files':len(campaign['before']['source']),'checks':receipt('build-v1/qualification.json'),'reviews':{'protocol':receipt('protocol-review-v1.json'),'ordinary_raw_evidence':receipt('campaign-review-v1.json'),'interpretation_report':receipt('interpretation-review-v1.json'),'structural_hotpaths':receipt('hotpaths-review.json'),'new_prism_run':False,'prior_renderer_prism_checkpoint':'1f8d93a; Anthropic Claude Sonnet 5.5'},'campaign':receipt('ordinary-campaign-v1/qualification.json'),'ordinary_observations':4800,'ordinary_processes':40,'warmup_per_process':128,'samples_per_process':120,'warm_targets_ns':{'p95':4000000,'p99':6000000},'warm_target_met':campaign['warm_target_met'],'eligibility':receipt('eligibility-v1/qualification.json'),'diagnostic_main_scene_records':480,'profiles':receipt('cpu-profiles-v1/qualification.json'),'profile_scope':'Separate host CPU sampling, no ordinary timing/Go allocation or native GPU memory attribution. Cgo includes event waits.','report_sha256':sha(root/'docs/reports/macos-gpu-performance/README.md'),'completion_spec_sha256':sha(root/'specs/macos-completion.md'),'next_implementation':'Bounded span storage for touched rows, preserving packet ownership/pixel ordering/refusal/fallback, then measured allocation and native parity qualification. Benefit is a hypothesis.','os_settings_changed':False,'open_acceptance':['Unchanged sustained Mac/P4/P6 targets','Native/GPU/font memory and device-loss lifecycle','Broader scene/window/modal/sprite/workbench/tree eligibility','Human native services/input/accessibility and cross-display behavior','Physical GPU execution/presentation and public distribution audit'],'scope':'Source/spec/report implementation advances framework measurement and chooses the next allocation work. Goal remains active; no general speedup or complete Mac acceptance.'}
+(phase/'closure.json').write_text(json.dumps(closure,indent=2)+'\n');(phase/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+records=root/'docs/reports/macos-gpu-performance/records';records.mkdir(exist_ok=False)
+selected=[(p,p.relative_to(phase).as_posix())for p in phase.rglob('*')if p.is_file()and p.suffix in('.json','.log','.txt','.pprof')]
+index={name:{'sha256':sha(p),'bytes':p.stat().st_size}for p,name in selected};assert len(index)==len(selected)
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tar:
+ for p,name in sorted(selected,key=lambda pair:pair[1]):tar.add(p,arcname=name,recursive=False)
+(records/'evidence-index.json').write_text(json.dumps({'archive_sha256':sha(archive),'entries':index},indent=2)+'\n')
+closure['archive']={'path':'evidence.tar.gz','sha256':sha(archive),'files':len(index),'index_sha256':sha(records/'evidence-index.json')}
+(records/'checkpoint.json').write_text(json.dumps(closure,indent=2)+'\n');(records/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+with tarfile.open(archive)as tar:
+ assert len(tar.getmembers())==len(index)
+ for member in tar.getmembers():
+  data=tar.extractfile(member).read();entry=index[member.name]
+  assert len(data)==entry['bytes']and hashlib.sha256(data).hexdigest()==entry['sha256']
+print('ARCHIVE verified',len(index),'files',archive.stat().st_size,'bytes; targets remain failed')

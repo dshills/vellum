@@ -193,3 +193,14 @@ route is separately observed through diagnostic Cocoa frames. These bounded
 checks establish their tested behavior; representative ordinary latency, broader
 source eligibility, native/GPU memory and full P4/P6/Mac acceptance remain open.
 See the [rendering contract](rendering.md).
+
+The [ordinary GPU scene comparison](../docs/reports/macos-gpu-performance/README.md)
+uses one optimized binary for forty interleaved CPU/GPU-option processes across
+fixed/variable stored 10k/million cases. All 4,800 observations retain matched
+geometry and unchanged warm targets; both modes fail those targets, and GPU tails
+are mixed. Separate diagnostic processes establish the main-scene GPU route in
+all four numeric-table cases. GPU mode adds roughly 11 MB of process-wide Go
+allocation per observation; profiling and source inspection guide a bounded
+span-storage investigation rather than establish allocation attribution. This
+does not qualify broader scene support, native/GPU memory, tree/workbench or full
+Mac/P4/P6 performance. The renderer remains opt-in.

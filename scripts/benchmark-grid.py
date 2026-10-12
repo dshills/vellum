@@ -130,11 +130,13 @@ def validate_source_details(details, raster_upload_ns):
         raise ValueError("source draw sum exceeds ticket raster/upload interval")
 
 
-def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False, allow_input_details=False):
+def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False, allow_input_details=False, gpu_scene_rendering=False):
     """Require exact case, current completed geometry and one sample per tag."""
     if len(records) != samples + 3 or [r.get("event") for r in records[:2]] != ["grid.perf.setup", "grid.perf.ready"] or records[-1].get("event") != "grid.perf.end":
         raise ValueError("missing, repeated or unordered benchmark stages")
     setup, ready, end = records[0], records[1], records[-1]
+    if type(gpu_scene_rendering) is not bool or any(r.get("gpu_scene_rendering", False) is not gpu_scene_rendering for r in records):
+        raise ValueError("requested GPU scene rendering mode identity mismatch")
     for r in (setup, ready, end):
         if r.get("rows") != rows or r.get("variable") is not variable or r.get("novel") is not novel:
             raise ValueError("benchmark case identity mismatch")
@@ -253,7 +255,9 @@ def process_sample(pid):
             "cpu_quantum_seconds": quantum, "source": "ps; RSS is process-wide"}
 
 
-def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None, source_details=False):
+def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout, *, cpu_profile=None, source_details=False, gpu_scene_rendering=False):
+    if type(gpu_scene_rendering) is not bool:
+        raise ValueError("invalid GPU scene rendering mode")
     if type(source_details) is not bool or source_details and (type(samples) is not int or type(warmup) is not int or warmup + samples + 2 > MAX_SOURCE_CAPACITY):
         raise ValueError("invalid source detail mode/recorder capacity")
     directory.mkdir(parents=True, exist_ok=False)
@@ -261,6 +265,7 @@ def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout,
     if cpu_profile is not None:
         argv.append(f"-perf-cpu-profile={cpu_profile}")
     if source_details: argv.append("-perf-source-details")
+    if gpu_scene_rendering: argv.append("-gpu-scene")
     if variable: argv.append("-variable-rows")
     if novel: argv.append("-perf-novel")
     process_options = {"start_new_session": True} if os.name != "nt" else {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
@@ -312,7 +317,7 @@ def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout,
             if pending: raise ValueError("incomplete benchmark record at EOF")
             if returncode != 0: raise RuntimeError(f"native benchmark exited {returncode}")
             selected = validate_records(records, rows, variable, samples, novel, allow_profile=cpu_profile is not None,
-                                        allow_source_details=source_details)
+                                        allow_source_details=source_details, gpu_scene_rendering=gpu_scene_rendering)
             if records[0].get("cpu_profile", False) is not (cpu_profile is not None):
                 raise ValueError("requested CPU profile case mismatch")
             if records[0].get("source_details", False) is not source_details:
@@ -405,6 +410,7 @@ def main():
     parser.add_argument("--warmup", type=int, default=128)
     parser.add_argument("--novel", action="store_true", help="separate newly visited row strings; not a cold-font claim")
     parser.add_argument("--source-details", action="store_true", help="diagnostic nested source/image API costs; excluded from warm targets")
+    parser.add_argument("--gpu-scene", action="store_true", help="select the opt-in GPU scene renderer; unsupported batches may use CPU fallback")
     parser.add_argument("--timeout", type=float, default=180)
     args = parser.parse_args()
     if not args.run: parser.error("--run is required; this tool launches visible native windows")
@@ -427,6 +433,7 @@ def main():
               "host": platform.platform(), "machine": platform.machine(), "machine_metadata": "machine.json",
               "selected_inputs_before": source_before, "input_scope": "selected sources, not complete compiler/dependency closure", "runs": args.runs,
               "samples_per_run": args.samples, "warmup": args.warmup, "novel": args.novel,
+              "gpu_scene_rendering": args.gpu_scene,
               "source_details": args.source_details, "diagnostic": args.source_details, "cases": {},
               "scope": "release actual widget routing/frame elapsed work; end-only process-wide RSS/CPU and staged Go observations; baseline/warm process RSS, process CPU deltas, native/GPU allocations and compositor presentation unavailable"}
     try:
@@ -437,7 +444,7 @@ def main():
                 all_runs, raw = [], []
                 for index in range(args.runs):
                     measured, outcome = run_case(binary, args.output / case / f"run-{index+1}", rows, variable, args.samples, args.warmup, args.novel, args.timeout,
-                                                source_details=args.source_details)
+                                                source_details=args.source_details, gpu_scene_rendering=args.gpu_scene)
                     all_runs.append(measured); raw.append(outcome)
                     if hashlib.sha256(binary.read_bytes()).hexdigest() != report["binary_sha256"]:
                         raise ValueError("binary changed during measurement")
