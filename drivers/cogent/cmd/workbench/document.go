@@ -110,7 +110,7 @@ func installDocument(source *partSource, table *virtual.Table, board *canvas.Sce
 	if image.outline == nil {
 		return fmt.Errorf("document outline is missing")
 	}
-	if source.revision == math.MaxUint64 {
+	if source.revision == math.MaxUint64 || refs.revision == math.MaxUint64 {
 		return fmt.Errorf("component revision exhausted")
 	}
 	source.parts = image.Parts
@@ -118,5 +118,6 @@ func installDocument(source *partSource, table *virtual.Table, board *canvas.Sce
 	table.Reset()
 	board.Objects = image.Objects
 	refs.paths = image.References
+	refs.revision++
 	return nil
 }

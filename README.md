@@ -17,6 +17,7 @@ open. The workbench does not change system input sources.
 | `app/`, `ui/` | Application lifecycle, UI ownership and keyed widget descriptions |
 | `command/`, `tasks/`, `history/`, `document/` | Commands, asynchronous work, undo/redo and document persistence |
 | `replay/` | Bounded input records, explicit draining and deterministic checkpoint capture |
+| `automation/` | Opt-in Mac-local semantic queries/actions with capability and revision checks |
 | `execution/` | Bounded explicit worker and timer stepping, plus real schedulers |
 | `editor/` | Exact UTF-8 document editing, composition, sparse history and input epochs |
 | `workbench/`, `virtual/`, `canvas/` | Dock layouts, large-data views and canvas models |

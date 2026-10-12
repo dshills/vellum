@@ -128,5 +128,7 @@ timer scheduling, configuration refusal and teardown.
 
 Software replay does not qualify Cocoa IME, external accessibility, VoiceOver,
 GPU presentation, physical device loss, cross-display scale or performance.
-External automation transport, large-grid acceptance, output-reader timers and
+The separate [local semantic endpoint](automation.md) reuses owner/domain actions;
+it is not physical input replay. Broader external automation workflows,
+large-grid acceptance, output-reader timers and
 filesystem autosave remain separate work.

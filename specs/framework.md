@@ -172,6 +172,9 @@ clock. The caller keeps Cogent global configuration fixed and injects that same
 borrowed executor into task/document managers. See the
 [checkpoint report](../docs/reports/macos-replay/README.md).
 
-The complete P9 professional workloads, large-data replay, external automation
-transport, native services/IME/accessibility, GPU presentation and sustained
+The [local semantic automation](automation.md) endpoint now provides opt-in Mac
+transport for explicitly registered typed domain queries/actions. Full external
+professional automation workflows remain unqualified.
+The complete P9 professional workloads, large-data replay,
+native services/IME/accessibility, GPU presentation and sustained
 performance acceptance remain open.

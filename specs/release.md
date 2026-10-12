@@ -9,6 +9,10 @@ repository directories. Root and module-local LICENSE files record this choice.
 The third-party/native distribution audit remains pending. The Go module graph notice inventory does not establish
 complete embedded Rust/native binary/font redistribution rights.
 
+Release metadata also records the experimental, explicitly opted-in Mac semantic
+automation protocol version. It does not change the alpha SDK version or target
+qualification status; source revision identifies this added public contract.
+
 ## Mac distribution input inventory
 
 `scripts/distribution-inventory.py --output <new.json>` records the actual SDK

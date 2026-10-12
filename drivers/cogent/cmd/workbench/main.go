@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/automation"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/command"
 	"github.com/dshills/vellum/document"
@@ -19,7 +21,6 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -32,6 +33,7 @@ func main() {
 	layoutPath := flag.String("layout", "", "layout file for explicit Save/Restore commands")
 	smoke := flag.Bool("smoke", false, "exercise registered actions and worker completion")
 	documentSmoke := flag.Bool("document-smoke", false, "exercise native unsaved-close and temporary document save/open")
+	automationEnabled := flag.Bool("automation", false, "enable private local semantic API and print its capability descriptor")
 	flag.Parse()
 	if *documentSmoke && (*smoke || *exit > 0) {
 		must(errors.New("document-smoke requires its own native process without smoke/exit-after"))
@@ -47,6 +49,7 @@ func main() {
 	}
 	parts := newParts(*rowCount)
 	selectedIndex := 0
+	selectionRevision := uint64(1)
 	count := 0
 	status := "Ready"
 	var task *tasks.Task
@@ -63,8 +66,7 @@ func main() {
 	must(err)
 	must(registry.Register(command.Command{ID: "project.increment", Label: "Next component", Shortcut: "Meta+I", Execute: func(context.Context) error {
 		count++
-		selectedIndex = (selectedIndex + 1) % parts.Len()
-		selectID(parts.Row(selectedIndex).ID)
+		selectID(parts.Row((selectedIndex + 1) % parts.Len()).ID)
 		status = "Selected " + parts.Row(selectedIndex).Cells[0]
 		return nil
 	}}))
@@ -144,18 +146,31 @@ func main() {
 	must(err)
 	treeModel, err := buildOutline(*treeCount, parts.Len())
 	must(err)
+	selectComponent := func(id string) error {
+		index, err := componentIndex(parts, id)
+		if err != nil {
+			return err
+		}
+		if index != selectedIndex && selectionRevision == math.MaxUint64 {
+			return history.ErrRevisionExhausted
+		}
+		if index != selectedIndex {
+			selectionRevision++
+		}
+		selectedIndex = index
+		table.Selected = id
+		if board != nil {
+			board.Selected = id
+		}
+		status = "Selected " + parts.Row(selectedIndex).Cells[0]
+		return nil
+	}
 	selectID = func(id string) {
 		if !strings.HasPrefix(id, "component:") {
 			return
 		}
-		index, err := strconv.Atoi(strings.TrimPrefix(id, "component:"))
-		if err == nil && index > 0 && index <= parts.Len() {
-			selectedIndex = index - 1
-			table.Selected = id
-			if board != nil {
-				board.Selected = id
-			}
-			status = "Selected " + parts.Row(selectedIndex).Cells[0]
+		if err := selectComponent(id); err != nil {
+			status = err.Error()
 		}
 	}
 	tableView := &cogent.VirtualTable{Owner: a, Window: "main", Model: table, Columns: []string{"Reference", "Value", "Package", "Rotation"}, Select: func(r virtual.Row) { selectID(r.ID) }}
@@ -387,6 +402,16 @@ func main() {
 	must(registry.Register(command.Command{ID: "file.open", Label: "Open", Shortcut: "Meta+O", Available: fileAvailable, Execute: workflow.open}))
 	must(registry.Register(command.Command{ID: "file.save", Label: "Save", Shortcut: "Meta+S", Available: fileAvailable, Execute: func(ctx context.Context) error { return persistence.Save(ctx, document.SaveOptions{}) }}))
 	must(registry.Register(command.Command{ID: "file.save-as", Label: "Save As", Shortcut: "Meta+Shift+S", Available: fileAvailable, Execute: func(ctx context.Context) error { return persistence.Save(ctx, document.SaveOptions{Choose: true}) }}))
+	if *automationEnabled {
+		semantic, err := workbenchAutomation(a, registry, parts, references, func() (int, uint64) { return selectedIndex, selectionRevision }, selectComponent)
+		must(err)
+		server, err := automation.Start(automation.Config{Owner: a, Window: "main", Registry: semantic})
+		must(err)
+		defer server.Close()
+		// Explicit opt-in writes this credential only to the invoking process's
+		// stdout. Never include it in application semantics or audit records.
+		must(json.NewEncoder(os.Stdout).Encode(server.Endpoint()))
+	}
 	if *documentSmoke {
 		go func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)

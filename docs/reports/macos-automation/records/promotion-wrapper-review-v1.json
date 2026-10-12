@@ -1,0 +1,61 @@
+{
+  "status": "APPROVED",
+  "scope": "Read-only final local automation checkpoint promotion producer safety/identity review only. No script/command/Git/native/provider execution, no source mutation or new implementation/evidence approval.",
+  "producer_path": "/private/tmp/vellum-macos-automation/promote.py",
+  "producer_sha256": "ce03b7a5b890f8f829cce24f582dd67a2445cce28efb56516122dd5fd17c4c48",
+  "base_commit": "94888a320273a29a45a1265235eb6457e356f718",
+  "prior_approved_wrapper": {
+    "review_path": "/private/tmp/vellum-distribution-inventory/promotion-wrapper-review-v1.json",
+    "review_sha256": "9f7c7ba08b7da28a0b0071f4afffbecb8e018eed4ecd7c80c35d413ff1181b89",
+    "producer_sha256": "6a5869cf3f9fc4d13c2aa72909417c8dbb03a2b9894606b2969b5acd26826687"
+  },
+  "mechanical_delta": "Exact allowed substitutions only from approved inventory wrapper: phase/report/artifact labels, base, headless qualification result and scope prose. All executable sole-parent/clean/branch/source/ff-only/timeout/finally/identity logic otherwise unchanged.",
+  "findings": [],
+  "static_bindings": {
+    "qualification_path": "/private/tmp/vellum-macos-automation/qualification.json",
+    "qualification_sha256": "5a536c780cb48a81e94327134273ba4c66d7701ecb3bdf1306866956f355cd85",
+    "source_entries": 26,
+    "current_source_match": true,
+    "prepared_entries": 6172,
+    "checkpoint_path": "/private/tmp/vellum-large-data/docs/reports/macos-automation/records/checkpoint.json",
+    "checkpoint_sha256": "acf1b77d1557ca02f76d1e2874ef81a6b027931b52c2b7754a10b5bd24b9cc5d",
+    "checkpoint_matches_qualification": true,
+    "archive_path": "/private/tmp/vellum-large-data/docs/reports/macos-automation/records/evidence.tar.gz",
+    "archive_sha256": "0aa970458774b2c3ee7b14b47231ff05c112bf8cc19c56b3d58aeba51f63f8cf",
+    "archive_matches_checkpoint": true
+  },
+  "prism": {
+    "process_path": "/private/tmp/vellum-macos-automation/prism-v1/process.json",
+    "process_sha256": "7815a0778faad0679418c32582dc2c6ecd4843d373475048560a60dd73af17d9",
+    "raw_cli_exit_code": 1,
+    "json_path": "/private/tmp/vellum-macos-automation/prism-v1/prism.json",
+    "json_sha256": "ff70a65f8787e40548dc457401befcc2df62a743340fc4f642c092f27a043c1b",
+    "raw_findings": 1,
+    "finding_ids": [
+      "4086271e3b54a6eb"
+    ],
+    "coverage_complete": true,
+    "checkpoint_resolved_by_internal": true,
+    "scope": "Preserves raw conditional finding/process status and inspects checkpoint resolution guard. Does not claim raw zero findings/exit0 or independently re-adjudicate implementation fix."
+  },
+  "checked_properties": [
+    "Clean canonical/scratch, exact base/canonical branch and exact sole-parent [commit,base] required before output/fetch. Current uncommitted/staged scratch cannot pass these runtime preconditions until the one-child commit is completed and clean.",
+    "All26 qualified source entries must match tracked scratch expected map; qualification result/base and checkpoint qualification hash are required.",
+    "Local exact-SHA fetch, FETCH_HEAD equality, --ff-only merge and final HEAD equality. No public push/tag/release or native application invocation.",
+    "Git60s and fresh prepare180s bounded via existing owned-child helper; exclusive new destination and xb raw prepare logs.",
+    "Prepare finally preserves terminal error/exit/log digests before assertions; outer finally preserves failed outcome, exception and best-effort observed canonical HEAD/status, commands and elapsed.",
+    "Success requires all6172 fresh prepared bytes equal qualification, all tracked canonical bytes equal committed scratch, archive hash equals checkpoint and both endpoint trees clean.",
+    "Scope remains local headless semantic automation only, with native/human automation, redistribution rights, sustained performance and broader Mac acceptance open; no UI/input/OS preference/performance/public publish claimed."
+  ],
+  "limits": [
+    "Source-only approval of producer; actual clean branch/commit/preparation/promotion state was not observed with Git or by executing it.",
+    "Frozen single-owner execution remains required; individual checks do not provide an atomic repository lock.",
+    "Evidence audit and final implementation resolution approval remain separate. Current q/checkpoint/archive static identities verified, not a whole archive/member audit."
+  ],
+  "actions": {
+    "execution": false,
+    "commands_git": false,
+    "native_provider": false,
+    "source_mutation": false
+  }
+}

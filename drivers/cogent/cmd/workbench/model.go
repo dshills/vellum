@@ -7,6 +7,7 @@ import (
 	"github.com/dshills/vellum/history"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
+	"math"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -113,6 +114,9 @@ func (e *partEditor) change(index int, label string, next part) error {
 		}
 	}
 	assign := func(p part, rect canvas.Rect) error {
+		if e.source.revision == math.MaxUint64 {
+			return history.ErrRevisionExhausted
+		}
 		e.source.parts[index] = p
 		if hasRect {
 			e.board.Objects[index] = rect
@@ -128,7 +132,10 @@ func (e *partEditor) change(index int, label string, next part) error {
 
 // File references share document history; importing file contents is a separate
 // application policy. Journal captures and retained values never alias callers.
-type fileReferences struct{ paths []string }
+type fileReferences struct {
+	paths    []string
+	revision uint64
+}
 
 func (r *fileReferences) replace(journal *history.Journal, paths []string) error {
 	after, err := ui.CopyFileDropPaths(paths)
@@ -139,7 +146,14 @@ func (r *fileReferences) replace(journal *history.Journal, paths []string) error
 		return nil
 	}
 	before := slices.Clone(r.paths)
-	assign := func(paths []string) error { r.paths = slices.Clone(paths); return nil }
+	assign := func(paths []string) error {
+		if r.revision == math.MaxUint64 {
+			return history.ErrRevisionExhausted
+		}
+		r.paths = slices.Clone(paths)
+		r.revision++
+		return nil
+	}
 	return journal.Apply(history.Change{Label: "Reference files", Apply: func() error { return assign(after) }, Revert: func() error { return assign(before) }})
 }
 

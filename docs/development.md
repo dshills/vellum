@@ -147,3 +147,14 @@ The collector does not approve or publish a distribution.
 Set `VELLUM_CACHE_DIR` to reuse a chosen Go cache across preparation/check commands.
 The legacy `P0_CACHE_DIR` variable is accepted for existing local environments.
 Without either variable, sourcing the environment creates an isolated temporary cache.
+
+## Local semantic automation
+
+The workbench opens no external endpoint by default. Run it with `-automation`
+when a trusted local controller needs domain inspection/actions. The single JSON
+descriptor on stdout contains a secret capability. Pass it privately to clients
+using `automation.Call`; inspect first, then invoke with that response's revision.
+Do not automatically retry actions after a lost response. See the
+[protocol and lifetime contract](../specs/automation.md). Headless socket tests
+are included in root `go test -race ./...`; workbench domain tests run with the
+native module's `offscreen` tag and create no windows.

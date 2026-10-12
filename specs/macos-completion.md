@@ -157,8 +157,14 @@ The ordinary four-case comparison uses five release processes per build and
 every run still failing the unchanged targets; no general frame improvement or
 full P6/Mac completion is inferred.
 
+The opt-in [semantic automation endpoint](automation.md) implements a Mac-local
+capability-protected socket with typed DTO queries/actions, revision checks and
+bounded owner admission. The workbench exposes selected/stable virtual component
+inspection and a narrow shared-domain action allowlist. Headless transport/domain
+checks are separate from a live professional automation campaign.
+
 Full P9 professional workload and large-data replay acceptance, external
-application automation transport, native services/input/accessibility, GPU
+application automation workflows, native services/input/accessibility, GPU
 presentation and sustained performance qualification remain open. This bounded
 software fixture does not complete the macOS milestone.
 

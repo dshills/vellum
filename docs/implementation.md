@@ -164,8 +164,14 @@ without forcing time forward. This checkpoint permits one active managed
 application per process, with multiple windows sharing its supplied clock.
 See the [checkpoint report](reports/macos-replay/README.md).
 
+The new opt-in [Mac semantic endpoint](../specs/automation.md) supplies a private
+Unix socket, typed queries/actions, revision checks and bounded owner dispatch.
+The workbench shares its selection, command and history validation with this
+transport and publishes explicit redacted domain DTOs. Headless transport and
+domain tests are distinct from a live professional automation campaign.
+
 The full P9 professional workloads, large-data replay, external automation
-transport, native services/IME/accessibility, GPU presentation and sustained
+workflows, native services/IME/accessibility, GPU presentation and sustained
 performance acceptance remain open. Software replay does not certify those gates.
 
 ## Indexed grid foundation

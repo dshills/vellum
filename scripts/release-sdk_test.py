@@ -262,10 +262,13 @@ func TestExportedHistory(t *testing.T) {
     def test_source_whitelist_covers_root_api_and_refuses_links(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);(root/"vellum.go").write_text("package vellum")
+            (root/"automation").mkdir();(root/"automation/protocol.go").write_text("package automation")
             for dependency in ("upstream","typesetting"):
                 directory=root/"drivers/cogent/build"/dependency;directory.mkdir(parents=True);(directory/"go.mod").write_text("module source")
-            with mock.patch.object(release,"check_child_output",return_value=b"vellum.go\0"):
-                self.assertIn("vellum.go",[name for name,_ in release.source_files(root)])
+            with mock.patch.object(release,"check_child_output",return_value=b"vellum.go\0automation/protocol.go\0"):
+                files=dict(release.source_files(root))
+                self.assertIn("vellum.go",files)
+                self.assertIn("automation/protocol.go",files)
             (root/"link").symlink_to(root/"drivers",target_is_directory=True)
             with self.assertRaisesRegex(ValueError,"symlinks"):release.require_regular_source(root,root/"link/cogent/build/upstream/go.mod")
 
