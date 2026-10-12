@@ -40,6 +40,8 @@ type ManualConfig struct {
 	LogicalDPI                            float32
 	EventCapacity, OwnerBatch, MaxWindows int
 	MaxControls                           int // zero uses 4096; each window descriptor is checked before allocation.
+	// ExperimentalGridScrollReuse mirrors Driver's main-scene opt-in.
+	ExperimentalGridScrollReuse bool
 }
 
 // ManualInput either supplies physical coordinates or resolves a current target

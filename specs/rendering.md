@@ -179,3 +179,69 @@ rectangle write elision and does not establish GPU upload or native memory gains
 
 Qualification and ordinary latency results are recorded in
 [the covered-fill report](../docs/reports/macos-covered-fills/README.md).
+
+## Ordered scroll surfaces
+
+An optional painter-group hint retains the full original command stream. Raster
+reuse occurs at that group's original position, with an opaque rectangular pixel
+cache captured before later siblings. Disjoint exposed strips replay the current
+paint under its existing clip and order. The main source image stays current for
+software snapshots and receives the ordinary complete GPU copy/upload. CPU
+memmove does not admit strip-only uploads to an unchanged GPU texture.
+
+Per-renderer retention is limited to 32 MiB of owned RGBA pixels, 8 MiB of detached
+paint descriptors and 64 groups. The descriptor account includes operation slots,
+fixed path data, mask headers and tightly copied alpha pixels. Map/renderer and
+Go allocator metadata are separate; this is not a process/native/GPU memory
+limit. A replacement plan temporarily coexists with retained plans and operation
+builder/trim allocations. It retains no widgets, domain models, shaped runs, font
+faces, strings, render commands or borrowed masks. Resize, bounded LRU eviction
+and clock exhaustion retire all associated pixels and descriptors.
+
+Opted-in managed Grid panes emit checked hints after actual layout/painting, preserving
+frozen-header, scrolling-header, frozen-body and scrolling-body order. The raster
+owner captures actual text output through the existing renderer: exact cached
+mask bytes or post-scale/post-position fixed outline control points, effective
+clips, built-in value colors and selection/background geometry. Capture preserves
+SVG/bitmap/outline precedence, refuses SVG/bitmap/stroked/decorated/vertical/math
+text and stops at its byte/primitive limit. Unsupported operations, uncertain
+opaque coverage, source clipping and large jumps use ordinary complete replay.
+A disabled fill-and-stroke standard-box path produces no pixels and is ignored.
+
+For each overlap, every affecting operation in the old plan translated by the
+checked integer delta must equal the current ordered operation stream clipped to
+that overlap. Whole intersecting masks/outlines may be compared conservatively;
+uncertainty repaints. The accepted current plan drives both complete and exposed
+strip replay, avoiding a second font/color read between checking and drawing.
+Model revision, selection/style subsets, font pointer identities and hashes do
+not establish equality. Fractional physical phase/clip differences trigger full
+repair even when rounded logical scroll offsets suggest an integer translation.
+Other callers can explicitly use the original scalar epoch promise without this
+checked paint protocol; the native Grid always requests VerifyPaint.
+
+Filled quadratic/cubic curves flatten in coordinates relative to their integer
+control hull and restore the origin and terminal endpoint exactly. This removes
+absolute-position floating-weight jitter under integer translation. Some previous
+antialias edge pixels intentionally change; logical paths, shaping and interaction
+geometry do not. Exact emitted-edge and new full-replay pixel comparisons test
+the new rule. The unchanged 4/6 ms frame targets and full Mac acceptance remain open.
+
+The owned pane buffer uses toroidal storage. Checked scroll deltas change a
+bounded logical-to-storage offset; overlap restore splits at most once in each
+axis. Only disjoint exposed strips are written back before later siblings paint.
+Full repair resets the mapping and captures the complete pane. CapturedPixels
+counts owned CPU cache writes, not GPU uploads. This avoids a second full-pane
+copy after every reuse. Capture shares identical copied glyph masks within one
+plan, checking current bytes again before sharing. A changed borrowed mask gets
+a new owned copy; the temporary lookup is cleared before retaining the plan.
+Detached replay preserves covered-clear elision: an owned uniform Src immediately
+covered by an equal-rectangle opaque uniform Over is replaced by that Over.
+Admission has already checked each original uniform's finite source coverage.
+
+Managed main-window Grid reuse is opt-in through Driver.ExperimentalGridScrollReuse
+or ManualConfig.ExperimentalGridScrollReuse. Both default to false and are copied
+at adapter startup; additional modal scenes retain ordinary replay. Current
+matched stored-table experiments regress latency even though pixels agree, so
+normal managed rendering emits no cache hints and retains no pane cache. The
+experimental mode remains available for further renderer work; this is not a
+recommended performance setting or completed latency acceptance.

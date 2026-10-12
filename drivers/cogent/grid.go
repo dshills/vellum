@@ -141,6 +141,7 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 	for i := range g.panes {
 		p := tree.New[gridPane](host)
 		p.binding = g
+		p.part = uint8(i)
 		g.panes[i] = p
 	}
 	g.horizontal = core.NewSlider(host)
@@ -957,6 +958,7 @@ func (w *gridWidget) RenderWidget() {
 type gridPane struct {
 	core.Frame
 	binding *gridBinding
+	part    uint8
 	rect    virtual.GridRect
 }
 

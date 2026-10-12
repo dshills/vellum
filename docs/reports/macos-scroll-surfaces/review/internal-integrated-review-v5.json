@@ -1,0 +1,164 @@
+{
+  "base_commit": "56d394fa0ce6084033ca86c79d3456b560e59d4c",
+  "decision": "Approved frozen v5 integrated source, ring-cache/deduplicated paint capture and covered-clear correction. No remaining material source finding in this review. Ordinary performance acceptance is separate.",
+  "delta_review": [
+    {
+      "conclusion": "delta is oldPosition minus newPosition. Updating offset by minus delta maps each new logical coordinate to the exact old ring coordinate. Offsets remain normalized and subtraction is bounded by admitted pane dimensions.",
+      "file": "paint/renderers/rasterx/scroll.go",
+      "line": 241,
+      "ordering": "Restore all overlap before exposed writes. Current full/strip replay occurs at original group position. Dirty strips are disjoint and their ring locations are a bijective mapping. Later siblings remain later. Full repair resets offset to zero and captures all pane pixels.",
+      "resource": "Ring uses the existing owned RGBA allocation; no extra screen/font/command/domain reference enters retained cache. Eviction, resized bounds, scene size change and clock exhaustion retain prior guards."
+    },
+    {
+      "bounds": "Masks remain <=128x128, operation/descriptor limits unchanged, and original capture failure exits remain. A-B-A conservatively allocates a third payload rather than reusing an older borrowed state.",
+      "conclusion": "Borrowed pointer is only a capture lookup key. Each attempted reuse compares the actual current strided mask rows. A mutation allocates a new tight owned alpha image and earlier operations keep their previous detached copy. Operation slots are always charged, unique new mask header/payload is charged once. Success clears the borrowed lookup before retention.",
+      "file": "paint/renderers/rasterx/scroll_plan.go",
+      "line": 87
+    },
+    {
+      "conclusion": "Replacing a previous owned uniform Src with a same-rectangle/same-clip fully opaque uniform Over preserves final pixels for every destination. Admission has already validated original finite source coverage; only immutable built-in value colors are captured. No custom color callbacks or borrowed render items are altered. One retained slot remains charged; translucent Over appends.",
+      "file": "paint/renderers/rasterx/scroll_plan.go",
+      "line": 59
+    }
+  ],
+  "findings": [],
+  "inert_verification_recipe": {
+    "path": "/private/tmp/vellum-scroll-surfaces/verify-internal-integrated-v5.py.txt",
+    "sha256": "b69f80c3f5afa733682cc3c3004fb0fdae10335c43b9587ee0eea9295d75a56d"
+  },
+  "limits": [
+    "Source approval and recorded race/vet/build/oracle checks do not establish that v5 improves latency or reaches 4/6ms budgets. The completed v4 campaign is separate and must retain its reported regression.",
+    "All CPU pane pixels may still be restored to the scene; the removed cost is the second complete-pane cache capture on reuse. Entire scene GPU copy/upload remains unchanged.",
+    "Logical retained descriptor/pixel caps exclude allocator/map overhead and temporary replacement/build allocations. Capture-only mask lookup is bounded by admitted operations but not part of a total peak-heap claim.",
+    "Native hints always VerifyPaint; arbitrary external scalar epoch callers remain responsible for their promise. SamePaint proof and immutable current plan replay remain unchanged.",
+    "Curve kernel intentional antialias changes and prior fixed endpoint correction remain unchanged from v4; full replay differential uses the new kernel.",
+    "Read-only reviewer audit ran stdlib source/hash/reconstruction scripts only. V5 live Cocoa and ordinary performance evidence are not inspected or approved by this certificate."
+  ],
+  "mechanical": {
+    "binaries_verified": 2,
+    "current_prepared_files": 6146,
+    "current_source_files": 659,
+    "path": "/private/tmp/vellum-scroll-surfaces/internal-integrated-mechanical-v5.json",
+    "reconstructed_stage_inputs": 12,
+    "retained_generated_images_verified": 17,
+    "sha256": "17271da96f95e102e7e08ca3ab95f2b49eb8c9c8d433d16b672b659f2cfbbbeb"
+  },
+  "patch_sha256": "5826bb188061429e650a877744c1d0ed1d9ec3726897c9a059fa2089ac4c7249",
+  "prepared_output_sha256": {
+    "paint/render/item.go": "e003f06f7f25c9b2911bf2db426b71fe9ed8fd6c570a01b82f9ef308647621cf",
+    "paint/render/scroll.go": "78e326421238ebe43fe69950feb0dcefa077df2fd3b0a0cca20a20c594c85e1f",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll.go": "a86eed0f0c4aa51c063f012eafa4c2e6ef232192396779d806fca1382ec63e1a",
+    "paint/renderers/rasterx/scroll_plan.go": "48e473539dd4ec63240ca464a0b676b9fc7a2781ed257ad46e4a6de06597af28",
+    "paint/renderers/rasterx/scroll_plan_test.go": "918beb144f0e515a35889ead8c5b568bad16acb473b6fc6ea64d02057860d2a4",
+    "paint/renderers/rasterx/scroll_test.go": "14ed3b1ac774627260fede341053653a81b1c0c6ef5e30fb9ea300dce21b780b",
+    "paint/renderers/rasterx/text.go": "b2d87240c0779b8d3129bbe06876acb0d87c73b1e2615727b107452e8d6b5fdc",
+    "paint/renderers/rasterx/textbitmap.go": "a57e617f953bf44aee8f3c3fa101732dd6a3d7bbb81aec217ae7ef569835e607",
+    "paint/renderers/rasterx/textsvg.go": "41ee414efcaca93cb713e022ff1e148b8dbae2df9f0512eefbfb6ff8ce61b4c5"
+  },
+  "prior_source_review": {
+    "path": "/private/tmp/vellum-scroll-surfaces/internal-integrated-review-v4.json",
+    "relationship": "Unchanged source invariants inherited from exact reviewed v4; changed files separately read in full/diff. Prior source approval is not a performance pass.",
+    "sha256": "69a57330fdf8bb252452e7ea2c7745ce5cab52c47d28bdf11e3b4de1096a65cf"
+  },
+  "qualification": {
+    "checks": 7,
+    "current_verification": {
+      "binaries": 2,
+      "generated_outputs": 17,
+      "prepared_files": 6146,
+      "source_files": 659
+    },
+    "log_sha256": {
+      "fresh-prepare.log": "56711da4860f1e98a054387be4fdc3cc04755f464dfbd50d8d341d60e7ec000f",
+      "generic-smoke-build.log": "6f9ed08bde9a6d02c495b43364c4f18229108fe7c1353b81d950a446dd4b1819",
+      "native-pixel-race.log": "92f93ea9588d1b0e2978eb04d4d9ed78777f85f16643772a007be6995ba59efb",
+      "prepare-tests.log": "add621e08278bcc09f3f6bc6213a7468fb9e2b505407e195f16aadfc3afaccd3",
+      "raster-race.log": "3def6cf170143cb240db95d9f33e2e62fbdf23fbbb5499957b075222685009de",
+      "raster-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "release-build.log": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0"
+    },
+    "producer_sha256": "e94e80b4adf30628a1f437fd7f88ac73e63c6d9152bb9b11c657f18140e3451a",
+    "result": "PASS",
+    "scope": "Source-bound preparation/race/vet/build and real offscreen native-adapter pixel proof; no live Cocoa, ordinary latency, native/GPU memory or full Mac qualification.",
+    "sha256": "5e6c9a83ab69bcde4beeced8a2899e716b75aa2e285655d8fb9785818c396158",
+    "source_before_equals_after": true
+  },
+  "reviewed_source_sha256": {
+    "drivers/cogent/grid.go": "6e5601f16448d1313de9def6b1c957eb59d763084b6d45539b94aabdecea5b0c",
+    "drivers/cogent/grid_scroll.go": "42e56fd555c1da5dc61654f706e5f33005b3e526fd944f14c6147df1cd8ae55c",
+    "drivers/cogent/grid_scroll_offscreen_test.go": "72994816a6f245f56d94525096f32aa5407cb593b696be5a7abc000b031146cf",
+    "drivers/cogent/native/README.md": "4886c7d8a437085cece5667fc98ddd10e21d504f1adf34b2d68b8485328958e2",
+    "drivers/cogent/native/dependencies.json": "40eeadf399f78ef2518ea4d63bd30e18b1fcad80f431568ef2f6322b6427db01",
+    "drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch": "5826bb188061429e650a877744c1d0ed1d9ec3726897c9a059fa2089ac4c7249",
+    "drivers/cogent/native/patches/scrollsurfaces/README.md": "4019b4fc1da7202fea455678e03c5888c54559d70ff095d6018ad1a21eb340f6",
+    "drivers/cogent/native/patches/scrollsurfaces/original-hashes.json": "80165a4f0b589e2bd85079e02c6bb8b6d89b71361ebb91a949e2f91a24819d83",
+    "drivers/cogent/native/patches/scrollsurfaces/output-hashes.json": "62a8b4e56801266f8a1dc08e4c9d8d3e459f8925dff3d1bd7849757bce997731",
+    "drivers/cogent/prepare_test.py": "504a295278caf9dfe396cf0e939dc728a065c83d5b948a2b39718ac830a42029",
+    "paint/render/item.go": "e003f06f7f25c9b2911bf2db426b71fe9ed8fd6c570a01b82f9ef308647621cf",
+    "paint/render/scroll.go": "78e326421238ebe43fe69950feb0dcefa077df2fd3b0a0cca20a20c594c85e1f",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll.go": "a86eed0f0c4aa51c063f012eafa4c2e6ef232192396779d806fca1382ec63e1a",
+    "paint/renderers/rasterx/scroll_plan.go": "48e473539dd4ec63240ca464a0b676b9fc7a2781ed257ad46e4a6de06597af28",
+    "paint/renderers/rasterx/scroll_plan_test.go": "918beb144f0e515a35889ead8c5b568bad16acb473b6fc6ea64d02057860d2a4",
+    "paint/renderers/rasterx/scroll_test.go": "14ed3b1ac774627260fede341053653a81b1c0c6ef5e30fb9ea300dce21b780b",
+    "paint/renderers/rasterx/text.go": "b2d87240c0779b8d3129bbe06876acb0d87c73b1e2615727b107452e8d6b5fdc",
+    "paint/renderers/rasterx/textbitmap.go": "a57e617f953bf44aee8f3c3fa101732dd6a3d7bbb81aec217ae7ef569835e607",
+    "paint/renderers/rasterx/textsvg.go": "41ee414efcaca93cb713e022ff1e148b8dbae2df9f0512eefbfb6ff8ce61b4c5",
+    "specs/rendering.md": "2b4bff3eb79da6bd30c479cbeeb16e6c8fe5869379bdb0bfc1f7c0a0f3a4acf7"
+  },
+  "schema_version": 1,
+  "scope": {
+    "changed_since_v4": [
+      "drivers/cogent/grid_scroll_offscreen_test.go",
+      "drivers/cogent/native/dependencies.json",
+      "drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch",
+      "drivers/cogent/native/patches/scrollsurfaces/README.md",
+      "drivers/cogent/native/patches/scrollsurfaces/output-hashes.json",
+      "paint/renderers/rasterx/scroll.go",
+      "paint/renderers/rasterx/scroll_plan.go",
+      "paint/renderers/rasterx/scroll_plan_test.go",
+      "paint/renderers/rasterx/scroll_test.go",
+      "specs/rendering.md"
+    ],
+    "prepared_files": 12,
+    "review_type": "Read-only production/test/spec delta plus exact frozen/current source and Stage39 pins/proof/log identities. No reviewer test/build/native/GUI/provider/Git/prepare executions.",
+    "selected_root_files": 11,
+    "selected_union": 23
+  },
+  "source_receipt": {
+    "path": "/private/tmp/vellum-scroll-surfaces/source-v5.json",
+    "sha256": "04feba178aa3c714c7d6c973ba6143d58eb2717da9b02d9bea30d63e385e097f"
+  },
+  "status": "APPROVED",
+  "test_review": [
+    {
+      "coverage": "Exhausts every normalized offset of nonzero/negative-origin pane bounds, horizontal/vertical 1px panes and 1x1. Compares whole/subrect restore and partial-store preservation to a direct draw oracle.",
+      "file": "paint/renderers/rasterx/scroll_test.go",
+      "name": "TestScrollRingWrappedCopiesExact"
+    },
+    {
+      "coverage": "160 randomized scroll frames with dirty parent and later overlapping peer, bounds repair/unsupported fallback, uniform source bounds and selected shaped text. CapturedPixels equals RedrawPixels: full admitted repair captures the full pane; reuse captures exposed strips only.",
+      "name": "Existing random/full-replay oracles"
+    },
+    {
+      "coverage": "Nonzero-origin strided alpha resource; repeated pointer at different position/color shares the owned copy. A-B-A mutation preserves all earlier op bytes and exact unique-payload charge. Retained actual plan separately asserts maskCopies=nil.",
+      "file": "paint/renderers/rasterx/scroll_plan_test.go",
+      "name": "TestScrollPaintSharedMaskCopiesPreserveCurrentBytes"
+    },
+    {
+      "coverage": "Pixel parity against sequential Src+opaque Over over a dirty destination, one-slot accounting, and translucent refusal.",
+      "file": "paint/renderers/rasterx/scroll_plan_test.go",
+      "name": "TestScrollPaintCoveredClearRetainsOneOwnedOperation"
+    },
+    {
+      "coverage": "Same 56 actual managed frames at four DPIs; forced repeat render, source/text/selection/disabled changes, exact full command-stream pixels and nonzero reuse. Adds native CapturedPixels==RedrawPixels assertion; no oracle weakening.",
+      "file": "drivers/cogent/grid_scroll_offscreen_test.go",
+      "name": "TestManagedGridScrollSurfaceFullReplayPixels"
+    }
+  ]
+}

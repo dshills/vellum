@@ -1,0 +1,179 @@
+{
+  "base_commit": "56d394fa0ce6084033ca86c79d3456b560e59d4c",
+  "correctness_evidence": [
+    "Actual glyph-data precedence and effective placement are reused during capture. Glyph masks and fixed paths are detached, then the same accepted plan supplies full and strip replay without a second font resource read.",
+    "Ordered operations affecting the overlap must exactly match after checked integer translation. Changed color, selection/background, physical phase, clipping, glyph output or actual consumed mask refuse reuse.",
+    "Uniform finite source bounds and initial fully opaque coverage are checked. Unsupported image/color/transform/path effects or SVG/bitmap/stroked/decorated/vertical/math text fall back; zero text clips fall back. No-paint standard-box Paths are ignored.",
+    "Owned pane pixels are captured before later overlapping siblings; full parent redraw cannot erase restored panes. Disjoint dirty rectangles avoid applying translucent text twice.",
+    "Current adapter oracle strips hints from actual painted commands and compares complete software RGBA pixels. Repeat position forces Scene.NeedsRender; source/text change, selection and disabled transitions are included. Aggregate reuse must be nonzero.",
+    "Pixel cache <=32MiB/64groups and retained descriptor payload <=8MiB; tight arrays/masks prevent explicit slice-capacity undercount. Eviction, resize and clock exhaustion retire pixels and plans."
+  ],
+  "decision": "Approved frozen v4 integrated Stage39 source and stated correctness contract. No remaining material finding in reviewed inputs. Performance qualification remains separate.",
+  "findings": [],
+  "inert_verification_recipe": {
+    "path": "/private/tmp/vellum-scroll-surfaces/verify-internal-integrated-v4.py.txt",
+    "sha256": "6104b36449aaf6d6934fde95f5d4dc73e6a5845bacd09743dd195328d9a2ed3f"
+  },
+  "limits": [
+    "Reviewer executed only read/hash/reconstruction scripts, no Go/native/GUI/provider tests. Qualification execution belongs to recorded producers.",
+    "Logical retained payload limits exclude Go allocator/map metadata; replacement capture temporarily overlaps old plan and builder/trim allocations. They do not bound peak process/native/GPU memory.",
+    "New relative curve interpolation intentionally changes some preceding-kernel antialias edge pixels. Full-replay differential oracle uses the new kernel; preceding-kernel pixel parity is not claimed.",
+    "Normal full scene GPU copy/upload remains unchanged. No strip-only GPU transfer, compositor/GPU completion, physical presentation timing, general latency improvement or 4/6ms target acceptance is certified.",
+    "Three live Cocoa process receipts and old-kernel meaningful-negative receipt are hash-checked supplemental evidence, not human input, external accessibility, VoiceOver, OS-setting or whole-Mac acceptance.",
+    "Other renderers retain original flat commands; their metadata ignoring is reviewed structurally, not separately rerun in this review."
+  ],
+  "mechanical_summary": {
+    "path": "/private/tmp/vellum-scroll-surfaces/internal-integrated-mechanical-v4.json",
+    "sha256": "025f546639465d25e5539a85ce8820c6dd2b444cca30b98798a2526ca3b081e9"
+  },
+  "methods": [
+    "Read selected production/test/spec source and v3-to-v4 diffs.",
+    "Verified all 23 frozen v3 and v4 snapshots; all 23 v4 current sources match receipt.",
+    "Reconstructed all 12 Stage39 input files in memory from current output and unified diff; hashes match original pins (new files reconstruct empty).",
+    "Verified all registered patch-file SHA values and final Stage39 manifest input/output/patch binding.",
+    "Verified final proof source659/prepared6146 current hashes, binaries2 and retained generated images17; verified 13 historical-v3 and 7 final-v4 raw log hashes/exit records."
+  ],
+  "patch_sha256": "a7dc8781c06fb0ea000730a24070ad2a7bbededb9e9ec9f65d376e06353557e8",
+  "prepared_output_sha256": {
+    "paint/render/item.go": "e003f06f7f25c9b2911bf2db426b71fe9ed8fd6c570a01b82f9ef308647621cf",
+    "paint/render/scroll.go": "78e326421238ebe43fe69950feb0dcefa077df2fd3b0a0cca20a20c594c85e1f",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll.go": "1bd7c075228f71a1629f30312031f9366dacdbf94ab6988a921d24ccfbbc1fa3",
+    "paint/renderers/rasterx/scroll_plan.go": "c9c86d1e2c28df6168670196e550043cc021a5af24e5963c896dbb05b43e16a8",
+    "paint/renderers/rasterx/scroll_plan_test.go": "fdf0ac410dab57e3bb1bf7dfe6e70b30ea4c6fbc9878763e7acc647f1c30c521",
+    "paint/renderers/rasterx/scroll_test.go": "b7af442ce6c4bf8920129916609b651b924e29fa2c42f566888878d1b95abee5",
+    "paint/renderers/rasterx/text.go": "b2d87240c0779b8d3129bbe06876acb0d87c73b1e2615727b107452e8d6b5fdc",
+    "paint/renderers/rasterx/textbitmap.go": "a57e617f953bf44aee8f3c3fa101732dd6a3d7bbb81aec217ae7ef569835e607",
+    "paint/renderers/rasterx/textsvg.go": "41ee414efcaca93cb713e022ff1e148b8dbae2df9f0512eefbfb6ff8ce61b4c5"
+  },
+  "qualification": {
+    "checks": 7,
+    "current_verification": {
+      "binaries": 2,
+      "generated_outputs": 17,
+      "prepared_files": 6146,
+      "source_files": 659
+    },
+    "log_sha256": {
+      "fresh-prepare.log": "56711da4860f1e98a054387be4fdc3cc04755f464dfbd50d8d341d60e7ec000f",
+      "generic-smoke-build.log": "6f9ed08bde9a6d02c495b43364c4f18229108fe7c1353b81d950a446dd4b1819",
+      "native-pixel-race.log": "fc0be8add68ddf441ccafb877ba85d431d0f3173949266026437da3bd9960408",
+      "prepare-tests.log": "eb415a59e21c0a977f3222b774d2913fad2c6faacf6b862e57bf55b374dd5f74",
+      "raster-race.log": "a0fb62995677bfedc080c7909cda572a758248f361819c9a4b4daaedad61005c",
+      "raster-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "release-build.log": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0"
+    },
+    "producer_sha256": "9858805b6ecf929b051b4b59fa3048f65ec2377d1d916a97cf17c60795cefd94",
+    "result": "PASS",
+    "scope": "Source-bound preparation/race/vet/build and real offscreen native-adapter pixel proof; no live Cocoa, ordinary latency, native/GPU memory or full Mac qualification.",
+    "sha256": "445bfdeced67bbedd6edc41d17e8242e1d9f1eb293f2233b3862677413a63fa7",
+    "source_before_equals_after": true
+  },
+  "resolved_history": [
+    {
+      "evidence": "Exact allocation matches length charge; regression checks retained cap==len and mutation detachment.",
+      "final_source_sha256": "c9c86d1e2c28df6168670196e550043cc021a5af24e5963c896dbb05b43e16a8",
+      "finding": "SCROLL-PATH-CAPACITY",
+      "historical_certificate": "/private/tmp/vellum-scroll-surfaces/internal-integrated-review-v3.json",
+      "historical_certificate_sha256": "1581c19a72778a51edcd58120cce3357baca2ae667cbecb8d6ffc6aed5fa6750",
+      "resolution_line": 104,
+      "test": {
+        "file": "paint/renderers/rasterx/scroll_plan_test.go",
+        "line": 208,
+        "name": "TestScrollPaintPathRetentionHasExactCapacity",
+        "sha256": "fdf0ac410dab57e3bb1bf7dfe6e70b30ea4c6fbc9878763e7acc647f1c30c521"
+      }
+    },
+    {
+      "certificate": "/private/tmp/vellum-scroll-surfaces/internal-primitive-review-v2.json",
+      "finding": "Prior primitive endpoint defect",
+      "resolution": "Interpolation-only helpers emit the exact supplied fixed endpoint after interior points; wide positive/negative hull and next-segment fixtures retained.",
+      "sha256": "fa41f5abb295ff7243404fe0788a7917877dd87b60555c9a144f61bcfc81436a"
+    }
+  ],
+  "reviewed_source_sha256": {
+    "drivers/cogent/grid.go": "6e5601f16448d1313de9def6b1c957eb59d763084b6d45539b94aabdecea5b0c",
+    "drivers/cogent/grid_scroll.go": "42e56fd555c1da5dc61654f706e5f33005b3e526fd944f14c6147df1cd8ae55c",
+    "drivers/cogent/grid_scroll_offscreen_test.go": "ec7d6c67020d976f75b46c73b02830e6eab89d9c7b1c728b6af5111dfe968fd5",
+    "drivers/cogent/native/README.md": "4886c7d8a437085cece5667fc98ddd10e21d504f1adf34b2d68b8485328958e2",
+    "drivers/cogent/native/dependencies.json": "1490e873e1fd4343394083744052157cd9f7c8ead10c9c2c6469468883711c5e",
+    "drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch": "a7dc8781c06fb0ea000730a24070ad2a7bbededb9e9ec9f65d376e06353557e8",
+    "drivers/cogent/native/patches/scrollsurfaces/README.md": "b93cf9490d9c80900ca74a93c6edfa7c78786a9c041271f77e3f47cf28206601",
+    "drivers/cogent/native/patches/scrollsurfaces/original-hashes.json": "80165a4f0b589e2bd85079e02c6bb8b6d89b71361ebb91a949e2f91a24819d83",
+    "drivers/cogent/native/patches/scrollsurfaces/output-hashes.json": "de50f9b169fa015cfe1503c6612bd2071a954685b93576399aa8a1fbe6285eb1",
+    "drivers/cogent/prepare_test.py": "504a295278caf9dfe396cf0e939dc728a065c83d5b948a2b39718ac830a42029",
+    "paint/render/item.go": "e003f06f7f25c9b2911bf2db426b71fe9ed8fd6c570a01b82f9ef308647621cf",
+    "paint/render/scroll.go": "78e326421238ebe43fe69950feb0dcefa077df2fd3b0a0cca20a20c594c85e1f",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll.go": "1bd7c075228f71a1629f30312031f9366dacdbf94ab6988a921d24ccfbbc1fa3",
+    "paint/renderers/rasterx/scroll_plan.go": "c9c86d1e2c28df6168670196e550043cc021a5af24e5963c896dbb05b43e16a8",
+    "paint/renderers/rasterx/scroll_plan_test.go": "fdf0ac410dab57e3bb1bf7dfe6e70b30ea4c6fbc9878763e7acc647f1c30c521",
+    "paint/renderers/rasterx/scroll_test.go": "b7af442ce6c4bf8920129916609b651b924e29fa2c42f566888878d1b95abee5",
+    "paint/renderers/rasterx/text.go": "b2d87240c0779b8d3129bbe06876acb0d87c73b1e2615727b107452e8d6b5fdc",
+    "paint/renderers/rasterx/textbitmap.go": "a57e617f953bf44aee8f3c3fa101732dd6a3d7bbb81aec217ae7ef569835e607",
+    "paint/renderers/rasterx/textsvg.go": "41ee414efcaca93cb713e022ff1e148b8dbae2df9f0512eefbfb6ff8ce61b4c5",
+    "specs/rendering.md": "05a98932b5dbd2869bf1996fad339302eae8aa389d153a6f2e1646c946929449"
+  },
+  "schema_version": 1,
+  "scope": {
+    "native": "Managed Grid pane hint construction and 56 actual offscreen adapter frames at 96/120/144/192 DPI. Native Grid always requests VerifyPaint; no epoch-only native admission.",
+    "prepared_files": 12,
+    "renderer": "Painter-position opaque pixel restore, disjoint strip replay, exact ordered current/old uniform/mask/path proof, original-command fallback, cache ownership/refusal/retirement and relative curve kernel.",
+    "selected_root_files": 11,
+    "selected_union": 23,
+    "spec_and_pins": "Rendering contract, patch README/native README, dependencies stage registration, prepare stage-order assertion and exact input/output hashes."
+  },
+  "source_receipt": {
+    "path": "/private/tmp/vellum-scroll-surfaces/source-v4.json",
+    "sha256": "b09c102553756d4b9eb1b0f0c08f52a8f6e482c93529480e0b8c4adaa845a069"
+  },
+  "status": "APPROVED",
+  "supplemental_receipts": {
+    "legacy-kernel-negative-v4/qualification.json": {
+      "checks": [
+        {
+          "exit_code": 1,
+          "log": "/private/tmp/vellum-scroll-surfaces/legacy-kernel-negative-v4/legacy-kernel.log",
+          "log_sha256": "e35a1571a8b63519292d198ce355de4cb9cf89e6f785b69dd74ec1ffb947d95c",
+          "name": "legacy-kernel"
+        }
+      ],
+      "input_endpoints_equal": true,
+      "path": "/private/tmp/vellum-scroll-surfaces/legacy-kernel-negative-v4/qualification.json",
+      "result": "PASS_MEANINGFUL_NEGATIVE",
+      "scope": "Original stage38 curve kernel plus unused test-only helper compiles and fails both selected actualcurve/textpixel translation tests. Currenttracked/preparedcandidatebytes unchanged.",
+      "sha256": "b72bddca36dd9cd5b552dc7bd9b1a80577171214e6712d57bf6ad717196575d6"
+    },
+    "native-v4/qualification.json": {
+      "checks": [
+        {
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-scroll-surfaces/native-v4/fixed-10k.log",
+          "log_sha256": "2dd935f6c0541610b0564f6d634cd6fc30948b3fd58d2ccf4c56302a87847d9c",
+          "name": "fixed-10k"
+        },
+        {
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-scroll-surfaces/native-v4/variable-million.log",
+          "log_sha256": "0d641907c363c68bd4f7f2c84e89eb2f6c58709ec509ff097c0304e28caf5866",
+          "name": "variable-million"
+        },
+        {
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-scroll-surfaces/native-v4/generic-ax.log",
+          "log_sha256": "855cb44feab35f97f5e1dff00a3a96bfbde40a3f848575c61ffa1a97f23149b4",
+          "name": "generic-ax"
+        }
+      ],
+      "input_endpoints_equal": true,
+      "path": "/private/tmp/vellum-scroll-surfaces/native-v4/qualification.json",
+      "result": "PASS",
+      "scope": "Three live Cocoa processes on final byte-matched artifact. No inputsource/VoiceOver/OS preference changes. Not humaninput/screenreader,physicalGPU,latency,nativememory orfullMac qualification.",
+      "sha256": "0c697a5166b93aa5b030392c737c08a5c4be468de664d7591e1b4ea51d56542b"
+    }
+  }
+}

@@ -129,3 +129,10 @@ during raster replay and skips only a completely overwritten Src clear.
 Exact input/output pins and differential tests preserve captured items, painter
 recording, clipping, borrowed colors and original fallback call behavior.
 It adds no native image cache, resource ownership or partial GPU upload.
+
+Stage 39 (`patches/scrollsurfaces`) introduces ordered opaque raster surface
+reuse with bounded detached actual-paint proofs, and translation-stable filled
+curve subdivision. Opted-in native Grid main scenes emit checked hints; the complete original
+paint stream and full GPU upload remain intact. See
+[the contract](patches/scrollsurfaces/README.md) and
+[rendering specification](../../../specs/rendering.md).

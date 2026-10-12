@@ -1,0 +1,16 @@
+{
+  "after_sha256": "ffed4ab5efd9958b7bea51d6a03683833339ac3502a48c85ac987c75cc2b895d",
+  "appendix": "\n## Final review disposition\n\nPrism reviewed the 16 implementation, patch, test, specification and report files\nwith Anthropic Claude Sonnet 5.5. It exited 0 with no retained findings and complete\ncoverage. Its raw output also contains one discarded medium comment about the\nshared curve kernel changing ordinary raster output. Independent source review\nconfirmed that scope as the intentional compatibility change described above;\nit did not rely on Prism's evidence-location discard rationale, which was not\nreproduced. No unresolved defect was demonstrated. Existing raster tests pass,\nbut their generated PNG fixtures do not establish parity with prior antialias\npixels. The raw provider record and separate internal disposition are preserved.\n\nThis review paragraph, the explicit fill/stroke/dash scope clarification and a\nspacing correction were added after Prism. They receive a separate internal\nclosure review; the original provider input and source approvals remain intact.\n",
+  "before_sha256": "e18ff43a314f88b4812525f4d0c852922528648724ba0d8354af030bc94040b5",
+  "replacements": [
+    {
+      "new": "redrawn/exposed area. 12 default-mode frames",
+      "old": "redrawn/exposed area.12 default-mode frames"
+    },
+    {
+      "new": "Shared quadratic/cubic subdivision now uses coordinates relative to its integer\ncontrol hull, restoring the origin and terminal endpoint exactly. Ordinary fills,\nstrokes and dashes use this kernel even when scroll reuse is disabled.",
+      "old": "Filled quadratic/cubic subdivision now uses coordinates relative to its integer\ncontrol hull, restoring the origin and terminal endpoint exactly."
+    }
+  ],
+  "scope": "Documentation only after provider review; no production, specification, patch or test bytes changed."
+}

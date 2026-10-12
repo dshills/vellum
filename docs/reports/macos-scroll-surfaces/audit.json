@@ -1,0 +1,47 @@
+{
+  "archive": {
+    "bytes": 13933198,
+    "files": 528,
+    "index_sha256": "ce7662eb0b6f2064f2dfda0e397c55afd6c4c11d2434be7ec95f0964dc1b4a00",
+    "sha256": "5d5561580bbf2f3bde9288b14d5f208e99bf88be0cf6b5d39f453601af596f78"
+  },
+  "base_commit": "56d394fa0ce6084033ca86c79d3456b560e59d4c",
+  "binaries": {
+    "vellum-scroll-candidate-v6": "608b61e21d6d75a4c0f9c4ce423e07dd1a03378e548e47744db378931580d629",
+    "vellum-scroll-generic-ax-v6": "2a9013434a60ff15fa33da3157bfedba0228a93566bb36542e3715a9494137c1"
+  },
+  "checks": {
+    "final_native_processes": 3,
+    "v3": 13,
+    "v4": 7,
+    "v5": 7,
+    "v6": 10
+  },
+  "prepared_files": 6146,
+  "prepared_identity": "Exact final v6 prepared map equals qualified v5 raster map.",
+  "prism": {
+    "discarded_findings": 1,
+    "disposition_sha256": "b77f35505a377dc2dc5371f567d93b4977c5d0dbd06060329431e73abf77ecce",
+    "exit_code": 0,
+    "files": 16,
+    "process_sha256": "863ec3afe7e477daab49f6d964cf5e5ae614679285fd469c52c0f013e03c0465",
+    "raw_sha256": "ea63810296c93c6b46f35e002a4f58c97cd5cf688b2127d9176d38daa32b7c4b",
+    "retained_findings": 0
+  },
+  "producer_sha256": "e1e285e4493c23703c1b1b96c57aef94f0bd4a7283f3ddb9a5bb952f66306614",
+  "qualified_source_receipt": {
+    "path": "records/final-checks-v6/qualification.json",
+    "sha256": "a37bab0644112f137b7b6eb19332c34cbdc46c2a23c8b4441cece771e52cf0b9"
+  },
+  "receipt_review_sha256": "72809fd9c50fa137c5efbacd591ea99a320a3b660b6aa14eb20e870833e3ccf3",
+  "report": {
+    "documentation_delta_sha256": "99dee5ca8750c58235ae7fb23d2c2fd68f9998881f394a0032a4d7aa521f8d26",
+    "final_sha256": "ffed4ab5efd9958b7bea51d6a03683833339ac3502a48c85ac987c75cc2b895d",
+    "prism_input_sha256": "e18ff43a314f88b4812525f4d0c852922528648724ba0d8354af030bc94040b5"
+  },
+  "result": "PASS",
+  "schema": 1,
+  "scope": "Selected source/prepared/binary endpoint identities, exact raw evidence archive, versioned checks and review disposition. No whole compiler/SDK closure, old antialias pixel parity, measured final-default latency, physical GPU presentation, human input/VoiceOver or complete Mac acceptance claim. Final closure certificate is separate to keep hash dependencies acyclic.",
+  "source_files": 659,
+  "source_review_sha256": "61a66ac6f440144189be36876cef5265fbed4e369b5ab7a510ba8f6bedc1f634"
+}

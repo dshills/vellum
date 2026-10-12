@@ -311,3 +311,15 @@ All 40 ordinary processes still fail both unchanged warm UI-work targets. The
 bounded payload fixture does not qualify native/GPU memory or complete Mac/P6.
 See [the report](reports/macos-ax-publication/README.md) for full distributions,
 source/artifact bindings, reviews and coverage limits.
+
+## Ordered scroll-surface experiment
+
+The pinned raster backend adds exact actual-paint guards and bounded toroidal
+CPU pane caches, retaining original painter order and full GPU upload. Current
+stored-table experiments regress p95, so managed rendering keeps ordinary replay
+by default. Driver.ExperimentalGridScrollReuse and its manual counterpart opt in
+for main scenes; modal/popup scenes remain ordinary. Curve subdivision stabilizes
+integer translation and intentionally changes some prior antialias edge pixels.
+Pixel/race/native checks and all 9,600 experimental observations are retained in
+[the report](reports/macos-scroll-surfaces/README.md). The 4/6 ms targets and full
+Mac acceptance remain open; no default performance gain is claimed.

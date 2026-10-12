@@ -37,6 +37,10 @@ type Driver struct {
 	Theme    ui.Theme
 	// ContinuousRendering opts into refresh-rate paint ticks; default uses invalidation.
 	ContinuousRendering bool
+	// ExperimentalGridScrollReuse enables checked CPU pixel reuse in main-window
+	// grid scenes. Default replay is retained: current table workloads are slower
+	// with this experiment. It does not reduce GPU uploads. Copied at Run startup.
+	ExperimentalGridScrollReuse bool
 	// FrameMetrics opts into bounded diagnostic samples for explicitly tagged
 	// routed grid input; ordinary frames do not pay for timing calls.
 	FrameMetrics *FrameMetrics
@@ -235,6 +239,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w := &nativeWindow{window: spec}
 			buildErr := a.Do(func() {
 				w.body = core.NewBody(spec.Title)
+				setGridScrollReuse(w.body.Scene, d.ExperimentalGridScrollReuse)
 				if d.FrameMetrics != nil {
 					var metricErr error
 					w.metrics, metricErr = d.FrameMetrics.bind(a, w)

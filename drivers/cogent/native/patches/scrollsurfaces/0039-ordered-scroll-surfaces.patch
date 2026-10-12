@@ -1,0 +1,1689 @@
+--- a/paint/render/item.go
++++ b/paint/render/item.go
+@@ -18,6 +18,11 @@
+ // that track group structure (e.g., SVG).
+ type ContextPush struct {
+ 	Context Context
++
++	// Scroll optionally describes a complete, opaque scrolling surface. It is
++	// an owned raster optimization hint; other renderers keep replaying the
++	// original items between this push and its matching pop in their order.
++	Scroll *ScrollSurface
+ }
+ 
+ // interface assertion.
+--- /dev/null
++++ b/paint/render/scroll.go
+@@ -0,0 +1,33 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package render
++
++import "image"
++
++// ScrollSurface describes a complete rectangular painter group whose content
++// moves by an integer number of output pixels. ID/Part identify one retained
++// surface, without retaining its widget or domain model. Epoch must change when
++// anything other than Position changes the group's pixels: data/order, selection,
++// style/font resources, clipping, scale, editing, or layout. Zero ID/Epoch refuses
++// caching. Bounds are in the destination raster's coordinates; Position is the
++// accepted absolute scroll offset, not a delta from a possibly unrendered frame.
++//
++// The caller owns this promise. A renderer additionally validates supported
++// commands and opaque coverage, bounds cache memory, and falls back to ordinary
++// ordered rendering when reuse cannot be established. This hint never admits a
++// partial GPU upload: the ordinary source image is still uploaded after drawing.
++// The complete original command group is retained for other renderers and for
++// repair; no cached commands or application references survive raster replay.
++type ScrollSurface struct {
++	ID       uint64
++	Part     uint8
++	Epoch    uint64
++	Position image.Point
++	Bounds   image.Rectangle
++
++	// VerifyPaint requires the renderer to compare detached actual paint operations
++	// in the overlap. Native adapters use this instead of an application promise
++	// about font, style, clipping, data, or subpixel phase stability.
++	VerifyPaint bool
++}
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -35,6 +35,13 @@
+ 
+ 	// scan spanner
+ 	ImgSpanner *scan.ImgSpanner
++
++	scrollCache     map[scrollKey]*scrollPixels
++	scrollBytes     int
++	scrollClock     uint64
++	scrollStats     ScrollStats
++	scrollPlanBytes int
++	scrollRecord    *scrollPaintPlan
+ }
+ 
+ func New(size math32.Vector2) render.Renderer {
+@@ -55,6 +62,9 @@
+ 		return
+ 	}
+ 	rs.size = size
++	rs.scrollCache = nil
++	rs.scrollBytes = 0
++	rs.scrollPlanBytes = 0
+ 	psz := size.ToPointCeil()
+ 	rs.image = image.NewRGBA(image.Rectangle{Max: psz})
+ 	rs.ImgSpanner = scan.NewImgSpanner(rs.image)
+@@ -64,8 +74,24 @@
+ 
+ // Render is the main rendering function.
+ func (rs *Renderer) Render(r render.Render) render.Renderer {
+-	for i, ri := range r {
++	rs.scrollStats = ScrollStats{}
++	rs.renderItems(r, image.Rectangle{})
++	rs.scrollStats.CachedBytes = rs.scrollBytes
++	rs.scrollStats.DescriptorBytes = rs.scrollPlanBytes
++	return rs
++}
++
++func (rs *Renderer) renderItems(r render.Render, clip image.Rectangle) {
++	for i := 0; i < len(r); i++ {
++		ri := r[i]
+ 		switch x := ri.(type) {
++		case *render.ContextPush:
++			if x != nil && x.Scroll != nil && clip == (image.Rectangle{}) {
++				if end := scrollGroupEnd(r, i); end >= 0 {
++					rs.renderScroll(x.Scroll, r[i+1:end])
++					i = end
++				}
++			}
+ 		case *render.Path:
+ 			rs.RenderPath(x)
+ 		case *pimage.Params:
+@@ -74,12 +100,32 @@
+ 					continue
+ 				}
+ 			}
+-			x.Render(rs.image)
++			if clip == (image.Rectangle{}) {
++				x.Render(rs.image)
++			} else {
++				copy := *x
++				original := x.Rect
++				if original == (image.Rectangle{}) {
++					original = rs.image.Bounds()
++				}
++				copy.Rect = original.Intersect(clip)
++				if !copy.Rect.Empty() {
++					copy.SourcePos = x.SourcePos.Add(copy.Rect.Min.Sub(original.Min))
++					copy.Render(rs.image)
++				}
++			}
+ 		case *render.Text:
+-			rs.RenderText(x)
++			if clip == (image.Rectangle{}) {
++				rs.RenderText(x)
++			} else {
++				copy := *x
++				copy.Context.Bounds.Rect = x.Context.Bounds.Rect.Intersect(math32.B2FromRect(clip))
++				if !copy.Context.Bounds.Rect.IsEmpty() {
++					rs.RenderText(&copy)
++				}
++			}
+ 		}
+ 	}
+-	return rs
+ }
+ 
+ // coveredUniformDraw recognizes an immediately overwritten rectangular clear.
+--- /dev/null
++++ b/paint/renderers/rasterx/scroll.go
+@@ -0,0 +1,337 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"image"
++	"image/draw"
++	"math"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++)
++
++const scrollCacheBudget = 32 << 20
++const scrollCacheGroups = 64
++
++type scrollKey struct {
++	id   uint64
++	part uint8
++}
++type scrollPixels struct {
++	epoch    uint64
++	position image.Point
++	pixels   *image.RGBA
++	used     uint64
++	plan     *scrollPaintPlan
++	offset   image.Point // toroidal storage offset for the current logical surface
++}
++
++// ScrollStats describes the last raster replay. Counts are CPU pixel regions,
++// never physical GPU transfers or presentation. CachedBytes is bounded per
++// renderer; the renderer releases the complete cache on a size change.
++type ScrollStats struct {
++	Groups, FullRedraws, ReusedGroups int
++	ReusedPixels, RedrawPixels        int
++	CapturedPixels                    int // writes to owned surface cache, not GPU transfers
++	CachedBytes                       int
++	DescriptorBytes, PaintRefusals    int
++}
++
++func (rs *Renderer) ScrollStats() ScrollStats { return rs.scrollStats }
++
++func scrollGroupEnd(r render.Render, start int) int {
++	depth := 1
++	for i := start + 1; i < len(r); i++ {
++		switch r[i].(type) {
++		case *render.ContextPush:
++			depth++
++		case *render.ContextPop:
++			depth--
++			if depth == 0 {
++				return i
++			}
++		}
++	}
++	return -1
++}
++
++// Admit only fully covered rectangular uniform/text groups. Unknown sources,
++// destination-dependent commands, path masks/filters, transforms, nested hints
++// and writes outside the surface keep their existing complete replay behavior.
++func scrollCommands(r render.Render, bounds image.Rectangle) bool {
++	opaque := false
++	for _, item := range r {
++		switch x := item.(type) {
++		case *render.ContextPush:
++			if x != nil && x.Scroll != nil {
++				return false
++			}
++		case *render.ContextPop:
++		case *pimage.Params:
++			if x == nil || x.Cmd != pimage.Draw || x.Mask != nil || x.Rect.Empty() || !x.Rect.In(bounds) || x.Op != draw.Src && x.Op != draw.Over {
++				return false
++			}
++			u, ok := valueUniform(x.Source)
++			if !ok {
++				return false
++			}
++			// image.Uniform has finite bounds. Source positions outside them can
++			// clip an apparently covering fill to nothing. Check before accepting
++			// coverage, using subtraction within the known uniform bounds.
++			source := u.Bounds()
++			if x.SourcePos.X < source.Min.X || x.SourcePos.Y < source.Min.Y || x.SourcePos.X > source.Max.X-x.Rect.Dx() || x.SourcePos.Y > source.Max.Y-x.Rect.Dy() {
++				return false
++			}
++			if !opaque {
++				if x.Rect != bounds {
++					return false
++				}
++				_, _, _, alpha := u.C.RGBA()
++				opaque = alpha == 0xffff
++			}
++		case *render.Path:
++			// Standard widget boxes retain a path even when both paints are disabled.
++			// They clear raster scratch but produce no destination pixels.
++			if x == nil || x.Context.Style.HasFill() || x.Context.Style.HasStroke() {
++				return false
++			}
++		case *render.Text:
++			if !opaque || x == nil || x.Text == nil || x.Context.Cumulative != math32.Identity2() || x.Context.Mask != nil || len(x.Context.ClipPath) != 0 || x.Context.Bounds.Rect.ToRect().Empty() || !x.Context.Bounds.Rect.ToRect().In(bounds) {
++				return false
++			}
++			if _, ok := valueUniform(&image.Uniform{C: x.Text.Color}); !ok {
++				return false
++			}
++			for _, source := range []image.Image{x.Text.SelectionColor, x.Text.HighlightColor} {
++				if !scrollUniform(source) {
++					return false
++				}
++			}
++			for _, line := range x.Text.Lines {
++				for _, shaped := range line.Runs {
++					run, ok := shaped.(*shapedgt.Run)
++					if !ok || run == nil || run.Face == nil || run.Math.Path != nil || run.Direction.IsVertical() || run.Decoration != 0 || !scrollUniform(run.FillColor) || !scrollUniform(run.StrokeColor) || !scrollUniform(run.Background) {
++						return false
++					}
++				}
++			}
++		default:
++			return false
++		}
++	}
++	return opaque
++}
++
++func scrollUniform(source image.Image) bool {
++	if source == nil {
++		return true
++	}
++	_, ok := valueUniform(source)
++	return ok
++}
++
++func scrollDifference(a, b, limit int) (int, bool) {
++	if a >= b {
++		difference := uint(a) - uint(b)
++		if difference >= uint(limit) {
++			return 0, false
++		}
++		return int(difference), true
++	}
++	difference := uint(b) - uint(a)
++	if difference >= uint(limit) {
++		return 0, false
++	}
++	return -int(difference), true
++}
++
++func (rs *Renderer) forgetScroll(key scrollKey) {
++	if old := rs.scrollCache[key]; old != nil {
++		rs.scrollBytes -= len(old.pixels.Pix)
++		if old.plan != nil {
++			rs.scrollPlanBytes -= old.plan.bytes
++		}
++		delete(rs.scrollCache, key)
++	}
++}
++
++func (rs *Renderer) reserveScroll(bytes, descriptors int, key scrollKey) {
++	for rs.scrollBytes+bytes > scrollCacheBudget || rs.scrollPlanBytes+descriptors > scrollPlanBudget || (rs.scrollCache[key] == nil && len(rs.scrollCache) >= scrollCacheGroups) {
++		var oldest scrollKey
++		age := uint64(math.MaxUint64)
++		found := false
++		for k, v := range rs.scrollCache {
++			if k != key && v.used <= age {
++				oldest, age, found = k, v.used, true
++			}
++		}
++		if !found {
++			break
++		} // each admitted group individually fits both budgets
++		rs.forgetScroll(oldest)
++	}
++	if rs.scrollCache == nil {
++		rs.scrollCache = make(map[scrollKey]*scrollPixels)
++	}
++}
++
++func (rs *Renderer) renderScroll(hint *render.ScrollSurface, commands render.Render) {
++	rs.scrollStats.Groups++
++	key := scrollKey{hint.ID, hint.Part}
++	bounds := hint.Bounds
++	w, h := bounds.Dx(), bounds.Dy()
++	if hint.ID == 0 || hint.Epoch == 0 || w <= 0 || h <= 0 || !bounds.In(rs.image.Bounds()) || w > scrollCacheBudget/4 || h > scrollCacheBudget/4/w || !scrollCommands(commands, bounds) {
++		rs.forgetScroll(key)
++		rs.scrollStats.FullRedraws++
++		rs.renderItems(commands, image.Rectangle{})
++		return
++	}
++	var plan *scrollPaintPlan
++	if hint.VerifyPaint {
++		plan = rs.scrollPlan(commands)
++		if plan == nil {
++			rs.forgetScroll(key)
++			rs.scrollStats.FullRedraws++
++			rs.scrollStats.PaintRefusals++
++			rs.renderItems(commands, image.Rectangle{})
++			return
++		}
++	}
++	replay := func(clip image.Rectangle) {
++		if plan != nil {
++			rs.replayScrollPlan(plan, clip)
++		} else {
++			if clip == bounds {
++				clip = image.Rectangle{}
++			}
++			rs.renderItems(commands, clip)
++		}
++	}
++	bytes := w * h * 4
++	if rs.scrollClock == math.MaxUint64 {
++		rs.scrollCache = nil
++		rs.scrollBytes = 0
++		rs.scrollPlanBytes = 0
++		rs.scrollClock = 0
++	}
++	rs.scrollClock++
++	old := rs.scrollCache[key]
++	if old != nil && old.pixels.Bounds() != bounds {
++		rs.forgetScroll(key)
++		old = nil
++	}
++	overlap := image.Rectangle{}
++	if old != nil && old.epoch == hint.Epoch {
++		// Bound subtraction before computing it, so adversarial extreme offsets
++		// cannot wrap into a plausible overlap. Large jumps simply repaint.
++		dx, xok := scrollDifference(old.position.X, hint.Position.X, w)
++		dy, yok := scrollDifference(old.position.Y, hint.Position.Y, h)
++		if xok && yok {
++			delta := image.Pt(dx, dy)
++			overlap = bounds.Intersect(bounds.Add(delta))
++			if !overlap.Empty() && hint.VerifyPaint && !sameScrollPaint(old.plan, plan, overlap, delta) {
++				overlap = image.Rectangle{}
++				rs.scrollStats.PaintRefusals++
++			}
++			if !overlap.Empty() {
++				old.offset = image.Pt(scrollModulo(old.offset.X-delta.X, w), scrollModulo(old.offset.Y-delta.Y, h))
++				scrollRingCopy(rs.image, old.pixels, overlap, old.offset, false)
++			}
++		}
++	}
++	if overlap.Empty() {
++		rs.scrollStats.FullRedraws++
++		rs.scrollStats.RedrawPixels += w * h
++		replay(bounds)
++	} else {
++		rs.scrollStats.ReusedGroups++
++		rs.scrollStats.ReusedPixels += overlap.Dx() * overlap.Dy()
++		// Four disjoint rectangles cover the surface minus its overlap. Side
++		// strips exclude top/bottom strips, so translucent text is never doubled.
++		for _, dirty := range []image.Rectangle{
++			image.Rect(bounds.Min.X, bounds.Min.Y, bounds.Max.X, overlap.Min.Y),
++			image.Rect(bounds.Min.X, overlap.Max.Y, bounds.Max.X, bounds.Max.Y),
++			image.Rect(bounds.Min.X, overlap.Min.Y, overlap.Min.X, overlap.Max.Y),
++			image.Rect(overlap.Max.X, overlap.Min.Y, bounds.Max.X, overlap.Max.Y),
++		} {
++			if dirty.Empty() {
++				continue
++			}
++			rs.scrollStats.RedrawPixels += dirty.Dx() * dirty.Dy()
++			replay(dirty)
++			scrollRingCopy(rs.image, old.pixels, dirty, old.offset, true)
++			rs.scrollStats.CapturedPixels += dirty.Dx() * dirty.Dy()
++		}
++	}
++	descriptors := 0
++	if plan != nil {
++		descriptors = plan.bytes
++	}
++	if old != nil && old.plan != nil {
++		rs.scrollPlanBytes -= old.plan.bytes
++		old.plan = nil
++	}
++	extra := 0
++	if old == nil {
++		extra = bytes
++	}
++	rs.reserveScroll(extra, descriptors, key)
++	if old == nil {
++		old = &scrollPixels{pixels: image.NewRGBA(bounds)}
++		rs.scrollCache[key] = old
++		rs.scrollBytes += bytes
++	}
++	old.plan = plan
++	rs.scrollPlanBytes += descriptors
++	// Capture at the original group position, before later siblings paint. The
++	// next replay restores these pixels after any preceding parent repaint.
++	if overlap.Empty() {
++		old.offset = image.Point{}
++		draw.Draw(old.pixels, bounds, rs.image, bounds.Min, draw.Src)
++		rs.scrollStats.CapturedPixels += w * h
++	}
++	old.epoch, old.position, old.used = hint.Epoch, hint.Position, rs.scrollClock
++}
++
++// scrollModulo uses bounded offsets/deltas smaller than twice the admitted
++// surface dimensions. It never receives an absolute application scroll offset.
++func scrollModulo(value, size int) int {
++	value %= size
++	if value < 0 {
++		value += size
++	}
++	return value
++}
++
++// The private cache is toroidal: scrolling changes a scalar logical-to-storage
++// mapping, without moving all its retained pixels. Restore the overlap first,
++// then write only disjoint exposed strips before later siblings paint. Each
++// rectangular copy splits at most once in each axis, preserving exact Src bytes.
++func scrollRingCopy(screen, ring *image.RGBA, region image.Rectangle, offset image.Point, store bool) {
++	bounds := ring.Bounds()
++	region = region.Intersect(bounds)
++	if region.Empty() {
++		return
++	}
++	for y := region.Min.Y; y < region.Max.Y; {
++		sy := bounds.Min.Y + scrollModulo(y-bounds.Min.Y+offset.Y, bounds.Dy())
++		height := min(region.Max.Y-y, bounds.Max.Y-sy)
++		for x := region.Min.X; x < region.Max.X; {
++			sx := bounds.Min.X + scrollModulo(x-bounds.Min.X+offset.X, bounds.Dx())
++			width := min(region.Max.X-x, bounds.Max.X-sx)
++			logical := image.Rect(x, y, x+width, y+height)
++			physical := image.Rect(sx, sy, sx+width, sy+height)
++			if store {
++				draw.Draw(ring, physical, screen, logical.Min, draw.Src)
++			} else {
++				draw.Draw(screen, logical, ring, physical.Min, draw.Src)
++			}
++			x += width
++		}
++		y += height
++	}
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/scroll_test.go
+@@ -0,0 +1,302 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"math"
++	"math/rand"
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++	"cogentcore.org/core/text/textpos"
++)
++
++// Replay the previous dispatch, ignoring the new hint. This oracle executes
++// every original item at its original painter position, including later peers.
++func scrollReference(rs *Renderer, items render.Render) {
++	for i, item := range items {
++		switch x := item.(type) {
++		case *render.Path:
++			rs.RenderPath(x)
++		case *pimage.Params:
++			if i+1 < len(items) {
++				if next, ok := items[i+1].(*pimage.Params); ok && coveredUniformDraw(x, next) {
++					continue
++				}
++			}
++			x.Render(rs.image)
++		case *render.Text:
++			rs.RenderText(x)
++		}
++	}
++}
++
++func scrollPattern(bounds image.Rectangle, position image.Point, epoch uint64) render.Render {
++	items := render.Render{pimage.NewDraw(bounds, image.NewUniform(color.RGBA{R: 19, G: 27, B: 35, A: 255}), nil, bounds.Min, draw.Src)}
++	// The content is defined in stable world coordinates, not by a pooled slot.
++	for y := -8; y < bounds.Dy()+16; y += 8 {
++		for x := -12; x < bounds.Dx()+24; x += 12 {
++			worldX := x + position.X/12*12
++			worldY := y + position.Y/8*8
++			r := image.Rect(bounds.Min.X+x-position.X%12, bounds.Min.Y+y-position.Y%8, bounds.Min.X+x-position.X%12+10, bounds.Min.Y+y-position.Y%8+6).Intersect(bounds)
++			if r.Empty() {
++				continue
++			}
++			c := color.RGBA{R: uint8(worldX*3 + int(epoch)), G: uint8(worldY * 7), B: uint8(worldX ^ worldY), A: 149}
++			items = append(items, pimage.NewDraw(r, image.NewUniform(c), nil, r.Min, draw.Over))
++		}
++	}
++	return items
++}
++
++func scrollFrame(bounds image.Rectangle, position image.Point, epoch uint64) render.Render {
++	all := render.Render{pimage.NewDraw(image.Rect(0, 0, 240, 160), image.NewUniform(color.RGBA{R: uint8(epoch * 31), A: 255}), nil, image.Point{}, draw.Src)}
++	all = append(all, &render.ContextPush{Scroll: &render.ScrollSurface{ID: 7, Part: 2, Epoch: epoch, Position: position, Bounds: bounds}})
++	all = append(all, scrollPattern(bounds, position, epoch)...)
++	all = append(all, &render.ContextPop{})
++	// A fixed overlay intersects the surface. Capturing it into the scrolling
++	// image, or composing the surface after the scene, would move/cover it.
++	all = append(all, pimage.NewDraw(image.Rect(41, 27, 113, 71), image.NewUniform(color.RGBA{R: 241, G: 63, B: 7, A: 255}), nil, image.Point{}, draw.Src))
++	return all
++}
++
++func TestScrollSurfaceOrderedPixelsAndActualReuse(t *testing.T) {
++	actual := New(math32.Vec2(240, 160)).(*Renderer)
++	reference := New(math32.Vec2(240, 160)).(*Renderer)
++	bounds := image.Rect(11, 9, 191, 105)
++	position := image.Pt(120, 96)
++	epoch := uint64(1)
++	random := rand.New(rand.NewSource(91))
++	reused := 0
++	for frame := 0; frame < 160; frame++ {
++		if frame%23 == 0 {
++			epoch++
++		}
++		if frame > 0 {
++			position = position.Add(image.Pt(random.Intn(19)-9, random.Intn(13)-6))
++		}
++		items := scrollFrame(bounds, position, epoch)
++		actual.Render(items)
++		if actual.ScrollStats().CapturedPixels != actual.ScrollStats().RedrawPixels {
++			t.Fatal("cache capture exceeded exposed/redrawn area", actual.ScrollStats())
++		}
++		scrollReference(reference, items)
++		if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++			t.Fatalf("pixels differ at frame %d offset %v epoch %d", frame, position, epoch)
++		}
++		stats := actual.ScrollStats()
++		if stats.ReusedGroups > 0 {
++			reused++
++			if stats.ReusedPixels+stats.RedrawPixels != bounds.Dx()*bounds.Dy() {
++				t.Fatal("damage areas overlap or leave a hole", stats)
++			}
++		}
++		if frame%23 == 0 && stats.FullRedraws != 1 {
++			t.Fatal("changed content did not repair the complete surface", stats)
++		}
++		if stats.CachedBytes != 4*bounds.Dx()*bounds.Dy() {
++			t.Fatal("unexpected cache retention", stats)
++		}
++	}
++	if reused < 140 {
++		t.Fatalf("oracle passed without effective reuse: %d", reused)
++	}
++}
++
++func TestScrollSurfaceBoundsRepairAndUnsupportedFallback(t *testing.T) {
++	actual := New(math32.Vec2(240, 160)).(*Renderer)
++	reference := New(math32.Vec2(240, 160)).(*Renderer)
++	bounds := image.Rect(11, 9, 191, 105)
++	for i := 0; i < 5; i++ {
++		items := scrollFrame(bounds, image.Pt(i*3, 16), 1)
++		if i == 2 {
++			// A destination-dependent blur cannot be drawn strip by strip.
++			items = append(items[:len(items)-2], append(render.Render{pimage.NewBlur(bounds, 2)}, items[len(items)-2:]...)...)
++		}
++		if i == 3 {
++			bounds = image.Rect(13, 11, 189, 101)
++			items = scrollFrame(bounds, image.Pt(i*3, 16), 1)
++		}
++		actual.Render(items)
++		if actual.ScrollStats().CapturedPixels != actual.ScrollStats().RedrawPixels {
++			t.Fatal("cache capture exceeded exposed/redrawn area", actual.ScrollStats())
++		}
++		scrollReference(reference, items)
++		if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++			t.Fatal("fallback or bounds repair changed pixels", i)
++		}
++		if i == 2 && actual.ScrollStats().CachedBytes != 0 {
++			t.Fatal("unsupported group retained a stale cache")
++		}
++		if i == 3 && actual.ScrollStats().ReusedGroups != 0 {
++			t.Fatal("changed bounds reused old pixels")
++		}
++	}
++	actual.SetSize(units.UnitDot, math32.Vec2(250, 170))
++	if actual.scrollBytes != 0 || len(actual.scrollCache) != 0 {
++		t.Fatal("resize retained surfaces")
++	}
++}
++
++func TestScrollSurfaceCheckedOffsetsAndBudgets(t *testing.T) {
++	for _, c := range []struct {
++		a, b, want int
++		ok         bool
++	}{{math.MaxInt, math.MaxInt - 1, 1, true}, {math.MinInt, math.MinInt + 1, -1, true}, {math.MinInt, math.MaxInt, 0, false}, {math.MaxInt, math.MinInt, 0, false}, {0, 10, 0, false}, {9, 0, 9, true}} {
++		if got, ok := scrollDifference(c.a, c.b, 10); got != c.want || ok != c.ok {
++			t.Fatal(c, got, ok)
++		}
++	}
++	rs := New(math32.Vec2(240, 160)).(*Renderer)
++	bounds := image.Rect(11, 9, 191, 105)
++	for id := uint64(1); id <= 80; id++ {
++		items := scrollFrame(bounds, image.Point{}, 1)
++		items[1].(*render.ContextPush).Scroll.ID = id
++		rs.Render(items)
++		if len(rs.scrollCache) > scrollCacheGroups || rs.scrollBytes > scrollCacheBudget {
++			t.Fatal("cache is unbounded")
++		}
++	}
++	if len(rs.scrollCache) != scrollCacheGroups {
++		t.Fatal("cache is not exercising eviction")
++	}
++	rs.scrollClock = math.MaxUint64
++	rs.Render(scrollFrame(bounds, image.Point{}, 1))
++	if rs.scrollClock != 1 || len(rs.scrollCache) != 1 {
++		t.Fatal("clock exhaustion did not repair/reset cache")
++	}
++	items := scrollFrame(bounds, image.Point{}, 1)
++	items[1].(*render.ContextPush).Scroll.Epoch = 0
++	rs.Render(items)
++	if len(rs.scrollCache) != 0 {
++		t.Fatal("zero epoch retained a cache")
++	}
++}
++
++func TestScrollSurfaceUniformSourceBoundsCannotAdmitParentPixels(t *testing.T) {
++	actual := New(math32.Vec2(240, 160)).(*Renderer)
++	reference := New(math32.Vec2(240, 160)).(*Renderer)
++	bounds := image.Rect(11, 9, 191, 105)
++	for _, sourceX := range []int{0, 1e9, math.MaxInt, -1e9 - 1, 1e9 - bounds.Dx() + 1, 0} {
++		items := scrollFrame(bounds, image.Pt(3, 7), 1)
++		items[0].(*pimage.Params).Source = image.NewUniform(color.RGBA{R: uint8(sourceX), G: 93, B: 211, A: 255})
++		items[2].(*pimage.Params).SourcePos.X = sourceX
++		actual.Render(items)
++		if actual.ScrollStats().CapturedPixels != actual.ScrollStats().RedrawPixels {
++			t.Fatal("cache capture exceeded exposed/redrawn area", actual.ScrollStats())
++		}
++		scrollReference(reference, items)
++		if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++			t.Fatal("clipped uniform coverage captured/restored parent pixels", sourceX)
++		}
++		if sourceX != 0 && (actual.ScrollStats().ReusedGroups != 0 || actual.scrollBytes != 0) {
++			t.Fatal("source clipping did not refuse caching", sourceX)
++		}
++	}
++}
++
++func TestScrollSurfaceShapedTextAndFractionalPhasePixels(t *testing.T) {
++	for _, dpi := range []float32{96, 120, 144, 192} {
++		for _, phase := range []float32{0, .25, .5, .75} {
++			uc := units.Context{}
++			uc.Defaults()
++			uc.DPI = dpi
++			style := rich.NewStyle()
++			textStyle := text.NewStyle()
++			textStyle.WhiteSpace = text.WrapNever
++			textStyle.ToDots(&uc)
++			shaper := shapedgt.NewShaperWithFonts(fonts.Embedded)
++			lines := shaper.WrapLines(rich.NewText(style, []rune("0123456789 אבג é")), style, textStyle, math32.Vec2(240, 100))
++			lines.Color = color.NRGBA{R: 17, G: 31, B: 52, A: 229}
++			lines.SelectionColor = image.NewUniform(color.NRGBA{R: 91, G: 127, B: 179, A: 93})
++			lines.SelectRegion(textpos.Range{Start: 0, End: 7})
++			paint := styles.NewPaint()
++			context := &render.Context{}
++			bounds := image.Rect(11, 9, 191, 105)
++			context.Init(paint, &render.Bounds{Rect: math32.B2FromRect(bounds)}, nil)
++			actual := New(math32.Vec2(240, 160)).(*Renderer)
++			reference := New(math32.Vec2(240, 160)).(*Renderer)
++			for index, position := range []image.Point{{0, 0}, {7, 4}, {-3, 9}, {12, 1}, {12, 1}, {2, 0}, {0, 0}} {
++				items := render.Render{pimage.NewDraw(image.Rect(0, 0, 240, 160), image.NewUniform(color.RGBA{R: 219, G: 181, B: 173, A: 255}), nil, image.Point{}, draw.Src), &render.ContextPush{Scroll: &render.ScrollSurface{ID: 1, Epoch: 1, Bounds: bounds, Position: position, VerifyPaint: true}}}
++				items = append(items, pimage.NewDraw(bounds, image.NewUniform(color.RGBA{R: 233, G: 237, B: 241, A: 255}), nil, bounds.Min, draw.Src))
++				origin := math32.Vec2(19+phase, 23+phase).Sub(math32.FromPoint(position))
++				items = append(items, render.NewTextWithGeometry(lines, paint, context, origin, lines.InteractionLayout()), &render.ContextPop{})
++				actual.Render(items)
++				if actual.ScrollStats().CapturedPixels != actual.ScrollStats().RedrawPixels {
++					t.Fatal("cache capture exceeded exposed/redrawn area", actual.ScrollStats())
++				}
++				scrollReference(reference, items)
++				if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++					count := 0
++					var first image.Point
++					for y := 0; y < 160; y++ {
++						for x := 0; x < 240; x++ {
++							if actual.image.RGBAAt(x, y) != reference.image.RGBAAt(x, y) {
++								if count == 0 {
++									first = image.Pt(x, y)
++								}
++								count++
++							}
++						}
++					}
++					t.Log("different pixels", count, "first", first, "actual", actual.image.RGBAAt(first.X, first.Y), "full", reference.image.RGBAAt(first.X, first.Y), "stats", actual.ScrollStats())
++					t.Fatalf("text pixels differ dpi=%v phase=%v frame=%d", dpi, phase, index)
++				}
++				if index > 0 && actual.ScrollStats().ReusedGroups != 1 {
++					t.Fatal("text differential did not exercise reuse", dpi, phase, index, actual.ScrollStats())
++				}
++			}
++		}
++	}
++}
++
++func TestScrollRingWrappedCopiesExact(t *testing.T) {
++	for _, bounds := range []image.Rectangle{image.Rect(-13, 7, -2, 16), image.Rect(5, -9, 6, -2), image.Rect(17, 23, 26, 24), image.Rect(3, 4, 4, 5)} {
++		logical := image.NewRGBA(bounds)
++		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
++			for x := bounds.Min.X; x < bounds.Max.X; x++ {
++				logical.SetRGBA(x, y, color.RGBA{R: uint8(x*13 + y), G: uint8(x - y*7), B: uint8(x * y), A: uint8(31 + x + y)})
++			}
++		}
++		for oy := 0; oy < bounds.Dy(); oy++ {
++			for ox := 0; ox < bounds.Dx(); ox++ {
++				offset := image.Pt(ox, oy)
++				ring := image.NewRGBA(bounds)
++				scrollRingCopy(logical, ring, bounds, offset, true)
++				for _, region := range []image.Rectangle{bounds, image.Rect(bounds.Min.X, bounds.Min.Y, bounds.Min.X+1, bounds.Min.Y+1), image.Rect(bounds.Min.X+bounds.Dx()/3, bounds.Min.Y+bounds.Dy()/3, bounds.Max.X, bounds.Max.Y)} {
++					actual := image.NewRGBA(bounds)
++					reference := image.NewRGBA(bounds)
++					draw.Draw(actual, bounds, image.NewUniform(color.RGBA{B: 219, A: 255}), image.Point{}, draw.Src)
++					draw.Draw(reference, bounds, image.NewUniform(color.RGBA{B: 219, A: 255}), image.Point{}, draw.Src)
++					scrollRingCopy(actual, ring, region, offset, false)
++					draw.Draw(reference, region, logical, region.Min, draw.Src)
++					if !bytes.Equal(actual.Pix, reference.Pix) {
++						t.Fatal("wrapped restore", bounds, offset, region)
++					}
++					changed := image.NewRGBA(bounds)
++					draw.Draw(changed, bounds, logical, bounds.Min, draw.Src)
++					draw.Draw(changed, region, image.NewUniform(color.RGBA{R: 99, G: 71, B: 39, A: 167}), image.Point{}, draw.Src)
++					scrollRingCopy(changed, ring, region, offset, true)
++					scrollRingCopy(actual, ring, bounds, offset, false)
++					if !bytes.Equal(actual.Pix, changed.Pix) {
++						t.Fatal("wrapped partial store corrupted other pixels", bounds, offset, region)
++					}
++					scrollRingCopy(logical, ring, bounds, offset, true)
++				}
++			}
++		}
++	}
++}
+--- a/paint/renderers/rasterx/fill.go
++++ b/paint/renderers/rasterx/fill.go
+@@ -55,6 +55,13 @@
+ // This functions is adapted from the version found in
+ // golang.org/x/image/vector
+ func QuadTo(ax, ay, bx, by, cx, cy float32, LineTo func(dx, dy float32)) {
++	quadInterior(ax, ay, bx, by, cx, cy, LineTo)
++	LineTo(cx, cy)
++}
++
++// Keep the terminal point separate so fixed-coordinate callers can retain it
++// exactly, even when a wide relative hull cannot be represented by float32.
++func quadInterior(ax, ay, bx, by, cx, cy float32, LineTo func(dx, dy float32)) {
+ 	devsq := DevSquared(ax, ay, bx, by, cx, cy)
+ 	if devsq >= 0.333 {
+ 		const tol = 3
+@@ -72,13 +79,17 @@
+ 				ay*t1+by*t2+cy*t3)
+ 		}
+ 	}
+-	LineTo(cx, cy)
+ }
+ 
+ // CubeTo flattens the cubic Bezier curve into lines through the LineTo func
+ // This functions is adapted from the version found in
+ // golang.org/x/image/vector
+ func CubeTo(ax, ay, bx, by, cx, cy, dx, dy float32, LineTo func(ex, ey float32)) {
++	cubeInterior(ax, ay, bx, by, cx, cy, dx, dy, LineTo)
++	LineTo(dx, dy)
++}
++
++func cubeInterior(ax, ay, bx, by, cx, cy, dx, dy float32, LineTo func(ex, ey float32)) {
+ 	devsq := DevSquared(ax, ay, bx, by, dx, dy)
+ 	if devsqAlt := DevSquared(ax, ay, cx, cy, dx, dy); devsq < devsqAlt {
+ 		devsq = devsqAlt
+@@ -102,7 +113,6 @@
+ 				ay*t1+by*t2+cy*t3+dy*t4)
+ 		}
+ 	}
+-	LineTo(dx, dy)
+ }
+ 
+ // DevSquared returns a measure of how curvy the sequence (ax, ay) to (bx, by)
+@@ -134,12 +144,18 @@
+ 		return
+ 	}
+ 	sgm.JoinF()
+-	QuadTo(float32(r.A.X), float32(r.A.Y), // Pts are x64, but does not matter.
+-		float32(b.X), float32(b.Y),
+-		float32(c.X), float32(c.Y),
++	// Flatten relative to the integer control hull. Absolute floating-point
++	// weights can move a sampled edge by one fixed unit after an integer
++	// translation, producing different antialias coverage for the same shape.
++	origin := fixed.Point26_6{X: min(r.A.X, b.X, c.X), Y: min(r.A.Y, b.Y, c.Y)}
++	maxX, maxY := max(r.A.X, b.X, c.X), max(r.A.Y, b.Y, c.Y)
++	quadInterior(float32(int64(r.A.X)-int64(origin.X)), float32(int64(r.A.Y)-int64(origin.Y)),
++		float32(int64(b.X)-int64(origin.X)), float32(int64(b.Y)-int64(origin.Y)),
++		float32(int64(c.X)-int64(origin.X)), float32(int64(c.Y)-int64(origin.Y)),
+ 		func(dx, dy float32) {
+-			sgm.LineF(fixed.Point26_6{X: fixed.Int26_6(dx), Y: fixed.Int26_6(dy)})
++			sgm.LineF(fixed.Point26_6{X: relativeCurveCoordinate(origin.X, maxX, dx), Y: relativeCurveCoordinate(origin.Y, maxY, dy)})
+ 		})
++	sgm.LineF(c)
+ 
+ }
+ 
+@@ -173,13 +189,30 @@
+ 		return
+ 	}
+ 	sgm.JoinF()
+-	CubeTo(float32(r.A.X), float32(r.A.Y),
+-		float32(b.X), float32(b.Y),
+-		float32(c.X), float32(c.Y),
+-		float32(d.X), float32(d.Y),
++	origin := fixed.Point26_6{X: min(r.A.X, b.X, c.X, d.X), Y: min(r.A.Y, b.Y, c.Y, d.Y)}
++	maxX, maxY := max(r.A.X, b.X, c.X, d.X), max(r.A.Y, b.Y, c.Y, d.Y)
++	cubeInterior(float32(int64(r.A.X)-int64(origin.X)), float32(int64(r.A.Y)-int64(origin.Y)),
++		float32(int64(b.X)-int64(origin.X)), float32(int64(b.Y)-int64(origin.Y)),
++		float32(int64(c.X)-int64(origin.X)), float32(int64(c.Y)-int64(origin.Y)),
++		float32(int64(d.X)-int64(origin.X)), float32(int64(d.Y)-int64(origin.Y)),
+ 		func(ex, ey float32) {
+-			sgm.LineF(fixed.Point26_6{X: fixed.Int26_6(ex), Y: fixed.Int26_6(ey)})
++			sgm.LineF(fixed.Point26_6{X: relativeCurveCoordinate(origin.X, maxX, ex), Y: relativeCurveCoordinate(origin.Y, maxY, ey)})
+ 		})
++	sgm.LineF(d)
++}
++
++// The convex control hull bounds every point. Clamp relative floating error
++// before restoring the exact integer origin, without overflowing a subtraction.
++func relativeCurveCoordinate(origin, maximum fixed.Int26_6, value float32) fixed.Int26_6 {
++	span := int64(maximum) - int64(origin)
++	relative := int64(value)
++	if relative < 0 {
++		relative = 0
++	}
++	if relative > span {
++		relative = span
++	}
++	return fixed.Int26_6(int64(origin) + relative)
+ }
+ 
+ // Clear resets the filler
+--- /dev/null
++++ b/paint/renderers/rasterx/curve_translation_test.go
+@@ -0,0 +1,93 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"math/rand"
++	"testing"
++
++	"golang.org/x/image/math/fixed"
++)
++
++type curveLines struct {
++	*Filler
++	points []fixed.Point26_6
++}
++
++func (r *curveLines) LineF(p fixed.Point26_6) { r.points = append(r.points, p); r.A = p }
++func (r *curveLines) Line(p fixed.Point26_6)  { r.LineF(p) }
++func (r *curveLines) JoinF()                  {}
++
++func recordedCurve(points [4]fixed.Point26_6, cubic bool) []fixed.Point26_6 {
++	r := &curveLines{Filler: &Filler{A: points[0]}}
++	if cubic {
++		r.CubeBezierF(r, points[1], points[2], points[3])
++	} else {
++		r.QuadBezierF(r, points[1], points[2])
++	}
++	return r.points
++}
++
++func TestCurveFlatteningExactIntegerTranslations(t *testing.T) {
++	random := rand.New(rand.NewSource(319))
++	for index := 0; index < 800; index++ {
++		var points [4]fixed.Point26_6
++		for i := range points {
++			points[i] = fixed.Point26_6{X: fixed.Int26_6(random.Intn(32000) - 16000), Y: fixed.Int26_6(random.Intn(32000) - 16000)}
++		}
++		for _, cubic := range []bool{false, true} {
++			original := recordedCurve(points, cubic)
++			for _, delta := range []fixed.Point26_6{{X: 64, Y: 0}, {X: 0, Y: -64}, {X: 37 * 64, Y: -29 * 64}, {X: -251 * 64, Y: 109 * 64}, {X: 1 << 22, Y: -1 << 22}} {
++				translated := points
++				for i := range translated {
++					translated[i] = translated[i].Add(delta)
++				}
++				got := recordedCurve(translated, cubic)
++				if len(got) != len(original) {
++					t.Fatal("translation changed subdivision count", index, cubic, delta)
++				}
++				for i := range got {
++					if got[i] != original[i].Add(delta) {
++						t.Fatalf("translation changed edge: curve=%d cubic=%v delta=%v sample=%d got=%v want=%v", index, cubic, delta, i, got[i], original[i].Add(delta))
++					}
++				}
++			}
++		}
++	}
++}
++
++func TestCurveWideHullKeepsExactEndpointAndNextSegment(t *testing.T) {
++	for _, cubic := range []bool{false, true} {
++		for _, end := range []fixed.Point26_6{{X: 1, Y: -1}, {X: -17, Y: 65}, {X: 1<<30 - 3, Y: -(1 << 30) + 5}} {
++			r := &curveLines{Filler: &Filler{A: fixed.Point26_6{X: -(1 << 30), Y: 1 << 30}}}
++			b := fixed.Point26_6{X: 1 << 30, Y: -(1 << 30)}
++			if cubic {
++				r.CubeBezierF(r, b, fixed.Point26_6{X: 19, Y: 23}, end)
++			} else {
++				r.QuadBezierF(r, b, end)
++			}
++			if r.A != end || r.points[len(r.points)-1] != end {
++				t.Fatal("wide hull lost exact terminal point", cubic, end, r.A)
++			}
++			start := len(r.points)
++			next := fixed.Point26_6{X: 257, Y: 129}
++			r.QuadBezierF(r, end, next) // Degenerate first control preserves the start/end boundary.
++			if r.A != next || len(r.points) != start+1 || r.points[start] != next {
++				t.Fatal("successive segment boundary changed", end, next, r.A)
++			}
++		}
++	}
++}
++
++func TestCurveRelativeCoordinateStaysInControlHull(t *testing.T) {
++	for _, c := range []struct {
++		origin, maximum fixed.Int26_6
++		value           float32
++		want            fixed.Int26_6
++	}{{-100, 40, -1, -100}, {-100, 40, 0, -100}, {-100, 40, 87.75, -13}, {-100, 40, 141, 40}, {-1 << 31, 1<<31 - 1, 1 << 32, 1<<31 - 1}, {1<<31 - 100, 1<<31 - 1, 99, 1<<31 - 1}} {
++		if got := relativeCurveCoordinate(c.origin, c.maximum, c.value); got != c.want {
++			t.Fatal(c, got)
++		}
++	}
++}
+--- a/paint/renderers/rasterx/text.go
++++ b/paint/renderers/rasterx/text.go
+@@ -59,6 +59,9 @@
+ 	clr := colors.Uniform(lns.Color)
+ 	cellIndex := 0
+ 	for li := range lns.Lines {
++		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++			return
++		}
+ 		var cells []shaped.Cell
+ 		if geometry != nil {
+ 			start := cellIndex
+@@ -79,6 +82,9 @@
+ 	// tbb := ln.Bounds.Translate(off)
+ 	// rs.StrokeBounds(ctx, tbb, colors.Blue)
+ 	for ri := range ln.Runs {
++		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++			return
++		}
+ 		run := ln.Runs[ri].(*shapedgt.Run)
+ 		if run.Background != nil {
+ 			rs.FillBounds(ctx, run.MaxBounds.Translate(off), run.Background)
+@@ -98,6 +104,9 @@
+ 	rs.TextRegionFill(ctx, cells, origin, lns.SelectionColor, ln.Selections)
+ 	off = start
+ 	for ri := range ln.Runs {
++		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++			return
++		}
+ 		run := ln.Runs[ri].(*shapedgt.Run)
+ 		rs.TextRun(ctx, run, ln, lns, clr, off, identity)
+ 		if run.Direction.IsVertical() {
+@@ -170,6 +179,9 @@
+ 		return
+ 	}
+ 	for _, box := range textRegionRects(cells, ranges) {
++		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++			return
++		}
+ 		box = box.Translate(origin)
+ 		corners := []math32.Vector2{box.Min, math32.Vec2(box.Max.X, box.Min.Y), box.Max, math32.Vec2(box.Min.X, box.Max.Y)}
+ 		transformed := math32.Box2{Min: ctx.Cumulative.MulPoint(corners[0]), Max: ctx.Cumulative.MulPoint(corners[0])}
+@@ -255,6 +267,9 @@
+ 	}
+ 
+ 	for gi := range run.Glyphs {
++		if rs.scrollRecord != nil && rs.scrollRecord.failed {
++			return
++		}
+ 		g := &run.Glyphs[gi]
+ 		pos := off.Add(math32.Vec2(math32.FromFixed(g.XOffset), -math32.FromFixed(g.YOffset)))
+ 		bb := run.GlyphBoundsBox(g).Translate(off)
+@@ -302,6 +317,10 @@
+ 		}
+ 	}
+ 
++	if rs.scrollRecord != nil && len(outline.Segments) > scrollPlanMaxOps {
++		rs.scrollRecord.failed = true
++		return
++	}
+ 	if UseGlyphCache && identity && stroke == nil {
+ 		mask, pi := theGlyphCache.Glyph(run.Face, g, outline, scale, pos)
+ 		if mask != nil {
+@@ -329,6 +348,12 @@
+ 		}
+ 	}
+ 	rs.Path.Stop(true)
++	if rs.scrollRecord != nil {
++		rs.scrollRecord.winding = true
++		rs.scrollRecord.addPath(rs.Path, ctx.Bounds.Rect.ToRect(), fill)
++		rs.Path.Clear()
++		return
++	}
+ 	if fill != nil {
+ 		rf := &rs.Raster.Filler
+ 		rf.SetWinding(true)
+@@ -353,6 +378,10 @@
+ }
+ 
+ func (rs *Renderer) GlyphMask(ctx *render.Context, run *shapedgt.Run, g *shaping.Glyph, fill, stroke image.Image, bb math32.Box2, pos image.Point, mask *image.Alpha) error {
++	if rs.scrollRecord != nil {
++		rs.scrollRecord.addMask(mask, pos, ctx.Bounds.Rect.ToRect(), fill)
++		return nil
++	}
+ 	mbb := mask.Bounds()
+ 	dbb := mbb.Add(pos)
+ 	ibb := dbb.Intersect(ctx.Bounds.Rect.ToRect())
+@@ -403,6 +432,17 @@
+ 
+ // FillBounds fills a bounding box in the given color.
+ func (rs *Renderer) FillBounds(ctx *render.Context, bb math32.Box2, clr image.Image) {
++	if rs.scrollRecord != nil {
++		var path Path
++		m := ctx.Cumulative
++		path.Start(m.MulPoint(bb.Min).ToFixed())
++		path.Line(m.MulPoint(math32.Vec2(bb.Max.X, bb.Min.Y)).ToFixed())
++		path.Line(m.MulPoint(bb.Max).ToFixed())
++		path.Line(m.MulPoint(math32.Vec2(bb.Min.X, bb.Max.Y)).ToFixed())
++		path.Stop(true)
++		rs.scrollRecord.addPath(path, ctx.Bounds.Rect.ToRect(), clr)
++		return
++	}
+ 	rf := &rs.Raster.Filler
+ 	rf.SetColor(clr)
+ 	m := ctx.Cumulative
+--- a/paint/renderers/rasterx/textbitmap.go
++++ b/paint/renderers/rasterx/textbitmap.go
+@@ -22,6 +22,10 @@
+ var bitmapGlyphCache map[glyphKey]*image.RGBA
+ 
+ func (rs *Renderer) GlyphBitmap(ctx *render.Context, run *shapedgt.Run, g *shaping.Glyph, bitmap font.GlyphBitmap, fill, stroke image.Image, bb math32.Box2, pos math32.Vector2, identity bool) error {
++	if rs.scrollRecord != nil {
++		rs.scrollRecord.failed = true
++		return nil
++	}
+ 	if bitmapGlyphCache == nil {
+ 		bitmapGlyphCache = make(map[glyphKey]*image.RGBA)
+ 	}
+--- a/paint/renderers/rasterx/textsvg.go
++++ b/paint/renderers/rasterx/textsvg.go
+@@ -22,6 +22,10 @@
+ var svgGlyphCache map[glyphKey]image.Image
+ 
+ func (rs *Renderer) GlyphSVG(ctx *render.Context, run *shapedgt.Run, g *shaping.Glyph, svgCmds []byte, bb math32.Box2, pos math32.Vector2, identity bool) {
++	if rs.scrollRecord != nil {
++		rs.scrollRecord.failed = true
++		return
++	}
+ 	if svgGlyphCache == nil {
+ 		svgGlyphCache = make(map[glyphKey]image.Image)
+ 	}
+--- /dev/null
++++ b/paint/renderers/rasterx/scroll_plan.go
+@@ -0,0 +1,292 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"unsafe"
++
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++)
++
++const scrollPlanBudget = 8 << 20
++const scrollPlanMaxOps = 65536
++
++type scrollPaintOp struct {
++	kind       uint8 // uniform draw, glyph alpha mask, filled fixed path
++	rect, clip image.Rectangle
++	color      color.Color // only copied, comparable built-in value colors
++	op         draw.Op
++	mask       *image.Alpha // owned bytes; never the font's or shared glyph cache's mask
++	path       Path         // owned fixed coordinates; no font, widget, model or shaped-run references
++	winding    bool
++}
++type scrollPaintPlan struct {
++	ops             []scrollPaintOp
++	bytes           int
++	failed, winding bool
++	maskCopies      map[*image.Alpha]*image.Alpha // capture-only; cleared before retention
++}
++
++func (p *scrollPaintPlan) reserve(deep int) bool {
++	size := int(unsafe.Sizeof(scrollPaintOp{})) + deep
++	if p.failed || deep < 0 || size > scrollPlanBudget-p.bytes || len(p.ops) == scrollPlanMaxOps {
++		p.failed = true
++		return false
++	}
++	p.bytes += size
++	return true
++}
++func (p *scrollPaintPlan) addUniform(x *pimage.Params) {
++	u, ok := valueUniform(x.Source)
++	if !ok || p.failed {
++		p.failed = true
++		return
++	}
++	next := scrollPaintOp{rect: x.Rect, clip: x.Rect, color: u.C, op: x.Op}
++	// A fully covering owned uniform Over makes the immediately preceding
++	// uniform Src irrelevant. Preserve covered-clear elision for full repair;
++	// source bounds/positions were already validated before detached capture.
++	if n := len(p.ops); n > 0 && x.Op == draw.Over {
++		prior := &p.ops[n-1]
++		_, _, _, alpha := u.C.RGBA()
++		if prior.kind == 0 && prior.op == draw.Src && prior.rect == next.rect && prior.clip == next.clip && alpha == 0xffff {
++			*prior = next
++			return
++		}
++	}
++	if !p.reserve(0) {
++		return
++	}
++	p.ops = append(p.ops, next)
++}
++
++func (p *scrollPaintPlan) addMask(mask *image.Alpha, pos image.Point, clip image.Rectangle, fill image.Image) {
++	u, ok := valueUniform(fill)
++	if !ok || mask == nil {
++		p.failed = true
++		return
++	}
++	b := mask.Bounds()
++	if b.Empty() {
++		return
++	}
++	// The existing glyph cache only returns small masks. Refuse other mask sizes
++	// before multiplying or allocating. Replay uses the exact copied mask bytes.
++
++	if b.Dx() > glyphMaxSize || b.Dy() > glyphMaxSize {
++		p.failed = true
++		return
++	}
++	own := p.maskCopies[mask]
++	// Borrowed identity only accelerates capture. Compare actual rows again;
++	// mutable bytes get a new owned copy, preserving earlier operations as well.
++	same := own != nil && own.Rect.Size() == b.Size()
++	if same {
++		for y := 0; y < b.Dy(); y++ {
++			if !bytes.Equal(own.Pix[y*own.Stride:][:b.Dx()], mask.Pix[mask.PixOffset(b.Min.X, b.Min.Y+y):][:b.Dx()]) {
++				same = false
++				break
++			}
++		}
++	}
++	deep := 0
++	if !same {
++		deep = b.Dx()*b.Dy() + int(unsafe.Sizeof(image.Alpha{}))
++	}
++	if !p.reserve(deep) {
++		return
++	}
++	if !same {
++		own = image.NewAlpha(image.Rectangle{Max: b.Size()})
++		for y := 0; y < b.Dy(); y++ {
++			copy(own.Pix[y*own.Stride:], mask.Pix[mask.PixOffset(b.Min.X, b.Min.Y+y):][:b.Dx()])
++		}
++		if p.maskCopies == nil {
++			p.maskCopies = make(map[*image.Alpha]*image.Alpha)
++		}
++		p.maskCopies[mask] = own
++	}
++	p.ops = append(p.ops, scrollPaintOp{kind: 1, rect: b.Add(pos), clip: clip, color: u.C, op: draw.Over, mask: own})
++}
++func (p *scrollPaintPlan) addPath(path Path, clip image.Rectangle, fill image.Image) {
++	if fill == nil || len(path) == 0 {
++		return
++	}
++	u, ok := valueUniform(fill)
++	if !ok || len(path) > scrollPlanBudget/4 || !p.reserve(len(path)*4) {
++		p.failed = true
++		return
++	}
++	hull := image.Rectangle{}
++	first := true
++	for i := 0; i < len(path); {
++		n := pathCoordinates(PathCommand(path[i]))
++		if n < 0 || i+n >= len(path) {
++			p.failed = true
++			return
++		}
++		for j := 1; j <= n; j += 2 {
++			x, y := path[i+j], path[i+j+1]
++			b := image.Rect(x.Floor()-1, y.Floor()-1, x.Ceil()+1, y.Ceil()+1)
++			if first {
++				hull = b
++				first = false
++			} else {
++				hull = hull.Union(b)
++			}
++		}
++		i += n + 1
++	}
++	owned := make(Path, len(path))
++	copy(owned, path)
++	p.ops = append(p.ops, scrollPaintOp{kind: 2, rect: hull, clip: clip, color: u.C, path: owned, winding: p.winding})
++}
++func pathCoordinates(cmd PathCommand) int {
++	switch cmd {
++	case PathMoveTo, PathLineTo:
++		return 2
++	case PathQuadTo:
++		return 4
++	case PathCubicTo:
++		return 6
++	case PathClose:
++		return 0
++	}
++	return -1
++}
++
++// Capture follows the same text placement, selection/background, outline and
++// cached-mask code as ordinary text replay. Those routines only record in this
++// mode. The accepted plan is also the source of full/strip replay, so mutable
++// font resources are not read again between the proof and the actual drawing.
++func (rs *Renderer) scrollPlan(commands render.Render) *scrollPaintPlan {
++	p := &scrollPaintPlan{bytes: int(unsafe.Sizeof(scrollPaintPlan{})), winding: rs.Scanner.UseNonZeroWinding}
++	capture := *rs
++	capture.Path = nil
++	capture.scrollRecord = p
++	for _, item := range commands {
++		switch x := item.(type) {
++		case *pimage.Params:
++			p.addUniform(x)
++		case *render.Text:
++			for _, line := range x.Text.Lines {
++				for _, r := range line.Runs {
++					run := r.(*shapedgt.Run)
++					if run.StrokeColor != nil {
++						p.failed = true
++					}
++				}
++			}
++			if !p.failed {
++				capture.RenderText(x)
++			}
++		}
++		if p.failed {
++			return nil
++		}
++	}
++	// Trim allocation capacity so retained accounting includes all operation slots.
++	exact := make([]scrollPaintOp, len(p.ops))
++	copy(exact, p.ops)
++	p.ops = exact
++	p.maskCopies = nil
++	return p
++}
++
++func (rs *Renderer) replayScrollPlan(p *scrollPaintPlan, clip image.Rectangle) {
++	for _, op := range p.ops {
++		rect := op.rect.Intersect(op.clip).Intersect(clip)
++		if rect.Empty() {
++			continue
++		}
++		source := &image.Uniform{C: op.color}
++		switch op.kind {
++		case 0:
++			draw.Draw(rs.image, rect, source, image.Point{}, op.op)
++		case 1:
++			draw.DrawMask(rs.image, rect, source, image.Point{}, op.mask, rect.Min.Sub(op.rect.Min), draw.Over)
++		case 2:
++			rs.Scanner.SetClip(op.clip.Intersect(clip))
++			rf := &rs.Raster.Filler
++			rf.SetWinding(op.winding)
++			rf.SetColor(source)
++			op.path.AddTo(rf)
++			rf.Draw()
++			rf.Clear()
++		}
++	}
++	// Preserve the text group's final winding state even when no strip needs it.
++	rs.Scanner.SetWinding(p.winding)
++}
++
++func sameScrollPath(a, b Path, delta image.Point) bool {
++	if len(a) != len(b) {
++		return false
++	}
++	for i := 0; i < len(a); {
++		if a[i] != b[i] {
++			return false
++		}
++		n := pathCoordinates(PathCommand(a[i]))
++		if n < 0 || i+n >= len(a) {
++			return false
++		}
++		for j := 1; j <= n; j++ {
++			shift := delta.X
++			if j%2 == 0 {
++				shift = delta.Y
++			}
++			if int64(a[i+j])+int64(shift)*64 != int64(b[i+j]) {
++				return false
++			}
++		}
++		i += n + 1
++	}
++	return true
++}
++
++// Compare the complete ordered operation stream affecting the overlap. Exposed
++// cells may enter/leave, but every old paint in the overlap must have an equal
++// translated current paint (including colors, masks, fixed outlines and clips).
++// Pointer identities, face IDs, model stamps and hash collisions cannot admit reuse.
++func sameScrollPaint(old, next *scrollPaintPlan, overlap image.Rectangle, delta image.Point) bool {
++	if old == nil || next == nil {
++		return false
++	}
++	previous := overlap.Sub(delta)
++	ai, bi := 0, 0
++	for {
++		for ai < len(old.ops) && old.ops[ai].rect.Intersect(old.ops[ai].clip).Intersect(previous).Empty() {
++			ai++
++		}
++		for bi < len(next.ops) && next.ops[bi].rect.Intersect(next.ops[bi].clip).Intersect(overlap).Empty() {
++			bi++
++		}
++		if ai == len(old.ops) || bi == len(next.ops) {
++			return ai == len(old.ops) && bi == len(next.ops)
++		}
++		a, b := &old.ops[ai], &next.ops[bi]
++		if a.kind != b.kind || a.color != b.color || a.op != b.op || a.winding != b.winding || a.rect.Intersect(a.clip).Intersect(previous).Add(delta) != b.rect.Intersect(b.clip).Intersect(overlap) {
++			return false
++		}
++		switch a.kind {
++		case 1:
++			if a.rect.Add(delta) != b.rect || a.mask.Rect != b.mask.Rect || !bytes.Equal(a.mask.Pix, b.mask.Pix) {
++				return false
++			}
++		case 2:
++			if a.clip.Intersect(previous).Add(delta) != b.clip.Intersect(overlap) || !sameScrollPath(a.path, b.path, delta) {
++				return false
++			}
++		}
++		ai++
++		bi++
++	}
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/scroll_plan_test.go
+@@ -0,0 +1,279 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++	"unsafe"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++	"cogentcore.org/core/text/textpos"
++)
++
++func TestScrollPaintChangesRefuseUnchangedEpoch(t *testing.T) {
++	uc := units.Context{}
++	uc.Defaults()
++	style := rich.NewStyle()
++	ts := text.NewStyle()
++	ts.WhiteSpace = text.WrapNever
++	ts.ToDots(&uc)
++	shaper := shapedgt.NewShaperWithFonts(fonts.Embedded)
++	lines := shaper.WrapLines(rich.NewText(style, []rune("Guard 012345 אבג é")), style, ts, math32.Vec2(240, 100))
++	lines.Color = color.RGBA{R: 17, G: 31, B: 52, A: 255}
++	paint := styles.NewPaint()
++	bounds := image.Rect(11, 9, 191, 105)
++	ctx := &render.Context{}
++	ctx.Init(paint, &render.Bounds{Rect: math32.B2FromRect(bounds)}, nil)
++	position := image.Point{}
++	origin := math32.Vec2(19, 23)
++	background := image.NewUniform(color.RGBA{R: 233, G: 237, B: 241, A: 255})
++	actual := New(math32.Vec2(240, 160)).(*Renderer)
++	reference := New(math32.Vec2(240, 160)).(*Renderer)
++	frame := func() render.Render {
++		return render.Render{
++			pimage.NewDraw(image.Rect(0, 0, 240, 160), image.NewUniform(color.RGBA{R: 219, A: 255}), nil, image.Point{}, draw.Src),
++			&render.ContextPush{Scroll: &render.ScrollSurface{ID: 1, Epoch: 1, Bounds: bounds, Position: position, VerifyPaint: true}},
++			pimage.NewDraw(bounds, background, nil, bounds.Min, draw.Src),
++			render.NewTextWithGeometry(lines, paint, ctx, origin.Sub(math32.FromPoint(position)), lines.InteractionLayout()),
++			&render.ContextPop{},
++			pimage.NewDraw(image.Rect(53, 31, 133, 49), image.NewUniform(color.RGBA{G: 171, A: 255}), nil, image.Point{}, draw.Src),
++		}
++	}
++	check := func(label string, wantReuse bool) {
++		t.Helper()
++		items := frame()
++		actual.Render(items)
++		scrollReference(reference, items)
++		if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++			t.Fatal(label, "pixel mismatch", actual.ScrollStats())
++		}
++		if (actual.ScrollStats().ReusedGroups == 1) != wantReuse {
++			t.Fatal(label, "unexpected reuse", actual.ScrollStats())
++		}
++	}
++	check("initial", false)
++	position = image.Pt(3, 2)
++	check("translate", true)
++	mutations := []struct {
++		name   string
++		change func()
++	}{
++		{"ink", func() { lines.Color = color.NRGBA{R: 81, G: 91, B: 121, A: 123} }},
++		{"background", func() { background.C = color.NRGBA{R: 191, G: 229, B: 221, A: 255} }},
++		{"selection", func() {
++			lines.SelectionColor = image.NewUniform(color.NRGBA{B: 221, A: 111})
++			lines.SelectRegion(textpos.Range{Start: 0, End: 4})
++		}},
++		{"clip", func() { ctx.Bounds.Rect.Max.X -= 13 }},
++		{"subpixel", func() { origin.X += .5 }},
++		{"glyph-output", func() { run := lines.Lines[0].Runs[0].(*shapedgt.Run); run.Glyphs[0].XOffset += 64 }},
++	}
++	for _, m := range mutations {
++		m.change()
++		check(m.name, false)
++		check(m.name+"-stable", true)
++	}
++	// Existing mask resources are mutable in Go. Verify the proof stores detached
++	// bytes and notices a change in the exact mask ordinary replay would consume.
++	cache := actual.scrollCache[scrollKey{1, 0}]
++	if cache == nil || cache.plan == nil || cache.plan.maskCopies != nil {
++		t.Fatal("no retained proof")
++	}
++
++	run := lines.Lines[0].Runs[0].(*shapedgt.Run)
++	glyph := &run.Glyphs[0]
++	outline, ok := run.Face.GlyphDataOutline(glyph.GlyphID)
++	if !ok {
++		t.Fatal("fixture glyph has no outline")
++	}
++	glyphPos := origin.Sub(math32.FromPoint(position)).Add(lines.Offset).Add(lines.Lines[0].Offset).Add(math32.Vec2(math32.FromFixed(glyph.XOffset), -math32.FromFixed(glyph.YOffset)))
++	scale := math32.FromFixed(run.Size) / float32(run.Face.Upem())
++	if width, advance := math32.FromFixed(glyph.Width), math32.Abs(math32.FromFixed(glyph.Advance)); width > advance && run.Font.Style(&ctx.Style.Text).Family == rich.Monospace {
++		scale *= .95 * advance / width
++	}
++	resource, maskPos := theGlyphCache.Glyph(run.Face, glyph, outline, scale, glyphPos)
++	if resource == nil {
++		t.Fatal("fixture actual glyph did not use a mask")
++	}
++	consumed := false
++	for _, op := range cache.plan.ops {
++		if op.kind == 1 && op.rect == resource.Rect.Add(maskPos) && !op.rect.Intersect(op.clip).Empty() && bytes.Equal(op.mask.Pix, resource.Pix) {
++			consumed = true
++		}
++	}
++	if !consumed {
++		t.Fatal("exact current glyph mask not consumed by retained plan")
++	}
++	saved := bytes.Clone(resource.Pix)
++	defer copy(resource.Pix, saved)
++	for i := range resource.Pix {
++		resource.Pix[i] ^= 0xff
++	}
++	items := frame()
++	actual.Render(items)
++	scrollReference(reference, items)
++	if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++		t.Fatal("mutable mask pixel mismatch")
++	}
++	if actual.ScrollStats().ReusedGroups != 0 || actual.ScrollStats().PaintRefusals != 1 {
++		t.Fatal("changed consumed mask incorrectly reused", actual.ScrollStats())
++	}
++
++	ctx.Bounds.Rect = math32.Box2{}
++	items = frame()
++	actual.Render(items)
++	scrollReference(reference, items)
++	if !bytes.Equal(actual.image.Pix, reference.image.Pix) || actual.ScrollStats().ReusedGroups != 0 || actual.ScrollStats().CachedBytes != 0 {
++		t.Fatal("zero text clip did not use complete unclipped fallback", actual.ScrollStats())
++	}
++
++}
++
++func TestScrollPaintPacketBudgetAndExactBytes(t *testing.T) {
++	p := &scrollPaintPlan{}
++	fill := image.NewUniform(color.RGBA{A: 255})
++	mask := image.NewAlpha(image.Rect(0, 0, 128, 128))
++	mask.Pix[0] = 131
++	p.addMask(mask, image.Pt(3, 4), image.Rect(0, 0, 160, 160), fill)
++	if p.failed || p.ops[0].mask.Pix[0] != 131 {
++		t.Fatal("mask capture failed")
++	}
++	mask.Pix[0] = 19
++	if p.ops[0].mask.Pix[0] != 131 {
++		t.Fatal("retained source mask reference")
++	}
++	next := &scrollPaintPlan{}
++	next.addMask(mask, image.Pt(3, 4), image.Rect(0, 0, 160, 160), fill)
++	if sameScrollPaint(p, next, image.Rect(0, 0, 160, 160), image.Point{}) {
++		t.Fatal("different actual mask admitted")
++	}
++	for !p.failed {
++		p.addMask(mask, image.Point{}, image.Rect(0, 0, 160, 160), fill)
++	}
++	if p.bytes > scrollPlanBudget || len(p.ops) > scrollPlanMaxOps {
++		t.Fatal("packet budget exceeded")
++	}
++	actual := New(math32.Vec2(240, 160)).(*Renderer)
++	for i := uint64(1); i <= 80; i++ {
++		items := scrollFrame(image.Rect(11, 9, 191, 105), image.Pt(120, 96), 1)
++		hint := items[1].(*render.ContextPush).Scroll
++		hint.ID = i
++		hint.VerifyPaint = true
++		actual.Render(items)
++	}
++	if actual.scrollPlanBytes > scrollPlanBudget || actual.scrollBytes > scrollCacheBudget || len(actual.scrollCache) > scrollCacheGroups {
++		t.Fatal("retained aggregate budget exceeded")
++	}
++	actual.SetSize(units.UnitDot, math32.Vec2(241, 160))
++	if len(actual.scrollCache) != 0 || actual.scrollPlanBytes != 0 || actual.scrollBytes != 0 {
++		t.Fatal("resize did not retire proofs")
++	}
++}
++
++func TestScrollPaintCaptureStopsAfterBudgetFailure(t *testing.T) {
++	uc := units.Context{}
++	uc.Defaults()
++	style := rich.NewStyle()
++	ts := text.NewStyle()
++	ts.ToDots(&uc)
++	lines := shapedgt.NewShaperWithFonts(fonts.Embedded).WrapLines(rich.NewText(style, []rune("Guard")), style, ts, math32.Vec2(200, 100))
++	lines.Color = color.RGBA{A: 255}
++	// The second run would panic on its nil font face if capture traversed it.
++	run := *lines.Lines[0].Runs[0].(*shapedgt.Run)
++	run.Face = nil
++	lines.Lines[0].Runs = append(lines.Lines[0].Runs, &run)
++	ctx := &render.Context{}
++	ctx.Init(styles.NewPaint(), &render.Bounds{Rect: math32.B2(0, 0, 240, 160)}, nil)
++	actual := New(math32.Vec2(240, 160)).(*Renderer)
++	plan := &scrollPaintPlan{bytes: scrollPlanBudget, winding: true}
++	actual.scrollRecord = plan
++	actual.TextLinesWithGeometry(ctx, lines, math32.Vec2(10, 10), nil)
++	if !plan.failed || len(plan.ops) != 0 {
++		t.Fatal("capture did not stop at budget")
++	}
++}
++
++func TestScrollPaintPathRetentionHasExactCapacity(t *testing.T) {
++	p := &scrollPaintPlan{winding: true}
++	var path Path
++	path.Start(math32.Vec2(1, 2).ToFixed())
++	path.Line(math32.Vec2(3, 4).ToFixed())
++	path.Stop(true)
++	p.addPath(path, image.Rect(0, 0, 10, 10), image.NewUniform(color.RGBA{A: 255}))
++	if p.failed || len(p.ops) != 1 || cap(p.ops[0].path) != len(p.ops[0].path) {
++		t.Fatal("retained path capacity exceeds accounted length")
++	}
++	path[1] += 64
++	if p.ops[0].path[1] == path[1] {
++		t.Fatal("retained borrowed path")
++	}
++}
++
++func TestScrollPaintSharedMaskCopiesPreserveCurrentBytes(t *testing.T) {
++	mask := &image.Alpha{Pix: make([]byte, 24*7), Stride: 24, Rect: image.Rect(-3, 5, 5, 12)}
++	for y := mask.Rect.Min.Y; y < mask.Rect.Max.Y; y++ {
++		for x := mask.Rect.Min.X; x < mask.Rect.Max.X; x++ {
++			mask.SetAlpha(x, y, color.Alpha{A: uint8(x*3 + y*11)})
++		}
++	}
++	fill := image.NewUniform(color.RGBA{R: 151, A: 255})
++	p := &scrollPaintPlan{}
++	p.addMask(mask, image.Pt(8, 9), image.Rect(0, 0, 40, 40), fill)
++	firstBytes := p.bytes
++	p.addMask(mask, image.Pt(10, 11), image.Rect(0, 0, 40, 40), image.NewUniform(color.NRGBA{B: 199, A: 137}))
++	if p.failed || p.ops[0].mask != p.ops[1].mask || p.bytes-firstBytes != int(unsafe.Sizeof(scrollPaintOp{})) {
++		t.Fatal("unchanged mask payload not shared/accounted once")
++	}
++	first := bytes.Clone(p.ops[0].mask.Pix)
++	mask.Pix[mask.PixOffset(-3, 5)] ^= 0xff
++	p.addMask(mask, image.Pt(12, 13), image.Rect(0, 0, 40, 40), fill)
++	if p.ops[2].mask == p.ops[0].mask || !bytes.Equal(first, p.ops[0].mask.Pix) || p.ops[2].mask.Pix[0] == first[0] {
++		t.Fatal("changed borrowed mask mutated earlier owned operation")
++	}
++	mask.Pix[mask.PixOffset(-3, 5)] ^= 0xff
++	p.addMask(mask, image.Pt(14, 15), image.Rect(0, 0, 40, 40), fill)
++	if !bytes.Equal(first, p.ops[3].mask.Pix) || p.ops[3].mask == p.ops[2].mask {
++		t.Fatal("same-pointer A B A capture lost exact paint bytes")
++	}
++	if p.bytes != 4*int(unsafe.Sizeof(scrollPaintOp{}))+3*(mask.Rect.Dx()*mask.Rect.Dy()+int(unsafe.Sizeof(image.Alpha{}))) {
++		t.Fatal("unique payload accounting", p.bytes)
++	}
++}
++
++func TestScrollPaintCoveredClearRetainsOneOwnedOperation(t *testing.T) {
++	bounds := image.Rect(11, 9, 191, 105)
++	p := &scrollPaintPlan{}
++	p.addUniform(pimage.NewDraw(bounds, image.NewUniform(color.NRGBA{R: 121, A: 17}), nil, bounds.Min, draw.Src))
++	p.addUniform(pimage.NewDraw(bounds, image.NewUniform(color.RGBA{G: 91, B: 31, A: 255}), nil, bounds.Min, draw.Over))
++	if len(p.ops) != 1 || p.bytes != int(unsafe.Sizeof(scrollPaintOp{})) {
++		t.Fatal("covered clear was retained/overaccounted")
++	}
++	actual := New(math32.Vec2(240, 160)).(*Renderer)
++	reference := New(math32.Vec2(240, 160)).(*Renderer)
++	fill := image.NewUniform(color.NRGBA{R: 221, G: 199, B: 173, A: 201})
++	draw.Draw(actual.image, actual.image.Bounds(), fill, image.Point{}, draw.Src)
++	copy(reference.image.Pix, actual.image.Pix)
++	actual.replayScrollPlan(p, bounds)
++	draw.Draw(reference.image, bounds, image.NewUniform(color.NRGBA{R: 121, A: 17}), bounds.Min, draw.Src)
++	draw.Draw(reference.image, bounds, image.NewUniform(color.RGBA{G: 91, B: 31, A: 255}), bounds.Min, draw.Over)
++	if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++		t.Fatal("covered-clear plan changed final pixels")
++	}
++	p.addUniform(pimage.NewDraw(bounds, image.NewUniform(color.NRGBA{R: 211, A: 31}), nil, bounds.Min, draw.Over))
++	if len(p.ops) != 2 {
++		t.Fatal("translucent draw elided a prior operation")
++	}
++}

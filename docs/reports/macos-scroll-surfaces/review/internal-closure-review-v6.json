@@ -1,0 +1,125 @@
+{
+  "acyclicity": {
+    "audit_producer_explicitly_skips_later_certificate": true,
+    "certificate_not_in_bound_audit_or_index": true,
+    "certificate_outside_phase_and_archive": true,
+    "existing_certificates_unchanged": true
+  },
+  "aggregate_audit_sha256": "f6caf7813b673986d2cca0fc928e61414ea3edb21861e9ccf65851ad81d66979",
+  "archive": {
+    "all_member_data_hashes_match_index_and_phase": true,
+    "all_members_safe_unique_relative_0644": true,
+    "compressed_bytes": 13933198,
+    "index_sha256": "ce7662eb0b6f2064f2dfda0e397c55afd6c4c11d2434be7ec95f0964dc1b4a00",
+    "regular_members": 528,
+    "sha256": "5d5561580bbf2f3bde9288b14d5f208e99bf88be0cf6b5d39f453601af596f78",
+    "uncompressed_bytes": 64974998
+  },
+  "checks": {
+    "final_native_processes": 3,
+    "v3": 13,
+    "v4": 7,
+    "v5": 7,
+    "v6": 10
+  },
+  "decision": "APPROVED_CLOSURE",
+  "findings": [],
+  "identity": {
+    "all_current_bytes_rehashed": true,
+    "complete_prepared_files": 6146,
+    "final_v6_binaries": {
+      "vellum-scroll-candidate-v6": "608b61e21d6d75a4c0f9c4ce423e07dd1a03378e548e47744db378931580d629",
+      "vellum-scroll-generic-ax-v6": "2a9013434a60ff15fa33da3157bfedba0228a93566bb36542e3715a9494137c1"
+    },
+    "original_receipt_review_sha256": "72809fd9c50fa137c5efbacd591ea99a320a3b660b6aa14eb20e870833e3ccf3",
+    "prepared_map_sha256": "df469bc585904d55cfe59fdaea2877878b3a4030092695ab2bfe860128306afb",
+    "prepared_v6_equals_v5": true,
+    "selected_source_files": 659,
+    "source_map_sha256": "5aed27f4425ce56cc17a131f95bfa52b2b25908838fb80f5bea993424a4eedbc",
+    "source_review_sha256": "61a66ac6f440144189be36876cef5265fbed4e369b5ab7a510ba8f6bedc1f634"
+  },
+  "limits": [
+    "No source, report, phase, archive or existing certificate changes; only this newly requested certificate written. No tests, builds, preparation, Git, provider/native/GUI programs or OS changes executed.",
+    "Current selected source and complete prepared bytes are not full compiler/SDK/cache/ambient runtime closure. Git/index cleanliness is producer evidence; reviewer executed no Git.",
+    "Provider discard rationale is not accepted as a correctness argument. The global default fill/stroke/dash antialias change is an explicitly accepted compatibility choice, not proof of old-pixel parity.",
+    "v4/v5 measurements are experimental enabled builds, not final default-v6 timings. All 80 ordinary processes fail both warm targets; no cache recommendation, default speedup, complete P6/Mac/human-workflow, native/GPU memory or physical presentation qualification.",
+    "This certificate binds the existing audit/index/archive and is intentionally excluded from that same archive/hash graph."
+  ],
+  "preserved_evidence": {
+    "all80_fail_both_targets": true,
+    "experimental_v4_v5_each40_runs_4800_samples": true,
+    "final_default_v6_latency_not_measured": true,
+    "historical_failures_generated_outputs_and_diagnostics_separate": true,
+    "native_v6_3_passes": true,
+    "v3_budget_finding_and_v4_correction": true,
+    "versioned_v3_13_v4_7_v5_7_v6_10_checks": true
+  },
+  "provider": {
+    "coverage": {
+      "bytes": 102505,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "chunks": 4,
+      "complete": true,
+      "excluded": [],
+      "files": 16,
+      "llmCalls": 5,
+      "reviewer": [
+        {
+          "model": "claude-sonnet-5-5",
+          "provider": "anthropic"
+        }
+      ],
+      "skipped": [],
+      "tokens": [
+        {
+          "costUSD": 0.417348,
+          "input": 93199,
+          "model": "claude-sonnet-5-5",
+          "output": 23095,
+          "provider": "anthropic"
+        }
+      ],
+      "truncatedBytes": 0,
+      "widenedFiles": 2
+    },
+    "discarded_comment_substantive_scope_is_real": true,
+    "discarded_finding_id": "61e59df22809a345",
+    "discarded_findings": 1,
+    "local_disposition": "Accepted intentional raster-wide compatibility change; no unresolved defect demonstrated. The exact quote exists in the patch.",
+    "local_disposition_sha256": "b77f35505a377dc2dc5371f567d93b4977c5d0dbd06060329431e73abf77ecce",
+    "quote_discard_reason_not_used": true,
+    "raw_exit_code": 0,
+    "raw_sha256": "ea63810296c93c6b46f35e002a4f58c97cd5cf688b2127d9176d38daa32b7c4b",
+    "retained_findings": 0,
+    "suppressed_findings": 0
+  },
+  "report_lineage": {
+    "delta_sha256": "99dee5ca8750c58235ae7fb23d2c2fd68f9998881f394a0032a4d7aa521f8d26",
+    "exact_two_replacements_and_one_appendix_only": true,
+    "fills_strokes_dashes_global_default_scope_explicit": true,
+    "final_sha256": "ffed4ab5efd9958b7bea51d6a03683833339ac3502a48c85ac987c75cc2b895d",
+    "no_prior_antialias_pixel_parity_claim": true,
+    "provider_input_sha256": "e18ff43a314f88b4812525f4d0c852922528648724ba0d8354af030bc94040b5"
+  },
+  "result": "APPROVED",
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/README.md": "ffed4ab5efd9958b7bea51d6a03683833339ac3502a48c85ac987c75cc2b895d",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/audit.json": "f6caf7813b673986d2cca0fc928e61414ea3edb21861e9ccf65851ad81d66979",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/records-index.json": "ce7662eb0b6f2064f2dfda0e397c55afd6c4c11d2434be7ec95f0964dc1b4a00",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/records.tar.gz": "5d5561580bbf2f3bde9288b14d5f208e99bf88be0cf6b5d39f453601af596f78",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/inputs.json": "c14ef8880d0aa3e240bc2c8087e74a31e16fb7bdd2b95f094543a6e5f76ec633",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/internal-integrated-review-v3.json": "1581c19a72778a51edcd58120cce3357baca2ae667cbecb8d6ffc6aed5fa6750",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/internal-integrated-review-v4.json": "69a57330fdf8bb252452e7ea2c7745ce5cab52c47d28bdf11e3b4de1096a65cf",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/internal-integrated-review-v5.json": "773b18352598a1b7120e3e0b1640f6abd552c8ff2f6791b32028b4ccb85a9621",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/internal-integrated-review-v6.json": "61a66ac6f440144189be36876cef5265fbed4e369b5ab7a510ba8f6bedc1f634",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/internal-prism-disposition-v6.json": "b77f35505a377dc2dc5371f567d93b4977c5d0dbd06060329431e73abf77ecce",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/internal-receipt-review-v6.json": "72809fd9c50fa137c5efbacd591ea99a320a3b660b6aa14eb20e870833e3ccf3",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/prism.json": "ea63810296c93c6b46f35e002a4f58c97cd5cf688b2127d9176d38daa32b7c4b",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/process.json": "863ec3afe7e477daab49f6d964cf5e5ae614679285fd469c52c0f013e03c0465",
+    "/private/tmp/vellum-large-data/docs/reports/macos-scroll-surfaces/review/report-post-prism-delta.json": "99dee5ca8750c58235ae7fb23d2c2fd68f9998881f394a0032a4d7aa521f8d26"
+  },
+  "schema": 1,
+  "scope": "Read-only final metadata, source, archive, provider, disposition and report closure. Inherits the exact independent 9,600-sample statistical audit without runtime reruns. Existing phase and archive bytes were not changed.",
+  "status": "APPROVED"
+}

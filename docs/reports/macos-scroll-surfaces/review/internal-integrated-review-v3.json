@@ -1,0 +1,74 @@
+{
+  "decision": "Frozen v3 contains a retained-payload accounting defect; its passing checks are historical, not final source approval.",
+  "findings": [
+    {
+      "diagnostic_scope": "Source-backed logical retention mismatch; no independent Go test or runtime measurement was executed in this review.",
+      "file": "paint/renderers/rasterx/scroll_plan.go",
+      "final_resolution": "Fixed in v4 using tight allocation plus TestScrollPaintPathRetentionHasExactCapacity; v3 snapshots and receipt retained unchanged.",
+      "id": "SCROLL-PATH-CAPACITY",
+      "line": 105,
+      "problem": "addPath charges len(path)*4 while slices.Clone can retain a slice with cap(path)>len(path). Excess visible backing capacity is retained by each descriptor and omitted from the stated fixed-path payload charge.",
+      "required_correction": "Retain make(Path,len(path))+copy, or charge actual retained capacity. Keep detachment and add exact-capacity regression.",
+      "severity": "medium",
+      "source_sha256": "3a171923c20f84c3aba202715134f4e80305da969c356eb05f56a846c7848e60"
+    }
+  ],
+  "historical_qualification": {
+    "checks": 13,
+    "current_verification": null,
+    "log_sha256": {
+      "driver-native-race.log": "520678b8095ddda61df4259d5fe444fe44c70c3fc9ede00c179857060522c2ac",
+      "driver-native-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "driver-offscreen-race.log": "a14cf4b6d76c47f549714ef73f8ee20f37f484cea7ef761462c7b8ca9367f07b",
+      "driver-offscreen-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fresh-prepare.log": "56711da4860f1e98a054387be4fdc3cc04755f464dfbd50d8d341d60e7ec000f",
+      "generic-smoke-build.log": "6f9ed08bde9a6d02c495b43364c4f18229108fe7c1353b81d950a446dd4b1819",
+      "loadedgrid-race.log": "440cb0b5bdd5f01c00bbc05459e3904c0cb39b5f0d73f2c287ef73bc9b08c495",
+      "native-pixel-race.log": "758d864384c718c5c6b59e2eb8c50a5eaafcf54a03e75b7a08f2202a4e64e609",
+      "portable-race.log": "039c04b2ef5a3012cc7dd56cb4c0260af5b94a1b3328da778afb6c33c6458f14",
+      "prepare-tests.log": "747b40c74f541763e048afb661ee5784d5ffea4c0c4446ca99b288a3e78e48e1",
+      "raster-race.log": "504a9ed265e1688e4f2ccad8dbfb707be83d4a881c3a1201843c472fd12ba397",
+      "raster-vet.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "release-build.log": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0"
+    },
+    "producer_sha256": "4d4a4fecf18b0b0d1b138e38f683849fcc9221f152d3fa3b46bb1e8444e77bca",
+    "result": "PASS",
+    "scope": "Source-bound preparation/race/vet/build and real offscreen native-adapter pixel proof; no live Cocoa, ordinary latency, native/GPU memory or full Mac qualification.",
+    "sha256": "677fb41a1151a8fa59dccdd5a3dd5ed69a871401505378aef3ed0d568a9b5cbc",
+    "source_before_equals_after": true
+  },
+  "other_reviewed_invariants": "Painter-position replay; exact current paint proof; owned masks/path arrays; strict fallback; signed offset checks; bounded per-renderer pixels/groups/descriptors; original flat commands retained.",
+  "patch_sha256": "42f12715775f11ff61e61d5d0277ef2e72eb9b12feeffcfc5b0f529958e62bd3",
+  "reviewed_source_sha256": {
+    "drivers/cogent/grid.go": "6e5601f16448d1313de9def6b1c957eb59d763084b6d45539b94aabdecea5b0c",
+    "drivers/cogent/grid_scroll.go": "42e56fd555c1da5dc61654f706e5f33005b3e526fd944f14c6147df1cd8ae55c",
+    "drivers/cogent/grid_scroll_offscreen_test.go": "ec7d6c67020d976f75b46c73b02830e6eab89d9c7b1c728b6af5111dfe968fd5",
+    "drivers/cogent/native/README.md": "4886c7d8a437085cece5667fc98ddd10e21d504f1adf34b2d68b8485328958e2",
+    "drivers/cogent/native/dependencies.json": "1b6a9e056c74404cd822c0734bafcad99d15e6bea8c6cbef152dedcbb84194f4",
+    "drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch": "42f12715775f11ff61e61d5d0277ef2e72eb9b12feeffcfc5b0f529958e62bd3",
+    "drivers/cogent/native/patches/scrollsurfaces/README.md": "b93cf9490d9c80900ca74a93c6edfa7c78786a9c041271f77e3f47cf28206601",
+    "drivers/cogent/native/patches/scrollsurfaces/original-hashes.json": "80165a4f0b589e2bd85079e02c6bb8b6d89b71361ebb91a949e2f91a24819d83",
+    "drivers/cogent/native/patches/scrollsurfaces/output-hashes.json": "ef1e2544256027bf90e5dfab983fba324e54da4984ca7c1b554b0f1ef9dc9e4a",
+    "drivers/cogent/prepare_test.py": "504a295278caf9dfe396cf0e939dc728a065c83d5b948a2b39718ac830a42029",
+    "paint/render/item.go": "e003f06f7f25c9b2911bf2db426b71fe9ed8fd6c570a01b82f9ef308647621cf",
+    "paint/render/scroll.go": "78e326421238ebe43fe69950feb0dcefa077df2fd3b0a0cca20a20c594c85e1f",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll.go": "1bd7c075228f71a1629f30312031f9366dacdbf94ab6988a921d24ccfbbc1fa3",
+    "paint/renderers/rasterx/scroll_plan.go": "3a171923c20f84c3aba202715134f4e80305da969c356eb05f56a846c7848e60",
+    "paint/renderers/rasterx/scroll_plan_test.go": "d1b16725fda9d9993e0591222cbd20fb93c2d01fb09e05a9ba4133054c7b3fff",
+    "paint/renderers/rasterx/scroll_test.go": "b7af442ce6c4bf8920129916609b651b924e29fa2c42f566888878d1b95abee5",
+    "paint/renderers/rasterx/text.go": "b2d87240c0779b8d3129bbe06876acb0d87c73b1e2615727b107452e8d6b5fdc",
+    "paint/renderers/rasterx/textbitmap.go": "a57e617f953bf44aee8f3c3fa101732dd6a3d7bbb81aec217ae7ef569835e607",
+    "paint/renderers/rasterx/textsvg.go": "41ee414efcaca93cb713e022ff1e148b8dbae2df9f0512eefbfb6ff8ce61b4c5",
+    "specs/rendering.md": "05a98932b5dbd2869bf1996fad339302eae8aa389d153a6f2e1646c946929449"
+  },
+  "schema_version": 1,
+  "scope": "Read-only integrated Stage39 renderer/managed-grid source review. No test, build, native process, provider, Git, preparation or shared-source mutation by reviewer.",
+  "source_receipt": {
+    "path": "/private/tmp/vellum-scroll-surfaces/source-v3.json",
+    "sha256": "b3c17bfa9b3a97bd1ba645738ecabb0761cff391d399a99df0767bebf76a1e59"
+  },
+  "status": "NEEDS_BUDGET_FIX"
+}

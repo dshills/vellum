@@ -1,0 +1,140 @@
+{
+  "auxiliary_contract_source_sha256": {
+    "core/scene.go": "1d9e0698d4370127440b6cc36591031a27a98f053594fdd927702389ccd6643b",
+    "tree/nodebase.go": "bb72c6036d5693b61befa17d9c1dd26e99bf661805a46b58c246f4d9cd3be9f8"
+  },
+  "base_commit": "56d394fa0ce6084033ca86c79d3456b560e59d4c",
+  "baselines_for_newly_selected_files": {
+    "drivers/cogent/driver.go": {
+      "qualified_v5_sha256": "b7dc3446007514d0bc845b76daafb4960b4e475b9d7ed88f756104b5e35c22ba",
+      "v6_sha256": "d1421343afc429230e61d0598ac8fc0b907c62e26770d9a31baf9fc4fd6ee60c"
+    },
+    "drivers/cogent/manual.go": {
+      "qualified_v5_sha256": "158bcd90c411f30a1c031dac330493c543290d2ec70f9c4d254afa5cd7bb52c9",
+      "v6_sha256": "a09acd5374f9ff024145da9c01e8ac7a47d2b72cd9b00e2bd81da6de00b91ba3"
+    },
+    "drivers/cogent/manual_offscreen.go": {
+      "qualified_v5_sha256": "2ba45cc4399aee2f155a76471e7df20d4d2d93f56fe161bbfa65f84cd5057e60",
+      "v6_sha256": "57c18c35c3bcb4d6e2aa24e3ba20233bbeab58dc9cfba8fb8dfd10bbc1592cfb"
+    }
+  },
+  "decision": "Approved frozen v6 opt-in policy and exact inherited Stage39 implementation. Ordinary managed rendering does not emit scroll-surface hints by default. No remaining material source finding in the reviewed delta.",
+  "findings": [],
+  "inert_verification_recipe": {
+    "path": "/private/tmp/vellum-scroll-surfaces/verify-internal-integrated-v6.py.txt",
+    "sha256": "f3932c8f6ec814fec2d7affeb01f9388ae7bcb7b535ef26b26c34f1489260ba6"
+  },
+  "limits": [
+    "No Go/native/GUI/provider/prepare/Git execution by reviewer. Only read-only stdlib hash/reconstruction scripts ran.",
+    "Property is immutable in framework lifecycle, not an enforceable restriction on arbitrary direct Core callers. Such callers must obey native ownership and synchronization contracts.",
+    "Modal/additional-scene default behavior is source-backed through local property lookup and fresh Scene construction, not separately executed in a new runtime test by reviewer.",
+    "Earlier v5 correctness/source approval and its reported ordinary latency regression remain separate historical evidence. This certificate performs no independent metric recomputation and establishes no performance improvement.",
+    "The curve kernel remains globally active and has intentional antialias changes described in prior certificates/spec; disabling hints selects ordinary complete replay, not preceding-kernel pixel parity.",
+    "Experimental reuse is explicitly optional and not a recommended latency setting. Full GPU image copy/upload, physical presentation/native memory and 4/6ms/full-Mac acceptance remain unqualified."
+  ],
+  "mechanical": {
+    "frozen_and_current_selected_match": 26,
+    "path": "/private/tmp/vellum-scroll-surfaces/internal-integrated-mechanical-v6.json",
+    "prepared_closure_identity": {
+      "all_current_match_qualified_v5": true,
+      "count": 6146
+    },
+    "reconstructed_original_pins": 12,
+    "sha256": "b6e40b533cb37340d238ac98b777ccbcd3057bbda5c6ee61d67459333d7591f2"
+  },
+  "patch_sha256": "5826bb188061429e650a877744c1d0ed1d9ec3726897c9a059fa2089ac4c7249",
+  "policy_review": [
+    {
+      "conclusion": "Public bool zero value is false. Driver.Run has a value receiver, so the configuration is copied at invocation. Every owned new main body receives the captured setting before metrics mounting, reconciliation and its native Run.",
+      "file": "drivers/cogent/driver.go",
+      "line": 43
+    },
+    {
+      "conclusion": "Public ManualConfig bool defaults false and flows through by-value validation into private implementation.config. Owned topology construction initializes each main body before managed mount/RunManual; caller changes to its config variable cannot alter this copied bool.",
+      "file": "drivers/cogent/manual.go",
+      "line": 44
+    },
+    {
+      "conclusion": "Property lookup occurs before collecting paint items or constructing a hint. Missing/false/wrong-type values call the original Frame.RenderWidget and return. Enabled main panes retain VerifyPaint and the prior ordered paint proof.",
+      "file": "drivers/cogent/grid_scroll.go",
+      "line": 24
+    },
+    {
+      "conclusion": "Core Property returns only the local Properties map; it does not inherit a parent/main-scene value. Core NewScene constructs a fresh node. Separate modal/popup scenes therefore lack this internal property unless explicitly configured elsewhere. Framework setter call sites are only the two owned startup paths; there is no refresh-time toggle.",
+      "file": "tree/nodebase.go",
+      "line": 415
+    }
+  ],
+  "prepared_output_sha256": {
+    "paint/render/item.go": "e003f06f7f25c9b2911bf2db426b71fe9ed8fd6c570a01b82f9ef308647621cf",
+    "paint/render/scroll.go": "78e326421238ebe43fe69950feb0dcefa077df2fd3b0a0cca20a20c594c85e1f",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll.go": "a86eed0f0c4aa51c063f012eafa4c2e6ef232192396779d806fca1382ec63e1a",
+    "paint/renderers/rasterx/scroll_plan.go": "48e473539dd4ec63240ca464a0b676b9fc7a2781ed257ad46e4a6de06597af28",
+    "paint/renderers/rasterx/scroll_plan_test.go": "918beb144f0e515a35889ead8c5b568bad16acb473b6fc6ea64d02057860d2a4",
+    "paint/renderers/rasterx/scroll_test.go": "14ed3b1ac774627260fede341053653a81b1c0c6ef5e30fb9ea300dce21b780b",
+    "paint/renderers/rasterx/text.go": "b2d87240c0779b8d3129bbe06876acb0d87c73b1e2615727b107452e8d6b5fdc",
+    "paint/renderers/rasterx/textbitmap.go": "a57e617f953bf44aee8f3c3fa101732dd6a3d7bbb81aec217ae7ef569835e607",
+    "paint/renderers/rasterx/textsvg.go": "41ee414efcaca93cb713e022ff1e148b8dbae2df9f0512eefbfb6ff8ce61b4c5"
+  },
+  "prior_review": {
+    "path": "/private/tmp/vellum-scroll-surfaces/internal-integrated-review-v5.json",
+    "sha256": "773b18352598a1b7120e3e0b1640f6abd552c8ff2f6791b32028b4ccb85a9621",
+    "status": "APPROVED_SOURCE_ONLY"
+  },
+  "qualification_state": "Source approval is final for these bytes. Final v6 driver/API/build gate was still running at certificate creation and is deliberately not claimed PASS here; producer final receipt must be bound separately.",
+  "reviewed_source_sha256": {
+    "drivers/cogent/driver.go": "d1421343afc429230e61d0598ac8fc0b907c62e26770d9a31baf9fc4fd6ee60c",
+    "drivers/cogent/grid.go": "6e5601f16448d1313de9def6b1c957eb59d763084b6d45539b94aabdecea5b0c",
+    "drivers/cogent/grid_scroll.go": "303c99adecfe24c99f5c34b8255acdc2e118b8c77c898cff31e7c02c4eca41eb",
+    "drivers/cogent/grid_scroll_offscreen_test.go": "3eacf1cee71dad3ccc027db58acba0c9b5e45e3af7d6ab23d9fe6979efd34985",
+    "drivers/cogent/manual.go": "a09acd5374f9ff024145da9c01e8ac7a47d2b72cd9b00e2bd81da6de00b91ba3",
+    "drivers/cogent/manual_offscreen.go": "57c18c35c3bcb4d6e2aa24e3ba20233bbeab58dc9cfba8fb8dfd10bbc1592cfb",
+    "drivers/cogent/native/README.md": "788bd5105beacda1922294d0ad2a16b3feeb45ff503ab27b7548ed219c9e0737",
+    "drivers/cogent/native/dependencies.json": "40eeadf399f78ef2518ea4d63bd30e18b1fcad80f431568ef2f6322b6427db01",
+    "drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch": "5826bb188061429e650a877744c1d0ed1d9ec3726897c9a059fa2089ac4c7249",
+    "drivers/cogent/native/patches/scrollsurfaces/README.md": "a29bc33d06df933a11b0b9fcdeea67b113ff76c3e9ac070a2b96ad45f566cb6a",
+    "drivers/cogent/native/patches/scrollsurfaces/original-hashes.json": "80165a4f0b589e2bd85079e02c6bb8b6d89b71361ebb91a949e2f91a24819d83",
+    "drivers/cogent/native/patches/scrollsurfaces/output-hashes.json": "62a8b4e56801266f8a1dc08e4c9d8d3e459f8925dff3d1bd7849757bce997731",
+    "drivers/cogent/prepare_test.py": "504a295278caf9dfe396cf0e939dc728a065c83d5b948a2b39718ac830a42029",
+    "paint/render/item.go": "e003f06f7f25c9b2911bf2db426b71fe9ed8fd6c570a01b82f9ef308647621cf",
+    "paint/render/scroll.go": "78e326421238ebe43fe69950feb0dcefa077df2fd3b0a0cca20a20c594c85e1f",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll.go": "a86eed0f0c4aa51c063f012eafa4c2e6ef232192396779d806fca1382ec63e1a",
+    "paint/renderers/rasterx/scroll_plan.go": "48e473539dd4ec63240ca464a0b676b9fc7a2781ed257ad46e4a6de06597af28",
+    "paint/renderers/rasterx/scroll_plan_test.go": "918beb144f0e515a35889ead8c5b568bad16acb473b6fc6ea64d02057860d2a4",
+    "paint/renderers/rasterx/scroll_test.go": "14ed3b1ac774627260fede341053653a81b1c0c6ef5e30fb9ea300dce21b780b",
+    "paint/renderers/rasterx/text.go": "b2d87240c0779b8d3129bbe06876acb0d87c73b1e2615727b107452e8d6b5fdc",
+    "paint/renderers/rasterx/textbitmap.go": "a57e617f953bf44aee8f3c3fa101732dd6a3d7bbb81aec217ae7ef569835e607",
+    "paint/renderers/rasterx/textsvg.go": "41ee414efcaca93cb713e022ff1e148b8dbae2df9f0512eefbfb6ff8ce61b4c5",
+    "specs/rendering.md": "a876cd74df46d4c70dda2b934d0e886dcecd5399f503c9067028127b605a2678"
+  },
+  "schema_version": 1,
+  "scope": {
+    "inherited_renderer": "Same12 prepared outputs and same patch as approved v5; no renderer algorithm/kernel changes in v6.",
+    "policy": "Driver/ManualConfig startup snapshot and main-scene-only hint admission; opt-in oracle and default refusal; source/spec/registration identity.",
+    "prepared_outputs": 12,
+    "selected_sources": 26
+  },
+  "source_receipt": {
+    "path": "/private/tmp/vellum-scroll-surfaces/source-v6.json",
+    "sha256": "03c10d79d627a98ba0d0242ef1b23eb4f1875a8b2663efd0060dfed4d5b0f66d"
+  },
+  "status": "APPROVED",
+  "test_review": [
+    {
+      "conclusion": "Now explicitly opts in. Existing56 actual managed frames/four DPIs preserve exact full-replay pixel comparisons and captured-area/cost/budget assertions; only config enablement changes.",
+      "file": "drivers/cogent/grid_scroll_offscreen_test.go",
+      "name": "TestManagedGridScrollSurfaceFullReplayPixels"
+    },
+    {
+      "conclusion": "Twelve actual default frames/four DPIs check config false, zero renderer Groups/CachedBytes/DescriptorBytes and no hint in actual Scene.RenderWidget output after accepted scrolling. This tests both actual default cache state and hint construction.",
+      "file": "drivers/cogent/grid_scroll_offscreen_test.go",
+      "name": "TestManagedGridScrollReuseDisabledByDefault"
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "attribution": {
+    "fact": "Existing Cogent/rasterx BSD attribution and derivation comments remain. New tests/render metadata have distinct MIT attribution; the existing kernel file has not been relabelled.",
+    "file": "paint/renderers/rasterx/fill.go"
+  },
+  "automatic_discard_assessment": {
+    "exact_evidence_substring_present_in_current_patch": true,
+    "interpretation": "Current inspected patch contains the exact quoted line. Independent substantive disposition does not rely on the provider discard reason.",
+    "raw_reason_preserved": "quoted evidence not found in drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch"
+  },
+  "decision": "The global raster antialias change is substantiated and is not refuted. It is a disclosed compatibility choice with source-bound translation/endpoint/full-replay evidence. The comment identifies a real scope/risk, but does not demonstrate a remaining correctness defect or a false old-pixel-parity claim.",
+  "disposition": "ACCEPTED_INTENTIONAL_CHANGE_NOT_UNRESOLVED_DEFECT",
+  "evidence": {
+    "full_raster_qualification": {
+      "path": "/private/tmp/vellum-scroll-surfaces/final-checks-v5/qualification.json",
+      "relationship": "V6 prepared12 outputs exactly equal qualifiedv5; final policy changes no kernel/renderer source.",
+      "selected_checks": [
+        {
+          "argv": [
+            "go",
+            "test",
+            "-race",
+            "-count=1",
+            "./paint/renderers/rasterx/...",
+            "./paint/render"
+          ],
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-scroll-surfaces/final-checks-v5/raster-race.log",
+          "log_sha256": "3def6cf170143cb240db95d9f33e2e62fbdf23fbbb5499957b075222685009de",
+          "name": "raster-race"
+        },
+        {
+          "argv": [
+            "go",
+            "vet",
+            "./paint/renderers/rasterx/...",
+            "./paint/render"
+          ],
+          "exit_code": 0,
+          "log": "/private/tmp/vellum-scroll-surfaces/final-checks-v5/raster-vet.log",
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "name": "raster-vet"
+        }
+      ],
+      "sha256": "5e6c9a83ab69bcde4beeced8a2899e716b75aa2e285655d8fb9785818c396158"
+    },
+    "meaningful_negative": {
+      "exit_code": 1,
+      "interpretation": "Restored preceding kernel compiles, then fails emitted-edge translation and actual selected-text reuse/full-replay pixel tests. This demonstrates the motivating translation defect; it is not an old-pixel parity pass.",
+      "log": "/private/tmp/vellum-scroll-surfaces/legacy-kernel-negative-v4/legacy-kernel.log",
+      "log_sha256": "e35a1571a8b63519292d198ce355de4cb9cf89e6f785b69dd74ec1ffb947d95c",
+      "path": "/private/tmp/vellum-scroll-surfaces/legacy-kernel-negative-v4/qualification.json",
+      "result": "PASS_MEANINGFUL_NEGATIVE",
+      "scope": "Original stage38 curve kernel plus unused test-only helper compiles and fails both selected actualcurve/textpixel translation tests. Currenttracked/preparedcandidatebytes unchanged.",
+      "sha256": "b72bddca36dd9cd5b552dc7bd9b1a80577171214e6712d57bf6ad717196575d6"
+    },
+    "new_specific_tests": [
+      "800 randomized quadratic/cubic exact integer translations",
+      "Wide positive/negative hull exact endpoints and next-segment continuity",
+      "Relative-coordinate hull saturation",
+      "Selected/bidi/combining text full-replay pixels at4DPIs\u00d74fractionalphases",
+      "Actual56 managed opt-in frames and12 default frames"
+    ]
+  },
+  "finding_id": "61e59df22809a345",
+  "optional_clarification": "State explicitly in release/report prose that ordinary default-mode path strokes/dashes as well as fills use the shared new kernel. This clarifies real scope; it is not evidence of an unresolved runtime defect.",
+  "raw_provider": {
+    "cli_exit_code": 0,
+    "coverage": {
+      "bytes": 102505,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "chunks": 4,
+      "complete": true,
+      "excluded": [],
+      "files": 16,
+      "llmCalls": 5,
+      "reviewer": [
+        {
+          "model": "claude-sonnet-5-5",
+          "provider": "anthropic"
+        }
+      ],
+      "skipped": [],
+      "tokens": [
+        {
+          "costUSD": 0.417348,
+          "input": 93199,
+          "model": "claude-sonnet-5-5",
+          "output": 23095,
+          "provider": "anthropic"
+        }
+      ],
+      "truncatedBytes": 0,
+      "widenedFiles": 2
+    },
+    "discarded_findings": 1,
+    "discarded_record": {
+      "finding": {
+        "category": "correctness",
+        "confidence": 0.4,
+        "evidence": "origin := fixed.Point26_6{X: min(r.A.X, b.X, c.X), Y: min(r.A.Y, b.Y, c.Y)}",
+        "id": "61e59df22809a345",
+        "locations": [
+          {
+            "lines": {
+              "end": 1200,
+              "start": 1190
+            },
+            "path": "drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch"
+          }
+        ],
+        "message": "The scroll-surface patch rewrites the shared Bezier flattening in fill.go (QuadBezierF and CubeBezierF). Every path fill and stroke in rasterx goes through it, so output changes for all rendering, not just scrolling surfaces. Coordinates are now flattened relative to the control-hull minimum, and float32 truncation toward zero is applied to those relative values instead of absolute ones. For curves that cross zero this can move individual edge samples by one fixed unit compared with the old output, which can shift antialiasing and break existing golden-image tests. The curve tests only check translation invariance, not parity with the previous output.",
+        "model": "claude-sonnet-5-5",
+        "provider": "anthropic",
+        "severity": "medium",
+        "suggestion": "Either confirm and document that the new flattening is acceptable for all renderers by running the existing golden and raster tests, or confine the translation-stable flattening to the scroll-verification path. Add a regression test that compares the new flattening against the old one for non-translated curves.",
+        "tags": [
+          "rendering",
+          "regression-risk",
+          "fill"
+        ],
+        "title": "Global curve-flattening change alters output for all rendering"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch"
+    },
+    "json_path": "/private/tmp/vellum-scroll-surfaces/prism-v6/prism.json",
+    "json_sha256": "ea63810296c93c6b46f35e002a4f58c97cd5cf688b2127d9176d38daa32b7c4b",
+    "process_path": "/private/tmp/vellum-scroll-surfaces/prism-v6/process.json",
+    "process_sha256": "863ec3afe7e477daab49f6d964cf5e5ae614679285fd469c52c0f013e03c0465",
+    "retained_findings": 0
+  },
+  "reviewer_method": "Read-only source/callsite/test/spec inspection plus stdlib proof/log/source hash validation. Original provider record remains byte-identical.",
+  "schema_version": 1,
+  "source_evidence": [
+    {
+      "fact": "Fixed Filler quadratic/cubic flattening uses relative control-hull coordinates, bounds intermediate coordinates, and emits supplied fixed terminal endpoints exactly. Relative float32 truncation can intentionally differ from previous absolute truncation.",
+      "file": "paint/renderers/rasterx/fill.go",
+      "lines": [
+        140,
+        150,
+        158,
+        186,
+        201,
+        206
+      ]
+    },
+    {
+      "fact": "Stroker delegates quadratic/cubic samples to the same shared Filler helpers; dashed stroking shares this path. The change is raster-wide, not confined to opted-in scrolling groups.",
+      "file": "paint/renderers/rasterx/stroke.go",
+      "lines": [
+        550,
+        588
+      ]
+    },
+    {
+      "fact": "Ordinary path fills/strokes use Raster/Filler independently of ScrollSurface hint admission. Turning off ExperimentalGridScrollReuse does not select the previous curve kernel.",
+      "file": "paint/renderers/rasterx/renderer.go",
+      "lines": [
+        165,
+        201,
+        246
+      ]
+    },
+    {
+      "fact": "Intentional antialias edge change is documented; logical paths, shaping and interaction geometry unchanged. The report explicitly states new full-replay comparisons do not establish whole old-pixel parity.",
+      "file": "specs/rendering.md",
+      "line": 222
+    }
+  ],
+  "source_sha256": {
+    "docs/reports/macos-scroll-surfaces/README.md": "e18ff43a314f88b4812525f4d0c852922528648724ba0d8354af030bc94040b5",
+    "drivers/cogent/native/patches/scrollsurfaces/0039-ordered-scroll-surfaces.patch": "5826bb188061429e650a877744c1d0ed1d9ec3726897c9a059fa2089ac4c7249",
+    "drivers/cogent/native/patches/scrollsurfaces/README.md": "a29bc33d06df933a11b0b9fcdeea67b113ff76c3e9ac070a2b96ad45f566cb6a",
+    "paint/renderers/rasterx/bezier_test.go": "c8e5c91870b5cc60801d7fd56e4100b568679d8cee909afba198d1946e0ae995",
+    "paint/renderers/rasterx/curve_translation_test.go": "b0e728e4d59c35f18761bc97234af4c85f6316fb99d019d01971c665ab16c7ce",
+    "paint/renderers/rasterx/fill.go": "aae69bd8d0be9a0296a1e53884a5463be905c4dbcbe382c98696913a89a2d28d",
+    "paint/renderers/rasterx/raster_test.go": "a786fcd22e22af020278bba8a1f29c0aca470bbf946c4f211ab308ff2963d43b",
+    "paint/renderers/rasterx/renderer.go": "5cbe26edd79107a65c1028a7267fa424f587deece4048046caed030c455998d3",
+    "paint/renderers/rasterx/scroll_test.go": "14ed3b1ac774627260fede341053653a81b1c0c6ef5e30fb9ea300dce21b780b",
+    "paint/renderers/rasterx/stroke.go": "73e4a41f1e24b240583c055079a985db51d8edb8ebfed3e8a0e5d557feab81c5",
+    "specs/rendering.md": "a876cd74df46d4c70dda2b934d0e886dcecd5399f503c9067028127b605a2678"
+  },
+  "status": "RESOLVED_DOCUMENTED_COMPATIBILITY_CHANGE",
+  "test_limits": [
+    "Existing full raster tests exercise fills, strokes, dashed curves, gradients and Bezier mathematics and pass; several raster image fixtures write PNG outputs rather than comparing to a preceding-kernel golden image. Their passes do not prove old output parity.",
+    "No exhaustive old/new pixel-parity guarantee for all filled/stroked paths is established or promised. New full-replay differential tests use the current kernel.",
+    "No new provider, Go/runtime/native/GUI test was executed in this disposition review.",
+    "The source and contract support intentional compatibility acceptance, not latency, physical GPU presentation or complete Mac acceptance."
+  ],
+  "unresolved_defects": []
+}
