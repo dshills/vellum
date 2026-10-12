@@ -67,6 +67,7 @@ type nativeWindow struct {
 	root             *record
 	rootMu           sync.Mutex
 	lastFocus        ui.FocusRequest
+	axScope          string // originating event loop, under rootMu
 	stopLoss         func()
 	lossMu           sync.Mutex
 	input            atomic.Pointer[textWindow]

@@ -1,0 +1,146 @@
+import hashlib,io,json,shutil,tarfile
+from pathlib import Path
+r=Path('/private/tmp/vellum-large-data');p=Path('/private/tmp/vellum-macos-quiet');out=r/'docs/reports/macos-modal-geometry';records=out/'records'
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+sources=json.loads((p/'source-final.json').read_text())['sources'];assert all(sha(r/n)==h for n,h in sources.items())
+cert=json.loads((p/'source-review.json').read_text());assert cert['status']=='APPROVED_SOURCE' and {Path(n).relative_to(r).as_posix():h for n,h in cert['reviewed_source_sha256'].items()}==sources
+prism=json.loads((p/'prism-v1/prism.json').read_text());assert prism['coverage']['complete'] and prism['coverage']['files']==5 and len(prism['findings'])==1
+assert json.loads((p/'prism-disposition.json').read_text())['status']=='FIXED'
+qualifying=['offscreen-race-final','vet-final','drop-outcome-race','drop-bounded-a','drop-bounded-b','accessibility-reviewed','render-reviewed','external-ax-check','grid-cpu-campaign','grid-gpu-campaign','idle-campaign']
+receipts={}
+for name in qualifying:
+ d=json.loads((p/(name+'.json')).read_text());assert d['exit_code']==0 and d['error'] is None and d['source_delta_stable']
+ for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+ required={n:h for n,h in sources.items() if name!='render-reviewed' or n in ['drivers/cogent/accessibility.go','drivers/cogent/driver.go']}
+ assert all(d['source_delta_before'].get(n)==h for n,h in required.items())
+ # The render binary predates the fixture-only join correction; its complete
+ # production library hashes match. All other final sources are byte-stable.
+ assert all(d['source_delta_before'].get(n)==sources[n] for n in ['drivers/cogent/accessibility.go','drivers/cogent/driver.go'])
+ receipts[name]={'path':name+'.json','sha256':sha(p/(name+'.json')),'exit_code':0}
+expected=json.loads((p/'drop-bounded-timeout.json').read_text());assert expected['exit_code']==1 and expected['error'] is None and expected['elapsed_seconds']<6
+prepared={f.relative_to(r/'drivers/cogent/build').as_posix():sha(f) for module in ['upstream','typesetting'] for f in sorted((r/'drivers/cogent/build'/module).rglob('*')) if f.is_file()}
+prior=json.loads(Path('/private/tmp/vellum-macos-notifications/qualification.json').read_text());assert len(prepared)==6174 and prepared==prior['prepared']
+perf={}
+def redact(x):
+ if isinstance(x,dict):return {k:('<redacted>' if 'serial' in k.lower() or 'uuid' in k.lower() else redact(v)) for k,v in x.items()}
+ if isinstance(x,list):return [redact(v) for v in x]
+ return x
+for mode in ['cpu','gpu']:
+ directory=p/('performance-'+mode);d=json.loads((directory/'summary.json').read_text());assert d['result']=='MEASURED' and d['runs']==5 and len(d['cases'])==4 and d['samples_per_run']==120 and d['warmup']==128 and d['binary_sha256']==sha(p/'grid-reviewed')
+ assert d['selected_inputs_before']==d['selected_inputs_after']
+ assert all(len(c['runs'])==5 and all(v['exit_code']==0 and v['result']=='PASS' for v in c['runs']) for c in d['cases'].values())
+ perf[mode]={'warm_target_met':d['warm_target_met'],'summary_sha256':sha(directory/'summary.json'),'cases':{n:{'p95_ms':c['timings_ns']['ui_work_ns']['pooled']['p95']/1e6,'p99_ms':c['timings_ns']['ui_work_ns']['pooled']['p99']/1e6} for n,c in d['cases'].items()}}
+ m=json.loads((directory/'machine.json').read_text());m['displays_gpu']['stdout']=json.dumps(redact(json.loads(m['displays_gpu']['stdout'])),indent=2)
+ (directory/'machine.redacted.json').write_text(json.dumps(m,indent=2)+'\n')
+ (directory/'machine-redaction.json').write_text(json.dumps({'original_sha256':sha(directory/'machine.json'),'archived_derivative':'machine.redacted.json','serial_uuid_values_redacted':True,'raw_retained_locally_not_archived':True},indent=2)+'\n')
+idle=[json.loads(l) for l in (p/'idle-campaign.stdout').read_text().splitlines() if l.strip()];assert len(idle)==3 and all(d['idle_sample_seconds']>=60 for d in idle)
+ax=json.loads((p/'external-ax-result.json').read_text());assert ax['result']=='PASS_BOUNDED_EXTERNAL_AX_RESPONSE' and all(d['exit_code']==0 and d['elapsed_seconds']<8 for d in ax['queries'])
+for n,h in ax.items():
+ if n.startswith('external-ax-') and n.endswith('_sha256'):assert sha(p/n[:-7])==h
+q={'result':'PASS_MAC_MODAL_GEOMETRY','base_commit':'5a1f7f934083bf591427b8e51c9deea72e55d37e','source':sources,'prepared':prepared,'receipts':receipts,'source_review_sha256':sha(p/'source-review.json'),'prism_raw_exit_code':1,'prism_findings':1,'prism_findings_resolved':True,'performance':perf,'idle_cpu_percent_one_core':[d['idle_cpu_percent_one_core'] for d in idle],'idle_target_met':all(d['idle_cpu_percent_one_core']<=.5 for d in idle),'external_ax_query_seconds':[d['elapsed_seconds'] for d in ax['queries']],'live_tests':True,'os_preferences_changed':False,'general_pasteboard_written':False,'physical_drag_qualified':False,'human_ime_voiceover_qualified':False,'macos_completion':False}
+(p/'qualification.json').write_text(json.dumps(q,indent=2)+'\n')
+records.mkdir(parents=True,exist_ok=False)
+shutil.copy2(Path(__file__),records/'archive-producer.py.txt')
+files={}
+for f in sorted(p.rglob('*')):
+ if not f.is_file() or f.is_symlink():continue
+ n=f.relative_to(p).as_posix();first=f.relative_to(p).parts[0]
+ top=f.parent==p and f.suffix in ['.json','.stdout','.stderr','.py','.txt']
+ nested=first in ['prism-v1','performance-cpu','performance-gpu'] or first.startswith('source-review-')
+ if not (top or nested) or f.name=='machine.json':continue
+ if f.suffix not in ['.json','.stdout','.stderr','.py','.txt','.log']:continue
+ files[n]=f.read_bytes()
+index={n:hashlib.sha256(b).hexdigest() for n,b in files.items()}
+(records/'evidence-index.json').write_text(json.dumps(index,indent=2)+'\n')
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz') as tf:
+ for n,b in files.items():
+  info=tarfile.TarInfo(n);info.size=len(b);info.mode=0o644;info.mtime=0;tf.addfile(info,io.BytesIO(b))
+with tarfile.open(archive) as tf:
+ actual={m.name:hashlib.sha256(tf.extractfile(m).read()).hexdigest() for m in tf.getmembers() if m.isfile()}
+assert actual==index
+rows=[]
+for n in perf['cpu']['cases']:
+ c,g=perf['cpu']['cases'][n],perf['gpu']['cases'][n];rows.append(f"| {n} | {c['p95_ms']:.3f} / {c['p99_ms']:.3f} | {g['p95_ms']:.3f} / {g['p99_ms']:.3f} |")
+text='''# Mac modal geometry and native checks
+
+Closing a label-only modal could restore its background accessibility elements
+with zero-size frames. Escape did dismiss the modal; the cached main scene did
+not render again after native modal publication pruned the old background frames.
+The driver now requests one main-host render when the visible accessibility scope
+changes. Unchanged scopes keep demand painting. Removed elements remain retired.
+
+The Cocoa file-drop regression requires positive background frames after Escape
+and controlled closure, then routes another drop through the restored frame. It
+moves no physical pointer. The test also retains the last inspection on failure
+and bounds the worker shutdown join with a five-second grace period.
+
+## Verification and review
+
+The final six source/contract files have internal approval. Fresh full native
+offscreen race and vet suites pass; outcome tests pass twenty race repetitions.
+Final native modal/drop, broader accessibility and demand-rendering checks pass.
+The initial root/offscreen attempts were denied temporary Unix-socket binding in
+the sandbox; authorized retries pass. Baseline main-queue normal/panic, rendering,
+platform, multiwindow, lifetime, history and docking receipts retain their original
+5a1f7f9 identity; intermediate fix receipts remain historical versions.
+
+Prism ran once with Anthropic Claude Sonnet 5.5 on five original files, complete
+coverage, 5,854 input and 1,329 output tokens. Its raw exit 1 and one medium finding
+are preserved: the fixture join could wait indefinitely. The bounded join and its
+new test file were internally reviewed and tested afterward. The final six-file
+approval and explicit disposition bind that correction; no second provider run
+was made. Full Prism coverage refers to its original five-file input.
+
+A separate trusted, PID/executable/window-bound AX inspector answered the two
+idle native windows in 0.092 and 0.048 seconds. Its dump route reads a partial tree,
+performs no activation or input, and has an eight-second watchdog. The no-drag
+fixture then closed normally with its expected deadline failure. This narrows but
+does not diagnose two earlier CUA app-selection calls lasting 3,885 and 9,262
+seconds. Those physical-drag attempts timed out without issuing a drag. The test
+Finder window was closed, returning to Desktop. Physical Finder interaction
+remains unqualified. The external receipt producer's pending-wrapper-stdout hash
+was removed; original and corrected receipts are retained, with query data unchanged.
+
+## Performance observations
+
+The authorized fifteen-hour window began 2026-10-12 19:07:09 UTC and ends
+2026-10-13 10:07:09 UTC. This host is an Apple M4 Pro Mac with 64 GiB RAM and one
+5120×1440 60 Hz display. Background processes remain observable; user absence is
+not proof of an idle OS. No user processes or power/display settings were changed.
+
+Both renderers completed five runs for each fixed/variable-height 10k/million-row
+case, 120 measured events after 128 warm events. All forty runs passed record and
+matched-geometry validation, including the 400-cell workload. Timing targets
+remain total UI work p95 ≤4 ms and p99 ≤6 ms. Both campaigns fail those targets.
+These are elapsed same-ticket UI regions, not physical input-to-photon timing.
+
+| Stored rows/heights | CPU p95 / p99 ms | GPU p95 / p99 ms |
+|---|---:|---:|
+'''+ '\n'.join(rows)+f'''
+
+Three small hello-fixture idle runs sampled about 63 seconds each and observed
+one-core CPU percentages {', '.join(f'{d["idle_cpu_percent_one_core"]:.3f}%' for d in idle)}.
+They meet that fixture's 0.5% target; they do not qualify the integrated
+1,000-control workbench, kernel wakeups or endurance/native/GPU memory.
+
+## Records and remaining gates
+
+[Checkpoint](records/checkpoint.json) binds the [archive](records/evidence.tar.gz)
+and its per-member [index](records/evidence-index.json). Qualification binds all
+6,174 prepared dependency files and the final source hashes. Raw benchmark
+machine records retain serial fields locally; archived machine.redacted.json
+derivatives remove serial/UUID values and retain the original digest.
+No general clipboard write, IME/VoiceOver toggle or OS preference change occurred.
+Earlier deferred evidence remains unchanged.
+
+Rich clipboard interoperation, tray interaction/teardown, notification permission
+and presentation, physical dragging, human IME/VoiceOver, multiple displays,
+physical GPU loss, full P4/P6/P9/P11 performance/endurance and distribution rights
+remain separate gates. This checkpoint fixes the reproduced modal defect and
+records bounded checks; it does not complete the Mac UI framework.
+'''
+(out/'README.md').write_text(text)
+checkpoint={'result':q['result'],'base_commit':q['base_commit'],'qualification_sha256':sha(p/'qualification.json'),'source_review_sha256':sha(p/'source-review.json'),'prism_provider':'anthropic','prism_model':'claude-sonnet-5-5','prism_coverage_complete':True,'prism_original_coverage_files':5,'final_internally_reviewed_files':6,'prism_findings':1,'prism_findings_resolved':True,'archive':{'sha256':sha(archive),'members':len(index),'index_sha256':sha(records/'evidence-index.json')},'report_sha256':sha(out/'README.md'),'live_tests':True,'macos_completion':False}
+(records/'checkpoint.json').write_text(json.dumps(checkpoint,indent=2)+'\n')
+print(json.dumps({'archive_members':len(index),'archive_sha256':sha(archive),'qualification_sha256':sha(p/'qualification.json'),'report_sha256':sha(out/'README.md')}))

@@ -319,3 +319,22 @@ Mac acceptance remain separate gates.
 Live windows, input and performance checks are deferred while the user is using
 the computer. They resume only after the user explicitly says it is free.
 Code, preparation, offscreen checks, reviews and local commits may continue.
+
+## Modal geometry and authorized native checks
+
+[Modal geometry and native checks](../docs/reports/macos-modal-geometry/README.md)
+fix a reproduced background accessibility-frame loss after a label-only modal
+closes. Scope transitions request one main-host render; unchanged scopes keep
+demand painting. Final native/offscreen regressions and the bounded fixture
+shutdown correction pass, with one Prism finding preserved and resolved through
+internal review and tests.
+
+During the explicitly authorized fifteen-hour window, both CPU and opt-in GPU
+grid campaigns completed five matched runs per fixed/variable 10k/million-row
+case. Both still fail unchanged warm latency targets. Three small-fixture idle
+CPU measurements pass their 0.5% one-core target over 63-second samples. A
+separate bounded read-only external AX query responds promptly in both windows;
+physical Finder drag remains unqualified after CUA app-selection stalls. No OS
+preference or general clipboard write occurred. Human IME/VoiceOver, native
+service interoperation, physical display/GPU cases, integrated performance and
+endurance, distribution rights and full Mac completion remain open.

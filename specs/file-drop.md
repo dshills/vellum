@@ -43,3 +43,11 @@ include that list. It does not import or persist file contents.
 Acceptance needs portable payload tests, native routing/lifetime tests, actual
 Cocoa file-URL receive-path tests, and a separate physical Finder drag. A selector
 fixture alone does not establish the Finder workflow or OS feedback behavior.
+
+The Cocoa receive fixture also requires positive restored background frames
+after Escape and controlled dismissal of a label-only modal, without a resize,
+pointer move or style change. A subsequent drop uses that restored frame. Its
+timeout reports the last reachable accessibility inspection; native shutdown
+cancels and joins the fixture worker so the diagnostic cannot be lost to a
+result/deadline race. A five-second grace period bounds that join and reports an
+explicit failure if the worker does not finish.

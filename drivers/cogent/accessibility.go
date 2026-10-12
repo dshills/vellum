@@ -247,7 +247,21 @@ func syncAccessibility(w *nativeWindow, a *app.Application) {
 	accessibilityStampVirtualGeometry(w.root)
 	accessibilityStampDialogNamespaces(w.root, "")
 	nodes, handlers := accessibilitySnapshot(w.root, b)
+	// A modal projection retires background Cocoa elements and their geometry.
+	// Removing a modal can recompose a cached main Scene without rendering its
+	// accessibility host. Render the restored scope once so its newly recreated
+	// elements receive current frames; unchanged scopes keep demand painting.
+	scope := ""
+	if len(nodes) != 0 {
+		scope = nodes[0].ID
+	}
 	b.updateOwned(nodes, handlers)
+	if scope != w.axScope {
+		w.axScope = scope
+		if !accessibilityTreeNil(w.host) {
+			w.host.NeedsRender()
+		}
+	}
 }
 func closeAccessibility(w *nativeWindow) {
 	if b := windowAccessibilityBridge(w); b != nil {

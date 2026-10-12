@@ -16,6 +16,13 @@ Workbench dock headers publish panel choices and each active panel’s managed c
 
 Tabs publish enabled header choices and the selected page. Closed or dismissed dialogs publish no modal content. An active enabled modal isolates the accessibility tree and managed keyboard order from its underlying window. Escape calls its controlled dismissal. A modal seeds an explicit first enabled own-scope native start-focus target before Run, so its first queued keyboard event does not depend on deferred Shown; nested modal Scenes establish their own focus, and an empty managed scope uses its body as the Escape handler anchor. Ordinary Tab/Shift-Tab follows descriptor order and wraps in the active scope; a tabs descriptor contributes one header target followed by its selected page. Custom extensions own their internal keyboard order.
 
+When the visible accessibility scope changes, the originating refresh requests
+one render of the main accessibility host. This restores current background
+frames after a modal retires its native elements, including a label-only modal
+closed through Escape or a controlled `Open` change. Unchanged scopes retain
+demand painting. Removed elements and their cached frames remain retired; a
+restored identifier receives a new native object and a completed geometry update.
+
 Virtual tables and outlines publish a bounded materialized viewport, total/index metadata, stable domain IDs, selection, outline depth/expansion and previous/next page actions. Both table and outline pagers have real native button targets and completed geometry. Accessible page and row actions operate on the owner. Table paging clamps to the last valid viewport and refuses stale viewport counts or model errors. Outline press selects only; independent native expand/collapse actions preserve selection, reread current materialized child/expansion state and refuse leaves, offscreen rows or unadvertised actions. Cocoa uses `setAccessibilityExpanded:` and publishes `isAccessibilityExpanded`. A stale row action never selects a different domain row when a native slot is recycled. Offscreen rows are reached through paging; this implementation does not claim arbitrary offscreen row loading through the system accessibility table API.
 
 ## Managed grid publication

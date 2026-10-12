@@ -30,8 +30,13 @@ type delivery struct {
 
 func main() {
 	interactive := flag.Bool("interactive", false, "wait for a physical drag rather than the Cocoa fixture")
+	trace := flag.Bool("trace", false, "trace native event dispatch and focus for diagnosis")
 	duration := flag.Duration("timeout", 30*time.Second, "bounded check duration")
 	flag.Parse()
+	if *trace {
+		core.DebugSettings.EventTrace = true
+		core.DebugSettings.FocusTrace = true
+	}
 	a, err := app.New(app.Config{})
 	must(err)
 	defer a.Close()
@@ -91,11 +96,10 @@ func main() {
 		a.Close()
 	}()
 	runErr := a.Run(ctx, cogent.Driver{})
-	select {
-	case err = <-outcome:
-	case <-ctx.Done():
-		err = ctx.Err()
-	}
+	// Unblock the worker on early native shutdown, then preserve its diagnostic
+	// instead of racing its result against the already-expired context.
+	cancel()
+	err = awaitOutcome(outcome, 5*time.Second)
 	must(errors.Join(runErr, err))
 	if *interactive {
 		fmt.Println("PASS physical external file drop")
@@ -103,10 +107,32 @@ func main() {
 		fmt.Println("PASS Cocoa file-URL receive, exact names, child admission/refusal, parent copies, callback replacement/removal, disabled fallback, independent windows, modal host and background blocking")
 	}
 }
+
+var errWorkerOutcome = errors.New("file-drop fixture worker did not finish after native shutdown")
+
+func awaitOutcome(outcome <-chan error, grace time.Duration) error {
+	// A diagnostic already delivered wins even if the grace period is zero.
+	select {
+	case err := <-outcome:
+		return err
+	default:
+	}
+	timer := time.NewTimer(grace)
+	defer timer.Stop()
+	select {
+	case err := <-outcome:
+		return err
+	case <-timer.C:
+		return errWorkerOutcome
+	}
+}
+
 func waitElement(ctx context.Context, window, id, name string) (cogent.AccessibilityElement, error) {
+	var last cogent.AccessibilityInspection
 	for {
 		s, err := cogent.InspectAccessibility(ctx, window)
 		if err == nil && s.Reachable {
+			last = s
 			for _, e := range s.Elements {
 				if e.DomainID == id && (name == "" || e.Name == name) && e.Frame[2] > 0 && e.Frame[3] > 0 {
 					return e, nil
@@ -115,7 +141,7 @@ func waitElement(ctx context.Context, window, id, name string) (cogent.Accessibi
 		}
 		select {
 		case <-ctx.Done():
-			return cogent.AccessibilityElement{}, fmt.Errorf("waiting for %s/%s %s: %w", window, id, name, ctx.Err())
+			return cogent.AccessibilityElement{}, fmt.Errorf("waiting for %s/%s %s: %w; last inspection: %+v", window, id, name, ctx.Err(), last)
 		case <-time.After(15 * time.Millisecond):
 		}
 	}
@@ -232,6 +258,27 @@ func check(ctx context.Context, a *app.Application, deliveries <-chan delivery, 
 	case d := <-deliveries:
 		return fmt.Errorf("modal background drop leaked: %+v", d)
 	default:
+	}
+	// A controlled close must also republish the unchanged background's
+	// geometry. Neither path injects a resize, pointer move, or style update.
+	if err := a.Do(func() { *modal = true; a.Invalidate("drop") }); err != nil {
+		return err
+	}
+	if _, err := waitElement(ctx, "drop", "modal-child", ""); err != nil {
+		return err
+	}
+	if err := a.Do(func() { *modal = false; a.Invalidate("drop") }); err != nil {
+		return err
+	}
+	if _, err := waitElement(ctx, "drop", "help", ""); err != nil {
+		return err
+	}
+	// The restored positive frame is usable by native drop routing too.
+	if err := fixture(ctx, "drop", "help", mainTitle, paths); err != nil {
+		return err
+	}
+	if err := expect(ctx, deliveries, "root", "drop", "root", paths); err != nil {
+		return err
 	}
 	return nil
 }
