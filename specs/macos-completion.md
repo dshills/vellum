@@ -32,6 +32,12 @@ Native dispatch now has explicit synchronous failure and desktop wake terminatio
 semantics. See [contract](native-dispatch.md) and its evidence; broad panic resource
 recovery remains outside that contract.
 
+The optional [clipboard extension](clipboard.md) implements bounded text, PNG,
+HTML and custom MIME representations, first-item consistency and capacity-aware
+cancellation/shutdown. Its native parser and dispatch policy can be checked
+without accessing the clipboard. Actual rich pasteboard roundtrips and external
+app interoperation remain deferred with the other live checks.
+
 Document history adds bounded sparse undo/redo, revision-aware dirty/save handling
 and focused native text precedence. [Document persistence](document.md) adds asynchronous save/open and native
 unsaved-close prompts with a working component-document consumer. Its bounded

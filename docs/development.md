@@ -158,3 +158,14 @@ Do not automatically retry actions after a lost response. See the
 [protocol and lifetime contract](../specs/automation.md). Headless socket tests
 are included in root `go test -race ./...`; workbench domain tests run with the
 native module's `offscreen` tag and create no windows.
+
+## Clipboard data
+
+Obtain `Application.Clipboard()` after the native driver publishes services and
+inspect its capabilities. Read explicit formats such as `text/plain`, `image/png`
+and `application/vnd.vellum+json`; write one slice of `app.ClipboardRepresentation`
+from a worker. Keep input bytes immutable until the method returns. See the
+[clipboard contract](../specs/clipboard.md) for limits and cancellation semantics.
+`go test -race -run '^TestClipboard' .` in `drivers/cogent` checks the native
+parser and injected queue without opening or reading a pasteboard. Live
+interoperation tests remain separate and must wait for a free computer.

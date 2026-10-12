@@ -60,23 +60,6 @@ void vellumCancelFile(uint64_t token) {
         [vellumPanels removeObjectForKey:@(token)];
     });
 }
-void vellumReadClipboard(uint64_t token) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!vellumServiceActive(token)) return;
-        NSString *text = [[NSPasteboard generalPasteboard] stringForType:NSPasteboardTypeString];
-        vellumServiceResult(token, (char *)(text ?: @"").UTF8String, 0);
-    });
-}
-void vellumWriteClipboard(uint64_t token, const char *text) {
-    NSString *value = text ? [NSString stringWithUTF8String:text] : nil;
-    if (!value) { vellumServiceResult(token, "", 2); return; }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!vellumServiceActive(token)) return;
-        NSPasteboard *board = [NSPasteboard generalPasteboard];
-        [board clearContents]; BOOL ok = [board setString:value forType:NSPasteboardTypeString];
-        vellumServiceResult(token, "", ok ? 0 : 2);
-    });
-}
 void vellumSetMenu(uint64_t token, const char *json) {
     NSString *payload = json ? [NSString stringWithUTF8String:json] : nil;
     if (!payload) { vellumServiceResult(token, "", 2); return; }

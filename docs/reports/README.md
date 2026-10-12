@@ -4,6 +4,7 @@ These reports preserve investigation outcomes and their original validation scop
 The [implementation status](../implementation.md) describes the current framework.
 
 - [Large stored-tree adapter](macos-large-tree/README.md)
+- [Mac clipboard data (offscreen)](macos-clipboard-data/README.md)
 - [Native grid timing foundation](macos-grid-performance/README.md)
 - [Stored-data worker grid](macos-grid-loaded/README.md)
 - [Managed native grid adapter](macos-grid-native/README.md)

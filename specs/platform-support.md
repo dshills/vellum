@@ -10,7 +10,7 @@ modified by these checks.
 
 | Platform | Clipboard | Single-file chooser | Command menus | Target runtime evidence in this checkout |
 | --- | --- | --- | --- | --- |
-| macOS | Existing Cocoa text transport | Existing Cocoa panels | Existing process native menu | Existing macOS foundation evidence |
+| macOS | Cocoa text/PNG/HTML/custom MIME, bounded optional extension | Existing Cocoa panels | Existing process native menu | Existing foundation evidence; new rich clipboard runtime deferred |
 | Windows | GLFW Win32 clipboard on native main queue | Windows PowerShell 5.1 STA process using WinForms OpenFileDialog/SaveFileDialog | Cogent menu bar per native window | Not executed on this macOS host |
 | Linux X11 | GLFW X11 clipboard on native main queue | GTK chooser through Zenity | Cogent menu bar per native window | Not executed on this macOS host |
 | Linux Wayland session with XWayland | Same compiled X11 backend; must verify XWayland explicitly | GTK chooser availability depends on desktop | Same per-window bar | Not qualified |
@@ -25,7 +25,11 @@ OS windows. They do not claim Win32 HMENU or Linux global-menu integration.
 
 ## Transport and ownership
 
-Clipboard work uses the pinned desktop main queue with context/shutdown selects.
+Mac rich clipboard ownership, bounds and capability reporting are defined in
+[clipboard representations](clipboard.md). Its new offscreen parser/dispatch
+checks do not qualify actual pasteboard or cross-app behavior.
+
+Windows/Linux clipboard work uses the pinned desktop main queue with context/shutdown selects.
 Each callback checks cancellation again before executing, and results travel over
 a private buffered channel: no canceled caller storage is later mutated. A native
 clipboard call already executing can finish while cancellation is reported.

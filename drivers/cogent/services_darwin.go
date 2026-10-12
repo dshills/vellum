@@ -10,8 +10,6 @@ package cogent
 void vellumChooseFile(uint64_t token, const char *json);
 void vellumCancelFile(uint64_t token);
 void vellumSetMenu(uint64_t token, const char *json);
-void vellumReadClipboard(uint64_t token);
-void vellumWriteClipboard(uint64_t token, const char *text);
 void vellumShutdown(void);
 */
 import "C"
@@ -112,14 +110,24 @@ func nativeChooseFile(ctx context.Context, o app.FileOptions) (string, error) {
 	})
 }
 func nativeReadClipboard(ctx context.Context) (string, error) {
-	return nativeOperationRun(ctx, func(token uint64) { C.vellumReadClipboard(C.uint64_t(token)) })
+	wire, err := nativeClipboardData(ctx, []app.ClipboardRepresentation{{MIME: "text/plain"}}, false)
+	if err != nil {
+		return "", err
+	}
+	data, err := decodeClipboardResponse(wire, []string{"text/plain"})
+	if err != nil {
+		return "", err
+	}
+	if len(data) == 0 {
+		return "", nil
+	}
+	return string(data[0].Data), nil
 }
 func nativeWriteClipboard(ctx context.Context, value string) error {
-	_, err := nativeOperationRun(ctx, func(token uint64) {
-		text := C.CString(value)
-		defer C.free(unsafe.Pointer(text))
-		C.vellumWriteClipboard(C.uint64_t(token), text)
-	})
+	if len(value) > app.ClipboardMaxRepresentationBytes {
+		return app.ErrClipboardTooLarge
+	}
+	_, err := nativeClipboardData(ctx, []app.ClipboardRepresentation{{MIME: "text/plain", Data: []byte(value)}}, true)
 	return err
 }
 func nativeSetMenu(ctx context.Context, groups []nativeMenuGroup, service *platformServices) error {
@@ -211,6 +219,7 @@ func nativeMenuAction(token uint64, index int) {
 
 // Pending callers are released even if Cocoa no longer services its main queue.
 func stopNativeCallbacks() {
+	clipboardDispatch.stop()
 	nativeCallbacks.Lock()
 	defer nativeCallbacks.Unlock()
 	// The native main loop is single-run per process (Driver.processRun).

@@ -1,0 +1,49 @@
+{
+  "status": "APPROVED",
+  "scope": "Read-only control-flow safety review of proposed local clipboard promotion wrapper only. Qualification/checkpoint/report/archive are still being produced and are not finally approved by this certificate. No execution, commands/Git, source edits, UI/pasteboard/runtime tests, provider or external transmission.",
+  "producer_path": "/private/tmp/vellum-macos-clipboard-data/promote.py",
+  "producer_sha256": "2cb3112a7cbf8f8537f53b277e39a1ea7cfb5a2d211b04d6af061c397680a712",
+  "base_commit": "c42e25571c9ea23e46f94d49c20bbb1736f26d09",
+  "prior_approved_wrapper": {
+    "review_path": "/private/tmp/vellum-macos-automation/promotion-wrapper-review-v1.json",
+    "review_sha256": "091c86d3e8d09fdcf5c967248d2ecfeca2bf609bf8a58358b792986bfb0029df",
+    "producer_sha256": "ce03b7a5b890f8f829cce24f582dd67a2445cce28efb56516122dd5fd17c4c48"
+  },
+  "mechanical_delta": "Exact adaptation of approved automation wrapper after phase/report/artifact labels, base, qualification result, scope prose and not-yet-known raw findings count guard substitution. Other clean/branch/sole-parent/source/ff-only/timeout/finally/identity control flow is unchanged.",
+  "findings": [],
+  "prerequisites": {
+    "status": "PENDING_FINAL_EVIDENCE",
+    "qualification_path": "/private/tmp/vellum-macos-clipboard-data/qualification.json",
+    "required_result": "PASS_OFFSCREEN_MAC_CLIPBOARD",
+    "checkpoint_path": "/private/tmp/vellum-large-data/docs/reports/macos-clipboard-data/records/checkpoint.json",
+    "archive_path": "/private/tmp/vellum-large-data/docs/reports/macos-clipboard-data/records/evidence.tar.gz",
+    "qualification_checkpoint_archive_hashes_verified": false,
+    "final_source_prepared_identity_verified": false,
+    "expected_prepared_files": 6172,
+    "final_prism_count_and_resolution_verified": false,
+    "note": "Absent/malformed/nonpassing/mismatched prerequisite files fail before destination creation/fetch. Final evidence/source review and one clean sole-child scratch commit must exist before execution."
+  },
+  "checked_properties": [
+    "Both scratch and canonical must be clean. Canonical HEAD exact base and branch codex/foundation-completion; scratch must be a different commit with exactly one parent equal base.",
+    "Every qualified source entry must equal tracked scratch expected map; qualification base/result and checkpoint qualification digest are checked before output/fetch.",
+    "Checkpoint requires complete Anthropic Claude Sonnet5.5 review, a nonnegative raw finding count and explicit resolved flag. This accommodates a not-yet-final review but does not establish its actual count, exit code or disposition. Later evidence must preserve those values honestly.",
+    "Local exact-SHA fetch/FETCH_HEAD equality, --ff-only merge and target HEAD equality remain. No public push/tag/release command.",
+    "Git60s/fresh prepare180s bounded via existing child helper; exclusive destination and xb raw logs.",
+    "Prepare finally records terminal exit/error/log hashes before identity assertions; outer finally writes failure/exception/best-effort HEAD/status/commands/elapsed.",
+    "PASS requires exact all tracked scratch/canonical bytes, all6172 freshly prepared entries matching qualification, checkpoint archive digest and both clean endpoints.",
+    "Only Git and pinned preparation are invoked by wrapper. No live app/UI/input/pasteboard/runtime test, OS preferences, native/provider, performance or public release action appears."
+  ],
+  "limits": [
+    "Control-flow/source approval only; pending prerequisite contents and final evidence audit remain separately required. No current Git state or successful promotion observed.",
+    "Frozen single-owner execution required; individual guards are not an atomic repository lock.",
+    "Offscreen clipboard qualification does not establish real pasteboard/human/native acceptance, rights, sustained performance or broader Mac acceptance."
+  ],
+  "actions": {
+    "execution": false,
+    "commands_git": false,
+    "source_edits": false,
+    "ui_pasteboard_runtime": false,
+    "provider": false,
+    "external_transmission": false
+  }
+}

@@ -142,6 +142,10 @@ on the application owner. The Mac adapter handles native file URL payloads and
 modal/active target routing. See [file drops](file-drop.md) for coordinates,
 limits and the separate physical Finder acceptance gate.
 
+The optional [clipboard extension](clipboard.md) adds bounded Mac PNG/HTML/custom
+MIME representations and capability reporting. Its plain-text methods share the
+same cancellation-aware bridge. Real clipboard acceptance remains deferred.
+
 Windows/Linux service adapters implement clipboard, chooser transports and
 window-local menu widgets. Actual target runtime, native IME/accessibility and
 native Wayland acceptance remain open; [platform support](platform-support.md)
