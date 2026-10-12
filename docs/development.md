@@ -169,3 +169,13 @@ from a worker. Keep input bytes immutable until the method returns. See the
 `go test -race -run '^TestClipboard' .` in `drivers/cogent` checks the native
 parser and injected queue without opening or reading a pasteboard. Live
 interoperation tests remain separate and must wait for a free computer.
+
+## Mac menu-bar item
+
+From a worker after native services become available, obtain `Application.Tray()`
+and inspect its capabilities. `SetTray` takes a complete title/icon/command-menu
+snapshot; command IDs refer to the driver's registry. `ClearTray` removes the
+application's item. Provide a descriptive tooltip/accessibility name for an
+icon-only item. See [the contract](../specs/tray.md). The focused native-module
+tests `TestTray` and `TestNativeService` exercise injected routing/admission and
+offscreen Cocoa data/bitmap conversion without creating status items or panels.

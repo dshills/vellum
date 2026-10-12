@@ -1,7 +1,10 @@
 //go:build darwin && cgo
 
 #import <Cocoa/Cocoa.h>
+#import "services_native.h"
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 extern int vellumServiceActive(uint64_t token);
 extern void vellumServiceResult(uint64_t token, char *text, int status);
 extern int vellumMenuCommit(uint64_t token);
@@ -16,16 +19,86 @@ static NSMutableDictionary<NSNumber *, NSSavePanel *> *vellumPanels;
 @end
 static VellumMenuTarget *vellumTarget;
 static NSMenu *vellumOriginalMenu;
+static int vellumCleanupStatus;
+static const NSUInteger vellumPanelLimit = 8;
+
+// Attempt both dismissal operations even if one raises. Exceptional owned panels
+// remain tracked for terminal cleanup; their count has a separate fixed bound.
+static int vellumDismissPanel(NSSavePanel *panel) {
+    int status=0;
+    @try { [panel cancel:nil]; } @catch (NSException *exception) { status=2; }
+    @try { [panel orderOut:nil]; } @catch (NSException *exception) { status=2; }
+    return status;
+}
+
+@interface VellumDismissFixture : NSObject
+@property BOOL failCancel, failOrder;
+@property int canceled, ordered;
+@end
+@implementation VellumDismissFixture
+- (void)cancel:(id)sender { self.canceled++; if (self.failCancel) @throw [NSException exceptionWithName:@"fixture" reason:@"cancel" userInfo:nil]; }
+- (void)orderOut:(id)sender { self.ordered++; if (self.failOrder) @throw [NSException exceptionWithName:@"fixture" reason:@"order" userInfo:nil]; }
+@end
+// Injected objects exercise the production exception fence without NSSavePanel.
+int vellumServiceDismissFixture(void) {
+    @autoreleasepool {
+        for (int flags=0; flags<4; flags++) {
+            VellumDismissFixture *panel=[VellumDismissFixture new];
+            panel.failCancel=(flags&1)!=0; panel.failOrder=(flags&2)!=0;
+            int status=vellumDismissPanel((NSSavePanel *)panel);
+            if (panel.canceled!=1 || panel.ordered!=1 || status!=(flags ? 2 : 0)) return 0;
+        }
+        return 1;
+    }
+}
+
+// Drain temporary producer objects on the originating Go worker. Main-queue
+// consumers strongly capture detached NSData, independently of caller storage.
+BOOL vellumWithServiceJSON(uint64_t token, const char *json, void (^consume)(NSData *)) {
+    if (!json) { vellumServiceResult(token, "", 2); return NO; }
+    size_t length = strnlen(json, VELLUM_SERVICE_REQUEST_MAX + 1);
+    if (length > VELLUM_SERVICE_REQUEST_MAX) { vellumServiceResult(token, "", 3); return NO; }
+    @autoreleasepool {
+        @try {
+            NSData *payload = [NSData dataWithBytes:json length:length];
+            if (!payload) { vellumServiceResult(token, "", 2); return NO; }
+            consume(payload);
+            return YES;
+        } @catch (NSException *exception) { vellumServiceResult(token, "", 2); return NO; }
+    }
+}
+
+// Production producer, delayed injected consumer; no panel/menu/status-bar work.
+int vellumServicePayloadFixture(const char *json) {
+    if (!json || strnlen(json, VELLUM_SERVICE_REQUEST_MAX + 1) > VELLUM_SERVICE_REQUEST_MAX) return 0;
+    @autoreleasepool {
+        size_t length = strlen(json);
+        char *input = strdup(json); if (!input) return 0;
+        NSData *expected = [[NSData alloc] initWithBytes:input length:length];
+        __block dispatch_block_t queued = nil;
+        __block __weak NSData *weakPayload = nil;
+        __block BOOL copied = NO;
+        BOOL accepted = vellumWithServiceJSON(0, input, ^(NSData *payload) {
+            weakPayload = payload;
+            queued = [^{ @autoreleasepool { copied = [payload isEqualToData:expected]; } } copy];
+        });
+        memset(input, 'x', length); free(input);
+        BOOL alive; @autoreleasepool { alive = weakPayload != nil; }
+        if (queued) queued(); queued = nil;
+        BOOL released; @autoreleasepool { released = weakPayload == nil; }
+        return accepted ? ((alive ? 1 : 0) | (copied ? 2 : 0) | (released ? 4 : 0)) : 0;
+    }
+}
 
 void vellumChooseFile(uint64_t token, const char *json) {
-    NSString *payload = json ? [NSString stringWithUTF8String:json] : nil;
-    if (!payload) { vellumServiceResult(token, "", 2); return; }
+    vellumWithServiceJSON(token, json, ^(NSData *data) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!vellumServiceActive(token)) return;
-        NSData *data = [payload dataUsingEncoding:NSUTF8StringEncoding];
+      @autoreleasepool { @try {
+        if (!vellumServiceActive(token)) { vellumServiceResult(token, "", 2); return; }
         NSDictionary *options = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
         if (![options isKindOfClass:[NSDictionary class]]) { vellumServiceResult(token, "", 2); return; }
         BOOL save = [options[@"Mode"] intValue] == 1;
+        if (vellumPanels.count >= vellumPanelLimit) { vellumServiceResult(token, "", 2); return; }
         NSSavePanel *panel = save ? [NSSavePanel savePanel] : [NSOpenPanel openPanel];
         if (!save) {
             NSOpenPanel *open = (NSOpenPanel *)panel;
@@ -45,27 +118,46 @@ void vellumChooseFile(uint64_t token, const char *json) {
 #pragma clang diagnostic pop
         }
         if (!vellumPanels) vellumPanels = [NSMutableDictionary new];
+        if (!vellumServiceActive(token)) { vellumServiceResult(token, "", 2); return; }
         vellumPanels[@(token)] = panel;
         [panel beginWithCompletionHandler:^(NSModalResponse response) {
+          @autoreleasepool {
+            @try {
             NSString *path = response == NSModalResponseOK ? panel.URL.path : @"";
-            vellumServiceResult(token, (char *)path.UTF8String, response == NSModalResponseOK ? 0 : 1);
-            [vellumPanels removeObjectForKey:@(token)];
+            int status = response == NSModalResponseOK ? (path ? 0 : 2) : 1;
+            vellumServiceResult(token, (char *)(path ?: @"").UTF8String, status);
+            } @catch (NSException *exception) { vellumServiceResult(token, "", 2); }
+            @finally { [vellumPanels removeObjectForKey:@(token)]; }
+          }
         }];
+      } @catch (NSException *exception) {
+        vellumServiceResult(token, "", 2);
+        NSSavePanel *panel = vellumPanels[@(token)];
+        if (vellumDismissPanel(panel)) vellumCleanupStatus=2;
+        else [vellumPanels removeObjectForKey:@(token)];
+      } }
+    });
     });
 }
 void vellumCancelFile(uint64_t token) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSSavePanel *panel = vellumPanels[@(token)];
-        [panel cancel:nil]; [panel orderOut:nil];
-        [vellumPanels removeObjectForKey:@(token)];
+        @autoreleasepool {
+            int status=2;
+            @try {
+                NSSavePanel *panel = vellumPanels[@(token)];
+                status=vellumDismissPanel(panel);
+                if (status) vellumCleanupStatus=2;
+                else [vellumPanels removeObjectForKey:@(token)];
+            } @catch (NSException *exception) { vellumCleanupStatus=2; }
+            @finally { vellumServiceResult(token, "", status ? 2 : 1); }
+        }
     });
 }
 void vellumSetMenu(uint64_t token, const char *json) {
-    NSString *payload = json ? [NSString stringWithUTF8String:json] : nil;
-    if (!payload) { vellumServiceResult(token, "", 2); return; }
+    vellumWithServiceJSON(token, json, ^(NSData *data) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!vellumServiceActive(token)) return;
-        NSData *data = [payload dataUsingEncoding:NSUTF8StringEncoding];
+      @autoreleasepool { @try {
+        if (!vellumServiceActive(token)) { vellumServiceResult(token, "", 2); return; }
         NSArray *groups = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
         if (![groups isKindOfClass:[NSArray class]]) { vellumServiceResult(token, "", 2); return; }
         if (!vellumOriginalMenu) vellumOriginalMenu = NSApp.mainMenu;
@@ -96,16 +188,29 @@ void vellumSetMenu(uint64_t token, const char *json) {
         }
         // Keep the previous target and menu untouched until ownership is accepted.
         // Cancellation during construction cannot install a menu without callbacks.
-        if (!vellumMenuCommit(token)) return;
+        if (!vellumMenuCommit(token)) { vellumServiceResult(token, "", 2); return; }
         NSApp.mainMenu = menu; vellumTarget = target;
         vellumServiceResult(token, "", 0);
+      } @catch (NSException *exception) { vellumServiceResult(token, "", 2); } }
+    });
     });
 }
-void vellumShutdown(void) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for (NSSavePanel *panel in vellumPanels.allValues.copy) { [panel cancel:nil]; [panel orderOut:nil]; }
+int vellumShutdownOnMain(void) {
+    @autoreleasepool {
+        int status=0;
+        for (NSSavePanel *panel in vellumPanels.allValues.copy) {
+            if (vellumDismissPanel(panel)) status=2;
+        }
         [vellumPanels removeAllObjects];
-        if (vellumOriginalMenu) NSApp.mainMenu = vellumOriginalMenu;
-        vellumTarget = nil;
-    });
+        @try { if (vellumOriginalMenu) NSApp.mainMenu= vellumOriginalMenu; }
+        @catch (NSException *exception) { status=2; }
+        vellumOriginalMenu=nil; vellumTarget=nil;
+        @try { vellumTrayShutdown(); }
+        @catch (NSException *exception) { status=2; }
+        if (status) vellumCleanupStatus=status;
+        return vellumCleanupStatus;
+    }
+}
+void vellumShutdown(void) {
+    dispatch_async(dispatch_get_main_queue(), ^{ vellumShutdownOnMain(); });
 }

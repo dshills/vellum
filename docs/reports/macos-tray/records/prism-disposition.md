@@ -1,0 +1,11 @@
+# Conditional duplicate-completion finding disposition
+
+Finding cc7bc1313447fdbf: RESOLVED_NO_CODE_CHANGE (existing retirement prerequisite satisfied). Raw Prism remains exit 1 with one medium finding, complete31-file/5-call coverage. No raw finding or process record was altered.
+
+The provider correctly observes that cancellation, completion and a creation-error path may all attempt to report a token. Its stated safety prerequisite is already present: vellumServiceResult reads the pending operation under the native callback mutex and exits for an absent token (services_darwin.go120–127). After copying/validation, nativeServiceFinish locks again, rechecks existence, deletes before delivery and sends once (151–169). Thus even callbacks that both observed a live token before either finishes cannot publish two results or retire twice; the later finish finds the entry absent.
+
+Token allocation is monotonic CAS with explicit uint64-max refusal (76–88). Production shutdown does not reset serviceToken. A late completion cannot collide with another admitted operation or native panel dictionary key. The canceled-admission fixture acknowledges tokens[0], admits/completes a newer operation, then acknowledges all original tokens again; its final pending check verifies duplicate finish is ignored (tray_darwin_test.go72–84). This is a source/fixture assessment, not a reviewer test rerun.
+
+The cancellation finally ACK is intentional: it retires a canceled operation even when dismissal/completion raises or never runs. Replacing it with reliance on completion would reopen the previously corrected acknowledgement gap. Native panel ownership remains separately bounded and tracked on failed dismissal; repeated Go operation completion does not revoke that policy.
+
+All31 current/frozen V5 hashes and provider before/after maps match. Source-review-v5 remains approved. No code change/provider rerun was needed or performed. No native service/UI/clipboard/settings operation or test/build/Git execution occurred; live behavior and broader acceptance remain deferred. This proves at-most-once Go retirement/result publication per internal token, not a general domain exactly-once or rollback guarantee.

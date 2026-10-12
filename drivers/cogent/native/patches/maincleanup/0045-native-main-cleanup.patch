@@ -1,0 +1,217 @@
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -45,6 +45,7 @@
+ }
+ 
+ type App struct {
++	mainCleanup mainCleanups
+ 	// lastScreenPoll is protected by Mu; each window has its own paint loop.
+ 	lastScreenPoll time.Time
+ 
+@@ -73,7 +74,7 @@
+ func (a *App) MainLoop() {
+ 	defer func() {
+ 		a.StopMain()
+-		desktopEvents.stop(glfw.Terminate)
++		a.mainCleanup.finish(func() { desktopEvents.stop(glfw.Terminate) })
+ 	}()
+ 	queue, stopped := a.InitMainQueue()
+ 	for {
+--- /dev/null
++++ b/system/driver/desktop/main_cleanup.go
+@@ -0,0 +1,94 @@
++// Copyright 2026 Vellum contributors. All rights reserved.
++// Use of this source code is governed by the MIT license in the Vellum repository.
++
++package desktop
++
++import (
++	"cogentcore.org/core/system/driver/base"
++	"fmt"
++	"sync"
++)
++
++type mainCleanupEntry struct {
++	id uint64
++	fn func()
++}
++type mainCleanups struct {
++	mu      sync.Mutex
++	next    uint64
++	done    bool
++	entries []mainCleanupEntry
++}
++
++// AddMainCleanup registers an adapter cleanup before native termination. It is
++// worker-safe, bounded to 16 live hooks, and returns an idempotent removal function.
++// Terminal ownership detaches the list; removal after that point cannot revoke a
++// captured hook. Hooks run once, in reverse registration order, on the main thread
++// after queue closure and before GLFW termination. Never enter a UI owner,
++// redispatch to the main thread or block in a hook. Callback time is caller-owned.
++func (a *App) AddMainCleanup(fn func()) (func(), error) { return a.mainCleanup.add(fn) }
++func (c *mainCleanups) add(fn func()) (func(), error) {
++	if fn == nil {
++		return nil, fmt.Errorf("desktop: cleanup required")
++	}
++	c.mu.Lock()
++	defer c.mu.Unlock()
++	if c.done {
++		return nil, base.ErrMainStopped
++	}
++	if len(c.entries) >= 16 || c.next == ^uint64(0) {
++		return nil, fmt.Errorf("desktop: cleanup capacity exhausted")
++	}
++	c.next++
++	id := c.next
++	c.entries = append(c.entries, mainCleanupEntry{id, fn})
++	return func() {
++		c.mu.Lock()
++		defer c.mu.Unlock()
++		for i, e := range c.entries {
++			if e.id == id {
++				copy(c.entries[i:], c.entries[i+1:])
++				c.entries[len(c.entries)-1] = mainCleanupEntry{}
++				c.entries = c.entries[:len(c.entries)-1]
++				return
++			}
++		}
++	}, nil
++}
++func (c *mainCleanups) run() {
++	c.mu.Lock()
++	if c.done {
++		c.mu.Unlock()
++		return
++	}
++	c.done = true
++	entries := c.entries
++	c.entries = nil
++	c.mu.Unlock()
++	var first any
++	panicked := false
++	for i := len(entries) - 1; i >= 0; i-- {
++		func() {
++			returned := false
++			defer func() {
++				if !returned {
++					p := recover()
++					if !panicked {
++						first = p
++						panicked = true
++					}
++				}
++			}()
++			entries[i].fn()
++			returned = true
++		}()
++		entries[i] = mainCleanupEntry{}
++	}
++	if panicked {
++		panic(first)
++	}
++}
++
++// Always terminate after running all hooks, even when a hook panics. No lifecycle
++// barrier is held across callbacks. The caller owns termination idempotence.
++func (c *mainCleanups) finish(terminate func()) { defer terminate(); c.run() }
+--- /dev/null
++++ b/system/driver/desktop/main_cleanup_vellum_test.go
+@@ -0,0 +1,98 @@
++// Copyright 2026 Vellum contributors. All rights reserved.
++// Use of this source code is governed by the MIT license in the Vellum repository.
++
++package desktop
++
++import (
++	"cogentcore.org/core/system/driver/base"
++	"errors"
++	"reflect"
++	"sync"
++	"testing"
++)
++
++func TestMainCleanupOrderRemovalAndTerminalOwnership(t *testing.T) {
++	var a App
++	var order []int
++	remove, err := a.AddMainCleanup(func() { order = append(order, 1) })
++	if err != nil {
++		t.Fatal(err)
++	}
++	remove()
++	remove()
++	for _, i := range []int{2, 3} {
++		v := i
++		if _, err := a.AddMainCleanup(func() {
++			if !a.MainStopped() {
++				t.Error("queue still open")
++			}
++			order = append(order, v)
++		}); err != nil {
++			t.Fatal(err)
++		}
++	}
++	a.StopMain()
++	a.mainCleanup.finish(func() { order = append(order, 4) })
++	a.mainCleanup.run()
++	if !reflect.DeepEqual(order, []int{3, 2, 4}) {
++		t.Fatal(order)
++	}
++	if _, err := a.AddMainCleanup(func() {}); !errors.Is(err, base.ErrMainStopped) {
++		t.Fatal(err)
++	}
++}
++func TestMainCleanupPanicStillRunsAllHooksAndTermination(t *testing.T) {
++	var c mainCleanups
++	var order []int
++	c.add(func() { order = append(order, 1) })
++	c.add(func() { order = append(order, 2); panic("first") })
++	c.add(func() { order = append(order, 3); panic("latest") })
++	var recovered any
++	func() { defer func() { recovered = recover() }(); c.finish(func() { order = append(order, 4) }) }()
++	if recovered != "latest" || !reflect.DeepEqual(order, []int{3, 2, 1, 4}) {
++		t.Fatal(recovered, order)
++	}
++	c.run()
++}
++func TestMainCleanupConcurrentRetirementAndCapacity(t *testing.T) {
++	var c mainCleanups
++	if _, err := c.add(nil); err == nil {
++		t.Fatal("nil accepted")
++	}
++	var removes []func()
++	for i := 0; i < 16; i++ {
++		r, err := c.add(func() {})
++		if err != nil {
++			t.Fatal(err)
++		}
++		removes = append(removes, r)
++	}
++	if _, err := c.add(func() {}); err == nil {
++		t.Fatal("over capacity")
++	}
++	var wg sync.WaitGroup
++	for _, r := range removes {
++		wg.Add(1)
++		go func(remove func()) { defer wg.Done(); remove(); remove() }(r)
++	}
++	wg.Wait()
++	if len(c.entries) != 0 {
++		t.Fatal("retained callbacks")
++	}
++	if _, err := c.add(func() {}); err != nil {
++		t.Fatal(err)
++	}
++	c.run()
++}
++
++func TestMainCleanupLegacyNilPanicIsNotSwallowed(t *testing.T) {
++	t.Setenv("GODEBUG", "panicnil=1")
++	var c mainCleanups
++	ran, terminated, returned := false, false, false
++	c.add(func() { ran = true })
++	c.add(func() { panic(nil) })
++	func() { defer func() { recover() }(); c.finish(func() { terminated = true }); returned = true }()
++	if returned || !ran || !terminated {
++		t.Fatal("nil panic swallowed or cleanup skipped", returned, ran, terminated)
++	}
++}

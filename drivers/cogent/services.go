@@ -20,10 +20,11 @@ type nativeMenuGroup struct {
 	Items []nativeMenuItem
 }
 type platformServices struct {
-	owner    *app.Application
-	commands *command.Registry
-	onError  func(error)
-	stopped  atomic.Bool
+	owner      *app.Application
+	commands   *command.Registry
+	onError    func(error)
+	stopped    atomic.Bool
+	cleanupErr atomic.Pointer[error]
 }
 
 func (s *platformServices) check(ctx context.Context) error {
@@ -98,7 +99,23 @@ func (s *platformServices) SetMenu(ctx context.Context, groups []app.MenuGroup) 
 	if err := s.check(ctx); err != nil {
 		return err
 	}
+	if len(groups) > 16 {
+		return app.ErrServiceTooLarge
+	}
+	total := 0
+	for _, g := range groups {
+		if len(g.Label) > 1024 || len(g.Commands) > 256-total {
+			return app.ErrServiceTooLarge
+		}
+		total += len(g.Commands)
+		for _, id := range g.Commands {
+			if len(id) > 128 {
+				return app.ErrServiceTooLarge
+			}
+		}
+	}
 	var menu []nativeMenuGroup
+	var captureErr error
 	err := s.owner.Do(func() {
 		for _, group := range groups {
 			if strings.TrimSpace(group.Label) == "" || !utf8.ValidString(group.Label) || strings.ContainsRune(group.Label, 0) {
@@ -111,28 +128,30 @@ func (s *platformServices) SetMenu(ctx context.Context, groups []app.MenuGroup) 
 					menu = nil
 					return
 				}
-				found := false
-				for _, cmd := range s.commands.Search("") {
-					if cmd.ID == id {
-						if !utf8.ValidString(cmd.Label) || strings.ContainsRune(cmd.Label, 0) {
-							menu = nil
-							return
-						}
-						g.Items = append(g.Items, nativeMenuItem{Label: cmd.Label, Command: id, Disabled: s.commands.Enabled(id) != nil})
-						found = true
-						break
-					}
-				}
+				cmd, found := s.commands.Lookup(id)
 				if !found {
 					menu = nil
 					return
 				}
+				if len(cmd.Label) > 1024 {
+					captureErr = app.ErrServiceTooLarge
+					menu = nil
+					return
+				}
+				if !utf8.ValidString(cmd.Label) || strings.ContainsRune(cmd.Label, 0) {
+					menu = nil
+					return
+				}
+				g.Items = append(g.Items, nativeMenuItem{Label: cmd.Label, Command: id, Disabled: s.commands.Enabled(id) != nil})
 			}
 			menu = append(menu, g)
 		}
 	})
 	if err != nil {
 		return err
+	}
+	if captureErr != nil {
+		return captureErr
 	}
 	if len(groups) > 0 && menu == nil {
 		return fmt.Errorf("cogent: menu label or command invalid")
@@ -148,8 +167,11 @@ func (s *platformServices) SetMenu(ctx context.Context, groups []app.MenuGroup) 
 // Native application menus are process-wide. Activation uses the application
 // lifetime and rechecks command availability under the current UI owner.
 func (s *platformServices) invokeMenu(id string) {
+	s.invokeMenuIf(id, nil)
+}
+func (s *platformServices) invokeMenuIf(id string, current func() bool) {
 	err := s.owner.Post(func() {
-		if s.commands == nil {
+		if s.stopped.Load() || s.owner.Context().Err() != nil || s.commands == nil || (current != nil && !current()) {
 			return
 		}
 		if err := s.commands.Invoke(s.owner.Context(), id); err != nil && s.onError != nil {

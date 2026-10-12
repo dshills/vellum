@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "phase": "Mac tray/shared-service final V5",
+  "review_mode": "READ_ONLY_SELECTED_SOURCE",
+  "base_commit": "54963dbd1e305cdc3dc0e8ab5556357a8f59bc6b",
+  "freeze": {
+    "path": "/private/tmp/vellum-macos-tray/source-v5.json",
+    "sha256": "ebd566c8a04fda55e2e942659d55508955e88f8e0fd566683f273c07f2c79191",
+    "source_count": 31
+  },
+  "files": {
+    "app/services.go": "8b1f068b0c38f5eb91c5fdf1a7266746eaa42027236fac26f88d56fd07e83b74",
+    "app/tray.go": "ca55e5ed14d5e16f2f003a54644c4803c96719bc222706ebf1a4712c22b5a9be",
+    "app/tray_test.go": "d413decffdd8b601dcfa32a62231af808604bd110276d6c4849c18f1dafcc162",
+    "command/command.go": "5ead736c936d7d1543c4d8589273cf5690298a968531981d32db058b015987b7",
+    "docs/development.md": "20efe209a1e9e1283af5865a710b9fcab1152f56cb456087e2257b79198749c3",
+    "drivers/cogent/driver.go": "7da3118804e93787b210d09003222f1531b1a76656a97fe45c964bdf45269e4f",
+    "drivers/cogent/native/README.md": "89f0b547c91f5fc812a658c78f4d447e3397d8f955135673cfade67fb591dd4f",
+    "drivers/cogent/native/dependencies.json": "50a71188bef3fb493bfc5e18d77e4d6fd19e6ab3be62fa4484dd1dc3b9d27ab4",
+    "drivers/cogent/native/patches/maincleanup/0045-native-main-cleanup.patch": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e",
+    "drivers/cogent/native/patches/maincleanup/README.md": "cebd2e501ddef6ecd28f954a457e514bfb9bfecd08bc3d0d795bd4e6d02f3c8a",
+    "drivers/cogent/native/patches/maincleanup/original-hashes.json": "129a8eb3c20ba651b7f2ac3f71de49e4cd5b26d895a153814e1fe4dac40c338c",
+    "drivers/cogent/native/patches/maincleanup/output-hashes.json": "a9839433c5869aa45784a90bba6fa4694c30098257132bc62b68e0ca5d8ae8b3",
+    "drivers/cogent/prepare_test.py": "6135d4a9400f699136b87239cdfdc5ec2d3b93fac73668b5936b502df00b126c",
+    "drivers/cogent/services.go": "6d9844fc146cc1cd2a330898713a31c32fb3aef530813d007e4417e7b4fcf396",
+    "drivers/cogent/services_cleanup_darwin.go": "1778b3c5432286e76c0966a0419916ad1c3d129ed2c5d78d14144b60a65858f0",
+    "drivers/cogent/services_cleanup_other.go": "4194d5e5559f10e30258b55761714a911ad254cca357b5a31c81420ea7929610",
+    "drivers/cogent/services_darwin.go": "ed1b5e927ea516055a4261174ae6a6c38e8ffd47ea28930808ee4980d567cf7e",
+    "drivers/cogent/services_darwin.m": "ebee5b038b547fdf443d685c5daf84598a234f25a5a80e14df46b29578bc473f",
+    "drivers/cogent/services_darwin_test.go": "fdc7e22a37fd866ca377ed2a164a9edccd4c8e077355de41636b12718441f2fd",
+    "drivers/cogent/services_native.h": "17e11f71ee761caf6b100e153752790fadd26e128ee30596058fe527364ada61",
+    "drivers/cogent/tray.go": "affc3fa96e1396f14cf480bc15074cad08e588dab445ed8e88d7e51e0f815f37",
+    "drivers/cogent/tray_darwin.go": "776312ae8c0c38cef2a71249e22564d79fe4492bcde3e919763eae88c5d961e8",
+    "drivers/cogent/tray_darwin.m": "e3500850b53bb18feff359bc1652ddac4e944f558a88e235858a2abb08742ed3",
+    "drivers/cogent/tray_darwin_test.go": "c2c49233ccfbefc2350746cba8b5338c7d6d022c891ba3f9f55a16337b9281ef",
+    "drivers/cogent/tray_other.go": "6eb19197118299ae07ffd61a8e2f713457dcf8ae2a21524faa6c318ab0775d6b",
+    "drivers/cogent/tray_test.go": "b41226bb21ee80c705dd4366751522a109116b72d7c44d1394b6f97bdef6db91",
+    "examples/sdk-contract/tray_test.go": "3ff5ac6b4078efc7f60ff8829f74ccdfa0addcae2f38a58b1795523894cb6c2e",
+    "specs/README.md": "282dfa5fe9e6c64f52434fb2d0614a42121729e6bcf61f1471a10f6834db82e3",
+    "specs/framework.md": "1f295a16bb034f263afeff739e09c94dda6d53f5a57cd35c7aa1a649b2002bbe",
+    "specs/macos-completion.md": "bb159f22b49b6cc46da7c58a41c1e0c5ddf8f3c7a77ee52ed01ea741be924a7c",
+    "specs/tray.md": "0defef55e8971480fc23c186a32fa7e6d1a93e9ac9a599630fee3ff95701fdae"
+  },
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-macos-tray/source-v5/app/services.go": "8b1f068b0c38f5eb91c5fdf1a7266746eaa42027236fac26f88d56fd07e83b74",
+    "/private/tmp/vellum-macos-tray/source-v5/app/tray.go": "ca55e5ed14d5e16f2f003a54644c4803c96719bc222706ebf1a4712c22b5a9be",
+    "/private/tmp/vellum-macos-tray/source-v5/app/tray_test.go": "d413decffdd8b601dcfa32a62231af808604bd110276d6c4849c18f1dafcc162",
+    "/private/tmp/vellum-macos-tray/source-v5/command/command.go": "5ead736c936d7d1543c4d8589273cf5690298a968531981d32db058b015987b7",
+    "/private/tmp/vellum-macos-tray/source-v5/docs/development.md": "20efe209a1e9e1283af5865a710b9fcab1152f56cb456087e2257b79198749c3",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/driver.go": "7da3118804e93787b210d09003222f1531b1a76656a97fe45c964bdf45269e4f",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/native/README.md": "89f0b547c91f5fc812a658c78f4d447e3397d8f955135673cfade67fb591dd4f",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/native/dependencies.json": "50a71188bef3fb493bfc5e18d77e4d6fd19e6ab3be62fa4484dd1dc3b9d27ab4",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/native/patches/maincleanup/0045-native-main-cleanup.patch": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/native/patches/maincleanup/README.md": "cebd2e501ddef6ecd28f954a457e514bfb9bfecd08bc3d0d795bd4e6d02f3c8a",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/native/patches/maincleanup/original-hashes.json": "129a8eb3c20ba651b7f2ac3f71de49e4cd5b26d895a153814e1fe4dac40c338c",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/native/patches/maincleanup/output-hashes.json": "a9839433c5869aa45784a90bba6fa4694c30098257132bc62b68e0ca5d8ae8b3",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/prepare_test.py": "6135d4a9400f699136b87239cdfdc5ec2d3b93fac73668b5936b502df00b126c",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/services.go": "6d9844fc146cc1cd2a330898713a31c32fb3aef530813d007e4417e7b4fcf396",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/services_cleanup_darwin.go": "1778b3c5432286e76c0966a0419916ad1c3d129ed2c5d78d14144b60a65858f0",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/services_cleanup_other.go": "4194d5e5559f10e30258b55761714a911ad254cca357b5a31c81420ea7929610",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/services_darwin.go": "ed1b5e927ea516055a4261174ae6a6c38e8ffd47ea28930808ee4980d567cf7e",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/services_darwin.m": "ebee5b038b547fdf443d685c5daf84598a234f25a5a80e14df46b29578bc473f",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/services_darwin_test.go": "fdc7e22a37fd866ca377ed2a164a9edccd4c8e077355de41636b12718441f2fd",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/services_native.h": "17e11f71ee761caf6b100e153752790fadd26e128ee30596058fe527364ada61",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/tray.go": "affc3fa96e1396f14cf480bc15074cad08e588dab445ed8e88d7e51e0f815f37",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/tray_darwin.go": "776312ae8c0c38cef2a71249e22564d79fe4492bcde3e919763eae88c5d961e8",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/tray_darwin.m": "e3500850b53bb18feff359bc1652ddac4e944f558a88e235858a2abb08742ed3",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/tray_darwin_test.go": "c2c49233ccfbefc2350746cba8b5338c7d6d022c891ba3f9f55a16337b9281ef",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/tray_other.go": "6eb19197118299ae07ffd61a8e2f713457dcf8ae2a21524faa6c318ab0775d6b",
+    "/private/tmp/vellum-macos-tray/source-v5/drivers/cogent/tray_test.go": "b41226bb21ee80c705dd4366751522a109116b72d7c44d1394b6f97bdef6db91",
+    "/private/tmp/vellum-macos-tray/source-v5/examples/sdk-contract/tray_test.go": "3ff5ac6b4078efc7f60ff8829f74ccdfa0addcae2f38a58b1795523894cb6c2e",
+    "/private/tmp/vellum-macos-tray/source-v5/specs/README.md": "282dfa5fe9e6c64f52434fb2d0614a42121729e6bcf61f1471a10f6834db82e3",
+    "/private/tmp/vellum-macos-tray/source-v5/specs/framework.md": "1f295a16bb034f263afeff739e09c94dda6d53f5a57cd35c7aa1a649b2002bbe",
+    "/private/tmp/vellum-macos-tray/source-v5/specs/macos-completion.md": "bb159f22b49b6cc46da7c58a41c1e0c5ddf8f3c7a77ee52ed01ea741be924a7c",
+    "/private/tmp/vellum-macos-tray/source-v5/specs/tray.md": "0defef55e8971480fc23c186a32fa7e6d1a93e9ac9a599630fee3ff95701fdae"
+  },
+  "current_selected_file_sha256": {
+    "/private/tmp/vellum-large-data/app/services.go": "8b1f068b0c38f5eb91c5fdf1a7266746eaa42027236fac26f88d56fd07e83b74",
+    "/private/tmp/vellum-large-data/app/tray.go": "ca55e5ed14d5e16f2f003a54644c4803c96719bc222706ebf1a4712c22b5a9be",
+    "/private/tmp/vellum-large-data/app/tray_test.go": "d413decffdd8b601dcfa32a62231af808604bd110276d6c4849c18f1dafcc162",
+    "/private/tmp/vellum-large-data/command/command.go": "5ead736c936d7d1543c4d8589273cf5690298a968531981d32db058b015987b7",
+    "/private/tmp/vellum-large-data/docs/development.md": "20efe209a1e9e1283af5865a710b9fcab1152f56cb456087e2257b79198749c3",
+    "/private/tmp/vellum-large-data/drivers/cogent/driver.go": "7da3118804e93787b210d09003222f1531b1a76656a97fe45c964bdf45269e4f",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/README.md": "89f0b547c91f5fc812a658c78f4d447e3397d8f955135673cfade67fb591dd4f",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/dependencies.json": "50a71188bef3fb493bfc5e18d77e4d6fd19e6ab3be62fa4484dd1dc3b9d27ab4",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/maincleanup/0045-native-main-cleanup.patch": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/maincleanup/README.md": "cebd2e501ddef6ecd28f954a457e514bfb9bfecd08bc3d0d795bd4e6d02f3c8a",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/maincleanup/original-hashes.json": "129a8eb3c20ba651b7f2ac3f71de49e4cd5b26d895a153814e1fe4dac40c338c",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/maincleanup/output-hashes.json": "a9839433c5869aa45784a90bba6fa4694c30098257132bc62b68e0ca5d8ae8b3",
+    "/private/tmp/vellum-large-data/drivers/cogent/prepare_test.py": "6135d4a9400f699136b87239cdfdc5ec2d3b93fac73668b5936b502df00b126c",
+    "/private/tmp/vellum-large-data/drivers/cogent/services.go": "6d9844fc146cc1cd2a330898713a31c32fb3aef530813d007e4417e7b4fcf396",
+    "/private/tmp/vellum-large-data/drivers/cogent/services_cleanup_darwin.go": "1778b3c5432286e76c0966a0419916ad1c3d129ed2c5d78d14144b60a65858f0",
+    "/private/tmp/vellum-large-data/drivers/cogent/services_cleanup_other.go": "4194d5e5559f10e30258b55761714a911ad254cca357b5a31c81420ea7929610",
+    "/private/tmp/vellum-large-data/drivers/cogent/services_darwin.go": "ed1b5e927ea516055a4261174ae6a6c38e8ffd47ea28930808ee4980d567cf7e",
+    "/private/tmp/vellum-large-data/drivers/cogent/services_darwin.m": "ebee5b038b547fdf443d685c5daf84598a234f25a5a80e14df46b29578bc473f",
+    "/private/tmp/vellum-large-data/drivers/cogent/services_darwin_test.go": "fdc7e22a37fd866ca377ed2a164a9edccd4c8e077355de41636b12718441f2fd",
+    "/private/tmp/vellum-large-data/drivers/cogent/services_native.h": "17e11f71ee761caf6b100e153752790fadd26e128ee30596058fe527364ada61",
+    "/private/tmp/vellum-large-data/drivers/cogent/tray.go": "affc3fa96e1396f14cf480bc15074cad08e588dab445ed8e88d7e51e0f815f37",
+    "/private/tmp/vellum-large-data/drivers/cogent/tray_darwin.go": "776312ae8c0c38cef2a71249e22564d79fe4492bcde3e919763eae88c5d961e8",
+    "/private/tmp/vellum-large-data/drivers/cogent/tray_darwin.m": "e3500850b53bb18feff359bc1652ddac4e944f558a88e235858a2abb08742ed3",
+    "/private/tmp/vellum-large-data/drivers/cogent/tray_darwin_test.go": "c2c49233ccfbefc2350746cba8b5338c7d6d022c891ba3f9f55a16337b9281ef",
+    "/private/tmp/vellum-large-data/drivers/cogent/tray_other.go": "6eb19197118299ae07ffd61a8e2f713457dcf8ae2a21524faa6c318ab0775d6b",
+    "/private/tmp/vellum-large-data/drivers/cogent/tray_test.go": "b41226bb21ee80c705dd4366751522a109116b72d7c44d1394b6f97bdef6db91",
+    "/private/tmp/vellum-large-data/examples/sdk-contract/tray_test.go": "3ff5ac6b4078efc7f60ff8829f74ccdfa0addcae2f38a58b1795523894cb6c2e",
+    "/private/tmp/vellum-large-data/specs/README.md": "282dfa5fe9e6c64f52434fb2d0614a42121729e6bcf61f1471a10f6834db82e3",
+    "/private/tmp/vellum-large-data/specs/framework.md": "1f295a16bb034f263afeff739e09c94dda6d53f5a57cd35c7aa1a649b2002bbe",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "bb159f22b49b6cc46da7c58a41c1e0c5ddf8f3c7a77ee52ed01ea741be924a7c",
+    "/private/tmp/vellum-large-data/specs/tray.md": "0defef55e8971480fc23c186a32fa7e6d1a93e9ac9a599630fee3ff95701fdae"
+  },
+  "history": {
+    "v1_review": {
+      "path": "/private/tmp/vellum-macos-tray/source-review-v1.json",
+      "sha256": "1c6b8e3de1141e7982c32aff7aa96af90b0f1d6ea28c4118eec860d1110c8cd1",
+      "result": "NEEDS_FIX",
+      "preserved": true
+    },
+    "v4_review": {
+      "path": "/private/tmp/vellum-macos-tray/source-review-v4.json",
+      "sha256": "28c93d4832992258cc0968d9c8ef5286193ceb80aa789bd33cfeca63f1c297cf",
+      "result": "NEEDS_FIX",
+      "preserved": true
+    },
+    "v1_freeze": {
+      "path": "/private/tmp/vellum-macos-tray/source-v1.json",
+      "sha256": "6457b9b953898fc8b95fcbc9ab2baa7abf7bbebb0fc4d32a6b59723720fb4529"
+    },
+    "v4_freeze": {
+      "path": "/private/tmp/vellum-macos-tray/source-v4.json",
+      "sha256": "2d8b839953d6207e285ace78b0c567bb3c549ffdfbe1216fbf566ba5582340a8"
+    },
+    "changed_vs_v4": [
+      "drivers/cogent/services_darwin.go",
+      "drivers/cogent/services_darwin.m",
+      "drivers/cogent/services_darwin_test.go",
+      "specs/tray.md"
+    ],
+    "unchanged_vs_v4": 27
+  },
+  "finding_closures": [
+    {
+      "id": "TRAY-V1-01",
+      "result": "RESOLVED",
+      "source": "native/patches/maincleanup/0045-native-main-cleanup.patch",
+      "evidence": "Normal-return marker and separate panicked bool preserve nil payload, retain first LIFO panic and continue hooks/termination.",
+      "test": "TestMainCleanupLegacyNilPanicIsNotSwallowed"
+    },
+    {
+      "id": "TRAY-V1-02",
+      "result": "RESOLVED",
+      "path": "drivers/cogent/tray_darwin.m",
+      "lines": [
+        145,
+        148,
+        151,
+        154
+      ],
+      "evidence": "Private item/target ownership is published immediately after accepted Go commit before fallible AppKit setters. The finding is tracking/lifetime discipline, not NSStatusBar retention or a demonstrated leak.",
+      "test_scope": "Source correction; real status-item failure/retention is deferred."
+    },
+    {
+      "id": "TRAY-V1-03",
+      "result": "RESOLVED_SOURCE",
+      "path": "drivers/cogent/services_darwin.m",
+      "lines": [
+        123,
+        125,
+        128,
+        129,
+        130
+      ],
+      "evidence": "Asynchronous chooser completion now has its own result exception fence and ownership-removal finally.",
+      "test_scope": "Source reviewed; no NSSavePanel/UI invocation."
+    },
+    {
+      "id": "TRAY-V1-04",
+      "result": "RESOLVED",
+      "path": "drivers/cogent/prepare_test.py",
+      "evidence": "Expected patch sequence includes1..45 and file is part of the final31-source freeze."
+    },
+    {
+      "id": "TRAY-V4-01",
+      "result": "RESOLVED",
+      "path": "drivers/cogent/services_darwin.m",
+      "lines": [
+        23,
+        27,
+        29,
+        30,
+        101,
+        102,
+        142,
+        144,
+        148,
+        149,
+        150,
+        152
+      ],
+      "evidence": "Pooled cancellation always acknowledges; production dismiss helper catches both native operations independently. Failed native panels remain tracked, capped at eight before creation, with persistent error for terminal cleanup.",
+      "test": "TestNativeShutdownUnblocksUndispatchedBackgroundOperation invokes vellumServiceDismissFixture, whose pure NSObject cases cover all4 success/failure combinations."
+    },
+    {
+      "id": "TRAY-V1-A01",
+      "result": "ADDRESSED",
+      "paths": [
+        "drivers/cogent/services.go",
+        "drivers/cogent/services_darwin.go",
+        "drivers/cogent/services_darwin_test.go"
+      ],
+      "evidence": "Installed/current/nonstopped ownership is checked at native action admission and again on owner drain; common helper also checks stopped/owner context.",
+      "test": "TestNativeMenuQueuedActionRetiresBeforeOwnerDrain: replacement/native-stop/service-stop"
+    },
+    {
+      "id": "TRAY-V1-A03",
+      "result": "ADDRESSED",
+      "path": "drivers/cogent/services_darwin.go",
+      "evidence": "nativeServiceResultFixture traverses production strnlen/GoStringN callback before finish; current oversized/invalid-UTF8 fixture calls it.",
+      "test": "TestNativeServiceResultLimitsAndShutdown"
+    }
+  ],
+  "static_pin_verification": {
+    "original_app_path": "/private/tmp/vellum-macos-tray/backend-before/system/driver/desktop/app.go",
+    "original_app_sha256": "8ae3d8c643ec3ece72a7dbc078358b25d9371596c1afb828d8c2f24dd5b74903",
+    "patch_sha256": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e",
+    "reproduced_and_selected_prepared_output_sha256": {
+      "system/driver/desktop/app.go": "bd6bc29967e942c2170e526bbf11fb06ddaa5d0e07719097fcc2a3c731087f3c",
+      "system/driver/desktop/main_cleanup.go": "3c4f8e7d6e34949aa8131652019113fa96401e996940a42d241256b154d09d92",
+      "system/driver/desktop/main_cleanup_vellum_test.go": "3316562c2ebfb64488c48d11f705f47198681e39aca836e1c3c100c88460422f"
+    },
+    "manifest_last_stage": {
+      "origin": "drivers/cogent/native/patches/maincleanup",
+      "inputs": "native/patches/maincleanup/original-hashes.json",
+      "outputs": "native/patches/maincleanup/output-hashes.json",
+      "patches": [
+        {
+          "file": "native/patches/maincleanup/0045-native-main-cleanup.patch",
+          "sha256": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e"
+        }
+      ]
+    },
+    "method": "In-memory textual unified-diff reconstruction and file SHA comparison only; no patch/prepare/test/source execution."
+  },
+  "source_assessment": {
+    "api_and_image": "Optional Services extension preserves legacy compatibility. Metadata/header bounds precede full bounded PNG decode; detached straight RGBA and native bitmap copy preserve accepted8-bit pixels and18-point aspect fit.",
+    "accessible_name": "Title/tooltip/accessibility byte/UTF-8 limits, fallback and unnamed-icon refusal apply before install; actual human accessibility is deferred.",
+    "commands": "Lookup/Enabled snapshot only under owner; tray and native menu callbacks only Post, then revalidate current lifetime/availability before Invoke.",
+    "shared_lifetime": "Eight operation credits retain canceled native work to terminal acknowledgement; exceptional native panel ownership separately capped eight. JSON<=1MiB and C reply<=64KiB before Go copy. Clipboard cap remains separate.",
+    "shutdown": "Producer/consumer pools, early private tray ownership and main cleanup hook preserve owned tracking. Hook is before GLFW termination; driver removes after synchronous core.Wait and joins retained cleanup errors.",
+    "normal_semantics": "Cancellation/native failures after transfer may leave changed presentation; no rollback or OS atomicity promise."
+  },
+  "supporting_file_sha256": {
+    "/private/tmp/vellum-large-data/app/app.go": "b70e7dac15367c2999679880f72c90ebf8a8404a9cf05a33ed63f319c1af2487",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/renderwindow.go": "81974eacc77240959de8d70b3c2da2d08986bdb19f931ba18e5c5fca73745c71",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/base/app.go": "45760739540dffde4ca8cc6473ae5be238485285630d8414208a37f76d9b83ee"
+  },
+  "remaining_scope_caveats": [
+    {
+      "id": "TRAY-V1-A02",
+      "result": "OUTSIDE_PANIC_CONTRACT",
+      "description": "runtime.Goexit unwinds the loop rather than executing remaining callbacks; termination is deferred, but no all-hook Goexit guarantee is approved."
+    }
+  ],
+  "parent_gates_scope": "Final31 source gates and provider are parent-owned and separate. No unfinished command or earlier pre-accessibility pass is inferred as final runtime evidence.",
+  "notes": {
+    "path": "/private/tmp/vellum-macos-tray/source-review-v5.md",
+    "sha256": "ee1924c2f1348bc5042d6affed5bf8e1eae6443e68dc291fb35e2ef8f4bf9343"
+  },
+  "limitations": [
+    "Read-only selected-source approval; no reviewer implementation scripts/tests/build/preparation/native functions/OS/UI/clipboard/preferences/screenshots/provider/Git execution.",
+    "Selected frozen/current identities and three prepared cleanup outputs were checked; staged index and complete compiler/module/prepared/SDK closure are not asserted.",
+    "Only offscreen/pure fixture logic was source reviewed; actual native tray item/bar position, menus/panels, keyboard/VoiceOver, template appearance/DPI and real native termination remain deferred.",
+    "No performance, rights/distribution, Windows/Linux target or full Mac acceptance is certified."
+  ]
+}

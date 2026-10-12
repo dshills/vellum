@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "result": "APPROVED_DISPOSITION",
+  "status": "RESOLVED_NO_CODE_CHANGE",
+  "disposition": "REFUTED_EXISTING_RETIREMENT_GUARD",
+  "finding_id": "cc7bc1313447fdbf",
+  "unresolved_findings": [],
+  "prism_path": "/private/tmp/vellum-macos-tray/prism-v1/prism.json",
+  "prism_sha256": "9d8e68c818d948fcd37f67cee9eb4c2124a6c4a625fc5265d03f561ca2fa2caa",
+  "raw_provider_exit_code": 1,
+  "raw_retained_findings": 1,
+  "raw_provider_finding_preserved": true,
+  "provider_process": {
+    "path": "/private/tmp/vellum-macos-tray/prism-v1/process.json",
+    "sha256": "471b80e2d5a6bab901e66083ade532cb7f7b0d9fe647f8189887c2706dee8126"
+  },
+  "provider_coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 31,
+    "bytes": 97219,
+    "chunks": 5,
+    "llmCalls": 5,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 59549,
+        "output": 10185,
+        "costUSD": 0.220948
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "provider_before_after_match_v5": true,
+  "source_freeze": {
+    "path": "/private/tmp/vellum-macos-tray/source-v5.json",
+    "sha256": "ebd566c8a04fda55e2e942659d55508955e88f8e0fd566683f273c07f2c79191"
+  },
+  "files": {
+    "app/services.go": "8b1f068b0c38f5eb91c5fdf1a7266746eaa42027236fac26f88d56fd07e83b74",
+    "app/tray.go": "ca55e5ed14d5e16f2f003a54644c4803c96719bc222706ebf1a4712c22b5a9be",
+    "app/tray_test.go": "d413decffdd8b601dcfa32a62231af808604bd110276d6c4849c18f1dafcc162",
+    "command/command.go": "5ead736c936d7d1543c4d8589273cf5690298a968531981d32db058b015987b7",
+    "docs/development.md": "20efe209a1e9e1283af5865a710b9fcab1152f56cb456087e2257b79198749c3",
+    "drivers/cogent/driver.go": "7da3118804e93787b210d09003222f1531b1a76656a97fe45c964bdf45269e4f",
+    "drivers/cogent/native/README.md": "89f0b547c91f5fc812a658c78f4d447e3397d8f955135673cfade67fb591dd4f",
+    "drivers/cogent/native/dependencies.json": "50a71188bef3fb493bfc5e18d77e4d6fd19e6ab3be62fa4484dd1dc3b9d27ab4",
+    "drivers/cogent/native/patches/maincleanup/0045-native-main-cleanup.patch": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e",
+    "drivers/cogent/native/patches/maincleanup/README.md": "cebd2e501ddef6ecd28f954a457e514bfb9bfecd08bc3d0d795bd4e6d02f3c8a",
+    "drivers/cogent/native/patches/maincleanup/original-hashes.json": "129a8eb3c20ba651b7f2ac3f71de49e4cd5b26d895a153814e1fe4dac40c338c",
+    "drivers/cogent/native/patches/maincleanup/output-hashes.json": "a9839433c5869aa45784a90bba6fa4694c30098257132bc62b68e0ca5d8ae8b3",
+    "drivers/cogent/prepare_test.py": "6135d4a9400f699136b87239cdfdc5ec2d3b93fac73668b5936b502df00b126c",
+    "drivers/cogent/services.go": "6d9844fc146cc1cd2a330898713a31c32fb3aef530813d007e4417e7b4fcf396",
+    "drivers/cogent/services_cleanup_darwin.go": "1778b3c5432286e76c0966a0419916ad1c3d129ed2c5d78d14144b60a65858f0",
+    "drivers/cogent/services_cleanup_other.go": "4194d5e5559f10e30258b55761714a911ad254cca357b5a31c81420ea7929610",
+    "drivers/cogent/services_darwin.go": "ed1b5e927ea516055a4261174ae6a6c38e8ffd47ea28930808ee4980d567cf7e",
+    "drivers/cogent/services_darwin.m": "ebee5b038b547fdf443d685c5daf84598a234f25a5a80e14df46b29578bc473f",
+    "drivers/cogent/services_darwin_test.go": "fdc7e22a37fd866ca377ed2a164a9edccd4c8e077355de41636b12718441f2fd",
+    "drivers/cogent/services_native.h": "17e11f71ee761caf6b100e153752790fadd26e128ee30596058fe527364ada61",
+    "drivers/cogent/tray.go": "affc3fa96e1396f14cf480bc15074cad08e588dab445ed8e88d7e51e0f815f37",
+    "drivers/cogent/tray_darwin.go": "776312ae8c0c38cef2a71249e22564d79fe4492bcde3e919763eae88c5d961e8",
+    "drivers/cogent/tray_darwin.m": "e3500850b53bb18feff359bc1652ddac4e944f558a88e235858a2abb08742ed3",
+    "drivers/cogent/tray_darwin_test.go": "c2c49233ccfbefc2350746cba8b5338c7d6d022c891ba3f9f55a16337b9281ef",
+    "drivers/cogent/tray_other.go": "6eb19197118299ae07ffd61a8e2f713457dcf8ae2a21524faa6c318ab0775d6b",
+    "drivers/cogent/tray_test.go": "b41226bb21ee80c705dd4366751522a109116b72d7c44d1394b6f97bdef6db91",
+    "examples/sdk-contract/tray_test.go": "3ff5ac6b4078efc7f60ff8829f74ccdfa0addcae2f38a58b1795523894cb6c2e",
+    "specs/README.md": "282dfa5fe9e6c64f52434fb2d0614a42121729e6bcf61f1471a10f6834db82e3",
+    "specs/framework.md": "1f295a16bb034f263afeff739e09c94dda6d53f5a57cd35c7aa1a649b2002bbe",
+    "specs/macos-completion.md": "bb159f22b49b6cc46da7c58a41c1e0c5ddf8f3c7a77ee52ed01ea741be924a7c",
+    "specs/tray.md": "0defef55e8971480fc23c186a32fa7e6d1a93e9ac9a599630fee3ff95701fdae"
+  },
+  "source_certificate": {
+    "path": "/private/tmp/vellum-macos-tray/source-review-v5.json",
+    "sha256": "442d939b74404131a8f2ea29ca39b246691ce2094c871f4eba074cb217992d12",
+    "result": "APPROVED_SOURCE"
+  },
+  "rationale": "The finding is conditional on whether Go ignores retired completions. That prerequisite is implemented at callback entry and, decisively, by an under-lock recheck/delete-before-publication at finish. Concurrent or late duplicates cannot release or publish twice, and monotonic nonwrapping allocation prevents token ABA.",
+  "cited_source_locations": [
+    {
+      "path": "drivers/cogent/services_darwin.go",
+      "sha256": "ed1b5e927ea516055a4261174ae6a6c38e8ffd47ea28930808ee4980d567cf7e",
+      "lines": [
+        120,
+        122,
+        123,
+        125,
+        126
+      ],
+      "role": "Ignore absent token before reading/copying reply."
+    },
+    {
+      "path": "drivers/cogent/services_darwin.go",
+      "sha256": "ed1b5e927ea516055a4261174ae6a6c38e8ffd47ea28930808ee4980d567cf7e",
+      "lines": [
+        151,
+        152,
+        154,
+        155,
+        158,
+        166
+      ],
+      "role": "Mutex recheck, delete-before-delivery; duplicate finish returns."
+    },
+    {
+      "path": "drivers/cogent/services_darwin.go",
+      "sha256": "ed1b5e927ea516055a4261174ae6a6c38e8ffd47ea28930808ee4980d567cf7e",
+      "lines": [
+        76,
+        78,
+        79,
+        83,
+        84,
+        88
+      ],
+      "role": "Monotonic CAS allocation; refuse max before wrap; no production reset."
+    },
+    {
+      "path": "drivers/cogent/tray_darwin_test.go",
+      "sha256": "c2c49233ccfbefc2350746cba8b5338c7d6d022c891ba3f9f55a16337b9281ef",
+      "lines": [
+        72,
+        73,
+        77,
+        78,
+        83
+      ],
+      "role": "Existing fixture acknowledges old token again after newer operation, then requires no pending entries."
+    },
+    {
+      "path": "drivers/cogent/services_darwin.m",
+      "sha256": "ebee5b038b547fdf443d685c5daf84598a234f25a5a80e14df46b29578bc473f",
+      "lines": [
+        129,
+        134,
+        142,
+        148,
+        149,
+        150,
+        152
+      ],
+      "role": "Intentional multiple possible reporting paths; finally acknowledgement preserves cancellation terminal discipline."
+    }
+  ],
+  "concurrency_argument": [
+    "Two callbacks may each copy the old pending operation while it is present.",
+    "Both call nativeServiceFinish, whose same mutex serializes the decisive existence check and deletion.",
+    "Only the first finds the entry and can send its buffered result; the second returns without another retirement/publication.",
+    "Shutdown clearing the map makes later finishes absent too.",
+    "New operations receive a fresh nonzero token and cannot reuse the retired token; uint64 exhaustion refuses."
+  ],
+  "no_source_change": true,
+  "no_provider_rerun": true,
+  "notes": {
+    "path": "/private/tmp/vellum-macos-tray/prism-disposition.md",
+    "sha256": "9b4a1555aa8c35f4be51dc711fa2aedd01d69a9d2e63572e66c9d931a9e6db69"
+  },
+  "limitations": [
+    "Read-only source/fixture assessment with exact V5/provider hashes; no reviewer execution of production code, tests, native APIs, builds, provider or Git.",
+    "Existing fixture body was reviewed, not rerun; actual NSPanel cancellation/completion is still live acceptance deferred by user.",
+    "At-most-once internal token retirement/result publication is not general domain exactly-once execution, cancellation rollback or full Mac/SDK/performance qualification."
+  ]
+}

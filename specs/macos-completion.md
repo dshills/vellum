@@ -38,6 +38,12 @@ cancellation/shutdown. Its native parser and dispatch policy can be checked
 without accessing the clipboard. Actual rich pasteboard roundtrips and external
 app interoperation remain deferred with the other live checks.
 
+The optional [Mac tray service](tray.md) adds a retained native menu-bar item,
+named/template PNG icons and owner-validated command menus. Bounded shared Cocoa
+admission and a main-loop cleanup hook retire actions and native resources before
+termination. Offscreen parser/bitmap/ownership and injected cleanup tests remain
+separate from actual tray interaction, VoiceOver and native loop teardown.
+
 Document history adds bounded sparse undo/redo, revision-aware dirty/save handling
 and focused native text precedence. [Document persistence](document.md) adds asynchronous save/open and native
 unsaved-close prompts with a working component-document consumer. Its bounded

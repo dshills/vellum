@@ -171,3 +171,9 @@ reuses tile-count scratch after writing the count table. Packet ownership,
 logical limits and encoded bytes remain fixed. Qualification is offscreen;
 live native/performance checks are deferred.
 See [operation staging contract](patches/operationblocks/README.md).
+
+Patch 0045 adds bounded main-thread cleanup hooks after queue closure and before
+native termination, with LIFO ownership, reference retirement and panic-safe
+complete cleanup/termination. The Mac service adapter uses it for panel/menu/tray
+resources; actual native termination remains a separate acceptance check.
+See [cleanup contract](patches/maincleanup/README.md).

@@ -58,6 +58,11 @@ func (r *Registry) Enabled(id string) error {
 	}
 	return nil
 }
+
+// Lookup returns command metadata without scanning or sorting the registry.
+// Like all Registry methods, call it under the application UI owner. It does not
+// evaluate availability; Enabled and Invoke retain that validation.
+func (r *Registry) Lookup(id string) (Command, bool) { c, ok := r.entries[id]; return c, ok }
 func (r *Registry) Invoke(ctx context.Context, id string) error {
 	if ctx == nil {
 		return fmt.Errorf("command: context required")

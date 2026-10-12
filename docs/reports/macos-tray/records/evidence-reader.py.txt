@@ -1,0 +1,151 @@
+"""Independent stdlib-only bounded metadata reader; no producer imports."""
+from pathlib import Path, PurePosixPath
+import hashlib, json, tarfile, re, os
+P=Path('/private/tmp/vellum-macos-tray')
+R=Path('/private/tmp/vellum-large-data')
+D=R/'docs/reports/macos-tray'
+BASE='54963dbd1e305cdc3dc0e8ab5556357a8f59bc6b'
+ASHA='f353d717efb49d2df2ec7b8403b62d6552ae774e8d76db5586ae38135c2f7f7d'
+CSHA='317be918f4a684fbb457cf09c1e8029071e6482c06a90ac707705092f1985482'
+RSHA='c11de763a65d89d0e4b27cf1451bfa63c98ed6bc29bef1a4ee2f059bfe767ad9'
+SSHA='258065a19a2970613a70403c7a66a766f1fea6913d4af7c4042d7124f5172e9a'
+def unique(pairs):
+ d={}
+ for k,v in pairs:
+  assert k not in d,('duplicate key',k)
+  d[k]=v
+ return d
+def load(p):return json.loads(Path(p).read_text(),object_pairs_hook=unique)
+def sha(p):
+ h=hashlib.sha256()
+ with Path(p).open('rb')as f:
+  for b in iter(lambda:f.read(1048576),b''):h.update(b)
+ return h.hexdigest()
+def dig(b):return hashlib.sha256(b).hexdigest()
+def ck(ok,label):
+ if not ok:raise AssertionError(label)
+def audit():
+ ck(sha(D/'records/evidence.tar.gz')==ASHA and sha(D/'records/checkpoint.json')==CSHA and sha(D/'README.md')==RSHA,'frozen report/artifacts')
+ ixdoc=load(D/'records/archive-index.json');ix=ixdoc['members'];cp=load(D/'records/checkpoint.json');seen=set();total=0
+ ck(ixdoc['archive_sha256']==ASHA and len(ix)==286 and cp['archive']=={'sha256':ASHA,'members':286},'index/checkpoint identity')
+ with tarfile.open(D/'records/evidence.tar.gz','r:gz')as a:
+  for m in a:
+   n=m.name;p=PurePosixPath(n);ck(m.isfile()and not p.is_absolute()and'..'not in p.parts and str(p)==n,'safe regular member '+n)
+   ck(n not in seen and n in ix,'duplicate/extra '+n);seen.add(n);b=a.extractfile(m).read()
+   ck(m.size==len(b)==ix[n]['size']and dig(b)==ix[n]['sha256']==sha(P/n),'member length/digest '+n);total+=len(b)
+ ck(seen==set(ix)and total==4457078 and(D/'records/evidence.tar.gz').stat().st_size==1411323,'exact membership/compressed/uncompressed bytes')
+ excluded=set(ixdoc['excluded_binary_and_sdk_payloads']);ck(not seen&excluded,'binary/archive exclusion')
+ q=load(P/'qualification.json');src=load(P/'source-v5.json')['sources'];rv=load(P/'source-review-v5.json')
+ ck(q['result']==cp['result']=='PASS_OFFSCREEN_MAC_TRAY'and q['base_commit']==cp['base_commit']==BASE,'result/base')
+ ck(cp['qualification_sha256']==sha(P/'qualification.json')and q['source_review_sha256']==sha(P/'source-review-v5.json'),'review/qualifier hashes')
+ ck(len(src)==31 and src==q['source']==rv['files']and rv['result']=='APPROVED_SOURCE'and not rv['findings'],'final31 approval')
+ for n,h in src.items():ck(sha(R/n)==sha(P/'source-v5'/n)==h,'current/frozen source '+n)
+ for v in range(1,6):
+  f=load(P/f'source-v{v}.json')
+  for n,h in f['sources'].items():ck(sha(P/f'source-v{v}'/n)==h,'historical snapshot '+n)
+ for v in [1,4,5]:
+  r=load(P/f'source-review-v{v}.json');ck(r['freeze']['sha256']==sha(P/f'source-v{v}.json')and r['notes']['sha256']==sha(Path(r['notes']['path'])),'review chain '+str(v))
+ ck(load(P/'source-review-v1.json')['result']=='NEEDS_FIX'and load(P/'source-review-v4.json')['result']=='NEEDS_FIX','earlier findings retained')
+ ck({n for n,h in src.items()if load(P/'source-v4.json')['sources'].get(n)!=h}==set(rv['history']['changed_vs_v4']),'exact V5 leaf scope')
+ b=R/'drivers/cogent/build';prepared={p.relative_to(b).as_posix():sha(p)for mod in ['upstream','typesetting']for p in sorted((b/mod).rglob('*'))if p.is_file()}
+ ck(len(prepared)==6174 and prepared==q['prepared']==load(P/'prepared-identity.json')['files'],'current prepared6174')
+ pins=load(R/'drivers/cogent/native/patches/maincleanup/output-hashes.json');inputs=load(R/'drivers/cogent/native/patches/maincleanup/original-hashes.json')
+ for n,h in pins.items():ck(prepared['upstream/'+n]==h,'stage45 output '+n)
+ ck(sha(P/'backend-before/system/driver/desktop/app.go')==inputs['system/driver/desktop/app.go'],'original backend input')
+ deps=load(R/'drivers/cogent/native/dependencies.json')['dependencies'];up=next(d for d in deps if d['name']=='upstream');flat=[p for s in up['stages']for p in s['patches']]
+ ck([int(Path(p['file']).name[:4])for p in flat]==list(range(1,46)),'flattened patch1..45')
+ ck(up['stages'][-1]==rv['static_pin_verification']['manifest_last_stage'],'stage45 registration')
+ for p in flat:ck(sha(R/'drivers/cogent'/p['file'])==p['sha256'],'patch pin '+p['file'])
+ proc={}
+ for p in sorted(P.glob('*.json')):
+  x=load(p)
+  if not isinstance(x,dict)or'argv'not in x:continue
+  n=p.stem;ck(x['exit_code']==(1 if n=='tray-driver'else 0)and x['error']is None and x['live_tests']is False,'process terminal '+n)
+  for s in ['stdout','stderr']:ck(x[s+'_sha256']==sha(P/(n+'.'+s)),'raw log '+n+s)
+  ck(x['argv'][0]in['go','python3','xcrun'],'no app execution '+n);proc[n]=x
+ ck(len(q['process'])==14 and q['process']=={n:proc[n]for n in q['process']},'fourteen final receipt objects')
+ ck(all(proc[n]['exit_code']==0 for n in q['process']),'final process0')
+ ck('Ran 11 tests' in(P/'prep-regression.stderr').read_text()and(P/'prep-regression.stderr').read_text().rstrip().endswith('OK'),'eleven preparation regressions')
+ ck(proc['driver-v5']['argv'][-1]=='./...'and'offscreen'in proc['driver-v5']['argv']and'-race'in proc['driver-v5']['argv'],'final whole offscreen race')
+ ck('disabled'in(P/'tray-driver.stdout').read_text()and'TestTrayCommitReplacementRetirementAndAvailability'in(P/'tray-driver.stdout').read_text(),'failed expectation retained')
+ for n in q['process']:ck('WARNING: DATA RACE'not in(P/(n+'.stdout')).read_text(),'final race status '+n)
+ newfiles=['app/tray_test.go','drivers/cogent/tray_test.go','drivers/cogent/tray_darwin_test.go','examples/sdk-contract/tray_test.go','drivers/cogent/build/upstream/system/driver/desktop/main_cleanup_vellum_test.go']
+ names=[m for n in newfiles for m in re.findall(r'^func (Test\w+)\(', (R/n).read_text(),re.M)]
+ ck(len(names)==14 and'func TestNativeMenuQueuedActionRetiresBeforeOwnerDrain('in(R/'drivers/cogent/services_darwin_test.go').read_text(),'fifteen new functions')
+ provenance=load(P/'duplicate-ack-provenance.json');probe=(P/'duplicate-ack-probe.go.txt').read_text()
+ ck(provenance==q['duplicate_ack_probe']and all(provenance[k]is True for k in ['final_source_unchanged','index_unchanged','temporary_fixture_removed'])and provenance['probe_sha256']==sha(P/'duplicate-ack-probe.go.txt'),'probe provenance')
+ ck(proc['duplicate-ack-probe']['argv'][-3:]==['-run','^TestNativeServiceDuplicateAcknowledgementsProbe$','.']and'-race'in proc['duplicate-ack-probe']['argv'],'actual probe admission')
+ ck(not(R/'drivers/cogent/prism_duplicate_ack_probe_test.go').exists(),'temporary source removed')
+ for s in ['nativeServiceResultFixture(first','for i:=0;i<16;i++','serviceToken.Store(^uint64(0))','nativeServiceResultFixture(token','retained!=0']:ck(s in probe,'probe case '+s)
+ disp=load(P/'prism-disposition.json');prism=load(P/'prism-v1/prism.json');pp=load(P/'prism-v1/process.json');pi=load(P/'prism-v1/inputs.json');cov=prism['coverage']
+ ck(pp['exit_code']==1 and pp['error']is None and pp['before']==pp['after']==pi['files']==src and pp['source_index_stable']is True,'raw stable provider31/exit1')
+ ck(pp['prism_sha256']==disp['prism_sha256']==sha(P/'prism-v1/prism.json')and pi['diff_sha256']==sha(P/'prism-v1/staged.diff.txt'),'provider raw/diff identities')
+ ck(cov['complete']is True and cov['files']==31 and cov['chunks']==cov['llmCalls']==5 and cov['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]and cov['excluded']==cov['skipped']==[]and cov['truncatedBytes']==0,'provider full coverage')
+ ck(len(prism['findings'])==1 and prism['findings'][0]['id']=='cc7bc1313447fdbf'and prism['findings'][0]['severity']=='medium'and not prism['discarded']and not prism['suppressed'],'original conditional finding')
+ ck(disp['result']=='APPROVED_DISPOSITION'and disp['disposition']=='REFUTED_EXISTING_RETIREMENT_GUARD'and not disp['unresolved_findings']and disp['files']==src and disp['no_source_change']is True and disp['no_provider_rerun']is True,'independent disposition')
+ ck(disp['source_certificate']['sha256']==sha(P/'source-review-v5.json')and disp['notes']['sha256']==sha(P/'prism-disposition.md')and q['prism_disposition_sha256']==sha(P/'prism-disposition.json'),'disposition certificates')
+ ck(q['prism_raw_exit']==1 and q['prism_findings']==cp['prism_findings']==1 and q['prism_findings_resolved']is True and cp['prism_findings_resolved']is True,'raw and resolved distinct')
+ native=(R/'drivers/cogent/services_darwin.go').read_text();start=native.index('func nativeServiceFinish(');end=native.index('// Exercise the real bounded',start);finish=native[start:end]
+ ck(finish.index('nativeCallbacks.Lock()')<finish.index('if !exists')<finish.index('delete(nativeCallbacks.operations, token)')<finish.index('op.result <- value'),'existing lock/recheck/delete-before-publication')
+ ck('if previous == ^uint64(0)'in native and'serviceToken.CompareAndSwap(previous, previous+1)'in native,'existing nonwrapping tokens')
+ sdk=P/'private-sdk-v5.tar.gz';manifest=load(P/'private-sdk-v5-manifest.json');ck(sha(sdk)==SSHA==q['sdk']['sha256']and len(manifest['files'])==6933 and q['sdk']['source_files']==31,'final SDK identity/count')
+ sdkseen=set();mods={};sdkbytes=0
+ with tarfile.open(sdk,'r:gz')as a:
+  for m in a:
+   parts=PurePosixPath(m.name).parts;ck(m.isfile()and len(parts)>1 and parts[0]=='vellum-v0.1.0-alpha.1'and'..'not in parts,'safe SDK member');n='/'.join(parts[1:]);ck(n not in sdkseen,'duplicate SDK');sdkseen.add(n);data=a.extractfile(m).read();sdkbytes+=len(data)
+   if n=='SDK_MANIFEST.json':ck(data==(P/'private-sdk-v5-manifest.json').read_bytes(),'SDK manifest bytes')
+   else:
+    ck(n in manifest['files']and dig(data)==manifest['files'][n],'SDK payload '+n)
+    if n in src:ck(dig(data)==src[n],'SDK current source '+n)
+    if n in ['go.mod','drivers/cogent/go.mod','drivers/cogent/build/upstream/go.mod','drivers/cogent/build/typesetting/go.mod']:mods[n]=data.decode()
+ ck(sdkseen==set(manifest['files'])|{'SDK_MANIFEST.json'}and all(manifest['files'].get(n)==h for n,h in src.items()),'all6933/all31 source identities')
+ ck('drivers/cogent/prism_duplicate_ack_probe_test.go'not in sdkseen,'temporary probe excluded SDK')
+ checker=json.loads((P/'sdk-check-v5.stdout').read_text(),object_pairs_hook=unique);ck(checker==q['sdk_check']and checker['archive_sha256']==SSHA and checker['verified_files']==6933 and checker['digest_verified_against_expected']is True and checker['independent_authenticity_verified']is False,'checker exact trusted digest')
+ ck(checker['path_contains_spaces']is True and checker['native_runtime']=='not executed'and checker['public_distribution_audit']=='not certified','checker limits')
+ replacements={'cogentcore.org/core':'drivers/cogent/build/upstream','github.com/dshills/vellum':'.','github.com/dshills/vellum/drivers/cogent':'drivers/cogent','github.com/go-text/typesetting':'drivers/cogent/build/typesetting'};ck(checker['replacements_within_sdk']==replacements,'four targets')
+ for module,path in replacements.items():ck(re.search(r'^module\s+'+re.escape(module)+r'\s*$',mods['go.mod'if path=='.'else path+'/go.mod'],re.M),'target module '+module)
+ ck(sha(P/'workbench-v5')==q['native_binary_sha256']and'go1.27.2'in(P/'build-metadata-v5.stdout').read_text(),'compiled-only binary')
+ loads=(P/'native-load-commands-v5.stdout').read_text();ck(re.search(r'minos\s+26\.0',loads)and re.search(r'sdk\s+27\.0',loads),'local load metadata')
+ wr=load(P/'promotion-review.json');text=(P/'promote.py').read_text();ck(wr['status']=='APPROVED'and not wr['findings']and wr['producer_sha256']==sha(P/'promote.py')==sha(P/'promotion-reviewed-producer.py.txt'),'reviewed promotion identity')
+ head=text[:text.index('out.mkdir(parents=True,exist_ok=False)')]
+ for s in ["git(scratch,'rev-list','--parents','-n','1','HEAD').split()==[commit,base]","q['result']=='PASS_OFFSCREEN_MAC_TRAY'","expected.get(n)==h","checkpoint['prism_coverage_complete']","checkpoint['prism_findings_resolved']","sha(phase/'qualification.json')==checkpoint['qualification_sha256']"]:ck(s in head,'wrapper preflight '+s)
+ ck("'merge','--ff-only'"in text and'timeout=180'in text and"'FAILED_CANONICAL_PROMOTION'"in text,'wrapper bounds/failure')
+ report=(D/'README.md').read_text()
+ for s in ['Fifteen new test functions','Eleven preparation regression','final V5 native suite/build','6933 manifest files',SSHA,'31 final source hashes','6174 freshly prepared','raw exit1 and one medium','conditional duplicate-ACK','No code change or repeated','fixture is excluded from the final SDK','compiled only','No fixture creates NSStatusItem','performance and public distribution gates remain open']:ck(s in report,'bounded report '+s)
+ ck(all((D/s).is_file()for s in re.findall(r'\]\(([^)]+)\)',report)),'report links')
+ for k in ['live_tests','status_bar_access','pasteboard_access','whole_macos_completion','performance_acceptance']:ck(q[k]is False,'open gate '+k)
+ return {'result':'APPROVED_EVIDENCE','status':'APPROVED_EVIDENCE','findings':[],
+ 'scope':'Independent read-only frozen source/receipt/SDK/archive/report audit. Only stdlib metadata reader ran; no producer/tests/build/prepare/native/UI/settings/provider/Git actions or implementation edits.',
+ 'reviewed_document_sha256':{'docs/reports/macos-tray/README.md':RSHA,'specs/tray.md':sha(R/'specs/tray.md')},
+ 'reviewed_file_sha256':{str(R/n):h for n,h in src.items()},'reviewed_receipt_sha256':{n:e['sha256']for n,e in ix.items()},
+ 'archive':{'sha256':ASHA,'index_sha256':sha(D/'records/archive-index.json'),'checkpoint_sha256':CSHA,'members':286,'member_bytes':total,'compressed_bytes':1411323,'exact_member_identity':True,'excluded':sorted(excluded)},
+ 'source':{'final31_match_current_snapshots_sdk':True,'prepared_files':6174,'current_prepared_full_map_matches':True,'stage45_pins_and_order_verified':True,'approved_review_sha256':sha(P/'source-review-v5.json')},
+ 'checks':{'final_processes':14,'all_terminal_exit0':True,'all_raw_hashes_match':True,'new_test_functions':15,'preparation_tests':11,'earlier_disabled_expectation_failure_preserved':True,'earlier_root_backend_public_scope_unchanged_atV5':True},
+ 'prism':{'raw_exit1':True,'raw_medium_findings':1,'files':31,'chunks':5,'complete':True,'raw_sha256':sha(P/'prism-v1/prism.json'),'disposition_sha256':sha(P/'prism-disposition.json'),'disposition':'REFUTED_EXISTING_RETIREMENT_GUARD','unresolved_findings':[],'no_source_change_or_second_provider':True},
+ 'probe':{'source_sha256':sha(P/'duplicate-ack-probe.go.txt'),'receipt_sha256':sha(P/'duplicate-ack-probe.json'),'provenance_sha256':sha(P/'duplicate-ack-provenance.json'),'result':'PASS_RACE_ACTUAL_C_REPLY_CALLBACK','source_removed_sdk_excluded':True,'source_and_index_unchanged_producer_record':True},
+ 'sdk':{'sha256':SSHA,'manifest_sha256':sha(P/'private-sdk-v5-manifest.json'),'files':6933,'all_payload_hashes_verified':True,'all31_sources_current_match':True,'spaced_path_and_expected_digest':True,'native_runtime':'not executed','distribution_audit':'not certified'},
+ 'compiled_only':{'binary_sha256':q['native_binary_sha256'],'Go':'1.27.2','local_minimum':'macOS26.0','local_sdk':'27.0'},
+ 'promotion':{'producer_sha256':sha(P/'promote.py'),'review_sha256':sha(P/'promotion-review.json'),'source_only_control_flow':'APPROVED','actual_promotion_certified':False},
+ 'limitations':['Headless/injected parser, bitmap, lifetime, cleanup and reply fixtures do not establish actual status-item/menu/panel/window-loop/OS behavior. No real tray/native UI/pasteboard call is certified.',
+ 'The duplicate probe exercises C-string-to-Go reply entry and Go retirement, not actual concurrent NSSavePanel callbacks or exactly-once domain execution. Index stability is the producer’s preserved byte-comparison result; no reviewer Git command ran.',
+ 'Some recorded package successes use Go test cache; test-function counts are not individual verbose RUN/PASS enumerations. Generic receipts do not independently prove complete compiler/source intervals.',
+ 'Private SDK integrity uses the caller-supplied digest, not independent authenticity, rights, signing/notarization or public distribution. Shipped target modules match the checker map; generated checker consumer modfile is not retained.',
+ 'Earlier source findings/disabled fixture failure and original raw Prism exit1 remain separate. Refutation is based on existing guards and the scoped probe; no provider finding was erased.',
+ 'Compiled-only local Go/build/load metadata grants no older-Mac runtime, native human acceptance, GPU/DPI/memory/performance or full Mac/P10/distribution qualification. User live-testing deferral remains in force.',
+ 'Certificate/reader intentionally remain outside the frozen286-member archive; no actual commit/promotion is inferred.']}
+if __name__=='__main__':
+ result=audit();result['audit_recipe_sha256']=sha(Path(__file__));result['audit_recipe_path']=str(Path(__file__))
+ out=P/'evidence-review.json';temp=out.with_suffix('.json.tmp');temp.write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n');os.replace(temp,out)
+ notes=P/'evidence-review.md';temp=notes.with_suffix('.md.tmp');temp.write_text('''# Independent tray/native service lifetime evidence review
+
+APPROVED_EVIDENCE; no actionable finding in the frozen source-bound report scope.
+
+All286 archive members/4457078 uncompressed bytes match exact indexed membership, length, SHA and phase originals; compressed archive length is1411323 bytes. Final31 sources match frozen V5/current/source approval and all shipped SDK entries; all6174 prepared hashes and stage45 pins/order match. Fourteen final receipt objects are terminal0 with matching logs. The15 new-function and11 preparation-test claims agree; earlier unchanged root/backend/public scope is distinguished from final V5 native correction. The disabled-command expectation failure remains failed and separate.
+
+Prism’s original exit1/one conditional medium is retained with complete31-file/five-chunk scope. Independent disposition, current mutex recheck/delete-before-publication and nonwrapping tokens agree. The temporary actual C-reply fixture’s source, race-pass receipt and unchanged-source/index provenance are bound. Repeated/concurrent/stale/exhaustion cases are explicit; fixture removal and SDK exclusion are verified. This does not prove actual native-panel callback behavior or general exactly-once domain execution.
+
+The final private SDK258065a19a2970613a70403c7a66a766f1fea6913d4af7c4042d7124f5172e9a has all6933 payload identities verified, all31 current hashes, expected-digest/spaced-path/four-module checks, native runtime unexecuted and public distribution uncertified. Binary/build/load receipts are compiled-only Go1.27.2/macOS26.0 minimum/SDK27.0. Reviewed promotion source/control-flow is bound; no actual promotion or Git state is certified.
+
+This is an offscreen implementation/tooling evidence approval. Real status-item visibility, retained native objects, menu/keyboard/VoiceOver/dark-mode/mixed-DPI, real loop cleanup, live native human/UI/GPU/frame/performance and full Mac/P10/distribution gates remain open. Only the independent stdlib reader ran; no producer/test/build/prepare/native/UI/provider/Git action or shared source change occurred.
+''');os.replace(temp,notes)
+ print(json.dumps({'result':result['result'],'certificate':str(out),'certificate_sha256':sha(out),'notes_sha256':sha(notes),'archive_members':286,'prepared_files':6174,'sdk_files':6933,'findings':[]}))

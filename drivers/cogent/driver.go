@@ -4,6 +4,7 @@ package cogent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html"
 	"reflect"
@@ -111,6 +112,11 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		return out
 	}
 	services := &platformServices{owner: a, commands: d.Commands, onError: d.OnError}
+	removeServiceCleanup, err := configureServiceCleanup(services)
+	if err != nil {
+		return err
+	}
+	defer removeServiceCleanup()
 	var quitting atomic.Bool
 	quit := func() {
 		if !shown.Load() {
@@ -411,10 +417,14 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 	stop := context.AfterFunc(ctx, quit)
 	defer stop()
 	core.Wait()
+	var runErr error
 	if err := failure.Load(); err != nil {
-		return *err
+		runErr = *err
 	}
-	return nil
+	if err := services.cleanupErr.Load(); err != nil {
+		return errors.Join(runErr, *err)
+	}
+	return runErr
 }
 func sameShape(r *record, n ui.Node) bool {
 	if r.node.ID != n.ID || r.node.Kind != n.Kind || len(r.children) != len(n.Children) {

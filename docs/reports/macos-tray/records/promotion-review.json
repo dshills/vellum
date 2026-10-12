@@ -1,0 +1,56 @@
+{
+  "status": "APPROVED",
+  "scope": "Read-only control-flow safety review of proposed local tray/native-service checkpoint promotion producer. No producer, command/Git, test/build/prepare, live UI/settings/provider or implementation mutation action; no actual promotion/native/performance acceptance.",
+  "producer_path": "/private/tmp/vellum-macos-tray/promote.py",
+  "producer_sha256": "106a5a7190fdf81b42975e5be6d348802877bda3815361103b4a67f6aa6b103d",
+  "base_commit": "54963dbd1e305cdc3dc0e8ab5556357a8f59bc6b",
+  "prior_reference": {
+    "review_path": "/private/tmp/vellum-macos-clipboard-data/promotion-wrapper-review-v1.json",
+    "review_sha256": "a326afdb4e8444fdd6d336b97f0447454aa50366d611c842f2ac23c80069f6ed",
+    "producer_sha256": "2cb3112a7cbf8f8537f53b277e39a1ea7cfb5a2d211b04d6af061c397680a712"
+  },
+  "mechanical_delta": "Exact permitted adaptation of approved clipboard wrapper: phase/report/artifact paths, base, qualification result, prepared count6172→6174 and scope prose. Other executable guards, timeouts and failure/finally paths unchanged.",
+  "findings": [],
+  "source_freeze_reference": {
+    "path": "/private/tmp/vellum-macos-tray/source-v4.json",
+    "sha256": "2d8b839953d6207e285ace78b0c567bb3c549ffdfbe1216fbf566ba5582340a8",
+    "base_commit": "54963dbd1e305cdc3dc0e8ab5556357a8f59bc6b",
+    "source_entries": 31,
+    "current_mismatches": [],
+    "scope": "Selected hash identity only, not a tray implementation review or final source/prism/evidence qualification."
+  },
+  "prerequisites": {
+    "status": "PENDING_FINAL_QUALIFICATION_REPORT",
+    "qualification_path": "/private/tmp/vellum-macos-tray/qualification.json",
+    "required_result": "PASS_OFFSCREEN_MAC_TRAY",
+    "checkpoint_path": "/private/tmp/vellum-large-data/docs/reports/macos-tray/records/checkpoint.json",
+    "archive_path": "/private/tmp/vellum-large-data/docs/reports/macos-tray/records/evidence.tar.gz",
+    "final_qualification_checkpoint_archive_verified": false,
+    "expected_sources": 31,
+    "expected_prepared_files": 6174,
+    "final_prism_result_resolution_verified": false,
+    "note": "Final qualification/report/checkpoint/archive and separate source/evidence review must exist and pass before execution. Missing/mismatched/nonpassing prerequisites refuse before output/fetch. Scratch must be a clean sole-child commit."
+  },
+  "checked_properties": [
+    "Scratch/canonical clean; exact canonical base and codex/foundation-completion branch; scratch different target with exact sole-parent token list [commit,base].",
+    "Every qualified source entry must match tracked scratch expected map. Qualification base/result and checkpoint qualification hash are checked before destination creation/fetch.",
+    "Prism guard requires complete Anthropic Claude Sonnet5.5 coverage, nonnegative raw findings and explicit resolution. It does not assert zero findings or CLI exit0; actual final results remain evidence prerequisites.",
+    "Explicit local scratch exact-SHA fetch and FETCH_HEAD identity, --ff-only merge, final HEAD exact. No public push/tag/release invocation.",
+    "Git60s and fresh prepare180s via existing owned-child helper; exclusive destination and xb stdout/stderr logs. Preparation finally records exit/error/elapsed/log hashes before output assertions.",
+    "Success requires all6174 freshly prepared bytes equal qualification, all tracked canonical bytes equal clean committed scratch, archive digest equality and both clean endpoint trees. Failure preserves error, best-effort canonical HEAD/status, commands and elapsed in outer finally.",
+    "Producer invokes only Git and pinned preparation. No live window, tray interaction/input test, performance, OS settings or provider call. Real status-bar/native-loop and broader Mac acceptance stay deferred/open."
+  ],
+  "limits": [
+    "Source-only control-flow approval; no actual canonical/scratch Git state, final qualification contents, fresh prepared outputs or successful promotion observed.",
+    "Frozen single-owner execution required; individual guards are not an atomic repository lock.",
+    "Receipt/file-write failures remain external filesystem failures. Broader source/evidence, human/native interaction, latency and memory approval are separate."
+  ],
+  "actions": {
+    "execution": false,
+    "commands_git": false,
+    "tests_builds_prepare": false,
+    "live_ui_settings": false,
+    "provider": false,
+    "implementation_edits": false
+  }
+}

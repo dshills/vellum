@@ -5,6 +5,7 @@ The [implementation status](../implementation.md) describes the current framewor
 
 - [Large stored-tree adapter](macos-large-tree/README.md)
 - [Mac clipboard data (offscreen)](macos-clipboard-data/README.md)
+- [Mac tray and native service lifetime (offscreen)](macos-tray/README.md)
 - [Native grid timing foundation](macos-grid-performance/README.md)
 - [Stored-data worker grid](macos-grid-loaded/README.md)
 - [Managed native grid adapter](macos-grid-native/README.md)

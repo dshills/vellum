@@ -10,6 +10,8 @@ import (
 
 var ErrUnavailable = errors.New("vellum: platform service unavailable")
 var ErrCanceled = errors.New("vellum: dialog canceled")
+var ErrServiceBusy = errors.New("vellum: platform service dispatch capacity exhausted")
+var ErrServiceTooLarge = errors.New("vellum: platform service data exceeds limit")
 
 type FileMode uint8
 

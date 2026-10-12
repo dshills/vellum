@@ -408,6 +408,17 @@
               "sha256": "2b103de8f7e2ba2ac371ec5efaebb882e5dd9f69549f5cda0ec300aaf337866b"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/maincleanup",
+          "inputs": "native/patches/maincleanup/original-hashes.json",
+          "outputs": "native/patches/maincleanup/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/maincleanup/0045-native-main-cleanup.patch",
+              "sha256": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e"
+            }
+          ]
         }
       ]
     },

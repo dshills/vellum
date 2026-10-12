@@ -15,6 +15,7 @@
 - [Standard controls](controls.md): interaction, focus and semantic metadata.
 - [Windows and services](windows-services.md): scoped lifetimes and OS integration.
 - [Clipboard representations](clipboard.md): bounded Mac text/PNG/HTML/custom-MIME data with optional capability reporting.
+- [Mac tray service](tray.md): retained menu-bar item, bounded PNG icons, owner-validated command menus and main-loop cleanup.
 - [Workbench interaction](workbench-interaction.md): pointer docking, floating,
   redocking and transactional multiwindow session persistence.
 - [Accessibility and keyboard workflows](accessibility.md): native macOS semantics,

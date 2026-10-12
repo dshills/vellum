@@ -146,6 +146,11 @@ The optional [clipboard extension](clipboard.md) adds bounded Mac PNG/HTML/custo
 MIME representations and capability reporting. Its plain-text methods share the
 same cancellation-aware bridge. Real clipboard acceptance remains deferred.
 
+The optional [tray service](tray.md) adds a retained Mac status item with bounded
+PNG icons, accessible naming and shared command validation. Native object/menu
+interaction and real shutdown acceptance remain deferred; offscreen fixtures
+and the patched desktop cleanup lifecycle establish their tested source behavior.
+
 Windows/Linux service adapters implement clipboard, chooser transports and
 window-local menu widgets. Actual target runtime, native IME/accessibility and
 native Wayland acceptance remain open; [platform support](platform-support.md)

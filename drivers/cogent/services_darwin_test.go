@@ -17,9 +17,12 @@ func withMenuCommitState(t *testing.T) {
 	previousStopped := nativeCallbacks.stopped
 	nativeCallbacks.stopped = false
 	previousOperations, previousMenus, previousToken := nativeCallbacks.operations, nativeCallbacks.menus, nativeCallbacks.menuToken
+	previousTrays, previousTrayToken := nativeCallbacks.trays, nativeCallbacks.trayToken
 	nativeCallbacks.operations = make(map[uint64]nativeOperation)
 	nativeCallbacks.menus = make(map[uint64]nativeMenuCallback)
 	nativeCallbacks.menuToken = 0
+	nativeCallbacks.trays = make(map[uint64]nativeMenuCallback)
+	nativeCallbacks.trayToken = 0
 	nativeCallbacks.Unlock()
 	t.Cleanup(func() {
 		nativeCallbacks.Lock()
@@ -27,6 +30,8 @@ func withMenuCommitState(t *testing.T) {
 		nativeCallbacks.operations = previousOperations
 		nativeCallbacks.menus = previousMenus
 		nativeCallbacks.menuToken = previousToken
+		nativeCallbacks.trays = previousTrays
+		nativeCallbacks.trayToken = previousTrayToken
 		nativeCallbacks.Unlock()
 	})
 }
@@ -133,12 +138,48 @@ func TestNativeMenuCommitRejectsCompletedCanceledOperation(t *testing.T) {
 	nativeMenuCleanup(token)
 }
 
+func TestNativeMenuQueuedActionRetiresBeforeOwnerDrain(t *testing.T) {
+	for _, retirement := range []string{"replacement", "native-stop", "service-stop"} {
+		t.Run(retirement, func(t *testing.T) {
+			withMenuCommitState(t)
+			token := serviceToken.Add(1)
+			clicked := 0
+			a, service := menuCommitService(t, command.Command{ID: "menu", Label: "Menu", Execute: func(context.Context) error { clicked++; return nil }})
+			nativeCallbacks.Lock()
+			nativeCallbacks.menuToken = token
+			nativeCallbacks.menus[token] = nativeMenuCallback{ids: []string{"menu"}, service: service}
+			nativeCallbacks.Unlock()
+			nativeMenuAction(token, 0)
+			switch retirement {
+			case "replacement":
+				nativeCallbacks.Lock()
+				nativeCallbacks.menuToken = serviceToken.Add(1)
+				delete(nativeCallbacks.menus, token)
+				nativeCallbacks.Unlock()
+			case "native-stop":
+				stopNativeCallbacks()
+			case "service-stop":
+				service.stopped.Store(true)
+			}
+			if err := a.Drain(); err != nil {
+				t.Fatal(err)
+			}
+			if clicked != 0 {
+				t.Fatal("retired menu action executed", retirement)
+			}
+		})
+	}
+}
+
 func TestNativeShutdownUnblocksUndispatchedBackgroundOperation(t *testing.T) {
+	if !nativeServiceDismissFixture() {
+		t.Fatal("native cancellation fence failed injected dismissal exceptions")
+	}
 	withMenuCommitState(t)
 	dispatched := make(chan struct{})
 	finished := make(chan error, 1)
 	go func() {
-		_, err := nativeOperationRun(context.Background(), func(uint64) { close(dispatched) })
+		_, err := nativeOperationRun(context.Background(), func(uint64) { close(dispatched) }, nil)
 		finished <- err
 	}()
 	<-dispatched
@@ -151,7 +192,7 @@ func TestNativeShutdownUnblocksUndispatchedBackgroundOperation(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("shutdown stranded pending operation")
 	}
-	_, err := nativeOperationRun(context.Background(), func(uint64) { t.Fatal("dispatch after shutdown") })
+	_, err := nativeOperationRun(context.Background(), func(uint64) { t.Fatal("dispatch after shutdown") }, nil)
 	if !errors.Is(err, app.ErrClosed) {
 		t.Fatal(err)
 	}
