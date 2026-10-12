@@ -151,3 +151,9 @@ limits. Stage input/output pins bind every changed file; direct upstream checks
 resolve the adjacent prepared font module. The GPU scene path is disabled by
 default pending representative latency/eligibility and native memory acceptance.
 See [rendering contract](../../../specs/rendering.md).
+
+Patch 0042 uses lazy, charged geometric row bands while constructing exact
+scanner spans. Sealing retains the preceding relative-row packet/encoding and
+shader arithmetic, including arbitrary row arrival and overlap. The accompanying
+reference/byte, allocation and native multi-row fixtures bind this change; full
+Mac performance/memory acceptance remains separate.

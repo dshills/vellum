@@ -1,0 +1,32 @@
+import hashlib,json,tarfile
+from pathlib import Path
+root=Path('/private/tmp/vellum-large-data');phase=Path('/private/tmp/vellum-gpu-span-bands')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def read(name):return json.loads((phase/name).read_text())
+def receipt(name):return {'path':name,'sha256':sha(phase/name)}
+checks=read('checks-v1/qualification.json');prepare=read('preparation-v1/process.json');native=read('native-v1/process.json');source=read('source-review-v1.json');build=read('build-v1/qualification.json');campaign=read('ordinary-campaign-v1/qualification.json');eligibility=read('eligibility-v1/qualification.json');prism=read('prism-v1/prism.json');review=read('evidence-review-v1.json')
+assert checks['all_pass']and len(checks['checks'])==17 and checks['before']==checks['after']==prepare['before']==prepare['after']==native['before']==native['after']==build['prepared']==campaign['after']['prepared']
+assert prepare['exit_code']==native['exit_code']==0 and source['status']=='APPROVED'
+assert review.get('result',review.get('status'))=='APPROVED_EVIDENCE'and not review['findings']
+assert campaign['before']==campaign['after']and campaign['samples']==4800 and len(campaign['runs'])==40 and campaign['warm_target_met']=={'baseline':False,'candidate':False}
+assert read('prism-v1/process.json')['exit_code']==0 and read('prism-v1/process.json')['source_index_stable']and prism['coverage']['complete']and not prism['coverage']['skipped']and prism['coverage']['truncatedBytes']==0 and not prism['findings']
+assert len(eligibility['cases'])==4 and sum(v['samples']for v in eligibility['cases'].values())==480 and sum(v['main_scene_records']for v in eligibility['cases'].values())==481
+for name,digest in campaign['after']['source'].items():assert sha(root/name)==digest
+current={str(p.relative_to(root/'drivers/cogent/build')):sha(p)for name in ['upstream','typesetting']for p in sorted((root/'drivers/cogent/build'/name).rglob('*'))if p.is_file()};assert current==checks['after']and len(current)==6167
+stage=read('stage.json');assert len(stage['outputs'])==3
+for name,digest in stage['outputs'].items():assert current['upstream/'+name]==digest
+record={'schema':1,'checkpoint':'Sparse staging bands for scanner spans','base_commit':'ced30ee553073c4ff5bb98ee203a92e4280dcb4a','upstream_patch':42,'prepared_files':6167,'production_scope':'Builder only; test changes are excluded from consumer executables. Packet/shader/encoded format and reference arithmetic unchanged. Empty stream reservation leak corrected.','default_gpu_scene_rendering':False,'stage':receipt('stage.json'),'preparation':receipt('preparation-v1/process.json'),'checks':receipt('checks-v1/qualification.json'),'native':receipt('native-v1/process.json'),'native_groups':4,'kernel_packets':96,'native_backend_type':'not recorded','build':receipt('build-v1/qualification.json'),'source_review':receipt('source-review-v1.json'),'evidence_review':receipt('evidence-review-v1.json'),'prism':receipt('prism-v1/prism.json'),'prism_provider':'anthropic','prism_model':'claude-sonnet-5-5','prism_coverage_complete':True,'prism_findings':0,'microbenchmark':receipt('microbenchmark-v1/qualification.json'),'microbenchmark_scope':'Common400path×12row corpus,128×4096 target, prior Builder vs candidate overlays, five repeats. Lower bytes/op, more allocations/op; not a native frame result.','ordinary_campaign':receipt('ordinary-campaign-v1/qualification.json'),'ordinary_observations':4800,'ordinary_processes':40,'warmup':128,'samples_per_run':120,'warm_target_met':campaign['warm_target_met'],'ordinary_scope':'Both GPU-selected builds, qualified precedingartifact versus sparse-bands candidate. All geometry/outliers/source/binaries preserved. Source/prepared stability is not externalcompiler/module-cache/dynamic-library closure.','eligibility':receipt('eligibility-v1/qualification.json'),'diagnostic_samples':480,'main_scene_records':481,'diagnostic_scope':'Four stored-table main-scene source routes; zero Go-image attempts. No physical-transfer or general scene/presentation qualification.','report_sha256':sha(root/'docs/reports/macos-span-bands/README.md'),'spec_sha256':{name:sha(root/name)for name in ['specs/rendering.md','specs/macos-completion.md']},'os_preferences_changed':False,'open_acceptance':['Unchanged Mac/P4/P6 performance targets','Native/GPU/font memory and actual device loss','Broader scene/window/modal/sprite/workbench/tree workloads','Human services/input/accessibility and cross-display behavior','Physical GPU execution/presentation and public distribution']}
+(phase/'closure.json').write_text(json.dumps(record,indent=2)+'\n');(phase/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+out=root/'docs/reports/macos-span-bands/records';out.mkdir(exist_ok=False)
+selected=[(p,p.relative_to(phase).as_posix())for p in phase.rglob('*')if p.is_file()and p.suffix in('.json','.log','.txt','.go')and p.name!='staged.diff.txt']
+index={name:{'sha256':sha(p),'bytes':p.stat().st_size}for p,name in selected};archive=out/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tar:
+ for p,name in sorted(selected,key=lambda item:item[1]):tar.add(p,arcname=name,recursive=False)
+(out/'evidence-index.json').write_text(json.dumps({'archive_sha256':sha(archive),'entries':index},indent=2)+'\n')
+record['archive']={'path':'evidence.tar.gz','sha256':sha(archive),'files':len(index),'index_sha256':sha(out/'evidence-index.json')}
+(out/'checkpoint.json').write_text(json.dumps(record,indent=2)+'\n');(out/'archive-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+with tarfile.open(archive)as tar:
+ assert len(tar.getmembers())==len(index)
+ for member in tar.getmembers():
+  data=tar.extractfile(member).read();assert len(data)==index[member.name]['bytes']and hashlib.sha256(data).hexdigest()==index[member.name]['sha256']
+print('ARCHIVE',len(index),'files',archive.stat().st_size,'bytes; VERIFIED')

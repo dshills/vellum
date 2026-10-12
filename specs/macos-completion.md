@@ -204,3 +204,11 @@ allocation per observation; profiling and source inspection guide a bounded
 span-storage investigation rather than establish allocation attribution. This
 does not qualify broader scene support, native/GPU memory, tree/workbench or full
 Mac/P4/P6 performance. The renderer remains opt-in.
+
+The [sparse span-band checkpoint](../docs/reports/macos-span-bands/README.md)
+replaces full-height construction row arrays with charged geometric bands and
+keeps the existing sealed packet/shader format. Reference bytes/pixels, explicit
+native parity and forty matched stored-table processes qualify that bounded
+change. Observed process-wide Go allocation falls about 5.7–5.9 MB per observation;
+both builds still miss unchanged warm targets. This closes neither sustained
+performance nor native/GPU memory acceptance, and the renderer stays opt-in.

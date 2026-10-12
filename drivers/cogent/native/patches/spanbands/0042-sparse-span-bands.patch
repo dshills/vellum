@@ -1,0 +1,276 @@
+--- a/paint/renderers/gpuscene/native_test.go
++++ b/paint/renderers/gpuscene/native_test.go
+@@ -148,6 +148,10 @@
+ 					for j, a := range []uint32{0, 1, 257, 32768, 65534, 65535} {
+ 						b.Span(y, j, min(size.X, j+7), a)
+ 					}
++					// Exercise both ends, gaps and band relocation in one stream.
++					b.Span(size.Y-1, 0, size.X, 32768)
++					b.Span(0, 1, size.X, 65535)
++					b.Span(size.Y/2, 0, size.X-1, 257)
+ 				}
+ 				packet := b.Seal(false)
+ 				if packet == nil {
+--- a/paint/renderers/sceneplan/builder.go
++++ b/paint/renderers/sceneplan/builder.go
+@@ -13,10 +13,11 @@
+ // Builder is an originating-render-context-only construction object. Seal drops
+ // every borrowed lookup; retained packets hold only copied value colors/bytes.
+ type Builder struct {
+-	packet Packet
+-	failed bool
+-	masks  map[*image.Alpha]*image.Alpha
+-	stream *operation
++	packet       Packet
++	failed       bool
++	masks        map[*image.Alpha]*image.Alpha
++	stream       *operation
++	streamRowMin int
+ }
+ 
+ func New(bounds image.Rectangle) *Builder {
+@@ -68,12 +69,14 @@
+ 		return
+ 	}
+ 	o := *b.stream
++	rowMin := b.streamRowMin
+ 	b.stream = nil
++	b.streamRowMin = 0
+ 	if o.rect.Empty() {
+ 		return
+ 	}
+ 	b.packet.bytes -= (len(o.rows) - o.rect.Dy()) * int(unsafe.Sizeof([]span{}))
+-	o.rows = o.rows[o.rect.Min.Y:o.rect.Max.Y]
++	o.rows = o.rows[o.rect.Min.Y-rowMin : o.rect.Max.Y-rowMin]
+ 	// Compact each row to exactly its retained capacity; replacement transients
+ 	// and the construction row index are accounted separately from owned packets.
+ 	exact := make([][]span, len(o.rows))
+@@ -94,10 +97,7 @@
+ 		return
+ 	}
+ 	r, g, bl, a := c.RGBA()
+-	if !b.reserve(b.packet.bounds.Dy() * int(unsafe.Sizeof([]span{}))) {
+-		return
+-	}
+-	b.stream = &operation{kind: Spans, op: op, color: [4]uint32{r, g, bl, a}, rows: make([][]span, b.packet.bounds.Dy())}
++	b.stream = &operation{kind: Spans, op: op, color: [4]uint32{r, g, bl, a}}
+ }
+ func (b *Builder) Span(y, x0, x1 int, alpha uint32) {
+ 	if b.failed || b.stream == nil {
+@@ -115,10 +115,38 @@
+ 	if x0 >= x1 || alpha == 0 && b.stream.op == draw.Over {
+ 		return
+ 	}
+-	if !b.reserve(int(unsafe.Sizeof(span{}))) {
+-		return
+-	}
+-	b.stream.rows[y] = append(b.stream.rows[y], span{x0, x1, alpha})
++	rows := b.stream.rows
++	rowMin, size := b.streamRowMin, len(rows)
++	grow := y < rowMin || y >= rowMin+size
++	if grow {
++		minY, maxY := y, y+1
++		if !b.stream.rect.Empty() {
++			minY = min(minY, b.stream.rect.Min.Y)
++			maxY = max(maxY, b.stream.rect.Max.Y)
++		}
++		// Geometric growth bounds repeated ascending or descending row work.
++		// Keep all touched rows; spare headers may move to either side of them.
++		size = min(b.packet.bounds.Dy(), max(maxY-minY, max(1, len(rows)*2)))
++		rowMin = min(minY, b.packet.bounds.Dy()-size)
++		if len(rows) != 0 && y < b.streamRowMin {
++			rowMin = max(0, maxY-size)
++		}
++	}
++	// Charge construction capacity and the span before either allocation. Flush
++	// retires spare headers and compacts into the unchanged relative row format.
++	if !b.reserve(int(unsafe.Sizeof(span{})) + (size-len(rows))*int(unsafe.Sizeof([]span{}))) {
++		return
++	}
++	if grow {
++		grown := make([][]span, size)
++		if !b.stream.rect.Empty() {
++			r := b.stream.rect
++			copy(grown[r.Min.Y-rowMin:], rows[r.Min.Y-b.streamRowMin:r.Max.Y-b.streamRowMin])
++		}
++		b.stream.rows = grown
++		b.streamRowMin = rowMin
++	}
++	b.stream.rows[y-b.streamRowMin] = append(b.stream.rows[y-b.streamRowMin], span{x0, x1, alpha})
+ 	r := image.Rect(x0, y, x1, y+1)
+ 	if b.stream.rect.Empty() {
+ 		b.stream.rect = r
+--- /dev/null
++++ b/paint/renderers/sceneplan/row_bands_test.go
+@@ -0,0 +1,171 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package sceneplan
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"testing"
++	"unsafe"
++
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++)
++
++type rowBandInput struct {
++	y, x0, x1 int
++	alpha     uint32
++}
++
++// Full-target rows reproduce the prior construction format independently of
++// Builder's moving band. Reference scan arithmetic checks the replay separately.
++func rowBandReference(bounds image.Rectangle, c color.RGBA, op draw.Op, inputs []rowBandInput) *Packet {
++	r, g, bl, a := c.RGBA()
++	o := operation{kind: Spans, op: op, color: [4]uint32{r, g, bl, a}, rows: make([][]span, bounds.Dy())}
++	n := 0
++	for _, in := range inputs {
++		if in.y < 0 || in.y >= bounds.Dy() {
++			continue
++		}
++		x0, x1 := max(0, in.x0), min(bounds.Dx(), in.x1)
++		if x0 >= x1 || in.alpha == 0 && op == draw.Over {
++			continue
++		}
++		o.rows[in.y] = append(o.rows[in.y], span{x0, x1, in.alpha})
++		r := image.Rect(x0, in.y, x1, in.y+1)
++		if o.rect.Empty() {
++			o.rect = r
++		} else {
++			o.rect = o.rect.Union(r)
++		}
++		n++
++	}
++	p := &Packet{bounds: bounds, bytes: int(unsafe.Sizeof(Packet{}))}
++	if !o.rect.Empty() {
++		o.rows = o.rows[o.rect.Min.Y:o.rect.Max.Y]
++		p.ops = []operation{o}
++		p.bytes += int(unsafe.Sizeof(operation{})) + len(o.rows)*int(unsafe.Sizeof([]span{})) + n*int(unsafe.Sizeof(span{}))
++	}
++	return p
++}
++
++func TestVellumScenePlanRowBandsReferenceEncodingAndScan(t *testing.T) {
++	bounds := image.Rect(0, 0, 19, 8192)
++	rng := rand.New(rand.NewSource(422))
++	orders := [][]int{{4090, 4091, 4092, 4093, 4094, 4095, 4096, 4097, 4098},
++		{6012, 6011, 6010, 6009, 6008, 6007, 6006, 6005, 6004},
++		{8, 9, 10, 11, 7, 6, 5, 4, 12, 13, 0, 14, 8191, 4096, 1, 8190},
++		{-1, 8192, 23, 23, 23}, {}}
++	for trial := 0; trial < 30; trial++ {
++		y := rng.Intn(bounds.Dy())
++		order := make([]int, 100)
++		for i := range order {
++			order[i] = max(0, min(bounds.Dy()-1, y+rng.Intn(81)-40))
++		}
++		orders = append(orders, order)
++	}
++	for _, op := range []draw.Op{draw.Src, draw.Over} {
++		for trial, order := range orders {
++			c := color.RGBA{17, 61, 129, 173}
++			inputs := make([]rowBandInput, 0, len(order)*3)
++			for i, y := range order {
++				for _, alpha := range []uint32{0, 257, 65535} {
++					inputs = append(inputs, rowBandInput{y, i%9 - 2, i%9 + 12, alpha})
++				}
++			}
++			b := New(bounds)
++			b.BeginSpans(c, op)
++			for _, in := range inputs {
++				b.Span(in.y, in.x0, in.x1, in.alpha)
++			}
++			got := b.Seal(false)
++			want := rowBandReference(bounds, c, op, inputs)
++			if got == nil || got.Bytes() != want.Bytes() {
++				t.Fatal("band refused or changed detached byte accounting", op, trial)
++			}
++			ge, gok := got.Encode()
++			we, wok := want.Encode()
++			if !gok || !wok || ge.Tiles != we.Tiles || !bytes.Equal(ge.Ops, we.Ops) || !bytes.Equal(ge.Rows, we.Rows) || !bytes.Equal(ge.Refs, we.Refs) || !bytes.Equal(ge.Data, we.Data) {
++				t.Fatal("band changed prior relative-row encoding", op, trial)
++			}
++			imageGot := image.NewRGBA(bounds)
++			rng.Read(imageGot.Pix)
++			imageWant := image.NewRGBA(bounds)
++			copy(imageWant.Pix, imageGot.Pix)
++			spanner := scan.NewImgSpanner(imageWant)
++			spanner.Op = op
++			spanner.SetColor(image.NewUniform(c))
++			fn := spanner.GetSpanFunc()
++			for _, in := range inputs {
++				if in.y >= 0 && in.y < bounds.Dy() {
++					x0, x1 := max(0, in.x0), min(bounds.Dx(), in.x1)
++					if x0 < x1 {
++						fn(in.y, x0, x1, in.alpha)
++					}
++				}
++			}
++			if !got.Replay(imageGot) || !bytes.Equal(imageGot.Pix, imageWant.Pix) {
++				t.Fatal("moving/gapped/overlapping rows changed reference scan pixels", op, trial)
++			}
++		}
++	}
++}
++
++func TestVellumScenePlanRowBandsCapacityAndPreallocationRefusal(t *testing.T) {
++	b := New(image.Rect(0, 0, 8, 8192))
++	initial := b.packet.bytes
++	for i := 0; i < 100; i++ {
++		b.BeginSpans(color.RGBA{}, draw.Over)
++	}
++	if b.packet.bytes != initial || len(b.stream.rows) != 0 {
++		t.Fatal("empty stream reserved full-target rows")
++	}
++	b.Span(6000, 0, 8, 65535)
++	if len(b.stream.rows) != 1 || b.streamRowMin != 6000 || b.packet.bytes != initial+int(unsafe.Sizeof([]span{}))+int(unsafe.Sizeof(span{})) {
++		t.Fatal("first accepted row did not charge one header and span")
++	}
++	for y := 6001; y < 6012; y++ {
++		b.Span(y, 0, 8, 65535)
++	}
++	if len(b.stream.rows) != 16 {
++		t.Fatal("small band grew to target height", len(b.stream.rows))
++	}
++	p := b.Seal(false)
++	if p == nil || len(p.ops) != 1 || len(p.ops[0].rows) != 12 || cap(p.ops[0].rows) != 12 {
++		t.Fatal("sealed rows did not retire staging headroom")
++	}
++	for _, row := range p.ops[0].rows {
++		if len(row) != cap(row) {
++			t.Fatal("sealed spans retain growth capacity")
++		}
++	}
++	refused := New(image.Rect(0, 0, 8, 8192))
++	refused.BeginSpans(color.RGBA{}, draw.Src)
++	refused.packet.bytes = MaxBytes - int(unsafe.Sizeof([]span{})) - int(unsafe.Sizeof(span{})) + 1
++	refused.Span(7000, 0, 8, 65535)
++	if !refused.Failed() || len(refused.stream.rows) != 0 || refused.Seal(false) != nil {
++		t.Fatal("row/span budget refusal happened after allocation or published a packet")
++	}
++}
++
++var rowBandBenchmarkSink *Packet
++
++func BenchmarkVellumScenePlanSpanBandsTallTarget(b *testing.B) {
++	b.ReportAllocs()
++	for i := 0; i < b.N; i++ {
++		builder := New(image.Rect(0, 0, 128, 4096))
++		for path := 0; path < 400; path++ {
++			builder.BeginSpans(color.RGBA{13, 31, 59, 255}, draw.Over)
++			for row := 0; row < 12; row++ {
++				builder.Span(1024+path%50*12+row, 0, 128, 65535)
++			}
++		}
++		rowBandBenchmarkSink = builder.Seal(false)
++		if rowBandBenchmarkSink == nil {
++			b.Fatal("valid tall-target fixture refused")
++		}
++	}
++}

@@ -279,6 +279,14 @@ exact output capacities. Coverage keeps the scanner's full 16-bit alpha and span
 order. A first accepted full-target Src or opaque uniform operation establishes
 an independent reset; command count alone never establishes a complete frame.
 
+Span construction allocates row headers lazily for a geometric staging band,
+bounded by the target height. The band can move/grow for arbitrary ascending,
+descending or gapped arrival while preserving order within each row. Header
+capacity and each accepted span are charged before allocation. Empty/clipped
+streams allocate no row headers. Sealing refunds spare headers and emits the
+unchanged exact relative-row format, without exposing staging growth capacity.
+The shader, encoded packet arithmetic and retained payload limits remain fixed.
+
 Compute composites packed premultiplied RGBA bytes with the reference Go/scan
 u32 blend and truncation rules, then copies the storage buffer to a sampled
 RGBA8UnormSrgb texture. The final source uses the existing drawer composition

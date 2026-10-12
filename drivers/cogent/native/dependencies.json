@@ -375,6 +375,17 @@
               "sha256": "ef8606923f8645d9c7b006395000f0fcc2645f002a84fd3ed66b93a3c0fe5c69"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/spanbands",
+          "inputs": "native/patches/spanbands/original-hashes.json",
+          "outputs": "native/patches/spanbands/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/spanbands/0042-sparse-span-bands.patch",
+              "sha256": "cfa4e54b7b455a5669d6622e13add20162d9cc0845805d24a3113d49473a6c6e"
+            }
+          ]
         }
       ]
     },

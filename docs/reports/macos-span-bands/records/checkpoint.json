@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "checkpoint": "Sparse staging bands for scanner spans",
+  "base_commit": "ced30ee553073c4ff5bb98ee203a92e4280dcb4a",
+  "upstream_patch": 42,
+  "prepared_files": 6167,
+  "production_scope": "Builder only; test changes are excluded from consumer executables. Packet/shader/encoded format and reference arithmetic unchanged. Empty stream reservation leak corrected.",
+  "default_gpu_scene_rendering": false,
+  "stage": {
+    "path": "stage.json",
+    "sha256": "7151be8b7466b73fbc822b6b4c397f2cd9a8226f7f25ce5e437c5c4bb8b59480"
+  },
+  "preparation": {
+    "path": "preparation-v1/process.json",
+    "sha256": "6417fbeb8744d60aa6a06ca68d036a76ce70b7b0a056e14ffcdfe36f4d077339"
+  },
+  "checks": {
+    "path": "checks-v1/qualification.json",
+    "sha256": "4e456ea94462e494f43535b72997224fd90f487373c62f5c668ef62e711527fe"
+  },
+  "native": {
+    "path": "native-v1/process.json",
+    "sha256": "1891db6970ee82fdfbc5f5ca868694c69ac8b61ebf50d2f1cfca681c2749def2"
+  },
+  "native_groups": 4,
+  "kernel_packets": 96,
+  "native_backend_type": "not recorded",
+  "build": {
+    "path": "build-v1/qualification.json",
+    "sha256": "faae6d763681e798f4c5a49e4873a914c4475f7958550727f2b3e80c1c466008"
+  },
+  "source_review": {
+    "path": "source-review-v1.json",
+    "sha256": "dcb62f1df6f46cd0e3433b54c69be7f37873da33a7a4482d3c0eb1e3d4622fd8"
+  },
+  "evidence_review": {
+    "path": "evidence-review-v1.json",
+    "sha256": "e06c18257805b75f2e7b12bae11d98ce0ba902036d06f5649e8d67b09182d19d"
+  },
+  "prism": {
+    "path": "prism-v1/prism.json",
+    "sha256": "7c170ba239fc71b106910885f964fd0d46ab45f02aae4c2a11551229f7fabea4"
+  },
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "microbenchmark": {
+    "path": "microbenchmark-v1/qualification.json",
+    "sha256": "012bec68a3deb1670121ad779b749ca9827e65c05b9b2cc0b69f89e97ed1282b"
+  },
+  "microbenchmark_scope": "Common400path\u00d712row corpus,128\u00d74096 target, prior Builder vs candidate overlays, five repeats. Lower bytes/op, more allocations/op; not a native frame result.",
+  "ordinary_campaign": {
+    "path": "ordinary-campaign-v1/qualification.json",
+    "sha256": "f168b15172e7659a61cd01f5a01d6321e125c3b392f016797bbaeb86cbb83151"
+  },
+  "ordinary_observations": 4800,
+  "ordinary_processes": 40,
+  "warmup": 128,
+  "samples_per_run": 120,
+  "warm_target_met": {
+    "baseline": false,
+    "candidate": false
+  },
+  "ordinary_scope": "Both GPU-selected builds, qualified precedingartifact versus sparse-bands candidate. All geometry/outliers/source/binaries preserved. Source/prepared stability is not externalcompiler/module-cache/dynamic-library closure.",
+  "eligibility": {
+    "path": "eligibility-v1/qualification.json",
+    "sha256": "65e522298fcac40066f2a2ee72976d6e94309075836ab80b9ab1ce3fb07cbded"
+  },
+  "diagnostic_samples": 480,
+  "main_scene_records": 481,
+  "diagnostic_scope": "Four stored-table main-scene source routes; zero Go-image attempts. No physical-transfer or general scene/presentation qualification.",
+  "report_sha256": "2725a6fe1dae6ece92b1165b5594e4acaafba385657e1595eb4ec8c85a03a881",
+  "spec_sha256": {
+    "specs/rendering.md": "488bfc558137434e5d5dd0134a1d28ee764eef011056e5ad0a27a29a690017a6",
+    "specs/macos-completion.md": "89f77116f1e86fb95c8173e1c370101c3e61aabb08c65b340e09e039a97fa7e6"
+  },
+  "os_preferences_changed": false,
+  "open_acceptance": [
+    "Unchanged Mac/P4/P6 performance targets",
+    "Native/GPU/font memory and actual device loss",
+    "Broader scene/window/modal/sprite/workbench/tree workloads",
+    "Human services/input/accessibility and cross-display behavior",
+    "Physical GPU execution/presentation and public distribution"
+  ],
+  "archive": {
+    "path": "evidence.tar.gz",
+    "sha256": "5a555c26729ea76ca94c1c7e6722e5e1ee1caaa8c4db3cc6bf01b04ac167415e",
+    "files": 199,
+    "index_sha256": "e453f718b09d1272de2eaf3cff83f287e8fd9b1dbaea775a3a6b9d9468fa6a90"
+  }
+}
