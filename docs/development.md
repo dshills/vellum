@@ -80,6 +80,23 @@ preferences. Swift is needed only for this acceptance tool. Human VoiceOver and
 IME candidate-panel workflows remain separate checks. See the
 [editor acceptance record](reports/macos-editor/README.md).
 
+## Native menu and tray acceptance
+
+Mac application-menu/tray acceptance has a separate, opt-in diagnostic build:
+
+```sh
+cd drivers/cogent
+go build -tags=vellum_native_checks -o /tmp/vellum-native-services ./cmd/services-smoke
+/tmp/vellum-native-services -cycles=3
+```
+
+Run it only on an available Mac desktop. It creates two temporary windows and
+owned native tray/menu objects, invokes installed AppKit actions, and observes
+cleanup before GLFW terminates. Its exported diagnostics exist only with that
+build tag. It does not access the clipboard, request notification permission,
+change preferences or synthesize physical input. Selector acceptance remains
+separate from physical clicks and human screen-reader workflows.
+
 ## Grid acceptance
 
 `examples/grid` is a separate consumer module with independent 10,000-row and

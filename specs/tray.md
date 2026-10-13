@@ -91,9 +91,15 @@ Offscreen fixtures exercise Go option/PNG/command ownership, canceled admission,
 callback retirement, actual Cocoa JSON/bitmap/alpha/aspect conversion and producer
 copy/release. Backend tests inject cleanup/termination functions. They never
 create a status item, open a menu/panel or modify clipboard/OS preferences.
-Actual tray visibility, native object/bar-position retention, menu clicks,
-VoiceOver, dark-mode template rendering, mixed-DPI behavior and cleanup through
-real window/loop termination remain deferred until the user frees the computer.
+An explicitly opted-in `vellum_native_checks` acceptance build inspects the
+adapter's actual NSStatusItem/NSMenu objects and invokes installed AppKit menu
+actions. It checks title/name/icon/template presentation properties, native item
+identity across updates, replacement/clear callback refusal, owner availability,
+surviving-window lifetime and main-thread cleanup before GLFW termination.
+The probes and diagnostic API are absent from ordinary SDK builds. Retained
+stale test targets/items are bounded and released by the terminal observer.
+This selector fixture does not establish physical menu clicks, bar-position
+pixels, VoiceOver, dark-mode tinting or mixed-DPI behavior.
 
 Primary APIs: [NSStatusBar](https://developer.apple.com/documentation/appkit/nsstatusbar),
 [NSStatusItem button](https://developer.apple.com/documentation/appkit/nsstatusitem/button?language=objc)

@@ -1,0 +1,124 @@
+import hashlib,io,json,shutil,tarfile
+from pathlib import Path
+r=Path('/private/tmp/vellum-large-data');p=Path('/private/tmp/vellum-macos-service-checks');out=r/'docs/reports/macos-native-services';records=out/'records'
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+sources=json.loads((p/'source-final.json').read_text())['sources'];assert len(sources)==8 and all(sha(r/n)==h for n,h in sources.items())
+cert=json.loads((p/'source-review.json').read_text())
+reviewed={Path(n).relative_to(r).as_posix() if Path(n).is_absolute() else n:h for n,h in cert['reviewed_source_sha256'].items()}
+assert cert['status']=='APPROVED_SOURCE' and reviewed==sources
+prism=json.loads((p/'prism-v1/prism.json').read_text());process=json.loads((p/'prism-v1/process.json').read_text())
+original=json.loads((p/'source-prism.json').read_text())['sources']
+assert prism['coverage']['complete'] and prism['coverage']['files']==8 and len(prism['findings'])==1 and process['exit_code']==1 and process['source_index_stable'] and process['before']==original
+disposition=json.loads((p/'prism-disposition.json').read_text());assert disposition['status']=='FIXED' and disposition['final_source_sha256']==sources['drivers/cogent/native_services_checks_darwin.m']
+disposition['affected_native_retest']='services-final-race-100.json';(p/'prism-disposition.json').write_text(json.dumps(disposition,indent=2)+'\n')
+receipts={}
+for name in ['build-services-v3','services-live-v3','build-services-race','services-race-100','root-race','native-race','offscreen-race','vet','build-services-final-race','services-final-race-100','opt-in-vet-final','isolation-final']:
+ d=json.loads((p/(name+'.json')).read_text());assert d['exit_code']==0 and d['error'] is None and d['source_delta_stable']
+ for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+ expected=sources if name in ['build-services-final-race','services-final-race-100','opt-in-vet-final','isolation-final'] else original
+ assert d['source_delta_before']==expected and d['source_delta_after']==expected
+ receipts[name]={'path':name+'.json','sha256':sha(p/(name+'.json')),'source_map':'final' if expected==sources else 'original_prism','exit_code':0}
+live=[json.loads(l) for l in (p/'services-final-race-100.stdout').read_text().splitlines()]
+final=live[-1];assert final['result']=='PASS_NATIVE_MENU_TRAY' and final['extra_create_clear_cycles']==100 and not final['clipboard_access'] and not final['preferences_changed'] and not final['physical_click_tested']
+assert live[0]['state']['WindowTitles']==['Vellum native services first','Vellum native services second']
+after_close=live[-2]['state'];assert 'Vellum native services first' not in after_close['WindowTitles'] and 'Vellum native services second' in after_close['WindowTitles'] and after_close['Tray']['Present']
+assert final['cleanup']['MainThread'] and final['cleanup']['CleanupObserved'] and final['cleanup']['Menu']['OriginalRestored'] and final['cleanup']['CallbacksStopped']
+assert not final['cleanup']['Tray']['Present'] and final['cleanup']['Menu']['TargetRetired'] and final['cleanup']['Tray']['TargetRetired']
+assert all(final['cleanup'][n]==0 for n in ['PendingCallbacks','MenuCallbacks','TrayCallbacks'])
+assert sha(p/'services-final-race')==json.loads((p/'services-final-race-100.json').read_text())['executable_sha256']
+isol=json.loads((p/'isolation-result.json').read_text());oldisol=json.loads((p/'isolation-result-v2.json').read_text())
+assert isol['result']=='PASS_DEFAULT_OFFSCREEN_OPT_IN_ISOLATION'
+for mode in ['default','offscreen']:
+ assert not isol['modes'][mode]['diagnostic_symbols'] and not isol['modes'][mode]['macro']
+ assert isol['modes'][mode]['archive_sha256']==oldisol['modes'][mode]['archive_sha256']
+assert len(isol['modes']['opt_in']['diagnostic_symbols'])==7 and isol['modes']['opt_in']['macro']
+prepared={f.relative_to(r/'drivers/cogent/build').as_posix():sha(f) for module in ['upstream','typesetting'] for f in sorted((r/'drivers/cogent/build'/module).rglob('*')) if f.is_file()}
+assert len(prepared)==6174 and prepared==json.loads(Path('/private/tmp/vellum-macos-quiet/qualification.json').read_text())['prepared']
+q={'result':'PASS_MAC_NATIVE_MENU_TRAY_SELECTORS','base_commit':'aaff77501865604ab51b31fc1425821c5a9c63e6','source':sources,'prepared':prepared,'receipts':receipts,'source_review_sha256':sha(p/'source-review.json'),'prism_raw_exit_code':1,'prism_findings':1,'prism_findings_resolved':True,'final_race_binary_sha256':sha(p/'services-final-race'),'cleanup':final['cleanup'],'extra_create_clear_cycles':100,'default_package_archive_unchanged_after_diagnostic_fix':True,'live_tests':True,'os_preferences_changed':False,'general_pasteboard_accessed':False,'physical_click_qualified':False,'human_voiceover_qualified':False,'native_heap_endurance_qualified':False,'macos_completion':False}
+(p/'qualification.json').write_text(json.dumps(q,indent=2)+'\n')
+records.mkdir(parents=True,exist_ok=False);shutil.copy2(Path(__file__),records/'archive-producer.py.txt')
+files={}
+for f in sorted(p.rglob('*')):
+ if not f.is_file() or f.is_symlink():continue
+ n=f.relative_to(p).as_posix()
+ if f.suffix in ['.json','.stdout','.stderr','.py','.txt','.log']:files[n]=f.read_bytes()
+index={n:hashlib.sha256(b).hexdigest() for n,b in files.items()}
+(records/'evidence-index.json').write_text(json.dumps(index,indent=2)+'\n')
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz') as tf:
+ for n,b in files.items():
+  info=tarfile.TarInfo(n);info.size=len(b);info.mode=0o644;info.mtime=0;tf.addfile(info,io.BytesIO(b))
+with tarfile.open(archive) as tf:
+ actual={m.name:hashlib.sha256(tf.extractfile(m).read()).hexdigest() for m in tf.getmembers() if m.isfile()}
+assert actual==index
+(out/'README.md').write_text('''# Mac native menu and tray acceptance
+
+An opt-in `vellum_native_checks` build now checks the adapter's installed AppKit
+application menu and NSStatusItem, native selector routing and terminal cleanup.
+The ordinary SDK excludes its Go diagnostics, Objective-C probes and symbols.
+The development guide documents the separate desktop fixture.
+
+## Observed behavior
+
+The fixture installs a two-command application menu, invokes its installed action,
+changes owner availability before refreshing native presentation, and verifies
+that owner dispatch refuses the newly unavailable command. Refresh presents the
+disabled state. Replacement rejects an actual retained old target/item callback;
+the new installed action reaches the current command.
+
+The native tray presents the supplied title, name, tooltip and template icon. A
+4×2 straight-alpha bitmap fits 18×9 Cocoa points and its menu contains the expected
+commands and separator. Updating reuses the installed native item. Replacement
+and clear reject retained old callbacks; clear retires production ownership.
+After the first actual Cocoa window disappears, the second remains visible and
+the application-wide tray action still reaches the owner.
+
+Terminal main-loop inspection runs after production service retirement and before
+GLFW termination. It observes the original application menu restored, no owned
+tray/targets and stopped callback admission with zero pending operation/menu/tray
+records. Test-retained stale targets/items are released before that inspection.
+
+## Checks and review
+
+One ordinary selector run and two race-enabled 100-cycle runs pass. The last race
+run tests the final source, including the defensive JSON correction. These are
+functional create/clear cycles, not a native heap or endurance qualification.
+Root, native adapter and offscreen race suites pass. Vet passes for root, default,
+offscreen and opt-in builds; affected opt-in vet was repeated after correction.
+Default/offscreen package metadata and symbols exclude all seven diagnostics;
+their package archive hashes are unchanged by the opt-in-only correction.
+
+Internal review approves all eight final source/contract files. Prism ran once
+with Anthropic Claude Sonnet 5.5, complete eight-file coverage in two chunks,
+18,106 input and 3,590 output tokens. Its raw exit 1 and one medium finding
+are preserved: a possible nil UTF8String before strdup in the diagnostic encoder.
+The encoder now returns NULL through the existing failure path; internal review,
+a fresh race build, live stress check, opt-in vet and isolation check cover that
+change. No second provider run was made.
+
+The first live diagnostic failed because a boxed C comparison encoded a JSON
+number where Go expected a Boolean. Explicit BOOL casts corrected the diagnostic
+producer. That initial run also overlapped a diagnostic-only source edit and is
+historical evidence. Original and final frozen source maps are kept separately.
+The first isolation producer reused its wrapper receipt filename, so its detailed
+metadata was overwritten; the corrected producer and final receipt keep distinct
+names. Original stdout still records the completed isolation assertions.
+
+## Evidence and limits
+
+[Checkpoint](records/checkpoint.json) binds the [archive](records/evidence.tar.gz)
+and per-member [index](records/evidence-index.json). Qualification identifies the
+eight final files, original/final receipts, race binary and all 6,174 unchanged
+prepared dependency files. Raw failed/intermediate diagnostics remain archived.
+
+Checks ran within the authorized fifteen-hour Mac testing window. They changed
+no preferences, clipboard contents, notification permissions or user files.
+Installed NSMenu actions and retained old target callbacks were invoked in-process.
+Physical pointer/keyboard menu clicks, bar-position pixels, appearance tint,
+VoiceOver, mixed-DPI screens, heap deallocation and endurance remain separate.
+Rich clipboard and notification runtime checks also remain open. This bounded
+checkpoint does not complete the Mac UI framework or qualify a public release.
+''')
+checkpoint={'result':q['result'],'base_commit':q['base_commit'],'qualification_sha256':sha(p/'qualification.json'),'source_review_sha256':sha(p/'source-review.json'),'prism_provider':'anthropic','prism_model':'claude-sonnet-5-5','prism_coverage_complete':True,'prism_original_coverage_files':8,'final_internally_reviewed_files':8,'prism_findings':1,'prism_findings_resolved':True,'archive':{'sha256':sha(archive),'members':len(index),'index_sha256':sha(records/'evidence-index.json')},'report_sha256':sha(out/'README.md'),'live_tests':True,'macos_completion':False}
+(records/'checkpoint.json').write_text(json.dumps(checkpoint,indent=2)+'\n')
+print(json.dumps({'archive_members':len(index),'archive_sha256':sha(archive),'qualification_sha256':sha(p/'qualification.json'),'report_sha256':sha(out/'README.md')}))

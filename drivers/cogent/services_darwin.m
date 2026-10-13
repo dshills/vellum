@@ -214,3 +214,39 @@ int vellumShutdownOnMain(void) {
 void vellumShutdown(void) {
     dispatch_async(dispatch_get_main_queue(), ^{ vellumShutdownOnMain(); });
 }
+
+#ifdef VELLUM_NATIVE_CHECKS
+#import "native_services_checks.h"
+static __weak NSMenu *checkOriginalMenu;
+static BOOL checkOriginalCaptured;
+static VellumMenuTarget *checkStaleMenuTarget;
+static NSMenuItem *checkStaleMenuItem;
+NSDictionary *vellumCheckMenu(int operation,int index) {
+    if (!NSThread.isMainThread) return nil;
+    if (operation==1) {
+        if (checkOriginalCaptured) return nil;
+        checkOriginalMenu=NSApp.mainMenu;checkOriginalCaptured=YES;
+    }
+    if (operation==8) { checkStaleMenuTarget=nil;checkStaleMenuItem=nil; }
+    if (operation==4) {
+        if (!checkStaleMenuTarget || !checkStaleMenuItem) return nil;
+        [checkStaleMenuTarget invoke:checkStaleMenuItem];
+    }
+    NSMutableArray *items=[NSMutableArray new];NSMenu *foundMenu=nil;NSInteger foundIndex=-1;
+    for (NSMenuItem *group in NSApp.mainMenu.itemArray) {
+        for (NSMenuItem *item in group.submenu.itemArray) {
+            if (!vellumTarget || item.target!=vellumTarget || item.action!=@selector(invoke:)) continue;
+            [items addObject:@{@"label":item.title,@"index":@(item.tag),@"enabled":@(item.enabled),@"separator":@NO}];
+            if (item.tag==index) { foundMenu=group.submenu;foundIndex=[foundMenu indexOfItem:item]; }
+        }
+    }
+    if (operation==2 || operation==3) {
+        if (!foundMenu || foundIndex<0) return nil;
+        NSMenuItem *item=[foundMenu itemAtIndex:foundIndex];
+        if (operation==2) [foundMenu performActionForItemAtIndex:foundIndex];
+        else { checkStaleMenuTarget=vellumTarget;checkStaleMenuItem=item.copy; }
+    }
+    return @{@"Owned":@((BOOL)(vellumTarget!=nil)),@"OriginalRestored":@((BOOL)(checkOriginalCaptured && NSApp.mainMenu==checkOriginalMenu)),
+             @"TargetRetired":@((BOOL)(vellumTarget==nil)),@"Items":items};
+}
+#endif

@@ -166,3 +166,40 @@ void vellumTrayShutdown(void) {
     if (vellumTrayItem) [NSStatusBar.systemStatusBar removeStatusItem:vellumTrayItem];
     vellumTrayItem=nil; vellumTrayTarget=nil;
 }
+
+#ifdef VELLUM_NATIVE_CHECKS
+#import "native_services_checks.h"
+static __weak NSStatusItem *checkLastTrayItem;
+static uint64_t checkTrayIdentity;
+static VellumTrayTarget *checkStaleTrayTarget;
+static NSMenuItem *checkStaleTrayItem;
+NSDictionary *vellumCheckTray(int operation,int index) {
+    if (!NSThread.isMainThread) return nil;
+    if (operation==8) { checkStaleTrayTarget=nil;checkStaleTrayItem=nil; }
+    if (operation==7) {
+        if (!checkStaleTrayTarget || !checkStaleTrayItem) return nil;
+        [checkStaleTrayTarget invoke:checkStaleTrayItem];
+    }
+    if (vellumTrayItem && checkLastTrayItem!=vellumTrayItem) {
+        if (checkTrayIdentity==UINT64_MAX) return nil;
+        checkTrayIdentity++;checkLastTrayItem=vellumTrayItem;
+    }
+    NSStatusBarButton *button=vellumTrayItem.button;NSImage *image=button.image;
+    NSBitmapImageRep *rep=(NSBitmapImageRep *)image.representations.firstObject;
+    NSMutableArray *items=[NSMutableArray new];NSInteger foundIndex=-1;
+    for (NSMenuItem *item in vellumTrayItem.menu.itemArray) {
+        [items addObject:@{@"label":item.title?:@"",@"index":item.separatorItem?@(-1):@(item.tag),@"enabled":@(item.enabled),@"separator":@(item.separatorItem)}];
+        if (!item.separatorItem && item.tag==index && item.target==vellumTrayTarget) foundIndex=[vellumTrayItem.menu indexOfItem:item];
+    }
+    if (operation==5 || operation==6) {
+        if (!vellumTrayTarget || foundIndex<0) return nil;
+        NSMenuItem *item=[vellumTrayItem.menu itemAtIndex:foundIndex];
+        if (operation==5) [vellumTrayItem.menu performActionForItemAtIndex:foundIndex];
+        else { checkStaleTrayTarget=vellumTrayTarget;checkStaleTrayItem=item.copy; }
+    }
+    return @{@"Present":@((BOOL)(vellumTrayItem!=nil)),@"Visible":@(vellumTrayItem.visible),@"TargetRetired":@((BOOL)(vellumTrayTarget==nil)),
+             @"Identity":vellumTrayItem?@(checkTrayIdentity):@0,@"Title":button.title?:@"",@"Tooltip":button.toolTip?:@"",
+             @"AccessibilityLabel":button.accessibilityLabel?:@"",@"Template":@(image.template),@"ImageWidth":@(image.size.width),@"ImageHeight":@(image.size.height),
+             @"PixelWidth":@(rep.pixelsWide),@"PixelHeight":@(rep.pixelsHigh),@"Items":items};
+}
+#endif
