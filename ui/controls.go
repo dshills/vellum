@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	SplitPane        Kind = "split-pane"
 	Toolbar          Kind = "toolbar"
 	StatusBar        Kind = "status-bar"
 	FormGroup        Kind = "form-group"
@@ -48,7 +49,8 @@ const (
 
 // ChangeEvent requests a model edit. The relevant payload is Checked for
 // Checkbox/Switch/ToggleButton, Number for Slider/NumberField, Text for TextField, and SelectedID
-// for Selector/Tabs/RadioGroup/SegmentedControl. Controlled nodes reflect the accepted value on redraw.
+// for Selector/Tabs/RadioGroup/SegmentedControl. SplitPane uses Number for the
+// first pane's fraction. Controlled nodes reflect the accepted value on redraw.
 type ChangeEvent struct {
 	ID               string
 	Kind             Kind
@@ -70,14 +72,14 @@ type FocusRequest struct {
 
 func IsContainer(kind Kind) bool {
 	switch kind {
-	case Row, Column, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup:
+	case Row, Column, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane:
 		return true
 	}
 	return false
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Switch, ToggleButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs:
+	case Button, Checkbox, Switch, ToggleButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane:
 		return true
 	}
 	return false
@@ -106,11 +108,17 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind == SplitPane {
+		bounds := SplitRange(n.Numeric)
+		if len(n.Children) != 2 || n.Activate != nil || bounds.Min <= 0 || bounds.Max >= 1 || bounds.Validate(n.Number) != nil {
+			return fmt.Errorf("ui: split pane requires two children, a finite fraction within ordered bounds strictly inside 0..1, positive step, and no Activate callback")
+		}
+	}
 	if (n.Kind == Toolbar || n.Kind == StatusBar || n.Kind == FormGroup) && (n.Change != nil || n.Activate != nil) {
 		return fmt.Errorf("ui: container callbacks belong on their interactive children")
 	}
-	if n.Orientation != "" && n.Kind != ProgressBar && n.Kind != Separator && n.Kind != RadioGroup && n.Kind != SegmentedControl && n.Kind != Toolbar {
-		return fmt.Errorf("ui: Orientation belongs only on progress, separator, choice and toolbar controls")
+	if n.Orientation != "" && n.Kind != ProgressBar && n.Kind != Separator && n.Kind != RadioGroup && n.Kind != SegmentedControl && n.Kind != Toolbar && n.Kind != SplitPane {
+		return fmt.Errorf("ui: Orientation belongs only on progress, separator, choice, toolbar and split controls")
 	}
 	if n.Orientation != "" && n.Orientation != Horizontal && n.Orientation != Vertical {
 		return fmt.Errorf("ui: invalid display orientation %q", n.Orientation)

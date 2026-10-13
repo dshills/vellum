@@ -413,3 +413,10 @@ managed enabled focus navigation reveals tools, and private headings/status capt
 preserve child identity and editing drafts. Offscreen input/raster and inert Cocoa
 role checks advance implementation; physical Mac input/VoiceOver and the existing
 native-memory/performance/endurance gates remain unqualified.
+
+The UI vocabulary also includes a controlled two-child SplitPane with retained
+independently scrolling pane hosts, owner-accepted fractional sizing, pointer and
+keyboard divider input, visual Tab order and Mac split-group/divider semantics.
+Offscreen input/geometry/rendering and inert Cocoa roles are scoped evidence;
+physical Mac input, human VoiceOver and the remaining memory/performance gates
+remain open. Nested SplitPane descriptors support larger adjustable layouts.

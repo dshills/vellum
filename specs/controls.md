@@ -202,7 +202,7 @@ physical keyboard/pointer acceptance remain separate from offscreen/native-objec
 fixtures. No indeterminate animation is implied by these display elements.
 
 The gallery demonstrates all four additions using ordinary descriptors and
-accepted application state. Further vocabulary work prioritizes adjustable splitters and richer reusable
+accepted application state. Further vocabulary work prioritizes richer reusable
 command/button presentation, with keyboard, disabled, lifetime and accessibility
 contracts.
 
@@ -291,3 +291,46 @@ pass. The gallery demonstrates all three containers. Actual Manual tests cover
 horizontal/vertical overflow, keyboard reveal, disabled navigation, text-key
 precedence and completed status pixels. Inert Cocoa objects check roles. Physical
 Mac input, human VoiceOver and native memory/performance remain separate gates.
+
+## Adjustable split panes
+
+`SplitPane` is a controlled container with exactly two stable child nodes. Empty
+or Horizontal Orientation places them side by side; Vertical places them top/bottom.
+Number is the first pane's accepted fraction of available space after the divider.
+Pixel rounding reserves at least one pixel for each positive pane when space permits,
+without changing its accepted fraction.
+An omitted Numeric resolves to Min .05, Max .95 and Step .01. Explicit bounds and
+Number must be finite, 0 < Min < Max < 1, with a positive step no larger than the
+range. Both panes stay mounted without implicit collapse. Drawing a pixel for
+each pane requires space for the divider and gap plus two pixels on the main axis;
+explicit content minimums can still overflow or clip a viewport. Collapsing/showing
+regions belongs in application layout state. Nested split panes form larger resizable layouts.
+
+The native divider requests Change.Number from pointer positions clamped to the
+current range; main-axis arrows use Step and Home/End select Min/Max. Programmatic
+reconciliation emits no callback. Native resize does not optimistically mutate
+accepted pane proportions. On the bounded owner queue, the latest callback and
+bounds are used. Removal, disabled ancestry, pane identity/order changes or an
+orientation change retire an earlier queued resize. A refused request leaves the
+accepted ratio unchanged. A missing Change makes resizing read-only while leaving
+the divider a readable focus target. Native digit collapse/equalization shortcuts
+are suppressed because they would bypass owner acceptance; application commands
+still run through the ordinary command router.
+
+Private pane hosts retain their scroll state and isolate native layout styling
+from managed child styles. Reorder/reparent preserves compatible child native
+identity and uncommitted editor state. Each pane scrolls independently when its
+content does not fit. Explicit outer styles override defaults and removing them
+restores native defaults. Focus request to SplitPane's ID targets its divider;
+Tab visits first-pane targets, divider, then second-pane targets within the usual
+active modal/selected-tab scope. `split:` is a reserved descriptor ID prefix for
+qualified private divider targets.
+
+Accessibility exposes an AXSplitGroup with child content and a named AXSplitter
+in visual order. The divider has current value, configured bounds, current focus,
+set/increment/decrement when writable, and exact rendered geometry. Its native
+orientation describes the divider: vertical for side-by-side panes, horizontal
+for top/bottom panes. Actions obey current disabled/lifetime guards and use the
+managed focus proxy. Inert Cocoa and actual Manual software tests remain separate
+from human VoiceOver, physical pointer/key routing, native attachment and Mac
+performance/endurance qualification.

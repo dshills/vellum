@@ -132,3 +132,10 @@ The separate [local semantic endpoint](automation.md) reuses owner/domain action
 it is not physical input replay. Broader external automation workflows,
 large-grid acceptance, output-reader timers and
 filesystem autosave remain separate work.
+
+The Manual scene size is the requested physical viewport, including its native
+scene padding/border. The body grows into the allocated content area; requested
+window dimensions are not reapplied as a body-content minimum. This keeps grown
+roots and narrow far-side split panes inside the completed viewport. Explicit
+application/theme content minimums retain their normal layout meaning. This is
+a software-driver layout correction, separate from live window-size acceptance.

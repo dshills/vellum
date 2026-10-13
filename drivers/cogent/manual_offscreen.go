@@ -24,7 +24,6 @@ import (
 	"cogentcore.org/core/keymap"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
-	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/system"
 	"cogentcore.org/core/text/shaped"
 	"cogentcore.org/core/text/shaped/shapers/shapedgt"
@@ -439,7 +438,9 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 			n.host = newAccessibilityHost(n)
 			n.body.Styler(func(s *styles.Style) {
 				applyStyle(s, ui.Node{Kind: ui.Column}, p.config.Theme)
-				s.Min.Set(units.Dp(spec.Width), units.Dp(spec.Height))
+				// RunManual already fixes the physical scene size. Reusing that size
+				// as a body-content minimum ignores scene padding/borders and clips
+				// grown roots at the far edge. Grow into the actual allocated content.
 				s.Grow.Set(1, 1)
 			})
 			n.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
@@ -813,6 +814,13 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				result.FocusedID = r.node.ID
 			}
 			result.Elements = append(result.Elements, ManualElement{ID: r.node.ID, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
+			if r.control != nil && r.control.split != nil {
+				id := accessibilitySplitHandleID(r.node.ID)
+				handle := r.control.split.handle
+				b := bounds[id]
+				box := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
+				result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: w.records[r], Kind: ui.SplitPane, Name: r.node.Accessibility.Name, Value: r.node.Number, Enabled: !controlDisabled(r), Focused: handle.ContainsFocus(), Visible: visible, Bounds: box})
+			}
 
 			if r.control != nil && r.control.outline != nil && visible {
 				inspection, treeErr := InspectTree(p.owner, r.node.Tree)

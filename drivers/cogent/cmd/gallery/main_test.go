@@ -87,3 +87,19 @@ func TestGalleryChromeContainers(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGallerySplitPane(t *testing.T) {
+	g := newGallery()
+	node(g.view(), "pages").Change(ui.ChangeEvent{SelectedID: "split-demo"})
+	node(g.view(), "panes").Change(ui.ChangeEvent{Number: 0.7})
+	if g.tab != "split-demo" || node(g.view(), "panes").Number != 0.7 {
+		t.Fatal("split pane does not use accepted gallery state")
+	}
+	node(g.view(), "split-reset").Activate()
+	if node(g.view(), "panes").Number != 0.35 {
+		t.Fatal("reset did not restore accepted divider value")
+	}
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+}

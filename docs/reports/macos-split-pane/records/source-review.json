@@ -1,0 +1,294 @@
+{
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "review_kind": "independent_read_only_final_source_delta_and_provider_disposition",
+  "created_utc": "2026-10-13T18:45:05.364451+00:00",
+  "base_commit": "3d93ec2d05731144ebf347734773c49cf5e75e12",
+  "source_manifest": "source-final-v3.json",
+  "source_manifest_sha256": "a8f84c2707da030dfb27bfece4c91b65b7e4d415af7d90f90b88d418fd3cf5ae",
+  "reviewed_count": 20,
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/docs/controls.md": "340110ef5fb11ade2017c8edc763a3cb536aa06d6419e5763328559823593e8f",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility.go": "138ed86101ef9063f57fa111b3be0e5df9e6b965b247bfbb51bbd3fc6f8e2964",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin.m": "0a16cc6ffa80053e9047126efe5e58333a6888fcdfe18e68de03f6d4e2319596",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_workbench.go": "c97f36b2b56b851cd49080a96eee01f10f463426128c8ae3a6578868c2ee64d8",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main.go": "644ae1b2715ff02fdf7280db4715ce52bf2d75cb656e77d2174f9171bb8362f7",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main_test.go": "e8ed4704e77f4e0a24a6171cab609382df7f06b7b438ad231785be1cfebc5948",
+    "/private/tmp/vellum-large-data/drivers/cogent/controls.go": "9aa7e907cb8a410ec70e787c287b821c5db4afe75b65727ae07f2b6fcd24cedc",
+    "/private/tmp/vellum-large-data/drivers/cogent/manual_offscreen.go": "050f95f75499ea27763cf88a79a90ba18c3dc7e5126db268e2323038bafb93e6",
+    "/private/tmp/vellum-large-data/drivers/cogent/split.go": "8b0e2bfd5be69ad56d411aade6543d77f510d11134a35a105cbf5e5bd98273c5",
+    "/private/tmp/vellum-large-data/drivers/cogent/split_darwin_test.go": "ac1f790c2235d7f8045bedbc6746085804492dcb6f7a1aa94048330b52c9203d",
+    "/private/tmp/vellum-large-data/drivers/cogent/split_offscreen_test.go": "312ba965f6c2e1d4e0713bff989359fb5350f1ddb1700db59fe8bf575883e5b8",
+    "/private/tmp/vellum-large-data/drivers/cogent/split_test.go": "72e7c716a33f5cb0d742ba51b07f52a467bed0ce7bfd9fce91edada233c79ce8",
+    "/private/tmp/vellum-large-data/specs/controls.md": "b49addccf1debf042d43db2d10e3626942e8668c82808235cb3252eaeceeb589",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "1006d125f1b830082e7327991d32ef6c0669899d74bd67f4dcfacd902f631cee",
+    "/private/tmp/vellum-large-data/specs/replay.md": "dde3d2bd0602a7204ab36e6ee4744916c91ded0dc9aeecaa3130d2249a74ae77",
+    "/private/tmp/vellum-large-data/ui/controls.go": "068392a461458f0a184f067942b3a4bab49fc30573dcb74692f7c998e37ce045",
+    "/private/tmp/vellum-large-data/ui/focus.go": "99f505ffaa5e28704b69be8a4a3cdd6edccb484aa861a5d582e369290b4b6d13",
+    "/private/tmp/vellum-large-data/ui/node.go": "ccbf1a5969dd9496f2eabfb6df5e60ef3595a6820eb3d53e2b20f11427ea3793",
+    "/private/tmp/vellum-large-data/ui/split.go": "362bea5b9f97b660977b9316d6029516ca19a8bcc2142bd34047e0cdece6ad83",
+    "/private/tmp/vellum-large-data/ui/split_test.go": "5b93aa2efd86cebd9f06fc1a946bdf04fcbf4e2bbceb2f093134f2307e2ea7a4"
+  },
+  "root_sha256": {
+    "docs/controls.md": "340110ef5fb11ade2017c8edc763a3cb536aa06d6419e5763328559823593e8f",
+    "drivers/cogent/accessibility.go": "138ed86101ef9063f57fa111b3be0e5df9e6b965b247bfbb51bbd3fc6f8e2964",
+    "drivers/cogent/accessibility_darwin.m": "0a16cc6ffa80053e9047126efe5e58333a6888fcdfe18e68de03f6d4e2319596",
+    "drivers/cogent/accessibility_workbench.go": "c97f36b2b56b851cd49080a96eee01f10f463426128c8ae3a6578868c2ee64d8",
+    "drivers/cogent/cmd/gallery/main.go": "644ae1b2715ff02fdf7280db4715ce52bf2d75cb656e77d2174f9171bb8362f7",
+    "drivers/cogent/cmd/gallery/main_test.go": "e8ed4704e77f4e0a24a6171cab609382df7f06b7b438ad231785be1cfebc5948",
+    "drivers/cogent/controls.go": "9aa7e907cb8a410ec70e787c287b821c5db4afe75b65727ae07f2b6fcd24cedc",
+    "drivers/cogent/manual_offscreen.go": "050f95f75499ea27763cf88a79a90ba18c3dc7e5126db268e2323038bafb93e6",
+    "drivers/cogent/split.go": "8b0e2bfd5be69ad56d411aade6543d77f510d11134a35a105cbf5e5bd98273c5",
+    "drivers/cogent/split_darwin_test.go": "ac1f790c2235d7f8045bedbc6746085804492dcb6f7a1aa94048330b52c9203d",
+    "drivers/cogent/split_offscreen_test.go": "312ba965f6c2e1d4e0713bff989359fb5350f1ddb1700db59fe8bf575883e5b8",
+    "drivers/cogent/split_test.go": "72e7c716a33f5cb0d742ba51b07f52a467bed0ce7bfd9fce91edada233c79ce8",
+    "specs/controls.md": "b49addccf1debf042d43db2d10e3626942e8668c82808235cb3252eaeceeb589",
+    "specs/macos-completion.md": "1006d125f1b830082e7327991d32ef6c0669899d74bd67f4dcfacd902f631cee",
+    "specs/replay.md": "dde3d2bd0602a7204ab36e6ee4744916c91ded0dc9aeecaa3130d2249a74ae77",
+    "ui/controls.go": "068392a461458f0a184f067942b3a4bab49fc30573dcb74692f7c998e37ce045",
+    "ui/focus.go": "99f505ffaa5e28704b69be8a4a3cdd6edccb484aa861a5d582e369290b4b6d13",
+    "ui/node.go": "ccbf1a5969dd9496f2eabfb6df5e60ef3595a6820eb3d53e2b20f11427ea3793",
+    "ui/split.go": "362bea5b9f97b660977b9316d6029516ca19a8bcc2142bd34047e0cdece6ad83",
+    "ui/split_test.go": "5b93aa2efd86cebd9f06fc1a946bdf04fcbf4e2bbceb2f093134f2307e2ea7a4"
+  },
+  "immutable_snapshot_sha256": {
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/docs/controls.md": "340110ef5fb11ade2017c8edc763a3cb536aa06d6419e5763328559823593e8f",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/accessibility.go": "138ed86101ef9063f57fa111b3be0e5df9e6b965b247bfbb51bbd3fc6f8e2964",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/accessibility_darwin.m": "0a16cc6ffa80053e9047126efe5e58333a6888fcdfe18e68de03f6d4e2319596",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/accessibility_workbench.go": "c97f36b2b56b851cd49080a96eee01f10f463426128c8ae3a6578868c2ee64d8",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/cmd/gallery/main.go": "644ae1b2715ff02fdf7280db4715ce52bf2d75cb656e77d2174f9171bb8362f7",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/cmd/gallery/main_test.go": "e8ed4704e77f4e0a24a6171cab609382df7f06b7b438ad231785be1cfebc5948",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/controls.go": "9aa7e907cb8a410ec70e787c287b821c5db4afe75b65727ae07f2b6fcd24cedc",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/manual_offscreen.go": "050f95f75499ea27763cf88a79a90ba18c3dc7e5126db268e2323038bafb93e6",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/split.go": "8b0e2bfd5be69ad56d411aade6543d77f510d11134a35a105cbf5e5bd98273c5",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/split_darwin_test.go": "ac1f790c2235d7f8045bedbc6746085804492dcb6f7a1aa94048330b52c9203d",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/split_offscreen_test.go": "312ba965f6c2e1d4e0713bff989359fb5350f1ddb1700db59fe8bf575883e5b8",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/drivers/cogent/split_test.go": "72e7c716a33f5cb0d742ba51b07f52a467bed0ce7bfd9fce91edada233c79ce8",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/specs/controls.md": "b49addccf1debf042d43db2d10e3626942e8668c82808235cb3252eaeceeb589",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/specs/macos-completion.md": "1006d125f1b830082e7327991d32ef6c0669899d74bd67f4dcfacd902f631cee",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/specs/replay.md": "dde3d2bd0602a7204ab36e6ee4744916c91ded0dc9aeecaa3130d2249a74ae77",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/ui/controls.go": "068392a461458f0a184f067942b3a4bab49fc30573dcb74692f7c998e37ce045",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/ui/focus.go": "99f505ffaa5e28704b69be8a4a3cdd6edccb484aa861a5d582e369290b4b6d13",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/ui/node.go": "ccbf1a5969dd9496f2eabfb6df5e60ef3595a6820eb3d53e2b20f11427ea3793",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/ui/split.go": "362bea5b9f97b660977b9316d6029516ca19a8bcc2142bd34047e0cdece6ad83",
+    "/private/tmp/vellum-macos-split-pane/candidate-final-v3/ui/split_test.go": "5b93aa2efd86cebd9f06fc1a946bdf04fcbf4e2bbceb2f093134f2307e2ea7a4"
+  },
+  "reference_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/reconcile.go": "15554b47a7785fc3c6fc7736a04987d3476ec9ad01a68dda9beb7aa5253bc386",
+    "/private/tmp/vellum-large-data/drivers/cogent/driver.go": "3afe51d95d53fc80b687019e51dcc760d728ab23d8e8bf51f556977f3e39f009",
+    "/private/tmp/vellum-large-data/drivers/cogent/reconcile_test.go": "d5e509072ea762477cd41c0ab89df88e25315244137bf47d999b976d559e47a5"
+  },
+  "previous_review_sha256": {
+    "review-final-v1.json": "1fc24cae7d8699f8094ee986412c1792fbc6eca19fcbeb3845fe66077b4039ae",
+    "review-final-v1.md": "36d66fe757807bd64bd05b2f7fd262b315b17b62885bebc64bed0f6943fe2a7c",
+    "review-final-v2.json": "d2fc326276f5350da406dee718daab82fd2d6199b99bd329c8ddfc3c90b260d2",
+    "review-final-v2.md": "dd674d7c0490219239bc4af215ab0f9042026c5573b8a34113ce9b3eac692d18",
+    "review-v2.json": "e1b14d9078a4392752ad7e42f69ea864cfccbadb76755fa6df3e7a405b0e5ec9",
+    "review-v2.md": "14d690658159d09dd890f09088b2a7c49d0aa65443b2b74d536e3daa40cd8317"
+  },
+  "delta_from_approved_v1": [
+    "drivers/cogent/controls.go",
+    "drivers/cogent/split.go",
+    "drivers/cogent/split_test.go"
+  ],
+  "unchanged_v1_source_count": 17,
+  "findings": [],
+  "unresolved_defects": [],
+  "resolved_internal_findings": [
+    {
+      "id": "split-failed-prepare-mutates-accepted-pane-identity",
+      "status": "FIXED",
+      "prior_certificate": "review-final-v2.json",
+      "resolution": "plannedIDs supplies pre-commit childHost routing; childIDs publishes only at finishControl after the complete prepare and attachment succeed. queueSplit continues to capture/validate only accepted IDs.",
+      "test": "TestSplitInvalidUpdateAndNilMountPreserveAcceptedPanes",
+      "old_source_overlay": "rollback-original-v1.json",
+      "actual_old_failure": "nil-mount metadata assertion; child exit 1 after successful compilation",
+      "corrected_pass": "split-race-final-v3.json, race count3",
+      "claim_scope": "Accepted pane binding/native structure on descriptor/mount refusal, not arbitrary extension side-effect rollback or later fatal synchronization."
+    }
+  ],
+  "inherited_resolutions": {
+    "certificate": "review-final-v1.json",
+    "sha256": "1fc24cae7d8699f8094ee986412c1792fbc6eca19fcbeb3845fe66077b4039ae",
+    "items": [
+      "split-maker-handle-retirement",
+      "split-native-collapse-threshold",
+      "split-command-shortcut-priority",
+      "Manual physical viewport versus content minimum correction"
+    ]
+  },
+  "provider_disposition": {
+    "id": "1836ac2091b7d2a7",
+    "disposition": "REJECTED_INVARIANT",
+    "raw_exit_code": 1,
+    "raw_findings": 1,
+    "severity": "medium",
+    "confidence": 0.35,
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "provider_sha256": "e24cf29b47d17e8cbf2705908ee356ac220732780fea799d3b2cfb818faa259c",
+    "process_sha256": "fac567adf488a1b70adc1f25c5dbad86a4204b0f327754b0a8e146076108238b",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 20,
+      "bytes": 73402,
+      "chunks": 4,
+      "llmCalls": 4,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 45120,
+          "output": 5401,
+          "costUSD": 0.14425
+        }
+      ],
+      "widenedFiles": 6,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "provider_baseline_manifest": "source-final-v1.json",
+    "provider_baseline_manifest_sha256": "24f09ddbb6b764d7c42a1dc157aaf8eda235e3bd5db114f1b5abddb18713b0e2",
+    "provider_before_after_exact_v1": true,
+    "post_provider_internal_delta": [
+      "drivers/cogent/controls.go",
+      "drivers/cogent/split.go",
+      "drivers/cogent/split_test.go"
+    ],
+    "reason": "Validated len=2, nonnil/typed-nil mount guard and whole recursive prepare before attach/order/finishControl refute the stated invalid-record scenario. Distinct private rollback finding was addressed internally.",
+    "additional_provider_executed": false
+  },
+  "reviewed_receipt_sha256": {
+    "source-final-v1.json": "24f09ddbb6b764d7c42a1dc157aaf8eda235e3bd5db114f1b5abddb18713b0e2",
+    "source-final-v2.json": "6b5e66068c59d415203cd831a8cbe5430fec58e779a520c38e5ccd5fca855a7b",
+    "source-final-v3.json": "a8f84c2707da030dfb27bfece4c91b65b7e4d415af7d90f90b88d418fd3cf5ae",
+    "review-final-v1.json": "1fc24cae7d8699f8094ee986412c1792fbc6eca19fcbeb3845fe66077b4039ae",
+    "review-final-v1.md": "36d66fe757807bd64bd05b2f7fd262b315b17b62885bebc64bed0f6943fe2a7c",
+    "review-final-v2.json": "d2fc326276f5350da406dee718daab82fd2d6199b99bd329c8ddfc3c90b260d2",
+    "review-final-v2.md": "dd674d7c0490219239bc4af215ab0f9042026c5573b8a34113ce9b3eac692d18",
+    "review-v2.json": "e1b14d9078a4392752ad7e42f69ea864cfccbadb76755fa6df3e7a405b0e5ec9",
+    "review-v2.md": "14d690658159d09dd890f09088b2a7c49d0aa65443b2b74d536e3daa40cd8317",
+    "prism-v1/prism.json": "e24cf29b47d17e8cbf2705908ee356ac220732780fea799d3b2cfb818faa259c",
+    "prism-v1/process.json": "fac567adf488a1b70adc1f25c5dbad86a4204b0f327754b0a8e146076108238b",
+    "prism-v1/inputs.json": "a1b4e99e3e5d8233384b3a996de5c62841cf3d824d9ece75b05491ec4a1bb3e0",
+    "rollback-original-overlay.json": "cb827cba631f4480ae8267f2e34dffbd38491da56d593401201df9a4e3b6ac1e",
+    "rollback-original.go.txt": "56a1d94143c557793fad5990d4290d13fd694594fed2df63e83c98c9acae0fcf",
+    "rollback-controls-original.go.txt": "8d4b7b69573d7ae7154ebf4da22366b59fb9174af0237d91d206c23fec89ae41",
+    "rollback-original-v1.json": "a68bf4affa658bcf4cc9a5a6fbd61f1014efa74f945a0183a2810585da6e143e",
+    "rollback-original-v1.stdout": "ef550fcdea79b5a8d20e76bc004336b4c973fcfbd9f9de263a9c9ee7a96c59fd",
+    "rollback-original-v1.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+    "split-race-final-v3.json": "cb654dcf64260ff8b91650f76b77c813d5d68a301aae48e2173f37547efa222d",
+    "split-race-final-v3.stdout": "b52121aac10f852ebaa8318758b41964d6728a4133f8ae3ac7331c2070c522d9",
+    "split-race-final-v3.stderr": "f2ac8214ebe84751c8dc3bbf0ed6fb76aee135dc931743b5310247f73be8305c",
+    "portable-race-final-v3.json": "387b47e58ad00b19ee28d3ff77e19f2e8a50b8c551c8bd7558c72dd9e036f43d",
+    "portable-race-final-v3.stdout": "ed4ea762708e0de80b5a90eef5b8a2bde7b72c1c2792a52972468fb6d62b5495",
+    "portable-race-final-v3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vet-final-v3.json": "2b4666bd994b05e783ca1d3a9dcbc63a5d6d8f90fd639c341549f750269d4615",
+    "vet-final-v3.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vet-final-v3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gallery-build-final-v3.json": "af16411a0350a431f747af7c0b8be0248db455a42a447920b2ca45ce903f3525",
+    "gallery-build-final-v3.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gallery-build-final-v3.stderr": "4b626c2ebc9884ee638c2cd36990d1c976f6e074cc41ab476fd1f97c4bd85ba4"
+  },
+  "observed_author_receipts": {
+    "rollback-original-v1": {
+      "exit_code": 1,
+      "argv": [
+        "go",
+        "test",
+        "-v",
+        "-tags=offscreen",
+        "-overlay=/private/tmp/vellum-macos-split-pane/rollback-original-overlay.json",
+        "-run",
+        "^TestSplitInvalidUpdateAndNilMountPreserveAcceptedPanes$",
+        "."
+      ],
+      "source_before_after_exact": true,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false
+    },
+    "split-race-final-v3": {
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-count=3",
+        "-v",
+        "-tags=offscreen",
+        "-run",
+        "^(TestSplit|TestGallerySplit)",
+        ".",
+        "./cmd/gallery"
+      ],
+      "source_before_after_exact": true,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false
+    },
+    "portable-race-final-v3": {
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "./..."
+      ],
+      "source_before_after_exact": true,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false
+    },
+    "vet-final-v3": {
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "source_before_after_exact": true,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false
+    },
+    "gallery-build-final-v3": {
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-split-pane/gallery-final-v3",
+        "./cmd/gallery"
+      ],
+      "source_before_after_exact": true,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false
+    }
+  },
+  "full_adapter_v3_status": "Not certified terminal by this source review; final evidence qualification remains separate.",
+  "notes_sha256": "3ab4eeba36c711602b005b706d9fd8ea9e058c81bb78b56d42309aa3a676c1a8",
+  "reviewer_executed_tests_or_native": false,
+  "limits": [
+    "No live native input/window sizing/human VoiceOver acceptance.",
+    "No native-memory, endurance, sustained-performance, distribution or full Mac completion claim.",
+    "Provider raw exit 1/finding preserved; three-leaf internal correction is not a second provider review.",
+    "Source approval separate from full final execution/evidence approval."
+  ]
+}

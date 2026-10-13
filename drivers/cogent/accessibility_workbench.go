@@ -307,6 +307,9 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 				}
 			}
 			out[prefix+accessibilityManagedID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused}
+			if root.control != nil && root.control.split != nil {
+				out[prefix+accessibilitySplitHandleID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}
+			}
 		}
 	}
 	if w, ok := root.node.Custom.(*Workbench); root.node.Kind == ui.Extension && ok {

@@ -63,6 +63,8 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"slider"])return NSAccessibilitySliderRole;
  if([role isEqual:@"selector"])return NSAccessibilityPopUpButtonRole;
  if([role isEqual:@"toolbar"])return NSAccessibilityToolbarRole;
+ if([role isEqual:@"split-pane"])return NSAccessibilitySplitGroupRole;
+ if([role isEqual:@"split-handle"])return NSAccessibilitySplitterRole;
  if([role isEqual:@"tabs"])return NSAccessibilityTabGroupRole;
  if([role isEqual:@"option"])return NSAccessibilityRadioButtonRole;
  if([role isEqual:@"radio-group"])return NSAccessibilityRadioGroupRole;
@@ -147,6 +149,11 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
 - (BOOL)isAccessibilityElement{return self.live&&!self.state.closed;}
 - (NSString *)accessibilityIdentifier{return self.node[@"id"];}
 - (NSString *)accessibilityRole{return vellumAXRole(self.node[@"role"]);}
+- (NSAccessibilityOrientation)accessibilityOrientation{
+ if([self.node[@"orientation"] isEqual:@"horizontal"])return NSAccessibilityOrientationHorizontal;
+ if([self.node[@"orientation"] isEqual:@"vertical"])return NSAccessibilityOrientationVertical;
+ return NSAccessibilityOrientationUnknown;
+}
 - (NSString *)accessibilitySubrole{return [self.node[@"role"] isEqual:@"dialog"]?NSAccessibilityDialogSubrole:nil;}
 - (NSString *)accessibilityLabel{return self.node[@"name"];}
 - (NSString *)accessibilityTitle{return self.node[@"name"];}
@@ -385,7 +392,7 @@ char *vellumAXGridFixture(const char *json,const char *tableID,int column,int ro
   VellumAXElement *table=elements[tableID?[NSString stringWithUTF8String:tableID]:@""];
   if(!table)return strdup("");
   VellumAXElement *cell=[table accessibilityCellForColumn:column row:row];
-  NSDictionary *result=@{@"role":[table accessibilityRole]?:@"",@"rows":@([table accessibilityRowCount]),@"columns":@([table accessibilityColumnCount]),@"visible_rows":@(table.accessibilityVisibleRows.count),@"visible_columns":@(table.accessibilityVisibleColumns.count),@"visible_cells":@(table.accessibilityVisibleCells.count),@"selected_cells":@(table.accessibilitySelectedCells.count),@"cell":cell.accessibilityIdentifier?:@"",@"cell_role":cell.accessibilityRole?:@"",@"row":cell?@(cell.accessibilityRowIndexRange.location):@(-1),@"column":cell?@(cell.accessibilityColumnIndexRange.location):@(-1)};
+  NSDictionary *result=@{@"role":[table accessibilityRole]?:@"",@"orientation":@([table accessibilityOrientation]),@"rows":@([table accessibilityRowCount]),@"columns":@([table accessibilityColumnCount]),@"visible_rows":@(table.accessibilityVisibleRows.count),@"visible_columns":@(table.accessibilityVisibleColumns.count),@"visible_cells":@(table.accessibilityVisibleCells.count),@"selected_cells":@(table.accessibilitySelectedCells.count),@"cell":cell.accessibilityIdentifier?:@"",@"cell_role":cell.accessibilityRole?:@"",@"row":cell?@(cell.accessibilityRowIndexRange.location):@(-1),@"column":cell?@(cell.accessibilityColumnIndexRange.location):@(-1)};
   NSData *data=[NSJSONSerialization dataWithJSONObject:result options:0 error:nil];return strdup([[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding].UTF8String?:"");
  }
 }

@@ -29,6 +29,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Toolbar | `ui.Toolbar` | Children, `Orientation`, scrolling overflow |
 | Status bar | `ui.StatusBar` | `Text` status, children |
 | Labeled form group | `ui.FormGroup` | `Text` heading, children |
+| Adjustable split pane | `ui.SplitPane` | Two children, `Number` fraction, `Numeric`, `Orientation`, `Change` |
 | Horizontal/vertical layout | `ui.Row`, `ui.Column` | Children, `Style` |
 | Custom driver extension | `ui.Extension` | `Custom` |
 
@@ -98,3 +99,22 @@ The example uses application-owned name/status and a save callback. Gap, alignme
 and justification style the managed form/status content as well as the outer
 container; padding and dimensions apply to the outer container. Empty headings
 or status messages hide the private caption without removing child controls.
+
+SplitPane places exactly two retained children side by side, or top/bottom with
+`Orientation: ui.Vertical`. `Number` is the first pane's accepted space fraction.
+Omitted `Numeric` defaults to 5..95% with a 1% keyboard step; explicit bounds must
+stay strictly inside 0..1 to prevent complete pane collapse. Dragging the divider or
+using its main-axis arrows/Home/End requests a `ChangeEvent.Number`. Tab moves
+through the first pane, divider, then second pane. Each pane scrolls independently.
+
+```go
+ui.Node{ID: "workspace", Kind: ui.SplitPane, Number: divider, Grow: true,
+    Accessibility: ui.Accessibility{Name: "Inspector width"},
+    Change: func(e ui.ChangeEvent) { divider = e.Number },
+    Children: []ui.Node{inspector, content},
+}
+```
+
+The application owns divider and the two child nodes. Without Change the divider
+is readable and focusable, while its position remains fixed. Nested SplitPane
+nodes support more than two regions. The gallery has a Split panes page.

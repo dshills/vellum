@@ -21,7 +21,8 @@ const (
 
 // Node IDs are stable within one window. The grid: prefix is reserved for
 // generated grid cell/row/header identities. The tree: prefix similarly reserves
-// managed outline row/disclosure/page targets. Both are refused in descriptions.
+// managed outline row/disclosure/page targets. split: reserves native divider
+// targets. These prefixes are refused in descriptions.
 // A View returns a fresh description;
 // callbacks run on the application owner. Custom holds driver-specific content.
 type Node struct {
@@ -55,7 +56,7 @@ type Node struct {
 	Checked             bool
 	Number              float32
 	Numeric             Numeric
-	// Orientation applies to display/choice/toolbar controls; RadioGroup defaults vertical.
+	// Orientation applies to display/choice/toolbar/split controls; RadioGroup defaults vertical.
 	Orientation   Orientation
 	Options       []Option
 	SelectedID    string
@@ -84,6 +85,9 @@ func Validate(root Node) error {
 		}
 		if strings.HasPrefix(n.ID, "tree:") {
 			return fmt.Errorf("ui: ID %q uses reserved tree: prefix", n.ID)
+		}
+		if strings.HasPrefix(n.ID, "split:") {
+			return fmt.Errorf("ui: ID %q uses reserved split: prefix", n.ID)
 		}
 		seen[n.ID] = true
 		if n.Kind == MultilineText {
@@ -114,7 +118,7 @@ func Validate(root Node) error {
 			return err
 		}
 		switch n.Kind {
-		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup:
+		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane:
 		case Label, Button, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)

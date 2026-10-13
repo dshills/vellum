@@ -38,6 +38,7 @@ type accessibilityNode struct {
 	Focused              bool        `json:"focused"`
 	Selected             bool        `json:"selected"`
 	Actions              []string    `json:"actions"`
+	Orientation          string      `json:"orientation,omitempty"`
 	RowIndex             int         `json:"row_index,omitempty"`
 	RowCount             int         `json:"row_count,omitempty"`
 	ColumnIndex          int         `json:"column_index,omitempty"`
@@ -325,6 +326,8 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		switch n.Kind {
+		case ui.SplitPane:
+			x.Focusable, x.Focused = false, false // The divider owns focus.
 		case ui.StatusBar:
 			x.Value = n.Text
 		case ui.DataTree:
@@ -486,7 +489,14 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		if edit := gridEditingRecord(r); edit != nil {
 			visit(edit, x.ID, disabled)
 		}
-		for _, c := range r.children {
+		for i, c := range r.children {
+			if n.Kind == ui.SplitPane && i == 1 && r.control != nil && r.control.split != nil {
+				handle, action := splitAccessibility(r, x.ID, b, disabled)
+				nodes = append(nodes, handle)
+				if action != nil {
+					handlers[handle.ID] = action
+				}
+			}
 			if n.Kind == ui.Tabs && c.node.ID != n.SelectedID {
 				continue
 			}
@@ -640,13 +650,17 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 			}
 		}
 		change.SelectedID = selected
-	case ui.Slider, ui.NumberField:
+	case ui.Slider, ui.NumberField, ui.SplitPane:
+		bounds := n.Numeric
+		if n.Kind == ui.SplitPane {
+			bounds = ui.SplitRange(bounds)
+		}
 		value := float64(n.Number)
 		switch action.Kind {
 		case "increment":
-			value += float64(n.Numeric.Step)
+			value += float64(bounds.Step)
 		case "decrement":
-			value -= float64(n.Numeric.Step)
+			value -= float64(bounds.Step)
 		case "set":
 			parsed, err := strconv.ParseFloat(strings.TrimSpace(action.Value), 64)
 			if err != nil {
@@ -659,11 +673,14 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 		if math.IsNaN(value) || math.IsInf(value, 0) || value > math.MaxFloat32 || value < -math.MaxFloat32 {
 			return false
 		}
-		number, ok := ui.ClampNumeric(float32(value), n.Numeric)
+		number, ok := ui.ClampNumeric(float32(value), bounds)
 		if !ok {
 			return false
 		}
 		change.Number = number
+		if n.Kind == ui.SplitPane && number == n.Number {
+			return true
+		}
 	default:
 		return false
 	}
@@ -881,6 +898,9 @@ func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[stri
 			for _, option := range r.node.Options {
 				bounds(accessibilityOptionID(r.node.ID, option.ID), r.control.choice.buttons[option.ID])
 			}
+		}
+		if r.control != nil && r.control.split != nil {
+			bounds(accessibilitySplitHandleID(r.node.ID), r.control.split.handle)
 		}
 		if r.node.Kind == ui.Selector {
 			for _, o := range r.node.Options {

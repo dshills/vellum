@@ -40,6 +40,12 @@ func FocusOrder(root Node) []string {
 		if disabled || (n.Kind == Dialog && !n.Open) {
 			return
 		}
+		if n.Kind == SplitPane && len(n.Children) == 2 {
+			visit(n.Children[0], disabled)
+			out = append(out, n.ID) // Divider is between the two pane tab orders.
+			visit(n.Children[1], disabled)
+			return
+		}
 		if _, ok := FocusTarget(n, n.ID); ok {
 			out = append(out, n.ID)
 		}

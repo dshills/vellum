@@ -44,6 +44,7 @@ type controlState struct {
 	window            string
 	tabs              *tabState
 	chrome            *chromeState
+	split             *splitState
 	choice            *choiceState
 	dialog            *dialogState
 	wake              func(events.Event)
@@ -120,6 +121,8 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		}
 	}()
 	switch r.node.Kind {
+	case ui.SplitPane:
+		widget = mountSplit(parent, r)
 	case ui.Toolbar, ui.StatusBar, ui.FormGroup:
 		widget = mountChrome(parent, r)
 	case ui.Checkbox:
@@ -391,6 +394,9 @@ func syncControl(r *record, previous ui.Node) error {
 	if r.control.chrome != nil {
 		syncChrome(r, previous)
 	}
+	if r.control.split != nil {
+		syncSplit(r, previous)
+	}
 	switch w := r.widget.(type) {
 	case *core.Switch:
 		// Resetting Checked alone leaves a segmented toggle's checked styling
@@ -499,6 +505,9 @@ func prepareControl(r *record, n ui.Node) error {
 	if r.control != nil && r.control.choice != nil {
 		return prepareChoice(r, n)
 	}
+	if r.control != nil && r.control.split != nil {
+		return prepareSplit(r, n)
+	}
 	if r.control == nil || r.control.tabs == nil {
 		return nil
 	}
@@ -538,6 +547,13 @@ func prepareControl(r *record, n ui.Node) error {
 }
 func childHost(r *record, id string) tree.Node {
 	if r.control != nil {
+		if r.control.split != nil {
+			for i, childID := range r.control.split.plannedIDs {
+				if childID == id {
+					return r.control.split.panes[i]
+				}
+			}
+		}
 		if r.control.chrome != nil {
 			return r.control.chrome.host
 		}
@@ -551,6 +567,12 @@ func childHost(r *record, id string) tree.Node {
 	return r.widget
 }
 func finishControl(r *record, n ui.Node) {
+	if r.control != nil && r.control.split != nil {
+		for i, child := range r.children {
+			r.control.split.panes[i].Children = []tree.Node{child.widget}
+			r.control.split.childIDs[i] = n.Children[i].ID
+		}
+	}
 	if r.control != nil && r.control.choice != nil {
 		finishChoice(r, n)
 	}
@@ -743,6 +765,9 @@ func applyFocus(root *record, request ui.FocusRequest, last *ui.FocusRequest) er
 // A Tabs descriptor focuses an enabled header button, never its nonfocusable
 // native container. Prefer the selected option, then the first enabled option.
 func focusWidget(r *record) (core.Widget, error) {
+	if r.control != nil && r.control.split != nil {
+		return r.control.split.handle, nil
+	}
 	if edit := gridEditingRecord(r); edit != nil && !edit.node.Disabled {
 		return edit.widget, nil
 	}
