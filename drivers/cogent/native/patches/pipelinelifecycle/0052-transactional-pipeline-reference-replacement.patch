@@ -1,0 +1,452 @@
+--- a/gpu/pipeline.go
++++ b/gpu/pipeline.go
+@@ -148,35 +148,19 @@
+ // along with dynamic offsets. manages whether updates are needed
+ // or can re-use existing.
+ func (pl *Pipeline) bindGroup(vg *VarGroup, used ...*Var) (*wgpu.BindGroup, []uint32, error) {
+-	if pl.currentBindGroups == nil {
+-		pl.currentBindGroups = make(map[int]*wgpu.BindGroup)
+-		pl.currentBindGroupsCount = make(map[int]int)
+-	}
+ 	dynamicOffsets := vg.dynamicOffsets(used...)
+-	cbg, ok := pl.currentBindGroups[vg.Group]
+-	ccount := pl.currentBindGroupsCount[vg.Group]
+-	vgcount := vg.BindGroupUpdateCount()
+-	if ok && ccount == vgcount {
+-		return cbg, dynamicOffsets, nil
+-	}
+-	if cbg != nil {
+-		pl.oldBindGroups = append(pl.oldBindGroups, cbg) // to be released
+-	}
+-	bg, err := vg.bindGroup(pl.Vars(), used...)
+-	if err == nil {
+-		pl.currentBindGroups[vg.Group] = bg
+-		pl.currentBindGroupsCount[vg.Group] = vgcount
+-	}
++	bg, err := refreshPipelineBinding(&pl.currentBindGroups, &pl.currentBindGroupsCount,
++		&pl.oldBindGroups, vg.Group, vg.BindGroupUpdateCount(), func() (*wgpu.BindGroup, error) {
++			return vg.bindGroup(pl.Vars(), used...)
++		})
+ 	return bg, dynamicOffsets, err
+ }
+ 
+ // releaseCurrentBindGroups releases current bind groups.
+ func (pl *Pipeline) releaseCurrentBindGroups() {
+-	if pl.currentBindGroups == nil {
+-		return
+-	}
+ 	og := pl.currentBindGroups
+ 	pl.currentBindGroups = nil
++	pl.currentBindGroupsCount = nil
+ 	for _, bg := range og {
+ 		bg.Release()
+ 	}
+--- /dev/null
++++ b/gpu/pipeline_lifecycle.go
+@@ -0,0 +1,66 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import "fmt"
++
++// Factories return fresh owned references. A refusal never publishes a partial
++// reference. One serialized owner configures, uses and retires pipeline state.
++func admitPipelineReference[R liveOwnedReference](create func() (R, error)) (R, error) {
++	var zero R
++	candidate, err := create()
++	if err != nil || candidate == zero || !candidate.IsValid() {
++		if candidate != zero {
++			candidate.Release()
++		}
++		if err == nil {
++			err = fmt.Errorf("gpu: pipeline factory returned no live reference")
++		}
++		return zero, err
++	}
++	return candidate, nil
++}
++
++// Shader replacement preserves the current module on refusal. Native pipelines
++// retain their own shader dependencies; callers rebuild them to use new code.
++func replacePipelineReference[R liveOwnedReference](current *R, create func() (R, error)) error {
++	candidate, err := admitPipelineReference(create)
++	if err != nil {
++		return err
++	}
++	old := *current
++	*current = candidate
++	var zero R
++	if old != zero {
++		old.Release()
++	}
++	return nil
++}
++
++// Failed creation must not queue the current binding for retirement or change
++// its generation. A successful replacement queues it exactly once until pass
++// completion/shutdown; previously encoded commands retain their native refs.
++func refreshPipelineBinding[R liveOwnedReference](current *map[int]R, counts *map[int]int,
++	retired *[]R, group, generation int, create func() (R, error)) (R, error) {
++	var zero R
++	old, exists := (*current)[group]
++	if exists && old != zero && old.IsValid() && (*counts)[group] == generation {
++		return old, nil
++	}
++	candidate, err := admitPipelineReference(create)
++	if err != nil {
++		return zero, err
++	}
++	if *current == nil {
++		*current = make(map[int]R)
++	}
++	if *counts == nil {
++		*counts = make(map[int]int)
++	}
++	if old != zero {
++		*retired = append(*retired, old)
++	}
++	(*current)[group], (*counts)[group] = candidate, generation
++	return candidate, nil
++}
+--- /dev/null
++++ b/gpu/pipeline_lifecycle_test.go
+@@ -0,0 +1,113 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import (
++	"errors"
++	"testing"
++)
++
++type pipelineReference struct {
++	live     bool
++	releases int
++}
++
++func (r *pipelineReference) IsValid() bool { return r != nil && r.live }
++func (r *pipelineReference) Release()      { r.live = false; r.releases++ }
++
++func TestVellumPipelineReplacementRefusalAndRetry(t *testing.T) {
++	failure := errors.New("injected replacement failure")
++	for _, scenario := range []string{"error", "partial", "nil", "invalid"} {
++		t.Run(scenario, func(t *testing.T) {
++			old := &pipelineReference{live: true}
++			for attempt := 0; attempt < 3; attempt++ {
++				candidate := &pipelineReference{live: scenario != "invalid"}
++				factory := func() (*pipelineReference, error) {
++					switch scenario {
++					case "error":
++						return nil, failure
++					case "partial":
++						return candidate, failure
++					case "nil":
++						return nil, nil
++					default:
++						return candidate, nil
++					}
++				}
++				module := old
++				if err := replacePipelineReference(&module, factory); err == nil || module != old || !old.live || old.releases != 0 {
++					t.Fatal("shader refusal changed old ownership", err, old)
++				}
++				want := 0
++				if scenario == "partial" || scenario == "invalid" {
++					want = 1
++				}
++				if candidate.releases != want {
++					t.Fatal("partial shader release", candidate.releases, want)
++				}
++				candidate = &pipelineReference{live: scenario != "invalid"}
++				current := map[int]*pipelineReference{2: old}
++				counts := map[int]int{2: 7}
++				var retired []*pipelineReference
++				if result, err := refreshPipelineBinding(&current, &counts, &retired, 2, 8, factory); err == nil || result != nil || current[2] != old || counts[2] != 7 || len(retired) != 0 || !old.live || old.releases != 0 {
++					t.Fatal("binding refusal changed ownership/generation", result, err, counts, retired)
++				}
++				if candidate.releases != want {
++					t.Fatal("partial binding release", candidate.releases, want)
++				}
++				replacement := &pipelineReference{live: true}
++				calls := 0
++				create := func() (*pipelineReference, error) { calls++; return replacement, nil }
++				result, err := refreshPipelineBinding(&current, &counts, &retired, 2, 8, create)
++				if err != nil || result != replacement || counts[2] != 8 || len(retired) != 1 || retired[0] != old || !old.live {
++					t.Fatal("successful retry did not retire old once", err, retired)
++				}
++				result, err = refreshPipelineBinding(&current, &counts, &retired, 2, 8, create)
++				if err != nil || result != replacement || calls != 1 || len(retired) != 1 {
++					t.Fatal("matching binding was recreated", calls, err)
++				}
++			}
++		})
++	}
++}
++
++func TestVellumShaderReplacementPublishesBeforeRetirement(t *testing.T) {
++	old := &pipelineReference{live: true}
++	current := old
++	for i := 0; i < 1000; i++ {
++		next := &pipelineReference{live: true}
++		if err := replacePipelineReference(&current, func() (*pipelineReference, error) { return next, nil }); err != nil {
++			t.Fatal(err)
++		}
++		if current != next || old.live || old.releases != 1 || next.releases != 0 {
++			t.Fatal("replacement leaked or released wrong owner", i)
++		}
++		old = next
++	}
++}
++
++func TestVellumPipelineBindingEmptyAndInvalidCache(t *testing.T) {
++	var current map[int]*pipelineReference
++	var counts map[int]int
++	var retired []*pipelineReference
++	failure := errors.New("refused")
++	if result, err := refreshPipelineBinding(&current, &counts, &retired, 0, 0, func() (*pipelineReference, error) { return nil, failure }); result != nil || err == nil || current != nil || counts != nil || retired != nil {
++		t.Fatal("empty refusal mutated cache")
++	}
++	invalid := &pipelineReference{}
++	current = map[int]*pipelineReference{0: invalid}
++	counts = map[int]int{0: 0}
++	next := &pipelineReference{live: true}
++	if result, err := refreshPipelineBinding(&current, &counts, &retired, 0, 0, func() (*pipelineReference, error) { return next, nil }); err != nil || result != next || len(retired) != 1 || retired[0] != invalid {
++		t.Fatal("invalid cache reused", err)
++	}
++}
++
++func TestVellumShaderRefusesMissingDevice(t *testing.T) {
++	shader := &Shader{}
++	if err := shader.OpenCode("@compute @workgroup_size(1) fn main() {}"); err == nil || shader.module != nil {
++		t.Fatal("missing device admitted shader", err)
++	}
++	shader.Release()
++}
+--- /dev/null
++++ b/gpu/pipeline_native_lifecycle_test.go
+@@ -0,0 +1,182 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build !js
++
++package gpu
++
++import (
++	"encoding/json"
++	"fmt"
++	"os"
++	"reflect"
++	"testing"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// Opt-in correctness fixture: no windows, surfaces, input, settings or timings.
++func TestVellumPipelineNativeOwnership(t *testing.T) {
++	if os.Getenv("VELLUM_PIPELINE_GPU_TEST") != "1" {
++		t.Skip("explicit headless pipeline fixture required")
++	}
++	gp, borrowed, err := NoDisplayGPU()
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer func() { borrowed.Release(); gp.Release(); ReleaseInstance() }()
++	record := func(fields map[string]any) {
++		fields["windows_created"], fields["surfaces_created"] = 0, 0
++		b, err := json.Marshal(fields)
++		if err != nil {
++			t.Fatal(err)
++		}
++		fmt.Printf("VELLUM_PIPELINE_NATIVE %s\n", b)
++	}
++	t.Run("shader_reload", func(t *testing.T) {
++		sh := NewShader("reload", borrowed)
++		var modules []*wgpu.ShaderModule
++		// Baseline cleanup explicitly retires leaked wrappers, after observation.
++		defer func() {
++			sh.Release()
++			for _, m := range modules {
++				m.Release()
++			}
++		}()
++		code := `@compute @workgroup_size(1) fn main() {}`
++		if err := sh.OpenCode(code); err != nil {
++			t.Fatal(err)
++		}
++		modules = append(modules, sh.module)
++		for i := 0; i < 16; i++ {
++			old := sh.module
++			if err := sh.OpenCode(code); err != nil {
++				t.Fatal(err)
++			}
++			modules = append(modules, sh.module)
++			if sh.module == old || !sh.module.IsValid() {
++				t.Fatal("reload did not publish a fresh live shader")
++			}
++			if old.IsValid() {
++				t.Errorf("reload retained old module %d", i)
++			}
++		}
++		current := sh.module
++		if err := sh.OpenCode("this is deliberately invalid WGSL"); err == nil {
++			t.Fatal("invalid WGSL accepted")
++		}
++		if sh.module != current || !current.IsValid() {
++			t.Fatal("failed reload changed current shader")
++		}
++		sh.Release()
++		sh.Release()
++		if current.IsValid() || sh.module != nil {
++			t.Fatal("release retained current shader")
++		}
++		if !t.Failed() {
++			record(map[string]any{"case": "shader_reload", "old_module_refs_retired": 16, "current_module_ref_retired": 1, "invalid_reload_preserved_current": true})
++		}
++	})
++	t.Run("binding_failure_retry_and_dispatch", func(t *testing.T) {
++		sy := NewComputeSystem(gp, "binding-retry")
++		if sy == nil {
++			t.Fatal("compute system missing")
++		}
++		defer sy.Release()
++		group := sy.Vars().AddGroup(Storage)
++		variable := group.Add("Data", Uint32, 4, ComputeShader)
++		other := group.Add("Other", Uint32, 4, ComputeShader)
++		group.SetNValues(1)
++		pipeline := sy.AddComputePipeline("add")
++		shader := pipeline.AddShader("add")
++		if err := shader.OpenCode(`@group(0) @binding(0) var<storage,read_write> data: array<u32,4>;
++@compute @workgroup_size(1) fn main(@builtin(global_invocation_id) id: vec3<u32>) { data[id.x] += 3u; }`); err != nil {
++			t.Fatal(err)
++		}
++		pipeline.AddEntry(shader, ComputeShader, "main")
++		sy.Config()
++		value := variable.Values.Values[0]
++		if err := SetValueFrom(value, []uint32{7, 11, 19, 31}); err != nil {
++			t.Fatal(err)
++		}
++		old, _, err := pipeline.bindGroup(group)
++		if err != nil || !old.IsValid() {
++			t.Fatal("first binding", err)
++		}
++		count := pipeline.currentBindGroupsCount[group.Group]
++		otherValue := other.Values.Values[0]
++		if err := SetValueFrom(otherValue, []uint32{0, 0, 0, 0}); err != nil {
++			t.Fatal(err)
++		}
++		originalBinding := other.Binding
++		// The original code may wrongly queue duplicate aliases on failure.
++		// Remove those aliases before system-owned current retirement.
++		defer func() {
++			other.Binding = originalBinding
++			seen := make(map[*wgpu.BindGroup]bool)
++			for _, binding := range pipeline.currentBindGroups {
++				seen[binding] = true
++			}
++			for _, binding := range pipeline.oldBindGroups {
++				if binding != nil && !seen[binding] {
++					seen[binding] = true
++					binding.Release()
++				}
++			}
++			pipeline.oldBindGroups = nil
++		}()
++		other.Binding = variable.Binding // native duplicate-layout refusal
++		group.ValuesUpdated()
++		for i := 0; i < 3; i++ {
++			binding, _, err := pipeline.bindGroup(group)
++			if err == nil || binding != nil {
++				t.Fatal("duplicate layout binding admitted", err)
++			}
++			if pipeline.currentBindGroups[group.Group] != old || pipeline.currentBindGroupsCount[group.Group] != count || len(pipeline.oldBindGroups) != 0 || !old.IsValid() {
++				t.Fatalf("failed replacement changed current ownership: attempt=%d retired=%d", i, len(pipeline.oldBindGroups))
++			}
++		}
++		other.Binding = originalBinding
++		replacement, _, err := pipeline.bindGroup(group)
++		if err != nil || !replacement.IsValid() || replacement == old || len(pipeline.oldBindGroups) != 1 || pipeline.oldBindGroups[0] != old || !old.IsValid() {
++			t.Fatal("retry did not retain one old binding until pass retirement", err)
++		}
++		again, _, err := pipeline.bindGroup(group)
++		if err != nil || again != replacement || len(pipeline.oldBindGroups) != 1 {
++			t.Fatal("same generation recreated binding", err)
++		}
++		pass, err := sy.BeginComputePass()
++		if err != nil {
++			t.Fatal(err)
++		}
++		if err := pipeline.Dispatch(pass, 4, 1, 1); err != nil {
++			t.Fatal(err)
++		}
++		pass.End()
++		if err := value.GPUToRead(sy.CommandEncoder); err != nil {
++			t.Fatal(err)
++		}
++		if err := sy.EndComputePass(); err != nil {
++			t.Fatal(err)
++		}
++		if old.IsValid() || !replacement.IsValid() || len(pipeline.oldBindGroups) != 0 {
++			t.Fatal("pass completion retired wrong binding")
++		}
++		result := make([]uint32, 4)
++		if err := value.ReadSync(); err != nil {
++			t.Fatal(err)
++		}
++		if err := ReadToBytes(value, result); err != nil {
++			t.Fatal(err)
++		}
++		if !reflect.DeepEqual(result, []uint32{10, 14, 22, 34}) {
++			t.Fatal("retry shader output", result)
++		}
++		pipeline.Release()
++		pipeline.Release()
++		if replacement.IsValid() || pipeline.currentBindGroups != nil || pipeline.currentBindGroupsCount != nil {
++			t.Fatal("pipeline cache retained state")
++		}
++		record(map[string]any{"case": "binding_failure_retry_and_dispatch", "refused_replacements": 3, "computed_words_checked": 4, "old_binding_refs_retired": 1, "current_binding_refs_retired": 1})
++	})
++}
+--- a/gpu/shader.go
++++ b/gpu/shader.go
+@@ -56,24 +56,24 @@
+ 
+ // OpenCode loads given WGSL ".wgl" code for the Shader.
+ func (sh *Shader) OpenCode(code string) error {
+-	module, err := sh.device.Device.TryCreateShaderModule(&wgpu.ShaderModuleDescriptor{
+-		Label:      sh.Name,
+-		WGSLSource: &wgpu.ShaderSourceWGSL{Code: code},
+-	})
+-	if errors.Log(err) != nil {
+-		return err
++	if !sh.device.Device.IsValid() {
++		return errors.New("gpu: shader requires a live device")
+ 	}
+-	sh.module = module
+-	return nil
++	return errors.Log(replacePipelineReference(&sh.module, func() (*wgpu.ShaderModule, error) {
++		return sh.device.Device.TryCreateShaderModule(&wgpu.ShaderModuleDescriptor{
++			Label:      sh.Name,
++			WGSLSource: &wgpu.ShaderSourceWGSL{Code: code},
++		})
++	}))
+ }
+ 
+ // Release destroys the shader
+ func (sh *Shader) Release() {
+-	if sh.module == nil {
+-		return
++	module := sh.module
++	sh.module = nil
++	if module != nil {
++		module.Release()
+ 	}
+-	sh.module.Release()
+-	sh.module = nil
+ }
+ 
+ // ShaderEntry is an entry point into a Shader.  There can be multiple

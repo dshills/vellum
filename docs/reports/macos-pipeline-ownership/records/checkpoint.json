@@ -1,0 +1,50 @@
+{
+  "result": "REVIEWED_PIPELINE_REFERENCE_OWNERSHIP",
+  "base_commit": "c77c16d0b9013092f261118d83361d37db4a5c41",
+  "source_manifest_sha256": "888e8831b70be8d4d080a0ff08b2c753ed8a1e290b19e490fd6755e1d45bfa25",
+  "qualification_sha256": "4d803f1f9bf7b0507d3122c79ed72abc0502a8acadb1eff96f4e26861e5ff6a1",
+  "source_review_sha256": "0735b98ad7dde7eea3c7a8ff44058ff5679a2b5c3c79a3a8c3db298afcf62858",
+  "evidence_review_sha256": "399674683d77ce6ef0b6b5dcadab4ad77c2dbeb2f5d2c3b260bb0a239b800e8d",
+  "report_sha256": "3f5b1be65cf4db6cd11285b5fc57e685ccafdf9fab82df829c1dab578b8512f2",
+  "archive": {
+    "sha256": "ce6c2d3b3695255efaac6d11a3f63a5818770d81225afcf5b5d07a41c0cc3857",
+    "members": 105,
+    "index_sha256": "0cdbeed2ee74b5d94ae1c6f6f92a92b3f1e787d35c5f2f29cb9b91d8ab7b4bb2"
+  },
+  "prepared_files": 6198,
+  "command_receipts": 15,
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_sha256": "2ce2a3769456af0d3a8a4942a1b1cd72958852476777458ff6263587c6c6647d",
+  "source": {
+    "drivers/cogent/native/dependencies.json": "4601fe6fe6a0a94fef73baed9992bdf753a42ea542d536204016b508fca4889f",
+    "drivers/cogent/native/patches/pipelinelifecycle/0052-transactional-pipeline-reference-replacement.patch": "2bb7a6e600158f53736a279a0d715dcba9f5980a21b5f3c060514fcd5293d09d",
+    "drivers/cogent/native/patches/pipelinelifecycle/README.md": "12fb2b7e545ca065337a554c96841814cfd20822ae37e92c8eec9ced2ba39f32",
+    "drivers/cogent/native/patches/pipelinelifecycle/original-hashes.json": "997b54d3d12750885db8d528505d790436e55fc40a6efb9e04a57157e956d0f1",
+    "drivers/cogent/native/patches/pipelinelifecycle/output-hashes.json": "7fc33ed4424199c2a52fca95019e4d7c480cd8e926e7dd14d351ad011177ff15",
+    "drivers/cogent/prepare_test.py": "11feab31c4572f5927a629f7403f84fd6adb1862999f2ffdfe2638dc52c92ccf",
+    "specs/gpu-frame-lifecycle.md": "22abc4931583c2af1379f34b4512703e7dbaa8beb91db980450908ce74a62e59",
+    "specs/macos-completion.md": "f06223bb793f621cbd01669abedebfec8a68a6033a545d53408b42cc20112cde"
+  },
+  "decoded_outputs": {
+    "gpu/pipeline.go": "0280ed5c005ad8572c2928bdafb02128ca0f4a3e6ead778714176389234ca28e",
+    "gpu/pipeline_lifecycle.go": "04909c7df6995be917b2563b4758e5fe23a8ff94c8eefc6e708d40c589bcaa3b",
+    "gpu/pipeline_lifecycle_test.go": "f20582e92ab4a7cd07df2dd86ae59bd386fce8ee8e1e9c21dcc6acfbc06c7a68",
+    "gpu/pipeline_native_lifecycle_test.go": "6337655e5ace77488b95e518dbf7515055709814d0141d3af4c3e107db32bb3c",
+    "gpu/shader.go": "b9011f4c20e27da85159604a9dd2bb287e7686604363bce6307e4b395d8bfed0"
+  },
+  "promotion_producer_sha256": "9a04b1df29cf7edb19927f9022ac9a7666347d57eeb72056c60623f5a4e4c957",
+  "checkpoint_producer_sha256": "38a50b7a5120b2588f8a72d440e5b2d5bf87bcc2c40b122d40d83a0b8f02c863",
+  "limits": [
+    "No windows/surfaces/input/settings/presentation/performance",
+    "Native duplicate layout creation refusal inside VarGroup.bindGroup; not incompatible buffer creation refusal",
+    "Wrapper invalidation/refcount calls do not establish native heap reclamation or physical fault recovery",
+    "Native consumer compiled only; desktop checks deferred",
+    "Stage registration first guard compared40stages to51patches and stopped before manifest change; separate preparation used unchanged6195. Corrected patch-order guard and final52stage patch sequence pass.",
+    "Initial native fixture expected wrong-usage refusal; automatic buffer repair admitted valid binding. Initial candidate and raw failure preserved; corrected layout oracle passes.",
+    "First native compilation used nonexistent cmd/native-window-cycle; raw1 preserved. Corrected build passed with unstable inventory during Git staging; final repeated cmd/window-cycle-smoke build passes with stable complete inventory."
+  ]
+}

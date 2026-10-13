@@ -128,3 +128,23 @@ Vars.Config keeps its native bind-layout validation and releases those temporary
 owned handles immediately. Pipelines independently create their own layouts.
 Source release calls, fault kernels and tiny native words/padding checks remain
 separate from actual native/GPU memory, latency/endurance and Mac acceptance.
+
+## Pipeline replacement ownership
+
+Shader reload admits a fresh live module before replacing the current reference.
+Factory refusal preserves the current module and retires any returned partial
+reference. Success publishes the new module and explicitly retires the previous
+one. Existing native pipelines retain their dependencies; callers rebuild them
+to use new code. Shader retirement clears ownership before releasing the handle.
+
+A bind-group replacement leaves current ownership, generation and retirement
+queue unchanged on refusal. Only successful replacement queues the previous
+group, once, for pass-completion/shutdown retirement. Matching live generations
+reuse the current binding. Pipeline retirement detaches both cache maps. Native
+factories return fresh owned references and callers serialize use/reconfiguration;
+external native retirement and copied ownership remain outside this contract.
+
+Counted admission/refusal/retry fixtures and tiny headless duplicate-layout
+validation/shader-output checks qualify their observed reference scope. They do
+not establish GPU/native heap reclamation, physical faults, presentation,
+sustained performance or full Mac acceptance.

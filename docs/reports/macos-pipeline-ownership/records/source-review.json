@@ -1,0 +1,100 @@
+{
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "approved": true,
+  "findings": [],
+  "files": {
+    "drivers/cogent/native/dependencies.json": "4601fe6fe6a0a94fef73baed9992bdf753a42ea542d536204016b508fca4889f",
+    "drivers/cogent/native/patches/pipelinelifecycle/0052-transactional-pipeline-reference-replacement.patch": "2bb7a6e600158f53736a279a0d715dcba9f5980a21b5f3c060514fcd5293d09d",
+    "drivers/cogent/native/patches/pipelinelifecycle/README.md": "12fb2b7e545ca065337a554c96841814cfd20822ae37e92c8eec9ced2ba39f32",
+    "drivers/cogent/native/patches/pipelinelifecycle/original-hashes.json": "997b54d3d12750885db8d528505d790436e55fc40a6efb9e04a57157e956d0f1",
+    "drivers/cogent/native/patches/pipelinelifecycle/output-hashes.json": "7fc33ed4424199c2a52fca95019e4d7c480cd8e926e7dd14d351ad011177ff15",
+    "drivers/cogent/prepare_test.py": "11feab31c4572f5927a629f7403f84fd6adb1862999f2ffdfe2638dc52c92ccf",
+    "specs/gpu-frame-lifecycle.md": "22abc4931583c2af1379f34b4512703e7dbaa8beb91db980450908ce74a62e59",
+    "specs/macos-completion.md": "f06223bb793f621cbd01669abedebfec8a68a6033a545d53408b42cc20112cde"
+  },
+  "source_manifest_sha256": "888e8831b70be8d4d080a0ff08b2c753ed8a1e290b19e490fd6755e1d45bfa25",
+  "decoded_output_sha256": {
+    "gpu/pipeline.go": "0280ed5c005ad8572c2928bdafb02128ca0f4a3e6ead778714176389234ca28e",
+    "gpu/pipeline_lifecycle.go": "04909c7df6995be917b2563b4758e5fe23a8ff94c8eefc6e708d40c589bcaa3b",
+    "gpu/pipeline_lifecycle_test.go": "f20582e92ab4a7cd07df2dd86ae59bd386fce8ee8e1e9c21dcc6acfbc06c7a68",
+    "gpu/pipeline_native_lifecycle_test.go": "6337655e5ace77488b95e518dbf7515055709814d0141d3af4c3e107db32bb3c",
+    "gpu/shader.go": "b9011f4c20e27da85159604a9dd2bb287e7686604363bce6307e4b395d8bfed0"
+  },
+  "candidate_manifest_sha256": "0ec22c182fb370cf38a17c62fec72569a98d4f2988c050d5e84a3fce5cb0628c",
+  "base_commit": "c77c16d0b9013092f261118d83361d37db4a5c41",
+  "artifact_sha256": {
+    "/private/tmp/vellum-macos-pipeline-ownership/source-final.json": "888e8831b70be8d4d080a0ff08b2c753ed8a1e290b19e490fd6755e1d45bfa25",
+    "/private/tmp/vellum-macos-pipeline-ownership/candidate-final.json": "0ec22c182fb370cf38a17c62fec72569a98d4f2988c050d5e84a3fce5cb0628c",
+    "/private/tmp/vellum-macos-pipeline-ownership/source-review-v2.json": "d569919531290b264274bd3b0a3780b09fbed1e671a0bc440888e3dacbbddc1d",
+    "/private/tmp/vellum-macos-pipeline-ownership/source-review-v1.json": "ceae9bd451540ae24c547cf1e4a258790f3760084f962036de418eae9a38fd76",
+    "/private/tmp/vellum-macos-pipeline-ownership/prepare-owned.json": "5ebac6679ba04a5a8b1ed962e5b7aa09a1bdb1a75027160d9bff8e56acc408c8",
+    "/private/tmp/vellum-macos-pipeline-ownership/prepare-before-registration.json": "bcebcb0649ef8de463df8520e956efebd245af28380f62bb9fdafeea52a5a984"
+  },
+  "verification": {
+    "all_eight_current_source_hashes_match": true,
+    "manifest_stable_at_end": true,
+    "original_two_input_hashes_match": true,
+    "new_three_input_headers_dev_null": true,
+    "patch_replayed_in_memory": true,
+    "all_five_decoded_hashes_equal_output_pins_and_manifest": true,
+    "all_five_prepared_bytes_equal_decoded_and_approved_candidate": true,
+    "candidate_approval_inherited_without_code_delta": true,
+    "dependency_patch_sequence": "1..52",
+    "last_stage_patch_sha256_matches": true,
+    "input_and_output_pin_paths_registered": true,
+    "prior_stages_unchanged": true,
+    "prepare_test_only_expected_range_delta": "range(1, 52) -> range(1, 53)",
+    "specs_preserve_prior_contract_and_append_scoped_pipeline_section": true
+  },
+  "preparation_receipt_scope": {
+    "owned": {
+      "argv": [
+        "python3",
+        "prepare.py"
+      ],
+      "exit_code": 0,
+      "source_stable": true,
+      "prepared_before_count": 6195,
+      "prepared_after_count": 6198,
+      "all_five_decoded_outputs_bound_in_after_map": true,
+      "all_eight_source_leaves_match_before_and_after": true
+    },
+    "earlier": {
+      "exit_code": 0,
+      "prepared_after_count": 6195,
+      "qualification_scope": "Original 6195-file preparation before stage52 registration; not evidence for the final owned patch."
+    },
+    "initial_registration_guard": {
+      "scope": "Parent-reported history",
+      "disposition": "Initial stage-count vs patch-count guard failed before manifest mutation; final observed manifest is independently verified by exact patch number sequence1..52. No earlier guard failure is promoted to successful stage preparation."
+    }
+  },
+  "finding_resolutions": [
+    {
+      "id": "PIPELINE-FIXTURE-01",
+      "status": "ACCEPTED_FIXED",
+      "evidence": "The fixture changes Other.Binding to the existing Data.Binding. VarGroup.bindGroup returns the native TryCreateBindGroupLayout duplicate-binding refusal before entry construction, preserving current reference/count/retired state for three attempts. Restoring the layout admits one replacement and reuses it on the next call.",
+      "exact_fault_scope": "Native layout-creation refusal inside the bind-group factory; not an incompatible-buffer failure or physical GPU fault."
+    },
+    {
+      "id": "PIPELINE-FIXTURE-02",
+      "status": "ACCEPTED_FIXED",
+      "evidence": "Cleanup restores Other.Binding, seeds a set with currentBindGroups references, releases each unique queued old binding not still current, then clears duplicate aliases before System.Release. This retains current ownership and retires detached old handles on early/baseline failure."
+    }
+  ],
+  "source_assessment": [
+    "Fresh-owned shader replacement preserves old module on refusal, retires partial candidate handles, then publishes and retires old on success. Existing native pipelines require caller rebuild for new shader code.",
+    "Fresh bind-group admission preserves current reference/count/retirement queue on refusal; successful replacement queues old once and matching live current generation reuses. Retirement detaches both maps and the old-reference slice.",
+    "Native fixture fault is duplicate layout creation inside VarGroup.bindGroup, followed by actual binding replacement/reuse and shader-word verification. It is not incompatible-buffer or physical-device fault evidence.",
+    "Corrected fixture cleanup retires unique detached old refs and preserves current ownership for system release; missing-device shader pure check refuses before native entry.",
+    "New helpers/tests retain MIT notices; changed upstream files retain BSD-style notices."
+  ],
+  "limitations": [
+    "Source-only independent review with read-only hash/JSON analysis and in-memory patch replay; no tests, preparation, builds, GPU/native/UI, provider or Git operations executed by this reviewer.",
+    "Author preparation receipt is version-linked supporting evidence, not full compiler/SDK closure or a full-repository evidence audit.",
+    "Factories return fresh owned references and one owner serializes configuration/use/retirement. External handle retirement, copied ownership and arbitrary concurrent access are outside scope.",
+    "Broader Vars.bindLayout error propagation and graphics pipeline rebuild semantics remain separate.",
+    "Physical GPU faults, native/GPU heap reclamation, desktop/presentation, sustained performance and full Mac acceptance are not certified."
+  ]
+}

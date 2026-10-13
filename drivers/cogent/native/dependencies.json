@@ -485,6 +485,17 @@
               "sha256": "9549a5875a96965db44ae185ac0da7cfcef350df89d41a6b84d155ec377f3d89"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/pipelinelifecycle",
+          "inputs": "native/patches/pipelinelifecycle/original-hashes.json",
+          "outputs": "native/patches/pipelinelifecycle/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/pipelinelifecycle/0052-transactional-pipeline-reference-replacement.patch",
+              "sha256": "2bb7a6e600158f53736a279a0d715dcba9f5980a21b5f3c060514fcd5293d09d"
+            }
+          ]
         }
       ]
     },

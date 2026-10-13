@@ -381,3 +381,10 @@ retry. Vars.Config's temporary validation layouts retire explicitly. These
 [GPU ownership contracts](gpu-frame-lifecycle.md) retain serialized, initially
 unmapped ownership; physical memory, sustained performance and live-window
 qualification remain open.
+
+Shader reload and bind-group replacement now have transactional owned-reference
+publication in the [GPU ownership contract](gpu-frame-lifecycle.md). Refusal keeps
+the current cache generation and retirement queue intact; successful reload
+explicitly retires the prior module. Internal fault kernels and tiny headless
+layout-refusal/retry checks remain separate from native/GPU memory, sustained
+performance, physical backend faults and live Mac qualification.
