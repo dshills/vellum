@@ -5,5 +5,6 @@
 #import <Cocoa/Cocoa.h>
 NSDictionary *vellumCheckMenu(int operation, int index);
 NSDictionary *vellumCheckTray(int operation, int index);
+NSDictionary *vellumCheckFilePanels(void);
 #endif
 #endif

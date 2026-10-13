@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_EVIDENCE",
+  "result": "APPROVED_EVIDENCE",
+  "findings": [],
+  "source_root": "/private/tmp/vellum-large-data",
+  "phase": "/private/tmp/vellum-macos-file-interaction",
+  "base_commit_reported": "30c6dd9bea5e9f07f7f2ac3012ba7ab9afed519a",
+  "review_execution": "Read-only source, artifact and stdlib evidence processing. No tests, builds, native processes, GUI, provider calls, Git commands/mutations or repository edits.",
+  "endpoints": {
+    "/private/tmp/vellum-large-data/docs/reports/macos-file-interaction/README.md": "57a1688f95c5db8845c80a4cb3b25d2a09191e8e457b2df95d1899fe27ac8bb3",
+    "/private/tmp/vellum-large-data/docs/reports/macos-file-interaction/records/evidence-index.json": "324ceeeae3415837d832777a824529ed4135e4b7fdcb6b982907721ac583a8ac",
+    "/private/tmp/vellum-large-data/docs/reports/macos-file-interaction/records/evidence.tar.gz": "37ae973dbbc496dc6da6e2dae9fdbb5a4e51509c671906944e97f65a8ceba7ce",
+    "/private/tmp/vellum-large-data/docs/reports/macos-file-interaction/records/archive-producer.py.txt": "774b9394da3558a306cd5194e98a5e307d4ff3d203e481004ab09cb65a773b55",
+    "/private/tmp/vellum-macos-file-interaction/qualification.json": "ba3e8d3c74ca2b3f97a04bce3916275da87f5f942e11222e9b791615101a2457",
+    "/private/tmp/vellum-macos-file-interaction/source-review-final.json": "1402fcda43421cb273430c9a06174d72893564b82a98226ac4c6ca1856be8887",
+    "/private/tmp/vellum-macos-file-interaction/source-final.json": "329bfaa40f5474e265af0d32c888060b72fade1a2223cb24497ff4f0c7e86476",
+    "/private/tmp/vellum-macos-file-interaction/report.py": "774b9394da3558a306cd5194e98a5e307d4ff3d203e481004ab09cb65a773b55",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "66e8e7514f5cc5dcf0e8e81e346ad0951cd632d8f6dd3d9401c2e35cd33563a6"
+  },
+  "qualified_source8": {
+    "docs/development.md": "fb15c339fad644b0c63e660f37402a8a97cff43f22873a44cdcc4e6f44936e85",
+    "drivers/cogent/cmd/file-panel-smoke/main.go": "2358609d7c983f8b5ae8b8a30147539a0c36ce411b130dbba6e65a9a0e88f6a4",
+    "drivers/cogent/cmd/file-panel-smoke/main_test.go": "27251a01708dcdae1f1551389ec9620100f3944bf7d28ff614546ead99871f67",
+    "drivers/cogent/native_services_checks.h": "eec8f01ddcc827dc448ee87a6b2c7bc68da88d8053704c2bf3bd3215522ec0b6",
+    "drivers/cogent/native_services_checks_darwin.go": "ce9b7d26de1b839e6898f5671ce079c9369a843440c06d1da8dd554573acddfe",
+    "drivers/cogent/native_services_checks_darwin.m": "75323291d5f2fbaff88c42cdc6b5ce9c009d56be47992a97c4e3f2610f13c187",
+    "drivers/cogent/services_darwin.m": "992bf32a3a6b1ddc88d3148b08e6988110d3a5e9bbc1efabad19a772eb9d4152",
+    "specs/file-panel-lifecycle.md": "3d7b1dbb6b2f1cb32aee504fb9e66d3dda225ffdf6e298355b93b118c27821be"
+  },
+  "post_test_document": {
+    "path": "/private/tmp/vellum-large-data/specs/macos-completion.md",
+    "sha256": "66e8e7514f5cc5dcf0e8e81e346ad0951cd632d8f6dd3d9401c2e35cd33563a6",
+    "scope": "Static post-test review only; not relabelled as part of the eight-source runtime or Prism payload.",
+    "baseline_canonical_sha256": "7157683130cd3cef6cad3854cecc309c2da249b72f6d5b913f1a0a2cd406f291",
+    "diff_path": "/private/tmp/vellum-file-interaction-evidence-review/post-test-document.diff.txt",
+    "diff_sha256": "d47c50ad83b813147da53fa9fddd55db143a73109fafb0fedad995805800591c",
+    "decision": "APPROVED_DOCUMENT_DELTA",
+    "assessment": "New paragraph accurately reports 200 alternating caller-cancellation cycles and active Open/Save normal shutdown, tracked-only non-atomic samples and unqualified Finder attempt. Remaining-scope list distinguishes already observed chooser/menu/clipboard fixtures from broader user-facing acceptance. Referenced report and previous chooser report exist."
+  },
+  "archive": {
+    "member_count": 85,
+    "all_members_unique_regular_relative": true,
+    "sha256_roundtrip_exact": true,
+    "current_phase_files_equal": true,
+    "all_members_utf8": true,
+    "app_bundle_binary_cache_and_dsstore_excluded": true,
+    "producer_review": "report.py asserts exact source/certificate/Prism and raw exits, independently classifies source versions, checks each cycle, retains both failures and separately unqualified UI attempt, checks prepared/current parent equality and function-body equality. os.walk prunes .app directories and directory symlinks before recursion; extension and regular-file/symlink checks precede reading. Archive-producer copy matches the actual producer byte-for-byte."
+  },
+  "raw_evidence": {
+    "receipt_count": 21,
+    "log_count": 42,
+    "source_groups": {
+      "final": 7,
+      "v2": 5,
+      "unchanged_base": 3,
+      "initial": 6
+    },
+    "receipts": {
+      "affected-race-final": {
+        "sha256": "07b4be40946bf18910f6c6caa74691c8bb02df58163a41cd736a707627a0b133",
+        "exit_code": 0,
+        "source_group": "final",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-count=3",
+          "./cmd/file-panel-smoke",
+          "./cmd/services-smoke",
+          "./cmd/notifications-smoke"
+        ],
+        "elapsed_seconds": 4.17279379197862
+      },
+      "affected-race-v2": {
+        "sha256": "6e0f0d7adf10d598caa44c214c46ca01fb850d2cb16ee30aa2546608354fc133",
+        "exit_code": 0,
+        "source_group": "v2",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-count=3",
+          "./cmd/file-panel-smoke",
+          "./cmd/services-smoke",
+          "./cmd/notifications-smoke"
+        ],
+        "elapsed_seconds": 4.010142958024517
+      },
+      "affected-vet-final": {
+        "sha256": "9396f80b06737e423ca6d3de73c97956e0b5fc383581b4890e654eb1a8a635a3",
+        "exit_code": 0,
+        "source_group": "final",
+        "argv": [
+          "go",
+          "vet",
+          "-tags=vellum_native_checks",
+          "./cmd/file-panel-smoke",
+          "./cmd/services-smoke",
+          "./cmd/notifications-smoke"
+        ],
+        "elapsed_seconds": 1.1547580829937942
+      },
+      "affected-vet-v2": {
+        "sha256": "8b6c69ac69c0d9d427a858226af5fe16a7a48f8ea628717bffca1d86823406c6",
+        "exit_code": 0,
+        "source_group": "v2",
+        "argv": [
+          "go",
+          "vet",
+          "-tags=vellum_native_checks",
+          "./cmd/file-panel-smoke",
+          "./cmd/services-smoke",
+          "./cmd/notifications-smoke"
+        ],
+        "elapsed_seconds": 2.8961559999734163
+      },
+      "build-drop-baseline": {
+        "sha256": "13fef1adb7a6890287ed0a72558e4f43a3462b15ec58fc2ee8230caa56df7f7c",
+        "exit_code": 0,
+        "source_group": "unchanged_base",
+        "argv": [
+          "go",
+          "build",
+          "-o",
+          "/private/tmp/vellum-macos-file-interaction/file-drop-smoke",
+          "./cmd/file-drop-smoke"
+        ],
+        "elapsed_seconds": 3.439247499976773
+      },
+      "driver-default-race-final": {
+        "sha256": "3ff9765fcc959c00394e300c051d846a5744840239bf7f329ee9be7c6f05e523",
+        "exit_code": 0,
+        "source_group": "final",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "."
+        ],
+        "elapsed_seconds": 23.030038625001907
+      },
+      "driver-offscreen-race": {
+        "sha256": "7427ca7652a48eead26adc649831da2c428a8e83cabd406e2d4742e87f24d7e0",
+        "exit_code": 0,
+        "source_group": "initial",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "."
+        ],
+        "elapsed_seconds": 89.99133441597223
+      },
+      "driver-optin-race-final": {
+        "sha256": "e3b1d26e71d5b18955a0d62964afe45492c415976ed8af0c3de4666591af8f8e",
+        "exit_code": 0,
+        "source_group": "final",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          "."
+        ],
+        "elapsed_seconds": 23.429099125030916
+      },
+      "driver-optin-race": {
+        "sha256": "70b2b2b3961e935045d5988cfddf6be9a166fbfb525ac1471fec8387dcfdeea6",
+        "exit_code": 0,
+        "source_group": "initial",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          "."
+        ],
+        "elapsed_seconds": 22.7680731669534
+      },
+      "isolation-v2": {
+        "sha256": "04a2094986e0b572789469cab72e348f7e6ef7ecf2488b0ed7db7543db449099",
+        "exit_code": 0,
+        "source_group": "v2",
+        "argv": [
+          "python3",
+          "/private/tmp/vellum-macos-file-interaction/isolation.py"
+        ],
+        "elapsed_seconds": 6.25527249998413
+      },
+      "package-drop-baseline": {
+        "sha256": "e44bdba41a6a5db52fc40083b9447006912e2464c0ad56205c554b2d7178eddb",
+        "exit_code": 0,
+        "source_group": "unchanged_base",
+        "argv": [
+          "python3",
+          "-B",
+          "scripts/package-app.py",
+          "--binary",
+          "/private/tmp/vellum-macos-file-interaction/file-drop-smoke",
+          "--output",
+          "/private/tmp/vellum-macos-file-interaction/VellumFileDragChecks.app",
+          "--name",
+          "VellumFileDragChecks",
+          "--identifier",
+          "com.vellum.native-checks.file-drag.8d9da28fcaa68447b61473232ea2f8e5",
+          "--version",
+          "0.1.0",
+          "--platform",
+          "darwin",
+          "--sign-identity",
+          "-"
+        ],
+        "elapsed_seconds": 0.3013935420312919
+      },
+      "panel-race-build-final": {
+        "sha256": "50e19c2d3eda1d93f336d9b7a8cc0cd6b90b5050da7b37211612e7c45782c485",
+        "exit_code": 0,
+        "source_group": "final",
+        "argv": [
+          "go",
+          "build",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-file-interaction/file-panel-smoke-final",
+          "./cmd/file-panel-smoke"
+        ],
+        "elapsed_seconds": 3.146872457989957
+      },
+      "panel-race-build-v2": {
+        "sha256": "217af13e62470a87ab798cc045d9023d161fce4273bc021ef12cc76ba5cb1acf",
+        "exit_code": 0,
+        "source_group": "v2",
+        "argv": [
+          "go",
+          "build",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-file-interaction/file-panel-smoke-v2",
+          "./cmd/file-panel-smoke"
+        ],
+        "elapsed_seconds": 6.452557374956086
+      },
+      "panel-race-build": {
+        "sha256": "bf9406dd2f84b3cd27ddeaca3b80a4f1d70278f986c4e356453b7481a79f2d5a",
+        "exit_code": 0,
+        "source_group": "initial",
+        "argv": [
+          "go",
+          "build",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-file-interaction/file-panel-smoke",
+          "./cmd/file-panel-smoke"
+        ],
+        "elapsed_seconds": 3.6836236249655485
+      },
+      "panel-race-unit": {
+        "sha256": "5601661f2a11880e3686095024392e1d6514f13c959e296acaca3cce99793d64",
+        "exit_code": 0,
+        "source_group": "initial",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-count=3",
+          "./cmd/file-panel-smoke"
+        ],
+        "elapsed_seconds": 6.9566812079865485
+      },
+      "panel-vet": {
+        "sha256": "c45b6629aeac1c1e318fa1c000a9b0027fc99fa6d3c91c1ab6e22a19a3a8f180",
+        "exit_code": 0,
+        "source_group": "initial",
+        "argv": [
+          "go",
+          "vet",
+          "-tags=vellum_native_checks",
+          "./cmd/file-panel-smoke"
+        ],
+        "elapsed_seconds": 2.8542151249712333
+      },
+      "panels-live-open-final": {
+        "sha256": "3329d6ba4ae9b21ba81d516f837b65224f81a8834df268b691bc730d85dc5758",
+        "exit_code": 0,
+        "source_group": "final",
+        "argv": [
+          "/private/tmp/vellum-macos-file-interaction/file-panel-smoke-final",
+          "-cycles=100",
+          "-shutdown-mode=open"
+        ],
+        "elapsed_seconds": 54.878582250035834
+      },
+      "panels-live-open-v2": {
+        "sha256": "ad1c65cec8e6e4d769326a08746be0e46334be830591a73b4f50f2b253a4b3c8",
+        "exit_code": 0,
+        "source_group": "v2",
+        "argv": [
+          "/private/tmp/vellum-macos-file-interaction/file-panel-smoke-v2",
+          "-cycles=100",
+          "-shutdown-mode=open"
+        ],
+        "elapsed_seconds": 18.57572804199299
+      },
+      "panels-live-open": {
+        "sha256": "938a173c030c86095ffa3a701da971a1960bc062b6b8c44b117a66528c057698",
+        "exit_code": 1,
+        "source_group": "initial",
+        "argv": [
+          "/private/tmp/vellum-macos-file-interaction/file-panel-smoke",
+          "-cycles=10",
+          "-shutdown-mode=open"
+        ],
+        "elapsed_seconds": 4.370801457960624
+      },
+      "panels-live-save-final": {
+        "sha256": "d19914ca6cce51ee1b961d64b2bf8b40fc4eb7be9e2477b496346897ef813cce",
+        "exit_code": 0,
+        "source_group": "final",
+        "argv": [
+          "/private/tmp/vellum-macos-file-interaction/file-panel-smoke-final",
+          "-cycles=100",
+          "-shutdown-mode=save"
+        ],
+        "elapsed_seconds": 54.97649895801442
+      },
+      "physical-drop-one": {
+        "sha256": "116c744e3921f2c01432fea9d72e12a4c6a0843b9dcdad5d508ab05dd2aec9b3",
+        "exit_code": 1,
+        "source_group": "unchanged_base",
+        "argv": [
+          "/private/tmp/vellum-macos-file-interaction/VellumFileDragChecks.app/Contents/MacOS/VellumFileDragChecks",
+          "-interactive",
+          "-timeout=4m",
+          "/private/tmp/vellum-macos-file-interaction/fixtures/drag-file.txt"
+        ],
+        "elapsed_seconds": 240.80712658300763
+      }
+    },
+    "qualified_final_native": {
+      "panels-live-open-final": {
+        "cancellation_counts": {
+          "open": 50,
+          "save": 50
+        },
+        "event_count": 203,
+        "active_owner_shutdown_mode": "open",
+        "elapsed_seconds": 54.878582250035834,
+        "stdout_sha256": "fc6037b5a5e6465d3f4f4ba499fb29485e2289d0dbb3be5c18d4ab3795422e96"
+      },
+      "panels-live-save-final": {
+        "cancellation_counts": {
+          "open": 50,
+          "save": 50
+        },
+        "event_count": 203,
+        "active_owner_shutdown_mode": "save",
+        "elapsed_seconds": 54.97649895801442,
+        "stdout_sha256": "dc963d3ba9fbefae8244ae391720508af49e1d91d009ee6ed4c22aa70cbbd258"
+      }
+    },
+    "compiled_executable_hashes_checked": {
+      "/private/tmp/vellum-macos-file-interaction/file-panel-smoke-final": "b13c48e604c27e72f13363686717487508840a41cb798b416ac08102e2f35ecb",
+      "/private/tmp/vellum-macos-file-interaction/file-panel-smoke-v2": "56624fef45694b271576b6a128d24baaa811c99ce30a35c5e631f91b9059d0bf",
+      "/private/tmp/vellum-macos-file-interaction/file-panel-smoke": "51ccacb53b8c5f1f1ae0771bf68d8a6bda3b28c7345983beacf1849d5515336a",
+      "/private/tmp/vellum-macos-file-interaction/VellumFileDragChecks.app/Contents/MacOS/VellumFileDragChecks": "27f1311cb05235527c0863e487bef770b3642100a8d31ff9e4999c95c0be301b"
+    },
+    "native_event_assessment": "203 events per final process: initial actual empty sample; 100 ordered visible/retired pairs (50 Open + 50 Save); actual visible owner-shutdown panel; caller-joined marker. Native cleanup observer separately supplies the zero terminal inventory; the zero-valued joined marker is not treated as a Cocoa sample. Both live stderr streams are empty. Current fixture source requires empty/context.Canceled result and fresh-use ErrClosed before emitting PASS.",
+    "source_versions": "Seven final receipts, five V2, six initial, three unchanged-parent; earlier offscreen and V2 isolation/native pass retain their actual source classifications. V2 and final four probe sources match exactly.",
+    "historical_failures": {
+      "panels-live-open": {
+        "raw_exit_code": 1,
+        "reason": "Fixture expected ErrClosed for already-admitted owner-cancelled call; raw stderr records context canceled. Ten cycle retirements and active shutdown are preserved; no production chooser change inferred."
+      },
+      "physical-drop-one": {
+        "raw_exit_code": 1,
+        "native_elapsed_seconds": 240.80712658300763,
+        "requested_cua_timeout_ms": 30000,
+        "cua_wall_seconds": 17293.7148,
+        "drag_issued": false,
+        "qualified": false,
+        "assessment": "Native READY then deadline; UI app-selection stall produced no drag or delivery. Session UI timing is an observation record, independently distinct from terminal native receipt. Not evidence of product receiving failure."
+      }
+    },
+    "compiled_isolation": "V2 opt-in compiled symbol/Go/ObjC/macro result contains exactly six service diagnostics. Default/offscreen/offscreen+opt-in results contain none. Four driver probe source hashes are identical in V2 and final. Compiled export archives themselves are not archived/recomputed by this review."
+  },
+  "prism": {
+    "raw_result_sha256": "ea83006fb91cf94038e1f2b979b8271773f9e3be711237b2ee9edba0c74cbf64",
+    "process_sha256": "09279c79b543f236e6a825010bca534a509b258547fa81c97535f2e4e2ada98b",
+    "inputs_sha256": "a37d68a4aa9eb6ed020262f7b20a225b4d82d4d18d20fdb2e4f64364518e82d2",
+    "raw_exit_code": 0,
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "files": 8,
+    "chunks": 2,
+    "llm_calls": 2,
+    "complete": true,
+    "input_tokens": 16028,
+    "output_tokens": 1679,
+    "findings": 0,
+    "source_maps_current_equal": true
+  },
+  "source_review": {
+    "certificate_sha256": "1402fcda43421cb273430c9a06174d72893564b82a98226ac4c6ca1856be8887",
+    "status": "APPROVED_SOURCE",
+    "exact_files_match_qualification": true,
+    "production_body_hashes": {
+      "vellumChooseFile": "13a5a2ffe9aabedae6b93b637750b75012decbd6cd9ccadd0ae3f0eaf1830c0f",
+      "vellumCancelFile": "5ce2c158c3eb185926e2498800eb51adeee8b7c174ddae7df05592d8c02393a9",
+      "vellumShutdownOnMain": "f63f734b748d12025d494047288e6d9d324fda1bf88291ccbad0fde81027edbf"
+    },
+    "assessment": "The three asserted Cocoa chooser/cancellation/shutdown function bodies independently match the current canonical parent bodies and the retained qualification hashes."
+  },
+  "prepared": {
+    "count": 6174,
+    "current_all_files_hashed": true,
+    "current_equals_qualification": true,
+    "equals_previous_notification_checkpoint": true,
+    "scope": "Complete recorded upstream/typesetting endpoint file map. Not a complete compiler, cache, SDK or link-input closure and not a proof against unobserved intermediate file mutation."
+  },
+  "report_assessment": "README scope and results match current raw receipts and source/version maps. Durations are labelled instrumented/concurrent-build observations, not performance acceptance. No unsupported file selection, write, physical cancellation, heap or full Mac claim. No actionable evidence/report discrepancy found.",
+  "verification": {
+    "recipe_path": "/private/tmp/vellum-file-interaction-evidence-review/verify.py.txt",
+    "recipe_sha256": "ce4bdc4a809917e99db1e4d4e31261dcb27af225035ffbbea4aecab8eb539078",
+    "result_path": "/private/tmp/vellum-file-interaction-evidence-review/verification.json",
+    "result_sha256": "7e76230ea7ab8eae915dbbbe0fcd7f735a1433e624a800257f1fdc10f06a9a48",
+    "result": "PASS_INDEPENDENT_READ_ONLY_VERIFICATION"
+  },
+  "limitations": [
+    "Cocoa tracked-panel observations and Go registry samples are non-atomic and specific to this isolated sequential fixture. They do not discover an untracked visible panel or qualify arbitrary concurrent-panel behavior.",
+    "Normal actual cancellation/shutdown is qualified by the retained observations; exceptional AppKit cleanup, late OS callbacks, fatal early native-loop recovery and heap/native-memory reclamation are not.",
+    "No paths were selected or written by this phase; physical Cancel, Finder drag, human IME/VoiceOver, cross-display, sustained performance and full Mac/public distribution remain open. Existing chooser selection evidence remains separate.",
+    "Historical initial/V2 source stamps are retained, with raw logs; complete earlier source byte sets are not newly reconstructed or certified here.",
+    "Base commit is recorded by the producer. This review used filesystem source/body comparisons and no Git commands or repository-history mutation."
+  ]
+}

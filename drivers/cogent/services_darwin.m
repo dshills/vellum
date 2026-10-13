@@ -2,6 +2,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "services_native.h"
+#import "native_services_checks.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,7 @@ extern void vellumServiceResult(uint64_t token, char *text, int status);
 extern int vellumMenuCommit(uint64_t token);
 extern void vellumMenuAction(uint64_t token, int index);
 static NSMutableDictionary<NSNumber *, NSSavePanel *> *vellumPanels;
+
 @interface VellumMenuTarget : NSObject
 @property uint64_t token;
 - (void)invoke:(NSMenuItem *)item;
@@ -21,6 +23,22 @@ static VellumMenuTarget *vellumTarget;
 static NSMenu *vellumOriginalMenu;
 static int vellumCleanupStatus;
 static const NSUInteger vellumPanelLimit = 8;
+
+#ifdef VELLUM_NATIVE_CHECKS
+// Main-thread, read-only inventory of exactly the production-owned panels.
+// Never inspect another process, select a URL, or invoke a panel action.
+NSDictionary *vellumCheckFilePanels(void) {
+    if (!NSThread.isMainThread || vellumPanels.count > vellumPanelLimit) return nil;
+    NSUInteger visible=0, open=0, save=0;
+    for (NSSavePanel *panel in vellumPanels.allValues) {
+        if (![panel isKindOfClass:NSSavePanel.class]) return nil;
+        if (panel.isVisible) visible++;
+        if ([panel isKindOfClass:NSOpenPanel.class]) open++; else save++;
+    }
+    return @{@"Tracked":@(vellumPanels.count),@"Visible":@(visible),@"Open":@(open),@"Save":@(save)};
+}
+#endif
+
 
 // Attempt both dismissal operations even if one raises. Exceptional owned panels
 // remain tracked for terminal cleanup; their count has a separate fixed bound.

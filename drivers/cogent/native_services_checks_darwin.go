@@ -41,10 +41,18 @@ type NativeServiceTrayCheck struct {
 	PixelWidth, PixelHeight                   int
 	Items                                     []NativeServiceItemCheck
 }
+type NativeServiceFilePanelCheck struct {
+	Tracked, Visible, Open, Save int
+}
+
 type NativeServiceCheckState struct {
-	MainThread                   bool
-	CleanupObserved              bool
-	WindowTitles                 []string // Visible NSWindows owned by this process.
+	MainThread      bool
+	CleanupObserved bool
+	WindowTitles    []string // Visible NSWindows owned by this process.
+	FilePanels      NativeServiceFilePanelCheck
+	// NativeOutstanding is sampled after this query ACK, separately from the
+	// main-thread Cocoa snapshot; it is not an atomic cross-thread inventory.
+	NativeOutstanding            int
 	Menu                         NativeServiceMenuCheck
 	Tray                         NativeServiceTrayCheck
 	CallbacksStopped             bool
@@ -80,6 +88,11 @@ func CheckNativeServices(ctx context.Context, operation, index int) (NativeServi
 	if err == nil && !state.MainThread {
 		err = fmt.Errorf("cogent: native check did not run on main thread")
 	}
+	if err == nil {
+		nativeCallbacks.Lock()
+		state.NativeOutstanding = len(nativeCallbacks.operations)
+		nativeCallbacks.Unlock()
+	}
 	return state, err
 }
 
@@ -99,6 +112,7 @@ func ObserveNativeServiceCleanup() (func(), error) {
 		nativeCallbacks.Lock()
 		state.CallbacksStopped = nativeCallbacks.stopped
 		state.PendingCallbacks = len(nativeCallbacks.operations)
+		state.NativeOutstanding = state.PendingCallbacks
 		state.MenuCallbacks = len(nativeCallbacks.menus)
 		state.TrayCallbacks = len(nativeCallbacks.trays)
 		nativeCallbacks.Unlock()

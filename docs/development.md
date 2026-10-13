@@ -97,6 +97,25 @@ build tag. It does not access the clipboard, request notification permission,
 change preferences or synthesize physical input. Selector acceptance remains
 separate from physical clicks and human screen-reader workflows.
 
+## Native file-panel lifecycle acceptance
+
+Mac file-panel lifetime has a separate opt-in check on an available desktop:
+
+```sh
+cd drivers/cogent
+go build -tags=vellum_native_checks -o /tmp/vellum-file-panels ./cmd/file-panel-smoke
+/tmp/vellum-file-panels -cycles=10 -shutdown-mode=open
+/tmp/vellum-file-panels -cycles=10 -shutdown-mode=save
+```
+
+It observes real Open/Save panels before canceling their callers and checks
+native acknowledgement retirement before each next panel. It then shuts down
+with a visible panel and joins the application-owned operation. Partial progress
+and terminal inventory are emitted on failure as well as success. It selects or
+writes no files and changes no clipboard or OS preferences. See the
+[lifecycle contract](../specs/file-panel-lifecycle.md); actual selections and
+physical Finder drops have independent acceptance requirements.
+
 ## Grid acceptance
 
 `examples/grid` is a separate consumer module with independent 10,000-row and

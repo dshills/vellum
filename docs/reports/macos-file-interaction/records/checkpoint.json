@@ -1,0 +1,37 @@
+{
+  "result": "PASS_MAC_FILE_PANEL_LIFECYCLE",
+  "base_commit": "30c6dd9bea5e9f07f7f2ac3012ba7ab9afed519a",
+  "qualification_sha256": "ba3e8d3c74ca2b3f97a04bce3916275da87f5f942e11222e9b791615101a2457",
+  "source": {
+    "docs/development.md": "fb15c339fad644b0c63e660f37402a8a97cff43f22873a44cdcc4e6f44936e85",
+    "drivers/cogent/cmd/file-panel-smoke/main.go": "2358609d7c983f8b5ae8b8a30147539a0c36ce411b130dbba6e65a9a0e88f6a4",
+    "drivers/cogent/cmd/file-panel-smoke/main_test.go": "27251a01708dcdae1f1551389ec9620100f3944bf7d28ff614546ead99871f67",
+    "drivers/cogent/native_services_checks.h": "eec8f01ddcc827dc448ee87a6b2c7bc68da88d8053704c2bf3bd3215522ec0b6",
+    "drivers/cogent/native_services_checks_darwin.go": "ce9b7d26de1b839e6898f5671ce079c9369a843440c06d1da8dd554573acddfe",
+    "drivers/cogent/native_services_checks_darwin.m": "75323291d5f2fbaff88c42cdc6b5ce9c009d56be47992a97c4e3f2610f13c187",
+    "drivers/cogent/services_darwin.m": "992bf32a3a6b1ddc88d3148b08e6988110d3a5e9bbc1efabad19a772eb9d4152",
+    "specs/file-panel-lifecycle.md": "3d7b1dbb6b2f1cb32aee504fb9e66d3dda225ffdf6e298355b93b118c27821be"
+  },
+  "source_review_sha256": "1402fcda43421cb273430c9a06174d72893564b82a98226ac4c6ca1856be8887",
+  "evidence_review_sha256": "fbbceca9db4a9b5aeacb7887b1e64439d15e2494d1605450ddf6008fe9af89ed",
+  "post_test_document_sha256": "66e8e7514f5cc5dcf0e8e81e346ad0951cd632d8f6dd3d9401c2e35cd33563a6",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_raw_exit_code": 0,
+  "archive": {
+    "sha256": "37ae973dbbc496dc6da6e2dae9fdbb5a4e51509c671906944e97f65a8ceba7ce",
+    "index_sha256": "324ceeeae3415837d832777a824529ed4135e4b7fdcb6b982907721ac583a8ac",
+    "members": 85
+  },
+  "qualified_cancellation_cycles": 200,
+  "actual_active_shutdown_modes": [
+    "open",
+    "save"
+  ],
+  "physical_finder_drag_qualified": false,
+  "native_heap_qualified": false,
+  "macos_completion": false
+}

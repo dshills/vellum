@@ -8,15 +8,15 @@ extern int vellumServiceActive(uint64_t token);
 extern void vellumServiceResult(uint64_t token, char *text, int status);
 
 static NSDictionary *checkSnapshot(BOOL cleanup) {
-    NSDictionary *menu=vellumCheckMenu(0,0), *tray=vellumCheckTray(0,0);
-    if (!menu || !tray) return nil;
+    NSDictionary *menu=vellumCheckMenu(0,0), *tray=vellumCheckTray(0,0), *panels=vellumCheckFilePanels();
+    if (!menu || !tray || !panels) return nil;
     NSMutableArray *titles=[NSMutableArray array];
     for (NSWindow *window in NSApp.windows) {
         if (!window.isVisible) continue;
         if (titles.count>=64) return nil;
         [titles addObject:window.title ?: @""];
     }
-    return @{@"MainThread":@(NSThread.isMainThread),@"CleanupObserved":@(cleanup),@"WindowTitles":titles,@"Menu":menu,@"Tray":tray};
+    return @{@"MainThread":@(NSThread.isMainThread),@"CleanupObserved":@(cleanup),@"WindowTitles":titles,@"Menu":menu,@"Tray":tray,@"FilePanels":panels};
 }
 static char *checkWire(NSDictionary *snapshot) {
     NSData *data=snapshot ? [NSJSONSerialization dataWithJSONObject:snapshot options:0 error:nil] : nil;

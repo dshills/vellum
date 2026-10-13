@@ -195,8 +195,8 @@ Remaining Mac acceptance includes broader external AX and human
 screen-reader workflows; candidate-panel placement through scrolling/focus/scale;
 cross-display DPI and monitor changes; physical GPU loss policy acceptance;
 representative sustained frame/input latency, idle CPU and bounded font/native/GPU
-memory; actual chooser selection, native menu activation, clipboard roundtrips and
-external file-drop workflow. Automated selector/fixture tests cannot substitute
+memory; broader chooser scenarios, physical menu interaction, third-party
+clipboard compatibility and external file-drop workflow. Automated selector/fixture tests cannot substitute
 for broader user-facing acceptance. OS preference changes require specific user
 authorization and restoration; routine checks do not change those preferences.
 
@@ -286,6 +286,16 @@ exercise its failure records and bounds. Native focused-window observations
 match both shortcuts, while foreground checking and global posting remain
 non-atomic. Earlier full workflows remain historical observations, and later
 failed attempts remain failed. These harness changes are not production fixes.
+
+The separate [native file-panel lifecycle checkpoint](../docs/reports/macos-file-interaction/README.md)
+passes 200 actual alternating Open/Save caller-cancellation cycles and normal
+shutdown with active panels of both modes. It requires visible tracked native
+objects before cancellation, empty native/Go inventories before next admission,
+joined application-owned callers and terminal retirement. Counts are limited to
+tracked objects and are separate non-atomic samples. This does not qualify native
+heap reclamation, exceptional/concurrent-panel cleanup or physical Cancel clicks.
+The physical Finder attempt remains unqualified: its UI app-selection tool
+stalled before a drag was issued while the bounded fixture exited on time.
 
 ## Static outline allocation work
 

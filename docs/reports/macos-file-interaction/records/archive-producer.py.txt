@@ -1,0 +1,170 @@
+"""Seal scoped native panel lifecycle and unsuccessful physical-drag evidence."""
+import datetime, hashlib, io, json, os, shutil, subprocess, tarfile
+from pathlib import Path
+
+r=Path('/private/tmp/vellum-large-data')
+p=Path('/private/tmp/vellum-macos-file-interaction')
+out=r/'docs/reports/macos-file-interaction'
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+read=lambda n:json.loads((p/n).read_text())
+manifests={k:read(v)['sources'] for k,v in [('initial','source-implementation.json'),('v2','source-v2.json'),('final','source-final.json')]}
+final=manifests['final'];base=read('source-final.json')['base_commit']
+assert len(final)==8 and all(sha(r/n)==h for n,h in final.items())
+cert=read('source-review-final.json')
+assert cert['status']=='APPROVED_SOURCE' and cert['files']==final and not cert['findings']
+prism,process=read('prism-v1/prism.json'),read('prism-v1/process.json')
+assert process['exit_code']==0 and process['error'] is None and process['source_index_stable'] and process['before']==process['after']==final
+assert prism['coverage']['complete'] and prism['coverage']['files']==8 and not prism['findings']
+assert prism['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]
+authorization=read('testing-authorization.json')
+start,end=[datetime.datetime.fromisoformat(authorization[k]) for k in ['authorized_from_utc','authorized_until_utc']]
+receipts={}
+for f in sorted(p.glob('*.json')):
+    d=json.loads(f.read_text())
+    if 'source_delta_stable' not in d:continue
+    name=f.stem
+    assert d['exit_code']==(1 if name in ['physical-drop-one','panels-live-open'] else 0) and d['error'] is None and d['source_delta_stable']
+    assert d['source_delta_before']==d['source_delta_after']
+    source=d['source_delta_before']
+    groups=[k for k,v in manifests.items() if source==v]
+    group=groups[0] if groups else 'unchanged_base'
+    if not groups:assert source=={}
+    when=datetime.datetime.fromisoformat(d['started_utc'])
+    assert start<=when and when+datetime.timedelta(seconds=d['elapsed_seconds'])<end
+    for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+    if d['executable_sha256'] is not None:assert sha(Path(d['argv'][0]))==d['executable_sha256']
+    receipts[name]={'sha256':sha(f),'raw_exit_code':d['exit_code'],'source_group':group}
+assert len(receipts)==21
+native={}
+for name,mode in [('panels-live-open-final','open'),('panels-live-save-final','save')]:
+    d=read(name+'.stdout');events=d['events'];c=d['native_cleanup']
+    assert d['result']=='PASS_NATIVE_FILE_PANEL_LIFECYCLE' and d['requested_cycles']==100 and d['shutdown_mode']==mode
+    assert not any(d[k] for k in ['selection_qualified','physical_cancel_qualified','clipboard_access','preferences_changed'])
+    assert len(events)==203 and events[0]['Stage']=='initial_empty' and events[-1]['Stage']=='owner_caller_joined'
+    for i in range(100):
+        active,retired=events[1+2*i:3+2*i]
+        assert active['Stage']=='visible_before_cancel' and retired['Stage']=='retired_after_cancel' and active['Cycle']==retired['Cycle']==i
+        assert active['Mode']==retired['Mode']==i%2
+        s=active['State'];panel=s['FilePanels']
+        assert s['MainThread'] and s['NativeOutstanding']==1 and panel=={'Tracked':1,'Visible':1,'Open':int(i%2==0),'Save':int(i%2==1)}
+        s=retired['State'];assert s['MainThread'] and s['NativeOutstanding']==0 and all(v==0 for v in s['FilePanels'].values())
+    s=events[-2]['State'];assert events[-2]['Stage']=='visible_before_shutdown' and events[-2]['Mode']==int(mode=='save')
+    assert s['MainThread'] and s['NativeOutstanding']==1 and s['FilePanels']=={'Tracked':1,'Visible':1,'Open':int(mode=='open'),'Save':int(mode=='save')}
+    assert c['MainThread'] and c['CleanupObserved'] and c['CallbacksStopped'] and c['PendingCallbacks']==c['NativeOutstanding']==0 and all(v==0 for v in c['FilePanels'].values())
+    assert receipts[name]['source_group']=='final' and Path(p/(name+'.stderr')).stat().st_size==0
+    native[name]={'stdout_sha256':sha(p/(name+'.stdout')),'cancellation_cycles':100,'active_shutdown_mode':mode,'elapsed_seconds':read(name+'.json')['elapsed_seconds']}
+initial=read('panels-live-open.stdout')
+assert initial['result']=='FAILED_NATIVE_FILE_PANEL_LIFECYCLE' and sum(e['Stage']=='retired_after_cancel' for e in initial['events'])==10
+assert (p/'panels-live-open.stderr').read_text()=='owner shutdown: path-present=false error=context canceled\n'
+assert read('initial-failure-disposition.json')['production_change'] is False
+drag=read('physical-drop-ui-attempt.json');dr=read('physical-drop-one.json')
+assert not drag['drag_issued'] and not drag['delivery_observed'] and not drag['qualified'] and drag['native_exit_code']==dr['exit_code']==1
+assert drag['native_elapsed_seconds']==dr['elapsed_seconds'] and drag['cua_requested_timeout_ms']==30000 and drag['cua_actual_elapsed_seconds']==17293.7148
+assert (p/'physical-drop-one.stdout').read_text()=='READY physical drag target: Vellum file drop smoke\n'
+assert (p/'physical-drop-one.stderr').read_text()=='context deadline exceeded\n'
+isolation=read('isolation-result.json')
+assert isolation['result']=='PASS_DEFAULT_OFFSCREEN_OPT_IN_ISOLATION'
+for name,d in isolation['modes'].items():
+    if name=='opt_in':assert len(d['diagnostic_symbols'])==6 and d['probe_go'] and d['probe_objc'] and d['macro']
+    else:assert not d['diagnostic_symbols'] and not d['probe_go'] and not d['probe_objc'] and not d['macro']
+for n in final:
+    if n.startswith('drivers/cogent/') and not n.startswith('drivers/cogent/cmd/'):assert manifests['v2'][n]==final[n]
+prepared={f.relative_to(r/'drivers/cogent/build').as_posix():sha(f) for module in ['upstream','typesetting'] for f in sorted((r/'drivers/cogent/build'/module).rglob('*')) if f.is_file()}
+assert len(prepared)==6174 and prepared==json.loads(Path('/private/tmp/vellum-macos-notification-runtime/qualification.json').read_text())['prepared']
+old=subprocess.check_output(['git','show',base+':drivers/cogent/services_darwin.m'],cwd=r).decode();new=(r/'drivers/cogent/services_darwin.m').read_text()
+def body(text,name):
+    begin=text.index(name+'(');begin=text.index('{',begin);depth=1;end=begin+1
+    while depth:depth+=(text[end]=='{')-(text[end]=='}');end+=1
+    return text[begin:end]
+production={}
+for name in ['vellumChooseFile','vellumCancelFile','vellumShutdownOnMain']:
+    a,b=body(old,name),body(new,name);assert a==b
+    production[name]=hashlib.sha256(b.encode()).hexdigest()
+q={'result':'PASS_MAC_FILE_PANEL_LIFECYCLE','base_commit':base,'source':final,'prepared':prepared,'receipts':receipts,'native_cases':native,'qualified_cancellation_cycles':200,'actual_active_shutdown_modes':['open','save'],'source_review_sha256':sha(p/'source-review-final.json'),'prism_raw_exit_code':0,'prism_findings':0,'production_function_bodies_unchanged':production,'compiled_isolation_sha256':sha(p/'isolation-result.json'),'physical_drag_attempt_sha256':sha(p/'physical-drop-ui-attempt.json'),'physical_finder_drag_qualified':False,'selected_paths_qualified_by_this_phase':False,'physical_cancel_qualified':False,'exceptional_cleanup_qualified':False,'native_heap_qualified':False,'early_native_loop_failure_qualified':False,'macos_completion':False,'preferences_changed':False,'clipboard_access':False,'suite_scope':'Final driver default/opt-in race and affected consumer race x3/vet passed. Initial offscreen driver race passed. V2 compiled isolation binds the same four driver probe files as final; final-only differences are the consumer cancellation helper/regression and tracked-only spec limitation. Initial native fixture failure and V2 native pass remain historical.'}
+(p/'qualification.json').write_text(json.dumps(q,indent=2)+'\n')
+records=out/'records';records.mkdir(parents=True,exist_ok=False)
+shutil.copy2(Path(__file__),records/'archive-producer.py.txt')
+files={}
+for folder,dirs,names in os.walk(p):
+    dirs[:]=sorted(d for d in dirs if not d.endswith('.app') and not (Path(folder)/d).is_symlink())
+    for name in sorted(names):
+        f=Path(folder)/name
+        if f.is_file() and not f.is_symlink() and f.suffix in ['.json','.stdout','.stderr','.py','.txt','.log']:files[f.relative_to(p).as_posix()]=f.read_bytes()
+index={n:hashlib.sha256(b).hexdigest() for n,b in files.items()}
+(records/'evidence-index.json').write_text(json.dumps(index,indent=2)+'\n')
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz') as tf:
+    for n,b in sorted(files.items()):
+        info=tarfile.TarInfo(n);info.size,info.mode,info.mtime=len(b),0o644,0;tf.addfile(info,io.BytesIO(b))
+with tarfile.open(archive) as tf:actual={m.name:hashlib.sha256(tf.extractfile(m).read()).hexdigest() for m in tf.getmembers() if m.isfile()}
+assert actual==index and not any('.app/' in n or n.endswith('.DS_Store') for n in index)
+(out/'README.md').write_text('''# Mac native file-panel lifecycle and Finder attempt
+
+The opt-in native consumer passes 200 real Open/Save caller-cancellation cycles
+across two final-source race-instrumented processes, then normal owner shutdown
+with an active Open panel and an active Save panel. The production chooser,
+cancellation and main shutdown function bodies are byte-identical to the parent.
+Only explicitly opted-in diagnostics and the acceptance consumer are added.
+
+Each final run alternates 50 Open and 50 Save panels. Before caller cancellation,
+the main-thread inventory observes exactly one visible tracked panel of the
+requested class and a separate Go sample observes one retained operation. An
+empty cancellation result is followed by zero tracked/visible/class counts and
+zero retained operations before the next admission. The final caller starts with
+Background context; application lifetime cancels it, the caller joins, new use
+returns ErrClosed, and native main-loop cleanup has no panels or pending callbacks.
+Both final processes exit 0 with empty stderr, in approximately 54.9 seconds each.
+These durations include race instrumentation and concurrent compilation and are
+not performance acceptance measurements.
+
+The initial ten-cycle process failed because the fixture incorrectly expected
+ErrClosed from an already-admitted call. It actually returned context.Canceled;
+all ten cancellations and tracked native shutdown retirement had completed.
+Internal review corrected this distinction and added a regression that rejects
+nil errors, nonempty paths and other cancellation/refusal classes. The initial
+failure remains raw exit 1. An intermediate 100-cycle Open-shutdown pass remains
+historical V2 evidence; it does not replace either final-source process.
+
+The final driver default/opt-in race suites and affected consumer race x3/vet
+pass. The initial offscreen race suite passes. Compiled V2 isolation proves six
+diagnostic symbols and the native-check macro absent in default, offscreen and
+offscreen-plus-opt-in builds; its four driver probe source files exactly match
+the final version. Final-only changes affect the consumer regression and scope
+documentation. Diagnostic sources still exist in the source SDK payload.
+
+Internal source review approves eight exact source files. One Prism review uses
+Anthropic Claude Sonnet 5.5, covers all eight files in two chunks, returns exit 0
+with no findings, and uses 16,028 input / 1,679 output tokens. The archive retains
+the source groups, raw process receipts/logs, provider result, source certificate,
+selected function-body identities and all 6,174 prepared dependency identities.
+This is selected-source/prepared evidence, not a complete compiler/cache/SDK
+dependency closure. Binaries, app bundles, caches and desktop snapshots are excluded.
+
+## Physical Finder attempt remains unqualified
+
+A separate unchanged-parent file-drop build and private ad hoc bundle were ready
+for a real Finder drag. No drag was issued: native app selection through the UI
+tool stalled for 17,293.7148 seconds despite a requested 30-second timeout, then
+returned a stale window snapshot. The actual native fixture stopped after
+240.807 seconds with exit 1, a READY line and context deadline exceeded. Its
+bounded process lifetime worked; this supplies no receiving/routing acceptance
+and does not demonstrate a framework file-drop failure. The session-level UI
+attempt record is distinguished from the native terminal receipt.
+
+## Scope
+
+Counts cover precisely production-tracked objects; they do not independently
+discover a visible panel removed by an exceptional cleanup path. Main-thread
+Cocoa and Go callback observations are separate, non-atomic samples. This isolated
+sequential fixture qualifies normal lifecycle retirement, not concurrent-panel
+behavior, exceptional AppKit cleanup, late-callback ACKs, native heap reclamation
+or actual early native-loop failure. Partial worker/loop progress is retained by
+the consumer; pre-loop startup failures still rely on the parent process receipt.
+
+This phase selects and writes no files, accesses no clipboard and changes no
+preferences. Actual editor selection/persistence is independently qualified in
+the native-chooser report. Physical Cancel clicks, Finder drag, human IME and
+VoiceOver, cross-display behavior, broader native/GPU memory, sustained performance
+and public distribution remain open. Full Mac completion is not established.
+''')
+print(json.dumps({'qualification_sha256':sha(p/'qualification.json'),'archive_sha256':sha(archive),'archive_members':len(index),'native_cycles':200}))
