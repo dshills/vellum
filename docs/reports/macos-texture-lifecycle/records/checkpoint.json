@@ -1,0 +1,93 @@
+{
+  "result": "PASS_OWNED_TEXTURE_LIFECYCLE_AND_HEADLESS_READBACK",
+  "base_commit": "9a34670e989517ab0bb776eeb3e0638d5a4c4959",
+  "qualification_sha256": "594b7931c04a507228d616b0c0993381ef716ec838f2e36566f6c10b36627e58",
+  "source": {
+    "drivers/cogent/native/dependencies.json": "e7f69996967539cbbe7e30244fd2bc22da6b50d07b10bc42109d2cf132017530",
+    "drivers/cogent/native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76",
+    "drivers/cogent/native/patches/texturelifecycle/README.md": "25341c20bdf014402045d4fb442c9b151c32b1bf4bfcffd1af5fd500f6b1cf66",
+    "drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+    "drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734",
+    "drivers/cogent/prepare_test.py": "8beccffa1d1be9096f579fe130c6380fcf772328e3fed92a3c00576347932f26",
+    "specs/gpu-frame-lifecycle.md": "a5429f2ed9fdc1f0549087890d70ee911f29d4b312cd56566bda6302c45c0263",
+    "specs/macos-completion.md": "997f7cf2626c8c8184a51ae9156b4004003766d92197dc543590aa4bc90470e7"
+  },
+  "stage_outputs": {
+    "gpu/gpu.go": "3643f98bf3e579e64e1bc8f34661795715af8caec5b91552acf722d8ccf44d01",
+    "gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "gpu/texture_lifecycle_test.go": "a9038794c30b74540b31e8b610cb7ff95529908996e68ffae96fa6c0ae55ba1a",
+    "gpu/texture_native_lifecycle_test.go": "fee8169f295c819c609513417ea25edb6ddb28c50fdd29cbc2e3209f6bd8ecb3"
+  },
+  "source_review_sha256": "177e2fa69dc0f2f7e9132d8e5dadf8b94a1947af8cfc521bfa36c86784b4f180",
+  "evidence_review_sha256": "1127351533ced089f416d3c75473fbc7edbc836f532fa1077fb776272c868edb",
+  "post_test_document_sha256": "77dedd58dba8f3f244fa5dc85098b491fca3b7d63eaac58d5de61f6a3f842da1",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_reviewed_files": 6,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_raw_exit_code": 0,
+  "prism_static_leaves_internally_verified": {
+    "drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+    "drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734"
+  },
+  "archive": {
+    "sha256": "452eefca788c1c30f90e5c5320ec6f4cc6a143d6c2b5e1b23a4604d67407ac83",
+    "index_sha256": "7e342dc05442d2477d9495c9e67d644e0f3a0596eda365b80dc01f60e3f2312a",
+    "members": 139
+  },
+  "prepared_files": 6187,
+  "python_preparation_tests": 11,
+  "native_compiled_sha256": "9b3f14364ebfad97c9a0405a743145b59fa9ed9ef3770c009b6571a020ddf7df",
+  "final_owned_source_native_window_executed": false,
+  "final_owned_source_headless_gpu_executed": true,
+  "headless_gpu_observations": [
+    {
+      "case": "usage_reconfiguration",
+      "fixture": "texture_headless",
+      "retired_references": 2,
+      "windows_created": 0
+    },
+    {
+      "case": "staging_retirement",
+      "created_buffers": 32,
+      "fixture": "texture_headless",
+      "retired_references": 32,
+      "windows_created": 0
+    },
+    {
+      "case": "device_change",
+      "fixture": "texture_headless",
+      "retired_references": 3,
+      "windows_created": 0
+    },
+    {
+      "case": "rgba_readback",
+      "fixture": "texture_headless",
+      "image_rgba_channels": true,
+      "padded_bytes": 512,
+      "pixels": 6,
+      "raw_native_channels": true,
+      "windows_created": 0
+    },
+    {
+      "case": "bgra_readback",
+      "fixture": "texture_headless",
+      "image_rgba_channels": true,
+      "padded_bytes": 512,
+      "pixels": 6,
+      "raw_native_channels": true,
+      "windows_created": 0
+    }
+  ],
+  "physical_gpu_fault_injection": false,
+  "native_memory_qualified": false,
+  "gpu_memory_qualified": false,
+  "full_p11_qualified": false,
+  "macos_completion": false,
+  "next_live_tests_deferred": true
+}

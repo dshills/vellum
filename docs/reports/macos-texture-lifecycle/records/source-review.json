@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "source_version": "owned-V5",
+  "base_commit": "9a34670e989517ab0bb776eeb3e0638d5a4c4959",
+  "source_root": "/private/tmp/vellum-large-data",
+  "source_manifest_path": "/private/tmp/vellum-macos-texture-lifecycle/source-final.json",
+  "source_manifest_sha256": "e903ebc23e2c69dbfbffed254ba763000157123db0d8497fd9f2ce943bf2788a",
+  "files": {
+    "drivers/cogent/native/dependencies.json": "e7f69996967539cbbe7e30244fd2bc22da6b50d07b10bc42109d2cf132017530",
+    "drivers/cogent/native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76",
+    "drivers/cogent/native/patches/texturelifecycle/README.md": "25341c20bdf014402045d4fb442c9b151c32b1bf4bfcffd1af5fd500f6b1cf66",
+    "drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+    "drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734",
+    "drivers/cogent/prepare_test.py": "8beccffa1d1be9096f579fe130c6380fcf772328e3fed92a3c00576347932f26",
+    "specs/gpu-frame-lifecycle.md": "a5429f2ed9fdc1f0549087890d70ee911f29d4b312cd56566bda6302c45c0263",
+    "specs/macos-completion.md": "997f7cf2626c8c8184a51ae9156b4004003766d92197dc543590aa4bc90470e7"
+  },
+  "decoded_output_sha256": {
+    "gpu/gpu.go": "3643f98bf3e579e64e1bc8f34661795715af8caec5b91552acf722d8ccf44d01",
+    "gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "gpu/texture_lifecycle_test.go": "a9038794c30b74540b31e8b610cb7ff95529908996e68ffae96fa6c0ae55ba1a",
+    "gpu/texture_native_lifecycle_test.go": "fee8169f295c819c609513417ea25edb6ddb28c50fdd29cbc2e3209f6bd8ecb3"
+  },
+  "stage_input_sha256": {
+    "gpu/gsystem.go": "1ff66ce971ee9fbd12c2e7b465daeada5fd95598f4a59662cd32eb77ab16c224",
+    "gpu/texture.go": "1071f4296eede5694c1d84444c10c5eeff950cb1c6261f1961bebd824005e355",
+    "gpu/texture_config_regression_test.go": null,
+    "gpu/texture_lifecycle.go": null,
+    "gpu/texture_lifecycle_test.go": null,
+    "gpu/texture_native_lifecycle_test.go": null,
+    "gpu/gpu.go": "ec2fca347dd0e66b791b34839fb38208efc3a4610f6940143c1fe77e10a6a1eb"
+  },
+  "stage_output_sha256": {
+    "gpu/gpu.go": "3643f98bf3e579e64e1bc8f34661795715af8caec5b91552acf722d8ccf44d01",
+    "gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "gpu/texture_lifecycle_test.go": "a9038794c30b74540b31e8b610cb7ff95529908996e68ffae96fa6c0ae55ba1a",
+    "gpu/texture_native_lifecycle_test.go": "fee8169f295c819c609513417ea25edb6ddb28c50fdd29cbc2e3209f6bd8ecb3"
+  },
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/native/dependencies.json": "e7f69996967539cbbe7e30244fd2bc22da6b50d07b10bc42109d2cf132017530",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/README.md": "25341c20bdf014402045d4fb442c9b151c32b1bf4bfcffd1af5fd500f6b1cf66",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734",
+    "/private/tmp/vellum-large-data/drivers/cogent/prepare_test.py": "8beccffa1d1be9096f579fe130c6380fcf772328e3fed92a3c00576347932f26",
+    "/private/tmp/vellum-large-data/specs/gpu-frame-lifecycle.md": "a5429f2ed9fdc1f0549087890d70ee911f29d4b312cd56566bda6302c45c0263",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "997f7cf2626c8c8184a51ae9156b4004003766d92197dc543590aa4bc90470e7",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/gpu.go": "3643f98bf3e579e64e1bc8f34661795715af8caec5b91552acf722d8ccf44d01",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_lifecycle_test.go": "a9038794c30b74540b31e8b610cb7ff95529908996e68ffae96fa6c0ae55ba1a",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_native_lifecycle_test.go": "fee8169f295c819c609513417ea25edb6ddb28c50fdd29cbc2e3209f6bd8ecb3"
+  },
+  "artifact_sha256": {
+    "/private/tmp/vellum-macos-texture-lifecycle/source-final.json": "e903ebc23e2c69dbfbffed254ba763000157123db0d8497fd9f2ce943bf2788a",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-prism.json": "e30ed11cf95512469638421388e1ff9105a079d84bb41ca33393be7951537206",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-review-candidate-v3.json": "4da0170b13b2860dd7c8838f279d22b64f5f4b5e43e5f7c13368c058dc0b469b"
+  },
+  "scope": [
+    "Exact eight repository implementation/pin/test-registration/specification leaves and seven decoded Go outputs, under serialized texture/frame ownership.",
+    "Independently replayed the patch in memory against exact three original production files and four absent files; decoded bytes match every output pin and selected prepared output. No source/prepare/test command was executed.",
+    "Candidate V3 source approval and prior owned V3/V4 versions remain distinct. V4 adds required usage-bit checks and a gated real headless fixture; V5 fixes its setup error cleanup and missing-adapter device admission."
+  ],
+  "invariants": [
+    "Texture publication admits a complete live owned texture/view pair and retires failed/partial creation references. Empty borrowed retirement clears shared state; created pairs explicitly publish owned mode.",
+    "Reuse requires live device/queue, live owned same-origin texture/view, exact format and all requested usage bits. Image/render transitions replace incompatible resources; SetFromGoImage also rejects an invalid/missing pair rather than uploading through a format-only shortcut.",
+    "Explicit device/queue changes retire texture/view/sampler/staging. Same-device staging allocation refusal preserves old buffer/dimensions; successful replacement explicitly releases the previous reference instead of relying on GC.",
+    "Four-byte single-layer resolve layout validates positive dimensions, uint32 row/image limits and Go map length before allocating/mapping. Checked copy and stale/missing read admission preserve existing explicit configuration/copy/submission preconditions.",
+    "Raw ReadData remains native channel order; ReadGoImage normalizes detached BGRA bytes to NRGBA without changing alpha/transfer bytes. GrabImage refuses a failed copy/read while completing an otherwise valid render.",
+    "NoDisplayGPU refuses a nil adapter before NewDevice. createHeadlessPair cleans returned partial device then GPU references on ordinary nil/error admission; it leaves shared global Instance ownership with final shutdown."
+  ],
+  "fixture_review": [
+    "The explicit VELLUM_TEXTURE_GPU_TEST=1 gate and !js build constraint keep the tiny real-GPU fixture out of ordinary execution. It creates no application window, surface or presentation path and records no performance/physical-memory metric.",
+    "Guarded device/GPU/Instance teardown is installed before calling NoDisplayGPU, so missing-adapter or device-error termination cannot skip fixture cleanup. Each successful subtest installs its texture/device/command-buffer cleanup before subsequent failure checks.",
+    "Image↔render usage checks strongly retain the old texture wrappers and require their explicit invalidation. Staging checks retain all32 old buffer wrappers, assert immediate owner-reference retirement/reuse and perform idempotent final cleanup. Device-change checks retire old texture/view/staging before allocating new staging.",
+    "Two3x2RGBA/BGRA transfer cases check exact unpadded native-order bytes, padded copy/map dimensions and detached normalized image bytes after queue submission/mapping. They cover tiny transfer/reference correctness, not physical heap reclamation or general GPU fault recovery.",
+    "The five-case injected headless admission table verifies missing adapter, device error, partial device, nil-without-error and success, with exact cleanup order/error identity. Defensive partial-handle tables remain separate from pinned native factory behavior."
+  ],
+  "resolved_findings": [
+    {
+      "id": "TEXTURE-01",
+      "resolution": "Device/queue change invalidates staging ownership before same-sized reuse."
+    },
+    {
+      "id": "TEXTURE-02",
+      "resolution": "Detached ReadGoImage normalizes BGRA; raw ReadData remains native order."
+    },
+    {
+      "id": "TEXTURE-03",
+      "resolution": "Empty borrowed retirement unconditionally clears shared mode; created pairs explicitly own their handles."
+    },
+    {
+      "id": "TEXTURE-04",
+      "resolution": "Same-format shortcuts require a live device and queue."
+    },
+    {
+      "id": "TEXTURE-NATIVE-SETUP",
+      "resolution": "Fixture teardown is registered before NoDisplayGPU; missing-adapter admission is checked and returned failed/partial device admission releases GPU ownership without releasing the shared global Instance."
+    }
+  ],
+  "patch_safety": {
+    "stage": 49,
+    "patch_sha256": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76",
+    "ordered_1_through49": true,
+    "prepare_test_range": "list(range(1, 50))",
+    "original_changed_files": 3,
+    "absent_new_files": 4,
+    "exact_decoded_and_prepared_outputs": 7
+  },
+  "provider_scope": {
+    "frozen_manifest_sha256": "e30ed11cf95512469638421388e1ff9105a079d84bb41ca33393be7951537206",
+    "implementation_specification_paths": 6,
+    "excluded_static_pin_leaves": 2,
+    "scope": "Provider result is a separate gate; this source certificate does not infer a pending/future provider outcome."
+  },
+  "limitations": [
+    "Read-only source approval only. Final V5 tests and authorized headless execution were in progress when review completed; no success is inferred from candidate or earlier-version receipts.",
+    "No reviewer Go/build/prepare/native/UI/provider/Git execution or source edits. Only selected prepared output bytes were independently hashed/replayed; complete compiler/SDK/native closure is outside this certificate.",
+    "No windows/surfaces/input/presentation/performance timing or physical/native/GPU memory acceptance. A successful tiny headless fixture proves reference/transfer observations, not physical reclamation, backend faults or full Mac acceptance.",
+    "Serialized owners remain required; stale/concurrent owner support, arbitrary abandoned resources, broad panic recovery and device-loss recreation are not added.",
+    "V4 sandbox no-adapter failure and earlier candidate/original-overlay results remain historical version-specific evidence, not relabeled as final V5 success."
+  ]
+}

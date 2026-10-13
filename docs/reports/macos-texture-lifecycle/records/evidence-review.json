@@ -1,0 +1,853 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_EVIDENCE",
+  "result": "APPROVED_EVIDENCE",
+  "findings": [],
+  "base_commit_reported": "9a34670e989517ab0bb776eeb3e0638d5a4c4959",
+  "source_root": "/private/tmp/vellum-large-data",
+  "phase": "/private/tmp/vellum-macos-texture-lifecycle",
+  "review_scope": "Bounded selected evidence audit: filesystem reads/hashes and stdlib processing only. No tests, GPU/native/UI execution, Go/build/prepare/provider/Git commands or source/sealed-artifact mutations.",
+  "endpoints": {
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/README.md": "77dedd58dba8f3f244fa5dc85098b491fca3b7d63eaac58d5de61f6a3f842da1",
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/records/evidence-index.json": "7e342dc05442d2477d9495c9e67d644e0f3a0596eda365b80dc01f60e3f2312a",
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/records/evidence.tar.gz": "452eefca788c1c30f90e5c5320ec6f4cc6a143d6c2b5e1b23a4604d67407ac83",
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/records/archive-producer.py.txt": "5c2bf1b45fbf264353a4e5d5abf16e3bb8a471c830e6271bafd017ea7805490f",
+    "/private/tmp/vellum-macos-texture-lifecycle/qualification.json": "594b7931c04a507228d616b0c0993381ef716ec838f2e36566f6c10b36627e58",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-review-final.json": "177e2fa69dc0f2f7e9132d8e5dadf8b94a1947af8cfc521bfa36c86784b4f180",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-final.json": "e903ebc23e2c69dbfbffed254ba763000157123db0d8497fd9f2ce943bf2788a",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-prism.json": "e30ed11cf95512469638421388e1ff9105a079d84bb41ca33393be7951537206",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-review-candidate-v3.json": "4da0170b13b2860dd7c8838f279d22b64f5f4b5e43e5f7c13368c058dc0b469b",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/prism.json": "645203ea13b564cebbfc4b6861a075135fa94531eb5ff02565b8f021fdcc0147",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/process.json": "7c2d46fca8489e0e43688059aacb6ca10b778e88cd4ba92ff4190578b7babb14",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/inputs.json": "632db3557b08e009d9f44636ee6879d0ec29cd2f96510097933d1e362b104857",
+    "/private/tmp/vellum-macos-texture-lifecycle/headless-original-overlay.json": "05c87001443c7f3a52f1855d1316b8c32cc86c7fa4262e44ec7f5d2191e9c73d",
+    "/private/tmp/vellum-macos-texture-lifecycle/original/gpu/texture.go": "1071f4296eede5694c1d84444c10c5eeff950cb1c6261f1961bebd824005e355",
+    "/private/tmp/vellum-macos-texture-lifecycle/code_run.py": "16cba230b529a80a7dd69f7dbab7f8c3e7153220f2458bbf08dd500e81b8176e"
+  },
+  "reviewed_artifact_sha256": {
+    "/private/tmp/vellum-macos-texture-lifecycle/adopt.py": "bfb7c73b817be0fdaf7eb91eba3eb08d04096982d45bd2a8a9ddb53c8667c1c8",
+    "/private/tmp/vellum-macos-texture-lifecycle/adopt_v4.py": "74d05f4cbe20a04dbad4c9998fa55a1a2662ecb1a128ba71249f7359edce7c99",
+    "/private/tmp/vellum-macos-texture-lifecycle/adopt_v5.py": "e0f433bf398fc629b8ef02c75d393b5015884a1be3101560eba60c463b605e26",
+    "/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json": "d3cf432f29b42e57a958beab400d422b4117b7f53ed376614c6e9811f749f122",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate-v1-inputs.json": "b3c9afe209e9668c2731caab27788af0385b22a49ff0e9745dba9910198c342b",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate-v2-inputs.json": "1f685e168e8146dd7891c25f1ed899c2a4023fba51db94c4055c38f9124071ae",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate-v3-initial-inputs.json": "8bd4cedddb44a8fedcebf0a692256177526c319819bcf6757c513909bef35e98",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate-v3-inputs.json": "798a7a5e500bafa88f25c2fe40c8949378b3cb5bdb8c7cc416a8cc5ae879e702",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate-v4-inputs.json": "c9b68c40fe03cd85b7e0e3b4ce22b2e24df83c0534b2e972d9b7377e5eb9d795",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate-v5-inputs.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gpu.go": "3643f98bf3e579e64e1bc8f34661795715af8caec5b91552acf722d8ccf44d01",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle_test.go": "a9038794c30b74540b31e8b610cb7ff95529908996e68ffae96fa6c0ae55ba1a",
+    "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_native_lifecycle_test.go": "fee8169f295c819c609513417ea25edb6ddb28c50fdd29cbc2e3209f6bd8ecb3",
+    "/private/tmp/vellum-macos-texture-lifecycle/code_run-v1.py.txt": "ac6a04292af2d1404566d57f81ef52f27656ab557adf9d9b9f02fd8f8fba5c35",
+    "/private/tmp/vellum-macos-texture-lifecycle/code_run.py": "16cba230b529a80a7dd69f7dbab7f8c3e7153220f2458bbf08dd500e81b8176e",
+    "/private/tmp/vellum-macos-texture-lifecycle/driver-offscreen-race-v5.json": "426142e87b0b092f3ce37d934eafe89aa979b6745f5847a27ec37890ca2812fe",
+    "/private/tmp/vellum-macos-texture-lifecycle/driver-offscreen-race-v5.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+    "/private/tmp/vellum-macos-texture-lifecycle/driver-offscreen-race-v5.stdout": "81d36c0cf34059948326db8eaa1206e93ea943e6d1d46aefe32be3cbaa6b4e27",
+    "/private/tmp/vellum-macos-texture-lifecycle/driver-offscreen-race.json": "efd05bfb53d7f8765c36de5704e4b76116c121624f37b88f0a1ebcd9a3aa6084",
+    "/private/tmp/vellum-macos-texture-lifecycle/driver-offscreen-race.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+    "/private/tmp/vellum-macos-texture-lifecycle/driver-offscreen-race.stdout": "55c84184e5732f20a7c9114d4c2b4df3f7bdfab3e7f7e9a7157a509268b6e7a4",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-offscreen-race-v5.json": "bdec5be48243156ece0f114def46f2076b447d09711bbdad869e98d0fd102b27",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-offscreen-race-v5.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-offscreen-race-v5.stdout": "03a5db5e130d4a79d8f3786f8db48534f29aaaba513ba3c49946cd9d5524c438",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-offscreen-race.json": "b9abd493651f1db64d960e88848a43db02cefe5dcdcf2d3be1427d87ef43f033",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-offscreen-race.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-offscreen-race.stdout": "f4e09d3aeb14a6fccb41133b8a9d871b2bb40446ec2316d90e6dddd3c841f1f6",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-vet-v5.json": "6fa57c89c5dac53724284eafdc2ac8b489cd26d81b710dedfea9676f279d479e",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-vet-v5.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-vet-v5.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-vet.json": "191f0fb1bf0acd093b1f242517bdeb961d72093f54006c3a21ab5167ce3e298e",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-vet.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/gpu-vet.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/headless-baseline-overlay.json": "b309076c3a7773e668d8b6613c85f8754c14eef4a2711bec9a765159cdf703b7",
+    "/private/tmp/vellum-macos-texture-lifecycle/headless-original-overlay.json": "05c87001443c7f3a52f1855d1316b8c32cc86c7fa4262e44ec7f5d2191e9c73d",
+    "/private/tmp/vellum-macos-texture-lifecycle/native-build-v5.json": "8a50ba8eff09a1762bcc9ef3ff3455f8fa0f8d65c57316d672191fb309982c07",
+    "/private/tmp/vellum-macos-texture-lifecycle/native-build-v5.stderr": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776",
+    "/private/tmp/vellum-macos-texture-lifecycle/native-build-v5.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/native-build.json": "61fdb5468b8f35db4851ba6afb1e08d6205b8e1ccd63e8d7f7fddd4a58c2603c",
+    "/private/tmp/vellum-macos-texture-lifecycle/native-build.stderr": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776",
+    "/private/tmp/vellum-macos-texture-lifecycle/native-build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/original-inputs.json": "778f548edc9fdbf0b9d82c1e6cf5567a7c3e4c12a2be309fc75fc087a25c081e",
+    "/private/tmp/vellum-macos-texture-lifecycle/original-v4-inputs.json": "9c4052488907e779be3e598328c8d9c421fdf1b4ac967d54deb89bf298f212e1",
+    "/private/tmp/vellum-macos-texture-lifecycle/original-v5-inputs.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+    "/private/tmp/vellum-macos-texture-lifecycle/original/gpu/texture.go": "1071f4296eede5694c1d84444c10c5eeff950cb1c6261f1961bebd824005e355",
+    "/private/tmp/vellum-macos-texture-lifecycle/overlay.json": "15e29558eea1b8875100f64ea500ac6b247b72aed4c5725a0e57d436b7774b61",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare-v4.json": "3edc8dbaa5ef7c0dd12f2c3be8d7d4f4f97328b4a7cd6ab1deff5d47acdd54eb",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare-v4.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare-v4.stdout": "3fec6a64e96e522c558954c66cdfa7c0e5c213e3283bb244d7b92ae56cfbff08",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare-v5.json": "4bac1f0a05d175c5b7693e6a72050e1273622aaf9192694cce5f8a0ac24cb9b9",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare-v5.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare-v5.stdout": "89074061a58ec43aa7996660f57d791e4ec6e40a00a6df9a942a709ac4793882",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare.json": "0da3b32ec7dc0cddf763ad5a11fa4e86954f9c7e0cf0aa9691ba31034d5e87d2",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-prepare.stdout": "0aa08a0269ba541417d61efb2ceba08415fea89f80e5994a466bb5638a261b1a",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/drivers/cogent/native/dependencies.json": "042ece030cc4f3ca4c57c98b2b6e375999ddfdca93a7ba76797b8f3f8dc9aa23",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/drivers/cogent/native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch": "81e206f8209c58ac1773139f6d219e1ea9c14cffc5a0a82ace9ad18869f50a07",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/drivers/cogent/native/patches/texturelifecycle/README.md": "0605a5225f48b513ba09055bf9fdbc6c2c0962e4dfa9d028ce1e7e0579c9b729",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "778f548edc9fdbf0b9d82c1e6cf5567a7c3e4c12a2be309fc75fc087a25c081e",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "798a7a5e500bafa88f25c2fe40c8949378b3cb5bdb8c7cc416a8cc5ae879e702",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/drivers/cogent/prepare_test.py": "8beccffa1d1be9096f579fe130c6380fcf772328e3fed92a3c00576347932f26",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/specs/gpu-frame-lifecycle.md": "d13fa35b26fb07b4dbf14bc6abb2629fe30c9931cc648b2bc18d67605a20c812",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v3/specs/macos-completion.md": "997f7cf2626c8c8184a51ae9156b4004003766d92197dc543590aa4bc90470e7",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/drivers/cogent/native/dependencies.json": "ba0ca28d2bb361d7a4244aadf8e99181e25c7c4145173914ec19a2f21b768963",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/drivers/cogent/native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch": "0c36b687950dec910f80b7a81cba859ea0e0539fde16d1194b38b8c41b33c405",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/drivers/cogent/native/patches/texturelifecycle/README.md": "406dc496c0ed7772c834f672d7af21993d088f9b905a3bf4de9b7512603a607a",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "9c4052488907e779be3e598328c8d9c421fdf1b4ac967d54deb89bf298f212e1",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "c9b68c40fe03cd85b7e0e3b4ce22b2e24df83c0534b2e972d9b7377e5eb9d795",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/drivers/cogent/prepare_test.py": "8beccffa1d1be9096f579fe130c6380fcf772328e3fed92a3c00576347932f26",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/specs/gpu-frame-lifecycle.md": "0d6cda75bb6b660529ee2008c96653e0b1c0038f9e9e6dd1c2218366cefa9e7d",
+    "/private/tmp/vellum-macos-texture-lifecycle/owned-v4/specs/macos-completion.md": "997f7cf2626c8c8184a51ae9156b4004003766d92197dc543590aa4bc90470e7",
+    "/private/tmp/vellum-macos-texture-lifecycle/prepare-tests-v5.json": "c81a695d62f9cb3982faa6a6028f983becaeb0cdb6afe1697ea21a1b40349a94",
+    "/private/tmp/vellum-macos-texture-lifecycle/prepare-tests-v5.stderr": "32b1dbbc5815aae7afbbead5d81f6398817e18d86ba21b42486ace6bf0688516",
+    "/private/tmp/vellum-macos-texture-lifecycle/prepare-tests-v5.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/prepare-tests.json": "a1b45ede2b9e20574ecb32b39b0bd6be6bdf369feed118ef6de57841e239804a",
+    "/private/tmp/vellum-macos-texture-lifecycle/prepare-tests.stderr": "f6c54f78e96f0f7ea4571a1762556280051f724651cd88327d4b4d78187b22ed",
+    "/private/tmp/vellum-macos-texture-lifecycle/prepare-tests.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/inputs.json": "632db3557b08e009d9f44636ee6879d0ec29cd2f96510097933d1e362b104857",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/prism.json": "645203ea13b564cebbfc4b6861a075135fa94531eb5ff02565b8f021fdcc0147",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/process.json": "7c2d46fca8489e0e43688059aacb6ca10b778e88cd4ba92ff4190578b7babb14",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/producer.py.txt": "2196774930913a34d9899c7e5a9f6f56d9db51e0998e41f4fe77b5249dcae76d",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/staged.diff.txt": "cae19a7b4a5893b672d300027b49e3aa00f7703ad6f703c25c43a10866bc9ad4",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism-v1/stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/prism.py": "2196774930913a34d9899c7e5a9f6f56d9db51e0998e41f4fe77b5249dcae76d",
+    "/private/tmp/vellum-macos-texture-lifecycle/qualification.json": "594b7931c04a507228d616b0c0993381ef716ec838f2e36566f6c10b36627e58",
+    "/private/tmp/vellum-macos-texture-lifecycle/report.py": "5c2bf1b45fbf264353a4e5d5abf16e3bb8a471c830e6271bafd017ea7805490f",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-final.json": "e903ebc23e2c69dbfbffed254ba763000157123db0d8497fd9f2ce943bf2788a",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-prism-v4.json": "c74156632f31969f14a1b7d7cbb97603d0107b6a421f926f8ce54acfc09622fd",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-prism.json": "e30ed11cf95512469638421388e1ff9105a079d84bb41ca33393be7951537206",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-review-candidate-v3.json": "4da0170b13b2860dd7c8838f279d22b64f5f4b5e43e5f7c13368c058dc0b469b",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-review-final.json": "177e2fa69dc0f2f7e9132d8e5dadf8b94a1947af8cfc521bfa36c86784b4f180",
+    "/private/tmp/vellum-macos-texture-lifecycle/source-v4.json": "a22058a98da7a6616d21a012ff34361279e7a7ef586e3964c23a75d58f72d278",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-final-v5.json": "b3185b6adc355afda01720a743d2dea0f2c0345646461e65939143762a7869f2",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-final-v5.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-final-v5.stdout": "04ea329ea3fc71c5a22649472501bbbe4d8f5b6032069c0f521fc3e44782fe45",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-final.json": "a0c6de8e21ee98d6cc55cb7274d9419ddee0f22fd629ec484e916f54761b69bd",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-final.stdout": "8abd54f461524773b64fd55b04608fd27120501613fb129e328552e7c8ba044d",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-original.json": "cfdcfced07ea74d4f822f35565524bf27d01c3517b02c09079b293ba9d1ecb68",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-original.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-headless-original.stdout": "538d5897a6b219231937d7fa8b159be23304e182f2e0a477ad78cbf99e5218eb",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-original-regression-v3.json": "0946ea380f2461380db4da6af1a6f710dd1a580bbb6e68e9f0649580abc8443e",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-original-regression-v3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-original-regression-v3.stdout": "6ad75ea61c9aab997a72a800bde2c796b590a1f1880901a1df365b7751cfb910",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-original-regression.json": "415babfcd7bbd747a47de87ef75ba711d635399bba33f44abf86493681504f85",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-original-regression.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-original-regression.stdout": "35984b3ee571f453acc7b96f726fddff6142c317e825ef5242e0e7ba2540fbd1",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-overlay-race-v2.json": "6700f56cc31d443aebd890b6b59b8df5e85a257d94716c79444496d35d787a09",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-overlay-race-v2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-overlay-race-v2.stdout": "bf9d4181f67234d05da5c7adf20c01e58179b7170ac36cf661d89a8105b326e6",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-overlay-race.json": "27de6488c5b5420494a696fff135e0f81d8e6a1e33b0c4a7d50357f9a346b1b8",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-overlay-race.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-texture-lifecycle/texture-overlay-race.stdout": "2aa5e6fdd521fcd41e6505bf1cb06d33d3df9888c1b84b99a1fefc48eb3d7a48",
+    "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture.go": "71933bf5f9a03c0b964c110906db3ca9ea42ab05b39ecfb43c5e0d3ced2645a6",
+    "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_config_regression_test.go": "60ada1ff97764d4274b7764a26a41d49d04040aab60be803ad8174081c85046e",
+    "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_lifecycle.go": "af95e6742dc640864bd6d70dcaa3a0dfe7664c77a246dc78aa20610bcf68ccb9",
+    "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_lifecycle_test.go": "1487c47f4ce7f9a58eed64d6119758650c9f6a985a886649f3480791aefe04f8",
+    "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture.go": "cfecdfa4f9d6dd2f6c84b7e9cf84081b89f0c826c8c7376bc5bbb51370adfc98",
+    "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_config_regression_test.go": "60ada1ff97764d4274b7764a26a41d49d04040aab60be803ad8174081c85046e",
+    "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_lifecycle.go": "e04ed552e66b9b68587c0a2d5f4f33dd09f98c9196f9ad0674404e83e9b38ffe",
+    "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_lifecycle_test.go": "5c3e8d75d2fea8ab63c4aa559210d9ae95521f63efd890edd2db74738b266531",
+    "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/texture.go": "9b94a596df83898e14eb4d4d0c6104477e6720e690ebd0aa7890adb51be91a6d",
+    "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/texture_lifecycle.go": "1ff5c43c4f9976f4e175639b5009d9a7c0f1ed9bed3b079633e5cd4a6df828b0",
+    "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/texture_lifecycle_test.go": "5c3e8d75d2fea8ab63c4aa559210d9ae95521f63efd890edd2db74738b266531",
+    "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/texture_lifecycle_test.go": "5c3e8d75d2fea8ab63c4aa559210d9ae95521f63efd890edd2db74738b266531",
+    "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/texture_native_lifecycle_test.go": "8dd016b59acf9a015356cccc7a20b0173a8e8b07559934e1356c82ed181546ce",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/dependencies.json": "e7f69996967539cbbe7e30244fd2bc22da6b50d07b10bc42109d2cf132017530",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/README.md": "25341c20bdf014402045d4fb442c9b151c32b1bf4bfcffd1af5fd500f6b1cf66",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734",
+    "/private/tmp/vellum-large-data/drivers/cogent/prepare_test.py": "8beccffa1d1be9096f579fe130c6380fcf772328e3fed92a3c00576347932f26",
+    "/private/tmp/vellum-large-data/specs/gpu-frame-lifecycle.md": "a5429f2ed9fdc1f0549087890d70ee911f29d4b312cd56566bda6302c45c0263",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "997f7cf2626c8c8184a51ae9156b4004003766d92197dc543590aa4bc90470e7",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/gpu.go": "3643f98bf3e579e64e1bc8f34661795715af8caec5b91552acf722d8ccf44d01",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_lifecycle_test.go": "a9038794c30b74540b31e8b610cb7ff95529908996e68ffae96fa6c0ae55ba1a",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/gpu/texture_native_lifecycle_test.go": "fee8169f295c819c609513417ea25edb6ddb28c50fdd29cbc2e3209f6bd8ecb3",
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/README.md": "77dedd58dba8f3f244fa5dc85098b491fca3b7d63eaac58d5de61f6a3f842da1",
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/records/evidence-index.json": "7e342dc05442d2477d9495c9e67d644e0f3a0596eda365b80dc01f60e3f2312a",
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/records/evidence.tar.gz": "452eefca788c1c30f90e5c5320ec6f4cc6a143d6c2b5e1b23a4604d67407ac83",
+    "/private/tmp/vellum-large-data/docs/reports/macos-texture-lifecycle/records/archive-producer.py.txt": "5c2bf1b45fbf264353a4e5d5abf16e3bb8a471c830e6271bafd017ea7805490f"
+  },
+  "source8": {
+    "drivers/cogent/native/dependencies.json": "e7f69996967539cbbe7e30244fd2bc22da6b50d07b10bc42109d2cf132017530",
+    "drivers/cogent/native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76",
+    "drivers/cogent/native/patches/texturelifecycle/README.md": "25341c20bdf014402045d4fb442c9b151c32b1bf4bfcffd1af5fd500f6b1cf66",
+    "drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+    "drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734",
+    "drivers/cogent/prepare_test.py": "8beccffa1d1be9096f579fe130c6380fcf772328e3fed92a3c00576347932f26",
+    "specs/gpu-frame-lifecycle.md": "a5429f2ed9fdc1f0549087890d70ee911f29d4b312cd56566bda6302c45c0263",
+    "specs/macos-completion.md": "997f7cf2626c8c8184a51ae9156b4004003766d92197dc543590aa4bc90470e7"
+  },
+  "decoded_outputs7": {
+    "gpu/gpu.go": "3643f98bf3e579e64e1bc8f34661795715af8caec5b91552acf722d8ccf44d01",
+    "gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+    "gpu/texture.go": "f6e88007cc8c0038d1bff6e85686d5b465d5fa8fed570a4a97a0027e91493094",
+    "gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8",
+    "gpu/texture_lifecycle.go": "f05546dfde2e7e0775f7f17f9fa5c889d5716d02443b4eff08d197fc15efc8bf",
+    "gpu/texture_lifecycle_test.go": "a9038794c30b74540b31e8b610cb7ff95529908996e68ffae96fa6c0ae55ba1a",
+    "gpu/texture_native_lifecycle_test.go": "fee8169f295c819c609513417ea25edb6ddb28c50fdd29cbc2e3209f6bd8ecb3"
+  },
+  "archive": {
+    "members": 139,
+    "all_unique_regular_relative_utf8": true,
+    "index_archive_current_members_equal": true,
+    "producer_matches_retained_copy": true,
+    "binaries_caches_desktop_artifacts_excluded": true,
+    "scope": "Original, candidateV1/V2/V3/V4/V5 and ownedV3/V4 records; versioned frozen source copies/maps; raw logs/receipts; provider/source certificates/pins. Separate compiler/cache/SDK closure is not inferred."
+  },
+  "receipts": {
+    "count": 20,
+    "logs": 40,
+    "source_groups": {
+      "final": 7,
+      "historical_2d442169c55c": 7,
+      "historical_b0fd5942cbb2": 1,
+      "historical_c1b614e1d043": 1,
+      "historical_44136fa355b3": 4
+    },
+    "records": {
+      "driver-offscreen-race-v5": {
+        "sha256": "426142e87b0b092f3ce37d934eafe89aa979b6745f5847a27ec37890ca2812fe",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "."
+        ],
+        "source_group": "final",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": true,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "driver-offscreen-race": {
+        "sha256": "efd05bfb53d7f8765c36de5704e4b76116c121624f37b88f0a1ebcd9a3aa6084",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "."
+        ],
+        "source_group": "historical_2d442169c55c",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "gpu-offscreen-race-v5": {
+        "sha256": "bdec5be48243156ece0f114def46f2076b447d09711bbdad869e98d0fd102b27",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-count=3",
+          "cogentcore.org/core/gpu",
+          "cogentcore.org/core/gpu/gpudraw"
+        ],
+        "source_group": "final",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": true,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "gpu-offscreen-race": {
+        "sha256": "b9abd493651f1db64d960e88848a43db02cefe5dcdcf2d3be1427d87ef43f033",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-count=3",
+          "cogentcore.org/core/gpu",
+          "cogentcore.org/core/gpu/gpudraw"
+        ],
+        "source_group": "historical_2d442169c55c",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "gpu-vet-v5": {
+        "sha256": "6fa57c89c5dac53724284eafdc2ac8b489cd26d81b710dedfea9676f279d479e",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "vet",
+          "-tags=offscreen",
+          "cogentcore.org/core/gpu",
+          "cogentcore.org/core/gpu/gpudraw"
+        ],
+        "source_group": "final",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": true,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "gpu-vet": {
+        "sha256": "191f0fb1bf0acd093b1f242517bdeb961d72093f54006c3a21ab5167ce3e298e",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "vet",
+          "-tags=offscreen",
+          "cogentcore.org/core/gpu",
+          "cogentcore.org/core/gpu/gpudraw"
+        ],
+        "source_group": "historical_2d442169c55c",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "native-build-v5": {
+        "sha256": "8a50ba8eff09a1762bcc9ef3ff3455f8fa0f8d65c57316d672191fb309982c07",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-texture-lifecycle/window-cycle-smoke-owned-v5",
+          "./cmd/window-cycle-smoke"
+        ],
+        "source_group": "final",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": true,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "native-build": {
+        "sha256": "61fdb5468b8f35db4851ba6afb1e08d6205b8e1ccd63e8d7f7fddd4a58c2603c",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-texture-lifecycle/window-cycle-smoke-owned",
+          "./cmd/window-cycle-smoke"
+        ],
+        "source_group": "historical_2d442169c55c",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "owned-prepare-v4": {
+        "sha256": "3edc8dbaa5ef7c0dd12f2c3be8d7d4f4f97328b4a7cd6ab1deff5d47acdd54eb",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare.py"
+        ],
+        "source_group": "historical_2d442169c55c",
+        "source_count": 8,
+        "prepared_before_count": 6186,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "owned-prepare-v5": {
+        "sha256": "4bac1f0a05d175c5b7693e6a72050e1273622aaf9192694cce5f8a0ac24cb9b9",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare.py"
+        ],
+        "source_group": "historical_b0fd5942cbb2",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "owned-prepare": {
+        "sha256": "0da3b32ec7dc0cddf763ad5a11fa4e86954f9c7e0cf0aa9691ba31034d5e87d2",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare.py"
+        ],
+        "source_group": "historical_c1b614e1d043",
+        "source_count": 8,
+        "prepared_before_count": 6183,
+        "prepared_after_count": 6186,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "prepare-tests-v5": {
+        "sha256": "c81a695d62f9cb3982faa6a6028f983becaeb0cdb6afe1697ea21a1b40349a94",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare_test.py"
+        ],
+        "source_group": "final",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": true,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "prepare-tests": {
+        "sha256": "a1b45ede2b9e20574ecb32b39b0bd6be6bdf369feed118ef6de57841e239804a",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare_test.py"
+        ],
+        "source_group": "historical_2d442169c55c",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {}
+      },
+      "texture-headless-final-v5": {
+        "sha256": "b3185b6adc355afda01720a743d2dea0f2c0345646461e65939143762a7869f2",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-v",
+          "-tags=offscreen",
+          "-run=TestVellumTextureNativeOwnershipAndReadback",
+          "-count=1",
+          "cogentcore.org/core/gpu"
+        ],
+        "source_group": "final",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": true,
+        "headless_gpu_requested": true,
+        "overlay_input_binding": {}
+      },
+      "texture-headless-final": {
+        "sha256": "a0c6de8e21ee98d6cc55cb7274d9419ddee0f22fd629ec484e916f54761b69bd",
+        "exit_code": 1,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-v",
+          "-tags=offscreen",
+          "-run=TestVellumTextureNativeOwnershipAndReadback",
+          "-count=1",
+          "cogentcore.org/core/gpu"
+        ],
+        "source_group": "historical_2d442169c55c",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": true,
+        "overlay_input_binding": {}
+      },
+      "texture-headless-original": {
+        "sha256": "cfdcfced07ea74d4f822f35565524bf27d01c3517b02c09079b293ba9d1ecb68",
+        "exit_code": 1,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-v",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-texture-lifecycle/headless-original-overlay.json",
+          "-run=TestVellumTextureNativeOwnershipAndReadback",
+          "-count=1",
+          "cogentcore.org/core/gpu"
+        ],
+        "source_group": "final",
+        "source_count": 8,
+        "prepared_before_count": 6187,
+        "prepared_after_count": 6187,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": true,
+        "overlay_input_binding": {
+          "/private/tmp/vellum-macos-texture-lifecycle/headless-original-overlay.json": "05c87001443c7f3a52f1855d1316b8c32cc86c7fa4262e44ec7f5d2191e9c73d",
+          "/private/tmp/vellum-macos-texture-lifecycle/original/gpu/texture.go": "1071f4296eede5694c1d84444c10c5eeff950cb1c6261f1961bebd824005e355"
+        }
+      },
+      "texture-original-regression-v3": {
+        "sha256": "0946ea380f2461380db4da6af1a6f710dd1a580bbb6e68e9f0649580abc8443e",
+        "exit_code": 1,
+        "argv": [
+          "go",
+          "test",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json",
+          "-run=TestVellum(TextureConfigurationRejectsIncompleteOrBorrowedMatch|EmptyBorrowedTextureRetiresSharedState)",
+          "-count=1",
+          "cogentcore.org/core/gpu"
+        ],
+        "source_group": "historical_44136fa355b3",
+        "source_count": 0,
+        "prepared_before_count": 6183,
+        "prepared_after_count": 6183,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {
+          "/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json": "d3cf432f29b42e57a958beab400d422b4117b7f53ed376614c6e9811f749f122",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": "f0d52ef9a009fef4c0ec4a9fab3acb24b9b8596de009c3fa5acf99273bb2b7a8"
+        }
+      },
+      "texture-original-regression": {
+        "sha256": "415babfcd7bbd747a47de87ef75ba711d635399bba33f44abf86493681504f85",
+        "exit_code": 1,
+        "argv": [
+          "go",
+          "test",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json",
+          "-run=TestVellumTextureConfigurationRejectsIncompleteOrBorrowedMatch",
+          "-count=1",
+          "cogentcore.org/core/gpu"
+        ],
+        "source_group": "historical_44136fa355b3",
+        "source_count": 0,
+        "prepared_before_count": 6183,
+        "prepared_after_count": 6183,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {
+          "/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json": "d3cf432f29b42e57a958beab400d422b4117b7f53ed376614c6e9811f749f122",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": "60ada1ff97764d4274b7764a26a41d49d04040aab60be803ad8174081c85046e"
+        }
+      },
+      "texture-overlay-race-v2": {
+        "sha256": "6700f56cc31d443aebd890b6b59b8df5e85a257d94716c79444496d35d787a09",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-texture-lifecycle/overlay.json",
+          "-run=TestVellum",
+          "-count=3",
+          "cogentcore.org/core/gpu"
+        ],
+        "source_group": "historical_44136fa355b3",
+        "source_count": 0,
+        "prepared_before_count": 6183,
+        "prepared_after_count": 6183,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {
+          "/private/tmp/vellum-macos-texture-lifecycle/overlay.json": "15e29558eea1b8875100f64ea500ac6b247b72aed4c5725a0e57d436b7774b61",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture.go": "cfecdfa4f9d6dd2f6c84b7e9cf84081b89f0c826c8c7376bc5bbb51370adfc98",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": "60ada1ff97764d4274b7764a26a41d49d04040aab60be803ad8174081c85046e",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle.go": "e04ed552e66b9b68587c0a2d5f4f33dd09f98c9196f9ad0674404e83e9b38ffe",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle_test.go": "5c3e8d75d2fea8ab63c4aa559210d9ae95521f63efd890edd2db74738b266531"
+        }
+      },
+      "texture-overlay-race": {
+        "sha256": "27de6488c5b5420494a696fff135e0f81d8e6a1e33b0c4a7d50357f9a346b1b8",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-texture-lifecycle/overlay.json",
+          "-run=TestVellum",
+          "-count=1",
+          "cogentcore.org/core/gpu"
+        ],
+        "source_group": "historical_44136fa355b3",
+        "source_count": 0,
+        "prepared_before_count": 6183,
+        "prepared_after_count": 6183,
+        "exact_final_prepared_execution": false,
+        "headless_gpu_requested": false,
+        "overlay_input_binding": {
+          "/private/tmp/vellum-macos-texture-lifecycle/overlay.json": "15e29558eea1b8875100f64ea500ac6b247b72aed4c5725a0e57d436b7774b61",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gsystem.go": "9d2f4f9743433dace0bc0aece507f157c6330b3ef657f65546497083ff7310bf",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture.go": "71933bf5f9a03c0b964c110906db3ca9ea42ab05b39ecfb43c5e0d3ced2645a6",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": "60ada1ff97764d4274b7764a26a41d49d04040aab60be803ad8174081c85046e",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle.go": "af95e6742dc640864bd6d70dcaa3a0dfe7664c77a246dc78aa20610bcf68ccb9",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle_test.go": "1487c47f4ce7f9a58eed64d6119758650c9f6a985a886649f3480791aefe04f8"
+        }
+      }
+    },
+    "final6": [
+      "driver-offscreen-race-v5",
+      "gpu-offscreen-race-v5",
+      "gpu-vet-v5",
+      "native-build-v5",
+      "prepare-tests-v5",
+      "texture-headless-final-v5"
+    ],
+    "final_intervals": "Exact8 selected repository and all6187 prepared identities before/after, no overlay or drift. Includes explicit headlessGPU request and all5 PASS subcases.",
+    "observed_final_checks": "Full GPU+gpudraw offscreen race count3, full adapter offscreen race, GPU+gpudraw vet, native consumer compile,11Python preparation tests and one tiny real headlessGPU race fixture.",
+    "four_raw_exit1": [
+      "texture-original-regression",
+      "texture-original-regression-v3",
+      "texture-headless-original",
+      "texture-headless-final"
+    ],
+    "producer_binding": "Current recorded producer SHA values match code_run.py; it gates texture-headless requests through VELLUM_TEXTURE_GPU_TEST=1. Earlier producer/field omissions remain their recorded source version."
+  },
+  "prepared": {
+    "current_count": 6187,
+    "current_all_files_independently_hashed": true,
+    "current_equals_recorded_map": true,
+    "previous_frame_cleanup_count": 6183,
+    "changed_existing": [
+      "upstream/gpu/gpu.go",
+      "upstream/gpu/gsystem.go",
+      "upstream/gpu/texture.go"
+    ],
+    "added": [
+      "upstream/gpu/texture_config_regression_test.go",
+      "upstream/gpu/texture_lifecycle.go",
+      "upstream/gpu/texture_lifecycle_test.go",
+      "upstream/gpu/texture_native_lifecycle_test.go"
+    ],
+    "exact_three_changed_four_added": true,
+    "stage_order": "Registered patch numbers flatten to1..49; final stage points to current texture-lifecycle input/output pin maps and patchSHA.",
+    "scope": "Recorded all-prepared source endpoints and final6 check intervals, not complete compiler/cache/SDK/OS/native-link closure."
+  },
+  "source_certificate": {
+    "sha256": "177e2fa69dc0f2f7e9132d8e5dadf8b94a1947af8cfc521bfa36c86784b4f180",
+    "status": "APPROVED_SOURCE",
+    "source_version": "owned-V5",
+    "exact8_current_files_match": true,
+    "seven_decoded_pins_match_current": true,
+    "reviewed_file_and_artifact_hashes_rechecked": true,
+    "assessment": "Separate source certificate covers seven-output patch replay, complete pair/device/usage admission, staging retirement/layout/refusal, detached BGRA channel normalization and V5 failed/missing-adapter cleanup. This evidence audit binds its exact inputs and does not widen implementation approval."
+  },
+  "provider": {
+    "raw_result_sha256": "645203ea13b564cebbfc4b6861a075135fa94531eb5ff02565b8f021fdcc0147",
+    "process_sha256": "7c2d46fca8489e0e43688059aacb6ca10b778e88cd4ba92ff4190578b7babb14",
+    "inputs_sha256": "632db3557b08e009d9f44636ee6879d0ec29cd2f96510097933d1e362b104857",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "files": 6,
+    "chunks": 3,
+    "calls": 3,
+    "complete": true,
+    "raw_exit_code": 0,
+    "findings": 0,
+    "input_tokens": 27243,
+    "output_tokens": 5189,
+    "source_before_after_selected6_match": true,
+    "static_internal_only2": {
+      "drivers/cogent/native/patches/texturelifecycle/original-hashes.json": "f4ad4fb4447c939925fd8e9bf2a128fc19a5e84dfc8f1c19b1b7d04d30f58da7",
+      "drivers/cogent/native/patches/texturelifecycle/output-hashes.json": "59b44c97bde4b01b23e99f66664d136ae583be386fc439f584975477f7d10734"
+    },
+    "scope": "Six patch/registration/docs leaves provider-reviewed, two pin maps internally checked; no provider8 or decoded7 blanket coverage claim."
+  },
+  "headless_gpu": {
+    "observations": [
+      {
+        "case": "usage_reconfiguration",
+        "fixture": "texture_headless",
+        "retired_references": 2,
+        "windows_created": 0
+      },
+      {
+        "case": "staging_retirement",
+        "created_buffers": 32,
+        "fixture": "texture_headless",
+        "retired_references": 32,
+        "windows_created": 0
+      },
+      {
+        "case": "device_change",
+        "fixture": "texture_headless",
+        "retired_references": 3,
+        "windows_created": 0
+      },
+      {
+        "case": "rgba_readback",
+        "fixture": "texture_headless",
+        "image_rgba_channels": true,
+        "padded_bytes": 512,
+        "pixels": 6,
+        "raw_native_channels": true,
+        "windows_created": 0
+      },
+      {
+        "case": "bgra_readback",
+        "fixture": "texture_headless",
+        "image_rgba_channels": true,
+        "padded_bytes": 512,
+        "pixels": 6,
+        "raw_native_channels": true,
+        "windows_created": 0
+      }
+    ],
+    "final5_subcases_all_pass_no_skips": true,
+    "usage_prior_reference_release_count": 2,
+    "staging_created_and_retired_reference_count": 32,
+    "device_change_retired_reference_count": 3,
+    "pixel_scope": "Two opaque3x2RGBA/BGRA copy/map captures; six pixels per format,12total,512 padded staging bytes each. Exact native raw order and expected detached NRGBA channels are checked by bound fixture source before record emission.",
+    "reference_scope": "Strongly held old Go wrappers become IsValid=false after explicit release. This distinguishes explicit reference retirement from finalizer behavior; it does not prove backend GPU heap reclamation.",
+    "native_windows": false,
+    "presentation": false,
+    "physical_gpu_fault_injection": false,
+    "final_owned_source_headless_gpu_executed": true,
+    "final_owned_source_native_window_executed": false,
+    "native_window_consumer_compile_sha256": "9b3f14364ebfad97c9a0405a743145b59fa9ed9ef3770c009b6571a020ddf7df",
+    "native_window_consumer_executed": false
+  },
+  "baseline_and_history": {
+    "matched_overlay_copies": {
+      "texture-headless-original": {
+        "/private/tmp/vellum-macos-texture-lifecycle/headless-original-overlay.json": "/private/tmp/vellum-macos-texture-lifecycle/headless-original-overlay.json",
+        "/private/tmp/vellum-macos-texture-lifecycle/original/gpu/texture.go": "/private/tmp/vellum-macos-texture-lifecycle/original/gpu/texture.go"
+      },
+      "texture-original-regression-v3": {
+        "/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json": "/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json",
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/texture_config_regression_test.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/texture_config_regression_test.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go"
+        ]
+      },
+      "texture-original-regression": {
+        "/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json": "/private/tmp/vellum-macos-texture-lifecycle/baseline-overlay.json",
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_config_regression_test.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_config_regression_test.go"
+        ]
+      },
+      "texture-overlay-race-v2": {
+        "/private/tmp/vellum-macos-texture-lifecycle/overlay.json": "/private/tmp/vellum-macos-texture-lifecycle/overlay.json",
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gsystem.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gsystem.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_config_regression_test.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_config_regression_test.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_lifecycle.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle_test.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_lifecycle_test.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/texture_lifecycle_test.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/texture_lifecycle_test.go"
+        ]
+      },
+      "texture-overlay-race": {
+        "/private/tmp/vellum-macos-texture-lifecycle/overlay.json": "/private/tmp/vellum-macos-texture-lifecycle/overlay.json",
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gsystem.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v3/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v4/gpu/gsystem.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/gsystem.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_config_regression_test.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_config_regression_test.go",
+          "/private/tmp/vellum-macos-texture-lifecycle/v2/gpu/texture_config_regression_test.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_lifecycle.go"
+        ],
+        "/private/tmp/vellum-macos-texture-lifecycle/candidate/gpu/texture_lifecycle_test.go": [
+          "/private/tmp/vellum-macos-texture-lifecycle/v1/gpu/texture_lifecycle_test.go"
+        ]
+      }
+    },
+    "original_wrapper_controls": "Original6183 plus single regression-test overlay fails six invalid/borrowed same-format cases; V3 regression also fails empty-borrowed mode, seven assertions. Current final prepared source is not substituted into that original wrapper-only baseline.",
+    "texture_only_gpu_baseline": {
+      "scope": "Replaces only texture.go with exact9a34670 original atop final6187 and current fixture/admission source. Not a complete parent-tree or final prepared execution.",
+      "observations": [
+        {
+          "case": "rgba_readback",
+          "fixture": "texture_headless",
+          "image_rgba_channels": true,
+          "padded_bytes": 512,
+          "pixels": 6,
+          "raw_native_channels": true,
+          "windows_created": 0
+        }
+      ],
+      "raw_exit": 1,
+      "failures": [
+        "usage reuse",
+        "staging retirement at second allocation",
+        "device-change cleanup",
+        "BGRA NRGBA channels"
+      ],
+      "positive": "RGBA alone emits one6-pixel/512byte observation; failed staging cases do not complete32 replacements."
+    },
+    "v4_setup_failure": "Rawexit1, zero-adapter log then NewDevice(0x0) nil-pointer panic before any fixture subcase/observation. No GPU success is attributed to it. V5 source guard/early fixture teardown is separately approved and final checks pass.",
+    "versions": "All V1/V2/V3/V4 frozen manifest copies match. OwnedV3/V4 source snapshots match their versioned repository maps. Overlay target maps resolve to appropriate frozen/current copies. Earlier passes and preparations remain historical, not relabelled as finalV5."
+  },
+  "report_assessment": "Current report accurately states complete pair/reference/staging semantics, tiny headlessGPU results, exact source/prepared/proof/provider scopes and all four failures. It distinguishes wrapper release from GPU memory reclamation and texture-only original overlay from full parent execution. No actionable overclaim or evidence mismatch found.",
+  "verification": {
+    "recipe_path": "/private/tmp/vellum-texture-evidence-review/verify.py.txt",
+    "recipe_sha256": "d32df906bcb78d2f431873e045ee04a5a935d9626b9c4026ae6dec94e6ac6a04",
+    "result_path": "/private/tmp/vellum-texture-evidence-review/verification.json",
+    "result_sha256": "c6d9547b5d6e3eade6172eb8fe9c4096d62e893e317a1ba2968144867b40d54e",
+    "status": "PASS_INDEPENDENT_READ_ONLY_VERIFICATION"
+  },
+  "limitations": [
+    "Only stated control/source checks and tiny real headlessGPU observations are qualified. No actual backend fault injection, native/GPU heap reclamation, physical footprint, presentation, latency/endurance or all-format/HDR/nonopaque-native-alpha qualification.",
+    "Native staging/reference tests do not identify physical allocation ownership or completion beyond their explicit submission/map steps. Caller serialization and submission/completion requirements remain.",
+    "The retained window-cycle binary is compiled only; no final-owned native-window, desktop/input/performance or live IOSurface rerun is inferred. Earlier graphics-retention observations remain unresolved.",
+    "Provider6/static2 and source/decoded identities are checked; compiler/cache/SDK/native-link dependency closure and arbitrary unobserved mutation outside recorded endpoints are excluded.",
+    "No fullMac/P11/distribution, human interaction, cross-display or public-release acceptance claim."
+  ]
+}

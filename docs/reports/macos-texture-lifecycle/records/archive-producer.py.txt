@@ -1,0 +1,153 @@
+"""Seal source-bound texture ownership checks, preserving original failures."""
+import hashlib,io,json,os,shutil,tarfile
+from pathlib import Path
+r=Path('/private/tmp/vellum-large-data');p=Path('/private/tmp/vellum-macos-texture-lifecycle');out=r/'docs/reports/macos-texture-lifecycle'
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();read=lambda n:json.loads((p/n).read_text())
+source=read('source-final.json')['sources'];base=read('source-final.json')['base_commit'];selected=read('source-prism.json')['sources']
+assert len(source)==8 and len(selected)==6 and all(source[n]==h for n,h in selected.items()) and all(sha(r/n)==h for n,h in source.items())
+cert=read('source-review-final.json');assert cert['status']=='APPROVED_SOURCE' and not cert['findings'] and cert['files']==source and cert['source_manifest_sha256']==sha(p/'source-final.json')
+pr=read('prism-v1/prism.json');proc=read('prism-v1/process.json');assert proc['exit_code']==0 and proc['error']is None and proc['source_index_stable'] and proc['before']==proc['after']==selected
+assert pr['coverage']['complete'] and pr['coverage']['files']==6 and not pr['findings'] and pr['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]
+prepared={f.relative_to(r/'drivers/cogent/build').as_posix():sha(f)for module in ['upstream','typesetting']for f in sorted((r/'drivers/cogent/build'/module).rglob('*'))if f.is_file()};assert len(prepared)==6187
+stage=r/'drivers/cogent/native/patches/texturelifecycle';outputs=json.loads((stage/'output-hashes.json').read_text());inputs=json.loads((stage/'original-hashes.json').read_text());assert len(outputs)==7 and all(prepared['upstream/'+n]==h for n,h in outputs.items())
+old=read('owned-prepare.json')['prepared_before'];assert len(old)==6183
+assert {n for n in old if old[n]!=prepared[n]}=={'upstream/'+n for n,h in inputs.items()if h is not None}
+assert set(prepared)-set(old)=={'upstream/'+n for n,h in inputs.items()if h is None}
+assert read('owned-prepare-v5.json')['prepared_after']==prepared
+final={'gpu-offscreen-race-v5','driver-offscreen-race-v5','native-build-v5','prepare-tests-v5','gpu-vet-v5','texture-headless-final-v5'}
+failed={'texture-original-regression','texture-original-regression-v3','texture-headless-original','texture-headless-final'}
+receipts={};groups={'final':source}
+for f in sorted(p.glob('*.json')):
+ d=json.loads(f.read_text())
+ if 'source_delta_stable'not in d:continue
+ name=f.stem;assert d['exit_code']==int(name in failed) and d['error']is None and d['source_delta_stable'] and not d['live_tests'] and d['source_commit']==base
+ assert d['source_delta_before']==d['source_delta_after']
+ group='final'if d['source_delta_before']==source else'historical_'+hashlib.sha256(json.dumps(d['source_delta_before'],sort_keys=True).encode()).hexdigest()[:12];groups[group]=d['source_delta_before']
+ for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+ overlay=d.get('overlay_inputs_before',{});assert overlay==d.get('overlay_inputs_after',{})
+ if name in final:assert group=='final' and d['prepared_before']==d['prepared_after']==prepared and not overlay
+ if name=='texture-headless-original':assert group=='final' and d['prepared_before']==d['prepared_after']==prepared and len(overlay)==2
+ if not name.startswith('owned-prepare'):assert d['prepared_before']==d['prepared_after']
+ if d.get('producer_sha256'):assert d['producer_sha256']==sha(p/'code_run.py')
+ receipts[name]={'sha256':sha(f),'raw_exit_code':d['exit_code'],'source_group':group,'exact_final_prepared_execution':name in final,'headless_gpu_requested':d.get('headless_gpu_requested',False),'overlay_input_binding':overlay}
+assert len(receipts)==20 and final<=set(receipts)
+for version in ['v1','v2','v3','v4']:
+ m=read('candidate-'+version+'-inputs.json')
+ assert all(sha(p/version/n)==h for n,h in m.items())
+assert all(sha(p/'candidate'/n)==h for n,h in read('candidate-v5-inputs.json').items())
+assert {n:h for n,h in outputs.items()}==read('candidate-v5-inputs.json')
+for version,manifest in [('owned-v3','owned-prepare.json'),('owned-v4','source-v4.json')]:
+ m=read(manifest)['source_delta_before']if manifest.startswith('owned-prepare')else read(manifest)['sources'];assert all(sha(p/version/n)==h for n,h in m.items())
+def observations(name):
+ return [json.loads(line.split('VELLUM_TEXTURE_NATIVE ',1)[1])for line in(p/(name+'.stdout')).read_text().splitlines()if line.startswith('VELLUM_TEXTURE_NATIVE ')]
+actual=observations('texture-headless-final-v5');assert len(actual)==5 and [d['case']for d in actual]==['usage_reconfiguration','staging_retirement','device_change','rgba_readback','bgra_readback']
+assert all(d['fixture']=='texture_headless'and d['windows_created']==0 for d in actual)
+assert actual[0]['retired_references']==2 and actual[1]['created_buffers']==actual[1]['retired_references']==32 and actual[2]['retired_references']==3
+for d in actual[3:]:assert d['pixels']==6 and d['padded_bytes']==512 and d['raw_native_channels'] and d['image_rgba_channels']
+original=observations('texture-headless-original');assert original==[actual[3]]
+log=(p/'texture-headless-original.stdout').read_text();assert all(v in log for v in ['same format reused incompatible image usage','replaced staging reference waits for GC 1','device change retained old references','NRGBA readback channel/padding mismatch'])
+log=(p/'texture-original-regression-v3.stdout').read_text();assert log.count('incomplete/borrowed format shortcut accepted')==6 and 'empty borrowed retirement retained ownership mode'in log
+sandbox=(p/'texture-headless-final.stdout').read_text();assert not observations('texture-headless-final') and 'no adapters available'in sandbox and 'NewDevice(0x0)'in sandbox
+binary=p/'window-cycle-smoke-owned-v5';assert binary.is_file()
+q={'result':'PASS_OWNED_TEXTURE_LIFECYCLE_AND_HEADLESS_READBACK','base_commit':base,'source':source,'source_groups':groups,'prepared':prepared,'stage_inputs':inputs,'stage_outputs':outputs,'receipts':receipts,'source_review_sha256':sha(p/'source-review-final.json'),'prism_source':selected,'prism_raw_exit_code':0,'prism_findings':0,'prism_static_leaves_internally_verified':read('source-prism.json')['excluded_static_leaves'],'native_build_sha256':sha(binary),'headless_gpu_observations':actual,'original_headless_observations':original,'final_owned_source_headless_gpu_executed':True,'final_owned_source_native_window_executed':False,'physical_gpu_fault_injection':False,'native_memory_qualified':False,'gpu_memory_qualified':False,'full_p11_qualified':False,'macos_completion':False,'next_live_tests_deferred':True,'preferences_changed':False,'input_sources_changed':False,'source_scope':'Eight selected repository leaves and all6187 prepared identities; seven decoded patch outputs. Provider selects6 patch/test/registration/spec/doc leaves,2 pin maps internally verified. Compiler/cache/SDK full closure excluded.','original_scope':'Wrapper-only regressions run against original6183 plus single test overlay, fail six configuration cases then empty borrowed state. Native baseline replaces only texture.go with exact9a34670 original atop final6187 and current fixture/admission helpers; four cases fail,RGBA readback passes6pixels. Baseline has unchanged root8/prepared maps but original overlay execution, not final-source qualification.','history':'V1/V2 candidate overlays pass with their own5-target+overlay maps and original6183. V3/V4 owned stages and V4 passing code tests remain historical. First V4 headless request in sandbox fails zero-adapter admission with nilNewDevice panic before any subcase; no actualGPU observation qualifies it. V5 corrects headless admission and installs fixture cleanup before call. Final GPU-access execution passes5cases.','limits':'Counted failure kernels are defensive control contracts. Pinned TryCreate methods already release their own error references. Native old-wrapper IsValid and reference retirement do not prove GPU/native heap deallocation. Readback checks are tiny opaque3x2RGBA/BGRA captures, not general format/HDR/alpha/latency/performance/presentation qualification. Copy admission still requires caller submission/completion; no broad panic, stale/concurrent owner or device recreation qualification.'}
+(p/'qualification.json').write_text(json.dumps(q,indent=2)+'\n')
+records=out/'records';records.mkdir(parents=True,exist_ok=False);shutil.copy2(Path(__file__),records/'archive-producer.py.txt')
+files={}
+for folder,dirs,names in os.walk(p):
+ dirs[:]=sorted(d for d in dirs if not d.endswith('.app')and not(Path(folder)/d).is_symlink())
+ for name in sorted(names):
+  f=Path(folder)/name
+  if f.is_file()and not f.is_symlink()and f.suffix in ['.json','.stdout','.stderr','.py','.txt','.log','.go','.patch','.md']:
+   files[f.relative_to(p).as_posix()]=f.read_bytes()
+index={n:hashlib.sha256(b).hexdigest()for n,b in files.items()};(records/'evidence-index.json').write_text(json.dumps(index,indent=2)+'\n');archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tf:
+ for n,b in sorted(files.items()):
+  info=tarfile.TarInfo(n);info.size,info.mode,info.mtime=len(b),0o644,0;tf.addfile(info,io.BytesIO(b))
+with tarfile.open(archive)as tf:assert {m.name:hashlib.sha256(tf.extractfile(m).read()).hexdigest()for m in tf.getmembers()if m.isfile()}==index
+(out/'README.md').write_text('''# Mac GPU texture ownership and headless readback
+
+Owned patch 0049 publishes a texture only with a complete live view. Configuration
+reuse requires an owned live pair on the same live device/queue with the required
+usage bits; image/render transitions recreate incompatible allocations. Device
+changes retire old texture/view/sampler/staging references. Empty borrowed state
+is cleared even without a texture, and created pairs explicitly acquire owned
+mode. Failure no longer leaves an incomplete pair eligible for the format shortcut.
+
+Readback configuration explicitly releases replaced staging buffers; the original
+relied on Go finalizers after overwriting its pointer. Same-device allocation
+refusal preserves the old buffer/layout. Four-byte single-layer/single-sample
+RGBA8/BGRA8 staging validates row/image fields and Go map arithmetic. Copy/mapping
+refuse stale or invalid staging, and mapping never allocates uncopied replacement
+data. GrabImage skips reading a refused copy. Raw ReadData retains native channels;
+ReadGoImage normalizes detached BGRA bytes to NRGBA order with alpha/transfer bytes
+unchanged. Headless admission returns an error for a missing adapter and retires
+GPU/device admission references on failure; the shared instance remains owned by
+final shutdown. Callers serialize allocation, copy/map/unmap and retirement.
+
+## Exact final checks
+
+Fresh preparation yields 6,187 files: three existing files change and four are
+added relative to the original 6,183. Seven decoded outputs match their pins.
+Final GPU/gpudraw offscreen race suites pass three repetitions. The full native
+adapter offscreen race suite, GPU/gpudraw vet, native consumer compilation and all
+11 preparation tests pass. Six final execution receipts bind unchanged eight
+source leaves and all 6,187 prepared files, including the headless GPU execution.
+The window-cycle binary is compiled only; its existing duplicate -lobjc warning
+remains. No native window, surface, presentation, input, clipboard or preference
+operation occurs in this phase.
+
+The explicit headless GPU race fixture passes five cases: image→render→upload
+usage changes retire two prior texture references; 32 staging replacements retire
+all 32 held references; device replacement retires texture/view/staging and creates
+new-device staging; two 3x2 RGBA/BGRA copy/map captures preserve exact native raw
+bytes and produce the expected NRGBA channels. Each uses 512 padded staging bytes
+for six opaque pixels. Old Go wrappers stay strongly held while IsValid becomes
+false, establishing explicit reference release rather than finalizer activity.
+These observations do not prove native/physical GPU heap reclamation.
+
+Counted factory tables cover complete texture/view admission, nil/invalid/partial
+results, preserved staging on refusal, five headless admission outcomes and 1,000
+staging replacements with two owned handles only during replacement. Pinned
+TryCreate APIs already clean their own native error references; partial-return
+cases are defensive shared-control tests. Layout, device-change refusal and
+four-format channel/alpha vectors accompany the seven wrapper-only regressions.
+
+## Original failures and earlier versions
+
+The original texture configuration fails all six invalid/borrowed same-format
+cases and the empty-borrowed retirement assertion. The original-compatible GPU
+fixture replaces only texture.go with its exact 9a34670 bytes atop final prepared
+sources and current admission/test code. It fails usage reuse, staging retirement
+at the second allocation, device-change cleanup and BGRA image channels. Its RGBA
+case passes six pixels. Neither failed staging loop completes 32 replacements.
+That baseline remains raw exit 1 with its overlay identity; it is not a final
+prepared-source pass or a complete parent-tree execution.
+
+The initial V4 sandbox GPU request sees zero adapters and panics in the old
+NoDisplayGPU nil-adapter path before any fixture subcase. Its raw exit remains 1.
+V5 fixes admission and registers fixture teardown before initialization. The final
+GPU-access check passes all five cases. V1/V2 overlays, V3/V4 owned preparations
+and V4 code passes retain their exact earlier source/prepared groups and are not
+relabeled as final. Twenty receipts preserve raw exits and forty output logs;
+four exits are 1. Frozen candidate and intermediate source copies are archived.
+
+Internal review approves eight final source/spec/pin leaves and independently
+replays seven decoded outputs. One Prism review using Anthropic Claude Sonnet 5.5
+covers six patch/registration/doc leaves in three chunks, returns exit 0 with no
+findings, and uses 27,243 input / 5,189 output tokens. Two static pin maps are
+checked internally. The indexed archive includes exact selected source/prepared
+maps, original overlays, producer scripts, source certificates, provider records
+and raw outcomes. Binaries/caches/desktop artifacts are excluded. Compiler/cache/
+SDK full closure is outside this evidence.
+
+## Remaining Mac acceptance
+
+This qualifies the stated code-level and tiny native headless pixel/reference
+checks. It does not qualify GPU/native heap reclamation, physical device faults,
+all readback formats/HDR/alpha, presentation, sustained frame/input latency or
+endurance. The earlier IOSurface/physical-footprint growth still needs a quiet
+live-window rerun. Desktop/input/performance tests remain deferred while the user
+uses the computer. P11, broader Mac interaction/display, distribution and full
+framework completion remain open.
+''')
+print(json.dumps({'result':q['result'],'qualification_sha256':sha(p/'qualification.json'),'archive_sha256':sha(archive),'archive_members':len(index),'receipts':len(receipts)}))

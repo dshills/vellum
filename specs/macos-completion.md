@@ -360,3 +360,9 @@ measured paths shared checked failure cleanup. Failed preparation/submission
 aborts surface ownership and prevents presentation or image capture. This code
 checkpoint remains separate from physical backend faults, device recreation and
 actual native graphics-memory/performance acceptance.
+
+Texture creation and synchronous staging now have complete-pair publication,
+explicit replacement retirement, device-change cleanup and checked layout/copy
+refusal in the [GPU ownership contract](gpu-frame-lifecycle.md). Counted ownership
+and wrapper-only regressions remain separate from physical GPU readback/faults
+and the outstanding native graphics-memory/performance gates.

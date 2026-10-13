@@ -1,0 +1,1044 @@
+--- a/gpu/gpu.go
++++ b/gpu/gpu.go
+@@ -410,7 +410,29 @@
+ // NoDisplayGPU Initializes WebGPU and returns that and a new
+ // GPU device, without using an existing surface window.
+ func NoDisplayGPU() (*GPU, *Device, error) {
+-	gp := NewGPU(nil)
+-	dev, err := NewDevice(gp)
+-	return gp, dev, err
+-}
++	return createHeadlessPair(func() *GPU { return NewGPU(nil) }, NewDevice)
++}
++
++// createHeadlessPair owns admission resources until the complete pair exists.
++// The global instance is shared and remains owned by final application shutdown.
++func createHeadlessPair[G ownedReference, D ownedReference](gpu func() G, device func(G) (D, error)) (g G, d D, err error) {
++	var zeroG G
++	var zeroD D
++	g = gpu()
++	if g == zeroG {
++		return g, d, errors.New("gpu: no usable adapter for headless device")
++	}
++	d, err = device(g)
++	if err != nil || d == zeroD {
++		if err == nil {
++			err = errors.New("gpu: device factory returned nil without error")
++		}
++		oldG, oldD := g, d
++		g, d = zeroG, zeroD
++		defer oldG.Release()
++		if oldD != zeroD {
++			oldD.Release()
++		}
++	}
++	return
++}
+--- a/gpu/gsystem.go
++++ b/gpu/gsystem.go
+@@ -296,7 +296,12 @@
+ 		sy.EndRenderPass(rp)
+ 		return nil
+ 	}
+-	rt.ReadFrame(sy.CommandEncoder)
++	if err := rt.CurrentFrame().CopyToReadBuffer(sy.CommandEncoder); err != nil {
++		errors.Log(err)
++		// Finish the valid render, but never read a refused/stale copy.
++		sy.EndRenderPass(rp)
++		return nil
++	}
+ 	if err := sy.EndRenderPassChecked(rp); err != nil {
+ 		errors.Log(err)
+ 		return nil
+--- a/gpu/texture.go
++++ b/gpu/texture.go
+@@ -90,7 +90,7 @@
+ 
+ 	nfmt := TextureFormat{Size: sz, Format: wgpu.TextureFormatRGBA8UnormSrgb, Layers: 1, Samples: 1}
+ 
+-	if tx.texture == nil || tx.Format != nfmt {
++	if !tx.texture.IsValid() || !tx.view.IsValid() || tx.Format != nfmt || tx.texture.GetUsage()&(wgpu.TextureUsageTextureBinding|wgpu.TextureUsageCopyDst) != (wgpu.TextureUsageTextureBinding|wgpu.TextureUsageCopyDst) {
+ 		tx.Format = nfmt
+ 		err := tx.CreateTexture(wgpu.TextureUsageTextureBinding | wgpu.TextureUsageCopyDst)
+ 		if err != nil { // already logged
+@@ -127,24 +127,23 @@
+ 	}
+ 
+ 	size := tx.Format.Extent3D()
+-	t, err := tx.device.Device.TryCreateTexture(&wgpu.TextureDescriptor{
+-		Label:         tx.Name,
+-		Size:          size,
+-		MipLevelCount: 1,
+-		SampleCount:   uint32(tx.Format.Samples),
+-		Dimension:     wgpu.TextureDimension2D,
+-		Format:        tx.Format.Format,
+-		Usage:         usage,
++	t, view, err := createTexturePair(func() (*wgpu.Texture, error) {
++		return tx.device.Device.TryCreateTexture(&wgpu.TextureDescriptor{
++			Label:         tx.Name,
++			Size:          size,
++			MipLevelCount: 1,
++			SampleCount:   uint32(tx.Format.Samples),
++			Dimension:     wgpu.TextureDimension2D,
++			Format:        tx.Format.Format,
++			Usage:         usage,
++		})
++	}, func(texture *wgpu.Texture) (*wgpu.TextureView, error) {
++		return texture.TryCreateView(nil)
+ 	})
+ 	if errors.Log(err) != nil {
+ 		return err
+ 	}
+-	tx.texture = t
+-	vw, err := t.TryCreateView(nil)
+-	if errors.Log(err) != nil {
+-		return err
+-	}
+-	tx.view = vw
++	tx.texture, tx.view, tx.shared = t, view, false
+ 	return nil
+ }
+ 
+@@ -153,12 +152,15 @@
+ // ConfigRenderTexture configures this texture as a render texture
+ // using format.  Sets multisampling to 1, layers to 1.
+ func (tx *Texture) ConfigRenderTexture(dev *Device, imgFmt *TextureFormat) error {
+-	tx.device = *dev
++	if dev == nil || imgFmt == nil {
++		return fmt.Errorf("gpu.Texture.ConfigRenderTexture: device and format required")
++	}
+ 	nfmt := *imgFmt
+ 	nfmt.SetMultisample(1)
+-	if tx.texture != nil && tx.Format == nfmt {
++	if tx.reusableConfiguration(dev, nfmt, wgpu.TextureUsageRenderAttachment|wgpu.TextureUsageCopySrc|wgpu.TextureUsageTextureBinding) {
+ 		return nil
+ 	}
++	tx.configureDevice(dev)
+ 	tx.Format = nfmt
+ 	return tx.CreateTexture(wgpu.TextureUsageRenderAttachment | wgpu.TextureUsageCopySrc | wgpu.TextureUsageTextureBinding)
+ }
+@@ -168,12 +170,15 @@
+ // from the given render texture format.
+ // If current texture is identical format, does not recreate.
+ func (tx *Texture) ConfigDepth(dev *Device, depthType Types, imgFmt *TextureFormat) error {
+-	tx.device = *dev
++	if dev == nil || imgFmt == nil {
++		return fmt.Errorf("gpu.Texture.ConfigDepth: device and format required")
++	}
+ 	nfmt := *imgFmt
+ 	nfmt.Format = depthType.TextureFormat()
+-	if tx.texture != nil && tx.Format == nfmt {
++	if tx.reusableConfiguration(dev, nfmt, wgpu.TextureUsageRenderAttachment|wgpu.TextureUsageCopySrc) {
+ 		return nil
+ 	}
++	tx.configureDevice(dev)
+ 	tx.Format = nfmt
+ 	return tx.CreateTexture(wgpu.TextureUsageRenderAttachment | wgpu.TextureUsageCopySrc)
+ }
+@@ -181,11 +186,15 @@
+ // ConfigMulti configures this texture as a mutisampling texture
+ // using format.
+ func (tx *Texture) ConfigMulti(dev *Device, imgFmt *TextureFormat) error {
+-	tx.device = *dev
+-	if tx.texture != nil && tx.Format == *imgFmt {
++	if dev == nil || imgFmt == nil {
++		return fmt.Errorf("gpu.Texture.ConfigMulti: device and format required")
++	}
++	nfmt := *imgFmt
++	if tx.reusableConfiguration(dev, nfmt, wgpu.TextureUsageRenderAttachment) {
+ 		return nil
+ 	}
+-	tx.Format = *imgFmt
++	tx.configureDevice(dev)
++	tx.Format = nfmt
+ 	return tx.CreateTexture(wgpu.TextureUsageRenderAttachment)
+ }
+ 
+@@ -214,14 +223,11 @@
+ // ReleaseTexture frees device memory version of texture that we own
+ func (tx *Texture) ReleaseTexture() {
+ 	tx.ReleaseView()
+-	if tx.texture == nil {
+-		return
+-	}
+-	if !tx.shared {
+-		tx.texture.Release()
+-	}
+-	tx.shared = false
+-	tx.texture = nil
++	texture, shared := tx.texture, tx.shared
++	tx.texture, tx.shared = nil, false
++	if texture != nil && !shared {
++		texture.Release()
++	}
+ }
+ 
+ // Release destroys any existing view, nils fields
+@@ -232,6 +238,7 @@
+ 		tx.readBuffer.Release()
+ 		tx.readBuffer = nil
+ 	}
++	tx.ReadBufferDims = TextureBufferDims{}
+ }
+ 
+ ///////////////////////////////////////////////////////////////
+@@ -241,46 +248,32 @@
+ // Must have this in place prior to render pass with a
+ // [CopyToReadBuffer] command added to it.
+ func (tx *Texture) ConfigReadBuffer() error {
+-	dims := NewTextureBufferDims(tx.Format.Size)
+-	buffSize := dims.PaddedSize()
+-
+-	if tx.readBuffer != nil && tx.ReadBufferDims == *dims {
+-		return nil
+-	}
+-	b, err := tx.device.Device.TryCreateBuffer(&wgpu.BufferDescriptor{
+-		Size:  buffSize,
+-		Usage: wgpu.BufferUsageMapRead | wgpu.BufferUsageCopyDst,
+-	})
+-	if errors.Log(err) != nil {
++	dims, err := textureReadLayout(tx.Format)
++	if err != nil {
+ 		return err
+ 	}
+-	tx.readBuffer = b
+-	tx.ReadBufferDims = *dims
+-	return nil
++	if !tx.device.Device.IsValid() || !tx.device.Queue.IsValid() {
++		return fmt.Errorf("gpu.Texture.ConfigReadBuffer: live device and queue required")
++	}
++	return errors.Log(replaceReadBuffer(&tx.readBuffer, &tx.ReadBufferDims, dims, func() (*wgpu.Buffer, error) {
++		return tx.device.Device.TryCreateBuffer(&wgpu.BufferDescriptor{
++			Size: dims.PaddedSize(), Usage: wgpu.BufferUsageMapRead | wgpu.BufferUsageCopyDst,
++		})
++	}))
+ }
+ 
+ // CopyToReadBuffer adds a command to the given command encoder
+ // to copy this texture to its [readBuffer]. Must have called
+ // [ConfigReadBuffer] prior to start of render pass for this to work.
+ func (tx *Texture) CopyToReadBuffer(cmd *wgpu.CommandEncoder) error {
+-	if tx.readBuffer == nil {
+-		err := errors.New("gpu.Texture.CopyToReadBuffer: must configure readBuffer prior to render pass")
+-		return errors.Log(err)
+-	}
+-	size := tx.Format.Extent3D()
+-	cmd.CopyTextureToBuffer(
+-		tx.texture.AsImageCopy(),
+-		&wgpu.TexelCopyBufferInfo{
+-			Buffer: tx.readBuffer,
+-			Layout: wgpu.TexelCopyBufferLayout{
+-				Offset:       0,
+-				BytesPerRow:  uint32(tx.ReadBufferDims.PaddedRowSize),
+-				RowsPerImage: wgpu.CopyStrideUndefined,
+-			},
+-		},
+-		&size,
+-	)
+-	return nil
++	dims, err := textureReadLayout(tx.Format)
++	if err != nil {
++		return err
++	}
++	if tx.ReadBufferDims != dims || !tx.readBuffer.IsValid() {
++		return fmt.Errorf("gpu.Texture.CopyToReadBuffer: configure matching read buffer before encoding")
++	}
++	return tx.CopyToBuffer(cmd, tx.readBuffer, uint32(dims.PaddedRowSize))
+ }
+ 
+ // ReadGoImage reads the GPU-resident Texture and returns
+@@ -291,6 +284,7 @@
+ 	if err != nil {
+ 		return nil, err
+ 	}
++	normalizeReadImageChannels(data, tx.Format.Format)
+ 	img := &image.NRGBA{
+ 		Pix:    data,
+ 		Stride: int(tx.ReadBufferDims.UnpaddedRowSize), // note: this is actually unpadded here
+@@ -337,22 +331,16 @@
+ // There is alignment padding as reflected in the
+ // [ReadBufferDims] data.
+ func (tx *Texture) ReadDataMapped() ([]byte, error) {
+-	dims := NewTextureBufferDims(tx.Format.Size)
++	dims, err := textureReadLayout(tx.Format)
++	if err != nil {
++		return nil, err
++	}
++	if !tx.readBuffer.IsValid() || tx.ReadBufferDims != dims || !tx.device.Device.IsValid() || !tx.device.Queue.IsValid() {
++		return nil, fmt.Errorf("gpu.Texture.ReadDataMapped: live matching read buffer and device required; configure and copy before reading")
++	}
+ 	buffSize := dims.PaddedSize()
+ 
+-	if tx.readBuffer == nil || tx.ReadBufferDims != *dims {
+-		b, err := tx.device.Device.TryCreateBuffer(&wgpu.BufferDescriptor{
+-			Size:  buffSize,
+-			Usage: wgpu.BufferUsageMapRead | wgpu.BufferUsageCopyDst,
+-		})
+-		if errors.Log(err) != nil {
+-			return nil, err
+-		}
+-		tx.readBuffer = b
+-		tx.ReadBufferDims = *dims
+-	}
+-
+-	err := BufferReadSync(&tx.device, int(buffSize), tx.readBuffer)
++	err = BufferReadSync(&tx.device, int(buffSize), tx.readBuffer)
+ 	if errors.Log(err) != nil {
+ 		return nil, err
+ 	}
+--- /dev/null
++++ b/gpu/texture_config_regression_test.go
+@@ -0,0 +1,68 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import (
++	"image"
++	"testing"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// This regression also compiles against patch48. Empty native wrappers and a
++// missing device cannot allocate; borrowed handles must be detached, not reused
++// solely because their format matches. It never enters a native GPU factory.
++func TestVellumTextureConfigurationRejectsIncompleteOrBorrowedMatch(t *testing.T) {
++	for _, kind := range []string{"render", "depth", "multi"} {
++		for _, borrowed := range []bool{false, true} {
++			t.Run(kind+map[bool]string{false: "_invalid", true: "_borrowed"}[borrowed], func(t *testing.T) {
++				format := TextureFormat{Size: image.Pt(2, 3), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}
++				if kind == "depth" {
++					format.Format = Depth32.TextureFormat()
++				}
++				if kind == "multi" {
++					format.Samples = 4
++				}
++				owner := &Texture{texture: &wgpu.Texture{}, view: &wgpu.TextureView{}, Format: format}
++				tex, view := owner.texture, owner.view
++				tx := owner
++				if borrowed {
++					tx = &Texture{}
++					tx.SetShared(owner)
++				}
++				var err error
++				switch kind {
++				case "render":
++					err = tx.ConfigRenderTexture(&Device{}, &format)
++				case "depth":
++					err = tx.ConfigDepth(&Device{}, Depth32, &format)
++				case "multi":
++					err = tx.ConfigMulti(&Device{}, &format)
++				}
++				if err == nil || tx.texture != nil || tx.view != nil || tx.shared {
++					t.Fatal("incomplete/borrowed format shortcut accepted", err, tx.shared)
++				}
++				if borrowed && (owner.texture != tex || owner.view != view) {
++					t.Fatal("configuration changed borrowed owner")
++				}
++			})
++		}
++	}
++}
++
++func TestVellumEmptyBorrowedTextureRetiresSharedState(t *testing.T) {
++	tx := &Texture{}
++	tx.SetShared(&Texture{})
++	if !tx.shared {
++		t.Fatal("empty shared state not established")
++	}
++	tx.ReleaseTexture()
++	if tx.shared || tx.texture != nil || tx.view != nil {
++		t.Fatal("empty borrowed retirement retained ownership mode")
++	}
++	tx.ReleaseTexture()
++	if err := tx.CreateTexture(wgpu.TextureUsageTextureBinding); err == nil || tx.shared {
++		t.Fatal("refused owned creation retained borrowed mode", err)
++	}
++}
+--- /dev/null
++++ b/gpu/texture_lifecycle.go
+@@ -0,0 +1,135 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import (
++	"fmt"
++	"math"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++type liveOwnedReference interface {
++	ownedReference
++	IsValid() bool
++}
++
++// createTexturePair admits only a complete live texture/view pair. Factories
++// return fresh owned references. Failed preparation publishes neither handle.
++func createTexturePair[T liveOwnedReference, V liveOwnedReference](
++	texture func() (T, error), view func(T) (V, error),
++) (t T, v V, err error) {
++	var zeroT T
++	var zeroV V
++	succeeded := false
++	defer func() {
++		if succeeded {
++			return
++		}
++		oldT, oldV := t, v
++		t, v = zeroT, zeroV
++		if oldT != zeroT {
++			defer oldT.Release()
++		}
++		if oldV != zeroV {
++			oldV.Release()
++		}
++	}()
++	t, err = texture()
++	if err != nil {
++		return
++	}
++	if t == zeroT || !t.IsValid() {
++		err = fmt.Errorf("gpu: texture factory returned no live texture")
++		return
++	}
++	v, err = view(t)
++	if err != nil {
++		return
++	}
++	if v == zeroV || !v.IsValid() {
++		err = fmt.Errorf("gpu: view factory returned no live view")
++		return
++	}
++	succeeded = true
++	return
++}
++
++// replaceReadBuffer preserves the old buffer and dimensions on allocation
++// refusal. A successful replacement explicitly retires the previous reference.
++// Caller serializes configuration, copying, mapping and release; factories
++// return fresh owned handles. Native/in-flight reclamation can complete later.
++func replaceReadBuffer[B liveOwnedReference](current *B, have *TextureBufferDims, want TextureBufferDims, allocate func() (B, error)) error {
++	var zero B
++	if *current != zero && (*current).IsValid() && *have == want {
++		return nil
++	}
++	candidate, err := allocate()
++	if err != nil {
++		if candidate != zero {
++			candidate.Release()
++		}
++		return err
++	}
++	if candidate == zero || !candidate.IsValid() {
++		if candidate != zero {
++			candidate.Release()
++		}
++		return fmt.Errorf("gpu: staging factory returned no live buffer")
++	}
++	old := *current
++	*current, *have = candidate, want
++	if old != zero {
++		old.Release()
++	}
++	return nil
++}
++
++// textureReadLayout is the four-byte resolve layout used by this synchronous
++// readback API. Bounds cover native uint32 row/image fields and Go map lengths.
++func textureReadLayout(format TextureFormat) (TextureBufferDims, error) {
++	var empty TextureBufferDims
++	if format.Size.X < 1 || format.Size.Y < 1 || format.Layers != 1 || format.Samples != 1 {
++		return empty, fmt.Errorf("gpu: readback requires a positive single-layer resolve")
++	}
++	switch format.Format {
++	case wgpu.TextureFormatRGBA8Unorm, wgpu.TextureFormatRGBA8UnormSrgb, wgpu.TextureFormatBGRA8Unorm, wgpu.TextureFormatBGRA8UnormSrgb:
++	default:
++		return empty, fmt.Errorf("gpu: unsupported synchronous readback format")
++	}
++	width, height := uint64(format.Size.X), uint64(format.Size.Y)
++	if width > math.MaxUint32/4 || height > math.MaxUint32 {
++		return empty, fmt.Errorf("gpu: readback dimensions exceed native layout fields")
++	}
++	dims := *NewTextureBufferDims(format.Size)
++	if dims.PaddedRowSize > math.MaxUint32 || height > uint64(^uint(0)>>1)/dims.PaddedRowSize {
++		return empty, fmt.Errorf("gpu: readback size exceeds native layout or Go map length")
++	}
++	return dims, nil
++}
++
++func (tx *Texture) reusableConfiguration(dev *Device, format TextureFormat, usage wgpu.TextureUsage) bool {
++	return dev != nil && dev.Device.IsValid() && dev.Queue.IsValid() && !tx.shared && tx.device.Device == dev.Device && tx.device.Queue == dev.Queue &&
++		tx.texture.IsValid() && tx.view.IsValid() && tx.Format == format && tx.texture.GetUsage()&usage == usage
++}
++
++// Reconfiguration on another device cannot reuse staging or sampler references
++// from the prior device. These belong to this Texture, not to borrowed copies.
++func (tx *Texture) configureDevice(dev *Device) {
++	if tx.device.Device != dev.Device || tx.device.Queue != dev.Queue {
++		tx.Release()
++	}
++	tx.device = *dev
++}
++
++// ReadData remains in native channel order. ReadGoImage owns detached data and
++// normalizes BGRA resolve bytes to the NRGBA image's channel order.
++func normalizeReadImageChannels(data []byte, format wgpu.TextureFormat) {
++	if format != wgpu.TextureFormatBGRA8Unorm && format != wgpu.TextureFormatBGRA8UnormSrgb {
++		return
++	}
++	for i := 0; i+3 < len(data); i += 4 {
++		data[i], data[i+2] = data[i+2], data[i]
++	}
++}
+--- /dev/null
++++ b/gpu/texture_lifecycle_test.go
+@@ -0,0 +1,343 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import (
++	"errors"
++	"image"
++	"math"
++	"reflect"
++	"testing"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++type textureRef struct {
++	name     string
++	valid    bool
++	releases int
++	events   *[]string
++}
++
++func (r *textureRef) IsValid() bool { return r != nil && r.valid && r.releases == 0 }
++func (r *textureRef) Release()      { r.releases++; *r.events = append(*r.events, r.name) }
++
++func TestVellumTexturePairPublishesOnlyCompleteCreation(t *testing.T) {
++	failure := errors.New("controlled texture factory refusal")
++	for _, stage := range []string{"texture_error", "partial_texture", "nil_texture", "invalid_texture", "view_error", "partial_view", "nil_view", "invalid_view", "success"} {
++		t.Run(stage, func(t *testing.T) {
++			var events []string
++			texture := &textureRef{name: "texture.release", valid: true, events: &events}
++			view := &textureRef{name: "view.release", valid: true, events: &events}
++			viewCalls := 0
++			x, y, err := createTexturePair(func() (*textureRef, error) {
++				switch stage {
++				case "texture_error":
++					return nil, failure
++				case "partial_texture":
++					return texture, failure
++				case "nil_texture":
++					return nil, nil
++				case "invalid_texture":
++					texture.valid = false
++				}
++				return texture, nil
++			}, func(got *textureRef) (*textureRef, error) {
++				viewCalls++
++				if got != texture {
++					t.Fatal("view used another texture")
++				}
++				switch stage {
++				case "view_error":
++					return nil, failure
++				case "partial_view":
++					return view, failure
++				case "nil_view":
++					return nil, nil
++				case "invalid_view":
++					view.valid = false
++				}
++				return view, nil
++			})
++			if stage == "success" {
++				if err != nil || x != texture || y != view || len(events) != 0 {
++					t.Fatal("complete pair not retained", err, events)
++				}
++				view.Release()
++				texture.Release()
++				return
++			}
++			if err == nil || x != nil || y != nil {
++				t.Fatal("incomplete creation published", stage, x, y, err)
++			}
++			if stage == "texture_error" || stage == "partial_texture" || stage == "view_error" || stage == "partial_view" {
++				if err != failure {
++					t.Fatal("factory error identity lost", err)
++				}
++			}
++			var want []string
++			switch stage {
++			case "partial_texture", "invalid_texture", "view_error", "nil_view":
++				want = []string{"texture.release"}
++			case "partial_view", "invalid_view":
++				want = []string{"view.release", "texture.release"}
++			}
++			if !reflect.DeepEqual(events, want) {
++				t.Fatal("partial ownership differs", events, want)
++			}
++			if (stage == "texture_error" || stage == "partial_texture" || stage == "nil_texture" || stage == "invalid_texture") && viewCalls != 0 {
++				t.Fatal("view factory called for refused texture")
++			}
++		})
++	}
++}
++
++func TestVellumReadBufferRefusalPreservesOldAllocation(t *testing.T) {
++	failure := errors.New("controlled staging refusal")
++	for _, stage := range []string{"error", "partial", "nil", "invalid", "success", "hit"} {
++		t.Run(stage, func(t *testing.T) {
++			var events []string
++			old := &textureRef{name: "old", valid: true, events: &events}
++			next := &textureRef{name: "new", valid: true, events: &events}
++			current := old
++			have := *NewTextureBufferDims(image.Pt(64, 2))
++			original := have
++			want := *NewTextureBufferDims(image.Pt(65, 2))
++			if stage == "hit" {
++				want = have
++			}
++			calls := 0
++			err := replaceReadBuffer(&current, &have, want, func() (*textureRef, error) {
++				calls++
++				switch stage {
++				case "error":
++					return nil, failure
++				case "partial":
++					return next, failure
++				case "nil":
++					return nil, nil
++				case "invalid":
++					next.valid = false
++				}
++				return next, nil
++			})
++			if stage == "hit" {
++				if err != nil || calls != 0 || current != old || have != original || len(events) != 0 {
++					t.Fatal("matching buffer replaced")
++				}
++				return
++			}
++			if calls != 1 {
++				t.Fatal("allocation retry", calls)
++			}
++			if stage == "success" {
++				if err != nil || current != next || have != want || !reflect.DeepEqual(events, []string{"old"}) {
++					t.Fatal("replacement ownership differs", err, events)
++				}
++				return
++			}
++			if err == nil || current != old || have != original || old.releases != 0 {
++				t.Fatal("refusal retired/reconfigured old buffer", err, events)
++			}
++			if (stage == "error" || stage == "partial") && err != failure {
++				t.Fatal("allocation error identity lost")
++			}
++			wantReleases := 0
++			if stage == "partial" || stage == "invalid" {
++				wantReleases = 1
++			}
++			if next.releases != wantReleases {
++				t.Fatal("partial staging not retired", events)
++			}
++		})
++	}
++}
++
++func TestVellumReadBufferThousandResizesHaveExplicitRetirement(t *testing.T) {
++	var current *textureRef
++	var dims TextureBufferDims
++	var events []string
++	var refs []*textureRef
++	live, peak := 0, 0
++	for i := 0; i < 1000; i++ {
++		want := *NewTextureBufferDims(image.Pt(64+i%3, i+1))
++		err := replaceReadBuffer(&current, &dims, want, func() (*textureRef, error) {
++			for _, r := range refs {
++				if r.releases > 1 {
++					t.Fatal("staging released twice")
++				}
++			}
++			live = 0
++			for _, r := range refs {
++				if r.releases == 0 {
++					live++
++				}
++			}
++			live++
++			if live > peak {
++				peak = live
++			}
++			r := &textureRef{name: "retire", valid: true, events: &events}
++			refs = append(refs, r)
++			return r, nil
++		})
++		if err != nil || current != refs[len(refs)-1] || dims != want {
++			t.Fatal("resize not committed", i, err)
++		}
++		if len(events) != i {
++			t.Fatal("old staging waiting for GC", i, len(events))
++		}
++	}
++	current.Release()
++	for _, r := range refs {
++		if r.releases != 1 {
++			t.Fatal("staging ownership retained", r.releases)
++		}
++	}
++	if peak != 2 || len(events) != 1000 {
++		t.Fatal("replacement exceeds old-plus-new ownership", peak, len(events))
++	}
++}
++
++func TestVellumReadLayoutAdmissionAndExactPadding(t *testing.T) {
++	format := TextureFormat{Size: image.Pt(65, 3), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}
++	nativeMax := uint64(math.MaxUint32)
++	dims, err := textureReadLayout(format)
++	if err != nil || dims != (TextureBufferDims{Width: 65, Height: 3, UnpaddedRowSize: 260, PaddedRowSize: 512}) || dims.PaddedSize() != 1536 {
++		t.Fatal("padding changed", dims, err)
++	}
++	for _, mutation := range []func(*TextureFormat){
++		func(f *TextureFormat) { f.Size.X = 0 }, func(f *TextureFormat) { f.Size.Y = -1 }, func(f *TextureFormat) { f.Layers = 2 }, func(f *TextureFormat) { f.Samples = 4 }, func(f *TextureFormat) { f.Format = wgpu.TextureFormatRGBA16Float },
++		func(f *TextureFormat) { f.Size.X = int(math.MaxUint32/4) + 1 }, func(f *TextureFormat) { f.Size.X = int((math.MaxUint32/256)*256/4) + 1 },
++		func(f *TextureFormat) { f.Size.Y = int(nativeMax) + 1 }, func(f *TextureFormat) { f.Size = image.Pt(int((math.MaxUint32/256)*256/4), int(nativeMax)) },
++	} {
++		f := format
++		mutation(&f)
++		if got, err := textureReadLayout(f); err == nil || got != (TextureBufferDims{}) {
++			t.Fatal("invalid/overflow layout admitted", f, got, err)
++		}
++	}
++	for _, f := range []wgpu.TextureFormat{wgpu.TextureFormatRGBA8Unorm, wgpu.TextureFormatRGBA8UnormSrgb, wgpu.TextureFormatBGRA8Unorm, wgpu.TextureFormatBGRA8UnormSrgb} {
++		format.Format = f
++		if _, err := textureReadLayout(format); err != nil {
++			t.Fatal("four-byte resolve refused", f, err)
++		}
++	}
++}
++
++func TestVellumReadbackRefusesInvalidNativeInputsWithoutMutation(t *testing.T) {
++	format := TextureFormat{Size: image.Pt(65, 3), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}
++	tx := &Texture{Format: format, readBuffer: &wgpu.Buffer{}, ReadBufferDims: *NewTextureBufferDims(image.Pt(1, 1))}
++	buffer, dims := tx.readBuffer, tx.ReadBufferDims
++	if err := tx.ConfigReadBuffer(); err == nil {
++		t.Fatal("missing device accepted")
++	}
++	if err := tx.CopyToReadBuffer(&wgpu.CommandEncoder{}); err == nil {
++		t.Fatal("stale layout accepted")
++	}
++	if data, err := tx.ReadDataMapped(); err == nil || data != nil {
++		t.Fatal("stale read configured/mapped a new empty buffer")
++	}
++	if tx.readBuffer != buffer || tx.ReadBufferDims != dims {
++		t.Fatal("refusal changed staging")
++	}
++	tx.ReadBufferDims = *NewTextureBufferDims(format.Size)
++	if err := tx.CopyToReadBuffer(&wgpu.CommandEncoder{}); err == nil {
++		t.Fatal("invalid native staging accepted")
++	}
++	if data, err := tx.ReadDataMapped(); err == nil || data != nil {
++		t.Fatal("invalid native staging mapped")
++	}
++	tx.Release()
++	if tx.readBuffer != nil || tx.ReadBufferDims != (TextureBufferDims{}) {
++		t.Fatal("release retained staging metadata")
++	}
++}
++
++func TestVellumReadGoImageChannelOrder(t *testing.T) {
++	for _, format := range []wgpu.TextureFormat{wgpu.TextureFormatRGBA8Unorm, wgpu.TextureFormatRGBA8UnormSrgb, wgpu.TextureFormatBGRA8Unorm, wgpu.TextureFormatBGRA8UnormSrgb} {
++		data := []byte{5, 17, 31, 255, 49, 71, 101, 127}
++		want := append([]byte(nil), data...)
++		if format == wgpu.TextureFormatBGRA8Unorm || format == wgpu.TextureFormatBGRA8UnormSrgb {
++			want = []byte{31, 17, 5, 255, 101, 71, 49, 127}
++		}
++		normalizeReadImageChannels(data, format)
++		if !reflect.DeepEqual(data, want) {
++			t.Fatal("image channels/alpha changed", format, data)
++		}
++	}
++}
++
++func TestVellumTextureDeviceChangeRetiresStaging(t *testing.T) {
++	tx := &Texture{device: Device{Device: &wgpu.Device{}, Queue: &wgpu.Queue{}}, texture: &wgpu.Texture{}, view: &wgpu.TextureView{}, readBuffer: &wgpu.Buffer{}, ReadBufferDims: *NewTextureBufferDims(image.Pt(2, 3))}
++	format := TextureFormat{Size: image.Pt(2, 3), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}
++	if err := tx.ConfigRenderTexture(&Device{}, &format); err == nil {
++		t.Fatal("invalid replacement device accepted")
++	}
++	if tx.readBuffer != nil || tx.ReadBufferDims != (TextureBufferDims{}) || tx.texture != nil || tx.view != nil {
++		t.Fatal("device change retained prior resources")
++	}
++}
++
++func TestVellumHeadlessDeviceAdmissionAndPartialRetirement(t *testing.T) {
++	failure := errors.New("controlled device refusal")
++	for _, stage := range []string{"no_gpu", "device_error", "partial_device", "nil_device", "success"} {
++		t.Run(stage, func(t *testing.T) {
++			var events []string
++			gpu := &textureRef{name: "gpu", valid: true, events: &events}
++			device := &textureRef{name: "device", valid: true, events: &events}
++			calls := 0
++			g, d, err := createHeadlessPair(func() *textureRef {
++				if stage == "no_gpu" {
++					return nil
++				}
++				return gpu
++			}, func(g *textureRef) (*textureRef, error) {
++				calls++
++				if g != gpu {
++					t.Fatal("wrong adapter")
++				}
++				switch stage {
++				case "device_error":
++					return nil, failure
++				case "partial_device":
++					return device, failure
++				case "nil_device":
++					return nil, nil
++				}
++				return device, nil
++			})
++			if stage == "success" {
++				if err != nil || g != gpu || d != device || len(events) != 0 {
++					t.Fatal("complete device pair not retained", err, events)
++				}
++				device.Release()
++				gpu.Release()
++				return
++			}
++			if err == nil || g != nil || d != nil {
++				t.Fatal("incomplete admission published", err, g, d)
++			}
++			if stage == "no_gpu" {
++				if calls != 0 || len(events) != 0 {
++					t.Fatal("nil adapter reached device factory")
++				}
++				return
++			}
++			if calls != 1 || gpu.releases != 1 {
++				t.Fatal("adapter admission leaked/retried", calls, events)
++			}
++			want := []string{"gpu"}
++			if stage == "partial_device" {
++				want = []string{"device", "gpu"}
++			}
++			if !reflect.DeepEqual(events, want) {
++				t.Fatal("admission cleanup order differs", events)
++			}
++			if (stage == "device_error" || stage == "partial_device") && err != failure {
++				t.Fatal("device error identity lost")
++			}
++		})
++	}
++}
+--- /dev/null
++++ b/gpu/texture_native_lifecycle_test.go
+@@ -0,0 +1,198 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build !js
++
++package gpu
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"image"
++	"os"
++	"testing"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// This fixture uses tiny headless GPU resources, no windows/surfaces, no input
++// or presentation, and no timing/physical-memory acceptance. Held old Go wrappers
++// prove explicit reference retirement rather than eventual finalizer activity.
++// It also compiles against patch48 for original-compatible native regressions.
++func TestVellumTextureNativeOwnershipAndReadback(t *testing.T) {
++	if os.Getenv("VELLUM_TEXTURE_GPU_TEST") != "1" {
++		t.Skip("explicit headless GPU correctness fixture required")
++	}
++	var gp *GPU
++	var dev *Device
++	defer func() {
++		if dev != nil {
++			dev.Release()
++		}
++		if gp != nil {
++			gp.Release()
++		}
++		ReleaseInstance()
++	}()
++	var err error
++	gp, dev, err = NoDisplayGPU()
++	if err != nil || gp == nil || dev == nil {
++		t.Fatal("headless GPU unavailable", err)
++	}
++	record := func(fields map[string]any) {
++		fields["fixture"] = "texture_headless"
++		fields["windows_created"] = 0
++		data, err := json.Marshal(fields)
++		if err != nil {
++			t.Fatal(err)
++		}
++		fmt.Printf("VELLUM_TEXTURE_NATIVE %s\n", data)
++	}
++	format := TextureFormat{Size: image.Pt(3, 2), Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}
++	t.Run("usage_reconfiguration", func(t *testing.T) {
++		tx := NewTexture(dev)
++		defer tx.Release()
++		tx.Format = format
++		img := image.NewRGBA(image.Rect(0, 0, 3, 2))
++		for i := 3; i < len(img.Pix); i += 4 {
++			img.Pix[i] = 255
++		}
++		if err := tx.SetFromGoImage(img, 0); err != nil {
++			t.Fatal(err)
++		}
++		old := tx.texture
++		required := wgpu.TextureUsageRenderAttachment | wgpu.TextureUsageCopySrc | wgpu.TextureUsageTextureBinding
++		if err := tx.ConfigRenderTexture(dev, &format); err != nil {
++			t.Fatal(err)
++		}
++		if old.IsValid() || tx.texture.GetUsage()&required != required {
++			t.Fatal("same format reused incompatible image usage")
++		}
++		old = tx.texture
++		if err := tx.SetFromGoImage(img, 0); err != nil {
++			t.Fatal(err)
++		}
++		if old.IsValid() || tx.texture.GetUsage()&(wgpu.TextureUsageTextureBinding|wgpu.TextureUsageCopyDst) != (wgpu.TextureUsageTextureBinding|wgpu.TextureUsageCopyDst) {
++			t.Fatal("upload reused incompatible render usage")
++		}
++		record(map[string]any{"case": "usage_reconfiguration", "retired_references": 2})
++	})
++	t.Run("staging_retirement", func(t *testing.T) {
++		tx := NewTexture(dev)
++		defer tx.Release()
++		tx.Format = format
++		var refs []*wgpu.Buffer
++		defer func() {
++			for _, b := range refs {
++				b.Release()
++			}
++		}()
++		for i := 0; i < 32; i++ {
++			tx.Format.Size = image.Pt(3+i%3, 2+i)
++			if err := tx.ConfigReadBuffer(); err != nil {
++				t.Fatal(err)
++			}
++			for _, old := range refs {
++				if old.IsValid() {
++					t.Fatal("replaced staging reference waits for GC", i)
++				}
++			}
++			refs = append(refs, tx.readBuffer)
++			current := tx.readBuffer
++			if err := tx.ConfigReadBuffer(); err != nil || current != tx.readBuffer {
++				t.Fatal("matching staging was replaced", err)
++			}
++		}
++		tx.Release()
++		for _, b := range refs {
++			if b.IsValid() {
++				t.Fatal("staging survived owner release")
++			}
++		}
++		record(map[string]any{"case": "staging_retirement", "created_buffers": 32, "retired_references": 32})
++	})
++	t.Run("device_change", func(t *testing.T) {
++		other, err := NewDevice(gp)
++		if err != nil {
++			t.Fatal(err)
++		}
++		defer other.Release()
++		tx := NewTexture(dev)
++		defer tx.Release()
++		if err := tx.ConfigRenderTexture(dev, &format); err != nil {
++			t.Fatal(err)
++		}
++		if err := tx.ConfigReadBuffer(); err != nil {
++			t.Fatal(err)
++		}
++		texture, view, staging := tx.texture, tx.view, tx.readBuffer
++		if err := tx.ConfigRenderTexture(other, &format); err != nil {
++			t.Fatal(err)
++		}
++		if texture.IsValid() || view.IsValid() || staging.IsValid() || tx.readBuffer != nil || tx.ReadBufferDims != (TextureBufferDims{}) {
++			t.Fatal("device change retained old references")
++		}
++		if err := tx.ConfigReadBuffer(); err != nil {
++			t.Fatal(err)
++		}
++		if tx.readBuffer == staging {
++			t.Fatal("other-device staging reused")
++		}
++		record(map[string]any{"case": "device_change", "retired_references": 3})
++	})
++	for _, bgra := range []bool{false, true} {
++		name := "rgba_readback"
++		if bgra {
++			name = "bgra_readback"
++		}
++		t.Run(name, func(t *testing.T) {
++			tx := NewTexture(dev)
++			defer tx.Release()
++			tx.Format = format
++			if bgra {
++				tx.Format.Format = wgpu.TextureFormatBGRA8UnormSrgb
++			}
++			if err := tx.CreateTexture(wgpu.TextureUsageCopySrc | wgpu.TextureUsageCopyDst | wgpu.TextureUsageTextureBinding); err != nil {
++				t.Fatal(err)
++			}
++			want := []byte{17, 43, 71, 255, 29, 59, 97, 255, 83, 113, 149, 255, 131, 163, 191, 255, 197, 211, 227, 255, 7, 19, 31, 255}
++			native := append([]byte(nil), want...)
++			if bgra {
++				for i := 0; i < len(native); i += 4 {
++					native[i], native[i+2] = native[i+2], native[i]
++				}
++			}
++			size := tx.Format.Extent3D()
++			if err := dev.Queue.TryWriteTexture(tx.texture.AsImageCopy(), native, &wgpu.TexelCopyBufferLayout{BytesPerRow: 12, RowsPerImage: 2}, &size); err != nil {
++				t.Fatal(err)
++			}
++			if err := tx.ConfigReadBuffer(); err != nil {
++				t.Fatal(err)
++			}
++			cmd, err := dev.Device.TryCreateCommandEncoder(nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer cmd.Release()
++			if err := tx.CopyToReadBuffer(cmd); err != nil {
++				t.Fatal(err)
++			}
++			buffer, err := cmd.TryFinish(nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer buffer.Release()
++			dev.Queue.Submit(buffer)
++			var raw []byte
++			if err := tx.ReadData(&raw, true); err != nil || !bytes.Equal(raw, native) {
++				t.Fatal("raw readback channel/padding mismatch", err, raw)
++			}
++			img, err := tx.ReadGoImage()
++			if err != nil || img == nil || img.Rect != image.Rect(0, 0, 3, 2) || img.Stride != 12 || !bytes.Equal(img.Pix, want) {
++				t.Fatal("NRGBA readback channel/padding mismatch", err, img)
++			}
++			record(map[string]any{"case": name, "pixels": 6, "padded_bytes": 512, "raw_native_channels": true, "image_rgba_channels": true})
++		})
++	}
++}

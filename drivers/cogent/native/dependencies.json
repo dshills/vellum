@@ -452,6 +452,17 @@
               "sha256": "623cc2d3ad55cea0b2d5b5f542e3b4d7356b5541cfca96bb760b3d9ff6cc6b37"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/texturelifecycle",
+          "inputs": "native/patches/texturelifecycle/original-hashes.json",
+          "outputs": "native/patches/texturelifecycle/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/texturelifecycle/0049-complete-texture-readback-ownership.patch",
+              "sha256": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76"
+            }
+          ]
         }
       ]
     },
