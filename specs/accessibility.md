@@ -133,3 +133,18 @@ without changing complete wire records, ordering, semantic-generation equality,
 callback replacement or native validation/commit/notification behavior. Ownership
 transfer and fewer intermediate copies do not qualify total retained, native or
 GPU memory, or sustained latency by themselves.
+
+## Native integer validation
+
+Unsigned generation/incarnation fields reject booleans, negative values,
+fractions and values above UINT64_MAX. Positive fields also reject zero. Exact
+integral Foundation NSNumber representations may be checked through their signed
+or unsigned integer accessor; floating, decimal and unknown representations retain
+the strict digit-string validation, preserving full-width boundaries. Complete
+snapshot validation still precedes retained-tree mutation.
+
+The [native validation checkpoint](../docs/reports/macos-native-validation/README.md)
+records original/candidate boundary parity, native 400-cell acceptance and a
+451-node validation-only benchmark. Sampled process/native stacks and this local
+benchmark remain separate from recorded UI-work latency, P6/P11 and human Mac
+accessibility qualification.

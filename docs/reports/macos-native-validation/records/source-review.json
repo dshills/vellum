@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "base_commit": "f3caa2e668839395f0e7ed66f57d39f8e0941df7",
+  "reviewed_at_utc": "2026-10-13T22:09:02.843639+00:00",
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin.m": "ff95a989b698baeb87a59e04cb688a41674476821dedd20dd9eb45f9c084b594",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin_test.go": "c13b2040a607c8792abc3c0eec22da0b53e84f01f3016fd00e8d36c49f807066"
+  },
+  "source_manifest": {
+    "path": "/private/tmp/vellum-macos-scene-cost/candidate-source.json",
+    "sha256": "ea2db5b62d325dde0f6456369aadd494f8f840f1687367b0c54810ae2defb513"
+  },
+  "original_file_sha256": {
+    "/private/tmp/vellum-macos-scene-cost/original/drivers/cogent/accessibility_darwin.m": "b8fc7c0a3662d7cb308b6887b9568aebef630665792a75eefdc69d3c0f139586",
+    "/private/tmp/vellum-macos-scene-cost/original/drivers/cogent/accessibility_darwin_test.go": "16e8b86a61f8a56b247789e1714fd7192eb26401a8ceb3f68d3f5ca1e6a1ea8a"
+  },
+  "assessment": [
+    "The only production delta adds a fast path after the existing NSNumber and CFBoolean checks. Exact one-character signed c/s/i/l/q encodings use int64_t longLongValue and reject negative values; exact unsigned C/S/I/L/Q encodings use uint64_t unsignedLongLongValue. Each retains the positive-versus-zero policy without a floating-point conversion, including UINT64_MAX.",
+    "Decimal, floating and unknown/multichar encodings still execute the byte-identical digit-string fallback, including its 20-digit and UINT64_MAX comparison. Class refusal, boolean refusal, schema validation-before-retained-mutation, thread/callback behavior and ownership are unchanged.",
+    "The added boundary matrix exercises the actual NSJSONSerialization validation path for generation and the three grid integer fields: zero/positive policies, signed-width boundaries, 2^53, signed/unsigned 64-bit boundaries, negative/fractional/oversized/boolean/non-number rejection. It establishes expected parsed-JSON behavior; it does not force every possible custom NSNumber subclass or objcType.",
+    "The microbenchmark uses one host, 50 rows and 400 cells (451 total nodes), prevalidates the immutable payload, and times repeated production native validation. It is a native validation diagnostic, not a rendered-frame or P6 workload benchmark."
+  ],
+  "limits": [
+    "Read/hash/diff-only review of exactly two candidate leaves. No reviewer tests, builds, native/UI calls, provider runs, Git actions or source edits.",
+    "Author original/candidate boundary and race receipts were not independently executed or evidence-qualified by this source review.",
+    "No latency, whole-frame/total-UI-work, native memory, physical GPU or broad Mac/P6 acceptance claim. The native main-thread asynchronous validation path may lie outside the existing exact totalUI accounting."
+  ]
+}

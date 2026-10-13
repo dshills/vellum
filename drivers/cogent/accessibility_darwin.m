@@ -296,6 +296,16 @@ static void vellumAXWithJSONPayload(const char *json,void (^enqueue)(NSData *)){
 }
 static BOOL vellumAXUInt(id value,BOOL positive){
  if(![value isKindOfClass:NSNumber.class]||CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID())return NO;
+ // Integral Foundation representations preserve their exact encoded width.
+ // Decimal/floating representations retain the strict digit-string boundary
+ // check below, including values near UINT64_MAX that a double cannot retain.
+ const char *type=[value objCType];
+ if(type&&type[0]&&type[1]=='\0'){
+  switch(type[0]){
+   case 'c':case 's':case 'i':case 'l':case 'q':{int64_t n=[value longLongValue];return n>=0&&(!positive||n!=0);}
+   case 'C':case 'S':case 'I':case 'L':case 'Q':{uint64_t n=[value unsignedLongLongValue];return !positive||n!=0;}
+  }
+ }
  NSString *digits=[value stringValue];if(digits.length==0||digits.length>20)return NO;
  for(NSUInteger i=0;i<digits.length;i++){unichar c=[digits characterAtIndex:i];if(c<'0'||c>'9')return NO;}
  if(digits.length==20&&[digits compare:@"18446744073709551615"]==NSOrderedDescending)return NO;

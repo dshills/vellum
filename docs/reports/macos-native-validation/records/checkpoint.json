@@ -1,0 +1,31 @@
+{
+  "result": "REVIEWED_SCOPED_NATIVE_VALIDATION",
+  "base_commit": "f3caa2e668839395f0e7ed66f57d39f8e0941df7",
+  "qualification_sha256": "2ce2040603e2eadf60657f4bbc2d12bd4c10115fd56f9a2991753bb434754911",
+  "source_manifest_sha256": "f1a1ab0d03d8ca6181dc38681c073d9b67331fd6fd0bb7a500ba147b36a397a1",
+  "archive_sha256": "0f5e3c55d13a2ffeea19dff764a6ac10f54304e3a44f4b18a5f633aecbc3eabe",
+  "index_sha256": "7ddc2c4ce343b58e3e955ed3936d864529c34c2ce6af88f3d57dc2ec59966c61",
+  "archive_members": 106,
+  "source": {
+    "drivers/cogent/accessibility_darwin.m": "ff95a989b698baeb87a59e04cb688a41674476821dedd20dd9eb45f9c084b594",
+    "drivers/cogent/accessibility_darwin_test.go": "c13b2040a607c8792abc3c0eec22da0b53e84f01f3016fd00e8d36c49f807066",
+    "specs/accessibility.md": "35670e1236871c5fc98866c84705faf31e39d93a7f6e2bca06c055c19d595c95",
+    "docs/reports/macos-native-validation/README.md": "bef31b10b2784501e858acd375799fc1b8d1921f22e70b1430fee2fb9c8ae32b"
+  },
+  "reviews": {
+    "source-review": "63b31c6515bb93bc3029558bd504c4ad83a7962069358f99e8c1590037c02bdb",
+    "evidence-review": "5d77068784298218675256144d942a4439aefce0065d16dfa413ec4302713811"
+  },
+  "prism_sha256": "2aa5fbb754a40d7067e39488aefaa601a0b1dcf1010cfe0feda6f2121e3d432b",
+  "evidence_review_sha256": "100a480cfb2b7f679552139e9a9921ddee150540ab8844470421db41909a1785",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "ordinary_samples": 0,
+  "profiled_samples": 480,
+  "ordinary_latency_targets_met": false,
+  "checkpoint_producer_sha256": "b4d3d9bcef54ff5ca244869c6a4599305d77607bb9c22427f4182b13aa65e021",
+  "promotion_producer_sha256": "8cc87c9706eae2e6513e0dca74669731f5be73dfa70e7bca52519d7b8d988209"
+}

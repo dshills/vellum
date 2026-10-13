@@ -6,9 +6,87 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 )
+
+func TestNativeAccessibilityUIntBoundaries(t *testing.T) {
+	cases := []struct {
+		literal        string
+		positive, zero bool
+	}{
+		{"0", false, true}, {"0.0", false, true},
+		{"1", true, true}, {"1.0", true, true}, {"1e3", true, true},
+		{"127", true, true}, {"128", true, true}, {"255", true, true}, {"256", true, true},
+		{"32767", true, true}, {"32768", true, true}, {"65535", true, true}, {"65536", true, true},
+		{"2147483647", true, true}, {"2147483648", true, true},
+		{"4294967295", true, true}, {"4294967296", true, true},
+		{"9007199254740991", true, true}, {"9007199254740992", true, true},
+		{"9223372036854775807", true, true}, {"9223372036854775808", true, true},
+		{"18446744073709551615", true, true},
+		{"-1", false, false}, {"-1.0", false, false}, {"1.5", false, false},
+		{"1e-2", false, false}, {"18446744073709551616", false, false},
+		{"1e20", false, false}, {"true", false, false}, {"false", false, false},
+		{"null", false, false}, {`"1"`, false, false}, {"[]", false, false}, {"{}", false, false},
+	}
+	for _, c := range cases {
+		t.Run(c.literal, func(t *testing.T) {
+			payload := fmt.Sprintf(`{"generation":%s,"nodes":[]}`, c.literal)
+			if got := nativeAccessibilitySnapshotValid(payload); got != c.positive {
+				t.Fatalf("positive generation %s: %v, want %v", c.literal, got, c.positive)
+			}
+			for _, field := range []string{"grid_incarnation", "grid_target_generation", "grid_generation"} {
+				node := map[string]any{"id": "table", "parent": "", "role": "table", "actions": []string{},
+					"grid_scope": "table", "grid_incarnation": 1, "grid_target_generation": json.RawMessage("18446744073709551615"),
+					"grid_generation": 0, "grid_pending": true, "disabled": true}
+				node[field] = json.RawMessage(c.literal)
+				bytes, err := json.Marshal(map[string]any{"generation": 1, "nodes": []any{node}})
+				if err != nil {
+					t.Fatal(err)
+				}
+				want := c.positive
+				if field == "grid_generation" {
+					want = c.zero
+				}
+				if got := nativeAccessibilitySnapshotValid(string(bytes)); got != want {
+					t.Fatalf("%s=%s: %v, want %v", field, c.literal, got, want)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkNativeAccessibilitySnapshotUIntFields(b *testing.B) {
+	frame := [4]float32{0, 0, 100, 20}
+	makeNode := func(id, parent, role string) accessibilityNode {
+		return accessibilityNode{ID: id, Parent: parent, Role: role, Actions: []string{}, GridScope: "table",
+			GridIncarnation: 17, GridTargetGeneration: 12345, GridGeneration: 12345, GridFrame: &frame}
+	}
+	nodes := []accessibilityNode{makeNode("table", "", "table")}
+	for row := 0; row < 50; row++ {
+		id := fmt.Sprintf("row-%d", row)
+		nodes = append(nodes, makeNode(id, "table", "grid-row"))
+		for col := 0; col < 8; col++ {
+			nodes = append(nodes, makeNode(fmt.Sprintf("%s-cell-%d", id, col), id, "grid-cell"))
+		}
+	}
+	payload, err := json.Marshal(map[string]any{"generation": 12345, "nodes": nodes})
+	if err != nil {
+		b.Fatal(err)
+	}
+	text := string(payload)
+	if !nativeAccessibilitySnapshotValid(text) {
+		b.Fatal("benchmark snapshot refused")
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if !nativeAccessibilitySnapshotValid(text) {
+			b.Fatal("snapshot refused")
+		}
+	}
+}
 
 func TestNativeAccessibilitySnapshotValidationIsAtomic(t *testing.T) {
 	valid := `{"generation":1,"nodes":[{"id":"root","parent":"","role":"column","actions":[]},{"id":"child","parent":"root","role":"button","actions":["press"]}]}`

@@ -1,0 +1,104 @@
+{
+  "status": "APPROVED_EVIDENCE",
+  "result": "APPROVED_EVIDENCE",
+  "findings": [],
+  "endpoints": {
+    "qualification_sha256": "2ce2040603e2eadf60657f4bbc2d12bd4c10115fd56f9a2991753bb434754911",
+    "source_manifest_sha256": "f1a1ab0d03d8ca6181dc38681c073d9b67331fd6fd0bb7a500ba147b36a397a1",
+    "archive_sha256": "0f5e3c55d13a2ffeea19dff764a6ac10f54304e3a44f4b18a5f633aecbc3eabe",
+    "index_sha256": "7ddc2c4ce343b58e3e955ed3936d864529c34c2ce6af88f3d57dc2ec59966c61",
+    "archive_members": 106,
+    "source": {
+      "drivers/cogent/accessibility_darwin.m": "ff95a989b698baeb87a59e04cb688a41674476821dedd20dd9eb45f9c084b594",
+      "drivers/cogent/accessibility_darwin_test.go": "c13b2040a607c8792abc3c0eec22da0b53e84f01f3016fd00e8d36c49f807066",
+      "specs/accessibility.md": "35670e1236871c5fc98866c84705faf31e39d93a7f6e2bca06c055c19d595c95",
+      "docs/reports/macos-native-validation/README.md": "bef31b10b2784501e858acd375799fc1b8d1921f22e70b1430fee2fb9c8ae32b"
+    },
+    "reviews": {
+      "source-review": "63b31c6515bb93bc3029558bd504c4ad83a7962069358f99e8c1590037c02bdb",
+      "evidence-review": "5d77068784298218675256144d942a4439aefce0065d16dfa413ec4302713811"
+    },
+    "prism_sha256": "2aa5fbb754a40d7067e39488aefaa601a0b1dcf1010cfe0feda6f2121e3d432b"
+  },
+  "reviewed_artifact_sha256": {
+    "/private/tmp/vellum-macos-scene-cost/endpoints.json": "4b2aad312eac77c36b7eb3bb64d766562666cba0bda31aa18c09dc257b2fb803",
+    "/private/tmp/vellum-macos-scene-cost/qualification.json": "2ce2040603e2eadf60657f4bbc2d12bd4c10115fd56f9a2991753bb434754911",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-validation/records/evidence.tar.xz": "0f5e3c55d13a2ffeea19dff764a6ac10f54304e3a44f4b18a5f633aecbc3eabe",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-validation/records/evidence-index.json": "7ddc2c4ce343b58e3e955ed3936d864529c34c2ce6af88f3d57dc2ec59966c61",
+    "/private/tmp/vellum-macos-scene-cost/checkpoint-source.json": "f1a1ab0d03d8ca6181dc38681c073d9b67331fd6fd0bb7a500ba147b36a397a1",
+    "/private/tmp/vellum-macos-scene-cost/baseline.json": "6418c08747fc61e346594f1af01d18149c8f0565e491369d1769b39f9b587afb",
+    "/private/tmp/vellum-macos-scene-cost/candidate-baseline-v1.json": "09ff588bbbfae1f8b03163b23671424b959f373f1ea2c8f0bf6430c6ab298e91",
+    "/private/tmp/vellum-macos-scene-cost/source-review.json": "63b31c6515bb93bc3029558bd504c4ad83a7962069358f99e8c1590037c02bdb",
+    "/private/tmp/vellum-macos-scene-cost/evidence-review.json": "5d77068784298218675256144d942a4439aefce0065d16dfa413ec4302713811",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-validation/records/source-review.json": "63b31c6515bb93bc3029558bd504c4ad83a7962069358f99e8c1590037c02bdb",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-validation/records/evidence-review.json": "5d77068784298218675256144d942a4439aefce0065d16dfa413ec4302713811",
+    "/private/tmp/vellum-macos-scene-cost/packaging-source-review.json": "a61df60314a55a752b86eccfea4a25e1e50a3c6276abea041c707396d1a623ba",
+    "/private/tmp/vellum-macos-scene-cost/prism-v1/prism.json": "2aa5fbb754a40d7067e39488aefaa601a0b1dcf1010cfe0feda6f2121e3d432b",
+    "/private/tmp/vellum-macos-scene-cost/prism-v1/process.json": "f18ea873e329fb33f8e07c7a79d5d1a58b0cb590dfb7051ecdac10b68497e5fe",
+    "/private/tmp/vellum-macos-scene-cost/seal.py": "f48a9493b334886e02b2549f0dcbd7195ae118407da4da54e9b695c2c51fa2a3",
+    "/private/tmp/vellum-macos-scene-cost/checkpoint.py": "b4d3d9bcef54ff5ca244869c6a4599305d77607bb9c22427f4182b13aa65e021",
+    "/private/tmp/vellum-macos-scene-cost/promote.py": "8cc87c9706eae2e6513e0dca74669731f5be73dfa70e7bca52519d7b8d988209",
+    "/private/tmp/vellum-macos-scene-cost/profile-qualification.json": "208d15b599f5d863edbd06192d8384e6fac9342d8b423102577db6d97cdf8e88",
+    "/private/tmp/vellum-macos-scene-cost/native-sample-qualification.json": "5ed96af45e5a6f51ff2eb30759291df15f89185f1dcc9e70f8fa3fce8d02a8a2",
+    "/private/tmp/vellum-macos-scene-cost/benchmark-qualification.json": "3f46dd3ed7975df4efb4d636d1ce751e093de1d64f4ac39ede205c8fc35c7728",
+    "/private/tmp/vellum-macos-scene-cost/final-metadata-audit.py.txt": "0a02aecfe01dd1f9f859aeb4c2a051b8c73a86bf49aedf1e4eb79945b7aa03f0",
+    "/private/tmp/vellum-macos-scene-cost/final-metadata-audit.stdout": "08dad0249e29b34c10c1068858f0ce431d43a7a56db06a1bbe4b584a6717650e",
+    "/private/tmp/vellum-macos-scene-cost/final-metadata-audit-initial.py.txt": "e052658fd0aa803b4c79dee965ed723aceb1c4f8557e03ba92238f1ff8e8aa95",
+    "/private/tmp/vellum-macos-scene-cost/final-metadata-audit-initial-refusal.json": "43cf3e9b808194ff9c8ec45fcfb985c25e6532e3d5dad59a2dd7aae9728810ed",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin.m": "ff95a989b698baeb87a59e04cb688a41674476821dedd20dd9eb45f9c084b594",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin_test.go": "c13b2040a607c8792abc3c0eec22da0b53e84f01f3016fd00e8d36c49f807066",
+    "/private/tmp/vellum-large-data/specs/accessibility.md": "35670e1236871c5fc98866c84705faf31e39d93a7f6e2bca06c055c19d595c95",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-validation/README.md": "bef31b10b2784501e858acd375799fc1b8d1921f22e70b1430fee2fb9c8ae32b"
+  },
+  "scope": "Bounded independent read-only final archive/source/link metadata audit. No raw diagnosis recalculation or new runtime/build/test/provider/Git/canonical operation.",
+  "verification": {
+    "archive_members": 106,
+    "all_members_regular_and_safe_normalized_paths": true,
+    "no_duplicate_link_absolute_parent_or_backslash_paths": true,
+    "index_payload_hashes_and_sizes_exact": true,
+    "all_archive_payloads_equal_current_retained_phase_or_root_bytes": true,
+    "intentional_binary_pprof_profiles": 3,
+    "compiled_binaries_and_caches_excluded": true,
+    "final_source_leaves": 4,
+    "current_code_delta_leaves": 2,
+    "current_selected_runtime_sources": 710,
+    "current_prepared_files": 6198,
+    "complete_current_source_and_prepared_vectors_match": true,
+    "source_review_sha256": "63b31c6515bb93bc3029558bd504c4ad83a7962069358f99e8c1590037c02bdb",
+    "evidence_review_final_sha256": "5d77068784298218675256144d942a4439aefce0065d16dfa413ec4302713811",
+    "reviews_match_phase_and_root_copies": true,
+    "required_terminal_receipts": 19,
+    "receipt_and_stdout_stderr_hash_links_match": true,
+    "qualifier_links": 3,
+    "provider_source_scope_files": 4,
+    "provider_raw_exit_code": 0,
+    "provider_findings": 0,
+    "provider_complete_no_skip_exclusion_truncation": true,
+    "provider_identity": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    "provider_before_after_exact_final4": true,
+    "producers_match_prior_approved_source_hashes": true,
+    "report_and_contract_links_present": true,
+    "checkpoint_link": "INTENTIONALLY_MATERIALIZED_AFTER_THIS_CERTIFICATE"
+  },
+  "historical_scope": [
+    "Original helper/test and overlay source versions are retained as regular inert archive members; their identities are checked as indexed bytes without relabeling them as final source.",
+    "Earlier overlapping benchmark batches and setup failures remain archived under the evidence reviewer’s explicit exploratory/failed scope; selected validation-only benchmark results remain distinct.",
+    "The reviewer verifier first treated repository-relative reviewed_source_sha256 keys as working-directory paths. The initial refusal/recipe is retained; the narrow resolver correction uses the repository root and the completed read-only audit passes. This is not a workload/source/native failure."
+  ],
+  "qualification_scope": {
+    "result": "REVIEWED_SCOPED_NATIVE_VALIDATION",
+    "ordinary_samples": 0,
+    "profiled_diagnostic_samples": 480,
+    "local_microbenchmark": "451-node validation-only benchmark2.249→1.936ms as already independently audited; not a frame speedup or exact native CPU/allocation measurement.",
+    "live_scope": "Real400-cell Cocoa/race/vet scope as independently reviewed; no physical/human/fullMac conclusion.",
+    "latest_ordinary_latency_targets": "Remain failed; no new ordinary campaign."
+  },
+  "limitations": [
+    "This audit independently verifies artifact bytes/vectors, archive metadata and links, while relying on the FINAL source/evidence certificates for their source correctness, raw diagnostic and statistical conclusions.",
+    "The final certificate and metadata-verification recipe/stdout are outside the sealed106-member archive; checkpoint/evidence-review metadata will be materialized after approval, avoiding a circular link requirement.",
+    "Selected710-source/prepared6198 linkage is not complete compiler/SDK/cache closure. Native/GPU allocation attribution, physical execution/presentation, human VoiceOver/input, sustained P6/P11, distribution/release and fullMac qualification remain open."
+  ]
+}
