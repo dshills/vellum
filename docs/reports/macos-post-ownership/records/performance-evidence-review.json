@@ -1,0 +1,1727 @@
+{
+  "result": "APPROVED_EVIDENCE",
+  "status": "APPROVED_EVIDENCE",
+  "findings": [],
+  "created_utc": "2026-10-13T20:51:18.404496+00:00",
+  "source_commit": "1d91d848ac973e2b264c24e61c4a3beac34f7f08",
+  "scope": "Current selected-source-bound ordinary observations and separate numeric-table route diagnostics; not controlled speedup or full acceptance.",
+  "binary_sha256": "416ae873ad71b1115210435e349a5d764ead3f4c6c4b4a15d9d7a2218ccb9ecd",
+  "selected_source_count": 710,
+  "prepared_count": 6198,
+  "current_source_prepared_maps_verified": true,
+  "ordinary_processes": 40,
+  "ordinary_samples": 4800,
+  "closed_warmup_callbacks_per_process": 128,
+  "samples_per_process": 120,
+  "rowcount_exact_geometry_sample_pairs": 2400,
+  "cross_mode_exact_geometry_sample_pairs": 2400,
+  "all_eleven_timing_distributions_recomputed": true,
+  "allocation_malloc_and_source_counter_distributions_recomputed": true,
+  "statistics": "Pooled/per-run nearest-rank p50/p95/p99, all min/max/outliers, mean, sample SD/CV and variation of run p95s; no sum of phase percentiles.",
+  "modes": {
+    "grid-default": {
+      "cases": {
+        "fixed-10000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 7015249,
+              "p95": 8060625,
+              "p99": 8902541,
+              "max": 9726290,
+              "min": 6258835,
+              "mean": 7192590.37,
+              "sample_stddev": 497070.73012189084,
+              "coefficient_of_variation": 0.06910872224771099
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 7001833,
+                "p95": 7978460,
+                "p99": 8266585,
+                "max": 8980209,
+                "min": 6437458,
+                "mean": 7169191.691666666,
+                "sample_stddev": 456082.02779232187,
+                "coefficient_of_variation": 0.06361693861840283
+              },
+              {
+                "count": 120,
+                "p50": 7022127,
+                "p95": 8029710,
+                "p99": 8257833,
+                "max": 8852833,
+                "min": 6651705,
+                "mean": 7191641.325,
+                "sample_stddev": 440266.04067630816,
+                "coefficient_of_variation": 0.06121913215357805
+              },
+              {
+                "count": 120,
+                "p50": 6968501,
+                "p95": 8187750,
+                "p99": 8902541,
+                "max": 9030374,
+                "min": 6486418,
+                "mean": 7197689.691666666,
+                "sample_stddev": 522876.6106914049,
+                "coefficient_of_variation": 0.07264506155312314
+              },
+              {
+                "count": 120,
+                "p50": 7028959,
+                "p95": 8278708,
+                "p99": 9392332,
+                "max": 9726290,
+                "min": 6258835,
+                "mean": 7234162.541666667,
+                "sample_stddev": 596982.2338720155,
+                "coefficient_of_variation": 0.0825226459087105
+              },
+              {
+                "count": 120,
+                "p50": 7057875,
+                "p95": 8048624,
+                "p99": 8226497,
+                "max": 8229625,
+                "min": 6358250,
+                "mean": 7170266.6,
+                "sample_stddev": 457432.4699250199,
+                "coefficient_of_variation": 0.06379574086199527
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 8048624,
+              "p95": 8278708,
+              "p99": 8278708,
+              "max": 8278708,
+              "min": 7978460,
+              "mean": 8104650.4,
+              "sample_stddev": 124379.08761041786,
+              "coefficient_of_variation": 0.015346632053421806
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 8268696,
+            "p95": 9535104,
+            "p99": 10012160,
+            "max": 10808688,
+            "min": 6765240,
+            "mean": 8140634.4,
+            "sample_stddev": 787077.4796836387,
+            "coefficient_of_variation": 0.0966850298158137
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 43340,
+            "p95": 62902,
+            "p99": 64864,
+            "max": 64899,
+            "min": 40428,
+            "mean": 45402.746666666666,
+            "sample_stddev": 6563.906872552463,
+            "coefficient_of_variation": 0.14457070011078177
+          },
+          "gc_cycles_total": 152,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              400
+            ],
+            "rows": [
+              50,
+              50
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              468,
+              540
+            ],
+            "retained_cells": [
+              468,
+              540
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        },
+        "fixed-1000000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 6858627,
+              "p95": 7952334,
+              "p99": 8402206,
+              "max": 9694125,
+              "min": 6350915,
+              "mean": 6992173.361666666,
+              "sample_stddev": 432455.355980149,
+              "coefficient_of_variation": 0.061848488819085605
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 6858627,
+                "p95": 8034041,
+                "p99": 8148790,
+                "max": 8402206,
+                "min": 6443418,
+                "mean": 6981197.983333333,
+                "sample_stddev": 413098.22790642455,
+                "coefficient_of_variation": 0.0591729712998601
+              },
+              {
+                "count": 120,
+                "p50": 6807667,
+                "p95": 7761793,
+                "p99": 8303418,
+                "max": 8707002,
+                "min": 6350915,
+                "mean": 6937213.183333334,
+                "sample_stddev": 406749.4280976695,
+                "coefficient_of_variation": 0.058632972253885134
+              },
+              {
+                "count": 120,
+                "p50": 6866792,
+                "p95": 7952334,
+                "p99": 8390541,
+                "max": 8719374,
+                "min": 6506791,
+                "mean": 7002130.566666666,
+                "sample_stddev": 421347.2156365035,
+                "coefficient_of_variation": 0.060174144372901056
+              },
+              {
+                "count": 120,
+                "p50": 6868751,
+                "p95": 7963833,
+                "p99": 8402458,
+                "max": 9694125,
+                "min": 6427498,
+                "mean": 7017046.55,
+                "sample_stddev": 484327.5367409544,
+                "coefficient_of_variation": 0.06902156531097181
+              },
+              {
+                "count": 120,
+                "p50": 6887124,
+                "p95": 7930583,
+                "p99": 8730126,
+                "max": 9067332,
+                "min": 6527542,
+                "mean": 7023278.525,
+                "sample_stddev": 433941.9413960088,
+                "coefficient_of_variation": 0.061786235566673446
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 7952334,
+              "p95": 8034041,
+              "p99": 8034041,
+              "max": 8034041,
+              "min": 7761793,
+              "mean": 7928516.8,
+              "sample_stddev": 100934.31583559676,
+              "coefficient_of_variation": 0.012730541964115756
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 7614928,
+            "p95": 8832848,
+            "p99": 9539904,
+            "max": 9875328,
+            "min": 6625896,
+            "mean": 7718156.466666667,
+            "sample_stddev": 653977.0896187924,
+            "coefficient_of_variation": 0.08473229228290488
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 43314,
+            "p95": 62893,
+            "p99": 64859,
+            "max": 64884,
+            "min": 40425,
+            "mean": 45381.388333333336,
+            "sample_stddev": 6564.895752759894,
+            "coefficient_of_variation": 0.14466053141741095
+          },
+          "gc_cycles_total": 20,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              400
+            ],
+            "rows": [
+              50,
+              50
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              468,
+              540
+            ],
+            "retained_cells": [
+              468,
+              540
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        },
+        "variable-10000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 6990502,
+              "p95": 8312877,
+              "p99": 11724999,
+              "max": 15491209,
+              "min": 5549206,
+              "mean": 7110427.208333333,
+              "sample_stddev": 1079513.0020822596,
+              "coefficient_of_variation": 0.15182111713584293
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 7029332,
+                "p95": 8147668,
+                "p99": 8573376,
+                "max": 9598834,
+                "min": 5650670,
+                "mean": 7065700.416666667,
+                "sample_stddev": 765907.3633127895,
+                "coefficient_of_variation": 0.1083979390785034
+              },
+              {
+                "count": 120,
+                "p50": 6969791,
+                "p95": 8117875,
+                "p99": 8956875,
+                "max": 9028334,
+                "min": 5637585,
+                "mean": 6978084.275,
+                "sample_stddev": 717687.0714452058,
+                "coefficient_of_variation": 0.10284872511735405
+              },
+              {
+                "count": 120,
+                "p50": 6961417,
+                "p95": 8133835,
+                "p99": 9643499,
+                "max": 11044082,
+                "min": 5745332,
+                "mean": 7038320.608333333,
+                "sample_stddev": 828219.4323653209,
+                "coefficient_of_variation": 0.11767287659284995
+              },
+              {
+                "count": 120,
+                "p50": 7159084,
+                "p95": 11724999,
+                "p99": 14761503,
+                "max": 15491209,
+                "min": 5616584,
+                "mean": 7578100.533333333,
+                "sample_stddev": 1787497.0735553028,
+                "coefficient_of_variation": 0.23587666403906196
+              },
+              {
+                "count": 120,
+                "p50": 6905294,
+                "p95": 8139416,
+                "p99": 8351459,
+                "max": 9239668,
+                "min": 5549206,
+                "mean": 6891930.208333333,
+                "sample_stddev": 767795.7583987582,
+                "coefficient_of_variation": 0.1114050396898075
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 8139416,
+              "p95": 11724999,
+              "p99": 11724999,
+              "max": 11724999,
+              "min": 8117875,
+              "mean": 8852758.6,
+              "sample_stddev": 1605668.1150506476,
+              "coefficient_of_variation": 0.18137488974912833
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 8042184,
+            "p95": 9629248,
+            "p99": 10050088,
+            "max": 11147648,
+            "min": 5912160,
+            "mean": 7961472.413333333,
+            "sample_stddev": 952575.2185399971,
+            "coefficient_of_variation": 0.11964812148876995
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 43765,
+            "p95": 63694,
+            "p99": 65685,
+            "max": 65753,
+            "min": 23618,
+            "mean": 41699.988333333335,
+            "sample_stddev": 11429.78847555181,
+            "coefficient_of_variation": 0.27409572358118106
+          },
+          "gc_cycles_total": 147,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              408
+            ],
+            "rows": [
+              50,
+              51
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              477,
+              550
+            ],
+            "retained_cells": [
+              477,
+              550
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        },
+        "variable-1000000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 6868626,
+              "p95": 8014375,
+              "p99": 8234126,
+              "max": 8912915,
+              "min": 5408127,
+              "mean": 6782476.088333333,
+              "sample_stddev": 694640.479440643,
+              "coefficient_of_variation": 0.10241694484341897
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 6904164,
+                "p95": 8051332,
+                "p99": 8494207,
+                "max": 8912915,
+                "min": 5534294,
+                "mean": 6839918.633333334,
+                "sample_stddev": 703330.6956471793,
+                "coefficient_of_variation": 0.10282734829908662
+              },
+              {
+                "count": 120,
+                "p50": 6932292,
+                "p95": 8131333,
+                "p99": 8282168,
+                "max": 8455960,
+                "min": 5608290,
+                "mean": 6823193.508333334,
+                "sample_stddev": 700486.5738391476,
+                "coefficient_of_variation": 0.10266256892518527
+              },
+              {
+                "count": 120,
+                "p50": 6810457,
+                "p95": 7932375,
+                "p99": 8190375,
+                "max": 8234126,
+                "min": 5408127,
+                "mean": 6707826.233333333,
+                "sample_stddev": 694364.79348221,
+                "coefficient_of_variation": 0.10351562031104643
+              },
+              {
+                "count": 120,
+                "p50": 6832167,
+                "p95": 7958251,
+                "p99": 8172624,
+                "max": 8379834,
+                "min": 5408544,
+                "mean": 6739503.916666667,
+                "sample_stddev": 696466.9934467336,
+                "coefficient_of_variation": 0.10334098801016849
+              },
+              {
+                "count": 120,
+                "p50": 6848290,
+                "p95": 7922708,
+                "p99": 8162376,
+                "max": 8286335,
+                "min": 5432004,
+                "mean": 6801938.15,
+                "sample_stddev": 680749.1084058469,
+                "coefficient_of_variation": 0.1000816375264816
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 7958251,
+              "p95": 8131333,
+              "p99": 8131333,
+              "max": 8131333,
+              "min": 7922708,
+              "mean": 7999199.8,
+              "sample_stddev": 89680.40812072612,
+              "coefficient_of_variation": 0.011211172412611336
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 7446384,
+            "p95": 8791024,
+            "p99": 9392880,
+            "max": 9956192,
+            "min": 5912136,
+            "mean": 7548797.96,
+            "sample_stddev": 786694.3773361922,
+            "coefficient_of_variation": 0.10421452282929985
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 43743,
+            "p95": 63670,
+            "p99": 65683,
+            "max": 65707,
+            "min": 23616,
+            "mean": 41679.60166666667,
+            "sample_stddev": 11429.4384945265,
+            "coefficient_of_variation": 0.2742213945789029
+          },
+          "gc_cycles_total": 20,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              408
+            ],
+            "rows": [
+              50,
+              51
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              477,
+              550
+            ],
+            "retained_cells": [
+              477,
+              550
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        }
+      },
+      "rowcount_p95_ratios": {
+        "fixed": 0.986565433821819,
+        "variable": 0.964091613529227
+      },
+      "warm_target_met": false,
+      "selected_input_count": 58
+    },
+    "grid-gpu": {
+      "cases": {
+        "fixed-10000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 6787750,
+              "p95": 7944998,
+              "p99": 11123834,
+              "max": 19446873,
+              "min": 6162873,
+              "mean": 7071273.345,
+              "sample_stddev": 969136.9113348495,
+              "coefficient_of_variation": 0.1370526727014609
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 6728626,
+                "p95": 8308251,
+                "p99": 8932333,
+                "max": 12334292,
+                "min": 6327874,
+                "mean": 7011797.683333334,
+                "sample_stddev": 734297.1252645149,
+                "coefficient_of_variation": 0.10472309077170035
+              },
+              {
+                "count": 120,
+                "p50": 6838877,
+                "p95": 9070372,
+                "p99": 14996708,
+                "max": 19446873,
+                "min": 6266627,
+                "mean": 7302227.316666666,
+                "sample_stddev": 1784579.3909623765,
+                "coefficient_of_variation": 0.24438836447740228
+              },
+              {
+                "count": 120,
+                "p50": 6675041,
+                "p95": 7676540,
+                "p99": 8022959,
+                "max": 8400960,
+                "min": 6196581,
+                "mean": 6909094.066666666,
+                "sample_stddev": 464955.64641816105,
+                "coefficient_of_variation": 0.06729618122604049
+              },
+              {
+                "count": 120,
+                "p50": 6926128,
+                "p95": 7881208,
+                "p99": 8492416,
+                "max": 11683583,
+                "min": 6162873,
+                "mean": 7066211.366666666,
+                "sample_stddev": 655643.2463101791,
+                "coefficient_of_variation": 0.09278568277804924
+              },
+              {
+                "count": 120,
+                "p50": 6801374,
+                "p95": 7877376,
+                "p99": 8667499,
+                "max": 8852126,
+                "min": 6346125,
+                "mean": 7067036.291666667,
+                "sample_stddev": 523271.02997784415,
+                "coefficient_of_variation": 0.0740439143626412
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 7881208,
+              "p95": 9070372,
+              "p99": 9070372,
+              "max": 9070372,
+              "min": 7676540,
+              "mean": 8162749.4,
+              "sample_stddev": 557237.0719952147,
+              "coefficient_of_variation": 0.06826585561909014
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 11646952,
+            "p95": 13021216,
+            "p99": 13395960,
+            "max": 14064488,
+            "min": 10053848,
+            "mean": 11548685.226666667,
+            "sample_stddev": 793817.5886333425,
+            "coefficient_of_variation": 0.0687366200613353
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 59594,
+            "p95": 79171,
+            "p99": 81191,
+            "max": 81235,
+            "min": 56642,
+            "mean": 61660.145,
+            "sample_stddev": 6573.561990228278,
+            "coefficient_of_variation": 0.10660957722736912
+          },
+          "gc_cycles_total": 214,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              400
+            ],
+            "rows": [
+              50,
+              50
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              468,
+              540
+            ],
+            "retained_cells": [
+              468,
+              540
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        },
+        "fixed-1000000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 6646667,
+              "p95": 7719208,
+              "p99": 7904749,
+              "max": 8893416,
+              "min": 6077378,
+              "mean": 6788288.493333333,
+              "sample_stddev": 422921.24312638387,
+              "coefficient_of_variation": 0.06230160128605729
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 6638045,
+                "p95": 7678289,
+                "p99": 7821541,
+                "max": 7854750,
+                "min": 6077378,
+                "mean": 6779538.025,
+                "sample_stddev": 412239.3572160355,
+                "coefficient_of_variation": 0.06080640829742016
+              },
+              {
+                "count": 120,
+                "p50": 6671958,
+                "p95": 7695919,
+                "p99": 7770166,
+                "max": 8723375,
+                "min": 6134084,
+                "mean": 6782510.708333333,
+                "sample_stddev": 429376.8224280314,
+                "coefficient_of_variation": 0.06330647173184371
+              },
+              {
+                "count": 120,
+                "p50": 6665503,
+                "p95": 7808625,
+                "p99": 8033624,
+                "max": 8239082,
+                "min": 6405793,
+                "mean": 6832326.425,
+                "sample_stddev": 431192.3125910579,
+                "coefficient_of_variation": 0.06311061354054932
+              },
+              {
+                "count": 120,
+                "p50": 6615749,
+                "p95": 7682291,
+                "p99": 7842083,
+                "max": 8061709,
+                "min": 6220499,
+                "mean": 6767952.583333333,
+                "sample_stddev": 421237.2998323831,
+                "coefficient_of_variation": 0.06223998981164795
+              },
+              {
+                "count": 120,
+                "p50": 6637919,
+                "p95": 7708041,
+                "p99": 7780707,
+                "max": 8893416,
+                "min": 6237040,
+                "mean": 6779114.725,
+                "sample_stddev": 424360.9904059301,
+                "coefficient_of_variation": 0.06259829013380949
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 7695919,
+              "p95": 7808625,
+              "p99": 7808625,
+              "max": 7808625,
+              "min": 7678289,
+              "mean": 7714633,
+              "sample_stddev": 53840.170003446314,
+              "coefficient_of_variation": 0.00697896711398278
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 10986776,
+            "p95": 12207760,
+            "p99": 13104416,
+            "max": 13250488,
+            "min": 10024952,
+            "mean": 11082348.946666667,
+            "sample_stddev": 662472.8518304866,
+            "coefficient_of_variation": 0.05977729586197014
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 59558,
+            "p95": 79141,
+            "p99": 81166,
+            "max": 81186,
+            "min": 56633,
+            "mean": 61627.176666666666,
+            "sample_stddev": 6573.707327592015,
+            "coefficient_of_variation": 0.10666896786702297
+          },
+          "gc_cycles_total": 30,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              400
+            ],
+            "rows": [
+              50,
+              50
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              468,
+              540
+            ],
+            "retained_cells": [
+              468,
+              540
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        },
+        "variable-10000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 6827626,
+              "p95": 8144087,
+              "p99": 9050833,
+              "max": 9670001,
+              "min": 5242583,
+              "mean": 6886274.325,
+              "sample_stddev": 823466.6781487163,
+              "coefficient_of_variation": 0.11958087048016582
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 6793460,
+                "p95": 7936416,
+                "p99": 8669417,
+                "max": 8795623,
+                "min": 5369624,
+                "mean": 6837040.266666667,
+                "sample_stddev": 788687.8983756165,
+                "coefficient_of_variation": 0.11535516358164345
+              },
+              {
+                "count": 120,
+                "p50": 6821500,
+                "p95": 8298126,
+                "p99": 9166336,
+                "max": 9577834,
+                "min": 5518416,
+                "mean": 6925976.566666666,
+                "sample_stddev": 819342.1410337854,
+                "coefficient_of_variation": 0.11829987195987848
+              },
+              {
+                "count": 120,
+                "p50": 6874249,
+                "p95": 8120709,
+                "p99": 8756835,
+                "max": 9115000,
+                "min": 5455294,
+                "mean": 6904350.7,
+                "sample_stddev": 823642.7430118253,
+                "coefficient_of_variation": 0.11929329473542316
+              },
+              {
+                "count": 120,
+                "p50": 6765082,
+                "p95": 8367706,
+                "p99": 9157585,
+                "max": 9670001,
+                "min": 5242583,
+                "mean": 6876417.358333333,
+                "sample_stddev": 842653.8910452265,
+                "coefficient_of_variation": 0.12254257517165365
+              },
+              {
+                "count": 120,
+                "p50": 6823751,
+                "p95": 8088209,
+                "p99": 8828458,
+                "max": 9164208,
+                "min": 5415958,
+                "mean": 6887586.733333333,
+                "sample_stddev": 852651.0747266925,
+                "coefficient_of_variation": 0.12379533031506978
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 8120709,
+              "p95": 8367706,
+              "p99": 8367706,
+              "max": 8367706,
+              "min": 7936416,
+              "mean": 8162233.2,
+              "sample_stddev": 172397.19677158326,
+              "coefficient_of_variation": 0.02112132703726025
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 11501408,
+            "p95": 13078368,
+            "p99": 13436720,
+            "max": 14552288,
+            "min": 9282384,
+            "mean": 11460432.093333334,
+            "sample_stddev": 937161.1465601355,
+            "coefficient_of_variation": 0.08177363112733708
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 60047,
+            "p95": 79992,
+            "p99": 82047,
+            "max": 82077,
+            "min": 39831,
+            "mean": 57971.916666666664,
+            "sample_stddev": 11447.602547689714,
+            "coefficient_of_variation": 0.19746807085079496
+          },
+          "gc_cycles_total": 209,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              408
+            ],
+            "rows": [
+              50,
+              51
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              477,
+              550
+            ],
+            "retained_cells": [
+              477,
+              550
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        },
+        "variable-1000000": {
+          "ui_work_ns": {
+            "pooled": {
+              "count": 600,
+              "p50": 6689708,
+              "p95": 7829877,
+              "p99": 8326543,
+              "max": 9022542,
+              "min": 5276711,
+              "mean": 6598431.593333334,
+              "sample_stddev": 704242.7180708682,
+              "coefficient_of_variation": 0.10672880488484468
+            },
+            "per_run": [
+              {
+                "count": 120,
+                "p50": 6652043,
+                "p95": 7774998,
+                "p99": 7991003,
+                "max": 9009712,
+                "min": 5324916,
+                "mean": 6588809.825,
+                "sample_stddev": 720830.4339060406,
+                "coefficient_of_variation": 0.10940222180506486
+              },
+              {
+                "count": 120,
+                "p50": 6675335,
+                "p95": 7825207,
+                "p99": 7970917,
+                "max": 8615623,
+                "min": 5276711,
+                "mean": 6592643.808333334,
+                "sample_stddev": 688975.5934166586,
+                "coefficient_of_variation": 0.10450672195360672
+              },
+              {
+                "count": 120,
+                "p50": 6657751,
+                "p95": 7765544,
+                "p99": 8083210,
+                "max": 8376916,
+                "min": 5297667,
+                "mean": 6553781.233333333,
+                "sample_stddev": 684512.6569622175,
+                "coefficient_of_variation": 0.10444545409613344
+              },
+              {
+                "count": 120,
+                "p50": 6725082,
+                "p95": 7879042,
+                "p99": 8635165,
+                "max": 9022542,
+                "min": 5327334,
+                "mean": 6648740.541666667,
+                "sample_stddev": 728374.355911951,
+                "coefficient_of_variation": 0.1095507263890563
+              },
+              {
+                "count": 120,
+                "p50": 6707917,
+                "p95": 7804751,
+                "p99": 7991959,
+                "max": 8683040,
+                "min": 5348875,
+                "mean": 6608182.558333334,
+                "sample_stddev": 705906.1792549698,
+                "coefficient_of_variation": 0.10682304446398469
+              }
+            ],
+            "run_p95_variation": {
+              "count": 5,
+              "p50": 7804751,
+              "p95": 7879042,
+              "p99": 7879042,
+              "max": 7879042,
+              "min": 7765544,
+              "mean": 7809908.4,
+              "sample_stddev": 45351.50659349698,
+              "coefficient_of_variation": 0.005806919143058961
+            }
+          },
+          "alloc_bytes": {
+            "count": 600,
+            "p50": 10852920,
+            "p95": 12317936,
+            "p99": 13178160,
+            "max": 13465368,
+            "min": 9301704,
+            "mean": 10980838.44,
+            "sample_stddev": 820248.2711798762,
+            "coefficient_of_variation": 0.07469814583483447
+          },
+          "mallocs": {
+            "count": 600,
+            "p50": 60010,
+            "p95": 79972,
+            "p99": 81998,
+            "max": 82003,
+            "min": 39820,
+            "mean": 57937.36833333333,
+            "sample_stddev": 11446.56088130169,
+            "coefficient_of_variation": 0.19756784283755766
+          },
+          "gc_cycles_total": 30,
+          "targets": [
+            {
+              "run": 1,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 2,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 3,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 4,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            },
+            {
+              "run": 5,
+              "p95_met": false,
+              "p99_met": false,
+              "combined_met": false
+            }
+          ],
+          "geometry_ranges": {
+            "cells": [
+              400,
+              408
+            ],
+            "rows": [
+              50,
+              51
+            ],
+            "columns": [
+              8,
+              8
+            ],
+            "materialized_cells": [
+              477,
+              550
+            ],
+            "retained_cells": [
+              477,
+              550
+            ],
+            "retained_headers": [
+              9,
+              10
+            ]
+          }
+        }
+      },
+      "rowcount_p95_ratios": {
+        "fixed": 0.9715808613167681,
+        "variable": 0.9614186341575182
+      },
+      "warm_target_met": false,
+      "selected_input_count": 58
+    }
+  },
+  "parent_receipts": {
+    "build-grid-v1": {
+      "exit_code": 0,
+      "started_utc": "2026-10-13T20:19:35.979651+00:00",
+      "elapsed_seconds": 3.510465874976944,
+      "source_prepared_stable": true,
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-post-ownership-live/loadedgrid",
+        "."
+      ],
+      "mode": "build"
+    },
+    "grid-default-v1": {
+      "exit_code": 0,
+      "started_utc": "2026-10-13T20:29:01.297730+00:00",
+      "elapsed_seconds": 171.59320554201258,
+      "source_prepared_stable": true,
+      "argv": [
+        "python3",
+        "scripts/benchmark-grid.py",
+        "--run",
+        "--binary",
+        "/private/tmp/vellum-macos-post-ownership-live/loadedgrid",
+        "--output",
+        "/private/tmp/vellum-macos-post-ownership-live/grid-default",
+        "--runs",
+        "5",
+        "--samples",
+        "120",
+        "--warmup",
+        "128",
+        "--timeout",
+        "180"
+      ],
+      "mode": "performance"
+    },
+    "grid-gpu-v1": {
+      "exit_code": 0,
+      "started_utc": "2026-10-13T20:32:05.550343+00:00",
+      "elapsed_seconds": 169.44772304198705,
+      "source_prepared_stable": true,
+      "argv": [
+        "python3",
+        "scripts/benchmark-grid.py",
+        "--run",
+        "--binary",
+        "/private/tmp/vellum-macos-post-ownership-live/loadedgrid",
+        "--output",
+        "/private/tmp/vellum-macos-post-ownership-live/grid-gpu",
+        "--runs",
+        "5",
+        "--samples",
+        "120",
+        "--warmup",
+        "128",
+        "--timeout",
+        "180",
+        "--gpu-scene"
+      ],
+      "mode": "performance"
+    },
+    "gpu-route-v1": {
+      "exit_code": 0,
+      "started_utc": "2026-10-13T20:35:32.733098+00:00",
+      "elapsed_seconds": 35.39091316703707,
+      "source_prepared_stable": true,
+      "argv": [
+        "python3",
+        "/private/tmp/vellum-macos-post-ownership-live/route.py"
+      ],
+      "mode": "performance"
+    }
+  },
+  "raw_runs": {
+    "grid-default/fixed-10000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    },
+    "grid-default/fixed-1000000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    },
+    "grid-default/variable-10000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    },
+    "grid-default/variable-1000000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    },
+    "grid-gpu/fixed-10000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    },
+    "grid-gpu/fixed-1000000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    },
+    "grid-gpu/variable-10000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    },
+    "grid-gpu/variable-1000000": {
+      "runs": 5,
+      "samples": 600,
+      "all_outliers_retained": true
+    }
+  },
+  "unstructured_line_records": {
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-1": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-2": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-3": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-4": [],
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-5": [],
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/fixed-10000": [],
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/fixed-1000000": [],
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/variable-10000": [],
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/variable-1000000": []
+  },
+  "route_diagnostics": {
+    "fixed-10000": {
+      "samples": 120,
+      "main_scene_records": 120,
+      "all_source_records": 120,
+      "compositions": 120,
+      "set_from_go_image_attempts": 0,
+      "logical_upload_bytes": 0,
+      "raster_copy_unavailable": true
+    },
+    "fixed-1000000": {
+      "samples": 120,
+      "main_scene_records": 120,
+      "all_source_records": 120,
+      "compositions": 120,
+      "set_from_go_image_attempts": 0,
+      "logical_upload_bytes": 0,
+      "raster_copy_unavailable": true
+    },
+    "variable-10000": {
+      "samples": 120,
+      "main_scene_records": 120,
+      "all_source_records": 120,
+      "compositions": 120,
+      "set_from_go_image_attempts": 0,
+      "logical_upload_bytes": 0,
+      "raster_copy_unavailable": true
+    },
+    "variable-1000000": {
+      "samples": 120,
+      "main_scene_records": 120,
+      "all_source_records": 120,
+      "compositions": 120,
+      "set_from_go_image_attempts": 0,
+      "logical_upload_bytes": 0,
+      "raster_copy_unavailable": true
+    }
+  },
+  "route_diagnostic_samples": 480,
+  "route_main_records": 480,
+  "route_all_records": 480,
+  "diagnostic_timing_excluded_from_ordinary": true,
+  "host_background_prelaunch_cpu_percent": 464.3,
+  "host_cpu_percent_scope": "One all-process snapshot, including indexers and an earlier desktop.test; not exclusively indexing or continuous during-frame load.",
+  "performance_acceptance_eligible": false,
+  "controlled_cpu_gpu_comparison": false,
+  "assessment": "Share with caveats: verified ordinary observations; performance acceptance and metadata/archive closure remain separate.",
+  "reviewed_document_sha256": {
+    "/private/tmp/vellum-large-data/docs/reports/macos-post-ownership/README.md": "216930310389bfe2dac055a9f32824c217d93230de93d099ac0292782b2eb233",
+    "/private/tmp/vellum-large-data/specs/macos-post-ownership.md": "6bef4b4b44110b79fd5e37f71e303062e2487d36d47fb9fa9088d8abf7f1e916"
+  },
+  "report_performance_table_and_route_claims_verified": true,
+  "report_scope": "Performance/route/host/build statements reviewed; cycle/footprint inventory claims belong to the separate cycle-evidence reviewer.",
+  "provider_record": {
+    "raw_exit_code": 1,
+    "files": 2,
+    "complete": true,
+    "raw_medium_findings": 1,
+    "finding_id": "472834ed908ce9f1",
+    "disposition": "Archive-link closure pending parent seal; not rejected or declared fixed by this performance review.",
+    "provider_sha256": "679c87416a826be7d952bd5f71c91f3676ea9ef3d39501a0bed239d100f5fdd4"
+  },
+  "metadata_handoff_pending": [
+    "/private/tmp/vellum-large-data/docs/reports/macos-post-ownership/records/checkpoint.json",
+    "/private/tmp/vellum-large-data/docs/reports/macos-post-ownership/records/evidence.tar.xz",
+    "/private/tmp/vellum-large-data/docs/reports/macos-post-ownership/records/evidence-index.json"
+  ],
+  "reviewed_artifact_sha256": {
+    "/private/tmp/vellum-macos-post-ownership-live/baseline.json": "6ba34f573e0913b3ea7b6e03f94b694b7ef5398ee1bb5f8f65cfe3937ac2ae81",
+    "/private/tmp/vellum-macos-post-ownership-live/loadedgrid": "416ae873ad71b1115210435e349a5d764ead3f4c6c4b4a15d9d7a2218ccb9ecd",
+    "/private/tmp/vellum-macos-post-ownership-live/protocol-review.json": "2d1cbd7fb80b53280b8e6a9f69af112a0df7cc1fb0cc54f5e5f3521cdb6e93e3",
+    "/private/tmp/vellum-macos-post-ownership-live/run.py": "ae1bf2dce28fe40d67dc3834eabf3a3d42f2ca8e9105b516f8f446c813a810db",
+    "/private/tmp/vellum-macos-post-ownership-live/monitor.py": "267033f5d48b9ff3ffa0805b6ac1e3e68bdd1c9c0c38dd0fb570bc5ed52a5e72",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/window-cycle-smoke/main.go": "6fdbdb2e70f37ce05477dbd2a7e53ef72ea032c24323fb4d5b5cafb8854c822b",
+    "/private/tmp/vellum-large-data/scripts/benchmark-grid.py": "c99da36325b5a978917f8f8168dbabf9be7a1428d42a73f1f13e3307489389e1",
+    "/private/tmp/vellum-macos-post-ownership-live/testing-authorization.json": "0896c3d50e2557a1b1739bc22d7304e17b513bb8350990318dbf68f74fbcd369",
+    "/private/tmp/vellum-large-data/scripts/child_process.py": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc",
+    "/private/tmp/vellum-macos-post-ownership-live/protocol-review-v1.json": "dc3dd1d87883924e88658553867799291c034595d6a4fdc41f121cb6631601ed",
+    "/private/tmp/vellum-macos-post-ownership-live/build-grid-v1.json": "91b8af2c42b98418f902745753e1601931ce3a7bce6b498e72bdbde00dada3c0",
+    "/private/tmp/vellum-macos-post-ownership-live/build-grid-v1.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-post-ownership-live/build-grid-v1.stderr": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default-v1.json": "f0f2c7e94262ab2df1cad1bb8b6be6c9397bf950676e15bea2c02f1d42578f78",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default-v1.stdout": "d80c302520426fda83914ccf92af921becc4fe1534896147842aede6b1b71c93",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default-v1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu-v1.json": "b20fd2ce72730fc1dd32ae5b44f67d5ac78a3ad93335367287c0878e3a61cefc",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu-v1.stdout": "27b006bd9744576ee1b6212f9834e0442fd2b7cc812c9a05916cd5135e57f422",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu-v1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route-v1.json": "5abe78bda908b1003660e4b45857a75c4ed1ff8ada452640099e330a8fac155f",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route-v1.stdout": "7c2be025f30647c84972155b0babc4148828d88c36e53009e4fb0d350ec7236a",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route-v1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/summary.json": "cef3097c50225dcf1ea4b83bfdaf41f88ae28eb645e42dd722b9142c9f79ae67",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/machine.json": "3d159fecadb1db55121a36e4baa92ef317737b450344b56db650a63631fb6463",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-1/result.json": "b5f3c416147260d3bc26515935fe86e835baa0a7277de3441c989bae59c3542c",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-1/native.log": "a5b3539f323d3acfa0063119a5b02d134228e0773bcac9fb86b560c92748dd6d",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-2/result.json": "029d7bd31788ff13a68f507234d2a6001dcb592b8c2c9527d1315a9ea1ce324f",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-2/native.log": "fe05be8f34c3001c44d5d43df5870f37737b1529a49f4708a74058c52f6b125e",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-3/result.json": "fbf3a3a7d83f5a958db780e552b6f73c771fa775e35c49b6d76c730406cb85ee",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-3/native.log": "57db6c4d5bcfa7bf04b67a47bd805aea83013f3b7fe5fce1201a4d330f69a315",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-4/result.json": "4b02180336c2ceb74f4c799c414ef284e95129583f9e0bb8e79cf903fdcc61fa",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-4/native.log": "4fba3f411d05c8f5e52a9d885137e1a6d9fd91d0e6320cb7cd4c661128958a8f",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-5/result.json": "aea65e9c61e2a96a9be2ae9a16217eb2540e5f57d89bf440dbd5dd04aca0a44b",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-10000/run-5/native.log": "7888d6a451aebfe31f85e8c9b744d158523854c2c64c2064daec1b9d0759f0c0",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-1/result.json": "9c4eb9e17dd4c893b3e00fd51e379883d52932b69c227aa443b81458090afd74",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-1/native.log": "5c761b63a9698374019acf84422892a572f521e8170ac0b63ad309e809906c12",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-2/result.json": "8c445451850bff797181e9f927a75e3abd15047c52359b0f210d469b3acd7ca5",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-2/native.log": "424ff1ed1069c2a7f7660bdc0067b779e8e6fb11a0a163afe7e01e112ed4c6a2",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-3/result.json": "a1b5f2ab5a6a2adadacd35a5e95fddfe472fbc7ea70ba50eee6fe44e7c88b6b6",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-3/native.log": "987eacc3396aac87bb1fbd8a3fcb8ca7e654e5313bff0a3a80bc0ae7d4b0898a",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-4/result.json": "147d67f270f6fd9be25609814832fb59dea41ab8a667a289f9b6151418d4467d",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-4/native.log": "bb690127777d6b9749fc063aa84308b256a4120d1d27e228ca87adfc5ca7535b",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-5/result.json": "ab1c440c1789dbfaad1da8beff1f315ec513bea05f17ab8049fdd94a8a0709e3",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/fixed-1000000/run-5/native.log": "d623734b46c1bde2241d1b91ff53f6bcbd189a424a37ccacee02eb029727fbf9",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-1/result.json": "184622644ff0a162632e37ca6dc56049aeeb4f9efcb63789b95b882513faa292",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-1/native.log": "262bda10cfd079088b059e76c6fb3a45c6d00d6770c0d2bd9fdeb60d7207cb4f",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-2/result.json": "50f31bce92571d9d1333ba7b872fcdac2012e68b9d7d52b9b0f5b1d5162d1426",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-2/native.log": "01bc3fa54a214ee0b539d719139c215f9847ef30abfdbe5d90917bf1c2654cf1",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-3/result.json": "1c741adbfdd07c2a81f59a50c159df968fa698dee248da1296975c8ee2cd4339",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-3/native.log": "81cf7fd9192d94fa2f0fb29211063e15781424d7256e167234123d9d1a27696b",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-4/result.json": "beb6f07d51dbcb9d061ec47f9c444b4da2f9e42efb0ee6bdfe6a4158d48c86b2",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-4/native.log": "d880f38706af15198967277fbd0a23c250523fab351a62f5d066e400dd1c9698",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-5/result.json": "f84e8139b4d7673bfda61b60993ae7983077f25f5861c50d82f7e849d849b2bc",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-10000/run-5/native.log": "1c5ad447779d83d7e57e8e81cf3b9f4a3516f6aa5356ebdf4dadca31e90ca270",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-1/result.json": "79c0c5740a7461dc366ce0e6b1ed454052da1c9afcc0be067e2438529e9b55ba",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-1/native.log": "e915eb1ad702d6df6beb055a226ea8f9d6c3f02442de4474eef277d57be9dc11",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-2/result.json": "73804b0b7444e2e81b3a53f52859e8769b8e0fef19e7e4abde1318a037ca5b14",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-2/native.log": "8a87e0511892b1505b578e293d6cec48b7ea6c66db24f3de17706718d1627506",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-3/result.json": "9082882d40630db537cb154bc94a69dfaf23f180d144e93b4e36a26c186ad3db",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-3/native.log": "ce26c424b81b0c0156fc84d68f9a13dd36fc23d06181b48ca731ca63bce6a062",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-4/result.json": "76fa924ccf2637c2926036276dcd86f87e862f9726daed3fa5a49bccb1adb59d",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-4/native.log": "3a00894ca0750bbe4194393ad87046d3a27fe7bdf2892d7860cd94cdf5a146e7",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-5/result.json": "c97465e020d6ce0add0c0f99dbd9aaeb9f894c99d3b2107db16983d8fce54522",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-default/variable-1000000/run-5/native.log": "74f8b4ac1df1f785c21c5ae8983d398821954d95de8b7be328cdddf1047cd175",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/summary.json": "1a1901690c5a2a1bacf14b972bff8a23cf6e709f957c6d8931495c2718ce707e",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/machine.json": "3d159fecadb1db55121a36e4baa92ef317737b450344b56db650a63631fb6463",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-1/result.json": "64c6730c46328fb649ae893c9cd6f8950c433cbde0c9f0e77857b1bc4bd7549f",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-1/native.log": "44abfbcc154b639abb8acdd1ec8f68f9b5d268030890a755a298d6e8632b1e14",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-2/result.json": "0c52707da1c23c9803828c5e041dff0ccd4554e27c8d130c55e7ab5c9136167e",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-2/native.log": "14cf1fd639b3b025f3778f8c2b35d0dd1ec01fae66de015ab6a142c128b59e46",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-3/result.json": "82981949f05780e030e0531dc6602b82ebed45dbbe6dcbaa1d738f5564aae643",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-3/native.log": "b378acdc44bc8aea41c11109bc709860490467ba5d3bd5bad1c5e106869c065e",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-4/result.json": "a86dd830c82638c4a450c5f1f1006a72a243876e585a5c08eea162bf136ff00a",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-4/native.log": "d6675d4b066d38cf8b9400c522bcc97471ecf3090a8872147c0025a38dafb98f",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-5/result.json": "1034aacc0bfe06c3e6358de330c07cc9fc327c20f6b44535ec183eafba775628",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-10000/run-5/native.log": "d762f6dfca9bac856f7aca3bd00332b1b3895dc8608d4c1e52431770420e2070",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-1/result.json": "26d5cc3ffb6a6f342cca4c5a1ed0a4ffcd5a2d925e1417ffecd7b4e073a739f8",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-1/native.log": "5e31b133c2055e6cd73d448f2ae94f0ef658846719edc94a93f85465ac2e2022",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-2/result.json": "39a8ce8d9ff8173d6a3b680069933f4a35f30db16b408e571cd9f77da55167f2",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-2/native.log": "141f1be3e8432ea9183140c65f505e5c43b8c299caf73e3ccd84095a6b0060a4",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-3/result.json": "54ff379c91e6277ed95a7ccbd2a25388a077dac3043d571e97a87eac1c33c65f",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-3/native.log": "9b45a69c8ce44bd5bb2a6197ff08acc4ac1a6add28785327ac641c630aa3240d",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-4/result.json": "891eb37423012dda0379459b98cbde996d0a506a7a5450a50fc4a6ea4c81b836",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-4/native.log": "57adcc651f0876769025708e21f0e3e6167515339117b0f0084fce7d9f35bb6f",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-5/result.json": "2c6e9168048a197bcf627c596357a3eaa2ac9864bb2afe48d2bc6b2941ecdde3",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/fixed-1000000/run-5/native.log": "ac1d6381bb638072fa443b0e60cfd096eab4f340f7b685ba9f07db9a61ce46e8",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-1/result.json": "6bf65326992358dac5d79a2a6279cc0406e5e2b7fb84a3d46476bc442f052211",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-1/native.log": "164d398401dc4553d4b0218cd98c77f5bd9630ebc5d34e2abd897068af95a458",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-2/result.json": "13e87a794c6f1173b66bbcedc583aeb7c994b3ea3045490e39d6053755981252",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-2/native.log": "062d09c92589fa52e108d0608ce500edb7201b36f5776ca6bbe73df729268b43",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-3/result.json": "b8b05800f3125e439e7a9a4c39078b77ee3c7c7ea7ee91dad4c20d645dd227aa",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-3/native.log": "456eb043efee5b4fd1fd5c24d0907289428f73573cbef90ac94b4a3011d81f66",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-4/result.json": "956017424d7ecc8db66cfd1d696613f9923fb8852ab3c69c96256ad771e1e78b",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-4/native.log": "a34f20bc0f1adb13b0bb6a15d19d3d3aba9f113fc1d902195f82b5b8c670121e",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-5/result.json": "094be2a4411dd181b723739bf7e277c16cdc52b00ec506dab8ddd5e7401d30a5",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-10000/run-5/native.log": "ea5577cc36e1daec259704688c72d07f276af59c293f9300dd2a49f26e95dc47",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-1/result.json": "09452bb4a8be031dccc75603ac180caa1d647511e4e98b233dc3e623ab68ed60",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-1/native.log": "07838da995893a9cf7a82bd0da15580b24e3cd3369eec8565560c3a028e09670",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-2/result.json": "88c5d7344812bdaa3d97d5d43b33ef5a94643882d49b7921ade0f05d34f181e0",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-2/native.log": "02b732fe8ca86934ca17d234a3581c689b8e530ffec7bb446689c17b82dc05c0",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-3/result.json": "334d4fe819a7975b9e8a278728a3f116e04fa13680bfbdcce8e350c61bb01d3c",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-3/native.log": "e17a035ca3b0717afb5b34c49437d976a8895fa9957452bb93026d7cc94ac19e",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-4/result.json": "13801e6a6eb82ff5edfed4f9192c81b0c2ac1c9d5e04c2835223117f61bb3b29",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-4/native.log": "bbed4f1aa1648d8eba8585c6d0995e746ff1461095b042a52740f78363ccf2a6",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-5/result.json": "02baf8ff777240afbb695af1c926c3a37ca3566a59c0b88ce68ab27e0ac18078",
+    "/private/tmp/vellum-macos-post-ownership-live/grid-gpu/variable-1000000/run-5/native.log": "ff5c15f4e7f434d31c458f228f52a09f7ec026cc90b67932489fcba4767a339a",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/qualification.json": "7923d59701b72d8c6106879a7c456e1a3c703b03369f2f24156c823af03ec2fb",
+    "/private/tmp/vellum-macos-post-ownership-live/route.py": "b1a6cb5d382434967d2e49481302f173fb54d15486f8b21fad6f41b662bb5e8f",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/fixed-10000/result.json": "1c538cb07f3b711a4e32f0696e3066e6bb34f34cd0ad9282b990aa0a7a21cda1",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/fixed-10000/native.log": "eb194adeef41b841c79f246340b1d7bf36d6d3689f59dfbad2fa8f407b303e4c",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/fixed-1000000/result.json": "6a6151e5096009fe5fc2d8ed15ee1c9dc0e1fd814d06e28458d6e0c0162ad6e1",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/fixed-1000000/native.log": "aa56189f6cbcb726d65e09402463c4f7a8704d3559d6a4a16527dc3ccacf9e7d",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/variable-10000/result.json": "e19d1a5c3ebd85bbed3e6ca88c67ae48a97a94701d0c46751bd9801b67dcfdae",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/variable-10000/native.log": "7a59fa0994deb447eb70f9b0c18ba83faed2e95b6c60a167733b945e8abb0852",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/variable-1000000/result.json": "394f5c7b5d5b888350b460f9d4c86075937414a7dfdef419ce4428fe92d29254",
+    "/private/tmp/vellum-macos-post-ownership-live/gpu-route/variable-1000000/native.log": "841266b11fd13a582f02651eab41eb805554c418682830decfac2bacb949b426",
+    "/private/tmp/vellum-macos-post-ownership-live/host-background-prelive.json": "1ee0363ae91e404f0d97bf6eaf9a0e0416fbb567f9bce6bffb655d4f669ac9d0",
+    "/private/tmp/vellum-macos-post-ownership-live/host-prelive-v2.json": "d0f7bf0d1317dc9315bf0b4cbedffd614f1e5da723fae03ddfc609ff897d5ba3",
+    "/private/tmp/vellum-macos-post-ownership-live/host-after-tests.json": "f54a7ecb0246ab171f648e10e035437ff69ef0ae0d91a897c11d7d0a46086b3a",
+    "/private/tmp/vellum-macos-post-ownership-live/host-before.json": "67aaf6f6d51642fa69b825814695928aa49c54d5c91e16bf930e7048307d6800",
+    "/private/tmp/vellum-macos-post-ownership-live/performance-evidence-reader.py.txt": "902f33f054b10d0ad1b4ace390c1bc342891591163154282792f3b3d17091df1",
+    "/private/tmp/vellum-large-data/docs/reports/macos-post-ownership/README.md": "216930310389bfe2dac055a9f32824c217d93230de93d099ac0292782b2eb233",
+    "/private/tmp/vellum-large-data/specs/macos-post-ownership.md": "6bef4b4b44110b79fd5e37f71e303062e2487d36d47fb9fa9088d8abf7f1e916",
+    "/private/tmp/vellum-macos-post-ownership-live/prism-v1/prism.json": "679c87416a826be7d952bd5f71c91f3676ea9ef3d39501a0bed239d100f5fdd4",
+    "/private/tmp/vellum-macos-post-ownership-live/prism-v1/process.json": "87384d4e8c0b1c580bc595e48226b14ea807709f62fe02ab3265cc7002b2a328",
+    "/private/tmp/vellum-macos-post-ownership-live/prism-v1/inputs.json": "9a64ea243faf87cdd7a08c25c5aef4b063656d811a917da5ba3549641d37478f"
+  },
+  "reader_recipe": "/private/tmp/vellum-macos-post-ownership-live/performance-evidence-reader.py.txt",
+  "reader_recipe_sha256": "902f33f054b10d0ad1b4ace390c1bc342891591163154282792f3b3d17091df1",
+  "limits": [
+    "CPU twenty processes ran first, then GPU twenty; no balanced/interleaved causal mode comparison.",
+    "Background indexing and high load observed; host exclusivity/load control not established.",
+    "Both modes fail unchanged p95 4ms/p99 6ms targets; all outliers retained.",
+    "Binary metadata indicates default optimized/non-race build, not complete compiler/module-cache/SDK closure.",
+    "UI work is same-ticket measured work sum, excluding queue/acquire/presentation diagnostics; not physical display completion.",
+    "Go allocation observations are process-wide with observers; no native/GPU/peak/retained memory attribution.",
+    "Four source-detail processes establish only selected numeric-table deferred-route observations, not GPU completion/physical transfer counts or broader scene eligibility."
+  ],
+  "reviewer_launched_native_ui_tests_builds_or_providers": false,
+  "notes_sha256": "3017ee899817799f94bbfda12049b6a49a227a1e5b335a8b8a0f99d83c8c53ce"
+}

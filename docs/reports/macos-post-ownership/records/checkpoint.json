@@ -1,0 +1,40 @@
+{
+  "result": "REVIEWED_SCOPED_NATIVE_CHECKS_WITH_FAILED_LATENCY_TARGETS",
+  "base_commit": "1d91d848ac973e2b264c24e61c4a3beac34f7f08",
+  "runtime_baseline_sha256": "6ba34f573e0913b3ea7b6e03f94b694b7ef5398ee1bb5f8f65cfe3937ac2ae81",
+  "source_manifest_sha256": "5630947ad990d7ffa74763d5dc6e6343b88441f02c72dfd08f95e136fdac600d",
+  "qualification_sha256": "230865e72df0fc274909bbc651548f4e4db6c6c54c566481cc5aff15df03eb7b",
+  "archive": {
+    "sha256": "47a46ea55597aefdfdcc431932375dd9f1d426489ad5738329bdf4ae7552ff38",
+    "members": 231,
+    "index_sha256": "d25ae15efc8f3a4fda4b9711c0e384f84007de5f674c86b078a55e10dee9a894"
+  },
+  "cycle_review_sha256": "6f7cf8949f764bb67f55727ad70aae309e4af1553a5fd19ac08c5c5a85b5204b",
+  "performance_review_sha256": "3237a04ef57f8b7021e73477f7cfa86262aa215b95dc778ec4f7eca5ebacc7c2",
+  "evidence_review_sha256": "dbecee37c829571e494d4b3ac1c61927679201f776d821f4421217eb567dc167",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 1,
+  "prism_raw_exit_code": 1,
+  "prism_sha256": "679c87416a826be7d952bd5f71c91f3676ea9ef3d39501a0bed239d100f5fdd4",
+  "prism_findings_resolved": true,
+  "provider_disposition": {
+    "id": "472834ed908ce9f1",
+    "status": "RESOLVED_REFERENCED_RECORDS_ADDED",
+    "resolution": "Referenced checkpoint, archive and member index are included in this same local commit."
+  },
+  "native_cycles": 1000,
+  "vmmap_samples": 40,
+  "ordinary_samples": 4800,
+  "ordinary_latency_targets_met": false,
+  "diagnostic_gpu_route_samples": 480,
+  "prepared_files": 6198,
+  "selected_runtime_source_files": 710,
+  "documentation_source": {
+    "docs/reports/macos-post-ownership/README.md": "216930310389bfe2dac055a9f32824c217d93230de93d099ac0292782b2eb233",
+    "specs/macos-post-ownership.md": "6bef4b4b44110b79fd5e37f71e303062e2487d36d47fb9fa9088d8abf7f1e916"
+  },
+  "promotion_producer_sha256": "972989b4287e7236dedc57e368c030dde366b77ca70ed1c780cc7f5fadb2f228",
+  "checkpoint_producer_sha256": "14b17f979808b08c76e27d8f40b0bb3e93cad4d8b5cd8366176996e637b96002"
+}
