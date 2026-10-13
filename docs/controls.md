@@ -26,6 +26,9 @@ renders these elements and publishes their supported accessibility semantics.
 | Tabs | `ui.Tabs` | `Options`, `SelectedID`, page children |
 | Scroll container | `ui.Scroll` | Children |
 | Modal dialog | `ui.Dialog` | `Open`, `Dismiss`, children |
+| Toolbar | `ui.Toolbar` | Children, `Orientation`, scrolling overflow |
+| Status bar | `ui.StatusBar` | `Text` status, children |
+| Labeled form group | `ui.FormGroup` | `Text` heading, children |
 | Horizontal/vertical layout | `ui.Row`, `ui.Column` | Children, `Style` |
 | Custom driver extension | `ui.Extension` | `Custom` |
 
@@ -68,3 +71,30 @@ object fixtures cover controlled behavior and the new Mac role/value mappings;
 human VoiceOver and physical input checks remain part of Mac qualification.
 See the [controls contract](../specs/controls.md) for detailed event, focus,
 editing, accessibility and lifetime behavior.
+
+Toolbars retain their child controls when a narrow viewport requires scrolling.
+They support horizontal/default or vertical Orientation. Tab visits child controls;
+unconsumed arrows wrap through enabled children, and Home/End focus the first/last.
+Text-field editing keeps precedence. A FormGroup gives related controls a visible
+Text heading and semantic group. StatusBar Text displays and exposes the current
+status; use Accessibility.Name for a stable region name. These containers do not
+add a focus stop or own input callback.
+
+```go
+ui.Node{ID: "preferences", Kind: ui.Column, Children: []ui.Node{
+    {ID: "tools", Kind: ui.Toolbar, Accessibility: ui.Accessibility{Name: "Document tools"},
+        Children: []ui.Node{{ID: "save", Kind: ui.Button, Text: "Save", Activate: save}}},
+    {ID: "details", Kind: ui.FormGroup, Text: "Details", Children: []ui.Node{
+        {ID: "name", Kind: ui.TextField, Text: name,
+            Accessibility: ui.Accessibility{Name: "Name"},
+            Change: func(e ui.ChangeEvent) { name = e.Text }},
+    }},
+    {ID: "status", Kind: ui.StatusBar, Text: status,
+        Accessibility: ui.Accessibility{Name: "Application status"}},
+}}
+```
+
+The example uses application-owned name/status and a save callback. Gap, alignment
+and justification style the managed form/status content as well as the outer
+container; padding and dimensions apply to the outer container. Empty headings
+or status messages hide the private caption without removing child controls.

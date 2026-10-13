@@ -405,3 +405,11 @@ navigation and scoped native accessibility. The [controls contract](controls.md)
 and public catalog specify their API. Internal/native-object/software-frame
 checks remain separate from physical Mac input, VoiceOver and the outstanding
 memory/performance/endurance gates.
+
+
+[Toolbar, status-bar and form-group containers](../docs/reports/macos-ui-containers/README.md)
+extend reusable application structure. Native scrolling overflow retains controls,
+managed enabled focus navigation reveals tools, and private headings/status captions
+preserve child identity and editing drafts. Offscreen input/raster and inert Cocoa
+role checks advance implementation; physical Mac input/VoiceOver and the existing
+native-memory/performance/endurance gates remain unqualified.

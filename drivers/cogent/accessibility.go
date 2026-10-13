@@ -325,6 +325,8 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		switch n.Kind {
+		case ui.StatusBar:
+			x.Value = n.Text
 		case ui.DataTree:
 			x.Role = "outline"
 			if r.control != nil && r.control.outline != nil {

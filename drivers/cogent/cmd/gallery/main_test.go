@@ -73,3 +73,17 @@ func TestGallerySharedChoiceGroups(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGalleryChromeContainers(t *testing.T) {
+	g := newGallery()
+	if node(g.view(), "fields").Kind != ui.FormGroup || node(g.view(), "more-controls").Kind != ui.Toolbar || node(g.view(), "state").Kind != ui.StatusBar {
+		t.Fatal("gallery missing reusable containers")
+	}
+	node(g.view(), "segmented-preset").Change(ui.ChangeEvent{SelectedID: "advanced"})
+	if node(g.view(), "state").Text != "Preset advanced · project Vellum" {
+		t.Fatal("status does not reflect accepted state")
+	}
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+}

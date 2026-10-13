@@ -202,7 +202,7 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		// therefore occupy the entire managed container; no extension subtree
 		// is reordered. A same-parent reorder uses the exported native slice
 		// to avoid calling OnAdd and resetting native state.
-		if p.node.Kind == ui.Column || p.node.Kind == ui.Row || p.node.Kind == ui.Scroll || p.node.Kind == ui.Dialog {
+		if p.node.Kind == ui.Column || p.node.Kind == ui.Row || p.node.Kind == ui.Scroll || p.node.Kind == ui.Dialog || p.node.Kind == ui.Toolbar || p.node.Kind == ui.StatusBar || p.node.Kind == ui.FormGroup {
 			children := make([]tree.Node, len(p.children))
 			for i, child := range p.children {
 				children[i] = child.r.widget
@@ -223,6 +223,7 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	if err := syncRecord(next.r, n); err != nil {
 		return next.r, err
 	}
+	bindToolbarNavigation(next.r)
 	if changed {
 		parent.AsWidget().Update()
 	}

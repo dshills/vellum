@@ -3,7 +3,7 @@
 The public `ui.Node` vocabulary now includes checkbox, switch, toggle button,
 progress bar, separator, radio group, segmented control, selector, slider, numeric
 field, single-line text field, multiline document editor, managed data grid,
-tabs, scroll container and modal dialog. Cogent
+tabs, scroll container, toolbar, status bar, labeled form group and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
 of native dependencies.
 
@@ -193,7 +193,7 @@ Programmatic synchronization emits no Change.
 
 `ProgressBar` displays a finite accepted `Number` fraction in 0..1 without a
 keyboard step or input callbacks. `Separator` is a decorative line. Both accept
-`Orientation` Horizontal/Vertical; empty defaults to horizontal. Kinds outside these display and choice controls refuse Orientation. Explicit managed size/grow styles override native final
+`Orientation` Horizontal/Vertical; empty defaults to horizontal. Kinds outside these display, choice and toolbar controls refuse Orientation. Explicit managed size/grow styles override native final
 defaults; removing those styles restores the native dimensions and growth. They are leaves and do not join managed focus order.
 Progress exposes its fraction and 0/1 bounds with the Mac progress-indicator role;
 Separator is omitted from the accessible hierarchy. Switch and ToggleButton
@@ -202,8 +202,9 @@ physical keyboard/pointer acceptance remain separate from offscreen/native-objec
 fixtures. No indeterminate animation is implied by these display elements.
 
 The gallery demonstrates all four additions using ordinary descriptors and
-accepted application state. Next vocabulary expansion should prioritize reusable toolbars/status bars, form groups and adjustable
-splitters, each with keyboard, disabled, lifetime and accessibility contracts.
+accepted application state. Further vocabulary work prioritizes adjustable splitters and richer reusable
+command/button presentation, with keyboard, disabled, lifetime and accessibility
+contracts.
 
 ## Radio and segmented choices
 
@@ -245,3 +246,48 @@ identity and refuses replacements. Manual captures use full semantic identities
 so group-local option IDs cannot shadow unrelated managed controls. Tests of native
 objects and completed software frames remain separate from physical OS input,
 human VoiceOver, graphics-memory and sustained-performance qualification.
+
+## Toolbars, status bars and form groups
+
+`Toolbar`, `StatusBar` and `FormGroup` are retained containers, with ordinary
+managed Children and disabled ancestry. They add no managed focus stop or own
+Activate/Change callback; callbacks belong on interactive children. Child IDs,
+editing drafts, current callbacks and semantic identity survive label/status
+updates and reordering. Moving children out of a removed container happens
+before its private host is destroyed.
+
+Toolbar defaults horizontal; Orientation Vertical selects a vertical toolbar.
+Only its main axis scrolls when constrained. The cross axis retains natural
+control size subject to explicit style limits. Overflow uses the same retained
+controls in a native scrolling region, preserving private editing state. Keyboard
+focus reveals an offscreen tool. Tab follows each child's ordinary managed stop;
+unconsumed main-axis arrows wrap through enabled stops, and Home/End focus the
+first/last enabled stop. Child text and choice editing consume their keys before
+toolbar navigation. Modified chords remain available to enclosing shortcuts.
+Toolbar publishes the Mac toolbar role and ordinary child semantics. Nested
+managed layouts follow the same enabled traversal; a nested Toolbar has its own
+nearest scope. Moving a layout out removes the old navigation scope. Modal
+content is a separate input scope and extensions own their private input trees.
+When all stops or the toolbar/ancestor are disabled, recognized traversal keys
+are consumed without changing focus. Ordinary trees without a toolbar/old scope
+skip native binding traversal.
+
+FormGroup lays out a visible escaped Text heading over a retained column of
+managed children. Its semantic group uses Accessibility.Name when supplied and
+Text otherwise. StatusBar lays out an escaped Text status message beside a row of
+managed children, exposing that literal Text as its readable semantic Value.
+Use Accessibility.Name for a stable status-region name. These private captions
+are omitted as duplicate semantic nodes and do not enter focus traversal. An
+empty Text hides the caption and a later nonempty Text restores it. StatusBar
+and FormGroup publish Mac group roles, with the children's own supported actions.
+These kinds do not imply live-region announcements or individual field-label
+associations; give fields their own Accessibility.Name.
+
+Managed styles override outer defaults. Gap, Align and Justify also apply to the
+managed content host in status/form containers; removing these properties restores
+native defaults. Typography/colors inherit through the private structure. No
+native child plan can delete/rebuild managed content during an overflow/layout
+pass. The gallery demonstrates all three containers. Actual Manual tests cover
+horizontal/vertical overflow, keyboard reveal, disabled navigation, text-key
+precedence and completed status pixels. Inert Cocoa objects check roles. Physical
+Mac input, human VoiceOver and native memory/performance remain separate gates.

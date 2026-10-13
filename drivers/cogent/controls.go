@@ -43,6 +43,7 @@ type controlState struct {
 	a                 *app.Application
 	window            string
 	tabs              *tabState
+	chrome            *chromeState
 	choice            *choiceState
 	dialog            *dialogState
 	wake              func(events.Event)
@@ -119,6 +120,8 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		}
 	}()
 	switch r.node.Kind {
+	case ui.Toolbar, ui.StatusBar, ui.FormGroup:
+		widget = mountChrome(parent, r)
 	case ui.Checkbox:
 		widget = core.NewSwitch(parent).SetType(core.SwitchCheckbox)
 	case ui.RadioGroup, ui.SegmentedControl:
@@ -385,6 +388,9 @@ func syncControl(r *record, previous ui.Node) error {
 		}
 		return err
 	}
+	if r.control.chrome != nil {
+		syncChrome(r, previous)
+	}
 	switch w := r.widget.(type) {
 	case *core.Switch:
 		// Resetting Checked alone leaves a segmented toggle's checked styling
@@ -532,6 +538,9 @@ func prepareControl(r *record, n ui.Node) error {
 }
 func childHost(r *record, id string) tree.Node {
 	if r.control != nil {
+		if r.control.chrome != nil {
+			return r.control.chrome.host
+		}
 		if r.control.tabs != nil {
 			return r.control.tabs.pages[id]
 		}

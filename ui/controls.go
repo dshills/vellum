@@ -6,6 +6,9 @@ import (
 )
 
 const (
+	Toolbar          Kind = "toolbar"
+	StatusBar        Kind = "status-bar"
+	FormGroup        Kind = "form-group"
 	Checkbox         Kind = "checkbox"
 	Switch           Kind = "switch"
 	ToggleButton     Kind = "toggle-button"
@@ -67,7 +70,7 @@ type FocusRequest struct {
 
 func IsContainer(kind Kind) bool {
 	switch kind {
-	case Row, Column, Tabs, Scroll, Dialog:
+	case Row, Column, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup:
 		return true
 	}
 	return false
@@ -103,8 +106,11 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
-	if n.Orientation != "" && n.Kind != ProgressBar && n.Kind != Separator && n.Kind != RadioGroup && n.Kind != SegmentedControl {
-		return fmt.Errorf("ui: Orientation belongs only on progress, separator and choice controls")
+	if (n.Kind == Toolbar || n.Kind == StatusBar || n.Kind == FormGroup) && (n.Change != nil || n.Activate != nil) {
+		return fmt.Errorf("ui: container callbacks belong on their interactive children")
+	}
+	if n.Orientation != "" && n.Kind != ProgressBar && n.Kind != Separator && n.Kind != RadioGroup && n.Kind != SegmentedControl && n.Kind != Toolbar {
+		return fmt.Errorf("ui: Orientation belongs only on progress, separator, choice and toolbar controls")
 	}
 	if n.Orientation != "" && n.Orientation != Horizontal && n.Orientation != Vertical {
 		return fmt.Errorf("ui: invalid display orientation %q", n.Orientation)
