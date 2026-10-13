@@ -1,0 +1,55 @@
+{
+  "result": "PASS_OWNED_FRAME_FAILURE_CLEANUP_OFFSCREEN",
+  "base_commit": "d710f967ca741ba618f84d4e6261a5e9f35291fe",
+  "qualification_sha256": "e443406cd3984a673c49f529c399e9fca1ee61642377d6bcb461e59e34d048f7",
+  "source": {
+    "drivers/cogent/native/dependencies.json": "9b7c5f2486876e57cd68c2b22385bd2a90e934cafff96d58b6dadde0c53b2a58",
+    "drivers/cogent/native/patches/framecleanup/0048-owned-frame-failure-cleanup.patch": "623cc2d3ad55cea0b2d5b5f542e3b4d7356b5541cfca96bb760b3d9ff6cc6b37",
+    "drivers/cogent/native/patches/framecleanup/README.md": "74188b408a69da8c770e11f459cc48d69090fd224cdf68abb897ed0e87e68ca0",
+    "drivers/cogent/native/patches/framecleanup/original-hashes.json": "ed524fd29c598b2af52bca44feb8b9f7036c4214c19fd50c4ca797431bfd9a90",
+    "drivers/cogent/native/patches/framecleanup/output-hashes.json": "b125f2c0edbd549bfbf9866db0c1d6a8949b3eb2a4bfec50c53125e90e0df09d",
+    "drivers/cogent/prepare_test.py": "f4c1d7d597c57dfe40c54bbdb08844f8d6b969a457f82ff8e8312c3d61aa46e2",
+    "specs/gpu-frame-lifecycle.md": "0c34c3b632b602679d66d893e15a080534dc0302430a166a8e74be90c32b912a",
+    "specs/macos-completion.md": "a7daf7da0f2003ad145519a8abd1e911701525b7667009c0b132324cfbae23bc"
+  },
+  "stage_outputs": {
+    "gpu/frame_lifecycle.go": "eafa7661cbe2b883a82b8cb0f7149943111dbf21fc7af183a65e6f8f04d5356d",
+    "gpu/frame_lifecycle_test.go": "3de93dc1a0495d6dda1593f466b6a5987139e2a80349d61bde34dfb1eef58689",
+    "gpu/gsystem.go": "1ff66ce971ee9fbd12c2e7b465daeada5fd95598f4a59662cd32eb77ab16c224",
+    "gpu/gsystem_timing.go": "a798fcefb11c62e4e9fdcb7aa1b6135e54d8f9a053dbb559f928eda3dff3a89d",
+    "gpu/render.go": "0e378de2a7c7b98fdea0a45136152a95f692951564a985ae68aef3001219d625",
+    "gpu/renderer.go": "b6dfd3a6bf816d9cba48ead67ab76be8ce8d868212e0f7930ae317797689f6bd",
+    "gpu/surface.go": "69e55d6eac191ef89fbd742d025047c0aa2109ee0d3a4660826735546d2bd6d7",
+    "gpu/surface_timing.go": "ea473d99473c184972e4f6d0e20478a59749669a9153f8cd61e2fd85ee5b6215",
+    "gpu/gpudraw/system.go": "5f8497b3a3f46678c6a12d6eb7c874a280ac5b592cb0d4509d4b7a496799b848"
+  },
+  "source_review_sha256": "06bc6749691ff0aa3a546a3ccd78bacc3af33d87afa93d2c5d0d629dc2e0c36b",
+  "evidence_review_sha256": "33ecf17301340c978291e3b999145776ec7ac453e400501df7b27a88a4996b12",
+  "post_test_document_sha256": "00b4a9b0e41b83fbc82f022c4311e86d05304e74b76086ef74132c6e6b721222",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_reviewed_files": 6,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_raw_exit_code": 0,
+  "prism_static_leaves_internally_verified": {
+    "drivers/cogent/native/patches/framecleanup/original-hashes.json": "ed524fd29c598b2af52bca44feb8b9f7036c4214c19fd50c4ca797431bfd9a90",
+    "drivers/cogent/native/patches/framecleanup/output-hashes.json": "b125f2c0edbd549bfbf9866db0c1d6a8949b3eb2a4bfec50c53125e90e0df09d"
+  },
+  "archive": {
+    "sha256": "06fae0c8c7302976a8999548ae0dba7448d1e7786201526ad55de1261c2c6d50",
+    "index_sha256": "f2b57e62159df18f00b901c407ba26d53ba2f533bc46e090b7c70269886436fc",
+    "members": 82
+  },
+  "prepared_files": 6183,
+  "python_preparation_tests": 11,
+  "native_compiled_sha256": "27cff5651398a94037eb17c986b5cf93ec3b940762071bc22ec68950342e3031",
+  "final_owned_source_native_window_executed": false,
+  "physical_gpu_fault_injection": false,
+  "native_memory_qualified": false,
+  "gpu_memory_qualified": false,
+  "full_p11_qualified": false,
+  "macos_completion": false,
+  "next_live_tests_deferred": true
+}

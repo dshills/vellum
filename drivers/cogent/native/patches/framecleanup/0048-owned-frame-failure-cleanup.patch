@@ -1,0 +1,789 @@
+--- /dev/null
++++ b/gpu/frame_lifecycle.go
+@@ -0,0 +1,115 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import "fmt"
++
++import "github.com/oliverbestmann/webgpu/wgpu"
++
++type releasedReference interface{ Release() }
++type ownedReference interface {
++	comparable
++	Release()
++}
++
++// surfaceFrame is used only by the serialized acquisition owner. Interface
++// references are always admitted nonnil; concrete handles never leave GPU code.
++type surfaceFrame struct{ view, texture releasedReference }
++
++func (f *surfaceFrame) held() bool { return f.view != nil || f.texture != nil }
++
++func (f *surfaceFrame) retire(unlock func()) {
++	if !f.held() {
++		return
++	}
++	view, texture := f.view, f.texture
++	f.view, f.texture = nil, nil
++	defer unlock()
++	if texture != nil {
++		defer texture.Release()
++	}
++	if view != nil {
++		view.Release()
++	}
++}
++
++// prepareOwnedPass is shared by ordinary and measured rendering. Successful
++// acquisition stays owned only after both encoder and render pass exist.
++func prepareOwnedPass[C ownedReference, P ownedReference](
++	acquire func() (*wgpu.TextureView, error), abort func(),
++	encoder func() (C, error), pass func(C, *wgpu.TextureView) (P, error),
++) (c C, p P, err error) {
++	view, err := acquire()
++	if view == nil {
++		return c, p, err
++	}
++	succeeded := false
++	defer func() {
++		if succeeded {
++			return
++		}
++		defer abort()
++		var zeroC C
++		if c != zeroC {
++			defer c.Release()
++		}
++		var zeroP P
++		if p != zeroP {
++			p.Release()
++		}
++		c, p = zeroC, zeroP
++	}()
++	if err != nil {
++		return c, p, err
++	}
++	c, err = encoder()
++	var zeroC C
++	if err != nil {
++		return c, p, err
++	}
++	if c == zeroC {
++		return c, p, fmt.Errorf("gpu: encoder factory returned nil without error")
++	}
++	p, err = pass(c, view)
++	var zeroP P
++	if err != nil {
++		return c, p, err
++	}
++	if p == zeroP {
++		return c, p, fmt.Errorf("gpu: pass factory returned nil without error")
++	}
++	succeeded = true
++	return c, p, nil
++}
++
++// submitOwnedPass releases the pass before Finish, and buffer before encoder on
++// every return. Only a valid finished buffer reaches the queue.
++func submitOwnedPass[C ownedReference, P ownedReference, B ownedReference](
++	c C, p P, finish func(C) (B, error), submit func(B),
++) error {
++	var zeroC C
++	if c != zeroC {
++		defer c.Release()
++	}
++	var zeroP P
++	if p != zeroP {
++		p.Release()
++	}
++	if c == zeroC || p == zeroP {
++		return fmt.Errorf("gpu: submission requires an encoder and pass")
++	}
++	buffer, err := finish(c)
++	var zeroB B
++	if buffer != zeroB {
++		defer buffer.Release()
++	}
++	if err != nil {
++		return err
++	}
++	if buffer == zeroB {
++		return fmt.Errorf("gpu: finish returned nil without error")
++	}
++	submit(buffer)
++	return nil
++}
+--- /dev/null
++++ b/gpu/frame_lifecycle_test.go
+@@ -0,0 +1,274 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpu
++
++import (
++	"errors"
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"reflect"
++	"testing"
++)
++
++type countedFrameRef struct {
++	name     string
++	events   *[]string
++	releases int
++	panics   bool
++}
++
++type observedFrameRenderer struct {
++	Renderer
++	aborts, presents int
++}
++
++func (r *observedFrameRenderer) AbortCurrentTexture()   { r.aborts++ }
++func (r *observedFrameRenderer) Present()               { r.presents++ }
++func (r *observedFrameRenderer) PresentMeasured() int64 { r.presents++; return 7 }
++
++func TestVellumOrdinaryAndMeasuredEndRefuseUnsubmittedFrame(t *testing.T) {
++	for _, measured := range []bool{false, true} {
++		renderer := &observedFrameRenderer{}
++		sy := &GraphicsSystem{Renderer: renderer}
++		var err error
++		if measured {
++			var elapsed int64
++			elapsed, err = sy.EndRenderPassMeasured(nil)
++			if elapsed != 0 {
++				t.Fatal("failed submission qualified presentation timing")
++			}
++		} else {
++			err = sy.EndRenderPassChecked(nil)
++		}
++		if err == nil || renderer.aborts != 1 || renderer.presents != 0 || sy.CommandEncoder != nil {
++			t.Fatal("failed End did not abort without presenting", err, renderer)
++		}
++	}
++}
++
++func (r *countedFrameRef) Release() {
++	r.releases++
++	*r.events = append(*r.events, r.name)
++	if r.panics {
++		panic(r.name)
++	}
++}
++
++func TestVellumSurfaceFrameAbortAndReleaseUnlockOnce(t *testing.T) {
++	for _, teardown := range []bool{false, true} {
++		var events []string
++		view := &countedFrameRef{name: "view", events: &events}
++		texture := &countedFrameRef{name: "texture", events: &events}
++		sf := &Surface{}
++		sf.Lock()
++		sf.frame = surfaceFrame{view: view, texture: texture}
++		if teardown {
++			sf.Release()
++		} else {
++			sf.AbortCurrentTexture()
++		}
++		sf.AbortCurrentTexture()
++		if !sf.TryLock() {
++			t.Fatal("abort/teardown retained surface lock")
++		}
++		sf.Unlock()
++		if sf.frame.held() || view.releases != 1 || texture.releases != 1 || !reflect.DeepEqual(events, []string{"view", "texture"}) {
++			t.Fatal("frame retirement differs", events)
++		}
++		// An idle presentation must not call the nil native surface or unlock again.
++		sf.Present()
++		if elapsed := sf.PresentMeasured(); elapsed != 0 {
++			t.Fatal("idle present measured backend work")
++		}
++	}
++}
++
++func TestVellumSurfaceRetirementClearsAndUnlocksOnGoPanic(t *testing.T) {
++	var events []string
++	view := &countedFrameRef{name: "view", events: &events, panics: true}
++	texture := &countedFrameRef{name: "texture", events: &events}
++	sf := &Surface{}
++	sf.Lock()
++	sf.frame = surfaceFrame{view: view, texture: texture}
++	func() {
++		defer func() {
++			if recover() == nil {
++				t.Error("injected release panic absent")
++			}
++		}()
++		sf.AbortCurrentTexture()
++	}()
++	if !sf.TryLock() {
++		t.Fatal("panic retained frame lock")
++	}
++	sf.Unlock()
++	if sf.frame.held() || texture.releases != 1 {
++		t.Fatal("panic retained owner texture")
++	}
++	sf.AbortCurrentTexture()
++}
++
++func TestVellumPrepareOwnedFrameFailuresAndSuccess(t *testing.T) {
++	failure := errors.New("controlled native factory failure")
++	for _, stage := range []string{"yield", "acquire", "encoder", "nil_encoder", "partial_encoder", "pass", "nil_pass", "partial_pass", "success"} {
++		t.Run(stage, func(t *testing.T) {
++			var events []string
++			c := &countedFrameRef{name: "encoder.release", events: &events}
++			p := &countedFrameRef{name: "pass.release", events: &events}
++			var frame surfaceFrame
++			view := &countedFrameRef{name: "view.release", events: &events}
++			texture := &countedFrameRef{name: "texture.release", events: &events}
++			unlocks := 0
++			acquire := func() (*wgpu.TextureView, error) {
++				events = append(events, "acquire")
++				if stage == "yield" {
++					return nil, nil
++				}
++				frame = surfaceFrame{view: view, texture: texture}
++				if stage == "acquire" {
++					return &wgpu.TextureView{}, failure
++				}
++				return &wgpu.TextureView{}, nil
++			}
++			abort := func() { events = append(events, "abort"); frame.retire(func() { unlocks++ }) }
++			encoder := func() (*countedFrameRef, error) {
++				events = append(events, "encoder.create")
++				switch stage {
++				case "encoder":
++					return nil, failure
++				case "nil_encoder":
++					return nil, nil
++				case "partial_encoder":
++					return c, failure
++				}
++				return c, nil
++			}
++			pass := func(*countedFrameRef, *wgpu.TextureView) (*countedFrameRef, error) {
++				events = append(events, "pass.create")
++				switch stage {
++				case "pass":
++					return nil, failure
++				case "nil_pass":
++					return nil, nil
++				case "partial_pass":
++					return p, failure
++				}
++				return p, nil
++			}
++			gotC, gotP, err := prepareOwnedPass(acquire, abort, encoder, pass)
++			if stage == "yield" {
++				if err != nil || gotC != nil || gotP != nil || len(events) != 1 {
++					t.Fatal("yield constructed frame", events, err)
++				}
++				return
++			}
++			if stage == "success" {
++				if err != nil || gotC != c || gotP != p || !frame.held() || unlocks != 0 {
++					t.Fatal("successful preparation retired frame", events, err)
++				}
++				gotP.Release()
++				gotC.Release()
++				abort()
++				return
++			}
++			if err == nil || gotC != nil || gotP != nil || frame.held() || unlocks != 1 || view.releases != 1 || texture.releases != 1 {
++				t.Fatal("failure retained frame or admitted output", events, err)
++			}
++			if stage != "nil_encoder" && stage != "nil_pass" && !errors.Is(err, failure) {
++				t.Fatal("factory error identity lost", err)
++			}
++			wantC := 0
++			if stage == "partial_encoder" || stage == "pass" || stage == "nil_pass" || stage == "partial_pass" {
++				wantC = 1
++			}
++			wantP := 0
++			if stage == "partial_pass" {
++				wantP = 1
++			}
++			if c.releases != wantC || p.releases != wantP {
++				t.Fatal("partial handles differ", events)
++			}
++			if len(events) < 3 || events[len(events)-3] != "abort" || events[len(events)-2] != "view.release" || events[len(events)-1] != "texture.release" {
++				t.Fatal("abort did not follow encoder/pass retirement", events)
++			}
++		})
++	}
++}
++
++func TestVellumSubmitOwnedPassFailureOrdering(t *testing.T) {
++	failure := errors.New("controlled Finish failure")
++	for _, stage := range []string{"finish", "nil_buffer", "partial_buffer", "success", "queue_panic"} {
++		t.Run(stage, func(t *testing.T) {
++			var events []string
++			c := &countedFrameRef{name: "encoder.release", events: &events}
++			p := &countedFrameRef{name: "pass.release", events: &events}
++			b := &countedFrameRef{name: "buffer.release", events: &events}
++			finish := func(*countedFrameRef) (*countedFrameRef, error) {
++				events = append(events, "finish")
++				switch stage {
++				case "finish":
++					return nil, failure
++				case "nil_buffer":
++					return nil, nil
++				case "partial_buffer":
++					return b, failure
++				}
++				return b, nil
++			}
++			submit := func(*countedFrameRef) {
++				events = append(events, "submit")
++				if stage == "queue_panic" {
++					panic("controlled queue panic")
++				}
++			}
++			var err error
++			func() {
++				defer func() {
++					got := recover()
++					if (stage == "queue_panic") != (got != nil) {
++						t.Errorf("panic=%v", got)
++					}
++				}()
++				err = submitOwnedPass(c, p, finish, submit)
++			}()
++			want := []string{"pass.release", "finish"}
++			if stage == "success" || stage == "queue_panic" {
++				want = append(want, "submit")
++			}
++			if stage == "partial_buffer" || stage == "success" || stage == "queue_panic" {
++				want = append(want, "buffer.release")
++			}
++			want = append(want, "encoder.release")
++			if !reflect.DeepEqual(events, want) || c.releases != 1 || p.releases != 1 {
++				t.Fatal("submission ownership order", events, want)
++			}
++			if stage == "success" || stage == "queue_panic" {
++				return
++			}
++			if err == nil {
++				t.Fatal("failed finish qualified submission")
++			}
++			if stage != "nil_buffer" && !errors.Is(err, failure) {
++				t.Fatal("finish error identity lost")
++			}
++		})
++	}
++}
++
++func TestVellumAcquireSurfaceFrameRetiresPartialError(t *testing.T) {
++	failure := errors.New("partial acquisition")
++	for _, status := range []wgpu.SurfaceGetCurrentTextureStatus{wgpu.SurfaceGetCurrentTextureStatusSuccessOptimal, wgpu.SurfaceGetCurrentTextureStatusOutdated} {
++		texture := &wgpu.Texture{}
++		releases, configs := 0, 0
++		got, err := acquireSurfaceFrameOwned(func() (wgpu.SurfaceTexture, error) {
++			return wgpu.SurfaceTexture{Texture: texture, Status: status}, failure
++		}, func() { configs++ }, func(value *wgpu.Texture) {
++			if value != texture {
++				t.Fatal("wrong acquired owner")
++			}
++			releases++
++		})
++		if !errors.Is(err, failure) || got.Texture != nil || releases != 1 || configs != 0 {
++			t.Fatal("partial acquisition not retired", got, err, releases, configs)
++		}
++	}
++}
+--- a/gpu/gsystem.go
++++ b/gpu/gsystem.go
+@@ -210,18 +210,14 @@
+ 	return cmd, nil
+ }
+ 
+-func (sy *GraphicsSystem) beginRenderPass() (*Render, *wgpu.TextureView, error) {
++func (sy *GraphicsSystem) beginOwnedRenderPass(clear bool, acquire func() (*wgpu.TextureView, error)) (*wgpu.RenderPassEncoder, error) {
+ 	rd := sy.Renderer
+-	view, err := rd.GetCurrentTexture()
+-	if view == nil || errors.Log(err) != nil {
+-		return nil, nil, err
+-	}
+-	cmd, err := sy.NewCommandEncoder()
+-	if errors.Log(err) != nil {
+-		return nil, nil, err
+-	}
++	cmd, pass, err := prepareOwnedPass(acquire, rd.AbortCurrentTexture, sy.NewCommandEncoder,
++		func(cmd *wgpu.CommandEncoder, view *wgpu.TextureView) (*wgpu.RenderPassEncoder, error) {
++			return rd.Render().tryBeginRenderPass(cmd, view, clear)
++		})
+ 	sy.CommandEncoder = cmd
+-	return rd.Render(), view, nil
++	return pass, err
+ }
+ 
+ // BeginRenderPass adds commands to the given command buffer
+@@ -233,11 +229,7 @@
+ // The RenderPassEncoder can be nil AND the err also nil, which
+ // indicates the need to reconfigure the surface and try again.
+ func (sy *GraphicsSystem) BeginRenderPass() (*wgpu.RenderPassEncoder, error) {
+-	rd, view, err := sy.beginRenderPass()
+-	if view == nil || errors.Log(err) != nil {
+-		return nil, err
+-	}
+-	return rd.BeginRenderPass(sy.CommandEncoder, view), nil
++	return sy.beginOwnedRenderPass(true, sy.Renderer.GetCurrentTexture)
+ }
+ 
+ // BeginRenderPassNoClear adds commands to the given command buffer
+@@ -250,11 +242,7 @@
+ // The RenderPassEncoder can be nil AND the err also nil, which
+ // indicates the need to reconfigure the surface and try again.
+ func (sy *GraphicsSystem) BeginRenderPassNoClear() (*wgpu.RenderPassEncoder, error) {
+-	rd, view, err := sy.beginRenderPass()
+-	if view == nil || errors.Log(err) != nil {
+-		return nil, err
+-	}
+-	return rd.BeginRenderPassNoClear(sy.CommandEncoder, view), nil
++	return sy.beginOwnedRenderPass(false, sy.Renderer.GetCurrentTexture)
+ }
+ 
+ // SubmitRender submits the current render commands to the device
+@@ -265,17 +253,21 @@
+ func (sy *GraphicsSystem) SubmitRender(rp *wgpu.RenderPassEncoder) error {
+ 	cmd := sy.CommandEncoder
+ 	sy.CommandEncoder = nil
+-	rp.Release() // must happen before Finish
+-	cmdBuffer, err := cmd.TryFinish(nil)
+-	if errors.Log(err) != nil {
++	succeeded := false
++	defer func() {
++		if !succeeded {
++			sy.Renderer.AbortCurrentTexture()
++		}
++	}()
++	err := submitOwnedPass(cmd, rp, func(cmd *wgpu.CommandEncoder) (*wgpu.CommandBuffer, error) { return cmd.TryFinish(nil) },
++		func(buffer *wgpu.CommandBuffer) { sy.device.Queue.Submit(buffer) })
++	if err != nil {
+ 		return err
+ 	}
+-	sy.device.Queue.Submit(cmdBuffer)
+-	cmdBuffer.Release()
+-	cmd.Release()
+ 	for _, pl := range sy.GraphicsPipelines {
+ 		pl.releaseOldBindGroups()
+ 	}
++	succeeded = true
+ 	return nil
+ }
+ 
+@@ -283,8 +275,17 @@
+ // by calling [GraphicsSystem.SubmitRender] to submit the rendering commands to the
+ // device, and calling Present() on the Renderer to show results.
+ func (sy *GraphicsSystem) EndRenderPass(rp *wgpu.RenderPassEncoder) {
+-	sy.SubmitRender(rp)
++	errors.Log(sy.EndRenderPassChecked(rp))
++}
++
++// EndRenderPassChecked returns synchronous encoding/submission failure. Failed
++// frames are aborted without presentation; successful frames follow normal order.
++func (sy *GraphicsSystem) EndRenderPassChecked(rp *wgpu.RenderPassEncoder) error {
++	if err := sy.SubmitRender(rp); err != nil {
++		return err
++	}
+ 	sy.Renderer.Present()
++	return nil
+ }
+ 
+ // EndRenderPassGrabImage ends the render pass started by [GraphicsSystem.BeginRenderPass],
+@@ -296,7 +297,10 @@
+ 		return nil
+ 	}
+ 	rt.ReadFrame(sy.CommandEncoder)
+-	sy.EndRenderPass(rp)
++	if err := sy.EndRenderPassChecked(rp); err != nil {
++		errors.Log(err)
++		return nil
++	}
+ 	img := errors.Log1(rt.CurrentFrame().ReadGoImage())
+ 	return img
+ }
+--- a/gpu/gsystem_timing.go
++++ b/gpu/gsystem_timing.go
+@@ -2,7 +2,6 @@
+ 
+ import (
+ 	"errors"
+-	"time"
+ 
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ )
+@@ -11,36 +10,31 @@
+ // separated from encoder creation. Only the renderer's acquisition wait and
+ // acquisition lock wait are excluded; reconfiguration and view work are charged.
+ func (sy *GraphicsSystem) BeginRenderPassMeasured() (*wgpu.RenderPassEncoder, int64, error) {
+-	rd := sy.Renderer
+-	measured, ok := rd.(interface {
++	measured, ok := sy.Renderer.(interface {
+ 		GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error)
+-		AbortCurrentTexture()
+ 		PresentMeasured() int64
+ 	})
+ 	if !ok {
+ 		return nil, 0, errors.New("renderer does not support measured acquisition")
+ 	}
+-	view, acquire, err := measured.GetCurrentTextureMeasured()
+-	if view == nil || err != nil {
+-		return nil, acquire, err
+-	}
+-	cmd, err := sy.NewCommandEncoder()
+-	if err != nil {
+-		measured.AbortCurrentTexture()
+-		return nil, acquire, err
+-	}
+-	sy.CommandEncoder = cmd
+-	return rd.Render().BeginRenderPass(cmd, view), acquire, nil
++	var acquire int64
++	pass, err := sy.beginOwnedRenderPass(true, func() (*wgpu.TextureView, error) {
++		view, elapsed, err := measured.GetCurrentTextureMeasured()
++		acquire = elapsed
++		return view, err
++	})
++	return pass, acquire, err
+ }
+ 
+ // EndRenderPassMeasured separates the renderer present call from encoding and
+ // queue submission. It reports submission failure rather than qualifying a frame.
+ func (sy *GraphicsSystem) EndRenderPassMeasured(rp *wgpu.RenderPassEncoder) (int64, error) {
+-	err := sy.SubmitRender(rp)
++	if err := sy.SubmitRender(rp); err != nil {
++		return 0, err
++	}
+ 	if measured, ok := sy.Renderer.(interface{ PresentMeasured() int64 }); ok {
+-		return measured.PresentMeasured(), err
++		return measured.PresentMeasured(), nil
+ 	}
+-	start := time.Now()
+-	sy.Renderer.Present()
+-	return time.Since(start).Nanoseconds(), errors.New("renderer lost measured presentation support")
++	sy.Renderer.AbortCurrentTexture()
++	return 0, errors.New("renderer lost measured presentation support")
+ }
+--- a/gpu/render.go
++++ b/gpu/render.go
+@@ -10,6 +10,7 @@
+ 	"image/color"
+ 	"log"
+ 
++	cerrors "cogentcore.org/core/base/errors"
+ 	"cogentcore.org/core/colors"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ )
+@@ -177,6 +178,10 @@
+ }
+ 
+ func (rd *Render) beginRenderPass(cmd *wgpu.CommandEncoder, view *wgpu.TextureView, clear bool) *wgpu.RenderPassEncoder {
++	return cerrors.Log1(rd.tryBeginRenderPass(cmd, view, clear))
++}
++
++func (rd *Render) tryBeginRenderPass(cmd *wgpu.CommandEncoder, view *wgpu.TextureView, clear bool) (*wgpu.RenderPassEncoder, error) {
+ 	// w, h := fr.Texture.Format.Size32()
+ 	// clearValues := rp.ClearValues
+ 	// vrp := rp.VkClearPass
+@@ -192,7 +197,7 @@
+ 	} else {
+ 		rpd = rd.LoadRenderPass(view)
+ 	}
+-	return cmd.BeginRenderPass(rpd)
++	return cmd.TryBeginRenderPass(rpd)
+ }
+ 
+ // ConfigGrab configures the Grab for copying rendered image
+--- a/gpu/renderer.go
++++ b/gpu/renderer.go
+@@ -22,6 +22,10 @@
+ 	// and finalizes the current render pass.
+ 	Present()
+ 
++	// AbortCurrentTexture retires a successful acquisition without presenting.
++	// It runs on the same serialized frame owner and is a no-op when idle.
++	AbortCurrentTexture()
++
+ 	// Device returns the device for this renderer,
+ 	// which serves as the source device for the GraphicsSystem
+ 	// and all of its components.
+--- a/gpu/surface.go
++++ b/gpu/surface.go
+@@ -5,6 +5,7 @@
+ package gpu
+ 
+ import (
++	"fmt"
+ 	"image"
+ 	"sync"
+ 
+@@ -40,11 +41,8 @@
+ 
+ 	config *wgpu.SurfaceConfiguration
+ 
+-	// current texture: must release at end
+-	curTexture *wgpu.TextureView
+-
+-	// Retain the acquired surface texture through submission and presentation.
+-	curTextureOwner *wgpu.Texture
++	// Successful acquisition holds the surface mutex until present or abort.
++	frame surfaceFrame
+ 
+ 	sync.Mutex
+ }
+@@ -132,30 +130,34 @@
+ 		ArrayLayerCount: texture.GetDepthOrArrayLayers(),
+ 		Format:          sf.Format.Format,
+ 	})
+-	if errors.Log(err) != nil {
++	if err != nil || view == nil {
++		if view != nil {
++			view.Release()
++		}
+ 		texture.Release()
+ 		sf.Unlock()
++		if err == nil {
++			err = fmt.Errorf("gpu: texture view factory returned nil without error")
++		}
+ 		return nil, err
+ 	}
+-	sf.curTextureOwner = texture
+-	sf.curTexture = view
++	sf.frame = surfaceFrame{view: view, texture: texture}
+ 	return view, nil
+ }
+ 
+ // Present is the final step for showing the rendered texture to the window.
+ // The current texture is automatically Released and Unlock() is called.
+ func (sf *Surface) Present() {
++	if !sf.frame.held() {
++		return
++	}
++	defer sf.AbortCurrentTexture()
+ 	sf.surface.Present()
+-	if sf.curTexture != nil {
+-		sf.curTexture.Release()
+-		sf.curTexture = nil
+-	}
+-	if sf.curTextureOwner != nil {
+-		sf.curTextureOwner.Release()
+-		sf.curTextureOwner = nil
+-	}
+-	sf.Unlock()
+-}
++}
++
++// AbortCurrentTexture retires the owner-held frame, never presenting its contents.
++// Idle calls do nothing. Calls from stale/concurrent frame owners are unsupported.
++func (sf *Surface) AbortCurrentTexture() { sf.frame.retire(sf.Unlock) }
+ 
+ // InitConfig does the initial configuration of the surface.
+ // This assumes that all existing items have been destroyed.
+@@ -208,6 +210,8 @@
+ }
+ 
+ func (sf *Surface) Release() {
++	// Teardown runs after encoding stops, under the native window ownership lock.
++	sf.AbortCurrentTexture()
+ 	sf.render.Release()
+ 	if sf.surface != nil {
+ 		sf.surface.Release()
+@@ -223,16 +227,24 @@
+ // Unavailable/occluded surfaces yield without polling under a render lock.
+ // Lost/outdated surface configuration gets one bounded retry on the same device.
+ func acquireSurfaceFrame(acquire func() (wgpu.SurfaceTexture, error), configure func()) (wgpu.SurfaceTexture, error) {
++	return acquireSurfaceFrameOwned(acquire, configure, func(texture *wgpu.Texture) { texture.Release() })
++}
++
++func acquireSurfaceFrameOwned(acquire func() (wgpu.SurfaceTexture, error), configure func(), release func(*wgpu.Texture)) (wgpu.SurfaceTexture, error) {
+ 	for attempt := 0; attempt < 2; attempt++ {
+ 		frame, err := acquire()
+ 		if err != nil {
++			if frame.Texture != nil {
++				release(frame.Texture)
++				frame.Texture = nil
++			}
+ 			return frame, err
+ 		}
+ 		if frame.IsStatusSuccess() {
+ 			return frame, nil
+ 		}
+ 		if frame.Texture != nil {
+-			frame.Texture.Release()
++			release(frame.Texture)
+ 			frame.Texture = nil
+ 		}
+ 		if (frame.Status == wgpu.SurfaceGetCurrentTextureStatusOutdated || frame.Status == wgpu.SurfaceGetCurrentTextureStatusLost) && attempt == 0 {
+--- a/gpu/surface_timing.go
++++ b/gpu/surface_timing.go
+@@ -1,6 +1,7 @@
+ package gpu
+ 
+ import (
++	"fmt"
+ 	"time"
+ 
+ 	"cogentcore.org/core/base/errors"
+@@ -32,37 +33,31 @@
+ 	view, err := texture.TryCreateView(&wgpu.TextureViewDescriptor{
+ 		MipLevelCount: texture.GetMipLevelCount(), ArrayLayerCount: texture.GetDepthOrArrayLayers(), Format: sf.Format.Format,
+ 	})
+-	if errors.Log(err) != nil {
++	if err != nil || view == nil {
++		if view != nil {
++			view.Release()
++		}
+ 		texture.Release()
+ 		sf.Unlock()
++		if err == nil {
++			err = fmt.Errorf("gpu: texture view factory returned nil without error")
++		}
+ 		return nil, acquireNS, err
+ 	}
+-	sf.curTextureOwner, sf.curTexture = texture, view
++	sf.frame = surfaceFrame{view: view, texture: texture}
+ 	return view, acquireNS, nil
+-}
+-
+-// AbortCurrentTexture withdraws an acquired diagnostic frame without presenting
+-// unsubmitted contents. The caller must own a successful texture acquisition.
+-func (sf *Surface) AbortCurrentTexture() {
+-	if sf.curTexture != nil {
+-		sf.curTexture.Release()
+-		sf.curTexture = nil
+-	}
+-	if sf.curTextureOwner != nil {
+-		sf.curTextureOwner.Release()
+-		sf.curTextureOwner = nil
+-	}
+-	sf.Unlock()
+ }
+ 
+ // PresentMeasured excludes only the backend presentation call. Texture cleanup
+ // and ownership release remain charged in the encompassing encoding interval.
+ func (sf *Surface) PresentMeasured() int64 {
++	if !sf.frame.held() {
++		return 0
++	}
++	defer sf.AbortCurrentTexture()
+ 	start := time.Now()
+ 	sf.surface.Present()
+-	presentNS := time.Since(start).Nanoseconds()
+-	sf.AbortCurrentTexture()
+-	return presentNS
++	return time.Since(start).Nanoseconds()
+ }
+ 
+ // A render texture has no surface acquisition or presentation wait.
+--- a/gpu/gpudraw/system.go
++++ b/gpu/gpudraw/system.go
+@@ -172,6 +172,5 @@
+ 		timing.Submitted = err == nil
+ 		return err
+ 	}
+-	sy.EndRenderPass(rp)
+-	return nil
++	return sy.EndRenderPassChecked(rp)
+ }

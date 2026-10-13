@@ -354,3 +354,9 @@ physical Finder drag remains unqualified after CUA app-selection stalls. No OS
 preference or general clipboard write occurred. Human IME/VoiceOver, native
 service interoperation, physical display/GPU cases, integrated performance and
 endurance, distribution rights and full Mac completion remain open.
+
+The [GPU frame ownership contract](gpu-frame-lifecycle.md) gives ordinary and
+measured paths shared checked failure cleanup. Failed preparation/submission
+aborts surface ownership and prevents presentation or image capture. This code
+checkpoint remains separate from physical backend faults, device recreation and
+actual native graphics-memory/performance acceptance.

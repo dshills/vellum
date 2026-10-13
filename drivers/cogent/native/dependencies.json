@@ -441,6 +441,17 @@
               "sha256": "34a5e53c3666d365f248736b617f0d82f938af36f41496fb4e5fb1baf657983b"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/framecleanup",
+          "inputs": "native/patches/framecleanup/original-hashes.json",
+          "outputs": "native/patches/framecleanup/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/framecleanup/0048-owned-frame-failure-cleanup.patch",
+              "sha256": "623cc2d3ad55cea0b2d5b5f542e3b4d7356b5541cfca96bb760b3d9ff6cc6b37"
+            }
+          ]
         }
       ]
     },
