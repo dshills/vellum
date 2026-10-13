@@ -1,0 +1,169 @@
+"""Seal public test evidence; never traverse or read protected clipboard backups."""
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+import shutil
+import tarfile
+
+r=Path('/private/tmp/vellum-large-data')
+p=Path('/private/tmp/vellum-macos-clipboard-checks')
+out=r/'docs/reports/macos-clipboard'
+records=out/'records'
+sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
+load=lambda path:json.loads(path.read_text())
+sources=load(p/'source-post-prism.json')['sources']
+assert len(sources)==13 and all(sha(r/n)==h for n,h in sources.items())
+cert=load(p/'source-review-final.json')
+assert cert['status']=='APPROVED_SOURCE'
+reviewed=cert.get('files') or cert.get('reviewed_source_sha256') or cert.get('reviewed_file_sha256')
+reviewed={Path(n).relative_to(r).as_posix() if Path(n).is_absolute() else n:h for n,h in reviewed.items()}
+assert reviewed==sources
+prism=load(p/'prism-v1/prism.json');process=load(p/'prism-v1/process.json')
+original=load(p/'source-prism.json')['sources']
+assert len(original)==12 and prism['coverage']['complete'] and prism['coverage']['files']==12
+assert len(prism['findings'])==4 and process['exit_code']==1 and process['error'] is None
+assert process['source_index_stable'] and process['before']==original and process['after']==original
+receipts={}
+names=['python-regression','clipboard-self-test-v7','isolation-post-prism','opt-in-vet-post-prism']
+names += ['clipboard-general-'+case+'-post-prism' for case in ['normal','failure','termination']]
+for name in names:
+    path=p/(name+'.json');d=load(path)
+    assert d['exit_code']==0 and d['error'] is None and d['source_delta_stable']
+    assert d['source_delta_before']==sources and d['source_delta_after']==sources
+    for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+    receipts[name]={'path':path.name,'sha256':sha(path),'source_map':'post_prism','exit_code':0}
+prior_tested=load(p/'source-general.json')['sources']
+for name in ['default-race-final','offscreen-race-final','opt-in-vet-final','isolation-final']:
+    path=p/(name+'.json');d=load(path)
+    assert d['exit_code']==0 and d['error'] is None and d['source_delta_stable']
+    assert all(d['source_delta_before'].get(n)==h and d['source_delta_after'].get(n)==h for n,h in prior_tested.items())
+    for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+    receipts[name]={'path':path.name,'sha256':sha(path),'source_map':'pre_prism_general','exit_code':0}
+safety=load(p/'self-test-v7/result.json')
+assert safety['result']=='PASS' and safety['source_stable'] and not safety['protected_backup_retained']
+assert safety['summary']['stale_journal_ignored'] and safety['summary']['foreign_after_admission_refused'] and safety['summary']['foreign_after_empty_refused']
+native=load(p/'self-test-v7/native-safety.stdout')
+assert native['result']=='PASS_NATIVE_CLIPBOARD_GUARD_INTERPOSITION' and native['stale_journal_ignored'] and not native['general_pasteboard_access']
+assert sha(p/'self-test-v7/guardian')==safety['guardian_sha256'] and sha(p/'self-test-v7/clipboard-smoke')==safety['fixture_sha256']
+cases={}
+for name,status,cross,forced in [('normal',0,True,False),('failure',1,False,False),('termination',15,False,True)]:
+    d=load(p/('general-'+name+'-post-prism/result.json'));s=d['summary']
+    assert d['result']=='PASS' and d['source_stable'] and not d['protected_backup_retained']
+    assert all(sources[n]==h for n,h in d['sources_before'].items()) and d['sources_before']==d['sources_after']
+    assert d['guardian_sha256']==safety['guardian_sha256'] and d['fixture_sha256']==safety['fixture_sha256']
+    assert s['result']=='PASS_GENERAL_CLIPBOARD_RESTORED' and s['original_raw_items_restored'] and s['protected_backup_removed']
+    assert s['child_exit']==status and s['cross_process_read']==cross and s['forced_child_termination']==forced and not s['preferences_changed'] and 'recovery' not in d
+    cases[name]=s
+normal=load(p/'general-normal-post-prism/observed-child.stdout')
+assert normal['result']=='PASS_GO_CLIPBOARD_TRANSPORT' and all(normal[k] for k in ['alias_tested','detached_bytes','first_item_consistency','legacy_text','missing_omitted','request_order'])
+assert not normal['original_content_received'] and not normal['preferences_changed']
+isol=load(p/'isolation-result.json');old=load(p/'isolation-result-pre-prism.json')
+assert isol['result']=='PASS_DEFAULT_OFFSCREEN_OPT_IN_ISOLATION'
+for mode in ['default','offscreen','offscreen_opt_in']:
+    assert not isol['modes'][mode]['diagnostic_symbols'] and not isol['modes'][mode]['macro']
+    assert isol['modes'][mode]['archive_sha256']==old['modes'][mode]['archive_sha256']
+assert len(isol['modes']['opt_in']['diagnostic_symbols'])==19
+prepared={f.relative_to(r/'drivers/cogent/build').as_posix():sha(f) for module in ['upstream','typesetting'] for f in sorted((r/'drivers/cogent/build'/module).rglob('*')) if f.is_file()}
+assert len(prepared)==6174 and prepared==load(Path('/private/tmp/vellum-macos-service-checks/qualification.json'))['prepared']
+disposition={'status':'FIXED','prism_raw_exit_code':1,'prism_coverage_files':12,'final_internal_review_files':13,'findings':{
+    '10adbf077d19b30a':'Unique mkstemp C journal writes; actual native private fixture succeeds with a retained old state.json.new.',
+    'dafbb6e38e7a3b19':'Record cancellation receipt then rethrow KeyboardInterrupt/SystemExit; regression checks no later build/live call and recovery on interrupted guardian.',
+    'a39344f658cfbfbe':'Malformed/nonobject summary becomes a bounded failure; actual wrapper main still emits source-stable result.json under mocked native processes.',
+    '8e2537f1af57da27':'Unique mkstemp Swift durable writes; private restore/summary/backup fixture succeeds with retained dummy old .new files.'},'source_review_sha256':sha(p/'source-review-final.json'),'no_second_provider_run':True}
+(p/'prism-disposition.json').write_text(json.dumps(disposition,indent=2)+'\n')
+q={'result':'PASS_MAC_GUARDED_CLIPBOARD','base_commit':'a1c18162af5fcf5e2784067f1be89acc09bebf5a','source':sources,'prepared':prepared,'receipts':receipts,'source_review_sha256':sha(p/'source-review-final.json'),'prism_raw_exit_code':1,'prism_findings':4,'prism_findings_resolved':True,'guardian_sha256':safety['guardian_sha256'],'race_fixture_sha256':safety['fixture_sha256'],'cases':cases,'normal_assertions':normal,'default_offscreen_package_archives_unchanged_after_corrections':True,'live_tests':True,'general_pasteboard_accessed':True,'original_content_logged':False,'backup_content_hashed':False,'original_materialized_content_restored':True,'os_preferences_changed':False,'guardian_crash_outer_recovery_live_qualified':False,'human_ime_voiceover_qualified':False,'native_heap_endurance_qualified':False,'macos_completion':False}
+(p/'qualification.json').write_text(json.dumps(q,indent=2)+'\n')
+records.mkdir(parents=True,exist_ok=False)
+shutil.copy2(Path(__file__),records/'archive-producer.py.txt')
+files={}
+# Prune before traversal. Never enumerate protected job directories or read any
+# private file, even a dummy original from an unsuccessful self-test.
+for directory,dirs,leaves in os.walk(p,followlinks=False):
+    dirs[:]=sorted(d for d in dirs if d not in ['private','swift-cache','__pycache__'] and not (Path(directory)/d).is_symlink())
+    for leaf in sorted(leaves):
+        f=Path(directory)/leaf;n=f.relative_to(p).as_posix()
+        if f.is_symlink() or f.suffix not in ['.json','.stdout','.stderr','.py','.txt','.log','.swift']:continue
+        assert 'private' not in Path(n).parts and '.plist' not in f.name
+        files[n]=f.read_bytes()
+index={n:hashlib.sha256(b).hexdigest() for n,b in sorted(files.items())}
+(records/'evidence-index.json').write_text(json.dumps(index,indent=2)+'\n')
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz') as tf:
+    for n,b in sorted(files.items()):
+        info=tarfile.TarInfo(n);info.size=len(b);info.mode=0o644;info.mtime=0;tf.addfile(info,io.BytesIO(b))
+with tarfile.open(archive) as tf:
+    members=tf.getmembers()
+    assert all(m.isfile() and 'private' not in Path(m.name).parts and '.plist' not in Path(m.name).name for m in members)
+    actual={m.name:hashlib.sha256(tf.extractfile(m).read()).hexdigest() for m in members}
+assert actual==index
+(out/'README.md').write_text('''# Guarded Mac clipboard acceptance
+
+The opt-in Mac fixture now qualifies the native rich clipboard transport against
+the actual general pasteboard. An independent Swift guardian preserves bounded,
+ordered raw items and flavors before the fixture starts, then restores their
+materialized bytes after verifying test ownership. Its protected original is
+never logged, hashed for evidence, reviewed or archived.
+
+## Observed behavior
+
+The race-enabled Go fixture transports exact plain text, PNG, HTML and custom
+MIME bytes; checks request order, missing-format omission and detached reads;
+exercises legacy text and controlled first-item consistency; and refuses a real
+OS MIME alias collision without changing the board. Swift independently compares
+the final test representations after Go exits.
+
+Normal completion, intentional fixture exit 1 and forced fixture termination all
+restore the original raw items/flavors, including Cocoa's derived legacy string
+alias, and delete the protected backup only after verification. All three cases
+passed again with the final corrected source and fresh guardian/race binaries.
+These runs changed no input-source, VoiceOver or notification settings.
+
+Private named-pasteboard tests exercise the actual native guards and Swift
+restoration with foreign writes during both journal I/O gaps. They refuse unknown
+admission, a wrong clear revision and an unrepresented board-level flavor, and
+preserve multiple items, empty/binary flavors and the known derived text alias.
+Stale dummy journal temporaries no longer block durable writes or restoration.
+
+## Checks and review
+
+Native and offscreen race suites pass on the pre-Prism source. The subsequent
+changes affect opt-in diagnostics and the test harness; final isolation verifies
+the default/offscreen/offscreen-with-opt-in package archives are unchanged and
+exclude all 19 diagnostic symbols. Final opt-in vet, fresh native race build,
+private safety fixtures and four Python harness regression tests pass.
+
+Prism ran once with Anthropic Claude Sonnet 5.5: complete 12-file coverage,
+45,494 input and 13,632 output tokens. Its raw exit 1 and four medium findings are
+preserved. Unique mkstemp names fix stale temporary blocking in C and Swift;
+cancellation is recorded then propagated; malformed/nonobject summaries produce
+a failed result with source evidence. Internal review covers all 13 final files,
+including the added regression tests. No second provider run was made.
+
+Historical failures remain in the archive: early compiler/cache issues, attempted
+reuse of a native item already associated with a board, strict rejection of the
+known Cocoa text alias, and a sandboxed native-service refusal. These were private
+checks; the successful native runs used the authorized desktop service access.
+Separate frozen maps preserve each reviewed/tested source version.
+
+## Evidence and limits
+
+[Checkpoint](records/checkpoint.json) binds the [archive](records/evidence.tar.gz)
+and its per-member [index](records/evidence-index.json). Qualification records the
+final source, binary identities, terminal receipts and all 6,174 unchanged prepared
+dependency files. The archiver prunes every protected private directory before
+traversal and excludes all backup files. Restoration evidence comes from the
+reviewed verification path and public receipts; original content stays private.
+
+Clear/check/write is non-atomic with other writers. Restoration preserves
+materialized bytes and order, not a live provider or change-count identity.
+The three live cases do not qualify guardian crash or outer recovery, third-party
+application interoperability, broad lazy providers or adversarial concurrency.
+Human IME/VoiceOver, hardware, memory/endurance, full workload performance and
+public distribution remain separate. This checkpoint does not complete the Mac
+framework or a public release.
+''')
+checkpoint={'result':q['result'],'base_commit':q['base_commit'],'qualification_sha256':sha(p/'qualification.json'),'source_review_sha256':sha(p/'source-review-final.json'),'prism_provider':'anthropic','prism_model':'claude-sonnet-5-5','prism_coverage_complete':True,'prism_original_coverage_files':12,'final_internally_reviewed_files':13,'prism_findings':4,'prism_findings_resolved':True,'archive':{'sha256':sha(archive),'members':len(index),'index_sha256':sha(records/'evidence-index.json')},'report_sha256':sha(out/'README.md'),'original_content_archived':False,'live_tests':True,'macos_completion':False}
+(records/'checkpoint.json').write_text(json.dumps(checkpoint,indent=2)+'\n')
+print(json.dumps({'members':len(index),'archive_sha256':sha(archive),'qualification_sha256':sha(p/'qualification.json'),'report_sha256':sha(out/'README.md')}))

@@ -56,10 +56,54 @@ check the full wire length before `C.GoBytes`.
 
 Offscreen tests validate the Go contract/codec, detached results, cancellation,
 stalled-queue admission, shutdown and the actual Objective-C parser/MIME resolver.
-They never call NSPasteboard. Native compilation also establishes no clipboard
-runtime acceptance. Real text/PNG/HTML/custom-MIME roundtrips, interoperability
-with other apps, alias availability and multiple-item/change-count behavior
-remain deferred until the user explicitly frees this computer for live tests.
+They never call NSPasteboard. Native compilation establishes no clipboard
+runtime acceptance. The explicit `scripts/check-clipboard.py --live` tool adds
+a separate general-pasteboard acceptance workflow when the computer is available.
+Its `--self-test` uses only a new private named pasteboard, exercising exact
+multi-item/empty/binary-flavor restoration and refusal on foreign or unknown
+ownership. Injected foreign writes after admitted/empty journal persistence are
+refused immediately before clear/write, both by the actual native guards and
+the guardian's restoration path. An injected unrepresented board-level flavor
+is refused by the capture path. These safety checks precede a general-board run.
+
+The Swift guardian captures complete ordered raw items/flavors before launching
+the Go fixture. It refuses unavailable data, non-item legacy state, changing
+revisions or unsupported board-level types absent from the complete item-type union,
+more than 32 items/32 flavors per item, type names over 1024 UTF-8
+bytes/64 KiB total, representations over 8 MiB, payload over 16 MiB and a serialized
+backup over 20 MiB. Lazy provider materialization occurs before accepted-size
+checks. Original bytes stay local in a 0700 job directory/0600 binary plist;
+they are never printed, hashed for evidence or sent for review. Restoration
+preserves materialized data, item order and each item's type order, not the original live provider
+or pasteboard change-count identity. Cocoa calls have Objective-C exception fences
+before returning to Swift; error logs omit system/provider exception payloads.
+One derived Cocoa `NSStringPboardType` alias is accepted outside the item union
+only when its raw data exactly matches the first item's canonical text. Its
+raw bytes are also bounded, backed up and compared after restoration. Arbitrary
+unrepresented flavors and differing alias data remain refused before mutation.
+
+Only the `vellum_native_checks` build adds write guards at the public native
+transport's clear/write boundary. They require an exact original/owned revision,
+a unique test marker or exact nonce-bearing legacy text, and durable admitted,
+known-empty and owned journal states. Ownership is rechecked after journal I/O
+immediately before clear/write. Known-empty records use the clear call's returned
+revision and require matching revision and empty item/type sets. The guardian holds a global test lock and
+waits for its recorded child to disappear before restoration or recovery. Unknown
+admission/restoration state and foreign changes retain the protected backup and
+fail instead of guessing ownership. The guardian removes the backup only after
+verified byte-exact restoration. Neither fixture writes nor restoration provide
+an atomic OS compare-and-swap; another writer can still intervene between calls.
+The guards/API are absent from ordinary compiled builds; current SDK source
+payloads can still contain diagnostic source files.
+
+The Go fixture checks text/PNG/HTML/custom MIME bytes, requested order/omission,
+detached reads, legacy text and controlled first-item consistency. Native MIME
+alias refusal is checked only if the OS registry supplies a usable alias pair.
+The independent Swift process compares the final test representations after Go
+exits. Separate cases fail or terminate the fixture after an owned write and
+require original restoration. Third-party application compatibility, broad
+provider/restart behavior and adversarial concurrent-writer atomicity remain
+separate from these bounded checks.
 
 Primary APIs: [NSPasteboard types](https://developer.apple.com/documentation/appkit/nspasteboard/pasteboardtype)
 and [UTType](https://developer.apple.com/documentation/uniformtypeidentifiers/uttype).

@@ -178,6 +178,31 @@ native module's `offscreen` tag and create no windows.
 
 ## Clipboard data
 
+Run preservation safety checks against a new private named pasteboard:
+
+```sh
+python3 scripts/check-clipboard.py --self-test --output /tmp/vellum-clipboard-safety
+```
+
+On an available Mac desktop, explicitly opt into the general-board workflow:
+
+```sh
+python3 scripts/check-clipboard.py --live --output /tmp/vellum-clipboard-normal
+python3 scripts/check-clipboard.py --live --case exit-after-owned --output /tmp/vellum-clipboard-failure
+python3 scripts/check-clipboard.py --live --case kill-after-owned --output /tmp/vellum-clipboard-termination
+```
+
+Each output directory must be new. Go pins must already be prepared; Swift/Clang
+are needed for the separate guardian. The tool preserves bounded raw clipboard
+items/flavors in a protected local backup and restores only known test ownership.
+Original bytes/type names never enter ordinary output files or evidence. A retained
+`private/job/original.plist` means uncertain ownership or restoration failed;
+keep that protected directory for recovery. Never include it in a review/archive.
+The compiled guardian's `--recover <private/job>` refuses a live recorded child,
+foreign changes and ambiguous admitted state. These checks do not change input
+sources, VoiceOver or notification preferences. See the [contract](../specs/clipboard.md)
+for bounds, materialized-provider fidelity and non-atomic OS limitations.
+
 Obtain `Application.Clipboard()` after the native driver publishes services and
 inspect its capabilities. Read explicit formats such as `text/plain`, `image/png`
 and `application/vnd.vellum+json`; write one slice of `app.ClipboardRepresentation`

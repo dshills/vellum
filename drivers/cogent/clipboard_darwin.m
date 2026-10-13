@@ -4,6 +4,9 @@
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #include <stdint.h>
 #include <string.h>
+#ifdef VELLUM_NATIVE_CHECKS
+#import "native_clipboard_checks.h"
+#endif
 
 // Keep synchronized with app/clipboard.go and clipboard.go. The native parser
 // repeats the caps before copying into Cocoa's asynchronously retained payload.
@@ -165,8 +168,25 @@ static int clipWrite(uint64_t token, NSArray<NSDictionary *> *entries) {
     // This final check bounds cancellation before destructive mutation. The OS
     // clear/write pair is not transactional; failures can leave an empty board.
     if (!vellumClipboardActive(token)) return 2;
+#ifdef VELLUM_NATIVE_CHECKS
+    int guarded=vellumClipboardCheckBeforeWrite(board,entries);
+    if (guarded) return guarded;
+    guarded=vellumClipboardCheckBeforeClear(board);
+    if (guarded) return guarded;
+    NSInteger clearedRevision=[board clearContents];
+    guarded=vellumClipboardCheckAfterClear(board,clearedRevision);
+    if (guarded) return guarded;
+    guarded=vellumClipboardCheckBeforeItems(board);
+    if (guarded) return guarded;
+#else
     [board clearContents];
-    return [board writeObjects:@[item]] ? 0 : 2;
+#endif
+    BOOL written=[board writeObjects:@[item]];
+#ifdef VELLUM_NATIVE_CHECKS
+    int observed=vellumClipboardCheckAfterWrite(board);
+    if (observed) return observed;
+#endif
+    return written ? 0 : 2;
 }
 void vellumClipboardData(uint64_t token, const void *bytes, size_t length, int write) {
     if (!bytes || length > VELLUM_CLIP_WIRE) { vellumClipboardResult(token, NULL, 0, 4); return; }

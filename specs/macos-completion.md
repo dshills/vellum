@@ -35,8 +35,14 @@ recovery remains outside that contract.
 The optional [clipboard extension](clipboard.md) implements bounded text, PNG,
 HTML and custom MIME representations, first-item consistency and capacity-aware
 cancellation/shutdown. Its native parser and dispatch policy can be checked
-without accessing the clipboard. Actual rich pasteboard roundtrips and external
-app interoperation remain deferred with the other live checks.
+without accessing the clipboard. A separate guarded Cocoa acceptance now checks
+general-pasteboard text/PNG/HTML/custom data, legacy text, native alias refusal,
+controlled first-item reads and independent-process verification after Go exits.
+Complete bounded raw items/flavors are restored after normal completion, an
+intentional fixture failure and forced fixture termination. Private-board tests
+exercise both journal gaps with foreign writers and preserve the derived legacy
+string alias. Third-party app compatibility, broader live providers and concurrent
+writer atomicity remain separate. See the [clipboard contract](clipboard.md).
 
 The optional [Mac tray service](tray.md) adds a retained native menu-bar item,
 named/template PNG icons and owner-validated command menus. Bounded shared Cocoa

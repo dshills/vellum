@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED",
+  "result": "APPROVED_EVIDENCE",
+  "reviewer": "mac_history_review",
+  "scope": "Independent read-only evidence-sealing review of the public clipboard report producer, final public receipts, source/version graph and completed archive. This is not a new clipboard/native test or a second source review.",
+  "reviewed_hashes": {
+    "/private/tmp/vellum-macos-clipboard-checks/source-prism.json": "0e0de994fc9ea4a790985fbbe92b83f954f65f79aa7cc2279593a62fec4a8351",
+    "/private/tmp/vellum-macos-clipboard-checks/source-post-prism.json": "b5a2b0a35746adb0a17ac8c30cf08205f48a0784beb843a9e7be373d71a4c1ab",
+    "/private/tmp/vellum-macos-clipboard-checks/prism-v1/prism.json": "62dbee1af3cbbb079bb53f1a53d67dad6e4a3ee869bd3e28487013bffd1eda07",
+    "/private/tmp/vellum-macos-clipboard-checks/prism-v1/process.json": "e394839b2da21f00c5b0e9b5b61ee65d578844acd2905dbf6b5b2419544d791f",
+    "/private/tmp/vellum-macos-clipboard-checks/self-test-v7/result.json": "f1c506a500af4e7069765d1d1a1f360617d6d8508d4b7bf0ddfcc436d4e248ab",
+    "/private/tmp/vellum-macos-clipboard-checks/self-test-v7/native-safety.stdout": "5d418bbb6d607884bb3e42f16a08938830ca5a6eeb5d374aa8055bab89e04fb1",
+    "/private/tmp/vellum-macos-clipboard-checks/python-regression.json": "5c9bce8f96499c75b92fb6dc1264f82184c1c3e7b54dbe1291ffe43647ceee09",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-result.json": "d97c906eeea3566b1fae28c6935734fcd3da48fbeffc43acce69096820b04d17",
+    "/private/tmp/vellum-macos-clipboard-checks/general-normal-post-prism/result.json": "6371504d3966a8945bb1c94554817a502c2c63cf51996cba95fe9769ea33dba6",
+    "/private/tmp/vellum-macos-clipboard-checks/general-failure-post-prism/result.json": "42e4a0795a71e0a36060e01d1b9f3fb8e7f3a4a0c2d22050a1e68a467b17e39f",
+    "/private/tmp/vellum-macos-clipboard-checks/general-termination-post-prism/result.json": "ed2f01d5de73ae9b09a763bda27eb488ade49db8471b53479b5152ab8ca2a34c",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-normal-post-prism.json": "c979a586e79468423296ecd1b6e2d7886ac454c73c68c8ffbef2533527c2e1fc",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-failure-post-prism.json": "2b3097bbe54da81951d95db466741cdf9f0191072e28576e94c752bb6391b6b2",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-termination-post-prism.json": "5aad0bb63248ea44ba69781337b0bac4f458f34bc2bfac8ec65fd30fd0285074",
+    "/private/tmp/vellum-macos-clipboard-checks/source-review-final.json": "841729151f636c63aa9af08360c3f9c883edf189224704bdfa764ea6ed986a5e",
+    "/private/tmp/vellum-macos-clipboard-checks/qualification.json": "2e79ea493f279a8b7560f77a74f490d1a5f45f148b5157a1763439ac2e5d4a84",
+    "/private/tmp/vellum-macos-clipboard-checks/source-general.json": "4a3f6603a01d34ef18fe1a3a1d020080d9d352b0e944767c0b4006df161e3b83",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-result-pre-prism.json": "220aadd30fc732afaf2ce5ff8ec40302bdfbc1abea5122785d91358cd24a3064",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-self-test-v7.json": "81c9ca3d4ae25fc20028dec17b0cfaa76cab7b587835174b62d9b57dba92526b",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-post-prism.json": "9dbd0e3a1db224a39c449706b8ccc4e53d236cee8b9f50a44c3457df83c2a9db",
+    "/private/tmp/vellum-macos-clipboard-checks/opt-in-vet-post-prism.json": "41190de72cc45057819e68811ffc3fc10124a01034201925a6d971e3254bb277",
+    "/private/tmp/vellum-macos-clipboard-checks/default-race-final.json": "f36b8834a820ea2cd593ab54475db1824aec83bbe30880d5a83030e6b58e4019",
+    "/private/tmp/vellum-macos-clipboard-checks/offscreen-race-final.json": "22279bd528a7a761750311b22e0cfc74df2a183f632a2b37b0a30ee8bb954ff3",
+    "/private/tmp/vellum-macos-clipboard-checks/opt-in-vet-final.json": "1b0685f57530a6673abeef20e2b31390096de659332ea6f4559fdca13ef80b5e",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-final.json": "16eb88a64c41eba6e22c08e978249d05f825c5e8d9ea0d0d70afc50da2ac727e",
+    "/private/tmp/vellum-macos-clipboard-checks/prism-disposition.json": "bd2ade560bc61505f95bc4284a3c2d7e357d5112c7228efd65ddcafc19487a1d",
+    "/private/tmp/vellum-macos-clipboard-checks/general-normal-post-prism/observed-child.stdout": "b9943113129fe885f7043583480a213ba7996385eb77b49e9e351e813a86babd",
+    "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/README.md": "15b48fd42d2c9aff0da9b24d775dbf3c0ad9b254c24bb2bf191192075326b593",
+    "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/records/checkpoint.json": "d8a62343bce1e1939f07665fcc83212267d12733c8455ba58d988a235d4428d0",
+    "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/records/evidence-index.json": "683f669b436f8fed1986a88a56a8a5a1f3977f56edd34585324006ecc45f097b",
+    "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/records/archive-producer.py.txt": "1bd1a013394effcf64bd1aeb5fc1dddce9346639345208812521e2a25621056b",
+    "/private/tmp/vellum-clipboard-evidence-review/archive-check.json": "86dffedc14bcf9fdcb84cf6bfa39f8d3ec9a67c9bedd0beee7545e69a351a84e",
+    "/private/tmp/vellum-macos-clipboard-checks/report.py": "1bd1a013394effcf64bd1aeb5fc1dddce9346639345208812521e2a25621056b",
+    "/private/tmp/vellum-macos-service-checks/qualification.json": "5d724e1013234f0a6501ac35dbdca4bc13851b672a54d9d3d6ddb19dbb60c6ce",
+    "/private/tmp/vellum-clipboard-evidence-review/verify-public-archive-v2.py.txt": "1e64169b2c87ed6c22f430bbac148e03817335ee8d8946908c70ec5156e002d8"
+  },
+  "verified_public_log_sha256": {
+    "/private/tmp/vellum-macos-clipboard-checks/python-regression.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/python-regression.stderr": "03e2ce7efb78ca7222db4c9a68781f9953dd3bd674b491cc52a8a4986d74e6f4",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-self-test-v7.stdout": "985bd559691393a03a9f63d75387caf28d9cfab6488a0a78d0d4844233c36f5b",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-self-test-v7.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-post-prism.stdout": "b97c6a5e61bd08f0fa619c526c824837e5138357946d175af45829752427cf9e",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-post-prism.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/opt-in-vet-post-prism.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/opt-in-vet-post-prism.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-normal-post-prism.stdout": "61fec6f4662695c06c9f4b85cd43c74a97213c6865f2cf88ddce5198d90120f7",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-normal-post-prism.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-failure-post-prism.stdout": "cd620f5e02bc52062d4ae234521bbb8616b8ea26295816dea682869b029c4ead",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-failure-post-prism.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-termination-post-prism.stdout": "ba78abe3f6b250a96c8d066573ebaa5cb9f64577ca1b4d37694e82ada9845151",
+    "/private/tmp/vellum-macos-clipboard-checks/clipboard-general-termination-post-prism.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/default-race-final.stdout": "b999748d6e826f219b1778b655906ee93534896ff91554bb3201d366fe21a194",
+    "/private/tmp/vellum-macos-clipboard-checks/default-race-final.stderr": "8b707efa857bae1168a00576d009a1608477029f245893608ee6683649cd7611",
+    "/private/tmp/vellum-macos-clipboard-checks/offscreen-race-final.stdout": "c5ad9397f3ded8ae6deb6f6f772c35e430d7deadd902e2b41f9377d98bd294a2",
+    "/private/tmp/vellum-macos-clipboard-checks/offscreen-race-final.stderr": "ebd2d431734c12cd4cd165df39c05ff5095172e62513185f64d8a325e4868b14",
+    "/private/tmp/vellum-macos-clipboard-checks/opt-in-vet-final.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/opt-in-vet-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-final.stdout": "b97c6a5e61bd08f0fa619c526c824837e5138357946d175af45829752427cf9e",
+    "/private/tmp/vellum-macos-clipboard-checks/isolation-final.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "verified_final_source_sha256": {
+    "docs/development.md": "4d6c354b86dddfed68150d80e5cdd926204bb4e18ab3deb1364067cb1a39d0b3",
+    "drivers/cogent/clipboard_darwin.m": "18df89dc21e56dc8788d860db234d31a7601824e937224312f4af8919c1fb1ec",
+    "drivers/cogent/cmd/clipboard-smoke/main.go": "291be2cb4d1ee610cda9d67c9f239795ff5b9e960285f8811978adcc6be191eb",
+    "drivers/cogent/native_clipboard_checks.h": "1272360dec6158ed06060c42021dae49a1efecd971c7958a19859dade545ba37",
+    "drivers/cogent/native_clipboard_checks_darwin.go": "917f2dc899ea4e6444a76ff5f2dc8c2f9046378e9644e17147441ab27db589ec",
+    "drivers/cogent/native_clipboard_checks_darwin.m": "b9b8ad2ce440eee4e90e9024f47ba16353548c29b2d26055cee781a717569469",
+    "scripts/check-clipboard-native.h": "dc2f3e03141ed311c1b5fccc30dcac66b28409c0283a3793c7e0d8a90486d1ad",
+    "scripts/check-clipboard-native.m": "1df5b54128627bceed7b7b54f7c5558ae2874935b2450ddcc7ab116a1a0f8e24",
+    "scripts/check-clipboard.py": "53ac28a21497dbd9451a7ffce1934d494174e9ff2cb7243bd072ed58b0fab36d",
+    "scripts/check-clipboard.swift": "2f9d6ee3e5e8fbd42c0767482b9968096729d91c1849536760b3427e81c68e36",
+    "scripts/check-clipboard_test.py": "4075caa6922c8820dcb128f78762721e2b3e132dc206e3f6fa860e8e9c55f217",
+    "specs/clipboard.md": "a410d24c07d2bd8c585e91ca0f5452d75b9132d3fbd587621ffa22fab4f22cf2",
+    "specs/macos-completion.md": "7157683130cd3cef6cad3854cecc309c2da249b72f6d5b913f1a0a2cd406f291"
+  },
+  "report": {
+    "path": "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/README.md",
+    "sha256": "15b48fd42d2c9aff0da9b24d775dbf3c0ad9b254c24bb2bf191192075326b593",
+    "claims_match_public_final_receipts": true
+  },
+  "qualification": {
+    "path": "/private/tmp/vellum-macos-clipboard-checks/qualification.json",
+    "sha256": "2e79ea493f279a8b7560f77a74f490d1a5f45f148b5157a1763439ac2e5d4a84",
+    "final_sources": 13,
+    "prepared_map_entries": 6174,
+    "prepared_map_equals_prior_checkpoint": true,
+    "prior_checkpoint_path": "/private/tmp/vellum-macos-service-checks/qualification.json",
+    "prior_checkpoint_sha256": "5d724e1013234f0a6501ac35dbdca4bc13851b672a54d9d3d6ddb19dbb60c6ce",
+    "independent_whole_prepared_tree_rehash": false
+  },
+  "source_review": {
+    "path": "/private/tmp/vellum-macos-clipboard-checks/source-review-final.json",
+    "sha256": "841729151f636c63aa9af08360c3f9c883edf189224704bdfa764ea6ed986a5e",
+    "status": "APPROVED_SOURCE",
+    "exact_13_final_map_match": true,
+    "implementation_review_owner": "platform_completion"
+  },
+  "producer_review": {
+    "path": "/private/tmp/vellum-macos-clipboard-checks/report.py",
+    "sha256": "1bd1a013394effcf64bd1aeb5fc1dddce9346639345208812521e2a25621056b",
+    "executed_by_reviewer": false,
+    "copied_producer_matches": true,
+    "assertions": "Validates exact final source/internal certificate; raw Prism original map/coverage/exit and four findings; final outer source-stable receipts and raw log hashes; historical tested maps; native safety and binary identities; normal versus restoration-only case results; unchanged default/offscreen archive identities; prepared map; public archive roundtrip.",
+    "privacy": "The top-down os.walk prunes private directories and symlink directories before descent; the file loop excludes symlinks/non-allowlisted suffixes, and asserts private/plist exclusion before read. The protected originals are neither enumerated nor read by this review. The completed archive was independently checked before any member content hashing."
+  },
+  "archive": {
+    "path": "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/records/evidence.tar.gz",
+    "sha256": "0dcf9da69dd092f0ac9b68d0a3c9291c2910668da38185549ede2fd97b8ea408",
+    "index_path": "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/records/evidence-index.json",
+    "index_sha256": "683f669b436f8fed1986a88a56a8a5a1f3977f56edd34585324006ecc45f097b",
+    "members": 284,
+    "roundtrip": "PASS",
+    "all_members_unique_regular_utf8": true,
+    "no_private_or_plist_member_paths": true,
+    "recipe": "/private/tmp/vellum-clipboard-evidence-review/verify-public-archive-v2.py.txt",
+    "recipe_sha256": "1e64169b2c87ed6c22f430bbac148e03817335ee8d8946908c70ec5156e002d8",
+    "verification_receipt": "/private/tmp/vellum-clipboard-evidence-review/archive-check.json",
+    "verification_receipt_sha256": "86dffedc14bcf9fdcb84cf6bfa39f8d3ec9a67c9bedd0beee7545e69a351a84e"
+  },
+  "checkpoint": {
+    "path": "/private/tmp/vellum-large-data/docs/reports/macos-clipboard/records/checkpoint.json",
+    "sha256": "d8a62343bce1e1939f07665fcc83212267d12733c8455ba58d988a235d4428d0",
+    "qualification_report_source_certificate_archive_index_links_verified": true
+  },
+  "final_receipts": {
+    "python-regression": {
+      "exit_code": 0,
+      "source_scope": "final_post_prism_13",
+      "receipt_sha256": "5c9bce8f96499c75b92fb6dc1264f82184c1c3e7b54dbe1291ffe43647ceee09"
+    },
+    "clipboard-self-test-v7": {
+      "exit_code": 0,
+      "source_scope": "final_post_prism_13",
+      "receipt_sha256": "81c9ca3d4ae25fc20028dec17b0cfaa76cab7b587835174b62d9b57dba92526b"
+    },
+    "isolation-post-prism": {
+      "exit_code": 0,
+      "source_scope": "final_post_prism_13",
+      "receipt_sha256": "9dbd0e3a1db224a39c449706b8ccc4e53d236cee8b9f50a44c3457df83c2a9db"
+    },
+    "opt-in-vet-post-prism": {
+      "exit_code": 0,
+      "source_scope": "final_post_prism_13",
+      "receipt_sha256": "41190de72cc45057819e68811ffc3fc10124a01034201925a6d971e3254bb277"
+    },
+    "clipboard-general-normal-post-prism": {
+      "exit_code": 0,
+      "source_scope": "final_post_prism_13",
+      "receipt_sha256": "c979a586e79468423296ecd1b6e2d7886ac454c73c68c8ffbef2533527c2e1fc"
+    },
+    "clipboard-general-failure-post-prism": {
+      "exit_code": 0,
+      "source_scope": "final_post_prism_13",
+      "receipt_sha256": "2b3097bbe54da81951d95db466741cdf9f0191072e28576e94c752bb6391b6b2"
+    },
+    "clipboard-general-termination-post-prism": {
+      "exit_code": 0,
+      "source_scope": "final_post_prism_13",
+      "receipt_sha256": "5aad0bb63248ea44ba69781337b0bac4f458f34bc2bfac8ec65fd30fd0285074"
+    },
+    "default-race-final": {
+      "exit_code": 0,
+      "source_scope": "historical_pre_prism_general",
+      "receipt_sha256": "f36b8834a820ea2cd593ab54475db1824aec83bbe30880d5a83030e6b58e4019"
+    },
+    "offscreen-race-final": {
+      "exit_code": 0,
+      "source_scope": "historical_pre_prism_general",
+      "receipt_sha256": "22279bd528a7a761750311b22e0cfc74df2a183f632a2b37b0a30ee8bb954ff3"
+    },
+    "opt-in-vet-final": {
+      "exit_code": 0,
+      "source_scope": "historical_pre_prism_general",
+      "receipt_sha256": "1b0685f57530a6673abeef20e2b31390096de659332ea6f4559fdca13ef80b5e"
+    },
+    "isolation-final": {
+      "exit_code": 0,
+      "source_scope": "historical_pre_prism_general",
+      "receipt_sha256": "16eb88a64c41eba6e22c08e978249d05f825c5e8d9ea0d0d70afc50da2ac727e"
+    }
+  },
+  "cases": {
+    "normal": {
+      "child_exit": 0,
+      "cross_process_read": true,
+      "forced_child_termination": false,
+      "materialized_restore_verified": true,
+      "protected_backup_removed": true,
+      "outer_recovery_observed": false
+    },
+    "failure": {
+      "child_exit": 1,
+      "cross_process_read": false,
+      "forced_child_termination": false,
+      "materialized_restore_verified": true,
+      "protected_backup_removed": true,
+      "outer_recovery_observed": false
+    },
+    "termination": {
+      "child_exit": 15,
+      "cross_process_read": false,
+      "forced_child_termination": true,
+      "materialized_restore_verified": true,
+      "protected_backup_removed": true,
+      "outer_recovery_observed": false
+    }
+  },
+  "verified_public_binaries": {
+    "/private/tmp/vellum-macos-clipboard-checks/self-test-v7/guardian": "7cfbabde0f7dbbc4e87cb5a376901336b83c923e35f101c801ad5fa2af025488",
+    "/private/tmp/vellum-macos-clipboard-checks/self-test-v7/clipboard-smoke": "38d208c21ebd5ad1f47f4c87e8d4946baf63a8d2f1be7f970d9cf23cba318d54"
+  },
+  "prism": {
+    "result_path": "/private/tmp/vellum-macos-clipboard-checks/prism-v1/prism.json",
+    "result_sha256": "62dbee1af3cbbb079bb53f1a53d67dad6e4a3ee869bd3e28487013bffd1eda07",
+    "process_path": "/private/tmp/vellum-macos-clipboard-checks/prism-v1/process.json",
+    "process_sha256": "e394839b2da21f00c5b0e9b5b61ee65d578844acd2905dbf6b5b2419544d791f",
+    "raw_cli_exit_code": 1,
+    "coverage_files": 12,
+    "coverage_complete": true,
+    "raw_medium_findings": 4,
+    "dispositions": "Four FIXED dispositions linked to the approved final 13-file source map and current public regression/native safety receipts.",
+    "second_provider_run": false,
+    "no_zero_finding_or_raw_exit_zero_claim": true
+  },
+  "findings": [],
+  "conclusions": [
+    "The normal final run has child exit 0 and independent cross-process read=true. Intentional exit 1 and forced termination status 15 have cross_process_read=false and qualify restoration only. All three final summaries verify materialized restoration and protected-backup removal and contain no outer recovery record.",
+    "The corrected v7 safety summary and native interposition output report stale journal acceptance and foreign-write refusals without general pasteboard access. Final Python regression, opt-in vet/isolation and live outer receipts bind the final13 source map; pre-Prism native/offscreen checks remain explicitly historical.",
+    "Final default, offscreen and offscreen-with-opt-in package archive hashes equal their earlier counterparts, with diagnostic symbols/macro absent; the opt-in mode alone exposes the 19 recorded diagnostic symbols.",
+    "The report preserves raw Prism exit1/four medium findings, final internal review coverage13, historical failure artifacts and source-version limits. It does not claim a second provider pass, guardian-crash/outer-recovery live qualification, native heap/endurance, full Mac completion or public release."
+  ],
+  "limits": [
+    "No private directory, protected original/backup, or private archive member was read or enumerated, including dummy originals. Public summaries and source-reviewed verification paths provide restoration evidence; this review intentionally did not inspect original clipboard bytes.",
+    "No clipboard/native/UI operations, tests, builds, provider calls or Git actions were performed. The only executed helper was a stdlib public-archive parser/hash verifier writing reviewer-owned evidence.",
+    "The public archive/source/log graph and prepared maps were verified; the complete prepared filesystem was not independently rehashed and production source implementation review remains separately certified.",
+    "Restoration is of materialized bytes/item/flavor order, not lazy provider/change-count identity. Non-atomic competition with writers, third-party interoperability, broad provider/adversarial behavior, physical/human IME/VoiceOver, hardware, heap/endurance and full workload performance remain open.",
+    "The three observed live cases did not actually qualify outer recovery after a guardian crash; report and qualification correctly preserve that limit."
+  ],
+  "privacy_actions": {
+    "private_directory_enumerated": false,
+    "private_or_original_backup_read": false,
+    "clipboard_access": false,
+    "native_ui": false,
+    "tests_or_builds": false,
+    "provider_calls": false,
+    "git_actions": false,
+    "producer_executed": false
+  }
+}
