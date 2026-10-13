@@ -64,6 +64,7 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"selector"])return NSAccessibilityPopUpButtonRole;
  if([role isEqual:@"tabs"])return NSAccessibilityTabGroupRole;
  if([role isEqual:@"option"])return NSAccessibilityRadioButtonRole;
+ if([role isEqual:@"radio-group"])return NSAccessibilityRadioGroupRole;
  if([role isEqual:@"scroll"])return NSAccessibilityScrollAreaRole;
  if([role isEqual:@"table"])return NSAccessibilityTableRole;
  if([role isEqual:@"outline"])return NSAccessibilityOutlineRole;

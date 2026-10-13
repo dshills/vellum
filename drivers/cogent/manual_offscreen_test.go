@@ -533,16 +533,17 @@ func TestManualUnqualifiedManagerKeysRefuseBeforeRefreshOrAdmission(t *testing.T
 	}
 }
 
-func TestManualAccessibilityIndexRetainsFirstPublishedNode(t *testing.T) {
+func TestManualAccessibilityIndexUsesQualifiedIdentity(t *testing.T) {
 	firstSelection, laterSelection := [2]int{1, 4}, [2]int{0, 0}
 	nodes := []accessibilityNode{
-		{DomainID: "field", Value: "first", Selected: true, TextSelection: &firstSelection, TextFocus: 1},
-		{DomainID: "check", Value: true},
-		{DomainID: "field", Value: "later", TextSelection: &laterSelection, TextFocus: 0},
+		{ID: "field", DomainID: "field", Value: "first", Selected: true, TextSelection: &firstSelection, TextFocus: 1},
+		{ID: "check", DomainID: "check", Value: true},
+		{ID: "field", DomainID: "field", Value: "later", TextSelection: &laterSelection, TextFocus: 0},
+		{ID: accessibilityOptionID("group", "check"), DomainID: "check", Value: false},
 	}
 	index := manualAccessibilityIndex(nodes)
-	if len(index) != 2 || !reflect.DeepEqual(index["field"], nodes[0]) || !reflect.DeepEqual(index["check"], nodes[1]) {
-		t.Fatalf("index changed published first-match semantics: %+v", index)
+	if len(index) != 3 || !reflect.DeepEqual(index["field"], nodes[0]) || !reflect.DeepEqual(index["check"], nodes[1]) {
+		t.Fatalf("index aliased domain identities or changed duplicate-ID precedence: %+v", index)
 	}
 	if _, exists := index["missing"]; exists {
 		t.Fatal("index invented a visible node")
@@ -575,7 +576,7 @@ func TestManualCaptureKeepsLiveFieldTextAndDirectionalSelectionCoherent(t *testi
 		// field value/selection after indexed semantic lookup, not this state.
 		fieldRecord.control.fieldState = &stale
 		nodes, _ := accessibilitySnapshot(w.state.root, nil)
-		if manualAccessibilityIndex(nodes)["field"].Value != "controlled" {
+		if manualAccessibilityIndex(nodes)[accessibilityManagedID("field")].Value != "controlled" {
 			t.Fatal("fixture did not establish a stale published cache")
 		}
 	}); err != nil {

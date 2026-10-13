@@ -58,3 +58,18 @@ func TestGalleryExpandedControls(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGallerySharedChoiceGroups(t *testing.T) {
+	g := newGallery()
+	node(g.view(), "radio-preset").Change(ui.ChangeEvent{SelectedID: "advanced"})
+	if node(g.view(), "segmented-preset").SelectedID != "advanced" || node(g.view(), "selection").SelectedID != "advanced" {
+		t.Fatal("choice controls do not share accepted preset")
+	}
+	node(g.view(), "segmented-preset").Change(ui.ChangeEvent{SelectedID: "basic"})
+	if node(g.view(), "radio-preset").SelectedID != "basic" {
+		t.Fatal("segmented choice did not update radio value")
+	}
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+}

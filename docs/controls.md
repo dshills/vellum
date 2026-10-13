@@ -13,6 +13,8 @@ renders these elements and publishes their supported accessibility semantics.
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
 | Selection menu | `ui.Selector` | `Options`, `SelectedID`, `Change` |
+| Radio choices | `ui.RadioGroup` | `Options`, `SelectedID`, `Change`, `Orientation` |
+| Segmented choices | `ui.SegmentedControl` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Slider | `ui.Slider` | `Numeric`, `Number`, `Change` |
 | Numeric field | `ui.NumberField` | `Numeric`, `Number`, `Change` |
 | Single-line field | `ui.TextField` | `Text`, `Change` |
@@ -50,8 +52,14 @@ The example uses application-owned `enabled`, `pinned` and `progress` values.
 Progress must be finite and within 0..1. Progress bars and separators default to
 horizontal; set `Orientation: ui.Vertical` for a vertical element. Explicit size
 and grow styles override native defaults; removing them restores those defaults.
-A toggle button holds one boolean value; it does not imply a radio or segmented
-single-selection group.
+A toggle button holds one boolean value. Use `ui.RadioGroup` or
+`ui.SegmentedControl` for a mutually exclusive choice. These retain 1..64 options
+with distinct nonempty IDs and one selected ID. Duplicate labels are allowed.
+Disabled selections can be displayed, but users cannot choose disabled options.
+Radio groups default to vertical, segmented controls to horizontal; Orientation
+can change either. Tab visits each group once; arrows wrap through enabled options,
+Home/End jump to first/last, and Enter/Space request the focused choice. Selection
+cannot be cleared by clicking its currently selected option.
 
 The independent gallery in `drivers/cogent/cmd/gallery` demonstrates the control
 set. After driver dependency preparation, run `go run ./cmd/gallery` from

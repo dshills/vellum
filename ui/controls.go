@@ -6,19 +6,21 @@ import (
 )
 
 const (
-	Checkbox      Kind = "checkbox"
-	Switch        Kind = "switch"
-	ToggleButton  Kind = "toggle-button"
-	ProgressBar   Kind = "progress-bar"
-	Separator     Kind = "separator"
-	Selector      Kind = "selector"
-	Slider        Kind = "slider"
-	NumberField   Kind = "number-field"
-	TextField     Kind = "text-field"
-	MultilineText Kind = "multiline-text"
-	Tabs          Kind = "tabs"
-	Scroll        Kind = "scroll"
-	Dialog        Kind = "dialog"
+	Checkbox         Kind = "checkbox"
+	Switch           Kind = "switch"
+	ToggleButton     Kind = "toggle-button"
+	ProgressBar      Kind = "progress-bar"
+	Separator        Kind = "separator"
+	Selector         Kind = "selector"
+	RadioGroup       Kind = "radio-group"
+	SegmentedControl Kind = "segmented-control"
+	Slider           Kind = "slider"
+	NumberField      Kind = "number-field"
+	TextField        Kind = "text-field"
+	MultilineText    Kind = "multiline-text"
+	Tabs             Kind = "tabs"
+	Scroll           Kind = "scroll"
+	Dialog           Kind = "dialog"
 )
 
 // Option has a stable domain ID independent of its displayed label. For Tabs,
@@ -32,8 +34,8 @@ type Option struct {
 // the keyboard increment; pointer and typed values need not be step multiples.
 type Numeric struct{ Min, Max, Step float32 }
 
-// Orientation sets a progress bar or separator's direction. The zero value
-// selects horizontal; these display controls never join keyboard focus order.
+// Orientation sets display/choice direction. Empty means horizontal except for
+// RadioGroup, which defaults to vertical. Progress/separators are not focusable.
 type Orientation string
 
 const (
@@ -43,7 +45,7 @@ const (
 
 // ChangeEvent requests a model edit. The relevant payload is Checked for
 // Checkbox/Switch/ToggleButton, Number for Slider/NumberField, Text for TextField, and SelectedID
-// for Selector/Tabs. Controlled nodes reflect the accepted value on redraw.
+// for Selector/Tabs/RadioGroup/SegmentedControl. Controlled nodes reflect the accepted value on redraw.
 type ChangeEvent struct {
 	ID               string
 	Kind             Kind
@@ -72,7 +74,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Switch, ToggleButton, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs:
+	case Button, Checkbox, Switch, ToggleButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs:
 		return true
 	}
 	return false
@@ -101,8 +103,8 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
-	if n.Orientation != "" && n.Kind != ProgressBar && n.Kind != Separator {
-		return fmt.Errorf("ui: Orientation belongs only on progress bars and separators")
+	if n.Orientation != "" && n.Kind != ProgressBar && n.Kind != Separator && n.Kind != RadioGroup && n.Kind != SegmentedControl {
+		return fmt.Errorf("ui: Orientation belongs only on progress, separator and choice controls")
 	}
 	if n.Orientation != "" && n.Orientation != Horizontal && n.Orientation != Vertical {
 		return fmt.Errorf("ui: invalid display orientation %q", n.Orientation)
@@ -154,7 +156,12 @@ func ValidateControl(n Node) error {
 			return fmt.Errorf("ui: node %q: %w", n.ID, err)
 		}
 	}
-	if n.Kind == Selector || n.Kind == Tabs {
+	if n.Kind == RadioGroup || n.Kind == SegmentedControl {
+		if len(n.Options) == 0 || len(n.Options) > MaxChoiceOptions || n.SelectedID == "" {
+			return fmt.Errorf("ui: choice group requires 1..%d options and one selected ID", MaxChoiceOptions)
+		}
+	}
+	if n.Kind == Selector || n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl {
 		seen := map[string]bool{}
 		selected := n.SelectedID == ""
 		if n.Kind == Tabs && (len(n.Options) == 0 || len(n.Options) != len(n.Children)) {
@@ -190,7 +197,7 @@ func FocusTarget(root Node, id string) (Node, bool) {
 			if disabled || !IsFocusable(n.Kind) {
 				return n, false
 			}
-			if n.Kind == Tabs {
+			if n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl {
 				for _, option := range n.Options {
 					if !option.Disabled {
 						return n, true

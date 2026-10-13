@@ -398,3 +398,10 @@ Offscreen lifecycle/input and Mac native-object checks do not substitute for
 human VoiceOver, physical keyboard/pointer interaction or the remaining native
 memory and sustained-performance gates. Further UI vocabulary is part of the
 framework completion work, alongside the existing ownership/qualification effort.
+
+[Radio groups and segmented choices](../docs/reports/macos-choice-controls/README.md) extend the public vocabulary
+with bounded keyed options, exclusive controlled selection, enabled keyboard
+navigation and scoped native accessibility. The [controls contract](controls.md)
+and public catalog specify their API. Internal/native-object/software-frame
+checks remain separate from physical Mac input, VoiceOver and the outstanding
+memory/performance/endurance gates.

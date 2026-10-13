@@ -751,8 +751,8 @@ func (m *Manual) Frame(ctx context.Context, window string) (ManualStepResult, er
 func manualAccessibilityIndex(nodes []accessibilityNode) map[string]accessibilityNode {
 	index := make(map[string]accessibilityNode, len(nodes))
 	for _, node := range nodes {
-		if _, exists := index[node.DomainID]; !exists {
-			index[node.DomainID] = node // Preserve the former scan's first-match semantics.
+		if _, exists := index[node.ID]; !exists {
+			index[node.ID] = node // Full AX identity separates managed nodes from group-local option IDs.
 		}
 	}
 	return index
@@ -771,7 +771,9 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 		result = ManualWindowSnapshot{ID: n.window.ID, Incarnation: w.incarnation, Frames: native.Frames, Events: native.Events, Timers: native.Timers, Blocked: native.Blocked, ReadyPaint: native.ReadyPaint, FuturePaint: native.FuturePaint, Closed: native.Closed, Failure: native.Failure, Now: native.Now, NextPaint: native.NextPaint, Elements: []ManualElement{}}
 		bounds := accessibilityBounds(n.root)
 		nodes, _ := accessibilitySnapshot(n.root, nil)
-		byDomain := manualAccessibilityIndex(nodes)
+		byID := manualAccessibilityIndex(nodes)
+		focusTargets := map[string]accessibilityFocusTarget{}
+		accessibilityNativeFocusTargets(n.root, "", focusTargets)
 		parents := map[string]string{}
 		var collect func(*record, string)
 		collect = func(r *record, parent string) {
@@ -783,7 +785,7 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 			selection := [2]int{-1, 0}
 			focus := 0
 			selected := false
-			node, visible := byDomain[r.node.ID]
+			node, visible := byID[accessibilityManagedID(r.node.ID)]
 			if visible {
 				value = node.Value
 				selected = node.Selected
@@ -804,6 +806,9 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 			b := bounds[accessibilityManagedID(r.node.ID)]
 			rect := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
 			focused := r.widget.AsWidget().StateIs(states.Focused)
+			if ui.IsFocusable(r.node.Kind) && gridEditingRecord(r) == nil {
+				focused = focusTargets[accessibilityManagedID(r.node.ID)].focused
+			}
 			if focused {
 				result.FocusedID = r.node.ID
 			}

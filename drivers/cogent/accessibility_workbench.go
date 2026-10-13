@@ -2,7 +2,6 @@ package cogent
 
 import (
 	"cogentcore.org/core/core"
-	"cogentcore.org/core/styles/states"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
 )
@@ -96,7 +95,7 @@ func workbenchAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 		}
 		focused := false
 		for _, panel := range group.Tabs {
-			if button := w.buttons[panel]; button != nil && button.StateIs(states.Focused) {
+			if button := w.buttons[panel]; button != nil && button.ContainsFocus() {
 				focused = true
 				break
 			}
@@ -276,6 +275,7 @@ func accessibilityFocusProjection(root *record, prefix string) ui.Node {
 type accessibilityFocusTarget struct {
 	widget  core.Widget
 	focused bool
+	scopeID string // Option targets validate visibility through their managed group.
 }
 
 func accessibilityNativeFocusTargets(root *record, prefix string, out map[string]accessibilityFocusTarget) {
@@ -285,27 +285,40 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 	if ui.IsFocusable(root.node.Kind) {
 		widget, err := focusWidget(root)
 		if err == nil && !accessibilityTreeNil(widget) {
-			focused := widget.AsWidget().StateIs(states.Focused)
+			focused := widget.AsWidget().ContainsFocus()
 			if root.control != nil && root.control.tabs != nil {
 				for _, button := range root.control.tabs.buttons {
-					if !accessibilityTreeNil(button) && button.StateIs(states.Focused) {
+					if !accessibilityTreeNil(button) && button.ContainsFocus() {
 						focused = true
 					}
 				}
 			}
-			out[prefix+accessibilityManagedID(root.node.ID)] = accessibilityFocusTarget{widget, focused}
+			if root.control != nil && root.control.choice != nil {
+				for _, button := range root.control.choice.buttons {
+					focused = focused || button.ContainsFocus()
+				}
+				for _, option := range root.node.Options {
+					if option.Disabled {
+						continue
+					}
+					if button := root.control.choice.buttons[option.ID]; button != nil {
+						out[prefix+accessibilityOptionID(root.node.ID, option.ID)] = accessibilityFocusTarget{widget: button, focused: button.ContainsFocus(), scopeID: prefix + accessibilityManagedID(root.node.ID)}
+					}
+				}
+			}
+			out[prefix+accessibilityManagedID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused}
 		}
 	}
 	if w, ok := root.node.Custom.(*Workbench); root.node.Kind == ui.Extension && ok {
 		accessibilityWorkbenchLeaves(w, func(g *workbench.Group) {
 			focused := false
 			for _, panel := range g.Tabs {
-				if button := w.buttons[panel]; button != nil && button.StateIs(states.Focused) {
+				if button := w.buttons[panel]; button != nil && button.ContainsFocus() {
 					focused = true
 				}
 			}
 			if button := w.buttons[g.Active]; button != nil {
-				out[prefix+accessibilityDockID(root.node.ID, g.ID)] = accessibilityFocusTarget{button, focused}
+				out[prefix+accessibilityDockID(root.node.ID, g.ID)] = accessibilityFocusTarget{widget: button, focused: focused}
 			}
 			accessibilityNativeFocusTargets(w.records[g.Active], prefix+accessibilityWorkbenchNamespace(root.node.ID, g.Active), out)
 		})

@@ -1,7 +1,7 @@
 # Standard controls contract
 
 The public `ui.Node` vocabulary now includes checkbox, switch, toggle button,
-progress bar, separator, selector, slider, numeric
+progress bar, separator, radio group, segmented control, selector, slider, numeric
 field, single-line text field, multiline document editor, managed data grid,
 tabs, scroll container and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
@@ -193,17 +193,55 @@ Programmatic synchronization emits no Change.
 
 `ProgressBar` displays a finite accepted `Number` fraction in 0..1 without a
 keyboard step or input callbacks. `Separator` is a decorative line. Both accept
-`Orientation` Horizontal/Vertical; empty defaults to horizontal. Other kinds
-refuse Orientation. Explicit managed size/grow styles override native final
+`Orientation` Horizontal/Vertical; empty defaults to horizontal. Kinds outside these display and choice controls refuse Orientation. Explicit managed size/grow styles override native final
 defaults; removing those styles restores the native dimensions and growth. They are leaves and do not join managed focus order.
 Progress exposes its fraction and 0/1 bounds with the Mac progress-indicator role;
 Separator is omitted from the accessible hierarchy. Switch and ToggleButton
 publish checkable Mac roles and boolean press/set actions. Human VoiceOver and
 physical keyboard/pointer acceptance remain separate from offscreen/native-object
-fixtures. No indeterminate animation, radio grouping or segmented single-choice
-contract is implied by these elements.
+fixtures. No indeterminate animation is implied by these display elements.
 
 The gallery demonstrates all four additions using ordinary descriptors and
-accepted application state. Next vocabulary expansion should prioritize radio
-and segmented choices, reusable toolbars/status bars, form groups and adjustable
+accepted application state. Next vocabulary expansion should prioritize reusable toolbars/status bars, form groups and adjustable
 splitters, each with keyboard, disabled, lifetime and accessibility contracts.
+
+## Radio and segmented choices
+
+`RadioGroup` and `SegmentedControl` are controlled leaves with 1..64 Options,
+stable nonempty unique option IDs, and one required SelectedID from those options.
+Displayed labels can repeat. An accepted disabled choice remains displayed; it
+cannot be selected by input. A disabled group/ancestor refuses changes. Empty,
+missing-selected and oversized descriptors are refused before retained mutation.
+`ui.NextChoiceOption` wraps enabled IDs for ±1; missing current IDs choose the
+first/last enabled value. Invalid/disabled/all-disabled descriptors have no target.
+
+Radio groups default vertical and segmented controls horizontal; Orientation can
+set either explicitly. Option widgets retain identity by domain ID through label
+updates/reordering. Removal retires the private binding; readding the same ID
+creates a new binding. Native input captures option ID and binding identity, then
+rechecks current enabled state and callback on owner delivery. Retired queued
+requests cannot select a new same-ID binding. Programmatic synchronization emits
+no Change. Native clicks restore the accepted exclusive selection while their
+owner request is pending. Choosing the accepted selected option cannot clear it.
+
+The group is one managed Tab stop, preferring its selected enabled option and
+otherwise the first enabled option. Arrow keys wrap through enabled options;
+Home/End select the first/last; Enter/Space request the focused option. Modified
+chords remain available to enclosing shortcuts. Actual focused options stay
+within the group's managed traversal identity. All-disabled groups are skipped.
+Keyboard navigation requests Change through bounded originating-window owner
+admission. Refusal restores controlled values and reports the standard OnError
+and control-error property. No unbounded retry queue is added.
+
+The Mac semantic group has a radio-group role and readable selected label;
+option records have radio-button roles, stable generated IDs, selected boolean,
+measured frames and per-option focus/press actions. Set uses domain IDs, without
+label fallback. Semantic focus admission validates the live option binding; its
+pending ID is an intent to focus the current visible, enabled same-ID target at
+application time, including a replacement binding and workbench/modal namespaces.
+If the option disappears or its group becomes hidden/disabled before application,
+the request is refused. This differs from queued Change, which retains binding
+identity and refuses replacements. Manual captures use full semantic identities
+so group-local option IDs cannot shadow unrelated managed controls. Tests of native
+objects and completed software frames remain separate from physical OS input,
+human VoiceOver, graphics-memory and sustained-performance qualification.

@@ -55,7 +55,7 @@ type Node struct {
 	Checked             bool
 	Number              float32
 	Numeric             Numeric
-	// Orientation applies to ProgressBar and Separator; empty means horizontal.
+	// Orientation applies to display/choice controls; RadioGroup defaults vertical.
 	Orientation   Orientation
 	Options       []Option
 	SelectedID    string
@@ -115,7 +115,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog:
-		case Label, Button, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
+		case Label, Button, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

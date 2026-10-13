@@ -1,0 +1,114 @@
+{
+  "result": "REVIEWED_UI_CHOICE_CONTROLS",
+  "base_commit": "c7e4ee31ecc22b28f2a237a98ebb23ca8c033bf4",
+  "source_manifest_sha256": "b7696288c53fc110a9feb5806d3b4a5f0993cc0b09e7f6fa7570521edbc9dec1",
+  "qualification_sha256": "f0c9f85fada4e54b3fbf841501e28217d59f144a65c1b564e1a11c31aed18195",
+  "source_review_sha256": "c388a70f2834941d7088adaf3f05dbd3467b664a1aa211ce751e17eaf854a2d0",
+  "evidence_review_sha256": "60ef22645763af5519a8bca50d67db1a74b755311d5b7ef105bc502d4b021310",
+  "report_sha256": "cb84cbde2e0b708a011f93ed6a1616dfd6c24577ae3c49a4b69e551d8db16816",
+  "archive": {
+    "sha256": "9041c9e87c538039b16c1565ce3b2c1c6ba3d118bfeac1b7dff072f1a3e32b02",
+    "members": 208,
+    "index_sha256": "9f96d6d4c08225d4f9aea1beec0dcfcb81056d25960967a5a4842e38df2221b2"
+  },
+  "prepared_files": 6198,
+  "command_receipts": 25,
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 1,
+  "prism_findings_resolved": true,
+  "prism_sha256": "8cf883035860db2a6dfd7916842e31abc5b93286df42cc47634b1200391cfdc7",
+  "prism_initial_sha256": "31983a4a2d09083fa900b7f7be63f45885c259cf3a94800e00271fa5329fb489",
+  "prism_composite_coverage": {
+    "initial": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 19,
+      "bytes": 82809,
+      "chunks": 4,
+      "llmCalls": 4,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 49473,
+          "output": 5596,
+          "costUSD": 0.154906
+        }
+      ],
+      "widenedFiles": 8,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "delta": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 2,
+      "bytes": 16740,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 10641,
+          "output": 1487,
+          "costUSD": 0.036152
+        }
+      ],
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "composite_files": 19,
+    "resolved_findings": 1
+  },
+  "source": {
+    "docs/controls.md": "e930b2279cc2b8ee5286ed0bd34451a89bfca396256d163a661e8062f3a42846",
+    "drivers/cogent/accessibility.go": "e1a8da980e347546d6160cf6454405c5b738ccd778a79a91f55342e87a5576f4",
+    "drivers/cogent/accessibility_darwin.m": "5ce4c05af0f96b5bcdf648e6edacf109d23340be48187e9d0d4654c918a868e3",
+    "drivers/cogent/accessibility_workbench.go": "7bcd53b82ca0bf2b104ca50c2296a5a7d2ed41f6e648e37891c80771f88effcd",
+    "drivers/cogent/choices.go": "5ee72446b682b6694183a4e90cd65de1f39de4608303d0a712e96515da24fb8b",
+    "drivers/cogent/choices_darwin_test.go": "9815121e6a0da26c237bb1de97e5e2f863edf37ad8a37ff69c507c6207844721",
+    "drivers/cogent/choices_offscreen_test.go": "1222245912f4a6591dd1b95a3269cfb4550b1899164e40753ea75211145243bd",
+    "drivers/cogent/choices_test.go": "a426a61085bd46803b989addb9c3c718fd02a3ef8ef8a1e204f16d3c0b9b0cbb",
+    "drivers/cogent/cmd/gallery/main.go": "11bea04885b4b890ac37634456a0dc4fa0a104c0b8f845245a92a9315a99a22c",
+    "drivers/cogent/cmd/gallery/main_test.go": "1d034bff961f91c3ea42fa37d93870052fcdf6ac39b637ac02f8d00d08dd8ec7",
+    "drivers/cogent/controls.go": "fa9f8c66e5f3ccce43842761bb0b5d46a81477f9dd92ef740fdfb9c8031d21ca",
+    "drivers/cogent/manual_offscreen.go": "e2a65d6a7950d8b2058337daa0d27341c3bed684b894c929808ac648410bc8ba",
+    "drivers/cogent/manual_offscreen_test.go": "c4b4127f1da5c655d6684cf8b37407c93dc4aae3d07d484283e5cf1862a239db",
+    "specs/controls.md": "68b97e21446549bb8a4d7f61976822eb75373ed3195f9c6512ecc56582fb41cc",
+    "specs/macos-completion.md": "862664c4e898804258653703dc73389ba0a56fa4e4bfdf3142b025c905c6202b",
+    "ui/choices.go": "269cc8f08b1f4d3d69c34955c9a48d74436f652910b0dfcaa41c57b0d2aaaa1e",
+    "ui/choices_test.go": "a35152a57332b38a336830de71744ee7f92be663a25664eae90eb6476867288e",
+    "ui/controls.go": "9162899ef58f7c47bf60d6cee7024932b223c2a2d4c7a43c7dd8236dbdeb1499",
+    "ui/node.go": "8677274c381b1db2dafb183fe482d3bd8aa0ec87abf92e96850a25ace0ddca9f"
+  },
+  "promotion_producer_sha256": "3ab6c1c7976301e15a3f87879f1bda32fd11c7980f886f8ad0a910f35b55ff9b",
+  "checkpoint_producer_sha256": "6d8637518271586a9ce06f83f7f1d8e014970436fec715b09303f88520a8836c",
+  "limits": [
+    "Nineteen changed source leaves and unchanged6198 prepared hashes are endpoint identities, not a full compiler/SDK/native-binary closure",
+    "Five final checks bind all nineteen source leaves; other raw receipts retain their historical source maps and available payloads with explicit missing-payload entries",
+    "Native Cocoa role fixtures use inert retained objects without an OS window or attachment",
+    "Manual input/raster tests use explicit fonts, colors, workers and clock; they do not establish physical display, OS input, VoiceOver or performance",
+    "Gallery compiled only and was not launched; no desktop windows, OS input/settings or general clipboard writes",
+    "Pending semantic focus intentionally resolves current visible/enabled same-ID targets; queued Change captures binding identity and refuses replacements",
+    "Physical Mac input/VoiceOver, native/GPU heap, sustained performance/endurance and full Mac qualification remain open"
+  ]
+}

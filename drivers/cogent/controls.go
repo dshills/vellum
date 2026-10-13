@@ -43,6 +43,7 @@ type controlState struct {
 	a                 *app.Application
 	window            string
 	tabs              *tabState
+	choice            *choiceState
 	dialog            *dialogState
 	wake              func(events.Event)
 	onError           func(error)
@@ -120,6 +121,18 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	switch r.node.Kind {
 	case ui.Checkbox:
 		widget = core.NewSwitch(parent).SetType(core.SwitchCheckbox)
+	case ui.RadioGroup, ui.SegmentedControl:
+		widget = core.NewFrame(parent)
+		c.choice = &choiceState{buttons: make(map[string]*core.Switch)}
+		widget.AsWidget().Styler(func(s *styles.Style) {
+			s.Direction = styles.Row
+			if choiceVertical(r.node) {
+				s.Direction = styles.Column
+			}
+			if r.node.Kind == ui.SegmentedControl {
+				s.Gap.Zero()
+			}
+		})
 	case ui.Switch:
 		widget = core.NewSwitch(parent).SetType(core.SwitchSwitch)
 	case ui.ToggleButton:
@@ -362,6 +375,16 @@ func syncControl(r *record, previous ui.Node) error {
 		return syncGrid(r)
 	}
 	nativeValueChanged := false
+	if r.control.choice != nil {
+		err := syncChoice(r, previous)
+		if refused != nil {
+			r.widget.AsTree().SetProperty("vellum.control-error", *refused)
+			if r.control.onError != nil {
+				r.control.onError(*refused)
+			}
+		}
+		return err
+	}
 	switch w := r.widget.(type) {
 	case *core.Switch:
 		// Resetting Checked alone leaves a segmented toggle's checked styling
@@ -467,6 +490,9 @@ func prepareControl(r *record, n ui.Node) error {
 	if err := validateNativeEditor(n); err != nil {
 		return err
 	}
+	if r.control != nil && r.control.choice != nil {
+		return prepareChoice(r, n)
+	}
 	if r.control == nil || r.control.tabs == nil {
 		return nil
 	}
@@ -516,6 +542,9 @@ func childHost(r *record, id string) tree.Node {
 	return r.widget
 }
 func finishControl(r *record, n ui.Node) {
+	if r.control != nil && r.control.choice != nil {
+		finishChoice(r, n)
+	}
 	if r.control != nil && r.control.outline != nil {
 		r.control.outline.previous = nil
 	}
@@ -707,6 +736,9 @@ func applyFocus(root *record, request ui.FocusRequest, last *ui.FocusRequest) er
 func focusWidget(r *record) (core.Widget, error) {
 	if edit := gridEditingRecord(r); edit != nil && !edit.node.Disabled {
 		return edit.widget, nil
+	}
+	if r.control != nil && r.control.choice != nil {
+		return choiceFocusWidget(r)
 	}
 	if r.node.Kind != ui.Tabs {
 		return r.widget, nil

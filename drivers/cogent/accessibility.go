@@ -215,7 +215,11 @@ func accessibilityApplyFocus(root *record, id string) bool {
 	if _, ok := targets[id]; !ok {
 		id = accessibilityManagedID(id)
 	}
-	if _, ok := ui.FocusTarget(ui.FocusScope(accessibilityFocusProjection(root, "")), id); !ok {
+	scopeID := id
+	if target, ok := targets[id]; ok && target.scopeID != "" {
+		scopeID = target.scopeID
+	}
+	if _, ok := ui.FocusTarget(ui.FocusScope(accessibilityFocusProjection(root, "")), scopeID); !ok {
 		return false
 	}
 	target, ok := targets[id]
@@ -368,6 +372,18 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			minimum, maximum := n.Numeric.Min, n.Numeric.Max
 			x.Min = &minimum
 			x.Max = &maximum
+		case ui.RadioGroup, ui.SegmentedControl:
+			x.Role = "radio-group"
+			x.Value = n.SelectedID
+			for _, option := range n.Options {
+				if option.ID == n.SelectedID {
+					x.Value = option.Label
+					break
+				}
+			}
+			_, x.Focusable = ui.FocusTarget(n, n.ID)
+			// Keyboard focus belongs to one option; group focus is a managed proxy.
+			x.Focused = false
 		case ui.Selector, ui.Tabs:
 			x.Value = n.SelectedID
 			for _, o := range n.Options {
@@ -399,7 +415,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if (n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
 				x.Actions = append(x.Actions, "increment", "decrement")
 			}
-			if (n.Kind == ui.Selector || n.Kind == ui.Tabs) && n.Change != nil {
+			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl) && n.Change != nil {
 				x.Actions = append(x.Actions, "set")
 			}
 			if n.Kind == ui.Dialog && n.Dismiss != nil {
@@ -439,6 +455,13 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			nodes = append(nodes, extra...)
 			for id, action := range actions {
 				handlers[id] = action
+			}
+		}
+		if r.control != nil && r.control.choice != nil {
+			extra, actions := choiceAccessibility(r, x.ID, b, disabled)
+			nodes = append(nodes, extra...)
+			for id, handler := range actions {
+				handlers[id] = handler
 			}
 		}
 		if n.Kind == ui.Tabs || n.Kind == ui.Selector {
@@ -580,6 +603,14 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 			return true
 		}
 		change.Text = action.Value
+	case ui.RadioGroup, ui.SegmentedControl:
+		if action.Kind != "set" || !choiceOptionEnabled(n, action.Value) {
+			return false
+		}
+		if n.SelectedID == action.Value {
+			return true
+		}
+		change.SelectedID = action.Value
 	case ui.Selector, ui.Tabs:
 		if action.Kind != "set" {
 			return false
@@ -842,6 +873,11 @@ func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[stri
 		if r.node.Kind == ui.Tabs && r.control != nil && r.control.tabs != nil {
 			for _, o := range r.node.Options {
 				bounds(accessibilityOptionID(r.node.ID, o.ID), r.control.tabs.buttons[o.ID])
+			}
+		}
+		if r.control != nil && r.control.choice != nil {
+			for _, option := range r.node.Options {
+				bounds(accessibilityOptionID(r.node.ID, option.ID), r.control.choice.buttons[option.ID])
 			}
 		}
 		if r.node.Kind == ui.Selector {
