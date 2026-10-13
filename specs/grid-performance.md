@@ -311,3 +311,7 @@ snapshot hashes and raw records for attribution. These are sampled process-wide
 Go allocations, including observers, concurrent adapter work and profile
 encoding; they cannot establish framework-only, native/GPU or retained-memory
 cost, or satisfy P6 latency targets.
+
+## Accessibility capacity and semantic string comparison
+
+The [service/allocation checkpoint](../docs/reports/macos-service-performance/README.md) compares exact completed-grid capacity reservation and owned semantic string encoding against the preceding committed build. Five interleaved process pairs per stored case retain all 4,800 samples with exact paired geometry. Process-wide allocation is lower, while frame timings are mixed and all unchanged warm targets remain failed. Separate sampled Go allocation profiles remain diagnostic; cache ownership, visible semantics and action guards are unchanged.

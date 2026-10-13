@@ -43,6 +43,39 @@ func TestAccessibilityPayloadMatchesValidatedEnvelope(t *testing.T) {
 	}
 }
 
+func TestAccessibilitySemanticMatchesIndependentMarshal(t *testing.T) {
+	selection := [2]int{1, 7}
+	cases := [][]accessibilityNode{
+		nil, {},
+		{{ID: "escaped", Name: "<>&\"\\\n\u2028\u2029\xff", Value: "A😀עברית", TextSelection: &selection}},
+		{{ID: "zero", Value: math.Copysign(0, -1)}, {ID: "integer", Value: uint64(math.MaxUint64)}},
+		{{ID: "raw", Value: json.RawMessage(" {\"nested\": [true, null, \"<>&\"]} \n")}},
+		gridAXPayloadFixture(400),
+		{{ID: "nonfinite", Value: math.NaN()}},
+		{{ID: "unsupported", Value: func() {}}},
+		{{ID: "invalid raw", Value: json.RawMessage("{")}},
+	}
+	for i, nodes := range cases {
+		want, wantErr := json.Marshal(nodes)
+		got, err := accessibilitySemantic(nodes)
+		if (err == nil) != (wantErr == nil) || err == nil && got != string(want) {
+			t.Fatalf("case %d changed validated semantics: error=%v, oracle=%v", i, err, wantErr)
+		}
+		if err != nil && got != "" {
+			t.Fatalf("case %d exposed a partial failed encoding", i)
+		}
+		if err == nil {
+			// A later encode cannot overwrite a previously retained semantic tree.
+			if _, err := accessibilitySemantic(gridAXPayloadFixture(17)); err != nil {
+				t.Fatal(err)
+			}
+			if got != string(want) {
+				t.Fatalf("case %d retained shared mutable encoder storage", i)
+			}
+		}
+	}
+}
+
 func TestAccessibilityGridPublicationInterleavedScopeOwnership(t *testing.T) {
 	b := &accessibilityBridge{}
 	one := gridAXCompleted("one", "root", 1, 4)

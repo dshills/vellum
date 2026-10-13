@@ -435,3 +435,7 @@ alternate text and bounded worker PNG/JPEG decoding. Independent preview/source
 replacement tests advance application use without conflating ordinary scene
 painting with MeshCanvas's direct GPU image workload. Physical Mac/VoiceOver,
 native memory and sustained performance remain open.
+
+## Native service and accessibility allocation checks
+
+The [service/allocation checkpoint](../docs/reports/macos-service-performance/README.md) passes the real Cocoa menu/tray fixture with 100 additional tray create/clear cycles and final service cleanup, plus the candidate stored 400-cell Cocoa accessibility fixture. Two small adapter changes reduce process-wide allocation in a matched 4,800-sample table campaign; frame timing is mixed and unchanged 4/6 ms targets remain failed. Native selectors do not qualify physical menu/tray interaction or human VoiceOver. This advances scoped implementation and acceptance without completing P6, P11/endurance, notification delivery or full Mac/release qualification.

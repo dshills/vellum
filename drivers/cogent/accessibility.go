@@ -162,7 +162,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		return
 	}
 	// Reject unencodable records before they can become a retained grid view.
-	semantic, err := json.Marshal(nodes)
+	semantic, err := accessibilitySemantic(nodes)
 	if err != nil {
 		return
 	}
@@ -174,7 +174,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	if pendingGrid {
 		// Ready records are unchanged by the scoped cache. Only pending records
 		// replace input semantics with their last-completed read-only subtree.
-		semantic, err = json.Marshal(nodes)
+		semantic, err = accessibilitySemantic(nodes)
 		if err != nil {
 			return
 		}
@@ -185,7 +185,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		return
 	}
 	b.handlers = handlers
-	snapshot := string(semantic)
+	snapshot := semantic
 	unchanged := b.lastSnapshot == snapshot
 	b.lastSnapshot = snapshot
 	b.mu.Unlock()
@@ -199,7 +199,19 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	nativeAccessibilityUpdate(b.token, accessibilityPayload(generation, snapshot))
 }
 
-// semantic is the complete successful json.Marshal result above, including the
+// accessibilitySemantic preserves Marshal's compact representation without
+// copying its returned byte slice again to retain an immutable string. Encoder
+// appends exactly one record delimiter after successful encoding; that newline
+// is removed while the builder's immutable backing remains owned by the result.
+func accessibilitySemantic(nodes []accessibilityNode) (string, error) {
+	var buffer strings.Builder
+	if err := json.NewEncoder(&buffer).Encode(nodes); err != nil {
+		return "", err
+	}
+	return strings.TrimSuffix(buffer.String(), "\n"), nil
+}
+
+// semantic is the complete successful encoding result above, including the
 // second validation after a pending-grid replacement. Only a generated decimal
 // integer and fixed delimiters surround it; no raw application text is appended.
 // This preserves the full envelope without re-encoding/copying its RawMessage.

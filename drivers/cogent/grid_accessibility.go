@@ -15,6 +15,24 @@ func gridAccessibility(r *record, parent string, b *accessibilityBridge, disable
 		return nodes, handlers
 	}
 	rows := map[string]string{}
+	visibleCells, visibleHeaders := 0, 0
+	for _, c := range m.Cells {
+		if !c.Bounds.Empty() {
+			visibleCells++
+			rows[c.RowKey] = ""
+		}
+	}
+	for _, h := range m.Headers {
+		if !h.Bounds.Empty() {
+			visibleHeaders++
+		}
+	}
+	// Count the exact completed visible records, including one row per key.
+	// Empty overscan remains absent and first appearance still orders rows.
+	nodes = make([]accessibilityNode, 0, visibleCells+visibleHeaders+len(rows))
+	if !disabled {
+		handlers = make(map[string]accessibilityHandler, visibleCells)
+	}
 	rowSelection := m.RowSelection
 	for i, c := range m.Cells {
 		if c.Bounds.Empty() {

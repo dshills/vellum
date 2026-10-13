@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "reviewed_at_utc": "2026-10-13T21:17:23.486360+00:00",
+  "review_kind": "Independent internal read-only source review",
+  "base_commit": "2338d7f56d6acf7c5213b21f1a78cfc8f471909c",
+  "scope": [
+    "drivers/cogent/accessibility.go",
+    "drivers/cogent/grid_accessibility.go",
+    "drivers/cogent/accessibility_payload_test.go"
+  ],
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility.go": "1215e9e11e657dac2dc9db486750c8df2e3e89793d87c391c996a94b0202c37a",
+    "/private/tmp/vellum-large-data/drivers/cogent/grid_accessibility.go": "00b5ae276a13ca3ee5950c668568dfb86aa48d2b8146fc7d4c55c8a82fb9c6eb",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_payload_test.go": "b9a5a6d506c22e2012471f2576b4555322680132d3f8dc9b76c4411d9237efff"
+  },
+  "reference_sha256": {
+    "/private/tmp/vellum-macos-service-performance/candidate-baseline-v1.json": "48413895f8b7fd276a7ecf1725971685079a2de44f76a87c297992aec020110c",
+    "/private/tmp/vellum-macos-service-performance/original-source.json": "98a7f1b2513fd9243ce0d24156b696140c766bc34f3c60f55ad34b401f7c3391",
+    "/private/tmp/vellum-macos-service-performance/original/drivers/cogent/accessibility.go": "9e1bb409b7f91fc07741b7f090a0cfa3132b67089e3c5201b833699e5cccf6a2",
+    "/private/tmp/vellum-macos-service-performance/original/drivers/cogent/grid_accessibility.go": "3db9d27754faa9a1643fa1ad2c4a416e482f23544f63873dcb27c77979432325",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_grid_publication.go": "9ccf3517bbc7f156ae62ac805b2d74d62a5d26f1a68a98f7d8edcdb665b44767",
+    "/private/tmp/vellum-large-data/drivers/cogent/grid.go": "6510019b9c6674b965dff9e4bbdd60d1e900b897219f7146856d678be1dc79a8"
+  },
+  "source_binding": {
+    "manifest": "/private/tmp/vellum-macos-service-performance/candidate-baseline-v1.json",
+    "manifest_sha256": "48413895f8b7fd276a7ecf1725971685079a2de44f76a87c297992aec020110c",
+    "selected_source_entries": 710,
+    "prepared_entries": 6198,
+    "claim": "Only the three reviewed leaves and cited reference files were independently read and hashed; the full manifest counts identify context, not an independent transitive source closure."
+  },
+  "conclusions": [
+    {
+      "area": "Wire representation and immutable storage",
+      "evidence": "accessibility.go:accessibilitySemantic and updateSnapshot; accessibility_payload_test.go:TestAccessibilitySemanticMatchesIndependentMarshal",
+      "assessment": "The helper uses a fresh local strings.Builder, default compact JSON Encoder and exactly one TrimSuffix LF. Successful Encoder output matches the former Marshal representation under the existing defaults. The builder is never pooled, reset or reused; later encodes cannot mutate a retained result. It does not expose any partial result on encode failure."
+    },
+    {
+      "area": "Failure and publication sequencing",
+      "evidence": "Original/current accessibility.go:updateSnapshot diff",
+      "assessment": "Initial serialization precedes scoped-cache preparation, and failure returns before that preparation. For pending grids the existing second serialization remains after preparation and before handler/snapshot/generation/native publication. The optimization preserves that prior sequence; it introduces no stronger rollback guarantee for the already-prepared cache. Closed checks, mutex boundaries, unchanged-tree generation preservation and queued-current handler resolution are unchanged."
+    },
+    {
+      "area": "Visible grid cardinality and order",
+      "evidence": "grid_accessibility.go:gridAccessibility",
+      "assessment": "The added passes read only detached completed measurement cells/headers, count nonempty bounds and seed a row-key map with empty string sentinels. The existing emission loop still tests rows[key]==empty, emits each row at its first visible cell, and emits cells and headers in original measurement order. Empty overscan stays absent. No actions, captured refs, eligibility/stale checks or geometry were changed."
+    },
+    {
+      "area": "Bounded allocation hints and ownership",
+      "evidence": "grid_accessibility.go plus grid.go native configuration caps and accessibility_grid_publication.go clone helpers",
+      "assessment": "Capacity is the sum of visible cells, visible headers and distinct visible row keys, bounded by existing native projection caps. Map capacity equals visible actionable cells when enabled. These are capacity hints, not new API limits. Completed cache cloning and owned/borrowed snapshot contracts remain intact; no source/model access or ownership transfer was added."
+    },
+    {
+      "area": "Regression test rigor",
+      "evidence": "accessibility_payload_test.go",
+      "assessment": "The new helper test uses independent stdlib Marshal as the wire/error oracle for nil/empty trees, escaped and invalid UTF-8 strings, negative zero, large integers, RawMessage, 400 cells and invalid/nonfinite/unsupported values. It checks failed results are empty and retained strings survive subsequent encoding. Existing envelope, detached-cache and owned/borrowed lifecycle bodies provide supporting tests; the reviewer has not executed them."
+    }
+  ],
+  "limitations": [
+    "Source approval only. The reviewer ran no tests, Go commands, builds, native/UI calls, providers or Git operations.",
+    "Author test/build receipts and performance comparisons are separate qualifications and were not adjudicated here.",
+    "The change avoids the prior final Marshal byte-slice-to-string copy; JSON Encoder still performs serialization and writes bytes into the Builder. It does not establish a zero-copy or exact physical/retained-memory claim.",
+    "The process-wide allocation profile includes measurement work and cumulative AX stacks; it cannot establish exact UI attribution or a speedup. No whole-frame, GPU, native memory or broad Mac acceptance follows from this review."
+  ],
+  "reviewer_executions": {
+    "tests": false,
+    "builds": false,
+    "native_or_ui": false,
+    "providers": false,
+    "git": false,
+    "source_mutation": false
+  }
+}

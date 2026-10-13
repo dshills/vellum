@@ -1,0 +1,79 @@
+{
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "decision": "APPROVED_PROTOCOL",
+  "findings": [],
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-macos-service-performance/compare.py": "3bfdb239cf4b1704f35d6deb46f6c760d5ee3f1baa2c02a29d1b5e80771a1bfd",
+    "/private/tmp/vellum-macos-service-performance/candidate_run.py": "ae62c1bc460e9b5d9f0f3529556764dcf81814055c72d5fd98848119fa57b7b7",
+    "/private/tmp/vellum-large-data/scripts/benchmark-grid.py": "c99da36325b5a978917f8f8168dbabf9be7a1428d42a73f1f13e3307489389e1",
+    "/private/tmp/vellum-large-data/scripts/child_process.py": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc"
+  },
+  "artifact_sha256": {
+    "/private/tmp/vellum-macos-service-performance/source-review.json": "8056ba787cd24784af47905389791aaa5a1886204b65084bedf27fdebc0ac98d",
+    "/private/tmp/vellum-macos-service-performance/baseline.json": "cd796df457abc43c1201d1cc05c3b49d235474e33342cf63c53f79fa4abc2e73",
+    "/private/tmp/vellum-macos-service-performance/candidate-baseline-v1.json": "48413895f8b7fd276a7ecf1725971685079a2de44f76a87c297992aec020110c",
+    "/private/tmp/vellum-macos-service-performance/build-grid-candidate-v1.json": "0741b4707d7960945e832701cbdcfce949a28c01cc1234b0473865365e01ba96",
+    "/private/tmp/vellum-macos-service-performance/compare-initial.py.txt": "36d69604d43d3de0b22a66b0039124f4fff4268c6935429b5c1f622fc08d3bcd"
+  },
+  "input_receipt_checks": {
+    "source_keysets_equal": true,
+    "prepared_maps_equal": true,
+    "changed_source": [
+      "drivers/cogent/accessibility.go",
+      "drivers/cogent/accessibility_payload_test.go",
+      "drivers/cogent/grid_accessibility.go"
+    ],
+    "candidate_approved_hashes_match": true,
+    "candidate_build_baseline_receipt_matches": true,
+    "candidate_build_exit_code": 0,
+    "candidate_build_source_stable": true
+  },
+  "baseline_scope": {
+    "commit": "2338d7f56d6acf7c5213b21f1a78cfc8f471909c",
+    "selected_source_count": 710,
+    "prepared_count": 6198,
+    "candidate_selected_source_count": 710,
+    "candidate_prepared_count": 6198
+  },
+  "finding_resolutions": [
+    {
+      "id": "SERVICE-COMPARE-PROTOCOL-01",
+      "status": "ACCEPTED_FIXED",
+      "issue": "Initial run_case native sessions escaped the outer hard watchdog group.",
+      "evidence": "A scoped benchmark.subprocess facade strips the native start_new_session option, checks inherited PGID, and kills/joins a launched child if admission validation fails. It delegates other module attributes and does not globally monkeypatch subprocess. Local benchmark cleanup kills the direct child; existing run_case finally joins/closes it. The outer candidate_run/run_child group covers native and ps observers."
+    },
+    {
+      "id": "SERVICE-COMPARE-PROTOCOL-02",
+      "status": "ACCEPTED_FIXED",
+      "issue": "Reusable benchmark validation alone could accept missing legacy warmup guard or a different ordinary warmup count.",
+      "evidence": "Every returned process must now show warmup_guard1 on all raw records and ready.warmup==ready.warm_callbacks==128."
+    },
+    {
+      "id": "SERVICE-COMPARE-PROTOCOL-03",
+      "status": "ACCEPTED_FIXED",
+      "issue": "A changed filename set did not alone bind the approved candidate bytes.",
+      "evidence": "Preflight now requires exact selected-source keyset equality, exact three changed paths, approved source review/findings[], and each candidate hash equal the corresponding reviewed absolute path."
+    }
+  ],
+  "approved_protocol": [
+    "Four fixed/variable10k/million cases, five matched pairs per case, alternating baseline/candidate pair order,120 completed ordinary samples and128 guarded warmups: planned40 fresh processes and4800 measured samples.",
+    "Each completed run retains native.log and full result.json, checks process exit/result, validates current source/prepared identity and current binary digest, then writes progress. Baseline binary must equal the prior allocation-qualification digest. Candidate build receipt names the exact output path, exits0, binds the candidate source baseline and reports source/prepared stability.",
+    "Matched baseline/candidate raw geometry dictionaries must be equal for every sample; shared compare_geometry also checks10k/million clip-workload identities within each build.",
+    "Common validator rejects active diagnostic profile/input/source-detail modes in these ordinary calls, checks completed tag/generation/callback/phase sums and minimum400 actually clipped cells, and uses end-only external ps observation.",
+    "Summaries derive all11 elapsed-work metrics from raw samples using the existing nearest-rank method, plus process-wide Go allocation observations. Targets remain the existing4ms p95/6ms p99 per-run limits."
+  ],
+  "preconditions": [
+    "Invoke compare.py through the reviewed candidate_run.py/run_child route so the process group belongs to the outer watchdog.",
+    "Wait for all concurrent adapter/test work to finish before latency processes; parent reports those gates terminal, but this source certificate does not independently execute or classify them.",
+    "Hold candidate repository/prepared bytes, phase producer files and both binaries stable throughout the campaign. Actual terminal raw receipts must be audited separately before any comparison result or benefit is qualified."
+  ],
+  "limitations": [
+    "Read-only producer/source/hash review only. No fixture, native/window/input, performance, test/build, provider or Git operations were executed by the reviewer.",
+    "No runtime outcomes, target pass, speedup, allocation attribution or full P6/Mac acceptance is certified before the campaign.",
+    "Outer hard group cleanup covers interruptions; on a hard kill an unfinished run may lack its final per-run receipt and must remain incomplete, not silently count toward40.",
+    "Selected-source/prepared and recorded build linkage is not a complete compiler/SDK/module-cache closure. Compare producer_sha256 is an end-state file hash; freeze/entry captures must remain separate provenance.",
+    "Local native cleanup kills/joins the direct child; it relies on outer group ownership for hard-stop descendant coverage.",
+    "Same-ticket values measure elapsed work, not physical GPU execution/presentation or native/GPU allocations. End-only RSS/CPU snapshots do not yield baseline/warm RSS or process CPU deltas."
+  ]
+}
