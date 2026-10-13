@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED",
+  "result": "APPROVED_EVIDENCE",
+  "reviewer": "mac_history_review",
+  "base_commit": "4ea5a9d67af7c16307a03d787b499a9053351fb6",
+  "scope": "Read-only independent review of the final notification evidence seal, public endpoints, source/review versions, native sampled observations and documented limitations. No new native acceptance or implementation self-approval.",
+  "primary_bindings": {
+    "report": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-notification-runtime/README.md",
+      "sha256": "ecb0900bbe8306fb869eb45a19a79070ccb2f6b2ea54585706f7d35d6b7b8b65"
+    },
+    "checkpoint": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-notification-runtime/records/checkpoint.json",
+      "sha256": "e6d6aaf1afe305a3c0d1e56bf24d2f668d9be0f8d66af66c2284880a37cad853"
+    },
+    "qualification": {
+      "path": "/private/tmp/vellum-macos-notification-runtime/qualification.json",
+      "sha256": "daa409011290c6c323b6293d967a53d8bb212c6049359d320e49dbb75e59fb43"
+    },
+    "archive": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-notification-runtime/records/evidence.tar.gz",
+      "sha256": "51d0ae84656c9f866e0d53db14843e91c536aa4f2c637f927940681a1c68e736",
+      "members": 100,
+      "index_sha256": "2c3c2467ea0ca325947f711cde59fc8c5056f41629d4163c323ad81c370598c3"
+    },
+    "producer": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-notification-runtime/records/archive-producer.py.txt",
+      "sha256": "6d17313212d8660b90480c276436f9c9c8c89ad50534410dbc3ce8c3a327dfc2",
+      "not_executed_by_reviewer": true
+    },
+    "independent_audit": {
+      "path": "/private/tmp/vellum-notification-evidence-review/audit-final.json",
+      "sha256": "f98af1db9516ab803d0b03001e0c8bcb2b7f2f6c39c93e295b5d27ce811a70cb"
+    },
+    "inert_recipe": {
+      "path": "/private/tmp/vellum-notification-evidence-review/verify-final.py.txt",
+      "sha256": "aa246c8d50bf9bf21835eb54c690690e8a2707b2b257564e76fd0df0c66a849c"
+    },
+    "actual_manifest_check": {
+      "path": "/private/tmp/vellum-notification-evidence-review/manifest-check.json",
+      "sha256": "847c4e65162ccfc77ef37e8a00f101358519e974b3d0eab07db761b73878a241"
+    }
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "HISTORICAL-DECODE-CAUSE-INFERENCE",
+      "disposition": "CLARIFIED",
+      "previous_report_sha256": "07ea86916e07fc2fbd2f340f94e0a8c1a6926f02138e79d34750876db3505b45",
+      "final_report_sha256": "ecb0900bbe8306fb869eb45a19a79070ccb2f6b2ea54585706f7d35d6b7b8b65",
+      "issue": "The initial retained pure log proves invalid inventory decoding and a nil-context panic, but does not identify a numeric Sound field.",
+      "resolution": "The final report explicitly states the boxed-Sound diagnosis is an inference rather than a field-specific log observation. It preserves the limitation that the complete initial source bytes were not saved and does not claim a replayable original-source qualification."
+    }
+  ],
+  "archive_verification": {
+    "unique_regular_relative_utf8_members": 100,
+    "all_hashes_equal_index": true,
+    "all_public_endpoints_equal_index": true,
+    "app_bundle_and_compiled_binary_members_absent": true,
+    "producer_prunes_app_directories_before_descent": true,
+    "producer_skips_binary_bytes_before_archiving": true,
+    "final_vs_initial": "Original99-member seal retained in reviewer history. Only report.py changed; promote.py was added. The other98 initial public members, including all source/test/native/raw receipts, are byte-identical.",
+    "added_promote_script": "Hash-bound archive data only; this certificate does not approve its safety or execute it."
+  },
+  "source_and_prepared": {
+    "final_source_sha256": {
+      "drivers/cogent/notification_checks_darwin.go": "a746f0ee6902b348d1a82a250546ae9378dae917b3870f3f59f7ca2fd65eec00",
+      "drivers/cogent/notification_checks_darwin.m": "1367ea2ac8187fc736d1ce8b15f9fe028a4cebba25ca55473ccdd191fbfd0fa9",
+      "drivers/cogent/notification_checks_darwin_test.go": "e620031854cc2118a4f5fbb545e4e73a5570d14976e8e4cf30b599b7a50e0169",
+      "drivers/cogent/cmd/notifications-smoke/main.go": "04f9d010cab0b68ee609c7f3823ba23265acbd65a6c6be296a6c18c0555040a1",
+      "specs/notifications.md": "f953f1c8002ff671eb2b6a876af96bd8494990d724bed7919ea4d33b99ff761d",
+      "docs/development.md": "45062d30f2020faa113ea24f9511386012cf315d7d69c612f09d6b3e5d9f3568",
+      "drivers/cogent/cmd/notifications-smoke/main_test.go": "49cb0c2ff2340ed9d1abe9e26d3fa5524c263da5b19f318f4946891a62912dfe"
+    },
+    "final_source_count": 7,
+    "current_and_archived_snapshots_match": true,
+    "source_certificate": {
+      "path": "/private/tmp/vellum-macos-notification-runtime/source-review-final.json",
+      "sha256": "555bfa688b5adb6cb3f38fb51cfe16fba319d7d6999ffd387c5471c4af8b614c",
+      "status": "APPROVED_SOURCE",
+      "exact_final_map": true
+    },
+    "unchanged_probe_implementation_since_prism": true,
+    "corrective_source_delta": [
+      "drivers/cogent/cmd/notifications-smoke/main.go",
+      "drivers/cogent/cmd/notifications-smoke/main_test.go",
+      "specs/notifications.md"
+    ],
+    "all6174_current_prepared_files_independently_hashed": true,
+    "exact_previous_pane_checkpoint_map": true,
+    "selected_source_not_full_compiler_cache_or_sdk_closure": true
+  },
+  "provider": {
+    "raw_path": "/private/tmp/vellum-macos-notification-runtime/prism-v1/prism.json",
+    "raw_sha256": "a943bcc1db82c4afae93df192246e746a9f8f233b160479c071620be690f310f",
+    "process_path": "/private/tmp/vellum-macos-notification-runtime/prism-v1/process.json",
+    "process_sha256": "7efd6c5a00a7c821b0270e8eba5f83b5bc34caa85df8abe29fa726db5abaa7dc",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "complete": true,
+    "files": 6,
+    "chunks": 2,
+    "input_tokens": 22057,
+    "output_tokens": 4177,
+    "raw_exit_code": 1,
+    "raw_medium_findings": 1,
+    "finding_id": "e49e58d43b4df2e5",
+    "disposition": "FIXED_BY_INTERNAL_SEVEN_SOURCE_CORRECTION",
+    "second_provider_call": false,
+    "original_before_after_map_verified": true
+  },
+  "receipts": {
+    "count": 22,
+    "stdout_stderr_hashes_verified": 44,
+    "groups": {
+      "seven_final": 8,
+      "four_before_docs": 7,
+      "six_prism_before_correction": 6,
+      "initial_failed_probe": 1
+    },
+    "all_terminal_source_stable_and_correctly_classified": true,
+    "expected_initial_pure_failure_retained_exit1": true,
+    "other21_receipts_exit0": true,
+    "final_corrected_command_race_count3_and_vet_pass": true,
+    "all_recorded_lifetimes_within_provided_authorization_interval": true,
+    "initial_isolation_detail_overwritten": "Initial raw stdout/exit is historical; only final isolation-result detail is bound. No initial/final package archive-equality claim.",
+    "initial_failed_pure_source": "Initial failure/hash evidence only; complete old source bytes were not retained and are not certified replayable."
+  },
+  "native": {
+    "total_lifetimes": 8,
+    "bare_lifetimes": 2,
+    "private_packaged_lifetimes": 6,
+    "final_corrected_race_lifetimes": [
+      "bare-race-correction",
+      "bundle-race-correction",
+      "restart-race-correction"
+    ],
+    "earlier_five_native_lifetimes_remain_four_or_six_source_history": true,
+    "observed_permission": "NotDetermined",
+    "exposed_settings_before_after": {
+      "Permission": 1,
+      "AlertEnabled": false,
+      "SoundEnabled": false
+    },
+    "all_requested_current_and_previous_reserved_ids_derived_and_nonce_chain_verified": true,
+    "all_packaged_queried_pending_and_delivered_arrays_empty": true,
+    "sampled_native_outstanding_operations": 0,
+    "main_thread_dispatch_and_terminal_callback_retirement_recorded": true,
+    "closed_service_refusal": "Supported by the hash-bound approved consumer completion path, not a claim that the stopped OS loop recovered arbitrary requests.",
+    "package_metadata": "All three actual Info.plist/APPL records, APP_MANIFEST bytes, pre-sign binaries and signed executables match captured hashes. Private ad hoc identity, non-notarization and shared isolated bundle identifier are preserved."
+  },
+  "compilation_isolation": {
+    "final_detail_sha256": "b3700e00737aa25571a9605cc0cab9d3ecfd468f0105a7630645641689a401ef",
+    "default_offscreen_and_offscreen_opt_in_probe_go_objc_macro_and_symbols_absent": true,
+    "opt_in_new_symbols": 9,
+    "earlier_detail_archive_equality_not_claimed": true
+  },
+  "conclusions": [
+    "The final report matches the actual evidence: bare calls refuse as unavailable, packaged calls observe NotDetermined and reject Notify with permission errors, and requested own-ID inventories/settings stay unchanged at the sampled boundaries.",
+    "Withdrawal concerns absent owned IDs. Empty sampled arrays and callback counts establish dispatch/observation and retirement in these processes, not successful removal of an existing notification or guaranteed future OS state.",
+    "The lifecycle helper correction retains late failure reports with unqualified cleanup/delivery/withdrawal. Deterministic command tests support that correction, but no actual fatal native-loop cleanup/recovery scenario is live-qualified.",
+    "The initial Sound diagnosis is now accurately labeled inference. Raw Prism exit1/one finding, historical four/six-source runs, overwritten isolation-detail limitation and nonreplayable initial failure source evidence remain explicit.",
+    "No permission prompt, Denied/Authorized/Provisional delivery, human presentation, sound, foreground/delegate interoperability, memory/endurance, public distribution or full Mac-completion claim is made."
+  ],
+  "limits": [
+    "No source/report/archive edits, native/UI calls, tests/builds, provider calls or Git actions by this reviewer. Only stdlib evidence parsing/hashing and reviewer-owned records were executed/written.",
+    "The new promote.py member is preserved as a source artifact, not reviewed as an executable promotion producer by this certificate.",
+    "Empty arrays/counts are sampled own-namespace observations and cannot prove concurrent linearization or future notification-center state.",
+    "Only exposed Permission/AlertEnabled/SoundEnabled fields were compared; no broader OS preference or notification policy equivalence is inferred.",
+    "The seven-file source certificate is separate; whole compiler/cache/SDK rights/distribution closure, real early-loop recovery and wider hardware/performance remain open.",
+    "No user clipboard content or host serial metadata was accessed in this phase."
+  ],
+  "history": {
+    "initial99_audit": {
+      "path": "/private/tmp/vellum-notification-evidence-review/audit.json",
+      "sha256": "033c92a6d421e9ed829902cbb49792a7d869757e2bd79693baf52faab45909a2"
+    },
+    "exact_initial_report_and_producer_snapshots": "/private/tmp/vellum-notification-evidence-review/initial-seal",
+    "initial_index_roundtrip_exact": true,
+    "initial_checkpoint_roundtrip_exact": true,
+    "qualification_unchanged_through_documentary_reseal": true
+  },
+  "actions": {
+    "source_or_sealed_file_mutation": false,
+    "native_ui": false,
+    "tests_builds": false,
+    "provider_calls": false,
+    "git_actions": false,
+    "independent_stdlib_data_processing": true
+  }
+}

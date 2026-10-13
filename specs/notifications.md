@@ -62,10 +62,52 @@ Offscreen tests cover options, compatibility, public consumers, context prefligh
 native parsing, actual UNNotificationContent/Request data objects, detached
 producers, injected settings normalization and permission-error callbacks. They
 never access UNUserNotificationCenter, request permission, send/withdraw messages,
-create UI, play sound or change OS settings. Packaged permission/denial, real
-presentation/sound/replacement/removal, concurrent ordering, foreground/delegate
-interoperability and restart remain live acceptance checks until the user says
-the computer is free.
+create UI, play sound or change OS settings.
+
+## Separate native acceptance
+
+The opt-in `vellum_native_checks` consumer `cmd/notifications-smoke` checks a bare
+executable separately from an isolated private `.app`. Bare operations, including
+the permission method, must refuse before accessing the center; bundle metadata
+is checked before that method is invoked. Packaged checks read actual settings
+and use unique per-run nonce IDs. They never request permission, install a
+notification delegate, request sound or alter OS settings.
+
+`InspectNativeNotifications` is available only in that build. It accepts 1..32
+valid public IDs and requires a bundle identifier beginning with
+`com.vellum.native-checks.notifications.`. Only the requested reserved identifiers
+are returned. Pending and delivered lists are separate asynchronous observations,
+not an atomic union. Native input is limited to 8192 bytes, each OS collection to
+4096 entries, and aggregate reply JSON to 64 KiB. A conservative escaped-text
+budget reserves each selected row before collection; oversized content, duplicate
+results or a complete reply that exceeds the bound are refused, never truncated.
+Thus 32 maximal bodies need not fit the diagnostic reply even though the public
+service accepts a 32-ID withdrawal batch. Ordinary/offscreen builds exclude the
+probe, consumer and their symbols; the SDK source payload may contain them.
+
+On NotDetermined/Denied, the consumer requires a permission error, unchanged
+settings and no retained owned item. On Authorized/Provisional, it requires actual
+delivered content, replacement and targeted removal preserving a second item.
+This conditional branch is not qualified by a permission-refusal run. Restart
+checks the previous run's exact IDs in the same bundle; an initially stale item
+fails the check even if later cleanup removes it.
+
+The worker's 45-second deadline precedes the native loop's 90-second deadline.
+Cleanup uses a fresh 15-second context while services remain alive, waits for
+retained native operations to ACK, dispatches withdrawal only for the fixture's
+exact IDs and polls for observed empty lists. A timeout preserves failure rather
+than claiming cleanup from a canceled caller or removal ACK. Outstanding counts
+and inventories are sampled observations; they do not establish concurrent
+writer ordering or future OS state. Permission prompts/denial changes, visible
+presentation/sound, authorized replacement/removal, foreground/delegate
+interoperability and broader restart behavior remain acceptance work until their
+corresponding live evidence exists.
+
+An unexpected native-loop exit cancels the worker and waits 16 seconds, longer
+than its fresh cleanup deadline, for a terminal outcome. A late worker report is
+preserved; no reply produces a scoped failed report. Both paths mark cleanup
+unverified and refuse a phase pass because the loop has already stopped. This
+preserves evidence without claiming that an ended loop can complete withdrawal.
 
 Primary APIs: [UserNotifications](https://developer.apple.com/documentation/usernotifications/unusernotificationcenter),
 [authorization](https://developer.apple.com/documentation/usernotifications/unusernotificationcenter/requestauthorization(options:completionhandler:)),

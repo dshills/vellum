@@ -232,3 +232,36 @@ Run through an app bundle with its own identifier; ordinary Go binaries return
 Unavailable. See [the contract](../specs/notifications.md). Focused `TestNotification`
 checks with `-tags offscreen` in `drivers/cogent` build data objects and injected
 settings/results; they never access the center, send messages or request permission.
+
+For separate nonprompting native acceptance, build the opt-in consumer and package
+an isolated private app with the ordinary packaging tool:
+
+```sh
+cd drivers/cogent
+go build -tags=vellum_native_checks -o /tmp/vellum-notifications ./cmd/notifications-smoke
+cd ../..
+python3 scripts/package-app.py --binary /tmp/vellum-notifications \
+  --output /tmp/VellumNotificationChecks.app --name VellumNotificationChecks \
+  --identifier com.vellum.native-checks.notifications.local --version 0.1.0 \
+  --platform darwin --sign-identity -
+/tmp/VellumNotificationChecks.app/Contents/MacOS/VellumNotificationChecks \
+  -bundle-id=com.vellum.native-checks.notifications.local \
+  -nonce="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
+```
+
+The output must be new. Run only on an available Mac desktop. The private bundle
+uses ad hoc signing, independently of public release/signing/notarization. The
+consumer never requests permission, changes a delegate, requests sound or changes
+preferences. NotDetermined/Denied qualifies refusal and unchanged state. An
+already Authorized/Provisional bundle additionally checks actual delivered
+content, replacement and targeted withdrawal preserving a second item; that
+branch can fail if OS presentation policy does not retain notifications. A pass
+never proves human-visible presentation. `-previous-nonce` checks a completed
+prior run's IDs in the same bundle. The bare executable accepts
+`-expect-unbundled` with a fresh nonce and verifies unavailable operations.
+
+The diagnostic inventory returns only requested test IDs, keeps pending/delivered
+observations separate and enforces a 64 KiB aggregate reply limit. Cleanup waits
+for native ACKs under a fresh deadline before withdrawal and observes empty owned
+lists before closing the loop. This does not establish concurrent-writer
+atomicity. See the [notification contract](../specs/notifications.md) for limits.

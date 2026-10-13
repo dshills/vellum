@@ -1,0 +1,216 @@
+"""Seal bounded, nonprompting Mac notification acceptance evidence."""
+import datetime, hashlib, io, json, os, shutil, tarfile
+from pathlib import Path
+
+r = Path('/private/tmp/vellum-large-data')
+p = Path('/private/tmp/vellum-macos-notification-runtime')
+out = r / 'docs/reports/macos-notification-runtime'
+sha = lambda f: hashlib.sha256(f.read_bytes()).hexdigest()
+read = lambda n: json.loads((p / n).read_text())
+final, original, implementation = [read(n)['sources'] for n in ['source-final.json', 'source-prism.json', 'source-implementation.json']]
+assert len(final) == 7 and all(sha(r / n) == h for n, h in final.items())
+cert = read('source-review-final.json')
+assert cert['status'] == 'APPROVED_SOURCE' and not cert['findings'] and cert['files'] == final
+prism, process = read('prism-v1/prism.json'), read('prism-v1/process.json')
+assert prism['coverage']['complete'] and prism['coverage']['files'] == 6 and len(prism['findings']) == 1
+assert process['exit_code'] == 1 and process['error'] is None and process['source_index_stable']
+assert process['before'] == process['after'] == original
+assert read('prism-disposition.json')['status'] == 'FIXED'
+assert read('prism-disposition.json')['final_source_review_sha256'] == sha(p / 'source-review-final.json')
+allowed = read('testing-authorization.json')
+start, end = [datetime.datetime.fromisoformat(allowed[k]) for k in ['authorized_from_utc', 'authorized_until_utc']]
+receipts = {}
+for f in sorted(p.glob('*.json')):
+    d = json.loads(f.read_text())
+    if 'source_delta_stable' not in d:
+        continue
+    name = f.stem
+    assert d['exit_code'] == (1 if name == 'probe-pure-race' else 0) and d['error'] is None and d['source_delta_stable']
+    assert d['source_delta_before'] == d['source_delta_after']
+    for channel in ['stdout', 'stderr']:
+        assert sha(p / (name + '.' + channel)) == d[channel + '_sha256']
+    source = d['source_delta_before']
+    if name == 'probe-pure-race':
+        group = 'initial_failed_probe'
+    elif source == final:
+        group = 'seven_final'
+    elif source == original:
+        group = 'six_prism_before_correction'
+    else:
+        assert source == implementation
+        group = 'four_before_docs'
+    when = datetime.datetime.fromisoformat(d['started_utc'])
+    assert start <= when and when + datetime.timedelta(seconds=d['elapsed_seconds']) < end
+    if d['executable_sha256'] is not None:
+        assert sha(Path(d['argv'][0])) == d['executable_sha256']
+    receipts[name] = {'path': f.name, 'sha256': sha(f), 'exit_code': d['exit_code'], 'source_group': group}
+assert len(receipts) == 22
+native_names = ['bare-v1', 'bundle-v1', 'restart-v1', 'bundle-race-final', 'restart-race-final', 'bare-race-correction', 'bundle-race-correction', 'restart-race-correction']
+native = {}
+for name in native_names:
+    d = read(name + '.stdout')
+    assert d['raw_result'] == 'PASS'
+    assert not any(d[k] for k in ['delegate_changed', 'permission_requested', 'sound_requested', 'os_preferences_changed', 'human_presentation_qualified', 'delivery_qualified', 'withdrawal_qualified'])
+    c = d['native_cleanup']
+    assert c['MainThread'] and c['CleanupObserved'] and c['CallbacksStopped'] and c['PendingCallbacks'] == 0
+    if name.startswith('bare'):
+        assert d['result'] == 'PASS_NATIVE_NOTIFICATION_UNBUNDLED_REFUSAL' and not d['bundle']['AppBundle']
+    else:
+        assert d['result'] == 'PASS_NATIVE_NOTIFICATION_PERMISSION_REFUSAL' and d['bundle']['AppBundle']
+        assert d['settings_before'] == d['settings_after'] == {'Permission': 1, 'AlertEnabled': False, 'SoundEnabled': False}
+        assert d['owned_cleanup_verified']
+        for field in ['initial_inventory', 'after_refusal_inventory', 'owned_cleanup']:
+            s = d[field]
+            assert s['MainThreadDispatch'] and s['BundleIdentifier'] == d['bundle']['BundleIdentifier'] and s['NativeOutstanding'] == 0 and s['Pending'] == s['Delivered'] == []
+    native[name] = {'sha256': sha(p / (name + '.stdout')), 'result': d['result'], 'source_group': receipts[name]['source_group']}
+inputs = read('campaign-correction-inputs.json')
+previous = ''
+for name, nonce, prior in [('bundle-v1', inputs['bundle_nonce'], ''), ('restart-v1', inputs['restart_nonce'], inputs['bundle_nonce']), ('bundle-race-final', inputs['race_nonce'], inputs['restart_nonce']), ('restart-race-final', inputs['race_restart_nonce'], inputs['race_nonce']), ('bundle-race-correction', inputs['corrected_nonce'], inputs['race_restart_nonce']), ('restart-race-correction', inputs['corrected_restart_nonce'], inputs['corrected_nonce'])]:
+    d = read(name + '.stdout')
+    assert d['nonce'] == nonce and d['previous_nonce'] == prior and d['bundle']['BundleIdentifier'] == inputs['bundle_id']
+isolation = read('isolation-result.json')
+assert isolation['result'] == 'PASS_DEFAULT_OFFSCREEN_OPT_IN_ISOLATION'
+for name, d in isolation['modes'].items():
+    if name == 'opt_in':
+        assert len(d['diagnostic_symbols']) == 9 and d['probe_go'] and d['probe_objc'] and d['macro']
+    else:
+        assert not d['diagnostic_symbols'] and not d['probe_go'] and not d['probe_objc'] and not d['macro']
+metadata = read('bundle-metadata.json')
+assert len(metadata) == 3
+for name, d in metadata.items():
+    assert d['info']['CFBundleIdentifier'] == inputs['bundle_id'] and d['info']['CFBundlePackageType'] == 'APPL'
+    assert d['manifest']['signed_identity'] == '-' and not d['manifest']['notarized'] and d['manifest']['private_build']
+prepared = {f.relative_to(r / 'drivers/cogent/build').as_posix(): sha(f) for module in ['upstream', 'typesetting'] for f in sorted((r / 'drivers/cogent/build' / module).rglob('*')) if f.is_file()}
+assert len(prepared) == 6174 and prepared == json.loads(Path('/private/tmp/vellum-macos-grid-latency/qualification.json').read_text())['prepared']
+q = {'result': 'PASS_MAC_NOTIFICATION_BUNDLE_PERMISSION_REFUSAL', 'base_commit': read('source-final.json')['base_commit'],
+     'source': final, 'prism_source': original, 'prepared': prepared, 'receipts': receipts, 'native_cases': native,
+     'source_review_sha256': sha(p / 'source-review-final.json'), 'prism_raw_exit_code': 1, 'prism_findings': 1, 'prism_findings_resolved': True,
+     'compiled_isolation_sha256': sha(p / 'isolation-result.json'), 'bundle_metadata_sha256': sha(p / 'bundle-metadata.json'),
+     'live_tests': True, 'os_preferences_changed': False, 'general_pasteboard_accessed': False,
+     'observed_permission': 'NotDetermined', 'permission_prompt_qualified': False, 'denied_state_qualified': False,
+     'authorized_delivery_qualified': False, 'existing_item_removal_qualified': False, 'human_presentation_qualified': False,
+     'actual_early_native_loop_failure_qualified': False, 'macos_completion': False,
+     'suite_disposition': 'Complete opt-in race/vet passed six-source pre-correction code. Only command lifecycle/spec and a new command test changed afterwards. Affected command race x3/vet, fresh race build and three final-source native checks pass. Probe and production adapter sources are unchanged.',
+     'isolation_history': 'The initial detail filename was reused by the final isolation producer. Initial raw exit/stdout remain historical; only final detail is bound. No initial/final archive equality claim is made.'}
+(p / 'qualification.json').write_text(json.dumps(q, indent=2) + '\n')
+records = out / 'records'
+records.mkdir(parents=True, exist_ok=False)
+shutil.copy2(Path(__file__), records / 'archive-producer.py.txt')
+files = {}
+for folder, dirs, names in os.walk(p):
+    dirs[:] = sorted(d for d in dirs if not d.endswith('.app') and not (Path(folder) / d).is_symlink())
+    for name in sorted(names):
+        f = Path(folder) / name
+        if f.is_file() and not f.is_symlink() and f.suffix in ['.json', '.stdout', '.stderr', '.py', '.txt', '.log']:
+            files[f.relative_to(p).as_posix()] = f.read_bytes()
+index = {n: hashlib.sha256(b).hexdigest() for n, b in files.items()}
+(records / 'evidence-index.json').write_text(json.dumps(index, indent=2) + '\n')
+archive = records / 'evidence.tar.gz'
+with tarfile.open(archive, 'w:gz') as tf:
+    for n, b in sorted(files.items()):
+        info = tarfile.TarInfo(n); info.size, info.mode, info.mtime = len(b), 0o644, 0
+        tf.addfile(info, io.BytesIO(b))
+with tarfile.open(archive) as tf:
+    actual = {m.name: hashlib.sha256(tf.extractfile(m).read()).hexdigest() for m in tf.getmembers() if m.isfile()}
+assert actual == index and all('.app/' not in n for n in index)
+
+(out / 'README.md').write_text('''# Mac notification bundle and permission acceptance
+
+The optional notification service now has a separate, nonprompting real-Cocoa
+acceptance consumer and bounded inventory probe. The ordinary SDK's notification
+implementation is unchanged. Default/offscreen builds exclude the new probe and
+consumer; diagnostic source files remain part of the repository/source payload.
+
+## Actual host result
+
+Two bare processes refuse settings, the permission method, delivery, withdrawal
+and inventory as unavailable. Bundle metadata is checked before those calls;
+the permission method refuses before accessing the notification center.
+
+Six private ad hoc bundle lifetimes reach the actual UNUserNotificationCenter.
+They observe NotDetermined permission with alerts/sound false, both valid Notify
+calls return the permission error, settings remain unchanged, and queried pending/
+delivered IDs are empty. Restart queries include the preceding run's exact nonce
+IDs under the same bundle identifier. Native dispatch runs on the main queue;
+sampled outstanding operations are zero before cleanup. Scoped withdrawal and
+observed empty inventories precede process exit, terminal native callbacks retire,
+and the closed public service refuses another settings operation.
+
+The final three processes use the corrected race-enabled consumer: bare refusal,
+packaged refusal and restart. The preceding five runs are separately identified
+as four/six-source history. The probe and production adapter bytes are unchanged
+through the lifecycle correction. Bundle metadata binds pre-sign source binary,
+actual signed executable, APPL information and private ad hoc identity. No public
+identity, notarization, permission prompt, delegate, sound or preference change
+was used. General clipboard contents and input/VoiceOver settings were untouched.
+
+This does not qualify Denied state, an authorization prompt, Authorized/Provisional
+delivery, replacement or removal of an existing item. Withdrawal of absent owned
+IDs confirms dispatch/observation only. Empty inventories and outstanding counts
+are sampled observations, not concurrent ordering or future OS state. Human
+visible presentation, sound and foreground/delegate policy remain open.
+
+## Bounds, tests and review
+
+The opt-in probe accepts at most 32 valid public IDs and only the isolated check
+bundle namespace. It returns only those reserved identifiers, keeps pending and
+delivered reads separate, caps input at 8192 bytes and scans each OS array at most
+4096 entries. A conservative escaped-text budget precedes selected-row collection;
+aggregate reply JSON is at most 64 KiB. Overflow and duplicates refuse the complete
+reply, never truncate. Two data-object/canceled/shutdown test methods pass three
+times under race without contacting the center. They cover malformed/NUL IDs,
+counts, oversized aggregate bodies, duplicate/native reply refusal, detached
+content, unrequested IDs, required fields and canceled/nil/stopped admission.
+
+The first pure log records invalid inventory decoding and a nil-context panic.
+The decode failure was diagnosed as a boxed C Sound comparison encoding a number;
+explicit BOOL boxing and nil-context preflight corrected the observed failures.
+That diagnosis is an inference, not a field-specific log observation. Raw failure
+and source hashes remain historical; its old complete source bytes were not saved,
+so it is not a replayable original-source qualification.
+
+The complete opt-in adapter race suite and vet pass before the Prism correction.
+Only command lifecycle/spec and a new command test change afterwards. The affected
+command race regressions pass three times, affected vet passes, and a fresh race
+build plus three actual native processes verify the final source. The nine new
+diagnostic symbols and their Go/Objective-C files are excluded from default,
+offscreen and offscreen-plus-opt-in compilation. Final isolation metadata is bound;
+the initial detail filename was reused by that producer. Initial raw exit/stdout
+remain historical, with no earlier/final archive-equality claim.
+
+Prism runs once with Anthropic Claude Sonnet 5.5: complete six-file/two-chunk
+coverage, 22,057 input and 4,177 output tokens, raw exit 1 and one medium finding.
+An early native-loop exit could outlast the five-second worker wait and lose its
+report. The corrected consumer waits 16 seconds, longer than fresh 15-second
+cleanup, and preserves a late outcome or emits a scoped failure. Both early-loop
+paths explicitly mark cleanup/delivery/withdrawal unqualified. Deterministic tests
+cover normal completion, late worker detail/error and no reply. They do not
+qualify an actual fatal Cocoa-loop failure or recover its notifications.
+Internal correction review approves all seven final files and the finding's fix;
+no second provider call was made.
+
+## Evidence and remaining acceptance
+
+[Checkpoint](records/checkpoint.json) binds the [archive](records/evidence.tar.gz)
+and [member index](records/evidence-index.json). It includes all 22 wrapper receipts,
+raw stdout/stderr, source snapshots/manifests, separate original/final reviews,
+Prism disposition, scoped fixture IDs and package metadata. App bundles/binaries
+are pruned before archive enumeration; metadata retains their hashes. All 6,174
+prepared dependency files remain byte-identical to the preceding checkpoint.
+Selected source/binary evidence is not a complete compiler/cache/SDK closure.
+
+Checks ran inside the authorized fifteen-hour quiet window. Authorized delivery/
+replacement/removal, permission changes, visible presentation, foreground/delegate
+interoperability, real early-loop failure/recovery, native memory/endurance and
+broader Mac hardware/performance/distribution remain open. This bounded runtime
+acceptance does not complete the Mac UI framework or qualify public release.
+''')
+checkpoint = {'result': q['result'], 'base_commit': q['base_commit'], 'qualification_sha256': sha(p / 'qualification.json'),
+              'source_review_sha256': sha(p / 'source-review-final.json'), 'prism_provider': 'anthropic', 'prism_model': 'claude-sonnet-5-5',
+              'prism_coverage_complete': True, 'prism_original_coverage_files': 6, 'final_internally_reviewed_files': 7,
+              'prism_findings': 1, 'prism_findings_resolved': True,
+              'archive': {'sha256': sha(archive), 'members': len(index), 'index_sha256': sha(records / 'evidence-index.json')},
+              'report_sha256': sha(out / 'README.md'), 'live_tests': True, 'authorized_delivery_qualified': False,
+              'existing_item_removal_qualified': False, 'macos_completion': False}
+(records / 'checkpoint.json').write_text(json.dumps(checkpoint, indent=2) + '\n')
+print(json.dumps(checkpoint, indent=2))
