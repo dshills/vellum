@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "reviewed_utc": "2026-10-13T11:06:06.674384+00:00",
+  "base_commit": "848121d32278757dca7eae7544dc005a553633de",
+  "source_manifest_sha256": "95f6e7b42c4b76b994c00df4eb245d643e3bf9cb99002020a76628af6b537283",
+  "reviewed_source_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input_darwin.m": "ee6bcfe1579ea7224adf25c51c313bedf637b4357ce86cbb3d045f1db072b69e",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/README.md": "739f4f6bdae2acc375b7c6d88e11ba9583e47b60738b58f2e78d24a1dddf378b",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/dependencies.json": "213175e74ddc783fd013e968553c391d3bb021260d62d7906540cbbed9b07133",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/0047-scoped-native-layer-ownership.patch": "34a5e53c3666d365f248736b617f0d82f938af36f41496fb4e5fb1baf657983b",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/LICENSE.apache-2.0.txt": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/README.md": "3a85c83ed0f5b822f7361a7e33d4127e45b47365ce8acc24dd8d9094afbad9a2",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/check.py": "6c205f158210750502686662cdf44497e27af3062849561a52daab58a9d1056c",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/input_pool_test.m": "94a7f3a9ec2c97b5d31b01b74553c96de651eeef2c5dc98cd8f88c8bd235250d",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/original-hashes.json": "fcc27c1be405fc81def4df9849215f9c24d6e734c0097cc9bb32744bca6200dc",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/output-hashes.json": "0fb9e3dfdbd5dd68f4f9f6ee2a99902e1a04816408154d8a8ec2955496b40f9e",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/provenance.json": "6d5dceebafa2ffd0994230c6b604afef9418e77c4361f14c56354eb5495c38eb",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/surface_pool_test.m": "98fc5bc955985b2571b94449f91efd3d924e512f77befa791aeea5ae5db54dda",
+    "/private/tmp/vellum-large-data/drivers/cogent/prepare_test.py": "78a40c612e500f8e949adc7a72365e7743a2dadc720bb04125bfb579b9e61126",
+    "/private/tmp/vellum-large-data/specs/native-object-lifetime.md": "aa5bfd94ed13556a128a33d2b4d5686a4ef861adf5ab14cc682d3377c32ad1cf"
+  },
+  "reviewed_patch_output_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/desktop/app.go": "fe8234f95bbcb09f4d0c5bd5dd61450a322abc16c639e77d07adcbc1b336d402",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/desktop/surface_darwin.go": "edf2f1b85987a605b11406ecbffd5dc827ee46515b775a6a9f5406c0e30b1cd2",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/desktop/surface_other.go": "813fd936bf6b147234b22451b506b75cbb4fe361bce4a8ac35bb2fd6defd5499",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/desktop/surface_layer_darwin.h": "35a0a59776ca0465fda420516ece104f87d520f25891547f629d1d5572377178"
+  },
+  "reference_file_sha256": {
+    "/private/tmp/vellum-macos-autorelease/app-original.go": "bd6bc29967e942c2170e526bbf11fb06ddaa5d0e07719097fcc2a3c731087f3c",
+    "/private/tmp/vellum-macos-autorelease/input-original.m": "00b0b3d52d80960d9d24b9dab0e3f715665323b3fcbff648300b7b5a3342964f",
+    "/tmp/vellum-p0-cache/mod/github.com/oliverbestmann/webgpu@v1.36.1-0.20261006093257-de8bdd5d5976/wgpuglfw/surface_darwin.go": "a6492fa147f5033825ee4fe426b6e367b89a788dccb79109f5d7de032eb8c4e0",
+    "/tmp/vellum-p0-cache/mod/github.com/oliverbestmann/webgpu@v1.36.1-0.20261006093257-de8bdd5d5976/LICENSE": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AppKit.framework/Headers/NSView.h": "af91fb647759eccbc205c2db73a20f7d73cd3850b90ae13d4a211745abeb372c",
+    "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+  },
+  "counts": {
+    "root_source_files": 14,
+    "decoded_patch_outputs": 4,
+    "added_input_pool_bodies": 10
+  },
+  "mechanical_checks": {
+    "root_manifest_current": true,
+    "patch_context_and_hunk_counts_valid": true,
+    "decoded_patch_matches_output_pins_and_prepared": true,
+    "input_original_equal_after_removing_only_two_comment_lines_and_ten_pool_wrappers": true,
+    "patch47_registered_after_1_through_46": true,
+    "provenance_source_and_apache_license_byte_identical_to_pinned_webgpu": true,
+    "endpoint_source_hashes_unchanged": true
+  },
+  "source_conclusions": [
+    "Darwin helper captures contentView and refuses missing view before layer allocation; strong NSView.layer retains the borrowed descriptor pointer after local pool drainage. Production caller remains the serialized native main-thread construction callback.",
+    "Non-Darwin factory delegates to the prior wgpuglfw implementation. Normal surface/device teardown precedes GLFW view/window destruction.",
+    "Input callbacks, validation, retained state/copy/release, geometry sorting and malloc replies are byte-identical after stripping only pool wrappers and the added ownership comment. Nested geometry/publication pools retain accepted buffers before outer drainage.",
+    "Surface fixture uses counted NSObject stand-ins, nil-window/no-view refusal, replacements, caller-held ownership and final retirement; it avoids undocumented immediate CoreAnimation deallocation assumptions.",
+    "Swizzle original IMPs are captured before installing replacements; background factory calls use originals and do not mutate main-thread counters; original IMPs are restored in finally cleanup.",
+    "Input fixture checks completed_cycles separately from requested_cycles, accepted/refused publications, copied/retained geometry, caller-held data, caret, unmarked settlement and malloc reply lifetime."
+  ],
+  "limitations": [
+    "This is a source-only internal review, not a qualification receipt; the reviewer ran no Go, Objective-C compilation, fixture binary, UI, GPU, provider or live test.",
+    "The headless layer fixture substitutes NSObject resources and does not prove actual CAMetalLayer, drawable, IOSurface, RSS or physical-footprint retirement.",
+    "Input admission callbacks are stubs and composition remains unmarked. This does not qualify human IME/preedit behavior or all diagnostic bridge paths.",
+    "Private factory assumes a valid nonnil GLFW object and native main-thread caller as guaranteed by current construction. Nil native window/contentView is refused by the C helper.",
+    "Previously measured native retention is a source-supported hypothesis; resolution requires a separately authorized quiet-host live campaign. No live run is currently authorized by this certificate."
+  ]
+}

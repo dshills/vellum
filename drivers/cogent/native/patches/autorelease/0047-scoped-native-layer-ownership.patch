@@ -1,0 +1,90 @@
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -22,7 +22,6 @@
+ 	"cogentcore.org/core/system/composer"
+ 	"cogentcore.org/core/system/driver/base"
+ 	"github.com/go-gl/glfw/v3.4/glfw"
+-	"github.com/oliverbestmann/webgpu/wgpuglfw"
+ )
+ 
+ func Init() {
+@@ -143,7 +142,7 @@
+ 	}
+ 
+ 	func() {
+-		surf := gpu.Instance().CreateSurface(wgpuglfw.GetSurfaceDescriptor(w.Glw))
++		surf := gpu.Instance().CreateSurface(nativeSurfaceDescriptor(w.Glw))
+ 		var fbsz image.Point
+ 		fbsz.X, fbsz.Y = w.Glw.GetFramebufferSize()
+ 		if fbsz == (image.Point{}) {
+--- /dev/null
++++ b/system/driver/desktop/surface_darwin.go
+@@ -0,0 +1,26 @@
++//go:build darwin
++
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package desktop
++
++/*
++#cgo CFLAGS: -x objective-c
++#cgo LDFLAGS: -framework Cocoa -framework QuartzCore
++#include "surface_layer_darwin.h"
++*/
++import "C"
++
++import (
++	"unsafe"
++
++	"github.com/go-gl/glfw/v3.4/glfw"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++func nativeSurfaceDescriptor(window *glfw.Window) *wgpu.SurfaceDescriptor {
++	return &wgpu.SurfaceDescriptor{MetalLayer: &wgpu.SurfaceSourceMetalLayer{
++		Layer: C.vellumMetalLayerFromWindow(unsafe.Pointer(window.GetCocoaWindow())),
++	}}
++}
+--- /dev/null
++++ b/system/driver/desktop/surface_other.go
+@@ -0,0 +1,16 @@
++//go:build !darwin
++
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package desktop
++
++import (
++	"github.com/go-gl/glfw/v3.4/glfw"
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"github.com/oliverbestmann/webgpu/wgpuglfw"
++)
++
++func nativeSurfaceDescriptor(window *glfw.Window) *wgpu.SurfaceDescriptor {
++	return wgpuglfw.GetSurfaceDescriptor(window)
++}
+--- /dev/null
++++ b/system/driver/desktop/surface_layer_darwin.h
+@@ -0,0 +1,20 @@
++// Derived from webgpu/wgpuglfw/surface_darwin.go, Apache-2.0.
++// Vellum modification: scope temporary Cocoa ownership with a local pool.
++// The upstream license and pinned provenance accompany owned patch 0047.
++#import <Cocoa/Cocoa.h>
++#import <QuartzCore/CAMetalLayer.h>
++
++static void *vellumMetalLayerFromWindow(void *nativeWindow) {
++ @autoreleasepool {
++  NSWindow *window = (__bridge NSWindow *)nativeWindow;
++  NSView *view = window.contentView;
++  // No view means no owner after pool drainage. Never return a dangling layer.
++  if(!view)return NULL;
++  [view setWantsLayer:YES];
++  CAMetalLayer *layer = [CAMetalLayer layer];
++  // NSView.layer is strong. The view owns the borrowed descriptor pointer after
++  // this temporary pool drains; surface teardown precedes view destruction.
++  [view setLayer:layer];
++  return (__bridge void *)layer;
++ }
++}

@@ -430,6 +430,17 @@
               "sha256": "d6321c4d4a1643896e8198a8076790a1b7f35349f91c897ad2e4cdc8ee8d46b7"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/autorelease",
+          "inputs": "native/patches/autorelease/original-hashes.json",
+          "outputs": "native/patches/autorelease/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/autorelease/0047-scoped-native-layer-ownership.patch",
+              "sha256": "34a5e53c3666d365f248736b617f0d82f938af36f41496fb4e5fb1baf657983b"
+            }
+          ]
         }
       ]
     },

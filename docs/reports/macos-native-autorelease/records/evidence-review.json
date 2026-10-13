@@ -1,0 +1,563 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_EVIDENCE",
+  "result": "APPROVED_EVIDENCE",
+  "findings": [],
+  "base_commit_reported": "848121d32278757dca7eae7544dc005a553633de",
+  "source_root": "/private/tmp/vellum-large-data",
+  "phase": "/private/tmp/vellum-macos-autorelease",
+  "endpoints": {
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-autorelease/README.md": "cfc636dba89dfde72a5d5034f5630fd1638084f13b54b3a194677c838ae0c855",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-autorelease/records/evidence-index.json": "59adcc8de1ac99e4479e8ac91616d4febd0d27253659839655b63d9a27dfca37",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-autorelease/records/evidence.tar.gz": "441ad62b9552099947d1c99e09069fe09776264cade04b7b585568d725b339be",
+    "/private/tmp/vellum-large-data/docs/reports/macos-native-autorelease/records/archive-producer.py.txt": "b2ddcb34b48916fd232c94efa221e58cce9c3ba41fd28ee89097be3c3bc7609c",
+    "/private/tmp/vellum-macos-autorelease/qualification.json": "9b8be4dc718c012c70e802fb6d05ab2bcca7c6d1fd7fa3da5c9c3d5ca0c318f1",
+    "/private/tmp/vellum-macos-autorelease/source-review-final.json": "04a0ae6533994353087c5a69203297981520ba8b9f95f120f92d03873ce145cc",
+    "/private/tmp/vellum-macos-autorelease/source-final.json": "95f6e7b42c4b76b994c00df4eb245d643e3bf9cb99002020a76628af6b537283",
+    "/private/tmp/vellum-macos-autorelease/source-prism.json": "8cdb534cc63389a0ee9843efdbb165e0a98aa43f8def92c2ba1083d77ff74cf6",
+    "/private/tmp/vellum-macos-autorelease/prism-v1/prism.json": "43d12fcb6b6c073ec9ded66e0544ce2839f664d463d037df57ae2f9212fbbab1",
+    "/private/tmp/vellum-macos-autorelease/prism-v1/process.json": "11b3e812a21dfda49847ee286ec3d35d8fb84f74279516801900af6478b400da",
+    "/private/tmp/vellum-macos-autorelease/prism-v1/inputs.json": "be8fea985df3db5359e196cfddf3191e5540077811ad75c2e737db5d74ec187b",
+    "/private/tmp/vellum-macos-autorelease/surface-layer-original.h": "4633b11f26816ea85a2b347941404b65a8e15a631b8d6cff3a1aac350e8556e6",
+    "/private/tmp/vellum-macos-autorelease/input-original.m": "00b0b3d52d80960d9d24b9dab0e3f715665323b3fcbff648300b7b5a3342964f",
+    "/private/tmp/vellum-macos-autorelease/app-original.go": "bd6bc29967e942c2170e526bbf11fb06ddaa5d0e07719097fcc2a3c731087f3c",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/provenance.json": "6d5dceebafa2ffd0994230c6b604afef9418e77c4361f14c56354eb5495c38eb",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/LICENSE.apache-2.0.txt": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+  },
+  "source14": {
+    "drivers/cogent/internal/textinput/input_darwin.m": "ee6bcfe1579ea7224adf25c51c313bedf637b4357ce86cbb3d045f1db072b69e",
+    "drivers/cogent/native/README.md": "739f4f6bdae2acc375b7c6d88e11ba9583e47b60738b58f2e78d24a1dddf378b",
+    "drivers/cogent/native/dependencies.json": "213175e74ddc783fd013e968553c391d3bb021260d62d7906540cbbed9b07133",
+    "drivers/cogent/native/patches/autorelease/0047-scoped-native-layer-ownership.patch": "34a5e53c3666d365f248736b617f0d82f938af36f41496fb4e5fb1baf657983b",
+    "drivers/cogent/native/patches/autorelease/LICENSE.apache-2.0.txt": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "drivers/cogent/native/patches/autorelease/README.md": "3a85c83ed0f5b822f7361a7e33d4127e45b47365ce8acc24dd8d9094afbad9a2",
+    "drivers/cogent/native/patches/autorelease/check.py": "6c205f158210750502686662cdf44497e27af3062849561a52daab58a9d1056c",
+    "drivers/cogent/native/patches/autorelease/input_pool_test.m": "94a7f3a9ec2c97b5d31b01b74553c96de651eeef2c5dc98cd8f88c8bd235250d",
+    "drivers/cogent/native/patches/autorelease/original-hashes.json": "fcc27c1be405fc81def4df9849215f9c24d6e734c0097cc9bb32744bca6200dc",
+    "drivers/cogent/native/patches/autorelease/output-hashes.json": "0fb9e3dfdbd5dd68f4f9f6ee2a99902e1a04816408154d8a8ec2955496b40f9e",
+    "drivers/cogent/native/patches/autorelease/provenance.json": "6d5dceebafa2ffd0994230c6b604afef9418e77c4361f14c56354eb5495c38eb",
+    "drivers/cogent/native/patches/autorelease/surface_pool_test.m": "98fc5bc955985b2571b94449f91efd3d924e512f77befa791aeea5ae5db54dda",
+    "drivers/cogent/prepare_test.py": "78a40c612e500f8e949adc7a72365e7743a2dadc720bb04125bfb579b9e61126",
+    "specs/native-object-lifetime.md": "aa5bfd94ed13556a128a33d2b4d5686a4ef861adf5ab14cc682d3377c32ad1cf"
+  },
+  "patch_outputs4": {
+    "system/driver/desktop/app.go": "fe8234f95bbcb09f4d0c5bd5dd61450a322abc16c639e77d07adcbc1b336d402",
+    "system/driver/desktop/surface_darwin.go": "edf2f1b85987a605b11406ecbffd5dc827ee46515b775a6a9f5406c0e30b1cd2",
+    "system/driver/desktop/surface_other.go": "813fd936bf6b147234b22451b506b75cbb4fe361bce4a8ac35bb2fd6defd5499",
+    "system/driver/desktop/surface_layer_darwin.h": "35a0a59776ca0465fda420516ece104f87d520f25891547f629d1d5572377178"
+  },
+  "archive": {
+    "members": 54,
+    "all_unique_regular_relative_utf8": true,
+    "index_archive_current_files_roundtrip_equal": true,
+    "producer_matches_retained_copy": true,
+    "binaries_caches_app_bundles_desktop_snapshots_excluded": true,
+    "scope": "Current and historical source maps, original/v1 header/input fixture bytes, raw process receipts/logs and provider/certificate metadata. Selected repository bytes and compiler/link inputs are not a complete archived SDK/compiler closure."
+  },
+  "source_certificate": {
+    "sha256": "04a0ae6533994353087c5a69203297981520ba8b9f95f120f92d03873ce145cc",
+    "status": "APPROVED_SOURCE",
+    "absolute_reviewed_source_map14_matches_current": true,
+    "decoded_output_map4_matches_pins_current": true,
+    "reference_hashes_current_equal": true,
+    "counts": {
+      "source_files": 14,
+      "decoded_outputs": 4,
+      "pool_bodies": 10
+    },
+    "mechanical_source_review_claims_bound": true,
+    "assessment": "Independent source certificate reports checked four-output patch replay, exact input statement identity after removing10 pool wrappers/two comments, pinned provenance/copied Apache license and platform-lifetime constraints. This evidence review verifies its exact source/reference/pin bindings; it does not repeat or widen implementation review."
+  },
+  "receipts": {
+    "count": 10,
+    "logs": 20,
+    "source_groups": {
+      "final": 5,
+      "historical_990511aa0eb1": 1,
+      "historical_88fc00bbba64": 1,
+      "historical_df9c623e31da": 2,
+      "historical_0624878c2b80": 1
+    },
+    "records": {
+      "driver-offscreen-race": {
+        "sha256": "b0a4239b3ffce86ba72ff5219d117fafaac738cf59d252f496868edce0615cfc",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "."
+        ],
+        "source_group": "final",
+        "source_count": 14,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": true
+      },
+      "native-build": {
+        "sha256": "42f8ded442dc43a9fa8610f76be8367db79b9c2eff73c6b0d2dc507f33c35cc5",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-autorelease/window-cycle-smoke-owned",
+          "./cmd/window-cycle-smoke"
+        ],
+        "source_group": "final",
+        "source_count": 14,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": true
+      },
+      "owned-prepare-v2": {
+        "sha256": "83031bcd39c2804ce16a064ba649eeb282a493814f0a1debefe59b5fb157b39f",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare.py"
+        ],
+        "source_group": "historical_990511aa0eb1",
+        "source_count": 11,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": false
+      },
+      "owned-prepare": {
+        "sha256": "183bff3816e08b36fd95940cfce50adb5778cfd0ae49acd8f18d0afa86b43cee",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare.py"
+        ],
+        "source_group": "historical_88fc00bbba64",
+        "source_count": 11,
+        "prepared_before_count": 6178,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": false
+      },
+      "pool-baseline-final": {
+        "sha256": "7d04158712c5292192c3584db7feac6cdfdda3560063276a231f02318364e2aa",
+        "exit_code": 1,
+        "argv": [
+          "python3",
+          "native/patches/autorelease/check.py",
+          "--layer-header",
+          "/private/tmp/vellum-macos-autorelease/surface-layer-original.h",
+          "--input-source",
+          "/private/tmp/vellum-macos-autorelease/input-original.m"
+        ],
+        "source_group": "final",
+        "source_count": 14,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": true
+      },
+      "pool-baseline": {
+        "sha256": "05fe414461e00898d2ccca8f65d2ba2afc1b12dfda2b26665e9dbbeb29270ebc",
+        "exit_code": 1,
+        "argv": [
+          "python3",
+          "native/patches/autorelease/check.py",
+          "--layer-header",
+          "/private/tmp/vellum-macos-autorelease/surface-layer-original.h",
+          "--input-source",
+          "/private/tmp/vellum-macos-autorelease/input-original.m"
+        ],
+        "source_group": "historical_df9c623e31da",
+        "source_count": 11,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": false
+      },
+      "pool-final": {
+        "sha256": "c2346ff096189e69ac1ea6eb95ac5e5c3abae23502e9faea2d302c06e1cb1d80",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "native/patches/autorelease/check.py"
+        ],
+        "source_group": "final",
+        "source_count": 14,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": true
+      },
+      "pool-fixed-v2": {
+        "sha256": "5e675a7a76a6bc55ed27bcf9c17e976e7ebb805efbab7bd6afda6bf1d0c9525a",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "native/patches/autorelease/check.py"
+        ],
+        "source_group": "historical_0624878c2b80",
+        "source_count": 11,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": false
+      },
+      "pool-fixed": {
+        "sha256": "689b737883eb06d2e73bdce377269e367ed73970ac0569d5d4c7a3d8edaf13f9",
+        "exit_code": 1,
+        "argv": [
+          "python3",
+          "native/patches/autorelease/check.py"
+        ],
+        "source_group": "historical_df9c623e31da",
+        "source_count": 11,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": false
+      },
+      "prepare-tests": {
+        "sha256": "2c78c84714a1f2a5d0fd8c43f1d15c5c23763decbd160d7c1d4c05687807a28c",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare_test.py"
+        ],
+        "source_group": "final",
+        "source_count": 14,
+        "prepared_before_count": 6181,
+        "prepared_after_count": 6181,
+        "exact_final_prepared_input": true
+      }
+    },
+    "final5": [
+      "pool-final",
+      "pool-baseline-final",
+      "native-build",
+      "driver-offscreen-race",
+      "prepare-tests"
+    ],
+    "final_maps": "All14 current selected source bytes and all6181 prepared bytes before/after, no extras or drift.",
+    "offscreen": "go test -race -tags=offscreen . passed",
+    "native_consumer": "go build -tags=vellum_native_checks ./cmd/window-cycle-smoke only; recorded retained binary hash independently recomputed.",
+    "python": "prepare_test.py raw11 tests/OK",
+    "historical": "Earlier preparation/fixed/baseline results retain distinct source-group hashes. IntermediateV2 observation uses cycles and checked fields; final observation adds explicit requested/completed and passed fields. No historical result is relabelled."
+  },
+  "fixtures": {
+    "evidence": {
+      "pool-final": [
+        {
+          "fixture": "surface_pool",
+          "compile_exit": 0,
+          "run_exit": 0,
+          "binary_sha256": "2624240b0363f6016e6d85a606d5928b734f70d6198b0d8a9f3ec585ce9c965b",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/surface_pool_test.m": "98fc5bc955985b2571b94449f91efd3d924e512f77befa791aeea5ae5db54dda",
+            "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/desktop/surface_layer_darwin.h": "35a0a59776ca0465fda420516ece104f87d520f25891547f629d1d5572377178",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "surface_pool",
+            "exit": 0,
+            "temporaries": 0,
+            "live_layer_standins": 0,
+            "created": 64,
+            "retired": 64,
+            "nil_window_and_view_passed": true,
+            "windows_created": 0,
+            "gpu_drawables_acquired": 0
+          },
+          "run_stderr": ""
+        },
+        {
+          "fixture": "input_pool",
+          "compile_exit": 0,
+          "run_exit": 0,
+          "binary_sha256": "71395ffba58f0c2f0c9b42ccd58a7bc29519ef9099ea50e6eeea65716377dbbe",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/input_pool_test.m": "94a7f3a9ec2c97b5d31b01b74553c96de651eeef2c5dc98cd8f88c8bd235250d",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input_darwin.m": "ee6bcfe1579ea7224adf25c51c313bedf637b4357ce86cbb3d045f1db072b69e",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "input_pool",
+            "exit": 0,
+            "temporaries": 0,
+            "live_views": 0,
+            "factory_calls": 901,
+            "requested_cycles": 100,
+            "completed_cycles": 100,
+            "windows_created": 0,
+            "input_sources_changed": false
+          },
+          "run_stderr": ""
+        }
+      ],
+      "pool-baseline-final": [
+        {
+          "fixture": "surface_pool",
+          "compile_exit": 0,
+          "run_exit": 1,
+          "binary_sha256": "4be08989b733c63f7b8a763a2205fd2058d8558502baf0d5fc1a4eaaa1d33601",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/surface_pool_test.m": "98fc5bc955985b2571b94449f91efd3d924e512f77befa791aeea5ae5db54dda",
+            "/private/tmp/vellum-macos-autorelease/surface-layer-original.h": "4633b11f26816ea85a2b347941404b65a8e15a631b8d6cff3a1aac350e8556e6",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "surface_pool",
+            "exit": 1,
+            "temporaries": 2,
+            "live_layer_standins": 2,
+            "created": 2,
+            "retired": 0,
+            "nil_window_and_view_passed": false,
+            "windows_created": 0,
+            "gpu_drawables_acquired": 0
+          },
+          "run_stderr": "nil window/view returned an unowned layer\n"
+        },
+        {
+          "fixture": "input_pool",
+          "compile_exit": 0,
+          "run_exit": 1,
+          "binary_sha256": "8ce406c048629e523c5380d4f0007e73af89159f3bb61a5555a720065ae1e041",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/input_pool_test.m": "94a7f3a9ec2c97b5d31b01b74553c96de651eeef2c5dc98cd8f88c8bd235250d",
+            "/private/tmp/vellum-macos-autorelease/input-original.m": "00b0b3d52d80960d9d24b9dab0e3f715665323b3fcbff648300b7b5a3342964f",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "input_pool",
+            "exit": 1,
+            "temporaries": 2,
+            "live_views": 0,
+            "factory_calls": 1,
+            "requested_cycles": 100,
+            "completed_cycles": 0,
+            "windows_created": 0,
+            "input_sources_changed": false
+          },
+          "run_stderr": "input ownership: attach pool/refused ownership temporary=1\n"
+        }
+      ],
+      "pool-baseline": [
+        {
+          "fixture": "surface_pool",
+          "compile_exit": 0,
+          "run_exit": 1,
+          "binary_sha256": "c0cfa9a4e7eebbf4b1b59e39b4120438078429faf35f13f23e8fab438156fe02",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/surface_pool_test.m": "6f28ff8d0696c3ccda97ec38bf1e41ed64217eb70fc3dac2636ec42cf9143df8",
+            "/private/tmp/vellum-macos-autorelease/surface-layer-original.h": "4633b11f26816ea85a2b347941404b65a8e15a631b8d6cff3a1aac350e8556e6",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "surface_pool",
+            "exit": 1,
+            "temporaries": 1,
+            "live_layers": 1,
+            "created": 1,
+            "retired": 0,
+            "windows_created": 0,
+            "gpu_drawables_acquired": 0
+          },
+          "run_stderr": "layer factory failed scoped ownership at iteration 0: temporary=1 layers=1\n"
+        },
+        {
+          "fixture": "input_pool",
+          "compile_exit": 0,
+          "run_exit": 1,
+          "binary_sha256": "d6a04f40523e4b479bedda096aac16e6c103e44b75bf54749ec63b20c177d477",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/input_pool_test.m": "52221e430aa333cdb4560ec94d6019d7075a4e51611925bdbf4a47f2b96a798e",
+            "/private/tmp/vellum-macos-autorelease/input-original.m": "00b0b3d52d80960d9d24b9dab0e3f715665323b3fcbff648300b7b5a3342964f",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "input_pool",
+            "exit": 1,
+            "temporaries": 2,
+            "live_views": 0,
+            "factory_calls": 1,
+            "cycles": 100,
+            "windows_created": 0,
+            "input_sources_changed": false
+          },
+          "run_stderr": "input ownership: attach pool/refused ownership temporary=1\n"
+        }
+      ],
+      "pool-fixed": [
+        {
+          "fixture": "surface_pool",
+          "compile_exit": 0,
+          "run_exit": 1,
+          "binary_sha256": "e6960f2c28a1d119d5ae23dc2a73e697ca4b9d4268d8631ba693bb5264a60020",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/surface_pool_test.m": "6f28ff8d0696c3ccda97ec38bf1e41ed64217eb70fc3dac2636ec42cf9143df8",
+            "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/desktop/surface_layer_darwin.h": "c03c7a31fb774e0a7a3f1e5bed3f9d7ac6e7f16cf42f07dac82ee86c15debed7",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "surface_pool",
+            "exit": 1,
+            "temporaries": 0,
+            "live_layers": 2,
+            "created": 2,
+            "retired": 0,
+            "windows_created": 0,
+            "gpu_drawables_acquired": 0
+          },
+          "run_stderr": ""
+        },
+        {
+          "fixture": "input_pool",
+          "compile_exit": 0,
+          "run_exit": 0,
+          "binary_sha256": "983865e991749d2401e6bb95ddcb4fee92790ccdef34f093f8ba1d69855b7839",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/input_pool_test.m": "52221e430aa333cdb4560ec94d6019d7075a4e51611925bdbf4a47f2b96a798e",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input_darwin.m": "ee6bcfe1579ea7224adf25c51c313bedf637b4357ce86cbb3d045f1db072b69e",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "input_pool",
+            "exit": 0,
+            "temporaries": 0,
+            "live_views": 0,
+            "factory_calls": 901,
+            "cycles": 100,
+            "windows_created": 0,
+            "input_sources_changed": false
+          },
+          "run_stderr": ""
+        }
+      ],
+      "pool-fixed-v2": [
+        {
+          "fixture": "surface_pool",
+          "compile_exit": 0,
+          "run_exit": 0,
+          "binary_sha256": "3ee1efce992955ecdab765bb9e6428390512b7d30b2c82c8d8a19bba22a550cd",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/surface_pool_test.m": "f7f25752abd184932aa988637df31000665a7dd13c4895f662d005fca2765a11",
+            "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/system/driver/desktop/surface_layer_darwin.h": "35a0a59776ca0465fda420516ece104f87d520f25891547f629d1d5572377178",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "surface_pool",
+            "exit": 0,
+            "temporaries": 0,
+            "live_layer_standins": 0,
+            "created": 64,
+            "retired": 64,
+            "nil_window_and_view_checked": true,
+            "windows_created": 0,
+            "gpu_drawables_acquired": 0
+          },
+          "run_stderr": ""
+        },
+        {
+          "fixture": "input_pool",
+          "compile_exit": 0,
+          "run_exit": 0,
+          "binary_sha256": "94801d99b110543375988bc13d5e507f6040b3bc7ec7b3c379dffd42bfaffe7f",
+          "inputs": {
+            "/private/tmp/vellum-large-data/drivers/cogent/native/patches/autorelease/input_pool_test.m": "9629bbcc36abba7537ee67fd57d80cbcf6b71b44b2edebd12861866488cabc0b",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input_darwin.m": "ee6bcfe1579ea7224adf25c51c313bedf637b4357ce86cbb3d045f1db072b69e",
+            "/private/tmp/vellum-large-data/drivers/cogent/internal/textinput/input.h": "820d61330e38fd5d5f2c032511155be2a5dc3483fba21c7d4063b2ea42cdbcd5"
+          },
+          "observation": {
+            "fixture": "input_pool",
+            "exit": 0,
+            "temporaries": 0,
+            "live_views": 0,
+            "factory_calls": 901,
+            "cycles": 100,
+            "windows_created": 0,
+            "input_sources_changed": false
+          },
+          "run_stderr": ""
+        }
+      ]
+    },
+    "final_surface": {
+      "fixture": "surface_pool",
+      "exit": 0,
+      "temporaries": 0,
+      "live_layer_standins": 0,
+      "created": 64,
+      "retired": 64,
+      "nil_window_and_view_passed": true,
+      "windows_created": 0,
+      "gpu_drawables_acquired": 0
+    },
+    "final_input": {
+      "fixture": "input_pool",
+      "exit": 0,
+      "temporaries": 0,
+      "live_views": 0,
+      "factory_calls": 901,
+      "requested_cycles": 100,
+      "completed_cycles": 100,
+      "windows_created": 0,
+      "input_sources_changed": false
+    },
+    "final_selected_input_hashes_current": true,
+    "actual_prepared_header_and_actual_input_source_used": true,
+    "fixture_binary_hash_scope": "Standalone fixture binary identities are recorded in raw compile/run rows; temporary binaries are excluded from archive and not independently recomputed. Current retained native-consumer compile binary is hashed.",
+    "positive_scope": "CountedNSObject layer stand-ins: nil-window/view refusal,64 creations/replacements, caller-held references and64 retirements; input100 requested/100 completed,901 factory calls, zero temporary witnesses/views, copied state/geometry/refusals and inactive malloc reply lifetime.",
+    "negative_scope": "Final baseline surface refuses nil-view invariant first with2 temporaries/2 live stand-ins/created2/retired0, rawexit1; final baseline input stops on attachment with0 completed/100 requested and rawexit1.",
+    "earlier_failures": "Original normal-view surface baseline reports PoolWitness temporary1/layer1 and rawexit1. Initial fixed realCAMetalLayer fixture reports temporary0/live_layers2 and rawexit1 while its input fixture reports100 cycles/raw0. Those preserve the overstrong immediate-deallocation oracle failure, not actual deallocation proof or adopted-runtime failure."
+  },
+  "prepared": {
+    "current_count": 6181,
+    "all_current_files_independently_hashed": true,
+    "current_map_equals_recorded": true,
+    "previous_cache_checkpoint_count": 6178,
+    "changed_existing": [
+      "upstream/system/driver/desktop/app.go"
+    ],
+    "added": [
+      "upstream/system/driver/desktop/surface_darwin.go",
+      "upstream/system/driver/desktop/surface_layer_darwin.h",
+      "upstream/system/driver/desktop/surface_other.go"
+    ],
+    "exact_one_changed_three_added": true,
+    "stage_number_order": "All registered core patches flatten to1..47; last autorelease stage refers to exact current input/output pins and patchSHA.",
+    "scope": "Complete recorded prepared source endpoint and final5 selected check intervals; not complete compiler/cache/SDK/OS/native-link closure."
+  },
+  "provider": {
+    "raw_result_sha256": "43d12fcb6b6c073ec9ded66e0544ce2839f664d463d037df57ae2f9212fbbab1",
+    "process_sha256": "11b3e812a21dfda49847ee286ec3d35d8fb84f74279516801900af6478b400da",
+    "inputs_sha256": "be8fea985df3db5359e196cfddf3191e5540077811ad75c2e737db5d74ec187b",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "files": 10,
+    "chunks": 2,
+    "calls": 2,
+    "complete": true,
+    "raw_exit_code": 0,
+    "findings": 0,
+    "input_tokens": 22910,
+    "output_tokens": 3085,
+    "exact_source_before_after_selected10": true,
+    "static_internal_only4": [
+      "drivers/cogent/native/patches/autorelease/LICENSE.apache-2.0.txt",
+      "drivers/cogent/native/patches/autorelease/original-hashes.json",
+      "drivers/cogent/native/patches/autorelease/output-hashes.json",
+      "drivers/cogent/native/patches/autorelease/provenance.json"
+    ],
+    "scope": "Ten implementation/test/registration/doc leaves reviewed by provider. Four static pin/provenance/Apache-license leaves are internally verified; no provider14-file claim or second provider call."
+  },
+  "report_assessment": "Current report matches final stand-in/input observations, raw failures/version groups,14-vs10 review scopes, exact prepared delta and final checks. It explicitly excludes native windows/NSApplication/GPU drawables and actual CAMetalLayer/IOSurface reclamation. The measured previous physical-footprint growth remains unresolved. No actionable evidence/report discrepancy found.",
+  "verification": {
+    "recipe_path": "/private/tmp/vellum-autorelease-evidence-review/verify.py.txt",
+    "recipe_sha256": "3f9be30e0a833ba54782695a18e4478013a5f0643ff8224f97d9b7a496ddb8c7",
+    "result_path": "/private/tmp/vellum-autorelease-evidence-review/verification.json",
+    "result_sha256": "731556fa83577bd9708710551c6cf3804e0c624445cd0581897ca44d60234d28",
+    "status": "PASS_INDEPENDENT_READ_ONLY_VERIFICATION"
+  },
+  "limitations": [
+    "Reviewer performed reads/hashes and stdlib evidence processing only; no tests, native fixture/window/application, Go/build/prepare, UI/provider/Git or source/sealed-artifact mutations.",
+    "Headless counters use main-thread instrumented factories and NSObject stand-ins. They demonstrate temporary and retained-reference behavior under those contracts, not actual native layer/drawable/IOSurface deallocation, native/GPU memory acceptance or concurrent general factory instrumentation.",
+    "Input admission callbacks are stubs and composition is unmarked; not humanIME/preedit/input-source behavior. Other environment/probe/query pool paths are source-reviewed but not all executed by these fixtures.",
+    "Retained consumer binary was compiled only. No final owned live NSWindow/NSApplication/GPU process or physical-footprint campaign is qualified. Prior memory diagnostics remain historical.",
+    "FullP11 endurance, native/GPU physical memory, latency, human interaction, cross-display, distribution/rights audit and Mac completion remain open."
+  ]
+}

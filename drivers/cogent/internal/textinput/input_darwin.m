@@ -279,7 +279,10 @@ static NSRect clipTextRect(NSRect r,NSRect viewport){
 }
 @end
 
+// Go-to-Cocoa calls do not inherit GLFW event pools. Each bridge below drains
+// local temporaries while explicit retained state and malloc replies survive.
 void *vellum_managed_input_attach(void *view, uintptr_t handle) {
+ @autoreleasepool {
  NSCAssert(NSThread.isMainThread,@"Input attachment requires main thread");
  if(!view || ![(NSView *)view window] || state((id)view))return NULL;
  // A foreign isa layer can keep retired input methods in its hierarchy.
@@ -303,8 +306,11 @@ void *vellum_managed_input_attach(void *view, uintptr_t handle) {
  object_setClass(s->view,s->subclass);
  for(NSNotificationName name in @[NSWindowDidMoveNotification,NSWindowDidResizeNotification,NSWindowDidChangeScreenNotification])[[NSNotificationCenter defaultCenter] addObserver:s selector:@selector(windowGeometryChanged:) name:name object:s->view.window];
  return s;
+
+ }
 }
 static BOOL publish(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height, NSData *cells, NSData *carets, NSRect viewport, int focusLine, BOOL geometryClient, uint64_t clientID) {
+ @autoreleasepool {
  VellumManagedInputState *s=(id)input;
  NSCAssert(NSThread.isMainThread,@"Input update requires main thread");
  if(!s || s->closed)return NO;
@@ -338,12 +344,15 @@ static BOOL publish(void *input,const char *text,int anchor,int focus,int marked
 
  [[s->view inputContext] invalidateCharacterCoordinates];
  return YES;
+
+ }
 }
 void vellum_managed_input_update(void *input,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height) {
  publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,nil,nil,NSZeroRect,-1,NO,0);
 }
 static int compareCells(const void *a,const void *b){const VellumTextCell *x=a,*y=b;if(x->start!=y->start)return x->start<y->start ? -1:1;return (x->line>y->line)-(x->line<y->line);}
 bool vellum_managed_input_client_geometry_update(void *input,uint64_t clientID,const char *text,int anchor,int focus,int markedStart,int markedEnd,bool active,uint64_t acknowledged,double x,double y,double width,double height,const VellumTextCell *cells,int nc,const VellumTextCaret *carets,int nk,double vx,double vy,double vw,double vh,int focusLine) {
+ @autoreleasepool {
  NSCAssert(NSThread.isMainThread,@"Input geometry publication requires main thread");
  if(nc<0 || nk<0 || nc>262144 || nk>262144 || (nc && !cells) || (nk && !carets) || !isfinite(vx) || !isfinite(vy) || !isfinite(vw) || !isfinite(vh) || vw<0 || vh<=0 || !isfinite(vx+vw) || !isfinite(vy+vh))return NO;
  if(!text || strnlen(text,(4u<<20)+1)>(4u<<20))return NO;
@@ -352,9 +361,12 @@ bool vellum_managed_input_client_geometry_update(void *input,uint64_t clientID,c
  for(int i=0;i<nk;i++){const VellumTextCaret *c=&carets[i];if(c->offset<0 || c->line<0 || !validRange(value,NSMakeRange(c->offset,0)) || !isfinite(c->x) || !isfinite(c->y) || !isfinite(c->height) || c->height<=0 || !isfinite(c->y+c->height))return NO;}
  NSMutableData *ownedCells=[NSMutableData dataWithBytes:cells length:(NSUInteger)nc*sizeof(*cells)];if(nc>1)qsort(ownedCells.mutableBytes,nc,sizeof(*cells),compareCells);NSData *ownedCarets=[NSData dataWithBytes:carets length:(NSUInteger)nk*sizeof(*carets)];
  return publish(input,text,anchor,focus,markedStart,markedEnd,active,acknowledged,x,y,width,height,ownedCells,ownedCarets,NSMakeRect(vx,vy,vw,vh),focusLine,YES,clientID);
+
+ }
 }
 
 void vellum_managed_input_close(void *input) {
+ @autoreleasepool {
  VellumManagedInputState *s=(id)input;if(!s)return;
  NSCAssert(NSThread.isMainThread,@"Input close requires main thread");
  s->closed=YES;s->active=NO;[[s->view inputContext] discardMarkedText];
@@ -365,11 +377,16 @@ void vellum_managed_input_close(void *input) {
  if(object_getClass(view)==s->subclass)object_setClass(view,s->baseClass);
  if(state(view)==s)objc_setAssociatedObject(view,&inputKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
  s->view=nil;[view release];[s release];
+
+ }
 }
 void vellum_managed_input_caret(void *input,double x,double y,double width,double height){
+ @autoreleasepool {
  VellumManagedInputState *s=(id)input;if(!s || s->closed)return;
  NSCAssert(NSThread.isMainThread,@"Input geometry requires main thread");
  s->caret=NSMakeRect(x,y,width,height);[[s->view inputContext] invalidateCharacterCoordinates];
+
+ }
 }
 char *vellum_managed_input_source(void) {
  TISInputSourceRef source=TISCopyCurrentKeyboardInputSource();
@@ -379,6 +396,7 @@ char *vellum_managed_input_source(void) {
  return strdup(result);
 }
 char *vellum_managed_input_probe(void *input,int step) {
+ @autoreleasepool {
  VellumManagedInputState *s=(id)input;if(!s || s->closed || !s->active)return NULL;
  id<NSTextInputClient> client=(id)s->view;
  if(step==10)[client insertText:[@"" stringByPaddingToLength:4097 withString:@"a" startingAtIndex:0] replacementRange:NSMakeRange(NSNotFound,0)];
@@ -400,8 +418,11 @@ char *vellum_managed_input_probe(void *input,int step) {
  free(source);
  NSData *data=[NSJSONSerialization dataWithJSONObject:report options:0 error:NULL];
  return strdup([[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease].UTF8String);
+
+ }
 }
 char *vellum_managed_input_environment(void) {
+ @autoreleasepool {
  NSDictionary *filter=@{(id)kTISPropertyInputSourceCategory:(id)kTISCategoryKeyboardInputSource};
  CFArrayRef enabled=TISCreateInputSourceList((CFDictionaryRef)filter,false);
  NSMutableArray *sources=[NSMutableArray array];
@@ -415,9 +436,12 @@ char *vellum_managed_input_environment(void) {
  NSData *data=[NSJSONSerialization dataWithJSONObject:@{@"current":@(current ?: "unknown"),@"enabled":sources} options:0 error:NULL];
  free(current);if(enabled)CFRelease(enabled);
  return strdup([[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease].UTF8String);
+
+ }
 }
 
 char *vellum_managed_input_inactive_probe(void *input){
+ @autoreleasepool {
  VellumManagedInputState *s=(id)input;if(!s || s->closed || s->active)return NULL;
  id<NSTextInputClient>client=(id)s->view;NSRange actual;
  [client selectedRange];[client markedRange];[client hasMarkedText];[client validAttributesForMarkedText];
@@ -427,9 +451,12 @@ char *vellum_managed_input_inactive_probe(void *input){
  [client setMarkedText:@"ignored" selectedRange:NSMakeRange(0,0) replacementRange:NSMakeRange(NSNotFound,0)];
  [client insertText:@"ignored" replacementRange:NSMakeRange(NSNotFound,0)];[client unmarkText];
  return strdup("inactive_optional_super_queries_passed");
+
+ }
 }
 
 char *vellum_managed_input_query_probe(void *input,int start,int length,double x,double y){
+ @autoreleasepool {
  NSCAssert(NSThread.isMainThread,@"Query probe requires main thread");
  VellumManagedInputState *s=(id)input;if(!usable(s) || start<0 || length<0)return NULL;
  id<NSTextInputClient> client=(id)s->view;
@@ -442,6 +469,8 @@ char *vellum_managed_input_query_probe(void *input,int start,int length,double x
  NSData *data=[NSJSONSerialization dataWithJSONObject:report options:0 error:NULL];
  if(!data)return NULL;
  return strdup([[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]autorelease].UTF8String);
+
+ }
 }
 
 VellumScreenRect vellum_managed_input_rendered_rect(void *input,double x,double y,double width,double height,int pixel_width,int pixel_height){
@@ -461,10 +490,13 @@ bool vellum_managed_input_client_update(void *input,uint64_t clientID,const char
 void vellum_managed_input_enable_deltas(void *input){VellumManagedInputState *s=(id)input;NSCAssert(NSThread.isMainThread,@"Input mode requires main thread");if(s && !s->closed && !s->active)s->deltas=YES;}
 
 bool vellum_managed_input_settle(void *input,uint64_t clientID){
+ @autoreleasepool {
  NSCAssert(NSThread.isMainThread,@"Input settlement requires main thread");
  VellumManagedInputState *s=(id)input;if(!s || s->closed)return false;
  if(s->clientID!=clientID)return true;
  if(!finish(s,NO))return false;[[s->view inputContext] discardMarkedText];return true;
+
+ }
 }
 void vellum_managed_input_request_limit(void *input,uint64_t clientID,int maximum){
  NSCAssert(NSThread.isMainThread,@"Input budget requires main thread");

@@ -1,0 +1,68 @@
+{
+  "result": "PASS_SCOPED_NATIVE_OWNERSHIP_HEADLESS",
+  "base_commit": "848121d32278757dca7eae7544dc005a553633de",
+  "qualification_sha256": "9b8be4dc718c012c70e802fb6d05ab2bcca7c6d1fd7fa3da5c9c3d5ca0c318f1",
+  "source": {
+    "drivers/cogent/internal/textinput/input_darwin.m": "ee6bcfe1579ea7224adf25c51c313bedf637b4357ce86cbb3d045f1db072b69e",
+    "drivers/cogent/native/README.md": "739f4f6bdae2acc375b7c6d88e11ba9583e47b60738b58f2e78d24a1dddf378b",
+    "drivers/cogent/native/dependencies.json": "213175e74ddc783fd013e968553c391d3bb021260d62d7906540cbbed9b07133",
+    "drivers/cogent/native/patches/autorelease/0047-scoped-native-layer-ownership.patch": "34a5e53c3666d365f248736b617f0d82f938af36f41496fb4e5fb1baf657983b",
+    "drivers/cogent/native/patches/autorelease/LICENSE.apache-2.0.txt": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "drivers/cogent/native/patches/autorelease/README.md": "3a85c83ed0f5b822f7361a7e33d4127e45b47365ce8acc24dd8d9094afbad9a2",
+    "drivers/cogent/native/patches/autorelease/check.py": "6c205f158210750502686662cdf44497e27af3062849561a52daab58a9d1056c",
+    "drivers/cogent/native/patches/autorelease/input_pool_test.m": "94a7f3a9ec2c97b5d31b01b74553c96de651eeef2c5dc98cd8f88c8bd235250d",
+    "drivers/cogent/native/patches/autorelease/original-hashes.json": "fcc27c1be405fc81def4df9849215f9c24d6e734c0097cc9bb32744bca6200dc",
+    "drivers/cogent/native/patches/autorelease/output-hashes.json": "0fb9e3dfdbd5dd68f4f9f6ee2a99902e1a04816408154d8a8ec2955496b40f9e",
+    "drivers/cogent/native/patches/autorelease/provenance.json": "6d5dceebafa2ffd0994230c6b604afef9418e77c4361f14c56354eb5495c38eb",
+    "drivers/cogent/native/patches/autorelease/surface_pool_test.m": "98fc5bc955985b2571b94449f91efd3d924e512f77befa791aeea5ae5db54dda",
+    "drivers/cogent/prepare_test.py": "78a40c612e500f8e949adc7a72365e7743a2dadc720bb04125bfb579b9e61126",
+    "specs/native-object-lifetime.md": "aa5bfd94ed13556a128a33d2b4d5686a4ef861adf5ab14cc682d3377c32ad1cf"
+  },
+  "stage_outputs": {
+    "system/driver/desktop/app.go": "fe8234f95bbcb09f4d0c5bd5dd61450a322abc16c639e77d07adcbc1b336d402",
+    "system/driver/desktop/surface_darwin.go": "edf2f1b85987a605b11406ecbffd5dc827ee46515b775a6a9f5406c0e30b1cd2",
+    "system/driver/desktop/surface_other.go": "813fd936bf6b147234b22451b506b75cbb4fe361bce4a8ac35bb2fd6defd5499",
+    "system/driver/desktop/surface_layer_darwin.h": "35a0a59776ca0465fda420516ece104f87d520f25891547f629d1d5572377178"
+  },
+  "source_review_sha256": "04a0ae6533994353087c5a69203297981520ba8b9f95f120f92d03873ce145cc",
+  "evidence_review_sha256": "dd450a9e494e2c1e120a083e0e78f2578806f0ccf56dba44fc291b492f5a33db",
+  "post_test_document_sha256": "cfc636dba89dfde72a5d5034f5630fd1638084f13b54b3a194677c838ae0c855",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_reviewed_files": 10,
+  "internally_verified_static_leaves": [
+    "drivers/cogent/native/patches/autorelease/LICENSE.apache-2.0.txt",
+    "drivers/cogent/native/patches/autorelease/original-hashes.json",
+    "drivers/cogent/native/patches/autorelease/output-hashes.json",
+    "drivers/cogent/native/patches/autorelease/provenance.json"
+  ],
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_raw_exit_code": 0,
+  "archive": {
+    "sha256": "441ad62b9552099947d1c99e09069fe09776264cade04b7b585568d725b339be",
+    "index_sha256": "59adcc8de1ac99e4479e8ac91616d4febd0d27253659839655b63d9a27dfca37",
+    "members": 54
+  },
+  "prepared_files": 6181,
+  "input_pool_wrappers": 10,
+  "headless_surface_standins_created_retired": [
+    64,
+    64
+  ],
+  "headless_input_completed_requested": [
+    100,
+    100
+  ],
+  "headless_input_factory_calls": 901,
+  "python_preparation_tests": 11,
+  "native_compiled_sha256": "b3040db37002af8e0415c7a45477de0c976773af5665a1dab72a90edb7f4b5c7",
+  "native_window_executed": false,
+  "actual_cocoa_layer_deallocation_qualified": false,
+  "native_memory_qualified": false,
+  "gpu_memory_qualified": false,
+  "full_p11_qualified": false,
+  "macos_completion": false,
+  "next_live_tests_deferred": true
+}

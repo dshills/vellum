@@ -186,3 +186,12 @@ the implementation, retention/concurrency/pixel tests and original test oracle.
 See [patch notes](patches/glyphmask/README.md) and the
 [retention specification](../../../specs/glyph-mask-cache.md). Native graphics
 retention and the final adopted patch's live memory acceptance remain open.
+
+## Scoped native temporary ownership
+
+Patch 0047 uses a locally pooled Darwin Metal-layer factory with a retained view
+owner and nil-view refusal. The adapter input bridge also pools its Go-to-Cocoa
+publication and cleanup paths. Headless fixtures verify temporary and retained
+ownership; actual IOSurface/physical-footprint acceptance remains open.
+See [ownership checks](patches/autorelease/README.md) and the
+[native lifetime contract](../../../specs/native-object-lifetime.md).
