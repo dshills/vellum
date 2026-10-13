@@ -1,0 +1,53 @@
+{
+  "result": "REVIEWED_FRAME_POLL_MAC_COMPARISON",
+  "base_commit": "61976ee557d46550b3aed8e2fa6b6cf1c5198a15",
+  "source": {
+    "drivers/cogent/frame_metrics.go": "790bc115d22ddda4e1cbee752ac3ec3009b3fd9250524ec9f3cda6d8be02ba41",
+    "drivers/cogent/frame_metrics_test.go": "03ddb5405e93f26e7bbd2d9994cc39dc2a26bc3398f2391990d265cdfb90fe83",
+    "drivers/cogent/frame_source_metrics_test.go": "4ef434bf4dfdba5fc0b4f6325c30913702efd4d4fb152a33d10944a585aafb37",
+    "examples/loadedgrid/perf_runtime.go": "e541c9dd446f8204178c00750217ef4d0ace99a5adfc174ca166e49879524670",
+    "specs/grid-performance.md": "16a5a0d456865bcbef067623e642ae92180c1615893a62d44a51ea260c21de80",
+    "docs/reports/macos-frame-poll/README.md": "7ca873e4df61bbfa8b2f6e4bd3a458d8620c4d9108532cc2629c966030cf5df2"
+  },
+  "selected_source_files": 710,
+  "prepared_files": 6198,
+  "processes": 40,
+  "ordinary_samples": 4800,
+  "ordinary_latency_targets_met": false,
+  "required_receipts": {
+    "poll-race-v2": "de3b8fd79c10d635d5074f835539ec3b2642db6ec8556a8092a33d448379bffd",
+    "adapter-race-v1": "72ff217ea6a87974e5f91808bc22607f9dea35ec68da9c35a55a229379308595",
+    "adapter-vet-v1": "6e044b07d33a9b0a6b19db5db10f07d65303d8143c8a846d297595c411be735c",
+    "loadedgrid-race-v1": "ecab8dfaee0f547497b099829a842cf6d9822004a6d997dcd375fb6a93038484",
+    "observer-benchmark-v1": "560156984d60f636887a8be2ab911c8f0408b241a0011589de38c0af1b55ef8b",
+    "build-grid-baseline-v1": "07b31d93185853a7a9681938f58e1649bca803677105823cbb7d31773f20a00a",
+    "build-grid-candidate-v1": "8d65d8727cc4292878965a6ef6e177037f135a5d5280dbde2ca827d95d3ebc33",
+    "comparison-v1": "1a73058720644f0397d819d71f69e09e39672a7f995437d01410bce8f1328fe6"
+  },
+  "reviews": {
+    "source-review": "6c9e6292dba976afaba432157fcb8d118e06c9469ed9dc9234cebac44610ee44",
+    "protocol-review": "bb823deeadc831c72e11e1cde5f50ca32c06cbd0d091951304554ee1d59b21eb",
+    "evidence-review": "c846ce4ba5eedeee98318ecda5530478bbe139978507fc3c10e9de143a2b3d8e"
+  },
+  "comparison_qualification_sha256": "731b606c22c5e1ceaf30ad957aee462429ccbb243e486f1e403bdc001bbb5f26",
+  "observer_qualification_sha256": "24576e926f197ca41777351108f642eb075a26bfd4d368649f248b6c26a0ba7f",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_findings": 0,
+  "prism_sha256": "46c98dcb34637951aaa9559db4bfa34febefc6639af1aa03fcea8f16a6175a8b",
+  "limits": [
+    "Observer pressure changes across variants; timing mixed, unchanged4/6ms targets fail.",
+    "Process allocation includes helpers/runtime; no exact native/GPU memory or shipping-runtime speedup attribution.",
+    "Scoped ordinary grid campaign is not fullP6/P11/Mac/human/physical/release qualification or completecompiler/SDK/cache closure."
+  ],
+  "qualification_sha256": "1f7fcb60d7178238d07a6d408bb417b441e8a29ce8e2d5ec44578dfc2d386aba",
+  "source_manifest_sha256": "6f91a05c6e813be787468590ef8d0d5062f0fd4ed463c039a9e60be9e3bc5684",
+  "archive_sha256": "89a75980827fb204527d3304d602b640d7a2799ed59a4ce45a0a25766a13b3ce",
+  "index_sha256": "2fba994915adb131c9a3971bfc1cfc6224a4aab9230de07d27c489d712ab1330",
+  "archive_members": 147,
+  "prism_coverage_complete": true,
+  "prism_findings_resolved": true,
+  "seal_producer_sha256": "dd2a3231a0ba475cc48d9f36a4fbe452ab8467ff0c1f5180b80f670caca54cb6",
+  "promotion_producer_sha256": "cff02f407f16c3adcf6ab8bc0b06259bbc1c0970910113a5f91bd98cebc5b68e",
+  "archive_index_verified": true
+}

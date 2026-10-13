@@ -61,7 +61,7 @@ func TestFrameSourceMetricsBindingRetirementKeepsDiagnosticMode(t *testing.T) {
 		t.Fatal(err)
 	}
 	b.tag = 1
-	m.tags[1] = true
+	m.tags[1] = 0
 	b.retire()
 	s := m.Snapshot()
 	if s.Pending != 0 || len(s.Samples) != 1 || s.Samples[0].Completed || s.Samples[0].Failure != "native window retired" || s.Samples[0].SourceDetails == nil || s.Samples[0].SourceDetails.UploadFailuresAvailable || len(s.Samples[0].SourceDetails.Records) != 0 {

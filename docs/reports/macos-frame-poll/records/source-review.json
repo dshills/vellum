@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "reviewed_at_utc": "2026-10-13T22:41:57.197699+00:00",
+  "base_commit": "61976ee557d46550b3aed8e2fa6b6cf1c5198a15",
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/frame_metrics.go": "790bc115d22ddda4e1cbee752ac3ec3009b3fd9250524ec9f3cda6d8be02ba41",
+    "/private/tmp/vellum-large-data/drivers/cogent/frame_metrics_test.go": "03ddb5405e93f26e7bbd2d9994cc39dc2a26bc3398f2391990d265cdfb90fe83",
+    "/private/tmp/vellum-large-data/drivers/cogent/frame_source_metrics_test.go": "4ef434bf4dfdba5fc0b4f6325c30913702efd4d4fb152a33d10944a585aafb37",
+    "/private/tmp/vellum-large-data/examples/loadedgrid/perf_runtime.go": "e541c9dd446f8204178c00750217ef4d0ace99a5adfc174ca166e49879524670"
+  },
+  "original_file_sha256": {
+    "/private/tmp/vellum-macos-frame-poll/original/drivers/cogent/frame_metrics.go": "714c000a6746a44e747d83307fd75428174b5747780d4cce04ef3aff403c99ec",
+    "/private/tmp/vellum-macos-frame-poll/original/drivers/cogent/frame_metrics_test.go": "879e06b62d7a5d733bf6be4cb6beef8053785a8345aba1dc57d2953a37e2d184",
+    "/private/tmp/vellum-macos-frame-poll/original/examples/loadedgrid/perf_runtime.go": "52682da80b0b67a52b40b6f4635b53e13fff1c02f99c27201704fff8e8146c44"
+  },
+  "context_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/frame_source_metrics.go": "d8933382682d3d852b77505375e4e59276f06fa39fcd8e867516350b86bf1fb0",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/frame_trace.go": "a2591565da1ac7936639850d1fc6a2a6792aa7692927405b188f2e44642953a6"
+  },
+  "referenced_author_receipt_sha256": {
+    "/private/tmp/vellum-macos-frame-poll/poll-race-v1.json": "d365521241ec4ed6c7798cf48a8e9f6f6e13d7df53297e2302cbdbad1ab0e0b6",
+    "/private/tmp/vellum-macos-frame-poll/poll-race-v1.stdout": "f332c3897273905cd7d109f02a1eff3d736263b756f56ce0ce40b662a76ca7b7",
+    "/private/tmp/vellum-macos-frame-poll/poll-race-v1.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+    "/private/tmp/vellum-macos-frame-poll/poll-race-v2.json": "de3b8fd79c10d635d5074f835539ec3b2642db6ec8556a8092a33d448379bffd",
+    "/private/tmp/vellum-macos-frame-poll/poll-race-v2.stdout": "7a8daf3b86bf2a8d7f850e668a34886b8b792129167f9b21a14576869418b8c3",
+    "/private/tmp/vellum-macos-frame-poll/poll-race-v2.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a"
+  },
+  "conclusions": [
+    {
+      "area": "Ticket lifecycle and identity",
+      "assessment": "The private tags map changes from membership booleans to a bounded retained-history index: reservation zero, collection append index+1. Admission still tests map membership, so a reserved zero-valued entry refuses duplicate admission. Collection sets the index only after appending the retained sample. Pending, unknown and collected/refused tickets are distinguished without deleting history, reusing capacity or overwriting samples."
+    },
+    {
+      "area": "Synchronization and detachment",
+      "assessment": "Poll validates the noncopied recorder and nonzero tag, then holds metrics.mu throughout the unchanged collector, pending count and indexed read. Enqueue, retirement and Snapshot use that mutex too. The collector takes the existing Core trace lock; cancellation touches only the trace, and Stop does not await its callback. No reverse lock path is introduced. Returned scalar/string sample values are detached, and cloneFrameSourceDetails copies the nested struct and Records slice."
+    },
+    {
+      "area": "Failure, retirement and drop status",
+      "assessment": "Poll does not manufacture a terminal for a failed but undispatched ticket. Core Take still requires input/owner terminals or explicit retirement. Failed and retired collected records are Found=true with Completed=false/Failure preserved. The unchanged overflow path increments Dropped, and Poll exposes recorder-wide Dropped/Pending just as Snapshot does. Invalid/copied/zero-tag calls return configuration Failure; unknown tags otherwise preserve recorder status."
+    },
+    {
+      "area": "Benchmark consumer and final history",
+      "assessment": "The waiting loop replaces repeated full-history copies and scans with Poll(tag), retaining configuration/drop refusal, Completed/Failure refusal, measured generation equality, context waiting and physical inspection. The final full Snapshot and terminal Pending/Dropped checks remain unchanged. No source counters, frame timing fields, event routing or capture protocol changed."
+    },
+    {
+      "area": "Tests and original fixture correction",
+      "assessment": "New tests cover pending and unknown tags, refusal before terminal, explicit Retire preserving the original refusal, native retirement, repeated history reads, concurrent Poll/Snapshot observers, copied/invalid recorders, detached detailed Records and dropped status. The microbenchmark contrasts full-history Snapshot against Poll across history sizes. The v1 failed fixture assumed Fail alone was collectible; v2 checks nonterminal pending then supplies Retire, matching existing Core Take semantics rather than weakening them."
+    }
+  ],
+  "author_evidence_scope": {
+    "poll_race_v1_exit_code": 1,
+    "poll_race_v2_exit_code": 0,
+    "v2_argv": [
+      "go",
+      "test",
+      "-race",
+      "-tags=offscreen",
+      "-run=^(TestFrameMetrics|TestFrameSourceMetrics|TestGridInput)",
+      "-count=3",
+      "."
+    ],
+    "v2_source_delta_matches_review": true,
+    "claim": "Referenced author receipts identify the fixture history and reviewed vector only; no independent full qualification or reviewer execution is claimed."
+  },
+  "limitations": [
+    "Read/hash/diff-only review of the four candidate Go leaves and the cited locking/detachment context; no reviewer tests, builds, native/UI calls, provider or Git actions, and no implementation writes.",
+    "Ordinary Poll avoids copying full history; collector work and optional per-ticket source-details detachment still occur. No whole-frame latency, exact native/Go allocation attribution or speedup follows from source approval.",
+    "Historical measurements made with full Snapshot observers remain their original observations. A changed observer requires separately bound new measurements for comparison; no P6/native/GPU/physical-presentation acceptance is granted here."
+  ]
+}

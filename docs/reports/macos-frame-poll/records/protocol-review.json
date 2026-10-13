@@ -1,0 +1,71 @@
+{
+  "status": "APPROVED_PROTOCOL",
+  "result": "APPROVED_PROTOCOL",
+  "findings": [],
+  "reviewed_artifact_sha256": {
+    "/private/tmp/vellum-macos-frame-poll/compare.py": "3eafa32c07ceecd8ac4dd40032c4da5ca938f2447458ec9d78e287fe0fa13872",
+    "/private/tmp/vellum-macos-frame-poll/candidate_run.py": "9335196c5e69dc1b9498fed8207392fa671cdeef0a85e56f755f544ff7c11f47",
+    "/private/tmp/vellum-macos-frame-poll/run.py": "7bc06ee2294565b72bf2370c566c7e14c1d6724e1d3735f470d4c82472f8b44b",
+    "/private/tmp/vellum-macos-frame-poll/code_run.py": "1f6d0faf006f7ad1c475fb8f63d6adf6d5319585149d2a2eee060346cf993de8",
+    "/private/tmp/vellum-macos-frame-poll/build-grid-baseline-v1.json": "07b31d93185853a7a9681938f58e1649bca803677105823cbb7d31773f20a00a",
+    "/private/tmp/vellum-macos-frame-poll/testing-authorization.json": "0896c3d50e2557a1b1739bc22d7304e17b513bb8350990318dbf68f74fbcd369",
+    "/private/tmp/vellum-macos-frame-poll/baseline.json": "ea88b130b3648d925d163fe3d9a6b173260179fb5f354b1806ee6a52e5a3f133",
+    "/private/tmp/vellum-macos-frame-poll/candidate-baseline-v1.json": "59c5c3b0f0e1257f8bfb950789ca614a8efe5614900977dfc05fddf4ba8df791",
+    "/private/tmp/vellum-macos-frame-poll/source-review.json": "6c9e6292dba976afaba432157fcb8d118e06c9469ed9dc9234cebac44610ee44",
+    "/private/tmp/vellum-macos-frame-poll/binary-identities.json": "af7f53d7324f8c0709b18d5f74eaaf3b80be6c10e386e880bcb593f56c4a630e",
+    "/private/tmp/vellum-macos-frame-poll/prelaunch.json": "3622f896631475e940ef61f2acc848a7f535569d590aa9135ce2dbcd045f37a9",
+    "/private/tmp/vellum-macos-frame-poll/build-grid-candidate-v1.json": "8d65d8727cc4292878965a6ef6e177037f135a5d5280dbde2ca827d95d3ebc33",
+    "/private/tmp/vellum-large-data/scripts/benchmark-grid.py": "c99da36325b5a978917f8f8168dbabf9be7a1428d42a73f1f13e3307489389e1",
+    "/private/tmp/vellum-large-data/scripts/child_process.py": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc",
+    "/private/tmp/vellum-macos-frame-poll/poll-race-v2.json": "de3b8fd79c10d635d5074f835539ec3b2642db6ec8556a8092a33d448379bffd",
+    "/private/tmp/vellum-macos-frame-poll/adapter-race-v1.json": "72ff217ea6a87974e5f91808bc22607f9dea35ec68da9c35a55a229379308595",
+    "/private/tmp/vellum-macos-frame-poll/adapter-vet-v1.json": "6e044b07d33a9b0a6b19db5db10f07d65303d8143c8a846d297595c411be735c",
+    "/private/tmp/vellum-macos-frame-poll/loadedgrid-race-v1.json": "ecab8dfaee0f547497b099829a842cf6d9822004a6d997dcd375fb6a93038484",
+    "/private/tmp/vellum-macos-frame-poll/observer-benchmark-v1.json": "560156984d60f636887a8be2ab911c8f0408b241a0011589de38c0af1b55ef8b"
+  },
+  "base_commit": "61976ee557d46550b3aed8e2fa6b6cf1c5198a15",
+  "source_scope": {
+    "approved_source_review_sha256": "6c9e6292dba976afaba432157fcb8d118e06c9469ed9dc9234cebac44610ee44",
+    "changed_four_leaves": [
+      "drivers/cogent/frame_metrics.go",
+      "drivers/cogent/frame_metrics_test.go",
+      "drivers/cogent/frame_source_metrics_test.go",
+      "examples/loadedgrid/perf_runtime.go"
+    ],
+    "source_keysets_equal": true,
+    "approved_candidate_hashes_match": true,
+    "prepared_maps_equal": true,
+    "selected_source_count": 710,
+    "prepared_count": 6198
+  },
+  "build_and_prelaunch": {
+    "baseline_build_exit0_error_null_stable": true,
+    "baseline_build_baseline_hash_matches": true,
+    "candidate_build_exit0_error_null_stable": true,
+    "candidate_build_baseline_hash_matches": true,
+    "binary_identities": {
+      "baseline": "b6c903d21b82d44152d5882ceb4407fc1d42971def3fc553829d2f2fadb3173b",
+      "candidate": "5fb76fcd600f3e67c1fea510063ced717521c7472a11fa52301af25401462ede"
+    },
+    "binary_identities_file_hash": "af7f53d7324f8c0709b18d5f74eaaf3b80be6c10e386e880bcb593f56c4a630e",
+    "prelaunch_hash": "3622f896631475e940ef61f2acc848a7f535569d590aa9135ce2dbcd045f37a9",
+    "all_checks_terminal_recorded": true,
+    "selected_five_receipt_hashes_match": true,
+    "launcher_predicates": "Parent launcher explicitly verified exit0/errorNone/source_delta_stable/complete prepared=baseline and overlay endpoint equality for all5selected receipts before admission. This certificate binds that prelaunch receipt and exact code receipts; it does not rerun the tests."
+  },
+  "approved_protocol": [
+    "Native benchmark children inherit the comparison outer owned group through a scoped benchmark.subprocess facade. Failed PGID admission kills/joins the direct child; local run_case cleanup joins/closes it and outer candidate_run/run_child handles hard group timeout/interruption, including end-only ps observers.",
+    "Preflight requires identical selected-source keysets/prepared vectors, exactly4named changes and each hash equal the approved source review. Both binary digests must equal frozen binary-identities.json; every completed run rechecks actual binary and candidate source/prepared endpoints.",
+    "Four fixed/variable10k/million cases each have5alternating-order baseline/candidate pairs,128closed guard1 warmups and120measured events: intended40fresh processes/4800ordinary observations. Common validation checks mode, completed ticket/generation, callbacks, ≥400actual clipped cells and exact native phase totals. All raw paired geometry dictionaries must match.",
+    "Outputs are retained per process in a new comparison directory; incomplete/refused/nonzero runs cannot satisfy the full comparison. Existing nearest-rank distributions and unchanged4ms p95/6ms p99 per-run targets remain.",
+    "The qualification explicitly states observer implementation changes between variants. Measurements characterize the instrumented fixture with changed diagnostic pressure, not isolated shipping-runtime speedup or framework-only allocation savings."
+  ],
+  "preconditions_and_limits": [
+    "Run compare only through candidate_run.py/run_child so the parent group is owned. Freeze reviewed scripts, source4, baseline/candidate manifests and binaries for the whole campaign.",
+    "All heavy tests/builds must be terminal before latency. Parent reports the campaign admitted only after the frozen PASS_PRELAUNCH_CODE_ENDPOINTS predicates and terminal stable candidate build; this source/protocol certificate supplies no runtime outcome.",
+    "code_run records drift but its exitcondition alone checks process/error; selected receipts need the explicit prelaunch/seal endpoint predicates already recorded. The stale expired-quiet-host docstring is narrative only; receipt mode is code-only and actual live authorization comes from the run/candidate wrappers.",
+    "Fresh direct human machine-availability authorization is bound; stop live work when availability is withdrawn. No native, build, test, UI, provider or Git execution was performed by this reviewer.",
+    "No heavy binary/prepared rehashing was performed by this reviewer during the active campaign. The frozen binary identities and complete prelaunch predicate receipt are bound; actual per-run binary checks and final endpoint/raw audit remain mandatory.",
+    "No target pass, speedup, continuous host isolation, physical GPU/presentation/native-allocation attribution, fullP6/P11/Mac or complete compiler/SDK/cache closure is certified. No sealing was performed."
+  ]
+}

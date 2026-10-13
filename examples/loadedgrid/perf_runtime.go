@@ -141,17 +141,15 @@ func (p *perfProgram) scroll(ctx context.Context, m *cogent.FrameMetrics, dx, dy
 	ticker := time.NewTicker(time.Millisecond)
 	defer ticker.Stop()
 	for {
-		snapshot := m.Snapshot()
-		if snapshot.Failure != "" {
-			return empty, cogent.GridInspection{}, errors.New(snapshot.Failure)
+		poll := m.Poll(tag)
+		if poll.Failure != "" {
+			return empty, cogent.GridInspection{}, errors.New(poll.Failure)
 		}
-		if snapshot.Dropped != 0 {
+		if poll.Dropped != 0 {
 			return empty, cogent.GridInspection{}, errors.New("loadedgrid perf: frame recorder overflow")
 		}
-		for _, s := range snapshot.Samples {
-			if s.Tag != tag {
-				continue
-			}
+		if poll.Found {
+			s := poll.Sample
 			if !s.Completed || s.Failure != "" {
 				return s, cogent.GridInspection{}, fmt.Errorf("loadedgrid perf: incomplete/refused frame: %s", s.Failure)
 			}

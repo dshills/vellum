@@ -81,6 +81,24 @@ Inspection, JSON output, recorder polling and memory snapshots happen outside
 the recorded work regions. No synchronous screenshot/readback is used. Dropped,
 failed, missing, duplicate or pending recorder tickets invalidate the run.
 
+`FrameMetrics.Poll(tag)` collects through the same synchronized path as
+`Snapshot` and returns one detached `FrameMetricsPoll` with `Sample`, `Found`,
+recorder-wide `Dropped` and `Pending`, and configuration `Failure`. Zero tags
+and nil, zero or copied recorders are refused. Unknown and still-pending tags
+return `Found=false`; a collected refused ticket returns `Found=true` with its
+sample failure. Cancellation does not bypass the dispatch/owner terminal.
+Collected ordinary records need no history-sized observer allocation; optional
+source details are deeply copied. Poll retains every record and tag reservation,
+including failed records, so duplicate admission and capacity limits remain.
+The loaded-grid waiting loop polls its requested tag and retains a full final
+snapshot to validate all history, dropped records and pending work.
+
+Polling remains outside recorded UI work but can change process allocation and
+GC pressure. Comparisons spanning observer implementations cannot isolate a
+shipping-runtime improvement. The
+[frame polling checkpoint](../docs/reports/macos-frame-poll/README.md) preserves
+a matched native campaign and the still-failed unchanged warm targets.
+
 ## Memory and callback observations
 
 Each sample distinguishes actually clipped visible cells, materialized

@@ -43,6 +43,17 @@ type FrameMetricsSnapshot struct {
 	Pending int
 	Failure string
 }
+
+// FrameMetricsPoll is one detached ticket plus recorder-wide refusal/pending
+// status. Found distinguishes a completed or refused record from an unknown or
+// still-pending tag. Poll never removes records from the retained history.
+type FrameMetricsPoll struct {
+	Sample  FrameSample
+	Found   bool
+	Dropped uint64
+	Pending int
+	Failure string
+}
 type frameWindowKey struct {
 	owner  *app.Application
 	window string
@@ -66,7 +77,7 @@ type FrameMetrics struct {
 	mu            sync.Mutex
 	capacity      int
 	samples       []FrameSample
-	tags          map[uint64]bool
+	tags          map[uint64]int // reserved=0; collected=sample index+1
 	windows       []*frameWindowMetrics
 	dropped       uint64
 	sourceDetails bool               // immutable configuration
@@ -97,7 +108,7 @@ func newFrameMetrics(capacity int, sourceDetails bool) (*FrameMetrics, error) {
 	if capacity < 1 || capacity > limit {
 		return nil, ErrFrameMetricsConfig
 	}
-	m := &FrameMetrics{capacity: capacity, sourceDetails: sourceDetails, samples: make([]FrameSample, 0, capacity), tags: make(map[uint64]bool)}
+	m := &FrameMetrics{capacity: capacity, sourceDetails: sourceDetails, samples: make([]FrameSample, 0, capacity), tags: make(map[uint64]int)}
 	m.self = m
 	return m, nil
 }
@@ -161,8 +172,37 @@ func (m *FrameMetrics) collectLocked() {
 				EncodeSubmitNS: sample.EncodeSubmitNS, AcquireNS: sample.AcquireNS, PresentCallNS: sample.PresentCallNS,
 				TotalUIWorkNS: sample.TotalUIWorkNS, Completed: sample.Completed, Failure: sample.Failure,
 				SourceDetails: frameSourceDetails(sample.SourceDetails)})
+			m.tags[sample.Tag] = len(m.samples)
 		}
 	}
+}
+
+// Poll collects available native completion through the same path as Snapshot,
+// then copies only the requested record. Ordinary records require no observer
+// allocation; diagnostic source details are separately detached when present.
+// Admission, retained history and global drop/pending checks remain unchanged.
+func (m *FrameMetrics) Poll(tag uint64) FrameMetricsPoll {
+	if !m.valid() || tag == 0 {
+		return FrameMetricsPoll{Failure: ErrFrameMetricsConfig.Error()}
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.collectLocked()
+	out := FrameMetricsPoll{Dropped: m.dropped}
+	for _, window := range m.windows {
+		if window.tag != 0 {
+			out.Pending++
+		}
+	}
+	if index := m.tags[tag]; index > 0 {
+		if index > len(m.samples) {
+			out.Failure = ErrFrameMetricsConfig.Error()
+			return out
+		}
+		out.Sample, out.Found = m.samples[index-1], true
+		out.Sample.SourceDetails = cloneFrameSourceDetails(out.Sample.SourceDetails)
+	}
+	return out
 }
 func (m *FrameMetrics) Snapshot() FrameMetricsSnapshot {
 	if !m.valid() {
@@ -267,7 +307,7 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
 	if b.tag != 0 {
 		return ErrFrameMetricsBusy
 	}
-	if m.tags[tag] {
+	if _, reserved := m.tags[tag]; reserved {
 		return ErrFrameMetricsConfig
 	}
 	if len(m.tags) >= m.capacity {
@@ -283,7 +323,7 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
 		return err
 	}
 	b.tag = tag
-	m.tags[tag] = true
+	m.tags[tag] = 0
 	b.stop = context.AfterFunc(ctx, func() { b.trace.Fail(tag, ctx.Err().Error()) })
 	// A deferred node owns its FIFO position even when a later ordinary scroll
 	// would normally replace/combine the preceding same-type event.
