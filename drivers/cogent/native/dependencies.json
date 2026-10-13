@@ -419,6 +419,17 @@
               "sha256": "41dc4f854788286eec18634e20d07ef6ec4537ad85fee2d0f24427ec6b83b63e"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/glyphmask",
+          "inputs": "native/patches/glyphmask/original-hashes.json",
+          "outputs": "native/patches/glyphmask/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/glyphmask/0046-bounded-glyph-mask-cache.patch",
+              "sha256": "d6321c4d4a1643896e8198a8076790a1b7f35349f91c897ad2e4cdc8ee8d46b7"
+            }
+          ]
         }
       ]
     },

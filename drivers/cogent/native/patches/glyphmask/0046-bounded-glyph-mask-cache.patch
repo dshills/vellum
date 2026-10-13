@@ -1,0 +1,491 @@
+--- a/paint/renderers/rasterx/glyphcache.go
++++ b/paint/renderers/rasterx/glyphcache.go
+@@ -27,6 +27,11 @@
+ )
+ 
+ const (
++	// Bounds cover retained mask data and strong face keys, not parsed fonts,
++	// map/allocator overhead, other caches or caller-held masks.
++	glyphCacheFaceLimit = 32
++	glyphCacheMaskBytes = 8 << 20
++
+ 	// glyphMinSize is the min size in height to use the cached values.
+ 	// small glyphs end up with bad aliasing artifacts when rendered
+ 	// from the cache.
+@@ -52,6 +57,8 @@
+ // GlyphCache holds cached rendered font glyphs.
+ type glyphCache struct {
+ 	glyphs     map[*font.Face]map[glyphKey]*image.Alpha
++	faces      []*font.Face
++	bytes      int
+ 	maxSize    image.Point
+ 	image      *image.RGBA
+ 	scanner    *scan.Scanner
+@@ -71,6 +78,8 @@
+ 
+ func (fc *glyphCache) init() {
+ 	fc.glyphs = make(map[*font.Face]map[glyphKey]*image.Alpha)
++	fc.faces = nil
++	fc.bytes = 0
+ 	fc.maxSize = image.Point{glyphMaxSize, glyphMaxSize}
+ 	sz := fc.maxSize
+ 	fc.image = image.NewRGBA(image.Rectangle{Max: sz})
+@@ -114,12 +123,30 @@
+ 		if mask != nil {
+ 			return mask, pi
+ 		}
+-	} else {
++	}
++
++	mask := gc.renderGlyph(face, g.GlyphID, g, outline, size, scale, oi.X, oi.Y)
++
++	// Group FIFO evicts the oldest admitted face groups and their masks. Hits do
++	// not refresh admission order. Returned masks remain
++	// owned by live callers through ordinary Go references; no object is mutated.
++	cost := len(mask.Pix)
++	for len(gc.faces) > 0 && (gc.bytes+cost > glyphCacheMaskBytes || (gc.glyphs[face] == nil && len(gc.faces) >= glyphCacheFaceLimit)) {
++		oldest := gc.faces[0]
++		gc.faces[0] = nil
++		gc.faces = gc.faces[1:]
++		for _, old := range gc.glyphs[oldest] {
++			gc.bytes -= len(old.Pix)
++		}
++		delete(gc.glyphs, oldest)
++	}
++	fc = gc.glyphs[face]
++	if fc == nil {
+ 		fc = make(map[glyphKey]*image.Alpha)
+-	}
+-
+-	mask := gc.renderGlyph(face, g.GlyphID, g, outline, size, scale, oi.X, oi.Y)
++		gc.faces = append(gc.faces, face)
++	}
+ 	fc[key] = mask
++	gc.bytes += cost
+ 	gc.glyphs[face] = fc
+ 	// fmt.Println(gc.CacheSize())
+ 	return mask, pi
+--- /dev/null
++++ b/paint/renderers/rasterx/glyphcache_bounds_test.go
+@@ -0,0 +1,225 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"io/fs"
++	"sync"
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/fonts"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"cogentcore.org/core/text/text"
++	"github.com/go-text/typesetting/font"
++	"github.com/go-text/typesetting/font/opentype"
++	"github.com/go-text/typesetting/shaping"
++)
++
++func maskFixture(side int, id font.GID) (shaping.Glyph, font.GlyphOutline) {
++	g := shaping.Glyph{GlyphID: id, Width: math32.ToFixed(float32(side)), Height: -math32.ToFixed(float32(side)), YBearing: math32.ToFixed(float32(side))}
++	points := [][2]float32{{0, 0}, {float32(side), 0}, {float32(side), float32(side)}, {0, float32(side)}, {0, 0}}
++	outline := font.GlyphOutline{}
++	for i, point := range points {
++		op := opentype.SegmentOpLineTo
++		if i == 0 {
++			op = opentype.SegmentOpMoveTo
++		}
++		outline.Segments = append(outline.Segments, font.Segment{Op: op, Args: [3]font.SegmentPoint{{X: point[0], Y: point[1]}}})
++	}
++	return g, outline
++}
++
++func maskBounds(t *testing.T, gc *glyphCache) {
++	t.Helper()
++	gc.Lock()
++	defer gc.Unlock()
++	if len(gc.faces) > 32 || len(gc.glyphs) != len(gc.faces) || gc.bytes < 0 || gc.bytes > 8<<20 {
++		t.Fatalf("retained limits: faces=%d keys=%d bytes=%d", len(gc.faces), len(gc.glyphs), gc.bytes)
++	}
++	seen := map[*font.Face]bool{}
++	total := 0
++	for _, face := range gc.faces {
++		if seen[face] || len(gc.glyphs[face]) == 0 {
++			t.Fatal("FIFO and face map diverged")
++		}
++		seen[face] = true
++		for _, mask := range gc.glyphs[face] {
++			total += len(mask.Pix)
++		}
++	}
++	if total != gc.bytes {
++		t.Fatalf("charged=%d actual mask data=%d", gc.bytes, total)
++	}
++}
++
++func TestVellumGlyphMaskFaceFIFOAndCallerOwnership(t *testing.T) {
++	var gc glyphCache
++	gc.init()
++	faces := make([]*font.Face, 33)
++	g, outline := maskFixture(20, 7)
++	for i := range faces {
++		faces[i] = &font.Face{}
++	}
++	held, placement := gc.Glyph(faces[0], &g, outline, 1, math32.Vec2(20.25, 30.5))
++	before := bytes.Clone(held.Pix)
++	if held.AlphaAt(10, 10).A == 0 {
++		t.Fatal("empty geometry oracle")
++	}
++	for i := 1; i < 32; i++ {
++		gc.Glyph(faces[i], &g, outline, 1, math32.Vector2{})
++	}
++	backing := gc.faces[:cap(gc.faces)]
++	hit, hitPlacement := gc.Glyph(faces[0], &g, outline, 1, math32.Vec2(20.25, 30.5))
++	if hit != held || hitPlacement != placement {
++		t.Fatal("warm hit lost caller mask or placement")
++	}
++	gc.Glyph(faces[32], &g, outline, 1, math32.Vector2{})
++	if backing[0] != nil || gc.glyphs[faces[0]] != nil || gc.faces[0] != faces[1] {
++		t.Fatal("oldest admitted group not cleared/evicted; hit must not refresh FIFO")
++	}
++	if !bytes.Equal(before, held.Pix) {
++		t.Fatal("eviction modified caller-held pixels")
++	}
++	fresh, freshPlacement := gc.Glyph(faces[0], &g, outline, 1, math32.Vec2(20.25, 30.5))
++	if fresh == held || freshPlacement != placement || !bytes.Equal(fresh.Pix, before) {
++		t.Fatal("regeneration changed pixels or reused evicted mask")
++	}
++	maskBounds(t, &gc)
++}
++
++func TestVellumGlyphMaskExactByteBoundaryAndSelfEviction(t *testing.T) {
++	var gc glyphCache
++	gc.init()
++	face := &font.Face{}
++	g, outline := maskFixture(60, 0) // 64*64 mask bytes: exact 8 MiB at 2,048 glyphs.
++	held, _ := gc.Glyph(face, &g, outline, 1, math32.Vector2{})
++	before := bytes.Clone(held.Pix)
++	for i := 1; i < 2048; i++ {
++		g.GlyphID = font.GID(i)
++		gc.Glyph(face, &g, outline, 1, math32.Vector2{})
++	}
++	if gc.CacheSize() != 8<<20 || len(gc.glyphs[face]) != 2048 {
++		t.Fatal("exact boundary evicted early")
++	}
++	maskBounds(t, &gc)
++	backing := gc.faces[:cap(gc.faces)]
++	g.GlyphID = 2048
++	last, _ := gc.Glyph(face, &g, outline, 1, math32.Vector2{})
++	if len(gc.glyphs[face]) != 1 || gc.CacheSize() != 4096 || backing[0] != nil {
++		t.Fatal("self eviction failed to clear/relookup original face group")
++	}
++	if !bytes.Equal(held.Pix, before) || !bytes.Equal(last.Pix, before) {
++		t.Fatal("byte eviction changed caller geometry")
++	}
++	maskBounds(t, &gc)
++}
++
++func TestVellumGlyphMaskConcurrentBounds(t *testing.T) {
++	var gc glyphCache
++	gc.init()
++	faces := make([]*font.Face, 40)
++	for i := range faces {
++		faces[i] = &font.Face{}
++	}
++	var wg sync.WaitGroup
++	for worker := 0; worker < 8; worker++ {
++		wg.Add(1)
++		go func(worker int) {
++			defer wg.Done()
++			for i := 0; i < 120; i++ {
++				g, outline := maskFixture(20, font.GID(i%30))
++				mask, _ := gc.Glyph(faces[(i+worker)%len(faces)], &g, outline, 1, math32.Vector2{})
++				if mask == nil || mask.AlphaAt(10, 10).A == 0 {
++					t.Error("concurrent render returned empty mask")
++				}
++				if size := gc.CacheSize(); size < 0 || size > 8<<20 {
++					t.Errorf("concurrent byte bound=%d", size)
++				}
++			}
++		}(worker)
++	}
++	wg.Wait()
++	maskBounds(t, &gc)
++}
++
++func TestVellumGlyphMaskRefusalDoesNotRetainFaces(t *testing.T) {
++	var gc glyphCache
++	gc.init()
++	for _, side := range []int{-5, 0, 3, 125, 200} {
++		g, outline := maskFixture(side, 0)
++		if mask, _ := gc.Glyph(&font.Face{}, &g, outline, 1, math32.Vector2{}); mask != nil {
++			t.Fatalf("uncacheable side=%d admitted", side)
++		}
++	}
++	if len(gc.faces) != 0 || len(gc.glyphs) != 0 || gc.CacheSize() != 0 {
++		t.Fatal("refused masks retain face keys")
++	}
++}
++
++func TestVellumGlyphMaskRealFontOriginalColdWarmAndEvictedPixels(t *testing.T) {
++	var gc glyphCache
++	var original referenceMaskCache
++	gc.init()
++	original.init()
++	shaper := shapedgt.NewShaperWithFonts([]fs.FS{fonts.Default})
++	checks := 0
++	for _, size := range []float32{24, 48} {
++		unitContext := units.Context{}
++		unitContext.Defaults()
++		style := text.NewStyle()
++		style.FontSize = units.Dot(size)
++		style.WhiteSpace = text.WrapNever
++		style.ToDots(&unitContext)
++		runs := shaper.Shape(rich.NewText(rich.NewStyle(), []rune("AgQjpMWé")), style)
++		if len(runs) == 0 {
++			t.Fatal("embedded font produced no shaped run")
++		}
++		for _, shaped := range runs {
++			run, ok := shaped.(*shapedgt.Run)
++			if !ok || run.Face == nil {
++				t.Fatal("missing real outline face")
++			}
++			scale := math32.FromFixed(run.Size) / float32(run.Face.Upem())
++			for i := range run.Glyphs {
++				g := &run.Glyphs[i]
++				outline, ok := run.Face.GlyphDataOutline(g.GlyphID)
++				if !ok || len(outline.Segments) == 0 {
++					t.Fatal("missing nonempty real glyph")
++				}
++				for _, pos := range []math32.Vector2{math32.Vec2(20, 60), math32.Vec2(20.25, 60.5), math32.Vec2(20.5, 60.25), math32.Vec2(-6.25, 44.75)} {
++					want, placement := original.Glyph(run.Face, g, outline, scale, pos)
++					cold, coldPlacement := gc.Glyph(run.Face, g, outline, scale, pos)
++					warm, warmPlacement := gc.Glyph(run.Face, g, outline, scale, pos)
++					if want == nil || cold == nil || warm != cold || coldPlacement != placement || warmPlacement != placement || cold.Bounds() != want.Bounds() || cold.Stride != want.Stride || !bytes.Equal(cold.Pix, want.Pix) {
++						t.Fatal("original/cold/warm pixels or placement differ")
++					}
++					if bytes.Equal(want.Pix, make([]byte, len(want.Pix))) {
++						t.Fatal("blank real glyph oracle")
++					}
++					retained := bytes.Clone(cold.Pix)
++					for n := 0; n < 33; n++ {
++						dummy, rect := maskFixture(20, 0)
++						gc.Glyph(&font.Face{}, &dummy, rect, 1, math32.Vector2{})
++					}
++					if gc.glyphs[run.Face] != nil {
++						t.Fatal("real face not evicted by 33 admissions")
++					}
++					fresh, freshPlacement := gc.Glyph(run.Face, g, outline, scale, pos)
++					if fresh == cold || freshPlacement != placement || !bytes.Equal(fresh.Pix, want.Pix) || !bytes.Equal(cold.Pix, retained) {
++						t.Fatal("original/regenerated pixels or held ownership differ")
++					}
++					maskBounds(t, &gc)
++					checks++
++				}
++			}
++		}
++	}
++	if checks != 64 {
++		t.Fatalf("real-font cases=%d want64", checks)
++	}
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/glyphcache_retention_test.go
+@@ -0,0 +1,41 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"github.com/go-text/typesetting/font"
++	"github.com/go-text/typesetting/shaping"
++)
++
++// These assertions also compile against the pinned parent implementation, so
++// its unbounded strong face keys and mask data can be reproduced directly.
++func TestVellumGlyphMaskRetainedFaceAndMaskBounds(t *testing.T) {
++	t.Run("face_keys", func(t *testing.T) {
++		var gc glyphCache
++		gc.init()
++		g := shaping.Glyph{Width: math32.ToFixed(20), Height: -math32.ToFixed(20), YBearing: math32.ToFixed(20)}
++		for n := 0; n < 33; n++ {
++			gc.Glyph(&font.Face{}, &g, font.GlyphOutline{}, 1, math32.Vector2{})
++		}
++		if len(gc.glyphs) > 32 {
++			t.Fatalf("retained face keys=%d; limit32", len(gc.glyphs))
++		}
++	})
++	t.Run("mask_data", func(t *testing.T) {
++		var gc glyphCache
++		gc.init()
++		face := &font.Face{}
++		g := shaping.Glyph{Width: math32.ToFixed(60), Height: -math32.ToFixed(60), YBearing: math32.ToFixed(60)}
++		for n := 0; n < 2049; n++ {
++			g.GlyphID = font.GID(n)
++			gc.Glyph(face, &g, font.GlyphOutline{}, 1, math32.Vector2{})
++		}
++		if bytes := gc.CacheSize(); bytes > 8<<20 {
++			t.Fatalf("retained mask bytes=%d; limit8388608", bytes)
++		}
++	})
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/glyphcache_reference_test.go
+@@ -0,0 +1,140 @@
++// Copyright (c) 2025, Cogent Core. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++// Test oracle generated from the pinned pre-bounds glyph cache; see glyphcache-original-oracle.json.
++package rasterx
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"sync"
++
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"github.com/go-text/typesetting/font"
++	"github.com/go-text/typesetting/font/opentype"
++	"github.com/go-text/typesetting/shaping"
++)
++
++// GlyphCache holds cached rendered font glyphs.
++type referenceMaskCache struct {
++	glyphs     map[*font.Face]map[glyphKey]*image.Alpha
++	maxSize    image.Point
++	image      *image.RGBA
++	scanner    *scan.Scanner
++	imgSpanner *scan.ImgSpanner
++	filler     *Filler
++	sync.Mutex
++}
++
++func (fc *referenceMaskCache) init() {
++	fc.glyphs = make(map[*font.Face]map[glyphKey]*image.Alpha)
++	fc.maxSize = image.Point{glyphMaxSize, glyphMaxSize}
++	sz := fc.maxSize
++	fc.image = image.NewRGBA(image.Rectangle{Max: sz})
++	fc.imgSpanner = scan.NewImgSpanner(fc.image)
++	fc.scanner = scan.NewScannerWithRowTracking(fc.imgSpanner, sz.X, sz.Y)
++	fc.filler = NewFiller(sz.X, sz.Y, fc.scanner)
++	fc.filler.SetWinding(true)
++	fc.filler.SetColor(colors.Uniform(color.Black))
++	fc.scanner.SetClip(fc.image.Bounds())
++}
++
++// Glyph returns an existing cached glyph or a newly rendered one,
++// and the top-left rendering position to use, based on pos arg.
++// fractional offsets are supported to improve quality.
++func (gc *referenceMaskCache) Glyph(face *font.Face, g *shaping.Glyph, outline font.GlyphOutline, scale float32, pos math32.Vector2) (*image.Alpha, image.Point) {
++	gc.Lock()
++	defer gc.Unlock()
++
++	fsize := image.Point{X: int(g.Width.Round()), Y: -int(g.Height.Round())}
++	size := fsize.Add(image.Point{2 * glyphMaskBorder, 2 * glyphMaskBorder})
++	if size.X <= 0 || size.X > glyphMaxSize || size.Y <= 0 || size.Y > glyphMaxSize || size.Y < glyphMinSize {
++		return nil, image.Point{}
++	}
++	// fmt.Println(face.Describe().Family, g.GlyphID, "wd, ht:", math32.FromFixed(g.Width), -math32.FromFixed(g.Height), "size:", size)
++	// fmt.Printf("g: %#v\n", g)
++
++	pf := pos.Floor()
++	pi := pf.ToPoint().Sub(image.Point{glyphMaskBorder, glyphMaskBorder})
++	pi.X += g.XBearing.Round()
++	pi.Y -= g.YBearing.Round()
++
++	off := pos.Sub(pf)
++	oi := off.Mul(math32.Vec2(glyphMaskOffsetsX, glyphMaskOffsetsY)).Round().ToPoint()
++	// fmt.Println("pos:", pos, "oi:", oi, "pi:", pi)
++
++	key := glyphKey{gid: g.GlyphID, sx: uint8(fsize.X), sy: uint8(fsize.Y), ox: uint8(oi.X), oy: uint8(oi.Y)}
++
++	fc, hasfc := gc.glyphs[face]
++	if hasfc {
++		mask := fc[key]
++		if mask != nil {
++			return mask, pi
++		}
++	} else {
++		fc = make(map[glyphKey]*image.Alpha)
++	}
++
++	mask := gc.renderGlyph(face, g.GlyphID, g, outline, size, scale, oi.X, oi.Y)
++	fc[key] = mask
++	gc.glyphs[face] = fc
++	// fmt.Println(gc.CacheSize())
++	return mask, pi
++}
++
++// renderGlyph renders the given glyph and caches the result.
++func (gc *referenceMaskCache) renderGlyph(face *font.Face, gid font.GID, g *shaping.Glyph, outline font.GlyphOutline, size image.Point, scale float32, xo, yo int) *image.Alpha {
++	// clear target:
++	draw.Draw(gc.image, gc.image.Bounds(), colors.Uniform(color.Transparent), image.Point{0, 0}, draw.Src)
++
++	od := math32.Vec2(1, 1).Div(math32.Vec2(glyphMaskOffsetsX, glyphMaskOffsetsY))
++	x := -float32(g.XBearing.Round()) + float32(xo)*od.X + glyphMaskBorder
++	y := float32(g.YBearing.Round()) + float32(yo)*od.Y + glyphMaskBorder
++	rs := gc.filler
++	rs.Clear()
++	for _, s := range outline.Segments {
++		p0 := math32.Vec2(s.Args[0].X*scale+x, -s.Args[0].Y*scale+y)
++		switch s.Op {
++		case opentype.SegmentOpMoveTo:
++			rs.Start(p0.ToFixed())
++		case opentype.SegmentOpLineTo:
++			rs.Line(p0.ToFixed())
++		case opentype.SegmentOpQuadTo:
++			p1 := math32.Vec2(s.Args[1].X*scale+x, -s.Args[1].Y*scale+y)
++			rs.QuadBezier(p0.ToFixed(), p1.ToFixed())
++		case opentype.SegmentOpCubeTo:
++			p1 := math32.Vec2(s.Args[1].X*scale+x, -s.Args[1].Y*scale+y)
++			p2 := math32.Vec2(s.Args[2].X*scale+x, -s.Args[2].Y*scale+y)
++			rs.CubeBezier(p0.ToFixed(), p1.ToFixed(), p2.ToFixed())
++		}
++	}
++	rs.Stop(true)
++	rs.Draw()
++	rs.Clear()
++	bb := image.Rectangle{Max: size}
++
++	mask := image.NewAlpha(bb)
++	draw.Draw(mask, bb, gc.image, image.Point{}, draw.Src)
++	// fmt.Println("size:", size, *mask)
++	// fmt.Println("render:", gid, size)
++	return mask
++}
++
++// CacheSize reports the total number of bytes used for image masks.
++// For example, the cogent core docs took about 3.5mb using 4
++func (gc *referenceMaskCache) CacheSize() int {
++	gc.Lock()
++	defer gc.Unlock()
++	total := 0
++	for _, fc := range gc.glyphs {
++		for _, mask := range fc {
++			sz := mask.Bounds().Size()
++			total += sz.X * sz.Y
++		}
++	}
++	return total
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/glyphcache-original-oracle.json
+@@ -0,0 +1,6 @@
++{
++  "original_path": "paint/renderers/rasterx/glyphcache.go",
++  "original_sha256": "902cbbd000b304e967617a307d06346d88eea7568292e7754d7a08ae0415540c",
++  "transformation": "Retain original imports and all original glyphCache methods/type; remove duplicate glyphKey declaration; rename only glyphCache to referenceMaskCache; exclude original globals/constants/init. Production globals/constants are unchanged.",
++  "license": "Cogent Core BSD-style original methods retained with copyright notice"
++}

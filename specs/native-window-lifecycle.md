@@ -45,3 +45,8 @@ application closure, including after a safety-limit failure. It requires a new
 clean absolute path, uses exclusive creation and caps compressed output at
 8 MiB. Write/close errors remain failures. Profiling adds another forced GC and
 is diagnostic only; allocation sites do not prove the retaining reference.
+
+The [glyph-mask cache](glyph-mask-cache.md) bounds one shared Go cache. The native
+retention report preserves production failures and an earlier diagnostic overlay;
+it does not qualify the adopted patch's native memory behavior. Future acceptance
+must observe physical footprint and native graphics allocations as well as RSS.

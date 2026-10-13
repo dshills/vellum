@@ -177,3 +177,12 @@ native termination, with LIFO ownership, reference retirement and panic-safe
 complete cleanup/termination. The Mac service adapter uses it for panel/menu/tray
 resources; actual native termination remains a separate acceptance check.
 See [cleanup contract](patches/maincleanup/README.md).
+
+## Shared glyph-mask bounds
+
+Patch 0046 adds FIFO whole-face eviction to the shared raster glyph-mask cache,
+bounded to 32 face keys and 8 MiB of mask data. Pinned input/output hashes cover
+the implementation, retention/concurrency/pixel tests and original test oracle.
+See [patch notes](patches/glyphmask/README.md) and the
+[retention specification](../../../specs/glyph-mask-cache.md). Native graphics
+retention and the final adopted patch's live memory acceptance remain open.

@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "source_root": "/private/tmp/vellum-large-data",
+  "base_commit": "977a974fb508f9a3c5b05f702485521edd8bf3ef",
+  "source_manifest": {
+    "path": "/private/tmp/vellum-macos-cache-bounds/source-final.json",
+    "sha256": "e044e59fe6d3844ae280d3008ced611fc06ade10afbba3749af5b17e6e9e70e2",
+    "files": 9
+  },
+  "files": {
+    "drivers/cogent/native/README.md": "7b07b1381c66799f33390a230d9154c40031b0baa67c4f0b48bd5e5e19debf1a",
+    "drivers/cogent/native/dependencies.json": "e5cb3e571f4edfeace537cf48193d7d1207a5b703c8c3595a352dcb151a8fd8c",
+    "drivers/cogent/native/patches/glyphmask/0046-bounded-glyph-mask-cache.patch": "d6321c4d4a1643896e8198a8076790a1b7f35349f91c897ad2e4cdc8ee8d46b7",
+    "drivers/cogent/native/patches/glyphmask/README.md": "eceb81f5d3f7c8359c80496a058f3c1d94358111b47777e87b5d72698f432a30",
+    "drivers/cogent/native/patches/glyphmask/original-hashes.json": "68b86f9fae848e4f69c5420534bce8515ebabb78932e80c30f8ff2cbe589246d",
+    "drivers/cogent/native/patches/glyphmask/output-hashes.json": "28901a2367c73fa5c519fc702ce081b8012f15862d0c8128040fd519f191111f",
+    "specs/glyph-mask-cache.md": "bcedd4791c9d1f4b50bbab426e782b7f7e4830916241b801480c10744bfc62a5",
+    "specs/native-window-lifecycle.md": "caa7edfcb90d813806e604c2bccb3ca9c1e90c75fa09fec16e366b8feb8ad667",
+    "drivers/cogent/prepare_test.py": "3894d5b55a43ce16920d76b465b3c6ab39667f4db1480c99e799109d584c7545"
+  },
+  "stage_input_hashes": {
+    "paint/renderers/rasterx/glyphcache.go": "902cbbd000b304e967617a307d06346d88eea7568292e7754d7a08ae0415540c",
+    "paint/renderers/rasterx/glyphcache_bounds_test.go": null,
+    "paint/renderers/rasterx/glyphcache_retention_test.go": null,
+    "paint/renderers/rasterx/glyphcache_reference_test.go": null,
+    "paint/renderers/rasterx/glyphcache-original-oracle.json": null
+  },
+  "stage_output_hashes": {
+    "paint/renderers/rasterx/glyphcache.go": "e6d7a6cd0589c1c28570f551acacc61e7ec3f553fc3fb6cf8031057036dcccbf",
+    "paint/renderers/rasterx/glyphcache_bounds_test.go": "9ead4ff07c13a38079b09802df23e32d8cb84d7e975cc83e9802c038a0c69484",
+    "paint/renderers/rasterx/glyphcache_retention_test.go": "7caa468056071c3cb5cf8322fca952f8e9867ace722093afbf4d1b42b679ca1e",
+    "paint/renderers/rasterx/glyphcache_reference_test.go": "fa94a121667d6d3143311560429dea2d6ec7eb0d841b84320d36511f21da613a",
+    "paint/renderers/rasterx/glyphcache-original-oracle.json": "96ab6287212718055473e272143caa66e63cc8fac5482e40b98b24a4c76db41b"
+  },
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/native/README.md": "7b07b1381c66799f33390a230d9154c40031b0baa67c4f0b48bd5e5e19debf1a",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/dependencies.json": "e5cb3e571f4edfeace537cf48193d7d1207a5b703c8c3595a352dcb151a8fd8c",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/glyphmask/0046-bounded-glyph-mask-cache.patch": "d6321c4d4a1643896e8198a8076790a1b7f35349f91c897ad2e4cdc8ee8d46b7",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/glyphmask/README.md": "eceb81f5d3f7c8359c80496a058f3c1d94358111b47777e87b5d72698f432a30",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/glyphmask/original-hashes.json": "68b86f9fae848e4f69c5420534bce8515ebabb78932e80c30f8ff2cbe589246d",
+    "/private/tmp/vellum-large-data/drivers/cogent/native/patches/glyphmask/output-hashes.json": "28901a2367c73fa5c519fc702ce081b8012f15862d0c8128040fd519f191111f",
+    "/private/tmp/vellum-large-data/specs/glyph-mask-cache.md": "bcedd4791c9d1f4b50bbab426e782b7f7e4830916241b801480c10744bfc62a5",
+    "/private/tmp/vellum-large-data/specs/native-window-lifecycle.md": "caa7edfcb90d813806e604c2bccb3ca9c1e90c75fa09fec16e366b8feb8ad667",
+    "/private/tmp/vellum-large-data/drivers/cogent/prepare_test.py": "3894d5b55a43ce16920d76b465b3c6ab39667f4db1480c99e799109d584c7545",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/paint/renderers/rasterx/glyphcache.go": "e6d7a6cd0589c1c28570f551acacc61e7ec3f553fc3fb6cf8031057036dcccbf",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/paint/renderers/rasterx/glyphcache_bounds_test.go": "9ead4ff07c13a38079b09802df23e32d8cb84d7e975cc83e9802c038a0c69484",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/paint/renderers/rasterx/glyphcache_retention_test.go": "7caa468056071c3cb5cf8322fca952f8e9867ace722093afbf4d1b42b679ca1e",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/paint/renderers/rasterx/glyphcache_reference_test.go": "fa94a121667d6d3143311560429dea2d6ec7eb0d841b84320d36511f21da613a",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/paint/renderers/rasterx/glyphcache-original-oracle.json": "96ab6287212718055473e272143caa66e63cc8fac5482e40b98b24a4c76db41b",
+    "/private/tmp/vellum-large-data/drivers/cogent/prepare.py": "1f65ff4dff0a117a18dc9c66f94bc3110b39014962f4c47da08bf854afd71841",
+    "/private/tmp/vellum-large-data/scripts/check.sh": "2d2aaa98503e1c6bbaf9765050cb1d825fedb22516d6b4925a1c21185fdb4d2a",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/LICENSE": "c6297bf0da1f70caea4ef25247a6d11650cb1c87b0b0a28a53a6bc725fe451d1",
+    "/private/tmp/vellum-large-data/LICENSE": "07c4328563b9066be35c2ac90c6744e6ac904882fd2355ea82d7f0756c940b43"
+  },
+  "artifact_sha256": {
+    "/private/tmp/vellum-macos-cache-bounds/owned-prepare.json": "56d4f939ca848addf79b7f6323805258dc2e3f8b43a4c38c61e17c45b80eae97",
+    "/private/tmp/vellum-macos-cache-bounds/owned-prepare.stdout": "d2944f4ea1c12b84f0abd8d3e6189f3d83c7f1f9dfc1a210211e35bd688a471b",
+    "/private/tmp/vellum-macos-cache-bounds/owned-prepare.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-cache-bounds/owned-rasterx-race.json": "42b2094cb3d6a424dd3749df2ff7cfd941996958938abeb3dd05eea8d261c098",
+    "/private/tmp/vellum-macos-cache-bounds/owned-rasterx-race.stdout": "d0526c2621e189629cf9f50b04f29a68cb86e2db7bb494313d0b0207bec2e09a",
+    "/private/tmp/vellum-macos-cache-bounds/owned-rasterx-race.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-cache-bounds/owned-rasterx-vet.json": "f103d8e5a8302d64c045385d7a974dba76b43d452049ec82c797f91d415dba7a",
+    "/private/tmp/vellum-macos-cache-bounds/owned-rasterx-vet.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-cache-bounds/owned-rasterx-vet.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-cache-bounds/owned-native-build.json": "48c4b5a7d6bf52681a88f19e56a1a8039b27e706ac9ad9029e9ce2cb220cfadc",
+    "/private/tmp/vellum-macos-cache-bounds/owned-native-build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-cache-bounds/owned-native-build.stderr": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776",
+    "/private/tmp/vellum-macos-cache-bounds/owned-driver-offscreen-race.json": "39e4316341e32e392f986665e10ec1817be1b076b813b374a8d6fe15ec4da53d",
+    "/private/tmp/vellum-macos-cache-bounds/owned-driver-offscreen-race.stdout": "a0f166283e0425ee37d83f069bc682a3ac1df5f49a97b64320f568a234f9a550",
+    "/private/tmp/vellum-macos-cache-bounds/owned-driver-offscreen-race.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+    "/private/tmp/vellum-macos-cache-bounds/cache-original-retention.json": "be5ddbad027d6bc982543dd6e78705a568c04ddd81a746a195ec57bca98beb24",
+    "/private/tmp/vellum-macos-cache-bounds/cache-original-retention.stdout": "8465713d331742c4a6bed91e2ff26c465086f0b938a5fadcec925372ec110a77",
+    "/private/tmp/vellum-macos-cache-bounds/cache-original-retention.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-cache-bounds/source-final.json": "e044e59fe6d3844ae280d3008ced611fc06ade10afbba3749af5b17e6e9e70e2",
+    "/private/tmp/vellum-macos-cache-bounds/source-prism.json": "258116ad88b6233635c11a3b626503acd0d9b5515f924bdaf805657079580dea",
+    "/private/tmp/vellum-macos-cache-bounds/owned-prepare-tests.json": "d8d7703c09bbaaab20eae85c72381fc76b79e6236948018a62da8626fef8a051",
+    "/private/tmp/vellum-macos-cache-bounds/owned-prepare-tests.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-cache-bounds/owned-prepare-tests.stderr": "8354535a78999845e951fc9b421c1e46811b3dd73e23b12bd352632b16b7e942",
+    "/private/tmp/vellum-macos-cache-bounds/prism-v1/prism.json": "220748518f1bb97bfdead29e98953e8c59b674ca200d1b15fd85c20b63f2bf92",
+    "/private/tmp/vellum-macos-cache-bounds/prism-v1/process.json": "53673d6b8f78f772b39315ae1d0ccdfeb0932dcf5b139a95bb68a9605d9a4de9",
+    "/private/tmp/vellum-macos-cache-bounds/prism-v1/inputs.json": "fe22179355615b665bbec424851ffb0eae6ddb099464ffac043a68677021c971",
+    "/private/tmp/vellum-macos-cache-bounds/glyphcache-original.go": "902cbbd000b304e967617a307d06346d88eea7568292e7754d7a08ae0415540c"
+  },
+  "review_scope": [
+    "Read-only implementation, tests, original-oracle provenance, pinned patch replay, preparation guards, licensing notices and scoped specification/documentation review.",
+    "Independently replayed all five patch outputs in memory from exact original902cbbd000b304e967617a307d06346d88eea7568292e7754d7a08ae0415540c plus absent new files; every byte matches output-hashes.json and selected prepared files.",
+    "Independently regenerated the BSD-noticed reference cache from original imports/type/methods with only documented type renaming and removal of duplicate/global declarations; exact reference SHA fa94a121667d6d3143311560429dea2d6ec7eb0d841b84320d36511f21da613a. Original key quantization, cacheable dimensions, shared mutex, renderGlyph and CacheSize semantics are retained."
+  ],
+  "correctness": [
+    "Whole-face FIFO evicts until both32face/8MiBmask limits admit the new cacheable mask; cacheable dimensions limit individual mask allocation to16KiB. Re-looking up the requested face after eviction handles self-eviction safely.",
+    "Evicted FIFO backing slots are cleared before slicing; deleted maps no longer retain those face keys or masks. Caller-held image.Alpha buffers are neither mutated nor invalidated, and hits do not refresh FIFO order.",
+    "Membership, retained-byte accounting and shared rasterization remain under the existing mutex. The budget covers cached mask pixel data and strong face-key count, not parsed-font backing, map/slice/allocator overhead, temporary allocations or caller-held masks.",
+    "Meaningful tests cover original-compatible two-failure retention, exact byte boundary/self-eviction, FIFO warm hits, backing clearing, held pixels,960concurrent calls across40faces and64real-font original/cold/warm/evicted pixel-and-placement cases."
+  ],
+  "resolved_findings": [
+    {
+      "id": "PATCH46-PREPARE-REGISTRATION",
+      "finding": "Existing prepare_test.py expected patch numbers1..45 after append of0046.",
+      "resolution": "Only the expected range endpoint changed46→47; the exact single-line delta was independently verified. Final9-file map includes this internally reviewed addition; prior8 files remain byte-identical.",
+      "final_file_sha256": "3894d5b55a43ce16920d76b465b3c6ab39667f4db1480c99e799109d584c7545",
+      "qualification_sha256": "d8d7703c09bbaaab20eae85c72381fc76b79e6236948018a62da8626fef8a051",
+      "observed_exit_code": 0,
+      "observed_tests": 11
+    }
+  ],
+  "provider": {
+    "path": "/private/tmp/vellum-macos-cache-bounds/prism-v1/prism.json",
+    "sha256": "220748518f1bb97bfdead29e98953e8c59b674ca200d1b15fd85c20b63f2bf92",
+    "process_sha256": "53673d6b8f78f772b39315ae1d0ccdfeb0932dcf5b139a95bb68a9605d9a4de9",
+    "source_manifest_path": "/private/tmp/vellum-macos-cache-bounds/source-prism.json",
+    "source_manifest_sha256": "258116ad88b6233635c11a3b626503acd0d9b5515f924bdaf805657079580dea",
+    "reviewed_files": 8,
+    "complete": true,
+    "chunks": 2,
+    "calls": 2,
+    "exit_code": 0,
+    "findings": 0,
+    "discarded": 0,
+    "suppressed": 0,
+    "truncated_bytes": 0,
+    "scope_note": "Provider reviewed original8 files only. The later single-line preparation registration addition was internally reviewed and qualified separately; no second provider run is claimed."
+  },
+  "qualification_observations": {
+    "owned_rasterx_race": {
+      "proof_sha256": "42b2094cb3d6a424dd3749df2ff7cfd941996958938abeb3dd05eea8d261c098",
+      "exit_code": 0,
+      "count": 3,
+      "source_files": 8,
+      "prepared_inputs": 6178,
+      "source_and_existing_prepared_unchanged": true,
+      "new_outputs": 17,
+      "new_output_scope": "Generated rasterx testdata PNG files; retained/removed as declared artifacts, not additional source inputs."
+    },
+    "owned_rasterx_vet": {
+      "proof_sha256": "f103d8e5a8302d64c045385d7a974dba76b43d452049ec82c797f91d415dba7a",
+      "exit_code": 0,
+      "source_files": 8,
+      "prepared_inputs": 6178
+    },
+    "owned_native_build": {
+      "proof_sha256": "48c4b5a7d6bf52681a88f19e56a1a8039b27e706ac9ad9029e9ce2cb220cfadc",
+      "exit_code": 0,
+      "source_files": 8,
+      "prepared_inputs": 6178,
+      "scope": "Compile only; native consumer was not executed."
+    },
+    "owned_adapter_offscreen_race": {
+      "proof_sha256": "39e4316341e32e392f986665e10ec1817be1b076b813b374a8d6fe15ec4da53d",
+      "exit_code": 0,
+      "source_files": 8,
+      "prepared_inputs": 6178
+    },
+    "owned_prepare_tests": {
+      "proof_sha256": "d8d7703c09bbaaab20eae85c72381fc76b79e6236948018a62da8626fef8a051",
+      "exit_code": 0,
+      "tests": 11,
+      "source_files": 9,
+      "prepared_inputs": 6178,
+      "before_after_maps_equal": true
+    },
+    "prepare": {
+      "proof_sha256": "56d4f939ca848addf79b7f6323805258dc2e3f8b43a4c38c61e17c45b80eae97",
+      "exit_code": 0,
+      "before_prepared_files": 6174,
+      "after_prepared_files": 6178,
+      "changed_existing_files": 1,
+      "new_files": 4,
+      "scope_note": "Preparation preceded the README heading spacing correction; other7 selected phase files and all runtime pins match. Later8-source Go receipts bind the final README."
+    },
+    "original_retention": {
+      "proof_sha256": "be5ddbad027d6bc982543dd6e78705a568c04ddd81a746a195ec57bca98beb24",
+      "exit_code": 1,
+      "observed_failures": [
+        "retained face keys33 exceeds32",
+        "retained mask bytes8392704 exceeds8388608"
+      ],
+      "scope_note": "Historical original-overlay log; its runner did not include cache overlay leaves in its source maps, so exact loaded overlay provenance is not promoted beyond that recorded scope."
+    }
+  },
+  "licensing": {
+    "original_oracle": "Original Cogent copyright/BSD-style notice retained, with exact original hash and regeneration metadata.",
+    "new_tests": "Bounds and original-compatible retention tests carry Vellum MIT notices.",
+    "scope": "Notice/provenance inspection only; no legal redistribution approval."
+  },
+  "limitations": [
+    "No reviewer execution of Go, prepare, native/UI, provider or Git mutations; only source reads, hash comparisons, in-memory patch/oracle reconstruction and own certificate output.",
+    "Selected prepared output hashes were recomputed; receipt6178-entry maps were compared for concordance but this review did not independently rehash the complete prepared/compiler/SDK closure.",
+    "Prior loose overlay race receipt had incomplete cache input binding and the initial fixture expected72 rather than64 cases; those historical results are not relabeled as exact adopted-stage qualification.",
+    "Earlier native overlay diagnostics used different source hashes and do not establish final owned patch native-memory behavior. Final owned live testing remains deferred; native/GPU retention, physical footprint, fullP11 endurance and latency remain unqualified.",
+    "FIFO may evict a recently used face; this intentional warm-hit tradeoff follows the documented retained-resource policy."
+  ]
+}

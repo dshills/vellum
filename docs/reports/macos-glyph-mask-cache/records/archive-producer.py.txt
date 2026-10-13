@@ -1,0 +1,128 @@
+"""Seal exact owned cache bounds with code/offscreen evidence; native retest deferred."""
+import hashlib, io, json, os, shutil, tarfile
+from pathlib import Path
+r=Path('/private/tmp/vellum-large-data');p=Path('/private/tmp/vellum-macos-cache-bounds');out=r/'docs/reports/macos-glyph-mask-cache'
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+read=lambda n:json.loads((p/n).read_text())
+source=read('source-final.json')['sources'];base=read('source-final.json')['base_commit']
+assert len(source)==9 and all(sha(r/n)==h for n,h in source.items())
+reviewed=read('source-prism.json')['sources'];assert len(reviewed)==8 and reviewed=={n:h for n,h in source.items()if n!='drivers/cogent/prepare_test.py'}
+cert=read('source-review-final.json');assert cert['status']=='APPROVED_SOURCE' and cert['files']==source and not cert['findings']
+provider=read('prism-v1/prism.json');process=read('prism-v1/process.json')
+assert process['exit_code']==0 and process['error']is None and process['source_index_stable'] and process['before']==process['after']==reviewed
+assert provider['coverage']['complete'] and provider['coverage']['files']==8 and not provider['findings']
+assert provider['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]
+stage=r/'drivers/cogent/native/patches/glyphmask';outputs=json.loads((stage/'output-hashes.json').read_text())
+prepared={f.relative_to(r/'drivers/cogent/build').as_posix():sha(f)for module in ['upstream','typesetting']for f in sorted((r/'drivers/cogent/build'/module).rglob('*'))if f.is_file()}
+assert len(prepared)==6178 and all(prepared['upstream/'+n]==h for n,h in outputs.items())
+old=read('owned-prepare.json')['prepared_before'];assert len(old)==6174
+assert set(prepared)-set(old)=={'upstream/'+n for n in outputs if n!='paint/renderers/rasterx/glyphcache.go'}
+assert {n for n in old if old[n]!=prepared[n]}=={'upstream/paint/renderers/rasterx/glyphcache.go'}
+receipts={}
+expected_fail={'cache-overlay-race-v1','cache-original-retention'}
+final_checks={'owned-rasterx-race','owned-rasterx-vet','owned-native-build','owned-driver-offscreen-race','owned-prepare-tests'}
+for f in sorted(p.glob('*.json')):
+    d=json.loads(f.read_text())
+    if 'source_delta_stable'not in d:continue
+    name=f.stem;assert d['exit_code']==int(name in expected_fail) and d['error']is None and d['source_delta_stable'] and not d['live_tests']
+    for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+    if name in final_checks:
+        assert d['source_commit']==base and d['source_delta_before']==d['source_delta_after']==(source if name=='owned-prepare-tests'else reviewed)
+        assert d['prepared_before']==prepared and all(d['prepared_after'][n]==h for n,h in prepared.items())
+        extras=set(d['prepared_after'])-set(prepared)
+        assert (len(extras)==17 and all(n.startswith('upstream/paint/renderers/rasterx/testdata/')and n.endswith('.png')for n in extras))if name=='owned-rasterx-race'else not extras
+    receipts[name]={'sha256':sha(f),'raw_exit_code':d['exit_code'],'exact_owned_prepared_input':name in final_checks,'historical':name not in final_checks and name!='owned-prepare'}
+assert len(receipts)==9 and final_checks<=receipts.keys()
+assert 'retained face keys=33; limit32'in(p/'cache-original-retention.stdout').read_text()
+assert 'retained mask bytes=8392704; limit8388608'in(p/'cache-original-retention.stdout').read_text()
+assert 'real-font cases=64 want72'in(p/'cache-overlay-race-v1.stdout').read_text()
+assert read('owned-prepare.json')['prepared_after']==prepared
+manifest=json.loads((r/'drivers/cogent/native/dependencies.json').read_text());entry=manifest['dependencies'][0]['stages'][-1]
+assert entry['inputs']=='native/patches/glyphmask/original-hashes.json' and entry['outputs']=='native/patches/glyphmask/output-hashes.json' and len(entry['patches'])==1
+assert sha(r/'drivers/cogent'/entry['patches'][0]['file'])==entry['patches'][0]['sha256']
+binary=p/'window-cycle-smoke-owned';assert binary.is_file()
+q={'result':'PASS_OWNED_GLYPH_MASK_BOUNDS_OFFSCREEN','base_commit':base,'source':source,'prism_source':reviewed,'prepared':prepared,'stage_outputs':outputs,'receipts':receipts,'source_review_sha256':sha(p/'source-review-final.json'),'prism_raw_exit_code':0,'prism_findings':0,'post_prism_addition':'One-line preparation order assertion includes patch46; internal exact9source review and wholePython suite after provider. Go gates bind unchanged8scope and6178prepared outputs.','native_build_sha256':sha(binary),'final_owned_source_native_executed':False,'real_font_cases':64,'face_key_limit':32,'mask_data_limit':8<<20,'native_memory_qualified':False,'gpu_memory_qualified':False,'full_p11_qualified':False,'macos_completion':False,'quiet_window_expired':True,'next_live_tests_deferred':True,'historical_overlay_binding':'Pre-adoption raw pass does not bind exact current overlay leaves; final owned Go receipts bind all6178 prepared files and8 implementation/doc/pin inputs; laterPython suite binds final9. Initial fixture count error retained. Original-compatible parent regression fails both32key/8MiB assertions.','previous_native_diagnostics':'See parent macos-window-retention report; historical one-file overlay passes1000 but vmmap shows IOSurface-dominated7.9G->14.3G footprint growth. No current source or full P11/native/GPU memory pass inferred.','prepared_changes':'Exactly one prior file changed plus4 new test/oracle leaves;17 generated test PNGs moved outside prepared tree. No module-cache changes.','scope':'Selected source and all prepared identities; compiler/cache/SDK closure and unsampled/process/native/GPU memory bounds excluded.'}
+(p/'qualification.json').write_text(json.dumps(q,indent=2)+'\n')
+records=out/'records';records.mkdir(parents=True,exist_ok=False);shutil.copy2(Path(__file__),records/'archive-producer.py.txt')
+files={}
+for folder,dirs,names in os.walk(p):
+    dirs[:]=sorted(d for d in dirs if not d.endswith('.app')and not(Path(folder)/d).is_symlink())
+    for name in sorted(names):
+        f=Path(folder)/name
+        if f.is_file()and not f.is_symlink()and f.suffix in ['.json','.stdout','.stderr','.py','.txt','.log','.go']:
+            files[f.relative_to(p).as_posix()]=f.read_bytes()
+index={n:hashlib.sha256(b).hexdigest()for n,b in files.items()};(records/'evidence-index.json').write_text(json.dumps(index,indent=2)+'\n')
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tf:
+    for n,b in sorted(files.items()):
+        info=tarfile.TarInfo(n);info.size,info.mode,info.mtime=len(b),0o644,0;tf.addfile(info,io.BytesIO(b))
+with tarfile.open(archive)as tf:actual={m.name:hashlib.sha256(tf.extractfile(m).read()).hexdigest()for m in tf.getmembers()if m.isfile()}
+assert actual==index
+(out/'README.md').write_text('''# Mac glyph-mask cache: owned bounded retention
+
+Owned patch 0046 bounds the shared raster cache to 32 strong font-face keys and
+8 MiB of mask pixel data. Whole face groups use FIFO admission order; hits keep
+their original position. Eviction clears vacated backing-slice entries and removes
+the group's map, then relooks up the requesting face before inserting. Returned
+masks remain valid through caller references. Key quantization, placement,
+cacheable dimensions and render code retain the pinned parent behavior. The
+existing mutex covers lookup, eviction, accounting and shared rasterization.
+Limits exclude parsed-font size, container/allocator overhead, other caches,
+temporary allocations and caller-held masks.
+
+The original-compatible regression fails the parent cache at 33 face keys and
+8,392,704 mask bytes, preserving raw exit 1. New tests exercise exact 8 MiB
+admission, current-face self eviction, FIFO warm hits, backing-prefix retirement,
+caller-held pixel preservation, refused glyphs, 960 concurrent requests across
+40 faces, and 64 embedded real-font cold/warm/regenerated pixel and placement
+comparisons against separately instantiated original cache methods. The oracle
+preserves the parent methods and license notice with type renaming and duplicate
+declarations removed; its original hash/transformation metadata are pinned.
+
+Fresh prepare verifies input/patch/output hashes and produces 6,178 files: exactly
+one previous implementation changes and four test/oracle leaves are added. The
+final owned full raster suite passes with race instrumentation three times,
+offscreen vet passes, the adapter offscreen race suite passes, and the opted-in
+native window-cycle consumer compiles. These final receipts bind all prepared
+inputs and eight implementation/pin/spec/doc files. Internal review catches and
+corrects the preparation test's old 1..45 order expectation to include 46; the
+whole Python preparation suite passes against the final nine selected files.
+The full raster suite generates 17 known
+PNG outputs; their identities are recorded and they are moved outside the
+prepared tree. Native compilation retains an existing duplicate -lobjc linker
+warning. Compilation is not native execution or memory acceptance.
+
+An initial overlay suite fails only its fixture's incorrect expected case count
+(64 actual versus 72 expected); its sources and raw failure remain historical.
+The later preliminary overlay suite passes, but its receipt did not bind the
+external overlay source leaves, so it is not used to certify exact adopted code.
+The final prepared-source runs supply that identity evidence. The preparation
+receipt predates a README-only heading-spacing clarification. Final Go gates and
+Prism bind the unchanged eight-file implementation/pin/doc scope; the later Python
+gate and internal source certificate bind all nine files and the same prepared
+outputs. The one-line preparation expectation update needs no second provider call.
+
+Internal source review approves the exact nine-file owned patch/pins/specification,
+preparation regression expectation and
+five decoded output leaves. One Prism review uses Anthropic Claude Sonnet 5.5,
+covers all eight files in two chunks, returns exit 0 with no findings, and uses
+16,818 input / 532 output tokens. The indexed archive retains raw receipts/logs,
+original/current cache/test leaves, stage/source identities and review results.
+Binaries, generated PNG pixels, caches and desktop snapshots are excluded.
+Selected-source/all-prepared evidence is not a full compiler/cache/SDK closure.
+
+## Native memory acceptance remains open
+
+The parent window-retention report preserves production 1,000-cycle failures at
+375 cycles and a different, earlier cache overlay's diagnostic completion of
+1,000 cycles. That intervention reduces Go heap while sampled RSS still grows;
+a separate 800-cycle own-process vmmap diagnostic reports physical footprint
+7.9 GB then 14.3 GB and IOSurface 7.2 GB then 13.5 GB at 250/750 cycles. Neither
+diagnostic qualifies the final adopted source or resolves native graphics
+retention. This phase launches no native app, changes no settings and performs
+no latency acceptance. Further live/input/performance checks are deferred after
+the quiet-host authorization expires. Native layer/input temporary-object
+ownership remains under investigation; full P11/endurance, native/GPU memory,
+latency, human interaction, cross-display and public distribution remain open.
+''')
+print(json.dumps({'result':q['result'],'qualification_sha256':sha(p/'qualification.json'),'archive_sha256':sha(archive),'archive_members':len(index),'receipts':len(receipts)}))

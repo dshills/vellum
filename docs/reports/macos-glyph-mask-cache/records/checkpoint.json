@@ -1,0 +1,51 @@
+{
+  "result": "PASS_OWNED_GLYPH_MASK_BOUNDS_OFFSCREEN",
+  "base_commit": "977a974fb508f9a3c5b05f702485521edd8bf3ef",
+  "qualification_sha256": "9ed5ddbb2a4d11e6b4a4b1321ba02f0116a583468de6080c69b4e384565e0fa1",
+  "source": {
+    "drivers/cogent/native/README.md": "7b07b1381c66799f33390a230d9154c40031b0baa67c4f0b48bd5e5e19debf1a",
+    "drivers/cogent/native/dependencies.json": "e5cb3e571f4edfeace537cf48193d7d1207a5b703c8c3595a352dcb151a8fd8c",
+    "drivers/cogent/native/patches/glyphmask/0046-bounded-glyph-mask-cache.patch": "d6321c4d4a1643896e8198a8076790a1b7f35349f91c897ad2e4cdc8ee8d46b7",
+    "drivers/cogent/native/patches/glyphmask/README.md": "eceb81f5d3f7c8359c80496a058f3c1d94358111b47777e87b5d72698f432a30",
+    "drivers/cogent/native/patches/glyphmask/original-hashes.json": "68b86f9fae848e4f69c5420534bce8515ebabb78932e80c30f8ff2cbe589246d",
+    "drivers/cogent/native/patches/glyphmask/output-hashes.json": "28901a2367c73fa5c519fc702ce081b8012f15862d0c8128040fd519f191111f",
+    "specs/glyph-mask-cache.md": "bcedd4791c9d1f4b50bbab426e782b7f7e4830916241b801480c10744bfc62a5",
+    "specs/native-window-lifecycle.md": "caa7edfcb90d813806e604c2bccb3ca9c1e90c75fa09fec16e366b8feb8ad667",
+    "drivers/cogent/prepare_test.py": "3894d5b55a43ce16920d76b465b3c6ab39667f4db1480c99e799109d584c7545"
+  },
+  "stage_outputs": {
+    "paint/renderers/rasterx/glyphcache.go": "e6d7a6cd0589c1c28570f551acacc61e7ec3f553fc3fb6cf8031057036dcccbf",
+    "paint/renderers/rasterx/glyphcache_bounds_test.go": "9ead4ff07c13a38079b09802df23e32d8cb84d7e975cc83e9802c038a0c69484",
+    "paint/renderers/rasterx/glyphcache_retention_test.go": "7caa468056071c3cb5cf8322fca952f8e9867ace722093afbf4d1b42b679ca1e",
+    "paint/renderers/rasterx/glyphcache_reference_test.go": "fa94a121667d6d3143311560429dea2d6ec7eb0d841b84320d36511f21da613a",
+    "paint/renderers/rasterx/glyphcache-original-oracle.json": "96ab6287212718055473e272143caa66e63cc8fac5482e40b98b24a4c76db41b"
+  },
+  "source_review_sha256": "0cb3ab90a56654df49175ad8dfde696fdc7c41271c7c9829fc5c7e1ffbede296",
+  "evidence_review_sha256": "3691062d2c5725921abd584bbc29bb712bc883fb56e45ab926085b5ad8280281",
+  "post_test_document_sha256": "944b7e70561cb79c1b62bf7287f10fcb2392eb945d8cb9dfb1411f41a32e9531",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_reviewed_files": 8,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_raw_exit_code": 0,
+  "post_prism_addition": "One-line preparation order assertion includes patch46; internal exact9source review and wholePython suite after provider. Go gates bind unchanged8scope and6178prepared outputs.",
+  "archive": {
+    "sha256": "116e8051fb6f6de8dc0384ee5f0ea9d3d7a0c716be54def6b66c4b89887c248d",
+    "index_sha256": "c670998f31149eba3f46db9b847381ffbfe1a3017d4a329570c0e55fe759a37a",
+    "members": 57
+  },
+  "face_key_limit": 32,
+  "mask_data_limit": 8388608,
+  "real_font_cases": 64,
+  "prepared_files": 6178,
+  "python_preparation_tests": 11,
+  "native_compiled_sha256": "4632420c5ba950c3266bc5d66d3c105a9e1278b431eb753b06faf60c26e471f8",
+  "final_owned_source_native_executed": false,
+  "native_memory_qualified": false,
+  "gpu_memory_qualified": false,
+  "full_p11_qualified": false,
+  "macos_completion": false,
+  "next_live_tests_deferred": true
+}

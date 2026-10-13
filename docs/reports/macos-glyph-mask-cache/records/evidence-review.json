@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_EVIDENCE",
+  "result": "APPROVED_EVIDENCE",
+  "findings": [],
+  "source_root": "/private/tmp/vellum-large-data",
+  "phase": "/private/tmp/vellum-macos-cache-bounds",
+  "base_commit_reported": "977a974fb508f9a3c5b05f702485521edd8bf3ef",
+  "endpoints": {
+    "/private/tmp/vellum-large-data/docs/reports/macos-glyph-mask-cache/README.md": "944b7e70561cb79c1b62bf7287f10fcb2392eb945d8cb9dfb1411f41a32e9531",
+    "/private/tmp/vellum-large-data/docs/reports/macos-glyph-mask-cache/records/evidence-index.json": "c670998f31149eba3f46db9b847381ffbfe1a3017d4a329570c0e55fe759a37a",
+    "/private/tmp/vellum-large-data/docs/reports/macos-glyph-mask-cache/records/evidence.tar.gz": "116e8051fb6f6de8dc0384ee5f0ea9d3d7a0c716be54def6b66c4b89887c248d",
+    "/private/tmp/vellum-large-data/docs/reports/macos-glyph-mask-cache/records/archive-producer.py.txt": "7585b7fc1427a34fa12494b26787f7a9fa37c8a80a93d300808efc9dfa49ad26",
+    "/private/tmp/vellum-macos-cache-bounds/qualification.json": "9ed5ddbb2a4d11e6b4a4b1321ba02f0116a583468de6080c69b4e384565e0fa1",
+    "/private/tmp/vellum-macos-cache-bounds/source-review-final.json": "0cb3ab90a56654df49175ad8dfde696fdc7c41271c7c9829fc5c7e1ffbede296",
+    "/private/tmp/vellum-macos-cache-bounds/source-final.json": "e044e59fe6d3844ae280d3008ced611fc06ade10afbba3749af5b17e6e9e70e2",
+    "/private/tmp/vellum-macos-cache-bounds/source-prism.json": "258116ad88b6233635c11a3b626503acd0d9b5515f924bdaf805657079580dea",
+    "/private/tmp/vellum-macos-cache-bounds/prism-v1/prism.json": "220748518f1bb97bfdead29e98953e8c59b674ca200d1b15fd85c20b63f2bf92",
+    "/private/tmp/vellum-macos-cache-bounds/prism-v1/process.json": "53673d6b8f78f772b39315ae1d0ccdfeb0932dcf5b139a95bb68a9605d9a4de9",
+    "/private/tmp/vellum-macos-cache-bounds/prism-v1/inputs.json": "fe22179355615b665bbec424851ffb0eae6ddb099464ffac043a68677021c971",
+    "/private/tmp/vellum-macos-cache-bounds/oracle-inputs.json": "4d13f1c1f3a742d206218f3b42703487a0912198fe99bf4cc66ba236d46a28b3",
+    "/private/tmp/vellum-macos-cache-bounds/glyphcache-original.go": "902cbbd000b304e967617a307d06346d88eea7568292e7754d7a08ae0415540c",
+    "/private/tmp/vellum-macos-cache-bounds/owned-generated-test-images/index.json": "7eb3d9d1e252e64ba06b03baf97b7b9b2d3b3265da199a778b3847ae0cd96910"
+  },
+  "source9": {
+    "drivers/cogent/native/README.md": "7b07b1381c66799f33390a230d9154c40031b0baa67c4f0b48bd5e5e19debf1a",
+    "drivers/cogent/native/dependencies.json": "e5cb3e571f4edfeace537cf48193d7d1207a5b703c8c3595a352dcb151a8fd8c",
+    "drivers/cogent/native/patches/glyphmask/0046-bounded-glyph-mask-cache.patch": "d6321c4d4a1643896e8198a8076790a1b7f35349f91c897ad2e4cdc8ee8d46b7",
+    "drivers/cogent/native/patches/glyphmask/README.md": "eceb81f5d3f7c8359c80496a058f3c1d94358111b47777e87b5d72698f432a30",
+    "drivers/cogent/native/patches/glyphmask/original-hashes.json": "68b86f9fae848e4f69c5420534bce8515ebabb78932e80c30f8ff2cbe589246d",
+    "drivers/cogent/native/patches/glyphmask/output-hashes.json": "28901a2367c73fa5c519fc702ce081b8012f15862d0c8128040fd519f191111f",
+    "specs/glyph-mask-cache.md": "bcedd4791c9d1f4b50bbab426e782b7f7e4830916241b801480c10744bfc62a5",
+    "specs/native-window-lifecycle.md": "caa7edfcb90d813806e604c2bccb3ca9c1e90c75fa09fec16e366b8feb8ad667",
+    "drivers/cogent/prepare_test.py": "3894d5b55a43ce16920d76b465b3c6ab39667f4db1480c99e799109d584c7545"
+  },
+  "stage_outputs5": {
+    "paint/renderers/rasterx/glyphcache.go": "e6d7a6cd0589c1c28570f551acacc61e7ec3f553fc3fb6cf8031057036dcccbf",
+    "paint/renderers/rasterx/glyphcache_bounds_test.go": "9ead4ff07c13a38079b09802df23e32d8cb84d7e975cc83e9802c038a0c69484",
+    "paint/renderers/rasterx/glyphcache_retention_test.go": "7caa468056071c3cb5cf8322fca952f8e9867ace722093afbf4d1b42b679ca1e",
+    "paint/renderers/rasterx/glyphcache_reference_test.go": "fa94a121667d6d3143311560429dea2d6ec7eb0d841b84320d36511f21da613a",
+    "paint/renderers/rasterx/glyphcache-original-oracle.json": "96ab6287212718055473e272143caa66e63cc8fac5482e40b98b24a4c76db41b"
+  },
+  "archive": {
+    "members": 57,
+    "all_unique_regular_relative_utf8": true,
+    "index_archive_current_files_roundtrip_exact": true,
+    "producer_matches_retained_copy": true,
+    "generated_png_pixels_archived": 0,
+    "scope": "Source/proof/log/metadata only; binaries, cache bytecode, app bundles and desktop captures excluded. Original/v1 cache/test leaves remain distinguishable from adopted prepared outputs."
+  },
+  "receipts": {
+    "count": 9,
+    "logs": 18,
+    "records": {
+      "cache-original-retention": {
+        "sha256": "be5ddbad027d6bc982543dd6e78705a568c04ddd81a746a195ec57bca98beb24",
+        "exit_code": 1,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-cache-bounds/original-overlay.json",
+          "-run=TestVellumGlyphMaskRetainedFaceAndMaskBounds",
+          "-count=1",
+          "cogentcore.org/core/paint/renderers/rasterx"
+        ],
+        "source_count": 12,
+        "prepared_before_count": 0,
+        "prepared_after_count": 0,
+        "exact_owned_prepared_input": false,
+        "historical": true
+      },
+      "cache-overlay-race-final": {
+        "sha256": "98a0d3c6d900b58651871c76434cad1af745a76a8f1a9ba6202e26427f40cfc6",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-cache-bounds/test-overlay.json",
+          "-count=3",
+          "cogentcore.org/core/paint/renderers/rasterx"
+        ],
+        "source_count": 8,
+        "prepared_before_count": 0,
+        "prepared_after_count": 0,
+        "exact_owned_prepared_input": false,
+        "historical": true
+      },
+      "cache-overlay-race-v1": {
+        "sha256": "4718568032dafbaa24d9d96b993b381b337d3afb590a67cb3e945c35f2114117",
+        "exit_code": 1,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-overlay=/private/tmp/vellum-macos-cache-bounds/test-overlay.json",
+          "-count=1",
+          "cogentcore.org/core/paint/renderers/rasterx"
+        ],
+        "source_count": 12,
+        "prepared_before_count": 0,
+        "prepared_after_count": 0,
+        "exact_owned_prepared_input": false,
+        "historical": true
+      },
+      "owned-driver-offscreen-race": {
+        "sha256": "39e4316341e32e392f986665e10ec1817be1b076b813b374a8d6fe15ec4da53d",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "."
+        ],
+        "source_count": 8,
+        "prepared_before_count": 6178,
+        "prepared_after_count": 6178,
+        "exact_owned_prepared_input": true,
+        "historical": false
+      },
+      "owned-native-build": {
+        "sha256": "48c4b5a7d6bf52681a88f19e56a1a8039b27e706ac9ad9029e9ce2cb220cfadc",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-cache-bounds/window-cycle-smoke-owned",
+          "./cmd/window-cycle-smoke"
+        ],
+        "source_count": 8,
+        "prepared_before_count": 6178,
+        "prepared_after_count": 6178,
+        "exact_owned_prepared_input": true,
+        "historical": false
+      },
+      "owned-prepare-tests": {
+        "sha256": "d8d7703c09bbaaab20eae85c72381fc76b79e6236948018a62da8626fef8a051",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare_test.py"
+        ],
+        "source_count": 9,
+        "prepared_before_count": 6178,
+        "prepared_after_count": 6178,
+        "exact_owned_prepared_input": true,
+        "historical": false
+      },
+      "owned-prepare": {
+        "sha256": "56d4f939ca848addf79b7f6323805258dc2e3f8b43a4c38c61e17c45b80eae97",
+        "exit_code": 0,
+        "argv": [
+          "python3",
+          "prepare.py"
+        ],
+        "source_count": 8,
+        "prepared_before_count": 6174,
+        "prepared_after_count": 6178,
+        "exact_owned_prepared_input": false,
+        "historical": false
+      },
+      "owned-rasterx-race": {
+        "sha256": "42b2094cb3d6a424dd3749df2ff7cfd941996958938abeb3dd05eea8d261c098",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "-count=3",
+          "cogentcore.org/core/paint/renderers/rasterx"
+        ],
+        "source_count": 8,
+        "prepared_before_count": 6178,
+        "prepared_after_count": 6195,
+        "exact_owned_prepared_input": true,
+        "historical": false
+      },
+      "owned-rasterx-vet": {
+        "sha256": "f103d8e5a8302d64c045385d7a974dba76b43d452049ec82c797f91d415dba7a",
+        "exit_code": 0,
+        "argv": [
+          "go",
+          "vet",
+          "-tags=offscreen",
+          "cogentcore.org/core/paint/renderers/rasterx"
+        ],
+        "source_count": 8,
+        "prepared_before_count": 6178,
+        "prepared_after_count": 6178,
+        "exact_owned_prepared_input": true,
+        "historical": false
+      }
+    },
+    "final_go_checks": [
+      "owned-rasterx-race",
+      "owned-rasterx-vet",
+      "owned-driver-offscreen-race",
+      "owned-native-build"
+    ],
+    "final_go_input_scope": "Exact8 repository implementation/pin/spec/doc inputs and all6178 prepared inputs before/after. Race full raster count3, vet, adapter offscreen race and native consumer compilation; the only extra raster outputs are17 identified generated PNGs.",
+    "later_python_scope": "owned-prepare-tests exact9 selected sources and6178prepared before/after, raw11tests/OK; one-line range1..46 expectation fix is internally reviewed, not a second provider run.",
+    "prepare_scope": "Initial owned-prepare converts6174→6178 with input/output pins. It precedes a drivers/cogent/native/README.md heading-spacing change; other7 selected leaves and all output pins match current. Later Go/provider gates bind final8.",
+    "historical": {
+      "cache-overlay-race-v1": {
+        "exit_code": 1,
+        "reason": "Real-font case-count expectation was72, actual64. Original fixture bytes and raw failure retained."
+      },
+      "cache-overlay-race-final": {
+        "exit_code": 0,
+        "qualification": "HISTORICAL_ONLY",
+        "reason": "No prepared maps or external overlay source leaf binding; not used to certify exact adopted outputs."
+      },
+      "cache-original-retention": {
+        "exit_code": 1,
+        "observed_failures": [
+          "33face keys exceed32",
+          "8,392,704mask bytes exceed8,388,608"
+        ],
+        "qualification": "Original-compatible historical red; its incomplete external overlay input binding is explicitly limited."
+      }
+    }
+  },
+  "prepared": {
+    "current_count": 6178,
+    "all_current_files_independently_hashed": true,
+    "recorded_map_equal": true,
+    "previous_checkpoint_count": 6174,
+    "changed_existing": [
+      "upstream/paint/renderers/rasterx/glyphcache.go"
+    ],
+    "added": [
+      "upstream/paint/renderers/rasterx/glyphcache-original-oracle.json",
+      "upstream/paint/renderers/rasterx/glyphcache_bounds_test.go",
+      "upstream/paint/renderers/rasterx/glyphcache_reference_test.go",
+      "upstream/paint/renderers/rasterx/glyphcache_retention_test.go"
+    ],
+    "exact_delta_one_changed_four_added": true,
+    "generated_png_count": 17,
+    "generated_png_current_hashes_match_recorded_raster_extras": true,
+    "generated_pngs_outside_prepared": true,
+    "scope": "All prepared endpoint identities and final selected receipts; not a complete compiler/cache/SDK/native-link dependency closure."
+  },
+  "pin_and_oracle_review": {
+    "input_hashes": {
+      "paint/renderers/rasterx/glyphcache.go": "902cbbd000b304e967617a307d06346d88eea7568292e7754d7a08ae0415540c",
+      "paint/renderers/rasterx/glyphcache_bounds_test.go": null,
+      "paint/renderers/rasterx/glyphcache_retention_test.go": null,
+      "paint/renderers/rasterx/glyphcache_reference_test.go": null,
+      "paint/renderers/rasterx/glyphcache-original-oracle.json": null
+    },
+    "output_hashes": {
+      "paint/renderers/rasterx/glyphcache.go": "e6d7a6cd0589c1c28570f551acacc61e7ec3f553fc3fb6cf8031057036dcccbf",
+      "paint/renderers/rasterx/glyphcache_bounds_test.go": "9ead4ff07c13a38079b09802df23e32d8cb84d7e975cc83e9802c038a0c69484",
+      "paint/renderers/rasterx/glyphcache_retention_test.go": "7caa468056071c3cb5cf8322fca952f8e9867ace722093afbf4d1b42b679ca1e",
+      "paint/renderers/rasterx/glyphcache_reference_test.go": "fa94a121667d6d3143311560429dea2d6ec7eb0d841b84320d36511f21da613a",
+      "paint/renderers/rasterx/glyphcache-original-oracle.json": "96ab6287212718055473e272143caa66e63cc8fac5482e40b98b24a4c76db41b"
+    },
+    "patch_sha256": "d6321c4d4a1643896e8198a8076790a1b7f35349f91c897ad2e4cdc8ee8d46b7",
+    "strict_in_memory_five_output_reconstruction": true,
+    "original_oracle_regenerated_sha256": "fa94a121667d6d3143311560429dea2d6ec7eb0d841b84320d36511f21da613a",
+    "original_methods_regeneration": "Exact imports/type/methods retained from pinned902cbbd original; global/constants/init wrapper and duplicate glyphKey removed, glyphCache renamed referenceMaskCache, generated-oracle comment inserted. Exact output bytes match. Original Cogent BSD notice retained.",
+    "dependency_registration": "All numbered patches flatten to1..46; metadata groups them into35 stages. Last stage correctly references glyphmask input/output pin files and the current patch SHA.",
+    "source_review_certificate_sha256": "0cb3ab90a56654df49175ad8dfde696fdc7c41271c7c9829fc5c7e1ffbede296",
+    "source_review_status": "APPROVED_SOURCE",
+    "source_review_exact9_and5outputs_match": true
+  },
+  "provider": {
+    "raw_result_sha256": "220748518f1bb97bfdead29e98953e8c59b674ca200d1b15fd85c20b63f2bf92",
+    "process_sha256": "53673d6b8f78f772b39315ae1d0ccdfeb0932dcf5b139a95bb68a9605d9a4de9",
+    "inputs_sha256": "fe22179355615b665bbec424851ffb0eae6ddb099464ffac043a68677021c971",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "files": 8,
+    "chunks": 2,
+    "calls": 2,
+    "complete": true,
+    "raw_exit_code": 0,
+    "findings": 0,
+    "input_tokens": 16818,
+    "output_tokens": 532,
+    "source_before_after_equal_final8": true,
+    "post_provider_addition": "prepare_test.py one-line expected order endpoint, internally approved and independently confirmed as the sole delta from canonical parent file; final Python11 check binds9. No repeat provider call claimed."
+  },
+  "runtime_scope": {
+    "native_build_sha256": "4632420c5ba950c3266bc5d66d3c105a9e1278b431eb753b06faf60c26e471f8",
+    "native_compilation_only": true,
+    "final_owned_source_native_executed": false,
+    "native_memory_qualified": false,
+    "gpu_memory_qualified": false,
+    "full_p11_qualified": false,
+    "macos_completion": false,
+    "previous_overlay_diagnostics": "Prior checkpoint production375 failures and unadopted1000/800 diagnostics are accurately described as historical and from different source bytes. They are not final-owned cache memory qualification.",
+    "retention_limits": "32 strong face keys and8MiB cached mask pixel bytes. Parsed fonts, containers/allocator overhead, temporary work, caller-held masks and other caches remain excluded. Cache admission bounds do not establish process/native/GPU memory bounds or warm performance."
+  },
+  "report_assessment": "Report accurately describes bounded adoption, meaningful original-cache pixel/placement oracle, exact final code/prepared checks, incomplete historical overlay bindings, later Python registration addition and17 relocated PNG outputs. It explicitly defers new final-owned native memory and latency acceptance while preserving the prior unresolved IOSurface growth. No actionable overclaim or artifact mismatch found.",
+  "verification": {
+    "recipe_path": "/private/tmp/vellum-glyph-cache-evidence-review/verify.py.txt",
+    "recipe_sha256": "460b266c6bc914276523ae5357f305cd31b2388427b6dcf8e06484effbbc3226",
+    "result_path": "/private/tmp/vellum-glyph-cache-evidence-review/verification.json",
+    "result_sha256": "bc5b9edbf97ef511b37d8154b88d3c2a5c169a390ad69960690a7ba14aa6bc49",
+    "status": "PASS_INDEPENDENT_READ_ONLY_VERIFICATION",
+    "reviewer_attempt_history": [
+      "/private/tmp/vellum-glyph-cache-evidence-review/reviewer-attempt-history/v1.json",
+      "/private/tmp/vellum-glyph-cache-evidence-review/reviewer-attempt-history/v2.json"
+    ],
+    "history_note": "Withdrawn reviewer assumptions equated stage groups with numbered patches and selected the wrong README leaf. Actual35 groups contain1..46 patches, and earlier prepare differs only in native/README.md. Corrected verifier passes; no source/receipt/artifact mutation or defect inferred."
+  },
+  "limitations": [
+    "Reviewer performed filesystem reads/hashes and stdlib in-memory proof processing only. No tests, Go/native execution, GUI, provider/Git calls or source/sealed-artifact edits.",
+    "Evidence approval does not replace the separate implementation certificate, legal dependency/redistribution audit or full compiler/cache/SDK closure.",
+    "Final native consumer was compiled only. Prior overlay observations are not native execution/memory proof for adopted patch46. Physical footprint, native/GPU retention, fullP11 endurance and unchanged latency targets remain open.",
+    "Historical overlay source input intervals are incomplete; their raw failures/pass are retained with limited attribution, not reconstructed as full exact adopted qualification.",
+    "No settings, clipboard, physical input, human accessibility, cross-display or public-release acceptance is established."
+  ]
+}
