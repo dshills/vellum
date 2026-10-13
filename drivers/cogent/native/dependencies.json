@@ -474,6 +474,17 @@
               "sha256": "dd27b3544799eed4b0315396a7e8a5819d1d6495da7262c8f7965e64df56f909"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/storagereadback",
+          "inputs": "native/patches/storagereadback/original-hashes.json",
+          "outputs": "native/patches/storagereadback/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/storagereadback/0051-owned-storage-readback-and-layouts.patch",
+              "sha256": "9549a5875a96965db44ae185ac0da7cfcef350df89d41a6b84d155ec377f3d89"
+            }
+          ]
         }
       ]
     },

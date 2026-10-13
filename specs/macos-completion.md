@@ -373,3 +373,11 @@ admission and complete recording cleanup extend the [GPU ownership contract](gpu
 Offscreen failure fixtures and tiny headless shader execution qualify only their
 observed scope; physical memory, sustained performance and window checks remain
 open. Storage-value staging/map batch integrity is a separate follow-up audit.
+
+Storage-value readback now checks shape/usage/source/staging identity and performs
+complete batch preflight, synchronized callback delivery and rollback/quarantine.
+Automatic byte uploads repair staging; exact-length reads support short-target
+retry. Vars.Config's temporary validation layouts retire explicitly. These
+[GPU ownership contracts](gpu-frame-lifecycle.md) retain serialized, initially
+unmapped ownership; physical memory, sustained performance and live-window
+qualification remain open.

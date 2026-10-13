@@ -95,3 +95,36 @@ owned GetQueue reference even when the device is missing/invalid. Polling requir
 a live device. Wrapper retirement and small headless shader-output checks remain
 separate from GPU/native heap reclamation, physical device loss, presentation,
 sustained performance and full Mac acceptance.
+
+## Storage-value readback and temporary layouts
+
+The legacy Value buffer APIs validate nonnegative shape operands and multiplication
+before native allocation or Go slicing. Storage readback uses positive four-byte
+aligned ranges, live source/staging handles, exact read sizes and required usage.
+Buffer-backed StorageTexture roles retain their prior buffer route; real texture
+objects require Texture copy/layout methods. Automatic staging errors propagate
+through CreateBuffer, SetFromBytes and WriteDynamicBuffer; matching GPU buffers
+still repair absent staging. A staged upload is not rolled back on later refusal.
+Staging replacement is transactional with respect to its owned reference and
+checks staging size independently of the GPU AllocSize field.
+
+Mapping has one serialized owner and initially unmapped buffers. Values/native
+ownership are not copied, and caller-native maps are outside this contract. Every
+batch member, known device/queue identity and duplicate is checked before any map.
+Callbacks capture only per-attempt buffered channels. The owner waits for statuses
+through channels after synchronous Poll; callback delivery then has a 30-second
+bound. This does not bound Poll or qualify physical-loss recovery. Any batch error
+cancels all attempted exact buffers; a refused rollback quarantines its staging.
+Late callbacks cannot publish a map or change a replacement buffer's owner state.
+
+ReadToBytes accepts only this API's completed mapping and exact allocated byte
+length (including dynamic-offset padding). Short destinations preserve a ready
+map for retry; range/unmap refusal quarantines staging until explicit ReleaseRead.
+Held/quarantined maps refuse upload, copying and non-retiring reconfiguration.
+Explicit zero/readonly configuration retires staging. Source bytes are detached
+before unmapping; no partial copied output is successful when cleanup refuses.
+
+Vars.Config keeps its native bind-layout validation and releases those temporary
+owned handles immediately. Pipelines independently create their own layouts.
+Source release calls, fault kernels and tiny native words/padding checks remain
+separate from actual native/GPU memory, latency/endurance and Mac acceptance.

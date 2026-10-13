@@ -1,0 +1,137 @@
+{
+  "result": "PASS_STORAGE_READBACK_OWNERSHIP",
+  "base_commit": "7ad28c86a9216a4ead7f97cb4a083e9adfb2a113",
+  "qualification_sha256": "c7e5c667fc475219ff8e81e0c9f6e267569b2c8ac474aab7a58add029d876a15",
+  "source": {
+    "drivers/cogent/native/dependencies.json": "d2cd438b221b9c68ecddc353afc018e4057696c8a7a78447efe1e23501ae0f02",
+    "drivers/cogent/native/patches/storagereadback/0051-owned-storage-readback-and-layouts.patch": "9549a5875a96965db44ae185ac0da7cfcef350df89d41a6b84d155ec377f3d89",
+    "drivers/cogent/native/patches/storagereadback/README.md": "8ce27efe40abff8ebecf01fc94ebc80531a72654f0ac33fb7854a89fda3df102",
+    "drivers/cogent/native/patches/storagereadback/original-hashes.json": "173c8105d3507cab9aa06330974796f6b78e83ff8b8b3e3dd9b1c08b5df19f7e",
+    "drivers/cogent/native/patches/storagereadback/output-hashes.json": "4bafdf3a7f6cacb980afdcb2f78dddb2072cb867bd9a69dc6b5d4762b418b3c6",
+    "drivers/cogent/prepare_test.py": "a0627b846b450d3853fcac91385a3bef53b1dc6583a26f2df931fb3a005166fa",
+    "specs/gpu-frame-lifecycle.md": "f3a752e94a64eb169e2f0d4e5a22ca036bee67cb9a58648d6d01c229cbd760d1",
+    "specs/macos-completion.md": "40f326b4e73a8a80b70191d70136483304b325eb36061c18288c006a2e5e6184"
+  },
+  "decoded_outputs": {
+    "gpu/buffer.go": "330278300838d0410b114bc88e67fa6010adf6960c62bc66386f473aa539e358",
+    "gpu/value.go": "8b1f8b722ad23cf40f91a1e37028cbe9b34be91bc007d85a79e83a05c7bc9da1",
+    "gpu/value_readback.go": "3aa77b62cf5d7f63a86f2a3fbd5ee15cd9bb0ac3a98d4424906cfd149a3efc9e",
+    "gpu/value_readback_native_test.go": "6baeb23473928a08fc05534d8a2015524278ca251bc2121f23f9682262cb30b3",
+    "gpu/value_readback_regression_test.go": "c81cac3cbd885ead672f0ae84aba61ca0b52f149f95dc2267b84c666d26c05e3",
+    "gpu/value_readback_test.go": "a10dcbf9aa92f4d3fda55cfee2b7ee76814bb98ad016930a79523e45abe4e637",
+    "gpu/vars.go": "7910ea96969662f8fc43f881e35690bcddc3ef2b0899e73ab5884f76e09f998c"
+  },
+  "source_review_sha256": "429100236072e4af94a5d2938853e8527f29877c4f04cf644d9d170676502f00",
+  "evidence_review_sha256": "debe23fd137dc1cf1a9d1d0807ff348158f56f7855d397abfb275244a05e402a",
+  "post_test_document_sha256": "efc23bb891674afc4afeca4b0bb8c0fc9199d1deb0caa5b5305638daf142eb0e",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_reviewed_files": 8,
+  "prism_raw_exit_code": 0,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "archive": {
+    "sha256": "73002e8a2b2a08728337f3fab627fbda8be91f3dd2ab7bc1be4a4f130dff1843",
+    "index_sha256": "5f5f253cd8b44307545a7ac7a76a5a29911a4bdddcd6b5688839bd34f64d6d65",
+    "members": 126
+  },
+  "prepared_files": 6195,
+  "raw_receipts": 15,
+  "failed_receipts_preserved": 3,
+  "python_preparation_tests": 11,
+  "native_compiled_sha256": "99354c4cd7245592d747e64761bf51d52aae65747a62f14502d4657ecb89878b",
+  "final_owned_source_headless_gpu_executed": true,
+  "final_owned_source_native_window_executed": false,
+  "headless_gpu_observations": {
+    "private_device_and_active_recording": {
+      "borrowed_owner_live": true,
+      "case": "private_device_and_active_recording",
+      "computed_words_checked": 32,
+      "retired_child_refs": 5,
+      "retired_device_refs": 2,
+      "retired_recording_refs": 18,
+      "submitted_passes": 8,
+      "surfaces_created": 0,
+      "windows_created": 0
+    },
+    "partial_device_queue": {
+      "case": "partial_device_queue",
+      "retired_queue_refs": 1,
+      "surfaces_created": 0,
+      "windows_created": 0
+    },
+    "staging_size_cycle": {
+      "case": "staging_size_cycle",
+      "retired_refs": 2,
+      "sizes": [
+        16,
+        8,
+        16
+      ],
+      "surfaces_created": 0,
+      "verified_words": 4,
+      "windows_created": 0
+    },
+    "automatic_repair_CreateBuffer": {
+      "case": "automatic_repair_CreateBuffer",
+      "source_reused": true,
+      "surfaces_created": 0,
+      "verified_words": 4,
+      "windows_created": 0
+    },
+    "automatic_repair_SetFromBytes": {
+      "case": "automatic_repair_SetFromBytes",
+      "source_reused": true,
+      "surfaces_created": 0,
+      "verified_words": 4,
+      "windows_created": 0
+    },
+    "automatic_repair_WriteDynamicBuffer": {
+      "case": "automatic_repair_WriteDynamicBuffer",
+      "source_reused": true,
+      "surfaces_created": 0,
+      "verified_bytes": 512,
+      "windows_created": 0
+    },
+    "short_destination_retry": {
+      "case": "short_destination_retry",
+      "short_refused": true,
+      "surfaces_created": 0,
+      "verified_words": 8,
+      "windows_created": 0
+    },
+    "unmapped_read_refused": {
+      "case": "unmapped_read_refused",
+      "surfaces_created": 0,
+      "windows_created": 0
+    },
+    "batch_preflight_late_nil": {
+      "case": "batch_preflight_late_nil",
+      "first_member_reusable": true,
+      "surfaces_created": 0,
+      "verified_words": 4,
+      "windows_created": 0
+    },
+    "batch_preflight_duplicate": {
+      "case": "batch_preflight_duplicate",
+      "first_member_reusable": true,
+      "surfaces_created": 0,
+      "verified_words": 4,
+      "windows_created": 0
+    },
+    "batch_preflight_mixed_device": {
+      "case": "batch_preflight_mixed_device",
+      "first_member_reusable": true,
+      "surfaces_created": 0,
+      "verified_words": 4,
+      "windows_created": 0
+    }
+  },
+  "physical_gpu_fault_injection": false,
+  "native_memory_qualified": false,
+  "gpu_memory_qualified": false,
+  "sustained_performance_qualified": false,
+  "macos_completion": false,
+  "next_live_tests_deferred": true
+}

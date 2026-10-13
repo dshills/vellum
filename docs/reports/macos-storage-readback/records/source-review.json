@@ -1,0 +1,83 @@
+{
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "outcome": "APPROVED_SOURCE",
+  "approved": true,
+  "findings": [],
+  "files": {
+    "drivers/cogent/native/dependencies.json": "d2cd438b221b9c68ecddc353afc018e4057696c8a7a78447efe1e23501ae0f02",
+    "drivers/cogent/native/patches/storagereadback/0051-owned-storage-readback-and-layouts.patch": "9549a5875a96965db44ae185ac0da7cfcef350df89d41a6b84d155ec377f3d89",
+    "drivers/cogent/native/patches/storagereadback/README.md": "8ce27efe40abff8ebecf01fc94ebc80531a72654f0ac33fb7854a89fda3df102",
+    "drivers/cogent/native/patches/storagereadback/original-hashes.json": "173c8105d3507cab9aa06330974796f6b78e83ff8b8b3e3dd9b1c08b5df19f7e",
+    "drivers/cogent/native/patches/storagereadback/output-hashes.json": "4bafdf3a7f6cacb980afdcb2f78dddb2072cb867bd9a69dc6b5d4762b418b3c6",
+    "drivers/cogent/prepare_test.py": "a0627b846b450d3853fcac91385a3bef53b1dc6583a26f2df931fb3a005166fa",
+    "specs/gpu-frame-lifecycle.md": "f3a752e94a64eb169e2f0d4e5a22ca036bee67cb9a58648d6d01c229cbd760d1",
+    "specs/macos-completion.md": "40f326b4e73a8a80b70191d70136483304b325eb36061c18288c006a2e5e6184"
+  },
+  "source_manifest_sha256": "e5338858335de0d19ad1dedbc3e1144b4c19b8a0edfcd04ca119119dce52034f",
+  "decoded_output_sha256": {
+    "gpu/buffer.go": "330278300838d0410b114bc88e67fa6010adf6960c62bc66386f473aa539e358",
+    "gpu/value.go": "8b1f8b722ad23cf40f91a1e37028cbe9b34be91bc007d85a79e83a05c7bc9da1",
+    "gpu/value_readback.go": "3aa77b62cf5d7f63a86f2a3fbd5ee15cd9bb0ac3a98d4424906cfd149a3efc9e",
+    "gpu/value_readback_native_test.go": "6baeb23473928a08fc05534d8a2015524278ca251bc2121f23f9682262cb30b3",
+    "gpu/value_readback_regression_test.go": "c81cac3cbd885ead672f0ae84aba61ca0b52f149f95dc2267b84c666d26c05e3",
+    "gpu/value_readback_test.go": "a10dcbf9aa92f4d3fda55cfee2b7ee76814bb98ad016930a79523e45abe4e637",
+    "gpu/vars.go": "7910ea96969662f8fc43f881e35690bcddc3ef2b0899e73ab5884f76e09f998c"
+  },
+  "base_commit": "7ad28c86a9216a4ead7f97cb4a083e9adfb2a113",
+  "reviewed_scope": [
+    "Eight exact repository leaves selected by source-final.json, including both pin maps, dependency stage registration, prepare regression endpoint, patch README and two specs.",
+    "All seven patch outputs decoded in memory against the three pinned original files and four absent-file inputs; context/hunk counts and hashes validated.",
+    "All seven decoded bytes equal their freshly prepared upstream counterparts at review time.",
+    "The previously approved five unchanged production/helper/unit-test leaves were inherited exactly; both final-only fixture deltas were inspected."
+  ],
+  "verification": {
+    "root_manifest_hashes_match": true,
+    "source_manifest_stable_at_end": true,
+    "stage_number_sequence": "1..51",
+    "stage_patch_digest_matches": true,
+    "stage_input_output_paths_match": true,
+    "prepare_test_expected_range": "range(1, 52)",
+    "original_input_hashes_match": true,
+    "decoded_pin_and_manifest_maps_match": true,
+    "decoded_prepared_bytes_match": true,
+    "previous_approved_implementation_unchanged": true,
+    "new_source_notices": "MIT helpers/tests; modified upstream BSD-style notices retained"
+  },
+  "artifact_sha256": {
+    "/private/tmp/vellum-macos-storage-readback/source-final.json": "e5338858335de0d19ad1dedbc3e1144b4c19b8a0edfcd04ca119119dce52034f",
+    "/private/tmp/vellum-macos-storage-readback/internal-candidate-review-v3/review.json": "c47c25fe4ca55f57e2908fc46c89a4d7cd0f1eb5d1ceab6257730ad1fd5e6193",
+    "/private/tmp/vellum-macos-storage-readback/internal-candidate-review-v2/review.json": "d908a1b305f68d33393f458834c0c809c8d82d452f0348b8c21b84d830bcf148",
+    "/tmp/vellum-p0-cache/mod/github.com/oliverbestmann/webgpu@v1.36.1-0.20261006093257-de8bdd5d5976/wgpu/buffer.go": "44c801f9ff7cd42c7c6c9e2912b1cd46a4e9af338d4c4231eda863f9036814b1"
+  },
+  "finding_resolutions": [
+    {
+      "id": "STORAGE-READ-01",
+      "status": "ACCEPTED_FIXED",
+      "scope": "The already-approved helper publishes Quarantined on range/unmap refusal and prevents repeated range access; final patch preserves that exact code and regression."
+    }
+  ],
+  "final_fixture_delta": [
+    {
+      "path": "gpu/value_readback_native_test.go",
+      "assessment": "Each makeValue cleanup now explicitly TryUnmap on the exact held staging before Value.Release, making original-source late-nil panic cleanup independent of candidate readState. Cleanup remains subtest-scoped, before the corresponding device is released."
+    },
+    {
+      "path": "gpu/value_readback_regression_test.go",
+      "assessment": "ValueReadSync(nil,nil,v) causes the original nil-first Go refusal path instead of entering a nil native device. Four original-compatible refusal checks are inspected; an earlier raw failure remains historical and is not physical-hardware fault evidence."
+    }
+  ],
+  "contract_assessment": [
+    "Whole map batches preflight owner identity, staging size/usage/liveness, Idle state and duplicate buffer pointers before mapping. Channels isolate callback delivery from owner mutation and replacement resources.",
+    "Allocation refusal preserves old staging; automatic upload/reuse routes return read-staging repair errors. A prior valid upload is explicitly not atomically rolled back.",
+    "Buffer-backed legacy StorageTexture retains its original buffer route; actual texture-backed values use separate Texture methods.",
+    "Vars.Config preserves its native validation operation and immediately releases the temporary layout references, leaving pipeline-created layouts distinct."
+  ],
+  "limitations": [
+    "Read-only source/hash/in-memory patch replay review only; no Go, prepare, build, native GPU, window/UI, provider or Git execution by the reviewer.",
+    "No final receipt or pending run is certified here; prior candidate tiny headless execution is separate supporting author evidence and predates the final cleanup-only test delta.",
+    "One serialized initially-unmapped owner is required. Copied Value ownership, caller-native maps, arbitrary concurrency and broad abnormal owner recovery are outside the contract.",
+    "The post-Poll callback wait is bounded; the underlying blocking Poll is unchanged and has no new physical-loss deadline.",
+    "No native/GPU heap reclamation, physical fault injection, sustained latency/endurance, complete compiler/SDK closure or full Mac acceptance is implied."
+  ]
+}
