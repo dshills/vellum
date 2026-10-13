@@ -31,6 +31,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Toolbar | `ui.Toolbar` | Children, `Orientation`, scrolling overflow |
 | Status bar | `ui.StatusBar` | `Text` status, children |
 | Labeled form group | `ui.FormGroup` | `Text` heading, children |
+| Collapsible section | `ui.Disclosure` | `Text` heading, `Checked` expansion, `Change`, children |
 | Adjustable split pane | `ui.SplitPane` | Two children, `Number` fraction, `Numeric`, `Orientation`, `Change` |
 | Horizontal/vertical layout | `ui.Row`, `ui.Column` | Children, `Style` |
 | Custom driver extension | `ui.Extension` | `Custom` |
@@ -39,6 +40,20 @@ All elements support stable identity, disabled ancestry, local styles and themes
 Focusable controls support managed focus requests. Interactive controls use their
 specified callbacks; progress bars and separators are passive leaves and reject
 Change/Activate callbacks. Separators do not enter the accessible hierarchy.
+
+Use `ui.Disclosure` for collapsible inspector or settings sections. Keep its child
+descriptors present in both states; the adapter retains their native controls
+and private editing state while collapsed. `Checked` controls expansion and the
+Change callback accepts or rejects the requested boolean. A collapsed section
+keeps its heading in focus order and hides child focus/accessibility targets.
+
+```go
+ui.Node{ID: "details", Kind: ui.Disclosure, Text: "Details", Checked: expanded,
+    Change: func(e ui.ChangeEvent) { expanded = e.Checked },
+    Children: []ui.Node{{ID: "name", Kind: ui.TextField, Text: name,
+        Change: func(e ui.ChangeEvent) { name = e.Text }}},
+}
+```
 
 ```go
 func view() ui.Node {

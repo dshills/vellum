@@ -14,6 +14,9 @@ func FocusScope(root Node) Node {
 			copy := n
 			active = &copy
 		}
+		if n.Kind == Disclosure && !n.Checked {
+			return
+		}
 		for _, c := range n.Children {
 			if n.Kind == Tabs && c.ID != n.SelectedID {
 				continue
@@ -48,6 +51,9 @@ func FocusOrder(root Node) []string {
 		}
 		if _, ok := FocusTarget(n, n.ID); ok {
 			out = append(out, n.ID)
+		}
+		if n.Kind == Disclosure && !n.Checked {
+			return
 		}
 		for _, c := range n.Children {
 			if n.Kind == Tabs && c.ID != n.SelectedID {

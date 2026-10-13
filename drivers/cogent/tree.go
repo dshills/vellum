@@ -666,7 +666,7 @@ func bindTreeScopes(root *record) {
 			allowed[n.Tree] = true
 		}
 		for _, c := range n.Children {
-			if n.Kind == ui.Tabs && c.ID != n.SelectedID {
+			if n.Kind == ui.Disclosure && !n.Checked || n.Kind == ui.Tabs && c.ID != n.SelectedID {
 				continue
 			}
 			collect(c, disabled)

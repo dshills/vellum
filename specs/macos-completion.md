@@ -391,6 +391,13 @@ performance, physical backend faults and live Mac qualification.
 
 ## UI element expansion
 
+The public control set includes a controlled `Disclosure` container for retained
+collapsible inspector/settings content. Its heading input, visible focus/modal
+scope, child admission and separate Cocoa disclosure triangle follow the
+[controls contract](controls.md). Deterministic routing and native selectors
+remain separate from physical Mac input, human VoiceOver and the existing
+memory/performance/endurance gates.
+
 The public control vocabulary adds controlled switches and toggle buttons plus
 passive progress bars and oriented decorative separators. The native adapter,
 semantic actions and gallery follow the [controls contract](controls.md).

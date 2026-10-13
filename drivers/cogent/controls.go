@@ -45,6 +45,7 @@ type controlState struct {
 	window            string
 	tabs              *tabState
 	chrome            *chromeState
+	disclosure        *disclosureState
 	split             *splitState
 	choice            *choiceState
 	dialog            *dialogState
@@ -149,6 +150,8 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = mountSplit(parent, r)
 	case ui.Toolbar, ui.StatusBar, ui.FormGroup:
 		widget = mountChrome(parent, r)
+	case ui.Disclosure:
+		widget = mountDisclosure(parent, r)
 	case ui.Checkbox:
 		widget = core.NewSwitch(parent).SetType(core.SwitchCheckbox)
 	case ui.RadioGroup, ui.SegmentedControl:
@@ -418,6 +421,9 @@ func syncControl(r *record, previous ui.Node) error {
 	if r.control.chrome != nil {
 		syncChrome(r, previous)
 	}
+	if r.control.disclosure != nil {
+		syncDisclosure(r)
+	}
 	if r.control.split != nil {
 		syncSplit(r, previous)
 	}
@@ -589,6 +595,9 @@ func childHost(r *record, id string) tree.Node {
 		}
 		if r.control.chrome != nil {
 			return r.control.chrome.host
+		}
+		if r.control.disclosure != nil {
+			return r.control.disclosure.host
 		}
 		if r.control.tabs != nil {
 			return r.control.tabs.pages[id]
@@ -802,6 +811,9 @@ func applyFocus(root *record, request ui.FocusRequest, last *ui.FocusRequest) er
 // A Tabs descriptor focuses an enabled header button, never its nonfocusable
 // native container. Prefer the selected option, then the first enabled option.
 func focusWidget(r *record) (core.Widget, error) {
+	if r.control != nil && r.control.disclosure != nil {
+		return r.control.disclosure.header, nil
+	}
 	if r.control != nil && r.control.split != nil {
 		return r.control.split.handle, nil
 	}

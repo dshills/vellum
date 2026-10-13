@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "reviewed_at_utc": "2026-10-13T23:15:53.751573+00:00",
+  "base_commit": "ac65fc3f10fb164b8b1c0aa7b317329a9f938d73",
+  "reviewed_leaf_count": 23,
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/docs/controls.md": "68fcf1ef20a0fcdd7760a023a71066782344bb604f00b220ffb286c33ad71169",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility.go": "1ed93b9341d0ce58d83d3c8c3e1c946b7d99f4fb1dff7f9f079aa48dd3de0ef8",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin.m": "cfd45fec9cae2a31932fde24a34c48f9e1c80114ceb087ea6b2baa753221e2c7",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_workbench.go": "5a11c293a91912e15404a66c4b487daca085073758dd7add9bef21bc1386a80a",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/disclosure_smoke.go": "8026ad31dc3784a40d9312dae9cf5066f2427c4c832f47e8c4f0a1652b3d63dc",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main.go": "92b1be52a2813780c183ff8e028574be3d1804e1591f555d2af25c9534942f9d",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main_test.go": "5f1de1048f574b3df400b346d39bc27070f7a9be43688abfba6a131bb38c4cc0",
+    "/private/tmp/vellum-large-data/drivers/cogent/controls.go": "20e3971270bdc16492f30b388f49b8c2b85e4b8fba47ef7dfc720d8ca1c04578",
+    "/private/tmp/vellum-large-data/drivers/cogent/disclosure.go": "f64a6337183e2d55674abdcb70b20a261bfdcd3491c6c6c09c05623a3edc10fe",
+    "/private/tmp/vellum-large-data/drivers/cogent/disclosure_darwin_test.go": "30679ff44de38121a98e0ac8afce51871b9ca63b21d8c8238fbc7a7e61163f64",
+    "/private/tmp/vellum-large-data/drivers/cogent/disclosure_offscreen_test.go": "2c28852979d3e20c6512fb638526540e8b831031dd570c6c69d5fe7658012409",
+    "/private/tmp/vellum-large-data/drivers/cogent/disclosure_test.go": "5822f19e4a844238e929a0dad1dd7ad994d68d18e1e7483935d9e5c68af98bcc",
+    "/private/tmp/vellum-large-data/drivers/cogent/grid.go": "8103e4ad8830943c2c0b8b1e512be4cdd4caffaf43713cb57bbe1c39bd179ae2",
+    "/private/tmp/vellum-large-data/drivers/cogent/manual_offscreen.go": "344a500c258cea2836c57d32c985a09407b19ac356621c3c9fba5bce2706080a",
+    "/private/tmp/vellum-large-data/drivers/cogent/reconcile.go": "806808bf3e708f46afb18fbc6e9676594a8d85e0280f69ebdf19f0a63de7dc37",
+    "/private/tmp/vellum-large-data/drivers/cogent/tree.go": "b01dcc6bc7564554e9955484e39638f2e7beeeefc94b59f0bc7b616423029bc1",
+    "/private/tmp/vellum-large-data/examples/sdk-contract/disclosure_test.go": "634897cc3bc7f6885717cc1499cabf96b28cfe0f1ca20e0e66949d6d7d96adc1",
+    "/private/tmp/vellum-large-data/specs/controls.md": "a3cf8fcef881e8ab7ff8d634b839452b9068bb8ce5ac8237ba5dd72f54b10f0d",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "2256236f40adedbd492bdcbcd691e0e635fd4cda728fd4b57115caf0e8c4ea3f",
+    "/private/tmp/vellum-large-data/ui/controls.go": "54f7d46c9cb0a50482d1cdd0cdef49fdffe2475641a08b6a7839eaba06bbe8cf",
+    "/private/tmp/vellum-large-data/ui/disclosure_test.go": "7bf4a0657f957bc4a44cf4f1039acbe4d7f19ccd66c00974c1f5145adae6d8b8",
+    "/private/tmp/vellum-large-data/ui/focus.go": "7b180b7299c49af18a9d803da5435b0d8a7f825414d5e393c9c671e19c1f45f6",
+    "/private/tmp/vellum-large-data/ui/node.go": "4b7a0dabff7d7d9696825c87bf02912f0c792c5f4ff8cc95a6dd2818fe83d587"
+  },
+  "reference_sha256": {
+    "/private/tmp/vellum-macos-disclosure/baseline.json": "ab13bfeed90c66e5a3cd7909df957b0577a780693d0ac81917df3a38c50fbd15",
+    "/private/tmp/vellum-macos-disclosure/disclosure-race-v5.json": "3278a2e6a2f7422382fe1c67d3dc60ad481bb098ab89ffec304cccb22200ab10",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/button.go": "7d961504453760e6072824fb4ea1bb4aa761678e5551ae1e220f738b4a1558c5",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/widgetevents.go": "da23687aebedf16be5ed54346966a5a366b586fc6f024905936e6d29eb70584b"
+  },
+  "source_binding": {
+    "path": "/private/tmp/vellum-macos-disclosure/disclosure-race-v5.json",
+    "vector_key": "source_delta_before",
+    "matches_current_and_after": true,
+    "claim": "The amended frozen 23-leaf vector includes manual_offscreen.go in addition to the initially requested 22. Source approval does not independently qualify all author process or prepared-file receipts."
+  },
+  "assessment": [
+    {
+      "area": "Portable API and validation",
+      "evidence": [
+        "ui/controls.go",
+        "ui/node.go",
+        "ui/focus.go",
+        "ui/disclosure_test.go",
+        "examples/sdk-contract/disclosure_test.go"
+      ],
+      "conclusion": "Disclosure is a container with nonblank literal Text heading and controlled Checked/Change. Activate and Orientation are refused. Empty content and a nil read-only Change are supported. The private disclosure: target namespace is reserved. FocusTarget, FocusScope and FocusOrder retain the heading but exclude collapsed children and nested modal discovery."
+    },
+    {
+      "area": "Retained topology, drafts and ancestor admission",
+      "evidence": [
+        "drivers/cogent/disclosure.go",
+        "drivers/cogent/controls.go",
+        "drivers/cogent/reconcile.go"
+      ],
+      "conclusion": "Stable private header/body hosts remain attached; childHost and the managed ordering path operate on the body rather than replacing private children. Collapse sets visibility both ways and the body disabled property before descendants synchronize, so current owner admission and settlement consult accepted ancestry. Compatible keyed records and field drafts survive hide/reopen/reorder; ordinary removal/reparenting and control retirement remain in the existing transactional preparation/attachment/disposal path. Focused ordinary content returns to an enabled heading on collapse."
+    },
+    {
+      "area": "Native event and queued delivery",
+      "evidence": [
+        "drivers/cogent/disclosure.go",
+        "drivers/cogent/controls.go",
+        "drivers/cogent/build/upstream/core/button.go",
+        "drivers/cogent/build/upstream/core/widgetevents.go"
+      ],
+      "conclusion": "The header uses actual Core Button Enter/Space/pointer activation and an unmodified Left/Right handler. Native requests do not optimistically mutate accepted expansion. PostWindow resolves the current callback and revokes disabled, changed accepted-state, retired and closed-window deliveries; no cross-window widget read is added to the owner callback. No-op and read-only requests emit no Change."
+    },
+    {
+      "area": "Focus/modal/data scope and accessibility",
+      "evidence": [
+        "drivers/cogent/accessibility.go",
+        "drivers/cogent/accessibility_workbench.go",
+        "drivers/cogent/grid.go",
+        "drivers/cogent/tree.go",
+        "drivers/cogent/accessibility_darwin.m"
+      ],
+      "conclusion": "Collapsed child traversal is consistently excluded from visible accessibility/modal scope and grid/tree admission. The semantic container is a nonfocusable group; a qualified separately framed heading owns the managed focus proxy, Expanded, accepted boolean Value and allowed focus/press/expand/collapse actions. Current disabled/retired checks and bridge generation rules apply to delivery. The Cocoa role is DisclosureTriangle; setAccessibilityExpanded uses the existing guarded request path. Value changes enter the existing native ValueChanged notification comparison even for empty content. The fixture reads the actual Expanded selector. Heading semantics can retain native identity while hidden child semantic objects retire."
+    },
+    {
+      "area": "Manual heading target and hidden geometry correction",
+      "evidence": [
+        "drivers/cogent/manual_offscreen.go",
+        "drivers/cogent/disclosure_offscreen_test.go"
+      ],
+      "conclusion": "The private heading target uses measured header bounds, reserved ID, retained record incarnation and accepted Checked value. Manual target routing rechecks incarnation, enabled/visible state and nonempty geometry. Grid capture now requires visible, like existing tree capture: hidden descriptor records remain, but unavailable hidden grid geometry cannot strand layoutPending or materialize stale cell targets. The current actual router fixture uses inspected heading Target/Incarnation and exercises collapse/reopen/Tab and retained grid/tree scopes."
+    },
+    {
+      "area": "Gallery, smoke worker and contracts",
+      "evidence": [
+        "drivers/cogent/cmd/gallery/main.go",
+        "drivers/cogent/cmd/gallery/disclosure_smoke.go",
+        "drivers/cogent/cmd/gallery/main_test.go",
+        "drivers/cogent/disclosure_test.go",
+        "drivers/cogent/disclosure_darwin_test.go",
+        "docs/controls.md",
+        "specs/controls.md",
+        "specs/macos-completion.md"
+      ],
+      "conclusion": "The controlled gallery keeps section children present. Its opt-in smoke has a 45-second context and bounded post-Run join; success cancels the Run context and failed/closed/time-out workflows produce nonzero exit. The worker performs 20 collapse/expand cycles through actual Cocoa selector actions, awaits published Expanded and child visibility, checks stable heading identity and hidden stale field refusal, and explicitly excludes physical input/human VoiceOver. Test bodies cover latest/refused/programmatic/disabled/retired requests, escaped labels, draft retention, semantic hierarchy, portable focus and actual software frames. Documentation describes supported retention and leaves broader Mac gates open."
+    }
+  ],
+  "historical_notes": [
+    "The v2 native-object fixture omitted Expanded from its observation; current GridFixture exposes the actual selector rather than substituting descriptor state.",
+    "The later settling failure was after collapsing retained data content, not merely initial allocation. The material visible-only grid capture fix is included in the reviewed vector. The constrained grid/tree viewports define a bounded scope/identity fixture; they do not lower a benchmark workload.",
+    "Parent-reported sandbox socket refusal and subsequent authorized headless pass belong to author qualification history and are not erased by this source approval."
+  ],
+  "execution_scope": {
+    "reviewer_tests": false,
+    "reviewer_builds": false,
+    "reviewer_native_or_ui": false,
+    "reviewer_provider": false,
+    "reviewer_git": false,
+    "implementation_mutation": false
+  },
+  "limitations": [
+    "Source review only; final broad adapter/portable/SDK/race/vet/build and later live smoke evidence are separate gates. No unfinished author gate is independently certified here.",
+    "Focus/data-scope and software/native-object contracts do not certify physical Mac keyboard/pointer interaction or human VoiceOver behavior.",
+    "No provider review occurred in this subtask, and no memory/endurance/performance/P6/full-Mac/distribution acceptance follows from this approval."
+  ]
+}

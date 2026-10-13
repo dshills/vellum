@@ -22,6 +22,7 @@ import (
 
 type gallery struct {
 	enabled              bool
+	details              bool
 	snapping, pinned     bool
 	selection, tab, text string
 	number               float32
@@ -33,7 +34,7 @@ type gallery struct {
 }
 
 func newGallery() *gallery {
-	return &gallery{enabled: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
+	return &gallery{enabled: true, details: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
 }
 
 func galleryImage() *canvas.TiledImage {
@@ -55,17 +56,19 @@ func (g *gallery) view() ui.Node {
 	changeNumber := func(e ui.ChangeEvent) { g.number = e.Number }
 	controls := ui.Node{ID: "controls", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
 		{ID: "enable", Kind: ui.Checkbox, Text: "Enable editing controls", Checked: g.enabled, Change: func(e ui.ChangeEvent) { g.enabled = e.Checked }, Accessibility: ui.Accessibility{Help: "Toggle the disabled state of the controls below"}},
-		{ID: "fields", Kind: ui.FormGroup, Text: "Editing", Disabled: !g.enabled, Style: ui.Style{Gap: ui.Some(float32(10))}, Children: []ui.Node{
-			{ID: "selection-label", Kind: ui.Label, Text: "Preset"},
-			{ID: "selection", Kind: ui.Selector, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset"}},
-			{ID: "radio-preset", Kind: ui.RadioGroup, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset radio choices"}},
-			{ID: "segmented-preset", Kind: ui.SegmentedControl, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset segments"}},
-			{ID: "value-label", Kind: ui.Label, Text: fmt.Sprintf("Shared slider / numeric value: %.0f", g.number)},
-			{ID: "slider", Kind: ui.Slider, Number: g.number, Numeric: numeric, Change: changeNumber, MinWidth: 300, Accessibility: ui.Accessibility{Name: "Level", Help: "Drag or use arrow keys"}},
-			{ID: "number", Kind: ui.NumberField, Number: g.number, Numeric: numeric, Change: changeNumber, Accessibility: ui.Accessibility{Name: "Numeric level"}},
-			{ID: "text-label", Kind: ui.Label, Text: "Project name"},
-			{ID: "project-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name", Help: "Single-line native text field"}},
-			{ID: "focus-name", Kind: ui.Button, Text: "Focus project name", Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++ }},
+		{ID: "details", Kind: ui.Disclosure, Text: "Editing controls", Checked: g.details, Change: func(e ui.ChangeEvent) { g.details = e.Checked }, Children: []ui.Node{
+			{ID: "fields", Kind: ui.FormGroup, Text: "Editing", Disabled: !g.enabled, Style: ui.Style{Gap: ui.Some(float32(10))}, Children: []ui.Node{
+				{ID: "selection-label", Kind: ui.Label, Text: "Preset"},
+				{ID: "selection", Kind: ui.Selector, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset"}},
+				{ID: "radio-preset", Kind: ui.RadioGroup, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset radio choices"}},
+				{ID: "segmented-preset", Kind: ui.SegmentedControl, SelectedID: g.selection, Options: []ui.Option{{ID: "basic", Label: "Basic"}, {ID: "advanced", Label: "Advanced"}, {ID: "unavailable", Label: "Unavailable", Disabled: true}}, Change: func(e ui.ChangeEvent) { g.selection = e.SelectedID }, Accessibility: ui.Accessibility{Name: "Preset segments"}},
+				{ID: "value-label", Kind: ui.Label, Text: fmt.Sprintf("Shared slider / numeric value: %.0f", g.number)},
+				{ID: "slider", Kind: ui.Slider, Number: g.number, Numeric: numeric, Change: changeNumber, MinWidth: 300, Accessibility: ui.Accessibility{Name: "Level", Help: "Drag or use arrow keys"}},
+				{ID: "number", Kind: ui.NumberField, Number: g.number, Numeric: numeric, Change: changeNumber, Accessibility: ui.Accessibility{Name: "Numeric level"}},
+				{ID: "text-label", Kind: ui.Label, Text: "Project name"},
+				{ID: "project-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name", Help: "Single-line native text field"}},
+				{ID: "focus-name", Kind: ui.Button, Text: "Focus project name", Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++ }},
+			}},
 		}},
 		{ID: "more-controls", Kind: ui.Toolbar, Accessibility: ui.Accessibility{Name: "Control tools"}, Children: []ui.Node{
 			{ID: "snapping", Kind: ui.Switch, Text: "Snapping", Checked: g.snapping, Change: func(e ui.ChangeEvent) { g.snapping = e.Checked }},
@@ -127,7 +130,14 @@ func (g *gallery) view() ui.Node {
 func main() {
 	exit := flag.Duration("exit-after", 0, "close after a duration for smoke checks")
 	smoke := flag.Bool("smoke", false, "open and close a native modal during the smoke check")
+	disclosureSmoke := flag.Bool("disclosure-smoke", false, "check actual Cocoa disclosure publication and actions in a bounded fixture")
 	flag.Parse()
+	if *disclosureSmoke && (*smoke || *exit > 0) {
+		must(errors.New("disclosure-smoke requires its own bounded process"))
+	}
+	if *disclosureSmoke {
+		core.DebugSettings.DisableWindowGeometrySaver = true
+	}
 	a, err := app.New(app.Config{})
 	must(err)
 	defer a.Close()
@@ -135,6 +145,14 @@ func main() {
 	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: 720, Height: 650, View: g.view}))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	var disclosureDone chan error
+	if *disclosureSmoke {
+		var stop context.CancelFunc
+		ctx, stop = context.WithTimeout(ctx, 45*time.Second)
+		defer stop()
+		disclosureDone = make(chan error, 1)
+		go func() { disclosureDone <- checkDisclosure(ctx); cancel() }()
+	}
 	if *exit > 0 {
 		time.AfterFunc(*exit, cancel)
 	}
@@ -145,6 +163,15 @@ func main() {
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
 	err = a.Run(ctx, cogent.Driver{Theme: theme})
+	if disclosureDone != nil {
+		cancel()
+		select {
+		case checkErr := <-disclosureDone:
+			must(checkErr)
+		case <-time.After(6 * time.Second):
+			must(errors.New("disclosure worker did not join after native exit"))
+		}
+	}
 	if err != nil && !errors.Is(err, context.Canceled) {
 		must(err)
 	}

@@ -56,6 +56,7 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"label"])return NSAccessibilityStaticTextRole;
  if([role isEqual:@"image"])return NSAccessibilityImageRole;
  if([role isEqual:@"button"])return NSAccessibilityButtonRole;
+ if([role isEqual:@"disclosure-heading"])return NSAccessibilityDisclosureTriangleRole;
  if(vellumAXCheckable(role))return NSAccessibilityCheckBoxRole;
  if([role isEqual:@"progress-bar"])return NSAccessibilityProgressIndicatorRole;
  if([role isEqual:@"text-field"])return NSAccessibilityTextFieldRole;
@@ -403,7 +404,7 @@ char *vellumAXGridFixture(const char *json,const char *tableID,int column,int ro
   VellumAXElement *table=elements[tableID?[NSString stringWithUTF8String:tableID]:@""];
   if(!table)return strdup("");
   VellumAXElement *cell=[table accessibilityCellForColumn:column row:row];
-  NSDictionary *result=@{@"role":[table accessibilityRole]?:@"",@"orientation":@([table accessibilityOrientation]),@"rows":@([table accessibilityRowCount]),@"columns":@([table accessibilityColumnCount]),@"visible_rows":@(table.accessibilityVisibleRows.count),@"visible_columns":@(table.accessibilityVisibleColumns.count),@"visible_cells":@(table.accessibilityVisibleCells.count),@"selected_cells":@(table.accessibilitySelectedCells.count),@"cell":cell.accessibilityIdentifier?:@"",@"cell_role":cell.accessibilityRole?:@"",@"row":cell?@(cell.accessibilityRowIndexRange.location):@(-1),@"column":cell?@(cell.accessibilityColumnIndexRange.location):@(-1)};
+  NSDictionary *result=@{@"role":[table accessibilityRole]?:@"",@"expanded":@([table isAccessibilityExpanded]),@"orientation":@([table accessibilityOrientation]),@"rows":@([table accessibilityRowCount]),@"columns":@([table accessibilityColumnCount]),@"visible_rows":@(table.accessibilityVisibleRows.count),@"visible_columns":@(table.accessibilityVisibleColumns.count),@"visible_cells":@(table.accessibilityVisibleCells.count),@"selected_cells":@(table.accessibilitySelectedCells.count),@"cell":cell.accessibilityIdentifier?:@"",@"cell_role":cell.accessibilityRole?:@"",@"row":cell?@(cell.accessibilityRowIndexRange.location):@(-1),@"column":cell?@(cell.accessibilityColumnIndexRange.location):@(-1)};
   NSData *data=[NSJSONSerialization dataWithJSONObject:result options:0 error:nil];return strdup([[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding].UTF8String?:"");
  }
 }

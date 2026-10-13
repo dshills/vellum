@@ -214,7 +214,7 @@ func visibleAccessibilityScope(root *record) (*record, string) {
 			})
 		}
 		for _, c := range r.children {
-			if r.node.Kind == ui.Tabs && c.node.ID != r.node.SelectedID {
+			if r.node.Kind == ui.Disclosure && !r.node.Checked || r.node.Kind == ui.Tabs && c.node.ID != r.node.SelectedID {
 				continue
 			}
 			visit(c, prefix, disabled)
@@ -307,6 +307,9 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 				}
 			}
 			out[prefix+accessibilityManagedID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused}
+			if root.control != nil && root.control.disclosure != nil {
+				out[prefix+accessibilityDisclosureID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}
+			}
 			if root.control != nil && root.control.split != nil {
 				out[prefix+accessibilitySplitHandleID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}
 			}

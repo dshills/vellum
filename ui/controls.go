@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 const (
@@ -10,6 +11,7 @@ const (
 	Toolbar          Kind = "toolbar"
 	StatusBar        Kind = "status-bar"
 	FormGroup        Kind = "form-group"
+	Disclosure       Kind = "disclosure"
 	Checkbox         Kind = "checkbox"
 	Switch           Kind = "switch"
 	ToggleButton     Kind = "toggle-button"
@@ -48,7 +50,7 @@ const (
 )
 
 // ChangeEvent requests a model edit. The relevant payload is Checked for
-// Checkbox/Switch/ToggleButton, Number for Slider/NumberField, Text for TextField, and SelectedID
+// Checkbox/Switch/ToggleButton/Disclosure, Number for Slider/NumberField, Text for TextField, and SelectedID
 // for Selector/Tabs/RadioGroup/SegmentedControl. SplitPane uses Number for the
 // first pane's fraction. Controlled nodes reflect the accepted value on redraw.
 type ChangeEvent struct {
@@ -72,14 +74,14 @@ type FocusRequest struct {
 
 func IsContainer(kind Kind) bool {
 	switch kind {
-	case Row, Column, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane:
+	case Row, Column, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane, Disclosure:
 		return true
 	}
 	return false
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Switch, ToggleButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane:
+	case Button, Checkbox, Switch, ToggleButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
 		return true
 	}
 	return false
@@ -108,6 +110,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind == Disclosure && (strings.TrimSpace(n.Text) == "" || n.Activate != nil) {
+		return fmt.Errorf("ui: disclosure requires a heading and uses Checked/Change for expansion")
+	}
 	if err := validateImage(n); err != nil {
 		return err
 	}
@@ -227,7 +232,7 @@ func FocusTarget(root Node, id string) (Node, bool) {
 			}
 			return n, true
 		}
-		if n.Kind == Dialog && !n.Open {
+		if n.Kind == Dialog && !n.Open || n.Kind == Disclosure && !n.Checked {
 			return Node{}, false
 		}
 		for _, c := range n.Children {

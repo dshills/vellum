@@ -59,6 +59,21 @@ func TestGalleryExpandedControls(t *testing.T) {
 	}
 }
 
+func TestGalleryDisclosureControlledExpansion(t *testing.T) {
+	g := newGallery()
+	node(g.view(), "details").Change(ui.ChangeEvent{Checked: false})
+	if node(g.view(), "details").Checked {
+		t.Fatal("collapse not accepted by gallery model")
+	}
+	if _, ok := ui.FocusTarget(g.view(), "project-name"); ok {
+		t.Fatal("collapsed gallery field remains a focus target")
+	}
+	node(g.view(), "details").Change(ui.ChangeEvent{Checked: true})
+	if _, ok := ui.FocusTarget(g.view(), "project-name"); !ok || ui.Validate(g.view()) != nil {
+		t.Fatal("expanded gallery field unavailable")
+	}
+}
+
 func TestGallerySharedChoiceGroups(t *testing.T) {
 	g := newGallery()
 	node(g.view(), "radio-preset").Change(ui.ChangeEvent{SelectedID: "advanced"})

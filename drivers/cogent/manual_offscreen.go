@@ -814,6 +814,13 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				result.FocusedID = r.node.ID
 			}
 			result.Elements = append(result.Elements, ManualElement{ID: r.node.ID, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
+			if r.control != nil && r.control.disclosure != nil {
+				id := accessibilityDisclosureID(r.node.ID)
+				heading := r.control.disclosure.header
+				b := bounds[id]
+				box := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
+				result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: w.records[r], Kind: ui.Disclosure, Name: r.node.Text, Value: r.node.Checked, Enabled: !controlDisabled(r), Focused: heading.ContainsFocus(), Visible: visible && heading.IsVisible(), Bounds: box})
+			}
 			if r.control != nil && r.control.split != nil {
 				id := accessibilitySplitHandleID(r.node.ID)
 				handle := r.control.split.handle
@@ -846,7 +853,7 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					}
 				}
 			}
-			if r.control != nil && r.control.grid != nil {
+			if r.control != nil && r.control.grid != nil && visible {
 				inspection, gridErr := InspectGrid(p.owner, r.node.Grid)
 				if gridErr != nil {
 					if errors.Is(gridErr, ErrGridLayout) {

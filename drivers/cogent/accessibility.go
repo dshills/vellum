@@ -455,6 +455,17 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				return applyAccessibilityAction(r, action)
 			}
 		}
+		if n.Kind == ui.Disclosure && r.control != nil && r.control.disclosure != nil {
+			nodes[len(nodes)-1].Focusable = false
+			nodes[len(nodes)-1].Focused = false
+			nodes[len(nodes)-1].Actions = []string{}
+			delete(handlers, x.ID)
+			heading, handler := disclosureAccessibility(r, x.ID, b, disabled)
+			nodes = append(nodes, heading)
+			if handler != nil {
+				handlers[heading.ID] = handler
+			}
+		}
 		if n.Kind == ui.DataTree && r.control != nil && r.control.outline != nil {
 			extra, actions := treeAccessibility(r, x.ID, b, disabled)
 			nodes = append(nodes, extra...)
@@ -511,7 +522,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					handlers[handle.ID] = action
 				}
 			}
-			if n.Kind == ui.Tabs && c.node.ID != n.SelectedID {
+			if n.Kind == ui.Disclosure && !n.Checked || n.Kind == ui.Tabs && c.node.ID != n.SelectedID {
 				continue
 			}
 			visit(c, x.ID, disabled)
@@ -599,6 +610,22 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 	}
 	change := ui.ChangeEvent{ID: n.ID, Kind: n.Kind}
 	switch n.Kind {
+	case ui.Disclosure:
+		expanded := n.Checked
+		switch action.Kind {
+		case "press":
+			expanded = !expanded
+		case "expand":
+			expanded = true
+		case "collapse":
+			expanded = false
+		default:
+			return false
+		}
+		if expanded == n.Checked {
+			return true
+		}
+		change.Checked = expanded
 	case ui.Checkbox, ui.Switch, ui.ToggleButton:
 		if action.Kind == "press" {
 			change.Checked = !n.Checked
@@ -915,6 +942,9 @@ func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[stri
 		}
 		if r.control != nil && r.control.split != nil {
 			bounds(accessibilitySplitHandleID(r.node.ID), r.control.split.handle)
+		}
+		if r.control != nil && r.control.disclosure != nil {
+			bounds(accessibilityDisclosureID(r.node.ID), r.control.disclosure.header)
 		}
 		if r.node.Kind == ui.Selector {
 			for _, o := range r.node.Options {

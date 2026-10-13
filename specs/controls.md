@@ -182,6 +182,32 @@ still requires platform acceptance beyond these adapter checks.
 
 ## Expanded desktop elements
 
+`Disclosure` is a labeled collapsible container for inspector/settings sections.
+Its nonblank `Text` is the heading; `Checked` is accepted expansion state and
+`Change` requests `ChangeEvent.Checked` with the section's ID/kind. `Activate`
+and Orientation are refused. Empty content is allowed. Programmatic synchronization
+does not issue Change. The private heading/body and keyed children are retained
+across collapse, expansion and label updates; removal still retires them.
+
+The heading is one managed focus target. Unmodified Left collapses and Right
+expands; Enter/Space and pointer activation toggle. Read-only sections with no
+Change callback remain focusable. Collapsed descendants do not join Tab order,
+modal discovery, grid/tree input scopes or native accessibility. Queued child
+actions are revoked when their accepted ancestor collapses. A programmatic
+collapse of focused content moves focus to its enabled heading. Disabled ancestry
+refuses heading and child input. Queued heading requests use the current callback
+and are revoked after a later accepted state, disable or retirement.
+Manual inspection also exposes its separately framed heading target. Its
+`disclosure:` namespace is reserved so domain nodes cannot alias routed targets.
+
+The native accessibility hierarchy is an AXGroup with a separately framed
+AXDisclosureTriangle heading and, when expanded, its child hierarchy. Heading
+identity survives expansion changes. It exposes Expanded plus focus/press/expand/
+collapse actions as allowed by controlled state. Collapsed child semantic objects
+are retired and may acquire new accessibility identities when restored; native
+widget identity and private editing state remain retained. Human VoiceOver and
+physical Mac input remain separate from deterministic routing and Cocoa selectors.
+
 `Switch` and `ToggleButton` are controlled boolean leaves. `Checked` is the
 accepted value and `Change` receives the requested Checked value with stable ID
 and kind. Switch displays an on/off switch; ToggleButton displays a checkable
