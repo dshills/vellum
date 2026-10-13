@@ -1,6 +1,7 @@
 # Standard controls contract
 
-The public `ui.Node` vocabulary now includes checkbox, selector, slider, numeric
+The public `ui.Node` vocabulary now includes checkbox, switch, toggle button,
+progress bar, separator, selector, slider, numeric
 field, single-line text field, multiline document editor, managed data grid,
 tabs, scroll container and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
@@ -178,3 +179,31 @@ across unrelated redraws, tab reorder/reparent, modal scene cleanup preserving
 content, custom wake forwarding and repeated focus sequence requests. The gallery
 model test checks the complete controlled workflow. Native visual/input behavior
 still requires platform acceptance beyond these adapter checks.
+
+## Expanded desktop elements
+
+`Switch` and `ToggleButton` are controlled boolean leaves. `Checked` is the
+accepted value and `Change` receives the requested Checked value with stable ID
+and kind. Switch displays an on/off switch; ToggleButton displays a checkable
+button. They share bounded owner delivery, latest callbacks, ancestor-disabled
+refusal, accepted-value restoration, retained identity and focus traversal with
+Checkbox. Rejected native boolean changes restyle their accepted value even if
+the descriptor stays unchanged, preventing stale selected toggle backgrounds.
+Programmatic synchronization emits no Change.
+
+`ProgressBar` displays a finite accepted `Number` fraction in 0..1 without a
+keyboard step or input callbacks. `Separator` is a decorative line. Both accept
+`Orientation` Horizontal/Vertical; empty defaults to horizontal. Other kinds
+refuse Orientation. Explicit managed size/grow styles override native final
+defaults; removing those styles restores the native dimensions and growth. They are leaves and do not join managed focus order.
+Progress exposes its fraction and 0/1 bounds with the Mac progress-indicator role;
+Separator is omitted from the accessible hierarchy. Switch and ToggleButton
+publish checkable Mac roles and boolean press/set actions. Human VoiceOver and
+physical keyboard/pointer acceptance remain separate from offscreen/native-object
+fixtures. No indeterminate animation, radio grouping or segmented single-choice
+contract is implied by these elements.
+
+The gallery demonstrates all four additions using ordinary descriptors and
+accepted application state. Next vocabulary expansion should prioritize radio
+and segmented choices, reusable toolbars/status bars, form groups and adjustable
+splitters, each with keyboard, disabled, lifetime and accessibility contracts.

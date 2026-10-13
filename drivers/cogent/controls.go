@@ -120,6 +120,14 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	switch r.node.Kind {
 	case ui.Checkbox:
 		widget = core.NewSwitch(parent).SetType(core.SwitchCheckbox)
+	case ui.Switch:
+		widget = core.NewSwitch(parent).SetType(core.SwitchSwitch)
+	case ui.ToggleButton:
+		widget = core.NewSwitch(parent).SetType(core.SwitchSegmentedButton)
+	case ui.ProgressBar:
+		widget = core.NewMeter(parent)
+	case ui.Separator:
+		widget = core.NewSeparator(parent)
 	case ui.Selector:
 		widget = core.NewChooser(parent)
 	case ui.Slider:
@@ -177,7 +185,18 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		return nil, false, nil
 	}
 	r.widget = widget
-	if r.node.Kind == ui.Checkbox || r.node.Kind == ui.Selector || r.node.Kind == ui.Slider || r.node.Kind == ui.NumberField || r.node.Kind == ui.TextField {
+	if r.node.Kind == ui.ProgressBar || r.node.Kind == ui.Separator {
+		widget.AsWidget().Styler(func(s *styles.Style) {
+			s.Direction = styles.Row
+			if r.node.Orientation == ui.Vertical {
+				s.Direction = styles.Column
+			}
+		})
+		// These native controls set dimensions/growth in FinalStyler. Managed
+		// explicit styles must run after those defaults, including restoration.
+		widget.AsWidget().FinalStyler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
+	}
+	if r.node.Kind == ui.Checkbox || r.node.Kind == ui.Switch || r.node.Kind == ui.ToggleButton || r.node.Kind == ui.Selector || r.node.Kind == ui.Slider || r.node.Kind == ui.NumberField || r.node.Kind == ui.TextField {
 		widget.AsWidget().OnChange(func(e events.Event) { dispatchControl(r, e) })
 	}
 	if err := prepareControl(r, r.node); err != nil {
@@ -342,8 +361,12 @@ func syncControl(r *record, previous ui.Node) error {
 		}
 		return syncGrid(r)
 	}
+	nativeValueChanged := false
 	switch w := r.widget.(type) {
 	case *core.Switch:
+		// Resetting Checked alone leaves a segmented toggle's checked styling
+		// behind when the owner declines a native change without changing state.
+		nativeValueChanged = w.IsChecked() != r.node.Checked
 		w.SetText(html.EscapeString(r.node.Text)).SetChecked(r.node.Checked)
 	case *core.Chooser:
 		w.Items = nil
@@ -379,6 +402,8 @@ func syncControl(r *record, previous ui.Node) error {
 		w.PageStep = n.Step
 		w.EnforceStep = false
 		w.SetValue(r.node.Number)
+	case *core.Meter:
+		w.Min, w.Max, w.Value = 0, 1, r.node.Number
 	case *core.Spinner:
 		w.Precision = 9 // round-trip every float32 without crossing tight bounds
 		n := r.node.Numeric
@@ -423,7 +448,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if restoring || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if nativeValueChanged || restoring || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
 	}
 	if refused != nil {

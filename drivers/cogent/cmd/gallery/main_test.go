@@ -45,3 +45,16 @@ func TestGalleryControlledValuesDialogAndFocus(t *testing.T) {
 		t.Fatal("dismissal didn't close model state")
 	}
 }
+
+func TestGalleryExpandedControls(t *testing.T) {
+	g := newGallery()
+	node(g.view(), "snapping").Change(ui.ChangeEvent{Checked: true})
+	node(g.view(), "pinned").Change(ui.ChangeEvent{Checked: true})
+	node(g.view(), "slider").Change(ui.ChangeEvent{Number: 75})
+	if !node(g.view(), "snapping").Checked || !node(g.view(), "pinned").Checked || node(g.view(), "progress").Number != 0.75 {
+		t.Fatal("expanded gallery controls do not reflect accepted state")
+	}
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+}

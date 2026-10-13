@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "reviewed_utc": "2026-10-13T15:24:37.886751+00:00",
+  "base_commit": "4e2477fe128a33c6b1b1afb7e73143810de0e45a",
+  "source_manifest": "/private/tmp/vellum-macos-controls-expansion/source-final.json",
+  "source_manifest_sha256": "da74ce135903edd1202feb8c32e9d3b3e078caa26a349f2d0a241178d31dea20",
+  "source_count": 14,
+  "reviewed_source_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility.go": "ae961e05468f9343bd5c474311485599d963afd4fc8045276ae04fe5059886e4",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin.m": "5d5396ab29260e12bc5c1a8bf01956150edf689d8a0fa38a4f5396fea43b58e0",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main.go": "b39b853e477b95cd45df84be127dc21d22e1e5fa39be88181aeb97bd3b2762d5",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main_test.go": "6261db9d09c541e216c4adbc45c373d20b3431dcd6200aafbd0e970e2d94d239",
+    "/private/tmp/vellum-large-data/drivers/cogent/controls.go": "a6512a93346bcbac6eb1e80c7cb7345feb64a37eb7416138decf901b4f4c3db4",
+    "/private/tmp/vellum-large-data/drivers/cogent/expanded_controls_darwin_test.go": "4cc5d9d98a992384d269373a226030ed44ed5f469506da37b5757f3f4b2bf131",
+    "/private/tmp/vellum-large-data/drivers/cogent/expanded_controls_test.go": "9e477c7d0b6aabc7089770d856f6dfab5c85ce1f85a293ac857eb4b96faa19e1",
+    "/private/tmp/vellum-large-data/specs/controls.md": "c78ea7443fd062ba8d0237785cb1cd74a3d2106c33a7fa6f90b520896cefeae0",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "be9186327690cd25273bdaa60839d8db9ebefe402e5def39bec8b00c9dc15d1c",
+    "/private/tmp/vellum-large-data/ui/controls.go": "2719bb860c538dcc62da21f8213ebdc837d28669aa8e77f6888f2fa9ae6a145e",
+    "/private/tmp/vellum-large-data/ui/expanded_controls_test.go": "f83eb00a7fdb60065d1556df9f808484471c28757851ac1f5c19d38a67c54fed",
+    "/private/tmp/vellum-large-data/ui/node.go": "080d22d9b6187ee37316979b612cf6c7ecb06b7860e68c61adc84968c527cd62",
+    "/private/tmp/vellum-large-data/drivers/cogent/expanded_controls_offscreen_test.go": "ebc4c409b7458c7c460572d2cf8776733e783b90eb0eae66bde43adf7bf30973",
+    "/private/tmp/vellum-large-data/docs/controls.md": "a5c6579929b5391dcd6b306a1b7d06f94faa4013211dffb69a46bebbf5d49f2e"
+  },
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility.go": "ae961e05468f9343bd5c474311485599d963afd4fc8045276ae04fe5059886e4",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin.m": "5d5396ab29260e12bc5c1a8bf01956150edf689d8a0fa38a4f5396fea43b58e0",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main.go": "b39b853e477b95cd45df84be127dc21d22e1e5fa39be88181aeb97bd3b2762d5",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main_test.go": "6261db9d09c541e216c4adbc45c373d20b3431dcd6200aafbd0e970e2d94d239",
+    "/private/tmp/vellum-large-data/drivers/cogent/controls.go": "a6512a93346bcbac6eb1e80c7cb7345feb64a37eb7416138decf901b4f4c3db4",
+    "/private/tmp/vellum-large-data/drivers/cogent/expanded_controls_darwin_test.go": "4cc5d9d98a992384d269373a226030ed44ed5f469506da37b5757f3f4b2bf131",
+    "/private/tmp/vellum-large-data/drivers/cogent/expanded_controls_test.go": "9e477c7d0b6aabc7089770d856f6dfab5c85ce1f85a293ac857eb4b96faa19e1",
+    "/private/tmp/vellum-large-data/specs/controls.md": "c78ea7443fd062ba8d0237785cb1cd74a3d2106c33a7fa6f90b520896cefeae0",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "be9186327690cd25273bdaa60839d8db9ebefe402e5def39bec8b00c9dc15d1c",
+    "/private/tmp/vellum-large-data/ui/controls.go": "2719bb860c538dcc62da21f8213ebdc837d28669aa8e77f6888f2fa9ae6a145e",
+    "/private/tmp/vellum-large-data/ui/expanded_controls_test.go": "f83eb00a7fdb60065d1556df9f808484471c28757851ac1f5c19d38a67c54fed",
+    "/private/tmp/vellum-large-data/ui/node.go": "080d22d9b6187ee37316979b612cf6c7ecb06b7860e68c61adc84968c527cd62",
+    "/private/tmp/vellum-large-data/drivers/cogent/expanded_controls_offscreen_test.go": "ebc4c409b7458c7c460572d2cf8776733e783b90eb0eae66bde43adf7bf30973",
+    "/private/tmp/vellum-large-data/docs/controls.md": "a5c6579929b5391dcd6b306a1b7d06f94faa4013211dffb69a46bebbf5d49f2e"
+  },
+  "snapshot_file_sha256": {
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/accessibility.go": "ae961e05468f9343bd5c474311485599d963afd4fc8045276ae04fe5059886e4",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/accessibility_darwin.m": "5d5396ab29260e12bc5c1a8bf01956150edf689d8a0fa38a4f5396fea43b58e0",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/cmd/gallery/main.go": "b39b853e477b95cd45df84be127dc21d22e1e5fa39be88181aeb97bd3b2762d5",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/cmd/gallery/main_test.go": "6261db9d09c541e216c4adbc45c373d20b3431dcd6200aafbd0e970e2d94d239",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/controls.go": "a6512a93346bcbac6eb1e80c7cb7345feb64a37eb7416138decf901b4f4c3db4",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/expanded_controls_darwin_test.go": "4cc5d9d98a992384d269373a226030ed44ed5f469506da37b5757f3f4b2bf131",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/expanded_controls_test.go": "9e477c7d0b6aabc7089770d856f6dfab5c85ce1f85a293ac857eb4b96faa19e1",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/specs/controls.md": "c78ea7443fd062ba8d0237785cb1cd74a3d2106c33a7fa6f90b520896cefeae0",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/specs/macos-completion.md": "be9186327690cd25273bdaa60839d8db9ebefe402e5def39bec8b00c9dc15d1c",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/ui/controls.go": "2719bb860c538dcc62da21f8213ebdc837d28669aa8e77f6888f2fa9ae6a145e",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/ui/expanded_controls_test.go": "f83eb00a7fdb60065d1556df9f808484471c28757851ac1f5c19d38a67c54fed",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/ui/node.go": "080d22d9b6187ee37316979b612cf6c7ecb06b7860e68c61adc84968c527cd62",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/drivers/cogent/expanded_controls_offscreen_test.go": "ebc4c409b7458c7c460572d2cf8776733e783b90eb0eae66bde43adf7bf30973",
+    "/private/tmp/vellum-macos-controls-expansion/candidate-final/docs/controls.md": "a5c6579929b5391dcd6b306a1b7d06f94faa4013211dffb69a46bebbf5d49f2e"
+  },
+  "reference_file_sha256": {
+    "/private/tmp/vellum-large-data/drivers/cogent/driver.go": "3afe51d95d53fc80b687019e51dcc760d728ab23d8e8bf51f556977f3e39f009",
+    "/private/tmp/vellum-large-data/drivers/cogent/reconcile.go": "0ebc3f7c19488067836892039673eda153cffa52431494a3fcab6ee73e0ce9a7",
+    "/private/tmp/vellum-large-data/drivers/cogent/style.go": "ec94b2cc7c7c0952f22b46de772a058dd73b31d90d09e5b6f35a16688cb26ff9",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/switch.go": "1444ff2bb792ff1e26c57e567382719e94d5f6ee90933fd91fc00cf1357a42ae",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/widgetevents.go": "da23687aebedf16be5ed54346966a5a366b586fc6f024905936e6d29eb70584b",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/flags.go": "53952efdda7f239a1f6e57490e872fc10a071a63945f1b0b9084967dac5b6ba6",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/render.go": "056a7ece05171a8685484ec2acacf011122732336e8dbec7b5b3490e1abb19aa",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/style.go": "50ca543d3755ec22621bb1409ff68668e45dfc82efa4f0c222f5840845a7bbeb",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/meter.go": "45a89c4ffbad0be0b5d1ed03b6711198d7f2546d879c029abf758cabf91fe58e",
+    "/private/tmp/vellum-large-data/drivers/cogent/build/upstream/core/separator.go": "8d1301513f05764cf571b215c758ec6599620b6a2c2d012be9b9bd464080466c"
+  },
+  "reviewed_receipt_sha256": {
+    "/private/tmp/vellum-macos-controls-expansion/review-v1.json": "1e6193170759c4464545959a4e4e1755af43a064df082637fd5946c0db58e1d1",
+    "/private/tmp/vellum-macos-controls-expansion/review-v1.md": "ea4f311b618a42f74e441e9265a39b5c440fdf8434bd45cd7f34ddd7ba44f336",
+    "/private/tmp/vellum-macos-controls-expansion/rejected-toggle-original-v3.json": "4682c813be0ac309299027cd718eb48b5fbb88429a949378708d769aca337ad9",
+    "/private/tmp/vellum-macos-controls-expansion/rejected-toggle-original-v3.stdout": "10b078065fdd85611089e1b13b915a7fe6c26cf3b093da3c73a7154180261637",
+    "/private/tmp/vellum-macos-controls-expansion/rejected-toggle-original-v3.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+    "/private/tmp/vellum-macos-controls-expansion/source-before-toggle-fix-v3.json": "584c360c77e8fa1a851408cc8024e7e514f1c4d07498ee325ddebc5a79257afb"
+  },
+  "previous_finding_disposition": {
+    "id": "rejected-toggle-retains-checked-style",
+    "status": "RESOLVED",
+    "original_review_sha256": "1e6193170759c4464545959a4e4e1755af43a064df082637fd5946c0db58e1d1",
+    "correction": "syncControl detects native boolean mismatch before Switch.SetChecked and includes it in the existing Update predicate. This repairs the style without invoking Change.",
+    "negative_proof": "The unchanged final regression compiled and actually failed against the preserved pre-fix14 source at the selected-background versus accepted-nil assertion. Earlier invalid-manual-config and nil-background-reader failures remain historical fixture failures, not defect proof."
+  },
+  "source_conclusions": [
+    "Four additive public leaf kinds are validated; progress rejects nonfinite/out-of-range Number and passive Change/Activate, Orientation is restricted to progress/separator and horizontal/vertical/empty, and passive kinds stay out of managed focus order.",
+    "Switch/ToggleButton use existing bounded PostWindow delivery, latest callback and captured native boolean value, disabled ancestry and retired-record guards, and retained Core Switch identity. The restored native boolean mismatch now guarantees required update/style work.",
+    "Core Meter is passive, bounded to the accepted0..1 values; progress and separator orientation stylers follow current descriptor state. Their final managed style hook runs after native dimensional/growth defaults so explicit override and removal restoration remain coherent.",
+    "Separator is omitted from accessibility publication; progress has numeric Value and0/1 Min/Max with no focus/actions. Switch/ToggleButton publish boolean Value and only supported focus/press/set handlers. Cocoa role and NSNumber conversion reuse the checkable predicate.",
+    "Existing owner generation/lifetime guards continue to protect AX delivery; the new code adds no native read to queued owner callback delivery.",
+    "Portable and direct retained tests cover validation, focus, restoration, latest callbacks, disabled/removal refusal, passive semantics, identity and style override/restoration. The rejection fixture exercises actual Core Switch Click/listener/Styler and queued owner Drain/reconcile, with an explicit faithful post-event restyle.",
+    "The separate actual Manual fixture routes public key and measured pointer input, captures completed software frames and checks progress-region pixels; its scope remains distinct from physical OS input.",
+    "The public catalog and specs describe the controlled/passive limits, independent boolean semantics, and outstanding physical Mac accessibility/input/memory/performance gates."
+  ],
+  "limitations": [
+    "This is an internal source review; reviewer executed only bounded file reading/hash/JSON checks, no Go/test/native/UI/provider/settings/Git actions.",
+    "Root-owned final targeted/full race, vet, builds and any provider review are separate pending qualification records and are not certified as PASS here.",
+    "The rejected-style fixture directly sends a Core Switch event and explicitly runs its post-event styler; it does not itself traverse the complete public Manual router or OS input path. That router is exercised by the separate accepted-change Manual fixture.",
+    "Software RGBA evidence and inert Objective-C role/value fixtures do not establish physical display, human VoiceOver, native memory, sustained performance or full Mac acceptance.",
+    "Previous review-v1 remains immutable and binds historical13 inspected inputs. Final14 approval is additive and does not reinterpret earlier fixture failures as product defects."
+  ]
+}

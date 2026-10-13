@@ -388,3 +388,13 @@ the current cache generation and retirement queue intact; successful reload
 explicitly retires the prior module. Internal fault kernels and tiny headless
 layout-refusal/retry checks remain separate from native/GPU memory, sustained
 performance, physical backend faults and live Mac qualification.
+
+## UI element expansion
+
+The public control vocabulary adds controlled switches and toggle buttons plus
+passive progress bars and oriented decorative separators. The native adapter,
+semantic actions and gallery follow the [controls contract](controls.md).
+Offscreen lifecycle/input and Mac native-object checks do not substitute for
+human VoiceOver, physical keyboard/pointer interaction or the remaining native
+memory and sustained-performance gates. Further UI vocabulary is part of the
+framework completion work, alongside the existing ownership/qualification effort.

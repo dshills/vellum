@@ -1,0 +1,49 @@
+{
+  "result": "REVIEWED_UI_ELEMENTS_EXPANSION",
+  "base_commit": "4e2477fe128a33c6b1b1afb7e73143810de0e45a",
+  "source_manifest_sha256": "da74ce135903edd1202feb8c32e9d3b3e078caa26a349f2d0a241178d31dea20",
+  "qualification_sha256": "60084583752e0722069ad7f542242819be50dd93b455481cedda149affd9897d",
+  "source_review_sha256": "fa45bcb201402d3ee1d7a04d8b2672e2c609f4155638005eb0db6b3c8fa05da4",
+  "evidence_review_sha256": "353663aada14049d3791a4aa716016d217bb5eb888ebdc9dfe5a6ce71458aff4",
+  "report_sha256": "373d5ec414c7fd25f5d95a13bdef812b65964c5012e2de21a63f1063cd45becb",
+  "archive": {
+    "sha256": "ee7feb6697cd0fa9b0b5fa864f9122a2e0a9aa559b708e3ca9b6dfab01098e69",
+    "members": 184,
+    "index_sha256": "5dbaf88609741e76cc618d498f630fb9adaa3dc2d1f38e4ac4b0c847f7ec8d3a"
+  },
+  "prepared_files": 6198,
+  "command_receipts": 19,
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_sha256": "38d1c80561bc44c16f24badcf106a46e70541f4b30ce980ba59349a0cad92100",
+  "source": {
+    "drivers/cogent/accessibility.go": "ae961e05468f9343bd5c474311485599d963afd4fc8045276ae04fe5059886e4",
+    "drivers/cogent/accessibility_darwin.m": "5d5396ab29260e12bc5c1a8bf01956150edf689d8a0fa38a4f5396fea43b58e0",
+    "drivers/cogent/cmd/gallery/main.go": "b39b853e477b95cd45df84be127dc21d22e1e5fa39be88181aeb97bd3b2762d5",
+    "drivers/cogent/cmd/gallery/main_test.go": "6261db9d09c541e216c4adbc45c373d20b3431dcd6200aafbd0e970e2d94d239",
+    "drivers/cogent/controls.go": "a6512a93346bcbac6eb1e80c7cb7345feb64a37eb7416138decf901b4f4c3db4",
+    "drivers/cogent/expanded_controls_darwin_test.go": "4cc5d9d98a992384d269373a226030ed44ed5f469506da37b5757f3f4b2bf131",
+    "drivers/cogent/expanded_controls_test.go": "9e477c7d0b6aabc7089770d856f6dfab5c85ce1f85a293ac857eb4b96faa19e1",
+    "specs/controls.md": "c78ea7443fd062ba8d0237785cb1cd74a3d2106c33a7fa6f90b520896cefeae0",
+    "specs/macos-completion.md": "be9186327690cd25273bdaa60839d8db9ebefe402e5def39bec8b00c9dc15d1c",
+    "ui/controls.go": "2719bb860c538dcc62da21f8213ebdc837d28669aa8e77f6888f2fa9ae6a145e",
+    "ui/expanded_controls_test.go": "f83eb00a7fdb60065d1556df9f808484471c28757851ac1f5c19d38a67c54fed",
+    "ui/node.go": "080d22d9b6187ee37316979b612cf6c7ecb06b7860e68c61adc84968c527cd62",
+    "drivers/cogent/expanded_controls_offscreen_test.go": "ebc4c409b7458c7c460572d2cf8776733e783b90eb0eae66bde43adf7bf30973",
+    "docs/controls.md": "a5c6579929b5391dcd6b306a1b7d06f94faa4013211dffb69a46bebbf5d49f2e"
+  },
+  "preview_sha256": "5803c837861825739f98844f65d3c58f0320d69c13a093e1df60bc49320c37a6",
+  "promotion_producer_sha256": "5e249a333e7cf8e327c653411eb199994efebfe0276017c5525771198332fbbb",
+  "checkpoint_producer_sha256": "bf632072ddad21b2934994fe86d0242490e1dfd7c4f5bd2b9541c525fc3b7861",
+  "limits": [
+    "Four public controls and their tested boundaries; no indeterminate progress/radio or grouped single-choice contract",
+    "Direct Core rejection fixture routes Click and explicitly completes post-event Style before owner drain; separate Manual fixture routes accepted Enter/pointer and completed software frame",
+    "Cocoa role and NSNumber fixtures use retained objects without an OS window or native attachment",
+    "Gallery compiled only; no desktop UI/input/settings or general clipboard writes",
+    "Offscreen/native-object results do not establish physical Mac input/VoiceOver, native heap or performance/endurance qualification",
+    "All6198 prepared hashes are endpoint identities, not a full SDK/compiler/native binary component closure"
+  ]
+}

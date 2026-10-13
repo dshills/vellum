@@ -20,6 +20,7 @@ import (
 
 type gallery struct {
 	enabled              bool
+	snapping, pinned     bool
 	selection, tab, text string
 	number               float32
 	dialog               bool
@@ -44,6 +45,12 @@ func (g *gallery) view() ui.Node {
 			{ID: "project-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name", Help: "Single-line native text field"}},
 			{ID: "focus-name", Kind: ui.Button, Text: "Focus project name", Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++ }},
 		}},
+		{ID: "more-controls", Kind: ui.Row, Children: []ui.Node{
+			{ID: "snapping", Kind: ui.Switch, Text: "Snapping", Checked: g.snapping, Change: func(e ui.ChangeEvent) { g.snapping = e.Checked }},
+			{ID: "pinned", Kind: ui.ToggleButton, Text: "Pin panel", Checked: g.pinned, Change: func(e ui.ChangeEvent) { g.pinned = e.Checked }},
+		}},
+		{ID: "controls-separator", Kind: ui.Separator},
+		{ID: "progress", Kind: ui.ProgressBar, Number: g.number / 100, Accessibility: ui.Accessibility{Name: "Operation progress"}},
 		{ID: "show-dialog", Kind: ui.Button, Text: "Open preferences dialog", Activate: func() { g.dialog = true }},
 		{ID: "state", Kind: ui.Label, Text: fmt.Sprintf("Preset %s · project %s", g.selection, g.text)},
 	}}

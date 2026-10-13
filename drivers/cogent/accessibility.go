@@ -291,6 +291,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		if n.Kind == ui.Dialog && (!n.Open || disabled || (r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed)) {
 			return
 		}
+		if n.Kind == ui.Separator {
+			return
+		} // decorative, no accessible target
 		name := n.Accessibility.Name
 		if name == "" {
 			name = n.Text
@@ -354,8 +357,12 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			rangeValue := [2]int{min(anchor, focus), max(anchor, focus) - min(anchor, focus)}
 			x.TextSelection = &rangeValue
 			x.TextFocus = focus
-		case ui.Checkbox:
+		case ui.Checkbox, ui.Switch, ui.ToggleButton:
 			x.Value = n.Checked
+		case ui.ProgressBar:
+			x.Value = n.Number
+			minimum, maximum := float32(0), float32(1)
+			x.Min, x.Max = &minimum, &maximum
 		case ui.Slider, ui.NumberField:
 			x.Value = n.Number
 			minimum, maximum := n.Numeric.Min, n.Numeric.Max
@@ -377,7 +384,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if n.Kind == ui.Button && n.Activate != nil {
 				x.Actions = append(x.Actions, "press")
 			}
-			if n.Kind == ui.Checkbox && n.Change != nil {
+			if (n.Kind == ui.Checkbox || n.Kind == ui.Switch || n.Kind == ui.ToggleButton) && n.Change != nil {
 				x.Actions = append(x.Actions, "press", "set")
 			}
 			if n.Kind == ui.MultilineText {
@@ -543,7 +550,7 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 	}
 	change := ui.ChangeEvent{ID: n.ID, Kind: n.Kind}
 	switch n.Kind {
-	case ui.Checkbox:
+	case ui.Checkbox, ui.Switch, ui.ToggleButton:
 		if action.Kind == "press" {
 			change.Checked = !n.Checked
 		} else if action.Kind == "set" && (action.Value == "true" || action.Value == "false") {

@@ -51,10 +51,12 @@ static uint64_t vellumAXIdentity(void){
  uint64_t next=atomic_load(&vellumAXNextIdentity);
  while(next!=UINT64_MAX){if(atomic_compare_exchange_weak(&vellumAXNextIdentity,&next,next+1))return next;}return 0;
 }
+static BOOL vellumAXCheckable(NSString *role){return [role isEqual:@"checkbox"]||[role isEqual:@"switch"]||[role isEqual:@"toggle-button"];}
 static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"label"])return NSAccessibilityStaticTextRole;
  if([role isEqual:@"button"])return NSAccessibilityButtonRole;
- if([role isEqual:@"checkbox"])return NSAccessibilityCheckBoxRole;
+ if(vellumAXCheckable(role))return NSAccessibilityCheckBoxRole;
+ if([role isEqual:@"progress-bar"])return NSAccessibilityProgressIndicatorRole;
  if([role isEqual:@"text-field"])return NSAccessibilityTextFieldRole;
  if([role isEqual:@"multiline-text"])return NSAccessibilityTextAreaRole;
  if([role isEqual:@"number-field"])return NSAccessibilityIncrementorRole;
@@ -209,7 +211,7 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
  NSString *text=nil;
  if([value isKindOfClass:NSString.class])text=value;
  else if([value isKindOfClass:NSNumber.class])text=[value stringValue];
- if([self.node[@"role"] isEqual:@"checkbox"]&&[value isKindOfClass:NSNumber.class])text=[value boolValue]?@"true":@"false";
+ if(vellumAXCheckable(self.node[@"role"])&&[value isKindOfClass:NSNumber.class])text=[value boolValue]?@"true":@"false";
  if([self.node[@"role"] isEqual:@"text-field"]||[self.node[@"role"] isEqual:@"multiline-text"]){
   // Refuse before UTF8String/C.GoString can truncate NUL or queue a value that
   // the native document cannot represent. Owner model limits still apply.

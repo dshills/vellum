@@ -7,6 +7,10 @@ import (
 
 const (
 	Checkbox      Kind = "checkbox"
+	Switch        Kind = "switch"
+	ToggleButton  Kind = "toggle-button"
+	ProgressBar   Kind = "progress-bar"
+	Separator     Kind = "separator"
 	Selector      Kind = "selector"
 	Slider        Kind = "slider"
 	NumberField   Kind = "number-field"
@@ -28,8 +32,17 @@ type Option struct {
 // the keyboard increment; pointer and typed values need not be step multiples.
 type Numeric struct{ Min, Max, Step float32 }
 
+// Orientation sets a progress bar or separator's direction. The zero value
+// selects horizontal; these display controls never join keyboard focus order.
+type Orientation string
+
+const (
+	Horizontal Orientation = "horizontal"
+	Vertical   Orientation = "vertical"
+)
+
 // ChangeEvent requests a model edit. The relevant payload is Checked for
-// Checkbox, Number for Slider/NumberField, Text for TextField, and SelectedID
+// Checkbox/Switch/ToggleButton, Number for Slider/NumberField, Text for TextField, and SelectedID
 // for Selector/Tabs. Controlled nodes reflect the accepted value on redraw.
 type ChangeEvent struct {
 	ID               string
@@ -59,7 +72,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs:
+	case Button, Checkbox, Switch, ToggleButton, Selector, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs:
 		return true
 	}
 	return false
@@ -88,6 +101,20 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Orientation != "" && n.Kind != ProgressBar && n.Kind != Separator {
+		return fmt.Errorf("ui: Orientation belongs only on progress bars and separators")
+	}
+	if n.Orientation != "" && n.Orientation != Horizontal && n.Orientation != Vertical {
+		return fmt.Errorf("ui: invalid display orientation %q", n.Orientation)
+	}
+	if n.Kind == ProgressBar {
+		if !finite(n.Number) || n.Number < 0 || n.Number > 1 {
+			return fmt.Errorf("ui: progress requires a finite fraction within 0..1")
+		}
+	}
+	if (n.Kind == ProgressBar || n.Kind == Separator) && (n.Change != nil || n.Activate != nil) {
+		return fmt.Errorf("ui: display-only controls cannot have input callbacks")
+	}
 	if n.Kind == DataTree {
 		if n.Tree == nil {
 			return fmt.Errorf("ui: data tree requires an Outline")
