@@ -1,0 +1,199 @@
+{
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "review_kind": "independent_read_only_final_image_clipping_test_delta_review",
+  "created_utc": "2026-10-13T20:05:57.475693+00:00",
+  "base_commit": "10e7611f93214838dda1ca50c11606f17efd7cb6",
+  "source_manifest": "source-final-v2.json",
+  "source_manifest_sha256": "db27fec10915189a8cafa710a01aa07f7445a5ae108b2dcfac64f00eaa15780b",
+  "candidate_manifest_sha256": "db27fec10915189a8cafa710a01aa07f7445a5ae108b2dcfac64f00eaa15780b",
+  "reviewed_count": 16,
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/docs/controls.md": "24c97b1af2cbb0bc2b6cf2e603e07d781a2e8272138301e1aace5c2f9f7fa85b",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility.go": "9e1bb409b7f91fc07741b7f090a0cfa3132b67089e3c5201b833699e5cccf6a2",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main.go": "fb01e7b78ae7946514de6b1e263feb5cc1c0a407fc4144c9ed26676089d7dd8f",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main_test.go": "9653389ad51daa2f918415992de9ef2073198dc9a7fe716cf30b56289856b7f1",
+    "/private/tmp/vellum-large-data/drivers/cogent/controls.go": "52ee0f560e5f28cbf63f21eb5fb786dccc62f586ba5686c830f763c5124a09d8",
+    "/private/tmp/vellum-large-data/drivers/cogent/images.go": "27cd981b73a5ee429ca6f9274fe5577497057f9f92e932461b1e856401710955",
+    "/private/tmp/vellum-large-data/drivers/cogent/images_darwin_test.go": "24f786929338b83630c508ca89452dff27ad670d010c8e1caca17c313ac91561",
+    "/private/tmp/vellum-large-data/drivers/cogent/images_offscreen_test.go": "31c044231c25f3fe587b924303abd6d66626a5b6b579f38f91042450968c99a0",
+    "/private/tmp/vellum-large-data/drivers/cogent/images_test.go": "03e9f0f9ea63906d987905838325e1f4e6a20497573bba0069b9dfa01a0b508a",
+    "/private/tmp/vellum-large-data/specs/controls.md": "b15c743c7ccefa94779d75a62e2d74387dfc85c5b52565f80e0a4c7bfcd293b5",
+    "/private/tmp/vellum-large-data/specs/images.md": "d56f26739acffb7c5babb17a1ff1d12b6ccc11a7142ec68e3af87d685d15f0ae",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "6764471880cb98ef80ef8040d68a73dbef62cd64c41385899558c02dbb037325",
+    "/private/tmp/vellum-large-data/ui/controls.go": "a861f85f37e6fcdb97e77d3d0458ded36da24f3980c1d01cdb844ca4ef59800c",
+    "/private/tmp/vellum-large-data/ui/images.go": "5ab63f915b47cceabed75690443adba77fbe0f1daac11a9bbd73555361ec4cc8",
+    "/private/tmp/vellum-large-data/ui/images_test.go": "805ed5ab01d3b58f4ec6f5ea9274131243414676e4545c82a6553bf7ea56f821",
+    "/private/tmp/vellum-large-data/ui/node.go": "9994bc8371f366e7fac0aad071bcf01d56ca16dba39cf617001b10053f93a2e2"
+  },
+  "root_sha256": {
+    "docs/controls.md": "24c97b1af2cbb0bc2b6cf2e603e07d781a2e8272138301e1aace5c2f9f7fa85b",
+    "drivers/cogent/accessibility.go": "9e1bb409b7f91fc07741b7f090a0cfa3132b67089e3c5201b833699e5cccf6a2",
+    "drivers/cogent/cmd/gallery/main.go": "fb01e7b78ae7946514de6b1e263feb5cc1c0a407fc4144c9ed26676089d7dd8f",
+    "drivers/cogent/cmd/gallery/main_test.go": "9653389ad51daa2f918415992de9ef2073198dc9a7fe716cf30b56289856b7f1",
+    "drivers/cogent/controls.go": "52ee0f560e5f28cbf63f21eb5fb786dccc62f586ba5686c830f763c5124a09d8",
+    "drivers/cogent/images.go": "27cd981b73a5ee429ca6f9274fe5577497057f9f92e932461b1e856401710955",
+    "drivers/cogent/images_darwin_test.go": "24f786929338b83630c508ca89452dff27ad670d010c8e1caca17c313ac91561",
+    "drivers/cogent/images_offscreen_test.go": "31c044231c25f3fe587b924303abd6d66626a5b6b579f38f91042450968c99a0",
+    "drivers/cogent/images_test.go": "03e9f0f9ea63906d987905838325e1f4e6a20497573bba0069b9dfa01a0b508a",
+    "specs/controls.md": "b15c743c7ccefa94779d75a62e2d74387dfc85c5b52565f80e0a4c7bfcd293b5",
+    "specs/images.md": "d56f26739acffb7c5babb17a1ff1d12b6ccc11a7142ec68e3af87d685d15f0ae",
+    "specs/macos-completion.md": "6764471880cb98ef80ef8040d68a73dbef62cd64c41385899558c02dbb037325",
+    "ui/controls.go": "a861f85f37e6fcdb97e77d3d0458ded36da24f3980c1d01cdb844ca4ef59800c",
+    "ui/images.go": "5ab63f915b47cceabed75690443adba77fbe0f1daac11a9bbd73555361ec4cc8",
+    "ui/images_test.go": "805ed5ab01d3b58f4ec6f5ea9274131243414676e4545c82a6553bf7ea56f821",
+    "ui/node.go": "9994bc8371f366e7fac0aad071bcf01d56ca16dba39cf617001b10053f93a2e2"
+  },
+  "immutable_snapshot_sha256": {
+    "/private/tmp/vellum-macos-image-control/candidate-v3/docs/controls.md": "24c97b1af2cbb0bc2b6cf2e603e07d781a2e8272138301e1aace5c2f9f7fa85b",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/accessibility.go": "9e1bb409b7f91fc07741b7f090a0cfa3132b67089e3c5201b833699e5cccf6a2",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/cmd/gallery/main.go": "fb01e7b78ae7946514de6b1e263feb5cc1c0a407fc4144c9ed26676089d7dd8f",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/cmd/gallery/main_test.go": "9653389ad51daa2f918415992de9ef2073198dc9a7fe716cf30b56289856b7f1",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/controls.go": "52ee0f560e5f28cbf63f21eb5fb786dccc62f586ba5686c830f763c5124a09d8",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/images.go": "27cd981b73a5ee429ca6f9274fe5577497057f9f92e932461b1e856401710955",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/images_darwin_test.go": "24f786929338b83630c508ca89452dff27ad670d010c8e1caca17c313ac91561",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/images_offscreen_test.go": "31c044231c25f3fe587b924303abd6d66626a5b6b579f38f91042450968c99a0",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/drivers/cogent/images_test.go": "03e9f0f9ea63906d987905838325e1f4e6a20497573bba0069b9dfa01a0b508a",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/specs/controls.md": "b15c743c7ccefa94779d75a62e2d74387dfc85c5b52565f80e0a4c7bfcd293b5",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/specs/images.md": "d56f26739acffb7c5babb17a1ff1d12b6ccc11a7142ec68e3af87d685d15f0ae",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/specs/macos-completion.md": "6764471880cb98ef80ef8040d68a73dbef62cd64c41385899558c02dbb037325",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/ui/controls.go": "a861f85f37e6fcdb97e77d3d0458ded36da24f3980c1d01cdb844ca4ef59800c",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/ui/images.go": "5ab63f915b47cceabed75690443adba77fbe0f1daac11a9bbd73555361ec4cc8",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/ui/images_test.go": "805ed5ab01d3b58f4ec6f5ea9274131243414676e4545c82a6553bf7ea56f821",
+    "/private/tmp/vellum-macos-image-control/candidate-v3/ui/node.go": "9994bc8371f366e7fac0aad071bcf01d56ca16dba39cf617001b10053f93a2e2"
+  },
+  "previous_review_sha256": {
+    "review-v1.json": "7b75c2dbbdafc98b001a3692b774f1ab9cbff7d6bc2ab648a13401b88057d351",
+    "review-v1.md": "43c0cc17a140cd65b192f0ba81c31ef71bc2d6a63341b5fa1bad5b3a79a6aa5a"
+  },
+  "previous_manifest_sha256": "e2f766bbff0f112ddee1a9940152f48e382baca30dd3a7af10a1380dbda42fe2",
+  "delta_from_prior_approval": [
+    "drivers/cogent/images_offscreen_test.go"
+  ],
+  "unchanged_prior_source_count": 15,
+  "production_docs_gallery_unchanged_from_original": true,
+  "findings": [],
+  "unresolved_defects": [],
+  "test_delta": {
+    "test": "TestManagedImageManualCenteredFitAndCompletedPixels/cover",
+    "new_assertion": "Completed scene background outside image content but inside unmasked centered cover source footprint.",
+    "image_box": [
+      120,
+      120
+    ],
+    "cover_width": 240,
+    "relative_probe": [
+      136,
+      60
+    ],
+    "expected_pixel": [
+      248,
+      248,
+      248,
+      255
+    ],
+    "faulty_pixel": [
+      0,
+      0,
+      240,
+      255
+    ],
+    "not_relaxed_previous_assertions": true
+  },
+  "observed_author_receipts": {
+    "image-native-v5": {
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-v",
+        "-tags=offscreen",
+        "-run",
+        "^(TestManagedImage|TestGalleryManagedImage)",
+        ".",
+        "./cmd/gallery"
+      ],
+      "source_before_after_exact": true,
+      "source_count": 16,
+      "source_matches_final16": true,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false,
+      "classification": "Corrected exact final fixture passes."
+    },
+    "unclipped-v1": {
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-v",
+        "-tags=offscreen",
+        "-overlay=/private/tmp/vellum-macos-image-control/negative/unclipped-v1/overlay.json",
+        "-run",
+        "^TestManagedImageManualScrollClipPreservesSourceMapping$",
+        "."
+      ],
+      "source_before_after_exact": true,
+      "source_count": 16,
+      "source_matches_final16": false,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false,
+      "classification": "Weak faulty-source run: exit0 does not prove missing image-owned clip is detected."
+    },
+    "unclipped-v2": {
+      "exit_code": 1,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-v",
+        "-tags=offscreen",
+        "-overlay=/private/tmp/vellum-macos-image-control/negative/unclipped-v1/overlay.json",
+        "-run",
+        "^TestManagedImageManualCenteredFitAndCompletedPixels/cover$",
+        "."
+      ],
+      "source_before_after_exact": true,
+      "source_count": 16,
+      "source_matches_final16": true,
+      "prepared_count": 6198,
+      "prepared_before_after_exact": true,
+      "live_tests": false,
+      "headless_gpu_requested": false,
+      "classification": "Meaningful negative: compiled same final cover fixture, actual out-of-content blue pixel assertion failure."
+    }
+  },
+  "reviewed_receipt_sha256": {
+    "source-final-v1.json": "e2f766bbff0f112ddee1a9940152f48e382baca30dd3a7af10a1380dbda42fe2",
+    "source-final-v2.json": "db27fec10915189a8cafa710a01aa07f7445a5ae108b2dcfac64f00eaa15780b",
+    "source-candidate-v3.json": "db27fec10915189a8cafa710a01aa07f7445a5ae108b2dcfac64f00eaa15780b",
+    "review-v1.json": "7b75c2dbbdafc98b001a3692b774f1ab9cbff7d6bc2ab648a13401b88057d351",
+    "review-v1.md": "43c0cc17a140cd65b192f0ba81c31ef71bc2d6a63341b5fa1bad5b3a79a6aa5a",
+    "negative/unclipped-v1/overlay.json": "5b842bd4ab41f8612116ed596a44493004703c4deceee8f6e6d17acec163cf36",
+    "negative/unclipped-v1/images.go": "4703f30aacf2972562a0da81073b3fa78aaa76f5537c5814369c0721c88ed201",
+    "image-native-v5.json": "4b1538513d85b3240b7a5e2fd49076a1adbb35888b9e3439e3129114e5991de3",
+    "image-native-v5.stdout": "c352ca8def0fa4e15a547c07df823df6b86880a107044386a63cc91b8e70d30d",
+    "image-native-v5.stderr": "f2ac8214ebe84751c8dc3bbf0ed6fb76aee135dc931743b5310247f73be8305c",
+    "unclipped-v1.json": "747fcf315094d2c0ca305a1946666a1d7aa68f0c062946ad00ecf7424ef8c483",
+    "unclipped-v1.stdout": "5e5676b3cf3eff7a6b06a024ea121467bf7a0b6cb5ef1ba151e73861a47fbbc6",
+    "unclipped-v1.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+    "unclipped-v2.json": "3f18b1b2b5681381c1525976859ecdbeed28831a4695a6ad82fd0d02f030cf60",
+    "unclipped-v2.stdout": "259f859a35394984e479dd42eeae95f2618af11f851bce5df8485c39f255cddb",
+    "unclipped-v2.stderr": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a"
+  },
+  "notes_sha256": "2b34df8faadd680e8d1140aa89fbe73f4cc1920f8a2f4c158615b7235c7bcf2e",
+  "reviewer_executed_tests_or_native": false,
+  "reviewer_executed_producers_providers_or_git": false,
+  "provider_scope": "No provider review result yet certified for this checkpoint.",
+  "execution_status": "Narrow final normal/meaningful-negative receipts inspected; broader final qualification remains separate.",
+  "limits": [
+    "No physical display/input/native-window or human VoiceOver acceptance.",
+    "No direct GPU image/tile-upload, peak/native memory, performance, rights or full Mac completion claim.",
+    "Only source/hash/log inspection and certificate writes performed."
+  ]
+}

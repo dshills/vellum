@@ -10,6 +10,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
 | Bundled icon | `ui.Icon` | `Icon`, optional alternate `Text`/accessible name |
+| Image preview | `ui.Image` | Immutable `Image`, `Fit`, alternate `Text`/accessible name |
 | Checkbox | `ui.Checkbox` | `Checked`, `Change` |
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
@@ -142,3 +143,26 @@ ui.Node{ID: "search", Kind: ui.Button, Icon: ui.SymbolSearch,
 The application supplies search. The gallery's Icons and actions page shows the
 built-in catalog and action appearances. Presentation changes keep each control's
 identity, callback and accepted state; icons add no private accessible action.
+
+`ui.Image` displays an immutable `*canvas.TiledImage` shared with other windows or
+GPU canvases. Fit is ImageContain/default, ImageCover or ImageStretch. Contain and
+cover preserve aspect, center the source, and respectively letterbox or crop.
+Styles determine the box; fitting does not change it. The default preferred size
+uses source pixels as device-independent pixels, capped at 256 on the longest
+edge. A single minimum dimension derives its partner from source aspect.
+An unlabeled preview is decorative; Text/Accessibility.Name adds alternate text
+and a passive image role. It adds no Tab stop or action.
+
+```go
+ui.Node{ID: "preview", Kind: ui.Image, Image: picture, Fit: ui.ImageContain,
+    Text: "Document preview", Style: ui.Style{
+        MinSize: ui.Some(ui.Size{Width: 320, Height: 180}),
+    }}
+```
+
+The application owns picture. Construct it with canvas.NewTiledImage from NRGBA
+pixels, or ui.DecodeImage from a caller-owned PNG/JPEG reader on a worker.
+DecodeImage bounds encoded data to 32 MiB and retains the existing source limits;
+reader cancellation and temporary decode memory remain caller concerns. Source
+replacement/patches preserve control identity and do not mutate earlier versions.
+The gallery's Images page demonstrates fitting, transparency and source changes.

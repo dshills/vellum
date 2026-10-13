@@ -7,6 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"image"
 	"image/color"
 	"os"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"cogentcore.org/core/core"
 
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
 )
@@ -26,10 +28,27 @@ type gallery struct {
 	split                float32
 	dialog               bool
 	focus                ui.FocusRequest
+	picture              *canvas.TiledImage
+	imageFit             ui.ImageFit
 }
 
 func newGallery() *gallery {
-	return &gallery{enabled: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35}
+	return &gallery{enabled: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
+}
+
+func galleryImage() *canvas.TiledImage {
+	pixels := image.NewNRGBA(image.Rect(0, 0, 96, 32))
+	palette := []color.NRGBA{{R: 240, G: 64, B: 48, A: 255}, {R: 48, G: 192, B: 96, A: 255}, {R: 48, G: 96, B: 240, A: 128}}
+	for y := range 32 {
+		for x := range 96 {
+			pixels.SetNRGBA(x, y, palette[x/32])
+		}
+	}
+	source, err := canvas.NewTiledImage(pixels)
+	if err != nil {
+		panic(err)
+	} // The fixed, private source satisfies admission.
+	return source
 }
 func (g *gallery) view() ui.Node {
 	numeric := ui.Numeric{Min: 0, Max: 100, Step: 1}
@@ -77,9 +96,27 @@ func (g *gallery) view() ui.Node {
 		{ID: "quiet-action", Kind: ui.Button, Text: "Quiet", Appearance: ui.ButtonQuiet},
 		{ID: "tool-action", Kind: ui.Button, Icon: ui.SymbolSearch, Appearance: ui.ButtonTool, Accessibility: ui.Accessibility{Name: "Search", Help: "Compact icon-only tool"}, Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++; g.tab = "controls" }},
 	}}}, symbols.Children...)
+	images := ui.Node{ID: "images", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
+		{ID: "image-instructions", Kind: ui.Label, Text: "Immutable shared pixels. Contain shows the full image; cover crops centrally; stretch fills both axes."},
+		{ID: "image-fit", Kind: ui.SegmentedControl, SelectedID: string(g.imageFit), Accessibility: ui.Accessibility{Name: "Image fit"}, Options: []ui.Option{{ID: string(ui.ImageContain), Label: "Contain"}, {ID: string(ui.ImageCover), Label: "Cover"}, {ID: string(ui.ImageStretch), Label: "Stretch"}}, Change: func(e ui.ChangeEvent) { g.imageFit = ui.ImageFit(e.SelectedID) }},
+		{ID: "image-preview", Kind: ui.Image, Image: g.picture, Fit: g.imageFit, Text: "Three color strips, with transparency in the blue strip", Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 320, Height: 160})}},
+		{ID: "image-replace", Kind: ui.Button, Text: "Replace first strip", Activate: func() {
+			patch := image.NewNRGBA(image.Rect(0, 0, 32, 32))
+			for y := range 32 {
+				for x := range 32 {
+					patch.SetNRGBA(x, y, color.NRGBA{R: 240, G: 192, A: 255})
+				}
+			}
+			source, err := g.picture.WithPatch(patch.Bounds(), patch)
+			if err != nil {
+				panic(err)
+			}
+			g.picture = source
+		}},
+	}}
 	return ui.Node{ID: "gallery", Kind: ui.Column, Grow: true, Focus: g.focus, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{
 		{ID: "title", Kind: ui.Label, Text: "Vellum controls gallery", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 24, Weight: 600})}},
-		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
+		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
 		{ID: "preferences", Kind: ui.Dialog, Text: "Preferences", Open: g.dialog, Dismiss: func() { g.dialog = false }, Children: []ui.Node{
 			{ID: "dialog-description", Kind: ui.Label, Text: "Native modal dialog with retained content. Close with Escape or the Close button."},
 			{ID: "dialog-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name in preferences"}},

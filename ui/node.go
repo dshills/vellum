@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/editor"
 	"github.com/dshills/vellum/virtual"
 )
@@ -17,6 +18,7 @@ const (
 	Label     Kind = "label"
 	Button    Kind = "button"
 	Icon      Kind = "icon"
+	Image     Kind = "image"
 	Extension Kind = "extension"
 )
 
@@ -35,6 +37,10 @@ type Node struct {
 	Icon Symbol
 	// Appearance changes Button presentation without changing its action.
 	Appearance ButtonAppearance
+	// Image holds immutable shared pixels for an Image node. Fit changes
+	// painting within its content box; Text/Accessibility.Name are alternate text.
+	Image *canvas.TiledImage
+	Fit   ImageFit
 	// Editor owns multiline document state and history; one live native binding is supported.
 	Editor *editor.Model
 	// Grid is caller-owned. One live managed binding per Grid is supported.
@@ -125,7 +131,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane:
-		case Label, Button, Icon, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
+		case Label, Button, Icon, Image, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

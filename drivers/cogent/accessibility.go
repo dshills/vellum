@@ -296,11 +296,11 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		if n.Kind == ui.Dialog && (!n.Open || disabled || (r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed)) {
 			return
 		}
-		if n.Kind == ui.Separator || (n.Kind == ui.Icon && strings.TrimSpace(n.Accessibility.Name) == "" && strings.TrimSpace(n.Text) == "") {
+		if n.Kind == ui.Separator || ((n.Kind == ui.Icon || n.Kind == ui.Image) && strings.TrimSpace(n.Accessibility.Name) == "" && strings.TrimSpace(n.Text) == "") {
 			return
 		} // decorative, no accessible target
 		name := n.Accessibility.Name
-		if name == "" || (n.Kind == ui.Icon && strings.TrimSpace(name) == "") {
+		if name == "" || ((n.Kind == ui.Icon || n.Kind == ui.Image) && strings.TrimSpace(name) == "") {
 			name = n.Text
 		}
 		x := accessibilityNode{ID: accessibilityManagedID(n.ID), DomainID: n.ID, Parent: parent, Role: string(n.Kind), Name: name, Help: n.Accessibility.Help, Disabled: disabled, Focusable: ui.IsFocusable(n.Kind), Actions: []string{}}

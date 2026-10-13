@@ -143,6 +143,8 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		icon.Styler(func(s *styles.Style) { s.IconSize.Set(units.Dp(24)) })
 		icon.FinalStyler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
 		widget = icon
+	case ui.Image:
+		widget = tree.New[managedImage](parent)
 	case ui.SplitPane:
 		widget = mountSplit(parent, r)
 	case ui.Toolbar, ui.StatusBar, ui.FormGroup:
@@ -361,7 +363,7 @@ func requestControlRestore(r *record) {
 
 func syncSemantics(r *record) {
 	name := r.node.Accessibility.Name
-	if name == "" || (r.node.Kind == ui.Icon && strings.TrimSpace(name) == "") {
+	if name == "" || ((r.node.Kind == ui.Icon || r.node.Kind == ui.Image) && strings.TrimSpace(name) == "") {
 		name = r.node.Text
 	}
 	disabled := controlDisabled(r)
@@ -424,6 +426,8 @@ func syncControl(r *record, previous ui.Node) error {
 		w.SetText(html.EscapeString(r.node.Text)).SetIcon(nativeSymbol(r.node.Icon)).SetType(nativeButtonAppearance(r.node.Appearance))
 	case *core.Icon:
 		w.SetIcon(nativeSymbol(r.node.Icon))
+	case *managedImage:
+		w.source, w.fit = r.node.Image, r.node.Fit
 	case *core.Switch:
 		// Resetting Checked alone leaves a segmented toggle's checked styling
 		// behind when the owner declines a native change without changing state.
@@ -512,7 +516,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if nativeValueChanged || restoring || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if nativeValueChanged || restoring || previous.Image != r.node.Image || previous.Fit != r.node.Fit || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
 	}
 	if refused != nil {
@@ -763,6 +767,10 @@ func disposeControl(r *record) {
 	}
 	if r.control != nil {
 		r.control.retired = true
+		if image, ok := r.widget.(*managedImage); ok {
+			image.source = nil
+			r.node.Image = nil
+		}
 		r.control.fieldFocusLost.Store(false)
 		r.control.fieldNativeActive.Store(false)
 		if field, ok := r.widget.(*core.TextField); ok {

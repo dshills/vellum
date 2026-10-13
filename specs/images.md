@@ -42,3 +42,13 @@ window baselines, removal, rebuild, resizing and closure. A full-image replaceme
 from unrelated immutable tile identities intentionally requires a complete upload.
 Native clipped composition, broader 3D/compute/float/asynchronous-readback P4 work,
 sustained performance and physical device-loss qualification remain separate.
+
+## Standard managed image element
+
+`ui.Image` reuses immutable TiledImage source data in the ordinary retained scene
+painter, with centered contain/cover and stretch fitting. Its layout, clipping,
+alternate-text, bounded PNG/JPEG decoding and retirement contracts are specified
+in [controls](controls.md). This extends standard UI image previews; it does not
+inherit MeshCanvas's direct GPU texture/tile-upload qualification. One source can
+be shared by both consumers. Decoder/conversion temporary memory, physical Mac
+display/accessibility and sustained native rendering remain separate gates.

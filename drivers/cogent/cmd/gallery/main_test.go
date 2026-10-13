@@ -120,3 +120,17 @@ func TestGalleryIconsAndActionAppearances(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGalleryManagedImageFitAndReplacement(t *testing.T) {
+	g := newGallery()
+	old := g.picture
+	node(g.view(), "image-fit").Change(ui.ChangeEvent{SelectedID: string(ui.ImageCover)})
+	node(g.view(), "image-replace").Activate()
+	preview := node(g.view(), "image-preview")
+	if preview.Kind != ui.Image || preview.Fit != ui.ImageCover || preview.Image == old || preview.Image.NRGBAAt(4, 4).G != 192 || old.NRGBAAt(4, 4).G != 64 {
+		t.Fatal("image replacement did not retain immutable prior source")
+	}
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+}

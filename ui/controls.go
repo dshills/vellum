@@ -108,6 +108,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := validateImage(n); err != nil {
+		return err
+	}
 	if err := validateIcon(n); err != nil {
 		return err
 	}

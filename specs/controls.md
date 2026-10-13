@@ -367,3 +367,39 @@ their contracts. App-local theme and explicit styles remain authoritative.
 Owner delivery revalidates the current callback and disabled ancestry; removal
 retires queued button activations. These software/native-object checks do not
 qualify physical Mac input, human VoiceOver or native memory/performance.
+
+## Managed image control
+
+`ui.Image` is a passive leaf whose Image is a nonempty immutable
+`*canvas.TiledImage`. It reuses the retained-image ownership/patch contract and
+can share one source between windows. It rejects children, Activate/Change, nil
+or zero sources. Other kinds refuse Image/Fit. Rendering performs no file/network
+lookup or decoding; replacement is an owner-accepted source pointer change.
+
+`Fit` defaults to ImageContain (preserve aspect and center all source pixels).
+ImageCover preserves aspect, fills the box and crops centrally; ImageStretch
+fills both axes independently. Fit changes painting, not the layout box. Style
+minimum/maximum and Grow determine that box. Without explicit dimensions the
+preferred size uses source pixels as device-independent pixels, with the longest
+edge capped at 256; one nonzero minimum derives the other axis from source aspect.
+The preferred size respects maximums. Removing styles restores these defaults.
+Padding is outside the image's content. Painting clips to visible content, retains
+the full unscrolled source mapping, honors opacity/ancestor masks, and blends
+straight-alpha pixels through the scene painter. It does not allocate a scaled
+per-widget bitmap or promise direct GPU/partial-texture upload.
+
+Text supplies alternate text; Accessibility.Name overrides it. A nonblank name
+exposes a passive Mac image role; an unlabeled image is decorative. It adds no
+Tab stop or semantic action. Semantic geometry is the visible widget rectangle.
+Source, fit and style updates retain widget identity. Removal drops the widget's
+source reference; the immutable caller-owned image remains usable.
+
+`ui.DecodeImage(io.Reader)` accepts PNG/JPEG on a caller-owned reader. It reads at
+most 32 MiB plus one refusal byte, verifies bounded dimensions before decoding,
+then normalizes/copies pixels into TiledImage. It never opens a path or URL.
+Encoded byte bounds and the existing 8192-axis/256-MiB source bounds are separate
+from decoder/conversion temporary memory and elapsed reader time. Large decoding
+belongs on a cancellable application worker; the caller owns reader cancellation.
+Unknown formats, malformed images, oversized input/dimensions and reader errors
+are refused. Human Mac input/display/accessibility and native memory/performance
+acceptance remain separate from software rendering and inert Cocoa role checks.

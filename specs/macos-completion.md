@@ -428,3 +428,10 @@ Mac accessibility. Controlled identity and owner-window activation retirement
 apply across presentation changes. The [controls contract](controls.md) records
 the API; software raster/input and inert Cocoa image roles remain separate from
 physical interaction, human VoiceOver and the existing memory/performance gates.
+
+The standard control set adds a managed Image over the existing immutable tiled
+source, centered contain/cover and stretch fitting, visible-content clipping,
+alternate text and bounded worker PNG/JPEG decoding. Independent preview/source
+replacement tests advance application use without conflating ordinary scene
+painting with MeshCanvas's direct GPU image workload. Physical Mac/VoiceOver,
+native memory and sustained performance remain open.

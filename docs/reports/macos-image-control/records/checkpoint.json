@@ -1,0 +1,53 @@
+{
+  "result": "REVIEWED_IMAGE_CONTROL",
+  "base_commit": "10e7611f93214838dda1ca50c11606f17efd7cb6",
+  "source_manifest_sha256": "db27fec10915189a8cafa710a01aa07f7445a5ae108b2dcfac64f00eaa15780b",
+  "qualification_sha256": "d5f71786de669ea5687f1f3c6c943db51fc83e4af840e9da5915708c1925ada8",
+  "source_review_sha256": "ca50776cea42222ae84fe92fce28d29f842ce38c2d05bde9317c7b77cf20678e",
+  "evidence_review_sha256": "413e3ecd561ff75c7a47a4f8ecbfb246a792aaa57dd5b948a3f0263199d7bcf8",
+  "report_sha256": "dd37539793c555bb9767f1dbbb9214c6ea8cab28ee06d89cd75e4eab671180ca",
+  "archive": {
+    "sha256": "59b7aab89f51d237463049b5d7b799b7ee85e9c8ecfaafbca0f8e21458c43d1e",
+    "members": 184,
+    "index_sha256": "1869cda3478aeaacfdda4b8c8e2a4384071c3cb43d16d7fba9038bf94bbe79cd"
+  },
+  "prepared_files": 6198,
+  "command_receipts": 25,
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "prism_findings_resolved": true,
+  "prism_sha256": "6d08b576075f2ff7dd5d924f5616fcd59845b2fe8b497308cdde36a52af539b3",
+  "prism_raw_exit_code": 0,
+  "provider_disposition": "One complete final16 provider run, raw0/no findings; exact source internally approved.",
+  "source": {
+    "docs/controls.md": "24c97b1af2cbb0bc2b6cf2e603e07d781a2e8272138301e1aace5c2f9f7fa85b",
+    "drivers/cogent/accessibility.go": "9e1bb409b7f91fc07741b7f090a0cfa3132b67089e3c5201b833699e5cccf6a2",
+    "drivers/cogent/cmd/gallery/main.go": "fb01e7b78ae7946514de6b1e263feb5cc1c0a407fc4144c9ed26676089d7dd8f",
+    "drivers/cogent/cmd/gallery/main_test.go": "9653389ad51daa2f918415992de9ef2073198dc9a7fe716cf30b56289856b7f1",
+    "drivers/cogent/controls.go": "52ee0f560e5f28cbf63f21eb5fb786dccc62f586ba5686c830f763c5124a09d8",
+    "drivers/cogent/images.go": "27cd981b73a5ee429ca6f9274fe5577497057f9f92e932461b1e856401710955",
+    "drivers/cogent/images_darwin_test.go": "24f786929338b83630c508ca89452dff27ad670d010c8e1caca17c313ac91561",
+    "drivers/cogent/images_offscreen_test.go": "31c044231c25f3fe587b924303abd6d66626a5b6b579f38f91042450968c99a0",
+    "drivers/cogent/images_test.go": "03e9f0f9ea63906d987905838325e1f4e6a20497573bba0069b9dfa01a0b508a",
+    "specs/controls.md": "b15c743c7ccefa94779d75a62e2d74387dfc85c5b52565f80e0a4c7bfcd293b5",
+    "specs/images.md": "d56f26739acffb7c5babb17a1ff1d12b6ccc11a7142ec68e3af87d685d15f0ae",
+    "specs/macos-completion.md": "6764471880cb98ef80ef8040d68a73dbef62cd64c41385899558c02dbb037325",
+    "ui/controls.go": "a861f85f37e6fcdb97e77d3d0458ded36da24f3980c1d01cdb844ca4ef59800c",
+    "ui/images.go": "5ab63f915b47cceabed75690443adba77fbe0f1daac11a9bbd73555361ec4cc8",
+    "ui/images_test.go": "805ed5ab01d3b58f4ec6f5ea9274131243414676e4545c82a6553bf7ea56f821",
+    "ui/node.go": "9994bc8371f366e7fac0aad071bcf01d56ca16dba39cf617001b10053f93a2e2"
+  },
+  "promotion_producer_sha256": "d6653f6cedcee58361d195bedc8be95c25dc5c7b5e0ee1c47c31e7a1b33823f8",
+  "checkpoint_producer_sha256": "ea21bfff4dc3b4fa73418c18336af3558dc3a595df5dbd3a5aa24b977ba8560b",
+  "limits": [
+    "Physical Mac display/input/VoiceOver, native/GPU memory, sustained performance/endurance, distribution/release and full Mac completion remain open.",
+    "Exact final16 root leaves and unchanged prepared6198 identities are scoped endpoints, not complete compiler/SDK/native binary closure.",
+    "Ordinary source transforms/custom masks are safely refused by scene packet preflight. No direct GPU image/tile-upload claim.",
+    "Retained pixel bounds do not bound decoder/conversion temporary memory or reader elapsed time; caller-owned cancellation and worker construction apply.",
+    "Localized new-code mutations are not complete original-production builds. Earlier unmasked scroll mutation passed a weak image-owned-clipping oracle.",
+    "Software DPI320/two-window frames, direct fixtures, inert Cocoa selectors and one inspected capture differ from physical Mac/native heap evidence.",
+    "Initial Name/filter-boundary fixture mistakes, intermediate payload gaps and the first capture without forwarded environment are preserved. Gallery is BUILD ONLY."
+  ]
+}
