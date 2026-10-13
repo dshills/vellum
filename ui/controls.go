@@ -108,6 +108,9 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if err := validateIcon(n); err != nil {
+		return err
+	}
 	if n.Kind == SplitPane {
 		bounds := SplitRange(n.Numeric)
 		if len(n.Children) != 2 || n.Activate != nil || bounds.Min <= 0 || bounds.Max >= 1 || bounds.Validate(n.Number) != nil {

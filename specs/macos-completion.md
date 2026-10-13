@@ -420,3 +420,11 @@ keyboard divider input, visual Tab order and Mac split-group/divider semantics.
 Offscreen input/geometry/rendering and inert Cocoa roles are scoped evidence;
 physical Mac input, human VoiceOver and the remaining memory/performance gates
 remain open. Nested SplitPane descriptors support larger adjustable layouts.
+
+The control vocabulary adds a passive Icon with a bounded portable symbol catalog,
+icon-bearing buttons/toggles and primary/secondary/quiet/toolbar button appearance.
+Icon-only actions require accessible labels; decorative symbols are omitted from
+Mac accessibility. Controlled identity and owner-window activation retirement
+apply across presentation changes. The [controls contract](controls.md) records
+the API; software raster/input and inert Cocoa image roles remain separate from
+physical interaction, human VoiceOver and the existing memory/performance gates.

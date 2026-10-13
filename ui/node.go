@@ -16,6 +16,7 @@ const (
 	Row       Kind = "row"
 	Label     Kind = "label"
 	Button    Kind = "button"
+	Icon      Kind = "icon"
 	Extension Kind = "extension"
 )
 
@@ -29,6 +30,11 @@ type Node struct {
 	ID   string
 	Kind Kind
 	Text string
+	// Icon is bundled artwork for Icon/Button/ToggleButton. Text is alternate
+	// text for an Icon. Icon-only actions require Accessibility.Name.
+	Icon Symbol
+	// Appearance changes Button presentation without changing its action.
+	Appearance ButtonAppearance
 	// Editor owns multiline document state and history; one live native binding is supported.
 	Editor *editor.Model
 	// Grid is caller-owned. One live managed binding per Grid is supported.
@@ -119,7 +125,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane:
-		case Label, Button, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
+		case Label, Button, Icon, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

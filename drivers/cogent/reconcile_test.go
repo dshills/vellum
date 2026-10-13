@@ -46,6 +46,9 @@ func TestKeyedInsertionReorderRemovalAndCallback(t *testing.T) {
 	button := ui.Node{ID: "button", Kind: ui.Button, Activate: func() { clicks++ }}
 	ext := &retainedExtension{}
 	n := frame("root", button, ui.Node{ID: "gpu", Kind: ui.Extension, Custom: ext}, label("remove"))
+	if err := a.Open(app.Window{ID: "main", Title: "Headless", Width: 400, Height: 240, View: func() ui.Node { return n }}); err != nil {
+		t.Fatal(err)
+	}
 	r, err := reconcile(host, nil, n, a, "main")
 	if err != nil {
 		t.Fatal(err)
@@ -55,6 +58,10 @@ func TestKeyedInsertionReorderRemovalAndCallback(t *testing.T) {
 	oldGPU := ext.widget
 	oldGPU.SetProperty("scroll-position", 42)
 	removed := findRecord(r, "remove").widget
+	oldButton.AsWidget().Send(events.Click)
+	if clicks != 0 {
+		t.Fatal("button activated before owner delivery")
+	}
 	button.Activate = func() { clicks += 10 }
 	next := frame("root", label("insert"), ui.Node{ID: "gpu", Kind: ui.Extension, Custom: ext}, button)
 	r, err = reconcile(host, r, next, a, "main")
@@ -75,7 +82,7 @@ func TestKeyedInsertionReorderRemovalAndCallback(t *testing.T) {
 			t.Fatal("native child order differs")
 		}
 	}
-	oldButton.AsWidget().Send(events.Click)
+	a.Drain()
 	if clicks != 10 {
 		t.Fatalf("stale callback: %d", clicks)
 	}

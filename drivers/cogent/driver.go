@@ -14,7 +14,6 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
-	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
@@ -481,18 +480,6 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 		r.widget = core.NewFrame(parent)
 	case ui.Label:
 		r.widget = core.NewText(parent)
-	case ui.Button:
-		btn := core.NewButton(parent).SetText(html.EscapeString(n.Text))
-		btn.SetState(n.Disabled, states.Disabled)
-		r.widget = btn
-		btn.OnClick(func(e events.Event) {
-			a.Do(func() {
-				if !controlDisabled(r) && r.node.Activate != nil {
-					r.node.Activate()
-					a.Invalidate(window)
-				}
-			})
-		})
 	case ui.Extension:
 		if ext, ok := n.Custom.(Extension); ok {
 			r.widget = ext.Mount(parent)
@@ -539,11 +526,6 @@ func syncRecord(r *record, n ui.Node) error {
 	case ui.Label:
 		if previous.Text != n.Text || r.widget.(*core.Text).Text != html.EscapeString(n.Text) {
 			r.widget.(*core.Text).SetText(html.EscapeString(n.Text)).Update()
-		}
-	case ui.Button:
-		if previous.Text != n.Text || previous.Disabled != n.Disabled {
-			r.widget.(*core.Button).SetText(html.EscapeString(n.Text)).SetState(n.Disabled, states.Disabled)
-			r.widget.AsWidget().Update()
 		}
 	case ui.Extension:
 		ext, ok := n.Custom.(Extension)

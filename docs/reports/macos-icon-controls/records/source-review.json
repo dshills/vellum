@@ -1,0 +1,138 @@
+{
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "review_kind": "independent_read_only_document_formatting_delta_review",
+  "created_utc": "2026-10-13T19:17:03.463194+00:00",
+  "base_commit": "a0986e969d6eaa6d3c9189b56b9abeec6095f6db",
+  "source_manifest": "source-final-v2.json",
+  "source_manifest_sha256": "51e543e5f3b8217197496bdf98a322fe566ad400e24aad90235fb28349f07c50",
+  "reviewed_count": 18,
+  "reviewed_file_sha256": {
+    "/private/tmp/vellum-large-data/docs/controls.md": "936b5336ec26a265067781ef3807f52be56b5e1b1f5f472c69a72d2d8497e58b",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility.go": "5ab2059fe58f1fe0277dd0bb92f380a1ac66bd3cb1ecdf13e1de6aefa9299fa0",
+    "/private/tmp/vellum-large-data/drivers/cogent/accessibility_darwin.m": "b8fc7c0a3662d7cb308b6887b9568aebef630665792a75eefdc69d3c0f139586",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main.go": "51c11248c0c999115b24b3b1db216d3f209be1e9a78820d4cfc3ba3a02dd1f40",
+    "/private/tmp/vellum-large-data/drivers/cogent/cmd/gallery/main_test.go": "31f98ce58b32c04c86e18e098cf606dedda6e524cc7905ae7aa0fcfce3a1a4cc",
+    "/private/tmp/vellum-large-data/drivers/cogent/controls.go": "e9690c535988a700d1658e7f073943b396cd34538300ab879d2dc35042295a56",
+    "/private/tmp/vellum-large-data/drivers/cogent/driver.go": "ae3acfeeaaba45f9fb77b1a4c8d18a70d4a02106f86cf15925d4a732a7cb90a7",
+    "/private/tmp/vellum-large-data/drivers/cogent/icons.go": "ab3a62aac295a8f0ec386ce5e86e65e1a5ec68c941ced5e2ef694d78a98200a0",
+    "/private/tmp/vellum-large-data/drivers/cogent/icons_darwin_test.go": "96a146509179106ed0963409b6ba2e917273294fa507a3336c447e12d6ebc308",
+    "/private/tmp/vellum-large-data/drivers/cogent/icons_offscreen_test.go": "1977d1f1c682aa0923324d31e46dc81c8d3b84d76c81887d4f8e9a318242cd75",
+    "/private/tmp/vellum-large-data/drivers/cogent/icons_test.go": "c6108c032ca9a96996f0d52ff7fdee498ddaa14268e56d795ef8cc8a26d9c2a5",
+    "/private/tmp/vellum-large-data/drivers/cogent/reconcile_test.go": "9ac7f50250d8db0fdd45236639988874041fe7c77c255dd6c8d5d66a7451f641",
+    "/private/tmp/vellum-large-data/specs/controls.md": "aab51960afbfa9a28f16de2c12b5955d52960f6bb71f8b84eac4880c84088d58",
+    "/private/tmp/vellum-large-data/specs/macos-completion.md": "0cebf3cc2ee5d67699011a1f18180ac95fd16567540af607d15d257c3918d633",
+    "/private/tmp/vellum-large-data/ui/controls.go": "41ef0ee329d21ae48e40687d729ed0b674961e8d654d2a51e2e4e02179a5aa24",
+    "/private/tmp/vellum-large-data/ui/icons.go": "a37e663682d073e08e853921ad87f0f121285bb28b6b1cfeca4369ae392d45d0",
+    "/private/tmp/vellum-large-data/ui/icons_test.go": "176cbf1761262c15596c35c4ffd841df4858bf51d8512e5907c920ac6a196823",
+    "/private/tmp/vellum-large-data/ui/node.go": "e98eb15b4ffa41031693f2125f56783ee331d8e5d44c719b3c863e75cb95cd72"
+  },
+  "root_sha256": {
+    "docs/controls.md": "936b5336ec26a265067781ef3807f52be56b5e1b1f5f472c69a72d2d8497e58b",
+    "drivers/cogent/accessibility.go": "5ab2059fe58f1fe0277dd0bb92f380a1ac66bd3cb1ecdf13e1de6aefa9299fa0",
+    "drivers/cogent/accessibility_darwin.m": "b8fc7c0a3662d7cb308b6887b9568aebef630665792a75eefdc69d3c0f139586",
+    "drivers/cogent/cmd/gallery/main.go": "51c11248c0c999115b24b3b1db216d3f209be1e9a78820d4cfc3ba3a02dd1f40",
+    "drivers/cogent/cmd/gallery/main_test.go": "31f98ce58b32c04c86e18e098cf606dedda6e524cc7905ae7aa0fcfce3a1a4cc",
+    "drivers/cogent/controls.go": "e9690c535988a700d1658e7f073943b396cd34538300ab879d2dc35042295a56",
+    "drivers/cogent/driver.go": "ae3acfeeaaba45f9fb77b1a4c8d18a70d4a02106f86cf15925d4a732a7cb90a7",
+    "drivers/cogent/icons.go": "ab3a62aac295a8f0ec386ce5e86e65e1a5ec68c941ced5e2ef694d78a98200a0",
+    "drivers/cogent/icons_darwin_test.go": "96a146509179106ed0963409b6ba2e917273294fa507a3336c447e12d6ebc308",
+    "drivers/cogent/icons_offscreen_test.go": "1977d1f1c682aa0923324d31e46dc81c8d3b84d76c81887d4f8e9a318242cd75",
+    "drivers/cogent/icons_test.go": "c6108c032ca9a96996f0d52ff7fdee498ddaa14268e56d795ef8cc8a26d9c2a5",
+    "drivers/cogent/reconcile_test.go": "9ac7f50250d8db0fdd45236639988874041fe7c77c255dd6c8d5d66a7451f641",
+    "specs/controls.md": "aab51960afbfa9a28f16de2c12b5955d52960f6bb71f8b84eac4880c84088d58",
+    "specs/macos-completion.md": "0cebf3cc2ee5d67699011a1f18180ac95fd16567540af607d15d257c3918d633",
+    "ui/controls.go": "41ef0ee329d21ae48e40687d729ed0b674961e8d654d2a51e2e4e02179a5aa24",
+    "ui/icons.go": "a37e663682d073e08e853921ad87f0f121285bb28b6b1cfeca4369ae392d45d0",
+    "ui/icons_test.go": "176cbf1761262c15596c35c4ffd841df4858bf51d8512e5907c920ac6a196823",
+    "ui/node.go": "e98eb15b4ffa41031693f2125f56783ee331d8e5d44c719b3c863e75cb95cd72"
+  },
+  "immutable_snapshot_sha256": {
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/docs/controls.md": "936b5336ec26a265067781ef3807f52be56b5e1b1f5f472c69a72d2d8497e58b",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/accessibility.go": "5ab2059fe58f1fe0277dd0bb92f380a1ac66bd3cb1ecdf13e1de6aefa9299fa0",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/accessibility_darwin.m": "b8fc7c0a3662d7cb308b6887b9568aebef630665792a75eefdc69d3c0f139586",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/cmd/gallery/main.go": "51c11248c0c999115b24b3b1db216d3f209be1e9a78820d4cfc3ba3a02dd1f40",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/cmd/gallery/main_test.go": "31f98ce58b32c04c86e18e098cf606dedda6e524cc7905ae7aa0fcfce3a1a4cc",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/controls.go": "e9690c535988a700d1658e7f073943b396cd34538300ab879d2dc35042295a56",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/driver.go": "ae3acfeeaaba45f9fb77b1a4c8d18a70d4a02106f86cf15925d4a732a7cb90a7",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/icons.go": "ab3a62aac295a8f0ec386ce5e86e65e1a5ec68c941ced5e2ef694d78a98200a0",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/icons_darwin_test.go": "96a146509179106ed0963409b6ba2e917273294fa507a3336c447e12d6ebc308",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/icons_offscreen_test.go": "1977d1f1c682aa0923324d31e46dc81c8d3b84d76c81887d4f8e9a318242cd75",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/icons_test.go": "c6108c032ca9a96996f0d52ff7fdee498ddaa14268e56d795ef8cc8a26d9c2a5",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/drivers/cogent/reconcile_test.go": "9ac7f50250d8db0fdd45236639988874041fe7c77c255dd6c8d5d66a7451f641",
+    "/private/tmp/vellum-macos-icon-controls/final-v2/specs/controls.md": "aab51960afbfa9a28f16de2c12b5955d52960f6bb71f8b84eac4880c84088d58",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/specs/macos-completion.md": "0cebf3cc2ee5d67699011a1f18180ac95fd16567540af607d15d257c3918d633",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/ui/controls.go": "41ef0ee329d21ae48e40687d729ed0b674961e8d654d2a51e2e4e02179a5aa24",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/ui/icons.go": "a37e663682d073e08e853921ad87f0f121285bb28b6b1cfeca4369ae392d45d0",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/ui/icons_test.go": "176cbf1761262c15596c35c4ffd841df4858bf51d8512e5907c920ac6a196823",
+    "/private/tmp/vellum-macos-icon-controls/candidate-v2/ui/node.go": "e98eb15b4ffa41031693f2125f56783ee331d8e5d44c719b3c863e75cb95cd72"
+  },
+  "snapshot_layout": "final-v2/specs/controls.md plus seventeen unchanged candidate-v2 source files",
+  "previous_source_manifest_sha256": "05e2276a2a0016e004a1c1030bcd2ad66082c1c28c7c8c5133ebfffc2ebbaef8",
+  "previous_review_sha256": {
+    "review-v1.json": "928e92c58796f95f475e193c337d14cdd9c44fd4dad8c547d56e40f9285dfb53",
+    "review-v1.md": "3a68ce5380640fe295b054c6058c47af41140407bf2ca1eaa3662b9089f2093d"
+  },
+  "delta": {
+    "path": "specs/controls.md",
+    "before_sha256": "7972aea73265bfeecc63b528ff6e51d588e588ea52125908e7c0f04ee12ee021",
+    "after_sha256": "aab51960afbfa9a28f16de2c12b5955d52960f6bb71f8b84eac4880c84088d58",
+    "before_bytes": 24367,
+    "after_bytes": 24366,
+    "verified_relation": "before == after + b\"\\n\"",
+    "content_or_production_or_test_change": false,
+    "unchanged_source_count": 17
+  },
+  "findings": [],
+  "unresolved_defects": [],
+  "provider_scope": {
+    "baseline_manifest": "source-final-v1.json",
+    "baseline_manifest_sha256": "05e2276a2a0016e004a1c1030bcd2ad66082c1c28c7c8c5133ebfffc2ebbaef8",
+    "raw_exit_code": 0,
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "provider_sha256": "8edb80ca540fa93b5251532476cf903cdcf45ba7623a50b0c4ffca9da8fcda59",
+    "process_sha256": "83e997492ac89bf42cfa97571ce6682aea2228874ca8e31669902acc154c9e33",
+    "input_sha256": "9a4b516b8da697d5502729b432a4d17316599da7b476fed8f3383268d92fccb4",
+    "before_after_exact_baseline": true,
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 18,
+      "bytes": 58626,
+      "chunks": 3,
+      "llmCalls": 3,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 36592,
+          "output": 2804,
+          "costUSD": 0.101224
+        }
+      ],
+      "widenedFiles": 7,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "raw_findings_count": 0,
+    "additional_provider_executed": false,
+    "final_doc_delta_internal_only": true
+  },
+  "notes_sha256": "d5df4cbdc0e3d1764a81311fbe91555eaaec4db8b978bb074984371398bba7c8",
+  "reviewer_executed_tests_or_native": false,
+  "reviewer_executed_providers_or_git": false,
+  "execution_scope": "Source-only formatting approval; final-v2 producer qualification is separate.",
+  "limits": [
+    "No physical/native-window/human VoiceOver qualification.",
+    "No memory/performance/distribution/full Mac completion claim."
+  ]
+}

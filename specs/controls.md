@@ -334,3 +334,36 @@ for top/bottom panes. Actions obey current disabled/lifetime guards and use the
 managed focus proxy. Inert Cocoa and actual Manual software tests remain separate
 from human VoiceOver, physical pointer/key routing, native attachment and Mac
 performance/endurance qualification.
+## Built-in symbols and action presentation
+
+`ui.Icon` is a passive retained symbol leaf. `Node.Icon` selects one of the
+portable `ui.Symbol` names listed by `ui.Symbols()`: add, remove, check, close,
+search, settings, save, open, undo, redo, copy, cut, paste, info, warning, delete,
+left/right/up/down, menu, expand and collapse. Unknown names and raw SVG/path
+strings are refused. No application filesystem or network lookup occurs.
+The Mac adapter supplies its bundled vector artwork. This is a finite built-in
+set; custom image/assets remain a separate API and distribution-rights gate.
+
+An Icon requires a symbol and rejects Activate/Change callbacks and children.
+It never enters Tab order. Accessibility.Name, or Text as its fallback alternate
+label, exposes a passive image role; an unlabeled symbol is decorative and omitted
+from the accessible hierarchy. Icon Text is alternate text, not visible text.
+Default dimensions are 24 device-independent pixels; explicit size/style and
+application-local theme override them. A changed symbol keeps the widget identity
+and replaces the rendered artwork. Removal releases the native widget/cached art.
+
+Button and ToggleButton optionally use Icon beside their visible Text. An
+icon-only action/toggle requires a nonblank Accessibility.Name. Symbol changes or
+removal retain control identity, accepted toggle state and owner callback binding.
+Omitting Icon restores the ToggleButton's ordinary checked-state indicator.
+Other kinds refuse Icon. A standalone icon has no action/value; an action's icon
+does not add a separate accessible child or focus stop.
+
+`Node.Appearance` belongs only on Button. Empty preserves the existing filled
+button; ButtonPrimary is filled, ButtonSecondary is outlined, ButtonQuiet uses
+text emphasis, and ButtonTool uses compact toolbar-action treatment. Appearance
+is presentation: activation, enabled state and keyboard/semantic routing retain
+their contracts. App-local theme and explicit styles remain authoritative.
+Owner delivery revalidates the current callback and disabled ancestry; removal
+retires queued button activations. These software/native-object checks do not
+qualify physical Mac input, human VoiceOver or native memory/performance.

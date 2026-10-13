@@ -9,6 +9,7 @@ renders these elements and publishes their supported accessibility semantics.
 | --- | --- | --- |
 | Label | `ui.Label` | `Text` |
 | Action button | `ui.Button` | `Text`, `Activate` |
+| Bundled icon | `ui.Icon` | `Icon`, optional alternate `Text`/accessible name |
 | Checkbox | `ui.Checkbox` | `Checked`, `Change` |
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
@@ -118,3 +119,26 @@ ui.Node{ID: "workspace", Kind: ui.SplitPane, Number: divider, Grow: true,
 The application owns divider and the two child nodes. Without Change the divider
 is readable and focusable, while its position remains fixed. Nested SplitPane
 nodes support more than two regions. The gallery has a Split panes page.
+
+`ui.Icon` shows one of the 23 bundled vector symbols returned by `ui.Symbols()`.
+It is decorative when unlabeled, or a passive accessible image when Text or
+Accessibility.Name supplies alternate text. It adds no Tab stop. The default
+size is 24 device-independent pixels; MinSize/theme styles can override it.
+Raw SVG, paths and unknown names are refused.
+
+Buttons and toggle buttons accept Icon beside their Text. Icon-only actions
+require a nonblank Accessibility.Name; Accessibility.Help supplies the tooltip.
+Button Appearance may be ButtonPrimary (filled), ButtonSecondary (outlined),
+ButtonQuiet (text emphasis) or ButtonTool (compact toolbar action). Omission
+preserves the existing filled appearance. Styles remain application-local.
+Removing a toggle's Icon restores its ordinary checked-state indicator.
+
+```go
+ui.Node{ID: "search", Kind: ui.Button, Icon: ui.SymbolSearch,
+    Appearance: ui.ButtonTool, Activate: search,
+    Accessibility: ui.Accessibility{Name: "Search", Help: "Search the document"}}
+```
+
+The application supplies search. The gallery's Icons and actions page shows the
+built-in catalog and action appearances. Presentation changes keep each control's
+identity, callback and accepted state; icons add no private accessible action.

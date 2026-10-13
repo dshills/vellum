@@ -54,6 +54,7 @@ static uint64_t vellumAXIdentity(void){
 static BOOL vellumAXCheckable(NSString *role){return [role isEqual:@"checkbox"]||[role isEqual:@"switch"]||[role isEqual:@"toggle-button"];}
 static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"label"])return NSAccessibilityStaticTextRole;
+ if([role isEqual:@"image"])return NSAccessibilityImageRole;
  if([role isEqual:@"button"])return NSAccessibilityButtonRole;
  if(vellumAXCheckable(role))return NSAccessibilityCheckBoxRole;
  if([role isEqual:@"progress-bar"])return NSAccessibilityProgressIndicatorRole;

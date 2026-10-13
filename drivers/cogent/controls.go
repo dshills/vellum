@@ -13,6 +13,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
+	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/text/textcore"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
@@ -121,6 +122,27 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		}
 	}()
 	switch r.node.Kind {
+	case ui.Button:
+		button := core.NewButton(parent)
+		button.Styler(func(s *styles.Style) {
+			if r.node.Appearance == ui.ButtonTool {
+				s.Padding.Set(units.Dp(6))
+			}
+		})
+		button.OnClick(func(e events.Event) {
+			postControl(r, func() {
+				if !c.disabled && r.node.Activate != nil {
+					r.node.Activate()
+					c.a.Invalidate(c.window)
+				}
+			})
+		})
+		widget = button
+	case ui.Icon:
+		icon := core.NewIcon(parent)
+		icon.Styler(func(s *styles.Style) { s.IconSize.Set(units.Dp(24)) })
+		icon.FinalStyler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
+		widget = icon
 	case ui.SplitPane:
 		widget = mountSplit(parent, r)
 	case ui.Toolbar, ui.StatusBar, ui.FormGroup:
@@ -339,7 +361,7 @@ func requestControlRestore(r *record) {
 
 func syncSemantics(r *record) {
 	name := r.node.Accessibility.Name
-	if name == "" {
+	if name == "" || (r.node.Kind == ui.Icon && strings.TrimSpace(name) == "") {
 		name = r.node.Text
 	}
 	disabled := controlDisabled(r)
@@ -398,11 +420,18 @@ func syncControl(r *record, previous ui.Node) error {
 		syncSplit(r, previous)
 	}
 	switch w := r.widget.(type) {
+	case *core.Button:
+		w.SetText(html.EscapeString(r.node.Text)).SetIcon(nativeSymbol(r.node.Icon)).SetType(nativeButtonAppearance(r.node.Appearance))
+	case *core.Icon:
+		w.SetIcon(nativeSymbol(r.node.Icon))
 	case *core.Switch:
 		// Resetting Checked alone leaves a segmented toggle's checked styling
 		// behind when the owner declines a native change without changing state.
 		nativeValueChanged = w.IsChecked() != r.node.Checked
 		w.SetText(html.EscapeString(r.node.Text)).SetChecked(r.node.Checked)
+		if r.node.Kind == ui.ToggleButton {
+			syncToggleSymbol(w, r.node.Icon)
+		}
 	case *core.Chooser:
 		w.Items = nil
 		for _, o := range r.node.Options {
@@ -483,7 +512,7 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	// Value setters preserve identity; a redraw is necessary when externally
 	// controlled values/option labels change, including same-length option edits.
-	if nativeValueChanged || restoring || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
+	if nativeValueChanged || restoring || previous.Icon != r.node.Icon || previous.Appearance != r.node.Appearance || previous.Orientation != r.node.Orientation || previous.SoftWrap != r.node.SoftWrap || previous.Text != r.node.Text || previous.Checked != r.node.Checked || previous.Number != r.node.Number || previous.Numeric != r.node.Numeric || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility || !reflect.DeepEqual(previous.Options, r.node.Options) {
 		r.widget.AsWidget().Update()
 	}
 	if refused != nil {

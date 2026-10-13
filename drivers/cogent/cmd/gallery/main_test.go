@@ -103,3 +103,20 @@ func TestGallerySplitPane(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGalleryIconsAndActionAppearances(t *testing.T) {
+	g := newGallery()
+	node(g.view(), "pages").Change(ui.ChangeEvent{SelectedID: "symbols"})
+	for _, symbol := range ui.Symbols() {
+		if art := node(g.view(), "art-"+string(symbol)); art.Kind != ui.Icon || art.Icon != symbol {
+			t.Fatal("gallery omitted bundled artwork", symbol)
+		}
+	}
+	node(g.view(), "tool-action").Activate()
+	if g.tab != "controls" || g.focus.ID != "project-name" || g.focus.Sequence != 1 {
+		t.Fatal("tool action did not select/focus its application target")
+	}
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+}
