@@ -366,3 +366,10 @@ explicit replacement retirement, device-change cleanup and checked layout/copy
 refusal in the [GPU ownership contract](gpu-frame-lifecycle.md). Counted ownership
 and wrapper-only regressions remain separate from physical GPU readback/faults
 and the outstanding native graphics-memory/performance gates.
+
+Private compute-system retirement now releases its owned device/queue, pending
+recording and child resources while preserving the borrowed adapter. Checked
+admission and complete recording cleanup extend the [GPU ownership contract](gpu-frame-lifecycle.md).
+Offscreen failure fixtures and tiny headless shader execution qualify only their
+observed scope; physical memory, sustained performance and window checks remain
+open. Storage-value staging/map batch integrity is a separate follow-up audit.

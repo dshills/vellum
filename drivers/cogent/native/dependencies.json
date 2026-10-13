@@ -463,6 +463,17 @@
               "sha256": "c5dc66859c0e13eb686f4c3bbbfb7c20a8eaea396e7def1f4c527bd3a364ab76"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/computelifecycle",
+          "inputs": "native/patches/computelifecycle/original-hashes.json",
+          "outputs": "native/patches/computelifecycle/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/computelifecycle/0050-owned-compute-device-and-recording.patch",
+              "sha256": "dd27b3544799eed4b0315396a7e8a5819d1d6495da7262c8f7965e64df56f909"
+            }
+          ]
         }
       ]
     },

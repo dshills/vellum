@@ -1,0 +1,604 @@
+--- a/gpu/compute.go
++++ b/gpu/compute.go
+@@ -49,9 +49,7 @@
+ // NewComputeSystem returns a new ComputeSystem, initialized with
+ // its own new device that is owned by the system.
+ func NewComputeSystem(gp *GPU, name string) *ComputeSystem {
+-	sy := &ComputeSystem{}
+-	sy.init(gp, name)
+-	return sy
++	return errors.Log1(NewComputeSystemChecked(gp, name))
+ }
+ 
+ // System interface:
+@@ -61,29 +59,54 @@
+ func (sy *ComputeSystem) GPU() *GPU       { return sy.gpu }
+ func (sy *ComputeSystem) Render() *Render { return nil }
+ 
+-// init initializes the ComputeSystem
+-func (sy *ComputeSystem) init(gp *GPU, name string) {
+-	sy.gpu = gp
+-	sy.Name = name
+-	sy.device = errors.Log1(NewComputeDevice(gp))
+-	sy.vars.device = *sy.device
++// NewComputeSystemChecked refuses failed private-device admission without
++// publishing a partial system. The GPU is borrowed; the new device is owned.
++func NewComputeSystemChecked(gp *GPU, name string) (*ComputeSystem, error) {
++	if gp == nil || !gp.GPU.IsValid() {
++		return nil, fmt.Errorf("gpu: compute system requires a live adapter")
++	}
++	dev, err := NewComputeDevice(gp)
++	if err != nil || dev == nil || !dev.Device.IsValid() || !dev.Queue.IsValid() {
++		if dev != nil {
++			dev.Release()
++		}
++		if err == nil {
++			err = fmt.Errorf("gpu: compute device admission returned no live pair")
++		}
++		return nil, err
++	}
++	sy := &ComputeSystem{Name: name, gpu: gp, device: dev, ComputePipelines: make(map[string]*ComputePipeline)}
++	sy.vars.device = *dev
+ 	sy.vars.sys = sy
+-	sy.ComputePipelines = make(map[string]*ComputePipeline)
+-}
+-
+-// WaitDone waits until device is done with current processing steps
++	return sy, nil
++}
++
++// WaitDone waits until this system's private device has completed work.
+ func (sy *ComputeSystem) WaitDone() {
+-	sy.device.WaitDone()
+-}
+-
++	if sy.device != nil && sy.device.Device.IsValid() {
++		sy.device.WaitDone()
++	}
++}
++
++// Release requires serialized owner access after all other users have stopped.
++// Active recording is abandoned, never submitted. The adapter remains borrowed.
++// Detach ownership first so repeated shutdown cannot retire references twice.
+ func (sy *ComputeSystem) Release() {
+-	sy.WaitDone()
+-	for _, pl := range sy.ComputePipelines {
++	dev, pass, command := sy.device, sy.ComputeEncoder, sy.CommandEncoder
++	pipelines, vars := sy.ComputePipelines, sy.vars
++	sy.device, sy.ComputeEncoder, sy.CommandEncoder = nil, nil, nil
++	sy.ComputePipelines, sy.gpu, sy.vars = nil, nil, Vars{}
++	if dev != nil {
++		defer dev.Release()
++	}
++	retireComputeRecording(command, pass)
++	if dev != nil && dev.Device.IsValid() {
++		dev.WaitDone()
++	}
++	for _, pl := range pipelines {
+ 		pl.Release()
+ 	}
+-	sy.ComputePipelines = nil
+-	sy.vars.Release()
+-	sy.gpu = nil
++	vars.Release()
+ }
+ 
+ // AddComputePipeline adds a new ComputePipeline to the system
+@@ -111,9 +134,21 @@
+ // compute commands.  This is automatically called by
+ // BeginRenderPass and the result maintained in [CommandEncoder].
+ func (sy *ComputeSystem) NewCommandEncoder() (*wgpu.CommandEncoder, error) {
++	if sy.device == nil || !sy.device.Device.IsValid() || !sy.device.Queue.IsValid() {
++		return nil, fmt.Errorf("gpu: compute system has no live device and queue")
++	}
+ 	cmd, err := sy.device.Device.TryCreateCommandEncoder(nil)
+-	if errors.Log(err) != nil {
+-		return nil, err
++	if err != nil {
++		if cmd != nil {
++			cmd.Release()
++		}
++		return nil, errors.Log(err)
++	}
++	if !cmd.IsValid() {
++		if cmd != nil {
++			cmd.Release()
++		}
++		return nil, fmt.Errorf("gpu: command factory returned no live encoder")
+ 	}
+ 	return cmd, nil
+ }
+@@ -127,40 +162,43 @@
+ // is safe and efficient to call for every compute shader dispatch,
+ // where the first call will create and the rest add to the ongoing job.
+ func (sy *ComputeSystem) BeginComputePass() (*wgpu.ComputePassEncoder, error) {
+-	if sy.ComputeEncoder != nil {
+-		return sy.ComputeEncoder, nil
+-	}
+-	cmd, err := sy.NewCommandEncoder()
+-	if errors.Log(err) != nil {
+-		return nil, err
+-	}
+-	sy.CommandEncoder = cmd
+-	sy.ComputeEncoder = cmd.BeginComputePass(nil) // optional name in the encoder
+-	return sy.ComputeEncoder, nil
+-}
+-
+-// EndComputePass submits the current compute commands to the device
+-// Queue and releases the [ComputeSystem.CommandEncoder] and
+-// [ComputeSystem.ComputeEncoder].  You must call ce.End prior to calling this.
+-// Can insert other commands after ce.End, e.g., to copy data back
+-// from the GPU, prior to calling EndComputePass.
++	if sy.ComputeEncoder != nil || sy.CommandEncoder != nil {
++		if sy.ComputeEncoder.IsValid() && sy.CommandEncoder.IsValid() {
++			return sy.ComputeEncoder, nil
++		}
++		command, pass := sy.CommandEncoder, sy.ComputeEncoder
++		sy.CommandEncoder, sy.ComputeEncoder = nil, nil
++		retireComputeRecording(command, pass)
++		return nil, fmt.Errorf("gpu: compute recording contains retired references")
++	}
++	command, pass, err := prepareComputeRecording(sy.NewCommandEncoder, func(c *wgpu.CommandEncoder) (*wgpu.ComputePassEncoder, error) {
++		return c.BeginComputePass(nil), nil
++	})
++	if err != nil {
++		return nil, errors.Log(err)
++	}
++	sy.CommandEncoder, sy.ComputeEncoder = command, pass
++	return pass, nil
++}
++
++// EndComputePass submits the current compute commands and retires all recording
++// references on success or refusal. The caller must call ce.End before this.
++// Copy commands may be inserted after ce.End and before submission.
+ func (sy *ComputeSystem) EndComputePass() error {
+-	ce := sy.ComputeEncoder
+-	cmd := sy.CommandEncoder
+-	sy.ComputeEncoder = nil
+-	sy.CommandEncoder = nil
+-	ce.Release() // must happen before Finish
+-	cmdBuffer, err := cmd.TryFinish(nil)
+-	if errors.Log(err) != nil {
+-		return err
+-	}
+-	sy.device.Queue.Submit(cmdBuffer)
+-	cmdBuffer.Release()
+-	cmd.Release()
+-	for _, pl := range sy.ComputePipelines {
+-		pl.releaseOldBindGroups()
+-	}
+-	return nil
++	ce, cmd := sy.ComputeEncoder, sy.CommandEncoder
++	livePair := ce.IsValid() && cmd.IsValid()
++	sy.ComputeEncoder, sy.CommandEncoder = nil, nil
++	defer func() {
++		for _, pl := range sy.ComputePipelines {
++			pl.releaseOldBindGroups()
++		}
++	}()
++	return errors.Log(submitOwnedPass(cmd, ce, func(c *wgpu.CommandEncoder) (*wgpu.CommandBuffer, error) {
++		if !livePair || !c.IsValid() || sy.device == nil || !sy.device.Device.IsValid() || !sy.device.Queue.IsValid() {
++			return nil, fmt.Errorf("gpu: compute submission requires live owner references")
++		}
++		return c.TryFinish(nil)
++	}, func(buffer *wgpu.CommandBuffer) { sy.device.Queue.Submit(buffer) }))
+ }
+ 
+ // NumThreads is the number of threads to use for parallel threading,
+--- /dev/null
++++ b/gpu/compute_lifecycle.go
+@@ -0,0 +1,52 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import "fmt"
++
++// prepareComputeRecording publishes only a complete live pair. Factories return
++// fresh owned references; caller serializes recording, submission and retirement.
++func prepareComputeRecording[C liveOwnedReference, P liveOwnedReference](command func() (C, error), pass func(C) (P, error)) (c C, p P, err error) {
++	var zeroC C
++	var zeroP P
++	succeeded := false
++	defer func() {
++		if succeeded {
++			return
++		}
++		oldC, oldP := c, p
++		c, p = zeroC, zeroP
++		retireComputeRecording(oldC, oldP)
++	}()
++	c, err = command()
++	if err != nil {
++		return
++	}
++	if c == zeroC || !c.IsValid() {
++		err = fmt.Errorf("gpu: compute command factory returned no live encoder")
++		return
++	}
++	p, err = pass(c)
++	if err != nil {
++		return
++	}
++	if p == zeroP || !p.IsValid() {
++		err = fmt.Errorf("gpu: compute pass factory returned no live encoder")
++		return
++	}
++	succeeded = true
++	return
++}
++
++// Discard a pending recording without Finish or Submit, pass before command.
++func retireComputeRecording[C ownedReference, P ownedReference](command C, pass P) {
++	var zeroC C
++	var zeroP P
++	if command != zeroC {
++		defer command.Release()
++	}
++	if pass != zeroP {
++		pass.Release()
++	}
++}
+--- /dev/null
++++ b/gpu/compute_lifecycle_test.go
+@@ -0,0 +1,108 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import (
++	"errors"
++	"reflect"
++	"testing"
++)
++
++type computeReference struct {
++	name     string
++	valid    bool
++	releases int
++	events   *[]string
++}
++
++func (r *computeReference) IsValid() bool { return r != nil && r.valid }
++func (r *computeReference) Release() {
++	r.releases++
++	r.valid = false
++	*r.events = append(*r.events, r.name)
++}
++
++func TestVellumComputeRecordingAdmission(t *testing.T) {
++	failure := errors.New("injected compute admission refusal")
++	for _, scenario := range []string{"command_error", "partial_command", "nil_command", "invalid_command", "pass_error", "partial_pass", "nil_pass", "invalid_pass", "success"} {
++		t.Run(scenario, func(t *testing.T) {
++			events := []string{}
++			c := &computeReference{name: "command", valid: true, events: &events}
++			p := &computeReference{name: "pass", valid: true, events: &events}
++			called := 0
++			gotC, gotP, err := prepareComputeRecording(func() (*computeReference, error) {
++				switch scenario {
++				case "command_error":
++					return nil, failure
++				case "partial_command":
++					return c, failure
++				case "nil_command":
++					return nil, nil
++				case "invalid_command":
++					c.valid = false
++				}
++				return c, nil
++			}, func(*computeReference) (*computeReference, error) {
++				called++
++				switch scenario {
++				case "pass_error":
++					return nil, failure
++				case "partial_pass":
++					return p, failure
++				case "nil_pass":
++					return nil, nil
++				case "invalid_pass":
++					p.valid = false
++				}
++				return p, nil
++			})
++			if scenario == "success" {
++				if err != nil || gotC != c || gotP != p || len(events) != 0 {
++					t.Fatal("complete pair not retained", err, events)
++				}
++				retireComputeRecording(gotC, gotP)
++			} else if err == nil || gotC != nil || gotP != nil {
++				t.Fatal("partial pair published", err, gotC, gotP)
++			}
++			want := []string{}
++			switch scenario {
++			case "partial_command", "invalid_command", "pass_error", "nil_pass":
++				want = []string{"command"}
++			case "partial_pass", "invalid_pass", "success":
++				want = []string{"pass", "command"}
++			}
++			if !reflect.DeepEqual(events, want) || c.releases > 1 || p.releases > 1 {
++				t.Fatal("retirement order/count", events, want)
++			}
++			if called > 0 && (scenario == "command_error" || scenario == "partial_command" || scenario == "nil_command" || scenario == "invalid_command") {
++				t.Fatal("partial command reached pass factory")
++			}
++		})
++	}
++}
++
++func TestVellumCheckedComputeConstructorRefusesMissingAdapter(t *testing.T) {
++	for _, gp := range []*GPU{nil, {}} {
++		sy, err := NewComputeSystemChecked(gp, "refused")
++		if err == nil || sy != nil {
++			t.Fatal("partial system published", sy, err)
++		}
++	}
++}
++
++func TestVellumComputeAdmissionPanicRetiresAcquiredCommand(t *testing.T) {
++	events := []string{}
++	c := &computeReference{name: "command", valid: true, events: &events}
++	func() {
++		defer func() {
++			if recover() == nil {
++				t.Error("injected panic absent")
++			}
++		}()
++		prepareComputeRecording(func() (*computeReference, error) { return c, nil }, func(*computeReference) (*computeReference, error) { panic("pass factory") })
++	}()
++	if c.releases != 1 || c.valid {
++		t.Fatal("acquired command survived pass factory panic")
++	}
++}
+--- /dev/null
++++ b/gpu/compute_native_lifecycle_test.go
+@@ -0,0 +1,170 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++//go:build !js
++
++package gpu
++
++import (
++	"encoding/json"
++	"fmt"
++	"os"
++	"reflect"
++	"testing"
++)
++
++// Tiny opt-in native ownership check. No windows, surfaces, input, presentation,
++// timings or physical-memory assertions. Old wrappers stay live in Go.
++func TestVellumComputeNativeOwnership(t *testing.T) {
++	if os.Getenv("VELLUM_COMPUTE_GPU_TEST") != "1" {
++		t.Skip("explicit headless compute fixture required")
++	}
++	var gp *GPU
++	var borrowed *Device
++	defer func() {
++		if borrowed != nil {
++			borrowed.Release()
++		}
++		if gp != nil {
++			gp.Release()
++		}
++		ReleaseInstance()
++	}()
++	var err error
++	gp, borrowed, err = NoDisplayGPU()
++	if err != nil || gp == nil || borrowed == nil {
++		t.Fatal("headless admission", err)
++	}
++	record := func(fields map[string]any) {
++		fields["windows_created"] = 0
++		fields["surfaces_created"] = 0
++		b, e := json.Marshal(fields)
++		if e != nil {
++			t.Fatal(e)
++		}
++		fmt.Printf("VELLUM_COMPUTE_NATIVE %s\n", b)
++	}
++	t.Run("private_device_and_active_recording", func(t *testing.T) {
++		sy := NewComputeSystem(gp, "native ownership")
++		if sy == nil {
++			t.Fatal("compute admission")
++		}
++		owned := sy.Device()
++		defer func() {
++			defer owned.Release()
++			// Fallback for the original-regression build: retire recording before
++			// its device if the original system leaves it owned after Release.
++			defer retireComputeRecording(sy.CommandEncoder, sy.ComputeEncoder)
++			sy.Release()
++		}()
++		device, queue := owned.Device, owned.Queue
++		if device == borrowed.Device {
++			t.Fatal("private device is shared")
++		}
++		group := sy.Vars().AddGroup(Storage)
++		variable := group.Add("Values", Uint32, 4, ComputeShader)
++		group.SetNValues(1)
++		pipeline := sy.AddComputePipeline("increment")
++		shader := pipeline.AddShader("increment")
++		if err := shader.OpenCode(`@group(0) @binding(0) var<storage,read_write> data: array<u32,4>;
++@compute @workgroup_size(1) fn main(@builtin(global_invocation_id) id: vec3<u32>) { data[id.x] = data[id.x] + 1u; }`); err != nil {
++			t.Fatal(err)
++		}
++		pipeline.AddEntry(shader, ComputeShader, "main")
++		sy.Config()
++		value := variable.Values.Values[0]
++		if err := SetValueFrom(value, []uint32{3, 11, 17, 29}); err != nil {
++			t.Fatal(err)
++		}
++		buffer, staging, module, program := value.buffer, value.readBuffer, shader.module, pipeline.computePipeline
++		if !buffer.IsValid() || !staging.IsValid() || !module.IsValid() || !program.IsValid() {
++			t.Fatal("native pipeline fixture incomplete")
++		}
++		for i := 0; i < 8; i++ {
++			pass, e := sy.BeginComputePass()
++			if e != nil {
++				t.Fatal(e)
++			}
++			command := sy.CommandEncoder
++			again, e := sy.BeginComputePass()
++			if e != nil || again != pass || sy.CommandEncoder != command {
++				t.Fatal("pending pass not reused", e)
++			}
++			if e := pipeline.Dispatch(pass, 4, 1, 1); e != nil {
++				t.Fatal(e)
++			}
++			pass.End()
++			if e := value.GPUToRead(command); e != nil {
++				t.Fatal(e)
++			}
++			if e = sy.EndComputePass(); e != nil {
++				t.Fatal(e)
++			}
++			result := make([]uint32, 4)
++			if e := value.ReadSync(); e != nil {
++				t.Fatal(e)
++			}
++			if e := ReadToBytes(value, result); e != nil {
++				t.Fatal(e)
++			}
++			want := []uint32{uint32(4 + i), uint32(12 + i), uint32(18 + i), uint32(30 + i)}
++			if !reflect.DeepEqual(result, want) {
++				t.Fatal("compute output", result, want)
++			}
++			if pass.IsValid() || command.IsValid() || sy.ComputeEncoder != nil || sy.CommandEncoder != nil {
++				t.Fatal("submitted recording retained references", i)
++			}
++		}
++		sy.WaitDone()
++		bindings := pipeline.currentBindGroups
++		if len(bindings) != 1 {
++			t.Fatal("native binding fixture incomplete")
++		}
++		active, e := sy.BeginComputePass()
++		if e != nil {
++			t.Fatal(e)
++		}
++		pending := sy.CommandEncoder
++		sy.Release()
++		for _, binding := range bindings {
++			if binding.IsValid() {
++				t.Fatal("pipeline retained binding")
++			}
++		}
++		if buffer.IsValid() || staging.IsValid() || module.IsValid() || program.IsValid() || value.buffer != nil || value.readBuffer != nil {
++			t.Fatal("compute children not retired")
++		}
++		if active.IsValid() || pending.IsValid() || device.IsValid() || queue.IsValid() || owned.Device != nil || owned.Queue != nil || sy.Device() != nil || sy.GPU() != nil {
++			t.Fatal("private compute ownership not retired")
++		}
++		sy.Release()
++		if !gp.GPU.IsValid() || !borrowed.Device.IsValid() || !borrowed.Queue.IsValid() {
++			t.Fatal("compute shutdown retired borrowed adapter/device")
++		}
++		if pass, e := sy.BeginComputePass(); e == nil || pass != nil {
++			t.Fatal("retired system admitted recording", e)
++		}
++		if e := sy.EndComputePass(); e == nil {
++			t.Fatal("retired system accepted submission")
++		}
++		record(map[string]any{"case": "private_device_and_active_recording", "submitted_passes": 8, "computed_words_checked": 32, "retired_child_refs": 5, "retired_recording_refs": 18, "retired_device_refs": 2, "borrowed_owner_live": true})
++	})
++	t.Run("partial_device_queue", func(t *testing.T) {
++		dev, e := NewDevice(gp)
++		if e != nil {
++			t.Fatal(e)
++		}
++		defer dev.Release()
++		queue, device := dev.Queue, dev.Device
++		device.Release() // Keep the independently owned GetQueue reference live.
++		if !queue.IsValid() || device.IsValid() {
++			t.Fatal("fixture failed partial state")
++		}
++		dev.Release()
++		if queue.IsValid() || dev.Queue != nil || dev.Device != nil {
++			t.Fatal("partial device retained queue reference")
++		}
++		dev.Release()
++		record(map[string]any{"case": "partial_device_queue", "retired_queue_refs": 1})
++	})
++}
+--- /dev/null
++++ b/gpu/compute_regression_test.go
+@@ -0,0 +1,47 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package gpu
++
++import (
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"testing"
++)
++
++// Original-compatible owner entry points; no native device or fake handles.
++func TestVellumComputeEmptyEndAndRepeatedRetirement(t *testing.T) {
++	sy := &ComputeSystem{}
++	func() {
++		defer func() {
++			if value := recover(); value != nil {
++				t.Errorf("empty End panicked instead of refusing: %v", value)
++			}
++		}()
++		if err := sy.EndComputePass(); err == nil {
++			t.Error("empty submission accepted")
++		}
++	}()
++	func() {
++		defer func() {
++			if value := recover(); value != nil {
++				t.Errorf("empty Release panicked: %v", value)
++			}
++		}()
++		sy.Release()
++		sy.Release()
++		sy.WaitDone()
++	}()
++	if sy.ComputeEncoder != nil || sy.CommandEncoder != nil || sy.Device() != nil || sy.GPU() != nil {
++		t.Fatal("empty owner retained resources")
++	}
++}
++
++func TestVellumPartialDeviceReleaseClearsQueueWithoutDevice(t *testing.T) {
++	queue := &wgpu.Queue{}
++	dev := &Device{Queue: queue}
++	dev.Release()
++	if dev.Queue != nil || dev.Device != nil {
++		t.Fatal("empty device retained independently owned queue")
++	}
++	dev.Release()
++}
+--- a/gpu/device.go
++++ b/gpu/device.go
+@@ -87,16 +87,17 @@
+ // GetQueue owns a WebGPU reference independently of the device. Complete work
+ // before releasing both owned handles; no deferred callback retains this Device.
+ func (dv *Device) Release() {
+-	if dv.Device == nil {
+-		return
++	device, queue := dv.Device, dv.Queue
++	dv.Device, dv.Queue = nil, nil
++	if device != nil {
++		defer device.Release()
+ 	}
+-	dv.Device.Poll(true, nil)
+-	if dv.Queue != nil {
+-		dv.Queue.Release()
+-		dv.Queue = nil
++	if queue != nil {
++		defer queue.Release()
+ 	}
+-	dv.Device.Release()
+-	dv.Device = nil
++	if device.IsValid() {
++		device.Poll(true, nil)
++	}
+ }
+ 
+ // WaitDoneFunc waits until the device is idle and then calls

@@ -72,3 +72,26 @@ physical GPU heap reclamation, native surfaces/presentation and performance.
 Headless device admission refuses a missing adapter and cleans partial GPU/device
 references on failure. The shared global instance remains owned by final
 application shutdown. Counted factory probes verify error and retirement order.
+
+## Private compute-system ownership
+
+A ComputeSystem borrows its GPU adapter and owns its separately requested device
+and queue. NewComputeSystemChecked returns no partial system on adapter/device
+refusal; the legacy constructor logs and returns nil. Owner-serialized shutdown
+first detaches all system state, abandons pending recording, completes prior work,
+retires pipelines/values and then releases the private device/queue. Empty and
+repeated shutdown are safe. GraphicsSystem still borrows its renderer's device.
+
+Compute recording admits a complete live command/pass pair. Partial/refused
+factories retire acquired references. The pinned native BeginComputePass can
+panic; cleanup unwinds but does not convert that panic to a returned error.
+Submission requires caller End, detaches the recording, releases pass before
+Finish and retires command/buffer on success/refusal. Failure never reaches the
+queue, and old bind groups retire on both paths. Shutdown never submits pending
+recording. No broad panic recovery or concurrent-owner contract is added.
+
+Device.Release clears ownership before cleanup and releases its independently
+owned GetQueue reference even when the device is missing/invalid. Polling requires
+a live device. Wrapper retirement and small headless shader-output checks remain
+separate from GPU/native heap reclamation, physical device loss, presentation,
+sustained performance and full Mac acceptance.

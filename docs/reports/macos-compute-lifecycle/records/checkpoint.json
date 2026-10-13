@@ -1,0 +1,72 @@
+{
+  "result": "PASS_PRIVATE_COMPUTE_OWNERSHIP",
+  "base_commit": "ef4dcb3486e41790be3e59a9faa0036080ff02f0",
+  "qualification_sha256": "6d18e1bf1545d88500c6fdf913095d437e053bb0f901dbd0d987c453f4b07580",
+  "source": {
+    "drivers/cogent/native/dependencies.json": "db29f6514d302acc9022351646874afb91a8cbdc4514c4f5f2dc57a7763126f9",
+    "drivers/cogent/native/patches/computelifecycle/0050-owned-compute-device-and-recording.patch": "dd27b3544799eed4b0315396a7e8a5819d1d6495da7262c8f7965e64df56f909",
+    "drivers/cogent/native/patches/computelifecycle/README.md": "b565232db05c5f1a3c33548a87d950c7e0fed6c3e7d9d9d7d375f98c1fa3a329",
+    "drivers/cogent/native/patches/computelifecycle/original-hashes.json": "f27191ce2bc317381f37580cfe62c524e2245ede97b69ef4344587a5b02cb19d",
+    "drivers/cogent/native/patches/computelifecycle/output-hashes.json": "f375c5539b5e49c08a5b7e6b447a8b421e2806d77139e960ac8b7833fb023739",
+    "drivers/cogent/prepare_test.py": "78a5e3488839d745210c30de084034d563943c03cd7e7251eb3711ac98b82f9b",
+    "specs/gpu-frame-lifecycle.md": "e20db57a243535926518fa669155e1d55cc2595f739ea00e5838925b45e62f45",
+    "specs/macos-completion.md": "58eb889f3b734115c2f9de7ce00f17826bcfd2ca72845e14d793325c164e2f07"
+  },
+  "decoded_outputs": {
+    "gpu/compute.go": "a0f19248859b70d8fef0fb3a25e161858b70fdfa5dd2d100b203f2599d685a1a",
+    "gpu/compute_lifecycle.go": "87b138a11bd50315df764a688140e1e0c889b88f5d9db2c570f382673c55ec8b",
+    "gpu/compute_lifecycle_test.go": "7af201abdb3f36029d2ca1fa1ce70c38e43ef96e43f3276cab2eac8aae5187c4",
+    "gpu/compute_native_lifecycle_test.go": "ccc854f208a6b80b9f52349de073f8fba1b290e674e92cd83e57dbea20a6792a",
+    "gpu/compute_regression_test.go": "45d92f9a7d1386b412f0d6f9ebaa1efdd10ff8f98cf1952919b33319c8f9e6e2",
+    "gpu/device.go": "1eaa5ba9ecff742f156d40793658ea6e72b330d7cc42c465023d9ef0c898c34e"
+  },
+  "source_review_sha256": "66662a1a8437ff51307eeb1c7cb2629ca863c60033443b99ac2b295046896d5d",
+  "evidence_review_sha256": "ec8ebfd4dd308f3ed6766c4feb26ce4b1af8498aaa9e874cf1bd3993ec1c30b5",
+  "post_test_document_sha256": "200eed6067eb43ba9d37023ed25f1d2ce2bf36e0a732f55b0e7ce81a383b9db4",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_reviewed_files": 6,
+  "prism_raw_exit_code": 1,
+  "prism_findings": 1,
+  "prism_findings_resolved": true,
+  "prism_resolution": "431ef9dfb1485c78: both intentionally excluded static pin maps are in the full staged checkpoint; source review replays exact6outputs and preparation11tests passes. No missing file.",
+  "post_prism_delta": "Ordered fixture failure teardown only; three root leaves (patch/output pin/native manifest hash) updated. All five other decoded sources byte-identical to PrismV1; final internal review and actual headless/race/build checks bind final source.",
+  "archive": {
+    "sha256": "c905dc799c110a61546aee00e6d81b69d6bce48b937df70d316b4a6de7c3ccfe",
+    "index_sha256": "53fe2758908ff5fb130b7c66750803959469e649b2d5bfe15e4ccfda75e97cca",
+    "members": 113
+  },
+  "prepared_files": 6191,
+  "raw_receipts": 20,
+  "failed_receipts_preserved": 6,
+  "python_preparation_tests": 11,
+  "native_compiled_sha256": "73ee7d6734069bd6068dbd169a31edffab08efb09b4fe46cb1da67f809239e71",
+  "final_owned_source_headless_gpu_executed": true,
+  "final_owned_source_native_window_executed": false,
+  "headless_gpu_observations": [
+    {
+      "borrowed_owner_live": true,
+      "case": "private_device_and_active_recording",
+      "computed_words_checked": 32,
+      "retired_child_refs": 5,
+      "retired_device_refs": 2,
+      "retired_recording_refs": 18,
+      "submitted_passes": 8,
+      "surfaces_created": 0,
+      "windows_created": 0
+    },
+    {
+      "case": "partial_device_queue",
+      "retired_queue_refs": 1,
+      "surfaces_created": 0,
+      "windows_created": 0
+    }
+  ],
+  "physical_gpu_fault_injection": false,
+  "native_memory_qualified": false,
+  "gpu_memory_qualified": false,
+  "sustained_performance_qualified": false,
+  "macos_completion": false,
+  "next_live_tests_deferred": true
+}
