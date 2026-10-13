@@ -25,6 +25,192 @@ type gridLayoutProbe struct {
 
 func (p *gridLayoutProbe) SizeUp() { p.sizeUps++; p.Text.SizeUp() }
 
+// Simultaneous row/column changes interleave new column slots with the incoming
+// row. A flat donor queue can move frozen widgets into scrolling panes even
+// though each pane's population is unchanged, forcing a full scene layout.
+func TestManagedGridCombinedScrollKeepsDonorPanesAndLocalLayout(t *testing.T) {
+	for _, dpi := range []float32{96, 120, 144, 192} {
+		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
+			columns := make([]virtual.GridColumn, 20)
+			for i := range columns {
+				columns[i] = virtual.GridColumn{ID: fmt.Sprintf("c%d", i), Width: 96}
+			}
+			model, err := virtual.NewGrid(&nativeGridSource{rows: 10000, revision: 1}, columns, virtual.GridConfig{RowHeight: 24, HeaderHeight: 24, FrozenColumns: 2}, virtual.GridViewport{Width: 480, Height: 240})
+			if err != nil {
+				t.Fatal(err)
+			}
+			config := manualConfig(t, 7)
+			config.LogicalDPI = dpi
+			m, a := gridManual(t, config, func() ui.Node { return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true} })
+			gridFrame(t, m)
+			var g *gridBinding
+			var probe *gridLayoutProbe
+			if err = a.Do(func() {
+				window := m.implementation.find("one").state
+				g = window.root.control.grid
+				probe = tree.New[gridLayoutProbe](window.body)
+				probe.SetText("unrelated layout probe")
+				probe.Styler(func(s *styles.Style) { s.Min.Y = units.Dp(30); s.Grow.SetZero() })
+				window.body.Update()
+				if e := model.Scroll(192, 72); e != nil {
+					t.Error(e)
+				}
+				_ = a.Invalidate("one")
+			}); err != nil {
+				t.Fatal(err)
+			}
+			gridFrame(t, m)
+			for _, step := range []image.Point{{96, 24}, {-96, -24}, {96, -24}, {-96, 24}} {
+				before := make(map[*core.Text]tree.Node)
+				keys := make(map[gridCellKey]*core.Text)
+				if err = a.Do(func() {
+					for i, w := range g.cells {
+						before[w] = w.Parent
+						c := g.projection.Cells[i]
+						keys[gridCellKey{c.RowKey, c.ColumnID}] = w
+					}
+					probe.sizeUps = 0
+					if e := model.Scroll(step.X, step.Y); e != nil {
+						t.Error(e)
+					}
+					if e := syncGrid(g.r); e != nil {
+						t.Error(e)
+					}
+					if len(g.cells) != len(before) {
+						t.Error("fixture changed total cell population")
+					}
+					for i, w := range g.cells {
+						if parent := before[w]; parent != nil && parent != w.Parent {
+							t.Errorf("recycled widget crossed frozen/scrolling pane on %v", step)
+						}
+						c := g.projection.Cells[i]
+						if old := keys[gridCellKey{c.RowKey, c.ColumnID}]; old != nil && old != w {
+							t.Error("overlapping cell lost domain-key identity")
+						}
+					}
+					if g.host.Scene.GlobalLayoutPending() {
+						t.Errorf("combined scroll %v forced global layout", step)
+					}
+					assertGridRetainedPaneOrder(t, g)
+				}); err != nil {
+					t.Fatal(err)
+				}
+				gridFrame(t, m)
+				actual, e := m.Capture(testContext, "one")
+				if e != nil {
+					t.Fatal(e)
+				}
+				inspection := gridInspection(t, a, model)
+				if err = a.Do(func() {
+					if probe.sizeUps != 0 {
+						t.Error("combined scroll sized unrelated scene content")
+					}
+					g.host.Update() // Independent ordinary full-layout oracle.
+				}); err != nil {
+					t.Fatal(err)
+				}
+				gridFrame(t, m)
+				full, e := m.Capture(testContext, "one")
+				if e != nil {
+					t.Fatal(e)
+				}
+				if actual.Bounds() != full.Bounds() || !bytes.Equal(actual.Pix, full.Pix) {
+					t.Fatalf("combined scroll %v local/full pixels differ", step)
+				}
+				oracle := gridInspection(t, a, model)
+				inspection.Frames, oracle.Frames = 0, 0
+				if !reflect.DeepEqual(inspection, oracle) {
+					t.Fatalf("combined scroll %v local/full geometry or semantics differ", step)
+				}
+				if probe.sizeUps == 0 {
+					t.Fatal("ordinary full oracle did not exercise unrelated layout")
+				}
+			}
+		})
+	}
+}
+
+func TestManagedGridDonorShortageFallbackAndRetirement(t *testing.T) {
+	a, host := gridContractOwner(t, 8)
+	model, _ := testNativeGrid(t, 10000)
+	mounted := mountGridContract(t, a, host, ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model}).control.grid
+	var frozen, scrolling []*core.Text
+	var frozenCells, scrollingCells []virtual.GridCell
+	for i, w := range mounted.cells {
+		cell := mounted.projection.Cells[i]
+		if cell.Frozen && len(frozen) < 2 {
+			frozen = append(frozen, w)
+			frozenCells = append(frozenCells, cell)
+		}
+		if !cell.Frozen && len(scrolling) < 2 {
+			scrolling = append(scrolling, w)
+			scrollingCells = append(scrollingCells, cell)
+		}
+	}
+	if len(frozen) != 2 || len(scrolling) != 2 {
+		t.Fatal("fixture lacks both donor panes")
+	}
+	old := append(append([]*core.Text{}, frozen...), scrolling...)
+	oldCells := append(append([]virtual.GridCell{}, frozenCells...), scrollingCells...)
+	makeBinding := func() *gridBinding {
+		return &gridBinding{cells: old, projection: virtual.GridSnapshot{Cells: oldCells}, panes: mounted.panes}
+	}
+	makeCells := func(count, frozenCount int) []virtual.GridCell {
+		out := make([]virtual.GridCell, count)
+		for i := range out {
+			out[i] = virtual.GridCell{RowKey: fmt.Sprintf("new-row%d", i), ColumnID: "new-column", Frozen: i < frozenCount}
+		}
+		return out
+	}
+	// Growth leaves two frozen holes. All old scrolling donors must first reach
+	// the later scrolling holes rather than being stolen by early fallback.
+	cells, retired, err := makeBinding().retainCells(virtual.GridSnapshot{Cells: makeCells(6, 4)})
+	if err != nil || len(retired) != 0 || cells[2] != nil || cells[3] != nil || cells[4] != scrolling[0] || cells[5] != scrolling[1] {
+		t.Fatal("preferred holes lost donors before fallback", cells, retired, err)
+	}
+	// A true population change still reuses every old widget, including donors
+	// from the other pane, rather than temporarily growing the retained pool.
+	cells, retired, err = makeBinding().retainCells(virtual.GridSnapshot{Cells: makeCells(4, 0)})
+	seen := map[*core.Text]bool{}
+	for _, w := range cells {
+		if w == nil || seen[w] {
+			t.Fatal("fallback lost or duplicated widget")
+		}
+		seen[w] = true
+	}
+	if err != nil || len(retired) != 0 || len(seen) != 4 {
+		t.Fatal("fallback grew or retired reusable pool", err)
+	}
+	// Surplus retirement retains old order and contains each unconsumed widget
+	// once. Nothing has reparented the borrowed mounted widgets during matching.
+	cells, retired, err = makeBinding().retainCells(virtual.GridSnapshot{Cells: makeCells(2, 0)})
+	if err != nil || !reflect.DeepEqual(cells, scrolling) || !reflect.DeepEqual(retired, frozen) {
+		t.Fatal("surplus retirement changed membership/order", err)
+	}
+	keyed := makeCells(2, 0)
+	keyed[0] = oldCells[0]
+	keyed[0].Frozen = false
+	cells, _, err = makeBinding().retainCells(virtual.GridSnapshot{Cells: keyed})
+	if err != nil || cells[0] != old[0] {
+		t.Fatal("pane preference overrode domain-key match", err)
+	}
+	duplicate := makeCells(2, 0)
+	duplicate[1] = duplicate[0]
+	if cells, retired, err = makeBinding().retainCells(virtual.GridSnapshot{Cells: duplicate}); !errors.Is(err, ErrGridBinding) || cells != nil || retired != nil {
+		t.Fatal("duplicate key was admitted", err)
+	}
+	for _, w := range frozen {
+		if w.Parent != mounted.panes[2] {
+			t.Fatal("matching mutated frozen parent")
+		}
+	}
+	for _, w := range scrolling {
+		if w.Parent != mounted.panes[3] {
+			t.Fatal("matching mutated scrolling parent")
+		}
+	}
+}
+
 func TestManagedGridKeyedLocalLayoutMatchesFullScene(t *testing.T) {
 	for _, variableRows := range []bool{false, true} {
 		for _, batch := range []int{1, 7, 64} {

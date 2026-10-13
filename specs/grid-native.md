@@ -253,6 +253,14 @@ Inspection does not render, drain, fetch hidden cells or invoke callbacks.
 ## Retained viewport layout
 
 The private cell pool matches `(RowKey, ColumnID)` and headers match `ColumnID`.
+Departing cell slots first serve every entering slot in their existing frozen
+or scrolling pane. Only after all same-pane matches are assigned does an old-order
+fallback reuse donors across panes when populations change. Exact domain-key
+matches keep precedence, each widget is consumed once, and unused widgets retire
+in their old order. Combined row/column scrolling with unchanged pane populations
+therefore avoids incidental reparenting and the resulting full-scene layout.
+The pool still contains only the current admitted projection; this adds no
+offscreen row cache, retained widgets or relaxed geometry/layout guard.
 Overlapping identities keep their widgets and shaped text. Departing widgets are
 bounded donors for entering identities; surplus widgets are destroyed and their
 private caches retired. No off-viewport row cache is introduced. `g.cells` and

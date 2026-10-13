@@ -1,0 +1,240 @@
+"""Seal the bounded pane-retention checkpoint after all native runs terminate."""
+import hashlib, io, json, shutil, sys, tarfile
+from pathlib import Path
+
+r = Path('/private/tmp/vellum-large-data')
+p = Path('/private/tmp/vellum-macos-grid-latency')
+out = r / 'docs/reports/macos-grid-pane-retention'
+sha = lambda f: hashlib.sha256(f.read_bytes()).hexdigest()
+read = lambda n: json.loads((p / n).read_text())
+manifest = read('pane-source-final.json')
+sources = manifest['sources']
+assert len(sources) == 3 and all(sha(r / n) == h for n, h in sources.items())
+cert = read('pane-source-review.json')
+assert cert['status'] == 'APPROVED_SOURCE' and not cert['findings'] and cert['files'] == sources
+prism, process = read('prism-v1/prism.json'), read('prism-v1/process.json')
+assert prism['coverage']['complete'] and prism['coverage']['files'] == 3 and not prism['findings']
+assert process['exit_code'] == 0 and process['error'] is None and process['source_index_stable']
+assert process['before'] == process['after'] == sources
+
+# Use the production validator to recheck every raw native ticket and percentile.
+sys.path.insert(0, str(r / 'scripts'))
+import importlib.util
+spec = importlib.util.spec_from_file_location('grid_benchmark', r / 'scripts/benchmark-grid.py')
+bench = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(bench)
+summaries, samples = {}, {}
+comparison = {'scope': 'Serial campaigns on one host; elapsed UI work, not a controlled causal estimate or compositor/native CPU/GPU timing.', 'cases': {}}
+for name in ['baseline-cpu', 'baseline-gpu', 'pane-final-cpu', 'pane-final-gpu']:
+    d = read(name + '/summary.json')
+    assert d['result'] == 'MEASURED' and not d['diagnostic'] and not d['novel']
+    assert d['runs'] == 5 and d['samples_per_run'] == 120 and d['warmup'] == 128
+    assert d['warm_targets_ns'] == {'p95': 4000000, 'p99': 6000000}
+    assert d['selected_inputs_before'] == d['selected_inputs_after']
+    assert sha(Path(d['binary'])) == d['binary_sha256']
+    summaries[name], samples[name] = d, {}
+    for key, case in d['cases'].items():
+        variable, rows = key.startswith('variable'), int(key.split('-')[1])
+        assert len(case['runs']) == 5
+        runs = []
+        for run in case['runs']:
+            assert run['exit_code'] == 0
+            selected = bench.validate_records(run['records'], rows, variable, 120, False, gpu_scene_rendering=d['gpu_scene_rendering'])
+            assert all(s['geometry']['cells'] >= 400 and s['geometry']['rows'] >= 50 and s['geometry']['columns'] == 8 for s in selected)
+            runs.append(selected)
+        assert bench.summarize(runs) == case['timings_ns']
+        samples[name][key] = runs
+    for variable in ['fixed', 'variable']:
+        for small, large in zip(samples[name][variable + '-10000'], samples[name][variable + '-1000000']):
+            bench.compare_geometry(small, large)
+    met = all(v['p95'] <= 4000000 and v['p99'] <= 6000000 for c in d['cases'].values() for v in c['timings_ns']['ui_work_ns']['per_run'])
+    assert d['warm_target_met'] is met
+
+for mode in ['cpu', 'gpu']:
+    b, a = summaries['baseline-' + mode], summaries['pane-final-' + mode]
+    changes = {n for n in b['selected_inputs_before'] if b['selected_inputs_before'][n] != a['selected_inputs_before'][n]}
+    assert changes == {'drivers/cogent/grid_retained.go', 'drivers/cogent/grid_retained_offscreen_test.go'}
+    assert not b['gpu_scene_rendering'] if mode == 'cpu' else b['gpu_scene_rendering']
+    assert a['gpu_scene_rendering'] == b['gpu_scene_rendering']
+    for key in b['cases']:
+        for before, after in zip(samples['baseline-' + mode][key], samples['pane-final-' + mode][key]):
+            bench.compare_geometry(before, after)
+            for x, y in zip(before, after):
+                assert x['geometry'] == y['geometry'] and x['source_callbacks'] == y['source_callbacks']
+        prior, final = b['cases'][key]['timings_ns']['ui_work_ns'], a['cases'][key]['timings_ns']['ui_work_ns']
+        comparison['cases'][mode + '/' + key] = {
+            'baseline_ns': prior['pooled'], 'final_ns': final['pooled'],
+            'p95_change_percent': 100 * (final['pooled']['p95'] / prior['pooled']['p95'] - 1),
+            'mean_change_percent': 100 * (final['pooled']['mean'] / prior['pooled']['mean'] - 1),
+            'baseline_per_run': prior['per_run'], 'final_per_run': final['per_run'],
+        }
+(p / 'comparison.json').write_text(json.dumps(comparison, indent=2) + '\n')
+
+# Raw hardware reports can contain serial numbers/UUIDs inside JSON stdout strings.
+def redact(value):
+    if isinstance(value, dict):
+        return {k: redact(v) for k, v in value.items() if 'serial' not in k.lower() and 'uuid' not in k.lower()}
+    if isinstance(value, list):
+        return [redact(v) for v in value]
+    if isinstance(value, str):
+        try:
+            nested = json.loads(value)
+        except ValueError:
+            return value
+        if isinstance(nested, (dict, list)):
+            return json.dumps(redact(nested))
+    return value
+for name in summaries:
+    f = p / name / 'machine.json'
+    safe = {'source_sha256': sha(f), 'redaction': 'Remove serial/UUID keys including JSON encoded stdout.', 'metadata': redact(json.loads(f.read_text()))}
+    (f.parent / 'machine.redacted.json').write_text(json.dumps(safe, indent=2) + '\n')
+
+names = ['build-baseline', 'cpu-profile-baseline', 'profile-top-flat', 'profile-top-cumulative', 'profile-source-lines', 'profile-grid-focus',
+         'baseline-cpu-campaign', 'baseline-gpu-campaign', 'geometry-race-candidate', 'build-candidate', 'candidate-probe',
+         'pane-regression-before', 'pane-regression-after', 'pane-regression-final', 'build-pane-final', 'loadedgrid-offscreen-race',
+         'adapter-default-race', 'adapter-offscreen-race', 'adapter-vet', 'adapter-offscreen-vet',
+         'workbench-default-race-retry', 'workbench-offscreen-race-retry', 'pane-final-cpu-campaign', 'pane-final-gpu-campaign',
+         'pane-ax-fixed-10000', 'pane-ax-fixed-1000000', 'pane-ax-variable-10000', 'pane-ax-variable-1000000']
+receipts = {}
+expected_failures = {'pane-regression-before', 'adapter-default-race', 'adapter-offscreen-race'}
+final_names = set(names[13:])
+for name in names:
+    d = read(name + '.json')
+    assert d['exit_code'] == (1 if name in expected_failures else 0) and d['error'] is None and d['source_delta_stable']
+    for channel in ['stdout', 'stderr']:
+        assert sha(p / (name + '.' + channel)) == d[channel + '_sha256']
+    if name in final_names:
+        assert d['source_delta_before'] == d['source_delta_after'] == sources
+    receipts[name] = {'path': name + '.json', 'sha256': sha(p / (name + '.json')), 'exit_code': d['exit_code'], 'historical': name not in final_names}
+for name in ['adapter-default-race', 'adapter-offscreen-race']:
+    text = (p / (name + '.stdout')).read_text() + (p / (name + '.stderr')).read_text()
+    assert 'operation not permitted' in text and 'cmd/workbench' in text
+before = (p / 'pane-regression-before.stdout').read_text()
+assert 'FAIL' in before and 'crossed frozen/scrolling pane' in before
+ax = {}
+for name in names[-4:]:
+    records = [json.loads(line) for line in (p / (name + '.stdout')).read_text().splitlines() if line.startswith('{')]
+    passes = [x for x in records if x.get('event') == 'grid.accessibility.pass']
+    assert len(passes) == 1 and passes[0]['visible_minimum'] == 400 and passes[0]['native_press_admitted']
+    ax[name] = passes[0]
+
+prepared = {f.relative_to(r / 'drivers/cogent/build').as_posix(): sha(f) for module in ['upstream', 'typesetting'] for f in sorted((r / 'drivers/cogent/build' / module).rglob('*')) if f.is_file()}
+assert len(prepared) == 6174 and prepared == read('prepared-final.json')
+q = {'result': 'PASS_MAC_GRID_PANE_RETENTION_WITH_PERFORMANCE_GATES_OPEN', 'base_commit': manifest['base_commit'],
+     'source': sources, 'prepared': prepared, 'receipts': receipts, 'source_review_sha256': sha(p / 'pane-source-review.json'),
+     'prism_raw_exit_code': 0, 'prism_findings': 0, 'prism_findings_resolved': True,
+     'campaigns': {n: {'summary_sha256': sha(p / n / 'summary.json'), 'binary_sha256': d['binary_sha256'], 'warm_target_met': d['warm_target_met'], 'fresh_processes': 20, 'measured_frames': 2400} for n, d in summaries.items()},
+     'native_grid_ax': ax, 'comparison_sha256': sha(p / 'comparison.json'),
+     'performance_acceptance': all(d['warm_target_met'] for n, d in summaries.items() if n.startswith('pane-final')),
+     'live_tests': True, 'os_preferences_changed': False, 'general_pasteboard_accessed': False,
+     'human_voiceover_qualified': False, 'macos_completion': False,
+     'suite_disposition': 'Each full default/offscreen adapter race run passed its driver and all other packages except sandbox-denied workbench Unix sockets. Each affected package passed an authorized unsandboxed race retry. Original full-run exits remain 1.',
+     'unadopted_experiment': 'Geometry publication cache was tested separately and removed before final donor implementation. Its four files are historical, excluded from final source and Prism scope.'}
+(p / 'qualification.json').write_text(json.dumps(q, indent=2) + '\n')
+records = out / 'records'
+records.mkdir(parents=True, exist_ok=False)
+shutil.copy2(Path(__file__), records / 'archive-producer.py.txt')
+files = {}
+for f in sorted(p.rglob('*')):
+    if not f.is_file() or f.is_symlink() or f.name == 'machine.json':
+        continue
+    if f.suffix in ['.json', '.stdout', '.stderr', '.py', '.txt', '.log', '.pprof']:
+        files[f.relative_to(p).as_posix()] = f.read_bytes()
+index = {n: hashlib.sha256(b).hexdigest() for n, b in files.items()}
+(records / 'evidence-index.json').write_text(json.dumps(index, indent=2) + '\n')
+archive = records / 'evidence.tar.gz'
+with tarfile.open(archive, 'w:gz') as tf:
+    for n, b in files.items():
+        info = tarfile.TarInfo(n)
+        info.size, info.mode, info.mtime = len(b), 0o644, 0
+        tf.addfile(info, io.BytesIO(b))
+with tarfile.open(archive) as tf:
+    actual = {m.name: hashlib.sha256(tf.extractfile(m).read()).hexdigest() for m in tf.getmembers() if m.isfile()}
+assert actual == index and all(Path(n).name != 'machine.json' for n in index)
+
+table = '\n'.join('| ' + key.replace('/', ' / ') + ' | ' + ' | '.join(f'{c[side][metric] / 1e6:.3f}' for metric in ['mean', 'p95', 'p99'] for side in ['baseline_ns', 'final_ns']) + ' |' for key, c in comparison['cases'].items())
+report = '''# Mac grid pane retention
+
+Combined row/column scrolling could recycle a departing frozen-cell widget into a
+scrolling pane. That parent change forced a full scene layout, including unrelated
+siblings. Retention now reserves same-pane donors for every hole before using the
+stable old-order fallback. Exact domain-key matches retain priority. The admitted
+widget pool, native capacity limits and full-layout safety guards are unchanged.
+
+## Functional acceptance
+
+The new regression fails against the original algorithm: each combined-scroll
+direction moves four donors across panes and sizes an unrelated sibling. The final
+two-pass implementation passes three race repetitions at 96/120/144/192 DPI. The
+tests check actual widget parents, overlapping domain-key identity, local-layout
+admission, pane child order and exact pixels against the ordinary full-layout
+oracle. Growth, donor shortage, true pane population changes, stable fallback,
+ordered retirement and duplicate-key rejection are also checked.
+
+Default and offscreen driver race suites and the loaded-grid offscreen race suite
+pass. The full adapter commands originally exit 1 because the sandbox denied the
+workbench package's temporary Unix sockets. Both affected workbench packages pass
+authorized unsandboxed race retries; original failure receipts remain unchanged.
+Default/offscreen vet passes. Four separate real Cocoa grid AX runs cover fixed and
+variable rows at 10,000 and 1,000,000 records: bounded 400-cell semantics, geometry,
+overlapping object identity, replacement retirement and native press admission.
+These queries do not qualify human VoiceOver or physical pointer input.
+
+## Native performance comparison
+
+Each of four serial campaigns uses five fresh optimized processes per fixed/
+variable 10k/million case, 128 warmup callbacks and 120 measured frames per process.
+Together they record 80 processes and 9,600 measured frames. CPU scene and opt-in
+GPU scene modes remain separate. Every paired measured frame has the same actually
+clipped workload, layout identity, materialized/retained pool and source callback
+counts before and after the fix. Fixed rows show 400 cells and 50 rows; variable
+rows show 400/408 cells and 50/51 rows, always eight columns. Stored values are
+verified by the production fixture. Selected source and binary hashes are bound
+to each campaign; the selected source list is not a complete compiler closure.
+
+The following pooled elapsed UI-work measurements are milliseconds. Per-run
+distributions and raw native tickets remain in the archive.
+
+| Mode / case | Mean before | Mean after | p95 before | p95 after | p99 before | p99 after |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+''' + table + '''
+
+Tail latency decreases in this comparison, while average frame work increases.
+This is a measured tradeoff on one host across serial runs, not a controlled
+estimate of a causal speedup. The unchanged p95 <=4 ms and p99 <=6 ms targets still
+fail in every final process. This checkpoint fixes pane ownership and preserves
+local layout; it does not pass P6 performance acceptance. UI work excludes acquire
+wait and queued delay, and does not measure native/GPU CPU time or compositor
+presentation. No percentile sums are used.
+
+A separate 2,048-frame process-wide CPU profile is diagnostic only. Its CGO/wait
+attribution cannot identify precise native CPU costs. A geometry-publication cache
+experiment produced no persuasive full-frame gain and was removed before the
+final implementation. Historical source and receipts are archived with that scope;
+they are excluded from final source qualification and Prism review.
+
+## Review and evidence
+
+Internal source review approves the exact three implementation/test/spec files.
+Prism ran once with Anthropic Claude Sonnet 5.5: complete three-file coverage,
+8,110 input and 1,278 output tokens, raw exit 0 and no findings. Report/evidence
+validation is a separate internal review, without another provider call.
+
+[Checkpoint](records/checkpoint.json) binds the [archive](records/evidence.tar.gz)
+and [member index](records/evidence-index.json). The archive preserves raw exits,
+stdout/stderr, source manifests, profile, review and comparison evidence. Executable
+binaries and raw serial/UUID-bearing hardware metadata are excluded; redacted
+metadata retains the raw file hash. All 6,174 prepared dependency files remain
+byte-identical. Checks ran within the authorized fifteen-hour quiet window and
+changed no OS preferences or general clipboard contents. Wider Mac qualification,
+hardware coverage, performance/endurance and public distribution remain open.
+'''
+(out / 'README.md').write_text(report)
+checkpoint = {'result': q['result'], 'base_commit': q['base_commit'], 'qualification_sha256': sha(p / 'qualification.json'),
+              'source_review_sha256': sha(p / 'pane-source-review.json'), 'prism_provider': 'anthropic', 'prism_model': 'claude-sonnet-5-5',
+              'prism_coverage_complete': True, 'prism_original_coverage_files': 3, 'final_internally_reviewed_files': 3,
+              'prism_findings': 0, 'prism_findings_resolved': True,
+              'archive': {'sha256': sha(archive), 'members': len(index), 'index_sha256': sha(records / 'evidence-index.json')},
+              'report_sha256': sha(out / 'README.md'), 'live_tests': True, 'performance_acceptance': q['performance_acceptance'], 'macos_completion': False}
+(records / 'checkpoint.json').write_text(json.dumps(checkpoint, indent=2) + '\n')
+print(json.dumps(checkpoint, indent=2))

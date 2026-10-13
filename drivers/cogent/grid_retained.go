@@ -36,20 +36,77 @@ func (g *gridBinding) retainCells(next virtual.GridSnapshot) ([]*core.Text, []*c
 			cells[i], used[w] = w, true
 		}
 	}
-	donors := make([]*core.Text, 0, len(g.cells))
+	// Prefer donors already owned by the destination pane. A combined row/
+	// column scroll interleaves entering columns and rows; a flat donor queue
+	// can move frozen widgets into scrolling slots and force a full layout even
+	// when both pane populations are unchanged. Partition once, then use FIFO
+	// heads so matching and fallback remain linear and retain no extra widgets.
+	bucket := func(w *core.Text) int {
+		if w != nil && w.Parent == g.panes[2] {
+			return 0
+		}
+		if w != nil && w.Parent == g.panes[3] {
+			return 1
+		}
+		return -1
+	}
+	var counts [2]int
 	for _, w := range g.cells {
 		if !used[w] {
-			donors = append(donors, w)
+			if b := bucket(w); b >= 0 {
+				counts[b]++
+			}
 		}
 	}
-	n := 0
+	starts := [2]int{0, counts[0]}
+	heads, ends := starts, starts
+	donors := make([]*core.Text, counts[0]+counts[1])
+	for _, w := range g.cells {
+		if !used[w] {
+			if b := bucket(w); b >= 0 {
+				donors[ends[b]] = w
+				ends[b]++
+			}
+		}
+	}
 	for i, w := range cells {
-		if w == nil && n < len(donors) {
-			cells[i] = donors[n]
-			n++
+		if w != nil {
+			continue
+		}
+		preferred := 1
+		if next.Cells[i].Frozen {
+			preferred = 0
+		}
+		if heads[preferred] < ends[preferred] {
+			cells[i] = donors[heads[preferred]]
+			heads[preferred]++
+			used[cells[i]] = true
 		}
 	}
-	return cells, donors[n:], nil
+	// Only after every same-parent hole is served may a real population change
+	// reuse another pane's donor. Preserve old order and single consumption.
+	fallback := 0
+	for i, w := range cells {
+		if w != nil {
+			continue
+		}
+		for fallback < len(g.cells) {
+			donor := g.cells[fallback]
+			fallback++
+			if donor != nil && !used[donor] {
+				cells[i], used[donor] = donor, true
+				break
+			}
+		}
+	}
+	retired := make([]*core.Text, 0, len(g.cells)-len(used))
+	for _, w := range g.cells {
+		if w != nil && !used[w] {
+			retired = append(retired, w)
+			used[w] = true
+		}
+	}
+	return cells, retired, nil
 }
 
 func (g *gridBinding) retainHeaders(next virtual.GridSnapshot) ([]*core.Text, []*core.Text, error) {

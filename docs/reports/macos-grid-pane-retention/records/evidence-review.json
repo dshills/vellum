@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED",
+  "result": "APPROVED_EVIDENCE",
+  "reviewer": "mac_history_review",
+  "base_commit": "6d2cd2ffbd58e8b00e7edd1e90413bd86a0742de",
+  "scope": "Read-only independent evidence review of the completed pane-retention checkpoint; report/producer graph, archive, source/provider versions, functional receipts and raw paired native measurements.",
+  "findings": [],
+  "primary_bindings": {
+    "report": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-grid-pane-retention/README.md",
+      "sha256": "6ad4fc5856b9a5186f8f9b16205cd1e787c847577863787bdc4b790ec910b37f"
+    },
+    "checkpoint": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-grid-pane-retention/records/checkpoint.json",
+      "sha256": "8cc59d18544eeb258c2b7f3c861f3086730c475da4018fd64cceac75a0d4e5ad"
+    },
+    "qualification": {
+      "path": "/private/tmp/vellum-macos-grid-latency/qualification.json",
+      "sha256": "ff355c95ad303a094d3d179babf0582b7bef8281d3d00aba15d00d25dedec02a"
+    },
+    "archive": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-grid-pane-retention/records/evidence.tar.gz",
+      "sha256": "5842c7d158ecf5401276bfe97817e5078f23df2997d5f1670cd33ad26837e615",
+      "members": 288,
+      "index_sha256": "86b41ca3fe02116ec53cc82b50670ebf406e537653398851a3295aaeeb4bfad4"
+    },
+    "producer": {
+      "path": "/private/tmp/vellum-large-data/docs/reports/macos-grid-pane-retention/records/archive-producer.py.txt",
+      "sha256": "23ae8103359e50da728b09b7d30111ced9297ea07b5dac71ad4fae1b2e14b7f0",
+      "not_executed_by_reviewer": true
+    },
+    "independent_audit": {
+      "path": "/private/tmp/vellum-grid-pane-evidence-review/audit.json",
+      "sha256": "cbeaf8378bc369bacd4dc87d3c9dd8e889d4cc1390d697ebcf10307a89c17e31"
+    },
+    "inert_recipe": {
+      "path": "/private/tmp/vellum-grid-pane-evidence-review/verify-v4.py.txt",
+      "sha256": "11e47bf5301be8a1bc58c9bbb5beaae337b66447ce6f57f3d95249ac56fb0230"
+    }
+  },
+  "source_and_review": {
+    "final_source_sha256": {
+      "drivers/cogent/grid_retained.go": "0044b857e9e8a34dd7e832c1c3fa2b674d0ba3affd49fda5b826bfc9176e91ee",
+      "drivers/cogent/grid_retained_offscreen_test.go": "01edd9ee4b72fab3d0465e9df82c73d7c120d95fbfc4979f22dadf3bc030b3b8",
+      "specs/grid-native.md": "4944d49ab609dc5b0c7b3fd905ab5331371d7adc5eb75ee58106d746a72cbdf7"
+    },
+    "frozen_certificate": {
+      "path": "/private/tmp/vellum-macos-grid-latency/pane-source-review.json",
+      "sha256": "7a4c0ed78901eebaee97cdaf3a5a6de949b61b4483ed91fd67e2654731eae2cc",
+      "status": "APPROVED_SOURCE",
+      "exact_three_file_match": true
+    },
+    "prism": {
+      "raw_result_path": "/private/tmp/vellum-macos-grid-latency/prism-v1/prism.json",
+      "raw_sha256": "ee239a21986c816c8de0b2f84f9db755a38b63014af1df97822d126a4044ca61",
+      "process_path": "/private/tmp/vellum-macos-grid-latency/prism-v1/process.json",
+      "process_sha256": "0973a604a307d8f7e4abd8821bc21394a4bb9dc48581c5248b021014b2ec1618",
+      "raw_exit_code": 0,
+      "complete": true,
+      "files": 3,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5",
+      "input_tokens": 8110,
+      "output_tokens": 1278,
+      "findings": 0,
+      "exact_before_after_source_map": true
+    },
+    "prepared_files": 6174,
+    "all_current_prepared_bytes_independently_hashed": true,
+    "prepared_map_matches_recorded_final": true,
+    "prepared_matches_preceding_approved_checkpoint": true,
+    "prior_public_checkpoint_map": {
+      "qualification_sha256": "2e79ea493f279a8b7560f77a74f490d1a5f45f148b5157a1763439ac2e5d4a84",
+      "scope": "Previously reviewed public prepared digest map reused from reviewer memory; no protected clipboard content accessed."
+    },
+    "unadopted_geometry_experiment": "Historical archived four-file source/probe only. Final source/provider scope contains none of those files; baseline/final selected compiler input differences are exactly grid_retained.go and its test. Final helper bytes match baseline selected bindings."
+  },
+  "functional_evidence": {
+    "receipts": {
+      "build-baseline": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "cpu-profile-baseline": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "profile-top-flat": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "profile-top-cumulative": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "profile-source-lines": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "profile-grid-focus": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "baseline-cpu-campaign": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "baseline-gpu-campaign": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "geometry-race-candidate": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "build-candidate": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "candidate-probe": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "pane-regression-before": {
+        "exit_code": 1,
+        "historical": true
+      },
+      "pane-regression-after": {
+        "exit_code": 0,
+        "historical": true
+      },
+      "pane-regression-final": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "build-pane-final": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "loadedgrid-offscreen-race": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "adapter-default-race": {
+        "exit_code": 1,
+        "historical": false
+      },
+      "adapter-offscreen-race": {
+        "exit_code": 1,
+        "historical": false
+      },
+      "adapter-vet": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "adapter-offscreen-vet": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "workbench-default-race-retry": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "workbench-offscreen-race-retry": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "pane-final-cpu-campaign": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "pane-final-gpu-campaign": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "pane-ax-fixed-10000": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "pane-ax-fixed-1000000": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "pane-ax-variable-10000": {
+        "exit_code": 0,
+        "historical": false
+      },
+      "pane-ax-variable-1000000": {
+        "exit_code": 0,
+        "historical": false
+      }
+    },
+    "before_regression": {
+      "exit_code": 1,
+      "historical_test_file_sha256": "927ec531cec2b207a41a5fee503608d28a4abb6ec7f92d6a371ff436a3dde48b",
+      "cross_pane_donor_failures": 64,
+      "global_layout_failures": 16,
+      "unrelated_sizing_failures": 16,
+      "scope": "Original-algorithm historical regression receipt; evolved final test file has a different preserved source hash."
+    },
+    "final_regression": {
+      "exit_code": 0,
+      "race": true,
+      "repetitions": 3,
+      "exact_final_source_binding": true
+    },
+    "full_suites": {
+      "original_default_exit": 1,
+      "original_offscreen_exit": 1,
+      "only_failed_package": "github.com/dshills/vellum/drivers/cogent/cmd/workbench",
+      "reason": "temporary Unix-socket bind operation not permitted",
+      "default_affected_package_retry_exit": 0,
+      "offscreen_affected_package_retry_exit": 0,
+      "original_failures_preserved": true,
+      "no_full_command_exit_zero_relabeling": true
+    },
+    "cocoa_ax": {
+      "pane-ax-fixed-10000": {
+        "event": "grid.accessibility.pass",
+        "native_press_admitted": true,
+        "overlap_objects_reused": 2268,
+        "replacement_objects_retired": 459,
+        "rows": 10000,
+        "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification",
+        "visible_minimum": 400
+      },
+      "pane-ax-fixed-1000000": {
+        "event": "grid.accessibility.pass",
+        "native_press_admitted": true,
+        "overlap_objects_reused": 2268,
+        "replacement_objects_retired": 459,
+        "rows": 1000000,
+        "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification",
+        "visible_minimum": 400
+      },
+      "pane-ax-variable-10000": {
+        "event": "grid.accessibility.pass",
+        "native_press_admitted": true,
+        "overlap_objects_reused": 2307,
+        "replacement_objects_retired": 468,
+        "rows": 10000,
+        "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification",
+        "visible_minimum": 400
+      },
+      "pane-ax-variable-1000000": {
+        "event": "grid.accessibility.pass",
+        "native_press_admitted": true,
+        "overlap_objects_reused": 2307,
+        "replacement_objects_retired": 468,
+        "rows": 1000000,
+        "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification",
+        "visible_minimum": 400
+      }
+    },
+    "native_ax_count": 4,
+    "native_ax_binary_matches_final_campaign": true
+  },
+  "native_measurement": {
+    "campaigns": 4,
+    "processes": 80,
+    "processes_per_mode_case_build": 5,
+    "samples_per_process": 120,
+    "total_measured_samples": 9600,
+    "warmup_callbacks_per_process": 128,
+    "all_processes_terminal_exit_zero": true,
+    "all_123_stages_and_raw_records_match_embedded_results": true,
+    "all_11_scalar_native_phases_and_seven_phase_ui_sum_verified": true,
+    "all_11_per_run_and_pooled_distributions_independently_recomputed": true,
+    "method": "Nearest-rank percentiles; direct same-ticket totals; sample standard deviation and CV. No production benchmark implementation was invoked.",
+    "workload_cardinalities": [
+      [
+        400,
+        50,
+        8
+      ],
+      [
+        408,
+        51,
+        8
+      ]
+    ],
+    "fixed_cardinality": [
+      400,
+      50,
+      8
+    ],
+    "variable_cardinalities": [
+      [
+        400,
+        50,
+        8
+      ],
+      [
+        408,
+        51,
+        8
+      ]
+    ],
+    "exact_paired_geometry_layout_hash_pool_scale_and_source_callbacks": true,
+    "paired_scopes": "Before/final, 10k/million, and CPU/opt-in-GPU mode for each identical row-height case.",
+    "ticket_scope": "120 ordered unique completed tags per process, matching generation and frame progression; tags are process scoped, not globally unique across processes.",
+    "stored_values_and_release_diagnostic_guards_verified": true,
+    "report_table_rounding_matches_recomputed_values": true,
+    "mean_change_percent_range": [
+      3.8649101025596044,
+      6.002943834270935
+    ],
+    "pooled_p95_change_percent_range": [
+      -16.85214109260421,
+      -13.071255555203699
+    ],
+    "every_final_process_p95_exceeds_4ms_and_p99_exceeds_6ms": true,
+    "performance_acceptance": false,
+    "binary_selected_source_and_result_log_hashes_verified": true
+  },
+  "archive_and_redaction": {
+    "all_288_member_hashes_equal_index_and_current_public_artifacts": true,
+    "all_members_unique_regular_relative_paths": true,
+    "raw_machine_json_absent_and_not_read": true,
+    "redacted_metadata_only": true,
+    "nested_serial_uuid_keys_absent_in_redacted_metadata": true,
+    "opaque_original_metadata_hash_retained_without_reading_original": true,
+    "profile_binary_hashes_verified_as_public_archive_data": true,
+    "no_executable_binary_members": true
+  },
+  "conclusions": [
+    "The sealed report is supported: this is a functional pane-ownership/local-layout correction with lower observed pooled p95 and higher observed mean in every pair. It does not present serial one-host campaigns as a controlled causal speedup.",
+    "All original full-suite Unix-socket failures remain exit1; exact affected-package retries pass. Before-regression and unadopted experiment receipts remain historical and are not attributed to final source.",
+    "The unchanged p95<=4ms/p99<=6ms targets fail in every final process. The report correctly keeps P6 performance, memory/endurance, hardware, human accessibility and public release gates open.",
+    "The producer omits raw machine.json from its allowlisted archive traversal and recursively redacts serial/UUID keys, including JSON-encoded stdout, before sealing metadata. Independent verification did not read the raw file."
+  ],
+  "limitations": [
+    "CPU and opt-in GPU labels identify requested scene-renderer modes, not proof that every source took the GPU path or a measurement of physical GPU/compositor completion.",
+    "UI-work excludes queued delay, acquire wait and PresentCallNS; API/presentation timing remains separately measured. No native CPU/GPU allocation or framework-only Go allocation attribution is established.",
+    "Four serial campaigns on one host do not eliminate host scheduling/thermal/order effects. No causal speedup or wider hardware result is inferred.",
+    "Selected source/binary bindings are not the entire compiler/dependency closure. The complete prepared bytes were rehashed, but whole SDK/release/legal closure was outside this evidence review.",
+    "Native selector AX checks do not qualify physical pointer interaction, human VoiceOver, real IME candidate panels, endurance or full Mac completion.",
+    "Raw serial/UUID-bearing metadata was deliberately unread; its retained opaque hash is not independently recomputed from the forbidden input."
+  ],
+  "reviewer_recipe_history": [
+    {
+      "path": "/private/tmp/vellum-grid-pane-evidence-review/attempt-v1.json",
+      "status": "WITHDRAWN",
+      "reason": "Reviewer incorrectly included PresentCallNS in UI-work; corrected to the actual seven-phase definition."
+    },
+    {
+      "path": "/private/tmp/vellum-grid-pane-evidence-review/attempt-v2.json",
+      "status": "WITHDRAWN",
+      "reason": "Reviewer package regex crossed standalone FAIL newlines; corrected to horizontal whitespace."
+    },
+    {
+      "path": "/private/tmp/vellum-grid-pane-evidence-review/attempt-v3.json",
+      "status": "WITHDRAWN",
+      "reason": "Reviewer numeric-table parser included the header; corrected without changing evidence."
+    }
+  ],
+  "actions": {
+    "source_report_archive_mutations": false,
+    "tests_builds": false,
+    "native_ui": false,
+    "provider_calls": false,
+    "git_mutation": false,
+    "raw_machine_read": false,
+    "independent_stdlib_evidence_processing": true
+  }
+}
