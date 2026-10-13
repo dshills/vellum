@@ -116,6 +116,23 @@ writes no files and changes no clipboard or OS preferences. See the
 [lifecycle contract](../specs/file-panel-lifecycle.md); actual selections and
 physical Finder drops have independent acceptance requirements.
 
+## Native window cycle acceptance
+
+The opt-in native window-cycle check exercises actual control/canvas mounting,
+readback and closure with a surviving window:
+
+```sh
+cd drivers/cogent
+go build -tags=vellum_native_checks -o /tmp/vellum-window-cycles ./cmd/window-cycle-smoke
+/tmp/vellum-window-cycles -cycles=1000 -sample-every=25 -timeout=12m
+```
+
+Run it on an available Mac desktop. It records post-GC Go/RSS diagnostics and
+stops on sampled safety limits; geometry persistence is disabled in this temporary
+consumer. Explicit owner replies distinguish admission from completed checks.
+It does not measure the full integrated/endurance or native/GPU memory gates.
+See the [native lifecycle contract](../specs/native-window-lifecycle.md).
+
 ## Grid acceptance
 
 `examples/grid` is a separate consumer module with independent 10,000-row and

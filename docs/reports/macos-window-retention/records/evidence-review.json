@@ -1,0 +1,830 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_EVIDENCE",
+  "result": "APPROVED_EVIDENCE",
+  "findings": [],
+  "base_commit_reported": "c842de16e448d2ec6834f39ac95da854e1e6319b",
+  "source_root": "/private/tmp/vellum-large-data",
+  "phase": "/private/tmp/vellum-macos-window-retention",
+  "review_scope": "Read-only independent evidence/source-relation verification of a mixed successful portable-compaction and failed native-memory checkpoint. No tests, builds, native applications, GUI, provider calls, Git commands/mutations, source or sealed-artifact edits.",
+  "endpoints": {
+    "/private/tmp/vellum-large-data/docs/reports/macos-window-retention/README.md": "594a3c42507991d2e149e7a8fb2ecb3dd4646887ed3f3998ae5b598aaa812d94",
+    "/private/tmp/vellum-large-data/docs/reports/macos-window-retention/records/evidence-index.json": "923393bc16de1de16f42d575651051afd55711e60e9fcfb150fdd043479e845b",
+    "/private/tmp/vellum-large-data/docs/reports/macos-window-retention/records/evidence.tar.gz": "e1945aac88213b5d8cc477044fbe4bea25b89c4200809ec0a72f62a10cf1476f",
+    "/private/tmp/vellum-large-data/docs/reports/macos-window-retention/records/archive-producer.py.txt": "a825eae4e854f26f73a1f2f006a9a9cac8e366918c8f8fed3c6ccd9ccbf20567",
+    "/private/tmp/vellum-macos-window-retention/qualification.json": "db16e4137c8503a09195da5fdc28dd1c93ba40c594970c498a2a33719e2e7c89",
+    "/private/tmp/vellum-macos-window-retention/source-profile.json": "cf8a0874dd514ae6d0c9cec450effbd75916c861b152f4c777ab10e3353ce387",
+    "/private/tmp/vellum-macos-window-retention/source-final.json": "599181bae8b25321c49b1207550cf5b8b7db4574d90996450e9c1cd25377e8ec",
+    "/private/tmp/vellum-macos-window-retention/source-prism.json": "599181bae8b25321c49b1207550cf5b8b7db4574d90996450e9c1cd25377e8ec",
+    "/private/tmp/vellum-macos-window-retention/source-review-profile.json": "910113d06744a9739a2dc7e144683f3148a2f708ac39bd732bebfd251aee08b1",
+    "/private/tmp/vellum-macos-window-retention/source-review-final.json": "36358936611af572f2883a07ee7703122d78a7a66f7b33e1cd5965276ccec2c3",
+    "/private/tmp/vellum-macos-window-retention/prism-v1/prism.json": "7646c27d40681259680d05327a2b9d55c2ce7f064a15dee4e569972e919af6e0",
+    "/private/tmp/vellum-macos-window-retention/prism-v1/process.json": "b48bada10068873383bdecbd096bed529bf38f7cd218f1d3ac88f267a530cb7f",
+    "/private/tmp/vellum-macos-window-retention/prism-v1/inputs.json": "4918b8871037c645bc81d21ea36b3d67cfd92eb6659f3879f9e400b99121d16a",
+    "/private/tmp/vellum-macos-window-retention/prism-disposition.json": "074c189f7183ddc07edbe58f311bb7a99417b739cda975b8c62f8a20cded4e47",
+    "/private/tmp/vellum-macos-window-retention/native-retention.profile": "6e6cbd4e3d77143159be9eca0f0010a7c71a188d7e253f301bcd0390432125ae",
+    "/private/tmp/vellum-macos-window-retention/glyphcache-candidate-inputs.json": "42350871feb34c7f3d97378634524e58aa69135c92bb959395097d32eeafb9a7",
+    "/private/tmp/vellum-macos-window-retention/glyphcache-candidate.go": "19c942ee7726fcc798e95872d6468d97eb197826e180b87ff3827783b8959a0e",
+    "/private/tmp/vellum-macos-window-retention/glyphcache-overlay.json": "0145dfbbae510641130e6baadb8334841161b844c82e20755f595f27d764a26f",
+    "/private/tmp/vellum-macos-window-retention/vmmap_run.py": "ed7189626d69041f7fe1b83f340d2771258d235e3830f9a4c1c11331f685f7b5",
+    "/private/tmp/vellum-macos-window-retention/vmmap_run-v1.py": "cb5a974a52fdb6309649dbc61444e471feaf37a94060f9ac6673f7500631272b",
+    "/private/tmp/vellum-macos-window-retention/vmmap-native-process.json": "45a20d79df8a36f5a01bba41f0964086f71bdd24635052adad4ce70c1d84236f"
+  },
+  "source_current8": {
+    "app/app.go": "1ed87bf35c78d2246f10f6af11e6e5eeb60b989a9c0f6f4b684c24bbf0402863",
+    "app/window_retention_test.go": "98b8cd03b4c30bff8d6a51ff8ef2e5e9e19b09cd83794a6d66a727a29c6ac246",
+    "docs/development.md": "eb10d9cc6fa1249417f4d8286e4c6d1b55d983c1f71cc399813b4c75693781bc",
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": "6fdbdb2e70f37ce05477dbd2a7e53ef72ea032c24323fb4d5b5cafb8854c822b",
+    "drivers/cogent/cmd/window-cycle-smoke/main_test.go": "4a747f2c914404a558b38c9682331fa5b65ad45e15956a24bd7be2cc1d63b363",
+    "drivers/cogent/native_services_checks_darwin.go": "a1533ab077525ea913d818342c7556c7aa2b216984cba847e187551374df34e7",
+    "specs/native-window-lifecycle.md": "9d29b8e135fd34a0ec7f75e9d5588fb296b5610fd8f8b57f2a0cbc731dbc7266",
+    "specs/windows-services.md": "55085ed86622af02146bffd28f3a9611cfd79b905368d3864ad9ec83ee619c90"
+  },
+  "source_classification": {
+    "pre_profile_manifest_sha256": "599181bae8b25321c49b1207550cf5b8b7db4574d90996450e9c1cd25377e8ec",
+    "current_profile_manifest_sha256": "cf8a0874dd514ae6d0c9cec450effbd75916c861b152f4c777ab10e3353ce387",
+    "internally_reviewed_delta": [
+      "drivers/cogent/cmd/window-cycle-smoke/main.go",
+      "drivers/cogent/cmd/window-cycle-smoke/main_test.go",
+      "specs/native-window-lifecycle.md"
+    ],
+    "source_certificates_match_exact_manifest_files": true,
+    "pre_profile_source_status": "APPROVED_SOURCE",
+    "profile_extension_source_status": "APPROVED_SOURCE",
+    "provider_scope_pre_profile_only": true,
+    "current_profile_delta_no_second_provider_claim": true
+  },
+  "archive": {
+    "members": 109,
+    "unique_regular_relative_files": true,
+    "archive_index_current_roundtrip_equal": true,
+    "binaries_app_bundles_caches_desktop_snapshots_excluded": true,
+    "compressed_profile_included_as_data": true,
+    "producer_matches_retained_copy": true,
+    "producer_assessment": "Source/current and separate pre-profile certificates, raw provider exit/finding/disposition, expected four failures, receipt/version groups, exact native result samples, overlay/profile/current prepared identities are asserted. Directory .app/symlink pruning happens before os.walk recursion; file extension/symlink checks precede reads. Neither failed native 1000-cycle process is converted to a pass. Selected filename admission excludes executables and app contents; diagnostic profile is explicitly retained."
+  },
+  "receipt_verification": {
+    "count": 25,
+    "logs": 50,
+    "source_groups": {
+      "historical_81a0597b7c09": 2,
+      "profile_final": 10,
+      "reviewed_pre_profile": 7,
+      "historical_d8d0625587bd": 1,
+      "historical_3d9d5655331a": 2,
+      "historical_040ad5de045f": 2,
+      "historical_01628146f01a": 1
+    },
+    "receipts": {
+      "app-retention-original": {
+        "sha256": "a2e0969cc2f7e17828609cff6486b3d656b926d5a87933282122d9156454a26c",
+        "exit_code": 1,
+        "group": "historical_81a0597b7c09",
+        "mode": "build",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-overlay=/private/tmp/vellum-macos-window-retention/original-overlay.json",
+          "-run=TestClosedWindowLifetimesCompactWithoutAcceptingStaleWork",
+          "-count=1",
+          "./app"
+        ],
+        "started_utc": "2026-10-13T09:19:07.933949+00:00",
+        "finished_utc": "2026-10-13T09:19:08.708344+00:00",
+        "elapsed_seconds": 0.774394666950684
+      },
+      "cycle-build-cache-candidate": {
+        "sha256": "c78a0e87e349f3d26cab3d2c1dcb9d6e9d26bc2e55ac707fe57df67de761f8b1",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "build",
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-overlay=/private/tmp/vellum-macos-window-retention/glyphcache-overlay.json",
+          "-o",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-cache-candidate",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:53:11.058298+00:00",
+        "finished_utc": "2026-10-13T09:53:16.076479+00:00",
+        "elapsed_seconds": 5.018180833023507
+      },
+      "cycle-build-final": {
+        "sha256": "fd5817d133529453c48eefdb32cffe9754bfda7689e94e944e7a1b26e7404334",
+        "exit_code": 0,
+        "group": "reviewed_pre_profile",
+        "mode": "build",
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-final",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:36:22.089234+00:00",
+        "finished_utc": "2026-10-13T09:36:24.839520+00:00",
+        "elapsed_seconds": 2.7502863330300897
+      },
+      "cycle-build-profile": {
+        "sha256": "07d5387f8af30c7f5cbe5c6e610a214954b3ec4d79852b3219eeaa4dcf3e886e",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "build",
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-profile",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:45:02.928741+00:00",
+        "finished_utc": "2026-10-13T09:45:05.797087+00:00",
+        "elapsed_seconds": 2.8683456660364754
+      },
+      "cycle-build-v2": {
+        "sha256": "88889a69845fddec2701b1ac59c6e45db47ad66f93a461c0136650c09639692c",
+        "exit_code": 0,
+        "group": "historical_d8d0625587bd",
+        "mode": "build",
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-v2",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:27:28.371710+00:00",
+        "finished_utc": "2026-10-13T09:27:31.241385+00:00",
+        "elapsed_seconds": 2.8696750000235625
+      },
+      "cycle-build-v3": {
+        "sha256": "8b182bbb96768c5eff44efaae1cdbb49d8ce0348ce073fa3444f449a4a92e40e",
+        "exit_code": 0,
+        "group": "historical_3d9d5655331a",
+        "mode": "build",
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-v3",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:28:55.583827+00:00",
+        "finished_utc": "2026-10-13T09:28:58.481208+00:00",
+        "elapsed_seconds": 2.8973813750199042
+      },
+      "cycle-build-v4": {
+        "sha256": "005b1ac5e4fd2be42e55950f619ffc157ebf76c3cfbed966fca17dbb9a5c2843",
+        "exit_code": 0,
+        "group": "historical_040ad5de045f",
+        "mode": "build",
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-v4",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:34:50.504227+00:00",
+        "finished_utc": "2026-10-13T09:34:53.519330+00:00",
+        "elapsed_seconds": 3.015102958015632
+      },
+      "cycle-build": {
+        "sha256": "57342d3d876da38d3a7387398e379ef210d8a4fb85288313abba1ab6b423949f",
+        "exit_code": 0,
+        "group": "historical_01628146f01a",
+        "mode": "build",
+        "argv": [
+          "go",
+          "build",
+          "-tags=vellum_native_checks",
+          "-o",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:25:12.326582+00:00",
+        "finished_utc": "2026-10-13T09:25:18.062789+00:00",
+        "elapsed_seconds": 5.7362074999837205
+      },
+      "cycle-native-cache-candidate": {
+        "sha256": "5ca3394774abc137da25998e9fd621a0951c5742ad5cdd29b991d2fc9041bf0b",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "live",
+        "argv": [
+          "/private/tmp/vellum-macos-window-retention/window-cycle-cache-candidate",
+          "-cycles=1000",
+          "-sample-every=25",
+          "-timeout=10m"
+        ],
+        "started_utc": "2026-10-13T09:54:43.113371+00:00",
+        "finished_utc": "2026-10-13T09:57:51.708310+00:00",
+        "elapsed_seconds": 188.59493924997514
+      },
+      "cycle-native-profile": {
+        "sha256": "bb5d742a7b4768f906df5225275ec2d9444fcf6d2c4580096a5742b9cb39647f",
+        "exit_code": 1,
+        "group": "profile_final",
+        "mode": "live",
+        "argv": [
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-profile",
+          "-cycles=1000",
+          "-sample-every=25",
+          "-timeout=12m",
+          "-heap-profile=/private/tmp/vellum-macos-window-retention/native-retention.profile"
+        ],
+        "started_utc": "2026-10-13T09:46:13.968404+00:00",
+        "finished_utc": "2026-10-13T09:47:12.902854+00:00",
+        "elapsed_seconds": 58.934449666994624
+      },
+      "cycle-native-thousand": {
+        "sha256": "9df2c57ac41e21251a7b23c3fe56bf008255cf9f4c00cd103d973bd8eb96211c",
+        "exit_code": 1,
+        "group": "reviewed_pre_profile",
+        "mode": "live",
+        "argv": [
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-final",
+          "-cycles=1000",
+          "-sample-every=25",
+          "-timeout=12m"
+        ],
+        "started_utc": "2026-10-13T09:39:12.806001+00:00",
+        "finished_utc": "2026-10-13T09:40:11.504252+00:00",
+        "elapsed_seconds": 58.69825120799942
+      },
+      "cycle-native-two-final": {
+        "sha256": "86380bc59d52361156a097987d963db1260ecaaa40cae9487c4d17e7b6b63459",
+        "exit_code": 0,
+        "group": "reviewed_pre_profile",
+        "mode": "live",
+        "argv": [
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-final",
+          "-cycles=2",
+          "-sample-every=1",
+          "-timeout=1m"
+        ],
+        "started_utc": "2026-10-13T09:37:38.363626+00:00",
+        "finished_utc": "2026-10-13T09:37:39.575061+00:00",
+        "elapsed_seconds": 1.2114347919705324
+      },
+      "cycle-native-two": {
+        "sha256": "e95a29c7f1d1a62867d7165716e85a522335d4020c50130d0a7636742115400a",
+        "exit_code": 0,
+        "group": "historical_3d9d5655331a",
+        "mode": "live",
+        "argv": [
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-v3",
+          "-cycles=2",
+          "-sample-every=1",
+          "-timeout=1m"
+        ],
+        "started_utc": "2026-10-13T09:29:55.051848+00:00",
+        "finished_utc": "2026-10-13T09:29:56.622019+00:00",
+        "elapsed_seconds": 1.5701711250003427
+      },
+      "cycle-race-profile": {
+        "sha256": "806ac25e5fd64c12e92e534ce69b33ce6e036c880a12900674b9789991ec5244",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "build",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-count=3",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:45:56.103653+00:00",
+        "finished_utc": "2026-10-13T09:45:59.831002+00:00",
+        "elapsed_seconds": 3.727348709013313
+      },
+      "cycle-race": {
+        "sha256": "851da0f0a9dfad290db295a4e34996a9da494e0de5395e7e42699e79a6c1bfd8",
+        "exit_code": 0,
+        "group": "historical_040ad5de045f",
+        "mode": "build",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          "-count=3",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:34:49.337318+00:00",
+        "finished_utc": "2026-10-13T09:34:56.334387+00:00",
+        "elapsed_seconds": 6.9970690829795785
+      },
+      "cycle-vet-final": {
+        "sha256": "898e1940a93c51e39ab8c20f953dff2e81742a84af8058d87e6b6e11ad12c5f0",
+        "exit_code": 0,
+        "group": "reviewed_pre_profile",
+        "mode": "build",
+        "argv": [
+          "go",
+          "vet",
+          "-tags=vellum_native_checks",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T09:37:14.128445+00:00",
+        "finished_utc": "2026-10-13T09:37:14.984649+00:00",
+        "elapsed_seconds": 0.8562041250406764
+      },
+      "cycle-vet-profile": {
+        "sha256": "387b37a7cbdf2bd4795578c5147ad79db560473f0a3f9ab0de127e7289d5d69f",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "code",
+        "argv": [
+          "go",
+          "vet",
+          "-tags=vellum_native_checks",
+          "./cmd/window-cycle-smoke"
+        ],
+        "started_utc": "2026-10-13T10:09:19.841672+00:00",
+        "finished_utc": "2026-10-13T10:09:21.090385+00:00",
+        "elapsed_seconds": 1.2487133749527857
+      },
+      "driver-offscreen-race-final": {
+        "sha256": "92519d9782fb82100adfad5e8e1b2fa7a8e1bcd7d9561c16c4d20732f51c6d55",
+        "exit_code": 0,
+        "group": "reviewed_pre_profile",
+        "mode": "build",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=offscreen",
+          "."
+        ],
+        "started_utc": "2026-10-13T09:40:20.757590+00:00",
+        "finished_utc": "2026-10-13T09:41:46.215493+00:00",
+        "elapsed_seconds": 85.4579026249703
+      },
+      "driver-optin-race-final": {
+        "sha256": "5faeffef08d9c1ee0af9a746b1eb7cb2b71bf993ded1fe3762b77192d0eb6c05",
+        "exit_code": 0,
+        "group": "reviewed_pre_profile",
+        "mode": "build",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-tags=vellum_native_checks",
+          ".",
+          "./cmd/window-cycle-smoke",
+          "./cmd/file-panel-smoke",
+          "./cmd/notifications-smoke"
+        ],
+        "started_utc": "2026-10-13T09:37:14.128056+00:00",
+        "finished_utc": "2026-10-13T09:37:36.013037+00:00",
+        "elapsed_seconds": 21.884981208946556
+      },
+      "heap-cumulative": {
+        "sha256": "a4af940598323a673e7182cdffd417b7ee3a91a844f8bb0c0e6b78537f825cf3",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "build",
+        "argv": [
+          "go",
+          "tool",
+          "pprof",
+          "-top",
+          "-cum",
+          "-sample_index=inuse_space",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-profile",
+          "/private/tmp/vellum-macos-window-retention/native-retention.profile"
+        ],
+        "started_utc": "2026-10-13T09:49:24.839517+00:00",
+        "finished_utc": "2026-10-13T09:49:25.147816+00:00",
+        "elapsed_seconds": 0.3082991659757681
+      },
+      "heap-top": {
+        "sha256": "ad9a118a8b61f4283c357c8551de43b14e169dfba252cad7cb96731000bc0eb0",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "build",
+        "argv": [
+          "go",
+          "tool",
+          "pprof",
+          "-top",
+          "-sample_index=inuse_space",
+          "/private/tmp/vellum-macos-window-retention/window-cycle-smoke-profile",
+          "/private/tmp/vellum-macos-window-retention/native-retention.profile"
+        ],
+        "started_utc": "2026-10-13T09:49:24.839363+00:00",
+        "finished_utc": "2026-10-13T09:49:25.141713+00:00",
+        "elapsed_seconds": 0.302350000012666
+      },
+      "native-vmmap-diagnostic-v2": {
+        "sha256": "95305e25a2be63052a5fdaaa0433c9121083dcb5e2c0960fc8289b09ab0afa3b",
+        "exit_code": 0,
+        "group": "profile_final",
+        "mode": "live",
+        "argv": [
+          "python3",
+          "/private/tmp/vellum-macos-window-retention/vmmap_run.py"
+        ],
+        "started_utc": "2026-10-13T10:04:24.350284+00:00",
+        "finished_utc": "2026-10-13T10:06:44.662648+00:00",
+        "elapsed_seconds": 140.31236370798433
+      },
+      "native-vmmap-diagnostic": {
+        "sha256": "02f8ba7884de4d6c7e8c5dbf87e054398819396144078fd781d2ee59c8cf98f5",
+        "exit_code": 1,
+        "group": "profile_final",
+        "mode": "live",
+        "argv": [
+          "python3",
+          "/private/tmp/vellum-macos-window-retention/vmmap_run.py"
+        ],
+        "started_utc": "2026-10-13T10:03:11.137356+00:00",
+        "finished_utc": "2026-10-13T10:03:11.213991+00:00",
+        "elapsed_seconds": 0.07663533301092684
+      },
+      "portable-race-final": {
+        "sha256": "bbae83e3c729911a6175efd4bc4b7e1b864f9e1064325632f9121d7182e56fa5",
+        "exit_code": 0,
+        "group": "reviewed_pre_profile",
+        "mode": "build",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-count=3",
+          "./app",
+          "./tasks",
+          "./document",
+          "./history",
+          "./workbench"
+        ],
+        "started_utc": "2026-10-13T09:37:14.128106+00:00",
+        "finished_utc": "2026-10-13T09:37:16.712825+00:00",
+        "elapsed_seconds": 2.5847187920007855
+      },
+      "portable-race": {
+        "sha256": "74704d2daf069c1e88a15a77bdc2fac566985b4038c628d2b0f1b8b47714aec9",
+        "exit_code": 0,
+        "group": "historical_81a0597b7c09",
+        "mode": "build",
+        "argv": [
+          "go",
+          "test",
+          "-race",
+          "-count=3",
+          "./app",
+          "./tasks",
+          "./document",
+          "./history",
+          "./workbench"
+        ],
+        "started_utc": "2026-10-13T09:19:07.933949+00:00",
+        "finished_utc": "2026-10-13T09:19:10.540238+00:00",
+        "elapsed_seconds": 2.60628937499132
+      }
+    },
+    "raw_failures": [
+      "app-retention-original",
+      "cycle-native-thousand",
+      "cycle-native-profile",
+      "native-vmmap-diagnostic"
+    ],
+    "hashes_current_equal": true,
+    "all_source_delta_before_after_equal_recorded_groups": true,
+    "all_live_intervals_within_authorization": true,
+    "last_live_finished_utc": "2026-10-13T10:06:44.662648+00:00",
+    "seconds_before_expiry": 24.337352,
+    "post_expiry_code_receipt": "cycle-vet-profile is go vet only, live_tests=false, not a desktop or runtime acceptance run."
+  },
+  "portable": {
+    "cycles": 1000,
+    "original_failure": "Original app overlay matches canonical parent source; raw result fails final retention assertion at 1001 stored cancels / 1000 distinct closed contexts after completing behavior cycles.",
+    "final_qualified": "Portable app/tasks/document/history/workbench race count3 passes on the pre-profile source map; app and portable test bytes remain identical in the current profile map.",
+    "limits": "Compacts per-window canceled contexts/cancel functions while preserving ID tombstones and captured cancellation semantics. Does not bound historical ID storage, maps, caller-held originals or all application lifetime costs."
+  },
+  "native": {
+    "cases": {
+      "cycle-native-two-final": {
+        "completed": 2,
+        "requested": 2,
+        "result": "PASS_NATIVE_WINDOW_CYCLES",
+        "sample_count": 3,
+        "first": {
+          "Completed": 0,
+          "HeapAlloc": 30126112,
+          "HeapInuse": 35725312,
+          "GoSys": 67508504,
+          "TotalAlloc": 66333016,
+          "Mallocs": 292943,
+          "Frees": 180847,
+          "NumGC": 11,
+          "Goroutines": 6,
+          "RSSBytes": 184336384,
+          "ElapsedSeconds": 0.207907709
+        },
+        "last": {
+          "Completed": 2,
+          "HeapAlloc": 52481416,
+          "HeapInuse": 61276160,
+          "GoSys": 118810920,
+          "TotalAlloc": 164690912,
+          "Mallocs": 649038,
+          "Frees": 466952,
+          "NumGC": 15,
+          "Goroutines": 7,
+          "RSSBytes": 243990528,
+          "ElapsedSeconds": 0.5640405
+        },
+        "max_sampled_rss": 243990528,
+        "min_sampled_rss": 184336384,
+        "sample_at_25": null,
+        "heap_profile_requested": false
+      },
+      "cycle-native-thousand": {
+        "completed": 375,
+        "requested": 1000,
+        "result": "FAILED_NATIVE_WINDOW_CYCLES",
+        "sample_count": 16,
+        "first": {
+          "Completed": 0,
+          "HeapAlloc": 30129384,
+          "HeapInuse": 35586048,
+          "GoSys": 67438856,
+          "TotalAlloc": 66333784,
+          "Mallocs": 292929,
+          "Frees": 180833,
+          "NumGC": 11,
+          "Goroutines": 6,
+          "RSSBytes": 184385536,
+          "ElapsedSeconds": 0.186182833
+        },
+        "last": {
+          "Completed": 375,
+          "HeapAlloc": 388373216,
+          "HeapInuse": 446849024,
+          "GoSys": 770838968,
+          "TotalAlloc": 15556979544,
+          "Mallocs": 66916118,
+          "Frees": 64830794,
+          "NumGC": 119,
+          "Goroutines": 6,
+          "RSSBytes": 1112784896,
+          "ElapsedSeconds": 58.56954125
+        },
+        "max_sampled_rss": 1112784896,
+        "min_sampled_rss": 184385536,
+        "sample_at_25": {
+          "Completed": 25,
+          "HeapAlloc": 73251992,
+          "HeapInuse": 85106688,
+          "GoSys": 174385448,
+          "TotalAlloc": 1099424064,
+          "Mallocs": 4736173,
+          "Frees": 4436468,
+          "NumGC": 29,
+          "Goroutines": 7,
+          "RSSBytes": 312082432,
+          "ElapsedSeconds": 4.348986
+        },
+        "heap_profile_requested": false
+      },
+      "cycle-native-profile": {
+        "completed": 375,
+        "requested": 1000,
+        "result": "FAILED_NATIVE_WINDOW_CYCLES",
+        "sample_count": 16,
+        "first": {
+          "Completed": 0,
+          "HeapAlloc": 30127200,
+          "HeapInuse": 35962880,
+          "GoSys": 67918104,
+          "TotalAlloc": 66336344,
+          "Mallocs": 292958,
+          "Frees": 180850,
+          "NumGC": 11,
+          "Goroutines": 6,
+          "RSSBytes": 185335808,
+          "ElapsedSeconds": 0.188091167
+        },
+        "last": {
+          "Completed": 375,
+          "HeapAlloc": 388393952,
+          "HeapInuse": 441458688,
+          "GoSys": 762450360,
+          "TotalAlloc": 15556529192,
+          "Mallocs": 66910775,
+          "Frees": 64825345,
+          "NumGC": 120,
+          "Goroutines": 5,
+          "RSSBytes": 1102462976,
+          "ElapsedSeconds": 58.235245375
+        },
+        "max_sampled_rss": 1102462976,
+        "min_sampled_rss": 185335808,
+        "sample_at_25": {
+          "Completed": 25,
+          "HeapAlloc": 73247128,
+          "HeapInuse": 84459520,
+          "GoSys": 182778168,
+          "TotalAlloc": 1099537576,
+          "Mallocs": 4736478,
+          "Frees": 4436783,
+          "NumGC": 30,
+          "Goroutines": 7,
+          "RSSBytes": 318865408,
+          "ElapsedSeconds": 4.350303792
+        },
+        "heap_profile_requested": true
+      },
+      "cycle-native-cache-candidate": {
+        "completed": 1000,
+        "requested": 1000,
+        "result": "PASS_NATIVE_WINDOW_CYCLES",
+        "sample_count": 41,
+        "first": {
+          "Completed": 0,
+          "HeapAlloc": 30121120,
+          "HeapInuse": 35586048,
+          "GoSys": 67262744,
+          "TotalAlloc": 66327632,
+          "Mallocs": 292932,
+          "Frees": 180843,
+          "NumGC": 11,
+          "Goroutines": 6,
+          "RSSBytes": 184074240,
+          "ElapsedSeconds": 0.202384667
+        },
+        "last": {
+          "Completed": 1000,
+          "HeapAlloc": 65709896,
+          "HeapInuse": 78503936,
+          "GoSys": 183367992,
+          "TotalAlloc": 41390110248,
+          "Mallocs": 177938532,
+          "Frees": 177679240,
+          "NumGC": 752,
+          "Goroutines": 6,
+          "RSSBytes": 933494784,
+          "ElapsedSeconds": 187.7649665
+        },
+        "max_sampled_rss": 933494784,
+        "min_sampled_rss": 184074240,
+        "sample_at_25": {
+          "Completed": 25,
+          "HeapAlloc": 65095320,
+          "HeapInuse": 80420864,
+          "GoSys": 170260792,
+          "TotalAlloc": 1099334584,
+          "Mallocs": 4735444,
+          "Frees": 4481870,
+          "NumGC": 30,
+          "Goroutines": 6,
+          "RSSBytes": 307052544,
+          "ElapsedSeconds": 4.03228375
+        },
+        "heap_profile_requested": false
+      }
+    },
+    "production_thousand_pass": false,
+    "production_failure_reason": "Both runs complete 375 of 1000, record sampled RSS above 1 GiB, retain exact guard stderr and raw exit1, and then report normal zero-inventory cleanup. Neither supplies 1000-cycle or memory acceptance.",
+    "corrected_quick_two": "Raw exit0 validates only two corrected cycles with actual OnShow and buffered immutable ownerProbe ACK before readback/retirement checks.",
+    "historical_quick_two": "Earlier admission-only raw exit0 remains UNQUALIFIED. Characterization is bound to the prior source-review finding and distinct historical source hash; no full earlier source reconstruction is claimed.",
+    "native_memory_qualified": false,
+    "gpu_memory_qualified": false,
+    "registry_limits": "Static-name guarded registry/atomic composer and separately sampled own Cocoa/AX inventories prove scoped retirement, not native/GPU deallocation or an atomic full-process snapshot."
+  },
+  "profile": {
+    "sha256": "6e6cbd4e3d77143159be9eca0f0010a7c71a188d7e253f301bcd0390432125ae",
+    "compressed_bytes": 76162,
+    "mode": "0o600",
+    "pprof_sample_type": "inuse_space",
+    "UseEmbeddedInMap_cumulative": "353.66MB / 90.77%",
+    "claim": "allocation-site attribution, not retaining-reference proof",
+    "limits": "Current 76162-byte mode0600 compressed profile is within8MiB output cap. Optional capture adds GC/work and runs on failure; cannot qualify ordinary latency. Pprof cumulative values are not disjoint categories and must not be summed. Sampling attributes allocation sites through new shapers, not the retaining reference."
+  },
+  "unadopted_cache": {
+    "manifest_sha256": "42350871feb34c7f3d97378634524e58aa69135c92bb959395097d32eeafb9a7",
+    "candidate_sha256": "19c942ee7726fcc798e95872d6468d97eb197826e180b87ff3827783b8959a0e",
+    "overlay_sha256": "0145dfbbae510641130e6baadb8334841161b844c82e20755f595f27d764a26f",
+    "prepared_original_sha256": "902cbbd000b304e967617a307d06346d88eea7568292e7754d7a08ae0415540c",
+    "source_adopted": false,
+    "bound_claim": "Diagnostic FIFO whole-face32-key/8MiB logical mask experiment only; source and build overlay are recorded. Parsed fonts, map/slice overhead, other caches and caller-held masks remain excluded. Meaningful cache/pixel/concurrency adoption tests are still required.",
+    "diagnostic_1000_raw_exit": 0,
+    "last_heap_bytes": 65709896,
+    "last_rss_bytes": 933494784,
+    "production_memory_acceptance": false
+  },
+  "vmmap": {
+    "process_receipt_sha256": "45a20d79df8a36f5a01bba41f0964086f71bdd24635052adad4ce70c1d84236f",
+    "owned_pid": 63996,
+    "queries": {
+      "250": {
+        "physical_footprint": "7.9G",
+        "IOSurface_first_columns": [
+          "7.2G",
+          "7.2G",
+          "2.6G",
+          "4.6G"
+        ],
+        "CoreAnimation_first_columns": [
+          "20.3M",
+          "17.8M"
+        ],
+        "MALLOC_SMALL_first_columns": [
+          "154.8M",
+          "119.1M"
+        ],
+        "stdout_sha256": "0c52d63ec5434bd6293a560a9fed415fd902c2953a575c923df6be6c304721bf"
+      },
+      "750": {
+        "physical_footprint": "14.3G",
+        "IOSurface_first_columns": [
+          "13.5G",
+          "13.5G",
+          "1.8G",
+          "11.7G"
+        ],
+        "CoreAnimation_first_columns": [
+          "59.2M",
+          "51.7M"
+        ],
+        "MALLOC_SMALL_first_columns": [
+          "340.9M",
+          "296.0M"
+        ],
+        "stdout_sha256": "cd1fadae6fd6088bef55bc069e03dfa02299c645da09db5b46a8c1a684c665d7"
+      }
+    },
+    "completed_candidate_cycles": 800,
+    "sample_count": 33,
+    "raw_native_exit": 0,
+    "raw_diagnostic_exit": 0,
+    "initial_attempt": "Old retained recipe tests remaining>240 before Popen; raw stderr is that AssertionError, stdout empty, exit1. V2 recipe is distinct and completed800 cycles.",
+    "limits": "Queries target only Popen-owned process PID, at observed250/750 samples. Those sample events trigger queries while the process continues; vmmap is not a paused exact-cycle snapshot. Human-readable macOS G/M units retained verbatim; physical footprint, IOSurface virtual/resident/dirty columns and psRSS are different quantities. Growth is observed; precise allocator ownership, deallocation or a physical-memory bound is not established."
+  },
+  "provider": {
+    "result_sha256": "7646c27d40681259680d05327a2b9d55c2ce7f064a15dee4e569972e919af6e0",
+    "process_sha256": "b48bada10068873383bdecbd096bed529bf38f7cd218f1d3ac88f267a530cb7f",
+    "input_sha256": "4918b8871037c645bc81d21ea36b3d67cfd92eb6659f3879f9e400b99121d16a",
+    "disposition_sha256": "074c189f7183ddc07edbe58f311bb7a99417b739cda975b8c62f8a20cded4e47",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "files": 8,
+    "chunks": 3,
+    "calls": 3,
+    "complete": true,
+    "input_tokens": 22381,
+    "output_tokens": 2419,
+    "raw_exit_code": 1,
+    "raw_findings": 1,
+    "finding_id": "83f6fc41a5329c14",
+    "disposition": "REFUTED_ON_PINNED_SOURCE_NO_CODE_CHANGE",
+    "independent_assessment": "FindName takes renderWindowGlobalMu before membership traversal and desktop IsClosed reads atomic composerPointer. Pinned source hashes match the preserved disposition. Refutation is valid for this static-name fixture, not arbitrary rename or other mutable native fields. Raw provider exit1/finding remains preserved."
+  },
+  "prepared": {
+    "count": 6174,
+    "current_all_files_independently_hashed": true,
+    "current_equal_recorded": true,
+    "previous_file_interaction_checkpoint_equal": true,
+    "scope": "Endpoint prepared source identities only; not a complete compiler, cache, SDK or embedded native-link dependency closure."
+  },
+  "resolved_wording": {
+    "original_report_sha256": "6e39580390aba6a46e67f72cd88be8167c4108e02b9860ee10f846ad62d13d41",
+    "current_report_sha256": "594a3c42507991d2e149e7a8fb2ecb3dd4646887ed3f3998ae5b598aaa812d94",
+    "status": "FIXED",
+    "finding": "Initial default opt-in/offscreen phrasing could imply a separate untagged-default driver suite.",
+    "resolution": "Current wording says pre-profile opt-in and offscreen driver race suites; two actual receipts use those modes.",
+    "source_runtime_proof_changes": false,
+    "resealed_index_delta": [
+      "report.py"
+    ],
+    "original_report_preserved": "/private/tmp/vellum-window-retention-evidence-review/report-before-clarification.md.txt"
+  },
+  "report_assessment": "Current README truthfully leads with a portable retention fix and FAILED production native memory gate; it preserves unqualified quick-two, separate profile/overlay/vmmap diagnostics and raw failures. No fullP11, native/GPU memory, performance, physical interaction or Mac completion claim. The final report differs from the first read only in corrected driver-suite wording.",
+  "verification": {
+    "recipe_path": "/private/tmp/vellum-window-retention-evidence-review/verify.py.txt",
+    "recipe_sha256": "6a63794a10243b48e40221a8221375bea9b93218d38931e5cabb0ff7f246608c",
+    "result_path": "/private/tmp/vellum-window-retention-evidence-review/verification.json",
+    "result_sha256": "0c4bac1832296372ee49db6478881807d02bc565721ff32bb5f96bbd35d669d7",
+    "status": "PASS_INDEPENDENT_READ_ONLY_VERIFICATION",
+    "reviewer_attempt_history": "/private/tmp/vellum-window-retention-evidence-review/reviewer-attempt-history/v1.json",
+    "history_note": "Initial reviewer parser wrongly required a later profile-only field in older pre-profile results. With absent historical flag interpreted as false and profile run required true, verifier passes. This was a reviewer schema error, not an evidence failure; original recipe/metadata are preserved."
+  },
+  "limitations": [
+    "Approval covers evidence truthfulness and exact selected/source/prepared/archive bindings. It does not qualify the failed native memory gate or adopt the diagnostic glyph-cache overlay.",
+    "Post-GC memory samples every25 cycles omit unsampled peaks. psRSS, Go in-use sample allocation and vmmap footprint/mapping categories are different non-atomic observations.",
+    "Buffered ACK proves owner callback completion but cannot preempt a synchronous GPU readback already executing. Native loop/deallocation/endurance/heap safety outside observed cases remains open.",
+    "Historical version hashes, receipts and selected overlays are retained, but full earlier consumer source byte sets and all compiler/cache/link inputs are not independently reconstructed.",
+    "No clipboard, preferences, physical input, human IME/VoiceOver, Finder drag, cross-display, sustained performance or public distribution acceptance follows."
+  ]
+}

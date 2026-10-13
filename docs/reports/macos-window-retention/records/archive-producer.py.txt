@@ -1,0 +1,178 @@
+"""Seal portable compaction and a FAILED native-memory acceptance campaign."""
+import datetime, hashlib, io, json, os, shutil, subprocess, tarfile
+from pathlib import Path
+r=Path('/private/tmp/vellum-large-data');p=Path('/private/tmp/vellum-macos-window-retention')
+out=r/'docs/reports/macos-window-retention'
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+read=lambda n:json.loads((p/n).read_text())
+manifest=read('source-profile.json');source=manifest['sources'];base=manifest['base_commit']
+assert len(source)==8 and all(sha(r/n)==h for n,h in source.items())
+pre=read('source-prism.json')['sources'];assert pre==read('source-final.json')['sources']
+cert=read('source-review-profile.json');assert cert['status']=='APPROVED_SOURCE' and cert['files']==source and not cert['findings']
+provider=read('prism-v1/prism.json');process=read('prism-v1/process.json');disposition=read('prism-disposition.json')
+assert process['exit_code']==1 and process['error']is None and process['source_index_stable'] and process['before']==process['after']==pre
+assert provider['coverage']['complete'] and provider['coverage']['files']==8 and provider['coverage']['chunks']==3
+assert provider['coverage']['reviewer']==[{'provider':'anthropic','model':'claude-sonnet-5-5'}]
+assert len(provider['findings'])==1 and provider['findings'][0]['id']=='83f6fc41a5329c14'
+assert 'REFUTED' in json.dumps(disposition) and sha(p/'prism-disposition.json')=='074c189f7183ddc07edbe58f311bb7a99417b739cda975b8c62f8a20cded4e47'
+auth=read('testing-authorization.json');start,end=[datetime.datetime.fromisoformat(auth[k])for k in ['authorized_from_utc','authorized_until_utc']]
+receipts={};groups={'reviewed_pre_profile':pre,'profile_final':source}
+expected_fail={'app-retention-original','cycle-native-thousand','cycle-native-profile','native-vmmap-diagnostic'}
+for f in sorted(p.glob('*.json')):
+    d=json.loads(f.read_text())
+    if 'source_delta_stable'not in d:continue
+    name=f.stem
+    assert d['exit_code']==int(name in expected_fail) and d['error']is None and d['source_delta_stable']
+    assert d['source_delta_before']==d['source_delta_after'] and d['source_commit']==base
+    current=d['source_delta_before'];matching=[k for k,v in groups.items()if v==current]
+    if not matching:
+        group='historical_'+hashlib.sha256(json.dumps(current,sort_keys=True).encode()).hexdigest()[:12];groups[group]=current
+    else:group=matching[0]
+    when=datetime.datetime.fromisoformat(d['started_utc'])
+    if d['mode']!='code':assert start<=when and when+datetime.timedelta(seconds=d['elapsed_seconds'])<end
+    else:assert not d['live_tests'] and d['argv'][:2]in [['go','vet'],['go','test']]
+    for channel in ['stdout','stderr']:assert sha(p/(name+'.'+channel))==d[channel+'_sha256']
+    if d['executable_sha256']is not None:assert sha(Path(d['argv'][0]))==d['executable_sha256']
+    receipts[name]={'sha256':sha(f),'raw_exit_code':d['exit_code'],'source_group':group,'mode':d['mode'],'started_utc':d['started_utc'],'elapsed_seconds':d['elapsed_seconds']}
+assert len(receipts)==25 and set(k for k,v in receipts.items()if v['raw_exit_code'])==expected_fail
+def native(name,cycles,result,group):
+    rows=[json.loads(line)for line in (p/(name+'.stdout')).read_text().splitlines()]
+    value=rows[-1];samples=[v['sample']for v in rows[:-1]]
+    assert all(v['event']=='vellum.window-cycle.sample'for v in rows[:-1]) and value['event']=='vellum.window-cycle.result'
+    assert value['result']==result and value['completed_cycles']==cycles and value['samples']==samples
+    assert samples[0]['Completed']==0 and samples[-1]['Completed']==cycles
+    c=value['native_cleanup'];assert c['MainThread'] and c['CleanupObserved'] and c['CallbacksStopped'] and c['PendingCallbacks']==c['NativeOutstanding']==c['AccessibilityWindows']==0 and c['WindowTitles']==[]
+    assert value['geometry_persistence_disabled_in_fixture'] and not any(value[k]for k in ['full_p11_qualified','native_heap_qualified','gpu_memory_qualified','clipboard_access','preferences_changed'])
+    assert receipts[name]['source_group']==group
+    return {'completed':cycles,'requested':value['requested_cycles'],'result':result,'first_sample':samples[0],'last_sample':samples[-1],'samples':len(samples),'stdout_sha256':sha(p/(name+'.stdout'))}
+cases={}
+cases['corrected_two']=native('cycle-native-two-final',2,'PASS_NATIVE_WINDOW_CYCLES','reviewed_pre_profile')
+cases['production_guard_failure']=native('cycle-native-thousand',375,'FAILED_NATIVE_WINDOW_CYCLES','reviewed_pre_profile')
+cases['production_profile_failure']=native('cycle-native-profile',375,'FAILED_NATIVE_WINDOW_CYCLES','profile_final')
+for name in ['cycle-native-thousand','cycle-native-profile']:
+    assert 'window-cycle safety memory limit at 375' in (p/(name+'.stderr')).read_text()
+    assert cases['production_guard_failure'if name=='cycle-native-thousand'else'production_profile_failure']['last_sample']['RSSBytes']>1<<30
+candidate=read('glyphcache-candidate-inputs.json');assert candidate['status']=='UNADOPTED_DIAGNOSTIC_CANDIDATE'
+assert sha(Path(candidate['original_path']))==candidate['original_sha256'] and sha(Path(candidate['candidate_path']))==candidate['candidate_sha256']
+assert read('glyphcache-overlay.json')['Replace']=={candidate['original_path']:candidate['candidate_path']}
+assert sha(p/'native-retention.profile')==candidate['profile_source_sha256']
+cases['unadopted_cache_diagnostic']=native('cycle-native-cache-candidate',1000,'PASS_NATIVE_WINDOW_CYCLES','profile_final')
+assert cases['unadopted_cache_diagnostic']['samples']==41 and cases['unadopted_cache_diagnostic']['last_sample']['HeapAlloc']<70<<20
+vm=read('vmmap-native-process.json');assert vm['native_exit_code']==vm['observed_terminal_exit']==0 and vm['error']is None
+assert vm['argv'][0]==str(p/'window-cycle-cache-candidate') and '-cycles=800'in vm['argv']
+assert vm['executable_sha256']==read('cycle-native-cache-candidate.json')['executable_sha256']
+for item in vm['vmmap']:
+    assert item['cycle_observed']in [250,750] and item['exit_code']==0 and item['argv']==['/usr/bin/vmmap','-summary',str(vm['owned_pid'])]
+    for channel in ['stdout','stderr']:assert sha(p/f"vmmap-{item['cycle_observed']}.{channel}")==item[channel+'_sha256']
+vrows=[json.loads(line)for line in (p/'vmmap-native.stdout').read_text().splitlines()]
+assert vrows[-1]['result']=='PASS_NATIVE_WINDOW_CYCLES' and vrows[-1]['completed_cycles']==800
+assert (p/'vmmap-native.stderr').stat().st_size==0
+assert 'Physical footprint:         7.9G'in(p/'vmmap-250.stdout').read_text() and 'IOSurface                             7.2G'in(p/'vmmap-250.stdout').read_text()
+assert 'Physical footprint:         14.3G'in(p/'vmmap-750.stdout').read_text() and 'IOSurface                            13.5G'in(p/'vmmap-750.stdout').read_text()
+assert 'AssertionError' in(p/'native-vmmap-diagnostic.stderr').read_text()
+assert 'cancel entries=1001 distinct closed contexts=1000'in(p/'app-retention-original.stdout').read_text()
+assert '353.66MB 90.77%' in(p/'heap-cumulative.stdout').read_text()
+prepared={f.relative_to(r/'drivers/cogent/build').as_posix():sha(f)for module in ['upstream','typesetting']for f in sorted((r/'drivers/cogent/build'/module).rglob('*'))if f.is_file()}
+previous=json.loads(Path('/private/tmp/vellum-macos-file-interaction/qualification.json').read_text())
+assert len(prepared)==6174 and prepared==previous['prepared']
+q={'result':'PASS_PORTABLE_COMPACTION_NATIVE_MEMORY_GATE_FAILED','base_commit':base,'source':source,'source_groups':groups,'prepared':prepared,'receipts':receipts,'native_cases':cases,'source_review_sha256':sha(p/'source-review-profile.json'),'pre_profile_source_review_sha256':sha(p/'source-review-final.json'),'prism_raw_exit_code':1,'prism_findings':1,'prism_findings_resolved':True,'prism_disposition_sha256':sha(p/'prism-disposition.json'),'prism_reviewed_source':pre,'post_prism_profile_extension_review':'internal exact-source approval; optional exclusive/capped diagnostic IO and tests, no second provider call','portable_cycles':1000,'production_native_thousand_pass':False,'unadopted_candidate_thousand_pass':True,'candidate_inputs_sha256':sha(p/'glyphcache-candidate-inputs.json'),'vmmap_process_sha256':sha(p/'vmmap-native-process.json'),'native_memory_qualified':False,'gpu_memory_qualified':False,'full_p11_qualified':False,'macos_completion':False,'preferences_changed':False,'clipboard_access':False,'quiet_window_expired':True,'next_live_tests_deferred':True,'historical_quick_two':'admission-only v3, raw exit0 but unqualified; corrected owner ACK required','vmmap_initial_attempt':'raw exit1 startup remaining-window assertion before Popen; saved v1 recipe; v2 800-cycle diagnostic is distinct from 1000-cycle acceptance','scope':'Selected source/prepared bytes and diagnostic owned-process evidence. No compiler/cache/SDK full closure, physical-memory bound or performance acceptance.'}
+(p/'qualification.json').write_text(json.dumps(q,indent=2)+'\n')
+records=out/'records';records.mkdir(parents=True,exist_ok=False)
+shutil.copy2(Path(__file__),records/'archive-producer.py.txt')
+files={}
+for folder,dirs,names in os.walk(p):
+    dirs[:]=sorted(d for d in dirs if not d.endswith('.app') and not(Path(folder)/d).is_symlink())
+    for name in sorted(names):
+        f=Path(folder)/name
+        if f.is_file() and not f.is_symlink() and f.suffix in ['.json','.stdout','.stderr','.py','.txt','.log','.go','.profile']:
+            files[f.relative_to(p).as_posix()]=f.read_bytes()
+index={n:hashlib.sha256(b).hexdigest()for n,b in files.items()}
+(records/'evidence-index.json').write_text(json.dumps(index,indent=2)+'\n')
+archive=records/'evidence.tar.gz'
+with tarfile.open(archive,'w:gz')as tf:
+    for n,b in sorted(files.items()):
+        info=tarfile.TarInfo(n);info.size,info.mode,info.mtime=len(b),0o644,0;tf.addfile(info,io.BytesIO(b))
+with tarfile.open(archive)as tf:actual={m.name:hashlib.sha256(tf.extractfile(m).read()).hexdigest()for m in tf.getmembers()if m.isfile()}
+assert actual==index and not any('.app/'in n or n.endswith('.DS_Store')for n in index)
+(out/'README.md').write_text('''# Mac window retention: portable fix, native memory gate failed
+
+Closed portable windows now cancel the original lifetime, substitute one shared
+canceled marker and discard the per-window cancel function. Historical identity
+tombstones remain to reject reopening and stale delivery; this does not bound
+historical ID storage or caller-held objects. The 1,000-cycle regression preserves
+captured-context and descendant cancellation, completion revocation, survivor
+independence and stale-work refusal. The parent implementation runs all cycles
+but fails the retention assertion (1,001 cancel functions / 1,000 closed contexts).
+The final portable app/tasks/document/history/workbench race suites pass three
+times. The affected native consumer race tests and vet pass, and pre-profile
+opt-in and offscreen driver race suites pass. Diagnostic sources are build
+guarded and opted in; no ordinary native startup is performed by these unit tests.
+
+The native consumer mounts a label, text field, checkbox, button and GPU rectangle
+in each fresh child while a survivor remains. OnShow precedes owner readback;
+each probe returns an immutable buffered acknowledgment. PostWait alone is queue
+admission. An original quick-two process returned exit 0 with admission-only
+checks and remains unqualified. A corrected quick-two process passes, checking
+viewport/pixel, context cancellation, completion/stale-work refusal, atomic
+composer withdrawal, locked registry removal, visible/AX inventories and retired
+canvas refusal. Registry retirement is not native or GPU deallocation.
+
+## Production 1,000-cycle gate failed
+
+Two corrected production processes stop at 375 of 1,000 cycles when sampled RSS
+exceeds the 1 GiB safety guard: 1,112,784,896 bytes without profiling and
+1,102,462,976 bytes with profiling. Live Go heap is about 388 MB. Both return raw
+exit 1 after normal zero-inventory cleanup; neither is a 1,000-cycle pass.
+Post-GC samples every 25 cycles do not bound unsampled peaks. Self ps RSS is
+resident pages, not physical footprint or native/GPU attribution. An optional
+exclusive new-file heap profile is capped at 8 MiB compressed; failures remain
+failures. The retained profile is approximately 74 KiB. Pprof attributes 353.66 MB
+(90.77% of sampled in-use space) to embedded-font parsing through new shapers.
+Allocation-site attribution alone does not establish the retaining reference.
+
+## Unadopted cache experiment and native footprint
+
+The global glyph-mask cache has unbounded strong font-face keys. A one-file Go
+overlay outside the prepared tree tests FIFO whole-face eviction with 32 face
+keys and 8 MiB of mask data. Prepared source remains unchanged. This candidate
+completes 1,000 cycles with raw exit 0 and empty stderr: heap reaches about 65 MB
+by 25 cycles and ends at 65,709,896 bytes, while RSS still rises to 933,494,784
+bytes. This is diagnostic evidence for a cache intervention, not adopted source
+or a production memory pass. Parsed fonts, allocator overhead, other caches and
+caller-held masks are outside its stated bounds; meaningful cache boundary,
+concurrency and pixel tests and owned-patch adoption remain necessary.
+
+A separate bounded 800-cycle candidate process completes with exit 0 before the
+quiet-host authorization expires. Vmmap queries only its Popen-owned PID at 250
+and 750 cycles. Physical footprint is 7.9 GB then 14.3 GB, and IOSurface is 7.2 GB
+then 13.5 GB (as reported in macOS human-readable units); CoreAnimation and native
+malloc also grow. These observations expose significant native graphics retention
+despite the sampled RSS guard passing. They do not identify a precise allocator
+owner. An earlier diagnostic recipe fails its remaining-window assertion before
+launching an app; its raw exit 1 and original recipe are retained. The successful
+800-cycle diagnostic does not replace the failed production 1,000-cycle gate.
+
+## Review, provenance and remaining gates
+
+One Prism review uses Anthropic Claude Sonnet 5.5, covers eight pre-profile files
+in three chunks, consumes 22,381 input / 2,419 output tokens and returns raw exit
+1 with one medium finding. Internal inspection refutes the unsynchronized-registry
+claim against pinned source: FindName holds renderWindowGlobalMu and IsClosed
+loads an atomic composer pointer. Names stay fixed in this fixture; no arbitrary
+rename or other mutable-field safety guarantee follows. The raw result remains
+exit 1. Internal exact-source review also covers the later diagnostic profile
+extension without another provider call. The source certificates, disposition,
+all process logs, original/cache overlays, profile, vmmap output, version groups,
+and 6,174 unchanged prepared file hashes are retained in the indexed archive.
+Binaries, app bundles, caches and desktop snapshots are excluded. Evidence covers
+selected source and prepared identities, not the full compiler/cache/SDK closure.
+
+All live processes finished before 2026-10-13 10:07:09 UTC. Further live/input and
+performance checks are deferred pending user availability; code, offscreen,
+review and commit work continues. This campaign changes no input sources,
+VoiceOver, notification permission, clipboard or user preferences. Unique-title
+geometry saving is disabled only in the fixture. Full P11 component/endurance,
+native/GPU memory, latency, human IME/VoiceOver, Finder drag, cross-display and
+public distribution gates remain open. Mac framework completion is not established.
+''')
+print(json.dumps({'result':q['result'],'qualification_sha256':sha(p/'qualification.json'),'archive_sha256':sha(archive),'archive_members':len(index),'receipts':len(receipts)}))

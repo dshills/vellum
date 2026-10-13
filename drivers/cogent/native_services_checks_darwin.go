@@ -52,7 +52,10 @@ type NativeServiceCheckState struct {
 	FilePanels      NativeServiceFilePanelCheck
 	// NativeOutstanding is sampled after this query ACK, separately from the
 	// main-thread Cocoa snapshot; it is not an atomic cross-thread inventory.
-	NativeOutstanding            int
+	NativeOutstanding int
+	// AccessibilityWindows is a separate, mutex-protected Go bridge-registry
+	// membership count, not a Cocoa allocation or atomic cross-registry snapshot.
+	AccessibilityWindows         int
 	Menu                         NativeServiceMenuCheck
 	Tray                         NativeServiceTrayCheck
 	CallbacksStopped             bool
@@ -92,6 +95,9 @@ func CheckNativeServices(ctx context.Context, operation, index int) (NativeServi
 		nativeCallbacks.Lock()
 		state.NativeOutstanding = len(nativeCallbacks.operations)
 		nativeCallbacks.Unlock()
+		accessibilityRegistry.Lock()
+		state.AccessibilityWindows = len(accessibilityRegistry.windows)
+		accessibilityRegistry.Unlock()
 	}
 	return state, err
 }
@@ -116,6 +122,9 @@ func ObserveNativeServiceCleanup() (func(), error) {
 		state.MenuCallbacks = len(nativeCallbacks.menus)
 		state.TrayCallbacks = len(nativeCallbacks.trays)
 		nativeCallbacks.Unlock()
+		accessibilityRegistry.Lock()
+		state.AccessibilityWindows = len(accessibilityRegistry.windows)
+		accessibilityRegistry.Unlock()
 		nativeServiceCleanupCheck.Store(&state)
 	})
 }

@@ -51,6 +51,7 @@ type Application struct {
 	completions                                map[uint64]*Completion
 	windows                                    []Window
 	lifetimes                                  map[string]context.Context
+	retiredLifetime                            context.Context
 	windowCancels                              map[string]context.CancelFunc
 	closeRequests                              map[string]bool
 	services                                   Services
@@ -73,7 +74,9 @@ func New(c Config) (*Application, error) {
 		return nil, fmt.Errorf("vellum: completion capacity must be positive")
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Application{ctx: ctx, cancel: cancel, capacity: c.QueueCapacity, completionCapacity: c.CompletionCapacity, completions: map[uint64]*Completion{}, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, closeRequests: map[string]bool{}, changed: make(chan struct{})}, nil
+	retired, retire := context.WithCancel(ctx)
+	retire()
+	return &Application{ctx: ctx, cancel: cancel, retiredLifetime: retired, capacity: c.QueueCapacity, completionCapacity: c.CompletionCapacity, completions: map[uint64]*Completion{}, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, closeRequests: map[string]bool{}, changed: make(chan struct{})}, nil
 }
 func (a *Application) Context() context.Context { return a.ctx }
 
@@ -107,6 +110,8 @@ func (a *Application) Open(w Window) error {
 
 // WindowContext scopes work to a particular window. Its cancellation does not
 // cancel other windows; closing the last registered window closes the app.
+// Captured contexts remain canceled after close. A later lookup of a closed ID
+// may return a shared canceled marker; context object identity is not promised.
 func (a *Application) WindowContext(id string) (context.Context, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -192,6 +197,10 @@ func (a *Application) CloseWindow(id string) error {
 		return fmt.Errorf("vellum: unknown window %q", id)
 	}
 	a.windowCancels[id]()
+	// Keep the ID tombstone for stale-work rejection, while releasing the
+	// original context and cancel closure from application-owned storage.
+	a.lifetimes[id] = a.retiredLifetime
+	delete(a.windowCancels, id)
 	a.windows = append(a.windows[:index], a.windows[index+1:]...)
 	delete(a.dirty, id)
 	wake := a.wake

@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "status": "APPROVED_SOURCE",
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "source_root": "/private/tmp/vellum-large-data",
+  "base_commit_parent_reported": "c842de16e448d2ec6834f39ac95da854e1e6319b",
+  "base_commit_independently_verified": false,
+  "source_manifest": {
+    "path": "/private/tmp/vellum-macos-window-retention/source-profile.json",
+    "sha256": "cf8a0874dd514ae6d0c9cec450effbd75916c861b152f4c777ab10e3353ce387"
+  },
+  "files": {
+    "app/app.go": "1ed87bf35c78d2246f10f6af11e6e5eeb60b989a9c0f6f4b684c24bbf0402863",
+    "app/window_retention_test.go": "98b8cd03b4c30bff8d6a51ff8ef2e5e9e19b09cd83794a6d66a727a29c6ac246",
+    "docs/development.md": "eb10d9cc6fa1249417f4d8286e4c6d1b55d983c1f71cc399813b4c75693781bc",
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": "6fdbdb2e70f37ce05477dbd2a7e53ef72ea032c24323fb4d5b5cafb8854c822b",
+    "drivers/cogent/cmd/window-cycle-smoke/main_test.go": "4a747f2c914404a558b38c9682331fa5b65ad45e15956a24bd7be2cc1d63b363",
+    "drivers/cogent/native_services_checks_darwin.go": "a1533ab077525ea913d818342c7556c7aa2b216984cba847e187551374df34e7",
+    "specs/native-window-lifecycle.md": "9d29b8e135fd34a0ec7f75e9d5588fb296b5610fd8f8b57f2a0cbc731dbc7266",
+    "specs/windows-services.md": "55085ed86622af02146bffd28f3a9611cfd79b905368d3864ad9ec83ee619c90"
+  },
+  "prior_reviews": {
+    "source": {
+      "path": "/private/tmp/vellum-macos-window-retention/source-review-final.json",
+      "sha256": "36358936611af572f2883a07ee7703122d78a7a66f7b33e1cd5965276ccec2c3",
+      "unchanged": true
+    },
+    "prism_disposition": {
+      "path": "/private/tmp/vellum-macos-window-retention/prism-disposition.json",
+      "sha256": "074c189f7183ddc07edbe58f311bb7a99417b739cda975b8c62f8a20cded4e47",
+      "unchanged": true
+    },
+    "provider_scope_manifest": {
+      "path": "/private/tmp/vellum-macos-window-retention/source-prism.json",
+      "sha256": "599181bae8b25321c49b1207550cf5b8b7db4574d90996450e9c1cd25377e8ec",
+      "files": {
+        "app/app.go": "1ed87bf35c78d2246f10f6af11e6e5eeb60b989a9c0f6f4b684c24bbf0402863",
+        "app/window_retention_test.go": "98b8cd03b4c30bff8d6a51ff8ef2e5e9e19b09cd83794a6d66a727a29c6ac246",
+        "docs/development.md": "eb10d9cc6fa1249417f4d8286e4c6d1b55d983c1f71cc399813b4c75693781bc",
+        "drivers/cogent/cmd/window-cycle-smoke/main.go": "e1704939d991a78a1d089a866bc2a6cf0cbd09f02e9bfcfd047c81113e330d77",
+        "drivers/cogent/cmd/window-cycle-smoke/main_test.go": "6c2b655690c91ef2b3a514636bb562d02dea7280bede4fd6c498963d953ac15b",
+        "drivers/cogent/native_services_checks_darwin.go": "a1533ab077525ea913d818342c7556c7aa2b216984cba847e187551374df34e7",
+        "specs/native-window-lifecycle.md": "335f689587cbd579924c7083af5f6ef248a66cd3395e0f92c41e0f2887767eed",
+        "specs/windows-services.md": "55085ed86622af02146bffd28f3a9611cfd79b905368d3864ad9ec83ee619c90"
+      }
+    }
+  },
+  "bounded_delta": {
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": {
+      "before_sha256": "e1704939d991a78a1d089a866bc2a6cf0cbd09f02e9bfcfd047c81113e330d77",
+      "after_sha256": "6fdbdb2e70f37ce05477dbd2a7e53ef72ea032c24323fb4d5b5cafb8854c822b"
+    },
+    "drivers/cogent/cmd/window-cycle-smoke/main_test.go": {
+      "before_sha256": "6c2b655690c91ef2b3a514636bb562d02dea7280bede4fd6c498963d953ac15b",
+      "after_sha256": "4a747f2c914404a558b38c9682331fa5b65ad45e15956a24bd7be2cc1d63b363"
+    },
+    "specs/native-window-lifecycle.md": {
+      "before_sha256": "335f689587cbd579924c7083af5f6ef248a66cd3395e0f92c41e0f2887767eed",
+      "after_sha256": "9d29b8e135fd34a0ec7f75e9d5588fb296b5610fd8f8b57f2a0cbc731dbc7266"
+    }
+  },
+  "review_scope": "All eight current file hashes checked against source-profile manifest. Exactly consumer main/test and native-window-lifecycle spec changed; inherited portable compaction, acknowledged probe, AX sample and development contracts remain byte-identical. Additive diagnostic reviewed independently; no provider rerun or source edits.",
+  "reviewed_behavior": [
+    {
+      "file": "drivers/cogent/cmd/window-cycle-smoke/main.go",
+      "line": 47,
+      "assessment": "Optional profile destination must be clean and absolute. Empty default keeps ordinary fixture free of the extra profile/GC action."
+    },
+    {
+      "file": "drivers/cogent/cmd/window-cycle-smoke/main.go",
+      "line": 118,
+      "assessment": "Normal worker sequence runs checks, attempts the diagnostic including on check failure, joins diagnostic error, publishes outcome, then closes owner. It preserves the original memory-guard failure rather than replacing it with profiling success."
+    },
+    {
+      "file": "drivers/cogent/cmd/window-cycle-smoke/main.go",
+      "line": 165,
+      "assessment": "profileWriter refuses a write larger than remaining compressed budget before file write; accepted bytes reduce remaining. Total output cannot exceed8MiB. This is an output bound, not a bound on profiler memory/CPU/latency."
+    },
+    {
+      "file": "drivers/cogent/cmd/window-cycle-smoke/main.go",
+      "line": 173,
+      "assessment": "O_WRONLY|O_CREATE|O_EXCL at0600 refuses existing files/symlinks rather than overwriting or deleting them. GC and WriteHeapProfile occur only after exclusive open. Write and close errors are joined; incomplete output remains diagnostic evidence, not a validated profile claim."
+    },
+    {
+      "file": "drivers/cogent/cmd/window-cycle-smoke/main_test.go",
+      "assessment": "Existing acknowledgment and sampled-guard regressions remain intact. New meaningful existing-file regression invokes actual writer entry, requires os.ErrExist and verifies exact original bytes preserved. Config fixture additionally rejects a relative profile path."
+    },
+    {
+      "file": "specs/native-window-lifecycle.md",
+      "assessment": "New paragraph accurately states optional capture, exclusive destination, compressed cap, joined errors and added forced GC; allocation sites do not establish retaining references. Existing guard/outer-watchdog/P11/native-memory/tombstone limitations remain explicit."
+    }
+  ],
+  "provider_disposition": {
+    "finding_id": "83f6fc41a5329c14",
+    "status": "REFUTED_ON_PINNED_SOURCE_NO_CODE_CHANGE",
+    "raw_prism_path": "/private/tmp/vellum-macos-window-retention/prism-v1/prism.json",
+    "raw_prism_sha256": "7646c27d40681259680d05327a2b9d55c2ce7f064a15dee4e569972e919af6e0",
+    "raw_process_path": "/private/tmp/vellum-macos-window-retention/prism-v1/process.json",
+    "raw_process_sha256": "b48bada10068873383bdecbd096bed529bf38f7cd218f1d3ac88f267a530cb7f",
+    "raw_exit_code": 1,
+    "retained_findings": 1,
+    "provider_reviewed_preprofile_eight_file_manifest_only": true,
+    "additive_profile_changes_reviewed_internally": true,
+    "reason": "Existing pinned FindName mutex and desktop IsClosed atomic predicate are unchanged. Prior precise refutation is preserved, not rewritten to claim provider pass."
+  },
+  "reviewed_receipt_sha256": {
+    "/private/tmp/vellum-macos-window-retention/cycle-build-profile.json": "07d5387f8af30c7f5cbe5c6e610a214954b3ec4d79852b3219eeaa4dcf3e886e",
+    "/private/tmp/vellum-macos-window-retention/cycle-build-profile.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/vellum-macos-window-retention/cycle-build-profile.stderr": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776",
+    "/private/tmp/vellum-macos-window-retention/cycle-race-profile.json": "806ac25e5fd64c12e92e534ce69b33ce6e036c880a12900674b9789991ec5244",
+    "/private/tmp/vellum-macos-window-retention/cycle-race-profile.stdout": "a4940e4acef547892c955395f539b0330d18b79b4ac72d2dfa254e02dee32884",
+    "/private/tmp/vellum-macos-window-retention/cycle-race-profile.stderr": "c57aa38e64ac55891740c16b0a3e85968934ce9186f1294753e878f63f6defc0",
+    "/private/tmp/vellum-macos-window-retention/cycle-native-profile.json": "bb5d742a7b4768f906df5225275ec2d9444fcf6d2c4580096a5742b9cb39647f",
+    "/private/tmp/vellum-macos-window-retention/cycle-native-profile.stdout": "6df120bbebc6b4f36c47bf7f55bcb67a840d2ddbefa8dc2b25bb70c819ac2ee8",
+    "/private/tmp/vellum-macos-window-retention/cycle-native-profile.stderr": "256d9458d0c44d56f3f4005c571dab18ae0d0b597f8e58bca0b43a8577911d1d"
+  },
+  "receipt_scope": {
+    "build_profile_exit_code": 0,
+    "race_profile_count3_exit_code": 0,
+    "native_profile_exit_code": 1,
+    "native_result": "FAILED_NATIVE_WINDOW_CYCLES",
+    "requested_cycles": 1000,
+    "completed_cycles": 375,
+    "last_sample_rss_bytes": 1102462976,
+    "last_sample_live_go_heap_bytes": 388393952,
+    "normal_terminal_inventory_zero": true,
+    "qualification": "FAILED_SAMPLED_MEMORY_GUARD_NOT_1000_CYCLE_PASS",
+    "retention_cause": "NOT_ADJUDICATED_BY_THIS_SOURCE_REVIEW"
+  },
+  "profile_file_metadata_only": {
+    "path": "/private/tmp/vellum-macos-window-retention/native-retention.profile",
+    "regular_file": true,
+    "bytes": 76162,
+    "mode": "600",
+    "within_compressed_cap": true,
+    "profile_contents_not_read_or_analyzed": true
+  },
+  "limitations": [
+    "Reviewer executed no Go/tests/build/native/UI/OS-setting/provider calls or Git mutations. Selected source/public receipt reads, hashing/stat and this outside-repository certificate only.",
+    "Native run requested1000 but stopped at375 with RSS guard failure. Normal zero terminal inventories do not transform that failure into memory/endurance acceptance. No full P11/native heap/GPU attribution or cause claim.",
+    "Optional profiling changes GC/work and is diagnostic only; it cannot be used as ordinary performance timing. Allocation-site profiles cannot alone prove retaining references.",
+    "Compressed output cap does not bound runtime profiler scratch memory or write/GC latency. Context/outer watchdog cannot preempt an already executing synchronous GPU operation; normal pre-close profile ordering is not guaranteed after an early native-loop failure.",
+    "Historical ID strings/map entries, caller-held contexts and other retained descriptors remain outside the small closed-lifetime compaction claim.",
+    "Prism ran once on the pre-profile8source scope and returned rawexit1/one finding, independently refuted. The additive3path delta received this internal review; no repeat provider pass claimed.",
+    "Source/public process selected maps and raw logs verified, not complete compiler/SDK/prepared closure or native executable identity.",
+    "No clipboard access, physical interaction, permission/UI tests, screenshots or live actions performed by reviewer; quiet-testing authorization is not extended by this source approval."
+  ]
+}

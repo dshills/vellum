@@ -26,6 +26,14 @@ CheckCloseWindow permission is separate from body cleanup. See [document and clo
 contract](document.md). An accepted native close follows the same lifecycle. Callers handle invalid IDs and
 `ErrClosed`; a closed ID cannot be reused for a different document.
 
+After closing a window, the application replaces its stored context with one
+already-canceled marker and removes its stored cancel function. Captured original
+contexts and their descendants are canceled first and retain their normal Context
+semantics; later lookups of closed IDs need not preserve context object identity.
+Used ID strings and map entries remain as tombstones to prevent reuse, so this
+compaction reduces per-window retained cancellation state without establishing a
+global bound on historical IDs or caller-retained contexts.
+
 The driver uses an event source and coalesced wake flag for each window. A wake
 notifies all live window sources; each window refreshes its own tree while owning
 its native event/render context. A closing native window creates any accepted remaining

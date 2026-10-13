@@ -1,0 +1,44 @@
+{
+  "result": "PASS_PORTABLE_COMPACTION_NATIVE_MEMORY_GATE_FAILED",
+  "base_commit": "c842de16e448d2ec6834f39ac95da854e1e6319b",
+  "qualification_sha256": "db16e4137c8503a09195da5fdc28dd1c93ba40c594970c498a2a33719e2e7c89",
+  "source": {
+    "app/app.go": "1ed87bf35c78d2246f10f6af11e6e5eeb60b989a9c0f6f4b684c24bbf0402863",
+    "app/window_retention_test.go": "98b8cd03b4c30bff8d6a51ff8ef2e5e9e19b09cd83794a6d66a727a29c6ac246",
+    "docs/development.md": "eb10d9cc6fa1249417f4d8286e4c6d1b55d983c1f71cc399813b4c75693781bc",
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": "6fdbdb2e70f37ce05477dbd2a7e53ef72ea032c24323fb4d5b5cafb8854c822b",
+    "drivers/cogent/cmd/window-cycle-smoke/main_test.go": "4a747f2c914404a558b38c9682331fa5b65ad45e15956a24bd7be2cc1d63b363",
+    "drivers/cogent/native_services_checks_darwin.go": "a1533ab077525ea913d818342c7556c7aa2b216984cba847e187551374df34e7",
+    "specs/native-window-lifecycle.md": "9d29b8e135fd34a0ec7f75e9d5588fb296b5610fd8f8b57f2a0cbc731dbc7266",
+    "specs/windows-services.md": "55085ed86622af02146bffd28f3a9611cfd79b905368d3864ad9ec83ee619c90"
+  },
+  "source_review_sha256": "910113d06744a9739a2dc7e144683f3148a2f708ac39bd732bebfd251aee08b1",
+  "evidence_review_sha256": "6364487cc510fd0e57d13b24b97109f9f32949c3884bb5af9f3ee11fbc7f298f",
+  "post_test_document_sha256": "594a3c42507991d2e149e7a8fb2ecb3dd4646887ed3f3998ae5b598aaa812d94",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_findings": 1,
+  "prism_findings_resolved": true,
+  "prism_raw_exit_code": 1,
+  "prism_disposition_sha256": "074c189f7183ddc07edbe58f311bb7a99417b739cda975b8c62f8a20cded4e47",
+  "post_provider_profile_extension": "internal source review",
+  "archive": {
+    "sha256": "e1945aac88213b5d8cc477044fbe4bea25b89c4200809ec0a72f62a10cf1476f",
+    "index_sha256": "923393bc16de1de16f42d575651051afd55711e60e9fcfb150fdd043479e845b",
+    "members": 109
+  },
+  "portable_cycles": 1000,
+  "production_native_thousand_pass": false,
+  "production_native_completed": [
+    375,
+    375
+  ],
+  "unadopted_cache_thousand_diagnostic": true,
+  "vmmap_diagnostic_cycles": 800,
+  "native_memory_qualified": false,
+  "gpu_memory_qualified": false,
+  "macos_completion": false,
+  "quiet_window_expired": true,
+  "next_live_tests_deferred": true
+}
