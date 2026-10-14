@@ -45,10 +45,10 @@ type config struct {
 func (c config) validate() error {
 	maximum := 20 * time.Minute
 	if c.composed {
-		maximum = 45 * time.Minute
+		maximum = 3 * time.Hour
 	}
 	if c.cycles < 1 || c.cycles > 1000 || c.every < 1 || c.every > c.cycles || c.timeout < 10*time.Second || c.timeout > maximum {
-		return errors.New("cycles 1..1000, sample-every 1..cycles, timeout 10s..20m (45m for composed) required")
+		return errors.New("cycles 1..1000, sample-every 1..cycles, timeout 10s..20m (3h for composed) required")
 	}
 	if c.heapProfile != "" && (!filepath.IsAbs(c.heapProfile) || filepath.Clean(c.heapProfile) != c.heapProfile) {
 		return errors.New("heap-profile needs a clean absolute new file path")
@@ -159,7 +159,7 @@ func run() error {
 	if errors.Join(runErr, err) == nil {
 		result = "PASS_NATIVE_WINDOW_CYCLES"
 	}
-	report := map[string]any{"event": "vellum.window-cycle.result", "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": true, "full_p11_qualified": false, "native_heap_qualified": false, "gpu_memory_qualified": false, "clipboard_access": false, "preferences_changed": false, "composed_workspace": c.composed, "dense_labels_per_composed_window": func() int {
+	report := map[string]any{"event": "vellum.window-cycle.result", "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": true, "full_p11_qualified": false, "native_heap_qualified": false, "gpu_memory_qualified": false, "clipboard_access": false, "preferences_changed": false, "cooperative_timeout_seconds": c.timeout.Seconds(), "composed_workspace": c.composed, "dense_labels_per_composed_window": func() int {
 		if c.composed {
 			return acceptance.DenseLabels
 		}

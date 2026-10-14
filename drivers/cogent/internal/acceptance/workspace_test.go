@@ -8,6 +8,7 @@ import (
 	"github.com/dshills/vellum/tasks"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
+	"image/color"
 	"strings"
 	"testing"
 )
@@ -26,7 +27,7 @@ func TestWorkspaceCatalogAndFreshModelIsolation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if first.Editor == second.Editor || first.Grid == second.Grid || first.Tree == second.Tree || first.Dock == second.Dock {
+	if first.Editor == second.Editor || first.Grid == second.Grid || first.Tree == second.Tree || first.Dock == second.Dock || first.Color == second.Color {
 		t.Fatal("per-window mutable models aliased")
 	}
 	kinds := map[ui.Kind]bool{}
@@ -199,5 +200,39 @@ func TestRefusedPreparePreservesFirstFailureAcrossLaterSuccess(t *testing.T) {
 	state, _ := w.Tree.State()
 	if state.Pending || state.VisibleRows != 64 {
 		t.Fatal("later successful worker did not complete", state)
+	}
+}
+
+func TestComposedColorModelAndQueuedChannelsAreIndependent(t *testing.T) {
+	a, _ := app.New(app.Config{})
+	defer a.Close()
+	first, err := New(a, "first", struct{}{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := New(a, "second", struct{}{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	view := first.Color.View()
+	var red, green ui.Node
+	var find func(ui.Node)
+	find = func(n ui.Node) {
+		if n.ID == ui.ColorFieldID("color", ui.ColorRed) {
+			red = n
+		}
+		if n.ID == ui.ColorFieldID("color", ui.ColorGreen) {
+			green = n
+		}
+		for _, c := range n.Children {
+			find(c)
+		}
+	}
+	find(view)
+	if err := a.Do(func() { red.Change(ui.ChangeEvent{Number: 12}); green.Change(ui.ChangeEvent{Number: 97}) }); err != nil {
+		t.Fatal(err)
+	}
+	if first.State().Color != (color.NRGBA{R: 12, G: 97, B: 224, A: 255}) || second.State().Color != (color.NRGBA{R: 32, G: 96, B: 224, A: 255}) || first.State().Changes[red.ID] != 1 || first.State().Changes[green.ID] != 1 {
+		t.Fatal("composed color shared/stale model")
 	}
 }

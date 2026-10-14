@@ -186,11 +186,11 @@ func TestComposedVisibilityRequiresCompleteInsideFrames(t *testing.T) {
 }
 
 func TestComposedDeadlineHasBoundedExtendedBudget(t *testing.T) {
-	if err := (config{cycles: 1000, every: 25, timeout: 45 * time.Minute, composed: true}).validate(); err != nil {
+	if err := (config{cycles: 1000, every: 25, timeout: 3 * time.Hour, composed: true}).validate(); err != nil {
 		t.Fatal(err)
 	}
-	if (config{cycles: 1000, every: 25, timeout: 45*time.Minute + time.Second, composed: true}).validate() == nil {
-		t.Fatal("unbounded composed run admitted")
+	if (config{cycles: 1000, every: 25, timeout: 3*time.Hour + time.Second, composed: true}).validate() == nil {
+		t.Fatal("composed run above three-hour cap admitted")
 	}
 }
 
@@ -254,5 +254,20 @@ func TestTreeEnvelopeRequiresMatchingCompletedNativeView(t *testing.T) {
 				t.Fatal("stale/missing native rows qualified")
 			}
 		})
+	}
+}
+
+func TestOrdinaryDeadlineRetainsTwentyMinuteCap(t *testing.T) {
+	if err := (config{cycles: 1000, every: 25, timeout: 20 * time.Minute}).validate(); err != nil {
+		t.Fatal(err)
+	}
+	if (config{cycles: 1000, every: 25, timeout: 20*time.Minute + time.Second}).validate() == nil {
+		t.Fatal("ordinary deadline cap changed")
+	}
+	if (config{cycles: 1001, every: 25, timeout: time.Minute, composed: true}).validate() == nil {
+		t.Fatal("cycle cap changed")
+	}
+	if (config{cycles: 10, every: 25, timeout: time.Minute, composed: true}).validate() == nil {
+		t.Fatal("invalid sample interval admitted")
 	}
 }

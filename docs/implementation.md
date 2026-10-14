@@ -351,3 +351,14 @@ The gallery demonstrates reset/disable/focus. The checkpoint also fixes Slider
 minimum sizing overridden by backend final styling; removing overrides restores
 native defaults. See [the report](reports/macos-color-picker/README.md). Broader
 Mac performance, human accessibility and release gates remain open.
+
+## Color-inclusive lifecycle validation
+
+The composed fixture exercises 24 Cocoa selector steps per window, including
+accepted RGBA/hex publication. Five fresh windows pass 120 steps. The requested
+1000-window campaign fails after 343 completed windows when the next window's
+tree-row request observes its accessibility bridge retired. Cleanup completes;
+the triggering retirement cause and a passing complete campaign remain open.
+Four completed actions retry queue admission without duplicate accepted callback
+counts. Live testing is paused while the human uses the machine. See
+[the preserved failure report](reports/macos-interacting-retention/README.md).

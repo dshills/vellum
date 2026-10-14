@@ -45,3 +45,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Composed native actions](macos-composed-actions/README.md): 500 acknowledged Cocoa action steps across 25 windows, including worker-built tree disclosure; physical and sustained acceptance remain open.
 
 - [Inline color picker](macos-color-picker/README.md): reusable RGBA/hex fields, retained preview and scoped Mac action/lifetime checks.
+
+- [Interacting lifecycle fixture](macos-interacting-retention/README.md): 24-step color-inclusive preflight passes; the 1000-window campaign fails after 343 completed windows, with preserved attachment-close evidence and clean teardown.

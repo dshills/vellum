@@ -108,4 +108,36 @@ func TestWorkspaceCompletedDensityGeometry(t *testing.T) {
 		}
 		t.Fatalf("completed density defined=%d visible=%d clip=%v", defined, visible, clip)
 	}
+	// A selected scroll page must allocate real field geometry. This catches
+	// fixture regressions that catalog validation and hidden-page tests cannot.
+	if err = a.Do(func() { workspace.tab = "colors"; _ = a.Invalidate("one") }); err != nil {
+		t.Fatal(err)
+	}
+	for range 32 {
+		if _, err = manual.Step(ctx, 16); err != nil {
+			t.Fatal(err)
+		}
+		if _, err = manual.Frame(ctx, "one"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	snapshot, err = manual.Snapshot(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []ui.ColorChannel{ui.ColorRed, ui.ColorGreen, ui.ColorBlue, ui.ColorAlpha, ui.ColorHex} {
+		found := false
+		for _, e := range snapshot.Windows[0].Elements {
+			if e.ID == ui.ColorFieldID("color", c) {
+				found = e.Visible && e.Enabled && !e.Bounds.Empty()
+				if !found {
+					t.Log("color field geometry", e)
+				}
+			}
+		}
+		if !found {
+			t.Fatalf("selected color field has no visible geometry: %s", c)
+		}
+	}
+
 }

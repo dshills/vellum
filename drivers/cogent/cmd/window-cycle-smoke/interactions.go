@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/dshills/vellum/ui"
+	"image/color"
 	"os"
 	"time"
 
@@ -20,6 +22,7 @@ type nativeActionRecord struct {
 	NativeRole              string
 	Attempts, Admissions    int
 	OwnerAndNativeCompleted bool
+	ElapsedSeconds          float64
 }
 type nativeActionHooks struct {
 	targetRole string
@@ -33,6 +36,7 @@ type nativeActionHooks struct {
 // retry. Accepted domain state waits only for publication, never repeating a
 // non-idempotent press while native semantics catch up.
 func runNativeAction(ctx context.Context, duration time.Duration, target, kind, value string, h nativeActionHooks) (nativeActionRecord, error) {
+	started := time.Now()
 	record := nativeActionRecord{Target: target, Kind: kind, Value: value}
 	err := waitWithin(ctx, duration, func(inner context.Context) (bool, error) {
 		accepted, err := h.accepted(inner)
@@ -76,6 +80,7 @@ func runNativeAction(ctx context.Context, duration time.Duration, target, kind, 
 		}
 		return false, nil
 	})
+	record.ElapsedSeconds = time.Since(started).Seconds()
 	if err != nil {
 		return record, fmt.Errorf("native %s %s: %w (attempts=%d admissions=%d)", target, kind, err, record.Attempts, record.Admissions)
 	}
@@ -195,6 +200,28 @@ func exerciseNativeActions(ctx context.Context, a *app.Application, id string, w
 			return records, err
 		}
 	}
+
+	if err := run("tabs", "set", "colors", changed("tabs", 3, func(s acceptance.ControlState) bool { return s.Tab == "colors" }), valueMatches("tabs", "Colors")); err != nil {
+		return records, err
+	}
+	colorCompleted := func(want color.NRGBA) func(cogent.AccessibilityInspection) bool {
+		return func(s cogent.AccessibilityInspection) bool { return colorEnvelopeCompleted(s, want) }
+	}
+
+	red := color.NRGBA{R: 12, G: 96, B: 224, A: 255}
+	redID := ui.ColorFieldID("color", ui.ColorRed)
+	if err := run(redID, "set", "12", changed(redID, 1, func(s acceptance.ControlState) bool { return s.Color == red }), colorCompleted(red)); err != nil {
+		return records, err
+	}
+	hex := color.NRGBA{R: 53, G: 103, B: 181, A: 128}
+	hexID := ui.ColorFieldID("color", ui.ColorHex)
+	if err := run(hexID, "set", "#3567B580", changed(hexID, 1, func(s acceptance.ControlState) bool { return s.Color == hex }), colorCompleted(hex)); err != nil {
+		return records, err
+	}
+	if err := run("tabs", "set", "live", changed("tabs", 4, func(s acceptance.ControlState) bool { return s.Tab == "live" }), valueMatches("tabs", "Workspace")); err != nil {
+		return records, err
+	}
+
 	ownerTreeCompleted := false
 	treeReady := func(selected string, disclosures, visible int, expanded bool) (bool, error) {
 		ownerTreeCompleted = false
@@ -255,4 +282,23 @@ func exerciseNativeActions(ctx context.Context, a *app.Application, id string, w
 		}
 	}
 	return records, nil
+}
+
+func colorEnvelopeCompleted(s cogent.AccessibilityInspection, want color.NRGBA) bool {
+	if !s.Reachable || !s.NativeWindow {
+		return false
+	}
+	values := []any{float64(want.R), float64(want.G), float64(want.B), float64(want.A), ui.ColorHexString(want)}
+	for i, c := range []ui.ColorChannel{ui.ColorRed, ui.ColorGreen, ui.ColorBlue, ui.ColorAlpha, ui.ColorHex} {
+		e, ok := nativeElement(s, ui.ColorFieldID("color", c))
+		role := "AXSlider"
+		if c == ui.ColorHex {
+			role = "AXTextField"
+		}
+		if !ok || e.ObjectIdentity == 0 || e.Role != role || !e.Enabled || e.Frame[2] <= 0 || e.Frame[3] <= 0 || e.Value != values[i] {
+			return false
+		}
+	}
+	e, ok := nativeElement(s, "color/color/preview")
+	return ok && e.ObjectIdentity > 0 && e.Role == "AXImage" && e.Name == "Workspace color preview "+ui.ColorHexString(want) && e.Frame[2] > 0 && e.Frame[3] > 0
 }

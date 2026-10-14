@@ -6,6 +6,8 @@ import (
 	"context"
 	"errors"
 	cogent "github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/ui"
+	"image/color"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -30,7 +32,7 @@ func TestNativeActionJoinsOwnerBeforeRetryAndWaitsForPublication(t *testing.T) {
 		perform:   func(context.Context, string) (bool, error) { performs++; queued = true; return true, nil },
 		completed: func(cogent.AccessibilityInspection) bool { publications++; return publications == 3 },
 	})
-	if err != nil || performs != 1 || ownerCalls < 5 || record.Admissions != 1 || !record.OwnerAndNativeCompleted {
+	if err != nil || performs != 1 || ownerCalls < 5 || record.Admissions != 1 || record.ElapsedSeconds <= 0 || !record.OwnerAndNativeCompleted {
 		t.Fatal("admission substituted for owner/publication or press repeated", record, err, ownerCalls, performs)
 	}
 }
@@ -44,6 +46,55 @@ func TestNativeActionRequiresItsOwnAdmission(t *testing.T) {
 	})
 	if err == nil || performs != 0 || record.OwnerAndNativeCompleted {
 		t.Fatal("initial domain value counted as native acceptance", record, err)
+	}
+}
+
+func TestNativeActionRetriesDrainedUnacceptedAdmission(t *testing.T) {
+	queued, accepted := false, false
+	performs, acknowledgements := 0, 0
+	record, err := runNativeAction(context.Background(), time.Second, "target", "press", "", nativeActionHooks{
+		accepted: func(context.Context) (bool, error) {
+			if queued {
+				queued = false
+				acknowledgements++
+				// The first admitted closure drained without accepting the model.
+				accepted = acknowledgements == 2
+			}
+			return accepted, nil
+		},
+		inspect: func(context.Context) (cogent.AccessibilityInspection, error) { return actionFixture(), nil },
+		perform: func(context.Context, string) (bool, error) {
+			if queued {
+				t.Fatal("retry preceded owner acknowledgement")
+			}
+			performs++
+			queued = true
+			return true, nil
+		},
+		completed: func(cogent.AccessibilityInspection) bool { return true },
+	})
+	if err != nil || performs != 2 || acknowledgements != 2 || record.Attempts != 2 || record.Admissions != 2 || !record.OwnerAndNativeCompleted {
+		t.Fatal("drained unaccepted request prevented retry or bypassed acceptance", record, err, performs, acknowledgements)
+	}
+}
+
+func TestNativeActionInspectionFailureAfterAdmissionStops(t *testing.T) {
+	closed := errors.New("attachment retired")
+	performs, inspections := 0, 0
+	record, err := runNativeAction(context.Background(), time.Second, "target", "press", "", nativeActionHooks{
+		accepted: func(context.Context) (bool, error) { return performs > 0, nil },
+		inspect: func(context.Context) (cogent.AccessibilityInspection, error) {
+			inspections++
+			if inspections > 1 {
+				return cogent.AccessibilityInspection{}, closed
+			}
+			return actionFixture(), nil
+		},
+		perform:   func(context.Context, string) (bool, error) { performs++; return true, nil },
+		completed: func(cogent.AccessibilityInspection) bool { t.Fatal("failed inspection qualified"); return true },
+	})
+	if !errors.Is(err, closed) || performs != 1 || record.Attempts != 1 || record.Admissions != 1 || record.OwnerAndNativeCompleted {
+		t.Fatal("closed attachment swallowed, repeated or qualified", record, err, performs)
 	}
 }
 func TestNativeAdmissionCannotQualifyWithoutOwnerAcceptance(t *testing.T) {
@@ -127,5 +178,44 @@ func TestNativeActionSelectsActionableDisclosureHeading(t *testing.T) {
 	})
 	if err != nil || record.NativeRole != "AXDisclosureTriangle" || record.Attempts != 1 {
 		t.Fatal(record, err)
+	}
+}
+
+func TestColorEnvelopeRequiresEveryNativeFieldValueAndPreview(t *testing.T) {
+	want := color.NRGBA{R: 53, G: 103, B: 181, A: 128}
+	native := cogent.AccessibilityInspection{Reachable: true, NativeWindow: true}
+	values := []any{float64(53), float64(103), float64(181), float64(128), "#3567B580"}
+	for i, c := range []ui.ColorChannel{ui.ColorRed, ui.ColorGreen, ui.ColorBlue, ui.ColorAlpha, ui.ColorHex} {
+		role := "AXSlider"
+		if c == ui.ColorHex {
+			role = "AXTextField"
+		}
+		native.Elements = append(native.Elements, cogent.AccessibilityElement{DomainID: ui.ColorFieldID("color", c), ObjectIdentity: uint64(i + 1), Role: role, Enabled: true, Value: values[i], Frame: [4]float64{0, 0, 100, 20}})
+	}
+	native.Elements = append(native.Elements, cogent.AccessibilityElement{DomainID: "color/color/preview", ObjectIdentity: 6, Role: "AXImage", Name: "Workspace color preview #3567B580", Frame: [4]float64{0, 0, 32, 32}})
+	if !colorEnvelopeCompleted(native, want) {
+		t.Fatal("valid color view refused")
+	}
+	for name, change := range map[string]func(*cogent.AccessibilityInspection){
+		"unreachable":     func(s *cogent.AccessibilityInspection) { s.Reachable = false },
+		"non-native":      func(s *cogent.AccessibilityInspection) { s.NativeWindow = false },
+		"missing-channel": func(s *cogent.AccessibilityInspection) { s.Elements = append(s.Elements[:1], s.Elements[2:]...) },
+		"zero-identity":   func(s *cogent.AccessibilityInspection) { s.Elements[0].ObjectIdentity = 0 },
+		"wrong-role":      func(s *cogent.AccessibilityInspection) { s.Elements[1].Role = "AXGroup" },
+		"disabled":        func(s *cogent.AccessibilityInspection) { s.Elements[2].Enabled = false },
+		"empty-frame":     func(s *cogent.AccessibilityInspection) { s.Elements[3].Frame = [4]float64{} },
+		"stale-hex":       func(s *cogent.AccessibilityInspection) { s.Elements[4].Value = "#3567B5FF" },
+		"stale-channel":   func(s *cogent.AccessibilityInspection) { s.Elements[0].Value = float64(99) },
+		"stale-preview":   func(s *cogent.AccessibilityInspection) { s.Elements[5].Name = "Workspace color preview #3567B5FF" },
+		"missing-preview": func(s *cogent.AccessibilityInspection) { s.Elements = s.Elements[:5] },
+	} {
+		t.Run(name, func(t *testing.T) {
+			s := native
+			s.Elements = append([]cogent.AccessibilityElement(nil), native.Elements...)
+			change(&s)
+			if colorEnvelopeCompleted(s, want) {
+				t.Fatal("incomplete color view qualified")
+			}
+		})
 	}
 }

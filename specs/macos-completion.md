@@ -586,3 +586,34 @@ adds an owner-held RGBA/hex component built from managed controls, immutable
 checker pixels and ordinary focus/AX semantics. Slider explicit/theme minimum
 sizes now survive the backend final style pass. The scoped routed-input/Cocoa
 checks do not close P6/P11, human accessibility or distribution gates.
+
+The current interacting lifecycle fixture includes the owner-held color picker
+in a Colors tab. Each fresh workspace has 24 Cocoa action steps, including red
+and full-hex proposals with all five native values and preview publication
+checked before proceeding. Its per-action elapsed time includes inspection,
+owner admission and native publication waits; it is diagnostic wall time, not
+UI CPU/GPU or input latency. Prior 20-step/1000-cycle results retain their exact
+source/workload scope.
+
+The composed runner admits a cooperative deadline up to three hours; ordinary
+runs retain twenty minutes. This accommodates the measured roughly eight seconds
+per prior 20-step window plus four new steps, without raising the 1000-cycle cap,
+512 MiB sampled Go-heap guard or 1 GiB sampled RSS guard. The owned campaign
+wrapper grants a three-hour-five-minute watchdog only to its exact 1000-cycle,
+GC-every-25, three-hour composed command with a new bounded diagnostic profile.
+Other wrapper processes retain fifty minutes maximum. A complete current
+campaign, its terminal cleanup, profiles and exact source/prepared bindings must
+be validated before qualifying this lifecycle workload. Full P6/P11, unsampled
+native/GPU allocation, sustained latency/pacing, physical input/displays, human
+accessibility, overnight background and distribution gates remain separate.
+
+The [interacting lifecycle checkpoint](../docs/reports/macos-interacting-retention/README.md)
+passes a five-window, 120-step preflight but fails the requested 1000-window
+campaign after 343 completed windows. The next window's tree-row press reports
+an attachment closed before owner/native completion; its triggering close path
+is not established. Partial memory samples and clean final teardown do not
+qualify the failed campaign. Four completed actions retried queue admissions;
+the exact owner callback counters still require one accepted effect. An original
+single-admission validator assumption is preserved and explicitly corrected.
+Live checks are deferred while the human uses the machine. Investigation and a
+fresh complete campaign remain required.

@@ -31,6 +31,7 @@ type Workspace struct {
 	Editor                      *editor.Model
 	Grid                        *virtual.Grid
 	Tree                        *virtual.Outline
+	Color                       *ui.ColorPicker
 	Dock                        *cogent.Workbench
 	checked, open, dialog       bool
 	number                      float32
@@ -51,6 +52,12 @@ func New(owner *app.Application, window string, gpuCanvas any) (*Workspace, erro
 		return nil, fmt.Errorf("acceptance: owner, window and canvas required")
 	}
 	w := &Workspace{Owner: owner, Window: window, canvas: gpuCanvas, open: true, number: 25, text: "Native workspace", choice: "a", tab: "live", split: .5, changes: map[string]int{}}
+	w.Color = &ui.ColorPicker{ID: "color", Label: "Workspace color", Color: color.NRGBA{R: 32, G: 96, B: 224, A: 255}}
+	w.Color.Change = func(e ui.ColorEdit) {
+		w.Color.Color = e.Apply(w.Color.Color)
+		w.changes[ui.ColorFieldID(w.Color.ID, e.Channel)]++
+	}
+	w.Color.Invalid = w.recordFailure
 	var err error
 	w.Editor, err = editor.New("Native document\nGo owner and shared history", editor.Config{MaxBytes: 4096, HistoryLimit: 16})
 	if err != nil {
@@ -162,9 +169,10 @@ func (w *Workspace) View() ui.Node {
 	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Style: compact, Children: []ui.Node{
 		{ID: "density-scroll", Kind: ui.Scroll, Grow: true, MinHeight: 160, Style: ui.Style{MinSize: ui.Some(ui.Size{Height: 160}), MaxSize: ui.Some(ui.Size{Height: 170})}, Children: []ui.Node{dense}},
 		controls,
-		{ID: "tabs", Kind: ui.Tabs, Grow: true, SelectedID: w.tab, Options: []ui.Option{{ID: "live", Label: "Workspace"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { w.tab = e.SelectedID; w.changes[e.ID]++ }, Children: []ui.Node{
+		{ID: "tabs", Kind: ui.Tabs, Grow: true, SelectedID: w.tab, Options: []ui.Option{{ID: "live", Label: "Workspace"}, {ID: "about", Label: "About"}, {ID: "colors", Label: "Colors"}}, Change: func(e ui.ChangeEvent) { w.tab = e.SelectedID; w.changes[e.ID]++ }, Children: []ui.Node{
 			{ID: "live", Kind: ui.Extension, Grow: true, MinHeight: 240, Custom: w.Dock},
 			{ID: "about", Kind: ui.Label, Text: "All-component acceptance workspace"},
+			{ID: "colors", Kind: ui.Scroll, Grow: true, Children: []ui.Node{w.Color.View()}},
 		}},
 		{ID: "dialog", Kind: ui.Dialog, Text: "Acceptance dialog", Open: w.dialog, Dismiss: func() { w.dialog = false }, Children: []ui.Node{{ID: "dialog-label", Kind: ui.Label, Text: "Composed modal lifecycle"}, {ID: "dialog-close", Kind: ui.Button, Text: "Close", Activate: func() { w.dialog = false }}}},
 	}}
@@ -202,6 +210,7 @@ func (w *Workspace) Text() string        { return w.text }
 // State is a detached owner-only observation, separate from native admission.
 type ControlState struct {
 	Checked, IndicatorsOpen, DialogOpen                bool
+	Color                                              color.NRGBA
 	Number                                             float32
 	Choice, Tab                                        string
 	Actions, TreeSelections, Disclosures, WorkerActive int
@@ -214,7 +223,7 @@ func (w *Workspace) State() ControlState {
 	if w.manager != nil {
 		active = w.manager.Pending().Active
 	}
-	return ControlState{Checked: w.checked, IndicatorsOpen: w.open, DialogOpen: w.dialog, Number: w.number, Choice: w.choice, Tab: w.tab, Actions: w.actions, TreeSelections: w.treeSelections, Disclosures: w.disclosures, WorkerActive: active, Changes: maps.Clone(w.changes), Failure: w.workerError}
+	return ControlState{Color: w.Color.Color, Checked: w.checked, IndicatorsOpen: w.open, DialogOpen: w.dialog, Number: w.number, Choice: w.choice, Tab: w.tab, Actions: w.actions, TreeSelections: w.treeSelections, Disclosures: w.disclosures, WorkerActive: active, Changes: maps.Clone(w.changes), Failure: w.workerError}
 }
 
 func (w *Workspace) recordFailure(err error) {
