@@ -1,0 +1,894 @@
+{
+  "archive_sha256": "83f65e15a54638139526c0246e5c1e9a30cafe730eca97cd53bc92a849aaad22",
+  "files": {
+    "glyph_coverage_checkpoint/adopt-test-v3.py": {
+      "sha256": "aaa58b8578ed87091af3d957f541d0cf215bd2109a1146aa44bd602a1522cf29",
+      "bytes": 2566
+    },
+    "glyph_coverage_checkpoint/adopt-v1-failure.json": {
+      "sha256": "9265705fb3dcff464d529cd7f2978c8a24292477cf5f9f42d029979f2673ae09",
+      "bytes": 280
+    },
+    "glyph_coverage_checkpoint/adopt-v2.py": {
+      "sha256": "17537c09f8563bcec367cd02652f664a2a1516d73c7c2ae7e7c0535c5538d795",
+      "bytes": 4488
+    },
+    "glyph_coverage_checkpoint/adopt.py": {
+      "sha256": "822abd6fc2f4c70643fa6cf4e86490a21688dcb1feada3dab77d963f16e0e73b",
+      "bytes": 4146
+    },
+    "glyph_coverage_checkpoint/adoption-inputs-v2.json": {
+      "sha256": "7ef3bbb143d439e2f6b31531bc15039f2eae8a343917323d9b6452c06da59699",
+      "bytes": 2212
+    },
+    "glyph_coverage_checkpoint/adoption-inputs.json": {
+      "sha256": "3afd6820f2ff0942172f6043e82f8ac3b869bd6fc698fee73cc9e5578dd03f2e",
+      "bytes": 2212
+    },
+    "glyph_coverage_checkpoint/archive.py": {
+      "sha256": "5b68d7adbe86c6bbd58695a7e8f765786310a2251cc8114686de654a74a2872a",
+      "bytes": 3611
+    },
+    "glyph_coverage_checkpoint/candidate-renderer.go": {
+      "sha256": "ebd3f00e19daa055b78d8f9beb36d529bd11280126fe385b9c0006bda3e95c21",
+      "bytes": 8532
+    },
+    "glyph_coverage_checkpoint/candidate-scene_packet.go": {
+      "sha256": "c46b3d580b278f46a60a393d3f0af2aafb510ded06da9cc6d0a9a4dae907b9e4",
+      "bytes": 11543
+    },
+    "glyph_coverage_checkpoint/candidate-text.go": {
+      "sha256": "16dbdbf2d891a3118be7086421469548c8e2a44c45e4b70ec258f94f700bb57a",
+      "bytes": 18331
+    },
+    "glyph_coverage_checkpoint/candidate-v3-renderer.go": {
+      "sha256": "16faf9a1cff241cda7a017f94c8ea97965760536dc66222cac844954ddd0dfb8",
+      "bytes": 8640
+    },
+    "glyph_coverage_checkpoint/candidate-v3-scene_packet.go": {
+      "sha256": "692f8eb44ba536cb7102e02885791be50df38ba3e45751b5865c23c788970313",
+      "bytes": 11590
+    },
+    "glyph_coverage_checkpoint/candidate-v3-text.go": {
+      "sha256": "5c79e38249b2721e95cdc827ac29b4242884a6ec228da971d0c3a856eb27be62",
+      "bytes": 18358
+    },
+    "glyph_coverage_checkpoint/candidate-v4-cpu-raster.cpu": {
+      "sha256": "e836341e606f38e21204b4a7ca28b6bed12c8bd1d49f01dc28e4b11198a2a7ea",
+      "bytes": 3328
+    },
+    "glyph_coverage_checkpoint/candidate-v4-gpu-packet-encode.cpu": {
+      "sha256": "d3dc2a6e7c9ffcd69900877511d0d826755df7d88baaf46166ee808ae61ebbfc",
+      "bytes": 6567
+    },
+    "glyph_coverage_checkpoint/checkpoint-source.json": {
+      "sha256": "6500cf18e8bcd7e4055aa875aa563b9b06f091505827fec1c40c599ae5ecae52",
+      "bytes": 1182
+    },
+    "glyph_coverage_checkpoint/checkpoint.py": {
+      "sha256": "0c82d8b65ada3257b13d5840094bab0630e598bef2a19d87af8f21ee1a7029eb",
+      "bytes": 858
+    },
+    "glyph_coverage_checkpoint/code_run.py": {
+      "sha256": "af0258371614c02d5fcd6b816cfa52dd3bf9549330bddba0acdd73eeacadfdf8",
+      "bytes": 3405
+    },
+    "glyph_coverage_checkpoint/continuation-state.json": {
+      "sha256": "d9b486d1b0412004f1702ca0314c4976adf65c9ecc855eb6e4e3878a6bf90170",
+      "bytes": 2361
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-overlay.json": {
+      "sha256": "5a1744429fdbbae161b1d7163a84ab83ba3d62855e1138879ce86bfae042ffd7",
+      "bytes": 1089
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-race.json": {
+      "sha256": "1686aaaa71fbd798debdea54bbdbe7de4476343a975b21f794ffb59a5aab4a53",
+      "bytes": 1400900
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-race.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-race.stdout": {
+      "sha256": "9be541759cdfe51af06578b76cea5771d5dd0ffb7747d9a7eda5da171912ede2",
+      "bytes": 1942
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-v2-overlay.json": {
+      "sha256": "99ec24132f0ffbd3d466fbf28e6a509efa32c7150edf69a5efa80e0e3a7eaee1",
+      "bytes": 1092
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-v2-race.json": {
+      "sha256": "5f0b96b0ab3e8d893f51cfbbb8744dead69b26fb056377e5d05cb8acaeb3144f",
+      "bytes": 1400915
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-v2-race.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/coverage-adoption-v2-race.stdout": {
+      "sha256": "a5cd6043ac94d5cfd289f6a397d8900ee332720a47a4d13464781c45244bec75",
+      "bytes": 1837
+    },
+    "glyph_coverage_checkpoint/coverage-existing-parity.json": {
+      "sha256": "dfb0d018f7361bd4351cba8dd4f07d5eec7138c8316690917657781239c115c6",
+      "bytes": 1400307
+    },
+    "glyph_coverage_checkpoint/coverage-existing-parity.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/coverage-existing-parity.stdout": {
+      "sha256": "c67eaec0c9df34ee515cba349b34566c8cc495557ab094e27dcc4d6d9d86a916",
+      "bytes": 56
+    },
+    "glyph_coverage_checkpoint/coverage-focused-v2.json": {
+      "sha256": "0d711ba5aa215133c02429cbc83a8e53339f9de33da8d130b94e33cd104f684e",
+      "bytes": 1400571
+    },
+    "glyph_coverage_checkpoint/coverage-focused-v2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/coverage-focused-v2.stdout": {
+      "sha256": "c6ed570781b4943a3b4fd09a9adbe76de9576463ede37b2a97200fd85aceba7e",
+      "bytes": 431
+    },
+    "glyph_coverage_checkpoint/coverage-focused-v3.json": {
+      "sha256": "db69c50243da17a6a1d8b693cccffc24b74f1047b1b259923d95f31d2a1c0aa3",
+      "bytes": 1400613
+    },
+    "glyph_coverage_checkpoint/coverage-focused-v3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/coverage-focused-v3.stdout": {
+      "sha256": "0df2c5120eebae200552eed9f8298a59410387279ecb6893581d7c0582a238bd",
+      "bytes": 779
+    },
+    "glyph_coverage_checkpoint/coverage-focused.json": {
+      "sha256": "a48e81cd7a303c9188e5ae8f79cb38c409ad2b4258205e6189fe053045041b32",
+      "bytes": 1400568
+    },
+    "glyph_coverage_checkpoint/coverage-focused.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/coverage-focused.stdout": {
+      "sha256": "b1285d2736ec36c396d2c77d55a7e46067ee5cc69f36142ce6402e7200279895",
+      "bytes": 431
+    },
+    "glyph_coverage_checkpoint/coverage-overlay.json": {
+      "sha256": "9a8f30b2354fe4e677a89f9a63cd29d807835259246d5f47eb3aebf60a9dc68e",
+      "bytes": 696
+    },
+    "glyph_coverage_checkpoint/coverage-tests-overlay.json": {
+      "sha256": "0752b776228557930a5e183733a6859195a5f1e7bc92ebda6576d087e6899794",
+      "bytes": 876
+    },
+    "glyph_coverage_checkpoint/coverage-v2-overlay.json": {
+      "sha256": "5af29ae603c5785c551ddd09cbcbbb0f1a773fa952327116ac8a775777d057a7",
+      "bytes": 882
+    },
+    "glyph_coverage_checkpoint/coverage-v3-overlay.json": {
+      "sha256": "55c838d4ad49fe8cdfc0a787252a89c5cbb2515b7a8755a379a14d04c6177b6a",
+      "bytes": 891
+    },
+    "glyph_coverage_checkpoint/cpu-raster-profile.json": {
+      "sha256": "6aa6e262bdb30f0d3a9f79e1c846537e3eb722985ab3b4b4959f0bdb6e350636",
+      "bytes": 1398789
+    },
+    "glyph_coverage_checkpoint/cpu-raster-profile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/cpu-raster-profile.stdout": {
+      "sha256": "98c14a0fc8c4979157d9f697d0662c9c2e8f14edb94f830c97c541e321dd47f4",
+      "bytes": 6704
+    },
+    "glyph_coverage_checkpoint/cpu-raster.cpu": {
+      "sha256": "ea17fac37fbead43fb60f6ae9a9dfec623863e4cc17fbf28ce3ae58603790de8",
+      "bytes": 4256
+    },
+    "glyph_coverage_checkpoint/faulty-clip-overlay.json": {
+      "sha256": "37bfad2bf0475dccf8b52d0b5b8a644d178c836e33b3d1d95e83f006cd27744c",
+      "bytes": 1086
+    },
+    "glyph_coverage_checkpoint/faulty-clip.go": {
+      "sha256": "f821b743b0ebfe796119b601a410c0d523d2a937e4c7f3ffb52f92c1ae818c49",
+      "bytes": 7141
+    },
+    "glyph_coverage_checkpoint/faulty-clip.json": {
+      "sha256": "db65f5cda090ddb7bafc237d2f68c0048980969518ff04e452c846c01cd73e26",
+      "bytes": 1400889
+    },
+    "glyph_coverage_checkpoint/faulty-clip.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/faulty-clip.stdout": {
+      "sha256": "4b7f4d35fa97c9a7aa3edb0d392661d9bd3134bc086179e204fdad09a7d85da9",
+      "bytes": 282
+    },
+    "glyph_coverage_checkpoint/faulty-comparison-overlay.json": {
+      "sha256": "e82b791fed242ded9ffc6a5c4e8814e5902cc2aa0c19c644527b193012a3a170",
+      "bytes": 1092
+    },
+    "glyph_coverage_checkpoint/faulty-comparison.go": {
+      "sha256": "dd6c8d1510c5a54f7c85775e003f751baa073dbdfae7ff86f49548c8f026525a",
+      "bytes": 7115
+    },
+    "glyph_coverage_checkpoint/faulty-comparison.json": {
+      "sha256": "372a14723566b7004c8917a2374ee6ebf251998045793e0f5caa50ec22c104a7",
+      "bytes": 1400925
+    },
+    "glyph_coverage_checkpoint/faulty-comparison.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/faulty-comparison.stdout": {
+      "sha256": "e40fe57bec6a4d0ac88fc136d228fda80e716165b52094c4367fa37842c36f39",
+      "bytes": 291
+    },
+    "glyph_coverage_checkpoint/faulty-retirement-overlay.json": {
+      "sha256": "09b27ac44c74a5eb77431b6f29d5a6fcf80834d5625fa3058a5f6f9735f28fba",
+      "bytes": 1088
+    },
+    "glyph_coverage_checkpoint/faulty-retirement.go": {
+      "sha256": "0ddf5ad2814122379ec543438e3a0ba798bc5e380fe06eb3032e7ef5f1346e6e",
+      "bytes": 8682
+    },
+    "glyph_coverage_checkpoint/faulty-retirement.json": {
+      "sha256": "0be6074c6824756601012cf240ed65c6397dd9c1d7e317c09657eefcab0de876",
+      "bytes": 1400920
+    },
+    "glyph_coverage_checkpoint/faulty-retirement.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/faulty-retirement.stdout": {
+      "sha256": "4092c780da5f869ecb1510728a8a0dcf2b090858377a7ab1b2e9e68062988a77",
+      "bytes": 1199
+    },
+    "glyph_coverage_checkpoint/faulty-work-overlay.json": {
+      "sha256": "61c99aaff6b2489e183f4ecf54604f387ced05ee9aa654c26f30a741042edb77",
+      "bytes": 1086
+    },
+    "glyph_coverage_checkpoint/faulty-work.go": {
+      "sha256": "282955d35aadf91203dd44c381cf8cc30970e8d922548065b1b5e08a7c61ae8f",
+      "bytes": 16769
+    },
+    "glyph_coverage_checkpoint/faulty-work.json": {
+      "sha256": "dae2d917eddf7e221dcf3d950d26bf4c74dbd6153b11f1c8c12609c8431eb2a8",
+      "bytes": 1400895
+    },
+    "glyph_coverage_checkpoint/faulty-work.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/faulty-work.stdout": {
+      "sha256": "0fa8d1dd8283bdd5f5400ef71bc0029771f308a96d02a9ad2b5972865465e87f",
+      "bytes": 292
+    },
+    "glyph_coverage_checkpoint/final-adapter-race-v2.json": {
+      "sha256": "985ece633483f4b8fd19452e089e316cf2260138bfd8916167f4c5f67e0eefbe",
+      "bytes": 1401748
+    },
+    "glyph_coverage_checkpoint/final-adapter-race-v2.stderr": {
+      "sha256": "a1d0eb490e53c1ba6c604980f48f617e3d80d269e62f6500403a00a8b8391a67",
+      "bytes": 803
+    },
+    "glyph_coverage_checkpoint/final-adapter-race-v2.stdout": {
+      "sha256": "782d43ee156019cd688e774ae9fa3411ad31868d7b6d5bb64eb5b4788aaecc51",
+      "bytes": 1368
+    },
+    "glyph_coverage_checkpoint/final-adapter-race.json": {
+      "sha256": "3fee7f034848fa904446069d6ecd767234757a005ab6450fa66a93be2c6f0f84",
+      "bytes": 1401119
+    },
+    "glyph_coverage_checkpoint/final-adapter-race.stderr": {
+      "sha256": "2d86a3d418982ab75da83eccf11ea7f6e3646b494daac16b338753e0c66111d7",
+      "bytes": 803
+    },
+    "glyph_coverage_checkpoint/final-adapter-race.stdout": {
+      "sha256": "7496a21c945098da24fb878d9968293e383c835cd9a15805134cce724504b963",
+      "bytes": 1533
+    },
+    "glyph_coverage_checkpoint/final-adapter-vet.json": {
+      "sha256": "816b130365f7be852c490299137c9ffa0bc2fc90e99ef3858b349c5621b09d21",
+      "bytes": 1401105
+    },
+    "glyph_coverage_checkpoint/final-adapter-vet.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-adapter-vet.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-native-build.json": {
+      "sha256": "79baaac15e7422a67f09586cb3bc98f397a0181e57139427db477817821ab98b",
+      "bytes": 1401207
+    },
+    "glyph_coverage_checkpoint/final-native-build.stderr": {
+      "sha256": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776",
+      "bytes": 118
+    },
+    "glyph_coverage_checkpoint/final-native-build.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-native-contracts-command-failure.json": {
+      "sha256": "9a60b3e839be00957a563013dfebd197c45edf338352841381537b7cda9a7669",
+      "bytes": 137
+    },
+    "glyph_coverage_checkpoint/final-native-contracts-v2.json": {
+      "sha256": "1575dfcedb34931dfb56db2efa0a8edaab37297c24e437baabcdbeb3b7815c45",
+      "bytes": 1401150
+    },
+    "glyph_coverage_checkpoint/final-native-contracts-v2.stderr": {
+      "sha256": "c57aa38e64ac55891740c16b0a3e85968934ce9186f1294753e878f63f6defc0",
+      "bytes": 123
+    },
+    "glyph_coverage_checkpoint/final-native-contracts-v2.stdout": {
+      "sha256": "86ebb46cd796271217e39e9fc6a24da5ea8e4548b4a9f04cd86ad8486d063198",
+      "bytes": 76
+    },
+    "glyph_coverage_checkpoint/final-native-contracts.json": {
+      "sha256": "c2f71dc5aedf350ca162d0a37a37cf532e1a4e6c33dc91fe28758412a79296fc",
+      "bytes": 1401133
+    },
+    "glyph_coverage_checkpoint/final-native-contracts.stderr": {
+      "sha256": "4ea98017bdf5250d0b9deb33e928f22cb87af4949fd9edc95d4987ec1795015f",
+      "bytes": 106
+    },
+    "glyph_coverage_checkpoint/final-native-contracts.stdout": {
+      "sha256": "5a5c7ed7f93c66e9d69082a02f4eb2b934080e6ac3c4a66fc0c96a24a24f57e7",
+      "bytes": 42
+    },
+    "glyph_coverage_checkpoint/final-native-vet.json": {
+      "sha256": "f2184f54b48ee9b99bad0ad32ffbe60c8b951f6a2333b01337e62efef4a009fc",
+      "bytes": 1401116
+    },
+    "glyph_coverage_checkpoint/final-native-vet.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-native-vet.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-portable-race-v2.json": {
+      "sha256": "4c18671098621f2a0d4ccf4046f037442454db06a937f1eded7f6f01fec84bcf",
+      "bytes": 1401081
+    },
+    "glyph_coverage_checkpoint/final-portable-race-v2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-portable-race-v2.stdout": {
+      "sha256": "0552854fba509fe3a33bd22c36f368953b58966566751a86105460396c314d72",
+      "bytes": 656
+    },
+    "glyph_coverage_checkpoint/final-portable-race.json": {
+      "sha256": "30e2e2fac4e4595be6025f327c1d34516d5b392484afdc2fb78b13288b140d04",
+      "bytes": 1401081
+    },
+    "glyph_coverage_checkpoint/final-portable-race.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-portable-race.stdout": {
+      "sha256": "dae15ea1709a106f17c105ef1afb2511d31082d947922acdd9d8d5a959bb3990",
+      "bytes": 3587
+    },
+    "glyph_coverage_checkpoint/final-preparation-tests-v2.json": {
+      "sha256": "6010c4d57c85fcab33812bf1a0641c6a25583d01ab01c1bf043ea11b0a280cad",
+      "bytes": 1401716
+    },
+    "glyph_coverage_checkpoint/final-preparation-tests-v2.stderr": {
+      "sha256": "6161a0b71f5746c8794e198c41aadaee8559da03bd553500c303df628450978b",
+      "bytes": 110
+    },
+    "glyph_coverage_checkpoint/final-preparation-tests-v2.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-preparation-tests.json": {
+      "sha256": "1ca15d0bef0a8cb5665a92844e97115cd582539433b7bae266bac2c3add983c5",
+      "bytes": 1401088
+    },
+    "glyph_coverage_checkpoint/final-preparation-tests.stderr": {
+      "sha256": "0e0ff48818165bc025ea30dd179e6fddcf43567b32239c9f54ea734d19862220",
+      "bytes": 110
+    },
+    "glyph_coverage_checkpoint/final-preparation-tests.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-prepare-v2.json": {
+      "sha256": "dfa306c83b93bd44967304ef6372306c06c50055c85541353d5d270af9131400",
+      "bytes": 1401081
+    },
+    "glyph_coverage_checkpoint/final-prepare-v2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-prepare-v2.stdout": {
+      "sha256": "468511e1e401895eb45734c8ad9a30d5a5d46517328b40113096ab63c82e73eb",
+      "bytes": 16967
+    },
+    "glyph_coverage_checkpoint/final-prepare.json": {
+      "sha256": "c90699070894a5ffe4d431fb9c0620924dafa5ecaeb5b96fc5398db5ecad85f3",
+      "bytes": 1400684
+    },
+    "glyph_coverage_checkpoint/final-prepare.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-prepare.stdout": {
+      "sha256": "468511e1e401895eb45734c8ad9a30d5a5d46517328b40113096ab63c82e73eb",
+      "bytes": 16967
+    },
+    "glyph_coverage_checkpoint/final-renderer-race-v2.json": {
+      "sha256": "521b74201e8ec193a3c148f604459e96cec69eed283c3a99216aa12e8d4defb3",
+      "bytes": 1401878
+    },
+    "glyph_coverage_checkpoint/final-renderer-race-v2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-renderer-race-v2.stdout": {
+      "sha256": "a5ba28f151bcfef7ab20a3ef3dc22bc034cace64fa16606ae95cb755f36a656f",
+      "bytes": 58
+    },
+    "glyph_coverage_checkpoint/final-renderer-race.json": {
+      "sha256": "1121aca2c3f7e09a39cc0d95f8be85c2c3554de5c6312f05c5649bc734dbd435",
+      "bytes": 1401251
+    },
+    "glyph_coverage_checkpoint/final-renderer-race.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-renderer-race.stdout": {
+      "sha256": "f497eb8522ef15f109a4061d9e675428165da5c81f27e1d763f4a3225182cef7",
+      "bytes": 57
+    },
+    "glyph_coverage_checkpoint/final-renderer-vet-v2.json": {
+      "sha256": "066676561ce59d4aec5863c09baf4f5948ae18dbc29052f09b40d9db6a6d3947",
+      "bytes": 1401772
+    },
+    "glyph_coverage_checkpoint/final-renderer-vet-v2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-renderer-vet-v2.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-renderer-vet.json": {
+      "sha256": "00d49f57c625c4529e430ffb83d6eb1150cbbd4710f159ed979c8afa39893a36",
+      "bytes": 1401145
+    },
+    "glyph_coverage_checkpoint/final-renderer-vet.stderr": {
+      "sha256": "5f97d9eb4dc622e4b8c9f871748ec3ab114053d2a850a6672db8032d1ebc83f2",
+      "bytes": 2373
+    },
+    "glyph_coverage_checkpoint/final-renderer-vet.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/final-source-review.json": {
+      "sha256": "357d7bfa3691e7ba4a2917a0a576b42131390d5725afdd890d14f1a9ce790f75",
+      "bytes": 28747
+    },
+    "glyph_coverage_checkpoint/final-summary.json": {
+      "sha256": "b20f51e9919acd192e92893dc116b794e90e2c9247a19e4d28142c85bdb9349c",
+      "bytes": 10725
+    },
+    "glyph_coverage_checkpoint/glyph_coverage.go": {
+      "sha256": "9d6e5f406308ef593ac1950d6ad6b6307aa986bcd5575f8da23d327b688e2b79",
+      "bytes": 6646
+    },
+    "glyph_coverage_checkpoint/glyph_coverage_adoption_test.go": {
+      "sha256": "475751c80058a112832d6eaafb48a3fd50ba732dfaefdf8f6ac1e5ae697d5ad9",
+      "bytes": 7629
+    },
+    "glyph_coverage_checkpoint/glyph_coverage_adoption_v2_test.go": {
+      "sha256": "005773777d111fea08233b04780a4fd91de477c30757ad7405b326995ba0af8e",
+      "bytes": 8159
+    },
+    "glyph_coverage_checkpoint/glyph_coverage_test.go": {
+      "sha256": "4c4b0d217f73a69490f76b6c811a9872b94e033b3346b155d70ce30515762af2",
+      "bytes": 6276
+    },
+    "glyph_coverage_checkpoint/glyph_coverage_v2.go": {
+      "sha256": "5a7294d829cc02339e191ae46ba22da27e8e96ca3ea4c2045ca7556669cf2517",
+      "bytes": 7017
+    },
+    "glyph_coverage_checkpoint/glyph_coverage_v2_test.go": {
+      "sha256": "df5675603d7da0c5207132ea8e657fd3574fdf7559d87dfe9d3f197cb8d9a6f4",
+      "bytes": 6389
+    },
+    "glyph_coverage_checkpoint/glyph_coverage_v3.go": {
+      "sha256": "c3af5959dc3f68cdb15442fec81e77ee038bae12a805e5de200655c457a2cf08",
+      "bytes": 7159
+    },
+    "glyph_coverage_checkpoint/glyph_coverage_v3_test.go": {
+      "sha256": "5683013054b36dcfc6d815723c89a29a0e57960c621625977617b0900fa4a19e",
+      "bytes": 6491
+    },
+    "glyph_coverage_checkpoint/gpu-packet-encode.cpu": {
+      "sha256": "589320fbc3e291f85251c6b1aaf66fc78e3a6511bec5bfb3d79450f9e6f252ef",
+      "bytes": 7784
+    },
+    "glyph_coverage_checkpoint/gpu-packet-profile.json": {
+      "sha256": "8c68a4ea430df55a7ef23917c8d53f4419a7605860f4d4f81fff64d621611ea4",
+      "bytes": 1398796
+    },
+    "glyph_coverage_checkpoint/gpu-packet-profile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/gpu-packet-profile.stdout": {
+      "sha256": "6efbf756b6b7c16b8c415d80f8e47b7cd300db3591b21f639937e32960d9c330",
+      "bytes": 11528
+    },
+    "glyph_coverage_checkpoint/grid_matrix_test.go": {
+      "sha256": "a443ced05c4016e7e8f793b70a2754627c8cf89f2a6110227273c8b417487f61",
+      "bytes": 3018
+    },
+    "glyph_coverage_checkpoint/internal-final-review.json": {
+      "sha256": "8155b42057ead241ff51687eab5ef3e0ddc2ee9c9637dcef2e63b15b5cde6ae1",
+      "bytes": 30359
+    },
+    "glyph_coverage_checkpoint/matrix-base-overlay.json": {
+      "sha256": "564dffeae171aa55619badff880c50d6d4450bf2979b3723ef8e3e059fdd34c0",
+      "bytes": 178
+    },
+    "glyph_coverage_checkpoint/matrix-base.json": {
+      "sha256": "81cf6119f2422d4e04a0f447c339c21a782b52e885afa096d147b4e2bf56bdb0",
+      "bytes": 1399424
+    },
+    "glyph_coverage_checkpoint/matrix-base.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/matrix-base.stdout": {
+      "sha256": "f8854a670009f64b9a169778f493f1630914345954ad868487df18509277ba1f",
+      "bytes": 1188
+    },
+    "glyph_coverage_checkpoint/matrix-base_test.go": {
+      "sha256": "c816edd8f1f07c7d3b7b5db91302b7b98eb52282a1d071a42060dd0c3fd9ac18",
+      "bytes": 3593
+    },
+    "glyph_coverage_checkpoint/matrix-candidate-overlay.json": {
+      "sha256": "180e86b8c3140ec358760bdb7a7c27054dc53f051d06be088619b7211d4595e3",
+      "bytes": 1253
+    },
+    "glyph_coverage_checkpoint/matrix-candidate.json": {
+      "sha256": "26782bcba6f1c0af01000153c3c7b0f752eb3ae8786aa85b734774ca03d2654f",
+      "bytes": 1401145
+    },
+    "glyph_coverage_checkpoint/matrix-candidate.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/matrix-candidate.stdout": {
+      "sha256": "74b26ccdf079cac4f43975d3b3649b357d8b0514293f45e0aa9a270e66cea219",
+      "bytes": 1188
+    },
+    "glyph_coverage_checkpoint/matrix-candidate_test.go": {
+      "sha256": "7a34861d2c030f7bece665cf833054c50d688ff7b098a0d45af0f8ac946f384c",
+      "bytes": 3598
+    },
+    "glyph_coverage_checkpoint/matrix-comparison.json": {
+      "sha256": "a7314133efc396caeb862b7e16dad032a5ae6725c95e9c5d64ae338da5bfa9a8",
+      "bytes": 450
+    },
+    "glyph_coverage_checkpoint/matrix-v1-output-collision.json": {
+      "sha256": "52cb2fbc3636ad6ec9ce7508a99bc0107f9f6ff50aedd95f015bbb49291c9352",
+      "bytes": 278
+    },
+    "glyph_coverage_checkpoint/matrix-v2-base-overlay.json": {
+      "sha256": "5c6f65e9e7e5cfd68c00a09843e87ae3212da8490d29eae6a76e816ca60424ee",
+      "bytes": 181
+    },
+    "glyph_coverage_checkpoint/matrix-v2-base-pixels.json": {
+      "sha256": "db05c447bf97137976a7e721f47624d330945ac1cea83cd997e33585f7ca5355",
+      "bytes": 17114
+    },
+    "glyph_coverage_checkpoint/matrix-v2-base.json": {
+      "sha256": "28e2f00e5b95217fcd02100affebeab4a84274cc8a2b01c28576c49327bcfb26",
+      "bytes": 1399439
+    },
+    "glyph_coverage_checkpoint/matrix-v2-base.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/matrix-v2-base.stdout": {
+      "sha256": "4adc749d05908c89bc8078192b2e0e836deaa75b10b879d10c46752c372bc728",
+      "bytes": 1188
+    },
+    "glyph_coverage_checkpoint/matrix-v2-base_test.go": {
+      "sha256": "f40f6143f7b12cc80766fdfbc0d86e362aa5358641eb9cf7d23b0bab25123de9",
+      "bytes": 3603
+    },
+    "glyph_coverage_checkpoint/matrix-v2-candidate-overlay.json": {
+      "sha256": "5ad5919e96a094d7a02c1c6ccf9f414c4ddfbb76168875cce12c194c552f44aa",
+      "bytes": 1256
+    },
+    "glyph_coverage_checkpoint/matrix-v2-candidate-pixels.json": {
+      "sha256": "db05c447bf97137976a7e721f47624d330945ac1cea83cd997e33585f7ca5355",
+      "bytes": 17114
+    },
+    "glyph_coverage_checkpoint/matrix-v2-candidate.json": {
+      "sha256": "fd8dd9d25d8e42763ccc9727f7c30b3c65cf99b9e8f3b51e17023f44e04fb975",
+      "bytes": 1401160
+    },
+    "glyph_coverage_checkpoint/matrix-v2-candidate.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/matrix-v2-candidate.stdout": {
+      "sha256": "1cd380dc92ef7feeecec202a2092abb02cc99854d8b428d9cf6956fbb3191a90",
+      "bytes": 1188
+    },
+    "glyph_coverage_checkpoint/matrix-v2-candidate_test.go": {
+      "sha256": "47fdfb91348c03ceed6849a8b5e2553e5f1e1ebefb9cb9460d23aa7a19c57bb9",
+      "bytes": 3608
+    },
+    "glyph_coverage_checkpoint/overlay-v2.json": {
+      "sha256": "9effb87b418468490a5ff7c295ccd21c2d71e0af89d0dbc4504b9392a7c6951e",
+      "bytes": 176
+    },
+    "glyph_coverage_checkpoint/overlay.json": {
+      "sha256": "1a9ca213398efb753d80970b11ea41b870dcd542e85fa7cdd8fbce1a01759ca9",
+      "bytes": 173
+    },
+    "glyph_coverage_checkpoint/owned-v1-0056-exact-small-glyph-coverage.patch": {
+      "sha256": "cbe96801bcd5ccbf8ac81f53ada49b1b01c71c4b51eb50f3571fad5d9646e96f",
+      "bytes": 25597
+    },
+    "glyph_coverage_checkpoint/owned-v1-output-hashes.json": {
+      "sha256": "71bb1868b50d688212b14418a2bc33dc736104dad31af698e68e72a5d78c51ef",
+      "bytes": 694
+    },
+    "glyph_coverage_checkpoint/paint-probe-base-image_test.go": {
+      "sha256": "3027d7524c752927b66d4f0ccddb743a98348abb7421e78ecb9cdc2c902860ed",
+      "bytes": 6228
+    },
+    "glyph_coverage_checkpoint/paint-probe-candidate-v3_test.go": {
+      "sha256": "73df57d5b3afa3297de5b00e6dd01f373e5e69db0b60f821e117d3337ec761e6",
+      "bytes": 6263
+    },
+    "glyph_coverage_checkpoint/paint-probe-candidate-v4_test.go": {
+      "sha256": "f6d3817ab5e2b69caabe22fb7f30ae852792d770f0e7005e8960bd458cc2dd63",
+      "bytes": 6276
+    },
+    "glyph_coverage_checkpoint/paint_probe_test.go": {
+      "sha256": "12efb62a4d372141688348cd6cbe9193d796de92bf3c582af73a9d552301b14e",
+      "bytes": 5403
+    },
+    "glyph_coverage_checkpoint/paint_probe_v2_test.go": {
+      "sha256": "b1dca7e991f2420e1586dd6d22f591b459a1f9ad6d8701816587b125b2d933b8",
+      "bytes": 6165
+    },
+    "glyph_coverage_checkpoint/prepared-baseline.json": {
+      "sha256": "dd0ef2c6cc20da767106956f448a3a98ed637a2a855591462b5bb1a20d3f0b13",
+      "bytes": 686516
+    },
+    "glyph_coverage_checkpoint/prepared-comparison.json": {
+      "sha256": "225e7e0f281089e36fbb98d058c0254052b32aa86e4144037c331432c75d8e92",
+      "bytes": 167
+    },
+    "glyph_coverage_checkpoint/prepared-final-v2.json": {
+      "sha256": "955ae549c8cfac5af92c948fb62cf2cd65ba3fd5e82a819c75ef145bd7076b52",
+      "bytes": 686907
+    },
+    "glyph_coverage_checkpoint/prepared-final.json": {
+      "sha256": "35caa2c75d9247e7660bf1373b64bab859dcc52d9bfdc56299a830f069136343",
+      "bytes": 686907
+    },
+    "glyph_coverage_checkpoint/prism-v1/inputs.json": {
+      "sha256": "2f692bbb9dfa02325c6ccdfe2c81d5d1f13b5c9dea5f9b86c9f75dc45d6797f6",
+      "bytes": 1511
+    },
+    "glyph_coverage_checkpoint/prism-v1/process.json": {
+      "sha256": "f3070a92e8e0e7f5a90bc3ad4b62f1a8dd00604a5820f2a398d5c41c196cda2f",
+      "bytes": 3298
+    },
+    "glyph_coverage_checkpoint/prism-v1/staged.diff.txt": {
+      "sha256": "330545021684df411f5acb74a2490e1b6dc1feb5d980adf48cc15051eef93263",
+      "bytes": 39542
+    },
+    "glyph_coverage_checkpoint/prism-v1/stderr.log": {
+      "sha256": "26fde8effb4595bfd907e98cb1fdcbf6f87323693a1a5d66eb20c30e2543a48b",
+      "bytes": 76
+    },
+    "glyph_coverage_checkpoint/prism-v1/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/prism-v1-credential-omission.json": {
+      "sha256": "04c1c32604a45f27142043a33e29390aca5b29be0059a0f20d7c82cc674f8011",
+      "bytes": 227
+    },
+    "glyph_coverage_checkpoint/prism-v2/inputs.json": {
+      "sha256": "2f692bbb9dfa02325c6ccdfe2c81d5d1f13b5c9dea5f9b86c9f75dc45d6797f6",
+      "bytes": 1511
+    },
+    "glyph_coverage_checkpoint/prism-v2/prism.json": {
+      "sha256": "135c77811afa2603f3ead3a2b32bb5a64220b119073666da61cd1776a2a5687c",
+      "bytes": 1067
+    },
+    "glyph_coverage_checkpoint/prism-v2/process.json": {
+      "sha256": "87f09c12dc73ffac5a2aa259409dc8c940d64cc7db6afcc5bdc3eb8383279562",
+      "bytes": 3359
+    },
+    "glyph_coverage_checkpoint/prism-v2/staged.diff.txt": {
+      "sha256": "330545021684df411f5acb74a2490e1b6dc1feb5d980adf48cc15051eef93263",
+      "bytes": 39542
+    },
+    "glyph_coverage_checkpoint/prism-v2/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/prism-v2/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glyph_coverage_checkpoint/prism-v2.py": {
+      "sha256": "ed9d8400698fb510de43567180012565b925979cbb43821ab6d60dc0a4acfc0b",
+      "bytes": 2459
+    },
+    "glyph_coverage_checkpoint/prism-v3.py": {
+      "sha256": "d428c9a597eff96cf645863c8262d4768dae23ac6776249e359a6a3e0c42ff7c",
+      "bytes": 2518
+    },
+    "glyph_coverage_checkpoint/prism-wrapper-v1-compile-failure.json": {
+      "sha256": "eb321946fe7a48b20930713d2ae67135d130078635977d5fa493578c9f60d1bb",
+      "bytes": 221
+    },
+    "glyph_coverage_checkpoint/prism.py": {
+      "sha256": "62f6d3552cd8e2cd7673ffdfec97705c8cf1d797998ae9d74b19e15ed68dd6ca",
+      "bytes": 2458
+    },
+    "glyph_coverage_checkpoint/probe-base-image-overlay.json": {
+      "sha256": "ef02085dc8233152bc0bdc6e24cefa83c630acb70df0d6ea6a6bcc5a631aeffa",
+      "bytes": 184
+    },
+    "glyph_coverage_checkpoint/probe-candidate-v3-overlay.json": {
+      "sha256": "8c260d8017b0dc5ccb9abe99441cb1249adbecd454a97d288294dd4f2b5f1216",
+      "bytes": 1055
+    },
+    "glyph_coverage_checkpoint/probe-candidate-v4-overlay.json": {
+      "sha256": "26e905390a945a3e6f973a6ea2a1ccec2259557570ed7e7a1eacc1776522203c",
+      "bytes": 1055
+    },
+    "glyph_coverage_checkpoint/promote.py": {
+      "sha256": "b5c2d44aa1f0d5907543a0258ba53b56a4218e537ba73f36cdc626e12abf4fca",
+      "bytes": 3708
+    },
+    "glyph_coverage_checkpoint/provisional-internal-review.json": {
+      "sha256": "3a08475aa8cbf200724b1da71c95a4a32166567b0281b7aa2198c84ff060932f",
+      "bytes": 1092
+    },
+    "glyph_coverage_checkpoint/source-base-image.json": {
+      "sha256": "7fa25090bcc68ac49b0611755827c775071f15f1d6fb4bd1b0f9a15ca524fba0",
+      "bytes": 1399462
+    },
+    "glyph_coverage_checkpoint/source-base-image.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/source-base-image.stdout": {
+      "sha256": "06e5c750fc1389a85158a9a1c06ebe556625dc7e5e0cd0cfc74d7d6fec908721",
+      "bytes": 907
+    },
+    "glyph_coverage_checkpoint/source-candidate-profile-v3.json": {
+      "sha256": "fcf030a069bc8328d37c8345c3160f9af855524e8fef9bae1869ed425f6c2cf1",
+      "bytes": 1400856
+    },
+    "glyph_coverage_checkpoint/source-candidate-profile-v3.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/source-candidate-profile-v3.stdout": {
+      "sha256": "9e8c1587cce96ffb27c141009b4fdf01178e6a0d59f71cb4bc7f80e2d6fdc352",
+      "bytes": 268
+    },
+    "glyph_coverage_checkpoint/source-candidate-profile-v4.json": {
+      "sha256": "48b2bcde5656cee7a02031adebe8dd7ccf77e7d2b7c8abbcdb4ec3b211e2003a",
+      "bytes": 1400856
+    },
+    "glyph_coverage_checkpoint/source-candidate-profile-v4.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/source-candidate-profile-v4.stdout": {
+      "sha256": "4257ee207594019ab219b801558cc104b5bd7c4d7a995545991b454f8c9e1eb8",
+      "bytes": 955
+    },
+    "glyph_coverage_checkpoint/source-observation-base-image.json": {
+      "sha256": "3fcfeb491b62a8e87e16724871991188237f16e41d679caeb23cfeddb89a6aae",
+      "bytes": 798
+    },
+    "glyph_coverage_checkpoint/source-observation-candidate-v4.json": {
+      "sha256": "2078558dbd16f13d623c0e386673d312735bdcf01ef6859a1822b637eeabaa4f",
+      "bytes": 850
+    },
+    "glyph_coverage_checkpoint/source-observation.json": {
+      "sha256": "aec32dfd17cd883cc88797200e0f68297518598dc55d583771b137b797859af8",
+      "bytes": 760
+    },
+    "glyph_coverage_checkpoint/source-probe-v2.json": {
+      "sha256": "f25f6e52f3e7904af6e68927c57854fafa77dcb94faae0d1d5af3d2417364808",
+      "bytes": 1399404
+    },
+    "glyph_coverage_checkpoint/source-probe-v2.stderr": {
+      "sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a",
+      "bytes": 100
+    },
+    "glyph_coverage_checkpoint/source-probe-v2.stdout": {
+      "sha256": "35b78cd7b8074046a066008c2aaa7949e8eff524b99725704130573f6191c93b",
+      "bytes": 869
+    },
+    "glyph_coverage_checkpoint/source-probe.json": {
+      "sha256": "09194488fbf02d98f64563a39bddbcbb0ba6675c32d9bd1a67d3004472b51669",
+      "bytes": 1399391
+    },
+    "glyph_coverage_checkpoint/source-probe.stderr": {
+      "sha256": "a49d52e28d1ff09bd2e587875da6c9cb96c19bd1cc5b8fd5efd1609aef5dd286",
+      "bytes": 120
+    },
+    "glyph_coverage_checkpoint/source-probe.stdout": {
+      "sha256": "a9812f58ea930b8ebe97834771a29e67eb53d6552ab45bc55e4f2b284b4119e8",
+      "bytes": 66
+    },
+    "glyph_coverage_checkpoint/validate.py": {
+      "sha256": "f45264827cd2db179f28a51ee10533b8fa1621cfccffbae43c52a7d259dd3087",
+      "bytes": 4178
+    },
+    "glyph_coverage_checkpoint/write_docs.py": {
+      "sha256": "9fb3ce1f6e50918b505de03443744ee9eaaf34a63ed93dad07769ae2eb801f64",
+      "bytes": 6569
+    },
+    "reviewed_source/docs/reports/macos-glyph-coverage/README.md": {
+      "sha256": "361c79c1a95ba12487fec035dfa0e3b8f295257eb7b633a32668065ffd25a080",
+      "bytes": 3968
+    },
+    "reviewed_source/drivers/cogent/native/dependencies.json": {
+      "sha256": "9c7972a84edf8e030b0ff0887a35f5c4e4b4003fa2950950eaf8823c37f00f7a",
+      "bytes": 25469
+    },
+    "reviewed_source/drivers/cogent/native/patches/glyphcoverage/0056-exact-small-glyph-coverage.patch": {
+      "sha256": "949a0184fe59cab10dc2497d8e40b74bb80e23cbd2da2f39f72b0b31381ca177",
+      "bytes": 25699
+    },
+    "reviewed_source/drivers/cogent/native/patches/glyphcoverage/README.md": {
+      "sha256": "5cdba2aedcd5efa0b3f68c51d8f91f767a8387954e6b5a7e75ec468b705d39ab",
+      "bytes": 1699
+    },
+    "reviewed_source/drivers/cogent/native/patches/glyphcoverage/original-hashes.json": {
+      "sha256": "72d6215533e2204fdd057b8b1b9cc106e55c033ac9aea64af162037918d654fb",
+      "bytes": 508
+    },
+    "reviewed_source/drivers/cogent/native/patches/glyphcoverage/output-hashes.json": {
+      "sha256": "b217660d50871edfd546642eec01697d8943bc4a042647d655ed5101cb4c2a1f",
+      "bytes": 694
+    },
+    "reviewed_source/drivers/cogent/prepare_test.py": {
+      "sha256": "0e88aec913381b52b0f9dc69b1cab12a9f8195ca4d6638adc3b34a88a6f3886b",
+      "bytes": 16346
+    },
+    "reviewed_source/specs/macos-completion.md": {
+      "sha256": "6990f3554637050c2da87d1fd88f3f02b949836a156be0f96620482d86653354",
+      "bytes": 41987
+    },
+    "reviewed_source/specs/rendering.md": {
+      "sha256": "04fd08e77efe32e13965b6644d2180d32cf0d6064c8fd56ea682d35c096183ca",
+      "bytes": 27619
+    }
+  },
+  "note": "Scoped exact scanner coverage cache and owned stage56. Includes all versioned source/producers/failed checks, CPU profiles, 48frame software matrix, final race/vet/preparation/build receipts, internal review, failed credential-omitted provider attempt and successful Anthropic review. Native binary excluded; hash in summary. No native/live/performance or full Mac qualification."
+}

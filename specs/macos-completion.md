@@ -625,3 +625,13 @@ offscreen race checks pass. This correction requires internal review between Pri
 It does not establish the prior endurance failure's triggering close event or
 qualify a new live campaign. Live testing remains deferred while the human uses
 the machine.
+
+
+The [small glyph coverage checkpoint](../docs/reports/macos-glyph-coverage/README.md)
+adds bounded per-renderer exact scanner-span reuse to CPU paint and private GPU
+capture. Software grid composition matches across 48 frames at four DPI settings;
+refusal, packet immutability, eviction and ownership checks preserve original
+behavior. This source optimization requires internal and Anthropic Prism review.
+It does not establish a native frame-rate gain or close P6/P11. GPU scene rendering
+remains opt-in. Live tests remain deferred while the human uses the machine;
+current complete lifecycle, physical/human checks and distribution remain open.

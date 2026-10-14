@@ -398,3 +398,29 @@ work charges, immutable packet ownership and ordinary CPU fallback are unchanged
 The [Mac scratch checkpoint](../docs/reports/macos-scene-scratch/README.md) shows
 local allocation removal with mixed whole-frame timing. The 4/6 ms targets remain
 failed and GPU scene rendering remains opt-in.
+
+
+## Exact small glyph coverage reuse
+
+After the existing Alpha-mask route declines a small static TrueType fill-only
+glyph, ordinary CPU paint and private GPU scene capture may reuse ordered 16-bit
+scanner spans. Every original outline/segment/coordinate/extent charge runs before
+lookup. Cache warmth preserves refusal and CPU fallback state. Exact normalized
+fixed-path equality, including original float32 conversions, authorizes reuse;
+a fingerprint alone cannot authorize a hit.
+
+Admission requires identity transform, bounded static outline, value uniform
+fill, clean known owned scanner/spanner and a guarded hull wholly inside current
+target and nonempty clip. Scroll recording, unsupported fonts/fills/transforms,
+clipped boundaries or changed scanner ownership retain ordinary rendering.
+Existing span functions blend pixels and emit packets; packet ownership remains
+immutable. Entries retain only copied fixed paths and coverage, with no fonts,
+images, builders or packets. Existing renderer owner serialization is required.
+
+FIFO storage is bounded by 512 entries and 1 MiB exact path/span backing, at most
+512 path values and 256 spans per entry. Bounds exclude metadata/transient record
+backing and total process/native/GPU memory. Resize and Release drop storage.
+The [coverage checkpoint](../docs/reports/macos-glyph-coverage/README.md) requires
+original pixel/packet, budget/fallback, ownership/eviction and actual-driver
+software composition parity. Diagnostic offscreen profiling does not establish
+native latency acceptance. GPU scene rendering remains opt-in.

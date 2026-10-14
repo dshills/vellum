@@ -529,6 +529,17 @@
               "sha256": "27c5209647059ce4020d8fc4d5fd3131d351c8d408ab23c9eb5a4bffdbb6721c"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/glyphcoverage",
+          "inputs": "native/patches/glyphcoverage/original-hashes.json",
+          "outputs": "native/patches/glyphcoverage/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/glyphcoverage/0056-exact-small-glyph-coverage.patch",
+              "sha256": "949a0184fe59cab10dc2497d8e40b74bb80e23cbd2da2f39f72b0b31381ca177"
+            }
+          ]
         }
       ]
     },
