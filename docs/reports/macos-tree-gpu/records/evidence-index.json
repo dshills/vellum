@@ -1,0 +1,858 @@
+{
+  "archive_sha256": "13a53f3981fada90ec11d007951f2acf5407e6094bcf35401f358d4abbc6cf76",
+  "files": {
+    "tree_gpu_checkpoint/adopt_pack.py": {
+      "sha256": "736df611c3c910c5a6276a4fbda00cd4ed1e7a6a9eb4131cd50f2fea449856b4",
+      "bytes": 2420
+    },
+    "tree_gpu_checkpoint/archive.py": {
+      "sha256": "3319bbf47650c8103fa390d6e2602b3656e36ee628f577769777fe0f90d62998",
+      "bytes": 3278
+    },
+    "tree_gpu_checkpoint/baseline.json": {
+      "sha256": "c14326cfc6496fb0187f7ded514516af6d02160c79e66708184cf970a772cf9a",
+      "bytes": 784443
+    },
+    "tree_gpu_checkpoint/before-main.go": {
+      "sha256": "d0de6a71451817d0ceb1f4be97d1caa68eab37ca3424935b04f778eb342e6963",
+      "bytes": 2133
+    },
+    "tree_gpu_checkpoint/before-perf.go": {
+      "sha256": "e09e06903783b6c9286b67cf46598caed610de034c46f497d6b251c57050b027",
+      "bytes": 14025
+    },
+    "tree_gpu_checkpoint/before-perf_test.go": {
+      "sha256": "d458b1c151d7287751bbccfe5bd73cd0b6653338d5530cac12006ab37e005abf",
+      "bytes": 4880
+    },
+    "tree_gpu_checkpoint/build-cpu-count.json": {
+      "sha256": "61792907f9f441019032a4cc353a3ad6f6c5150a495250119747177b42fb4125",
+      "bytes": 1399632
+    },
+    "tree_gpu_checkpoint/build-cpu-count.stderr": {
+      "sha256": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "bytes": 100
+    },
+    "tree_gpu_checkpoint/build-cpu-count.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/build-cpu-details.json": {
+      "sha256": "90e620e26cf8957c131dd26d7155c68d0c8a8326ea046c37ecccad04dfa3ab07",
+      "bytes": 1399393
+    },
+    "tree_gpu_checkpoint/build-cpu-details.stderr": {
+      "sha256": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "bytes": 100
+    },
+    "tree_gpu_checkpoint/build-cpu-details.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/build-cpu-profile.json": {
+      "sha256": "b0dc2bf8072555ef597a6cd4f26bfe37292905a5a3ccccbf87adfd9848dbb8ad",
+      "bytes": 1399392
+    },
+    "tree_gpu_checkpoint/build-cpu-profile.stderr": {
+      "sha256": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "bytes": 100
+    },
+    "tree_gpu_checkpoint/build-cpu-profile.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/build-gpu-details.json": {
+      "sha256": "8902462ab46dcd101914f5ac5118b88f82b2115878982f68ba34fc28f01d49d1",
+      "bytes": 1399393
+    },
+    "tree_gpu_checkpoint/build-gpu-details.stderr": {
+      "sha256": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "bytes": 100
+    },
+    "tree_gpu_checkpoint/build-gpu-details.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/build-gpu-ordinary.json": {
+      "sha256": "7729e2f9e88d8192fe95da2bf7032fa7f0bfe55c9cda6e5e26fde021fd9420d5",
+      "bytes": 1399390
+    },
+    "tree_gpu_checkpoint/build-gpu-ordinary.stderr": {
+      "sha256": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "bytes": 100
+    },
+    "tree_gpu_checkpoint/build-gpu-ordinary.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/build-gpu-packed.json": {
+      "sha256": "ed6d6de1a0db8a4b8edf3674d72766aa78b2dc0aba405dcabd8ac9faef0fe36c",
+      "bytes": 1399646
+    },
+    "tree_gpu_checkpoint/build-gpu-packed.stderr": {
+      "sha256": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "bytes": 100
+    },
+    "tree_gpu_checkpoint/build-gpu-packed.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/candidate-packing-regression.json": {
+      "sha256": "a3cbcdd646f9cfd5975384be322754fce306b9ee88c7083c7b5fb90fe67a5ee6",
+      "bytes": 1399658
+    },
+    "tree_gpu_checkpoint/candidate-packing-regression.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/candidate-packing-regression.stdout": {
+      "sha256": "decd09e0fc8eddf460b3b6ac747eca40698aee4073074d9ae23bbf8fe8a305c3",
+      "bytes": 58
+    },
+    "tree_gpu_checkpoint/candidate-test-overlay.json": {
+      "sha256": "4af21c31ac64215021d0de3f1e8e89b4fd3e7e90cf3afe8172c2c15df77cca66",
+      "bytes": 357
+    },
+    "tree_gpu_checkpoint/check_invalid.py": {
+      "sha256": "78bb9e5b2c20e7b4a156740803fd427e6ae9a7b58a3661f2c342ad30f71f6afe",
+      "bytes": 1688
+    },
+    "tree_gpu_checkpoint/check_invalid_v2.py": {
+      "sha256": "f9c5fc395d9022c88970ced112378888014b60454c4954af5afbde25824c07f9",
+      "bytes": 1697
+    },
+    "tree_gpu_checkpoint/checkpoint-source.json": {
+      "sha256": "66232d595259d42b694c0583126223c04575dd0dc1a297e66b690b79137b12f3",
+      "bytes": 1120
+    },
+    "tree_gpu_checkpoint/code_run.py": {
+      "sha256": "085ed85b7532a5f64218834d58887db0400afe76e1a3238d48ae271a179f0b42",
+      "bytes": 3401
+    },
+    "tree_gpu_checkpoint/count_probe.py": {
+      "sha256": "a13f86feb682464c87fec47ed6f6a39d02cac16093d3bfcd8a97df997627422b",
+      "bytes": 1126
+    },
+    "tree_gpu_checkpoint/cpu-count-overlay.json": {
+      "sha256": "d2aa3d6fa011ff8f2d4bcb506b83320d17a83d9e190aeb0e788772be547d73cc",
+      "bytes": 276
+    },
+    "tree_gpu_checkpoint/cpu-count.go": {
+      "sha256": "d765f06e81186444d61f7aeae3be08c7556d91908ba33daccc5b2d06f3723105",
+      "bytes": 14160
+    },
+    "tree_gpu_checkpoint/cpu-detail-pilot.json": {
+      "sha256": "6a69b388f3e1c36f0c00c714266f77cace19579c47293e089cb0245eb1e32c6d",
+      "bytes": 1024
+    },
+    "tree_gpu_checkpoint/cpu-detail-pilot.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/cpu-detail-pilot.stdout": {
+      "sha256": "c2379e5fad3fa396b9c9d03633a082b6032dd4e7ab9ad5781e405c54b7920885",
+      "bytes": 209946
+    },
+    "tree_gpu_checkpoint/cpu-details-overlay.json": {
+      "sha256": "796fba66041df2846622145c64f6ae8f640fc8acb53470b459847bac413fd9f9",
+      "bytes": 141
+    },
+    "tree_gpu_checkpoint/cpu-details.go": {
+      "sha256": "b9e7229b13187c81661064fbe6c981222b9963e6d36ff92779265e187f260f2b",
+      "bytes": 14042
+    },
+    "tree_gpu_checkpoint/cpu-profile-diagnostic.json": {
+      "sha256": "d26ca7223670c2aa23911f4fb380afcfa2f3a6a157087edbd25c0b05a2d8c671",
+      "bytes": 1026
+    },
+    "tree_gpu_checkpoint/cpu-profile-diagnostic.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/cpu-profile-diagnostic.stdout": {
+      "sha256": "7f51355c072dc7cfceac82d440263e4acf2250216983fdc66b4a7fd219e1dd24",
+      "bytes": 1592602
+    },
+    "tree_gpu_checkpoint/cpu-profile-overlay.json": {
+      "sha256": "e72bdbfc818447d08bafc8d37c902f67236e641d2cc38f7cb82c07dc02b3a2d7",
+      "bytes": 141
+    },
+    "tree_gpu_checkpoint/cpu-profile.go": {
+      "sha256": "6210ca70c56928bcc9ba14ea981df3048355c505f44d9ecb8977ac8906585a46",
+      "bytes": 14734
+    },
+    "tree_gpu_checkpoint/cpu-upload-count.json": {
+      "sha256": "d07fa9b3e6e3d0838d010b95dac2ec0ff699ddf5627e0ee766cf237ce52573c8",
+      "bytes": 1042
+    },
+    "tree_gpu_checkpoint/cpu-upload-count.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/cpu-upload-count.stdout": {
+      "sha256": "2b29e3d18198e22fbb0a422c3a6a606667a625ad298d8731d8b8513bb2d28141",
+      "bytes": 162150
+    },
+    "tree_gpu_checkpoint/cpu-warm.pprof": {
+      "sha256": "39064357d2f815f9ec71524b0fddd2263a0dc2f22bf26a5c1a0e6bcb3258b64d",
+      "bytes": 26065
+    },
+    "tree_gpu_checkpoint/final-baseline.json": {
+      "sha256": "78b968f49e50fab45c2cc2ea9bb8a4d8e4aa6e11ab188ad98690d8a290b5f050",
+      "bytes": 784542
+    },
+    "tree_gpu_checkpoint/final-consumer-build.json": {
+      "sha256": "309d18e34aa0f75154df1cc423870c72913496d37e94dea8e852103328b878ef",
+      "bytes": 1399418
+    },
+    "tree_gpu_checkpoint/final-consumer-build.stderr": {
+      "sha256": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "bytes": 100
+    },
+    "tree_gpu_checkpoint/final-consumer-build.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-consumer-race.json": {
+      "sha256": "28431f0043dcf1106f348cc29099fc8ebe5302923c8b0474a6cbe0e9a84f6346",
+      "bytes": 1399381
+    },
+    "tree_gpu_checkpoint/final-consumer-race.stderr": {
+      "sha256": "c80f03f83101e08d3149e79d9d5c2a2ae96a1e4cdd215d6da893ef4923ea12d3",
+      "bytes": 105
+    },
+    "tree_gpu_checkpoint/final-consumer-race.stdout": {
+      "sha256": "228c94237723aac7deff88a4f302295a1f6130a2937d7a072b593b8cf324c7c2",
+      "bytes": 58
+    },
+    "tree_gpu_checkpoint/final-consumer-vet.json": {
+      "sha256": "01616171a752d74c190516e7ccb5434001fc1d8355dc8c06e64257d03f3fa9c5",
+      "bytes": 1399352
+    },
+    "tree_gpu_checkpoint/final-consumer-vet.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-consumer-vet.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-cpu-details.json": {
+      "sha256": "9ec29590a66c85c91ec9b577918f951a9f2ce99a2006bf79c6bc2ac21aaaebab",
+      "bytes": 1066
+    },
+    "tree_gpu_checkpoint/final-cpu-details.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-cpu-details.stdout": {
+      "sha256": "8a74619c2a1414d1b1789ddc7c0c3be9692bf6c76f0469dac43864e4888d76f0",
+      "bytes": 216181
+    },
+    "tree_gpu_checkpoint/final-cpu.json": {
+      "sha256": "372195e7e1c161405b83baa9a4d3ab09d6cc8472435e218f0cb350c75bcb921f",
+      "bytes": 1038
+    },
+    "tree_gpu_checkpoint/final-cpu.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-cpu.stdout": {
+      "sha256": "923a6e2da2bfe03ccee3ea21a3cdf76dc7a7b556fcc929999f3d78f13f04822e",
+      "bytes": 166440
+    },
+    "tree_gpu_checkpoint/final-gpu-deep.json": {
+      "sha256": "4f157de056e7b523999fd070b7e3655a881a605ef621f51d742c57df0c328bdc",
+      "bytes": 1079
+    },
+    "tree_gpu_checkpoint/final-gpu-deep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-gpu-deep.stdout": {
+      "sha256": "a7483b38225b12fdd7c1c64847ba9d186068f2e5b2111622037ca7a45124d8ff",
+      "bytes": 168758
+    },
+    "tree_gpu_checkpoint/final-gpu-details.json": {
+      "sha256": "fc37a9c13f6938c2d30a32a269678d4d273573e55c5c544699da279b0cbf591e",
+      "bytes": 1089
+    },
+    "tree_gpu_checkpoint/final-gpu-details.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-gpu-details.stdout": {
+      "sha256": "fa73b47e83046c4f51103c73f784df781b06026ff3a42cf0744f3f3410b13832",
+      "bytes": 214189
+    },
+    "tree_gpu_checkpoint/final-gpu.json": {
+      "sha256": "77db563866c97539d20a210708d3941f89a1b53e23522ac37401f1a17e2d856d",
+      "bytes": 1061
+    },
+    "tree_gpu_checkpoint/final-gpu.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/final-gpu.stdout": {
+      "sha256": "4f010a89d132a0a6250f5dc3279d491cc949b87ae4ae53dc5c6948e19c6f8081",
+      "bytes": 166939
+    },
+    "tree_gpu_checkpoint/final-internal-review.json": {
+      "sha256": "9e34d7e4917f4bde2d785407db67f521bd2e53631f0fb9d4c1e8ad0a86cd776c",
+      "bytes": 1047
+    },
+    "tree_gpu_checkpoint/final-summary.json": {
+      "sha256": "a9d8794dda2abf9d00cf722408d62d93da4c2f84e30e23adf179a98dc35b1cce",
+      "bytes": 3705
+    },
+    "tree_gpu_checkpoint/final_summary.py": {
+      "sha256": "369b9b1904489286e6afc9080f0ff82889786c028d738acaa7f6162dbbee1bf1",
+      "bytes": 4583
+    },
+    "tree_gpu_checkpoint/final_summary_initial.py": {
+      "sha256": "335ef6195dbe7f6a1fc494177796d7eeccc8e0ed2c1cc5e5ab6d7b114cbc732c",
+      "bytes": 4580
+    },
+    "tree_gpu_checkpoint/gpu-detail-pilot.json": {
+      "sha256": "e7353ad6458d36900123e3414e8c6a30f3eea0d71d0d5731341cd292f9e258fa",
+      "bytes": 1024
+    },
+    "tree_gpu_checkpoint/gpu-detail-pilot.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/gpu-detail-pilot.stdout": {
+      "sha256": "299a8650de8c84c1cefbaf197b4c1ffdbcc416ae3d2a61613727574f819b1928",
+      "bytes": 207712
+    },
+    "tree_gpu_checkpoint/gpu-details-overlay.json": {
+      "sha256": "c019c2b37b488d08f62d6e56caaec6ec55e253cbf6135e54fe3c0020ee7eeaf1",
+      "bytes": 141
+    },
+    "tree_gpu_checkpoint/gpu-details.go": {
+      "sha256": "ef4db7ad63b4c4bffe99eb0bf065d318ad662eaeabc9e9fe508c125a7038f92a",
+      "bytes": 14065
+    },
+    "tree_gpu_checkpoint/gpu-ordinary-overlay.json": {
+      "sha256": "e0be9e70dd9cc9dccb7977fbfd10d17fc9ffb874abbd23e630ed18594cc67591",
+      "bytes": 142
+    },
+    "tree_gpu_checkpoint/gpu-ordinary.go": {
+      "sha256": "f052fa83a2b7c013a541976d4d67290afb5d0e5894dc13bc56002c7480b0f902",
+      "bytes": 14048
+    },
+    "tree_gpu_checkpoint/gpu-packed-overlay.json": {
+      "sha256": "6d2cfa53c0d78bb8c0f23ac6af3ddcd7014d19a19c36ce9722bcc427ab94cba0",
+      "bytes": 303
+    },
+    "tree_gpu_checkpoint/gpu-packed-pilot-deep.json": {
+      "sha256": "210508a543a094ac17a6647eea6a71e3be781e31716eddfe7b0b9ce135b22412",
+      "bytes": 1061
+    },
+    "tree_gpu_checkpoint/gpu-packed-pilot-deep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/gpu-packed-pilot-deep.stdout": {
+      "sha256": "b2c6ea8314a54d5f4934d4072d4db13cac289d4f8361a289d0d16cfd47d1d1b7",
+      "bytes": 162551
+    },
+    "tree_gpu_checkpoint/gpu-packed-pilot-wide.json": {
+      "sha256": "ee7319634c7635100fcd8c4e4b791f1ecf26354a85a63d31ed176eca585b3e17",
+      "bytes": 1043
+    },
+    "tree_gpu_checkpoint/gpu-packed-pilot-wide.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/gpu-packed-pilot-wide.stdout": {
+      "sha256": "04e92ef228588dfecc27b27245008300c0208ddb22757c6c5b857587a04d31f8",
+      "bytes": 160391
+    },
+    "tree_gpu_checkpoint/gpu-pilot-deep.json": {
+      "sha256": "197777ee6b9cbaf09efaad40f9c2a87ee9027b5bda9a24ae960d6686475997e5",
+      "bytes": 1034
+    },
+    "tree_gpu_checkpoint/gpu-pilot-deep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/gpu-pilot-deep.stdout": {
+      "sha256": "eebbc04de555ddd7e4071db1a3167ba1f29ee56c7bdd49b16b71f0104d3dfaa8",
+      "bytes": 162572
+    },
+    "tree_gpu_checkpoint/gpu-pilot-wide.json": {
+      "sha256": "7e2745a426766162d11c0826d3d34edda3bd1555aedbe25c89c6feba0a00fe37",
+      "bytes": 1016
+    },
+    "tree_gpu_checkpoint/gpu-pilot-wide.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/gpu-pilot-wide.stdout": {
+      "sha256": "27885c52406985f3aee381a814742532725173c5a04f5c71f64d32b619bf9ded",
+      "bytes": 160698
+    },
+    "tree_gpu_checkpoint/implement_modes.py": {
+      "sha256": "02c09f8911a6c8b8f1f2cc708aeb730181f9004aed32bee5507fd4f3cc5df422",
+      "bytes": 3869
+    },
+    "tree_gpu_checkpoint/internal-review.json": {
+      "sha256": "474e0e30674cb365bb75a6c980667bd58dad5be9eb441f624e2b500bd25fbf8a",
+      "bytes": 1099
+    },
+    "tree_gpu_checkpoint/invalid-cli-initial-attempt.json": {
+      "sha256": "0e74d9fe696ba23113fed1d8659706d68a27d81fa596913b1e574642c05a1b79",
+      "bytes": 466
+    },
+    "tree_gpu_checkpoint/invalid-cli-v2.json": {
+      "sha256": "43b1bb973707c1ceb14999941155402161289d99561a46eee104f671d1b8f2ff",
+      "bytes": 2010
+    },
+    "tree_gpu_checkpoint/invalid-v2-capacity-refused.stderr": {
+      "sha256": "c887a10dbee3fdc81a2f87ff7e1a6e40a8a55ee53a8fe186cca4e07d45953a9d",
+      "bytes": 69
+    },
+    "tree_gpu_checkpoint/invalid-v2-capacity-refused.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/invalid-v2-details-requires-perf.stderr": {
+      "sha256": "64960fe75a861023775c87f92806eb1c03432265aff29245a8fac4dfaea63420",
+      "bytes": 56
+    },
+    "tree_gpu_checkpoint/invalid-v2-details-requires-perf.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/invalid-v2-gpu-requires-perf.stderr": {
+      "sha256": "64960fe75a861023775c87f92806eb1c03432265aff29245a8fac4dfaea63420",
+      "bytes": 56
+    },
+    "tree_gpu_checkpoint/invalid-v2-gpu-requires-perf.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/invalid-v2-smoke-excludes-perf.stderr": {
+      "sha256": "64960fe75a861023775c87f92806eb1c03432265aff29245a8fac4dfaea63420",
+      "bytes": 56
+    },
+    "tree_gpu_checkpoint/invalid-v2-smoke-excludes-perf.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/original-packing-regression.json": {
+      "sha256": "201cef883726784c766a79c88b572fcfc467ff6342ef3718ca2eedccc2a1b324",
+      "bytes": 1399457
+    },
+    "tree_gpu_checkpoint/original-packing-regression.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/original-packing-regression.stdout": {
+      "sha256": "cabe3b67b957c82a1f81f1043e9502ecb41a47d55b64592774e5c0e7396b877c",
+      "bytes": 222
+    },
+    "tree_gpu_checkpoint/original-test-overlay.json": {
+      "sha256": "d06e654e34a1537c270824dedd57e2502ccbaf94378c92e0f759e06926d95254",
+      "bytes": 196
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r1.json": {
+      "sha256": "87662b8d0ab0a6f42e7d616d2763c33ca62728d6e3ea8c488e47cee5a0af0316",
+      "bytes": 1074
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r1.stdout": {
+      "sha256": "e62b052988bc9f592636ec12163a6346823f5ed25d31910ce51d6649e2418b0f",
+      "bytes": 252610
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r2.json": {
+      "sha256": "ef4f49fc625f1e9e3d1cfbbec368620d0b0209d97c31b9a8b51076356d3c4773",
+      "bytes": 1073
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r2.stdout": {
+      "sha256": "2ee0f594e9cb05af4cf8307c8f0e0881802511ac2770f737e88fda9cbc6d5e69",
+      "bytes": 252624
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r3.json": {
+      "sha256": "2d2d02fd18e3c4d266af5b340f45085b92a04c045b1156456d41d9ef40f699f9",
+      "bytes": 1074
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r3.stdout": {
+      "sha256": "48e9495a6b8049fee55d30fe7aaedf46c23fcc8535fe538c4263d03fe35d763c",
+      "bytes": 252610
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r4.json": {
+      "sha256": "fd3fcc1f3026e01c37d84a1dafbfc7fe4aae99d1b085f334fb75ee2437f5a938",
+      "bytes": 1074
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r4.stdout": {
+      "sha256": "cfc35e89bdb641a9780b63fc37f3148c22d720bfbd30398c0d543b0bb2a4c0f1",
+      "bytes": 252638
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r5.json": {
+      "sha256": "91cf9c384bc76acd42507baa0e5f67671c697e87c5ecc4e62f358d58b6013f3f",
+      "bytes": 1074
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-deep-r5.stdout": {
+      "sha256": "1ddef57cf8d3959ef507f248db162e551d172018f6ebcd85d4ba50bd3afc8aac",
+      "bytes": 252626
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r1.json": {
+      "sha256": "21c6e79b7e0ce3e5d2b2b36d8668c126a2f6da990a47f2a2fcfe5864defd9010",
+      "bytes": 1057
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r1.stdout": {
+      "sha256": "9577aa4a6de20d513ba4961ee42e5e6dceffca176d4bbe254efb85010598cd88",
+      "bytes": 250364
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r2.json": {
+      "sha256": "b6b536ec76d50fd28a6dc2a550016c16ea91414db8ffb0afad5e137f2e5e1a36",
+      "bytes": 1056
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r2.stdout": {
+      "sha256": "4f415dce981d50de2eec5327aab743773fa9373c6e4b6d12bba45a04e45f15a5",
+      "bytes": 250352
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r3.json": {
+      "sha256": "3cda8e49d0731b8bc08fa3c6340d51a3873dbb16edaff7d78acff94d3684b999",
+      "bytes": 1057
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r3.stdout": {
+      "sha256": "d708b71a61a4825520fbd95bd16865adf46c2e7a61b50b7c6977bccea67b2991",
+      "bytes": 250434
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r4.json": {
+      "sha256": "ec412075e500c7e84c6de4950321e62ef4875e582fab66f63261dff8b4cdf623",
+      "bytes": 1057
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r4.stdout": {
+      "sha256": "9ea84e2ba5e1b6cff1d2cc044d58ef75b800a8f5463391122305e170a9b504c4",
+      "bytes": 250375
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r5.json": {
+      "sha256": "8960cd6241c21526dd965cbf615b08f84644e0e5bc2300a0f2e610d03708f23b",
+      "bytes": 1057
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-baseline-wide-r5.stdout": {
+      "sha256": "b28b772ae5e598be848fbd373fadcb9f7bdc76bfcac7a53759a528e9b72ac57c",
+      "bytes": 250364
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r1.json": {
+      "sha256": "6b79803f6bab3e9eafc113be7d984e5cde7f2677e6314bc1d3a4b50cfff00036",
+      "bytes": 1076
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r1.stdout": {
+      "sha256": "9a80d5174721f175cab3e82ba645871ac5a57044219c5d6c7b9f400836afb1c7",
+      "bytes": 252424
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r2.json": {
+      "sha256": "1adf2ced55f3392853d50fcba409ecda75d58fd5c011ed448cc69cad1096d6f7",
+      "bytes": 1077
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r2.stdout": {
+      "sha256": "401b1f81cdc36ca78cb356cb514f71e0d2ab3b8776d8786e5fb6aac6e1fcf36c",
+      "bytes": 252088
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r3.json": {
+      "sha256": "a0f093e6686a3e8a0660b595f1b447818521e87a4f7841ea46e829bd19156d7e",
+      "bytes": 1077
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r3.stdout": {
+      "sha256": "f90545ae8521bae2fdec72d63f63f07452360fcdfea143824dbe541d166da52b",
+      "bytes": 252653
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r4.json": {
+      "sha256": "a35d747ee16258ba8d75e4f98e31a135d1d3f9ad338308dfe91761462b6561e0",
+      "bytes": 1077
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r4.stdout": {
+      "sha256": "4f44ed898f9d88224e2ed49b5bc77d16c7a31382beaad7011eb6db807054b4f0",
+      "bytes": 252620
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r5.json": {
+      "sha256": "3d132c1d6f879a7d2bbe6db2ebffdb179e51f642fa877ac866442b68da01e245",
+      "bytes": 1077
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-deep-r5.stdout": {
+      "sha256": "6cbc1c08a57d5ac536206cac6398b350f986279e7e3fc34791aa89508c1f6b4d",
+      "bytes": 252610
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r1.json": {
+      "sha256": "7ece334aeb9048b3a1ca4024fc9e4975ba3daa0fe7a310680b382a286143406e",
+      "bytes": 1060
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r1.stdout": {
+      "sha256": "3ed5206482783de9b84a25e9e4288d41d1f2fbe47a60d3f5581d9aa57976649e",
+      "bytes": 250499
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r2.json": {
+      "sha256": "d0c043e401049b8ff7f9d6316fd367fc2138317c908f106cff2608e526960195",
+      "bytes": 1059
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r2.stdout": {
+      "sha256": "2ef518dff84391313176439ae9a17e93015d880646f9516e47c32dc8cfab8d58",
+      "bytes": 250425
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r3.json": {
+      "sha256": "33abdcf4f209cb26232b6d6a9bce25a012c604b080c0f946b36a6c4c07d849c1",
+      "bytes": 1060
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r3.stdout": {
+      "sha256": "8f49aa2c82ad25bb0f2779ccea766c63ff35d980e1672d5c55210e75a46abf7e",
+      "bytes": 250442
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r4.json": {
+      "sha256": "df30f90d5a7ecf8fc85404859ddb156554a5f1f5a0a12f09fd0640061aeee9e6",
+      "bytes": 1060
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r4.stdout": {
+      "sha256": "70d16eaddebc48b107aa6a43a490c1d3809bcfb37d25d550eb610cf83df743e0",
+      "bytes": 250281
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r5.json": {
+      "sha256": "c11a22f39515c132578696808748627eaf9baaee332414fee3fc01707d73d52a",
+      "bytes": 1060
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/pack-packed-wide-r5.stdout": {
+      "sha256": "5394c692bc622b1d27786e85c06966aa1bc259067ff3e872b9b73dbb532a70a7",
+      "bytes": 250391
+    },
+    "tree_gpu_checkpoint/pack_probe.py": {
+      "sha256": "aa1c8906a2b6169e098a0888fa9451212c9340a0851d1c19184a1940765a47d9",
+      "bytes": 850
+    },
+    "tree_gpu_checkpoint/pack_summary.py": {
+      "sha256": "53f39f78c22633760675c6c074af0efa7dcc0e399a3198168506e247f6b1afc6",
+      "bytes": 3600
+    },
+    "tree_gpu_checkpoint/packed-builder.go": {
+      "sha256": "1a1652a4d1d2bc1475ce481430e4b6471a2b79608ccf8998c5576740ceefe388",
+      "bytes": 10240
+    },
+    "tree_gpu_checkpoint/packed-campaign-inputs.json": {
+      "sha256": "3655b657cefa5b40639ca67ef982f6545f2ce67b1c6080e69dc5a324e53a7655",
+      "bytes": 1061
+    },
+    "tree_gpu_checkpoint/packed-campaign.json": {
+      "sha256": "1485493757d7b6a1701c566d2e213a0203960cf145816da361fd049a0d793dae",
+      "bytes": 23663
+    },
+    "tree_gpu_checkpoint/packed-sceneplan-race.json": {
+      "sha256": "f2478f126ebc24906ac333142ff0caf21e9860598c05f31fc45b833904d37252",
+      "bytes": 1399636
+    },
+    "tree_gpu_checkpoint/packed-sceneplan-race.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/packed-sceneplan-race.stdout": {
+      "sha256": "6005c51e913a45fadf05e489c4d984b3c8af9c6f6fef2d62fdf443ec44034b60",
+      "bytes": 58
+    },
+    "tree_gpu_checkpoint/packed-summary.json": {
+      "sha256": "845160f25a3d5c24e123d95bf9492b3636b7174cd4d9b4e4076d50e0fe1ee149",
+      "bytes": 9274
+    },
+    "tree_gpu_checkpoint/packed_campaign.py": {
+      "sha256": "c165359c33eee94f6fc1bce526535847ceb9e599c4f24fe9bd8dde3ed6dc22e5",
+      "bytes": 2984
+    },
+    "tree_gpu_checkpoint/packed_spans_test.go": {
+      "sha256": "e78656c1df8b14fa07edd50cc37dd26f88ff4ae591e26d3e4e37b3e4ae6620e8",
+      "bytes": 2463
+    },
+    "tree_gpu_checkpoint/prism-v1/inputs.json": {
+      "sha256": "b6341a96f6c1b7895242da3111276d4e5cac9c2aa949104992ef41257a37e94b",
+      "bytes": 1500
+    },
+    "tree_gpu_checkpoint/prism-v1/prism.json": {
+      "sha256": "90f512f8f25489ba889b046c7b0fcd703530532b825fcf01a5550ba466b4c320",
+      "bytes": 1090
+    },
+    "tree_gpu_checkpoint/prism-v1/process.json": {
+      "sha256": "450a5dd18713d1293f17066ff1bfe7a46af6bcc735aecc684d5879ce25e392cb",
+      "bytes": 3277
+    },
+    "tree_gpu_checkpoint/prism-v1/staged.diff.txt": {
+      "sha256": "e4ebabedd6f16fda7e0e9ad1a8c779f901c3f9e54348ee4a2aaf3e7cec3baf75",
+      "bytes": 35092
+    },
+    "tree_gpu_checkpoint/prism-v1/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/prism-v1/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/prism.py": {
+      "sha256": "0c980b7a9ddade7e3f40d2dcf326faa61a61f19854eb0d5355998bcedf32f9e8",
+      "bytes": 2683
+    },
+    "tree_gpu_checkpoint/profile-raster.json": {
+      "sha256": "b342f50b4ad7e46fc3274e9bc36e9fe79d7649a649c830bef7dbb1ef18607cdb",
+      "bytes": 1398923
+    },
+    "tree_gpu_checkpoint/profile-raster.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/profile-raster.stdout": {
+      "sha256": "5a52aac32541a289831fad60bd3c4aac4fb4d119e508a6b29dba2d66fc61182d",
+      "bytes": 4635
+    },
+    "tree_gpu_checkpoint/profile-top.json": {
+      "sha256": "7327bee9f5f1d8a5aec4172bdb7ca8c4fc70025844ee8439c638c4d7bc262697",
+      "bytes": 1398857
+    },
+    "tree_gpu_checkpoint/profile-top.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "tree_gpu_checkpoint/profile-top.stdout": {
+      "sha256": "5ae1f1f757dc4101797fda3adae3729087897c7f21d92e8e0089dc5052763d21",
+      "bytes": 3526
+    },
+    "tree_gpu_checkpoint/report-draft.md": {
+      "sha256": "b6cf6dd2b79401e105778e39399c5e2c049c01ef992dbdfc2b3cd027e40f499f",
+      "bytes": 2805
+    },
+    "tree_gpu_checkpoint/run.py": {
+      "sha256": "d5af0ffa7bcae45727303e2c6b920dc1f5ab2de9e32fc87f3b8ea230f0752e52",
+      "bytes": 4111
+    },
+    "tree_gpu_checkpoint/run_final.py": {
+      "sha256": "3754944bc109edd97261407f308628fd6bc4cfaccb5c48bcdb146bbd85c0f175",
+      "bytes": 4123
+    },
+    "tree_gpu_checkpoint/testing-authorization.json": {
+      "sha256": "0896c3d50e2557a1b1739bc22d7304e17b513bb8350990318dbf68f74fbcd369",
+      "bytes": 741
+    },
+    "tree_gpu_checkpoint/upload-count.go": {
+      "sha256": "e3fe6d285def3b49b7eab68a5e7774d3c8755c4dd203b7d82963194437d81014",
+      "bytes": 11809
+    },
+    "reviewed_source/examples/loadedtree/main.go": {
+      "sha256": "e83b4233bb61b35771f2ee83ab2483a02443d1bd77b6cb13e61aed69a06e164a",
+      "bytes": 2466
+    },
+    "reviewed_source/examples/loadedtree/perf.go": {
+      "sha256": "3d771d96168866fb543d873126eb2601441bf4dc563dd3a334c4e391f53819d7",
+      "bytes": 14612
+    },
+    "reviewed_source/examples/loadedtree/perf_test.go": {
+      "sha256": "ebf2d02dba1200867a7c40affd4d5e08b78376dbe497105d1f617e55ff15b095",
+      "bytes": 6288
+    },
+    "reviewed_source/examples/loadedtree/README.md": {
+      "sha256": "87aa0feca917963acfcab01655927c45ab6fe42ef59dc5e5d7ef996058ce0598",
+      "bytes": 5845
+    },
+    "reviewed_source/specs/tree-performance.md": {
+      "sha256": "cb2cb79320d5ec6e6ad9b3df378b0fc1cdc5295d882049e363b5bbd7e2c5d8b2",
+      "bytes": 4727
+    },
+    "reviewed_source/specs/macos-completion.md": {
+      "sha256": "38b50b0c448a357f3178adde974dd470fc471e1f9891fe5b9e0962e31f32e4a8",
+      "bytes": 36665
+    },
+    "reviewed_source/docs/reports/README.md": {
+      "sha256": "e92845f2cf3c2e0b424326dacaec4d8fa8c27d407a92c90a6550036322a3b8ae",
+      "bytes": 2519
+    },
+    "reviewed_source/docs/reports/macos-tree-gpu/README.md": {
+      "sha256": "9b3c796a8a3f98e9ccd79a32823edfb7015cc7c1be084d200fb1e4415e4956db",
+      "bytes": 4974
+    },
+    "reviewed_source/docs/reports/macos-tree-gpu/records/native-summary.json": {
+      "sha256": "a9d8794dda2abf9d00cf722408d62d93da4c2f84e30e23adf179a98dc35b1cce",
+      "bytes": 3705
+    },
+    "reviewed_source/docs/reports/macos-tree-gpu/records/comparison-summary.json": {
+      "sha256": "845160f25a3d5c24e123d95bf9492b3636b7174cd4d9b4e4076d50e0fe1ee149",
+      "bytes": 9274
+    }
+  },
+  "note": "Native/profile/source-routing investigation, rejected compaction overlays and negative regression,20process4800sample comparison, final five-mode600sample preflights,4nativeCLIrefusals, source/internal/Prism reviews. Raw failures and unused adoption helper retained. Native binaries excluded; hashes in receipts."
+}

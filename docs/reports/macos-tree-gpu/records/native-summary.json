@@ -1,0 +1,116 @@
+{
+  "result": "VALIDATED_TREE_RENDERER_MODE_PREFLIGHTS",
+  "processes": 5,
+  "samples": 600,
+  "ordinary_samples": 360,
+  "source_diagnostic_samples": 240,
+  "runs": [
+    {
+      "name": "final-cpu",
+      "gpu_scene_rendering": false,
+      "source_details": false,
+      "deep": false,
+      "samples": 120,
+      "receipt_sha256": "372195e7e1c161405b83baa9a4d3ab09d6cc8472435e218f0cb350c75bcb921f",
+      "executable_sha256": "651ab5f6b050fdd1188d4bc2a70eab6dd82a20ec64770b47b0895c376b0acc2e",
+      "source_prepared_stable": true,
+      "p95_ns": 8566374,
+      "mean_ns": 7499065.925,
+      "ordinary_target_qualified": false
+    },
+    {
+      "name": "final-gpu",
+      "gpu_scene_rendering": true,
+      "source_details": false,
+      "deep": false,
+      "samples": 120,
+      "receipt_sha256": "77db563866c97539d20a210708d3941f89a1b53e23522ac37401f1a17e2d856d",
+      "executable_sha256": "651ab5f6b050fdd1188d4bc2a70eab6dd82a20ec64770b47b0895c376b0acc2e",
+      "source_prepared_stable": true,
+      "p95_ns": 6918419,
+      "mean_ns": 5935809.725,
+      "ordinary_target_qualified": false
+    },
+    {
+      "name": "final-cpu-details",
+      "gpu_scene_rendering": false,
+      "source_details": true,
+      "deep": false,
+      "samples": 120,
+      "receipt_sha256": "9ec29590a66c85c91ec9b577918f951a9f2ce99a2006bf79c6bc2ac21aaaebab",
+      "executable_sha256": "651ab5f6b050fdd1188d4bc2a70eab6dd82a20ec64770b47b0895c376b0acc2e",
+      "source_prepared_stable": true,
+      "p95_ns": 8305499,
+      "mean_ns": 7559976.7,
+      "ordinary_target_qualified": false,
+      "diagnostic_source_means": {
+        "DrawNS": 5204082.25,
+        "RasterNS": 3406878.125,
+        "CopyNS": 1796016.7083333333,
+        "SetFromGoImageNS": 1790839.2666666666,
+        "SetFromGoImageAttempts": 1,
+        "LogicalUploadRGBABytes": 14155776
+      }
+    },
+    {
+      "name": "final-gpu-details",
+      "gpu_scene_rendering": true,
+      "source_details": true,
+      "deep": false,
+      "samples": 120,
+      "receipt_sha256": "fc37a9c13f6938c2d30a32a269678d4d273573e55c5c544699da279b0cbf591e",
+      "executable_sha256": "651ab5f6b050fdd1188d4bc2a70eab6dd82a20ec64770b47b0895c376b0acc2e",
+      "source_prepared_stable": true,
+      "p95_ns": 6701666,
+      "mean_ns": 5946346.258333334,
+      "ordinary_target_qualified": false,
+      "diagnostic_source_means": {
+        "DrawNS": 3392606.566666667,
+        "RasterNS": 0,
+        "CopyNS": 0,
+        "SetFromGoImageNS": 0,
+        "SetFromGoImageAttempts": 0,
+        "LogicalUploadRGBABytes": 0
+      }
+    },
+    {
+      "name": "final-gpu-deep",
+      "gpu_scene_rendering": true,
+      "source_details": false,
+      "deep": true,
+      "samples": 120,
+      "receipt_sha256": "4f157de056e7b523999fd070b7e3655a881a605ef621f51d742c57df0c328bdc",
+      "executable_sha256": "651ab5f6b050fdd1188d4bc2a70eab6dd82a20ec64770b47b0895c376b0acc2e",
+      "source_prepared_stable": true,
+      "p95_ns": 7327834,
+      "mean_ns": 6142818.2,
+      "ordinary_target_qualified": false
+    }
+  ],
+  "code_checks": [
+    {
+      "name": "final-consumer-race",
+      "exit_code": 0,
+      "source_delta_stable": true,
+      "prepared_files": 6204
+    },
+    {
+      "name": "final-consumer-vet",
+      "exit_code": 0,
+      "source_delta_stable": true,
+      "prepared_files": 6204
+    },
+    {
+      "name": "final-consumer-build",
+      "exit_code": 0,
+      "source_delta_stable": true,
+      "prepared_files": 6204
+    }
+  ],
+  "cli_refusals": 4,
+  "native_geometry_matched": true,
+  "gpu_mode_is_requested": true,
+  "additional_diagnostic_clocks_excluded_from_ordinary_latency": true,
+  "full_p6_qualified": false,
+  "prepared_renderer_change": false
+}

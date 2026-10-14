@@ -28,13 +28,17 @@ const treePerfPeriod = 32
 const treePerfMinRows = 64
 
 type treePerfConfig struct {
-	Nodes, Samples, Warmup int
-	Deep                   bool
+	Nodes, Samples, Warmup           int
+	Deep                             bool
+	GPUSceneRendering, SourceDetails bool
 }
 
 func (c treePerfConfig) validate() error {
 	if (c.Nodes != 10_000 && c.Nodes != 100_000) || c.Samples < 120 || c.Samples > 2048 || c.Warmup < treePerfPeriod || c.Warmup > 2048 || c.Warmup%treePerfPeriod != 0 {
 		return errors.New("loadedtree perf: nodes10000/100000, samples120..2048, warmup32..2048 in complete cycles required")
+	}
+	if c.SourceDetails && c.Warmup+c.Samples+2 > cogent.MaxSourceFrameMetricsCapacity {
+		return errors.New("loadedtree perf: source diagnostics exceed bounded recorder capacity")
 	}
 	return nil
 }
@@ -98,8 +102,14 @@ func (p *treePerfProgram) describe() ui.Node {
 	}}
 }
 func treePerfMemory() runtime.MemStats { var s runtime.MemStats; runtime.ReadMemStats(&s); return s }
-func treePerfEmit(event string, value map[string]any) error {
+func (c treePerfConfig) record(event string, value map[string]any) map[string]any {
 	value["event"] = event
+	value["gpu_scene_rendering"] = c.GPUSceneRendering
+	value["source_details"] = c.SourceDetails
+	return value
+}
+func (c treePerfConfig) emit(event string, value map[string]any) error {
+	value = c.record(event, value)
 	return json.NewEncoder(os.Stdout).Encode(value)
 }
 
@@ -225,7 +235,7 @@ func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c
 	if err != nil {
 		return err
 	}
-	if err = treePerfEmit("tree.perf.geometry", map[string]any{"initial": initial}); err != nil {
+	if err = c.emit("tree.perf.geometry", map[string]any{"initial": initial}); err != nil {
 		return err
 	}
 	geometry, err := treePerfGeometryCheck(initial)
@@ -245,7 +255,7 @@ func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c
 	if _, err = treePerfGeometryCheck(coldGeometry); err != nil {
 		return err
 	}
-	if err = treePerfEmit("tree.perf.first-scroll", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "frame": cold, "geometry": coldGeometry}); err != nil {
+	if err = c.emit("tree.perf.first-scroll", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "frame": cold, "geometry": coldGeometry}); err != nil {
 		return err
 	}
 	if _, _, err = p.scroll(ctx, m, -12, 2); err != nil {
@@ -273,7 +283,7 @@ func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c
 	}
 	runtime.GC()
 	warmMemory := treePerfMemory()
-	if err = treePerfEmit("tree.perf.ready", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "warmup": c.Warmup, "geometry": warmGeometry, "memory": warmMemory}); err != nil {
+	if err = c.emit("tree.perf.ready", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "warmup": c.Warmup, "geometry": warmGeometry, "memory": warmMemory}); err != nil {
 		return err
 	}
 	for i := 0; i < c.Samples; i++ {
@@ -298,7 +308,7 @@ func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c
 		if afterCount-beforeCount != 1 || after.TotalAlloc < before.TotalAlloc || after.Mallocs < before.Mallocs {
 			return errors.New("loadedtree perf: extra callback or allocation counter drift")
 		}
-		if err = treePerfEmit("tree.perf.sample", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "index": i, "phase": i % treePerfPeriod, "frame": sample, "geometry": measured, "tree_notifications": afterCount - beforeCount, "allocation_bytes": after.TotalAlloc - before.TotalAlloc, "mallocs": after.Mallocs - before.Mallocs, "gc_count": after.NumGC - before.NumGC}); err != nil {
+		if err = c.emit("tree.perf.sample", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "index": i, "phase": i % treePerfPeriod, "frame": sample, "geometry": measured, "tree_notifications": afterCount - beforeCount, "allocation_bytes": after.TotalAlloc - before.TotalAlloc, "mallocs": after.Mallocs - before.Mallocs, "gc_count": after.NumGC - before.NumGC}); err != nil {
 			return err
 		}
 	}
@@ -312,7 +322,7 @@ func (p *treePerfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c
 		}
 	}
 	runtime.GC()
-	return treePerfEmit("tree.perf.finished", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "samples": c.Samples, "frame_tickets": len(snapshot.Samples), "memory": treePerfMemory(), "full_p6_qualified": false})
+	return c.emit("tree.perf.finished", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "samples": c.Samples, "frame_tickets": len(snapshot.Samples), "memory": treePerfMemory(), "full_p6_qualified": false})
 }
 func runTreePerf(c treePerfConfig) error {
 	if err := c.validate(); err != nil {
@@ -370,16 +380,20 @@ func runTreePerf(c treePerfConfig) error {
 		return err
 	}
 	hash := sha256.Sum256(font)
-	if err = treePerfEmit("tree.perf.setup", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "data": data.Stats(), "index": index.Stats(), "construction_ns": dataAt.Sub(start).Nanoseconds(), "index_ns": indexAt.Sub(dataAt).Nanoseconds(), "font_sha256": hex.EncodeToString(hash[:]), "go_version": runtime.Version(), "build": settings, "memory_before_data": before, "memory_after_data": afterData, "target_p95_ns": int64(4_000_000), "timing": "elapsed CPU-side work regions; no thread CPU/GPU/presentation attribution"}); err != nil {
+	if err = c.emit("tree.perf.setup", map[string]any{"nodes": c.Nodes, "deep": c.Deep, "data": data.Stats(), "index": index.Stats(), "construction_ns": dataAt.Sub(start).Nanoseconds(), "index_ns": indexAt.Sub(dataAt).Nanoseconds(), "font_sha256": hex.EncodeToString(hash[:]), "go_version": runtime.Version(), "build": settings, "memory_before_data": before, "memory_after_data": afterData, "target_p95_ns": int64(4_000_000), "timing": "elapsed CPU-side work regions; no thread CPU/GPU/presentation attribution"}); err != nil {
 		return err
 	}
-	metrics, err := cogent.NewFrameMetrics(c.Warmup + c.Samples + 2)
+	newMetrics := cogent.NewFrameMetrics
+	if c.SourceDetails {
+		newMetrics = cogent.NewFrameMetricsWithSourceDetails
+	}
+	metrics, err := newMetrics(c.Warmup + c.Samples + 2)
 	if err != nil {
 		return err
 	}
 	result := make(chan error, 1)
 	failures := make(chan error, 1)
-	driver := cogent.Driver{FrameMetrics: metrics, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 12}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(e error) {
+	driver := cogent.Driver{GPUSceneRendering: c.GPUSceneRendering, FrameMetrics: metrics, Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 12}), Foreground: ui.Some(color.NRGBA{R: 20, G: 20, B: 20, A: 255}), Background: ui.Some(color.NRGBA{R: 250, G: 250, B: 250, A: 255})}}, OnError: func(e error) {
 		select {
 		case failures <- e:
 		default:

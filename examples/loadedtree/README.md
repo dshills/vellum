@@ -85,3 +85,22 @@ closed warm trajectory and is not cold-cache evidence. Geometry persistence is
 disabled in this fixture. See the [measurement contract](../../specs/tree-performance.md)
 for timing boundaries, pairing, bounded refusal and the unchanged 4 ms p95 target.
 `-perf` excludes `-smoke`; performance flags require explicit `-perf`.
+
+
+Use `-perf-gpu-scene` to select the optional GPU scene renderer for a separate
+comparison run. Omit it for the default CPU renderer. Add `-perf-source-details`
+only in a separate diagnostic run to observe source routing, raster/copy clocks
+and image API attempt counters. It adds measurement work and cannot qualify
+ordinary latency targets. Both flags require `-perf`; every JSON event includes
+`gpu_scene_rendering` (requested mode, which permits fallback) and `source_details`.
+Detailed runs must fit the recorder's 4096-ticket cap, including warmup and both
+first/reverse scrolls; an oversized workload is refused before data/UI creation.
+
+```sh
+/tmp/vellum-loadedtree -perf -perf-gpu-scene -nodes=100000
+/tmp/vellum-loadedtree -perf -perf-gpu-scene -perf-source-details -nodes=100000
+```
+
+See the [route investigation](../../docs/reports/macos-tree-gpu/README.md) for
+separate diagnostics and a rejected scanline-allocation prototype. No renderer
+change was adopted by that investigation.

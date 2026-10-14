@@ -547,3 +547,12 @@ observed interval falls about 21–23%. Final p95 8.45–8.56 ms still fails the
 4 ms tree target. Original updater regressions fail, race checks pass and twelve
 software pixel records match. Full tree interaction/cold-cache/maximum-visible,
 P6/P11, physical native/GPU budgets, overnight and Mac release remain open.
+
+
+The [tree route investigation](../docs/reports/macos-tree-gpu/README.md) adds
+explicit consumer GPU/source-detail modes with stamped event identity and early
+diagnostic-capacity refusal. Separate diagnostics observe full CPU scene uploads
+and the optional GPU route. A 20-process/4800-sample GPU-mode comparison rejects
+packed scanline compaction: object counts fall 12–13%, bytes rise slightly and deep
+p95 is 3.1% worse. No renderer/prepared change was adopted. Tree 4 ms, complete P6/P11,
+physical/native memory, human accessibility and Mac distribution remain open.

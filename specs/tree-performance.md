@@ -54,3 +54,19 @@ raw first-scroll/warm samples and report distributions by run. The constructor
 and worker index costs remain separate. This warm-scroll fixture does not close
 large-branch expansion/filter interaction, cold caches, maximum-visible workload,
 physical display, native memory, full P6 or P11/Mac acceptance.
+
+
+The consumer accepts `-perf-gpu-scene` and `-perf-source-details` only with
+`-perf`, excluding smoke. Every event stamps both requested GPU mode and source
+measurement mode. GPU mode permits the existing fallback; use separate source
+records to establish routing for the observed diagnostic corpus. Source details
+add clocks/counters and are excluded from ordinary latency comparisons. Their
+recorder is capped at 4096 tickets including warmup, measured and first/reverse
+scrolls; invalid totals refuse before stored-data/UI construction. Defaults remain
+CPU rendering and ordinary recording. Never pool CPU/GPU or ordinary/detailed
+runs, and retain requested mode plus actual route evidence separately.
+
+The [route investigation](../docs/reports/macos-tree-gpu/README.md) rejected
+packed scanline compaction after 20 matched GPU-mode processes: fewer allocation
+objects alone did not establish a useful byte or latency improvement. It added
+no prepared patch and did not qualify the unchanged 4 ms target.

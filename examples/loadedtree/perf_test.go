@@ -17,12 +17,12 @@ import (
 func TestTreePerfConfigAndTrajectory(t *testing.T) {
 	for _, nodes := range []int{10_000, 100_000} {
 		for _, deep := range []bool{false, true} {
-			if err := (treePerfConfig{nodes, 240, 128, deep}).validate(); err != nil {
+			if err := (treePerfConfig{Nodes: nodes, Samples: 240, Warmup: 128, Deep: deep}).validate(); err != nil {
 				t.Fatal(err)
 			}
 		}
 	}
-	for _, config := range []treePerfConfig{{1000, 240, 128, false}, {10000, 119, 128, false}, {10000, 2049, 128, false}, {10000, 240, 31, false}, {10000, 240, 33, false}, {10000, 240, 2049, false}} {
+	for _, config := range []treePerfConfig{{Nodes: 1000, Samples: 240, Warmup: 128}, {Nodes: 10000, Samples: 119, Warmup: 128}, {Nodes: 10000, Samples: 2049, Warmup: 128}, {Nodes: 10000, Samples: 240, Warmup: 31}, {Nodes: 10000, Samples: 240, Warmup: 33}, {Nodes: 10000, Samples: 240, Warmup: 2049}} {
 		if config.validate() == nil {
 			t.Fatal("invalid workload admitted", config)
 		}
@@ -137,5 +137,38 @@ func TestTreePerfInspectionDistinguishesStartupAndRetirement(t *testing.T) {
 	p := &treePerfProgram{owner: owner}
 	if _, err = p.inspect(context.Background()); err == nil {
 		t.Fatal("closed logical origin retried as startup")
+	}
+}
+
+func TestTreePerfModesAndSourceCapacity(t *testing.T) {
+	for _, gpu := range []bool{false, true} {
+		for _, detailed := range []bool{false, true} {
+			c := treePerfConfig{Nodes: 100000, Samples: 2048, Warmup: 128, GPUSceneRendering: gpu, SourceDetails: detailed}
+			if err := c.validate(); err != nil {
+				t.Fatal(err)
+			}
+			value := c.record("tree.perf.sample", map[string]any{"gpu_scene_rendering": !gpu, "source_details": !detailed, "event": "incorrect"})
+			if value["event"] != "tree.perf.sample" || value["gpu_scene_rendering"] != gpu || value["source_details"] != detailed {
+				t.Fatal("run mode was omitted or overridden", value)
+			}
+		}
+	}
+	// Ordinary recorders have a larger capacity. Detailed mode must refuse the
+	// same workload before construction/mount rather than silently shrink it.
+	c := treePerfConfig{Nodes: 100000, Samples: 2048, Warmup: 2048}
+	if err := c.validate(); err != nil {
+		t.Fatal(err)
+	}
+	c.SourceDetails = true
+	if c.validate() == nil {
+		t.Fatal("oversized diagnostic recorder admitted")
+	}
+	c.Samples = cogent.MaxSourceFrameMetricsCapacity - c.Warmup - 2
+	if err := c.validate(); err != nil {
+		t.Fatal("exact diagnostic capacity refused", err)
+	}
+	c.Samples++
+	if c.validate() == nil {
+		t.Fatal("capacity overflow admitted")
 	}
 }
