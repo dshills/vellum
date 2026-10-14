@@ -162,6 +162,11 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
 - (NSString *)accessibilityTitle{return self.node[@"name"];}
 - (NSString *)accessibilityHelp{return self.node[@"help"];}
 - (id)accessibilityValue {id value=self.node[@"value"];return value==NSNull.null?nil:value;}
+- (NSString *)accessibilityValueDescription {
+ id value=self.node[@"value"];
+ if([self.node[@"role"] isEqual:@"menu-item"]&&[value isKindOfClass:NSNumber.class]&&CFGetTypeID((__bridge CFTypeRef)value)==CFBooleanGetTypeID())return [value boolValue]?@"Checked":@"Unchecked";
+ return nil;
+}
 - (id)accessibilityMinValue{return self.node[@"min"];}
 - (id)accessibilityMaxValue{return self.node[@"max"];}
 - (BOOL)isAccessibilityEnabled{return [self isAccessibilityElement]&&!vellumAXPending(self)&&![self.node[@"disabled"] boolValue];}
@@ -368,6 +373,21 @@ static NSDictionary *vellumAXValidatedNodes(NSDictionary *snapshot){
 static BOOL vellumAXValidSnapshot(NSDictionary *snapshot){return vellumAXValidatedNodes(snapshot)!=nil;}
 int vellumAXSnapshotValid(const char *json){
  @autoreleasepool{NSData *data=vellumAXJSONData(json);NSDictionary *snapshot=data?[NSJSONSerialization JSONObjectWithData:data options:0 error:nil]:nil;return vellumAXValidSnapshot(snapshot);}
+}
+
+// Inert check-action fixture uses production selectors without an attachment,
+// main-loop dispatch, native window, or successful action delivery.
+char *vellumAXMenuFixture(const char *json){
+ @autoreleasepool{
+  NSData *data=vellumAXJSONData(json);NSDictionary *snapshot=data?[NSJSONSerialization JSONObjectWithData:data options:0 error:nil]:nil;
+  if(!vellumAXValidSnapshot(snapshot))return strdup("{}");
+  NSMutableArray *out=[NSMutableArray new];
+  for(NSDictionary *node in snapshot[@"nodes"]){
+   VellumAXElement *element=[VellumAXElement new];element.node=node;element.live=YES;
+   [out addObject:@{@"id":element.accessibilityIdentifier?:@"",@"role":element.accessibilityRole?:@"",@"value":element.accessibilityValue?:NSNull.null,@"description":element.accessibilityValueDescription?:@"",@"enabled":@(element.isAccessibilityEnabled),@"press_allowed":@([element isAccessibilitySelectorAllowed:@selector(accessibilityPerformPress)])}];
+  }
+  NSData *result=[NSJSONSerialization dataWithJSONObject:@{@"elements":out} options:0 error:nil];return strdup([[NSString alloc]initWithData:result encoding:NSUTF8StringEncoding].UTF8String?:"{}");
+ }
 }
 
 // Native unit fixtures use the production retained-tree traversal with pixel

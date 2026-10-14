@@ -10,6 +10,7 @@ package cogent
 char *vellumAXScopedFixture(const char *json);
 char *vellumAXPayloadFixture(const char *json,int consume);
 char *vellumAXGridFixture(const char *json,const char *tableID,int column,int row);
+char *vellumAXMenuFixture(const char *json);
 char *vellumAXTextFixture(const char *node,const char *geometry,int start,int length,int line);
 int vellumAXSetValueFixture(uint64_t token,uint64_t generation,const char *node,const char *value);
 int vellumAXAttach(uint64_t token, void *view, void *window);
@@ -273,6 +274,15 @@ func nativeAccessibilityGridFixture(payload, table string, column, row int) stri
 	defer C.free(unsafe.Pointer(p))
 	defer C.free(unsafe.Pointer(t))
 	result := C.vellumAXGridFixture(p, t, C.int(column), C.int(row))
+	defer C.free(unsafe.Pointer(result))
+	return C.GoString(result)
+}
+
+// Inert selectors on unattached retained elements; creates no OS window.
+func nativeAccessibilityMenuFixture(payload string) string {
+	p := C.CString(payload)
+	defer C.free(unsafe.Pointer(p))
+	result := C.vellumAXMenuFixture(p)
 	defer C.free(unsafe.Pointer(result))
 	return C.GoString(result)
 }

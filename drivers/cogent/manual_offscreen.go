@@ -825,6 +825,9 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					popup.manualIncarnation = w.nextRecord
 				}
 				for _, o := range r.control.menu.options {
+					if o.Separator {
+						continue
+					}
 					id := menuActionID(r.node.ID, o.ID)
 					b := bounds[id]
 					item := popup.items[o.ID]
@@ -832,7 +835,11 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					if focused {
 						result.FocusedID = id
 					}
-					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: popup.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
+					value := ""
+					if o.Checkable {
+						value = fmt.Sprint(o.Checked)
+					}
+					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: popup.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Value: value, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
 				}
 			}
 			if r.control != nil && r.control.disclosure != nil {

@@ -67,7 +67,7 @@ func menuAvailable(r *record) bool {
 		return false
 	}
 	for _, o := range r.node.Options {
-		if !o.Disabled {
+		if !o.Disabled && !o.Separator {
 			return true
 		}
 	}
@@ -157,10 +157,17 @@ func openManagedMenu(r *record) {
 	var first core.Widget
 	for _, o := range s.options {
 		o := o
+		if o.Separator {
+			core.NewSeparator(scene).SetName(o.ID)
+			continue
+		}
 		item := tree.New[menuItem](scene)
 		item.popup = p
 		item.SetName(o.ID)
 		item.SetText(html.EscapeString(o.Label))
+		if o.Checkable && o.Checked {
+			item.SetIcon(nativeSymbol(ui.SymbolCheck))
+		}
 		item.FinalStyler(func(style *styles.Style) { applyStyle(style, ui.Node{Kind: ui.Button, Style: itemStyle}, ui.Theme{}) })
 		item.SetState(o.Disabled, states.Disabled)
 		p.items[o.ID] = item
@@ -210,9 +217,9 @@ func queueMenuAction(r *record, p *menuPopup, id string) {
 			return
 		}
 		for _, o := range r.node.Options {
-			if o.ID == id && !o.Disabled {
+			if o.ID == id && !o.Disabled && !o.Separator {
 				requestMenuClose(r)
-				r.node.Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.MenuButton, SelectedID: id})
+				r.node.Change(ui.ChangeEvent{ID: r.node.ID, Kind: ui.MenuButton, SelectedID: id, Checked: o.Checkable && !o.Checked})
 				_ = r.control.a.Invalidate(r.control.window)
 				return
 			}
@@ -264,8 +271,14 @@ func menuAccessibility(r *record, parent string, b *accessibilityBridge) ([]acce
 	}
 	p := r.control.menu.popup
 	for _, o := range r.control.menu.options {
+		if o.Separator {
+			continue
+		}
 		id := menuActionID(r.node.ID, o.ID)
 		node := accessibilityNode{ID: id, Parent: parent, Role: "menu-item", Actions: []string{}, DomainID: o.ID, Name: o.Label, Disabled: o.Disabled, Focusable: !o.Disabled}
+		if o.Checkable {
+			node.Value = o.Checked
+		}
 		if item := p.items[o.ID]; item != nil {
 			node.Focused = item.StateIs(states.Focused)
 		}

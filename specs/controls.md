@@ -436,3 +436,10 @@ originating-window popup retirement.
 
 The [inline color picker](color-picker.md) composes existing Slider, TextField,
 Image and FormGroup nodes into an owner-held RGBA editor.
+
+
+MenuButton Options also support controlled `Checkable`/`Checked` actions and
+passive `Separator` entries. Change.Checked proposes the inverse accepted check
+state. Ordinary actions only identify their action, and separators have no input
+or focus. Other kinds refuse these fields. Full lifetime, bounds and semantics
+are specified by the [action-menu contract](menu-button.md).

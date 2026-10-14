@@ -35,6 +35,11 @@ const (
 type Option struct {
 	ID, Label string
 	Disabled  bool
+	// MenuButton alone supports passive separators and controlled check actions.
+	// Separators retain a stable ID, but have no label, value or input behavior.
+	Separator bool
+	Checkable bool
+	Checked   bool
 }
 
 // Numeric uses finite float32 values supported by the native widgets. Step is
@@ -52,7 +57,8 @@ const (
 
 // ChangeEvent requests a model edit. The relevant payload is Checked for
 // Checkbox/Switch/ToggleButton/Disclosure, Number for Slider/NumberField, Text for TextField, and SelectedID
-// for Selector/Tabs/RadioGroup/SegmentedControl. SplitPane uses Number for the
+// for Selector/Tabs/RadioGroup/SegmentedControl/MenuButton. MenuButton check actions
+// also use Checked for the proposed boolean. SplitPane uses Number for the
 // first pane's fraction. Controlled nodes reflect the accepted value on redraw.
 type ChangeEvent struct {
 	ID               string
@@ -192,6 +198,13 @@ func ValidateControl(n Node) error {
 			return err
 		}
 	}
+	if n.Kind != MenuButton {
+		for _, o := range n.Options {
+			if o.Separator || o.Checkable || o.Checked {
+				return fmt.Errorf("ui: separator/check action metadata belongs only on menu options")
+			}
+		}
+	}
 	if n.Kind == Selector || n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl || n.Kind == MenuButton {
 		seen := map[string]bool{}
 		selected := n.SelectedID == ""
@@ -233,7 +246,7 @@ func FocusTarget(root Node, id string) (Node, bool) {
 			}
 			if n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl || n.Kind == MenuButton {
 				for _, option := range n.Options {
-					if !option.Disabled {
+					if !option.Disabled && !option.Separator {
 						return n, true
 					}
 				}

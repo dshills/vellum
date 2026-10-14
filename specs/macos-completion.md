@@ -635,3 +635,12 @@ behavior. This source optimization requires internal and Anthropic Prism review.
 It does not establish a native frame-rate gain or close P6/P11. GPU scene rendering
 remains opt-in. Live tests remain deferred while the human uses the machine;
 current complete lifecycle, physical/human checks and distribution remain open.
+
+
+The [menu check-action checkpoint](../docs/reports/macos-menu-checks/README.md)
+adds controlled boolean menu actions and passive separators to the desktop
+control catalog. Offscreen real-popup pointer/keyboard, rejected/stale proposal,
+visual and inert Cocoa selector checks qualify the tested source behavior.
+Internal review and the selected Anthropic Prism checkpoint remain required.
+Human screen-reader, physical menu/input and full Mac acceptance remain open;
+live tests remain paused while the human uses the machine.

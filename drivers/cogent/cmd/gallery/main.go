@@ -34,6 +34,7 @@ type gallery struct {
 	menuCount                   int
 	menuLast                    string
 	menuDisabled                bool
+	menuChecked                 bool
 	colorPicker                 *ui.ColorPicker
 	colorEdits, colorInvalid    int
 	colorReject, colorNormalize bool
@@ -111,6 +112,18 @@ func (g *gallery) view() ui.Node {
 			Options: []ui.Option{{ID: "blocked", Label: "Unavailable", Disabled: true}, {ID: "first", Label: "Run action"}, {ID: "second", Label: "Run action"}},
 			Change:  func(e ui.ChangeEvent) { g.menuCount++; g.menuLast = e.SelectedID }},
 		{ID: "menu-status", Kind: ui.StatusBar, Text: fmt.Sprintf("Action %s · requests %d", g.menuLast, g.menuCount)},
+		{ID: "view-menu", Kind: ui.MenuButton, Text: "View options", Options: []ui.Option{
+			{ID: "grid", Label: "Show grid", Checkable: true, Checked: g.menuChecked},
+			{ID: "group-divider", Separator: true},
+			{ID: "reset", Label: "Reset view"},
+		}, Change: func(e ui.ChangeEvent) {
+			if e.SelectedID == "grid" {
+				g.menuChecked = e.Checked
+			} else if e.SelectedID == "reset" {
+				g.menuChecked = false
+			}
+		}},
+		{ID: "view-state", Kind: ui.Label, Text: fmt.Sprintf("Show grid: %t", g.menuChecked)},
 	}}
 	for _, symbol := range ui.Symbols() {
 		symbols.Children = append(symbols.Children, ui.Node{ID: "symbol-" + string(symbol), Kind: ui.Row, Style: ui.Style{Gap: ui.Some(float32(12))}, Children: []ui.Node{

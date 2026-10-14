@@ -184,7 +184,8 @@ reader cancellation and temporary decode memory remain caller concerns. Source
 replacement/patches preserve control identity and do not mutate earlier versions.
 The gallery's Images page demonstrates fitting, transparency and source changes.
 
-Use `ui.MenuButton` for a flat list of transient actions. Keep SelectedID empty;
+Use `ui.MenuButton` for a flat list of transient actions, controlled check actions
+and passive separators. Keep SelectedID empty;
 the callback receives the stable action ID in ChangeEvent.SelectedID. Duplicate
 labels are allowed and disabled items remain readable. Enter/Space, pointer or
 Down opens; Escape dismisses; Tab/Shift-Tab resumes managed traversal.
@@ -222,3 +223,26 @@ the component read-only. Reserve its ID + "/color/" namespace. Focus the hex
 field with ui.ColorFieldID("ink", ui.ColorHex) and a normal FocusRequest. See the
 [contract](../specs/color-picker.md) for bounded input and cache behavior. The
 controls gallery includes a Colors page with reset, disable and focus actions.
+
+
+Checkable menu actions receive a proposed boolean along with their stable ID.
+Accept it in the application model; reopening displays the accepted checkmark:
+
+```go
+ui.Node{ID: "view-options", Kind: ui.MenuButton, Text: "View", Options: []ui.Option{
+    {ID: "grid", Label: "Show grid", Checkable: true, Checked: showGrid},
+    {ID: "divider", Separator: true},
+    {ID: "reset", Label: "Reset view"},
+}, Change: func(e ui.ChangeEvent) {
+    if e.SelectedID == "grid" { showGrid = e.Checked }
+    if e.SelectedID == "reset" { resetView() }
+}}
+```
+
+The application owns showGrid and resetView. Separator entries require a unique
+ID and no other fields. They count toward the 64-entry menu limit but add no
+keyboard/accessibility/input target. Checkable/Checked/Separator fields apply only
+to MenuButton Options. The gallery's Icons and actions page includes View options.
+The [check-action checkpoint](reports/macos-menu-checks/README.md) records the
+software routing, visual and inert Cocoa checks; physical input and human
+VoiceOver remain separate acceptance work.
