@@ -16,6 +16,8 @@ const (
 	Switch           Kind = "switch"
 	ToggleButton     Kind = "toggle-button"
 	ProgressBar      Kind = "progress-bar"
+	ProgressRing     Kind = "progress-ring"
+	ProgressGauge    Kind = "progress-gauge"
 	Separator        Kind = "separator"
 	Selector         Kind = "selector"
 	MenuButton       Kind = "menu-button"
@@ -156,12 +158,12 @@ func ValidateControl(n Node) error {
 	if n.Orientation != "" && n.Orientation != Horizontal && n.Orientation != Vertical {
 		return fmt.Errorf("ui: invalid display orientation %q", n.Orientation)
 	}
-	if n.Kind == ProgressBar {
+	if n.Kind == ProgressBar || n.Kind == ProgressRing || n.Kind == ProgressGauge {
 		if !finite(n.Number) || n.Number < 0 || n.Number > 1 {
 			return fmt.Errorf("ui: progress requires a finite fraction within 0..1")
 		}
 	}
-	if (n.Kind == ProgressBar || n.Kind == Separator) && (n.Change != nil || n.Activate != nil) {
+	if (n.Kind == ProgressBar || n.Kind == ProgressRing || n.Kind == ProgressGauge || n.Kind == Separator) && (n.Change != nil || n.Activate != nil) {
 		return fmt.Errorf("ui: display-only controls cannot have input callbacks")
 	}
 	if n.Kind == DataTree {

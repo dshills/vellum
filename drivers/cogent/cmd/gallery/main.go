@@ -105,6 +105,10 @@ func (g *gallery) view() ui.Node {
 		}},
 		{ID: "controls-separator", Kind: ui.Separator},
 		{ID: "progress", Kind: ui.ProgressBar, Number: g.number / 100, Accessibility: ui.Accessibility{Name: "Operation progress"}},
+		{ID: "progress-shapes", Kind: ui.Row, Style: ui.Style{Gap: ui.Some(float32(24))}, Children: []ui.Node{
+			{ID: "progress-ring", Kind: ui.ProgressRing, Number: g.number / 100, Text: fmt.Sprintf("%.0f%%", g.number), Accessibility: ui.Accessibility{Name: "Circular operation progress"}},
+			{ID: "progress-gauge", Kind: ui.ProgressGauge, Number: g.number / 100, Text: fmt.Sprintf("%.0f%%", g.number), Accessibility: ui.Accessibility{Name: "Semicircular operation progress"}},
+		}},
 		{ID: "show-dialog", Kind: ui.Button, Text: "Open preferences dialog", Activate: func() { g.dialog = true }},
 		{ID: "state", Kind: ui.StatusBar, Accessibility: ui.Accessibility{Name: "Application status"}, Text: fmt.Sprintf("Preset %s · project %s", g.selection, g.text)},
 	}}
@@ -191,7 +195,11 @@ func main() {
 	disclosureSmoke := flag.Bool("disclosure-smoke", false, "check actual Cocoa disclosure publication and actions in a bounded fixture")
 	menuSmoke := flag.Bool("menu-smoke", false, "check actual Cocoa menu routing and lifetime in a bounded fixture")
 	colorSmoke := flag.Bool("color-smoke", false, "verify bounded native color field acceptance and lifetime")
+	progressSmoke := flag.Bool("progress-smoke", false, "verify native progress shape values, geometry and lifetime")
 	flag.Parse()
+	if *progressSmoke && (*colorSmoke || *menuSmoke || *disclosureSmoke || *smoke || *exit > 0) {
+		must(errors.New("progress-smoke requires its own bounded process"))
+	}
 	if *colorSmoke && (*smoke || *menuSmoke || *disclosureSmoke || *exit > 0) {
 		must(errors.New("color-smoke requires its own bounded process"))
 	}
@@ -201,7 +209,7 @@ func main() {
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *disclosureSmoke || *menuSmoke || *colorSmoke {
+	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
@@ -214,9 +222,24 @@ func main() {
 	if *colorSmoke {
 		g.tab = "colors"
 	}
-	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: 720, Height: 650, View: g.view}))
+	view := g.view
+	if *progressSmoke {
+		view = g.progressView
+	}
+	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: 720, Height: 650, View: view}))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	var progressDone chan error
+	if *progressSmoke {
+		removeCleanup, observeErr := beginProgressCleanup()
+		must(observeErr)
+		defer removeCleanup()
+		var stop context.CancelFunc
+		ctx, stop = context.WithTimeout(ctx, 45*time.Second)
+		defer stop()
+		progressDone = make(chan error, 1)
+		go func() { progressDone <- checkProgress(ctx, a, g); cancel() }()
+	}
 	var colorDone chan error
 	var removeColorCleanup func()
 	if *colorSmoke {
@@ -256,6 +279,18 @@ func main() {
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
 	err = a.Run(ctx, cogent.Driver{Theme: theme})
+	if progressDone != nil {
+		cancel()
+		var checkErr error
+		select {
+		case checkErr = <-progressDone:
+		case <-time.After(6 * time.Second):
+			checkErr = errors.New("progress worker did not join after native exit")
+		}
+		checkErr = errors.Join(checkErr, finishProgressCleanup())
+		must(errors.Join(progressRunError(err), checkErr))
+		return
+	}
 	if colorDone != nil {
 		cancel()
 		var checkErr error

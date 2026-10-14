@@ -178,6 +178,10 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = core.NewSwitch(parent).SetType(core.SwitchSegmentedButton)
 	case ui.ProgressBar:
 		widget = core.NewMeter(parent)
+	case ui.ProgressRing:
+		widget = core.NewMeter(parent).SetType(core.MeterCircle)
+	case ui.ProgressGauge:
+		widget = core.NewMeter(parent).SetType(core.MeterSemicircle)
 	case ui.Separator:
 		widget = core.NewSeparator(parent)
 	case ui.Selector:
@@ -237,7 +241,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		return nil, false, nil
 	}
 	r.widget = widget
-	if r.node.Kind == ui.ProgressBar || r.node.Kind == ui.Separator || r.node.Kind == ui.Slider {
+	if r.node.Kind == ui.ProgressBar || r.node.Kind == ui.ProgressRing || r.node.Kind == ui.ProgressGauge || r.node.Kind == ui.Separator || r.node.Kind == ui.Slider {
 		if r.node.Kind != ui.Slider {
 			widget.AsWidget().Styler(func(s *styles.Style) {
 				s.Direction = styles.Row
@@ -489,6 +493,15 @@ func syncControl(r *record, previous ui.Node) error {
 		w.SetValue(r.node.Number)
 	case *core.Meter:
 		w.Min, w.Max, w.Value = 0, 1, r.node.Number
+		w.Text = ""
+		switch r.node.Kind {
+		case ui.ProgressRing:
+			w.Type, w.Text = core.MeterCircle, html.EscapeString(r.node.Text)
+		case ui.ProgressGauge:
+			w.Type, w.Text = core.MeterSemicircle, html.EscapeString(r.node.Text)
+		default:
+			w.Type = core.MeterLinear
+		}
 	case *core.Spinner:
 		w.Precision = 9 // round-trip every float32 without crossing tight bounds
 		n := r.node.Numeric

@@ -440,7 +440,8 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		case ui.Checkbox, ui.Switch, ui.ToggleButton:
 			x.Value = n.Checked
-		case ui.ProgressBar:
+		case ui.ProgressBar, ui.ProgressRing, ui.ProgressGauge:
+			x.Role = "progress-bar"
 			x.Value = n.Number
 			minimum, maximum := float32(0), float32(1)
 			x.Min, x.Max = &minimum, &maximum

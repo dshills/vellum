@@ -153,6 +153,8 @@ func (w *Workspace) View() ui.Node {
 			{ID: "icon", Kind: ui.Icon, Icon: ui.SymbolCheck, Text: "Check icon"},
 			{ID: "image", Kind: ui.Image, Image: w.picture, Text: "Local amber square", Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 24, Height: 24}), MaxSize: ui.Some(ui.Size{Width: 24, Height: 24})}},
 			{ID: "progress", Kind: ui.ProgressBar, Number: w.number / 100, MinWidth: 200},
+			{ID: "progress-ring", Kind: ui.ProgressRing, Number: w.number / 100, Text: fmt.Sprintf("%.0f%%", w.number), Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 80, Height: 80}), MaxSize: ui.Some(ui.Size{Width: 80, Height: 80})}, Accessibility: ui.Accessibility{Name: "Circular progress"}},
+			{ID: "progress-gauge", Kind: ui.ProgressGauge, Number: w.number / 100, Text: fmt.Sprintf("%.0f%%", w.number), Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 88, Height: 56}), MaxSize: ui.Some(ui.Size{Width: 88, Height: 56})}, Accessibility: ui.Accessibility{Name: "Semicircular progress"}},
 			{ID: "separator", Kind: ui.Separator, Orientation: ui.Vertical},
 			{ID: "status", Kind: ui.StatusBar, Text: fmt.Sprintf("Actions %d · %s", w.actions, w.action)},
 		}}}},

@@ -1,7 +1,7 @@
 # Standard controls contract
 
 The public `ui.Node` vocabulary now includes checkbox, switch, toggle button,
-progress bar, separator, action menu button, radio group, segmented control, selector, slider, numeric
+progress bar, circular progress ring, semicircular progress gauge, separator, action menu button, radio group, segmented control, selector, slider, numeric
 field, single-line text field, multiline document editor, managed data grid,
 tabs, scroll container, toolbar, status bar, labeled form group and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
@@ -453,3 +453,23 @@ when closing the last page. Rejected requests retain pages and drafts. Pointer
 close and Delete/Backspace on a focused tab share bounded guarded admission;
 modified command chords retain application routing. See [the close contract](tab-close.md)
 for binding, modal lifetime, private target geometry and scope limits.
+
+
+## Progress shapes
+
+`ui.ProgressRing` and `ui.ProgressGauge` render controlled fractions from zero to
+one as a circle or semicircle. `Number` is the accepted fraction; optional `Text`
+is literal text inside the shape. These passive leaves reject input callbacks,
+children, orientation, nonfinite values and values outside the interval. They
+remain outside focus order and expose a read-only native progress indicator with
+minimum zero, maximum one and the accepted value. Accessibility.Name supplies
+a stable descriptive label independently of the changing visible text.
+
+The normal style options override and restore native size/typography defaults.
+Default ring size is 128×128 logical units; gauge size is 112×64. The controls
+start no animation or timer. Their native meter type is selected before initial
+styling, keyed updates retain identity, and kind changes replace the old shape.
+Manual completed-frame tests cover fractions 0, 0.25, 0.75 and 1 at DPI
+96/120/144/192, with pixel changes, nonempty geometry and no ongoing timers.
+Offscreen/native-selector fixtures remain separate from physical input, human
+screen-reader and the complete current-source Mac qualification.

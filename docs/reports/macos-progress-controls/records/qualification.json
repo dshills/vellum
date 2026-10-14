@@ -1,0 +1,234 @@
+{
+  "base_commit": "68c3750243326ce9120fd2d5ff5b0d610cc36d9e",
+  "sources": {
+    "docs/reports/macos-progress-controls/README.md": "e9e63b6cefefc1decf42b7510fb668615f0a2199844bfb6e5d64779c04630e0d",
+    "drivers/cogent/accessibility.go": "eb11be54e9cad93d0f110e6e1a0e632ebde111e210ec32d537693617fd03e2c7",
+    "drivers/cogent/cmd/gallery/main.go": "3379d1f2caada39897fdc0ec84b6a2041e60c14847d8b32c0269320ed6e6c395",
+    "drivers/cogent/cmd/gallery/progress_cleanup_native.go": "047975d4476bf54d3bfe0ea9c6e9733b7220af4d00f96b79827d1634eac6cc9f",
+    "drivers/cogent/cmd/gallery/progress_cleanup_other.go": "4fd0440aad44a00bb1b4652118c38a421693f26ba0e893a0864fda99fbbb0b53",
+    "drivers/cogent/cmd/gallery/progress_smoke.go": "0b2e5dd24a4baf992a9e221674d004ffa5e0b8ebd6224e9c0c4c0fd084f4995a",
+    "drivers/cogent/cmd/gallery/progress_smoke_test.go": "04266f1754b9c9e30dc4ba30eed538be03e64afafdb28746a11f17d776c802b7",
+    "drivers/cogent/controls.go": "4f6d6ce333a55b17e134f1fdb407d3de3c6ede5e44b8cfcbdd413b295a26b6d6",
+    "drivers/cogent/internal/acceptance/workspace.go": "a7906ba04740b7490c6c3370d88635717bd2c1694f5cec874a2e41a3e81a8648",
+    "drivers/cogent/internal/acceptance/workspace_test.go": "a52378ea39120dea6a9b31206d93926f3b29de8df95f41a57b7a6fd2c9db0132",
+    "drivers/cogent/progress_shapes_darwin_test.go": "ad7908daee0cad7284ae7b1500f9a1055a9263e0e0aa35823f93e0b459f1f8f2",
+    "drivers/cogent/progress_shapes_offscreen_test.go": "94b90442335dacc28b48777fb3a00e8a82adb5a09b044890324d5e6ba2418395",
+    "drivers/cogent/progress_shapes_test.go": "5b385199ceaa5d2068517ef7ce0c66635f4b28b82243d315d732a754933331ba",
+    "scripts/release-sdk_test.py": "b927d5cc34505850c5963293e24a8bceb9e890811dd766bf0b9dee46324b88e2",
+    "specs/controls.md": "7a26546ccc844fe237d6a33b6f1073f1965dad5f9566b7a25c9f4c2a7fa287d4",
+    "ui/controls.go": "f0bba584eea81fc2fe8aad55d05aa4b1b6e796bd0157cc7b5931a6858a251cca",
+    "ui/node.go": "d319edf79d86f228adcab320658060ab8144b7e4c45461b89537e3bcd292a4d8",
+    "ui/progress_shapes_test.go": "07ab0e944522b68e177663410d3a853457dab1ce6819222f3ab49226afe58091"
+  },
+  "result": "PASS_SCOPED_PROGRESS_SHAPES",
+  "checks": {
+    "progress-ui-race": {
+      "receipt_sha256": "a85d5e1c8ec8ecfe235e9a86005a0f404cbbed390064075ee732fcd2a84fa7c2",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "./ui"
+      ],
+      "elapsed_seconds": 2.096973291016184,
+      "source_files_bound": {
+        "ui/controls.go": "f0bba584eea81fc2fe8aad55d05aa4b1b6e796bd0157cc7b5931a6858a251cca",
+        "ui/node.go": "d319edf79d86f228adcab320658060ab8144b7e4c45461b89537e3bcd292a4d8",
+        "ui/progress_shapes_test.go": "07ab0e944522b68e177663410d3a853457dab1ce6819222f3ab49226afe58091"
+      }
+    },
+    "progress-dpi-race": {
+      "receipt_sha256": "cba50d17f5da8778cbbe10c0032ce93116f32e8d205eb9707174a5b51dd731a2",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "-run=ProgressShapes",
+        "-count=1",
+        "."
+      ],
+      "elapsed_seconds": 11.744874541996978,
+      "source_files_bound": {
+        "drivers/cogent/accessibility.go": "eb11be54e9cad93d0f110e6e1a0e632ebde111e210ec32d537693617fd03e2c7",
+        "drivers/cogent/controls.go": "4f6d6ce333a55b17e134f1fdb407d3de3c6ede5e44b8cfcbdd413b295a26b6d6",
+        "drivers/cogent/progress_shapes_offscreen_test.go": "94b90442335dacc28b48777fb3a00e8a82adb5a09b044890324d5e6ba2418395",
+        "drivers/cogent/progress_shapes_test.go": "5b385199ceaa5d2068517ef7ce0c66635f4b28b82243d315d732a754933331ba"
+      }
+    },
+    "progress-native-roles": {
+      "receipt_sha256": "407bf944fee668da55c2d6acc4525f3bab35f7cb51f1bc6938674a72512b04b5",
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-p=1",
+        "-run=^TestProgressShapesCocoaRole",
+        "-count=1",
+        "."
+      ],
+      "elapsed_seconds": 26.51027429208625,
+      "source_files_bound": {
+        "drivers/cogent/progress_shapes_darwin_test.go": "ad7908daee0cad7284ae7b1500f9a1055a9263e0e0aa35823f93e0b459f1f8f2"
+      }
+    },
+    "progress-portable-race-v2": {
+      "receipt_sha256": "a381a0d6147ae8f4842c5670f5be72dacf9577a98769400a5b477d3f8b259823",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "./..."
+      ],
+      "elapsed_seconds": 1.5482540830271319,
+      "source_files_bound": {
+        "ui/controls.go": "f0bba584eea81fc2fe8aad55d05aa4b1b6e796bd0157cc7b5931a6858a251cca",
+        "ui/node.go": "d319edf79d86f228adcab320658060ab8144b7e4c45461b89537e3bcd292a4d8",
+        "ui/progress_shapes_test.go": "07ab0e944522b68e177663410d3a853457dab1ce6819222f3ab49226afe58091"
+      }
+    },
+    "progress-portable-vet": {
+      "receipt_sha256": "b3b42998f78d2328ca2e22bba6bcde4e842128fa252ca70b28bef5f2e5b2ac20",
+      "argv": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "elapsed_seconds": 0.5221868340158835,
+      "source_files_bound": {
+        "ui/controls.go": "f0bba584eea81fc2fe8aad55d05aa4b1b6e796bd0157cc7b5931a6858a251cca",
+        "ui/node.go": "d319edf79d86f228adcab320658060ab8144b7e4c45461b89537e3bcd292a4d8",
+        "ui/progress_shapes_test.go": "07ab0e944522b68e177663410d3a853457dab1ce6819222f3ab49226afe58091"
+      }
+    },
+    "progress-sdk": {
+      "receipt_sha256": "dff829689fda7f63a0ad8e3f1805c9562a930177659ff769244ea56f4d046117",
+      "argv": [
+        "python3",
+        "scripts/release-sdk_test.py"
+      ],
+      "elapsed_seconds": 1.6319100830005482,
+      "source_files_bound": {
+        "scripts/release-sdk_test.py": "b927d5cc34505850c5963293e24a8bceb9e890811dd766bf0b9dee46324b88e2",
+        "ui/controls.go": "f0bba584eea81fc2fe8aad55d05aa4b1b6e796bd0157cc7b5931a6858a251cca",
+        "ui/node.go": "d319edf79d86f228adcab320658060ab8144b7e4c45461b89537e3bcd292a4d8",
+        "ui/progress_shapes_test.go": "07ab0e944522b68e177663410d3a853457dab1ce6819222f3ab49226afe58091"
+      }
+    },
+    "progress-adapter-full-race": {
+      "receipt_sha256": "0eeca25784b1b874cccc5c5799fd8cadbe55ed6b9619c9ccbe9136a546011726",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./..."
+      ],
+      "elapsed_seconds": 141.64704625005834,
+      "source_files_bound": {
+        "drivers/cogent/accessibility.go": "eb11be54e9cad93d0f110e6e1a0e632ebde111e210ec32d537693617fd03e2c7",
+        "drivers/cogent/controls.go": "4f6d6ce333a55b17e134f1fdb407d3de3c6ede5e44b8cfcbdd413b295a26b6d6",
+        "drivers/cogent/internal/acceptance/workspace.go": "a7906ba04740b7490c6c3370d88635717bd2c1694f5cec874a2e41a3e81a8648",
+        "drivers/cogent/internal/acceptance/workspace_test.go": "a52378ea39120dea6a9b31206d93926f3b29de8df95f41a57b7a6fd2c9db0132"
+      }
+    },
+    "progress-adapter-vet": {
+      "receipt_sha256": "6a99d503f6a88b2381a25f1102ea748c90e2b33b2135c78b17202b3bb440dd77",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "elapsed_seconds": 6.5396560409571975,
+      "source_files_bound": {
+        "drivers/cogent/accessibility.go": "eb11be54e9cad93d0f110e6e1a0e632ebde111e210ec32d537693617fd03e2c7",
+        "drivers/cogent/controls.go": "4f6d6ce333a55b17e134f1fdb407d3de3c6ede5e44b8cfcbdd413b295a26b6d6",
+        "drivers/cogent/internal/acceptance/workspace.go": "a7906ba04740b7490c6c3370d88635717bd2c1694f5cec874a2e41a3e81a8648",
+        "drivers/cogent/internal/acceptance/workspace_test.go": "a52378ea39120dea6a9b31206d93926f3b29de8df95f41a57b7a6fd2c9db0132"
+      }
+    },
+    "progress-gallery-v2": {
+      "receipt_sha256": "95c847ec59ebef55cdef6506d4b2d7ebbe0c13ddebfd323aab42602736cf3690",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./cmd/gallery"
+      ],
+      "elapsed_seconds": 3.583723625051789,
+      "source_files_bound": {
+        "drivers/cogent/cmd/gallery/main.go": "3379d1f2caada39897fdc0ec84b6a2041e60c14847d8b32c0269320ed6e6c395",
+        "drivers/cogent/cmd/gallery/progress_cleanup_native.go": "047975d4476bf54d3bfe0ea9c6e9733b7220af4d00f96b79827d1634eac6cc9f",
+        "drivers/cogent/cmd/gallery/progress_cleanup_other.go": "4fd0440aad44a00bb1b4652118c38a421693f26ba0e893a0864fda99fbbb0b53",
+        "drivers/cogent/cmd/gallery/progress_smoke.go": "0b2e5dd24a4baf992a9e221674d004ffa5e0b8ebd6224e9c0c4c0fd084f4995a",
+        "drivers/cogent/cmd/gallery/progress_smoke_test.go": "04266f1754b9c9e30dc4ba30eed538be03e64afafdb28746a11f17d776c802b7"
+      }
+    },
+    "progress-native-build-v2": {
+      "receipt_sha256": "20ada7f6762b9f2b43384faadd5a97cf2a5a89686d9063581fd1961f3f00a696",
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-progress-controls/gallery-v2",
+        "./cmd/gallery"
+      ],
+      "elapsed_seconds": 3.4589533330872655,
+      "source_files_bound": {
+        "drivers/cogent/accessibility.go": "eb11be54e9cad93d0f110e6e1a0e632ebde111e210ec32d537693617fd03e2c7",
+        "drivers/cogent/cmd/gallery/main.go": "3379d1f2caada39897fdc0ec84b6a2041e60c14847d8b32c0269320ed6e6c395",
+        "drivers/cogent/cmd/gallery/progress_cleanup_native.go": "047975d4476bf54d3bfe0ea9c6e9733b7220af4d00f96b79827d1634eac6cc9f",
+        "drivers/cogent/cmd/gallery/progress_cleanup_other.go": "4fd0440aad44a00bb1b4652118c38a421693f26ba0e893a0864fda99fbbb0b53",
+        "drivers/cogent/cmd/gallery/progress_smoke.go": "0b2e5dd24a4baf992a9e221674d004ffa5e0b8ebd6224e9c0c4c0fd084f4995a",
+        "drivers/cogent/cmd/gallery/progress_smoke_test.go": "04266f1754b9c9e30dc4ba30eed538be03e64afafdb28746a11f17d776c802b7",
+        "drivers/cogent/controls.go": "4f6d6ce333a55b17e134f1fdb407d3de3c6ede5e44b8cfcbdd413b295a26b6d6",
+        "drivers/cogent/internal/acceptance/workspace.go": "a7906ba04740b7490c6c3370d88635717bd2c1694f5cec874a2e41a3e81a8648",
+        "drivers/cogent/internal/acceptance/workspace_test.go": "a52378ea39120dea6a9b31206d93926f3b29de8df95f41a57b7a6fd2c9db0132",
+        "drivers/cogent/progress_shapes_darwin_test.go": "ad7908daee0cad7284ae7b1500f9a1055a9263e0e0aa35823f93e0b459f1f8f2",
+        "drivers/cogent/progress_shapes_offscreen_test.go": "94b90442335dacc28b48777fb3a00e8a82adb5a09b044890324d5e6ba2418395",
+        "drivers/cogent/progress_shapes_test.go": "5b385199ceaa5d2068517ef7ce0c66635f4b28b82243d315d732a754933331ba",
+        "scripts/release-sdk_test.py": "b927d5cc34505850c5963293e24a8bceb9e890811dd766bf0b9dee46324b88e2",
+        "ui/controls.go": "f0bba584eea81fc2fe8aad55d05aa4b1b6e796bd0157cc7b5931a6858a251cca",
+        "ui/node.go": "d319edf79d86f228adcab320658060ab8144b7e4c45461b89537e3bcd292a4d8",
+        "ui/progress_shapes_test.go": "07ab0e944522b68e177663410d3a853457dab1ce6819222f3ab49226afe58091"
+      }
+    }
+  },
+  "prepared_files": 6211,
+  "native_samples": 4,
+  "native_shapes": 2,
+  "native_cleanup_zero": true,
+  "native_summary_sha256": "c31963f7727646d48f7ed9fa7339de4d408a50a442fef16a7d926d574b26e8a9",
+  "source_review_sha256": "7d0c7ba726abbe0e7b78b79fde0a372ada04bdf31d5ac90adc0345fdb7be8e97",
+  "build_binary_sha256": "2965d71ee71c18580427fc88dbe0f0d014a8541a90673ab104596ebe96757ff6",
+  "prior_fixture_findings_resolved": [
+    "PROGRESS-01",
+    "PROGRESS-02"
+  ],
+  "physical_input_qualified": false,
+  "human_voiceover_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "mac_distribution_qualified": false,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 18,
+  "prism_findings": 1,
+  "prism_resolved_false_positives": 1,
+  "prism_unresolved_findings": 0,
+  "prism_cli_invocations": 1,
+  "prism_calls": 2,
+  "prism_disposition_sha256": "38b68a55fb2151d99cfd29cae1e340de0f638c983fabf4a6e7cb7cae0c5162d6",
+  "archive_sha256": "19524dbbaaff016cccf29c6a1ab9196067f167bddcf045a160a9d708dd154279",
+  "archive_members": 94,
+  "archive_bytes": 509420,
+  "canonical_promoted": false
+}
