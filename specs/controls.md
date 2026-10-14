@@ -473,3 +473,10 @@ Manual completed-frame tests cover fractions 0, 0.25, 0.75 and 1 at DPI
 96/120/144/192, with pixel changes, nonempty geometry and no ongoing timers.
 Offscreen/native-selector fixtures remain separate from physical input, human
 screen-reader and the complete current-source Mac qualification.
+
+## Breadcrumb navigation
+
+The owner-held `ui.Breadcrumb` component adds bounded controlled hierarchy/location
+navigation over ordinary managed nodes. Ancestors are quiet buttons and the current
+location is a passive label. Item/root identity, queued request guards, read-only
+behavior and overflow/focus/accessibility follow [the breadcrumb contract](breadcrumb.md).

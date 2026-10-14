@@ -414,6 +414,12 @@ performance, physical backend faults and live Mac qualification.
 
 ## UI element expansion
 
+[Controlled breadcrumb navigation](breadcrumb.md) adds a reusable owner-held path
+component to the public SDK and gallery. Managed input, keyed retirement, four-DPI
+software frames and inert Cocoa roles remain separate from physical interaction,
+human VoiceOver, the active source-bound endurance campaign and full Mac gates.
+
+
 The public control set includes a controlled `Disclosure` container for retained
 collapsible inspector/settings content. Its heading input, visible focus/modal
 scope, child admission and separate Cocoa disclosure triangle follow the

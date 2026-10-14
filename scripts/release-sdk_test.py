@@ -103,6 +103,9 @@ import (
     "github.com/dshills/vellum/ui"
 )
 func TestExportedControls(t *testing.T) {
+    path := &ui.Breadcrumb{ID:"path",Items:[]ui.BreadcrumbItem{{ID:"home",Label:"Home"},{ID:"current",Label:"Current"}},Navigate:func(e ui.BreadcrumbEvent){if e.ItemID==""{t.Fatal("missing location identity")}}}
+    pathNode, err := path.View()
+    if err != nil || ui.Validate(pathNode) != nil {t.Fatal(err)}
     picker := &ui.ColorPicker{ID:"ink", Color:color.NRGBA{R:32,G:96,B:224,A:255}}
     if err := ui.Validate(picker.View()); err != nil { t.Fatal(err) }
     menu := ui.Node{ID:"view", Kind:ui.MenuButton, Text:"View", Options:[]ui.Option{

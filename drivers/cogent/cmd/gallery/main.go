@@ -41,6 +41,9 @@ type gallery struct {
 	menuDisabled                bool
 	menuChecked                 bool
 	colorPicker                 *ui.ColorPicker
+	breadcrumb                  *ui.Breadcrumb
+	breadcrumbRequests          int
+	breadcrumbReject            bool
 	colorEdits, colorInvalid    int
 	colorReject, colorNormalize bool
 }
@@ -63,6 +66,20 @@ func newGallery() *gallery {
 		g.colorPicker.ValidationMessage = ""
 	}
 	g.colorPicker.Invalid = func(err error) { g.colorInvalid++; g.colorPicker.ValidationMessage = err.Error() }
+	g.breadcrumb = &ui.Breadcrumb{ID: "project-path", Label: "Project location", Items: galleryBreadcrumbItems()}
+	g.breadcrumb.Navigate = func(e ui.BreadcrumbEvent) {
+		g.breadcrumbRequests++
+		if g.breadcrumbReject {
+			return
+		}
+		for i, item := range g.breadcrumb.Items {
+			if item.ID == e.ItemID {
+				g.breadcrumb.Items = append([]ui.BreadcrumbItem(nil), g.breadcrumb.Items[:i+1]...)
+				return
+			}
+		}
+	}
+
 	return g
 }
 
@@ -80,7 +97,15 @@ func galleryImage() *canvas.TiledImage {
 	} // The fixed, private source satisfies admission.
 	return source
 }
+func galleryBreadcrumbItems() []ui.BreadcrumbItem {
+	return []ui.BreadcrumbItem{{ID: "projects", Label: "Projects"}, {ID: "workspace", Label: "Workspace"}, {ID: "document", Label: "Document"}}
+}
 func (g *gallery) view() ui.Node {
+	path, err := g.breadcrumb.View()
+	if err != nil {
+		panic(err)
+	}
+
 	numeric := ui.Numeric{Min: 0, Max: 100, Step: 1}
 	changeNumber := func(e ui.ChangeEvent) { g.number = e.Number }
 	controls := ui.Node{ID: "controls", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
@@ -103,6 +128,14 @@ func (g *gallery) view() ui.Node {
 			{ID: "snapping", Kind: ui.Switch, Text: "Snapping", Checked: g.snapping, Change: func(e ui.ChangeEvent) { g.snapping = e.Checked }},
 			{ID: "pinned", Kind: ui.ToggleButton, Icon: ui.SymbolCheck, Text: "Pin panel", Checked: g.pinned, Change: func(e ui.ChangeEvent) { g.pinned = e.Checked }},
 		}},
+
+		path,
+		{ID: "path-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "path-reset", Kind: ui.Button, Text: "Reset location", Activate: func() { g.breadcrumb.Items = galleryBreadcrumbItems() }},
+			{ID: "path-reject", Kind: ui.Checkbox, Text: "Reject navigation", Checked: g.breadcrumbReject, Change: func(e ui.ChangeEvent) { g.breadcrumbReject = e.Checked }},
+			{ID: "path-disabled", Kind: ui.Checkbox, Text: "Disable navigation", Checked: g.breadcrumb.Disabled, Change: func(e ui.ChangeEvent) { g.breadcrumb.Disabled = e.Checked }},
+		}},
+		{ID: "path-status", Kind: ui.Label, Text: fmt.Sprintf("Navigation requests: %d", g.breadcrumbRequests)},
 		{ID: "controls-separator", Kind: ui.Separator},
 		{ID: "progress", Kind: ui.ProgressBar, Number: g.number / 100, Accessibility: ui.Accessibility{Name: "Operation progress"}},
 		{ID: "progress-shapes", Kind: ui.Row, Style: ui.Style{Gap: ui.Some(float32(24))}, Children: []ui.Node{

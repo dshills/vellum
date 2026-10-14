@@ -1,0 +1,188 @@
+{
+  "base_commit": "e7f8e306f56c3c237ad41985da4a407d62f2d87d",
+  "sources": {
+    "docs/reports/macos-breadcrumb-controls/README.md": "c6a38ad6c46714cb4d6df9f266fc0dcc318bc930f692d3e9ff1114f39a34b805",
+    "drivers/cogent/breadcrumb_darwin_test.go": "db890c07f4fb3eb567c839490076d79ebefed3a5e33d7924756d70cbcf5402ea",
+    "drivers/cogent/breadcrumb_offscreen_test.go": "5e13b4f559de44b8d696699c1ee0d235ffc287a3bfdabf08d28cbc74535afece",
+    "drivers/cogent/cmd/gallery/breadcrumb_test.go": "ed1f1616f8e697917a2baebba608b0411bd928984129487ef4603ff119388c50",
+    "drivers/cogent/cmd/gallery/main.go": "43214347a404272f019f65240dd7fb726739a4df7383c8557a125e32e3704d92",
+    "scripts/release-sdk_test.py": "9771c27fc170eeb62836671bd451958fe5e657fd697ce0b39ae69813a19c1a16",
+    "specs/breadcrumb.md": "4bb13d96751d6e947048dcbcf4fa7207f2d45c8e0a56b07296232f5686d16b2a",
+    "specs/controls.md": "3856ec90f17f72cb6ed0e4f65d324b06260dbc7b3a1a854488ceba5d63d2dac5",
+    "specs/macos-completion.md": "ce2f96759ad7107280b10182de32dc3da2bf9302f3ec05e6d1fb032b3ccdfccc",
+    "ui/breadcrumb.go": "37597253998ce588e21a670e3734a9913a70225c0f7080a6825f763c9dab9fec",
+    "ui/breadcrumb_test.go": "2d9fd5e99f690e18662d5ec9007f4bf7667a4c0cc43953122dc5902a5e6f33b8"
+  },
+  "result": "PASS_SCOPED_BREADCRUMB_COMPONENT",
+  "checks": {
+    "final-portable-race": {
+      "receipt_sha256": "6ee18e0a5d7cc44c9c003c838b1b490f188c17f1796ec67aba62e2a15c383e55",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "./..."
+      ],
+      "elapsed_seconds": 24.332952417084016
+    },
+    "final-portable-vet": {
+      "receipt_sha256": "3ae245630874ff33ff09e50213eddd83f9ee83095d5bde834d81848b35969c11",
+      "argv": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "elapsed_seconds": 0.7485393750248477
+    },
+    "final-adapter-race": {
+      "receipt_sha256": "873cfa66e21db29ad7e5278b38906327ef1d2d1819a72269e941588639d9426c",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./..."
+      ],
+      "elapsed_seconds": 125.07000666600652
+    },
+    "final-adapter-vet": {
+      "receipt_sha256": "af670cfaf58dc21803e8c11a59d4ac952cb8f0d24667e76757e871dec63a151b",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "elapsed_seconds": 13.118441291968338
+    },
+    "final-sdk": {
+      "receipt_sha256": "5ebe0af051a4fb28a4cb7efda141751802709adfac0ac7ed30faf81e1ba478bd",
+      "argv": [
+        "python3",
+        "scripts/release-sdk_test.py"
+      ],
+      "elapsed_seconds": 1.7505425410345197
+    },
+    "final-native-build": {
+      "receipt_sha256": "1ccb6d84477ae7291a24c9b57c6b925aecd512e1e97d27b36ebd9009b7bf8c3e",
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-breadcrumb-controls/gallery",
+        "./cmd/gallery"
+      ],
+      "elapsed_seconds": 20.387740457896143
+    }
+  },
+  "faults": {
+    "negative-count": {
+      "receipt_sha256": "3c7248a0ee8023aee9a4e907fec5bcd30bac80d15d64a9e48b33556aa8991c56",
+      "detected_assertion": "65 valid locations admitted",
+      "consumed_source_files": [
+        "ui/breadcrumb.go",
+        "ui/breadcrumb_test.go"
+      ]
+    },
+    "negative-native-path-v2": {
+      "receipt_sha256": "9765dca0feeb9c2830be674980d5116656dabb4c4f482055dccfbe527c16e552",
+      "detected_assertion": "queued old path navigated replacement",
+      "consumed_source_files": [
+        "drivers/cogent/breadcrumb_darwin_test.go",
+        "drivers/cogent/breadcrumb_offscreen_test.go",
+        "drivers/cogent/cmd/gallery/breadcrumb_test.go",
+        "drivers/cogent/cmd/gallery/main.go",
+        "scripts/release-sdk_test.py",
+        "specs/breadcrumb.md",
+        "specs/controls.md",
+        "specs/macos-completion.md",
+        "ui/breadcrumb.go",
+        "ui/breadcrumb_test.go"
+      ]
+    }
+  },
+  "prepared_files": 6214,
+  "prepared_changed": false,
+  "sdk_tests": 28,
+  "software_dpi": [
+    96,
+    120,
+    144,
+    192
+  ],
+  "inert_native_roles_and_owner_guard": true,
+  "window_created_by_native_fixture": false,
+  "native_binary": {
+    "path": "/private/tmp/vellum-macos-breadcrumb-controls/gallery",
+    "sha256": "643ba545c95907742e7068672de2884d0856bcae346379c0a4fda541c531e69d",
+    "bytes": 58626690,
+    "build_receipt_sha256": "1ccb6d84477ae7291a24c9b57c6b925aecd512e1e97d27b36ebd9009b7bf8c3e",
+    "launched": false
+  },
+  "report_before_code_checks_sha256": "39595699bed4f2a19e64ce203e45170fdbb064fec198ee21f5bb79bc3303949e",
+  "report_updated_after_checks": true,
+  "concurrent_endurance_scope": "Separate frozen e7f8e30 process, not breadcrumb qualification. Code checks ran while it was active; no latency claim.",
+  "live_breadcrumb_sequence_qualified": false,
+  "physical_input_qualified": false,
+  "human_voiceover_qualified": false,
+  "frame_performance_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "mac_distribution_qualified": false,
+  "original_source_manifest_sha256": "0739a2140ebedb957b0ec16148a357e7abcaec0693a779b549db4efe41d1eeae",
+  "prism_correction": {
+    "finding_id": "4365374625626cda",
+    "disposition": "FIXED_TEST_CLEANUP",
+    "changes": {
+      "drivers/cogent/breadcrumb_darwin_test.go": {
+        "before": "4fb315692c735e3e683a75703738191fb7359077702c71e78aedc2f78588eb1d",
+        "after": "db890c07f4fb3eb567c839490076d79ebefed3a5e33d7924756d70cbcf5402ea"
+      }
+    },
+    "production_source_changed": false,
+    "reason": "Deferred closure reads final test tree. Existing constant root ID/kind is compatible; no leak reproduction claimed. Raw conditional mediumfinding preserved."
+  },
+  "correction_checks": {
+    "correction-adapter-race": {
+      "receipt_sha256": "167352292f955a3e9dd6339c7fa390a97b10af1b1225d72050574546db9dd66d",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./..."
+      ],
+      "elapsed_seconds": 91.25449712492991
+    },
+    "correction-adapter-vet": {
+      "receipt_sha256": "7e9d16c045e4f853852f08c67dc8ee63e64be857a395d5b21481f3820df9e35e",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "elapsed_seconds": 2.219357541995123
+    }
+  },
+  "original_gates_remain_bound_to_original_test_bytes": true,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 11,
+  "prism_findings": 1,
+  "prism_unresolved_findings": 0,
+  "prism_raw_exit_code": 1,
+  "prism_disposition": "FIXED_TEST_CLEANUP",
+  "internal_correction_review_sha256": "0835a684283adf499ab6c0ad0521069e83aa1ba3bf76494d783aeee44f1ff166",
+  "prism_calls": 2,
+  "archive_sha256": "84d5d80143cd29e9fc3a03c2c02e006afa6828631f345dc1046719ef3cf2945d",
+  "archive_members": 118,
+  "archive_bytes": 362836,
+  "canonical_promoted": false
+}
