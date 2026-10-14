@@ -34,3 +34,15 @@ accepted current-label retirement, literal labels, disabled/read-only/stale refu
 independent namespace collisions, completed frames at four DPI settings and inert
 Cocoa role/owner-queue behavior. These checks are separate from physical input,
 human VoiceOver, sustained P6/P11, native/GPU memory and full Mac qualification.
+
+## Native selector acceptance
+
+The [native consumer checkpoint](../docs/reports/macos-breadcrumb-native/README.md)
+checks actual Cocoa ancestor/current roles, literal labels, frames/hit tests,
+owner accept/reject callbacks, disabled/read-only/absent refusals, queued stale
+path behavior, removed native identity and terminal cleanup in one owned window.
+A current-as-button source fault fails actual role acceptance. Removing only the
+component path-order guard still passes this native workflow; it does not isolate
+that guard. Its earlier inert queued-path fault remains separate evidence.
+This native selector workload does not replace physical keyboard/pointer, human
+VoiceOver, broader display or performance/memory acceptance.

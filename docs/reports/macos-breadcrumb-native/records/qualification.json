@@ -1,0 +1,205 @@
+{
+  "base_commit": "87e7de154b96732cad5dcb67703087115909c6f2",
+  "sources": {
+    "docs/reports/macos-breadcrumb-native/README.md": "ae7f1f118c7db71fec66758c8d517e049aeef9476e114923e10d1caba6df856d",
+    "drivers/cogent/cmd/breadcrumb-smoke/main_native.go": "ff86a33834a5070d9244fa666e09526f0aded43e6e5bfa02ebcf3c6283c70ee3",
+    "drivers/cogent/cmd/breadcrumb-smoke/main_other.go": "ad32d686f5ef498de921b394d50551419cb51ed2a40b39acd8390ffc63046670",
+    "drivers/cogent/cmd/breadcrumb-smoke/model.go": "26301dbcef61b009522f9bbe2603eb50309cfc9e783f6d137c2bd20cb6da40b1",
+    "drivers/cogent/cmd/breadcrumb-smoke/model_test.go": "8382daa50f78b7884065d891ae6290a04f02c3c7980f232a0dd32a78f8c22942",
+    "specs/breadcrumb.md": "33892ea393594cd188a43d5d38e0a230af07c4c887229ff932be2347b6f749b8"
+  },
+  "result": "PASS_SCOPED_NATIVE_BREADCRUMB",
+  "checks": {
+    "model-race": {
+      "receipt_sha256": "d65085fba219caf6aae63ce8236a3d972e388ec84bbee90ad794f2a7f747e130",
+      "exit_code": 0,
+      "elapsed_seconds": 2.23772562504746,
+      "argv": [
+        "go",
+        "test",
+        "-p=1",
+        "-tags=offscreen",
+        "-race",
+        "-count=1",
+        "./cmd/breadcrumb-smoke"
+      ]
+    },
+    "native-build": {
+      "receipt_sha256": "af934537de34ac97a7a39a37cf684dc6590d9aa9ce35dcc0c662c9c075eb15f5",
+      "exit_code": 0,
+      "elapsed_seconds": 18.714236083091237,
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-breadcrumb-native/breadcrumb-smoke",
+        "./cmd/breadcrumb-smoke"
+      ]
+    },
+    "native-vet": {
+      "receipt_sha256": "19a71f4718f3c03025df6321174e31b09a9111e898c53204de4d17110da094a5",
+      "exit_code": 0,
+      "elapsed_seconds": 3.6133164579514414,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=vellum_native_checks",
+        "./cmd/breadcrumb-smoke"
+      ]
+    },
+    "fault-build": {
+      "receipt_sha256": "d965ef7ac9fcef85dd3bca8a0e8baa90172a77b1fcf87ea813cbd5a54e51370d",
+      "exit_code": 0,
+      "elapsed_seconds": 7.4534866670146585,
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-overlay=/private/tmp/vellum-macos-breadcrumb-native/fault-overlay.json",
+        "-o",
+        "/private/tmp/vellum-macos-breadcrumb-native/breadcrumb-fault-path",
+        "./cmd/breadcrumb-smoke"
+      ]
+    },
+    "fault-current-build": {
+      "receipt_sha256": "7e24b69605213e1582586aa28317717cd06586c5e7d6e85b754eb6da9ac2c8de",
+      "exit_code": 0,
+      "elapsed_seconds": 7.428354250034317,
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-overlay=/private/tmp/vellum-macos-breadcrumb-native/fault-current-overlay.json",
+        "-o",
+        "/private/tmp/vellum-macos-breadcrumb-native/breadcrumb-fault-current",
+        "./cmd/breadcrumb-smoke"
+      ]
+    }
+  },
+  "native_observations": {
+    "native-positive": {
+      "receipt_sha256": "f06601c5e1fa567320ac38698f416da7136dbe6b140d3ad92eafe257cd538af6",
+      "executable_sha256": "43e34fe2dde8c46c90f0dea0551c6abf6bba82abadbff1bfd49f0e867b26cf1a",
+      "exit_code": 0,
+      "elapsed_seconds": 1.6714336660224944,
+      "steps": 12,
+      "cleanup_complete": true,
+      "detected_fault": false,
+      "non_detecting_fault_retained": false
+    },
+    "native-fault": {
+      "receipt_sha256": "5bcabcd732f0c785e496a72bbcc26edfce299fabc250e262bd5b84af508c4355",
+      "executable_sha256": "4eac981596075fb964acbad1e5fb41ae1988a29e672c4e85dc55b61b77190026",
+      "exit_code": 0,
+      "elapsed_seconds": 1.5184117500903085,
+      "steps": 12,
+      "cleanup_complete": true,
+      "detected_fault": false,
+      "non_detecting_fault_retained": true
+    },
+    "native-fault-current": {
+      "receipt_sha256": "f04b2401f86dd771fef2a5c9263b6e88f2d4cd0760cf3d3f45c6cf839f1f6c59",
+      "executable_sha256": "17336c921c07b6aa2bfa50e8076e0dc4c2a7b29fe4a1eb5a0519714499f742b3",
+      "exit_code": 1,
+      "elapsed_seconds": 6.0107334579806775,
+      "steps": 1,
+      "cleanup_complete": true,
+      "detected_fault": true,
+      "non_detecting_fault_retained": false
+    }
+  },
+  "prepared_files": 6216,
+  "prepared_changed": false,
+  "production_framework_changed": false,
+  "code_files": 4,
+  "positive_native_stages": 12,
+  "native_accepted_navigation_requests": 3,
+  "meaningful_faults_detected": 1,
+  "path_only_fault_detected": false,
+  "source_docs_added_after_runtime": true,
+  "consumed_code_unchanged": true,
+  "endurance_concurrent": true,
+  "latency_qualified": false,
+  "physical_input_qualified": false,
+  "human_voiceover_qualified": false,
+  "full_mac_qualified": false,
+  "legacy_source_map_sha256": "2470cbbae99432a923abc74e6e55040f8b45de659b73f2565139e8a32553fb3d",
+  "legacy_summary_sha256": "630bbf7e88f69ed6c6f00445fe7130835481945bfe12f3f55f7259f7e09c5b81",
+  "legacy_native_main_sha256": "e93b9340c4d55ed76d6f26d6d2fc9f6937d695ec384c633cc145bfc514005ca3",
+  "final_native_main_sha256": "ff86a33834a5070d9244fa666e09526f0aded43e6e5bfa02ebcf3c6283c70ee3",
+  "correction": "Failure-only stale admission reporting now derives actual bool. Final rebuilt positive has identical12stage observation bytes. Earlier role/path faults bind initial consumer source; corrected real missing-ID refusal records0.",
+  "corrected_checks": {
+    "corrected-native-build": {
+      "receipt_sha256": "001435d6693732b911fe4e9df7bcbb9dec60472e9c2397232799348aa6fd423e",
+      "exit_code": 0,
+      "elapsed_seconds": 2.9974831249564886,
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-breadcrumb-native/breadcrumb-smoke-corrected",
+        "./cmd/breadcrumb-smoke"
+      ]
+    },
+    "corrected-native-vet": {
+      "receipt_sha256": "addbd81db35c106c678958610f3e1f91678bacd44d56a705c407aa8ecfd87ed8",
+      "exit_code": 0,
+      "elapsed_seconds": 0.35962504195049405,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=vellum_native_checks",
+        "./cmd/breadcrumb-smoke"
+      ]
+    },
+    "report-fault-build-v2": {
+      "receipt_sha256": "0b325fe8b81810164b54523131b0bbcfbd95bfc04626d499f25c6bf842edfa71",
+      "exit_code": 0,
+      "elapsed_seconds": 2.9722495829919353,
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-overlay=/private/tmp/vellum-macos-breadcrumb-native/fault-admission-report-v2-overlay.json",
+        "-o",
+        "/private/tmp/vellum-macos-breadcrumb-native/breadcrumb-fault-report-v2",
+        "./cmd/breadcrumb-smoke"
+      ]
+    }
+  },
+  "corrected_native_observations": {
+    "native-positive-corrected": {
+      "receipt_sha256": "59d17b028fb0fde0d227b73094ef2fe0dc51619f42e52ec4f9b636dbb1f0ba10",
+      "executable_sha256": "c0c82fa13aa94746daae94c9ad206007885dd84fb61c5ffe229ad194bb2ef998",
+      "exit_code": 0,
+      "elapsed_seconds": 1.5109455839265138,
+      "stages": 12,
+      "cleanup_complete": true
+    },
+    "native-report-fault-v2": {
+      "receipt_sha256": "2bc0676d61b8e8cf497f61b8b9a2dd91ef6c73871f200d7b7f925252a4ad0bfe",
+      "executable_sha256": "4b25dac2715de0a3e73a33ff7eb475cda120f0279a1efa38d2855fac05e86d67",
+      "exit_code": 1,
+      "elapsed_seconds": 1.4032489579403773,
+      "stages": 5,
+      "cleanup_complete": true
+    }
+  },
+  "initial_report_fault_compile_only_excluded": true,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_review_sha256": "5932e2a8bd1c343c2ae619ccb73bb5cd55d29d221d6f30aba60fe3c53379eb4e",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 6,
+  "prism_findings": 0,
+  "prism_unresolved_findings": 0,
+  "prism_raw_exit_code": 0,
+  "prism_calls": 1,
+  "archive_sha256": "6cff1dd83c2523dc5801daa1d2debc76c48a2c5625a6effff2093e8dcfbf2315",
+  "archive_members": 85,
+  "archive_bytes": 345020,
+  "canonical_promoted": false
+}
