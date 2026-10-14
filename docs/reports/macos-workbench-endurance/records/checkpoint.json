@@ -1,0 +1,58 @@
+{
+  "result": "REVIEWED_MAC_WORKBENCH_ENDURANCE",
+  "base_commit": "26b8009ba082c35c5c90d8ee879811b5510d2dd1",
+  "source": {
+    "drivers/cogent/cmd/workbench/main.go": "1bb3e1e584042b3820789aff793a88d181d2e7c35ddee9098cf4016dd4ed0fbf",
+    "drivers/cogent/cmd/workbench/inspector.go": "849801871ff6d3c497396b1c2ffd93d2f2bd932403a78d196bc0596f189e5887",
+    "drivers/cogent/cmd/workbench/inspector_test.go": "f679eb0ccacf29ba46e59a14f74d984085f9227b45b1fa72a8842999d749b0e1",
+    "drivers/cogent/cmd/workbench/endurance.go": "3d43d978944c4af6698e418a96abad1bdcdbad86e904e92a2ee265129a731a76",
+    "drivers/cogent/cmd/workbench/endurance_test.go": "27b972b15f33f96018cf743e26facc1ba1f9c5d5115306222283ff9452454408",
+    "specs/workbench-endurance.md": "4cf53c668dea6f87142b16442ecaa7578644e29e1a83cc0109ab662e4c5c706e",
+    "specs/macos-completion.md": "1a0ca09053454ef7ece46885d34966649a22c33b043136faf45cab6dd9338f22",
+    "docs/reports/macos-workbench-endurance/README.md": "002699b3353bfff39778f9808ae723ca2365f6f7e8c3e4ba39a667b3ddfbd220"
+  },
+  "prepared_files": 6200,
+  "prepared_manifest_sha256": "c19ed6a2658d8acac06be39858b31876d5ebcf5d60bf79faaa4e8b4ef4225350",
+  "required_receipts": {
+    "focused-race-v6": "d8d3e4ea173abc35d160a20ae7e31e8d1d49b6ef85ad3f4cad67b01341b4caa6",
+    "adapter-race-v3": "ea23d900a56a168aa8cf1e7b8c151730aa278b093cba9f54f8d175b70de49b08",
+    "adapter-vet-v3": "e22c4311f4dcafb62382929b60ef5e623f2d8f23b36b243207b5b424fefe6f49",
+    "build-v11": "e8699eefd5534d334841d66cca6a75da8e27f62227798e06b02b3e752aa12552",
+    "native-short-v7": "770d35c2ac6ae64b2e40edad411a681d0f5112fbac7920ccf4942365fdf73c86",
+    "native-ten-minute-v1": "5d3d1b14bef361dd385cb9641afaa25aadcc61d5634da00c8fc4a582f7caa49c"
+  },
+  "native_qualification_sha256": "45c89df6a85e19b77da095fa888c01f07a295f5e828ca5e643c340e5f54ba240",
+  "profile_validation_sha256": "48a340d112e572c1c4b9c4c27793f0e5d48010925264b02dbb91c7b3cea0614d",
+  "original_v9_source_review_sha256": "272db09b7c99819e26bd284d598e26accda276df310939cbfa1a6533c77544c5",
+  "final_source_review_sha256": "fc51953033b9b13cf98b879e332f606fef93c93f274e18c961b8ecbbedfffe85",
+  "final_vs_ten_minute_delta": "Geometryrefusal cancellation andshutdown native-error preservation. Originalv9fiveleaves retained; finalv11shortnativepass. Steadyactivityunchanged; binary/sourcevectorsdistinct.",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_findings": 0,
+  "prism_original_findings": 1,
+  "prism_followup_raw_findings": 1,
+  "prism_rejected_finding_ids": [
+    "726b66507d7097be"
+  ],
+  "finding_disposition_sha256": "91b956b927fd8faf357d782703275e59276d7de5ecfd987303020b8f747ace44",
+  "prism_resolved_finding_ids": [
+    "baad453567de06cf"
+  ],
+  "prism_original_sha256": "5232eade04b802a993d5a44e5aaa8c9048f28a3876f4da5bbb45b5902eb02de4",
+  "prism_coverage_complete": true,
+  "prism_sha256": "ca204c4fd87f7baa6666e7ce5a9374582a3ac19102ab32dda83a8cee1e1039c3",
+  "full_p11_qualified": false,
+  "ordinary_frame_samples": 0,
+  "limits": [
+    "Profiled single composition run, not five ordinary latency runs or confidence/performance qualification.",
+    "Legacytable viewport/canvas mutations and commands run onowner; nativeAXrequests mayretry aftersemanticrevocation. Not physicalinput/noindividualdelivery guarantee.",
+    "Native/GPUallocation, droppedframes/inputbacklog/presentation unavailable; sampledRSS/physicalfootprint include driver/caches.",
+    "1000composed lifecycle, overnightidle, allacceptedcomponent/1000visiblecontrol primary andalternatephysicaldisplay gates stillopen."
+  ],
+  "archive_sha256": "057eb72a0fd3b634b752de18394d7c3b550e8cf485a7c2e6f5940ce5ed6e693d",
+  "index_sha256": "8a0444e34c5549c9f75ffc90fd1e4c6f211f8583699649e10bd82ff280bc00a9",
+  "archive_members": 183,
+  "archive_index_verified": true,
+  "qualification_sha256": "e886eaf8edc5d275510f72e31dbb2691731e8cd9052e9811ab03aa735b30e4e0",
+  "seal_producer_sha256": "50b105b735411f21d67514a7970eb1ff39b28bec67194cea8aa711e8ce31d089"
+}

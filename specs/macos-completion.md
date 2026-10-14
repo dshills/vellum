@@ -455,3 +455,14 @@ paired geometry and 17.2–20.0% lower pooled p95 UI work. Both binaries still f
 the unchanged 4 ms p95 / 6 ms p99 targets. This reduces measured host UI work
 without qualifying presentation, default CPU performance, physical GPU recovery,
 complete P6, integrated P11/endurance or Mac release acceptance.
+
+
+The [composed workbench checkpoint](../docs/reports/macos-workbench-endurance/README.md)
+adds editable inspector controls and a bounded native endurance mode. A single
+profiled ten-minute process with 1m records/100k outline nodes completes 2,384
+owner activity steps, 596 confirmed Cocoa edits and all 1,787 worker completions.
+Effective geometry alternates between 1280×900 and 1100×780. This is diagnostic
+composition evidence, not all-component/1,000-visible-control primary geometry,
+five ordinary latency runs, individual native request delivery, integrated 1,000
+lifecycle cycles or overnight/physical/presentation/full P11/Mac acceptance.
+The original P6 targets remain failed. See the [fixture contract](workbench-endurance.md).

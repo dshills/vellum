@@ -1,0 +1,47 @@
+# Composed native workbench endurance
+
+The Mac workbench has a dedicated `-endurance` mode. It requires a new clean
+absolute `-endurance-output` directory and a 10-second to 12-hour duration.
+Ten seconds is a preflight; at least ten minutes of activity is required for a
+steady composition trace. It refuses smoke, document-smoke, exit-after and
+semantic-server modes in the same process. Window geometry persistence is
+locally disabled. It changes no input source, VoiceOver or clipboard setting.
+
+The existing inspector demonstrates controlled value TextField, package
+RadioGroup, rotation SegmentedControl, disclosed FormGroup and StatusBar.
+Valid property changes use the same sparse document journal as commands and
+undo/redo. Integer values preserve the full uint32 range. Invalid requests
+leave accepted document/history unchanged; callbacks use the current owner
+selection. Disclosure expansion is transient UI state, outside document data.
+
+The composed fixture contains the indexed outline, pooled table, docked panels,
+command bar, GPU canvas, document/history and inspector controls. Every activity
+step selects a component, checks property replay, moves the table viewport,
+updates canvas fit/zoom and invalidates the native view. Periodic actual Cocoa
+value requests count only after observing the accepted domain value. Requests
+revoked by a newer semantic generation may retry within their fixed deadline.
+This proves eventual controlled edit acceptance, not loss-free delivery of every
+individual native request. Native resize requests and effective pixel/window
+manager dimensions are distinct observations.
+
+Allocating worker results use a captured revision, deterministic checksum and
+bounded task slots. Both fresh owner completion and stale-result refusal must
+occur. Worker termination and owner completion are joined before shutdown,
+including failure cleanup. Timed-out queued owner callbacks are revoked; an
+already executing callback is joined before closing its resources. Process
+watchdogs bound a broken native loop. Geometry reads hold the native window
+mutex and occur outside the application owner.
+
+Private outputs retain raw observations, a bounded 256 MiB Go execution trace
+and an 8 MiB final post-GC heap profile. Samples record Go memory/GC, goroutines,
+mailbox/task counts and effective geometry. Observation/profile overhead is part
+of this diagnostic run. Owner round-trip time is not frame UI work, presentation
+latency or CPU execution time. RSS/private/native/GPU observations need separate
+platform evidence; unavailable attribution must remain explicit.
+
+The complete original P11 remains required: all accepted components in one
+workspace, primary roughly 1,000 visible controls/text plus canvas at the stated
+logical geometry, five measured runs, cold/warm distinction, pacing/input/frame
+and native/GPU/resource budgets, 1,000 composed lifecycle cycles, overnight
+idle/background soak and the physical display variants. A passing bounded
+composition run alone does not satisfy that gate or the unchanged P6 targets.

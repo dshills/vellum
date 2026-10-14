@@ -33,8 +33,20 @@ func main() {
 	layoutPath := flag.String("layout", "", "layout file for explicit Save/Restore commands")
 	smoke := flag.Bool("smoke", false, "exercise registered actions and worker completion")
 	documentSmoke := flag.Bool("document-smoke", false, "exercise native unsaved-close and temporary document save/open")
+	enduranceDuration := flag.Duration("endurance", 0, "run composed workbench activity for 10s..12h (10m minimum for steady endurance evidence)")
+	enduranceOutput := flag.String("endurance-output", "", "new absolute private directory for endurance observations and trace")
 	automationEnabled := flag.Bool("automation", false, "enable private local semantic API and print its capability descriptor")
 	flag.Parse()
+	enduranceConfig := enduranceConfig{duration: *enduranceDuration, output: *enduranceOutput}
+	if err := enduranceConfig.validate(); err != nil {
+		must(err)
+	}
+	if *enduranceDuration > 0 && (*smoke || *documentSmoke || *exit > 0 || *automationEnabled) {
+		must(errors.New("endurance requires a dedicated process"))
+	}
+	if *enduranceDuration > 0 {
+		disableEnduranceGeometrySaver()
+	}
 	if *documentSmoke && (*smoke || *exit > 0) {
 		must(errors.New("document-smoke requires its own native process without smoke/exit-after"))
 	}
@@ -49,6 +61,7 @@ func main() {
 	}
 	parts := newParts(*rowCount)
 	selectedIndex := 0
+	inspectorExpanded := true
 	selectionRevision := uint64(1)
 	count := 0
 	status := "Ready"
@@ -317,16 +330,7 @@ func main() {
 				return ui.Node{ID: "board-a.root", Kind: ui.Column, Grow: true, FileDrop: referenceFiles, Children: []ui.Node{{ID: "board-a.canvas", Kind: ui.Extension, Grow: true, MinHeight: 240, Custom: gpuCanvas}, {ID: "board-a.table", Kind: ui.Extension, Grow: true, Custom: tableView}}}
 			}
 			if id == "inspector" {
-				row := parts.Row(selectedIndex)
-				return ui.Node{ID: "inspector.root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "inspector.reference", Kind: ui.Label, Text: row.Cells[0]}, {ID: "inspector.value", Kind: ui.Label, Text: "Value: " + row.Cells[1]}, {ID: "inspector.package", Kind: ui.Label, Text: "Package: " + row.Cells[2]}, {ID: "inspector.rotation", Kind: ui.Label, Text: "Rotation: " + row.Cells[3]}, {ID: "inspector.rotate", Kind: ui.Button, Text: "Rotate 90°", Activate: func() {
-					if err := registry.Invoke(a.Context(), "component.rotate"); err != nil {
-						status = err.Error()
-					}
-				}}, {ID: "inspector.raise", Kind: ui.Button, Text: "Increase value", Activate: func() {
-					if err := registry.Invoke(a.Context(), "component.raise-value"); err != nil {
-						status = err.Error()
-					}
-				}}}}
+				return inspectorView(parts, editor, inspectorExpanded, func(open bool) { inspectorExpanded = open }, func() int { return selectedIndex }, func(text string) { status = text })
 			}
 			return ui.Node{ID: id + ".root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: id + ".title", Kind: ui.Label, Text: text}, {ID: id + ".detail", Kind: ui.Label, Text: "Panel content · Vellum keyed UI"}}}
 		}})
@@ -509,10 +513,27 @@ func main() {
 			a.Invalidate("main")
 		})
 	}
+	var enduranceDone chan error
+	runContext := context.Background()
+	var endRun context.CancelFunc
+	if *enduranceDuration > 0 {
+		runContext, endRun = context.WithTimeout(runContext, *enduranceDuration+90*time.Second)
+		defer endRun()
+		enduranceDone = make(chan error, 1)
+		go func() {
+			enduranceDone <- runEndurance(runContext, a, enduranceConfig, registry, parts, table, board, gpuCanvas, manager, func() int { return selectedIndex })
+			endRun()
+		}()
+	}
 	if *exit > 0 {
 		time.AfterFunc(*exit, a.Close)
 	}
-	must(a.Run(context.Background(), cogent.Driver{Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16})}, Kinds: map[ui.Kind]ui.Style{ui.Row: {Gap: ui.Some(float32(8))}, ui.Column: {Gap: ui.Some(float32(8))}}}, Commands: registry, OnError: func(err error) { status = err.Error() }}))
+	runErr := a.Run(runContext, cogent.Driver{Theme: ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16})}, Kinds: map[ui.Kind]ui.Style{ui.Row: {Gap: ui.Some(float32(8))}, ui.Column: {Gap: ui.Some(float32(8))}}}, Commands: registry, OnError: func(err error) { status = err.Error() }})
+	if enduranceDone != nil {
+		endRun()
+		runErr = enduranceRunResult(runErr, enduranceDone, 10*time.Second)
+	}
+	must(runErr)
 	if *documentSmoke {
 		select {
 		case err := <-documentOutcome:
