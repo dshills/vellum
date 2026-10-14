@@ -424,3 +424,25 @@ The [coverage checkpoint](../docs/reports/macos-glyph-coverage/README.md) requir
 original pixel/packet, budget/fallback, ownership/eviction and actual-driver
 software composition parity. Diagnostic offscreen profiling does not establish
 native latency acceptance. GPU scene rendering remains opt-in.
+
+
+## Covered uniform GPU encoding
+
+The opt-in GPU adapter calls Packet.EncodeGPU. Only a detached Uniform Src
+immediately followed by an opaque Uniform Over with the same clipped rectangle
+may be omitted from the encoding. All original commands have already passed
+Builder validation and snapshotting. Encoding charges the original operation
+count, encoded bytes and tile references before allocating compacted output;
+compaction cannot revive an originally refused batch. Retained tile rows and
+operation IDs describe the emitted stream exactly. Packet operations, Bytes,
+Independent, Winding and CPU Replay are unchanged. Packet.Encode retains original
+bytes for comparison and other callers.
+
+Scalar tile-outer execution of the serialized ABI checks exact mixed image, mask,
+span and uniform pixels. Actual-driver software capture compares 48 complete
+composition frames at DPI 96/120/144/192, fixed/variable rows and mixed-axis scroll.
+The 400-cell frame removes 417 operations and 149,184 bytes; all frames remove
+193–477 operations. These are work/payload reductions, not native frame timings.
+Native compute and paired representative latency must be rerun during an
+explicit quiet-machine window before this can qualify the unchanged 4/6 ms
+targets. See [the scoped report](../docs/reports/macos-gpu-covered/README.md).

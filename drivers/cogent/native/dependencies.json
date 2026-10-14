@@ -540,6 +540,17 @@
               "sha256": "949a0184fe59cab10dc2497d8e40b74bb80e23cbd2da2f39f72b0b31381ca177"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/gpucovered",
+          "inputs": "native/patches/gpucovered/original-hashes.json",
+          "outputs": "native/patches/gpucovered/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/gpucovered/0057-covered-uniform-gpu-encoding.patch",
+              "sha256": "2fdc5b2bb51df0ba07e6a303707d32426b9a9f2f7acedb9c5554819ffaab04a9"
+            }
+          ]
         }
       ]
     },

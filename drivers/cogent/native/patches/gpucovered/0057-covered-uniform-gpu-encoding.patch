@@ -1,0 +1,473 @@
+--- a/paint/renderers/sceneplan/packet.go
++++ b/paint/renderers/sceneplan/packet.go
+@@ -132,16 +132,39 @@
+ 	}
+ 	return dst
+ }
+-func (p *Packet) Encode() (*Encoded, bool) {
++
++// Encode preserves every accepted operation in its original order.
++func (p *Packet) Encode() (*Encoded, bool) { return p.encode(false) }
++
++// EncodeGPU omits an owned uniform Src immediately overwritten by an equal
++// rectangle opaque uniform Over. Admission still charges every original operation,
++// encoded byte and tile reference. Packet replay, accounting and reset proof are
++// unchanged; the encoded result owns compact operation IDs and tile references.
++func (p *Packet) EncodeGPU() (*Encoded, bool) { return p.encode(true) }
++
++func (p *Packet) coveredClear(i int) bool {
++	if i+1 >= len(p.ops) {
++		return false
++	}
++	a, b := p.ops[i], p.ops[i+1]
++	return a.kind == Uniform && b.kind == Uniform && a.op == draw.Src && b.op == draw.Over &&
++		a.rect == b.rect && b.color[3] == 65535
++}
++
++func (p *Packet) encode(compact bool) (*Encoded, bool) {
+ 	if p == nil || len(p.ops) > MaxOps {
+ 		return nil, false
+ 	}
+ 	tiles := image.Pt((p.bounds.Dx()+TileSize-1)/TileSize, (p.bounds.Dy()+TileSize-1)/TileSize)
+ 	counts := make([]int, tiles.X*tiles.Y)
+ 	masks := make(map[*image.Alpha]uint32)
+-	dataBytes, refs := 0, 0
++	dataBytes, refs, retainedRefs, retainedOps := 0, 0, 0, 0
+ 	// Validate exact encoded sizes and bin counts before allocating any output.
+-	for _, o := range p.ops {
++	for i, o := range p.ops {
++		keep := !compact || !p.coveredClear(i)
++		if keep {
++			retainedOps++
++		}
+ 		if o.mask != nil {
+ 			if _, ok := masks[o.mask]; !ok {
+ 				masks[o.mask] = uint32(dataBytes / 4)
+@@ -162,7 +185,10 @@
+ 				if refs == MaxTileReferences {
+ 					return nil, false
+ 				}
+-				counts[y*tiles.X+x]++
++				if keep {
++					counts[y*tiles.X+x]++
++					retainedRefs++
++				}
+ 				refs++
+ 			}
+ 		}
+@@ -170,7 +196,7 @@
+ 			return nil, false
+ 		}
+ 	}
+-	e := &Encoded{Tiles: tiles, Ops: make([]byte, 0, max(4, len(p.ops)*opWords*4)), Rows: make([]byte, 0, len(counts)*8), Refs: make([]byte, max(4, refs*4)), Data: make([]byte, 0, max(4, dataBytes))}
++	e := &Encoded{Tiles: tiles, Ops: make([]byte, 0, max(4, retainedOps*opWords*4)), Rows: make([]byte, 0, len(counts)*8), Refs: make([]byte, max(4, retainedRefs*4)), Data: make([]byte, 0, max(4, dataBytes))}
+ 	// Once each count has been copied into Rows, its slot becomes fill scratch.
+ 	positions := counts
+ 	offset := 0
+@@ -181,7 +207,11 @@
+ 		offset += count
+ 	}
+ 	clear(masks)
++	encodedIndex := uint32(0)
+ 	for i, o := range p.ops {
++		if compact && p.coveredClear(i) {
++			continue
++		}
+ 		words := [opWords]uint32{uint32(o.rect.Min.X), uint32(o.rect.Min.Y), uint32(o.rect.Max.X), uint32(o.rect.Max.Y), o.color[0], o.color[1], o.color[2], o.color[3], o.kind, uint32(o.op), 0, 0, ^uint32(0), 0, 0, 0}
+ 		if o.mask != nil {
+ 			at, ok := masks[o.mask]
+@@ -221,10 +251,11 @@
+ 		for y := o.rect.Min.Y / TileSize; y <= (o.rect.Max.Y-1)/TileSize; y++ {
+ 			for x := o.rect.Min.X / TileSize; x <= (o.rect.Max.X-1)/TileSize; x++ {
+ 				bin := y*tiles.X + x
+-				binary.LittleEndian.PutUint32(e.Refs[positions[bin]*4:], uint32(i))
++				binary.LittleEndian.PutUint32(e.Refs[positions[bin]*4:], encodedIndex)
+ 				positions[bin]++
+ 			}
+ 		}
++		encodedIndex++
+ 	}
+ 	if len(e.Ops) == 0 {
+ 		e.Ops = e.Ops[:4]
+--- a/paint/renderers/gpuscene/renderer.go
++++ b/paint/renderers/gpuscene/renderer.go
+@@ -231,7 +231,7 @@
+ 		if packet == nil {
+ 			return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: unsupported or over-budget paint batch"))
+ 		}
+-		encoded, ok = packet.Encode()
++		encoded, ok = packet.EncodeGPU()
+ 		if !ok {
+ 			return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: encoded paint exceeds limits"))
+ 		}
+--- /dev/null
++++ b/paint/renderers/sceneplan/covered_encoding_test.go
+@@ -0,0 +1,287 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"encoding/binary"
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"reflect"
++	"testing"
++	"unsafe"
++)
++
++// Tile-outer scalar execution reads the serialized ABI rather than Packet.ops.
++// Arithmetic follows the pinned integer shader; it creates no GPU device.
++func replayEncodedGPU(t *testing.T, e *Encoded, dst *image.RGBA) {
++	t.Helper()
++	word := func(b []byte, i uint32) uint32 { return binary.LittleEndian.Uint32(b[int(i)*4:]) }
++	blend := func(dst, src, alpha, coverage uint32, over bool) uint32 {
++		if !over {
++			return (src * coverage / 16776960) & 255
++		}
++		a := (65535 - alpha*coverage/65535) * 257
++		return ((dst*a + src*coverage) / 16776960) & 255
++	}
++	for y := 0; y < dst.Rect.Dy(); y++ {
++		for x := 0; x < dst.Rect.Dx(); x++ {
++			tile := uint32((y/TileSize)*e.Tiles.X + x/TileSize)
++			start := word(e.Rows, tile*2)
++			count := word(e.Rows, tile*2+1)
++			at := dst.PixOffset(x, y)
++			for ri := start; ri < start+count; ri++ {
++				oi := word(e.Refs, ri) * opWords
++				minX, minY := int(word(e.Ops, oi)), int(word(e.Ops, oi+1))
++				if x < minX || y < minY || x >= int(word(e.Ops, oi+2)) || y >= int(word(e.Ops, oi+3)) {
++					continue
++				}
++				kind, over := word(e.Ops, oi+8), word(e.Ops, oi+9) == uint32(draw.Over)
++				src := [4]uint32{word(e.Ops, oi+4), word(e.Ops, oi+5), word(e.Ops, oi+6), word(e.Ops, oi+7)}
++				if kind == Spans {
++					row := word(e.Ops, oi+10) + uint32(y-minY)*2
++					s0, n := word(e.Data, row), word(e.Data, row+1)
++					for si := s0; si < s0+n*3; si += 3 {
++						if uint32(x) >= word(e.Data, si) && uint32(x) < word(e.Data, si+1) {
++							for ch := 0; ch < 4; ch++ {
++								dst.Pix[at+ch] = byte(blend(uint32(dst.Pix[at+ch]), src[ch], src[3], word(e.Data, si+2), over))
++							}
++						}
++					}
++					continue
++				}
++				if kind == Pixels {
++					v := word(e.Data, word(e.Ops, oi+10)+uint32(y-minY)*word(e.Ops, oi+11)+uint32(x-minX))
++					for ch := 0; ch < 4; ch++ {
++						src[ch] = ((v >> uint(ch*8)) & 255) * 257
++					}
++				}
++				mask := word(e.Ops, oi+12)
++				if mask != ^uint32(0) {
++					byteAt := (uint32(y-minY)+word(e.Ops, oi+15))*word(e.Ops, oi+13) + uint32(x-minX) + word(e.Ops, oi+14)
++					a := ((word(e.Data, mask+byteAt/4) >> ((byteAt % 4) * 8)) & 255) * 257
++					for ch := 0; ch < 4; ch++ {
++						dst.Pix[at+ch] = byte(blend(uint32(dst.Pix[at+ch]), src[ch], src[3], a, over))
++					}
++				} else {
++					for ch := 0; ch < 4; ch++ {
++						v := src[ch]
++						if over {
++							v = (uint32(dst.Pix[at+ch])*(65535-src[3])*257/65535 + src[ch])
++						}
++						dst.Pix[at+ch] = byte(v >> 8)
++					}
++				}
++			}
++		}
++	}
++}
++
++func TestVellumScenePlanGPUCoveredMixedOracle(t *testing.T) {
++	random := rand.New(rand.NewSource(9057))
++	for trial := 0; trial < 100; trial++ {
++		// The independent expected stream is an existing mixed fixture. Only explicit
++		// inserted clears are removable; all other original mask/pixel/span bytes stay.
++		want := stagingFixture(129, true)
++		expanded := *want
++		expanded.ops = nil
++		removed := 0
++		for _, o := range want.ops {
++			if o.kind == Uniform && o.op == draw.Over && o.color[3] == 65535 {
++				clear := o
++				clear.op = draw.Src
++				clear.color = [4]uint32{0, 0, 0, 0}
++				expanded.ops = append(expanded.ops, clear)
++				removed++
++			}
++			expanded.ops = append(expanded.ops, o)
++		}
++		original, ok := expanded.Encode()
++		if !ok {
++			t.Fatal("original refused")
++		}
++		before := stagingDigest(&expanded)
++		e, ok := expanded.EncodeGPU()
++		oracle, _ := want.Encode()
++		if !ok || !reflect.DeepEqual(e, oracle) || removed == 0 {
++			t.Fatal("compact ABI differs from independent original stream", trial)
++		}
++		if len(e.Ops) != len(original.Ops)-removed*opWords*4 {
++			t.Fatal("no exact operation reduction")
++		}
++		seed := image.NewRGBA(want.bounds)
++		random.Read(seed.Pix)
++		got := image.NewRGBA(seed.Rect)
++		copy(got.Pix, seed.Pix)
++		if !expanded.Replay(seed) {
++			t.Fatal("original replay refused")
++		}
++		replayEncodedGPU(t, e, got)
++		if !bytes.Equal(got.Pix, seed.Pix) {
++			t.Fatal("serialized tile execution changed pixels", trial)
++		}
++		// A second encoding is detached from both the packet and a previous encoding.
++		saved := append([]byte(nil), e.Refs...)
++		clear(e.Ops)
++		again, _ := expanded.EncodeGPU()
++		if !reflect.DeepEqual(again, oracle) || !bytes.Equal(e.Refs, saved) || stagingDigest(&expanded) != before || expanded.Independent() != want.Independent() {
++			t.Fatal("encoding mutated packet or held result")
++		}
++	}
++}
++
++func TestVellumScenePlanGPUCoveredBoundaries(t *testing.T) {
++	bounds := image.Rect(0, 0, 35, 33)
++	for _, tc := range []struct {
++		name            string
++		rect            image.Rectangle
++		alpha           uint16
++		op              draw.Op
++		mask, interrupt bool
++		removed         int
++	}{
++		{"opaque", image.Rect(1, 2, 20, 19), 65535, draw.Over, false, false, 1},
++		{"clipped", image.Rect(-4, -2, 40, 37), 65535, draw.Over, false, false, 1},
++		{"full-default", image.Rectangle{}, 65535, draw.Over, false, false, 1},
++		{"almost-opaque", bounds, 65534, draw.Over, false, false, 0},
++		{"src", bounds, 65535, draw.Src, false, false, 0},
++		{"masked", bounds, 65535, draw.Over, true, false, 0},
++		{"intervening-span", bounds, 65535, draw.Over, false, true, 0},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			b := New(bounds)
++			u := image.NewUniform(color.NRGBA64{17, 31, 63, 511})
++			b.Draw(tc.rect, u, image.Pt(7, 9), nil, image.Pt(-2, 3), draw.Src)
++			if tc.interrupt {
++				b.BeginSpans(color.RGBA{1, 3, 5, 7}, draw.Over)
++				b.Span(4, 0, 5, 32768)
++			}
++			var mask image.Image
++			if tc.mask {
++				m := image.NewAlpha(bounds)
++				for i := range m.Pix {
++					m.Pix[i] = 255
++				}
++				mask = m
++			}
++			b.Draw(tc.rect, image.NewUniform(color.NRGBA64{333, 1777, 6333, tc.alpha}), image.Pt(-7, -9), mask, image.Point{}, tc.op)
++			p := b.Seal(true)
++			if p == nil {
++				t.Fatal("valid fixture refused")
++			}
++			u.C = color.RGBA{255, 0, 0, 255}
++			old, ok := p.Encode()
++			if !ok {
++				t.Fatal("original encode refused")
++			}
++			e, ok := p.EncodeGPU()
++			if !ok || len(e.Ops) != len(old.Ops)-tc.removed*opWords*4 {
++				t.Fatal("wrong compact operation count")
++			}
++			seed := image.NewRGBA(bounds)
++			for i := range seed.Pix {
++				seed.Pix[i] = byte(i*71 + 3)
++			}
++			got := image.NewRGBA(bounds)
++			copy(got.Pix, seed.Pix)
++			p.Replay(seed)
++			replayEncodedGPU(t, e, got)
++			if !bytes.Equal(seed.Pix, got.Pix) {
++				t.Fatal("boundary serialized pixels changed")
++			}
++			if tc.removed == 0 && !reflect.DeepEqual(e, old) {
++				t.Fatal("ineligible pair encoded bytes changed")
++			}
++		})
++	}
++	empty := New(bounds).Seal(false)
++	a, _ := empty.Encode()
++	b, _ := empty.EncodeGPU()
++	if !reflect.DeepEqual(a, b) {
++		t.Fatal("empty encoding changed")
++	}
++	var nilPacket *Packet
++	if e, ok := nilPacket.EncodeGPU(); e != nil || ok {
++		t.Fatal("nil packet admitted")
++	}
++	// Unequal rectangles and Src/Src/Over chains only drop the final covered Src.
++	bld := New(bounds)
++	bld.Draw(bounds, image.Black, image.Point{}, nil, image.Point{}, draw.Src)
++	bld.Draw(bounds.Inset(1), image.Black, image.Point{}, nil, image.Point{}, draw.Src)
++	bld.Draw(bounds.Inset(1), image.White, image.Point{}, nil, image.Point{}, draw.Over)
++	p := bld.Seal(false)
++	e, _ := p.EncodeGPU()
++	if len(e.Ops) != 2*opWords*4 || p.Operations() != 3 || !p.Independent() {
++		t.Fatal("chain changed original accounting/reset")
++	}
++}
++
++func TestVellumScenePlanGPUCoveredOriginalLimits(t *testing.T) {
++	bounds := image.Rect(0, 0, 8192, 2048)
++	for _, n := range []int{32, 33} {
++		b := New(bounds)
++		for i := 0; i < n; i++ {
++			b.Draw(bounds, image.White, image.Point{}, nil, image.Point{}, draw.Op(1-i%2))
++		}
++		p := b.Seal(false)
++		if p == nil {
++			t.Fatal("bounded builder unexpectedly refused")
++		}
++		_, oldOK := p.Encode()
++		e, newOK := p.EncodeGPU()
++		if oldOK != newOK || newOK != (n == 32) {
++			t.Fatal("original tile-reference admission changed", n)
++		}
++		if newOK && len(e.Ops) != 16*opWords*4 {
++			t.Fatal("exact reference boundary not compacted")
++		}
++	}
++	// A real builder packet fits retained bytes but exceeds encoded bytes because
++	// tile references and headers add to a large image+mask. Covered draws cannot
++	// rescue this refusal. Mask snapshots are charged by their full validated size.
++	bounds = image.Rect(0, 0, 3072, 2048)
++	b := New(bounds)
++	for i := 0; i < 42; i++ {
++		b.Draw(bounds, image.White, image.Point{}, nil, image.Point{}, draw.Op(1-i%2))
++	}
++	img := image.NewRGBA(bounds)
++	mask := image.NewAlpha(image.Rect(0, 0, 2048, 2048))
++	b.Draw(image.Rect(0, 0, 1, 1), image.White, image.Point{}, mask, image.Point{}, draw.Over)
++	b.Draw(bounds, img, image.Point{}, nil, image.Point{}, draw.Src)
++	p := b.Seal(false)
++	if p == nil || p.Bytes() > MaxBytes {
++		t.Fatal("retained-byte fixture refused")
++	}
++	if _, ok := p.Encode(); ok {
++		t.Fatal("original encoded-byte fixture did not refuse")
++	}
++	if _, ok := p.EncodeGPU(); ok {
++		t.Fatal("covered clear revived encoded-byte refusal")
++	}
++	for _, count := range []int{MaxOps, MaxOps + 1} {
++		b := New(image.Rect(0, 0, 1, 1))
++		for i := 0; i < count; i++ {
++			b.Draw(b.packet.bounds, image.White, image.Point{}, nil, image.Point{}, draw.Op(1-i%2))
++		}
++		p := b.Seal(false)
++		if count > MaxOps {
++			if p != nil {
++				t.Fatal("logical op limit revived")
++			}
++			continue
++		}
++		e, ok := p.EncodeGPU()
++		if !ok || p.Operations() != MaxOps || len(e.Ops) != MaxOps/2*opWords*4 {
++			t.Fatal("exact op limit changed")
++		}
++	}
++	b = New(image.Rect(0, 0, 1, 1))
++	b.packet.bytes = MaxBytes - int(unsafe.Sizeof(operation{}))
++	b.Draw(b.packet.bounds, image.Black, image.Point{}, nil, image.Point{}, draw.Src)
++	b.Draw(b.packet.bounds, image.White, image.Point{}, nil, image.Point{}, draw.Over)
++	if !b.Failed() || b.Seal(false) != nil {
++		t.Fatal("covered clear revived builder byte refusal")
++	}
++}
+--- a/paint/renderers/gpuscene/native_test.go
++++ b/paint/renderers/gpuscene/native_test.go
+@@ -158,7 +158,7 @@
+ 				if packet == nil {
+ 					t.Fatal("native fixture refused", batch)
+ 				}
+-				encoded, ok := packet.Encode()
++				encoded, ok := packet.EncodeGPU()
+ 				if !ok {
+ 					t.Fatal("native fixture encoding refused")
+ 				}
+@@ -345,7 +345,7 @@
+ 			if packet == nil {
+ 				t.Fatal("real outline/path scene refused", transform, repeat)
+ 			}
+-			encoded, ok := packet.Encode()
++			encoded, ok := packet.EncodeGPU()
+ 			if !ok {
+ 				t.Fatal("real scene encoding refused")
+ 			}
+@@ -353,7 +353,7 @@
+ 			if warmPacket == nil {
+ 				t.Fatal("cache warmth changed real scene admission")
+ 			}
+-			warmEncoded, warmOK := warmPacket.Encode()
++			warmEncoded, warmOK := warmPacket.EncodeGPU()
+ 			if !warmOK || !reflect.DeepEqual(encoded, warmEncoded) {
+ 				t.Fatal("cold/warm real scene encoded bytes differ")
+ 			}
+@@ -370,3 +370,51 @@
+ 		}
+ 	}
+ }
++
++func TestVellumGPUSceneNativeCoveredUniforms(t *testing.T) {
++	_, dev := nativeDevice(t)
++	size := image.Pt(35, 33)
++	res := &resources{}
++	defer res.release()
++	reserve := func(n uint64) error {
++		if n > 128<<20 {
++			return fmt.Errorf("test budget")
++		}
++		return nil
++	}
++	if err := res.initialize(dev, size, reserve); err != nil {
++		t.Fatal(err)
++	}
++	want := image.NewRGBA(image.Rectangle{Max: size})
++	for frame := 0; frame < 12; frame++ {
++		b := sceneplan.New(want.Rect)
++		rect := image.Rect(frame%7, frame%5, 27, 29)
++		if frame == 0 {
++			rect = want.Rect
++		}
++		b.Draw(rect, image.NewUniform(color.RGBA{1, 3, 5, 7}), image.Point{}, nil, image.Point{}, draw.Src)
++		b.Draw(rect, image.NewUniform(color.NRGBA64{333, 1777, 6333, 65535}), image.Point{}, nil, image.Point{}, draw.Over)
++		b.BeginSpans(color.RGBA{13, 19, 31, 71}, draw.Over)
++		b.Span(2, 0, 31, 32767)
++		p := b.Seal(frame%2 == 0)
++		if p == nil {
++			t.Fatal("fixture refused")
++		}
++		original, ok := p.Encode()
++		if !ok {
++			t.Fatal("original encoding refused")
++		}
++		encoded, ok := p.EncodeGPU()
++		if !ok || len(encoded.Ops) != len(original.Ops)-64 {
++			t.Fatal("covered pair was not compacted")
++		}
++		if err := res.render(encoded, reserve); err != nil {
++			t.Fatal(err)
++		}
++		p.Replay(want)
++		got := readTexture(t, dev, res.texture)
++		if !bytes.Equal(got.Pix, want.Pix) {
++			t.Fatal("native compacted partial output differs", frame)
++		}
++	}
++}

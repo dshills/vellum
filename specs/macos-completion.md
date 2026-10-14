@@ -644,3 +644,16 @@ visual and inert Cocoa selector checks qualify the tested source behavior.
 Internal review and the selected Anthropic Prism checkpoint remain required.
 Human screen-reader, physical menu/input and full Mac acceptance remain open;
 live tests remain paused while the human uses the machine.
+
+
+The owned stage-57 GPU encoder removes validated covered uniform clears while
+preserving original admission and packet reconstruction. A 48-frame actual-driver
+software matrix matches every full-composition pixel and removes 193–477 encoded
+operations per frame. Original limit boundaries, frozen Encode digests, serialized
+tile order, detached results and three faulty variants are checked. Gated native
+integer/text tests now exercise the compact route, with a dedicated partial-frame
+regression; they compile but have not run while the human uses the machine.
+This does not qualify native GPU pixels, timing or memory. GPU rendering remains
+opt-in, original P6 frame targets still fail, and full P6/P11, fresh complete
+retention, physical input/displays, human accessibility and distribution remain
+open. [Scoped evidence](../docs/reports/macos-gpu-covered/README.md).
