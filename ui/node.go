@@ -27,7 +27,7 @@ const (
 // generated grid cell/row/header identities. The tree: prefix similarly reserves
 // managed outline row/disclosure/page targets. split: reserves native divider
 // targets. disclosure: reserves native section-heading targets. These prefixes
-// are refused in descriptions.
+// are refused in descriptions. tab-close: reserves private document-tab close targets.
 // A View returns a fresh description;
 // callbacks run on the application owner. Custom holds driver-specific content.
 type Node struct {
@@ -74,6 +74,7 @@ type Node struct {
 	Orientation   Orientation
 	Options       []Option
 	SelectedID    string
+	TabClose      func(TabCloseEvent)
 	Change        func(ChangeEvent)
 	Accessibility Accessibility
 	Focus         FocusRequest
@@ -108,6 +109,9 @@ func Validate(root Node) error {
 		}
 		if strings.HasPrefix(n.ID, "menu:") {
 			return fmt.Errorf("ui: ID %q uses reserved menu: prefix", n.ID)
+		}
+		if strings.HasPrefix(n.ID, "tab-close:") {
+			return fmt.Errorf("ui: ID %q uses reserved tab-close: prefix", n.ID)
 		}
 		seen[n.ID] = true
 		if n.Kind == MultilineText {

@@ -551,6 +551,17 @@
               "sha256": "2fdc5b2bb51df0ba07e6a303707d32426b9a9f2f7acedb9c5554819ffaab04a9"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/tabclose",
+          "inputs": "native/patches/tabclose/original-hashes.json",
+          "outputs": "native/patches/tabclose/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/tabclose/0058-controlled-tab-close-admission.patch",
+              "sha256": "4446b4f0b7ba050bf61486e15350f4085fbd08b6ef9d3427432fd68845fae66d"
+            }
+          ]
         }
       ]
     },

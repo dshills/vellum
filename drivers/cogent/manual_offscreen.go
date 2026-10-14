@@ -842,6 +842,26 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: popup.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Value: value, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
 				}
 			}
+			if visible && r.control != nil && r.control.tabs != nil {
+				for _, o := range r.node.Options {
+					if !o.Closable {
+						continue
+					}
+					binding := r.control.tabs.bindings[o.ID]
+					if binding.manualIncarnation == 0 {
+						if w.nextRecord == math.MaxUint64 {
+							gridCaptureErr = ErrManualConfig
+							return
+						}
+						w.nextRecord++
+						binding.manualIncarnation = w.nextRecord
+					}
+					id := tabCloseID(r.node.ID, o.ID)
+					b := bounds[id]
+					box := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
+					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: binding.manualIncarnation, Kind: ui.Button, Name: "Close " + o.Label, Enabled: tabCloseEnabled(r, o.ID, binding), Visible: true, Bounds: box})
+				}
+			}
 			if r.control != nil && r.control.disclosure != nil {
 				id := accessibilityDisclosureID(r.node.ID)
 				heading := r.control.disclosure.header

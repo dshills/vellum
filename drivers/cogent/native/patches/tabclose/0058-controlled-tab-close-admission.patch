@@ -1,0 +1,75 @@
+--- a/core/tabs.go
++++ b/core/tabs.go
+@@ -460,6 +460,11 @@
+ 	// tabs will not render a close button and can not be closed.
+ 	CloseIcon icons.Icon
+ 
++	// CloseRequest, when nonnil, owns close admission instead of native deletion.
++	// The managed caller must retain a guarded callback through retirement. Nil
++	// preserves ordinary unmanaged FunctionalTabs close behavior.
++	CloseRequest func(*Button)
++
+ 	// TODO(kai): replace this with general text overflow property (#778)
+ 
+ 	// maxChars is the maximum number of characters to include in tab text.
+@@ -548,6 +553,11 @@
+ 					s.Border.Radius = styles.BorderRadiusFull
+ 				})
+ 				w.OnClick(func(e events.Event) {
++					if tb.CloseRequest != nil {
++						e.SetHandled()
++						tb.CloseRequest(w)
++						return
++					}
+ 					ts := tb.tabs()
+ 					idx := ts.tabIndexByName(tb.Name)
+ 					// if OnlyCloseActiveTab is on, only process delete when already selected
+--- /dev/null
++++ b/core/tabs_close_request_vellum_test.go
+@@ -0,0 +1,46 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"image"
++	"testing"
++)
++
++func TestVellumTabCloseRequestOwnsDeletionBeforeParentLookup(t *testing.T) {
++	tabs := NewTabs(NewBody("close request")).SetType(FunctionalTabs)
++	_, a := tabs.NewTab("a")
++	_, b := tabs.NewTab("b")
++	tabs.SelectTabByName("a")
++	called := 0
++	b.CloseRequest = func(origin *Button) {
++		called++
++		if origin != b.AsTree().ChildByName("close") {
++			t.Error("wrong private button origin")
++		}
++	}
++	b.UpdateWidget()
++	close := b.AsTree().ChildByName("close").(*Button)
++	e := events.NewMouse(events.Click, events.Left, image.Point{}, 0)
++	close.HandleEvent(e)
++	current, _ := tabs.CurrentTab()
++	if called != 1 || !e.IsHandled() || tabs.NumTabs() != 2 || current.AsTree().Name != "a" {
++		t.Fatal("controlled close selected/deleted native page", called, e.IsHandled(), tabs.NumTabs())
++	}
++	// The seam precedes parent lookup, including a delayed event after detaching
++	// the native Tab. A held callback can still identify its own private button.
++	parent := b.Parent
++	b.Parent = nil
++	close.HandleEvent(events.NewMouse(events.Click, events.Left, image.Point{}, 0))
++	b.Parent = parent
++	if called != 2 {
++		t.Fatal("detached close callback failed")
++	}
++	// Unmanaged nil seam preserves the existing active-tab deletion route.
++	a.UpdateWidget()
++	a.AsTree().ChildByName("close").(*Button).Send(events.Click)
++	if tabs.NumTabs() != 1 {
++		t.Fatal("nil close seam changed unmanaged behavior")
++	}
++}

@@ -27,7 +27,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Decorative separator | `ui.Separator` | `Orientation` |
 | Managed data grid | `ui.DataGrid` | `Grid`, `GridChange`, `GridCommit` |
 | Managed outline | `ui.DataTree` | `Tree`, `TreeChange`, `TreeDisclosure` |
-| Tabs | `ui.Tabs` | `Options`, `SelectedID`, page children |
+| Tabs / closable document tabs | `ui.Tabs` | `Options.Closable`, `SelectedID`, `TabClose`, page children |
 | Scroll container | `ui.Scroll` | Children |
 | Modal dialog | `ui.Dialog` | `Open`, `Dismiss`, children |
 | Toolbar | `ui.Toolbar` | Children, `Orientation`, scrolling overflow |
@@ -246,3 +246,13 @@ to MenuButton Options. The gallery's Icons and actions page includes View option
 The [check-action checkpoint](reports/macos-menu-checks/README.md) records the
 software routing, visual and inert Cocoa checks; physical input and human
 VoiceOver remain separate acceptance work.
+
+Use closable Tabs for document workspaces. Set Closable on individual options and
+handle TabClose with the Tabs node ID and stable PageID. The handler accepts by
+removing the matching option/page and selecting a remaining page; leave state
+unchanged to reject. Closing the last page must replace/remove the Tabs node.
+Native pages and drafts remain intact until the accepted view removes them.
+Delete/Backspace on a focused tab and its visible close button request the same
+owner decision. Application command shortcuts remain available. The gallery's
+Document tabs page demonstrates rejection, reopening and the empty last-page state.
+See [the contract](../specs/tab-close.md) for lifetime and accessibility details.

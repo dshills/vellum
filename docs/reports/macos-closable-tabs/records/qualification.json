@@ -1,0 +1,225 @@
+{
+  "result": "REVIEWED_CONTROLLED_TAB_CLOSE",
+  "base_commit": "2de76d21c86bbf050ecea11be315fa538625ff4c",
+  "sources": {
+    "docs/controls.md": "0fef56d3ca27010fd9e3f85e79ef9815b9cd142f900cadba96520136f9d318b5",
+    "docs/reports/macos-closable-tabs/README.md": "7ac0662ac97fd59c3a7b69624da75c6ff746545c4c216297f4ae248ba83fbecf",
+    "drivers/cogent/accessibility.go": "76f93c7bff8ca734df68984690e13c64fb151e0192ffb0c1929e9c342e052fd6",
+    "drivers/cogent/cmd/gallery/documents.go": "a6b4c431ae798fe41c7385dd206382936113551c36b8435ee4540112f8188481",
+    "drivers/cogent/cmd/gallery/documents_test.go": "52b6156e0ced9188c920c1e3ea28167ac8059b30394e3a2f21f20c4dece9fccc",
+    "drivers/cogent/cmd/gallery/main.go": "ab1708b0643a8736a76ab78c0806b4a01c52b8879bb01db06bf9c740fdca7f6d",
+    "drivers/cogent/controls.go": "ffaaa670fc97c4496654cbee3492590064d5682734b1c3450fb4bf3399564e5c",
+    "drivers/cogent/driver.go": "c4985ef719725a79b51d9b7824be6f732f0f3660c7ac38c270ce9f8617d9882e",
+    "drivers/cogent/manual_offscreen.go": "668f2a0f8b59191452cd3094eb82fcc9ffb877fed316665bd761057add4a2a89",
+    "drivers/cogent/native/dependencies.json": "15afab274c8337782f18dde74d5e1114d2fe088c1692db50776a0beb4a35bab0",
+    "drivers/cogent/native/patches/tabclose/0058-controlled-tab-close-admission.patch": "4446b4f0b7ba050bf61486e15350f4085fbd08b6ef9d3427432fd68845fae66d",
+    "drivers/cogent/native/patches/tabclose/README.md": "1d94733dfd26a65c6cf20e010be673245ef12ff1d676ab7cffac97be8f1ce182",
+    "drivers/cogent/native/patches/tabclose/original-hashes.json": "073019cd10a4eb194600a357a54920c344146fb24fbfeb09a4e875793b7c4b03",
+    "drivers/cogent/native/patches/tabclose/output-hashes.json": "794a0463db4e702c48f44789ebca53362404e32ed4bd981ca42d42c180d2f3c3",
+    "drivers/cogent/prepare_test.py": "9ea78ee6b7a255635736751a894a797802e49dcfd96c7e06eab1970abc7b887b",
+    "drivers/cogent/tab_close.go": "cbd8fdf575623da01806e778ef70dfe9f5063949e724c97d12959bca0d1df7d3",
+    "drivers/cogent/tab_close_offscreen_test.go": "42334445fe1da62a7eb646ce67c932c58ab3aecd07303a98ff40c7ad924b744b",
+    "drivers/cogent/tab_close_test.go": "6821c28e1e41bc586b61aec89a95b260ee753dc7912e2ecb1f4da6b9e406447c",
+    "scripts/release-sdk_test.py": "f54c60ee1502e9ad3310603e88fd86c7ee4c255fdc9a89ccef753f7fffee26a4",
+    "specs/controls.md": "690548e23cd04c51ff28a67197295316b4c824814ff14286977bd2b1ae6dddbe",
+    "specs/macos-completion.md": "066b2c91c1d4d27b56bef9e7961c45145c2a4041c953c8ef9a66720bd0bbf5bc",
+    "specs/tab-close.md": "14f8b6d48cadb3bcf22d898cb8cc0bd3c6f98019415e85aff64c5b21f9ca4094",
+    "ui/controls.go": "6edaca7ef29db1b8353210373bdde5e1f21f06dda38a02b3c4ed3cf773c0f8f5",
+    "ui/node.go": "1e8b7f14f4272f1b52d66926738c5eff469f6481e8a28c305d8d8ecd4bfaa845",
+    "ui/tab_close_test.go": "9a9fa202521f477042e0bade568eed4585ec7b0a56c62425790a2407288fa081"
+  },
+  "checks": {
+    "final-prepare-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 2.253843249985948,
+      "argv": [
+        "python3",
+        "prepare.py"
+      ],
+      "receipt_sha256": "5ee96ac4a3b4d8351e9fd92e0c97b6d370b4611f32b5c725ebd7031d0add8188",
+      "prepared_version": "corrected-Core-test"
+    },
+    "final-adapter-race": {
+      "exit_code": 0,
+      "elapsed_seconds": 91.12843033304671,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-count=1",
+        "./..."
+      ],
+      "receipt_sha256": "075c297da3010bed5a32ed5afde869b4e7b349d1831e4e0e9c3f36efc8e0c298",
+      "prepared_version": "before-Core-test-only-repair"
+    },
+    "final-adapter-race-v3": {
+      "exit_code": 0,
+      "elapsed_seconds": 84.79255770798773,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-count=1",
+        "./..."
+      ],
+      "receipt_sha256": "df0d1c7cf05cd533da5fcd79282bb23f343ad022eda247b886078450e2710f84",
+      "prepared_version": "corrected-Core-test"
+    },
+    "final-portable-race": {
+      "exit_code": 0,
+      "elapsed_seconds": 6.203880957968067,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "receipt_sha256": "27ef36574a36497f417383a71d53317acbe6cd21717e39f0fd0aecad8e93d018",
+      "prepared_version": "before-Core-test-only-repair"
+    },
+    "final-sdk": {
+      "exit_code": 0,
+      "elapsed_seconds": 3.0128494999953546,
+      "argv": [
+        "python3",
+        "scripts/release-sdk_test.py"
+      ],
+      "receipt_sha256": "9200d8e269ab9ca700f1df0cbe93a057f3f1a6cd1e095558ca5030b819a22ec1",
+      "prepared_version": "before-Core-test-only-repair"
+    },
+    "final-adapter-vet": {
+      "exit_code": 0,
+      "elapsed_seconds": 4.788540834037121,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "receipt_sha256": "e19d7d605cde63177239987286ceac79a54ec8897149420e211eef928e04be6b",
+      "prepared_version": "before-Core-test-only-repair"
+    },
+    "final-core-contract-v3": {
+      "exit_code": 0,
+      "elapsed_seconds": 9.670515000005253,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-run",
+        "^TestVellumTabCloseRequest",
+        "-count=1",
+        "./core"
+      ],
+      "receipt_sha256": "2aa09fd87125d87fad782a2a03526bb5d646a11ee2eebea924f14892941ecf4d",
+      "prepared_version": "corrected-Core-test"
+    },
+    "final-native-vet": {
+      "exit_code": 0,
+      "elapsed_seconds": 2.370090832991991,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=vellum_native_checks",
+        "./..."
+      ],
+      "receipt_sha256": "05ee113833c12068d3fc9a16703feccae669ef8568cc408806bead26042c3196",
+      "prepared_version": "corrected-Core-test"
+    },
+    "final-preparation-tests-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.18010695901466534,
+      "argv": [
+        "python3",
+        "prepare_test.py"
+      ],
+      "receipt_sha256": "bb443e62555220893987e3e95002ec2cccfa3eb0e7b2c981577a664446405c0a",
+      "prepared_version": "corrected-Core-test"
+    },
+    "final-native-build-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 3.7517985419835895,
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-closable-tabs/gallery-v2",
+        "./cmd/gallery"
+      ],
+      "receipt_sha256": "415646d27c4874e3dfefb802b4488b85a76250fff332ab99bef5160b127ded34",
+      "prepared_version": "corrected-Core-test"
+    },
+    "final-visual-route": {
+      "exit_code": 0,
+      "elapsed_seconds": 8.942449541995302,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-run",
+        "^TestTabClose|^TestNativeTabs|^TestDialog|^TestAccessibilityWorkbench",
+        "-count=1",
+        ".",
+        "-vellum-tab-close-capture=/private/tmp/vellum-macos-closable-tabs/tab-close.png"
+      ],
+      "receipt_sha256": "faaee7729bfad11f4c641968df5500f39991b9f9cce125f6e3f48c553a867da2",
+      "prepared_version": "before-Core-test-only-repair"
+    }
+  },
+  "negative_controls": {
+    "negative-private-v2": {
+      "expected_assertion": "retired private close button acted on replacement",
+      "receipt_sha256": "04236d4234133426313be3774047e90fba3ebe87f619ab79a57be365df3937c3"
+    },
+    "negative-dialog-v1": {
+      "expected_assertion": "native dismissal left old close capability alive before owner drain",
+      "receipt_sha256": "86e0fef696f589cf0eb49818fda1419fce8087a56774942a135042e66a6f39ea"
+    },
+    "negative-native-v2": {
+      "expected_assertion": "native close selected/deleted before owner admission",
+      "receipt_sha256": "53b0a9be7d0b61fe5e2a1d3946e8060e16ef374b087909e9148f95b2f3b05285"
+    }
+  },
+  "prepared_before_files": 6208,
+  "prepared_after_files": 6209,
+  "two_reviewed_outputs_exact": true,
+  "all_other_dependency_leaves_unchanged": true,
+  "post_broad_check_repair": {
+    "only_prepared_leaf": "upstream/core/tabs_close_request_vellum_test.go",
+    "production_code_unchanged": true,
+    "native_binary_byte_equal": true,
+    "test_cleanup_fixed_after_Prism": true,
+    "new_full_adapter_race_check": "final-adapter-race-v3"
+  },
+  "native_build_sha256": "fe8ac8c31a4efa8266bc22372561a3e2b9710d86f903b90774f8db4801e92d1b",
+  "native_build_bytes": 58576226,
+  "native_build_launched": false,
+  "live_checks_run": false,
+  "native_gpu_checks_run": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "gpu_default_enabled": false,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_exit_code": 0,
+  "prism_coverage_complete": true,
+  "prism_files": 25,
+  "prism_provider_calls": 1,
+  "prism_initial_reported_findings": 2,
+  "prism_initial_finding_resolved": "latest-tree cleanup closure and full adapter race rerun; duplicate report prose removed and binding producer made non-mutating",
+  "prism_reported_findings": 0,
+  "prism_unresolved_findings": 0,
+  "physical_input_qualified": false,
+  "human_voiceover_qualified": false,
+  "fresh_endurance_qualified": false,
+  "archive_sha256": "a799e010aaaab5ce234d15a995776d5d8506730127af24c7d3a759aa3b0a8ec2",
+  "archive_members": 227,
+  "archive_bytes": 488044
+}

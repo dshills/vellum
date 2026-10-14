@@ -657,3 +657,11 @@ This does not qualify native GPU pixels, timing or memory. GPU rendering remains
 opt-in, original P6 frame targets still fail, and full P6/P11, fresh complete
 retention, physical input/displays, human accessibility and distribution remain
 open. [Scoped evidence](../docs/reports/macos-gpu-covered/README.md).
+
+Controlled document-tab closing adds owner-admitted close buttons and focused-tab
+Delete/Backspace requests, preserving rejected pages, reparented drafts and the
+original unmanaged native path. Private tab/artwork identity and atomic modal
+lifetime capabilities prevent stale requests from reaching replacement content.
+The public contract is [tab closing](tab-close.md). Actual software input,
+serialized/native-object semantics and lifetime fixtures are distinct from live
+Mac attachment, physical input, human VoiceOver and full P6/P11/endurance targets.

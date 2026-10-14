@@ -580,6 +580,13 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 					}
 				}
 				nodes = append(nodes, child)
+				if n.Kind == ui.Tabs && o.Closable {
+					close, handler := tabCloseAccessibility(r, o, id, disabled)
+					nodes = append(nodes, close)
+					if handler != nil {
+						handlers[close.ID] = handler
+					}
+				}
 			}
 		}
 		if edit := gridEditingRecord(r); edit != nil {
@@ -1027,6 +1034,11 @@ func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[stri
 		if r.node.Kind == ui.Tabs && r.control != nil && r.control.tabs != nil {
 			for _, o := range r.node.Options {
 				bounds(accessibilityOptionID(r.node.ID, o.ID), r.control.tabs.buttons[o.ID])
+				if o.Closable {
+					if close := tabCloseButton(r.control.tabs.bindings[o.ID]); close != nil {
+						bounds(tabCloseID(r.node.ID, o.ID), close)
+					}
+				}
 			}
 		}
 		if r.control != nil && r.control.choice != nil {

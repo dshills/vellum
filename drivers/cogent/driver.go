@@ -507,6 +507,17 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 	return r, nil
 }
 func syncRecord(r *record, n ui.Node) error {
+	visible, scopes := tabCloseInheritedContext(r)
+	return syncRecordVisible(r, n, visible && accessibilityDialogVisible(r), scopes)
+}
+
+func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseScope) error {
+	for _, scope := range scopes {
+		if scope == nil || scope.closed.Load() {
+			visible = false
+			break
+		}
+	}
 	if _, err := ui.ResolveStyle(n, r.theme); err != nil {
 		return err
 	}
@@ -528,6 +539,7 @@ func syncRecord(r *record, n ui.Node) error {
 			r.widget.(*core.Text).SetText(html.EscapeString(n.Text)).Update()
 		}
 	case ui.Extension:
+		r.widget.AsTree().SetProperty(tabCloseContextProperty, &tabCloseContext{visible: visible, scopes: append([]*tabCloseScope(nil), scopes...)})
 		ext, ok := n.Custom.(Extension)
 		if !ok {
 			return fmt.Errorf("cogent: unsupported extension %q", n.ID)
@@ -540,8 +552,24 @@ func syncRecord(r *record, n ui.Node) error {
 	if err := syncControl(r, previous); err != nil {
 		return err
 	}
+	if n.Kind == ui.Dialog && r.control != nil && r.control.dialog != nil {
+		d := r.control.dialog
+		scope := d.tabScope.Load()
+		visible = visible && n.Open && !d.dismissed && scope != nil && !scope.closed.Load()
+		scopes = append(append([]*tabCloseScope(nil), scopes...), scope)
+	}
+	syncTabVisibility(r, visible, scopes)
 	for i, c := range n.Children {
-		if err := syncRecord(r.children[i], c); err != nil {
+		childVisible := visible
+		switch n.Kind {
+		case ui.Tabs:
+			childVisible = childVisible && c.ID == n.SelectedID
+		case ui.Disclosure:
+			childVisible = childVisible && n.Checked
+		case ui.Dialog:
+			childVisible = childVisible && n.Open
+		}
+		if err := syncRecordVisible(r.children[i], c, childVisible, scopes); err != nil {
 			return err
 		}
 	}

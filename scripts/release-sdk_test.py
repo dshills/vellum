@@ -111,6 +111,8 @@ func TestExportedControls(t *testing.T) {
         {ID:"reset",Label:"Reset"},
     }, Change:func(ui.ChangeEvent){}}
     if err := ui.Validate(menu); err != nil || !ui.MenuEnabled(menu) { t.Fatal(err) }
+    tabs := ui.Node{ID:"documents",Kind:ui.Tabs,SelectedID:"page",Options:[]ui.Option{{ID:"page",Label:"Page",Closable:true}},Children:[]ui.Node{{ID:"page",Kind:ui.Column}},TabClose:func(e ui.TabCloseEvent){if e.ID==""||e.PageID==""{t.Fatal("missing close identity")}}}
+    if err := ui.Validate(tabs); err != nil {t.Fatal(err)}
 }
 func TestExportedReplay(t *testing.T) {
     manifest := replay.Manifest{Version: replay.Version, FixtureSHA256: strings.Repeat("a",64), ThemeSHA256: strings.Repeat("b",64), LayoutVersion:"sdk-1", RendererVersion:"sdk-1", Start:time.Unix(0,0).UTC(), Windows:[]replay.Window{{ID:"main",Incarnation:1,Width:640,Height:480,DPI:160}}, Fonts:[]replay.Font{{Family:"fixture",SHA256:strings.Repeat("c",64)}}}

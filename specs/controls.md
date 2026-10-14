@@ -443,3 +443,13 @@ passive `Separator` entries. Change.Checked proposes the inverse accepted check
 state. Ordinary actions only identify their action, and separators have no input
 or focus. Other kinds refuse these fields. Full lifetime, bounds and semantics
 are specified by the [action-menu contract](menu-button.md).
+
+## Closable document tabs
+
+Tabs options may set Closable and supply Node.TabClose. Closing proposes a stable
+PageID on the owner without native selection/deletion. The application accepts by
+removing that option/page and selecting a remaining page, or removes the Tabs node
+when closing the last page. Rejected requests retain pages and drafts. Pointer
+close and Delete/Backspace on a focused tab share bounded guarded admission;
+modified command chords retain application routing. See [the close contract](tab-close.md)
+for binding, modal lifetime, private target geometry and scope limits.

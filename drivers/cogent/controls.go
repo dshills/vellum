@@ -84,14 +84,17 @@ func cacheFieldEditingState(r *record, state core.TextFieldEditingState) bool {
 }
 
 type tabState struct {
-	pages   map[string]*core.Frame
-	buttons map[string]*core.Tab
-	order   []string
+	pages    map[string]*core.Frame
+	buttons  map[string]*core.Tab
+	order    []string
+	bindings map[string]*tabBinding
+	visible  bool
 }
 type dialogState struct {
 	host                       *accessibilityDialogHost
 	body                       *core.Body
 	active, closing, dismissed bool
+	tabScope                   atomic.Pointer[tabCloseScope]
 }
 
 func mountControl(parent tree.Node, r *record, a *app.Application, window string) (core.Widget, bool, error) {
@@ -222,7 +225,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = w
 	case ui.Tabs:
 		widget = core.NewTabs(parent)
-		c.tabs = &tabState{pages: map[string]*core.Frame{}, buttons: map[string]*core.Tab{}}
+		c.tabs = &tabState{pages: map[string]*core.Frame{}, buttons: map[string]*core.Tab{}, bindings: map[string]*tabBinding{}}
 	case ui.Dialog:
 		w := core.NewFrame(parent)
 		w.Styler(func(s *styles.Style) { s.Display = styles.DisplayNone })
@@ -517,6 +520,7 @@ func syncControl(r *record, previous ui.Node) error {
 		if err := prepareControl(r, r.node); err != nil {
 			return err
 		}
+		syncTabsPresentation(r)
 		for _, o := range r.node.Options {
 			b := r.control.tabs.buttons[o.ID]
 			b.SetText(html.EscapeString(o.Label)).SetState(controlDisabled(r) || o.Disabled, states.Disabled)
@@ -571,6 +575,7 @@ func prepareControl(r *record, n ui.Node) error {
 			c.buttons[o.ID] = button
 			c.order = append(c.order, o.ID)
 			id := o.ID
+			binding := bindTab(r, id, button)
 			button.OnClick(func(e events.Event) {
 				postControl(r, func() {
 					enabled := false
@@ -580,7 +585,7 @@ func prepareControl(r *record, n ui.Node) error {
 							break
 						}
 					}
-					if !enabled || r.node.Change == nil {
+					if !enabled || r.node.Change == nil || r.control.tabs.bindings[id] != binding || !r.control.tabs.visible {
 						requestControlRestore(r)
 						return
 					}
@@ -646,6 +651,11 @@ func finishControl(r *record, n ui.Node) {
 		if !desired[id] {
 			w.DeleteTabIndex(i)
 			delete(c.pages, id)
+			if binding := c.bindings[id]; binding != nil {
+				binding.closeEpoch.Store(nil)
+				binding.closeWidget.Store(nil)
+			}
+			delete(c.bindings, id)
 			delete(c.buttons, id)
 			c.order = append(c.order[:i], c.order[i+1:]...)
 		}
@@ -695,6 +705,8 @@ func syncDialog(r *record) {
 // prepareDialogBody keeps one stable child host across native modal scenes.
 func prepareDialogBody(r *record) *core.Body {
 	d := r.control.dialog
+	scope := &tabCloseScope{}
+	d.tabScope.Store(scope)
 	d.body = core.NewBody(r.node.Text)
 	body := d.body
 	bindAccessibilityDialogKeyboard(r, body)
@@ -708,6 +720,7 @@ func prepareDialogBody(r *record) *core.Body {
 	tree.MoveToParent(d.host, body)
 	d.host.SetScene(body.Scene)
 	body.OnClose(func(e events.Event) {
+		scope.closed.Store(true) // revoke this lifetime before retaining/parking native children
 		// Preserve retained children before Cogent destroys the closing Scene.
 		withdrawDataGeometry(r)
 		tree.MoveToParent(d.host, r.widget)
@@ -787,6 +800,12 @@ func disposeControl(r *record) {
 	}
 	if r.control != nil {
 		r.control.retired = true
+		if r.control.tabs != nil {
+			for _, binding := range r.control.tabs.bindings {
+				binding.closeEpoch.Store(nil)
+				binding.closeWidget.Store(nil)
+			}
+		}
 		if r.control.menu != nil {
 			requestMenuClose(r)
 			flushMenuClose(r) // disposal is originating reconciliation/native teardown

@@ -37,6 +37,8 @@ type Option struct {
 	Disabled  bool
 	// MenuButton alone supports passive separators and controlled check actions.
 	// Separators retain a stable ID, but have no label, value or input behavior.
+	// Closable belongs only on Tabs and requires Node.TabClose.
+	Closable  bool
 	Separator bool
 	Checkable bool
 	Checked   bool
@@ -67,6 +69,11 @@ type ChangeEvent struct {
 	Number           float32
 	Text, SelectedID string
 }
+
+// TabCloseEvent proposes closing one stable page. The application accepts by
+// removing its option/page and selecting a remaining page in the next view.
+// ID is the Tabs node ID; PageID is the option/page ID. No native deletion runs.
+type TabCloseEvent struct{ ID, PageID string }
 
 // Accessibility carries semantic labels independently of display text. Driver
 // publication to platform accessibility APIs requires separate certification.
@@ -117,6 +124,14 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind != Tabs && n.TabClose != nil {
+		return fmt.Errorf("ui: TabClose belongs only on tabs")
+	}
+	for _, option := range n.Options {
+		if option.Closable && (n.Kind != Tabs || n.TabClose == nil) {
+			return fmt.Errorf("ui: closable tab requires Tabs and TabClose")
+		}
+	}
 	if n.Kind == Disclosure && (strings.TrimSpace(n.Text) == "" || n.Activate != nil) {
 		return fmt.Errorf("ui: disclosure requires a heading and uses Checked/Change for expansion")
 	}
