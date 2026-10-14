@@ -69,53 +69,9 @@ func exerciseComposed(ctx context.Context, a *app.Application, id string, w *acc
 	}); err != nil {
 		return fmt.Errorf("composed tree AX completion: %w", err)
 	}
-	// Queue admission alone is not an accepted controlled native edit. Reinspect
-	// and retry within one bounded operation when publication advances generation.
-	const edited = "Cocoa composed edit"
-	if err = wait(ctx, func(inner context.Context) (bool, error) {
-		accepted := false
-		value, e := ownerProbe(inner, a, func() ownerReply { accepted = w.Text() == edited; return ownerReply{} })
-		if e != nil || value.err != nil {
-			return false, errors.Join(e, value.err)
-		}
-		if accepted {
-			return true, nil
-		}
-		inspection, e := cogent.InspectAccessibility(inner, id)
-		if e != nil {
-			return false, e
-		}
-		for _, element := range inspection.Elements {
-			if element.ID == "text" || element.DomainID == "text" {
-				_, e = cogent.PerformAccessibilityAction(inner, id, element.ID, "set", edited)
-				return false, e
-			}
-		}
-		return false, errors.New("composed Cocoa text target missing")
-	}); err != nil {
+	nativeActions, err := exerciseNativeActions(ctx, a, id, w)
+	if err != nil {
 		return err
-	}
-	// Exercise the real modal scene's creation and retirement in every cycle.
-	for _, open := range []bool{true, false} {
-		value, err = ownerProbe(ctx, a, func() ownerReply { w.SetDialog(open); return ownerReply{err: a.Invalidate(id)} })
-		if err != nil || value.err != nil {
-			return errors.Join(err, value.err)
-		}
-		if err = wait(ctx, func(inner context.Context) (bool, error) {
-			inspection, e := cogent.InspectAccessibility(inner, id)
-			if e != nil {
-				return false, e
-			}
-			present := false
-			for _, element := range inspection.Elements {
-				if element.ID == "dialog-close" || element.DomainID == "dialog-close" {
-					present = true
-				}
-			}
-			return present == open, nil
-		}); err != nil {
-			return err
-		}
 	}
 
 	var inspection cogent.AccessibilityInspection
@@ -168,7 +124,7 @@ func exerciseComposed(ctx context.Context, a *app.Application, id string, w *acc
 		return fmt.Errorf("composed catalog contains %d of %d dense labels", defined, acceptance.DenseLabels)
 	}
 	// Every cycle emits bounded scalar evidence; no 1000-node dump per cycle.
-	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.composed-cycle", "cycle": cycle + 1, "native_text_accepted": true, "editor_history_replayed": true, "grid_tree_completed": true, "tree_accessibility_completed": true, "tree_accessibility_rows": treeAXRows, "modal_open_close": true, "dense_defined": defined, "dense_fully_visible": visible, "root_screen_points": root, "density_clip_screen_points": clip, "all_dense_labels_fully_visible": visible == acceptance.DenseLabels, "requested_logical_size": [2]int{1920, 1080}, "full_p11_qualified": false})
+	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.composed-cycle", "cycle": cycle + 1, "native_text_accepted": true, "native_actions": nativeActions, "native_tree_selection": true, "native_tree_disclosures": 2, "editor_history_replayed": true, "grid_tree_completed": true, "tree_accessibility_completed": true, "tree_accessibility_rows": treeAXRows, "modal_open_close": true, "dense_defined": defined, "dense_fully_visible": visible, "root_screen_points": root, "density_clip_screen_points": clip, "all_dense_labels_fully_visible": visible == acceptance.DenseLabels, "requested_logical_size": [2]int{1920, 1080}, "full_p11_qualified": false})
 }
 func frameInside(frame, bounds [4]float64) bool {
 	return frame[2] > 0 && frame[3] > 0 && bounds[2] > 0 && bounds[3] > 0 && frame[0] >= bounds[0] && frame[1] >= bounds[1] && frame[0]+frame[2] <= bounds[0]+bounds[2]+.01 && frame[1]+frame[3] <= bounds[1]+bounds[3]+.01

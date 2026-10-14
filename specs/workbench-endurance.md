@@ -100,3 +100,16 @@ source, prepared inputs, producers, authorization and terminal cleanup qualify. 
 Go heap is 42.6–46.7 MiB and RSS 350.4–366.0 MiB. This establishes that sampled
 lifecycle workload. Native standard-control callbacks, hierarchical tree actions,
 modal data-view transfer, paced frame/input budgets and full P11 remain separate.
+
+The [composed native action checkpoint](../docs/reports/macos-composed-actions/README.md)
+adds 20 actual Cocoa-selector steps per fresh window: standard controlled values,
+button, disclosure heading, tabs, text, modal buttons and hierarchical tree
+selection/collapse/expansion. Owner callback/request acknowledgment precedes retries;
+accepted asynchronous requests wait for worker/index/geometry and native publication.
+Disclosure uses one window-scoped reserved task with off-owner bounded index work.
+Scalar partial action records survive failures. Native command/fixture race and
+offscreen layout checks pass; five plus twenty native cycles qualify 500 steps.
+The tree now has four children beneath n0 and 64 stored nodes. This changed
+interaction fixture has no new 1000-cycle qualification; the earlier retained
+campaign remains versioned to bf3b1b5. Sustained P6/P11 budgets, modal data-view
+transfer, physical input/display and human accessibility remain separate.

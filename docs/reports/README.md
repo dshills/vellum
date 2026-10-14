@@ -41,3 +41,5 @@ The [validation plan](../../specs/prototype-plan.md) defines the research gates.
 A passing local check does not imply production or cross-platform certification.
 
 - [Completed-outline composed retention](macos-tree-retention/README.md): 1000 native cycles on committed source with strict native tree completion and sampled native memory; broader P6/P11 remains open.
+
+- [Composed native actions](macos-composed-actions/README.md): 500 acknowledged Cocoa action steps across 25 windows, including worker-built tree disclosure; physical and sustained acceptance remain open.

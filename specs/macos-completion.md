@@ -572,3 +572,11 @@ completion per cycle and final main-loop cleanup. Warm sampled heap/RSS remain b
 by unchanged guards; two owned native allocation snapshots are preserved. This updates
 lifecycle/retention evidence without qualifying full P6/P11, physical display/input,
 human accessibility, overnight background soak or public distribution.
+
+The [composed native action checkpoint](../docs/reports/macos-composed-actions/README.md)
+qualifies 500 Cocoa-selector steps across 25 fresh windows. It verifies native
+requests, acknowledged owner callbacks and final native publication for standard
+controls, modal buttons and hierarchical tree selection/disclosure. Tree indexing
+reserves bounded window-scoped worker/completion credit and runs off-owner. This
+broadens interaction evidence; it does not certify physical input, human VoiceOver,
+menus/services, sustained P6/P11 or a new 1000-cycle retention campaign.

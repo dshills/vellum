@@ -1,8 +1,13 @@
 package acceptance
 
 import (
+	"context"
+	"errors"
 	"github.com/dshills/vellum/app"
+	"github.com/dshills/vellum/execution"
+	"github.com/dshills/vellum/tasks"
 	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/virtual"
 	"strings"
 	"testing"
 )
@@ -65,5 +70,134 @@ func TestWorkspaceCatalogAndFreshModelIsolation(t *testing.T) {
 	}
 	if second.Editor.Snapshot() != before || second.Text() == first.Text() {
 		t.Fatal("exercise mutated another workspace")
+	}
+}
+
+func TestDisclosureUsesReservedWorkerAndJoinsRetirement(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	w, err := New(a, "worker", struct{}{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	executor, err := execution.NewManual(2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer executor.Close()
+	w.executor = executor
+	if err = a.Open(app.Window{ID: "worker", Title: "worker", Width: 640, Height: 480, View: w.View}); err != nil {
+		t.Fatal(err)
+	}
+	start := func(kind virtual.OutlineChangeKind) {
+		t.Helper()
+		var failure error
+		if err = a.Do(func() { failure = w.disclose(virtual.OutlineChange{Kind: kind, ID: "n0"}) }); err != nil || failure != nil {
+			t.Fatal(err, failure)
+		}
+		if w.workerError != nil {
+			t.Fatal(w.workerError)
+		}
+	}
+	// No builder runs before explicit worker selection; the old index stays live.
+	var admissionError error
+	if err = a.Do(func() { admissionError = w.disclose(virtual.OutlineChange{Kind: virtual.OutlineCollapse, ID: "n0"}) }); err != nil || admissionError != nil {
+		t.Fatal(err, admissionError)
+	}
+	pending, _ := w.Tree.State()
+	if !pending.Pending || pending.VisibleRows != 64 || w.State().Disclosures != 1 || w.State().WorkerActive != 1 {
+		t.Fatal("builder ran on owner or credit missing", pending, w.State())
+	}
+	if err = a.Do(func() { admissionError = w.disclose(virtual.OutlineChange{Kind: virtual.OutlineExpand, ID: "n0"}) }); err != nil || !errors.Is(admissionError, tasks.ErrCapacity) {
+		t.Fatal("capacity did not refuse before prepare", err, admissionError)
+	}
+	if _, err = executor.StepNext(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	a.Drain()
+	collapsed, _ := w.Tree.State()
+	if collapsed.Pending || collapsed.VisibleRows != 60 || w.State().WorkerActive != 0 || w.State().Failure != nil {
+		t.Fatal("accepted worker failed to complete/release", collapsed, w.State())
+	}
+	start(virtual.OutlineExpand)
+	if _, err = executor.StepNext(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	a.Drain()
+	expanded, _ := w.Tree.State()
+	if expanded.Pending || expanded.VisibleRows != 64 || w.State().WorkerActive != 0 || w.State().Disclosures != 2 {
+		t.Fatal("expansion failed", expanded, w.State())
+	}
+	start(virtual.OutlineCollapse)
+	if err = a.CloseWindow("worker"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = executor.StepNext(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	a.Drain()
+	retired, _ := w.Tree.State()
+	if !retired.Pending || retired.VisibleRows != 64 || w.State().WorkerActive != 0 {
+		t.Fatal("retired worker committed or retained credit", retired, w.State())
+	}
+}
+
+func TestRefusedPreparePreservesFirstFailureAcrossLaterSuccess(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	w, err := New(a, "failure", struct{}{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	executor, err := execution.NewManual(2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer executor.Close()
+	w.executor = executor
+	if err = a.Open(app.Window{ID: "failure", Title: "failure", Width: 640, Height: 480, View: w.View}); err != nil {
+		t.Fatal(err)
+	}
+	var refused error
+	if err = a.Do(func() { refused = w.disclose(virtual.OutlineChange{Kind: virtual.OutlineExpand, ID: "missing"}) }); err != nil || !errors.Is(refused, virtual.ErrTreeRange) {
+		t.Fatal(err, refused)
+	}
+	first := w.State().Failure
+	if first != refused {
+		t.Fatal("original refusal not retained", first, refused)
+	}
+	if _, err = executor.StepNext(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	a.Drain()
+	if w.State().Failure != first || errors.Is(w.State().Failure, virtual.ErrTreeStale) || errors.Is(w.State().Failure, context.Canceled) || w.State().WorkerActive != 0 {
+		t.Fatal("unprepared cancel or worker cancellation masked original refusal", w.State())
+	}
+	for _, kind := range []virtual.OutlineChangeKind{virtual.OutlineCollapse, virtual.OutlineExpand} {
+		if err = a.Do(func() {
+			w.models().Children[0].TreeDisclosure(ui.TreeDisclosureEvent{Change: virtual.OutlineChange{Kind: kind, ID: "n0"}})
+		}); err != nil {
+			t.Fatal(err)
+		}
+		if w.State().Failure != first {
+			t.Fatal("successful callback cleared failure", w.State())
+		}
+		if _, err = executor.StepNext(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		a.Drain()
+		if w.State().Failure != first || w.State().WorkerActive != 0 {
+			t.Fatal("successful completion cleared failure", w.State())
+		}
+	}
+	state, _ := w.Tree.State()
+	if state.Pending || state.VisibleRows != 64 {
+		t.Fatal("later successful worker did not complete", state)
 	}
 }

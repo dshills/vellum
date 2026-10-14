@@ -4,9 +4,11 @@ package acceptance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"image"
 	"image/color"
+	"maps"
 	"strconv"
 	"strings"
 
@@ -14,6 +16,8 @@ import (
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/editor"
+	"github.com/dshills/vellum/execution"
+	"github.com/dshills/vellum/tasks"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
 	"github.com/dshills/vellum/workbench"
@@ -22,26 +26,31 @@ import (
 const DenseLabels = 1000
 
 type Workspace struct {
-	Owner                     *app.Application
-	Window                    string
-	Editor                    *editor.Model
-	Grid                      *virtual.Grid
-	Tree                      *virtual.Outline
-	Dock                      *cogent.Workbench
-	checked, open, dialog     bool
-	number                    float32
-	text, choice, tab, action string
-	split                     float32
-	picture                   *canvas.TiledImage
-	canvas                    any
-	actions                   int
+	Owner                       *app.Application
+	Window                      string
+	Editor                      *editor.Model
+	Grid                        *virtual.Grid
+	Tree                        *virtual.Outline
+	Dock                        *cogent.Workbench
+	checked, open, dialog       bool
+	number                      float32
+	text, choice, tab, action   string
+	split                       float32
+	picture                     *canvas.TiledImage
+	canvas                      any
+	actions                     int
+	changes                     map[string]int
+	treeSelections, disclosures int
+	manager                     *tasks.Manager
+	executor                    execution.Executor
+	workerError                 error
 }
 
 func New(owner *app.Application, window string, gpuCanvas any) (*Workspace, error) {
 	if owner == nil || window == "" || gpuCanvas == nil {
 		return nil, fmt.Errorf("acceptance: owner, window and canvas required")
 	}
-	w := &Workspace{Owner: owner, Window: window, canvas: gpuCanvas, open: true, number: 25, text: "Native workspace", choice: "a", tab: "live", split: .5}
+	w := &Workspace{Owner: owner, Window: window, canvas: gpuCanvas, open: true, number: 25, text: "Native workspace", choice: "a", tab: "live", split: .5, changes: map[string]int{}}
 	var err error
 	w.Editor, err = editor.New("Native document\nGo owner and shared history", editor.Config{MaxBytes: 4096, HistoryLimit: 16})
 	if err != nil {
@@ -58,12 +67,15 @@ func New(owner *app.Application, window string, gpuCanvas any) (*Workspace, erro
 	nodes := make([]virtual.TreeNode, 64)
 	for i := range nodes {
 		nodes[i] = virtual.TreeNode{ID: fmt.Sprintf("n%d", i), Label: fmt.Sprintf("Node %02d", i)}
+		if i >= 1 && i <= 4 {
+			nodes[i].Parent = "n0"
+		}
 	}
 	data, err := virtual.NewTreeData(context.Background(), "acceptance-tree:"+window, 1, nodes, virtual.TreeLimits{})
 	if err != nil {
 		return nil, err
 	}
-	index, err := virtual.BuildTreeIndex(context.Background(), data, virtual.TreeIndexOptions{})
+	index, err := virtual.BuildTreeIndex(context.Background(), data, virtual.TreeIndexOptions{ExpandAll: true})
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +107,11 @@ func New(owner *app.Application, window string, gpuCanvas any) (*Workspace, erro
 
 func (w *Workspace) models() ui.Node {
 	return ui.Node{ID: "models", Kind: ui.Row, Grow: true, Children: []ui.Node{
-		{ID: "outline", Kind: ui.DataTree, Tree: w.Tree, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 130}), MaxSize: ui.Some(ui.Size{Width: 160})}},
+		{ID: "outline", Kind: ui.DataTree, Tree: w.Tree, TreeChange: func(e ui.TreeEvent) {
+			if e.Reason == ui.TreeSelection {
+				w.treeSelections++
+			}
+		}, TreeDisclosure: func(e ui.TreeDisclosureEvent) { w.recordFailure(w.disclose(e.Change)) }, Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 130}), MaxSize: ui.Some(ui.Size{Width: 160})}},
 		{ID: "model-split", Kind: ui.SplitPane, Grow: true, Orientation: ui.Horizontal, Number: w.split, Change: func(e ui.ChangeEvent) { w.split = e.Number }, Children: []ui.Node{
 			{ID: "grid", Kind: ui.DataGrid, Grid: w.Grid, Grow: true},
 			{ID: "document", Kind: ui.MultilineText, Editor: w.Editor, SoftWrap: true, Grow: true},
@@ -105,9 +121,9 @@ func (w *Workspace) models() ui.Node {
 
 func (w *Workspace) View() ui.Node {
 	choice := []ui.Option{{ID: "a", Label: "A"}, {ID: "b", Label: "B"}, {ID: "disabled", Label: "Disabled", Disabled: true}}
-	checked := func(e ui.ChangeEvent) { w.checked = e.Checked }
-	number := func(e ui.ChangeEvent) { w.number = e.Number }
-	choose := func(e ui.ChangeEvent) { w.choice = e.SelectedID }
+	checked := func(e ui.ChangeEvent) { w.checked = e.Checked; w.changes[e.ID]++ }
+	number := func(e ui.ChangeEvent) { w.number = e.Number; w.changes[e.ID]++ }
+	choose := func(e ui.ChangeEvent) { w.choice = e.SelectedID; w.changes[e.ID]++ }
 	compact := ui.Style{Padding: ui.Some(ui.UniformInsets(0)), Gap: ui.Some(float32(0))}
 	controls := ui.Node{ID: "controls", Kind: ui.Column, Style: compact, Children: []ui.Node{
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
@@ -124,9 +140,9 @@ func (w *Workspace) View() ui.Node {
 			{ID: "segment", Kind: ui.SegmentedControl, SelectedID: w.choice, Options: choice, Change: choose},
 			{ID: "slider", Kind: ui.Slider, Number: w.number, Numeric: ui.Numeric{Min: 0, Max: 100, Step: 1}, Change: number, MinWidth: 160},
 			{ID: "number", Kind: ui.NumberField, Number: w.number, Numeric: ui.Numeric{Min: 0, Max: 100, Step: 1}, Change: number},
-			{ID: "text", Kind: ui.TextField, Text: w.text, Change: func(e ui.ChangeEvent) { w.text = e.Text }},
+			{ID: "text", Kind: ui.TextField, Text: w.text, Change: func(e ui.ChangeEvent) { w.text = e.Text; w.changes[e.ID]++ }},
 		}}}},
-		{ID: "disclosure", Kind: ui.Disclosure, Text: "Indicators", Checked: w.open, Change: func(e ui.ChangeEvent) { w.open = e.Checked }, Children: []ui.Node{{ID: "indicators", Kind: ui.Row, Children: []ui.Node{
+		{ID: "disclosure", Kind: ui.Disclosure, Text: "Indicators", Checked: w.open, Change: func(e ui.ChangeEvent) { w.open = e.Checked; w.changes[e.ID]++ }, Children: []ui.Node{{ID: "indicators", Kind: ui.Row, Children: []ui.Node{
 			{ID: "icon", Kind: ui.Icon, Icon: ui.SymbolCheck, Text: "Check icon"},
 			{ID: "image", Kind: ui.Image, Image: w.picture, Text: "Local amber square", Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 24, Height: 24}), MaxSize: ui.Some(ui.Size{Width: 24, Height: 24})}},
 			{ID: "progress", Kind: ui.ProgressBar, Number: w.number / 100, MinWidth: 200},
@@ -146,7 +162,7 @@ func (w *Workspace) View() ui.Node {
 	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Style: compact, Children: []ui.Node{
 		{ID: "density-scroll", Kind: ui.Scroll, Grow: true, MinHeight: 160, Style: ui.Style{MinSize: ui.Some(ui.Size{Height: 160}), MaxSize: ui.Some(ui.Size{Height: 170})}, Children: []ui.Node{dense}},
 		controls,
-		{ID: "tabs", Kind: ui.Tabs, Grow: true, SelectedID: w.tab, Options: []ui.Option{{ID: "live", Label: "Workspace"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { w.tab = e.SelectedID }, Children: []ui.Node{
+		{ID: "tabs", Kind: ui.Tabs, Grow: true, SelectedID: w.tab, Options: []ui.Option{{ID: "live", Label: "Workspace"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { w.tab = e.SelectedID; w.changes[e.ID]++ }, Children: []ui.Node{
 			{ID: "live", Kind: ui.Extension, Grow: true, MinHeight: 240, Custom: w.Dock},
 			{ID: "about", Kind: ui.Label, Text: "All-component acceptance workspace"},
 		}},
@@ -182,6 +198,94 @@ func (w *Workspace) Exercise() error {
 }
 func (w *Workspace) SetDialog(open bool) { w.dialog = open }
 func (w *Workspace) Text() string        { return w.text }
+
+// State is a detached owner-only observation, separate from native admission.
+type ControlState struct {
+	Checked, IndicatorsOpen, DialogOpen                bool
+	Number                                             float32
+	Choice, Tab                                        string
+	Actions, TreeSelections, Disclosures, WorkerActive int
+	Changes                                            map[string]int
+	Failure                                            error
+}
+
+func (w *Workspace) State() ControlState {
+	active := 0
+	if w.manager != nil {
+		active = w.manager.Pending().Active
+	}
+	return ControlState{Checked: w.checked, IndicatorsOpen: w.open, DialogOpen: w.dialog, Number: w.number, Choice: w.choice, Tab: w.tab, Actions: w.actions, TreeSelections: w.treeSelections, Disclosures: w.disclosures, WorkerActive: active, Changes: maps.Clone(w.changes), Failure: w.workerError}
+}
+
+func (w *Workspace) recordFailure(err error) {
+	if err != nil && w.workerError == nil {
+		w.workerError = err
+	}
+}
+
+func (w *Workspace) disclose(change virtual.OutlineChange) error {
+	if w.manager == nil {
+		manager, err := tasks.NewWithConfig(tasks.Config{Owner: w.Owner, Window: w.Window, Limit: 1, Executor: w.executor, Invalidate: func() { _ = w.Owner.Invalidate(w.Window) }})
+		if err != nil {
+			return err
+		}
+		w.manager = manager
+	}
+	lifetime, err := w.Owner.WindowContext(w.Window)
+	if err != nil {
+		return err
+	}
+	// Reserve both worker and completion credit before marking the model pending.
+	input := make(chan virtual.OutlineRequest, 1)
+	var request virtual.OutlineRequest
+	prepared := false
+	var prepareError error
+	task, err := tasks.Start(w.manager, lifetime, func(ctx context.Context, _ func(float64, string)) (*virtual.TreeIndex, error) {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case captured := <-input:
+			builder, err := virtual.NewOutlineBuilder(ctx, captured)
+			if err != nil {
+				return nil, err
+			}
+			for {
+				done, err := builder.Step(64)
+				if err != nil {
+					return nil, err
+				}
+				if done {
+					return builder.Result()
+				}
+			}
+		}
+	}, func(index *virtual.TreeIndex, err error) {
+		if !prepared {
+			w.recordFailure(prepareError)
+			return
+		}
+		if err == nil {
+			err = w.Tree.Complete(request, index)
+		}
+		if err != nil {
+			err = errors.Join(err, w.Tree.Cancel(request))
+		}
+		w.recordFailure(err)
+	})
+	if err != nil {
+		return err
+	}
+	request, prepareError = w.Tree.Prepare(change)
+	if prepareError != nil {
+		task.Cancel()
+		w.recordFailure(prepareError)
+		return prepareError
+	}
+	prepared = true
+	w.disclosures++
+	input <- request
+	return nil
+}
 
 type source struct{}
 

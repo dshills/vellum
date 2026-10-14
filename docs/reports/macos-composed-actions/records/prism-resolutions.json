@@ -1,0 +1,27 @@
+{
+  "result": "ALL_FINDINGS_RESOLVED_WITH_FOCUSED_VERIFICATION",
+  "raw_prism_exit_code": 1,
+  "reported_findings": 3,
+  "unresolved_findings": 0,
+  "provider_review_not_repeated": true,
+  "findings": [
+    {
+      "id": "7a83e0137b15b108",
+      "resolution": "Runsummaryadds exitcode, AXrows/densitycounts, baseline/source/prepared digests, exact rawreceipt/stdout identities and versionboundaries",
+      "validation": "validate.py"
+    },
+    {
+      "id": "2323bb5ef8f1d984",
+      "resolution": "Explicit preparedflag avoids Complete/Cancel onzero request; preservesoriginalPrepareerror beforetaskcancel",
+      "validation": "prism-error-corrections-race.json and internal-post-prism-review.json"
+    },
+    {
+      "id": "0be52accda181316",
+      "resolution": "recordFailure retains firstnon-nil error in callback/completion; actualmissing-node/manualworker regression thenlater successfulcallbacks/completions preserveserror",
+      "validation": "prism-error-corrections-race.json, final-error-paths-offscreen-race.json"
+    }
+  ],
+  "final_native_receipt": "native-actions-five-final.json",
+  "final_native_cycles": 5,
+  "final_native_steps": 100
+}
