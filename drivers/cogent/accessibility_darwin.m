@@ -354,7 +354,7 @@ static NSDictionary *vellumAXValidatedNodes(NSDictionary *snapshot){
   while(cursor.length){if([ancestors containsObject:cursor]||!nodes[cursor])return nil;[ancestors addObject:cursor];cursor=nodes[cursor][@"parent"];}
   NSDictionary *parent=nodes[node[@"parent"]];
   if(scope){
-   NSDictionary *host=nodes[scope];if(!host||![host[@"grid_scope"] isEqual:scope]||![host[@"role"] isEqual:@"table"])return nil;
+   NSDictionary *host=nodes[scope];if(!host||![host[@"grid_scope"] isEqual:scope]||(![host[@"role"] isEqual:@"table"]&&![host[@"role"] isEqual:@"outline"]))return nil;
    for(NSString *key in @[@"grid_incarnation",@"grid_target_generation"])if(![node[key] isEqual:host[key]])return nil;
    // Go's ordinary omitempty encoding omits ready false and startup zero.
    // Missing values normalize only here; present values were type-validated.
@@ -425,7 +425,7 @@ static BOOL vellumAXCanReuse(VellumAXElement *old,NSDictionary *node,NSDictionar
  // across reparenting. Parent is an ownership boundary only for grid scopes.
  if(!scope&&!oldScope)return YES;
  if(![old.node[@"parent"] isEqual:node[@"parent"]]||![scope isEqual:oldScope]||![node[@"grid_incarnation"] isEqual:old.node[@"grid_incarnation"]])return NO;
- return [nodes[scope][@"parent"] isEqual:oldElements[scope].node[@"parent"]];
+ return [nodes[scope][@"parent"] isEqual:oldElements[scope].node[@"parent"]]&&[nodes[scope][@"role"] isEqual:oldElements[scope].node[@"role"]];
 }
 // Called synchronously on the native owner by publication; inert fixtures use
 // the same transaction without NSWindow creation or notifications.

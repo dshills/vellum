@@ -1,0 +1,189 @@
+{
+  "result": "PASS_FINAL_FRAMEWORK_AND_NATIVE_PREFLIGHTS",
+  "code_checks": {
+    "final-adapter-race": {
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 88.65301383397309,
+      "source_delta_stable": true
+    },
+    "final-adapter-vet": {
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.3303685000282712,
+      "source_delta_stable": true
+    },
+    "final-consumer-race": {
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 13.119007750006858,
+      "source_delta_stable": true
+    },
+    "final-consumer-build": {
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-tree-publication/loadedtree",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.861236500029918,
+      "source_delta_stable": true
+    },
+    "final-composed-build": {
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-tree-publication/composed-cycle",
+        "./cmd/window-cycle-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.327610459004063,
+      "source_delta_stable": true
+    },
+    "native-envelope-validator-v2-race": {
+      "argv": [
+        "go",
+        "test",
+        "-tags=vellum_native_checks",
+        "-race",
+        "-count=1",
+        "./cmd/window-cycle-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.433530749985948,
+      "source_delta_stable": true
+    },
+    "composed-envelope-v2-build": {
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-tree-publication/window-cycle-envelope-v2",
+        "./cmd/window-cycle-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.9161486249649897,
+      "source_delta_stable": true
+    }
+  },
+  "tree_preflights": [
+    {
+      "name": "native-tree-wide",
+      "samples": 120,
+      "clipped_rows": [
+        71
+      ],
+      "p95_total_ui_work_ns": 8952834,
+      "target_ns": 4000000,
+      "target_pass": false,
+      "elapsed_seconds": 6.474869417026639,
+      "scope": "one-process compatibility preflight, no matched speed comparison"
+    },
+    {
+      "name": "native-tree-deep",
+      "samples": 120,
+      "clipped_rows": [
+        71
+      ],
+      "p95_total_ui_work_ns": 9036000,
+      "target_ns": 4000000,
+      "target_pass": false,
+      "elapsed_seconds": 6.456636583025102,
+      "scope": "one-process compatibility preflight, no matched speed comparison"
+    }
+  ],
+  "later_source_changes": [
+    "drivers/cogent/cmd/window-cycle-smoke/main_test.go",
+    "drivers/cogent/cmd/window-cycle-smoke/composed.go"
+  ],
+  "version_note": "Full adapter/consumer suite and original native preflights use final framework source. Only acceptance command and tests change later; final command race/build and five composed cycles use final checker.",
+  "native_workflow_stages": 9,
+  "native_workflow_teardown_joined": false,
+  "final_composed": {
+    "cycles": 5,
+    "tree_ax_rows_each": 18,
+    "dense_labels_each": 1000,
+    "cleanup": {
+      "MainThread": true,
+      "CleanupObserved": true,
+      "WindowTitles": [],
+      "FilePanels": {
+        "Tracked": 0,
+        "Visible": 0,
+        "Open": 0,
+        "Save": 0
+      },
+      "NativeOutstanding": 0,
+      "AccessibilityWindows": 0,
+      "Menu": {
+        "Owned": false,
+        "OriginalRestored": false,
+        "TargetRetired": true,
+        "Items": []
+      },
+      "Tray": {
+        "Present": false,
+        "Visible": false,
+        "Template": false,
+        "TargetRetired": true,
+        "Identity": 0,
+        "Title": "",
+        "Tooltip": "",
+        "AccessibilityLabel": "",
+        "ImageWidth": 0,
+        "ImageHeight": 0,
+        "PixelWidth": 0,
+        "PixelHeight": 0,
+        "Items": []
+      },
+      "CallbacksStopped": true,
+      "PendingCallbacks": 0,
+      "MenuCallbacks": 0,
+      "TrayCallbacks": 0
+    },
+    "last_heap_bytes": 42339912,
+    "last_rss_bytes": 337199104,
+    "elapsed_seconds": 7.608865667018108,
+    "full_1000_cycle_qualified": false
+  },
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "prepared_files": 6204,
+  "post_prism_clipped_contract_race": {
+    "exit_code": 0,
+    "argv": [
+      "go",
+      "test",
+      "-tags=vellum_native_checks",
+      "-race",
+      "-count=1",
+      "./cmd/window-cycle-smoke"
+    ],
+    "elapsed_seconds": 3.425806957995519
+  },
+  "post_prism_changes": "Only test fixtures and report/receipt bytes changed; production/checker unchanged from final native five-cycle run."
+}

@@ -145,6 +145,7 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 			if parking == nil {
 				parking = core.NewFrame(parent)
 			}
+			withdrawDataGeometry(p.r)
 			tree.MoveToParent(p.r.widget, parking)
 		}
 		for _, child := range p.children {

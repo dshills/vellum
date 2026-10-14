@@ -702,10 +702,12 @@ func prepareDialogBody(r *record) *core.Body {
 		}
 	})
 
+	withdrawDataGeometry(r)
 	tree.MoveToParent(d.host, body)
 	d.host.SetScene(body.Scene)
 	body.OnClose(func(e events.Event) {
 		// Preserve retained children before Cogent destroys the closing Scene.
+		withdrawDataGeometry(r)
 		tree.MoveToParent(d.host, r.widget)
 		d.host.SetScene(r.widget.AsWidget().Scene)
 		d.active = false
@@ -732,6 +734,7 @@ func closeDialog(r *record) {
 	}
 	body := d.body
 	d.closing = true
+	withdrawDataGeometry(r)
 	tree.MoveToParent(d.host, r.widget)
 	d.host.SetScene(r.widget.AsWidget().Scene)
 	body.Close()

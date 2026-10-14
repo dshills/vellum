@@ -148,3 +148,27 @@ records original/candidate boundary parity, native 400-cell acceptance and a
 451-node validation-only benchmark. Sampled process/native stacks and this local
 benchmark remain separate from recorded UI-work latency, P6/P11 and human Mac
 accessibility qualification.
+
+
+## Managed outline publication
+
+Managed `ui.DataTree` uses the same bounded pending/completed transaction as
+managed tables. The existing Grid-prefixed JSON and inspection field names apply
+to both; scoped native hosts are restricted to table/outline roles. Each completed
+row/page frame is published with its matching semantics, incarnation and target/
+completed generation. Unversioned geometry callbacks cannot overwrite it. Pending
+layout preserves last-readable rows/frames and compatible Cocoa object identities,
+while actions, enabled/focused state and queued handlers are revoked. Initial
+pending layout contains only its disabled host. Completion restores the current
+snapshot atomically; removal, binding replacement, parent and scope-kind changes
+retire old objects. Independent ordinary controls and view scopes remain current.
+
+The tree adapter fences same-generation scene layout and pending-index metadata,
+and checks readiness again at owner action delivery. Native selectors also reject
+pending records. Retained table/tree scene references and geometry are withdrawn
+before modal transfers, keyed ancestor moves and workbench parking. This protects
+views moved by an ancestor rather than remounted individually. A pending index
+worker retains its old accepted index's ordinary interaction once layout is ready.
+The [checkpoint](../docs/reports/macos-tree-publication/README.md) separates manual
+and inert ownership oracles, actual Cocoa-object transactions and native workflows
+from human VoiceOver, physical input and full Mac qualification.

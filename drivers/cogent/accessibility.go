@@ -22,6 +22,8 @@ import (
 	"github.com/dshills/vellum/workbench"
 )
 
+// Grid-prefixed fields retain the existing bounded virtual-view wire protocol;
+// both managed tables and outlines use its pending/completed transaction.
 type accessibilityNode struct {
 	// pressFocusID is Go-only metadata for the managed Grid cell action.
 	// Workbench namespace wrapping qualifies this exact pending host focus.
@@ -549,6 +551,10 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 			visit(c, x.ID, disabled)
 		}
+		if n.Kind == ui.DataTree && r.control != nil && r.control.outline != nil {
+			stampTreeAccessibility(r, nodes[start:])
+			guardTreeAccessibility(r.control.outline, nodes[start:], handlers)
+		}
 		if n.Kind == ui.DataGrid && r.control != nil && r.control.grid != nil {
 			stampGridAccessibility(r, nodes[start:])
 			guardGridAccessibility(r.control.grid, nodes[start:], handlers)
@@ -1017,8 +1023,9 @@ type AccessibilityInspection struct {
 	Elements     []AccessibilityElement `json:"elements"`
 }
 type AccessibilityElement struct {
-	// Pending grid records describe the last completed view, with actions
-	// revoked. Target generation is distinct from that completed generation.
+	// Grid-prefixed metadata covers managed tables and outlines. Pending records
+	// preserve last-completed data with actions revoked; target and completed
+	// generations remain distinct.
 	GridScope            string     `json:"grid_scope"`
 	GridIncarnation      uint64     `json:"grid_incarnation"`
 	GridPending          bool       `json:"grid_pending"`

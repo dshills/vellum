@@ -118,6 +118,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		parking := core.NewFrame(w.host.AsTree().Parent)
 		for _, r := range retained {
 			if r != nil && !tree.IsNil(r.widget) {
+				withdrawDataGeometry(r)
 				tree.MoveToParent(r.widget, parking)
 			}
 		}

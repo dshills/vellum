@@ -5,6 +5,8 @@ package main
 import (
 	"context"
 	"errors"
+	cogent "github.com/dshills/vellum/drivers/cogent"
+	"image"
 	"os"
 	"path/filepath"
 	"sync"
@@ -189,5 +191,68 @@ func TestComposedDeadlineHasBoundedExtendedBudget(t *testing.T) {
 	}
 	if (config{cycles: 1000, every: 25, timeout: 45*time.Minute + time.Second, composed: true}).validate() == nil {
 		t.Fatal("unbounded composed run admitted")
+	}
+}
+
+func TestTreeEnvelopeRequiresMatchingCompletedNativeView(t *testing.T) {
+	g := cogent.TreeInspection{ID: "outline", Incarnation: 17, Generation: 3, VisibleRows: 1000, Rows: []cogent.TreeRowGeometry{{ID: "row-id", Label: "Row", Index: 7, Selected: true, Bounds: image.Rect(0, 0, 100, 20)}}}
+	host := cogent.AccessibilityElement{ID: "host", DomainID: "outline", ObjectIdentity: 1, Role: "AXOutline", GridScope: "host", GridIncarnation: 17, GridGeneration: 3, GridTargetGeneration: 3, RowCount: 1000, Frame: [4]float64{0, 0, 100, 200}}
+	row := host
+	row.ID = "row"
+	row.DomainID = "row-id"
+	row.ObjectIdentity = 2
+	row.Role = "AXRow"
+	row.Parent = "host"
+	row.Name = "Row"
+	row.Selected = true
+	row.RowIndex = [2]int{7, 1}
+	native := cogent.AccessibilityInspection{Reachable: true, NativeWindow: true, Elements: []cogent.AccessibilityElement{host, row}}
+	if ready, count := treeEnvelopeCompleted(g, native); !ready || count != 1 {
+		t.Fatal("valid completed view refused", count)
+	}
+	// Production treeAccessibility omits empty-bounds rows. The checker accepts
+	// that bounded view and refuses a native row that should have been omitted.
+	clipped := g
+	clipped.Rows = append(append([]cogent.TreeRowGeometry(nil), g.Rows...), cogent.TreeRowGeometry{ID: "clipped-row", Label: "Clipped", Index: 8})
+	if ready, count := treeEnvelopeCompleted(clipped, native); !ready || count != 1 {
+		t.Fatal("production view with omitted clipped row refused", count)
+	}
+	extra := native
+	extra.Elements = append([]cogent.AccessibilityElement(nil), native.Elements...)
+	clippedNative := row
+	clippedNative.ID, clippedNative.DomainID = "clipped-native", "clipped-row"
+	clippedNative.ObjectIdentity = 4
+	clippedNative.Frame = [4]float64{}
+	extra.Elements = append(extra.Elements, clippedNative)
+	if ready, _ := treeEnvelopeCompleted(clipped, extra); ready {
+		t.Fatal("out-of-contract native clipped row qualified")
+	}
+	cases := map[string]func(*cogent.AccessibilityInspection){
+		"pending":      func(s *cogent.AccessibilityInspection) { s.Elements[1].GridPending = true },
+		"generation":   func(s *cogent.AccessibilityInspection) { s.Elements[1].GridGeneration = 2 },
+		"target":       func(s *cogent.AccessibilityInspection) { s.Elements[1].GridTargetGeneration = 4 },
+		"incarnation":  func(s *cogent.AccessibilityInspection) { s.Elements[1].GridIncarnation = 18 },
+		"scope":        func(s *cogent.AccessibilityInspection) { s.Elements[1].GridScope = "foreign" },
+		"selection":    func(s *cogent.AccessibilityInspection) { s.Elements[1].Selected = false },
+		"empty-frame":  func(s *cogent.AccessibilityInspection) { s.Elements[1].Frame = [4]float64{} },
+		"row-count":    func(s *cogent.AccessibilityInspection) { s.Elements[1].RowCount = 999 },
+		"index-length": func(s *cogent.AccessibilityInspection) { s.Elements[1].RowIndex[1] = 2 },
+		"duplicate": func(s *cogent.AccessibilityInspection) {
+			duplicate := s.Elements[1]
+			duplicate.ID = "duplicate-row"
+			duplicate.ObjectIdentity = 3
+			s.Elements = append(s.Elements, duplicate)
+		},
+		"missing": func(s *cogent.AccessibilityInspection) { s.Elements = s.Elements[:1] },
+	}
+	for name, change := range cases {
+		t.Run(name, func(t *testing.T) {
+			candidate := native
+			candidate.Elements = append([]cogent.AccessibilityElement(nil), native.Elements...)
+			change(&candidate)
+			if ready, _ := treeEnvelopeCompleted(g, candidate); ready {
+				t.Fatal("stale/missing native rows qualified")
+			}
+		})
 	}
 }

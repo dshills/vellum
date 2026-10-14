@@ -556,3 +556,12 @@ and the optional GPU route. A 20-process/4800-sample GPU-mode comparison rejects
 packed scanline compaction: object counts fall 12–13%, bytes rise slightly and deep
 p95 is 3.1% worse. No renderer/prepared change was adopted. Tree 4 ms, complete P6/P11,
 physical/native memory, human accessibility and Mac distribution remain open.
+
+
+The [tree/retained-view publication checkpoint](../docs/reports/macos-tree-publication/README.md)
+refuses stale tree geometry and queued AX actions during same-generation layout,
+retains read-only pending accessibility rows and publishes ready data/frames with
+stable compatible Cocoa identities. It withdraws descendant table/tree geometry
+before modal/ancestor/workbench transfers, including before panel.View. Original
+regressions fail; final verification scopes remain documented separately from
+human accessibility, full P6/P11, native/GPU memory and Mac distribution.

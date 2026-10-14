@@ -71,6 +71,7 @@ type outlineBinding struct {
 	projectedDisabled          bool
 	projectedHelp              string
 	measurement                atomic.Pointer[TreeInspection]
+	measurementScene           atomic.Pointer[core.Scene]
 	armed                      *outlinePress
 	requestMu                  sync.Mutex
 	requested                  outlineRequest
@@ -605,6 +606,7 @@ func disposeTree(r *record) {
 	t.projectionValid.Store(false)
 	t.armed = nil
 	t.measurement.Store(nil)
+	t.measurementScene.Store(nil)
 	outlineRegistry.Lock()
 	if outlineRegistry.models[t.model] == t {
 		if old := t.previous; old != nil && !old.closed.Load() && !old.r.control.retired {

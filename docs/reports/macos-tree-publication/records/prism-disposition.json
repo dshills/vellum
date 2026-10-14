@@ -1,0 +1,23 @@
+{
+  "result": "REVIEWED_FINDING_DISPOSITION",
+  "finding_id": "6676cba3705e2053",
+  "disposition": "NOT_APPLICABLE_TO_PRODUCTION_CONTRACT",
+  "reason": "Production treeAccessibility skips row.Bounds.Empty() before emitting native AXRow. Completed native set must exactly match nonempty owner rows; accepting extra clipped/stale native rows would weaken verification. Positive visible+clipped-owner fixture qualifies when clipped native row omitted; extra empty native clipped row refuses.",
+  "production_contract_source": {
+    "path": "drivers/cogent/tree_accessibility.go",
+    "sha256": "35ea67d9d50fb2ca9370d2af0918bcd24666ed1354537ede58d4036415e2d89a"
+  },
+  "followup_change": "main_test.go adds explicit positive and negative clipped row fixtures; no production or checker changes",
+  "test_receipt": "prism-clipped-contract-race.json",
+  "test_exit_code": 0,
+  "raw_prism_exit_code": 1,
+  "provider_review_not_repeated": true,
+  "internal_reviewer": "/root/platform_completion",
+  "internal_result": "REFUTED_ON_PRODUCTION_CONTRACT; APPROVED_SOURCE",
+  "confirmed_hashes": {
+    "drivers/cogent/tree_accessibility.go": "35ea67d9d50fb2ca9370d2af0918bcd24666ed1354537ede58d4036415e2d89a",
+    "drivers/cogent/tree_publication.go": "5e6b3adad52ba1bd460b5025c17132b42c926dcdde16359832a9aa63483d00ad",
+    "drivers/cogent/cmd/window-cycle-smoke/main_test.go": "1e9302992d656a6f103a2d5e2703e83a904a9c9f1577ac3faad345f31e928d29",
+    "drivers/cogent/cmd/window-cycle-smoke/composed.go": "b545206fc73deac8189dcaa0f976356e7318b5c4161edb08c65bedcc6d8feddc"
+  }
+}

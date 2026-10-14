@@ -116,14 +116,21 @@ func (t *outlineBinding) capture() {
 		m.Pages[i] = TreePageGeometry{ID: TreePageID(m.ID, direction), Name: b.Text, Direction: direction, Enabled: !b.StateIs(states.Disabled), Bounds: b.Geom.TotalBBox.Add(origin)}
 	}
 	old := t.measurement.Load()
+	t.measurementScene.Store(t.host.Scene)
 	t.measurement.Store(m)
-	if old == nil || old.Generation != m.Generation || old.Bounds != m.Bounds {
+	if t.host.Scene != nil && t.host.Scene.GlobalLayoutPending() || !sameTreeAccessibilityMeasurement(old, m) {
 		_ = t.owner.Invalidate(t.window)
 	}
 }
 func (t *outlineBinding) currentMeasurement() *TreeInspection {
 	m := t.measurement.Load()
-	if !t.projectionValid.Load() || m == nil || m.Generation != t.projection.State.Generation || m.Stamp != t.projection.State.Stamp || m.Viewport != t.projection.State.Viewport {
+	if !t.projectionValid.Load() || m == nil || m.Generation != t.projection.State.Generation || m.Stamp != t.projection.State.Stamp || m.Viewport != t.projection.State.Viewport || m.Pending != t.projection.State.Pending {
+		return nil
+	}
+	if scene := t.measurementScene.Load(); scene != nil && scene.GlobalLayoutPending() {
+		return nil
+	}
+	if t.measurement.Load() != m {
 		return nil
 	}
 	t.requestMu.Lock()

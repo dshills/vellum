@@ -206,7 +206,7 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshot(nodes []accessibili
 		}
 		previous := b.gridPublications[scope]
 		retained := nodes[indices[0] : indices[0]+1]
-		if len(previous) > 0 && previous[0].GridIncarnation == host.GridIncarnation && previous[0].Parent == host.Parent {
+		if len(previous) > 0 && previous[0].GridIncarnation == host.GridIncarnation && previous[0].Parent == host.Parent && previous[0].Role == host.Role {
 			cache[scope] = previous
 			retained = previous
 		}

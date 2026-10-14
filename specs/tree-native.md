@@ -41,8 +41,9 @@ projection withdraws measurement/AX actions, and later paints cannot republish
 the retained old rows until successful bounded synchronization.
 Normal inspection never scans immutable stored nodes. Previous/next AX page
 buttons reveal a viewport, retaining selected identity. AX tree-row identities
-use generated `tree:` namespace, expose current materialized rows only, and retire
-when the accepted projection or binding changes. The existing Cocoa bridge maps
+use generated `tree:` namespace and expose bounded materialized rows. Compatible
+keys retain native identity across completed layout/state publications; rows retire
+when their key leaves the completed view or their binding/scope ownership changes. The existing Cocoa bridge maps
 these semantic roles; human VoiceOver/external AX certification remains separate.
 
 Manual input uses the actual Core hit-test, focus, modal, key, scroll and originating
@@ -65,3 +66,33 @@ The native row sync installs all row/footer state before one host updater pass;
 separate per-row passes are redundant. Tests compare retained updater/style counts
 and final software pixels across four DPI settings. The ordinary input contract
 and existing ownership, scope, geometry and payload limits remain unchanged.
+
+
+## Pending geometry and retained scene transfers
+
+A full scene layout invalidates `InspectTree`, pointer row geometry and queued
+AX actions even at the same portable generation. The captured originating scene's
+atomic layout fence is checked without treating last-completed coordinates as
+current. Completed publication compares every data/geometry field except frame
+ordinal; scale, native row/disclosure/page movement and pending-index metadata
+therefore cause a new owner publication even when host bounds stay unchanged.
+
+Trees share the existing bounded virtual-view accessibility transaction. Its
+legacy `grid_scope`, incarnation, pending, target/completed generation and frame
+fields describe both tables and outlines. Pending layout keeps the last completed
+rows readable while revoking actions and enabled/focused state. Ready data/frames
+publish atomically and retain compatible native object identity. Cocoa selectors
+and queued owner handlers independently recheck readiness. Index-worker pending
+state remains distinct: after its current layout completes, the old accepted index
+keeps its existing interactive behavior.
+
+Before an ancestor moves, all retained descendant table/tree completions and
+captured scene references are withdrawn. This includes keyed ancestor moves,
+workbench parking before panel.View and modal open/native-close/programmatic-close
+transfers. Table local-layout stamps are invalidated too. Destination rendering
+is required before geometry can become current again; model/widget identity and
+last-readable AX data remain separately owned. Scope-kind changes are an ownership
+boundary even when independently numbered tree/grid incarnations coincide.
+
+See the [publication checkpoint](../docs/reports/macos-tree-publication/README.md)
+for original failing regressions and the scoped final verification.

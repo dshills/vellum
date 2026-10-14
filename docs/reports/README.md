@@ -3,6 +3,7 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Tree and retained-view geometry publication](macos-tree-publication/README.md)
 - [Stored-tree CPU/GPU route investigation](macos-tree-gpu/README.md)
 - [Large stored-tree adapter](macos-large-tree/README.md)
 - [Mac clipboard data (offscreen)](macos-clipboard-data/README.md)
