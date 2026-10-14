@@ -501,3 +501,9 @@ covers actual popup keyboard/pointer routing, peer-owner drain retirement and
 20 Cocoa selection cycles with real item geometry and modal wake progress.
 This component checkpoint does not close frame-performance, composed lifecycle,
 human accessibility, overnight or distribution gates.
+
+The [upload pilots](../docs/reports/macos-upload-pilots/README.md) tested packed
+inputs and unchanged-byte upload copies with actual GPU parity and paired native
+release runs. Neither showed a useful pilot gain; both prototypes were rejected
+and no renderer patch was added. Warm table layout/paint and reconciliation are
+the next profiling priority. The unchanged 4/6ms targets remain failed.

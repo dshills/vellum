@@ -1,0 +1,23 @@
+"""Complete the review's missing-artifact staging fix and commit the negative result."""
+from pathlib import Path
+import hashlib,json,subprocess,shutil,tarfile
+r=Path('/private/tmp/vellum-large-data');p=Path('/private/tmp/vellum-macos-grid-profile-55');rec=r/'docs/reports/macos-upload-pilots/records';sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest()
+review=json.loads((p/'prism-report/prism.json').read_text());process=json.loads((p/'prism-report/process.json').read_text());assert process['exit_code']==1 and process['source_index_stable'] and review['coverage']['complete'] and [x['id']for x in review['findings']]==['9c228c0786bb257b']
+assert all(sha(r/n)==h for n,h in process['after'].items())
+index=json.loads((rec/'evidence-index.json').read_text());assert sha(rec/'evidence.tar.xz')==index['archive_sha256']
+with tarfile.open(rec/'evidence.tar.xz')as t:assert {m.name:hashlib.sha256(t.extractfile(m).read()).hexdigest()for m in t.getmembers()if m.isfile()}==index['members']
+q=json.loads((rec/'qualification.json').read_text());summary=json.loads((rec/'review-summary.json').read_text());assert q['result']==summary['result']=='REJECTED_BOTH_UPLOAD_PROTOTYPES' and q['ordinary_samples']==960 and not q['renderer_changed']
+for name,v in q['variants'].items():
+ for mode in ['baseline','candidate']:
+  assert v[mode]['timings_ns']['ui_work_ns']['pooled']==summary['variants'][name][mode]['ui_work_ns']
+  assert v[mode]['go_process_alloc_bytes']['mean']==summary['variants'][name][mode]['mean_go_process_alloc_bytes']
+for name in ['prism.json','process.json','inputs.json']:shutil.copyfile(p/'prism-report'/name,rec/('prism-'+name))
+resolution={'finding':'9c228c0786bb257b','disposition':'ACCEPTED_FIXED','raw_exit_code':1,'raw_findings':1,'unresolved_findings':0,'fix':'Add real qualification.json and evidence.tar.xz to staged checkpoint. Provider payload intentionally limited to report, compact summary and archive index; binary/archive bytes excluded. README and every reviewed file remain unchanged.','linked_files':{'docs/reports/macos-upload-pilots/records/'+n:sha(rec/n)for n in ['qualification.json','evidence-index.json','evidence.tar.xz']},'verified_archive_members':index['verified_members']}
+(rec/'review-resolution.json').write_text(json.dumps(resolution,indent=2)+'\n')
+checkpoint={'result':'REVIEWED_REJECTED_UPLOAD_PILOTS','base_commit':q['base_commit'],'source':process['after'],'prism_coverage_complete':True,'unresolved_findings':0,'raw_prism_findings':1,'archive_sha256':index['archive_sha256'],'ordinary_processes':8,'ordinary_samples':960,'diagnostic_samples':512,'renderer_changed':False,'prepared_files':6202,'qualifies_full_macos':False,'review_resolution_sha256':sha(rec/'review-resolution.json')}
+(rec/'checkpoint.json').write_text(json.dumps(checkpoint,indent=2)+'\n');(rec/'finalize-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+names=set(subprocess.check_output(['git','diff','HEAD','--name-only'],cwd=r).decode().splitlines())|set(subprocess.check_output(['git','ls-files','--others','--exclude-standard'],cwd=r).decode().splitlines());assert all(n=='specs/macos-completion.md' or n.startswith('docs/reports/macos-upload-pilots/')for n in names)
+subprocess.run(['git','add','--',*sorted(names)],cwd=r,check=True)
+for name,h in resolution['linked_files'].items():assert hashlib.sha256(subprocess.check_output(['git','show',':'+name],cwd=r)).hexdigest()==h
+subprocess.run(['git','diff','--cached','--check'],cwd=r,check=True);subprocess.run(['git','commit','-m','test(macos): reject ineffective upload optimizations'],cwd=r,check=True)
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=r).strip();print('COMMIT',subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip())

@@ -1,0 +1,121 @@
+{
+  "result": "REJECTED_BOTH_UPLOAD_PROTOTYPES",
+  "base_commit": "aad1b4bc0cd7a306b87af55acb511843d896af83",
+  "ordinary_processes": 8,
+  "ordinary_samples": 960,
+  "diagnostic_samples": 512,
+  "prepared_files": 6202,
+  "renderer_changed": false,
+  "limits": [
+    "Two repetitions and one fixed10k case per prototype; no complete performance campaign",
+    "Profiler samples include native waits/process activity; no GPU completion or physical CPU attribution",
+    "No new timing, allocation, P6, P11 or Mac acceptance claimed"
+  ],
+  "next_evidence_priority": "Layout/paint and reconciliation currently remain substantial parts of warm UI work; examine cell renderer reuse before more upload-call changes.",
+  "variants": {
+    "pilot": {
+      "baseline": {
+        "ui_work_ns": {
+          "count": 240,
+          "p50": 5485251,
+          "p95": 6622334,
+          "p99": 7463168,
+          "max": 7661458,
+          "min": 4922916,
+          "mean": 5712055.491666666,
+          "sample_stddev": 521115.03808805457,
+          "coefficient_of_variation": 0.09123073801511745
+        },
+        "raster_upload_ns": {
+          "count": 240,
+          "p50": 2180583,
+          "p95": 2953708,
+          "p99": 3203666,
+          "max": 3391833,
+          "min": 1949125,
+          "mean": 2259400.15,
+          "sample_stddev": 255413.27321192797,
+          "coefficient_of_variation": 0.11304472703160968
+        },
+        "mean_go_process_alloc_bytes": 9794237.633333333
+      },
+      "candidate": {
+        "ui_work_ns": {
+          "count": 240,
+          "p50": 5514542,
+          "p95": 6646962,
+          "p99": 7398459,
+          "max": 7649458,
+          "min": 5093458,
+          "mean": 5754831.204166667,
+          "sample_stddev": 524938.5497534699,
+          "coefficient_of_variation": 0.09121701942767652
+        },
+        "raster_upload_ns": {
+          "count": 240,
+          "p50": 2176417,
+          "p95": 2912834,
+          "p99": 3091917,
+          "max": 3185625,
+          "min": 2032833,
+          "mean": 2247088.025,
+          "sample_stddev": 227489.68413850924,
+          "coefficient_of_variation": 0.10123754904461708
+        },
+        "mean_go_process_alloc_bytes": 10748945.633333333
+      }
+    },
+    "copies-pilot": {
+      "baseline": {
+        "ui_work_ns": {
+          "count": 240,
+          "p50": 5514670,
+          "p95": 6620874,
+          "p99": 7399668,
+          "max": 7595835,
+          "min": 4970042,
+          "mean": 5711976.791666667,
+          "sample_stddev": 508610.2021822205,
+          "coefficient_of_variation": 0.0890427641310174
+        },
+        "raster_upload_ns": {
+          "count": 240,
+          "p50": 2161000,
+          "p95": 2831583,
+          "p99": 3067375,
+          "max": 3141292,
+          "min": 1940292,
+          "mean": 2221782.970833333,
+          "sample_stddev": 212995.8706846951,
+          "coefficient_of_variation": 0.09586709119694345
+        },
+        "mean_go_process_alloc_bytes": 9764134.466666667
+      },
+      "candidate": {
+        "ui_work_ns": {
+          "count": 240,
+          "p50": 5636582,
+          "p95": 6839584,
+          "p99": 7665666,
+          "max": 7800041,
+          "min": 4763918,
+          "mean": 5826548.558333334,
+          "sample_stddev": 560282.6382796259,
+          "coefficient_of_variation": 0.09616029672974923
+        },
+        "raster_upload_ns": {
+          "count": 240,
+          "p50": 2202792,
+          "p95": 3079666,
+          "p99": 3284542,
+          "max": 3460542,
+          "min": 1907166,
+          "mean": 2315293.9291666667,
+          "sample_stddev": 301467.1794363019,
+          "coefficient_of_variation": 0.13020687163672892
+        },
+        "mean_go_process_alloc_bytes": 9752532.933333334
+      }
+    }
+  }
+}

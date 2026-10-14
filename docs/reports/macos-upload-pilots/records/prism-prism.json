@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9b6add6be987711ce690126584ea15c2",
+  "repo": {
+    "root": "/private/tmp/vellum-large-data",
+    "head": "aad1b4bc0cd7a306b87af55acb511843d896af83",
+    "branch": "codex/macos-window-retention"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "9c228c0786bb257b",
+      "severity": "medium",
+      "category": "docs",
+      "title": "README links to a records/qualification.json file that this change does not add",
+      "message": "The README links to records/qualification.json, but this change adds only evidence-index.json and review-summary.json under records/. The link will 404, and the qualification result the README relies on cannot be checked from the repo. Only the archive's internal members (pilot/qualification.json and copies-pilot/qualification.json) are indexed, and those are not in the repo either.",
+      "suggestion": "Add records/qualification.json to the change, or repoint the link to an existing file such as records/review-summary.json. Also state that the raw archive is not in the repo, if that is the case.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "docs/reports/macos-upload-pilots/README.md",
+          "lines": {
+            "start": 44,
+            "end": 44
+          }
+        }
+      ],
+      "tags": [
+        "docs",
+        "broken-link",
+        "evidence"
+      ],
+      "evidence": "[Qualification](records/qualification.json) and [archive index](records/evidence-index.json)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 17797,
+    "totalMs": 17821
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 18425,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 11221,
+        "output": 2393,
+        "costUSD": 0.046372
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

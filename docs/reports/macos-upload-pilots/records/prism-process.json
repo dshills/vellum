@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--format",
+    "json",
+    "--baseline",
+    "none",
+    "--fail-on",
+    "medium",
+    "--min-severity",
+    "medium",
+    "--no-auto-exclude",
+    "--paths",
+    "specs/macos-completion.md,docs/reports/macos-upload-pilots/README.md,docs/reports/macos-upload-pilots/records/review-summary.json,docs/reports/macos-upload-pilots/records/evidence-index.json",
+    "--out",
+    "/private/tmp/vellum-macos-grid-profile-55/prism-report/prism.json"
+  ],
+  "exit_code": 1,
+  "error": null,
+  "elapsed_seconds": 17.915136167022865,
+  "before": {
+    "specs/macos-completion.md": "30fb26ac34fdaab9917f9e017f8c7c242a1734c8275d65d96bbba0ccb1664a47",
+    "docs/reports/macos-upload-pilots/README.md": "f4c9fec98d7e84c1ee46390c704091de7ef43e0d23b9a092bed4a7ad70fafd38",
+    "docs/reports/macos-upload-pilots/records/review-summary.json": "cbef91f6c8c4faa7c35bb450d10f0ef73f07cc048065c2ee6145ea110a781573",
+    "docs/reports/macos-upload-pilots/records/evidence-index.json": "20054b633c791f992e402bf2673f85aed18486354ce49ccc6a168c69a4ffabfd"
+  },
+  "after": {
+    "specs/macos-completion.md": "30fb26ac34fdaab9917f9e017f8c7c242a1734c8275d65d96bbba0ccb1664a47",
+    "docs/reports/macos-upload-pilots/README.md": "f4c9fec98d7e84c1ee46390c704091de7ef43e0d23b9a092bed4a7ad70fafd38",
+    "docs/reports/macos-upload-pilots/records/review-summary.json": "cbef91f6c8c4faa7c35bb450d10f0ef73f07cc048065c2ee6145ea110a781573",
+    "docs/reports/macos-upload-pilots/records/evidence-index.json": "20054b633c791f992e402bf2673f85aed18486354ce49ccc6a168c69a4ffabfd"
+  },
+  "source_index_stable": true,
+  "prism_sha256": "461606e5f907c27a4f49213b5b2b36d5479a2fae370c82b24fd91516bd1e81e7",
+  "producer_sha256": "318b0faaaf03478cbdc0a80724bb45513abbe2e15c4cf037e9925f9da9a2fab6"
+}
