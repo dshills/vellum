@@ -1,0 +1,45 @@
+{
+  "result": "REVIEWED_SCOPED_MAC_STATIC_IDLE",
+  "runs": 5,
+  "sampled_seconds": [
+    60.01946820796002,
+    60.022263999970164,
+    60.02045720897149,
+    60.01314724999247,
+    60.01970983296633
+  ],
+  "idle_cpu_percent_one_core": [
+    0.36654773287515197,
+    0.33320969032440934,
+    0.2332538046362527,
+    0.29993427815106394,
+    0.23325670915373845
+  ],
+  "binary_sha256": "3ef7014766f8feab4c98bc9667800c2f68d2574338d1e097063a4a447d41e4c1",
+  "baseline_sha256": "76500c82990a322f1807331e0a5e592a93b2efef527e3d0ab2f60f37872a43c9",
+  "raw_samples_sha256": "bed950bee81091c7b9de656781bb048a342bb8508f95575532746bead7d1d54a",
+  "results_sha256": "12813bfeb6e59bc9cf6f83efa199afba9f25f385d09e1fed0f62b8a578c79f21",
+  "producer_sha256": "b49023c37b844e78f6c7937c518a40f2ca32c040d4a66a90a09d40963e9b710a",
+  "scope": "Five independent ordinary hello processes; 60-second settled CPU/RSS observations within each 100-second idle. Startup endpoint is verified GPU readback, not first interactive presentation. Not primary1000-control workbench, wakeup/present counts, occluded/minimized, overnight/P11 or total native-memory qualification.",
+  "base_commit": "df4bcb1d8652c331584fced8b1853096d4de1dd3",
+  "source": {
+    "docs/reports/macos-static-idle/README.md": "1c78a52556449265277c0f2062e94412fd955225d5e521c2e57bd29fa2698fd4",
+    "specs/macos-completion.md": "e0a7ca12d85d79bd273eded81bbe520dd71df365df6d5edc12aed70363af7237"
+  },
+  "prepared_files": 6202,
+  "internal_review_sha256": "f673c45ce1bd177a5652b6de81da4482d375d821e67016cbc16d2266d5f0d2c6",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_findings": 1,
+  "prism_finding_disposition": "RESOLVED_EVIDENCE_INCLUDED",
+  "prism_coverage_complete": true,
+  "prism_sha256": "9e8f5b0fcbb32b96818d18e65f0b94be53aa45d29fd87d2f384a795372ee092b",
+  "process_receipt_sha256": "c68ae31128674eb565305ba52f3a7eb483385e2846f02b96460bac1c0a71ae2a",
+  "archive_sha256": "8e43283de23b95203315c719402631754b1723a9ced6be2f4a964a3261e86f24",
+  "index_sha256": "65fc4f938bd24a3c4d522f8ed269b76e8864267322138253b344010569df0378",
+  "archive_members": 29,
+  "archive_index_verified": true,
+  "seal_producer_sha256": "f2c1a794ff1439ff1e72ed52db1afdfc7204689288dfbd79faf2caa50cf4ee09",
+  "prism_disposition_sha256": "be79721a685f89f0ac7833d37daa697353a5ead64daf36df093c4ad7ae00fb8d",
+  "unresolved_prism_findings": 0
+}

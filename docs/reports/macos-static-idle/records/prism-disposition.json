@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "result": "RESOLVED_EVIDENCE_INCLUDED",
+  "status": "RESOLVED_EVIDENCE_INCLUDED",
+  "finding_id": "12cdb0e882d65f3b",
+  "findings": [],
+  "unresolved_findings": [],
+  "files": {
+    "docs/reports/macos-static-idle/README.md": "1c78a52556449265277c0f2062e94412fd955225d5e521c2e57bd29fa2698fd4",
+    "specs/macos-completion.md": "e0a7ca12d85d79bd273eded81bbe520dd71df365df6d5edc12aed70363af7237"
+  },
+  "prism_sha256": "9e8f5b0fcbb32b96818d18e65f0b94be53aa45d29fd87d2f384a795372ee092b",
+  "process_sha256": "9b92823d0ded9a7f95b9fce43a176929f2f4f9eaab731e3b3e9beeca06345c51",
+  "archive_sha256": "8e43283de23b95203315c719402631754b1723a9ced6be2f4a964a3261e86f24",
+  "index_sha256": "65fc4f938bd24a3c4d522f8ed269b76e8864267322138253b344010569df0378",
+  "reviewed_artifact_sha256": {
+    "/private/tmp/vellum-macos-static-idle/prism-v1/prism.json": "9e8f5b0fcbb32b96818d18e65f0b94be53aa45d29fd87d2f384a795372ee092b",
+    "/private/tmp/vellum-macos-static-idle/prism-v1/process.json": "9b92823d0ded9a7f95b9fce43a176929f2f4f9eaab731e3b3e9beeca06345c51",
+    "/private/tmp/vellum-macos-static-idle/prism-v1/inputs.json": "2429bdad25044d5690ac278a6a9f59303ff765e93f3c30d66a04cecc24565453",
+    "/private/tmp/vellum-macos-static-idle/prism-v1/staged.diff.txt": "0048a285230f456836661cefbf7cb2ade836ade0678be958649df37f22faa36d",
+    "/private/tmp/vellum-large-data/docs/reports/macos-static-idle/records/evidence.tar.xz": "8e43283de23b95203315c719402631754b1723a9ced6be2f4a964a3261e86f24",
+    "/private/tmp/vellum-large-data/docs/reports/macos-static-idle/records/evidence-index.json": "65fc4f938bd24a3c4d522f8ed269b76e8864267322138253b344010569df0378",
+    "/private/tmp/vellum-macos-static-idle/checkpoint-source.json": "036d946cd3f43fc5a82547f65cdc5e9adc0f7277a4f2ca9c4954ef7de79b193f",
+    "/private/tmp/vellum-macos-static-idle/raw-samples.jsonl": "bed950bee81091c7b9de656781bb048a342bb8508f95575532746bead7d1d54a",
+    "/private/tmp/vellum-macos-static-idle/results.json": "12813bfeb6e59bc9cf6f83efa199afba9f25f385d09e1fed0f62b8a578c79f21",
+    "/private/tmp/vellum-macos-static-idle/qualification.json": "c16bc74efcd3a0563934be04ac17178127ca81b25c038615d4b93420475c76a5",
+    "/private/tmp/vellum-macos-static-idle/measure.py": "b49023c37b844e78f6c7937c518a40f2ca32c040d4a66a90a09d40963e9b710a",
+    "/private/tmp/vellum-macos-static-idle/run.py": "ee3d217a0ec7a3395616ed26150b7edbcace58885b390e665a16a18db542ba41",
+    "/private/tmp/vellum-macos-static-idle/final-source-review.json": "f673c45ce1bd177a5652b6de81da4482d375d821e67016cbc16d2266d5f0d2c6"
+  },
+  "archive_verification": {
+    "members": 29,
+    "safe_regular_unique_paths": true,
+    "index_keyset_payload_sizes_and_sha256_exact": true,
+    "raw_five_pairs_results_qualifications_producers_and_source_snapshots_included": true,
+    "current_source_and_measurement_payloads_unchanged": true
+  },
+  "links": {
+    "report": "docs/reports/macos-static-idle/README.md",
+    "archive": "docs/reports/macos-static-idle/records/evidence.tar.xz",
+    "index": "docs/reports/macos-static-idle/records/evidence-index.json",
+    "raw_samples_member": "phase/raw-samples.jsonl",
+    "five_results_member": "phase/results.json",
+    "measurement_producer_member": "phase/measure.py",
+    "wrapper_member": "phase/run.py",
+    "raw_prism_member": "phase/prism-v1/prism.json",
+    "raw_process_member": "phase/prism-v1/process.json",
+    "source_manifest_member": "phase/checkpoint-source.json"
+  },
+  "rationale": "The provider saw the two report/spec leaves without the later evidence archive. The actual adjacent archive/index now contains all ten parsed process samples, five results, producer bytes, terminal build/campaign receipts, source/prepared baseline identities, unchanged source2, internal review and the unchanged raw Prism response. A read-only stdlib tar audit verifies all 29 safe regular unique members, exact index sizes/SHA256 and current payload equality except the explicitly versioned archived promotion producer. The prior independently recomputed evidence approval remains unchanged. This satisfies evidence inclusion; it does not convert the original provider exit 1 into a pass.",
+  "raw_provider": {
+    "exit_code": 1,
+    "medium_findings": 1,
+    "coverage_files": 2,
+    "coverage_complete": true,
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "rerun": false
+  },
+  "producer_version_note": {
+    "member": "phase/promote.py",
+    "archived_sha256": "8b7b9309db933ca445e986fecee9ec4333a832d1ad2e05169c1f14d405d0d2cc",
+    "current_sha256": "ee7f50b696ab71fceeeae8efc949c0c2d7f81986a21036896ddaf3b28ccbfe15",
+    "scope": "The archive retains the pre-disposition promotion gate variant. The changed current promotion producer is outside this approval and will be retained/checked separately by parent. This distinction does not change source or measured evidence."
+  },
+  "limitations": [
+    "The archive certificate binds the current 29-member archive version only, not future archive/checkpoint/promotion output.",
+    "Resolution concerns evidence inclusion. Quantized small-fixture CPU/RSS limitations, above-reference RSS, missing wakeup/present/full-workbench/P11/Mac acceptance remain as in the unchanged source review.",
+    "No provider rerun, tests/build/native/UI/OS or Git/root mutation occurred; reviewer only read/hash-audited metadata and wrote these external disposition files."
+  ]
+}

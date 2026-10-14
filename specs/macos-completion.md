@@ -474,3 +474,13 @@ removes eight allocations per local capture fixture while retaining at most
 comparison passes exact geometry and ownership checks but has mixed frame timing
 and no demonstrated process-wide allocation reduction. Both 4/6 ms targets still
 fail. Complete P6, composed P11/lifecycle/idle soak and Mac release remain open.
+
+
+The [settled static-idle checkpoint](../docs/reports/macos-static-idle/README.md)
+records five independent 100-second native hello processes, each with a settled
+60-second process CPU/RSS sample. Observed CPU is 0.23–0.37% of one core; within-run
+RSS changes by at most 0.079 MiB. The small counter/canvas fixture is not the
+primary 1,000-control workbench. RSS is roughly 227–237 MiB, above the provisional
+150 MiB reference, and is not private/native allocation attribution. Wakeup/
+present counts, minimized/occluded/overnight cases, full P11 and memory acceptance
+remain open; the original P6 frame targets still fail.
