@@ -1,0 +1,111 @@
+{
+  "base_commit": "4c0df93c35fc5700e0fbc8f07e4333e90b93ce57",
+  "sources": {
+    "drivers/cogent/cmd/tab-close-smoke/model.go": "7e8aefecf6fe07b07ce8c9775873f0fa0e6ed4ab81651813d5c454c84b1ea44a",
+    "drivers/cogent/cmd/tab-close-smoke/main_native.go": "4dc7a089135ad968df0b36e0c25ce3b8c184ac4d93b31e29e9ffd790649b3aad",
+    "drivers/cogent/cmd/tab-close-smoke/main_other.go": "67578d80bc87c211a8c202a2e52637b65a19587c5db9fb7a7d3a16b33f23dbed",
+    "drivers/cogent/cmd/tab-close-smoke/model_test.go": "d56ce8ea4e1e3fcb2ea2bfc76aeb7991a62936039191d02e4b1d9def5c973425",
+    "specs/tab-close.md": "afb048b6cfc9165d510f9ff58b3995bb3d929718e9aa6dbc01539b7dd0fc32ba",
+    "docs/reports/macos-tab-close-native/README.md": "251dbb4d8e6e7c9e62dd6bd50ba6bd6ef0fda6091006693fa4f44646cbf666a4",
+    "docs/reports/macos-glyph-lookup/README.md": "83e9b80ba58ac95cd198a5dcfe820ba6ad97ff1545a37af31041257fb7112c91",
+    "docs/reports/macos-native-followups/README.md": "f2e71d7f3dd4884440dccb54f608a566498c69250fe3adc7c4952f0a47212f39",
+    "docs/reports/macos-span-storage/README.md": "adc7356db55fcd4e075a130d5ec6902e0b2ac72a70e1873767f75c8a7f6dabb1",
+    "specs/macos-completion.md": "75e74cbb37f7b18d3a4f7dde6db37c121ca84b304e8f816ae62a66655f88de3a"
+  },
+  "result": "PASS_SCOPED_NATIVE_TAB_ACCEPTANCE_CURRENT_FRAMEWORK",
+  "checks": {
+    "rgba-model-race": {
+      "receipt_sha256": "450b36a27f0bf2a4bebdbc89dbd86c3db19df01d353fbb1dfc501b44cd43d25d",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./cmd/tab-close-smoke",
+        "./cmd/gallery"
+      ],
+      "elapsed_seconds": 23.792691208072938
+    },
+    "rgba-vet": {
+      "receipt_sha256": "ec9bf6c2b72454da0b75c9a70373e78feb445424d27fa29eebbf78d42eb15ca5",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./cmd/tab-close-smoke",
+        "./cmd/gallery"
+      ],
+      "elapsed_seconds": 10.78824258397799
+    },
+    "rgba-native-build": {
+      "receipt_sha256": "a7beebc3571bc043c900f3b09f4ad9e89a43b47576ec5260cd6c8a2edd7e2f9a",
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-tab-close-native/tab-close-smoke-rgba",
+        "./cmd/tab-close-smoke"
+      ],
+      "elapsed_seconds": 16.94507225009147
+    }
+  },
+  "current_framework_prepared_files": 6214,
+  "current_framework_native_steps": 8,
+  "current_framework_native_cleanup_zero": true,
+  "prior_base_commit": "4cf9e3654206600885a86581b958bc388043e8af",
+  "prior_prepared_files": 6209,
+  "prior_native_faults_detected": 2,
+  "current_native_summary_sha256": "5db2837dab35717553f9fe2cae9bd1fd94cd507ec644c5000415d8a36549d70e",
+  "prior_native_summary_sha256": "9e9ab8153bc029e744f9e6d54b374a1411acf80451e83e43061c700b668f9e56",
+  "physical_input_qualified": false,
+  "human_voiceover_qualified": false,
+  "performance_qualified": false,
+  "retention_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "mac_distribution_qualified": false,
+  "documentation_added_after_native_run": {
+    "docs/reports/macos-glyph-lookup/README.md": "83e9b80ba58ac95cd198a5dcfe820ba6ad97ff1545a37af31041257fb7112c91",
+    "docs/reports/macos-native-followups/README.md": "f2e71d7f3dd4884440dccb54f608a566498c69250fe3adc7c4952f0a47212f39",
+    "docs/reports/macos-span-storage/README.md": "adc7356db55fcd4e075a130d5ec6902e0b2ac72a70e1873767f75c8a7f6dabb1",
+    "specs/macos-completion.md": "75e74cbb37f7b18d3a4f7dde6db37c121ca84b304e8f816ae62a66655f88de3a"
+  },
+  "native_runtime_source_manifest_sha256": "03dadf47f4b3b6412f914661692fa031921205ba29ce12a7a7aebf072a42ff0b",
+  "followup_inputs": {
+    "retention": {
+      "path": "/private/tmp/vellum-macos-quiet-current/retention-summary.json",
+      "sha256": "b8427f526f1e5aea453e091c5107da5dad114c69a6b656e0a3abb60702302858"
+    },
+    "retention_review": {
+      "path": "/private/tmp/vellum-macos-quiet-current/internal-retention-review.json",
+      "sha256": "82797b54a0ca96e74d3da68814005204052d0ea9a4737b9800ecec814e445079"
+    },
+    "stage59": {
+      "path": "/private/tmp/vellum-macos-glyph-lookup/native-summary.json",
+      "sha256": "b2c6c24931a09d2fefc43abd4ed030fd9b761ad8527122123b4a79a319d13c9c"
+    },
+    "stage60": {
+      "path": "/private/tmp/vellum-macos-span-storage/native-summary.json",
+      "sha256": "fde54e0cafad69f4738c23af4d501343ae54d4cee3fd0e8ce3913d0c888c7912"
+    }
+  },
+  "scope": "Bounded native tab acceptance plus source-bound historical lifecycle/renderer evidence; four documentation files added after current tab native run. No production or executable source changed after passing runtime gates.",
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 10,
+  "prism_findings": 1,
+  "prism_unresolved_findings": 0,
+  "prism_raw_exit_code": 1,
+  "prism_disposition": "FIXED_DOCUMENTATION",
+  "internal_correction_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_correction_review_sha256": "e2e6e546ab3cf5d15ec51c7fbfd4474b5b6f3e057f7d6831750b48f776184df9",
+  "prism_calls": 2,
+  "archive_sha256": "a979673993da0ebc2a4ded7b34d2c29d58752a17441f77d0300de2b6898e813e",
+  "archive_members": 507,
+  "archive_bytes": 5649380,
+  "canonical_promoted": false
+}

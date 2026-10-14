@@ -44,3 +44,15 @@ queue refusal, hidden/disabled/dialog capability retirement and serialized
 semantics are required checks. These do not qualify physical input, human
 VoiceOver or a live native lifecycle/performance campaign. The gallery includes
 Document tabs with close rejection and a last-document empty state.
+
+## Native acceptance sequence
+
+The separate bounded `drivers/cogent/cmd/tab-close-smoke` command must complete
+actual Cocoa action selectors, exact owner callback counts and native publication
+for rejected selected/nonselected closes, preserved edited draft identity,
+accepted nonselected and selected closes, last-page empty state, disabled/absent
+refusal, and re-created native identities. Every stage requires a five-second
+bound and owner FIFO acknowledgement after admission; accepted proposals are not
+reissued while awaiting native publication. Terminal cleanup must report no
+windows, accessibility registrations, native operations or pending callbacks.
+It does not synthesize global keyboard/pointer input or certify human VoiceOver.

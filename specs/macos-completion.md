@@ -21,6 +21,29 @@ identity. Replacement and real removal retire old objects. The separate stored
 400-cell Cocoa acceptance mode and scoped lifecycle/race fixtures qualify this
 behavior. Full-frame latency targets and human screen-reader checks remain open.
 
+## Latest unattended evidence
+
+The human authorized unattended native and performance testing on 14 October
+2026. Prior paused-test notes below describe historical checkpoints. A return
+message stops live testing immediately.
+
+The [source-bound native follow-ups](../docs/reports/macos-native-followups/README.md)
+include a complete 1,000-window/24,000-step composed run on `4cf9e36`/6,209 leaves
+with final cleanup, and the completed stage-59/stage-60 four-case native renderer
+comparisons. They retain their exact endpoints. Sampled memory safety guards pass;
+full memory budgets and native/GPU allocation remain unqualified. All renderer
+comparison arms miss unchanged 4 ms p95 / 6 ms p99 targets. A new pass does not
+establish the cause of the prior 343-window failure.
+
+The [native tab checkpoint](../docs/reports/macos-tab-close-native/README.md)
+passes eight actual Cocoa stages on `4c0df93`/6,214 leaves; two meaningful fault
+controls retain their earlier `4cf9e36`/6,209 scope. These selector workflows
+remain separate from physical input and human VoiceOver. The checked RGBA row
+upload correction and new progress controls do not imply whole-frame gains.
+Current-source composed endurance, complete P4/P6/P11, overnight soak, physical
+input/displays, human accessibility, native/GPU memory, service interoperability
+and Mac distribution remain required.
+
 ## Current implementation and remaining work
 
 Application ownership, cancellable tasks, commands, controlled standard controls,

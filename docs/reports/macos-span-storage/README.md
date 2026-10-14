@@ -24,8 +24,15 @@ race/vet, full adapter race/vet, preparation tests and native build pass. The
 preparation unit tests use mocked installations and stable stage-59 dependency
 snapshots, while testing the new manifest/pins; regeneration and runtime code
 gates separately bind the exact stage-60 dependencies. The native binary is
-built and hash-bound but has not been launched. Internal final review and one
-bounded Anthropic Claude Sonnet 5.5 Prism review precede commit. Native follow-up
-must run after the existing endurance, tab-close and stage-59 comparison sequences.
+built and hash-bound. Internal final review and one bounded Anthropic Claude
+Sonnet 5.5 Prism review passed before the code commit. The subsequent native
+follow-up completed 40 interleaved opt-in GPU processes and 4,800 samples across
+four stored-table cases, comparing `9686e38`/6,210 prepared leaves against
+`68c3750`/6,211. Geometry remained exact; four gated native GPU roots passed without
+skips on the candidate. Native differences were mixed, with observed tail regressions; both arms
+missed the unchanged warm targets. See the [source-bound follow-up report](../macos-native-followups/README.md).
 The original 4 ms p95 / 6 ms p99 native targets remain unqualified by this change;
 full P6/P11, human input/accessibility and Mac distribution remain open.
+
+The follow-up report names the observed p99 increases explicitly. Their cause
+is unassigned; allocation or local capture gains do not dismiss those tails.

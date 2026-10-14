@@ -23,7 +23,7 @@ and full-composition pixels, encoded shape and accounting. Renderer race/vet,
 adapter vet and preparation tests pass. Two faulty overlays fail the original
 hash and per-coordinate collision checks. A first native build used the wrong
 command directory; the corrected native loaded-grid build passes. Its binary
-hash is retained; it has not been launched.
+hash is retained; the subsequent native campaign launched it as recorded below.
 
 The full adapter race suite needs local socket access: the sandboxed pass found
 a denied Unix socket bind in the workbench test, while the main adapter passed.
@@ -34,7 +34,14 @@ code checks; each recorded source endpoint was stable, and every production
 source and prepared dependency remained unchanged.
 Renderer tests generated 17 PNGs, preserved separately before restoring the
 6,210-leaf prepared tree; finalization initially rejected those additions.
-Native performance follow-up will run after the endurance and tab-close
-sequences finish. Internal final review and one bounded Prism review using
-Anthropic Claude Sonnet 5.5 precede this scoped code checkpoint.
-The original 4 ms p95 / 6 ms p99 native targets still fail in the current baseline.
+The code checkpoint passed internal review and one bounded Prism review using
+Anthropic Claude Sonnet 5.5. Its subsequent ordinary native comparison completed
+80 interleaved processes and 9,600 samples across four stored-table cases in CPU
+and opt-in GPU modes, comparing `4cf9e36`/6,209 prepared leaves against
+`9686e38`/6,210. Geometry remained exact; four gated native GPU roots passed without
+skips on the candidate. Native differences were mixed, with observed tail regressions. Both arms missed
+the unchanged warm targets. See the [source-bound native follow-up report](../macos-native-followups/README.md).
+The reported original and candidate arms still miss the 4 ms p95 / 6 ms p99 targets.
+
+The follow-up report names the observed p99 increases explicitly. Their cause
+is unassigned; allocation or local capture gains do not dismiss those tails.
