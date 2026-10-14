@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "result": "REJECTED_FALSE_POSITIVE",
+  "finding_id": "e9ba90cd877b28c0",
+  "disposition": "REJECTED_FALSE_POSITIVE",
+  "findings": [],
+  "unresolved_findings": [],
+  "raw_prism_sha256": "163e8e943f944989ff5189f6f62d473e248c3bb56433471d682eb09ca8e3498c",
+  "raw_exit_code": 1,
+  "provider_coverage": {
+    "files": 5,
+    "chunks": 2,
+    "complete": true,
+    "truncated_bytes": 0
+  },
+  "files": {
+    "ui/menu.go": "e59eec3f3f73e2a59e627aa75581a60e71c18f9d3b6d0a58b2fa005e3ce5206e",
+    "ui/menu_test.go": "ec65bbe44103c5ccf951b69335da03917c0fdbdea540984a15bb45153c138906",
+    "drivers/cogent/accessibility.go": "fcbd51dac170b15016a03a258d902cedab78964a44414d5f3ce6f0d344df2bcf",
+    "drivers/cogent/manual_offscreen.go": "2ef1f8b0af080b22fa6491e4d8578e4dd6442f869208deadf22956f7708b84e7",
+    "drivers/cogent/accessibility_darwin.m": "c4530edf589d34a135a7880244171e1aa6750c449ad26d594eca52694b01c23f",
+    "drivers/cogent/menu_button_offscreen_test.go": "4c388d88da0bbb8e2872b4cb35c5f65c7a99beb44f111fb698e84e327b697190",
+    "drivers/cogent/cmd/gallery/menu_smoke.go": "fe1be980e9cbd3771b3d4c8d0561cd7770ef4db26b006e34ca64c8e69e2a0cc0",
+    "ui/controls.go": "682d97e9e74a235d31991d27b2534e2e4fea27e89b23f35ec52c24b057aabce5",
+    "drivers/cogent/reconcile.go": "db80af12f045fc8ff59a4941ce483396acdd7fbaf3122e4b1344d38e789ee24c",
+    "drivers/cogent/menu_button.go": "f3a3d40a281f7f30751d438dd2a0dc4b0e5825534a03ed5362a94c4ea52a381b",
+    "drivers/cogent/cmd/gallery/main.go": "57e49a8ee78e410659fce70a24f2c7eef7d45d12ad1ac9571820fe8dbf6c8992",
+    "ui/icons.go": "cf9060840f2479a8e23a589e5dcf18b33d4aeadabdbc28578abb623dce02ee02",
+    "drivers/cogent/controls.go": "b719e83c1741515bbac5343c78c7a3f1d1626a7f89f9a1e999a94b5555952b33",
+    "drivers/cogent/accessibility_workbench.go": "851f658a2857af2231bea7c4895f62bc75c164907360709c09fd2f5995f32208",
+    "ui/node.go": "03d4cb25ec0ebbf068b2b27e6780c07ba12bfe94ac52ea61e732879e230580be",
+    "drivers/cogent/menu_accessibility_darwin_test.go": "4c2e13fe2e842597a25bc9c08be2fa8d504de0d1498be5a2db1f5c6420e32cef"
+  },
+  "supporting_source_sha256": {
+    "drivers/cogent/menu_button.go": "f3a3d40a281f7f30751d438dd2a0dc4b0e5825534a03ed5362a94c4ea52a381b",
+    "drivers/cogent/controls.go": "b719e83c1741515bbac5343c78c7a3f1d1626a7f89f9a1e999a94b5555952b33",
+    "drivers/cogent/reconcile.go": "db80af12f045fc8ff59a4941ce483396acdd7fbaf3122e4b1344d38e789ee24c",
+    "drivers/cogent/driver.go": "ae3acfeeaaba45f9fb77b1a4c8d18a70d4a02106f86cf15925d4a732a7cb90a7",
+    "app/app.go": "1ed87bf35c78d2246f10f6af11e6e5eeb60b989a9c0f6f4b684c24bbf0402863"
+  },
+  "reviewed_artifact_sha256": {
+    "/private/tmp/vellum-macos-menu-button/prism-v2/prism.json": "163e8e943f944989ff5189f6f62d473e248c3bb56433471d682eb09ca8e3498c",
+    "/private/tmp/vellum-macos-menu-button/prism-v2/process.json": "cad17f14600b9e474cfe0d440ae87cd08d34f5cd4593b445ec3560924643c647",
+    "/private/tmp/vellum-macos-menu-button/implementation-review-v4.json": "76c0eb3aed2ef6b7a30c780905f367017c2dd86cf05f3d6ee42b97a32e1a04d5"
+  },
+  "reasoning": [
+    {
+      "location": "drivers/cogent/controls.go:104",
+      "statement": "mountControl creates and assigns a controlState before entering the kind switch."
+    },
+    {
+      "location": "drivers/cogent/controls.go:143",
+      "statement": "The supported MenuButton branch invokes mountMenuButton; that helper assigns its menuState before registering any event callbacks (menu_button.go:80). Neither state pointer is subsequently cleared on this route."
+    },
+    {
+      "location": "drivers/cogent/controls.go:233",
+      "statement": "The one production r.control=nil assignment is only the mountControl default for unsupported kinds, which returns without a managed widget/menu callback. It cannot be reached by a mounted MenuButton."
+    },
+    {
+      "location": "drivers/cogent/controls.go:278",
+      "statement": "postControl is the gateway for all cited queued closures. It wraps them in PostWindow and calls fn only if the captured record is not retired."
+    },
+    {
+      "location": "drivers/cogent/controls.go:784",
+      "statement": "disposeControl first sets retired=true, then retires popup/native resources; it leaves controlState/menuState pointers intact. Already admitted owner work therefore skips the inner closure."
+    },
+    {
+      "location": "drivers/cogent/reconcile.go:83",
+      "statement": "A kind change is incompatible (compatible at line237), so reconciliation mounts a distinct new record. It does not repurpose the old menu record into the unsupported branch."
+    },
+    {
+      "location": "app/app.go:224",
+      "statement": "PostWindow also skips its admitted callback when the captured window lifetime is canceled."
+    }
+  ],
+  "conclusion": "The provider scenario assumes unmount clears mounted menu control/menu pointers. Actual supported routing preserves those pointers and revokes via retired/window lifetime. No reachable production path establishes the proposed nil dereference, so no defensive source change or new test is warranted.",
+  "limitations": [
+    "Bounded read-only source contract adjudication, not arbitrary mutation of private records or malformed direct helper calls.",
+    "No tests/build/native/provider/Git execution; current final16 hashes checked against V4.",
+    "Raw provider finding/exit1 and prior source certificates are preserved. No runtime/whole-Mac qualification follows."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "result": "APPROVED_SOURCE",
+  "findings": [],
+  "files": {
+    "ui/menu.go": "e59eec3f3f73e2a59e627aa75581a60e71c18f9d3b6d0a58b2fa005e3ce5206e",
+    "ui/menu_test.go": "ec65bbe44103c5ccf951b69335da03917c0fdbdea540984a15bb45153c138906",
+    "drivers/cogent/accessibility.go": "fcbd51dac170b15016a03a258d902cedab78964a44414d5f3ce6f0d344df2bcf",
+    "drivers/cogent/manual_offscreen.go": "2ef1f8b0af080b22fa6491e4d8578e4dd6442f869208deadf22956f7708b84e7",
+    "drivers/cogent/accessibility_darwin.m": "c4530edf589d34a135a7880244171e1aa6750c449ad26d594eca52694b01c23f",
+    "drivers/cogent/menu_button_offscreen_test.go": "4c388d88da0bbb8e2872b4cb35c5f65c7a99beb44f111fb698e84e327b697190",
+    "drivers/cogent/cmd/gallery/menu_smoke.go": "fe1be980e9cbd3771b3d4c8d0561cd7770ef4db26b006e34ca64c8e69e2a0cc0",
+    "ui/controls.go": "682d97e9e74a235d31991d27b2534e2e4fea27e89b23f35ec52c24b057aabce5",
+    "drivers/cogent/reconcile.go": "db80af12f045fc8ff59a4941ce483396acdd7fbaf3122e4b1344d38e789ee24c",
+    "drivers/cogent/menu_button.go": "f3a3d40a281f7f30751d438dd2a0dc4b0e5825534a03ed5362a94c4ea52a381b",
+    "drivers/cogent/cmd/gallery/main.go": "57e49a8ee78e410659fce70a24f2c7eef7d45d12ad1ac9571820fe8dbf6c8992",
+    "ui/icons.go": "cf9060840f2479a8e23a589e5dcf18b33d4aeadabdbc28578abb623dce02ee02",
+    "drivers/cogent/controls.go": "b719e83c1741515bbac5343c78c7a3f1d1626a7f89f9a1e999a94b5555952b33",
+    "drivers/cogent/accessibility_workbench.go": "851f658a2857af2231bea7c4895f62bc75c164907360709c09fd2f5995f32208",
+    "ui/node.go": "03d4cb25ec0ebbf068b2b27e6780c07ba12bfe94ac52ea61e732879e230580be",
+    "drivers/cogent/menu_accessibility_darwin_test.go": "4c2e13fe2e842597a25bc9c08be2fa8d504de0d1498be5a2db1f5c6420e32cef"
+  },
+  "reviewed_artifact_sha256": {
+    "/private/tmp/vellum-macos-menu-button/implementation-review-v3.json": "198c98e49eb7340bde1a9fe16d6f41acb0e38dc536bd13722c1a32da5729e8bc",
+    "/private/tmp/vellum-macos-menu-button/implementation-review-v3.md": "52022e978eb4d891b2caec3d3f0b7be30415cebf81c1c6943f68de38915dd4e5"
+  },
+  "inherited_review": "V3 implementation and publication-order approval remain unchanged; fifteen other leaves exactly match.",
+  "reviewed_delta": {
+    "path": "drivers/cogent/cmd/gallery/menu_smoke.go",
+    "old_sha256": "0b58a7e1c735d1258635ba6897311cf37ac7b8f7b5968f0a72e9acb75f1c359f",
+    "new_sha256": "fe1be980e9cbd3771b3d4c8d0561cd7770ef4db26b006e34ca64c8e69e2a0cc0",
+    "mechanical_check": "Reverting only chosen-item capture, geometryReady predicate and its condition reconstructs exact V3 leaf hash.",
+    "rationale": "When open, await now requires the selected item to exist with positive width/height and its center hit-test to resolve to that item, in addition to prior root/scope/enabled/expanded checks. Closed state retains prior item-absence condition. Stable anchor identity, fresh item lifetime, duplicate labels, disabled/refused and owner action assertions remain unchanged after await.",
+    "bounded_failure": "The existing deadline, 20ms polling and timeout snapshot/error path are unchanged; awaiting layout does not convert a validation failure into success."
+  },
+  "limitations": [
+    "Tiny source-only review; reviewer ran no tests/build/native/Git/Prism.",
+    "V3 and historical native readiness failure remain unchanged. This supplement does not independently certify the reported native-v5 or focused-v8 runtime outcomes.",
+    "No production change, provider rerun, performance, memory or full Mac acceptance claim."
+  ]
+}

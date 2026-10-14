@@ -48,6 +48,7 @@ type controlState struct {
 	disclosure        *disclosureState
 	split             *splitState
 	choice            *choiceState
+	menu              *menuState
 	dialog            *dialogState
 	wake              func(events.Event)
 	onError           func(error)
@@ -139,6 +140,8 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			})
 		})
 		widget = button
+	case ui.MenuButton:
+		widget = mountMenuButton(parent, r)
 	case ui.Icon:
 		icon := core.NewIcon(parent)
 		icon.Styler(func(s *styles.Style) { s.IconSize.Set(units.Dp(24)) })
@@ -262,7 +265,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 }
 
 func controlDisabled(r *record) bool {
-	if r.node.Disabled {
+	if r.node.Disabled || r.node.Kind == ui.MenuButton && !ui.MenuEnabled(r.node) {
 		return true
 	}
 	for p := r.widget.AsTree().Parent; p != nil; p = p.AsTree().Parent {
@@ -429,6 +432,9 @@ func syncControl(r *record, previous ui.Node) error {
 	}
 	switch w := r.widget.(type) {
 	case *core.Button:
+		if r.control.menu != nil {
+			syncMenuButton(r, previous)
+		}
 		w.SetText(html.EscapeString(r.node.Text)).SetIcon(nativeSymbol(r.node.Icon)).SetType(nativeButtonAppearance(r.node.Appearance))
 	case *core.Icon:
 		w.SetIcon(nativeSymbol(r.node.Icon))
@@ -776,6 +782,10 @@ func disposeControl(r *record) {
 	}
 	if r.control != nil {
 		r.control.retired = true
+		if r.control.menu != nil {
+			requestMenuClose(r)
+			flushMenuClose(r) // disposal is originating reconciliation/native teardown
+		}
 		if image, ok := r.widget.(*managedImage); ok {
 			image.source = nil
 			r.node.Image = nil

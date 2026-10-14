@@ -814,6 +814,27 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				result.FocusedID = r.node.ID
 			}
 			result.Elements = append(result.Elements, ManualElement{ID: r.node.ID, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
+			if menuOpen(r) {
+				popup := r.control.menu.popup
+				if popup.manualIncarnation == 0 {
+					if w.nextRecord == math.MaxUint64 {
+						gridCaptureErr = ErrManualConfig
+						return
+					}
+					w.nextRecord++
+					popup.manualIncarnation = w.nextRecord
+				}
+				for _, o := range r.control.menu.options {
+					id := menuActionID(r.node.ID, o.ID)
+					b := bounds[id]
+					item := popup.items[o.ID]
+					focused := item != nil && item.ContainsFocus()
+					if focused {
+						result.FocusedID = id
+					}
+					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: popup.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
+				}
+			}
 			if r.control != nil && r.control.disclosure != nil {
 				id := accessibilityDisclosureID(r.node.ID)
 				heading := r.control.disclosure.header

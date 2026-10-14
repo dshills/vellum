@@ -12,6 +12,7 @@
 - [Stored-table timing](grid-performance.md): actual native scroll recording and unchanged warm performance targets.
 - [Keyed reconciliation](keyed-reconciliation.md): retained native identity.
 - [Layout and themes](layout-theme.md): portable style values and local themes.
+- [Action menu button](menu-button.md): bounded flat actions, popup focus, native semantics and originating retirement.
 - [Standard controls](controls.md): interaction, focus and semantic metadata.
 - [Windows and services](windows-services.md): scoped lifetimes and OS integration.
 - [Clipboard representations](clipboard.md): bounded Mac text/PNG/HTML/custom-MIME data with optional capability reporting.

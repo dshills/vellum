@@ -1,0 +1,28 @@
+"""Freeze the reviewed local MenuButton phase without changing tested code."""
+import hashlib,json,shutil,subprocess,tarfile
+from pathlib import Path
+r=Path('/private/tmp/vellum-large-data');p=Path('/private/tmp/vellum-macos-menu-button');rec=r/'docs/reports/macos-menu-button/records';sha=lambda f:hashlib.sha256(Path(f).read_bytes()).hexdigest()
+initial=json.loads((p/'prism-v1/prism.json').read_text());final=json.loads((p/'prism-v2/prism.json').read_text());ip=json.loads((p/'prism-v1/process.json').read_text());fp=json.loads((p/'prism-v2/process.json').read_text())
+assert initial['coverage']['complete'] and final['coverage']['complete'] and ip['source_index_stable'] and fp['source_index_stable'] and ip['exit_code']==1 and fp['exit_code']==1
+assert {f['id']for f in initial['findings']}=={'dcfdac4eab97a91f','7827df8e0c43dccb'} and {f['id']for f in final['findings']}=={'e9ba90cd877b28c0'}
+disposition=json.loads((p/'prism-final-disposition.json').read_text());assert disposition['files']==json.loads((p/'implementation-review-v4.json').read_text())['files']
+code=disposition['files'];assert all(sha(r/n)==h for n,h in code.items())
+source={**ip['after'],**fp['after']};assert len(source)==25 and all(sha(r/n)==h for n,h in source.items())
+for archive_name,index_name in [('evidence.tar.xz','evidence-index.json'),('correction-evidence.tar.xz','correction-evidence-index.json')]:
+ d=json.loads((rec/index_name).read_text());assert sha(rec/archive_name)==d['archive_sha256']
+ with tarfile.open(rec/archive_name)as t:assert {m.name:hashlib.sha256(t.extractfile(m).read()).hexdigest()for m in t.getmembers()if m.isfile()}==d['members']
+for label in ['v1','v2']:
+ for name in ['prism.json','process.json','inputs.json']:shutil.copyfile(p/('prism-'+label)/name,rec/('prism-'+label+'-'+name))
+for name in ['implementation-review-v4.json','prism-final-disposition.json']:shutil.copyfile(p/name,rec/name)
+resolution={'raw_initial_findings':2,'raw_final_findings':1,'raw_initial_exit':1,'raw_final_exit':1,'unresolved_findings':0,'resolutions':{'dcfdac4eab97a91f':'ACCEPTED_CLARIFIED: anchor_object_identity is native token; stable_anchor_cycles20 andunique_anchor_objects1 verified raw snapshots','7827df8e0c43dccb':'ACCEPTED_FIXED: active property publishes after stage success; focusedrace3/native20cycles pass; internalV3','e9ba90cd877b28c0':'REJECTED_FALSE_POSITIVE: mounted menu control/menu retained, postControl retirement gate and window scope; source-bound internal disposition'},'internal_disposition_sha256':sha(rec/'prism-final-disposition.json')}
+(rec/'review-resolution.json').write_text(json.dumps(resolution,indent=2)+'\n')
+checkpoint={'result':'REVIEWED_MAC_MENU_BUTTON','base_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip(),'source':source,'internal_source':code,'prism_coverage_complete':True,'unresolved_findings':0,'raw_prism_findings':3,'archives':{n:sha(rec/n)for n in ['evidence.tar.xz','correction-evidence.tar.xz']},'checks':{'portable_race':'portable-full-v1','portable_vet':'portable-vet-v1','full_adapter_race_before_delta':'adapter-full-v1','adapter_vet_before_delta':'adapter-vet-v1','final_delta_race':'focused-menu-v8','final_native':'native-menu-v5'},'qualifies_full_macos':False,'review_resolution_sha256':sha(rec/'review-resolution.json')}
+(rec/'checkpoint.json').write_text(json.dumps(checkpoint,indent=2)+'\n')
+(rec/'finalize-producer.py.txt').write_bytes(Path(__file__).read_bytes())
+# Only this reviewed checkpoint is dirty; archive/review records are derived from verified artifacts.
+names=set(subprocess.check_output(['git','diff','HEAD','--name-only'],cwd=r).decode().splitlines())|set(subprocess.check_output(['git','ls-files','--others','--exclude-standard'],cwd=r).decode().splitlines())
+assert all(n in source or n.startswith('docs/reports/macos-menu-button/records/')for n in names)
+subprocess.run(['git','add','--',*sorted(names)],cwd=r,check=True);subprocess.run(['git','diff','--cached','--check'],cwd=r,check=True)
+subprocess.run(['git','commit','-m','feat(ui): add managed action menu buttons'],cwd=r,check=True)
+assert not subprocess.check_output(['git','status','--porcelain'],cwd=r).strip()
+print('COMMIT',subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip())

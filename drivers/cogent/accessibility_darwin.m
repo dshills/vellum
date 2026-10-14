@@ -63,7 +63,8 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"multiline-text"])return NSAccessibilityTextAreaRole;
  if([role isEqual:@"number-field"])return NSAccessibilityIncrementorRole;
  if([role isEqual:@"slider"])return NSAccessibilitySliderRole;
- if([role isEqual:@"selector"])return NSAccessibilityPopUpButtonRole;
+ if([role isEqual:@"menu-item"])return NSAccessibilityMenuItemRole;
+ if([role isEqual:@"menu-button"]||[role isEqual:@"selector"])return NSAccessibilityPopUpButtonRole;
  if([role isEqual:@"toolbar"])return NSAccessibilityToolbarRole;
  if([role isEqual:@"split-pane"])return NSAccessibilitySplitGroupRole;
  if([role isEqual:@"split-handle"])return NSAccessibilitySplitterRole;

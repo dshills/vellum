@@ -494,3 +494,10 @@ concurrent reader isolation and actual 1m-record native save/load/calculation/
 short Cocoa editing checks qualify this composition behavior. Worker traversal
 is slower in the local fixture; no whole-frame/memory acceptance is inferred.
 Other owner scans, complete P6/P11 and Mac release gates remain open.
+
+The [MenuButton](menu-button.md) adds a bounded flat action menu to the public
+control catalog. The [checkpoint](../docs/reports/macos-menu-button/README.md)
+covers actual popup keyboard/pointer routing, peer-owner drain retirement and
+20 Cocoa selection cycles with real item geometry and modal wake progress.
+This component checkpoint does not close frame-performance, composed lifecycle,
+human accessibility, overnight or distribution gates.

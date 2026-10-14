@@ -1,0 +1,87 @@
+{
+  "result": "PASS_MENU_BUTTON_CHECKPOINT_TESTS",
+  "base_commit": "1e0663eadb0840df6e520c6efa2db0b4125855c4",
+  "portable_race": "portable-full-v1",
+  "adapter_race": "adapter-full-v1",
+  "adapter_vet": "adapter-vet-v1",
+  "native_receipt": "native-menu-v5",
+  "native_elapsed_seconds": 2.310394667030778,
+  "native_samples": 20,
+  "distinct_item_lifetimes": 20,
+  "native_result": {
+    "cocoa_collapse_completed": true,
+    "disabled_action_refused": true,
+    "event": "vellum.menu.result",
+    "human_voiceover_qualified": false,
+    "modal_owner_disable_completed": true,
+    "physical_input_qualified": false,
+    "preferences_changed": false,
+    "result": "PASS_NATIVE_MENU_CYCLES",
+    "retired_action_refused": true,
+    "selection_cycles": 20,
+    "stable_action_id": "second"
+  },
+  "preserved_failures": {
+    "focused-menu-v3": "test reused handled Custom event; fresh event fixed V4",
+    "focused-menu-v5": "test compared domain ID with encoded native ID; fixed V6",
+    "gallery-build-v1": "fixture initially used undefined icon symbol; fixed V2",
+    "native-menu-v1": "timed out waiting scoped Cocoa menu publication",
+    "native-menu-v2": "snapshot showed Cocoa retained initial generation; disabled Actions=null rejected payload; fixed V3; Darwin regression includes null negative",
+    "native-menu-v4": "13 cycles passed; cycle14 observed item semantics before geometry; fixture now waits measured item geometry and hit test"
+  },
+  "limits": [
+    "No frame timing/primary acceptance",
+    "No composed lifecycle/overnight acceptance",
+    "No human VoiceOver/physical input/cross-display acceptance",
+    "No distribution qualification"
+  ],
+  "original_code_files": {
+    "ui/menu.go": "e59eec3f3f73e2a59e627aa75581a60e71c18f9d3b6d0a58b2fa005e3ce5206e",
+    "ui/menu_test.go": "ec65bbe44103c5ccf951b69335da03917c0fdbdea540984a15bb45153c138906",
+    "drivers/cogent/accessibility.go": "fcbd51dac170b15016a03a258d902cedab78964a44414d5f3ce6f0d344df2bcf",
+    "drivers/cogent/manual_offscreen.go": "2ef1f8b0af080b22fa6491e4d8578e4dd6442f869208deadf22956f7708b84e7",
+    "drivers/cogent/accessibility_darwin.m": "c4530edf589d34a135a7880244171e1aa6750c449ad26d594eca52694b01c23f",
+    "drivers/cogent/menu_button_offscreen_test.go": "4c388d88da0bbb8e2872b4cb35c5f65c7a99beb44f111fb698e84e327b697190",
+    "drivers/cogent/cmd/gallery/menu_smoke.go": "0b58a7e1c735d1258635ba6897311cf37ac7b8f7b5968f0a72e9acb75f1c359f",
+    "ui/controls.go": "682d97e9e74a235d31991d27b2534e2e4fea27e89b23f35ec52c24b057aabce5",
+    "drivers/cogent/reconcile.go": "db80af12f045fc8ff59a4941ce483396acdd7fbaf3122e4b1344d38e789ee24c",
+    "drivers/cogent/menu_button.go": "596c2abaffd34144bbabaacdc63d9bca87fe4fe8a5c8d91dc6274d3489c32c41",
+    "drivers/cogent/cmd/gallery/main.go": "57e49a8ee78e410659fce70a24f2c7eef7d45d12ad1ac9571820fe8dbf6c8992",
+    "ui/icons.go": "cf9060840f2479a8e23a589e5dcf18b33d4aeadabdbc28578abb623dce02ee02",
+    "drivers/cogent/controls.go": "b719e83c1741515bbac5343c78c7a3f1d1626a7f89f9a1e999a94b5555952b33",
+    "drivers/cogent/accessibility_workbench.go": "851f658a2857af2231bea7c4895f62bc75c164907360709c09fd2f5995f32208",
+    "ui/node.go": "03d4cb25ec0ebbf068b2b27e6780c07ba12bfe94ac52ea61e732879e230580be",
+    "drivers/cogent/menu_accessibility_darwin_test.go": "4c2e13fe2e842597a25bc9c08be2fa8d504de0d1498be5a2db1f5c6420e32cef"
+  },
+  "code_files": {
+    "ui/menu.go": "e59eec3f3f73e2a59e627aa75581a60e71c18f9d3b6d0a58b2fa005e3ce5206e",
+    "ui/menu_test.go": "ec65bbe44103c5ccf951b69335da03917c0fdbdea540984a15bb45153c138906",
+    "drivers/cogent/accessibility.go": "fcbd51dac170b15016a03a258d902cedab78964a44414d5f3ce6f0d344df2bcf",
+    "drivers/cogent/manual_offscreen.go": "2ef1f8b0af080b22fa6491e4d8578e4dd6442f869208deadf22956f7708b84e7",
+    "drivers/cogent/accessibility_darwin.m": "c4530edf589d34a135a7880244171e1aa6750c449ad26d594eca52694b01c23f",
+    "drivers/cogent/menu_button_offscreen_test.go": "4c388d88da0bbb8e2872b4cb35c5f65c7a99beb44f111fb698e84e327b697190",
+    "drivers/cogent/cmd/gallery/menu_smoke.go": "fe1be980e9cbd3771b3d4c8d0561cd7770ef4db26b006e34ca64c8e69e2a0cc0",
+    "ui/controls.go": "682d97e9e74a235d31991d27b2534e2e4fea27e89b23f35ec52c24b057aabce5",
+    "drivers/cogent/reconcile.go": "db80af12f045fc8ff59a4941ce483396acdd7fbaf3122e4b1344d38e789ee24c",
+    "drivers/cogent/menu_button.go": "f3a3d40a281f7f30751d438dd2a0dc4b0e5825534a03ed5362a94c4ea52a381b",
+    "drivers/cogent/cmd/gallery/main.go": "57e49a8ee78e410659fce70a24f2c7eef7d45d12ad1ac9571820fe8dbf6c8992",
+    "ui/icons.go": "cf9060840f2479a8e23a589e5dcf18b33d4aeadabdbc28578abb623dce02ee02",
+    "drivers/cogent/controls.go": "b719e83c1741515bbac5343c78c7a3f1d1626a7f89f9a1e999a94b5555952b33",
+    "drivers/cogent/accessibility_workbench.go": "851f658a2857af2231bea7c4895f62bc75c164907360709c09fd2f5995f32208",
+    "ui/node.go": "03d4cb25ec0ebbf068b2b27e6780c07ba12bfe94ac52ea61e732879e230580be",
+    "drivers/cogent/menu_accessibility_darwin_test.go": "4c2e13fe2e842597a25bc9c08be2fa8d504de0d1498be5a2db1f5c6420e32cef"
+  },
+  "anchor_object_identity": 15,
+  "stable_anchor_cycles": 20,
+  "unique_anchor_objects": 1,
+  "after_prism_delta": {
+    "focused_race": "focused-menu-v8",
+    "build": "gallery-build-v6",
+    "native": "native-menu-v5",
+    "changes": [
+      "active menu reference registered only after successful stage creation",
+      "native fixture awaits item geometry and hit test before declaring readiness"
+    ],
+    "full_race_scope": "Full portable/adapter race and vet passed on original_code_files; two final delta leaves rechecked with focused race/native; unchanged14 inherit full adapter result"
+  }
+}

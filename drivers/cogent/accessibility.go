@@ -305,6 +305,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		start := len(nodes)
 		n := r.node
 		disabled = disabled || n.Disabled
+		if n.Kind == ui.MenuButton {
+			disabled = disabled || !ui.MenuEnabled(n)
+		}
 		if n.Kind == ui.Dialog && (!n.Open || disabled || (r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed)) {
 			return
 		}
@@ -380,6 +383,12 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			rangeValue := [2]int{min(anchor, focus), max(anchor, focus) - min(anchor, focus)}
 			x.TextSelection = &rangeValue
 			x.TextFocus = focus
+		case ui.MenuButton:
+			opened := menuOpen(r)
+			x.Expanded = &opened
+			if opened {
+				x.Focused = false
+			}
 		case ui.Checkbox, ui.Switch, ui.ToggleButton:
 			x.Value = n.Checked
 		case ui.ProgressBar:
@@ -418,6 +427,12 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 			if n.Kind == ui.Button && n.Activate != nil {
 				x.Actions = append(x.Actions, "press")
+			}
+			if n.Kind == ui.MenuButton {
+				x.Actions = append(x.Actions, "press", "expand")
+				if menuOpen(r) {
+					x.Actions = append(x.Actions, "cancel", "collapse")
+				}
 			}
 			if (n.Kind == ui.Checkbox || n.Kind == ui.Switch || n.Kind == ui.ToggleButton) && n.Change != nil {
 				x.Actions = append(x.Actions, "press", "set")
@@ -494,6 +509,13 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				handlers[id] = handler
 			}
 		}
+		if n.Kind == ui.MenuButton {
+			extra, actions := menuAccessibility(r, x.ID, b)
+			nodes = append(nodes, extra...)
+			for id, handler := range actions {
+				handlers[id] = handler
+			}
+		}
 		if n.Kind == ui.Tabs || n.Kind == ui.Selector {
 			for _, o := range n.Options {
 				id := accessibilityOptionID(n.ID, o.ID)
@@ -558,6 +580,24 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 	n := r.node
 	if n.Disabled || (r.control != nil && (r.control.disabled || r.control.retired)) {
 		return false
+	}
+	if n.Kind == ui.MenuButton {
+		if !menuAvailable(r) {
+			return false
+		}
+		switch action.Kind {
+		case "press", "expand":
+			r.control.menu.request = true
+		case "cancel", "collapse":
+			if !menuOpen(r) {
+				return false
+			}
+			requestMenuClose(r)
+		default:
+			return false
+		}
+		_ = r.control.a.Invalidate(r.control.window)
+		return true
 	}
 	if action.Kind == "press" && n.Kind == ui.Button && n.Activate != nil {
 		n.Activate()
@@ -930,6 +970,7 @@ func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[stri
 			widget = r.control.dialog.host
 		}
 		bounds(accessibilityManagedID(r.node.ID), widget)
+		menuPopupBounds(r, bounds)
 		if r.node.Kind == ui.Tabs && r.control != nil && r.control.tabs != nil {
 			for _, o := range r.node.Options {
 				bounds(accessibilityOptionID(r.node.ID, o.ID), r.control.tabs.buttons[o.ID])

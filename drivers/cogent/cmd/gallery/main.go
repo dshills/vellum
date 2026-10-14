@@ -31,6 +31,9 @@ type gallery struct {
 	focus                ui.FocusRequest
 	picture              *canvas.TiledImage
 	imageFit             ui.ImageFit
+	menuCount            int
+	menuLast             string
+	menuDisabled         bool
 }
 
 func newGallery() *gallery {
@@ -86,7 +89,12 @@ func (g *gallery) view() ui.Node {
 			{ID: "split-workspace", Kind: ui.Scroll, Children: []ui.Node{{ID: "split-content", Kind: ui.Label, Text: "Workspace content retains its native controls as the panes resize."}, {ID: "split-reset", Kind: ui.Button, Text: "Reset divider", Activate: func() { g.split = 0.35 }}}},
 		}},
 	}}
-	symbols := ui.Node{ID: "symbols", Kind: ui.Scroll, Grow: true}
+	symbols := ui.Node{ID: "symbols", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
+		{ID: "menu-actions", Kind: ui.MenuButton, Text: "Document actions", Icon: ui.SymbolSettings, Disabled: g.menuDisabled,
+			Options: []ui.Option{{ID: "blocked", Label: "Unavailable", Disabled: true}, {ID: "first", Label: "Run action"}, {ID: "second", Label: "Run action"}},
+			Change:  func(e ui.ChangeEvent) { g.menuCount++; g.menuLast = e.SelectedID }},
+		{ID: "menu-status", Kind: ui.StatusBar, Text: fmt.Sprintf("Action %s · requests %d", g.menuLast, g.menuCount)},
+	}}
 	for _, symbol := range ui.Symbols() {
 		symbols.Children = append(symbols.Children, ui.Node{ID: "symbol-" + string(symbol), Kind: ui.Row, Style: ui.Style{Gap: ui.Some(float32(12))}, Children: []ui.Node{
 			{ID: "art-" + string(symbol), Kind: ui.Icon, Icon: symbol},
@@ -131,20 +139,35 @@ func main() {
 	exit := flag.Duration("exit-after", 0, "close after a duration for smoke checks")
 	smoke := flag.Bool("smoke", false, "open and close a native modal during the smoke check")
 	disclosureSmoke := flag.Bool("disclosure-smoke", false, "check actual Cocoa disclosure publication and actions in a bounded fixture")
+	menuSmoke := flag.Bool("menu-smoke", false, "check actual Cocoa menu routing and lifetime in a bounded fixture")
 	flag.Parse()
+	if *menuSmoke && (*smoke || *disclosureSmoke || *exit > 0) {
+		must(errors.New("menu-smoke requires its own bounded process"))
+	}
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *disclosureSmoke {
+	if *disclosureSmoke || *menuSmoke {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
 	must(err)
 	defer a.Close()
 	g := newGallery()
+	if *menuSmoke {
+		g.tab = "symbols"
+	}
 	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: 720, Height: 650, View: g.view}))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	var menuDone chan error
+	if *menuSmoke {
+		var stop context.CancelFunc
+		ctx, stop = context.WithTimeout(ctx, 60*time.Second)
+		defer stop()
+		menuDone = make(chan error, 1)
+		go func() { menuDone <- checkMenu(ctx, a, g); cancel() }()
+	}
 	var disclosureDone chan error
 	if *disclosureSmoke {
 		var stop context.CancelFunc
@@ -163,6 +186,20 @@ func main() {
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
 	err = a.Run(ctx, cogent.Driver{Theme: theme})
+	if menuDone != nil {
+		cancel()
+		var checkErr error
+		select {
+		case checkErr = <-menuDone:
+		case <-time.After(6 * time.Second):
+			checkErr = errors.New("menu worker did not join after native exit")
+		}
+		if errors.Is(err, context.Canceled) {
+			err = nil
+		}
+		must(errors.Join(err, checkErr))
+		return
+	}
 	if disclosureDone != nil {
 		cancel()
 		select {

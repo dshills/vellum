@@ -1,0 +1,94 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "42e5932b9b3d5ab0b3b16e962317e158",
+  "repo": {
+    "root": "/private/tmp/vellum-large-data",
+    "head": "1e0663eadb0840df6e520c6efa2db0b4125855c4",
+    "branch": "codex/macos-window-retention"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "e9ba90cd877b28c0",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Possible nil dereference of r.control in deferred menu closures",
+      "message": "The closure posted by queueMenuAction dereferences r.control.menu before any nil check. menuAvailable itself checks `r.control == nil`, which suggests control can be nil by the time posted work runs, for example after the record is retired or unmounted. In that case this panics on the owner/control queue. The posted closures in menuItem.Destroy and menuItem.Render have the same unguarded access to p.owner.control.",
+      "suggestion": "Guard against r.control == nil and r.control.menu == nil at the top of every deferred closure (queueMenuAction, menuItem.Destroy, menuItem.Render) before dereferencing.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/menu_button.go",
+          "lines": {
+            "start": 209,
+            "end": 209
+          }
+        }
+      ],
+      "tags": [
+        "nil-deref",
+        "lifecycle",
+        "location-corrected"
+      ],
+      "evidence": "if r.control.menu.popup != p || r.control.menu.epoch != p.epoch || !menuAvailable(r) {",
+      "fix": {
+        "before": "if r.control.menu.popup != p || r.control.menu.epoch != p.epoch || !menuAvailable(r) {",
+        "after": "if r.control == nil || r.control.menu == nil || r.control.menu.popup != p || r.control.menu.epoch != p.epoch || !menuAvailable(r) {"
+      },
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 33324,
+    "totalMs": 24652
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 5,
+    "bytes": 27550,
+    "chunks": 2,
+    "llmCalls": 2,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 18355,
+        "output": 4123,
+        "costUSD": 0.07794
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

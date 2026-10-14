@@ -158,6 +158,10 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	var attach func(*plan)
 	attach = func(p *plan) {
 		if !reflect.DeepEqual(p.r.theme, theme) {
+			if p.r.control != nil && p.r.control.menu != nil {
+				requestMenuClose(p.r)
+				flushMenuClose(p.r)
+			}
 			if p.r.control != nil && p.r.control.grid != nil {
 				p.r.control.grid.layoutPending.Store(true)
 				p.r.control.grid.layout.valid = false

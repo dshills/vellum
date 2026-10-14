@@ -1,7 +1,7 @@
 # Standard controls contract
 
 The public `ui.Node` vocabulary now includes checkbox, switch, toggle button,
-progress bar, separator, radio group, segmented control, selector, slider, numeric
+progress bar, separator, action menu button, radio group, segmented control, selector, slider, numeric
 field, single-line text field, multiline document editor, managed data grid,
 tabs, scroll container, toolbar, status bar, labeled form group and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
@@ -429,3 +429,7 @@ belongs on a cancellable application worker; the caller owns reader cancellation
 Unknown formats, malformed images, oversized input/dimensions and reader errors
 are refused. Human Mac input/display/accessibility and native memory/performance
 acceptance remain separate from software rendering and inert Cocoa role checks.
+
+Action menu buttons have transient actions rather than controlled selection. See
+the [MenuButton contract](menu-button.md) for input, focus, Cocoa semantics and
+originating-window popup retirement.

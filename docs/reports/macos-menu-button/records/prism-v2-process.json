@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--format",
+    "json",
+    "--baseline",
+    "none",
+    "--fail-on",
+    "medium",
+    "--min-severity",
+    "medium",
+    "--no-auto-exclude",
+    "--paths",
+    "drivers/cogent/menu_button.go,drivers/cogent/cmd/gallery/menu_smoke.go,docs/reports/macos-menu-button/README.md,docs/reports/macos-menu-button/records/qualification.json,docs/reports/macos-menu-button/records/correction-evidence-index.json",
+    "--out",
+    "/private/tmp/vellum-macos-menu-button/prism-v2/prism.json"
+  ],
+  "exit_code": 1,
+  "error": null,
+  "elapsed_seconds": 24.692154916992877,
+  "before": {
+    "drivers/cogent/menu_button.go": "f3a3d40a281f7f30751d438dd2a0dc4b0e5825534a03ed5362a94c4ea52a381b",
+    "drivers/cogent/cmd/gallery/menu_smoke.go": "fe1be980e9cbd3771b3d4c8d0561cd7770ef4db26b006e34ca64c8e69e2a0cc0",
+    "docs/reports/macos-menu-button/README.md": "ba817ba56a65db464be69a7fd90714a2b15c1e4957da3c53e3794cfbfa04e083",
+    "docs/reports/macos-menu-button/records/qualification.json": "d3088b76b8fb6a9df4e76fa5464d339f729f1ecc5eb10f4ba67d07bd709c7312",
+    "docs/reports/macos-menu-button/records/correction-evidence-index.json": "f5b4e0f7fd850318c5d2038a8f1ae8dbe233a0e733d132605a7f1f2b3acee648"
+  },
+  "after": {
+    "drivers/cogent/menu_button.go": "f3a3d40a281f7f30751d438dd2a0dc4b0e5825534a03ed5362a94c4ea52a381b",
+    "drivers/cogent/cmd/gallery/menu_smoke.go": "fe1be980e9cbd3771b3d4c8d0561cd7770ef4db26b006e34ca64c8e69e2a0cc0",
+    "docs/reports/macos-menu-button/README.md": "ba817ba56a65db464be69a7fd90714a2b15c1e4957da3c53e3794cfbfa04e083",
+    "docs/reports/macos-menu-button/records/qualification.json": "d3088b76b8fb6a9df4e76fa5464d339f729f1ecc5eb10f4ba67d07bd709c7312",
+    "docs/reports/macos-menu-button/records/correction-evidence-index.json": "f5b4e0f7fd850318c5d2038a8f1ae8dbe233a0e733d132605a7f1f2b3acee648"
+  },
+  "source_index_stable": true,
+  "producer_sha256": "1521e127c97d9b9bcb34bf1c506dfa90c9dbd2fe3e413a99e2c5777ac718b332",
+  "prism_sha256": "163e8e943f944989ff5189f6f62d473e248c3bb56433471d682eb09ca8e3498c"
+}

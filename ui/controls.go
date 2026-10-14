@@ -18,6 +18,7 @@ const (
 	ProgressBar      Kind = "progress-bar"
 	Separator        Kind = "separator"
 	Selector         Kind = "selector"
+	MenuButton       Kind = "menu-button"
 	RadioGroup       Kind = "radio-group"
 	SegmentedControl Kind = "segmented-control"
 	Slider           Kind = "slider"
@@ -81,7 +82,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Switch, ToggleButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
+	case Button, Checkbox, Switch, ToggleButton, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
 		return true
 	}
 	return false
@@ -186,7 +187,12 @@ func ValidateControl(n Node) error {
 			return fmt.Errorf("ui: choice group requires 1..%d options and one selected ID", MaxChoiceOptions)
 		}
 	}
-	if n.Kind == Selector || n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl {
+	if n.Kind == MenuButton {
+		if err := validateMenuButton(n); err != nil {
+			return err
+		}
+	}
+	if n.Kind == Selector || n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl || n.Kind == MenuButton {
 		seen := map[string]bool{}
 		selected := n.SelectedID == ""
 		if n.Kind == Tabs && (len(n.Options) == 0 || len(n.Options) != len(n.Children)) {
@@ -222,7 +228,10 @@ func FocusTarget(root Node, id string) (Node, bool) {
 			if disabled || !IsFocusable(n.Kind) {
 				return n, false
 			}
-			if n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl {
+			if n.Kind == MenuButton && n.Change == nil {
+				return n, false
+			}
+			if n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl || n.Kind == MenuButton {
 				for _, option := range n.Options {
 					if !option.Disabled {
 						return n, true

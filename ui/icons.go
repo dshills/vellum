@@ -59,7 +59,7 @@ func validateIcon(n Node) error {
 		for _, symbol := range symbols {
 			known = known || n.Icon == symbol
 		}
-		if !known || (n.Kind != Icon && n.Kind != Button && n.Kind != ToggleButton) {
+		if !known || (n.Kind != Icon && n.Kind != Button && n.Kind != MenuButton && n.Kind != ToggleButton) {
 			return fmt.Errorf("ui: Icon requires a built-in symbol on an icon, button or toggle button")
 		}
 		if n.Kind != Icon && strings.TrimSpace(n.Text) == "" && strings.TrimSpace(n.Accessibility.Name) == "" {
@@ -70,7 +70,7 @@ func validateIcon(n Node) error {
 		return fmt.Errorf("ui: icon requires a built-in symbol and no input callbacks")
 	}
 	if n.Appearance != "" {
-		if n.Kind != Button {
+		if n.Kind != Button && n.Kind != MenuButton {
 			return fmt.Errorf("ui: Appearance belongs only on buttons")
 		}
 		switch n.Appearance {

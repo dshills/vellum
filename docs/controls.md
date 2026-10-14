@@ -14,6 +14,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Checkbox | `ui.Checkbox` | `Checked`, `Change` |
 | On/off switch | `ui.Switch` | `Checked`, `Change` |
 | Toggle button | `ui.ToggleButton` | `Checked`, `Change` |
+| Action menu | `ui.MenuButton` | `Options`, `Change.SelectedID` action requests |
 | Selection menu | `ui.Selector` | `Options`, `SelectedID`, `Change` |
 | Radio choices | `ui.RadioGroup` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Segmented choices | `ui.SegmentedControl` | `Options`, `SelectedID`, `Change`, `Orientation` |
@@ -181,3 +182,21 @@ DecodeImage bounds encoded data to 32 MiB and retains the existing source limits
 reader cancellation and temporary decode memory remain caller concerns. Source
 replacement/patches preserve control identity and do not mutate earlier versions.
 The gallery's Images page demonstrates fitting, transparency and source changes.
+
+Use `ui.MenuButton` for a flat list of transient actions. Keep SelectedID empty;
+the callback receives the stable action ID in ChangeEvent.SelectedID. Duplicate
+labels are allowed and disabled items remain readable. Enter/Space, pointer or
+Down opens; Escape dismisses; Tab/Shift-Tab resumes managed traversal.
+
+```go
+ui.Node{ID: "actions", Kind: ui.MenuButton, Text: "Document actions",
+    Options: []ui.Option{{ID: "export", Label: "Export"},
+        {ID: "archive", Label: "Archive", Disabled: !canArchive}},
+    Change: func(e ui.ChangeEvent) { requestAction(e.SelectedID) },
+}
+```
+
+The application supplies canArchive and requestAction. This menu has no selected
+value; the gallery's Icons and actions page demonstrates it. See the
+[MenuButton contract](../specs/menu-button.md) and
+[Mac checkpoint](reports/macos-menu-button/README.md) for tested scope.

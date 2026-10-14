@@ -22,7 +22,8 @@ const (
 	Extension Kind = "extension"
 )
 
-// Node IDs are stable within one window. The grid: prefix is reserved for
+// Node IDs are stable within one window. The menu: prefix is reserved for
+// private action popup items. The grid: prefix is reserved for
 // generated grid cell/row/header identities. The tree: prefix similarly reserves
 // managed outline row/disclosure/page targets. split: reserves native divider
 // targets. disclosure: reserves native section-heading targets. These prefixes
@@ -105,6 +106,9 @@ func Validate(root Node) error {
 		if strings.HasPrefix(n.ID, "disclosure:") {
 			return fmt.Errorf("ui: ID %q uses reserved disclosure: prefix", n.ID)
 		}
+		if strings.HasPrefix(n.ID, "menu:") {
+			return fmt.Errorf("ui: ID %q uses reserved menu: prefix", n.ID)
+		}
 		seen[n.ID] = true
 		if n.Kind == MultilineText {
 			if models[n.Editor] {
@@ -135,7 +139,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane, Disclosure:
-		case Label, Button, Icon, Image, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
+		case Label, Button, Icon, Image, Extension, Checkbox, Switch, ToggleButton, ProgressBar, Separator, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

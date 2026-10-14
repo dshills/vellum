@@ -204,7 +204,7 @@ func visibleAccessibilityScope(root *record) (*record, string) {
 		if disabled || r.node.Kind == ui.Dialog && (!r.node.Open || r.control != nil && r.control.dialog != nil && r.control.dialog.dismissed) {
 			return
 		}
-		if r.node.Kind == ui.Dialog {
+		if r.node.Kind == ui.Dialog || menuOpen(r) {
 			selected = r
 			namespace = prefix
 		}
@@ -309,6 +309,15 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 			out[prefix+accessibilityManagedID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused}
 			if root.control != nil && root.control.disclosure != nil {
 				out[prefix+accessibilityDisclosureID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}
+			}
+			if menuOpen(root) {
+				for _, o := range root.node.Options {
+					if !o.Disabled {
+						if item := root.control.menu.popup.items[o.ID]; item != nil {
+							out[prefix+menuActionID(root.node.ID, o.ID)] = accessibilityFocusTarget{widget: item, focused: item.ContainsFocus(), scopeID: prefix + accessibilityManagedID(root.node.ID)}
+						}
+					}
+				}
 			}
 			if root.control != nil && root.control.split != nil {
 				out[prefix+accessibilitySplitHandleID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}

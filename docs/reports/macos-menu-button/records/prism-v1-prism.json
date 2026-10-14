@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "9f0187970d73a28cbfe49b96f0540614",
+  "repo": {
+    "root": "/private/tmp/vellum-large-data",
+    "head": "1e0663eadb0840df6e520c6efa2db0b4125855c4",
+    "branch": "codex/macos-window-retention"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 2,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "dcfdac4eab97a91f",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "stable_anchor_identity (15) contradicts the \"one anchor retained across 20 cycles\" claim",
+      "message": "The README says the 20 native selection cycles \"retained one anchor object\". The qualification record gives `stable_anchor_identity` as 15 next to `native_samples` 20 and `distinct_item_lifetimes` 20. The value is unexplained. If it counts cycles with a stable anchor, 5 cycles had an unstable one and the claim is wrong. If it is an identity token, the field name misleads. Either way the evidence does not clearly support the stated result, and an unclear PASS record weakens the checkpoint.",
+      "suggestion": "Document what the field measures, for example by renaming it to `stable_anchor_cycles` or `anchor_object_id`. If it counts cycles, investigate the 5 cycles without a stable anchor and correct the README claim. If it is an identity token, align the value with the single retained anchor.",
+      "confidence": 0.45,
+      "locations": [
+        {
+          "path": "docs/reports/macos-menu-button/records/qualification.json",
+          "lines": {
+            "start": 28,
+            "end": 28
+          }
+        }
+      ],
+      "tags": [
+        "evidence",
+        "consistency",
+        "qualification",
+        "location-corrected"
+      ],
+      "evidence": "\"stable_anchor_identity\": 15,",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    },
+    {
+      "id": "7827df8e0c43dccb",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Active-menu property left set when menu stage creation fails",
+      "message": "The popup is registered as the context's active menu before core.NewMenuStage runs. If NewMenuStage returns nil, the function returns early without clearing the property, and s.popup is never set, so flushMenuClose never runs for it. The next openManagedMenu then finds this stale popup and calls requestMenuClose and flushMenuClose on its owner. That can close an unrelated, currently open menu on that owner.",
+      "suggestion": "Set the 'vellum.menu.active' property only after NewMenuStage succeeds, just before assigning s.popup. Alternatively, clear the property in the nil-stage branch.",
+      "confidence": 0.5,
+      "locations": [
+        {
+          "path": "drivers/cogent/menu_button.go",
+          "lines": {
+            "start": 144,
+            "end": 146
+          }
+        }
+      ],
+      "tags": [
+        "leak",
+        "state",
+        "menu",
+        "location-corrected"
+      ],
+      "evidence": "if context != nil {\n\t\tcontext.SetProperty(\"vellum.menu.active\", p)\n\t}",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 56281,
+    "totalMs": 20486
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 24,
+    "bytes": 81659,
+    "chunks": 4,
+    "llmCalls": 4,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 49676,
+        "output": 6820,
+        "costUSD": 0.167552
+      }
+    ],
+    "widenedFiles": 6,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}
