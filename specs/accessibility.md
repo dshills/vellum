@@ -191,3 +191,22 @@ worker retains its old accepted index's ordinary interaction once layout is read
 The [checkpoint](../docs/reports/macos-tree-publication/README.md) separates manual
 and inert ownership oracles, actual Cocoa-object transactions and native workflows
 from human VoiceOver, physical input and full Mac qualification.
+
+
+Ordinary completed-frame geometry may reuse the last encoded payload at the native
+bridge only when its token, exact payload and ordinary identifier membership are
+unchanged. The bridge owns at most 64 KiB of payload backing; oversized or
+presemantic/unknown-ID projections use the existing publication path. The current
+ordinary identifier set is separate membership metadata, not a second semantic
+snapshot. Any ordinary ID set change, including remove/readd between renders or an
+ordinary/scoped transition, invalidates reuse. Ordinary native ID reuse across role
+changes or reparenting retains its existing geometry behavior.
+
+Main and modal hosts share one last-payload cache because they write the same native
+geometry map. A different host's write must prevent reuse of an earlier value.
+Semantic enqueue, membership invalidation, geometry enqueue and cache commit are
+serialized by the bridge mutex. Close clears membership and payload storage.
+Text-range publication and scoped grid/tree transactions retain their existing
+paths. Source and sender-oracle checks, actual Cocoa consumers and ordinary frame
+measurements are separate evidence. See the
+[geometry reuse checkpoint](../docs/reports/macos-geometry-reuse/README.md).

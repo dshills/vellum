@@ -74,6 +74,9 @@ type accessibilityBridge struct {
 	handlers         map[string]accessibilityHandler
 	lastSnapshot     string
 	gridPublications map[string][]accessibilityNode
+	geometryMembers  map[string]struct{}
+	geometryVersion  *accessibilityGeometryVersion
+	geometryCache    accessibilityGeometryCache
 	generation       atomic.Uint64
 	closed           atomic.Bool
 	retirement       atomic.Pointer[AccessibilityRetirement]
@@ -156,6 +159,9 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	b.generation.Add(1)
 	b.handlers = nil
 	b.gridPublications = nil
+	b.geometryMembers = nil
+	b.geometryVersion = nil
+	b.geometryCache = accessibilityGeometryCache{}
 	window := b.window
 	b.mu.Unlock()
 	close(b.done)
@@ -237,15 +243,19 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	snapshot := semantic
 	unchanged := b.lastSnapshot == snapshot
 	b.lastSnapshot = snapshot
-	b.mu.Unlock()
+	if !unchanged {
+		b.updateGeometryMembership(nodes)
+	}
 	// Focus handlers can enqueue a duplicate invalidation after the originating
 	// key event already published the same tree. An identical refresh must not
 	// retire a valid native action admitted between these two publications.
 	if unchanged {
+		b.mu.Unlock()
 		return
 	}
 	generation := b.generation.Add(1)
 	nativeAccessibilityUpdate(b.token, accessibilityPayload(generation, snapshot))
+	b.mu.Unlock()
 }
 
 // accessibilitySemantic preserves Marshal's compact representation without
@@ -985,8 +995,7 @@ func publishAccessibilityGeometry(w *nativeWindow) {
 	bounds := nativeAccessibilityBounds(w.root)
 	textBounds := accessibilityTextGeometry(w.root)
 	w.rootMu.Unlock()
-	payload, _ := json.Marshal(bounds)
-	nativeAccessibilityGeometry(b.token, string(payload))
+	b.publishGeometry(bounds)
 	textPayload, _ := json.Marshal(textBounds)
 	nativeAccessibilityTextGeometry(b.token, string(textPayload))
 }
@@ -1151,8 +1160,7 @@ func (h *accessibilityDialogHost) RenderWidget() {
 		}
 		bounds = qualified
 	}
-	payload, _ := json.Marshal(bounds)
-	nativeAccessibilityGeometry(b.token, string(payload))
+	b.publishGeometry(bounds)
 	textBounds := accessibilityTextGeometry(r)
 	if prefix, _ := h.Property("vellum.accessibility-namespace").(string); prefix != "" {
 		qualified := map[string]any{}

@@ -1,0 +1,224 @@
+{
+  "result": "PASS_SCOPED_NATIVE_ORDINARY_GEOMETRY_REUSE",
+  "base_commit": "59055e6be4bce2b4fd4f19462f4bd58e49c2d87e",
+  "sources": {
+    "docs/reports/macos-geometry-reuse/README.md": "40d53bb48930082470a7776788a18eb474aa515c7aea753a172c621205531807",
+    "drivers/cogent/accessibility.go": "b6a4d5559e0720e4e3973774907398cab4202d50779cd9ad5c8ad4918ed620b2",
+    "drivers/cogent/accessibility_geometry_cache.go": "129228002304d91f7837e408deee5ecc8d5479c6e7bd6510a86eac059cf5341d",
+    "drivers/cogent/accessibility_geometry_cache_test.go": "d18d7727de1c70580bcb2b09784cf5c644088f91732fd0c767095970d8df6317",
+    "specs/accessibility.md": "0b7b6a2e731566f8e7ace2660d2bccc50bdc25725124488f0801bf5b327ba562",
+    "specs/macos-service-performance.md": "fe971e00491add5f7c7cb6a9a2a6beeee4b12716886d871d157e2939b65e6404"
+  },
+  "prepared_count": 6216,
+  "prepared_map_sha256": "53edd425e08b66d2566b50d4f2eed6ddffa3082132c94b1383d71c1f25909440",
+  "checks": {
+    "prepare": {
+      "exit_code": 0,
+      "receipt_sha256": "d4e8bead027ff01fe2f67b825741c058129b7d206c730091e42f010b3f3037df",
+      "elapsed_seconds": 1.4148020410211757,
+      "argv": [
+        "python3",
+        "prepare.py"
+      ],
+      "assertion_fault_expected": false
+    },
+    "geometry-race": {
+      "exit_code": 0,
+      "receipt_sha256": "07a9c240cbc965702a4118f61354c441e83905c17810df9fab9e147610636185",
+      "elapsed_seconds": 22.57003858301323,
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-race",
+        "-count=1",
+        "-run",
+        "TestAccessibilityGeometryCache",
+        "."
+      ],
+      "assertion_fault_expected": false
+    },
+    "adapter-race": {
+      "exit_code": 0,
+      "receipt_sha256": "cb6f8dfcc95dca0c9b55ae3cfaac7d9a5896cdf65d5dfcc351cd5db8ee853bd6",
+      "elapsed_seconds": 92.54424275003839,
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-race",
+        "-count=1",
+        "./..."
+      ],
+      "assertion_fault_expected": false
+    },
+    "adapter-vet": {
+      "exit_code": 0,
+      "receipt_sha256": "3ed220274240316f0e9021a03eddabea8963907c5acb350ba3886c97c6c80571",
+      "elapsed_seconds": 7.31695175007917,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "assertion_fault_expected": false
+    },
+    "native-candidate-build": {
+      "exit_code": 0,
+      "receipt_sha256": "c1bb3985221252abf8f32393c56aae77a13e08e4165406c47cbce07e1c2ad623",
+      "elapsed_seconds": 13.559958875062875,
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-geometry-reuse/loadedgrid",
+        "."
+      ],
+      "assertion_fault_expected": false
+    },
+    "native-original-build": {
+      "exit_code": 0,
+      "receipt_sha256": "c0bbcbf82f83a78eb5193f323f9ba55b93051c1f09d0cafe83d615d599770297",
+      "elapsed_seconds": 7.423652790952474,
+      "argv": [
+        "go",
+        "build",
+        "-overlay=/private/tmp/vellum-macos-geometry-reuse/original.overlay.json",
+        "-o",
+        "/private/tmp/vellum-macos-geometry-reuse/loadedgrid-original",
+        "."
+      ],
+      "assertion_fault_expected": false
+    },
+    "native-ax-build": {
+      "exit_code": 0,
+      "receipt_sha256": "85cc08886fc1538e83dff1e84af6efcf3db538b3ebeb243e72acb30f1c3823bd",
+      "elapsed_seconds": 3.1295464580180123,
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-geometry-reuse/accessibility-smoke",
+        "./cmd/accessibility-smoke"
+      ],
+      "assertion_fault_expected": false
+    },
+    "fault-always-send": {
+      "exit_code": 1,
+      "receipt_sha256": "2b32adcfda06a7fc682ceba1812dea0fd1c8734e97e8697c36a1de2ce96fe9d6",
+      "elapsed_seconds": 15.862978041986935,
+      "argv": [
+        "go",
+        "test",
+        "-overlay=/private/tmp/vellum-macos-geometry-reuse/always-send.overlay.json",
+        "-tags=offscreen",
+        "-count=1",
+        "-run",
+        "TestAccessibilityGeometryCacheRetirementAndSharedHosts",
+        "."
+      ],
+      "assertion_fault_expected": true
+    },
+    "fault-stale-membership": {
+      "exit_code": 1,
+      "receipt_sha256": "08be5c7b1b807ea4ae8f25ed059c884ff5b70a49de63bae9c6778c058d45bc4a",
+      "elapsed_seconds": 16.705469709006138,
+      "argv": [
+        "go",
+        "test",
+        "-overlay=/private/tmp/vellum-macos-geometry-reuse/stale-membership.overlay.json",
+        "-tags=offscreen",
+        "-count=1",
+        "-run",
+        "TestAccessibilityGeometryCacheSemanticPublication",
+        "."
+      ],
+      "assertion_fault_expected": true
+    }
+  },
+  "native": {
+    "cocoa-stored-grid": {
+      "exit_code": 0,
+      "receipt_sha256": "b03a21ab2bd58bd9f8e432cead024267d23fe04834140fea5dc6744f4da52879",
+      "binary_sha256": "d0d4f6fa23d357fea5e8f9ee5beb7adad7c25c51668dd5e3e73ed607f8e6ea7e",
+      "elapsed_seconds": 2.4518950839992613,
+      "observations": [
+        {
+          "event": "grid.accessibility.pass",
+          "native_press_admitted": true,
+          "overlap_objects_reused": 2268,
+          "replacement_objects_retired": 459,
+          "rows": 1000000,
+          "scope": "actual Cocoa stored-grid semantics/geometry/identity; not screen-reader or performance qualification",
+          "visible_minimum": 400
+        },
+        {
+          "attachment_query_refused": true,
+          "event": "grid.accessibility.closed"
+        }
+      ],
+      "stderr_present": true
+    },
+    "cocoa-general-accessibility": {
+      "exit_code": 0,
+      "receipt_sha256": "be65ba64b12646fe75ad00af5eb34f1a8ab51f790a664f2fcce4f3d28e27211a",
+      "binary_sha256": "c869709757d91c3eced65f74f0bc352fba0995b22642ccc63ba3b01d7cf3a16b",
+      "elapsed_seconds": 2.616191500099376,
+      "observations": [
+        {
+          "checks": [
+            "reachable Cocoa tree",
+            "native NSWindow identity and AXWindow role",
+            "roles labels values native hit testing",
+            "deterministic equal-frame descendant and sibling hit testing",
+            "controlled native actions",
+            "disabled refusal",
+            "Tab order",
+            "selected tab visibility",
+            "bounded stable virtual rows and paging",
+            "real outline pager geometry and native hit testing",
+            "independent outline selection disclosure and leaf refusal",
+            "modal isolation Tab wrap Escape",
+            "live dock panel namespaces activation focus modal geometry and retirement"
+          ],
+          "native": "macOS NSAccessibility",
+          "preferences_changed": false,
+          "reachable_elements": 27,
+          "result": "PASS",
+          "voiceover_tested": false
+        }
+      ],
+      "stderr_present": false
+    }
+  },
+  "design_review_sha256": "583f4a2fe3a2da526301e38ff934ad535869b99723c613adfb5df0681f3d64bb",
+  "diagnostic_evidence_review_sha256": "3d83b404067b5f3c0efc87aa31a8fc0d52ffcd48a4b2f33bd28e4f4419e5d075",
+  "diagnostic_profile_source_commit": "87e7de154b96732cad5dcb67703087115909c6f2",
+  "post_terminal_groups_sha256": "8556bde3054f650c0100ae23a84a819df243158043308277ce671db6e0934354",
+  "cache_payload_limit_bytes": 65536,
+  "membership_metadata_bound": "current ordinary identifier set, not a total memory bound",
+  "native_acknowledgement": false,
+  "ordinary_frame_comparison_complete": false,
+  "latency_gain_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "full_mac_qualified": false,
+  "scope": "Bounded last-payload reuse/sender oracles and existing Cocoa geometry/focus consumers; diagnostics guide work, no ordinary latency/nativeGPUbudget/presentation/fullMac qualification.",
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_review_sha256": "bbd42b18e47ce4f19054bc1d87a74c94d822b475ffd0c9c8f069d29ff694c650",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 6,
+  "prism_findings": 1,
+  "prism_unresolved_findings": 0,
+  "prism_raw_exit_code": 1,
+  "prism_disposition": "REJECTED_FALSE_POSITIVE",
+  "prism_disposition_sha256": "a897ce05eee8d18196a7e1a88635b8f0e2cb2109c301199916ca30277db888e3",
+  "prism_calls": 1,
+  "archive_sha256": "cd52ace94238cc115095d896b171141b95213f0c3bc321160b3968f334826f92",
+  "archive_members": 96,
+  "archive_bytes": 1061692,
+  "canonical_promoted": false
+}

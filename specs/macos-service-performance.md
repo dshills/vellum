@@ -30,3 +30,13 @@ process-wide Go allocation does not establish framework-only/retained/native/GPU
 memory savings or consistent latency improvement. P6, P11 and full Mac qualification
 require their broader workloads. The [report](../docs/reports/macos-service-performance/README.md)
 records current results, ownership scope and remaining gates.
+
+
+The ordinary geometry reuse checkpoint uses exact last-payload equality and native
+ordinary membership invalidation. It must preserve shared-host overwrites,
+remove/readd without an intervening render, unknown/presemantic IDs, scope changes,
+close, and the existing text/grid transaction paths. The bounded cache's reuse is
+qualified through sender oracles with intentional faults and the existing native
+Cocoa control/modal and stored-grid consumers. A sampled process-wide CPU profile
+may guide the change but does not qualify latency; ordinary comparisons remain a
+separate checkpoint with unchanged 4/6 ms targets.
