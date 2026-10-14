@@ -525,3 +525,14 @@ regressions fail; final race/vet checks and five native composed preflight cycle
 pass. Native frame containment is separate from pixel/physical/primary geometry.
 The1000-cycle composed campaign, fullP6/P11/memory/overnight and Mac release gates
 remain required.
+
+
+The [native AX ownership checkpoint](../docs/reports/macos-ax-retention/README.md)
+adds local pools to attachment/teardown after the full composed campaign failed
+its RSS guard at cycle 600. Object-count diagnostics and an original-code failing
+before-outer-pool regression isolate retained accessibility temporaries. The fixed
+1000-cycle campaign passes interaction, density and final cleanup; sampled warm
+Go heap is 45.3–46.6 MiB and RSS 350.4–369.1 MiB. Raw wrapper status-format failure
+is retained alongside exact code/prepared endpoint equality. This closes that
+specific composed lifecycle campaign, while full P6/P11, physical native/GPU
+budgets, overnight soak, human accessibility and Mac distribution remain open.

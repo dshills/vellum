@@ -267,6 +267,7 @@ static Class vellumAXSubclass(Class base,Class methods,const char *prefix){
  free(list);objc_registerClassPair(cls);return cls;
 }
 int vellumAXAttach(uint64_t token,void *viewPtr,void *windowPtr){
+ @autoreleasepool{
  NSView *view=(__bridge NSView *)viewPtr;NSWindow *window=(__bridge NSWindow *)windowPtr;
  if(![NSThread isMainThread]||!view||!window||vellumAXState(view))return 0;
  VellumAXState *state=[VellumAXState new];state.view=view;state.window=window;state.token=token;state.elements=[NSMutableDictionary new];state.geometry=[NSMutableDictionary new];state.textGeometry=[NSMutableDictionary new];state.roots=@[];
@@ -276,11 +277,15 @@ int vellumAXAttach(uint64_t token,void *viewPtr,void *windowPtr){
  objc_setAssociatedObject(view,&vellumAXKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
  object_setClass(view,viewClass);
  if(!vellumAXStates)vellumAXStates=[NSMutableDictionary new];vellumAXStates[@(token)]=state;return 1;
+ }
 }
 void vellumAXDetach(uint64_t token){
  // Production NativeAttachment.Close runs before GLFW destruction on main.
  // Keep direct callers safe without exposing mutable AppKit state off main.
  if(![NSThread isMainThread]){dispatch_sync(dispatch_get_main_queue(),^{vellumAXDetach(token);});return;}
+ // Go-owned main callbacks have no ambient Cocoa pool. Drain the temporary
+ // allValues array here so it cannot retain every retired element and node.
+ @autoreleasepool{
  VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;state.closed=YES;
  for(VellumAXElement *x in state.elements.allValues){x.live=NO;x.parentElement=nil;x.childElements=@[];}
  [state.geometry removeAllObjects];[state.textGeometry removeAllObjects];
@@ -288,6 +293,7 @@ void vellumAXDetach(uint64_t token){
  if(state.view&&object_getClass(state.view)==state.installedViewClass)object_setClass(state.view,state.viewClass);
  objc_setAssociatedObject(state.view,&vellumAXKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
  [vellumAXStates removeObjectForKey:@(token)];
+ }
 }
 // JSON bytes are copied before async publication; no NSString UTF8 roundtrip.
 static NSData *vellumAXJSONData(const char *json){return json?[NSData dataWithBytes:json length:strlen(json)]:nil;}

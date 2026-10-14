@@ -133,6 +133,21 @@ consumer. Explicit owner replies distinguish admission from completed checks.
 It does not measure the full integrated/endurance or native/GPU memory gates.
 See the [native lifecycle contract](../specs/native-window-lifecycle.md).
 
+For the all-component lifecycle fixture, add `-composed` and allow up to 45 minutes:
+
+```sh
+/tmp/vellum-window-cycles -composed -cycles=1000 -sample-every=25 -timeout=45m
+python3 native/patches/autorelease/check.py
+```
+
+The second command checks native temporary ownership without opening windows.
+The composed mode mounts the full kind catalog, editor/history, table, outline,
+docked GPU canvas, modal and 1000 dense labels. It checks native AX containment,
+actual controlled edits and resource retirement; it does not measure frame latency
+or certify physical display scale. The [AX retention report](reports/macos-ax-retention/README.md)
+retains a failed campaign alongside the reviewed correction.
+
+
 ## Grid acceptance
 
 `examples/grid` is a separate consumer module with independent 10,000-row and

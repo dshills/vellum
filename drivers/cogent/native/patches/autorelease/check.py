@@ -13,17 +13,18 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--layer-header',type=Path,default=DRIVER/'build/upstream/system/driver/desktop/surface_layer_darwin.h')
     parser.add_argument('--input-source',type=Path,default=DRIVER/'internal/textinput/input_darwin.m')
+    parser.add_argument('--accessibility-source',type=Path,default=DRIVER/'accessibility_darwin.m')
     args=parser.parse_args()
-    sources={'surface_pool':args.layer_header,'input_pool':args.input_source}
+    sources={'surface_pool':args.layer_header,'input_pool':args.input_source,'accessibility_pool':args.accessibility_source}
     for source in sources.values():
         if not source.is_absolute() or not source.is_file():parser.error('Fixture sources require existing absolute paths')
     env=child_environment();result=0
     with tempfile.TemporaryDirectory(prefix='vellum-pool-fixture-')as temporary:
         for name,source in sources.items():
             fixture=STAGE/(name+'_test.m');binary=Path(temporary)/name
-            selector='VELLUM_LAYER_SOURCE'if name=='surface_pool'else'VELLUM_INPUT_SOURCE'
+            selector={'surface_pool':'VELLUM_LAYER_SOURCE','input_pool':'VELLUM_INPUT_SOURCE','accessibility_pool':'VELLUM_AX_SOURCE'}[name]
             inputs={str(f):hashlib.sha256(f.read_bytes()).hexdigest()for f in [fixture,source,DRIVER/'internal/textinput/input.h']}
-            argv=['/usr/bin/clang','-fno-objc-arc','-Wno-unused-parameter','-I',str(DRIVER/'internal/textinput'),'-D'+selector+'="'+str(source)+'"',str(fixture),'-framework','Cocoa','-framework','QuartzCore','-framework','Carbon','-o',str(binary)]
+            argv=['/usr/bin/clang','-fobjc-arc'if name=='accessibility_pool'else'-fno-objc-arc','-Wno-unused-parameter','-I',str(DRIVER/'internal/textinput'),'-D'+selector+'="'+str(source)+'"',str(fixture),'-framework','Cocoa','-framework','QuartzCore','-framework','Carbon','-o',str(binary)]
             compiled=run_child(argv,env=env,capture_output=True,timeout=30)
             record={'fixture':name,'live_tests':False,'inputs':inputs,'compile_argv':argv,'compile_exit':compiled.returncode,'compile_stdout':compiled.stdout.decode(),'compile_stderr':compiled.stderr.decode(),'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest()if binary.exists()else None}
             if compiled.returncode==0:

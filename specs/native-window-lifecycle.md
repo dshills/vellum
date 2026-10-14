@@ -50,3 +50,20 @@ The [glyph-mask cache](glyph-mask-cache.md) bounds one shared Go cache. The nati
 retention report preserves production failures and an earlier diagnostic overlay;
 it does not qualify the adopted patch's native memory behavior. Future acceptance
 must observe physical footprint and native graphics allocations as well as RSS.
+
+
+## Accessibility temporary ownership
+
+Native accessibility attachment and teardown own local autorelease pools even
+when called directly from Go's main callback queue. Registry/view association
+ownership keeps a live attachment valid after its producer pool drains. Teardown
+revokes every element, clears geometry, restores the view class when still owned,
+and removes association/registry ownership before draining collection temporaries.
+Logical registry removal alone does not establish native object retirement.
+
+The inert ARC ownership check requires weak node/state expiry before an enclosing
+pool drains and preserves the original-code failing assertion. The full composed
+campaign additionally observes native interaction and cleanup, sampled Go/RSS,
+and source-bound native allocation snapshots. Physical graphics allocation and
+all remaining P11 budgets remain separate from these observations. See the
+[accessibility retention checkpoint](../docs/reports/macos-ax-retention/README.md).

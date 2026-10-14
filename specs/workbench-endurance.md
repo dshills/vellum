@@ -85,4 +85,10 @@ teardown, including unadopted records after a failed shape rebuild. It revokes
 interaction generation and refuses retired queue admission/delivery. Ordinary
 window removal clears backing slots holding View/CloseRequest closures. Domain
 models remain application-owned. The [checkpoint](../docs/reports/macos-composed-lifecycle/README.md)
-records short native observations;1000composedcycles and fullP11 remain required.
+records short native observations. The later [AX ownership checkpoint](../docs/reports/macos-ax-retention/README.md)
+retains the failed 600-cycle campaign, corrects native teardown temporary retention
+and passes 1000 composed cycles with all 1000 label frames contained per cycle.
+Observed effective root geometry remains separate from the requested primary
+physical/display workload. Full P11 still requires the five measured cold/warm
+runs, sustained pacing/input/frame and resource budgets, overnight soak and
+physical display variants.
