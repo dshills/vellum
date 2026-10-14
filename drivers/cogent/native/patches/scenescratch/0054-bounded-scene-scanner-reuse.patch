@@ -1,0 +1,319 @@
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -46,6 +46,7 @@
+ 	sceneWork       *sceneWorkBudget
+ 	scrollRecord    *scrollPaintPlan
+ 	outlineCache    *staticOutlineCache
++	sceneScanner    *scan.Scanner
+ }
+ 
+ func New(size math32.Vector2) render.Renderer {
+@@ -60,7 +61,7 @@
+ // Release drops derived outline/font references at scene retirement. Keep the
+ // CPU image available to existing snapshot callers; a reused renderer can build
+ // a fresh cache on its next paint. Calls share the renderer's owner serialization.
+-func (rs *Renderer) Release() { rs.outlineCache = nil }
++func (rs *Renderer) Release() { rs.outlineCache = nil; rs.sceneScanner = nil }
+ 
+ func (rs *Renderer) Size() (units.Units, math32.Vector2) {
+ 	return units.UnitDot, rs.size
+@@ -71,6 +72,7 @@
+ 		return
+ 	}
+ 	rs.size = size
++	rs.sceneScanner = nil
+ 	rs.scrollCache = nil
+ 	rs.scrollBytes = 0
+ 	rs.scrollPlanBytes = 0
+--- a/paint/renderers/rasterx/scene_packet.go
++++ b/paint/renderers/rasterx/scene_packet.go
+@@ -87,7 +87,8 @@
+ 	}
+ 	spanner := &sceneSpanner{builder: b, op: int(rs.ImgSpanner.Op)}
+ 	capture := &Renderer{size: rs.size, sceneRecord: b, sceneWork: work, outlineCache: rs.staticOutlines()}
+-	capture.Scanner = scan.NewScannerWithRowTracking(spanner, rs.image.Bounds().Dx(), rs.image.Bounds().Dy())
++	capture.Scanner = rs.borrowSceneScanner(spanner)
++	defer rs.returnSceneScanner(capture.Scanner)
+ 	capture.Raster = NewDasher(rs.image.Bounds().Dx(), rs.image.Bounds().Dy(), capture.Scanner)
+ 	// NewDasher initializes nonzero winding; restore the captured value afterward.
+ 	capture.Scanner.SetWinding(rs.Scanner.UseNonZeroWinding)
+--- /dev/null
++++ b/paint/renderers/rasterx/scene_scratch.go
+@@ -0,0 +1,38 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"image"
++	"unsafe"
++)
++
++// Retain at most64KiB of scanner row/cell backing per renderer. Metadata is
++// fixed scalar state. No packet, source image, builder or font is retained.
++const sceneScratchMaxBytes = 64 << 10
++
++func sceneScannerBytes(s *scan.Scanner) int {
++	return cap(s.Cell)*int(unsafe.Sizeof(scan.Cell{})) + cap(s.CellIndex)*int(unsafe.Sizeof(int(0)))
++}
++func (rs *Renderer) borrowSceneScanner(spanner *sceneSpanner) *scan.Scanner {
++	s := rs.sceneScanner
++	rs.sceneScanner = nil // Active scratch never becomes another capture's cache.
++	if s == nil {
++		return scan.NewScannerWithRowTracking(spanner, rs.image.Bounds().Dx(), rs.image.Bounds().Dy())
++	}
++	s.Spanner = spanner
++	s.SetClip(image.Rectangle{})
++	s.Clear()
++	// NewDasher resets complete bounds and default winding below; ScenePacket
++	// subsequently restores the current original renderer winding as before.
++	return s
++}
++func (rs *Renderer) returnSceneScanner(s *scan.Scanner) {
++	s.Spanner = nil
++	s.SetClip(image.Rectangle{})
++	s.Clear()
++	if sceneScannerBytes(s) <= sceneScratchMaxBytes {
++		rs.sceneScanner = s
++	}
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/scene_scratch_test.go
+@@ -0,0 +1,236 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"bytes"
++	"cogentcore.org/core/colors"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/styles/units"
++	"github.com/go-text/typesetting/font"
++	"image"
++	"image/color"
++	"image/draw"
++	"reflect"
++	"testing"
++)
++
++func (rs *Renderer) vellumFreshScenePacket(commands render.Render) *sceneplan.Packet {
++	if rs == nil || rs.image == nil {
++		return nil
++	}
++	b := sceneplan.New(rs.image.Bounds())
++	if b.Failed() || len(commands) > sceneplan.MaxOps {
++		return nil
++	}
++	work := &sceneWorkBudget{remaining: sceneMaxWork, outlines: font.NewGlyphOutlineBudget(1<<20, 1<<20)}
++	if !work.take(len(commands)) {
++		return nil
++	}
++	for _, item := range commands {
++		switch x := item.(type) {
++		case *render.ContextPush, *render.ContextPop:
++			if reflect.ValueOf(x).IsNil() {
++				return nil
++			}
++		case *pimage.Params:
++			if x == nil || x.Cmd != pimage.Draw || !sceneplan.Known(x.Source) || !sceneplan.Known(x.Mask) || sceneplan.Aliases(x.Source, rs.image) || sceneplan.Aliases(x.Mask, rs.image) {
++				return nil
++			}
++		case *render.Path:
++			if x == nil || !sceneColorOK(x.Context.Style.Fill.Color) || !sceneColorOK(x.Context.Style.Stroke.Color) || !sceneContextFinite(&x.Context) || !work.path(x.Path, x.Context.Cumulative, math32.Vector2{}, scenePathFactor(&x.Context)) {
++				return nil
++			}
++		case *render.Text:
++			if !work.text(x) {
++				return nil
++			}
++		default:
++			return nil
++		}
++	}
++	spanner := &sceneSpanner{builder: b, op: int(rs.ImgSpanner.Op)}
++	capture := &Renderer{size: rs.size, sceneRecord: b, sceneWork: work, outlineCache: rs.staticOutlines()}
++	capture.Scanner = scan.NewScannerWithRowTracking(spanner, rs.image.Bounds().Dx(), rs.image.Bounds().Dy())
++	capture.Raster = NewDasher(rs.image.Bounds().Dx(), rs.image.Bounds().Dy(), capture.Scanner)
++	// NewDasher initializes nonzero winding; restore the captured value afterward.
++	capture.Scanner.SetWinding(rs.Scanner.UseNonZeroWinding)
++	for _, item := range commands {
++		switch x := item.(type) {
++		case *pimage.Params:
++			b.Draw(x.Rect, x.Source, x.SourcePos, x.Mask, x.MaskPos, x.Op)
++		case *render.Path:
++			capture.RenderPath(x)
++		case *render.Text:
++			capture.RenderText(x)
++		}
++		if b.Failed() {
++			return nil
++		}
++	}
++	return b.Seal(capture.Scanner.UseNonZeroWinding)
++}
++
++// The oracle is copied from the original fresh-capture entry point, not the
++// scratch helper. It exercises the unchanged work/preflight/packet path.
++func TestVellumSceneScratchSequenceMatchesFresh(t *testing.T) {
++	for _, height := range []int{64, 1152} {
++		rs := New(math32.Vec2(240, float32(height))).(*Renderer)
++		original := New(math32.Vec2(240, float32(height))).(*Renderer)
++		sequence := []render.Render{nil, {&pimage.Params{Cmd: pimage.Draw, Source: colors.Uniform(color.White), Op: draw.Src}}}
++		for _, scene := range vellumOwnedPathScenes(height) {
++			sequence = append(sequence, scene.items)
++		}
++		sequence = append(sequence, render.Render{vellumSceneText(t)})
++		var held *sceneplan.Packet
++		var heldPixels []byte
++		var heldEncoding *sceneplan.Encoded
++		for round := 0; round < 3; round++ {
++			for index, commands := range sequence {
++				rs.Scanner.SetWinding((index+round)%2 == 0)
++				original.Scanner.SetWinding(rs.Scanner.UseNonZeroWinding)
++				a, b := rs.ScenePacket(commands), original.vellumFreshScenePacket(commands)
++				if (a == nil) != (b == nil) {
++					t.Fatal("admission mismatch", height, round, index)
++				}
++				if a == nil {
++					continue
++				}
++				ea, oka := a.Encode()
++				eb, okb := b.Encode()
++				if oka != okb || !reflect.DeepEqual(ea, eb) {
++					t.Fatal("encoded packet mismatch", height, round, index)
++				}
++				pa, pb := image.NewRGBA(rs.image.Bounds()), image.NewRGBA(rs.image.Bounds())
++				for i := range pa.Pix {
++					pa.Pix[i] = byte(i * 17)
++					pb.Pix[i] = pa.Pix[i]
++				}
++				if !a.Replay(pa) || !b.Replay(pb) || !bytes.Equal(pa.Pix, pb.Pix) {
++					t.Fatal("replay pixels mismatch", height, round, index)
++				}
++				if held != nil {
++					replay := image.NewRGBA(rs.image.Bounds())
++					for i := range replay.Pix {
++						replay.Pix[i] = byte(i * 17)
++					}
++					encoded, ok := held.Encode()
++					if !held.Replay(replay) || !bytes.Equal(replay.Pix, heldPixels) || !ok || !reflect.DeepEqual(encoded, heldEncoding) {
++						t.Fatal("successful next capture altered held packet")
++					}
++				}
++				held = a
++				heldPixels = bytes.Clone(pa.Pix)
++				heldEncoding = &sceneplan.Encoded{Ops: bytes.Clone(ea.Ops), Rows: bytes.Clone(ea.Rows), Refs: bytes.Clone(ea.Refs), Data: bytes.Clone(ea.Data), Tiles: ea.Tiles}
++				if rs.sceneScanner == nil || rs.sceneScanner.Spanner != nil || sceneScannerBytes(rs.sceneScanner) > sceneScratchMaxBytes {
++					t.Fatal("scratch owner/detachment/budget", height, index)
++				}
++				// A retained sealed packet stays detached after another capture/refusal.
++				calls := 0
++				bad := append(render.Render(nil), commands...)
++				bad = append(bad, &pimage.Params{Cmd: pimage.Draw, Source: sceneHookImage{&calls}})
++				if rs.ScenePacket(bad) != nil || calls != 0 {
++					t.Fatal("refusal/source hooks changed")
++				}
++				again := image.NewRGBA(rs.image.Bounds())
++				for i := range again.Pix {
++					again.Pix[i] = byte(i * 17)
++				}
++				if !a.Replay(again) || !bytes.Equal(again.Pix, pa.Pix) {
++					t.Fatal("later capture altered retained packet")
++				}
++			}
++		}
++	}
++}
++func TestVellumSceneScratchBudgetResizeRelease(t *testing.T) {
++	rs := New(math32.Vec2(64, 64)).(*Renderer)
++	if rs.ScenePacket(nil) == nil || rs.sceneScanner == nil {
++		t.Fatal("empty capture did not return scratch")
++	}
++	old := rs.sceneScanner
++	rs.SetSize(units.UnitDot, math32.Vec2(80, 90))
++	if rs.sceneScanner != nil {
++		t.Fatal("resize kept old scratch")
++	}
++	if rs.ScenePacket(nil) == nil || rs.sceneScanner == nil || rs.sceneScanner == old {
++		t.Fatal("resize scratch not rebuilt")
++	}
++	rs.Release()
++	rs.Release()
++	if rs.sceneScanner != nil {
++		t.Fatal("retirement kept scratch")
++	}
++	s := scan.NewScannerWithRowTracking(&sceneSpanner{}, 32, 32)
++	s.Cell = make([]scan.Cell, sceneScratchMaxBytes)
++	rs.returnSceneScanner(s)
++	if rs.sceneScanner != nil || s.Spanner != nil {
++		t.Fatal("oversized scratch retained")
++	}
++	if rs.ScenePacket(nil) == nil || rs.sceneScanner == nil {
++		t.Fatal("oversized refusal changed later admission")
++	}
++}
++func BenchmarkVellumSceneScratchCapture(b *testing.B) {
++	for _, height := range []int{64, 1152} {
++		commands := vellumOwnedPathScenes(height)[0].items
++		for _, fresh := range []bool{true, false} {
++			label := "cached"
++			if fresh {
++				label = "fresh"
++			}
++			b.Run(fmtHeight(height)+"/"+label, func(b *testing.B) {
++				rs := New(math32.Vec2(96, float32(height))).(*Renderer)
++				rs.ScenePacket(commands)
++				b.ReportAllocs()
++				b.ResetTimer()
++				for i := 0; i < b.N; i++ {
++					var p *sceneplan.Packet
++					if fresh {
++						p = rs.vellumFreshScenePacket(commands)
++					} else {
++						p = rs.ScenePacket(commands)
++					}
++					if p == nil {
++						b.Fatal("capture refused")
++					}
++				}
++			})
++		}
++	}
++}
++func fmtHeight(height int) string {
++	if height == 64 {
++		return "short"
++	}
++	return "tall"
++}
++
++func TestVellumSceneScratchLateRefusalResetsCapture(t *testing.T) {
++	rs := New(math32.Vec2(96, 64)).(*Renderer)
++	commands := vellumOwnedPathScenes(64)[0].items
++	rs.Scanner.SetWinding(false)
++	rs.Scanner.SetClip(image.Rect(2, 3, 41, 42))
++	before := bytes.Clone(rs.image.Pix)
++	bad := append(render.Render(nil), commands...)
++	bad = append(bad, &pimage.Params{Cmd: pimage.Draw, Source: colors.Uniform(color.White), Op: draw.Op(7)})
++	if rs.ScenePacket(bad) != nil {
++		t.Fatal("invalid blend admitted after capture started")
++	}
++	if rs.sceneScanner == nil || rs.sceneScanner.Spanner != nil || rs.sceneScanner.Clip != (image.Rectangle{}) || len(rs.sceneScanner.Cell) != 0 {
++		t.Fatal("late refusal kept capture source/state")
++	}
++	if rs.Scanner.UseNonZeroWinding || rs.Scanner.Clip != image.Rect(2, 3, 41, 42) || !bytes.Equal(rs.image.Pix, before) {
++		t.Fatal("late refusal changed original fallback state")
++	}
++	packet := rs.ScenePacket(commands)
++	oracle := rs.vellumFreshScenePacket(commands)
++	a, b := image.NewRGBA(rs.image.Bounds()), image.NewRGBA(rs.image.Bounds())
++	if packet == nil || oracle == nil || !packet.Replay(a) || !oracle.Replay(b) || !bytes.Equal(a.Pix, b.Pix) {
++		t.Fatal("late refusal polluted next capture")
++	}
++}

@@ -381,3 +381,20 @@ is bounded by the entry limit, separately from segment capacity. The
 [Mac extrema checkpoint](../docs/reports/macos-outline-extrema/README.md) records
 matching geometry/native parity and a measured opt-in GPU UI-work improvement;
 the unchanged 4/6 ms targets still fail and the GPU path remains opt-in.
+
+
+## Bounded scene scanner reuse
+
+Private GPU scene capture may reuse one Scanner under the originating renderer's
+existing serialized owner. Borrow removes it from the idle cache. Return detaches
+the current Spanner, clears clip/accumulation and retains only combined cell/row
+backing capacity of at most 64 KiB. Size change and Release drop it. Bounds and
+winding reset through the existing fresh Dasher; original winding is restored.
+No packet/builder/source-image/font reference survives in idle scratch.
+
+The bound excludes active/peak capture and total native/process memory. Oversized
+backing is discarded without changing successful admission; whole preflight,
+work charges, immutable packet ownership and ordinary CPU fallback are unchanged.
+The [Mac scratch checkpoint](../docs/reports/macos-scene-scratch/README.md) shows
+local allocation removal with mixed whole-frame timing. The 4/6 ms targets remain
+failed and GPU scene rendering remains opt-in.

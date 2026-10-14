@@ -466,3 +466,11 @@ composition evidence, not all-component/1,000-visible-control primary geometry,
 five ordinary latency runs, individual native request delivery, integrated 1,000
 lifecycle cycles or overnight/physical/presentation/full P11/Mac acceptance.
 The original P6 targets remain failed. See the [fixture contract](workbench-endurance.md).
+
+
+The [bounded scene scanner checkpoint](../docs/reports/macos-scene-scratch/README.md)
+removes eight allocations per local capture fixture while retaining at most
+64 KiB of idle scanner backing per renderer. A 40-process/4,800-sample opt-in GPU
+comparison passes exact geometry and ownership checks but has mixed frame timing
+and no demonstrated process-wide allocation reduction. Both 4/6 ms targets still
+fail. Complete P6, composed P11/lifecycle/idle soak and Mac release remain open.

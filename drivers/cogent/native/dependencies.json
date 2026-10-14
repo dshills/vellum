@@ -507,6 +507,17 @@
               "sha256": "3167781a35dce4be1196465ff51b5aca4ec2696af114a73a983cfd668044b858"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/scenescratch",
+          "inputs": "native/patches/scenescratch/original-hashes.json",
+          "outputs": "native/patches/scenescratch/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/scenescratch/0054-bounded-scene-scanner-reuse.patch",
+              "sha256": "ca29a3be9cc8b4b2c95b1dd95392f44d2f14f6a14564df51d0b434d5a18de8f7"
+            }
+          ]
         }
       ]
     },
