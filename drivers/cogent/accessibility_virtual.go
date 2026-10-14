@@ -139,10 +139,10 @@ func extensionAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 	}
 	return nodes, handlers
 }
-func extensionAccessibilityBounds(r *record, out map[string][4]float32, bounds func(string, core.Widget), includeGrids bool) {
+func extensionAccessibilityBounds(r *record, out map[string][4]float32, bounds func(string, core.Widget), includeScoped bool) {
 	switch v := r.node.Custom.(type) {
 	case *Workbench:
-		workbenchAccessibilityBounds(r, bounds, out, includeGrids)
+		workbenchAccessibilityBounds(r, bounds, out, includeScoped)
 	case *VirtualTable:
 		if v == nil || v.host == nil {
 			return

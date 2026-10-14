@@ -34,7 +34,7 @@ func assertNativeGeometryProjection(t *testing.T, root *record) {
 		}
 	}
 	if omitted == 0 {
-		t.Fatal("fixture has no scoped grid semantics")
+		t.Fatal("fixture has no scoped grid/tree semantics")
 	}
 	got := nativeAccessibilityBounds(root)
 	if !reflect.DeepEqual(got, want) {
@@ -133,6 +133,83 @@ func TestNativeAccessibilityGeometryOmitsScopedGridOnly(t *testing.T) {
 					t.Error(e)
 				}
 				assertNativeGeometryProjection(t, root) // owner accepted, frame pending
+				_ = a.Invalidate("one")
+			}); err != nil {
+				t.Fatal(err)
+			}
+			gridFrame(t, m)
+			check("scrolled")
+			if err := a.Do(func() { disabled = true; _ = a.Invalidate("one") }); err != nil {
+				t.Fatal(err)
+			}
+			gridFrame(t, m)
+			check("disabled")
+		})
+	}
+}
+
+// The oracle derives scope membership from the semantic projection, so it also
+// covers outlines without duplicating their generated row/page identifier rules.
+func TestNativeAccessibilityGeometryScopedOutlineAndMixedWorkbench(t *testing.T) {
+	for _, dpi := range []float32{96, 120, 144, 192} {
+		t.Run(fmt.Sprint(dpi), func(t *testing.T) {
+			o := nativeOutline(t, 1000, true)
+			g, err := virtual.NewGrid(&nativeGridSource{rows: 10000, revision: 1}, []virtual.GridColumn{{ID: "c0", Width: 120}}, virtual.GridConfig{RowHeight: 23}, virtual.GridViewport{Width: 300, Height: 120})
+			if err != nil {
+				t.Fatal(err)
+			}
+			disabled := false
+			config := manualConfig(t, 7)
+			config.LogicalDPI = dpi
+			m, a := gridManual(t, config, func() ui.Node {
+				return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "button", Kind: ui.Button, Text: "Apply"}, {ID: "outline", Kind: ui.DataTree, Tree: o, Grow: true, Disabled: disabled}, {ID: "grid", Kind: ui.DataGrid, Grid: g, Grow: true}}}
+			})
+			gridFrame(t, m)
+			root := m.implementation.find("one").state.root
+			check := func(phase string) {
+				t.Helper()
+				if err := a.Do(func() {
+					t.Log(phase)
+					assertNativeGeometryProjection(t, root)
+					for _, id := range []string{"root", "button"} {
+						if _, ok := nativeAccessibilityBounds(root)[accessibilityManagedID(id)]; !ok {
+							t.Error("ordinary geometry lost", id)
+						}
+					}
+				}); err != nil {
+					t.Fatal(err)
+				}
+			}
+			check("ready")
+			if err := a.Do(func() {
+				layout := workbench.Layout{Version: workbench.Version, Root: &workbench.Group{ID: "group", Tabs: []string{"panel"}, Active: "panel"}}
+				workspace, e := workbench.New(layout, []string{"panel"})
+				if e != nil {
+					t.Error(e)
+					return
+				}
+				w := &Workbench{Workspace: workspace, layoutSnapshot: workspace.Layout().Root, records: map[string]*record{"panel": root}}
+				dock := &record{node: ui.Node{ID: "dock", Kind: ui.Extension, Custom: w}}
+				assertNativeGeometryProjection(t, dock)
+				if _, ok := nativeAccessibilityBounds(dock)[accessibilityWorkbenchNamespace("dock", "panel")+accessibilityManagedID("button")]; !ok {
+					t.Error("namespaced ordinary geometry lost")
+				}
+				state, e := o.State()
+				if e != nil {
+					t.Error(e)
+					return
+				}
+				viewport := state.Viewport
+				viewport.ScrollY = 230
+				if e := o.SetViewport(viewport); e != nil {
+					t.Error(e)
+					return
+				}
+				if e := syncTree(root.children[1]); e != nil {
+					t.Error(e)
+					return
+				}
+				assertNativeGeometryProjection(t, root)
 				_ = a.Invalidate("one")
 			}); err != nil {
 				t.Fatal(err)

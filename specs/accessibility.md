@@ -218,3 +218,11 @@ The exact cache/source correctness evidence does not establish a consistent fram
 latency gain; all runs still miss at least one unchanged 4/6 ms threshold. Future
 reuse work must verify actual eligibility and send decisions, including managed
 outline subtrees, while keeping native scoped transactions and text geometry intact.
+
+
+Managed `ui.DataTree` outlines share the atomic scoped geometry channel with
+`ui.DataGrid` tables. The ordinary projection excludes both bound hosts and their
+materialized descendants, including outline rows/page controls. Full inspection,
+legacy `VirtualTree` geometry, ordinary controls and namespaced workbench geometry
+retain their existing paths. Scope is determined by the live managed binding,
+not by tree-shaped IDs. See the [scoped projection checkpoint](../docs/reports/macos-scoped-geometry/README.md).

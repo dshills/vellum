@@ -1000,18 +1000,18 @@ func publishAccessibilityGeometry(w *nativeWindow) {
 	nativeAccessibilityTextGeometry(b.token, string(textPayload))
 }
 func accessibilityBounds(root *record) map[string][4]float32 {
-	return accessibilityBoundsIncludingGrids(root, true)
+	return accessibilityBoundsIncludingScoped(root, true)
 }
 
-// Scoped grid frames are published atomically with their semantics. Cocoa
+// Scoped grid and outline frames are published atomically with their semantics. Cocoa
 // deliberately ignores these IDs in the unversioned geometry channel, so do
 // not construct or encode a second copy of them on every render. Inspection
 // keeps the full projection above, including private grid editor bounds.
 func nativeAccessibilityBounds(root *record) map[string][4]float32 {
-	return accessibilityBoundsIncludingGrids(root, false)
+	return accessibilityBoundsIncludingScoped(root, false)
 }
 
-func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[string][4]float32 {
+func accessibilityBoundsIncludingScoped(root *record, includeScoped bool) map[string][4]float32 {
 	out := map[string][4]float32{}
 	var bounds func(string, core.Widget)
 	bounds = func(id string, widget core.Widget) {
@@ -1032,8 +1032,8 @@ func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[stri
 		if r == nil {
 			return
 		}
-		if !includeGrids && r.node.Kind == ui.DataGrid && r.control != nil && r.control.grid != nil {
-			return // Host, rows, cells, headers and private editor share the scope.
+		if !includeScoped && r.control != nil && (r.node.Kind == ui.DataGrid && r.control.grid != nil || r.node.Kind == ui.DataTree && r.control.outline != nil) {
+			return // The bound host and its materialized descendants share a scope.
 		}
 		widget := r.widget
 		if r.control != nil && r.control.dialog != nil {
@@ -1067,7 +1067,7 @@ func accessibilityBoundsIncludingGrids(root *record, includeGrids bool) map[stri
 				bounds(accessibilityOptionID(r.node.ID, o.ID), r.widget)
 			}
 		}
-		extensionAccessibilityBounds(r, out, bounds, includeGrids)
+		extensionAccessibilityBounds(r, out, bounds, includeScoped)
 		gridAccessibilityBounds(r, out)
 		treeAccessibilityBounds(r, out)
 		if edit := gridEditingRecord(r); edit != nil {

@@ -96,3 +96,12 @@ boundary even when independently numbered tree/grid incarnations coincide.
 
 See the [publication checkpoint](../docs/reports/macos-tree-publication/README.md)
 for original failing regressions and the scoped final verification.
+
+
+Ordinary per-render geometry excludes a bound managed outline subtree because
+its host, row and page frames already publish through the scoped semantic
+transaction. Full inspection still includes these frames. Pending/ready ownership,
+incarnation, layout fences and text geometry remain separate from this omission.
+Legacy `VirtualTree` extensions continue using ordinary geometry. Projection
+checks compare full bounds minus actual scoped semantic IDs, including mixed
+workbench content and four DPI settings.

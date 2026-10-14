@@ -11,6 +11,7 @@ import (
 	"github.com/dshills/vellum/virtual"
 	"github.com/dshills/vellum/workbench"
 	"math"
+	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -400,6 +401,9 @@ func TestAccessibilityVirtualTreePagingTargetsAndStableBounds(t *testing.T) {
 	}
 	accessibilityStampVirtualGeometry(r)
 	bounds := accessibilityBounds(r)
+	if !reflect.DeepEqual(nativeAccessibilityBounds(r), bounds) {
+		t.Fatal("ordinary legacy tree projection changed")
+	}
 	for _, page := range []string{"previous", "next"} {
 		if _, ok := bounds[accessibilityPageID("outline", page)]; !ok {
 			t.Fatal("actual outline pager target missing", page)
@@ -414,6 +418,9 @@ func TestAccessibilityVirtualTreePagingTargetsAndStableBounds(t *testing.T) {
 	}
 	accessibilityStampVirtualGeometry(r)
 	bounds = accessibilityBounds(r)
+	if !reflect.DeepEqual(nativeAccessibilityBounds(r), bounds) {
+		t.Fatal("paged legacy tree projection changed")
+	}
 	if _, ok := bounds[accessibilityRowID("outline", "three")]; !ok {
 		t.Fatal("recycled outline row has wrong domain bounds")
 	}

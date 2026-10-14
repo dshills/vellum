@@ -1,0 +1,71 @@
+{
+  "result": "PASS_SCOPED_MANAGED_OUTLINE_GEOMETRY_PROJECTION",
+  "base_commit": "608e695bf4cbadb3731883f67fe78b25a96c1a89",
+  "sources": {
+    "docs/reports/macos-scoped-geometry/README.md": "f71dda42c8e013e8021e25c029dfc0f990f738011faee5f84d72454e9b2e1065",
+    "drivers/cogent/accessibility.go": "f3f5b0cf38e98962e0ba6a3a731b4b08280552a0e2d7798e0ab0483558e64e65",
+    "drivers/cogent/accessibility_geometry_offscreen_test.go": "262c153f648147c3188b42d400e319cbcca4b12732e42d4f3d90279eb7e2a492",
+    "drivers/cogent/accessibility_test.go": "8b807f1b94ea7b56bdbf609704ea7237750daa1f4894b589d8e60c1bb297ff57",
+    "drivers/cogent/accessibility_virtual.go": "dac90b6710994ff311f98b91a274108d9ca1b50cc0bfb4f92ad087f7c2547d78",
+    "drivers/cogent/accessibility_workbench.go": "66a1ef964d8371d763b869cddff8dbe288a6457dc2e8a5b86077b027bb6523d9",
+    "specs/accessibility.md": "4ade396c6f238b7ef1211ea23636f3da77f1b6aa0cb8ad60664e8914340ad237",
+    "specs/tree-native.md": "a635512ac0d3591989974cfa5b8c435c395233d1d9eaa3314457ed6566b6e09a"
+  },
+  "prepared_count": 6216,
+  "code_gates": {
+    "prepare": {
+      "receipt_sha256": "e5b01991a632ffab42392981e858f55ffa8034214cc9b9d0af4396c9a265a968",
+      "elapsed_seconds": 1.3521236670203507
+    },
+    "focused-v2": {
+      "receipt_sha256": "1332efd8c4ca728d141a561c8b9576d113d0eb3817d00acb6806ecc10beeaa2f",
+      "elapsed_seconds": 10.851776708033867
+    },
+    "full-adapter": {
+      "receipt_sha256": "12670c1c499d4007c05be72ed64f134cb72dfadd0fd92499b6b99e95efad091c",
+      "elapsed_seconds": 88.38825179205742
+    },
+    "vet": {
+      "receipt_sha256": "876270a4191105776cd359a880252252133c4359729f4f05ce2c97b391827e14",
+      "elapsed_seconds": 15.846918791998178
+    },
+    "build-cycles-v3": {
+      "receipt_sha256": "b52a3210e9b33e277953d6c29379b92d12320f93b99dd69dc834e45c674a5fa0",
+      "elapsed_seconds": 14.041927292011678
+    }
+  },
+  "old_behavior_fault_receipt_sha256": "0e20a4aae22ede60000cf7abd5a31a37b9bee1292b4b7a6e7c5d0086d87b1237",
+  "reconstructed_original_overlay_sha256": "492134bccc3cca51c700f75d7b91cb6870108611f257daf0324768749d8db079",
+  "source_review_sha256": "1357fed6433e2cfa637bb3c29fc3bb0d40f48bb5396f2a249e0b5265dcb1578a",
+  "native_summary_sha256": "6b33ee54a8aca9f5b19fd30c3fe1edb3c79f7dc715867623770a8318f01c9196",
+  "native_cycles": 5,
+  "native_activity_steps": 120,
+  "native_scope": "Current source delta on608e with6216prepared; fivecomposedwindowcycles/120owner-native step completions andtracked mainthread nativecleanup only. Queueadmissions are notacceptedcallbacks. No finalsource1000cycle/overnight,physicalinput/humanaccessibility,nativeGPUmemorybudget or ordinaryframegain qualification.",
+  "native_retry_steps": 0,
+  "retry_cause_observed": false,
+  "prior_frozen_diagnostic_source": "8c1709e3ecc7a1a787cc5530df966155203f0053",
+  "prior_diagnostic_summary_sha256": "ac6af9f5d521ffe13745230923b327c491a219a9fddfec4a8add5390d213aed2",
+  "prior_diagnostic_review_sha256": "53bbeb7b1bca5e503099a6b8870e8c35a966a8347f356d6cd83ce59bc113c4f3",
+  "latency_gain_qualified": false,
+  "physical_input_qualified": false,
+  "human_voiceover_qualified": false,
+  "native_gpu_memory_budget_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "full_mac_qualified": false,
+  "scope": "Bound managed table/outline ordinary projection excludes existing atomic scoped frames. Full inspector/text/legacy tree/namespaces preserved. FourDPI oracle,originalbehaviorfault andfivecurrentCocoacomposedcycles qualifycorrectness only. Prior8c instrumentedgrid diagnostic retains separateendpoint and noordinarylatency/nativeconsumption proof.",
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_review_sha256": "99296bb3ef40796451ee4e92cf33137044f52a55858a6fa6e065660b4b6d51e9",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 8,
+  "prism_findings": 0,
+  "prism_unresolved_findings": 0,
+  "prism_raw_exit_code": 0,
+  "prism_calls": 1,
+  "archive_sha256": "b6a8eb40833d03f7264ff4bd098b5f8fa8e1839d09b6421c91b4b07ee3bbdbc2",
+  "archive_members": 190,
+  "archive_bytes": 1952104,
+  "canonical_promoted": false
+}
