@@ -1,0 +1,194 @@
+--- a/paint/renderers/rasterx/glyph_coverage.go
++++ b/paint/renderers/rasterx/glyph_coverage.go
+@@ -97,7 +97,26 @@
+ 		return image.Point{}, 0, false
+ 	}
+ 	h := uint64(14695981039346656037)
+-	glyphCoverageWalk(p, origin, func(v fixed.Int26_6) { h ^= uint64(uint32(v)); h *= 1099511628211 })
++	for i := 0; i < len(p); {
++		h ^= uint64(uint32(p[i]))
++		h *= 1099511628211
++		n := 1
++		switch PathCommand(p[i]) {
++		case PathMoveTo, PathLineTo:
++			n = 3
++		case PathQuadTo:
++			n = 5
++		case PathCubicTo:
++			n = 7
++		}
++		for j := i + 1; j < i+n; j += 2 {
++			h ^= uint64(uint32(p[j] - fixed.Int26_6(origin.X*64)))
++			h *= 1099511628211
++			h ^= uint64(uint32(p[j+1] - fixed.Int26_6(origin.Y*64)))
++			h *= 1099511628211
++		}
++		i += n
++	}
+ 	return origin, h, true
+ }
+ func glyphCoverageWalk(p Path, origin image.Point, each func(fixed.Int26_6)) {
+@@ -123,10 +142,27 @@
+ 	if len(e.path) != len(p) {
+ 		return false
+ 	}
+-	i := 0
+-	same := true
+-	glyphCoverageWalk(p, origin, func(v fixed.Int26_6) { same = same && e.path[i] == v; i++ })
+-	return same
++	for i := 0; i < len(p); {
++		if e.path[i] != p[i] {
++			return false
++		}
++		n := 1
++		switch PathCommand(p[i]) {
++		case PathMoveTo, PathLineTo:
++			n = 3
++		case PathQuadTo:
++			n = 5
++		case PathCubicTo:
++			n = 7
++		}
++		for j := i + 1; j < i+n; j += 2 {
++			if e.path[j] != p[j]-fixed.Int26_6(origin.X*64) || e.path[j+1] != p[j+1]-fixed.Int26_6(origin.Y*64) {
++				return false
++			}
++		}
++		i += n
++	}
++	return true
+ }
+ func (c *glyphCoverageCache) retain(hash uint64, p Path, origin image.Point, spans []glyphCoverageSpan) {
+ 	if len(spans) == 0 || len(spans) > glyphCoverageSpans || c.entries[hash] != nil {
+--- /dev/null
++++ b/paint/renderers/rasterx/glyph_lookup_vellum_test.go
+@@ -0,0 +1,129 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"golang.org/x/image/math/fixed"
++	"image"
++	"math/rand"
++	"testing"
++)
++
++func glyphCoverageGeometryWalkerOracle(p Path, bounds, clip image.Rectangle) (image.Point, uint64, bool) {
++	if len(p) == 0 || len(p) > glyphCoveragePathValues || bounds.Min != (image.Point{}) || clip.Empty() {
++		return image.Point{}, 0, false
++	}
++	lo, hi := image.Pt(1<<30, 1<<30), image.Point{}
++	points := 0
++	for i := 0; i < len(p); {
++		n := 0
++		switch PathCommand(p[i]) {
++		case PathMoveTo, PathLineTo:
++			n = 3
++		case PathQuadTo:
++			n = 5
++		case PathCubicTo:
++			n = 7
++		case PathClose:
++			n = 1
++		default:
++			return image.Point{}, 0, false
++		}
++		if i+n > len(p) {
++			return image.Point{}, 0, false
++		}
++		for j := i + 1; j < i+n; j += 2 {
++			x, y := int(p[j]), int(p[j+1])
++			if x < 0 || y < 0 || x > 8192*64 || y > 8192*64 {
++				return image.Point{}, 0, false
++			}
++			lo.X = min(lo.X, x)
++			lo.Y = min(lo.Y, y)
++			hi.X = max(hi.X, x)
++			hi.Y = max(hi.Y, y)
++			points++
++		}
++		i += n
++	}
++	if points == 0 {
++		return image.Point{}, 0, false
++	}
++	origin := image.Pt(lo.X/64, lo.Y/64)
++	// Include a full guard pixel. No target/clip edge may have removed a span.
++	hull := image.Rectangle{Min: origin, Max: image.Pt((hi.X+63)/64+1, (hi.Y+63)/64+1)}
++	if hull.Dx() > 128 || hull.Dy() > 128 || !hull.In(bounds) || !hull.In(clip) {
++		return image.Point{}, 0, false
++	}
++	h := uint64(14695981039346656037)
++	glyphCoverageWalk(p, origin, func(v fixed.Int26_6) { h ^= uint64(uint32(v)); h *= 1099511628211 })
++	return origin, h, true
++}
++func walkerMatchesOracle(e *glyphCoverageEntry, p Path, origin image.Point) bool {
++	if len(e.path) != len(p) {
++		return false
++	}
++	i := 0
++	same := true
++	glyphCoverageWalk(p, origin, func(v fixed.Int26_6) { same = same && e.path[i] == v; i++ })
++	return same
++}
++func TestVellumGlyphLookupDirectLoopMatchesWalker(t *testing.T) {
++	rng := rand.New(rand.NewSource(5917))
++	bounds := image.Rect(0, 0, 8192, 8192)
++	for iteration := 0; iteration < 2000; iteration++ {
++		base := image.Pt(1+rng.Intn(8060), 1+rng.Intn(8060))
++		var p Path
++		point := func() fixed.Point26_6 {
++			return fixed.Point26_6{X: fixed.Int26_6(base.X*64 + rng.Intn(32*64)), Y: fixed.Int26_6(base.Y*64 + rng.Intn(32*64))}
++		}
++		p.Start(point())
++		for i := 0; i < 1+rng.Intn(18); i++ {
++			switch rng.Intn(4) {
++			case 0:
++				p.Line(point())
++			case 1:
++				p.QuadBezier(point(), point())
++			case 2:
++				p.CubeBezier(point(), point(), point())
++			case 3:
++				p.Stop(true)
++				p.Start(point())
++			}
++		}
++		p.Stop(true)
++		clip := bounds
++		if iteration%3 == 0 {
++			clip = image.Rect(base.X+1, base.Y+1, base.X+32, base.Y+32)
++		}
++		origin, hash, ok := glyphCoverageGeometry(p, bounds, clip)
++		oldOrigin, oldHash, oldOK := glyphCoverageGeometryWalkerOracle(p, bounds, clip)
++		if origin != oldOrigin || hash != oldHash || ok != oldOK {
++			t.Fatal("normalized hash differs from original walker", iteration)
++		}
++		if !ok {
++			continue
++		}
++		key := make(Path, len(p))
++		j := 0
++		glyphCoverageWalk(p, origin, func(v fixed.Int26_6) { key[j] = v; j++ })
++		e := &glyphCoverageEntry{path: key}
++		if !glyphCoverageMatches(e, p, origin) || !walkerMatchesOracle(e, p, origin) {
++			t.Fatal("equal normalized path missed", iteration)
++		}
++		// Corrupt every command and coordinate individually. A matching hash never
++		// substitutes for exact equality of the whole normalized path.
++		for j := range key {
++			key[j] ^= 1
++			got := glyphCoverageMatches(e, p, origin)
++			old := walkerMatchesOracle(e, p, origin)
++			if got || got != old {
++				t.Fatal("hash collision accepted differing path", iteration, j)
++			}
++			key[j] ^= 1
++		}
++		e.path = e.path[:len(e.path)-1]
++		if glyphCoverageMatches(e, p, origin) || walkerMatchesOracle(e, p, origin) {
++			t.Fatal("different path length accepted")
++		}
++	}
++}

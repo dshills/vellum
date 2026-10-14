@@ -1,0 +1,166 @@
+{
+  "base_commit": "4cf9e3654206600885a86581b958bc388043e8af",
+  "sources": {
+    "docs/reports/macos-glyph-lookup/README.md": "2b19fa332e9aa14b9588e776fe25103239a01ededb30cadd6379123b5e3d6c95",
+    "drivers/cogent/native/dependencies.json": "8df24d344120e251d4ea5c3bef53eb4d63211fc204757816c4e5ddedb94325eb",
+    "drivers/cogent/native/patches/glyphlookup/0059-direct-exact-glyph-lookup.patch": "af5de1659b775ac7da8a6702ffeddcb44e1fc320c61ade7203b9620967119898",
+    "drivers/cogent/native/patches/glyphlookup/README.md": "69d90bd4ebe6b73f815bdc609b7ad73900aeecba820533f5eb83e7b2f9a22fca",
+    "drivers/cogent/native/patches/glyphlookup/original-hashes.json": "f6c4f787df03f4bffbe20cbcbbf64bf2c5e943a154227a2a5811873056001f25",
+    "drivers/cogent/native/patches/glyphlookup/output-hashes.json": "89fe0e069b83538dbcc94f8aa910335bfcb7a22d4692718a78f8ca3a4100025a",
+    "drivers/cogent/prepare_test.py": "a84216d04331dd2871c51c369ba0d73156b8e6eb1f160126c72c4bdcae9ce30d",
+    "specs/rendering.md": "2e44c6776461ba156d788845964a0a80fa8963a675b641f92e142b4ff78e8306"
+  },
+  "result": "PASS_SCOPED_DIRECT_GLYPH_LOOKUP",
+  "checks": {
+    "stage59-prepare": {
+      "receipt_sha256": "e20d129c8a93614ad9996aac549dc085b5345e645729bc4b39651ca5f70cb8df",
+      "elapsed_seconds": 2.433945666998625,
+      "all_production_source_stable": true,
+      "generated_png_count": 0,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "prepare.py"
+      ]
+    },
+    "stage59-renderer-race": {
+      "receipt_sha256": "65aa95becad9a2c5f1622d27ccf8a70cffaaab00d4e46527b8c5fb6acf27da17",
+      "elapsed_seconds": 27.490475250058807,
+      "all_production_source_stable": true,
+      "generated_png_count": 17,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./paint/renderers/rasterx",
+        "./paint/renderers/sceneplan"
+      ]
+    },
+    "stage59-renderer-vet": {
+      "receipt_sha256": "c1326143d672c357c92a328b13f343cfb7ac0b3bb45697ef8f0de6f3b05ee993",
+      "elapsed_seconds": 0.24808425002265722,
+      "all_production_source_stable": true,
+      "generated_png_count": 17,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./paint/renderers/rasterx",
+        "./paint/renderers/sceneplan"
+      ]
+    },
+    "stage59-preparation-tests": {
+      "receipt_sha256": "626eee0c95438e773780152a4a06007575e47a9c957126ddcef9c0a33687078c",
+      "elapsed_seconds": 0.17573774990160018,
+      "all_production_source_stable": true,
+      "generated_png_count": 0,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "prepare_test.py"
+      ]
+    },
+    "stage59-actual-matrix": {
+      "receipt_sha256": "56f7a12158d4e38688de880b0177bd8f57c6f3309bf89baa012b9ce2ffb2fa54",
+      "elapsed_seconds": 34.56525066692848,
+      "all_production_source_stable": true,
+      "generated_png_count": 17,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-p=1",
+        "-overlay=/private/tmp/vellum-macos-glyph-lookup/stage59-matrix-overlay.json",
+        "-run=^TestDirectGlyphLookupActualGridMatrix$",
+        "-count=1",
+        "."
+      ]
+    },
+    "stage59-vet": {
+      "receipt_sha256": "308759d3c31c052bfea01da04e79861f5807b4bd9da0d7286b60371e4cae15e0",
+      "elapsed_seconds": 12.227082917001098,
+      "all_production_source_stable": true,
+      "generated_png_count": 17,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ]
+    },
+    "stage59-adapter-race-v2": {
+      "receipt_sha256": "e35eedaf1c9e9291f9b19562491d8b4879ee7a52cfc7909f081c9921f89e13d2",
+      "elapsed_seconds": 12.217684249975719,
+      "all_production_source_stable": true,
+      "generated_png_count": 17,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./..."
+      ]
+    },
+    "stage59-native-build-v2": {
+      "receipt_sha256": "267cad92c5f1dacf666075b1112a8c1b21d841962b4ab3f5b138454017210f6e",
+      "elapsed_seconds": 13.03964149998501,
+      "all_production_source_stable": true,
+      "generated_png_count": 17,
+      "documentation_only_endpoint_changes": [],
+      "exit_code": 0,
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-glyph-lookup/stage59-loadedgrid",
+        "."
+      ]
+    }
+  },
+  "prepared_before_files": 6209,
+  "prepared_after_files": 6210,
+  "all_other_leaves_unchanged": true,
+  "software_frames_identical": 48,
+  "negative_controls_detected": 2,
+  "local_capture_pairs": 5,
+  "local_capture_median_ns": {
+    "original": 5241053,
+    "candidate": 3907896
+  },
+  "local_capture_only": true,
+  "native_build_sha256": "1d0497ba0367793cdff79b455324324c6447a8408af63bb1d0c88d337b0a90a2",
+  "native_binary_launched": false,
+  "native_performance_gain_qualified": false,
+  "native_gpu_run": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "failed_native_build_preserved": true,
+  "sandbox_socket_failure_preserved": true,
+  "local_capture_cpu_profiling_active": true,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 8,
+  "prism_findings": 0,
+  "prism_calls": 1,
+  "archive_sha256": "089bfd91191092198853559e6959ea3b465575c520f489e3bb7a4f1f598a1a18",
+  "archive_members": 186,
+  "archive_bytes": 869612,
+  "canonical_promoted": false
+}

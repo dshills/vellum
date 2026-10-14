@@ -562,6 +562,17 @@
               "sha256": "4446b4f0b7ba050bf61486e15350f4085fbd08b6ef9d3427432fd68845fae66d"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/glyphlookup",
+          "inputs": "native/patches/glyphlookup/original-hashes.json",
+          "outputs": "native/patches/glyphlookup/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/glyphlookup/0059-direct-exact-glyph-lookup.patch",
+              "sha256": "af5de1659b775ac7da8a6702ffeddcb44e1fc320c61ade7203b9620967119898"
+            }
+          ]
         }
       ]
     },

@@ -446,3 +446,19 @@ The 400-cell frame removes 417 operations and 149,184 bytes; all frames remove
 Native compute and paired representative latency must be rerun during an
 explicit quiet-machine window before this can qualify the unchanged 4/6 ms
 targets. See [the scoped report](../docs/reports/macos-gpu-covered/README.md).
+
+
+## Direct exact glyph lookup
+
+Stage 59 computes the existing normalized glyph-path hash and cache-hit equality
+with direct loops after unchanged full geometry validation. Hashes retain the
+original command/coordinate order and arithmetic. Cache hits require equal path
+length and every normalized command and coordinate, including hash collisions.
+Cold path copies, FIFO admission, retained-byte limits, scanner state, input work
+budgets and font ownership remain unchanged.
+
+A 2,000-path deterministic original-walker oracle checks geometry/hash admission,
+exact equality and individual value corruption. Five interleaved offscreen
+400-cell driver captures, with CPU profiling active in both arms, measured
+median 5.241 ms before and 3.908 ms after with matching pixels and encoded shapes. This local capture result does not establish
+native frame latency or the unchanged P6 targets.
