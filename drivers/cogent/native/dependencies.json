@@ -595,6 +595,17 @@
               "sha256": "b55cc993c5e416acc6d78163ab908cfaffaec38c36098b0ea8761a77f32264cc"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/spanscratch",
+          "inputs": "native/patches/spanscratch/original-hashes.json",
+          "outputs": "native/patches/spanscratch/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/spanscratch/0062-reuse-bounded-span-row-scratch.patch",
+              "sha256": "78ee8449203ecf5e39432633970e5053588dc51c7e56aad0229fd612c653e4da"
+            }
+          ]
         }
       ]
     },

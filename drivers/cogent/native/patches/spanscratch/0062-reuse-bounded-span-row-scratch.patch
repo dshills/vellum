@@ -1,0 +1,507 @@
+--- a/paint/renderers/sceneplan/builder.go
++++ b/paint/renderers/sceneplan/builder.go
+@@ -13,13 +13,15 @@
+ // Builder is an originating-render-context-only construction object. Seal drops
+ // every borrowed lookup; retained packets hold only copied value colors/bytes.
+ type Builder struct {
+-	packet       Packet
+-	failed       bool
+-	head, tail   *operationBlock
+-	count        int
+-	masks        map[*image.Alpha]*image.Alpha
+-	stream       *operation
+-	streamRowMin int
++	packet                             Packet
++	failed                             bool
++	head, tail                         *operationBlock
++	count                              int
++	masks                              map[*image.Alpha]*image.Alpha
++	stream                             *operation
++	streamRowMin                       int
++	spanScratch                        [32][]span
++	spanScratchCount, spanScratchBytes int
+ }
+ 
+ // Fixed blocks avoid copying the operation prefix on each slice growth. The
+@@ -123,8 +125,34 @@
+ 		exact[i] = storage[offset:end:end]
+ 		offset = end
+ 	}
++
++	for _, row := range o.rows {
++		b.retainSpanScratch(row)
++	}
+ 	o.rows = exact
+ 	b.add(o)
++}
++
++// Scratch is confined to one construction lifetime. Accepted packets always own
++// exact detached rows. Retain at most 32 small row buffers and 64 KiB backing.
++func (b *Builder) retainSpanScratch(row []span) {
++	cost := cap(row) * int(unsafe.Sizeof(span{}))
++	if cap(row) == 0 || cap(row) > 256 || b.spanScratchCount == len(b.spanScratch) || cost > 64<<10-b.spanScratchBytes {
++		return
++	}
++	b.spanScratch[b.spanScratchCount] = row[:0]
++	b.spanScratchCount++
++	b.spanScratchBytes += cost
++}
++func (b *Builder) borrowSpanScratch() []span {
++	if b.spanScratchCount == 0 {
++		return nil
++	}
++	b.spanScratchCount--
++	row := b.spanScratch[b.spanScratchCount]
++	b.spanScratch[b.spanScratchCount] = nil
++	b.spanScratchBytes -= cap(row) * int(unsafe.Sizeof(span{}))
++	return row
+ }
+ func (b *Builder) BeginSpans(c color.RGBA, op draw.Op) {
+ 	b.flush()
+@@ -185,7 +213,11 @@
+ 		b.stream.rows = grown
+ 		b.streamRowMin = rowMin
+ 	}
+-	b.stream.rows[y-b.streamRowMin] = append(b.stream.rows[y-b.streamRowMin], span{x0, x1, alpha})
++	row := b.stream.rows[y-b.streamRowMin]
++	if cap(row) == 0 {
++		row = b.borrowSpanScratch()
++	}
++	b.stream.rows[y-b.streamRowMin] = append(row, span{x0, x1, alpha})
+ 	r := image.Rect(x0, y, x1, y+1)
+ 	if b.stream.rect.Empty() {
+ 		b.stream.rect = r
+@@ -369,5 +401,7 @@
+ 	b.masks = nil
+ 	b.stream = nil
+ 	b.streamRowMin = 0
++	b.spanScratch = [32][]span{}
++	b.spanScratchCount, b.spanScratchBytes = 0, 0
+ 	b.failed = true // construction callbacks cannot mutate the sealed result
+ }
+--- /dev/null
++++ b/paint/renderers/sceneplan/span_scratch_reference_test.go
+@@ -0,0 +1,202 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"unsafe"
++)
++
++// Pinned pre-reuse builder methods retain original row allocation and admission.
++type spanScratchReferenceBuilder struct {
++	packet       Packet
++	failed       bool
++	head, tail   *operationBlock
++	count        int
++	masks        map[*image.Alpha]*image.Alpha
++	stream       *operation
++	streamRowMin int
++}
++
++func newSpanScratchReference(bounds image.Rectangle) *spanScratchReferenceBuilder {
++	b := &spanScratchReferenceBuilder{packet: Packet{bounds: bounds, bytes: int(unsafe.Sizeof(Packet{}))}}
++	if bounds.Min != (image.Point{}) || bounds.Empty() || bounds.Dx() > MaxDimension || bounds.Dy() > MaxDimension || bounds.Dx()*bounds.Dy() > MaxPixels {
++		b.failed = true
++	}
++	return b
++}
++
++func (b *spanScratchReferenceBuilder) Failed() bool { return b.failed }
++
++func (b *spanScratchReferenceBuilder) Refuse() { b.failed = true }
++
++func (b *spanScratchReferenceBuilder) reserve(n int) bool {
++	if b.failed || n < 0 || n > MaxBytes-b.packet.bytes {
++		b.failed = true
++		return false
++	}
++	b.packet.bytes += n
++	return true
++}
++
++func (b *spanScratchReferenceBuilder) add(o operation) {
++	if b.failed || o.rect.Empty() {
++		return
++	}
++	if b.count == MaxOps || !b.reserve(int(unsafe.Sizeof(operation{}))) {
++		b.failed = true
++		return
++	}
++	if b.count == 0 && o.rect == b.packet.bounds && (o.kind == Uniform && (o.op == draw.Src || o.color[3] == 65535)) {
++		b.packet.independent = true
++	}
++	if b.count%operationBlockSize == 0 {
++		block := new(operationBlock)
++		if b.tail == nil {
++			b.head = block
++		} else {
++			b.tail.next = block
++		}
++		b.tail = block
++	}
++	b.tail.ops[b.count%operationBlockSize] = o
++	b.count++
++}
++
++func (b *spanScratchReferenceBuilder) flush() {
++	if b.stream == nil {
++		return
++	}
++	o := *b.stream
++	rowMin := b.streamRowMin
++	b.stream = nil
++	b.streamRowMin = 0
++	if b.failed || o.rect.Empty() {
++		return
++	}
++	b.packet.bytes -= (len(o.rows) - o.rect.Dy()) * int(unsafe.Sizeof([]span{}))
++	// Refund spare row headers before checking the unchanged operation charge.
++	// A refused stream need not allocate compact rows that can never be retained.
++	if b.count == MaxOps || int(unsafe.Sizeof(operation{})) > MaxBytes-b.packet.bytes {
++		b.failed = true
++		return
++	}
++	o.rows = o.rows[o.rect.Min.Y-rowMin : o.rect.Max.Y-rowMin]
++	// Compact each row to exactly its retained capacity; replacement transients
++	// and the construction row index are accounted separately from owned packets.
++	// One detached backing holds every retained span. Row capacities are capped
++	// at their lengths, so appending cannot overwrite the following row. The
++	// same exact row/span charges cover this storage once, as before.
++	total := 0
++	for _, row := range o.rows {
++		total += len(row)
++	}
++	storage := make([]span, total)
++	exact := make([][]span, len(o.rows))
++	offset := 0
++	for i, row := range o.rows {
++		end := offset + len(row)
++		copy(storage[offset:end], row)
++		exact[i] = storage[offset:end:end]
++		offset = end
++	}
++	o.rows = exact
++	b.add(o)
++}
++
++func (b *spanScratchReferenceBuilder) BeginSpans(c color.RGBA, op draw.Op) {
++	b.flush()
++	if b.failed {
++		return
++	}
++	if op != draw.Src && op != draw.Over {
++		b.Refuse()
++		return
++	}
++	r, g, bl, a := c.RGBA()
++	b.stream = &operation{kind: Spans, op: op, color: [4]uint32{r, g, bl, a}}
++}
++
++func (b *spanScratchReferenceBuilder) Span(y, x0, x1 int, alpha uint32) {
++	if b.failed || b.stream == nil {
++		return
++	}
++	if alpha > 65535 {
++		b.failed = true
++		return
++	}
++	if y < 0 || y >= b.packet.bounds.Dy() {
++		return
++	}
++	x0 = max(0, x0)
++	x1 = min(b.packet.bounds.Dx(), x1)
++	if x0 >= x1 || alpha == 0 && b.stream.op == draw.Over {
++		return
++	}
++	rows := b.stream.rows
++	rowMin, size := b.streamRowMin, len(rows)
++	grow := y < rowMin || y >= rowMin+size
++	if grow {
++		minY, maxY := y, y+1
++		if !b.stream.rect.Empty() {
++			minY = min(minY, b.stream.rect.Min.Y)
++			maxY = max(maxY, b.stream.rect.Max.Y)
++		}
++		// Geometric growth bounds repeated ascending or descending row work.
++		// Keep all touched rows; spare headers may move to either side of them.
++		size = min(b.packet.bounds.Dy(), max(maxY-minY, max(1, len(rows)*2)))
++		rowMin = min(minY, b.packet.bounds.Dy()-size)
++		if len(rows) != 0 && y < b.streamRowMin {
++			rowMin = max(0, maxY-size)
++		}
++	}
++	// Charge construction capacity and the span before either allocation. Flush
++	// retires spare headers and compacts into the unchanged relative row format.
++	if !b.reserve(int(unsafe.Sizeof(span{})) + (size-len(rows))*int(unsafe.Sizeof([]span{}))) {
++		return
++	}
++	if grow {
++		grown := make([][]span, size)
++		if !b.stream.rect.Empty() {
++			r := b.stream.rect
++			copy(grown[r.Min.Y-rowMin:], rows[r.Min.Y-b.streamRowMin:r.Max.Y-b.streamRowMin])
++		}
++		b.stream.rows = grown
++		b.streamRowMin = rowMin
++	}
++	b.stream.rows[y-b.streamRowMin] = append(b.stream.rows[y-b.streamRowMin], span{x0, x1, alpha})
++	r := image.Rect(x0, y, x1, y+1)
++	if b.stream.rect.Empty() {
++		b.stream.rect = r
++	} else {
++		b.stream.rect = b.stream.rect.Union(r)
++	}
++}
++
++func (b *spanScratchReferenceBuilder) Seal(winding bool) *Packet {
++	defer b.retire()
++	b.flush()
++	if b.failed {
++		return nil
++	}
++	exact := make([]operation, b.count)
++	for block, offset := b.head, 0; block != nil; block = block.next {
++		offset += copy(exact[offset:], block.ops[:])
++	}
++	b.packet.ops = exact
++	b.packet.winding = winding
++	packet := b.packet
++	return &packet
++}
++
++func (b *spanScratchReferenceBuilder) retire() {
++	b.packet = Packet{}
++	b.head, b.tail = nil, nil
++	b.count = 0
++	b.masks = nil
++	b.stream = nil
++	b.streamRowMin = 0
++	b.failed = true // construction callbacks cannot mutate the sealed result
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/span_scratch_test.go
+@@ -0,0 +1,218 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"reflect"
++	"testing"
++	"unsafe"
++)
++
++func assertSpanScratchReference(t *testing.T, b *Builder, w *spanScratchReferenceBuilder) {
++	t.Helper()
++	if b.failed != w.failed || b.packet.bytes != w.packet.bytes || b.count != w.count || b.streamRowMin != w.streamRowMin || !reflect.DeepEqual(b.stream, w.stream) {
++		t.Fatal("span state or admission differs from pinned pre-reuse builder")
++	}
++	if b.spanScratchCount < 0 || b.spanScratchCount > 32 || b.spanScratchBytes < 0 || b.spanScratchBytes > 64<<10 {
++		t.Fatal("scratch bound exceeded")
++	}
++	total := 0
++	seen := map[*span]bool{}
++	for i, row := range b.spanScratch {
++		if i >= b.spanScratchCount {
++			if row != nil {
++				t.Fatal("inactive scratch slot retains backing")
++			}
++			continue
++		}
++		if len(row) != 0 || cap(row) == 0 || cap(row) > 256 {
++			t.Fatal("invalid scratch row")
++		}
++		total += cap(row) * int(unsafe.Sizeof(span{}))
++		pointer := &row[:cap(row)][0]
++		if seen[pointer] {
++			t.Fatal("scratch rows alias one another")
++		}
++		seen[pointer] = true
++	}
++	if total != b.spanScratchBytes {
++		t.Fatal("scratch byte counter differs from backing")
++	}
++}
++
++func TestVellumSpanScratchPinnedAdmissionOrderAndPixels(t *testing.T) {
++	rng := rand.New(rand.NewSource(62059))
++	bounds := image.Rect(0, 0, 48, 64)
++	for trial := 0; trial < 80; trial++ {
++		b, w := New(bounds), newSpanScratchReference(bounds)
++		for stream := 0; stream < 12; stream++ {
++			c := color.RGBA{byte(rng.Intn(90)), byte(rng.Intn(90)), byte(rng.Intn(90)), 128}
++			op := draw.Op(stream % 2)
++			b.BeginSpans(c, op)
++			w.BeginSpans(c, op)
++			assertSpanScratchReference(t, b, w)
++			for i := 0; i < 30; i++ {
++				y := rng.Intn(80) - 8
++				if stream%3 == 0 {
++					y = 40 - i
++				}
++				x0, x1 := rng.Intn(64)-8, rng.Intn(64)-8
++				alpha := uint32(rng.Intn(65536))
++				if i%7 == 0 {
++					alpha = 0
++				}
++				b.Span(y, x0, x1, alpha)
++				w.Span(y, x0, x1, alpha)
++				assertSpanScratchReference(t, b, w)
++			}
++			b.flush()
++			w.flush()
++			assertSpanScratchReference(t, b, w)
++		}
++		got, want := b.Seal(trial%2 == 0), w.Seal(trial%2 == 0)
++		if got == nil || want == nil || got.Bytes() != want.Bytes() || got.Operations() != want.Operations() {
++			t.Fatal("packet accounting differs")
++		}
++		for _, compact := range []bool{false, true} {
++			encode := func(p *Packet) (*Encoded, bool) {
++				if compact {
++					return p.EncodeGPU()
++				}
++				return p.Encode()
++			}
++			g, gok := encode(got)
++			v, vok := encode(want)
++			if !gok || !vok || !reflect.DeepEqual(g, v) {
++				t.Fatal("serialized span order or coverage differs", trial, compact)
++			}
++		}
++		actual, reference := image.NewRGBA(bounds), image.NewRGBA(bounds)
++		rng.Read(actual.Pix)
++		copy(reference.Pix, actual.Pix)
++		if !got.Replay(actual) || !want.Replay(reference) || !bytes.Equal(actual.Pix, reference.Pix) {
++			t.Fatal("seeded replay differs")
++		}
++		if b.spanScratchCount != 0 || b.spanScratchBytes != 0 || !reflect.DeepEqual(b.spanScratch, [32][]span{}) {
++			t.Fatal("sealed builder retains scratch")
++		}
++	}
++}
++
++func TestVellumSpanScratchReusedConstructionCannotChangeEarlierOperation(t *testing.T) {
++	b := New(image.Rect(0, 0, 24, 24))
++	b.BeginSpans(color.RGBA{7, 9, 11, 128}, draw.Src)
++	b.Span(3, 1, 9, 65535)
++	staging := b.stream.rows[0]
++	b.flush()
++	if b.spanScratchCount != 1 {
++		t.Fatal("retired row was not retained")
++	}
++	first := b.head.ops[0]
++	held := Packet{bounds: b.packet.bounds, bytes: b.packet.bytes, ops: []operation{first}}
++	before, ok := held.EncodeGPU()
++	if !ok {
++		t.Fatal("held encode refused")
++	}
++	b.BeginSpans(color.RGBA{19, 23, 31, 128}, draw.Over)
++	b.Span(11, 2, 17, 32767)
++	if &b.stream.rows[0][0] != &staging[0] {
++		t.Fatal("fixture did not actually reuse the construction buffer")
++	}
++	after, ok := held.EncodeGPU()
++	if !ok || !reflect.DeepEqual(before, after) {
++		t.Fatal("reused staging changed earlier operation")
++	}
++	b.flush()
++	for i := range staging {
++		staging[i] = span{0, 24, 1}
++	}
++	after, ok = held.EncodeGPU()
++	if !ok || !reflect.DeepEqual(before, after) {
++		t.Fatal("borrowed staging changed held operation")
++	}
++	if p := b.Seal(false); p == nil || p.Operations() != 2 {
++		t.Fatal("reused stream did not seal")
++	}
++}
++
++func TestVellumSpanScratchBoundsAndWarmRefusal(t *testing.T) {
++	for _, capacity := range []int{1, 256, 257} {
++		b := New(image.Rect(0, 0, 8, 32))
++		for i := 0; i < 64; i++ {
++			b.retainSpanScratch(make([]span, 1, capacity))
++		}
++		if capacity == 1 && (b.spanScratchCount != 32 || b.spanScratchBytes != 32*int(unsafe.Sizeof(span{}))) {
++			t.Fatal("slot limit not enforced")
++		}
++		expected := min(32, (64<<10)/(256*int(unsafe.Sizeof(span{}))))
++		if capacity == 256 && (b.spanScratchCount != expected || b.spanScratchBytes != expected*256*int(unsafe.Sizeof(span{}))) {
++			t.Fatal("backing limit not enforced")
++		}
++		if capacity == 257 && b.spanScratchCount != 0 {
++			t.Fatal("large backing retained")
++		}
++		b.Refuse()
++		if b.Seal(false) != nil || b.spanScratchCount != 0 || b.spanScratchBytes != 0 {
++			t.Fatal("refused seal retained scratch")
++		}
++	}
++	need := int(unsafe.Sizeof([]span{})) + int(unsafe.Sizeof(span{}))
++	for _, short := range []int{0, 1} {
++		b, w := New(image.Rect(0, 0, 8, 32)), newSpanScratchReference(image.Rect(0, 0, 8, 32))
++		b.BeginSpans(color.RGBA{}, draw.Src)
++		w.BeginSpans(color.RGBA{}, draw.Src)
++		b.Span(4, 0, 8, 1)
++		w.Span(4, 0, 8, 1)
++		b.flush()
++		w.flush()
++		b.BeginSpans(color.RGBA{}, draw.Src)
++		w.BeginSpans(color.RGBA{}, draw.Src)
++		b.packet.bytes, w.packet.bytes = MaxBytes-need+short, MaxBytes-need+short
++		count, backing := b.spanScratchCount, b.spanScratchBytes
++		b.Span(18, 0, 8, 1)
++		w.Span(18, 0, 8, 1)
++		assertSpanScratchReference(t, b, w)
++		if short == 1 && (b.spanScratchCount != count || b.spanScratchBytes != backing || len(b.stream.rows) != 0) {
++			t.Fatal("warm row borrowed before budget admission")
++		}
++		if short == 0 && (b.Failed() || b.spanScratchCount != count-1 || len(b.stream.rows) != 1) {
++			t.Fatal("exact budget did not admit same row")
++		}
++	}
++	// Three rows grow four logical headers; the one spare refund must precede
++	// the operation charge, including when a warm row was reused.
++	for _, short := range []int{0, 1} {
++		b, w := New(image.Rect(0, 0, 8, 32)), newSpanScratchReference(image.Rect(0, 0, 8, 32))
++		for i := 0; i < 2; i++ {
++			b.BeginSpans(color.RGBA{}, draw.Src)
++			w.BeginSpans(color.RGBA{}, draw.Src)
++			for y := 4; y < 7; y++ {
++				b.Span(y, 0, 8, 1)
++				w.Span(y, 0, 8, 1)
++			}
++			b.flush()
++			w.flush()
++			assertSpanScratchReference(t, b, w)
++		}
++		b.BeginSpans(color.RGBA{}, draw.Src)
++		w.BeginSpans(color.RGBA{}, draw.Src)
++		for y := 12; y < 15; y++ {
++			b.Span(y, 0, 8, 1)
++			w.Span(y, 0, 8, 1)
++		}
++		spare := int(unsafe.Sizeof([]span{}))
++		charge := int(unsafe.Sizeof(operation{}))
++		b.packet.bytes, w.packet.bytes = MaxBytes-charge+spare+short, MaxBytes-charge+spare+short
++		b.flush()
++		w.flush()
++		assertSpanScratchReference(t, b, w)
++		if b.Failed() != (short == 1) {
++			t.Fatal("spare header refund boundary changed")
++		}
++	}
++}

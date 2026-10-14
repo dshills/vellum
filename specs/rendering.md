@@ -479,3 +479,15 @@ unprofiled local 400-cell captures reduce allocations 106,337 to 88,944 per capt
 median local times were 3.832 versus 3.738 ms. A separate native endurance process
 was active. This observation does not qualify native frame, retained/physical
 memory, or the unchanged P6 targets. See [the scoped report](../docs/reports/macos-span-storage/README.md).
+
+### Builder-local span scratch
+
+Packet capture may reuse construction row-span backing within a single builder
+after copying completed operations into exact detached storage. The pool is
+bounded to 32 buffers and 64 KiB backing, at most 256 spans per buffer, and retires
+on successful/refused Seal. Fixed slot metadata is separate transient storage.
+Pool overflow uses ordinary allocation. Logical row growth, header/span and
+operation admission, spare-header refunds, ordering, held-packet ownership and
+encoding remain unchanged. This does not affect the default CPU image spanner.
+See [the scoped checkpoint](../docs/reports/macos-span-scratch/README.md); native
+frame latency and physical memory remain separate acceptance gates.
