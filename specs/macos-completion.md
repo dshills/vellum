@@ -617,3 +617,11 @@ the exact owner callback counters still require one accepted effect. An original
 single-admission validator assumption is preserved and explicitly corrected.
 Live checks are deferred while the human uses the machine. Investigation and a
 fresh complete campaign remain required.
+
+The [accessibility retirement checkpoint](../docs/reports/macos-ax-retirement/README.md)
+fixes a reproduced late-refresh registry resurrection and adds copied first-close
+request diagnostics. Original-bind oracles fail; current targeted and full
+offscreen race checks pass. This correction requires internal review between Prism checkpoints.
+It does not establish the prior endurance failure's triggering close event or
+qualify a new live campaign. Live testing remains deferred while the human uses
+the machine.

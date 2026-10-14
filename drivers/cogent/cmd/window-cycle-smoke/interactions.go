@@ -23,6 +23,7 @@ type nativeActionRecord struct {
 	Attempts, Admissions    int
 	OwnerAndNativeCompleted bool
 	ElapsedSeconds          float64
+	AttachmentRetirement    *cogent.AccessibilityRetirement `json:",omitempty"`
 }
 type nativeActionHooks struct {
 	targetRole string
@@ -82,6 +83,11 @@ func runNativeAction(ctx context.Context, duration time.Duration, target, kind, 
 	})
 	record.ElapsedSeconds = time.Since(started).Seconds()
 	if err != nil {
+		var closed *cogent.AccessibilityClosedError
+		if errors.As(err, &closed) {
+			retirement := closed.Retirement
+			record.AttachmentRetirement = &retirement
+		}
 		return record, fmt.Errorf("native %s %s: %w (attempts=%d admissions=%d)", target, kind, err, record.Attempts, record.Admissions)
 	}
 	return record, nil

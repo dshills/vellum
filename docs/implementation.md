@@ -362,3 +362,10 @@ the triggering retirement cause and a passing complete campaign remain open.
 Four completed actions retry queue admission without duplicate accepted callback
 counts. Live testing is paused while the human uses the machine. See
 [the preserved failure report](reports/macos-interacting-retention/README.md).
+
+Late accessibility refreshes now refuse to republish retired bridge registry
+entries. Requests canceled by retirement expose a copied first-close path through
+typed errors and the optional native fixture record. Targeted/full offscreen race
+tests and native build checks pass; the 343-window failure's triggering event and
+fresh endurance acceptance remain open. See
+[the retirement checkpoint](reports/macos-ax-retirement/README.md).

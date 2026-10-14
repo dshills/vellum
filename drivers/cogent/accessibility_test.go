@@ -3,6 +3,7 @@ package cogent
 import (
 	"cogentcore.org/core/core"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent/internal/textinput"
@@ -11,6 +12,7 @@ import (
 	"github.com/dshills/vellum/workbench"
 	"math"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -67,6 +69,83 @@ func TestAccessibilityAdmissionBoundedStaleAndRetired(t *testing.T) {
 	}
 	if accessibilityDeliver(b.token, 3, "button", accessibilityAction{Kind: "press"}) {
 		t.Fatal("closed token admitted")
+	}
+}
+
+func TestAccessibilityRetiredBridgeCannotRepublishWindow(t *testing.T) {
+	_, b := newAXTest(t, 8)
+	b.close()
+	// A refresh can have passed its initial closed check before native teardown.
+	b.bind("ax")
+	accessibilityRegistry.Lock()
+	_, registered := accessibilityRegistry.windows["ax"]
+	_, tokenRegistered := accessibilityRegistry.bridges[b.token]
+	accessibilityRegistry.Unlock()
+	if registered || tokenRegistered {
+		t.Fatal("retired bridge republished window registry entry", registered, tokenRegistered)
+	}
+}
+
+func TestAccessibilityConcurrentBindAndCloseRetireRegistry(t *testing.T) {
+	a, _ := newAXTest(t, 8)
+	for range 256 {
+		b := newAccessibilityBridge(a)
+		b.bind("ax")
+		start := make(chan struct{})
+		var workers sync.WaitGroup
+		workers.Add(2)
+		go func() { defer workers.Done(); <-start; b.bind("ax") }()
+		go func() { defer workers.Done(); <-start; b.closeFrom("concurrent-close") }()
+		close(start)
+		workers.Wait()
+		accessibilityRegistry.Lock()
+		registered := accessibilityRegistry.windows["ax"] == b || accessibilityRegistry.bridges[b.token] == b
+		accessibilityRegistry.Unlock()
+		if registered {
+			t.Fatal("concurrent refresh retained closed bridge", b.token)
+		}
+	}
+}
+
+func TestAccessibilityLateRetiredBindPreservesReplacement(t *testing.T) {
+	a, old := newAXTest(t, 8)
+	old.close()
+	next := newAccessibilityBridge(a)
+	next.bind("ax")
+	t.Cleanup(next.close)
+	old.bind("ax")
+	old.closeFrom("later-cleanup")
+	accessibilityRegistry.Lock()
+	current := accessibilityRegistry.windows["ax"]
+	accessibilityRegistry.Unlock()
+	if current != next {
+		t.Fatal("retired refresh displaced current attachment")
+	}
+}
+
+func TestAccessibilityRetirementErrorCopiesFirstClose(t *testing.T) {
+	_, b := newAXTest(t, 8)
+	b.generation.Store(17)
+	b.closeFrom("native-attachment-close")
+	b.closeFrom("driver-window-cleanup")
+	var closed *AccessibilityClosedError
+	err := b.closedError()
+	if !errors.Is(err, ErrAccessibilityClosed) || !errors.As(err, &closed) {
+		t.Fatal("unclassifiable attachment retirement", err)
+	}
+	want := AccessibilityRetirement{Window: "ax", Token: b.token, Generation: 17, Source: "native-attachment-close"}
+	if closed.Retirement != want {
+		t.Fatal("later cleanup overwrote first close", closed.Retirement)
+	}
+	closed.Retirement.Source = "mutated caller copy"
+	var again *AccessibilityClosedError
+	if !errors.As(b.closedError(), &again) || again.Retirement != want {
+		t.Fatal("caller error mutated retained provenance", again)
+	}
+	select {
+	case <-b.done:
+	default:
+		t.Fatal("retirement did not cancel requests")
 	}
 }
 func TestAccessibilitySnapshotModalTabsDisabledAndIDNamespaces(t *testing.T) {

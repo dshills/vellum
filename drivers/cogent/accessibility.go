@@ -3,6 +3,7 @@ package cogent
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -75,6 +76,7 @@ type accessibilityBridge struct {
 	gridPublications map[string][]accessibilityNode
 	generation       atomic.Uint64
 	closed           atomic.Bool
+	retirement       atomic.Pointer[AccessibilityRetirement]
 	pendingFocus     atomic.Pointer[string]
 	done             chan struct{}
 }
@@ -95,23 +97,68 @@ func newAccessibilityBridge(owner *app.Application) *accessibilityBridge {
 }
 func (b *accessibilityBridge) bind(window string) {
 	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.closed.Load() {
+		return
+	}
 	b.window = window
-	b.mu.Unlock()
+	// Serialize publication with retirement; a late refresh must not recreate a
+	// registry entry after close removed it.
 	accessibilityRegistry.Lock()
 	accessibilityRegistry.windows[window] = b
 	accessibilityRegistry.Unlock()
 }
 func (b *accessibilityBridge) close() {
-	if !b.closed.CompareAndSwap(false, true) {
+	b.closeFrom("unspecified")
+}
+
+// AccessibilityRetirement identifies the first bridge teardown path. It records
+// lifecycle provenance, not the event that caused that path to run.
+type AccessibilityRetirement struct {
+	Window     string
+	Token      uint64
+	Generation uint64
+	Source     string
+}
+
+var ErrAccessibilityClosed = errors.New("cogent: native accessibility attachment closed")
+
+// AccessibilityClosedError exposes a copied retirement record without retaining
+// the window, bridge, owner, controls or action handlers.
+type AccessibilityClosedError struct {
+	Retirement AccessibilityRetirement
+}
+
+func (e *AccessibilityClosedError) Error() string {
+	return fmt.Sprintf("%s (window=%q token=%d generation=%d source=%s)", ErrAccessibilityClosed, e.Retirement.Window, e.Retirement.Token, e.Retirement.Generation, e.Retirement.Source)
+}
+func (e *AccessibilityClosedError) Unwrap() error { return ErrAccessibilityClosed }
+
+func (b *accessibilityBridge) closedError() error {
+	if b != nil {
+		if r := b.retirement.Load(); r != nil {
+			return &AccessibilityClosedError{Retirement: *r}
+		}
+	}
+	return &AccessibilityClosedError{Retirement: AccessibilityRetirement{Source: "unavailable"}}
+}
+
+func (b *accessibilityBridge) closeFrom(source string) {
+	b.mu.Lock()
+	if b.closed.Load() {
+		b.mu.Unlock()
 		return
 	}
-	close(b.done)
+	b.retirement.Store(&AccessibilityRetirement{Window: b.window, Token: b.token, Generation: b.generation.Load(), Source: source})
+	// Publish the record before signaling closure so every canceled request sees
+	// the same first-close provenance, even when a later cleanup path runs.
+	b.closed.Store(true)
 	b.generation.Add(1)
-	b.mu.Lock()
 	b.handlers = nil
 	b.gridPublications = nil
 	window := b.window
 	b.mu.Unlock()
+	close(b.done)
 	accessibilityRegistry.Lock()
 	delete(accessibilityRegistry.bridges, b.token)
 	if accessibilityRegistry.windows[window] == b {
@@ -282,9 +329,9 @@ func syncAccessibility(w *nativeWindow, a *app.Application) {
 		}
 	}
 }
-func closeAccessibility(w *nativeWindow) {
+func closeAccessibility(w *nativeWindow, source string) {
 	if b := windowAccessibilityBridge(w); b != nil {
-		b.close()
+		b.closeFrom(source)
 	}
 }
 

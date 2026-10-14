@@ -47,3 +47,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Inline color picker](macos-color-picker/README.md): reusable RGBA/hex fields, retained preview and scoped Mac action/lifetime checks.
 
 - [Interacting lifecycle fixture](macos-interacting-retention/README.md): 24-step color-inclusive preflight passes; the 1000-window campaign fails after 343 completed windows, with preserved attachment-close evidence and clean teardown.
+
+- [Accessibility retirement](macos-ax-retirement/README.md): late-refresh registry retirement fix and copied first-close diagnostics, verified with offscreen race checks; prior endurance cause remains open.

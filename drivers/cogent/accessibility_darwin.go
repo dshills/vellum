@@ -49,7 +49,7 @@ func (n *accessibilityAttachment) Close() {
 	if n.text != nil && n.text.native != nil {
 		n.text.native.Close()
 	}
-	n.bridge.close()
+	n.bridge.closeFrom("native-attachment-close")
 	C.vellumAXDetach(C.uint64_t(n.bridge.token))
 }
 func configureAccessibility(a *app.Application) error {
@@ -59,12 +59,12 @@ func configureAccessibility(a *app.Application) error {
 	desktop.TheApp.NativeAttach = func(w *desktop.Window) (desktop.NativeAttachment, error) {
 		b := newAccessibilityBridge(a)
 		if C.vellumAXAttach(C.uint64_t(b.token), w.Glw.GetCocoaView(), w.Glw.GetCocoaWindow()) == 0 {
-			b.close()
+			b.closeFrom("native-attach-failed")
 			return nil, fmt.Errorf("cogent: native accessibility attachment failed")
 		}
 		text, err := attachTextInput(a, w)
 		if err != nil {
-			b.close()
+			b.closeFrom("text-attach-failed")
 			C.vellumAXDetach(C.uint64_t(b.token))
 			return nil, err
 		}
@@ -152,7 +152,7 @@ func accessibilityRequestRun(ctx context.Context, b *accessibilityBridge, start 
 		return "", err
 	}
 	if b == nil || b.closed.Load() {
-		return "", fmt.Errorf("cogent: native accessibility attachment closed")
+		return "", b.closedError()
 	}
 	// A stopped main queue cannot deliver Objective-C completion. Bound even
 	// Background contexts, and let attachment retirement cancel immediately.
@@ -172,11 +172,11 @@ func accessibilityRequestRun(ctx context.Context, b *accessibilityBridge, start 
 	select {
 	case value := <-result:
 		if b.closed.Load() {
-			return "", fmt.Errorf("cogent: native accessibility attachment closed")
+			return "", b.closedError()
 		}
 		return value, nil
 	case <-b.done:
-		return "", fmt.Errorf("cogent: native accessibility attachment closed")
+		return "", b.closedError()
 	case <-ctx.Done():
 		return "", ctx.Err()
 	}

@@ -116,11 +116,12 @@ func TestNativeAccessibilityRequestCancelsOnAttachmentClose(t *testing.T) {
 		done <- err
 	}()
 	request := <-started
-	b.close()
+	b.closeFrom("native-attachment-close")
 	select {
 	case err := <-done:
-		if err == nil {
-			t.Fatal("closed attachment returned a native result")
+		var closed *AccessibilityClosedError
+		if !errors.Is(err, ErrAccessibilityClosed) || !errors.As(err, &closed) || closed.Retirement.Window != "ax" || closed.Retirement.Token != b.token || closed.Retirement.Source != "native-attachment-close" {
+			t.Fatal("closed request lacked first retirement provenance", err)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("request survived attachment close")
@@ -130,6 +131,21 @@ func TestNativeAccessibilityRequestCancelsOnAttachmentClose(t *testing.T) {
 	accessibilityResults.Unlock()
 	if retained {
 		t.Fatal("closed request leaked result registration")
+	}
+}
+
+func TestNativeAccessibilityCompletedResultCannotHideRetirement(t *testing.T) {
+	_, b := newAXTest(t, 8)
+	_, err := accessibilityRequestRun(context.Background(), b, func(id uint64) {
+		accessibilityResults.Lock()
+		result := accessibilityResults.requests[id]
+		accessibilityResults.Unlock()
+		result <- "true"
+		b.closeFrom("driver-window-cleanup")
+	})
+	var closed *AccessibilityClosedError
+	if !errors.Is(err, ErrAccessibilityClosed) || !errors.As(err, &closed) || closed.Retirement.Source != "driver-window-cleanup" {
+		t.Fatal("ready native result hid closed bridge", err)
 	}
 }
 func TestNativeAccessibilityRequestBoundsBackgroundWait(t *testing.T) {

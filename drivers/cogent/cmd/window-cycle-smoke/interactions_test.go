@@ -79,7 +79,8 @@ func TestNativeActionRetriesDrainedUnacceptedAdmission(t *testing.T) {
 }
 
 func TestNativeActionInspectionFailureAfterAdmissionStops(t *testing.T) {
-	closed := errors.New("attachment retired")
+	retirement := cogent.AccessibilityRetirement{Window: "test", Token: 8, Generation: 3, Source: "native-attachment-close"}
+	closed := &cogent.AccessibilityClosedError{Retirement: retirement}
 	performs, inspections := 0, 0
 	record, err := runNativeAction(context.Background(), time.Second, "target", "press", "", nativeActionHooks{
 		accepted: func(context.Context) (bool, error) { return performs > 0, nil },
@@ -93,7 +94,7 @@ func TestNativeActionInspectionFailureAfterAdmissionStops(t *testing.T) {
 		perform:   func(context.Context, string) (bool, error) { performs++; return true, nil },
 		completed: func(cogent.AccessibilityInspection) bool { t.Fatal("failed inspection qualified"); return true },
 	})
-	if !errors.Is(err, closed) || performs != 1 || record.Attempts != 1 || record.Admissions != 1 || record.OwnerAndNativeCompleted {
+	if !errors.Is(err, cogent.ErrAccessibilityClosed) || performs != 1 || record.Attempts != 1 || record.Admissions != 1 || record.OwnerAndNativeCompleted || record.AttachmentRetirement == nil || *record.AttachmentRetirement != retirement {
 		t.Fatal("closed attachment swallowed, repeated or qualified", record, err, performs)
 	}
 }

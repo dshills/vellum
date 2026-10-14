@@ -8,6 +8,25 @@ Native accessibility queries read immutable AppKit snapshots on the main thread.
 
 Native objects retain identity across updates by identifier. Managed IDs, option IDs, page actions and virtual row IDs use separate encoded namespaces, including both extension identity and domain row identity. Application IDs containing separators cannot collide with synthetic IDs. Native payloads validate completely before retained elements change, including identifier uniqueness, parent links and scalar/action types. Native teardown unregisters callbacks and retires elements on the main thread before GLFW destruction; it restores the content-view class only while the exact bridge-installed subclass still owns that class slot. The native NSWindow class is preserved. Failed pre-show runs release the native attachment configuration so the existing retry contract remains valid.
 
+Bridge window registration is serialized with retirement. A refresh that passed
+an earlier readiness check must still refuse registry publication after close;
+old attachments cannot replace or unregister a newer attachment for that window.
+No retired-window registry is retained.
+
+A request already holding a retiring bridge returns `AccessibilityClosedError`,
+which unwraps `ErrAccessibilityClosed` for `errors.Is` and exposes a copied
+`AccessibilityRetirement` through `errors.As`. The record contains the window ID,
+monotonic attachment token, observed semantic generation before the retirement
+increment and first teardown call-path label. It is published before closure is
+signaled, and later cleanup cannot overwrite it. Errors retain no bridge, owner,
+controls or callbacks. A lookup after unregistration still reports an unavailable
+window. Labels are diagnostic implementation details; they identify native
+attachment release, setup failure or driver cleanup, not the triggering OS,
+application or user event. No historical global log or memory qualification is
+implied. The optional cycle fixture records this copied provenance on failure and
+stops, without retrying closed attachments or qualifying incomplete actions.
+See the [retirement checkpoint](../docs/reports/macos-ax-retirement/README.md).
+
 ## Supported semantics and actions
 
 Buttons, labels, checkboxes, selectors, sliders, number fields, text fields, tabs, scroll areas and dialogs expose roles, labels, help, enabled state, accepted values, relationships, selection and focus. Labels are independent of presentation text. Inherited disabled state removes actions. Numeric proposals reject nonfinite/malformed values and clamp finite values to the declared range. Selectors and tabs accept stable option IDs or a unique enabled option label; disabled and ambiguous labels are refused. Text fields publish their accepted editing value and directional selection from an owner-held cache. That cache refreshes after native publication, completed outgoing focus loss, and controlled text/selection reconciliation. An unchanged descriptor preserves visible preedit; a coalesced publication or focus handoff cannot leave an unfocused field exposing an older preview. These updates neither reactivate the outgoing client nor emit an extra controlled Change. Text fields publish their accepted full value; detailed native attributed text, text selection ranges and multiline editor accessibility remain separate acceptance gates.
