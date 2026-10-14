@@ -1,0 +1,44 @@
+{
+  "result": "REVIEWED_MAC_OUTLINE_EXTREMA",
+  "base_commit": "ce84efb4d38441d3f64cc9a7bfda30b0e2224f74",
+  "source": {
+    "drivers/cogent/native/dependencies.json": "44c804fa57496aae1f21c83f776d5d11e3e57dfcdf85c3b5e5ee43b1098e89ec",
+    "drivers/cogent/prepare_test.py": "d623d30a24529e90e591299bf21b59a3031ebc47f7a14c53e6eba20a3a702f53",
+    "specs/rendering.md": "e9ee9339f35c0b6be2c5c11be5f705a4f4f2188ea18b43d9e752f586e5a5a7b9",
+    "specs/macos-completion.md": "39210d03284f77818d6033c516a23c21328b2dd6e71772ad245aeb8494c72dc1",
+    "docs/reports/macos-outline-extrema/README.md": "1254a22ab70d0010ec3e5a3872127aafab657fc8b251bb7088329e76d7a10932",
+    "drivers/cogent/native/patches/outlineextrema/0053-cache-identity-outline-extrema.patch": "3167781a35dce4be1196465ff51b5aca4ec2696af114a73a983cfd668044b858",
+    "drivers/cogent/native/patches/outlineextrema/README.md": "036c2c5c1b4fef02f247965738df783635c3ee4ebe43cf0b2aa49293c90ff68b",
+    "drivers/cogent/native/patches/outlineextrema/original-hashes.json": "5612a895a90a8215723c254458252e93a9f96821517d11add9d542c39f99bdcc",
+    "drivers/cogent/native/patches/outlineextrema/output-hashes.json": "c0fa11e79095428e9f4323b4f588bf8b88177f667c4be4b03511178c2216ede7"
+  },
+  "prepared_files": 6200,
+  "prepared_manifest_sha256": "c19ed6a2658d8acac06be39858b31876d5ebcf5d60bf79faaa4e8b4ef4225350",
+  "processes": 40,
+  "ordinary_samples": 4800,
+  "gpu_scene_opt_in": true,
+  "latency_targets_met": false,
+  "required_receipts": {
+    "formal-race-v1": "3790972081670c3c3beb1546c25830484fa6ea73b81b8bd8a7cc40518f8f785c",
+    "formal-adapter-race-v2": "7b6fb9e7c74539d36e7b7b97cc662c84e937b1ead9342c7dc02e53373e490d32",
+    "formal-vet-v1": "251a6030876ec860abb37b8bf6193d74a62d782e2a459df22670856e3ddf584b",
+    "formal-prepare-test-v1": "68b33f237c88c073e3730121558e26e92e500b096a78c543bc8b348a50f6937f"
+  },
+  "comparison_sha256": "916e6bfd2eba3c8d424e522410e1efc7a81922eb69c95ea8f4da43b9ac20949e",
+  "internal_review_sha256": "f47c14fc602b2e46a730da98eea3390a72f2c80d6e79c60f0495050477cea0ae",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_findings": 0,
+  "prism_coverage_complete": true,
+  "prism_sha256": "cb33d584fad0c08cd977156b85d88b862ebcd5edba7b2a720539cc30649b61b6",
+  "limits": [
+    "Elapsed host UI work excludes queue wait/drawable acquisition and does not measure GPU completion/presentation.",
+    "Default CPU performance, completeP6, integratedP11, physicalGPU/human/release acceptance remainopen."
+  ],
+  "archive_sha256": "2d0fc71d11453e2d5fb8ec8adcf9ac60382c09f5de7657c0129709b0051f0b82",
+  "index_sha256": "646b6c0bc85cadb3d89d9386b921181e4db81930671b2e7dd3fedb3c51ceb45a",
+  "archive_members": 183,
+  "archive_index_verified": true,
+  "qualification_sha256": "e9814d6f0ad0bff51e58ce79e0e49c2237e5fd248eee85d9d610eb72c0a5aad1",
+  "seal_producer_sha256": "007fc3b61f4d8c0a8bbb12ad962de9876d45b3084cf34a9921481274ef36e4f6"
+}

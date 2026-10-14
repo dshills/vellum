@@ -1,0 +1,303 @@
+--- a/paint/renderers/rasterx/outline_cache.go
++++ b/paint/renderers/rasterx/outline_cache.go
+@@ -29,6 +29,7 @@
+ 	outline font.GlyphOutline
+ 	cost    font.GlyphOutlineCost
+ 	bytes   int
++	extrema outlineExtrema
+ }
+ 
+ // staticOutlineCache belongs to one renderer and its private paint captures.
+@@ -108,7 +109,7 @@
+ 		(cache.fonts[key.font] == 0 && len(cache.fonts) >= outlineCacheFonts) {
+ 		cache.evict()
+ 	}
+-	cache.entries[key] = cache.lru.PushFront(outlineEntry{key, outline, cost, weight})
++	cache.entries[key] = cache.lru.PushFront(outlineEntry{key: key, outline: outline, cost: cost, bytes: weight, extrema: measureOutlineExtrema(outline)})
+ 	cache.fonts[key.font]++
+ 	cache.bytes += weight
+ }
+--- /dev/null
++++ b/paint/renderers/rasterx/outline_extrema.go
+@@ -0,0 +1,79 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"math"
++
++	"cogentcore.org/core/math32"
++	"github.com/go-text/typesetting/font"
++	"github.com/go-text/typesetting/font/opentype"
++)
++
++// Extrema belong to one cache-owned immutable outline, never a caller's slice.
++// Four font-unit values plus validity are fixed per admitted entry; existing
++// entry/font/segment bounds also bound this metadata. They retain no new owners.
++type outlineExtrema struct {
++	minX, minY, maxX, maxY float32
++	valid                  bool
++}
++
++func measureOutlineExtrema(outline font.GlyphOutline) outlineExtrema {
++	e := outlineExtrema{}
++	points := 0
++	for _, segment := range outline.Segments {
++		var count int
++		switch segment.Op {
++		case opentype.SegmentOpMoveTo, opentype.SegmentOpLineTo:
++			count = 1
++		case opentype.SegmentOpQuadTo:
++			count = 2
++		case opentype.SegmentOpCubeTo:
++			count = 3
++		default:
++			return outlineExtrema{}
++		}
++		for _, p := range segment.Args[:count] {
++			if math.IsNaN(float64(p.X)) || math.IsInf(float64(p.X), 0) || math.IsNaN(float64(p.Y)) || math.IsInf(float64(p.Y), 0) {
++				return outlineExtrema{}
++			}
++			if points == 0 {
++				e.minX, e.maxX, e.minY, e.maxY = p.X, p.X, p.Y, p.Y
++			} else {
++				e.minX = min(e.minX, p.X)
++				e.maxX = max(e.maxX, p.X)
++				e.minY = min(e.minY, p.Y)
++				e.maxY = max(e.maxY, p.Y)
++			}
++			points++
++		}
++	}
++	e.valid = points > 0
++	return e
++}
++
++func (e outlineExtrema) identityBounds(scale float32, pos math32.Vector2) (math32.Box2, bool) {
++	// Positive scaling/addition are monotonic float32 operations. Each extremum
++	// is an actual input point and uses the same arithmetic as the original loop.
++	b := math32.Box2{Min: math32.Vec2(e.minX*scale+pos.X, -e.maxY*scale+pos.Y),
++		Max: math32.Vec2(e.maxX*scale+pos.X, -e.minY*scale+pos.Y)}
++	return b, scenePoint(b.Min) && scenePoint(b.Max)
++}
++
++func (cache *staticOutlineCache) identitySceneBounds(f *font.Font, gid font.GID, outline font.GlyphOutline, scale float32, pos math32.Vector2) (math32.Box2, bool, bool) {
++	if scale < 0 || math.IsNaN(float64(scale)) || math.IsInf(float64(scale), 0) || len(outline.Segments) == 0 {
++		return math32.Box2{}, false, false
++	}
++	cache.mu.Lock()
++	defer cache.mu.Unlock()
++	element := cache.entries[outlineKey{f, gid}]
++	if element == nil {
++		return math32.Box2{}, false, false
++	}
++	entry := element.Value.(outlineEntry)
++	if !entry.extrema.valid || len(entry.outline.Segments) != len(outline.Segments) || &entry.outline.Segments[0] != &outline.Segments[0] {
++		return math32.Box2{}, false, false
++	}
++	b, valid := entry.extrema.identityBounds(scale, pos)
++	return b, true, valid
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/outline_extrema_test.go
+@@ -0,0 +1,127 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"math"
++	"math/rand/v2"
++	"reflect"
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"github.com/go-text/typesetting/font"
++	"github.com/go-text/typesetting/font/opentype"
++)
++
++// Independent original point loop, including the actual identity matrix math.
++func originalOutlineBounds(outline font.GlyphOutline, scale float32, pos math32.Vector2) (math32.Box2, bool) {
++	b := math32.Box2{}
++	points := 0
++	for _, s := range outline.Segments {
++		var n int
++		switch s.Op {
++		case opentype.SegmentOpMoveTo, opentype.SegmentOpLineTo:
++			n = 1
++		case opentype.SegmentOpQuadTo:
++			n = 2
++		case opentype.SegmentOpCubeTo:
++			n = 3
++		default:
++			return b, false
++		}
++		for _, arg := range s.Args[:n] {
++			p := math32.Vec2(arg.X*scale+pos.X, -arg.Y*scale+pos.Y)
++			q := math32.Identity2().MulPoint(p)
++			if points == 0 {
++				b = math32.Box2{Min: q, Max: q}
++			} else {
++				b.ExpandByPoint(q)
++			}
++			points++
++			if !scenePoint(p) || !scenePoint(q) {
++				return b, false
++			}
++		}
++	}
++	return b, true
++}
++
++func TestVellumOutlineExtremaOriginalPointOracle(t *testing.T) {
++	face := vellumOutlineFace(t)
++	cache := &staticOutlineCache{}
++	rng := rand.New(rand.NewPCG(7, 11))
++	for _, letter := range "AgéÅfj0123456789" {
++		gid, _ := face.NominalGlyph(letter)
++		outline, ok := cache.ordinary(face, gid)
++		if !ok {
++			t.Fatal("outline")
++		}
++		positions := []math32.Vector2{math32.Vec2(0, 0), math32.Vec2(1<<16, 0), math32.Vec2(-(1 << 16), 0), math32.Vec2(math.Nextafter32(1<<16, float32(math.Inf(1))), 0)}
++		for range 500 {
++			positions = append(positions, math32.Vec2((rng.Float32()-.5)*(1<<18), (rng.Float32()-.5)*(1<<18)))
++		}
++		for _, scale := range []float32{0, .001, .015625, .1, 1, 2, 1000} {
++			for _, pos := range positions {
++				want, accepted := originalOutlineBounds(outline, scale, pos)
++				got, available, valid := cache.identitySceneBounds(face.Font, gid, outline, scale, pos)
++				if !available || valid != accepted || valid && (!reflect.DeepEqual(got, want) || 1+int(got.Size().X)+int(got.Size().Y) != 1+int(want.Size().X)+int(want.Size().Y)) {
++					t.Fatal("bounds/admission drift", letter, scale, pos, got, want, available, valid, accepted)
++				}
++			}
++		}
++	}
++}
++
++func TestVellumOutlineExtremaExactOwnerAndRefusal(t *testing.T) {
++	face := vellumOutlineFace(t)
++	gid, _ := face.NominalGlyph('A')
++	cache := &staticOutlineCache{}
++	own, _ := cache.ordinary(face, gid)
++	public, _ := face.GlyphDataOutline(gid)
++	if _, available, _ := cache.identitySceneBounds(face.Font, gid, public, 1, math32.Vector2{}); available {
++		t.Fatal("caller-owned outline trusted")
++	}
++	for _, scale := range []float32{-1, float32(math.NaN()), float32(math.Inf(1))} {
++		if _, available, _ := cache.identitySceneBounds(face.Font, gid, own, scale, math32.Vector2{}); available {
++			t.Fatal("nonmonotonic scale trusted")
++		}
++	}
++	if _, available, valid := cache.identitySceneBounds(face.Font, gid, own, 1, math32.Vec2(float32(math.NaN()), 0)); !available || valid {
++		t.Fatal("invalid position admitted")
++	}
++	cache.mu.Lock()
++	cache.evict()
++	cache.mu.Unlock()
++	if _, available, _ := cache.identitySceneBounds(face.Font, gid, own, 1, math32.Vector2{}); available {
++		t.Fatal("evicted outline metadata reused")
++	}
++	bad := font.GlyphOutline{Segments: append([]font.Segment(nil), own.Segments...)}
++	bad.Segments[0].Op = opentype.SegmentOp(255)
++	if measureOutlineExtrema(bad).valid {
++		t.Fatal("unknown operation summarized")
++	}
++}
++
++func BenchmarkVellumOutlineIdentityPreflight(b *testing.B) {
++	face := vellumOutlineFace(b)
++	gid, _ := face.NominalGlyph('Å')
++	cache := &staticOutlineCache{}
++	outline, _ := cache.ordinary(face, gid)
++	pos := math32.Vec2(123.25, 456.5)
++	b.Run("Original", func(b *testing.B) {
++		b.ReportAllocs()
++		for range b.N {
++			if _, ok := originalOutlineBounds(outline, .02, pos); !ok {
++				b.Fatal("refused")
++			}
++		}
++	})
++	b.Run("Cached", func(b *testing.B) {
++		b.ReportAllocs()
++		for range b.N {
++			if _, available, valid := cache.identitySceneBounds(face.Font, gid, outline, .02, pos); !available || !valid {
++				b.Fatal("refused")
++			}
++		}
++	})
++}
+--- a/paint/renderers/rasterx/text.go
++++ b/paint/renderers/rasterx/text.go
+@@ -363,34 +363,47 @@
+ 			rs.sceneRecord.Refuse()
+ 			return
+ 		}
+-		// Validate transformed outline coordinates before cache or scanner work.
++		// Cached extrema prove the same bounds for the exact identity transform.
++		// Cold/unretained/replaced outlines and all other transforms retain the
++		// point traversal; every logical outline/work charge still runs above.
+ 		var bounds math32.Box2
+-		points := 0
+-		for _, segment := range outline.Segments {
+-			var n int
+-			switch segment.Op {
+-			case opentype.SegmentOpMoveTo, opentype.SegmentOpLineTo:
+-				n = 1
+-			case opentype.SegmentOpQuadTo:
+-				n = 2
+-			case opentype.SegmentOpCubeTo:
+-				n = 3
+-			default:
++		available, valid := false, false
++		if identity && ctx.Cumulative == math32.Identity2() {
++			bounds, available, valid = rs.staticOutlines().identitySceneBounds(run.Face.Font, g.GlyphID, outline, scale, pos)
++		}
++		if available {
++			if !valid {
+ 				rs.sceneRecord.Refuse()
+ 				return
+ 			}
+-			for _, arg := range segment.Args[:n] {
+-				p := math32.Vec2(arg.X*scale+x, -arg.Y*scale+y)
+-				q := ctx.Cumulative.MulPoint(p)
+-				if points == 0 {
+-					bounds = math32.Box2{Min: q, Max: q}
+-				} else {
+-					bounds.ExpandByPoint(q)
+-				}
+-				points++
+-				if !scenePoint(p) || !scenePoint(ctx.Cumulative.MulPoint(p)) {
++		} else {
++			points := 0
++			for _, segment := range outline.Segments {
++				var n int
++				switch segment.Op {
++				case opentype.SegmentOpMoveTo, opentype.SegmentOpLineTo:
++					n = 1
++				case opentype.SegmentOpQuadTo:
++					n = 2
++				case opentype.SegmentOpCubeTo:
++					n = 3
++				default:
+ 					rs.sceneRecord.Refuse()
+ 					return
++				}
++				for _, arg := range segment.Args[:n] {
++					p := math32.Vec2(arg.X*scale+x, -arg.Y*scale+y)
++					q := ctx.Cumulative.MulPoint(p)
++					if points == 0 {
++						bounds = math32.Box2{Min: q, Max: q}
++					} else {
++						bounds.ExpandByPoint(q)
++					}
++					points++
++					if !scenePoint(p) || !scenePoint(ctx.Cumulative.MulPoint(p)) {
++						rs.sceneRecord.Refuse()
++						return
++					}
+ 				}
+ 			}
+ 		}

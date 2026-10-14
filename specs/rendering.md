@@ -370,3 +370,14 @@ immutability and the renderer's existing owner serialization remain required.
 Matched original geometry/pixels, budget/refusal and native measurements must
 qualify this optimization. It does not itself establish performance or memory
 acceptance or enable the GPU scene path by default.
+
+
+Retained static outlines also carry used control-point extrema. For the exact
+identity transform, finite nonnegative-scale preflight may check those extrema
+using the original float32 arithmetic. Font/GID, exact segment backing and cache
+ownership guard the summary; all other cases retain per-point traversal. Logical
+retrieval, segment and integer extent-product charges remain identical. Metadata
+is bounded by the entry limit, separately from segment capacity. The
+[Mac extrema checkpoint](../docs/reports/macos-outline-extrema/README.md) records
+matching geometry/native parity and a measured opt-in GPU UI-work improvement;
+the unchanged 4/6 ms targets still fail and the GPU path remains opt-in.

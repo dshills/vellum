@@ -496,6 +496,17 @@
               "sha256": "2bb7a6e600158f53736a279a0d715dcba9f5980a21b5f3c060514fcd5293d09d"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/outlineextrema",
+          "inputs": "native/patches/outlineextrema/original-hashes.json",
+          "outputs": "native/patches/outlineextrema/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/outlineextrema/0053-cache-identity-outline-extrema.patch",
+              "sha256": "3167781a35dce4be1196465ff51b5aca4ec2696af114a73a983cfd668044b858"
+            }
+          ]
         }
       ]
     },
