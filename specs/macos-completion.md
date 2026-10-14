@@ -565,3 +565,10 @@ stable compatible Cocoa identities. It withdraws descendant table/tree geometry
 before modal/ancestor/workbench transfers, including before panel.View. Original
 regressions fail; final verification scopes remain documented separately from
 human accessibility, full P6/P11, native/GPU memory and Mac distribution.
+
+The [current completed-outline campaign](../docs/reports/macos-tree-retention/README.md)
+passes 1000 composed native cycles on committed bf3b1b5 with exact current tree AX
+completion per cycle and final main-loop cleanup. Warm sampled heap/RSS remain bounded
+by unchanged guards; two owned native allocation snapshots are preserved. This updates
+lifecycle/retention evidence without qualifying full P6/P11, physical display/input,
+human accessibility, overnight background soak or public distribution.

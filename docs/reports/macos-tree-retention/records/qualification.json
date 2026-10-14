@@ -1,0 +1,31 @@
+{
+  "result": "REVIEWED_1000_COMPOSED_TREE_RETENTION",
+  "base_commit": "bf3b1b55f2ebacc5ddea493e3365c4ed4947a966",
+  "sources": {
+    "docs/reports/README.md": "0b525c27111380eb547f19a5e2304955adaec13bcc57528a296d60c251d3d6d3",
+    "docs/reports/macos-tree-retention/README.md": "c61e248cba695e46d5fa05919a1acae9fcb72951fdf901848ab1dd5cf2d4b255",
+    "docs/reports/macos-tree-retention/records/final-summary.json": "4144dc6310711c2e625486d72002f4158017a366615bebf3f47daa6d90254f6d",
+    "specs/macos-completion.md": "94a4c66fe32a82e844331494d8dfa194adb8c13416e9acd6b606a298c8a5ab7f",
+    "specs/workbench-endurance.md": "d31c9a248d4e31b9de26706e0ce1f7ec2334347df82349ff7869172b3ddb56ed"
+  },
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_exit_code": 0,
+  "prism_coverage_complete": true,
+  "prism_files": 5,
+  "prism_findings": 0,
+  "cycles": 1000,
+  "tree_ax_rows_each": 18,
+  "forced_gc_samples": 41,
+  "prepared_files": 6204,
+  "prepared_changed": false,
+  "production_code_changed": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "native_heap_budget_qualified": false,
+  "gpu_memory_qualified": false,
+  "archive_sha256": "59d857075f58a67355ba801bcd51f7e26163f787ac4463a7dc2bfa6abfce2f90",
+  "archive_members": 45,
+  "archive_bytes": 642008
+}

@@ -92,3 +92,11 @@ Observed effective root geometry remains separate from the requested primary
 physical/display workload. Full P11 still requires the five measured cold/warm
 runs, sustained pacing/input/frame and resource budgets, overnight soak and
 physical display variants.
+
+The [completed-outline retention campaign](../docs/reports/macos-tree-retention/README.md)
+repeats 1000 composed cycles on committed bf3b1b5 after retained-view publication
+fixes. Each cycle additionally matches owner geometry to 18 completed native AX rows;
+source, prepared inputs, producers, authorization and terminal cleanup qualify. Warm sampled
+Go heap is 42.6–46.7 MiB and RSS 350.4–366.0 MiB. This establishes that sampled
+lifecycle workload. Native standard-control callbacks, hierarchical tree actions,
+modal data-view transfer, paced frame/input budgets and full P11 remain separate.

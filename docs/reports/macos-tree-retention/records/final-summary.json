@@ -1,0 +1,116 @@
+{
+  "result": "PASS_1000_COMPOSED_CYCLES_AND_NATIVE_OUTLINE_COMPLETION",
+  "commit": "bf3b1b55f2ebacc5ddea493e3365c4ed4947a966",
+  "executable_sha256": "8a53ccfc0d34910329df0c8fb75a2a43782f8169d5bc42a30549a9a1859f1279",
+  "prepared_files": 6204,
+  "prepared_changed": false,
+  "elapsed_seconds": 1362.162769833987,
+  "cycles": 1000,
+  "dense_labels_per_cycle": 1000,
+  "tree_ax_rows_counts": [
+    18
+  ],
+  "forced_gc_samples": 41,
+  "warm_sample_cycles": [
+    100,
+    1000
+  ],
+  "warm_go_heap_bytes": [
+    44706080,
+    49013928
+  ],
+  "warm_rss_bytes": [
+    367394816,
+    383827968
+  ],
+  "terminal_sample": {
+    "Completed": 1000,
+    "HeapAlloc": 44892824,
+    "HeapInuse": 69156864,
+    "GoSys": 240924984,
+    "TotalAlloc": 295125858016,
+    "Mallocs": 2435662678,
+    "Frees": 2435458951,
+    "NumGC": 4050,
+    "Goroutines": 6,
+    "RSSBytes": 381026304,
+    "ElapsedSeconds": 1361.415105959
+  },
+  "native_cleanup": {
+    "MainThread": true,
+    "CleanupObserved": true,
+    "WindowTitles": [],
+    "FilePanels": {
+      "Tracked": 0,
+      "Visible": 0,
+      "Open": 0,
+      "Save": 0
+    },
+    "NativeOutstanding": 0,
+    "AccessibilityWindows": 0,
+    "Menu": {
+      "Owned": false,
+      "OriginalRestored": false,
+      "TargetRetired": true,
+      "Items": []
+    },
+    "Tray": {
+      "Present": false,
+      "Visible": false,
+      "Template": false,
+      "TargetRetired": true,
+      "Identity": 0,
+      "Title": "",
+      "Tooltip": "",
+      "AccessibilityLabel": "",
+      "ImageWidth": 0,
+      "ImageHeight": 0,
+      "PixelWidth": 0,
+      "PixelHeight": 0,
+      "Items": []
+    },
+    "CallbacksStopped": true,
+    "PendingCallbacks": 0,
+    "MenuCallbacks": 0,
+    "TrayCallbacks": 0
+  },
+  "native_snapshots": [
+    {
+      "name": "vmmap-early",
+      "pid": 95137,
+      "cycle": 156,
+      "raw_native_summary_lines": [
+        "Physical footprint:         702.2M",
+        "Physical footprint (peak):  737.1M",
+        "IOSurface                        113.6M   113.4M   113.4M       0K       0K   113.4M       0K       22",
+        "MALLOC_SMALL                      59.9M    26.7M    26.7M       0K       0K       0K       0K       74         see MALLOC ZONE table below",
+        "MALLOC_SMALL (empty)              20.1M    3488K    3488K       0K       0K       0K       0K       10         see MALLOC ZONE table below",
+        "owned unmapped (graphics)        330.3M   326.3M   326.3M       0K       0K       0K       0K      105",
+        "TOTAL                              4.7G     1.6G   702.2M       0K       0K   145.6M       0K     6632",
+        "TOTAL                                      85.8M      31.1M      31.1M         0K      94280      25.8M      5383K     17%      90"
+      ]
+    },
+    {
+      "name": "vmmap-late",
+      "pid": 95137,
+      "cycle": 656,
+      "raw_native_summary_lines": [
+        "Physical footprint:         654.8M",
+        "Physical footprint (peak):  743.0M",
+        "IOSurface                         72.3M    72.1M    72.1M       0K       0K    72.1M       0K       20",
+        "MALLOC_SMALL                      63.9M    28.0M    28.0M       0K       0K       0K       0K       74         see MALLOC ZONE table below",
+        "MALLOC_SMALL (empty)              24.1M    3520K    3520K       0K       0K       0K       0K       12         see MALLOC ZONE table below",
+        "owned unmapped (graphics)        330.3M   326.3M   326.3M       0K       0K       0K       0K      105",
+        "TOTAL                              4.7G     1.6G   654.8M       0K       0K    88.3M       0K     6638",
+        "TOTAL                                      93.8M      32.5M      32.5M         0K     107967      26.6M      6088K     19%      92"
+      ]
+    }
+  ],
+  "heap_profile_sha256": "7d24bde46c0d774d13f95faa904db0f01785e72ad8fd69246ce6aed54d1c3a87",
+  "heap_profile_bytes": 329665,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "gpu_memory_qualified": false,
+  "native_heap_budget_qualified": false,
+  "scope": "One sampled lifecycle/retention campaign, perturbed by two read-only vmmap snapshots. Logical and native outline completion per cycle; no frame/presentation/input-latency, physical-display, human screen-reader or overnight qualification."
+}

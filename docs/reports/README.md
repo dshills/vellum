@@ -39,3 +39,5 @@ The [implementation status](../implementation.md) describes the current framewor
 
 The [validation plan](../../specs/prototype-plan.md) defines the research gates.
 A passing local check does not imply production or cross-platform certification.
+
+- [Completed-outline composed retention](macos-tree-retention/README.md): 1000 native cycles on committed source with strict native tree completion and sampled native memory; broader P6/P11 remains open.
