@@ -536,3 +536,14 @@ Go heap is 45.3–46.6 MiB and RSS 350.4–369.1 MiB. Raw wrapper status-format 
 is retained alongside exact code/prepared endpoint equality. This closes that
 specific composed lifecycle campaign, while full P6/P11, physical native/GPU
 budgets, overnight soak, human accessibility and Mac distribution remain open.
+
+
+The [stored-tree frame checkpoint](../docs/reports/macos-tree-performance/README.md)
+adds actual native input/owner/completed-frame timing for sealed 10k/100k wide/deep
+trees and removes duplicate retained row updater/style work. Forty matched native
+processes produce 9600 validated warm samples with identical phase geometry and
+71 clipped rows; mean per-run p95 improves 8.8–10.9% and process Go allocation per
+observed interval falls about 21–23%. Final p95 8.45–8.56 ms still fails the unchanged
+4 ms tree target. Original updater regressions fail, race checks pass and twelve
+software pixel records match. Full tree interaction/cold-cache/maximum-visible,
+P6/P11, physical native/GPU budgets, overnight and Mac release remain open.

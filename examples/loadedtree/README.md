@@ -63,3 +63,25 @@ shaping, borrowed previous results and RSS; this is not a process memory limit.
 The integration owner records final source-bound checks and Cocoa evidence in
 [the durable report](../../docs/reports/macos-large-tree/README.md). Scratch-only
 exploratory logs are not a final qualification record.
+
+
+## Warm native frame measurement
+
+Use an optimized non-race binary for the separate `-perf` mode:
+
+```sh
+go build -o /tmp/vellum-loadedtree .
+/tmp/vellum-loadedtree -perf -nodes=100000 -perf-warmup=128 -perf-samples=240
+/tmp/vellum-loadedtree -perf -nodes=100000 -perf-deep -perf-warmup=128 -perf-samples=240
+```
+
+Repeat with `-nodes=10000` at the same effective viewport. The fixture requires
+at least 64 measured clipped rows and refuses smaller layouts. Its compact
+9-logical-pixel rows and 12-Dp typography define a dense workload at
+the recorded native scale; requested dimensions do not certify a physical display.
+Each scroll uses actual originating native input and requires one owner callback
+and its matching completed native frame. The first scroll is separate from the
+closed warm trajectory and is not cold-cache evidence. Geometry persistence is
+disabled in this fixture. See the [measurement contract](../../specs/tree-performance.md)
+for timing boundaries, pairing, bounded refusal and the unchanged 4 ms p95 target.
+`-perf` excludes `-smoke`; performance flags require explicit `-perf`.

@@ -1,0 +1,127 @@
+{
+  "result": "REVIEWED_MAC_TREE_FRAME_PERFORMANCE",
+  "base_commit": "a5f2c165e96e8b8342f417381a0ea343176e012b",
+  "source": {
+    "drivers/cogent/tree_frame_metrics.go": "6321c69951cba72b955388eb690461f5436e2cb649869e1e03833b977075efca",
+    "drivers/cogent/tree.go": "8764cb49236c9d182d02672df732e9f6b77ebd3b1e6a51a720c320a6a1cf548f",
+    "drivers/cogent/tree_frame_metrics_offscreen_test.go": "8d1495db4841e8c4928ac7c0fd402c9d40c46d8a22a780a7cc47a12b911d1398",
+    "drivers/cogent/tree_update_pass_offscreen_test.go": "c3f7849eb4fbaa1a9eedbb2e0cad2b497acf2775743aa6623cd4b61bd9690caa",
+    "drivers/cogent/driver.go": "72d89146437c2da5798dc2ad7059f1df9ee02e8959c69346f8e7533ca9cdd9ed",
+    "examples/loadedtree/perf.go": "e09e06903783b6c9286b67cf46598caed610de034c46f497d6b251c57050b027",
+    "examples/loadedtree/perf_test.go": "d458b1c151d7287751bbccfe5bd73cd0b6653338d5530cac12006ab37e005abf",
+    "examples/loadedtree/main.go": "d0de6a71451817d0ceb1f4be97d1caa68eab37ca3424935b04f778eb342e6963",
+    "examples/loadedtree/README.md": "7b9fde8f4bacc01bca9f0610e09fc5b5bbaecac72241a098183ae7fe4a55c12c",
+    "specs/README.md": "fe53722e18cc2590da7e90cea4d1fd206a5c141330e867e40b0fdabccb5a2db4",
+    "specs/tree-performance.md": "d37685b76c01d94e2a67bb4da8e4a966d6c01bddfa2e9e88530831a63cc61158",
+    "specs/tree-native.md": "943013367ede20797642226ab797bd0b8cdf2821c7f4965f7de0f7daa43eb3e5",
+    "specs/tree.md": "6fd3ecc1536672eb9f4ad562e3316ed4de22c99b54276b3498907601e5bbffa8",
+    "specs/macos-completion.md": "7c40fa63aff421d2b2f1d82b07ffca4bb63065759ba62adf0cee8f89836b2d37",
+    "docs/reports/macos-tree-performance/README.md": "523f92f0e8e1d7afcda3232c0a5a39eba6800e3a5e104417fa50fc2b62f83a05"
+  },
+  "internal_review": "APPROVED_SOURCE; initial tracing, updater/trajectory delta and bounded startup/retirement delta; no unresolved findings",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_process_exit_code": 1,
+  "prism_raw_findings": 2,
+  "prism_resolved_findings": 2,
+  "prism_findings": 0,
+  "prism_coverage_complete": true,
+  "prism_files": 15,
+  "native_processes": 40,
+  "native_samples": 9600,
+  "final_native_preflight_processes": 2,
+  "final_native_preflight_samples": 240,
+  "prepared_files": 6204,
+  "scope": "Actual tree input/owner/completed-frame recorder and single-host retained updater correction. Matched40process comparison predates onlyconsumererrorpathfix; finalfocusedrace/nativepreflights separately qualifythatfix. Allfinal p95targetsfailed; originalcode450duplicateassertions and12pixelparityrecords retained.",
+  "cases": [
+    {
+      "nodes": 10000,
+      "deep": false,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.304217,
+          "mean_ms_mean_of_runs": 8.595472311666667,
+          "allocation_bytes_mean": 3286058.72,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.4859996,
+          "mean_ms_mean_of_runs": 7.6936311925,
+          "allocation_bytes_mean": 2583996.2733333334,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -8.79404897800643
+    },
+    {
+      "nodes": 10000,
+      "deep": true,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.5112334,
+          "mean_ms_mean_of_runs": 8.768267176666665,
+          "allocation_bytes_mean": 3625815.68,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.562317,
+          "mean_ms_mean_of_runs": 7.854672403333334,
+          "allocation_bytes_mean": 2796926.92,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -9.976796489927375
+    },
+    {
+      "nodes": 100000,
+      "deep": false,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.377091,
+          "mean_ms_mean_of_runs": 8.625402631666669,
+          "allocation_bytes_mean": 3285620.2666666666,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.454808400000001,
+          "mean_ms_mean_of_runs": 7.757231733333334,
+          "allocation_bytes_mean": 2583782.98,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -9.835487359565976
+    },
+    {
+      "nodes": 100000,
+      "deep": true,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.5183748,
+          "mean_ms_mean_of_runs": 8.80531377,
+          "allocation_bytes_mean": 3625628.48,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.478841599999999,
+          "mean_ms_mean_of_runs": 7.786974816666667,
+          "allocation_bytes_mean": 2798182.0266666664,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -10.921330813743547
+    }
+  ],
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "physical_gpu_memory_qualified": false,
+  "archive_sha256": "3b52f79381e4e7f303ade0bee6186050123342ba34cf4639029d4d50004d0eea",
+  "archive_files": 238
+}

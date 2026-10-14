@@ -43,3 +43,6 @@
 
 See [implementation status](../docs/implementation.md) for completed phases and
 [foundation reports](../docs/reports/README.md) for the evidence behind the gates.
+
+[Stored-tree warm performance](tree-performance.md) defines actual native-input/frame
+measurement and matched 10k/100k wide/deep workloads.

@@ -1,0 +1,1460 @@
+{
+  "result": "VALIDATED_TREE_NATIVE_COMPARISON",
+  "processes": 40,
+  "samples": 9600,
+  "runs": [
+    {
+      "name": "baseline-10000-wide-r1",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8299159.825,
+        "p50": 8381707,
+        "p95": 9237791,
+        "p99": 9752211,
+        "max": 11994208
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3287318.066666667,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7466834,
+      "stage_p95_ns": {
+        "InputNS": 7125,
+        "OwnerNS": 2166,
+        "ReconcileNS": 2169500,
+        "LayoutPaintNS": 1569708,
+        "GatherNS": 14917,
+        "RasterUploadNS": 5610084,
+        "EncodeSubmitNS": 231500
+      },
+      "heap_after_data": 3775216,
+      "heap_after_warmup": 34594296,
+      "heap_after_measurement": 34652496
+    },
+    {
+      "name": "candidate-10000-wide-r1",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7721799.65,
+        "p50": 7723332,
+        "p95": 8549210,
+        "p99": 9071416,
+        "max": 9172501
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2584493.2,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7739123,
+      "stage_p95_ns": {
+        "InputNS": 7542,
+        "OwnerNS": 2166,
+        "ReconcileNS": 1198250,
+        "LayoutPaintNS": 1545084,
+        "GatherNS": 7167,
+        "RasterUploadNS": 5871625,
+        "EncodeSubmitNS": 217042
+      },
+      "heap_after_data": 3774240,
+      "heap_after_warmup": 34586312,
+      "heap_after_measurement": 34615744
+    },
+    {
+      "name": "baseline-100000-wide-r1",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8681714.641666668,
+        "p50": 8613292,
+        "p95": 9306916,
+        "p99": 9720166,
+        "max": 24888792
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3286205.2,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7583998,
+      "stage_p95_ns": {
+        "InputNS": 7250,
+        "OwnerNS": 2125,
+        "ReconcileNS": 2273875,
+        "LayoutPaintNS": 1397583,
+        "GatherNS": 6624,
+        "RasterUploadNS": 5683959,
+        "EncodeSubmitNS": 226084
+      },
+      "heap_after_data": 21351688,
+      "heap_after_warmup": 52104664,
+      "heap_after_measurement": 52177640
+    },
+    {
+      "name": "candidate-100000-wide-r1",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7729469.783333333,
+        "p50": 7709959,
+        "p95": 8377332,
+        "p99": 8886042,
+        "max": 9730001
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2583682.7666666666,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7155623,
+      "stage_p95_ns": {
+        "InputNS": 7750,
+        "OwnerNS": 2042,
+        "ReconcileNS": 1156583,
+        "LayoutPaintNS": 1377042,
+        "GatherNS": 6750,
+        "RasterUploadNS": 5778583,
+        "EncodeSubmitNS": 209459
+      },
+      "heap_after_data": 21342264,
+      "heap_after_warmup": 52141824,
+      "heap_after_measurement": 52208792
+    },
+    {
+      "name": "baseline-10000-deep-r1",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8758809.195833333,
+        "p50": 8750835,
+        "p95": 9475414,
+        "p99": 9769624,
+        "max": 10184710
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3626216.1,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7595081,
+      "stage_p95_ns": {
+        "InputNS": 6875,
+        "OwnerNS": 2250,
+        "ReconcileNS": 2587500,
+        "LayoutPaintNS": 1442417,
+        "GatherNS": 17042,
+        "RasterUploadNS": 5496917,
+        "EncodeSubmitNS": 226375
+      },
+      "heap_after_data": 3778048,
+      "heap_after_warmup": 34577152,
+      "heap_after_measurement": 34763376
+    },
+    {
+      "name": "candidate-10000-deep-r1",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7967868.204166667,
+        "p50": 7934959,
+        "p95": 8595998,
+        "p99": 8908124,
+        "max": 9080292
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2796683.6,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6976128,
+      "stage_p95_ns": {
+        "InputNS": 6792,
+        "OwnerNS": 1958,
+        "ReconcileNS": 1362542,
+        "LayoutPaintNS": 1475041,
+        "GatherNS": 6500,
+        "RasterUploadNS": 5529375,
+        "EncodeSubmitNS": 205918
+      },
+      "heap_after_data": 3778432,
+      "heap_after_warmup": 34464336,
+      "heap_after_measurement": 34631920
+    },
+    {
+      "name": "baseline-100000-deep-r1",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8663842.720833333,
+        "p50": 8681999,
+        "p95": 9469334,
+        "p99": 10113501,
+        "max": 10460627
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3626109.566666667,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8112624,
+      "stage_p95_ns": {
+        "InputNS": 6666,
+        "OwnerNS": 2041,
+        "ReconcileNS": 2573250,
+        "LayoutPaintNS": 1350041,
+        "GatherNS": 5917,
+        "RasterUploadNS": 5579959,
+        "EncodeSubmitNS": 224124
+      },
+      "heap_after_data": 21341928,
+      "heap_after_warmup": 52102248,
+      "heap_after_measurement": 52289200
+    },
+    {
+      "name": "candidate-100000-deep-r1",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 1,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7733047.35,
+        "p50": 7773794,
+        "p95": 8372626,
+        "p99": 8813833,
+        "max": 9224167
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2797995.3,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7286500,
+      "stage_p95_ns": {
+        "InputNS": 7125,
+        "OwnerNS": 2208,
+        "ReconcileNS": 1287417,
+        "LayoutPaintNS": 1321083,
+        "GatherNS": 5376,
+        "RasterUploadNS": 5685625,
+        "EncodeSubmitNS": 221834
+      },
+      "heap_after_data": 21347184,
+      "heap_after_warmup": 52146960,
+      "heap_after_measurement": 52156904
+    },
+    {
+      "name": "candidate-10000-wide-r2",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7755341.083333333,
+        "p50": 7699625,
+        "p95": 8500625,
+        "p99": 8900873,
+        "max": 9280915
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2583258.3333333335,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6939874,
+      "stage_p95_ns": {
+        "InputNS": 7917,
+        "OwnerNS": 2125,
+        "ReconcileNS": 1202875,
+        "LayoutPaintNS": 1469833,
+        "GatherNS": 7833,
+        "RasterUploadNS": 5913500,
+        "EncodeSubmitNS": 213416
+      },
+      "heap_after_data": 3775536,
+      "heap_after_warmup": 34441688,
+      "heap_after_measurement": 34613384
+    },
+    {
+      "name": "baseline-10000-wide-r2",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8600567.525,
+        "p50": 8634500,
+        "p95": 9355626,
+        "p99": 9858293,
+        "max": 10004583
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3286513.2,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8247166,
+      "stage_p95_ns": {
+        "InputNS": 7125,
+        "OwnerNS": 2083,
+        "ReconcileNS": 2282417,
+        "LayoutPaintNS": 1501583,
+        "GatherNS": 12625,
+        "RasterUploadNS": 5714125,
+        "EncodeSubmitNS": 205126
+      },
+      "heap_after_data": 3772264,
+      "heap_after_warmup": 34549656,
+      "heap_after_measurement": 34594992
+    },
+    {
+      "name": "candidate-100000-wide-r2",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7735874.033333333,
+        "p50": 7654001,
+        "p95": 8431627,
+        "p99": 8912041,
+        "max": 9131333
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2584120,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6945961,
+      "stage_p95_ns": {
+        "InputNS": 7208,
+        "OwnerNS": 2042,
+        "ReconcileNS": 1178584,
+        "LayoutPaintNS": 1281083,
+        "GatherNS": 4625,
+        "RasterUploadNS": 5870208,
+        "EncodeSubmitNS": 209000
+      },
+      "heap_after_data": 21352872,
+      "heap_after_warmup": 52143232,
+      "heap_after_measurement": 52235904
+    },
+    {
+      "name": "baseline-100000-wide-r2",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8639264.425,
+        "p50": 8564916,
+        "p95": 9499666,
+        "p99": 9776626,
+        "max": 10175587
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3285176.3666666667,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7846042,
+      "stage_p95_ns": {
+        "InputNS": 7375,
+        "OwnerNS": 2209,
+        "ReconcileNS": 2240041,
+        "LayoutPaintNS": 1440500,
+        "GatherNS": 5667,
+        "RasterUploadNS": 5812958,
+        "EncodeSubmitNS": 229667
+      },
+      "heap_after_data": 21341368,
+      "heap_after_warmup": 52082576,
+      "heap_after_measurement": 52132848
+    },
+    {
+      "name": "candidate-10000-deep-r2",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7782387.75,
+        "p50": 7765085,
+        "p95": 8481293,
+        "p99": 9040166,
+        "max": 9218666
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2797517.6666666665,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8143832,
+      "stage_p95_ns": {
+        "InputNS": 7833,
+        "OwnerNS": 2042,
+        "ReconcileNS": 1309292,
+        "LayoutPaintNS": 1399042,
+        "GatherNS": 5958,
+        "RasterUploadNS": 5667167,
+        "EncodeSubmitNS": 218167
+      },
+      "heap_after_data": 3771960,
+      "heap_after_warmup": 34585056,
+      "heap_after_measurement": 34593832
+    },
+    {
+      "name": "baseline-10000-deep-r2",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8672752.229166666,
+        "p50": 8747750,
+        "p95": 9421709,
+        "p99": 9717500,
+        "max": 10188665
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3625905.8,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7707165,
+      "stage_p95_ns": {
+        "InputNS": 6792,
+        "OwnerNS": 2125,
+        "ReconcileNS": 2459833,
+        "LayoutPaintNS": 1496958,
+        "GatherNS": 15750,
+        "RasterUploadNS": 5600625,
+        "EncodeSubmitNS": 208166
+      },
+      "heap_after_data": 3778272,
+      "heap_after_warmup": 34541552,
+      "heap_after_measurement": 34677696
+    },
+    {
+      "name": "candidate-100000-deep-r2",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7891642.804166666,
+        "p50": 7882084,
+        "p95": 8498583,
+        "p99": 9090668,
+        "max": 9382293
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2798542.033333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7003917,
+      "stage_p95_ns": {
+        "InputNS": 6916,
+        "OwnerNS": 2083,
+        "ReconcileNS": 1327542,
+        "LayoutPaintNS": 1371041,
+        "GatherNS": 6125,
+        "RasterUploadNS": 5556416,
+        "EncodeSubmitNS": 213293
+      },
+      "heap_after_data": 21329192,
+      "heap_after_warmup": 52128208,
+      "heap_after_measurement": 52218120
+    },
+    {
+      "name": "baseline-100000-deep-r2",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 2,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8759912.070833333,
+        "p50": 8749291,
+        "p95": 9427457,
+        "p99": 10027249,
+        "max": 10265791
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3623848.2666666666,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8478086,
+      "stage_p95_ns": {
+        "InputNS": 7209,
+        "OwnerNS": 2125,
+        "ReconcileNS": 2442375,
+        "LayoutPaintNS": 1359834,
+        "GatherNS": 6333,
+        "RasterUploadNS": 5526875,
+        "EncodeSubmitNS": 207999
+      },
+      "heap_after_data": 21347328,
+      "heap_after_warmup": 52137024,
+      "heap_after_measurement": 52227408
+    },
+    {
+      "name": "baseline-10000-wide-r3",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8720905.441666666,
+        "p50": 8707627,
+        "p95": 9322042,
+        "p99": 9715081,
+        "max": 9941959
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3286953.033333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7422791,
+      "stage_p95_ns": {
+        "InputNS": 6834,
+        "OwnerNS": 2250,
+        "ReconcileNS": 2232833,
+        "LayoutPaintNS": 1498708,
+        "GatherNS": 13666,
+        "RasterUploadNS": 5734500,
+        "EncodeSubmitNS": 217375
+      },
+      "heap_after_data": 3775184,
+      "heap_after_warmup": 34558608,
+      "heap_after_measurement": 34647584
+    },
+    {
+      "name": "candidate-10000-wide-r3",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7745840.383333334,
+        "p50": 7795875,
+        "p95": 8459833,
+        "p99": 8759542,
+        "max": 9118540
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2584740.7,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7005125,
+      "stage_p95_ns": {
+        "InputNS": 7917,
+        "OwnerNS": 2167,
+        "ReconcileNS": 1181584,
+        "LayoutPaintNS": 1456833,
+        "GatherNS": 7750,
+        "RasterUploadNS": 5877208,
+        "EncodeSubmitNS": 226584
+      },
+      "heap_after_data": 3790288,
+      "heap_after_warmup": 34511632,
+      "heap_after_measurement": 34575416
+    },
+    {
+      "name": "baseline-100000-wide-r3",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8628317.495833334,
+        "p50": 8614332,
+        "p95": 9382998,
+        "p99": 9670957,
+        "max": 10002667
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3285079.2333333334,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8037500,
+      "stage_p95_ns": {
+        "InputNS": 6917,
+        "OwnerNS": 2125,
+        "ReconcileNS": 2185041,
+        "LayoutPaintNS": 1510625,
+        "GatherNS": 10875,
+        "RasterUploadNS": 5832291,
+        "EncodeSubmitNS": 226375
+      },
+      "heap_after_data": 21351800,
+      "heap_after_warmup": 52136512,
+      "heap_after_measurement": 52150176
+    },
+    {
+      "name": "candidate-100000-wide-r3",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7705347.575,
+        "p50": 7685584,
+        "p95": 8461042,
+        "p99": 8972837,
+        "max": 9249414
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2582807.4,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7092875,
+      "stage_p95_ns": {
+        "InputNS": 7625,
+        "OwnerNS": 2167,
+        "ReconcileNS": 1191209,
+        "LayoutPaintNS": 1351208,
+        "GatherNS": 6917,
+        "RasterUploadNS": 5776750,
+        "EncodeSubmitNS": 213625
+      },
+      "heap_after_data": 21341592,
+      "heap_after_warmup": 52113680,
+      "heap_after_measurement": 52197040
+    },
+    {
+      "name": "baseline-10000-deep-r3",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8917727.208333334,
+        "p50": 8895793,
+        "p95": 9567125,
+        "p99": 9806164,
+        "max": 9975459
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3624357.933333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7282457,
+      "stage_p95_ns": {
+        "InputNS": 7167,
+        "OwnerNS": 2250,
+        "ReconcileNS": 2470167,
+        "LayoutPaintNS": 1495667,
+        "GatherNS": 18834,
+        "RasterUploadNS": 5623417,
+        "EncodeSubmitNS": 212833
+      },
+      "heap_after_data": 3766656,
+      "heap_after_warmup": 34515640,
+      "heap_after_measurement": 34624896
+    },
+    {
+      "name": "candidate-10000-deep-r3",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7726290.129166666,
+        "p50": 7729541,
+        "p95": 8572875,
+        "p99": 8874625,
+        "max": 8982002
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2796100.033333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6591335,
+      "stage_p95_ns": {
+        "InputNS": 7416,
+        "OwnerNS": 2000,
+        "ReconcileNS": 1295834,
+        "LayoutPaintNS": 1488084,
+        "GatherNS": 4250,
+        "RasterUploadNS": 5758875,
+        "EncodeSubmitNS": 217667
+      },
+      "heap_after_data": 3778592,
+      "heap_after_warmup": 34618760,
+      "heap_after_measurement": 34679352
+    },
+    {
+      "name": "baseline-100000-deep-r3",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8960281.645833334,
+        "p50": 8902544,
+        "p95": 9623498,
+        "p99": 10325041,
+        "max": 10596708
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3626152.033333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7699208,
+      "stage_p95_ns": {
+        "InputNS": 6875,
+        "OwnerNS": 2250,
+        "ReconcileNS": 2700417,
+        "LayoutPaintNS": 1468333,
+        "GatherNS": 6750,
+        "RasterUploadNS": 5662125,
+        "EncodeSubmitNS": 217291
+      },
+      "heap_after_data": 21339928,
+      "heap_after_warmup": 52029280,
+      "heap_after_measurement": 52257608
+    },
+    {
+      "name": "candidate-100000-deep-r3",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 3,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7852704.145833333,
+        "p50": 7827083,
+        "p95": 8466956,
+        "p99": 9015791,
+        "max": 9347376
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2797690.3,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7022165,
+      "stage_p95_ns": {
+        "InputNS": 6833,
+        "OwnerNS": 2042,
+        "ReconcileNS": 1318375,
+        "LayoutPaintNS": 1386750,
+        "GatherNS": 6916,
+        "RasterUploadNS": 5590375,
+        "EncodeSubmitNS": 208041
+      },
+      "heap_after_data": 21346848,
+      "heap_after_warmup": 52136072,
+      "heap_after_measurement": 52274920
+    },
+    {
+      "name": "candidate-10000-wide-r4",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7552435.920833333,
+        "p50": 7573874,
+        "p95": 8339123,
+        "p99": 8919166,
+        "max": 9196624
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2584136.8333333335,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6788584,
+      "stage_p95_ns": {
+        "InputNS": 7084,
+        "OwnerNS": 2041,
+        "ReconcileNS": 1137375,
+        "LayoutPaintNS": 1452500,
+        "GatherNS": 6458,
+        "RasterUploadNS": 5741167,
+        "EncodeSubmitNS": 214249
+      },
+      "heap_after_data": 3773240,
+      "heap_after_warmup": 34569256,
+      "heap_after_measurement": 34581208
+    },
+    {
+      "name": "baseline-10000-wide-r4",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8659268.3125,
+        "p50": 8617085,
+        "p95": 9351459,
+        "p99": 9799540,
+        "max": 11366543
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3285343.566666667,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7428626,
+      "stage_p95_ns": {
+        "InputNS": 7250,
+        "OwnerNS": 2167,
+        "ReconcileNS": 2243458,
+        "LayoutPaintNS": 1536417,
+        "GatherNS": 13084,
+        "RasterUploadNS": 5670333,
+        "EncodeSubmitNS": 207959
+      },
+      "heap_after_data": 3773288,
+      "heap_after_warmup": 34440432,
+      "heap_after_measurement": 34641496
+    },
+    {
+      "name": "candidate-100000-wide-r4",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7787865.783333333,
+        "p50": 7760456,
+        "p95": 8516167,
+        "p99": 8791625,
+        "max": 9733373
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2583420.533333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6865085,
+      "stage_p95_ns": {
+        "InputNS": 7250,
+        "OwnerNS": 2083,
+        "ReconcileNS": 1176375,
+        "LayoutPaintNS": 1362250,
+        "GatherNS": 5291,
+        "RasterUploadNS": 5844125,
+        "EncodeSubmitNS": 227791
+      },
+      "heap_after_data": 21347040,
+      "heap_after_warmup": 52108136,
+      "heap_after_measurement": 52202752
+    },
+    {
+      "name": "baseline-100000-wide-r4",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8645455.716666667,
+        "p50": 8622790,
+        "p95": 9408500,
+        "p99": 9711499,
+        "max": 10416206
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3285307.933333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8506210,
+      "stage_p95_ns": {
+        "InputNS": 7375,
+        "OwnerNS": 2000,
+        "ReconcileNS": 2236500,
+        "LayoutPaintNS": 1439458,
+        "GatherNS": 6999,
+        "RasterUploadNS": 5806375,
+        "EncodeSubmitNS": 237541
+      },
+      "heap_after_data": 21340936,
+      "heap_after_warmup": 52142536,
+      "heap_after_measurement": 52197216
+    },
+    {
+      "name": "candidate-10000-deep-r4",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7922321.6625,
+        "p50": 7918874,
+        "p95": 8511375,
+        "p99": 9026084,
+        "max": 9209041
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2797762.533333333,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6637167,
+      "stage_p95_ns": {
+        "InputNS": 6875,
+        "OwnerNS": 2166,
+        "ReconcileNS": 1339250,
+        "LayoutPaintNS": 1363459,
+        "GatherNS": 5666,
+        "RasterUploadNS": 5570541,
+        "EncodeSubmitNS": 216418
+      },
+      "heap_after_data": 3779936,
+      "heap_after_warmup": 34611408,
+      "heap_after_measurement": 34662432
+    },
+    {
+      "name": "baseline-10000-deep-r4",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8791405.333333334,
+        "p50": 8773541,
+        "p95": 9466585,
+        "p99": 9889169,
+        "max": 10061833
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3625305.466666667,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7341540,
+      "stage_p95_ns": {
+        "InputNS": 7083,
+        "OwnerNS": 2083,
+        "ReconcileNS": 2566083,
+        "LayoutPaintNS": 1501708,
+        "GatherNS": 13209,
+        "RasterUploadNS": 5589333,
+        "EncodeSubmitNS": 210209
+      },
+      "heap_after_data": 3784184,
+      "heap_after_warmup": 34472544,
+      "heap_after_measurement": 34627800
+    },
+    {
+      "name": "candidate-100000-deep-r4",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7881603.479166667,
+        "p50": 7850706,
+        "p95": 8554916,
+        "p99": 9005834,
+        "max": 9235624
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2797733.7666666666,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6623462,
+      "stage_p95_ns": {
+        "InputNS": 7625,
+        "OwnerNS": 2125,
+        "ReconcileNS": 1314458,
+        "LayoutPaintNS": 1568250,
+        "GatherNS": 6791,
+        "RasterUploadNS": 5711250,
+        "EncodeSubmitNS": 209043
+      },
+      "heap_after_data": 21352328,
+      "heap_after_warmup": 52163368,
+      "heap_after_measurement": 52226088
+    },
+    {
+      "name": "baseline-100000-deep-r4",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 4,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8795413.141666668,
+        "p50": 8790001,
+        "p95": 9589085,
+        "p99": 10133207,
+        "max": 10607125
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3625906.3333333335,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8712956,
+      "stage_p95_ns": {
+        "InputNS": 7125,
+        "OwnerNS": 2209,
+        "ReconcileNS": 2496625,
+        "LayoutPaintNS": 1406000,
+        "GatherNS": 6458,
+        "RasterUploadNS": 5627750,
+        "EncodeSubmitNS": 216458
+      },
+      "heap_after_data": 21346896,
+      "heap_after_warmup": 52167016,
+      "heap_after_measurement": 52256352
+    },
+    {
+      "name": "baseline-10000-wide-r5",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8697460.454166668,
+        "p50": 8671500,
+        "p95": 9254167,
+        "p99": 9463500,
+        "max": 9649124
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3284165.7333333334,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7930917,
+      "stage_p95_ns": {
+        "InputNS": 7167,
+        "OwnerNS": 2291,
+        "ReconcileNS": 2242375,
+        "LayoutPaintNS": 1523375,
+        "GatherNS": 15000,
+        "RasterUploadNS": 5711125,
+        "EncodeSubmitNS": 225499
+      },
+      "heap_after_data": 3774608,
+      "heap_after_warmup": 34514704,
+      "heap_after_measurement": 34536144
+    },
+    {
+      "name": "candidate-10000-wide-r5",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": false,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7692738.925,
+        "p50": 7744374,
+        "p95": 8581207,
+        "p99": 9135497,
+        "max": 13099334
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2583352.3,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7856167,
+      "stage_p95_ns": {
+        "InputNS": 7375,
+        "OwnerNS": 2084,
+        "ReconcileNS": 1201666,
+        "LayoutPaintNS": 1480875,
+        "GatherNS": 6416,
+        "RasterUploadNS": 5910542,
+        "EncodeSubmitNS": 227416
+      },
+      "heap_after_data": 3780536,
+      "heap_after_warmup": 34578216,
+      "heap_after_measurement": 34565392
+    },
+    {
+      "name": "baseline-100000-wide-r5",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8532260.879166666,
+        "p50": 8561083,
+        "p95": 9287375,
+        "p99": 9778374,
+        "max": 10219332
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3286332.6,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7707333,
+      "stage_p95_ns": {
+        "InputNS": 6958,
+        "OwnerNS": 2292,
+        "ReconcileNS": 2212666,
+        "LayoutPaintNS": 1352750,
+        "GatherNS": 6375,
+        "RasterUploadNS": 5745833,
+        "EncodeSubmitNS": 215208
+      },
+      "heap_after_data": 21348112,
+      "heap_after_warmup": 52114320,
+      "heap_after_measurement": 52160416
+    },
+    {
+      "name": "candidate-100000-wide-r5",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": false,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7827601.491666666,
+        "p50": 7773457,
+        "p95": 8487874,
+        "p99": 8941831,
+        "max": 9025335
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2584884.2,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 6759876,
+      "stage_p95_ns": {
+        "InputNS": 7292,
+        "OwnerNS": 2084,
+        "ReconcileNS": 1179125,
+        "LayoutPaintNS": 1414000,
+        "GatherNS": 6959,
+        "RasterUploadNS": 5976583,
+        "EncodeSubmitNS": 215333
+      },
+      "heap_after_data": 21347456,
+      "heap_after_warmup": 52145752,
+      "heap_after_measurement": 52175512
+    },
+    {
+      "name": "baseline-10000-deep-r5",
+      "build": "baseline",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8700641.916666666,
+        "p50": 8729750,
+        "p95": 9625334,
+        "p99": 9929918,
+        "max": 14810333
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3627293.1,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7491207,
+      "stage_p95_ns": {
+        "InputNS": 7292,
+        "OwnerNS": 2334,
+        "ReconcileNS": 2727667,
+        "LayoutPaintNS": 1636875,
+        "GatherNS": 6958,
+        "RasterUploadNS": 5598750,
+        "EncodeSubmitNS": 220835
+      },
+      "heap_after_data": 3771240,
+      "heap_after_warmup": 34499904,
+      "heap_after_measurement": 34703640
+    },
+    {
+      "name": "candidate-10000-deep-r5",
+      "build": "candidate",
+      "nodes": 10000,
+      "deep": true,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7874494.270833333,
+        "p50": 7867501,
+        "p95": 8650044,
+        "p99": 9157581,
+        "max": 9383793
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2796570.7666666666,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7082834,
+      "stage_p95_ns": {
+        "InputNS": 6625,
+        "OwnerNS": 2000,
+        "ReconcileNS": 1334958,
+        "LayoutPaintNS": 1495209,
+        "GatherNS": 3416,
+        "RasterUploadNS": 5568375,
+        "EncodeSubmitNS": 208292
+      },
+      "heap_after_data": 3778664,
+      "heap_after_warmup": 34572432,
+      "heap_after_measurement": 34632328
+    },
+    {
+      "name": "baseline-100000-deep-r5",
+      "build": "baseline",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 8847119.270833334,
+        "p50": 8796334,
+        "p95": 9482500,
+        "p99": 10197292,
+        "max": 10620583
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 3626126.2,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 8617378,
+      "stage_p95_ns": {
+        "InputNS": 7125,
+        "OwnerNS": 2250,
+        "ReconcileNS": 2678125,
+        "LayoutPaintNS": 1453958,
+        "GatherNS": 6376,
+        "RasterUploadNS": 5577167,
+        "EncodeSubmitNS": 216916
+      },
+      "heap_after_data": 21340968,
+      "heap_after_warmup": 52136712,
+      "heap_after_measurement": 52191704
+    },
+    {
+      "name": "candidate-100000-deep-r5",
+      "build": "candidate",
+      "nodes": 100000,
+      "deep": true,
+      "repeat": 5,
+      "samples": 240,
+      "ui_work_ns": {
+        "mean": 7575876.304166666,
+        "p50": 7530376,
+        "p95": 8501127,
+        "p99": 11620500,
+        "max": 15008249
+      },
+      "target_p95_pass": false,
+      "allocation_bytes_mean": 2798948.7333333334,
+      "clipped_rows_range": [
+        71,
+        71
+      ],
+      "first_scroll_ui_work_ns": 7512997,
+      "stage_p95_ns": {
+        "InputNS": 7208,
+        "OwnerNS": 2208,
+        "ReconcileNS": 1279708,
+        "LayoutPaintNS": 1342625,
+        "GatherNS": 6417,
+        "RasterUploadNS": 5683958,
+        "EncodeSubmitNS": 222459
+      },
+      "heap_after_data": 21346720,
+      "heap_after_warmup": 52170816,
+      "heap_after_measurement": 52197464
+    }
+  ],
+  "cases": [
+    {
+      "nodes": 10000,
+      "deep": false,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.304217,
+          "mean_ms_mean_of_runs": 8.595472311666667,
+          "allocation_bytes_mean": 3286058.72,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.4859996,
+          "mean_ms_mean_of_runs": 7.6936311925,
+          "allocation_bytes_mean": 2583996.2733333334,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -8.79404897800643
+    },
+    {
+      "nodes": 10000,
+      "deep": true,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.5112334,
+          "mean_ms_mean_of_runs": 8.768267176666665,
+          "allocation_bytes_mean": 3625815.68,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.562317,
+          "mean_ms_mean_of_runs": 7.854672403333334,
+          "allocation_bytes_mean": 2796926.92,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -9.976796489927375
+    },
+    {
+      "nodes": 100000,
+      "deep": false,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.377091,
+          "mean_ms_mean_of_runs": 8.625402631666669,
+          "allocation_bytes_mean": 3285620.2666666666,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.454808400000001,
+          "mean_ms_mean_of_runs": 7.757231733333334,
+          "allocation_bytes_mean": 2583782.98,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -9.835487359565976
+    },
+    {
+      "nodes": 100000,
+      "deep": true,
+      "builds": {
+        "baseline": {
+          "p95_ms_mean_of_runs": 9.5183748,
+          "mean_ms_mean_of_runs": 8.80531377,
+          "allocation_bytes_mean": 3625628.48,
+          "target_passes": 0,
+          "samples": 1200
+        },
+        "candidate": {
+          "p95_ms_mean_of_runs": 8.478841599999999,
+          "mean_ms_mean_of_runs": 7.786974816666667,
+          "allocation_bytes_mean": 2798182.0266666664,
+          "target_passes": 0,
+          "samples": 1200
+        }
+      },
+      "p95_change_percent": -10.921330813743547
+    }
+  ],
+  "identical_phase_geometry": true,
+  "software_pixel_records": 12,
+  "software_pixels_exact": true,
+  "original_duplicate_pass_errors": 450,
+  "full_p6_qualified": false,
+  "native_gpu_memory_qualified": false,
+  "notes": "Elapsed recorded work regions, not thread CPU/GPU/presentation; ordinary first scroll is separate and is not cold-cache evidence. Allocation intervals include observers and other process goroutines. This is a64-minimum-row warm workload, not500visible-row or fulltreeinteraction/cold-cache qualification. Raw preflights that refused53rows remain historical diagnostics."
+}

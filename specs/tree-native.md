@@ -56,3 +56,12 @@ visible-index construction run on bounded workers. Actual routed CPU checks are
 separate from Cocoa owner-command/measurement smoke. No desktop physical-input,
 human IME/VoiceOver, full P6, native services/GPU, or frame-latency claim follows
 from these correctness checks.
+
+
+The opt-in [warm tree recorder](tree-performance.md) links reserved actual scroll
+input to the owner transition and matching completed native frame. Pending/stale
+layout and unchanged/refused delivery cannot qualify a successful timing sample.
+The native row sync installs all row/footer state before one host updater pass;
+separate per-row passes are redundant. Tests compare retained updater/style counts
+and final software pixels across four DPI settings. The ordinary input contract
+and existing ownership, scope, geometry and payload limits remain unchanged.

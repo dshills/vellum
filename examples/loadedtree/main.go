@@ -57,7 +57,23 @@ func run(nodes int, smoke bool) error {
 func main() {
 	nodes := flag.Int("nodes", maxNodes, "stored nodes (1..100000); first window at most10000")
 	smoke := flag.Bool("smoke", false, "bounded Cocoa owner-command geometry/settlement smoke")
+	perf := flag.Bool("perf", false, "routed completed-frame warm tree performance")
+	samples := flag.Int("perf-samples", 240, "measured native scroll samples")
+	warmup := flag.Int("perf-warmup", 128, "unmeasured complete warm trajectory events")
+	deep := flag.Bool("perf-deep", false, "warm deep-chain viewport instead of wide branch")
 	flag.Parse()
+	if *perf && *smoke || !*perf && (*deep || *samples != 240 || *warmup != 128) {
+		fmt.Fprintln(os.Stderr, "loadedtree: perf flags require -perf and exclude -smoke")
+		os.Exit(1)
+	}
+	if *perf {
+		if e := runTreePerf(treePerfConfig{Nodes: *nodes, Samples: *samples, Warmup: *warmup, Deep: *deep}); e != nil {
+			fmt.Fprintln(os.Stderr, e)
+			os.Exit(1)
+		}
+		return
+	}
+
 	if e := run(*nodes, *smoke); e != nil {
 		fmt.Fprintln(os.Stderr, e)
 		os.Exit(1)

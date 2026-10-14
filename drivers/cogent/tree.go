@@ -301,7 +301,12 @@ func (t *outlineBinding) apply(reason ui.TreeChangeReason, interactive bool, fn 
 }
 func (t *outlineBinding) post(reason ui.TreeChangeReason, fn func() error) {
 	if t.live() {
-		postControl(t.r, func() { t.apply(reason, true, fn) })
+		trace, tag := tracedTreeIntent(t)
+		if tag == 0 {
+			postControl(t.r, func() { t.apply(reason, true, fn) })
+			return
+		}
+		t.postTraced(trace, tag, reason, fn)
 	}
 }
 func (t *outlineBinding) disclose(row virtual.OutlineRow, expanded bool) {
@@ -498,7 +503,9 @@ func syncTree(r *record) (result error) {
 	}
 	for i, row := range snap.Rows {
 		native := t.rows[i]
-		rowDirty := dirty || native.row != row
+		if native.row != row {
+			dirty = true
+		}
 		native.row = row
 		value := ""
 		if row.HasChildren {
@@ -512,9 +519,7 @@ func syncTree(r *record) (result error) {
 		native.SetState((row.Clip.Width <= 0 || row.Clip.Height <= 0), states.Invisible)
 		native.SetState(row.Selected, states.Selected)
 		native.label.SetState(row.Selected, states.Selected)
-		if rowDirty {
-			native.Update()
-		}
+
 	}
 	value := float32(0)
 	if maximum := treeMaxY(snap.State); maximum > 0 {
@@ -541,6 +546,9 @@ func syncTree(r *record) (result error) {
 		suffix = " · building"
 	}
 	t.status.SetText(fmtTreeRange(first, last, snap.State.VisibleRows, suffix))
+	// One parent update traverses every retained row/text after all placements
+	// and states are installed. Updating each row first duplicates updater,
+	// style and shaping work and reads the previous parent style unnecessarily.
 	if dirty {
 		t.host.Update()
 	}

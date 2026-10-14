@@ -154,3 +154,10 @@ admission, hidden selection, data replacement, extreme navigation, stale refs,
 and atomic capacity/exhaustion refusal. Native rendering, accessibility,
 physical interaction, and performance qualification are separate checkpoints;
 these portable checks do not certify them or full P6 completion.
+
+
+[Stored-tree frame measurement](tree-performance.md) compares sealed 10k/100k
+wide/deep trees at identical measured native viewport/row cardinalities. Data and
+initial indexing precede native frame accounting. A guarded warm-scroll comparison
+remains separate from large-branch expansion/filter work, cold caches, native
+memory, maximum-visible rows and the full P6 gate.

@@ -46,7 +46,7 @@ type Driver struct {
 	// while representative native performance and lifecycle checks are ongoing.
 	GPUSceneRendering bool
 	// FrameMetrics opts into bounded diagnostic samples for explicitly tagged
-	// routed grid input; ordinary frames do not pay for timing calls.
+	// routed grid/tree input; ordinary frames do not pay for timing calls.
 	FrameMetrics *FrameMetrics
 }
 type record struct {
