@@ -1,0 +1,275 @@
+--- a/gpu/texture.go
++++ b/gpu/texture.go
+@@ -85,8 +85,14 @@
+ 	if !tx.device.Device.IsValid() || !tx.device.Queue.IsValid() {
+ 		return fmt.Errorf("gpu.Texture.SetFromGoImage: live device and queue required")
+ 	}
++	if img == nil {
++		return fmt.Errorf("gpu.Texture.SetFromGoImage: nil image")
++	}
+ 	rimg := imagex.AsRGBA(img)
+-	sz := rimg.Rect.Size()
++	sz, pixels, rowStride, err := rgbaTextureUpload(rimg)
++	if err != nil {
++		return err
++	}
+ 
+ 	nfmt := TextureFormat{Size: sz, Format: wgpu.TextureFormatRGBA8UnormSrgb, Layers: 1, Samples: 1}
+ 
+@@ -108,10 +114,10 @@
+ 			MipLevel: 0,
+ 			Origin:   wgpu.Origin3D{X: 0, Y: 0, Z: 0},
+ 		},
+-		rimg.Pix,
++		pixels,
+ 		&wgpu.TexelCopyBufferLayout{
+ 			Offset:       0,
+-			BytesPerRow:  4 * uint32(sz.X),
++			BytesPerRow:  rowStride,
+ 			RowsPerImage: uint32(sz.Y),
+ 		},
+ 		&size,
+--- /dev/null
++++ b/gpu/texture_rgba_upload.go
+@@ -0,0 +1,39 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpu
++
++import (
++	"fmt"
++	"image"
++	"math"
++)
++
++// rgbaTextureUpload describes borrowed pixels consumed by the immediate queue
++// write. RGBA subimages retain their parent's row stride; their Pix begins at
++// Rect.Min, and the final row need not include its trailing padding.
++func rgbaTextureUpload(img *image.RGBA) (image.Point, []byte, uint32, error) {
++	if img == nil {
++		return image.Point{}, nil, 0, fmt.Errorf("gpu.Texture.SetFromGoImage: nil RGBA image")
++	}
++	if img.Rect.Empty() {
++		return image.Point{}, nil, 0, fmt.Errorf("gpu.Texture.SetFromGoImage: empty or reversed RGBA bounds")
++	}
++	size := img.Rect.Size()
++	if size.X <= 0 || size.Y <= 0 || size.X > int(^uint(0)>>1)/4 || uint64(size.X) > math.MaxUint32/4 || uint64(size.Y) > math.MaxUint32 {
++		return image.Point{}, nil, 0, fmt.Errorf("gpu.Texture.SetFromGoImage: invalid RGBA dimensions")
++	}
++	rowBytes := size.X * 4
++	if img.Stride < rowBytes || len(img.Pix) < rowBytes {
++		return image.Point{}, nil, 0, fmt.Errorf("gpu.Texture.SetFromGoImage: invalid RGBA row storage")
++	}
++	stride := img.Stride
++	if size.Y == 1 {
++		// No inter-row offset is used; avoid narrowing an arbitrary unused stride.
++		stride = rowBytes
++	}
++	if uint64(stride) > math.MaxUint32 || size.Y > 1 && stride > (len(img.Pix)-rowBytes)/(size.Y-1) {
++		return image.Point{}, nil, 0, fmt.Errorf("gpu.Texture.SetFromGoImage: incomplete RGBA pixel storage")
++	}
++	end := rowBytes + (size.Y-1)*stride // Checked against len(Pix) before multiplication.
++	return size, img.Pix[:end], uint32(stride), nil
++}
+--- /dev/null
++++ b/gpu/texture_rgba_upload_test.go
+@@ -0,0 +1,94 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpu
++
++import (
++	"bytes"
++	"image"
++	"math/rand"
++	"testing"
++)
++
++func TestVellumRGBAUploadSubimageRows(t *testing.T) {
++	parent := image.NewRGBA(image.Rect(-5, -4, 2, 2))
++	for y := parent.Rect.Min.Y; y < parent.Rect.Max.Y; y++ {
++		for x := parent.Rect.Min.X; x < parent.Rect.Max.X; x++ {
++			i := parent.PixOffset(x, y)
++			copy(parent.Pix[i:i+4], []byte{byte(x + 10), byte(y + 10), byte(x + y + 20), 255})
++		}
++	}
++	sub := parent.SubImage(image.Rect(-3, -2, 0, 1)).(*image.RGBA)
++	size, data, stride, err := rgbaTextureUpload(sub)
++	if err != nil || size != image.Pt(3, 3) || stride != 28 || len(data) != 68 {
++		t.Fatalf("subimage layout: size=%v stride=%d bytes=%d error=%v", size, stride, len(data), err)
++	}
++	for y := range size.Y {
++		for x := range size.X {
++			c := sub.RGBAAt(sub.Rect.Min.X+x, sub.Rect.Min.Y+y)
++			got := data[y*int(stride)+x*4:][:4]
++			if !bytes.Equal(got, []byte{c.R, c.G, c.B, c.A}) {
++				t.Fatalf("row=%d col=%d: %v", y, x, got)
++			}
++		}
++	}
++	data[0] ^= 1
++	if data[0] != sub.Pix[0] {
++		t.Fatal("upload description unexpectedly copied borrowed input")
++	}
++}
++
++func TestVellumRGBAUploadSeededLayouts(t *testing.T) {
++	rng := rand.New(rand.NewSource(61))
++	for n := range 600 {
++		w, h := 1+rng.Intn(31), 1+rng.Intn(19)
++		stride := 4*w + rng.Intn(24)
++		need := (h-1)*stride + 4*w
++		pixels := make([]byte, need+rng.Intn(8))
++		_, _ = rng.Read(pixels)
++		x, y := rng.Intn(201)-100, rng.Intn(201)-100
++		img := &image.RGBA{Pix: pixels, Stride: stride, Rect: image.Rect(x, y, x+w, y+h)}
++		size, data, rowStride, err := rgbaTextureUpload(img)
++		wantStride := stride
++		if h == 1 {
++			wantStride = 4 * w
++		}
++		if err != nil || size != image.Pt(w, h) || int(rowStride) != wantStride || len(data) != need {
++			t.Fatalf("case=%d dimensions=%dx%d stride=%d: %v %d %d %v", n, w, h, stride, size, rowStride, len(data), err)
++		}
++		for row := range h {
++			for col := range w {
++				c := img.RGBAAt(x+col, y+row)
++				i := row*int(rowStride) + 4*col
++				if !bytes.Equal(data[i:i+4], []byte{c.R, c.G, c.B, c.A}) {
++					t.Fatalf("case=%d row=%d col=%d", n, row, col)
++				}
++			}
++		}
++	}
++}
++
++func TestVellumRGBAUploadRefusesMalformedStorage(t *testing.T) {
++	maxInt := int(^uint(0) >> 1)
++	minInt := -maxInt - 1
++	for name, img := range map[string]*image.RGBA{
++		"reversed-overflow": {Pix: make([]byte, 4), Stride: 4, Rect: image.Rectangle{Min: image.Pt(maxInt, 0), Max: image.Pt(minInt, 1)}},
++		"nil":               nil,
++		"empty":             {},
++		"negative-size":     {Pix: make([]byte, 4), Stride: 4, Rect: image.Rectangle{Max: image.Pt(-1, 1)}},
++		"row-overflow":      {Pix: make([]byte, 4), Stride: maxInt, Rect: image.Rect(0, 0, maxInt, 1)},
++		"short-stride":      {Pix: make([]byte, 8), Stride: 3, Rect: image.Rect(0, 0, 1, 2)},
++		"short-first-row":   {Pix: make([]byte, 3), Stride: 4, Rect: image.Rect(0, 0, 1, 1)},
++		"short-final-row":   {Pix: make([]byte, 15), Stride: 8, Rect: image.Rect(0, 0, 2, 2)},
++		"span-overflow":     {Pix: make([]byte, 8), Stride: maxInt, Rect: image.Rect(0, 0, 1, maxInt)},
++	} {
++		t.Run(name, func(t *testing.T) {
++			if size, data, stride, err := rgbaTextureUpload(img); err == nil || size != (image.Point{}) || data != nil || stride != 0 {
++				t.Fatalf("malformed input accepted: %v %v %d %v", size, data, stride, err)
++			}
++		})
++	}
++	img := &image.RGBA{Pix: []byte{1, 2, 3, 255}, Stride: maxInt, Rect: image.Rect(0, 0, 1, 1)}
++	if _, data, stride, err := rgbaTextureUpload(img); err != nil || stride != 4 || len(data) != 4 {
++		t.Fatal("unused single-row stride was narrowed", stride, err)
++	}
++}
+--- /dev/null
++++ b/gpu/texture_rgba_upload_native_test.go
+@@ -0,0 +1,102 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++//go:build !js
++
++package gpu
++
++import (
++	"bytes"
++	"encoding/json"
++	"image"
++	"os"
++	"testing"
++
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// Tiny headless resources exercise the production upload followed by real
++// texture-to-buffer copy/map. No native windows, input or presentation are used.
++func TestVellumRGBAUploadNativeRows(t *testing.T) {
++	if os.Getenv("VELLUM_TEXTURE_GPU_TEST") != "1" {
++		t.Skip("explicit headless texture correctness fixture required")
++	}
++	var gp *GPU
++	var dev *Device
++	defer func() {
++		if dev != nil {
++			dev.Release()
++		}
++		if gp != nil {
++			gp.Release()
++		}
++		ReleaseInstance()
++	}()
++	var err error
++	gp, dev, err = NoDisplayGPU()
++	if err != nil || gp == nil || dev == nil {
++		t.Fatal("headless GPU unavailable", err)
++	}
++	parent := image.NewRGBA(image.Rect(-5, -4, 2, 2))
++	for y := parent.Rect.Min.Y; y < parent.Rect.Max.Y; y++ {
++		for x := parent.Rect.Min.X; x < parent.Rect.Max.X; x++ {
++			i := parent.PixOffset(x, y)
++			copy(parent.Pix[i:i+4], []byte{byte(x + 30), byte(y + 40), byte(x + y + 50), 255})
++		}
++	}
++	cases := map[string]*image.RGBA{
++		"parent-stride-subimage": parent.SubImage(image.Rect(-3, -2, 0, 1)).(*image.RGBA),
++		"odd-padded-stride":      {Pix: []byte{10, 20, 30, 255, 9, 9, 9, 40, 50, 60, 255}, Stride: 7, Rect: image.Rect(3, 5, 4, 7)},
++		"short-final-padding":    {Pix: []byte{70, 80, 90, 255, 9, 9, 9, 9, 100, 110, 120, 255}, Stride: 8, Rect: image.Rect(-2, -3, -1, -1)},
++		"single-row":             {Pix: []byte{130, 140, 150, 255}, Stride: int(^uint(0) >> 1), Rect: image.Rect(2, 3, 3, 4)},
++	}
++	for name, source := range cases {
++		t.Run(name, func(t *testing.T) {
++			size := source.Rect.Size()
++			want := make([]byte, size.X*size.Y*4)
++			for y := range size.Y {
++				for x := range size.X {
++					c := source.RGBAAt(source.Rect.Min.X+x, source.Rect.Min.Y+y)
++					copy(want[(y*size.X+x)*4:], []byte{c.R, c.G, c.B, c.A})
++				}
++			}
++			tx := NewTexture(dev)
++			defer tx.Release()
++			tx.Format = TextureFormat{Size: size, Layers: 1, Samples: 1, Format: wgpu.TextureFormatRGBA8UnormSrgb}
++			if err := tx.CreateTexture(wgpu.TextureUsageTextureBinding | wgpu.TextureUsageCopyDst | wgpu.TextureUsageCopySrc); err != nil {
++				t.Fatal(err)
++			}
++			if err := tx.SetFromGoImage(source, 0); err != nil {
++				t.Fatal("production upload refused valid RGBA rows", err)
++			}
++			// The immediate queue write consumes bytes; later caller mutation must
++			// not change the enqueued upload, even before the copy is submitted.
++			for i := range source.Pix {
++				source.Pix[i] = 0
++			}
++			if err := tx.ConfigReadBuffer(); err != nil {
++				t.Fatal(err)
++			}
++			cmd, err := dev.Device.TryCreateCommandEncoder(nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer cmd.Release()
++			if err := tx.CopyToReadBuffer(cmd); err != nil {
++				t.Fatal(err)
++			}
++			buffer, err := cmd.TryFinish(nil)
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer buffer.Release()
++			dev.Queue.Submit(buffer)
++			got, err := tx.ReadGoImage()
++			if err != nil || got == nil || got.Rect != image.Rect(0, 0, size.X, size.Y) || !bytes.Equal(got.Pix, want) {
++				t.Fatalf("RGBA upload row readback differs: error=%v got=%v want=%v", err, got, want)
++			}
++			if err := json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.rgba-upload.native", "case": name, "pixels": size.X * size.Y, "source_stride": source.Stride, "pixels_match": true, "post_upload_source_mutation_isolated": true, "windows_created": 0}); err != nil {
++				t.Fatal(err)
++			}
++		})
++	}
++}

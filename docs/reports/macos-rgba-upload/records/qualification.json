@@ -1,0 +1,134 @@
+{
+  "base_commit": "3a8bd26fd87f63cfe2c5a80f8624939ff48b46e2",
+  "sources": {
+    "docs/reports/macos-rgba-upload/README.md": "e2537e7ebe94abf450d89fcab8cf2c6ad594b5e8cbcee11363bb9d32aa0ee8cc",
+    "drivers/cogent/native/dependencies.json": "6bea72b8096bc7c0ff1cfffbfde830217f794877db7a303819cba84b1aea86f1",
+    "drivers/cogent/native/patches/rgbaupload/0061-checked-rgba-upload-rows.patch": "b55cc993c5e416acc6d78163ab908cfaffaec38c36098b0ea8761a77f32264cc",
+    "drivers/cogent/native/patches/rgbaupload/README.md": "468810d6942933e4ad803404bfa0cb1a63d6c3286b459601db8b421e30b87cba",
+    "drivers/cogent/native/patches/rgbaupload/original-hashes.json": "b1a8c104304b79aeb27c05fc395985ac852d33ca2244ce9a2f2181733a05bb98",
+    "drivers/cogent/native/patches/rgbaupload/output-hashes.json": "04af6c2c8aafed1cdf6a76f8682350f9f91cb599bb71d87003182cb0f2e958e6",
+    "drivers/cogent/prepare_test.py": "eb86576c1d2f726cc1f6d2405ad27f1d0672c5069a604bb4427efc57c2fc24be",
+    "specs/gpu-frame-lifecycle.md": "c338fc167d7359145fa051df38372a6691c9a2ae5a5102320d114fb46af703c3"
+  },
+  "result": "PASS_SCOPED_RGBA_UPLOAD_ROWS",
+  "checks": {
+    "final-preparation-tests": {
+      "receipt_sha256": "f7db5dbd37be68fc608b367fabe82cd8b3e2b12606f7bebae29d601370161b0d",
+      "argv": [
+        "python3",
+        "prepare_test.py"
+      ],
+      "elapsed_seconds": 0.14156274998094887,
+      "uses_real_prepared_dependencies": false
+    },
+    "final-prepare": {
+      "receipt_sha256": "6b166189a931c075ad1c9fe189fc1934c079a585816cdfb9b761a52eb4bf65cc",
+      "argv": [
+        "python3",
+        "prepare.py"
+      ],
+      "elapsed_seconds": 2.5285585839301348,
+      "uses_real_prepared_dependencies": true
+    },
+    "final-gpu-race": {
+      "receipt_sha256": "dd85c3647bfc781d09b1ac0adea38cbd3c1ae046ee222abd783d823c8127d58b",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "./gpu"
+      ],
+      "elapsed_seconds": 3.6971606250153854,
+      "uses_real_prepared_dependencies": true
+    },
+    "final-gpu-vet": {
+      "receipt_sha256": "deb46a34471587881347b960cca23a2ae4e06216ab70d84f3abe65720c21afc1",
+      "argv": [
+        "go",
+        "vet",
+        "./gpu"
+      ],
+      "elapsed_seconds": 0.967256624950096,
+      "uses_real_prepared_dependencies": true
+    },
+    "final-headless-texture": {
+      "receipt_sha256": "2f032a1e80629200589cc4d89d75b77df3ea33c1e1add241a09542d4e4f52c79",
+      "argv": [
+        "go",
+        "test",
+        "-json",
+        "-count=1",
+        "-run",
+        "^TestVellum(RGBAUploadNativeRows|TextureNativeOwnershipAndReadback)$",
+        "./gpu"
+      ],
+      "elapsed_seconds": 2.295005791937001,
+      "uses_real_prepared_dependencies": true
+    },
+    "final-adapter-race": {
+      "receipt_sha256": "4188edb6020c542bd26b679155b29676e8c0797830d0d03072791c84d2e2dad4",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./..."
+      ],
+      "elapsed_seconds": 167.9346827500267,
+      "uses_real_prepared_dependencies": true
+    },
+    "final-adapter-vet": {
+      "receipt_sha256": "f454be7174d2b7680a631476394b0661e94737e66ec2ea395bda15abafc300c6",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "elapsed_seconds": 17.357305792043917,
+      "uses_real_prepared_dependencies": true
+    },
+    "final-native-build": {
+      "receipt_sha256": "677b1df818104ff9c7d2e03c51757bbbeffc1bd54b9f9d8a8667505834c5b68e",
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-rgba-upload/gallery",
+        "./cmd/gallery"
+      ],
+      "elapsed_seconds": 19.235458999988623,
+      "uses_real_prepared_dependencies": true
+    }
+  },
+  "prepared_before_files": 6211,
+  "prepared_after_files": 6214,
+  "all_other_dependency_leaves_unchanged": true,
+  "seeded_layout_cases": 600,
+  "native_row_cases_passed": 4,
+  "native_texture_roots_passed": 2,
+  "native_fault_cases_failed": 3,
+  "windows_created": 0,
+  "native_binary_launched": false,
+  "native_build_sha256": "5f77a9438181ff3f2629dd168d050c9a8539867e5dd35736f4080f4ba801e8f5",
+  "frame_performance_gain_qualified": false,
+  "image_composition_geometry_qualified": false,
+  "physical_gpu_memory_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "mac_distribution_qualified": false,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 8,
+  "prism_findings": 0,
+  "prism_calls": 1,
+  "archive_sha256": "efc03c465bbf6feda694d27fa72f2a9240f8faa8ba0b5db1e90221b0e9c5ebc9",
+  "archive_members": 79,
+  "archive_bytes": 330556,
+  "canonical_promoted": false
+}

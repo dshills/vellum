@@ -148,3 +148,27 @@ Counted admission/refusal/retry fixtures and tiny headless duplicate-layout
 validation/shader-output checks qualify their observed reference scope. They do
 not establish GPU/native heap reclamation, physical faults, presentation,
 sustained performance or full Mac acceptance.
+
+
+## RGBA upload row layout
+
+Texture image upload must preserve each RGBA row's actual stride, including
+subimages whose parent is wider and nonzero/negative image origins. The GPU
+texture extent remains zero based. Validate ordered nonempty bounds before
+subtraction, checked dimensions and row bytes, stride, and complete final-row
+storage before native creation/write. No trailing final-row padding is required.
+A single-row image does not use its inter-row stride. Queue writes consume the
+borrowed pixels immediately; later caller mutation cannot alter that upload.
+
+This follows the [WebGPU texel-copy layout](https://www.w3.org/TR/webgpu/#dictdef-gputexelcopybufferlayout):
+bytesPerRow is the distance between row starts. Queue writes do not introduce
+the command-encoder buffer-copy alignment rule. No row packing, partial update,
+texture-content cache or performance gain is part of this correction. Existing
+ownership/device/usage checks remain in force.
+
+The 600-layout/reference test and four tiny headless native readbacks cover
+parent stride, odd padding, a short final row and an unused single-row stride.
+A production fault restoring tightly packed row metadata is detected in the
+three multirow native cases. These observations do not qualify image composition
+geometry, native surfaces, physical GPU memory, sustained frame performance or
+the full Mac milestone.

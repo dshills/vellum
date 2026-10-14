@@ -584,6 +584,17 @@
               "sha256": "5c8f950adec6e753adef7226ce5424703ea7c02f1555993c21dc9c661aac6d4c"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/rgbaupload",
+          "inputs": "native/patches/rgbaupload/original-hashes.json",
+          "outputs": "native/patches/rgbaupload/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/rgbaupload/0061-checked-rgba-upload-rows.patch",
+              "sha256": "b55cc993c5e416acc6d78163ab908cfaffaec38c36098b0ea8761a77f32264cc"
+            }
+          ]
         }
       ]
     },
