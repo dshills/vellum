@@ -694,3 +694,18 @@ lifetime capabilities prevent stale requests from reaching replacement content.
 The public contract is [tab closing](tab-close.md). Actual software input,
 serialized/native-object semantics and lifetime fixtures are distinct from live
 Mac attachment, physical input, human VoiceOver and full P6/P11/endurance targets.
+
+
+The [current native evidence checkpoint](../docs/reports/macos-native-current/README.md)
+records the completed `e7f8e30`/6,214 composed 1,000-window/24,000-step lifecycle
+and the separate `87e7de1`/6,216 and `8c1709e`/6,216 ordinary renderer comparisons.
+The 40-process span-buffer campaign and 80-process ordinary-geometry campaign
+retain all paired geometries, per-run/pooled variability and allocation observations.
+Timing changes are mixed; no run passes both unchanged 4/6 ms thresholds. Sampled
+retention guards and tracked main-thread native cleanup pass on `e7f8e30`.
+Comparison exits and launcher cleanup do not provide equivalent native-resource
+inventories. The
+survivor profile precedes global application closure, and the 60 retries have no
+observed cause. These scoped results do not qualify later-source lifecycle,
+professional/native/GPU memory budgets, complete P4/P6/P11, overnight soak,
+physical input/displays, human accessibility, interoperability or Mac distribution.

@@ -1,0 +1,2871 @@
+{
+  "archive_sha256": "30664fca431cd089a1f07c7543de7c3520b86a3bb0e46fffade03305dfa7e2c5",
+  "files": {
+    "current-endurance/baseline.json": {
+      "sha256": "ed86b42249b0a65d8220ea2e59fd41526ccdb74b2bba77ce1181da43f39ba3ed",
+      "bytes": 1280266
+    },
+    "current-endurance/build-cycles.json": {
+      "sha256": "b4dd0c39c340bdbe8c45ee7f0731fa8763fba1276398fc423b3ab60d6e5f031b",
+      "bytes": 1231
+    },
+    "current-endurance/build-cycles.stderr": {
+      "sha256": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776",
+      "bytes": 118
+    },
+    "current-endurance/build-cycles.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/build.controller-owned.json": {
+      "sha256": "e3075e173b1f45448ebacf74760ec823ac63c802d7bed24404bf1db447a5efd0",
+      "bytes": 315
+    },
+    "current-endurance/build.controller.json": {
+      "sha256": "2f8c2ffa5ff2ed17c57d08379bc88707985e90c57e9c7f53c8f96539db0d33d8",
+      "bytes": 684
+    },
+    "current-endurance/build.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/build.controller.stdout": {
+      "sha256": "37712b764f957bf81ff1853264f28d973331bad53607707a283106ae8bbdbccd",
+      "bytes": 1161
+    },
+    "current-endurance/campaign-cleanup-probe/failure/controller.json": {
+      "sha256": "6684fcdfb0dd6301868534f6a09dcce3fe9edf18f76039d1c580c70a1e0fb306",
+      "bytes": 74
+    },
+    "current-endurance/campaign-cleanup-probe/failure/failure.controller-owned.json": {
+      "sha256": "42bcc5f9ab6e06826665d8e2fd71e8b9768f181790197162a320156b6a4afb2c",
+      "bytes": 280
+    },
+    "current-endurance/campaign-cleanup-probe/failure/failure.controller.json": {
+      "sha256": "919dd73655124e51a8f8c1fc116941b3c2d23c3650d962753b4b40426463b521",
+      "bytes": 617
+    },
+    "current-endurance/campaign-cleanup-probe/failure/failure.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/campaign-cleanup-probe/failure/failure.controller.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/campaign-cleanup-probe/failure/native.json": {
+      "sha256": "9269fcc91aa680b2804303b38e8188a20072f3deacca63740f055e3af66fb9c0",
+      "bytes": 78
+    },
+    "current-endurance/campaign-cleanup-probe/normal/controller.json": {
+      "sha256": "01c5ba45a82db0e5cff250485e6d9da9827fae6663e70d4911b6deb9146b474c",
+      "bytes": 74
+    },
+    "current-endurance/campaign-cleanup-probe/normal/native.json": {
+      "sha256": "0ba23a83535537218e7e65f76f829d796f555aae8144d6ec745581ae0dbf7331",
+      "bytes": 78
+    },
+    "current-endurance/campaign-cleanup-probe/normal/normal.controller-owned.json": {
+      "sha256": "7a8b4d323aaaee54c92396f1e758df9c1c013624043a90231b4190a4ebc20c31",
+      "bytes": 278
+    },
+    "current-endurance/campaign-cleanup-probe/normal/normal.controller.json": {
+      "sha256": "3e0b57a12475aa324e6cca14f86f7084ec6cb992f32bbd39fbaf6e6999e771fd",
+      "bytes": 614
+    },
+    "current-endurance/campaign-cleanup-probe/normal/normal.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/campaign-cleanup-probe/normal/normal.controller.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/campaign-cleanup-probe/result.json": {
+      "sha256": "001d9284785386daeef23aabb551362eb84262fff24a6b09ab98fd5e208f906e",
+      "bytes": 3715
+    },
+    "current-endurance/campaign-cleanup-probe/timeout/controller.json": {
+      "sha256": "e7540bbe51e4d059c9071c1b0a83a493fbdebad3393ab7e33342ec0d2d13b646",
+      "bytes": 74
+    },
+    "current-endurance/campaign-cleanup-probe/timeout/native.json": {
+      "sha256": "6c7cbdb699327bc278ba277304770beb6054ba0ca87367f57881e4b478fc8fc7",
+      "bytes": 78
+    },
+    "current-endurance/campaign-cleanup-probe/timeout/timeout.controller-owned.json": {
+      "sha256": "a079c50b79108a1ea662c8bea11a0bed6b3d0ae607648f5ca6478e5b8548d5de",
+      "bytes": 280
+    },
+    "current-endurance/campaign-cleanup-probe/timeout/timeout.controller.json": {
+      "sha256": "077ced0d63252b4518ec3ffc106100319e54e33620713b193d22b855af66d811",
+      "bytes": 702
+    },
+    "current-endurance/campaign-cleanup-probe/timeout/timeout.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/campaign-cleanup-probe/timeout/timeout.controller.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/campaign.py": {
+      "sha256": "07a4c1f3e4c57e977f37f745f24dd759bebb817f48118cf11f476c983f678d96",
+      "bytes": 3741
+    },
+    "current-endurance/campaign_cleanup_probe.py": {
+      "sha256": "48536ba960b9baae52c3ceda1e96a06197bd6445b2283a77add857a3f58bd37b",
+      "bytes": 2886
+    },
+    "current-endurance/campaign_v1_unlaunched.py": {
+      "sha256": "0e361e854dfe765a6d915d871c2ec16e5387d5eb179e396d8cc8520373568183",
+      "bytes": 2490
+    },
+    "current-endurance/campaign_v2_unlaunched.py": {
+      "sha256": "b4d199c69dd857ebb6fbeaa44386e63498d854e78aa3d9e35c70f0a1e5a1a41e",
+      "bytes": 2552
+    },
+    "current-endurance/checkout.json": {
+      "sha256": "af148ada1dd632b9f38ebad6b327efc199f4adb065a7fee1ed2608dc277ff34f",
+      "bytes": 341
+    },
+    "current-endurance/evidence-review.json": {
+      "sha256": "c4b80bd5d395e9080351265c965d42ecbf96b2b2db98c1187f2fcc88e32ea8e4",
+      "bytes": 11159
+    },
+    "current-endurance/evidence-review.md": {
+      "sha256": "ea0eebad05bbdd24af8cdeebd4d2d85b05bab5719992d7052963b1f633c9f7d8",
+      "bytes": 1634
+    },
+    "current-endurance/final.heap": {
+      "sha256": "419805dbe0ceaf6bbce90d91a3a06d17412c31b4f4b154c09a0de8561c564da8",
+      "bytes": 450135
+    },
+    "current-endurance/group-cleanup-probe-v2/controller.json": {
+      "sha256": "f243d05bbc21678a27b03fae1bafe07faf769ce6a372ae9e0c75f62e82599f61",
+      "bytes": 74
+    },
+    "current-endurance/group-cleanup-probe-v2/native.json": {
+      "sha256": "6c62f389115e7f116e238ea678da700ba6bc38a9b9e2db472cc8d50fa11dce50",
+      "bytes": 78
+    },
+    "current-endurance/group-cleanup-probe-v2/result.json": {
+      "sha256": "53ac156f4c3ee35049cc43593b3d7ca4a8e779a8b5aff6f1fd118cdc2005ff87",
+      "bytes": 639
+    },
+    "current-endurance/group-cleanup-probe-v2/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/group-cleanup-probe-v2/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/group-cleanup-probe/controller.json": {
+      "sha256": "e644894114204302f534f490517835f446e879e56af1acc1d6133ab5963a3773",
+      "bytes": 74
+    },
+    "current-endurance/group-cleanup-probe/native.json": {
+      "sha256": "bdac934fc9cf7000ccad358b48dede08b01969922eb6df7424b6ef81f3cb8c8f",
+      "bytes": 78
+    },
+    "current-endurance/group-cleanup-probe/result.json": {
+      "sha256": "4de8890249ab808d9d503aab6cbc7042a34cf7d0d702964188648320c86f4ecb",
+      "bytes": 187
+    },
+    "current-endurance/group-cleanup-probe/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/group-cleanup-probe/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/group_cleanup_probe.py": {
+      "sha256": "7efdb2bbd17fb9b1be8490696158d37040394b023dcb77c84715fabd5ad4052e",
+      "bytes": 1740
+    },
+    "current-endurance/group_cleanup_probe_v1.py": {
+      "sha256": "3dd160a58b936d2f799137633b7aa3f69bf3eb9c3308aeffad06c133e7b2d1f6",
+      "bytes": 1737
+    },
+    "current-endurance/harness-review.json": {
+      "sha256": "1b9f3851586e8c010c558498986776759ffc0b6a493131410cea5e5af05008f4",
+      "bytes": 10262
+    },
+    "current-endurance/harness-review.md": {
+      "sha256": "19e833dc2aa5bba8e088521273f9f93cba4f6fcbb801018d2aa99d70a9aa5f85",
+      "bytes": 1001
+    },
+    "current-endurance/interacting-1000.controller-owned.json": {
+      "sha256": "dc0e90fdcfa5135518cc2d8c6ed8d2e229c3981be0f1c292cd4d3bbbbf2f94c2",
+      "bytes": 374
+    },
+    "current-endurance/interacting-1000.controller.json": {
+      "sha256": "1280538fb002c5153fa190d92f3dca00779fab3f532f464eeec13cbca8aa8dd2",
+      "bytes": 738
+    },
+    "current-endurance/interacting-1000.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/interacting-1000.controller.stdout": {
+      "sha256": "cfa713632bb8934112c80d0bd764d91165d7c0d56adb65218c1d6854ea2e8156",
+      "bytes": 1144
+    },
+    "current-endurance/interacting-1000.json": {
+      "sha256": "c6380c30d4c97bfc5391defd838b72148c408704318e1a674e53986c8c4603a4",
+      "bytes": 1208
+    },
+    "current-endurance/interacting-1000.owned-process.json": {
+      "sha256": "c7361a0600c00bc1d98a4ca077ef72ccdf369857f7514963830cbc7668fe0772",
+      "bytes": 447
+    },
+    "current-endurance/interacting-1000.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/interacting-1000.stdout": {
+      "sha256": "45c93b052c6e566150f46ba00b3fe819944b702e6296cd216548fa61ff57a24b",
+      "bytes": 10218139
+    },
+    "current-endurance/interacting-preflight.json": {
+      "sha256": "5b491529af49717d0aa1fa64e5a065be65230d2596dbef6c818cd1b254da9da0",
+      "bytes": 1126
+    },
+    "current-endurance/interacting-preflight.owned-process.json": {
+      "sha256": "bd4b7ea2be0689e44c49fafde5d33f49c6f5a137a43a005b855e660c263a1c49",
+      "bytes": 367
+    },
+    "current-endurance/interacting-preflight.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/interacting-preflight.stdout": {
+      "sha256": "65f83353d7f34bbba54e3cfb3c1c3674b45cd14fe1a09dad62b1a487245d5613",
+      "bytes": 53154
+    },
+    "current-endurance/launch-binding.json": {
+      "sha256": "97faed49e75963583e86725b54fd85258eda0d36198147d778f11b642b8a84da",
+      "bytes": 783
+    },
+    "current-endurance/post-terminal-groups.json": {
+      "sha256": "c532c3edec02c4ee7690678d9ce0060376f3a519c448e32f89eda83799818163",
+      "bytes": 851
+    },
+    "current-endurance/preflight-summary.json": {
+      "sha256": "58c06b7731a32d8e6d71fd10c72003da8cf28c425788e8fa6a68b59f301908cb",
+      "bytes": 4682
+    },
+    "current-endurance/preflight-validation.controller-owned.json": {
+      "sha256": "c3b7b75bcec1df8bec3810d813c7f13747b8160270a9b4a157a3ab0326d23754",
+      "bytes": 154
+    },
+    "current-endurance/preflight-validation.controller.json": {
+      "sha256": "e0bc9c7efb70622f38a8fca5603ad1b7ab8f2ea1f32f795a7f1251fc9afd8b55",
+      "bytes": 487
+    },
+    "current-endurance/preflight-validation.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/preflight-validation.controller.stdout": {
+      "sha256": "be9d458bd5833183d2f86137ee3dc81c1b1778a7a4c690646028f3c0cd90b545",
+      "bytes": 2537
+    },
+    "current-endurance/preflight.controller-owned.json": {
+      "sha256": "9c0336dc57c9a3b322e13bd3c81bfb79cdd3cdc2bf6671efdd17580049c2ea73",
+      "bytes": 301
+    },
+    "current-endurance/preflight.controller.json": {
+      "sha256": "81d42d644034b9759fbcb53f98d1b8f5bc77277a4b25e7562df890644d6a3365",
+      "bytes": 661
+    },
+    "current-endurance/preflight.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/preflight.controller.stdout": {
+      "sha256": "378dcf08c9208df2a14f0cd8a7c63f928ce8cfc5178ad69f88f563774f4ec885",
+      "bytes": 1066
+    },
+    "current-endurance/probe_controller.py": {
+      "sha256": "90d1b0fc399f2b30ed5d32052b8427a78d38d6f4b9860340885c6ce7f81307d5",
+      "bytes": 346
+    },
+    "current-endurance/probe_controller_current.py": {
+      "sha256": "3643b4999ec72f5fff171503eca1f4b98bbb9128549050a2326bdecbfa291386",
+      "bytes": 556
+    },
+    "current-endurance/probe_native.py": {
+      "sha256": "6ce5328f7adb254d2bc443f9e9b1d1ee9cf45a9ddb6cdd8729ca71483762d335",
+      "bytes": 317
+    },
+    "current-endurance/retention-summary.json": {
+      "sha256": "acbd99f73e273ff09e44c51adc17c79fc96ccf7a3aa0ac9c4c6f4f62b4981d8e",
+      "bytes": 23859
+    },
+    "current-endurance/retention-validation.controller-owned.json": {
+      "sha256": "6f3c8f73d4b6e79af9c3e1e0ad7ee7b8a2ddad3fa46ba5e1bf45a6589a57c13b",
+      "bytes": 149
+    },
+    "current-endurance/retention-validation.controller.json": {
+      "sha256": "998ad7de7a94e8c240c00c396a2759ddf22aadea6c4d350233caac7190bc85c9",
+      "bytes": 482
+    },
+    "current-endurance/retention-validation.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-endurance/retention-validation.controller.stdout": {
+      "sha256": "a42e3c819ebcd346208444aa7d57e80afb5c0b9a5409d6dff2deaca7244a4237",
+      "bytes": 21657
+    },
+    "current-endurance/run.py": {
+      "sha256": "1b9224de1168226dc684eed4af60accbf16a92bf7778b25758d532a19df42ccf",
+      "bytes": 3241
+    },
+    "current-endurance/run_live.py": {
+      "sha256": "fef1cfa637ab4e733dd71b9e066f7c1ecd6b63d371724fe5effa07632598ce3c",
+      "bytes": 3363
+    },
+    "current-endurance/run_live_v1_unlaunched.py": {
+      "sha256": "5620c680275ab400d0a414221bbd690293ee433bd1db82d1f745c871499f22aa",
+      "bytes": 2723
+    },
+    "current-endurance/run_live_v2_unlaunched.py": {
+      "sha256": "a9ef09c90212527540a6a50c2b5e1eca733b47ceb358a6b10c1830c8a72579f4",
+      "bytes": 2759
+    },
+    "current-endurance/run_v1_unlaunched.py": {
+      "sha256": "555578481eb188fba2c58f560f8ec858ab13f58ffdf01e3e245f041b1fe2437c",
+      "bytes": 3272
+    },
+    "current-endurance/testing-authorization.json": {
+      "sha256": "a9d845a9e3ee9a8e1d1a8e8d00a9dda21234359588a5fd104e9ea1efeb6e194b",
+      "bytes": 378
+    },
+    "current-endurance/validate_retention.py": {
+      "sha256": "5b53b89276ea4fc3548b619c88357134a0d6801f632d055793f3f3f3f2c69e34",
+      "bytes": 7696
+    },
+    "current-endurance/validate_retention_v1_unlaunched.py": {
+      "sha256": "d68b23371b35c386608342e66163c670da032d91878bb187b3b84c309b5a4b8a",
+      "bytes": 7429
+    },
+    "external/private/tmp/vellum-current-endurance/drivers/cogent/cmd/window-cycle-smoke/composed.go": {
+      "sha256": "1005615de20ac9391b175a4cc78e21585c6873df18bbe122897122bb6d43bd80",
+      "bytes": 6171
+    },
+    "external/private/tmp/vellum-current-endurance/drivers/cogent/cmd/window-cycle-smoke/interactions.go": {
+      "sha256": "2939078173969c46f123213f3fb4fc4fb385560a673a695bc059ddf70213b8a7",
+      "bytes": 12224
+    },
+    "external/private/tmp/vellum-current-endurance/drivers/cogent/cmd/window-cycle-smoke/main.go": {
+      "sha256": "01affc26248ac04ea0655e33465b3ea4817d0398dfd0f35fe961b5e2e7f9fa0c",
+      "bytes": 16663
+    },
+    "external/private/tmp/vellum-current-endurance/drivers/cogent/internal/acceptance/workspace.go": {
+      "sha256": "a7906ba04740b7490c6c3370d88635717bd2c1694f5cec874a2e41a3e81a8648",
+      "bytes": 14782
+    },
+    "external/private/tmp/vellum-current-endurance/scripts/child_process.py": {
+      "sha256": "d5c79dbed4200d5cfeabcfc9afa6d023d354d52da5fee3444e3d7c36859e43cc",
+      "bytes": 3933
+    },
+    "external/private/tmp/vellum-current-endurance/scripts/sdk_environment.py": {
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311",
+      "bytes": 1356
+    },
+    "external/private/tmp/vellum-geometry-reuse/docs/reports/macos-geometry-reuse/records/qualification.json": {
+      "sha256": "0dd72d125114c91d80257e58be9f669631c24f944cfa7e29f8d81270305def35",
+      "bytes": 8407
+    },
+    "external/private/tmp/vellum-geometry-reuse/drivers/cogent/accessibility.go": {
+      "sha256": "b6a4d5559e0720e4e3973774907398cab4202d50779cd9ad5c8ad4918ed620b2",
+      "bytes": 42668
+    },
+    "external/private/tmp/vellum-geometry-reuse/drivers/cogent/accessibility_geometry_cache.go": {
+      "sha256": "129228002304d91f7837e408deee5ecc8d5479c6e7bd6510a86eac059cf5341d",
+      "bytes": 2623
+    },
+    "external/private/tmp/vellum-geometry-reuse/drivers/cogent/accessibility_geometry_cache_test.go": {
+      "sha256": "d18d7727de1c70580bcb2b09784cf5c644088f91732fd0c767095970d8df6317",
+      "bytes": 5170
+    },
+    "external/private/tmp/vellum-geometry-reuse/scripts/benchmark-grid.py": {
+      "sha256": "c99da36325b5a978917f8f8168dbabf9be7a1428d42a73f1f13e3307489389e1",
+      "bytes": 32623
+    },
+    "external/private/tmp/vellum-geometry-reuse/scripts/sdk_environment.py": {
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311",
+      "bytes": 1356
+    },
+    "external/private/tmp/vellum-macos-current-endurance/baseline.json": {
+      "sha256": "ed86b42249b0a65d8220ea2e59fd41526ccdb74b2bba77ce1181da43f39ba3ed",
+      "bytes": 1280266
+    },
+    "external/private/tmp/vellum-macos-current-endurance/build-cycles.json": {
+      "sha256": "b4dd0c39c340bdbe8c45ee7f0731fa8763fba1276398fc423b3ab60d6e5f031b",
+      "bytes": 1231
+    },
+    "external/private/tmp/vellum-macos-current-endurance/build-cycles.stderr": {
+      "sha256": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776",
+      "bytes": 118
+    },
+    "external/private/tmp/vellum-macos-current-endurance/build-cycles.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-current-endurance/campaign.py": {
+      "sha256": "07a4c1f3e4c57e977f37f745f24dd759bebb817f48118cf11f476c983f678d96",
+      "bytes": 3741
+    },
+    "external/private/tmp/vellum-macos-current-endurance/evidence-review.json": {
+      "sha256": "c4b80bd5d395e9080351265c965d42ecbf96b2b2db98c1187f2fcc88e32ea8e4",
+      "bytes": 11159
+    },
+    "external/private/tmp/vellum-macos-current-endurance/final.heap": {
+      "sha256": "419805dbe0ceaf6bbce90d91a3a06d17412c31b4f4b154c09a0de8561c564da8",
+      "bytes": 450135
+    },
+    "external/private/tmp/vellum-macos-current-endurance/harness-review.json": {
+      "sha256": "1b9f3851586e8c010c558498986776759ffc0b6a493131410cea5e5af05008f4",
+      "bytes": 10262
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.controller-owned.json": {
+      "sha256": "dc0e90fdcfa5135518cc2d8c6ed8d2e229c3981be0f1c292cd4d3bbbbf2f94c2",
+      "bytes": 374
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.controller.json": {
+      "sha256": "1280538fb002c5153fa190d92f3dca00779fab3f532f464eeec13cbca8aa8dd2",
+      "bytes": 738
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.controller.stdout": {
+      "sha256": "cfa713632bb8934112c80d0bd764d91165d7c0d56adb65218c1d6854ea2e8156",
+      "bytes": 1144
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.json": {
+      "sha256": "c6380c30d4c97bfc5391defd838b72148c408704318e1a674e53986c8c4603a4",
+      "bytes": 1208
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.owned-process.json": {
+      "sha256": "c7361a0600c00bc1d98a4ca077ef72ccdf369857f7514963830cbc7668fe0772",
+      "bytes": 447
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-current-endurance/interacting-1000.stdout": {
+      "sha256": "45c93b052c6e566150f46ba00b3fe819944b702e6296cd216548fa61ff57a24b",
+      "bytes": 10218139
+    },
+    "external/private/tmp/vellum-macos-current-endurance/post-terminal-groups.json": {
+      "sha256": "c532c3edec02c4ee7690678d9ce0060376f3a519c448e32f89eda83799818163",
+      "bytes": 851
+    },
+    "external/private/tmp/vellum-macos-current-endurance/retention-summary.json": {
+      "sha256": "acbd99f73e273ff09e44c51adc17c79fc96ccf7a3aa0ac9c4c6f4f62b4981d8e",
+      "bytes": 23859
+    },
+    "external/private/tmp/vellum-macos-current-endurance/retention-validation.controller-owned.json": {
+      "sha256": "6f3c8f73d4b6e79af9c3e1e0ad7ee7b8a2ddad3fa46ba5e1bf45a6589a57c13b",
+      "bytes": 149
+    },
+    "external/private/tmp/vellum-macos-current-endurance/retention-validation.controller.json": {
+      "sha256": "998ad7de7a94e8c240c00c396a2759ddf22aadea6c4d350233caac7190bc85c9",
+      "bytes": 482
+    },
+    "external/private/tmp/vellum-macos-current-endurance/retention-validation.controller.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-current-endurance/retention-validation.controller.stdout": {
+      "sha256": "a42e3c819ebcd346208444aa7d57e80afb5c0b9a5409d6dff2deaca7244a4237",
+      "bytes": 21657
+    },
+    "external/private/tmp/vellum-macos-current-endurance/run.py": {
+      "sha256": "1b9224de1168226dc684eed4af60accbf16a92bf7778b25758d532a19df42ccf",
+      "bytes": 3241
+    },
+    "external/private/tmp/vellum-macos-current-endurance/run_live.py": {
+      "sha256": "fef1cfa637ab4e733dd71b9e066f7c1ecd6b63d371724fe5effa07632598ce3c",
+      "bytes": 3363
+    },
+    "external/private/tmp/vellum-macos-current-endurance/testing-authorization.json": {
+      "sha256": "a9d845a9e3ee9a8e1d1a8e8d00a9dda21234359588a5fd104e9ea1efeb6e194b",
+      "bytes": 378
+    },
+    "external/private/tmp/vellum-macos-current-endurance/validate_retention.py": {
+      "sha256": "5b53b89276ea4fc3548b619c88357134a0d6801f632d055793f3f3f3f2c69e34",
+      "bytes": 7696
+    },
+    "external/private/tmp/vellum-macos-geometry-native/compare.py": {
+      "sha256": "12e74ff86da113cf96ea850974e2aff88940161db7c89c4f0891f067efe5f7c5",
+      "bytes": 9738
+    },
+    "external/private/tmp/vellum-macos-geometry-native/harness-review.json": {
+      "sha256": "de7cf3af51927a0a55794080f410eaf02c9aea64621b8e802455e015526f1381",
+      "bytes": 5914
+    },
+    "external/private/tmp/vellum-macos-geometry-native/inputs.json": {
+      "sha256": "aaab4de8cf0ecbcbc46341fccce857ad16e05d003c84630aa344455689eb10dc",
+      "bytes": 1308939
+    },
+    "external/private/tmp/vellum-macos-geometry-native/launch.py": {
+      "sha256": "d9534ab7ae5dbd7f22fcfd8fd7f75654611fbb141cf949603a7847b0db9c2282",
+      "bytes": 2534
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-1/native.log": {
+      "sha256": "f01e1e4f63844d7a9f7a5dce80e8e39af846bc8a825a9ef9778f748fe768b5d4",
+      "bytes": 152269
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-1/result.json": {
+      "sha256": "a195e88d1a5a7ba3a741adc39793d42dbe2caa3b465fe11cffea6d20d0a54a8e",
+      "bytes": 244480
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-2/native.log": {
+      "sha256": "ea3bf3947b9a7e5a3b053a279f738560cf61622fbd16d7d4293b7ff393ce26c9",
+      "bytes": 152246
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-2/result.json": {
+      "sha256": "87370b8f1dab4826678223056c2764afd990877501f4ba40871eb12e23757cd5",
+      "bytes": 244457
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-3/native.log": {
+      "sha256": "85c3b8113e2977956df5aa6aaa7c804f10e9fbd0975ff6e7c3b9940403598ecc",
+      "bytes": 152248
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-3/result.json": {
+      "sha256": "ec975f1dfb00622af2a58f49b23fc120ed049e91fa3986c84b925a8069ec626f",
+      "bytes": 244458
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-4/native.log": {
+      "sha256": "b320308a6710137dd5b8df693ef9a9416895ac58bce003740141006e1e3d460a",
+      "bytes": 152252
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-4/result.json": {
+      "sha256": "9f1f9e2933ba181afc034645e8e11c5ea1de99113fced8c55e57ab8f386b024a",
+      "bytes": 244462
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-5/native.log": {
+      "sha256": "a906b2141b2f4556e7b5cd9e3d598038f3333086fd842f4c5e4dbd56b5e7bd2b",
+      "bytes": 152280
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-10000/run-5/result.json": {
+      "sha256": "fabcd626d8f6be5c505c1dde4cc7d42e26a190104200c787a5f80fd554ad5db6",
+      "bytes": 244491
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-1/native.log": {
+      "sha256": "37dc4892f88507aced69c4af38e599da576076b834ac599a047073ae9d66a536",
+      "bytes": 152287
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-1/result.json": {
+      "sha256": "88e4dab74c2bea6fe934ad3a46b41eb373e85cad7ae3713bf4a3810678d147e1",
+      "bytes": 244499
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-2/native.log": {
+      "sha256": "fa7206ccfb882bc1ba70eeef29f6a9bd09cd24e49b768481406f3065b34c5f70",
+      "bytes": 152260
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-2/result.json": {
+      "sha256": "190465f9ccc9eb835639e5538fe1e7fd0df3188393a6a90546f78a0d9065ffe6",
+      "bytes": 244471
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-3/native.log": {
+      "sha256": "bc16d8c8a326b06c9abeaf24a56f70c518fdac57ae461f17220664af7fa34a8e",
+      "bytes": 152203
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-3/result.json": {
+      "sha256": "e4c927966c4728877cd6eadd8fa69c43231ad53f72019fcf6b0e210a1e4091bc",
+      "bytes": 244416
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-4/native.log": {
+      "sha256": "dcd4b0c8cc184ff021731c03e82f82eb8569df113de7576e5beedca7add766db",
+      "bytes": 152248
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-4/result.json": {
+      "sha256": "22a27214f41664a64814eeed4638ca1c20ebb0fa67d246fec967836303a1b440",
+      "bytes": 244460
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-5/native.log": {
+      "sha256": "d0999e8f4c87809def343019beac4ef0821cd2d1a3777d559a4a40a6cd992839",
+      "bytes": 152329
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-5/result.json": {
+      "sha256": "2089065fe4c3b13b57769ee7e7cc948542ec579df32137e4f5aa9fe6a88d8543",
+      "bytes": 244542
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-1/native.log": {
+      "sha256": "aaa287b052b1f5c617238bceffb6a504442a17af808c138d96bcf4f444bc01f1",
+      "bytes": 152283
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-1/result.json": {
+      "sha256": "108884376e5ac7c82745395138a88aa71fdbf1707f8f28d4b4d37648013607f6",
+      "bytes": 244516
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-2/native.log": {
+      "sha256": "eca63b219a33d4355b12b3b81fc3a3da201711312ec67f4e2cfccf12cbc44fd1",
+      "bytes": 152268
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-2/result.json": {
+      "sha256": "4e4dfa0e34ba4f727e8818fcbf9f40c868aa0676e1f03943651b07185c97f080",
+      "bytes": 244501
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-3/native.log": {
+      "sha256": "611087a06a08267720d2ab8c4edf4153c637f850ed1f1b1fb5afcc37050a160e",
+      "bytes": 152273
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-3/result.json": {
+      "sha256": "b12b77d17a8d2c822549fbbca2a8e876faf48812275bc08ae05d56005c462d67",
+      "bytes": 244505
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-4/native.log": {
+      "sha256": "d35e63dd1e3f0f57f96107db7feae00a15b33e21acb71e9d09f6637a0be68e70",
+      "bytes": 152259
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-4/result.json": {
+      "sha256": "d84687039110d63572008608c9f76b20aa05d9d9c8a5d9b6baf9d18548f1efef",
+      "bytes": 244490
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-5/native.log": {
+      "sha256": "45ce6bd1fd8770d60f965c970055d59328979309907787b62f9ac280ce435b1c",
+      "bytes": 152286
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-10000/run-5/result.json": {
+      "sha256": "171c5d0826e5edfe3f288c9951a7721d4f221ca3840f41437bc6e4b7b53876ea",
+      "bytes": 244519
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-1/native.log": {
+      "sha256": "294578c7640445f9811242f1fd43704d64b9e8707bffe576da2f64548b866ea6",
+      "bytes": 152298
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-1/result.json": {
+      "sha256": "58efb1ae70019fea718e789805dc308a86e1778a11094451728f6f7779059b3b",
+      "bytes": 244532
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-2/native.log": {
+      "sha256": "8164d45fad7d08a4523ae02385dbb673242a06e4aa7b8dde299be4fcc04641b9",
+      "bytes": 152274
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-2/result.json": {
+      "sha256": "f9f66ed8559ef6801174ee6ca856938764f44e535873e1db5e24b1399ac29a35",
+      "bytes": 244508
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-3/native.log": {
+      "sha256": "8136381d382bce993cef4f93c9f9597c642f3622650f36966593a5ffcf473f14",
+      "bytes": 152310
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-3/result.json": {
+      "sha256": "99f56a93bb9e2178c08a9b74d6cb71c0e936b8b3b15fb69e2b38e30360a8ef64",
+      "bytes": 244544
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-4/native.log": {
+      "sha256": "b83cbe270544fc34a4d1cc103e9dedcb200fdd92ea46f8f1ec0aeab790098227",
+      "bytes": 152283
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-4/result.json": {
+      "sha256": "cc3bb07defd97a7ebc28ebee5d0ade2bae43706ff1d0bff34bfe26ae1cf638dd",
+      "bytes": 244517
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-5/native.log": {
+      "sha256": "3d6eb32eb061994b54006883f7b289a49657f3a588975b00223ee08d1759dd70",
+      "bytes": 152323
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/candidate/variable-1000000/run-5/result.json": {
+      "sha256": "d19cf923f99e708137c2164d8d25f02cd681664331010256fa8f2a72ee3f222f",
+      "bytes": 244558
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-1/native.log": {
+      "sha256": "771751efc3f5436f997e9622a048ca540fc75c39844004b7d12d22ea258b618c",
+      "bytes": 152208
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-1/result.json": {
+      "sha256": "3388f92470d990f675d8a51973a2f8362cacb4cc3cb49cba578045f90de3ac2b",
+      "bytes": 244427
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-2/native.log": {
+      "sha256": "416c80be3a4cae4c1fd37cbb84517774d3dca4e6c6eff076c2974cd945883de6",
+      "bytes": 152196
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-2/result.json": {
+      "sha256": "92948b5d7afe71d3a0639f6e621de75eec879c9d7532e743c4e65ff65927f287",
+      "bytes": 244416
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-3/native.log": {
+      "sha256": "6d88133b3fdd41145a1eda6af404c5d2a8dc436107303f3d219d5d81307f4fb3",
+      "bytes": 152262
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-3/result.json": {
+      "sha256": "334fc4ae62ddcd2a4c4433499e4b58805cddd1c8a190e51d2811cdfc98c69b1e",
+      "bytes": 244480
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-4/native.log": {
+      "sha256": "af8358b1fa037421ee9b17225fcd6232b4672fc1e01bf3aaee3de9cf133b64a2",
+      "bytes": 152236
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-4/result.json": {
+      "sha256": "f9bdb136d89830d985ddb17f4c19d109e553b7a2e32dacb682c9565e7251c935",
+      "bytes": 244455
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-5/native.log": {
+      "sha256": "a7e095e4a36597845c59ad7dc34001ed899e446b1ccaae3e74bbda9949ec81a1",
+      "bytes": 152241
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-10000/run-5/result.json": {
+      "sha256": "d4bfbdacbf481130391ca7183bc1abbc94e123e950b3205b932aeec794b48b2c",
+      "bytes": 244460
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-1/native.log": {
+      "sha256": "b97dd3b7bce2f2037ff1a84e91158286f93304dcd831da94b6080da5d4711377",
+      "bytes": 152277
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-1/result.json": {
+      "sha256": "9bfd78d24be2d7ed726af69438b612d15d3b0abde0082fad05dff57257584813",
+      "bytes": 244499
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-2/native.log": {
+      "sha256": "4807bbc00d731285e98d1f1673c48d1ae83272e1fc0b7c378791a5075e7fcc94",
+      "bytes": 152281
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-2/result.json": {
+      "sha256": "ada34cc7e9402e18533fce1ea5589f1e95c0603d049ac1f66c9e6da630655eb7",
+      "bytes": 244503
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-3/native.log": {
+      "sha256": "4524ac901edc0c959a80e08336a7c07c81d63bf27025d3f668c4c325af0ec15e",
+      "bytes": 152263
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-3/result.json": {
+      "sha256": "499fc8d704ed7e0e8f4b16e0ac162b83705498d855b85380d8d3b1e53a3d502c",
+      "bytes": 244484
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-4/native.log": {
+      "sha256": "416c20f1fbc12f6eb944782ebf690ae5935f817301dfaeb25f712840bc8b8ff3",
+      "bytes": 152255
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-4/result.json": {
+      "sha256": "91efcfc4bd0dfe5116cd881fa4a2e66ccf36ec719572b88c9fa89ca27b0d07ff",
+      "bytes": 244476
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-5/native.log": {
+      "sha256": "fc1263f43f61ab62cc938b15fa557b114b55bd3b6003c30e1f3d3b61070e307d",
+      "bytes": 152289
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/fixed-1000000/run-5/result.json": {
+      "sha256": "9eb340cb806331b74b2d040763982c4aa312ce49e3569db4d134bc5acb8e362e",
+      "bytes": 244509
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-1/native.log": {
+      "sha256": "41817f74cca020c895a5017e205e64f2c692944413deec4120d0d15f32c51c8b",
+      "bytes": 152284
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-1/result.json": {
+      "sha256": "07009cd66eab386a44c5af0103e95616d6d804720a11990ad04ee0f755b89b2a",
+      "bytes": 244525
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-2/native.log": {
+      "sha256": "c9c3c79a07f65361d973950cea89fb902c8daf59fa8ecb52cc87d9e226f93649",
+      "bytes": 152264
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-2/result.json": {
+      "sha256": "63aaf983ed00c7223de7694c9c12d4d74119b30f643afdb92921cf87dbb8afc8",
+      "bytes": 244505
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-3/native.log": {
+      "sha256": "3b32dab7f0277f57586164c419518630c423a46abb4dd063f90447053f285e77",
+      "bytes": 152285
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-3/result.json": {
+      "sha256": "ca38888337436e29aec34ab9f8d29bdd93033b718b643c55f56cc2d8a00f2f0e",
+      "bytes": 244527
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-4/native.log": {
+      "sha256": "3c500e0641ad00ff9fc96a6daa63b57f8f2e61ab5048e7cba4847659b443066f",
+      "bytes": 152280
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-4/result.json": {
+      "sha256": "6a0b59ace18b818dc8c683b419970eb76ad37984fcafc8059ce7b4d387d7343e",
+      "bytes": 244522
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-5/native.log": {
+      "sha256": "0fc7058455e09aaefe95d31dc5704875de6b10bb328c96189f1dfedd723da97a",
+      "bytes": 152266
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-10000/run-5/result.json": {
+      "sha256": "c45c277d82dcb4b1bd6203e8c691fa804f9785506d3405e57c1d755b7b02c0e8",
+      "bytes": 244507
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-1/native.log": {
+      "sha256": "85410cd8b763cf3bb3d0369469248a610a4a8ac46a6efd96a48eeeb3efb2a22a",
+      "bytes": 152321
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-1/result.json": {
+      "sha256": "56389f365c5555a2bc91a66d946f5f64e2e8c4c7edf95d6b31bce461794934b9",
+      "bytes": 244564
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-2/native.log": {
+      "sha256": "04cf6e05123d4fc487bf5621ab1b571f7f3a0d5ce948fa1f074030e8a4984973",
+      "bytes": 152326
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-2/result.json": {
+      "sha256": "71cb958260f3d10e8fca66abc0fb7ee53ae1bddd93988fe0756d9a3a40874493",
+      "bytes": 244569
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-3/native.log": {
+      "sha256": "c9d77d103bf01bdc32e407dd22c7b8b5cec29baded72e06c414a0a5ecb90298f",
+      "bytes": 152299
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-3/result.json": {
+      "sha256": "373ef314c5bdf368cb1c9d48ced786edc6f27bf2708729d31a5e53ef45fc0d8c",
+      "bytes": 244542
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-4/native.log": {
+      "sha256": "bc7a92f4cd6127a8b4d800208b0119a0052a6cccae0861bc5a52a31029999528",
+      "bytes": 152310
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-4/result.json": {
+      "sha256": "499ab021974b31978eb64956487b3556a8d2ad3d9be3ada66076d6617398ee78",
+      "bytes": 244554
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-5/native.log": {
+      "sha256": "4795f5a40cb8e5000b00de81061359e52a31373984ac50ea8cc46b33796f0bfb",
+      "bytes": 152311
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/cpu/original/variable-1000000/run-5/result.json": {
+      "sha256": "7423617d0aeeeb6bfb99c2eab0d1bb36a625451b594f83ad7babe05bffb1e852",
+      "bytes": 244555
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-1/native.log": {
+      "sha256": "0365496770303f429c68668186a53e34148fb8f9d033d3a8c55b765d8fdfb4e4",
+      "bytes": 152079
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-1/result.json": {
+      "sha256": "7cdb75552ad345c74fd827c98da86e463240689eeccb471e13e1c7399c1ca66e",
+      "bytes": 244308
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-2/native.log": {
+      "sha256": "13259b4c78a451cb28d2c6a3af3ced025254eb9236f3a8f93f59994853190ec6",
+      "bytes": 152007
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-2/result.json": {
+      "sha256": "98c2a33b48bf30d670c36c092069c440c375b3e4ee690c479a898e2c8fcf12db",
+      "bytes": 244235
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-3/native.log": {
+      "sha256": "13c170614b7f504b94f76c0152405a85ef97d5160729a41e8ef7b1050c107ca2",
+      "bytes": 152078
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-3/result.json": {
+      "sha256": "5e8a65f2d44b705107199fcf81e0b45354d38e731f4205e0a63097e391096c8b",
+      "bytes": 244307
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-4/native.log": {
+      "sha256": "6e5fcc48ac909ec40928de3d81c10e938266bd31659f5e951b05310ba6c44a86",
+      "bytes": 152043
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-4/result.json": {
+      "sha256": "6a8a48dd81f9c6957b50c937eac9f41a6b0b789722fbd5cbde90a2bf8c0b2eb7",
+      "bytes": 244272
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-5/native.log": {
+      "sha256": "0f5e989ce53cf5c3cf42034ebc89795254bdc3e8b2aa79507c20769956657533",
+      "bytes": 152005
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-10000/run-5/result.json": {
+      "sha256": "9f2152772f88afd71103dc46373a154a621928daa28764e3b982069866d0a4b0",
+      "bytes": 244234
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-1/native.log": {
+      "sha256": "3d06eaca51148858383a015861875b5e2a6b4c331d179d096f2f23a325016a3b",
+      "bytes": 152002
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-1/result.json": {
+      "sha256": "f41db73f18c2aa731d057ba56689f542043492dedb11bf7ab09a4c245920709d",
+      "bytes": 244233
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-2/native.log": {
+      "sha256": "b0d66b5602aca47f26d044992900701430277c0270961ecbf3994e135c560f45",
+      "bytes": 152062
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-2/result.json": {
+      "sha256": "2db88a362c01360c7624feed7146023480e42e5b8e55c28b286b29bcf811cc88",
+      "bytes": 244292
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-3/native.log": {
+      "sha256": "be8d743f5a29623bd290ba442fe89a97e76474f46c98f21dd43a66d416fb006f",
+      "bytes": 152003
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-3/result.json": {
+      "sha256": "86976d827b851186dadc6313631901e9a0c74f1b8467046dc59c665a066390f4",
+      "bytes": 244234
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-4/native.log": {
+      "sha256": "a9e45fb5ee4b0f33bc2ad0b5980b1d5f42d19d07042675b87b2432e180fbc0b6",
+      "bytes": 152068
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-4/result.json": {
+      "sha256": "260c57facc7ec4a69955acf6cb326ad3829d4a385a0abbc267c91510339d00da",
+      "bytes": 244298
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-5/native.log": {
+      "sha256": "5cf9a3d5b38948e9663298520731980f486195e7126b85ffa0d463df644a3356",
+      "bytes": 152063
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-5/result.json": {
+      "sha256": "75e341b4f04bdf852dca0be1d906a26f0e0c823aadeb9f068fe238ff7e67fbe6",
+      "bytes": 244294
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-1/native.log": {
+      "sha256": "c7fd41bda26aea249a7dbdbbccfeb23638cb560f5e032936de99283522b270f6",
+      "bytes": 152074
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-1/result.json": {
+      "sha256": "94580e2c56ad1e8d5a11f8f7dd827b057f589c70c30039d86461e1fc380e1787",
+      "bytes": 244324
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-2/native.log": {
+      "sha256": "13b834391b0db69fe08a0d694ec98edb7703a160f770e1ff80e19cc61f8cbed9",
+      "bytes": 152099
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-2/result.json": {
+      "sha256": "f13c77fce74fbb78a0a720323593b4b99bf91c9f1ed3cb55609a726309ef570a",
+      "bytes": 244349
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-3/native.log": {
+      "sha256": "7c50088c25605d86c5dc5777bdce3d8e29254c385982fc4eb5de1ffa521ea4ac",
+      "bytes": 152164
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-3/result.json": {
+      "sha256": "aa396fa0dda17c233c2b4328c9b1714a716db10a370cc2b748518edbb8e5af8f",
+      "bytes": 244413
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-4/native.log": {
+      "sha256": "643380f720c6e0fc64aa5bdc0ede93889bac45e5d8c1b95fb6a838bdb1c38824",
+      "bytes": 152068
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-4/result.json": {
+      "sha256": "866480a593ace0baa6f7c2e6ecdc2be68a03b35a8ebb01859c3438264ac1eda6",
+      "bytes": 244318
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-5/native.log": {
+      "sha256": "748bfd4edff4121263d3cab33c950860f4c4863acd104d87798322b14b5aee27",
+      "bytes": 152105
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-10000/run-5/result.json": {
+      "sha256": "9b4512cd8c3548a11be727c215c37a22d703a2a03e8ee0d18568af55f6d1052b",
+      "bytes": 244356
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-1/native.log": {
+      "sha256": "6910a8960b7fe5042b11ea768e8e3d1eacb579b5f8794365b7dfc6247d9c7769",
+      "bytes": 152083
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-1/result.json": {
+      "sha256": "2e57811d31c31e5d7e8091f67481471e3b36cfe8c86ff3f0cdf9f878ad666459",
+      "bytes": 244336
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-2/native.log": {
+      "sha256": "c2059529bf83511dd2033dcf10099b26d860f4c43fe2ebfd541081c49b62adb5",
+      "bytes": 152170
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-2/result.json": {
+      "sha256": "71a0cfe332df75599738a3a83592274887d5e99e81bf0168bf3ec187183ab581",
+      "bytes": 244422
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-3/native.log": {
+      "sha256": "48ebe1601a936fc812cd15e9569ed2c763bab5efed13e86f923000c97807fcb8",
+      "bytes": 152058
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-3/result.json": {
+      "sha256": "5b867da032640b5fb3e71135f7f8a6323a1950e31d535e0ae22382650f362a45",
+      "bytes": 244310
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-4/native.log": {
+      "sha256": "123bf0dd13af983ffbc93bfdb00662204d8bc56b144cbd65b2412bf2ca01efc7",
+      "bytes": 152061
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-4/result.json": {
+      "sha256": "849e214d55553415fd761bce828b1b3b9902814f6770b4a6ad8af9d344cef6c2",
+      "bytes": 244314
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-5/native.log": {
+      "sha256": "29a3d90fe382e8fb89074eb9a18074bb8d13102ff3fb2abbc0e857dba0bed3f2",
+      "bytes": 152052
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/candidate/variable-1000000/run-5/result.json": {
+      "sha256": "5fe60fdcc6c4b5e757fa422dcfc0da1ce5364cbb07c7f0282637ffe990d5ed06",
+      "bytes": 244305
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-1/native.log": {
+      "sha256": "4c890c22babfb7ec174accc4b5a5d469abb2516a54f0374911506e969948adc6",
+      "bytes": 151999
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-1/result.json": {
+      "sha256": "f3b554ddb90d39d5661aef3fecbd12470cc8feee244cabcef25d976bfa7a05f8",
+      "bytes": 244236
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-2/native.log": {
+      "sha256": "7b2173c5d96036c5e51805f095df4f591fbfec139d76ba0ff3ae99207dda37ff",
+      "bytes": 152001
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-2/result.json": {
+      "sha256": "72c718687d61f15e643a376e122ec3813bdf1dbe133b840ced6c0cb8afcc6a24",
+      "bytes": 244239
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-3/native.log": {
+      "sha256": "2a1c3e76a1e897d63fbf51889a60401cf80458004bf68c879971e5d24f680ee3",
+      "bytes": 152028
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-3/result.json": {
+      "sha256": "1a6fc6b6b49c522527a307270057772b0b4a225cfc872053c6c286105ec66045",
+      "bytes": 244266
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-4/native.log": {
+      "sha256": "5978613b6b98f2c93957db22c18d1b48153f260ad3095c744f7bc2672ec8a1e8",
+      "bytes": 152005
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-4/result.json": {
+      "sha256": "aa4f8debdcf34cec0bfe981ba0a4dfe0b0fc823c831dad92ba04f929d2911f44",
+      "bytes": 244242
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-5/native.log": {
+      "sha256": "2be4ebc24810e714b29acc01d6f2ef43ffba420c0e8a942e7ed68d0c90d94716",
+      "bytes": 152071
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-10000/run-5/result.json": {
+      "sha256": "03714d3306488472faf61af6ba03176d02c7ee6b2427f72090ae0366b2a405dc",
+      "bytes": 244309
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-1/native.log": {
+      "sha256": "05335ab542f83cabf693f9c28e56b6095cab09c326ac79930451260f9f025fdf",
+      "bytes": 152000
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-1/result.json": {
+      "sha256": "7e15a9d076aefc0e6b298e4735b1ec16919695850ede2ea8c093a155addab067",
+      "bytes": 244240
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-2/native.log": {
+      "sha256": "4695605ead191b7a219ac6c52775023578bd96d0436f5adb5e1bdc178962ef2e",
+      "bytes": 152007
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-2/result.json": {
+      "sha256": "790c13642414ec4bd9638790b52c7860654210352bbd20c8d99421c5f0a4324b",
+      "bytes": 244247
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-3/native.log": {
+      "sha256": "2551139c481042a7e8c6af8bd86f5af89d40e5cb5dfc25da7b7f8dda135df53b",
+      "bytes": 152006
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-3/result.json": {
+      "sha256": "2a5cb5723bb117d3e95e092af8cb8d16cc05ecd400cad2fbdd1058e24532bdb2",
+      "bytes": 244246
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-4/native.log": {
+      "sha256": "d2340b1e0b8d853a05b4afb89f92883c118743e8bb6a95e5e6b6abeac264dd30",
+      "bytes": 152013
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-4/result.json": {
+      "sha256": "e4e9646fbd55db27e21c6a6e84be884358e394558ac3342f805c0f1727efbaab",
+      "bytes": 244253
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-5/native.log": {
+      "sha256": "a9790edc4de18b4017f5c808dcb5eff81876fd0dd1748af737f3fe9727fb0a1d",
+      "bytes": 152066
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/fixed-1000000/run-5/result.json": {
+      "sha256": "da1d9c3baf84f331af1b2d05f22df0a4f3b2d52e023fe4bc3c331e332e776694",
+      "bytes": 244306
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-1/native.log": {
+      "sha256": "c36584e0117c3b34f452523ba2f5ef55d71287649e67e201818cc58e9a0b5252",
+      "bytes": 152134
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-1/result.json": {
+      "sha256": "7f2d194c0abe3ff533016baad41b806a094fc7ebfc3e1e33993f0bec6788534d",
+      "bytes": 244394
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-2/native.log": {
+      "sha256": "377f22306cc94691916267920c86be09c1f3e7447057d879e0a047c201996ed5",
+      "bytes": 152098
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-2/result.json": {
+      "sha256": "ef9750b3df98157c9446d058fffa52781e2e1e0345e20c79a5254529cc0704d4",
+      "bytes": 244358
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-3/native.log": {
+      "sha256": "723e8af7709ababd4ad12903df69554e9dbf92d2a2fe0c848ca6f4a7ceb2783f",
+      "bytes": 152114
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-3/result.json": {
+      "sha256": "c60e028d66dbc3ff6becc80ad307d9b2199bdb488970db07ce65d810f48fe946",
+      "bytes": 244374
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-4/native.log": {
+      "sha256": "b4106b3bd92daab057b5aa7213fa3d195e7db6f00951f843c8943652e8cd2277",
+      "bytes": 152078
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-4/result.json": {
+      "sha256": "4ec31a4a319127c98618865c325639d3d69f72e8c4ebc9bec9edfd454b1fb7df",
+      "bytes": 244338
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-5/native.log": {
+      "sha256": "80201d0bae48d955e536b47d757f26b70d1e068906097a291d2cabecc08c1d0e",
+      "bytes": 152097
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-10000/run-5/result.json": {
+      "sha256": "a8f6502a3b021302925c031280427b164180b5f8f05d9a32b6eaf8e10628b44d",
+      "bytes": 244357
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-1/native.log": {
+      "sha256": "0f5e54f74943410ecd99f07f233b84cff445a3527075936a1a4369497a93572b",
+      "bytes": 152064
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-1/result.json": {
+      "sha256": "65b61e1213a401bfa7b9bb67524a45133a2042a8c44d182014861d3df822e677",
+      "bytes": 244326
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-2/native.log": {
+      "sha256": "03c82b2bd216117dc3d1b80bf698debfb2d58c2690f178fa7fdb8a6e49ff0d88",
+      "bytes": 152048
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-2/result.json": {
+      "sha256": "78e4853392446358ab37096357f0a967fe78872714ef93062affaa21d74203b7",
+      "bytes": 244310
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-3/native.log": {
+      "sha256": "bb990ed578725472113831443a1296d52f21b5e63e811426fbc25e0194fc5625",
+      "bytes": 152089
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-3/result.json": {
+      "sha256": "3fa4855fe5cd7612f836e89e80d66297ea00312e8c73f61c4b16bbfddd677669",
+      "bytes": 244350
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-4/native.log": {
+      "sha256": "2344be6271468d81d74cfd5f90da178d67c4695b48ca86f1ec628190810541e6",
+      "bytes": 152037
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-4/result.json": {
+      "sha256": "d8e0fa0abc3573adc06594516bf8006cff0e247ce8023090734886d9cb566bda",
+      "bytes": 244299
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-5/native.log": {
+      "sha256": "84d9cb9b4c73d58237ed173c58e47ccda4fc20867efb88fc11de3847083d7b24",
+      "bytes": 152077
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/gpu/original/variable-1000000/run-5/result.json": {
+      "sha256": "6a9e1ab20e835c98d62d9e8ffe1421cb9c653eb3e35e3820348101550ac3acfb",
+      "bytes": 244339
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/progress.json": {
+      "sha256": "f87affe81a389fb0eacc5eff0b9c31e67b10fc9dd3dc047b6cfb340673a6afdc",
+      "bytes": 15523
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-comparison/summary.json": {
+      "sha256": "3ff6ef09a0265a25da85812c963a36d97eb9203eaae619b65c4c3511de6847c4",
+      "bytes": 484102
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-queue.json": {
+      "sha256": "e5d86444ca17c7ef1ce7c06fe326b3eeecab447d92a071192d1040386dd97e98",
+      "bytes": 695
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-queue.owned-process.json": {
+      "sha256": "d4a960a458dc5ef4438d8dacf418eb918c791852c4ff1ca07cb46f07182226f7",
+      "bytes": 306
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-queue.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-queue.stdout": {
+      "sha256": "6743172a38bcc269b65e0746d93627fedaebc7aa7e9920f0c35aa7f82b3bb05c",
+      "bytes": 3852
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native-summary.json": {
+      "sha256": "f62d9308022e006b83c885811ab0faaab3ddde800747f2f8173985624c8b9a0a",
+      "bytes": 1602
+    },
+    "external/private/tmp/vellum-macos-geometry-native/native_identity.py": {
+      "sha256": "2f980fff981bf64d201b9a633fa8e6c5f78b9bb01971ae392e286f2b23a3408a",
+      "bytes": 638
+    },
+    "external/private/tmp/vellum-macos-geometry-native/predecessor-binding.json": {
+      "sha256": "9f1fcbf671fba044ad2e15f1eeca281683719824ff9d908195579637c2d95c54",
+      "bytes": 446
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/design-review.json": {
+      "sha256": "583f4a2fe3a2da526301e38ff934ad535869b99723c613adfb5df0681f3d64bb",
+      "bytes": 5938
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/final-review.json": {
+      "sha256": "bbd42b18e47ce4f19054bc1d87a74c94d822b475ffd0c9c8f069d29ff694c650",
+      "bytes": 12616
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/native-candidate-build.json": {
+      "sha256": "c1bb3985221252abf8f32393c56aae77a13e08e4165406c47cbce07e1c2ad623",
+      "bytes": 1402609
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/native-candidate-build.stderr": {
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+      "bytes": 100
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/native-candidate-build.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/native-original-build.json": {
+      "sha256": "c0bbcbf82f83a78eb5193f323f9ba55b93051c1f09d0cafe83d615d599770297",
+      "bytes": 1403260
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/native-original-build.stderr": {
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+      "bytes": 100
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/native-original-build.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/original-accessibility.go": {
+      "sha256": "eb11be54e9cad93d0f110e6e1a0e632ebde111e210ec32d537693617fd03e2c7",
+      "bytes": 42495
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/original.overlay.json": {
+      "sha256": "4501e9a346660555dd468da52a82df76a5bafcae1a51f674f760b220daba4137",
+      "bytes": 259
+    },
+    "external/private/tmp/vellum-macos-geometry-reuse/prism-disposition.json": {
+      "sha256": "a897ce05eee8d18196a7e1a88635b8f0e2cb2109c301199916ca30277db888e3",
+      "bytes": 6885
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/compare.py": {
+      "sha256": "40139f493464ecd24add5ecbb380b87e51859f296acfbc7e494e57ed95c60012",
+      "bytes": 9912
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/evidence-review.json": {
+      "sha256": "d037ecd561721da28aed2e5099cd7cf7dfddd569759920a27b8dcd24cafe4227",
+      "bytes": 26585
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/harness-review.json": {
+      "sha256": "063afdbc1a3940799ff7e690e16d652750c3836083dc9994bbb80a7ecb882072",
+      "bytes": 4359
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/inputs.json": {
+      "sha256": "8331287b9b8aacc18157df4c438438a36af80cbc19184e774d90f61c83bde70b",
+      "bytes": 1309062
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/launch.py": {
+      "sha256": "e70523c571aefef042dd116dec409674dfee4b4bc26e2c48367036466b76ad21",
+      "bytes": 2538
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-1/native.log": {
+      "sha256": "c9c4540f230565f4afb1fc6481bab33e4f47cdc02e7d913bac1749d8d5f7845e",
+      "bytes": 151903
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-1/result.json": {
+      "sha256": "19ec5ad672abd14b4715bd7f49a2a4945ec9431d82ec173b5194a02bde36f626",
+      "bytes": 244130
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-2/native.log": {
+      "sha256": "7873eb486dc8e764b1b203b9561716629adba60abe4827f5ca725b36a2bb5102",
+      "bytes": 151929
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-2/result.json": {
+      "sha256": "df0b2ab11aec4d3e1e04ca1657bab0e9da5e0aff4854577547c7fa3596f0a888",
+      "bytes": 244156
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-3/native.log": {
+      "sha256": "63685d1d5d5be5b73a3ccf70228a08e02359afac3fb44a9dddbeb456b16c7511",
+      "bytes": 151904
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-3/result.json": {
+      "sha256": "3d17d389cc8b09dc20926cc0b0c82eb27f00f1bbbe9020db446ab30c1347bb2c",
+      "bytes": 244131
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-4/native.log": {
+      "sha256": "c5f2de4053511774e1364c33dff56fbc413eb2bbed775869d6e48cd2bb06a592",
+      "bytes": 151869
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-4/result.json": {
+      "sha256": "1545126676cbcc413af22daef1191efd94544b0216c9d11235261a0820dcabc0",
+      "bytes": 244096
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-5/native.log": {
+      "sha256": "7e7a6304d2e449fcc51d647337285e18c81e3b4e5edbe0b95e04410fc46827e1",
+      "bytes": 151886
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-5/result.json": {
+      "sha256": "a388fc27cd9ad15e29feb155dcb910ee456e2527446f51a3cf7370817aa395c2",
+      "bytes": 244111
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-1/native.log": {
+      "sha256": "a801204f5e04dbbb6cfa482520e6a8e7c201cd42c397a109698892f0ca24886e",
+      "bytes": 151983
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-1/result.json": {
+      "sha256": "9b137d0016bc190b88122300fbc2fbb84d7d9fa51e7a79b0750cad5796f75cf9",
+      "bytes": 244210
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-2/native.log": {
+      "sha256": "b1ae70efc7b684528e25ecd1a50c7d726420e5dee5fbece8bd3fff862df85f0a",
+      "bytes": 151926
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-2/result.json": {
+      "sha256": "bb0fbd10e891e836f0d7f89e5dd19a7079fe14cdd9c4dedd1ad7028becf4bb83",
+      "bytes": 244154
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-3/native.log": {
+      "sha256": "a016aaeab18737b51eadd022ca0145f642ef5af3409648f3a15babeb24e60ff8",
+      "bytes": 151877
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-3/result.json": {
+      "sha256": "1f843db9fdc3d74cecec82d1e6319059cae85fe596b9bb6fa64d1e1a8bddb92a",
+      "bytes": 244105
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-4/native.log": {
+      "sha256": "b0aa534a2655c4e3a757789f1ece673643cad4a185b1e9524f4fcbc6ab3b57a5",
+      "bytes": 151842
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-4/result.json": {
+      "sha256": "24fb5f7198106ac03b0971196f2b23545f489e9167e5b71e597985494cc8cf5e",
+      "bytes": 244070
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-5/native.log": {
+      "sha256": "d1ee4f0a9a41129f67c069a0582a96d338eced7c7047e7df2918e5b7e30fdcc8",
+      "bytes": 151971
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-5/result.json": {
+      "sha256": "e4b7080664b7688c9297b24ba59ac5a65e11eaabb641760f3bdb3923e53789e1",
+      "bytes": 244200
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-1/native.log": {
+      "sha256": "50504689a8764299a08624490be703197812f6795477e2909ff5afe4fbabb7a0",
+      "bytes": 152096
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-1/result.json": {
+      "sha256": "ec450c473aa748ef31c8bcda699e050d48533d4137bed75398c987aa19e97c8b",
+      "bytes": 244343
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-2/native.log": {
+      "sha256": "22fb05a0eb748bd298148900966477d2ca02d9efb6fe5d3453a76d94ba9625dd",
+      "bytes": 152063
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-2/result.json": {
+      "sha256": "e2ce095499b4ee38d2f72ccaa3ae8183aed8d3f5fd007a1a5dda161c183f4f7c",
+      "bytes": 244312
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-3/native.log": {
+      "sha256": "64ddd48f053df999696cfae88a904e83f8e401eb24bae20412eef2093a8063fc",
+      "bytes": 152071
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-3/result.json": {
+      "sha256": "8541c360bcd8af34adaed73015ff964d4688fc2c677e2addb210c55306a110c1",
+      "bytes": 244320
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-4/native.log": {
+      "sha256": "6b78043eaf06144825127ce8a1d243c9c3431bdb66179dda3db28bf810983ccf",
+      "bytes": 152060
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-4/result.json": {
+      "sha256": "b9762c71b1c137cbbab2056466219d636661c14d5bd696b4507cb2093009ae7d",
+      "bytes": 244309
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-5/native.log": {
+      "sha256": "8c916e0de9fb012ac029d9204bfb2b2a86924d75029151ce1b4730bfee37dc6c",
+      "bytes": 152089
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-5/result.json": {
+      "sha256": "2aa7031b9987155b88292e0760640004fa4edd18ca4a60f631ff8cfc58086519",
+      "bytes": 244338
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-1/native.log": {
+      "sha256": "948adb03ed7cc1b635e05b8f9d0c0ee76e707b009514eb434c1a43dd36e8da55",
+      "bytes": 152106
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-1/result.json": {
+      "sha256": "6c9e5cc862f1654b78b0094a183d52291d5339913727e4e35e1fa8d81d576ddf",
+      "bytes": 244357
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-2/native.log": {
+      "sha256": "b63080f53d322630f8d209a1caba98610a4323407e64cb019bdd8a61cf782301",
+      "bytes": 152080
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-2/result.json": {
+      "sha256": "2e17d4658ace007b81965034ea669a38b312c7f27eed23c35808d0b2350f4eae",
+      "bytes": 244329
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-3/native.log": {
+      "sha256": "f2914b285ebcfc9c8422ea6ccc0b22f30d10917d87a90c691d048c70da272398",
+      "bytes": 152085
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-3/result.json": {
+      "sha256": "bf45d2d57177813f152a807fe63b3f6111b1d28a6db2ff3a9a4def3f271859ff",
+      "bytes": 244336
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-4/native.log": {
+      "sha256": "a5aca63be856eb44d0fedf4db5f66ad7e00d8ebb5587118eb89aac42246d62c6",
+      "bytes": 152041
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-4/result.json": {
+      "sha256": "139cf437fa942356ef8810adecbc4fd63e78c9693f2adab53e4df1a15957eb38",
+      "bytes": 244291
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-5/native.log": {
+      "sha256": "562818132d97643783800e2ca0b6b539f2c03704d18019ded6fe5e840aecb96c",
+      "bytes": 152046
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-5/result.json": {
+      "sha256": "e73a5537d0d9f4f643f47dff486be76b0a666d7ab3b09f5b6ba3f20181fbaea4",
+      "bytes": 244297
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-1/native.log": {
+      "sha256": "26b57f259d4c1fb996c1dd26c3c9ea805f3a90f0993d40b52c8e6b2fc13c56cc",
+      "bytes": 151994
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-1/result.json": {
+      "sha256": "45b04ffff13b1eb7b91d9d50c29cbf7a174b315434ae6a33bc0a88be77bb659f",
+      "bytes": 244230
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-2/native.log": {
+      "sha256": "8ea92fc98dfe0393073bb7313626632870cc416e2c80c650ad78a48a425f312b",
+      "bytes": 151874
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-2/result.json": {
+      "sha256": "1c5538c174fd4fcb372bbd725d26ed06115cedaa89bcee388fb9a5af42ed5275",
+      "bytes": 244110
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-3/native.log": {
+      "sha256": "abac8531d24f55fb826cc122e20c0ba8b297b36b7b89a733515dd4bb5c233155",
+      "bytes": 151975
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-3/result.json": {
+      "sha256": "e268a5766751d25f3a8896da9b622596000c2164290c32b9d2e9e4ba692ebd51",
+      "bytes": 244211
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-4/native.log": {
+      "sha256": "65dce46bd5af1a11b13a63407867493ab09876fcd43eb56a805f93347581c84e",
+      "bytes": 151829
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-4/result.json": {
+      "sha256": "0f0410c12ec97e7c2783ed5d4a9502091fd9383db7452721f209e3d734fa17ae",
+      "bytes": 244065
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-5/native.log": {
+      "sha256": "7d383eb6e3c5fdfdfc5b0779092c1ec3296d52fcaa5b66bc26744d92715cb9a4",
+      "bytes": 151839
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-10000/run-5/result.json": {
+      "sha256": "e4a5fda8512827070126988d6d9d36e49128788975a190d825a92050078d50e8",
+      "bytes": 244075
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-1/native.log": {
+      "sha256": "2852d2a3787bf6d57a96f4c4db3a384a53fe5a225c4824546941c8936957494a",
+      "bytes": 151871
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-1/result.json": {
+      "sha256": "df5b57f2ce67ef4f9bc9a29506db9750db8210a8a2d6605d1031ea31ff739760",
+      "bytes": 244109
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-2/native.log": {
+      "sha256": "eb2cc6057a9c1ecc7cfb9a59656664cf64f5c3c41b0033c182e33a4bc5519288",
+      "bytes": 151913
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-2/result.json": {
+      "sha256": "83415b2c8e37272a532139437c9667f87ce278a4a7a3b34f43811f17f6f6cb0f",
+      "bytes": 244151
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-3/native.log": {
+      "sha256": "255fd193260d85597cd9d49c111bc1d263290dd555b92dc514057074eb6cc683",
+      "bytes": 151956
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-3/result.json": {
+      "sha256": "52d30e6f846ad863ebb1dd2ac9ddca722216f42b67e5010c5a7f3b37de6ab295",
+      "bytes": 244194
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-4/native.log": {
+      "sha256": "983f5e92cf5119ba2811842069c0135598cbd8a69fabacf4d5858894781c9f30",
+      "bytes": 151870
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-4/result.json": {
+      "sha256": "dc921ac2def08134144c0feadab00d29030d89600673b6e1c8614803be42a66d",
+      "bytes": 244108
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-5/native.log": {
+      "sha256": "5140cb0c8223740ec8bf12c2cceb6efe87fb8f7b1ee84ce9c1e4b4510853ea04",
+      "bytes": 151972
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-5/result.json": {
+      "sha256": "b849a2b4ac3edaebf2d1a0dfef5fb16df89aebf2dcb10db1e5e3a763e9df2b00",
+      "bytes": 244210
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-1/native.log": {
+      "sha256": "b2954488df596e76365057fa2229f5f8e1904f53631a529771cda8b1e3f07263",
+      "bytes": 152059
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-1/result.json": {
+      "sha256": "ca9046ebd97f042fc7ab27448d907db53d51efcfd4cf806b0e3010a5ff44ec85",
+      "bytes": 244316
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-2/native.log": {
+      "sha256": "d006d2a906e2e4d6ee46cdbf8909d2ee865d33d3a4bdb53ffff0f23fcf1fb0db",
+      "bytes": 152120
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-2/result.json": {
+      "sha256": "8b3eb4ae9b1280d9a08d5acb3f0f1004c75c0416623aca5be4b78b76824aabc6",
+      "bytes": 244378
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-3/native.log": {
+      "sha256": "2d3c9d7da4cf830de3a8fb8c347d5d2bf8cb5cffa694e41959aaac406421bc9d",
+      "bytes": 152138
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-3/result.json": {
+      "sha256": "a8f793738a3f1e5549cbd4a5a8a1efb318c681d83f8f5eac0f5aa4fc01d5030d",
+      "bytes": 244395
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-4/native.log": {
+      "sha256": "b6731275cb5f1255fc10000ec1861b911633e44f006bda97b0f270b399e80a44",
+      "bytes": 152078
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-4/result.json": {
+      "sha256": "74f5fd45b86d69861f38e6be207f27f6ef98c7826620853b465df5b1eded935e",
+      "bytes": 244336
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-5/native.log": {
+      "sha256": "e735c856f2a1c10ba6a0e5aac00f8198948bfb7e72b8e46a79fe67d7ac2c4142",
+      "bytes": 152067
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-10000/run-5/result.json": {
+      "sha256": "f729b4cecc2db204e6843ae56538722570f156531c5d5ba8bb4c804e713a77cd",
+      "bytes": 244323
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-1/native.log": {
+      "sha256": "e203facc4e810c4238e54c30bbeb1d362314ecedbf66b054f9df6d6da7d42432",
+      "bytes": 152074
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-1/result.json": {
+      "sha256": "878335f459356b8eef67bffb988a1515c786ad7bff4937eff146887414292151",
+      "bytes": 244333
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-2/native.log": {
+      "sha256": "adb0db0d4f2d709a15c6550221fa6e70c0733534e369a2b84a09751b9b65d461",
+      "bytes": 152079
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-2/result.json": {
+      "sha256": "c7fdb4d5e4520feb001cdf365d6be910dd50e3975f482e2f055f4e4d0038c3c9",
+      "bytes": 244338
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-3/native.log": {
+      "sha256": "407093d9dfe8d5a38f39f50a81053f7167e79745561e55e01ba8694ecc5ae390",
+      "bytes": 152076
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-3/result.json": {
+      "sha256": "f5253e6bf7c8fa79cde7a5a3cd93625fc08c612644a3b479bf20c48207884d12",
+      "bytes": 244335
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-4/native.log": {
+      "sha256": "7deac3e60c4439e50a7c988621dfe6b618330f52701dff704d31a49faab1a0a1",
+      "bytes": 152021
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-4/result.json": {
+      "sha256": "a262f62eb42dbe518b25e813fd9b5595544991b6845dd9dbab71d2862da02e26",
+      "bytes": 244281
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-5/native.log": {
+      "sha256": "3c234bd88bea01ae5c4d805c5c580213311beb0fe343bb1d3295729e7789873a",
+      "bytes": 152054
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/gpu/original/variable-1000000/run-5/result.json": {
+      "sha256": "16eb667fa19b96b7a7b407d5680ffecf91027ea655c75828fefbdfbdfb986090",
+      "bytes": 244314
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/progress.json": {
+      "sha256": "6bc0d2ebe036b8e95409d90ac1ca3a06475e456da0e97fc06aecec1ecf3247d3",
+      "bytes": 7763
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-comparison/summary.json": {
+      "sha256": "a12e5df7d5c3ca2a77ac1e48a84d14c98201bbca400353005767398131e0eb2e",
+      "bytes": 242210
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-queue.json": {
+      "sha256": "1580e30cb3234902bff37b25daadfeb3e03ac41112b6fe709f5e50ac2d875b49",
+      "bytes": 699
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-queue.owned-process.json": {
+      "sha256": "dd5cefcf7498edfd4f207604ec7e4eb91c5ea24776a0af4c904ee29ef90cba55",
+      "bytes": 310
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-queue.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-queue.stdout": {
+      "sha256": "8200c73edc0f1efe5332748fc71566256c3918284c74de761ce396ad3e076ca7",
+      "bytes": 2414
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native-summary.json": {
+      "sha256": "9602d8cce6f71df83588b768770d9938a911b31aa5e4c01a57b28ba47e06f3f0",
+      "bytes": 1514
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/native_identity.py": {
+      "sha256": "2f980fff981bf64d201b9a633fa8e6c5f78b9bb01971ae392e286f2b23a3408a",
+      "bytes": 638
+    },
+    "external/private/tmp/vellum-macos-span-scratch-native/predecessor-binding.json": {
+      "sha256": "9612621d6fd27342ca792f3fa1e87e04bc7c67980d0c212b3bbc327659cb67fd",
+      "bytes": 372
+    },
+    "external/private/tmp/vellum-macos-span-scratch/builder-original.go": {
+      "sha256": "e1d4847b3fa901ca6fa1c7b94dc266d84596b292f2311c60af20ff6271e30681",
+      "bytes": 10502
+    },
+    "external/private/tmp/vellum-macos-span-scratch/final-native-build.json": {
+      "sha256": "8a025ec0816224b40dce9d8a92294c7e94818565a7b73bbb61a49b0dcda1b142",
+      "bytes": 1408039
+    },
+    "external/private/tmp/vellum-macos-span-scratch/final-native-build.stderr": {
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+      "bytes": 100
+    },
+    "external/private/tmp/vellum-macos-span-scratch/final-native-build.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-span-scratch/generated-testdata.json": {
+      "sha256": "7eb3d9d1e252e64ba06b03baf97b7b9b2d3b3265da199a778b3847ae0cd96910",
+      "bytes": 2156
+    },
+    "external/private/tmp/vellum-macos-span-scratch/internal-final-review.json": {
+      "sha256": "d40dff2024bfd9196f8d915b174f5bbebe672b6ff175d41ac8ef9641ce26bae8",
+      "bytes": 28995
+    },
+    "external/private/tmp/vellum-macos-span-scratch/original-native-build.json": {
+      "sha256": "697769d42555e2e4cb474ef927742dce33bdde2a43bc4ff4da5a5db958c99e74",
+      "bytes": 1404528
+    },
+    "external/private/tmp/vellum-macos-span-scratch/original-native-build.stderr": {
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+      "bytes": 100
+    },
+    "external/private/tmp/vellum-macos-span-scratch/original-native-build.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "external/private/tmp/vellum-macos-span-scratch/original-native-overlay.json": {
+      "sha256": "76898f6057f95331b67dd50587fab5186fe282907dc33eb83ff2ff36f65f97e4",
+      "bytes": 191
+    },
+    "external/private/tmp/vellum-span-scratch/docs/reports/macos-span-scratch/records/qualification.json": {
+      "sha256": "bab375ee1f1894ee092bfd65fc01d98ed84970fc9ff57613d163829940a02d2a",
+      "bytes": 7755
+    },
+    "external/private/tmp/vellum-span-scratch/scripts/benchmark-grid.py": {
+      "sha256": "c99da36325b5a978917f8f8168dbabf9be7a1428d42a73f1f13e3307489389e1",
+      "bytes": 32623
+    },
+    "external/private/tmp/vellum-span-scratch/scripts/sdk_environment.py": {
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311",
+      "bytes": 1356
+    },
+    "geometry-native/compare.py": {
+      "sha256": "12e74ff86da113cf96ea850974e2aff88940161db7c89c4f0891f067efe5f7c5",
+      "bytes": 9738
+    },
+    "geometry-native/compare_v1_unlaunched_schema_error.py": {
+      "sha256": "15dd2ff7e65a380e031c7acf2424c31d62c010a13ebafc1e2b5b89ddb1e425f1",
+      "bytes": 9484
+    },
+    "geometry-native/evidence-review.json": {
+      "sha256": "707ac848823231d19a3a905d4ae0d6edc94a0931c5a14ec1b324fc9697afcf9e",
+      "bytes": 45268
+    },
+    "geometry-native/evidence-review.md": {
+      "sha256": "12469873230892acadd340cfa2b2d43df522afe2acd4971a13e2a65a4deaa5fd",
+      "bytes": 1362
+    },
+    "geometry-native/harness-review-v1.json": {
+      "sha256": "e3ad17d4d56cac4ec347bab701ab56c8e64efecff55ca4d69490cade5443dc22",
+      "bytes": 895
+    },
+    "geometry-native/harness-review.json": {
+      "sha256": "de7cf3af51927a0a55794080f410eaf02c9aea64621b8e802455e015526f1381",
+      "bytes": 5914
+    },
+    "geometry-native/harness-review.md": {
+      "sha256": "bc0dbd6f576a0dba248add0a8a87cbc134b572dbbd9fce1be15da78389e8f096",
+      "bytes": 1072
+    },
+    "geometry-native/inputs.json": {
+      "sha256": "aaab4de8cf0ecbcbc46341fccce857ad16e05d003c84630aa344455689eb10dc",
+      "bytes": 1308939
+    },
+    "geometry-native/launch.py": {
+      "sha256": "d9534ab7ae5dbd7f22fcfd8fd7f75654611fbb141cf949603a7847b0db9c2282",
+      "bytes": 2534
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-1/native.log": {
+      "sha256": "f01e1e4f63844d7a9f7a5dce80e8e39af846bc8a825a9ef9778f748fe768b5d4",
+      "bytes": 152269
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-1/result.json": {
+      "sha256": "a195e88d1a5a7ba3a741adc39793d42dbe2caa3b465fe11cffea6d20d0a54a8e",
+      "bytes": 244480
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-2/native.log": {
+      "sha256": "ea3bf3947b9a7e5a3b053a279f738560cf61622fbd16d7d4293b7ff393ce26c9",
+      "bytes": 152246
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-2/result.json": {
+      "sha256": "87370b8f1dab4826678223056c2764afd990877501f4ba40871eb12e23757cd5",
+      "bytes": 244457
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-3/native.log": {
+      "sha256": "85c3b8113e2977956df5aa6aaa7c804f10e9fbd0975ff6e7c3b9940403598ecc",
+      "bytes": 152248
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-3/result.json": {
+      "sha256": "ec975f1dfb00622af2a58f49b23fc120ed049e91fa3986c84b925a8069ec626f",
+      "bytes": 244458
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-4/native.log": {
+      "sha256": "b320308a6710137dd5b8df693ef9a9416895ac58bce003740141006e1e3d460a",
+      "bytes": 152252
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-4/result.json": {
+      "sha256": "9f1f9e2933ba181afc034645e8e11c5ea1de99113fced8c55e57ab8f386b024a",
+      "bytes": 244462
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-5/native.log": {
+      "sha256": "a906b2141b2f4556e7b5cd9e3d598038f3333086fd842f4c5e4dbd56b5e7bd2b",
+      "bytes": 152280
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-10000/run-5/result.json": {
+      "sha256": "fabcd626d8f6be5c505c1dde4cc7d42e26a190104200c787a5f80fd554ad5db6",
+      "bytes": 244491
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-1/native.log": {
+      "sha256": "37dc4892f88507aced69c4af38e599da576076b834ac599a047073ae9d66a536",
+      "bytes": 152287
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-1/result.json": {
+      "sha256": "88e4dab74c2bea6fe934ad3a46b41eb373e85cad7ae3713bf4a3810678d147e1",
+      "bytes": 244499
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-2/native.log": {
+      "sha256": "fa7206ccfb882bc1ba70eeef29f6a9bd09cd24e49b768481406f3065b34c5f70",
+      "bytes": 152260
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-2/result.json": {
+      "sha256": "190465f9ccc9eb835639e5538fe1e7fd0df3188393a6a90546f78a0d9065ffe6",
+      "bytes": 244471
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-3/native.log": {
+      "sha256": "bc16d8c8a326b06c9abeaf24a56f70c518fdac57ae461f17220664af7fa34a8e",
+      "bytes": 152203
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-3/result.json": {
+      "sha256": "e4c927966c4728877cd6eadd8fa69c43231ad53f72019fcf6b0e210a1e4091bc",
+      "bytes": 244416
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-4/native.log": {
+      "sha256": "dcd4b0c8cc184ff021731c03e82f82eb8569df113de7576e5beedca7add766db",
+      "bytes": 152248
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-4/result.json": {
+      "sha256": "22a27214f41664a64814eeed4638ca1c20ebb0fa67d246fec967836303a1b440",
+      "bytes": 244460
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-5/native.log": {
+      "sha256": "d0999e8f4c87809def343019beac4ef0821cd2d1a3777d559a4a40a6cd992839",
+      "bytes": 152329
+    },
+    "geometry-native/native-comparison/cpu/candidate/fixed-1000000/run-5/result.json": {
+      "sha256": "2089065fe4c3b13b57769ee7e7cc948542ec579df32137e4f5aa9fe6a88d8543",
+      "bytes": 244542
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-1/native.log": {
+      "sha256": "aaa287b052b1f5c617238bceffb6a504442a17af808c138d96bcf4f444bc01f1",
+      "bytes": 152283
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-1/result.json": {
+      "sha256": "108884376e5ac7c82745395138a88aa71fdbf1707f8f28d4b4d37648013607f6",
+      "bytes": 244516
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-2/native.log": {
+      "sha256": "eca63b219a33d4355b12b3b81fc3a3da201711312ec67f4e2cfccf12cbc44fd1",
+      "bytes": 152268
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-2/result.json": {
+      "sha256": "4e4dfa0e34ba4f727e8818fcbf9f40c868aa0676e1f03943651b07185c97f080",
+      "bytes": 244501
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-3/native.log": {
+      "sha256": "611087a06a08267720d2ab8c4edf4153c637f850ed1f1b1fb5afcc37050a160e",
+      "bytes": 152273
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-3/result.json": {
+      "sha256": "b12b77d17a8d2c822549fbbca2a8e876faf48812275bc08ae05d56005c462d67",
+      "bytes": 244505
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-4/native.log": {
+      "sha256": "d35e63dd1e3f0f57f96107db7feae00a15b33e21acb71e9d09f6637a0be68e70",
+      "bytes": 152259
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-4/result.json": {
+      "sha256": "d84687039110d63572008608c9f76b20aa05d9d9c8a5d9b6baf9d18548f1efef",
+      "bytes": 244490
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-5/native.log": {
+      "sha256": "45ce6bd1fd8770d60f965c970055d59328979309907787b62f9ac280ce435b1c",
+      "bytes": 152286
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-10000/run-5/result.json": {
+      "sha256": "171c5d0826e5edfe3f288c9951a7721d4f221ca3840f41437bc6e4b7b53876ea",
+      "bytes": 244519
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-1/native.log": {
+      "sha256": "294578c7640445f9811242f1fd43704d64b9e8707bffe576da2f64548b866ea6",
+      "bytes": 152298
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-1/result.json": {
+      "sha256": "58efb1ae70019fea718e789805dc308a86e1778a11094451728f6f7779059b3b",
+      "bytes": 244532
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-2/native.log": {
+      "sha256": "8164d45fad7d08a4523ae02385dbb673242a06e4aa7b8dde299be4fcc04641b9",
+      "bytes": 152274
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-2/result.json": {
+      "sha256": "f9f66ed8559ef6801174ee6ca856938764f44e535873e1db5e24b1399ac29a35",
+      "bytes": 244508
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-3/native.log": {
+      "sha256": "8136381d382bce993cef4f93c9f9597c642f3622650f36966593a5ffcf473f14",
+      "bytes": 152310
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-3/result.json": {
+      "sha256": "99f56a93bb9e2178c08a9b74d6cb71c0e936b8b3b15fb69e2b38e30360a8ef64",
+      "bytes": 244544
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-4/native.log": {
+      "sha256": "b83cbe270544fc34a4d1cc103e9dedcb200fdd92ea46f8f1ec0aeab790098227",
+      "bytes": 152283
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-4/result.json": {
+      "sha256": "cc3bb07defd97a7ebc28ebee5d0ade2bae43706ff1d0bff34bfe26ae1cf638dd",
+      "bytes": 244517
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-5/native.log": {
+      "sha256": "3d6eb32eb061994b54006883f7b289a49657f3a588975b00223ee08d1759dd70",
+      "bytes": 152323
+    },
+    "geometry-native/native-comparison/cpu/candidate/variable-1000000/run-5/result.json": {
+      "sha256": "d19cf923f99e708137c2164d8d25f02cd681664331010256fa8f2a72ee3f222f",
+      "bytes": 244558
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-1/native.log": {
+      "sha256": "771751efc3f5436f997e9622a048ca540fc75c39844004b7d12d22ea258b618c",
+      "bytes": 152208
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-1/result.json": {
+      "sha256": "3388f92470d990f675d8a51973a2f8362cacb4cc3cb49cba578045f90de3ac2b",
+      "bytes": 244427
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-2/native.log": {
+      "sha256": "416c80be3a4cae4c1fd37cbb84517774d3dca4e6c6eff076c2974cd945883de6",
+      "bytes": 152196
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-2/result.json": {
+      "sha256": "92948b5d7afe71d3a0639f6e621de75eec879c9d7532e743c4e65ff65927f287",
+      "bytes": 244416
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-3/native.log": {
+      "sha256": "6d88133b3fdd41145a1eda6af404c5d2a8dc436107303f3d219d5d81307f4fb3",
+      "bytes": 152262
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-3/result.json": {
+      "sha256": "334fc4ae62ddcd2a4c4433499e4b58805cddd1c8a190e51d2811cdfc98c69b1e",
+      "bytes": 244480
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-4/native.log": {
+      "sha256": "af8358b1fa037421ee9b17225fcd6232b4672fc1e01bf3aaee3de9cf133b64a2",
+      "bytes": 152236
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-4/result.json": {
+      "sha256": "f9bdb136d89830d985ddb17f4c19d109e553b7a2e32dacb682c9565e7251c935",
+      "bytes": 244455
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-5/native.log": {
+      "sha256": "a7e095e4a36597845c59ad7dc34001ed899e446b1ccaae3e74bbda9949ec81a1",
+      "bytes": 152241
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-10000/run-5/result.json": {
+      "sha256": "d4bfbdacbf481130391ca7183bc1abbc94e123e950b3205b932aeec794b48b2c",
+      "bytes": 244460
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-1/native.log": {
+      "sha256": "b97dd3b7bce2f2037ff1a84e91158286f93304dcd831da94b6080da5d4711377",
+      "bytes": 152277
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-1/result.json": {
+      "sha256": "9bfd78d24be2d7ed726af69438b612d15d3b0abde0082fad05dff57257584813",
+      "bytes": 244499
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-2/native.log": {
+      "sha256": "4807bbc00d731285e98d1f1673c48d1ae83272e1fc0b7c378791a5075e7fcc94",
+      "bytes": 152281
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-2/result.json": {
+      "sha256": "ada34cc7e9402e18533fce1ea5589f1e95c0603d049ac1f66c9e6da630655eb7",
+      "bytes": 244503
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-3/native.log": {
+      "sha256": "4524ac901edc0c959a80e08336a7c07c81d63bf27025d3f668c4c325af0ec15e",
+      "bytes": 152263
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-3/result.json": {
+      "sha256": "499fc8d704ed7e0e8f4b16e0ac162b83705498d855b85380d8d3b1e53a3d502c",
+      "bytes": 244484
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-4/native.log": {
+      "sha256": "416c20f1fbc12f6eb944782ebf690ae5935f817301dfaeb25f712840bc8b8ff3",
+      "bytes": 152255
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-4/result.json": {
+      "sha256": "91efcfc4bd0dfe5116cd881fa4a2e66ccf36ec719572b88c9fa89ca27b0d07ff",
+      "bytes": 244476
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-5/native.log": {
+      "sha256": "fc1263f43f61ab62cc938b15fa557b114b55bd3b6003c30e1f3d3b61070e307d",
+      "bytes": 152289
+    },
+    "geometry-native/native-comparison/cpu/original/fixed-1000000/run-5/result.json": {
+      "sha256": "9eb340cb806331b74b2d040763982c4aa312ce49e3569db4d134bc5acb8e362e",
+      "bytes": 244509
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-1/native.log": {
+      "sha256": "41817f74cca020c895a5017e205e64f2c692944413deec4120d0d15f32c51c8b",
+      "bytes": 152284
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-1/result.json": {
+      "sha256": "07009cd66eab386a44c5af0103e95616d6d804720a11990ad04ee0f755b89b2a",
+      "bytes": 244525
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-2/native.log": {
+      "sha256": "c9c3c79a07f65361d973950cea89fb902c8daf59fa8ecb52cc87d9e226f93649",
+      "bytes": 152264
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-2/result.json": {
+      "sha256": "63aaf983ed00c7223de7694c9c12d4d74119b30f643afdb92921cf87dbb8afc8",
+      "bytes": 244505
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-3/native.log": {
+      "sha256": "3b32dab7f0277f57586164c419518630c423a46abb4dd063f90447053f285e77",
+      "bytes": 152285
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-3/result.json": {
+      "sha256": "ca38888337436e29aec34ab9f8d29bdd93033b718b643c55f56cc2d8a00f2f0e",
+      "bytes": 244527
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-4/native.log": {
+      "sha256": "3c500e0641ad00ff9fc96a6daa63b57f8f2e61ab5048e7cba4847659b443066f",
+      "bytes": 152280
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-4/result.json": {
+      "sha256": "6a0b59ace18b818dc8c683b419970eb76ad37984fcafc8059ce7b4d387d7343e",
+      "bytes": 244522
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-5/native.log": {
+      "sha256": "0fc7058455e09aaefe95d31dc5704875de6b10bb328c96189f1dfedd723da97a",
+      "bytes": 152266
+    },
+    "geometry-native/native-comparison/cpu/original/variable-10000/run-5/result.json": {
+      "sha256": "c45c277d82dcb4b1bd6203e8c691fa804f9785506d3405e57c1d755b7b02c0e8",
+      "bytes": 244507
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-1/native.log": {
+      "sha256": "85410cd8b763cf3bb3d0369469248a610a4a8ac46a6efd96a48eeeb3efb2a22a",
+      "bytes": 152321
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-1/result.json": {
+      "sha256": "56389f365c5555a2bc91a66d946f5f64e2e8c4c7edf95d6b31bce461794934b9",
+      "bytes": 244564
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-2/native.log": {
+      "sha256": "04cf6e05123d4fc487bf5621ab1b571f7f3a0d5ce948fa1f074030e8a4984973",
+      "bytes": 152326
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-2/result.json": {
+      "sha256": "71cb958260f3d10e8fca66abc0fb7ee53ae1bddd93988fe0756d9a3a40874493",
+      "bytes": 244569
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-3/native.log": {
+      "sha256": "c9d77d103bf01bdc32e407dd22c7b8b5cec29baded72e06c414a0a5ecb90298f",
+      "bytes": 152299
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-3/result.json": {
+      "sha256": "373ef314c5bdf368cb1c9d48ced786edc6f27bf2708729d31a5e53ef45fc0d8c",
+      "bytes": 244542
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-4/native.log": {
+      "sha256": "bc7a92f4cd6127a8b4d800208b0119a0052a6cccae0861bc5a52a31029999528",
+      "bytes": 152310
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-4/result.json": {
+      "sha256": "499ab021974b31978eb64956487b3556a8d2ad3d9be3ada66076d6617398ee78",
+      "bytes": 244554
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-5/native.log": {
+      "sha256": "4795f5a40cb8e5000b00de81061359e52a31373984ac50ea8cc46b33796f0bfb",
+      "bytes": 152311
+    },
+    "geometry-native/native-comparison/cpu/original/variable-1000000/run-5/result.json": {
+      "sha256": "7423617d0aeeeb6bfb99c2eab0d1bb36a625451b594f83ad7babe05bffb1e852",
+      "bytes": 244555
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-1/native.log": {
+      "sha256": "0365496770303f429c68668186a53e34148fb8f9d033d3a8c55b765d8fdfb4e4",
+      "bytes": 152079
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-1/result.json": {
+      "sha256": "7cdb75552ad345c74fd827c98da86e463240689eeccb471e13e1c7399c1ca66e",
+      "bytes": 244308
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-2/native.log": {
+      "sha256": "13259b4c78a451cb28d2c6a3af3ced025254eb9236f3a8f93f59994853190ec6",
+      "bytes": 152007
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-2/result.json": {
+      "sha256": "98c2a33b48bf30d670c36c092069c440c375b3e4ee690c479a898e2c8fcf12db",
+      "bytes": 244235
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-3/native.log": {
+      "sha256": "13c170614b7f504b94f76c0152405a85ef97d5160729a41e8ef7b1050c107ca2",
+      "bytes": 152078
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-3/result.json": {
+      "sha256": "5e8a65f2d44b705107199fcf81e0b45354d38e731f4205e0a63097e391096c8b",
+      "bytes": 244307
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-4/native.log": {
+      "sha256": "6e5fcc48ac909ec40928de3d81c10e938266bd31659f5e951b05310ba6c44a86",
+      "bytes": 152043
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-4/result.json": {
+      "sha256": "6a8a48dd81f9c6957b50c937eac9f41a6b0b789722fbd5cbde90a2bf8c0b2eb7",
+      "bytes": 244272
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-5/native.log": {
+      "sha256": "0f5e989ce53cf5c3cf42034ebc89795254bdc3e8b2aa79507c20769956657533",
+      "bytes": 152005
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-10000/run-5/result.json": {
+      "sha256": "9f2152772f88afd71103dc46373a154a621928daa28764e3b982069866d0a4b0",
+      "bytes": 244234
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-1/native.log": {
+      "sha256": "3d06eaca51148858383a015861875b5e2a6b4c331d179d096f2f23a325016a3b",
+      "bytes": 152002
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-1/result.json": {
+      "sha256": "f41db73f18c2aa731d057ba56689f542043492dedb11bf7ab09a4c245920709d",
+      "bytes": 244233
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-2/native.log": {
+      "sha256": "b0d66b5602aca47f26d044992900701430277c0270961ecbf3994e135c560f45",
+      "bytes": 152062
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-2/result.json": {
+      "sha256": "2db88a362c01360c7624feed7146023480e42e5b8e55c28b286b29bcf811cc88",
+      "bytes": 244292
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-3/native.log": {
+      "sha256": "be8d743f5a29623bd290ba442fe89a97e76474f46c98f21dd43a66d416fb006f",
+      "bytes": 152003
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-3/result.json": {
+      "sha256": "86976d827b851186dadc6313631901e9a0c74f1b8467046dc59c665a066390f4",
+      "bytes": 244234
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-4/native.log": {
+      "sha256": "a9e45fb5ee4b0f33bc2ad0b5980b1d5f42d19d07042675b87b2432e180fbc0b6",
+      "bytes": 152068
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-4/result.json": {
+      "sha256": "260c57facc7ec4a69955acf6cb326ad3829d4a385a0abbc267c91510339d00da",
+      "bytes": 244298
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-5/native.log": {
+      "sha256": "5cf9a3d5b38948e9663298520731980f486195e7126b85ffa0d463df644a3356",
+      "bytes": 152063
+    },
+    "geometry-native/native-comparison/gpu/candidate/fixed-1000000/run-5/result.json": {
+      "sha256": "75e341b4f04bdf852dca0be1d906a26f0e0c823aadeb9f068fe238ff7e67fbe6",
+      "bytes": 244294
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-1/native.log": {
+      "sha256": "c7fd41bda26aea249a7dbdbbccfeb23638cb560f5e032936de99283522b270f6",
+      "bytes": 152074
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-1/result.json": {
+      "sha256": "94580e2c56ad1e8d5a11f8f7dd827b057f589c70c30039d86461e1fc380e1787",
+      "bytes": 244324
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-2/native.log": {
+      "sha256": "13b834391b0db69fe08a0d694ec98edb7703a160f770e1ff80e19cc61f8cbed9",
+      "bytes": 152099
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-2/result.json": {
+      "sha256": "f13c77fce74fbb78a0a720323593b4b99bf91c9f1ed3cb55609a726309ef570a",
+      "bytes": 244349
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-3/native.log": {
+      "sha256": "7c50088c25605d86c5dc5777bdce3d8e29254c385982fc4eb5de1ffa521ea4ac",
+      "bytes": 152164
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-3/result.json": {
+      "sha256": "aa396fa0dda17c233c2b4328c9b1714a716db10a370cc2b748518edbb8e5af8f",
+      "bytes": 244413
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-4/native.log": {
+      "sha256": "643380f720c6e0fc64aa5bdc0ede93889bac45e5d8c1b95fb6a838bdb1c38824",
+      "bytes": 152068
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-4/result.json": {
+      "sha256": "866480a593ace0baa6f7c2e6ecdc2be68a03b35a8ebb01859c3438264ac1eda6",
+      "bytes": 244318
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-5/native.log": {
+      "sha256": "748bfd4edff4121263d3cab33c950860f4c4863acd104d87798322b14b5aee27",
+      "bytes": 152105
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-10000/run-5/result.json": {
+      "sha256": "9b4512cd8c3548a11be727c215c37a22d703a2a03e8ee0d18568af55f6d1052b",
+      "bytes": 244356
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-1/native.log": {
+      "sha256": "6910a8960b7fe5042b11ea768e8e3d1eacb579b5f8794365b7dfc6247d9c7769",
+      "bytes": 152083
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-1/result.json": {
+      "sha256": "2e57811d31c31e5d7e8091f67481471e3b36cfe8c86ff3f0cdf9f878ad666459",
+      "bytes": 244336
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-2/native.log": {
+      "sha256": "c2059529bf83511dd2033dcf10099b26d860f4c43fe2ebfd541081c49b62adb5",
+      "bytes": 152170
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-2/result.json": {
+      "sha256": "71a0cfe332df75599738a3a83592274887d5e99e81bf0168bf3ec187183ab581",
+      "bytes": 244422
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-3/native.log": {
+      "sha256": "48ebe1601a936fc812cd15e9569ed2c763bab5efed13e86f923000c97807fcb8",
+      "bytes": 152058
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-3/result.json": {
+      "sha256": "5b867da032640b5fb3e71135f7f8a6323a1950e31d535e0ae22382650f362a45",
+      "bytes": 244310
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-4/native.log": {
+      "sha256": "123bf0dd13af983ffbc93bfdb00662204d8bc56b144cbd65b2412bf2ca01efc7",
+      "bytes": 152061
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-4/result.json": {
+      "sha256": "849e214d55553415fd761bce828b1b3b9902814f6770b4a6ad8af9d344cef6c2",
+      "bytes": 244314
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-5/native.log": {
+      "sha256": "29a3d90fe382e8fb89074eb9a18074bb8d13102ff3fb2abbc0e857dba0bed3f2",
+      "bytes": 152052
+    },
+    "geometry-native/native-comparison/gpu/candidate/variable-1000000/run-5/result.json": {
+      "sha256": "5fe60fdcc6c4b5e757fa422dcfc0da1ce5364cbb07c7f0282637ffe990d5ed06",
+      "bytes": 244305
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-1/native.log": {
+      "sha256": "4c890c22babfb7ec174accc4b5a5d469abb2516a54f0374911506e969948adc6",
+      "bytes": 151999
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-1/result.json": {
+      "sha256": "f3b554ddb90d39d5661aef3fecbd12470cc8feee244cabcef25d976bfa7a05f8",
+      "bytes": 244236
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-2/native.log": {
+      "sha256": "7b2173c5d96036c5e51805f095df4f591fbfec139d76ba0ff3ae99207dda37ff",
+      "bytes": 152001
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-2/result.json": {
+      "sha256": "72c718687d61f15e643a376e122ec3813bdf1dbe133b840ced6c0cb8afcc6a24",
+      "bytes": 244239
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-3/native.log": {
+      "sha256": "2a1c3e76a1e897d63fbf51889a60401cf80458004bf68c879971e5d24f680ee3",
+      "bytes": 152028
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-3/result.json": {
+      "sha256": "1a6fc6b6b49c522527a307270057772b0b4a225cfc872053c6c286105ec66045",
+      "bytes": 244266
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-4/native.log": {
+      "sha256": "5978613b6b98f2c93957db22c18d1b48153f260ad3095c744f7bc2672ec8a1e8",
+      "bytes": 152005
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-4/result.json": {
+      "sha256": "aa4f8debdcf34cec0bfe981ba0a4dfe0b0fc823c831dad92ba04f929d2911f44",
+      "bytes": 244242
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-5/native.log": {
+      "sha256": "2be4ebc24810e714b29acc01d6f2ef43ffba420c0e8a942e7ed68d0c90d94716",
+      "bytes": 152071
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-10000/run-5/result.json": {
+      "sha256": "03714d3306488472faf61af6ba03176d02c7ee6b2427f72090ae0366b2a405dc",
+      "bytes": 244309
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-1/native.log": {
+      "sha256": "05335ab542f83cabf693f9c28e56b6095cab09c326ac79930451260f9f025fdf",
+      "bytes": 152000
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-1/result.json": {
+      "sha256": "7e15a9d076aefc0e6b298e4735b1ec16919695850ede2ea8c093a155addab067",
+      "bytes": 244240
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-2/native.log": {
+      "sha256": "4695605ead191b7a219ac6c52775023578bd96d0436f5adb5e1bdc178962ef2e",
+      "bytes": 152007
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-2/result.json": {
+      "sha256": "790c13642414ec4bd9638790b52c7860654210352bbd20c8d99421c5f0a4324b",
+      "bytes": 244247
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-3/native.log": {
+      "sha256": "2551139c481042a7e8c6af8bd86f5af89d40e5cb5dfc25da7b7f8dda135df53b",
+      "bytes": 152006
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-3/result.json": {
+      "sha256": "2a5cb5723bb117d3e95e092af8cb8d16cc05ecd400cad2fbdd1058e24532bdb2",
+      "bytes": 244246
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-4/native.log": {
+      "sha256": "d2340b1e0b8d853a05b4afb89f92883c118743e8bb6a95e5e6b6abeac264dd30",
+      "bytes": 152013
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-4/result.json": {
+      "sha256": "e4e9646fbd55db27e21c6a6e84be884358e394558ac3342f805c0f1727efbaab",
+      "bytes": 244253
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-5/native.log": {
+      "sha256": "a9790edc4de18b4017f5c808dcb5eff81876fd0dd1748af737f3fe9727fb0a1d",
+      "bytes": 152066
+    },
+    "geometry-native/native-comparison/gpu/original/fixed-1000000/run-5/result.json": {
+      "sha256": "da1d9c3baf84f331af1b2d05f22df0a4f3b2d52e023fe4bc3c331e332e776694",
+      "bytes": 244306
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-1/native.log": {
+      "sha256": "c36584e0117c3b34f452523ba2f5ef55d71287649e67e201818cc58e9a0b5252",
+      "bytes": 152134
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-1/result.json": {
+      "sha256": "7f2d194c0abe3ff533016baad41b806a094fc7ebfc3e1e33993f0bec6788534d",
+      "bytes": 244394
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-2/native.log": {
+      "sha256": "377f22306cc94691916267920c86be09c1f3e7447057d879e0a047c201996ed5",
+      "bytes": 152098
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-2/result.json": {
+      "sha256": "ef9750b3df98157c9446d058fffa52781e2e1e0345e20c79a5254529cc0704d4",
+      "bytes": 244358
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-3/native.log": {
+      "sha256": "723e8af7709ababd4ad12903df69554e9dbf92d2a2fe0c848ca6f4a7ceb2783f",
+      "bytes": 152114
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-3/result.json": {
+      "sha256": "c60e028d66dbc3ff6becc80ad307d9b2199bdb488970db07ce65d810f48fe946",
+      "bytes": 244374
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-4/native.log": {
+      "sha256": "b4106b3bd92daab057b5aa7213fa3d195e7db6f00951f843c8943652e8cd2277",
+      "bytes": 152078
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-4/result.json": {
+      "sha256": "4ec31a4a319127c98618865c325639d3d69f72e8c4ebc9bec9edfd454b1fb7df",
+      "bytes": 244338
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-5/native.log": {
+      "sha256": "80201d0bae48d955e536b47d757f26b70d1e068906097a291d2cabecc08c1d0e",
+      "bytes": 152097
+    },
+    "geometry-native/native-comparison/gpu/original/variable-10000/run-5/result.json": {
+      "sha256": "a8f6502a3b021302925c031280427b164180b5f8f05d9a32b6eaf8e10628b44d",
+      "bytes": 244357
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-1/native.log": {
+      "sha256": "0f5e54f74943410ecd99f07f233b84cff445a3527075936a1a4369497a93572b",
+      "bytes": 152064
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-1/result.json": {
+      "sha256": "65b61e1213a401bfa7b9bb67524a45133a2042a8c44d182014861d3df822e677",
+      "bytes": 244326
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-2/native.log": {
+      "sha256": "03c82b2bd216117dc3d1b80bf698debfb2d58c2690f178fa7fdb8a6e49ff0d88",
+      "bytes": 152048
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-2/result.json": {
+      "sha256": "78e4853392446358ab37096357f0a967fe78872714ef93062affaa21d74203b7",
+      "bytes": 244310
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-3/native.log": {
+      "sha256": "bb990ed578725472113831443a1296d52f21b5e63e811426fbc25e0194fc5625",
+      "bytes": 152089
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-3/result.json": {
+      "sha256": "3fa4855fe5cd7612f836e89e80d66297ea00312e8c73f61c4b16bbfddd677669",
+      "bytes": 244350
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-4/native.log": {
+      "sha256": "2344be6271468d81d74cfd5f90da178d67c4695b48ca86f1ec628190810541e6",
+      "bytes": 152037
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-4/result.json": {
+      "sha256": "d8e0fa0abc3573adc06594516bf8006cff0e247ce8023090734886d9cb566bda",
+      "bytes": 244299
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-5/native.log": {
+      "sha256": "84d9cb9b4c73d58237ed173c58e47ccda4fc20867efb88fc11de3847083d7b24",
+      "bytes": 152077
+    },
+    "geometry-native/native-comparison/gpu/original/variable-1000000/run-5/result.json": {
+      "sha256": "6a9e1ab20e835c98d62d9e8ffe1421cb9c653eb3e35e3820348101550ac3acfb",
+      "bytes": 244339
+    },
+    "geometry-native/native-comparison/progress.json": {
+      "sha256": "f87affe81a389fb0eacc5eff0b9c31e67b10fc9dd3dc047b6cfb340673a6afdc",
+      "bytes": 15523
+    },
+    "geometry-native/native-comparison/summary.json": {
+      "sha256": "3ff6ef09a0265a25da85812c963a36d97eb9203eaae619b65c4c3511de6847c4",
+      "bytes": 484102
+    },
+    "geometry-native/native-queue.json": {
+      "sha256": "e5d86444ca17c7ef1ce7c06fe326b3eeecab447d92a071192d1040386dd97e98",
+      "bytes": 695
+    },
+    "geometry-native/native-queue.owned-process.json": {
+      "sha256": "d4a960a458dc5ef4438d8dacf418eb918c791852c4ff1ca07cb46f07182226f7",
+      "bytes": 306
+    },
+    "geometry-native/native-queue.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "geometry-native/native-queue.stdout": {
+      "sha256": "6743172a38bcc269b65e0746d93627fedaebc7aa7e9920f0c35aa7f82b3bb05c",
+      "bytes": 3852
+    },
+    "geometry-native/native-summary.json": {
+      "sha256": "f62d9308022e006b83c885811ab0faaab3ddde800747f2f8173985624c8b9a0a",
+      "bytes": 1602
+    },
+    "geometry-native/native_identity.py": {
+      "sha256": "2f980fff981bf64d201b9a633fa8e6c5f78b9bb01971ae392e286f2b23a3408a",
+      "bytes": 638
+    },
+    "geometry-native/post-terminal-group.json": {
+      "sha256": "ac7ce98d92b781049a8215d5923f5b3c5df81f2d98710f0aa182c1aa15274ae4",
+      "bytes": 425
+    },
+    "geometry-native/predecessor-binding.json": {
+      "sha256": "9f1fcbf671fba044ad2e15f1eeca281683719824ff9d908195579637c2d95c54",
+      "bytes": 446
+    },
+    "native-evidence/archive.py": {
+      "sha256": "764b20daac4d53390c0226db6496ce9a67a2d281c2d444e26f6b60b1d07ae2f4",
+      "bytes": 4454
+    },
+    "native-evidence/checkpoint-source.json": {
+      "sha256": "3914c0acf52d4ba444bc3830251020c8599802185ca6a03db9b913ff18fb83a0",
+      "bytes": 511
+    },
+    "native-evidence/code_run.py": {
+      "sha256": "f2e9a6a12834be9bb29cc19dd761369b81438b4073b8c4e355f4868ddf402f3e",
+      "bytes": 3501
+    },
+    "native-evidence/final-review.json": {
+      "sha256": "7a7fc0412a3341e79a1bb48631c9c20666139646b62bbed2251e6a72e39873d4",
+      "bytes": 7002
+    },
+    "native-evidence/final-review.md": {
+      "sha256": "16ea79d36e819ab81a06df60e67f15e13692db47ae8a6c6fdcd30c485d4e544b",
+      "bytes": 1094
+    },
+    "native-evidence/final-summary.json": {
+      "sha256": "87837ea3dee1c80fa840909dc2c871639a47da36dbfa54da333123b82cff33c2",
+      "bytes": 8427
+    },
+    "native-evidence/finalize.py": {
+      "sha256": "7e2aaefda05495d64a7830e4c6c7b0e00b2821471efe5d095c1e7b9ed053ddbc",
+      "bytes": 6110
+    },
+    "native-evidence/prepare.json": {
+      "sha256": "0c8f859ce7765b2c2da0a42f8d687b48956267d26d474410623c3effadc2ac35",
+      "bytes": 702203
+    },
+    "native-evidence/prepare.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "native-evidence/prepare.stdout": {
+      "sha256": "d8658b3f3eeea2d1d114e8611f775e45072168b77e84699ce09a0ef9e3bd9d83",
+      "bytes": 17894
+    },
+    "native-evidence/prism-disposition.json": {
+      "sha256": "00bd5b4c1cb006cc56ccd8c4a3a1bf4186fe18c5e2600ebcb04c50c4fb4af1e5",
+      "bytes": 5564
+    },
+    "native-evidence/prism-disposition.md": {
+      "sha256": "b09c2b0295d2cb0e83aa6212c019cd17e0418d2fc3bbae961187ac977f5d928b",
+      "bytes": 814
+    },
+    "native-evidence/prism-v1/inputs.json": {
+      "sha256": "f7f44310f70642d7abf22739e51c35fcaaff16ad3968c6a95bcc8ee7a500ba11",
+      "bytes": 873
+    },
+    "native-evidence/prism-v1/prism.json": {
+      "sha256": "f82d9eb2ac993ef261c2098249e07d2c3d5705155ac3c03c8c3e0246bf94b762",
+      "bytes": 2723
+    },
+    "native-evidence/prism-v1/process.json": {
+      "sha256": "1bdbe11f1000510dcf2799a20f9c4acba1fb23b3835af18cacfe0b93a0638a46",
+      "bytes": 1724
+    },
+    "native-evidence/prism-v1/staged.diff.txt": {
+      "sha256": "b361997f3d684670f2e0245d9802826a0b568c7ec4b71afb5d7d21d2e236fbcd",
+      "bytes": 11115
+    },
+    "native-evidence/prism-v1/stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "native-evidence/prism-v1/stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "native-evidence/prism.py": {
+      "sha256": "ec3ad307e83cc9e4c4ebb415acffc98ad12d393283b4b1933aff143aefaeaafa",
+      "bytes": 2749
+    },
+    "native-evidence/promote.py": {
+      "sha256": "e6108ec920b4898c1250284ae3dbae8d76a706eb5bccec65d4fbde580e1e96a9",
+      "bytes": 4183
+    },
+    "reviewed_source/docs/reports/macos-native-current/README.md": {
+      "sha256": "4e754c195cacff9e0a59b8092f2fae519e23ab9918944e040117b77386aea4a8",
+      "bytes": 7110
+    },
+    "reviewed_source/specs/accessibility.md": {
+      "sha256": "c2bdbdf65790325a1046c04e7dc1a35ebb664fee0ff182cc9ca361c7e65c1db6",
+      "bytes": 21356
+    },
+    "reviewed_source/specs/macos-completion.md": {
+      "sha256": "56a814832277aa296a92767b007d890640a1a2529d892c87d4c066194422f50d",
+      "bytes": 46635
+    },
+    "reviewed_source/specs/macos-service-performance.md": {
+      "sha256": "472e844e6389f20d897b72aca4627e0b4e4b11f71c2060c488cd3ff97879f36e",
+      "bytes": 3450
+    },
+    "span-scratch-native/compare.py": {
+      "sha256": "40139f493464ecd24add5ecbb380b87e51859f296acfbc7e494e57ed95c60012",
+      "bytes": 9912
+    },
+    "span-scratch-native/evidence-review.json": {
+      "sha256": "d037ecd561721da28aed2e5099cd7cf7dfddd569759920a27b8dcd24cafe4227",
+      "bytes": 26585
+    },
+    "span-scratch-native/evidence-review.md": {
+      "sha256": "180d076e4b7de35ef319faa5f4d58a6e11c7acea6aac620cadbf4f36907687c7",
+      "bytes": 1442
+    },
+    "span-scratch-native/harness-review.json": {
+      "sha256": "063afdbc1a3940799ff7e690e16d652750c3836083dc9994bbb80a7ecb882072",
+      "bytes": 4359
+    },
+    "span-scratch-native/harness-review.md": {
+      "sha256": "a383aa615a997be014bbc514b151d3aeeceb4ed6975f3a293ee838b9c7aaa72a",
+      "bytes": 608
+    },
+    "span-scratch-native/inputs.json": {
+      "sha256": "8331287b9b8aacc18157df4c438438a36af80cbc19184e774d90f61c83bde70b",
+      "bytes": 1309062
+    },
+    "span-scratch-native/launch.py": {
+      "sha256": "e70523c571aefef042dd116dec409674dfee4b4bc26e2c48367036466b76ad21",
+      "bytes": 2538
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-1/native.log": {
+      "sha256": "c9c4540f230565f4afb1fc6481bab33e4f47cdc02e7d913bac1749d8d5f7845e",
+      "bytes": 151903
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-1/result.json": {
+      "sha256": "19ec5ad672abd14b4715bd7f49a2a4945ec9431d82ec173b5194a02bde36f626",
+      "bytes": 244130
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-2/native.log": {
+      "sha256": "7873eb486dc8e764b1b203b9561716629adba60abe4827f5ca725b36a2bb5102",
+      "bytes": 151929
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-2/result.json": {
+      "sha256": "df0b2ab11aec4d3e1e04ca1657bab0e9da5e0aff4854577547c7fa3596f0a888",
+      "bytes": 244156
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-3/native.log": {
+      "sha256": "63685d1d5d5be5b73a3ccf70228a08e02359afac3fb44a9dddbeb456b16c7511",
+      "bytes": 151904
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-3/result.json": {
+      "sha256": "3d17d389cc8b09dc20926cc0b0c82eb27f00f1bbbe9020db446ab30c1347bb2c",
+      "bytes": 244131
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-4/native.log": {
+      "sha256": "c5f2de4053511774e1364c33dff56fbc413eb2bbed775869d6e48cd2bb06a592",
+      "bytes": 151869
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-4/result.json": {
+      "sha256": "1545126676cbcc413af22daef1191efd94544b0216c9d11235261a0820dcabc0",
+      "bytes": 244096
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-5/native.log": {
+      "sha256": "7e7a6304d2e449fcc51d647337285e18c81e3b4e5edbe0b95e04410fc46827e1",
+      "bytes": 151886
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-10000/run-5/result.json": {
+      "sha256": "a388fc27cd9ad15e29feb155dcb910ee456e2527446f51a3cf7370817aa395c2",
+      "bytes": 244111
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-1/native.log": {
+      "sha256": "a801204f5e04dbbb6cfa482520e6a8e7c201cd42c397a109698892f0ca24886e",
+      "bytes": 151983
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-1/result.json": {
+      "sha256": "9b137d0016bc190b88122300fbc2fbb84d7d9fa51e7a79b0750cad5796f75cf9",
+      "bytes": 244210
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-2/native.log": {
+      "sha256": "b1ae70efc7b684528e25ecd1a50c7d726420e5dee5fbece8bd3fff862df85f0a",
+      "bytes": 151926
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-2/result.json": {
+      "sha256": "bb0fbd10e891e836f0d7f89e5dd19a7079fe14cdd9c4dedd1ad7028becf4bb83",
+      "bytes": 244154
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-3/native.log": {
+      "sha256": "a016aaeab18737b51eadd022ca0145f642ef5af3409648f3a15babeb24e60ff8",
+      "bytes": 151877
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-3/result.json": {
+      "sha256": "1f843db9fdc3d74cecec82d1e6319059cae85fe596b9bb6fa64d1e1a8bddb92a",
+      "bytes": 244105
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-4/native.log": {
+      "sha256": "b0aa534a2655c4e3a757789f1ece673643cad4a185b1e9524f4fcbc6ab3b57a5",
+      "bytes": 151842
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-4/result.json": {
+      "sha256": "24fb5f7198106ac03b0971196f2b23545f489e9167e5b71e597985494cc8cf5e",
+      "bytes": 244070
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-5/native.log": {
+      "sha256": "d1ee4f0a9a41129f67c069a0582a96d338eced7c7047e7df2918e5b7e30fdcc8",
+      "bytes": 151971
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/fixed-1000000/run-5/result.json": {
+      "sha256": "e4b7080664b7688c9297b24ba59ac5a65e11eaabb641760f3bdb3923e53789e1",
+      "bytes": 244200
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-1/native.log": {
+      "sha256": "50504689a8764299a08624490be703197812f6795477e2909ff5afe4fbabb7a0",
+      "bytes": 152096
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-1/result.json": {
+      "sha256": "ec450c473aa748ef31c8bcda699e050d48533d4137bed75398c987aa19e97c8b",
+      "bytes": 244343
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-2/native.log": {
+      "sha256": "22fb05a0eb748bd298148900966477d2ca02d9efb6fe5d3453a76d94ba9625dd",
+      "bytes": 152063
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-2/result.json": {
+      "sha256": "e2ce095499b4ee38d2f72ccaa3ae8183aed8d3f5fd007a1a5dda161c183f4f7c",
+      "bytes": 244312
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-3/native.log": {
+      "sha256": "64ddd48f053df999696cfae88a904e83f8e401eb24bae20412eef2093a8063fc",
+      "bytes": 152071
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-3/result.json": {
+      "sha256": "8541c360bcd8af34adaed73015ff964d4688fc2c677e2addb210c55306a110c1",
+      "bytes": 244320
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-4/native.log": {
+      "sha256": "6b78043eaf06144825127ce8a1d243c9c3431bdb66179dda3db28bf810983ccf",
+      "bytes": 152060
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-4/result.json": {
+      "sha256": "b9762c71b1c137cbbab2056466219d636661c14d5bd696b4507cb2093009ae7d",
+      "bytes": 244309
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-5/native.log": {
+      "sha256": "8c916e0de9fb012ac029d9204bfb2b2a86924d75029151ce1b4730bfee37dc6c",
+      "bytes": 152089
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-10000/run-5/result.json": {
+      "sha256": "2aa7031b9987155b88292e0760640004fa4edd18ca4a60f631ff8cfc58086519",
+      "bytes": 244338
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-1/native.log": {
+      "sha256": "948adb03ed7cc1b635e05b8f9d0c0ee76e707b009514eb434c1a43dd36e8da55",
+      "bytes": 152106
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-1/result.json": {
+      "sha256": "6c9e5cc862f1654b78b0094a183d52291d5339913727e4e35e1fa8d81d576ddf",
+      "bytes": 244357
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-2/native.log": {
+      "sha256": "b63080f53d322630f8d209a1caba98610a4323407e64cb019bdd8a61cf782301",
+      "bytes": 152080
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-2/result.json": {
+      "sha256": "2e17d4658ace007b81965034ea669a38b312c7f27eed23c35808d0b2350f4eae",
+      "bytes": 244329
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-3/native.log": {
+      "sha256": "f2914b285ebcfc9c8422ea6ccc0b22f30d10917d87a90c691d048c70da272398",
+      "bytes": 152085
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-3/result.json": {
+      "sha256": "bf45d2d57177813f152a807fe63b3f6111b1d28a6db2ff3a9a4def3f271859ff",
+      "bytes": 244336
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-4/native.log": {
+      "sha256": "a5aca63be856eb44d0fedf4db5f66ad7e00d8ebb5587118eb89aac42246d62c6",
+      "bytes": 152041
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-4/result.json": {
+      "sha256": "139cf437fa942356ef8810adecbc4fd63e78c9693f2adab53e4df1a15957eb38",
+      "bytes": 244291
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-5/native.log": {
+      "sha256": "562818132d97643783800e2ca0b6b539f2c03704d18019ded6fe5e840aecb96c",
+      "bytes": 152046
+    },
+    "span-scratch-native/native-comparison/gpu/candidate/variable-1000000/run-5/result.json": {
+      "sha256": "e73a5537d0d9f4f643f47dff486be76b0a666d7ab3b09f5b6ba3f20181fbaea4",
+      "bytes": 244297
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-1/native.log": {
+      "sha256": "26b57f259d4c1fb996c1dd26c3c9ea805f3a90f0993d40b52c8e6b2fc13c56cc",
+      "bytes": 151994
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-1/result.json": {
+      "sha256": "45b04ffff13b1eb7b91d9d50c29cbf7a174b315434ae6a33bc0a88be77bb659f",
+      "bytes": 244230
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-2/native.log": {
+      "sha256": "8ea92fc98dfe0393073bb7313626632870cc416e2c80c650ad78a48a425f312b",
+      "bytes": 151874
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-2/result.json": {
+      "sha256": "1c5538c174fd4fcb372bbd725d26ed06115cedaa89bcee388fb9a5af42ed5275",
+      "bytes": 244110
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-3/native.log": {
+      "sha256": "abac8531d24f55fb826cc122e20c0ba8b297b36b7b89a733515dd4bb5c233155",
+      "bytes": 151975
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-3/result.json": {
+      "sha256": "e268a5766751d25f3a8896da9b622596000c2164290c32b9d2e9e4ba692ebd51",
+      "bytes": 244211
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-4/native.log": {
+      "sha256": "65dce46bd5af1a11b13a63407867493ab09876fcd43eb56a805f93347581c84e",
+      "bytes": 151829
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-4/result.json": {
+      "sha256": "0f0410c12ec97e7c2783ed5d4a9502091fd9383db7452721f209e3d734fa17ae",
+      "bytes": 244065
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-5/native.log": {
+      "sha256": "7d383eb6e3c5fdfdfc5b0779092c1ec3296d52fcaa5b66bc26744d92715cb9a4",
+      "bytes": 151839
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-10000/run-5/result.json": {
+      "sha256": "e4a5fda8512827070126988d6d9d36e49128788975a190d825a92050078d50e8",
+      "bytes": 244075
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-1/native.log": {
+      "sha256": "2852d2a3787bf6d57a96f4c4db3a384a53fe5a225c4824546941c8936957494a",
+      "bytes": 151871
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-1/result.json": {
+      "sha256": "df5b57f2ce67ef4f9bc9a29506db9750db8210a8a2d6605d1031ea31ff739760",
+      "bytes": 244109
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-2/native.log": {
+      "sha256": "eb2cc6057a9c1ecc7cfb9a59656664cf64f5c3c41b0033c182e33a4bc5519288",
+      "bytes": 151913
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-2/result.json": {
+      "sha256": "83415b2c8e37272a532139437c9667f87ce278a4a7a3b34f43811f17f6f6cb0f",
+      "bytes": 244151
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-3/native.log": {
+      "sha256": "255fd193260d85597cd9d49c111bc1d263290dd555b92dc514057074eb6cc683",
+      "bytes": 151956
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-3/result.json": {
+      "sha256": "52d30e6f846ad863ebb1dd2ac9ddca722216f42b67e5010c5a7f3b37de6ab295",
+      "bytes": 244194
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-4/native.log": {
+      "sha256": "983f5e92cf5119ba2811842069c0135598cbd8a69fabacf4d5858894781c9f30",
+      "bytes": 151870
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-4/result.json": {
+      "sha256": "dc921ac2def08134144c0feadab00d29030d89600673b6e1c8614803be42a66d",
+      "bytes": 244108
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-5/native.log": {
+      "sha256": "5140cb0c8223740ec8bf12c2cceb6efe87fb8f7b1ee84ce9c1e4b4510853ea04",
+      "bytes": 151972
+    },
+    "span-scratch-native/native-comparison/gpu/original/fixed-1000000/run-5/result.json": {
+      "sha256": "b849a2b4ac3edaebf2d1a0dfef5fb16df89aebf2dcb10db1e5e3a763e9df2b00",
+      "bytes": 244210
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-1/native.log": {
+      "sha256": "b2954488df596e76365057fa2229f5f8e1904f53631a529771cda8b1e3f07263",
+      "bytes": 152059
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-1/result.json": {
+      "sha256": "ca9046ebd97f042fc7ab27448d907db53d51efcfd4cf806b0e3010a5ff44ec85",
+      "bytes": 244316
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-2/native.log": {
+      "sha256": "d006d2a906e2e4d6ee46cdbf8909d2ee865d33d3a4bdb53ffff0f23fcf1fb0db",
+      "bytes": 152120
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-2/result.json": {
+      "sha256": "8b3eb4ae9b1280d9a08d5acb3f0f1004c75c0416623aca5be4b78b76824aabc6",
+      "bytes": 244378
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-3/native.log": {
+      "sha256": "2d3c9d7da4cf830de3a8fb8c347d5d2bf8cb5cffa694e41959aaac406421bc9d",
+      "bytes": 152138
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-3/result.json": {
+      "sha256": "a8f793738a3f1e5549cbd4a5a8a1efb318c681d83f8f5eac0f5aa4fc01d5030d",
+      "bytes": 244395
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-4/native.log": {
+      "sha256": "b6731275cb5f1255fc10000ec1861b911633e44f006bda97b0f270b399e80a44",
+      "bytes": 152078
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-4/result.json": {
+      "sha256": "74f5fd45b86d69861f38e6be207f27f6ef98c7826620853b465df5b1eded935e",
+      "bytes": 244336
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-5/native.log": {
+      "sha256": "e735c856f2a1c10ba6a0e5aac00f8198948bfb7e72b8e46a79fe67d7ac2c4142",
+      "bytes": 152067
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-10000/run-5/result.json": {
+      "sha256": "f729b4cecc2db204e6843ae56538722570f156531c5d5ba8bb4c804e713a77cd",
+      "bytes": 244323
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-1/native.log": {
+      "sha256": "e203facc4e810c4238e54c30bbeb1d362314ecedbf66b054f9df6d6da7d42432",
+      "bytes": 152074
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-1/result.json": {
+      "sha256": "878335f459356b8eef67bffb988a1515c786ad7bff4937eff146887414292151",
+      "bytes": 244333
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-2/native.log": {
+      "sha256": "adb0db0d4f2d709a15c6550221fa6e70c0733534e369a2b84a09751b9b65d461",
+      "bytes": 152079
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-2/result.json": {
+      "sha256": "c7fdb4d5e4520feb001cdf365d6be910dd50e3975f482e2f055f4e4d0038c3c9",
+      "bytes": 244338
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-3/native.log": {
+      "sha256": "407093d9dfe8d5a38f39f50a81053f7167e79745561e55e01ba8694ecc5ae390",
+      "bytes": 152076
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-3/result.json": {
+      "sha256": "f5253e6bf7c8fa79cde7a5a3cd93625fc08c612644a3b479bf20c48207884d12",
+      "bytes": 244335
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-4/native.log": {
+      "sha256": "7deac3e60c4439e50a7c988621dfe6b618330f52701dff704d31a49faab1a0a1",
+      "bytes": 152021
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-4/result.json": {
+      "sha256": "a262f62eb42dbe518b25e813fd9b5595544991b6845dd9dbab71d2862da02e26",
+      "bytes": 244281
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-5/native.log": {
+      "sha256": "3c234bd88bea01ae5c4d805c5c580213311beb0fe343bb1d3295729e7789873a",
+      "bytes": 152054
+    },
+    "span-scratch-native/native-comparison/gpu/original/variable-1000000/run-5/result.json": {
+      "sha256": "16eb667fa19b96b7a7b407d5680ffecf91027ea655c75828fefbdfbdfb986090",
+      "bytes": 244314
+    },
+    "span-scratch-native/native-comparison/progress.json": {
+      "sha256": "6bc0d2ebe036b8e95409d90ac1ca3a06475e456da0e97fc06aecec1ecf3247d3",
+      "bytes": 7763
+    },
+    "span-scratch-native/native-comparison/summary.json": {
+      "sha256": "a12e5df7d5c3ca2a77ac1e48a84d14c98201bbca400353005767398131e0eb2e",
+      "bytes": 242210
+    },
+    "span-scratch-native/native-queue.json": {
+      "sha256": "1580e30cb3234902bff37b25daadfeb3e03ac41112b6fe709f5e50ac2d875b49",
+      "bytes": 699
+    },
+    "span-scratch-native/native-queue.owned-process.json": {
+      "sha256": "dd5cefcf7498edfd4f207604ec7e4eb91c5ea24776a0af4c904ee29ef90cba55",
+      "bytes": 310
+    },
+    "span-scratch-native/native-queue.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "span-scratch-native/native-queue.stdout": {
+      "sha256": "8200c73edc0f1efe5332748fc71566256c3918284c74de761ce396ad3e076ca7",
+      "bytes": 2414
+    },
+    "span-scratch-native/native-summary.json": {
+      "sha256": "9602d8cce6f71df83588b768770d9938a911b31aa5e4c01a57b28ba47e06f3f0",
+      "bytes": 1514
+    },
+    "span-scratch-native/native_identity.py": {
+      "sha256": "2f980fff981bf64d201b9a633fa8e6c5f78b9bb01971ae392e286f2b23a3408a",
+      "bytes": 638
+    },
+    "span-scratch-native/predecessor-binding.json": {
+      "sha256": "9612621d6fd27342ca792f3fa1e87e04bc7c67980d0c212b3bbc327659cb67fd",
+      "bytes": 372
+    }
+  },
+  "excluded_executables": {},
+  "scope": "Report/spec only. Completed e7/6214 retention and distinct87/6216 plus8c/6216 comparisons; noendpointinheritance orfullcompiler/physicalGPU/presentation/human/Mac qualification."
+}

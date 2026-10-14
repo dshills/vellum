@@ -1,0 +1,269 @@
+{
+  "result": "PASS_SOURCE_BOUND_NATIVE_EVIDENCE_CHECKPOINT",
+  "base_commit": "8c1709e3ecc7a1a787cc5530df966155203f0053",
+  "sources": {
+    "docs/reports/macos-native-current/README.md": "4e754c195cacff9e0a59b8092f2fae519e23ab9918944e040117b77386aea4a8",
+    "specs/accessibility.md": "c2bdbdf65790325a1046c04e7dc1a35ebb664fee0ff182cc9ca361c7e65c1db6",
+    "specs/macos-completion.md": "56a814832277aa296a92767b007d890640a1a2529d892c87d4c066194422f50d",
+    "specs/macos-service-performance.md": "472e844e6389f20d897b72aca4627e0b4e4b11f71c2060c488cd3ff97879f36e"
+  },
+  "prepared_count": 6216,
+  "prepared_map_sha256": "53edd425e08b66d2566b50d4f2eed6ddffa3082132c94b1383d71c1f25909440",
+  "evidence_reviews": {
+    "endurance": {
+      "path": "/private/tmp/vellum-macos-current-endurance/evidence-review.json",
+      "sha256": "c4b80bd5d395e9080351265c965d42ecbf96b2b2db98c1187f2fcc88e32ea8e4",
+      "result": "APPROVED_SCOPED_NATIVE_RETENTION_EVIDENCE"
+    },
+    "span_scratch": {
+      "path": "/private/tmp/vellum-macos-span-scratch-native/evidence-review.json",
+      "sha256": "d037ecd561721da28aed2e5099cd7cf7dfddd569759920a27b8dcd24cafe4227",
+      "result": "APPROVED_SCOPED_NATIVE_COMPARISON_EVIDENCE"
+    },
+    "geometry": {
+      "path": "/private/tmp/vellum-macos-geometry-native/evidence-review.json",
+      "sha256": "707ac848823231d19a3a905d4ae0d6edc94a0931c5a14ec1b324fc9697afcf9e",
+      "result": "APPROVED_SCOPED_NATIVE_COMPARISON_EVIDENCE"
+    }
+  },
+  "endurance": {
+    "endpoint": "e7f8e306f56c3c237ad41985da4a407d62f2d87d",
+    "prepared_count": 6214,
+    "cycles": 1000,
+    "activity_steps": 24000,
+    "summary_sha256": "acbd99f73e273ff09e44c51adc17c79fc96ccf7a3aa0ac9c4c6f4f62b4981d8e",
+    "heap_profile_sha256": "419805dbe0ceaf6bbce90d91a3a06d17412c31b4f4b154c09a0de8561c564da8",
+    "heap_profile_bytes": 450135,
+    "profile_before_global_closure": true,
+    "retry_steps": 60,
+    "retry_cause_observed": false,
+    "total_attempts": 24060,
+    "total_admissions": 24060
+  },
+  "comparisons": {
+    "span_scratch": {
+      "endpoint": "87e7de154b96732cad5dcb67703087115909c6f2",
+      "processes": 40,
+      "ordinary_samples": 4800,
+      "terminal_sha256": "1580e30cb3234902bff37b25daadfeb3e03ac41112b6fe709f5e50ac2d875b49",
+      "summary_sha256": "9602d8cce6f71df83588b768770d9938a911b31aa5e4c01a57b28ba47e06f3f0",
+      "pooled_summary_sha256": "a12e5df7d5c3ca2a77ac1e48a84d14c98201bbca400353005767398131e0eb2e",
+      "timings": {
+        "gpu": {
+          "fixed-10000": {
+            "original": {
+              "p95_ns": 6316293,
+              "p99_ns": 6695706,
+              "alloc_p50": 9694848,
+              "malloc_p50": 53266
+            },
+            "candidate": {
+              "p95_ns": 6302457,
+              "p99_ns": 6819416,
+              "alloc_p50": 9558464,
+              "malloc_p50": 51629
+            }
+          },
+          "fixed-1000000": {
+            "original": {
+              "p95_ns": 5907042,
+              "p99_ns": 6369458,
+              "alloc_p50": 8617808,
+              "malloc_p50": 53236
+            },
+            "candidate": {
+              "p95_ns": 5995669,
+              "p99_ns": 6288375,
+              "alloc_p50": 8529760,
+              "malloc_p50": 51604
+            }
+          },
+          "variable-10000": {
+            "original": {
+              "p95_ns": 6279209,
+              "p99_ns": 6799668,
+              "alloc_p50": 9171168,
+              "malloc_p50": 53684
+            },
+            "candidate": {
+              "p95_ns": 6223374,
+              "p99_ns": 6659540,
+              "alloc_p50": 9011704,
+              "malloc_p50": 52036
+            }
+          },
+          "variable-1000000": {
+            "original": {
+              "p95_ns": 5870750,
+              "p99_ns": 6532581,
+              "alloc_p50": 8726592,
+              "malloc_p50": 53667
+            },
+            "candidate": {
+              "p95_ns": 5879665,
+              "p99_ns": 6806500,
+              "alloc_p50": 8639216,
+              "malloc_p50": 52028
+            }
+          }
+        }
+      },
+      "p95_passing_runs": 0,
+      "p99_passing_runs": 0,
+      "both_targets_passing_runs": 0
+    },
+    "geometry": {
+      "endpoint": "8c1709e3ecc7a1a787cc5530df966155203f0053",
+      "processes": 80,
+      "ordinary_samples": 9600,
+      "terminal_sha256": "e5d86444ca17c7ef1ce7c06fe326b3eeecab447d92a071192d1040386dd97e98",
+      "summary_sha256": "f62d9308022e006b83c885811ab0faaab3ddde800747f2f8173985624c8b9a0a",
+      "pooled_summary_sha256": "3ff6ef09a0265a25da85812c963a36d97eb9203eaae619b65c4c3511de6847c4",
+      "timings": {
+        "cpu": {
+          "fixed-10000": {
+            "original": {
+              "p95_ns": 7742455,
+              "p99_ns": 8200460,
+              "alloc_p50": 5892768,
+              "malloc_p50": 41504
+            },
+            "candidate": {
+              "p95_ns": 7730125,
+              "p99_ns": 8155164,
+              "alloc_p50": 6363168,
+              "malloc_p50": 41501
+            }
+          },
+          "fixed-1000000": {
+            "original": {
+              "p95_ns": 7427167,
+              "p99_ns": 7795334,
+              "alloc_p50": 5464168,
+              "malloc_p50": 41481
+            },
+            "candidate": {
+              "p95_ns": 7362041,
+              "p99_ns": 7680416,
+              "alloc_p50": 5464216,
+              "malloc_p50": 41480
+            }
+          },
+          "variable-10000": {
+            "original": {
+              "p95_ns": 7791789,
+              "p99_ns": 8159876,
+              "alloc_p50": 5689600,
+              "malloc_p50": 41901
+            },
+            "candidate": {
+              "p95_ns": 7731586,
+              "p99_ns": 8019917,
+              "alloc_p50": 5819592,
+              "malloc_p50": 41901
+            }
+          },
+          "variable-1000000": {
+            "original": {
+              "p95_ns": 7542958,
+              "p99_ns": 7879297,
+              "alloc_p50": 5557104,
+              "malloc_p50": 41883
+            },
+            "candidate": {
+              "p95_ns": 7472958,
+              "p99_ns": 7747041,
+              "alloc_p50": 5553128,
+              "malloc_p50": 41883
+            }
+          }
+        },
+        "gpu": {
+          "fixed-10000": {
+            "original": {
+              "p95_ns": 6136250,
+              "p99_ns": 6521252,
+              "alloc_p50": 9605312,
+              "malloc_p50": 51630
+            },
+            "candidate": {
+              "p95_ns": 6160123,
+              "p99_ns": 6591712,
+              "alloc_p50": 9605648,
+              "malloc_p50": 51626
+            }
+          },
+          "fixed-1000000": {
+            "original": {
+              "p95_ns": 5810082,
+              "p99_ns": 6202083,
+              "alloc_p50": 8527984,
+              "malloc_p50": 51605
+            },
+            "candidate": {
+              "p95_ns": 5783874,
+              "p99_ns": 6121502,
+              "alloc_p50": 8530840,
+              "malloc_p50": 51604
+            }
+          },
+          "variable-10000": {
+            "original": {
+              "p95_ns": 6318707,
+              "p99_ns": 6849294,
+              "alloc_p50": 9011712,
+              "malloc_p50": 52039
+            },
+            "candidate": {
+              "p95_ns": 6246459,
+              "p99_ns": 6655918,
+              "alloc_p50": 9011992,
+              "malloc_p50": 52044
+            }
+          },
+          "variable-1000000": {
+            "original": {
+              "p95_ns": 5830666,
+              "p99_ns": 6567291,
+              "alloc_p50": 8638760,
+              "malloc_p50": 52028
+            },
+            "candidate": {
+              "p95_ns": 5881499,
+              "p99_ns": 6893667,
+              "alloc_p50": 8639216,
+              "malloc_p50": 52030
+            }
+          }
+        }
+      },
+      "p95_passing_runs": 0,
+      "p99_passing_runs": 2,
+      "both_targets_passing_runs": 0
+    }
+  },
+  "runtime_source_changed": false,
+  "consistent_native_latency_gain_qualified": false,
+  "full_p4_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "native_gpu_memory_budget_qualified": false,
+  "full_mac_qualified": false,
+  "scope": "Report/spec only. Completed e7/6214 retention and distinct87/6216 plus8c/6216 comparisons; noendpointinheritance orfullcompiler/physicalGPU/presentation/human/Mac qualification.",
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_review_sha256": "7a7fc0412a3341e79a1bb48631c9c20666139646b62bbed2251e6a72e39873d4",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 4,
+  "prism_findings": 1,
+  "prism_unresolved_findings": 0,
+  "prism_raw_exit_code": 1,
+  "prism_disposition": "REJECTED_FALSE_POSITIVE",
+  "prism_disposition_sha256": "00bd5b4c1cb006cc56ccd8c4a3a1bf4186fe18c5e2600ebcb04c50c4fb4af1e5",
+  "prism_calls": 1,
+  "archive_sha256": "30664fca431cd089a1f07c7543de7c3520b86a3bb0e46fffade03305dfa7e2c5",
+  "archive_members": 716,
+  "archive_bytes": 10416088,
+  "canonical_promoted": false
+}

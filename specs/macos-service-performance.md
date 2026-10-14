@@ -40,3 +40,13 @@ qualified through sender oracles with intentional faults and the existing native
 Cocoa control/modal and stored-grid consumers. A sampled process-wide CPU profile
 may guide the change but does not qualify latency; ordinary comparisons remain a
 separate checkpoint with unchanged 4/6 ms targets.
+
+
+The [completed native evidence checkpoint](../docs/reports/macos-native-current/README.md)
+retains both the 40-process stage-62 opt-in GPU comparison and the 80-process
+CPU/GPU ordinary geometry comparison. Neither establishes a consistent frame gain.
+All process-wide allocation observations, including increases, remain scoped to
+those measured processes. Sampled CGO/profile attribution does not predict elapsed
+UI savings. Inherited pre-run `launched=false` metadata must remain distinguished
+from actual argv/result launch receipts. Tested endpoints, original overlays,
+prepared identities, cleanup and producer versions are preserved independently.

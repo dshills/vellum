@@ -210,3 +210,11 @@ Text-range publication and scoped grid/tree transactions retain their existing
 paths. Source and sender-oracle checks, actual Cocoa consumers and ordinary frame
 measurements are separate evidence. See the
 [geometry reuse checkpoint](../docs/reports/macos-geometry-reuse/README.md).
+
+
+The [ordinary geometry native comparison](../docs/reports/macos-native-current/README.md)
+completes 80 unprofiled CPU/GPU processes on the committed reuse implementation.
+The exact cache/source correctness evidence does not establish a consistent frame
+latency gain; all runs still miss at least one unchanged 4/6 ms threshold. Future
+reuse work must verify actual eligibility and send decisions, including managed
+outline subtrees, while keeping native scoped transactions and text geometry intact.
