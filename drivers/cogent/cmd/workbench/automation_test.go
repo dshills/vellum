@@ -51,12 +51,12 @@ func TestWorkbenchSemanticDomainAndVirtualQueries(t *testing.T) {
 	}
 	commands := command.New()
 	commands.Register(command.Command{ID: "component.rotate", Label: "Rotate", Execute: func(context.Context) error {
-		next := source.parts[selected]
+		next := source.parts.at(selected)
 		next.Rotation = (next.Rotation + 90) % 360
 		return edit.change(selected, "Rotate", next)
 	}})
 	commands.Register(command.Command{ID: "component.raise-value", Label: "Raise", Execute: func(context.Context) error {
-		next := source.parts[selected]
+		next := source.parts.at(selected)
 		if next.Value > math.MaxUint32-100 {
 			return errors.New("overflow")
 		}
@@ -188,13 +188,13 @@ func TestWorkbenchEpochExhaustionPreservesDomain(t *testing.T) {
 	journal, _ := history.New(4)
 	e := &partEditor{source: source, table: table, journal: journal}
 	source.revision = math.MaxUint64
-	before := source.parts[0]
+	before := source.parts.at(0)
 	next := before
 	next.Value++
 	if err := e.change(0, "overflow", next); !errors.Is(err, history.ErrRevisionExhausted) {
 		t.Fatal(err)
 	}
-	if source.parts[0] != before || journal.Snapshot().UndoCount != 0 {
+	if source.parts.at(0) != before || journal.Snapshot().UndoCount != 0 {
 		t.Fatal("mutation before epoch refusal")
 	}
 	refs := &fileReferences{paths: []string{"/original"}, revision: math.MaxUint64}

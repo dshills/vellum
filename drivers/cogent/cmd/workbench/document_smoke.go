@@ -85,7 +85,7 @@ func documentPress(ctx context.Context, id string) error {
 	return nil
 }
 func runDocumentSmoke(ctx context.Context, a *app.Application, session *document.Session[documentImage], flow *documentWorkflow, j *history.Journal, registry *command.Registry, parts *partSource, board *canvas.Scene, refs *fileReferences, path string, store *documentSmokeStore) error {
-	if err := documentControl(ctx, "inspector.rotate"); err != nil {
+	if err := documentControl(ctx, "inspector.value"); err != nil {
 		return err
 	}
 	if err := documentOwner(a, func() error {
@@ -140,16 +140,24 @@ func runDocumentSmoke(ctx context.Context, a *app.Application, session *document
 	}); err != nil {
 		return err
 	}
+	var actual documentImage
 	if err := documentOwner(a, func() error {
-		actual := captureDocument(parts, board, refs)
-		if session.State().Last.Err != nil || j.Snapshot().Dirty || !reflect.DeepEqual(actual, expected) {
-			return errors.New("load didn't restore complete component/geometry/reference document")
+		actual = captureDocument(parts, board, refs)
+		if session.State().Last.Err != nil || j.Snapshot().Dirty {
+			return errors.New("load didn't acknowledge clean document")
 		}
-		return registry.Invoke(ctx, "component.raise-value")
+		return nil
 	}); err != nil {
 		return err
 	}
-	fmt.Printf("PASS asynchronous %d-component save/load with exact geometry and ordered references\n", len(expected.Parts))
+	// Full diagnostic comparison runs on this fixture worker, not the UI owner.
+	if !reflect.DeepEqual(materializeDocument(actual), materializeDocument(expected)) {
+		return errors.New("load didn't restore complete component/geometry/reference document")
+	}
+	if err := documentOwner(a, func() error { return registry.Invoke(ctx, "component.raise-value") }); err != nil {
+		return err
+	}
+	fmt.Printf("PASS asynchronous %d-component save/load with exact geometry and ordered references\n", expected.captured.Len())
 	native.CloseReq()
 	store.fail.Store(true)
 	if err := documentPress(ctx, "document.save"); err != nil {
@@ -178,7 +186,7 @@ func runDocumentSmoke(ctx context.Context, a *app.Application, session *document
 	if err != nil {
 		return err
 	}
-	if saved.Parts[0].Value != expected.Parts[0].Value+100 {
+	if saved.Parts[0].Value != expected.captured.parts.at(0).Value+100 {
 		return errors.New("save-close did not persist final edit")
 	}
 	fmt.Println("PASS native Save confirmation closes only after successful current-revision acknowledgment")

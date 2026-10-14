@@ -94,12 +94,13 @@ func main() {
 		var err error
 		task, err = tasks.Start(manager, ctx, func(ctx context.Context, report func(float64, string)) (int64, error) {
 			var total int64
-			for i, p := range snapshot.parts {
+			for i := 0; i < snapshot.Len(); i++ {
+				p := snapshot.parts.at(i)
 				if i%1024 == 0 {
 					if err := ctx.Err(); err != nil {
 						return 0, err
 					}
-					report(float64(i)/float64(len(snapshot.parts)), "Summing component values")
+					report(float64(i)/float64(snapshot.Len()), "Summing component values")
 				}
 				total += int64(p.Value)
 			}
@@ -113,6 +114,9 @@ func main() {
 				status = err.Error()
 			} else {
 				status = fmt.Sprintf("Sum: %d", total)
+				if *smoke {
+					fmt.Printf("Snapshot calculation committed revision%d sum%d\n", expectedRevision, total)
+				}
 			}
 		})
 		return err
@@ -241,7 +245,7 @@ func main() {
 		return true
 	}
 	must(registry.Register(command.Command{ID: "component.rotate", Label: "Rotate 90°", Shortcut: "Meta+R", Execute: func(context.Context) error {
-		next := parts.parts[selectedIndex]
+		next := parts.parts.at(selectedIndex)
 		next.Rotation = (next.Rotation + 90) % 360
 		if err := editor.change(selectedIndex, "Rotate component", next); err != nil {
 			return err
@@ -250,7 +254,7 @@ func main() {
 		return nil
 	}}))
 	must(registry.Register(command.Command{ID: "component.raise-value", Label: "Increase value", Execute: func(context.Context) error {
-		next := parts.parts[selectedIndex]
+		next := parts.parts.at(selectedIndex)
 		if next.Value > math.MaxUint32-100 {
 			return errors.New("component value would overflow")
 		}
@@ -486,18 +490,18 @@ func main() {
 
 		a.Post(func() {
 			must(registry.Invoke(a.Context(), "project.increment"))
-			original := parts.parts[selectedIndex]
+			original := parts.parts.at(selectedIndex)
 			must(registry.Invoke(a.Context(), "component.rotate"))
 			must(registry.Invoke(a.Context(), "component.raise-value"))
-			edited := parts.parts[selectedIndex]
+			edited := parts.parts.at(selectedIndex)
 			must(registry.Invoke(a.Context(), "edit.undo"))
 			must(registry.Invoke(a.Context(), "edit.undo"))
-			if parts.parts[selectedIndex] != original || journal.Snapshot().Dirty {
+			if parts.parts.at(selectedIndex) != original || journal.Snapshot().Dirty {
 				must(errors.New("document undo failed"))
 			}
 			must(registry.Invoke(a.Context(), "edit.redo"))
 			must(registry.Invoke(a.Context(), "edit.redo"))
-			if parts.parts[selectedIndex] != edited || !journal.Snapshot().Dirty {
+			if parts.parts.at(selectedIndex) != edited || !journal.Snapshot().Dirty {
 				must(errors.New("document redo failed"))
 			}
 			fmt.Println("Document history verified sparse property deltas, undo/redo and dirty state")

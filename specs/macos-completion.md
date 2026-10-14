@@ -484,3 +484,13 @@ primary 1,000-control workbench. RSS is roughly 227–237 MiB, above the provisi
 150 MiB reference, and is not private/native allocation attribution. Wakeup/
 present counts, minimized/occluded/overnight cases, full P11 and memory acceptance
 remain open; the original P6 frame targets still fail.
+
+
+The [workbench snapshot checkpoint](../docs/reports/macos-part-snapshots/README.md)
+replaces complete component-array copies during worker startup with immutable
+shared snapshots, and bounds edit path copies independently of document size.
+Persistence materializes component records on its worker. v1 JSON, history,
+concurrent reader isolation and actual 1m-record native save/load/calculation/
+short Cocoa editing checks qualify this composition behavior. Worker traversal
+is slower in the local fixture; no whole-frame/memory acceptance is inferred.
+Other owner scans, complete P6/P11 and Mac release gates remain open.

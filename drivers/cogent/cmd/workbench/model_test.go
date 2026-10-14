@@ -13,8 +13,10 @@ import (
 func TestSnapshotAndTypedMatcher(t *testing.T) {
 	s := newParts(100000)
 	snapshot := s.Snapshot()
-	s.parts[0].Value += 100
-	if snapshot.parts[0].Value == s.parts[0].Value {
+	changed := s.parts.at(0)
+	changed.Value += 100
+	s.parts = s.parts.with(0, changed)
+	if snapshot.parts.at(0).Value == s.parts.at(0).Value {
 		t.Fatal("mutable worker snapshot")
 	}
 	for _, q := range []string{"r0000001", "0603", "ω", "90°", "not-present"} {
@@ -63,7 +65,7 @@ func TestDocumentUndoCapturesDomainIdentityAndInvalidatesWorkers(t *testing.T) {
 		t.Fatal(err)
 	}
 	editor := &partEditor{source: source, table: table, board: board, journal: journal}
-	old := source.parts[0]
+	old := source.parts.at(0)
 	oldRect := board.Objects[0]
 	token := table.ProjectionToken()
 	projection, err := virtual.Project(source.Snapshot(), "", 1, false)
@@ -75,13 +77,13 @@ func TestDocumentUndoCapturesDomainIdentityAndInvalidatesWorkers(t *testing.T) {
 	if err = editor.change(0, "Rotate", next); err != nil {
 		t.Fatal(err)
 	}
-	if source.parts[0] != next || board.Objects[0].Width != 25 || source.Revision() != 2 {
+	if source.parts.at(0) != next || board.Objects[0].Width != 25 || source.Revision() != 2 {
 		t.Fatal("edit not reflected")
 	}
 	if table.ApplyProjection(projection, token) == nil {
 		t.Fatal("stale pre-edit worker accepted")
 	}
-	nextOther := source.parts[5]
+	nextOther := source.parts.at(5)
 	nextOther.Value += 100
 	if err = editor.change(5, "Value", nextOther); err != nil {
 		t.Fatal(err)
@@ -89,13 +91,13 @@ func TestDocumentUndoCapturesDomainIdentityAndInvalidatesWorkers(t *testing.T) {
 	if err = journal.Undo(); err != nil {
 		t.Fatal(err)
 	}
-	if source.parts[0] != next || source.parts[5] == nextOther {
+	if source.parts.at(0) != next || source.parts.at(5) == nextOther {
 		t.Fatal("undo used current selection instead of captured component")
 	}
 	if err = journal.Undo(); err != nil {
 		t.Fatal(err)
 	}
-	if source.parts[0] != old || board.Objects[0] != oldRect || journal.Snapshot().Dirty || source.Revision() != 5 {
+	if source.parts.at(0) != old || board.Objects[0] != oldRect || journal.Snapshot().Dirty || source.Revision() != 5 {
 		t.Fatal("undo did not restore model, geometry and clean state", source.Revision())
 	}
 	if table.ApplyProjection(projection, token) == nil {
@@ -104,7 +106,7 @@ func TestDocumentUndoCapturesDomainIdentityAndInvalidatesWorkers(t *testing.T) {
 	if err = journal.Redo(); err != nil {
 		t.Fatal(err)
 	}
-	if source.parts[0] != next || board.Objects[0].Width != 25 || source.Revision() != 6 {
+	if source.parts.at(0) != next || board.Objects[0].Width != 25 || source.Revision() != 6 {
 		t.Fatal("redo not reflected")
 	}
 	before := journal.Snapshot()

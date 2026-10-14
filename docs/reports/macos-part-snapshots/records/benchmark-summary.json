@@ -1,0 +1,42 @@
+{
+  "BenchmarkPartSnapshot/100k/original-flat-copy": {
+    "ns": 33230.0,
+    "bytes": 802850,
+    "allocs": 2
+  },
+  "BenchmarkPartSnapshot/100k/shared": {
+    "ns": 7.713,
+    "bytes": 24,
+    "allocs": 1
+  },
+  "BenchmarkPartSnapshot/100k/edit-path": {
+    "ns": 369.9,
+    "bytes": 3072,
+    "allocs": 3
+  },
+  "BenchmarkPartSnapshot/1m/original-flat-copy": {
+    "ns": 142389.0,
+    "bytes": 8003618,
+    "allocs": 2
+  },
+  "BenchmarkPartSnapshot/1m/shared": {
+    "ns": 6.488,
+    "bytes": 24,
+    "allocs": 1
+  },
+  "BenchmarkPartSnapshot/1m/edit-path": {
+    "ns": 310.6,
+    "bytes": 3072,
+    "allocs": 3
+  },
+  "BenchmarkPartTraversal/original-flat": {
+    "ns": 296821.0,
+    "bytes": 0,
+    "allocs": 0
+  },
+  "BenchmarkPartTraversal/shared-pages": {
+    "ns": 919944.0,
+    "bytes": 0,
+    "allocs": 0
+  }
+}

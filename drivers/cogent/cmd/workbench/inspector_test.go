@@ -47,22 +47,22 @@ func TestInspectorPropertyValidationHistoryAndLatestSelection(t *testing.T) {
 		}
 	}
 	walk(view)
-	before := parts.parts[0]
+	before := parts.parts.at(0)
 	revision := parts.Revision()
 	for _, bad := range []string{"", "-1", "4294967296", "1.5"} {
 		field.Change(ui.ChangeEvent{Text: bad})
 	}
-	if parts.parts[0] != before || parts.Revision() != revision || journal.Snapshot().UndoCount != 0 {
+	if parts.parts.at(0) != before || parts.Revision() != revision || journal.Snapshot().UndoCount != 0 {
 		t.Fatal("invalid property changed accepted document/history")
 	}
 	field.Change(ui.ChangeEvent{Text: "4294967295"})
-	if parts.parts[0].Value != ^uint32(0) {
+	if parts.parts.at(0).Value != ^uint32(0) {
 		t.Fatal("fulluint32 value lost")
 	}
 	if err := journal.Undo(); err != nil {
 		t.Fatal(err)
 	}
-	if parts.parts[0] != before {
+	if parts.parts.at(0) != before {
 		t.Fatal("value undo mismatch")
 	}
 	if err := journal.Redo(); err != nil {
@@ -71,15 +71,15 @@ func TestInspectorPropertyValidationHistoryAndLatestSelection(t *testing.T) {
 	// A descriptor callback always uses the owner’s current selection.
 	selected = 1
 	field.Change(ui.ChangeEvent{Text: "765"})
-	if parts.parts[1].Value != 765 || parts.parts[0].Value != ^uint32(0) {
+	if parts.parts.at(1).Value != 765 || parts.parts.at(0).Value != ^uint32(0) {
 		t.Fatal("property request used stale selected index")
 	}
 	pack.Change(ui.ChangeEvent{SelectedID: "0"})
-	if parts.parts[1].Package != 0 {
+	if parts.parts.at(1).Package != 0 {
 		t.Fatal("package request lost")
 	}
 	rotation.Change(ui.ChangeEvent{SelectedID: "180"})
-	if parts.parts[1].Rotation != 180 {
+	if parts.parts.at(1).Rotation != 180 {
 		t.Fatal("rotation request lost")
 	}
 	rev := parts.Revision()

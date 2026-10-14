@@ -23,6 +23,8 @@ type documentImage struct {
 	Objects    []canvas.Rect
 	References []string
 	outline    *virtual.Tree
+	captured   *partSource
+	prepared   partStore
 }
 
 func buildOutline(count, total int) (*virtual.Tree, error) {
@@ -45,7 +47,7 @@ func buildOutline(count, total int) (*virtual.Tree, error) {
 	return tree, nil
 }
 func captureDocument(source *partSource, board *canvas.Scene, refs *fileReferences) documentImage {
-	return documentImage{Version: 1, Parts: slices.Clone(source.parts), Objects: slices.Clone(board.Objects), References: slices.Clone(refs.paths)}
+	return documentImage{Version: 1, captured: source.Snapshot(), Objects: slices.Clone(board.Objects), References: slices.Clone(refs.paths)}
 }
 func validateDocument(image documentImage) error {
 	if image.Version != 1 {
@@ -77,7 +79,17 @@ func validateDocument(image documentImage) error {
 	}
 	return nil
 }
+
+// materializeDocument runs outside the application owner for persistence encoding.
+func materializeDocument(image documentImage) documentImage {
+	if image.captured != nil {
+		image.Parts = image.captured.parts.values()
+		image.captured = nil
+	}
+	return image
+}
 func encodeDocument(image documentImage) ([]byte, error) {
+	image = materializeDocument(image)
 	if err := validateDocument(image); err != nil {
 		return nil, err
 	}
@@ -102,18 +114,21 @@ func decodeDocument(data []byte, treeRows int) (documentImage, error) {
 	}
 	var err error
 	image.outline, err = buildOutline(min(treeRows, len(image.Parts)), len(image.Parts))
+	if err == nil {
+		image.prepared = storeParts(image.Parts)
+	}
 	return image, err
 }
 func installDocument(source *partSource, table *virtual.Table, board *canvas.Scene, refs *fileReferences, image documentImage) error {
 	// Decode has validated and built the projection. No assignments precede the
 	// remaining admission checks; its detached buffers transfer to this owner.
-	if image.outline == nil {
+	if image.outline == nil || image.prepared.count != len(image.Parts) || image.prepared.count < 100000 {
 		return fmt.Errorf("document outline is missing")
 	}
 	if source.revision == math.MaxUint64 || refs.revision == math.MaxUint64 {
 		return fmt.Errorf("component revision exhausted")
 	}
-	source.parts = image.Parts
+	source.parts = image.prepared
 	source.revision++
 	table.Reset()
 	board.Objects = image.Objects

@@ -79,7 +79,7 @@ func workbenchAutomation(owner *app.Application, commands *command.Registry, sou
 			Value     uint32 `json:"value"`
 			Package   string `json:"package"`
 			Rotation  uint16 `json:"rotation"`
-		}{row.ID, row.Cells[0], source.parts[index].Value, row.Cells[2], source.parts[index].Rotation}, nil
+		}{row.ID, row.Cells[0], source.parts.at(index).Value, row.Cells[2], source.parts.at(index).Rotation}, nil
 	}); err != nil {
 		return nil, err
 	}

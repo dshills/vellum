@@ -45,3 +45,22 @@ logical geometry, five measured runs, cold/warm distinction, pacing/input/frame
 and native/GPU/resource budgets, 1,000 composed lifecycle cycles, overnight
 idle/background soak and the physical display variants. A passing bounded
 composition run alone does not satisfy that gate or the unchanged P6 targets.
+
+
+## Immutable component worker snapshots
+
+Component data uses immutable scalar pages: at most 64 branches × 64 leaves ×
+256 records. The application/document count remains 100k..1m. Snapshot captures
+share a root and copy only source descriptor/revision. Owner edits and history
+replay copy one root/branch/leaf (3,072 array bytes on arm64) before publication;
+workers never observe mutation of their frozen pages. Old roots are retained only
+by their current source/snapshot holders; journal entries capture sparse values.
+
+Save capture shares component data. Full record materialization/validation/JSON
+encoding and decoded page construction run on the document worker. Load admission
+transfers the prepared root; v1 JSON stays compatible. Geometry/reference capture,
+initial pre-window construction and legacy table projection admission retain their
+existing work and are not declared constant-time by this change. Indexed worker
+traversal has a measured lookup tradeoff. The [snapshot checkpoint](../docs/reports/macos-part-snapshots/README.md)
+records isolated operation costs and native save/load/calculation/editing checks;
+it does not qualify whole-frame performance, memory or full P11.

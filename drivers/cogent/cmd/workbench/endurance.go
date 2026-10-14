@@ -222,13 +222,13 @@ func runEndurance(ctx context.Context, a *app.Application, c enduranceConfig, co
 			if err := commands.Invoke(operation, "project.increment"); err != nil {
 				return err
 			}
-			original := parts.parts[selected()]
+			original := parts.parts.at(selected())
 			for _, id := range []string{"component.rotate", "component.raise-value", "edit.undo", "edit.undo"} {
 				if err := commands.Invoke(operation, id); err != nil {
 					return err
 				}
 			}
-			if parts.parts[selected()] != original {
+			if parts.parts.at(selected()) != original {
 				return errors.New("endurance document replay mismatch")
 			}
 			if err := table.SetViewport((step*17)%(parts.Len()-table.VisibleCount()), table.VisibleCount()); err != nil {
@@ -304,7 +304,7 @@ func runEndurance(ctx context.Context, a *app.Application, c enduranceConfig, co
 			// Queue admission alone never counts as an accepted domain edit.
 			for {
 				visible := false
-				err = enduranceOwner(operation, a, func() error { visible = parts.parts[selected()].Value == value; return nil })
+				err = enduranceOwner(operation, a, func() error { visible = parts.parts.at(selected()).Value == value; return nil })
 				if err != nil || visible {
 					break
 				}
@@ -351,7 +351,7 @@ func runEndurance(ctx context.Context, a *app.Application, c enduranceConfig, co
 			err = enduranceOwner(operation, a, func() error {
 				var mem runtime.MemStats
 				runtime.ReadMemStats(&mem)
-				sample = map[string]any{"event": "vellum.endurance.sample", "step": state.Steps, "elapsed_seconds": time.Since(started).Seconds(), "owner_roundtrip_ns": time.Since(stepStart).Nanoseconds(), "heap_alloc": mem.HeapAlloc, "heap_inuse": mem.HeapInuse, "total_alloc": mem.TotalAlloc, "go_sys": mem.Sys, "gc_cycles": mem.NumGC, "goroutines": runtime.NumGoroutine(), "pending": a.Pending(), "workers": manager.Pending().Active, "window_pixels": pixels, "window_manager_units": managerUnits, "domain_value": parts.parts[selected()].Value}
+				sample = map[string]any{"event": "vellum.endurance.sample", "step": state.Steps, "elapsed_seconds": time.Since(started).Seconds(), "owner_roundtrip_ns": time.Since(stepStart).Nanoseconds(), "heap_alloc": mem.HeapAlloc, "heap_inuse": mem.HeapInuse, "total_alloc": mem.TotalAlloc, "go_sys": mem.Sys, "gc_cycles": mem.NumGC, "goroutines": runtime.NumGoroutine(), "pending": a.Pending(), "workers": manager.Pending().Active, "window_pixels": pixels, "window_manager_units": managerUnits, "domain_value": parts.parts.at(selected()).Value}
 				return nil
 			})
 			if err == nil {

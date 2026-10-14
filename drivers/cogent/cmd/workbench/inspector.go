@@ -10,10 +10,10 @@ import (
 func inspectorView(parts *partSource, edit *partEditor, expanded bool, expansion func(bool), selected func() int, status func(string)) ui.Node {
 	index := selected()
 	row := parts.Row(index)
-	value := parts.parts[index]
+	value := parts.parts.at(index)
 	change := func(label string, assign func(*part)) {
 		i := selected()
-		next := parts.parts[i]
+		next := parts.parts.at(i)
 		assign(&next)
 		if err := edit.change(i, label, next); err != nil {
 			status(err.Error())
