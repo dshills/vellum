@@ -573,6 +573,17 @@
               "sha256": "af5de1659b775ac7da8a6702ffeddcb44e1fc320c61ade7203b9620967119898"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/spanstorage",
+          "inputs": "native/patches/spanstorage/original-hashes.json",
+          "outputs": "native/patches/spanstorage/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/spanstorage/0060-packed-owned-span-rows.patch",
+              "sha256": "5c8f950adec6e753adef7226ce5424703ea7c02f1555993c21dc9c661aac6d4c"
+            }
+          ]
         }
       ]
     },

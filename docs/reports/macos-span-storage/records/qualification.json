@@ -1,0 +1,155 @@
+{
+  "base_commit": "9686e38e2f14068e95c9eddfd0a7ddae8f648041",
+  "sources": {
+    "docs/reports/macos-span-storage/README.md": "87157bc58d2f0a2c6e55bee5dd16029542afea0080d0fbdd419f13384fc48cda",
+    "drivers/cogent/native/dependencies.json": "5f618431228a80ea4a23db1e5ebc241ac3a8b702bcc1fc8c479cc84e77bbfa58",
+    "drivers/cogent/native/patches/spanstorage/0060-packed-owned-span-rows.patch": "5c8f950adec6e753adef7226ce5424703ea7c02f1555993c21dc9c661aac6d4c",
+    "drivers/cogent/native/patches/spanstorage/README.md": "8e874917bdfbb6e3ce9cce3b48625be9e0672b8845d0e245a85ea96abe491db6",
+    "drivers/cogent/native/patches/spanstorage/original-hashes.json": "f1a1a7dab0fda8b8b454544b24b19b729f4c9f977d36d46409c5bf59cc79bb14",
+    "drivers/cogent/native/patches/spanstorage/output-hashes.json": "4a4d961829e5ddd8845d7237af4ba293dab67abd1f6e9668d473cb9afb1e498e",
+    "drivers/cogent/prepare_test.py": "2f422c1ab0b8867cf66037547af3a9052012210fb2dc3afc4f3a491e2dd614b4",
+    "specs/rendering.md": "19d1b77b69f5b64e91bf4043b2bd5b9a319d2c22fd8cb47fe1c91a93c6a8b12f"
+  },
+  "result": "PASS_SCOPED_PACKED_SPAN_STORAGE",
+  "checks": {
+    "final-prepare": {
+      "receipt_sha256": "906438f3c07695ea1f28c812985efec29c7a0aff0064033113695bf044b06761",
+      "exit_code": 0,
+      "elapsed_seconds": 2.573349624988623,
+      "argv": [
+        "python3",
+        "prepare.py"
+      ],
+      "uses_prepared_dependencies": true
+    },
+    "final-preparation-tests": {
+      "receipt_sha256": "c55b7dbcf27ace62893c8b3ba3a9cd6d8f3f4861bd7b370b69c30ec4d7e547fc",
+      "exit_code": 0,
+      "elapsed_seconds": 0.1408838330535218,
+      "argv": [
+        "python3",
+        "prepare_test.py"
+      ],
+      "uses_prepared_dependencies": false
+    },
+    "final-sceneplan-race": {
+      "receipt_sha256": "497f7a3660ff15ce5e245466b81c7a4b92655b79d980d9ae1f66245ec334b876",
+      "exit_code": 0,
+      "elapsed_seconds": 0.500678375014104,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./paint/renderers/sceneplan"
+      ],
+      "uses_prepared_dependencies": true
+    },
+    "final-sceneplan-vet": {
+      "receipt_sha256": "71d440c97f0ee4ecc777d0d05a1e2f44a8510401c4f2ac3c85b7eafa481e4660",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5331629170104861,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./paint/renderers/sceneplan"
+      ],
+      "uses_prepared_dependencies": true
+    },
+    "final-actual-matrix": {
+      "receipt_sha256": "f73163c98bb65f89c05e6de30da5062857b7bf6ed5da1b62fc374a8c295a79ab",
+      "exit_code": 0,
+      "elapsed_seconds": 16.592836667085066,
+      "argv": [
+        "go",
+        "test",
+        "-tags=offscreen",
+        "-p=1",
+        "-overlay=/private/tmp/vellum-macos-span-storage/final-matrix-overlay.json",
+        "-run=^TestPackedSpanStorageActualGridMatrix$",
+        "-count=1",
+        "."
+      ],
+      "uses_prepared_dependencies": true
+    },
+    "final-adapter-vet": {
+      "receipt_sha256": "3f1b45c8ae6f101bc2b1ad0a3e88e7d8c91c63a3b39ce518889a81cb58a372a7",
+      "exit_code": 0,
+      "elapsed_seconds": 8.691337249940261,
+      "argv": [
+        "go",
+        "vet",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "uses_prepared_dependencies": true
+    },
+    "final-adapter-race": {
+      "receipt_sha256": "d5884471cf79a93e712b0d102e6b8dcad7e0dd18923ad258252e454d03fe6be5",
+      "exit_code": 0,
+      "elapsed_seconds": 164.23635941604152,
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=1",
+        "./..."
+      ],
+      "uses_prepared_dependencies": true
+    },
+    "final-native-build": {
+      "receipt_sha256": "92e9b01072be07e1e998d393fdc90a9f9312c405df72ce68225a80cff0d9998f",
+      "exit_code": 0,
+      "elapsed_seconds": 13.963788208086044,
+      "argv": [
+        "go",
+        "build",
+        "-o",
+        "/private/tmp/vellum-macos-span-storage/loadedgrid",
+        "."
+      ],
+      "uses_prepared_dependencies": true
+    }
+  },
+  "prepared_before_files": 6210,
+  "prepared_after_files": 6211,
+  "all_other_leaves_unchanged": true,
+  "software_frames_identical": 48,
+  "negative_controls_detected": 2,
+  "local_capture_pairs": 5,
+  "local_capture_cpu_profiling_active": false,
+  "host_native_endurance_concurrent": true,
+  "local_capture_medians": {
+    "original": {
+      "ns_per_op": 3831743,
+      "bytes_per_op": 9283434,
+      "allocations_per_op": 106337
+    },
+    "candidate": {
+      "ns_per_op": 3737812,
+      "bytes_per_op": 9273835,
+      "allocations_per_op": 88944
+    }
+  },
+  "native_build_sha256": "b8ea461779945b92cab8f0e0ace02395ff7bf171f56d1afb33cec891d2a9595a",
+  "native_binary_launched": false,
+  "native_gpu_run": false,
+  "native_performance_gain_qualified": false,
+  "physical_or_retained_memory_gain_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 8,
+  "prism_findings": 0,
+  "prism_calls": 1,
+  "archive_sha256": "582bb54812d2014f7472737a377ce9554a9213c4cf23e5074569ef726c20e728",
+  "archive_members": 153,
+  "archive_bytes": 355888,
+  "canonical_promoted": false
+}

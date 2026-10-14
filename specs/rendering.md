@@ -462,3 +462,20 @@ exact equality and individual value corruption. Five interleaved offscreen
 400-cell driver captures, with CPU profiling active in both arms, measured
 median 5.241 ms before and 3.908 ms after with matching pixels and encoded shapes. This local capture result does not establish
 native frame latency or the unchanged P6 targets.
+
+
+## Packed owned span rows
+
+Stage 60 uses one exact detached span backing per operation. Every row has
+capacity equal to its length, including empty/gapped rows. Row order, span order,
+clipping, partial alpha and seeded replay match the original layout. Construction
+row-header refunds and operation admission still happen before compact storage
+allocation. Original Packet.Bytes and both Encode/EncodeGPU results are unchanged;
+the original accounting covers every retained span once.
+
+A 600-stream original-row oracle checks byte identity, seeded pixels and isolation
+from borrowed construction mutations and appended row copies. Five interleaved
+unprofiled local 400-cell captures reduce allocations 106,337 to 88,944 per capture;
+median local times were 3.832 versus 3.738 ms. A separate native endurance process
+was active. This observation does not qualify native frame, retained/physical
+memory, or the unchanged P6 targets. See [the scoped report](../docs/reports/macos-span-storage/README.md).

@@ -1,0 +1,108 @@
+--- a/paint/renderers/sceneplan/builder.go
++++ b/paint/renderers/sceneplan/builder.go
+@@ -107,10 +107,21 @@
+ 	o.rows = o.rows[o.rect.Min.Y-rowMin : o.rect.Max.Y-rowMin]
+ 	// Compact each row to exactly its retained capacity; replacement transients
+ 	// and the construction row index are accounted separately from owned packets.
++	// One detached backing holds every retained span. Row capacities are capped
++	// at their lengths, so appending cannot overwrite the following row. The
++	// same exact row/span charges cover this storage once, as before.
++	total := 0
++	for _, row := range o.rows {
++		total += len(row)
++	}
++	storage := make([]span, total)
+ 	exact := make([][]span, len(o.rows))
++	offset := 0
+ 	for i, row := range o.rows {
+-		exact[i] = make([]span, len(row))
+-		copy(exact[i], row)
++		end := offset + len(row)
++		copy(storage[offset:end], row)
++		exact[i] = storage[offset:end:end]
++		offset = end
+ 	}
+ 	o.rows = exact
+ 	b.add(o)
+--- /dev/null
++++ b/paint/renderers/sceneplan/span_storage_vellum_test.go
+@@ -0,0 +1,79 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"reflect"
++	"testing"
++)
++
++func TestVellumScenePlanSpanStorageReferenceAndOwnership(t *testing.T) {
++	rng := rand.New(rand.NewSource(60059))
++	bounds := image.Rect(0, 0, 37, 128)
++	for trial := 0; trial < 600; trial++ {
++		op := draw.Op(trial % 2)
++		c := color.RGBA{17, 29, 43, 91}
++		inputs := []rowBandInput{{11, 2, 19, 32767}, {17, 1, 31, 65535}}
++		for i := 0; i < 90; i++ {
++			inputs = append(inputs, rowBandInput{rng.Intn(160) - 16, rng.Intn(55) - 9, rng.Intn(55) - 9, uint32(rng.Intn(65536))})
++		}
++		b := New(bounds)
++		b.BeginSpans(c, op)
++		for _, in := range inputs {
++			b.Span(in.y, in.x0, in.x1, in.alpha)
++		}
++		// Retain borrowed construction slices before Seal, then overwrite them.
++		staging := append([][]span(nil), b.stream.rows...)
++		got := b.Seal(false)
++		want := rowBandReference(bounds, c, op, inputs)
++		if got == nil || got.Bytes() != want.Bytes() || got.Operations() != want.Operations() {
++			t.Fatal("span accounting or admission differs", trial)
++		}
++		for _, compact := range []bool{false, true} {
++			encode := func(p *Packet) (*Encoded, bool) {
++				if compact {
++					return p.EncodeGPU()
++				}
++				return p.Encode()
++			}
++			before, ok := encode(got)
++			ref, accepted := encode(want)
++			if !ok || !accepted || !reflect.DeepEqual(before, ref) {
++				t.Fatal("serialized row order or coverage differs", trial, compact)
++			}
++			for _, row := range staging {
++				for i := range row {
++					row[i] = span{}
++				}
++			}
++			for _, row := range got.ops[0].rows {
++				if cap(row) != len(row) {
++					t.Fatal("row retains capacity from another row")
++				}
++				if len(row) != 0 {
++					grown := append(row, span{0, 37, 65535})
++					grown[0] = span{}
++				}
++			}
++			after, admitted := encode(got)
++			if !admitted || !reflect.DeepEqual(before, after) {
++				t.Fatal("borrowed construction or appended row changed sealed packet", trial, compact)
++			}
++		}
++		actual, reference := image.NewRGBA(bounds), image.NewRGBA(bounds)
++		for i := range actual.Pix {
++			actual.Pix[i] = byte(i*31 + 7)
++			reference.Pix[i] = actual.Pix[i]
++		}
++		got.Replay(actual)
++		want.Replay(reference)
++		if !bytes.Equal(actual.Pix, reference.Pix) {
++			t.Fatal("seeded replay differs", trial)
++		}
++	}
++}
