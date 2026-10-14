@@ -31,6 +31,7 @@ import (
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	cogent "github.com/dshills/vellum/drivers/cogent"
+	"github.com/dshills/vellum/drivers/cogent/internal/acceptance"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -38,11 +39,16 @@ type config struct {
 	cycles, every int
 	timeout       time.Duration
 	heapProfile   string
+	composed      bool
 }
 
 func (c config) validate() error {
-	if c.cycles < 1 || c.cycles > 1000 || c.every < 1 || c.every > c.cycles || c.timeout < 10*time.Second || c.timeout > 20*time.Minute {
-		return errors.New("cycles 1..1000, sample-every 1..cycles, timeout 10s..20m required")
+	maximum := 20 * time.Minute
+	if c.composed {
+		maximum = 45 * time.Minute
+	}
+	if c.cycles < 1 || c.cycles > 1000 || c.every < 1 || c.every > c.cycles || c.timeout < 10*time.Second || c.timeout > maximum {
+		return errors.New("cycles 1..1000, sample-every 1..cycles, timeout 10s..20m (45m for composed) required")
 	}
 	if c.heapProfile != "" && (!filepath.IsAbs(c.heapProfile) || filepath.Clean(c.heapProfile) != c.heapProfile) {
 		return errors.New("heap-profile needs a clean absolute new file path")
@@ -89,6 +95,7 @@ func run() error {
 	flag.IntVar(&c.every, "sample-every", 25, "post-GC Go/RSS observation interval")
 	flag.DurationVar(&c.timeout, "timeout", 12*time.Minute, "cooperative native loop deadline")
 	flag.StringVar(&c.heapProfile, "heap-profile", "", "optional new absolute diagnostic heap-profile path (never overwrites)")
+	flag.BoolVar(&c.composed, "composed", false, "mount and exercise the all-component workspace with 1000 dense labels in each fresh cycle window")
 	flag.Parse()
 	if err := c.validate(); err != nil {
 		return err
@@ -152,7 +159,12 @@ func run() error {
 	if errors.Join(runErr, err) == nil {
 		result = "PASS_NATIVE_WINDOW_CYCLES"
 	}
-	report := map[string]any{"event": "vellum.window-cycle.result", "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": true, "full_p11_qualified": false, "native_heap_qualified": false, "gpu_memory_qualified": false, "clipboard_access": false, "preferences_changed": false}
+	report := map[string]any{"event": "vellum.window-cycle.result", "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": true, "full_p11_qualified": false, "native_heap_qualified": false, "gpu_memory_qualified": false, "clipboard_access": false, "preferences_changed": false, "composed_workspace": c.composed, "dense_labels_per_composed_window": func() int {
+		if c.composed {
+			return acceptance.DenseLabels
+		}
+		return 0
+	}()}
 	encodeErr := json.NewEncoder(os.Stdout).Encode(report)
 	return errors.Join(runErr, err, encodeErr)
 }
@@ -195,21 +207,39 @@ func (p *readyCanvas) Mount(parent tree.Node) core.Widget {
 func (p *readyCanvas) Sync(w core.Widget) error { return p.renderer.Sync(w) }
 
 func open(a *app.Application, id, title string) (*cogent.GPUCanvas, *canvas.Scene, *atomic.Bool, error) {
+	g, m, shown, _, err := openMode(a, id, title, false)
+	return g, m, shown, err
+}
+func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUCanvas, *canvas.Scene, *atomic.Bool, *acceptance.Workspace, error) {
 	m, err := canvas.New([]canvas.Rect{{ID: "probe", X: 0, Y: 0, Width: 100, Height: 60, Color: color.RGBA{67, 197, 166, 255}}})
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	m.Fit()
 	g := &cogent.GPUCanvas{Owner: a, Window: id, Model: m}
 	shown := &atomic.Bool{}
 	text := "controlled field"
 	checked := false
-	err = a.Open(app.Window{ID: id, Title: title, Width: 480, Height: 420, View: func() ui.Node {
+	var suite *acceptance.Workspace
+	if composed {
+		suite, err = acceptance.New(a, id, &readyCanvas{g, shown})
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+	}
+	width, height := float32(480), float32(420)
+	if composed {
+		width, height = 1920, 1080
+	}
+	err = a.Open(app.Window{ID: id, Title: title, Width: width, Height: height, View: func() ui.Node {
+		if suite != nil {
+			return suite.View()
+		}
 		children := []ui.Node{{ID: "label", Kind: ui.Label, Text: title}, {ID: "field", Kind: ui.TextField, Text: text, Change: func(e ui.ChangeEvent) { text = e.Text }}, {ID: "check", Kind: ui.Checkbox, Text: "Controlled flag", Checked: checked, Change: func(e ui.ChangeEvent) { checked = e.Checked }}, {ID: "button", Kind: ui.Button, Text: "Temporary action", Activate: func() {}}}
 		children = append(children, ui.Node{ID: "canvas", Kind: ui.Extension, Grow: true, Custom: &readyCanvas{g, shown}})
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: children}
 	}})
-	return g, m, shown, err
+	return g, m, shown, suite, err
 }
 func wait(ctx context.Context, check func(context.Context) (bool, error)) error {
 	return waitWithin(ctx, 5*time.Second, check)
@@ -318,7 +348,7 @@ func check(ctx context.Context, a *app.Application, survivor *cogent.GPUCanvas, 
 		return err
 	}
 	for i := 0; i < c.cycles; i++ {
-		if err = cycle(ctx, a, i); err != nil {
+		if err = cycle(ctx, a, i, c.composed); err != nil {
 			return fmt.Errorf("cycle %d: %w", i, err)
 		}
 		p.advance()
@@ -340,10 +370,10 @@ func check(ctx context.Context, a *app.Application, survivor *cogent.GPUCanvas, 
 	}
 	return nil
 }
-func cycle(ctx context.Context, a *app.Application, i int) error {
+func cycle(ctx context.Context, a *app.Application, i int, composed bool) error {
 	id := fmt.Sprintf("native-cycle-%04d", i)
 	title := "Vellum " + id
-	g, m, shown, err := open(a, id, title)
+	g, m, shown, suite, err := openMode(a, id, title, composed)
 	if err != nil {
 		return err
 	}
@@ -367,6 +397,11 @@ func cycle(ctx context.Context, a *app.Application, i int) error {
 	native, err := readback(ctx, a, g, m, shown)
 	if err != nil {
 		return err
+	}
+	if suite != nil {
+		if err = exerciseComposed(ctx, a, id, suite, i); err != nil {
+			return err
+		}
 	}
 	if err = inventory(ctx, []string{"Vellum cycle survivor", title}); err != nil {
 		return err
@@ -395,8 +430,16 @@ func cycle(ctx context.Context, a *app.Application, i int) error {
 	defer cancel()
 	retired, e := ownerProbe(limit, a, func() ownerReply {
 		var retirement error
+		if suite != nil {
+			if _, e := cogent.InspectGrid(a, suite.Grid); !errors.Is(e, cogent.ErrGridClosed) {
+				retirement = errors.Join(retirement, fmt.Errorf("closed grid inspection: %v", e))
+			}
+			if _, e := cogent.InspectTree(a, suite.Tree); !errors.Is(e, cogent.ErrTreeClosed) {
+				retirement = errors.Join(retirement, fmt.Errorf("closed tree inspection: %v", e))
+			}
+		}
 		if g.NativeWindow() != nil {
-			retirement = errors.New("closed canvas exposed native window")
+			retirement = errors.Join(retirement, errors.New("closed canvas exposed native window"))
 		}
 		if _, e := g.Snapshot(); !errors.Is(e, cogent.ErrFrameNotReady) {
 			retirement = errors.Join(retirement, fmt.Errorf("closed readback: %v", e))
@@ -416,12 +459,23 @@ type ownerReply struct {
 
 func ownerProbe(ctx context.Context, a *app.Application, fn func() ownerReply) (ownerReply, error) {
 	reply := make(chan ownerReply, 1)
+	var mu sync.Mutex
+	phase := 0 // queued, running, revoked, completed
 	if err := a.PostWait(ctx, func() {
-		if err := ctx.Err(); err != nil {
-			reply <- ownerReply{err: err}
+		mu.Lock()
+		if phase == 2 || ctx.Err() != nil {
+			phase = 2
+			mu.Unlock()
+			reply <- ownerReply{err: ctx.Err()}
 			return
 		}
-		reply <- fn()
+		phase = 1
+		mu.Unlock()
+		value := fn()
+		mu.Lock()
+		phase = 3
+		mu.Unlock()
+		reply <- value
 	}); err != nil {
 		return ownerReply{}, err
 	}
@@ -429,9 +483,22 @@ func ownerProbe(ctx context.Context, a *app.Application, fn func() ownerReply) (
 	case value := <-reply:
 		return value, nil
 	case <-ctx.Done():
+		mu.Lock()
+		if phase == 0 {
+			phase = 2
+			mu.Unlock()
+			return ownerReply{}, ctx.Err()
+		}
+		running := phase == 1 || phase == 3
+		mu.Unlock()
+		if running {
+			value := <-reply
+			return value, ctx.Err()
+		}
 		return ownerReply{}, ctx.Err()
 	}
 }
+
 func memoryGuard(s observation) error {
 	if s.RSSBytes > 1<<30 || s.HeapAlloc > 512<<20 {
 		return fmt.Errorf("window-cycle safety memory limit at %d: RSS=%d GoHeap=%d", s.Completed, s.RSSBytes, s.HeapAlloc)

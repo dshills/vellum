@@ -1,0 +1,410 @@
+{
+  "result": "PASS_FIVE_NATIVE_COMPOSED_PREFLIGHT_CYCLES",
+  "base_commit": "8a3e71eb4045d00ba6558f2bea9a2a98f2a1129a",
+  "selected_live_receipt": "composed-visible-v3",
+  "selected_executable_sha256": "e106342daf15bfac51869ebb297ca120d895f175398df3c376fbc98190136be1",
+  "selected_build": "build-v7",
+  "final_rebuild": "build-v8",
+  "final_rebuild_difference": "Only the unchanged new weak-reference regression moved to window_view_retention_test.go and original window_retention_test.go restored; production source identical",
+  "original_four_cycle_samples": [
+    {
+      "Completed": 0,
+      "HeapAlloc": 30132544,
+      "HeapInuse": 35602432,
+      "GoSys": 63609112,
+      "TotalAlloc": 66356784,
+      "Mallocs": 293081,
+      "Frees": 180961,
+      "NumGC": 10,
+      "Goroutines": 5,
+      "RSSBytes": 185008128,
+      "ElapsedSeconds": 0.193216458
+    },
+    {
+      "Completed": 1,
+      "HeapAlloc": 71534400,
+      "HeapInuse": 82214912,
+      "GoSys": 175712552,
+      "TotalAlloc": 346199576,
+      "Mallocs": 2709515,
+      "Frees": 2374298,
+      "NumGC": 16,
+      "Goroutines": 7,
+      "RSSBytes": 307134464,
+      "ElapsedSeconds": 2.175440791
+    },
+    {
+      "Completed": 2,
+      "HeapAlloc": 111521816,
+      "HeapInuse": 126844928,
+      "GoSys": 248527160,
+      "TotalAlloc": 624419272,
+      "Mallocs": 5125536,
+      "Frees": 4567943,
+      "NumGC": 20,
+      "Goroutines": 6,
+      "RSSBytes": 388120576,
+      "ElapsedSeconds": 4.259013583
+    },
+    {
+      "Completed": 3,
+      "HeapAlloc": 152353112,
+      "HeapInuse": 170663936,
+      "GoSys": 329546072,
+      "TotalAlloc": 901792480,
+      "Mallocs": 7536342,
+      "Frees": 6756809,
+      "NumGC": 23,
+      "Goroutines": 6,
+      "RSSBytes": 468795392,
+      "ElapsedSeconds": 6.108829458
+    },
+    {
+      "Completed": 4,
+      "HeapAlloc": 192346560,
+      "HeapInuse": 216137728,
+      "GoSys": 388987224,
+      "TotalAlloc": 1208117096,
+      "Mallocs": 10214411,
+      "Frees": 9212344,
+      "NumGC": 25,
+      "Goroutines": 6,
+      "RSSBytes": 530300928,
+      "ElapsedSeconds": 7.782437458
+    }
+  ],
+  "intermediate_twenty_cycle_samples": [
+    {
+      "Completed": 0,
+      "HeapAlloc": 30120336,
+      "HeapInuse": 36028416,
+      "GoSys": 67492120,
+      "TotalAlloc": 66345656,
+      "Mallocs": 293071,
+      "Frees": 180974,
+      "NumGC": 10,
+      "Goroutines": 6,
+      "RSSBytes": 185024512,
+      "ElapsedSeconds": 0.218417916
+    },
+    {
+      "Completed": 5,
+      "HeapAlloc": 75925816,
+      "HeapInuse": 91119616,
+      "GoSys": 184379688,
+      "TotalAlloc": 1472782456,
+      "Mallocs": 13095660,
+      "Frees": 12735861,
+      "NumGC": 33,
+      "Goroutines": 6,
+      "RSSBytes": 328613888,
+      "ElapsedSeconds": 7.670175541
+    },
+    {
+      "Completed": 10,
+      "HeapAlloc": 80595776,
+      "HeapInuse": 98779136,
+      "GoSys": 201865528,
+      "TotalAlloc": 2804979744,
+      "Mallocs": 25162190,
+      "Frees": 24770281,
+      "NumGC": 52,
+      "Goroutines": 7,
+      "RSSBytes": 352354304,
+      "ElapsedSeconds": 15.096145791
+    },
+    {
+      "Completed": 15,
+      "HeapAlloc": 81013192,
+      "HeapInuse": 96542720,
+      "GoSys": 218904888,
+      "TotalAlloc": 4146166320,
+      "Mallocs": 37231305,
+      "Frees": 36839326,
+      "NumGC": 71,
+      "Goroutines": 7,
+      "RSSBytes": 360251392,
+      "ElapsedSeconds": 22.73052475
+    },
+    {
+      "Completed": 20,
+      "HeapAlloc": 81013576,
+      "HeapInuse": 99287040,
+      "GoSys": 218904888,
+      "TotalAlloc": 5453377856,
+      "Mallocs": 49046345,
+      "Frees": 48654342,
+      "NumGC": 89,
+      "Goroutines": 6,
+      "RSSBytes": 369065984,
+      "ElapsedSeconds": 30.469307833
+    }
+  ],
+  "final_five_cycle_samples": [
+    {
+      "Completed": 0,
+      "HeapAlloc": 30129992,
+      "HeapInuse": 35520512,
+      "GoSys": 63768840,
+      "TotalAlloc": 66342848,
+      "Mallocs": 293059,
+      "Frees": 180947,
+      "NumGC": 11,
+      "Goroutines": 6,
+      "RSSBytes": 184385536,
+      "ElapsedSeconds": 0.203302959
+    },
+    {
+      "Completed": 1,
+      "HeapAlloc": 36146464,
+      "HeapInuse": 44318720,
+      "GoSys": 179792168,
+      "TotalAlloc": 374996184,
+      "Mallocs": 2745245,
+      "Frees": 2600553,
+      "NumGC": 17,
+      "Goroutines": 5,
+      "RSSBytes": 309575680,
+      "ElapsedSeconds": 1.3504805
+    },
+    {
+      "Completed": 2,
+      "HeapAlloc": 37769992,
+      "HeapInuse": 47144960,
+      "GoSys": 188442920,
+      "TotalAlloc": 675713752,
+      "Mallocs": 5183809,
+      "Frees": 5028476,
+      "NumGC": 23,
+      "Goroutines": 6,
+      "RSSBytes": 322617344,
+      "ElapsedSeconds": 2.5171125
+    },
+    {
+      "Completed": 3,
+      "HeapAlloc": 39089928,
+      "HeapInuse": 49971200,
+      "GoSys": 188705064,
+      "TotalAlloc": 982215200,
+      "Mallocs": 7635537,
+      "Frees": 7469348,
+      "NumGC": 29,
+      "Goroutines": 5,
+      "RSSBytes": 328220672,
+      "ElapsedSeconds": 3.767666625
+    },
+    {
+      "Completed": 4,
+      "HeapAlloc": 40659360,
+      "HeapInuse": 51773440,
+      "GoSys": 188705064,
+      "TotalAlloc": 1285191424,
+      "Mallocs": 10074596,
+      "Frees": 9898427,
+      "NumGC": 35,
+      "Goroutines": 5,
+      "RSSBytes": 329711616,
+      "ElapsedSeconds": 4.934216167
+    },
+    {
+      "Completed": 5,
+      "HeapAlloc": 42846512,
+      "HeapInuse": 54771712,
+      "GoSys": 197093672,
+      "TotalAlloc": 1592489504,
+      "Mallocs": 12523961,
+      "Frees": 12336545,
+      "NumGC": 40,
+      "Goroutines": 5,
+      "RSSBytes": 336052224,
+      "ElapsedSeconds": 6.084775667
+    }
+  ],
+  "final_native_cleanup": {
+    "MainThread": true,
+    "CleanupObserved": true,
+    "WindowTitles": [],
+    "FilePanels": {
+      "Tracked": 0,
+      "Visible": 0,
+      "Open": 0,
+      "Save": 0
+    },
+    "NativeOutstanding": 0,
+    "AccessibilityWindows": 0,
+    "Menu": {
+      "Owned": false,
+      "OriginalRestored": false,
+      "TargetRetired": true,
+      "Items": []
+    },
+    "Tray": {
+      "Present": false,
+      "Visible": false,
+      "Template": false,
+      "TargetRetired": true,
+      "Identity": 0,
+      "Title": "",
+      "Tooltip": "",
+      "AccessibilityLabel": "",
+      "ImageWidth": 0,
+      "ImageHeight": 0,
+      "PixelWidth": 0,
+      "PixelHeight": 0,
+      "Items": []
+    },
+    "CallbacksStopped": true,
+    "PendingCallbacks": 0,
+    "MenuCallbacks": 0,
+    "TrayCallbacks": 0
+  },
+  "composed_observations": [
+    {
+      "all_dense_labels_fully_visible": true,
+      "cycle": 1,
+      "dense_defined": 1000,
+      "dense_fully_visible": 1000,
+      "density_clip_screen_points": [
+        2056,
+        960,
+        3056,
+        173
+      ],
+      "editor_history_replayed": true,
+      "event": "vellum.composed-cycle",
+      "full_p11_qualified": false,
+      "grid_tree_completed": true,
+      "modal_open_close": true,
+      "native_text_accepted": true,
+      "requested_logical_size": [
+        1920,
+        1080
+      ],
+      "root_screen_points": [
+        2056,
+        8,
+        3056,
+        1125
+      ]
+    },
+    {
+      "all_dense_labels_fully_visible": true,
+      "cycle": 2,
+      "dense_defined": 1000,
+      "dense_fully_visible": 1000,
+      "density_clip_screen_points": [
+        2056,
+        960,
+        3056,
+        173
+      ],
+      "editor_history_replayed": true,
+      "event": "vellum.composed-cycle",
+      "full_p11_qualified": false,
+      "grid_tree_completed": true,
+      "modal_open_close": true,
+      "native_text_accepted": true,
+      "requested_logical_size": [
+        1920,
+        1080
+      ],
+      "root_screen_points": [
+        2056,
+        8,
+        3056,
+        1125
+      ]
+    },
+    {
+      "all_dense_labels_fully_visible": true,
+      "cycle": 3,
+      "dense_defined": 1000,
+      "dense_fully_visible": 1000,
+      "density_clip_screen_points": [
+        2056,
+        960,
+        3056,
+        173
+      ],
+      "editor_history_replayed": true,
+      "event": "vellum.composed-cycle",
+      "full_p11_qualified": false,
+      "grid_tree_completed": true,
+      "modal_open_close": true,
+      "native_text_accepted": true,
+      "requested_logical_size": [
+        1920,
+        1080
+      ],
+      "root_screen_points": [
+        2056,
+        8,
+        3056,
+        1125
+      ]
+    },
+    {
+      "all_dense_labels_fully_visible": true,
+      "cycle": 4,
+      "dense_defined": 1000,
+      "dense_fully_visible": 1000,
+      "density_clip_screen_points": [
+        2056,
+        960,
+        3056,
+        173
+      ],
+      "editor_history_replayed": true,
+      "event": "vellum.composed-cycle",
+      "full_p11_qualified": false,
+      "grid_tree_completed": true,
+      "modal_open_close": true,
+      "native_text_accepted": true,
+      "requested_logical_size": [
+        1920,
+        1080
+      ],
+      "root_screen_points": [
+        2056,
+        8,
+        3056,
+        1125
+      ]
+    },
+    {
+      "all_dense_labels_fully_visible": true,
+      "cycle": 5,
+      "dense_defined": 1000,
+      "dense_fully_visible": 1000,
+      "density_clip_screen_points": [
+        2056,
+        960,
+        3056,
+        173
+      ],
+      "editor_history_replayed": true,
+      "event": "vellum.composed-cycle",
+      "full_p11_qualified": false,
+      "grid_tree_completed": true,
+      "modal_open_close": true,
+      "native_text_accepted": true,
+      "requested_logical_size": [
+        1920,
+        1080
+      ],
+      "root_screen_points": [
+        2056,
+        8,
+        3056,
+        1125
+      ]
+    }
+  ],
+  "limits": [
+    "Five-cycle preflight only; 1000composedcycles still required",
+    "Native AX frame containment, not physical pixel or primary1920x1080/100% geometry qualification",
+    "Modal AX publication/retirement, not independent modal scene inventory",
+    "Go post-GC/RSS samples, not native heap/GPU attribution or long-run leak freedom",
+    "FullP6/P11, overnight, physical/human/distribution gates remainopen"
+  ]
+}

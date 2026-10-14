@@ -45,9 +45,12 @@ func (w *Workbench) reportError(err error) bool {
 }
 
 func (w *Workbench) queue(change func() error) {
+	if w.retired.Load() {
+		return
+	}
 	generation := w.generation.Load()
 	err := w.Owner.PostWindow(w.Window, func() {
-		if generation != w.generation.Load() {
+		if w.retired.Load() || generation != w.generation.Load() {
 			return
 		}
 		if err := change(); err != nil && !w.reportError(err) {

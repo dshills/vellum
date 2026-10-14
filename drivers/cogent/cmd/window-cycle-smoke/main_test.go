@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -121,5 +122,72 @@ func TestHeapProfileRefusesExistingFile(t *testing.T) {
 	data, err := os.ReadFile(path)
 	if err != nil || string(data) != "preserve existing bytes" {
 		t.Fatal("existing profile bytes changed")
+	}
+}
+
+func TestOwnerProbeJoinsExecutingCallback(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	entered, release := make(chan struct{}), make(chan struct{})
+	var once sync.Once
+	unblock := func() { once.Do(func() { close(release) }) }
+	defer unblock()
+	done := make(chan error, 1)
+	go func() {
+		_, e := ownerProbe(ctx, a, func() ownerReply { close(entered); <-release; return ownerReply{} })
+		done <- e
+	}()
+	deadline := time.After(time.Second)
+	for a.Pending().Ordinary == 0 {
+		select {
+		case <-deadline:
+			t.Fatal("owner callback not admitted")
+		default:
+			time.Sleep(time.Millisecond)
+		}
+	}
+	drained := make(chan struct{})
+	go func() { a.Drain(); close(drained) }()
+	<-entered
+	cancel()
+	select {
+	case <-done:
+		t.Fatal("running callback detached at cancellation")
+	case <-time.After(20 * time.Millisecond):
+	}
+	unblock()
+	select {
+	case e := <-done:
+		if !errors.Is(e, context.Canceled) {
+			t.Fatal(e)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("callback did not join")
+	}
+	<-drained
+}
+func TestComposedVisibilityRequiresCompleteInsideFrames(t *testing.T) {
+	b := [4]float64{10, 20, 100, 80}
+	if !frameInside([4]float64{20, 30, 20, 20}, b) {
+		t.Fatal("contained frame refused")
+	}
+	for _, f := range [][4]float64{{20, 30, 0, 20}, {9, 30, 20, 20}, {90, 30, 30, 20}, {20, 90, 20, 20}} {
+		if frameInside(f, b) {
+			t.Fatal("empty/clipped frame qualified", f)
+		}
+	}
+}
+
+func TestComposedDeadlineHasBoundedExtendedBudget(t *testing.T) {
+	if err := (config{cycles: 1000, every: 25, timeout: 45 * time.Minute, composed: true}).validate(); err != nil {
+		t.Fatal(err)
+	}
+	if (config{cycles: 1000, every: 25, timeout: 45*time.Minute + time.Second, composed: true}).validate() == nil {
+		t.Fatal("unbounded composed run admitted")
 	}
 }

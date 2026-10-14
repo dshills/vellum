@@ -516,3 +516,12 @@ bounded behavior. A 40-process/4,800-sample native comparison shows roughly 3%
 lower mean UI work and fewer allocations in all four fixed/variable 10k/1m cases.
 The unchanged 4/6 ms targets still fail; complete P6, composed P11/endurance and
 Mac release acceptance remain open.
+
+The [composed lifecycle foundation](../docs/reports/macos-composed-lifecycle/README.md)
+adds an all-kind workspace with1000 dense labels to the native window-cycle
+runner. It fixes nested dock record retention, failed rebuild cleanup, retired
+interaction delivery and a closed Window.View backing-slot reference. Original
+regressions fail; final race/vet checks and five native composed preflight cycles
+pass. Native frame containment is separate from pixel/physical/primary geometry.
+The1000-cycle composed campaign, fullP6/P11/memory/overnight and Mac release gates
+remain required.

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/dshills/vellum/ui"
 	"math"
+	"slices"
 	"strings"
 	"sync"
 	"unicode/utf8"
@@ -201,7 +202,8 @@ func (a *Application) CloseWindow(id string) error {
 	// original context and cancel closure from application-owned storage.
 	a.lifetimes[id] = a.retiredLifetime
 	delete(a.windowCancels, id)
-	a.windows = append(a.windows[:index], a.windows[index+1:]...)
+	// Delete clears the removed backing slot, releasing its View/close closures.
+	a.windows = slices.Delete(a.windows, index, index+1)
 	delete(a.dirty, id)
 	wake := a.wake
 	hooks := a.revokeLocked(id, ErrWindowClosed)

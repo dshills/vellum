@@ -809,6 +809,11 @@ func disposeControlTree(r *record) {
 		return
 	}
 	disposeControl(r)
+	// Workbench extensions own retained records outside descriptor Children.
+	// Dispose those bindings under the same owner before widget destruction.
+	if extension, ok := r.node.Custom.(interface{ disposeControlRecords() }); r.node.Kind == ui.Extension && ok {
+		extension.disposeControlRecords()
+	}
 	for _, c := range r.children {
 		disposeControlTree(c)
 	}

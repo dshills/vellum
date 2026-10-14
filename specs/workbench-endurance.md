@@ -64,3 +64,25 @@ existing work and are not declared constant-time by this change. Indexed worker
 traversal has a measured lookup tradeoff. The [snapshot checkpoint](../docs/reports/macos-part-snapshots/README.md)
 records isolated operation costs and native save/load/calculation/editing checks;
 it does not qualify whole-frame performance, memory or full P11.
+
+## All-component native lifecycle fixture
+
+The native window-cycle command's `-composed` mode uses fresh editor/history,
+managed grid and indexed outline, docked GPU canvas, modal and every accepted
+UI kind, plus 1000 dense short labels. It retains the survivor/context/completion/
+late-admission/native teardown checks. Actual Cocoa text changes count only after
+controlled model acceptance; model history replay and grid/tree geometry stay
+separate observations. Modal proof is native AX target presence/absence.
+
+Density reports defined labels and frame containment within the measured root
+and scroll viewport after geometry publication. Requested1920×1080 dimensions
+are not effective geometry or100%scale qualification. Software tests replace
+Extension content with allocation placeholders and qualify only controls/labels.
+Composed deadlines are10seconds..45minutes; the original mode remains20minutes.
+
+Workbench disposal recursively retires private panel records before widget
+teardown, including unadopted records after a failed shape rebuild. It revokes
+interaction generation and refuses retired queue admission/delivery. Ordinary
+window removal clears backing slots holding View/CloseRequest closures. Domain
+models remain application-owned. The [checkpoint](../docs/reports/macos-composed-lifecycle/README.md)
+records short native observations;1000composedcycles and fullP11 remain required.

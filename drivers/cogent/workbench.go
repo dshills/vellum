@@ -6,10 +6,10 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/tree"
 	"encoding/json"
+	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/workbench"
-	"fmt"
 	"html"
 	"math"
 	"sync/atomic"
@@ -41,6 +41,7 @@ type Workbench struct {
 	SessionWindow  string
 	buttons        map[string]*core.Tab
 	pendingError   atomic.Pointer[error]
+	retired        atomic.Bool
 	geometryEpoch  atomic.Uint64
 	boundsSequence atomic.Uint64
 	pendingBounds  atomic.Pointer[nativeBoundsCapture]
@@ -70,6 +71,7 @@ func (w *Workbench) Mount(parent tree.Node) core.Widget {
 	if w == nil || w.Owner == nil || w.Workspace == nil && w.Group == nil {
 		return nil
 	}
+	w.retired.Store(false)
 	w.host = core.NewFrame(parent)
 	w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1) })
 	w.bindWindowGeometry()
@@ -79,7 +81,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 	if w == nil || w.Owner == nil || w.Workspace == nil && w.Group == nil {
 		return fmt.Errorf("workbench: owner and workspace required")
 	}
-	if w.host == nil {
+	if w.host == nil || w.host.This == nil {
 		return fmt.Errorf("workbench: not mounted")
 	}
 	if pending := w.pendingError.Swap(nil); pending != nil && !w.reportError(*pending) {
@@ -92,6 +94,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		if err == nil {
 			return
 		}
+		w.disposeControlRecords()
 		w.host.DeleteChildren()
 		w.records = nil
 		w.parents = nil
@@ -105,6 +108,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 	if err != nil {
 		return err
 	}
+	w.retired.Store(false) // explicit retry rebuilds a cleared but still attached host
 	w.layoutSnapshot = l.Root
 	signature := shape(l.Root)
 	w.syncing = true
@@ -117,7 +121,16 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 				tree.MoveToParent(r.widget, parking)
 			}
 		}
-		defer parking.Delete()
+		defer func() {
+			// A failed build can leave old panels unadopted in parking.
+			// Retire their private bindings before deleting their widgets.
+			for id, r := range retained {
+				if w.records[id] != r {
+					disposeControlTree(r)
+				}
+			}
+			parking.Delete()
+		}()
 		w.host.DeleteChildren()
 		w.generation.Add(1)
 		w.records = map[string]*record{}
@@ -130,6 +143,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		}
 		for id, r := range retained {
 			if w.records[id] == nil && r != nil && !tree.IsNil(r.widget) {
+				disposeControlTree(r)
 				r.widget.AsTree().Delete()
 			}
 		}
@@ -286,4 +300,23 @@ func (w *Workbench) syncLayout(g *workbench.Group) {
 			}
 		}
 	}
+}
+
+// disposeControlRecords retires this extension's private record graph. Widget
+// destruction still belongs to its originating scene; shared domain models and
+// panel factories remain application-owned. It is safe to call again.
+func (w *Workbench) disposeControlRecords() {
+	w.retired.Store(true)
+	w.generation.Add(1)
+	w.pendingError.Store(nil)
+	for _, r := range w.records {
+		disposeControlTree(r)
+	}
+	w.records = nil
+	w.parents = nil
+	w.tabs = nil
+	w.splits = nil
+	w.buttons = nil
+	w.layoutSnapshot = nil
+	w.signature = ""
 }
