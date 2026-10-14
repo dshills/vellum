@@ -1,0 +1,248 @@
+--- a/core/text.go
++++ b/core/text.go
+@@ -59,7 +59,9 @@
+ 	highlights []textpos.Range
+ 
+ 	// paintText is the [shaped.Lines] for the text.
+-	paintText *shaped.Lines
++	paintText         *shaped.Lines
++	localLayoutUpdate bool // scoped updater deferral under admitted fixed layout
++	localTextPending  bool // cancelled local requests lazily restore ordinary allocation shaping
+ 
+ 	// normalCursor is the cached cursor to display when there
+ 	// is no link being hovered.
+@@ -314,7 +316,10 @@
+ 
+ 	tx.FinalUpdater(func() {
+ 		tx.updateRichText()
+-		tx.configTextAlloc(tx.Geom.Size.Alloc.Content)
++		if !tx.localLayoutUpdate {
++			tx.configTextAlloc(tx.Geom.Size.Alloc.Content)
++			tx.localTextPending = false
++		}
+ 	})
+ }
+ 
+@@ -480,6 +485,7 @@
+ 	tsty.Align, tsty.AlignV = text.Start, text.Start
+ 	tx.paintText = tx.Scene.TextShaper().WrapLines(tx.richText, sty, tsty, sz)
+ 	tx.setAnchorFromProperties()
++	tx.localTextPending = false
+ }
+ 
+ // setAnchorFromProperties sets the Anchor string on paintText based on
+@@ -524,6 +530,7 @@
+ 	}
+ 	tx.paintText = tsh.WrapLines(tx.richText, sty, tsty, rsz)
+ 	tx.setAnchorFromProperties()
++	tx.localTextPending = false
+ 	return tx.paintText.Bounds.Size().Ceil()
+ }
+ 
+@@ -570,6 +577,9 @@
+ }
+ 
+ func (tx *Text) Render() {
++	if tx.localTextPending {
++		tx.configTextAlloc(tx.Geom.Size.Alloc.Content)
++	}
+ 	tx.WidgetBase.Render()
+ 	tx.paintText.SelectReset()
+ 	tx.paintText.SelectRegion(tx.selectRange)
+--- /dev/null
++++ b/core/text_local_layout.go
+@@ -0,0 +1,62 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package core
++
++import "cogentcore.org/core/styles/abilities"
++
++// UpdateTextForLocalLayout runs a passive text's ordinary value/updater callbacks
++// without allocation-based shaping that an admitted fixed-allocation pass will
++// immediately replace. The caller styles the text normally afterward; its root
++// must size every updated text before paint, including its ordinary fallback.
++// If a queued root is cancelled or reparented, Render restores ordinary
++// allocation shaping before consuming text. Interactive text is refused because
++// its input handlers require shaped content before the next layout pass.
++// Call only under this scene's originating render context. False leaves the text
++// untouched so the caller can use the normal UpdateWidget path.
++func (sc *Scene) UpdateTextForLocalLayout(root LocalLayoutRoot, tx *Text) bool {
++	_, wb := sc.localLayoutIdentity(root)
++	if wb == nil || tx == nil || tx.This == nil || tx.Scene != sc || sc.GlobalLayoutPending() || !sc.localLayoutAttached(wb) || !sc.localLayoutAttached(tx.AsWidget()) {
++		return false
++	}
++	for _, ability := range []abilities.Abilities{
++		abilities.Focusable, abilities.Selectable, abilities.Clickable, abilities.Activatable,
++		abilities.DoubleClickable, abilities.TripleClickable, abilities.Draggable,
++		abilities.LongPressable, abilities.LongHoverable, abilities.Slideable,
++	} {
++		if tx.AbilityIs(ability) {
++			return false
++		}
++	}
++	admitted := false
++	for _, request := range sc.localLayouts {
++		if request.root.AsWidget() == wb && request.parent == wb.Parent.AsTree() {
++			admitted = true
++			break
++		}
++	}
++	if !admitted {
++		return false
++	}
++	descendant := false
++	for parent, depth := tx.Parent, 0; parent != nil && depth < localLayoutMaxAncestors; parent, depth = parent.AsTree().Parent, depth+1 {
++		if parent.AsTree() == wb.AsTree() {
++			descendant = true
++			break
++		}
++	}
++	if !descendant {
++		return false
++	}
++	previous := tx.localLayoutUpdate
++	tx.localLayoutUpdate = true
++	defer func() { tx.localLayoutUpdate = previous }()
++	// Old shaped content must not receive new rich-span styles before SizeUp.
++	// The registered root guarantees its upcoming sizing/paint boundary.
++	tx.paintText = nil
++	tx.localTextPending = true
++	tx.UpdateWidget()
++	// An application updater may size eagerly; the final rich source still wins.
++	tx.paintText = nil
++	tx.localTextPending = true
++	return true
++}
+--- /dev/null
++++ b/core/text_local_layout_test.go
+@@ -0,0 +1,129 @@
++//go:build offscreen
++
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/abilities"
++	"cogentcore.org/core/text/rich"
++	"cogentcore.org/core/text/shaped"
++	"cogentcore.org/core/text/text"
++	"testing"
++)
++
++type textWrapProbe struct {
++	shaped.Shaper
++	calls int
++}
++
++func (p *textWrapProbe) WrapLines(tx rich.Text, style *rich.Style, ts *text.Style, size math32.Vector2) *shaped.Lines {
++	p.calls++
++	return p.Shaper.WrapLines(tx, style, ts, size)
++}
++
++func TestVellumLocalTextUpdateShapesOnceAndRefusesForeign(t *testing.T) {
++	var tx *Text
++	m, sc, roots := localFixture(t, 2)
++	root := roots[0]
++	rc := sc.renderContext()
++	rc.Lock()
++	tx = NewText(root).SetText("old value")
++	tx.Styler(func(s *styles.Style) {
++		s.Text.WhiteSpace = text.WhiteSpacePre
++		s.SetAbilities(false, abilities.Focusable, abilities.Selectable, abilities.Clickable, abilities.Activatable, abilities.DoubleClickable, abilities.TripleClickable, abilities.Draggable, abilities.LongPressable, abilities.LongHoverable, abilities.Slideable)
++	})
++	tx.Update()
++	rc.Unlock()
++	drainManual(t, m)
++	rc.Lock()
++	defer rc.Unlock()
++	probe := &textWrapProbe{Shaper: rc.textShaper}
++	rc.textShaper = probe
++	defer func() { rc.textShaper = probe.Shaper }()
++	oldPaint := tx.PaintText()
++	tx.SetText("new &lt;literal&gt;")
++	if sc.UpdateTextForLocalLayout(root, tx) {
++		t.Fatal("unrequested root admitted")
++	}
++	if tx.PaintText() != oldPaint {
++		t.Fatal("refusal changed text")
++	}
++	if !sc.NeedsLocalLayout(root) {
++		t.Fatal("local request rejected")
++	}
++	if sc.UpdateTextForLocalLayout(roots[1], tx) {
++		t.Fatal("foreign subtree admitted")
++	}
++	if !sc.UpdateTextForLocalLayout(root, tx) {
++		t.Fatal("admitted text refused")
++	}
++	if probe.calls != 0 || tx.PaintText() != nil || tx.localLayoutUpdate {
++		t.Fatal("updater shaped early or retained scoped deferral", probe.calls)
++	}
++	tx.Style()
++	tx.SizeUp()
++	tx.SizeDown(0)
++	tx.SizeFinal()
++	if probe.calls != 1 || tx.PaintText() == nil || string(tx.TextRunes()) != "new <literal>" {
++		t.Fatal("scheduled sizing did not produce exact new content once", probe.calls, string(tx.TextRunes()))
++	}
++	probe.calls = 0
++	tx.SetText("cancelled deferred")
++	if !sc.UpdateTextForLocalLayout(root, tx) {
++		t.Fatal("second admitted text refused")
++	}
++	tx.Style()
++	sc.clearLocalLayouts() // simulate request cancellation without a sizing pass
++	tx.Render()
++	if probe.calls != 1 || tx.PaintText() == nil || tx.localTextPending || string(tx.TextRunes()) != "cancelled deferred" {
++		t.Fatal("cancelled local layout lost text fallback", probe.calls)
++	}
++	probe.calls = 0
++	tx.SetText("ordinary next")
++	tx.UpdateWidget()
++	if probe.calls == 0 || tx.PaintText() == nil {
++		t.Fatal("normal updater lost immediate shaping")
++	}
++	sc.setFlag(true, sceneNeedsLayout)
++	oldPaint = tx.PaintText()
++	if sc.UpdateTextForLocalLayout(root, tx) || tx.PaintText() != oldPaint {
++		t.Fatal("full-layout fence bypassed")
++	}
++}
++
++func TestVellumLocalTextUpdateRefusesInteractiveText(t *testing.T) {
++	m, sc, roots := localFixture(t, 1)
++	root := roots[0]
++	rc := sc.renderContext()
++	rc.Lock()
++	tx := NewText(root).SetText("old interactive value")
++	tx.Update()
++	rc.Unlock()
++	drainManual(t, m)
++	rc.Lock()
++	defer rc.Unlock()
++	probe := &textWrapProbe{Shaper: rc.textShaper}
++	rc.textShaper = probe
++	defer func() { rc.textShaper = probe.Shaper }()
++	if !tx.AbilityIs(abilities.Selectable) || !tx.AbilityIs(abilities.DoubleClickable) || !tx.AbilityIs(abilities.Slideable) {
++		t.Fatal("fixture lacks ordinary text interactions")
++	}
++	if !sc.NeedsLocalLayout(root) {
++		t.Fatal("local request rejected")
++	}
++	oldPaint := tx.PaintText()
++	tx.SetText("new interactive value")
++	if sc.UpdateTextForLocalLayout(root, tx) || tx.PaintText() != oldPaint || probe.calls != 0 || tx.localTextPending {
++		t.Fatal("interactive refusal changed shaped content")
++	}
++	tx.UpdateWidget()
++	if tx.PaintText() == nil || probe.calls == 0 || string(tx.TextRunes()) != "new interactive value" {
++		t.Fatal("ordinary interactive fallback lost shaping")
++	}
++	// These shape-consuming paths are safe immediately, before a queued paint.
++	tx.pixelToRune(tx.Geom.ContentBBox.Min)
++	tx.selectWord(0)
++}

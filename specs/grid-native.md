@@ -278,6 +278,15 @@ rounding is unchanged. Unchanged text keeps its actual shaped output when its
 physical allocation and styling are stable. Complete scene painting follows;
 there is no partial scene image, altered painter order or GPU upload change.
 
+Passive grid labels can defer the ordinary updater's allocation shape to the
+admitted local sizing pass (owned patch 0055). Value/updater callbacks and rich
+parsing still run; old shaped output is cleared before applying new rich styles.
+Every updated label must remain passive and belong to the root's sizing set.
+Interactive text, wrong/retired/detached roots, missing requests and full-layout
+fences refuse without mutation and take the ordinary updater. Sizing clears the
+pending state; Render restores allocation shaping if a queued pass is canceled.
+This preserves inline editing's immediate shaping and complete scene paint.
+
 Core admits at most 64 live local-layout roots per scene and coalesces actual
 initialized tree identities. A full rebuild/restyle/layout overrides previously
 queued local work. Capacity or local-layout refusal promotes ordinary full scene

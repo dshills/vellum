@@ -518,6 +518,17 @@
               "sha256": "ca29a3be9cc8b4b2c95b1dd95392f44d2f14f6a14564df51d0b434d5a18de8f7"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/localtext",
+          "inputs": "native/patches/localtext/original-hashes.json",
+          "outputs": "native/patches/localtext/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/localtext/0055-passive-local-text-layout.patch",
+              "sha256": "27c5209647059ce4020d8fc4d5fd3131d351c8d408ab23c9eb5a4bffdbb6721c"
+            }
+          ]
         }
       ]
     },

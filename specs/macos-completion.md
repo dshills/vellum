@@ -507,3 +507,12 @@ inputs and unchanged-byte upload copies with actual GPU parity and paired native
 release runs. Neither showed a useful pilot gain; both prototypes were rejected
 and no renderer patch was added. Warm table layout/paint and reconciliation are
 the next profiling priority. The unchanged 4/6ms targets remain failed.
+
+The [passive grid text checkpoint](../docs/reports/macos-local-text/README.md)
+removes the updater shape that an admitted local sizing pass immediately replaces.
+Interactive text keeps its ordinary updater path; canceled local requests restore
+shaping before paint. Internal review and real-shaper/grid race checks qualify the
+bounded behavior. A 40-process/4,800-sample native comparison shows roughly 3%
+lower mean UI work and fewer allocations in all four fixed/variable 10k/1m cases.
+The unchanged 4/6 ms targets still fail; complete P6, composed P11/endurance and
+Mac release acceptance remain open.

@@ -1,0 +1,48 @@
+{
+  "result": "REVIEWED_MAC_LOCAL_TEXT",
+  "base_commit": "08e0a8ce631af6ff5c2e0413a1734e1d4d2e8142",
+  "source": {
+    "drivers/cogent/grid.go": "364e2050a904608fb2d3f0184d40d2965ffffbc3387b330d823668d2cde88f69",
+    "drivers/cogent/native/dependencies.json": "68c618fab9d4a7ab0955ba42d97a704709117494923973165491759f44d87c2b",
+    "drivers/cogent/prepare_test.py": "6affa0d2cbbbf8941ab688884b1318ed81a35652c293fda87091bf21bfa5e693",
+    "drivers/cogent/native/patches/localtext/0055-passive-local-text-layout.patch": "27c5209647059ce4020d8fc4d5fd3131d351c8d408ab23c9eb5a4bffdbb6721c",
+    "drivers/cogent/native/patches/localtext/README.md": "e2832f337b5e8a42996556bb7885808eafd5b62e8f8084e2d7c96786e86e377e",
+    "drivers/cogent/native/patches/localtext/original-hashes.json": "c633a96ce77d279697da149d019ac2390d79c8027ae10beddaaa0e0162a4e017",
+    "drivers/cogent/native/patches/localtext/output-hashes.json": "9fb5336e12bd959b01683ab92f1e314caed7611bb762afd372369d15256300cd",
+    "specs/grid-native.md": "ca129fbb3e4307e8c334df7849e16c61a539fcec19f74b465ace505aa0c1c4da",
+    "specs/macos-completion.md": "f99a171270e34f2c0e79a9db82d0f13c98b382d94c14087a8cf5e54af0c369df",
+    "docs/reports/macos-local-text/README.md": "d7113faa2d9a7accbb61d778731b6d0d13a701fd18addfc722984a210ba07b58",
+    "docs/reports/macos-local-text/records/review-summary.json": "7df1b2557dbabac8d675e32f5069eacd182d74bdf97ffdabcb8acfa54a2d94f9"
+  },
+  "prepared_files": 6204,
+  "prepared_manifest_sha256": "dd0ef2c6cc20da767106956f448a3a98ed637a2a855591462b5bb1a20d3f0b13",
+  "processes": 40,
+  "ordinary_samples": 4800,
+  "gpu_scene_opt_in": true,
+  "latency_targets_met": false,
+  "required_receipts": {
+    "formal-core-race-v1": "f9fe3097928f9d55b67c59f3d82f950fb011b1be7ffe78c3fd426a683e9996a3",
+    "formal-adapter-race-v1": "3b508954c46bbaf89569ca1931ec4cecfe5b4d266f93b2d5f9e192ec08e942fc",
+    "formal-workbench-race-v2": "86a2c381934fdfe46a1e17adab78b511a622e62166f590bf55b736de75fcb443",
+    "formal-vet-v1": "f2800855ae49ef53cf67aadaa3e807eb2e3bdd3cfe83c3dec5e7ef928226a80f",
+    "formal-prepare-test-v1": "f90f730af47955046e934fb1e9ed9bf1875cd64ba9e12c303f45efb28429d4b5"
+  },
+  "adapter_test_qualification": "Broad race suite passes all packages except sandbox-denied workbench Unix socket; exact failed package retry passes with socket permission. During broad suite only four report/spec leaves changed; all code and prepared files stayed exact. Raw failure retained.",
+  "comparison_sha256": "3b2cc75856c6d6d24723537c3d0c850ace8ca091de3efabf29ce263ba1e4c479",
+  "internal_review_sha256": "1e7d805f23169118a2cd33414612b5eba819645433f158e5a6eeb6bfcaaa8d1d",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_findings": 0,
+  "prism_coverage_complete": true,
+  "prism_sha256": "935bef49be4bbee9460cf51b45a6aa9e14dc78fb5193a8f3e5aa1cb624f4680a",
+  "limits": [
+    "Local opt-in GPU scene host observations; no GPU completion or physical presentation timing.",
+    "CompleteP6, integratedP11, physicalGPU/human/release acceptance remainopen."
+  ],
+  "archive_sha256": "61d04b5f409bdec014d4a07444cf9c371161253f570e48573c7b14d859a261ea",
+  "index_sha256": "f155312243c747905ad95d6c18670e7a475da55461b56a3738b90d8731af4751",
+  "archive_members": 183,
+  "archive_index_verified": true,
+  "qualification_sha256": "fca157688380ef6206b1dbc45959c51c1b162a3f4622431b6b171ad9a5de39f1",
+  "seal_producer_sha256": "460574aab452180234a30f4c44938db32b0168eaddabf9367a81bd70bd51d163"
+}

@@ -1,0 +1,137 @@
+{
+  "result": "PASS_MATCHED_NATIVE_LOCAL_TEXT_COMPARISON",
+  "base_commit": "08e0a8ce631af6ff5c2e0413a1734e1d4d2e8142",
+  "processes": 40,
+  "samples": 4800,
+  "runs_per_binary_per_case": 5,
+  "warmup_callbacks_per_process": 128,
+  "samples_per_process": 120,
+  "gpu_scene_opt_in": true,
+  "paired_geometry_exact": true,
+  "latency_targets_met": false,
+  "binary_sha256": {
+    "baseline": "ca12173aa3b5a54663ee940d227ade99026d23714a182f63227e843b86cb1162",
+    "candidate": "079d8bdb27a7524cfc28a1708852291124dfe711d8047b3a862a2da22d71eb1f"
+  },
+  "comparison_qualification_sha256": "3b2cc75856c6d6d24723537c3d0c850ace8ca091de3efabf29ce263ba1e4c479",
+  "cases": {
+    "fixed-10000": {
+      "baseline_ui_work_ns": {
+        "count": 600,
+        "p50": 5411502,
+        "p95": 6559750,
+        "p99": 7224084,
+        "max": 7572585,
+        "min": 4892080,
+        "mean": 5614390.126666667,
+        "sample_stddev": 511994.9803211819,
+        "coefficient_of_variation": 0.09119333868328093
+      },
+      "candidate_ui_work_ns": {
+        "count": 600,
+        "p50": 5317835,
+        "p95": 6218084,
+        "p99": 6613794,
+        "max": 7030584,
+        "min": 4752376,
+        "mean": 5456864.713333333,
+        "sample_stddev": 402811.95674778917,
+        "coefficient_of_variation": 0.07381747173675687
+      },
+      "baseline_mean_alloc_bytes": 9792659.573333334,
+      "candidate_mean_alloc_bytes": 9586719.2,
+      "baseline_mean_mallocs": 61607.69666666666,
+      "candidate_mean_mallocs": 58640.15666666667
+    },
+    "fixed-1000000": {
+      "baseline_ui_work_ns": {
+        "count": 600,
+        "p50": 5271624,
+        "p95": 6383210,
+        "p99": 6643124,
+        "max": 13200421,
+        "min": 4698460,
+        "mean": 5416068.821666666,
+        "sample_stddev": 527661.0513887911,
+        "coefficient_of_variation": 0.09742510089198164
+      },
+      "candidate_ui_work_ns": {
+        "count": 600,
+        "p50": 5173293,
+        "p95": 5856042,
+        "p99": 6399292,
+        "max": 7683625,
+        "min": 4628707,
+        "mean": 5246129.045,
+        "sample_stddev": 322467.946790455,
+        "coefficient_of_variation": 0.06146778777731249
+      },
+      "baseline_mean_alloc_bytes": 9322094.64,
+      "candidate_mean_alloc_bytes": 9177268.013333334,
+      "baseline_mean_mallocs": 61574.416666666664,
+      "candidate_mean_mallocs": 58609.16
+    },
+    "variable-10000": {
+      "baseline_ui_work_ns": {
+        "count": 600,
+        "p50": 5420252,
+        "p95": 6643043,
+        "p99": 7406709,
+        "max": 7704624,
+        "min": 3820000,
+        "mean": 5421029.511666667,
+        "sample_stddev": 779632.749039423,
+        "coefficient_of_variation": 0.14381636317632387
+      },
+      "candidate_ui_work_ns": {
+        "count": 600,
+        "p50": 5293251,
+        "p95": 6314414,
+        "p99": 6910543,
+        "max": 7634958,
+        "min": 3912749,
+        "mean": 5261170.698333333,
+        "sample_stddev": 667849.7534786721,
+        "coefficient_of_variation": 0.126939381322533
+      },
+      "baseline_mean_alloc_bytes": 9641366.933333334,
+      "candidate_mean_alloc_bytes": 9471408.533333333,
+      "baseline_mean_mallocs": 57916.02333333333,
+      "candidate_mean_mallocs": 55078.861666666664
+    },
+    "variable-1000000": {
+      "baseline_ui_work_ns": {
+        "count": 600,
+        "p50": 5359624,
+        "p95": 6506917,
+        "p99": 6799167,
+        "max": 7358583,
+        "min": 3736628,
+        "mean": 5268575.37,
+        "sample_stddev": 709694.1072349409,
+        "coefficient_of_variation": 0.13470322760798634
+      },
+      "candidate_ui_work_ns": {
+        "count": 600,
+        "p50": 5224793,
+        "p95": 5953417,
+        "p99": 6420000,
+        "max": 7476623,
+        "min": 3820043,
+        "mean": 5099140.955,
+        "sample_stddev": 591113.6841877878,
+        "coefficient_of_variation": 0.11592417024835663
+      },
+      "baseline_mean_alloc_bytes": 9206365.853333334,
+      "candidate_mean_alloc_bytes": 9028735.413333334,
+      "baseline_mean_mallocs": 57884.87,
+      "candidate_mean_mallocs": 55046.91333333333
+    }
+  },
+  "limits": [
+    "Single local host; opt-in GPU scene rendering only",
+    "Host UI work excludes queue wait/drawable acquisition, GPU completion and physical presentation",
+    "Process-wide Go allocation includes helpers/runtime; no native/private memory attribution",
+    "Complete P6, integrated P11, human accessibility and release acceptance remain open"
+  ]
+}

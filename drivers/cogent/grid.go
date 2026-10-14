@@ -777,7 +777,9 @@ func syncGrid(r *record) error {
 	g.orderPanes()
 	if local && g.host.Scene.NeedsLocalLayout(g.host) {
 		for w := range styleDirty {
-			w.UpdateWidget()
+			if !g.host.Scene.UpdateTextForLocalLayout(g.host, w) {
+				w.UpdateWidget()
+			}
 			w.Style()
 		}
 	} else {
