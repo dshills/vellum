@@ -580,3 +580,9 @@ controls, modal buttons and hierarchical tree selection/disclosure. Tree indexin
 reserves bounded window-scoped worker/completion credit and runs off-owner. This
 broadens interaction evidence; it does not certify physical input, human VoiceOver,
 menus/services, sustained P6/P11 or a new 1000-cycle retention campaign.
+
+The [inline color-picker checkpoint](../docs/reports/macos-color-picker/README.md)
+adds an owner-held RGBA/hex component built from managed controls, immutable
+checker pixels and ordinary focus/AX semantics. Slider explicit/theme minimum
+sizes now survive the backend final style pass. The scoped routed-input/Cocoa
+checks do not close P6/P11, human accessibility or distribution gates.

@@ -157,3 +157,39 @@ func TestReconcileNewThemeRestylesRetainedNodesAndPanels(t *testing.T) {
 		t.Fatal("theme extension kept stale theme")
 	}
 }
+
+func TestSliderManagedSizingOverridesFinalDefaultsAndRestores(t *testing.T) {
+	a, _ := app.New(app.Config{})
+	defer a.Close()
+	host := core.NewBody("headless")
+	n := ui.Node{ID: "slider", Kind: ui.Slider, Numeric: ui.Numeric{Min: 0, Max: 255, Step: 1}, MinWidth: 160, Style: ui.Style{MaxSize: ui.Some(ui.Size{Width: 240})}}
+	r, err := reconcile(host, nil, n, a, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	widget := r.widget
+	check := func(min float32, unit units.Units, max float32) {
+		t.Helper()
+		widget.AsWidget().Style()
+		s := widget.AsWidget().Styles
+		if s.Min.X.Value != min || s.Min.X.Unit != unit || s.Max.X.Value != max {
+			t.Fatalf("managed sizing after native final style: min=%+v max=%+v", s.Min.X, s.Max.X)
+		}
+	}
+	check(160, units.UnitDp, 240)
+	n.MinWidth, n.Style = 0, ui.Style{}
+	theme := ui.Theme{Kinds: map[ui.Kind]ui.Style{ui.Slider: {MinSize: ui.Some(ui.Size{Width: 110}), MaxSize: ui.Some(ui.Size{Width: 220})}}}
+	r, err = reconcile(host, r, n, a, "main", theme)
+	if err != nil {
+		t.Fatal(err)
+	}
+	check(110, units.UnitDp, 220)
+	r, err = reconcile(host, r, n, a, "main", ui.Theme{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	check(20, units.UnitEm, 0)
+	if r.widget != widget {
+		t.Fatal("sizing changes replaced retained slider")
+	}
+}

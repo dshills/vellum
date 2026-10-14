@@ -19,6 +19,7 @@ renders these elements and publishes their supported accessibility semantics.
 | Radio choices | `ui.RadioGroup` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Segmented choices | `ui.SegmentedControl` | `Options`, `SelectedID`, `Change`, `Orientation` |
 | Slider | `ui.Slider` | `Numeric`, `Number`, `Change` |
+| Inline color picker | `ui.ColorPicker.View()` | Straight-alpha `Color`, `Change(ColorEdit)`, `Invalid` |
 | Numeric field | `ui.NumberField` | `Numeric`, `Number`, `Change` |
 | Single-line field | `ui.TextField` | `Text`, `Change` |
 | Document editor | `ui.MultilineText` | `Editor`, `SoftWrap`, `TabInserts` |
@@ -200,3 +201,24 @@ The application supplies canArchive and requestAction. This menu has no selected
 value; the gallery's Icons and actions page demonstrates it. See the
 [MenuButton contract](../specs/menu-button.md) and
 [Mac checkpoint](reports/macos-menu-button/README.md) for tested scope.
+
+`ui.ColorPicker` supplies inline RGBA sliders, a hex field and a checker preview.
+Retain it in your application model and render its View on the owner:
+
+```go
+picker := &ui.ColorPicker{ID: "ink", Label: "Ink", Color: color.NRGBA{R: 32, G: 96, B: 224, A: 255}}
+picker.Change = func(edit ui.ColorEdit) {
+    picker.Color = edit.Apply(picker.Color)
+    picker.ValidationMessage = ""
+}
+picker.Invalid = func(err error) { picker.ValidationMessage = err.Error() }
+// Return picker.View() from an app.Window View, or include it among children.
+```
+
+The example imports image/color and github.com/dshills/vellum/ui. Apply edits to
+the current accepted value; this preserves other queued channel changes and RGB
+at zero alpha. You may reject or normalize proposals in Change. Nil Change makes
+the component read-only. Reserve its ID + "/color/" namespace. Focus the hex
+field with ui.ColorFieldID("ink", ui.ColorHex) and a normal FocusRequest. See the
+[contract](../specs/color-picker.md) for bounded input and cache behavior. The
+controls gallery includes a Colors page with reset, disable and focus actions.

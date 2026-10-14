@@ -341,3 +341,13 @@ checks pass. The ordinary matched comparison and open Mac/P6 targets are in
 [the checkpoint report](reports/macos-keyed-grid-layout/README.md). The default
 renderer still uses full raster replay and image upload; ordered GPU scene-source
 rendering remains the next architecture step.
+
+## Inline color component
+
+The public ui.ColorPicker composes managed RGBA sliders, a hex field and an
+immutable checker preview. Callers retain accepted straight-alpha color and can
+normalize/refuse edits, show validation and target generated field IDs for focus.
+The gallery demonstrates reset/disable/focus. The checkpoint also fixes Slider
+minimum sizing overridden by backend final styling; removing overrides restores
+native defaults. See [the report](reports/macos-color-picker/README.md). Broader
+Mac performance, human accessibility and release gates remain open.

@@ -21,23 +21,40 @@ import (
 )
 
 type gallery struct {
-	enabled              bool
-	details              bool
-	snapping, pinned     bool
-	selection, tab, text string
-	number               float32
-	split                float32
-	dialog               bool
-	focus                ui.FocusRequest
-	picture              *canvas.TiledImage
-	imageFit             ui.ImageFit
-	menuCount            int
-	menuLast             string
-	menuDisabled         bool
+	enabled                     bool
+	details                     bool
+	snapping, pinned            bool
+	selection, tab, text        string
+	number                      float32
+	split                       float32
+	dialog                      bool
+	focus                       ui.FocusRequest
+	picture                     *canvas.TiledImage
+	imageFit                    ui.ImageFit
+	menuCount                   int
+	menuLast                    string
+	menuDisabled                bool
+	colorPicker                 *ui.ColorPicker
+	colorEdits, colorInvalid    int
+	colorReject, colorNormalize bool
 }
 
 func newGallery() *gallery {
-	return &gallery{enabled: true, details: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
+	g := &gallery{enabled: true, details: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
+	g.colorPicker = &ui.ColorPicker{ID: "ink", Label: "Ink color", Color: color.NRGBA{R: 32, G: 96, B: 224, A: 255}, Style: ui.Style{Gap: ui.Some(float32(8))}}
+	g.colorPicker.Change = func(e ui.ColorEdit) {
+		g.colorEdits++
+		if g.colorReject {
+			return
+		}
+		g.colorPicker.Color = e.Apply(g.colorPicker.Color)
+		if g.colorNormalize {
+			g.colorPicker.Color.A = 255
+		}
+		g.colorPicker.ValidationMessage = ""
+	}
+	g.colorPicker.Invalid = func(err error) { g.colorInvalid++; g.colorPicker.ValidationMessage = err.Error() }
+	return g
 }
 
 func galleryImage() *canvas.TiledImage {
@@ -125,9 +142,21 @@ func (g *gallery) view() ui.Node {
 			g.picture = source
 		}},
 	}}
+	colorsPage := ui.Node{ID: "colors", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
+		g.colorPicker.View(),
+		{ID: "color-tools", Kind: ui.Toolbar, Children: []ui.Node{
+			{ID: "color-reset", Kind: ui.Button, Text: "Reset color", Activate: func() {
+				g.colorPicker.Color = color.NRGBA{R: 32, G: 96, B: 224, A: 255}
+				g.colorPicker.ValidationMessage = ""
+			}},
+			{ID: "color-disabled", Kind: ui.Checkbox, Text: "Disable color editing", Checked: g.colorPicker.Disabled, Change: func(e ui.ChangeEvent) { g.colorPicker.Disabled = e.Checked }},
+			{ID: "color-focus", Kind: ui.Button, Text: "Focus hex", Activate: func() { g.focus.ID = ui.ColorFieldID("ink", ui.ColorHex); g.focus.Sequence++ }},
+		}},
+	}}
+
 	return ui.Node{ID: "gallery", Kind: ui.Column, Grow: true, Focus: g.focus, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{
 		{ID: "title", Kind: ui.Label, Text: "Vellum controls gallery", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 24, Weight: 600})}},
-		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
+		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
 		{ID: "preferences", Kind: ui.Dialog, Text: "Preferences", Open: g.dialog, Dismiss: func() { g.dialog = false }, Children: []ui.Node{
 			{ID: "dialog-description", Kind: ui.Label, Text: "Native modal dialog with retained content. Close with Escape or the Close button."},
 			{ID: "dialog-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name in preferences"}},
@@ -140,14 +169,18 @@ func main() {
 	smoke := flag.Bool("smoke", false, "open and close a native modal during the smoke check")
 	disclosureSmoke := flag.Bool("disclosure-smoke", false, "check actual Cocoa disclosure publication and actions in a bounded fixture")
 	menuSmoke := flag.Bool("menu-smoke", false, "check actual Cocoa menu routing and lifetime in a bounded fixture")
+	colorSmoke := flag.Bool("color-smoke", false, "verify bounded native color field acceptance and lifetime")
 	flag.Parse()
+	if *colorSmoke && (*smoke || *menuSmoke || *disclosureSmoke || *exit > 0) {
+		must(errors.New("color-smoke requires its own bounded process"))
+	}
 	if *menuSmoke && (*smoke || *disclosureSmoke || *exit > 0) {
 		must(errors.New("menu-smoke requires its own bounded process"))
 	}
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *disclosureSmoke || *menuSmoke {
+	if *disclosureSmoke || *menuSmoke || *colorSmoke {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
@@ -157,9 +190,25 @@ func main() {
 	if *menuSmoke {
 		g.tab = "symbols"
 	}
+	if *colorSmoke {
+		g.tab = "colors"
+	}
 	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: 720, Height: 650, View: g.view}))
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	var colorDone chan error
+	var removeColorCleanup func()
+	if *colorSmoke {
+		var observeErr error
+		removeColorCleanup, observeErr = beginColorCleanup()
+		must(observeErr)
+		defer removeColorCleanup()
+		var stop context.CancelFunc
+		ctx, stop = context.WithTimeout(ctx, 60*time.Second)
+		defer stop()
+		colorDone = make(chan error, 1)
+		go func() { colorDone <- checkColor(ctx, a, g); cancel() }()
+	}
 	var menuDone chan error
 	if *menuSmoke {
 		var stop context.CancelFunc
@@ -186,6 +235,21 @@ func main() {
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
 	err = a.Run(ctx, cogent.Driver{Theme: theme})
+	if colorDone != nil {
+		cancel()
+		var checkErr error
+		select {
+		case checkErr = <-colorDone:
+		case <-time.After(6 * time.Second):
+			checkErr = errors.New("color worker did not join after native exit")
+		}
+		checkErr = errors.Join(checkErr, finishColorCleanup())
+		if errors.Is(err, context.Canceled) {
+			err = nil
+		}
+		must(errors.Join(err, checkErr))
+		return
+	}
 	if menuDone != nil {
 		cancel()
 		var checkErr error

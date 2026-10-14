@@ -433,3 +433,6 @@ acceptance remain separate from software rendering and inert Cocoa role checks.
 Action menu buttons have transient actions rather than controlled selection. See
 the [MenuButton contract](menu-button.md) for input, focus, Cocoa semantics and
 originating-window popup retirement.
+
+The [inline color picker](color-picker.md) composes existing Slider, TextField,
+Image and FormGroup nodes into an owner-held RGBA editor.

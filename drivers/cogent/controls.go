@@ -234,13 +234,15 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		return nil, false, nil
 	}
 	r.widget = widget
-	if r.node.Kind == ui.ProgressBar || r.node.Kind == ui.Separator {
-		widget.AsWidget().Styler(func(s *styles.Style) {
-			s.Direction = styles.Row
-			if r.node.Orientation == ui.Vertical {
-				s.Direction = styles.Column
-			}
-		})
+	if r.node.Kind == ui.ProgressBar || r.node.Kind == ui.Separator || r.node.Kind == ui.Slider {
+		if r.node.Kind != ui.Slider {
+			widget.AsWidget().Styler(func(s *styles.Style) {
+				s.Direction = styles.Row
+				if r.node.Orientation == ui.Vertical {
+					s.Direction = styles.Column
+				}
+			})
+		}
 		// These native controls set dimensions/growth in FinalStyler. Managed
 		// explicit styles must run after those defaults, including restoration.
 		widget.AsWidget().FinalStyler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })

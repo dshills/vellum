@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/dshills/vellum/ui"
+	"image/color"
 	"testing"
 )
 
@@ -144,6 +145,45 @@ func TestGalleryManagedImageFitAndReplacement(t *testing.T) {
 	preview := node(g.view(), "image-preview")
 	if preview.Kind != ui.Image || preview.Fit != ui.ImageCover || preview.Image == old || preview.Image.NRGBAAt(4, 4).G != 192 || old.NRGBAAt(4, 4).G != 64 {
 		t.Fatal("image replacement did not retain immutable prior source")
+	}
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGalleryColorPickerAcceptedInvalidRejectedAndNormalized(t *testing.T) {
+	g := newGallery()
+	g.tab = "colors"
+	if err := ui.Validate(g.view()); err != nil {
+		t.Fatal(err)
+	}
+	field := func(c ui.ColorChannel) ui.Node { return node(g.view(), ui.ColorFieldID("ink", c)) }
+	field(ui.ColorHex).Change(ui.ChangeEvent{Text: "#1234"})
+	if g.colorPicker.Color != (color.NRGBA{R: 17, G: 34, B: 51, A: 68}) || g.colorEdits != 1 {
+		t.Fatal("hex acceptance")
+	}
+	field(ui.ColorHex).Change(ui.ChangeEvent{Text: "invalid"})
+	if g.colorInvalid != 1 || node(g.view(), "ink/color/validation").Text == "" {
+		t.Fatal("invalid hex feedback")
+	}
+	g.colorReject = true
+	field(ui.ColorRed).Change(ui.ChangeEvent{Number: 99})
+	if g.colorPicker.Color.R != 17 || g.colorEdits != 2 {
+		t.Fatal("owner refusal")
+	}
+	g.colorReject, g.colorNormalize = false, true
+	field(ui.ColorAlpha).Change(ui.ChangeEvent{Number: 10})
+	if g.colorPicker.Color.A != 255 || g.colorPicker.ValidationMessage != "" {
+		t.Fatal("owner normalization")
+	}
+	node(g.view(), "color-focus").Activate()
+	if g.focus.ID != ui.ColorFieldID("ink", ui.ColorHex) {
+		t.Fatal("hex focus")
+	}
+	node(g.view(), "color-disabled").Change(ui.ChangeEvent{Checked: true})
+	field(ui.ColorRed).Change(ui.ChangeEvent{Number: 100})
+	if g.colorEdits != 3 || g.colorPicker.Color.R != 17 {
+		t.Fatal("disabled proposal")
 	}
 	if err := ui.Validate(g.view()); err != nil {
 		t.Fatal(err)
