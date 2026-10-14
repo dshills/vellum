@@ -8,6 +8,9 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import tempfile
+import struct
+
+from native_archive import archive_members, linker_objects, selected_archive_members
 
 from artifact_io import publish_exclusive
 from child_process import check_child_output
@@ -193,7 +196,57 @@ def package_inventory(packages, roots, notices):
     return {"packages": result, "embedded_assets": assets, "native_link_candidates": native, "unresolved_native_inputs": unresolved}
 
 
-def collect(root, include_untracked=False):
+def native_link_observation(binary, link_map, roots, builds):
+    """Observe supplied artifacts, without claiming they came from one build."""
+    binary, link_map = Path(binary).absolute(), Path(link_map).absolute()
+    binary_identity = file_identity(binary.parent.resolve(), binary.name)
+    with binary.open("rb") as stream:
+        header = stream.read(8)
+    if len(header) != 8 or header[:4] not in {b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf"}:
+        raise ValueError("link observation requires a thin 64-bit Mach-O binary")
+    cpu = struct.unpack("<I" if header[:4] == b"\xcf\xfa\xed\xfe" else ">I", header[4:])[0]
+    architecture = {0x100000c: "arm64", 0x1000007: "x86_64"}.get(cpu)
+    mapping = linker_objects(link_map)
+    if architecture != mapping["architecture"]:
+        raise ValueError("binary and linker-map architecture differ")
+    candidates = {}
+    for library in builds["native_link_candidates"]:
+        for candidate in library["file_candidates"]:
+            if candidate["file"].endswith(".a"):
+                path = (roots[candidate["module"]] / candidate["file"]).resolve()
+                candidates[path] = candidate
+    archives = []
+    observed = set()
+    unresolved = {}
+    for name in mapping["objects"]:
+        match = re.fullmatch(r"(.+\.a)\(([^()]+)\)", name)
+        if match:
+            if not Path(match[1]).is_absolute():
+                unresolved[match[1]] = "relative-linker-directory-unbound"
+                continue
+            path = Path(match[1]).resolve()
+            if path in candidates:
+                observed.add(path)
+            else:
+                unresolved[normalize_flag(str(path), roots)] = "not-a-verified-module-file-candidate"
+    for path in sorted(observed):
+        candidate = candidates[path]
+        archive = archive_members(path)
+        if archive["bytes"] != candidate["bytes"] or archive["sha256"] != candidate["sha256"]:
+            raise ValueError("native archive differs from collected candidate")
+        selected = selected_archive_members(mapping, path, archive)
+        archives.append({"module": candidate["module"], "file": candidate["file"], "bytes": archive["bytes"], "sha256": archive["sha256"], "archive_member_count": len(archive["members"]), "selected_members": selected, "selection": "reported-by-linker-object-table", "component_source_and_rights": "unreviewed"})
+    if file_identity(binary.parent.resolve(), binary.name) != binary_identity:
+        raise ValueError("binary changed during link observation")
+    map_identity = file_identity(link_map.parent.resolve(), link_map.name)
+    if map_identity["bytes"] != mapping["bytes"] or map_identity["sha256"] != mapping["sha256"]:
+        raise ValueError("linker map changed during observation")
+    return {"binary": binary_identity, "link_map": map_identity, "architecture": architecture, "object_count": len(mapping["objects"]), "archives": archives, "unresolved_archives": [{"file": name, "reason": unresolved[name]} for name in sorted(unresolved)], "artifact_pair_binding": "caller-supplied-unverified", "scope": "Exact archive-member identities reported by absolute paths in the supplied linker object table; relative paths have no bound linker working directory and remain unresolved. Member payload bytes need not all survive dead stripping. Binary/map hashes and matching architecture do not prove they came from one build. A separate owned build receipt must bind them. Object names do not prove Rust component versions, source or redistribution rights."}
+
+
+def collect(root, include_untracked=False, binary=None, link_map=None):
+    if (binary is None) != (link_map is None):
+        raise ValueError("binary and linker map must be supplied together")
     root = root.resolve()
     env = child_environment()
     configuration = json.loads(check_child_output(["go", "env", "-json", "GOOS", "GOARCH", "GOVERSION", "CGO_ENABLED", "GOROOT"], cwd=root, env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS))
@@ -215,6 +268,9 @@ def collect(root, include_untracked=False):
     raw = check_child_output(["go", "list", "-deps", "-json", "./cmd/workbench"], cwd=root / "drivers/cogent", env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS)
     packages = release.decode_objects(raw)
     builds = package_inventory(packages, roots, notice_by_module)
+    link_observation = native_link_observation(binary, link_map, roots, builds) if binary is not None else None
+    if link_observation is not None and link_observation["architecture"] != {"arm64": "arm64", "amd64": "x86_64"}.get(configuration["GOARCH"]):
+        raise ValueError("link artifacts differ from selected Go build architecture")
     sources = []
     for name, path in release.source_files(root, include_untracked=include_untracked):
         if len(sources) == MAX_FILES:
@@ -255,10 +311,16 @@ def collect(root, include_untracked=False):
         raise ValueError("Go build metadata changed during inventory collection")
     if release.source_state(root) != source_state:
         raise ValueError("Git state changed during inventory collection")
-    return {"schema": 1, "scope": "SDK source payload and selected macOS workbench Go build inputs; native files are linker search candidates, not proof of final binary inclusion or a complete embedded Rust/C dependency closure", "distribution_audit": "pending", "runtime_executed": False, "source": source_state, "include_untracked": include_untracked, "build_configuration": configuration, "package_pattern": "./cmd/workbench", "pin_manifest": pin_record, "framework_declarations": declarations, "toolchain_declaration_candidates": toolchain_declarations, "go_notices": notices, "sdk_files": sources, **builds}
+    if link_observation is not None:
+        if native_link_observation(binary, link_map, roots, builds) != link_observation:
+            raise ValueError("native link observation changed during collection")
+    result = {"schema": 1, "scope": "SDK source payload and selected macOS workbench Go build inputs; native files are linker search candidates, not proof of final binary inclusion or a complete embedded Rust/C dependency closure", "distribution_audit": "pending", "runtime_executed": False, "source": source_state, "include_untracked": include_untracked, "build_configuration": configuration, "package_pattern": "./cmd/workbench", "pin_manifest": pin_record, "framework_declarations": declarations, "toolchain_declaration_candidates": toolchain_declarations, "go_notices": notices, "sdk_files": sources, **builds}
+    if link_observation is not None:
+        result["native_link_observation"] = link_observation
+    return result
 
 
-def write_inventory(root, output, include_untracked=False):
+def write_inventory(root, output, include_untracked=False, binary=None, link_map=None):
     output = output.absolute()
     if output.exists() or output.is_symlink():
         raise ValueError("inventory output already exists")
@@ -268,7 +330,7 @@ def write_inventory(root, output, include_untracked=False):
         pass
     else:
         raise ValueError("inventory output must be outside the source checkout")
-    inventory = collect(root, include_untracked)
+    inventory = collect(root, include_untracked, binary, link_map)
     data = (json.dumps(inventory, indent=2, sort_keys=True) + "\n").encode()
     output.parent.mkdir(parents=True, exist_ok=True)
     pending = None
@@ -287,8 +349,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--include-untracked", action="store_true", help="record nonignored whitelisted private precommit inputs")
+    parser.add_argument("--binary", type=Path, help="optional private Mach-O artifact; requires --link-map")
+    parser.add_argument("--link-map", type=Path, help="optional ld -map artifact; pair provenance remains caller-supplied")
     args = parser.parse_args()
-    print(json.dumps(write_inventory(ROOT, args.output, args.include_untracked), indent=2))
+    print(json.dumps(write_inventory(ROOT, args.output, args.include_untracked, args.binary, args.link_map), indent=2))
 
 
 if __name__ == "__main__":

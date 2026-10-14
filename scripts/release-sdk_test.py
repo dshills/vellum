@@ -60,7 +60,7 @@ class ReleaseChecks(unittest.TestCase):
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
             public_files = []
-            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui", "virtual"):
+            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui", "virtual", "canvas"):
                 (root / package).mkdir()
                 for source in (release.ROOT / package).glob("*.go"):
                     if not source.name.endswith("_test.go"):
@@ -92,6 +92,7 @@ import (
     "errors"
     "strings"
     "time"
+    "image/color"
     "github.com/dshills/vellum/document"
     "github.com/dshills/vellum/editor"
     "github.com/dshills/vellum/history"
@@ -99,7 +100,18 @@ import (
     "github.com/dshills/vellum/execution"
     "github.com/dshills/vellum/tasks"
     "github.com/dshills/vellum/replay"
+    "github.com/dshills/vellum/ui"
 )
+func TestExportedControls(t *testing.T) {
+    picker := &ui.ColorPicker{ID:"ink", Color:color.NRGBA{R:32,G:96,B:224,A:255}}
+    if err := ui.Validate(picker.View()); err != nil { t.Fatal(err) }
+    menu := ui.Node{ID:"view", Kind:ui.MenuButton, Text:"View", Options:[]ui.Option{
+        {ID:"grid",Label:"Show grid",Checkable:true,Checked:true},
+        {ID:"divider",Separator:true},
+        {ID:"reset",Label:"Reset"},
+    }, Change:func(ui.ChangeEvent){}}
+    if err := ui.Validate(menu); err != nil || !ui.MenuEnabled(menu) { t.Fatal(err) }
+}
 func TestExportedReplay(t *testing.T) {
     manifest := replay.Manifest{Version: replay.Version, FixtureSHA256: strings.Repeat("a",64), ThemeSHA256: strings.Repeat("b",64), LayoutVersion:"sdk-1", RendererVersion:"sdk-1", Start:time.Unix(0,0).UTC(), Windows:[]replay.Window{{ID:"main",Incarnation:1,Width:640,Height:480,DPI:160}}, Fonts:[]replay.Font{{Family:"fixture",SHA256:strings.Repeat("c",64)}}}
     recorder, err := replay.NewRecorder(manifest, replay.Limits{})

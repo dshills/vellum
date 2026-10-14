@@ -258,3 +258,44 @@ and final bundle locations; `-` means
 ad-hoc signing. Default packaging does not sign, notarize or publish. Binary
 source checksums precede any explicit signing transformation. Application signing
 and redistribution require separate owner decisions and target acceptance.
+
+
+## Native linker-map observations
+
+The distribution collector optionally accepts both `--binary` and `--link-map`.
+They must be supplied together, have matching supported thin 64-bit Mach-O/map
+architecture and match the selected Go build architecture. The collector records
+artifact size/hash identities and the linker object-table count. It matches
+absolute archive paths only to verified module-owned linker candidates, then
+hashes exact selected member payloads and records original archive ordinals.
+Relative archive paths remain unresolved because the linker's cwd is unbound;
+unknown absolute archives also remain unresolved without reading their contents.
+
+The bounded reader supports BSD extended and short ar names. It rejects GNU
+long-name tables, thin archives, malformed/truncated headers or alignment,
+symlinks, nonregular inputs, surplus names/members/bytes and missing/ambiguous
+selected members. Admission opens nonblocking before checking regular-file type,
+so a FIFO with no writer cannot block. Payloads stream in 64 KiB chunks and are
+never extracted or executed. Limits are 1 GiB/archive, 10,000 members, 4 KiB/name,
+128 MiB/map and 20,000 object-table entries. Mutable stream metadata refuses;
+collection repeats observations and retains the existing full input/source
+and package metadata drift checks.
+
+`artifact_pair_binding` remains `caller-supplied-unverified`. Matching hashes and
+architecture alone cannot establish that a supplied map belongs to that binary.
+An independent owned build receipt must bind both outputs after successful
+compiler completion. Object-table membership does not mean every member payload
+byte survives dead stripping. Object names are not Rust crate version, source,
+license or notice identities. This observation does not approve distribution or
+change the public audit gate. See the [Mac native-link checkpoint](../docs/reports/macos-link-closure/README.md).
+
+Example for private investigation after dependency preparation:
+
+```sh
+go build -ldflags="-linkmode=external -extldflags=-Wl,-map,/tmp/vellum-workbench.map" -o /tmp/vellum-workbench ./cmd/workbench
+# Run the collector from the repository root, with the same controlled Go cache.
+python3 scripts/distribution-inventory.py --binary /tmp/vellum-workbench --link-map /tmp/vellum-workbench.map --output /tmp/vellum-link-inputs.json
+```
+
+Use fresh output paths and preserve the exact build receipt; the example alone
+is not a source/build provenance certification. No application is launched.

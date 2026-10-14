@@ -34,7 +34,7 @@ class InventoryChecks(unittest.TestCase):
         configuration = {"GOOS": "darwin", "GOARCH": "arm64", "CGO_ENABLED": "1", "GOVERSION": "go-fixture", "GOROOT": str(toolchain)}
         return root, driver, native, graph, packages, notices, sources, configuration
 
-    def collect_fixture(self, fixture, package_change=None, source_change=None):
+    def collect_fixture(self, fixture, package_change=None, source_change=None, **observation):
         root, driver, native, graph, packages, notices, sources, configuration = fixture
         calls = []
         def output(argv, **kwargs):
@@ -44,7 +44,7 @@ class InventoryChecks(unittest.TestCase):
             return "\n".join(json.dumps(p) for p in packages)
         source_results = [iter(sources), iter(source_change if source_change is not None else sources)]
         with mock.patch.object(inventory, "check_child_output", side_effect=output), mock.patch.object(inventory.release, "source_state", return_value={"commit": "fixture", "clean": True}), mock.patch.object(inventory.release, "verified_module_graph", return_value=graph), mock.patch.object(inventory.release, "license_inventory", return_value=(notices, {})), mock.patch.object(inventory.release, "source_files", side_effect=source_results):
-            result = inventory.collect(root)
+            result = inventory.collect(root, **observation)
         self.assertEqual([call[0][:2] for call in calls], [["go", "env"], ["go", "list"], ["go", "list"]])
         return result
 
@@ -193,6 +193,48 @@ class InventoryChecks(unittest.TestCase):
                 self.assertNotIn("notice", notice)
                 with self.assertRaisesRegex(ValueError, "notice exceeds inventory file bound"):
                     inventory.release.license_inventory(root, modules=graph, copy_notices=False, max_notice_bytes=2)
+
+    def test_link_member_observation_stays_unverified_and_reports_unknown_archive(self):
+        from native_archive_test import member, link_map
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture=self.fixture(Path(temporary));native=fixture[2];archive=native/'arm64/libfake.a'
+            archive.write_bytes(b'!<arch>\n'+member('used.o',b'used object')+member('unused.o',b'unused object',True))
+            binary=Path(temporary)/'app';binary.write_bytes(b'\xcf\xfa\xed\xfe\x0c\x00\x00\x01'+b'fixture bytes')
+            mapping=Path(temporary)/'app.map';mapping.write_text(link_map(archive,['used.o']).replace('# Sections:', '[2] /unknown/libother.a(other.o)\n# Sections:'))
+            result=self.collect_fixture(fixture,binary=binary,link_map=mapping)
+            observation=result['native_link_observation'];record=observation['archives'][0]
+            self.assertEqual(observation['artifact_pair_binding'],'caller-supplied-unverified')
+            self.assertEqual(record['archive_member_count'],2)
+            self.assertEqual([m['name']for m in record['selected_members']],['used.o'])
+            self.assertEqual(record['selected_members'][0]['sha256'],hashlib.sha256(b'used object').hexdigest())
+            self.assertEqual(observation['unresolved_archives'],[{'file':'/unknown/libother.a','reason':'not-a-verified-module-file-candidate'}])
+            mapping.write_text(link_map(archive,['used.o']).replace(str(archive),'libfake.a'))
+            relative=self.collect_fixture(fixture,binary=binary,link_map=mapping)['native_link_observation']
+            self.assertEqual(relative['archives'],[])
+            self.assertEqual(relative['unresolved_archives'],[{'file':'libfake.a','reason':'relative-linker-directory-unbound'}])
+            self.assertEqual(result['distribution_audit'],'pending');self.assertFalse(result['runtime_executed'])
+            self.assertEqual(result['native_link_candidates'][0]['link_selection'],'unverified')
+
+    def test_incomplete_pair_mismatched_architecture_and_candidate_drift_refuse(self):
+        from native_archive_test import member, link_map
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture=self.fixture(Path(temporary));root,driver,native=fixture[:3];archive=native/'arm64/libfake.a'
+            archive.write_bytes(b'!<arch>\n'+member('used.o',b'object'))
+            binary=Path(temporary)/'app';binary.write_bytes(b'\xcf\xfa\xed\xfe\x0c\x00\x00\x01')
+            mapping=Path(temporary)/'app.map';mapping.write_text(link_map(archive,['used.o']))
+            with mock.patch.object(inventory.release,'source_state')as source:
+                with self.assertRaisesRegex(ValueError,'supplied together'):inventory.collect(root,binary=binary)
+                source.assert_not_called()
+            roots={'example.com/driver':driver,'example.com/native':native};builds=inventory.package_inventory(fixture[4],roots,{})
+            mapping.write_text(link_map(archive,['used.o']).replace('arm64','x86_64'))
+            with self.assertRaisesRegex(ValueError,'architecture differ'):inventory.native_link_observation(binary,mapping,roots,builds)
+            binary.write_bytes(b'\xcf\xfa\xed\xfe\x07\x00\x00\x01')
+            with self.assertRaisesRegex(ValueError,'selected Go build architecture'):
+                self.collect_fixture(fixture,binary=binary,link_map=mapping)
+            binary.write_bytes(b'\xcf\xfa\xed\xfe\x0c\x00\x00\x01')
+            mapping.write_text(link_map(archive,['used.o']))
+            archive.write_bytes(b'!<arch>\n'+member('used.o',b'changed'))
+            with self.assertRaisesRegex(ValueError,'differs from collected candidate'):inventory.native_link_observation(binary,mapping,roots,builds)
 
 
 if __name__ == "__main__":
