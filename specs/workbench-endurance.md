@@ -121,3 +121,48 @@ ancestor request (path truncated). Completion checks the ancestor's transition
 from native button to current-location static text, retirement of the old leaf,
 and positive native geometry. This raises the plan to 26 steps per fresh window;
 earlier 24-step retention evidence remains bound to its original source.
+
+
+## Idle and background soak mode
+
+The native window-cycle fixture adds `-soak` as a distinct workload: use
+`-composed -cycles=1 -sample-every=1`, a 40-second to 12-hour total duration,
+and quiet plus settle strictly shorter than each phase, with a cooperative timeout 30 seconds to five minutes longer than that duration.
+Four equal phases request a visible unfocused window, complete occlusion behind
+its survivor, minimization, and visible unfocused background-worker completion.
+The fixture verifies actual process-owned Cocoa visibility, key, miniaturization,
+occlusion and screen-point frames before entering and around each quiet sample.
+A requested window arrangement alone never qualifies its effective state.
+Fixture geometry reads share the backend window mutex with resize callbacks;
+the fixture releases that mutex before dispatching any native operation.
+
+`-soak-quiet` defaults to 60 seconds, `-soak-settle` to ten seconds, and
+`-soak-interval` to five minutes. During each quiet interval the harness posts no
+owner callbacks, reads no Cocoa state and collects no heap. Getrusage CPU deltas
+measure this whole process as a percentage of one logical CPU, including both
+windows and runtime/native threads. Primary-window paint-request wake deltas
+are separate counters; they do not count every application wake or GPU present.
+Endpoint state samples cannot prove continuous occlusion between samples.
+Nonfinite window frames and invalid/reversed CPU intervals are refused. Short,
+overslept or wall/monotonic clock-divergent samples cannot qualify the 60-second
+CPU interval, even if the bounded fixture completes. The original static-idle
+target remains <0.5% of one CPU with <=2 app-originated wakeups/s and no repeated
+presents; CPU/primary-paint samples alone cannot qualify that complete target.
+
+Forced GC, Go memory/RSS samples, JSON output and one reserved 1 MiB worker
+allocation/checksum/owner completion per background sample occur outside quiet
+intervals. Both worker and owner termination are joined on error/cancellation.
+The existing 512 MiB Go heap and 1 GiB RSS guards are process safety bounds, not
+professional native/GPU allocation budgets. Short preflights exercise control
+flow without certifying the 60-second CPU target or overnight behavior. An
+eight-hour trace is intended for overnight coverage; actual runtime evidence,
+app-wide wake/present observations, physical displays and full P11 remain open.
+
+
+The cycle/soak fixture logs close-policy requests as owner observations and
+attaches application/window cancellation plus domain-registration observations to
+failed native actions. These reads are individually synchronized, not an atomic
+lifecycle snapshot. Policy invocation does not identify a human, OS or application
+actor, nor prove completed native closure. Forced teardown bypasses the policy.
+An unavailable AX lookup after unregistration remains an error; diagnostics do
+not retry it or turn a partial campaign into a pass.

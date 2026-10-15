@@ -40,18 +40,22 @@ type config struct {
 	timeout       time.Duration
 	heapProfile   string
 	composed      bool
+	soak          soakConfig
 }
 
 func (c config) validate() error {
+	if c.heapProfile != "" && (!filepath.IsAbs(c.heapProfile) || filepath.Clean(c.heapProfile) != c.heapProfile) {
+		return errors.New("heap-profile needs a clean absolute new file path")
+	}
+	if c.soak.Duration != 0 {
+		return c.soak.validate(c)
+	}
 	maximum := 20 * time.Minute
 	if c.composed {
 		maximum = 3 * time.Hour
 	}
 	if c.cycles < 1 || c.cycles > 1000 || c.every < 1 || c.every > c.cycles || c.timeout < 10*time.Second || c.timeout > maximum {
 		return errors.New("cycles 1..1000, sample-every 1..cycles, timeout 10s..20m (3h for composed) required")
-	}
-	if c.heapProfile != "" && (!filepath.IsAbs(c.heapProfile) || filepath.Clean(c.heapProfile) != c.heapProfile) {
-		return errors.New("heap-profile needs a clean absolute new file path")
 	}
 	return nil
 }
@@ -96,6 +100,10 @@ func run() error {
 	flag.DurationVar(&c.timeout, "timeout", 12*time.Minute, "cooperative native loop deadline")
 	flag.StringVar(&c.heapProfile, "heap-profile", "", "optional new absolute diagnostic heap-profile path (never overwrites)")
 	flag.BoolVar(&c.composed, "composed", false, "mount and exercise the all-component workspace with 1000 dense labels in each fresh cycle window")
+	flag.DurationVar(&c.soak.Duration, "soak", 0, "total visible/occluded/minimized/background soak duration; requires composed, cycles=1, sample-every=1")
+	flag.DurationVar(&c.soak.Quiet, "soak-quiet", time.Minute, "quiet CPU/paint observation interval")
+	flag.DurationVar(&c.soak.Settle, "soak-settle", 10*time.Second, "settling interval before each quiet sample")
+	flag.DurationVar(&c.soak.Interval, "soak-interval", 5*time.Minute, "minimum spacing of quiet samples within a phase")
 	flag.Parse()
 	if err := c.validate(); err != nil {
 		return err
@@ -123,7 +131,12 @@ func run() error {
 	finished := make(chan error, 1)
 	failures := make(chan error, 1)
 	go func() {
-		e := check(ctx, a, survivor, model, shown, c, p)
+		var e error
+		if c.soak.Duration != 0 {
+			e = checkSoak(ctx, a, survivor, model, shown, c, p)
+		} else {
+			e = check(ctx, a, survivor, model, shown, c, p)
+		}
 		if c.heapProfile != "" {
 			e = errors.Join(e, writeHeapProfile(c.heapProfile))
 		}
@@ -165,6 +178,14 @@ func run() error {
 		}
 		return 0
 	}()}
+	if c.soak.Duration != 0 {
+		report["event"] = "vellum.window-soak.result"
+		report["soak_config"] = c.soak
+		report["result"] = "FAILED_NATIVE_WINDOW_SOAK"
+		if result == "PASS_NATIVE_WINDOW_CYCLES" {
+			report["result"] = "PASS_NATIVE_WINDOW_SOAK"
+		}
+	}
 	encodeErr := json.NewEncoder(os.Stdout).Encode(report)
 	return errors.Join(runErr, err, encodeErr)
 }
@@ -231,7 +252,7 @@ func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUC
 	if composed {
 		width, height = 1920, 1080
 	}
-	err = a.Open(app.Window{ID: id, Title: title, Width: width, Height: height, View: func() ui.Node {
+	err = a.Open(app.Window{ID: id, Title: title, Width: width, Height: height, CloseRequest: closeRequestDiagnostic(id, os.Stdout), View: func() ui.Node {
 		if suite != nil {
 			return suite.View()
 		}

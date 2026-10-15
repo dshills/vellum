@@ -24,6 +24,7 @@ type nativeActionRecord struct {
 	OwnerAndNativeCompleted bool
 	ElapsedSeconds          float64
 	AttachmentRetirement    *cogent.AccessibilityRetirement `json:",omitempty"`
+	FailureContext          *nativeActionFailure            `json:",omitempty"`
 }
 type nativeActionHooks struct {
 	targetRole string
@@ -136,6 +137,10 @@ func exerciseNativeActions(ctx context.Context, a *app.Application, id string, w
 			},
 			completed: completed,
 		})
+		if err != nil {
+			failure := observeNativeActionFailure(a, id)
+			record.FailureContext = &failure
+		}
 		records = append(records, record)
 		return errors.Join(err, json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.native-action", "window": id, "action": record}))
 	}

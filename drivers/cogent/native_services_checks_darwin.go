@@ -45,7 +45,16 @@ type NativeServiceFilePanelCheck struct {
 	Tracked, Visible, Open, Save int
 }
 
+// NativeServiceWindowCheck is a sampled Cocoa state for a window owned by this
+// process. Frame uses Cocoa screen points and its bottom-left origin.
+type NativeServiceWindowCheck struct {
+	Title                                        string
+	Visible, Miniaturized, Key, OcclusionVisible bool
+	Frame                                        [4]float64
+}
+
 type NativeServiceCheckState struct {
+	Windows         []NativeServiceWindowCheck
 	MainThread      bool
 	CleanupObserved bool
 	WindowTitles    []string // Visible NSWindows owned by this process.

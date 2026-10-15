@@ -10,13 +10,14 @@ extern void vellumServiceResult(uint64_t token, char *text, int status);
 static NSDictionary *checkSnapshot(BOOL cleanup) {
     NSDictionary *menu=vellumCheckMenu(0,0), *tray=vellumCheckTray(0,0), *panels=vellumCheckFilePanels();
     if (!menu || !tray || !panels) return nil;
-    NSMutableArray *titles=[NSMutableArray array];
+    NSMutableArray *titles=[NSMutableArray array], *windows=[NSMutableArray array];
     for (NSWindow *window in NSApp.windows) {
-        if (!window.isVisible) continue;
-        if (titles.count>=64) return nil;
-        [titles addObject:window.title ?: @""];
+        if (windows.count>=64) return nil;
+        NSRect f=window.frame;
+        [windows addObject:@{@"Title":window.title?:@"",@"Visible":@(window.isVisible),@"Miniaturized":@(window.isMiniaturized),@"Key":@(window.isKeyWindow),@"OcclusionVisible":@((window.occlusionState&NSWindowOcclusionStateVisible)!=0),@"Frame":@[@(f.origin.x),@(f.origin.y),@(f.size.width),@(f.size.height)]}];
+        if (window.isVisible) [titles addObject:window.title ?: @""];
     }
-    return @{@"MainThread":@(NSThread.isMainThread),@"CleanupObserved":@(cleanup),@"WindowTitles":titles,@"Menu":menu,@"Tray":tray,@"FilePanels":panels};
+    return @{@"MainThread":@(NSThread.isMainThread),@"CleanupObserved":@(cleanup),@"WindowTitles":titles,@"Windows":windows,@"Menu":menu,@"Tray":tray,@"FilePanels":panels};
 }
 static char *checkWire(NSDictionary *snapshot) {
     NSData *data=snapshot ? [NSJSONSerialization dataWithJSONObject:snapshot options:0 error:nil] : nil;

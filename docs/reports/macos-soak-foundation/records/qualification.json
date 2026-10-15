@@ -1,0 +1,128 @@
+{
+  "result": "PASS_SCOPED_SOAK_FIXTURE_CHECKPOINT",
+  "base_commit": "dc33d64fd11fcacda7b789f10c81001c5b9cba28",
+  "sources": {
+    "drivers/cogent/cmd/window-cycle-smoke/diagnostics.go": "cd1f8a80eaeb18ae416457476de9f80fd4ea9292671be2271a09675ccb596511",
+    "drivers/cogent/cmd/window-cycle-smoke/diagnostics_test.go": "d389d9de568cc66af03c529a784fd09eeba22ccabd5ecdf2d138457a42ace3fc",
+    "drivers/cogent/cmd/window-cycle-smoke/interactions.go": "818f773b003fcb22d489f32811630090755be4be34736b726d77f6ab0c2ed7c8",
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": "15398ee99e238067d0f28b93280f3871a2e04fd75087413380e5e9a8085dc98d",
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go": "449755a7234d20391b5a89cf8f56be13eeaf96086dff0464b720c03233569a7b",
+    "drivers/cogent/cmd/window-cycle-smoke/soak_test.go": "071bd4b2d270d93bb7253ed3c9167acbde66211630158f9771c8ad2b4c2bb00f",
+    "drivers/cogent/native_services_checks_darwin.go": "6488c6bb21d1337424f0db7ad7f672af8e9e7c87d832d83f0d317f4cf42b921c",
+    "drivers/cogent/native_services_checks_darwin.m": "caad6a11ffa30204193a8c0936c356b54c7c72e3e9d1d5786bca5772e37a32d6",
+    "specs/workbench-endurance.md": "0299e450428f319d5a85e4c4a1e35e9a05610624a41423f6b0bfd206f5bc89c1",
+    "docs/reports/macos-soak-foundation/README.md": "8937e5405551a2e797f7a4319edf55413672e0cae95979f424af5b68c6f26cec"
+  },
+  "checks": {
+    "command-race-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 3.766406917013228,
+      "receipt_sha256": "542a5b742c4e8a39216f9d9cb34172f9e45d70001d09cb602f341b7557e838bc",
+      "stdout_sha256": "e247b448563798c19d21ba01bdc4dc23d0d8bb7064ec7637da611024dc4df50b",
+      "stderr_sha256": "c57aa38e64ac55891740c16b0a3e85968934ce9186f1294753e878f63f6defc0"
+    },
+    "command-vet-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.5813506249105558,
+      "receipt_sha256": "43c79dddbbf381c1f0b9c7f53a8bccf137151d4f6d33826d2a1c31220cf39c31",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native-build-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 3.4046904999995604,
+      "receipt_sha256": "da42c61585d6c2b2ab764694482f0f145601970fe634bd3bb4066b6c513bd3c5",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776"
+    },
+    "ordinary-build-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 0.4128083341056481,
+      "receipt_sha256": "519fe35b2eca49397299fbd0afb5a750c5ca12abbad629e61f7ea9e3403f5903",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "app-tasks-race-v2": {
+      "exit_code": 0,
+      "elapsed_seconds": 1.4702431670157239,
+      "receipt_sha256": "3a2c856d5b197ce18aac4a93d7737f7dd0a71a610236a479faad4171157b9301",
+      "stdout_sha256": "76cefd8084e43f31a316db8b56dcda2d69fdcec9aa30f175b69e4d4dcc8ae11c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "phase-fit-fault-v2": {
+      "exit_code": 1,
+      "elapsed_seconds": 2.319533791975118,
+      "receipt_sha256": "7cbce3fafb82902d0b71931b39ebf7ceea795b01d4828562370fa4ad7d48a945",
+      "stdout_sha256": "f282d1c4f3df6441f4ca111a0d054ee4d751693d200e3613134ab46cc0a533b4",
+      "stderr_sha256": "c57aa38e64ac55891740c16b0a3e85968934ce9186f1294753e878f63f6defc0"
+    },
+    "finite-frame-fault-v2": {
+      "exit_code": 1,
+      "elapsed_seconds": 1.964420665986836,
+      "receipt_sha256": "f67a248f210b7eaace363fded99de1054177e3e7665b145f12b580c9a1ec4af4",
+      "stdout_sha256": "2050d2c6cfa0c073b704766c8f33dd2472c94e81e36f1608686f54ee360da788",
+      "stderr_sha256": "c57aa38e64ac55891740c16b0a3e85968934ce9186f1294753e878f63f6defc0"
+    },
+    "interval-eligibility-fault-v2": {
+      "exit_code": 1,
+      "elapsed_seconds": 2.078031250042841,
+      "receipt_sha256": "41a4b86c5c023a615acfdaa18b11bfe6d6b0f0efbca811b044ddeb602939fe93",
+      "stdout_sha256": "6c89ff2bf4ef67fb9272f29d00e24207f2c83d67ed4d6c8fe1c20ff6f4e9797a",
+      "stderr_sha256": "c57aa38e64ac55891740c16b0a3e85968934ce9186f1294753e878f63f6defc0"
+    },
+    "geometry-lock-fault-v2": {
+      "exit_code": 1,
+      "elapsed_seconds": 2.776207166025415,
+      "receipt_sha256": "2c7d3afbb7c527eb45e3bc7c5e9a57585e9d941f214008d40bfffde1c3da4436",
+      "stdout_sha256": "5fd943f4b9faa31eda1399723443ee8cb70e86e15ac35205973f4f9eadae0da1",
+      "stderr_sha256": "c57aa38e64ac55891740c16b0a3e85968934ce9186f1294753e878f63f6defc0"
+    }
+  },
+  "soak_runtime_qualified": false,
+  "static_idle_qualified": false,
+  "historical_campaign": {
+    "result": "ARCHIVED_FAILED_CAMPAIGN_EVIDENCE",
+    "source_commit": "2c87a3d877c092b8ccf8b281cf6473f494d4c567",
+    "completed_cycles": 123,
+    "completed_action_records": 3201,
+    "failed_action_records": 1,
+    "cause_observed": false,
+    "total_attempts": 3203,
+    "total_admissions": 3203,
+    "retry_record_count": 1,
+    "live_tests_disabled_on_human_return": true,
+    "full1000_cycle_qualified": false,
+    "archive_members": 55,
+    "archive_bytes": 744638,
+    "archive_sha256": "3d5fc84797e3b59a8796fccd1dc86b81d27ee3b7b1f9af9a903203e9c0588fd8",
+    "manifest_sha256": "9b3be3930e8aa460f57246ef2ccd162030004a11bb240be40cec57f1fec52397",
+    "producer_sha256": "723b9828196a1618bcfa24538c0af41946e0045e02b9a8166c2ff3f3a709d408"
+  },
+  "prepared_files": 6217,
+  "prepared_stable": true,
+  "native_binary_sha256": "330a5caaa5170cf8a483518e851aa69fb8dced9a1aebc1ceb8a1e7989cb49f4f",
+  "native_binary_executed": false,
+  "live_tests": false,
+  "full_mac_qualified": false,
+  "internal_source_review_sha256": "19abdad1884c8029b52508de3d2648e15c7956b7bb02a76658b5228c3030f1c6",
+  "checkpoint_review_sha256": "23b8711269649a8ca2d51b557a7ec52ff1e55687441ac904550a7b10e4557f03",
+  "prism_sha256": "273678e0a0bf09889ed8e372cb2f6b4374f7108290323e9b569e52d3444ee46e",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_invocations": 1,
+  "prism_llm_calls": 3,
+  "prism_chunks": 3,
+  "prism_findings": 0,
+  "prism_coverage_complete": true,
+  "archive_sha256": "20eaf08ad07fe367b1653c71cdb1af193457a1366bb3e1995d6f2220ed003547",
+  "archive_bytes": 9288645,
+  "archive_members": 94,
+  "limits": [
+    "Native command tests exercise pure Go models, bounded waits, helpers and zero native-window records, never Run/main/NSWindow creation.",
+    "Both native-check and ordinary builds pass; Cocoa window arrangement/census and background/soak integration remain unexecuted.",
+    "v1 checks preceded geometry-lock fix and are historical, not final-source evidence. Original isolated WIP and its prepared6216/live harness have no current qualification.",
+    "Measurement eligibility is distinct from CPU values. App-wide wakes/presents/continuous occlusion/native/GPU memory unavailable; safety guards are not professional budgets.",
+    "Historical2c87/6216 campaign failed123/1000 with3201 completed actions+1 failed and unobserved cause. New diagnostics cannot establish that missing historical cause.",
+    "A fresh source-bound native runner, native preflight, complete1000 campaign and overnight soak require renewed quiet-host authorization. Live stop remains in force."
+  ]
+}
