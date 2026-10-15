@@ -169,11 +169,21 @@ func (b *accessibilityBridge) prepareGridPublication(nodes []accessibilityNode, 
 // owned admits only freshly created snapshot containers whose caller relinquishes
 // them. Borrowed callers still receive separate output and handler containers.
 func (b *accessibilityBridge) prepareGridPublicationSnapshot(nodes []accessibilityNode, handlers map[string]accessibilityHandler, owned bool) ([]accessibilityNode, map[string]accessibilityHandler) {
+	return b.prepareGridPublicationSnapshotForSemantic(nodes, handlers, owned, "")
+}
+
+// completedSemantic is supplied only after successful full encoding of ready
+// builtin-valued nodes. Install its identity atomically with the detached cache;
+// a direct preparation between this call and final publication must revoke it.
+func (b *accessibilityBridge) prepareGridPublicationSnapshotForSemantic(nodes []accessibilityNode, handlers map[string]accessibilityHandler, owned bool, completedSemantic string) ([]accessibilityNode, map[string]accessibilityHandler) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if b.closed.Load() {
 		return nil, nil
 	}
+	// Direct preparation can change the cache independently of lastSnapshot.
+	// Only a subsequent successful ready publication can certify reuse again.
+	b.completedSnapshot = ""
 	// Group input indices, rather than repeatedly copying large node records
 	// while each scope grows. Completed cache records are still fully detached.
 	scopes := map[string][]int{}
@@ -229,6 +239,7 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshot(nodes []accessibili
 	}
 	if owned && len(replacements) == 0 {
 		b.gridPublications = cache
+		b.completedSnapshot = completedSemantic
 		return nodes, actions
 	}
 	out := make([]accessibilityNode, 0, len(nodes))
@@ -242,5 +253,34 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshot(nodes []accessibili
 		out = append(out, node)
 	}
 	b.gridPublications = cache
+	b.completedSnapshot = completedSemantic
 	return out, actions
+}
+
+// sameCompletedGridMetadata runs under b.mu after full semantic equality and
+// builtin-value checks. The JSON wire omits pressFocusID, so compare that owner
+// metadata too. Values must also retain their exact builtin type/value (JSON can
+// encode int(1) and float64(1) identically). Interleaved scopes keep their order.
+func (b *accessibilityBridge) sameCompletedGridMetadata(nodes []accessibilityNode) bool {
+	offsets := make(map[string]int)
+	for _, node := range nodes {
+		if node.GridScope == "" {
+			continue
+		}
+		previous := b.gridPublications[node.GridScope]
+		index := offsets[node.GridScope]
+		if index >= len(previous) || previous[index].ID != node.ID || previous[index].pressFocusID != node.pressFocusID || previous[index].Value != node.Value {
+			return false
+		}
+		offsets[node.GridScope] = index + 1
+	}
+	if len(offsets) != len(b.gridPublications) {
+		return false
+	}
+	for scope, count := range offsets {
+		if count != len(b.gridPublications[scope]) {
+			return false
+		}
+	}
+	return true
 }

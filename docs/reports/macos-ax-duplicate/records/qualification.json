@@ -1,0 +1,548 @@
+{
+  "result": "PASS_SCOPED_DUPLICATE_AX_CHECKPOINT",
+  "base_commit": "c11858e4598362fae8b6e7e2a6c3e5f4e8245dee",
+  "sources": {
+    "drivers/cogent/accessibility.go": "1ccfad843d176080060aa1dab2f8f1f2c522a14bce0454f31a08b01cf59cd972",
+    "drivers/cogent/accessibility_grid_publication.go": "0dad2c108ba5e110652d248cf9af202e8ad38f26cb8be6080cbc1426f3921da7",
+    "drivers/cogent/accessibility_duplicate_offscreen_test.go": "bf3320467d133d1b34541c842e62d6ab616ba1ac115348ee3d650b1bdd07e00c",
+    "specs/accessibility.md": "c6c9d6a6ce36eac889cac4c6c6e0a59639e837e86930f1ae0e7addd21bc90ab1",
+    "docs/reports/macos-ax-duplicate/README.md": "7b43ab6b75054b7715aa876432154f695fbf481a7a3be69705f98476740cb7fa"
+  },
+  "checks": {
+    "baseline-bench-v3": {
+      "exit_code": 0,
+      "elapsed_seconds": 13.217011958011426,
+      "receipt_sha256": "ab617a5340ec91c033e4dbca6f8a5265329371f3230ce145efd89b403928e441",
+      "stdout_sha256": "d7bd521d040cd1be75aaaaa375dd519e76dcaeb3960f82fd95f426318848f78b",
+      "stderr_sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a"
+    },
+    "candidate-bench-v3": {
+      "exit_code": 0,
+      "elapsed_seconds": 18.23347041697707,
+      "receipt_sha256": "1b2730f69456df3f2dd3ec35a8968e1a46dbee64ef2367c3a99e37bd9d8f8c17",
+      "stdout_sha256": "377af96a789c31bcb7ff094850e86ec68b6a07949756a460a387654081cf8929",
+      "stderr_sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a"
+    },
+    "full-offscreen-race-v3": {
+      "exit_code": 0,
+      "elapsed_seconds": 98.53896037489176,
+      "receipt_sha256": "e35364469a0c1914709deda6094dcf2c88cb3c69d2b2af220d66cc3ccb17e29f",
+      "stdout_sha256": "2726495ddcc050a804bf388e09e95ec50b8046b7779e55bb8f41d00c67c4aef4",
+      "stderr_sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a"
+    },
+    "vet-v3": {
+      "exit_code": 0,
+      "elapsed_seconds": 2.3919368750648573,
+      "receipt_sha256": "492df4bd5f5d7cf642135dc7de97dd2680256ae73ca785b7782d3e7aa21b6218",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native-build-v4": {
+      "exit_code": 0,
+      "elapsed_seconds": 3.173330417019315,
+      "receipt_sha256": "7370ed2afd2d7858d17cf806c9dc4f261dbb07ac0636105d722f704ee041f64a",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ddb78f90ae76e023adb8f2b99b156a93428a8984615847984f2a1cac0981c776"
+    },
+    "no-reuse-fault-v3": {
+      "exit_code": 1,
+      "elapsed_seconds": 7.210118999937549,
+      "receipt_sha256": "72e439db4c4f06fd6c47b8066c3b56345fdb45a716c77e8011db6f9862a1c8a7",
+      "stdout_sha256": "4d95f9b41cc04408a7d896d34967d532cbfd76f76200a0da57604be16c087502",
+      "stderr_sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a"
+    },
+    "invalidation-fault-v3": {
+      "exit_code": 1,
+      "elapsed_seconds": 7.104480999987572,
+      "receipt_sha256": "99c49f64034e9c230c9c4a074f038aaff05cf6426bb82bf8c825cd6110888c66",
+      "stdout_sha256": "022229711fdbf0a7852d4147c8f5c9aa247db7ed5c8ce79f051f6927964b8ccb",
+      "stderr_sha256": "0754c184acedae70f6a74f6972f0ddf8b20d6498c66f6ee7a0c8388d7919595a"
+    }
+  },
+  "benchmark": {
+    "cells-0/owned-false": {
+      "baseline_samples": [
+        [
+          1529,
+          2395,
+          19
+        ],
+        [
+          1497,
+          2395,
+          19
+        ],
+        [
+          1506,
+          2395,
+          19
+        ],
+        [
+          1525,
+          2395,
+          19
+        ],
+        [
+          1512,
+          2395,
+          19
+        ]
+      ],
+      "candidate_samples": [
+        [
+          1483,
+          2395,
+          19
+        ],
+        [
+          1487,
+          2395,
+          19
+        ],
+        [
+          1493,
+          2395,
+          19
+        ],
+        [
+          1484,
+          2395,
+          19
+        ],
+        [
+          1489,
+          2395,
+          19
+        ]
+      ],
+      "columns": [
+        "ns_per_op",
+        "bytes_per_op",
+        "allocs_per_op"
+      ],
+      "baseline_median": [
+        1512,
+        2395,
+        19
+      ],
+      "candidate_median": [
+        1487,
+        2395,
+        19
+      ],
+      "median_change_percent": [
+        -1.6534,
+        0.0,
+        0.0
+      ]
+    },
+    "cells-0/owned-true": {
+      "baseline_samples": [
+        [
+          1382,
+          1818,
+          16
+        ],
+        [
+          1349,
+          1818,
+          16
+        ],
+        [
+          1342,
+          1818,
+          16
+        ],
+        [
+          1354,
+          1818,
+          16
+        ],
+        [
+          1362,
+          1818,
+          16
+        ]
+      ],
+      "candidate_samples": [
+        [
+          1107,
+          1057,
+          10
+        ],
+        [
+          1100,
+          1057,
+          10
+        ],
+        [
+          1103,
+          1057,
+          10
+        ],
+        [
+          1103,
+          1057,
+          10
+        ],
+        [
+          1091,
+          1057,
+          10
+        ]
+      ],
+      "columns": [
+        "ns_per_op",
+        "bytes_per_op",
+        "allocs_per_op"
+      ],
+      "baseline_median": [
+        1354,
+        1818,
+        16
+      ],
+      "candidate_median": [
+        1103,
+        1057,
+        10
+      ],
+      "median_change_percent": [
+        -18.5377,
+        -41.8592,
+        -37.5
+      ]
+    },
+    "cells-40/owned-false": {
+      "baseline_samples": [
+        [
+          46731,
+          66841,
+          274
+        ],
+        [
+          46908,
+          66600,
+          274
+        ],
+        [
+          47964,
+          66532,
+          274
+        ],
+        [
+          47806,
+          66576,
+          274
+        ],
+        [
+          47874,
+          66681,
+          274
+        ]
+      ],
+      "candidate_samples": [
+        [
+          46006,
+          66726,
+          274
+        ],
+        [
+          45991,
+          66598,
+          274
+        ],
+        [
+          46030,
+          66585,
+          274
+        ],
+        [
+          46191,
+          66593,
+          274
+        ],
+        [
+          46041,
+          66608,
+          274
+        ]
+      ],
+      "columns": [
+        "ns_per_op",
+        "bytes_per_op",
+        "allocs_per_op"
+      ],
+      "baseline_median": [
+        47806,
+        66600,
+        274
+      ],
+      "candidate_median": [
+        46030,
+        66598,
+        274
+      ],
+      "median_change_percent": [
+        -3.715,
+        -0.003,
+        0.0
+      ]
+    },
+    "cells-40/owned-true": {
+      "baseline_samples": [
+        [
+          43653,
+          50773,
+          269
+        ],
+        [
+          43464,
+          50613,
+          269
+        ],
+        [
+          43687,
+          50844,
+          269
+        ],
+        [
+          48302,
+          50672,
+          269
+        ],
+        [
+          47609,
+          50900,
+          269
+        ]
+      ],
+      "candidate_samples": [
+        [
+          38492,
+          33878,
+          177
+        ],
+        [
+          38599,
+          33799,
+          177
+        ],
+        [
+          38597,
+          33736,
+          177
+        ],
+        [
+          39019,
+          33898,
+          177
+        ],
+        [
+          38969,
+          33917,
+          177
+        ]
+      ],
+      "columns": [
+        "ns_per_op",
+        "bytes_per_op",
+        "allocs_per_op"
+      ],
+      "baseline_median": [
+        43687,
+        50773,
+        269
+      ],
+      "candidate_median": [
+        38599,
+        33878,
+        177
+      ],
+      "median_change_percent": [
+        -11.6465,
+        -33.2756,
+        -34.2007
+      ]
+    },
+    "cells-400/owned-false": {
+      "baseline_samples": [
+        [
+          424808,
+          693984,
+          2447
+        ],
+        [
+          419867,
+          697899,
+          2447
+        ],
+        [
+          422182,
+          680828,
+          2446
+        ],
+        [
+          421744,
+          677787,
+          2446
+        ],
+        [
+          424379,
+          690924,
+          2447
+        ]
+      ],
+      "candidate_samples": [
+        [
+          416418,
+          684509,
+          2447
+        ],
+        [
+          420114,
+          691752,
+          2447
+        ],
+        [
+          428628,
+          693918,
+          2447
+        ],
+        [
+          429169,
+          697874,
+          2447
+        ],
+        [
+          420256,
+          692837,
+          2447
+        ]
+      ],
+      "columns": [
+        "ns_per_op",
+        "bytes_per_op",
+        "allocs_per_op"
+      ],
+      "baseline_median": [
+        422182,
+        690924,
+        2447
+      ],
+      "candidate_median": [
+        420256,
+        692837,
+        2447
+      ],
+      "median_change_percent": [
+        -0.4562,
+        0.2769,
+        0.0
+      ]
+    },
+    "cells-400/owned-true": {
+      "baseline_samples": [
+        [
+          408361,
+          539351,
+          2441
+        ],
+        [
+          398935,
+          517259,
+          2440
+        ],
+        [
+          398709,
+          522650,
+          2441
+        ],
+        [
+          391157,
+          515929,
+          2440
+        ],
+        [
+          391536,
+          518269,
+          2440
+        ]
+      ],
+      "candidate_samples": [
+        [
+          362062,
+          343406,
+          1624
+        ],
+        [
+          359475,
+          344745,
+          1624
+        ],
+        [
+          361324,
+          346319,
+          1624
+        ],
+        [
+          359839,
+          338328,
+          1624
+        ],
+        [
+          362732,
+          340974,
+          1624
+        ]
+      ],
+      "columns": [
+        "ns_per_op",
+        "bytes_per_op",
+        "allocs_per_op"
+      ],
+      "baseline_median": [
+        398709,
+        518269,
+        2440
+      ],
+      "candidate_median": [
+        361324,
+        343406,
+        1624
+      ],
+      "median_change_percent": [
+        -9.3765,
+        -33.7398,
+        -33.4426
+      ]
+    }
+  },
+  "prepared_files": 6217,
+  "prepared_stable": true,
+  "native_binary_sha256": "047bd147dde6997d9b58347edd7b31daad153f1fcaa6808cef4927efc8a90fd3",
+  "native_binary_executed": false,
+  "live_tests": false,
+  "full_mac_qualified": false,
+  "internal_source_review_sha256": "401be0969b11c3a320fd4e572eee1e05393c48f072947d8629b8c54895f4dafa",
+  "checkpoint_review_sha256": "da2c996d0c3c8defad3a8aefaea837acf1ce774bf93177360e3dfc3a63441a20",
+  "prism_sha256": "3526e6d14f3a3a008cbb8caf01b6e1ac3b109ecc491041afeccc25acd12f8583",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_invocations": 1,
+  "prism_llm_calls": 1,
+  "prism_chunks": 1,
+  "prism_findings": 0,
+  "prism_coverage_complete": true,
+  "archive_sha256": "2c94c10a9ff5d84d3363863aaef563eb0d1ced1e8bf4a506211a9afd727755a6",
+  "archive_bytes": 8523375,
+  "archive_members": 85,
+  "limits": [
+    "Benchmark includes fresh node/handler container creation, full encoding and duplicate preparation; no native sends/windows/frame timings.",
+    "Five sequential samples per benchmark/route at 0,40,400cells. Human online, no quiet-host wall-time qualification or statistical-significance claim.",
+    "Original implementation supplied by exact Git blob overlay with identical benchmark body; new cache-specific tests omitted only from original overlay.",
+    "Full adapter root-package offscreen race/vet and native fixture compile pass; command subpackage suites and native runtime not run.",
+    "First untagged native compile refused build constraints; corrected compile used required vellum_native_checks.",
+    "Preliminary v1/v2 checks are historical endpoints. Final v3 checks bind ownership-correct test captures; tagged build is v4. Benchmark body and runtime implementation are unchanged from v2. Report updated only after final checks; its check-time version is retained separately.",
+    "Long native endurance failed at123/1000 and remains unresolved; live performance, retention, physical interaction and release audit remain open."
+  ]
+}

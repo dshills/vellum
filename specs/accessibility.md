@@ -143,6 +143,14 @@ and callback containers. Pending replacement keeps the original scope/incarnatio
 parent, disabled-state and stale-action rules, including independent ready grids
 and ordinary controls. Removal and closure still retire cache references.
 
+An identical owned ready snapshot with builtin scalar values may retain its
+already detached completed cache. Whole-node JSON encoding still precedes the
+comparison; current callbacks replace their predecessors without changing the
+semantic generation. Go-only focus metadata and exact cached scalar types/values
+must also match. Pending snapshots, custom/mutable values and borrowed updates
+use ordinary preparation. Direct cache preparation invalidates reuse until a
+successful ready publication, and closure clears the reuse identity.
+
 Scope grouping records input indices rather than growing copied node arrays.
 After successful whole-node JSON encoding (and a second encoding when pending
 replacement changes nodes), the native envelope surrounds those exact encoded

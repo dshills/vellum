@@ -67,21 +67,22 @@ type accessibilityAction struct {
 type accessibilityHandler func(accessibilityAction) bool
 
 type accessibilityBridge struct {
-	token            uint64
-	owner            *app.Application
-	mu               sync.Mutex
-	window           string
-	handlers         map[string]accessibilityHandler
-	lastSnapshot     string
-	gridPublications map[string][]accessibilityNode
-	geometryMembers  map[string]struct{}
-	geometryVersion  *accessibilityGeometryVersion
-	geometryCache    accessibilityGeometryCache
-	generation       atomic.Uint64
-	closed           atomic.Bool
-	retirement       atomic.Pointer[AccessibilityRetirement]
-	pendingFocus     atomic.Pointer[string]
-	done             chan struct{}
+	token             uint64
+	owner             *app.Application
+	mu                sync.Mutex
+	window            string
+	handlers          map[string]accessibilityHandler
+	lastSnapshot      string
+	completedSnapshot string // semantic identity of the detached ready cache
+	gridPublications  map[string][]accessibilityNode
+	geometryMembers   map[string]struct{}
+	geometryVersion   *accessibilityGeometryVersion
+	geometryCache     accessibilityGeometryCache
+	generation        atomic.Uint64
+	closed            atomic.Bool
+	retirement        atomic.Pointer[AccessibilityRetirement]
+	pendingFocus      atomic.Pointer[string]
+	done              chan struct{}
 }
 
 var accessibilityToken atomic.Uint64
@@ -159,6 +160,7 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	b.generation.Add(1)
 	b.handlers = nil
 	b.gridPublications = nil
+	b.completedSnapshot = ""
 	b.geometryMembers = nil
 	b.geometryVersion = nil
 	b.geometryCache = accessibilityGeometryCache{}
@@ -221,11 +223,34 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	if err != nil {
 		return
 	}
-	pendingGrid := false
+	pendingGrid, immutableValues := false, true
 	for _, node := range nodes {
 		pendingGrid = pendingGrid || node.GridPending
+		// Only builtin scalars can safely reuse a detached completed view.
+		// Custom marshalers and mutable values retain normal preparation.
+		switch node.Value.(type) {
+		case nil, string, bool, int, int8, int16, int32, int64,
+			uint, uint8, uint16, uint32, uint64, uintptr, float32, float64:
+		default:
+			immutableValues = false
+		}
 	}
-	nodes, handlers = b.prepareGridPublicationSnapshot(nodes, handlers, owned)
+	if owned && !pendingGrid && immutableValues {
+		b.mu.Lock()
+		if !b.closed.Load() && b.lastSnapshot == semantic && b.completedSnapshot == semantic && b.sameCompletedGridMetadata(nodes) {
+			// Keep the detached cache, but resolve admitted actions against the
+			// newest owner callbacks without retiring their semantic generation.
+			b.handlers = handlers
+			b.mu.Unlock()
+			return
+		}
+		b.mu.Unlock()
+	}
+	completedSemantic := ""
+	if !pendingGrid && immutableValues {
+		completedSemantic = semantic
+	}
+	nodes, handlers = b.prepareGridPublicationSnapshotForSemantic(nodes, handlers, owned, completedSemantic)
 	if pendingGrid {
 		// Ready records are unchanged by the scoped cache. Only pending records
 		// replace input semantics with their last-completed read-only subtree.
