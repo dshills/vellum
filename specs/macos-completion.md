@@ -764,3 +764,13 @@ accounting/encodings/pixels while reducing allocated objects and bytes. Exact
 admission, no retained span references, packet independence and both retirement
 paths remain required. No native frame-latency or retained/native/GPU memory gain
 is qualified; the failed 4/6 ms targets and full P4/P6/P11/Mac gates remain open.
+
+## Packed glyph coverage checkpoint
+
+The [packed coverage path](../docs/reports/macos-packed-coverage/README.md) transfers
+an owned exact span backing from bounded cached glyph replay into scene packets.
+It preserves the original sequential admission, operation boundaries and bytes,
+including fallback for clipped/unsupported/budget-limited input. Later ordinary
+spans and both retirement paths retain explicit ownership. Exact software
+comparison and allocation checks advance the measured scene-construction work;
+they do not qualify the failed native latency budgets or close P4/P6/P11/Mac.

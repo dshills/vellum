@@ -1,0 +1,596 @@
+--- a/paint/renderers/sceneplan/builder.go
++++ b/paint/renderers/sceneplan/builder.go
+@@ -20,6 +20,7 @@
+ 	masks                              map[*image.Alpha]*image.Alpha
+ 	stream                             *operation
+ 	streamValue                        operation
++	streamPacked                       bool
+ 	spanHeaders                        [9][][]span
+ 	streamRowMin                       int
+ 	spanScratch                        [32][]span
+@@ -96,6 +97,8 @@
+ 	}
+ 	o := *b.stream
+ 	construction := o.rows
++	packed := b.streamPacked
++	b.streamPacked = false
+ 	defer b.retainSpanHeaders(construction)
+ 	b.streamValue = operation{}
+ 	rowMin := b.streamRowMin
+@@ -117,22 +120,32 @@
+ 	// One detached backing holds every retained span. Row capacities are capped
+ 	// at their lengths, so appending cannot overwrite the following row. The
+ 	// same exact row/span charges cover this storage once, as before.
+-	total := 0
+-	for _, row := range o.rows {
+-		total += len(row)
+-	}
+-	storage := make([]span, total)
+ 	exact := make([][]span, len(o.rows))
+-	offset := 0
+-	for i, row := range o.rows {
+-		end := offset + len(row)
+-		copy(storage[offset:end], row)
+-		exact[i] = storage[offset:end:end]
+-		offset = end
+-	}
+-
+-	for _, row := range o.rows {
+-		b.retainSpanScratch(row)
++	if packed {
++		// Packed construction already owns one exact, detached span backing.
++		// Only headers need detaching before their scratch container is cleared.
++		copy(exact, o.rows)
++		for i, row := range exact {
++			if row == nil {
++				exact[i] = []span{}
++			}
++		}
++	} else {
++		total := 0
++		for _, row := range o.rows {
++			total += len(row)
++		}
++		storage := make([]span, total)
++		offset := 0
++		for i, row := range o.rows {
++			end := offset + len(row)
++			copy(storage[offset:end], row)
++			exact[i] = storage[offset:end:end]
++			offset = end
++		}
++		for _, row := range o.rows {
++			b.retainSpanScratch(row)
++		}
+ 	}
+ 	o.rows = exact
+ 	b.add(o)
+@@ -209,6 +222,9 @@
+ 	// retires spare headers and compacts into the unchanged relative row format.
+ 	if !b.reserve(int(unsafe.Sizeof(span{})) + (size-len(rows))*int(unsafe.Sizeof([]span{}))) {
+ 		return
++	}
++	if b.streamPacked {
++		b.unpackSpans()
+ 	}
+ 	if grow {
+ 		grown := b.borrowSpanHeaders(size)
+@@ -409,6 +425,7 @@
+ 	b.stream = nil
+ 	b.streamValue = operation{}
+ 	b.spanHeaders = [9][][]span{}
++	b.streamPacked = false
+ 	b.streamRowMin = 0
+ 	b.spanScratch = [32][]span{}
+ 	b.spanScratchCount, b.spanScratchBytes = 0, 0
+--- /dev/null
++++ b/paint/renderers/sceneplan/packed_spans.go
+@@ -0,0 +1,105 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"image"
++	"image/draw"
++	"unsafe"
++)
++
++// SpanSample is a relative coverage sample. Callers retain ownership of samples;
++// successful PackedSpans copies their values and never retains the input slice.
++type SpanSample struct {
++	Y, X0, X1 int32
++	Alpha     uint32
++}
++
++// PackedSpans replays at most 256 ascending coverage samples into an empty active
++// span stream. It preserves sequential Span admission/charges, row order and
++// stream boundaries. False means no mutation: callers must use ordinary Span
++// for unsupported/clipped input or to preserve partial budget refusal behavior.
++func (b *Builder) PackedSpans(samples []SpanSample, origin image.Point) bool {
++	if b.failed || b.stream == nil || !b.stream.rect.Empty() || len(b.stream.rows) != 0 || len(samples) == 0 || len(samples) > 256 || origin.X < 0 || origin.Y < 0 || origin.X > MaxDimension || origin.Y > MaxDimension {
++		return false
++	}
++	rowMin, size, count := 0, 0, 0
++	rect := image.Rectangle{}
++	lastY := -1
++	for _, s := range samples {
++		if s.Y < 0 || s.Y > MaxDimension || s.X0 < 0 || s.X1 > MaxDimension || s.X0 >= s.X1 || s.Alpha > 65535 {
++			return false
++		}
++		y, x0, x1 := int(s.Y)+origin.Y, int(s.X0)+origin.X, int(s.X1)+origin.X
++		if y < lastY || y >= b.packet.bounds.Dy() || x1 > b.packet.bounds.Dx() {
++			return false
++		}
++		lastY = y
++		if s.Alpha == 0 && b.stream.op == draw.Over {
++			continue
++		}
++		if y < rowMin || y >= rowMin+size {
++			minY, maxY := y, y+1
++			if !rect.Empty() {
++				minY = min(minY, rect.Min.Y)
++				maxY = max(maxY, rect.Max.Y)
++			}
++			size = min(b.packet.bounds.Dy(), max(maxY-minY, max(1, size*2)))
++			rowMin = min(minY, b.packet.bounds.Dy()-size)
++		}
++		r := image.Rect(x0, y, x1, y+1)
++		if rect.Empty() {
++			rect = r
++		} else {
++			rect = rect.Union(r)
++		}
++		count++
++	}
++	if count == 0 {
++		return true
++	}
++	cost := count*int(unsafe.Sizeof(span{})) + size*int(unsafe.Sizeof([]span{}))
++	if cost > MaxBytes-b.packet.bytes {
++		return false
++	}
++	if !b.reserve(cost) {
++		return false
++	}
++	// One exact backing replaces construction row growth and the later span copy.
++	// Capped row slices cannot overwrite adjacent rows on an ordinary append.
++	storage := make([]span, count)
++	rows := b.borrowSpanHeaders(size)
++	offset, start, row := 0, 0, -1
++	for _, s := range samples {
++		if s.Alpha == 0 && b.stream.op == draw.Over {
++			continue
++		}
++		y := int(s.Y) + origin.Y
++		if row != y {
++			if row >= 0 {
++				rows[row-rowMin] = storage[start:offset:offset]
++			}
++			row, start = y, offset
++		}
++		storage[offset] = span{int(s.X0) + origin.X, int(s.X1) + origin.X, s.Alpha}
++		offset++
++	}
++	rows[row-rowMin] = storage[start:offset:offset]
++	b.stream.rows, b.streamRowMin, b.stream.rect = rows, rowMin, rect
++	b.streamPacked = true
++	return true
++}
++
++// A later ordinary Span is legal. Detach every packed row before permitting
++// scratch retention, whose capacity budget assumes independently owned rows.
++func (b *Builder) unpackSpans() {
++	for i, row := range b.stream.rows {
++		if len(row) == 0 {
++			continue
++		}
++		own := make([]span, len(row))
++		copy(own, row)
++		b.stream.rows[i] = own
++	}
++	b.streamPacked = false
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/packed_spans_test.go
+@@ -0,0 +1,308 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"reflect"
++	"slices"
++	"sort"
++	"testing"
++	"unsafe"
++)
++
++// Deep copies keep a falsely declining implementation from mutating the same
++// row/header backing used by the expected snapshot.
++func packedState(b *Builder) any {
++	clone := func(rows [][]span) [][]span {
++		out := slices.Clone(rows)
++		for i := range out {
++			out[i] = slices.Clone(out[i])
++		}
++		return out
++	}
++	state := struct {
++		bytes, count, rowMin, scratchCount, scratchBytes int
++		failed, packed                                   bool
++		stream                                           *operation
++		value                                            operation
++		headers                                          [9][][]span
++		scratch                                          [32][]span
++	}{bytes: b.packet.bytes, count: b.count, rowMin: b.streamRowMin, scratchCount: b.spanScratchCount, scratchBytes: b.spanScratchBytes, failed: b.failed, packed: b.streamPacked, stream: b.stream, value: b.streamValue}
++	state.value.rows = clone(b.streamValue.rows)
++	for i, rows := range b.spanHeaders {
++		state.headers[i] = clone(rows)
++	}
++	for i, row := range b.spanScratch {
++		state.scratch[i] = slices.Clone(row)
++	}
++	return state
++}
++
++func packedReference(t *testing.T, b *Builder, w *spanScratchReferenceBuilder, samples []SpanSample, origin image.Point) bool {
++	t.Helper()
++	before := packedState(b)
++	fast := b.PackedSpans(samples, origin)
++	if !fast {
++		if !reflect.DeepEqual(packedState(b), before) {
++			t.Fatal("declined packed admission mutated builder")
++		}
++		for _, s := range samples {
++			b.Span(int(s.Y)+origin.Y, int(s.X0)+origin.X, int(s.X1)+origin.X, s.Alpha)
++		}
++	}
++	for _, s := range samples {
++		w.Span(int(s.Y)+origin.Y, int(s.X0)+origin.X, int(s.X1)+origin.X, s.Alpha)
++	}
++	assertSpanScratchReference(t, b, w)
++	return fast
++}
++
++func TestVellumPackedSpansOriginalAdmissionEncoding(t *testing.T) {
++	rng := rand.New(rand.NewSource(67066))
++	fastCount := 0
++	for _, height := range []int{1, 3, 127, 128, 255, 257, 300, 1024} {
++		for trial := 0; trial < 40; trial++ {
++			bounds := image.Rect(0, 0, 67, height)
++			b, w := New(bounds), newSpanScratchReference(bounds)
++			for stream := 0; stream < 4; stream++ {
++				op := draw.Op(stream % 2)
++				c := color.RGBA{13, 29, 61, 128}
++				b.BeginSpans(c, op)
++				w.BeginSpans(c, op)
++				samples := make([]SpanSample, 1+rng.Intn(256))
++				for i := range samples {
++					x := rng.Intn(30)
++					samples[i] = SpanSample{int32(rng.Intn(height)), int32(x), int32(x + 1 + rng.Intn(30)), uint32(rng.Intn(65536))}
++					if i%9 == 0 {
++						samples[i].Alpha = 0
++					}
++				}
++				sort.SliceStable(samples, func(i, j int) bool { return samples[i].Y < samples[j].Y })
++				if packedReference(t, b, w, samples, image.Point{}) {
++					fastCount++
++				}
++				if stream == 2 {
++					empty := b.stream.rect.Empty()
++					if packedReference(t, b, w, []SpanSample{{0, 1, 3, 1}}, image.Point{}) != empty {
++						t.Fatal("packed admission disagrees with active stream state")
++					}
++				}
++				// Ascending/descending, clipped and translucent ordinary spans must still
++				// append to the same operation and retain independent scratch ownership.
++				if stream%2 == 1 {
++					for _, y := range []int{height - 1, 0, height / 2, -1, height} {
++						b.Span(y, -3, 29, 32769)
++						w.Span(y, -3, 29, 32769)
++						assertSpanScratchReference(t, b, w)
++					}
++				}
++				b.flush()
++				w.flush()
++				assertSpanScratchReference(t, b, w)
++				checkHeaderScratch(t, b)
++			}
++			got, want := b.Seal(trial%2 == 0), w.Seal(trial%2 == 0)
++			if got == nil || want == nil || got.Bytes() != want.Bytes() || !reflect.DeepEqual(got.ops, want.ops) {
++				t.Fatal("packed packet or admission differs", height, trial)
++			}
++			for _, gpu := range []bool{false, true} {
++				ge, gok := got.Encode()
++				we, wok := want.Encode()
++				if gpu {
++					ge, gok = got.EncodeGPU()
++					we, wok = want.EncodeGPU()
++				}
++				if !gok || !wok || !reflect.DeepEqual(ge, we) {
++					t.Fatal("packed encoding differs", height, trial, gpu)
++				}
++			}
++			if b.streamPacked || b.stream != nil || !reflect.DeepEqual(b.streamValue, operation{}) {
++				t.Fatal("retired packed references")
++			}
++		}
++	}
++	if fastCount != 1280 {
++		t.Fatal("fixture lost fast path", fastCount)
++	}
++}
++
++func TestVellumPackedSpansPeakBudgetAndOperationRefusal(t *testing.T) {
++	samples := []SpanSample{{0, 1, 3, 1}, {1, 1, 3, 2}, {2, 1, 3, 3}, {3, 1, 3, 4}, {4, 1, 3, 5}, {5, 1, 3, 6}}
++	// Six rows occupy eight construction headers. Peak admission, spare-header
++	// refund and subsequent operation admission remain distinct boundaries.
++	construction := 6*int(unsafe.Sizeof(span{})) + 8*int(unsafe.Sizeof([]span{}))
++	retained := construction - 2*int(unsafe.Sizeof([]span{})) + int(unsafe.Sizeof(operation{}))
++	for _, remaining := range []int{construction - 1, construction, retained - 1, retained} {
++		b, w := New(image.Rect(0, 0, 32, 32)), newSpanScratchReference(image.Rect(0, 0, 32, 32))
++		b.BeginSpans(color.RGBA{}, draw.Src)
++		w.BeginSpans(color.RGBA{}, draw.Src)
++		b.spanHeaders[3] = make([][]span, 8)
++		b.packet.bytes, w.packet.bytes = MaxBytes-remaining, MaxBytes-remaining
++		fast := packedReference(t, b, w, samples, image.Point{})
++		if fast != (remaining >= construction) {
++			t.Fatal("packed peak admission boundary changed", remaining, fast)
++		}
++		got, want := b.Seal(true), w.Seal(true)
++		if (got == nil) != (want == nil) || (got != nil) != (remaining >= max(construction, retained)) {
++			t.Fatal("operation admission boundary changed", remaining)
++		}
++		if got != nil && (got.Bytes() != want.Bytes() || !reflect.DeepEqual(got.ops, want.ops)) {
++			t.Fatal("exact retained charge changed")
++		}
++	}
++	b, w := New(image.Rect(0, 0, 32, 32)), newSpanScratchReference(image.Rect(0, 0, 32, 32))
++	b.BeginSpans(color.RGBA{}, draw.Over)
++	w.BeginSpans(color.RGBA{}, draw.Over)
++	if !packedReference(t, b, w, []SpanSample{{0, 0, 1, 0}}, image.Point{}) || b.streamPacked {
++		t.Fatal("empty Over stream acquired storage")
++	}
++	if !packedReference(t, b, w, samples, image.Point{}) {
++		t.Fatal("fixture")
++	}
++	b.count, w.count = MaxOps, MaxOps
++	if b.Seal(false) != nil || w.Seal(false) != nil || b.streamPacked || b.spanScratchCount != 0 {
++		t.Fatal("operation refusal leaked packed state")
++	}
++}
++
++func TestVellumPackedSpansAtomicDeclineAndBudget(t *testing.T) {
++	samples := []SpanSample{{0, 1, 3, 0}, {2, 2, 8, 32769}, {2, 1, 9, 65535}, {5, 3, 7, 1}}
++	for _, op := range []draw.Op{draw.Src, draw.Over} {
++		for _, remaining := range []int{0, 1, 23, 24, 47, 48, 99, 100, 263, 264, 265, 511, 512, 1024} {
++			b, w := New(image.Rect(0, 0, 32, 7)), newSpanScratchReference(image.Rect(0, 0, 32, 7))
++			b.BeginSpans(color.RGBA{}, op)
++			w.BeginSpans(color.RGBA{}, op)
++			b.packet.bytes = MaxBytes - remaining
++			w.packet.bytes = b.packet.bytes
++			packedReference(t, b, w, samples, image.Point{})
++			got, want := b.Seal(true), w.Seal(true)
++			if (got == nil) != (want == nil) || got != nil && (got.Bytes() != want.Bytes() || !reflect.DeepEqual(got.ops, want.ops)) {
++				t.Fatal("budget refusal differs", op, remaining)
++			}
++			if b.streamPacked || b.stream != nil {
++				t.Fatal("refused retirement retained packed stream")
++			}
++		}
++	}
++	cases := [][]SpanSample{nil, make([]SpanSample, 257), {{3, 0, 1, 1}, {2, 0, 1, 1}}, {{-1, 0, 1, 1}}, {{32, 0, 1, 1}}, {{0, -1, 1, 1}}, {{0, 0, 33, 1}}, {{0, 2, 1, 1}}, {{0, 0, 1, 65536}}}
++	for _, samples := range cases {
++		b, w := New(image.Rect(0, 0, 32, 32)), newSpanScratchReference(image.Rect(0, 0, 32, 32))
++		b.BeginSpans(color.RGBA{}, draw.Over)
++		w.BeginSpans(color.RGBA{}, draw.Over)
++		if packedReference(t, b, w, samples, image.Point{}) {
++			t.Fatal("unsupported input entered fast path", samples)
++		}
++	}
++	b := New(image.Rect(0, 0, 32, 32))
++	b.BeginSpans(color.RGBA{}, draw.Src)
++	for _, origin := range []image.Point{{-1, 0}, {0, -1}, {MaxDimension + 1, 0}, {int(^uint(0) >> 1), int(^uint(0) >> 1)}} {
++		before := packedState(b)
++		if b.PackedSpans(samples, origin) || !reflect.DeepEqual(before, packedState(b)) {
++			t.Fatal("unsafe translation admitted/mutated")
++		}
++	}
++}
++
++func TestVellumPackedSpansOwnershipAndOrdinaryNoops(t *testing.T) {
++	samples := []SpanSample{{0, 1, 3, 32769}, {2, 2, 8, 65535}}
++	b, w := New(image.Rect(0, 0, 32, 32)), newSpanScratchReference(image.Rect(0, 0, 32, 32))
++	b.BeginSpans(color.RGBA{11, 13, 17, 128}, draw.Over)
++	w.BeginSpans(color.RGBA{11, 13, 17, 128}, draw.Over)
++	if !packedReference(t, b, w, samples, image.Pt(3, 7)) {
++		t.Fatal("translated coverage not packed")
++	}
++	held := b.stream.rows
++	packedRow := held[0]
++	samples[0] = SpanSample{1, 9, 12, 1}
++	for _, v := range []struct {
++		y, x0, x1 int
++		a         uint32
++	}{{-1, 0, 1, 1}, {32, 0, 1, 1}, {7, 0, 0, 1}, {7, 0, 1, 0}} {
++		before := packedState(b)
++		b.Span(v.y, v.x0, v.x1, v.a)
++		if !reflect.DeepEqual(before, packedState(b)) || !b.streamPacked {
++			t.Fatal("ordinary no-op detached packed rows")
++		}
++	}
++	b.packet.bytes = MaxBytes
++	w.packet.bytes = MaxBytes
++	b.Span(7, 0, 1, 1)
++	w.Span(7, 0, 1, 1)
++	if !b.failed || !b.streamPacked || &b.stream.rows[0][0] != &packedRow[0] {
++		t.Fatal("refused append detached before reservation")
++	}
++	b.Seal(false)
++	if b.streamPacked || b.stream != nil {
++		t.Fatal("refused packed backing retained")
++	}
++
++	b, w = New(image.Rect(0, 0, 32, 32)), newSpanScratchReference(image.Rect(0, 0, 32, 32))
++	b.BeginSpans(color.RGBA{}, draw.Src)
++	w.BeginSpans(color.RGBA{}, draw.Src)
++	samples = []SpanSample{{0, 1, 3, 32769}, {2, 2, 8, 65535}}
++	if !packedReference(t, b, w, samples, image.Pt(3, 7)) {
++		t.Fatal("fixture")
++	}
++	held = b.stream.rows
++	packedRow = held[0]
++	b.Span(7, 0, 1, 1)
++	w.Span(7, 0, 1, 1)
++	if b.streamPacked || &b.stream.rows[0][0] == &packedRow[0] {
++		t.Fatal("ordinary append failed to detach backing")
++	}
++	packedRow[0] = span{25, 31, 123}
++	assertSpanScratchReference(t, b, w)
++	b.flush()
++	w.flush()
++	assertSpanScratchReference(t, b, w)
++	for _, row := range b.head.ops[0].rows {
++		if cap(row) != len(row) {
++			t.Fatal("surplus retained row capacity")
++		}
++	}
++	if b.spanScratchBytes != 3*int(unsafe.Sizeof(span{})) {
++		t.Fatal("unexpected detached scratch charge", b.spanScratchBytes)
++	}
++	if !reflect.DeepEqual(b.Seal(false).ops, w.Seal(false).ops) {
++		t.Fatal("detached packet changed")
++	}
++
++	b = New(image.Rect(0, 0, 32, 32))
++	b.BeginSpans(color.RGBA{}, draw.Src)
++	samples[1].Y = 1 // a power-of-two header band participates in scratch reuse
++	if !b.PackedSpans(samples, image.Pt(3, 7)) {
++		t.Fatal("fixture")
++	}
++	held = b.stream.rows
++	b.flush()
++	if b.spanScratchCount != 0 || b.spanScratchBytes != 0 {
++		t.Fatal("packed subrows entered scratch")
++	}
++	for _, row := range held {
++		if row != nil {
++			t.Fatal("flushed header retained packed backing")
++		}
++	}
++	packet := b.Seal(false)
++	if cap(packet.ops[0].rows) != len(packet.ops[0].rows) {
++		t.Fatal("surplus packed row-header capacity")
++	}
++	for _, row := range packet.ops[0].rows {
++		if cap(row) != len(row) {
++			t.Fatal("surplus packed span capacity")
++		}
++	}
++	before, _ := packet.EncodeGPU()
++	for i := range held {
++		held[i] = []span{{0, 32, 65535}}
++	}
++	samples[0] = SpanSample{}
++	after, _ := packet.EncodeGPU()
++	if !reflect.DeepEqual(before, after) {
++		t.Fatal("caller or header alias changed packet")
++	}
++}
+--- a/paint/renderers/rasterx/glyph_coverage.go
++++ b/paint/renderers/rasterx/glyph_coverage.go
+@@ -4,6 +4,7 @@
+ 
+ import (
+ 	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/paint/renderers/sceneplan"
+ 	"golang.org/x/image/math/fixed"
+ 	"image"
+ )
+@@ -13,10 +14,7 @@
+ const glyphCoveragePathValues = 512
+ const glyphCoverageSpans = 256
+ 
+-type glyphCoverageSpan struct {
+-	y, x0, x1 int32
+-	alpha     uint32
+-}
++type glyphCoverageSpan = sceneplan.SpanSample
+ type glyphCoverageEntry struct {
+ 	hash  uint64
+ 	path  Path
+@@ -210,7 +208,7 @@
+ 			r.failed = true
+ 			return
+ 		}
+-		r.spans = append(r.spans, glyphCoverageSpan{int32(y), int32(x0), int32(x1), alpha})
++		r.spans = append(r.spans, glyphCoverageSpan{Y: int32(y), X0: int32(x0), X1: int32(x1), Alpha: alpha})
+ 	}
+ }
+ 
+@@ -249,9 +247,13 @@
+ 	rf.SetColor(fill)
+ 	if e := cache.entries[hash]; e != nil && glyphCoverageMatches(e, rs.Path, origin) {
+ 		cache.hits++
++		if s, ok := rs.Scanner.Spanner.(*sceneSpanner); ok && s.beginSpans() && s.builder.PackedSpans(e.spans, origin) {
++			rf.Clear()
++			return true
++		}
+ 		span := rs.Scanner.Spanner.GetSpanFunc()
+ 		for _, s := range e.spans {
+-			span(int(s.y)+origin.Y, int(s.x0)+origin.X, int(s.x1)+origin.X, s.alpha)
++			span(int(s.Y)+origin.Y, int(s.X0)+origin.X, int(s.X1)+origin.X, s.Alpha)
+ 		}
+ 		rf.Clear()
+ 		return true
+--- a/paint/renderers/rasterx/glyph_coverage_adoption_test.go
++++ b/paint/renderers/rasterx/glyph_coverage_adoption_test.go
+@@ -49,11 +49,11 @@
+ 	p.Start(fixed.Point26_6{X: 64, Y: 64})
+ 	p.Line(fixed.Point26_6{X: 96, Y: 128})
+ 	p.Stop(true)
+-	spans := []glyphCoverageSpan{{0, 0, 1, 32769}}
++	spans := []glyphCoverageSpan{{Y: 0, X0: 0, X1: 1, Alpha: 32769}}
+ 	c.retain(1, p, image.Point{}, spans)
+ 	p[1] = 99
+-	spans[0].alpha = 1
+-	if c.entries[1].path[1] != 64 || c.entries[1].spans[0].alpha != 32769 {
++	spans[0].Alpha = 1
++	if c.entries[1].path[1] != 64 || c.entries[1].spans[0].Alpha != 32769 {
+ 		t.Fatal("retained caller arrays")
+ 	}
+ 	for i := 2; i <= glyphCoverageEntries*3; i++ {
+--- a/paint/renderers/rasterx/scene_packet.go
++++ b/paint/renderers/rasterx/scene_packet.go
+@@ -34,16 +34,23 @@
+ 	}
+ 	s.source = source
+ }
+-func (s *sceneSpanner) GetSpanFunc() scan.SpanFunc {
++func (s *sceneSpanner) beginSpans() bool {
+ 	if s.builder.Failed() {
+-		return func(int, int, int, uint32) {}
++		return false
+ 	}
+ 	u, ok := s.source.(*image.Uniform)
+ 	if !ok || u == nil {
+ 		s.builder.Refuse()
++		return false
++	}
++	s.builder.BeginSpans(colors.AsRGBA(u.C), draw.Op(s.op))
++	return !s.builder.Failed()
++}
++
++func (s *sceneSpanner) GetSpanFunc() scan.SpanFunc {
++	if !s.beginSpans() {
+ 		return func(int, int, int, uint32) {}
+ 	}
+-	s.builder.BeginSpans(colors.AsRGBA(u.C), draw.Op(s.op))
+ 	return s.builder.Span
+ }
+ 

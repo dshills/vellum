@@ -650,6 +650,17 @@
               "sha256": "c5087950989f250e279037a72d96e27be8002d734f803a1c780e85dd6c281c60"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/packedcoverage",
+          "inputs": "native/patches/packedcoverage/original-hashes.json",
+          "outputs": "native/patches/packedcoverage/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/packedcoverage/0067-packed-cached-glyph-spans.patch",
+              "sha256": "ea661c9025dbf964f18b8d6a3755a061eb4bcff6a010e73935de81c878dbdc76"
+            }
+          ]
         }
       ]
     },

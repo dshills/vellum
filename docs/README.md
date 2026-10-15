@@ -20,3 +20,4 @@ are retained; current document links and tooling use the reorganized paths.
 - [Named canvas objects](reports/macos-canvas-accessibility/README.md): opt-in semantics, exact selection and completed geometry for retained Canvas2D.
 
 - [Span header construction](reports/macos-span-headers/README.md): bounded scene-builder scratch and source-capture allocation evidence.
+- [Packed glyph coverage](reports/macos-packed-coverage/README.md): owned cached-span replay with original admission and exact output checks.

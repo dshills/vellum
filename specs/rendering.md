@@ -528,3 +528,26 @@ never alias these headers, including after another stream or borrowed-container
 mutation. There is no global pool or cross-renderer cache. See the
 [span header checkpoint](../docs/reports/macos-span-headers/README.md); allocation
 evidence remains separate from the unchanged native performance budgets.
+
+### Packed cached coverage
+
+Cached glyph coverage may copy at most 256 sorted, in-bounds samples into one
+exact span backing owned by an empty scene-builder stream. The existing coverage
+cache remains bounded to 512 entries and 1 MiB of path/span backing. Its input
+slice never escapes into a packet. Geometry, collision checks, scanner winding,
+source support and logical outline work still run. CPU image replay is unchanged.
+
+Admission preflights the original sequential geometric header growth and span
+charges. Unsupported, clipped or under-budget input declines without mutation;
+the caller replays ordinary Span to preserve partial charge/refusal behavior.
+Spare-header refunds and operation admission remain at their original flush
+boundary. Ordered spans are neither merged nor sorted. Packet encoding,
+accounting, independent-reset detection, fallback and pixel results stay exact.
+
+Packed flush detaches exact row headers and transfers the private flat backing.
+Packed subrows cannot enter the row scratch cache, whose retention budget assumes
+independent backing. A later ordinary Span validates and reserves before copying
+packed rows into individual storage. No-op/refused spans cannot trigger that
+copy. Successful/refused Seal clears packed state and all construction references.
+See the [checkpoint](../docs/reports/macos-packed-coverage/README.md); software
+allocation observations do not qualify native latency, GPU or retained memory.
