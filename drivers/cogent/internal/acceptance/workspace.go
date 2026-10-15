@@ -32,6 +32,7 @@ type Workspace struct {
 	Grid                        *virtual.Grid
 	Tree                        *virtual.Outline
 	Color                       *ui.ColorPicker
+	Breadcrumb                  *ui.Breadcrumb
 	Dock                        *cogent.Workbench
 	checked, open, dialog       bool
 	number                      float32
@@ -58,6 +59,15 @@ func New(owner *app.Application, window string, gpuCanvas any) (*Workspace, erro
 		w.changes[ui.ColorFieldID(w.Color.ID, e.Channel)]++
 	}
 	w.Color.Invalid = w.recordFailure
+	w.Breadcrumb = &ui.Breadcrumb{ID: "workspace-path", Label: "Workspace location", Items: []ui.BreadcrumbItem{{ID: "home", Label: "Workspace"}, {ID: "models", Label: "Models"}, {ID: "part", Label: "Current"}}}
+	w.Breadcrumb.Navigate = func(e ui.BreadcrumbEvent) {
+		w.changes[w.Breadcrumb.ID]++
+		// The root request is deliberately rejected; the model ancestor is
+		// accepted. The native runner must observe the callback in both cases.
+		if e.ItemID == "models" {
+			w.Breadcrumb.Items = append([]ui.BreadcrumbItem(nil), w.Breadcrumb.Items[:2]...)
+		}
+	}
 	var err error
 	w.Editor, err = editor.New("Native document\nGo owner and shared history", editor.Config{MaxBytes: 4096, HistoryLimit: 16})
 	if err != nil {
@@ -132,7 +142,12 @@ func (w *Workspace) View() ui.Node {
 	number := func(e ui.ChangeEvent) { w.number = e.Number; w.changes[e.ID]++ }
 	choose := func(e ui.ChangeEvent) { w.choice = e.SelectedID; w.changes[e.ID]++ }
 	compact := ui.Style{Padding: ui.Some(ui.UniformInsets(0)), Gap: ui.Some(float32(0))}
+	breadcrumb, err := w.Breadcrumb.View()
+	if err != nil {
+		w.recordFailure(err)
+	}
 	controls := ui.Node{ID: "controls", Kind: ui.Column, Style: compact, Children: []ui.Node{
+		breadcrumb,
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "button", Kind: ui.Button, Text: "Action", Activate: func() { w.actions++ }},
 			{ID: "check", Kind: ui.Checkbox, Text: "Check", Checked: w.checked, Change: checked},
@@ -215,6 +230,8 @@ type ControlState struct {
 	Color                                              color.NRGBA
 	Number                                             float32
 	Choice, Tab                                        string
+	BreadcrumbCurrent                                  string
+	BreadcrumbItems                                    int
 	Actions, TreeSelections, Disclosures, WorkerActive int
 	Changes                                            map[string]int
 	Failure                                            error
@@ -225,7 +242,7 @@ func (w *Workspace) State() ControlState {
 	if w.manager != nil {
 		active = w.manager.Pending().Active
 	}
-	return ControlState{Color: w.Color.Color, Checked: w.checked, IndicatorsOpen: w.open, DialogOpen: w.dialog, Number: w.number, Choice: w.choice, Tab: w.tab, Actions: w.actions, TreeSelections: w.treeSelections, Disclosures: w.disclosures, WorkerActive: active, Changes: maps.Clone(w.changes), Failure: w.workerError}
+	return ControlState{Color: w.Color.Color, Checked: w.checked, IndicatorsOpen: w.open, DialogOpen: w.dialog, Number: w.number, Choice: w.choice, Tab: w.tab, BreadcrumbCurrent: w.Breadcrumb.Items[len(w.Breadcrumb.Items)-1].ID, BreadcrumbItems: len(w.Breadcrumb.Items), Actions: w.actions, TreeSelections: w.treeSelections, Disclosures: w.disclosures, WorkerActive: active, Changes: maps.Clone(w.changes), Failure: w.workerError}
 }
 
 func (w *Workspace) recordFailure(err error) {

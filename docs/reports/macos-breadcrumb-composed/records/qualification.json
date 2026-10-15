@@ -1,0 +1,114 @@
+{
+  "result": "PASS_SCOPED_COMPOSED_BREADCRUMB_COVERAGE",
+  "base_commit": "b003d3759a9a121093f93f14656eec73b33daabd",
+  "sources": {
+    "drivers/cogent/cmd/window-cycle-smoke/interactions_test.go": "dbb66b90c6597f2bf9461ed3899e9193ff954868d445932365ca7b0f61423867",
+    "drivers/cogent/internal/acceptance/workspace.go": "b43dc2d05cbfe293548cde77aa59c00eea82601d391ca135022035107e417928",
+    "drivers/cogent/internal/acceptance/workspace_layout_offscreen_test.go": "4caa66ca08a841f39e518ede63f7d576744089a51d0861c6247db5f66ccf6d06",
+    "drivers/cogent/internal/acceptance/workspace_test.go": "2bd4e4eac738be7905b8c9a8bfb04c90d988eb5afb706d2a8914366f3c0786ce",
+    "specs/workbench-endurance.md": "a6bdc7152815cb4448898f8f9b9211327e0ae5d7cbce9ebcc3659609caaec321",
+    "drivers/cogent/cmd/window-cycle-smoke/composed.go": "0d7d2717ab1596d0574a752404c7acbea4e63fa906b065fa734d571fd4ce2a39",
+    "drivers/cogent/cmd/window-cycle-smoke/interactions.go": "35b8592684dd3f38c0456b61405ee016960640092c313cadc0389f6469e8914d",
+    "docs/reports/macos-breadcrumb-composed/README.md": "1f3c38ed14b624f5c8ad614392a0ac0ba641e99981021901cbf0f5e1b5924761"
+  },
+  "prepared_count": 6216,
+  "cycles": 5,
+  "activity_steps": 130,
+  "run_receipt_sha256": "12c3e90e9bb6f8bea77ce3ab66d169440725b7a14eae9fded1edc05221d67d82",
+  "build_receipt_sha256": "d6ad7dc73c3a4f81bfb67ee8969990697a5d6d6c2979bb255e71622ec9bbcb8a",
+  "binary_sha256": "fda249469e39b8705e04a7a9b83684e50a7d8ef64f1ad91d67e957169f508147",
+  "inputs_sha256": "7c464097c9113cc787100b44991e8bf79889bb23364a30ec089248518ca37b3d",
+  "producer_sha256": "58eeea081f57e851bb6d6e7f445db4d5bdc2600c92711c0f715670facace7c09",
+  "native_cleanup": {
+    "MainThread": true,
+    "CleanupObserved": true,
+    "WindowTitles": [],
+    "FilePanels": {
+      "Tracked": 0,
+      "Visible": 0,
+      "Open": 0,
+      "Save": 0
+    },
+    "NativeOutstanding": 0,
+    "AccessibilityWindows": 0,
+    "Menu": {
+      "Owned": false,
+      "OriginalRestored": false,
+      "TargetRetired": true,
+      "Items": []
+    },
+    "Tray": {
+      "Present": false,
+      "Visible": false,
+      "Template": false,
+      "TargetRetired": true,
+      "Identity": 0,
+      "Title": "",
+      "Tooltip": "",
+      "AccessibilityLabel": "",
+      "ImageWidth": 0,
+      "ImageHeight": 0,
+      "PixelWidth": 0,
+      "PixelHeight": 0,
+      "Items": []
+    },
+    "CallbacksStopped": true,
+    "PendingCallbacks": 0,
+    "MenuCallbacks": 0,
+    "TrayCallbacks": 0
+  },
+  "tree_ax_rows_counts": [
+    15
+  ],
+  "dense_labels_per_cycle": 1000,
+  "total_attempts": 130,
+  "total_admissions": 130,
+  "retry_steps": 0,
+  "retry_cause_observed": false,
+  "full_p4_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "full_mac_qualified": false,
+  "scope": "Current Breadcrumb fixture delta onb003 with6216prepared; fivecomposedwindowcycles/130owner-native step completions andtracked mainthread nativecleanup only. Queueadmissions are notacceptedcallbacks. No finalsource1000cycle/overnight,physicalinput/humanaccessibility,nativeGPUmemorybudget or ordinaryframegain qualification.",
+  "runtime_sources": {
+    "drivers/cogent/cmd/window-cycle-smoke/interactions_test.go": "dbb66b90c6597f2bf9461ed3899e9193ff954868d445932365ca7b0f61423867",
+    "drivers/cogent/internal/acceptance/workspace.go": "b43dc2d05cbfe293548cde77aa59c00eea82601d391ca135022035107e417928",
+    "drivers/cogent/internal/acceptance/workspace_layout_offscreen_test.go": "4caa66ca08a841f39e518ede63f7d576744089a51d0861c6247db5f66ccf6d06",
+    "drivers/cogent/internal/acceptance/workspace_test.go": "2bd4e4eac738be7905b8c9a8bfb04c90d988eb5afb706d2a8914366f3c0786ce",
+    "specs/workbench-endurance.md": "a6bdc7152815cb4448898f8f9b9211327e0ae5d7cbce9ebcc3659609caaec321",
+    "drivers/cogent/cmd/window-cycle-smoke/composed.go": "0d7d2717ab1596d0574a752404c7acbea4e63fa906b065fa734d571fd4ce2a39",
+    "drivers/cogent/cmd/window-cycle-smoke/interactions.go": "35b8592684dd3f38c0456b61405ee016960640092c313cadc0389f6469e8914d"
+  },
+  "report_written_after_runtime_checks": true,
+  "latency_gain_qualified": false,
+  "current_code_checks": {
+    "adapter-offscreen": {
+      "receipt_sha256": "d49558cbefb110f739d399f37a6ea3996d158accd39d2be56a3031bd9c1c28b3",
+      "exit_code": 0
+    },
+    "native-command-v2": {
+      "receipt_sha256": "73553f9ed11ee177bd39d96ae5b8bd7c7f7484e59c81f6474e8c1868695f8b20",
+      "exit_code": 0
+    },
+    "build-cycles-v2": {
+      "receipt_sha256": "d6ad7dc73c3a4f81bfb67ee8969990697a5d6d6c2979bb255e71622ec9bbcb8a",
+      "exit_code": 0
+    }
+  },
+  "post_terminal_group_sha256": "1e1260065893ffbfb9c5c18780965143bf8fefa9cc5f4a5e93634c317746c29f",
+  "initial_layout_failure_retained": true,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_review_sha256": "9bd271fe146a8e04fb8a14ee6930e1881347d9b768000f4382f5fdcf7ab5de7c",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_coverage_complete": true,
+  "prism_files": 8,
+  "prism_findings": 0,
+  "prism_unresolved_findings": 0,
+  "prism_raw_exit_code": 0,
+  "prism_calls": 2,
+  "archive_sha256": "c3708eec0f02747d864179c8d12af0646bb9a7a90708c88831ff989b69065281",
+  "archive_members": 62,
+  "archive_bytes": 327636,
+  "canonical_promoted": false
+}

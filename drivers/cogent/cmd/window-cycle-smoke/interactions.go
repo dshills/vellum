@@ -109,7 +109,9 @@ func exerciseNativeActions(ctx context.Context, a *app.Application, id string, w
 	var geometry cogent.TreeInspection
 	run := func(target, kind, value string, accepted func() (bool, error), completed func(cogent.AccessibilityInspection) bool) error {
 		role := ""
-		if target == "disclosure" {
+		if target == ui.BreadcrumbItemID("workspace-path", "home") || target == ui.BreadcrumbItemID("workspace-path", "models") {
+			role = "AXButton"
+		} else if target == "disclosure" {
 			role = "AXDisclosureTriangle"
 		}
 		record, err := runNativeAction(ctx, 5*time.Second, target, kind, value, nativeActionHooks{
@@ -287,7 +289,42 @@ func exerciseNativeActions(ctx context.Context, a *app.Application, id string, w
 			return records, err
 		}
 	}
+	if err := run(ui.BreadcrumbItemID("workspace-path", "home"), "press", "", changed("workspace-path", 1, func(s acceptance.ControlState) bool { return s.BreadcrumbItems == 3 && s.BreadcrumbCurrent == "part" }), func(s cogent.AccessibilityInspection) bool {
+		return breadcrumbEnvelopeCompleted(s, false)
+	}); err != nil {
+		return records, err
+	}
+	if err := run(ui.BreadcrumbItemID("workspace-path", "models"), "press", "", changed("workspace-path", 2, func(s acceptance.ControlState) bool { return s.BreadcrumbItems == 2 && s.BreadcrumbCurrent == "models" }), func(s cogent.AccessibilityInspection) bool {
+		return breadcrumbEnvelopeCompleted(s, true)
+	}); err != nil {
+		return records, err
+	}
 	return records, nil
+}
+
+// Native publication must agree with the accepted path. Ordinary stable-ID
+// objects may be reused when an ancestor becomes the passive current location.
+func breadcrumbEnvelopeCompleted(s cogent.AccessibilityInspection, truncated bool) bool {
+	if !s.Reachable || !s.NativeWindow {
+		return false
+	}
+	for _, item := range []struct{ id, name, role string }{{"home", "Workspace", "AXButton"}, {"models", "Models", "AXButton"}, {"part", "Current", "AXStaticText"}} {
+		e, ok := nativeElement(s, ui.BreadcrumbItemID("workspace-path", item.id))
+		if truncated && item.id == "part" {
+			if ok {
+				return false
+			}
+			continue
+		}
+		role := item.role
+		if truncated && item.id == "models" {
+			role = "AXStaticText"
+		}
+		if !ok || e.ObjectIdentity == 0 || e.Role != role || e.Name != item.name || !e.Enabled || e.Frame[2] <= 0 || e.Frame[3] <= 0 {
+			return false
+		}
+	}
+	return true
 }
 
 func colorEnvelopeCompleted(s cogent.AccessibilityInspection, want color.NRGBA) bool {

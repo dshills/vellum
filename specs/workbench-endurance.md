@@ -78,7 +78,7 @@ Density reports defined labels and frame containment within the measured root
 and scroll viewport after geometry publication. Requested1920×1080 dimensions
 are not effective geometry or100%scale qualification. Software tests replace
 Extension content with allocation placeholders and qualify only controls/labels.
-Composed deadlines are10seconds..45minutes; the original mode remains20minutes.
+Composed deadlines are 10 seconds..3 hours; the original mode remains 20 minutes.
 
 Workbench disposal recursively retires private panel records before widget
 teardown, including unadopted records after a failed shape rebuild. It revokes
@@ -113,3 +113,11 @@ The tree now has four children beneath n0 and 64 stored nodes. This changed
 interaction fixture has no new 1000-cycle qualification; the earlier retained
 campaign remains versioned to bf3b1b5. Sustained P6/P11 budgets, modal data-view
 transfer, physical input/display and human accessibility remain separate.
+
+The current fixture also includes the controlled Breadcrumb composite alongside
+the progress ring/gauge and color picker. Its two final Cocoa selector steps
+require exactly one rejected root request (path unchanged) and one accepted
+ancestor request (path truncated). Completion checks the ancestor's transition
+from native button to current-location static text, retirement of the old leaf,
+and positive native geometry. This raises the plan to 26 steps per fresh window;
+earlier 24-step retention evidence remains bound to its original source.

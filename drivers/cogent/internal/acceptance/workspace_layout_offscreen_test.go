@@ -86,10 +86,13 @@ func TestWorkspaceCompletedDensityGeometry(t *testing.T) {
 		t.Fatal(err)
 	}
 	defined, visible := 0, 0
-	var clip image.Rectangle
+	var clip, root image.Rectangle
 	for _, e := range snapshot.Windows[0].Elements {
 		if e.ID == "density-scroll" {
 			clip = e.Bounds
+		}
+		if e.ID == "root" {
+			root = e.Bounds
 		}
 	}
 	for _, e := range snapshot.Windows[0].Elements {
@@ -107,6 +110,17 @@ func TestWorkspaceCompletedDensityGeometry(t *testing.T) {
 			}
 		}
 		t.Fatalf("completed density defined=%d visible=%d clip=%v", defined, visible, clip)
+	}
+	for _, item := range []string{"home", "models", "part"} {
+		found := false
+		for _, e := range snapshot.Windows[0].Elements {
+			if e.ID == ui.BreadcrumbItemID("workspace-path", item) {
+				found = e.Visible && e.Enabled && !e.Bounds.Empty() && e.Bounds.In(root)
+			}
+		}
+		if !found {
+			t.Fatalf("composed breadcrumb item lacks visible geometry: %s", item)
+		}
 	}
 	// A selected scroll page must allocate real field geometry. This catches
 	// fixture regressions that catalog validation and hidden-page tests cannot.

@@ -27,7 +27,7 @@ func TestWorkspaceCatalogAndFreshModelIsolation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if first.Editor == second.Editor || first.Grid == second.Grid || first.Tree == second.Tree || first.Dock == second.Dock || first.Color == second.Color {
+	if first.Editor == second.Editor || first.Grid == second.Grid || first.Tree == second.Tree || first.Dock == second.Dock || first.Color == second.Color || first.Breadcrumb == second.Breadcrumb {
 		t.Fatal("per-window mutable models aliased")
 	}
 	kinds := map[ui.Kind]bool{}
@@ -71,6 +71,67 @@ func TestWorkspaceCatalogAndFreshModelIsolation(t *testing.T) {
 	}
 	if second.Editor.Snapshot() != before || second.Text() == first.Text() {
 		t.Fatal("exercise mutated another workspace")
+	}
+}
+
+func TestComposedBreadcrumbRejectAcceptAndWindowIsolation(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	first, err := New(a, "first", struct{}{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := New(a, "second", struct{}{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var nodes map[string]ui.Node
+	collect := func() {
+		nodes = map[string]ui.Node{}
+		var walk func(ui.Node)
+		walk = func(n ui.Node) {
+			nodes[n.ID] = n
+			for _, c := range n.Children {
+				walk(c)
+			}
+		}
+		walk(first.View())
+	}
+	collect()
+	home := ui.BreadcrumbItemID("workspace-path", "home")
+	models := ui.BreadcrumbItemID("workspace-path", "models")
+	part := ui.BreadcrumbItemID("workspace-path", "part")
+	if nodes[home].Kind != ui.Button || nodes[models].Kind != ui.Button || nodes[part].Kind != ui.Label || nodes[part].Accessibility.Help != "Current location" {
+		t.Fatal("composed breadcrumb roles missing")
+	}
+	stale := nodes[models].Activate
+	if err = a.Do(nodes[home].Activate); err != nil {
+		t.Fatal(err)
+	}
+	if s := first.State(); s.Changes["workspace-path"] != 1 || s.BreadcrumbItems != 3 || s.BreadcrumbCurrent != "part" {
+		t.Fatal("rejected navigation changed path or lacked callback", s)
+	}
+	if err = a.Do(nodes[models].Activate); err != nil {
+		t.Fatal(err)
+	}
+	collect()
+	if s := first.State(); s.Changes["workspace-path"] != 2 || s.BreadcrumbItems != 2 || s.BreadcrumbCurrent != "models" {
+		t.Fatal("accepted path not committed", s)
+	}
+	if nodes[models].Kind != ui.Label || nodes[models].Activate != nil || nodes[models].Accessibility.Help != "Current location" {
+		t.Fatal("accepted current location stayed actionable")
+	}
+	if _, present := nodes[part]; present {
+		t.Fatal("old current location retained")
+	}
+	if err = a.Do(stale); err != nil {
+		t.Fatal(err)
+	}
+	if first.State().Changes["workspace-path"] != 2 || second.State().Changes["workspace-path"] != 0 || second.State().BreadcrumbCurrent != "part" || second.State().BreadcrumbItems != 3 {
+		t.Fatal("stale request accepted or another window mutated")
 	}
 }
 

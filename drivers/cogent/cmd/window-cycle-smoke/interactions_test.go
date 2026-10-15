@@ -220,3 +220,36 @@ func TestColorEnvelopeRequiresEveryNativeFieldValueAndPreview(t *testing.T) {
 		})
 	}
 }
+
+func TestBreadcrumbEnvelopeRequiresAcceptedRolesAndRetirement(t *testing.T) {
+	native := cogent.AccessibilityInspection{Reachable: true, NativeWindow: true}
+	for i, item := range []struct{ id, name, role string }{{"home", "Workspace", "AXButton"}, {"models", "Models", "AXButton"}, {"part", "Current", "AXStaticText"}} {
+		native.Elements = append(native.Elements, cogent.AccessibilityElement{ID: item.id, DomainID: ui.BreadcrumbItemID("workspace-path", item.id), Name: item.name, Role: item.role, Enabled: true, ObjectIdentity: uint64(i + 1), Frame: [4]float64{0, 0, 100, 20}})
+	}
+	if !breadcrumbEnvelopeCompleted(native, false) || breadcrumbEnvelopeCompleted(native, true) {
+		t.Fatal("unchanged path misqualified")
+	}
+	native.Elements = native.Elements[:2]
+	native.Elements[1].Role = "AXStaticText"
+	if !breadcrumbEnvelopeCompleted(native, true) {
+		t.Fatal("accepted path with reused identity refused")
+	}
+	for name, change := range map[string]func(*cogent.AccessibilityInspection){
+		"unreachable":   func(s *cogent.AccessibilityInspection) { s.Reachable = false },
+		"no-window":     func(s *cogent.AccessibilityInspection) { s.NativeWindow = false },
+		"stale-role":    func(s *cogent.AccessibilityInspection) { s.Elements[1].Role = "AXButton" },
+		"zero-identity": func(s *cogent.AccessibilityInspection) { s.Elements[1].ObjectIdentity = 0 },
+		"disabled":      func(s *cogent.AccessibilityInspection) { s.Elements[0].Enabled = false },
+		"empty-frame":   func(s *cogent.AccessibilityInspection) { s.Elements[1].Frame = [4]float64{} },
+		"wrong-name":    func(s *cogent.AccessibilityInspection) { s.Elements[1].Name = "Other" },
+	} {
+		t.Run(name, func(t *testing.T) {
+			broken := native
+			broken.Elements = append([]cogent.AccessibilityElement(nil), native.Elements...)
+			change(&broken)
+			if breadcrumbEnvelopeCompleted(broken, true) {
+				t.Fatal("incomplete publication qualified")
+			}
+		})
+	}
+}
