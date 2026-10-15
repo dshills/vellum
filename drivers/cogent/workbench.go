@@ -63,7 +63,18 @@ type Workbench struct {
 	host           *core.Frame
 	syncing        bool
 	theme          ui.Theme
+	// Manual replay freezes validated panel descriptors for one reconciliation.
+	// Nil retains ordinary desktop View evaluation. No captured views survive it.
+	manualViews map[string]ui.Node
+	manualMode  *manualWorkbenchMode
+	inputScope  atomic.Pointer[workbenchInputScope]
 }
+
+// One manual adapter's lease contains no model, owner or widget references.
+// Rollback/closure deactivate it only after every native scene has retired.
+type manualWorkbenchMode struct{ active atomic.Bool }
+
+func (w *Workbench) isManual() bool { return w.manualMode != nil && w.manualMode.active.Load() }
 
 func (w *Workbench) SetTheme(theme ui.Theme) { w.theme = theme.Clone() }
 
@@ -72,6 +83,7 @@ func (w *Workbench) Mount(parent tree.Node) core.Widget {
 		return nil
 	}
 	w.retired.Store(false)
+	w.setInputScope(true, false, nil)
 	w.host = core.NewFrame(parent)
 	w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1) })
 	w.bindWindowGeometry()
@@ -157,11 +169,10 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		if r == nil {
 			continue
 		}
-		n := p.View()
-		if err := ui.Validate(n); err != nil {
+		n, err := w.panelView(p)
+		if err != nil {
 			return err
 		}
-		var err error
 		r, err = reconcile(w.parents[p.ID], r, n, w.Owner, w.Window, w.theme)
 		if err != nil {
 			return err
@@ -171,6 +182,23 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 	w.syncWindowGeometry()
 	w.syncFocus()
 	return nil
+}
+
+func (w *Workbench) panelView(p Panel) (ui.Node, error) {
+	var n ui.Node
+	if w.manualViews != nil {
+		var ok bool
+		n, ok = w.manualViews[p.ID]
+		if !ok {
+			return n, fmt.Errorf("workbench: panel %q missing checked manual view", p.ID)
+		}
+	} else {
+		if p.View == nil {
+			return n, fmt.Errorf("workbench: panel %q has no view", p.ID)
+		}
+		n = p.View()
+	}
+	return n, ui.Validate(n)
 }
 func shape(g *workbench.Group) string {
 	c := *g
@@ -211,7 +239,7 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 			s := split.Splits()
 			if len(s) == 2 {
 				ratio := math.Max(.05, math.Min(.95, float64(s[0])))
-				w.queue(func() error {
+				w.queueInput(func() error {
 					if w.Group != nil {
 						return w.Group.Apply(func(model *workbench.Session) error { return model.Resize(w.SessionWindow, g.ID, ratio) })
 					}
@@ -239,8 +267,22 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 		frame.SetProperty(workbenchActiveProperty, g.Active == id)
 		w.buttons[id] = button
 		w.bindTabPointer(button, id, g.ID)
-		n := panel.View()
-		if err := ui.Validate(n); err != nil {
+		button.OnClick(func(events.Event) {
+			if w.syncing || w.buttons[id] != button {
+				return
+			}
+			w.queueInput(func() error {
+				if w.buttons[id] != button {
+					return nil
+				}
+				if w.Group != nil {
+					return w.Group.Apply(func(model *workbench.Session) error { return model.Activate(w.SessionWindow, g.ID, id) })
+				}
+				return w.Workspace.Activate(g.ID, id)
+			})
+		})
+		n, err := w.panelView(*panel)
+		if err != nil {
 			return err
 		}
 		r, err := reconcile(frame, retained[id], n, w.Owner, w.Window, w.theme)
@@ -255,21 +297,6 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 	}
 	w.tabs[g.ID] = tabs
 	tabs.SelectTabIndex(active)
-	tabs.OnChange(func(events.Event) {
-		if w.syncing {
-			return
-		}
-		_, i := tabs.CurrentTab()
-		if i >= 0 && i < len(g.Tabs) {
-			panel := g.Tabs[i]
-			w.queue(func() error {
-				if w.Group != nil {
-					return w.Group.Apply(func(model *workbench.Session) error { return model.Activate(w.SessionWindow, g.ID, panel) })
-				}
-				return w.Workspace.Activate(g.ID, panel)
-			})
-		}
-	})
 	return nil
 }
 
@@ -308,6 +335,9 @@ func (w *Workbench) syncLayout(g *workbench.Group) {
 // panel factories remain application-owned. It is safe to call again.
 func (w *Workbench) disposeControlRecords() {
 	w.retired.Store(true)
+	if scope := w.inputScope.Swap(nil); scope != nil {
+		scope.revoked.Store(true)
+	}
 	w.generation.Add(1)
 	w.pendingError.Store(nil)
 	for _, r := range w.records {

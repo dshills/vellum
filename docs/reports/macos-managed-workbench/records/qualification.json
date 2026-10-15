@@ -1,0 +1,396 @@
+{
+  "result": "PASS_SCOPED_MANAGED_WORKBENCH_CHECKPOINT",
+  "base_commit": "c4981ccadbfe59115814664c76b4440c45a8a7a9",
+  "sources": {
+    "docs/reports/macos-managed-workbench/README.md": "9c4e771fce17250e03285771a910be2819e65b76b3d94fbfeb68c1a005faa0a3",
+    "drivers/cogent/driver.go": "9b2c185b089eb4726bb57f5303119e23591c2b5173c27ce3728ab0e80dc50f3c",
+    "drivers/cogent/grid_selection_offscreen_test.go": "5df81d67479294f1ec03110d81477c622959cf04c7899d0d3a80493054aef538",
+    "drivers/cogent/manual.go": "b8785442c87dd0289f5cf847ea20ae7b7ae75a8be74e6ada91c066016d9de397",
+    "drivers/cogent/manual_offscreen.go": "cc9f35d6f6a48c585ad93fae0215d53a209d3f4413dc12b5f53bf2a45225223e",
+    "drivers/cogent/manual_workbench_drag_offscreen_test.go": "34e4766f2c9315dcfc75281177c1dd97bcc7074d4bb327452fc60ac4e71189c5",
+    "drivers/cogent/manual_workbench_offscreen.go": "780d3bb6d1f05181d99e475b44b5b30234408150294f64da586482a3540c3e57",
+    "drivers/cogent/manual_workbench_offscreen_test.go": "e9d24ca8fbbe12e763295ce44e178faca72e4831626ff948845e237eee40eeee",
+    "drivers/cogent/manual_workbench_scope_offscreen_test.go": "f4f59c74c4effaad2b7bdeaf313d34044e7bc5761773f31afc955937bb138cec",
+    "drivers/cogent/workbench.go": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+    "drivers/cogent/workbench_group.go": "91aba3dcf2eb9ca95b605ba93edb0b08b5f832acc0e8759120a48afeec5250dd",
+    "drivers/cogent/workbench_interaction.go": "59c2a0e9e3986a7e7d037b63e4a9ee551bc4a8e7b3dbfab03309e11386756762",
+    "drivers/cogent/workbench_scope.go": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+    "examples/replay/README.md": "d8b743bd8684991a2eb1e87df720faf67ee278357ff6789cee79a9f0397236a4",
+    "examples/replay/workbench_offscreen_test.go": "ef966226845effc6df0b94aa6b302408ab8e3693092f834b727c079a40954d6c",
+    "release/version.json": "23cab4759cda7fa258d71407baa6a48cd9cc18144807c23733e7a6189be68db7",
+    "specs/framework.md": "a1722c8e348be1576f5927577483c02335f64ce8ee70fd1d214fac70e815b5fd",
+    "specs/macos-completion.md": "d8c5819e5047814b85f15220537d3d0202528e973fc8f2c885ed10080021bd44",
+    "specs/replay.md": "5ddbe51e511e6a9235ae685095fe1c3911b44217190bef9eaa47ac5a5a0a1e10"
+  },
+  "checks": {
+    "adapter-race-v3": {
+      "receipt_sha256": "9cd9fc2507ec96bbca447e486c72237a1849513794a42fb4936ae783d5ffc03c",
+      "exit_code": 0,
+      "elapsed_seconds": 113.78628766699694,
+      "source_delta": {
+        "specs/macos-completion.md": "d8c5819e5047814b85f15220537d3d0202528e973fc8f2c885ed10080021bd44",
+        "drivers/cogent/workbench_interaction.go": "59c2a0e9e3986a7e7d037b63e4a9ee551bc4a8e7b3dbfab03309e11386756762",
+        "drivers/cogent/manual_workbench_scope_offscreen_test.go": "f4f59c74c4effaad2b7bdeaf313d34044e7bc5761773f31afc955937bb138cec",
+        "drivers/cogent/workbench_scope.go": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+        "drivers/cogent/manual_workbench_offscreen.go": "780d3bb6d1f05181d99e475b44b5b30234408150294f64da586482a3540c3e57",
+        "release/version.json": "23cab4759cda7fa258d71407baa6a48cd9cc18144807c23733e7a6189be68db7",
+        "drivers/cogent/grid_selection_offscreen_test.go": "5df81d67479294f1ec03110d81477c622959cf04c7899d0d3a80493054aef538",
+        "docs/reports/macos-managed-workbench/README.md": "9c4e771fce17250e03285771a910be2819e65b76b3d94fbfeb68c1a005faa0a3",
+        "drivers/cogent/workbench_group.go": "91aba3dcf2eb9ca95b605ba93edb0b08b5f832acc0e8759120a48afeec5250dd",
+        "drivers/cogent/manual_offscreen.go": "cc9f35d6f6a48c585ad93fae0215d53a209d3f4413dc12b5f53bf2a45225223e",
+        "drivers/cogent/manual_workbench_drag_offscreen_test.go": "34e4766f2c9315dcfc75281177c1dd97bcc7074d4bb327452fc60ac4e71189c5",
+        "examples/replay/workbench_offscreen_test.go": "ef966226845effc6df0b94aa6b302408ab8e3693092f834b727c079a40954d6c",
+        "drivers/cogent/manual_workbench_offscreen_test.go": "e9d24ca8fbbe12e763295ce44e178faca72e4831626ff948845e237eee40eeee",
+        "specs/replay.md": "5ddbe51e511e6a9235ae685095fe1c3911b44217190bef9eaa47ac5a5a0a1e10",
+        "drivers/cogent/driver.go": "9b2c185b089eb4726bb57f5303119e23591c2b5173c27ce3728ab0e80dc50f3c",
+        "drivers/cogent/workbench.go": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+        "specs/framework.md": "a1722c8e348be1576f5927577483c02335f64ce8ee70fd1d214fac70e815b5fd",
+        "drivers/cogent/manual.go": "b8785442c87dd0289f5cf847ea20ae7b7ae75a8be74e6ada91c066016d9de397",
+        "examples/replay/README.md": "d8b743bd8684991a2eb1e87df720faf67ee278357ff6789cee79a9f0397236a4"
+      },
+      "prepared_files": 6221
+    },
+    "replay-race-v2": {
+      "receipt_sha256": "4971ea04eb0172af2ca71ad21a5f692ef4e86c001c9b6908b273d550af26425d",
+      "exit_code": 0,
+      "elapsed_seconds": 14.16835833399091,
+      "source_delta": {
+        "specs/macos-completion.md": "d8c5819e5047814b85f15220537d3d0202528e973fc8f2c885ed10080021bd44",
+        "drivers/cogent/manual_workbench_scope_offscreen_test.go": "f4f59c74c4effaad2b7bdeaf313d34044e7bc5761773f31afc955937bb138cec",
+        "specs/replay.md": "5ddbe51e511e6a9235ae685095fe1c3911b44217190bef9eaa47ac5a5a0a1e10",
+        "examples/replay/README.md": "d8b743bd8684991a2eb1e87df720faf67ee278357ff6789cee79a9f0397236a4",
+        "docs/reports/macos-managed-workbench/README.md": "9c4e771fce17250e03285771a910be2819e65b76b3d94fbfeb68c1a005faa0a3",
+        "drivers/cogent/driver.go": "9b2c185b089eb4726bb57f5303119e23591c2b5173c27ce3728ab0e80dc50f3c",
+        "drivers/cogent/manual_offscreen.go": "cc9f35d6f6a48c585ad93fae0215d53a209d3f4413dc12b5f53bf2a45225223e",
+        "drivers/cogent/manual_workbench_drag_offscreen_test.go": "34e4766f2c9315dcfc75281177c1dd97bcc7074d4bb327452fc60ac4e71189c5",
+        "drivers/cogent/workbench_group.go": "91aba3dcf2eb9ca95b605ba93edb0b08b5f832acc0e8759120a48afeec5250dd",
+        "drivers/cogent/workbench_interaction.go": "59c2a0e9e3986a7e7d037b63e4a9ee551bc4a8e7b3dbfab03309e11386756762",
+        "release/version.json": "23cab4759cda7fa258d71407baa6a48cd9cc18144807c23733e7a6189be68db7",
+        "drivers/cogent/grid_selection_offscreen_test.go": "5df81d67479294f1ec03110d81477c622959cf04c7899d0d3a80493054aef538",
+        "drivers/cogent/manual.go": "b8785442c87dd0289f5cf847ea20ae7b7ae75a8be74e6ada91c066016d9de397",
+        "drivers/cogent/manual_workbench_offscreen.go": "780d3bb6d1f05181d99e475b44b5b30234408150294f64da586482a3540c3e57",
+        "specs/framework.md": "a1722c8e348be1576f5927577483c02335f64ce8ee70fd1d214fac70e815b5fd",
+        "examples/replay/workbench_offscreen_test.go": "ef966226845effc6df0b94aa6b302408ab8e3693092f834b727c079a40954d6c",
+        "drivers/cogent/workbench_scope.go": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+        "drivers/cogent/workbench.go": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+        "drivers/cogent/manual_workbench_offscreen_test.go": "e9d24ca8fbbe12e763295ce44e178faca72e4831626ff948845e237eee40eeee"
+      },
+      "prepared_files": 6221
+    },
+    "root-race-v1": {
+      "receipt_sha256": "793190164af038ed7c0a0a66b59ffd879265ea72d17b1ede97563cf97c803812",
+      "exit_code": 0,
+      "elapsed_seconds": 14.806884666904807,
+      "source_delta": {
+        "docs/reports/macos-managed-workbench/README.md": "7f086f41c02e3468b9eb9bc86c7398c3598fdfdbe870a7f1c50b715dc3846000",
+        "drivers/cogent/manual_workbench_offscreen.go": "780d3bb6d1f05181d99e475b44b5b30234408150294f64da586482a3540c3e57",
+        "drivers/cogent/manual_workbench_scope_offscreen_test.go": "e57c4f9dc816daf595a87f8baf8a0ebd92cbd951602d92d56667921fed545b31",
+        "drivers/cogent/manual.go": "b8785442c87dd0289f5cf847ea20ae7b7ae75a8be74e6ada91c066016d9de397",
+        "drivers/cogent/manual_workbench_drag_offscreen_test.go": "34e4766f2c9315dcfc75281177c1dd97bcc7074d4bb327452fc60ac4e71189c5",
+        "examples/replay/workbench_offscreen_test.go": "ef966226845effc6df0b94aa6b302408ab8e3693092f834b727c079a40954d6c",
+        "drivers/cogent/manual_offscreen.go": "a2cf594b05c6c0c50d73887f6854c23f2291fce184d5dde05f3b5726040937a6",
+        "drivers/cogent/workbench_group.go": "91aba3dcf2eb9ca95b605ba93edb0b08b5f832acc0e8759120a48afeec5250dd",
+        "release/version.json": "23cab4759cda7fa258d71407baa6a48cd9cc18144807c23733e7a6189be68db7",
+        "drivers/cogent/manual_workbench_offscreen_test.go": "e9d24ca8fbbe12e763295ce44e178faca72e4831626ff948845e237eee40eeee",
+        "drivers/cogent/workbench_scope.go": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+        "drivers/cogent/workbench_interaction.go": "59c2a0e9e3986a7e7d037b63e4a9ee551bc4a8e7b3dbfab03309e11386756762",
+        "drivers/cogent/workbench.go": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+        "examples/replay/README.md": "d8b743bd8684991a2eb1e87df720faf67ee278357ff6789cee79a9f0397236a4",
+        "specs/macos-completion.md": "d8c5819e5047814b85f15220537d3d0202528e973fc8f2c885ed10080021bd44",
+        "specs/replay.md": "5ddbe51e511e6a9235ae685095fe1c3911b44217190bef9eaa47ac5a5a0a1e10",
+        "specs/framework.md": "a1722c8e348be1576f5927577483c02335f64ce8ee70fd1d214fac70e815b5fd",
+        "drivers/cogent/driver.go": "9b2c185b089eb4726bb57f5303119e23591c2b5173c27ce3728ab0e80dc50f3c"
+      },
+      "prepared_files": 6221
+    },
+    "adapter-vet-v2": {
+      "receipt_sha256": "d5c89c025d528eb0e51fb89e67b8acb90981dc35a41cbefb87296d94e6dfd053",
+      "exit_code": 0,
+      "elapsed_seconds": 8.832495458074845,
+      "source_delta": {
+        "drivers/cogent/workbench_scope.go": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+        "specs/framework.md": "a1722c8e348be1576f5927577483c02335f64ce8ee70fd1d214fac70e815b5fd",
+        "drivers/cogent/manual_offscreen.go": "cc9f35d6f6a48c585ad93fae0215d53a209d3f4413dc12b5f53bf2a45225223e",
+        "drivers/cogent/driver.go": "9b2c185b089eb4726bb57f5303119e23591c2b5173c27ce3728ab0e80dc50f3c",
+        "drivers/cogent/manual_workbench_offscreen_test.go": "e9d24ca8fbbe12e763295ce44e178faca72e4831626ff948845e237eee40eeee",
+        "examples/replay/workbench_offscreen_test.go": "ef966226845effc6df0b94aa6b302408ab8e3693092f834b727c079a40954d6c",
+        "drivers/cogent/workbench.go": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+        "release/version.json": "23cab4759cda7fa258d71407baa6a48cd9cc18144807c23733e7a6189be68db7",
+        "drivers/cogent/workbench_interaction.go": "59c2a0e9e3986a7e7d037b63e4a9ee551bc4a8e7b3dbfab03309e11386756762",
+        "specs/replay.md": "5ddbe51e511e6a9235ae685095fe1c3911b44217190bef9eaa47ac5a5a0a1e10",
+        "drivers/cogent/manual_workbench_scope_offscreen_test.go": "f4f59c74c4effaad2b7bdeaf313d34044e7bc5761773f31afc955937bb138cec",
+        "specs/macos-completion.md": "d8c5819e5047814b85f15220537d3d0202528e973fc8f2c885ed10080021bd44",
+        "drivers/cogent/workbench_group.go": "91aba3dcf2eb9ca95b605ba93edb0b08b5f832acc0e8759120a48afeec5250dd",
+        "drivers/cogent/manual.go": "b8785442c87dd0289f5cf847ea20ae7b7ae75a8be74e6ada91c066016d9de397",
+        "drivers/cogent/manual_workbench_drag_offscreen_test.go": "34e4766f2c9315dcfc75281177c1dd97bcc7074d4bb327452fc60ac4e71189c5",
+        "drivers/cogent/manual_workbench_offscreen.go": "780d3bb6d1f05181d99e475b44b5b30234408150294f64da586482a3540c3e57",
+        "examples/replay/README.md": "d8b743bd8684991a2eb1e87df720faf67ee278357ff6789cee79a9f0397236a4",
+        "docs/reports/macos-managed-workbench/README.md": "9c4e771fce17250e03285771a910be2819e65b76b3d94fbfeb68c1a005faa0a3",
+        "drivers/cogent/grid_selection_offscreen_test.go": "5df81d67479294f1ec03110d81477c622959cf04c7899d0d3a80493054aef538"
+      },
+      "prepared_files": 6221
+    },
+    "native-build-v1": {
+      "receipt_sha256": "036ede1f71346b06ed468bd2665b6b49b5f00752c8f5530421ad80fb85490ccb",
+      "exit_code": 0,
+      "elapsed_seconds": 15.229972792090848,
+      "source_delta": {
+        "drivers/cogent/manual.go": "b8785442c87dd0289f5cf847ea20ae7b7ae75a8be74e6ada91c066016d9de397",
+        "specs/framework.md": "a1722c8e348be1576f5927577483c02335f64ce8ee70fd1d214fac70e815b5fd",
+        "drivers/cogent/workbench_scope.go": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+        "drivers/cogent/driver.go": "9b2c185b089eb4726bb57f5303119e23591c2b5173c27ce3728ab0e80dc50f3c",
+        "drivers/cogent/workbench_group.go": "91aba3dcf2eb9ca95b605ba93edb0b08b5f832acc0e8759120a48afeec5250dd",
+        "drivers/cogent/manual_workbench_scope_offscreen_test.go": "e57c4f9dc816daf595a87f8baf8a0ebd92cbd951602d92d56667921fed545b31",
+        "docs/reports/macos-managed-workbench/README.md": "7f086f41c02e3468b9eb9bc86c7398c3598fdfdbe870a7f1c50b715dc3846000",
+        "drivers/cogent/manual_workbench_offscreen.go": "780d3bb6d1f05181d99e475b44b5b30234408150294f64da586482a3540c3e57",
+        "specs/macos-completion.md": "d8c5819e5047814b85f15220537d3d0202528e973fc8f2c885ed10080021bd44",
+        "drivers/cogent/manual_workbench_drag_offscreen_test.go": "34e4766f2c9315dcfc75281177c1dd97bcc7074d4bb327452fc60ac4e71189c5",
+        "drivers/cogent/manual_workbench_offscreen_test.go": "e9d24ca8fbbe12e763295ce44e178faca72e4831626ff948845e237eee40eeee",
+        "examples/replay/workbench_offscreen_test.go": "ef966226845effc6df0b94aa6b302408ab8e3693092f834b727c079a40954d6c",
+        "specs/replay.md": "5ddbe51e511e6a9235ae685095fe1c3911b44217190bef9eaa47ac5a5a0a1e10",
+        "drivers/cogent/manual_offscreen.go": "a2cf594b05c6c0c50d73887f6854c23f2291fce184d5dde05f3b5726040937a6",
+        "drivers/cogent/workbench_interaction.go": "59c2a0e9e3986a7e7d037b63e4a9ee551bc4a8e7b3dbfab03309e11386756762",
+        "examples/replay/README.md": "d8b743bd8684991a2eb1e87df720faf67ee278357ff6789cee79a9f0397236a4",
+        "drivers/cogent/workbench.go": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+        "release/version.json": "23cab4759cda7fa258d71407baa6a48cd9cc18144807c23733e7a6189be68db7"
+      },
+      "prepared_files": 6221
+    },
+    "sdk-tests-v1": {
+      "receipt_sha256": "4d4f96799a9f4bc7c5c48fbfa71ee93a5123fc43ad7d0e94b03022058507ece4",
+      "exit_code": 0,
+      "elapsed_seconds": 1.9288037089863792,
+      "source_delta": {
+        "examples/replay/workbench_offscreen_test.go": "ef966226845effc6df0b94aa6b302408ab8e3693092f834b727c079a40954d6c",
+        "examples/replay/README.md": "d8b743bd8684991a2eb1e87df720faf67ee278357ff6789cee79a9f0397236a4",
+        "specs/replay.md": "5ddbe51e511e6a9235ae685095fe1c3911b44217190bef9eaa47ac5a5a0a1e10",
+        "drivers/cogent/workbench_interaction.go": "59c2a0e9e3986a7e7d037b63e4a9ee551bc4a8e7b3dbfab03309e11386756762",
+        "specs/macos-completion.md": "d8c5819e5047814b85f15220537d3d0202528e973fc8f2c885ed10080021bd44",
+        "release/version.json": "23cab4759cda7fa258d71407baa6a48cd9cc18144807c23733e7a6189be68db7",
+        "drivers/cogent/manual.go": "b8785442c87dd0289f5cf847ea20ae7b7ae75a8be74e6ada91c066016d9de397",
+        "drivers/cogent/workbench.go": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+        "drivers/cogent/manual_workbench_offscreen.go": "780d3bb6d1f05181d99e475b44b5b30234408150294f64da586482a3540c3e57",
+        "drivers/cogent/workbench_scope.go": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+        "drivers/cogent/manual_workbench_scope_offscreen_test.go": "e57c4f9dc816daf595a87f8baf8a0ebd92cbd951602d92d56667921fed545b31",
+        "drivers/cogent/manual_workbench_drag_offscreen_test.go": "34e4766f2c9315dcfc75281177c1dd97bcc7074d4bb327452fc60ac4e71189c5",
+        "drivers/cogent/manual_offscreen.go": "a2cf594b05c6c0c50d73887f6854c23f2291fce184d5dde05f3b5726040937a6",
+        "docs/reports/macos-managed-workbench/README.md": "7f086f41c02e3468b9eb9bc86c7398c3598fdfdbe870a7f1c50b715dc3846000",
+        "drivers/cogent/workbench_group.go": "91aba3dcf2eb9ca95b605ba93edb0b08b5f832acc0e8759120a48afeec5250dd",
+        "specs/framework.md": "a1722c8e348be1576f5927577483c02335f64ce8ee70fd1d214fac70e815b5fd",
+        "drivers/cogent/driver.go": "9b2c185b089eb4726bb57f5303119e23591c2b5173c27ce3728ab0e80dc50f3c",
+        "drivers/cogent/manual_workbench_offscreen_test.go": "e9d24ca8fbbe12e763295ce44e178faca72e4831626ff948845e237eee40eeee"
+      },
+      "prepared_files": 6221
+    }
+  },
+  "fault_controls": [
+    {
+      "name": "tab-owner",
+      "file": "drivers/cogent/workbench.go",
+      "source_sha256": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+      "overlay": "/private/tmp/vellum-macos-managed-workbench/fault-v2-tab-owner-overlay.json",
+      "test": "TestManualWorkbenchRoutedTabsAcrossBatches",
+      "result": "REJECTED_EXPECTED_DEFECT",
+      "receipt_sha256": "c2f52dce946ce8c2de196ce4ecfa3e0c8a06c3130c57d6c0be7d4c186cd64289",
+      "assertion": "native tab input bypassed or failed owner transition"
+    },
+    {
+      "name": "scope-aba",
+      "file": "drivers/cogent/workbench_scope.go",
+      "source_sha256": "8d61c2e2fa1c4b9ca2f62eb396043545e87aa97047c1ee5f754005d4509b98cc",
+      "overlay": "/private/tmp/vellum-macos-managed-workbench/fault-v2-scope-aba-overlay.json",
+      "test": "TestManualWorkbenchQueuedInputScopeRevocation",
+      "result": "REJECTED_EXPECTED_DEFECT",
+      "receipt_sha256": "a22f0fc8ad17af122da89e8362d5e5c7ec6ada519d37af520bd13ce1f137ec29",
+      "assertion": "old gesture survived scope revocation and reactivation"
+    },
+    {
+      "name": "double-close",
+      "file": "drivers/cogent/manual_offscreen.go",
+      "source_sha256": "cc9f35d6f6a48c585ad93fae0215d53a209d3f4413dc12b5f53bf2a45225223e",
+      "overlay": "/private/tmp/vellum-macos-managed-workbench/fault-v2-double-close-overlay.json",
+      "test": "TestManualWorkbenchGroupIndependentWindowsAndExplicitPolicies",
+      "result": "REJECTED_EXPECTED_DEFECT",
+      "receipt_sha256": "6f32b03197dec85412b75394e303a0412b0ee4777c321cd728dc53a771c70501",
+      "assertion": "vellum: unknown window"
+    },
+    {
+      "name": "duplicate-factory",
+      "file": "drivers/cogent/workbench.go",
+      "source_sha256": "95fb2640725d69babc36324fa6de7cc7996d3f5387d15cafca47fe4884bba350",
+      "overlay": "/private/tmp/vellum-macos-managed-workbench/fault-v2-duplicate-factory-overlay.json",
+      "test": "TestManualWorkbenchRoutedTabsAcrossBatches",
+      "result": "REJECTED_EXPECTED_DEFECT",
+      "receipt_sha256": "e4981671d192f9f345c264cefda05ca45d4849da9552c9f104c1e48b2315915e",
+      "assertion": "panel factory evaluated more than once during initial reconciliation"
+    }
+  ],
+  "provider_owner_closed_counterexample": {
+    "result": "PASS_WITH_EXPLICIT_FILTER_REMOVED",
+    "receipt_sha256": "56655bbcc4aa5e33213dfcf845aaf366b2b4f94d3d91d5f9cfb68fe3f981b506",
+    "meaning": "Existing p.fail already filters app.ErrClosed; provider sticky-error claim is unsupported. Added explicit guard clarifies existing behavior; added test supplies coverage."
+  },
+  "diagnostic_attempts": {
+    "adapter-race-v1.json": {
+      "sha256": "a17278107cf42b749ef5e0deccef3c89d6358a4bb5be198137c7c748182d9ef1",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "adapter-race-v2.json": {
+      "sha256": "00e2ef3f6b87d8341b3aebf4d15ee8dec12bfe1eb196b80d99b8ef8667b664b8",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "adapter-vet-v1.json": {
+      "sha256": "c29dce4921cb516c23d3ab3ab6f99354397477dbde23ec44cac6c6b1870fdc3d",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "compile-v1.json": {
+      "sha256": "8ae43f4fd4f756547ecc2d75df89fad2ba3db8a36349792cc5f06d4bc3e53020",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-debug-v1.json": {
+      "sha256": "b829dfd297e00ee303a4901e2aa970f2f2f299a2ffe4f262c46c3fa60ca93a1b",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-debug-v2.json": {
+      "sha256": "35fd6c715873549cf5c5dd8329e01e5857b62ec18fdcf91e100e35c7ad0a9c6f",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-drag-v2.json": {
+      "sha256": "ead737ccc973bbef39c856eb36ae559737e29b8e5c65cbeba3e23513c70bff4b",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v1.json": {
+      "sha256": "bbed20f619c2bbc96d9488abc1c8287319af6c5adf9c91dc2f5f140527445d0b",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v2.json": {
+      "sha256": "da771dd83461aaf540cb7cb15cfc21754a81c769562cce9b4b9461ce493a49fa",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v3.json": {
+      "sha256": "78764cc56814a3a8c6f6e777a30d8cdfc551e6af1ec09ec697365c69a1979c3f",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v4.json": {
+      "sha256": "1334fe73aa7352ee444cc567c55ec8403453f605cf74c6f14d80e9677b624f44",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v5.json": {
+      "sha256": "e291bb9555a51c192d50e1bf26bf31696fe758f6eaa0b90c124106155804a573",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v6.json": {
+      "sha256": "e8a71a6a8b7751613666d8611bdb9363d97dd7e796974529201d0e933ec03993",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v7.json": {
+      "sha256": "49463e1b7cea88317e0ad14cba1b243002592a31ec7203caad1562fe7f3dc49e",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-integration-v8.json": {
+      "sha256": "b050401a5641bbc21816a9114769fed49639de64471b4d39b76def8e214fbd8c",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-routing-v1.json": {
+      "sha256": "c257ade1287faf8ef456b4ff362b0c600729e421a230f9ac887bef2da5ed911b",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-routing-v2.json": {
+      "sha256": "174aa62cfff610fec3cf5a2e059d28be00f2ed8cdad7adab90e3a08bc49f976d",
+      "exit_code": 1,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "dock-routing-v3.json": {
+      "sha256": "ae46e2b17b183227398a0531223a424168e0b37e99cadcdd899902424547a9dd",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "public-workbench-v1.json": {
+      "sha256": "7e3ab92f589d6ffa7e22fb9adf7d581af9c801fe0b3b6743d6a213ee170c4ca6",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "replay-race-v1.json": {
+      "sha256": "8299dc4c43105cc5d57853c0643503f00074a0eee63d57253ae02af83cee9092",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    },
+    "workbench-final-v1.json": {
+      "sha256": "2cba0452a85c70e8f112821b815bd722f90c0d090f857360ef4a31e15ad6f894",
+      "exit_code": 0,
+      "error": null,
+      "not_final_qualification": true
+    }
+  },
+  "prepared_files": 6221,
+  "prepared_sha256": "fdfc4f91bd8d8137644cb35674792fc0a2dd0f64d68c0ca04a51a8e38c7c5f8b",
+  "native_binary_sha256": "f16b20226168ebbacc22f3ff3c116d9d60d64f3ebffa330f86bde2391997f22d",
+  "native_binary_executed": false,
+  "live_tests": false,
+  "full_mac_qualified": false,
+  "full_P9_qualified": false,
+  "limits": [
+    "Offscreen software routing and measured images only; no native GPU/GUI/OS tests or physical pointer evidence.",
+    "Control+A follows the explicit offscreen keymap, not physical Mac shortcut qualification.",
+    "Scope ABA tests isolate actual widget listeners while retaining distinct routed positives.",
+    "Group lifetime IDs are resolved by logical aliases; no independently versioned large workspace record.",
+    "Canvas/GPU, worker-built views/cancellation, professional P9/P11, native performance/memory/lifecycle, physical input/accessibility, idle/overnight and distribution remain open."
+  ],
+  "notes": [
+    "adapter-race-v1 found existing Control+Left fixture expected admission; updated fixture to require context-menu refusal with no queue/owner/state mutation.",
+    "All earlier diagnostic failures are retained; only selected final passing receipts qualify this checkpoint."
+  ],
+  "checkpoint_review_sha256": "90487b8617b5213616884297115d6211871cde07f6561c773834e9a9782f4da6",
+  "prism_sha256": "7fd9e8f4a4fcc7d7b944e73b5baedd008d1f51447a157f4caf24f5b2c74bbce0",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_invocations": 1,
+  "prism_llm_calls": 7,
+  "prism_chunks": 7,
+  "prism_raw_exit_code": 1,
+  "prism_findings": 2,
+  "prism_false_positives": 2,
+  "prism_unresolved_findings": 0,
+  "prism_adjudication_sha256": "1872c57463c466f1aa858f48b5928a352a8f06b1513ffffc36102df859a8dede",
+  "prism_source_version": "pre-provider hashes in sealed adjudication; final guard clarification and shutdown regression reviewed internally",
+  "prism_coverage_complete": true,
+  "archive_sha256": "7b5aee5cf9de8825c5877667622112d72f7bad9ae6a2887dddcae57c552309a9",
+  "archive_bytes": 18090967,
+  "archive_members": 162
+}

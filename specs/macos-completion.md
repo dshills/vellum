@@ -717,3 +717,13 @@ fallback tests and fixed replay benchmarks are separate from native acceptance.
 Live checks remain paused while the human uses the machine. Current full
 lifecycle, P4/P6/P9/P11, idle/overnight, physical input/displays, human accessibility,
 professional memory and distribution gates remain open.
+
+The [managed workbench checkpoint](../docs/reports/macos-managed-workbench/README.md)
+admits the concrete built-in Workbench to the explicit-clock software adapter.
+It fixes native dock-tab click synchronization with the owner model and revokes
+queued gestures across disable/hide/modal lifetimes. Actual software routing,
+retained drafts, split/tab drags, a stored 10,000-by-20 grid and independent
+floating-window closure are checked. This enables broader P9 composition; it
+does not complete the versioned professional workspace record, worker-built
+views/cancellation, canvas/GPU observations or native performance/retention gates.
+Live tests stay paused while the human uses the machine.

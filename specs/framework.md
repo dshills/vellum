@@ -186,6 +186,14 @@ clock. The caller keeps Cogent global configuration fixed and injects that same
 borrowed executor into task/document managers. See the
 [checkpoint report](../docs/reports/macos-replay/README.md).
 
+The concrete built-in Workbench now participates in bounded managed replay.
+Complete hosted-panel preflight, scoped target IDs, retained drafts, actual dock
+tab/split gestures and independent session windows have offscreen regressions.
+Tab clicks request owner model activation, and queued gestures lose eligibility
+permanently when their originating visibility/modal scope is revoked. See the
+[workbench checkpoint](../docs/reports/macos-managed-workbench/README.md). Full
+professional workspace records and native acceptance remain open.
+
 The [local semantic automation](automation.md) endpoint now provides opt-in Mac
 transport for explicitly registered typed domain queries/actions. Full external
 professional automation workflows remain unqualified.

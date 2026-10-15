@@ -75,6 +75,18 @@ type ManualElement struct {
 	TextFocus                           int
 	Bounds                              image.Rectangle // actual scene pixels, including dialog scene origin.
 }
+
+// ManualWorkbenchControlID qualifies a panel-local manual target. For nested
+// workbenches, pass the inner qualified ID as control. Node.ID stays local.
+func ManualWorkbenchControlID(extension, panel, control string) string {
+	return accessibilityWorkbenchNamespace(extension, panel) + control
+}
+
+// ManualWorkbenchTabID identifies an actual dock tab header in manual snapshots.
+func ManualWorkbenchTabID(extension, panel string) string {
+	return accessibilityDockOptionID(extension, panel)
+}
+
 type ManualWindowSnapshot struct {
 	ID                                                      string
 	Incarnation                                             uint64

@@ -5,6 +5,13 @@
   "namespace_status": "selected",
   "license_status": "selected",
   "third_party_distribution_audit": "pending",
+  "managed_replay": {
+    "status": "experimental",
+    "backend": "offscreen",
+    "builtin_workbench": true,
+    "workbench_target_helpers": ["ManualWorkbenchControlID", "ManualWorkbenchTabID"],
+    "professional_workspace_qualified": false
+  },
   "automation": {
     "protocol": 1,
     "targets": ["darwin"],

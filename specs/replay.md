@@ -42,8 +42,9 @@ native dispatch contract; broad arbitrary destructor recovery is not promised.
 Manual configuration supplies checked, detached font bytes with required SHA-256
 identities. Each scene uses that shaper, explicit DPI and captured theme. Ambient
 fonts, clipboard content, input preferences and OS services are not replay inputs.
-Native clipboard/menu/chooser/drop services, context-menu shortcuts and custom
-extensions refuse until separately qualified. Mapped screenshot, zoom, refresh,
+Native clipboard/menu/chooser/drop services, context-menu shortcuts and arbitrary
+extensions refuse until separately qualified. The built-in Workbench follows the
+bounded contract below. Mapped screenshot, zoom, refresh,
 clipboard, menu, find and window-switch shortcuts refuse before event admission;
 these manager routes can write files, change renderer settings or leave the
 qualified control topology.
@@ -63,6 +64,50 @@ fall inside the measured target, and target-specific keys require actual focus.
 An unrendered target refuses until an explicit frame establishes current bounds.
 Disabled controls and modal-hidden targets refuse. Raw-coordinate tests separately
 prove that native routing blocks disabled/background actions.
+
+## Managed workbenches
+
+Manual accepts the concrete Cogent `Workbench`, including nested workbenches and
+`WorkbenchGroup` session windows. Its owner and application window must match.
+Before mounting, the adapter captures every hosted panel factory once, including
+inactive panels, and validates the complete descriptor graph. Initial build and
+reconciliation consume those same captured descriptors. The per-window
+`MaxControls` budget includes retained panel contents and native tab headers;
+descriptor nesting is limited to 128 levels. Shared/recursive workbenches, shared
+grid/tree/editor models and already mounted foreign adapters refuse. Panel
+factories remain caller code and must obey the application owner contract.
+
+Panel-local descriptor IDs may repeat in different panels. Snapshot targets use
+`ManualWorkbenchControlID(extensionID, panelID, localID)`; native tab headers use
+`ManualWorkbenchTabID(extensionID, panelID)`. Nest by passing the inner qualified
+ID as the outer control ID. Grid/tree inspection transport IDs receive the same
+prefix without changing domain row, column or tree keys. The `workbench:`, `dock:`
+and `dock-option:` descriptor-ID prefixes are reserved in manual scenes. Hidden
+retained panels keep their control incarnations but refuse input. Structural
+header reconstruction revokes old header incarnations while unchanged panel
+records retain native drafts.
+
+Actual tab clicks, tab drags and split drags enter the native event source, then
+request owner-admitted model changes. A captured input scope is permanently
+revoked by disable, hide, modal exclusion or dialog dismissal, even if the same
+adapter becomes eligible again before the owner drains the old request. No native
+ancestor traversal occurs during owner callback delivery. Manual group windows
+have independent native records; a scene close notifies the session before
+retiring its application window. Forced adapter cleanup and failed construction
+do not masquerade as user close requests.
+
+Manual workbenches use fixed, unpositioned physical viewports. Floating creates
+an independent explicitly sized scene; changing an existing session window's
+bounds, desktop geometry timers, persistence/autosave and native context menus
+refuse or stay inactive. Pointer drags require explicit clock advancement past
+the configured slide threshold. Logical session-window aliases must be resolved
+with `WorkbenchGroup.WindowID`; process-global lifetime IDs are not stable replay
+fixture identities.
+
+The public consumer and driver regressions check these policies offscreen. They
+enable integrated workspace replay, but do not supply a versioned large-workspace
+record with canvas, worker-built views, cancellation and all P9 observations.
+See the [checkpoint evidence](../docs/reports/macos-managed-workbench/README.md).
 
 ## Bounds and observations
 

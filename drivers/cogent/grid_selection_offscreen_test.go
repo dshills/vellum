@@ -447,7 +447,26 @@ func TestManagedGridRowSelectionRefusalAndEligibility(t *testing.T) {
 	selectionNativePointer(t, m, selectionNativeCell(t, gridInspection(t, a, g), 2, 0), gridSelectionModifiers(key.Meta), 0)
 	before := variableNativeState(t, a, g)
 	beforeChanges := changes
-	for _, mods := range []key.Modifiers{gridSelectionModifiers(key.Control), gridSelectionModifiers(key.Alt), gridSelectionModifiers(key.Shift, key.Meta)} {
+	// Control+Left is a native context-menu gesture, so Manual now refuses
+	// it before admission. Other unsupported selection modifiers remain no-ops.
+	wBefore := selectionNativeWindow(t, m)
+	cellBefore := selectionNativeCell(t, gridInspection(t, a, g), 4, 3)
+	beforeEvents, err := m.Snapshot(testContext)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = m.Input(testContext, ManualInput{Window: wBefore.ID, WindowIncarnation: wBefore.Incarnation, Type: events.MouseDown, Button: events.Left, Position: cellBefore.Bounds.Min.Add(cellBefore.Bounds.Size().Div(2)), Modifiers: gridSelectionModifiers(key.Control)}); !errors.Is(err, ErrManualUnsupported) {
+		t.Fatal("context-menu selection gesture admitted", err)
+	}
+	afterEvents, err := m.Snapshot(testContext)
+	if err != nil || beforeEvents.Windows[0].Events != afterEvents.Windows[0].Events || beforeEvents.Application != afterEvents.Application {
+		t.Fatal("context-menu refusal dispatched work", err)
+	}
+	selectionNativeKey(t, m, key.CodeDownArrow, gridSelectionModifiers(key.Control))
+	if got := variableNativeState(t, a, g); got != before || changes != beforeChanges {
+		t.Fatal("refused context-menu gesture changed selection", got)
+	}
+	for _, mods := range []key.Modifiers{gridSelectionModifiers(key.Alt), gridSelectionModifiers(key.Shift, key.Meta)} {
 		selectionNativePointer(t, m, selectionNativeCell(t, gridInspection(t, a, g), 4, 3), mods, 0)
 		selectionNativeKey(t, m, key.CodeDownArrow, mods)
 		if got := variableNativeState(t, a, g); got != before || changes != beforeChanges {

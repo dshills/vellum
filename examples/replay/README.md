@@ -37,7 +37,13 @@ Mapped screenshot/zoom/refresh and other unqualified manager shortcuts refuse
 before admission. Completion, popup and cursor timing use explicit origin work;
 shared text-buffer leases, output readers and autosave are outside this workload.
 No OS input-source, VoiceOver, accessibility-permission or appearance settings
-are changed. Native OS services and custom extensions refuse in this checkpoint.
+are changed. Native OS services and arbitrary custom extensions refuse. The
+concrete built-in Workbench supports bounded managed replay; the separate
+`TestPublicWorkbenchManualConsumer` uses only public APIs to switch actual dock
+tabs and route panel-local button input at batches 1, 7 and 64. This test does
+not change the bundled 51-operation record. See the
+[workbench replay contract](../../specs/replay.md#managed-workbenches) for identity,
+fixed-viewport, persistence and explicit-clock restrictions.
 
 These tests qualify software rendering and routed widget behavior. Cocoa IME,
 external accessibility, GPU presentation and sustained performance have separate

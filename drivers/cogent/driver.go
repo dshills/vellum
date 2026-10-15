@@ -180,6 +180,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			bindGridScopes(w.root)
 			bindTreeScopes(w.root)
 			flushDialogs(w.root)
+			bindWorkbenchInputScopes(w.root)
 			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
 				fail(err)
 			}
@@ -313,6 +314,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
 					flushDialogs(w.root)
+					bindWorkbenchInputScopes(w.root)
 					if err := bindTextWindow(w); err != nil {
 						fail(err)
 						return
@@ -540,6 +542,9 @@ func syncRecordVisible(r *record, n ui.Node, visible bool, scopes []*tabCloseSco
 		}
 	case ui.Extension:
 		r.widget.AsTree().SetProperty(tabCloseContextProperty, &tabCloseContext{visible: visible, scopes: append([]*tabCloseScope(nil), scopes...)})
+		if dock, ok := n.Custom.(*Workbench); ok && dock != nil {
+			dock.setInputScope(visible, controlDisabled(r), scopes)
+		}
 		ext, ok := n.Custom.(Extension)
 		if !ok {
 			return fmt.Errorf("cogent: unsupported extension %q", n.ID)

@@ -29,6 +29,7 @@ import (
 	"cogentcore.org/core/text/shaped/shapers/shapedgt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/ui"
+	"github.com/dshills/vellum/workbench"
 	"github.com/go-text/typesetting/font"
 )
 
@@ -40,6 +41,7 @@ type manualImplementation struct {
 	windows                 []*managedManualWindow
 	nextWindow              uint64
 	fonts                   fontMemoryFS
+	workbenchMode           *manualWorkbenchMode
 	failure                 error // first failure, protected by mu; inspection never clears it.
 	ownerBudget, dispatched int   // dispatch owner only; bounded real Custom drains.
 }
@@ -49,6 +51,7 @@ type managedManualWindow struct {
 	incarnation         uint64
 	nextRecord          uint64
 	records             map[*record]uint64
+	dockHeaders         map[*core.Tab]uint64
 	layoutPending       bool
 	lastSnapshot        ManualWindowSnapshot
 	suppressDomainClose bool
@@ -168,7 +171,8 @@ func NewManual(ctx context.Context, a *app.Application, config ManualConfig) (*M
 	}
 	m := &Manual{}
 	m.self = m
-	m.implementation = &manualImplementation{owner: a, config: config, lifetime: ctx, fonts: fonts}
+	m.implementation = &manualImplementation{owner: a, config: config, lifetime: ctx, fonts: fonts, workbenchMode: &manualWorkbenchMode{}}
+	m.implementation.workbenchMode.active.Store(true)
 	manualOwners.Lock()
 	if manualOwners.active != nil {
 		manualOwners.Unlock()
@@ -194,6 +198,9 @@ func NewManual(ctx context.Context, a *app.Application, config ManualConfig) (*M
 				}
 			}()
 			m.implementation.rollback(m.implementation.windowList())
+			if len(m.implementation.windowList()) == 0 {
+				m.implementation.workbenchMode.active.Store(false)
+			}
 		}
 	}()
 	if err = m.implementation.syncTopology(ctx); err != nil {
@@ -270,32 +277,6 @@ func (p *manualImplementation) wake() {
 		}
 	}
 }
-func validateManualNode(n ui.Node, maximum int) error {
-	count := 0
-	var walk func(ui.Node) error
-	walk = func(n ui.Node) error {
-		count++
-		if count > maximum {
-			return fmt.Errorf("%w: descriptor control limit", ErrManualConfig)
-		}
-		if n.Kind == ui.Extension {
-			return fmt.Errorf("%w: custom extensions require separate manual qualification", ErrManualUnsupported)
-		}
-		if n.FileDrop != nil {
-			return fmt.Errorf("%w: native OS drop services", ErrManualUnsupported)
-		}
-		for _, c := range n.Children {
-			if err := walk(c); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-	if err := walk(n); err != nil {
-		return err
-	}
-	return ui.Validate(n)
-}
 func (p *manualImplementation) refresh(w *managedManualWindow) error {
 	n := w.state
 	if n.closing.Load() {
@@ -310,9 +291,12 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		}
 		w.layoutPending = true
 		view := n.window.View()
-		if updateErr = validateManualNode(view, p.config.MaxControls); updateErr != nil {
+		release, err := p.prepareManualView(n.window.ID, view)
+		if err != nil {
+			updateErr = err
 			return
 		}
+		defer release()
 		n.root, updateErr = reconcile(n.host, n.root, view, p.owner, n.window.ID, p.config.Theme)
 		if updateErr != nil {
 			return
@@ -321,6 +305,7 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		bindGridScopes(n.root)
 		bindTreeScopes(n.root)
 		flushDialogs(n.root)
+		bindWorkbenchInputScopes(n.root)
 		if updateErr = applyFocus(n.root, view.Focus, &n.lastFocus); updateErr != nil {
 			return
 		}
@@ -329,6 +314,7 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		}
 		accessibilityBindFocusInvalidation(n.root, p.owner, n.window.ID)
 		present := map[*record]uint64{}
+		headers := map[*core.Tab]uint64{}
 		var recordIDs func(*record)
 		recordIDs = func(r *record) {
 			if r == nil {
@@ -344,6 +330,23 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 				id = w.nextRecord
 			}
 			present[r] = id
+			if dock, ok := r.node.Custom.(*Workbench); r.node.Kind == ui.Extension && ok {
+				for _, panel := range dock.Panels {
+					if tab := dock.buttons[panel.ID]; tab != nil {
+						token, exists := w.dockHeaders[tab]
+						if !exists {
+							if w.nextRecord == math.MaxUint64 {
+								updateErr = ErrManualConfig
+								return
+							}
+							w.nextRecord++
+							token = w.nextRecord
+						}
+						headers[tab] = token
+					}
+				}
+			}
+			retainedWorkbenchRecords(r, func(_ string, child *record) { recordIDs(child) })
 			if edit := gridEditingRecord(r); edit != nil {
 				recordIDs(edit)
 			}
@@ -353,6 +356,7 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		}
 		recordIDs(n.root)
 		w.records = present
+		w.dockHeaders = headers
 		w.layoutPending = true
 	})
 	p.fail(errors.Join(err, updateErr))
@@ -463,6 +467,7 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 			p.fail(p.owner.Do(func() {
 				if n.root != nil {
 					flushDialogs(n.root)
+					bindWorkbenchInputScopes(n.root)
 					p.fail(applyFocus(n.root, n.root.node.Focus, &n.lastFocus))
 				}
 			}))
@@ -470,7 +475,16 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 		n.body.OnClose(func(events.Event) {
 			n.closing.Store(true)
 			if !w.suppressDomainClose {
-				p.fail(p.owner.CloseWindow(spec.ID))
+				// Once the owner stops, model notifications are no longer valid.
+				// Native/control cleanup below still retires every mounted record.
+				if err := p.owner.Do(func() { n.rootMu.Lock(); defer n.rootMu.Unlock(); p.fail(closeWorkbenchExtensions(n.root)) }); err != nil && !errors.Is(err, app.ErrClosed) {
+					p.fail(err)
+				}
+				// A workbench close notification may already have retired this
+				// registration. Preserve the original captured lifetime check.
+				if w.domain.Err() == nil {
+					p.fail(p.owner.CloseWindow(spec.ID))
+				}
 			}
 			p.fail(p.cleanup(w))
 		})
@@ -545,7 +559,7 @@ func (p *manualImplementation) find(id string) *managedManualWindow {
 // Refuse before reconciling or admitting an originating event; qualified model
 // commands and ordinary focus/navigation/editing remain actual routed input.
 func manualUnqualifiedInput(input ManualInput) bool {
-	if (input.Type == events.MouseDown || input.Type == events.MouseUp) && input.Button != events.Left {
+	if (input.Type == events.MouseDown || input.Type == events.MouseUp) && (input.Button != events.Left || key.HasAnyModifier(input.Modifiers, key.Control)) {
 		return true
 	}
 	if !input.Type.IsKey() {
@@ -605,7 +619,7 @@ func (m *Manual) Input(ctx context.Context, input ManualInput) error {
 				if !e.Enabled || !e.Visible {
 					return ErrManualDisabled
 				}
-				if input.Type == events.MouseDown || input.Type == events.MouseUp || input.Type == events.MouseMove {
+				if input.Type == events.MouseDown || input.Type == events.MouseUp || input.Type == events.MouseMove || input.Type == events.Scroll {
 					if e.Bounds.Empty() {
 						return ErrManualLayout
 					}
@@ -775,18 +789,18 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 		byID := manualAccessibilityIndex(nodes)
 		focusTargets := map[string]accessibilityFocusTarget{}
 		accessibilityNativeFocusTargets(n.root, "", focusTargets)
-		parents := map[string]string{}
-		var collect func(*record, string)
-		collect = func(r *record, parent string) {
+		var collect func(*record, string, string)
+		collect = func(r *record, parent, prefix string) {
 			if r == nil {
 				return
 			}
-			parents[r.node.ID] = parent
+			id := prefix + r.node.ID
+			axID := prefix + accessibilityManagedID(r.node.ID)
 			value := any(r.node.Text)
 			selection := [2]int{-1, 0}
 			focus := 0
 			selected := false
-			node, visible := byID[accessibilityManagedID(r.node.ID)]
+			node, visible := byID[axID]
 			if visible {
 				value = node.Value
 				selected = node.Selected
@@ -804,16 +818,16 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				offsets := utf16Selection(state.Text, state.Anchor, state.Focus)
 				selection, focus = offsets.rangeValue, offsets.focus
 			}
-			b := bounds[accessibilityManagedID(r.node.ID)]
+			b := bounds[axID]
 			rect := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
 			focused := r.widget.AsWidget().StateIs(states.Focused)
 			if ui.IsFocusable(r.node.Kind) && gridEditingRecord(r) == nil {
-				focused = focusTargets[accessibilityManagedID(r.node.ID)].focused
+				focused = focusTargets[axID].focused
 			}
 			if focused {
-				result.FocusedID = r.node.ID
+				result.FocusedID = id
 			}
-			result.Elements = append(result.Elements, ManualElement{ID: r.node.ID, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
+			result.Elements = append(result.Elements, ManualElement{ID: id, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
 			if menuOpen(r) {
 				popup := r.control.menu.popup
 				if popup.manualIncarnation == 0 {
@@ -828,7 +842,7 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					if o.Separator {
 						continue
 					}
-					id := menuActionID(r.node.ID, o.ID)
+					id := prefix + menuActionID(r.node.ID, o.ID)
 					b := bounds[id]
 					item := popup.items[o.ID]
 					focused := item != nil && item.ContainsFocus()
@@ -839,7 +853,7 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 					if o.Checkable {
 						value = fmt.Sprint(o.Checked)
 					}
-					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: popup.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Value: value, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
+					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: prefix + r.node.ID, Incarnation: popup.manualIncarnation, Kind: ui.MenuButton, Name: o.Label, Value: value, Enabled: !controlDisabled(r) && !o.Disabled, Visible: true, Focused: focused, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
 				}
 			}
 			if visible && r.control != nil && r.control.tabs != nil {
@@ -856,25 +870,25 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 						w.nextRecord++
 						binding.manualIncarnation = w.nextRecord
 					}
-					id := tabCloseID(r.node.ID, o.ID)
+					id := prefix + tabCloseID(r.node.ID, o.ID)
 					b := bounds[id]
 					box := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
-					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: binding.manualIncarnation, Kind: ui.Button, Name: "Close " + o.Label, Enabled: tabCloseEnabled(r, o.ID, binding), Visible: true, Bounds: box})
+					result.Elements = append(result.Elements, ManualElement{ID: id, Parent: prefix + r.node.ID, Incarnation: binding.manualIncarnation, Kind: ui.Button, Name: "Close " + o.Label, Enabled: tabCloseEnabled(r, o.ID, binding), Visible: true, Bounds: box})
 				}
 			}
 			if r.control != nil && r.control.disclosure != nil {
-				id := accessibilityDisclosureID(r.node.ID)
+				id := prefix + accessibilityDisclosureID(r.node.ID)
 				heading := r.control.disclosure.header
 				b := bounds[id]
 				box := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
-				result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: w.records[r], Kind: ui.Disclosure, Name: r.node.Text, Value: r.node.Checked, Enabled: !controlDisabled(r), Focused: heading.ContainsFocus(), Visible: visible && heading.IsVisible(), Bounds: box})
+				result.Elements = append(result.Elements, ManualElement{ID: id, Parent: prefix + r.node.ID, Incarnation: w.records[r], Kind: ui.Disclosure, Name: r.node.Text, Value: r.node.Checked, Enabled: !controlDisabled(r), Focused: heading.ContainsFocus(), Visible: visible && heading.IsVisible(), Bounds: box})
 			}
 			if r.control != nil && r.control.split != nil {
-				id := accessibilitySplitHandleID(r.node.ID)
+				id := prefix + accessibilitySplitHandleID(r.node.ID)
 				handle := r.control.split.handle
 				b := bounds[id]
 				box := image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))
-				result.Elements = append(result.Elements, ManualElement{ID: id, Parent: r.node.ID, Incarnation: w.records[r], Kind: ui.SplitPane, Name: r.node.Accessibility.Name, Value: r.node.Number, Enabled: !controlDisabled(r), Focused: handle.ContainsFocus(), Visible: visible, Bounds: box})
+				result.Elements = append(result.Elements, ManualElement{ID: id, Parent: prefix + r.node.ID, Incarnation: w.records[r], Kind: ui.SplitPane, Name: r.node.Accessibility.Name, Value: r.node.Number, Enabled: !controlDisabled(r), Focused: handle.ContainsFocus(), Visible: visible, Bounds: box})
 			}
 
 			if r.control != nil && r.control.outline != nil && visible {
@@ -886,18 +900,19 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 						gridCaptureErr = errors.Join(gridCaptureErr, treeErr)
 					}
 				} else {
+					qualifyManualTree(&inspection, prefix)
 					result.Trees = append(result.Trees, inspection)
 					for _, row := range inspection.Rows {
 						if row.Bounds.Empty() {
 							continue
 						}
-						result.Elements = append(result.Elements, ManualElement{ID: row.ID, Parent: r.node.ID, Incarnation: inspection.RowIncarnation, Kind: ui.DataTree, Name: row.Label, Value: row.Label, Enabled: !controlDisabled(r), Visible: true, Selected: row.Selected, Bounds: row.Bounds})
+						result.Elements = append(result.Elements, ManualElement{ID: row.ID, Parent: prefix + r.node.ID, Incarnation: inspection.RowIncarnation, Kind: ui.DataTree, Name: row.Label, Value: row.Label, Enabled: !controlDisabled(r), Visible: true, Selected: row.Selected, Bounds: row.Bounds})
 						if row.HasChildren && !row.DisclosureBounds.Empty() {
 							result.Elements = append(result.Elements, ManualElement{ID: row.DisclosureID, Parent: row.ID, Incarnation: inspection.RowIncarnation, Kind: ui.Button, Name: "Toggle expansion", Enabled: !controlDisabled(r) && r.node.TreeDisclosure != nil, Visible: true, Bounds: row.DisclosureBounds})
 						}
 					}
 					for _, page := range inspection.Pages {
-						result.Elements = append(result.Elements, ManualElement{ID: page.ID, Parent: r.node.ID, Incarnation: inspection.RowIncarnation, Kind: ui.Button, Name: page.Name, Enabled: !controlDisabled(r) && page.Enabled, Visible: true, Bounds: page.Bounds})
+						result.Elements = append(result.Elements, ManualElement{ID: page.ID, Parent: prefix + r.node.ID, Incarnation: inspection.RowIncarnation, Kind: ui.Button, Name: page.Name, Enabled: !controlDisabled(r) && page.Enabled, Visible: true, Bounds: page.Bounds})
 					}
 				}
 			}
@@ -910,23 +925,45 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 						gridCaptureErr = errors.Join(gridCaptureErr, gridErr)
 					}
 				} else {
+					qualifyManualGrid(&inspection, prefix)
 					result.Grids = append(result.Grids, inspection)
 					for _, cell := range inspection.Cells {
 						if cell.Bounds.Empty() {
 							continue
 						}
-						result.Elements = append(result.Elements, ManualElement{ID: cell.ID, Parent: r.node.ID, Incarnation: inspection.CellIncarnation, Kind: ui.DataGrid, Name: cell.Text, Value: cell.Text, Enabled: !controlDisabled(r), Visible: visible, Selected: cell.Active, Bounds: cell.Bounds})
+						result.Elements = append(result.Elements, ManualElement{ID: cell.ID, Parent: prefix + r.node.ID, Incarnation: inspection.CellIncarnation, Kind: ui.DataGrid, Name: cell.Text, Value: cell.Text, Enabled: !controlDisabled(r), Visible: visible, Selected: cell.Active, Bounds: cell.Bounds})
 					}
 				}
 			}
+			if dock, ok := r.node.Custom.(*Workbench); r.node.Kind == ui.Extension && ok {
+				accessibilityWorkbenchLeaves(dock, func(group *workbench.Group) {
+					for _, panel := range group.Tabs {
+						tab := dock.buttons[panel]
+						if tab == nil {
+							continue
+						}
+						target := prefix + accessibilityDockOptionID(r.node.ID, panel)
+						b := bounds[target]
+						node, shown := byID[target]
+						focused := tab.ContainsFocus()
+						if focused {
+							result.FocusedID = target
+						}
+						result.Elements = append(result.Elements, ManualElement{ID: target, Parent: id, Incarnation: w.dockHeaders[tab], Kind: ui.Tabs, Name: node.Name, Value: panel, Visible: shown, Enabled: !controlDisabled(r) && !node.Disabled, Focused: focused, Selected: group.Active == panel, Bounds: image.Rect(int(b[0]), int(b[1]), int(b[0]+b[2]), int(b[1]+b[3]))})
+					}
+				})
+				retainedWorkbenchRecords(r, func(panel string, child *record) {
+					collect(child, id, prefix+accessibilityWorkbenchNamespace(r.node.ID, panel))
+				})
+			}
 			if edit := gridEditingRecord(r); edit != nil {
-				collect(edit, r.node.ID)
+				collect(edit, prefix+r.node.ID, prefix)
 			}
 			for _, c := range r.children {
-				collect(c, r.node.ID)
+				collect(c, prefix+r.node.ID, prefix)
 			}
 		}
-		collect(n.root, "")
+		collect(n.root, "", "")
 		sort.Slice(result.Elements, func(i, j int) bool { return result.Elements[i].ID < result.Elements[j].ID })
 	})
 	err = errors.Join(err, gridCaptureErr)
@@ -1040,6 +1077,7 @@ func (m *Manual) Close(ctx context.Context) error {
 	}
 	if err == nil {
 		m.closed.Store(true)
+		p.workbenchMode.active.Store(false)
 		p.owner.SetServices(nil)
 		manualOwners.Lock()
 		delete(manualOwners.owners, p.owner)

@@ -73,7 +73,7 @@ func (w *Workbench) syncFocus() {
 	}
 	if button := w.buttons[f.Panel]; button != nil {
 		button.SetFocus()
-		if native := w.host.Scene.RenderWindow(); native != nil {
+		if native := w.host.Scene.RenderWindow(); !w.isManual() && native != nil {
 			native.SystemWindow.Raise()
 		}
 		w.focusSerial = f.Serial
@@ -82,6 +82,21 @@ func (w *Workbench) syncFocus() {
 }
 func (w *Workbench) bindWindowGeometry() {
 	if w.Group == nil {
+		return
+	}
+	if w.isManual() {
+		w.host.OnShow(func(events.Event) {
+			if w.positioned {
+				return
+			}
+			w.positioned = true
+			w.queue(func() error {
+				if w.Group.OnWindowReady != nil {
+					w.Group.OnWindowReady(w.SessionWindow)
+				}
+				return nil
+			})
+		})
 		return
 	}
 	w.host.OnShow(func(events.Event) {
@@ -134,7 +149,7 @@ func validNativeBounds(b workbench.Bounds) bool {
 		!(b.X == -32000 && b.Y == -32000)
 }
 func (w *Workbench) queueWindowBounds(b workbench.Bounds) {
-	if !validNativeBounds(b) {
+	if w.isManual() || !validNativeBounds(b) {
 		return
 	}
 	capture := &nativeBoundsCapture{bounds: b, epoch: w.geometryEpoch.Load(), sequence: w.boundsSequence.Add(1)}
@@ -203,7 +218,7 @@ func (w *Workbench) captureWindowBounds(b workbench.Bounds) error {
 	return nil
 }
 func (w *Workbench) syncWindowGeometry() {
-	if w.Group == nil || !w.positioned {
+	if w.isManual() || w.Group == nil || !w.positioned {
 		return
 	}
 	native := w.host.Scene.RenderWindow()
@@ -359,7 +374,7 @@ func (w *Workbench) bindTabPointer(button *core.Tab, panel, group string) {
 	button.OnFirst(events.SlideStop, func(e events.Event) {
 		e.SetHandled()
 		if hit, ok := w.hitDock(panel, e.WindowPos()); ok {
-			w.queue(func() error { return w.drop(panel, hit) })
+			w.queueInput(func() error { return w.drop(panel, hit) })
 			return
 		}
 		if w.Group != nil {
@@ -372,7 +387,7 @@ func (w *Workbench) bindTabPointer(button *core.Tab, panel, group string) {
 				return
 			}
 			bounds := w.floatingBounds(e.WindowPos())
-			w.queue(func() error { return w.Group.Float(panel, bounds) })
+			w.queueInput(func() error { return w.Group.Float(panel, bounds) })
 		}
 	})
 	if w.Group == nil {
@@ -382,7 +397,7 @@ func (w *Workbench) bindTabPointer(button *core.Tab, panel, group string) {
 	// native owner. Building a menu must not read another window's native tree.
 	button.AddContextMenu(func(menu *core.Scene, _ image.Point) {
 		core.NewButton(menu).SetText("Float panel").OnClick(func(events.Event) {
-			w.queue(func() error { return w.Group.Float(panel, workbench.Bounds{Width: 640, Height: 480}) })
+			w.queueInput(func() error { return w.Group.Float(panel, workbench.Bounds{Width: 640, Height: 480}) })
 		})
 		for _, window := range w.menuWindows {
 			var visit func(*workbench.Group)
@@ -398,7 +413,7 @@ func (w *Workbench) bindTabPointer(button *core.Tab, panel, group string) {
 				windowID, groupID, index := window.ID, target.ID, len(target.Tabs)
 				label := "Dock in " + window.Title + " / " + groupID
 				core.NewButton(menu).SetText(html.EscapeString(label)).OnClick(func(events.Event) {
-					w.queue(func() error {
+					w.queueInput(func() error {
 						return w.Group.Apply(func(s *workbench.Session) error { return s.Dock(panel, windowID, groupID, index) })
 					})
 				})
@@ -409,6 +424,9 @@ func (w *Workbench) bindTabPointer(button *core.Tab, panel, group string) {
 }
 func (w *Workbench) floatingBounds(pos image.Point) workbench.Bounds {
 	b := workbench.Bounds{Width: 640, Height: 480}
+	if w.isManual() {
+		return b
+	}
 	if native := w.host.Scene.RenderWindow(); native != nil {
 		win := native.SystemWindow
 		origin, size, pixels := win.Position(nil), win.WinSize(), win.Size()

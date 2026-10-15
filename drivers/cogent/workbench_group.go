@@ -30,6 +30,7 @@ type WorkbenchGroup struct {
 	identity        uint64
 	open            func(app.Window) error
 	close           func(string) error
+	manualMode      *manualWorkbenchMode
 }
 
 func NewWorkbenchGroup(owner *app.Application, session *workbench.Session, panels []Panel) (*WorkbenchGroup, error) {
@@ -102,6 +103,23 @@ func (g *WorkbenchGroup) Apply(change func(*workbench.Session) error) error {
 func (g *WorkbenchGroup) apply(next workbench.SessionLayout, persist, nativeGeometry bool) error {
 	if g.Owner.Context().Err() != nil {
 		return app.ErrClosed
+	}
+	if g.manualMode != nil && g.manualMode.active.Load() {
+		if g.PersistencePath != "" {
+			return ErrManualUnsupported
+		}
+		for _, after := range next.Windows {
+			if after.Bounds.Positioned {
+				return fmt.Errorf("%w: manual window positioning", ErrManualUnsupported)
+			}
+		}
+		for _, before := range g.Session.Layout().Windows {
+			for _, after := range next.Windows {
+				if after.ID == before.ID && after.Bounds != before.Bounds {
+					return fmt.Errorf("%w: manual window geometry is fixed", ErrManualUnsupported)
+				}
+			}
+		}
 	}
 	previous := g.Session.Layout()
 	for id, w := range g.windows {
@@ -200,8 +218,16 @@ func (g *WorkbenchGroup) captureNativeBounds(window string, bounds workbench.Bou
 	}
 	return g.apply(draft.Layout(), true, true)
 }
-func (g *WorkbenchGroup) Save(path string) error { return g.Session.Save(path) }
+func (g *WorkbenchGroup) Save(path string) error {
+	if g.manualMode != nil && g.manualMode.active.Load() {
+		return ErrManualUnsupported
+	}
+	return g.Session.Save(path)
+}
 func (g *WorkbenchGroup) Load(path string) error {
+	if g.manualMode != nil && g.manualMode.active.Load() {
+		return ErrManualUnsupported
+	}
 	serial := g.Session.Layout().Focus.Serial
 	if err := g.Apply(func(s *workbench.Session) error {
 		if err := s.Load(path); err != nil {
@@ -276,7 +302,7 @@ func (w *Workbench) WindowClosed() error {
 	}
 	w.geometryEpoch.Add(1)
 	w.pendingBounds.Store(nil)
-	if native := w.host; native != nil && native.Scene.RenderWindow() != nil {
+	if native := w.host; !w.isManual() && native != nil && native.Scene.RenderWindow() != nil {
 		win := native.Scene.RenderWindow().SystemWindow
 		size, pos := win.WinSize(), win.Position(nil)
 		if err := w.captureWindowBounds(workbench.Bounds{X: pos.X, Y: pos.Y, Width: size.X, Height: size.Y, Positioned: true}); err != nil {
@@ -304,6 +330,13 @@ func closeWorkbenchExtensions(r *record) error {
 	for _, child := range r.children {
 		if err := closeWorkbenchExtensions(child); err != nil {
 			failures = append(failures, err)
+		}
+	}
+	if w, ok := r.node.Custom.(*Workbench); r.node.Kind == ui.Extension && ok && w != nil {
+		for _, panel := range w.Panels {
+			if err := closeWorkbenchExtensions(w.records[panel.ID]); err != nil {
+				failures = append(failures, err)
+			}
 		}
 	}
 	return errors.Join(failures...)
