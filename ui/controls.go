@@ -30,6 +30,7 @@ const (
 	Tabs             Kind = "tabs"
 	Scroll           Kind = "scroll"
 	Dialog           Kind = "dialog"
+	Canvas2D         Kind = "canvas-2d"
 )
 
 // Option has a stable domain ID independent of its displayed label. For Tabs,
@@ -97,7 +98,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Checkbox, Switch, ToggleButton, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
+	case Button, Canvas2D, Checkbox, Switch, ToggleButton, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
 		return true
 	}
 	return false
@@ -126,6 +127,19 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind == Canvas2D {
+		if n.Canvas == nil || n.Canvas.Validate() != nil || !finite(n.CanvasGrid) || n.CanvasGrid < 0 || n.CanvasGrid > 1e6 {
+			return fmt.Errorf("ui: Canvas2D requires a valid scene and bounded grid spacing")
+		}
+	} else if n.Canvas != nil || n.CanvasGrid != 0 || n.PlacementTarget != nil {
+		return fmt.Errorf("ui: canvas fields belong only on Canvas2D")
+	}
+	if n.PlacementSource != nil && (n.Kind != Button || !n.PlacementSource.Valid() || n.Activate == nil) {
+		return fmt.Errorf("ui: placement source requires a valid focusable Button and keyboard Activate path")
+	}
+	if n.PlacementTarget != nil && !n.PlacementTarget.Valid() {
+		return fmt.Errorf("ui: invalid placement target")
+	}
 	if n.Kind != Tabs && n.TabClose != nil {
 		return fmt.Errorf("ui: TabClose belongs only on tabs")
 	}

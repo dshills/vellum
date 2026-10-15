@@ -369,3 +369,13 @@ typed errors and the optional native fixture record. Targeted/full offscreen rac
 tests and native build checks pass; the 343-window failure's triggering event and
 fresh endurance acceptance remain open. See
 [the retirement checkpoint](reports/macos-ax-retirement/README.md).
+
+## Typed palette placement
+
+Public `placement.Controller[T]`, managed Button sources and `ui.Canvas2D`
+provide same-window capture, threshold previews, target acceptance/snapping and
+exactly-once application command delivery. The independent `examples/placement`
+module demonstrates three types, keyboard placement, selection, pan/zoom, grid
+snapping and bounded Undo/Redo. See the [contract](../specs/placement.md) and
+[checkpoint](reports/macos-palette-placement/README.md) for automated routing
+evidence and the outstanding physical Mac checks. Full Mac/P9/P11 gates remain open.

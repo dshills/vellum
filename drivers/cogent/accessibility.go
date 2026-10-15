@@ -28,6 +28,7 @@ import (
 type accessibilityNode struct {
 	// pressFocusID is Go-only metadata for the managed Grid cell action.
 	// Workbench namespace wrapping qualifies this exact pending host focus.
+	activationGuard      func() bool // Go-only originating placement input lease
 	pressFocusID         string
 	ID                   string      `json:"id"`
 	DomainID             string      `json:"domain_id"`
@@ -72,6 +73,7 @@ type accessibilityBridge struct {
 	mu                sync.Mutex
 	window            string
 	handlers          map[string]accessibilityHandler
+	activationGuards  map[string]func() bool
 	lastSnapshot      string
 	completedSnapshot string // semantic identity of the detached ready cache
 	gridPublications  map[string][]accessibilityNode
@@ -159,6 +161,7 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	b.closed.Store(true)
 	b.generation.Add(1)
 	b.handlers = nil
+	b.activationGuards = nil
 	b.gridPublications = nil
 	b.completedSnapshot = ""
 	b.geometryMembers = nil
@@ -183,6 +186,7 @@ func accessibilityDeliver(token, generation uint64, id string, action accessibil
 	}
 	b.mu.Lock()
 	handler := b.handlers[id]
+	guard := b.activationGuards[id]
 	window := b.window
 	b.mu.Unlock()
 	if handler == nil || window == "" {
@@ -191,7 +195,7 @@ func accessibilityDeliver(token, generation uint64, id string, action accessibil
 	// Native main-thread callbacks never enter Do or wait for the owner. The
 	// generation is rechecked when an admitted action reaches the bounded queue.
 	err := b.owner.PostWindow(window, func() {
-		if b.closed.Load() || b.generation.Load() != generation {
+		if b.closed.Load() || b.generation.Load() != generation || (guard != nil && !guard()) {
 			return
 		}
 		b.mu.Lock()
@@ -241,6 +245,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 			// Keep the detached cache, but resolve admitted actions against the
 			// newest owner callbacks without retiring their semantic generation.
 			b.handlers = handlers
+			b.activationGuards = accessibilityActivationGuards(nodes)
 			b.mu.Unlock()
 			return
 		}
@@ -265,6 +270,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		return
 	}
 	b.handlers = handlers
+	b.activationGuards = accessibilityActivationGuards(nodes)
 	snapshot := semantic
 	unchanged := b.lastSnapshot == snapshot
 	b.lastSnapshot = snapshot
@@ -281,6 +287,16 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	generation := b.generation.Add(1)
 	nativeAccessibilityUpdate(b.token, accessibilityPayload(generation, snapshot))
 	b.mu.Unlock()
+}
+
+func accessibilityActivationGuards(nodes []accessibilityNode) map[string]func() bool {
+	guards := map[string]func() bool{}
+	for _, n := range nodes {
+		if n.activationGuard != nil {
+			guards[n.ID] = n.activationGuard
+		}
+	}
+	return guards
 }
 
 // accessibilitySemantic preserves Marshal's compact representation without
@@ -540,6 +556,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if n.Kind == ui.Dialog && n.Dismiss != nil {
 				x.Actions = append(x.Actions, "cancel")
 			}
+		}
+		if n.Kind == ui.Button && r.control != nil {
+			x.activationGuard = placementActivationGuard(r)
 		}
 		nodes = append(nodes, x)
 		if len(x.Actions) > 0 {

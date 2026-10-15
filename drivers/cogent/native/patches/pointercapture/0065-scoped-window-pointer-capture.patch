@@ -1,0 +1,519 @@
+--- a/core/events.go
++++ b/core/events.go
+@@ -390,6 +390,12 @@
+ 				}
+ 			}
+ 		}
++	}
++	// A MouseDown handler may have captured the sequence. Do not re-arm
++	// default press/slide/repeat state after capture reset it.
++	if rc := sc.renderContext(); et == events.MouseDown && rc != nil && (rc.pointerCapture != nil || rc.pointerSwallowUp) {
++		e.SetHandled()
++		return
+ 	}
+ 	switch et {
+ 	case events.MouseDown:
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -518,6 +518,10 @@
+ 		w.handleWindowEvents(e)
+ 		return
+ 	}
++	if rc.routeCapturedPointer(e) {
++		w.requestPaintAfter(0)
++		return
++	}
+ 	if DebugSettings.EventTrace && (!w.isVisible() || w.SystemWindow.Is(system.Minimized)) {
+ 		log.Println("got event while invisible:", e)
+ 		log.Println("w.isClosed:", w.isClosed(), "winClosing flag:", w.flags.HasFlag(winClosing), "syswin !isvis:", !w.SystemWindow.IsVisible(), "minimized:", w.SystemWindow.Is(system.Minimized))
+@@ -605,6 +609,7 @@
+ 			}
+ 			setCurrentRenderWindow(w)
+ 		case events.WinFocusLost:
++			w.renderContext().detachPointer(true)
+ 			if DebugSettings.WindowEventTrace {
+ 				fmt.Printf("Win: %v lost focus\n", w.name)
+ 			}
+@@ -682,6 +687,12 @@
+ 	textShaper shaped.Shaper
+ 
+ 	manual *ManualWindow
++
++	// One capture and one payload-free canceled-release tombstone per window.
++	pointerCapture   *pointerCapture
++	pointerSerial    uint64
++	pointerSwallowUp bool
++	pointerRouting   bool
+ 
+ 	// render mutex for locking out rendering and any destructive updates.
+ 	// It is locked at the [renderWindow] level during rendering and
+--- a/core/stage.go
++++ b/core/stage.go
+@@ -411,6 +411,9 @@
+ }
+ 
+ func (st *Stage) delete() {
++	if st.Scene != nil {
++		st.Scene.Events.CancelPointerCapture()
++	}
+ 	if st.Type.isMain() && st.popups != nil {
+ 		st.popups.deleteAll()
+ 		st.Sprites.reset()
+--- /dev/null
++++ b/core/pointer_capture.go
+@@ -0,0 +1,170 @@
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++package core
++
++import (
++	"errors"
++	"math"
++
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"cogentcore.org/core/styles/states"
++	"cogentcore.org/core/tree"
++)
++
++var ErrPointerCapture = errors.New("core: invalid, busy or exhausted pointer capture")
++
++type pointerCapture struct {
++	scene  *Scene
++	owner  Widget
++	token  uint64
++	handle func(events.Event)
++	lost   func()
++}
++
++// CapturePointer borrows one primary-mouse sequence in this native window.
++// Call from the owner's MouseDown handler under originating render ownership.
++// Captured move/drag/up and keys precede all normal stage/popup routing. Escape,
++// focus loss, hidden/removed owners and stage retirement notify lost once after
++// revocation. ReleasePointer ends capture without a loss notification. Native
++// handlers must arrange application-owner execution for application callbacks.
++func (em *Events) CapturePointer(owner Widget, start events.Event, handle func(events.Event), lost func()) (uint64, error) {
++	if em == nil || em.scene == nil || tree.IsNil(owner) || owner.AsWidget().Scene != em.scene || !owner.AsWidget().IsDisplayable() || owner.AsWidget().StateIs(states.Disabled) || start == nil || start.Type() != events.MouseDown || start.MouseButton() != events.Left || handle == nil {
++		return 0, ErrPointerCapture
++	}
++	rc := em.scene.renderContext()
++	if rc == nil || rc.pointerCapture != nil || rc.pointerRouting || rc.pointerSwallowUp || rc.pointerSerial == math.MaxUint64 {
++		return 0, ErrPointerCapture
++	}
++	rc.pointerSerial++
++	em.resetOnMouseDown()
++	rc.pointerCapture = &pointerCapture{scene: em.scene, owner: owner, token: rc.pointerSerial, handle: handle, lost: lost}
++	return rc.pointerSerial, nil
++}
++func (em *Events) PointerCaptured(token uint64) bool {
++	if em == nil || em.scene == nil || token == 0 {
++		return false
++	}
++	rc := em.scene.renderContext()
++	return rc != nil && rc.pointerCapture != nil && rc.pointerCapture.scene == em.scene && rc.pointerCapture.token == token
++}
++
++// ReleasePointer revokes a matching token before clearing native press state.
++// Its pending primary release remains consumed even if a different stage opens.
++func (em *Events) ReleasePointer(token uint64) bool {
++	if !em.PointerCaptured(token) {
++		return false
++	}
++	em.scene.renderContext().detachPointer(false)
++	return true
++}
++
++// ConsumePointerRelease suppresses the rest of a refused primary sequence.
++// Call under originating render ownership from its MouseDown handler. It never
++// steals a different active capture and retains no widget or callback.
++func (em *Events) ConsumePointerRelease() {
++	if em == nil || em.scene == nil {
++		return
++	}
++	rc := em.scene.renderContext()
++	if rc != nil && rc.pointerCapture == nil {
++		em.resetOnMouseDown()
++		rc.pointerSwallowUp = true
++	}
++}
++
++func (em *Events) CancelPointerCapture() {
++	if em == nil || em.scene == nil {
++		return
++	}
++	rc := em.scene.renderContext()
++	if rc != nil && rc.pointerCapture != nil && rc.pointerCapture.scene == em.scene {
++		rc.detachPointer(true)
++	}
++}
++func (rc *renderContext) detachPointer(notify bool) {
++	capture := rc.pointerCapture
++	if capture == nil {
++		return
++	}
++	rc.pointerCapture = nil
++	rc.pointerSwallowUp = true
++	capture.scene.Events.resetOnMouseDown()
++	if notify && capture.lost != nil {
++		capture.lost()
++	}
++	capture.scene = nil
++	capture.owner = nil
++	capture.handle = nil
++	capture.lost = nil
++}
++func (p *pointerCapture) eligible() bool {
++	if p.scene == nil || tree.IsNil(p.owner) || p.owner.AsWidget().Scene != p.scene || !p.owner.AsWidget().IsDisplayable() || p.owner.AsWidget().StateIs(states.Disabled) {
++		return false
++	}
++	st := p.scene.Stage
++	if st == nil || st.Mains == nil {
++		return false
++	}
++	if st.Type.isMain() {
++		return st.Mains.top() == st && (st.popups == nil || st.popups.top() == nil)
++	}
++	return st.Main != nil && st.Mains.top() == st.Main && st.Main.popups != nil && st.Main.popups.top() == st
++}
++
++// routeCapturedPointer is invoked by renderWindow before main/popup dispatch.
++// A canceled sequence retains only a boolean tombstone, no scene/widget refs.
++func (rc *renderContext) routeCapturedPointer(e events.Event) bool {
++	typ := e.Type()
++	if rc.pointerCapture == nil {
++		if rc.pointerSwallowUp {
++			if typ == events.MouseDown && e.MouseButton() == events.Left {
++				rc.pointerSwallowUp = false
++				return false
++			}
++			if typ == events.MouseDown {
++				e.SetHandled()
++				return true
++			}
++			if typ == events.MouseUp {
++				if e.MouseButton() == events.Left {
++					rc.pointerSwallowUp = false
++				}
++				e.SetHandled()
++				return true
++			}
++		}
++		return false
++	}
++	switch typ {
++	case events.MouseMove, events.MouseDrag, events.MouseUp, events.MouseDown, events.Scroll, events.KeyDown, events.KeyUp, events.KeyChord:
++	default:
++		return false
++	}
++	capture := rc.pointerCapture
++	scene := capture.scene
++	e.SetLocalOff(scene.SceneGeom.Pos)
++	rc.pointerRouting = true
++	defer func() { rc.pointerRouting = false }()
++	e.SetHandled()
++	defer func() {
++		if boundary := scene.EventBoundary; boundary != nil {
++			boundary(e)
++		}
++	}()
++	if !capture.eligible() || typ == events.MouseDown || typ == events.KeyChord && e.KeyCode() == key.CodeEscape {
++		rc.detachPointer(true)
++		if typ == events.MouseUp && e.MouseButton() == events.Left {
++			rc.pointerSwallowUp = false
++		}
++		return true
++	}
++	// Detach before terminal delivery, making recursive/duplicate release inert.
++	handle := capture.handle
++	if typ == events.MouseUp && e.MouseButton() == events.Left {
++		rc.detachPointer(false)
++		rc.pointerSwallowUp = false
++	}
++	handle(e)
++	return true
++}
+--- /dev/null
++++ b/core/pointer_capture_test.go
+@@ -0,0 +1,282 @@
++//go:build offscreen
++
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/events"
++	"cogentcore.org/core/events/key"
++	"context"
++	"image"
++	"testing"
++)
++
++func TestVellumPointerCaptureReleaseBeforeOrdinaryRouting(t *testing.T) {
++	var source, target *Button
++	var token uint64
++	var moves, ups, unrelated, clicks, loss, boundaries int
++	m, b, _ := manualFixture(t, func(b *Body) {
++		source = NewButton(b).SetText("Palette")
++		target = NewButton(b).SetText("Canvas")
++		target.On(events.MouseUp, func(events.Event) { unrelated++ })
++		target.OnClick(func(events.Event) { clicks++ })
++		source.OnClick(func(events.Event) { clicks++ })
++		source.OnFirst(events.MouseDown, func(e events.Event) {
++			var err error
++			token, err = b.Scene.Events.CapturePointer(source, e, func(e events.Event) {
++				if e.Type() == events.MouseDrag || e.Type() == events.MouseMove {
++					moves++
++				}
++				if e.Type() == events.MouseUp {
++					ups++
++				}
++			}, func() { loss++ })
++			if err != nil {
++				t.Fatal(err)
++			}
++			e.SetHandled()
++		})
++	})
++	if _, err := m.Frame(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	drainManual(t, m)
++	b.Scene.EventBoundary = func(events.Event) { boundaries++ }
++	inputManual(t, m, ManualInput{Type: events.MouseDown, Button: events.Left, Position: center(source)})
++	drainManual(t, m)
++	rc := b.Scene.renderContext()
++	capture := rc.pointerCapture
++	if token == 0 || !b.Scene.Events.PointerCaptured(token) || b.Scene.Events.press != nil || b.Scene.Events.slidePress != nil || b.Scene.Events.repeatClick != nil {
++		t.Fatal("default MouseDown tail rearmed capture", token)
++	}
++	inputManual(t, m, ManualInput{Type: events.MouseMove, Position: center(target)})
++	drainManual(t, m)
++	inputManual(t, m, ManualInput{Type: events.MouseUp, Button: events.Left, Position: center(target)})
++	drainManual(t, m)
++	if moves != 1 || ups != 1 || unrelated != 0 || clicks != 0 || loss != 0 || boundaries != 3 || rc.pointerCapture != nil || rc.pointerSwallowUp || capture.owner != nil || capture.scene != nil || capture.handle != nil || capture.lost != nil {
++		t.Fatal("capture release leaked or propagated", moves, ups, unrelated, clicks, loss, boundaries)
++	}
++}
++func TestVellumPointerCaptureCancellationSwallowsUpAcrossModal(t *testing.T) {
++	for _, variant := range []string{"escape", "explicit", "focus-loss", "owner-removed", "modal"} {
++		t.Run(variant, func(t *testing.T) {
++			var source, target *Button
++			token := uint64(0)
++			ups, loss, ordinary := 0, 0, 0
++			m, b, _ := manualFixture(t, func(b *Body) {
++				source = NewButton(b).SetText("Palette")
++				target = NewButton(b).SetText("Other")
++				target.On(events.MouseUp, func(events.Event) { ordinary++ })
++				target.OnClick(func(events.Event) { ordinary++ })
++				source.OnFirst(events.MouseDown, func(e events.Event) {
++					var err error
++					token, err = b.Scene.Events.CapturePointer(source, e, func(e events.Event) {
++						if e.Type() == events.MouseUp {
++							ups++
++						}
++					}, func() { loss++ })
++					if err != nil {
++						t.Fatal(err)
++					}
++					e.SetHandled()
++				})
++			})
++			if _, err := m.Frame(context.Background()); err != nil {
++				t.Fatal(err)
++			}
++			drainManual(t, m)
++			inputManual(t, m, ManualInput{Type: events.MouseDown, Button: events.Left, Position: center(source)})
++			drainManual(t, m)
++			rc := b.Scene.renderContext()
++			capture := rc.pointerCapture
++			var modal *Body
++			switch variant {
++			case "escape":
++				inputManual(t, m, ManualInput{Type: events.KeyChord, Code: key.CodeEscape})
++				drainManual(t, m)
++			case "explicit":
++				b.Scene.Events.CancelPointerCapture()
++			case "focus-loss":
++				rc.Lock()
++				b.Scene.RenderWindow().handleWindowEvents(events.NewWindow(events.WinFocusLost))
++				rc.Unlock()
++			case "owner-removed":
++				source.Delete()
++			case "modal":
++				modal = NewBody("blocking")
++				NewButton(modal).SetText("Modal").On(events.MouseUp, func(events.Event) { ordinary++ })
++				modal.NewDialog(b).Run()
++			}
++			pos := center(target)
++			if modal != nil {
++				if _, err := m.Frame(context.Background()); err != nil {
++					t.Fatal(err)
++				}
++				drainManual(t, m)
++				pos = modal.Scene.SceneGeom.Pos.Add(image.Pt(20, 20))
++			}
++			inputManual(t, m, ManualInput{Type: events.MouseUp, Button: events.Left, Position: pos})
++			drainManual(t, m)
++			if loss != 1 || ups != 0 || ordinary != 0 || rc.pointerCapture != nil || rc.pointerSwallowUp || b.Scene.Events.PointerCaptured(token) || capture.owner != nil || capture.handle != nil || capture.lost != nil {
++				t.Fatal("cancel missed release or retained capture", loss, ups, ordinary)
++			}
++		})
++	}
++}
++func TestVellumPointerCaptureStageRetirement(t *testing.T) {
++	var source *Button
++	loss := 0
++	m, b, _ := manualFixture(t, func(b *Body) {
++		source = NewButton(b).SetText("Palette")
++		source.OnFirst(events.MouseDown, func(e events.Event) {
++			if _, err := b.Scene.Events.CapturePointer(source, e, func(events.Event) {}, func() { loss++ }); err != nil {
++				t.Fatal(err)
++			}
++			e.SetHandled()
++		})
++	})
++	if _, err := m.Frame(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	drainManual(t, m)
++	inputManual(t, m, ManualInput{Type: events.MouseDown, Button: events.Left, Position: center(source)})
++	drainManual(t, m)
++	capture := b.Scene.renderContext().pointerCapture
++	if err := m.Close(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	if loss != 1 || capture.owner != nil || capture.handle != nil || capture.scene != nil || capture.lost != nil {
++		t.Fatal("native closure retained pointer capture", loss)
++	}
++}
++func TestVellumPointerCaptureTombstoneSuppressesWholeSecondarySequence(t *testing.T) {
++	var source, target *Button
++	ordinary := 0
++	m, b, _ := manualFixture(t, func(b *Body) {
++		source = NewButton(b).SetText("Palette")
++		target = NewButton(b).SetText("Other")
++		target.On(events.MouseDown, func(events.Event) { ordinary++ })
++		target.On(events.MouseUp, func(events.Event) { ordinary++ })
++		source.OnFirst(events.MouseDown, func(e events.Event) {
++			if _, err := b.Scene.Events.CapturePointer(source, e, func(events.Event) {}, nil); err != nil {
++				t.Fatal(err)
++			}
++			e.SetHandled()
++		})
++	})
++	if _, err := m.Frame(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	drainManual(t, m)
++	inputManual(t, m, ManualInput{Type: events.MouseDown, Button: events.Left, Position: center(source)})
++	drainManual(t, m)
++	b.Scene.Events.CancelPointerCapture()
++	for _, typ := range []events.Types{events.MouseDown, events.MouseUp} {
++		inputManual(t, m, ManualInput{Type: typ, Button: events.Right, Position: center(target)})
++		drainManual(t, m)
++	}
++	if ordinary != 0 || b.Scene.Events.press != nil || !b.Scene.renderContext().pointerSwallowUp {
++		t.Fatal("secondary sequence partially routed", ordinary)
++	}
++	inputManual(t, m, ManualInput{Type: events.MouseUp, Button: events.Left, Position: center(target)})
++	drainManual(t, m)
++	if ordinary != 0 || b.Scene.renderContext().pointerSwallowUp {
++		t.Fatal("pending primary release propagated", ordinary)
++	}
++}
++func TestVellumPointerCapturePreservesDialogLocalCoordinates(t *testing.T) {
++	m, b, _ := manualFixture(t, nil)
++	if _, err := m.Frame(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	drainManual(t, m)
++	dialog := NewBody("offset")
++	source := NewButton(dialog).SetText("Palette")
++	var positions [][2]image.Point
++	var boundaries [][2]image.Point
++	source.OnFirst(events.MouseDown, func(e events.Event) {
++		positions = append(positions, [2]image.Point{e.Pos(), e.WindowPos()})
++		if _, err := dialog.Scene.Events.CapturePointer(source, e, func(e events.Event) { positions = append(positions, [2]image.Point{e.Pos(), e.WindowPos()}) }, nil); err != nil {
++			t.Fatal(err)
++		}
++		e.SetHandled()
++	})
++	dialog.NewDialog(b).Run()
++	if _, err := m.Frame(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	drainManual(t, m)
++	origin := dialog.Scene.SceneGeom.Pos
++	if origin == (image.Point{}) {
++		t.Fatal("fixture has no dialog offset")
++	}
++	dialog.Scene.EventBoundary = func(e events.Event) {
++		if e.HasPos() {
++			boundaries = append(boundaries, [2]image.Point{e.Pos(), e.WindowPos()})
++		}
++	}
++	pos := center(source).Add(origin)
++	inputManual(t, m, ManualInput{Type: events.MouseDown, Button: events.Left, Position: pos})
++	drainManual(t, m)
++	inputManual(t, m, ManualInput{Type: events.MouseMove, Position: pos.Add(image.Pt(10, 10))})
++	drainManual(t, m)
++	inputManual(t, m, ManualInput{Type: events.MouseUp, Button: events.Left, Position: pos.Add(image.Pt(20, 20))})
++	drainManual(t, m)
++	if len(positions) != 3 || len(boundaries) != 3 {
++		t.Fatal("missing capture delivery", positions, boundaries)
++	}
++	for _, list := range [][][2]image.Point{positions, boundaries} {
++		for _, p := range list {
++			if p[1].Sub(p[0]) != origin {
++				t.Fatal("captured scene offset changed", origin, p)
++			}
++		}
++	}
++}
++
++func TestVellumPointerRefusedOrReleasedDuringDownConsumesSequence(t *testing.T) {
++	for _, refusal := range []bool{false, true} {
++		t.Run(map[bool]string{false: "released", true: "refused"}[refusal], func(t *testing.T) {
++			var source, target *Button
++			ordinary := 0
++			m, b, _ := manualFixture(t, func(b *Body) {
++				source = NewButton(b).SetText("Palette")
++				target = NewButton(b).SetText("Other")
++				target.On(events.MouseUp, func(events.Event) { ordinary++ })
++				source.OnFirst(events.MouseDown, func(e events.Event) {
++					if refusal {
++						b.Scene.renderContext().pointerSerial = ^uint64(0)
++					}
++					token, err := b.Scene.Events.CapturePointer(source, e, func(events.Event) {}, nil)
++					if refusal {
++						if err == nil {
++							t.Fatal("exhausted capture admitted")
++						}
++						b.Scene.Events.ConsumePointerRelease()
++					} else {
++						if err != nil {
++							t.Fatal(err)
++						}
++						b.Scene.Events.ReleasePointer(token)
++					}
++					e.SetHandled()
++				})
++			})
++			if _, err := m.Frame(context.Background()); err != nil {
++				t.Fatal(err)
++			}
++			drainManual(t, m)
++			inputManual(t, m, ManualInput{Type: events.MouseDown, Button: events.Left, Position: center(source)})
++			drainManual(t, m)
++			if b.Scene.Events.press != nil || b.Scene.Events.slidePress != nil || !b.Scene.renderContext().pointerSwallowUp {
++				t.Fatal("refused Down rearmed ordinary state")
++			}
++			inputManual(t, m, ManualInput{Type: events.MouseUp, Button: events.Left, Position: center(target)})
++			drainManual(t, m)
++			if ordinary != 0 || b.Scene.renderContext().pointerSwallowUp {
++				t.Fatal("refused release propagated", ordinary)
++			}
++		})
++	}
++}

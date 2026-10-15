@@ -200,3 +200,15 @@ professional automation workflows remain unqualified.
 The complete P9 professional workloads, large-data replay,
 native services/IME/accessibility, GPU presentation and sustained
 performance acceptance remain open.
+
+## Managed palette placement
+
+`placement.Controller[T]` and `ui.Canvas2D` add typed same-window palette
+placement with captured threshold gestures, fresh transformed target previews,
+accept/reject policy, optional snapping, release consumption and keyboard
+placement through the same application command. Models and history remain
+application-owned. The independently consumable `examples/placement` demonstrates
+one placement per Undo step and stable-object Redo. See the
+[contract](placement.md) for logical viewport units, lifecycle and bounded-state
+rules, and the [checkpoint](../docs/reports/macos-palette-placement/README.md)
+for code-only evidence. Physical native pointer behavior remains unqualified.

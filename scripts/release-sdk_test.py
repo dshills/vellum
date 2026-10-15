@@ -61,7 +61,7 @@ class ReleaseChecks(unittest.TestCase):
             root.mkdir()
             (root / "go.mod").write_bytes((release.ROOT / "go.mod").read_bytes())
             public_files = []
-            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui", "virtual", "canvas"):
+            for package in ("history", "document", "editor", "execution", "replay", "tasks", "app", "ui", "virtual", "canvas", "placement"):
                 (root / package).mkdir()
                 for source in (release.ROOT / package).glob("*.go"):
                     if not source.name.endswith("_test.go"):

@@ -9,12 +9,17 @@
     "status": "experimental",
     "backend": "offscreen",
     "builtin_workbench": true,
-    "workbench_target_helpers": ["ManualWorkbenchControlID", "ManualWorkbenchTabID"],
+    "workbench_target_helpers": [
+      "ManualWorkbenchControlID",
+      "ManualWorkbenchTabID"
+    ],
     "professional_workspace_qualified": false
   },
   "automation": {
     "protocol": 1,
-    "targets": ["darwin"],
+    "targets": [
+      "darwin"
+    ],
     "opt_in": true,
     "status": "experimental"
   },
@@ -24,5 +29,11 @@
     "linux-x11": "unqualified",
     "linux-wayland": "unsupported"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "palette_placement": {
+    "status": "experimental",
+    "same_window_only": true,
+    "physical_pointer_qualified": false,
+    "demo": "examples/placement"
+  }
 }

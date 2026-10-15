@@ -74,6 +74,21 @@ func (p *manualImplementation) prepareManualView(window string, root ui.Node) (f
 				return err
 			}
 		}
+		if n.Canvas != nil {
+			if err := claim(n.Canvas); err != nil {
+				return err
+			}
+		}
+		if n.PlacementSource != nil {
+			if err := claim(n.PlacementSource); err != nil {
+				return err
+			}
+		}
+		if n.PlacementTarget != nil {
+			if err := claim(n.PlacementTarget); err != nil {
+				return err
+			}
+		}
 
 		if n.Kind == ui.Extension {
 			w, ok := n.Custom.(*Workbench)

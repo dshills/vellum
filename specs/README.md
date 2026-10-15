@@ -23,6 +23,7 @@
   redocking and transactional multiwindow session persistence.
 - [Accessibility and keyboard workflows](accessibility.md): native macOS semantics,
   actions, focus scopes and bounded virtual data publication.
+- [Palette-to-canvas placement](placement.md): typed sources, scoped capture, transformed target previews and command/history placement.
 - [External file drops](file-drop.md): bounded native file references and owner callbacks.
 - [Document editor](editor.md): exact portable text, atomic selection/editing, native composition and persistence settlement.
 - [Document persistence](document.md): asynchronous save/open, revision checks and unsaved-close policies.

@@ -628,6 +628,17 @@
               "sha256": "1e7ff91884518ecb606f078649c7befe4c31b01a94c031e2763a1accc5546a64"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/pointercapture",
+          "inputs": "native/patches/pointercapture/original-hashes.json",
+          "outputs": "native/patches/pointercapture/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/pointercapture/0065-scoped-window-pointer-capture.patch",
+              "sha256": "97e0fccbbcafc07f3633211b78ec9bb473f4fc8740c2a43276b46c150968812b"
+            }
+          ]
         }
       ]
     },

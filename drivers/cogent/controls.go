@@ -60,6 +60,7 @@ type controlState struct {
 	grid              *gridBinding
 	outline           *outlineBinding
 	gridEdit          *gridEditBinding
+	placement         *placementBinding
 	fieldChanges      atomic.Pointer[fieldChangeEpoch]
 	fieldDelivered    string // owner: last delivered value, or controlled value applied by reconciliation
 	fieldState        *core.TextFieldEditingState
@@ -109,6 +110,9 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	var widget core.Widget
 	managedReturned := false
 	defer func() {
+		if !managedReturned && c.placement != nil {
+			disposePlacement(r)
+		}
 		// A source callback can panic or Goexit after registry admission but
 		// before reconcile owns this record. Retire admission first even if
 		// private widget deletion itself has an abnormal return. Do not recover
@@ -135,14 +139,22 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			}
 		})
 		button.OnClick(func(e events.Event) {
+			if r.node.PlacementSource != nil && e.HasPos() {
+				e.SetHandled()
+				return
+			}
+			guard := placementActivationGuard(r)
 			postControl(r, func() {
-				if !c.disabled && r.node.Activate != nil {
+				if guard() && !c.disabled && r.node.Activate != nil {
 					r.node.Activate()
 					c.a.Invalidate(c.window)
 				}
 			})
 		})
 		widget = button
+		button.OnFirst(events.MouseDown, func(e events.Event) { beginPlacement(r, e) })
+	case ui.Canvas2D:
+		widget = mountManagedCanvas(parent, r)
 	case ui.MenuButton:
 		widget = mountMenuButton(parent, r)
 	case ui.Icon:
@@ -402,6 +414,9 @@ func syncControl(r *record, previous ui.Node) error {
 	// reconcile attaches the full topology before syncRecord visits parents then
 	// children; parent semantic properties are current before this snapshot.
 	r.control.disabled = controlDisabled(r)
+	if err := syncPlacement(r); err != nil {
+		return err
+	}
 	refused := r.control.refused.Swap(nil)
 	restoring := r.control.restore || refused != nil
 	committed := r.control.committed || restoring
@@ -812,6 +827,7 @@ func disposeControl(r *record) {
 		return
 	}
 	if r.control != nil {
+		disposePlacement(r)
 		r.control.retired = true
 		if r.control.tabs != nil {
 			for _, binding := range r.control.tabs.bindings {

@@ -1,0 +1,47 @@
+# Palette-to-canvas placement
+
+An independent public Go SDK consumer demonstrating a reusable typed tool palette
+and a managed `ui.Canvas2D`. Block, Connector and Note use the same validation,
+command registry and bounded history path for pointer and keyboard placement.
+
+From the repository root, prepare the pinned native dependencies:
+
+```sh
+./drivers/cogent/prepare.sh
+. ./drivers/cogent/env.sh
+cd examples/placement
+go run .
+```
+
+Drag a tool at least six logical pixels, then release inside the canvas. Green
+feedback shows an accepted proposed footprint; red feedback shows rejection.
+Escape, release outside, focus loss or removing a source/target cancels without
+creating an object. A palette click only focuses its button. Tab to a tool and
+press Return to place it at the current canvas center through the same path.
+
+Click canvas objects to select. Drag the canvas or use arrow keys to pan; scroll
+to zoom about the pointer. Fit and Reset change the view. Toggle grid snapping,
+reject all drops, or reject notes to inspect target policy. Undo/Redo buttons and
+Cmd+Z / Cmd+Shift+Z replay exactly one placement with the original object ID.
+The example limits the document to 512 objects and history to 64 changes.
+
+Run the model checks or deterministic software routing checks separately:
+
+```sh
+go test -race ./...
+go test -race -tags offscreen ./...
+go vet -tags offscreen ./...
+go build .
+```
+
+The offscreen suite routes real managed-widget events at owner batches 1, 7 and
+64 using bundled, checked fonts. It exercises all component types, keyboard
+activation, validation, selection, pan/zoom and Undo/Redo. It does not prove
+physical Mac pointer delivery, display transitions, GPU presentation or external
+screen-reader interaction. These require a separate available desktop session.
+
+The first implementation supports palette and canvas in the **same native
+window**. It does not transfer captures or payloads between native windows or
+applications, use OS drag sessions, or offer cross-window autoscroll. Managed
+Canvas2D uses logical view units; the older GPU MeshCanvas API uses its existing
+physical viewport contract. See [the framework contract](../../specs/placement.md).

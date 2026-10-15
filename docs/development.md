@@ -32,7 +32,7 @@ export VELLUM_CACHE_DIR=/tmp/vellum-go-cache
 
 The script runs root race tests and vet, native-module tests and vet, then builds
 `drivers/cogent/build/vellum-workbench`. It also race-tests, vets and builds the
-independent hello, drawing, 3D, imaging, editor and grid modules, validates dependency
+independent hello, drawing, 3D, imaging, editor, grid and placement modules, validates dependency
 preparation inputs and race-tests upstream lifecycle regressions. Exact text and
 shaped range fixtures run with the prepared typesetting replacement, installed
 font cache and offscreen display initialization through
@@ -316,3 +316,19 @@ observations separate and enforces a 64 KiB aggregate reply limit. Cleanup waits
 for native ACKs under a fresh deadline before withdrawal and observes empty owned
 lists before closing the loop. This does not establish concurrent-writer
 atomicity. See the [notification contract](../specs/notifications.md) for limits.
+
+## Palette placement checks
+
+`examples/placement` is an independent public API consumer: prepare dependencies,
+source `drivers/cogent/env.sh`, then run `go run .` from that module. Its default
+window demonstrates typed tools, target policy, optional snapping, selection,
+pan/zoom and bounded command/history placement. The example and portable package
+are included in the private SDK and normal demo checks. Run its `offscreen` race
+tests for managed pointer/keyboard routing; no live window opens in that mode.
+
+The driver tests include transformed/DPI coordinates, real ancestor scroll
+geometry, preview pixels, consumed releases, exactly-once placement, queue
+saturation and removal/window lifetime cleanup. The pinned stage-65 native
+capture regressions run through the software window router. See the
+[placement contract](../specs/placement.md) for units, bounds and same-window
+limits. These checks do not certify physical Mac capture or cross-display input.

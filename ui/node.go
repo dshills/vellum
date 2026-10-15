@@ -7,6 +7,7 @@ import (
 
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/editor"
+	"github.com/dshills/vellum/placement"
 	"github.com/dshills/vellum/virtual"
 )
 
@@ -66,10 +67,15 @@ type Node struct {
 	FileDrop            func(FileDropEvent) bool
 	Children            []Node
 	Custom              any
-	Style               Style
-	Checked             bool
-	Number              float32
-	Numeric             Numeric
+	// Canvas2D uses logical canvas units and the existing canvas navigation model.
+	Canvas          *canvas.Scene
+	CanvasGrid      float32           // optional world-space grid spacing; zero hides it
+	PlacementSource *placement.Source // focusable palette Button; Activate supplies keyboard placement
+	PlacementTarget *placement.Target // optional Canvas2D acceptance endpoint
+	Style           Style
+	Checked         bool
+	Number          float32
+	Numeric         Numeric
 	// Orientation applies to display/choice/toolbar/split controls; RadioGroup defaults vertical.
 	Orientation   Orientation
 	Options       []Option
@@ -87,6 +93,9 @@ func Validate(root Node) error {
 	models := map[*editor.Model]bool{}
 	grids := map[*virtual.Grid]bool{}
 	trees := map[*virtual.Outline]bool{}
+	canvases := map[*canvas.Scene]bool{}
+	sources := map[*placement.Source]bool{}
+	targets := map[*placement.Target]bool{}
 	var walk func(Node, int) error
 	walk = func(n Node, depth int) error {
 		if depth >= 128 {
@@ -114,6 +123,24 @@ func Validate(root Node) error {
 			return fmt.Errorf("ui: ID %q uses reserved tab-close: prefix", n.ID)
 		}
 		seen[n.ID] = true
+		if n.Canvas != nil {
+			if canvases[n.Canvas] {
+				return fmt.Errorf("ui: canvas model has multiple bindings")
+			}
+			canvases[n.Canvas] = true
+		}
+		if n.PlacementSource != nil {
+			if sources[n.PlacementSource] {
+				return fmt.Errorf("ui: placement source has multiple bindings")
+			}
+			sources[n.PlacementSource] = true
+		}
+		if n.PlacementTarget != nil {
+			if targets[n.PlacementTarget] {
+				return fmt.Errorf("ui: placement target has multiple bindings")
+			}
+			targets[n.PlacementTarget] = true
+		}
 		if n.Kind == MultilineText {
 			if models[n.Editor] {
 				return fmt.Errorf("ui: editor model has multiple bindings")
@@ -143,7 +170,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane, Disclosure:
-		case Label, Button, Icon, Image, Extension, Checkbox, Switch, ToggleButton, ProgressBar, ProgressRing, ProgressGauge, Separator, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
+		case Label, Button, Icon, Image, Extension, Canvas2D, Checkbox, Switch, ToggleButton, ProgressBar, ProgressRing, ProgressGauge, Separator, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}
