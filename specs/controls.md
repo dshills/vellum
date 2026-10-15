@@ -1,11 +1,14 @@
 # Standard controls contract
 
 The public `ui.Node` vocabulary now includes checkbox, switch, toggle button,
-progress bar, circular progress ring, semicircular progress gauge, separator, action menu button, radio group, segmented control, selector, slider, numeric
+progress bar, circular progress ring, semicircular progress gauge, separator, action menu button, radio group, segmented control, selector, list box, slider, numeric
 field, single-line text field, multiline document editor, managed data grid,
 tabs, scroll container, toolbar, status bar, labeled form group and modal dialog. Cogent
 adapts these to its existing native controls. The portable module remains free
 of native dependencies.
+
+The [list box](list-box.md) adds bounded always-visible single selection with
+scrolling, clamped keyboard/page navigation and distinct Mac list/row semantics.
 
 Managed node IDs beginning with `grid:` are reserved for generated grid rows,
 cells and headers. Descriptor validation rejects that prefix before mounting controls,

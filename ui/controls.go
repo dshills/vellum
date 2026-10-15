@@ -20,6 +20,7 @@ const (
 	ProgressGauge    Kind = "progress-gauge"
 	Separator        Kind = "separator"
 	Selector         Kind = "selector"
+	ListBox          Kind = "list-box"
 	MenuButton       Kind = "menu-button"
 	RadioGroup       Kind = "radio-group"
 	SegmentedControl Kind = "segmented-control"
@@ -62,7 +63,7 @@ const (
 
 // ChangeEvent requests a model edit. The relevant payload is Checked for
 // Checkbox/Switch/ToggleButton/Disclosure, Number for Slider/NumberField, Text for TextField, and SelectedID
-// for Selector/Tabs/RadioGroup/SegmentedControl/MenuButton. MenuButton check actions
+// for Selector/ListBox/Tabs/RadioGroup/SegmentedControl/MenuButton. MenuButton check actions
 // also use Checked for the proposed boolean. SplitPane uses Number for the
 // first pane's fraction. Controlled nodes reflect the accepted value on redraw.
 type ChangeEvent struct {
@@ -98,7 +99,7 @@ func IsContainer(kind Kind) bool {
 }
 func IsFocusable(kind Kind) bool {
 	switch kind {
-	case Button, Canvas2D, Checkbox, Switch, ToggleButton, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
+	case Button, Canvas2D, Checkbox, Switch, ToggleButton, MenuButton, Selector, ListBox, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree, Tabs, SplitPane, Disclosure:
 		return true
 	}
 	return false
@@ -127,6 +128,11 @@ func ClampNumeric(value float32, r Numeric) (float32, bool) {
 }
 
 func ValidateControl(n Node) error {
+	if n.Kind == ListBox {
+		if err := validateListBox(n); err != nil {
+			return err
+		}
+	}
 	if n.Kind == Canvas2D {
 		if n.Canvas == nil || n.Canvas.Validate() != nil || !finite(n.CanvasGrid) || n.CanvasGrid < 0 || n.CanvasGrid > 1e6 {
 			return fmt.Errorf("ui: Canvas2D requires a valid scene and bounded grid spacing")
@@ -278,7 +284,7 @@ func FocusTarget(root Node, id string) (Node, bool) {
 			if n.Kind == MenuButton && n.Change == nil {
 				return n, false
 			}
-			if n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl || n.Kind == MenuButton {
+			if n.Kind == Tabs || n.Kind == RadioGroup || n.Kind == SegmentedControl || n.Kind == ListBox || n.Kind == MenuButton {
 				for _, option := range n.Options {
 					if !option.Disabled && !option.Separator {
 						return n, true

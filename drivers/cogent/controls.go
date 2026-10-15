@@ -172,7 +172,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		widget = mountDisclosure(parent, r)
 	case ui.Checkbox:
 		widget = core.NewSwitch(parent).SetType(core.SwitchCheckbox)
-	case ui.RadioGroup, ui.SegmentedControl:
+	case ui.RadioGroup, ui.SegmentedControl, ui.ListBox:
 		widget = core.NewFrame(parent)
 		c.choice = &choiceState{buttons: make(map[string]*core.Switch)}
 		widget.AsWidget().Styler(func(s *styles.Style) {
@@ -182,6 +182,9 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 			}
 			if r.node.Kind == ui.SegmentedControl {
 				s.Gap.Zero()
+			}
+			if r.node.Kind == ui.ListBox {
+				styleListBox(s)
 			}
 		})
 	case ui.Switch:

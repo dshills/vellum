@@ -276,6 +276,7 @@ type accessibilityFocusTarget struct {
 	widget  core.Widget
 	focused bool
 	scopeID string // Option targets validate visibility through their managed group.
+	reveal  bool   // ListBox focus must reveal even an already-focused scrolled row.
 }
 
 func accessibilityNativeFocusTargets(root *record, prefix string, out map[string]accessibilityFocusTarget) {
@@ -302,11 +303,11 @@ func accessibilityNativeFocusTargets(root *record, prefix string, out map[string
 						continue
 					}
 					if button := root.control.choice.buttons[option.ID]; button != nil {
-						out[prefix+accessibilityOptionID(root.node.ID, option.ID)] = accessibilityFocusTarget{widget: button, focused: button.ContainsFocus(), scopeID: prefix + accessibilityManagedID(root.node.ID)}
+						out[prefix+accessibilityOptionID(root.node.ID, option.ID)] = accessibilityFocusTarget{widget: button, focused: button.ContainsFocus(), scopeID: prefix + accessibilityManagedID(root.node.ID), reveal: root.node.Kind == ui.ListBox}
 					}
 				}
 			}
-			out[prefix+accessibilityManagedID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused}
+			out[prefix+accessibilityManagedID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, reveal: root.node.Kind == ui.ListBox}
 			if root.control != nil && root.control.disclosure != nil {
 				out[prefix+accessibilityDisclosureID(root.node.ID)] = accessibilityFocusTarget{widget: widget, focused: focused, scopeID: prefix + accessibilityManagedID(root.node.ID)}
 			}

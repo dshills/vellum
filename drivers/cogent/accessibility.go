@@ -28,7 +28,7 @@ import (
 type accessibilityNode struct {
 	// pressFocusID is Go-only metadata for the managed Grid cell action.
 	// Workbench namespace wrapping qualifies this exact pending host focus.
-	activationGuard      func() bool // Go-only originating placement input lease
+	activationGuard      func() bool // Go-only originating managed input lease
 	pressFocusID         string
 	ID                   string      `json:"id"`
 	DomainID             string      `json:"domain_id"`
@@ -345,6 +345,9 @@ func accessibilityApplyFocus(root *record, id string) bool {
 	} else {
 		widget.SetFocus()
 	}
+	if target.reveal {
+		widget.ScrollToThis()
+	}
 	return true
 }
 
@@ -506,8 +509,13 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			minimum, maximum := n.Numeric.Min, n.Numeric.Max
 			x.Min = &minimum
 			x.Max = &maximum
-		case ui.RadioGroup, ui.SegmentedControl:
+		case ui.RadioGroup, ui.SegmentedControl, ui.ListBox:
 			x.Role = "radio-group"
+			if n.Kind == ui.ListBox {
+				x.Role = "list-box"
+				x.RowCount = len(n.Options)
+				x.activationGuard = listBoxHostGuard(r)
+			}
 			x.Value = n.SelectedID
 			for _, option := range n.Options {
 				if option.ID == n.SelectedID {
@@ -555,7 +563,7 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			if (n.Kind == ui.Slider || n.Kind == ui.NumberField) && n.Change != nil {
 				x.Actions = append(x.Actions, "increment", "decrement")
 			}
-			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl) && n.Change != nil {
+			if (n.Kind == ui.Selector || n.Kind == ui.Tabs || n.Kind == ui.RadioGroup || n.Kind == ui.SegmentedControl || n.Kind == ui.ListBox) && n.Change != nil {
 				x.Actions = append(x.Actions, "set")
 			}
 			if n.Kind == ui.Dialog && n.Dismiss != nil {
@@ -569,6 +577,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 		if len(x.Actions) > 0 {
 			allowed := append([]string(nil), x.Actions...)
 			handlers[x.ID] = func(action accessibilityAction) bool {
+				if n.Kind == ui.ListBox && !x.activationGuard() {
+					return false
+				}
 				if !containsAccessibilityAction(allowed, action.Kind) {
 					return false
 				}
@@ -826,11 +837,11 @@ func applyAccessibilityAction(r *record, action accessibilityAction) bool {
 			return true
 		}
 		change.Text = action.Value
-	case ui.RadioGroup, ui.SegmentedControl:
+	case ui.RadioGroup, ui.SegmentedControl, ui.ListBox:
 		if action.Kind != "set" || !choiceOptionEnabled(n, action.Value) {
 			return false
 		}
-		if n.SelectedID == action.Value {
+		if n.Kind != ui.ListBox && n.SelectedID == action.Value {
 			return true
 		}
 		change.SelectedID = action.Value

@@ -92,6 +92,10 @@ func bindWorkbenchInputScopes(root *record) {
 			visible, scopes := tabCloseInheritedContext(r)
 			setPlacementScope(r.control.placement, visible && allowed[prefix+accessibilityManagedID(r.node.ID)], controlDisabled(r), scopes)
 		}
+		if r.control != nil && r.node.Kind == ui.ListBox {
+			context := r.control.choice.listContext
+			setListBoxScope(r, context.visible && allowed[prefix+accessibilityManagedID(r.node.ID)], controlDisabled(r), context.scopes)
+		}
 		if dock, ok := r.node.Custom.(*Workbench); r.node.Kind == ui.Extension && ok && dock != nil {
 			visible, scopes := tabCloseInheritedContext(r)
 			dock.setInputScope(visible && allowed[prefix+accessibilityManagedID(r.node.ID)], controlDisabled(r), scopes)

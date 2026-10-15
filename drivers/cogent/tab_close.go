@@ -151,6 +151,7 @@ func syncTabsPresentation(r *record) {
 // syncTabVisibility reuses the reconciler's existing ordered traversal. It
 // publishes only owner values/atomic capabilities, never a second tree walk.
 func syncTabVisibility(r *record, visible bool, scopes []*tabCloseScope) {
+	syncListBoxVisibility(r, visible, scopes)
 	if r.control == nil || r.control.tabs == nil {
 		return
 	}

@@ -796,3 +796,14 @@ exact path matching, clipping and existing cache/work bounds remain unchanged.
 Software grid parity and shared-computer elapsed observations advance source
 work only. The failed native 4/6 ms targets, full P4/P6/P11, native/GPU memory,
 endurance, physical/human checks and distribution rights remain open.
+
+## ListBox control checkpoint
+
+The [ListBox contract](list-box.md) adds bounded always-visible single selection,
+stable item identities, controlled rejection/read-only modes, scrolling and
+keyboard/page navigation. The gallery and public SDK consumer exercise the API;
+Mac semantics expose list/row roles, clipped visible rows and scoped owner
+selection. See the [checkpoint](../docs/reports/macos-list-box/README.md) for
+automated routing and inert Cocoa scope. Physical input, human VoiceOver,
+native/GPU memory, sustained performance, endurance and distribution acceptance
+remain required before full Mac completion.

@@ -21,31 +21,34 @@ import (
 )
 
 type gallery struct {
-	documents                   []string
-	documentSelected            string
-	documentText                map[string]string
-	documentReject              bool
-	documentCloseRequests       int
-	enabled                     bool
-	details                     bool
-	snapping, pinned            bool
-	selection, tab, text        string
-	number                      float32
-	split                       float32
-	dialog                      bool
-	focus                       ui.FocusRequest
-	picture                     *canvas.TiledImage
-	imageFit                    ui.ImageFit
-	menuCount                   int
-	menuLast                    string
-	menuDisabled                bool
-	menuChecked                 bool
-	colorPicker                 *ui.ColorPicker
-	breadcrumb                  *ui.Breadcrumb
-	breadcrumbRequests          int
-	breadcrumbReject            bool
-	colorEdits, colorInvalid    int
-	colorReject, colorNormalize bool
+	documents                                            []string
+	documentSelected                                     string
+	documentText                                         map[string]string
+	documentReject                                       bool
+	documentCloseRequests                                int
+	enabled                                              bool
+	details                                              bool
+	snapping, pinned                                     bool
+	selection, tab, text                                 string
+	number                                               float32
+	split                                                float32
+	dialog                                               bool
+	focus                                                ui.FocusRequest
+	picture                                              *canvas.TiledImage
+	imageFit                                             ui.ImageFit
+	menuCount                                            int
+	menuLast                                             string
+	menuDisabled                                         bool
+	menuChecked                                          bool
+	colorPicker                                          *ui.ColorPicker
+	breadcrumb                                           *ui.Breadcrumb
+	breadcrumbRequests                                   int
+	breadcrumbReject                                     bool
+	colorEdits, colorInvalid                             int
+	colorReject, colorNormalize                          bool
+	listSelection                                        string
+	listReject, listReadOnly, listDisabled, listReversed bool
+	listRequests                                         int
 }
 
 func newGallery() *gallery {
@@ -80,6 +83,7 @@ func newGallery() *gallery {
 		}
 	}
 
+	g.listSelection = "layer-00"
 	return g
 }
 
@@ -214,7 +218,7 @@ func (g *gallery) view() ui.Node {
 
 	return ui.Node{ID: "gallery", Kind: ui.Column, Grow: true, Focus: g.focus, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{
 		{ID: "title", Kind: ui.Label, Text: "Vellum controls gallery", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 24, Weight: 600})}},
-		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
+		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "lists", Label: "Lists"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), g.listBoxView(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
 		{ID: "preferences", Kind: ui.Dialog, Text: "Preferences", Open: g.dialog, Dismiss: func() { g.dialog = false }, Children: []ui.Node{
 			{ID: "dialog-description", Kind: ui.Label, Text: "Native modal dialog with retained content. Close with Escape or the Close button."},
 			{ID: "dialog-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name in preferences"}},

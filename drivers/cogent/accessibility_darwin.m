@@ -71,6 +71,8 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"tabs"])return NSAccessibilityTabGroupRole;
  if([role isEqual:@"option"])return NSAccessibilityRadioButtonRole;
  if([role isEqual:@"radio-group"])return NSAccessibilityRadioGroupRole;
+ if([role isEqual:@"list-box"])return NSAccessibilityListRole;
+ if([role isEqual:@"list-option"])return NSAccessibilityRowRole;
  if([role isEqual:@"scroll"])return NSAccessibilityScrollAreaRole;
  if([role isEqual:@"table"])return NSAccessibilityTableRole;
  if([role isEqual:@"outline"])return NSAccessibilityOutlineRole;
@@ -180,14 +182,16 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
 - (NSInteger)accessibilityDisclosureLevel{return MAX(0,[self.node[@"level"] integerValue]-1);}
 - (id)accessibilityParent{return self.parentElement;}
 - (NSArray *)accessibilityChildren{return self.childElements?:@[];}
-- (NSArray *)accessibilityVisibleChildren{return self.accessibilityChildren;}
-- (NSArray *)accessibilityRows{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x.node[@"role"] isEqual:@"row"]||[x.node[@"role"] isEqual:@"tree-row"]||[x.node[@"role"] isEqual:@"grid-row"];}]];}
+- (NSArray *)accessibilityVisibleChildren{if([self.node[@"role"] isEqual:@"list-box"])return self.accessibilityVisibleRows;return self.accessibilityChildren;}
+- (NSArray *)accessibilityRows{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x.node[@"role"] isEqual:@"row"]||[x.node[@"role"] isEqual:@"tree-row"]||[x.node[@"role"] isEqual:@"grid-row"]||[x.node[@"role"] isEqual:@"list-option"];}]];}
 - (NSInteger)accessibilityRowCount{if(self.node[@"row_count"])return [self.node[@"row_count"] integerValue];NSInteger count=0;for(VellumAXElement *row in self.accessibilityRows)count=MAX(count,[row.node[@"row_count"] integerValue]);return count;}
 - (NSInteger)accessibilityColumnCount{return [self.node[@"column_count"] integerValue];}
 - (BOOL)isAccessibilityOrderedByRow{return YES;}
 - (NSRange)accessibilityRowIndexRange{return self.node[@"row_index"]?NSMakeRange(MAX(0,[self.node[@"row_index"] integerValue]-1),1):NSMakeRange(NSNotFound,0);}
 - (NSRange)accessibilityColumnIndexRange{return self.node[@"column_index"]?NSMakeRange(MAX(0,[self.node[@"column_index"] integerValue]-1),1):NSMakeRange(NSNotFound,0);}
-- (NSArray *)accessibilityVisibleRows{return self.accessibilityRows;}
+- (NSArray *)accessibilityVisibleRows{if(![self.node[@"role"] isEqual:@"list-box"])return self.accessibilityRows;return [self.accessibilityRows filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return !NSIsEmptyRect(x.pixelFrame)&&NSIntersectsRect(self.pixelFrame,x.pixelFrame);}]];}
+- (NSArray *)accessibilitySelectedRows{return [self.accessibilityRows filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x isAccessibilitySelected];}]];}
+- (void)setAccessibilitySelectedRows:(NSArray *)rows{if(![self.node[@"role"] isEqual:@"list-box"]||rows.count!=1)return;id row=rows[0];if(![row isKindOfClass:VellumAXElement.class]||![self.childElements containsObject:row]||![[row node][@"role"] isEqual:@"list-option"]||![row isAccessibilityEnabled])return;[self request:@"set" value:[row node][@"domain_id"]?:@""];}
 - (NSArray *)accessibilityColumns{return [self.childElements filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(VellumAXElement *x,NSDictionary *bindings){return [x.node[@"role"] isEqual:@"grid-column"];}]];}
 - (NSArray *)accessibilityVisibleColumns{return self.accessibilityColumns;}
 - (NSArray *)accessibilityColumnHeaderUIElements{return self.accessibilityColumns;}
@@ -210,6 +214,7 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
  if(selector==@selector(accessibilityPerformDecrement))return vellumAXHas(self,@"decrement");
  if(selector==@selector(accessibilityPerformCancel))return vellumAXHas(self,@"cancel");
  if(selector==@selector(setAccessibilityValue:))return vellumAXHas(self,@"set");
+ if(selector==@selector(setAccessibilitySelectedRows:))return [self.node[@"role"] isEqual:@"list-box"]&&vellumAXHas(self,@"set");
  if(selector==@selector(setAccessibilitySelectedTextRange:))return vellumAXHas(self,@"selection");
  if(selector==@selector(setAccessibilityFocused:))return vellumAXHas(self,@"focus");
  if(selector==@selector(setAccessibilityExpanded:))return vellumAXHas(self,@"expand")||vellumAXHas(self,@"collapse");
@@ -507,7 +512,9 @@ void vellumAXGeometry(uint64_t token,const char *json){
 // retirement independently of the new same-ID dictionary entry.
 static NSDictionary *vellumAXFixtureElement(VellumAXElement *element){
  NSRect frame=element.pixelFrame;
- return @{@"id":element.accessibilityIdentifier?:@"",@"object_identity":@(element.objectIdentity),@"live":@(element.live),@"enabled":@([element isAccessibilityEnabled]),@"focused":@([element isAccessibilityFocused]),@"press_allowed":@([element isAccessibilitySelectorAllowed:@selector(accessibilityPerformPress)]),@"grid_scope":element.node[@"grid_scope"]?:@"",@"grid_incarnation":element.node[@"grid_incarnation"]?:@0,@"grid_pending":@([element.node[@"grid_pending"] boolValue]),@"grid_target_generation":element.node[@"grid_target_generation"]?:@0,@"grid_generation":element.node[@"grid_generation"]?:@0,@"value":element.accessibilityValue?:NSNull.null,@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]};
+ NSMutableDictionary *result=[@{@"id":element.accessibilityIdentifier?:@"",@"object_identity":@(element.objectIdentity),@"live":@(element.live),@"enabled":@([element isAccessibilityEnabled]),@"focused":@([element isAccessibilityFocused]),@"press_allowed":@([element isAccessibilitySelectorAllowed:@selector(accessibilityPerformPress)]),@"grid_scope":element.node[@"grid_scope"]?:@"",@"grid_incarnation":element.node[@"grid_incarnation"]?:@0,@"grid_pending":@([element.node[@"grid_pending"] boolValue]),@"grid_target_generation":element.node[@"grid_target_generation"]?:@0,@"grid_generation":element.node[@"grid_generation"]?:@0,@"value":element.accessibilityValue?:NSNull.null,@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]} mutableCopy];
+ if([element.node[@"role"] isEqual:@"list-box"]||[element.node[@"role"] isEqual:@"list-option"]){result[@"role"]=element.accessibilityRole;result[@"index"]=@(element.accessibilityIndex);result[@"rows"]=@(element.accessibilityRowCount);result[@"visible_rows"]=[element.accessibilityVisibleRows valueForKey:@"accessibilityIdentifier"];result[@"visible_children"]=[element.accessibilityVisibleChildren valueForKey:@"accessibilityIdentifier"];result[@"selected_rows"]=[element.accessibilitySelectedRows valueForKey:@"accessibilityIdentifier"];result[@"selected_children"]=[element.accessibilitySelectedChildren valueForKey:@"accessibilityIdentifier"];result[@"set_rows_allowed"]=@([element isAccessibilitySelectorAllowed:@selector(setAccessibilitySelectedRows:)]);}
+ return result;
 }
 char *vellumAXScopedFixture(const char *json){
  @autoreleasepool{
@@ -519,6 +526,14 @@ char *vellumAXScopedFixture(const char *json){
    if(![step isKindOfClass:NSDictionary.class])return strdup("");BOOL accepted=NO;
    if([step[@"kind"] isEqual:@"update"]){accepted=vellumAXCommitSnapshot(state,step[@"snapshot"],NO);if(accepted)for(VellumAXElement *element in state.elements.allValues)if(![held containsObject:element])[held addObject:element];}
    else if([step[@"kind"] isEqual:@"geometry"])vellumAXApplyGeometry(state,step[@"bounds"]);
+   else if([step[@"kind"] isEqual:@"select_rows"]){
+    // Inert production-setter/Go-owner bridge fixture, with no native attachment.
+    VellumAXElement *list=state.elements[step[@"list"]];id identifiers=step[@"rows"];
+    if(!list||![identifiers isKindOfClass:NSArray.class]||[identifiers count]>256)return strdup("");
+    state.token=[step[@"token"] unsignedLongLongValue];NSMutableArray *rows=[NSMutableArray new];BOOL valid=YES;
+    for(id identifier in identifiers){if(![identifier isKindOfClass:NSString.class]||!state.elements[identifier]){valid=NO;break;}[rows addObject:state.elements[identifier]];}
+    list.lastAdmission=NO;if(valid){[list setAccessibilitySelectedRows:rows];accepted=list.lastAdmission;}
+   }
    else if([step[@"kind"] isEqual:@"close"]){state.closed=YES;for(VellumAXElement *element in state.elements.allValues)vellumAXRetire(element);}
    else return strdup("");
    NSMutableArray *elements=[NSMutableArray new],*retired=[NSMutableArray new],*guards=[NSMutableArray new];

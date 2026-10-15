@@ -379,3 +379,15 @@ module demonstrates three types, keyboard placement, selection, pan/zoom, grid
 snapping and bounded Undo/Redo. See the [contract](../specs/placement.md) and
 [checkpoint](reports/macos-palette-placement/README.md) for automated routing
 evidence and the outstanding physical Mac checks. Full Mac/P9/P11 gates remain open.
+
+## Bounded list selection
+
+Public `ui.ListBox` adds an always-visible single-selection control with stable
+IDs, scrolling, controlled selection/rejection, clamped arrows, Home/End,
+measured page navigation and initial-letter cycling. The gallery's Lists page
+demonstrates it; the independent SDK consumer uses only exported APIs. Mac
+semantics expose list/row roles, selected and visible rows, clipped geometry and
+origin-scoped actions. See the [contract](../specs/list-box.md). Automated routing
+and inert Cocoa evidence do not qualify physical input or human VoiceOver.
+The [checkpoint report](reports/macos-list-box/README.md) binds the exact scoped
+checks and outstanding acceptance gates.

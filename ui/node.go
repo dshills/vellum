@@ -175,7 +175,7 @@ func Validate(root Node) error {
 		}
 		switch n.Kind {
 		case Column, Row, Tabs, Scroll, Dialog, Toolbar, StatusBar, FormGroup, SplitPane, Disclosure:
-		case Label, Button, Icon, Image, Extension, Canvas2D, Checkbox, Switch, ToggleButton, ProgressBar, ProgressRing, ProgressGauge, Separator, MenuButton, Selector, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
+		case Label, Button, Icon, Image, Extension, Canvas2D, Checkbox, Switch, ToggleButton, ProgressBar, ProgressRing, ProgressGauge, Separator, MenuButton, Selector, ListBox, RadioGroup, SegmentedControl, Slider, NumberField, TextField, MultilineText, DataGrid, DataTree:
 			if len(n.Children) != 0 {
 				return fmt.Errorf("ui: leaf %q has children", n.ID)
 			}

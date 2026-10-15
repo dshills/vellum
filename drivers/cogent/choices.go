@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"reflect"
+	"sync/atomic"
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
@@ -16,12 +17,16 @@ import (
 )
 
 type choiceState struct {
-	buttons map[string]*core.Switch
-	order   []string
+	buttons     map[string]*core.Switch
+	order       []string
+	listRows    map[string]*listBoxRowEpoch
+	listScope   atomic.Pointer[workbenchInputScope]
+	listCatalog *listBoxCatalogEpoch
+	listContext tabCloseContext // originating reconciliation, before global modal projection
 }
 
 func choiceVertical(n ui.Node) bool {
-	return n.Orientation == ui.Vertical || (n.Orientation == "" && n.Kind == ui.RadioGroup)
+	return n.Kind == ui.ListBox || n.Orientation == ui.Vertical || (n.Orientation == "" && n.Kind == ui.RadioGroup)
 }
 func choiceOptionEnabled(n ui.Node, id string) bool {
 	for _, o := range n.Options {
@@ -35,6 +40,10 @@ func choiceLive(r *record, id string, button *core.Switch) bool {
 	return r.control != nil && !r.control.retired && !r.control.disabled && r.control.choice != nil && r.control.choice.buttons[id] == button && choiceOptionEnabled(r.node, id)
 }
 func queueChoice(r *record, id string, button *core.Switch) {
+	if r.node.Kind == ui.ListBox {
+		queueListBox(r, id, button)
+		return
+	}
 	postControl(r, func() {
 		if !choiceLive(r, id, button) || r.node.Change == nil {
 			requestControlRestore(r)
@@ -49,6 +58,10 @@ func queueChoice(r *record, id string, button *core.Switch) {
 }
 func choiceKey(r *record, id string, button *core.Switch, e events.Event) {
 	if e.IsHandled() || e.Modifiers() != 0 || !choiceLive(r, id, button) {
+		return
+	}
+	if r.node.Kind == ui.ListBox {
+		listBoxKey(r, id, button, e)
 		return
 	}
 	target := ""
@@ -93,6 +106,10 @@ func prepareChoice(r *record, n ui.Node) error {
 		return err
 	}
 	c := r.control.choice
+	if n.Kind == ui.ListBox && c.listRows == nil {
+		c.listRows = make(map[string]*listBoxRowEpoch)
+		setListBoxScope(r, true, r.control.disabled, nil)
+	}
 	for _, o := range n.Options {
 		if c.buttons[o.ID] != nil {
 			continue
@@ -104,6 +121,10 @@ func prepareChoice(r *record, n ui.Node) error {
 		button.OnChange(func(events.Event) { queueChoice(r, id, button); restoreChoiceSelection(r) })
 		button.OnFirst(events.KeyChord, func(e events.Event) { choiceKey(r, id, button, e) })
 		button.Styler(func(s *styles.Style) {
+			if r.node.Kind == ui.ListBox {
+				styleListBoxRow(s)
+				return
+			}
 			if r.node.Kind != ui.SegmentedControl {
 				return
 			}
@@ -156,6 +177,7 @@ func finishChoice(r *record, n ui.Node) {
 	for id, button := range c.buttons {
 		if !keep[id] {
 			delete(c.buttons, id)
+			delete(c.listRows, id)
 			button.Delete()
 		}
 	}
@@ -167,10 +189,14 @@ func syncChoice(r *record, previous ui.Node) error {
 		return err
 	}
 	c := r.control.choice
+	listCatalogChanged := false
+	if r.node.Kind == ui.ListBox {
+		listCatalogChanged = syncListBoxEpochs(r)
+	}
 	for _, o := range r.node.Options {
 		b := c.buttons[o.ID]
 		typ := core.SwitchRadioButton
-		if r.node.Kind == ui.SegmentedControl {
+		if r.node.Kind == ui.SegmentedControl || r.node.Kind == ui.ListBox {
 			typ = core.SwitchSegmentedButton
 		}
 		text := html.EscapeString(o.Label)
@@ -183,7 +209,7 @@ func syncChoice(r *record, previous ui.Node) error {
 		}
 	}
 	syncSemantics(r)
-	if previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
+	if listCatalogChanged || previous.Orientation != r.node.Orientation || !reflect.DeepEqual(previous.Options, r.node.Options) || previous.SelectedID != r.node.SelectedID || previous.Disabled != r.node.Disabled || previous.Accessibility != r.node.Accessibility {
 		r.widget.AsWidget().Update()
 	}
 	return nil
@@ -219,13 +245,19 @@ func choiceAccessibility(r *record, parent string, b *accessibilityBridge, disab
 		id := accessibilityOptionID(r.node.ID, optionID)
 		blocked := disabled || o.Disabled
 		n := accessibilityNode{ID: id, Parent: parent, DomainID: optionID, Role: "option", Name: o.Label, Selected: optionID == r.node.SelectedID, Value: optionID == r.node.SelectedID, Disabled: blocked, Focusable: !blocked, Focused: button != nil && button.ContainsFocus(), Actions: []string{}}
+		guard := listBoxActionGuard(r, optionID, button)
+		if r.node.Kind == ui.ListBox {
+			n.Role = "list-option"
+			n.RowIndex = len(nodes) + 1
+			n.activationGuard = guard
+		}
 		if !blocked {
 			n.Actions = append(n.Actions, "focus")
 			if r.node.Change != nil {
 				n.Actions = append(n.Actions, "press")
 			}
 			handlers[id] = func(action accessibilityAction) bool {
-				if !choiceLive(r, optionID, button) {
+				if !guard() || !choiceLive(r, optionID, button) {
 					return false
 				}
 				switch action.Kind {

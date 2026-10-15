@@ -15,6 +15,7 @@
 - [Action menu button](menu-button.md): bounded flat actions, popup focus, native semantics and originating retirement.
 - [Inline color picker](color-picker.md): owner-held RGBA/hex composition, immutable checker preview and normal managed focus.
 - [Standard controls](controls.md): interaction, focus and semantic metadata.
+- [List box](list-box.md): bounded visible selection, clamped keyboard/page navigation, scrolling and Mac list semantics.
 - [Windows and services](windows-services.md): scoped lifetimes and OS integration.
 - [Clipboard representations](clipboard.md): bounded Mac text/PNG/HTML/custom-MIME data with optional capability reporting.
 - [Mac tray service](tray.md): retained menu-bar item, bounded PNG icons, owner-validated command menus and main-loop cleanup.

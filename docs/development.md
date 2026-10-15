@@ -15,6 +15,11 @@ prototype pipeline dependency; this is a repository-local development distributi
 
 ## Checks
 
+The standard-control gallery includes a **Lists** page with always-visible
+selection, rejection/read-only modes and stable row reorder. After preparation,
+run it from `drivers/cogent` with `go run ./cmd/gallery`. Its tests and the
+independent `examples/sdk-contract` ListBox contract run without launching it.
+
 Run portable checks from the repository root:
 
 ```sh
