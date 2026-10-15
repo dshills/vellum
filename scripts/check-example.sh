@@ -9,3 +9,9 @@ go vet ./...
 mkdir -p build
 go build -o "build/vellum-$VELLUM_EXAMPLE_NAME" .
 done
+
+cd "$VELLUM_REPO_ROOT/examples/replay"
+go test -race ./...
+go vet ./...
+mkdir -p build
+go build -o build/vellum-workspace ./cmd/workspace

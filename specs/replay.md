@@ -105,8 +105,8 @@ with `WorkbenchGroup.WindowID`; process-global lifetime IDs are not stable repla
 fixture identities.
 
 The public consumer and driver regressions check these policies offscreen. They
-enable integrated workspace replay, but do not supply a versioned large-workspace
-record with canvas, worker-built views, cancellation and all P9 observations.
+enable the integrated software workspace record described below. Full P9
+GPU/OS observations remain separate.
 See the [checkpoint evidence](../docs/reports/macos-managed-workbench/README.md).
 
 ## Bounds and observations
@@ -223,3 +223,41 @@ window dimensions are not reapplied as a body-content minimum. This keeps grown
 roots and narrow far-side split panes inside the completed viewport. Explicit
 application/theme content minimums retain their normal layout meaning. This is
 a software-driver layout correction, separate from live window-size acceptance.
+
+## Versioned professional workspace record
+
+Protocol version 2 adds physical wheel input (`scroll`) with finite signed
+`delta_x`/`delta_y`, each bounded to one million units. At least one delta must be
+nonzero. Pointer positions remain within the declared physical viewport. Deltas
+are irrelevant on other operation variants and reject there. Version 1 remains
+readable with its original vocabulary; a version-1 wheel operation rejects.
+`Manual.ReplayReadiness` exposes the same observational accounting used by the
+example backends; it never chooses workers, paints or advances time.
+
+The public `examples/replay/workspace` consumer combines a retained workbench,
+100,000 stored outline nodes, a stored 20-field numeric grid (10,000 or 1,000,000
+rows), an independent inspector window, multiline notes, property history and
+palette-to-canvas placement. Dataset generation, full numeric sorting/filtering
+and outline index construction run through the supplied executor. One task is
+admitted at a time; exact grid/outline request capabilities retire on success,
+cancellation, failure or refused installation. Application closure revokes owner
+delivery; owned teardown explicitly finishes canceled admitted work.
+
+Two frozen version-2 records each contain 216 operations and 27 completed
+observations. Acceptance replays those same inputs at batches 1, 7 and 64 and
+compares committed observations: domain state, captured selection, focused
+control and UTF-16 ranges, measured geometry/semantics and software image hashes.
+Only native incarnation tokens and frame/viewport transport generations are
+excluded from cross-instance equality; checked input operations retain their
+origin identities. Independent arithmetic checks derive all stored bytes,
+sort maxima, filter counts and active-cell values, then assert actual editing,
+cancellation, outline collapse/expand/filter, tab reordering, canvas navigation,
+placement Undo/Redo, modal exclusion and surviving-window behavior. Idle has a
+step bound and dispatches no hidden workers or clock advancement.
+
+The authoring test is opt-in and writes only to a new output directory.
+Acceptance reads the bundled records and goldens without regenerating them.
+The runnable native workspace uses the same public consumer with a real worker
+executor; compilation is separate from desktop acceptance. These software
+records do not complete P9/P11, GPU screenshot goldens, physical pointer/display
+checks, native services or human accessibility qualification.

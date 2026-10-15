@@ -23,7 +23,7 @@ open. The workbench does not change system input sources.
 | `workbench/`, `virtual/`, `canvas/` | Dock layouts, large-data views and canvas models |
 | `drivers/cogent/` | Separate native driver module |
 | `drivers/cogent/cmd/workbench/` | Executable workbench example in the native module |
-| `examples/replay/` | Independent fixed-record consumer using routed controls and software frames |
+| `examples/replay/` | Independent fixed-record consumers, including stored professional workspace replay |
 | `examples/editor/` | Independent managed multiline editor with exact-byte save/open and native input settling |
 | `examples/loadedgrid/` | Independent stored-data grid with cancellable worker sort/filter and separate domain/view revisions |
 | `examples/loadedtree/` | Independent stored 100k-node tree with worker-built indexes and bounded managed navigation |

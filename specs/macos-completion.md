@@ -727,3 +727,20 @@ floating-window closure are checked. This enables broader P9 composition; it
 does not complete the versioned professional workspace record, worker-built
 views/cancellation, canvas/GPU observations or native performance/retention gates.
 Live tests stay paused while the human uses the machine.
+
+
+## Integrated software workspace checkpoint
+
+The independent [workspace consumer](../examples/replay/README.md#professional-workspace)
+now supplies frozen version-2 216-operation/27-observation records for 10,000 and
+1,000,000 stored rows × twenty fields with 100,000 stored outline nodes. Public
+managed workbench, property/editor, canvas placement, commands/history, injected
+workers and an independent inspector compose through actual offscreen routing.
+Exact software observations and independent content/transition oracles pass at
+batches 1/7/64. Protocol v1 compatibility remains checked. See the
+[checkpoint evidence](../docs/reports/macos-workspace-replay/README.md).
+
+This closes the absence of an integrated versioned software record. The broader
+P9 GPU/OS workload, current-source native/endurance/performance and physical or
+human checks listed above remain open. A runnable native build is not a live
+qualification result. No native application is launched while the human is online.

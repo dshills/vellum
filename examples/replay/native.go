@@ -19,6 +19,7 @@ import (
 
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/text/fonts"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
@@ -113,7 +114,7 @@ func NewNative(ctx context.Context, ownerBatch int) (_ *NativeBackend, err error
 		return nil, err
 	}
 	h := sha256.Sum256(themeBytes)
-	m := replay.Manifest{Version: replay.Version, FixtureSHA256: FixtureSHA256(), ThemeSHA256: hex.EncodeToString(h[:]), LayoutVersion: "vellum-managed-layout-1", RendererVersion: "cogent-manual-software-1", Start: clock.Now(), Seed: 1, Fonts: identities, Windows: []replay.Window{}}
+	m := replay.Manifest{Version: replay.LegacyVersion, FixtureSHA256: FixtureSHA256(), ThemeSHA256: hex.EncodeToString(h[:]), LayoutVersion: "vellum-managed-layout-1", RendererVersion: "cogent-manual-software-1", Start: clock.Now(), Seed: 1, Fonts: identities, Windows: []replay.Window{}}
 	for _, w := range s.Windows {
 		m.Windows = append(m.Windows, replay.Window{ID: w.ID, Incarnation: w.Incarnation, Width: ViewportWidth, Height: ViewportHeight, DPI: 160})
 	}
@@ -186,34 +187,7 @@ func (b *NativeBackend) Model() (s Snapshot, err error) {
 // Readiness includes origin FIFO, ready paint, owner delivery and admitted worker
 // tails. Unrendered layout requires an explicit Frame operation, hence Blocked.
 func (b *NativeBackend) Readiness(ctx context.Context) (replay.Readiness, error) {
-	s, err := b.Driver.Snapshot(ctx)
-	if err != nil {
-		return replay.Readiness{}, err
-	}
-	if s.Failure != nil {
-		return replay.Readiness{}, s.Failure
-	}
-	r := replay.Readiness{Now: s.Clock.Now, Ready: s.Application.Ordinary + s.Application.ReadyCompletions, Running: s.Executor.Running + s.Clock.Running + s.Application.Dispatching + s.Application.Cleanup, Awaiting: s.Executor.Pending + s.Application.Reserved, Blocked: s.Clock.Advancing, DueTimers: s.Clock.Due, FutureTimers: s.Clock.Future, NextDeadline: s.Clock.NextDeadline}
-	deadline := func(t time.Time) {
-		if r.NextDeadline.IsZero() || t.Before(r.NextDeadline) {
-			r.NextDeadline = t
-		}
-	}
-	for _, w := range s.Windows {
-		if !w.Now.Equal(r.Now) {
-			return r, replay.ErrTime
-		}
-		r.Ready += w.Events
-		r.Blocked = r.Blocked || w.Blocked || w.LayoutPending
-		if w.ReadyPaint {
-			r.Ready++
-		}
-		if w.FuturePaint {
-			r.FutureTimers++
-			deadline(w.NextPaint)
-		}
-	}
-	return r, nil
+	return b.Driver.ReplayReadiness(ctx)
 }
 func (b *NativeBackend) Step(ctx context.Context, n int) (replay.Progress, error) {
 	r, err := b.Driver.Step(ctx, n)
@@ -274,7 +248,7 @@ func (b *NativeBackend) checkLive(ctx context.Context, o replay.Operation) (coge
 				if !e.Enabled || !e.Visible {
 					return w, cogent.ErrManualDisabled
 				}
-				if (o.Kind == replay.PointerDown || o.Kind == replay.PointerUp) && !image.Pt(int(o.X), int(o.Y)).In(e.Bounds) {
+				if (o.Kind == replay.PointerDown || o.Kind == replay.PointerUp || o.Kind == replay.Scroll) && !image.Pt(int(o.X), int(o.Y)).In(e.Bounds) {
 					return w, replay.ErrInvalid
 				}
 				if (o.Kind == replay.KeyDown || o.Kind == replay.KeyUp || o.Kind == replay.KeyChord) && !e.Focused {
@@ -345,7 +319,7 @@ func (b *NativeBackend) Apply(ctx context.Context, o replay.Operation) error {
 		return errors.Join(err, callErr)
 	case replay.Semantic:
 		return cogent.ErrManualUnsupported
-	case replay.PointerDown, replay.PointerUp, replay.PointerMove, replay.KeyDown, replay.KeyUp, replay.KeyChord:
+	case replay.PointerDown, replay.PointerUp, replay.PointerMove, replay.Scroll, replay.KeyDown, replay.KeyUp, replay.KeyChord:
 		input := cogent.ManualInput{Window: o.Window, WindowIncarnation: o.WindowIncarnation, Position: image.Pt(int(o.X), int(o.Y)), Modifiers: transportModifiers(o.Modifiers)}
 		switch o.Kind {
 		case replay.PointerDown:
@@ -354,6 +328,9 @@ func (b *NativeBackend) Apply(ctx context.Context, o replay.Operation) error {
 			input.Type = events.MouseUp
 		case replay.PointerMove:
 			input.Type = events.MouseMove
+		case replay.Scroll:
+			input.Type = events.Scroll
+			input.Delta = math32.Vec2(float32(o.DeltaX), float32(o.DeltaY))
 		case replay.KeyDown:
 			input.Type = events.KeyDown
 		case replay.KeyUp:
@@ -367,7 +344,7 @@ func (b *NativeBackend) Apply(ctx context.Context, o replay.Operation) error {
 			if err != nil {
 				return err
 			}
-		} else if o.Kind != replay.PointerMove {
+		} else if o.Kind != replay.PointerMove && o.Kind != replay.Scroll {
 			input.Button = events.Buttons(o.Button)
 		}
 		return b.Driver.Input(ctx, input)

@@ -16,7 +16,10 @@ import (
 	"unicode/utf8"
 )
 
-const Version = 1
+// Version 2 adds explicit wheel deltas. Version 1 records remain readable,
+// with their original operation vocabulary.
+const Version = 2
+const LegacyVersion = 1
 
 var (
 	ErrInvalid  = errors.New("replay: invalid record")
@@ -81,6 +84,7 @@ const (
 	PointerDown Kind = "pointer-down"
 	PointerUp   Kind = "pointer-up"
 	PointerMove Kind = "pointer-move"
+	Scroll      Kind = "scroll"
 	KeyDown     Kind = "key-down"
 	KeyUp       Kind = "key-up"
 	KeyChord    Kind = "key-chord"
@@ -111,6 +115,8 @@ type Operation struct {
 	ExpectedRevision  uint64        `json:"expected_revision,omitempty"`
 	X                 float64       `json:"x,omitempty"`
 	Y                 float64       `json:"y,omitempty"`
+	DeltaX            float64       `json:"delta_x,omitempty"`
+	DeltaY            float64       `json:"delta_y,omitempty"`
 	Button            int           `json:"button,omitempty"`
 	Key               string        `json:"key,omitempty"`
 	Modifiers         uint32        `json:"modifiers,omitempty"`
@@ -136,7 +142,7 @@ func hash(s string) bool {
 	return e == nil && len(b) == sha256.Size && s == strings.ToLower(s)
 }
 func (m Manifest) validate() error {
-	if m.Version != Version || !hash(m.FixtureSHA256) || !hash(m.ThemeSHA256) || !text(m.LayoutVersion, 128, false) || !text(m.RendererVersion, 128, false) || m.Start.IsZero() || m.Start.Location() != time.UTC || m.Start.Year() < 1 || m.Start.Year() > 9999 || len(m.Windows) < 1 || len(m.Windows) > 32 || len(m.Fonts) < 1 || len(m.Fonts) > 128 {
+	if (m.Version != Version && m.Version != LegacyVersion) || !hash(m.FixtureSHA256) || !hash(m.ThemeSHA256) || !text(m.LayoutVersion, 128, false) || !text(m.RendererVersion, 128, false) || m.Start.IsZero() || m.Start.Location() != time.UTC || m.Start.Year() < 1 || m.Start.Year() > 9999 || len(m.Windows) < 1 || len(m.Windows) > 32 || len(m.Fonts) < 1 || len(m.Fonts) > 128 {
 		return fmt.Errorf("%w: manifest", ErrInvalid)
 	}
 	ids := map[string]bool{}
@@ -230,7 +236,7 @@ func (o Operation) validate(m Manifest, l Limits) error {
 		allowed.ExpectedRevision = o.ExpectedRevision
 	}
 	switch o.Kind {
-	case PointerDown, PointerUp, PointerMove:
+	case PointerDown, PointerUp, PointerMove, Scroll:
 		window()
 		target()
 		allowed.X = o.X
@@ -244,7 +250,12 @@ func (o Operation) validate(m Manifest, l Limits) error {
 				return ErrInvalid
 			}
 		}
-		if o.Kind != PointerMove {
+		if o.Kind == Scroll {
+			if m.Version != Version || math.IsNaN(o.DeltaX) || math.IsNaN(o.DeltaY) || math.IsInf(o.DeltaX, 0) || math.IsInf(o.DeltaY, 0) || math.Abs(o.DeltaX) > 1e6 || math.Abs(o.DeltaY) > 1e6 || o.DeltaX == 0 && o.DeltaY == 0 {
+				return ErrInvalid
+			}
+			allowed.DeltaX, allowed.DeltaY = o.DeltaX, o.DeltaY
+		} else if o.Kind != PointerMove {
 			if o.Button < 1 || o.Button > 3 {
 				return ErrInvalid
 			}

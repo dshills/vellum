@@ -1,0 +1,1824 @@
+{
+  "manifest": {
+    "version": 2,
+    "fixture_sha256": "ccfb30635a50be5a8b05f45ec8d91945d00867e6cfbfcefffbc2342190ed5b04",
+    "layout_version": "vellum-managed-layout-1",
+    "renderer_version": "cogent-manual-software-1",
+    "theme_sha256": "c624177fb33479a7b80bc53207cdfdf1dfde92fe2ddfd49adf31a9557e9621da",
+    "start": "2024-10-27T03:33:20Z",
+    "seed": 1,
+    "windows": [
+      {
+        "id": "workspace",
+        "incarnation": 1,
+        "width": 1600,
+        "height": 1000,
+        "dpi": 160
+      },
+      {
+        "id": "inspector",
+        "incarnation": 2,
+        "width": 500,
+        "height": 320,
+        "dpi": 160
+      }
+    ],
+    "fonts": [
+      {
+        "family": "noto/NotoSans-Bold.ttf",
+        "sha256": "1b07286b38cd198342ec25549d04721004c562c857097cbf988065ff0594ad0e"
+      },
+      {
+        "family": "noto/NotoSans-BoldItalic.ttf",
+        "sha256": "36aa1aac6b8b232e0eb0ebdba31aa87400eafe13f3828607921985081dad8aa8"
+      },
+      {
+        "family": "noto/NotoSans-Italic.ttf",
+        "sha256": "2c63aa26551fabddc3e6f54f042f63cf07aa9b0ea2072f5a07b824a1de6577f3"
+      },
+      {
+        "family": "noto/NotoSans-Medium.ttf",
+        "sha256": "3ebd444d4edf1b98e0f33b0caecebefdd14cba1a55ea9507269689023819770b"
+      },
+      {
+        "family": "noto/NotoSans-MediumItalic.ttf",
+        "sha256": "95b428bd509827c94b586ffa3049ed5e74cb6f9799fb21faf68f8993697443e8"
+      },
+      {
+        "family": "noto/NotoSans-Regular.ttf",
+        "sha256": "e2597ff33b199739c26852f12da62f9fd250a838f8c3894a1a561541622963b3"
+      },
+      {
+        "family": "robotomono/RobotoMono-Bold.ttf",
+        "sha256": "3f4e0cd7747df32a34748a66c1274d76712cab429c75e75f5f0167319b97fccb"
+      },
+      {
+        "family": "robotomono/RobotoMono-BoldItalic.ttf",
+        "sha256": "c06fe92ae6e3eae20c1d40a312160ba8c1fc6c1fc39a136a837836e40563ce33"
+      },
+      {
+        "family": "robotomono/RobotoMono-Italic.ttf",
+        "sha256": "d357b7530d41b1562745a9fad9239565b83e1f1d81164a27c225e936450ad39f"
+      },
+      {
+        "family": "robotomono/RobotoMono-Medium.ttf",
+        "sha256": "f1c247bde0eed1e58e3b9eee89b2188dc5dfa44b8c2716044556662dd70cb7b1"
+      },
+      {
+        "family": "robotomono/RobotoMono-MediumItalic.ttf",
+        "sha256": "d28a27e622729e0968ba48a6799e7e0b89394822aceb4d4c7ccbbd7cadce7410"
+      },
+      {
+        "family": "robotomono/RobotoMono-Regular.ttf",
+        "sha256": "8d9a1fa4dfe5a5deea780f6513996141425ef782d7cc5665d4d459146fd3a71c"
+      }
+    ]
+  },
+  "operations": [
+    {
+      "sequence": 1,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 2,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 3,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "initial"
+    },
+    {
+      "sequence": 4,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "open",
+      "target_incarnation": 3,
+      "x": 96,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 5,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 96,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 6,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 7,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 8,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "open-admitted"
+    },
+    {
+      "sequence": 9,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 1
+    },
+    {
+      "sequence": 10,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 11,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 12,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "opened"
+    },
+    {
+      "sequence": 13,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "workbench:ZG9jaw:cHJvcGVydGllcw:name",
+      "target_incarnation": 26,
+      "x": 1475,
+      "y": 181,
+      "button": 1
+    },
+    {
+      "sequence": 14,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 1475,
+      "y": 181,
+      "button": 1
+    },
+    {
+      "sequence": 15,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 16,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 17,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "a",
+      "modifiers": 2
+    },
+    {
+      "sequence": 18,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 19,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 20,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "H"
+    },
+    {
+      "sequence": 21,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 22,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 23,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "a"
+    },
+    {
+      "sequence": 24,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 25,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 26,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "r"
+    },
+    {
+      "sequence": 27,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 28,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 29,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "b"
+    },
+    {
+      "sequence": 30,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 31,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 32,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "o"
+    },
+    {
+      "sequence": 33,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 34,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 35,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "r"
+    },
+    {
+      "sequence": 36,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 37,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 38,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "Enter"
+    },
+    {
+      "sequence": 39,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 40,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 41,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "property-edited"
+    },
+    {
+      "sequence": 42,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "dock-option:ZG9jaw:Z3JpZA",
+      "target_incarnation": 15,
+      "x": 371,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 43,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 371,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 44,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 45,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 46,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "grid-visible"
+    },
+    {
+      "sequence": 47,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "sort",
+      "target_incarnation": 4,
+      "x": 270,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 48,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 270,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 49,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 50,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 51,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "sort-admitted"
+    },
+    {
+      "sequence": 52,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 2
+    },
+    {
+      "sequence": 53,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 54,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 55,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "sorted"
+    },
+    {
+      "sequence": 56,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 323,
+      "y": 193,
+      "button": 1
+    },
+    {
+      "sequence": 57,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 323,
+      "y": 193,
+      "button": 1
+    },
+    {
+      "sequence": 58,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 59,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 60,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "Down"
+    },
+    {
+      "sequence": 61,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 62,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 63,
+      "at": 0,
+      "kind": "scroll",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 800,
+      "y": 540,
+      "delta_x": 128,
+      "delta_y": -480
+    },
+    {
+      "sequence": 64,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 65,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 66,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "grid-scrolled-selected"
+    },
+    {
+      "sequence": 67,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "filter",
+      "target_incarnation": 5,
+      "x": 467,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 68,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 467,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 69,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 70,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 71,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "filter-admitted"
+    },
+    {
+      "sequence": 72,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "cancel",
+      "target_incarnation": 7,
+      "x": 806,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 73,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 806,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 74,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 75,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 76,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "cancel-requested"
+    },
+    {
+      "sequence": 77,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 3
+    },
+    {
+      "sequence": 78,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 79,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 80,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "cancel-delivered"
+    },
+    {
+      "sequence": 81,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "filter",
+      "target_incarnation": 5,
+      "x": 467,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 82,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 467,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 83,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 84,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 85,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 4
+    },
+    {
+      "sequence": 86,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 87,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 88,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "filtered"
+    },
+    {
+      "sequence": 89,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 22,
+      "y": 150,
+      "button": 1
+    },
+    {
+      "sequence": 90,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 22,
+      "y": 150,
+      "button": 1
+    },
+    {
+      "sequence": 91,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 92,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 93,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "tree-collapse-admitted"
+    },
+    {
+      "sequence": 94,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 5
+    },
+    {
+      "sequence": 95,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 96,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 97,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "tree-collapsed"
+    },
+    {
+      "sequence": 98,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 22,
+      "y": 150,
+      "button": 1
+    },
+    {
+      "sequence": 99,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 22,
+      "y": 150,
+      "button": 1
+    },
+    {
+      "sequence": 100,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 101,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 102,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 6
+    },
+    {
+      "sequence": 103,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 104,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 105,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "tree-expanded"
+    },
+    {
+      "sequence": 106,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "tree-filter",
+      "target_incarnation": 6,
+      "x": 652,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 107,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 652,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 108,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 109,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 110,
+      "at": 0,
+      "kind": "worker",
+      "worker_id": 7
+    },
+    {
+      "sequence": 111,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 112,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 113,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "tree-filtered"
+    },
+    {
+      "sequence": 114,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "dock-option:ZG9jaw:bm90ZXM",
+      "target_incarnation": 16,
+      "x": 434,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 115,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 434,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 116,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 117,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 118,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "workbench:ZG9jaw:bm90ZXM:editor",
+      "target_incarnation": 23,
+      "x": 800,
+      "y": 540,
+      "button": 1
+    },
+    {
+      "sequence": 119,
+      "at": 0,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 800,
+      "y": 540,
+      "button": 1
+    },
+    {
+      "sequence": 120,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 121,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 122,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "a",
+      "modifiers": 2
+    },
+    {
+      "sequence": 123,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 124,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 125,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "N"
+    },
+    {
+      "sequence": 126,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 127,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 128,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "o"
+    },
+    {
+      "sequence": 129,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 130,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 131,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "t"
+    },
+    {
+      "sequence": 132,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 133,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 134,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "e"
+    },
+    {
+      "sequence": 135,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 136,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 137,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "s"
+    },
+    {
+      "sequence": 138,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 139,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 140,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": " "
+    },
+    {
+      "sequence": 141,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 142,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 143,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "Ω"
+    },
+    {
+      "sequence": 144,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 145,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 146,
+      "at": 0,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "Enter"
+    },
+    {
+      "sequence": 147,
+      "at": 0,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 148,
+      "at": 0,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 149,
+      "at": 0,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "notes-edited"
+    },
+    {
+      "sequence": 150,
+      "at": 0,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 434,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 151,
+      "at": 0,
+      "kind": "advance",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "delta": 51000000
+    },
+    {
+      "sequence": 152,
+      "at": 51000000,
+      "kind": "pointer-move",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 369,
+      "y": 100
+    },
+    {
+      "sequence": 153,
+      "at": 51000000,
+      "kind": "pointer-move",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 304,
+      "y": 100
+    },
+    {
+      "sequence": 154,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 304,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 155,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 156,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 157,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "tabs-reordered"
+    },
+    {
+      "sequence": 158,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "dock-option:ZG9jaw:Y2FudmFz",
+      "target_incarnation": 35,
+      "x": 304,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 159,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 304,
+      "y": 100,
+      "button": 1
+    },
+    {
+      "sequence": 160,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 161,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 162,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "workbench:ZG9jaw:Y2FudmFz:tool",
+      "target_incarnation": 20,
+      "x": 320,
+      "y": 156,
+      "button": 1
+    },
+    {
+      "sequence": 163,
+      "at": 51000000,
+      "kind": "pointer-move",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 832,
+      "y": 548
+    },
+    {
+      "sequence": 164,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 165,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 166,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "placement-preview"
+    },
+    {
+      "sequence": 167,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 832,
+      "y": 548,
+      "button": 1
+    },
+    {
+      "sequence": 168,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 169,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 170,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "placed"
+    },
+    {
+      "sequence": 171,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 852,
+      "y": 568,
+      "button": 1
+    },
+    {
+      "sequence": 172,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 852,
+      "y": 568,
+      "button": 1
+    },
+    {
+      "sequence": 173,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 174,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 175,
+      "at": 51000000,
+      "kind": "scroll",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 832,
+      "y": 548,
+      "delta_y": -100
+    },
+    {
+      "sequence": 176,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 177,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 178,
+      "at": 51000000,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "Right"
+    },
+    {
+      "sequence": 179,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 180,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 181,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "canvas-navigated"
+    },
+    {
+      "sequence": 182,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "undo",
+      "target_incarnation": 8,
+      "x": 962,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 183,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 962,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 184,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 185,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 186,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "placement-undone"
+    },
+    {
+      "sequence": 187,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "redo",
+      "target_incarnation": 9,
+      "x": 1070,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 188,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 1070,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 189,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 190,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 191,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "placement-redone"
+    },
+    {
+      "sequence": 192,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "undo",
+      "target_incarnation": 8,
+      "x": 962,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 193,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 962,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 194,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 195,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 196,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "undo",
+      "target_incarnation": 8,
+      "x": 962,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 197,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 962,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 198,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 199,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 200,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "undone"
+    },
+    {
+      "sequence": 201,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "modal",
+      "target_incarnation": 10,
+      "x": 1176,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 202,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 1176,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 203,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 204,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 205,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "modal-open"
+    },
+    {
+      "sequence": 206,
+      "at": 51000000,
+      "kind": "scroll",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 832,
+      "y": 548,
+      "delta_y": -100
+    },
+    {
+      "sequence": 207,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 208,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 209,
+      "at": 51000000,
+      "kind": "key-chord",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "key": "Escape"
+    },
+    {
+      "sequence": 210,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "workspace",
+      "window_incarnation": 1
+    },
+    {
+      "sequence": 211,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 212,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "label": "modal-closed"
+    },
+    {
+      "sequence": 213,
+      "at": 51000000,
+      "kind": "pointer-down",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "target": "close-main",
+      "target_incarnation": 11,
+      "x": 1310,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 214,
+      "at": 51000000,
+      "kind": "pointer-up",
+      "window": "workspace",
+      "window_incarnation": 1,
+      "x": 1310,
+      "y": 39,
+      "button": 1
+    },
+    {
+      "sequence": 215,
+      "at": 51000000,
+      "kind": "frame",
+      "window": "inspector",
+      "window_incarnation": 2
+    },
+    {
+      "sequence": 216,
+      "at": 51000000,
+      "kind": "capture",
+      "window": "inspector",
+      "window_incarnation": 2,
+      "label": "surviving-inspector"
+    }
+  ]
+}

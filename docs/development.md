@@ -332,3 +332,13 @@ saturation and removal/window lifetime cleanup. The pinned stage-65 native
 capture regressions run through the software window router. See the
 [placement contract](../specs/placement.md) for units, bounds and same-window
 limits. These checks do not certify physical Mac capture or cross-display input.
+
+
+## Professional workspace replay
+
+`examples/replay` includes `cmd/workspace`, a runnable public consumer composing
+stored data, workbench panels, canvas placement and a shared inspector. The
+software `cmd/workspace-replay` and frozen-record tests require `-tags offscreen`;
+they explicitly step workers and clocks and do not open a desktop window.
+See [commands and scope](../examples/replay/README.md#professional-workspace).
+Native compilation and software replay remain distinct from physical/GPU checks.

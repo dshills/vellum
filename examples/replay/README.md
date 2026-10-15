@@ -48,3 +48,50 @@ fixed-viewport, persistence and explicit-clock restrictions.
 These tests qualify software rendering and routed widget behavior. Cocoa IME,
 external accessibility, GPU presentation and sustained performance have separate
 acceptance workloads.
+
+
+## Professional workspace
+
+The `workspace` subpackage is a second independent public SDK consumer. It
+combines a 100,000-node outline, table retaining twenty `uint32` fields per row,
+notes editor, property inspector, command/history journal, dock tabs, a pannable/
+zoomable canvas and an independent shared-model inspector window. Open project,
+sort/filter and outline rebuilds use injected workers with bounded admission.
+Cancel worker prevents installation even when its result is awaiting delivery.
+
+From this example directory after repository preparation:
+
+```sh
+go run ./cmd/workspace -rows 10000
+# Use 1000000 for the larger stored workload.
+go test -race -tags offscreen ./workspace -count=1 -timeout=9m
+go run -tags offscreen ./cmd/workspace-replay -rows 10000 -batch 64 > workspace-result.json
+go build -o build/vellum-workspace ./cmd/workspace
+```
+
+The native application starts with Open project. Its document tabs expose Canvas,
+Table and Notes. Drag Block into the canvas, or Tab to Block and press Return to
+place at center; the grid is twenty logical units. Use the shared Undo/Redo
+controls for property edits and placements; notes keep their own editor history.
+Table filter matches `7` in V01 and sort orders V00 numerically descending.
+Outline filtering matches Component 000100 and includes its ancestor. Canvas
+click selects, drag/arrows pan and wheel zooms. Main-window closure preserves
+the independent inspector. Placement remains same-native-window only.
+
+Each bundled workspace record has 216 fixed operations and 27 completed
+observations. The acceptance tests read it unchanged at event batches 1, 7 and
+64 for both dataset sizes. Goldens include actual software image identities,
+measured geometry/semantics, UTF-16 selection/focus and model state. Independent
+oracles derive source-byte hashes, sort/filter results and selected-cell values;
+they also check cancellation, outline indexes, notes, tab dragging, placement
+history and modal/window lifetimes. Transport counters and native capability
+tokens are not cross-instance semantic identity. Target/window admission checks
+still enforce their captured lifetimes.
+
+Authoring is separate and opt-in: `go test -tags offscreen ./workspace -run
+'^TestAuthorWorkspaceRecords$' -args -workspace-record-out=/tmp/new-record-directory`.
+The destination must not exist. Changing golden observations requires reviewing
+the model assertions and recorded inputs together; acceptance never updates them.
+These are software routing results. Native compilation, physical pointer input,
+GPU presentation, cross-display scaling, human accessibility and full P9/P11
+acceptance remain separate.
