@@ -134,6 +134,9 @@ func ValidateControl(n Node) error {
 	} else if n.Canvas != nil || n.CanvasGrid != 0 || n.PlacementTarget != nil {
 		return fmt.Errorf("ui: canvas fields belong only on Canvas2D")
 	}
+	if err := validateCanvasObjects(n); err != nil {
+		return err
+	}
 	if n.PlacementSource != nil && (n.Kind != Button || !n.PlacementSource.Valid() || n.Activate == nil) {
 		return fmt.Errorf("ui: placement source requires a valid focusable Button and keyboard Activate path")
 	}

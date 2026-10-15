@@ -45,3 +45,11 @@ window**. It does not transfer captures or payloads between native windows or
 applications, use OS drag sessions, or offer cross-window autoscroll. Managed
 Canvas2D uses logical view units; the older GPU MeshCanvas API uses its existing
 physical viewport contract. See [the framework contract](../../specs/placement.md).
+
+Placed objects expose stable accessible names through `ui.Node.CanvasObjects`.
+Focus the canvas and use Option+Left/Right to cycle visible named objects, or
+Option+Home/End for the first/last in paint order. Ordinary arrows pan. Object
+selection uses the same stable-ID owner path as a semantic accessibility press;
+it does not add an entry to the placement history. Offscreen objects must be
+brought into view before this traversal. See the
+[canvas semantics contract](../../specs/canvas-accessibility.md).

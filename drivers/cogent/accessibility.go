@@ -441,6 +441,11 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 			}
 		}
 		switch n.Kind {
+		case ui.Canvas2D:
+			if len(n.CanvasObjects) > 0 {
+				x.Role = "canvas"
+				x.Value = canvasCompletedSelection(r)
+			}
 		case ui.Icon:
 			x.Role = "image"
 		case ui.SplitPane:
@@ -585,6 +590,13 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				handlers[heading.ID] = handler
 			}
 		}
+		if n.Kind == ui.Canvas2D && len(n.CanvasObjects) > 0 && r.control != nil && r.control.placement != nil {
+			extra, actions := canvasAccessibility(r, x.ID, b, disabled)
+			nodes = append(nodes, extra...)
+			for id, action := range actions {
+				handlers[id] = action
+			}
+		}
 		if n.Kind == ui.DataTree && r.control != nil && r.control.outline != nil {
 			extra, actions := treeAccessibility(r, x.ID, b, disabled)
 			nodes = append(nodes, extra...)
@@ -659,6 +671,9 @@ func accessibilitySnapshotInherited(root *record, b *accessibilityBridge, inheri
 				continue
 			}
 			visit(c, x.ID, disabled)
+		}
+		if n.Kind == ui.Canvas2D && len(n.CanvasObjects) > 0 && r.control != nil && r.control.placement != nil {
+			stampCanvasAccessibility(r, nodes[start:], handlers)
 		}
 		if n.Kind == ui.DataTree && r.control != nil && r.control.outline != nil {
 			stampTreeAccessibility(r, nodes[start:])
@@ -1076,7 +1091,7 @@ func accessibilityBoundsIncludingScoped(root *record, includeScoped bool) map[st
 		if r == nil {
 			return
 		}
-		if !includeScoped && r.control != nil && (r.node.Kind == ui.DataGrid && r.control.grid != nil || r.node.Kind == ui.DataTree && r.control.outline != nil) {
+		if !includeScoped && r.control != nil && (r.node.Kind == ui.DataGrid && r.control.grid != nil || r.node.Kind == ui.DataTree && r.control.outline != nil || r.node.Kind == ui.Canvas2D && len(r.node.CanvasObjects) > 0 && r.control.placement != nil) {
 			return // The bound host and its materialized descendants share a scope.
 		}
 		widget := r.widget
@@ -1114,6 +1129,7 @@ func accessibilityBoundsIncludingScoped(root *record, includeScoped bool) map[st
 		extensionAccessibilityBounds(r, out, bounds, includeScoped)
 		gridAccessibilityBounds(r, out)
 		treeAccessibilityBounds(r, out)
+		canvasAccessibilityBounds(r, out)
 		if edit := gridEditingRecord(r); edit != nil {
 			visit(edit)
 		}

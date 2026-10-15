@@ -91,18 +91,41 @@ func New(objects []Rect) (*Scene, error) {
 	return &Scene{Objects: append([]Rect(nil), objects...), View: Viewport{Width: 800, Height: 600, Zoom: 1}}, nil
 }
 
-// Pick uses reverse paint order so the topmost object wins.
-func (s *Scene) Pick(screen Point) string {
+// ObjectAt uses reverse paint order without changing selection.
+func (s *Scene) ObjectAt(screen Point) string {
 	p := s.View.World(screen)
-	s.Selected = ""
 	for i := len(s.Objects) - 1; i >= 0; i-- {
 		o := s.Objects[i]
 		if p.X >= o.X && p.X <= o.X+o.Width && p.Y >= o.Y && p.Y <= o.Y+o.Height {
-			s.Selected = o.ID
-			break
+			return o.ID
 		}
 	}
+	return ""
+}
+
+// Pick selects the topmost object at a screen point.
+func (s *Scene) Pick(screen Point) string {
+	s.Selected = s.ObjectAt(screen)
 	return s.Selected
+}
+
+// Select selects an exact stable object ID, including an overlapped object. An
+// empty ID clears selection; an unknown ID refuses without changing it.
+func (s *Scene) Select(id string) error {
+	if s == nil {
+		return fmt.Errorf("canvas: scene required")
+	}
+	if id == "" {
+		s.Selected = ""
+		return nil
+	}
+	for _, o := range s.Objects {
+		if o.ID == id {
+			s.Selected = id
+			return nil
+		}
+	}
+	return fmt.Errorf("canvas: unknown object %q", id)
 }
 func (s *Scene) Fit() {
 	if len(s.Objects) == 0 {

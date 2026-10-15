@@ -190,6 +190,14 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 			if m.scene.Selected == "" {
 				t.Fatal("canvas selection failed")
 			}
+			inspection, err := driver.Snapshot(ctx)
+			if err != nil || len(inspection.Windows[0].Canvases) != 1 || len(inspection.Windows[0].Canvases[0].Objects) == 0 {
+				t.Fatal("public canvas semantics missing", err)
+			}
+			input(cogent.ManualInput{Type: events.KeyChord, Code: key.CodeHome, Modifiers: key.Modifiers(1 << key.Alt)})
+			if m.scene.Selected != m.scene.Objects[0].ID {
+				t.Fatal("public keyboard object selection failed")
+			}
 			before := m.scene.View
 			input(cogent.ManualInput{Type: events.KeyChord, Code: key.CodeRightArrow})
 			if m.scene.View.Center == before.Center {

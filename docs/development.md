@@ -342,3 +342,11 @@ software `cmd/workspace-replay` and frozen-record tests require `-tags offscreen
 they explicitly step workers and clocks and do not open a desktop window.
 See [commands and scope](../examples/replay/README.md#professional-workspace).
 Native compilation and software replay remain distinct from physical/GPU checks.
+
+## Canvas object semantics
+
+The [placement demo](../examples/placement/README.md) also exercises opt-in named
+Canvas2D objects. Follow the [contract](../specs/canvas-accessibility.md) and
+[checkpoint](reports/macos-canvas-accessibility/README.md) for metadata budgets,
+completed-frame coordinates, queued-action lifetime guards and the separation
+between software/inert Cocoa evidence and live human accessibility acceptance.

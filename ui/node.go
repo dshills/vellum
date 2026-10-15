@@ -68,7 +68,9 @@ type Node struct {
 	Children            []Node
 	Custom              any
 	// Canvas2D uses logical canvas units and the existing canvas navigation model.
-	Canvas          *canvas.Scene
+	Canvas *canvas.Scene
+	// CanvasObjects optionally exposes named scene objects to assistive technology.
+	CanvasObjects   []CanvasObject
 	CanvasGrid      float32           // optional world-space grid spacing; zero hides it
 	PlacementSource *placement.Source // focusable palette Button; Activate supplies keyboard placement
 	PlacementTarget *placement.Target // optional Canvas2D acceptance endpoint
@@ -103,6 +105,9 @@ func Validate(root Node) error {
 		}
 		if n.ID == "" || seen[n.ID] {
 			return fmt.Errorf("ui: empty or duplicate ID %q", n.ID)
+		}
+		if strings.HasPrefix(n.ID, "canvas-object:") {
+			return fmt.Errorf("ui: ID %q uses reserved canvas-object: prefix", n.ID)
 		}
 		if strings.HasPrefix(n.ID, "grid:") {
 			return fmt.Errorf("ui: ID %q uses reserved grid: prefix", n.ID)

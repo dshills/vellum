@@ -828,6 +828,24 @@ func (p *manualImplementation) captureWindow(ctx context.Context, w *managedManu
 				result.FocusedID = id
 			}
 			result.Elements = append(result.Elements, ManualElement{ID: id, Parent: parent, Incarnation: w.records[r], Kind: r.node.Kind, Name: r.node.Accessibility.Name, Value: value, Enabled: !controlDisabled(r), Focused: focused, Visible: visible, Selected: selected, Selection: selection, TextFocus: focus, Bounds: rect})
+
+			if visible && len(r.node.CanvasObjects) > 0 && r.control != nil && r.control.placement != nil {
+				binding := r.control.placement
+				frame := binding.frame.Load()
+				if !canvasCompletedFrame(binding, frame) {
+					gridPending = true
+				} else {
+					inspection := inspectCanvasFrame(binding, frame)
+					inspection.ID = prefix + inspection.ID
+					for i := range inspection.Objects {
+						object := &inspection.Objects[i]
+						object.ID = prefix + object.ID
+						rect := object.Bounds
+						result.Elements = append(result.Elements, ManualElement{ID: object.ID, Parent: id, Incarnation: inspection.Incarnation, Kind: ui.Canvas2D, Name: object.Name, Value: object.ObjectID, Enabled: !controlDisabled(r) && binding.window.active == nil, Visible: true, Selected: object.Selected, Bounds: image.Rect(int(math.Floor(float64(rect[0]))), int(math.Floor(float64(rect[1]))), int(math.Ceil(float64(rect[0]+rect[2]))), int(math.Ceil(float64(rect[1]+rect[3]))))})
+					}
+					result.Canvases = append(result.Canvases, inspection)
+				}
+			}
 			if menuOpen(r) {
 				popup := r.control.menu.popup
 				if popup.manualIncarnation == 0 {
@@ -1016,6 +1034,7 @@ func (m *Manual) Snapshot(ctx context.Context) (ManualSnapshot, error) {
 		captured.Elements = slices.Clone(captured.Elements)
 		captured.Grids = cloneManualGrids(captured.Grids)
 		captured.Trees = cloneManualTrees(captured.Trees)
+		captured.Canvases = cloneManualCanvases(captured.Canvases)
 		captured.ID = w.state.window.ID
 		captured.Incarnation = w.incarnation
 		captured.Events = native.Events
@@ -1106,6 +1125,14 @@ func cloneManualTrees(trees []TreeInspection) []TreeInspection {
 	for i := range out {
 		out[i].Rows = slices.Clone(out[i].Rows)
 		out[i].Pages = slices.Clone(out[i].Pages)
+	}
+	return out
+}
+
+func cloneManualCanvases(canvases []CanvasInspection) []CanvasInspection {
+	out := slices.Clone(canvases)
+	for i := range out {
+		out[i].Objects = slices.Clone(out[i].Objects)
 	}
 	return out
 }

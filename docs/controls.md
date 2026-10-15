@@ -256,3 +256,7 @@ Delete/Backspace on a focused tab and its visible close button request the same
 owner decision. Application command shortcuts remain available. The gallery's
 Document tabs page demonstrates rejection, reopening and the empty last-page state.
 See [the contract](../specs/tab-close.md) for lifetime and accessibility details.
+
+Canvas2D optionally exposes existing scene objects through `CanvasObjects` stable
+IDs and names. Option+Left/Right/Home/End selects visible named objects in paint
+order, with one host focus stop. See the [contract](../specs/canvas-accessibility.md).

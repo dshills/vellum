@@ -29,6 +29,7 @@ type placementFixture struct {
 	controller                                                   *placement.Controller[string]
 	target                                                       *placement.Target
 	model                                                        *canvas.Scene
+	metadata                                                     []ui.CanvasObject
 	calls, keyboard, unrelated                                   int
 	reject, hideSource, hideTarget, disabled, cancelSnap, scroll bool
 }
@@ -90,7 +91,7 @@ func newPlacementFixture(t *testing.T, batch int, dpi float32) *placementFixture
 				a.Invalidate("main")
 			}})
 		}
-		target := ui.Node{ID: "drawing", Kind: ui.Canvas2D, Canvas: f.model, PlacementTarget: f.target, CanvasGrid: 20, Grow: true, Disabled: f.disabled, Accessibility: ui.Accessibility{Name: "Drawing canvas"}}
+		target := ui.Node{ID: "drawing", Kind: ui.Canvas2D, Canvas: f.model, CanvasObjects: f.metadata, PlacementTarget: f.target, CanvasGrid: 20, Grow: true, Disabled: f.disabled, Accessibility: ui.Accessibility{Name: "Drawing canvas"}}
 		if f.hideTarget {
 			target = ui.Node{ID: "removed", Kind: ui.Label, Text: "Target removed"}
 		}

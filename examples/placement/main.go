@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
@@ -63,6 +64,12 @@ func view(a *app.Application, m *model) ui.Node {
 	if m.snap {
 		grid = 20
 	}
+	objects := make([]ui.CanvasObject, 0, len(m.scene.Objects))
+	for _, object := range m.scene.Objects {
+		kind, _, _ := strings.Cut(object.ID, "-")
+		label := map[string]string{"block": "Block", "connector": "Connector", "note": "Note"}[kind]
+		objects = append(objects, ui.CanvasObject{ID: object.ID, Name: label + " " + object.ID, Help: "Select this component."})
+	}
 	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 		{ID: "toolbar", Kind: ui.Toolbar, Children: []ui.Node{
 			{ID: "undo", Kind: ui.Button, Text: "Undo", Disabled: m.commands.Enabled("undo") != nil, Activate: invoke("undo")},
@@ -73,10 +80,10 @@ func view(a *app.Application, m *model) ui.Node {
 			{ID: "lock", Kind: ui.Checkbox, Text: "Reject all drops", Checked: m.locked, Change: func(e ui.ChangeEvent) { m.locked = e.Checked; update() }},
 			{ID: "reject-notes", Kind: ui.Checkbox, Text: "Reject notes", Checked: m.rejectNotes, Change: func(e ui.ChangeEvent) { m.rejectNotes = e.Checked; update() }},
 		}},
-		{ID: "help", Kind: ui.Label, Text: "Drag to place • drag the canvas or use arrow keys to pan • wheel to zoom • Escape cancels • Return on a tool places at center"},
+		{ID: "help", Kind: ui.Label, Text: "Drag to place • drag the canvas or use arrow keys to pan • wheel to zoom • Escape cancels • Return on a tool places at center • Option+arrows select objects"},
 		{ID: "workspace", Kind: ui.Row, Grow: true, Children: []ui.Node{
 			{ID: "palette", Kind: ui.Column, MinWidth: 145, Children: tools},
-			{ID: "drawing", Kind: ui.Canvas2D, Canvas: m.scene, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Click to select; drag or use arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
+			{ID: "drawing", Kind: ui.Canvas2D, Canvas: m.scene, CanvasObjects: objects, CanvasGrid: grid, PlacementTarget: m.target, Grow: true, Accessibility: ui.Accessibility{Name: "Component canvas", Help: "Select a component, or use Option+Left/Right/Home/End on the canvas; drag or use plain arrow keys to pan; scroll to zoom."}, Change: func(e ui.ChangeEvent) {
 				m.status = fmt.Sprintf("Selected: %s • zoom %.0f%%", e.SelectedID, e.Number*100)
 				update()
 			}},

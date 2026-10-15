@@ -234,3 +234,10 @@ materialized descendants, including outline rows/page controls. Full inspection,
 legacy `VirtualTree` geometry, ordinary controls and namespaced workbench geometry
 retain their existing paths. Scope is determined by the live managed binding,
 not by tree-shaped IDs. See the [scoped projection checkpoint](../docs/reports/macos-scoped-geometry/README.md).
+
+## Named canvas objects
+
+Opt-in Canvas2D objects use the same atomic pending/completed scope publication,
+with an explicit native canvas host role, exact stable-ID press and one host focus
+stop. See [canvas object semantics](canvas-accessibility.md) for metadata limits,
+paint-order traversal, capture/lifecycle guards and qualification limits.

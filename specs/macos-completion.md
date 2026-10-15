@@ -744,3 +744,13 @@ This closes the absence of an integrated versioned software record. The broader
 P9 GPU/OS workload, current-source native/endurance/performance and physical or
 human checks listed above remain open. A runnable native build is not a live
 qualification result. No native application is launched while the human is online.
+
+## Named Canvas2D object checkpoint
+
+Opt-in object labels, visible completed clipped bounds, stable-ID selection and
+Option-key traversal extend the retained Canvas2D through public APIs. Pending
+publication, origin guards, capture loss and retained subtree transfer checks
+are specified in [canvas accessibility](canvas-accessibility.md). Offscreen software
+routing and inert Cocoa fixtures qualify their tested paths; live attachment,
+physical input/display changes and human VoiceOver remain separate P3 gates.
+This checkpoint does not complete P3, P4/P6/P9/P11 or Mac release acceptance.

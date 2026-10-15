@@ -9,6 +9,7 @@ func withdrawDataGeometry(r *record) {
 		return
 	}
 	if r.control != nil {
+		withdrawCanvasGeometry(r.control.placement)
 		if g := r.control.grid; g != nil {
 			g.layoutPending.Store(true)
 			g.layout.valid = false

@@ -210,6 +210,7 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshotForSemantic(nodes []
 			group := make([]accessibilityNode, len(indices))
 			for i, index := range indices {
 				group[i] = cloneAccessibilityNode(nodes[index])
+				group[i].activationGuard = nil // Completed caches retain no owner/model closures.
 			}
 			cache[scope] = group
 			continue

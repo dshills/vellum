@@ -94,3 +94,7 @@ Canvas wheel input zooms the canvas; ancestor scrolling can be driven by its
 scrollbar. This initial rectangular retained canvas is not a CAD geometry
 kernel, arbitrary scene extension or OS drop target. Cross-window capture,
 external payload transport and auto-scrolling while dragging are unsupported.
+
+Applications may provide optional `CanvasObjects` labels for placed scene objects.
+Their selection, completed geometry and keyboard traversal follow the
+[named canvas contract](canvas-accessibility.md), independently of placement history.

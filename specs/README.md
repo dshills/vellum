@@ -48,3 +48,5 @@ See [implementation status](../docs/implementation.md) for completed phases and
 
 [Stored-tree warm performance](tree-performance.md) defines actual native-input/frame
 measurement and matched 10k/100k wide/deep workloads.
+
+- [Named Canvas2D objects](canvas-accessibility.md): stable semantic identities, completed clipped frames and owner-held selection.

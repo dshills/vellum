@@ -90,3 +90,9 @@ The SDK identifies `v0.1.0-alpha.1`. Follow the
 Vellum's own code uses the [MIT license](LICENSE). The selected module namespace
 and license are recorded in `release/version.json`; public packaging still requires
 the third-party/native distribution audit and target qualification.
+
+Retained Canvas2D scenes may expose named objects with `ui.Node.CanvasObjects`, with
+completed clipped geometry, stable-ID selection and Option-key traversal. The
+[placement example](examples/placement/README.md) demonstrates this alongside
+palette placement and Undo/Redo; see the [contract](specs/canvas-accessibility.md)
+and [scoped acceptance](docs/reports/macos-canvas-accessibility/README.md).

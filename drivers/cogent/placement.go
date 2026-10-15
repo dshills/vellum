@@ -36,12 +36,14 @@ var placementWindows = struct {
 	sync.Mutex
 	windows map[placementKey]*placementWindow
 	models  map[any]*placementBinding
+	next    uint64
 }{windows: map[placementKey]*placementWindow{}, models: map[any]*placementBinding{}}
 
 type placementWindow struct {
-	key      placementKey
-	bindings []*placementBinding
-	active   *nativePlacement
+	key         placementKey
+	bindings    []*placementBinding
+	active      *nativePlacement
+	canvasEpoch atomic.Pointer[canvasActionEpoch]
 }
 type placementBinding struct {
 	domain          context.Context
@@ -56,17 +58,22 @@ type placementBinding struct {
 	viewportPending atomic.Pointer[placementFrame]
 	viewportQueued  atomic.Bool
 	retired         bool
+	incarnation     uint64
 }
 type placementFrame struct {
 	geometry placement.Geometry
 	scene    *core.Scene
+	picture  *canvasPicture
+	objects  []CanvasObjectGeometry
 }
 type canvasPicture struct {
-	objects  []canvas.Rect
-	view     canvas.Viewport
-	selected string
-	grid     float64
-	preview  placement.State
+	objects    []canvas.Rect
+	view       canvas.Viewport
+	selected   string
+	grid       float64
+	preview    placement.State
+	semantics  []ui.CanvasObject
+	generation uint64
 }
 type nativePlacement struct {
 	source, target *placementBinding
@@ -99,6 +106,10 @@ func syncPlacement(r *record) error {
 		}
 		binding := &placementBinding{domain: domain, r: r, source: r.node.PlacementSource, target: r.node.PlacementTarget, model: r.node.Canvas}
 		placementWindows.Lock()
+		if placementWindows.next == math.MaxUint64 {
+			placementWindows.Unlock()
+			return fmt.Errorf("canvas: native binding identity exhausted")
+		}
 		for _, model := range binding.models() {
 			if placementWindows.models[model] != nil {
 				placementWindows.Unlock()
@@ -115,6 +126,11 @@ func syncPlacement(r *record) error {
 			placementWindows.Unlock()
 			return fmt.Errorf("placement: native binding budget exceeded")
 		}
+		placementWindows.next++
+		binding.incarnation = placementWindows.next
+		if window.canvasEpoch.Load() == nil {
+			window.canvasEpoch.Store(&canvasActionEpoch{})
+		}
 		binding.window = window
 		window.bindings = append(window.bindings, binding)
 		for _, model := range binding.models() {
@@ -127,12 +143,22 @@ func syncPlacement(r *record) error {
 	}
 	if old.model != nil {
 		old.applyPendingViewport()
-		picture := &canvasPicture{objects: slices.Clone(old.model.Objects), view: old.model.View, selected: old.model.Selected, grid: float64(r.node.CanvasGrid)}
+		picture := &canvasPicture{objects: slices.Clone(old.model.Objects), view: old.model.View, selected: old.model.Selected, grid: float64(r.node.CanvasGrid), semantics: slices.Clone(r.node.CanvasObjects)}
 		if old.target != nil {
 			picture.preview = old.target.State()
 		}
-		old.picture.Store(picture)
-		r.widget.AsWidget().NeedsRender()
+		previous := old.picture.Load()
+		if !sameCanvasPicture(previous, picture) {
+			if previous != nil && previous.generation == math.MaxUint64 {
+				return fmt.Errorf("canvas: picture generation exhausted")
+			}
+			picture.generation = 1
+			if previous != nil {
+				picture.generation = previous.generation + 1
+			}
+			old.picture.Store(picture)
+			r.widget.AsWidget().NeedsRender()
+		}
 	}
 	return nil
 }
@@ -194,6 +220,10 @@ func setPlacementScope(b *placementBinding, visible, disabled bool, scopes []*ta
 	}
 	if old != nil {
 		old.revoked.Store(true)
+		withdrawCanvasGeometry(b)
+		if b.model != nil {
+			b.r.widget.AsWidget().NeedsRender()
+		}
 	}
 	b.scope.Store(&workbenchInputScope{visible: visible, disabled: disabled, scopes: slices.Clone(scopes)})
 	if cap := b.window.active; cap != nil && (cap.source == b || cap.target == b) {
@@ -261,6 +291,8 @@ func beginPlacement(r *record, e events.Event) {
 			placementRefusal(r, err)
 			return
 		}
+		b.window.canvasEpoch.Store(&canvasActionEpoch{})
+		_ = r.control.a.Invalidate(r.control.window)
 		cap.scope, cap.gesture, cap.cancellation = b.scope.Load(), g, ticket
 		b.window.active = cap
 	})
@@ -454,10 +486,6 @@ func (c *managedCanvas) Render() {
 	sceneOrigin := c.Scene.SceneGeom.Pos
 	clip := c.Geom.ContentBBox
 	geometry := placement.Geometry{Window: b.window.key.window, Origin: canvas.Point{X: float64(origin.X) + float64(sceneOrigin.X), Y: float64(origin.Y) + float64(sceneOrigin.Y)}, Clip: canvas.Bounds{Min: canvas.Point{X: float64(clip.Min.X + sceneOrigin.X), Y: float64(clip.Min.Y + sceneOrigin.Y)}, Max: canvas.Point{X: float64(clip.Max.X + sceneOrigin.X), Y: float64(clip.Max.Y + sceneOrigin.Y)}}, Scale: scale, View: view}
-	b.frame.Store(&placementFrame{geometry: geometry, scene: c.Scene})
-	if picture.view.Width != view.Width || picture.view.Height != view.Height {
-		b.requestViewport(b.frame.Load())
-	}
 	pc := &c.Scene.Painter
 	fill := func(rect canvas.Rect, col color.Color) {
 		p := view.Screen(canvas.Point{X: rect.X, Y: rect.Y})
@@ -511,6 +539,22 @@ func (c *managedCanvas) Render() {
 		p := view.World(canvas.Point{})
 		outline(canvas.Rect{X: p.X, Y: p.Y, Width: view.Width / view.Zoom, Height: view.Height / view.Zoom}, col)
 	}
+	// Publish only after the complete object/preview drawing has returned.
+	frame := &placementFrame{geometry: geometry, scene: c.Scene, picture: picture}
+	previous := b.frame.Load()
+	if previous != nil && previous.geometry == geometry && previous.scene == c.Scene && previous.picture == picture {
+		frame = previous
+	} else {
+		frame.objects = measureCanvasObjects(picture, geometry, c.r.node.ID)
+		b.frame.Store(frame)
+		if len(picture.semantics) > 0 {
+			_ = b.r.control.a.Invalidate(b.r.control.window)
+		}
+	}
+	if picture.view.Width != view.Width || picture.view.Height != view.Height {
+		b.requestViewport(frame)
+	}
+
 }
 
 // applyPendingViewport runs only under the application owner. The window's
@@ -574,9 +618,8 @@ func mountManagedCanvas(parent tree.Node, r *record) *managedCanvas {
 				return
 			}
 			b.model.View = frame.geometry.View
-			b.model.Selected = ""
-			b.model.Pick(frame.geometry.View.Screen(world))
-			canvasChanged(r)
+			id := b.model.ObjectAt(frame.geometry.View.Screen(world))
+			selectCanvasObject(b, id)
 		})
 		e.SetHandled()
 	})
@@ -604,6 +647,9 @@ func mountManagedCanvas(parent tree.Node, r *record) *managedCanvas {
 	})
 	w.OnFirst(events.DoubleClick, func(e events.Event) { e.SetHandled() })
 	w.OnFirst(events.KeyChord, func(e events.Event) {
+		if canvasObjectKey(r, e) {
+			return
+		}
 		dx, dy := 0., 0.
 		switch e.KeyCode() {
 		case key.CodeLeftArrow:
@@ -633,12 +679,13 @@ func canvasOwnerEvent(r *record, e events.Event, change func(*placementBinding, 
 	b := r.control.placement
 	frame := b.frame.Load()
 	scope := b.scope.Load()
+	epoch := b.window.canvasEpoch.Load()
 	if frame == nil || frame.scene.GlobalLayoutPending() {
 		return
 	}
 	err := r.control.a.Do(func() {
 		life, lifeErr := r.control.a.WindowContext(r.control.window)
-		if lifeErr != nil || life != b.domain || life.Err() != nil || !b.live() || !scope.allowed() || b.frame.Load() != frame {
+		if lifeErr != nil || life != b.domain || life.Err() != nil || !b.live() || !scope.allowed() || b.frame.Load() != frame || b.window.canvasEpoch.Load() != epoch || !canvasFrameCurrent(b, frame) {
 			return
 		}
 		current := b.model.View

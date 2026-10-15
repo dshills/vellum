@@ -74,6 +74,7 @@ static NSString *vellumAXRole(NSString *role){
  if([role isEqual:@"scroll"])return NSAccessibilityScrollAreaRole;
  if([role isEqual:@"table"])return NSAccessibilityTableRole;
  if([role isEqual:@"outline"])return NSAccessibilityOutlineRole;
+ if([role isEqual:@"canvas"])return NSAccessibilityGroupRole;
  if([role isEqual:@"row"]||[role isEqual:@"tree-row"]||[role isEqual:@"grid-row"])return NSAccessibilityRowRole;
  if([role isEqual:@"grid-cell"])return NSAccessibilityCellRole;
  if([role isEqual:@"grid-column"])return NSAccessibilityColumnRole;
@@ -359,7 +360,7 @@ static NSDictionary *vellumAXValidatedNodes(NSDictionary *snapshot){
   while(cursor.length){if([ancestors containsObject:cursor]||!nodes[cursor])return nil;[ancestors addObject:cursor];cursor=nodes[cursor][@"parent"];}
   NSDictionary *parent=nodes[node[@"parent"]];
   if(scope){
-   NSDictionary *host=nodes[scope];if(!host||![host[@"grid_scope"] isEqual:scope]||(![host[@"role"] isEqual:@"table"]&&![host[@"role"] isEqual:@"outline"]))return nil;
+   NSDictionary *host=nodes[scope];if(!host||![host[@"grid_scope"] isEqual:scope]||(![host[@"role"] isEqual:@"table"]&&![host[@"role"] isEqual:@"outline"]&&![host[@"role"] isEqual:@"canvas"]))return nil;
    for(NSString *key in @[@"grid_incarnation",@"grid_target_generation"])if(![node[key] isEqual:host[key]])return nil;
    // Go's ordinary omitempty encoding omits ready false and startup zero.
    // Missing values normalize only here; present values were type-validated.

@@ -16,3 +16,5 @@ past next-step instructions describe that stage of the investigation; consult
 implementation status and the framework contract for the current implementation.
 Recorded evidence may contain original paths and hashes. Those capture-time values
 are retained; current document links and tooling use the reorganized paths.
+
+- [Named canvas objects](reports/macos-canvas-accessibility/README.md): opt-in semantics, exact selection and completed geometry for retained Canvas2D.
