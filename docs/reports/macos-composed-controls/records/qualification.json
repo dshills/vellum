@@ -1,0 +1,486 @@
+{
+  "result": "PASS_SCOPED_COMPOSED_CONTROLS_PREFLIGHT_CHECKPOINT",
+  "base_commit": "3b680ecf05fad5e0ff7e563baa76d667a9d507b2",
+  "sources": {
+    "docs/reports/README.md": "b6cbda0c8a8dd39933a5f17c9622f30a5c447320108a5e7c600810d82c351790",
+    "docs/reports/macos-composed-controls/README.md": "9499b35ebf39a26992785c7e43266fcaf8682d954fdf1c87bf6203d829decf4a",
+    "drivers/cogent/cmd/window-cycle-smoke/composed.go": "fa5edfe6a8dbe285af597b705caac17683e932aba1d1818050b76a63c7d92d17",
+    "drivers/cogent/cmd/window-cycle-smoke/interactions.go": "d4c59db5cb26136b556862dc2d045bdc114f1611b3e005cd45dac4ed3b01d3c1",
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": "710766a51a62c8b6790dd0feed8ef10bbbf702f63e8ceb8491f89e03c086b58e",
+    "drivers/cogent/cmd/window-cycle-smoke/selections.go": "28a64075bf44755124e2cd32d2b1c6bdc63fc3dc57edcab841a6ea142b42a4a6",
+    "drivers/cogent/cmd/window-cycle-smoke/selections_test.go": "6ab402ec626fe9e83ab8c90f4e95877a07be4d7ce78ccbc51775a02fbfcddb29",
+    "drivers/cogent/internal/acceptance/selections.go": "934f4b4b216809848b50458b1f14df545e07394fc4f85c351ca176ae860cd2c2",
+    "drivers/cogent/internal/acceptance/selections_test.go": "9b8bb3bb548fff824ae980902230ebdc94f731cb9c205c3d9d5c12c6bf3fc482",
+    "drivers/cogent/internal/acceptance/workspace.go": "be0104cbb9f191c0f62e22534edad09a218fc80fe1cc09143cc5eb575f1fa059",
+    "drivers/cogent/internal/acceptance/workspace_layout_offscreen_test.go": "97797747671139fcf96b372133ebd6400c3a675f365c722be47af33289445e2b",
+    "drivers/cogent/internal/acceptance/workspace_test.go": "519ee581d6d68df550d002d63909febe89d836bfd026c33743bcd9e4877c22a4",
+    "specs/macos-completion.md": "6fc042ae6cb41c0de340334d6d98564f55e3900c4ed3243f16f8379b930dad41",
+    "specs/workbench-endurance.md": "63287e52ff12e4f341ecf2a5d17e452bc08145245c8b67dc1f2d1a5ba2ac1692",
+    "drivers/cogent/native_services_checks_darwin.go": "15ac6ab514237673f1c514a28cd5ebcaba56e201140d9f344295463c522b3119",
+    "drivers/cogent/native_services_checks_darwin.m": "96b5f9e14273f73cdc8df3c0d57456d466a16d33a5ddb8e280030c3b90d664f3",
+    "drivers/cogent/native_services_checks_darwin_test.go": "ba5d5fe1155994ba664f6e6a5859515044805a25edc82a6dc89835f06db3c68e"
+  },
+  "checks": [
+    {
+      "name": "adapter-race-final",
+      "receipt_sha256": "d400ac6018129804bf3e0c32970967ae0089863c63e7c596a206ad3dc6d92329",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-tags",
+        "offscreen",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 111.24111395899672,
+      "later_changed_or_added_excluded_native_or_document_leaves": [
+        "docs/reports/macos-composed-controls/README.md",
+        "drivers/cogent/cmd/window-cycle-smoke/selections.go",
+        "drivers/cogent/cmd/window-cycle-smoke/selections_test.go",
+        "drivers/cogent/native_services_checks_darwin.go",
+        "drivers/cogent/native_services_checks_darwin.m",
+        "drivers/cogent/native_services_checks_darwin_test.go"
+      ],
+      "scope": "Offscreen compiled sources unchanged; later native-only/test-only or report edits excluded by explicit !offscreen tags."
+    },
+    {
+      "name": "adapter-vet-final",
+      "receipt_sha256": "6048ab97ea390a4d5a19210e943fd9c9bc19bc6a675f76b6d45f788838aebd0f",
+      "argv": [
+        "go",
+        "vet",
+        "-tags",
+        "offscreen",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 11.665938167017885,
+      "later_changed_or_added_excluded_native_or_document_leaves": [
+        "docs/reports/macos-composed-controls/README.md",
+        "drivers/cogent/native_services_checks_darwin.go",
+        "drivers/cogent/native_services_checks_darwin.m",
+        "drivers/cogent/native_services_checks_darwin_test.go"
+      ],
+      "scope": "Offscreen compiled sources unchanged; later native-only/test-only or report edits excluded by explicit !offscreen tags."
+    },
+    {
+      "name": "native-harness-final",
+      "receipt_sha256": "3a8a32edd3fd9c20585f31ba11818f17d52b04ff53ae948dcb84fcc5577330e5",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-tags=vellum_native_checks",
+        "./cmd/window-cycle-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.198330000042915,
+      "later_changed_or_added_excluded_native_or_document_leaves": [],
+      "scope": "Exact current 17-source delta."
+    },
+    {
+      "name": "native-boolean-v2",
+      "receipt_sha256": "d10b64ac33b7f41726bc657b4fffb1591de8819bac48f649dcafd1b84a31f984",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-tags=vellum_native_checks",
+        "-run",
+        "^TestNative(WindowSnapshotBooleanWire|ServiceSnapshotRejectsPartialDecode)$",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.707572959014215,
+      "later_changed_or_added_excluded_native_or_document_leaves": [],
+      "scope": "Exact current 17-source delta."
+    },
+    {
+      "name": "native-build-v4",
+      "receipt_sha256": "5d31f4ae752b8fbdf3bc08ff0ad6cba824a743ad2aefca3d2d41de042338d54a",
+      "argv": [
+        "go",
+        "build",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-macos-composed-controls/window-cycle-v4",
+        "./cmd/window-cycle-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 8.500510582933202,
+      "later_changed_or_added_excluded_native_or_document_leaves": [],
+      "scope": "Exact current 17-source delta."
+    },
+    {
+      "name": "native-vet-v2",
+      "receipt_sha256": "7e752d2240f0fef30d05658a869c1029537f9a510b77cd32574e2237df50ecc9",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=vellum_native_checks",
+        "./cmd/window-cycle-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.4124697090592235,
+      "later_changed_or_added_excluded_native_or_document_leaves": [],
+      "scope": "Exact current 17-source delta."
+    },
+    {
+      "name": "native-root-vet",
+      "receipt_sha256": "97715165ce1aa2c37715891626aa20bf121c5b3db843837e0a5141d00e72c3c8",
+      "argv": [
+        "go",
+        "vet",
+        "-tags=vellum_native_checks",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.8216587499482557,
+      "later_changed_or_added_excluded_native_or_document_leaves": [],
+      "scope": "Exact current 17-source delta."
+    }
+  ],
+  "prepared_files": 6227,
+  "prepared_map_sha256": "886d8dd7b20cefd1818bcd3d89ede3624ba58bb34baee3518826448231bfbd86",
+  "source_review_sha256": "c3b058c03d7689bf22a91ec845dad6d05d63a47439be85f5e1d67f480ac156f3",
+  "harness_review_sha256": "a4efa3bace9eff8b81c6629a95aa7f362756661061efe77a7e713d39f1c06ee3",
+  "validator_review_sha256": "ace3d6b48fe8b3dded727ba89abe110a2856487f4b360888aea8f9aba555461b",
+  "preflight": {
+    "result": "PASS_FIVE_COMPOSED_CONTROLS_PREFLIGHT",
+    "mode": "preflight",
+    "validated_utc": "2026-10-15T21:05:45.663156+00:00",
+    "validator_sha256": "0005e937ff818c879bbe91aa811ceda65cc67a325e6745af0dc365c79a531aea",
+    "run_receipt_sha256": "66905e9c529a6f7d540b716cf146eb5865029446226f5a1df910b91ece46e4dd",
+    "binary_manifest_sha256": "d5fe882377167ec3befa399b94b0f2366092196a4ed2ddf95dc34a3465a24b9c",
+    "inputs_sha256": "8fa10f945bae15e8ac967cf4a4d3ab1447584b0bf3064275aa0a0190c4cf3d87",
+    "base_commit": "3b680ecf05fad5e0ff7e563baa76d667a9d507b2",
+    "cycles": 5,
+    "steps_per_cycle": 33,
+    "actions": 165,
+    "raw_events": 173,
+    "prepared_files": 6227,
+    "elapsed_seconds": 59.7672690419713,
+    "native_cleanup": {
+      "Windows": [
+        {
+          "Title": "",
+          "Visible": false,
+          "Miniaturized": false,
+          "Key": false,
+          "OcclusionVisible": false,
+          "Frame": [
+            0,
+            0,
+            500,
+            500
+          ]
+        }
+      ],
+      "MainThread": true,
+      "CleanupObserved": true,
+      "WindowTitles": [],
+      "FilePanels": {
+        "Tracked": 0,
+        "Visible": 0,
+        "Open": 0,
+        "Save": 0
+      },
+      "NativeOutstanding": 0,
+      "AccessibilityWindows": 0,
+      "Menu": {
+        "Owned": false,
+        "OriginalRestored": false,
+        "TargetRetired": true,
+        "Items": []
+      },
+      "Tray": {
+        "Present": false,
+        "Visible": false,
+        "Template": false,
+        "TargetRetired": true,
+        "Identity": 0,
+        "Title": "",
+        "Tooltip": "",
+        "AccessibilityLabel": "",
+        "ImageWidth": 0,
+        "ImageHeight": 0,
+        "PixelWidth": 0,
+        "PixelHeight": 0,
+        "Items": []
+      },
+      "CallbacksStopped": true,
+      "PendingCallbacks": 0,
+      "MenuCallbacks": 0,
+      "TrayCallbacks": 0
+    },
+    "hidden_inactive_untitled_native_windows": 1,
+    "zero_cocoa_windows_qualified": false,
+    "menu_restoration_qualified": false,
+    "direct_child_terminal": true,
+    "owned_group_absence_confirmed": true,
+    "total_attempts": 167,
+    "total_admissions": 167,
+    "queue_admissions_are_not_accepted_callbacks": true,
+    "retry_cause_observed": false,
+    "steps_with_retries": 2,
+    "retries": [
+      {
+        "cycle": 1,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.480484833
+        }
+      },
+      {
+        "cycle": 3,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.48116675
+        }
+      }
+    ],
+    "sampled_go_heap_bytes": [
+      30153056,
+      44966624
+    ],
+    "sampled_rss_bytes": [
+      184778752,
+      352665600
+    ],
+    "terminal_sample": {
+      "Completed": 5,
+      "HeapAlloc": 44966624,
+      "HeapInuse": 58589184,
+      "GoSys": 209860920,
+      "TotalAlloc": 9795064368,
+      "Mallocs": 59412882,
+      "Frees": 59221514,
+      "NumGC": 147,
+      "Goroutines": 7,
+      "RSSBytes": 352665600,
+      "ElapsedSeconds": 57.762073125
+    },
+    "tree_ax_row_counts": [
+      15
+    ],
+    "action_wall_time_seconds": {
+      "1:check:set": {
+        "median": 0.335913125,
+        "max": 0.349999667
+      },
+      "2:switch:press": {
+        "median": 0.344208709,
+        "max": 0.346290334
+      },
+      "3:toggle:press": {
+        "median": 0.341314417,
+        "max": 0.3478175
+      },
+      "4:check:set": {
+        "median": 0.340352375,
+        "max": 0.344643042
+      },
+      "5:slider:set": {
+        "median": 0.340067333,
+        "max": 0.343491416
+      },
+      "6:number:increment": {
+        "median": 0.344673958,
+        "max": 0.348653375
+      },
+      "7:radio:set": {
+        "median": 0.341697125,
+        "max": 0.347588541
+      },
+      "8:segment:set": {
+        "median": 0.344106458,
+        "max": 0.345731667
+      },
+      "9:selector:set": {
+        "median": 0.34140875,
+        "max": 0.342226084
+      },
+      "10:button:press": {
+        "median": 0.343334375,
+        "max": 0.346520042
+      },
+      "11:disclosure:collapse": {
+        "median": 0.339477292,
+        "max": 0.342186208
+      },
+      "12:disclosure:expand": {
+        "median": 0.361691541,
+        "max": 0.533898291
+      },
+      "13:tabs:set": {
+        "median": 0.30844725,
+        "max": 0.48116675
+      },
+      "14:tabs:set": {
+        "median": 0.231040792,
+        "max": 0.234770292
+      },
+      "15:tabs:set": {
+        "median": 0.297452625,
+        "max": 0.304330542
+      },
+      "16:color/color/red:set": {
+        "median": 0.235166958,
+        "max": 0.236984292
+      },
+      "17:color/color/hex:set": {
+        "median": 0.230564334,
+        "max": 0.231214792
+      },
+      "18:tabs:set": {
+        "median": 0.23542525,
+        "max": 0.236311542
+      },
+      "19:tree:b3V0bGluZQ:row:bjA:press": {
+        "median": 0.51391825,
+        "max": 0.514826375
+      },
+      "20:tree:b3V0bGluZQ:row:bjA:collapse": {
+        "median": 0.692960375,
+        "max": 0.713417041
+      },
+      "21:tree:b3V0bGluZQ:row:bjA:expand": {
+        "median": 0.684564458,
+        "max": 0.698603042
+      },
+      "22:text:set": {
+        "median": 0.336028458,
+        "max": 0.349964667
+      },
+      "23:dialog-open:press": {
+        "median": 0.178589291,
+        "max": 0.188384042
+      },
+      "24:dialog-close:press": {
+        "median": 0.208343709,
+        "max": 0.232816708
+      },
+      "25:workspace-path/breadcrumb/item/aG9tZQ:press": {
+        "median": 0.332170459,
+        "max": 0.407765
+      },
+      "26:workspace-path/breadcrumb/item/bW9kZWxz:press": {
+        "median": 0.345797917,
+        "max": 0.355336
+      },
+      "27:tabs:set": {
+        "median": 0.292049959,
+        "max": 0.303762375
+      },
+      "28:component-list:set": {
+        "median": 0.246971792,
+        "max": 0.248488875
+      },
+      "29:component-list:set": {
+        "median": 0.246157334,
+        "max": 0.248769709
+      },
+      "30:component-list:set": {
+        "median": 0.230097,
+        "max": 0.235953417
+      },
+      "31:selection-left:press": {
+        "median": 0.23565425,
+        "max": 0.237611417
+      },
+      "32:selection-right:press": {
+        "median": 0.234795166,
+        "max": 0.239750917
+      },
+      "33:tabs:set": {
+        "median": 0.233623458,
+        "max": 0.241974625
+      }
+    },
+    "scope": "Actual Cocoa selectors with owner/publication predicates, exact workload and tracked service/visible-window retirement. Hidden untitled inactive windows are retained without attributed cause or zero-Cocoa-window/OS-global claims. Wall time includes inspection/waits, not frame or input latency. Sampled RSS does not attribute native/GPU allocation.",
+    "physical_input_qualified": false,
+    "native_focus_reveal_qualified": false,
+    "human_voiceover_qualified": false,
+    "native_heap_budget_qualified": false,
+    "gpu_memory_qualified": false,
+    "full_p11_qualified": false,
+    "full_mac_qualified": false
+  },
+  "preflight_validation_sha256": "e5a8af72aa515f524bc36f6ac712500ce4456d476c418f1ac4a330e8030636ed",
+  "failed_native_attempt": {
+    "name": "composed-preflight",
+    "receipt_sha256": "86d5bf0993c83858745a66e128659b79ad18c02256b2758dda5ebd09237b007d",
+    "result": "FAILED_ZERO_COMPLETED_CYCLES",
+    "cause": "Native-check window OcclusionVisible boxed as an integer NSNumber; Go bool decode refused.",
+    "owned_direct_child_terminal": true,
+    "owned_group_absence_confirmed": true,
+    "cleanup_snapshot_qualified": false
+  },
+  "failed_inert_attempts": [
+    {
+      "name": "native-boolean-final",
+      "receipt_sha256": "aa9ef697f3146458c0a2e850042902116873e9b7dfb6d8baec10ef28b4f0550b",
+      "qualification": "Failed because the unrelated-mask fixture used the actual visible bit; not an isolating original-regression result."
+    },
+    {
+      "name": "native-boolean-original",
+      "receipt_sha256": "a7ec838d9f41407d5d96378df1d6fb8ec9ba58c4d4827f13c57b6bc601fd68e2",
+      "qualification": "Failed because the unrelated-mask fixture used the actual visible bit; not an isolating original-regression result."
+    }
+  ],
+  "original_failure_evidence": "Actual first native preflight refused numeric OcclusionVisible before any completed cycles. Inert overlay attempt is not an original-regression qualification.",
+  "native_application_executed": true,
+  "native_selector_actions_qualified": 165,
+  "automated_manual_key_pointer_routing_qualified": true,
+  "physical_input_qualified": false,
+  "native_focus_reveal_qualified": false,
+  "zero_cocoa_windows_qualified": false,
+  "menu_restoration_qualified": false,
+  "human_voiceover_qualified": false,
+  "native_heap_budget_qualified": false,
+  "gpu_memory_qualified": false,
+  "sustained_latency_qualified": false,
+  "current_1000_cycle_campaign_qualified": false,
+  "full_P4_qualified": false,
+  "full_P6_qualified": false,
+  "full_P9_qualified": false,
+  "full_P11_qualified": false,
+  "full_mac_qualified": false,
+  "os_input_sources_changed": false,
+  "voiceover_changed": false,
+  "clipboard_access": false,
+  "os_preferences_changed": false,
+  "cross_window_palette_drop_qualified": false,
+  "checkpoint_review_sha256": "37cde75b6d73b31f47dd100aca60576cadfd9a2aaaaaaa392faa9ebae2a8f436",
+  "prism_process_sha256": "bdcefd1f81f52724a09426ed2f84e3b0fd2154ae843f1a763e7ca325920c67c6",
+  "prism_sha256": "5eec365bfb09199dc6745ef1780a878e9669cef7e627018352d5f1bff13a3b97",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_invocations": 1,
+  "prism_coverage_complete": true,
+  "prism_files": 17,
+  "prism_llm_calls": 4,
+  "prism_findings": 0,
+  "prism_unresolved_findings": 0,
+  "archive_sha256": "450a1d77692af3026200b5307121e2546af8bb3c56972182e327538497672276",
+  "archive_bytes": 565136,
+  "archive_members": 155
+}

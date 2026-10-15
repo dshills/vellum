@@ -33,6 +33,8 @@ type Workspace struct {
 	Tree                        *virtual.Outline
 	Color                       *ui.ColorPicker
 	Breadcrumb                  *ui.Breadcrumb
+	Drawing                     *canvas.Scene
+	listSelection               string
 	Dock                        *cogent.Workbench
 	checked, open, dialog       bool
 	number                      float32
@@ -69,6 +71,11 @@ func New(owner *app.Application, window string, gpuCanvas any) (*Workspace, erro
 		}
 	}
 	var err error
+	w.Drawing, err = newSelectionScene()
+	if err != nil {
+		return nil, err
+	}
+	w.listSelection = "b"
 	w.Editor, err = editor.New("Native document\nGo owner and shared history", editor.Config{MaxBytes: 4096, HistoryLimit: 16})
 	if err != nil {
 		return nil, err
@@ -186,10 +193,11 @@ func (w *Workspace) View() ui.Node {
 	return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Style: compact, Children: []ui.Node{
 		{ID: "density-scroll", Kind: ui.Scroll, Grow: true, MinHeight: 160, Style: ui.Style{MinSize: ui.Some(ui.Size{Height: 160}), MaxSize: ui.Some(ui.Size{Height: 170})}, Children: []ui.Node{dense}},
 		controls,
-		{ID: "tabs", Kind: ui.Tabs, Grow: true, SelectedID: w.tab, Options: []ui.Option{{ID: "live", Label: "Workspace"}, {ID: "about", Label: "About"}, {ID: "colors", Label: "Colors"}}, Change: func(e ui.ChangeEvent) { w.tab = e.SelectedID; w.changes[e.ID]++ }, Children: []ui.Node{
+		{ID: "tabs", Kind: ui.Tabs, Grow: true, SelectedID: w.tab, Options: []ui.Option{{ID: "live", Label: "Workspace"}, {ID: "about", Label: "About"}, {ID: "colors", Label: "Colors"}, {ID: "selections", Label: "Selections"}}, Change: func(e ui.ChangeEvent) { w.tab = e.SelectedID; w.changes[e.ID]++ }, Children: []ui.Node{
 			{ID: "live", Kind: ui.Extension, Grow: true, MinHeight: 240, Custom: w.Dock},
 			{ID: "about", Kind: ui.Label, Text: "All-component acceptance workspace"},
 			{ID: "colors", Kind: ui.Scroll, Grow: true, Children: []ui.Node{w.Color.View()}},
+			w.selectionView(),
 		}},
 		{ID: "dialog", Kind: ui.Dialog, Text: "Acceptance dialog", Open: w.dialog, Dismiss: func() { w.dialog = false }, Children: []ui.Node{{ID: "dialog-label", Kind: ui.Label, Text: "Composed modal lifecycle"}, {ID: "dialog-close", Kind: ui.Button, Text: "Close", Activate: func() { w.dialog = false }}}},
 	}}
@@ -230,6 +238,7 @@ type ControlState struct {
 	Color                                              color.NRGBA
 	Number                                             float32
 	Choice, Tab                                        string
+	ListSelection, DrawingSelection                    string
 	BreadcrumbCurrent                                  string
 	BreadcrumbItems                                    int
 	Actions, TreeSelections, Disclosures, WorkerActive int
@@ -242,7 +251,7 @@ func (w *Workspace) State() ControlState {
 	if w.manager != nil {
 		active = w.manager.Pending().Active
 	}
-	return ControlState{Color: w.Color.Color, Checked: w.checked, IndicatorsOpen: w.open, DialogOpen: w.dialog, Number: w.number, Choice: w.choice, Tab: w.tab, BreadcrumbCurrent: w.Breadcrumb.Items[len(w.Breadcrumb.Items)-1].ID, BreadcrumbItems: len(w.Breadcrumb.Items), Actions: w.actions, TreeSelections: w.treeSelections, Disclosures: w.disclosures, WorkerActive: active, Changes: maps.Clone(w.changes), Failure: w.workerError}
+	return ControlState{Color: w.Color.Color, Checked: w.checked, IndicatorsOpen: w.open, DialogOpen: w.dialog, Number: w.number, Choice: w.choice, Tab: w.tab, ListSelection: w.listSelection, DrawingSelection: w.Drawing.Selected, BreadcrumbCurrent: w.Breadcrumb.Items[len(w.Breadcrumb.Items)-1].ID, BreadcrumbItems: len(w.Breadcrumb.Items), Actions: w.actions, TreeSelections: w.treeSelections, Disclosures: w.disclosures, WorkerActive: active, Changes: maps.Clone(w.changes), Failure: w.workerError}
 }
 
 func (w *Workspace) recordFailure(err error) {

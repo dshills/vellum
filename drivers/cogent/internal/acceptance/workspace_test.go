@@ -27,7 +27,7 @@ func TestWorkspaceCatalogAndFreshModelIsolation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if first.Editor == second.Editor || first.Grid == second.Grid || first.Tree == second.Tree || first.Dock == second.Dock || first.Color == second.Color || first.Breadcrumb == second.Breadcrumb {
+	if first.Editor == second.Editor || first.Grid == second.Grid || first.Tree == second.Tree || first.Dock == second.Dock || first.Color == second.Color || first.Breadcrumb == second.Breadcrumb || first.Drawing == second.Drawing {
 		t.Fatal("per-window mutable models aliased")
 	}
 	kinds := map[ui.Kind]bool{}
@@ -56,7 +56,7 @@ func TestWorkspaceCatalogAndFreshModelIsolation(t *testing.T) {
 	if labels != DenseLabels {
 		t.Fatalf("dense fixture has %d labels", labels)
 	}
-	for _, kind := range []ui.Kind{ui.Column, ui.Row, ui.Label, ui.Button, ui.Icon, ui.Image, ui.Extension, ui.Checkbox, ui.Switch, ui.ToggleButton, ui.ProgressBar, ui.ProgressRing, ui.ProgressGauge, ui.Separator, ui.MenuButton, ui.RadioGroup, ui.SegmentedControl, ui.Selector, ui.Slider, ui.NumberField, ui.TextField, ui.MultilineText, ui.DataGrid, ui.DataTree, ui.Tabs, ui.Scroll, ui.Toolbar, ui.StatusBar, ui.FormGroup, ui.Disclosure, ui.SplitPane, ui.Dialog} {
+	for _, kind := range []ui.Kind{ui.Column, ui.Row, ui.Label, ui.Button, ui.Icon, ui.Image, ui.Extension, ui.Canvas2D, ui.Checkbox, ui.Switch, ui.ToggleButton, ui.ProgressBar, ui.ProgressRing, ui.ProgressGauge, ui.Separator, ui.MenuButton, ui.RadioGroup, ui.SegmentedControl, ui.Selector, ui.ListBox, ui.Slider, ui.NumberField, ui.TextField, ui.MultilineText, ui.DataGrid, ui.DataTree, ui.Tabs, ui.Scroll, ui.Toolbar, ui.StatusBar, ui.FormGroup, ui.Disclosure, ui.SplitPane, ui.Dialog} {
 		if !kinds[kind] {
 			t.Errorf("accepted component %s missing", kind)
 		}

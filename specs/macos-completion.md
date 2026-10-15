@@ -814,3 +814,10 @@ transitions retire old objects while preserving ordinary cached bounds. See
 the [follow-up evidence](../docs/reports/macos-listbox-metadata/README.md) for the
 external native query/selection checks and their exact scope. Native pointer,
 keyboard and focus-reveal qualification remain open.
+
+The [composed control coverage follow-up](../docs/reports/macos-composed-controls/README.md)
+adds ListBox and named managed Canvas2D to the native all-kind lifecycle fixture.
+Its version-2 plan requires 33 acknowledged owner/native actions per fresh window,
+including rejected/repeated list proposals and current canvas publication.
+Fresh native evidence is required; earlier 24/26-step results do not qualify this
+mix, physical input, sustained performance or the remaining full Mac gates.

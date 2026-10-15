@@ -3,6 +3,8 @@
 package acceptance
 
 import (
+	"cogentcore.org/core/events"
+	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/text/fonts"
 	"context"
 	"crypto/sha256"
@@ -64,6 +66,9 @@ func TestWorkspaceCompletedDensityGeometry(t *testing.T) {
 			}
 		}
 		project(&n)
+		if workspace.tab == "selections" {
+			n.Focus = ui.FocusRequest{ID: SelectionListID, Sequence: 1}
+		}
 		return n
 	}}); err != nil {
 		t.Fatal(err)
@@ -152,6 +157,72 @@ func TestWorkspaceCompletedDensityGeometry(t *testing.T) {
 		if !found {
 			t.Fatalf("selected color field has no visible geometry: %s", c)
 		}
+	}
+	settle := func() {
+		t.Helper()
+		for range 32 {
+			if _, err := manual.Step(ctx, 16); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := manual.Frame(ctx, "one"); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	if err = a.Do(func() { workspace.tab = "selections"; _ = a.Invalidate("one") }); err != nil {
+		t.Fatal(err)
+	}
+	settle()
+	snapshot, err = manual.Snapshot(ctx)
+	if err != nil || snapshot.Windows[0].FocusedID != SelectionListID {
+		t.Fatal("selected list page did not allocate focus", snapshot, err)
+	}
+	window := snapshot.Windows[0].Incarnation
+	for i, code := range []key.Codes{key.CodeEnd, key.CodeHome, key.CodeEnd} {
+		if err = manual.Input(ctx, cogent.ManualInput{Window: "one", WindowIncarnation: window, Type: events.KeyChord, Code: code}); err != nil {
+			t.Fatal(err)
+		}
+		settle()
+		if workspace.State().ListSelection != "last" || workspace.State().Changes[SelectionListID] != i+1 {
+			t.Fatal("actual list accept/reject/repeat route", i, workspace.State())
+		}
+	}
+	for i, id := range []string{SelectionLeftID, SelectionRightID} {
+		snapshot, err = manual.Snapshot(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var target [4]float32
+		for _, drawing := range snapshot.Windows[0].Canvases {
+			if drawing.ID == SelectionCanvasID {
+				for _, object := range drawing.Objects {
+					if object.ObjectID == id {
+						target = object.Bounds
+					}
+				}
+			}
+		}
+		if target[2] <= 0 || target[3] <= 0 {
+			t.Fatal("selected canvas object lacks completed measured geometry", id, snapshot.Windows[0].Canvases)
+		}
+		point := image.Pt(int(target[0]+target[2]/2), int(target[1]+target[3]/2))
+		for _, kind := range []events.Types{events.MouseDown, events.MouseUp} {
+			if err = manual.Input(ctx, cogent.ManualInput{Window: "one", WindowIncarnation: window, Type: kind, Button: events.Left, Position: point}); err != nil {
+				t.Fatal(err)
+			}
+		}
+		settle()
+		if workspace.State().DrawingSelection != id || workspace.State().Changes[SelectionCanvasID] != i+1 {
+			t.Fatal("actual measured canvas pointer selection", i, workspace.State())
+		}
+	}
+	if err = a.Do(func() { workspace.tab = "live"; _ = a.Invalidate("one") }); err != nil {
+		t.Fatal(err)
+	}
+	settle()
+	snapshot, err = manual.Snapshot(ctx)
+	if err != nil || len(snapshot.Windows[0].Canvases) != 0 || workspace.State().ListSelection != "last" || workspace.State().DrawingSelection != SelectionRightID {
+		t.Fatal("hidden selection page leaked geometry or lost model state", snapshot, err)
 	}
 
 }

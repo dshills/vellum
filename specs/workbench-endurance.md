@@ -122,6 +122,24 @@ from native button to current-location static text, retirement of the old leaf,
 and positive native geometry. This raises the plan to 26 steps per fresh window;
 earlier 24-step retention evidence remains bound to its original source.
 
+The current action plan is version 2 with 33 steps. A Selections page adds the
+bounded ListBox and named managed Canvas2D alongside the existing custom GPU
+canvas. Three list proposals require exactly one callback each: accepting the
+last ID, rejecting the first ID, then repeating the accepted last ID. All eight
+native rows, the disabled row, unique identities and bounded clipped visible
+rows must agree with the accepted selection. Host selection of an offscreen row
+does not qualify native scrolling or focus reveal.
+
+Two named Canvas2D presses must select the corresponding fresh per-window scene
+object exactly once. The native target belongs to the intended canvas parent and
+scope; host and both children must share one nonpending completed generation.
+Native identities/incarnation persist across the selections while generation
+advances. Positive finite clipped geometry, names, roles and selected flags are
+required. Returning to Workspace restores the original density/teardown checks.
+The catalog/layout/routing regressions include both added accepted kinds. Earlier
+24/26-step campaigns remain historical; this 33-step mix needs its own complete
+native campaign and does not close P11 or physical input acceptance.
+
 
 ## Idle and background soak mode
 

@@ -8,6 +8,7 @@ package cogent
 #include <stdlib.h>
 void vellumNativeServicesCheck(uint64_t token, const char *json);
 char *vellumNativeServicesCleanupCheck(void);
+char *vellumNativeWindowSnapshotFixture(void);
 */
 import "C"
 
@@ -95,7 +96,7 @@ func CheckNativeServices(ctx context.Context, operation, index int) (NativeServi
 		C.vellumNativeServicesCheck(C.uint64_t(token), text)
 	}, nil)
 	if err == nil {
-		err = json.Unmarshal([]byte(value), &state)
+		state, err = decodeNativeServiceSnapshot(value)
 	}
 	if err == nil && !state.MainThread {
 		err = fmt.Errorf("cogent: native check did not run on main thread")
@@ -111,18 +112,38 @@ func CheckNativeServices(ctx context.Context, operation, index int) (NativeServi
 	return state, err
 }
 
+// Refuse partial decoding: a type error can leave otherwise plausible cleanup
+// fields populated, so callers must never publish that partially decoded value.
+func decodeNativeServiceSnapshot(raw string) (NativeServiceCheckState, error) {
+	var state NativeServiceCheckState
+	if err := json.Unmarshal([]byte(raw), &state); err != nil {
+		return NativeServiceCheckState{}, err
+	}
+	return state, nil
+}
+
+func nativeWindowSnapshotFixture() string {
+	text := C.vellumNativeWindowSnapshotFixture()
+	defer C.free(unsafe.Pointer(text))
+	return C.GoString(text)
+}
+
 var nativeServiceCleanupCheck atomic.Pointer[NativeServiceCheckState]
 
 // Register before Driver.Run. Reverse hook order makes this observer run after
 // production service retirement, while AppKit is still valid. It never queues
 // work or enters the UI owner. The caller can remove it if Run never starts.
 func ObserveNativeServiceCleanup() (func(), error) {
+	nativeServiceCleanupCheck.Store(nil)
 	return desktop.TheApp.AddMainCleanup(func() {
 		text := C.vellumNativeServicesCleanupCheck()
 		defer C.free(unsafe.Pointer(text))
-		state := NativeServiceCheckState{}
-		if text != nil {
-			_ = json.Unmarshal([]byte(C.GoString(text)), &state)
+		if text == nil {
+			return
+		}
+		state, err := decodeNativeServiceSnapshot(C.GoString(text))
+		if err != nil {
+			return
 		}
 		nativeCallbacks.Lock()
 		state.CallbacksStopped = nativeCallbacks.stopped

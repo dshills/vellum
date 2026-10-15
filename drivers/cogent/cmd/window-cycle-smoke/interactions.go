@@ -26,8 +26,13 @@ type nativeActionRecord struct {
 	AttachmentRetirement    *cogent.AccessibilityRetirement `json:",omitempty"`
 	FailureContext          *nativeActionFailure            `json:",omitempty"`
 }
+
+const nativeActionPlanVersion = 2
+const nativeActionPlanSteps = 33
+
 type nativeActionHooks struct {
 	targetRole string
+	eligible   func(cogent.AccessibilityInspection, cogent.AccessibilityElement) bool
 	accepted   func(context.Context) (bool, error)
 	inspect    func(context.Context) (cogent.AccessibilityInspection, error)
 	perform    func(context.Context, string) (bool, error)
@@ -61,6 +66,9 @@ func runNativeAction(ctx context.Context, duration time.Duration, target, kind, 
 		}
 		for _, e := range native.Elements {
 			if e.DomainID != target || h.targetRole != "" && e.Role != h.targetRole || !e.Enabled || e.Frame[2] <= 0 || e.Frame[3] <= 0 {
+				continue
+			}
+			if h.eligible != nil && !h.eligible(native, e) {
 				continue
 			}
 			record.Attempts++
@@ -117,6 +125,12 @@ func exerciseNativeActions(ctx context.Context, a *app.Application, id string, w
 		}
 		record, err := runNativeAction(ctx, 5*time.Second, target, kind, value, nativeActionHooks{
 			targetRole: role,
+			eligible: func(s cogent.AccessibilityInspection, e cogent.AccessibilityElement) bool {
+				if target != acceptance.SelectionLeftID && target != acceptance.SelectionRightID {
+					return true
+				}
+				return selectionCanvasTarget(s, e)
+			},
 			accepted: func(inner context.Context) (bool, error) {
 				ready := false
 				reply, err := ownerProbe(inner, a, func() ownerReply {
@@ -302,6 +316,28 @@ func exerciseNativeActions(ctx context.Context, a *app.Application, id string, w
 	if err := run(ui.BreadcrumbItemID("workspace-path", "models"), "press", "", changed("workspace-path", 2, func(s acceptance.ControlState) bool { return s.BreadcrumbItems == 2 && s.BreadcrumbCurrent == "models" }), func(s cogent.AccessibilityInspection) bool {
 		return breadcrumbEnvelopeCompleted(s, true)
 	}); err != nil {
+		return records, err
+	}
+	if err := run("tabs", "set", "selections", changed("tabs", 5, func(s acceptance.ControlState) bool { return s.Tab == "selections" }), valueMatches("tabs", "Selections")); err != nil {
+		return records, err
+	}
+	var listIdentity selectionListIdentity
+	for i, proposal := range []string{"last", "a", "last"} {
+		if err := run(acceptance.SelectionListID, "set", proposal, changed(acceptance.SelectionListID, i+1, func(s acceptance.ControlState) bool { return s.ListSelection == "last" }), func(s cogent.AccessibilityInspection) bool {
+			return selectionListCompleted(s, &listIdentity)
+		}); err != nil {
+			return records, err
+		}
+	}
+	var canvasIdentity selectionCanvasIdentity
+	for i, object := range []string{acceptance.SelectionLeftID, acceptance.SelectionRightID} {
+		if err := run(object, "press", "", changed(acceptance.SelectionCanvasID, i+1, func(s acceptance.ControlState) bool { return s.DrawingSelection == object }), func(s cogent.AccessibilityInspection) bool {
+			return selectionCanvasCompleted(s, object, &canvasIdentity)
+		}); err != nil {
+			return records, err
+		}
+	}
+	if err := run("tabs", "set", "live", changed("tabs", 6, func(s acceptance.ControlState) bool { return s.Tab == "live" }), valueMatches("tabs", "Workspace")); err != nil {
 		return records, err
 	}
 	return records, nil
