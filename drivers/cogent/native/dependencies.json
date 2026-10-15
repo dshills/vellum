@@ -661,6 +661,17 @@
               "sha256": "ea661c9025dbf964f18b8d6a3755a061eb4bcff6a010e73935de81c878dbdc76"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/glyphfingerprint",
+          "inputs": "native/patches/glyphfingerprint/original-hashes.json",
+          "outputs": "native/patches/glyphfingerprint/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/glyphfingerprint/0068-single-pass-glyph-fingerprint.patch",
+              "sha256": "8d27d3076c3231fafcd53121a36f1bb2fddb594766669c0146df26e9145ad034"
+            }
+          ]
         }
       ]
     },

@@ -463,6 +463,10 @@ exact equality and individual value corruption. Five interleaved offscreen
 median 5.241 ms before and 3.908 ms after with matching pixels and encoded shapes. This local capture result does not establish
 native frame latency or the unchanged P6 targets.
 
+Stage 68 supersedes only this internal hash's normalization as described in
+[one-pass glyph fingerprints](#one-pass-glyph-fingerprint). The original
+geometry-admission/origin and exact-comparison oracles remain required.
+
 
 ## Packed owned span rows
 
@@ -551,3 +555,29 @@ packed rows into individual storage. No-op/refused spans cannot trigger that
 copy. Successful/refused Seal clears packed state and all construction references.
 See the [checkpoint](../docs/reports/macos-packed-coverage/README.md); software
 allocation observations do not qualify native latency, GPU or retained memory.
+
+## One-pass glyph fingerprint
+
+Stage 68 combines grammar, fixed-coordinate range/extents and fingerprint work in
+one bounded walk of at most 512 path values. Every previous admission rule,
+minimum-bound replay origin and full guard pixel inside target/clip is retained.
+The private parser's admitted leading Close/non-Move commands remain admitted;
+the anchor is the first validated coordinate pair, not a presumed first command.
+
+The FNV candidate index normalizes coordinates to that first point's integer
+pixel origin. Signed relative words are hashed as uint32; integer translations
+retain the same key and fractional phases participate. Key values deliberately
+change from stage 59's minimum-origin normalization and are not persisted/public
+identities. Retained paths and collision checks continue to use the minimum-bound
+origin and compare every command and coordinate. A key match alone never
+authorizes reuse. Cold rendering, FIFO/byte limits, renderer ownership, original
+outline/work budgets, scanner cleanup and packet/storage formats are unchanged.
+
+The pinned original admission/origin oracle and full exact-equality/corruption
+checks remain required. An independent callback-walker oracle checks the new
+fingerprint, including first-point-not-minimum paths, signed deltas, fractional
+phases, integer translations and permissive grammar. Forced collisions, clipping,
+malformed/truncated input, capacity limits and exact actual-grid packet/pixel
+comparisons guard reuse. The [checkpoint](../docs/reports/macos-glyph-fingerprint/README.md)
+records software evidence; shared-computer times do not qualify native latency or
+close the unchanged P6 targets.

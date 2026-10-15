@@ -1,0 +1,211 @@
+--- a/paint/renderers/rasterx/glyph_coverage.go
++++ b/paint/renderers/rasterx/glyph_coverage.go
+@@ -48,6 +48,10 @@
+ }
+ 
+ // Every original float32 operation and ToFixed conversion already ran in Path.
++// Fingerprints normalize to the first point's pixel origin so grammar, bounds
++// and hashing share one walk. This internal index may collide; retained paths
++// and full equality still use the minimum-bound origin. Integer translations
++// preserve the key, while fractional coordinate phases remain represented.
+ // Only exact normalized operation/coordinate equality can authorize reuse.
+ func glyphCoverageGeometry(p Path, bounds, clip image.Rectangle) (image.Point, uint64, bool) {
+ 	if len(p) == 0 || len(p) > glyphCoveragePathValues || bounds.Min != (image.Point{}) || clip.Empty() {
+@@ -55,6 +59,8 @@
+ 	}
+ 	lo, hi := image.Pt(1<<30, 1<<30), image.Point{}
+ 	points := 0
++	anchor := image.Point{}
++	h := uint64(14695981039346656037)
+ 	for i := 0; i < len(p); {
+ 		n := 0
+ 		switch PathCommand(p[i]) {
+@@ -72,11 +78,20 @@
+ 		if i+n > len(p) {
+ 			return image.Point{}, 0, false
+ 		}
++		h ^= uint64(uint32(p[i]))
++		h *= 1099511628211
+ 		for j := i + 1; j < i+n; j += 2 {
+ 			x, y := int(p[j]), int(p[j+1])
+ 			if x < 0 || y < 0 || x > 8192*64 || y > 8192*64 {
+ 				return image.Point{}, 0, false
+ 			}
++			if points == 0 {
++				anchor = image.Pt(x/64, y/64)
++			}
++			h ^= uint64(uint32(p[j] - fixed.Int26_6(anchor.X*64)))
++			h *= 1099511628211
++			h ^= uint64(uint32(p[j+1] - fixed.Int26_6(anchor.Y*64)))
++			h *= 1099511628211
+ 			lo.X = min(lo.X, x)
+ 			lo.Y = min(lo.Y, y)
+ 			hi.X = max(hi.X, x)
+@@ -93,27 +108,6 @@
+ 	hull := image.Rectangle{Min: origin, Max: image.Pt((hi.X+63)/64+1, (hi.Y+63)/64+1)}
+ 	if hull.Dx() > 128 || hull.Dy() > 128 || !hull.In(bounds) || !hull.In(clip) {
+ 		return image.Point{}, 0, false
+-	}
+-	h := uint64(14695981039346656037)
+-	for i := 0; i < len(p); {
+-		h ^= uint64(uint32(p[i]))
+-		h *= 1099511628211
+-		n := 1
+-		switch PathCommand(p[i]) {
+-		case PathMoveTo, PathLineTo:
+-			n = 3
+-		case PathQuadTo:
+-			n = 5
+-		case PathCubicTo:
+-			n = 7
+-		}
+-		for j := i + 1; j < i+n; j += 2 {
+-			h ^= uint64(uint32(p[j] - fixed.Int26_6(origin.X*64)))
+-			h *= 1099511628211
+-			h ^= uint64(uint32(p[j+1] - fixed.Int26_6(origin.Y*64)))
+-			h *= 1099511628211
+-		}
+-		i += n
+ 	}
+ 	return origin, h, true
+ }
+--- a/paint/renderers/rasterx/glyph_lookup_vellum_test.go
++++ b/paint/renderers/rasterx/glyph_lookup_vellum_test.go
+@@ -96,12 +96,18 @@
+ 			clip = image.Rect(base.X+1, base.Y+1, base.X+32, base.Y+32)
+ 		}
+ 		origin, hash, ok := glyphCoverageGeometry(p, bounds, clip)
+-		oldOrigin, oldHash, oldOK := glyphCoverageGeometryWalkerOracle(p, bounds, clip)
+-		if origin != oldOrigin || hash != oldHash || ok != oldOK {
+-			t.Fatal("normalized hash differs from original walker", iteration)
++		oldOrigin, _, oldOK := glyphCoverageGeometryWalkerOracle(p, bounds, clip)
++		if origin != oldOrigin || ok != oldOK {
++			t.Fatal("geometry admission/origin differs from original walker", iteration)
+ 		}
+ 		if !ok {
++			if hash != 0 {
++				t.Fatal("refused geometry returned fingerprint")
++			}
+ 			continue
++		}
++		if hash != firstPointHashWalkerOracle(p) {
++			t.Fatal("first-point fingerprint differs from independent walker", iteration)
+ 		}
+ 		key := make(Path, len(p))
+ 		j := 0
+--- /dev/null
++++ b/paint/renderers/rasterx/glyph_fingerprint_vellum_test.go
+@@ -0,0 +1,113 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"golang.org/x/image/math/fixed"
++	"image"
++	"testing"
++)
++
++// The original callback walker remains an independent key-word emitter. Only
++// its hash origin changes; retained paths still normalize to the minimum hull.
++func firstPointHashWalkerOracle(p Path) uint64 {
++	var anchor image.Point
++	widths := map[PathCommand]int{PathMoveTo: 3, PathLineTo: 3, PathQuadTo: 5, PathCubicTo: 7, PathClose: 1}
++	for i := 0; i < len(p); i += widths[PathCommand(p[i])] {
++		if widths[PathCommand(p[i])] > 1 {
++			anchor = image.Pt(int(p[i+1])/64, int(p[i+2])/64)
++			break
++		}
++	}
++	hash := uint64(14695981039346656037)
++	glyphCoverageWalk(p, anchor, func(v fixed.Int26_6) { hash ^= uint64(uint32(v)); hash *= 1099511628211 })
++	return hash
++}
++func shiftedFingerprintPath(p Path, dx, dy int) Path {
++	out := append(Path(nil), p...)
++	widths := map[PathCommand]int{PathMoveTo: 3, PathLineTo: 3, PathQuadTo: 5, PathCubicTo: 7, PathClose: 1}
++	for i := 0; i < len(out); i += widths[PathCommand(out[i])] {
++		for j := i + 1; j < i+widths[PathCommand(out[i])]; j += 2 {
++			out[j] += fixed.Int26_6(dx)
++			out[j+1] += fixed.Int26_6(dy)
++		}
++	}
++	return out
++}
++func TestVellumGlyphFingerprintTranslationAndFractionalPhases(t *testing.T) {
++	bounds := image.Rect(0, 0, 8192, 8192)
++	// First point is deliberately neither minimum coordinate. Leading Close and
++	// LineTo are admitted by the existing geometry parser and must remain legal.
++	p := Path{fixed.Int26_6(PathClose), fixed.Int26_6(PathLineTo), 100*64 + 32, 100*64 + 32,
++		fixed.Int26_6(PathQuadTo), 99*64 + 7, 98*64 + 11, 102*64 + 1, 101*64 + 13,
++		fixed.Int26_6(PathCubicTo), 98*64 + 2, 102*64 + 5, 103*64 + 7, 97*64 + 9, 101*64 + 11, 99*64 + 13,
++		fixed.Int26_6(PathClose)}
++	seen := map[uint64]bool{}
++	for x := 0; x < 64; x++ {
++		for y := 0; y < 64; y++ {
++			phase := shiftedFingerprintPath(p, x, y)
++			origin, key, ok := glyphCoverageGeometry(phase, bounds, bounds)
++			oldOrigin, _, oldOK := glyphCoverageGeometryWalkerOracle(phase, bounds, bounds)
++			if !ok || ok != oldOK || origin != oldOrigin || key != firstPointHashWalkerOracle(phase) {
++				t.Fatal("phase oracle", x, y)
++			}
++			seen[key] = true
++			normalized := make(Path, len(phase))
++			at := 0
++			glyphCoverageWalk(phase, origin, func(v fixed.Int26_6) { normalized[at] = v; at++ })
++			e := &glyphCoverageEntry{path: normalized}
++			for _, delta := range []image.Point{{0, 0}, {3, -5}, {-50, 70}, {7980, 7970}} {
++				translated := shiftedFingerprintPath(phase, delta.X*64, delta.Y*64)
++				gotOrigin, gotKey, gotOK := glyphCoverageGeometry(translated, bounds, bounds)
++				if !gotOK || gotKey != key || gotOrigin != origin.Add(delta) || !glyphCoverageMatches(e, translated, gotOrigin) {
++					t.Fatal("integer translation changed exact identity", x, y, delta)
++				}
++			}
++			changed := shiftedFingerprintPath(phase, 1, 0)
++			changedOrigin, _, changedOK := glyphCoverageGeometry(changed, bounds, bounds)
++			if !changedOK || glyphCoverageMatches(e, changed, changedOrigin) {
++				t.Fatal("fractional translation reused different exact path", x, y)
++			}
++		}
++	}
++	// This deterministic corpus also checks useful phase discrimination. Correct
++	// reuse never relies on this count: full path comparison still guards hits.
++	if len(seen) != 64*64 {
++		t.Fatalf("fingerprint phase collisions in corpus: %d", len(seen))
++	}
++}
++func TestVellumGlyphFingerprintRefusalMatchesOriginal(t *testing.T) {
++	bounds := image.Rect(0, 0, 8192, 8192)
++	valid := Path{fixed.Int26_6(PathMoveTo), 64*20 + 7, 64*20 + 11, fixed.Int26_6(PathQuadTo), 64 * 19, 64 * 18, 64 * 22, 64 * 21, fixed.Int26_6(PathClose)}
++	paths := []Path{nil, {}, {fixed.Int26_6(PathClose)}, {99}, append(Path(nil), valid...)}
++	for n := 0; n < len(valid); n++ {
++		paths = append(paths, append(Path(nil), valid[:n]...))
++	}
++	paths = append(paths, shiftedFingerprintPath(valid, -64*21, 0), shiftedFingerprintPath(valid, 8192*64, 0), shiftedFingerprintPath(valid, 64*129, 0))
++	for n := 0; n < len(valid); n++ {
++		broken := append(Path(nil), valid...)
++		broken[n] = -1
++		paths = append(paths, broken)
++	}
++	long := Path{}
++	for len(long) <= glyphCoveragePathValues {
++		long = append(long, valid...)
++	}
++	paths = append(paths, long)
++	for pi, p := range paths {
++		for _, box := range []struct{ bounds, clip image.Rectangle }{{bounds, bounds}, {bounds, image.Rectangle{}}, {bounds, image.Rect(19, 18, 22, 21)}, {image.Rect(1, 1, 8192, 8192), bounds}, {image.Rect(0, 0, 22, 21), bounds}} {
++			origin, key, ok := glyphCoverageGeometry(p, box.bounds, box.clip)
++			oldOrigin, _, oldOK := glyphCoverageGeometryWalkerOracle(p, box.bounds, box.clip)
++			if origin != oldOrigin || ok != oldOK {
++				t.Fatal("admission/origin differs", pi, box)
++			}
++			if ok {
++				if key != firstPointHashWalkerOracle(p) {
++					t.Fatal("accepted key differs", pi)
++				}
++			} else if key != 0 {
++				t.Fatal("refused key differs", pi)
++			}
++		}
++	}
++}

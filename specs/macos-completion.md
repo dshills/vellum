@@ -786,3 +786,13 @@ claiming complete embedded component provenance or approving rights. Public audi
 native latency/memory/endurance, physical input/displays, human accessibility and
 full Mac completion remain open. No native application is launched for this
 checkpoint while the human is online.
+
+## One-pass glyph fingerprint checkpoint
+
+The [fingerprint checkpoint](../docs/reports/macos-glyph-fingerprint/README.md)
+removes a repeated path traversal from the measured scene-capture lookup path.
+Validation and internal candidate hashing share one walk; minimum-origin replay,
+exact path matching, clipping and existing cache/work bounds remain unchanged.
+Software grid parity and shared-computer elapsed observations advance source
+work only. The failed native 4/6 ms targets, full P4/P6/P11, native/GPU memory,
+endurance, physical/human checks and distribution rights remain open.

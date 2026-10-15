@@ -53,3 +53,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Palette placement](macos-palette-placement/README.md): typed public API, same-window capture, independent demo and code-only routing evidence.
 
 - [Owned private Mac build](macos-owned-build/README.md): observed compiler pairing for executable/map, sampled input stability and bounded logs; runtime and distribution rights remain separate.
+
+- [One-pass glyph fingerprint](macos-glyph-fingerprint/README.md): fused geometry validation/internal hashing with exact normalized path equality and software capture parity.
