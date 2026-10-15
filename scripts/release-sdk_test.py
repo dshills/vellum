@@ -7,6 +7,7 @@ import subprocess
 import shutil
 import sys
 import gzip
+import hashlib
 import io
 import json
 from pathlib import Path
@@ -373,14 +374,35 @@ func TestExportedHistory(t *testing.T) {
             self.assertFalse(output.exists());self.assertEqual(source.read_bytes(),b"artifact")
 
     def test_only_conventional_text_declarations_count_as_notices(self):
-        for name in ("LICENSE", "LICENSE.md", "LICENCE.txt", "COPYING.LESSER", "NOTICE-MIT", "third-party/LICENSE-APACHE"):
+        for name in ("LICENSE", "LICENSE.md", "LICENCE.txt", "COPYING.LESSER", "NOTICE-MIT", "third-party/LICENSE-APACHE", "OFL", "fonts/noto/OFL.txt"):
             self.assertTrue(release.declared_notice(Path(name)),name)
-        for name in ("license.go", "license_test.go", "license.py", "NOTICE.json", "testdata/LICENSE", "fixtures/COPYING", "examples/NOTICE", "licensechecker.txt"):
+        for name in ("license.go", "license_test.go", "license.py", "NOTICE.json", "testdata/LICENSE", "fixtures/COPYING", "examples/NOTICE", "licensechecker.txt", "OFL.go", "OFL.json", "testdata/OFL.txt"):
             self.assertFalse(release.declared_notice(Path(name)),name)
         self.assertTrue(release.module_license(Path("LICENSE.md")))
         self.assertTrue(release.module_license(Path("licenses/LICENSE-MIT")))
         self.assertFalse(release.module_license(Path("NOTICE")))
         self.assertFalse(release.module_license(Path("vendor/dependency/LICENSE")))
+        self.assertFalse(release.module_license(Path("OFL.txt")))
+        self.assertFalse(release.module_license(Path("fonts/noto/OFL.txt")))
+
+    def test_font_ofl_notice_is_copied_without_granting_module_license(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/"release").mkdir();(root/"release/version.json").write_text('{"module":"github.com/dshills/vellum"}')
+            dependency=root/"dependency";notice=dependency/"fonts/noto/OFL.txt"
+            notice.parent.mkdir(parents=True);content=b"fixture font license declaration\n";notice.write_bytes(content)
+            modules=[{"Path":"example.com/font-dependency","Dir":str(dependency)}]
+            inventory,copies=release.license_inventory(root,modules=modules)
+            record=inventory["modules"][0]
+            self.assertEqual(record["module_license_files"],[])
+            self.assertEqual(record["status"],"manual-review-required")
+            self.assertEqual([item["file"]for item in record["license_files"]],["fonts/noto/OFL.txt"])
+            self.assertEqual(list(copies.values()),[content])
+            self.assertEqual(record["license_files"][0]["sha256"],hashlib.sha256(content).hexdigest())
+            self.assertEqual(inventory["distribution_audit"],"pending")
+            metadata,empty=release.license_inventory(root,modules=modules,copy_notices=False,max_notice_bytes=128)
+            self.assertEqual(empty,{})
+            self.assertEqual(metadata["modules"][0]["license_files"][0]["bytes"],len(content))
+            self.assertEqual(metadata["modules"][0]["module_license_files"],[])
 
     def notice_graph_fixture(self, root):
         driver = root / "drivers/cogent"

@@ -162,7 +162,7 @@ def public_dependencies(root):
 def declared_notice(path):
     """Conventional text notices only; source/test fixtures are not declarations."""
     name = path.name.lower()
-    match = re.fullmatch(r"(?:licen[cs]e|copying|notice)(?:[._-][a-z0-9._-]+)?", name)
+    match = re.fullmatch(r"(?:licen[cs]e|copying|notice|ofl)(?:[._-][a-z0-9._-]+)?", name)
     if not match or path.suffix.lower() in {".go", ".c", ".h", ".cc", ".cpp", ".rs", ".py", ".js", ".ts", ".json", ".yaml", ".yml", ".xml", ".html", ".svg", ".png", ".pdf"}:
         return False
     return not any(part.lower() in {"test", "tests", "testdata", "fixture", "fixtures", "example", "examples"} for part in path.parts[:-1])

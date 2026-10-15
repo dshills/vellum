@@ -606,6 +606,17 @@
               "sha256": "78ee8449203ecf5e39432633970e5053588dc51c7e56aad0229fd612c653e4da"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/fontnotices",
+          "inputs": "native/patches/fontnotices/original-hashes.json",
+          "outputs": "native/patches/fontnotices/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/fontnotices/0063-notosans-ofl-notice.patch",
+              "sha256": "de671611d2acb30e612b4c48a404d5f622148792de97121530057c176faf06b9"
+            }
+          ]
         }
       ]
     },

@@ -92,6 +92,14 @@ opt-in. Public gating also rejects `assume-unchanged`/`skip-worktree` index flag
 which could otherwise hide changed working-tree bytes from Git status. Build outputs and review/research
 artifacts are omitted. Files and dependency paths cannot contain symlinks.
 
+Notice collection retains conventional `OFL`/`OFL.txt` font declarations alongside
+LICENSE/COPYING/NOTICE files. OFL entries remain supplemental asset notices;
+they do not satisfy a Go module's own-license gate. Owned native patch 0063
+restores the exact Noto Sans v2.015 upstream OFL text beside the pinned subset
+fonts without changing their bytes or embed pattern. Its source revision, blob
+and SHA256 are recorded in the patch README. Collection does not certify the
+historical font-subsetting provenance or approve the distribution audit.
+
 Notice collection first downloads and verifies the external module graph in a
 temporary copy of the driver module files, with absolute owned replacements.
 Cold and warm caches therefore collect the same available declarations; missing

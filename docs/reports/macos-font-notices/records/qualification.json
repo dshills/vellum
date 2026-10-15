@@ -1,0 +1,65 @@
+{
+  "result": "PASS_SCOPED_FONT_NOTICE_CHECKPOINT",
+  "base_commit": "eba38f14a96fb7b8e44612dc922a07793d3a5724",
+  "sources": {
+    "docs/reports/macos-font-notices/README.md": "f0d58971a131f34dc6c0bc3488eb9ee3b39bc7e340d5623fe5392cba1fb96f17",
+    "drivers/cogent/native/dependencies.json": "40854a9f90bc16df45d1025eb904e2cc0d403e0c6c445faf5798d200eb75d2e6",
+    "drivers/cogent/native/patches/fontnotices/0063-notosans-ofl-notice.patch": "de671611d2acb30e612b4c48a404d5f622148792de97121530057c176faf06b9",
+    "drivers/cogent/native/patches/fontnotices/README.md": "3a27f0b2ca6a7158dcbe4e7564b117fd65515ba8ce9fbb7fc12c09571a133c11",
+    "drivers/cogent/native/patches/fontnotices/original-hashes.json": "ebeb816104ed6e345f554e9d810b6b395547bdca338dfb68eb77226eadd4cbf3",
+    "drivers/cogent/native/patches/fontnotices/output-hashes.json": "e4ba8cc5f32fcb577eac0d9e9e98294200b06157a3a28842286594fe97aee544",
+    "drivers/cogent/prepare_test.py": "8539bc8fa26666d27ac0df2bb31f042fd397594d7f78798dc15b66b055b71788",
+    "scripts/release-sdk.py": "1f12c5024c49a54b720792a95baba7f2084f32d93359f464e876d47c211aed1b",
+    "scripts/release-sdk_test.py": "5d8e538776423df316a6448470e06e220797746307aebf8693df424c32c0288f",
+    "specs/release.md": "8cc7b62aff5f86427e9d61535238af0540c846e06035ca5d8b799c07e44f9c00"
+  },
+  "prepared_before": 6216,
+  "prepared_files": 6217,
+  "checks": {
+    "preparation-tests": {
+      "sha256": "9dc6dab313be4757a15fd6e43b377a951a65ff05be032c31cc6c20ce31618104",
+      "elapsed_seconds": 0.09019437502138317
+    },
+    "release-final": {
+      "sha256": "ea8b320dd6c992ec9f247293a64e054d84255788bd912d51052f080ba6d9d049",
+      "elapsed_seconds": 1.3347870419966057
+    },
+    "inventory-final": {
+      "sha256": "45ee6a7cd377b46687415c16398b2e351287d9c333e5b32e9a841bb193986d01",
+      "elapsed_seconds": 0.1411352080758661
+    },
+    "checker-final": {
+      "sha256": "39608c0d2d73fed35a326981c123d7d9e23427ba02486293e01f149f56f2ef39",
+      "elapsed_seconds": 0.20957337494473904
+    },
+    "produce-v2": {
+      "sha256": "677e88f3fe2faac57cea62ed2f1dd68953ed94dcb17a3be86dd6dd9f39a1c8e5",
+      "elapsed_seconds": 5.612513375002891
+    },
+    "relocate-v2": {
+      "sha256": "3191a93e8f0d99e3209d136ff8e0f4ed0b9bb1a8c8d5a04f2a1ad3b884237f12",
+      "elapsed_seconds": 46.536796665983275
+    }
+  },
+  "notice_sha256": "cee9892f9f0cc8fe882c9e9537ee6a89621d86ee7ceaf70b02e2b2b1c25c061a",
+  "sdk_sha256": "1462bc20d96ed1206ddafa5200e0ba07de42b5f30ab77edf53652dc282a9a86f",
+  "sdk_manifest_files": 7212,
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_review_sha256": "257e15dd0239abe6098b63156ec459d114ac28fa19b334672cf28657f6039c69",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_invocations": 1,
+  "prism_llm_calls": 1,
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "prism_process_sha256": "d1baf04577d15aa32456af12ac4d12a8e7697b1a793c7422a79e64d8539eacef",
+  "archive_sha256": "31426c65f8c30e9fd4e3a38851f2f25f22c2daf6766cf520d921a50160782f35",
+  "archive_bytes": 6898596,
+  "archive_members": 103,
+  "archive_index_sha256": "078254b94b685e42ff14b03d20e92244f385c36e54683a6eadebcff161d1a4c2",
+  "producer_sha256": "2e0a48d63d5423b0c0c01d960d69d62192fef66df36b00df44ffd97f25a76447",
+  "native_runtime_executed": false,
+  "distribution_audit": "pending",
+  "full_mac_qualified": false,
+  "scope": "Notice-only native patch and supplementalOFL discovery; no font/embed/runtime implementation bytes changed. Exact upstream nativearchive byte match is separate from source-build/crate-feature/signature provenance. Noto source notice matches embeddedcopyright/version, without reconstructing subset lineage. PrivateSDK captures the nine-source pre-report endpoint, not a future commit."
+}
