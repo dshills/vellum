@@ -212,6 +212,22 @@ against the verified module notice graph. Review-required asset/native rights
 and prebuilt archive component provenance remain separate from this inventory.
 The collector does not approve or publish a distribution.
 
+To build the private Mac workbench and record a binary/map pair from the same
+compiler invocation, use a new output directory outside the checkout:
+
+```sh
+python3 scripts/build-macos.py --output '/tmp/vellum private build'
+```
+
+Prepare the native dependencies first. The command writes the executable,
+linker map, before/after input inventories, bounded compiler logs and a completion
+receipt; it never launches the app. A successful command plus the final
+`build-receipt.json` identifies the observed pair. On failure, partial artifacts
+and diagnostics may remain, without a successful receipt. `--include-untracked`
+allows the collector's explicit private precommit input policy. This is sampled
+local build evidence; native component provenance, rights approval and public
+release remain separate. See the [contract](../specs/release.md#owned-private-mac-build).
+
 Set `VELLUM_CACHE_DIR` to reuse a chosen Go cache across preparation/check commands.
 The legacy `P0_CACHE_DIR` variable is accepted for existing local environments.
 Without either variable, sourcing the environment creates an isolated temporary cache.

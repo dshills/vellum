@@ -774,3 +774,15 @@ including fallback for clipped/unsupported/budget-limited input. Later ordinary
 spans and both retirement paths retain explicit ownership. Exact software
 comparison and allocation checks advance the measured scene-construction work;
 they do not qualify the failed native latency budgets or close P4/P6/P11/Mac.
+
+## Owned Mac build checkpoint
+
+The [private build producer](../docs/reports/macos-owned-build/README.md) binds a
+workbench executable and native linker map to one observed successful compiler
+invocation, with sampled input/tool/environment stability and bounded diagnostics.
+The existing collector's arbitrary-pair label stays unverified; only the new
+receipt carries the observed pairing. This advances distribution evidence without
+claiming complete embedded component provenance or approving rights. Public audit,
+native latency/memory/endurance, physical input/displays, human accessibility and
+full Mac completion remain open. No native application is launched for this
+checkpoint while the human is online.

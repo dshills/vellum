@@ -307,3 +307,51 @@ python3 scripts/distribution-inventory.py --binary /tmp/vellum-workbench --link-
 
 Use fresh output paths and preserve the exact build receipt; the example alone
 is not a source/build provenance certification. No application is launched.
+
+## Owned private Mac build
+
+`scripts/build-macos.py --output <new-directory>` owns one successful
+`go build` invocation of `drivers/cogent/cmd/workbench` on a Mac host, with
+external linking and a linker map. The resolved Go executable, exact argument
+vector, cwd, selected Go configuration, controlled environment digest/key names
+and sampled source/SDK inputs are recorded. Generated staging paths avoid Go
+linker quoting ambiguity; the chosen final output directory may contain spaces.
+The produced app is never executed. No signing identity, notarization or
+publication is requested. The native dependency preparation remains a prerequisite.
+
+Before/after inventories, Go executable identity, producer identity and controlled
+environment must agree. Initially absent binary/map paths are hashed after exit
+zero, checked through the collector and checked before publication. The collector
+continues to label its observation `caller-supplied-unverified`; the separate
+build receipt labels the verified pair `producer-observed-same-build`. The stronger
+label belongs to this observed invocation and its artifact hashes, not arbitrary
+future collector input. Linker `# Path` need not equal the Go output path because
+Go may use an intermediate native linker output.
+
+The output directory is exclusively created outside the checkout with private
+permissions. Descriptor-relative, no-follow, exclusive writes refuse replaced
+parents/directories/files. Artifact reads stream in 64 KiB chunks within the
+collector's 1 GiB file bound. Compiler stdout/stderr drain concurrently with a
+4 MiB bound per channel and a 600-second deadline; overflow, timeout or sink failure
+terminates the owned child group using the bounded cleanup path. The streamed
+log counts/hashes and serialized inventory hashes must match published files.
+Normal subprocess completion retains its existing semantics; it is not a claim
+that all possible descendants have retired.
+
+`build-receipt.json` is the last published file and binds six artifacts: executable,
+map, before/after inventories and both logs. Its own published bytes are checked.
+Successful command return and the receipt are required; directory creation alone
+is not completion. Failure retains diagnostics when the owned destination remains
+valid, removes only an owned partial success receipt and refuses to overwrite
+existing/replacement data. If receipt retirement or diagnostic publication fails,
+the original exception is preserved with a cleanup diagnostic; CLI failure JSON
+reports the phase and unconfirmed output completion, including unconfirmed receipt
+retirement when applicable. Directory publication is not atomic, and no success is
+claimed for partial diagnostics. Consumers must validate the receipt and hashes
+when consuming artifacts, since files can change after the producer returns.
+
+This is sampled local evidence, not a hermetic build, cryptographic attestation,
+independent source provenance, complete Rust/C dependency closure, redistribution
+rights approval or Mac runtime qualification. Transient input changes reverted
+between observations cannot be ruled out. The public audit gate stays pending.
+See the [owned-build checkpoint](../docs/reports/macos-owned-build/README.md).

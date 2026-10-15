@@ -3,13 +3,52 @@
 Normal completion retains ordinary subprocess semantics; this is not a sandbox.
 """
 import os
+import hashlib
+import selectors
 import signal
 import subprocess
+import time
 
 CLEANUP_TIMEOUT_SECONDS = 5
 
 class ChildCleanupError(OSError):
     """The command failed and descendant cleanup could not be confirmed."""
+
+
+class ChildOutputLimitError(OSError):
+    """A bounded binary log exceeded its admitted byte count."""
+
+
+def stream_logs(process, arguments, timeout, outputs, limit):
+    deadline = time.monotonic() + timeout
+    counts = [0, 0]
+    digests = [hashlib.sha256(), hashlib.sha256()]
+    with selectors.DefaultSelector() as ready:
+        for index, pipe in enumerate((process.stdout, process.stderr)):
+            ready.register(pipe, selectors.EVENT_READ, index)
+        while ready.get_map():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise subprocess.TimeoutExpired(arguments, timeout)
+            for key, _ in ready.select(remaining):
+                chunk = os.read(key.fd, 64 * 1024)
+                if not chunk:
+                    ready.unregister(key.fileobj)
+                    continue
+                index = key.data
+                accepted = min(len(chunk), limit - counts[index])
+                if accepted:
+                    if outputs[index].write(chunk[:accepted]) != accepted:
+                        raise OSError("short binary log write")
+                    digests[index].update(chunk[:accepted])
+                    counts[index] += accepted
+                if accepted != len(chunk):
+                    raise ChildOutputLimitError("SDK child exceeded binary log byte limit")
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise subprocess.TimeoutExpired(arguments, timeout)
+    process.wait(timeout=remaining)
+    return {name: {"bytes": counts[index], "sha256": digests[index].hexdigest()} for index, name in enumerate(("stdout", "stderr"))}
 
 
 def terminate_owned_group(process):
@@ -27,9 +66,17 @@ def terminate_owned_group(process):
             pass  # The entire owned group has already exited.
 
 
-def run_child(arguments, *, timeout, check=False, capture_output=False, input=None, **options):
+def run_child(arguments, *, timeout, check=False, capture_output=False, input=None, log_limit_bytes=None, **options):
     if timeout <= 0 or options.get("shell"):
         raise ValueError("SDK children require a positive deadline and argv without a shell")
+    logs = None
+    if log_limit_bytes is not None:
+        if os.name == "nt" or type(log_limit_bytes) is not int or log_limit_bytes <= 0 or capture_output or input is not None or any(options.get(key) for key in ("text", "universal_newlines", "encoding", "errors")):
+            raise ValueError("bounded logs require POSIX binary output files and a positive byte limit")
+        logs = (options.get("stdout"), options.get("stderr"))
+        if not all(hasattr(stream, "write") for stream in logs):
+            raise ValueError("bounded logs require both binary output files")
+        options["stdout"] = options["stderr"] = subprocess.PIPE
     if capture_output:
         if "stdout" in options or "stderr" in options:
             raise ValueError("capture_output conflicts with explicit stdout/stderr")
@@ -43,9 +90,14 @@ def run_child(arguments, *, timeout, check=False, capture_output=False, input=No
     else:
         options["start_new_session"] = True
     process = subprocess.Popen(arguments, **options)
+    log_summaries = None
     try:
         try:
-            stdout, stderr = process.communicate(input=input, timeout=timeout)
+            if logs is None:
+                stdout, stderr = process.communicate(input=input, timeout=timeout)
+            else:
+                log_summaries = stream_logs(process, arguments, timeout, logs, log_limit_bytes)
+                stdout = stderr = None
         except BaseException as original:
             cleanup_error = None
             try:
@@ -55,7 +107,15 @@ def run_child(arguments, *, timeout, check=False, capture_output=False, input=No
                 if process.poll() is None:
                     process.kill()
             try:
-                stdout, stderr = process.communicate(timeout=CLEANUP_TIMEOUT_SECONDS)
+                if logs is None:
+                    stdout, stderr = process.communicate(timeout=CLEANUP_TIMEOUT_SECONDS)
+                else:
+                    # Do not buffer a flood during failure cleanup. These logs
+                    # already contain only the admitted prefix. Closing read
+                    # ends also revokes pipe writers outside the owned group.
+                    process.stdout.close(); process.stderr.close()
+                    process.wait(timeout=CLEANUP_TIMEOUT_SECONDS)
+                    stdout = stderr = None
             except subprocess.TimeoutExpired as error:
                 raise ChildCleanupError("SDK child pipes remained open after cleanup attempt" + (": " + str(cleanup_error) if cleanup_error is not None else "")) from original
             if cleanup_error is not None:
@@ -64,6 +124,8 @@ def run_child(arguments, *, timeout, check=False, capture_output=False, input=No
                 original.output, original.stderr = stdout, stderr
             raise
         completed = subprocess.CompletedProcess(arguments, process.returncode, stdout, stderr)
+        if log_summaries is not None:
+            completed.log_summaries = log_summaries
         if check and completed.returncode:
             raise subprocess.CalledProcessError(completed.returncode, arguments, output=stdout, stderr=stderr)
         return completed

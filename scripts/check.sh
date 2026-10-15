@@ -13,6 +13,7 @@ python3 scripts/check-editor-accessibility_test.py
 python3 scripts/benchmark-native_test.py
 python3 scripts/benchmark-grid_test.py
 python3 scripts/child_process_test.py
+python3 scripts/build-macos_test.py
 python3 scripts/release-sdk_test.py
 python3 scripts/distribution-inventory_test.py
 python3 scripts/check-sdk_test.py

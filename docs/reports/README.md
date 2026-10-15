@@ -51,3 +51,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Accessibility retirement](macos-ax-retirement/README.md): late-refresh registry retirement fix and copied first-close diagnostics, verified with offscreen race checks; prior endurance cause remains open.
 
 - [Palette placement](macos-palette-placement/README.md): typed public API, same-window capture, independent demo and code-only routing evidence.
+
+- [Owned private Mac build](macos-owned-build/README.md): observed compiler pairing for executable/map, sampled input stability and bounded logs; runtime and distribution rights remain separate.
