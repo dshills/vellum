@@ -346,11 +346,12 @@ def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout,
                     selector.close()
                 except Exception as error:
                     cleanup_error = error
-            # Setup failures also retire any child already launched. Descendants
-            # can own the pipe after direct-child exit, so failure always cleans
-            # the owned group rather than relying on the direct child's state.
+            # A successful POSIX child can leave descendants that closed the
+            # inherited pipe. Always retire its owned group after the measured
+            # work, including after direct-child exit and EOF. Windows retains
+            # its existing failure/live-child tree-termination policy.
             if process is not None:
-                if failure or cleanup_error or process.poll() is None:
+                if os.name != "nt" or failure or cleanup_error or process.poll() is None:
                     try:
                         terminate_owned_group(process)
                     except Exception as error:
@@ -368,7 +369,7 @@ def run_case(binary, directory, rows, variable, samples, warmup, novel, timeout,
                 returncode = process.returncode
             raw.flush()
             if cleanup_error:
-                failure = (failure + "; " if failure else "") + f"cleanup failed: {type(cleanup_error).__name__}"
+                failure = (failure + "; " if failure else "") + f"cleanup failed: {type(cleanup_error).__name__}: {cleanup_error}"
             outcome = {"argv": argv, "exit_code": returncode, "elapsed_seconds": time.monotonic() - started,
                        "records": records, "process_observations": observations,
                        "process_observation_scope": {"stages": ["grid.perf.end"],

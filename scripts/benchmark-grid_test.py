@@ -5,8 +5,12 @@ import io
 import json
 import os
 from pathlib import Path
+import signal
+import subprocess
+import sys
 import tempfile
 import threading
+import time
 import types
 import unittest
 from unittest import mock
@@ -274,12 +278,12 @@ class FakeProcess:
 
 
 class ProcessTests(unittest.TestCase):
-    def run_fixture(self, data, *, source_details=False, alloc_profile=None, gpu_scene_rendering=False):
+    def run_fixture(self, data, *, source_details=False, alloc_profile=None, gpu_scene_rendering=False, retire_error=None):
         payload = b"native ordinary log\n" + b"\n".join(json.dumps(v).encode() for v in data)+b"\n"
         process = FakeProcess(payload)
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)/"run"
-            with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group") as kill:
+            with mock.patch.object(benchmark.subprocess, "Popen", return_value=process) as launch, mock.patch.object(benchmark, "process_sample", return_value={"rss_bytes": 1234}) as observe, mock.patch.object(benchmark, "terminate_owned_group", side_effect=retire_error) as kill:
                 try: result = benchmark.run_case(Path("fake"), directory, 10000, False, 120, 128, False, 5, source_details=source_details, alloc_profile=alloc_profile, gpu_scene_rendering=gpu_scene_rendering)
                 except Exception as error: result = error
             raw = (directory/"native.log").read_bytes()
@@ -300,6 +304,74 @@ class ProcessTests(unittest.TestCase):
         self.assertEqual(outcome["exit_code"], 0)
         self.assertEqual(len(outcome["process_observations"]), 1)
         self.assertEqual(outcome["result"], "PASS")
+
+    @unittest.skipIf(os.name == "nt", "Mac/POSIX successful-group retirement")
+    def test_successful_measurements_cannot_hide_retirement_failure(self):
+        result, outcome = self.run_fixture(records(), retire_error=OSError("retirement unavailable"))
+        self.assertTrue(isinstance(result, benchmark.ChildCleanupError), "retirement failure must reject successful measurements")
+        self.assertEqual(outcome["result"], "FAILED")
+        self.assertEqual(outcome["exit_code"], 0)
+        self.assertEqual(len(outcome["records"]), 123)
+        self.assertIn("cleanup failed", outcome["error"])
+        self.assertIn("retirement unavailable", outcome["error"])
+
+    @unittest.skipIf(os.name == "nt", "actual POSIX groups; no native window")
+    def test_success_retires_real_descendant_after_direct_child_exits(self):
+        # A real successful fixture exits after emitting valid records. Its
+        # descendant closes inherited pipes, so EOF/direct-child exit alone
+        # cannot reveal the surviving process. Never launches AppKit or a GPU.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            binary = root / "fake-native"
+            (root / "records.jsonl").write_bytes(b"\n".join(json.dumps(v).encode() for v in records()) + b"\n")
+            binary.write_text("#!" + sys.executable + "\n" + '''import pathlib, subprocess, sys, time
+root = pathlib.Path(__file__).parent
+code = "import pathlib,sys,time;pathlib.Path(sys.argv[1]).write_text('ready');time.sleep(30)"
+child = subprocess.Popen([sys.executable, '-c', code, str(root / 'ready')], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+(root / 'descendant.pid').write_text(str(child.pid))
+deadline = time.monotonic() + 5
+while not (root / 'ready').exists():
+    if child.poll() is not None or time.monotonic() >= deadline:
+        raise RuntimeError('fixture descendant did not become ready')
+    time.sleep(.01)
+sys.stdout.buffer.write((root / 'records.jsonl').read_bytes())
+''')
+            binary.chmod(0o700)
+            actual_popen = subprocess.Popen
+            owners = []
+            def launch(arguments, **options):
+                process = actual_popen(arguments, **options)
+                if arguments[0] == str(binary):
+                    owners.append(process)
+                return process
+            try:
+                with mock.patch.object(benchmark.subprocess, "Popen", side_effect=launch), mock.patch.object(benchmark, "process_sample", return_value={"unavailable": "CPU-only fixture"}):
+                    samples, outcome = benchmark.run_case(binary, root / "run", 10000, False, 120, 128, False, 10)
+                self.assertEqual(len(owners), 1)
+                self.assertEqual(owners[0].returncode, 0)
+                self.assertEqual(outcome["result"], "PASS")
+                self.assertEqual(len(samples), 120)
+                pid = int((root / "descendant.pid").read_text())
+                deadline = time.monotonic() + 2
+                while True:
+                    observed = subprocess.run(["ps", "-p", str(pid), "-o", "stat="], capture_output=True, text=True, timeout=2)
+                    self.assertEqual(observed.stderr, "")
+                    state = observed.stdout.strip()
+                    if observed.returncode == 1 and not state or observed.returncode == 0 and len(state.splitlines()) == 1 and state.startswith("Z"):
+                        break
+                    self.assertEqual(observed.returncode, 0, "process observation failed")
+                    if time.monotonic() >= deadline:
+                        self.fail("successful benchmark left a live descendant: " + state)
+                    time.sleep(.02)
+            finally:
+                # Retire the test's exact owned group even on original-code
+                # failure; a terminated orphan may await OS reaping as a zombie.
+                for owner in owners:
+                    try:
+                        os.killpg(owner.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    owner.wait(timeout=5)
 
     def test_gpu_scene_launch_flag_and_mismatched_child_result(self):
         data = records()

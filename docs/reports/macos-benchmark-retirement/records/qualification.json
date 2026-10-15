@@ -1,0 +1,92 @@
+{
+  "result": "PASS_SCOPED_BENCHMARK_RETIREMENT_CHECKPOINT",
+  "base_commit": "c078eb8e20f0e493ee063949f5fe7ee85e51bbe4",
+  "source_root": "/private/tmp/vellum-benchmark-cleanup",
+  "sources": {
+    "scripts/benchmark-grid.py": "c659373bdfee286cc1d95690ed915e297e6370248fb76831dfe70ee024c146f1",
+    "scripts/benchmark-grid_test.py": "5eaebf796f6f13d90c3f53c1e299d89059ee4caac90cdcc57dde5544dbb282e0",
+    "specs/grid-performance.md": "e3aacf91ef1c74c9b814b4850495ff192b8869e1695d0589cbb4d480227350e0",
+    "docs/reports/README.md": "4c94c4c2e19227a3c1f8211a014d046871d2b341921c1bef02e4d2d4e29c2f44",
+    "docs/reports/macos-benchmark-retirement/README.md": "bc0d0507c2292d56f3c0a0cb7355a3be7c52051efe3672bf410c6e867cf734b8"
+  },
+  "source_review_sha256": "1bdf7fa5332a3b514f04a5e909153fe972361b1b95e9dfd97497be0f9818dd67",
+  "producer_sha256": "15c1fbe6dbbd8d49b730bd4c54c5e481b5ee57ddd14d4e4d6beb274e203cba8a",
+  "baseline_sha256": "731fa87d01905744dbb73a82114c11d11aeb17ea08c44bdb2357a621f8eb12b2",
+  "test_producer_sha256": "1c2a1d28043eff70c18a16516b466c9318a4d2efa1ecaac8378ee65b2dfbe6fa",
+  "original_regressions": {
+    "receipt": "original-regressions.json",
+    "receipt_sha256": "50ffa38ce57fff7f970e27d27d91f109d4e1f3b825d338e322dacb8600e521de",
+    "tests": 2,
+    "failures": 2,
+    "exit_code": 1,
+    "actual_live_descendant_observed": true,
+    "scope": "Baseline runner and exact retained original test snapshot; final assertion diagnostic formatting differs."
+  },
+  "intermediate": {
+    "receipt_sha256": "37eb4b0edd1fe65ec67694949e707ce560a7c8f1159ab68724757ccf70da0b51",
+    "tests": 42,
+    "failures": 1,
+    "exit_code": 1,
+    "scope": "Exact intermediate two-source snapshot; missing exception message corrected afterward."
+  },
+  "final_benchmark": {
+    "receipt_sha256": "9a7fe376e28bb0e1768f10eddef5b1a4ff3be4652172b45fed67d0a6aefac62e",
+    "tests": 42,
+    "exit_code": 0,
+    "compiled_python_sources_exact": true,
+    "source_delta": {
+      "scripts/benchmark-grid.py": "c659373bdfee286cc1d95690ed915e297e6370248fb76831dfe70ee024c146f1",
+      "scripts/benchmark-grid_test.py": "5eaebf796f6f13d90c3f53c1e299d89059ee4caac90cdcc57dde5544dbb282e0"
+    },
+    "scope": "Final Python sources; three documentation leaves added/corrected afterward."
+  },
+  "process_helper": {
+    "receipt_sha256": "d294154f21ba4f8ba80a4b4e9a4adfb47d8f8349afa2a7a704d3c1d845068d37",
+    "tests": 9,
+    "exit_code": 0,
+    "unchanged_source_sha256": {
+      "scripts/child_process.py": "04ba2610ddf112e936e8adcd9a81c03cff422843f993c2ce8a9e1acd96f39c9c",
+      "scripts/child_process_test.py": "ae0f4809b1591914bb855527577485aa8018c00f3c24b0884fd1ba8625a69495"
+    },
+    "scope": "Helper closure unchanged between baseline/intermediate/final; benchmark leaf differed at execution and is not imported by this suite."
+  },
+  "scope": "Always retire benchmark-owned POSIX process groups after measured work, including direct exit0 plus EOF; reject cleanup errors with diagnostic. Generic child helper and Windows success policy unchanged.",
+  "native_application_executed": false,
+  "gpu_requested": false,
+  "prepared_inputs_used": false,
+  "empty_process_group_qualified": false,
+  "native_inventory_qualified": false,
+  "native_performance_qualified": false,
+  "overnight_qualified": false,
+  "physical_input_qualified": false,
+  "full_mac_qualified": false,
+  "limits": [
+    "Actual CPU-only Python descendant may be absent or a terminated zombie awaiting OS reap; not an empty Vellum native process group or allocation inventory.",
+    "Synthetic valid timing records are regression fixtures, not native frame measurements.",
+    "Independent native lifecycle campaign uses frozen c078 source/controller; no checkpoint claim extends to it."
+  ],
+  "checkpoint_review_sha256": "57a3c52ebbf8a725e0e64fa352a8a032bfded45f8223458a64de008fca9ab26f",
+  "prism_process_sha256": "98ae402a043ad13c2358928dd65f1cbc522815d7c253c068e3a8abafd94ca5ca",
+  "prism_sha256": "339db574f79d5a1e18e96e82f5109d2832eb80dfcbd60b3bf579f2f5bc02d18d",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_invocations": 1,
+  "prism_coverage_complete": true,
+  "prism_files": 5,
+  "prism_llm_calls": 1,
+  "prism_findings": 1,
+  "prism_exit_code": 1,
+  "prism_disposition": {
+    "id": "73100a8c145a4746",
+    "resolution": "ADD_REFERENCED_RECORDS",
+    "required_paths": [
+      "docs/reports/macos-benchmark-retirement/records/qualification.json",
+      "docs/reports/macos-benchmark-retirement/records/archive-index.json",
+      "docs/reports/macos-benchmark-retirement/records/evidence.tar.xz"
+    ],
+    "scope": "Missing linked evidence is supplied in the same checkpoint. Independent final review must validate all eight changed leaves and the archive. No clean-provider finding count or exit0 is claimed."
+  },
+  "archive_sha256": "12a40fc1fd46ae96e24d8d13ce4c24372f542df1d02a9b505742bbe0a28ed8f7",
+  "archive_bytes": 194132,
+  "archive_members": 40
+}

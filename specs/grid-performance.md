@@ -333,3 +333,19 @@ cost, or satisfy P6 latency targets.
 ## Accessibility capacity and semantic string comparison
 
 The [service/allocation checkpoint](../docs/reports/macos-service-performance/README.md) compares exact completed-grid capacity reservation and owned semantic string encoding against the preceding committed build. Five interleaved process pairs per stored case retain all 4,800 samples with exact paired geometry. Process-wide allocation is lower, while frame timings are mixed and all unchanged warm targets remain failed. Separate sampled Go allocation profiles remain diagnostic; cache ownership, visible semantics and action guards are unchanged.
+
+## Benchmark process retirement
+
+On Mac/POSIX the runner retires its owned process group after every launched
+case, including a successful direct-child exit and pipe EOF. Descendants can
+close inherited output and outlive the direct child. Retirement runs after
+measurement; it does not alter frame timing regions or the acceptance workload.
+Cleanup failure rejects the case, preserves the direct child's status and raw
+records, and records the exception type and message. Windows retains its existing
+failure/live-child tree-termination policy.
+
+The [retirement regression](../docs/reports/macos-benchmark-retirement/README.md)
+uses real CPU-only processes with a successful producer and a surviving
+same-group descendant. It verifies termination, permitting an orphan zombie
+awaiting OS reaping. This does not qualify native resource inventories, current
+frame performance, app-wide process absence or any broader Mac gate.
