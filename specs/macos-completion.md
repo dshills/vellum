@@ -709,3 +709,11 @@ survivor profile precedes global application closure, and the 60 retries have no
 observed cause. These scoped results do not qualify later-source lifecycle,
 professional/native/GPU memory budgets, complete P4/P6/P11, overnight soak,
 physical input/displays, human accessibility, interoperability or Mac distribution.
+
+The [uniform background checkpoint](../docs/reports/macos-uniform-crop/README.md)
+reduces redundant large CPU fills while retaining original widget painting and
+render items. Offscreen routed-grid geometry/pixel parity, original-dispatch
+fallback tests and fixed replay benchmarks are separate from native acceptance.
+Live checks remain paused while the human uses the machine. Current full
+lifecycle, P4/P6/P9/P11, idle/overnight, physical input/displays, human accessibility,
+professional memory and distribution gates remain open.

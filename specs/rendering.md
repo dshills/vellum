@@ -491,3 +491,21 @@ operation admission, spare-header refunds, ordering, held-packet ownership and
 encoding remain unchanged. This does not affect the default CPU image spanner.
 See [the scoped checkpoint](../docs/reports/macos-span-scratch/README.md); native
 frame latency and physical memory remain separate acceptance gates.
+
+## Bounded uniform background subtraction
+
+CPU replay may omit only uniform pixels replaced by the first later drawing
+command within eight items. Both source ranges and destination rectangles must
+be complete. The first area is at least 4,096 pixels and overlap covers at least
+half. Src replaces at any alpha; Over must be opaque. Remaining pixels are
+drawn through copied parameters in up to four disjoint strips. Original items
+and StandardBox clears remain intact for repeated replay and other backends.
+
+Only plain context markers and validated unpainted paths can be crossed. Paths
+are identity-transformed, finite move/line/close records of at most 20 values,
+with the renderer-owned scanner, and still execute normally. Custom callbacks,
+unknown sources, masks, malformed paths and intervening paint stop lookahead.
+The optimization applies to unclipped CPU replay, including full cache repaint;
+strip-clipped replay and scene packet capture keep their original paths.
+Software differential tests and fixed microbenchmarks establish scoped behavior;
+they do not qualify native frame latency or change GPU opt-in defaults.

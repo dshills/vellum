@@ -1,0 +1,474 @@
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -115,6 +115,9 @@
+ 				}
+ 			}
+ 			if clip == (image.Rectangle{}) {
++				if rs.drawUncoveredUniform(r, i, x) {
++					continue
++				}
+ 				x.Render(rs.image)
+ 			} else {
+ 				copy := *x
+--- /dev/null
++++ b/paint/renderers/rasterx/uniform_crop.go
+@@ -0,0 +1,104 @@
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"image"
++	"image/draw"
++	"math"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/ppath"
++	"cogentcore.org/core/paint/render"
++)
++
++// A short lookahead removes only uniform pixels guaranteed to be replaced by
++// the first subsequent drawing command. Items stay intact for future replays.
++func (rs *Renderer) drawUncoveredUniform(items render.Render, index int, first *pimage.Params) bool {
++	if !cropUniform(first, rs.image.Bounds(), false) || first.Rect.Dx()*first.Rect.Dy() < 4096 {
++		return false
++	}
++	end := min(len(items), index+9)
++	for next := index + 1; next < end; next++ {
++		switch item := items[next].(type) {
++		case *render.ContextPush:
++			if item != nil && item.Scroll != nil {
++				return false
++			}
++		case *render.ContextPop:
++		case *render.Path:
++			if !rs.cropNoPaintPath(item) {
++				return false
++			}
++		case *pimage.Params:
++			if !cropUniform(item, rs.image.Bounds(), true) {
++				return false
++			}
++			overlap := first.Rect.Intersect(item.Rect)
++			if overlap.Empty() || overlap.Dx()*overlap.Dy() < first.Rect.Dx()*first.Rect.Dy()/2 {
++				return false
++			}
++			bands := [4]image.Rectangle{
++				image.Rect(first.Rect.Min.X, first.Rect.Min.Y, first.Rect.Max.X, overlap.Min.Y),
++				image.Rect(first.Rect.Min.X, overlap.Max.Y, first.Rect.Max.X, first.Rect.Max.Y),
++				image.Rect(first.Rect.Min.X, overlap.Min.Y, overlap.Min.X, overlap.Max.Y),
++				image.Rect(overlap.Max.X, overlap.Min.Y, first.Rect.Max.X, overlap.Max.Y),
++			}
++			for _, region := range bands {
++				if region.Empty() {
++					continue
++				}
++				command := *first
++				command.Rect = region
++				command.SourcePos = first.SourcePos.Add(region.Min.Sub(first.Rect.Min))
++				command.Render(rs.image)
++			}
++			return true
++		default:
++			return false
++		}
++	}
++	return false
++}
++
++func cropUniform(command *pimage.Params, target image.Rectangle, replace bool) bool {
++	if command == nil || command.Cmd != pimage.Draw || command.Mask != nil || command.Rect.Empty() || !command.Rect.In(target) || (command.Op != draw.Src && command.Op != draw.Over) {
++		return false
++	}
++	uniform, ok := valueUniform(command.Source)
++	if !ok {
++		return false
++	}
++	source := uniform.Bounds()
++	// Checking by subtraction also excludes overflow when shifting subrects.
++	if command.SourcePos.X < source.Min.X || command.SourcePos.Y < source.Min.Y || command.SourcePos.X > source.Max.X-command.Rect.Dx() || command.SourcePos.Y > source.Max.Y-command.Rect.Dy() {
++		return false
++	}
++	if replace && command.Op == draw.Over {
++		_, _, _, alpha := uniform.C.RGBA()
++		return alpha == 65535
++	}
++	return true
++}
++
++// No user scanner callback, malformed path or transform is crossed. Normal box
++// borders use at most five finite move/line/close segments with paint disabled.
++// They still execute later, preserving clip and scratch-state transitions.
++func (rs *Renderer) cropNoPaintPath(path *render.Path) bool {
++	if path == nil || path.Context.Style.HasFill() || path.Context.Style.HasStroke() || path.Context.Cumulative != math32.Identity2() || len(path.Path) > 20 || len(path.Path)%4 != 0 || rs.Scanner == nil || rs.Raster == nil || rs.Raster.Filler.Scanner != rs.Scanner {
++		return false
++	}
++	for i := 0; i < len(path.Path); i += 4 {
++		command := path.Path[i]
++		if (command != ppath.MoveTo && command != ppath.LineTo && command != ppath.Close) || path.Path[i+3] != command {
++			return false
++		}
++		for _, coordinate := range path.Path[i+1 : i+3] {
++			if math.IsNaN(float64(coordinate)) || math.IsInf(float64(coordinate), 0) || coordinate < -8192 || coordinate > 8192 {
++				return false
++			}
++		}
++	}
++	return true
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/uniform_crop_test.go
+@@ -0,0 +1,219 @@
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++
++package rasterx
++
++import (
++	"bytes"
++	"fmt"
++	"image"
++	"image/color"
++	"image/draw"
++	"math"
++	"reflect"
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/ppath"
++	"cogentcore.org/core/paint/render"
++)
++
++func cropTestDraw(rect image.Rectangle, op draw.Op, c color.Color) *pimage.Params {
++	return &pimage.Params{Cmd: pimage.Draw, Rect: rect, SourcePos: rect.Min, Op: op, Source: image.NewUniform(c)}
++}
++
++func cropTestPath() *render.Path {
++	p := &render.Path{Path: ppath.Path{ppath.MoveTo, 2, 3, ppath.MoveTo, ppath.LineTo, 7, 9, ppath.LineTo, ppath.Close, 2, 3, ppath.Close}}
++	p.Context.Cumulative = math32.Identity2()
++	return p
++}
++
++func cropTestPair(bounds image.Rectangle) render.Render {
++	return render.Render{cropTestDraw(bounds, draw.Over, color.NRGBA{17, 51, 93, 113}), cropTestPath(), &render.ContextPush{},
++		cropTestDraw(bounds.Inset(4), draw.Src, color.NRGBA{91, 31, 11, 73}), &render.ContextPop{}}
++}
++
++func TestUniformCropPartialPixelAndStateParity(t *testing.T) {
++	for _, origin := range []image.Point{{}, {-19, -11}, {13, 17}} {
++		bounds := image.Rectangle{Min: origin, Max: origin.Add(image.Pt(112, 96))}
++		for _, firstOp := range []draw.Op{draw.Src, draw.Over} {
++			for _, lastOp := range []draw.Op{draw.Src, draw.Over} {
++				for _, c := range []color.Color{color.NRGBA{12, 33, 71, 255}, color.NRGBA{21, 41, 81, 93}, color.RGBA64{1, 2, 3, 65535}, color.Alpha{255}} {
++					for _, overlap := range []image.Rectangle{bounds, bounds.Inset(4), bounds.Add(image.Pt(13, -7)).Intersect(bounds)} {
++						items := cropTestPair(bounds)
++						items[0].(*pimage.Params).Op = firstOp
++						last := items[3].(*pimage.Params)
++						last.Rect, last.SourcePos, last.Op, last.Source = overlap, image.Pt(777, -987), lastOp, image.NewUniform(c)
++						for replay := 0; replay < 3; replay++ {
++							coveredDrawCompare(t, bounds, items)
++						}
++						// Check the intermediate subtraction itself, not just final
++						// pixels that would also pass with the helper disabled.
++						seed := coveredDrawTarget(bounds)
++						before := append([]byte(nil), seed.Pix...)
++						rs := coveredDrawRenderer(seed)
++						eligible := lastOp == draw.Src
++						if lastOp == draw.Over {
++							_, _, _, a := c.RGBA()
++							eligible = a == 65535
++						}
++						if got := rs.drawUncoveredUniform(items, 0, items[0].(*pimage.Params)); got != eligible {
++							t.Fatalf("eligible=%v want=%v", got, eligible)
++						}
++						if eligible {
++							expected := coveredDrawTarget(bounds)
++							items[0].(*pimage.Params).Render(expected)
++							for y := overlap.Min.Y; y < overlap.Max.Y; y++ {
++								for x := overlap.Min.X; x < overlap.Max.X; x++ {
++									off := seed.PixOffset(x, y)
++									copy(expected.Pix[off:off+4], before[off:off+4])
++								}
++							}
++							if !bytes.Equal(seed.Pix, expected.Pix) {
++								t.Fatal("subtraction changed overlap, padding, or retained strips")
++							}
++						}
++					}
++				}
++			}
++		}
++	}
++}
++
++func TestUniformCropChainsAndBorrowedSources(t *testing.T) {
++	bounds := image.Rect(0, 0, 160, 128)
++	items := cropTestPair(bounds)
++	items = append(items, cropTestPath(), cropTestDraw(bounds.Inset(12), draw.Over, color.RGBA{3, 7, 19, 255}))
++	seed := coveredDrawTarget(bounds)
++	actual, expected := coveredDrawRenderer(seed), coveredDrawRenderer(coveredDrawTarget(bounds))
++	a, b := coveredDrawCopies(items), coveredDrawCopies(items)
++	for _, c := range []color.Color{color.NRGBA{11, 31, 71, 255}, color.NRGBA{11, 31, 71, 87}, color.Alpha{255}} {
++		items[3].(*pimage.Params).Source.(*image.Uniform).C = c
++		coveredDrawReference(expected, b)
++		actual.Render(a)
++		if !bytes.Equal(actual.image.Pix, expected.image.Pix) || !reflect.DeepEqual(a, b) {
++			t.Fatal("borrowed source/repeated chain differs")
++		}
++	}
++}
++
++func TestUniformCropFallbacks(t *testing.T) {
++	bounds := image.Rect(0, 0, 112, 96)
++	for _, test := range []struct {
++		name   string
++		change func(render.Render)
++	}{
++		{"small", func(r render.Render) { r[0].(*pimage.Params).Rect = image.Rect(0, 0, 20, 20) }},
++		{"first-mask", func(r render.Render) { r[0].(*pimage.Params).Mask = image.NewAlpha(bounds) }},
++		{"last-mask", func(r render.Render) { r[3].(*pimage.Params).Mask = image.NewAlpha(bounds) }},
++		{"first-source-clipped", func(r render.Render) { r[0].(*pimage.Params).SourcePos.X = image.White.Bounds().Max.X - 2 }},
++		{"last-source-clipped", func(r render.Render) { r[3].(*pimage.Params).SourcePos.Y = image.White.Bounds().Max.Y - 2 }},
++		{"sentinel", func(r render.Render) { r[0].(*pimage.Params).Rect = image.Rectangle{} }},
++		{"outside-target", func(r render.Render) { r[0].(*pimage.Params).Rect = bounds.Add(image.Pt(1, 1)) }},
++		{"image", func(r render.Render) { r[0].(*pimage.Params).Source = coveredDrawTarget(bounds) }},
++		{"translucent-over", func(r render.Render) {
++			p := r[3].(*pimage.Params)
++			p.Op = draw.Over
++			p.Source = image.NewUniform(color.NRGBA{1, 2, 3, 99})
++		}},
++		{"small-overlap", func(r render.Render) { r[3].(*pimage.Params).Rect = image.Rect(0, 0, 8, 8) }},
++		{"set-pixel", func(r render.Render) { r[3].(*pimage.Params).Cmd = pimage.SetPixel }},
++		{"scroll", func(r render.Render) { r[2].(*render.ContextPush).Scroll = &render.ScrollSurface{} }},
++		{"painted-path", func(r render.Render) {
++			p := r[1].(*render.Path)
++			p.Context.Style.Fill.Color = image.White
++			p.Context.Style.Fill.Opacity = 1
++		}},
++		{"transform", func(r render.Render) { r[1].(*render.Path).Context.Cumulative = math32.Scale2D(2, 2) }},
++		{"oversize-path", func(r render.Render) { p := r[1].(*render.Path); p.Path = append(p.Path, p.Path...) }},
++	} {
++		t.Run(test.name, func(t *testing.T) {
++			items := cropTestPair(bounds)
++			test.change(items)
++			rs := coveredDrawRenderer(coveredDrawTarget(bounds))
++			before := append([]byte(nil), rs.image.Pix...)
++			if rs.drawUncoveredUniform(items, 0, items[0].(*pimage.Params)) || !bytes.Equal(before, rs.image.Pix) {
++				t.Fatal("fallback cropped or wrote pixels")
++			}
++			coveredDrawCompare(t, bounds, items)
++		})
++	}
++	for _, at := range []int{0, 3} {
++		items := cropTestPair(bounds)
++		calls := 0
++		items[at].(*pimage.Params).Source = image.NewUniform(coveredDrawColor{&calls})
++		rs := coveredDrawRenderer(coveredDrawTarget(bounds))
++		if rs.drawUncoveredUniform(items, 0, items[0].(*pimage.Params)) || calls != 0 {
++			t.Fatal("custom color inspected")
++		}
++		coveredDrawCompare(t, bounds, items)
++		if calls != 2 {
++			t.Fatalf("lost custom source calls: %d", calls)
++		}
++	}
++	for _, n := range []int{7, 8} {
++		first := cropTestDraw(bounds, draw.Src, color.RGBA{1, 2, 3, 255})
++		items := render.Render{first}
++		for range n {
++			items = append(items, &render.ContextPop{})
++		}
++		items = append(items, cropTestDraw(bounds.Inset(1), draw.Src, color.Alpha{99}))
++		rs := coveredDrawRenderer(coveredDrawTarget(bounds))
++		if got := rs.drawUncoveredUniform(items, 0, first); got != (n == 7) {
++			t.Fatalf("lookahead n=%d got=%v", n, got)
++		}
++		coveredDrawCompare(t, bounds, items)
++	}
++}
++
++type cropTestScanner struct {
++	Scanner
++	pixels   *image.RGBA
++	observed [][]byte
++}
++
++func (s *cropTestScanner) Clear() {
++	s.observed = append(s.observed, append([]byte(nil), s.pixels.Pix...))
++	s.Scanner.Clear()
++}
++
++func TestUniformCropKeepsScannerObservers(t *testing.T) {
++	bounds := image.Rect(0, 0, 112, 96)
++	items := cropTestPair(bounds)
++	a, b := coveredDrawRenderer(coveredDrawTarget(bounds)), coveredDrawRenderer(coveredDrawTarget(bounds))
++	sa, sb := &cropTestScanner{Scanner: a.Scanner, pixels: a.image}, &cropTestScanner{Scanner: b.Scanner, pixels: b.image}
++	a.Raster.Filler.Scanner = sa
++	b.Raster.Filler.Scanner = sb
++	a.Render(coveredDrawCopies(items))
++	coveredDrawReference(b, coveredDrawCopies(items))
++	if len(sa.observed) != 1 || !reflect.DeepEqual(sa.observed, sb.observed) || !bytes.Equal(a.image.Pix, b.image.Pix) {
++		t.Fatal("scanner observed omitted fill")
++	}
++}
++
++func TestUniformCropMalformedPathPanicParity(t *testing.T) {
++	bounds := image.Rect(0, 0, 112, 96)
++	for _, path := range []ppath.Path{{99, 0, 0, 99}, {ppath.MoveTo, 1}, {ppath.QuadTo, 1, 2, ppath.QuadTo}, {ppath.MoveTo, 1, 2, ppath.LineTo}, {ppath.MoveTo, float32(math.NaN()), 2, ppath.MoveTo}} {
++		items := cropTestPair(bounds)
++		items[1].(*render.Path).Path = path
++		a, b := coveredDrawRenderer(coveredDrawTarget(bounds)), coveredDrawRenderer(coveredDrawTarget(bounds))
++		if a.cropNoPaintPath(items[1].(*render.Path)) {
++			t.Fatal("malformed path crossed")
++		}
++		capture := func(f func()) (panicText string) {
++			defer func() {
++				if v := recover(); v != nil {
++					panicText = fmt.Sprint(v)
++				}
++			}()
++			f()
++			return
++		}
++		pa := capture(func() { a.Render(coveredDrawCopies(items)) })
++		pb := capture(func() { coveredDrawReference(b, coveredDrawCopies(items)) })
++		if pa != pb || !bytes.Equal(a.image.Pix, b.image.Pix) {
++			t.Fatalf("panic/pixels differ for %v: %q != %q", path, pa, pb)
++		}
++	}
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/uniform_crop_bench_test.go
+@@ -0,0 +1,63 @@
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/ppath"
++	"cogentcore.org/core/paint/render"
++)
++
++// Identical body runs against pristine and candidate Renderer.Render binaries.
++// Large nested box backgrounds precede 486 small cell backgrounds; assertions
++// and construction stay outside timing. This measures CPU replay only.
++func BenchmarkUniformCropGrid(b *testing.B) {
++	items := make(render.Render, 0, 2000)
++	add := func(rect image.Rectangle) {
++		items = append(items, &render.ContextPush{}, &pimage.Params{Cmd: pimage.Draw, Rect: rect, SourcePos: rect.Min, Op: draw.Src, Source: image.NewUniform(color.RGBA{27, 31, 41, 255})}, &pimage.Params{Cmd: pimage.Draw, Rect: rect, SourcePos: rect.Min, Op: draw.Over, Source: image.NewUniform(color.RGBA{39, 47, 59, 255})})
++		path := &render.Path{Path: ppath.Path{ppath.MoveTo, 2, 3, ppath.MoveTo, ppath.LineTo, 7, 9, ppath.LineTo, ppath.Close, 2, 3, ppath.Close}}
++		path.Context.Cumulative = math32.Identity2()
++		items = append(items, path)
++	}
++	for i := range 6 {
++		add(image.Rect(i*4, i*4, 1500-i*4, 1250-i*4))
++	}
++	for y := range 27 {
++		for x := range 18 {
++			add(image.Rect(24+x*70, 32+y*40, 94+x*70, 72+y*40))
++			items = append(items, &render.ContextPop{})
++		}
++	}
++	for range 6 {
++		items = append(items, &render.ContextPop{})
++	}
++	rs := New(math32.Vec2(1500, 1250)).(*Renderer)
++	want := coveredDrawRenderer(coveredDrawTarget(image.Rect(0, 0, 1500, 1250)))
++	coveredDrawReference(want, coveredDrawCopies(items))
++	rs.Render(items)
++	if !imageEqualCropBenchmark(rs.image, want.image) {
++		b.Fatal("benchmark replay pixels differ")
++	}
++	b.ReportAllocs()
++	b.ResetTimer()
++	for range b.N {
++		rs.Render(items)
++	}
++}
++
++func imageEqualCropBenchmark(a, b *image.RGBA) bool {
++	for y := a.Rect.Min.Y; y < a.Rect.Max.Y; y++ {
++		for x := a.Rect.Min.X; x < a.Rect.Max.X; x++ {
++			if a.RGBAAt(x, y) != b.RGBAAt(x, y) {
++				return false
++			}
++		}
++	}
++	return true
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/uniform_crop_scroll_test.go
+@@ -0,0 +1,64 @@
++// Copyright (c) 2026 Vellum contributors.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++)
++
++func TestUniformCropScrollFullAndStripReplay(t *testing.T) {
++	bounds := image.Rect(11, 9, 191, 105)
++	actual := coveredDrawRenderer(coveredDrawTarget(image.Rect(0, 0, 240, 160)))
++	reference := coveredDrawRenderer(coveredDrawTarget(image.Rect(0, 0, 240, 160)))
++	reused, repaired := 0, 0
++	for frame := range 24 {
++		position := image.Pt(frame*3, frame*2)
++		epoch := uint64(frame/8 + 1)
++		items := render.Render{&render.ContextPush{Scroll: &render.ScrollSurface{ID: 71, Epoch: epoch, Position: position, Bounds: bounds}},
++			cropTestDraw(bounds, draw.Src, color.RGBA{11, 13, 17, 255}), cropTestPath(),
++			cropTestDraw(bounds, draw.Src, color.RGBA{19, 27, 35, 255})}
++		items = append(items, scrollPattern(bounds, position, epoch)[1:]...)
++		items = append(items, &render.ContextPop{})
++		actual.Render(coveredDrawCopies(items))
++		scrollReference(reference, coveredDrawCopies(items))
++		if !bytes.Equal(actual.image.Pix, reference.image.Pix) {
++			t.Fatalf("scroll pixels differ at frame %d", frame)
++		}
++		stats := actual.ScrollStats()
++		reused += stats.ReusedGroups
++		repaired += stats.FullRedraws
++		if stats.CapturedPixels != stats.RedrawPixels {
++			t.Fatal("capture exceeds repaint", stats)
++		}
++	}
++	if repaired != 3 || reused != 21 {
++		t.Fatalf("cache path unexercised: full=%d reused=%d", repaired, reused)
++	}
++}
++
++func TestUniformCropClippedReplay(t *testing.T) {
++	bounds := image.Rect(0, 0, 112, 96)
++	clip := image.Rect(9, 11, 99, 83)
++	items := cropTestPair(bounds)
++	a, b := coveredDrawRenderer(coveredDrawTarget(bounds)), coveredDrawRenderer(coveredDrawTarget(bounds))
++	original := coveredDrawCopies(items)
++	for _, item := range original {
++		if p, ok := item.(*pimage.Params); ok {
++			prior := p.Rect
++			p.Rect = prior.Intersect(clip)
++			p.SourcePos = p.SourcePos.Add(p.Rect.Min.Sub(prior.Min))
++		}
++	}
++	coveredDrawReference(b, original)
++	a.renderItems(coveredDrawCopies(items), clip)
++	if !bytes.Equal(a.image.Pix, b.image.Pix) {
++		t.Fatal("clipped strip replay differs")
++	}
++}

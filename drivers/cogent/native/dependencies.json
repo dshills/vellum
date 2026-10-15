@@ -617,6 +617,17 @@
               "sha256": "de671611d2acb30e612b4c48a404d5f622148792de97121530057c176faf06b9"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/uniformcrop",
+          "inputs": "native/patches/uniformcrop/original-hashes.json",
+          "outputs": "native/patches/uniformcrop/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/uniformcrop/0064-crop-overwritten-uniform-pixels.patch",
+              "sha256": "1e7ff91884518ecb606f078649c7befe4c31b01a94c031e2763a1accc5546a64"
+            }
+          ]
         }
       ]
     },
