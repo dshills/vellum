@@ -186,11 +186,14 @@ func TestComposedVisibilityRequiresCompleteInsideFrames(t *testing.T) {
 }
 
 func TestComposedDeadlineHasBoundedExtendedBudget(t *testing.T) {
-	if err := (config{cycles: 1000, every: 25, timeout: 3 * time.Hour, composed: true}).validate(); err != nil {
+	if err := (config{cycles: 1000, every: 25, timeout: 3*time.Hour + time.Second, composed: true}).validate(); err != nil {
+		t.Fatal("extended composed deadline refused", err)
+	}
+	if err := (config{cycles: 1000, every: 25, timeout: 4 * time.Hour, composed: true}).validate(); err != nil {
 		t.Fatal(err)
 	}
-	if (config{cycles: 1000, every: 25, timeout: 3*time.Hour + time.Second, composed: true}).validate() == nil {
-		t.Fatal("composed run above three-hour cap admitted")
+	if (config{cycles: 1000, every: 25, timeout: 4*time.Hour + time.Second, composed: true}).validate() == nil {
+		t.Fatal("composed run above four-hour cap admitted")
 	}
 }
 

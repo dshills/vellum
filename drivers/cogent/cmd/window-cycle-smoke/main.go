@@ -52,10 +52,10 @@ func (c config) validate() error {
 	}
 	maximum := 20 * time.Minute
 	if c.composed {
-		maximum = 3 * time.Hour
+		maximum = 4 * time.Hour
 	}
 	if c.cycles < 1 || c.cycles > 1000 || c.every < 1 || c.every > c.cycles || c.timeout < 10*time.Second || c.timeout > maximum {
-		return errors.New("cycles 1..1000, sample-every 1..cycles, timeout 10s..20m (3h for composed) required")
+		return errors.New("cycles 1..1000, sample-every 1..cycles, timeout 10s..20m (4h for composed) required")
 	}
 	return nil
 }

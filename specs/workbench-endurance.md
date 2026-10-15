@@ -78,7 +78,7 @@ Density reports defined labels and frame containment within the measured root
 and scroll viewport after geometry publication. Requested1920×1080 dimensions
 are not effective geometry or100%scale qualification. Software tests replace
 Extension content with allocation placeholders and qualify only controls/labels.
-Composed deadlines are 10 seconds..3 hours; the original mode remains 20 minutes.
+Composed deadlines are 10 seconds..4 hours; the original mode remains 20 minutes.
 
 Workbench disposal recursively retires private panel records before widget
 teardown, including unadopted records after a failed shape rebuild. It revokes
@@ -184,3 +184,13 @@ lifecycle snapshot. Policy invocation does not identify a human, OS or applicati
 actor, nor prove completed native closure. Forced teardown bypasses the policy.
 An unavailable AX lookup after unregistration remains an error; diagnostics do
 not retry it or turn a partial campaign into a pass.
+
+The version-2 33-action [five-window preflight](../docs/reports/macos-composed-controls/README.md)
+recorded 57.762 seconds through its fifth terminal sample. A simple 1000-window
+projection is 11,552 seconds, already beyond the prior 10,800-second cap. The
+composed diagnostic deadline is therefore bounded at four hours, with a separate
+owned-process watchdog of four hours five minutes for that exact campaign. This
+projection guides test scheduling and is not a sustained-performance result.
+The 1000-cycle cap, 33-step plan, sample-every-25 cadence, 512 MiB sampled Go
+heap and 1 GiB sampled RSS guards are unchanged; the bounded profile is still
+8 MiB maximum. Complete current-source execution and cleanup remain required.

@@ -821,3 +821,10 @@ Its version-2 plan requires 33 acknowledged owner/native actions per fresh windo
 including rejected/repeated list proposals and current canvas publication.
 Fresh native evidence is required; earlier 24/26-step results do not qualify this
 mix, physical input, sustained performance or the remaining full Mac gates.
+
+The 33-step composed preflight projects beyond the old three-hour diagnostic
+deadline. Its bounded campaign deadline is now four hours; the ordinary mode
+remains capped at twenty minutes. The [endurance contract](workbench-endurance.md)
+retains the original workload, sampling and memory limits. This scheduling
+adjustment does not qualify a completed 1000-cycle campaign or close full Mac
+performance, memory, physical/human or distribution acceptance.
