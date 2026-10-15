@@ -509,3 +509,22 @@ The optimization applies to unclipped CPU replay, including full cache repaint;
 strip-clipped replay and scene packet capture keep their original paths.
 Software differential tests and fixed microbenchmarks establish scoped behavior;
 they do not qualify native frame latency or change GPU opt-in defaults.
+
+### Builder-local header bands
+
+The span builder stores its active operation inline and may reuse one exact
+power-of-two construction header container for each size 1..256. The nine slots
+bound backing to 511 slice headers (12,264 bytes on 64-bit); fixed slot metadata
+and inline operation storage are additional construction state. Larger/clamped
+non-power-of-two containers bypass reuse. None of this construction scratch is
+part of the unchanged logical packet payload charge.
+
+Admission occurs before cache removal/allocation. Growth copies active row
+references before clearing the old container and does not recycle their spans.
+Flush detaches exact packet storage before recycling construction headers/spans.
+Idle header slots contain no span references; the inline operation clears on
+flush. Successful/refused Seal retires all nine slots and inline state. Packets
+never alias these headers, including after another stream or borrowed-container
+mutation. There is no global pool or cross-renderer cache. See the
+[span header checkpoint](../docs/reports/macos-span-headers/README.md); allocation
+evidence remains separate from the unchanged native performance budgets.

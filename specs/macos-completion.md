@@ -754,3 +754,13 @@ are specified in [canvas accessibility](canvas-accessibility.md). Offscreen soft
 routing and inert Cocoa fixtures qualify their tested paths; live attachment,
 physical input/display changes and human VoiceOver remain separate P3 gates.
 This checkpoint does not complete P3, P4/P6/P9/P11 or Mac release acceptance.
+
+## Span header construction checkpoint
+
+The [bounded header patch](../docs/reports/macos-span-headers/README.md) removes
+per-stream operation allocations and reuses at most 511 temporary row headers
+within one scene builder. Five actual software grid-capture pairs preserve packet
+accounting/encodings/pixels while reducing allocated objects and bytes. Exact
+admission, no retained span references, packet independence and both retirement
+paths remain required. No native frame-latency or retained/native/GPU memory gain
+is qualified; the failed 4/6 ms targets and full P4/P6/P11/Mac gates remain open.

@@ -1,0 +1,251 @@
+--- a/paint/renderers/sceneplan/builder.go
++++ b/paint/renderers/sceneplan/builder.go
+@@ -19,6 +19,8 @@
+ 	count                              int
+ 	masks                              map[*image.Alpha]*image.Alpha
+ 	stream                             *operation
++	streamValue                        operation
++	spanHeaders                        [9][][]span
+ 	streamRowMin                       int
+ 	spanScratch                        [32][]span
+ 	spanScratchCount, spanScratchBytes int
+@@ -93,6 +95,9 @@
+ 		return
+ 	}
+ 	o := *b.stream
++	construction := o.rows
++	defer b.retainSpanHeaders(construction)
++	b.streamValue = operation{}
+ 	rowMin := b.streamRowMin
+ 	b.stream = nil
+ 	b.streamRowMin = 0
+@@ -164,7 +169,8 @@
+ 		return
+ 	}
+ 	r, g, bl, a := c.RGBA()
+-	b.stream = &operation{kind: Spans, op: op, color: [4]uint32{r, g, bl, a}}
++	b.streamValue = operation{kind: Spans, op: op, color: [4]uint32{r, g, bl, a}}
++	b.stream = &b.streamValue
+ }
+ func (b *Builder) Span(y, x0, x1 int, alpha uint32) {
+ 	if b.failed || b.stream == nil {
+@@ -205,11 +211,12 @@
+ 		return
+ 	}
+ 	if grow {
+-		grown := make([][]span, size)
++		grown := b.borrowSpanHeaders(size)
+ 		if !b.stream.rect.Empty() {
+ 			r := b.stream.rect
+ 			copy(grown[r.Min.Y-rowMin:], rows[r.Min.Y-b.streamRowMin:r.Max.Y-b.streamRowMin])
+ 		}
++		b.retainSpanHeaders(rows)
+ 		b.stream.rows = grown
+ 		b.streamRowMin = rowMin
+ 	}
+@@ -400,8 +407,43 @@
+ 	b.count = 0
+ 	b.masks = nil
+ 	b.stream = nil
++	b.streamValue = operation{}
++	b.spanHeaders = [9][][]span{}
+ 	b.streamRowMin = 0
+ 	b.spanScratch = [32][]span{}
+ 	b.spanScratchCount, b.spanScratchBytes = 0, 0
+ 	b.failed = true // construction callbacks cannot mutate the sealed result
+ }
++
++// Temporary header bands remain local to one builder and never enter a packet.
++// One exact power-of-two allocation for sizes1..256 bounds backing to511
++// slice headers (~12KiB on64-bit). Empty slots and all returned bands hold no
++// span references. Logical charges are still checked before borrowing a band.
++func spanHeaderSlot(size int) int {
++	if size < 1 || size > 256 || size&(size-1) != 0 {
++		return -1
++	}
++	slot := 0
++	for size > 1 {
++		size >>= 1
++		slot++
++	}
++	return slot
++}
++func (b *Builder) borrowSpanHeaders(size int) [][]span {
++	if slot := spanHeaderSlot(size); slot >= 0 {
++		if headers := b.spanHeaders[slot]; headers != nil {
++			b.spanHeaders[slot] = nil
++			return headers
++		}
++	}
++	return make([][]span, size)
++}
++func (b *Builder) retainSpanHeaders(headers [][]span) {
++	slot := spanHeaderSlot(len(headers))
++	if slot < 0 || cap(headers) != len(headers) || b.spanHeaders[slot] != nil {
++		return
++	}
++	clear(headers)
++	b.spanHeaders[slot] = headers
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/span_headers_vellum_test.go
+@@ -0,0 +1,159 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"reflect"
++	"testing"
++	"unsafe"
++)
++
++func checkHeaderScratch(t *testing.T, b *Builder) {
++	t.Helper()
++	if b.stream == nil && !reflect.DeepEqual(b.streamValue, operation{}) {
++		t.Fatal("flushed inline operation retains references")
++	}
++	bytes := 0
++	seen := map[*[]span]bool{}
++	for slot, headers := range b.spanHeaders {
++		if headers == nil {
++			continue
++		}
++		if len(headers) != 1<<slot || cap(headers) != len(headers) {
++			t.Fatal("non-exact retained header band", slot, len(headers), cap(headers))
++		}
++		bytes += cap(headers) * int(unsafe.Sizeof([]span{}))
++		pointer := &headers[0]
++		if seen[pointer] {
++			t.Fatal("scratch header bands alias")
++		}
++		seen[pointer] = true
++		if b.stream != nil && len(b.stream.rows) > 0 && pointer == &b.stream.rows[0] {
++			t.Fatal("active header band also cached")
++		}
++		for _, row := range headers {
++			if row != nil {
++				t.Fatal("cached header retained span reference")
++			}
++		}
++	}
++	if bytes > 511*int(unsafe.Sizeof([]span{})) {
++		t.Fatal("header scratch exceeds fixed bound", bytes)
++	}
++}
++func TestVellumSpanHeadersReuseKeepsDetachedPackets(t *testing.T) {
++	b := New(image.Rect(0, 0, 32, 1024))
++	c := color.RGBA{17, 29, 43, 128}
++	var held [][]span
++	b.BeginSpans(c, draw.Over)
++	for y := 0; y < 256; y++ {
++		b.Span(y, 1, 17, 32767)
++		if y == 255 {
++			held = b.stream.rows
++		}
++		checkHeaderScratch(t, b)
++	}
++	b.flush()
++	checkHeaderScratch(t, b)
++	for i, headers := range b.spanHeaders {
++		if len(headers) != 1<<i {
++			t.Fatal("geometric construction band was not retained", i)
++		}
++	}
++	first := b.head.ops[0]
++	// Reuse all nine header bands in another stream, preserving the first owned
++	// operation. This would corrupt first.rows if construction escaped flush.
++	b.BeginSpans(c, draw.Src)
++	for y := 255; y >= 0; y-- {
++		b.Span(y, 2, 19, 12345)
++		checkHeaderScratch(t, b)
++	}
++	b.flush()
++	checkHeaderScratch(t, b)
++	for y, row := range first.rows {
++		if len(row) != 1 || row[0] != (span{1, 17, 32767}) {
++			t.Fatal("header reuse changed owned operation", y, row)
++		}
++	}
++	packet := b.Seal(true)
++	if packet == nil || packet.Operations() != 2 {
++		t.Fatal("packet refused")
++	}
++	before, ok := packet.EncodeGPU()
++	if !ok {
++		t.Fatal("encode refused")
++	}
++	// Retained borrowed construction containers cannot mutate sealed packet rows.
++	for i := range held {
++		held[i] = []span{{0, 31, 65535}}
++	}
++	after, ok := packet.EncodeGPU()
++	if !ok || !reflect.DeepEqual(before, after) {
++		t.Fatal("borrowed header mutation changed sealed packet")
++	}
++}
++func TestVellumSpanHeadersBudgetPrecedesBorrowAndRetirement(t *testing.T) {
++	for _, short := range []int{0, 1} {
++		b := New(image.Rect(0, 0, 32, 300))
++		b.BeginSpans(color.RGBA{}, draw.Src)
++		b.Span(10, 1, 2, 100)
++		b.flush()
++		cached := b.spanHeaders[0]
++		if cached == nil {
++			t.Fatal("fixture failed to seed scratch")
++		}
++		b.BeginSpans(color.RGBA{}, draw.Src)
++		b.packet.bytes = MaxBytes - int(unsafe.Sizeof(span{})) - int(unsafe.Sizeof([]span{})) + short
++		b.Span(10, 1, 2, 100)
++		if short == 1 {
++			if !b.Failed() || b.spanHeaders[0] == nil || &b.spanHeaders[0][0] != &cached[0] || len(b.stream.rows) != 0 {
++				t.Fatal("budget refused after popping/allocating band")
++			}
++		} else if b.Failed() || b.spanHeaders[0] != nil || len(b.stream.rows) != 1 {
++			t.Fatal("exact admission refused")
++		}
++		b.Seal(false)
++		if !reflect.DeepEqual(b.streamValue, operation{}) || b.stream != nil {
++			t.Fatal("retired inline operation retained ownership")
++		}
++		for _, headers := range b.spanHeaders {
++			if headers != nil {
++				t.Fatal("retired header cache retained ownership")
++			}
++		}
++	}
++}
++func TestVellumSpanHeadersClampedBandsBypassCache(t *testing.T) {
++	for _, height := range []int{3, 127, 255, 257, 300, 512, 1024} {
++		b := New(image.Rect(0, 0, 32, height))
++		b.BeginSpans(color.RGBA{}, draw.Src)
++		b.Span(0, 0, 3, 100)
++		b.Span(height-1, 1, 4, 200)
++		construction := b.stream.rows
++		if len(construction) != height {
++			t.Fatal("growth changed logical band", height, len(construction))
++		}
++		b.flush()
++		checkHeaderScratch(t, b)
++		for _, headers := range b.spanHeaders {
++			if len(headers) > 0 && &headers[0] == &construction[0] {
++				t.Fatal("oversized/clamped non-power band retained", height)
++			}
++		}
++		b.Refuse()
++		if b.Seal(false) != nil {
++			t.Fatal("refused seal returned packet")
++		}
++		if !reflect.DeepEqual(b.streamValue, operation{}) {
++			t.Fatal("refused stream retained rows")
++		}
++		for _, headers := range b.spanHeaders {
++			if headers != nil {
++				t.Fatal("refused builder retained scratch")
++			}
++		}
++	}
++}

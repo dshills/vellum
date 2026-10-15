@@ -639,6 +639,17 @@
               "sha256": "97e0fccbbcafc07f3633211b78ec9bb473f4fc8740c2a43276b46c150968812b"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/spanheaders",
+          "inputs": "native/patches/spanheaders/original-hashes.json",
+          "outputs": "native/patches/spanheaders/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/spanheaders/0066-bounded-span-header-scratch.patch",
+              "sha256": "c5087950989f250e279037a72d96e27be8002d734f803a1c780e85dd6c281c60"
+            }
+          ]
         }
       ]
     },
