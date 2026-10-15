@@ -4,6 +4,7 @@ These reports preserve investigation outcomes and their original validation scop
 The [implementation status](../implementation.md) describes the current framework.
 
 - [Bounded ListBox control](macos-list-box/README.md)
+- [ListBox native writability metadata](macos-listbox-metadata/README.md)
 
 - [Tree and retained-view geometry publication](macos-tree-publication/README.md)
 - [Stored-tree CPU/GPU route investigation](macos-tree-gpu/README.md)

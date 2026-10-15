@@ -73,6 +73,9 @@ are refused; namespaced Workbench/modal focus uses the standard managed proxy.
 The Cocoa selected-row setter requests one enabled current child through the
 same owner selection path. Empty, multiple, foreign and stale row requests
 refuse; application code can still clear accepted selection programmatically.
+The native selected-rows writability query follows the current mutation policy,
+including read-only/disabled transitions without replacing a compatible list.
+The transport's setter return code does not promise owner admission or acceptance.
 
 The gallery's **Lists** page demonstrates scrolling, disabled items, rejection,
 read-only selection, stable reorder and programmatic clear. Run the gallery

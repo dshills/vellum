@@ -807,3 +807,10 @@ selection. See the [checkpoint](../docs/reports/macos-list-box/README.md) for
 automated routing and inert Cocoa scope. Physical input, human VoiceOver,
 native/GPU memory, sustained performance, endurance and distribution acceptance
 remain required before full Mac completion.
+
+The ListBox native metadata follow-up corrects read-only `AXSelectedRows`
+writability using a list-specific Cocoa compatibility class. Same-ID class
+transitions retire old objects while preserving ordinary cached bounds. See
+the [follow-up evidence](../docs/reports/macos-listbox-metadata/README.md) for the
+external native query/selection checks and their exact scope. Native pointer,
+keyboard and focus-reveal qualification remain open.

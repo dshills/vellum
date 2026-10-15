@@ -244,6 +244,20 @@ static NSRect vellumAXClipRect(NSRect r,NSRect viewport){if(r.size.width==0){if(
  if(text)[self request:@"set" value:text];
 }
 @end
+// Keep the legacy writability fallback on lists so other roles retain their
+// existing AppKit handling. Modern setter admission remains authoritative.
+@interface VellumAXListElement : VellumAXElement
+@end
+@implementation VellumAXListElement
+- (BOOL)accessibilityIsAttributeSettable:(NSAccessibilityAttributeName)attribute {
+ if([attribute isEqual:NSAccessibilitySelectedRowsAttribute])return [self isAccessibilitySelectorAllowed:@selector(setAccessibilitySelectedRows:)];
+ // This optional method is absent from NSAccessibilityElement on some systems.
+ // respondsToSelector would see our override, so inspect the superclass instead.
+ if(class_getInstanceMethod(VellumAXElement.class,_cmd))return [super accessibilityIsAttributeSettable:attribute];
+ return NO;
+}
+@end
+static VellumAXElement *vellumAXNewElement(NSDictionary *node){return [node[@"role"] isEqual:@"list-box"]?[VellumAXListElement new]:[VellumAXElement new];}
 static id vellumAXFocused(VellumAXState *state){for(VellumAXElement *x in state.elements.allValues)if(x.live&&[x isAccessibilityFocused])return x;return nil;}
 // Descriptor siblings retain painter/navigation order. Search later branches
 // first and descendants before their parent; traverse zero-frame containers
@@ -446,6 +460,7 @@ static void vellumAXRetire(VellumAXElement *element){element.live=NO;element.par
 // Scope host Parent is part of an incarnation's native ownership boundary.
 static BOOL vellumAXCanReuse(VellumAXElement *old,NSDictionary *node,NSDictionary *nodes,NSDictionary<NSString *,VellumAXElement *> *oldElements){
  if(!old.live)return NO;
+ if([old isKindOfClass:VellumAXListElement.class]!=[node[@"role"] isEqual:@"list-box"])return NO;
  NSString *scope=node[@"grid_scope"],*oldScope=old.node[@"grid_scope"];
  // Ordinary controls retain their legacy ID identity and cached geometry
  // across reparenting. Parent is an ownership boundary only for grid scopes.
@@ -462,14 +477,19 @@ static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,B
  // Allocate every required object before mutating the retained tree. Identity
  // exhaustion refuses the complete transaction and cannot wrap old IDs.
  NSMutableDictionary<NSString *,VellumAXElement *> *next=[NSMutableDictionary new];NSMutableDictionary *childLists=[NSMutableDictionary new];
- for(NSDictionary *node in snapshot[@"nodes"]){NSString *identifier=node[@"id"];VellumAXElement *old=state.elements[identifier];VellumAXElement *element=vellumAXCanReuse(old,node,nodes,state.elements)?old:[VellumAXElement new];if(!element)return NO;next[identifier]=element;childLists[identifier]=[NSMutableArray new];}
+ for(NSDictionary *node in snapshot[@"nodes"]){NSString *identifier=node[@"id"];VellumAXElement *old=state.elements[identifier];VellumAXElement *element=vellumAXCanReuse(old,node,nodes,state.elements)?old:vellumAXNewElement(node);if(!element)return NO;next[identifier]=element;childLists[identifier]=[NSMutableArray new];}
  id oldFocus=vellumAXFocused(state);NSString *oldFocusedID=[oldFocus isKindOfClass:VellumAXElement.class]?[oldFocus accessibilityIdentifier]:@"";
  NSArray *oldHierarchy=state.hierarchy;NSMutableArray *hierarchy=[NSMutableArray new],*changedElements=[NSMutableArray new],*roots=[NSMutableArray new];
  for(NSDictionary *node in snapshot[@"nodes"]){
   NSString *identifier=node[@"id"];VellumAXElement *element=next[identifier],*old=state.elements[identifier];
   [hierarchy addObject:@[identifier,node[@"parent"],node[@"role"],@(element.objectIdentity)]];
   NSObject *oldValue=element.node[@"value"],*newValue=node[@"value"];BOOL changed=element.node&&oldValue!=newValue&&![oldValue isEqual:newValue];
-  if(old&&old!=element){vellumAXRetire(old);[state.geometry removeObjectForKey:identifier];[state.textGeometry removeObjectForKey:identifier];}
+  if(old&&old!=element){
+   // Ordinary geometry belongs to ID membership, not the Cocoa class. The Go
+   // bridge may suppress identical bounds across this list-capability change.
+   BOOL preserveGeometry=!old.node[@"grid_scope"]&&!node[@"grid_scope"];
+   vellumAXRetire(old);if(!preserveGeometry)[state.geometry removeObjectForKey:identifier];[state.textGeometry removeObjectForKey:identifier];
+  }
   element.state=state;element.node=node;element.live=YES;element.textGeometry=state.textGeometry[identifier];
   if(node[@"grid_scope"]){element.pixelFrame=node[@"grid_frame"]?vellumAXArrayRect(node[@"grid_frame"]):NSZeroRect;[state.geometry removeObjectForKey:identifier];}
   else {NSArray *rect=state.geometry[identifier];element.pixelFrame=rect.count==4?vellumAXArrayRect(rect):NSZeroRect;}
@@ -514,6 +534,10 @@ static NSDictionary *vellumAXFixtureElement(VellumAXElement *element){
  NSRect frame=element.pixelFrame;
  NSMutableDictionary *result=[@{@"id":element.accessibilityIdentifier?:@"",@"object_identity":@(element.objectIdentity),@"live":@(element.live),@"enabled":@([element isAccessibilityEnabled]),@"focused":@([element isAccessibilityFocused]),@"press_allowed":@([element isAccessibilitySelectorAllowed:@selector(accessibilityPerformPress)]),@"grid_scope":element.node[@"grid_scope"]?:@"",@"grid_incarnation":element.node[@"grid_incarnation"]?:@0,@"grid_pending":@([element.node[@"grid_pending"] boolValue]),@"grid_target_generation":element.node[@"grid_target_generation"]?:@0,@"grid_generation":element.node[@"grid_generation"]?:@0,@"value":element.accessibilityValue?:NSNull.null,@"frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]} mutableCopy];
  if([element.node[@"role"] isEqual:@"list-box"]||[element.node[@"role"] isEqual:@"list-option"]){result[@"role"]=element.accessibilityRole;result[@"index"]=@(element.accessibilityIndex);result[@"rows"]=@(element.accessibilityRowCount);result[@"visible_rows"]=[element.accessibilityVisibleRows valueForKey:@"accessibilityIdentifier"];result[@"visible_children"]=[element.accessibilityVisibleChildren valueForKey:@"accessibilityIdentifier"];result[@"selected_rows"]=[element.accessibilitySelectedRows valueForKey:@"accessibilityIdentifier"];result[@"selected_children"]=[element.accessibilitySelectedChildren valueForKey:@"accessibilityIdentifier"];result[@"set_rows_allowed"]=@([element isAccessibilitySelectorAllowed:@selector(setAccessibilitySelectedRows:)]);}
+ if([element isKindOfClass:VellumAXListElement.class]){
+  result[@"set_rows_reported"]=@([element accessibilityIsAttributeSettable:NSAccessibilitySelectedRowsAttribute]);
+  result[@"unknown_settable"]=@([element accessibilityIsAttributeSettable:@"AXVellumUnknownAttribute"]);
+ }
  return result;
 }
 char *vellumAXScopedFixture(const char *json){
