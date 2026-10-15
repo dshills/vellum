@@ -133,6 +133,45 @@ it is not physical input replay. Broader external automation workflows,
 large-grid acceptance, output-reader timers and
 filesystem autosave remain separate work.
 
+### Stored managed-grid replay
+
+The driver offscreen regression `TestStoredGridRoutedReplayAcrossBatches` adds
+two stored datasets: 10,000 and 1,000,000 rows, each retaining twenty `uint32`
+fields. This is separate from the four-row independent replay consumer and its
+bundled record. A pilot measures one sixteen-event physical input trace per
+dataset; fresh instances replay that unchanged trace at dispatch batches 1, 7
+and 64. Coordinates are measured once by the pilot, not resolved again during
+replay. The source bytes and fixed sequence define this test; it does not yet
+provide an independently archived, versioned large-workspace replay record.
+
+The trace selects a cell, extends a two-row selection, scrolls both axes,
+reverses an immutable source index, selects a visible cell at the new deep
+offset, opens its inline editor with F2, types `42`, commits with Enter, and
+uses actual Undo/Redo buttons. The source replacement reverses an already
+ordered index in constant time; it is not a background sort/filter workload.
+An application-owned journal restores the original cell bytes and reapplies
+the edit with increasing cell versions. One inspector window shares the domain.
+
+Ten completed checkpoints compare source revision, active cell, captured
+selection, draft/editor state, viewport, measured cell/header geometry, actual
+control semantics/focus and both software-image digests. Explicit assertions
+check `42`, original bytes, cell versions, source revisions and history counts
+independently of pilot equality. A row/column formula also verifies every
+measured cell's key and value against the requested normal/reversed ordering;
+the undo baseline is calculated from the record identity, not copied from the
+pilot. Image identities include bounds and stride. Process-global native incarnation tokens and
+transport frame/generation counters are excluded from cross-instance equality;
+their lifetime checks are separate. A captured scrolled-out cell refuses stale
+input without changing a completed checkpoint. Closing the grid window refuses
+old window input and preserves the surviving inspector image.
+
+Dispatch has an explicit step bound, checks each call's event/owner charge and
+requests pending frames explicitly. No sleep, real clock advance, desktop
+session, native GPU or OS service is used. This regression covers its stored
+grid/editor/history/window composition; the P5/P6 workspace with canvas,
+worker-built views, cancellation, a versioned large replay record and the full
+P9/P11 acceptance requirements remain separate.
+
 The Manual scene size is the requested physical viewport, including its native
 scene padding/border. The body grows into the allocated content area; requested
 window dimensions are not reapplied as a body-content minimum. This keeps grown

@@ -1,0 +1,46 @@
+{
+  "result": "PASS_SCOPED_STORED_GRID_REPLAY",
+  "base_commit": "2c87a3d877c092b8ccf8b281cf6473f494d4c567",
+  "sources": {
+    "drivers/cogent/grid_replay_offscreen_test.go": "82d6c3cc936cb0638922a7d8bbeab3b73ca0feddf2db1dd7db5f69e0cef0b5a3",
+    "specs/replay.md": "7277fa2782114194a8e28b52ad4386c3eb46bb31817d09c6920c7a4fc4e8e18c",
+    "docs/reports/macos-grid-replay/README.md": "0aec151d2e190d40c7c801a4c2047fae75e254d80ffc4916f2aeb558185666ff"
+  },
+  "prepared_files": 6216,
+  "checks": {
+    "full-offscreen-race-v3": {
+      "sha256": "f36bf2904b17027238a8d6166e9f08da3e7c7dce7d1147d2c573cef7cd71962a",
+      "exit_code": 0,
+      "elapsed_seconds": 99.39812775002792
+    },
+    "vet-v3": {
+      "sha256": "aa0732be2bd91fc424945b64f88e4e3274c724dfaaebbca4747da27b74d015a3",
+      "exit_code": 0,
+      "elapsed_seconds": 3.27165458293166
+    },
+    "wheel-fault-v3": {
+      "sha256": "21ab063f89e7a661e3737b6dd52f06f8747e644909bc44836c8038dbcd8b7e38",
+      "exit_code": 1,
+      "elapsed_seconds": 6.983648999943398
+    }
+  },
+  "internal_review": "APPROVED_SOURCE_AND_EVIDENCE",
+  "internal_review_sha256": "6b28cc02315acb23fc575e11dd107d87a3d5608d5e9e0ea708159d37bd12a751",
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_invocations": 1,
+  "prism_llm_calls": 2,
+  "prism_coverage_complete": true,
+  "prism_findings": 0,
+  "prism_process_sha256": "a6169b1711f6c7f0ccff842074c62166f22000bb120ec05515fdf3813bdb08a0",
+  "archive_sha256": "e9a122b2580b831971536ba00934d0886cae7de83a5447e4965b0da0a852dbbd",
+  "archive_bytes": 3027577,
+  "archive_members": 39,
+  "archive_index_sha256": "8fe08c6533aea773841b18f8a1d1b422119003c63458ab9b532e8981176529f6",
+  "producer_sha256": "a222cc184268d5d41f6de88c2e50e1e61c93bddb4962302776e4f9437244fc62",
+  "live_tests": false,
+  "runtime_implementation_changed": false,
+  "full_p9_qualified": false,
+  "full_mac_qualified": false,
+  "scope": "Test/spec-only change. Pilot authors one physical-coordinate trace per dataset in each test process; three fresh instances consume that identical trace. Formula/domain/history oracles supplement equality. No independently versioned large replay record, workers/canvas/P5 workspace, Cocoa/GPU/physical input, frame/heap/native memory budgets or overnight qualification."
+}
