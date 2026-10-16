@@ -271,6 +271,9 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 			if e != nil {
 				return checkSoakEndpoints(phase, samples+1, endpoint0, soakEndpoint{}, time.Time{}, time.Time{}, emit)
 			}
+			activityStartRead := soakActivityReadWindow{StartUTC: time.Now()}
+			activity0 := cogent.NativeActivitySnapshot()
+			activityStartRead.EndUTC = time.Now()
 			wakes := win.Paint.Wakes.Load()
 			cpu0, e := soakCPU()
 			if e != nil {
@@ -287,6 +290,9 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 			if e != nil {
 				return e
 			}
+			activityEndRead := soakActivityReadWindow{StartUTC: time.Now()}
+			activity1 := cogent.NativeActivitySnapshot()
+			activityEndRead.EndUTC = time.Now()
 			intervalEligible, cpuPercent, e := soakInterval(c.soak.Quiet, elapsed, wallElapsed, cpu1-cpu0)
 			if e != nil {
 				return e
@@ -296,6 +302,10 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 			endpoint1 := soakEndpoint{target: state1, cover: cover1, err: e, at: time.Now()}
 			if err := checkSoakEndpoints(phase, samples+1, endpoint0, endpoint1, t0, t1, emit); err != nil {
 				return err
+			}
+			activity, activityErr := soakActivityDelta(os.Getpid(), activity0, activity1, soakActivityBounds{StartRead: activityStartRead, EndRead: activityEndRead, QuietStart: t0, QuietEnd: t1})
+			if activityErr != nil {
+				return errors.Join(activityErr, emit(map[string]any{"event": "vellum.soak.activity-failure", "phase": phase, "sample": samples + 1, "start_utc": t0.UTC(), "end_utc": t1.UTC(), "framework_native_activity": activity}))
 			}
 			memory, e := sample(ctx, 0, soakStarted)
 			if e != nil {
@@ -308,7 +318,7 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 				return e
 			}
 			samples++
-			observation := map[string]any{"event": "vellum.soak.sample", "phase": phase, "sample": samples, "elapsed_seconds": elapsed, "wall_elapsed_seconds": wallElapsed, "start_utc": t0.UTC(), "end_utc": t1.UTC(), "process_cpu_seconds": cpu1 - cpu0, "one_cpu_percent": cpuPercent, "primary_paint_wakes": delta, "start_state": state0, "end_state": state1, "forced_gc_memory": memory, "background_commits": committed, "app_originated_wakeups_available": false, "present_count_available": false, "cpu_60s_interval": intervalEligible, "full_p11_qualified": false}
+			observation := map[string]any{"event": "vellum.soak.sample", "phase": phase, "sample": samples, "elapsed_seconds": elapsed, "wall_elapsed_seconds": wallElapsed, "start_utc": t0.UTC(), "end_utc": t1.UTC(), "process_cpu_seconds": cpu1 - cpu0, "one_cpu_percent": cpuPercent, "primary_paint_wakes": delta, "start_state": state0, "end_state": state1, "forced_gc_memory": memory, "background_commits": committed, "framework_native_activity": activity, "app_originated_wakeups_available": false, "present_count_available": false, "cpu_60s_interval": intervalEligible, "full_p11_qualified": false}
 			if e = emit(observation); e != nil {
 				return e
 			}

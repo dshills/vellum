@@ -48,7 +48,7 @@ SOURCE_RECORD_FIELDS = {
     "Composition", "Source", "Kind", "DrawNS", "RasterNS", "CopyNS",
     "RasterAvailable", "CopyAvailable", "ImageWidth", "ImageHeight", "ImageChanged",
     "ImageUploadTimingAvailable", "SetFromGoImageNS", "SetFromGoImageAttempts",
-    "ImageCacheHits", "LogicalUploadRGBABytes",
+    "ImageCacheHits", "LogicalUploadRGBABytes", "SceneHost",
 }
 INT64_MAX = (1 << 63) - 1
 UINT64_MAX = (1 << 64) - 1
@@ -63,6 +63,77 @@ def source_integer(record, field, maximum):
     return value
 
 
+
+SCENE_HOST_FLAGS = (
+    "Available", "CaptureAttempted", "EncodeAttempted", "LeaseAttempted",
+    "ResourcesEntered", "InputAttempted", "DrawAccepted", "Reused", "Fallback",
+)
+SCENE_HOST_TIMES = ("CaptureNS", "EncodeNS", "LeaseNS", "ResourcesNS", "InputNS")
+SCENE_HOST_COUNTERS = ("InputWriteAttempts", "InputWriteErrors", "LogicalInputBytes", "QueueSubmitAttempts")
+SCENE_HOST_FIELDS = set(SCENE_HOST_FLAGS + SCENE_HOST_TIMES + SCENE_HOST_COUNTERS)
+
+
+def validate_scene_host(record):
+    """Validate current scalar host diagnostics, never infer GPU completion."""
+    host = record["SceneHost"]
+    if type(host) is not dict or set(host) != SCENE_HOST_FIELDS:
+        raise ValueError("invalid scene host scalar schema")
+    for flag in SCENE_HOST_FLAGS:
+        if type(host[flag]) is not bool:
+            raise ValueError("invalid scene host availability/outcome flag")
+    for name in SCENE_HOST_TIMES:
+        source_integer(host, name, INT64_MAX)
+    for name in SCENE_HOST_COUNTERS:
+        source_integer(host, name, UINT64_MAX)
+    if not host["Available"]:
+        if any(host[name] for name in SCENE_HOST_FIELDS):
+            raise ValueError("unavailable scene host observation fabricated")
+        return
+    if (host["CaptureAttempted"] and not record["ImageChanged"]) or (
+            host["DrawAccepted"] and record["ImageChanged"] != host["CaptureAttempted"]):
+        raise ValueError("scene host image change differs from capture/reuse")
+    if host["DrawAccepted"] == host["Fallback"]:
+        raise ValueError("scene host must record one draw/fallback outcome")
+    expected_cpu = (True, True) if host["Fallback"] else (False, False)
+    if (record["RasterAvailable"], record["CopyAvailable"]) != expected_cpu:
+        raise ValueError("scene host outcome differs from CPU fallback intervals")
+    requires = (("EncodeAttempted", "CaptureAttempted"), ("ResourcesEntered", "LeaseAttempted"),
+                ("InputAttempted", "ResourcesEntered"), ("InputAttempted", "EncodeAttempted"),
+                ("DrawAccepted", "LeaseAttempted"), ("DrawAccepted", "ResourcesEntered"))
+    if any(host[child] and not host[parent] for child, parent in requires):
+        raise ValueError("scene host stage order invalid")
+    if host["LeaseAttempted"] and host["CaptureAttempted"] and not host["EncodeAttempted"]:
+        raise ValueError("scene lease follows a refused capture")
+    for flag, duration in (("CaptureAttempted", "CaptureNS"), ("EncodeAttempted", "EncodeNS"),
+                           ("LeaseAttempted", "LeaseNS"), ("ResourcesEntered", "ResourcesNS"),
+                           ("InputAttempted", "InputNS")):
+        if not host[flag] and host[duration]:
+            raise ValueError("unattempted scene host interval fabricated")
+    if host["InputNS"] > host["ResourcesNS"] or host["ResourcesNS"] > host["LeaseNS"]:
+        raise ValueError("scene host nested interval exceeds parent")
+    disjoint = sum(host[name] for name in ("CaptureNS", "EncodeNS", "LeaseNS"))
+    if disjoint + record["RasterNS"] + record["CopyNS"] > record["DrawNS"]:
+        raise ValueError("scene host disjoint intervals exceed source draw")
+    attempts, errors, logical, submits = (host[name] for name in SCENE_HOST_COUNTERS)
+    if attempts > 5 or errors > 1 or errors > attempts or submits > 1:
+        raise ValueError("scene host input/submit count exceeds one source draw")
+    if not host["InputAttempted"] and (attempts or errors or logical or submits):
+        raise ValueError("scene input counters without admission attempt")
+    minimum = 32 if attempts == 5 else 4 * attempts
+    if logical % 4 or logical < minimum or (attempts == 0 and logical):
+        raise ValueError("scene host attempted input bytes invalid")
+    if errors and (submits or host["DrawAccepted"]):
+        raise ValueError("scene input error cannot continue to submit/admission")
+    if submits and (attempts != 5 or errors):
+        raise ValueError("scene submit without complete checked input writes")
+    if host["Reused"] != (host["DrawAccepted"] and not host["CaptureAttempted"]):
+        raise ValueError("scene host reuse outcome invalid")
+    if host["Reused"] and (host["EncodeAttempted"] or host["InputAttempted"] or attempts or logical or submits):
+        raise ValueError("unchanged scene reuse invented paint input")
+    if host["DrawAccepted"] and host["CaptureAttempted"] and (not host["InputAttempted"] or attempts != 5 or errors or submits != 1):
+        raise ValueError("accepted scene draw lacks complete input/submit path")
+
+
 def validate_source_details(details, raster_upload_ns):
     """Scalar diagnostics nested inside the ticket, never additional UI work."""
     if type(details) is not dict or set(details) != {"Compositions", "UploadFailuresAvailable", "Records"}:
@@ -75,6 +146,7 @@ def validate_source_details(details, raster_upload_ns):
         raise ValueError("source record/composition capacity exceeded or empty")
     composition, source, draw_total = 0, 0, 0
     totals = {name: 0 for name in ("SetFromGoImageAttempts", "ImageCacheHits", "LogicalUploadRGBABytes")}
+    host_totals = dict.fromkeys(SCENE_HOST_COUNTERS, 0)
     for record in records:
         if type(record) is not dict or set(record) != SOURCE_RECORD_FIELDS:
             raise ValueError("invalid source record scalar schema")
@@ -123,6 +195,11 @@ def validate_source_details(details, raster_upload_ns):
             totals[name] += value
             if totals[name] > UINT64_MAX:
                 raise ValueError("source ticket counter/byte sum overflow")
+        validate_scene_host(record)
+        for name in SCENE_HOST_COUNTERS:
+            host_totals[name] += record["SceneHost"][name]
+            if host_totals[name] > UINT64_MAX:
+                raise ValueError("scene host ticket counter/byte sum overflow")
         draw_total += draw
     if composition != compositions:
         raise ValueError("source composition count differs from records")
@@ -226,6 +303,8 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
             raise ValueError("same-ticket total does not match measured work phases")
         if detailed:
             validate_source_details(details, metrics["raster_upload_ns"])
+            if not gpu_scene_rendering and any(r["SceneHost"]["Available"] for r in details["Records"]):
+                raise ValueError("GPU scene host observation in CPU renderer case")
         result.append(record)
     return result
 

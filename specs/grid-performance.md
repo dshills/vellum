@@ -219,6 +219,66 @@ python3 scripts/benchmark-grid.py --run --source-details \
   --output /private/tmp/vellum-grid-source-costs --runs 5 --samples 120 --warmup 128
 ```
 
+## GPU scene host diagnostics
+
+The same explicit source-details recorder exposes `FrameSourceSample.SceneHost`
+as a detached `FrameSceneHostSample`. `Available` identifies an observation from
+the GPU scene renderer, including an early CPU fallback. Unavailable records
+contain zero durations/counters and false flags. Attempt flags distinguish a
+stage that ran from one that never started; an attempted interval can be zero
+at the clock's resolution. The existing 32-record shared ticket cap and
+4,096-ticket diagnostic capacity remain. Records retain no application, scene,
+image, font or GPU-handle references.
+
+| Interval | Measured host work | Parent |
+| --- | --- | --- |
+| `CaptureNS` | `ScenePacket` capture | source `DrawNS` |
+| `EncodeNS` | `EncodeGPU` serialization | source `DrawNS` |
+| `LeaseNS` | synchronous scene-lease draw admission | source `DrawNS` |
+| `ResourcesNS` | resource preparation callback, including initialization, seeding and rendering | `LeaseNS` |
+| `InputNS` | input-buffer retirement, admission, allocation and checked queue writes | `ResourcesNS` |
+
+Capture, Encode and Lease are disjoint portions of source Draw. Resources and
+Input are nested subsets. CPU fallback raster/copy intervals are disjoint from
+the attempted GPU portions; other source work can remain outside these
+subintervals. These observations neither add to the seven-region
+`TotalUIWorkNS` sum nor measure OS-thread CPU, GPU execution or presentation.
+Diagnostic clocks and storage affect the samples, which cannot qualify the
+ordinary 4 ms p95 / 6 ms p99 targets or an optimization gain.
+
+`InputWriteAttempts` and `InputWriteErrors` count actual checked input-write
+calls and their returned errors. `LogicalInputBytes` sums the supplied slice
+lengths, including a refused call, for Ops, Rows, Refs, Data and the 16-byte
+configuration buffer. It excludes retained buffer capacity, seed-image writes,
+physical traffic and confirmation of transfer. An accepted changed source has
+five input-write attempts and one `QueueSubmitAttempts`; this submit counter
+records a call without claiming completion. A partial refusal can retain fewer
+writes without an input-write error when admission/allocation failed instead.
+These checked input errors are separate from legacy image API errors, whose
+`FrameSourceDetails.UploadFailuresAvailable` remains false.
+
+`DrawAccepted` records successful scene-lease admission. `Reused` identifies an
+accepted unchanged source with no capture, encoding, input writes or new compute
+submission. Captured batches report `ImageChanged=true`; an early fallback can
+report changed commands before capture starts. `Fallback` preserves attempted
+GPU stages together with the CPU
+raster/copy observation. A post-submit lease refusal can therefore report one
+submit attempt, `DrawAccepted=false` and `Fallback=true`. Counter snapshots and
+JSON copies remain independent; ticket accumulation refuses unrepresentable
+unsigned counter sums.
+
+The fresh diagnostic validator requires the complete scalar `SceneHost` schema,
+type/bounds checks, stage ordering, nested/disjoint intervals, reuse/fallback
+consistency and checked attempt/byte sums. A CPU-renderer case refuses available
+GPU host observations. Archived earlier diagnostic records retain their recorded
+validator and source association; they are not relabeled as this richer schema.
+Regression requirements include actual checked-write refusal after a prior
+successful write, exact slice-length accounting with retained capacity headroom,
+post-submit lease refusal, unconditional owned-resource restoration, recovery
+pixels, and composer-to-ticket nesting without duplicate drawing or UI work.
+Full native preparation, Go tests and admitted GPU execution must establish those
+requirements before the new observations support a measurement report.
+
 ## Diagnostic CPU profiling
 
 `-perf-cpu-profile /private/tmp/new-grid-profile.pprof` is an optional process-wide

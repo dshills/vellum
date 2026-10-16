@@ -1,0 +1,396 @@
+--- /dev/null
++++ b/base/nativeactivity/counters.go
+@@ -0,0 +1,18 @@
++// Copyright 2026 Vellum contributors. MIT license in the Vellum repository.
++
++// Package nativeactivity exposes bounded diagnostic API-attempt observations.
++// Counters are enabled only by vellum_native_checks. They do not count OS
++// wakeups, GPU completions or compositor presentations.
++package nativeactivity
++
++// Counters is a detached process-local sample. The two counters are loaded
++// independently, not atomically together. Read intervals bracket observations;
++// they do not identify an exact shared timestamp. ProcessID is a necessary scope
++// check, not cross-process provenance or a process-lifetime capability.
++type Counters struct {
++	Available              bool   `json:"available"`
++	ProcessID              int    `json:"process_id"`
++	EmptyEventPostAttempts uint64 `json:"empty_event_post_attempts"`
++	SurfacePresentAttempts uint64 `json:"surface_present_attempts"`
++	Saturated              bool   `json:"saturated"`
++}
+--- /dev/null
++++ b/base/nativeactivity/disabled.go
+@@ -0,0 +1,8 @@
++//go:build !vellum_native_checks
++
++package nativeactivity
++
++// Ordinary builds contain no counter state or process query.
++func RecordEventPost()      {}
++func RecordSurfacePresent() {}
++func Read() Counters        { return Counters{} }
+--- /dev/null
++++ b/base/nativeactivity/disabled_test.go
+@@ -0,0 +1,13 @@
++//go:build !vellum_native_checks
++
++package nativeactivity
++
++import "testing"
++
++func TestVellumNativeActivityOrdinaryBuildUnavailable(t *testing.T) {
++	RecordEventPost()
++	RecordSurfacePresent()
++	if got := Read(); got != (Counters{}) {
++		t.Fatal("ordinary build published diagnostic counts", got)
++	}
++}
+--- /dev/null
++++ b/base/nativeactivity/enabled.go
+@@ -0,0 +1,42 @@
++//go:build vellum_native_checks
++
++package nativeactivity
++
++import (
++	"math"
++	"os"
++	"sync/atomic"
++)
++
++type counter struct{ value atomic.Uint64 }
++
++func (c *counter) add() {
++	for {
++		old := c.value.Load()
++		if old == math.MaxUint64 || c.value.CompareAndSwap(old, old+1) {
++			return
++		}
++	}
++}
++
++var eventPosts, surfacePresents counter
++
++// RecordEventPost counts an admitted framework post attempt before its backend
++// call. Coalescing, returned native events and successful wakeups are unknown.
++func RecordEventPost() { eventPosts.add() }
++
++// RecordSurfacePresent counts an owned surface's backend Present attempt before
++// the call. Failed/panicking attempts count; RenderTexture no-ops do not.
++func RecordSurfacePresent() { surfacePresents.add() }
++
++// Read never resets global counters, dispatches work or retains native objects.
++// MaxUint64 is a saturated/unusable observation, including the first arrival at
++// that value. Deriving Saturated from these exact loads avoids a flag race.
++func Read() Counters {
++	posts, presents := eventPosts.value.Load(), surfacePresents.value.Load()
++	return sample(os.Getpid(), posts, presents)
++}
++
++func sample(pid int, posts, presents uint64) Counters {
++	return Counters{Available: true, ProcessID: pid, EmptyEventPostAttempts: posts, SurfacePresentAttempts: presents, Saturated: posts == math.MaxUint64 || presents == math.MaxUint64}
++}
+--- /dev/null
++++ b/base/nativeactivity/enabled_test.go
+@@ -0,0 +1,63 @@
++//go:build vellum_native_checks
++
++package nativeactivity
++
++import (
++	"math"
++	"os"
++	"sync"
++	"testing"
++)
++
++func TestVellumNativeActivityConcurrentCounterAndSaturation(t *testing.T) {
++	var c counter
++	var workers sync.WaitGroup
++	for range 16 {
++		workers.Add(1)
++		go func() {
++			defer workers.Done()
++			for range 1024 {
++				c.add()
++			}
++		}()
++	}
++	workers.Wait()
++	if c.value.Load() != 16*1024 {
++		t.Fatal("concurrent attempts were lost", c.value.Load())
++	}
++	// Saturate only a local fixture. Never reset or poison process counters.
++	c.value.Store(math.MaxUint64 - 1)
++	for range 16 {
++		workers.Add(1)
++		go func() {
++			defer workers.Done()
++			for range 32 {
++				c.add()
++			}
++		}()
++	}
++	workers.Wait()
++	if c.value.Load() != math.MaxUint64 {
++		t.Fatal("saturated counter wrapped", c.value.Load())
++	}
++	for _, pair := range [][2]uint64{{math.MaxUint64, 0}, {0, math.MaxUint64}, {math.MaxUint64, math.MaxUint64}} {
++		if got := sample(123, pair[0], pair[1]); !got.Saturated || got.EmptyEventPostAttempts != pair[0] || got.SurfacePresentAttempts != pair[1] {
++			t.Fatal("loaded saturation was not published in the same sample", got)
++		}
++	}
++}
++
++func TestVellumNativeActivityAvailableDetachedProcessSamples(t *testing.T) {
++	before := Read()
++	RecordEventPost()
++	RecordEventPost()
++	RecordSurfacePresent()
++	after := Read()
++	if !before.Available || !after.Available || after.ProcessID != os.Getpid() || before.ProcessID != after.ProcessID || before.Saturated || after.Saturated || after.EmptyEventPostAttempts-before.EmptyEventPostAttempts != 2 || after.SurfacePresentAttempts-before.SurfacePresentAttempts != 1 {
++		t.Fatal("wrong process attempt deltas", before, after)
++	}
++	after.EmptyEventPostAttempts = 0
++	if Read().EmptyEventPostAttempts != before.EmptyEventPostAttempts+2 {
++		t.Fatal("caller mutated global counters")
++	}
++}
+--- a/gpu/surface.go
++++ b/gpu/surface.go
+@@ -145,16 +145,6 @@
+ 	return view, nil
+ }
+ 
+-// Present is the final step for showing the rendered texture to the window.
+-// The current texture is automatically Released and Unlock() is called.
+-func (sf *Surface) Present() {
+-	if !sf.frame.held() {
+-		return
+-	}
+-	defer sf.AbortCurrentTexture()
+-	sf.surface.Present()
+-}
+-
+ // AbortCurrentTexture retires the owner-held frame, never presenting its contents.
+ // Idle calls do nothing. Calls from stale/concurrent frame owners are unsupported.
+ func (sf *Surface) AbortCurrentTexture() { sf.frame.retire(sf.Unlock) }
+--- /dev/null
++++ b/gpu/surface_present.go
+@@ -0,0 +1,28 @@
++//go:build !vellum_native_checks
++
++// Original method bodies retained from the pinned upstream plus owned lifetime patches.
++package gpu
++
++import "time"
++
++// Present is the final step for showing the rendered texture to the window.
++// The current texture is automatically Released and Unlock() is called.
++func (sf *Surface) Present() {
++	if !sf.frame.held() {
++		return
++	}
++	defer sf.AbortCurrentTexture()
++	sf.surface.Present()
++}
++
++// PresentMeasured excludes only the backend presentation call. Texture cleanup
++// and ownership release remain charged in the encompassing encoding interval.
++func (sf *Surface) PresentMeasured() int64 {
++	if !sf.frame.held() {
++		return 0
++	}
++	defer sf.AbortCurrentTexture()
++	start := time.Now()
++	sf.surface.Present()
++	return time.Since(start).Nanoseconds()
++}
+--- /dev/null
++++ b/gpu/surface_present_checks.go
+@@ -0,0 +1,35 @@
++//go:build vellum_native_checks
++
++package gpu
++
++import (
++	"time"
++
++	"cogentcore.org/core/base/nativeactivity"
++)
++
++// presentObserved is only in explicit instrumentation builds. The callback is
++// synchronous and never retained. Deferred retirement covers counter/backend
++// unwind; idle frames never attempt the backend or increment its counter.
++func (sf *Surface) presentObserved(present func() int64) int64 {
++	if !sf.frame.held() {
++		return 0
++	}
++	defer sf.AbortCurrentTexture()
++	nativeactivity.RecordSurfacePresent()
++	return present()
++}
++
++func (sf *Surface) Present() {
++	sf.presentObserved(func() int64 { sf.surface.Present(); return 0 })
++}
++
++// Counter observation precedes the timer; retirement follows it. As before,
++// only elapsed backend call time is excluded from encompassing UI work.
++func (sf *Surface) PresentMeasured() int64 {
++	return sf.presentObserved(func() int64 {
++		start := time.Now()
++		sf.surface.Present()
++		return time.Since(start).Nanoseconds()
++	})
++}
+--- /dev/null
++++ b/gpu/surface_present_checks_test.go
+@@ -0,0 +1,60 @@
++//go:build vellum_native_checks
++
++package gpu
++
++import (
++	"reflect"
++	"testing"
++
++	"cogentcore.org/core/base/nativeactivity"
++)
++
++func TestVellumNativeActivityOwnedSurfaceAttemptAndPanicRetire(t *testing.T) {
++	for _, panics := range []bool{false, true} {
++		t.Run(map[bool]string{false: "return", true: "panic"}[panics], func(t *testing.T) {
++			before := nativeactivity.Read()
++			var events []string
++			view := &countedFrameRef{name: "view", events: &events}
++			texture := &countedFrameRef{name: "texture", events: &events}
++			sf := &Surface{}
++			sf.Lock()
++			sf.frame = surfaceFrame{view: view, texture: texture}
++			sentinel := "injected backend attempt panic"
++			func() {
++				defer func() {
++					if got := recover(); panics && got != sentinel || !panics && got != nil {
++						t.Error("backend unwind changed", got)
++					}
++				}()
++				elapsed := sf.presentObserved(func() int64 {
++					events = append(events, "attempt")
++					if !sf.frame.held() || sf.TryLock() || nativeactivity.Read().SurfacePresentAttempts != before.SurfacePresentAttempts+1 {
++						t.Error("attempt was not counted under original ownership before backend")
++					}
++					if panics {
++						panic(sentinel)
++					}
++					return 7
++				})
++				if elapsed != 7 {
++					t.Error("measured callback value changed", elapsed)
++				}
++			}()
++			if sf.frame.held() || !sf.TryLock() {
++				t.Fatal("attempt retained frame or lock")
++			}
++			sf.Unlock()
++			if view.releases != 1 || texture.releases != 1 || !reflect.DeepEqual(events, []string{"attempt", "view", "texture"}) {
++				t.Fatal("retirement order/count changed", events)
++			}
++			sf.Present() // nil native surface is safe because the frame is idle.
++			if sf.PresentMeasured() != 0 || (&RenderTexture{}).PresentMeasured() != 0 {
++				t.Fatal("idle/offscreen target reported presentation time")
++			}
++			after := nativeactivity.Read()
++			if after.SurfacePresentAttempts-before.SurfacePresentAttempts != 1 || after.EmptyEventPostAttempts != before.EmptyEventPostAttempts {
++				t.Fatal("idle/repeated/RenderTexture counted a backend attempt", before, after)
++			}
++		})
++	}
++}
+--- a/gpu/surface_timing.go
++++ b/gpu/surface_timing.go
+@@ -48,18 +48,6 @@
+ 	return view, acquireNS, nil
+ }
+ 
+-// PresentMeasured excludes only the backend presentation call. Texture cleanup
+-// and ownership release remain charged in the encompassing encoding interval.
+-func (sf *Surface) PresentMeasured() int64 {
+-	if !sf.frame.held() {
+-		return 0
+-	}
+-	defer sf.AbortCurrentTexture()
+-	start := time.Now()
+-	sf.surface.Present()
+-	return time.Since(start).Nanoseconds()
+-}
+-
+ // A render texture has no surface acquisition or presentation wait.
+ func (rt *RenderTexture) GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error) {
+ 	view, err := rt.GetCurrentTexture()
+--- /dev/null
++++ b/system/driver/desktop/native_activity_vellum_test.go
+@@ -0,0 +1,44 @@
++//go:build vellum_native_checks
++
++package desktop
++
++import (
++	"testing"
++
++	"cogentcore.org/core/base/nativeactivity"
++)
++
++// The actual lifecycle admission uses injected callbacks; no GLFW/AppKit call.
++func TestVellumNativeActivityCountsOnlyAdmittedPostAttempts(t *testing.T) {
++	before := nativeactivity.Read()
++	var n nativeEventLifecycle
++	n.wake(func() { t.Fatal("uninitialized post") })
++	if got := nativeactivity.Read(); got != before {
++		t.Fatal("refused post counted", before, got)
++	}
++	if err := n.start(func() error { return nil }); err != nil {
++		t.Fatal(err)
++	}
++	posts := 0
++	n.wake(func() {
++		posts++
++		if got := nativeactivity.Read(); got.EmptyEventPostAttempts != before.EmptyEventPostAttempts+1 {
++			t.Fatal("post was not counted before callback", got)
++		}
++	})
++	sentinel := "injected post failure"
++	func() {
++		defer func() {
++			if recover() != sentinel {
++				t.Error("post panic changed")
++			}
++		}()
++		n.wake(func() { panic(sentinel) })
++	}()
++	n.stop(func() {})
++	n.wake(func() { t.Fatal("retired post") })
++	after := nativeactivity.Read()
++	if posts != 1 || after.EmptyEventPostAttempts-before.EmptyEventPostAttempts != 2 || after.SurfacePresentAttempts != before.SurfacePresentAttempts || after.Saturated {
++		t.Fatal("admission/panic post count differs", before, after)
++	}
++}
+--- a/system/driver/desktop/native_events.go
++++ b/system/driver/desktop/native_events.go
+@@ -6,6 +6,7 @@
+ import (
+ 	"sync"
+ 
++	"cogentcore.org/core/base/nativeactivity"
+ 	"cogentcore.org/core/system/driver/base"
+ )
+ 
+@@ -44,6 +45,7 @@
+ 	n.mu.Lock()
+ 	defer n.mu.Unlock()
+ 	if n.ready && !n.stopped {
++		nativeactivity.RecordEventPost()
+ 		post()
+ 	}
+ }

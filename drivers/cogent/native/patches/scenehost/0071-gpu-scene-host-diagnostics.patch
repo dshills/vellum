@@ -1,0 +1,643 @@
+--- /dev/null
++++ b/core/frame_scene_host_details_test.go
+@@ -0,0 +1,46 @@
++package core
++
++import (
++	"cogentcore.org/core/system/composer"
++	"math"
++	"testing"
++)
++
++func TestVellumSceneHostCountersRefuseTicketOverflowWithoutAppending(t *testing.T) {
++	for _, field := range []string{"attempts", "errors", "bytes", "submits"} {
++		t.Run(field, func(t *testing.T) {
++			dst, src := sourceTraceComposition(1).SourceDetails, sourceTraceComposition(1).SourceDetails
++			set := func(h *composer.SceneHostTiming, n uint64) {
++				h.Available = true
++				switch field {
++				case "attempts":
++					h.InputWriteAttempts = n
++				case "errors":
++					h.InputWriteErrors = n
++				case "bytes":
++					h.LogicalInputBytes = n
++				case "submits":
++					h.QueueSubmitAttempts = n
++				}
++			}
++			set(&dst.Records[0].SceneHost, math.MaxUint64)
++			set(&src.Records[0].SceneHost, 1)
++			if appendFrameSourceDetails(dst, src) == "" || len(dst.Records) != 1 {
++				t.Fatal("accepted GPU host counter overflow or appended refused record")
++			}
++		})
++	}
++}
++
++func TestVellumSceneHostScalarCopyRemainsDetached(t *testing.T) {
++	dst := &composer.SourceDetails{}
++	src := sourceTraceComposition(1).SourceDetails
++	src.Records[0].SceneHost = composer.SceneHostTiming{Available: true, LeaseAttempted: true, ResourcesEntered: true, LeaseNS: 70, ResourcesNS: 50, DrawAccepted: true, Reused: true}
++	if err := appendFrameSourceDetails(dst, src); err != "" {
++		t.Fatal(err)
++	}
++	src.Records[0].SceneHost.ResourcesNS = 999
++	if dst.Records[0].SceneHost.ResourcesNS != 50 || dst.Records[0].SceneHost.InputWriteAttempts != 0 {
++		t.Fatal("scene observation aliases source or invents writes")
++	}
++}
+--- /dev/null
++++ b/core/frame_scene_host_native_test.go
+@@ -0,0 +1,105 @@
++//go:build !js
++
++package core
++
++import (
++	"image"
++	"image/color"
++	"image/draw"
++	"os"
++	"testing"
++
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/gpu/gpudraw"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/pimage"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/gpuscene"
++	"cogentcore.org/core/system/composer"
++)
++
++type nativeHostTimingSource struct {
++	renderer           *gpuscene.Renderer
++	drawer             *gpudraw.Drawer
++	commands           render.Render
++	ordinary, measured int
++}
++
++func (s *nativeHostTimingSource) Draw(composer.Composer) {
++	s.ordinary++
++	s.renderer.DrawScene(s.drawer, s.commands, image.Point{}, draw.Src, false)
++}
++func (s *nativeHostTimingSource) DrawMeasured(composer.Composer) composer.SourceTiming {
++	s.measured++
++	result := s.renderer.DrawScene(s.drawer, s.commands, image.Point{}, draw.Src, true)
++	result.Kind = composer.SourceScene
++	return result
++}
++
++func TestVellumSceneHostNativeComposerTicketNestingAndNoDoubleCount(t *testing.T) {
++	if os.Getenv("VELLUM_GPU_SCENE_TEST") != "1" {
++		t.Skip("explicit native GPU admission required")
++	}
++	gp, dev, err := gpu.NoDisplayGPU()
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer gp.Release()
++	defer dev.Release()
++	size := image.Pt(23, 19)
++	target := gpu.NewRenderTexture(gp, dev, size, 1, gpu.UndefinedType)
++	defer target.Release()
++	dw := gpudraw.NewDrawer(gp, target)
++	defer dw.Release()
++	renderer := gpuscene.New(math32.FromPoint(size)).(*gpuscene.Renderer)
++	defer renderer.Release()
++	source := &nativeHostTimingSource{renderer: renderer, drawer: dw, commands: render.Render{&pimage.Params{Cmd: pimage.Draw, Source: image.NewUniform(color.RGBA{13, 31, 59, 255}), Op: draw.Src}}}
++	cd := &composer.ComposerDrawer{Drawer: dw, Sources: []composer.Source{source}}
++	ordinary := cd.ComposeMeasured()
++	if !ordinary.Supported || !ordinary.Submitted || ordinary.Failure != "" || ordinary.SourceDetails != nil || source.ordinary != 1 || source.measured != 0 {
++		t.Fatal("ordinary draw acquired diagnostics or failed", ordinary)
++	}
++	trace := NewFrameTraceWithSourceDetails()
++	event := traceScroll()
++	if err := trace.Begin(91, event); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := trace.startEvent(event)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	trace.Transition(tag, 1)
++	trace.OwnerWork(tag, 7)
++	trace.Reconciled(tag, 11)
++	if trace.startFrame() != tag {
++		t.Fatal("missing frame claim")
++	}
++	composed := cd.ComposeMeasuredWithSourceDetails()
++	if !composed.Supported || !composed.Submitted || composed.Failure != "" || composed.SourceDetails == nil || len(composed.SourceDetails.Records) != 1 {
++		t.Fatal("native detailed composition failed", composed)
++	}
++	record := composed.SourceDetails.Records[0]
++	host := record.SceneHost
++	if !host.Available || !host.DrawAccepted || host.Fallback || !host.CaptureAttempted || !host.EncodeAttempted || !host.LeaseAttempted || !host.ResourcesEntered || !host.InputAttempted || host.InputWriteAttempts != 5 || host.QueueSubmitAttempts != 1 {
++		t.Fatal("native GPU host observation missing", record)
++	}
++	if host.CaptureNS < 0 || host.EncodeNS < 0 || host.LeaseNS < 0 || host.ResourcesNS < 0 || host.InputNS < 0 || host.CaptureNS+host.EncodeNS+host.LeaseNS > record.DrawNS || host.InputNS > host.ResourcesNS || host.ResourcesNS > host.LeaseNS || record.DrawNS > composed.RasterUploadNS {
++		t.Fatal("native host intervals exceed parent elapsed work", record, composed)
++	}
++	trace.finishFrame(tag, composed)
++	sample, ok := trace.Take()
++	if !ok || !sample.Completed || sample.Failure != "" || sample.SourceDetails == nil || len(sample.SourceDetails.Records) != 1 || source.ordinary != 1 || source.measured != 1 {
++		t.Fatal("ticket failed or drew a source twice", sample)
++	}
++	got := sample.SourceDetails.Records[0]
++	if got.SceneHost != host || got.DrawNS != record.DrawNS || sample.RasterUploadNS != composed.RasterUploadNS || sample.EncodeSubmitNS != composed.EncodeSubmitNS {
++		t.Fatal("ticket changed host values or counted nested work twice", sample)
++	}
++	counted := sample.InputNS + sample.OwnerNS + sample.ReconcileNS + sample.LayoutPaintNS + sample.GatherNS + sample.RasterUploadNS + sample.EncodeSubmitNS
++	if sample.TotalUIWorkNS != counted {
++		t.Fatal("nested diagnostics changed exact UI-work accounting", sample)
++	}
++	composed.SourceDetails.Records[0].SceneHost = composer.SceneHostTiming{}
++	if sample.SourceDetails.Records[0].SceneHost != host {
++		t.Fatal("native ticket aliases completed composer record")
++	}
++}
+--- a/core/frame_source_details.go
++++ b/core/frame_source_details.go
+@@ -30,11 +30,20 @@
+ 	// The public observations have uint64 counts. Refuse a ticket whose sums
+ 	// cannot be represented, even when each composition's counters fit.
+ 	var attempts, hits, bytes uint64
++	var inputAttempts, inputErrors, inputBytes, submits uint64
+ 	for _, records := range [][]composer.SourceTiming{dst.Records, src.Records} {
+ 		for _, record := range records {
+ 			if attempts > math.MaxUint64-record.SetFromGoImageAttempts || hits > math.MaxUint64-record.ImageCacheHits || bytes > math.MaxUint64-record.LogicalUploadRGBABytes {
+ 				return "source diagnostic ticket counter overflow"
+ 			}
++			host := record.SceneHost
++			if inputAttempts > math.MaxUint64-host.InputWriteAttempts || inputErrors > math.MaxUint64-host.InputWriteErrors || inputBytes > math.MaxUint64-host.LogicalInputBytes || submits > math.MaxUint64-host.QueueSubmitAttempts {
++				return "source diagnostic ticket GPU input counter overflow"
++			}
++			inputAttempts += host.InputWriteAttempts
++			inputErrors += host.InputWriteErrors
++			inputBytes += host.LogicalInputBytes
++			submits += host.QueueSubmitAttempts
+ 			attempts += record.SetFromGoImageAttempts
+ 			hits += record.ImageCacheHits
+ 			bytes += record.LogicalUploadRGBABytes
+--- /dev/null
++++ b/paint/renderers/gpuscene/host_timing_test.go
+@@ -0,0 +1,21 @@
++package gpuscene
++
++import (
++	"cogentcore.org/core/system/composer"
++	"errors"
++	"testing"
++)
++
++func TestVellumGPUInputTimingPreservesAdmissionRefusal(t *testing.T) {
++	res := &resources{}
++	sentinel := errors.New("refused before any native device access")
++	host := &composer.SceneHostTiming{Available: true}
++	err := res.uploadInput(nil, func(uint64) error { return sentinel }, host)
++	if !errors.Is(err, sentinel) || !host.InputAttempted || host.InputNS < 0 || host.InputWriteAttempts != 0 || host.InputWriteErrors != 0 || host.LogicalInputBytes != 0 || host.QueueSubmitAttempts != 0 {
++		t.Fatal("admission refusal invented native writes", host, err)
++	}
++	err = res.uploadInput(nil, func(uint64) error { return sentinel }, nil)
++	if !errors.Is(err, sentinel) {
++		t.Fatal("ordinary admission outcome changed", err)
++	}
++}
+--- /dev/null
++++ b/paint/renderers/gpuscene/native_input_timing_test.go
+@@ -0,0 +1,108 @@
++//go:build !js
++
++package gpuscene
++
++import (
++	"bytes"
++	"fmt"
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/system/composer"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// This must be run only with the existing explicit native GPU admission. A
++// validation-error write exercises the real checked API, not a synthetic count.
++func TestVellumGPUSceneNativeInputAttemptBytesFailureAndRecovery(t *testing.T) {
++	_, dev := nativeDevice(t)
++	size := image.Pt(23, 19)
++	res := &resources{}
++	defer res.release()
++	reserve := func(n uint64) error {
++		if n > 1<<20 {
++			return fmt.Errorf("tiny native fixture budget exceeded")
++		}
++		return nil
++	}
++	if err := res.initialize(dev, size, reserve); err != nil {
++		t.Fatal(err)
++	}
++	expected := image.NewRGBA(image.Rectangle{Max: size})
++	b := sceneplan.New(expected.Rect)
++	b.Draw(expected.Rect, image.NewUniform(color.RGBA{13, 31, 59, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	packet := b.Seal(false)
++	if packet == nil {
++		t.Fatal("fixture capture refused")
++	}
++	encoded, ok := packet.EncodeGPU()
++	if !ok {
++		t.Fatal("fixture encoding refused")
++	}
++	inputBytes := uint64(len(encoded.Ops) + len(encoded.Rows) + len(encoded.Refs) + len(encoded.Data) + 16)
++	successful := func() {
++		t.Helper()
++		host := &composer.SceneHostTiming{Available: true}
++		if err := res.renderWithTiming(encoded, reserve, host); err != nil {
++			t.Fatal(err)
++		}
++		if !host.InputAttempted || host.InputNS < 0 || host.InputWriteAttempts != 5 || host.InputWriteErrors != 0 || host.LogicalInputBytes != inputBytes || host.QueueSubmitAttempts != 1 {
++			t.Fatal("actual successful writes differ from encoded byte ledger", host, inputBytes)
++		}
++	}
++	successful()
++	headroom := false
++	for i, input := range [][]byte{encoded.Ops, encoded.Rows, encoded.Refs, encoded.Data} {
++		if res.buffers[i+1].GetSize() > uint64(len(input)) {
++			headroom = true
++		}
++	}
++	if !headroom {
++		t.Fatal("fixture needs a capacity larger than encoded length to distinguish attempted bytes")
++	}
++	// Preserve both owned references. Wait for earlier submissions before swapping
++	// this test-owned slot; the rejected buffer deliberately lacks CopyDst usage.
++	dev.WaitDone()
++	original := res.buffers[2]
++	refused, err := dev.Device.TryCreateBuffer(&wgpu.BufferDescriptor{Label: "Vellum diagnostic checked-write refusal", Size: original.GetSize(), Usage: wgpu.BufferUsageStorage})
++	if err != nil {
++		t.Fatal(err)
++	}
++	res.buffers[2] = refused
++	restored := false
++	restore := func() {
++		if restored {
++			return
++		}
++		res.buffers[2] = original
++		refused.Release()
++		restored = true
++	}
++	defer restore()
++	host := &composer.SceneHostTiming{Available: true}
++	err = res.renderWithTiming(encoded, reserve, host)
++	if err == nil {
++		t.Fatal("native write unexpectedly accepted storage buffer without CopyDst")
++	}
++	t.Logf("checked input write refusal: %v", err)
++	if refused.GetUsage()&wgpu.BufferUsageCopyDst != 0 {
++		t.Fatal("refusal fixture unexpectedly permits CopyDst")
++	}
++	if loss := dev.LossError(); loss != nil {
++		t.Fatal("checked usage refusal contaminated device lifetime", loss)
++	}
++	partialBytes := uint64(len(encoded.Ops) + len(encoded.Rows))
++	if !host.InputAttempted || host.InputNS < 0 || host.InputWriteAttempts != 2 || host.InputWriteErrors != 1 || host.LogicalInputBytes != partialBytes || host.QueueSubmitAttempts != 0 {
++		t.Fatal("checked refusal lost attempted bytes, error or early return", host, partialBytes)
++	}
++	restore()
++	successful()
++	packet.Replay(expected)
++	got := readTexture(t, dev, res.texture)
++	if !bytes.Equal(got.Pix, expected.Pix) {
++		t.Fatal("restored native input path changed compositor pixels")
++	}
++}
+--- a/paint/renderers/gpuscene/native_test.go
++++ b/paint/renderers/gpuscene/native_test.go
+@@ -33,6 +33,7 @@
+ 	"cogentcore.org/core/paint/render"
+ 	"cogentcore.org/core/paint/renderers/rasterx"
+ 	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/system/composer"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ )
+ 
+@@ -198,12 +199,38 @@
+ 	}
+ 	background := image.NewUniform(color.RGBA{37, 79, 113, 255})
+ 	later := image.NewUniform(color.RGBA{11, 23, 41, 83})
+-	renderFrame := func(commands render.Render, measured bool) {
++	renderFrame := func(commands render.Render, measured bool) composer.SourceTiming {
+ 		dw.Start()
+ 		reference.Start()
+ 		dw.Copy(image.Point{}, background, image.Rectangle{Max: size}, draw.Src, false)
+ 		reference.Copy(image.Point{}, background, image.Rectangle{Max: size}, draw.Src, false)
++		beforeFallbacks := r.Stats().CPUFallbacks
+ 		record := r.DrawScene(dw, commands, image.Pt(7, 5), draw.Over, measured)
++		host := record.SceneHost
++		if !measured {
++			if host != (composer.SceneHostTiming{}) {
++				t.Fatal("ordinary draw retained GPU diagnostics", host)
++			}
++		} else {
++			if !host.Available || host.CaptureNS < 0 || host.EncodeNS < 0 || host.LeaseNS < 0 || host.ResourcesNS < 0 || host.InputNS < 0 || host.InputNS > host.ResourcesNS || host.ResourcesNS > host.LeaseNS {
++				t.Fatal("unavailable or nonnested GPU host observation", host)
++			}
++			fallback := r.Stats().CPUFallbacks != beforeFallbacks
++			if host.Fallback != fallback || host.DrawAccepted == fallback {
++				t.Fatal("GPU draw outcome lost", host)
++			}
++			if fallback {
++				if !record.RasterAvailable || !record.CopyAvailable || host.DrawAccepted {
++					t.Fatal("fallback diagnostic lost CPU raster/copy or claimed admission", record)
++				}
++			} else if len(commands) == 0 {
++				if !host.Reused || host.CaptureAttempted || host.EncodeAttempted || !host.LeaseAttempted || !host.ResourcesEntered || host.InputAttempted || host.InputWriteAttempts != 0 || host.LogicalInputBytes != 0 || host.QueueSubmitAttempts != 0 {
++					t.Fatal("unchanged source invented paint input", host)
++				}
++			} else if !host.CaptureAttempted || !host.EncodeAttempted || !host.LeaseAttempted || !host.ResourcesEntered || !host.InputAttempted || host.Reused || host.InputWriteAttempts != 5 || host.InputWriteErrors != 0 || host.LogicalInputBytes <= 16 || host.QueueSubmitAttempts != 1 {
++				t.Fatal("accepted scene input observation incomplete", host)
++			}
++		}
+ 		if len(commands) != 0 {
+ 			expected.Render(commands)
+ 		}
+@@ -217,9 +244,10 @@
+ 		if !bytes.Equal(got.Pix, want.Pix) {
+ 			t.Fatal("shared-device ordered composition differs", r.Stats())
+ 		}
+-		if r.Stats().CPUFallbacks == 0 && (record.RasterAvailable || record.CopyAvailable) {
++		if r.Stats().CPUFallbacks == beforeFallbacks && (record.RasterAvailable || record.CopyAvailable) {
+ 			t.Fatal("GPU path claims CPU raster/copy or completion timings")
+ 		}
++		return record
+ 	}
+ 	renderFrame(clearSource(color.RGBA{23, 47, 71, 139}), false)
+ 	if dw.CanRedraw() {
+@@ -234,10 +262,36 @@
+ 	}
+ 	partial := render.Render{&pimage.Params{Cmd: pimage.Draw, Rect: image.Rect(3, 4, 17, 15), Source: image.NewUniform(color.RGBA{11, 29, 59, 103}), Op: draw.Over}}
+ 	renderFrame(partial, true)
++	// CopyFromBuffer permits linear and SRGB RGBA metadata, but the scene lease
++	// requires SRGB after preparation. Keep the native SRGB handle unchanged and
++	// temporarily alter this test-owned Go descriptor to force post-submit refusal.
++	func() {
++		texture := r.resources.texture
++		oldFormat := texture.Format.Format
++		defer func() { texture.Format.Format = oldFormat }()
++		texture.Format.Format = wgpu.TextureFormatRGBA8Unorm
++		late := renderFrame(clearSource(color.RGBA{19, 43, 67, 127}), true)
++		h := late.SceneHost
++		if !h.Available || !h.CaptureAttempted || !h.EncodeAttempted || !h.LeaseAttempted || !h.ResourcesEntered || !h.InputAttempted || h.InputWriteAttempts != 5 || h.InputWriteErrors != 0 || h.LogicalInputBytes <= 16 || h.QueueSubmitAttempts != 1 || h.DrawAccepted || h.Reused || !h.Fallback || !late.RasterAvailable || !late.CopyAvailable {
++			t.Fatal("late lease refusal lost attempted GPU work or fallback", late)
++		}
++		if r.Stats().LastFallback != gpudraw.ErrSceneSourceInvalid.Error() {
++			t.Fatal("late descriptor fixture failed at another boundary", r.Stats())
++		}
++		if loss := dev.LossError(); loss != nil {
++			t.Fatal("late descriptor fixture lost the device", loss)
++		}
++	}()
++	if r.Stats().CPUFallbacks != 1 {
++		t.Fatal("post-submit descriptor refusal did not fall back", r.Stats())
++	}
+ 	// Unknown paint must reconstruct old accepted history before normal render.
+ 	unknown := &nativeUnknownImage{Image: image.NewUniform(color.RGBA{7, 13, 31, 83})}
+-	renderFrame(render.Render{&pimage.Params{Cmd: pimage.Draw, Rect: image.Rect(5, 1, 19, 13), Source: unknown, Op: draw.Over}}, false)
+-	if r.Stats().CPUFallbacks != 1 || len(r.journal) != 0 {
++	early := renderFrame(render.Render{&pimage.Params{Cmd: pimage.Draw, Rect: image.Rect(5, 1, 19, 13), Source: unknown, Op: draw.Over}}, true)
++	if !early.SceneHost.CaptureAttempted || early.SceneHost.EncodeAttempted || early.SceneHost.LeaseAttempted || early.SceneHost.ResourcesEntered || early.SceneHost.InputAttempted || early.SceneHost.InputWriteAttempts != 0 || early.SceneHost.LogicalInputBytes != 0 || early.SceneHost.QueueSubmitAttempts != 0 {
++		t.Fatal("early capture refusal invented later GPU work", early)
++	}
++	if r.Stats().CPUFallbacks != 2 || len(r.journal) != 0 {
+ 		t.Fatal("unsupported batch did not reconstruct fallback", r.Stats())
+ 	}
+ 	renderFrame(partial, false)
+@@ -257,8 +311,11 @@
+ 	}
+ 	exposed.SetRGBA(1, 1, color.RGBA{31, 43, 53, 255})
+ 	expected.Image().(*image.RGBA).SetRGBA(1, 1, color.RGBA{31, 43, 53, 255})
+-	renderFrame(nil, false)
+-	if r.Stats().CPUFallbacks != 2 {
++	exposedFallback := renderFrame(nil, true)
++	if exposedFallback.SceneHost.CaptureAttempted || exposedFallback.SceneHost.EncodeAttempted || exposedFallback.SceneHost.LeaseAttempted || exposedFallback.SceneHost.ResourcesEntered || exposedFallback.SceneHost.InputAttempted || exposedFallback.SceneHost.InputWriteAttempts != 0 || exposedFallback.SceneHost.QueueSubmitAttempts != 0 {
++		t.Fatal("empty mutable-image fallback invented GPU work", exposedFallback)
++	}
++	if r.Stats().CPUFallbacks != 3 {
+ 		t.Fatal("empty exposed image reused stale texture", r.Stats())
+ 	}
+ 	if !dw.CanRedraw() {
+@@ -270,7 +327,7 @@
+ 		t.Fatal("resize retained mutable exposure from retired image")
+ 	}
+ 	renderFrame(clearSource(color.RGBA{31, 47, 59, 113}), false)
+-	if r.Stats().CPUFallbacks != 2 || len(r.journal) != 1 {
++	if r.Stats().CPUFallbacks != 3 || len(r.journal) != 1 {
+ 		t.Fatal("resize did not restart deferred GPU paint", r.Stats())
+ 	}
+ 	if err := r.lease.WithResources(func(ctx *gpudraw.SceneGPUContext) error {
+--- a/paint/renderers/gpuscene/renderer.go
++++ b/paint/renderers/gpuscene/renderer.go
+@@ -210,7 +210,14 @@
+ // drawer's device. Both ordinary and diagnostic Core paths call this method.
+ // GPU host work remains inside outer Draw timing; CPU Raster/Copy timings are
+ // available only on fallback, without pretending Submit measures GPU execution.
+-func (r *Renderer) DrawScene(dw composer.Drawer, commands render.Render, dp image.Point, op draw.Op, measured bool) composer.SourceTiming {
++func (r *Renderer) DrawScene(dw composer.Drawer, commands render.Render, dp image.Point, op draw.Op, measured bool) (record composer.SourceTiming) {
++	var host *composer.SceneHostTiming
++	if measured {
++		host = &composer.SceneHostTiming{Available: true, Fallback: true}
++		// A named result preserves attempted GPU work when a later refusal returns
++		// the CPU fallback's own raster/copy observation.
++		defer func() { record.SceneHost = *host }()
++	}
+ 	as, ok := dw.(gpudraw.AsGPUDrawer)
+ 	if !ok || as.AsGPUDrawer() == nil {
+ 		return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: drawer has no GPU scene support"))
+@@ -227,16 +234,41 @@
+ 	var packet *sceneplan.Packet
+ 	var encoded *sceneplan.Encoded
+ 	if len(commands) != 0 {
++		var start time.Time
++		if host != nil {
++			host.CaptureAttempted = true
++			start = time.Now()
++		}
+ 		packet = r.cpu.ScenePacket(commands)
++		if host != nil {
++			host.CaptureNS = time.Since(start).Nanoseconds()
++		}
+ 		if packet == nil {
+ 			return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: unsupported or over-budget paint batch"))
+ 		}
++		if host != nil {
++			host.EncodeAttempted = true
++			start = time.Now()
++		}
+ 		encoded, ok = packet.EncodeGPU()
++		if host != nil {
++			host.EncodeNS = time.Since(start).Nanoseconds()
++		}
+ 		if !ok {
+ 			return r.fallback(dw, commands, dp, op, measured, fmt.Errorf("gpuscene: encoded paint exceeds limits"))
+ 		}
+ 	}
++	var leaseStart time.Time
++	if host != nil {
++		host.LeaseAttempted = true
++		leaseStart = time.Now()
++	}
+ 	err := r.lease.Draw(gpudraw.SceneDraw{Size: bounds.Size(), DP: dp, SR: bounds, Op: op}, func(ctx *gpudraw.SceneGPUContext) (*gpu.Texture, error) {
++		if host != nil {
++			host.ResourcesEntered = true
++			start := time.Now()
++			defer func() { host.ResourcesNS = time.Since(start).Nanoseconds() }()
++		}
+ 		res := r.resources
+ 		if res.device.Device != ctx.Device.Device || res.size != bounds.Size() || res.texture == nil {
+ 			res.release()
+@@ -259,13 +291,21 @@
+ 				return nil, err
+ 			}
+ 		}
+-		if err := res.render(encoded, ctx.SetBudget); err != nil {
++		if err := res.renderWithTiming(encoded, ctx.SetBudget, host); err != nil {
+ 			return nil, err
+ 		}
+ 		return res.texture, nil
+ 	})
++	if host != nil {
++		host.LeaseNS = time.Since(leaseStart).Nanoseconds()
++	}
+ 	if err != nil {
+ 		return r.fallback(dw, commands, dp, op, measured, err)
++	}
++	if host != nil {
++		host.DrawAccepted = true
++		host.Fallback = false
++		host.Reused = packet == nil
+ 	}
+ 	if packet != nil {
+ 		r.remember(packet)
+--- a/paint/renderers/gpuscene/resources.go
++++ b/paint/renderers/gpuscene/resources.go
+@@ -11,6 +11,9 @@
+ 	"fmt"
+ 	"image"
+ 	"sync/atomic"
++	"time"
++
++	"cogentcore.org/core/system/composer"
+ 
+ 	"cogentcore.org/core/gpu"
+ 	"cogentcore.org/core/paint/renderers/sceneplan"
+@@ -153,7 +156,12 @@
+ // uploadInput admits retained plus transient replacement allocation before any
+ // allocation. Old buffers survive failed replacement; a successful replacement
+ // releases only our reference (queued WebGPU work retains its own references).
+-func (r *resources) uploadInput(e *sceneplan.Encoded, reserve func(uint64) error) error {
++func (r *resources) uploadInput(e *sceneplan.Encoded, reserve func(uint64) error, host *composer.SceneHostTiming) error {
++	if host != nil {
++		host.InputAttempted = true
++		start := time.Now()
++		defer func() { host.InputNS = time.Since(start).Nanoseconds() }()
++	}
+ 	retained := r.retired[:0]
+ 	for _, retired := range r.retired {
+ 		if retired.done.Load() {
+@@ -205,7 +213,9 @@
+ 				return err
+ 			}
+ 		}
+-		if err := r.device.Queue.TryWriteBuffer(r.buffers[slot], 0, data); err != nil {
++		err := r.device.Queue.TryWriteBuffer(r.buffers[slot], 0, data)
++		recordInputWrite(host, n, err)
++		if err != nil {
+ 			return err
+ 		}
+ 	}
+@@ -213,7 +223,20 @@
+ 	for i, v := range []uint32{uint32(r.size.X), uint32(r.size.Y), r.stride / 4, uint32(e.Tiles.X)} {
+ 		binary.LittleEndian.PutUint32(cfg[i*4:], v)
+ 	}
+-	return r.device.Queue.TryWriteBuffer(r.buffers[0], 0, cfg)
++	err := r.device.Queue.TryWriteBuffer(r.buffers[0], 0, cfg)
++	recordInputWrite(host, uint64(len(cfg)), err)
++	return err
++}
++
++func recordInputWrite(host *composer.SceneHostTiming, n uint64, err error) {
++	if host == nil {
++		return
++	}
++	host.InputWriteAttempts++
++	host.LogicalInputBytes += n
++	if err != nil {
++		host.InputWriteErrors++
++	}
+ }
+ func (r *resources) seed(img *image.RGBA) error {
+ 	if img == nil || img.Bounds() != (image.Rectangle{Max: r.size}) {
+@@ -231,10 +254,13 @@
+ 	return nil
+ }
+ func (r *resources) render(e *sceneplan.Encoded, reserve func(uint64) error) error {
++	return r.renderWithTiming(e, reserve, nil)
++}
++func (r *resources) renderWithTiming(e *sceneplan.Encoded, reserve func(uint64) error, host *composer.SceneHostTiming) error {
+ 	if err := r.device.LossError(); err != nil {
+ 		return err
+ 	}
+-	if err := r.uploadInput(e, reserve); err != nil {
++	if err := r.uploadInput(e, reserve, host); err != nil {
+ 		return err
+ 	}
+ 	layout := r.pipeline.GetBindGroupLayout(0)
+@@ -273,6 +299,9 @@
+ 		return err
+ 	}
+ 	defer command.Release()
++	if host != nil {
++		host.QueueSubmitAttempts++
++	}
+ 	r.device.Queue.Submit(command)
+ 	if err = r.device.LossError(); err != nil {
+ 		return err
+--- a/system/composer/source_timing.go
++++ b/system/composer/source_timing.go
+@@ -18,6 +18,26 @@
+ 	SourceInsets
+ )
+ 
++// SceneHostTiming describes elapsed host work in the opt-in GPU scene route.
++// Capture, Encode and Lease are disjoint subsets of SourceTiming.DrawNS.
++// Resources is nested in Lease; Input is nested in Resources. Input includes
++// buffer retirement/admission/allocation and checked input-buffer write calls.
++// It excludes seed-image writes, which remain inside Resources. Do not add
++// nested intervals or interpret these as GPU execution or presentation time.
++// LogicalInputBytes counts bytes passed to checked queue write attempts,
++// including refused writes; errors report only those API return values.
++// QueueSubmitAttempts is an API call count, never GPU completion evidence.
++// Each value belongs to one synchronous source draw; it retains no references.
++type SceneHostTiming struct {
++	Available                                               bool
++	CaptureAttempted, EncodeAttempted, LeaseAttempted       bool
++	ResourcesEntered, InputAttempted                        bool
++	CaptureNS, EncodeNS, LeaseNS, ResourcesNS, InputNS      int64
++	InputWriteAttempts, InputWriteErrors, LogicalInputBytes uint64
++	QueueSubmitAttempts                                     uint64
++	DrawAccepted, Reused, Fallback                          bool
++}
++
+ type SourceTiming struct {
+ 	Composition, Source                    uint32
+ 	Kind                                   uint8
+@@ -29,6 +49,7 @@
+ 	SetFromGoImageNS                       int64
+ 	SetFromGoImageAttempts, ImageCacheHits uint64
+ 	LogicalUploadRGBABytes                 uint64
++	SceneHost                              SceneHostTiming
+ }
+ 
+ type SourceDetails struct {

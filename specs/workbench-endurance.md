@@ -189,6 +189,14 @@ CPU interval, even if the bounded fixture completes. The original static-idle
 target remains <0.5% of one CPU with <=2 app-originated wakeups/s and no repeated
 presents; CPU/primary-paint samples alone cannot qualify that complete target.
 
+Current diagnostic builds also retain versioned [native API-attempt
+observations](native-activity.md), with raw process counters and separate read
+brackets outside the quiet interval/native queries. The current validator must
+match their PID to the actual owned process receipt and check exact counter
+deltas and brackets. These observations count framework API attempts across
+windows; OS wakeups and actual presentation remain unavailable. They do not
+upgrade an old sample or waive any idle/overnight requirement.
+
 Forced GC, Go memory/RSS samples, JSON output and one reserved 1 MiB worker
 allocation/checksum/owner completion per background sample occur outside quiet
 intervals. Both worker and owner termination are joined on error/cancellation.

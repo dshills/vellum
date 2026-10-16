@@ -694,6 +694,28 @@
               "sha256": "bbb8861a5e905ca60a7ea56541db7b8c42e51226aca1b539fe26d080920cbff0"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/scenehost",
+          "inputs": "native/patches/scenehost/original-hashes.json",
+          "outputs": "native/patches/scenehost/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/scenehost/0071-gpu-scene-host-diagnostics.patch",
+              "sha256": "61b21b22c88b531b074d4bfb29edf1835e239b4f0e2ccf7a1a9af763ea04e3d9"
+            }
+          ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/nativeactivity",
+          "inputs": "native/patches/nativeactivity/original-hashes.json",
+          "outputs": "native/patches/nativeactivity/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/nativeactivity/0072-native-api-attempt-observations.patch",
+              "sha256": "d5a6b2916ca77afaf89f82090aa794bfbc46525fec6a7768fa0bd868174df498"
+            }
+          ]
         }
       ]
     },

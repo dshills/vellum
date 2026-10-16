@@ -37,11 +37,40 @@ def records(samples=120):
     return result
 
 
+
+def scene_host(**overrides):
+    value = {"Available": False, "CaptureAttempted": False, "EncodeAttempted": False,
+             "LeaseAttempted": False, "ResourcesEntered": False, "InputAttempted": False,
+             "CaptureNS": 0, "EncodeNS": 0, "LeaseNS": 0, "ResourcesNS": 0, "InputNS": 0,
+             "InputWriteAttempts": 0, "InputWriteErrors": 0, "LogicalInputBytes": 0,
+             "QueueSubmitAttempts": 0, "DrawAccepted": False, "Reused": False, "Fallback": False}
+    value.update(overrides)
+    return value
+
+
+def accepted_scene_host(**overrides):
+    value = scene_host(Available=True, CaptureAttempted=True, EncodeAttempted=True,
+                       LeaseAttempted=True, ResourcesEntered=True, InputAttempted=True,
+                       CaptureNS=10, EncodeNS=10, LeaseNS=50, ResourcesNS=40, InputNS=20,
+                       InputWriteAttempts=5, LogicalInputBytes=1024, QueueSubmitAttempts=1,
+                       DrawAccepted=True)
+    value.update(overrides)
+    return value
+
+
+def gpu_source_record(**overrides):
+    value = source_record(RasterNS=0, CopyNS=0, RasterAvailable=False, CopyAvailable=False,
+                          SetFromGoImageNS=0, SetFromGoImageAttempts=0, LogicalUploadRGBABytes=0,
+                          SceneHost=accepted_scene_host())
+    value.update(overrides)
+    return value
+
+
 def source_record(**overrides):
     value = {"Composition": 1, "Source": 0, "Kind": 1, "DrawNS": 90, "RasterNS": 40, "CopyNS": 30,
              "RasterAvailable": True, "CopyAvailable": True, "ImageWidth": 10, "ImageHeight": 20,
              "ImageChanged": True, "ImageUploadTimingAvailable": True, "SetFromGoImageNS": 20,
-             "SetFromGoImageAttempts": 1, "ImageCacheHits": 0, "LogicalUploadRGBABytes": 800}
+             "SetFromGoImageAttempts": 1, "ImageCacheHits": 0, "LogicalUploadRGBABytes": 800, "SceneHost": scene_host()}
     value.update(overrides)
     return value
 
@@ -178,6 +207,128 @@ class SourceDetailTests(unittest.TestCase):
         self.assertFalse(benchmark.warm_target_met(cases, source_details=True))
         self.assertFalse(benchmark.warm_target_met(cases, novel=True))
         self.assertFalse(benchmark.warm_target_met({}))
+
+
+class SceneHostTests(unittest.TestCase):
+    def validate_source(self, record):
+        detail = {"Compositions": 1, "UploadFailuresAvailable": False, "Records": [record]}
+        benchmark.validate_source_details(detail, record["DrawNS"])
+
+    def test_available_success_reuse_early_partial_error_and_late_fallback(self):
+        variants = [source_record(), gpu_source_record(),
+                    gpu_source_record(ImageChanged=False, SceneHost=scene_host(Available=True, LeaseAttempted=True,
+                        ResourcesEntered=True, LeaseNS=50, ResourcesNS=40, DrawAccepted=True, Reused=True)),
+                    source_record(SceneHost=scene_host(Available=True, Fallback=True)),
+                    source_record(SceneHost=scene_host(Available=True, CaptureAttempted=True, CaptureNS=10, Fallback=True)),
+                    source_record(DrawNS=200, SceneHost=accepted_scene_host(DrawAccepted=False, Fallback=True,
+                        InputWriteAttempts=2, LogicalInputBytes=32, QueueSubmitAttempts=0)),
+                    source_record(DrawNS=200, SceneHost=accepted_scene_host(DrawAccepted=False, Fallback=True,
+                        InputWriteAttempts=2, InputWriteErrors=1, LogicalInputBytes=32, QueueSubmitAttempts=0)),
+                    source_record(DrawNS=200, SceneHost=accepted_scene_host(DrawAccepted=False, Fallback=True))]
+        for record in variants:
+            with self.subTest(host=record["SceneHost"]):
+                original = copy.deepcopy(record)
+                self.validate_source(record)
+                self.assertEqual(record, original)
+
+    def test_current_source_requires_exact_host_schema(self):
+        record = source_record()
+        record.pop("SceneHost")
+        with self.assertRaisesRegex(ValueError, "schema"): self.validate_source(record)
+        invalid = [None, [], {}, {**scene_host(), "user_text": "forbidden"}]
+        for field in benchmark.SCENE_HOST_FIELDS:
+            host = scene_host(); host.pop(field); invalid.append(host)
+        for host in invalid:
+            with self.subTest(host=host), self.assertRaisesRegex(ValueError, "schema"):
+                self.validate_source(source_record(SceneHost=host))
+
+    def test_flags_and_integer_ranges_are_type_strict(self):
+        for field in benchmark.SCENE_HOST_FLAGS:
+            for bad in (0, 1, "true", None):
+                with self.subTest(field=field, bad=bad), self.assertRaises(ValueError):
+                    self.validate_source(gpu_source_record(SceneHost=accepted_scene_host(**{field: bad})))
+        for fields, maximum in ((benchmark.SCENE_HOST_TIMES, benchmark.INT64_MAX),
+                                (benchmark.SCENE_HOST_COUNTERS, benchmark.UINT64_MAX)):
+            for field in fields:
+                for bad in (True, 1.0, -1, maximum+1, "1"):
+                    with self.subTest(field=field, bad=bad), self.assertRaises(ValueError):
+                        self.validate_source(gpu_source_record(SceneHost=accepted_scene_host(**{field: bad})))
+
+    def test_unavailable_observations_cannot_fabricate_any_scalar(self):
+        for field in benchmark.SCENE_HOST_FIELDS - {"Available"}:
+            host = scene_host(**{field: True if field in benchmark.SCENE_HOST_FLAGS else 1})
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "unavailable"):
+                self.validate_source(source_record(SceneHost=host))
+
+    def test_stage_dependencies_parent_intervals_and_call_counts_refuse(self):
+        changes = [{"CaptureAttempted": False}, {"EncodeAttempted": False}, {"LeaseAttempted": False},
+                   {"ResourcesEntered": False}, {"InputAttempted": False}, {"Fallback": True},
+                   {"DrawAccepted": False}, {"Reused": True}, {"InputWriteAttempts": 6},
+                   {"InputWriteErrors": 2}, {"InputWriteErrors": 1}, {"QueueSubmitAttempts": 2},
+                   {"QueueSubmitAttempts": 0}, {"LogicalInputBytes": 0}, {"LogicalInputBytes": 28},
+                   {"LogicalInputBytes": 1025}, {"InputNS": 41}, {"ResourcesNS": 51}, {"LeaseNS": 71}]
+        for change in changes:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                self.validate_source(gpu_source_record(SceneHost=accepted_scene_host(**change)))
+        for field in ("CaptureNS", "EncodeNS", "LeaseNS", "ResourcesNS", "InputNS"):
+            with self.subTest(unattempted=field), self.assertRaises(ValueError):
+                self.validate_source(source_record(SceneHost=scene_host(Available=True, Fallback=True, **{field: 1})))
+        with self.assertRaisesRegex(ValueError, "CPU fallback"):
+            self.validate_source(source_record(DrawNS=200, SceneHost=accepted_scene_host()))
+        with self.assertRaisesRegex(ValueError, "disjoint"):
+            self.validate_source(source_record(DrawNS=139, SceneHost=accepted_scene_host(DrawAccepted=False, Fallback=True)))
+        reuse = scene_host(Available=True, LeaseAttempted=True, ResourcesEntered=True,
+                           LeaseNS=50, ResourcesNS=40, DrawAccepted=True, Reused=True)
+        reuse.update(InputAttempted=True, EncodeAttempted=True, CaptureAttempted=True)
+        with self.assertRaises(ValueError): self.validate_source(gpu_source_record(SceneHost=reuse))
+
+    def test_image_change_tracks_capture_and_accepted_reuse_but_allows_early_fallback(self):
+        with self.assertRaisesRegex(ValueError, "image change"):
+            self.validate_source(gpu_source_record(ImageChanged=False))
+        reuse = scene_host(Available=True, LeaseAttempted=True, ResourcesEntered=True,
+                           LeaseNS=50, ResourcesNS=40, DrawAccepted=True, Reused=True)
+        with self.assertRaisesRegex(ValueError, "image change"):
+            self.validate_source(gpu_source_record(ImageChanged=True, SceneHost=reuse))
+        fallback = accepted_scene_host(DrawAccepted=False, Fallback=True)
+        with self.assertRaisesRegex(ValueError, "image change"):
+            self.validate_source(source_record(DrawNS=200, ImageChanged=False, SceneHost=fallback))
+        # A changed command batch can fall back before GPU capture starts.
+        self.validate_source(source_record(ImageChanged=True,
+                             SceneHost=scene_host(Available=True, Fallback=True)))
+
+    def test_partial_write_refusal_keeps_attempt_bytes_and_never_claims_submit(self):
+        valid = accepted_scene_host(DrawAccepted=False, Fallback=True, InputWriteAttempts=2,
+                                   InputWriteErrors=1, LogicalInputBytes=32, QueueSubmitAttempts=0)
+        self.validate_source(source_record(DrawNS=200, SceneHost=valid))
+        for change in ({"InputWriteAttempts": 0}, {"LogicalInputBytes": 0}, {"QueueSubmitAttempts": 1},
+                       {"DrawAccepted": True}, {"InputAttempted": False}):
+            host = {**valid, **change}
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                self.validate_source(source_record(DrawNS=200, SceneHost=host))
+
+    def test_nested_diagnostics_do_not_change_work_totals_or_qualify_warm_timing(self):
+        data = detailed_records()
+        expected_work = [record["metrics"]["ui_work_ns"] for record in data[2:-1]]
+        for record in data: record["gpu_scene_rendering"] = True
+        for record in data[2:-1]: record["native_sample"]["SourceDetails"]["Records"] = [gpu_source_record()]
+        selected = benchmark.validate_records(data, 10000, False, 120, False,
+                                              allow_source_details=True, gpu_scene_rendering=True)
+        self.assertEqual(benchmark.summarize([selected])["ui_work_ns"]["pooled"]["min"], 106)
+        for record, expected in zip(selected, expected_work):
+            self.assertEqual(record["metrics"]["ui_work_ns"], expected)
+            self.assertEqual(record["native_sample"]["SourceDetails"]["Records"][0]["SceneHost"]["InputNS"], 20)
+        cases = {"fixed-10000": {"timings_ns": {"ui_work_ns": {"per_run": [{"p95": 1, "p99": 1}]}}}}
+        self.assertFalse(benchmark.warm_target_met(cases, source_details=True))
+        for record in data: record["gpu_scene_rendering"] = False
+        with self.assertRaisesRegex(ValueError, "CPU renderer"):
+            benchmark.validate_records(data, 10000, False, 120, False, allow_source_details=True)
+
+    def test_logical_input_byte_ticket_sum_is_checked_without_float_rounding(self):
+        rows = [gpu_source_record(Source=i, SceneHost=accepted_scene_host(LogicalInputBytes=benchmark.UINT64_MAX-3))
+                for i in range(2)]
+        detail = {"Compositions": 1, "UploadFailuresAvailable": False, "Records": rows}
+        with self.assertRaisesRegex(ValueError, "sum overflow"):
+            benchmark.validate_source_details(detail, 180)
 
 
 class StatisticsTests(unittest.TestCase):
