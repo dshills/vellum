@@ -1,0 +1,1165 @@
+{
+  "GPU_pixels_or_execution_qualified": false,
+  "actual_OS_presentations_qualified": false,
+  "documentation_base_commit": "eab01c90cec1c367c5e163b7ccbb5fa64cf6eb82",
+  "evidence": {
+    "archive_bytes": 1340752,
+    "archive_sha256": "64acd5e3e4bdb0b25d84e3de8e1a6410ca37083dca00580ffafea8da2cc14d33",
+    "index_sha256": "b398915a7fd50234387abcdb69bb50d58a282f97d3d4c86194a5253aa523565c",
+    "indexed_entries": 395,
+    "unique_blobs": 274
+  },
+  "full_idle_qualified": false,
+  "full_mac_qualified": false,
+  "full_p11_qualified": false,
+  "full_p9_qualified": false,
+  "grid_analysis": {
+    "cases": [
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "cpu-fixed-10000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 17367171,
+          "gather_ns": 705416,
+          "input_ns": 1493579,
+          "layout_paint_ns": 237338004,
+          "owner_ns": 1258622,
+          "raster_upload_ns": 493787375,
+          "reconcile_ns": 153123048
+        },
+        "dominant_phase_counts": {
+          "raster_upload_ns": 120
+        },
+        "input_write_attempts": 0,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 0,
+        "native_validation_sha256": "74ca702a2e28e5d9cf33966cf9e370f03060bd0963ee9c5d51999cc34a880a80",
+        "nested_intervals_ns": {
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.0815704031642604,
+            "count": 120,
+            "max": 2227250,
+            "mean": 1800055.2,
+            "min": 1478584,
+            "p50": 1776084,
+            "p95": 2115375,
+            "p99": 2217666,
+            "sample_stddev": 146831.22838192337
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "raster_upload_ns": 7
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.019188691823125048,
+          "gather_ns": 0.0007794021393064869,
+          "input_ns": 0.0016502300313903334,
+          "layout_paint_ns": 0.2622307235111361,
+          "owner_ns": 0.0013906300386980295,
+          "raster_upload_ns": 0.5455772713371039,
+          "reconcile_ns": 0.16918305111924012
+        },
+        "queue_submit_attempts": 0,
+        "raster_upload_outside_reported_draw_ns": 268254,
+        "raw_stdout_sha256": "82adacb96e1e802084e72790b1d96bbac925770fb5d23f2ff5fec98a4af92512",
+        "sample_count": 120,
+        "scene_draws_accepted": 0,
+        "scene_fallbacks": 0,
+        "scene_host_records": 0,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 0,
+          "CopyNS": 216413581,
+          "EncodeNS": 0,
+          "LeaseNS": 0,
+          "RasterNS": 276994500,
+          "other_draw_ns": 111040
+        },
+        "source_draw_total_ns": 493519121,
+        "source_kind_counts": {
+          "1": 120
+        },
+        "source_record_count": 120,
+        "total_ui_work_ns": 905073215,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.0626453732467514,
+          "count": 120,
+          "max": 8855875,
+          "mean": 7542276.791666667,
+          "min": 6433291,
+          "p50": 7524458,
+          "p95": 8342167,
+          "p99": 8770376,
+          "sample_stddev": 472488.74474426906
+        }
+      },
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "cpu-fixed-1000000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 15259495,
+          "gather_ns": 504753,
+          "input_ns": 1357997,
+          "layout_paint_ns": 231073919,
+          "owner_ns": 1171674,
+          "raster_upload_ns": 485118202,
+          "reconcile_ns": 146259457
+        },
+        "dominant_phase_counts": {
+          "raster_upload_ns": 120
+        },
+        "input_write_attempts": 0,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 0,
+        "native_validation_sha256": "b3cd349fe933c94ffbb5e54bd0e2d092747428c6151e112dd8819ca4eb831077",
+        "nested_intervals_ns": {
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.07734058670193383,
+            "count": 120,
+            "max": 2212291,
+            "mean": 1737628.4833333334,
+            "min": 1495209,
+            "p50": 1716500,
+            "p95": 2016625,
+            "p99": 2170833,
+            "sample_stddev": 134389.20637099145
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "raster_upload_ns": 7
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.017325657697912705,
+          "gather_ns": 0.0005730974517829411,
+          "input_ns": 0.0015418722032932517,
+          "layout_paint_ns": 0.26236173762691406,
+          "owner_ns": 0.0013303207385004661,
+          "raster_upload_ns": 0.550804067295731,
+          "reconcile_ns": 0.16606324698586566
+        },
+        "queue_submit_attempts": 0,
+        "raster_upload_outside_reported_draw_ns": 319664,
+        "raw_stdout_sha256": "269a4c267ad6cd77b4ab58f9db999b97fcd214d44ed45e073e1a86a7c780913a",
+        "sample_count": 120,
+        "scene_draws_accepted": 0,
+        "scene_fallbacks": 0,
+        "scene_host_records": 0,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 0,
+          "CopyNS": 208892002,
+          "EncodeNS": 0,
+          "LeaseNS": 0,
+          "RasterNS": 275828671,
+          "other_draw_ns": 77865
+        },
+        "source_draw_total_ns": 484798538,
+        "source_kind_counts": {
+          "1": 120
+        },
+        "source_record_count": 120,
+        "total_ui_work_ns": 880745497,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.054511240622982134,
+          "count": 120,
+          "max": 9473290,
+          "mean": 7339545.808333334,
+          "min": 6628584,
+          "p50": 7259209,
+          "p95": 7953332,
+          "p99": 8658084,
+          "sample_stddev": 400087.74762145826
+        }
+      },
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "cpu-variable-10000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 19982837,
+          "gather_ns": 624341,
+          "input_ns": 1509910,
+          "layout_paint_ns": 215464464,
+          "owner_ns": 4312544,
+          "raster_upload_ns": 489864418,
+          "reconcile_ns": 164453825
+        },
+        "dominant_phase_counts": {
+          "raster_upload_ns": 120
+        },
+        "input_write_attempts": 0,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 0,
+        "native_validation_sha256": "301555bbe66af13b17d5fdfaecf471dbe8d7f6af521b69175b7f8588b8c2b575",
+        "nested_intervals_ns": {
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.09648189650308142,
+            "count": 120,
+            "max": 2276500,
+            "mean": 1715437.8416666666,
+            "min": 1465333,
+            "p50": 1685833,
+            "p95": 2073125,
+            "p99": 2245750,
+            "sample_stddev": 165508.6962971527
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "raster_upload_ns": 7
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.022296989374523665,
+          "gather_ns": 0.0006966440572517045,
+          "input_ns": 0.0016847681451080758,
+          "layout_paint_ns": 0.24041675685967095,
+          "owner_ns": 0.004811966776547583,
+          "raster_upload_ns": 0.5465941459214835,
+          "reconcile_ns": 0.18349872886541457
+        },
+        "queue_submit_attempts": 0,
+        "raster_upload_outside_reported_draw_ns": 235199,
+        "raw_stdout_sha256": "f68c5f7ae596c3589f8f875e1b518a3d4fafe4d90df738056326b49ac319b629",
+        "sample_count": 120,
+        "scene_draws_accepted": 0,
+        "scene_fallbacks": 0,
+        "scene_host_records": 0,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 0,
+          "CopyNS": 206256005,
+          "EncodeNS": 0,
+          "LeaseNS": 0,
+          "RasterNS": 283253548,
+          "other_draw_ns": 119666
+        },
+        "source_draw_total_ns": 489629219,
+        "source_kind_counts": {
+          "1": 120
+        },
+        "source_record_count": 120,
+        "total_ui_work_ns": 896212339,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.09915298473484406,
+          "count": 120,
+          "max": 9403499,
+          "mean": 7468436.158333333,
+          "min": 5895580,
+          "p50": 7585291,
+          "p95": 8661626,
+          "p99": 8867747,
+          "sample_stddev": 740517.7364003824
+        }
+      },
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "cpu-variable-1000000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 16206580,
+          "gather_ns": 511462,
+          "input_ns": 1620710,
+          "layout_paint_ns": 194808695,
+          "owner_ns": 4472421,
+          "raster_upload_ns": 480357414,
+          "reconcile_ns": 155146165
+        },
+        "dominant_phase_counts": {
+          "raster_upload_ns": 120
+        },
+        "input_write_attempts": 0,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 0,
+        "native_validation_sha256": "d897c60b6664b17ca001729a0b4597794747e1e0d15b71b2f4d72b2c4668c178",
+        "nested_intervals_ns": {
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.08654668892569968,
+            "count": 120,
+            "max": 2200709,
+            "mean": 1718837.1916666667,
+            "min": 1496125,
+            "p50": 1687417,
+            "p95": 2012291,
+            "p99": 2195584,
+            "sample_stddev": 148759.66774109824
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "raster_upload_ns": 7
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.0189967583905826,
+          "gather_ns": 0.0005995169887764202,
+          "input_ns": 0.0018997367915501683,
+          "layout_paint_ns": 0.2283476039546713,
+          "owner_ns": 0.005242407784860706,
+          "raster_upload_ns": 0.5630573344211462,
+          "reconcile_ns": 0.18185664166841262
+        },
+        "queue_submit_attempts": 0,
+        "raster_upload_outside_reported_draw_ns": 303830,
+        "raw_stdout_sha256": "8e223b5f169b4e6ed5387a29a2a843e60dcc1d6c635bf7bc7b2f907327a9370a",
+        "sample_count": 120,
+        "scene_draws_accepted": 0,
+        "scene_fallbacks": 0,
+        "scene_host_records": 0,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 0,
+          "CopyNS": 206640793,
+          "EncodeNS": 0,
+          "LeaseNS": 0,
+          "RasterNS": 273314666,
+          "other_draw_ns": 98125
+        },
+        "source_draw_total_ns": 480053584,
+        "source_kind_counts": {
+          "1": 120
+        },
+        "source_record_count": 120,
+        "total_ui_work_ns": 853123447,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.09301341226555133,
+          "count": 120,
+          "max": 8630917,
+          "mean": 7109362.058333334,
+          "min": 5689836,
+          "p50": 7195957,
+          "p95": 7964461,
+          "p99": 8447666,
+          "sample_stddev": 661266.024076827
+        }
+      },
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "gpu-fixed-10000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 11150844,
+          "gather_ns": 632530,
+          "input_ns": 1437128,
+          "layout_paint_ns": 237047994,
+          "owner_ns": 1260000,
+          "raster_upload_ns": 255075912,
+          "reconcile_ns": 145602247
+        },
+        "dominant_phase_counts": {
+          "layout_paint_ns": 26,
+          "raster_upload_ns": 94
+        },
+        "input_write_attempts": 600,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 97557108,
+        "native_validation_sha256": "e501c274ed7bd4f2eecc54ca4a46df65c1396558a07456a3a987b5ae81b990c5",
+        "nested_intervals_ns": {
+          "InputNS": {
+            "coefficient_of_variation": 0.13361952858767076,
+            "count": 120,
+            "max": 338000,
+            "mean": 184723.61666666667,
+            "min": 148083,
+            "p50": 180375,
+            "p95": 222666,
+            "p99": 236959,
+            "sample_stddev": 24682.6825780096
+          },
+          "ResourcesNS": {
+            "coefficient_of_variation": 0.14053221032696842,
+            "count": 120,
+            "max": 465250,
+            "mean": 277390.9583333333,
+            "min": 215208,
+            "p50": 274125,
+            "p95": 349167,
+            "p99": 359708,
+            "sample_stddev": 38982.36449929933
+          },
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.0,
+            "count": 120,
+            "max": 0,
+            "mean": 0,
+            "min": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "sample_stddev": 0.0
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "layout_paint_ns": 2,
+          "raster_upload_ns": 5
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.017097102451369497,
+          "gather_ns": 0.0009698306436324235,
+          "input_ns": 0.0022034856421389937,
+          "layout_paint_ns": 0.36345534376676975,
+          "owner_ns": 0.0019319030100973134,
+          "raster_upload_ns": 0.39109676364771223,
+          "reconcile_ns": 0.22324557083827978
+        },
+        "queue_submit_attempts": 120,
+        "raster_upload_outside_reported_draw_ns": 324038,
+        "raw_stdout_sha256": "b2bc655ea9598c617b5005feca2a74a810c21435bc9c248f6e89f4780b22b063",
+        "sample_count": 120,
+        "scene_draws_accepted": 120,
+        "scene_fallbacks": 0,
+        "scene_host_records": 120,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 149044750,
+          "CopyNS": 0,
+          "EncodeNS": 71261544,
+          "LeaseNS": 33831376,
+          "RasterNS": 0,
+          "other_draw_ns": 614204
+        },
+        "source_draw_total_ns": 254751874,
+        "source_kind_counts": {
+          "1": 120
+        },
+        "source_record_count": 120,
+        "total_ui_work_ns": 652206655,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.08613241200948367,
+          "count": 120,
+          "max": 6769249,
+          "mean": 5435055.458333333,
+          "min": 4515499,
+          "p50": 5312416,
+          "p95": 6324584,
+          "p99": 6583664,
+          "sample_stddev": 468134.4360315597
+        }
+      },
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "gpu-fixed-1000000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 12699122,
+          "gather_ns": 464501,
+          "input_ns": 1243872,
+          "layout_paint_ns": 235643173,
+          "owner_ns": 1218535,
+          "raster_upload_ns": 251689625,
+          "reconcile_ns": 148050212
+        },
+        "dominant_phase_counts": {
+          "layout_paint_ns": 17,
+          "raster_upload_ns": 103
+        },
+        "input_write_attempts": 600,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 97545008,
+        "native_validation_sha256": "642563e371de772f2f292b58d8deaa440805d588dfc2053b1a971ef6f105a561",
+        "nested_intervals_ns": {
+          "InputNS": {
+            "coefficient_of_variation": 0.1362106706365271,
+            "count": 120,
+            "max": 362625,
+            "mean": 177215.2,
+            "min": 147750,
+            "p50": 172375,
+            "p95": 209000,
+            "p99": 226791,
+            "sample_stddev": 24138.601238986277
+          },
+          "ResourcesNS": {
+            "coefficient_of_variation": 0.14943280307218398,
+            "count": 120,
+            "max": 512000,
+            "mean": 260905.51666666666,
+            "min": 205709,
+            "p50": 251542,
+            "p95": 317083,
+            "p99": 366833,
+            "sample_stddev": 38987.842692496415
+          },
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.0,
+            "count": 120,
+            "max": 0,
+            "mean": 0,
+            "min": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "sample_stddev": 0.0
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "layout_paint_ns": 5,
+          "raster_upload_ns": 2
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.019506828968150734,
+          "gather_ns": 0.0007135092932042848,
+          "input_ns": 0.0019106831450451133,
+          "layout_paint_ns": 0.361966053497506,
+          "owner_ns": 0.0018717635626073642,
+          "raster_upload_ns": 0.3866146390225242,
+          "reconcile_ns": 0.22741652251096237
+        },
+        "queue_submit_attempts": 120,
+        "raster_upload_outside_reported_draw_ns": 328206,
+        "raw_stdout_sha256": "80f08fa4206c75bc99cf4be9d398722fff3f4a9e9c27b1e8947d9f6a4d0b1886",
+        "sample_count": 120,
+        "scene_draws_accepted": 120,
+        "scene_fallbacks": 0,
+        "scene_host_records": 120,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 151317958,
+          "CopyNS": 0,
+          "EncodeNS": 67798084,
+          "LeaseNS": 31720210,
+          "RasterNS": 0,
+          "other_draw_ns": 525167
+        },
+        "source_draw_total_ns": 251361419,
+        "source_kind_counts": {
+          "1": 120
+        },
+        "source_record_count": 120,
+        "total_ui_work_ns": 651009040,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.07503178059156504,
+          "count": 120,
+          "max": 7124747,
+          "mean": 5425075.333333333,
+          "min": 4565044,
+          "p50": 5338043,
+          "p95": 6122875,
+          "p99": 6902084,
+          "sample_stddev": 407053.06210337824
+        }
+      },
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "gpu-variable-10000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 12406714,
+          "gather_ns": 662657,
+          "input_ns": 1231622,
+          "layout_paint_ns": 210970747,
+          "owner_ns": 3964993,
+          "raster_upload_ns": 259368954,
+          "reconcile_ns": 159801582
+        },
+        "dominant_phase_counts": {
+          "layout_paint_ns": 23,
+          "raster_upload_ns": 96,
+          "reconcile_ns": 1
+        },
+        "input_write_attempts": 600,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 97858760,
+        "native_validation_sha256": "a8b584e7b8cba4c3aebe3ea07359733cf4dfe603daf2b2529532d9161cbcf735",
+        "nested_intervals_ns": {
+          "InputNS": {
+            "coefficient_of_variation": 0.1513916765862036,
+            "count": 121,
+            "max": 314791,
+            "mean": 182110.8347107438,
+            "min": 0,
+            "p50": 179209,
+            "p95": 219042,
+            "p99": 235375,
+            "sample_stddev": 27570.064591372502
+          },
+          "ResourcesNS": {
+            "coefficient_of_variation": 0.15382372131482563,
+            "count": 121,
+            "max": 399959,
+            "mean": 268094.36363636365,
+            "min": 250,
+            "p50": 266750,
+            "p95": 328083,
+            "p99": 396167,
+            "sample_stddev": 41239.272678075526
+          },
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.0,
+            "count": 121,
+            "max": 0,
+            "mean": 0,
+            "min": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "sample_stddev": 0.0
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "layout_paint_ns": 4,
+          "raster_upload_ns": 3
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.0191341377451461,
+          "gather_ns": 0.0010219765133447324,
+          "input_ns": 0.0018994574226465063,
+          "layout_paint_ns": 0.32536764636424825,
+          "owner_ns": 0.006114973088002195,
+          "raster_upload_ns": 0.4000093250034185,
+          "reconcile_ns": 0.2464524838631937
+        },
+        "queue_submit_attempts": 120,
+        "raster_upload_outside_reported_draw_ns": 364547,
+        "raw_stdout_sha256": "f3e120c4438fdccdd1b1c3ed6758461574a682f1a79cdd102c5e6e3ddd3f6eef",
+        "sample_count": 120,
+        "scene_draws_accepted": 121,
+        "scene_fallbacks": 0,
+        "scene_host_records": 121,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 152043289,
+          "CopyNS": 0,
+          "EncodeNS": 73532628,
+          "LeaseNS": 32922913,
+          "RasterNS": 0,
+          "other_draw_ns": 505577
+        },
+        "source_draw_total_ns": 259004407,
+        "source_kind_counts": {
+          "1": 121
+        },
+        "source_record_count": 121,
+        "total_ui_work_ns": 648407269,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.12656992229336667,
+          "count": 120,
+          "max": 6772585,
+          "mean": 5403393.908333333,
+          "min": 3917956,
+          "p50": 5403043,
+          "p95": 6446748,
+          "p99": 6637166,
+          "sample_stddev": 683907.1470982007
+        }
+      },
+      {
+        "GPU_execution_or_presentations_qualified": false,
+        "at_or_above_p95_frames": 7,
+        "case": "gpu-variable-1000000",
+        "causal_gain_qualified": false,
+        "disjoint_phase_totals_ns": {
+          "encode_submit_ns": 13613127,
+          "gather_ns": 437173,
+          "input_ns": 1397205,
+          "layout_paint_ns": 197105293,
+          "owner_ns": 4342282,
+          "raster_upload_ns": 248571043,
+          "reconcile_ns": 154126843
+        },
+        "dominant_phase_counts": {
+          "layout_paint_ns": 13,
+          "raster_upload_ns": 107
+        },
+        "input_write_attempts": 600,
+        "input_write_errors": 0,
+        "logical_input_attempt_bytes": 97846660,
+        "native_validation_sha256": "f658fcb488257dd7e4f4093175c0ebb8ca5b2d4b42ee0e982ccc25fc435c8250",
+        "nested_intervals_ns": {
+          "InputNS": {
+            "coefficient_of_variation": 0.11795934829344921,
+            "count": 120,
+            "max": 256750,
+            "mean": 181834.71666666667,
+            "min": 152291,
+            "p50": 175792,
+            "p95": 226375,
+            "p99": 245666,
+            "sample_stddev": 21449.10467512399
+          },
+          "ResourcesNS": {
+            "coefficient_of_variation": 0.14953977229855403,
+            "count": 120,
+            "max": 403458,
+            "mean": 270202.075,
+            "min": 212708,
+            "p50": 257833,
+            "p95": 360000,
+            "p99": 393000,
+            "sample_stddev": 40405.95677009682
+          },
+          "SetFromGoImageNS": {
+            "coefficient_of_variation": 0.0,
+            "count": 120,
+            "max": 0,
+            "mean": 0,
+            "min": 0,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "sample_stddev": 0.0
+          }
+        },
+        "ordinary_targets_qualified": false,
+        "p95_tail_dominant_phase_counts": {
+          "layout_paint_ns": 6,
+          "raster_upload_ns": 1
+        },
+        "phase_share_of_total_ui_work": {
+          "encode_submit_ns": 0.02197108060778082,
+          "gather_ns": 0.0007055809603881139,
+          "input_ns": 0.00225503689788499,
+          "layout_paint_ns": 0.31812061113682816,
+          "owner_ns": 0.00700828162726431,
+          "raster_upload_ns": 0.40118441725498866,
+          "reconcile_ns": 0.24875499151486494
+        },
+        "queue_submit_attempts": 120,
+        "raster_upload_outside_reported_draw_ns": 269371,
+        "raw_stdout_sha256": "832348da8a099b6aff1b99638dd09ccf234db7e4e6f195454b439bd0622151a5",
+        "sample_count": 120,
+        "scene_draws_accepted": 120,
+        "scene_fallbacks": 0,
+        "scene_host_records": 120,
+        "source_commit": "7e97a1a850d47ba1490d99b3b257b61302df5e9d",
+        "source_disjoint_totals_ns": {
+          "CaptureNS": 148181206,
+          "CopyNS": 0,
+          "EncodeNS": 66730619,
+          "LeaseNS": 32874086,
+          "RasterNS": 0,
+          "other_draw_ns": 515761
+        },
+        "source_draw_total_ns": 248301672,
+        "source_kind_counts": {
+          "1": 120
+        },
+        "source_record_count": 120,
+        "total_ui_work_ns": 619592966,
+        "ui_work_ns": {
+          "coefficient_of_variation": 0.1307913660528053,
+          "count": 120,
+          "max": 7098709,
+          "mean": 5163274.716666667,
+          "min": 3745581,
+          "p50": 5285375,
+          "p95": 6128875,
+          "p99": 6443124,
+          "sample_stddev": 675311.7534987447
+        }
+      }
+    ],
+    "configuration_sha256": "77b95f8a294776f55f969c05a1b40c2fd424afd520c4aa38f20ffcb35ee9ddff",
+    "limits": [
+      "One diagnostic process per case with source-detail instrumentation; ordinary4ms-p95/6ms-p99 targets require separate qualification.",
+      "Phase shares use sums of per-frame disjoint intervals; independent percentiles are never added.",
+      "ResourcesNS and InputNS are nested inside LeaseNS. Image API intervals remain separately reported within DrawNS and, when CopyAvailable is true, within CopyNS.",
+      "CPU host capture/encode/lease, queue-submit attempts and logical byte counts do not measure GPU execution, physical traffic or compositor presentation.",
+      "Staggered single processes do not establish a causal renderer or optimization gain.",
+      "Dominant-phase ties select WORK_PHASES order; the at-or-above-p95 set includes threshold ties."
+    ],
+    "native_review_sha256": "bee9a834d809748f3c675c50b494d4864afb235b3982b931d4e6dae489836059",
+    "producer_sha256": "407b7daa7cfb3fb23b5b07e01c14e078ebe14cefa715628805d5ed3a15cb1828",
+    "queue_terminal_sha256": "75c43108dee12e78b621bd3a99c884db3e58835d170b6f2e7755fde5aacd8b8d",
+    "schema": "vellum.macos-grid-host-interval-analysis.v1"
+  },
+  "human_IME_VoiceOver_qualified": false,
+  "native_GPU_memory_qualified": false,
+  "ordinary_performance_targets_qualified": false,
+  "original_workspace_failure_preserved": true,
+  "overnight_qualified": false,
+  "physical_pointer_qualified": false,
+  "public_distribution_qualified": false,
+  "result_reviews": {
+    "grid": "d284447502ec6a82ffb19a932936539eacf121fb59e78cba250f21d732201569",
+    "original_failed_workspace": "23632b1e6de1235086ac779f04640cd73577fc5408b04e430d06464e71168847",
+    "unique": "a2d6de0fae49651496201be29d4617eb3e02ff87a5f43b0ec6230dc7739184f5",
+    "workspace_recovery": "35d6d696d81b5cba9e0bcf9298639137f382f0da4e17e985a9ab8a28c0153152"
+  },
+  "schema": "vellum.macos.workspace-checkpoint-qualification.v1",
+  "unique_lifecycle_validation": {
+    "actions": 33000,
+    "binary_sha256": "1d2b0d40155874542fd153aab3a4d8c4e46b3b7f629e6823de8fa9019c309c30",
+    "case": "unique-thousand",
+    "cocoa_deallocation_qualified": false,
+    "configuration_sha256": "e5692f8b57f0d2b0d4aabdef214a5f18a45aab434076dc0d0d978ca7e63b9ba6",
+    "continuous_lifetime_coverage": false,
+    "cycles": 1000,
+    "elapsed_seconds": 11591.883255791967,
+    "full_mac_qualified": false,
+    "full_p11_qualified": false,
+    "hidden_inactive_untitled_native_windows": 1,
+    "menu_restoration_qualified": false,
+    "native_cleanup": {
+      "AccessibilityWindows": 0,
+      "CallbacksStopped": true,
+      "CleanupObserved": true,
+      "FilePanels": {
+        "Open": 0,
+        "Save": 0,
+        "Tracked": 0,
+        "Visible": 0
+      },
+      "MainThread": true,
+      "Menu": {
+        "Items": [],
+        "OriginalCaptured": false,
+        "OriginalRestored": false,
+        "Owned": false,
+        "TargetRetired": true
+      },
+      "MenuCallbacks": 0,
+      "NativeOutstanding": 0,
+      "PendingCallbacks": 0,
+      "Tray": {
+        "AccessibilityLabel": "",
+        "Identity": 0,
+        "ImageHeight": 0,
+        "ImageWidth": 0,
+        "Items": [],
+        "PixelHeight": 0,
+        "PixelWidth": 0,
+        "Present": false,
+        "TargetRetired": true,
+        "Template": false,
+        "Title": "",
+        "Tooltip": "",
+        "Visible": false
+      },
+      "TrayCallbacks": 0,
+      "WindowTitles": [],
+      "Windows": [
+        {
+          "Alpha": 1,
+          "ContentViewClass": "NSView",
+          "Frame": [
+            0,
+            0,
+            500,
+            500
+          ],
+          "IdentityAvailable": true,
+          "Key": false,
+          "Level": 0,
+          "Miniaturized": false,
+          "OcclusionVisible": false,
+          "Opaque": false,
+          "OrderedIndex": -1,
+          "Title": "",
+          "Visible": false,
+          "WindowClass": "NSKVONotifying_TUINSWindow",
+          "WindowNumber": 116305
+        }
+      ]
+    },
+    "physical_pointer_qualified": false,
+    "queue_admissions_are_not_accepted_callbacks": true,
+    "raw_events": 34042,
+    "result": "PASS_SCOPED_NATIVE_CASE",
+    "retry_cause_observed": false,
+    "review_sha256": "a7892fffb4de20bc4beacb60b4921af14ab5ec499ebeeb8c63e80721351f1459",
+    "run_receipt_sha256": "fd92f48f2416f017b6b53f45db029fcf61353675414d2065ce07bc942d53ab0c",
+    "same_name": false,
+    "sampled_go_heap_bytes": [
+      30141040,
+      50564624
+    ],
+    "sampled_replacements_verified": 0,
+    "sampled_rss_bytes": [
+      184696832,
+      383369216
+    ],
+    "source_commit": "ddd23c6ea06ef7baf1014a08c61d01601c059f36",
+    "steps_per_cycle": 33,
+    "total_admissions": 33062,
+    "total_attempts": 33062,
+    "validator_sha256": "9e9129dcedbee9765acbe0c6a1fef5b3df773642892d260a0ac916014c74987b",
+    "zero_cocoa_windows_qualified": false
+  },
+  "workspace_cases": {
+    "cpu-10000": {
+      "binary_sha256": "60fbdc19c7c1b9e5e90a04b8a00c5ab8818561664a2cdd135ad985ea9ffebc8d",
+      "case": "cpu-10000",
+      "configuration_sha256": "81578b729b614eb8dc9298b140b44175dffd09136950a36217ed65469a2fceb1",
+      "details": {
+        "all_single_admission_owner_completed": true,
+        "case": "cpu-10000",
+        "columns": 20,
+        "final_history_undo_count": 2,
+        "final_object_id": "block-1",
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "full_p9_qualified": false,
+        "gpu_pixels_or_render_coverage_qualified": false,
+        "gpu_scene_requested": false,
+        "limits": [
+          "Native accessibility method transport with source-checked transient oracles; no physical keyboard/pointer delivery.",
+          "Optional GPU scene was requested; fallback/pixels/render coverage/compositor completion are unqualified.",
+          "Exactly 18 fixture actions; not the 216-operation replay, full P9/P11, performance/memory/idle/endurance or complete Mac qualification.",
+          "Tracked cleanup only: hidden Cocoa helper ownership/deallocation and original menu restoration remain unqualified."
+        ],
+        "main_closed_inspector_preserved": true,
+        "native_actions": 18,
+        "native_present_api_attempt_delta": 62,
+        "original_menu_captured": false,
+        "physical_pointer_verified": false,
+        "result": "COMPLETE_SCOPED_NATIVE_WORKSPACE",
+        "rows": 10000,
+        "sampled_native_windows": [
+          {
+            "Alpha": 1,
+            "ContentViewClass": "NSView",
+            "Frame": [
+              0,
+              0,
+              500,
+              500
+            ],
+            "IdentityAvailable": true,
+            "Key": false,
+            "Level": 0,
+            "Miniaturized": false,
+            "OcclusionVisible": false,
+            "Opaque": false,
+            "OrderedIndex": -1,
+            "Title": "",
+            "Visible": false,
+            "WindowClass": "NSKVONotifying_TUINSWindow",
+            "WindowNumber": 119402
+          }
+        ],
+        "source_sha256": "81a0b1fce79e51040d206bd689c8a7a366715b2a0dfe858bca144ec6a18dc712",
+        "stored_tree_nodes": 100000,
+        "tracked_native_services_retired": true,
+        "worker_joined": true
+      },
+      "elapsed_seconds": 2.8097667500842363,
+      "full_mac_qualified": false,
+      "full_p11_qualified": false,
+      "full_p9_qualified": false,
+      "kind": "workspace",
+      "physical_pointer_qualified": false,
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "review_sha256": "b8ed52afec18d22f68c9c84c23bcdf03834a0ac032aae8aa0bed497aa44dbafb",
+      "run_receipt_sha256": "44706b1266df3a41ec113ab59ebea10da8e0070af156b4f89484255d5b041afb",
+      "source_commit": "eab01c90cec1c367c5e163b7ccbb5fa64cf6eb82",
+      "validator_sha256": "ef15ed04d8a17f546955a8f13ce85d32cfb66b2ba815ff52cab10248c438756a"
+    },
+    "cpu-1000000": {
+      "binary_sha256": "60fbdc19c7c1b9e5e90a04b8a00c5ab8818561664a2cdd135ad985ea9ffebc8d",
+      "case": "cpu-1000000",
+      "configuration_sha256": "81578b729b614eb8dc9298b140b44175dffd09136950a36217ed65469a2fceb1",
+      "details": {
+        "all_single_admission_owner_completed": true,
+        "case": "cpu-1000000",
+        "columns": 20,
+        "final_history_undo_count": 2,
+        "final_object_id": "block-1",
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "full_p9_qualified": false,
+        "gpu_pixels_or_render_coverage_qualified": false,
+        "gpu_scene_requested": false,
+        "limits": [
+          "Native accessibility method transport with source-checked transient oracles; no physical keyboard/pointer delivery.",
+          "Optional GPU scene was requested; fallback/pixels/render coverage/compositor completion are unqualified.",
+          "Exactly 18 fixture actions; not the 216-operation replay, full P9/P11, performance/memory/idle/endurance or complete Mac qualification.",
+          "Tracked cleanup only: hidden Cocoa helper ownership/deallocation and original menu restoration remain unqualified."
+        ],
+        "main_closed_inspector_preserved": true,
+        "native_actions": 18,
+        "native_present_api_attempt_delta": 84,
+        "original_menu_captured": false,
+        "physical_pointer_verified": false,
+        "result": "COMPLETE_SCOPED_NATIVE_WORKSPACE",
+        "rows": 1000000,
+        "sampled_native_windows": [
+          {
+            "Alpha": 1,
+            "ContentViewClass": "NSView",
+            "Frame": [
+              0,
+              0,
+              500,
+              500
+            ],
+            "IdentityAvailable": true,
+            "Key": false,
+            "Level": 0,
+            "Miniaturized": false,
+            "OcclusionVisible": false,
+            "Opaque": false,
+            "OrderedIndex": -1,
+            "Title": "",
+            "Visible": false,
+            "WindowClass": "NSKVONotifying_TUINSWindow",
+            "WindowNumber": 119411
+          }
+        ],
+        "source_sha256": "6c388d1c3e9a0c13407e251f4c090ca03dc4c6294dbd9d7ed9542ea9ab1fdc03",
+        "stored_tree_nodes": 100000,
+        "tracked_native_services_retired": true,
+        "worker_joined": true
+      },
+      "elapsed_seconds": 3.9813611248973757,
+      "full_mac_qualified": false,
+      "full_p11_qualified": false,
+      "full_p9_qualified": false,
+      "kind": "workspace",
+      "physical_pointer_qualified": false,
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "review_sha256": "b8ed52afec18d22f68c9c84c23bcdf03834a0ac032aae8aa0bed497aa44dbafb",
+      "run_receipt_sha256": "9e88ea02b0ad03dc01a9f2ac48c4fbaf0b752d9a08828b0d7f662eb65d2b234a",
+      "source_commit": "eab01c90cec1c367c5e163b7ccbb5fa64cf6eb82",
+      "validator_sha256": "ef15ed04d8a17f546955a8f13ce85d32cfb66b2ba815ff52cab10248c438756a"
+    },
+    "gpu-10000": {
+      "binary_sha256": "60fbdc19c7c1b9e5e90a04b8a00c5ab8818561664a2cdd135ad985ea9ffebc8d",
+      "case": "gpu-10000",
+      "configuration_sha256": "81578b729b614eb8dc9298b140b44175dffd09136950a36217ed65469a2fceb1",
+      "details": {
+        "all_single_admission_owner_completed": true,
+        "case": "gpu-10000",
+        "columns": 20,
+        "final_history_undo_count": 2,
+        "final_object_id": "block-1",
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "full_p9_qualified": false,
+        "gpu_pixels_or_render_coverage_qualified": false,
+        "gpu_scene_requested": true,
+        "limits": [
+          "Native accessibility method transport with source-checked transient oracles; no physical keyboard/pointer delivery.",
+          "Optional GPU scene was requested; fallback/pixels/render coverage/compositor completion are unqualified.",
+          "Exactly 18 fixture actions; not the 216-operation replay, full P9/P11, performance/memory/idle/endurance or complete Mac qualification.",
+          "Tracked cleanup only: hidden Cocoa helper ownership/deallocation and original menu restoration remain unqualified."
+        ],
+        "main_closed_inspector_preserved": true,
+        "native_actions": 18,
+        "native_present_api_attempt_delta": 63,
+        "original_menu_captured": false,
+        "physical_pointer_verified": false,
+        "result": "COMPLETE_SCOPED_NATIVE_WORKSPACE",
+        "rows": 10000,
+        "sampled_native_windows": [
+          {
+            "Alpha": 1,
+            "ContentViewClass": "NSView",
+            "Frame": [
+              0,
+              0,
+              500,
+              500
+            ],
+            "IdentityAvailable": true,
+            "Key": false,
+            "Level": 0,
+            "Miniaturized": false,
+            "OcclusionVisible": false,
+            "Opaque": false,
+            "OrderedIndex": -1,
+            "Title": "",
+            "Visible": false,
+            "WindowClass": "NSKVONotifying_TUINSWindow",
+            "WindowNumber": 119420
+          }
+        ],
+        "source_sha256": "81a0b1fce79e51040d206bd689c8a7a366715b2a0dfe858bca144ec6a18dc712",
+        "stored_tree_nodes": 100000,
+        "tracked_native_services_retired": true,
+        "worker_joined": true
+      },
+      "elapsed_seconds": 1.9463321659713984,
+      "full_mac_qualified": false,
+      "full_p11_qualified": false,
+      "full_p9_qualified": false,
+      "kind": "workspace",
+      "physical_pointer_qualified": false,
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "review_sha256": "b8ed52afec18d22f68c9c84c23bcdf03834a0ac032aae8aa0bed497aa44dbafb",
+      "run_receipt_sha256": "ad12b149e845024a671ddc9cbd051e1b3cf537a947571e17af89eb6a6a043b79",
+      "source_commit": "eab01c90cec1c367c5e163b7ccbb5fa64cf6eb82",
+      "validator_sha256": "ef15ed04d8a17f546955a8f13ce85d32cfb66b2ba815ff52cab10248c438756a"
+    },
+    "gpu-1000000": {
+      "binary_sha256": "60fbdc19c7c1b9e5e90a04b8a00c5ab8818561664a2cdd135ad985ea9ffebc8d",
+      "case": "gpu-1000000",
+      "configuration_sha256": "81578b729b614eb8dc9298b140b44175dffd09136950a36217ed65469a2fceb1",
+      "details": {
+        "all_single_admission_owner_completed": true,
+        "case": "gpu-1000000",
+        "columns": 20,
+        "final_history_undo_count": 2,
+        "final_object_id": "block-1",
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "full_p9_qualified": false,
+        "gpu_pixels_or_render_coverage_qualified": false,
+        "gpu_scene_requested": true,
+        "limits": [
+          "Native accessibility method transport with source-checked transient oracles; no physical keyboard/pointer delivery.",
+          "Optional GPU scene was requested; fallback/pixels/render coverage/compositor completion are unqualified.",
+          "Exactly 18 fixture actions; not the 216-operation replay, full P9/P11, performance/memory/idle/endurance or complete Mac qualification.",
+          "Tracked cleanup only: hidden Cocoa helper ownership/deallocation and original menu restoration remain unqualified."
+        ],
+        "main_closed_inspector_preserved": true,
+        "native_actions": 18,
+        "native_present_api_attempt_delta": 77,
+        "original_menu_captured": false,
+        "physical_pointer_verified": false,
+        "result": "COMPLETE_SCOPED_NATIVE_WORKSPACE",
+        "rows": 1000000,
+        "sampled_native_windows": [
+          {
+            "Alpha": 1,
+            "ContentViewClass": "NSView",
+            "Frame": [
+              0,
+              0,
+              500,
+              500
+            ],
+            "IdentityAvailable": true,
+            "Key": false,
+            "Level": 0,
+            "Miniaturized": false,
+            "OcclusionVisible": false,
+            "Opaque": false,
+            "OrderedIndex": -1,
+            "Title": "",
+            "Visible": false,
+            "WindowClass": "NSKVONotifying_TUINSWindow",
+            "WindowNumber": 119430
+          }
+        ],
+        "source_sha256": "6c388d1c3e9a0c13407e251f4c090ca03dc4c6294dbd9d7ed9542ea9ab1fdc03",
+        "stored_tree_nodes": 100000,
+        "tracked_native_services_retired": true,
+        "worker_joined": true
+      },
+      "elapsed_seconds": 4.108973582973704,
+      "full_mac_qualified": false,
+      "full_p11_qualified": false,
+      "full_p9_qualified": false,
+      "kind": "workspace",
+      "physical_pointer_qualified": false,
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "review_sha256": "b8ed52afec18d22f68c9c84c23bcdf03834a0ac032aae8aa0bed497aa44dbafb",
+      "run_receipt_sha256": "e95449b180399dafe017d54ecb783c95717d525477f7cac75d9291c642748166",
+      "source_commit": "eab01c90cec1c367c5e163b7ccbb5fa64cf6eb82",
+      "validator_sha256": "ef15ed04d8a17f546955a8f13ce85d32cfb66b2ba815ff52cab10248c438756a"
+    }
+  }
+}

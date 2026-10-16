@@ -23,6 +23,24 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [unique lifecycle, grid diagnostics and workspace recovery checkpoint](../docs/reports/macos-workspace-recovery/README.md)
+completes 1,000 unique-name cycles and 33,000 native/owner actions on `ddd23c6`.
+Eight grid diagnostic configurations on `7e97a1a` complete 960 measured samples;
+CPU p95 is 7.95–8.66 ms and GPU-route p95 is 6.12–6.45 ms. These diagnostic
+measurements do not qualify the ordinary 4/6 ms targets or an optimization gain.
+
+The corrected `eab01c9` professional workspace smoke passes all four default/GPU
+requested × 10k/1M configurations: 72 single-admission native accessibility
+actions, same-object placement Undo/Redo, stored table/outline operations, modal
+and tab actions, independent inspector survival, worker joining and tracked
+native cleanup. Its earlier overscan-target failure remains failed. These
+selector/owner checks do not qualify physical dragging, GPU coverage, hidden
+helper deallocation, original-menu restoration, the 216-operation replay or
+full P9/P11. Professional memory, sustained/ordinary performance, full idle and
+overnight, physical displays/input, human accessibility and distribution remain
+open. The checkpoint retains raw results, builds, validators, reviews and failure
+records with separate source identities.
+
 The [16 October runtime checkpoints](../docs/reports/macos-runtime-checkpoints/README.md)
 complete 1,000 same-name windows and 33,000 native/owner actions on `ddd23c6`,
 including 999 sampled replacements. Separate `97aee13` diagnostics pass five

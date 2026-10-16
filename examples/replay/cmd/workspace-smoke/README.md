@@ -43,3 +43,10 @@ Table selection uses a distinct cell with positive clipped measured bounds.
 Retained overscan cells with empty bounds are excluded; partially visible cells
 remain eligible. The table step waits for that geometry and native publication
 before the single selection proposal.
+
+The [16 October checkpoint](../../../../docs/reports/macos-workspace-recovery/README.md)
+records reviewed native passes for all four default/GPU-requested × 10k/1M
+configurations on clean `eab01c9`. Each completes all eighteen actions and joins
+its worker with tracked native cleanup. The earlier `ed4f1b5` overscan-target
+failure is preserved. Physical dragging, actual GPU pixels and full P9/P11
+remain outside this smoke acceptance.

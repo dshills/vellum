@@ -16,6 +16,13 @@ not establish actual GPU coverage or OS presentation. Compilation/offscreen
 checks do not qualify a native run. Physical input, the full P9 record, P11,
 performance/memory budgets and overnight endurance retain their own gates.
 
+The [16 October native recovery checkpoint](../docs/reports/macos-workspace-recovery/README.md)
+passes this exact 18-action scenario in all four default/GPU-requested × 10k/1M
+configurations on clean `eab01c9`. All 72 actions have one attempt/admission and
+a completed owner reply; workers and tracked resources retire. This qualifies
+the bounded smoke only. The original `ed4f1b5` overscan-cell failure remains
+retained, with the other three original configurations unrun.
+
 The Mac workbench has a dedicated `-endurance` mode. It requires a new clean
 absolute `-endurance-output` directory and a 10-second to 12-hour duration.
 Ten seconds is a preflight; at least ten minutes of activity is required for a
