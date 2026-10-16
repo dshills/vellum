@@ -6,6 +6,8 @@ The [implementation status](../implementation.md) describes the current framewor
 - [Bounded ListBox control](macos-list-box/README.md)
 - [ListBox native writability metadata](macos-listbox-metadata/README.md)
 - [Composed ListBox and Canvas2D coverage](macos-composed-controls/README.md)
+- [33-action composed campaign and effective occlusion](macos-composed-campaign/README.md)
+- [Current native grid measurements](macos-post-glyph-native/README.md)
 - [Successful benchmark process retirement](macos-benchmark-retirement/README.md)
 
 - [Tree and retained-view geometry publication](macos-tree-publication/README.md)

@@ -15,10 +15,17 @@ static NSDictionary *checkSnapshot(BOOL cleanup) {
     NSDictionary *menu=vellumCheckMenu(0,0), *tray=vellumCheckTray(0,0), *panels=vellumCheckFilePanels();
     if (!menu || !tray || !panels) return nil;
     NSMutableArray *titles=[NSMutableArray array], *windows=[NSMutableArray array];
+    NSArray<NSWindow *> *ordered=NSApp.orderedWindows;
     for (NSWindow *window in NSApp.windows) {
         if (windows.count>=64) return nil;
         NSRect f=window.frame;
-        [windows addObject:windowSnapshot(window.title,window.isVisible,window.isMiniaturized,window.isKeyWindow,window.occlusionState,f)];
+        NSMutableDictionary *state=[NSMutableDictionary dictionaryWithDictionary:windowSnapshot(window.title,window.isVisible,window.isMiniaturized,window.isKeyWindow,window.occlusionState,f)];
+        NSUInteger index=[ordered indexOfObjectIdenticalTo:window];
+        state[@"OrderedIndex"]=index==NSNotFound?@(-1):@(index);
+        state[@"Opaque"]=@(window.isOpaque);
+        state[@"Alpha"]=@(window.alphaValue);
+        state[@"Level"]=@(window.level);
+        [windows addObject:state];
         if (window.isVisible) [titles addObject:window.title ?: @""];
     }
     return @{@"MainThread":@(NSThread.isMainThread),@"CleanupObserved":@(cleanup),@"WindowTitles":titles,@"Windows":windows,@"Menu":menu,@"Tray":tray,@"FilePanels":panels};

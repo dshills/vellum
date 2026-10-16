@@ -151,6 +151,16 @@ its survivor, minimization, and visible unfocused background-worker completion.
 The fixture verifies actual process-owned Cocoa visibility, key, miniaturization,
 occlusion and screen-point frames before entering and around each quiet sample.
 A requested window arrangement alone never qualifies its effective state.
+Each phase transition records one bounded, main-thread snapshot of both owned
+windows, their actual Cocoa outer frames, native ordering indices, opacity,
+alpha and levels, and whether the cover's frame contains the target. Failed
+transitions preserve the last observation and fail the run. Frame containment
+and ordering never substitute for `OcclusionVisible=false` in the occluded phase.
+The cover requests 32 window-manager points of margin on each side of the
+unchanged composed target. Occluded-phase admission additionally requires the
+observed cover to be visible, unminimized, opaque with alpha one, at the same
+native level, ordered ahead of the target, and to contain its full Cocoa frame.
+Requested margins are not assumed to survive window-manager constraints.
 Fixture geometry reads share the backend window mutex with resize callbacks;
 the fixture releases that mutex before dispatching any native operation.
 

@@ -1,0 +1,5671 @@
+{
+  "result": "SCOPED_NATIVE_EVIDENCE_WITH_OPEN_ACCEPTANCE",
+  "captured_utc": "2026-10-16T01:01:55.533606+00:00",
+  "archive_sha256": "ac11a8e18bdf26176e530e2223cc7087c22c5a9913c66ea5ff8cc990bd8e886f",
+  "archive_index_sha256": "da0e14e04aab51f0dfefa9a21aee3a951c475dd6c3fcaeb648efb773358a7c4f",
+  "endurance": {
+    "result": "PASS_1000_COMPOSED_CONTROLS_CYCLES",
+    "mode": "full",
+    "validated_utc": "2026-10-16T00:30:11.991110+00:00",
+    "validator_sha256": "e36334cb385f87bbd882600bc8974dd78608e9762e41030af11ac0ba5d9a75b9",
+    "run_receipt_sha256": "5866adadd0a48498c65e08b87bbdeae86cc66a4fff2652aefd6fc4ac269eb6a5",
+    "binary_manifest_sha256": "2d07a51a433371f9aaaec85af8e7279447daf4f9ecff934ad5fb1fac025e2e2a",
+    "inputs_sha256": "6c18362b1e6804bcf9e09fae5703d8f2e345dad5dffa38545ceb11f34d42215e",
+    "base_commit": "c078eb8e20f0e493ee063949f5fe7ee85e51bbe4",
+    "cycles": 1000,
+    "steps_per_cycle": 33,
+    "actions": 33000,
+    "raw_events": 34042,
+    "prepared_files": 6227,
+    "elapsed_seconds": 11584.144762290991,
+    "native_cleanup": {
+      "Windows": [
+        {
+          "Title": "",
+          "Visible": false,
+          "Miniaturized": false,
+          "Key": false,
+          "OcclusionVisible": false,
+          "Frame": [
+            0,
+            436,
+            64,
+            64
+          ]
+        }
+      ],
+      "MainThread": true,
+      "CleanupObserved": true,
+      "WindowTitles": [],
+      "FilePanels": {
+        "Tracked": 0,
+        "Visible": 0,
+        "Open": 0,
+        "Save": 0
+      },
+      "NativeOutstanding": 0,
+      "AccessibilityWindows": 0,
+      "Menu": {
+        "Owned": false,
+        "OriginalRestored": false,
+        "TargetRetired": true,
+        "Items": []
+      },
+      "Tray": {
+        "Present": false,
+        "Visible": false,
+        "Template": false,
+        "TargetRetired": true,
+        "Identity": 0,
+        "Title": "",
+        "Tooltip": "",
+        "AccessibilityLabel": "",
+        "ImageWidth": 0,
+        "ImageHeight": 0,
+        "PixelWidth": 0,
+        "PixelHeight": 0,
+        "Items": []
+      },
+      "CallbacksStopped": true,
+      "PendingCallbacks": 0,
+      "MenuCallbacks": 0,
+      "TrayCallbacks": 0
+    },
+    "hidden_inactive_untitled_native_windows": 1,
+    "zero_cocoa_windows_qualified": false,
+    "menu_restoration_qualified": false,
+    "direct_child_terminal": true,
+    "owned_group_absence_confirmed": true,
+    "total_attempts": 33271,
+    "total_admissions": 33271,
+    "queue_admissions_are_not_accepted_callbacks": true,
+    "retry_cause_observed": false,
+    "steps_with_retries": 271,
+    "retries": [
+      {
+        "cycle": 19,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.51191225
+        }
+      },
+      {
+        "cycle": 24,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486031209
+        }
+      },
+      {
+        "cycle": 26,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.498051208
+        }
+      },
+      {
+        "cycle": 28,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.3825705
+        }
+      },
+      {
+        "cycle": 39,
+        "step": 12,
+        "action": {
+          "Target": "disclosure",
+          "Kind": "expand",
+          "Value": "",
+          "NativeRole": "AXDisclosureTriangle",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.573715042
+        }
+      },
+      {
+        "cycle": 48,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.366471875
+        }
+      },
+      {
+        "cycle": 64,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.368779375
+        }
+      },
+      {
+        "cycle": 65,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490855708
+        }
+      },
+      {
+        "cycle": 66,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.381007917
+        }
+      },
+      {
+        "cycle": 80,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.364532333
+        }
+      },
+      {
+        "cycle": 85,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489867125
+        }
+      },
+      {
+        "cycle": 88,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491643958
+        }
+      },
+      {
+        "cycle": 93,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496180209
+        }
+      },
+      {
+        "cycle": 109,
+        "step": 12,
+        "action": {
+          "Target": "disclosure",
+          "Kind": "expand",
+          "Value": "",
+          "NativeRole": "AXDisclosureTriangle",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.544991791
+        }
+      },
+      {
+        "cycle": 117,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489149375
+        }
+      },
+      {
+        "cycle": 119,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488282958
+        }
+      },
+      {
+        "cycle": 140,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494103041
+        }
+      },
+      {
+        "cycle": 142,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.515221625
+        }
+      },
+      {
+        "cycle": 144,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494470834
+        }
+      },
+      {
+        "cycle": 148,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492534
+        }
+      },
+      {
+        "cycle": 149,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.371689167
+        }
+      },
+      {
+        "cycle": 165,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490101792
+        }
+      },
+      {
+        "cycle": 167,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.501016584
+        }
+      },
+      {
+        "cycle": 172,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.3641265
+        }
+      },
+      {
+        "cycle": 177,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.499185458
+        }
+      },
+      {
+        "cycle": 178,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483747375
+        }
+      },
+      {
+        "cycle": 181,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.506505375
+        }
+      },
+      {
+        "cycle": 182,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.524854167
+        }
+      },
+      {
+        "cycle": 183,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.504845125
+        }
+      },
+      {
+        "cycle": 192,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496390667
+        }
+      },
+      {
+        "cycle": 195,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485380709
+        }
+      },
+      {
+        "cycle": 196,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494433708
+        }
+      },
+      {
+        "cycle": 198,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.479570125
+        }
+      },
+      {
+        "cycle": 201,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.479607208
+        }
+      },
+      {
+        "cycle": 203,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483684042
+        }
+      },
+      {
+        "cycle": 206,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.476257417
+        }
+      },
+      {
+        "cycle": 211,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.487376917
+        }
+      },
+      {
+        "cycle": 215,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.498620791
+        }
+      },
+      {
+        "cycle": 219,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492562875
+        }
+      },
+      {
+        "cycle": 221,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.4897365
+        }
+      },
+      {
+        "cycle": 222,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.482259667
+        }
+      },
+      {
+        "cycle": 225,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483788209
+        }
+      },
+      {
+        "cycle": 227,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494010083
+        }
+      },
+      {
+        "cycle": 231,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.501198459
+        }
+      },
+      {
+        "cycle": 233,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494288
+        }
+      },
+      {
+        "cycle": 234,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489310583
+        }
+      },
+      {
+        "cycle": 235,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.482734292
+        }
+      },
+      {
+        "cycle": 239,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495681125
+        }
+      },
+      {
+        "cycle": 242,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.478556417
+        }
+      },
+      {
+        "cycle": 246,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484036417
+        }
+      },
+      {
+        "cycle": 248,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.478429625
+        }
+      },
+      {
+        "cycle": 249,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496108917
+        }
+      },
+      {
+        "cycle": 251,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.479583875
+        }
+      },
+      {
+        "cycle": 256,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491717292
+        }
+      },
+      {
+        "cycle": 257,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495419042
+        }
+      },
+      {
+        "cycle": 264,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493461833
+        }
+      },
+      {
+        "cycle": 266,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491496667
+        }
+      },
+      {
+        "cycle": 274,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49779225
+        }
+      },
+      {
+        "cycle": 279,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488516
+        }
+      },
+      {
+        "cycle": 280,
+        "step": 12,
+        "action": {
+          "Target": "disclosure",
+          "Kind": "expand",
+          "Value": "",
+          "NativeRole": "AXDisclosureTriangle",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.539119833
+        }
+      },
+      {
+        "cycle": 281,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485517583
+        }
+      },
+      {
+        "cycle": 284,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.48820875
+        }
+      },
+      {
+        "cycle": 295,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.498858958
+        }
+      },
+      {
+        "cycle": 298,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49375075
+        }
+      },
+      {
+        "cycle": 300,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493306125
+        }
+      },
+      {
+        "cycle": 307,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486838625
+        }
+      },
+      {
+        "cycle": 311,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485912791
+        }
+      },
+      {
+        "cycle": 312,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492560583
+        }
+      },
+      {
+        "cycle": 314,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.477975125
+        }
+      },
+      {
+        "cycle": 318,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493924875
+        }
+      },
+      {
+        "cycle": 329,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495529417
+        }
+      },
+      {
+        "cycle": 333,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483094417
+        }
+      },
+      {
+        "cycle": 334,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.482271333
+        }
+      },
+      {
+        "cycle": 342,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488836833
+        }
+      },
+      {
+        "cycle": 346,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485212292
+        }
+      },
+      {
+        "cycle": 347,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.476507875
+        }
+      },
+      {
+        "cycle": 349,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483732333
+        }
+      },
+      {
+        "cycle": 353,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49409725
+        }
+      },
+      {
+        "cycle": 354,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.513024334
+        }
+      },
+      {
+        "cycle": 355,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483006417
+        }
+      },
+      {
+        "cycle": 356,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488674
+        }
+      },
+      {
+        "cycle": 359,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485140958
+        }
+      },
+      {
+        "cycle": 361,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495212125
+        }
+      },
+      {
+        "cycle": 370,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495502542
+        }
+      },
+      {
+        "cycle": 372,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.499453166
+        }
+      },
+      {
+        "cycle": 373,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.501592625
+        }
+      },
+      {
+        "cycle": 375,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496260292
+        }
+      },
+      {
+        "cycle": 377,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.505601333
+        }
+      },
+      {
+        "cycle": 378,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.501263
+        }
+      },
+      {
+        "cycle": 386,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495417458
+        }
+      },
+      {
+        "cycle": 387,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.47816025
+        }
+      },
+      {
+        "cycle": 390,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494067959
+        }
+      },
+      {
+        "cycle": 392,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490654916
+        }
+      },
+      {
+        "cycle": 393,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496006584
+        }
+      },
+      {
+        "cycle": 394,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.4865415
+        }
+      },
+      {
+        "cycle": 395,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496684375
+        }
+      },
+      {
+        "cycle": 397,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486052167
+        }
+      },
+      {
+        "cycle": 402,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484756042
+        }
+      },
+      {
+        "cycle": 404,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489349958
+        }
+      },
+      {
+        "cycle": 415,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497873083
+        }
+      },
+      {
+        "cycle": 416,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.48925525
+        }
+      },
+      {
+        "cycle": 417,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.479257042
+        }
+      },
+      {
+        "cycle": 421,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.534995667
+        }
+      },
+      {
+        "cycle": 422,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484989083
+        }
+      },
+      {
+        "cycle": 425,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.481096709
+        }
+      },
+      {
+        "cycle": 427,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486836291
+        }
+      },
+      {
+        "cycle": 430,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.4820945
+        }
+      },
+      {
+        "cycle": 432,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484811208
+        }
+      },
+      {
+        "cycle": 435,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.482502625
+        }
+      },
+      {
+        "cycle": 442,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489332542
+        }
+      },
+      {
+        "cycle": 443,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488808167
+        }
+      },
+      {
+        "cycle": 447,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488515959
+        }
+      },
+      {
+        "cycle": 452,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.505728833
+        }
+      },
+      {
+        "cycle": 455,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485555584
+        }
+      },
+      {
+        "cycle": 462,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.498587375
+        }
+      },
+      {
+        "cycle": 463,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497789709
+        }
+      },
+      {
+        "cycle": 473,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.48640525
+        }
+      },
+      {
+        "cycle": 474,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497671458
+        }
+      },
+      {
+        "cycle": 481,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.498062041
+        }
+      },
+      {
+        "cycle": 482,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490621917
+        }
+      },
+      {
+        "cycle": 486,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.371158667
+        }
+      },
+      {
+        "cycle": 492,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493974875
+        }
+      },
+      {
+        "cycle": 493,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.499119125
+        }
+      },
+      {
+        "cycle": 497,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495976833
+        }
+      },
+      {
+        "cycle": 503,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489033542
+        }
+      },
+      {
+        "cycle": 507,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49499625
+        }
+      },
+      {
+        "cycle": 508,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486832708
+        }
+      },
+      {
+        "cycle": 514,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495673459
+        }
+      },
+      {
+        "cycle": 517,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495596
+        }
+      },
+      {
+        "cycle": 523,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.480460375
+        }
+      },
+      {
+        "cycle": 537,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.390077875
+        }
+      },
+      {
+        "cycle": 540,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.519305417
+        }
+      },
+      {
+        "cycle": 541,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.505809833
+        }
+      },
+      {
+        "cycle": 547,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.505492
+        }
+      },
+      {
+        "cycle": 551,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496688875
+        }
+      },
+      {
+        "cycle": 553,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488398291
+        }
+      },
+      {
+        "cycle": 554,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495182583
+        }
+      },
+      {
+        "cycle": 566,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494919042
+        }
+      },
+      {
+        "cycle": 571,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493071666
+        }
+      },
+      {
+        "cycle": 572,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492536958
+        }
+      },
+      {
+        "cycle": 576,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.487525042
+        }
+      },
+      {
+        "cycle": 578,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491003125
+        }
+      },
+      {
+        "cycle": 580,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486836708
+        }
+      },
+      {
+        "cycle": 584,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490597042
+        }
+      },
+      {
+        "cycle": 586,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.526163958
+        }
+      },
+      {
+        "cycle": 599,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489168208
+        }
+      },
+      {
+        "cycle": 601,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488385
+        }
+      },
+      {
+        "cycle": 602,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494438167
+        }
+      },
+      {
+        "cycle": 604,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485623875
+        }
+      },
+      {
+        "cycle": 605,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.4950115
+        }
+      },
+      {
+        "cycle": 620,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497290584
+        }
+      },
+      {
+        "cycle": 621,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496625167
+        }
+      },
+      {
+        "cycle": 622,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494354791
+        }
+      },
+      {
+        "cycle": 623,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.501971042
+        }
+      },
+      {
+        "cycle": 628,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.503886916
+        }
+      },
+      {
+        "cycle": 630,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484047
+        }
+      },
+      {
+        "cycle": 631,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.500062458
+        }
+      },
+      {
+        "cycle": 632,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489605834
+        }
+      },
+      {
+        "cycle": 633,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.50223425
+        }
+      },
+      {
+        "cycle": 641,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496340416
+        }
+      },
+      {
+        "cycle": 644,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491983625
+        }
+      },
+      {
+        "cycle": 646,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.506331875
+        }
+      },
+      {
+        "cycle": 648,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49199025
+        }
+      },
+      {
+        "cycle": 656,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.500915167
+        }
+      },
+      {
+        "cycle": 657,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49456875
+        }
+      },
+      {
+        "cycle": 658,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.50943275
+        }
+      },
+      {
+        "cycle": 660,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.500530792
+        }
+      },
+      {
+        "cycle": 661,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.48991325
+        }
+      },
+      {
+        "cycle": 665,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.515246458
+        }
+      },
+      {
+        "cycle": 667,
+        "step": 12,
+        "action": {
+          "Target": "disclosure",
+          "Kind": "expand",
+          "Value": "",
+          "NativeRole": "AXDisclosureTriangle",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.544960584
+        }
+      },
+      {
+        "cycle": 670,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492452416
+        }
+      },
+      {
+        "cycle": 678,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.504099125
+        }
+      },
+      {
+        "cycle": 678,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.375374792
+        }
+      },
+      {
+        "cycle": 685,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483952417
+        }
+      },
+      {
+        "cycle": 689,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494870667
+        }
+      },
+      {
+        "cycle": 694,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489445833
+        }
+      },
+      {
+        "cycle": 695,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491857625
+        }
+      },
+      {
+        "cycle": 698,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493454417
+        }
+      },
+      {
+        "cycle": 701,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493699708
+        }
+      },
+      {
+        "cycle": 706,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484910208
+        }
+      },
+      {
+        "cycle": 711,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.504036375
+        }
+      },
+      {
+        "cycle": 714,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484615917
+        }
+      },
+      {
+        "cycle": 719,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495507583
+        }
+      },
+      {
+        "cycle": 720,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491381292
+        }
+      },
+      {
+        "cycle": 722,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483187459
+        }
+      },
+      {
+        "cycle": 728,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484521541
+        }
+      },
+      {
+        "cycle": 729,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488749458
+        }
+      },
+      {
+        "cycle": 733,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.365000292
+        }
+      },
+      {
+        "cycle": 734,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496645208
+        }
+      },
+      {
+        "cycle": 735,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.503153709
+        }
+      },
+      {
+        "cycle": 738,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.483828417
+        }
+      },
+      {
+        "cycle": 739,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493370542
+        }
+      },
+      {
+        "cycle": 741,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488719875
+        }
+      },
+      {
+        "cycle": 745,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.505107292
+        }
+      },
+      {
+        "cycle": 748,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.374664042
+        }
+      },
+      {
+        "cycle": 751,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496861125
+        }
+      },
+      {
+        "cycle": 754,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.377963417
+        }
+      },
+      {
+        "cycle": 755,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.501779208
+        }
+      },
+      {
+        "cycle": 756,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.48603875
+        }
+      },
+      {
+        "cycle": 757,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.487659083
+        }
+      },
+      {
+        "cycle": 759,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.367603209
+        }
+      },
+      {
+        "cycle": 765,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.499082125
+        }
+      },
+      {
+        "cycle": 766,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493681625
+        }
+      },
+      {
+        "cycle": 773,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.487033417
+        }
+      },
+      {
+        "cycle": 776,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.503446834
+        }
+      },
+      {
+        "cycle": 781,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49334025
+        }
+      },
+      {
+        "cycle": 783,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.503654
+        }
+      },
+      {
+        "cycle": 787,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488421167
+        }
+      },
+      {
+        "cycle": 788,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.482116666
+        }
+      },
+      {
+        "cycle": 789,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49383875
+        }
+      },
+      {
+        "cycle": 794,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485338334
+        }
+      },
+      {
+        "cycle": 795,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492352375
+        }
+      },
+      {
+        "cycle": 797,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484349208
+        }
+      },
+      {
+        "cycle": 801,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485240292
+        }
+      },
+      {
+        "cycle": 809,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.480742
+        }
+      },
+      {
+        "cycle": 811,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.487490459
+        }
+      },
+      {
+        "cycle": 812,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490010041
+        }
+      },
+      {
+        "cycle": 813,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488073833
+        }
+      },
+      {
+        "cycle": 816,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49031425
+        }
+      },
+      {
+        "cycle": 819,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.499646833
+        }
+      },
+      {
+        "cycle": 824,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49185075
+        }
+      },
+      {
+        "cycle": 826,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.50281125
+        }
+      },
+      {
+        "cycle": 827,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.48858725
+        }
+      },
+      {
+        "cycle": 828,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497077541
+        }
+      },
+      {
+        "cycle": 832,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484601667
+        }
+      },
+      {
+        "cycle": 833,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.498457625
+        }
+      },
+      {
+        "cycle": 835,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490132583
+        }
+      },
+      {
+        "cycle": 837,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497681833
+        }
+      },
+      {
+        "cycle": 838,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486363917
+        }
+      },
+      {
+        "cycle": 839,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.503114333
+        }
+      },
+      {
+        "cycle": 843,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493929667
+        }
+      },
+      {
+        "cycle": 854,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497295125
+        }
+      },
+      {
+        "cycle": 865,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.497361625
+        }
+      },
+      {
+        "cycle": 866,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491761083
+        }
+      },
+      {
+        "cycle": 867,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.513749709
+        }
+      },
+      {
+        "cycle": 868,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.485787875
+        }
+      },
+      {
+        "cycle": 870,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491820417
+        }
+      },
+      {
+        "cycle": 873,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.509648625
+        }
+      },
+      {
+        "cycle": 875,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489469125
+        }
+      },
+      {
+        "cycle": 876,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494900625
+        }
+      },
+      {
+        "cycle": 887,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490182958
+        }
+      },
+      {
+        "cycle": 890,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.498151875
+        }
+      },
+      {
+        "cycle": 891,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489156709
+        }
+      },
+      {
+        "cycle": 894,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495103375
+        }
+      },
+      {
+        "cycle": 900,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491101375
+        }
+      },
+      {
+        "cycle": 901,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.50386875
+        }
+      },
+      {
+        "cycle": 910,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.368494875
+        }
+      },
+      {
+        "cycle": 913,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493019917
+        }
+      },
+      {
+        "cycle": 914,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.494072375
+        }
+      },
+      {
+        "cycle": 920,
+        "step": 29,
+        "action": {
+          "Target": "component-list",
+          "Kind": "set",
+          "Value": "a",
+          "NativeRole": "AXList",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.377059167
+        }
+      },
+      {
+        "cycle": 922,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.506019666
+        }
+      },
+      {
+        "cycle": 924,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.49201575
+        }
+      },
+      {
+        "cycle": 930,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.484332708
+        }
+      },
+      {
+        "cycle": 940,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.488386958
+        }
+      },
+      {
+        "cycle": 943,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.486867958
+        }
+      },
+      {
+        "cycle": 944,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.4971715
+        }
+      },
+      {
+        "cycle": 945,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.487936834
+        }
+      },
+      {
+        "cycle": 946,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496823333
+        }
+      },
+      {
+        "cycle": 947,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.499993541
+        }
+      },
+      {
+        "cycle": 948,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492372417
+        }
+      },
+      {
+        "cycle": 952,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492366083
+        }
+      },
+      {
+        "cycle": 957,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.489466625
+        }
+      },
+      {
+        "cycle": 959,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.5010475
+        }
+      },
+      {
+        "cycle": 971,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.496056833
+        }
+      },
+      {
+        "cycle": 973,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.506350458
+        }
+      },
+      {
+        "cycle": 981,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.490318583
+        }
+      },
+      {
+        "cycle": 982,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.495888166
+        }
+      },
+      {
+        "cycle": 983,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.5058065
+        }
+      },
+      {
+        "cycle": 988,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.492615959
+        }
+      },
+      {
+        "cycle": 995,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.493781125
+        }
+      },
+      {
+        "cycle": 999,
+        "step": 13,
+        "action": {
+          "Target": "tabs",
+          "Kind": "set",
+          "Value": "about",
+          "NativeRole": "AXTabGroup",
+          "Attempts": 2,
+          "Admissions": 2,
+          "OwnerAndNativeCompleted": true,
+          "ElapsedSeconds": 0.491176917
+        }
+      }
+    ],
+    "sampled_go_heap_bytes": [
+      30136112,
+      50996720
+    ],
+    "sampled_rss_bytes": [
+      187809792,
+      396443648
+    ],
+    "terminal_sample": {
+      "Completed": 1000,
+      "HeapAlloc": 50459568,
+      "HeapInuse": 72687616,
+      "GoSys": 260389176,
+      "TotalAlloc": 1940091485784,
+      "Mallocs": 11786949794,
+      "Frees": 11786721059,
+      "NumGC": 24304,
+      "Goroutines": 7,
+      "RSSBytes": 396443648,
+      "ElapsedSeconds": 11581.703270083
+    },
+    "tree_ax_row_counts": [
+      15
+    ],
+    "action_wall_time_seconds": {
+      "1:check:set": {
+        "median": 0.3424024585,
+        "max": 0.378032083
+      },
+      "2:switch:press": {
+        "median": 0.3478526875,
+        "max": 0.387972166
+      },
+      "3:toggle:press": {
+        "median": 0.3477048755,
+        "max": 0.392377375
+      },
+      "4:check:set": {
+        "median": 0.3478293965,
+        "max": 0.379875125
+      },
+      "5:slider:set": {
+        "median": 0.34725112550000004,
+        "max": 0.386209709
+      },
+      "6:number:increment": {
+        "median": 0.347756563,
+        "max": 0.378480625
+      },
+      "7:radio:set": {
+        "median": 0.347147396,
+        "max": 0.382255708
+      },
+      "8:segment:set": {
+        "median": 0.347525396,
+        "max": 0.3826155
+      },
+      "9:selector:set": {
+        "median": 0.3474693335,
+        "max": 0.548966416
+      },
+      "10:button:press": {
+        "median": 0.347702854,
+        "max": 0.371547958
+      },
+      "11:disclosure:collapse": {
+        "median": 0.342835667,
+        "max": 0.368352
+      },
+      "12:disclosure:expand": {
+        "median": 0.368730208,
+        "max": 0.586025792
+      },
+      "13:tabs:set": {
+        "median": 0.317298542,
+        "max": 0.534995667
+      },
+      "14:tabs:set": {
+        "median": 0.235636479,
+        "max": 0.273742458
+      },
+      "15:tabs:set": {
+        "median": 0.3009686455,
+        "max": 0.358848042
+      },
+      "16:color/color/red:set": {
+        "median": 0.236651375,
+        "max": 0.278391417
+      },
+      "17:color/color/hex:set": {
+        "median": 0.236586,
+        "max": 0.330354084
+      },
+      "18:tabs:set": {
+        "median": 0.2393355205,
+        "max": 0.326189084
+      },
+      "19:tree:b3V0bGluZQ:row:bjA:press": {
+        "median": 0.5220128749999999,
+        "max": 0.669211292
+      },
+      "20:tree:b3V0bGluZQ:row:bjA:collapse": {
+        "median": 0.6875202085000001,
+        "max": 0.763300833
+      },
+      "21:tree:b3V0bGluZQ:row:bjA:expand": {
+        "median": 0.6885812915,
+        "max": 0.739021834
+      },
+      "22:text:set": {
+        "median": 0.340751146,
+        "max": 0.374119542
+      },
+      "23:dialog-open:press": {
+        "median": 0.18311766699999998,
+        "max": 0.278769208
+      },
+      "24:dialog-close:press": {
+        "median": 0.201812979,
+        "max": 0.226584833
+      },
+      "25:workspace-path/breadcrumb/item/aG9tZQ:press": {
+        "median": 0.339575542,
+        "max": 0.367054458
+      },
+      "26:workspace-path/breadcrumb/item/bW9kZWxz:press": {
+        "median": 0.34772085399999997,
+        "max": 0.395802334
+      },
+      "27:tabs:set": {
+        "median": 0.298312979,
+        "max": 0.353231959
+      },
+      "28:component-list:set": {
+        "median": 0.245604125,
+        "max": 0.354494458
+      },
+      "29:component-list:set": {
+        "median": 0.244380208,
+        "max": 0.390077875
+      },
+      "30:component-list:set": {
+        "median": 0.235131771,
+        "max": 0.315515833
+      },
+      "31:selection-left:press": {
+        "median": 0.238140854,
+        "max": 0.371775292
+      },
+      "32:selection-right:press": {
+        "median": 0.2379248335,
+        "max": 0.378274167
+      },
+      "33:tabs:set": {
+        "median": 0.24079325000000001,
+        "max": 0.29656725
+      }
+    },
+    "scope": "Actual Cocoa selectors with owner/publication predicates, exact workload and tracked service/visible-window retirement. Hidden untitled inactive windows are retained without attributed cause or zero-Cocoa-window/OS-global claims. Wall time includes inspection/waits, not frame or input latency. Sampled RSS does not attribute native/GPU allocation.",
+    "physical_input_qualified": false,
+    "native_focus_reveal_qualified": false,
+    "human_voiceover_qualified": false,
+    "native_heap_budget_qualified": false,
+    "gpu_memory_qualified": false,
+    "full_p11_qualified": false,
+    "full_mac_qualified": false,
+    "heap_profile_sha256": "e25a22a0163d4f0e11ae9173d863f62c63efa2708e297afa1a4cb646e95eafea",
+    "heap_profile_bytes": 495011
+  },
+  "failed_preflight": {
+    "receipt": {
+      "harness_review_sha256": "daca343f3bfd90f4db49364b41bc5ea470b9d7b874f015c9df5692521a0478c3",
+      "lease_source_sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4",
+      "native_lease": {
+        "path": "/private/tmp/vellum-macos-live-oct15.lock",
+        "acquired": true,
+        "held_through_cleanup": true
+      },
+      "artifacts_stable": true,
+      "mode": "soak",
+      "soak_mode": "preflight",
+      "qualification_inputs_sha256": "3f720023e69d8765f9f621691eb5a036d6401f4500e3a1d43338a78081d164cd",
+      "predecessor_validation_sha256": "54676228edd93d03dc050c7f4a67e89d2769e412baadd8b63767da16d83cbbec",
+      "predecessor_group_reobserved_absent": true,
+      "prelaunch_group_observation_sha256": "487d1030c5f202875e2f6b6004bbd92aa315be19cc3cd38837d7c3930615e133",
+      "argv": [
+        "/private/tmp/vellum-macos-composed-endurance/window-cycle-committed",
+        "-composed",
+        "-cycles=1",
+        "-sample-every=1",
+        "-timeout=100s",
+        "-soak=40s",
+        "-soak-quiet=1s",
+        "-soak-settle=1s",
+        "-soak-interval=2s"
+      ],
+      "cwd": "/private/tmp/vellum-composed-controls/drivers/cogent",
+      "started_utc": "2026-10-16T00:30:29.968457+00:00",
+      "inputs_sha256": "6c18362b1e6804bcf9e09fae5703d8f2e345dad5dffa38545ceb11f34d42215e",
+      "producer_sha256": "e7fca049d986b45f461ac4d07b85f7aab50cb36db93f36ee481fbd179508e059",
+      "authorization_sha256": "22e91f5e0d41418220f025aa0b4334f0b32fd269313c79c5fef72a045a42606a",
+      "build_receipt_sha256": "68c0580338771a4ed6dcc8b00bbc100c95d4fd3216f178a72d197e23e3d957d7",
+      "binary_manifest_sha256": "2d07a51a433371f9aaaec85af8e7279447daf4f9ecff934ad5fb1fac025e2e2a",
+      "executable_sha256": "a1f97c96cf29573d4e091f1c624cf2a3f636eff50cc523519a4f201f74b7a555",
+      "watchdog_seconds": 180,
+      "exit_code": 1,
+      "error": null,
+      "stop_reason": null,
+      "direct_child_terminal": true,
+      "group_absence_confirmed": true,
+      "inputs_stable": true,
+      "binary_stable": true,
+      "logs_complete": true,
+      "cleanup_errors": [],
+      "pid": 92361,
+      "process_group": 92361,
+      "group_observation": {
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,comm="
+        ],
+        "exit_code": 0,
+        "stdout_sha256": "6571bd4e97162b81312f6587683b6fdc667627f5f167deb3044f68f0fcca9889",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 77441,
+        "stderr_bytes": 0
+      },
+      "post_terminal_group_members": [],
+      "group_observation_sha256": "6571bd4e97162b81312f6587683b6fdc667627f5f167deb3044f68f0fcca9889",
+      "stop_marker_at_exit": false,
+      "logs": {
+        "stdout": {
+          "bytes": 21239,
+          "sha256": "d5bb4e3582db25cdbdfc8d5d7f53a8226f0962931f4151a84fbb0cd288e8e1f1",
+          "stream_sha256": "d5bb4e3582db25cdbdfc8d5d7f53a8226f0962931f4151a84fbb0cd288e8e1f1"
+        },
+        "stderr": {
+          "bytes": 71,
+          "sha256": "c73c8a2f1bf432a4b79521dab5ba1ccdb4fb3517dec1d59e0a06cfbd6d1f5a08",
+          "stream_sha256": "c73c8a2f1bf432a4b79521dab5ba1ccdb4fb3517dec1d59e0a06cfbd6d1f5a08"
+        }
+      },
+      "elapsed_seconds": 28.513654666021466,
+      "result": "FAILED_OR_CANCELED_NATIVE_RUN"
+    },
+    "qualified": false
+  },
+  "failed_diagnostic": {
+    "receipt": {
+      "harness_review_sha256": "a0d2ca648e4cae94bbf8004746d5b22369417e36256ca2b7eb13df400c990100",
+      "lease_source_sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4",
+      "native_lease": {
+        "path": "/private/tmp/vellum-macos-live-oct15.lock",
+        "acquired": true,
+        "held_through_cleanup": true
+      },
+      "artifacts_stable": true,
+      "mode": "soak",
+      "soak_mode": "preflight",
+      "qualification_inputs_sha256": "40646f6ccd54a5edcece02c808e864dc4c429773a9caea641a918c4f4a92e9f7",
+      "predecessor_validation_sha256": "54676228edd93d03dc050c7f4a67e89d2769e412baadd8b63767da16d83cbbec",
+      "predecessor_group_reobserved_absent": true,
+      "prelaunch_group_observation_sha256": "5530d120e0ea2b7a00440a9b4e52778a4453c29b0b33289c6aefaf928f8e34a6",
+      "argv": [
+        "/private/tmp/vellum-macos-soak-occlusion/window-cycle-v2",
+        "-composed",
+        "-cycles=1",
+        "-sample-every=1",
+        "-timeout=100s",
+        "-soak=40s",
+        "-soak-quiet=1s",
+        "-soak-settle=1s",
+        "-soak-interval=2s"
+      ],
+      "cwd": "/private/tmp/vellum-soak-occlusion/drivers/cogent",
+      "started_utc": "2026-10-16T00:45:08.077709+00:00",
+      "inputs_sha256": "70028a3bd5ddfac213abb8d29563c0ee0045b4e4310faa872f518743b24697c7",
+      "producer_sha256": "af92c6f51092698ddf6643af031c50e4855fb41303d05b4ccfc2e5b2266572c5",
+      "authorization_sha256": "22e91f5e0d41418220f025aa0b4334f0b32fd269313c79c5fef72a045a42606a",
+      "build_receipt_sha256": "dc25fe039126e702f9bf2a666846c499f23cda01a77110d956a2703de846b297",
+      "binary_manifest_sha256": "3ee3e9563d092bd9adcba8d75e47095592ac03bfbcfdce5b01bd101ac668067c",
+      "executable_sha256": "8708987c42c7692aae5f3cace9f2411cffac431d1b0854f6bae98d450c084a72",
+      "watchdog_seconds": 180,
+      "exit_code": 1,
+      "error": null,
+      "stop_reason": null,
+      "direct_child_terminal": true,
+      "group_absence_confirmed": true,
+      "inputs_stable": true,
+      "binary_stable": true,
+      "logs_complete": true,
+      "cleanup_errors": [],
+      "pid": 2127,
+      "process_group": 2127,
+      "group_observation": {
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,comm="
+        ],
+        "exit_code": 0,
+        "stdout_sha256": "f9858a640c4958c6556d1a21e4a5c6b35885df5c2e495b4bbeaaceb075c7c01c",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 77802,
+        "stderr_bytes": 0
+      },
+      "post_terminal_group_members": [],
+      "group_observation_sha256": "f9858a640c4958c6556d1a21e4a5c6b35885df5c2e495b4bbeaaceb075c7c01c",
+      "stop_marker_at_exit": false,
+      "logs": {
+        "stdout": {
+          "bytes": 22812,
+          "sha256": "ea7e2d5503ffbd13c66676344822920c7ad1bce4cbfc901cdf41808230448e64",
+          "stream_sha256": "ea7e2d5503ffbd13c66676344822920c7ad1bce4cbfc901cdf41808230448e64"
+        },
+        "stderr": {
+          "bytes": 71,
+          "sha256": "c73c8a2f1bf432a4b79521dab5ba1ccdb4fb3517dec1d59e0a06cfbd6d1f5a08",
+          "stream_sha256": "c73c8a2f1bf432a4b79521dab5ba1ccdb4fb3517dec1d59e0a06cfbd6d1f5a08"
+        }
+      },
+      "elapsed_seconds": 28.77412916708272,
+      "result": "FAILED_OR_CANCELED_NATIVE_RUN"
+    },
+    "transitions": [
+      {
+        "cover": {
+          "Title": "Vellum cycle survivor",
+          "Visible": true,
+          "Miniaturized": false,
+          "Key": true,
+          "OcclusionVisible": true,
+          "Frame": [
+            0,
+            1218,
+            320,
+            192
+          ],
+          "OrderedIndex": 0,
+          "Opaque": true,
+          "Alpha": 1,
+          "Level": 0
+        },
+        "cover_contains_target": false,
+        "event": "vellum.soak.transition",
+        "last_query_error": "",
+        "observed": true,
+        "observed_utc": "2026-10-16T00:45:21.07405Z",
+        "phase": "visible",
+        "state_accepted": true,
+        "target": {
+          "Title": "Vellum composed idle soak",
+          "Visible": true,
+          "Miniaturized": false,
+          "Key": false,
+          "OcclusionVisible": true,
+          "Frame": [
+            2048,
+            0,
+            3072,
+            1173
+          ],
+          "OrderedIndex": 1,
+          "Opaque": true,
+          "Alpha": 1,
+          "Level": 0
+        }
+      },
+      {
+        "cover": {
+          "Title": "Vellum cycle survivor",
+          "Visible": true,
+          "Miniaturized": false,
+          "Key": true,
+          "OcclusionVisible": true,
+          "Frame": [
+            2048,
+            0,
+            3072,
+            1173
+          ],
+          "OrderedIndex": 0,
+          "Opaque": true,
+          "Alpha": 1,
+          "Level": 0
+        },
+        "cover_contains_target": true,
+        "event": "vellum.soak.transition",
+        "last_query_error": "",
+        "observed": true,
+        "observed_utc": "2026-10-16T00:45:36.116207Z",
+        "phase": "occluded",
+        "state_accepted": false,
+        "target": {
+          "Title": "Vellum composed idle soak",
+          "Visible": true,
+          "Miniaturized": false,
+          "Key": false,
+          "OcclusionVisible": true,
+          "Frame": [
+            2048,
+            0,
+            3072,
+            1173
+          ],
+          "OrderedIndex": 1,
+          "Opaque": true,
+          "Alpha": 1,
+          "Level": 0
+        }
+      }
+    ],
+    "qualified": false,
+    "cause_observed": false
+  },
+  "corrected_preflight": {
+    "result": "PASS_SCOPED_SOAK_PREFLIGHT",
+    "source_commit": "621aca2da91836631fc05b2a7b97f124d53518dd",
+    "source_delta": {
+      "drivers/cogent/cmd/window-cycle-smoke/soak.go": "f75d8f1170cc52136e01edf44bba57b2cfc1373eeb0655727528e0a4d9b83515",
+      "drivers/cogent/cmd/window-cycle-smoke/soak_test.go": "c841830c577d3d39c5c546f7adeb78ec250763657f92d723d043d227f537023d",
+      "drivers/cogent/native_services_checks_darwin.go": "17adddd178e371b90f3def94832d8722d7f2747e5c0941ea2d83e094a8db9fb3",
+      "drivers/cogent/native_services_checks_darwin.m": "9255b1c2a28a88b33172304e7aa31dd845903aab95708df2fa480a64a44cb604",
+      "specs/workbench-endurance.md": "8a0ca5745a3c7a7743bdb23c20601882589fb6784e589ecef5d896729b15155a"
+    },
+    "source_context": "621aca2 plus exact five reviewed fixture/spec leaves; separate from original c078 endurance qualification",
+    "run_receipt_sha256": "068265f007d9b20cd6837c2944a076b526d5ec525a497981a6f7eb301ee2a9a3",
+    "validator_sha256": "2ffcfc73e4d51c41ac55c4cea5a8df983084a6bf6105ff2b591fcc8651aa4473",
+    "mode": "preflight",
+    "duration_requested_seconds": 40,
+    "observed_phase_elapsed_seconds": 40.005111666,
+    "phase_samples": {
+      "visible": 4,
+      "occluded": 4,
+      "minimized": 4,
+      "background": 4
+    },
+    "quiet_cpu_one_core_percent_ranges": {
+      "visible": [
+        0.21216986993226675,
+        0.6475038735155724
+      ],
+      "occluded": [
+        0.37945681561334327,
+        0.4905823888753847
+      ],
+      "minimized": [
+        0.3048656635748553,
+        0.565731473466472
+      ],
+      "background": [
+        0.3418858432091927,
+        0.5418084996258755
+      ]
+    },
+    "eligible_sixty_second_intervals": 0,
+    "all_quiet_intervals_eligible": false,
+    "sampled_idle_cpu_target_met": false,
+    "primary_paint_wakes_total": 0,
+    "quiet_intervals_with_primary_paints": 0,
+    "background_commits": 4,
+    "native_selector_actions": 33,
+    "total_attempts": 33,
+    "total_admissions": 33,
+    "native_cleanup": {
+      "Windows": [
+        {
+          "Title": "",
+          "Visible": false,
+          "Miniaturized": false,
+          "Key": false,
+          "OcclusionVisible": false,
+          "Frame": [
+            0,
+            0,
+            500,
+            500
+          ],
+          "OrderedIndex": -1,
+          "Opaque": false,
+          "Alpha": 1,
+          "Level": 0
+        }
+      ],
+      "MainThread": true,
+      "CleanupObserved": true,
+      "WindowTitles": [],
+      "FilePanels": {
+        "Tracked": 0,
+        "Visible": 0,
+        "Open": 0,
+        "Save": 0
+      },
+      "NativeOutstanding": 0,
+      "AccessibilityWindows": 0,
+      "Menu": {
+        "Owned": false,
+        "OriginalRestored": false,
+        "TargetRetired": true,
+        "Items": []
+      },
+      "Tray": {
+        "Present": false,
+        "Visible": false,
+        "Template": false,
+        "TargetRetired": true,
+        "Identity": 0,
+        "Title": "",
+        "Tooltip": "",
+        "AccessibilityLabel": "",
+        "ImageWidth": 0,
+        "ImageHeight": 0,
+        "PixelWidth": 0,
+        "PixelHeight": 0,
+        "Items": []
+      },
+      "CallbacksStopped": true,
+      "PendingCallbacks": 0,
+      "MenuCallbacks": 0,
+      "TrayCallbacks": 0
+    },
+    "owned_group_absence_confirmed": true,
+    "full_idle_budget_qualified": false,
+    "os_application_background_qualified": false,
+    "continuously_observed_window_state_qualified": false,
+    "physical_input_qualified": false,
+    "human_voiceover_qualified": false,
+    "native_gpu_memory_qualified": false,
+    "full_p11_qualified": false,
+    "full_mac_qualified": false,
+    "limits": [
+      "Window states are sampled at interval endpoints. Background names the allocating-worker phase; it does not certify OS application background.",
+      "Only the primary paint counter is available; app-wide wakeups/presents remain unavailable.",
+      "The native PASS labels fixture completion, separate from CPU eligibility and target attainment.",
+      "Forced-GC RSS/Go observations remain sampled safety checks, with no native/GPU attribution."
+    ]
+  },
+  "performance": {
+    "result": "COMPLETE_CURRENT_NATIVE_GRID_MEASUREMENTS",
+    "source_commit": "77ca764b2a7896058cc21872a742f3a57bdf058c",
+    "canonical_reference_commit_at_build": "621aca2da91836631fc05b2a7b97f124d53518dd",
+    "build_receipt_sha256": "87f1ed9afd1a4ba4eef7d840e8a5fbcc5de2b54b5543ab82c8f8146aaf160009",
+    "binary_sha256": "c1938afd1b052923c41a5d870281ab960bd7482daf05cadbf3887150d0495ab1",
+    "run_receipt_sha256": "4c2742933d94ce95a4c61b41306027dd52f65f8b874266edafc8024c6b2c26d7",
+    "validator_sha256": "87116f312e3e6aa53ec900f169b010810990bee247b3c6c831b9f2b79f0dee7a",
+    "native_processes": 40,
+    "samples": 4800,
+    "warmup_per_process": 128,
+    "modes": {
+      "cpu": {
+        "summary_sha256": "28ff73e52b8ad38154b7d33e5d44be6cce2fed10f5a66289b75db7a6217a7a99",
+        "machine_sha256": "c22a4ca5e98f63842dd8f8c45039ae98ad4a2bd63d4778c09f6c99fd3c4d233e",
+        "warm_target_met": false
+      },
+      "gpu": {
+        "summary_sha256": "267fa3627d58c0723dac220f995c8a775a64f7c3d82be4664160476a8698f091",
+        "machine_sha256": "c22a4ca5e98f63842dd8f8c45039ae98ad4a2bd63d4778c09f6c99fd3c4d233e",
+        "warm_target_met": false
+      }
+    },
+    "ui_work_ns": {
+      "cpu": {
+        "fixed-10000": {
+          "pooled": {
+            "count": 600,
+            "p50": 6857501,
+            "p95": 7886873,
+            "p99": 8320000,
+            "max": 8723707,
+            "min": 5475958,
+            "mean": 6891838.455,
+            "sample_stddev": 547851.4751228644,
+            "coefficient_of_variation": 0.0794927911761194
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 6876374,
+              "p95": 7934581,
+              "p99": 8277458,
+              "max": 8406912,
+              "min": 6352790,
+              "mean": 7011778.691666666,
+              "sample_stddev": 449777.9754348982,
+              "coefficient_of_variation": 0.06414605982494125
+            },
+            {
+              "count": 120,
+              "p50": 6434001,
+              "p95": 7610293,
+              "p99": 8320000,
+              "max": 8524376,
+              "min": 5475958,
+              "mean": 6536475.9,
+              "sample_stddev": 596788.562873284,
+              "coefficient_of_variation": 0.09130127181732345
+            },
+            {
+              "count": 120,
+              "p50": 6822542,
+              "p95": 7879497,
+              "p99": 8264459,
+              "max": 8340334,
+              "min": 5627252,
+              "mean": 6833073.208333333,
+              "sample_stddev": 625709.0152876175,
+              "coefficient_of_variation": 0.09157065879588831
+            },
+            {
+              "count": 120,
+              "p50": 6870708,
+              "p95": 7981625,
+              "p99": 8367791,
+              "max": 8723707,
+              "min": 5771918,
+              "mean": 6996315.683333334,
+              "sample_stddev": 486897.4515001707,
+              "coefficient_of_variation": 0.06959340795042465
+            },
+            {
+              "count": 120,
+              "p50": 7002499,
+              "p95": 7742375,
+              "p99": 8026208,
+              "max": 8356916,
+              "min": 6517123,
+              "mean": 7081548.791666667,
+              "sample_stddev": 362111.75961971877,
+              "coefficient_of_variation": 0.05113454277768162
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 7879497,
+            "p95": 7981625,
+            "p99": 7981625,
+            "max": 7981625,
+            "min": 7610293,
+            "mean": 7829674.2,
+            "sample_stddev": 151926.0140173499,
+            "coefficient_of_variation": 0.019403874303907803
+          }
+        },
+        "fixed-1000000": {
+          "pooled": {
+            "count": 600,
+            "p50": 6796083,
+            "p95": 7490540,
+            "p99": 7985917,
+            "max": 8460000,
+            "min": 5468166,
+            "mean": 6786436.513333334,
+            "sample_stddev": 425794.47155630105,
+            "coefficient_of_variation": 0.06274198111479291
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 6778583,
+              "p95": 7409793,
+              "p99": 7585457,
+              "max": 8171418,
+              "min": 6178794,
+              "mean": 6829797.533333333,
+              "sample_stddev": 326429.29104364914,
+              "coefficient_of_variation": 0.047794870850927394
+            },
+            {
+              "count": 120,
+              "p50": 6899041,
+              "p95": 7638418,
+              "p99": 7846002,
+              "max": 8138004,
+              "min": 6230165,
+              "mean": 6949486.608333333,
+              "sample_stddev": 334520.70046679454,
+              "coefficient_of_variation": 0.0481360306624177
+            },
+            {
+              "count": 120,
+              "p50": 6567792,
+              "p95": 7273292,
+              "p99": 7662209,
+              "max": 8460000,
+              "min": 5670625,
+              "mean": 6606940.391666667,
+              "sample_stddev": 446121.73474145785,
+              "coefficient_of_variation": 0.06752319656223192
+            },
+            {
+              "count": 120,
+              "p50": 6742874,
+              "p95": 7343334,
+              "p99": 7780041,
+              "max": 7985917,
+              "min": 5468166,
+              "mean": 6631698.866666666,
+              "sample_stddev": 498849.99829955003,
+              "coefficient_of_variation": 0.07522205219645177
+            },
+            {
+              "count": 120,
+              "p50": 6839000,
+              "p95": 7629498,
+              "p99": 8138584,
+              "max": 8344250,
+              "min": 6004291,
+              "mean": 6914259.166666667,
+              "sample_stddev": 380062.50234323373,
+              "coefficient_of_variation": 0.05496792833214844
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 7409793,
+            "p95": 7638418,
+            "p99": 7638418,
+            "max": 7638418,
+            "min": 7273292,
+            "mean": 7458867,
+            "sample_stddev": 166993.7962560286,
+            "coefficient_of_variation": 0.022388627690509647
+          }
+        },
+        "variable-10000": {
+          "pooled": {
+            "count": 600,
+            "p50": 6877418,
+            "p95": 7874249,
+            "p99": 8441042,
+            "max": 9257834,
+            "min": 4691750,
+            "mean": 6762043.4783333335,
+            "sample_stddev": 735058.812493999,
+            "coefficient_of_variation": 0.10870365073061786
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 6832292,
+              "p95": 7886624,
+              "p99": 8456835,
+              "max": 8615542,
+              "min": 4691750,
+              "mean": 6690749.375,
+              "sample_stddev": 763023.2704431756,
+              "coefficient_of_variation": 0.11404152624431184
+            },
+            {
+              "count": 120,
+              "p50": 6952711,
+              "p95": 7846417,
+              "p99": 8184753,
+              "max": 8614584,
+              "min": 5251916,
+              "mean": 6873446.741666666,
+              "sample_stddev": 703298.8643662083,
+              "coefficient_of_variation": 0.10232113389383346
+            },
+            {
+              "count": 120,
+              "p50": 6786458,
+              "p95": 7877457,
+              "p99": 8934791,
+              "max": 9257834,
+              "min": 4766834,
+              "mean": 6712094.333333333,
+              "sample_stddev": 793820.7082654735,
+              "coefficient_of_variation": 0.11826721569201329
+            },
+            {
+              "count": 120,
+              "p50": 6926083,
+              "p95": 7870125,
+              "p99": 8050626,
+              "max": 8167084,
+              "min": 5454585,
+              "mean": 6841812.066666666,
+              "sample_stddev": 673137.0962933911,
+              "coefficient_of_variation": 0.0983857916198718
+            },
+            {
+              "count": 120,
+              "p50": 6820085,
+              "p95": 7785080,
+              "p99": 8175206,
+              "max": 8316042,
+              "min": 5266332,
+              "mean": 6692114.875,
+              "sample_stddev": 726716.1230806734,
+              "coefficient_of_variation": 0.10859289427255586
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 7870125,
+            "p95": 7886624,
+            "p99": 7886624,
+            "max": 7886624,
+            "min": 7785080,
+            "mean": 7853140.6,
+            "sample_stddev": 40860.57787525771,
+            "coefficient_of_variation": 0.005203087523386212
+          }
+        },
+        "variable-1000000": {
+          "pooled": {
+            "count": 600,
+            "p50": 6816625,
+            "p95": 7630376,
+            "p99": 7979083,
+            "max": 9198999,
+            "min": 4774250,
+            "mean": 6658727.556666667,
+            "sample_stddev": 682643.2762391798,
+            "coefficient_of_variation": 0.10251857737530087
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 6840249,
+              "p95": 7565458,
+              "p99": 7909792,
+              "max": 8044542,
+              "min": 5367124,
+              "mean": 6702177.133333334,
+              "sample_stddev": 646937.8591160795,
+              "coefficient_of_variation": 0.09652652358269206
+            },
+            {
+              "count": 120,
+              "p50": 6853998,
+              "p95": 7617751,
+              "p99": 7893792,
+              "max": 7920377,
+              "min": 5324959,
+              "mean": 6695947.433333334,
+              "sample_stddev": 642987.9054939849,
+              "coefficient_of_variation": 0.0960264267149267
+            },
+            {
+              "count": 120,
+              "p50": 6763542,
+              "p95": 7472998,
+              "p99": 7979083,
+              "max": 8518583,
+              "min": 4774250,
+              "mean": 6635883.616666666,
+              "sample_stddev": 668183.7980786246,
+              "coefficient_of_variation": 0.10069251311165496
+            },
+            {
+              "count": 120,
+              "p50": 6714711,
+              "p95": 7815003,
+              "p99": 8330457,
+              "max": 9198999,
+              "min": 5001832,
+              "mean": 6589437.841666667,
+              "sample_stddev": 780051.4395675637,
+              "coefficient_of_variation": 0.11837905725965013
+            },
+            {
+              "count": 120,
+              "p50": 6820667,
+              "p95": 7699042,
+              "p99": 7937753,
+              "max": 7951376,
+              "min": 5258456,
+              "mean": 6670191.758333334,
+              "sample_stddev": 670790.876740836,
+              "coefficient_of_variation": 0.10056545614341453
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 7617751,
+            "p95": 7815003,
+            "p99": 7815003,
+            "max": 7815003,
+            "min": 7472998,
+            "mean": 7634050.4,
+            "sample_stddev": 130265.32044370059,
+            "coefficient_of_variation": 0.017063722875565582
+          }
+        }
+      },
+      "gpu": {
+        "fixed-10000": {
+          "pooled": {
+            "count": 600,
+            "p50": 5526042,
+            "p95": 6601415,
+            "p99": 7118668,
+            "max": 7436751,
+            "min": 4498874,
+            "mean": 5661296.803333334,
+            "sample_stddev": 505515.0701725491,
+            "coefficient_of_variation": 0.08929315804020471
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 5553043,
+              "p95": 6778166,
+              "p99": 7106292,
+              "max": 7283377,
+              "min": 5118791,
+              "mean": 5759454.5,
+              "sample_stddev": 491746.3941150557,
+              "coefficient_of_variation": 0.0853807238367897
+            },
+            {
+              "count": 120,
+              "p50": 5475583,
+              "p95": 6546459,
+              "p99": 7180958,
+              "max": 7246545,
+              "min": 4498874,
+              "mean": 5530980.083333333,
+              "sample_stddev": 569105.1839425457,
+              "coefficient_of_variation": 0.10289409387993409
+            },
+            {
+              "count": 120,
+              "p50": 5460877,
+              "p95": 6518418,
+              "p99": 6842000,
+              "max": 6884295,
+              "min": 4733124,
+              "mean": 5549299.1,
+              "sample_stddev": 471540.9013801026,
+              "coefficient_of_variation": 0.08497305567474325
+            },
+            {
+              "count": 120,
+              "p50": 5614793,
+              "p95": 6604833,
+              "p99": 7081458,
+              "max": 7180750,
+              "min": 4775667,
+              "mean": 5719816.675,
+              "sample_stddev": 485125.10521247453,
+              "coefficient_of_variation": 0.08481479963035259
+            },
+            {
+              "count": 120,
+              "p50": 5596582,
+              "p95": 6636585,
+              "p99": 7161332,
+              "max": 7436751,
+              "min": 5190958,
+              "mean": 5746933.658333333,
+              "sample_stddev": 461070.68662653066,
+              "coefficient_of_variation": 0.08022899063015208
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 6604833,
+            "p95": 6778166,
+            "p99": 6778166,
+            "max": 6778166,
+            "min": 6518418,
+            "mean": 6616892.2,
+            "sample_stddev": 101489.49818922153,
+            "coefficient_of_variation": 0.015337940398850917
+          }
+        },
+        "fixed-1000000": {
+          "pooled": {
+            "count": 600,
+            "p50": 5133167,
+            "p95": 6081999,
+            "p99": 6810207,
+            "max": 8621749,
+            "min": 4360416,
+            "mean": 5183703.09,
+            "sample_stddev": 535137.1324128676,
+            "coefficient_of_variation": 0.10323452619136557
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 5479958,
+              "p95": 6229957,
+              "p99": 6466999,
+              "max": 6701333,
+              "min": 5003542,
+              "mean": 5550906.666666667,
+              "sample_stddev": 333228.94573753665,
+              "coefficient_of_variation": 0.06003144454555231
+            },
+            {
+              "count": 120,
+              "p50": 5493875,
+              "p95": 6158958,
+              "p99": 6810207,
+              "max": 6834083,
+              "min": 4958920,
+              "mean": 5569443.408333333,
+              "sample_stddev": 327071.0103456577,
+              "coefficient_of_variation": 0.05872597786993841
+            },
+            {
+              "count": 120,
+              "p50": 4919168,
+              "p95": 6343500,
+              "p99": 8411252,
+              "max": 8621749,
+              "min": 4360416,
+              "mean": 5138794.108333333,
+              "sample_stddev": 717882.1897103013,
+              "coefficient_of_variation": 0.1396985702435804
+            },
+            {
+              "count": 120,
+              "p50": 4757124,
+              "p95": 5397874,
+              "p99": 5786791,
+              "max": 6742623,
+              "min": 4376792,
+              "mean": 4869646.191666666,
+              "sample_stddev": 320351.84302269685,
+              "coefficient_of_variation": 0.06578544526929059
+            },
+            {
+              "count": 120,
+              "p50": 4701501,
+              "p95": 5315085,
+              "p99": 5431291,
+              "max": 5669498,
+              "min": 4458167,
+              "mean": 4789725.075,
+              "sample_stddev": 247896.47719766237,
+              "coefficient_of_variation": 0.051755888556435016
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 6158958,
+            "p95": 6343500,
+            "p99": 6343500,
+            "max": 6343500,
+            "min": 5315085,
+            "mean": 5889074.8,
+            "sample_stddev": 491498.32012398576,
+            "coefficient_of_variation": 0.08345934409323275
+          }
+        },
+        "variable-10000": {
+          "pooled": {
+            "count": 600,
+            "p50": 4943916,
+            "p95": 6185544,
+            "p99": 7004208,
+            "max": 9193919,
+            "min": 3607040,
+            "mean": 4996893.371666667,
+            "sample_stddev": 740854.7968408003,
+            "coefficient_of_variation": 0.14826307902457705
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 4865582,
+              "p95": 5902582,
+              "p99": 6535375,
+              "max": 6543916,
+              "min": 3715540,
+              "mean": 4847676.891666667,
+              "sample_stddev": 624531.3705680255,
+              "coefficient_of_variation": 0.12883106372902403
+            },
+            {
+              "count": 120,
+              "p50": 5001583,
+              "p95": 6556126,
+              "p99": 8563582,
+              "max": 9193919,
+              "min": 3653166,
+              "mean": 5111588.033333333,
+              "sample_stddev": 901489.3815295441,
+              "coefficient_of_variation": 0.17636190077346103
+            },
+            {
+              "count": 120,
+              "p50": 4884415,
+              "p95": 5814750,
+              "p99": 6432001,
+              "max": 6436168,
+              "min": 3607040,
+              "mean": 4860825.291666667,
+              "sample_stddev": 643835.4252663532,
+              "coefficient_of_variation": 0.1324539325390147
+            },
+            {
+              "count": 120,
+              "p50": 5229709,
+              "p95": 6538958,
+              "p99": 7004208,
+              "max": 7110125,
+              "min": 3695832,
+              "mean": 5264699.591666667,
+              "sample_stddev": 780857.3352137816,
+              "coefficient_of_variation": 0.14831944759958895
+            },
+            {
+              "count": 120,
+              "p50": 4900711,
+              "p95": 5951668,
+              "p99": 6089372,
+              "max": 6243380,
+              "min": 3638083,
+              "mean": 4899677.05,
+              "sample_stddev": 632101.3961159996,
+              "coefficient_of_variation": 0.12900878765387191
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 5951668,
+            "p95": 6556126,
+            "p99": 6556126,
+            "max": 6556126,
+            "min": 5814750,
+            "mean": 6152816.8,
+            "sample_stddev": 363706.8851688128,
+            "coefficient_of_variation": 0.05911225654708471
+          }
+        },
+        "variable-1000000": {
+          "pooled": {
+            "count": 600,
+            "p50": 4824541,
+            "p95": 5695710,
+            "p99": 6867123,
+            "max": 8810378,
+            "min": 3573042,
+            "mean": 4782978.708333333,
+            "sample_stddev": 666323.5634055317,
+            "coefficient_of_variation": 0.13931142161360727
+          },
+          "per_run": [
+            {
+              "count": 120,
+              "p50": 4838958,
+              "p95": 6398751,
+              "p99": 8200581,
+              "max": 8563416,
+              "min": 3668831,
+              "mean": 4906908.55,
+              "sample_stddev": 855231.8497302781,
+              "coefficient_of_variation": 0.17429137735413433
+            },
+            {
+              "count": 120,
+              "p50": 4801832,
+              "p95": 5537041,
+              "p99": 6142209,
+              "max": 6867123,
+              "min": 3573042,
+              "mean": 4712797.558333334,
+              "sample_stddev": 593344.2153128798,
+              "coefficient_of_variation": 0.12590063714145916
+            },
+            {
+              "count": 120,
+              "p50": 4811668,
+              "p95": 5460252,
+              "p99": 6494708,
+              "max": 6580126,
+              "min": 3661249,
+              "mean": 4707126.275,
+              "sample_stddev": 571468.9181996118,
+              "coefficient_of_variation": 0.12140505370224251
+            },
+            {
+              "count": 120,
+              "p50": 4781624,
+              "p95": 5391081,
+              "p99": 5590997,
+              "max": 6044291,
+              "min": 3653041,
+              "mean": 4655068.3,
+              "sample_stddev": 513008.36162924545,
+              "coefficient_of_variation": 0.11020426094054205
+            },
+            {
+              "count": 120,
+              "p50": 4929376,
+              "p95": 5788045,
+              "p99": 6317209,
+              "max": 8810378,
+              "min": 3674252,
+              "mean": 4932992.858333333,
+              "sample_stddev": 704398.9650097891,
+              "coefficient_of_variation": 0.14279342890591132
+            }
+          ],
+          "run_p95_variation": {
+            "count": 5,
+            "p50": 5537041,
+            "p95": 6398751,
+            "p99": 6398751,
+            "max": 6398751,
+            "min": 5391081,
+            "mean": 5715034,
+            "sample_stddev": 410591.17866559187,
+            "coefficient_of_variation": 0.07184404828835522
+          }
+        }
+      }
+    },
+    "fresh_predecessor_groups": [
+      {
+        "owned_group": 20189,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "66f1147cf67b3855e51ca0a2e17b04e8f2a572dce42f974e42dd2a9d2f88b29c",
+        "owned_members": []
+      },
+      {
+        "owned_group": 5658,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "c2864ddaad4a08aab170bf244579526325e33a2f28bdb6bb52b675a4ef5698be",
+        "owned_members": []
+      }
+    ],
+    "final_group_observations": [
+      {
+        "owned_group": 6754,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "e61b429e401ca7d1ad820a37c7632ab4660c69dcd797a6c5402ad05b517e9e43",
+        "owned_members": []
+      },
+      {
+        "owned_group": 6816,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "aa20ebb2c6b1ff15815deda50a0b5b86ffbe8554f0e906e08bab062ed241bfeb",
+        "owned_members": []
+      },
+      {
+        "owned_group": 6857,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "b18d5e02b2a482ccf34d513e5c7023012c71232dc5fef6597def3818e4d89c5f",
+        "owned_members": []
+      },
+      {
+        "owned_group": 6894,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "7564b251ebec40452bd2b35e5f21b80229fe6fdf96f2a3165ebfec442ab108b2",
+        "owned_members": []
+      },
+      {
+        "owned_group": 6954,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "44bca817a4c15e27e6f214780dd537817db5d5c80dad9cb9553acb6a69fcbbe7",
+        "owned_members": []
+      },
+      {
+        "owned_group": 6989,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "b788d8c80b5feb6acfa799638dab6da536b6804d0668d06343c56b1039b24a74",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7030,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "a39841d2edb3331390223de762f1e1d52978a7206d6e289a9db797e100660a66",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7067,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "cf2aca6a2c010f12c0097085014784630cf70ddc522f5da758e2d5ac3449e8be",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7143,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "05848026312677b19499ae7d7fb696fb154157d1208dfb5a0ad1c299e6bd1943",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7291,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "49a7638af6e94fbff6aa94ec0b49a57dcaa7bcb05536e7d66045fce32f1e714b",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7339,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "01397b87e3253728cfd70293dfaa59911cb90d14b3933c6160bd11748cd06abe",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7449,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "484ce8ac52c645b35975879a37a33d881ead66391190b963646d4ec6a54bb17c",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7487,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "953e51dd5d7ea8928427d3bb6892010aa148ca68f8726c3a457a7c2c0ba406cb",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7565,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "8a0c783d82e41d84d739c8a5877b56d9007571fb56910516a04393d22ccf3bc5",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7596,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "aca23a7d17f48648a67b5ed48fa4012c07efb1deb628c78cfd99846310a5fc20",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7636,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "ad4b61638fa7b44471e1abb86677226fddb8e79c694e63d2186a531fa503d5a6",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7675,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "44ebbd1b79312e0895954e742f36a91f66241a3e773c9dddd2be620de2e6edda",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7715,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "3ff8eb0986d482b3a42b86f756b9b06715e04a1894d2b2b1d22db254e4062e0a",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7792,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "d9d6d49181154a9d72d948f39d6ceec39c358a551c8bc768fc02bc01845a2eab",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7873,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "167ff4f1ab63a2c9d2134f1d077ad15638cdef426e296192cf7fd994fbc415a2",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7943,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "f8c9724e2c06516cb6d4b5dee7e75615b9f52f1e5acacc7aaa3768749dd8301d",
+        "owned_members": []
+      },
+      {
+        "owned_group": 7982,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "dc3c16b5834a4c989dee512def7beaf5d0e83631d16e9b56bad7f849bf0f5777",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8039,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "e8e22f70ad019bff5f7e6433eb86f5bb53c882b463f4dfab7b830a557fd9e033",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8087,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "50faa6beda3d5f1219882d630ef50cecf9729b3a2bd2c8b7b91e7adad12beac6",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8142,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "94eb24da84c4a5fd38170883e4b0501f89212ba85b54358b457e9acb2e4bce90",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8189,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "38326638041d65c6d647707556af6acec6bae23188e06eb0fce5073b7433caf3",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8228,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "4334d2311dd2adc816a4bdb771e595e0dcc173dedb76f6a4674e1abc49384ae4",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8266,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "d8deeb48cc086971be1bb7885b830c3477cc6308a4154d0fc59496782b510684",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8482,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "105a5246d3fbfc7e5a12adf4ba09a8411fcb3e32e4b45e6c51904a00d4799e82",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8572,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "5a6bb56eb0f3f4535e73b7c7d4aa1cf35f5b5e92b018e2b6e1939c52ce9a08a3",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8601,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "aeb9c24733ad7a7e19ccfc2ec977b2564d58c0881dd3581c2d27176cac4b025a",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8640,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "4d90c69d38de4480101aa52afc3adaf292edba56f59bf40ea7f76b8342687f23",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8692,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "747b1557d4735f7a889fd4bda29c22edf8564a776a1457acf2f8a23dde6ba1cd",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8726,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "61fbce6f6dd0322d9f13854af920a23c95dc8a64fe99d3180d7085d0918cbb3a",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8803,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "f4f122f61ac733fd416b46506c68732b2e600ba420893f5146c591880ff9039a",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8856,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "19bb34f2aa2c95dfae13c559933df58da213eddc19385aa3de4c56c9a881debf",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8926,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "4776208279bc75685640979479e3ba6505471834594a0f42657ff6d405bf4339",
+        "owned_members": []
+      },
+      {
+        "owned_group": 8965,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "f7585ef3fe4461a1e77d846be656a93ebeb50c10ec337085f9df35f7345002cd",
+        "owned_members": []
+      },
+      {
+        "owned_group": 9006,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "2e110f438367d4da0aaedc6f707fb0deffe5ce63d1511b00f0abee56a8f5aba6",
+        "owned_members": []
+      },
+      {
+        "owned_group": 9038,
+        "argv": [
+          "ps",
+          "-axo",
+          "pid=,pgid=,stat="
+        ],
+        "stdout_bytes": 14042,
+        "stdout_sha256": "e5771b537e535f2442fc75ad81f21f4bb40f35c55bfcb12c63e31d3a79b77a8a",
+        "owned_members": []
+      }
+    ],
+    "warm_targets_ns": {
+      "p95": 4000000,
+      "p99": 6000000
+    },
+    "full_p6_qualified": false,
+    "full_mac_qualified": false,
+    "native_gpu_memory_qualified": false,
+    "physical_input_qualified": false,
+    "limits": [
+      "CPU mode20 release processes then GPU mode20; current configuration measurements, no before/after optimization attribution.",
+      "Measured routed UI/frame elapsed work through submission; physical presentation/native GPU allocation are not available.",
+      "Source and prepared bytes observed at endpoints, not hermetic compiler/cache/SDK closure or loaded-executable attestation.",
+      "Group observations are bounded OS snapshots after measured work; no process observer runs in the measured native frame interval.",
+      "Overnight and human workflows have separate acceptance."
+    ]
+  },
+  "review_chain": {
+    "endurance": "37f65fccfabe17defaf0c2e3aa0e492e16ddcebe21aad5c25bb6e33d8b5de373",
+    "diagnostic_source": "3f07bb2ef377a6091682e8a20f471a412f9b1d3c5e2ac81fbabf32034c8affa0",
+    "diagnostic_harness": "a0d2ca648e4cae94bbf8004746d5b22369417e36256ca2b7eb13df400c990100",
+    "corrected_source": "6daaef7e7eb4ae70c148f038c17a676dc55cc2de854234f6613150c85f705801",
+    "corrected_harness": "6e200b0b010573d85ac89aea4f20566c2e3987d9cef319bf7addacba5eab73b6",
+    "corrected_evidence": "939d18b532c353b680c4a48563239dafc0a550c0414f66e2b33a81436e63ede1",
+    "performance_harness": "ed0276c6ea2c2e3bff22308feb2509cccd6291721a7470b675622d5b5e2d304a"
+  },
+  "full_idle_budget_qualified": false,
+  "overnight_qualified": false,
+  "full_p6_qualified": false,
+  "full_p11_qualified": false,
+  "full_mac_qualified": false,
+  "physical_input_qualified": false,
+  "native_gpu_memory_qualified": false,
+  "provider_review": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "exit_code": 0,
+    "report_sha256": "689fb52d987eb7cac56dbbbc8bb38f484257fb5ad1622b08e1d32cac64ee3b80",
+    "execution_sha256": "831b8d67b4a2afc667f68df9521895649431622880cc04d5ad162a7e6b1e4c03",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 9,
+      "bytes": 32093,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 16576,
+          "output": 3027,
+          "costUSD": 0.063422
+        }
+      ],
+      "widenedFiles": 4,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "returned_findings": 2,
+    "discarded_findings": 1,
+    "suppressed_findings": 0,
+    "resolution": {
+      "6d286fffc1192930": "Renamed callback native DTOs targetState/coverState.",
+      "68900fa65361828c": "Bounded error text removes incomplete/invalid UTF-8; seven meaningful prefix cases pass.",
+      "d0cf1539cbc58bdc": "Provider tool discarded this docs-link finding; both referenced qualification record and sealed evidence are included in the final commit."
+    },
+    "final_delta_review": "Internal review required; no second provider call.",
+    "scope": "Nine selected source/specification/report leaves; generated records and sealed raw evidence receive internal review."
+  },
+  "final_checkpoint_sources": {
+    "docs/reports/README.md": "75a5f4c48d3d8cea9db1a3e6d6018d2534ccf2876c3a647f6da6d6d6000cbafa",
+    "docs/reports/macos-composed-campaign/README.md": "c3ef9a998292e48247281d21f754eabd115f6510673f1761db207b3354c178a4",
+    "docs/reports/macos-post-glyph-native/README.md": "c28fbe203213f53a1db7a1f1a5e53efff8023dbe52f52f74edf97122d6a2cc0f",
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go": "c1349cc7bee0da8368c697114daffbacd4630e2d3ec1c487577fc60255ad0331",
+    "drivers/cogent/cmd/window-cycle-smoke/soak_test.go": "53130300b2e3c84d3ed3e082ed072502f9e216d07fee1c10925a39d0e5dee8c7",
+    "drivers/cogent/native_services_checks_darwin.go": "17adddd178e371b90f3def94832d8722d7f2747e5c0941ea2d83e094a8db9fb3",
+    "drivers/cogent/native_services_checks_darwin.m": "9255b1c2a28a88b33172304e7aa31dd845903aab95708df2fa480a64a44cb604",
+    "specs/macos-completion.md": "b4ce372733f6ccfa299709cf6e00cea72d3eb968d2e10c4b939074c24f8231c5",
+    "specs/workbench-endurance.md": "8a0ca5745a3c7a7743bdb23c20601882589fb6784e589ecef5d896729b15155a"
+  },
+  "provider_reviewed_sources": {
+    "docs/reports/README.md": "75a5f4c48d3d8cea9db1a3e6d6018d2534ccf2876c3a647f6da6d6d6000cbafa",
+    "docs/reports/macos-composed-campaign/README.md": "a105ef8d4195797d0ef992d4cafe8fa3904576c8325a7b185ba9f8ef571fb71a",
+    "docs/reports/macos-post-glyph-native/README.md": "c28fbe203213f53a1db7a1f1a5e53efff8023dbe52f52f74edf97122d6a2cc0f",
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go": "f75d8f1170cc52136e01edf44bba57b2cfc1373eeb0655727528e0a4d9b83515",
+    "drivers/cogent/cmd/window-cycle-smoke/soak_test.go": "c841830c577d3d39c5c546f7adeb78ec250763657f92d723d043d227f537023d",
+    "drivers/cogent/native_services_checks_darwin.go": "17adddd178e371b90f3def94832d8722d7f2747e5c0941ea2d83e094a8db9fb3",
+    "drivers/cogent/native_services_checks_darwin.m": "9255b1c2a28a88b33172304e7aa31dd845903aab95708df2fa480a64a44cb604",
+    "specs/macos-completion.md": "b4ce372733f6ccfa299709cf6e00cea72d3eb968d2e10c4b939074c24f8231c5",
+    "specs/workbench-endurance.md": "8a0ca5745a3c7a7743bdb23c20601882589fb6784e589ecef5d896729b15155a"
+  },
+  "final_inert_checks": {
+    "final-tests": {
+      "receipt_sha256": "94a6c465f20f80d14e0d49dfec9003c1ea720ab9957ca34da5e900d7e35830b7",
+      "exit_code": 0
+    },
+    "final-vet": {
+      "receipt_sha256": "b40b9318a565af5d3efc5ff1509456a939bb03ae6657b8235b0e989d2b220c7e",
+      "exit_code": 0
+    }
+  },
+  "native_source_limit": "Native successful preflight retains its exact pre-review five-leaf vector. Final callback naming/UTF-8 error-prefix delta has inert race/vet evidence; no native rerun or inherited final-source runtime claim."
+}

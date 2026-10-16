@@ -11,6 +11,7 @@ import (
 	"math"
 	"os"
 	"runtime"
+	"strings"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -88,6 +89,55 @@ func soakState(s cogent.NativeServiceWindowCheck, phase string) bool {
 	return s.OcclusionVisible == (phase != "occluded")
 }
 
+// Both DTOs come from one bounded main-thread snapshot. Requested client geometry
+// is separate from observed Cocoa outer frames. Neither containment nor ordering
+// substitutes for the target's strict effective occlusion predicate.
+func soakPair(ctx context.Context, target, cover string) (cogent.NativeServiceWindowCheck, cogent.NativeServiceWindowCheck, error) {
+	bounded, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	s, err := cogent.CheckNativeServices(bounded, cogent.NativeCheckSnapshot, 0)
+	if err != nil {
+		return cogent.NativeServiceWindowCheck{}, cogent.NativeServiceWindowCheck{}, err
+	}
+	return soakPairState(s, target, cover)
+}
+
+func soakPairState(s cogent.NativeServiceCheckState, target, cover string) (a, b cogent.NativeServiceWindowCheck, err error) {
+	na, nb := 0, 0
+	for _, w := range s.Windows {
+		if w.Title == target {
+			a = w
+			na++
+		}
+		if w.Title == cover {
+			b = w
+			nb++
+		}
+	}
+	if !s.MainThread || target == cover || na != 1 || nb != 1 {
+		err = fmt.Errorf("soak pair target=%d cover=%d main=%t", na, nb, s.MainThread)
+	}
+	return
+}
+
+func soakContains(outer, inner [4]float64) bool {
+	for _, frame := range [][4]float64{outer, inner} {
+		for _, v := range frame {
+			if math.IsNaN(v) || math.IsInf(v, 0) {
+				return false
+			}
+		}
+		if frame[2] <= 0 || frame[3] <= 0 || math.IsInf(frame[0]+frame[2], 0) || math.IsInf(frame[1]+frame[3], 0) {
+			return false
+		}
+	}
+	return outer[0] <= inner[0] && outer[1] <= inner[1] && outer[0]+outer[2] >= inner[0]+inner[2] && outer[1]+outer[3] >= inner[1]+inner[3]
+}
+
+func soakErrorText(text string) string {
+	return strings.ToValidUTF8(text[:min(len(text), 512)], "")
+}
+
 // Quiet samples do not post owner callbacks, collect heaps or inspect Cocoa
 // between the CPU/paint counter endpoints. Surrounding observations and the
 // allocating background phase remain separate, explicitly measured activity.
@@ -138,9 +188,11 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 	soakStarted := time.Now()
 	for _, phase := range []string{"visible", "occluded", "minimized", "background"} {
 		native.Raise()
-		cover.SetWinSize(soakWindowSize(win))
 		if phase == "occluded" {
-			cover.SetPos(native.Position(nil), nil)
+			// Equal decorated frames need not fully occlude their bounding boxes.
+			// Keep the composed target size and surround it with a larger cover.
+			cover.SetWinSize(soakWindowSize(win).Add(image.Pt(64, 64)))
+			cover.SetPos(native.Position(nil).Sub(image.Pt(32, 32)), nil)
 		} else {
 			cover.SetWinSize(image.Pt(320, 160))
 			cover.SetPos(image.Pt(0, 0), nil)
@@ -149,11 +201,22 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 		if phase == "minimized" {
 			native.Minimize()
 		}
-		if e = wait(ctx, func(inner context.Context) (bool, error) {
-			s, e := soakWindow(inner, "Vellum composed idle soak")
-			return soakState(s, phase), e
-		}); e != nil {
-			return fmt.Errorf("soak %s state: %w", phase, e)
+		var observedTarget, observedCover cogent.NativeServiceWindowCheck
+		observed := false
+		var observedUTC, queryError string
+		e = wait(ctx, func(inner context.Context) (bool, error) {
+			targetState, coverState, err := soakPair(inner, "Vellum composed idle soak", "Vellum cycle survivor")
+			if err != nil {
+				queryError = soakErrorText(err.Error())
+				return false, err
+			}
+			observedTarget, observedCover, observed = targetState, coverState, true
+			observedUTC, queryError = time.Now().UTC().Format(time.RFC3339Nano), ""
+			return soakState(targetState, phase) && (phase != "occluded" || soakCoverState(targetState, coverState)), nil
+		})
+		transitionErr := emit(map[string]any{"event": "vellum.soak.transition", "phase": phase, "observed": observed, "observed_utc": observedUTC, "last_query_error": queryError, "target": observedTarget, "cover": observedCover, "cover_contains_target": observed && soakContains(observedCover.Frame, observedTarget.Frame), "state_accepted": e == nil})
+		if e != nil || transitionErr != nil {
+			return fmt.Errorf("soak %s state: %w", phase, errors.Join(e, transitionErr))
 		}
 		phaseStarted := time.Now()
 		phaseCPU0, e := soakCPU()
@@ -278,6 +341,12 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 	}
 	p.advance()
 	return nil
+}
+
+func soakCoverState(target, cover cogent.NativeServiceWindowCheck) bool {
+	return cover.Visible && !cover.Miniaturized && cover.Opaque && cover.Alpha == 1 &&
+		cover.Level == target.Level && cover.OrderedIndex >= 0 && target.OrderedIndex > cover.OrderedIndex &&
+		soakContains(cover.Frame, target.Frame)
 }
 
 func soakResult(value uint64, err error) error {

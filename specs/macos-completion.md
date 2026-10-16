@@ -23,9 +23,27 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
-The human authorized unattended native and performance testing on 14 October
+The human authorized unattended native and performance testing on 15 October
 2026. Prior paused-test notes below describe historical checkpoints. A return
 message stops live testing immediately.
+
+The [33-action composed campaign](../docs/reports/macos-composed-campaign/README.md)
+completed 1,000 windows and 33,000 owner/native action checks on `c078eb8` with
+6,227 prepared source files. Its sampled safety guards and tracked teardown
+passed. The next soak preflight and a diagnostic reproduction failed the strict
+native occlusion predicate. The corrected fixture uses a larger opaque cover,
+observes actual containment/order and still requires native occlusion; its
+40-second preflight passes on the separately recorded source vector. Those
+one-second quiet samples do not qualify the 60-second idle target or overnight
+behavior. Full P11, professional/native/GPU memory, physical workflows and Mac
+release acceptance remain open.
+
+The [current native grid measurements](../docs/reports/macos-post-glyph-native/README.md)
+complete 40 fresh ordinary processes and 4,800 samples on `77ca764`/6,227 prepared
+files, after the source-bound endurance and corrected-preflight gates. All eight
+cases miss the unchanged 4 ms p95 / 6 ms p99 targets: pooled p95 is 7.49–7.89 ms
+for CPU raster and 5.70–6.60 ms for the GPU scene route. This configuration run
+does not attribute improvement to prior optimizations or complete P6.
 
 The [source-bound native follow-ups](../docs/reports/macos-native-followups/README.md)
 include a complete 1,000-window/24,000-step composed run on `4cf9e36`/6,209 leaves

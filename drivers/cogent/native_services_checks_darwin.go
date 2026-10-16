@@ -52,6 +52,12 @@ type NativeServiceWindowCheck struct {
 	Title                                        string
 	Visible, Miniaturized, Key, OcclusionVisible bool
 	Frame                                        [4]float64
+	// OrderedIndex is the position in NSApp.orderedWindows, or -1 if absent.
+	// These diagnostic fields do not establish continuous coverage or visibility.
+	OrderedIndex int
+	Opaque       bool
+	Alpha        float64
+	Level        int
 }
 
 type NativeServiceCheckState struct {
