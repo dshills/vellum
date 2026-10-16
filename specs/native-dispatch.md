@@ -34,12 +34,42 @@ before initialization or after termination are ignored. Duplicate termination an
 restart after termination do not call native functions. All desktop key, character,
 pointer and scroll wakes use this barrier, as do dispatched and render-window
 wakes. It never spans polling, callback execution, queue delivery or application
-locks. `StopMain` itself needs no wake: the existing desktop event wait is bounded
-at 100 ms. This guard does not cover unrelated GLFW calls or standalone GPU helper
+locks. The portable `StopMain` closes the stop signal without posting a native
+event. Windows and Linux retain the finite 100 ms event wait. The Mac loop owns
+the stop wake and joins its ingress before native cleanup. This guard does not
+cover unrelated GLFW calls or standalone GPU helper
 initialization/termination outside the desktop application driver.
 
-Owned patch22 contains exact input/output hashes and its regressions. Run the
+On Mac, owned patch 0069 replaces the periodic wait deadline with `WaitEvents`.
+One process-loop ingress receives the public unbuffered queue, publishes each
+packet to a private one-slot ready channel, then posts through the event barrier.
+The native thread alone executes admitted callbacks. Publication before posting
+closes the race in which the public caller's earlier wake was consumed before
+its queue send became selectable. Existing public leading/trailing wakes remain.
+
+Ingress retains at most one ready and one local pending packet, in addition to
+the native thread's active callback. It clears its local packet after transfer.
+Shutdown closes admission, refuses only those already received pending packets
+through the existing exactly-once acknowledgement protocol, and joins ingress
+before cleanup and GLFW termination. An active callback keeps completion and
+output ownership. Stop-before-start, callback panic/Goexit and a failing native
+wait use the same retirement order. A native post panic remains fatal and is
+re-thrown after refusing ingress-owned packets; it provides no native cleanup
+guarantee for a fatal worker panic. No goroutine-per-call or polling timer is added.
+
+Injected-wait regression tests cover routing and retirement without initializing
+GLFW. They do not establish native idle CPU, application-wide wakeups, GPU
+presentation counts or interactive event delivery. Those require separate,
+source-bound Mac acceptance; removing a recurring deadline alone does not prove
+that any performance budget has been met.
+
+Owned patches 0022 (callback failure) and 0069 (Mac ingress) contain exact
+input/output hashes and their regressions. Run the
 selected backend race suite through `scripts/check.sh`; `cmd/mainqueue-smoke`
-provides separate `-case normal` and `-case panic` real desktop-loop probes. Neither
-probe opens windows or changes OS input/accessibility preferences. Windowed
+provides separate `-case normal`, `-case panic`, `-case idle` and `-case stop`
+real desktop-loop probes. The idle case delays three synchronous callbacks; the
+stop case delays a worker-only stop without submitting any callback. These two
+cases omit the deliberate empty-event flood. They exercise wait/delivery and stop
+liveness, without qualifying idle CPU or wake budgets. None of these probes
+opens windows or changes OS input/accessibility preferences. Windowed
 shutdown remains a separate native acceptance check.

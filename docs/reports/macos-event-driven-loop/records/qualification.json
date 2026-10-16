@@ -1,0 +1,125 @@
+{
+  "schema": "vellum-macos-event-driven-loop-qualification-v1",
+  "result": "PASS_SCOPED_SOURCE_CHECKPOINT_NATIVE_PENDING",
+  "sealed_utc": "2026-10-16T01:59:47.397519+00:00",
+  "base_commit": "42319673ef8dea989b1dd1ff4e7a22a1b7603534",
+  "checkpoint_sources": {
+    "drivers/cogent/native/patches/nativeidle/0069-macos-event-driven-main-loop.patch": "5ecbd0f213ddb223738baedfb36f90e4ba7db1777490c44306de655c41ed18bd",
+    "drivers/cogent/native/patches/nativeidle/original-hashes.json": "2b7490f1f9d1ea572cad98a6386c8356ff8ad3bece90f7a587ad9f399950eebb",
+    "drivers/cogent/native/patches/nativeidle/output-hashes.json": "fdb0c431d44d4049b9fc33e66e84c6b2d21fc47ee01313b5d317408abbbed250",
+    "drivers/cogent/native/dependencies.json": "60ff354b6b73b4ad82781b2b25e4d28fdd370162cf385f6024603c7a9a5ad3f8",
+    "drivers/cogent/prepare_test.py": "046d64562caef4c29d3fbd30f9024f650a944fdc4a09bc0dfbe579ac14c9b230",
+    "scripts/check.sh": "ce69995989f8f084d8d6ea1188b1430f146c20602b39b5d32afc5ecb87ad0db5",
+    "specs/native-dispatch.md": "5cfac7ca2c75f561264e0bf826ce68125cb839a0b40fda24536268edd0061fd7",
+    "specs/windows-services.md": "dd6d97dd917a9504eab7bd56aae825a9722f18dddecb0f9420e9f76afdd301fa",
+    "docs/development.md": "66e15d93836b81177154ac2e0979a28a677843d62915bb96894ef5e3e4edc938",
+    "drivers/cogent/cmd/mainqueue-smoke/main.go": "820070d8c6f3288f193442686051974555bc1327e3a321ddb0a6f85c66e0bafc",
+    "docs/reports/macos-event-driven-loop/README.md": "b5ab6a77024e1174057c194b206ef0629320f6ad65c460bced35ccff139236b9"
+  },
+  "prepared_outputs": {
+    "system/driver/base/app.go": "f7c39f21a905e044e12a5e24f8bb708b26b04d1aaae4f08dfef26c8f7ff914dd",
+    "system/driver/base/helpers.go": "98e64f472e915ffed8878ffbe13d5be52ebce4b82664fa04dd0f76a43c3c559d",
+    "system/driver/desktop/app.go": "32326f74f0c8247766c6f0ccd4e67430991cff0b78f98938a956c0cd1e56a5be",
+    "system/driver/desktop/desktop_darwin.go": "c3150d2976b9e7dc4445c6d3f08e871e4095f33b9220ce0ba9f9909679456617",
+    "system/driver/desktop/native_idle.go": "74944313479981f6dcae212456b5cdfa35cfc6f19b54c9b55e142802d267e31c",
+    "system/driver/desktop/native_idle_vellum_test.go": "357755a442ad819b2d5eb32a229a8ab83e378b4f60c2d17dfe063087c5141b20"
+  },
+  "prepared_file_count": 6229,
+  "source_association_sha256": "fac027c86301e39a1b51c9e39e032a4bcd903fa0c376460ca625be230e6c30db",
+  "binary": {
+    "path": "/private/tmp/vellum-macos-native-idle/mainqueue-smoke-final",
+    "sha256": "08a840b6805789e0152b304ebce908b6408fefb0e654927c6b5b5831034383e4",
+    "bytes": 23544898
+  },
+  "checks": {
+    "regenerate-v2": {
+      "receipt_sha256": "2352d84ad9386bbf11c7f002eedf1fd6d3f71e0b8ebac6535b29baba3dd136bc",
+      "elapsed_seconds": 1.7771436660550535,
+      "exit_code": 0,
+      "source_stable": true,
+      "finished_before_next_expected_quiet": true
+    },
+    "ingress-race-final-v1": {
+      "receipt_sha256": "3a3cd332e25f36f2fde9dde149e2a1c504fb44d6e6fd191cca9c47682bb8b553",
+      "elapsed_seconds": 23.075040958006866,
+      "exit_code": 0,
+      "source_stable": true,
+      "finished_before_next_expected_quiet": true
+    },
+    "ingress-vet-v2": {
+      "receipt_sha256": "e6259d926dada3026c03a865595c9906ac0df0e8f027f148acec8d77fcdaa0a1",
+      "elapsed_seconds": 2.8373127499362454,
+      "exit_code": 0,
+      "source_stable": true,
+      "finished_before_next_expected_quiet": true
+    },
+    "smoke-build-v2": {
+      "receipt_sha256": "1b1ad2b1c8f57b25086f19940b066c767d1d4f6c56448c600602c65fd03b90c3",
+      "elapsed_seconds": 3.8091593750286847,
+      "exit_code": 0,
+      "source_stable": true,
+      "finished_before_next_expected_quiet": true
+    },
+    "preparation-tests-v1": {
+      "receipt_sha256": "91e5cca6161a40714a6415a9ab29db615030bbd60ec50c4355b8c4017e466b45",
+      "elapsed_seconds": 0.09415083297062665,
+      "exit_code": 0,
+      "source_stable": true,
+      "finished_before_next_expected_quiet": true
+    }
+  },
+  "provider_review": {
+    "execution_sha256": "987107184689df011f9cc3974205e7635d2fc94908364592616b3546a9dd0d42",
+    "exit_code": 0,
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 11,
+      "bytes": 42952,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 22047,
+          "output": 3596,
+          "costUSD": 0.080054
+        }
+      ],
+      "widenedFiles": 3,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "returned_findings": 0,
+    "discarded_findings": 0,
+    "suppressed_findings": 0
+  },
+  "internal_review_sha256": "88c5737fefc740ff305bbccc8d085d2a4ab2c61df6f31ef65f3aefe3dd5e47de",
+  "negative_control": {
+    "exit_code": 1,
+    "intended_shutdown_assertion_failed": true
+  },
+  "historical_vet_failure_preserved": true,
+  "producer_preservation": "First two exact executed versions reconstructed and SHA256-verified against original receipts; later versions saved before execution. See producer-index.json.",
+  "archive_sha256": "2f56e01ef1d81c2ccbada8e9fce9266b57a7d4ca83412c361b2ddfb34d440e0f",
+  "archive_index_sha256": "cd716a448b3fb90f59eea0459ba9b4d3d9cde49416dcf164f59ac64e53adee2f",
+  "seal_producer_sha256": "7fc0491c0160f6e569614e1efdce534e7f06df6eeb300d0ce97355aabd1cbecc",
+  "native_executed": false,
+  "idle_budget_qualified": false,
+  "full_mac_qualified": false,
+  "limits": [
+    "Focused inert regressions, vet, preparation and build; not a complete repository suite.",
+    "Timing-gap receipts do not certify global machine inactivity.",
+    "Ongoing overnight native source/executable remains frozen and separate.",
+    "No native startup/window/event/stop qualification or measured idle benefit for this new source."
+  ]
+}

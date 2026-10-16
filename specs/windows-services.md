@@ -53,9 +53,11 @@ deliveries as well as executed work. Native window construction is one admitted
 main-thread callback and returns an explicit error on refusal. The legacy
 RunOnMain API returns no refusal error; worker service transports use the stopped
 signal and their own context/error protocol.
-Stop does not post a native wake after
-signaling shutdown; the desktop loop's existing 100 ms event wait observes the
-closed signal, avoiding a post-termination GLFW call or nil native identity.
+The portable stop method does not post a native wake after signaling shutdown.
+Windows and Linux retain the desktop loop's finite 100 ms wait. The Mac loop
+owns an event-driven ingress and stop wake, joined before native termination;
+see [native dispatch](native-dispatch.md). The event barrier refuses posts after
+native termination or before initialization.
 
 ## Services
 

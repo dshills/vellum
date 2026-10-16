@@ -59,6 +59,29 @@ prototype evidence and review records remain part of the repository. Capture-tim
 paths and hashes in evidence are historical records; moving documentation does
 not regenerate measurements or certify additional platform behavior.
 
+## Native main-loop acceptance
+
+Mac dispatch uses a bounded private ingress and an event-driven native wait.
+The selected upstream race regressions in `scripts/check.sh` inject the event
+wait without opening a window or initializing a GPU instance. They check queue
+ownership and retirement; native liveness is a separate check:
+
+```sh
+cd drivers/cogent
+go build -o /tmp/vellum-mainqueue ./cmd/mainqueue-smoke
+/tmp/vellum-mainqueue -case normal
+/tmp/vellum-mainqueue -case panic
+/tmp/vellum-mainqueue -case idle
+/tmp/vellum-mainqueue -case stop
+```
+
+Run these sequentially when the Mac is available. Each process owns one native
+loop and opens no application windows. The idle and stop cases omit the wake
+flood to exercise delayed callback delivery and worker-only stop while waiting.
+They do not measure idle CPU, application wakeups or GPU presents. Native
+windowed close/focus/monitor behavior and sustained idle measurements remain
+separate; see the [dispatch contract](../specs/native-dispatch.md).
+
 ## Editor native acceptance
 
 After building `examples/editor`, run its `-smoke` mode for deterministic Cocoa

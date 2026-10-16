@@ -1,0 +1,610 @@
+--- a/system/driver/base/app.go
++++ b/system/driver/base/app.go
+@@ -223,8 +223,8 @@
+ 		close(a.mainQueueReady)
+ 	}
+ 	a.mainQueueMu.Unlock()
+-	// The desktop loop already has a bounded event wait. No native wake is
+-	// needed here, and posting after the stop signal could race termination.
++	// Platform loops own stop observation and any required native wake. The
++	// portable base must not post here: a late post could race termination.
+ }
+ 
+ func (a *App) SystemPlatform() system.Platforms {
+--- a/system/driver/base/helpers.go
++++ b/system/driver/base/helpers.go
+@@ -39,7 +39,9 @@
+ // one acknowledgement. A panic stops further admissions before releasing its
+ // caller, then propagates on the native thread. Goexit retains its native-thread
+ // semantics while its caller receives ErrMainCallbackIncomplete.
+-// Used only by the native loop or its pre-publication inline caller.
++// Execution belongs to the native loop or its pre-publication inline caller.
++// After MainStopped is irrevocably true, the desktop ingress may also use this
++// method off-main solely to acknowledge refusal; F cannot run in that state.
+ func (a *App) ExecuteMain(f FuncRun) (completed bool) {
+ 	a.mainQueueMu.Lock()
+ 	admitted := !a.mainQueueStopped
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -76,6 +76,10 @@
+ 		a.mainCleanup.finish(func() { desktopEvents.stop(glfw.Terminate) })
+ 	}()
+ 	queue, stopped := a.InitMainQueue()
++	if a.Platform() == system.MacOS {
++		a.runMacMainLoop(queue, stopped, glfw.WaitEvents, a.SendEmptyEvent)
++		return
++	}
+ 	for {
+ 		select {
+ 		case <-stopped:
+--- a/system/driver/desktop/desktop_darwin.go
++++ b/system/driver/desktop/desktop_darwin.go
+@@ -171,7 +171,7 @@
+ 	}
+ 	typ := C.GoStringN(ctyp, typlen)
+ 	data := C.GoBytes(unsafe.Pointer(cdata), datalen)
+-	*CurMimeData = append(*CurMimeData, &mimedata.Data{typ, data})
++	*CurMimeData = append(*CurMimeData, &mimedata.Data{Type: typ, Data: data})
+ }
+ 
+ // note: this does not happen in time for main startup
+--- /dev/null
++++ b/system/driver/desktop/native_idle.go
+@@ -0,0 +1,100 @@
++// Copyright 2026 Vellum contributors. All rights reserved.
++// Use of this source code is governed by the MIT license in the Vellum repository.
++
++package desktop
++
++import "cogentcore.org/core/system/driver/base"
++
++// macMainIngress publishes a received public rendezvous before posting its wake.
++// A wake before an unbuffered send can be consumed before the sender is ready.
++// One ready slot plus one pump-local packet bound additional retained calls;
++// a call already received by main belongs to ExecuteMain, not this ingress.
++type macMainIngress struct {
++	ready chan base.FuncRun
++	done  chan struct{}
++}
++
++func newMacMainIngress() *macMainIngress {
++	return &macMainIngress{ready: make(chan base.FuncRun, 1), done: make(chan struct{})}
++}
++
++// runMacMainLoop is native-thread-only. wait must process a posted native event
++// even when that event arrived before wait was called. It has no polling timer.
++func (a *App) runMacMainLoop(queue <-chan base.FuncRun, stopped <-chan struct{}, wait, wake func()) {
++	pump := newMacMainIngress()
++	// This inner defer runs before MainLoop's native cleanup, including on panic
++	// and Goexit. Never join while holding native-event, main-queue or App locks.
++	defer func() {
++		a.StopMain()
++		<-pump.done
++	}()
++	go pump.run(a, queue, stopped, wake)
++	for {
++		select {
++		case <-stopped:
++			return
++		case call := <-pump.ready:
++			if !a.ExecuteMain(call) {
++				return
++			}
++		default:
++			wait()
++		}
++	}
++}
++
++func (p *macMainIngress) run(a *App, queue <-chan base.FuncRun, stopped <-chan struct{}, wake func()) {
++	var local base.FuncRun
++	owned := false
++	defer close(p.done)
++	defer func() {
++		// Also retire accepted ownership when the native post panics. Such a
++		// backend failure remains fail-stop: the panic is not swallowed and no
++		// native-cleanup guarantee is made for a fatal worker-thread panic.
++		a.StopMain()
++		if owned {
++			a.ExecuteMain(local) // immutable stopped state: refusal only
++			local = base.FuncRun{}
++		}
++		for {
++			select {
++			case call := <-p.ready:
++				a.ExecuteMain(call)
++			default:
++				return
++			}
++		}
++	}()
++	for {
++		// The explicit check prevents an unbounded public drain if stop and a
++		// busy sender are both selectable. A concurrent rendezvous is refused.
++		select {
++		case <-stopped:
++			wake()
++			return
++		default:
++		}
++		select {
++		case <-stopped:
++			wake()
++			return
++		case local = <-queue:
++			owned = true
++		}
++		select {
++		case <-stopped:
++			wake()
++			return
++		default:
++		}
++		select {
++		case <-stopped:
++			wake()
++			return
++		case p.ready <- local:
++			owned = false
++			local = base.FuncRun{} // do not pin a caller capture while idle
++			wake()
++		}
++	}
++}
+--- /dev/null
++++ b/system/driver/desktop/native_idle_vellum_test.go
+@@ -0,0 +1,454 @@
++package desktop
++
++import (
++	"errors"
++	"runtime"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/system/driver/base"
++)
++
++// These tests use the real queue/ACK implementation and injected event waits.
++// They do not initialize GLFW, NSApplication, a surface or a GPU instance.
++type idleQueueApp struct {
++	*App
++	wake func()
++}
++
++func (a *idleQueueApp) SendEmptyEvent() { a.wake() }
++
++func idleApp(wake func()) (*App, chan base.FuncRun, chan struct{}) {
++	a := &App{AppMulti: base.NewAppMulti[*Window]()}
++	a.This = &idleQueueApp{App: a, wake: wake}
++	queue, stopped := a.InitMainQueue()
++	return a, queue, stopped
++}
++
++type idleEvents struct{ pending chan struct{} }
++
++func newIdleEvents() *idleEvents { return &idleEvents{pending: make(chan struct{}, 1)} }
++func (e *idleEvents) post() {
++	select {
++	case e.pending <- struct{}{}:
++	default:
++	}
++}
++func (e *idleEvents) wait() { <-e.pending }
++
++func idleWait(t *testing.T, ch <-chan struct{}) {
++	t.Helper()
++	select {
++	case <-ch:
++	case <-time.After(3 * time.Second):
++		t.Fatal("Mac main ingress did not retire")
++	}
++}
++
++func idleAckOnce(t *testing.T, ch <-chan struct{}) {
++	t.Helper()
++	idleWait(t, ch)
++	select {
++	case <-ch:
++		t.Fatal("duplicate acknowledgement")
++	default:
++	}
++}
++
++func idleEnqueue(t *testing.T, queue chan<- base.FuncRun, call base.FuncRun) {
++	t.Helper()
++	select {
++	case queue <- call:
++	case <-time.After(3 * time.Second):
++		t.Fatal("Mac ingress did not accept the expected bounded packet")
++	}
++}
++
++func TestVellumMacIngressRepairsWakeConsumedBeforePublicSend(t *testing.T) {
++	events := newIdleEvents()
++	reentered := make(chan struct{})
++	var waits, posts atomic.Int32
++	wake := func() {
++		events.post()
++		if posts.Add(1) == 1 {
++			// The original Base wake is consumed, and main is asleep again,
++			// before Base can attempt its public queue rendezvous.
++			<-reentered
++		}
++	}
++	a, queue, stopped := idleApp(wake)
++	exited := make(chan struct{})
++	go func() {
++		defer close(exited)
++		a.runMacMainLoop(queue, stopped, func() {
++			if waits.Add(1) == 2 {
++				close(reentered)
++			}
++			events.wait()
++		}, wake)
++	}()
++	t.Cleanup(func() { a.StopMain(); events.post(); idleWait(t, exited) })
++	done := make(chan struct{})
++	value := 0
++	go func() {
++		defer close(done)
++		if !a.RunOnMainIfOpen(func() { value = 42 }) || value != 42 {
++			t.Error("publication wake did not preserve synchronous output")
++		}
++	}()
++	idleWait(t, done)
++	if posts.Load() < 3 { // Base leading/trailing and the essential private wake.
++		t.Fatal("private publication did not post a wake")
++	}
++}
++
++func TestVellumMacIngressIdleHasNoPeriodicWaitAndStopWakes(t *testing.T) {
++	events := newIdleEvents()
++	entered := make(chan struct{})
++	var waits atomic.Int32
++	a, queue, stopped := idleApp(events.post)
++	exited := make(chan struct{})
++	go func() {
++		defer close(exited)
++		a.runMacMainLoop(queue, stopped, func() {
++			if waits.Add(1) == 1 {
++				close(entered)
++			}
++			events.wait()
++		}, events.post)
++	}()
++	t.Cleanup(func() { a.StopMain(); events.post(); idleWait(t, exited) })
++	idleWait(t, entered)
++	select {
++	case <-exited:
++		t.Fatal("idle loop returned without stop")
++	case <-time.After(250 * time.Millisecond):
++	}
++	if waits.Load() != 1 {
++		t.Fatal("idle loop polled its native wait", waits.Load())
++	}
++	a.StopMain() // Base does not post; the ingress must wake the native wait.
++	idleWait(t, exited)
++}
++
++func TestVellumMacIngressBoundsPendingCallsAndRefusesAfterStop(t *testing.T) {
++	var posts atomic.Int32
++	a, queue, stopped := idleApp(func() { posts.Add(1) })
++	pump := newMacMainIngress()
++	if cap(pump.ready) != 1 {
++		t.Fatal("native ready queue is not bounded at one")
++	}
++	go pump.run(a, queue, stopped, func() { posts.Add(1) })
++	t.Cleanup(func() { a.StopMain(); idleWait(t, pump.done) })
++	var invoked atomic.Int32
++	first, second := make(chan struct{}, 1), make(chan struct{}, 1)
++	for _, done := range []chan struct{}{first, second} {
++		idleEnqueue(t, queue, base.FuncRun{F: func() { invoked.Add(1) }, Done: done})
++	}
++	// The first call occupies ready; the second is pump-local. A third public
++	// sender must remain cancellable without becoming another retained packet.
++	thirdStarted, thirdDone := make(chan struct{}), make(chan struct{})
++	go func() {
++		defer close(thirdDone)
++		close(thirdStarted)
++		if a.RunOnMainIfOpen(func() { invoked.Add(1) }) {
++			t.Error("post-stop third call executed")
++		}
++	}()
++	idleWait(t, thirdStarted)
++	a.StopMain()
++	idleWait(t, pump.done)
++	idleAckOnce(t, first)
++	idleAckOnce(t, second)
++	idleWait(t, thirdDone)
++	if invoked.Load() != 0 || len(pump.ready) != 0 || posts.Load() == 0 {
++		t.Fatal("stopped ingress retained or executed pending calls")
++	}
++}
++
++func TestVellumMacIngressKeepsActiveCallbackOwnedThroughStop(t *testing.T) {
++	events := newIdleEvents()
++	a, queue, stopped := idleApp(events.post)
++	started, release, returned, exited := make(chan struct{}), make(chan struct{}), make(chan struct{}), make(chan struct{})
++	var releaseOnce sync.Once
++	go func() { defer close(exited); a.runMacMainLoop(queue, stopped, events.wait, events.post) }()
++	t.Cleanup(func() { releaseOnce.Do(func() { close(release) }); a.StopMain(); events.post(); idleWait(t, exited) })
++	value := 0
++	go func() {
++		defer close(returned)
++		if !a.RunOnMainIfOpen(func() { close(started); <-release; value = 42 }) || value != 42 {
++			t.Error("active callback output escaped its acknowledgement")
++		}
++	}()
++	idleWait(t, started)
++	a.StopMain()
++	select {
++	case <-returned:
++		t.Fatal("stop released a caller while its callback used output")
++	case <-time.After(10 * time.Millisecond):
++	}
++	releaseOnce.Do(func() { close(release) })
++	idleWait(t, returned)
++	idleWait(t, exited)
++}
++
++func TestVellumMacIngressCallbackFailureRetiresPendingCalls(t *testing.T) {
++	for _, mode := range []string{"panic", "nil-panic", "goexit"} {
++		t.Run(mode, func(t *testing.T) {
++			events := newIdleEvents()
++			a, queue, stopped := idleApp(events.post)
++			started, release, exited, callerDone := make(chan struct{}), make(chan struct{}), make(chan struct{}), make(chan struct{})
++			sentinel := errors.New("native callback failure")
++			var nativePanic, callerPanic any
++			go func() {
++				defer close(exited)
++				defer func() { nativePanic = recover() }()
++				a.runMacMainLoop(queue, stopped, events.wait, events.post)
++			}()
++			var releaseOnce sync.Once
++			t.Cleanup(func() { releaseOnce.Do(func() { close(release) }); a.StopMain(); events.post(); idleWait(t, exited) })
++			go func() {
++				defer close(callerDone)
++				defer func() { callerPanic = recover() }()
++				a.RunOnMainIfOpen(func() {
++					close(started)
++					<-release
++					if mode == "goexit" {
++						runtime.Goexit()
++					}
++					if mode == "nil-panic" {
++						panic(nil)
++					}
++					panic(sentinel)
++				})
++			}()
++			idleWait(t, started)
++			acks := []chan struct{}{make(chan struct{}, 1), make(chan struct{}, 1)}
++			for _, ack := range acks {
++				idleEnqueue(t, queue, base.FuncRun{F: func() { t.Error("pending failure callback executed") }, Done: ack})
++			}
++			releaseOnce.Do(func() { close(release) })
++			idleWait(t, exited)
++			idleWait(t, callerDone)
++			for _, ack := range acks {
++				idleAckOnce(t, ack)
++			}
++			if !a.MainStopped() || mode == "panic" && (nativePanic != sentinel || callerPanic != sentinel) || mode == "goexit" && (nativePanic != nil || callerPanic != base.ErrMainCallbackIncomplete) {
++				t.Fatal("callback failure contract changed", nativePanic, callerPanic)
++			}
++			if mode == "nil-panic" {
++				if _, ok := nativePanic.(*runtime.PanicNilError); !ok || callerPanic != nativePanic {
++					t.Fatal("nil panic identity changed", nativePanic, callerPanic)
++				}
++			}
++		})
++	}
++}
++
++func TestVellumMacIngressWakeFailureRetiresPublishedOwnership(t *testing.T) {
++	a, queue, stopped := idleApp(func() {})
++	pump := newMacMainIngress()
++	sentinel := errors.New("native wake failed")
++	exited := make(chan struct{})
++	var observed any
++	go func() {
++		defer close(exited)
++		defer func() { observed = recover() }()
++		pump.run(a, queue, stopped, func() { panic(sentinel) })
++	}()
++	ack := make(chan struct{}, 1)
++	t.Cleanup(func() { a.StopMain(); idleWait(t, exited) })
++	idleEnqueue(t, queue, base.FuncRun{F: func() { t.Error("wake failure executed callback") }, Done: ack})
++	idleWait(t, exited)
++	idleWait(t, pump.done)
++	idleAckOnce(t, ack)
++	if observed != sentinel || !a.MainStopped() || len(pump.ready) != 0 {
++		t.Fatal("wake failure swallowed or stranded ownership", observed)
++	}
++}
++
++func TestVellumMacIngressPublicationBeforeNativeWaitIsRetained(t *testing.T) {
++	events := newIdleEvents()
++	a, queue, stopped := idleApp(events.post)
++	betweenCheckAndWait, releaseWait, exited := make(chan struct{}), make(chan struct{}), make(chan struct{})
++	var firstWait sync.Once
++	var releaseOnce sync.Once
++	go func() {
++		defer close(exited)
++		a.runMacMainLoop(queue, stopped, func() {
++			firstWait.Do(func() { close(betweenCheckAndWait); <-releaseWait })
++			events.wait()
++		}, events.post)
++	}()
++	t.Cleanup(func() {
++		releaseOnce.Do(func() { close(releaseWait) })
++		a.StopMain()
++		events.post()
++		idleWait(t, exited)
++	})
++	idleWait(t, betweenCheckAndWait)
++	var invoked atomic.Int32
++	ack := make(chan struct{}, 1)
++	idleEnqueue(t, queue, base.FuncRun{F: func() { invoked.Add(1) }, Done: ack})
++	// Main has already checked its private channel and has not yet entered
++	// the fake native wait. A publication event must remain queued for it.
++	select {
++	case <-events.pending:
++		events.post()
++	case <-time.After(3 * time.Second):
++		t.Fatal("published packet did not post an event before wait")
++	}
++	releaseOnce.Do(func() { close(releaseWait) })
++	idleAckOnce(t, ack)
++	if invoked.Load() != 1 {
++		t.Fatal("publication before wait was lost")
++	}
++}
++
++func TestVellumMacIngressPreservesFIFO(t *testing.T) {
++	events := newIdleEvents()
++	a, queue, stopped := idleApp(events.post)
++	started, release, exited := make(chan struct{}), make(chan struct{}), make(chan struct{})
++	var releaseOnce sync.Once
++	go func() { defer close(exited); a.runMacMainLoop(queue, stopped, events.wait, events.post) }()
++	t.Cleanup(func() { releaseOnce.Do(func() { close(release) }); a.StopMain(); events.post(); idleWait(t, exited) })
++	var order []int // native-owned until the final packet is acknowledged
++	acks := []chan struct{}{make(chan struct{}, 1), make(chan struct{}, 1), make(chan struct{}, 1)}
++	idleEnqueue(t, queue, base.FuncRun{F: func() { close(started); <-release; order = append(order, 0) }, Done: acks[0]})
++	idleWait(t, started)
++	for i := 1; i < len(acks); i++ {
++		value := i
++		idleEnqueue(t, queue, base.FuncRun{F: func() { order = append(order, value) }, Done: acks[i]})
++	}
++	releaseOnce.Do(func() { close(release) })
++	for _, ack := range acks {
++		idleAckOnce(t, ack)
++	}
++	if len(order) != 3 || order[0] != 0 || order[1] != 1 || order[2] != 2 {
++		t.Fatal("ready/local ingress reordered calls", order)
++	}
++}
++
++func TestVellumMacIngressWaitFailureJoinsBeforeCleanup(t *testing.T) {
++	a, queue, stopped := idleApp(func() {})
++	waitEntered, failWait, exited := make(chan struct{}), make(chan struct{}), make(chan struct{})
++	stopWakeEntered, releaseStopWake := make(chan struct{}), make(chan struct{})
++	sentinel := errors.New("native wait failed")
++	var observed any
++	var releaseOnce, releaseWakeOnce sync.Once
++	var wakes atomic.Int32
++	go func() {
++		defer close(exited)
++		defer func() { observed = recover() }()
++		a.runMacMainLoop(queue, stopped, func() { close(waitEntered); <-failWait; panic(sentinel) }, func() {
++			wakes.Add(1)
++			if a.MainStopped() {
++				close(stopWakeEntered)
++				<-releaseStopWake
++			}
++		})
++	}()
++	t.Cleanup(func() {
++		releaseOnce.Do(func() { close(failWait) })
++		releaseWakeOnce.Do(func() { close(releaseStopWake) })
++		a.StopMain()
++		idleWait(t, exited)
++	})
++	idleWait(t, waitEntered)
++	acks := []chan struct{}{make(chan struct{}, 1), make(chan struct{}, 1)}
++	for _, ack := range acks {
++		idleEnqueue(t, queue, base.FuncRun{F: func() { t.Error("wait failure executed pending call") }, Done: ack})
++	}
++	releaseOnce.Do(func() { close(failWait) })
++	idleWait(t, stopWakeEntered)
++	select {
++	case <-exited:
++		t.Fatal("native loop returned before its ingress wake retired")
++	case <-time.After(10 * time.Millisecond):
++	}
++	releaseWakeOnce.Do(func() { close(releaseStopWake) })
++	idleWait(t, exited)
++	// These ACKs are complete before the enclosing native loop can perform
++	// cleanup or terminate its event backend; no pump wake is still in flight.
++	for _, ack := range acks {
++		select {
++		case <-ack:
++		default:
++			t.Fatal("native loop returned before pending acknowledgement")
++		}
++		select {
++		case <-ack:
++			t.Fatal("duplicate pending acknowledgement")
++		default:
++		}
++	}
++	if observed != sentinel || !a.MainStopped() || wakes.Load() == 0 {
++		t.Fatal("native wait failure did not retire ingress", observed)
++	}
++}
++
++func TestVellumMacIngressAlreadyStoppedNeverWaitsOrExecutes(t *testing.T) {
++	a, queue, stopped := idleApp(func() {})
++	a.StopMain()
++	var waits, wakes atomic.Int32
++	exited := make(chan struct{})
++	go func() {
++		defer close(exited)
++		a.runMacMainLoop(queue, stopped, func() { waits.Add(1) }, func() { wakes.Add(1) })
++	}()
++	idleWait(t, exited)
++	if waits.Load() != 0 || wakes.Load() != 1 {
++		t.Fatal("already stopped loop waited or leaked its pump", waits.Load(), wakes.Load())
++	}
++	if a.RunOnMainIfOpen(func() { t.Error("already stopped loop executed callback") }) {
++		t.Fatal("already stopped loop admitted callback")
++	}
++}
++
++func TestVellumMacIngressConcurrentStopRefusesWaitingCallers(t *testing.T) {
++	events := newIdleEvents()
++	a, queue, stopped := idleApp(events.post)
++	exited, active, release, firstDone := make(chan struct{}), make(chan struct{}), make(chan struct{}), make(chan struct{})
++	var releaseOnce sync.Once
++	go func() { defer close(exited); a.runMacMainLoop(queue, stopped, events.wait, events.post) }()
++	t.Cleanup(func() { releaseOnce.Do(func() { close(release) }); a.StopMain(); events.post(); idleWait(t, exited) })
++	go func() {
++		defer close(firstDone)
++		if !a.RunOnMainIfOpen(func() { close(active); <-release }) {
++			t.Error("active callback was refused")
++		}
++	}()
++	idleWait(t, active)
++	const callers = 64
++	results := make(chan bool, callers)
++	var entered sync.WaitGroup
++	entered.Add(callers)
++	for range callers {
++		go func() {
++			entered.Done()
++			results <- a.RunOnMainIfOpen(func() { t.Error("waiting callback ran after stop") })
++		}()
++	}
++	entered.Wait()
++	var stops sync.WaitGroup
++	stops.Add(callers)
++	for range callers {
++		go func() { defer stops.Done(); a.StopMain() }()
++	}
++	stops.Wait()
++	releaseOnce.Do(func() { close(release) })
++	idleWait(t, firstDone)
++	idleWait(t, exited)
++	for range callers {
++		select {
++		case accepted := <-results:
++			if accepted {
++				t.Fatal("waiting callback reported success after stop")
++			}
++		case <-time.After(3 * time.Second):
++			t.Fatal("concurrent stop stranded a synchronous caller")
++		}
++	}
++}

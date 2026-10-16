@@ -672,6 +672,17 @@
               "sha256": "8d27d3076c3231fafcd53121a36f1bb2fddb594766669c0146df26e9145ad034"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/nativeidle",
+          "inputs": "native/patches/nativeidle/original-hashes.json",
+          "outputs": "native/patches/nativeidle/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/nativeidle/0069-macos-event-driven-main-loop.patch",
+              "sha256": "5ecbd0f213ddb223738baedfb36f90e4ba7db1777490c44306de655c41ed18bd"
+            }
+          ]
         }
       ]
     },

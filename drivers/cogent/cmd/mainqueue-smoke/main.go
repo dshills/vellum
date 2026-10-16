@@ -29,7 +29,7 @@ func observe(f func()) (out outcome) {
 }
 
 func main() {
-	mode := flag.String("case", "normal", "native loop case: normal or panic")
+	mode := flag.String("case", "normal", "native loop case: normal, panic, idle or stop")
 	flag.Parse()
 	if err := run(*mode); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -38,7 +38,7 @@ func main() {
 }
 
 func run(mode string) error {
-	if mode != "normal" && mode != "panic" {
+	if mode != "normal" && mode != "panic" && mode != "idle" && mode != "stop" {
 		return fmt.Errorf("unknown case %q", mode)
 	}
 	watchdog := time.AfterFunc(10*time.Second, func() { fmt.Fprintln(os.Stderr, "FAIL native queue watchdog"); os.Exit(1) })
@@ -48,8 +48,17 @@ func run(mode string) error {
 	sentinel := errors.New("native callback panic fixture")
 	caller := make(chan outcome, 1)
 	completed := 0 // Main writes; the acknowledgement publishes it to the caller.
+	count, floodWorkers := 100, 4
+	switch mode {
+	case "panic":
+		count = 1
+	case "idle":
+		count, floodWorkers = 3, 0
+	case "stop":
+		count, floodWorkers = 0, 0
+	}
 	var wakes sync.WaitGroup
-	for i := 0; i < 4; i++ {
+	for i := 0; i < floodWorkers; i++ {
 		wakes.Add(1)
 		go func() {
 			defer wakes.Done()
@@ -60,11 +69,16 @@ func run(mode string) error {
 	}
 	go func() {
 		caller <- observe(func() {
-			count := 100
-			if mode == "panic" {
-				count = 1
+			if mode == "stop" {
+				// No dispatch or wake flood precedes this worker-only stop.
+				time.Sleep(250 * time.Millisecond)
 			}
 			for i := 0; i < count; i++ {
+				if mode == "idle" {
+					// Let the native loop enter its indefinite wait between
+					// calls. This is liveness evidence, not a CPU benchmark.
+					time.Sleep(250 * time.Millisecond)
+				}
 				if !a.RunOnMainIfOpen(func() {
 					completed++
 					if mode == "panic" {
@@ -91,7 +105,7 @@ func run(mode string) error {
 		if loop.returned || worker.returned || loop.value != sentinel || worker.value != sentinel || completed != 1 {
 			return fmt.Errorf("panic identity/completion changed: loop=%+v caller=%+v completed=%d", loop, worker, completed)
 		}
-	} else if !loop.returned || !worker.returned || completed != 100 {
+	} else if !loop.returned || !worker.returned || completed != count {
 		return fmt.Errorf("normal completion changed: loop=%+v caller=%+v completed=%d", loop, worker, completed)
 	}
 	done := make(chan struct{})
@@ -119,5 +133,5 @@ func run(mode string) error {
 		QueueStopped           bool   `json:"queue_stopped"`
 		CreationRefused        bool   `json:"native_creation_refused"`
 		PanicIdentityPreserved bool   `json:"panic_identity_preserved"`
-	}{mode, completed, 11000, true, true, mode == "panic"})
+	}{mode, completed, floodWorkers*2500 + 1000, true, true, mode == "panic"})
 }
