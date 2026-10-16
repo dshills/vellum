@@ -1,0 +1,122 @@
+{
+  "schema": "vellum-macos-ax-parent-graph-v1",
+  "result": "PASS_SCOPED_NATIVE_PARENT_GRAPH_CHECKPOINT",
+  "sealed_utc": "2026-10-16T05:26:57.145418+00:00",
+  "base_commit": "cebae61a01b9ca1d5f71beacd9d60ad5fd853fa7",
+  "checkpoint_sources": {
+    "drivers/cogent/accessibility_darwin.m": "e84131a2afb535aac450b0069d34621f0902f357714523aa5a97e32ce1dd9f11",
+    "drivers/cogent/accessibility_graph_darwin_test.go": "7978466206a5b4090f4455da63762bc4b85eab3f6c9abda7a9a50a00b1e14d5e",
+    "specs/accessibility.md": "386a67e55015f1e099d5f90f8e4dded2014fd65d87b15f79ef3c37b738682679",
+    "specs/macos-completion.md": "8f835b4ec703b75d5b4b213127afe6cacbfda7f82e5ebe85485e416738a649a2",
+    "docs/reports/README.md": "82e6556e2206a584b272ca53ea2e54b9cf18fecac220becbdaff86dfe5d211a2",
+    "docs/reports/macos-ax-parent-graph/README.md": "6d96f8e2c030c74e593bd5bbf33d6f7c8bdd5578530dd738395bcfadcd3e9d72"
+  },
+  "baseline_tracked_files": 4485,
+  "prepared_files": 6229,
+  "checks": {
+    "build-baseline": {
+      "receipt_sha256": "9b3a4e2e0b45696fc7ebd7e773320097f40e606554cb3c9323145f9935e15d7f",
+      "elapsed_seconds": 28.169247874990106,
+      "exit_code": 0
+    },
+    "test-baseline": {
+      "receipt_sha256": "4a1d1da5963e6098a6069afba0ccd6d6995a04671fa170b9fe7ab79202031938",
+      "elapsed_seconds": 2.2653252920135856,
+      "exit_code": 0
+    },
+    "build-candidate": {
+      "receipt_sha256": "f5651324031bcd9ecac080735d0abec2b33264f15f8d0741f4d3f3dd81e1f5ed",
+      "elapsed_seconds": 9.511770291021094,
+      "exit_code": 0
+    },
+    "test-candidate": {
+      "receipt_sha256": "6704d0931351ebb77fb0c5091f70a2ac91877bec843bc8f79443126385b77700",
+      "elapsed_seconds": 0.9992967089638114,
+      "exit_code": 0
+    },
+    "candidate-race": {
+      "receipt_sha256": "dba9c5a34b5d3f3589c61006a03694fabfaa25d2bacb2fae06bf9f27675738f6",
+      "elapsed_seconds": 193.75574249995407,
+      "exit_code": 0
+    },
+    "candidate-vet": {
+      "receipt_sha256": "902fd0d4a6b0d9b7b9706d704c170b15cf84826ed467bcdc0abe813f6ef54f36",
+      "elapsed_seconds": 9.119483833084814,
+      "exit_code": 0
+    },
+    "build-candidate-v2": {
+      "receipt_sha256": "3210bc3db5541339241bb1a223b646a1e4aa27bbc08bef3d88d5cf4cc6e1d486",
+      "elapsed_seconds": 9.34818983299192,
+      "exit_code": 0
+    },
+    "test-candidate-v2": {
+      "receipt_sha256": "54939ff975f13ad91fe508321460e5a4b4acc0b7f4a78445c27696d4fcc70746",
+      "elapsed_seconds": 1.0571168750757352,
+      "exit_code": 0
+    },
+    "candidate-v2-race": {
+      "receipt_sha256": "26a67daf70141c4bd0ecbf5cdec3c6ac9e97a3efce3b1e8658f6513f65821b7a",
+      "elapsed_seconds": 166.8381726250518,
+      "exit_code": 0
+    },
+    "candidate-v2-vet": {
+      "receipt_sha256": "57815ac8978d11cdeb48e2b81f34eabd31ee4471dce644cfd62667f6b0048fa9",
+      "elapsed_seconds": 6.527671291958541,
+      "exit_code": 0
+    },
+    "build-native-smoke": {
+      "receipt_sha256": "8596cd0de3e569dbf8cdb76422287e59e7d452120dda2f22ee6f7b05de301ff9",
+      "elapsed_seconds": 13.085100541939028,
+      "exit_code": 0
+    }
+  },
+  "native_smoke_receipt_sha256": "354b2f1e22da0ce74d88939f70f87af3b23dad317f1641a2cb26f0c2f268e76b",
+  "summary_sha256": "d57e5f0b9b282ba83e92dff1374d52f720ae99f345f7edbea4bcf518aeb2486e",
+  "internal_source_review_sha256": "59c4e9e35725538d0c38c33533787118a02ecae38f8a90c66c04c54273b22bc3",
+  "provider_resolution_sha256": "e47a5a42764204bd39311b4fd7dd94a8e40937c6df3161f03640953547c06c67",
+  "provider_review": {
+    "execution_sha256": "7af5b95cc844dfec3906a7c4210b61748aee12dbde31b7b611c9a98124c2da39",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 6,
+      "bytes": 26815,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 13814,
+          "output": 2021,
+          "costUSD": 0.047838
+        }
+      ],
+      "widenedFiles": 2,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "findings": 0,
+    "discarded": 0,
+    "suppressed": 0
+  },
+  "archive_sha256": "20a6b67375a5d610b1746f9a143266eec2c95d799b0c88da047f8c8f588a632e",
+  "archive_index_sha256": "ab26167254cedefe5c06e2033b7446a98ec9fff0787419d8fee0829c8431a66b",
+  "seal_producer_sha256": "d8ae81674cb90355ba647eefd47800e1265f7c0620b336f589da841cd1bbef4c",
+  "original_overnight_qualified": false,
+  "ordinary_frame_gain_qualified": false,
+  "ordinary_warm_targets_qualified": false,
+  "native_memory_qualified": false,
+  "physical_pointer_qualified": false,
+  "human_voiceover_qualified": false,
+  "full_p11_qualified": false,
+  "full_mac_qualified": false
+}

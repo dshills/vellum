@@ -62,3 +62,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Owned private Mac build](macos-owned-build/README.md): observed compiler pairing for executable/map, sampled input stability and bounded logs; runtime and distribution rights remain separate.
 
 - [One-pass glyph fingerprint](macos-glyph-fingerprint/README.md): fused geometry validation/internal hashing with exact normalized path equality and software capture parity.
+
+- [Native accessibility parent graph](macos-ax-parent-graph/README.md): bounded shared parent validation, independent oracle coverage, matched topology observations and scoped live Cocoa routing.

@@ -241,3 +241,37 @@ Opt-in Canvas2D objects use the same atomic pending/completed scope publication,
 with an explicit native canvas host role, exact stable-ID press and one host focus
 stop. See [canvas object semantics](canvas-accessibility.md) for metadata limits,
 paint-order traversal, capture/lifecycle guards and qualification limits.
+
+
+## Native parent graph validation
+
+The Mac snapshot preflight validates the complete immutable parent graph before
+retained elements, publication epochs, focus, geometry or notifications change.
+After the existing ID/parent/scalar checks, a snapshot-local set holds every
+nonempty referenced parent ID. Traversal starts only at node keys still in that
+set. An active-path set detects cycles; a successful root or completed tail
+retires its active IDs from the remaining set. Missing traversed nodes refuse
+immediately. The remaining set must be empty at the end, including missing
+parents referenced solely by skipped leaves. Empty snapshots and forests remain
+valid. No recursion, persistent traversal cache or mutation of the input map is
+introduced; temporary set references are bounded by the input node count.
+
+Every known referenced vertex is walked and retired at most once. This bounds
+graph traversal to a linear number of expected constant-time hash operations;
+it is not an unconditional elapsed-time or native-byte allocation guarantee.
+String hashing/comparison, Foundation parsing and other field checks still cost
+work. Unreferenced leaves receive no traversal-state entry.
+
+Scope admission keeps the designated `ID == grid_scope` host, its allowed role,
+self-scope, incarnation, target/completed generations, pending state and geometry
+rules. A host may have no parent or an unscoped parent. Each scoped non-host
+requires a direct parent in the same scope; ordinary nodes cannot have scoped
+parents. In a finite parent-complete acyclic graph these local rules force each
+scoped chain to reach its designated host, so no separate per-node ancestor set
+is required. A non-host with a table/outline/canvas role is still a non-host.
+
+The [parent graph checkpoint](../docs/reports/macos-ax-parent-graph/README.md)
+retains independent ancestor-oracle tests, actual Foundation comparisons,
+negative controls, matched topology benchmarks and a scoped live Cocoa smoke.
+Validation work is outside `FrameMetrics.TotalUIWork`; these results cannot be
+subtracted from the framework's unchanged frame-time targets.

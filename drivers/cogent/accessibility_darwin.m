@@ -351,6 +351,27 @@ static BOOL vellumAXValidRect(id value){
  double x=[value[0] doubleValue],y=[value[1] doubleValue],w=[value[2] doubleValue],h=[value[3] doubleValue];
  return w>=0&&h>=0&&isfinite(x+w)&&isfinite(y+h);
 }
+// IDs and parent strings have already been checked. Only referenced vertices can
+// belong to a cycle; leaves need no traversal state. Both sets are snapshot-local.
+static BOOL vellumAXValidParentGraph(NSDictionary *nodes){
+ NSMutableSet<NSString *> *remaining=[NSMutableSet new],*active=[NSMutableSet new];
+ for(NSDictionary *node in [nodes objectEnumerator]){NSString *parent=node[@"parent"];if(parent.length)[remaining addObject:parent];}
+ for(NSString *identifier in nodes){
+  if(![remaining containsObject:identifier])continue;
+  NSString *cursor=identifier;
+  while(cursor.length){
+   NSDictionary *node=nodes[cursor];if(!node)return NO;
+   if(![remaining containsObject:cursor])break;
+   if([active containsObject:cursor])return NO;
+   [active addObject:cursor];cursor=node[@"parent"];
+  }
+  for(NSString *visited in active)[remaining removeObject:visited];
+  [active removeAllObjects];
+ }
+ // A missing parent referenced only by a skipped leaf never enters the outer
+ // node-key loop. It must still refuse the whole snapshot.
+ return remaining.count==0;
+}
 // Validate the whole immutable payload before any retained element changes.
 static NSDictionary *vellumAXValidatedNodes(NSDictionary *snapshot){
  if(![snapshot isKindOfClass:NSDictionary.class]||!vellumAXUInt(snapshot[@"generation"],YES)||![snapshot[@"nodes"] isKindOfClass:NSArray.class])return nil;
@@ -374,9 +395,9 @@ static NSDictionary *vellumAXValidatedNodes(NSDictionary *snapshot){
   }else for(NSString *key in @[@"grid_incarnation",@"grid_pending",@"grid_target_generation",@"grid_frame"])if(node[key])return nil;
   nodes[identifier]=node;
  }
+ if(!vellumAXValidParentGraph(nodes))return nil;
  for(NSString *identifier in nodes){
-  NSMutableSet *ancestors=[NSMutableSet new];NSString *cursor=identifier;NSDictionary *node=nodes[identifier];NSString *scope=node[@"grid_scope"];
-  while(cursor.length){if([ancestors containsObject:cursor]||!nodes[cursor])return nil;[ancestors addObject:cursor];cursor=nodes[cursor][@"parent"];}
+  NSDictionary *node=nodes[identifier];NSString *scope=node[@"grid_scope"];
   NSDictionary *parent=nodes[node[@"parent"]];
   if(scope){
    NSDictionary *host=nodes[scope];if(!host||![host[@"grid_scope"] isEqual:scope]||(![host[@"role"] isEqual:@"table"]&&![host[@"role"] isEqual:@"outline"]&&![host[@"role"] isEqual:@"canvas"]))return nil;
@@ -385,7 +406,9 @@ static NSDictionary *vellumAXValidatedNodes(NSDictionary *snapshot){
    // Missing values normalize only here; present values were type-validated.
    if([node[@"grid_pending"] boolValue]!=[host[@"grid_pending"] boolValue]||[node[@"grid_generation"] unsignedLongLongValue]!=[host[@"grid_generation"] unsignedLongLongValue])return nil;
    if([identifier isEqual:scope]){if(parent[@"grid_scope"])return nil;}
-   else if(![parent[@"grid_scope"] isEqual:scope]||![ancestors containsObject:scope])return nil;
+   // In a finite parent-complete acyclic graph, same-scope parents force every
+   // non-host chain to reach its unique ID==scope host before a root boundary.
+   else if(![parent[@"grid_scope"] isEqual:scope])return nil;
   }else if(parent[@"grid_scope"])return nil;
  }
  return nodes;

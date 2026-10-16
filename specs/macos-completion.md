@@ -867,3 +867,23 @@ remains capped at twenty minutes. The [endurance contract](workbench-endurance.m
 retains the original workload, sampling and memory limits. This scheduling
 adjustment does not qualify a completed 1000-cycle campaign or close full Mac
 performance, memory, physical/human or distribution acceptance.
+
+
+## Native accessibility parent graph checkpoint
+
+The [parent graph checkpoint](../docs/reports/macos-ax-parent-graph/README.md)
+replaces repeated full ancestor walks with two bounded snapshot-local sets.
+Independent original-rule oracles agree with both baseline and revised native
+Foundation validation across 17,066 parent/scope cases, shuffled deep trees and
+atomic refusals. The complete offscreen race suite and vet pass; an actual Cocoa
+smoke exercises native semantics/actions, geometry, focus, virtual paging, modal
+routing and the workbench bridge on the revised source.
+
+Five alternating optimized benchmark pairs retain large deep-chain reductions
+without the first candidate's wide-tree regression. Whole-validation observations
+include JSON parsing; the wide-case ranges overlap, and the 451-node fixture
+shows a modest local reduction. This work is outside exact TotalUIWork timing
+and does not qualify the failed 4/6 ms ordinary targets, native/GPU memory,
+current-source endurance, successful overnight, physical input, human IME/
+VoiceOver, distribution or full Mac completion. The earlier failed soak remains
+failed and retained.
