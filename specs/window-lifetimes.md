@@ -89,3 +89,10 @@ and do not qualify this transition.
 replay records, then resolve them during intentional new-window setup. Captured
 references fence later work; they do not make arbitrary application callbacks
 preemptible or turn name-based model notifications into lifetime-scoped commands.
+
+The native cycle/soak fixture reports
+`historical_id_tombstones_retained: false` for this implementation. This describes
+the live-registration contract, not a sampled Go/native/GPU memory result.
+Earlier traces with the flag set to true retain their original source scope;
+current campaign validators must require the alpha.2 value rather than accept
+those historical traces as evidence for current window lifetimes.
