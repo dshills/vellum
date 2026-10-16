@@ -1,0 +1,297 @@
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -390,10 +390,12 @@
+ // Raise requests that the window be at the top of the stack of windows,
+ // and receive focus. If it is minimized, it will be un-minimized. This
+ // is the only supported mechanism for un-minimizing. This also sets
+-// [currentRenderWindow] to the window.
++// [currentRenderWindow] to the window while it is registered.
+ func (w *renderWindow) Raise() {
++	if !w.publishFocus() {
++		return
++	}
+ 	w.SystemWindow.Raise()
+-	setCurrentRenderWindow(w)
+ }
+ 
+ // minimize requests that the window be minimized, making it no longer
+@@ -415,13 +417,11 @@
+ 
+ // closed frees any resources after the window has been closed.
+ func (w *renderWindow) closed() {
+-	AllRenderWindows.delete(w)
+-	mainRenderWindows.delete(w)
+-	dialogRenderWindows.delete(w)
++	next := w.unregister()
+ 	if DebugSettings.WindowEventTrace {
+ 		fmt.Printf("Win: %v Closed\n", w.name)
+ 	}
+-	if pfw := AllRenderWindows.last(); pfw != nil {
++	if pfw := next; pfw != nil {
+ 		if DebugSettings.WindowEventTrace {
+ 			fmt.Printf("Win: %v getting restored focus after: %v closed\n", pfw.name, w.name)
+ 		}
+@@ -593,7 +593,7 @@
+ 		case events.WinFocus:
+ 			// Preserve focus order atomically, without resurrecting a window
+ 			// already removed by a closing event.
+-			if !AllRenderWindows.promoteExisting(w) {
++			if !w.publishFocus() {
+ 				return
+ 			}
+ 			if !w.flags.HasFlag(winGotFocus) {
+@@ -607,7 +607,6 @@
+ 					fmt.Printf("Win: %v got extra focus\n", w.name)
+ 				}
+ 			}
+-			setCurrentRenderWindow(w)
+ 		case events.WinFocusLost:
+ 			w.renderContext().detachPointer(true)
+ 			if DebugSettings.WindowEventTrace {
+--- a/core/windowlists.go
++++ b/core/windowlists.go
+@@ -15,6 +15,41 @@
+ 
+ // renderWindowList is a list of [renderWindow]s.
+ type renderWindowList []*renderWindow
++
++// unregister removes all registry ownership and withdraws a retired construction
++// context in one transaction. The returned focus candidate must be used outside
++// the mutex; this snapshot does not extend its native lifetime.
++func (w *renderWindow) unregister() *renderWindow {
++	renderWindowGlobalMu.Lock()
++	defer renderWindowGlobalMu.Unlock()
++	for _, list := range []*renderWindowList{&AllRenderWindows, &mainRenderWindows, &dialogRenderWindows} {
++		*list = slices.DeleteFunc(*list, func(candidate *renderWindow) bool { return candidate == w })
++	}
++	var next *renderWindow
++	if len(AllRenderWindows) > 0 {
++		next = AllRenderWindows[len(AllRenderWindows)-1]
++	}
++	if currentRenderWindow == w {
++		currentRenderWindow = next
++	}
++	return next
++}
++
++// publishFocus checks live membership, orders focus and publishes the current
++// context under the same mutex as unregister. A delayed native focus event must
++// not republish a window removed by a concurrent close.
++func (w *renderWindow) publishFocus() bool {
++	renderWindowGlobalMu.Lock()
++	defer renderWindowGlobalMu.Unlock()
++	i := slices.Index(AllRenderWindows, w)
++	if i < 0 {
++		return false
++	}
++	copy(AllRenderWindows[i:], AllRenderWindows[i+1:])
++	AllRenderWindows[len(AllRenderWindows)-1] = w
++	currentRenderWindow = w
++	return true
++}
+ 
+ // add adds a window to the list.
+ func (wl *renderWindowList) add(w *renderWindow) {
+--- /dev/null
++++ b/core/window_retirement_vellum_test.go
+@@ -0,0 +1,200 @@
++//go:build offscreen
++
++package core
++
++import (
++	"context"
++	"slices"
++	"sync"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/events"
++)
++
++func TestVellumRetiredManualWindowAllowsOrdinaryWindow(t *testing.T) {
++	m, _, _ := manualFixture(t, nil)
++	drainManual(t, m)
++	retired := m.window
++	if err := m.Close(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	if currentRenderWindowSnapshot() == retired || slices.Contains(AllRenderWindows.snapshot(), retired) || slices.Contains(mainRenderWindows.snapshot(), retired) || slices.Contains(dialogRenderWindows.snapshot(), retired) {
++		t.Fatal("closed manual window retained the construction context or registry ownership")
++	}
++	body := NewBody("ordinary after manual close")
++	shown := make(chan struct{}, 1)
++	body.OnFinal(events.Show, func(events.Event) {
++		select {
++		case shown <- struct{}{}:
++		default:
++		}
++	})
++	body.RunWindow()
++	w := body.Scene.RenderWindow()
++	if w == nil || w.manual != nil {
++		t.Fatal("ordinary construction inherited the retired manual context")
++	}
++	t.Cleanup(func() {
++		rc := w.renderContext()
++		rc.Lock()
++		body.Close()
++		rc.Unlock()
++		deadline := time.Now().Add(3 * time.Second)
++		for slices.Contains(AllRenderWindows.snapshot(), w) {
++			if time.Now().After(deadline) {
++				t.Error("ordinary window did not retire")
++				return
++			}
++			time.Sleep(time.Millisecond)
++		}
++	})
++	select {
++	case <-shown:
++	case <-time.After(3 * time.Second):
++		t.Fatal("ordinary window did not show after manual retirement")
++	}
++}
++
++func windowRetirementRegistryFixture(t *testing.T) {
++	t.Helper()
++	renderWindowGlobalMu.Lock()
++	all, main, dialogs, current := AllRenderWindows, mainRenderWindows, dialogRenderWindows, currentRenderWindow
++	AllRenderWindows, mainRenderWindows, dialogRenderWindows, currentRenderWindow = nil, nil, nil, nil
++	renderWindowGlobalMu.Unlock()
++	t.Cleanup(func() {
++		renderWindowGlobalMu.Lock()
++		AllRenderWindows, mainRenderWindows, dialogRenderWindows, currentRenderWindow = all, main, dialogs, current
++		renderWindowGlobalMu.Unlock()
++	})
++}
++
++func TestVellumWindowRetirementSelectsLiveContextAndReleasesBeforeRaise(t *testing.T) {
++	windowRetirementRegistryFixture(t)
++	a := &renderWindow{SystemWindow: &vellumWindowListNative{}}
++	b := &renderWindow{SystemWindow: &vellumWindowListNative{}}
++	raises := 0
++	c := &renderWindow{SystemWindow: &vellumWindowListNative{raise: func() {
++		raises++
++		// Reenter the registry from the native callout. Retirement must have
++		// released its mutex and removed the closed window from every list.
++		if slices.Contains(AllRenderWindows.snapshot(), b) || slices.Contains(mainRenderWindows.snapshot(), b) || slices.Contains(dialogRenderWindows.snapshot(), b) {
++			t.Error("native focus restoration ran before registry withdrawal")
++		}
++	}}}
++	renderWindowGlobalMu.Lock()
++	AllRenderWindows, mainRenderWindows, dialogRenderWindows = renderWindowList{a, b, c}, renderWindowList{a, b, c}, renderWindowList{b}
++	currentRenderWindow = a
++	renderWindowGlobalMu.Unlock()
++	b.closed()
++	if currentRenderWindowSnapshot() != c || raises != 1 {
++		t.Fatal("focus restoration did not select a registered survivor")
++	}
++	a.closed()
++	if currentRenderWindowSnapshot() != c || raises != 2 {
++		t.Fatal("closing the current window did not select the survivor")
++	}
++	c.closed()
++	c.closed()
++	if currentRenderWindowSnapshot() != nil || len(AllRenderWindows.snapshot()) != 0 || len(mainRenderWindows.snapshot()) != 0 || len(dialogRenderWindows.snapshot()) != 0 {
++		t.Fatal("last or repeated close retained registry or current-window state")
++	}
++}
++
++func TestVellumWindowRetirementRaiseCannotRepublishAfterNativeClose(t *testing.T) {
++	windowRetirementRegistryFixture(t)
++	w := &renderWindow{}
++	raises := 0
++	w.SystemWindow = &vellumWindowListNative{raise: func() {
++		raises++
++		w.closed()
++	}}
++	renderWindowGlobalMu.Lock()
++	AllRenderWindows, mainRenderWindows = renderWindowList{w}, renderWindowList{w}
++	currentRenderWindow = w
++	renderWindowGlobalMu.Unlock()
++	w.Raise()
++	w.Raise() // A second request for the retired window must not call native code.
++	if raises != 1 || currentRenderWindowSnapshot() != nil || len(AllRenderWindows.snapshot()) != 0 {
++		t.Fatal("native Raise republished a closed window or called it after retirement")
++	}
++}
++
++func TestVellumWindowRetirementConcurrentRaiseCloseKeepsContextWithdrawn(t *testing.T) {
++	windowRetirementRegistryFixture(t)
++	entered, release, done := make(chan struct{}), make(chan struct{}), make(chan struct{})
++	var once sync.Once
++	unblock := func() { once.Do(func() { close(release) }) }
++	defer unblock()
++	w := &renderWindow{SystemWindow: &vellumWindowListNative{raise: func() {
++		// Pause the admitted backend call while another goroutine retires
++		// the window. Real Mac native handle checks run on its main queue;
++		// this fixture tests only the core context publication contract.
++		close(entered)
++		<-release
++	}}}
++	renderWindowGlobalMu.Lock()
++	AllRenderWindows, mainRenderWindows = renderWindowList{w}, renderWindowList{w}
++	currentRenderWindow = w
++	renderWindowGlobalMu.Unlock()
++	go func() { defer close(done); w.Raise() }()
++	t.Cleanup(func() {
++		unblock()
++		select {
++		case <-done:
++		case <-time.After(3 * time.Second):
++			t.Error("Raise worker outlived its fixture")
++		}
++	})
++	select {
++	case <-entered:
++	case <-time.After(3 * time.Second):
++		t.Fatal("registered Raise did not enter backend")
++	}
++	w.handleWindowEvents(events.NewWindow(events.WinClose))
++	unblock()
++	select {
++	case <-done:
++	case <-time.After(3 * time.Second):
++		t.Fatal("admitted Raise did not finish after close")
++	}
++	if currentRenderWindowSnapshot() != nil || len(AllRenderWindows.snapshot()) != 0 || len(mainRenderWindows.snapshot()) != 0 {
++		t.Fatal("concurrent native Raise completion republished a retired context")
++	}
++}
++
++func TestVellumWindowFocusRetirementCannotRepublishClosedWindow(t *testing.T) {
++	windowRetirementRegistryFixture(t)
++	for round := 0; round < 64; round++ {
++		survivor := &renderWindow{SystemWindow: &vellumWindowListNative{}}
++		closing := &renderWindow{SystemWindow: &vellumWindowListNative{}}
++		renderWindowGlobalMu.Lock()
++		AllRenderWindows = renderWindowList{survivor, closing}
++		mainRenderWindows = slices.Clone(AllRenderWindows)
++		dialogRenderWindows = nil
++		currentRenderWindow = closing
++		renderWindowGlobalMu.Unlock()
++		start := make(chan struct{})
++		var workers sync.WaitGroup
++		workers.Add(2)
++		go func() {
++			defer workers.Done()
++			<-start
++			for range 512 {
++				closing.handleWindowEvents(events.NewWindow(events.WinFocus))
++			}
++		}()
++		go func() {
++			defer workers.Done()
++			<-start
++			closing.handleWindowEvents(events.NewWindow(events.WinClose))
++		}()
++		close(start)
++		workers.Wait()
++		closing.handleWindowEvents(events.NewWindow(events.WinFocus))
++		if currentRenderWindowSnapshot() != survivor || !slices.Equal(AllRenderWindows.snapshot(), renderWindowList{survivor}) || !slices.Equal(mainRenderWindows.snapshot(), renderWindowList{survivor}) {
++			t.Fatal("late focus republished a retired window or changed membership")
++		}
++		survivor.closed()
++	}
++}

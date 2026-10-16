@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "result": "PASS_SCOPED_OFFSCREEN_WINDOW_RETIREMENT_CHECKPOINT",
+  "recorded_utc": "2026-10-16T09:50:31.082125+00:00",
+  "base_commit": "4da0d6b42c67f52ba3243bad6fc6cd65d34c7d8f",
+  "sources": {
+    "drivers/cogent/native/dependencies.json": "22b4e98b6c11bf67987987c62837422f660ddabbe588914f25a3a1e1ba4efd58",
+    "drivers/cogent/native/patches/windowretirement/0070-retire-current-window-context.patch": "bbb8861a5e905ca60a7ea56541db7b8c42e51226aca1b539fe26d080920cbff0",
+    "drivers/cogent/native/patches/windowretirement/README.md": "68b2b76f816c1f44a0fae50a5228924193b848f4ea86f8e086cb9d7d58a649de",
+    "drivers/cogent/native/patches/windowretirement/original-hashes.json": "c411b24f528a35da4015cdc521509229cdac705cf78d7f47661f64220359a50c",
+    "drivers/cogent/native/patches/windowretirement/output-hashes.json": "7fc23fc6805eb8a5c4756a8bfa638a9b0bb15646b625b3ff09d5b5885efb2643",
+    "drivers/cogent/prepare_test.py": "93038e3fa80d5910af842152b2a1d291c6af2823ec8cd57f9354af57e13affe8",
+    "specs/native-window-lifecycle.md": "6d03a3cff5a34cb9e505c964e94ee2c1b1971028cb542d03575ab621e1009612",
+    "docs/reports/window-context-retirement/README.md": "8cc374d927bfba6243f5564b199ea63e1268f2045963eb60429ca7eee7a4ebff",
+    "docs/reports/README.md": "076fdff79d54a0170f6531a7e4d0a1b7785c302e448b625ec1a480e2ec07b7b6"
+  },
+  "summary": {
+    "result": "PASS_SCOPED_FINAL_OFFSCREEN_WINDOW_RETIREMENT",
+    "final_checks": {
+      "final-regression": {
+        "receipt_sha256": "4c8d31b40f125660b52b8d50583a32e3c5ffb55dfa28e4fcd38b2a3d8b311485",
+        "exit_code": 0,
+        "elapsed_seconds": 11.497249291976914
+      },
+      "final-core": {
+        "receipt_sha256": "883035b1db1652ea526ae912ed3b778543c7757afb472265b8a7f9979d902b5f",
+        "exit_code": 0,
+        "elapsed_seconds": 16.461689041927457
+      },
+      "final-prepare-tests": {
+        "receipt_sha256": "3186b1986ead921948636ddfa6594c20a9a4ca2ae59f677bd86e184dd31b5578",
+        "exit_code": 0,
+        "elapsed_seconds": 0.7018552080262452
+      }
+    },
+    "final_source_binding_sha256": "b497f730256a63ab29bb8a4c76cbf6e974538132f2aca445c7b2e9bfdd1d4cc6",
+    "baseline_pair_failed_same_show_wait": true,
+    "negative_final_intended_regression_failures": 5,
+    "final_selected_core_passes": 115,
+    "final_selected_core_skips": 0,
+    "prior_full_adapter_race_and_vet": {
+      "race_receipt_sha256": "c351552dd4f1a1d0b847188931686c9679f0bd731f7e1eaa1fcc0bd8eeabc0e5",
+      "vet_receipt_sha256": "a36cc3f652c9475047b17feb2ee97bfd8021fef3166449d3103c56b069676fa4",
+      "production_prepared_sources_unchanged": true,
+      "only_prepared_delta": "core/window_retirement_vellum_test.go",
+      "rerun_after_test_only_delta": false
+    },
+    "native_or_gpu_executed": false,
+    "full_mac_qualified": false
+  },
+  "archive_sha256": "8cd09feed63c9f3a379ef5a9b87ebe2c33b2ba69281a3b65eb14feff7c280701",
+  "archive_index_sha256": "60f8e634dc6f4c60b85603caa1bf2b61aaae1674d3644bd27b710e2980886039",
+  "internal_report_review_pending": false,
+  "provider_review_pending": false,
+  "checkpoint_complete": true,
+  "native_ui_qualified": false,
+  "full_mac_qualified": false,
+  "final_internal_review_required": false,
+  "followup_archive_sha256": "238fb9c52e58ea6a96f98ba51f4f742628de8acdd60313ec4364a8d371149d26",
+  "followup_index_sha256": "98b939e91b5f53686d86e6f1d13130574f138195dbd19687fcd51f89284e34ef",
+  "provider_review": {
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 9,
+      "bytes": 20567,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 10793,
+          "output": 2522,
+          "costUSD": 0.046806
+        }
+      ],
+      "widenedFiles": 1,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "counts": {
+      "findings": 1,
+      "discarded": 0,
+      "suppressed": 0
+    },
+    "resolution_sha256": "017b36629b2d31fbb4852b30d475925bc397f6f687fabaef8d8450fa37bb971c",
+    "reviewed_sources": {
+      "drivers/cogent/native/dependencies.json": "4cbc5b36827a5fce9268fa0cd585a3b7afc73e528291cbd54f80a3b89084bbb1",
+      "drivers/cogent/native/patches/windowretirement/0070-retire-current-window-context.patch": "9fb9caf70fe0e109ab1cf56907d0ea9f25241fc93c5315cfc0afc28e74c38080",
+      "drivers/cogent/native/patches/windowretirement/README.md": "68b2b76f816c1f44a0fae50a5228924193b848f4ea86f8e086cb9d7d58a649de",
+      "drivers/cogent/native/patches/windowretirement/original-hashes.json": "c411b24f528a35da4015cdc521509229cdac705cf78d7f47661f64220359a50c",
+      "drivers/cogent/native/patches/windowretirement/output-hashes.json": "37d7efe1d995f04cb75f8a325edb0b3a19fd503908639b76c6441b5ab26e64f9",
+      "drivers/cogent/prepare_test.py": "93038e3fa80d5910af842152b2a1d291c6af2823ec8cd57f9354af57e13affe8",
+      "specs/native-window-lifecycle.md": "6d03a3cff5a34cb9e505c964e94ee2c1b1971028cb542d03575ab621e1009612",
+      "docs/reports/window-context-retirement/README.md": "1926b7ca1f62767f5443311244cb8d3acd069eb5d6bbb9724a9eb54a68b3bdff",
+      "docs/reports/README.md": "076fdff79d54a0170f6531a7e4d0a1b7785c302e448b625ec1a480e2ec07b7b6"
+    },
+    "final_delta_provider_reviewed": false,
+    "final_delta_internally_reviewed": true
+  },
+  "final_internal_review_sha256": "0a81c3ea9651319871a7c92c6e97ab4dad48fd14493b1068d4588f276c4aa88f",
+  "sealed_utc": "2026-10-16T10:00:13.974794+00:00",
+  "records": {
+    "archive-index.json": {
+      "bytes": 9045,
+      "sha256": "60f8e634dc6f4c60b85603caa1bf2b61aaae1674d3644bd27b710e2980886039"
+    },
+    "evidence.tar.xz": {
+      "bytes": 454612,
+      "sha256": "8cd09feed63c9f3a379ef5a9b87ebe2c33b2ba69281a3b65eb14feff7c280701"
+    },
+    "final-checkpoint-files.json": {
+      "bytes": 5162,
+      "sha256": "21915a9520f77a7ba7cefd7640e02b02f9bfc0e812ed61520a7187ce4dd1f5ac"
+    },
+    "final-source-review.json": {
+      "bytes": 11047,
+      "sha256": "0a81c3ea9651319871a7c92c6e97ab4dad48fd14493b1068d4588f276c4aa88f"
+    },
+    "final-source-review.md": {
+      "bytes": 1799,
+      "sha256": "12002a14b8151510d7e605cd4095dcc0a5b884f6bd41ff94e544af46626200c4"
+    },
+    "finalize_checkpoint.py": {
+      "bytes": 2232,
+      "sha256": "ec3f6eea1a247371f5c6cf59d1b45547a458e6feb3a16394cd447352459d69ef"
+    },
+    "followup-evidence.tar.xz": {
+      "bytes": 456172,
+      "sha256": "238fb9c52e58ea6a96f98ba51f4f742628de8acdd60313ec4364a8d371149d26"
+    },
+    "followup-index.json": {
+      "bytes": 7212,
+      "sha256": "98b939e91b5f53686d86e6f1d13130574f138195dbd19687fcd51f89284e34ef"
+    },
+    "prism-execution.json": {
+      "bytes": 3623,
+      "sha256": "994741fcc2c1885d32c7e2adc836e104a6078ffbcd584ccf8e731e9a38e93821"
+    },
+    "prism.json": {
+      "bytes": 2671,
+      "sha256": "4e1b23bdef08085fd758a42143bbefb92135b6ad8b0fd15abe80632faf8bd068"
+    },
+    "provider-resolution.json": {
+      "bytes": 3239,
+      "sha256": "017b36629b2d31fbb4852b30d475925bc397f6f687fabaef8d8450fa37bb971c"
+    },
+    "provider-source-assessment.json": {
+      "bytes": 5946,
+      "sha256": "5c503423ec91b2383290930c73204e699fb25f9d51a85e06427fc9e895715dbd"
+    },
+    "provider-source-assessment.md": {
+      "bytes": 974,
+      "sha256": "2be5f6143189ecd5a73d600cc95a116e3b0ef03ddc9f7494b9482b4c9137057d"
+    }
+  }
+}

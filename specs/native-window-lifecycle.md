@@ -67,3 +67,24 @@ campaign additionally observes native interaction and cleanup, sampled Go/RSS,
 and source-bound native allocation snapshots. Physical graphics allocation and
 all remaining P11 budgets remain separate from these observations. See the
 [accessibility retention checkpoint](../docs/reports/macos-ax-retention/README.md).
+
+
+## Retired construction contexts
+
+Closing a render window withdraws it from all render registries and replaces its
+current construction context with a registered survivor, or nil when none remain.
+After the last manual window closes, a subsequent ordinary window must open and
+deliver Show through its ordinary event loop. A retired manual context must not
+make that construction silently fail the live manual-mode restrictions.
+
+Native focus membership checks, focus ordering and current-context publication
+are atomic with registry withdrawal. Raise refuses retired windows and publishes
+before invoking native code, so a reentrant close remains withdrawn. Native
+focus/raise calls run outside the registry mutex. This does not extend native
+object lifetimes or replace owner-thread requirements.
+
+Owned patch 0070 includes offscreen manual-to-ordinary construction, retirement,
+reentrant Raise and concurrent focus/close regression coverage. Existing mixed
+live manual/ordinary mode refusals still apply. Offscreen routing evidence does
+not establish physical desktop focus, native object deallocation or full Mac
+acceptance.

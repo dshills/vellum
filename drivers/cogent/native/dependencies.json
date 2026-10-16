@@ -683,6 +683,17 @@
               "sha256": "5ecbd0f213ddb223738baedfb36f90e4ba7db1777490c44306de655c41ed18bd"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/windowretirement",
+          "inputs": "native/patches/windowretirement/original-hashes.json",
+          "outputs": "native/patches/windowretirement/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/windowretirement/0070-retire-current-window-context.patch",
+              "sha256": "bbb8861a5e905ca60a7ea56541db7b8c42e51226aca1b539fe26d080920cbff0"
+            }
+          ]
         }
       ]
     },

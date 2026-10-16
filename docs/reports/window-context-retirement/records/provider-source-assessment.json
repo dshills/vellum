@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-16T09:54:43.292863+00:00",
+  "result": "SUPPORTED_BY_EXISTING_MAC_NATIVE_GUARDS",
+  "prism_report_sha256": "4e1b23bdef08085fd758a42143bbefb92135b6ad8b0fd15abe80632faf8bd068",
+  "prism_execution_sha256": "994741fcc2c1885d32c7e2adc836e104a6078ffbcd584ccf8e731e9a38e93821",
+  "raw_provider": {
+    "exit_code": 0,
+    "returned_findings": 1,
+    "discarded": 0,
+    "suppressed": 0,
+    "files": 9,
+    "chunks": 1,
+    "llm_calls": 1,
+    "coverage_complete": true
+  },
+  "provider_reviewed_sources": {
+    "drivers/cogent/native/dependencies.json": "4cbc5b36827a5fce9268fa0cd585a3b7afc73e528291cbd54f80a3b89084bbb1",
+    "drivers/cogent/native/patches/windowretirement/0070-retire-current-window-context.patch": "9fb9caf70fe0e109ab1cf56907d0ea9f25241fc93c5315cfc0afc28e74c38080",
+    "drivers/cogent/native/patches/windowretirement/README.md": "68b2b76f816c1f44a0fae50a5228924193b848f4ea86f8e086cb9d7d58a649de",
+    "drivers/cogent/native/patches/windowretirement/original-hashes.json": "c411b24f528a35da4015cdc521509229cdac705cf78d7f47661f64220359a50c",
+    "drivers/cogent/native/patches/windowretirement/output-hashes.json": "37d7efe1d995f04cb75f8a325edb0b3a19fd503908639b76c6441b5ab26e64f9",
+    "drivers/cogent/prepare_test.py": "93038e3fa80d5910af842152b2a1d291c6af2823ec8cd57f9354af57e13affe8",
+    "specs/native-window-lifecycle.md": "6d03a3cff5a34cb9e505c964e94ee2c1b1971028cb542d03575ab621e1009612",
+    "docs/reports/window-context-retirement/README.md": "1926b7ca1f62767f5443311244cb8d3acd069eb5d6bbb9724a9eb54a68b3bdff",
+    "docs/reports/README.md": "076fdff79d54a0170f6531a7e4d0a1b7785c302e448b625ec1a480e2ec07b7b6"
+  },
+  "reviewed_prepared_source_sha256": {
+    "system/driver/desktop/window.go": "de45a58d893cd51482cdf372ead259ff4cbecd479de0e2dbbc66496cdad21f8c",
+    "system/driver/desktop/app.go": "32326f74f0c8247766c6f0ccd4e67430991cff0b78f98938a956c0cd1e56a5be",
+    "system/driver/base/app.go": "f7c39f21a905e044e12a5e24f8bb708b26b04d1aaae4f08dfef26c8f7ff914dd",
+    "system/driver/base/helpers.go": "98e64f472e915ffed8878ffbe13d5be52ebce4b82664fa04dd0f76a43c3c559d",
+    "system/driver/base/window.go": "624a8b6e27990287c8dd03863fb123b1e584ee5cd5fdad8f4593b5f01cf2153e",
+    "system/driver/desktop/native_idle.go": "74944313479981f6dcae212456b5cdfa35cfc6f19b54c9b55e142802d267e31c",
+    "core/renderwindow.go": "0459cf7c1630d9e1e243d90bffa08cf0accf0eea48962d4b6bc5d855dd1b4e83",
+    "core/windowlists.go": "daf3054af31e74c4ef45c0ba6e0695da233d4cf08af8a2b10d58572c49e9a35a"
+  },
+  "findings": [
+    {
+      "id": "835af72b05c055a4",
+      "disposition": "NO_PRODUCTION_DEFECT_ESTABLISHED_EXISTING_GUARD_SATISFIES_SUGGESTION",
+      "severity": "low",
+      "membership_gap_acknowledged": true,
+      "evidence": [
+        {
+          "file": "core/renderwindow.go",
+          "lines": "394-400",
+          "observation": "publishFocus returns before SystemWindow.Raise; registry membership is not a native lifetime lease, as already documented."
+        },
+        {
+          "file": "system/driver/desktop/window.go",
+          "lines": "48-58,447-461",
+          "observation": "IsClosed uses atomic composer publication; Raise refuses a withdrawn composer and dispatches through RunOnMain. Its owner callback rechecks Glw for nil before Restore/Focus."
+        },
+        {
+          "file": "system/driver/desktop/window.go",
+          "lines": "477-522",
+          "observation": "Close queues native attachment shutdown and releaseNativeResources on the native owner. Resource release withdraws composer, destroys the GLFW window and sets Glw nil inside that owner callback."
+        },
+        {
+          "file": "system/driver/base/app.go",
+          "lines": "130-190",
+          "observation": "RunOnMain delegates synchronous queue/ack admission; RunOnMainQueued waits for native queue publication. The queue owner executes callbacks serially, while stopped admission refuses callbacks."
+        },
+        {
+          "file": "system/driver/base/helpers.go",
+          "lines": "45-78",
+          "observation": "ExecuteMain owns callback execution/completion; application stop does not run native callbacks after stopped admission."
+        },
+        {
+          "file": "system/driver/desktop/window.go",
+          "lines": "627-640",
+          "observation": "GLFW close request starts CloseReq on a goroutine; focus callbacks publish events rather than synchronously destroying Glw during Raise."
+        }
+      ],
+      "source_conclusion": "For the existing active Mac native-owner path, a queued Raise executes either before native destruction with a live handle or after it and observes Glw nil. A stale core registration candidate therefore does not by itself establish native use-after-destroy. The core fix already avoids stale current-context publication after the native call.",
+      "followup": "Add a deterministic cross-goroutine core Raise/retirement fixture with a closed-tolerant backend and explicit rendezvous. This strengthens the documented interface boundary; it is not actual Cocoa deallocation evidence. Review its final test/pin/doc vector separately."
+    }
+  ],
+  "production_change_required_by_this_assessment": false,
+  "pending_followup_test_review": true,
+  "unresolved_blocking_findings": [],
+  "limits": [
+    "Source proof only; no native/test/build/process/provider execution during review.",
+    "Assumes the existing native owner-thread contract; pre-publication native operations must remain on their designated owner, and arbitrary custom SystemWindow implementations retain responsibility for their own closed-handle safety.",
+    "No physical focus, actual Cocoa lifetime, native deallocation, frame performance or full Mac qualification.",
+    "The provider reviewed the original nine-source vector, not any later test/documentation/pin follow-up.",
+    "Human online; native live authorization remains revoked."
+  ]
+}

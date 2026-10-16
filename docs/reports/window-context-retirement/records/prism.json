@@ -1,0 +1,91 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "26852c3efe0644fb91d4f69f08787b15",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "4da0d6b42c67f52ba3243bad6fc6cd65d34c7d8f",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "835af72b05c055a4",
+      "severity": "low",
+      "category": "bug",
+      "title": "TOCTOU between membership check and native Raise call",
+      "message": "Raise checks registry membership under the mutex in publishFocus, then releases the lock before calling SystemWindow.Raise(). A concurrent close can retire the window in that gap, so native Raise runs on an already-closed window. The new tests only cover reentrant close on the same goroutine, not a cross-thread close. The patch comments say snapshots do not extend native lifetimes, which leaves this window open. Focus restoration in closed() takes a candidate from unregister() and calls Raise on it, so the same gap exists there.",
+      "suggestion": "Make the native Raise tolerate a window retired after publishFocus (for example, a closed flag checked on the native side), or document and enforce that Raise and close run on the same owner thread. Add a concurrent Raise/close test.",
+      "confidence": 0.35,
+      "locations": [
+        {
+          "path": "drivers/cogent/native/patches/windowretirement/0070-retire-current-window-context.patch",
+          "lines": {
+            "start": 13,
+            "end": 13
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "toctou",
+        "lifecycle"
+      ],
+      "evidence": "\tw.SystemWindow.Raise()",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 20110,
+    "totalMs": 20129
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 9,
+    "bytes": 20567,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 10793,
+        "output": 2522,
+        "costUSD": 0.046806
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

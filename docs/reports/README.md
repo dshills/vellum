@@ -66,3 +66,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Native accessibility parent graph](macos-ax-parent-graph/README.md): bounded shared parent validation, independent oracle coverage, matched topology observations and scoped live Cocoa routing.
 
 - [Current-source composed lifecycle](macos-parent-graph-endurance/README.md): committed `6330b2d` completes 1,000 windows and the current 33,000-action plan; terminal/source/cleanup evidence is scoped separately from memory, performance, overnight and physical/human acceptance.
+
+- [Window construction after manual retirement](window-context-retirement/README.md): reproduced manual-to-ordinary Show failure, atomic registry/context withdrawal, reentrant Raise safety and offscreen race controls.

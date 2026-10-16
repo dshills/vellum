@@ -1,0 +1,45 @@
+{
+  "result": "PROVIDER_CONCERN_ASSESSED_EXISTING_GUARD_AND_TESTED_CONCURRENT_FOLLOWUP",
+  "observed_finding_counts": {
+    "findings": 1,
+    "discarded": 0,
+    "suppressed": 0
+  },
+  "all_findings_triaged": true,
+  "unresolved_blocking_findings": [],
+  "prism_report_sha256": "4e1b23bdef08085fd758a42143bbefb92135b6ad8b0fd15abe80632faf8bd068",
+  "prism_execution_sha256": "994741fcc2c1885d32c7e2adc836e104a6078ffbcd584ccf8e731e9a38e93821",
+  "source_assessment_sha256": "5c503423ec91b2383290930c73204e699fb25f9d51a85e06427fc9e895715dbd",
+  "provider_reviewed_sources": {
+    "drivers/cogent/native/dependencies.json": "4cbc5b36827a5fce9268fa0cd585a3b7afc73e528291cbd54f80a3b89084bbb1",
+    "drivers/cogent/native/patches/windowretirement/0070-retire-current-window-context.patch": "9fb9caf70fe0e109ab1cf56907d0ea9f25241fc93c5315cfc0afc28e74c38080",
+    "drivers/cogent/native/patches/windowretirement/README.md": "68b2b76f816c1f44a0fae50a5228924193b848f4ea86f8e086cb9d7d58a649de",
+    "drivers/cogent/native/patches/windowretirement/original-hashes.json": "c411b24f528a35da4015cdc521509229cdac705cf78d7f47661f64220359a50c",
+    "drivers/cogent/native/patches/windowretirement/output-hashes.json": "37d7efe1d995f04cb75f8a325edb0b3a19fd503908639b76c6441b5ab26e64f9",
+    "drivers/cogent/prepare_test.py": "93038e3fa80d5910af842152b2a1d291c6af2823ec8cd57f9354af57e13affe8",
+    "specs/native-window-lifecycle.md": "6d03a3cff5a34cb9e505c964e94ee2c1b1971028cb542d03575ab621e1009612",
+    "docs/reports/window-context-retirement/README.md": "1926b7ca1f62767f5443311244cb8d3acd069eb5d6bbb9724a9eb54a68b3bdff",
+    "docs/reports/README.md": "076fdff79d54a0170f6531a7e4d0a1b7785c302e448b625ec1a480e2ec07b7b6"
+  },
+  "final_sources": {
+    "drivers/cogent/native/dependencies.json": "22b4e98b6c11bf67987987c62837422f660ddabbe588914f25a3a1e1ba4efd58",
+    "drivers/cogent/native/patches/windowretirement/0070-retire-current-window-context.patch": "bbb8861a5e905ca60a7ea56541db7b8c42e51226aca1b539fe26d080920cbff0",
+    "drivers/cogent/native/patches/windowretirement/README.md": "68b2b76f816c1f44a0fae50a5228924193b848f4ea86f8e086cb9d7d58a649de",
+    "drivers/cogent/native/patches/windowretirement/original-hashes.json": "c411b24f528a35da4015cdc521509229cdac705cf78d7f47661f64220359a50c",
+    "drivers/cogent/native/patches/windowretirement/output-hashes.json": "7fc23fc6805eb8a5c4756a8bfa638a9b0bb15646b625b3ff09d5b5885efb2643",
+    "drivers/cogent/prepare_test.py": "93038e3fa80d5910af842152b2a1d291c6af2823ec8cd57f9354af57e13affe8",
+    "specs/native-window-lifecycle.md": "6d03a3cff5a34cb9e505c964e94ee2c1b1971028cb542d03575ab621e1009612",
+    "docs/reports/window-context-retirement/README.md": "8cc374d927bfba6243f5564b199ea63e1268f2045963eb60429ca7eee7a4ebff",
+    "docs/reports/README.md": "076fdff79d54a0170f6531a7e4d0a1b7785c302e448b625ec1a480e2ec07b7b6"
+  },
+  "production_prepared_sources_changed": false,
+  "second_provider_call": false,
+  "final_delta_requires_internal_review": true,
+  "dispositions": [
+    {
+      "id": "835af72b05c055a4",
+      "disposition": "EXISTING_MAIN_OWNER_NATIVE_GUARDS_VERIFIED_BY_SOURCE; CONCURRENT_CORE_CONTRACT_REGRESSION_ADDED_AND_TESTED",
+      "native_execution_qualification": false
+    }
+  ]
+}
