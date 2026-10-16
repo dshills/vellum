@@ -38,6 +38,27 @@ one-second quiet samples do not qualify the 60-second idle target or overnight
 behavior. Full P11, professional/native/GPU memory, physical workflows and Mac
 release acceptance remain open.
 
+The subsequent eight-hour attempt failed after 9,084 seconds with
+`soak occluded state drift`: its visible phase and 30 eligible quiet samples
+completed, but minimized/background phases and final cycle completion did not.
+That failure remains failed. The [native-loop follow-up and soak diagnostics](../docs/reports/macos-loop-native/README.md)
+preserve its partial trace and cleanup separately from five successful native
+cases built from clean `82c0c5e`/6,229 leaves: four queue modes and five composed
+windows with 165 native action checks. A separate eight-minute four-state run
+passes with one eligible 60-second interval per state, sampled CPU 0.0214–0.0672%
+of one CPU and no primary paint wakes. Application-wide wakeups/presents, causal
+CPU improvement, full idle and overnight qualification remain open. The new soak
+failure record preserves endpoint states for future diagnosis; it does not
+establish or fix the unknown cause of the original state drift.
+
+Two separate fixed-million-row CPU-renderer diagnostic processes on that same
+clean source capture a whole-process CPU profile and nested source timings.
+Source raster work is about 68.1% of source Draw elapsed time; image-copy work is
+about 31.9%. Their profiled/detailed UI-work p95 values are 7.209/7.153 ms and
+cannot qualify ordinary timing targets or an optimization gain. Process-wide
+`cgocall` stacks do not identify native CPU work or a causal frame bottleneck.
+The retained profile guides further raster/copy/accessibility investigation.
+
 The [current native grid measurements](../docs/reports/macos-post-glyph-native/README.md)
 complete 40 fresh ordinary processes and 4,800 samples on `77ca764`/6,227 prepared
 files, after the source-bound endurance and corrected-preflight gates. All eight

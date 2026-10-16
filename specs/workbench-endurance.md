@@ -171,6 +171,18 @@ measure this whole process as a percentage of one logical CPU, including both
 windows and runtime/native threads. Primary-window paint-request wake deltas
 are separate counters; they do not count every application wake or GPU present.
 Endpoint state samples cannot prove continuous occlusion between samples.
+An endpoint query error or rejected target state emits one bounded
+`vellum.soak.interval-failure` record before returning the original failure.
+The record preserves the actual start/end target and cover snapshots, query
+status/error, capture times, quiet boundaries and individual state/containment
+predicates. Both windows come from one bounded main-thread query per endpoint,
+outside the quiet interval. Missing or ambiguous windows fail that query.
+An unattempted endpoint is explicitly unsuccessful. No later query replaces a
+failed observation. Text fields are limited to 512 bytes of valid UTF-8, numeric
+frame/alpha strings preserve nonfinite diagnostic values, and the encoded record
+is limited to 64 KiB. Output errors remain joined with the original failure.
+Successful intervals emit no failure record; diagnostic cover predicates do not
+replace strict native target occlusion or waive a failed run.
 Nonfinite window frames and invalid/reversed CPU intervals are refused. Short,
 overslept or wall/monotonic clock-divergent samples cannot qualify the 60-second
 CPU interval, even if the bounded fixture completes. The original static-idle

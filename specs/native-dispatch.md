@@ -73,3 +73,11 @@ cases omit the deliberate empty-event flood. They exercise wait/delivery and sto
 liveness, without qualifying idle CPU or wake budgets. None of these probes
 opens windows or changes OS input/accessibility preferences. Windowed
 shutdown remains a separate native acceptance check.
+
+The [clean-source native follow-up](../docs/reports/macos-loop-native/README.md)
+passes all four real queue cases and a separate five-window/165-action composed
+fixture on `82c0c5e` with 6,229 prepared leaves. Its eight-minute four-state soak
+records four eligible 60-second CPU intervals below 0.5% of one CPU and no primary
+paint wakes. This is sampled short-run acceptance; application-wide wakeups,
+presents, a causal idle gain and overnight qualification remain open. The earlier
+eight-hour attempt failed after its visible phase and six occluded samples.

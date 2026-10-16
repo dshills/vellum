@@ -1,0 +1,179 @@
+{
+  "schema": "vellum-macos-loop-native-checkpoint-v1",
+  "result": "PASS_SCOPED_NATIVE_FOLLOWUPS_AND_DIAGNOSTIC_SOURCE",
+  "sealed_utc": "2026-10-16T04:39:20.101462+00:00",
+  "base_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4",
+  "checkpoint_sources": {
+    "docs/reports/macos-event-driven-loop/README.md": "fc6f58e38685a570a30f733ca0052f5264d9febe44ba86429d0cb044a226121c",
+    "docs/reports/macos-loop-native/README.md": "c3ca2fde7cecdd9b3d4baf46c5c7648d009c1efbf282a21c44be8e10c56577a7",
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go": "806b3f3a348ca61b4fa172d6c8b63b2b1ae4b7a14e1dc18666c84b00b746240d",
+    "drivers/cogent/cmd/window-cycle-smoke/soak_failure.go": "2119791e13da1413f7feb9f6307bbbabd32a25763d8e99ed403dc7360d895ba5",
+    "drivers/cogent/cmd/window-cycle-smoke/soak_failure_test.go": "d242141d453cdca62472d51a82b13350cb242151dd3148648afdd3a4536e56f0",
+    "specs/macos-completion.md": "17973eb80eadf44325229b7d26cc32094514a6a18b03fb1aed85fa11638aeaf8",
+    "specs/native-dispatch.md": "f43a7d2347678219e20718731f873c9957c917708eda201ea0539adac16d5594",
+    "specs/workbench-endurance.md": "865b8e9d7f89a06e10ea91c09d721e84365c75ec3718d48d879592b29bf282c4"
+  },
+  "native_source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4",
+  "native_tracked_files": 4479,
+  "native_prepared_files": 6229,
+  "native_binaries": {
+    "queue": {
+      "binary": {
+        "path": "/private/tmp/vellum-macos-post-loop-native/outputs/queue",
+        "sha256": "18fb525ee492f2a911ef7ac8b68d9967d90e5ca14ada28b8ca0b0132834c9929",
+        "bytes": 23544898
+      },
+      "build_receipt_sha256": "c5b501a23ddd3d647b5f93c001af821fc16c63c360630ae3c880cd0e07cefe0c",
+      "build_metadata_sha256": "f96c5b6a5d3c95fcded4a2be2f5d02883e8e1a6c6c27c540077db9538f222f41",
+      "elapsed_seconds": 2.1103352500358596
+    },
+    "window": {
+      "binary": {
+        "path": "/private/tmp/vellum-macos-post-loop-native/outputs/window",
+        "sha256": "6e5c9433c61a70225a6ace708ea7aef947d8eb8c24570dd0509bc6e4bcf22de8",
+        "bytes": 60136258
+      },
+      "build_receipt_sha256": "52c0c9e08b249d900922365677daa8cbb524cc6477a371dd60293d5945ca9e10",
+      "build_metadata_sha256": "426fcac662c6c92f5dff61be36ac3d2a6c8debc549336f8c873c911d34006729",
+      "elapsed_seconds": 11.058482832973823
+    },
+    "grid": {
+      "binary": {
+        "path": "/private/tmp/vellum-macos-post-loop-native/outputs/grid",
+        "sha256": "2976e8f21dffc39a1b325238a235756e444bd75c3ea5bae9611784e3b88c0d1e",
+        "bytes": 59202594
+      },
+      "build_receipt_sha256": "6a388a8de79abd90ea5466f20a121ed1455a1eedd97763bb71e2b90d80636e86",
+      "build_metadata_sha256": "77086f68b24ebce94e67252471c0835708994cc9c9ce3df3f6aba587896c1576",
+      "elapsed_seconds": 8.26728216605261
+    }
+  },
+  "native_cases": {
+    "queue-normal": {
+      "validation_sha256": "aaceb5621fdef5a4d0209c977f4d15ba6d0a29a37af42510dbba2dc5a3b3f830",
+      "run_receipt_sha256": "2489b275b8067a97619dc06c36686716cd80eac35692aeda5cfda84f3f36328d",
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    },
+    "queue-panic": {
+      "validation_sha256": "894bbc064de50e1a6560bc666ff8e37ed3d13e7baf73e10d5f6fc5843dd9912d",
+      "run_receipt_sha256": "63f1c4a1372068f76a98c944f54736abcf097c3bc8ec2cf282b6932d88723b63",
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    },
+    "queue-idle": {
+      "validation_sha256": "a6f8abdceceaecefaf2ed7439835d938328a9e4630b98e41a97902989d4a24b3",
+      "run_receipt_sha256": "5f6196a084247a9c58915accda16022d094961dec49c62e7ca58677bb9cbd5c1",
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    },
+    "queue-stop": {
+      "validation_sha256": "bdf05a21061df3ab7a42d2ae9e0d58657ca79d6a8cd6d539ffaa10e172389843",
+      "run_receipt_sha256": "812b5d99b01c0474ddbab6dff194c29b3a09b0ab447f4662002c94b29e0ad1d7",
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    },
+    "window-five": {
+      "validation_sha256": "5f92ef0a656afec559779f6f50b3bc6d74d5c15ba47e8ad742ce3f6620d417e6",
+      "run_receipt_sha256": "6fbc0810c393dab1796746254b044e533720a2acef5269c7d97a44960b18f48d",
+      "result": "PASS_SCOPED_NATIVE_CASE",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    },
+    "idle-eight-minute": {
+      "validation_sha256": "8b93958b02aaa9ac26545c8f4f96ae3a65ea7dab6e6906f36610e423e46d192c",
+      "run_receipt_sha256": "b3e5361ec23f06c58fc2aeb90a3cc8eace9ac34836f5734fa8bc335ad4779a53",
+      "result": "PASS_SCOPED_MEASUREMENT",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    },
+    "grid-cpu-profile": {
+      "validation_sha256": "2c33cbc39d9f7f3e2c5c308f5327cfe0fa328caa69d2de962188ab3fa650feb5",
+      "run_receipt_sha256": "be709bf0142c192d3657aba36324ffd54d2f963ec462ad2864ba6fd90c30bb6a",
+      "result": "PASS_SCOPED_MEASUREMENT",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    },
+    "grid-source-details": {
+      "validation_sha256": "94ec84203b81017b5d8794ffceb0fd3a26d50fcf943c6fdef2afb1b34f4ccd6b",
+      "run_receipt_sha256": "d63ad1b78898e7084f825bee002bc9ea079628eea36fd8a64e4cc64c20f637b0",
+      "result": "PASS_SCOPED_MEASUREMENT",
+      "source_commit": "82c0c5ec17fd7f90da1a0ac4a26d65a3de8367a4"
+    }
+  },
+  "integrated_checks": {
+    "integrated-race": {
+      "receipt_sha256": "4f7150e36ba9a63e21f6c45cd63270c9140406ad9f3a1268fe8f7a656b28ffd0",
+      "exit_code": 0,
+      "elapsed_seconds": 34.34524516703095,
+      "native_application_executed": false
+    },
+    "integrated-vet": {
+      "receipt_sha256": "fc7f35db2429d30b46197b519310d111d22a2a96695cbb639297a0065c756659",
+      "exit_code": 0,
+      "elapsed_seconds": 23.71618379210122,
+      "native_application_executed": false
+    },
+    "diagnostic-build": {
+      "receipt_sha256": "ef17af2cfc47f64ef2196136c4b16c4083f081dd8c43a2d1806c515251c002b2",
+      "exit_code": 0,
+      "elapsed_seconds": 4.468534250045195,
+      "native_application_executed": false
+    }
+  },
+  "original_overnight_result": "FAILED_NATIVE_WINDOW_SOAK",
+  "original_overnight_receipt_sha256": "f331589b3a61ead2d26885ee11ede4e0e5ce96e715f5e1a779a1d682f1816337",
+  "original_overnight_qualified": false,
+  "diagnostic_native_event_qualified": false,
+  "sampled_short_idle_cpu_threshold_met": true,
+  "full_idle_budget_qualified": false,
+  "causal_performance_gain_qualified": false,
+  "ordinary_warm_targets_qualified": false,
+  "full_p11_qualified": false,
+  "full_mac_qualified": false,
+  "internal_source_review_sha256": "4ffdfe5aeba76959bf98c429eddcaff279bb36ecacdfe27e10a64eb80cdda500",
+  "internal_evidence_review_sha256": "dcbf7a3e5e5b4746ac9ad9393f0cac0de5f01d855b8fcd3fe48ba9bede0538ec",
+  "post_provider_seal_review_sha256": "dde70abb90cba7a5dedab3d5000959b18a9db1eb83ebb1a8d43b74dca3ae9d8c",
+  "provider_resolution_sha256": "deb2848ed3355cf9098979bd65f2e757c4ddcb1a52fe77f97db2d75d6baf4de0",
+  "provider_review": {
+    "execution_sha256": "f869ca677d938feb111b39b868f35a66687e7e9425870cd5ec5ec84144052039",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 8,
+      "bytes": 25281,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 12976,
+          "output": 2015,
+          "costUSD": 0.046102
+        }
+      ],
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "findings": 0,
+    "discarded": 1,
+    "suppressed": 0,
+    "discarded_disposition": "ACCEPTED_NONBLOCKING_COSMETIC"
+  },
+  "archive_sha256": "6cd3b5757c773a17b14d70fc9bd8c3a89e9626841ed7f0de05c1272061f853e0",
+  "archive_index_sha256": "ac6036619407da04c22e1a3939e3aa4d3182a50d111cf18fd7339d624f0f25d7",
+  "seal_producer_sha256": "55ec9946183bd806df49632d779a1f48feaf6f1c0c110520845a9402b150a3ce",
+  "limits": [
+    "Native runs predate diagnostic source changes; no live failure-event acceptance.",
+    "Failed original overnight remains failed; scheduling proof is not qualification.",
+    "Short sampled idle has endpoint states and primary paint counters only.",
+    "Profiling/detail modes are diagnostic, not ordinary timing or causal comparison.",
+    "No physical input, human IME/VoiceOver, native/GPU memory, release or full Mac acceptance."
+  ]
+}

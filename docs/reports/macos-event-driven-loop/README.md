@@ -1,5 +1,10 @@
 # Mac event-driven queue checkpoint
 
+This is the historical source-only checkpoint. Later clean-source queue,
+five-window and short-idle acceptance is recorded in the
+[native follow-up](../macos-loop-native/README.md); its scope does not include
+overnight, application-wide wakeups or presentation qualification.
+
 The Mac desktop adapter now waits for events without the recurring 100 ms native
 wait deadline. A single bounded ingress publishes each accepted queue packet
 before posting its wake. The native thread retains callback execution and output

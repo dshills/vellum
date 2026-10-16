@@ -266,9 +266,10 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 			if e = soakSleep(ctx, c.soak.Settle); e != nil {
 				return e
 			}
-			state0, e := soakWindow(ctx, "Vellum composed idle soak")
+			state0, cover0, e := soakPair(ctx, "Vellum composed idle soak", "Vellum cycle survivor")
+			endpoint0 := soakEndpoint{target: state0, cover: cover0, err: e, at: time.Now()}
 			if e != nil {
-				return e
+				return checkSoakEndpoints(phase, samples+1, endpoint0, soakEndpoint{}, time.Time{}, time.Time{}, emit)
 			}
 			wakes := win.Paint.Wakes.Load()
 			cpu0, e := soakCPU()
@@ -291,12 +292,10 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 				return e
 			}
 			delta := win.Paint.Wakes.Load() - wakes
-			state1, e := soakWindow(ctx, "Vellum composed idle soak")
-			if e != nil {
-				return e
-			}
-			if !soakState(state0, phase) || !soakState(state1, phase) {
-				return fmt.Errorf("soak %s state drift", phase)
+			state1, cover1, e := soakPair(ctx, "Vellum composed idle soak", "Vellum cycle survivor")
+			endpoint1 := soakEndpoint{target: state1, cover: cover1, err: e, at: time.Now()}
+			if err := checkSoakEndpoints(phase, samples+1, endpoint0, endpoint1, t0, t1, emit); err != nil {
+				return err
 			}
 			memory, e := sample(ctx, 0, soakStarted)
 			if e != nil {
