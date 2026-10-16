@@ -230,6 +230,22 @@ def check_origin(modules, sdk, module_path="github.com/dshills/vellum"):
 
 
 
+def native_benchmark_report(stdout):
+    reports = []
+    for line in stdout.splitlines():
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict) and value.get("event") == "vellum.native.ready":
+            reports.append(value)
+    if len(reports) != 1:
+        raise ValueError("relocated consumer failed to emit exactly one verified GPU report")
+    if reports[0].get("geometry_persistence_disabled_in_fixture") is not True:
+        raise ValueError("relocated benchmark did not disable window geometry persistence")
+    return reports[0]
+
+
 def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=False):
     if expected_sha256 is None and not allow_self_attested:
         raise ValueError("executing SDK code requires --sha256 from a trusted producer or explicit --allow-self-attested")
@@ -251,17 +267,7 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
         native = None
         if native_runtime:
             completed = run_child([str(base / "consumer"), "--benchmark", "--idle=1s", "--samples=3"], env=child_environment(runtime=True), check=True, text=True, capture_output=True, timeout=RUNTIME_TIMEOUT_SECONDS)
-            reports = []
-            for line in completed.stdout.splitlines():
-                try:
-                    value = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if isinstance(value,dict) and value.get("event") == "vellum.native.ready":
-                    reports.append(value)
-            if len(reports) != 1:
-                raise ValueError("relocated consumer failed to emit exactly one verified GPU report")
-            native = reports[0]
+            native = native_benchmark_report(completed.stdout)
         return {"event": "vellum.sdk.relocated", "digest_verified_against_expected": expected_sha256 is not None, "trust_basis": "caller-supplied expected digest" if expected_sha256 is not None else "explicit self-attestation", "independent_authenticity_verified": False, "archive_sha256": verified["archive_sha256"], "version": verified["manifest"]["release"]["version"], "source": verified["manifest"].get("source"), "verified_files": len(verified["manifest"]["files"]), "replacements_within_sdk": origins, "path_contains_spaces": " " in str(sdk), "checks": ["manifest all-file integrity", "external Go module cache verification", "standalone consumer race/vet/build", "public API scenarios race/vet"], "native_runtime": native if native_runtime else "not executed", "public_distribution_audit": "not certified"}
 
 

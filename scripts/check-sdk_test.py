@@ -27,6 +27,20 @@ def artifact(path,files=None,extra=None,checksums=None,release_record=None):
    member=tarfile.TarInfo(PREFIX+"/"+name);member.size=len(data);archive.addfile(member,io.BytesIO(data))
   if extra:archive.addfile(extra)
 class SDKChecks(unittest.TestCase):
+ def test_native_benchmark_reports_geometry_isolation(self):
+  report={"event":"vellum.native.ready","geometry_persistence_disabled_in_fixture":True}
+  self.assertEqual(sdk.native_benchmark_report("diagnostic output\n"+json.dumps(report)+"\n"),report)
+ def test_native_benchmark_rejects_missing_false_or_coerced_geometry_flag(self):
+  for value in (None,False,1,"true"):
+   report={"event":"vellum.native.ready"}
+   if value is not None:report["geometry_persistence_disabled_in_fixture"]=value
+   with self.subTest(value=value),self.assertRaisesRegex(ValueError,"did not disable window geometry"):
+    sdk.native_benchmark_report(json.dumps(report))
+ def test_native_benchmark_requires_exactly_one_report(self):
+  report=json.dumps({"event":"vellum.native.ready","geometry_persistence_disabled_in_fixture":True})
+  for output in ("diagnostic only",report+"\n"+report):
+   with self.subTest(output=output),self.assertRaisesRegex(ValueError,"exactly one verified GPU report"):
+    sdk.native_benchmark_report(output)
  def test_exact_hash_coverage_and_immutable_extraction(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp);path=root/"sdk.tar.gz";artifact(path)
@@ -126,6 +140,22 @@ class SDKChecks(unittest.TestCase):
   self.assertNotIn("ANTHROPIC_API_KEY",runtime_environment)
   self.assertEqual(environment["CGO_LDFLAGS_ALLOW"],r"^-Wl,-rpath,@executable_path/native$")
   self.assertEqual(environment["HTTPS_PROXY"],"transport-proxy");self.assertEqual(environment["SSL_CERT_FILE"],"certificate")
+ def test_native_runtime_check_enforces_geometry_report(self):
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp)
+   modules="\n".join(json.dumps({"Path":name,"Replace":{"Dir":str(root/relative)}}) for name,relative in ORIGINS.items())
+   verified={"archive_sha256":"digest","manifest":{"release":{"module":"github.com/dshills/vellum","version":"v0.1.0-alpha.1"},"files":{}}}
+   for flag in (None,False,1,"true",True):
+    report={"event":"vellum.native.ready"}
+    if flag is not None:report["geometry_persistence_disabled_in_fixture"]=flag
+    with self.subTest(flag=flag),mock.patch.object(sdk,"verify_archive",return_value=verified),mock.patch.object(sdk,"extract_verified",return_value=root),mock.patch.object(sdk,"run_child",return_value=mock.Mock(stdout=json.dumps(report))) as commands,mock.patch.object(sdk,"check_child_output",return_value=modules):
+     if flag is True:
+      self.assertEqual(sdk.check(Path("own-archive"),expected_sha256="digest",native_runtime=True)["native_runtime"],report)
+     else:
+      with self.assertRaisesRegex(ValueError,"did not disable window geometry"):
+       sdk.check(Path("own-archive"),expected_sha256="digest",native_runtime=True)
+     self.assertEqual(commands.call_args.args[0][1:],["--benchmark","--idle=1s","--samples=3"])
+     self.assertEqual(commands.call_args.kwargs["timeout"],sdk.RUNTIME_TIMEOUT_SECONDS)
  def test_execution_requires_digest_or_explicit_self_attestation(self):
   with mock.patch.object(sdk,"verify_archive") as verify,mock.patch.object(sdk,"run_child") as execute:
    with self.assertRaisesRegex(ValueError,"trusted producer or explicit"):

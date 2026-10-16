@@ -68,6 +68,14 @@ application's UI construction/validation benchmark, with allocation reporting an
 three repetitions. `--native` additionally builds and launches three visible native
 processes via `benchmark-native.py` on a desktop with a supported GPU.
 
+The standalone app's `-benchmark` mode disables native window-geometry loading
+and saving before constructing the app and restores its previous process-local
+switch on normal return after teardown. Ordinary interactive behavior is unchanged.
+Its report includes the actual `geometry_persistence_disabled_in_fixture` flag;
+`scripts/check-sdk.py --runtime` requires exactly one GPU report with that flag
+strictly true. The generator copies this same starter, so relocated native checks
+exercise the geometry-isolated benchmark rather than saved application geometry.
+
 Every native run reports:
 
 - Startup from application entry to a pixel-verified GPU rectangle; external process

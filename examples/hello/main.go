@@ -12,6 +12,8 @@ import (
 	"runtime"
 	"time"
 
+	"cogentcore.org/core/core"
+
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
 	"github.com/dshills/vellum/drivers/cogent"
@@ -25,6 +27,13 @@ func main() {
 	flag.Parse()
 	if *idle <= 0 || *samples < 1 || *samples > 1000 {
 		fail(errors.New("positive idle and 1..1000 samples required"))
+	}
+	if *benchmark {
+		// Measurement windows must neither restore nor persist application
+		// geometry. Keep this process-local setting through app teardown.
+		previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
+		core.DebugSettings.DisableWindowGeometrySaver = true
+		defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
 	}
 	started := time.Now()
 	a, err := app.New(app.Config{})
@@ -90,7 +99,7 @@ func main() {
 					}
 					var memory runtime.MemStats
 					runtime.ReadMemStats(&memory)
-					err = json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.native.ready", "startup_to_verified_gpu_ns": startup, "render_readback_ns": durations, "heap_alloc_bytes": memory.HeapAlloc, "width": image.Bounds().Dx(), "height": image.Bounds().Dy(), "go_version": runtime.Version()})
+					err = json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.native.ready", "geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver, "startup_to_verified_gpu_ns": startup, "render_readback_ns": durations, "heap_alloc_bytes": memory.HeapAlloc, "width": image.Bounds().Dx(), "height": image.Bounds().Dy(), "go_version": runtime.Version()})
 					measured <- err
 				})
 				if err != nil {
