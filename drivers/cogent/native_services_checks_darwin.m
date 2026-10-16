@@ -2,15 +2,13 @@
 
 #import "native_services_checks.h"
 #import "services_native.h"
+#import "native_window_snapshot.h"
+#import <objc/runtime.h>
 #include <stdint.h>
 #include <stdlib.h>
 extern int vellumServiceActive(uint64_t token);
 extern void vellumServiceResult(uint64_t token, char *text, int status);
 
-static NSDictionary *windowSnapshot(NSString *title,BOOL visible,BOOL miniaturized,BOOL key,NSWindowOcclusionState occlusion,NSRect frame) {
-    // A boxed C comparison is an integer NSNumber, not a JSON boolean.
-    return @{@"Title":title?:@"",@"Visible":@(visible),@"Miniaturized":@(miniaturized),@"Key":@(key),@"OcclusionVisible":(occlusion&NSWindowOcclusionStateVisible)?@YES:@NO,@"Frame":@[@(frame.origin.x),@(frame.origin.y),@(frame.size.width),@(frame.size.height)]};
-}
 static NSDictionary *checkSnapshot(BOOL cleanup) {
     NSDictionary *menu=vellumCheckMenu(0,0), *tray=vellumCheckTray(0,0), *panels=vellumCheckFilePanels();
     if (!menu || !tray || !panels) return nil;
@@ -19,7 +17,10 @@ static NSDictionary *checkSnapshot(BOOL cleanup) {
     for (NSWindow *window in NSApp.windows) {
         if (windows.count>=64) return nil;
         NSRect f=window.frame;
-        NSMutableDictionary *state=[NSMutableDictionary dictionaryWithDictionary:windowSnapshot(window.title,window.isVisible,window.isMiniaturized,window.isKeyWindow,window.occlusionState,f)];
+        NSView *contentView=window.contentView;
+        NSDictionary *sample=vellumWindowSnapshot(window.title,window.isVisible,window.isMiniaturized,window.isKeyWindow,window.occlusionState,f,NSStringFromClass(object_getClass(window)),contentView?NSStringFromClass(object_getClass(contentView)):nil,window.windowNumber);
+        if (!sample) return nil;
+        NSMutableDictionary *state=[NSMutableDictionary dictionaryWithDictionary:sample];
         NSUInteger index=[ordered indexOfObjectIdenticalTo:window];
         state[@"OrderedIndex"]=index==NSNotFound?@(-1):@(index);
         state[@"Opaque"]=@(window.isOpaque);
@@ -36,16 +37,6 @@ static char *checkWire(NSDictionary *snapshot) {
     NSString *text=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     const char *utf8=text.UTF8String;
     return utf8 ? strdup(utf8) : NULL;
-}
-char *vellumNativeWindowSnapshotFixture(void) {
-    // Inert serialization of the production helper; no NSApplication/window.
-    @autoreleasepool {
-        NSMutableArray *windows=[NSMutableArray array];
-        for (NSNumber *mask in @[@0,@1,@(NSWindowOcclusionStateVisible),@(NSWindowOcclusionStateVisible|1)]) {
-            [windows addObject:windowSnapshot(@"fixture",YES,NO,YES,[mask unsignedLongLongValue],NSMakeRect(10,20,30,40))];
-        }
-        return checkWire(@{@"MainThread":@YES,@"Windows":windows});
-    }
 }
 void vellumNativeServicesCheck(uint64_t token,const char *json) {
     vellumWithServiceJSON(token,json,^(NSData *wire) {

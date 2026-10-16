@@ -25,6 +25,8 @@ func TestNativeServiceSnapshotRejectsPartialDecode(t *testing.T) {
 		`{"MainThread":true,"CleanupObserved":true,"Windows":[{"OcclusionVisible":1}]}`,
 		`{"MainThread":true,"CleanupObserved":true,"Windows":[{"Visible":"true"}]}`,
 		`{"MainThread":true,"CleanupObserved":true,"Windows":[{"Frame":[0,"bad",20,30]}]}`,
+		`{"MainThread":true,"CleanupObserved":true,"Windows":[{"IdentityAvailable":1}]}`,
+		`{"MainThread":true,"CleanupObserved":true,"Windows":[{"WindowNumber":9223372036854775808}]}`,
 	} {
 		state, err := decodeNativeServiceSnapshot(raw)
 		if err == nil || !reflect.DeepEqual(state, NativeServiceCheckState{}) {

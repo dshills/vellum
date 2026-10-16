@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "result": "PASS_SCOPED_WINDOW_METADATA_SERIALIZATION_AND_COMPILATION",
+  "base_commit": "2ced41ab65d9561e86934ee2ffbd10a7dbe20c8a",
+  "source_files": {
+    "drivers/cogent/native_window_snapshot.h": "052dc2111c246dfe6d5ca2082a1fdae609b72f7a35f6cf28369f5c8081b32672",
+    "drivers/cogent/native_window_snapshot_darwin.go": "ef32114c25c13e15d7a417732254512043b130f9a813162e064b27d6b023f9e3",
+    "drivers/cogent/native_window_snapshot_darwin_test.go": "5575bdcec42a65bb02b4266719f3d8bbc095a63627a314770128fb4da4df5a4d",
+    "drivers/cogent/native_window_snapshot_fixture_darwin.m": "29bad74363ef157d3be7ca90d6eed905f5d7dc8cf197873059c6140b4d55209b",
+    "drivers/cogent/native_services_checks_darwin.go": "a37e0add1a66a2ae51e67fa7c65bc8e969a129a90f8f3e7419bf3c4c90307c47",
+    "drivers/cogent/native_services_checks_darwin.m": "6a5be465d3708370348250deeece201b1a9a9dcb2695a89c1b2b0f4918a07bcd",
+    "drivers/cogent/native_services_checks_darwin_test.go": "7917e3874b151ea2d94eed05f7b5f01cf7e9a9e9f1d61adf8cc02dbbdd271052",
+    "specs/native-window-lifecycle.md": "690887f93f45228145a74a84ccf21a4c3cd5e9b79fe0cd6c69173029e4308253"
+  },
+  "tested_source_files": 4559,
+  "prepared_files": 6230,
+  "checks": {
+    "inert": {
+      "receipt_sha256": "5046b5575f2298f4feaf8578ea427ee531dd7f67fb7e8f3f5a9dfb35d2a30f6c",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "-count=1",
+        "-tags=offscreen",
+        "-timeout=30s",
+        "-v",
+        "-run",
+        "^TestNativeWindowMetadata",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 42.146855500061065,
+      "logs": {
+        "stdout": {
+          "bytes": 322,
+          "sha256": "94f2bb19dca814b5b4f8e93a16abcfcef2ff649c4c2e762a9981052e986ca455"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "60ef650ec9d114eab49fa8f52bc1ef3600ee2f3e396a0871d00a18c77567ccac"
+        }
+      },
+      "compiled_binaries": {}
+    },
+    "adapter": {
+      "receipt_sha256": "5af5a066b26da53a039bf6de7951b69a4b1ddd40ad641be598cea4f38f2903e4",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "-count=1",
+        "-tags=offscreen",
+        "-timeout=120s",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 176.95363191701472,
+      "logs": {
+        "stdout": {
+          "bytes": 1591,
+          "sha256": "2f0023ad7e862ffd647a0a9c44e62585bec7ad2ea15012aed2f48e61fd81ebdc"
+        },
+        "stderr": {
+          "bytes": 1826,
+          "sha256": "ded2b6d3e65ec13df23a53e7add17f3e3108a56938b9147b4da929124279bbce"
+        }
+      },
+      "compiled_binaries": {}
+    },
+    "vet": {
+      "receipt_sha256": "90fb3c494903509f4e9e0897271959d1adfcbbf9d7cda3f821606e683e365f41",
+      "argv": [
+        "go",
+        "vet",
+        "-p=1",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 34.88119500002358,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 2094,
+          "sha256": "2e8a1f6619098f215762b340c8982119a3130efbcf9bf838f81f93d0f875b2b9"
+        }
+      },
+      "compiled_binaries": {}
+    },
+    "compile-native-tests": {
+      "receipt_sha256": "133608c28178577ab6be110456a6bdcc0d476bebbcf70960c186fde03e6da361",
+      "argv": [
+        "go",
+        "test",
+        "-c",
+        "-race",
+        "-p=1",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-window-metadata-checks/outputs/native-checks.test",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 26.905481667025015,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "60ef650ec9d114eab49fa8f52bc1ef3600ee2f3e396a0871d00a18c77567ccac"
+        }
+      },
+      "compiled_binaries": {
+        "native-checks.test": {
+          "bytes": 72803170,
+          "sha256": "1c0af65723daaa971b7e492d9e1a0add07b40e82129eff3841105c5f0741f8e4",
+          "executed": false
+        }
+      }
+    },
+    "compile-native-commands": {
+      "receipt_sha256": "1bd60344c55a0574fb01643399812a6993578db2e044c5020af1140b31132375",
+      "argv": [
+        "go",
+        "build",
+        "-p=1",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-window-metadata-checks/outputs",
+        "./cmd/services-smoke",
+        "./cmd/window-cycle-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 22.979916666983627,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1255,
+          "sha256": "6e13f1a5c866b5f24736c141138417e5cd786458e1f3a63156290cee2e641a2b"
+        }
+      },
+      "compiled_binaries": {
+        "services-smoke": {
+          "bytes": 58837314,
+          "sha256": "0f4029ad3a1da6e69e828fb6ccc040380823b2edcb0cb4936cbbbd9518107ded",
+          "executed": false
+        },
+        "window-cycle-smoke": {
+          "bytes": 60288034,
+          "sha256": "90bd27699d84c531f7ad59255d11a3f2193f1235389c234a39f4c8fd4fce1dd3",
+          "executed": false
+        }
+      }
+    }
+  },
+  "negative_controls": {
+    "receipt_sha256": "32e54298cd517f78803ed73fd85a813bf7bbdbc26f4efc9a768174f6f79ae248",
+    "cases": [
+      "availability",
+      "content-class-byte-limit"
+    ],
+    "semantics": "Two actual Go assertion failures (exit1) from omitted availability and removed content-class UTF-8 limit; Foundation only."
+  },
+  "internal_source_review_sha256": "6246c933d97cd0a358441e847d076ef212d8a2a09c978a94cdab86c0e53b6386",
+  "archive": {
+    "file": "evidence.tar.xz",
+    "sha256": "3ed45255098363c28c841418cfa3cb4aef07b1f8841e3c3d99251c4d938f1600",
+    "bytes": 416784,
+    "members": 37
+  },
+  "archive_index_sha256": "351c4b27701058a39927a39fcefff696e978329c09a3759806faa921153e82d0",
+  "compiled_native_executables_included": false,
+  "compiled_native_executables_executed": false,
+  "native_class_or_window_server_query_executed": false,
+  "native_check_decoder_cases_executed": false,
+  "hidden_window_identity_observed": false,
+  "native_ownership_or_leak_qualified": false,
+  "ordinary_performance_or_memory_qualified": false,
+  "full_mac_qualified": false,
+  "os_settings_changed": false,
+  "prism_review": "Small internally reviewed diagnostic checkpoint between provider reviews; significant GPU diagnostics checkpoint still pending native checks."
+}

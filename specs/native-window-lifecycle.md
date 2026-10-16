@@ -44,6 +44,32 @@ component mix, 1,000-control baseline, continuous workload latency, overnight
 soak, native heap or physical GPU memory. Caller-held objects remain separate
 retention costs.
 
+## Sampled Cocoa window metadata
+
+Opt-in `vellum_native_checks` snapshots include `IdentityAvailable`,
+`WindowClass`, `ContentViewClass` and signed 64-bit `WindowNumber` for every
+sampled process window. The class names come from the actual runtime classes;
+an absent content view has an empty class name. Each class name is limited to
+256 UTF-8 bytes. A missing window class or an oversized class refuses the whole
+snapshot, preserving the existing window-count and wire bounds. The observation
+creates no historical identity registry and retains no window/content-view
+references beyond the main-thread sample.
+
+`IdentityAvailable=false` in old records means metadata was not observed. A
+current observed zero/negative window number is preserved rather than classified.
+Cocoa window numbers can be reused, and class names describe types: these fields
+are not lifetime capabilities, managed ownership, allocation/deallocation or leak
+proof. Matching known framework windows and explaining the historical hidden
+untitled window still require fresh native evidence. Historical raw records stay
+unchanged.
+
+The same serializer and Go window DTO have inert Foundation coverage for boolean
+types, exact signed numbers, absent views, UTF-8 byte limits and legacy missing
+metadata. These fixtures create no NSApplication/NSWindow, dispatch no native
+operation and query no window server. Native sampling and cleanup commands must
+also compile, but compilation and inert fixtures do not qualify their runtime
+behavior or continuous state coverage.
+
 An optional `-heap-profile` writes a diagnostic after worker checks and before
 application closure, including after a safety-limit failure. It requires a new
 clean absolute path, uses exclusive creation and caps compressed output at

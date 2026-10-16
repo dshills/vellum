@@ -8,7 +8,6 @@ package cogent
 #include <stdlib.h>
 void vellumNativeServicesCheck(uint64_t token, const char *json);
 char *vellumNativeServicesCleanupCheck(void);
-char *vellumNativeWindowSnapshotFixture(void);
 */
 import "C"
 
@@ -51,17 +50,9 @@ type NativeServiceFilePanelCheck struct {
 
 // NativeServiceWindowCheck is a sampled Cocoa state for a window owned by this
 // process. Frame uses Cocoa screen points and its bottom-left origin.
-type NativeServiceWindowCheck struct {
-	Title                                        string
-	Visible, Miniaturized, Key, OcclusionVisible bool
-	Frame                                        [4]float64
-	// OrderedIndex is the position in NSApp.orderedWindows, or -1 if absent.
-	// These diagnostic fields do not establish continuous coverage or visibility.
-	OrderedIndex int
-	Opaque       bool
-	Alpha        float64
-	Level        int
-}
+// Class names and WindowNumber are sampled metadata, not object ownership,
+// allocation/deallocation, a stable lifetime key or continuous state coverage.
+type NativeServiceWindowCheck = nativeServiceWindowSnapshot
 
 type NativeServiceCheckState struct {
 	Windows         []NativeServiceWindowCheck
@@ -129,12 +120,6 @@ func decodeNativeServiceSnapshot(raw string) (NativeServiceCheckState, error) {
 		return NativeServiceCheckState{}, err
 	}
 	return state, nil
-}
-
-func nativeWindowSnapshotFixture() string {
-	text := C.vellumNativeWindowSnapshotFixture()
-	defer C.free(unsafe.Pointer(text))
-	return C.GoString(text)
 }
 
 var nativeServiceCleanupCheck atomic.Pointer[NativeServiceCheckState]
