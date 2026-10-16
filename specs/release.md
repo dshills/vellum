@@ -62,6 +62,22 @@ configuration and source state produce equivalent reports across relocated
 module/cache paths for the recorded conventional linker paths. Unknown absolute
 linker flags remain literal evidence rather than being guessed or resolved.
 
+## Recorded native release assertion
+
+The [16 October release identity check](../docs/reports/macos-native-release-identity/README.md)
+authenticates the exact retained `wgpu-macos-aarch64-release.zip` for
+`gfx-rs/wgpu-native` tag `v29.0.1.1`, including its URI commit subject and release
+repository/owner/release IDs. It uses the pinned official CLI/Sigstore policy,
+signed timestamp and normal TUF root/metadata/target checks with captured public
+responses and fresh caches. The verifier has no network fallback. All 27 negative
+controls pass against the final reviewed source; previous failures and the
+three-finding Prism review with dispositions are retained separately.
+
+The prior byte comparison relates the matching local static-library member to
+that same authenticated ZIP. This is not an executed-build/compiler/features
+attestation, a reproduced source build, complete component/rights approval or
+authentication of a Vellum SDK. Existing distribution gates remain unchanged.
+
 ## Alpha.2 window lifetime migration
 
 Alpha.2 deliberately breaks the alpha.1 string-scoped application APIs to avoid

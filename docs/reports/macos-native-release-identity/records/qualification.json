@@ -1,0 +1,90 @@
+{
+  "schema": "vellum.native-release-assertion-qualification.v1",
+  "released_zip_assertion_authenticated": true,
+  "zip_sha256": "a5797a37b1adf720bcd5dcffb291edbbd5b7b14be0a3874c28e6393a655a7a3e",
+  "repository": "gfx-rs/wgpu-native",
+  "tag": "v29.0.1.1",
+  "commit": "6aed50955d934ac36049ba8d002034841633ae02",
+  "verified_TSA_timestamp": "2026-06-23T11:46:58Z",
+  "negative_controls_passed": 27,
+  "local_static_member_relation": "P38 prior byte comparison for this same ZIP; no direct static-archive attestation claimed",
+  "compiler_verified": false,
+  "selected_features_verified": false,
+  "source_build_correspondence_verified": false,
+  "component_closure_verified": false,
+  "redistribution_rights_qualified": false,
+  "full_macos_qualified": false,
+  "public_distribution_qualified": false,
+  "prism_review": {
+    "schema": "vellum.release-verifier-prism-adjudication-final.v1",
+    "result": "APPROVED_SCOPED_CHECKPOINT_ADJUDICATION",
+    "checkpoint_ready": true,
+    "source_changes_required": false,
+    "reviewed_at_utc": "2026-10-16T20:44:56.896077+00:00",
+    "result_review_sha256": "f1c74b838a94ccd780430d510ce5f8b5a96fde63c8631e7e4f488d2bcc137b0f",
+    "verification_receipt_sha256": "201fd1ae88371065b06b678f86b1c31e3609871ab0c0d1d36cb8b4b65674272d",
+    "adjudication_plan_sha256": "5dbcf150db29970994d7ad6b781b6cc6022bb036d008408302753369d103d30c",
+    "provider_report_sha256": "76e116576f99bf88b03c5b9c1faaacdc3842708ac6a25e32c62e9c3b3d6695f0",
+    "provider_execution_sha256": "e3b919f9924c0c3c0846a329ed0b51a21ca05b84e1f454f21ba69848f914c1d1",
+    "raw_provider_counts": {
+      "returned_medium": 3,
+      "discarded": 0,
+      "suppressed": 0
+    },
+    "disposition_counts": {
+      "refuted_for_scope": 1,
+      "fixed_and_reviewed": 2
+    },
+    "dispositions": [
+      {
+        "id": "98d9e7a36e4e9f4a",
+        "disposition": "REFUTED_FOR_SCOPED_RELEASE_POLICY",
+        "basis": "Exact official CLI release policy deliberately uses wildcard OIDC issuer matcher and empty certificate.Extensions, anchored release SAN and authenticated GitHub TUF roots with signed timestamp. Repository/tag/IDs and ZIP/URI commit bind inside the same verified release assertion. Actions/workflow/source-build identity is not claimed; policy was not changed."
+      },
+      {
+        "id": "bd3afd5a5c795d56",
+        "disposition": "FIXED_AND_REVIEWED",
+        "basis": "Pre-Base attempt ledger and deferred failure outcome capture retain admitted Base/read/close/output failures, enforce 64 total attempts including failures and observed-byte aggregate budget. Six actual unit fault/response cases passed, including exhaustion; fresh v3 records 13 complete positive outcomes with hashes and zero refusals. No new live transport-error test is claimed."
+      },
+      {
+        "id": "41e63778115a7102",
+        "disposition": "FIXED_AND_REVIEWED",
+        "basis": "Explicit unique URI/Name target mutation is independent of subject ordering and refuses absent/ambiguous setup. Saved tests pass both orders, all subject mutations, non-no-op checks, exact commit rejection and original-positive independence; fresh actual v3 commit negative fails at the intended digest check."
+      }
+    ],
+    "reviewed_current_module_source_sha256": {
+      "go.mod": "0f0a4bb6e33bc6d78512a4c5daf396ee6d28297e2bf3df35e82c03b42eda3e18",
+      "checkpoint_test.go": "9a421210cd4e52227bd850d6e3c99b6891fcbc3d4787656e307f8efbaf98337f",
+      "go.sum": "7230fceaaed85da4a5d873c7c59647ca1ed8bdbf91fec708881279e32396e6c2",
+      "replay.go": "ee515caa9b641d7387c7bf65d3a445c02c0f944754e198e3ba8bc7cde50b7193",
+      "replay_test.go": "560ad0b6fb94435ad9d6495e464fde6c9bfcebb3667a5fada3143016d7cc7e54",
+      "main.go": "9d235527b89330ab21b8a7d50aac72b59c2cd8d5df1a6d75a12e963c987d1a82",
+      "main_test.go": "c3493460c0d906fddb7341dac03e38def40ced2596704b38174bb362c0b555f4",
+      "testdata/expected.json": "b71901e2faee1e2249faa6eacdf0d76b957a1f3b6441c412490b516ec536b094",
+      "testdata/unverified-statement.json": "49eb8d9607e7a26a6d4bc57f59487cb46992a22d58a7b74cc4fee5d60314cda8"
+    },
+    "reviewed_current_runner_source_sha256": {
+      "run-verifier.py": "5bee3b33f188a7f632eaa93516c3a9104e4576418671e22468181462afc1472c",
+      "test_runner.py": "a159b2b91453333456e0854290a25b703a2e33238b0b71793bd9da16272e653f"
+    },
+    "build_receipt_sha256": "017220b45c061f209e07c76372d9492ef18a05b6429d75be9f3988ccc43657e1",
+    "preflight_review_sha256": "4d663c66513c352636689376d924993c5395ffad68204158a26680840d23662f",
+    "validation": {
+      "Go_roots": 8,
+      "Go_subtests": 34,
+      "Python_roots": 7,
+      "Python_terminal_subcases": 4,
+      "module_verify_vet_build": true,
+      "actual_current_binary_positive_crypto_and_all_27_controls": true,
+      "all_214_pins_stable": true,
+      "recorded_owned_cleanup_successful": true
+    },
+    "findings": [],
+    "unresolved_findings": [],
+    "limits": [
+      "Current narrow fixes were internally reviewed and executed with fresh evidence; they were not re-reviewed by Prism. The provider run remains three returned medium findings, not zero findings.",
+      "Original plan, seven provider inputs, raw provider outcomes including earlier incomplete attempts, v2 result/review and v1 failure remain preserved.",
+      "Checkpoint readiness is for scoped private release-assertion evidence only; no additional native execution, compiler/features/build/source closure/rights/public distribution or full Mac qualification is granted."
+    ]
+  }
+}

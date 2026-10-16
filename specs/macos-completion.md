@@ -41,6 +41,14 @@ advance dependency provenance without completing build reproduction, component
 closure or rights. Unique-name endurance and later grid diagnostics are excluded
 from this completed checkpoint; full Mac/P11 and ordinary frame targets remain open.
 
+The [native GPU release identity checkpoint](../docs/reports/macos-native-release-identity/README.md)
+authenticates the retained WGPU macOS ARM64 ZIP, its repository/tag/numeric IDs
+and commit URI through the official GitHub release certificate policy and normal
+TUF verification. The corrected verifier passes all 27 negative controls; Prism
+returns three medium findings, with two fixed and one refuted for this scope.
+This advances release identity only. Executed compiler/features, source-built
+correspondence, component/rights closure and public Mac distribution remain open.
+
 The human authorized unattended native and performance testing on 15 October
 2026. Prior paused-test notes below describe historical checkpoints. A return
 message stops live testing immediately.
