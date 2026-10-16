@@ -95,3 +95,8 @@ the model assertions and recorded inputs together; acceptance never updates them
 These are software routing results. Native compilation, physical pointer input,
 GPU presentation, cross-display scaling, human accessibility and full P9/P11
 acceptance remain separate.
+
+The instrumentation-only [native workspace smoke runner](cmd/workspace-smoke/README.md)
+provides an 18-action Cocoa/owner scenario for the same stored-data fixture.
+Its native execution and cleanup results are recorded separately from the
+software records and from physical input or performance acceptance.

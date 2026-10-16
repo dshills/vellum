@@ -1,5 +1,19 @@
 # Composed native workbench endurance
 
+The separate [stored-workspace smoke runner](../examples/replay/cmd/workspace-smoke/README.md)
+defines an 18-action native accessibility/owner scenario for 10k or one million
+stored table rows and 100k outline nodes. It uses the independent public example,
+commands/history, palette activation, measured cell selection and two native
+windows. Each proposal is sent once; refused or uncertain outcomes fail. A
+streaming source oracle and completed table/outline geometry are required. Each
+step has a cooperative 30-second helper cap without extending caller deadlines.
+Scenario completion is handed off after application closure returns. Final
+window/service retirement and worker joining are checked separately from an
+external process receipt. Renderer request flags and present-attempt counters do
+not establish actual GPU coverage or OS presentation. Compilation/offscreen
+checks do not qualify a native run. Physical input, the full P9 record, P11,
+performance/memory budgets and overnight endurance retain their own gates.
+
 The Mac workbench has a dedicated `-endurance` mode. It requires a new clean
 absolute `-endurance-output` directory and a 10-second to 12-hour duration.
 Ten seconds is a preflight; at least ten minutes of activity is required for a
