@@ -23,6 +23,24 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [16 October runtime checkpoints](../docs/reports/macos-runtime-checkpoints/README.md)
+complete 1,000 same-name windows and 33,000 native/owner actions on `ddd23c6`,
+including 999 sampled replacements. Separate `97aee13` diagnostics pass five
+actual GPU scene fixtures, native composer-ticket nesting and two composed
+windows with 66 actions. The corrected input fixture reaches native checked-write
+refusal, restoration and readback; its original failure remains retained.
+
+Four eligible 60-second intervals in the eight-minute trace measure
+0.0736–0.0786% of one CPU, with zero recorded primary paint wakes, framework
+empty-event-post attempts and surface-present attempts. These observations meet
+the sampled CPU component only; actual OS wakeups/presentations, continuous state,
+full idle and overnight qualification remain open. The same source's private SDK
+passes 7,381-file integrity and relocated consumer race/vet/build checks without
+native runtime execution. Saved release-byte/source-declaration comparisons
+advance dependency provenance without completing build reproduction, component
+closure or rights. Unique-name endurance and later grid diagnostics are excluded
+from this completed checkpoint; full Mac/P11 and ordinary frame targets remain open.
+
 The human authorized unattended native and performance testing on 15 October
 2026. Prior paused-test notes below describe historical checkpoints. A return
 message stops live testing immediately.

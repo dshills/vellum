@@ -1,0 +1,559 @@
+{
+  "actual_presentations_qualified": false,
+  "actual_wakeups_qualified": false,
+  "documentation_base_commit": "97aee13132b41b35b7c041da7426b22948263f7a",
+  "evidence": {
+    "archive_bytes": 1615260,
+    "archive_sha256": "956f3f735d5008eaeecfa032c3a20360fbf3d9516e006e955783fa9591c04a26",
+    "excluded_local_artifacts": 2,
+    "index_sha256": "24c249e34b44358b87fdeabcf262eb86ed1b8e0f4c097764b7b642693feb1ca0",
+    "indexed_entries": 320,
+    "unique_blobs": 207
+  },
+  "full_idle_budget_qualified": false,
+  "full_mac_qualified": false,
+  "full_p11_qualified": false,
+  "historical_failed_gpu_and_queue_preserved": true,
+  "historical_failed_overnight_preserved": true,
+  "human_voiceover_qualified": false,
+  "native_gpu_memory_qualified": false,
+  "native_recovery": {
+    "cases": {
+      "gpu-scene": {
+        "binary_sha256": "0ad77c70f20adc2f64953fc47ff5781e5df6d1eac3abc2a50b2a63f6e6850b52",
+        "case": "gpu-scene",
+        "cocoa_deallocation_qualified": false,
+        "configuration_sha256": "a6d3553c262218c933aeb15ae6d76d6bba4ebd971ea9efe92d9e69a5b672a802",
+        "continuous_lifetime_coverage": false,
+        "details": {
+          "native_gpu_tests": [
+            "TestVellumGPUSceneNativeInputAttemptBytesFailureAndRecovery",
+            "TestVellumGPUSceneNativeIntegerCompositor",
+            "TestVellumGPUSceneNativeSharedDrawerOrderAndFallback",
+            "TestVellumGPUSceneNativeActualTextAndPaths",
+            "TestVellumGPUSceneNativeCoveredUniforms"
+          ],
+          "native_gpu_tests_passed": 5,
+          "native_gpu_tests_skipped": 0,
+          "performance_target_qualified": false,
+          "physical_input_qualified": false
+        },
+        "elapsed_seconds": 2.6002782080322504,
+        "full_idle_budget_qualified": false,
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "kind": "gpu",
+        "ordinary_performance_targets_qualified": false,
+        "physical_pointer_qualified": false,
+        "result": "PASS_SCOPED_NATIVE_CASE",
+        "review_sha256": "efd64b55ff0a082304c38f46db72442da79b3a74b25c235f4a3bebbca08f5ccf",
+        "run_receipt_sha256": "e5ad1719c55413faf759808da429c4d0e0e032b15392dea9737ca9b1905a8ce7",
+        "source_commit": "97aee13132b41b35b7c041da7426b22948263f7a",
+        "validator_sha256": "268d9dc6e638e5ba8d801d895ca9197aad67794692d0b636ea4e934210ad63e7"
+      },
+      "gpu-ticket": {
+        "binary_sha256": "19966ac01932462cf6d398fb7c64767b1ae73267e6707c6a8c28ce8c9fef786e",
+        "case": "gpu-ticket",
+        "cocoa_deallocation_qualified": false,
+        "configuration_sha256": "a6d3553c262218c933aeb15ae6d76d6bba4ebd971ea9efe92d9e69a5b672a802",
+        "continuous_lifetime_coverage": false,
+        "details": {
+          "native_gpu_tests": [
+            "TestVellumSceneHostNativeComposerTicketNestingAndNoDoubleCount"
+          ],
+          "native_gpu_tests_passed": 1,
+          "native_gpu_tests_skipped": 0,
+          "performance_target_qualified": false,
+          "physical_input_qualified": false
+        },
+        "elapsed_seconds": 2.268994416925125,
+        "full_idle_budget_qualified": false,
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "kind": "gpu",
+        "ordinary_performance_targets_qualified": false,
+        "physical_pointer_qualified": false,
+        "result": "PASS_SCOPED_NATIVE_CASE",
+        "review_sha256": "efd64b55ff0a082304c38f46db72442da79b3a74b25c235f4a3bebbca08f5ccf",
+        "run_receipt_sha256": "ab0e9e11e4ff0b0b7b97c3f7912085057aeaba6e4d6d3bbafe962cdea38c88e1",
+        "source_commit": "97aee13132b41b35b7c041da7426b22948263f7a",
+        "validator_sha256": "268d9dc6e638e5ba8d801d895ca9197aad67794692d0b636ea4e934210ad63e7"
+      },
+      "idle-eligible": {
+        "binary_sha256": "dd8843f36adb2307cbd651536231cbaeaeb87e2bc80eaf838bc3f356a1c95aee",
+        "case": "idle-eligible",
+        "cocoa_deallocation_qualified": false,
+        "configuration_sha256": "a6d3553c262218c933aeb15ae6d76d6bba4ebd971ea9efe92d9e69a5b672a802",
+        "continuous_lifetime_coverage": false,
+        "details": {
+          "actual_presentations_qualified": false,
+          "actual_wakeups_qualified": false,
+          "all_quiet_intervals_eligible": true,
+          "background_commits": 1,
+          "continuously_observed_window_state_qualified": false,
+          "duration_requested_seconds": 480,
+          "eligible_sixty_second_intervals": 4,
+          "empty_event_post_attempts_total": 0,
+          "framework_api_attempts_available": true,
+          "full_idle_budget_qualified": false,
+          "full_mac_qualified": false,
+          "full_p11_qualified": false,
+          "human_voiceover_qualified": false,
+          "limits": [
+            "Window states are sampled at interval endpoints. Background names the allocating-worker phase; it does not certify OS application background.",
+            "Primary paints and framework API attempts are observed; app-wide OS wakeups and actual presents remain unavailable.",
+            "The native PASS labels fixture completion, separate from CPU eligibility and target attainment.",
+            "Forced-GC RSS/Go observations remain sampled safety checks, with no native/GPU attribution."
+          ],
+          "mode": "eligible-requested",
+          "native_activity_samples": 4,
+          "native_cleanup": {
+            "AccessibilityWindows": 0,
+            "CallbacksStopped": true,
+            "CleanupObserved": true,
+            "FilePanels": {
+              "Open": 0,
+              "Save": 0,
+              "Tracked": 0,
+              "Visible": 0
+            },
+            "MainThread": true,
+            "Menu": {
+              "Items": [],
+              "OriginalCaptured": false,
+              "OriginalRestored": false,
+              "Owned": false,
+              "TargetRetired": true
+            },
+            "MenuCallbacks": 0,
+            "NativeOutstanding": 0,
+            "PendingCallbacks": 0,
+            "Tray": {
+              "AccessibilityLabel": "",
+              "Identity": 0,
+              "ImageHeight": 0,
+              "ImageWidth": 0,
+              "Items": [],
+              "PixelHeight": 0,
+              "PixelWidth": 0,
+              "Present": false,
+              "TargetRetired": true,
+              "Template": false,
+              "Title": "",
+              "Tooltip": "",
+              "Visible": false
+            },
+            "TrayCallbacks": 0,
+            "WindowTitles": [],
+            "Windows": [
+              {
+                "Alpha": 1,
+                "ContentViewClass": "NSView",
+                "Frame": [
+                  0,
+                  0,
+                  500,
+                  500
+                ],
+                "IdentityAvailable": true,
+                "Key": false,
+                "Level": 0,
+                "Miniaturized": false,
+                "OcclusionVisible": false,
+                "Opaque": false,
+                "OrderedIndex": -1,
+                "Title": "",
+                "Visible": false,
+                "WindowClass": "NSKVONotifying_TUINSWindow",
+                "WindowNumber": 116288
+              }
+            ]
+          },
+          "native_gpu_memory_qualified": false,
+          "native_selector_actions": 33,
+          "observed_phase_elapsed_seconds": 480.00610341699996,
+          "os_application_background_qualified": false,
+          "overnight_qualified": false,
+          "owned_group_absence_confirmed": true,
+          "owned_process_id": 99578,
+          "phase_samples": {
+            "background": 1,
+            "minimized": 1,
+            "occluded": 1,
+            "visible": 1
+          },
+          "physical_input_qualified": false,
+          "primary_paint_wakes_total": 0,
+          "quiet_cpu_one_core_percent_ranges": {
+            "background": [
+              0.07860560926642442,
+              0.07860560926642442
+            ],
+            "minimized": [
+              0.07357744165103902,
+              0.07357744165103902
+            ],
+            "occluded": [
+              0.07499070272197304,
+              0.07499070272197304
+            ],
+            "visible": [
+              0.07669564824041782,
+              0.07669564824041782
+            ]
+          },
+          "quiet_intervals_with_primary_paints": 0,
+          "result": "COMPLETE_SCOPED_SOAK_TRACE",
+          "sampled_idle_cpu_target_met": true,
+          "surface_present_attempts_total": 0,
+          "total_admissions": 33,
+          "total_attempts": 33
+        },
+        "elapsed_seconds": 492.9576836669585,
+        "full_idle_budget_qualified": false,
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "kind": "soak",
+        "ordinary_performance_targets_qualified": false,
+        "physical_pointer_qualified": false,
+        "result": "PASS_SCOPED_NATIVE_CASE",
+        "review_sha256": "efd64b55ff0a082304c38f46db72442da79b3a74b25c235f4a3bebbca08f5ccf",
+        "run_receipt_sha256": "f9bc66ce57021e215d873c6f9551bab061c788b2dd1aa73563cac0d473003c58",
+        "source_commit": "97aee13132b41b35b7c041da7426b22948263f7a",
+        "validator_sha256": "268d9dc6e638e5ba8d801d895ca9197aad67794692d0b636ea4e934210ad63e7"
+      },
+      "idle-short": {
+        "binary_sha256": "dd8843f36adb2307cbd651536231cbaeaeb87e2bc80eaf838bc3f356a1c95aee",
+        "case": "idle-short",
+        "cocoa_deallocation_qualified": false,
+        "configuration_sha256": "a6d3553c262218c933aeb15ae6d76d6bba4ebd971ea9efe92d9e69a5b672a802",
+        "continuous_lifetime_coverage": false,
+        "details": {
+          "actual_presentations_qualified": false,
+          "actual_wakeups_qualified": false,
+          "all_quiet_intervals_eligible": false,
+          "background_commits": 4,
+          "continuously_observed_window_state_qualified": false,
+          "duration_requested_seconds": 40,
+          "eligible_sixty_second_intervals": 0,
+          "empty_event_post_attempts_total": 0,
+          "framework_api_attempts_available": true,
+          "full_idle_budget_qualified": false,
+          "full_mac_qualified": false,
+          "full_p11_qualified": false,
+          "human_voiceover_qualified": false,
+          "limits": [
+            "Window states are sampled at interval endpoints. Background names the allocating-worker phase; it does not certify OS application background.",
+            "Primary paints and framework API attempts are observed; app-wide OS wakeups and actual presents remain unavailable.",
+            "The native PASS labels fixture completion, separate from CPU eligibility and target attainment.",
+            "Forced-GC RSS/Go observations remain sampled safety checks, with no native/GPU attribution."
+          ],
+          "mode": "short",
+          "native_activity_samples": 16,
+          "native_cleanup": {
+            "AccessibilityWindows": 0,
+            "CallbacksStopped": true,
+            "CleanupObserved": true,
+            "FilePanels": {
+              "Open": 0,
+              "Save": 0,
+              "Tracked": 0,
+              "Visible": 0
+            },
+            "MainThread": true,
+            "Menu": {
+              "Items": [],
+              "OriginalCaptured": false,
+              "OriginalRestored": false,
+              "Owned": false,
+              "TargetRetired": true
+            },
+            "MenuCallbacks": 0,
+            "NativeOutstanding": 0,
+            "PendingCallbacks": 0,
+            "Tray": {
+              "AccessibilityLabel": "",
+              "Identity": 0,
+              "ImageHeight": 0,
+              "ImageWidth": 0,
+              "Items": [],
+              "PixelHeight": 0,
+              "PixelWidth": 0,
+              "Present": false,
+              "TargetRetired": true,
+              "Template": false,
+              "Title": "",
+              "Tooltip": "",
+              "Visible": false
+            },
+            "TrayCallbacks": 0,
+            "WindowTitles": [],
+            "Windows": [
+              {
+                "Alpha": 1,
+                "ContentViewClass": "NSView",
+                "Frame": [
+                  0,
+                  0,
+                  500,
+                  500
+                ],
+                "IdentityAvailable": true,
+                "Key": false,
+                "Level": 0,
+                "Miniaturized": false,
+                "OcclusionVisible": false,
+                "Opaque": false,
+                "OrderedIndex": -1,
+                "Title": "",
+                "Visible": false,
+                "WindowClass": "NSKVONotifying_TUINSWindow",
+                "WindowNumber": 116271
+              }
+            ]
+          },
+          "native_gpu_memory_qualified": false,
+          "native_selector_actions": 33,
+          "observed_phase_elapsed_seconds": 40.008486499,
+          "os_application_background_qualified": false,
+          "overnight_qualified": false,
+          "owned_group_absence_confirmed": true,
+          "owned_process_id": 99304,
+          "phase_samples": {
+            "background": 4,
+            "minimized": 4,
+            "occluded": 4,
+            "visible": 4
+          },
+          "physical_input_qualified": false,
+          "primary_paint_wakes_total": 0,
+          "quiet_cpu_one_core_percent_ranges": {
+            "background": [
+              0.1349122956752189,
+              0.18600441511010676
+            ],
+            "minimized": [
+              0.09514446657941387,
+              0.18061856375654423
+            ],
+            "occluded": [
+              0.12413761454479563,
+              0.23783166972442618
+            ],
+            "visible": [
+              0.07244687143860962,
+              0.12815255523085564
+            ]
+          },
+          "quiet_intervals_with_primary_paints": 0,
+          "result": "COMPLETE_SCOPED_SOAK_TRACE",
+          "sampled_idle_cpu_target_met": false,
+          "surface_present_attempts_total": 0,
+          "total_admissions": 33,
+          "total_attempts": 33
+        },
+        "elapsed_seconds": 52.96909558295738,
+        "full_idle_budget_qualified": false,
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "kind": "soak",
+        "ordinary_performance_targets_qualified": false,
+        "physical_pointer_qualified": false,
+        "result": "PASS_SCOPED_NATIVE_CASE",
+        "review_sha256": "efd64b55ff0a082304c38f46db72442da79b3a74b25c235f4a3bebbca08f5ccf",
+        "run_receipt_sha256": "920e99caacd056c694f63b592cacc0b2699a9eb20a4f30419009e61eaf338315",
+        "source_commit": "97aee13132b41b35b7c041da7426b22948263f7a",
+        "validator_sha256": "268d9dc6e638e5ba8d801d895ca9197aad67794692d0b636ea4e934210ad63e7"
+      },
+      "lifecycle-two": {
+        "binary_sha256": "dd8843f36adb2307cbd651536231cbaeaeb87e2bc80eaf838bc3f356a1c95aee",
+        "case": "lifecycle-two",
+        "cocoa_deallocation_qualified": false,
+        "configuration_sha256": "a6d3553c262218c933aeb15ae6d76d6bba4ebd971ea9efe92d9e69a5b672a802",
+        "continuous_lifetime_coverage": false,
+        "details": {
+          "actions": 66,
+          "cycles": 2,
+          "hidden_inactive_untitled_native_windows": 1,
+          "menu_restoration_qualified": false,
+          "native_cleanup": {
+            "AccessibilityWindows": 0,
+            "CallbacksStopped": true,
+            "CleanupObserved": true,
+            "FilePanels": {
+              "Open": 0,
+              "Save": 0,
+              "Tracked": 0,
+              "Visible": 0
+            },
+            "MainThread": true,
+            "Menu": {
+              "Items": [],
+              "OriginalCaptured": false,
+              "OriginalRestored": false,
+              "Owned": false,
+              "TargetRetired": true
+            },
+            "MenuCallbacks": 0,
+            "NativeOutstanding": 0,
+            "PendingCallbacks": 0,
+            "Tray": {
+              "AccessibilityLabel": "",
+              "Identity": 0,
+              "ImageHeight": 0,
+              "ImageWidth": 0,
+              "Items": [],
+              "PixelHeight": 0,
+              "PixelWidth": 0,
+              "Present": false,
+              "TargetRetired": true,
+              "Template": false,
+              "Title": "",
+              "Tooltip": "",
+              "Visible": false
+            },
+            "TrayCallbacks": 0,
+            "WindowTitles": [],
+            "Windows": [
+              {
+                "Alpha": 1,
+                "ContentViewClass": "NSView",
+                "Frame": [
+                  0,
+                  0,
+                  500,
+                  500
+                ],
+                "IdentityAvailable": true,
+                "Key": false,
+                "Level": 0,
+                "Miniaturized": false,
+                "OcclusionVisible": false,
+                "Opaque": false,
+                "OrderedIndex": -1,
+                "Title": "",
+                "Visible": false,
+                "WindowClass": "NSKVONotifying_TUINSWindow",
+                "WindowNumber": 116257
+              }
+            ]
+          },
+          "queue_admissions_are_not_accepted_callbacks": true,
+          "retry_cause_observed": false,
+          "same_name": true,
+          "sampled_go_heap_bytes": [
+            30139448,
+            76606216
+          ],
+          "sampled_replacements_verified": 1,
+          "sampled_rss_bytes": [
+            186449920,
+            415449088
+          ],
+          "steps_per_cycle": 33,
+          "total_admissions": 66,
+          "total_attempts": 66,
+          "zero_cocoa_windows_qualified": false
+        },
+        "elapsed_seconds": 24.520331832929514,
+        "full_idle_budget_qualified": false,
+        "full_mac_qualified": false,
+        "full_p11_qualified": false,
+        "kind": "lifecycle",
+        "ordinary_performance_targets_qualified": false,
+        "physical_pointer_qualified": false,
+        "result": "PASS_SCOPED_NATIVE_CASE",
+        "review_sha256": "efd64b55ff0a082304c38f46db72442da79b3a74b25c235f4a3bebbca08f5ccf",
+        "run_receipt_sha256": "1e07f3daea841a6d12aca4ad286eab7c8a23272e5f9a88dee3495a446d21fdad",
+        "source_commit": "97aee13132b41b35b7c041da7426b22948263f7a",
+        "validator_sha256": "268d9dc6e638e5ba8d801d895ca9197aad67794692d0b636ea4e934210ad63e7"
+      }
+    },
+    "prepared": 6243,
+    "result_review_sha256": "6f84c9131bb144dfa8a6d190baa590106573a668c98b01a419ebf7f5e88075f6",
+    "source_commit": "97aee13132b41b35b7c041da7426b22948263f7a",
+    "tracked": 4585
+  },
+  "observed_date": "2026-10-16",
+  "ordinary_performance_targets_qualified": false,
+  "overnight_qualified": false,
+  "pending_results_excluded": [
+    "unique-name1000",
+    "later-eight-grid-diagnostics"
+  ],
+  "physical_interaction_qualified": false,
+  "private_sdk": {
+    "archive": {
+      "all_manifest_member_hashes_and_sizes_verified": true,
+      "all_member_paths_unique_safe_regular": true,
+      "bytes": 18479647,
+      "compiled_native_executable_headers_found": [],
+      "exact_member_set_verified": true,
+      "manifest_files": 7381,
+      "manifest_sha256": "c61013a260e0439c3d7b129efbbcb3c43555e9f419bb5e4f301649b2b76678ba",
+      "private_build": true,
+      "regular_members": 7382,
+      "sha256": "fce1e78ffe3b99aeb3745d6cc682ef1315ad9a446d3cbc6088f24277b037dbdb",
+      "untracked_files": [],
+      "version": "v0.1.0-alpha.2"
+    },
+    "checks": {
+      "package": {
+        "elapsed_seconds": 4.7505294169532135,
+        "exit_code": 0,
+        "receipt_sha256": "685b2b58c8b8553f5aa86eb1bb31d9b73caad7b9f1e3e98ec9c98424a14276e1",
+        "source_stable": true
+      },
+      "relocate": {
+        "checks": [
+          "manifest all-file integrity",
+          "external Go module cache verification",
+          "standalone consumer race/vet/build",
+          "public API scenarios race/vet"
+        ],
+        "elapsed_seconds": 46.7819036670262,
+        "exit_code": 0,
+        "path_contains_spaces": true,
+        "receipt_sha256": "6735527ca909647573872c505c48dfd5d749b360315823bbe2134ad2b98d37fc",
+        "runtime_requested": false,
+        "source_stable": true,
+        "verified_files": 7381
+      }
+    },
+    "native_runtime_executed": false,
+    "public_distribution_qualified": false,
+    "review_sha256": "716153a4c031663f6e6a707d5c7820746ecdaddec731f6761a917da8d6a3d7fc",
+    "source_commit": "97aee13132b41b35b7c041da7426b22948263f7a"
+  },
+  "public_distribution_qualified": false,
+  "review_sha256": {
+    "fixture_source": "0f296cf830293315e037aa866b0579464a8ed72c37d2cff0038e65f18205fc42",
+    "native_recovery": "6f84c9131bb144dfa8a6d190baa590106573a668c98b01a419ebf7f5e88075f6",
+    "release_byte_comparison": "2fdaa0b7941e8d40ddef9819aa151a7a5dd577ee24512ef5223055d0a1075e8a",
+    "release_source_declarations": "50072e9bf6c35e84e61ae90275e62906eaca706b67eae3bee8a5f67b003f07a7",
+    "same_name": "e450e24220e3ba3714251acc9f723dac0baabebfbf91233765550cef2a21d161",
+    "sdk": "716153a4c031663f6e6a707d5c7820746ecdaddec731f6761a917da8d6a3d7fc"
+  },
+  "same_name_lifecycle": {
+    "actions": 33000,
+    "binary_sha256": "1d2b0d40155874542fd153aab3a4d8c4e46b3b7f629e6823de8fa9019c309c30",
+    "cycles": 1000,
+    "elapsed_seconds": 11279.408880166942,
+    "hidden_inactive_untitled_native_windows": 1,
+    "menu_restoration_qualified": false,
+    "sampled_go_heap_bytes": [
+      30154216,
+      88456608
+    ],
+    "sampled_replacements_verified": 999,
+    "sampled_rss_bytes": [
+      185368576,
+      495763456
+    ],
+    "source_commit": "ddd23c6ea06ef7baf1014a08c61d01601c059f36",
+    "total_admissions": 33098,
+    "total_attempts": 33098,
+    "zero_cocoa_windows_qualified": false
+  },
+  "schema": "vellum.macos.runtime-checkpoints.v1"
+}
