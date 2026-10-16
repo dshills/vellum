@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "result": "PROVIDER_FINDINGS_ADDRESSED_WITH_NARROW_TRACEABILITY_FIX",
+  "prism_report_sha256": "73f8b7dabf640bcda6385d832a0031778e991b8fffd334eb226dfaa7011d78c1",
+  "prism_execution_sha256": "1a6a271b899031b1b1d9c4f5ddf56dc8937b750de5d70a08fc7bfe5eafcd29fb",
+  "observed_finding_counts": {
+    "findings": 1,
+    "discarded": 1,
+    "suppressed": 0
+  },
+  "all_findings_triaged": true,
+  "unresolved_blocking_findings": [],
+  "source_changed": true,
+  "provider_reviewed_sources": {
+    "docs/reports/macos-parent-graph-endurance/README.md": "7fcfb311b6b75d6efe401dbb824c2b6ef76d1b15bf4f53ebcaaf1da1965d1720",
+    "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+    "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+    "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+  },
+  "final_sources": {
+    "docs/reports/macos-parent-graph-endurance/README.md": "b05454a5378ec2d827266069db0efdd2833f7612fc31086f1546f17968f3e81b",
+    "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+    "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+    "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+  },
+  "final_fix_provider_rerun": false,
+  "final_fix_requires_internal_review": true,
+  "dispositions": [
+    {
+      "id": "bc0f6ba65055fc6c",
+      "channel": "findings",
+      "disposition": "FIXED_EXACT_ARCHIVE_ENTRY_REFERENCES",
+      "evidence": [
+        "evidence/run/completion-evidence-review.json",
+        "evidence/run/history/controller-v1/controls.json",
+        "evidence/run/history/controller-v2/controls-v2.json",
+        "evidence/scheduling-predecessor/soak-overnight.json"
+      ],
+      "changed_file": "docs/reports/macos-parent-graph-endurance/README.md"
+    },
+    {
+      "id": "5d8bac8e24391b60",
+      "channel": "discarded",
+      "disposition": "ADDRESSED_BY_COMMITTING_BOUND_RECORDS_IN_SAME_CHECKPOINT",
+      "evidence": "Archive, index, completed qualification, actual provider records and internal reviews are included in the final Git file vector. The tool discard is not used as a reason to ignore the concern."
+    }
+  ],
+  "scope": "No runtime or raw evidence changed. One provider review covers the pre-fix four-source vector; the additive traceability fix and final package require a separate internal sealed-stage review."
+}

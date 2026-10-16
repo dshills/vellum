@@ -1,0 +1,196 @@
+{
+  "schema": "vellum-current-source-macos-composed-lifecycle-v1",
+  "result": "PASS_SCOPED_LIFECYCLE_EVIDENCE_CHECKPOINT",
+  "recorded_utc": "2026-10-16T09:14:21.023941+00:00",
+  "executed_source_commit": "6330b2d42050b46c2019e558074e087ed281e56a",
+  "checkpoint_sources": {
+    "docs/reports/macos-parent-graph-endurance/README.md": "b05454a5378ec2d827266069db0efdd2833f7612fc31086f1546f17968f3e81b",
+    "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+    "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+    "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+  },
+  "archive": {
+    "file": "evidence.tar.xz",
+    "sha256": "9b95d7585db56859d6bc22c96217ac40a3b85f2e8304814286a4743a32b6286c",
+    "bytes": 1869364
+  },
+  "archive_index_sha256": "fcb2a411fdd4c86b04795cebd0a205a98f696dd6cd33bacf0b6c4983c33f7ce3",
+  "internal_evidence_review_sha256": "2be0a40ef53eb804ec820112b6d6c9e15e7ef8fb152280b2ce27b47b4cce5995",
+  "strict_validation_sha256": "9fe6e5052c3be95eab20cc1e3f25db548608cbe9a2cb965339540fe1933e354e",
+  "validation_result": "PASS_SCOPED_NATIVE_CASE",
+  "cycles": 1000,
+  "actions": 33000,
+  "extra_queue_admissions": 54,
+  "source_tracked_files": 4490,
+  "prepared_files": 6229,
+  "recorded_and_fresh_owned_process_absence_checked": true,
+  "zero_cocoa_windows_qualified": false,
+  "original_menu_restoration_qualified": false,
+  "professional_memory_qualified": false,
+  "ordinary_frame_budget_qualified": false,
+  "full_overnight_qualified": false,
+  "physical_input_qualified": false,
+  "human_accessibility_qualified": false,
+  "full_mac_qualified": false,
+  "report_source_review_pending": false,
+  "provider_review_pending": false,
+  "checkpoint_complete": true,
+  "sealed_utc": "2026-10-16T09:31:26.715760+00:00",
+  "final_sealed_stage_internal_review_required": false,
+  "internal_source_review_sha256": "632d5928126fabe6f25732a8fd6310176e11fa418941e0f23d72952d56df9ec6",
+  "provider_review": {
+    "execution_sha256": "1a6a271b899031b1b1d9c4f5ddf56dc8937b750de5d70a08fc7bfe5eafcd29fb",
+    "report_sha256": "73f8b7dabf640bcda6385d832a0031778e991b8fffd334eb226dfaa7011d78c1",
+    "resolution_sha256": "9b938ebc72e95618a73dbea427582593494c434b49db5f8527f514b310ba7f45",
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 4,
+      "bytes": 11402,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 6080,
+          "output": 1602,
+          "costUSD": 0.02818
+        }
+      ],
+      "widenedFiles": 1,
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "counts": {
+      "findings": 1,
+      "discarded": 1,
+      "suppressed": 0
+    },
+    "reviewed_sources": {
+      "docs/reports/macos-parent-graph-endurance/README.md": "7fcfb311b6b75d6efe401dbb824c2b6ef76d1b15bf4f53ebcaaf1da1965d1720",
+      "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+      "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+      "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+    },
+    "final_traceability_fix_provider_reviewed": false,
+    "final_traceability_fix_internal_review_required": false,
+    "final_traceability_fix_internally_reviewed": true
+  },
+  "records": {
+    "archive-index.json": {
+      "bytes": 19749,
+      "sha256": "fcb2a411fdd4c86b04795cebd0a205a98f696dd6cd33bacf0b6c4983c33f7ce3"
+    },
+    "checkpoint-report-sources.json": {
+      "bytes": 425,
+      "sha256": "a316541a26766abadab53a7d474b2306773c0d70f4e2d80cb2cb7dadf3a5b667"
+    },
+    "checkpoint-source-review-final.json": {
+      "bytes": 5377,
+      "sha256": "632d5928126fabe6f25732a8fd6310176e11fa418941e0f23d72952d56df9ec6"
+    },
+    "checkpoint-source-review.json": {
+      "bytes": 7253,
+      "sha256": "b36691703aefd4f4dd573006c1b93a050ed13774fcd3c9a63a557ca9b1c75d34"
+    },
+    "correct_report.py": {
+      "bytes": 2937,
+      "sha256": "7ad2d34b8ee76a20cdacaf24b5387632f3e11e3624aa6391d9cd33ea2e541cf1"
+    },
+    "evidence.tar.xz": {
+      "bytes": 1869364,
+      "sha256": "9b95d7585db56859d6bc22c96217ac40a3b85f2e8304814286a4743a32b6286c"
+    },
+    "finalize_checkpoint.py": {
+      "bytes": 2647,
+      "sha256": "ba02a04b041af2cfaf93d82c543a4da8c9efeedc41cbd95c024c5dbdf65ceaec"
+    },
+    "prepare_final_review.py": {
+      "bytes": 1408,
+      "sha256": "80a52ba7ddd764c4f2b8c76b3419ab3c900f67f89cfe563746d361d62bf71557"
+    },
+    "prism-execution.json": {
+      "bytes": 2227,
+      "sha256": "1a6a271b899031b1b1d9c4f5ddf56dc8937b750de5d70a08fc7bfe5eafcd29fb"
+    },
+    "prism-staged.diff": {
+      "bytes": 9964,
+      "sha256": "ddf3ef722f7c92c5e1ee533dc649e08189194846cc44d3c8945ba353b4bd76bb"
+    },
+    "prism.json": {
+      "bytes": 3662,
+      "sha256": "73f8b7dabf640bcda6385d832a0031778e991b8fffd334eb226dfaa7011d78c1"
+    },
+    "prism.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism_run.py": {
+      "bytes": 3713,
+      "sha256": "986a721efa69d04bcf801ca67af7d09d90d5551b6f2c3e7a8debe86c4e6e9d1c"
+    },
+    "provider-resolution.json": {
+      "bytes": 2555,
+      "sha256": "9b938ebc72e95618a73dbea427582593494c434b49db5f8527f514b310ba7f45"
+    },
+    "provider-reviewed-sources/docs/reports/README.md": {
+      "bytes": 5045,
+      "sha256": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1"
+    },
+    "provider-reviewed-sources/docs/reports/macos-parent-graph-endurance/README.md": {
+      "bytes": 5755,
+      "sha256": "7fcfb311b6b75d6efe401dbb824c2b6ef76d1b15bf4f53ebcaaf1da1965d1720"
+    },
+    "provider-reviewed-sources/specs/macos-completion.md": {
+      "bytes": 58957,
+      "sha256": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e"
+    },
+    "provider-reviewed-sources/specs/workbench-endurance.md": {
+      "bytes": 15771,
+      "sha256": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+    },
+    "report-correction.json": {
+      "bytes": 1356,
+      "sha256": "ac1acaff4bf342a28a7a3373af1e92149eddd5cfce1c5f9db05ba93c6cc89bf6"
+    },
+    "seal_checkpoint.py": {
+      "bytes": 6999,
+      "sha256": "22f47fdffe0ebe6c0ee04a99bd92bae2d1b83336d88b1911db04f8f4c54ba3f4"
+    },
+    "sealed-checkpoint-files.json": {
+      "bytes": 5224,
+      "sha256": "52742f83d7c573ba95e91c9b1cdaaac445929f399900f0142332d5fafe256d26"
+    },
+    "sealed-stage-review.json": {
+      "bytes": 9602,
+      "sha256": "d1f3691c127afd4ae41bca5584d00caa29e7fd35fbf00fd0a24659645c578de5"
+    },
+    "sealed-stage-review.md": {
+      "bytes": 1286,
+      "sha256": "7ee6f77138f4682d10df0d80997aaa6b1896b2c55bc8cef218b1c5a8885cade5"
+    },
+    "stage-checkpoint.json": {
+      "bytes": 739,
+      "sha256": "cda924cfff7fc4077034899421232bc12614182f22117ae385b30e7053613833"
+    },
+    "stage_checkpoint.py": {
+      "bytes": 1754,
+      "sha256": "210bb12e71b11a619494aa33fb403e0c1b6af5901025ca933baa5ad8300c8378"
+    }
+  },
+  "seal_producer_sha256": "22f47fdffe0ebe6c0ee04a99bd92bae2d1b83336d88b1911db04f8f4c54ba3f4",
+  "final_internal_review_sha256": "d1f3691c127afd4ae41bca5584d00caa29e7fd35fbf00fd0a24659645c578de5"
+}

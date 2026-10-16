@@ -1,0 +1,119 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "a5d76b4c506d48c139136230ab310628",
+  "repo": {
+    "root": "/Users/dshills/Development/projects/Vellum",
+    "head": "6330b2d42050b46c2019e558074e087ed281e56a",
+    "branch": "codex/foundation-completion"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": "low"
+  },
+  "findings": [
+    {
+      "id": "bc0f6ba65055fc6c",
+      "severity": "low",
+      "category": "docs",
+      "title": "Unverifiable review claim without a reference",
+      "message": "The README says the internal review reports no unresolved findings, but gives no link or identifier for the review. It also points to earlier controller-fault records without naming them. A reader cannot trace these assertions to anything.",
+      "suggestion": "Link the internal review record and the preserved controller-fault and failed-soak records by path or archive-index entry.",
+      "confidence": 0.3,
+      "locations": [
+        {
+          "path": "docs/reports/macos-parent-graph-endurance/README.md",
+          "lines": {
+            "start": 69,
+            "end": 69
+          }
+        }
+      ],
+      "tags": [
+        "traceability",
+        "location-corrected"
+      ],
+      "evidence": "findings. The earlier controller-fault and failed-soak records remain preserved.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 14529,
+    "totalMs": 14545
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 11402,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 6080,
+        "output": 1602,
+        "costUSD": 0.02818
+      }
+    ],
+    "widenedFiles": 1,
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "5d8bac8e24391b60",
+        "severity": "low",
+        "category": "docs",
+        "title": "Referenced evidence artifacts are not part of this change",
+        "message": "The report's central claims (PASS_SCOPED_NATIVE_CASE, SHA-256 of the raw log, the qualification binding, the internal review result) rest on files under `records/`. None of those files is in this diff. If they are not committed elsewhere, the links and claims cannot be checked, and the specs point at a result nobody can verify.",
+        "suggestion": "Confirm that `records/archive-index.json`, `records/evidence.tar.xz` and `records/qualification.json` are committed in the same change, or state where they are stored (for example an artifact store with its hash).",
+        "confidence": 0.3,
+        "locations": [
+          {
+            "path": "docs/reports/macos-parent-graph-endurance/README.md",
+            "lines": {
+              "start": 77,
+              "end": 80
+            }
+          }
+        ],
+        "tags": [
+          "evidence",
+          "traceability"
+        ],
+        "evidence": "`records/archive-index.json` and retained in `records/evidence.tar.xz`",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in docs/reports/macos-parent-graph-endurance/README.md"
+    }
+  ],
+  "suppressed": []
+}

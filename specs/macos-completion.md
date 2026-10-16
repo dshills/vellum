@@ -887,3 +887,21 @@ and does not qualify the failed 4/6 ms ordinary targets, native/GPU memory,
 current-source endurance, successful overnight, physical input, human IME/
 VoiceOver, distribution or full Mac completion. The earlier failed soak remains
 failed and retained.
+
+
+## Current-source composed lifecycle result
+
+The [current-source lifecycle check](../docs/reports/macos-parent-graph-endurance/README.md)
+completes 1,000 fresh windows and all 33,000 version-2 native/owner actions on
+committed `6330b2d`, including the current ListBox and named Canvas2D paths.
+Exact event order, completion predicates, density, sampled memory, source/build
+bindings, terminal cleanup and fresh owned-process absence are checked. Fifty-four
+actions retry once; the additional queue admissions have no observed cause and
+are not accepted callback counts. One hidden inactive untitled Cocoa window and
+false original-menu restoration remain explicit pre-exit limitations.
+
+This closes that source's current 33-step execution gate, with no qualification
+for native/GPU/private memory or unbounded retention, ordinary frame/input latency,
+physical display/pointer or human accessibility. The failed overnight stays failed;
+full idle, P4/P6/P9/P11, interoperability, distribution and Mac acceptance remain
+open. Later source changes need their own appropriate runtime evidence.

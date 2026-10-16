@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "reviewed_utc": "2026-10-16T09:18:39.300807+00:00",
+  "result": "NEEDS_REPORT_CORRECTIONS",
+  "sources": {
+    "docs/reports/macos-parent-graph-endurance/README.md": "d3362e8dc0ec857fee0f779f4b4cae964bef51c87805fede04d892715193d48a",
+    "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+    "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+    "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+  },
+  "reviewed_artifact_sha256": {
+    "checkpoint-report-sources.json": "ac392fcf4315380eb3958b6d84d7b2009319eedf259812a299ef5b0819095c4e",
+    "completion-evidence-review.json": "2be0a40ef53eb804ec820112b6d6c9e15e7ef8fb152280b2ce27b47b4cce5995",
+    "completion-analysis.json": "d3251e22215efa47dca2711175dbdbe49cd36d2767364152827888c0c953148d",
+    "window-thousand-validation.json": "9fe6e5052c3be95eab20cc1e3f25db548608cbe9a2cb965339540fe1933e354e",
+    "archive_completed.py": "a4dc69f3c550ad438a726758aa6303faec21a426e99f0eba1337ae75ff706923",
+    "draft_report.py": "82c11daf18cc0610911425bc95f3c511f0be4d39305723e68ac9841b4d5a68f0"
+  },
+  "sealed_record_sha256": {
+    "archive-index.json": "fcb2a411fdd4c86b04795cebd0a205a98f696dd6cd33bacf0b6c4983c33f7ce3",
+    "qualification.json": "1e493cf5d75e63d89ad2013acdae30eed97874dd10b96c720e3e749d7bef002e",
+    "evidence.tar.xz": "9b95d7585db56859d6bc22c96217ac40a3b85f2e8304814286a4743a32b6286c"
+  },
+  "bundle_manifest_sha256": "e986be9202595efc4162762f512216ec1f919464629beea753c1ee3c9310107d",
+  "baseline_append_only_checks": {
+    "docs/reports/README.md": {
+      "baseline_sha256": "82e6556e2206a584b272ca53ea2e54b9cf18fecac220becbdaff86dfe5d211a2",
+      "baseline_bytes": 4764,
+      "appended_bytes": 281
+    },
+    "specs/macos-completion.md": {
+      "baseline_sha256": "8f835b4ec703b75d5b4b213127afe6cacbfda7f82e5ebe85485e416738a649a2",
+      "baseline_bytes": 57866,
+      "appended_bytes": 1091
+    },
+    "specs/workbench-endurance.md": {
+      "baseline_sha256": "865b8e9d7f89a06e10ea91c09d721e84365c75ec3718d48d879592b29bf282c4",
+      "baseline_bytes": 14876,
+      "appended_bytes": 895
+    }
+  },
+  "findings": [
+    {
+      "id": "LIFECYCLE-REPORT-01",
+      "priority": 2,
+      "file": "docs/reports/macos-parent-graph-endurance/README.md",
+      "title": "Separate ordinary ListBox identity proof from scoped tree/canvas generation proof",
+      "quote": "List/canvas/tree native identities, generation and scope are checked against owner publication by the bound fixture.",
+      "evidence": "selectionListCompleted checks ordinary native host/row identities, values/selected/disabled metadata, clipped frames and stability across its three proposals. It does not test GridScope or GridGeneration. Tree/canvas predicates separately require completed scoped incarnation/generation and owner/publication agreement. The collective sentence overstates what is checked for the ordinary list.",
+      "recommendation": "State the ListBox identity/value/clipping checks separately, and scope generation/incarnation/namespace proof specifically to the tree and named canvas paths."
+    },
+    {
+      "id": "LIFECYCLE-REPORT-02",
+      "priority": 2,
+      "file": "docs/reports/macos-parent-graph-endurance/README.md",
+      "title": "Describe fixture clipboard/preferences declarations without claiming a global disable",
+      "quote": "Clipboard access and preference changes are disabled and reported false by the fixture; global OS state is outside this observation.",
+      "evidence": "main.go explicitly disables only the fixture window geometry saver; clipboard_access/preferences_changed false are literal fixture report declarations, not a general OS clipboard/preferences disable or global observation. The final clause limits global observation but does not make the claimed general disable implemented.",
+      "recommendation": "Say the fixture requests no general clipboard or OS preference changes, explicitly name disabled fixture geometry persistence, and retain that global OS state is not observed."
+    }
+  ],
+  "unresolved_findings": [
+    "LIFECYCLE-REPORT-01",
+    "LIFECYCLE-REPORT-02"
+  ],
+  "archive_integrity": {
+    "approved_for_current_prepared_scope": true,
+    "regular_members": 119,
+    "uncompressed_bytes": 23508215,
+    "compressed_bytes": 1869364,
+    "all_member_sets_sizes_and_sha256_match": true,
+    "safe_relative_regular_paths_only": true,
+    "private_executables_excluded": true,
+    "compiled_executable_magic_absent": true,
+    "portable_replay_claimed": false,
+    "durable_payload_files_verified": 116,
+    "durable_payload_bytes": 23464023,
+    "raw_evidence_and_failed_predecessor_retained": true
+  },
+  "qualification_scope": {
+    "result": "PREPARED_SCOPED_LIFECYCLE_EVIDENCE_CHECKPOINT",
+    "report_source_review_pending": true,
+    "provider_review_pending": true,
+    "checkpoint_complete": false,
+    "source_runtime": "6330b2d42050b46c2019e558074e087ed281e56a",
+    "new_gpu_draft_qualified": false
+  },
+  "observations": [
+    "The three existing document files are exact baseline prefixes plus appended text; historical text is unchanged. The new report otherwise reconciles completed cycles/actions/retries, sampled memory, native cleanup, original failed overnight and broad qualification limits with the approved evidence review.",
+    "All 119 tar members were read and hashed without filesystem extraction. They equal the index and 116 verified durable payloads plus the bundle manifest and two checkpoint producers. Private binary identity is retained outside the archive; only its metadata is included.",
+    "The qualification record correctly remains PREPARED with report/provider pending and checkpoint_complete=false. This review does not convert it into completed acceptance or commit readiness.",
+    "The four current report/spec files are separately bound by qualification; this initial raw archive does not itself include those report/spec bytes or a future provider result. Final checkpoint materialization must retain exact final sources/provider records and final review association.",
+    "The raw evidence remains a current-source version-2 33-step bounded lifecycle, not portable replay, full retention/professional memory, ordinary performance, successful overnight, physical/human or full Mac/P11 acceptance."
+  ],
+  "remaining_gates": [
+    "Preserve this exact V1 source/record endpoint, correct the two report sentences, refresh source bindings and review the narrow text delta.",
+    "Run the separately authorized scoped provider checkpoint only after source review readiness, preserve its actual output/counts/dispositions, then finish pending qualification/archive associations and final commit review.",
+    "No repeat runtime or strict-validator execution is required by these wording corrections; no native/Go/SDK result transfers to the separate unbuilt diagnostic draft."
+  ],
+  "prism_ready": false,
+  "commit_ready": false,
+  "reviewer_actions": {
+    "read_hash_parse_tar_only": true,
+    "validator_test_build_native_process_provider_run": false,
+    "overlay_canonical_frozen_sources_modified": false
+  }
+}

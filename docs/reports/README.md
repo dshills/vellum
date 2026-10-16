@@ -64,3 +64,5 @@ A passing local check does not imply production or cross-platform certification.
 - [One-pass glyph fingerprint](macos-glyph-fingerprint/README.md): fused geometry validation/internal hashing with exact normalized path equality and software capture parity.
 
 - [Native accessibility parent graph](macos-ax-parent-graph/README.md): bounded shared parent validation, independent oracle coverage, matched topology observations and scoped live Cocoa routing.
+
+- [Current-source composed lifecycle](macos-parent-graph-endurance/README.md): committed `6330b2d` completes 1,000 windows and the current 33,000-action plan; terminal/source/cleanup evidence is scoped separately from memory, performance, overnight and physical/human acceptance.

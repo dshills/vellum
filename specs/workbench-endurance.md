@@ -216,3 +216,16 @@ projection guides test scheduling and is not a sustained-performance result.
 The 1000-cycle cap, 33-step plan, sample-every-25 cadence, 512 MiB sampled Go
 heap and 1 GiB sampled RSS guards are unchanged; the bounded profile is still
 8 MiB maximum. Complete current-source execution and cleanup remain required.
+
+
+The [committed `6330b2d` campaign](../docs/reports/macos-parent-graph-endurance/README.md)
+now completes the current 1,000-window/33,000-action mix under that unchanged
+four-hour bound, with 41 forced-GC samples and a bounded final Go heap profile.
+Exact raw order, action/owner/native completion and source/cleanup bindings pass
+the strict post-terminal validator. Fifty-four extra queue attempts/admissions
+remain separate from 33,000 completed actions; their causes were not observed.
+The terminal snapshot retains one hidden inactive untitled Cocoa window and no
+original-menu-restoration proof. Sample ranges and a Go profile do not establish
+unbounded-retention, native/GPU/private allocation budgets or the empty-control
+baseline. The original failed overnight remains failed. Physical/human, ordinary
+latency, full idle/wake/present and P11/Mac requirements remain unchanged and open.

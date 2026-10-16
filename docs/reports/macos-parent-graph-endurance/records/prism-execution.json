@@ -1,0 +1,53 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "low",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--chunk-bytes",
+    "48000",
+    "--max-diff-bytes",
+    "250000",
+    "--format",
+    "json",
+    "--out",
+    "/private/tmp/vellum-macos-parent-graph-endurance/prism.json"
+  ],
+  "cwd": "/Users/dshills/Development/projects/Vellum",
+  "producer_sha256": "986a721efa69d04bcf801ca67af7d09d90d5551b6f2c3e7a8debe86c4e6e9d1c",
+  "review_sha256": "632d5928126fabe6f25732a8fd6310176e11fa418941e0f23d72952d56df9ec6",
+  "sources": {
+    "docs/reports/macos-parent-graph-endurance/README.md": "7fcfb311b6b75d6efe401dbb824c2b6ef76d1b15bf4f53ebcaaf1da1965d1720",
+    "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+    "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+    "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+  },
+  "staged_sources": {
+    "docs/reports/macos-parent-graph-endurance/README.md": "7fcfb311b6b75d6efe401dbb824c2b6ef76d1b15bf4f53ebcaaf1da1965d1720",
+    "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+    "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+    "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+  },
+  "staged_diff_sha256": "ddf3ef722f7c92c5e1ee533dc649e08189194846cc44d3c8945ba353b4bd76bb",
+  "started_utc": "2026-10-16T09:29:46.098941+00:00",
+  "exit_code": 0,
+  "error": null,
+  "elapsed_seconds": 14.588763082982041,
+  "finished_utc": "2026-10-16T09:30:00.710568+00:00",
+  "sources_stable": true,
+  "staged_sources_stable": true,
+  "staged_diff_stable": true,
+  "json_sha256": "73f8b7dabf640bcda6385d832a0031778e991b8fffd334eb226dfaa7011d78c1",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

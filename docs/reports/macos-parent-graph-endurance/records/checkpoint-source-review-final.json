@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "reviewed_utc": "2026-10-16T09:25:10.791590+00:00",
+  "result": "APPROVED_SOURCE_AND_SCOPED_EVIDENCE",
+  "sources": {
+    "docs/reports/macos-parent-graph-endurance/README.md": "7fcfb311b6b75d6efe401dbb824c2b6ef76d1b15bf4f53ebcaaf1da1965d1720",
+    "docs/reports/README.md": "7c77d0850fd11beb42ea2c469ad0b749c31a979498dec21ae94dd6a8c1081fa1",
+    "specs/macos-completion.md": "9dc920bec8c2bd19a46fcd1519449117bef79a5979d29f0cfed787498fea3d8e",
+    "specs/workbench-endurance.md": "ef56234468d14ed6568ba1998b29a8be08589a262d59197bcdbaa8e1f9641150"
+  },
+  "prism_ready": true,
+  "commit_ready": false,
+  "reviewed_artifact_sha256": {
+    "checkpoint-report-sources.json": "a316541a26766abadab53a7d474b2306773c0d70f4e2d80cb2cb7dadf3a5b667",
+    "report-correction.json": "ac1acaff4bf342a28a7a3373af1e92149eddd5cfce1c5f9db05ba93c6cc89bf6",
+    "completion-evidence-review.json": "2be0a40ef53eb804ec820112b6d6c9e15e7ef8fb152280b2ce27b47b4cce5995",
+    "completion-analysis.json": "d3251e22215efa47dca2711175dbdbe49cd36d2767364152827888c0c953148d",
+    "window-thousand-validation.json": "9fe6e5052c3be95eab20cc1e3f25db548608cbe9a2cb965339540fe1933e354e"
+  },
+  "reviewed_producers": {
+    "correct_report.py": "7ad2d34b8ee76a20cdacaf24b5387632f3e11e3624aa6391d9cd33ea2e541cf1",
+    "archive_completed.py": "a4dc69f3c550ad438a726758aa6303faec21a426e99f0eba1337ae75ff706923",
+    "draft_report.py": "82c11daf18cc0610911425bc95f3c511f0be4d39305723e68ac9841b4d5a68f0"
+  },
+  "producer_roles": {
+    "correct_report.py": "Narrow final two-sentence correction; current README is bound directly.",
+    "archive_completed.py": "Previously reviewed executed raw-evidence archive producer; archived/index bytes unchanged.",
+    "draft_report.py": "Preserved historical V1 text generator, not asserted to reproduce the corrected final report without correct_report.py."
+  },
+  "sealed_record_sha256": {
+    "evidence.tar.xz": "9b95d7585db56859d6bc22c96217ac40a3b85f2e8304814286a4743a32b6286c",
+    "archive-index.json": "fcb2a411fdd4c86b04795cebd0a205a98f696dd6cd33bacf0b6c4983c33f7ce3",
+    "qualification.json": "3ff92338d007b2d84547c6580ca02daeba2f28fd03fffc76108b4ab1e92ee3bb"
+  },
+  "prior_review_sha256": "b36691703aefd4f4dd573006c1b93a050ed13774fcd3c9a63a557ca9b1c75d34",
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "LIFECYCLE-REPORT-01",
+      "disposition": "RESOLVED_NARROW_REPORT_CORRECTION",
+      "evidence": "ListBox ordinary host/row identity, accepted-value and clipping proof is now distinct from tree/canvas current-generation/scope owner-publication proof."
+    },
+    {
+      "id": "LIFECYCLE-REPORT-02",
+      "disposition": "RESOLVED_NARROW_REPORT_CORRECTION",
+      "evidence": "Text now names only fixture geometry persistence as explicitly disabled, describes no requested general clipboard or OS preference changes and says the false fields do not independently observe global OS state."
+    }
+  ],
+  "unresolved_findings": [],
+  "verified_delta": {
+    "changed_document_count": 1,
+    "other_document_hashes_unchanged": 3,
+    "replacement_count": 2,
+    "qualification_change_only_current_readme_source_hash": true,
+    "archive_and_index_byte_identical_to_full_prior_audit": true,
+    "prior_archive_regular_member_count": 119,
+    "prior_archive_uncompressed_bytes": 23508215,
+    "provider_not_run": true,
+    "qualification_checkpoint_complete": false
+  },
+  "observations": [
+    "The exact replacements address both prior accuracy findings without changing runtime evidence, the 33-step workload, memory/retry observations or historical text.",
+    "The prior full archive/member/durable-bundle verification remains bound by unchanged archive/index digests and the preserved V1 review; no archive re-extraction or product validator rerun was necessary.",
+    "The current qualification remains a PREPARED snapshot with report/provider pending and checkpoint incomplete. This external source-ready review does not itself rewrite that snapshot or create final commit readiness.",
+    "Before final acceptance, preserve actual provider result/counts/dispositions and exact final report/spec/review associations, then rebind the completed qualification/archive and final commit vector.",
+    "The separate failed/interrupted R19 diagnostics broad test run is outside P18 execution and supplies no additional qualification here. The unbuilt GPU host draft is not exercised by this lifecycle.",
+    "The original overnight remains failed. Full retention/professional memory, zero Cocoa windows/menu restoration, ordinary performance, human/physical/presentation/GPU and full Mac/P11 acceptance remain open."
+  ],
+  "remaining_gates": [
+    "Perform the separately authorized provider checkpoint on exactly the current four reviewed source files and retain actual raw process/coverage/findings/dispositions.",
+    "Materialize final exact sources/provider/review/archive associations and update pending qualification state only after those requirements are met, then obtain final sealed-stage/commit review.",
+    "No native rerun, strict-validator repeat, compiler or test execution is required to resolve these prose findings."
+  ],
+  "reviewer_actions": {
+    "read_hash_compare_only": true,
+    "validator_provider_process_tests_builds_native_run": false,
+    "overlay_canonical_frozen_sources_modified": false
+  }
+}

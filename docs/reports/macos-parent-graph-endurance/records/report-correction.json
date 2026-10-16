@@ -1,0 +1,21 @@
+{
+  "created_utc": "2026-10-16T09:23:55.956401+00:00",
+  "result": "CORRECTED_TWO_REPORT_SCOPE_OVERCLAIMS",
+  "source": "docs/reports/macos-parent-graph-endurance/README.md",
+  "before_sha256": "d3362e8dc0ec857fee0f779f4b4cae964bef51c87805fede04d892715193d48a",
+  "after_sha256": "7fcfb311b6b75d6efe401dbb824c2b6ef76d1b15bf4f53ebcaaf1da1965d1720",
+  "prior_review_sha256": "b36691703aefd4f4dd573006c1b93a050ed13774fcd3c9a63a557ca9b1c75d34",
+  "replacements": [
+    {
+      "before": "List/canvas/tree native identities, generation and scope are checked\nagainst owner publication by the bound fixture.",
+      "after": "ListBox checks require ordinary native host/row identities, accepted values\nand clipping. Tree/canvas checks additionally require current generation and\nscope against owner publication by the bound fixture."
+    },
+    {
+      "before": "Clipboard access and preference changes are disabled\nand reported false by the fixture; global OS state is outside this observation.",
+      "after": "The fixture requests no general clipboard or OS preference changes and\nexplicitly disables window geometry persistence. Its reported false clipboard/\npreference flags do not independently observe global OS state."
+    }
+  ],
+  "archive_unchanged": true,
+  "native_evidence_or_runtime_source_changed": false,
+  "qualification_pending": true
+}
