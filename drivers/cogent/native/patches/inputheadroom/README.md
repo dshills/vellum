@@ -1,0 +1,3 @@
+# Native input diagnostic fixture headroom
+
+The original one-operation native fixture encoded only power-of-two input lengths, so its capacity-headroom precondition failed on the actual GPU run before checked-write refusal and recovery were exercised. This stage uses the same shared three-operation fixture for an ordinary CPU encoding regression and the admitted native GPU test. At least one non-power-of-two input length is required before native execution; the native check still verifies actual retained capacity, exact write bytes, failure accounting, owned restoration and pixels. Production renderer and timing code are unchanged. The prior failed run remains failed; neither compilation nor offscreen checks qualify native execution or latency.

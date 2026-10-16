@@ -417,3 +417,14 @@ uses real CPU-only processes with a successful producer and a surviving
 same-group descendant. It verifies termination, permitting an orphan zombie
 awaiting OS reaping. This does not qualify native resource inventories, current
 frame performance, app-wide process absence or any broader Mac gate.
+
+## Native input byte fixture
+
+The input-attempt diagnostic fixture uses three ordered paint operations so an
+encoded input requires capacity beyond its payload length. A CPU encoding
+regression checks that precondition through the same fixture used by the native
+GPU test; the native test separately requires actual retained headroom and exact
+success/refusal/recovery byte counts and reference pixels. The original single-
+operation fixture failed its headroom precondition in the admitted native run;
+that failure remains recorded. This fixture correction changes no production
+renderer, latency target, compiled-component or distribution qualification.

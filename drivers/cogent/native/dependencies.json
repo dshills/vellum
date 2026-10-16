@@ -716,6 +716,17 @@
               "sha256": "d5a6b2916ca77afaf89f82090aa794bfbc46525fec6a7768fa0bd868174df498"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/inputheadroom",
+          "inputs": "native/patches/inputheadroom/original-hashes.json",
+          "outputs": "native/patches/inputheadroom/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/inputheadroom/0073-native-input-fixture-headroom.patch",
+              "sha256": "0075572fdd654ca0f6eddf88b09cf2fa3058eefa50999f54e70063ea8400db17"
+            }
+          ]
         }
       ]
     },

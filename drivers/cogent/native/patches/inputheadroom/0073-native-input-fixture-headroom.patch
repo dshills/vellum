@@ -1,0 +1,57 @@
+--- a/paint/renderers/gpuscene/native_input_timing_test.go
++++ b/paint/renderers/gpuscene/native_input_timing_test.go
+@@ -14,6 +14,36 @@
+ 	"cogentcore.org/core/system/composer"
+ 	"github.com/oliverbestmann/webgpu/wgpu"
+ )
++
++func inputTimingFixture(t *testing.T, bounds image.Rectangle) (*sceneplan.Packet, *sceneplan.Encoded) {
++	t.Helper()
++	b := sceneplan.New(bounds)
++	b.Draw(bounds, image.NewUniform(color.RGBA{13, 31, 59, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	// Three operations force a non-power-of-two Ops encoding. Buffer growth
++	// rounds capacity upward; metrics must still count the shorter payload.
++	b.Draw(image.Rect(2, 3, 8, 9), image.NewUniform(color.RGBA{71, 19, 103, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	b.Draw(image.Rect(11, 4, 20, 16), image.NewUniform(color.RGBA{29, 83, 47, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	packet := b.Seal(false)
++	if packet == nil {
++		t.Fatal("fixture capture refused")
++	}
++	encoded, ok := packet.EncodeGPU()
++	if !ok {
++		t.Fatal("fixture encoding refused")
++	}
++	return packet, encoded
++}
++
++func TestVellumGPUSceneInputTimingFixtureHeadroom(t *testing.T) {
++	_, encoded := inputTimingFixture(t, image.Rect(0, 0, 23, 19))
++	for _, input := range [][]byte{encoded.Ops, encoded.Rows, encoded.Refs, encoded.Data} {
++		n := len(input)
++		if n > 0 && n&(n-1) != 0 {
++			return
++		}
++	}
++	t.Fatal("fixture has no input requiring capacity beyond its encoded length")
++}
+ 
+ // This must be run only with the existing explicit native GPU admission. A
+ // validation-error write exercises the real checked API, not a synthetic count.
+@@ -32,16 +62,7 @@
+ 		t.Fatal(err)
+ 	}
+ 	expected := image.NewRGBA(image.Rectangle{Max: size})
+-	b := sceneplan.New(expected.Rect)
+-	b.Draw(expected.Rect, image.NewUniform(color.RGBA{13, 31, 59, 255}), image.Point{}, nil, image.Point{}, draw.Src)
+-	packet := b.Seal(false)
+-	if packet == nil {
+-		t.Fatal("fixture capture refused")
+-	}
+-	encoded, ok := packet.EncodeGPU()
+-	if !ok {
+-		t.Fatal("fixture encoding refused")
+-	}
++	packet, encoded := inputTimingFixture(t, expected.Rect)
+ 	inputBytes := uint64(len(encoded.Ops) + len(encoded.Rows) + len(encoded.Refs) + len(encoded.Data) + 16)
+ 	successful := func() {
+ 		t.Helper()
