@@ -53,3 +53,32 @@ selection uses the same stable-ID owner path as a semantic accessibility press;
 it does not add an entry to the placement history. Offscreen objects must be
 brought into view before this traversal. See the
 [canvas semantics contract](../../specs/canvas-accessibility.md).
+
+For a separate Mac desktop-pointer acceptance session, build the opt-in probe:
+
+```sh
+go build -tags vellum_placement_probe -o /private/tmp/vellum-placement-probe .
+mkdir -m 700 /private/tmp/vellum-placement-probe-output
+VELLUM_NATIVE_PLACEMENT_PROBE=/private/tmp/vellum-placement-probe-output \
+  /private/tmp/vellum-placement-probe
+```
+
+The output directory must be new, empty, private and free of symlink components.
+This dedicated executable follows ordinary desktop initialization on AppKit's
+original locked thread and refuses inconsistent/offscreen app identities.
+Ordinary tests use the upstream offscreen driver and never open its window. A ten-minute deadline and the shared human-return
+marker end the session. The external operator supplies all pointer/key actions.
+The probe observes the ordinary view/model, command/history, canvas-change and
+palette-activation counts, bounded gesture state and actual Cocoa geometry.
+It writes atomic `latest.json` snapshots and at most 8 MiB of `events.jsonl`.
+Three diagnostic buttons arm removal of the source, target or window only after
+observing a threshold-crossed native gesture. Restore bindings before another
+case. Closing the native window joins the observer and records final cancellation
+and reservation state. Observer failure is retained; if it cannot join, the
+process fails without running shared teardown and the outer owner must reap it.
+Window-geometry persistence is locally disabled throughout.
+
+These sampled observations do not measure performance or establish physical
+hardware input, continuously visible previews, cross-display behavior, or native
+heap reclamation. Keep desktop-automation actions and their verified outcomes
+separate from the deterministic software-routing suite above.

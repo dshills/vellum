@@ -13,7 +13,7 @@ import (
 	"github.com/dshills/vellum/ui"
 )
 
-func main() {
+func run() {
 	m, err := newModel()
 	if err != nil {
 		fail(err)

@@ -98,3 +98,27 @@ external payload transport and auto-scrolling while dragging are unsupported.
 Applications may provide optional `CanvasObjects` labels for placed scene objects.
 Their selection, completed geometry and keyboard traversal follow the
 [named canvas contract](canvas-accessibility.md), independently of placement history.
+
+## Desktop-pointer acceptance probe
+
+The independent placement example includes a Mac-only, opt-in native executable.
+The `vellum_placement_probe` build tag replaces only the entry point; its private
+output environment/directory enables observation of the native loop on the
+original locked main thread. Offscreen or inconsistent system/core desktop app
+identities refuse. Ordinary tests retain their offscreen driver. It observes the same public demo view and model;
+it does not synthesize inputs or invoke placement/history commands. An external
+desktop operator supplies those actions. Bounded snapshots include objects,
+viewport, journal, activation/change counts and gesture state, with Cocoa frames.
+Diagnostic source/target/window removal is armed through visible controls and
+applied on the owner only after observing a threshold-crossed gesture. Model
+snapshots before that mutation preserve the trigger evidence.
+
+The probe requires an empty private absolute directory, caps individual records
+at 256 KiB and the log at 8 MiB, bounds its lifetime to ten minutes, joins its
+observer before shared teardown (or fails at the owned process boundary),
+retains observer errors/panics, honors the shared human-return marker and suppresses window geometry
+persistence. Successful process closure alone is not workflow acceptance: verify
+the externally supplied actions and resulting model/history states. Desktop
+automation, sampled preview state and existing software pixels do not establish
+physical hardware delivery, continuous visibility, cross-display scale changes,
+performance or native deallocation.
