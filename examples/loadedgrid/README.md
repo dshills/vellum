@@ -50,6 +50,10 @@ CPU deltas are unavailable. The native post-warm Go heap snapshot remains.
 It excludes dataset generation and projection
 building from warm UI work. See [the measurement contract](../../specs/grid-performance.md)
 for the explicit five-run command, boundaries and unchanged P6 targets.
+Performance mode disables native window-geometry persistence for the fixture
+lifetime and reports the actual switch in its setup record, so measurement
+windows do not restore or save application geometry. The previous process-local
+switch is restored after teardown. Ordinary interactive mode is unchanged.
 `-perf-novel` reports newly visited row strings separately from warm scrolling;
 no screenshot/readback duration is presented as UI CPU work.
 

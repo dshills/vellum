@@ -26,6 +26,14 @@ fits these compact cells. This is a numeric-table fixture, not the text-editor
 or 1,000-control baseline. Window dimensions, actual scale, measured viewport
 and clipped cell rectangles are retained.
 
+Performance mode disables the native window-geometry saver before constructing
+the fixture and keeps it disabled through native teardown. This process-local
+switch prevents saved window geometry from affecting the requested fixture and
+prevents measurement windows from persisting geometry. Setup records report the
+actual switch as `geometry_persistence_disabled_in_fixture`; the previous switch
+value is restored on return, including setup failures. Ordinary interactive
+mode retains its normal geometry behavior.
+
 At least 400 cells, 50 row identities and eight column identities must have
 nonempty measured clips after each completed native frame. Empty overscan
 records and pool capacity do not count. A display/layout that cannot satisfy

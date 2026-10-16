@@ -1,7 +1,6 @@
 package main
 
 import (
-	"cogentcore.org/core/text/fonts"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -15,6 +14,9 @@ import (
 	"runtime/debug"
 	"strings"
 	"time"
+
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/text/fonts"
 
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/drivers/cogent"
@@ -96,7 +98,7 @@ func newPerfProgram(ctx context.Context, c perfConfig) (*perfProgram, map[string
 		a.Close()
 		return nil, nil, err
 	}
-	metadata := map[string]any{"rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "cpu_profile_path": c.CPUProfile, "alloc_profile_prefix": c.AllocationProfile, "mem_profile_rate": runtime.MemProfileRate, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
+	metadata := map[string]any{"geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "cpu_profile_path": c.CPUProfile, "alloc_profile_prefix": c.AllocationProfile, "mem_profile_rate": runtime.MemProfileRate, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
 	return p, metadata, nil
 }
 func (p *perfProgram) describe() ui.Node {
@@ -321,6 +323,11 @@ func newPerfFrameMetrics(c perfConfig) (*cogent.FrameMetrics, error) {
 	return cogent.NewFrameMetrics(capacity)
 }
 func runPerf(c perfConfig) (terminal error) {
+	// Disposable measurements must neither restore nor persist application
+	// window geometry. Restore this process-local switch after native teardown.
+	previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
+	core.DebugSettings.DisableWindowGeometrySaver = true
+	defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 	p, metadata, err := newPerfProgram(ctx, c)
