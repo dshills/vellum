@@ -80,3 +80,21 @@ func (c *accessibilityGeometryCache) publish(token uint64, version *accessibilit
 	}
 	c.token, c.version, c.payload = token, version, payload
 }
+
+// Text geometry is an update of supplied entries. Cocoa's empty update leaves
+// the native map unchanged; semantic retirement removes obsolete entries.
+// Avoid allocating and queueing a native block when there are no text clients.
+func (b *accessibilityBridge) publishTextGeometry(geometry map[string]any) {
+	b.publishTextGeometryTo(geometry, nativeAccessibilityTextGeometry)
+}
+
+func (b *accessibilityBridge) publishTextGeometryTo(geometry map[string]any, send func(uint64, string)) {
+	if b == nil || b.closed.Load() || len(geometry) == 0 {
+		return
+	}
+	payload, err := json.Marshal(geometry)
+	if err != nil {
+		return
+	}
+	send(b.token, string(payload))
+}

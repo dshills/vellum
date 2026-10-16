@@ -1073,8 +1073,7 @@ func publishAccessibilityGeometry(w *nativeWindow) {
 	textBounds := accessibilityTextGeometry(w.root)
 	w.rootMu.Unlock()
 	b.publishGeometry(bounds)
-	textPayload, _ := json.Marshal(textBounds)
-	nativeAccessibilityTextGeometry(b.token, string(textPayload))
+	b.publishTextGeometry(textBounds)
 }
 func accessibilityBounds(root *record) map[string][4]float32 {
 	return accessibilityBoundsIncludingScoped(root, true)
@@ -1259,8 +1258,7 @@ func (h *accessibilityDialogHost) RenderWidget() {
 		}
 		textBounds = qualified
 	}
-	textPayload, _ := json.Marshal(textBounds)
-	nativeAccessibilityTextGeometry(b.token, string(textPayload))
+	b.publishTextGeometry(textBounds)
 }
 
 func accessibilityBindFocusInvalidation(root *record, a *app.Application, window string) {

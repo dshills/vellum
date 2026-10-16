@@ -60,3 +60,11 @@ those measured processes. Sampled CGO/profile attribution does not predict elaps
 UI savings. Inherited pre-run `launched=false` metadata must remain distinguished
 from actual argv/result launch receipts. Tested endpoints, original overlays,
 prepared identities, cleanup and producer versions are preserved independently.
+
+Text-range geometry publication skips nil/empty entry maps before JSON encoding
+or native dispatch. Cocoa treats an empty text-geometry update as a no-op;
+semantic retirement continues to prune obsolete client entries. Nonempty text
+client, whole-text and geometry values retain their existing JSON and native
+validation path, including workbench/dialog namespaces and private grid editors.
+This removes an unnecessary update from text-client-free frames; elapsed frame
+savings and the unchanged ordinary targets need separate native comparison.
