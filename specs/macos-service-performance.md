@@ -1,5 +1,15 @@
 # Mac services and accessibility allocation checkpoint
 
+Native-check menu snapshots report `OriginalCaptured` separately from
+`OriginalRestored`. The capture flag becomes true only after the explicit original
+menu capture operation. Without capture, a false restoration flag is unobserved;
+it does not establish a restoration failure. The services acceptance fixture
+requires both flags at cleanup. Window-cycle/soak fixtures do not capture the
+original menu and do not qualify menu restoration. The scalar serializer has
+inert Foundation truth-table coverage, separate from actual AppKit menu lifecycle
+acceptance and physical menu interaction. Historical records lack the new flag
+and retain their original qualification scope.
+
 Semantic encoding may use a local, never-reused string builder to avoid a separate
 byte-to-string copy. The resulting compact JSON must equal independent stdlib
 Marshal output after removing only the encoder's final record newline. Refusal

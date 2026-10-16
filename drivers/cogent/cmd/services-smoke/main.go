@@ -102,7 +102,7 @@ func run() error {
 		err = errors.New("native service fixture worker did not stop")
 	}
 	cleanup, observed := cogent.NativeServiceCleanupObservation()
-	if !observed || !cleanup.MainThread || !cleanup.CleanupObserved || !cleanup.Menu.OriginalRestored || !cleanup.Menu.TargetRetired || cleanup.Menu.Owned || cleanup.Tray.Present || !cleanup.Tray.TargetRetired || !cleanup.CallbacksStopped || cleanup.PendingCallbacks != 0 || cleanup.MenuCallbacks != 0 || cleanup.TrayCallbacks != 0 {
+	if !observed || !cleanup.MainThread || !cleanup.CleanupObserved || !cleanup.Menu.OriginalCaptured || !cleanup.Menu.OriginalRestored || !cleanup.Menu.TargetRetired || cleanup.Menu.Owned || cleanup.Tray.Present || !cleanup.Tray.TargetRetired || !cleanup.CallbacksStopped || cleanup.PendingCallbacks != 0 || cleanup.MenuCallbacks != 0 || cleanup.TrayCallbacks != 0 {
 		err = errors.Join(err, fmt.Errorf("terminal native service ownership: %+v", cleanup))
 	}
 	if err := errors.Join(runErr, err); err != nil {
@@ -179,6 +179,9 @@ func check(ctx context.Context, a *app.Application, m *model, cycles int) error 
 	initial, err := probe(ctx, cogent.NativeCheckCaptureOriginalMenu, 0)
 	if err != nil {
 		return err
+	}
+	if !initial.Menu.OriginalCaptured || !initial.Menu.OriginalRestored {
+		return fmt.Errorf("original menu capture was not observed: %+v", initial.Menu)
 	}
 	if !slices.Contains(initial.WindowTitles, "Vellum native services first") || !slices.Contains(initial.WindowTitles, "Vellum native services second") {
 		return fmt.Errorf("native fixture windows missing: %v", initial.WindowTitles)

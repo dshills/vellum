@@ -24,6 +24,31 @@ static NSMenu *vellumOriginalMenu;
 static int vellumCleanupStatus;
 static const NSUInteger vellumPanelLimit = 8;
 
+// A restoration comparison has meaning only after the diagnostic captures its
+// original menu. Keep availability explicit; pointer equality alone is not a
+// successful observation when both pointers happen to be nil.
+static NSDictionary *vellumMenuObservation(BOOL owned, BOOL captured, BOOL matches, NSArray *items) {
+    return @{@"Owned":@(owned), @"OriginalCaptured":@(captured),
+             @"OriginalRestored":@((BOOL)(captured && matches)),
+             @"TargetRetired":@((BOOL)!owned), @"Items":items};
+}
+
+// Exercise the production serializer with scalar inputs only. No NSApplication,
+// menu installation, main-queue work or desktop session is involved.
+char *vellumServiceMenuObservationFixture(void) {
+    @autoreleasepool {
+        NSMutableArray *records=[NSMutableArray new];
+        for (int flags=0; flags<8; flags++) {
+            [records addObject:vellumMenuObservation((flags&4)!=0, (flags&2)!=0,
+                                                    (flags&1)!=0, @[])];
+        }
+        NSData *data=[NSJSONSerialization dataWithJSONObject:records options:0 error:nil];
+        if (!data) return NULL;
+        NSString *text=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        return text.UTF8String ? strdup(text.UTF8String) : NULL;
+    }
+}
+
 #ifdef VELLUM_NATIVE_CHECKS
 // Main-thread, read-only inventory of exactly the production-owned panels.
 // Never inspect another process, select a URL, or invoke a panel action.
@@ -264,7 +289,7 @@ NSDictionary *vellumCheckMenu(int operation,int index) {
         if (operation==2) [foundMenu performActionForItemAtIndex:foundIndex];
         else { checkStaleMenuTarget=vellumTarget;checkStaleMenuItem=item.copy; }
     }
-    return @{@"Owned":@((BOOL)(vellumTarget!=nil)),@"OriginalRestored":@((BOOL)(checkOriginalCaptured && NSApp.mainMenu==checkOriginalMenu)),
-             @"TargetRetired":@((BOOL)(vellumTarget==nil)),@"Items":items};
+    return vellumMenuObservation(vellumTarget!=nil, checkOriginalCaptured,
+                                 NSApp.mainMenu==checkOriginalMenu, items);
 }
 #endif

@@ -13,6 +13,7 @@ void vellumCancelFile(uint64_t token);
 void vellumSetMenu(uint64_t token, const char *json);
 void vellumShutdown(void);
 int vellumServiceDismissFixture(void);
+char *vellumServiceMenuObservationFixture(void);
 */
 import "C"
 
@@ -42,6 +43,15 @@ type nativeOperation struct {
 var serviceToken atomic.Uint64
 
 func nativeServiceDismissFixture() bool { return C.vellumServiceDismissFixture() == 1 }
+
+func nativeServiceMenuObservationFixture() string {
+	text := C.vellumServiceMenuObservationFixture()
+	if text == nil {
+		return ""
+	}
+	defer C.free(unsafe.Pointer(text))
+	return C.GoString(text)
+}
 
 const nativeServicePendingMax = 8
 const nativeServiceRequestMax = 1 << 20

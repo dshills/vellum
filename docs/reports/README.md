@@ -3,6 +3,8 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Menu restoration observation availability](macos-menu-observation/README.md)
+
 - [Bounded ListBox control](macos-list-box/README.md)
 - [ListBox native writability metadata](macos-listbox-metadata/README.md)
 - [Composed ListBox and Canvas2D coverage](macos-composed-controls/README.md)

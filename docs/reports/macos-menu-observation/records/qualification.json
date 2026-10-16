@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "result": "PASS_SCOPED_MENU_OBSERVATION_SERIALIZATION",
+  "base_commit": "b8fd3e902a5d8d0a626f1aff5c1a4f6be46e95d7",
+  "source_files": {
+    "drivers/cogent/cmd/services-smoke/main.go": "e0c690cd9351b936b7a06816222e2ef91649489ad4418875b3295c7dfbda180d",
+    "drivers/cogent/native_services_checks_darwin.go": "3f32a79bb0f0c75062943999c48daec83901a01800cd87f2e9b5cd540a75e631",
+    "drivers/cogent/services_darwin.go": "98b00a0f0582c1a45641bea1a697bfcf05d4af6c8738a3e2863d74cc0f33cdc7",
+    "drivers/cogent/services_darwin.m": "1c0b80898a4c104dabbdaeb61e3eaa8c8938dec78511281f3b92c4b2e5ca6200",
+    "drivers/cogent/menu_observation_darwin_test.go": "68ca0f74c30fe26f3a66b546aeea0a898b2e6cfb6762fe2a910ccbd2fc99cfca",
+    "specs/macos-service-performance.md": "d3e0855f18877411d07327d17c34df6e905a076e6d384c4a843c8df9c56d1a47"
+  },
+  "tested_source_files": 4538,
+  "prepared_files": 6230,
+  "checks": {
+    "regression": {
+      "receipt_sha256": "953f5414ef2c6b1cca01cbb50cd63c68a6e5834edadfd4bb3a025c8b4ed02a04",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "-count=1",
+        "-tags=offscreen",
+        "-timeout=30s",
+        "-v",
+        "-run",
+        "^TestNativeMenuObservationDistinguishesUncapturedOriginal$",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 41.62920404097531,
+      "source_and_prepared_stable": true,
+      "logs": {
+        "stdout": {
+          "bytes": 200,
+          "sha256": "d2aac2e72a622bc6f5686a3aea850e81f49f4306515a49536e261d74700cb804"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "60ef650ec9d114eab49fa8f52bc1ef3600ee2f3e396a0871d00a18c77567ccac"
+        }
+      }
+    },
+    "adapter": {
+      "receipt_sha256": "a833244a9203be108a9ad86d8103dc3e6c49840078cd4c189713af6289d573c7",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "-count=1",
+        "-tags=offscreen",
+        "-timeout=120s",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 173.52313020802103,
+      "source_and_prepared_stable": true,
+      "logs": {
+        "stdout": {
+          "bytes": 1497,
+          "sha256": "e83bf13dc1879cd74f7f30cc963e7107ea37fb911b6201be71e4415d1645dd9c"
+        },
+        "stderr": {
+          "bytes": 1826,
+          "sha256": "ded2b6d3e65ec13df23a53e7add17f3e3108a56938b9147b4da929124279bbce"
+        }
+      }
+    },
+    "vet": {
+      "receipt_sha256": "da4972f24446738d89dda24e30a76b86a113a387c1c9ea31bfc76511f70f16f2",
+      "argv": [
+        "go",
+        "vet",
+        "-p=1",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 33.31689016590826,
+      "source_and_prepared_stable": true,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 2094,
+          "sha256": "2e8a1f6619098f215762b340c8982119a3130efbcf9bf838f81f93d0f875b2b9"
+        }
+      }
+    },
+    "build-native": {
+      "receipt_sha256": "bf902ea3967a847596012ade3cc191e88014eb70e2c81859f2062844de28c25d",
+      "argv": [
+        "go",
+        "build",
+        "-p=1",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-menu-observation-checks/services-smoke",
+        "./cmd/services-smoke"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 19.769334458978847,
+      "source_and_prepared_stable": true,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1137,
+          "sha256": "b2d9ce85ae7af3d33e58d89d98ce54979e0df7ea032942e174d97654e8710c33"
+        }
+      }
+    }
+  },
+  "internal_source_review": {
+    "file": "evidence/source-review.json",
+    "sha256": "730fa6032282e4f4a84348c56c14609937b946d6217a7f3e6f900528cb677c9d",
+    "result": "APPROVED_SOURCE"
+  },
+  "archive": {
+    "file": "evidence.tar.xz",
+    "bytes": 387412,
+    "sha256": "c408937bd61dfc49f60c9172c748dba3c65b246ed56817faf2a5e3409cad62ea",
+    "members": 24,
+    "uncompressed_bytes": 6673298
+  },
+  "archive_index_sha256": "b130bea80fb14d69c2b7b87439120884daca38152bf6b515aedd03a26a38c9e8",
+  "prism": "Deferred to next significant checkpoint; small internal-review checkpoint between provider reviews.",
+  "native_executable": {
+    "file": "services-smoke",
+    "bytes": 58818578,
+    "sha256": "7cbc043c80dc4d989f19c34b8bc80ab0819e77831984df29eb943adef149279d",
+    "executed": false
+  },
+  "native_appkit_menu_runtime_executed": false,
+  "native_menu_restoration_qualified": false,
+  "physical_menu_interaction_qualified": false,
+  "full_mac_qualified": false,
+  "settings_changed": false
+}

@@ -32,7 +32,10 @@ type NativeServiceItemCheck struct {
 }
 type NativeServiceMenuCheck struct {
 	Owned, OriginalRestored, TargetRetired bool
-	Items                                  []NativeServiceItemCheck
+	// OriginalCaptured is true only after NativeCheckCaptureOriginalMenu.
+	// Without it, OriginalRestored=false is unobserved rather than a failure.
+	OriginalCaptured bool
+	Items            []NativeServiceItemCheck
 }
 type NativeServiceTrayCheck struct {
 	Present, Visible, Template, TargetRetired bool
