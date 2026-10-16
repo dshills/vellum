@@ -76,3 +76,10 @@ report the disabled switch in their terminal acceptance record. These fixtures
 must neither restore saved window bounds nor write user window geometry. This
 isolation is required separately from ordinary performance mode; an unlaunched
 readiness refusal is not a native acceptance result.
+
+The [empty text geometry result](../docs/reports/macos-empty-text-geometry/README.md)
+records the corrected standalone Cocoa acceptance and all 80 ordinary runs on
+`cdc0111` against `1ba954c`. Both arms miss the existing targets, and the candidate
+GPU-requested fixed-million outlier remains unexplained. No consistent gain or
+no-regression qualification is claimed; native routing and process retirement
+remain separate from physical/human, native-service, GPU and full Mac acceptance.
