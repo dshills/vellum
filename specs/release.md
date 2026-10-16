@@ -1,7 +1,7 @@
 # SDK versioning, compatibility and release artifacts
 
 `release/version.json` and the public `vellum.Version` constant identify
-`v0.1.0-alpha.1`. This is an alpha packaging/API version; no Git tag or remote
+`v0.1.0-alpha.2`. This is an alpha packaging/API version; no Git tag or remote
 release is created by these tools. The owner selected `github.com/dshills/vellum`
 and the MIT license for Vellum's own code. The native module is
 `github.com/dshills/vellum/drivers/cogent`; example module paths also match their
@@ -61,6 +61,15 @@ cleanliness describe capture, not a later commit. Equivalent input bytes,
 configuration and source state produce equivalent reports across relocated
 module/cache paths for the recorded conventional linker paths. Unknown absolute
 linker flags remain literal evidence rather than being guessed or resolved.
+
+## Alpha.2 window lifetime migration
+
+Alpha.2 deliberately breaks the alpha.1 string-scoped application APIs to avoid
+retaining every historical window name. Keep `OpenWindow` receipts, pass exact
+`WindowRef` values to close/post/dirty APIs, and split application-wide completion
+reservations from `ReserveWindowCompletion`. Closed logical names may be reopened;
+old references and controllers remain retired. See [migration and limits](window-lifetimes.md).
+This version change does not certify native runtime, performance or distribution.
 
 ## API compatibility
 

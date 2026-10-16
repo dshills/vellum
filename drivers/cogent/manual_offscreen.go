@@ -283,10 +283,10 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		return nil
 	}
 	var updateErr error
-	err := p.owner.Do(func() {
+	err := withWindowOwner(p.owner, n.window.Ref(), func() {
 		n.rootMu.Lock()
 		defer n.rootMu.Unlock()
-		if !p.owner.TakeDirty(n.window.ID) {
+		if !p.owner.TakeDirty(n.window.Ref()) {
 			return
 		}
 		w.layoutPending = true
@@ -297,7 +297,7 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 			return
 		}
 		defer release()
-		n.root, updateErr = reconcile(n.host, n.root, view, p.owner, n.window.ID, p.config.Theme)
+		n.root, updateErr = reconcileScoped(n.host, n.root, view, p.owner, n.window.Ref(), p.config.Theme)
 		if updateErr != nil {
 			return
 		}
@@ -359,6 +359,9 @@ func (p *manualImplementation) refresh(w *managedManualWindow) error {
 		w.dockHeaders = headers
 		w.layoutPending = true
 	})
+	if n.window.Ref().Context().Err() != nil {
+		return nil
+	}
 	p.fail(errors.Join(err, updateErr))
 	return errors.Join(err, updateErr)
 }
@@ -399,12 +402,12 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 	if len(desired) > p.config.MaxWindows {
 		return ErrManualConfig
 	}
-	active := map[string]bool{}
+	active := map[string]app.WindowRef{}
 	for _, spec := range desired {
-		active[spec.ID] = true
+		active[spec.ID] = spec.Ref()
 	}
 	for _, w := range p.windowList() {
-		if !active[w.state.window.ID] {
+		if active[w.state.window.ID] != w.state.window.Ref() {
 			if err := p.retire(ctx, w); err != nil {
 				return err
 			}
@@ -427,10 +430,11 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 		if spec.Width < 1 || spec.Height < 1 || float32(int(spec.Width)) != spec.Width || float32(int(spec.Height)) != spec.Height {
 			return ErrManualConfig
 		}
-		domain, err := p.owner.WindowContext(spec.ID)
-		if err != nil || domain.Err() != nil {
+		domain := spec.Ref().Context()
+		if domain.Err() != nil {
 			return ErrManualClosed
 		}
+		var err error
 		w := &managedManualWindow{domain: domain, state: &nativeWindow{window: spec}, records: map[*record]uint64{}, layoutPending: true}
 		p.nextWindow++
 		w.incarnation = p.nextWindow
@@ -440,6 +444,7 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 			n.body.Scene.GPUSceneRendering = p.config.GPUSceneRendering
 			setGridScrollReuse(n.body.Scene, p.config.ExperimentalGridScrollReuse)
 			n.host = newAccessibilityHost(n)
+			bindWindowScope(n.host, p.owner, spec.Ref())
 			n.body.Styler(func(s *styles.Style) {
 				applyStyle(s, ui.Node{Kind: ui.Column}, p.config.Theme)
 				// RunManual already fixes the physical scene size. Reusing that size
@@ -460,30 +465,35 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 		n.body.Scene.OnFirst(events.Custom, func(e events.Event) { p.custom(n, e) })
 		bindAccessibilityKeyboard(n, p.owner, nil)
 		if p.config.Commands != nil {
-			bindCommandShortcuts(n.body.Scene, p.owner, spec.ID, p.config.Commands, nil)
+			bindCommandShortcutsScoped(n.body.Scene, p.owner, spec.Ref(), p.config.Commands, nil)
 		}
 		bindCloseRequest(n, p.owner, nil)
 		n.body.OnShow(func(events.Event) {
-			p.fail(p.owner.Do(func() {
+			showErr := withWindowOwner(p.owner, spec.Ref(), func() {
 				if n.root != nil {
 					flushDialogs(n.root)
 					bindWorkbenchInputScopes(n.root)
 					p.fail(applyFocus(n.root, n.root.node.Focus, &n.lastFocus))
 				}
-			}))
+			})
+			if !errors.Is(showErr, app.ErrWindowClosed) {
+				p.fail(showErr)
+			}
 		})
 		n.body.OnClose(func(events.Event) {
 			n.closing.Store(true)
-			if !w.suppressDomainClose {
+			if !w.suppressDomainClose && w.domain.Err() == nil {
 				// Once the owner stops, model notifications are no longer valid.
 				// Native/control cleanup below still retires every mounted record.
-				if err := p.owner.Do(func() { n.rootMu.Lock(); defer n.rootMu.Unlock(); p.fail(closeWorkbenchExtensions(n.root)) }); err != nil && !errors.Is(err, app.ErrClosed) {
+				if err := withWindowOwner(p.owner, spec.Ref(), func() { n.rootMu.Lock(); defer n.rootMu.Unlock(); p.fail(closeWorkbenchExtensions(n.root)) }); err != nil && !errors.Is(err, app.ErrClosed) && !errors.Is(err, app.ErrWindowClosed) {
 					p.fail(err)
 				}
 				// A workbench close notification may already have retired this
 				// registration. Preserve the original captured lifetime check.
 				if w.domain.Err() == nil {
-					p.fail(p.owner.CloseWindow(spec.ID))
+					if err := p.owner.CloseWindow(spec.Ref()); !errors.Is(err, app.ErrWindowClosed) && !errors.Is(err, app.ErrClosed) {
+						p.fail(err)
+					}
 				}
 			}
 			p.fail(p.cleanup(w))
@@ -506,11 +516,7 @@ func (p *manualImplementation) syncTopology(ctx context.Context) error {
 		textWindows.Lock()
 		textWindows.windows[n.window.ID] = t
 		textWindows.Unlock()
-		lifetime, err := p.owner.WindowContext(spec.ID)
-		if err != nil {
-			return err
-		}
-		t.lifetime.Store(&textLifetime{ctx: lifetime})
+		t.lifetime.Store(&textLifetime{ctx: domain})
 		n.input.Store(t)
 		var bindingErr error
 		if err = p.owner.Do(func() { bindingErr = bindTextWindow(n) }); err != nil {

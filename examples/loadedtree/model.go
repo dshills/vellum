@@ -19,6 +19,7 @@ var errStale = errors.New("loadedtree: worker result superseded")
 type window struct {
 	p                   *program
 	id                  string
+	windowRef           app.WindowRef
 	outline             *virtual.Outline
 	data                *virtual.TreeData
 	manager             *tasks.Manager
@@ -73,7 +74,7 @@ func newProgram(nodes int, executor execution.Executor) (*program, error) {
 		}
 		w := &window{p: p, id: id, outline: outline, data: data, message: "Empty view; Load builds stored nodes and indexes on workers"}
 		p.windows[i] = w
-		if e = a.Open(app.Window{ID: id, Title: "Vellum Loaded Tree · " + id, Width: 1000, Height: 740, View: w.describe}); e != nil {
+		if w.windowRef, e = a.OpenWindow(app.Window{ID: id, Title: "Vellum Loaded Tree · " + id, Width: 1000, Height: 740, View: w.describe}); e != nil {
 			return nil, e
 		}
 		w.manager, e = tasks.NewWithConfig(tasks.Config{Owner: a, Window: id, Limit: 2, Executor: executor, Invalidate: func() { _ = a.Invalidate(id) }})
@@ -93,10 +94,7 @@ func newProgram(nodes int, executor execution.Executor) (*program, error) {
 	return p, nil
 }
 func (w *window) lifetime() (context.Context, error) {
-	ctx, e := w.p.owner.WindowContext(w.id)
-	if e != nil {
-		return nil, e
-	}
+	ctx := w.windowRef.Context()
 	if ctx.Err() != nil {
 		return nil, app.ErrWindowClosed
 	}

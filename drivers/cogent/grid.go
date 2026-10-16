@@ -65,6 +65,7 @@ type gridBinding struct {
 	previous             *gridBinding
 	owner                *app.Application
 	window               string
+	windowRef            app.WindowRef
 	lifetimeDone         <-chan struct{}
 	model                *virtual.Grid
 	incarnation          uint64
@@ -122,18 +123,18 @@ func mountGrid(parent tree.Node, r *record, a *app.Application, window string) (
 	if err := validateNativeGrid(r.node); err != nil {
 		return nil, err
 	}
-	life, err := a.WindowContext(window)
+	life, err := scopedWindowContext(a, r.scope)
 	if err != nil {
 		return nil, err
 	}
 	gridRegistry.Lock()
 	existing := gridRegistry.models[r.node.Grid]
-	if existing != nil && (gridRegistry.preparing[r.node.Grid] != existing || existing.owner != a || existing.window != window) || gridRegistry.next == math.MaxUint64 {
+	if existing != nil && (gridRegistry.preparing[r.node.Grid] != existing || existing.owner != a || existing.windowRef != r.scope) || gridRegistry.next == math.MaxUint64 {
 		gridRegistry.Unlock()
 		return nil, ErrGridBinding
 	}
 	gridRegistry.next++
-	g := &gridBinding{r: r, owner: a, window: window, model: r.node.Grid, incarnation: gridRegistry.next, previous: existing, lifetimeDone: life.Done(), scope: true}
+	g := &gridBinding{r: r, owner: a, window: window, windowRef: r.scope, model: r.node.Grid, incarnation: gridRegistry.next, previous: existing, lifetimeDone: life.Done(), scope: true}
 	gridRegistry.models[g.model] = g
 	gridRegistry.Unlock()
 	r.control.grid = g
@@ -503,7 +504,7 @@ func (g *gridBinding) post(reason ui.GridChangeReason, fn func() error) {
 			return
 		}
 		trace.ExpectOwner(tag)
-		err := g.owner.PostWindow(g.window, func() {
+		err := g.owner.PostWindow(g.windowRef, func() {
 			returned := false
 			defer func() {
 				if !returned {
@@ -542,7 +543,7 @@ func (g *gridBinding) postObserved(reason ui.GridChangeReason, origin gridInputO
 			return
 		}
 		trace.ExpectOwner(tag)
-		err := g.owner.PostWindow(g.window, func() {
+		err := g.owner.PostWindow(g.windowRef, func() {
 			returned := false
 			defer func() {
 				if !returned {
@@ -582,7 +583,7 @@ func (g *gridBinding) requestViewport(request gridRequest) {
 	g.requestMu.Unlock()
 	// Layout owns geometry even when the control is disabled or outside modal
 	// input scope. No widget/source reads occur in this native admission path.
-	err := g.owner.PostWindow(g.window, func() {
+	err := g.owner.PostWindow(g.windowRef, func() {
 		g.applyIntentObserved(ui.GridViewport, false, gridInputOrigin{name: "layout"}, func() error {
 			s, e := g.model.State()
 			if e != nil {

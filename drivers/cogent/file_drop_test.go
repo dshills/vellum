@@ -124,7 +124,7 @@ func TestFileDropBubblesWithPrivatePathsAndRetainedCallbacks(t *testing.T) {
 		}
 	}
 	dropGeometry(retained)
-	if err := a.CloseWindow("main"); err != nil {
+	if err := a.CloseWindow(fixtureWindowRef(a, "main")); err != nil {
 		t.Fatal(err)
 	}
 	retained.AsWidget().HandleEvent(testFileDrop())

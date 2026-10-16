@@ -72,6 +72,7 @@ type accessibilityBridge struct {
 	owner             *app.Application
 	mu                sync.Mutex
 	window            string
+	windowRef         app.WindowRef
 	handlers          map[string]accessibilityHandler
 	activationGuards  map[string]func() bool
 	lastSnapshot      string
@@ -101,12 +102,17 @@ func newAccessibilityBridge(owner *app.Application) *accessibilityBridge {
 	accessibilityRegistry.Unlock()
 	return b
 }
-func (b *accessibilityBridge) bind(window string) {
+func (b *accessibilityBridge) bindScoped(ref app.WindowRef) {
+	window := ref.ID()
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	if b.closed.Load() {
+	if b.closed.Load() || (b.windowRef != (app.WindowRef{}) && b.windowRef != ref) {
 		return
 	}
+	if _, err := scopedWindowContext(b.owner, ref); err != nil {
+		return
+	}
+	b.windowRef = ref
 	b.window = window
 	// Serialize publication with retirement; a late refresh must not recreate a
 	// registry entry after close removed it.
@@ -188,13 +194,14 @@ func accessibilityDeliver(token, generation uint64, id string, action accessibil
 	handler := b.handlers[id]
 	guard := b.activationGuards[id]
 	window := b.window
+	ref := b.windowRef
 	b.mu.Unlock()
 	if handler == nil || window == "" {
 		return false
 	}
 	// Native main-thread callbacks never enter Do or wait for the owner. The
 	// generation is rechecked when an admitted action reaches the bounded queue.
-	err := b.owner.PostWindow(window, func() {
+	err := b.owner.PostWindow(ref, func() {
 		if b.closed.Load() || b.generation.Load() != generation || (guard != nil && !guard()) {
 			return
 		}
@@ -359,7 +366,7 @@ func syncAccessibility(w *nativeWindow, a *app.Application) {
 	if b == nil || b.closed.Load() {
 		return
 	}
-	b.bind(w.window.ID)
+	b.bindScoped(w.window.Ref())
 	if request := b.pendingFocus.Swap(nil); request != nil {
 		accessibilityApplyFocus(w.root, *request)
 	}
@@ -924,7 +931,7 @@ func bindAccessibilityKeyboard(w *nativeWindow, a *app.Application, onError func
 		err := a.Do(func() {
 			w.rootMu.Lock()
 			defer w.rootMu.Unlock()
-			if w.root == nil || w.closing.Load() {
+			if w.root == nil || w.closing.Load() || w.window.Ref().Context().Err() != nil {
 				return
 			}
 			if chord == "escape" {
@@ -934,7 +941,7 @@ func bindAccessibilityKeyboard(w *nativeWindow, a *app.Application, onError func
 						state := field.EditingState()
 						applyGridFieldNative(r, state.Text, state.Anchor, state.Focus, -1, -1, "cancel")
 						e.SetHandled()
-						requestTextPublication(w.window.ID)
+						requestTextPublicationScoped(w.window.Ref())
 						return
 					}
 				}
@@ -945,7 +952,7 @@ func bindAccessibilityKeyboard(w *nativeWindow, a *app.Application, onError func
 						syncEditor(r)
 					}
 					e.SetHandled()
-					requestTextPublication(w.window.ID)
+					requestTextPublicationScoped(w.window.Ref())
 					return
 				}
 				scope := ui.FocusScope(accessibilityFocusProjection(w.root, ""))
@@ -1198,6 +1205,12 @@ func lookupAccessibility(window string) (*accessibilityBridge, error) {
 	if b == nil || b.closed.Load() {
 		return nil, fmt.Errorf("cogent: native accessibility window %q unavailable", window)
 	}
+	b.mu.Lock()
+	ref := b.windowRef
+	b.mu.Unlock()
+	if _, err := scopedWindowContext(b.owner, ref); err != nil {
+		return nil, fmt.Errorf("cogent: native accessibility window %q unavailable: %w", window, err)
+	}
 	return b, nil
 }
 
@@ -1221,6 +1234,12 @@ func (h *accessibilityDialogHost) RenderWidget() {
 	}
 	b, err := lookupAccessibility(r.control.window)
 	if err != nil {
+		return
+	}
+	b.mu.Lock()
+	sameScope := b.windowRef == r.scope
+	b.mu.Unlock()
+	if !sameScope {
 		return
 	}
 	bounds := nativeAccessibilityBounds(r)

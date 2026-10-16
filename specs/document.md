@@ -30,7 +30,8 @@ it does not cancel other windows. User codecs and stores must cooperate with
 cancellation; OS filesystem calls and encoding already in progress may complete.
 
 OnComplete runs after state/history update and busy release. It may start another
-operation or force CloseWindow; it must not block or nest Do. Worker panic/Goexit
+operation or force `CloseWindow(ref)` using its retained opening receipt; it must
+not block or nest Do. Worker panic/Goexit
 reports failure and releases busy. A successful Save acknowledges only its captured
 journal revision. Edits during encoding/writing make that acknowledgment stale;
 written bytes may be older, dirty status remains and the current path is unchanged.

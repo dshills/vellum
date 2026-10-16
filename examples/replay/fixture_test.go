@@ -253,7 +253,7 @@ func TestWindowClosureDropsManualTaskResultButStillRunsAcceptedCleanup(t *testin
 	}
 	invoke(t, f, Action{ID: OpenProject})
 	invoke(t, f, Action{ID: StartTask})
-	if err := f.Owner.CloseWindow(f.Window); err != nil {
+	if err := f.Owner.CloseWindow(f.windowRef); err != nil {
 		t.Fatal(err)
 	}
 	before := snapshot(t, f)

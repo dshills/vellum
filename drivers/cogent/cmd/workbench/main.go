@@ -135,8 +135,9 @@ func main() {
 		}
 		return nil
 	}}))
+	var mainRef app.WindowRef
 	must(registry.Register(command.Command{ID: "app.close", Label: "Close", Shortcut: "Meta+Shift+X", Execute: func(context.Context) error {
-		err := a.RequestCloseWindow("main")
+		err := a.RequestCloseWindow(mainRef)
 		if errors.Is(err, app.ErrCloseRefused) {
 			return nil
 		}
@@ -342,7 +343,7 @@ func main() {
 	var persistence *document.Session[documentImage]
 	workflow := &documentWorkflow{owner: a, window: "main", status: func(text string) { status = text }}
 	bar := &cogent.CommandBar{Owner: a, Registry: registry, Toolbar: []string{"file.open", "file.save", "file.save-as", "edit.undo", "edit.redo", "project.increment", "analysis.calculate", "analysis.cancel"}, OnError: func(err error) { status = err.Error() }}
-	must(a.Open(app.Window{ID: "main", Title: "Vellum Workbench", Width: 1280, Height: 900, CloseRequest: workflow.requestClose, View: func() ui.Node {
+	mainRef, err = a.OpenWindow(app.Window{ID: "main", Title: "Vellum Workbench", Width: 1280, Height: 900, CloseRequest: workflow.requestClose, View: func() ui.Node {
 		progress := ""
 		if task != nil {
 			s := task.Snapshot()
@@ -364,7 +365,9 @@ func main() {
 			}
 		}
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "title", Kind: ui.Label, Text: "Vellum · Go native workbench"}, {ID: "commands", Kind: ui.Extension, Custom: bar}, {ID: "workbench", Kind: ui.Extension, Grow: true, MinHeight: 500, Custom: dock}, {ID: "files", Kind: ui.Label, Text: fileStatus}, {ID: "status", Kind: ui.Label, Text: status + progress}, workflow.view()}}
-	}}))
+	}})
+	must(err)
+	workflow.windowRef = mainRef
 
 	var documentStore document.Store
 	var documentChoose func(context.Context, app.FileOptions) (string, error)

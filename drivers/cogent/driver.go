@@ -50,6 +50,7 @@ type Driver struct {
 	FrameMetrics *FrameMetrics
 }
 type record struct {
+	scope    app.WindowRef
 	widget   core.Widget
 	node     ui.Node
 	children []*record
@@ -137,6 +138,12 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			quit()
 		}
 	}
+	failWindow := func(w *nativeWindow, err error) {
+		if w.window.Ref().Context().Err() != nil && (errors.Is(err, app.ErrWindowClosed) || errors.Is(err, app.ErrClosed)) {
+			return
+		}
+		fail(err)
+	}
 	wake := func() {
 		for _, w := range snapshot() {
 			if s := w.source.Load(); s != nil && !w.closing.Load() && w.pending.CompareAndSwap(false, true) {
@@ -149,26 +156,29 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 		if w.closing.Load() {
 			return
 		}
-		a.Do(func() {
+		withWindowOwner(a, w.window.Ref(), func() {
 			w.rootMu.Lock()
 			defer w.rootMu.Unlock()
 			if w.closing.Load() {
 				return
 			}
-			if !a.TakeDirty(w.window.ID) {
+			if !a.TakeDirty(w.window.Ref()) {
 				return
 			}
 			metricTag, metricStart := w.metrics.reconcileStart()
 			defer w.metrics.reconcileEnd(metricTag, metricStart)
 			n := w.window.View()
+			if w.window.Ref().Context().Err() != nil {
+				return
+			}
 			if err := ui.Validate(n); err != nil {
-				fail(err)
+				failWindow(w, err)
 				return
 			}
 			var err error
-			w.root, err = reconcile(w.host, w.root, n, a, w.window.ID, d.Theme)
+			w.root, err = reconcileScoped(w.host, w.root, n, a, w.window.Ref(), d.Theme)
 			if err != nil {
-				fail(err)
+				failWindow(w, err)
 				return
 			}
 			if w.root == nil {
@@ -182,10 +192,10 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			flushDialogs(w.root)
 			bindWorkbenchInputScopes(w.root)
 			if err := applyFocus(w.root, n.Focus, &w.lastFocus); err != nil {
-				fail(err)
+				failWindow(w, err)
 			}
 			if err := bindTextWindow(w); err != nil {
-				fail(err)
+				failWindow(w, err)
 				return
 			}
 			syncAccessibility(w, a)
@@ -223,17 +233,19 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					cleanup()
 				}
 				mu.Lock()
-				delete(windows, w.window.ID)
+				if windows[w.window.ID] == w {
+					delete(windows, w.window.ID)
+				}
 				mu.Unlock()
 			}
 		}()
 		desired := a.Windows()
-		active := map[string]bool{}
+		active := map[string]app.WindowRef{}
 		for _, w := range desired {
-			active[w.ID] = true
+			active[w.ID] = w.Ref()
 		}
 		for _, w := range snapshot() {
-			if !active[w.window.ID] && w.closing.CompareAndSwap(false, true) {
+			if active[w.window.ID] != w.window.Ref() && w.closing.CompareAndSwap(false, true) {
 				if w.body.Scene.RenderWindow() != nil {
 					win := w.body.Scene.RenderWindow().SystemWindow
 					go win.CloseReq()
@@ -244,7 +256,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			mu.Lock()
 			_, exists := windows[spec.ID]
 			mu.Unlock()
-			if exists || ctx.Err() != nil {
+			if exists || ctx.Err() != nil || spec.Ref().Context().Err() != nil {
 				continue
 			}
 			w := &nativeWindow{window: spec}
@@ -256,13 +268,14 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					var metricErr error
 					w.metrics, metricErr = d.FrameMetrics.bind(a, w)
 					if metricErr != nil {
-						fail(metricErr)
+						failWindow(w, metricErr)
 						return
 					}
 				}
 				nativeMountServices(w.body, services)
 				w.body.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(spec.Width), units.Dp(spec.Height)); s.Grow.Set(1, 1) })
 				w.host = newAccessibilityHost(w)
+				bindWindowScope(w.host, a, spec.Ref())
 				w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
 				bindAccessibilityKeyboard(w, a, d.OnError)
 			})
@@ -276,7 +289,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w.body.OnShow(func(events.Event) {
 				rw := w.body.Scene.RenderWindow()
 				if rw == nil || rw.SystemWindow == nil {
-					if !w.closing.Load() {
+					if !w.closing.Load() && w.window.Ref().Context().Err() == nil {
 						fail(fmt.Errorf("cogent: render window unavailable on show"))
 					}
 					return
@@ -287,12 +300,12 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					return
 				}
 				if err := configureRendering(rw.SystemWindow, d.ContinuousRendering); err != nil {
-					fail(err)
+					failWindow(w, err)
 					return
 				}
-				watchDeviceLoss(w, fail)
-				lifetime, lifetimeErr := a.WindowContext(spec.ID)
-				if w.closing.Load() || lifetimeErr != nil || lifetime.Err() != nil {
+				watchDeviceLoss(w, func(err error) { failWindow(w, err) })
+				lifetime := spec.Ref().Context()
+				if w.closing.Load() || lifetime.Err() != nil {
 					w.closing.Store(true)
 					if native := w.body.Scene.RenderWindow(); native != nil {
 						go native.SystemWindow.CloseReq()
@@ -300,27 +313,33 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					return
 				}
 				w.source.Store(w.body.SystemEvents())
-				if err := a.Do(func() {
+				if err := withWindowOwner(a, w.window.Ref(), func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
 					if err := startTextWindow(w, a); err != nil {
-						fail(err)
+						failWindow(w, err)
 					}
 				}); err != nil {
-					fail(err)
+					failWindow(w, err)
 					return
 				}
-				a.Do(func() {
+				if err := withWindowOwner(a, w.window.Ref(), func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
 					flushDialogs(w.root)
 					bindWorkbenchInputScopes(w.root)
 					if err := bindTextWindow(w); err != nil {
-						fail(err)
+						failWindow(w, err)
 						return
 					}
 					syncAccessibility(w, a)
-				})
+				}); err != nil {
+					failWindow(w, err)
+					return
+				}
+				if w.window.Ref().Context().Err() != nil {
+					return
+				}
 				if ctx.Err() != nil || failure.Load() != nil {
 					quit()
 					return
@@ -330,7 +349,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			})
 			w.body.Scene.OnFirst(events.Custom, func(e events.Event) { custom(w, e) })
 			if d.Commands != nil {
-				bindCommandShortcuts(w.body.Scene, a, spec.ID, d.Commands, d.OnError)
+				bindCommandShortcutsScoped(w.body.Scene, a, spec.Ref(), d.Commands, d.OnError)
 			}
 			bindCloseRequest(w, a, d.OnError)
 			w.body.OnClose(func(events.Event) {
@@ -339,17 +358,19 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				// native CloseReq runs outside the application owner. If the owner
 				// already stopped, skip model notifications; native/control cleanup
 				// below still releases every mounted widget.
-				if err := a.Do(func() {
+				if err := withWindowOwner(a, w.window.Ref(), func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
-					if err := closeWorkbenchExtensions(w.root); err != nil {
-						fail(err)
+					if spec.Ref().Context().Err() == nil {
+						if err := closeWorkbenchExtensions(w.root); err != nil {
+							failWindow(w, err)
+						}
 					}
 				}); err != nil && err != app.ErrClosed {
-					fail(err)
+					failWindow(w, err)
 				}
 				stopDeviceLoss(w)
-				a.CloseWindow(spec.ID)
+				a.CloseWindow(spec.Ref())
 				cleanup := func() {
 					w.rootMu.Lock()
 					defer w.rootMu.Unlock()
@@ -364,7 +385,9 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 				}
 				w.source.Store(nil)
 				mu.Lock()
-				delete(windows, spec.ID)
+				if windows[spec.ID] == w {
+					delete(windows, spec.ID)
+				}
 				mu.Unlock()
 				// A new registration may have been accepted just before the last native
 				// window closes, before its queued Custom wake could create that window.
@@ -448,13 +471,13 @@ func sameShape(r *record, n ui.Node) bool {
 	}
 	return true
 }
-func mount(parent tree.Node, n ui.Node, a *app.Application, window string, themes ...ui.Theme) (*record, error) {
-	r, err := mountShallow(parent, n, a, window, themes...)
+func mountScoped(parent tree.Node, n ui.Node, a *app.Application, scope app.WindowRef, themes ...ui.Theme) (*record, error) {
+	r, err := mountShallowScoped(parent, n, a, scope, themes...)
 	if err != nil {
 		return nil, err
 	}
 	for _, c := range n.Children {
-		child, err := mount(childHost(r, c.ID), c, a, window, r.theme)
+		child, err := mountScoped(childHost(r, c.ID), c, a, scope, r.theme)
 		if err != nil {
 			disposeControlTree(r)
 			r.widget.AsTree().Delete()
@@ -465,7 +488,7 @@ func mount(parent tree.Node, n ui.Node, a *app.Application, window string, theme
 	return r, nil
 }
 
-func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string, themes ...ui.Theme) (*record, error) {
+func mountShallowScoped(parent tree.Node, n ui.Node, a *app.Application, scope app.WindowRef, themes ...ui.Theme) (*record, error) {
 	var theme ui.Theme
 	if len(themes) > 0 {
 		theme = themes[0]
@@ -473,7 +496,10 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 	if _, err := ui.ResolveStyle(n, theme); err != nil {
 		return nil, err
 	}
-	r := &record{node: n, theme: theme}
+	if _, err := scopedWindowContext(a, scope); err != nil {
+		return nil, err
+	}
+	r := &record{node: n, theme: theme, scope: scope}
 	if ext, ok := n.Custom.(ThemeExtension); n.Kind == ui.Extension && ok {
 		ext.SetTheme(theme.Clone())
 	}
@@ -491,7 +517,7 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 	default:
 		var ok bool
 		var err error
-		r.widget, ok, err = mountControl(parent, r, a, window)
+		r.widget, ok, err = mountControl(parent, r, a, scope.ID())
 		if err != nil {
 			return nil, err
 		}
@@ -500,11 +526,15 @@ func mountShallow(parent tree.Node, n ui.Node, a *app.Application, window string
 		}
 	}
 	if r.widget == nil || (reflect.ValueOf(r.widget).Kind() == reflect.Pointer && reflect.ValueOf(r.widget).IsNil()) {
+		if scope.Context().Err() != nil {
+			return nil, app.ErrWindowClosed
+		}
 		return nil, fmt.Errorf("cogent: extension %q returned nil widget", n.ID)
 	}
+	bindWindowScope(r.widget, a, scope)
 	r.widget.AsWidget().SetName(n.ID)
 	syncSemantics(r)
-	bindFileDrop(r, a, window)
+	bindFileDrop(r, a, scope.ID())
 	r.widget.AsWidget().Styler(func(s *styles.Style) { applyStyle(s, r.node, r.theme) })
 	return r, nil
 }

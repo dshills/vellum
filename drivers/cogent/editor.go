@@ -140,7 +140,7 @@ func mountEditor(parent tree.Node, r *record) core.Widget {
 		if r.control.editor.syncing {
 			return
 		}
-		requestTextPublication(r.control.window)
+		requestTextPublicationScoped(r.control.windowRef)
 	})
 	w.OnFirst(events.KeyChord, func(e events.Event) {
 		chord := strings.ToLower(string(e.KeyChord()))
@@ -151,7 +151,7 @@ func mountEditor(parent tree.Node, r *record) core.Widget {
 		}
 		e.SetHandled()
 		_ = r.control.a.Do(func() {
-			if r.control.retired || r.control.disabled {
+			if r.control.retired || r.control.disabled || r.control.windowRef.Context().Err() != nil {
 				return
 			}
 			apply := func(err error) {
@@ -159,7 +159,7 @@ func mountEditor(parent tree.Node, r *record) core.Widget {
 					editorError(r, err)
 					return
 				}
-				if r.control.retired {
+				if r.control.retired || r.control.windowRef.Context().Err() != nil {
 					return
 				}
 				syncEditorFromWidget(r, w.EditingState())
@@ -186,7 +186,7 @@ func mountEditor(parent tree.Node, r *record) core.Widget {
 				apply(nil)
 			}
 		})
-		requestTextPublication(r.control.window)
+		requestTextPublicationScoped(r.control.windowRef)
 	})
 	return w
 }
@@ -381,7 +381,7 @@ func startTextWindow(w *nativeWindow, a *app.Application) error {
 		}
 	}
 	t.window = w
-	lifetime, err := a.WindowContext(w.window.ID)
+	lifetime, err := scopedWindowContext(a, w.window.Ref())
 	if err != nil {
 		return err
 	}
@@ -449,16 +449,20 @@ func bindTextWindow(w *nativeWindow) error {
 			t.complete(id, ErrTextInputStale)
 		}
 	}
-	requestTextPublication(w.window.ID)
+	requestTextPublicationScoped(w.window.Ref())
 	return nil
 }
 func lookupTextWindow(window string) *textWindow {
 	textWindows.Lock()
 	defer textWindows.Unlock()
-	return textWindows.windows[window]
+	t := textWindows.windows[window]
+	if t == nil || !t.acceptsNativeInput() {
+		return nil
+	}
+	return t
 }
-func requestTextPublication(window string) {
-	if t := lookupTextWindow(window); t != nil && !t.closed.Load() {
+func requestTextPublicationScoped(ref app.WindowRef) {
+	if t := lookupTextWindow(ref.ID()); t != nil && t.window.window.Ref() == ref && !t.closed.Load() {
 		_ = t.pump.Latest(textMessage{Kind: "publication"})
 	}
 }
@@ -523,7 +527,7 @@ func (t *textWindow) apply(u textinput.Update) {
 	defer func() {
 		t.ack = u.Sequence
 		_ = t.owner.Invalidate(t.window.window.ID)
-		requestTextPublication(t.window.window.ID)
+		requestTextPublicationScoped(t.window.window.Ref())
 	}()
 	r := t.clients[u.ClientID]
 	shadow, known := t.shadows[u.ClientID]
@@ -664,7 +668,7 @@ func (t *textWindow) admitSettlement(ctx context.Context, q *textSettlement) err
 	if t.nextRequest == ^uint64(0) {
 		return mailbox.ErrID
 	}
-	lifetime, err := t.owner.WindowContext(q.binding.control.window)
+	lifetime, err := scopedWindowContext(t.owner, q.binding.control.windowRef)
 	if err != nil {
 		return err
 	}
@@ -798,7 +802,7 @@ func (t *textWindow) bindBoundary(scene *core.Scene) {
 				}
 			}
 		})
-		requestTextPublication(t.window.window.ID)
+		requestTextPublicationScoped(t.window.window.Ref())
 	}
 }
 
@@ -859,13 +863,13 @@ func (t *textWindow) awaitNativeTextMain(enqueue func(func())) {
 	if !t.nativeReadyStarted.CompareAndSwap(false, true) {
 		return
 	}
-	window := t.window.window.ID
+	ref := t.window.window.Ref()
 	go enqueue(func() {
 		if t.closed.Load() {
 			return
 		}
 		t.nativeReady.Store(true)
-		requestTextPublication(window)
+		requestTextPublicationScoped(ref)
 	})
 }
 

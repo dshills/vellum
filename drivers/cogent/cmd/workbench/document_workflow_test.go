@@ -42,6 +42,7 @@ func TestWorkflowSaveDiscardCancelAndFailedSave(t *testing.T) {
 			status := ""
 			w := &documentWorkflow{owner: a, window: "main", status: func(s string) { status = s }}
 			a.Open(app.Window{ID: "main", Title: "Document", Width: 200, Height: 200, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }, CloseRequest: w.requestClose})
+			w.windowRef = currentFixtureRef(a, "main")
 			path := filepath.Join(t.TempDir(), "doc")
 			store := &workflowStore{fail: decision == "failure"}
 			session, err := document.New(document.Config[int]{Owner: a, Window: "main", Journal: j, Store: store, Choose: func(context.Context, app.FileOptions) (string, error) { return path, nil }, Codec: document.Codec[int]{Capture: func() (int, error) { return value, nil }, Encode: func(v int) ([]byte, error) { return []byte(strconv.Itoa(v)), nil }, Decode: func(b []byte) (int, error) { return strconv.Atoi(string(b)) }, Install: func(v int) error { value = v; return nil }}, OnComplete: w.complete})
@@ -63,7 +64,7 @@ func TestWorkflowSaveDiscardCancelAndFailedSave(t *testing.T) {
 						t.Fatal(err, w.pending)
 					}
 				} else {
-					if !errors.Is(a.RequestCloseWindow("main"), app.ErrCloseRefused) || w.pending != "close" {
+					if !errors.Is(a.RequestCloseWindow(currentFixtureRef(a, "main")), app.ErrCloseRefused) || w.pending != "close" {
 						t.Fatal("dirty close not deferred")
 					}
 				}
@@ -121,6 +122,7 @@ func TestSaveDecisionCancelAndLateEditKeepWindow(t *testing.T) {
 			store := &workflowStore{entered: make(chan struct{}), release: make(chan struct{})}
 			flow := &documentWorkflow{owner: a, window: "main", status: func(string) {}}
 			a.Open(app.Window{ID: "main", Title: "Document", Width: 100, Height: 100, CloseRequest: flow.requestClose, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }})
+			flow.windowRef = currentFixtureRef(a, "main")
 			path := filepath.Join(t.TempDir(), "doc")
 			session, err := document.New(document.Config[int]{Owner: a, Window: "main", Journal: j, Store: store, Path: path, Codec: document.Codec[int]{Capture: func() (int, error) { return value, nil }, Encode: func(v int) ([]byte, error) { return []byte(strconv.Itoa(v)), nil }, Decode: func(b []byte) (int, error) { return strconv.Atoi(string(b)) }, Install: func(v int) error { value = v; return nil }}, OnComplete: flow.complete})
 			if err != nil {

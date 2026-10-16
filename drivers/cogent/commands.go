@@ -34,8 +34,11 @@ type CommandBar struct {
 	buttons  []*core.Button
 }
 
-func (c *CommandBar) invoke(id string) {
+func (c *CommandBar) invokeScoped(ref app.WindowRef, id string) {
 	c.Owner.Do(func() {
+		if ref != (app.WindowRef{}) && ref.Context().Err() != nil {
+			return
+		}
 		if err := c.Registry.Invoke(c.Owner.Context(), id); err != nil && c.OnError != nil {
 			c.OnError(err)
 		}
@@ -63,16 +66,20 @@ func (c *CommandBar) snapshot(query string) []commandItem {
 	}
 	return out
 }
-func (c *CommandBar) populate(parent tree.Node, query string) {
+func (c *CommandBar) populateScoped(parent tree.Node, query string, ref app.WindowRef) {
 	for _, item := range c.snapshot(query) {
 		id := item.ID
 		b := core.NewButton(parent).SetText(html.EscapeString(item.Label))
 		b.SetState(item.Disabled, states.Disabled)
-		b.OnClick(func(events.Event) { c.invoke(id) })
+		b.OnClick(func(events.Event) { c.invokeScoped(ref, id) })
 	}
 }
 func (c *CommandBar) Mount(parent tree.Node) core.Widget {
 	if c == nil || c.Owner == nil || c.Registry == nil {
+		return nil
+	}
+	owner, ref, managed := WindowScope(parent)
+	if managed && (owner != c.Owner || ref.Context().Err() != nil) {
 		return nil
 	}
 	c.capture()
@@ -80,11 +87,11 @@ func (c *CommandBar) Mount(parent tree.Node) core.Widget {
 	c.buttons = nil
 	f := core.NewFrame(parent)
 	f.Styler(func(s *styles.Style) { s.Direction = styles.Row; s.Grow.X = 1 })
-	core.NewButton(f).SetText("Commands").SetMenu(func(m *core.Scene, _ image.Point) { c.populate(m, "") })
+	core.NewButton(f).SetText("Commands").SetMenu(func(m *core.Scene, _ image.Point) { c.populateScoped(m, "", ref) })
 	core.NewButton(f).SetText("Command palette").SetMenu(func(m *core.Scene, _ image.Point) {
 		query := core.NewTextField(m).SetPlaceholder("Search commands")
 		rows := core.NewFrame(m)
-		rebuild := func() { rows.DeleteChildren(); c.populate(rows, query.Text()); rows.Update() }
+		rebuild := func() { rows.DeleteChildren(); c.populateScoped(rows, query.Text(), ref); rows.Update() }
 		query.OnInput(func(events.Event) { rebuild() })
 		rebuild()
 	})
@@ -100,7 +107,7 @@ func (c *CommandBar) Mount(parent tree.Node) core.Widget {
 			}
 		}
 		b := core.NewButton(f).SetText(html.EscapeString(item.Label))
-		b.OnClick(func(events.Event) { c.invoke(id) })
+		b.OnClick(func(events.Event) { c.invokeScoped(ref, id) })
 		c.ids = append(c.ids, id)
 		c.buttons = append(c.buttons, b)
 	}
@@ -120,15 +127,15 @@ func (c *CommandBar) Sync(core.Widget) error {
 
 // bindCommandShortcuts uses the backend's first/final focused-event phases.
 // Text widgets consume Undo/Redo in their normal phase before document fallback.
-func bindCommandShortcuts(scene *core.Scene, owner *app.Application, window string, registry *command.Registry, onError func(error)) {
+func bindCommandShortcutsScoped(scene *core.Scene, owner *app.Application, ref app.WindowRef, registry *command.Registry, onError func(error)) {
 	route := func(scope command.ShortcutScope) func(events.Event) {
 		return func(e events.Event) {
 			if e.IsHandled() {
 				return
 			}
 			owner.Do(func() {
-				lifetime, err := owner.WindowContext(window)
-				if err != nil || lifetime.Err() != nil {
+				lifetime := ref.Context()
+				if lifetime.Err() != nil {
 					return
 				}
 				matched, err := registry.ShortcutInScope(lifetime, string(e.KeyChord()), scope)

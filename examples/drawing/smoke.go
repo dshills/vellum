@@ -82,7 +82,7 @@ func press(ctx context.Context, id string) error {
 		}
 	}
 }
-func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.MeshCanvas, m *drawingModel, nativeErrors <-chan error, chrome func()) error {
+func drawingSmoke(ctx context.Context, a *app.Application, otherRef app.WindowRef, g, other *cogent.MeshCanvas, m *drawingModel, nativeErrors <-chan error, chrome func()) error {
 	initial, err := waitFrame(ctx, a, g, 0)
 	if err != nil {
 		return err
@@ -283,7 +283,7 @@ func drawingSmoke(ctx context.Context, a *app.Application, g, other *cogent.Mesh
 		return err
 	}
 	if err := owner(a, func() error {
-		if err := a.CloseWindow("drawing-other"); err != nil {
+		if err := a.CloseWindow(otherRef); err != nil {
 			return err
 		}
 		_, err := other.Snapshot()

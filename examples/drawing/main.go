@@ -61,7 +61,7 @@ func main() {
 		status = map[string]string{"image": "4096×4096 RGBA; retained texture and changed 128-pixel tiles", "mesh": "Triangle gradients, alpha overlap and a retained stroke", "schematic": "100,000 source rectangles; visible geometry is queried from a retained index", "waveform": "1,000,000 source samples; min/max peaks reduced to visible columns"}[mode]
 		a.Invalidate("drawing")
 	}
-	err = a.Open(app.Window{ID: "drawing", Title: "Vellum custom GPU drawing", Width: 800, Height: 600, View: func() ui.Node {
+	_, err = a.OpenWindow(app.Window{ID: "drawing", Title: "Vellum custom GPU drawing", Width: 800, Height: 600, View: func() ui.Node {
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 			{ID: "modes", Kind: ui.Row, Children: []ui.Node{{ID: "mesh", Kind: ui.Button, Text: "Mesh and strokes", Activate: func() { selectMode("mesh") }}, {ID: "schematic", Kind: ui.Button, Text: "100k schematic", Activate: func() { selectMode("schematic") }}, {ID: "waveform", Kind: ui.Button, Text: "Million-sample waveform", Activate: func() { selectMode("waveform") }}, {ID: "image", Kind: ui.Button, Text: "4K tiled image", Activate: func() { selectMode("image") }}}},
 			{ID: "status", Kind: ui.Label, Text: status}, {ID: "canvas", Kind: ui.Extension, Grow: true, Custom: g},
@@ -71,10 +71,11 @@ func main() {
 		fail(err)
 	}
 	var other *cogent.MeshCanvas
+	var otherRef app.WindowRef
 	if *smoke {
 		otherView := canvas.Viewport{Width: 640, Height: 480, Zoom: 1}
 		other = &cogent.MeshCanvas{Owner: a, Window: "drawing-other", View: &otherView, Mesh: model.fixture, OnError: g.OnError}
-		if err := a.Open(app.Window{ID: "drawing-other", Title: "Vellum independent GPU resources", Width: 640, Height: 480, View: func() ui.Node {
+		if otherRef, err = a.OpenWindow(app.Window{ID: "drawing-other", Title: "Vellum independent GPU resources", Width: 640, Height: 480, View: func() ui.Node {
 			return ui.Node{ID: "other-root", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "other-canvas", Kind: ui.Extension, Grow: true, Custom: other}}}
 		}}); err != nil {
 			fail(err)
@@ -87,7 +88,7 @@ func main() {
 		go func() {
 			ctx, cancel := context.WithTimeout(a.Context(), 50*time.Second)
 			defer cancel()
-			result <- drawingSmoke(ctx, a, g, other, model, nativeErrors, func() { status = "Chrome remains responsive" })
+			result <- drawingSmoke(ctx, a, otherRef, g, other, model, nativeErrors, func() { status = "Chrome remains responsive" })
 			a.Close()
 		}()
 	}

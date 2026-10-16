@@ -5,8 +5,10 @@ The portable `app` package remains independent of native dependencies.
 
 ## Window lifecycle
 
-`Application.Open(Window)` registers windows before or during `Run`. Every ID
-is unique across the application lifetime, including closed windows. The view
+`Application.OpenWindow(Window)` registers windows before or during `Run` and
+returns an opaque `WindowRef` for that exact opening. `Open(Window)` discards
+the receipt. IDs are logical names unique among live windows; a closed name may
+be reopened with a new reference. Retain the opening receipt for delayed work. The view
 runs under the shared application UI owner; two windows never evaluate model
 state concurrently. Native widget/render resources belong to their window. Stateful native extension
 instances (including workbench, virtual views and GPU canvas adapters) must be
@@ -14,25 +16,30 @@ distinct for each mounted tree/window; applications may share their domain model
 under the application owner. Reusing one adapter instance across mounts is outside
 the extension contract.
 
-`WindowContext(id)` returns a context derived from the application lifetime.
-`CloseWindow(id)` removes its registration, cancels that context, drops pending
-`PostWindow(id, callback)` delivery, and asks the driver to close its native
-window. Other window contexts and accepted application work remain active.
-Closing the final window or calling `Close` ends the app and cancels all workers.
-User/native requests first evaluate Window.CloseRequest on the owner; refusal
-preserves registration and native widgets. RequestCloseWindow invokes that policy;
-CloseWindow/Close force teardown for confirmed decisions or cancellation. Native
-CheckCloseWindow permission is separate from body cleanup. See [document and close
-contract](document.md). An accepted native close follows the same lifecycle. Callers handle invalid IDs and
-`ErrClosed`; a closed ID cannot be reused for a different document.
+`ref.Context()` is derived from the application lifetime. `CloseWindow(ref)`
+removes that exact registration, cancels its context, drops pending
+`PostWindow(ref, callback)` delivery, and asks the driver to close its native
+window. Other windows and accepted application work remain active. Closing the
+final window or calling `Close` ends the app and cancels all workers.
+User/native requests first evaluate `Window.CloseRequest` on the owner; refusal
+preserves registration and native widgets. `RequestCloseWindow(ref)` invokes
+that policy; `CloseWindow(ref)` and `Close` force teardown for confirmed decisions
+or cancellation. `CheckCloseWindow(ref)` permission is separate from body cleanup.
+See the [document and close contract](document.md).
 
-After closing a window, the application replaces its stored context with one
-already-canceled marker and removes its stored cancel function. Captured original
-contexts and their descendants are canceled first and retain their normal Context
-semantics; later lookups of closed IDs need not preserve context object identity.
-Used ID strings and map entries remain as tombstones to prevent reuse, so this
-compaction reduces per-window retained cancellation state without establishing a
-global bound on historical IDs or caller-retained contexts.
+Copied references identify the same opening. Zero/foreign references refuse;
+retired references cannot post to, close, approve or consume dirty state for a
+replacement. `WindowRef(name)` and `WindowContext(name)` explicitly look up the
+current live registration and do not answer historical names. Capture during
+setup; resolving a name in a delayed callback can select a different document.
+A `Windows()` snapshot carries each opening's exact `Window.Ref()`.
+
+The application retains live lifetime/cancel entries only. Retirement cancels
+original contexts and their descendants before removing entries and window
+closures. Caller-held references retain their small lifetime/context identity,
+without an application/view/native backpointer. This bookkeeping bound does not
+qualify total Go/native/GPU memory. See [window lifetime references](window-lifetimes.md)
+for API migration, owner boundaries and acceptance limits.
 
 The driver uses an event source and coalesced wake flag for each window. A wake
 notifies all live window sources; each window refreshes its own tree while owning
@@ -68,8 +75,8 @@ an implementation of `app.Services`; headless callers may inject a fake with
 
 Call service methods from workers, outside `Do`, `Drain`, view evaluation, and
 widget callbacks. Service contexts scope pending operations; window-specific
-requests should use `WindowContext(id)` and deliver their result with
-`PostWindow`. All requests also end when the app closes. Context cancellation
+requests should retain the opening `WindowRef`, use `ref.Context()` and deliver
+their result with `PostWindow(ref, callback)`. All requests also end when the app closes. Context cancellation
 prevents queued native operations from starting and releases waiting callers.
 An OS operation already executing may complete before cancellation is observed.
 
@@ -103,7 +110,7 @@ certify cross-platform accessibility, text input, or device-loss recovery.
 ## Verification
 
 Portable race tests cover opening during Run, independent cancellation, closed-ID
-reuse rejection, suppressed late callbacks, surviving-window delivery, final-window
+reuse with stale-reference rejection, suppressed late callbacks, surviving-window delivery, final-window
 shutdown, and topology wakeups. Native adapter tests cover command availability
 rechecks and service cancellation before OS dispatch. `cmd/multiwindow-smoke`
 opens a second window after Run, closes the first, refreshes the second, installs

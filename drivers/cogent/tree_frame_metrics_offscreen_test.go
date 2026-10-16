@@ -138,7 +138,7 @@ func TestTreeFrameMetricsPriorOwnerDisablesTarget(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer b.retire()
-	if err = a.PostWindow("one", func() { disabled = true; _ = a.Invalidate("one") }); err != nil {
+	if err = a.PostWindow(fixtureWindowRef(a, "one"), func() { disabled = true; _ = a.Invalidate("one") }); err != nil {
 		t.Fatal(err)
 	}
 	var inner error

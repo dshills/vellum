@@ -204,5 +204,5 @@ func (w *editorWindow) finish(result document.Result) {
 
 	w.invalidate()
 }
-func (w *editorWindow) closeNow() error { return w.application.CloseWindow(w.id) }
+func (w *editorWindow) closeNow() error { return w.application.CloseWindow(w.windowRef) }
 func (w *editorWindow) invalidate()     { _ = w.application.Invalidate(w.id) }

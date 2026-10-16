@@ -101,8 +101,7 @@ func dispatchFileDrop(r *record, widget core.Widget, a *app.Application, window 
 	// Synchronous admission preserves deepest-first native propagation. No model
 	// callback is queued against a retained widget or a later window lifetime.
 	_ = a.Do(func() {
-		lifetime, err := a.WindowContext(window)
-		if err != nil || lifetime.Err() != nil || r.node.FileDrop == nil || !fileDropTargetActive(r, widget) {
+		if r.scope.Context().Err() != nil || r.node.FileDrop == nil || !fileDropTargetActive(r, widget) {
 			return
 		}
 		w := widget.AsWidget()

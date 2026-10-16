@@ -20,7 +20,10 @@ func TestDockReconcileRestoresTabsAndRatio(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	w := &Workbench{Owner: a, Workspace: model}
+	if _, err := fixtureMountScope(a, "main"); err != nil {
+		t.Fatal(err)
+	}
+	w := &Workbench{Owner: a, Window: "main", Workspace: model}
 	for _, id := range []string{"one", "two", "three"} {
 		id := id
 		w.Panels = append(w.Panels, Panel{ID: id, Title: id, View: func() ui.Node { return ui.Node{ID: id, Kind: ui.Label, Text: id} }})
@@ -73,7 +76,10 @@ func TestDockFailedRebuildClearsNativeCacheForRetry(t *testing.T) {
 		t.Fatal(err)
 	}
 	bad := false
-	w := &Workbench{Owner: a, Workspace: model, Panels: []Panel{
+	if _, err := fixtureMountScope(a, "main"); err != nil {
+		t.Fatal(err)
+	}
+	w := &Workbench{Owner: a, Window: "main", Workspace: model, Panels: []Panel{
 		{ID: "one", Title: "one", View: func() ui.Node { return ui.Node{ID: "one", Kind: ui.Label} }},
 		{ID: "two", Title: "two", View: func() ui.Node {
 			if bad {

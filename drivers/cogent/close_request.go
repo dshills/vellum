@@ -14,12 +14,11 @@ func bindCloseRequest(w *nativeWindow, a *app.Application, onError func(error)) 
 		if w.closing.Load() || a.Context().Err() != nil {
 			return
 		}
-		lifetime, err := a.WindowContext(w.window.ID)
-		if err != nil || lifetime.Err() != nil {
+		if w.window.Ref().Context().Err() != nil {
 			return
 		}
 		var decision error
-		err = a.Do(func() { decision = a.CheckCloseWindow(w.window.ID) })
+		err := a.Do(func() { decision = a.CheckCloseWindow(w.window.Ref()) })
 		if errors.Is(err, app.ErrClosed) || errors.Is(decision, app.ErrClosed) || errors.Is(decision, app.ErrWindowClosed) {
 			return
 		}
@@ -30,7 +29,7 @@ func bindCloseRequest(w *nativeWindow, a *app.Application, onError func(error)) 
 				if err != nil {
 					decision = err
 				}
-				a.PostWindow(w.window.ID, func() { onError(decision) })
+				a.PostWindow(w.window.Ref(), func() { onError(decision) })
 			}
 		}
 	})

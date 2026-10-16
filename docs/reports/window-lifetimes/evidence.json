@@ -1,0 +1,513 @@
+{
+  "schema": "vellum.window-lifetime.checkpoint-evidence.v1",
+  "base_commit": "7322f12be2c3b1de785a1e143371eab876691c64",
+  "api_version": "v0.1.0-alpha.2",
+  "integrated_seal_sha256": "9d145f70c62a20123be2f35c715c82f1c2f1387a80b249cce7fb998f34835c73",
+  "tested_source_files": 4553,
+  "prepared_files": 6230,
+  "implementation_overlay": {
+    "app/app.go": "8315f691afaec52bf6b7da9a0b1642eaf4803da9a0061ce0d9c64efcaf57f865",
+    "app/app_test.go": "d68d48f18205d559b095c571054cf8708dbb7ef8e78c866c59914b955ec893ca",
+    "app/completion.go": "f314a0d88cc6d5e878838e45babbdf63d1686037f5be9af308ad0e37a7def538",
+    "app/completion_test.go": "ac455d73680fb939b615555994b3216ca2582af03880fa86080ba059792c6f64",
+    "app/window_ref.go": "08d7571931f22e1244f500087017fd626cefdcdd90440a94b6978db02da434cc",
+    "app/window_ref_test.go": "0616dffcd0fa7f73a744c99e96df5df954d1f302e348bfb6b0594c5bffa48d9c",
+    "app/window_retention_test.go": "c7667f7d402dc201f697d2c3e6d589bac8aa0daf7afa3e24f2674cd41798f9d8",
+    "app/window_view_retention_test.go": "ffc71d903eae207d47ffd2ea373e7e0955977e34f4b204eb3776ce4938f525b4",
+    "app/windows_test.go": "8ebb8a6fc85cceea8156ba544ef41fdeeb44a5c955e75230e2f3c20912c0bfaf",
+    "automation/server_darwin_test.go": "5360bcc08da6b5dbcd80bbdd6e4cf36662d1c14cedcb24c1f3a5d6e4e0a83217",
+    "document/execution_test.go": "c5d242bac22b03d21a2b1d4b510b4dc8f88df192531dd63c309220107cb6992c",
+    "document/session.go": "e89289412f2b75084d0b24428d1fe1023277d2bd8935a6b7911aaaa5f32b59ef",
+    "document/session_test.go": "27e6fedeef70c081185fa39faa8a5b13480a26e3c57811e2cb095a42ce5c0747",
+    "drivers/cogent/accessibility.go": "ac46eca9f83534efc79d622b125ce2f093f5ae76fc4a1865112d9555e2a33c44",
+    "drivers/cogent/accessibility_grid_publication_test.go": "17b7a56072badd21fdc4eb478d95b35b39a852d6403b7fc4b4f36f56005830c3",
+    "drivers/cogent/accessibility_test.go": "d5caa1cfd0999a4b10f6ed374b4145b3b34ffcdb949f04437fd6507519898f7d",
+    "drivers/cogent/accessibility_virtual.go": "49adc424f46c48ecab50680c0b4963ad801fef712c255f9edff1923adf54e6a7",
+    "drivers/cogent/canvas.go": "0e1ff04bb5bdb67390eab5fd4eb02c5b3f6610428e674a0e000a6bcddb8bf2ec",
+    "drivers/cogent/canvas_queue_offscreen_test.go": "27069d7146d31d0d89ad8b315660b176b09697a5faa0b06182319edf866ff1a8",
+    "drivers/cogent/canvas_test.go": "8b90a3be2366bb1486b48a2cabcee2d18d0999b9f9bbb6be31a608deb3fd6dec",
+    "drivers/cogent/close_request.go": "c2a9397b57b8039847b39d7775b78d87cd273bd88b43dab9c1361f220e62fcb2",
+    "drivers/cogent/close_request_test.go": "4d5d28f901abec655b0ac4d246cbf26d3dad368008bf29ff572528f1e055c76a",
+    "drivers/cogent/cmd/accessibility-smoke/workbench.go": "946848865fd5ea222584770a884c103ee5feec5b11f373dfdc1109f6a1059130",
+    "drivers/cogent/cmd/gallery/menu_smoke.go": "6d985077bb8ba5d1b2e762f9ec3b56cf04bf6a47dbaa94abd598ac9c873c35a0",
+    "drivers/cogent/cmd/multiwindow-smoke/main.go": "eb6364a374150243488ff33c27ce5b4a6ad3bac36d19aebb2e10d02d128881e3",
+    "drivers/cogent/cmd/platform-smoke/main.go": "b533f1a5ded8f4073ce4badfdc2ea01bad0aa1b71776b2d8ae8548244bf2ce84",
+    "drivers/cogent/cmd/services-smoke/main.go": "d7bee13ef47e191c3408ce34929bd4e22d4df1926c5992323f210159c02f0175",
+    "drivers/cogent/cmd/window-cycle-smoke/diagnostics_test.go": "4aa086a02e2bca92d2ed4e46285e743eabcd166982a80c00f75a605ed84bfe98",
+    "drivers/cogent/cmd/window-cycle-smoke/main.go": "64a81d6e3be6ac9136eb6b252168f45e1f815561fd51168187356bc5115fc6e2",
+    "drivers/cogent/cmd/window-cycle-smoke/soak.go": "2a61ca00b441e9bc0d97d1b4782137857be9a3ea384ad5f87bedf22bf9835e5b",
+    "drivers/cogent/cmd/window-cycle-smoke/window_ref_fixture_test.go": "9a206f087399230bed3afb6027c6414df21b0029247fdfd1b70994d1bab885b3",
+    "drivers/cogent/cmd/window-handoff-smoke/main.go": "4d8657fd6f46995033e826d8dfe315bc9d77c6796d7d78e81a1fdbd23a9b9748",
+    "drivers/cogent/cmd/window-lifetime-smoke/main.go": "92b0de423adb34227b35b2c0be4dea0a840e38798262ff20b47ba3de55f6847a",
+    "drivers/cogent/cmd/workbench/document_workflow.go": "8871d4b60fc4d1779b341af51d4fd464f06ca19dad63d48c5824d3795def5780",
+    "drivers/cogent/cmd/workbench/document_workflow_test.go": "77606c72f6b51a9c930268742b9ce342951b4a65ff6f54aa1c2bbf65aaf0a159",
+    "drivers/cogent/cmd/workbench/main.go": "ccb1f608b278ce84037dcd6cc9019ba18293dd0cd0afe6a8f2516af1c05985ee",
+    "drivers/cogent/cmd/workbench/window_ref_fixture_test.go": "9a206f087399230bed3afb6027c6414df21b0029247fdfd1b70994d1bab885b3",
+    "drivers/cogent/commands.go": "a6832e5bfcf9d3d2cb3819d3ec42e7047387931391ee1a367647317941ea07d6",
+    "drivers/cogent/commands_test.go": "29319b95bc792f8b7943f83589c0eb9f75e6572ec9b2b222c09593ffb0a8bc12",
+    "drivers/cogent/controls.go": "a76446f2155de833fd21cfc6d56182152b6b882eb1b68f216eeec2270e9fe8f9",
+    "drivers/cogent/driver.go": "11c3baa36a1fd096f8e3dcffa44e8f843a7d507fdae9c5268c33c960f39994ad",
+    "drivers/cogent/editor.go": "40d29ac36e2ce83ea6c4a958cd94c38f8961c5111f15024995bcf5b5a9badf3a",
+    "drivers/cogent/editor_test.go": "fe532f9853aef74f2001f2e762b7f85a42bf70c63f4c057bb2e885eef21e278d",
+    "drivers/cogent/file_drop.go": "f565386ba5fa29f24da32dbc1e0cf0d0f19ca9e3012877eb9501d468b10221fc",
+    "drivers/cogent/file_drop_test.go": "5fb76f2e6e8376836d7e8d74f31bef55803a810c9ffde60ddfaca63ffa49f330",
+    "drivers/cogent/frame_metrics.go": "ba61af618d3d0bf7a1271ac6aff3a9bbf5ca138699a11df03cc75684a02bf349",
+    "drivers/cogent/frame_metrics_offscreen_test.go": "ac1dcc41f1ffe53b7b7a4c8a61bc62ba6a82b1fb02f06ece4f3582e78270cf46",
+    "drivers/cogent/frame_metrics_test.go": "fe6e89826477fec51f1a29a4ddaf52812b46784d8b7af4a94f48172e74156149",
+    "drivers/cogent/gpu_snapshot.go": "e77df2dbd4a80baabae54ff7f53dea3fc0c5d79974e448e1a036d270cd3f0cb7",
+    "drivers/cogent/gpu_view.go": "b27699a6a474531b36b06ffed440d2c156e7d5416df12aff4d8522344c690eaa",
+    "drivers/cogent/gpu_view_test.go": "4dce17218585f8819247638aab8e6e6613ffb3ddf7297f4f7a78879f642d126f",
+    "drivers/cogent/grid.go": "30f3d4eb1806bdd384726e80542b1ff6c0800fa73e72de4ecfa7963d6a580a83",
+    "drivers/cogent/grid_contract_test.go": "e9d8328d82b04a6001d3e4121075a82913deb99285b1c4af65271975dceb2301",
+    "drivers/cogent/grid_editing.go": "c57f7a66d523f7a92326a566f590da7272f3b6152504d961181fa3ad22769b6e",
+    "drivers/cogent/grid_editing_offscreen_test.go": "70169b649ecc36ebf0f02706db5dfea91b13b541b6e8da797582cd1743a87eac",
+    "drivers/cogent/grid_input_details.go": "12b33ad89e41665917485bc85510db27f953e984c26e6224baf4d30ae430ca46",
+    "drivers/cogent/grid_replay_offscreen_test.go": "a249dbec0626ebe37d04c2b6ec8b3bcff0c503df4c6da0be2e47b52d923372fd",
+    "drivers/cogent/grid_selection_offscreen_test.go": "dcb99ef3dc0a036e993d8abb9def0b4754c3844b65a553ce780b3c6ee87018f2",
+    "drivers/cogent/icons_test.go": "d761835e789de04d565f1566428a8572efe7f807ecf37673f4a80a185af367fe",
+    "drivers/cogent/image_canvas_test.go": "6cf6d31c9f5412359ac8038a349084d03278de928afa9650c33fd67e532e8956",
+    "drivers/cogent/images_offscreen_test.go": "aa7dfdfc24d27abd48af91cef03ae05548d332a0291f6ec0db5c359b10d57407",
+    "drivers/cogent/internal/acceptance/window_ref_fixture_test.go": "419906b35b81a1b99030fc3a835daca1a970716899912c5975b2aec650df2a70",
+    "drivers/cogent/internal/acceptance/workspace_test.go": "e7ffd6a6bd445915de0461325d43ef23214b7166ad8ded65e2872bb23220699c",
+    "drivers/cogent/list_box_test.go": "82adb0b710933d186ee939b1de0c04aef430a4519d905763b382046f5f5f0ca6",
+    "drivers/cogent/manual_offscreen.go": "3cf2843396f3aa9deba915ee618ccfbe71ecde49763eae92382f2afacdbd1f63",
+    "drivers/cogent/manual_offscreen_test.go": "550ea94996240bd240ccf4ce4d16568446649d09d3e2757100c231d88ee92303",
+    "drivers/cogent/menu_button_offscreen_test.go": "366db49efbfdec5f735fc8334a40102ddaee51e9021ecbf81ab948003702692c",
+    "drivers/cogent/mesh_canvas.go": "eb626ac6bc6df5edd29fab880f121055dc09f0321eeada210b65b5727712f9a9",
+    "drivers/cogent/mesh_canvas_test.go": "1d2dcfd265d1c785e0eb41cb6ccb0479721cb8d71138828d8a8c58f36e6d6b94",
+    "drivers/cogent/placement.go": "c7c6ba038b19926b133beff6b39d77b854ad2a0db111e76a21862e2830ab37de",
+    "drivers/cogent/placement_offscreen_test.go": "b7c5f6228e41c6c837ffd3a586bbd43488d60176b403762afd23b90a0f29db58",
+    "drivers/cogent/reconcile.go": "069f85ebae43a327517571b1a1f8754b5747e01e30178f46c70ba49021026a02",
+    "drivers/cogent/rendering.go": "788adde13c00df5ff8dc6e1b52816ed0a08f8e66297ffeed54694c1823fc274c",
+    "drivers/cogent/style_test.go": "373b4bff39cdd9cad6ef2f8ed9df1a8940801e491a5531bf1e4c029193a74a40",
+    "drivers/cogent/textfield_settlement_review_test.go": "792f212c81860fae111c86480a7094d2c2291e9408ae54bbae536869705e3d51",
+    "drivers/cogent/tree.go": "91869f47976939829e4d6fd3f1c070e4d4701d28ca3fe5e4e36f915c3a5b9d1e",
+    "drivers/cogent/tree_frame_metrics.go": "8815112566c8f0c5f5e9972ac8deb0e3524c3e90d8da5079d06bd394336507d1",
+    "drivers/cogent/tree_frame_metrics_offscreen_test.go": "de594c6f365737ffa6f71f7194e5abf2175a24316b66bcd6244b97b582841a49",
+    "drivers/cogent/tree_offscreen_test.go": "8a480a5dc783dd11fd88c260b4c94770b3cb720485c0c98b080c4ea01bad4992",
+    "drivers/cogent/virtual.go": "2c8a3f0f4f4d8fdac0078ffdd8124cdad6a93153f0e48a54e7961f3ec5c8f7a9",
+    "drivers/cogent/virtual_test.go": "1e7983c88a102c27bd028ae88cce769996fa5a0cd807f026c57a8fff3304c29f",
+    "drivers/cogent/window_scope.go": "5eb2a5d52cfbb4a25b785ee2eaaea62862020a70972d8533dc91cc688b898ef1",
+    "drivers/cogent/window_scope_fixture_test.go": "ab766750a00d9f964c889460585a281d96a0eeb42b98a07b61873274e26429e4",
+    "drivers/cogent/window_scope_offscreen_test.go": "92e7420281e66fa0a43a8fdd7517afcd414f665418fd117ecb0d4f48bff5f316",
+    "drivers/cogent/window_scope_test.go": "54ebe1e36583b16cb855892d208eaf1377638681da6a00d60a98aad47d82a2f3",
+    "drivers/cogent/workbench.go": "263fe0e0f06763348a89575b1f6710bf38b8a85f4f499f902063eefefca3b271",
+    "drivers/cogent/workbench_group.go": "2bc61e682a0c99b1121bc5e0c1ec36c21aae7deb7af14231165dca66d04abce5",
+    "drivers/cogent/workbench_group_test.go": "6eab82b4148e6f9d21785923661db8823084c3824fd91c96606fe7c5e62c9eb7",
+    "drivers/cogent/workbench_interaction.go": "2e8ba4fbcbf6151ec984b7be99f7aa73672c6359ac2c09c7b65fe583290cc530",
+    "drivers/cogent/workbench_test.go": "42c21b156dc057b5a09548ee417c227988dc6549385cf1d1c4adddeb4f82f30e",
+    "specs/window-lifetimes.md": "d1d8a010430764aa15b765c4d336f70a87858e394338b42029126a0e629e6aaf",
+    "tasks/execution_test.go": "39f936b7a59322681db2a79f7a0786121b6f62f8a6eb750522f8c82bfa328edb",
+    "tasks/tasks.go": "f2f734837cca30834e2f7ae994d4aabffb35495f512c101625a096c0cee9c890",
+    "README.md": "2bc5ae2927a3ee27a773cbd8173f7a633013e156e5efb0b295bc0578bba92d0a",
+    "docs/tutorials/building-an-app.md": "08d2531c2c926f01021ab6c9cfd1d7123210c4d9e255d3fa0384f56b161f1a4e",
+    "examples/drawing/main.go": "8a3db358c45be5ef7f97b0e015cfcea8d79b2be1f69ff6e6d197895f4908d745",
+    "examples/drawing/smoke.go": "740fe39196a9dfb713bff68df8f5aae202a1442b9009b610fb8bb3cdc24ead72",
+    "examples/editor/document.go": "4ecb65a11b0b19f876711bf0abc11c2ef8c423d67fa069e2bbc2c6b39232b9e2",
+    "examples/editor/document_test.go": "79f2833b69aecfe626029a27202e8e1b88990aa46910efc3d3db32c791697704",
+    "examples/editor/main.go": "46f531f815adcc0b097d92391170e1e512a9e473b50c1195325a6d7ab02d98cd",
+    "examples/grid/model.go": "f2d86eeae1b7f31bc66f4850a6bf7ae618ffad6ee19bcbc272b10f3ce19508b3",
+    "examples/grid/model_test.go": "302c267f7675ccfec861139c40fd0f6d1d8786340c3da7fade0878024a7e1d87",
+    "examples/grid/smoke.go": "6ef6685e988c1f2ae5f4e1ef98d030e21716820f82494bbc7de086c8f20f19b2",
+    "examples/imaging/main.go": "b56058a4ffff55deb04994ac1190fc2fc75554d7963da167d7153dac63176bdc",
+    "examples/imaging/main_test.go": "339772a367a34ab6bf1256d7dbf9036c69cb7574ef24068d95271d639ac6c638",
+    "examples/imaging/save_test.go": "53cab4c074b0ff1c47b3ed53d884fb9f7762dbdad957c7fbff50517d90e6d4fa",
+    "examples/imaging/smoke.go": "8ea572316e76a5eae77ffa0bc8173730c162cfc14cef5ef59e9c662e82100080",
+    "examples/loadedgrid/managed_test.go": "3969a09788cb539274fac3ed5cbce334f7f1621191c246ff5db5580c3788df63",
+    "examples/loadedgrid/model.go": "9af9d70bfa6869c06636fd01f457d4b23bad40716976d76ab1295ff532b90e9e",
+    "examples/loadedgrid/model_test.go": "6acd704ff9a229d73854a280e640c12c7ee495d42434eaa1404e00439ed35800",
+    "examples/loadedgrid/smoke.go": "5157d5ec163fd24cd988e974cee7c67ff80d17d5e61f1d94868b246466db677e",
+    "examples/loadedtree/managed_test.go": "f07a084f469b627da06b16bcf3a27f91f50e32b63e3702201b3b677018b5a93b",
+    "examples/loadedtree/model.go": "6978bae59cd8f6dd05bb60b514a91d4b37482ff079bd6294efa8c6312f2675f8",
+    "examples/loadedtree/model_test.go": "c6811060573c357dc62e602ecb913092531efd26f2d352097cb71c7d058f2668",
+    "examples/loadedtree/perf.go": "bcbfc1c3f9fa973ecb5f632067401cccf763f6b4f15eb9b8264b28d26711e603",
+    "examples/loadedtree/perf_test.go": "6996bc6b766517aa91b596b53f647c30f3ed81b956b99dde0a476a37a644fc07",
+    "examples/loadedtree/smoke.go": "f8ddb45094a558f2d361f6d84db646caa20ec918b302a9cc3d438e4d1fb0bae2",
+    "examples/placement/main.go": "fda8704e84d99f2e37ab01c8809a8dd06e2cca87e4aed3324230efbc3f0b5278",
+    "examples/placement/routing_offscreen_test.go": "273ff9563ad582163bc6fdc744c00078b9435a689618ca4425472db1e5f80149",
+    "examples/replay/fixture.go": "1230e5d0c77af6c99911fbb1d855abff3df69e696bcaea99ac88d6fe86229fc4",
+    "examples/replay/fixture_test.go": "031abd04de5b2c6eb34038d3366ca4194044475480b98f88599be5851edd5667",
+    "examples/replay/native.go": "3ab2103543470ff5f076ec2d47a47dfcc9d6c4ec50da0144e53952b0d416481a",
+    "examples/replay/native_test.go": "142449a284e199adb9c9a9f58fe1787b96733050efa0b4b3849775d650b1ed18",
+    "examples/replay/scenario.go": "261f6d8c8b621927e06e19a197a8a6bdb0e17848a74d6d9a64b32944ffab63bf",
+    "examples/replay/workspace/backend_offscreen.go": "99e51a137b28966adf4a3e00d149437c0668830de200f594ebf3359dd4861041",
+    "examples/replay/workspace/model.go": "79d13dc1d41d549d7b40032b5e5033f2f243081f693dd13f7d6026835c4c36c1",
+    "examples/sdk-contract/contract_test.go": "5d0ff8bb0c2b5e48c2dd0a6f128cc4d30416893e4554254b06b6f77965525d6e",
+    "examples/sdk-contract/window_lifetime_test.go": "15b68bfad54b6c28c3b4ac939160efb639209fc9911a242483fd4788a40b42c1",
+    "examples/viewport3d/main.go": "de09db8b9a51bd9bb64741b532a7da6d3c8f07fe6531183043b7be19bb22064f",
+    "examples/viewport3d/smoke.go": "8d1f972b214adf0c070356516c380ced2190dc5fd19b9ccdafe118e111ae5f4b",
+    "release/version.json": "971c6abbff909b475df8078fff164c0c035674a3663d441b539028ae3dd4b01e",
+    "scripts/package-app_test.py": "b16671dab83fbd150aa1eb456ce492faea9f2b9a994166c9f6209b96e1bd1eda",
+    "specs/document.md": "2b5914ebc82358ac85bf9495ac04539ec79adaa371fbfe072761cc9d965ad802",
+    "specs/execution.md": "58aa69457d44dcb85529aa539e5c26a3afd0c433dea2fc8fec9edae654d2082d",
+    "specs/macos-completion.md": "63e4176204cec8f611466b4c9267bfcd9534077f72c50058496eddcc95b9c9b5",
+    "specs/native-window-lifecycle.md": "dbac7ebb71f354c23902216a20c6f40284a5c92d0d7bbeb6e8364bbb40c29867",
+    "specs/release.md": "784546f97a0dbd54b46ecf9742d33afee55f6f34679224c3863b7a06829b9045",
+    "specs/windows-services.md": "9d9e1918e9b9caa448c112b445a8439ce8ce75a2e79e804e14453360a3d2c239",
+    "vellum.go": "cb04f07566d565ac77ecaac40e552c3bba1b1560a49042d8f0b573074b2836e7"
+  },
+  "checks": {
+    "integrated-adapter-race-v1.json": {
+      "sha256": "e8739f56ac97311c55d6b43ecc77ce26fe8c3b92ffb0853dc9f0e09c15381905",
+      "case": "adapter-race",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "-count=1",
+        "-tags=offscreen",
+        "-timeout=120s",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime/drivers/cogent",
+      "result": "PASS",
+      "elapsed_seconds": 152.57505124993622,
+      "logs": {
+        "stdout": {
+          "bytes": 1591,
+          "sha256": "d80dd8cda0eb258c43046c9a060e9ba950cabcc9066c8bb555965d52360eaf5b"
+        },
+        "stderr": {
+          "bytes": 803,
+          "sha256": "11343e7d231de61c1de0be7e2f7c3297c7c04b8e981e51dfae32d595b56fa973"
+        }
+      }
+    },
+    "integrated-adapter-vet-v1.json": {
+      "sha256": "17bdebc3fb1dbdd53e9fceed67d6acf2b8eb6f209329984de4c8ea130b19b129",
+      "case": "adapter-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-p=1",
+        "-tags=offscreen",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime/drivers/cogent",
+      "result": "PASS",
+      "elapsed_seconds": 4.877266917028464,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1071,
+          "sha256": "bbfcd7e2e25214cf13574ebd1bae53c023442cc53afc11a5089a151474765d32"
+        }
+      }
+    },
+    "integrated-contract-build-v1.json": {
+      "sha256": "53387d3a60f8c69a7d7597c94eb32158785327da1614f8610082a76f4119691f",
+      "case": "contract-build",
+      "argv": [
+        "go",
+        "build",
+        "-p=1",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime/examples/sdk-contract",
+      "result": "PASS",
+      "elapsed_seconds": 0.5943390830652788,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "integrated-native-build-v1.json": {
+      "sha256": "8dfc769124ccf95c88ebd3e6c0caf9a0332556e092a0bd0735cde0ad5f4c0151",
+      "case": "native-build",
+      "argv": [
+        "go",
+        "build",
+        "-p=1",
+        "-tags=vellum_native_checks",
+        "-o",
+        "/private/tmp/vellum-window-lifetime-checks/outputs/integrated-native-build-v1/",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime/drivers/cogent",
+      "result": "PASS",
+      "elapsed_seconds": 60.96582487504929,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 3211,
+          "sha256": "9fd0ae131bef3c9da59259988e213cf469d62b8453512ef3453e221b2a6d597c"
+        }
+      }
+    },
+    "integrated-python-package-v1.json": {
+      "sha256": "871bb076a85402f9c1a3208f77ca24998078109e900c3ed68f21a67feba23542",
+      "case": "python-package",
+      "argv": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/package-app_test.py"
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime",
+      "result": "PASS",
+      "elapsed_seconds": 0.7243244170676917,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 115,
+          "sha256": "8b519f9cc5c43acbdc83da7450db1dd89992c87ba70c48c0060e46ff81b65c7d"
+        }
+      }
+    },
+    "integrated-python-release-v1.json": {
+      "sha256": "d6f6acdc9a00f88efc81ddbe43df26c24de32fd124d5b12e2be841b3b0e6fc9c",
+      "case": "python-release",
+      "argv": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/release-sdk_test.py"
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime",
+      "result": "PASS",
+      "elapsed_seconds": 2.1447415000293404,
+      "logs": {
+        "stdout": {
+          "bytes": 264,
+          "sha256": "aa3e5d4d76ac4758435b6aaaf2a64d77f026625c108df64011ae217667d1e49d"
+        },
+        "stderr": {
+          "bytes": 128,
+          "sha256": "059f53a16a6072a77d4b48f2349e9a05ee56073375d6c3b5e52fe6a5d166f888"
+        }
+      }
+    },
+    "integrated-python-sdk-v1.json": {
+      "sha256": "aeff241475a35a3f5e3230d49bc6a673de16a730c333b24e6e993395b24aa24c",
+      "case": "python-sdk",
+      "argv": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/check-sdk_test.py"
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime",
+      "result": "PASS",
+      "elapsed_seconds": 0.7973936250200495,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 119,
+          "sha256": "1b8e386eca70fd94c23160897d6840706ca027183c509ac95bece94e552ee85a"
+        }
+      }
+    },
+    "integrated-root-race-v1.json": {
+      "sha256": "0b8c366e964f883a3698e3fa81cf8aa3ab56925a6230b0c40187c0e11e6ebe74",
+      "case": "root-race",
+      "argv": [
+        "go",
+        "test",
+        "-race",
+        "-p=1",
+        "-count=1",
+        "-timeout=90s",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime",
+      "result": "PASS",
+      "elapsed_seconds": 24.07757666707039,
+      "logs": {
+        "stdout": {
+          "bytes": 678,
+          "sha256": "4da0bd743d09463bfc9cdc1f868524a23868c11b13aad808dcdbb3fa0458a013"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "integrated-root-vet-v1.json": {
+      "sha256": "64a92a74e9f6298cfe852abb63498b716440cbcae67218762158aa877544c22b",
+      "case": "root-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-p=1",
+        "./..."
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime",
+      "result": "PASS",
+      "elapsed_seconds": 0.8504527079639956,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "integrated-sdk-package-v1.json": {
+      "sha256": "7ecdaa564a24532dd6272440276e2e0f3387b2a41fae75883841fc265a6e5596",
+      "case": "sdk-package",
+      "argv": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/release-sdk.py",
+        "--output",
+        "/private/tmp/vellum-window-lifetime-checks/sdk-alpha2.tar.gz",
+        "--include-untracked"
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime",
+      "result": "PASS",
+      "elapsed_seconds": 5.9263926659477875,
+      "logs": {
+        "stdout": {
+          "bytes": 233,
+          "sha256": "6311d4403ae3cdbcc52886fade77dc2de64f93ac9b6cdb1cb2cbf3a4abac7c57"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "integrated-sdk-relocation-v1.json": {
+      "sha256": "5274fdfc2f82f492b8087ba3e1ed940530ef8096221bffcb4b480f0810f056c9",
+      "case": "sdk-relocation",
+      "argv": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/check-sdk.py",
+        "--archive",
+        "/private/tmp/vellum-window-lifetime-checks/sdk-alpha2.tar.gz",
+        "--sha256",
+        "62186e90c14a61d8353e130314d01d82f5e039be6db1cb5ed03db9ad43ba7bfc"
+      ],
+      "cwd": "/private/tmp/vellum-window-lifetime",
+      "result": "PASS",
+      "elapsed_seconds": 49.434886707924306,
+      "logs": {
+        "stdout": {
+          "bytes": 987,
+          "sha256": "e5db693bcedcfa5f088a9891f5ab9857e1aa9d0a54cfe7d4c0d1ed2dcf68769e"
+        },
+        "stderr": {
+          "bytes": 2678,
+          "sha256": "77c0630217dea6579fa4af74dcea467d7ec535d22a1e7e36ef68fb0ce474f60b"
+        }
+      }
+    }
+  },
+  "independent_consumer_matrix": {
+    "modules": 11,
+    "checks": 33,
+    "base_receipt": "sdk-full-v2.json",
+    "base_receipt_sha256": "16d773c92290b4858702d2c2d8c17e8a840bf902548de550f07fc4502a84d1aa",
+    "base_result": "FAILED_CHECK",
+    "rescued_replay_receipt": "sdk-replay-v3.json",
+    "rescued_replay_sha256": "a4d828e47a0f1614a72bb8e4c45514c02f6cd9a8c5c20b524db32c9e0a52ea1b",
+    "current_result": "PASS_COMPOSED_CHECKS",
+    "application_module_builds": 10,
+    "test_only_contract_module": "race/vet and ordinary empty production build; no main executable"
+  },
+  "reviews": {
+    "portable-review.json": {
+      "sha256": "1ae81540c22e16c90f64c88850c3a8ff77983862535e9553688d8e94478de3a3",
+      "result": "APPROVED_SOURCE"
+    },
+    "adapter-review-v2.json": {
+      "sha256": "6b9e66b615c5be822715bf78a0944ee6f1c438f32f54f987bc55552988720073",
+      "result": "APPROVED_SOURCE_AND_EVIDENCE"
+    },
+    "adapter-mount-control-review.json": {
+      "sha256": "a4a6ce7b5777cd0ab966aeff53a174931b026a5a91049c2773e298fe6c8b8398",
+      "result": "APPROVED_SCOPED_EVIDENCE"
+    },
+    "sdk-review-v1.json": {
+      "sha256": "e0d876d690ee9f1489f0931cffb1cf4892cca7bbbc1f59d555b2ad0d80e98182",
+      "result": "APPROVED_SOURCE"
+    }
+  },
+  "private_sdk": {
+    "event": "vellum.sdk.relocated",
+    "digest_verified_against_expected": true,
+    "trust_basis": "caller-supplied expected digest",
+    "independent_authenticity_verified": false,
+    "archive_sha256": "62186e90c14a61d8353e130314d01d82f5e039be6db1cb5ed03db9ad43ba7bfc",
+    "version": "v0.1.0-alpha.2",
+    "source": {
+      "clean": false,
+      "commit": "7322f12be2c3b1de785a1e143371eab876691c64"
+    },
+    "verified_files": 7342,
+    "replacements_within_sdk": {
+      "cogentcore.org/core": "drivers/cogent/build/upstream",
+      "github.com/dshills/vellum": ".",
+      "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+      "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+    },
+    "path_contains_spaces": true,
+    "checks": [
+      "manifest all-file integrity",
+      "external Go module cache verification",
+      "standalone consumer race/vet/build",
+      "public API scenarios race/vet"
+    ],
+    "native_runtime": "not executed",
+    "public_distribution_audit": "not certified"
+  },
+  "retained_failed_receipts": [
+    "sdk-compile-v1.json",
+    "sdk-full-v1.json",
+    "sdk-root-race-v1.json",
+    "sdk-adapter-race-v1.json",
+    "sdk-full-v2.json"
+  ],
+  "failure_dispositions": [
+    "Initial compile had one unused loadedtree local, corrected before current checks.",
+    "Initial full suite wrote nine owned unexecuted example binaries into source; root/adapter children exited0 but source stability correctly failed. Binaries moved and current stable-source checks repeated.",
+    "Two-minute Go workspace suite timeout retained twice; unchanged assertions and frozen records rerun with a ten-minute Go suite deadline and eleven-minute outer process watchdog. Functional completion does not certify latency targets.",
+    "Test-only SDK-contract has no main package for -o directory. Its regular empty build and race/vet pass; all application outputs now stay outside source."
+  ],
+  "durable_artifact": "macos-window-lifetimes/integrated-alpha2",
+  "native_runtime_executed": false,
+  "full_macos_qualified": false,
+  "public_distribution_approved": false,
+  "durable_artifact_status": "planned_at_report_capture; final preservation is recorded separately",
+  "provider_review": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "checkpoint_invocations": 1,
+    "llm_calls": 8,
+    "cli_exit_code": 1,
+    "returned_findings": 15,
+    "returned_medium": 3,
+    "returned_low": 12,
+    "discarded_findings": 1,
+    "suppressed_findings": 0,
+    "coverage_complete": true,
+    "reviewed_files": 141,
+    "report_sha256": "09e08450673da3ce674c8e5e3683f06dd957f5edf0b5b97a9d195f27d94efc3b",
+    "execution_sha256": "f8b4b865cebe5590480a482bbdfe06a77370005eff5e33edd8c742c4c0933474",
+    "internal_assessment_sha256": "b95b0649de4861994235353f3fa5315451f66fadfdaaadb1f48fa38c1099ea25",
+    "dispositions": {
+      "returned_unsupported": 11,
+      "returned_valid_formatting_fixed": 2,
+      "returned_accepted_nonblocking_optional": 2,
+      "discarded_manually_assessed_unsupported": 1
+    },
+    "unresolved_blocking_findings": [],
+    "post_provider_changes": "Three test helper files normalized by gofmt, plus this report metadata. No production behavior or test assertions changed; these post-run bytes were not reviewed by the provider."
+  }
+}

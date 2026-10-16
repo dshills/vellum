@@ -21,6 +21,7 @@ import (
 
 type imageWindow struct {
 	application    *app.Application
+	windowRef      app.WindowRef
 	model          *imagingProgram
 	view           *cogent.GPUView
 	shown          atomic.Bool
@@ -107,14 +108,13 @@ func (w *imageWindow) capture() {
 	if w.captureBusy {
 		return
 	}
-	ctx, err := w.application.WindowContext(w.view.Window)
-	if err != nil {
-		w.status = err.Error()
-		w.reportCapture(captureResult{err: err})
+	ctx := w.windowRef.Context()
+	if ctx.Err() != nil {
+		w.reportCapture(captureResult{err: app.ErrWindowClosed})
 		return
 	}
 	w.captureBusy = true
-	err = w.view.SnapshotAsync(ctx, func(snapshot cogent.GPUSnapshot, err error) {
+	err := w.view.SnapshotAsync(ctx, func(snapshot cogent.GPUSnapshot, err error) {
 		w.completeCapture(ctx, snapshot, err)
 	})
 	if err != nil {
@@ -178,13 +178,13 @@ func run(smoke bool) error {
 	defer a.Close()
 	nativeErrors := make(chan error, 16)
 	first, spec := newImageWindow(a, "imaging", !smoke, nativeErrors)
-	if err := a.Open(spec); err != nil {
+	if first.windowRef, err = a.OpenWindow(spec); err != nil {
 		return err
 	}
 	result := make(chan error, 1)
 	if smoke {
 		second, other := newImageWindow(a, "imaging-other", false, nativeErrors)
-		if err := a.Open(other); err != nil {
+		if second.windowRef, err = a.OpenWindow(other); err != nil {
 			return err
 		}
 		go func() {

@@ -97,6 +97,7 @@ type Fixture struct {
 	Owner                   *app.Application
 	Commands                *command.Registry
 	Window                  string
+	windowRef               app.WindowRef
 	Journal                 *history.Journal
 	Table                   *virtual.Table
 	lifetime                context.Context
@@ -141,16 +142,13 @@ func New(config Config) (*Fixture, error) {
 	if err = f.register(); err != nil {
 		return nil, err
 	}
-	if err = f.Owner.Open(app.Window{ID: f.Window, Title: "Deterministic project", Width: ViewportWidth, Height: ViewportHeight, View: f.View}); err != nil {
+	if f.windowRef, err = f.Owner.OpenWindow(app.Window{ID: f.Window, Title: "Deterministic project", Width: ViewportWidth, Height: ViewportHeight, View: f.View}); err != nil {
 		return nil, err
 	}
-	f.lifetime, err = f.Owner.WindowContext(f.Window)
-	if err != nil {
-		return nil, err
-	}
+	f.lifetime = f.windowRef.Context()
 	f.manager, err = tasks.NewWithConfig(tasks.Config{Owner: f.Owner, Window: f.Window, Executor: config.Executor, Limit: 1, Invalidate: func() { _ = f.Owner.Invalidate(f.Window) }})
 	if err != nil {
-		_ = f.Owner.CloseWindow(f.Window)
+		_ = f.Owner.CloseWindow(f.windowRef)
 		return nil, err
 	}
 	return f, nil

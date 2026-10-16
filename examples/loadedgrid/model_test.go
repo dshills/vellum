@@ -251,7 +251,7 @@ func TestWindowCloseRevokesResultButCanceledWorkerRetainsCredit(t *testing.T) {
 		if e := w.queryWork(virtual.GridQuery{}); e != nil {
 			return e
 		}
-		return p.owner.CloseWindow(w.id)
+		return p.owner.CloseWindow(w.windowRef)
 	})
 	if w.manager.Pending().Active != 1 {
 		t.Fatal("closehidpendingworker")
@@ -381,7 +381,7 @@ func TestFilterSettlementReadsAcknowledgedValueAndRefusesStaleWork(t *testing.T)
 						return err
 					}
 				case "closed-window":
-					if err := p.owner.CloseWindow(w.id); err != nil {
+					if err := p.owner.CloseWindow(w.windowRef); err != nil {
 						return err
 					}
 				}

@@ -84,7 +84,7 @@ and preparation inputs belong to the driver; prototype directories are not neede
 See the [local SDK contract](specs/sdk.md) and run `scripts/benchmark.sh` for
 portable baselines or `scripts/benchmark.sh --native` for visible GPU measurements.
 
-The SDK identifies `v0.1.0-alpha.1`. Follow the
+The SDK identifies `v0.1.0-alpha.2`; see the [window lifetime API migration](specs/window-lifetimes.md). Follow the
 [application tutorial](docs/tutorials/building-an-app.md) and
 [release contract](specs/release.md) to create and verify a relocatable private SDK.
 Vellum's own code uses the [MIT license](LICENSE). The selected module namespace

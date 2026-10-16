@@ -56,9 +56,10 @@ func checkWorkbench(ctx context.Context, a *app.Application) (result error) {
 			}}
 		}})
 	}
+	var dockRef app.WindowRef
 	dock := &cogent.Workbench{Owner: a, Window: "ax-dock", Workspace: workspace, Panels: panels}
 	if err := a.Do(func() {
-		err = a.Open(app.Window{ID: "ax-dock", Title: "Vellum accessibility docking smoke", Width: 800, Height: 500, View: func() ui.Node { return ui.Node{ID: "workbench", Kind: ui.Extension, Custom: dock, Grow: true} }})
+		dockRef, err = a.OpenWindow(app.Window{ID: "ax-dock", Title: "Vellum accessibility docking smoke", Width: 800, Height: 500, View: func() ui.Node { return ui.Node{ID: "workbench", Kind: ui.Extension, Custom: dock, Grow: true} }})
 	}); err != nil {
 		return err
 	}
@@ -210,7 +211,7 @@ func checkWorkbench(ctx context.Context, a *app.Application) (result error) {
 			ownerErr = fmt.Errorf("dock controlled state incorrect")
 		}
 		if ownerErr == nil {
-			ownerErr = a.CloseWindow("ax-dock")
+			ownerErr = a.CloseWindow(dockRef)
 		}
 	}); err != nil {
 		return err

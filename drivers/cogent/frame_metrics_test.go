@@ -201,7 +201,7 @@ func TestFrameMetricsRetirementDetachesNativeOwnerAndSample(t *testing.T) {
 		t.Fatal("retained native owner")
 	}
 	frameMetricsRegistry.Lock()
-	leaked := frameMetricsRegistry.windows[frameWindowKey{a, "metrics-unit"}]
+	leaked := frameMetricsRegistry.windows[frameWindowKey{a, "metrics-unit", w.window.Ref()}]
 	frameMetricsRegistry.Unlock()
 	if leaked != nil {
 		t.Fatal("retained global registration")

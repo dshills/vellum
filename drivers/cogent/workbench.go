@@ -36,6 +36,7 @@ type Workbench struct {
 	splits         map[string]*core.Splits
 	Owner          *app.Application
 	Window         string
+	windowRef      app.WindowRef
 	Workspace      *workbench.Workspace
 	Group          *WorkbenchGroup
 	SessionWindow  string
@@ -82,9 +83,15 @@ func (w *Workbench) Mount(parent tree.Node) core.Widget {
 	if w == nil || w.Owner == nil || w.Workspace == nil && w.Group == nil {
 		return nil
 	}
+	ref, err := captureMountScope(parent, w.Owner, w.Window)
+	if err != nil || (w.windowRef != (app.WindowRef{}) && w.windowRef != ref) {
+		return nil
+	}
+	w.windowRef = ref
 	w.retired.Store(false)
 	w.setInputScope(true, false, nil)
 	w.host = core.NewFrame(parent)
+	bindWindowScope(w.host, w.Owner, ref)
 	w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1) })
 	w.bindWindowGeometry()
 	return w.host
@@ -95,6 +102,9 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 	}
 	if w.host == nil || w.host.This == nil {
 		return fmt.Errorf("workbench: not mounted")
+	}
+	if _, err := scopedWindowContext(w.Owner, w.windowRef); err != nil {
+		return err
 	}
 	if pending := w.pendingError.Swap(nil); pending != nil && !w.reportError(*pending) {
 		return fmt.Errorf("workbench: queued native change: %w", *pending)
@@ -173,7 +183,7 @@ func (w *Workbench) Sync(core.Widget) (err error) {
 		if err != nil {
 			return err
 		}
-		r, err = reconcile(w.parents[p.ID], r, n, w.Owner, w.Window, w.theme)
+		r, err = reconcileScoped(w.parents[p.ID], r, n, w.Owner, w.windowRef, w.theme)
 		if err != nil {
 			return err
 		}
@@ -285,7 +295,7 @@ func (w *Workbench) build(parent tree.Node, g *workbench.Group, retained map[str
 		if err != nil {
 			return err
 		}
-		r, err := reconcile(frame, retained[id], n, w.Owner, w.Window, w.theme)
+		r, err := reconcileScoped(frame, retained[id], n, w.Owner, w.windowRef, w.theme)
 		if err != nil {
 			return err
 		}

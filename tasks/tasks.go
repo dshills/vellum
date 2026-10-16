@@ -63,13 +63,16 @@ func (t *Task) deliveryFinished(err error) {
 
 type Manager struct {
 	app        *app.Application
-	window     string
+	window     app.WindowRef
 	executor   execution.Executor
 	slots      chan struct{}
 	invalidate func()
 }
 type Config struct {
-	Owner      *app.Application
+	Owner *app.Application
+	// Window captures the current named opening at manager construction. The
+	// manager retains that reference; Start never re-resolves a reused name.
+	// An empty name constructs an application-scoped manager.
 	Window     string
 	Limit      int
 	Invalidate func()
@@ -86,19 +89,21 @@ func NewWithConfig(c Config) (*Manager, error) {
 	if c.Owner == nil || c.Limit < 1 {
 		return nil, fmt.Errorf("tasks: application and positive limit required")
 	}
+	var window app.WindowRef
 	if c.Window != "" {
-		lifetime, err := c.Owner.WindowContext(c.Window)
+		var err error
+		window, err = c.Owner.WindowRef(c.Window)
 		if err != nil {
 			return nil, err
 		}
-		if lifetime.Err() != nil {
+		if window.Context().Err() != nil {
 			return nil, app.ErrWindowClosed
 		}
 	}
 	if c.Executor == nil {
 		c.Executor = &execution.Goroutine{}
 	}
-	return &Manager{app: c.Owner, window: c.Window, executor: c.Executor, slots: make(chan struct{}, c.Limit), invalidate: c.Invalidate}, nil
+	return &Manager{app: c.Owner, window: window, executor: c.Executor, slots: make(chan struct{}, c.Limit), invalidate: c.Invalidate}, nil
 }
 
 // Start is owner-only. Its slot remains occupied until worker termination AND
@@ -121,7 +126,13 @@ func Start[T any](m *Manager, parent context.Context, work func(context.Context,
 	ctx, cancel := context.WithCancel(parent)
 	var once sync.Once
 	task := &Task{state: State{Running: true}, cancel: cancel, done: make(chan struct{}), ownerDone: make(chan struct{}), release: func() { once.Do(func() { <-m.slots }) }}
-	ticket, err := m.app.ReserveCompletion(m.window, task.deliveryFinished)
+	var ticket *app.Completion
+	var err error
+	if m.window == (app.WindowRef{}) {
+		ticket, err = m.app.ReserveCompletion(task.deliveryFinished)
+	} else {
+		ticket, err = m.app.ReserveWindowCompletion(m.window, task.deliveryFinished)
+	}
 	if err != nil {
 		cancel()
 		task.release()
@@ -164,7 +175,7 @@ func Start[T any](m *Manager, parent context.Context, work func(context.Context,
 			if m.invalidate != nil && progressPending.CompareAndSwap(false, true) {
 				fn := func() { progressPending.Store(false); m.invalidate() }
 				var err error
-				if m.window == "" {
+				if m.window == (app.WindowRef{}) {
 					err = m.app.Post(fn)
 				} else {
 					err = m.app.PostWindow(m.window, fn)

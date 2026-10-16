@@ -57,6 +57,7 @@ type FrameMetricsPoll struct {
 type frameWindowKey struct {
 	owner  *app.Application
 	window string
+	ref    app.WindowRef
 }
 type frameWindowMetrics struct {
 	metrics *FrameMetrics
@@ -139,7 +140,7 @@ func (m *FrameMetrics) bind(a *app.Application, w *nativeWindow) (*frameWindowMe
 			return nil, ErrFrameMetricsConfig
 		}
 	}
-	key := frameWindowKey{a, strings.Clone(w.window.ID)}
+	key := frameWindowKey{a, strings.Clone(w.window.ID), w.window.Ref()}
 	frameMetricsRegistry.Lock()
 	defer frameMetricsRegistry.Unlock()
 	if frameMetricsRegistry.windows[key] != nil {
@@ -292,7 +293,7 @@ func EnqueueGridScroll(ctx context.Context, a *app.Application, model *virtual.G
 		return ErrGridLayout
 	}
 	frameMetricsRegistry.Lock()
-	b := frameMetricsRegistry.windows[frameWindowKey{a, g.window}]
+	b := frameMetricsRegistry.windows[frameWindowKey{a, g.window, g.windowRef}]
 	frameMetricsRegistry.Unlock()
 	if b == nil || !b.metrics.valid() {
 		return ErrFrameMetricsConfig

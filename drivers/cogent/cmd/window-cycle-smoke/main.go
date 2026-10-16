@@ -403,15 +403,16 @@ func cycle(ctx context.Context, a *app.Application, i int, composed bool) error 
 	if err != nil {
 		return err
 	}
-	original, err := a.WindowContext(id)
+	ref, err := a.WindowRef(id)
 	if err != nil {
 		return err
 	}
+	original := ref.Context()
 	child, stop := context.WithCancel(original)
 	defer stop()
 	var cleaned atomic.Int32
 	var badCleanup atomic.Bool
-	ticket, err := a.ReserveCompletion(id, func(e error) {
+	ticket, err := a.ReserveWindowCompletion(ref, func(e error) {
 		cleaned.Add(1)
 		if !errors.Is(e, app.ErrWindowClosed) {
 			badCleanup.Store(true)
@@ -432,7 +433,7 @@ func cycle(ctx context.Context, a *app.Application, i int, composed bool) error 
 	if err = inventory(ctx, []string{"Vellum cycle survivor", title}); err != nil {
 		return err
 	}
-	if err = a.CloseWindow(id); err != nil {
+	if err = a.CloseWindow(ref); err != nil {
 		return err
 	}
 	if !errors.Is(original.Err(), context.Canceled) || !errors.Is(child.Err(), context.Canceled) || cleaned.Load() != 1 || badCleanup.Load() {
@@ -441,7 +442,7 @@ func cycle(ctx context.Context, a *app.Application, i int, composed bool) error 
 	if err = ticket.Publish(func() {}); !errors.Is(err, app.ErrWindowClosed) {
 		return fmt.Errorf("late result admission: %v", err)
 	}
-	if err = a.PostWindow(id, func() {}); !errors.Is(err, app.ErrWindowClosed) {
+	if err = a.PostWindow(ref, func() {}); !errors.Is(err, app.ErrWindowClosed) {
 		return fmt.Errorf("late owner delivery: %v", err)
 	}
 	if err = wait(ctx, func(inner context.Context) (bool, error) {

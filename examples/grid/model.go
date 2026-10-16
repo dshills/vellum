@@ -18,6 +18,7 @@ const statusMaxWidth = 640
 type gridWindow struct {
 	owner                           *app.Application
 	id                              string
+	windowRef                       app.WindowRef
 	source                          *gridSource
 	grid                            *virtual.Grid
 	status                          string
@@ -138,9 +139,9 @@ func (w *gridWindow) requestCellCommit() error {
 	if w.cellCommitToken == math.MaxUint64 {
 		return virtual.ErrGridExhausted
 	}
-	lifetime, err := w.owner.WindowContext(w.id)
-	if err != nil {
-		return err
+	lifetime := w.windowRef.Context()
+	if lifetime.Err() != nil {
+		return app.ErrWindowClosed
 	}
 	ctx, cancel := context.WithCancel(lifetime)
 	w.cellCommitToken++
@@ -364,7 +365,7 @@ func (w *gridWindow) view() ui.Node {
 		button("page-up", "Page up", func() error { return w.grid.Page(-1) }), button("page-down", "Page down", func() error { return w.grid.Page(1) }),
 		button("disable", "Toggle disabled", func() error { w.disabled = !w.disabled; return nil }),
 		button("modal-open", "Open modal", func() error { w.modal = true; return nil }),
-		button("close", "Close window", func() error { return w.owner.CloseWindow(w.id) }),
+		button("close", "Close window", func() error { return w.owner.CloseWindow(w.windowRef) }),
 	}
 	if w.heightControls {
 		moreButtons = append(moreButtons, button("row-heights", "Toggle row heights", func() error { return w.setVariableRows(!w.variableRows) }))
@@ -440,7 +441,7 @@ func newProgramOptions(width, height int, variableRows, rowSelection, editableCe
 			a.Close()
 			return nil, err
 		}
-		if err = a.Open(app.Window{ID: w.id, Title: fmt.Sprintf("Vellum Grid · %s", w.id), Width: float32(width), Height: float32(height), View: w.view}); err != nil {
+		if w.windowRef, err = a.OpenWindow(app.Window{ID: w.id, Title: fmt.Sprintf("Vellum Grid · %s", w.id), Width: float32(width), Height: float32(height), View: w.view}); err != nil {
 			a.Close()
 			return nil, err
 		}

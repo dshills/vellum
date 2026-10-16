@@ -72,7 +72,7 @@ func main() {
 		return consumed
 	}
 	status := "Drag or use arrows to orbit; scroll to dolly"
-	err = a.Open(app.Window{ID: g.Window, Title: "Vellum shared-device 3D viewport", Width: 800, Height: 600, View: func() ui.Node {
+	primaryRef, err := a.OpenWindow(app.Window{ID: g.Window, Title: "Vellum shared-device 3D viewport", Width: 800, Height: 600, View: func() ui.Node {
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: []ui.Node{
 			{ID: "tools", Kind: ui.Row, Children: []ui.Node{{ID: "orbit", Kind: ui.Button, Text: "Orbit", Activate: func() { m.camera.orbit(.3, .1); change() }}, {ID: "dolly", Kind: ui.Button, Text: "Dolly", Activate: func() { m.camera.dolly(.85); change() }}, {ID: "reset", Kind: ui.Button, Text: "Reset camera", Activate: func() { m.camera = defaultCamera(); change() }}}},
 			{ID: "status", Kind: ui.Label, Text: status}, {ID: "viewport", Kind: ui.Extension, Grow: true, Custom: g},
@@ -83,11 +83,12 @@ func main() {
 	}
 	var other *cogent.GPUView
 	var otherModel *cubeProgram
+	var otherRef app.WindowRef
 	if *smoke {
 		var p *cogent.GPUProgram
 		otherModel, p = newCubeProgram()
 		other = &cogent.GPUView{Owner: a, Window: "viewport3d-other", Program: p, Depth: true, OnError: g.OnError}
-		if err := a.Open(app.Window{ID: other.Window, Title: "Vellum independent 3D resources", Width: 640, Height: 480, View: func() ui.Node {
+		if otherRef, err = a.OpenWindow(app.Window{ID: other.Window, Title: "Vellum independent 3D resources", Width: 640, Height: 480, View: func() ui.Node {
 			return ui.Node{ID: "other", Kind: ui.Column, Grow: true, Children: []ui.Node{{ID: "other-viewport", Kind: ui.Extension, Grow: true, Custom: other}}}
 		}}); err != nil {
 			fail(err)
@@ -100,7 +101,7 @@ func main() {
 		go func() {
 			ctx, cancel := context.WithTimeout(a.Context(), 50*time.Second)
 			defer cancel()
-			result <- viewportSmoke(ctx, a, g, other, m, otherModel, nativeErrors, func() { status = "Chrome remains responsive" })
+			result <- viewportSmoke(ctx, a, primaryRef, otherRef, g, other, m, otherModel, nativeErrors, func() { status = "Chrome remains responsive" })
 			a.Close()
 		}()
 	}

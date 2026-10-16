@@ -227,12 +227,8 @@ func desktopSmoke(ctx context.Context, p *program) error {
 	}
 	var lifetime context.Context
 	if e = owned(p, func() error {
-		var e error
-		lifetime, e = p.owner.WindowContext("small")
-		if e != nil {
-			return e
-		}
-		return p.owner.CloseWindow("small")
+		lifetime = p.windows[0].windowRef.Context()
+		return p.owner.CloseWindow(p.windows[0].windowRef)
 	}); e != nil {
 		return e
 	}
@@ -245,7 +241,7 @@ func desktopSmoke(ctx context.Context, p *program) error {
 	if e = emit("survivor-independent", nil); e != nil {
 		return e
 	}
-	if e = owned(p, func() error { return p.owner.CloseWindow("large") }); e != nil {
+	if e = owned(p, func() error { return p.owner.CloseWindow(p.windows[1].windowRef) }); e != nil {
 		return e
 	}
 	return emit("pass", map[string]any{"nodes": p.nodes, "desktop_input": "owner commands and real filter settlement", "native_teardown": "not joined or claimed"})

@@ -91,10 +91,11 @@ func TestTreePerfInspectionDistinguishesStartupAndRetirement(t *testing.T) {
 				t.Fatal(err)
 			}
 			defer owner.Close()
-			if err = owner.Open(app.Window{ID: "perf", Title: "inert perf inspector", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label} }}); err != nil {
+			ref, err := owner.OpenWindow(app.Window{ID: "perf", Title: "inert perf inspector", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label} }})
+			if err != nil {
 				t.Fatal(err)
 			}
-			p := &treePerfProgram{owner: owner, ready: ready} // no native binding exists
+			p := &treePerfProgram{owner: owner, windowRef: ref, ready: ready} // no native binding exists
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Millisecond)
 			defer cancel()
 			result := make(chan error, 1)
@@ -128,13 +129,14 @@ func TestTreePerfInspectionDistinguishesStartupAndRetirement(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer owner.Close()
-	if err = owner.Open(app.Window{ID: "perf", Title: "closed perf origin", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label} }}); err != nil {
+	ref, err := owner.OpenWindow(app.Window{ID: "perf", Title: "closed perf origin", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label} }})
+	if err != nil {
 		t.Fatal(err)
 	}
-	if err = owner.CloseWindow("perf"); err != nil {
+	if err = owner.CloseWindow(ref); err != nil {
 		t.Fatal(err)
 	}
-	p := &treePerfProgram{owner: owner}
+	p := &treePerfProgram{owner: owner, windowRef: ref}
 	if _, err = p.inspect(context.Background()); err == nil {
 		t.Fatal("closed logical origin retried as startup")
 	}

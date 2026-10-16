@@ -160,10 +160,10 @@ func (g *GPUCanvas) NativeWindow() system.Window {
 	if g == nil || g.widget == nil || g.widget.retired.Load() || g.widget.WidgetBase.Scene == nil {
 		return nil
 	}
-	if g.Owner == nil {
+	if g.Owner == nil || g.Owner != g.widget.application || g.Window != g.widget.windowRef.ID() {
 		return nil
 	}
-	ctx, err := g.Owner.WindowContext(g.Window)
+	ctx, err := scopedWindowContext(g.Owner, g.widget.windowRef)
 	if err != nil || ctx.Err() != nil {
 		return nil
 	}

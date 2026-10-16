@@ -28,8 +28,8 @@ type WorkbenchGroup struct {
 	windows         map[string]*Workbench
 	next            uint64
 	identity        uint64
-	open            func(app.Window) error
-	close           func(string) error
+	open            func(app.Window) (app.WindowRef, error)
+	close           func(app.WindowRef) error
 	manualMode      *manualWorkbenchMode
 }
 
@@ -50,7 +50,7 @@ func NewWorkbenchGroup(owner *app.Application, session *workbench.Session, panel
 	if len(ids) > 0 {
 		return nil, fmt.Errorf("workbench: missing registered panels")
 	}
-	return &WorkbenchGroup{Owner: owner, Session: session, Panels: append([]Panel(nil), panels...), windows: map[string]*Workbench{}, identity: workbenchGroupIDs.Add(1), open: owner.Open, close: owner.CloseWindow}, nil
+	return &WorkbenchGroup{Owner: owner, Session: session, Panels: append([]Panel(nil), panels...), windows: map[string]*Workbench{}, identity: workbenchGroupIDs.Add(1), open: owner.OpenWindow, close: owner.CloseWindow}, nil
 }
 func (g *WorkbenchGroup) newWindow(spec workbench.WindowLayout) (*Workbench, app.Window) {
 	g.next++
@@ -123,7 +123,7 @@ func (g *WorkbenchGroup) apply(next workbench.SessionLayout, persist, nativeGeom
 	}
 	previous := g.Session.Layout()
 	for id, w := range g.windows {
-		ctx, err := g.Owner.WindowContext(w.Window)
+		ctx, err := scopedWindowContext(g.Owner, w.windowRef)
 		if err != nil || ctx.Err() != nil {
 			return fmt.Errorf("workbench: native registration %q is no longer live", id)
 		}
@@ -140,16 +140,17 @@ func (g *WorkbenchGroup) apply(next workbench.SessionLayout, persist, nativeGeom
 		for _, spec := range previous.Windows {
 			if _, ok := removed[spec.ID]; ok {
 				w, win := g.newWindow(spec)
-				if err := g.open(win); err != nil {
+				if ref, err := g.open(win); err != nil {
 					cleanup = append(cleanup, err)
 				} else {
+					w.windowRef = ref
 					g.windows[spec.ID] = w
 				}
 			}
 		}
 		for id, w := range added {
 			delete(g.windows, id)
-			if err := g.close(w.Window); err != nil {
+			if err := g.close(w.windowRef); err != nil {
 				cleanup = append(cleanup, err)
 			}
 		}
@@ -163,9 +164,11 @@ func (g *WorkbenchGroup) apply(next workbench.SessionLayout, persist, nativeGeom
 	for _, spec := range next.Windows {
 		if g.windows[spec.ID] == nil {
 			w, win := g.newWindow(spec)
-			if err := g.open(win); err != nil {
+			ref, err := g.open(win)
+			if err != nil {
 				return rollback(err)
 			}
+			w.windowRef = ref
 			g.windows[spec.ID] = w
 			added[spec.ID] = w
 		}
@@ -176,7 +179,7 @@ func (g *WorkbenchGroup) apply(next workbench.SessionLayout, persist, nativeGeom
 				// Retire before invoking close: a synchronous native close hook
 				// must see this adapter as retired rather than reenter Apply.
 				delete(g.windows, spec.ID)
-				if err := g.close(w.Window); err != nil {
+				if err := g.close(w.windowRef); err != nil {
 					g.windows[spec.ID] = w
 					return rollback(err)
 				}

@@ -163,7 +163,7 @@ func TestGPUClosedAdapterAndInputCallbacks(t *testing.T) {
 	p := &GPUProgram{Draw: func(GPUFrame, *wgpu.RenderPassEncoder) error { return nil }}
 	g := &GPUView{Owner: a, Window: "gpu-closed", Program: p}
 	g.Mount(core.NewBody("gpu-closed"))
-	a.CloseWindow(g.Window)
+	a.CloseWindow(fixtureWindowRef(a, g.Window))
 	g.Input = func(GPUInput) bool { called = true; return true }
 	click := events.NewMouse(events.MouseDown, events.Left, image.Pt(20, 30), 0)
 	click.SetLocalOff(image.Point{})

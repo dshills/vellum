@@ -11,9 +11,9 @@ import (
 	"cogentcore.org/core/xyz"
 	"cogentcore.org/core/xyz/xyzcore"
 	"errors"
+	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
-	"fmt"
 	"image"
 	"image/color"
 	"math"
@@ -39,10 +39,16 @@ func (g *GPUCanvas) Mount(parent tree.Node) core.Widget {
 	if g == nil || g.Owner == nil || g.Model == nil || g.Model.Validate() != nil {
 		return nil
 	}
+	ref, err := captureMountScope(parent, g.Owner, g.Window)
+	if err != nil || g.widget != nil && !g.widget.retired.Load() {
+		return nil
+	}
 	g.solids = nil
 	g.ids = nil
 	g.widget = tree.New[canvasWidget](parent)
 	g.widget.owner = g
+	g.widget.application, g.widget.windowRef = g.Owner, ref
+	mounted := g.widget
 	g.widget.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(240), units.Dp(200)); s.Grow.Set(1, 1) })
 	sc := g.widget.XYZ
 	xyz.NewAmbient(sc, "vellum.ambient", 1, xyz.DirectSun)
@@ -61,7 +67,7 @@ func (g *GPUCanvas) Mount(parent tree.Node) core.Widget {
 	sc.Camera.Near = .01
 	g.widget.OnFirst(events.Scroll, func(e events.Event) {
 		if s, ok := e.(*events.MouseScroll); ok {
-			g.Owner.Do(func() {
+			mounted.ownerEvent(func() {
 				g.size()
 				p := e.Pos().Sub(g.widget.Geom.ContentBBox.Min)
 				if err := g.Model.View.ZoomAt(canvas.Point{X: float64(p.X), Y: float64(p.Y)}, math.Exp(-float64(s.Delta.Y)*.003)); err != nil {
@@ -75,7 +81,7 @@ func (g *GPUCanvas) Mount(parent tree.Node) core.Widget {
 		}
 	})
 	g.widget.OnFirst(events.SlideMove, func(e events.Event) {
-		g.Owner.Do(func() {
+		mounted.ownerEvent(func() {
 			g.size()
 			d := e.PrevDelta()
 			if err := g.Model.View.Pan(float64(d.X), float64(d.Y)); err != nil {
@@ -88,8 +94,8 @@ func (g *GPUCanvas) Mount(parent tree.Node) core.Widget {
 		e.SetHandled()
 	})
 	g.widget.OnFirst(events.MouseDown, func(e events.Event) {
-		g.widget.SetFocus()
-		g.Owner.Do(func() {
+		mounted.ownerEvent(func() {
+			mounted.SetFocus()
 			g.size()
 			p := e.Pos().Sub(g.widget.Geom.ContentBBox.Min)
 			id := g.Model.Pick(canvas.Point{X: float64(p.X), Y: float64(p.Y)})
@@ -116,7 +122,7 @@ func (g *GPUCanvas) Mount(parent tree.Node) core.Widget {
 		default:
 			return
 		}
-		g.Owner.Do(func() {
+		mounted.ownerEvent(func() {
 			if err := g.Model.View.Pan(dx, dy); err != nil {
 				g.report(err)
 				return
@@ -230,8 +236,10 @@ func (g *GPUCanvas) Snapshot() (*image.NRGBA, error) {
 // before direct rendering. Updaters run before layout and cannot supply this size.
 type canvasWidget struct {
 	xyzcore.Scene
-	owner   *GPUCanvas
-	retired atomic.Bool
+	owner       *GPUCanvas
+	application *app.Application
+	windowRef   app.WindowRef
+	retired     atomic.Bool
 }
 
 func (w *canvasWidget) OnAdd() { w.WidgetBase.OnAdd(); w.WidgetBase.Scene.AddDirectRender(w) }
@@ -272,7 +280,10 @@ func (w *canvasWidget) Render() {
 	if w.owner == nil {
 		return
 	}
-	if err := w.owner.Owner.Do(func() {
+	if err := w.application.Do(func() {
+		if w.retired.Load() || w.owner == nil || w.owner.widget != w || w.windowRef.Context().Err() != nil {
+			return
+		}
 		window := w.owner.NativeWindow()
 		if window == nil || !window.Lock() {
 			return
@@ -300,3 +311,12 @@ func (w *canvasWidget) Render() {
 }
 
 var ErrFrameNotReady = errors.New("canvas: native GPU frame not ready")
+
+func (w *canvasWidget) ownerEvent(fn func()) {
+	_ = w.application.Do(func() {
+		if w.retired.Load() || w.owner == nil || w.owner.widget != w || w.owner.Owner != w.application || w.owner.Window != w.windowRef.ID() || w.windowRef.Context().Err() != nil {
+			return
+		}
+		fn()
+	})
+}

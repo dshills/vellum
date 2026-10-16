@@ -94,13 +94,17 @@ Menus and shortcuts invoke the same registry, rechecking availability under the
 owner. Use stable command IDs rather than displayed labels.
 
 Use `tasks.New` and `tasks.Start` for bounded workers. Start tasks under the UI
-owner and use the relevant `application.WindowContext` as their parent. Workers
+owner and use a retained opening receipt's `ref.Context()` as their parent. Workers
 honor context cancellation and return owned results; commit callbacks run on the
-owner. Direct `PostWindow` also delivers a worker result to a living window.
+owner. `application.PostWindow(ref, callback)` delivers to that exact opening.
 Call platform services from workers, outside UI callbacks, `View` and `Do`.
 
-`application.Open` registers another window during a run. IDs remain unique for
-the whole application lifetime. Closing a window cancels its scope; closing the
+`ref, err := application.OpenWindow(spec)` registers another window during a run.
+Keep `ref` with its window/document controller. Close with `CloseWindow(ref)`;
+request its close policy with `RequestCloseWindow(ref)`. IDs are unique among
+live windows and may be reused after closure. `WindowRef(name)` selects the
+current registration; avoid looking it up in work intended for an earlier
+opening. Closing a window cancels its scope; closing the
 final window ends the application. Keep documents/undo history in application
 model objects, and use `workbench.Session` for the separate window/panel layout.
 The same document can move between docked/floating windows without becoming
@@ -198,7 +202,8 @@ leading dot, for example `Extensions: []string{"vellum"}`.
 Use Window.CloseRequest to show an asynchronous Save/Discard/Cancel dialog and
 return false while changes are unsaved. After Save completes, close only if
 Result.Err == nil and the journal is clean. `Written` alone is insufficient.
-RequestCloseWindow applies the policy; CloseWindow and Close force teardown.
+`RequestCloseWindow(ref)` applies the policy; `CloseWindow(ref)` and `Close`
+force teardown.
 Use Cancel to cancel IO while keeping the window alive. Window closure cancels
 pending work and suppresses late commits. See the [document contract](../../specs/document.md)
 and [workbench consumer](../../drivers/cogent/cmd/workbench/document_workflow.go).

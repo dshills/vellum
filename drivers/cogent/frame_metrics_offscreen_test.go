@@ -56,7 +56,7 @@ func TestFrameMetricsPriorOwnerWakeDisablesTargetBeforeDispatch(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer b.retire()
-	if err := a.PostWindow("one", func() { disabled = true; _ = a.Invalidate("one") }); err != nil {
+	if err := a.PostWindow(fixtureWindowRef(a, "one"), func() { disabled = true; _ = a.Invalidate("one") }); err != nil {
 		t.Fatal(err)
 	}
 	if outer := a.Do(func() { err = EnqueueGridScroll(testContext, a, grid, 0, 12, 1) }); outer != nil || err != nil {

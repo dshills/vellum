@@ -150,6 +150,10 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 	if e != nil {
 		return e
 	}
+	ref, e := a.WindowRef("soak")
+	if e != nil {
+		return e
+	}
 	native, e := readback(ctx, a, gpu, m, ready)
 	if e != nil {
 		return e
@@ -334,7 +338,7 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 	}
 	closing, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	r, e := ownerProbe(closing, a, func() ownerReply { return ownerReply{err: a.CloseWindow("soak")} })
+	r, e := ownerProbe(closing, a, func() ownerReply { return ownerReply{err: a.CloseWindow(ref)} })
 	if e != nil || r.err != nil {
 		return errors.Join(e, r.err)
 	}

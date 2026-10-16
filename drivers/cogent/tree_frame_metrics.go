@@ -50,7 +50,7 @@ func EnqueueTreeScroll(ctx context.Context, a *app.Application, model *virtual.O
 	}
 	position := image.Pt((body.Min.X+body.Max.X)/2, (body.Min.Y+body.Max.Y)/2)
 	frameMetricsRegistry.Lock()
-	b := frameMetricsRegistry.windows[frameWindowKey{a, t.window}]
+	b := frameMetricsRegistry.windows[frameWindowKey{a, t.window, t.windowRef}]
 	frameMetricsRegistry.Unlock()
 	if b == nil || !b.metrics.valid() {
 		return ErrFrameMetricsConfig
@@ -96,7 +96,7 @@ func tracedTreeIntent(t *outlineBinding) (*core.FrameTrace, uint64) {
 }
 func (t *outlineBinding) postTraced(trace *core.FrameTrace, tag uint64, reason ui.TreeChangeReason, fn func() error) {
 	trace.ExpectOwner(tag)
-	err := t.owner.PostWindow(t.window, func() {
+	err := t.owner.PostWindow(t.windowRef, func() {
 		returned := false
 		defer func() {
 			if !returned {

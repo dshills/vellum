@@ -163,6 +163,10 @@ func iconPNG() ([]byte, error) {
 	return encoded.Bytes(), err
 }
 func check(ctx context.Context, a *app.Application, m *model, cycles int) error {
+	firstRef, err := a.WindowRef("first")
+	if err != nil {
+		return err
+	}
 	for _, id := range []string{"first", "second"} {
 		if err := waitWindow(ctx, id); err != nil {
 			return err
@@ -306,7 +310,7 @@ func check(ctx context.Context, a *app.Application, m *model, cycles int) error 
 	if err = tray.SetTray(ctx, o); err != nil {
 		return err
 	}
-	if err = a.CloseWindow("first"); err != nil {
+	if err = a.CloseWindow(firstRef); err != nil {
 		return err
 	}
 	if err = waitWindow(ctx, "second"); err != nil {

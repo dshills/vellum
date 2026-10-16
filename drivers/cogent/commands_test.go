@@ -74,7 +74,7 @@ func TestDocumentFallbackLetsNativeTextUndoConsumeChord(t *testing.T) {
 	if !event.IsHandled() || calls != 1 {
 		t.Fatal("document fallback not invoked", calls)
 	}
-	if err := a.CloseWindow("main"); err != nil {
+	if err := a.CloseWindow(fixtureWindowRef(a, "main")); err != nil {
 		t.Fatal(err)
 	}
 	event = events.NewKey(events.KeyChord, 'z', key.CodeZ, key.Modifiers(1<<key.Control))

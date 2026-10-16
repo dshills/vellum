@@ -197,7 +197,7 @@ func TestWindowCloseDropsLateCallbacksAndCancelsWorker(t *testing.T) {
 		}
 	})
 	wait(t, entered)
-	if err := f.a.CloseWindow("main"); err != nil {
+	if err := f.a.CloseWindow(f.s.window); err != nil {
 		t.Fatal(err)
 	}
 	wait(t, ended)
@@ -268,7 +268,7 @@ func TestCompletionCanChainSaveAndClose(t *testing.T) {
 				t.Error(err)
 			}
 		} else {
-			if err := f.a.CloseWindow("main"); err != nil {
+			if err := f.a.CloseWindow(f.s.window); err != nil {
 				t.Error(err)
 			}
 		}

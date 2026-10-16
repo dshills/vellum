@@ -24,7 +24,8 @@ func main() {
 		fail(err)
 	}
 	defer a.Close()
-	if err := a.Open(app.Window{ID: "placement", Title: "Vellum palette to canvas", Width: 1100, Height: 760, View: func() ui.Node { return view(a, m) }}); err != nil {
+	var windowRef app.WindowRef
+	if windowRef, err = a.OpenWindow(app.Window{ID: "placement", Title: "Vellum palette to canvas", Width: 1100, Height: 760, View: func() ui.Node { return view(a, windowRef, m) }}); err != nil {
 		fail(err)
 	}
 	if err := a.Run(context.Background(), cogent.Driver{Commands: m.commands}); err != nil {
@@ -32,14 +33,15 @@ func main() {
 	}
 }
 func fail(err error) { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
-func view(a *app.Application, m *model) ui.Node {
+func view(a *app.Application, ref app.WindowRef, m *model) ui.Node {
 	update := func() { _ = a.Invalidate("placement") }
 	invoke := func(id string) func() {
 		return func() {
-			life, err := a.WindowContext("placement")
-			if err == nil {
-				err = m.commands.Invoke(life, id)
+			life := ref.Context()
+			if life.Err() != nil {
+				return
 			}
+			err := m.commands.Invoke(life, id)
 			if err != nil {
 				m.status = err.Error()
 			}
@@ -50,10 +52,11 @@ func view(a *app.Application, m *model) ui.Node {
 	for _, id := range []string{"block", "connector", "note"} {
 		source := m.palette.Source(id)
 		tools = append(tools, ui.Node{ID: "tool-" + id, Kind: ui.Button, Text: source.Label(), PlacementSource: source, Accessibility: ui.Accessibility{Name: source.Label(), Help: "Drag onto the canvas, or press Return to place at the current canvas center."}, Activate: func() {
-			life, err := a.WindowContext("placement")
-			if err == nil {
-				err = source.PlaceKeyboard(life, m.target, m.scene.View.Center)
+			life := ref.Context()
+			if life.Err() != nil {
+				return
 			}
+			err := source.PlaceKeyboard(life, m.target, m.scene.View.Center)
 			if err != nil {
 				m.status = err.Error()
 			}

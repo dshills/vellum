@@ -50,7 +50,7 @@ func RunCommands(ctx context.Context, batch int) (proof CommandProof, err error)
 	var commandErr error
 	for _, action := range actions {
 		action := action
-		if err := a.PostWindow(f.Window, func() {
+		if err := a.PostWindow(f.windowRef, func() {
 			if commandErr != nil {
 				return
 			}

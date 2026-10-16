@@ -80,15 +80,14 @@ func TestWorkbenchGroupNativeRecordsStayInTheirWindow(t *testing.T) {
 	if float.records["two"].widget == before || main.records["two"] != nil {
 		t.Fatal("native panel crossed windows")
 	}
-	nativeID := float.Window
+	original := float.windowRef.Context()
 	if err := g.Apply(func(s *workbench.Session) error { return s.Dock("two", "main", "documents", 0) }); err != nil {
 		t.Fatal(err)
 	}
 	if err := main.Sync(main.host); err != nil {
 		t.Fatal(err)
 	}
-	ctx, _ := a.WindowContext(nativeID)
-	if ctx.Err() == nil || len(a.Windows()) != 1 || len(g.Session.Layout().Windows) != 1 {
+	if original.Err() == nil || len(a.Windows()) != 1 || len(g.Session.Layout().Windows) != 1 {
 		t.Fatal("empty floating native registration survived")
 	}
 	if main.records["two"].widget == float.records["two"].widget {
@@ -98,7 +97,7 @@ func TestWorkbenchGroupNativeRecordsStayInTheirWindow(t *testing.T) {
 func TestWorkbenchGroupOpenCloseAndPersistenceFailuresCompensate(t *testing.T) {
 	a, g := groupFixture(t)
 	before := mustEncodeSession(t, g.Session)
-	g.open = func(app.Window) error { return errors.New("injected Open failure") }
+	g.open = func(app.Window) (app.WindowRef, error) { return app.WindowRef{}, errors.New("injected Open failure") }
 	if g.Float("two", workbench.Bounds{Width: 500, Height: 400}) == nil {
 		t.Fatal("Open failure ignored")
 	}
@@ -106,7 +105,7 @@ func TestWorkbenchGroupOpenCloseAndPersistenceFailuresCompensate(t *testing.T) {
 	if !bytes.Equal(before, after) || len(a.Windows()) != 1 || len(g.windows) != 1 || a.Context().Err() != nil {
 		t.Fatal("Open rollback diverged")
 	}
-	g.open = a.Open
+	g.open = a.OpenWindow
 	if err := g.Float("two", workbench.Bounds{Width: 500, Height: 400}); err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +116,7 @@ func TestWorkbenchGroupOpenCloseAndPersistenceFailuresCompensate(t *testing.T) {
 		}
 	}
 	before = mustEncodeSession(t, g.Session)
-	g.close = func(string) error { return errors.New("injected Close failure") }
+	g.close = func(app.WindowRef) error { return errors.New("injected Close failure") }
 	if g.Close(floating) == nil {
 		t.Fatal("Close failure ignored")
 	}
@@ -127,6 +126,7 @@ func TestWorkbenchGroupOpenCloseAndPersistenceFailuresCompensate(t *testing.T) {
 	}
 	g.close = a.CloseWindow
 	oldID := g.windows[floating].Window
+	oldRef := g.windows[floating].windowRef
 	g.PersistencePath = filepath.Join(t.TempDir(), "missing", "session.json")
 	if g.Close(floating) == nil {
 		t.Fatal("save failure ignored")
@@ -135,8 +135,7 @@ func TestWorkbenchGroupOpenCloseAndPersistenceFailuresCompensate(t *testing.T) {
 	if !bytes.Equal(before, after) || len(a.Windows()) != 2 || g.windows[floating].Window == oldID || a.Context().Err() != nil {
 		t.Fatal("save compensation did not reopen old session with fresh registration")
 	}
-	old, _ := a.WindowContext(oldID)
-	if old.Err() == nil {
+	if oldRef.Context().Err() == nil {
 		t.Fatal("retired identity reused")
 	}
 }
@@ -153,7 +152,9 @@ func TestWorkbenchGroupRollbackFailureClosesApplication(t *testing.T) {
 	}
 	before := mustEncodeSession(t, g.Session)
 	g.PersistencePath = filepath.Join(t.TempDir(), "missing", "session.json")
-	g.open = func(app.Window) error { return errors.New("cannot restore native window") }
+	g.open = func(app.Window) (app.WindowRef, error) {
+		return app.WindowRef{}, errors.New("cannot restore native window")
+	}
 	if g.Close(floating) == nil || a.Context().Err() == nil {
 		t.Fatal("failed compensation left incoherent running application")
 	}
@@ -409,7 +410,7 @@ func TestWorkbenchControllerCloseDoesNotReenterNativeCloseHook(t *testing.T) {
 			before := mustEncodeSession(t, g.Session)
 			calls := 0
 			closeErr := errors.New("injected synchronous close failure")
-			g.close = func(id string) error {
+			g.close = func(ref app.WindowRef) error {
 				calls++
 				if calls > 1 {
 					t.Fatal("close hook reentered the controller")
@@ -420,7 +421,7 @@ func TestWorkbenchControllerCloseDoesNotReenterNativeCloseHook(t *testing.T) {
 				if failClose {
 					return closeErr
 				}
-				return a.CloseWindow(id)
+				return a.CloseWindow(ref)
 			}
 			err := g.Close(logical)
 			if failClose {
@@ -695,12 +696,13 @@ func TestWorkbenchGeometryBurstUsesOneLatestPendingSnapshot(t *testing.T) {
 }
 func TestWorkbenchCommittedTransactionSurvivesRefusedWake(t *testing.T) {
 	a, g := groupFixture(t)
-	g.open = func(window app.Window) error {
-		if err := a.Open(window); err != nil {
-			return err
+	g.open = func(window app.Window) (app.WindowRef, error) {
+		ref, err := a.OpenWindow(window)
+		if err != nil {
+			return app.WindowRef{}, err
 		}
 		a.Close()
-		return nil
+		return ref, nil
 	}
 	if err := g.Float("two", workbench.Bounds{Width: 500, Height: 400}); err != nil {
 		t.Fatal("committed transaction reported wake failure", err)

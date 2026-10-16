@@ -265,7 +265,7 @@ authorization and restoration; routine checks do not change those preferences.
 Public distribution also requires the third-party/native dependency audit.
 The selected namespace and MIT license resolve owner choices but do not certify
 that audit, signing/notarization or production qualification. Existing version is
-v0.1.0-alpha.1 and macOS remains experimental until acceptance is complete.
+v0.1.0-alpha.2 and macOS remains experimental until acceptance is complete.
 
 The Mac distribution input collector adds size/hash identities for the complete
 SDK source payload, resolved workbench embed assets, listed cgo sources and

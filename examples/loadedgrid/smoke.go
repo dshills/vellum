@@ -251,10 +251,10 @@ func desktopSmoke(ctx context.Context, p *program) error {
 		return e
 	}
 	if e = owned(p, func() error {
-		if e := p.owner.CloseWindow(p.windows[0].id); e != nil {
+		if e := p.owner.CloseWindow(p.windows[0].windowRef); e != nil {
 			return e
 		}
-		return p.owner.CloseWindow(w.id)
+		return p.owner.CloseWindow(w.windowRef)
 	}); e != nil {
 		return e
 	}

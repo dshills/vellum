@@ -484,7 +484,7 @@ func TestStoredGridRoutedReplayAcrossBatches(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					if err := f.a.CloseWindow("grid"); err != nil {
+					if err := f.a.CloseWindow(fixtureWindowRef(f.a, "grid")); err != nil {
 						t.Fatal(err)
 					}
 					replayGridSettle(t, f, batch)

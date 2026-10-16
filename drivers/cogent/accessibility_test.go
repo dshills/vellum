@@ -271,7 +271,7 @@ func TestAccessibilityWindowLifetimeDropsAdmittedWork(t *testing.T) {
 	if !accessibilityDeliver(b.token, 1, "button", accessibilityAction{Kind: "press"}) {
 		t.Fatal("admission")
 	}
-	if err := a.CloseWindow("ax"); err != nil {
+	if err := a.CloseWindow(fixtureWindowRef(a, "ax")); err != nil {
 		t.Fatal(err)
 	}
 	if err := a.Drain(); err != nil {
@@ -471,6 +471,11 @@ func TestAccessibilityTablePagingReachesTrailingRowsAndRejectsStaleCount(t *test
 		t.Fatal(err)
 	}
 	v := &VirtualTable{Owner: a, Window: "ax", Model: model}
+	if native := v.Mount(core.NewBody("AX semantic fixture")); native == nil {
+		t.Fatal("mount")
+	} else if err := v.Sync(native); err != nil {
+		t.Fatal(err)
+	}
 	r := &record{node: ui.Node{ID: "small", Kind: ui.Extension, Custom: v}}
 	_, handlers := accessibilitySnapshot(r, b)
 	next := handlers[accessibilityPageID("small", "next")]
@@ -502,6 +507,11 @@ func TestAccessibilityTreeSelectAndDisclosureAreIndependentAndCurrent(t *testing
 	}
 	selected := 0
 	v := &VirtualTree{Owner: a, Window: "ax", Model: model, Count: 3, Select: func(string) { selected++ }}
+	if native := v.Mount(core.NewBody("AX semantic fixture")); native == nil {
+		t.Fatal("mount")
+	} else if err := v.Sync(native); err != nil {
+		t.Fatal(err)
+	}
 	r := &record{node: ui.Node{ID: "tree", Kind: ui.Extension, Custom: v}}
 	nodes, handlers := accessibilitySnapshot(r, b)
 	var row accessibilityNode

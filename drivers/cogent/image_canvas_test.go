@@ -32,8 +32,11 @@ func TestImageOnlyAdapterAndPreallocationAdmission(t *testing.T) {
 	}
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(scopeDeclaration("standalone-unit")); err != nil {
+		t.Fatal(err)
+	}
 	view := canvas.Viewport{Width: 200, Height: 100, Zoom: 1}
-	g := &MeshCanvas{Owner: a, View: &view, Image: &layer}
+	g := &MeshCanvas{Owner: a, Window: "standalone-unit", View: &view, Image: &layer}
 	if g.Mount(core.NewBody("image-only")) == nil {
 		t.Fatal("image-only mount")
 	}

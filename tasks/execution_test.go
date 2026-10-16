@@ -110,7 +110,7 @@ func TestRefusedExecutorAndReservationRefundEveryCreditWithoutWork(t *testing.T)
 	tickets := make([]*app.Completion, 4)
 	for i := range tickets {
 		var err error
-		tickets[i], err = a.ReserveCompletion("", nil)
+		tickets[i], err = a.ReserveCompletion(nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -213,7 +213,7 @@ func TestWindowCloseRevokesDeliveryButRetainsRunningWorkerLimit(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatal(ctx.Err())
 	}
-	if err := a.CloseWindow("one"); err != nil {
+	if err := a.CloseWindow(m.window); err != nil {
 		t.Fatal(err)
 	}
 	closed(t, task.OwnerDone())
@@ -226,7 +226,11 @@ func TestWindowCloseRevokesDeliveryButRetainsRunningWorkerLimit(t *testing.T) {
 	default:
 	}
 	var survived bool
-	if err := a.PostWindow("two", func() { survived = true }); err != nil {
+	second, err := a.WindowRef("two")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := a.PostWindow(second, func() { survived = true }); err != nil {
 		t.Fatal(err)
 	}
 	if err := a.Drain(); err != nil || !survived {
@@ -266,5 +270,49 @@ func TestApplicationCloseDoesNotSkipAlreadyAcceptedPendingWorker(t *testing.T) {
 	closed(t, task.Done())
 	if work.Load() != 1 || !m.Pending().Idle() {
 		t.Fatalf("accepted canceled worker dropped work%d %+v", work.Load(), m.Pending())
+	}
+}
+
+func TestTaskManagerNeverRebindsToReopenedName(t *testing.T) {
+	a, old, e := candidate(t, "one")
+	ctx := bounded(t)
+	if err := a.CloseWindow(old.window); err != nil {
+		t.Fatal(err)
+	}
+	current, err := a.OpenWindow(app.Window{ID: "one", Title: "Reopened", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }})
+	if err != nil {
+		t.Fatal(err)
+	}
+	work := func(context.Context, func(float64, string)) (int, error) { return 42, nil }
+	if task, err := Start(old, ctx, work, func(int, error) { t.Error("old manager committed") }); !errors.Is(err, app.ErrWindowClosed) || task != nil {
+		t.Fatal("old manager rebound", task, err)
+	}
+	if !e.Snapshot().Idle() || !old.Pending().Idle() {
+		t.Fatal("refused task consumed admission")
+	}
+	fresh, err := NewWithConfig(Config{Owner: a, Window: "one", Limit: 1, Executor: e})
+	if err != nil || fresh.window != current || fresh.window == old.window {
+		t.Fatal("fresh manager has wrong scope", err)
+	}
+	committed := 0
+	task, err := Start(fresh, ctx, work, func(value int, err error) {
+		if value != 42 || err != nil {
+			t.Error(value, err)
+		}
+		committed++
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = e.StepNext(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err = a.Drain(); err != nil {
+		t.Fatal(err)
+	}
+	closed(t, task.Done())
+	closed(t, task.OwnerDone())
+	if committed != 1 || current.Context().Err() != nil || !fresh.Pending().Idle() {
+		t.Fatal("new manager lost result")
 	}
 }

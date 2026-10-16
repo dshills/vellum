@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/dshills/vellum/app"
-	cogent "github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/command"
+	cogent "github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -30,7 +30,8 @@ func main() {
 			return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "label", Kind: ui.Label, Text: "Temporary multiwindow lifecycle check"}}}
 		}}
 	}
-	if err := a.Open(window("first", &firstViews)); err != nil {
+	firstRef, err := a.OpenWindow(window("first", &firstViews))
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -75,7 +76,8 @@ func main() {
 			finish(fmt.Errorf("panel cancel: %v", panelErr))
 			return
 		}
-		if err := a.Open(window("second", &secondViews)); err != nil {
+		secondRef, err := a.OpenWindow(window("second", &secondViews))
+		if err != nil {
 			finish(err)
 			return
 		}
@@ -95,7 +97,7 @@ func main() {
 			finish(err)
 			return
 		}
-		if err := a.CloseWindow("first"); err != nil {
+		if err := a.CloseWindow(firstRef); err != nil {
 			finish(err)
 			return
 		}
@@ -115,7 +117,7 @@ func main() {
 			pending <- err
 		}()
 		time.Sleep(150 * time.Millisecond)
-		if err := a.CloseWindow("second"); err != nil {
+		if err := a.CloseWindow(secondRef); err != nil {
 			finish(err)
 			return
 		}
@@ -131,7 +133,7 @@ func main() {
 		}
 		result <- nil
 	}()
-	err := a.Run(timeout, cogent.Driver{Commands: registry, OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
+	err = a.Run(timeout, cogent.Driver{Commands: registry, OnError: func(err error) { fmt.Fprintln(os.Stderr, err) }})
 	select {
 	case check := <-result:
 		if err == nil {

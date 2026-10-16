@@ -38,12 +38,13 @@ func extensionAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 		if v == nil || v.Model == nil {
 			return nodes, handlers
 		}
+		lease := v.input
 		rows := v.Model.View()
 		start := v.Model.StartRow()
 		count := v.Model.VisibleCount()
 		length := v.Model.Len()
 		page := func(delta int) bool {
-			if v.Model == nil || v.Model.VisibleCount() != count {
+			if v.input != lease || !lease.live(v.Owner, v.Window) || v.Model == nil || v.Model.VisibleCount() != count {
 				return false
 			}
 			next := v.Model.StartRow() + delta
@@ -71,7 +72,7 @@ func extensionAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 			nodes = append(nodes, accessibilityNode{ID: id, Parent: parent, Role: "row", DomainID: row.ID, Name: strings.Join(row.Cells, ", "), Value: strings.Join(row.Cells, ", "), Selected: v.Model.Selected == row.ID, Disabled: disabled, Actions: actions, RowIndex: start + index + 1, RowCount: length})
 			if !disabled {
 				handlers[id] = func(action accessibilityAction) bool {
-					if action.Kind != "press" {
+					if v.input != lease || !lease.live(v.Owner, v.Window) || action.Kind != "press" {
 						return false
 					}
 					// Match the captured domain ID against current viewport before selecting.
@@ -95,12 +96,13 @@ func extensionAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 		if v == nil || v.Model == nil {
 			return nodes, handlers
 		}
+		lease := v.input
 		rows, err := v.Model.View(v.Start, v.Count)
 		if err != nil {
 			return nodes, handlers
 		}
 		page := func(delta int) bool {
-			if v.Model == nil {
+			if v.input != lease || !lease.live(v.Owner, v.Window) || v.Model == nil {
 				return false
 			}
 			accessibilityTreePage(v, delta)
@@ -127,7 +129,7 @@ func extensionAccessibility(r *record, b *accessibilityBridge, disabled bool) ([
 			if !disabled {
 				allowed := append([]string(nil), actions...)
 				handlers[id] = func(action accessibilityAction) bool {
-					if !containsAccessibilityAction(allowed, action.Kind) {
+					if v.input != lease || !lease.live(v.Owner, v.Window) || !containsAccessibilityAction(allowed, action.Kind) {
 						return false
 					}
 					return applyAccessibilityTreeAction(v, row.ID, action.Kind)
@@ -225,6 +227,7 @@ func accessibilityStampVirtualGeometry(root *record) {
 // mountAccessibilityTreePager gives virtual outline paging a real native target.
 // Mount invokes this after constructing the host and before its fixed row pool.
 func mountAccessibilityTreePager(v *VirtualTree) {
+	lease := v.input
 	bar := core.NewFrame(v.host)
 	bar.Styler(func(s *styles.Style) { s.Direction = styles.Row })
 	for _, direction := range []int{-1, 1} {
@@ -236,7 +239,7 @@ func mountAccessibilityTreePager(v *VirtualTree) {
 		button := core.NewButton(bar).SetText(title)
 		button.SetProperty("vellum.accessibility-page", page)
 		button.OnClick(func(events.Event) {
-			if err := v.Owner.Do(func() {
+			if err := v.ownerEvent(lease, func() {
 				accessibilityTreePage(v, delta)
 				_ = v.Owner.Invalidate(v.Window)
 			}); err != nil && v.OnError != nil {

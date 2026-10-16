@@ -129,7 +129,7 @@ func newPlacementFixture(t *testing.T, batch int, dpi float32) *placementFixture
 		}
 	})
 	manualDockSettle(t, f.manual, batch)
-	for _, binding := range placementWindows.windows[placementKey{a, "main"}].bindings {
+	for _, binding := range placementWindows.windows[placementKey{a, "main", fixtureWindowRef(a, "main")}].bindings {
 		if binding.model != nil {
 			binding.r.widget.AsWidget().On(events.MouseUp, func(events.Event) { f.unrelated++ })
 			binding.r.widget.AsWidget().OnClick(func(events.Event) { f.unrelated++ })
@@ -139,7 +139,7 @@ func newPlacementFixture(t *testing.T, batch int, dpi float32) *placementFixture
 }
 func (f *placementFixture) frame(t *testing.T) *placementFrame {
 	t.Helper()
-	for _, b := range placementWindows.windows[placementKey{f.app, "main"}].bindings {
+	for _, b := range placementWindows.windows[placementKey{f.app, "main", fixtureWindowRef(f.app, "main")}].bindings {
 		if b.model != nil {
 			frame := b.frame.Load()
 			if frame != nil {
@@ -225,7 +225,7 @@ func TestPlacementRoutedCancellationAndRetirement(t *testing.T) {
 			case "viewport-stale":
 				f.app.Do(func() { f.model.View.Center.X += 500 }) // deliberately unpainted domain change
 			case "close":
-				f.app.CloseWindow("main")
+				f.app.CloseWindow(fixtureWindowRef(f.app, "main"))
 				if err := f.manual.Close(testContext); err != nil {
 					t.Fatal(err)
 				}
@@ -256,7 +256,7 @@ func TestPlacementCancellationReservedAgainstFullQueue(t *testing.T) {
 		}
 	}
 	// Invoke the actual native loss seam before draining the saturated owner.
-	w := placementWindows.windows[placementKey{f.app, "main"}]
+	w := placementWindows.windows[placementKey{f.app, "main", fixtureWindowRef(f.app, "main")}]
 	w.active.scene.Events.CancelPointerCapture()
 	if f.app.Pending().ReadyCompletions != 1 {
 		t.Fatal("loss cancellation was not admitted", f.app.Pending())
@@ -287,7 +287,7 @@ func TestPlacementReservationRefusalConsumesRelease(t *testing.T) {
 	f := newPlacementFixture(t, 7, 160)
 	var tickets []*app.Completion
 	for {
-		c, err := f.app.ReserveCompletion("main", nil)
+		c, err := f.app.ReserveWindowCompletion(fixtureWindowRef(f.app, "main"), nil)
 		if errors.Is(err, app.ErrCompletionCapacity) {
 			break
 		}
@@ -312,7 +312,7 @@ func TestPlacementReservationRefusalConsumesRelease(t *testing.T) {
 func TestPlacementViewportFeedbackFullQueueAndNewerFrame(t *testing.T) {
 	f := newPlacementFixture(t, 7, 160)
 	var b *placementBinding
-	for _, v := range placementWindows.windows[placementKey{f.app, "main"}].bindings {
+	for _, v := range placementWindows.windows[placementKey{f.app, "main", fixtureWindowRef(f.app, "main")}].bindings {
 		if v.model != nil {
 			b = v
 		}
@@ -364,7 +364,7 @@ func TestPlacementClosedWindowCanvasAndFeedbackCannotMutate(t *testing.T) {
 	}
 	manualDockSettle(t, f.manual, 7)
 	var b *placementBinding
-	for _, v := range placementWindows.windows[placementKey{f.app, "main"}].bindings {
+	for _, v := range placementWindows.windows[placementKey{f.app, "main", fixtureWindowRef(f.app, "main")}].bindings {
 		if v.model != nil {
 			b = v
 		}
@@ -375,7 +375,7 @@ func TestPlacementClosedWindowCanvasAndFeedbackCannotMutate(t *testing.T) {
 	b.requestViewport(&frame)
 	before := f.model.View
 	selected := f.model.Selected
-	if err := f.app.CloseWindow("main"); err != nil {
+	if err := f.app.CloseWindow(fixtureWindowRef(f.app, "main")); err != nil {
 		t.Fatal(err)
 	}
 	// Direct native listeners simulate input already in native delivery, after
@@ -423,7 +423,7 @@ func TestPlacementNativeScrolledContentAndPreviewPixels(t *testing.T) {
 	p := image.Pt(int((g.Clip.Min.X+g.Clip.Max.X)/2), int((g.Clip.Min.Y+g.Clip.Max.Y)/2))
 	want := canvas.Point{X: g.View.Center.X + (float64(p.X)-g.Origin.X-g.View.Width*g.Scale/2)/(g.View.Zoom*g.Scale), Y: g.View.Center.Y + (float64(p.Y)-g.Origin.Y-g.View.Height*g.Scale/2)/(g.View.Zoom*g.Scale)}
 	f.input(t, 7, events.MouseMove, p, 0)
-	active := placementWindows.windows[placementKey{f.app, "main"}].active
+	active := placementWindows.windows[placementKey{f.app, "main", fixtureWindowRef(f.app, "main")}].active
 	if active == nil {
 		t.Fatal("no native capture")
 	}

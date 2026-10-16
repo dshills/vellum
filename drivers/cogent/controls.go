@@ -43,6 +43,7 @@ type fieldChangeEpoch struct{ marker byte }
 type controlState struct {
 	a                 *app.Application
 	window            string
+	windowRef         app.WindowRef
 	tabs              *tabState
 	chrome            *chromeState
 	disclosure        *disclosureState
@@ -105,7 +106,7 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 	if err := ui.ValidateControl(r.node); err != nil {
 		return nil, true, err
 	}
-	c := &controlState{a: a, window: window, fieldDelivered: r.node.Text}
+	c := &controlState{a: a, window: window, windowRef: r.scope, fieldDelivered: r.node.Text}
 	r.control = c
 	var widget core.Widget
 	managedReturned := false
@@ -210,16 +211,16 @@ func mountControl(parent tree.Node, r *record, a *app.Application, window string
 		c.client = textClientID.Add(1)
 		c.textEpoch = 1
 		field := core.NewTextField(parent)
-		field.SetNativeEditingListener(func(core.TextFieldEditingState) { requestTextPublication(window) })
+		field.SetNativeEditingListener(func(core.TextFieldEditingState) { requestTextPublicationScoped(c.windowRef) })
 		field.SetNativeFocusLostHandler(func() bool {
 			// Focus can change from either the scene loop or an owner refresh.
 			// Do not inspect widgets, records or owner-only native shadows here.
 			t := lookupTextWindow(window)
-			if t == nil || !t.nativeReady.Load() || !t.acceptsNativeInput() || (!c.fieldNativeActive.Load() && !c.fieldFocusLost.Load()) {
+			if t == nil || t.window.window.Ref() != c.windowRef || !t.nativeReady.Load() || !t.acceptsNativeInput() || (!c.fieldNativeActive.Load() && !c.fieldFocusLost.Load()) {
 				return false
 			}
 			c.fieldFocusLost.Store(true)
-			requestTextPublication(window)
+			requestTextPublicationScoped(c.windowRef)
 			return true
 		})
 		widget = field
@@ -303,7 +304,7 @@ func postControl(r *record, fn func()) {
 	if tree.IsNil(r.widget) {
 		return
 	}
-	if err := r.control.a.PostWindow(r.control.window, func() {
+	if err := r.control.a.PostWindow(r.control.windowRef, func() {
 		if !r.control.retired {
 			fn()
 		}
@@ -628,7 +629,12 @@ func prepareControl(r *record, n ui.Node) error {
 	}
 	return nil
 }
-func childHost(r *record, id string) tree.Node {
+func childHost(r *record, id string) (host tree.Node) {
+	defer func() {
+		if !tree.IsNil(host) && r.control != nil {
+			bindWindowScope(host, r.control.a, r.scope)
+		}
+	}()
 	if r.control != nil {
 		if r.control.split != nil {
 			for i, childID := range r.control.split.plannedIDs {

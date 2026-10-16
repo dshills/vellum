@@ -162,7 +162,7 @@ func TestClosedDocumentRevokesResultWhileWorkerStillRuns(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatal(ctx.Err())
 	}
-	if err := f.a.CloseWindow("main"); err != nil {
+	if err := f.a.CloseWindow(f.s.window); err != nil {
 		t.Fatal(err)
 	}
 	f.owner(t, func() {
@@ -191,5 +191,51 @@ func TestClosedDocumentRevokesResultWhileWorkerStillRuns(t *testing.T) {
 	})
 	if !f.a.Pending().Idle() {
 		t.Fatalf("closed operation leaked reserved delivery %+v", f.a.Pending())
+	}
+}
+
+func TestDocumentSessionNeverRebindsToReopenedName(t *testing.T) {
+	writes := 0
+	f, e := manualSession(t, memoryStore{write: func(context.Context, []byte) (bool, error) { writes++; return true, nil }})
+	if err := f.a.Open(app.Window{ID: "survivor", Title: "Survivor", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "survivor", Kind: ui.Label} }}); err != nil {
+		t.Fatal(err)
+	}
+	old := f.s.window
+	if err := f.a.CloseWindow(old); err != nil {
+		t.Fatal(err)
+	}
+	current, err := f.a.OpenWindow(app.Window{ID: "main", Title: "Reopened", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "main", Kind: ui.Label} }})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := operationContext(t)
+	f.owner(t, func() {
+		if err := f.s.Save(ctx, SaveOptions{Path: f.path}); !errors.Is(err, app.ErrWindowClosed) {
+			t.Fatal("old save rebound", err)
+		}
+		if err := f.s.Open(ctx, OpenOptions{Path: f.path}); !errors.Is(err, app.ErrWindowClosed) {
+			t.Fatal("old open rebound", err)
+		}
+	})
+	if !e.Snapshot().Idle() || writes != 0 || current.Context().Err() != nil {
+		t.Fatal("closed session admitted work")
+	}
+	fresh, err := New(f.s.config)
+	if err != nil || fresh.window != current || fresh.window == old {
+		t.Fatal("fresh session captured wrong lifetime", err)
+	}
+	f.owner(t, func() {
+		if err := fresh.Save(ctx, SaveOptions{Path: f.path}); err != nil {
+			t.Fatal(err)
+		}
+	})
+	if _, err = e.StepNext(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err = f.a.Drain(); err != nil {
+		t.Fatal(err)
+	}
+	if writes != 1 || fresh.State().Closed || !f.s.State().Closed || len(f.results) != 1 {
+		t.Fatal("session generations crossed")
 	}
 }

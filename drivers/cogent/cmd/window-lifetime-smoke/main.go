@@ -36,7 +36,12 @@ func (x *closingExtension) Mount(parent tree.Node) core.Widget {
 		return widget
 	}
 	scene.Body.OnClose(func(events.Event) { x.closed.Store(true) })
-	x.mountErr = x.a.CloseWindow("closing")
+	owner, ref, ok := cogent.WindowScope(parent)
+	if !ok || owner != x.a {
+		x.mountErr = app.ErrInvalidWindowRef
+	} else {
+		x.mountErr = x.a.CloseWindow(ref)
+	}
 	return widget
 }
 func (x *closingExtension) Sync(core.Widget) error { return x.mountErr }
@@ -87,19 +92,22 @@ func run(which string) error {
 			cancel()
 		}
 	}
-	if err := a.Open(app.Window{ID: "main", Title: "Vellum lifetime smoke: " + which, Width: 360, Height: 180, View: func() ui.Node {
+	mainRef, err := a.OpenWindow(app.Window{ID: "main", Title: "Vellum lifetime smoke: " + which, Width: 360, Height: 180, View: func() ui.Node {
 		if invalid {
 			return ui.Node{ID: "root", Kind: invalidKind}
 		}
 		return ui.Node{ID: "root", Kind: ui.Label, Text: "Window lifetime regression"}
-	}}); err != nil {
+	}})
+	if err != nil {
 		return err
 	}
+	var closingRef app.WindowRef
 	closing := &closingExtension{a: a}
 	if which == "close-before-show" {
-		if err := a.Open(app.Window{ID: "closing", Title: "Closing before show", Width: 280, Height: 140, View: func() ui.Node {
+		closingRef, err = a.OpenWindow(app.Window{ID: "closing", Title: "Closing before show", Width: 280, Height: 140, View: func() ui.Node {
 			return ui.Node{ID: "closing-root", Kind: ui.Extension, Custom: closing}
-		}}); err != nil {
+		}})
+		if err != nil {
 			return err
 		}
 	}
@@ -121,7 +129,7 @@ func run(which string) error {
 				return
 			}
 		}
-		err = a.PostWindow("main", func() {
+		err = a.PostWindow(mainRef, func() {
 			if which == "invalid-view" {
 				invalid = true
 				delivered.Store(true)
@@ -133,11 +141,7 @@ func run(which string) error {
 				failWorker(fmt.Errorf("main window stopped before delivery: %v", err))
 				return
 			}
-			closingLife, err := a.WindowContext("closing")
-			if err != nil {
-				failWorker(fmt.Errorf("closing lifetime unavailable: %w", err))
-				return
-			}
+			closingLife := closingRef.Context()
 			if closingLife.Err() == nil || !closing.closed.Load() {
 				failWorker(errors.New("closing lifetime/native close was not completed"))
 				return

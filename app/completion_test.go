@@ -30,7 +30,13 @@ func completionWindow(t *testing.T, a *Application, id string) {
 }
 func ticket(t *testing.T, a *Application, window string, cleanup func(error)) *Completion {
 	t.Helper()
-	c, err := a.ReserveCompletion(window, cleanup)
+	var c *Completion
+	var err error
+	if window == "" {
+		c, err = a.ReserveCompletion(cleanup)
+	} else {
+		c, err = a.ReserveWindowCompletion(windowRef(t, a, window), cleanup)
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +134,7 @@ func TestWindowAndApplicationCloseRevokeUnpublishedAndReadyTicketsSynchronously(
 	if err := survivor.Publish(func() { delivered = true }); err != nil {
 		t.Fatal(err)
 	}
-	if err := a.CloseWindow("one"); err != nil {
+	if err := a.CloseWindow(windowRef(t, a, "one")); err != nil {
 		t.Fatal(err)
 	}
 	if lifetime.Err() != context.Canceled || canceled.Load() != 2 {
@@ -163,7 +169,7 @@ func TestReservationValidationCreditAndSequenceExhaustion(t *testing.T) {
 	a := completionApp(t, 1, 1)
 	a.nextArrival = math.MaxUint64 - 1
 	c := ticket(t, a, "", nil)
-	if _, err := a.ReserveCompletion("", nil); !errors.Is(err, ErrCompletionCapacity) {
+	if _, err := a.ReserveCompletion(nil); !errors.Is(err, ErrCompletionCapacity) {
 		t.Fatalf("full reserve %v", err)
 	}
 	if err := a.Post(func() {}); !errors.Is(err, ErrSequenceExhausted) {
@@ -181,7 +187,7 @@ func TestReservationValidationCreditAndSequenceExhaustion(t *testing.T) {
 	if err := a.Drain(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := a.ReserveCompletion("", nil); !errors.Is(err, ErrSequenceExhausted) {
+	if _, err := a.ReserveCompletion(nil); !errors.Is(err, ErrSequenceExhausted) {
 		t.Fatalf("identity recycled %v", err)
 	}
 	if n, err := a.DrainN(-1); err == nil || n != 0 {
@@ -203,7 +209,7 @@ func TestCopiedCompletionCannotPublishAbortOrRefundOriginalCredit(t *testing.T) 
 	if a.Pending().Reserved != 1 || cleaned.Load() != 0 {
 		t.Fatalf("copy stole original credit %+v cleanup%d", a.Pending(), cleaned.Load())
 	}
-	if _, err := a.ReserveCompletion("", nil); !errors.Is(err, ErrCompletionCapacity) {
+	if _, err := a.ReserveCompletion(nil); !errors.Is(err, ErrCompletionCapacity) {
 		t.Fatalf("copy refunded credit %v", err)
 	}
 	if !original.Abort() {

@@ -15,6 +15,10 @@ import (
 // checkMenu drives actual Cocoa selectors in one bounded process. Owner updates
 // while the popup is modal deliberately exercise its custom-wake route.
 func checkMenu(ctx context.Context, a *app.Application, g *gallery) error {
+	ref, err := a.WindowRef("gallery")
+	if err != nil {
+		return err
+	}
 	find := func(s cogent.AccessibilityInspection, domain, role string) (cogent.AccessibilityElement, bool) {
 		for _, e := range s.Elements {
 			if e.DomainID == domain && e.Role == role {
@@ -99,13 +103,13 @@ func checkMenu(ctx context.Context, a *app.Application, g *gallery) error {
 	if _, err := await(true, true); err != nil {
 		return err
 	}
-	if err := a.PostWindow("gallery", func() { g.menuDisabled = true; _ = a.Invalidate("gallery") }); err != nil {
+	if err := a.PostWindow(ref, func() { g.menuDisabled = true; _ = a.Invalidate("gallery") }); err != nil {
 		return err
 	}
 	if _, err := await(false, false); err != nil {
 		return fmt.Errorf("modal wake/disable: %w", err)
 	}
-	if err := a.PostWindow("gallery", func() { g.menuDisabled = false; _ = a.Invalidate("gallery") }); err != nil {
+	if err := a.PostWindow(ref, func() { g.menuDisabled = false; _ = a.Invalidate("gallery") }); err != nil {
 		return err
 	}
 	if _, err := await(false, true); err != nil {

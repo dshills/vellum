@@ -108,14 +108,8 @@ func measuredActive(g cogent.GridInspection, want virtual.GridActive) bool {
 // Actual key/pointer routing is separately exercised by offscreen tests.
 func desktopSmoke(ctx context.Context, p *gridProgram) error {
 	first, second := p.windows[0], p.windows[1]
-	firstLifetime, err := p.owner.WindowContext(first.id)
-	if err != nil {
-		return err
-	}
-	secondLifetime, err := p.owner.WindowContext(second.id)
-	if err != nil {
-		return err
-	}
+	firstLifetime, secondLifetime := first.windowRef.Context(), second.windowRef.Context()
+	var err error
 	initial := make([]cogent.GridInspection, len(p.windows))
 	expectedRows := []int{10_000, 1_000_000}
 	for i, w := range p.windows {
@@ -230,7 +224,7 @@ func desktopSmoke(ctx context.Context, p *gridProgram) error {
 			return err
 		}
 	}
-	if err = owned(p.owner, func() error { return p.owner.CloseWindow(first.id) }); err != nil {
+	if err = owned(p.owner, func() error { return p.owner.CloseWindow(first.windowRef) }); err != nil {
 		return err
 	}
 	if firstLifetime.Err() == nil || secondLifetime.Err() != nil || p.owner.Context().Err() != nil {
@@ -246,7 +240,7 @@ func desktopSmoke(ctx context.Context, p *gridProgram) error {
 		return fmt.Errorf("grid smoke: logically closed binding inspection: %v", err)
 	}
 
-	if err = owned(p.owner, func() error { return p.owner.CloseWindow(second.id) }); err != nil {
+	if err = owned(p.owner, func() error { return p.owner.CloseWindow(second.windowRef) }); err != nil {
 		return err
 	}
 	if secondLifetime.Err() == nil || p.owner.Context().Err() == nil {

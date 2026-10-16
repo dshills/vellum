@@ -22,8 +22,8 @@ import (
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/canvas"
-	cogent "github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/command"
+	cogent "github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
 )
 
@@ -118,7 +118,8 @@ func main() {
 	var firstShown, secondShown atomic.Bool
 	first, firstGPU, firstModel := makeWindow("first", &firstViews, &firstShown)
 	second, secondGPU, secondModel := makeWindow("second", &secondViews, &secondShown)
-	if err := a.Open(first); err != nil {
+	firstRef, err := a.OpenWindow(first)
+	if err != nil {
 		fail(err)
 	}
 	registry := command.New()
@@ -307,7 +308,8 @@ func main() {
 			}
 			evidence.add("file chooser transport cancellation (display readiness/selection require acceptance)")
 		}
-		if err := a.Open(second); err != nil {
+		secondRef, err := a.OpenWindow(second)
+		if err != nil {
 			finish(err)
 			return
 		}
@@ -346,7 +348,7 @@ func main() {
 			finish(cogent.ErrFrameNotReady)
 			return
 		}
-		if err := a.CloseWindow("first"); err != nil {
+		if err := a.CloseWindow(firstRef); err != nil {
 			finish(err)
 			return
 		}
@@ -369,7 +371,7 @@ func main() {
 			return
 		}
 		evidence.add("second window GPU dimensions/camera after two resizes after first teardown", "isolated window lifetime")
-		if err := a.CloseWindow("second"); err != nil {
+		if err := a.CloseWindow(secondRef); err != nil {
 			finish(err)
 			return
 		}

@@ -26,6 +26,7 @@ type Window struct {
 	ID, Title     string
 	Width, Height float32
 	View          func() ui.Node
+	reference     WindowRef
 	// CloseRequest runs on the UI owner for user/native close requests. Return
 	// false to keep the window open while showing an asynchronous confirmation.
 	// Once confirmed, CloseWindow can force teardown. Never block or nest Do.
@@ -51,10 +52,10 @@ type Application struct {
 	unpublished                                int
 	completions                                map[uint64]*Completion
 	windows                                    []Window
-	lifetimes                                  map[string]context.Context
-	retiredLifetime                            context.Context
+	lifetimes                                  map[string]*windowLifetime
+	issuer                                     *windowIssuer
 	windowCancels                              map[string]context.CancelFunc
-	closeRequests                              map[string]bool
+	closeRequests                              map[WindowRef]bool
 	services                                   Services
 	dirty                                      map[string]bool
 	wake                                       func()
@@ -75,30 +76,39 @@ func New(c Config) (*Application, error) {
 		return nil, fmt.Errorf("vellum: completion capacity must be positive")
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	retired, retire := context.WithCancel(ctx)
-	retire()
-	return &Application{ctx: ctx, cancel: cancel, retiredLifetime: retired, capacity: c.QueueCapacity, completionCapacity: c.CompletionCapacity, completions: map[uint64]*Completion{}, dirty: map[string]bool{}, lifetimes: map[string]context.Context{}, windowCancels: map[string]context.CancelFunc{}, closeRequests: map[string]bool{}, changed: make(chan struct{})}, nil
+	return &Application{ctx: ctx, cancel: cancel, issuer: &windowIssuer{}, capacity: c.QueueCapacity, completionCapacity: c.CompletionCapacity, completions: map[uint64]*Completion{}, dirty: map[string]bool{}, lifetimes: map[string]*windowLifetime{}, windowCancels: map[string]context.CancelFunc{}, closeRequests: map[WindowRef]bool{}, changed: make(chan struct{})}, nil
 }
 func (a *Application) Context() context.Context { return a.ctx }
 
-// Open registers a window before or during Run. IDs are unique for the entire
-// application lifetime: a closed ID cannot be reopened. View runs on the owner.
+// Open registers a fresh window lifetime before or during Run. Use OpenWindow
+// when the caller needs the exact reference created by this registration.
 func (a *Application) Open(w Window) error {
+	_, err := a.OpenWindow(w)
+	return err
+}
+
+// OpenWindow registers a fresh lifetime and returns its reference atomically
+// with registration. IDs are logical names unique among live windows; a closed
+// name can be reopened. View runs on the owner. Success does not promise that a
+// concurrent close has not already canceled the returned reference.
+func (a *Application) OpenWindow(w Window) (WindowRef, error) {
 	a.mu.Lock()
 	if a.closed {
 		a.mu.Unlock()
-		return ErrClosed
+		return WindowRef{}, ErrClosed
 	}
 	if w.ID == "" || w.Title == "" || !utf8.ValidString(w.Title) || strings.ContainsRune(w.Title, 0) || w.View == nil || w.Width <= 0 || w.Height <= 0 || math.IsNaN(float64(w.Width)) || math.IsNaN(float64(w.Height)) || math.IsInf(float64(w.Width), 0) || math.IsInf(float64(w.Height), 0) {
 		a.mu.Unlock()
-		return fmt.Errorf("vellum: invalid window")
+		return WindowRef{}, fmt.Errorf("vellum: invalid window")
 	}
 	if _, exists := a.lifetimes[w.ID]; exists {
 		a.mu.Unlock()
-		return fmt.Errorf("vellum: duplicate window %q", w.ID)
+		return WindowRef{}, fmt.Errorf("vellum: duplicate window %q", w.ID)
 	}
 	lifetime, cancel := context.WithCancel(a.ctx)
-	a.lifetimes[w.ID], a.windowCancels[w.ID] = lifetime, cancel
+	life := &windowLifetime{issuer: a.issuer, id: w.ID, ctx: lifetime}
+	w.reference = WindowRef{lifetime: life}
+	a.lifetimes[w.ID], a.windowCancels[w.ID] = life, cancel
 	a.windows = append(a.windows, w)
 	a.dirty[w.ID] = true
 	wake := a.wake
@@ -106,47 +116,48 @@ func (a *Application) Open(w Window) error {
 	if wake != nil {
 		wake()
 	}
-	return nil
+	return w.reference, nil
 }
 
-// WindowContext scopes work to a particular window. Its cancellation does not
-// cancel other windows; closing the last registered window closes the app.
-// Captured contexts remain canceled after close. A later lookup of a closed ID
-// may return a shared canceled marker; context object identity is not promised.
+// WindowContext looks up the current live opening of a logical name. Captured
+// contexts stay canceled after close, but retired names have no lookup entry.
+// Retain WindowRef instead when later work must identify the same opening.
 func (a *Application) WindowContext(id string) (context.Context, error) {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	ctx, ok := a.lifetimes[id]
-	if !ok {
-		return nil, fmt.Errorf("vellum: unknown window %q", id)
+	ref, err := a.WindowRef(id)
+	if err != nil {
+		return nil, err
 	}
-	return ctx, nil
+	return ref.Context(), nil
 }
 
 // RequestCloseWindow invokes the window's close policy and closes on acceptance.
 // Call only on the UI owner (Do/Drain/widget callbacks), never inside nested Do.
 // Refusal preserves registration and lifetime; CloseWindow and Close explicitly
 // force cancellation/teardown without prompting. Recursive requests refuse.
-func (a *Application) RequestCloseWindow(id string) error {
-	if err := a.CheckCloseWindow(id); err != nil {
+func (a *Application) RequestCloseWindow(ref WindowRef) error {
+	if err := a.CheckCloseWindow(ref); err != nil {
 		return err
 	}
-	return a.CloseWindow(id)
+	return a.CloseWindow(ref)
 }
 
 // CheckCloseWindow runs the same owner-held policy without committing teardown.
 // Drivers use it before native close events; registration changes only when native
 // close is accepted. As with RequestCloseWindow, recursive policy calls refuse.
-func (a *Application) CheckCloseWindow(id string) error {
+func (a *Application) CheckCloseWindow(ref WindowRef) error {
 	a.mu.Lock()
 	if a.closed {
 		a.mu.Unlock()
 		return ErrClosed
 	}
+	if err := a.windowRefErrorLocked(ref); err != nil {
+		a.mu.Unlock()
+		return err
+	}
 	var callback func() bool
 	found := false
 	for _, window := range a.windows {
-		if window.ID == id {
+		if window.Ref() == ref {
 			callback = window.CloseRequest
 			found = true
 			break
@@ -154,23 +165,23 @@ func (a *Application) CheckCloseWindow(id string) error {
 	}
 	if !found {
 		a.mu.Unlock()
-		return fmt.Errorf("vellum: unknown window %q", id)
+		return ErrWindowClosed
 	}
-	if a.closeRequests[id] {
+	if a.closeRequests[ref] {
 		a.mu.Unlock()
 		return ErrClosePending
 	}
-	a.closeRequests[id] = true
+	a.closeRequests[ref] = true
 	a.mu.Unlock()
-	defer func() { a.mu.Lock(); delete(a.closeRequests, id); a.mu.Unlock() }()
+	defer func() { a.mu.Lock(); delete(a.closeRequests, ref); a.mu.Unlock() }()
 	accepted := callback == nil || callback()
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if a.closed {
 		return ErrClosed
 	}
-	if a.lifetimes[id].Err() != nil {
-		return ErrWindowClosed
+	if err := a.windowRefErrorLocked(ref); err != nil {
+		return err
 	}
 	if !accepted {
 		return ErrCloseRefused
@@ -180,15 +191,20 @@ func (a *Application) CheckCloseWindow(id string) error {
 
 // CloseWindow removes a registered window and requests native teardown. Closing
 // the last window ends the app. It is safe from workers and native callbacks.
-func (a *Application) CloseWindow(id string) error {
+func (a *Application) CloseWindow(ref WindowRef) error {
 	a.mu.Lock()
 	if a.closed {
 		a.mu.Unlock()
 		return ErrClosed
 	}
+	if err := a.windowRefErrorLocked(ref); err != nil {
+		a.mu.Unlock()
+		return err
+	}
+	id := ref.ID()
 	index := -1
 	for i, w := range a.windows {
-		if w.ID == id {
+		if w.Ref() == ref {
 			index = i
 			break
 		}
@@ -198,18 +214,16 @@ func (a *Application) CloseWindow(id string) error {
 		return fmt.Errorf("vellum: unknown window %q", id)
 	}
 	a.windowCancels[id]()
-	// Keep the ID tombstone for stale-work rejection, while releasing the
-	// original context and cancel closure from application-owned storage.
-	a.lifetimes[id] = a.retiredLifetime
+	delete(a.lifetimes, id)
 	delete(a.windowCancels, id)
 	// Delete clears the removed backing slot, releasing its View/close closures.
 	a.windows = slices.Delete(a.windows, index, index+1)
 	delete(a.dirty, id)
 	wake := a.wake
-	hooks := a.revokeLocked(id, ErrWindowClosed)
+	hooks := a.revokeLocked(ref, ErrWindowClosed)
 	if len(a.windows) == 0 {
 		wake = a.closeLocked()
-		hooks = append(hooks, a.revokeLocked("", ErrClosed)...)
+		hooks = append(hooks, a.revokeLocked(WindowRef{}, ErrClosed)...)
 	}
 	a.mu.Unlock()
 	defer func() {
@@ -223,22 +237,30 @@ func (a *Application) CloseWindow(id string) error {
 
 // PostWindow discards delivery if its window closes before dispatch. It shares
 // Post's bounded queue and does not transfer mutable data ownership implicitly.
-func (a *Application) PostWindow(id string, fn func()) error {
+func (a *Application) PostWindow(ref WindowRef, fn func()) error {
 	if fn == nil {
 		return fmt.Errorf("vellum: nil UI callback")
 	}
-	ctx, err := a.WindowContext(id)
-	if err != nil {
+	a.mu.Lock()
+	if a.closed {
+		a.mu.Unlock()
+		return ErrClosed
+	}
+	if err := a.windowRefErrorLocked(ref); err != nil {
+		a.mu.Unlock()
 		return err
 	}
-	if ctx.Err() != nil {
-		return ErrWindowClosed
-	}
-	return a.Post(func() {
-		if ctx.Err() == nil {
+	err := a.postLocked(func() {
+		if ref.Context().Err() == nil {
 			fn()
 		}
 	})
+	wake := a.wake
+	a.mu.Unlock()
+	if err == nil && wake != nil {
+		wake()
+	}
+	return err
 }
 func (a *Application) Windows() []Window {
 	a.mu.Lock()
@@ -324,9 +346,13 @@ func (a *Application) Invalidate(id string) error {
 }
 
 // TakeDirty is called by a driver while holding Do's owner.
-func (a *Application) TakeDirty(id string) bool {
+func (a *Application) TakeDirty(ref WindowRef) bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	if a.closed || a.windowRefErrorLocked(ref) != nil {
+		return false
+	}
+	id := ref.ID()
 	d := a.dirty[id]
 	delete(a.dirty, id)
 	return d
@@ -358,12 +384,17 @@ func (a *Application) closeLocked() func() {
 	a.changed = make(chan struct{})
 	a.wake = nil
 	a.cancel()
+	a.windows = nil
+	a.lifetimes = nil
+	a.windowCancels = nil
+	a.closeRequests = nil
+	a.dirty = nil
 	return wake
 }
 func (a *Application) Close() {
 	a.mu.Lock()
 	wake := a.closeLocked()
-	hooks := a.revokeLocked("", ErrClosed)
+	hooks := a.revokeLocked(WindowRef{}, ErrClosed)
 	a.mu.Unlock()
 	defer func() {
 		if wake != nil {

@@ -678,13 +678,13 @@ func TestAccessibilityGridPublicationWithdrawnMeasurementRevokesCapturedHandlers
 		if len(handlers) < 3 {
 			t.Fatal("fixture lacks host, cell, and editor handlers")
 		}
-		_ = a.TakeDirty("one")
+		_ = a.TakeDirty(fixtureWindowRef(a, "one"))
 		binding.withdrawMeasurement()
-		if binding.measurement.Load() != nil || !a.TakeDirty("one") {
+		if binding.measurement.Load() != nil || !a.TakeDirty(fixtureWindowRef(a, "one")) {
 			t.Error("withdrawal did not request pending publication")
 		}
 		binding.withdrawMeasurement()
-		if a.TakeDirty("one") {
+		if a.TakeDirty(fixtureWindowRef(a, "one")) {
 			t.Error("already-nil measurement repeatedly invalidated owner")
 		}
 		for _, n := range nodes {
@@ -785,14 +785,14 @@ func TestAccessibilityGridPublicationCaptureWithdrawalPaths(t *testing.T) {
 			binding.projection.State.Viewport = viewport
 			binding.measurement.Store(measurement)
 		}()
-		_ = a.TakeDirty("one")
+		_ = a.TakeDirty(fixtureWindowRef(a, "one"))
 		binding.frames = math.MaxUint64
 		binding.capture()
-		if binding.measurement.Load() != nil || !a.TakeDirty("one") {
+		if binding.measurement.Load() != nil || !a.TakeDirty(fixtureWindowRef(a, "one")) {
 			t.Error("frame exhaustion silently withdrew last completed publication")
 		}
 		binding.capture()
-		if a.TakeDirty("one") {
+		if a.TakeDirty(fixtureWindowRef(a, "one")) {
 			t.Error("frame exhaustion repeated pending invalidation")
 		}
 		binding.frames = frames
@@ -802,11 +802,11 @@ func TestAccessibilityGridPublicationCaptureWithdrawalPaths(t *testing.T) {
 		before := a.Pending().Ordinary
 		binding.projection.State.Viewport.Width--
 		binding.capture()
-		if binding.measurement.Load() != nil || !a.TakeDirty("one") || a.Pending().Ordinary != before {
+		if binding.measurement.Load() != nil || !a.TakeDirty(fixtureWindowRef(a, "one")) || a.Pending().Ordinary != before {
 			t.Error("no-op viewport request failed to publish pending withdrawal")
 		}
 		binding.capture()
-		if a.TakeDirty("one") {
+		if a.TakeDirty(fixtureWindowRef(a, "one")) {
 			t.Error("viewport mismatch repeatedly invalidated owner")
 		}
 		binding.projection.State.Viewport = viewport
@@ -814,12 +814,12 @@ func TestAccessibilityGridPublicationCaptureWithdrawalPaths(t *testing.T) {
 		binding.host.Geom.ContentBBox = image.Rect(0, 0, gridNativeMaxDimension*4, 120)
 		binding.geometryRefused = false
 		binding.capture()
-		if binding.measurement.Load() != nil || !a.TakeDirty("one") {
+		if binding.measurement.Load() != nil || !a.TakeDirty(fixtureWindowRef(a, "one")) {
 			t.Error("refused geometry silently withdrew completed frame")
 		}
 		queued := a.Pending().Ordinary
 		binding.capture()
-		if a.TakeDirty("one") || a.Pending().Ordinary != queued {
+		if a.TakeDirty(fixtureWindowRef(a, "one")) || a.Pending().Ordinary != queued {
 			t.Error("refused geometry repeatedly notified owner/error queue")
 		}
 	}); err != nil {

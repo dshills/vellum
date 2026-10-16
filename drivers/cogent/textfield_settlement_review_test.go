@@ -245,7 +245,7 @@ func TestReviewFieldSettlementRetiredAndClosedBinding(t *testing.T) {
 			})
 			reviewOwner(t, a, func() {
 				if closed {
-					if err := a.CloseWindow(w.window.ID); err != nil {
+					if err := a.CloseWindow(w.window.Ref()); err != nil {
 						t.Fatal(err)
 					}
 					closeTextWindow(w)
@@ -277,7 +277,7 @@ func TestReviewFieldSettlementChangeCanCloseWindow(t *testing.T) {
 	called := 0
 	reviewOwner(t, a, func() {
 		r.node.Change = func(ui.ChangeEvent) {
-			if err := a.CloseWindow(w.window.ID); err != nil {
+			if err := a.CloseWindow(w.window.Ref()); err != nil {
 				t.Error(err)
 			}
 		}

@@ -137,9 +137,10 @@ func TestCloseRequestRefusalCheckAndForce(t *testing.T) {
 	defer a.Close()
 	calls := 0
 	accept := false
+	var ref WindowRef
 	w := Window{ID: "main", Title: "Document", Width: 400, Height: 300, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }, CloseRequest: func() bool {
 		calls++
-		if !errors.Is(a.CheckCloseWindow("main"), ErrClosePending) {
+		if !errors.Is(a.CheckCloseWindow(ref), ErrClosePending) {
 			t.Fatal("recursive policy admitted")
 		}
 		return accept
@@ -147,9 +148,10 @@ func TestCloseRequestRefusalCheckAndForce(t *testing.T) {
 	if err := a.Open(w); err != nil {
 		t.Fatal(err)
 	}
-	lifetime, _ := a.WindowContext("main")
+	ref = windowRef(t, a, "main")
+	lifetime := ref.Context()
 	a.Do(func() {
-		if !errors.Is(a.RequestCloseWindow("main"), ErrCloseRefused) {
+		if !errors.Is(a.RequestCloseWindow(ref), ErrCloseRefused) {
 			t.Fatal("refusal ignored")
 		}
 	})
@@ -158,7 +160,7 @@ func TestCloseRequestRefusalCheckAndForce(t *testing.T) {
 	}
 	accept = true
 	a.Do(func() {
-		if err := a.CheckCloseWindow("main"); err != nil {
+		if err := a.CheckCloseWindow(ref); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -166,7 +168,7 @@ func TestCloseRequestRefusalCheckAndForce(t *testing.T) {
 		t.Fatal("permission check committed teardown")
 	}
 	accept = false
-	if err := a.CloseWindow("main"); err != nil {
+	if err := a.CloseWindow(ref); err != nil {
 		t.Fatal(err)
 	}
 	if calls != 2 || lifetime.Err() == nil {
@@ -184,8 +186,9 @@ func TestAcceptedCloseAndPolicyCancellation(t *testing.T) {
 				}
 				return !force
 			}})
+			ref := windowRef(t, a, "main")
 			a.Do(func() {
-				err := a.RequestCloseWindow("main")
+				err := a.RequestCloseWindow(ref)
 				if force && !errors.Is(err, ErrClosed) {
 					t.Fatal(err)
 				}

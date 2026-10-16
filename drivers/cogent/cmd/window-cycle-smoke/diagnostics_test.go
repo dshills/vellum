@@ -27,7 +27,7 @@ func TestFailureContextSeparatesDomainRetirementAndUnknownWindow(t *testing.T) {
 		t.Fatal(before)
 	}
 	var policyError error
-	if e = a.Do(func() { policyError = a.RequestCloseWindow("active") }); e != nil || policyError != nil {
+	if e = a.Do(func() { policyError = a.RequestCloseWindow(currentFixtureRef(a, "active")) }); e != nil || policyError != nil {
 		t.Fatal(e, policyError)
 	}
 	after := observeNativeActionFailure(a, "active")
@@ -39,7 +39,7 @@ func TestFailureContextSeparatesDomainRetirementAndUnknownWindow(t *testing.T) {
 		t.Fatal(e, event)
 	}
 	log.Reset()
-	if e = a.CloseWindow("survivor"); e != nil {
+	if e = a.CloseWindow(currentFixtureRef(a, "survivor")); e != nil {
 		t.Fatal(e)
 	}
 	if log.Len() != 0 {

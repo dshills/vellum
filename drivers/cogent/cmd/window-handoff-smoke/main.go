@@ -17,17 +17,22 @@ import (
 	"github.com/dshills/vellum/ui"
 )
 
+type handoffOpening struct {
+	ref app.WindowRef
+	err error
+}
+
 type handoff struct {
 	owner    *app.Application
 	next     app.Window
-	opened   chan error
+	opened   chan handoffOpening
 	attached atomic.Bool
 }
 
 func (h *handoff) Mount(parent tree.Node) core.Widget {
 	f := core.NewFrame(parent)
 	if h.attached.CompareAndSwap(false, true) {
-		f.Scene.Body.OnFirst(events.Close, func(events.Event) { h.opened <- h.owner.Open(h.next) })
+		f.Scene.Body.OnFirst(events.Close, func(events.Event) { ref, err := h.owner.OpenWindow(h.next); h.opened <- handoffOpening{ref, err} })
 	}
 	core.NewText(f).SetText("Temporary close-to-open handoff check")
 	return f
@@ -45,7 +50,7 @@ func main() {
 		secondViews.Add(1)
 		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "label", Kind: ui.Label, Text: "Replacement native window"}}}
 	}}
-	h := &handoff{owner: a, next: second, opened: make(chan error, 1)}
+	h := &handoff{owner: a, next: second, opened: make(chan handoffOpening, 1)}
 	a.Open(app.Window{ID: "first", Title: "Vellum handoff first", Width: 360, Height: 180, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Extension, Custom: h} }})
 	timeout, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 	defer cancel()
@@ -71,10 +76,12 @@ func main() {
 		// Its OnFirst(Close) opens second under the old native render lock. The
 		// normal Close handler must create it without depending on a Custom wake.
 		native.CloseReq()
+		var secondRef app.WindowRef
 		select {
-		case err := <-h.opened:
-			if err != nil {
-				finish(err)
+		case opened := <-h.opened:
+			secondRef = opened.ref
+			if opened.err != nil {
+				finish(opened.err)
 				return
 			}
 		case <-timeout.Done():
@@ -82,7 +89,7 @@ func main() {
 			return
 		}
 		dispatched := make(chan struct{}, 1)
-		if err := a.PostWindow("second", func() { a.Invalidate("second"); dispatched <- struct{}{} }); err != nil {
+		if err := a.PostWindow(secondRef, func() { a.Invalidate("second"); dispatched <- struct{}{} }); err != nil {
 			finish(err)
 			return
 		}
@@ -98,7 +105,7 @@ func main() {
 			return
 		}
 		result <- nil
-		a.CloseWindow("second")
+		a.CloseWindow(secondRef)
 	}()
 	err := a.Run(timeout, cogent.Driver{})
 	select {

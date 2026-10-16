@@ -260,7 +260,7 @@ func TestManualFixedRegistrationAndOneWindowClose(t *testing.T) {
 	if counts["a"] != 1 || counts["b"] != 0 {
 		t.Fatal("window routing was shared", counts)
 	}
-	if err = a.CloseWindow("a"); err != nil {
+	if err = a.CloseWindow(fixtureWindowRef(a, "a")); err != nil {
 		t.Fatal(err)
 	}
 	unitSettle(t, m)
@@ -277,16 +277,16 @@ func TestManualOwnerArrivalCutoffAndFullOrdinaryQueue(t *testing.T) {
 	})
 	unitSettle(t, m)
 	sequence := []string{}
-	reserved, err := a.ReserveCompletion("one", nil)
+	reserved, err := a.ReserveWindowCompletion(fixtureWindowRef(a, "one"), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, v := range []string{"A", "B", "C", "D"} {
-		if err = a.PostWindow("one", func() { sequence = append(sequence, v) }); err != nil {
+		if err = a.PostWindow(fixtureWindowRef(a, "one"), func() { sequence = append(sequence, v) }); err != nil {
 			t.Fatal(err)
 		}
 	}
-	if err = a.PostWindow("one", func() {}); !errors.Is(err, app.ErrQueueFull) {
+	if err = a.PostWindow(fixtureWindowRef(a, "one"), func() {}); !errors.Is(err, app.ErrQueueFull) {
 		t.Fatal("ordinary queue not bounded", err)
 	}
 	if err = reserved.Publish(func() { sequence = append(sequence, "R") }); err != nil {
@@ -397,7 +397,7 @@ func TestManualClosedDomainRefusesImageAndEnqueueBeforeRetirement(t *testing.T) 
 	if _, err = m.Capture(testContext, "one"); err != nil {
 		t.Fatal(err)
 	}
-	if err = a.CloseWindow("one"); err != nil {
+	if err = a.CloseWindow(fixtureWindowRef(a, "one")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err = m.Capture(testContext, "one"); !errors.Is(err, ErrManualClosed) {
@@ -424,7 +424,7 @@ func TestManualRequestFrameOnlyEnqueuesAndStepChargesDispatch(t *testing.T) {
 		return ui.Node{ID: "root", Kind: ui.Column, Children: []ui.Node{{ID: "value", Kind: ui.Label, Text: fmt.Sprint(changed)}}}
 	})
 	unitSettle(t, m)
-	if err := a.PostWindow("one", func() { changed++; _ = a.Invalidate("one") }); err != nil {
+	if err := a.PostWindow(fixtureWindowRef(a, "one"), func() { changed++; _ = a.Invalidate("one") }); err != nil {
 		t.Fatal(err)
 	}
 	before, err := m.Snapshot(testContext)

@@ -21,6 +21,7 @@ import (
 type editorWindow struct {
 	application                               *app.Application
 	id                                        string
+	windowRef                                 app.WindowRef
 	lifetime                                  context.Context
 	model                                     *editor.Model
 	session                                   *document.Session[string]
@@ -51,16 +52,13 @@ func newEditorWindow(a *app.Application, id string, o windowOptions) (*editorWin
 	if w.settle == nil {
 		w.settle = cogent.SettleEditor
 	}
-	if err = a.Open(app.Window{ID: id, Title: "Vellum document editor — " + id, Width: 840, Height: 660, View: w.view, CloseRequest: func() bool { w.start(actionClose, ""); return false }}); err != nil {
+	if w.windowRef, err = a.OpenWindow(app.Window{ID: id, Title: "Vellum document editor — " + id, Width: 840, Height: 660, View: w.view, CloseRequest: func() bool { w.start(actionClose, ""); return false }}); err != nil {
 		return nil, err
 	}
-	w.lifetime, err = a.WindowContext(id)
-	if err != nil {
-		return nil, err
-	}
+	w.lifetime = w.windowRef.Context()
 	w.session, err = document.New(document.Config[string]{Owner: a, Window: id, Journal: m.Journal(), Codec: documentCodec(m), MaxBytes: int64(m.MaxBytes()), Filename: "Untitled.txt", Extensions: []string{"txt", "md", "go"}, Store: o.store, Choose: o.choose, OnComplete: w.finish})
 	if err != nil {
-		_ = a.CloseWindow(id)
+		_ = a.CloseWindow(w.windowRef)
 		return nil, err
 	}
 	return w, nil

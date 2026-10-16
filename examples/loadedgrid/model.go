@@ -20,6 +20,7 @@ var errStale = errors.New("loadedgrid: worker result superseded")
 type window struct {
 	p                     *program
 	id                    string
+	windowRef             app.WindowRef
 	grid                  *virtual.Grid
 	domain                *fullSource
 	view                  virtual.GridProjection
@@ -74,7 +75,7 @@ func newProgram(rows int, variable bool, executor execution.Executor) (*program,
 			return nil, e
 		}
 		p.windows[i] = w
-		if e = a.Open(app.Window{ID: id, Title: "Vellum Loaded Grid · " + id, Width: 1100, Height: 860, View: w.describe}); e != nil {
+		if w.windowRef, e = a.OpenWindow(app.Window{ID: id, Title: "Vellum Loaded Grid · " + id, Width: 1100, Height: 860, View: w.describe}); e != nil {
 			a.Close()
 			return nil, e
 		}
@@ -96,10 +97,7 @@ func newProgram(rows int, variable bool, executor execution.Executor) (*program,
 	return p, nil
 }
 func (w *window) lifetime() (context.Context, error) {
-	ctx, e := w.p.owner.WindowContext(w.id)
-	if e != nil {
-		return nil, e
-	}
+	ctx := w.windowRef.Context()
 	if ctx.Err() != nil {
 		return nil, app.ErrWindowClosed
 	}

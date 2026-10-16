@@ -17,7 +17,7 @@ func TestNativeClosePolicyBeforeWidgetCleanup(t *testing.T) {
 	if err := a.Open(spec); err != nil {
 		t.Fatal(err)
 	}
-	w := &nativeWindow{window: spec, body: core.NewBody("Document")}
+	w := &nativeWindow{window: fixtureWindow(a, spec.ID), body: core.NewBody("Document")}
 	w.body.Scene.AddChild(w.body)
 	w.body.Scene.Stage = &core.Stage{}
 	bindCloseRequest(w, a, func(err error) { t.Error(err) })
@@ -43,7 +43,7 @@ func TestNativeForcedCloseBypassesPolicy(t *testing.T) {
 	calls := 0
 	spec := app.Window{ID: "main", Title: "Document", Width: 200, Height: 200, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }, CloseRequest: func() bool { calls++; return false }}
 	a.Open(spec)
-	w := &nativeWindow{window: spec, body: core.NewBody("Document")}
+	w := &nativeWindow{window: fixtureWindow(a, spec.ID), body: core.NewBody("Document")}
 	w.body.Scene.AddChild(w.body)
 	w.body.Scene.Stage = &core.Stage{}
 	bindCloseRequest(w, a, nil)

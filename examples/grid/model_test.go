@@ -198,14 +198,7 @@ func TestProgramIndependentWindowLifetimes(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer p.owner.Close()
-	first, err := p.owner.WindowContext("small")
-	if err != nil {
-		t.Fatal(err)
-	}
-	second, err := p.owner.WindowContext("large")
-	if err != nil {
-		t.Fatal(err)
-	}
+	first, second := p.windows[0].windowRef.Context(), p.windows[1].windowRef.Context()
 	if err = p.owner.Do(func() {
 		if err := p.windows[0].last(); err != nil {
 			t.Fatal(err)
@@ -214,7 +207,7 @@ func TestProgramIndependentWindowLifetimes(t *testing.T) {
 		if err != nil || state.Active != (virtual.GridActive{}) {
 			t.Fatal("models shared", state, err)
 		}
-		if err := p.owner.CloseWindow("small"); err != nil {
+		if err := p.owner.CloseWindow(p.windows[0].windowRef); err != nil {
 			t.Fatal(err)
 		}
 	}); err != nil {
@@ -223,7 +216,7 @@ func TestProgramIndependentWindowLifetimes(t *testing.T) {
 	if first.Err() == nil || second.Err() != nil || p.owner.Context().Err() != nil {
 		t.Fatal("window lifetime leaked")
 	}
-	if err = p.owner.CloseWindow("large"); err != nil {
+	if err = p.owner.CloseWindow(p.windows[1].windowRef); err != nil {
 		t.Fatal(err)
 	}
 	if second.Err() == nil || p.owner.Context().Err() == nil {

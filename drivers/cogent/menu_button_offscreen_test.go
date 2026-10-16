@@ -182,7 +182,7 @@ func TestMenuButtonPeerDrainDefersNativeCloseAndModalWake(t *testing.T) {
 		t.Fatal("missing second popup")
 	}
 	posted := false
-	if err := a.PostWindow("one", func() { posted = true; disabled = true; _ = a.Invalidate("one") }); err != nil {
+	if err := a.PostWindow(fixtureWindowRef(a, "one"), func() { posted = true; disabled = true; _ = a.Invalidate("one") }); err != nil {
 		t.Fatal(err)
 	}
 	// Route through the actual modal scene, with no Manual.Step fallback drain.

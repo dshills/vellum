@@ -233,7 +233,7 @@ func TestManagedImageManualSharedWindowsAndDPIScaling(t *testing.T) {
 	if retired.source != source || surviving.source != source {
 		t.Fatal("shared immutable source copied or replaced")
 	}
-	if err = a.CloseWindow("one"); err != nil {
+	if err = a.CloseWindow(fixtureWindowRef(a, "one")); err != nil {
 		t.Fatal(err)
 	}
 	unitSettle(t, m)

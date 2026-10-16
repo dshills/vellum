@@ -89,6 +89,7 @@ func treePerfGeometryCheck(g cogent.TreeInspection) (treePerfGeometry, error) {
 
 type treePerfProgram struct {
 	owner     *app.Application
+	windowRef app.WindowRef
 	outline   *virtual.Outline
 	data      *virtual.TreeData
 	callbacks uint64
@@ -165,10 +166,7 @@ func (p *treePerfProgram) inspect(ctx context.Context) (cogent.TreeInspection, e
 		ctx, cancel = context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 	}
-	life, err := p.owner.WindowContext("perf")
-	if err != nil {
-		return cogent.TreeInspection{}, err
-	}
+	life := p.windowRef.Context()
 	ticker := time.NewTicker(time.Millisecond)
 	defer ticker.Stop()
 	for {
@@ -372,7 +370,7 @@ func runTreePerf(c treePerfConfig) error {
 	}
 	defer owner.Close()
 	p := &treePerfProgram{owner: owner, outline: outline, data: data}
-	if err = owner.Open(app.Window{ID: "perf", Title: "Vellum stored-tree performance", Width: 1500, Height: 1100, View: p.describe}); err != nil {
+	if p.windowRef, err = owner.OpenWindow(app.Window{ID: "perf", Title: "Vellum stored-tree performance", Width: 1500, Height: 1100, View: p.describe}); err != nil {
 		return err
 	}
 	font, err := fs.ReadFile(fonts.Default, "noto/NotoSans-Regular.ttf")

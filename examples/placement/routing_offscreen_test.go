@@ -52,7 +52,8 @@ func TestPublicPaletteCanvasConsumer(t *testing.T) {
 				t.Fatal(err)
 			}
 			defer a.Close()
-			if err := a.Open(app.Window{ID: "placement", Title: "Placement", Width: 1100, Height: 760, View: func() ui.Node { return view(a, m) }}); err != nil {
+			var windowRef app.WindowRef
+			if windowRef, err = a.OpenWindow(app.Window{ID: "placement", Title: "Placement", Width: 1100, Height: 760, View: func() ui.Node { return view(a, windowRef, m) }}); err != nil {
 				t.Fatal(err)
 			}
 			config := cogent.ManualConfig{Clock: clock, Executor: executor, Commands: m.commands, LogicalDPI: 160, OwnerBatch: batch, MaxWindows: 2, EventCapacity: 128, Theme: ui.Theme{Default: ui.Style{Foreground: ui.Some(color.NRGBA{R: 24, G: 24, B: 24, A: 255}), Background: ui.Some(color.NRGBA{R: 248, G: 248, B: 248, A: 255}), Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 16})}}}

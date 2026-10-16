@@ -251,7 +251,7 @@ func TestCancellationBeforeOwnerAndTargetClosure(t *testing.T) {
 	wait(t, wake)
 	cancel()
 	wait(t, finished)
-	a.CloseWindow("main")
+	a.CloseWindow(automationWindowRef(t, a, "main"))
 	wait(t, s.Done())
 	if calls.Load() != 0 {
 		t.Fatal("closed target invoked")
@@ -510,12 +510,16 @@ func TestWindowScopeClosurePreservesOtherWindow(t *testing.T) {
 		Call(ctx, s.Endpoint(), request("invoke", "x", pointer(1), `{}`))
 	}()
 	wait(t, wake)
-	if err := a.CloseWindow("main"); err != nil {
+	if err := a.CloseWindow(automationWindowRef(t, a, "main")); err != nil {
+		t.Fatal(err)
+	}
+	current, err := a.OpenWindow(app.Window{ID: "main", Title: "Reopened headless", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "reopened", Kind: ui.Label} }})
+	if err != nil {
 		t.Fatal(err)
 	}
 	wait(t, s.Done())
 	wait(t, finished)
-	if a.Context().Err() != nil || len(a.Windows()) != 1 {
+	if a.Context().Err() != nil || current.Context().Err() != nil || len(a.Windows()) != 2 {
 		t.Fatal("unrelated window retired")
 	}
 	if err := a.Drain(); err != nil {
@@ -563,4 +567,13 @@ func TestCopiedHandlesRefuseWithoutChangingOriginal(t *testing.T) {
 	if v := call(t, s, request("inspect", "x", nil, `{}`)); v.Error != nil {
 		t.Fatal("original retired", v)
 	}
+}
+
+func automationWindowRef(t *testing.T, a *app.Application, name string) app.WindowRef {
+	t.Helper()
+	ref, err := a.WindowRef(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return ref
 }

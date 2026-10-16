@@ -507,10 +507,7 @@ func imagingSmoke(ctx context.Context, a *app.Application, first, second *imageW
 	// verify suppressed delivery
 	// and usable surviving-window pixels, then complete domain cleanup normally.
 	var otherNative system.Window
-	otherLifetime, err := a.WindowContext(second.view.Window)
-	if err != nil {
-		return err
-	}
+	otherLifetime := second.windowRef.Context()
 	if err := owner(a, func() error {
 		otherNative = second.view.NativeWindow()
 		if otherNative == nil {
@@ -551,7 +548,7 @@ func imagingSmoke(ctx context.Context, a *app.Application, first, second *imageW
 		if otherLifetime.Err() != nil {
 			return nil
 		}
-		return a.CloseWindow(second.view.Window)
+		return a.CloseWindow(second.windowRef)
 	}); err != nil {
 		return err
 	}
@@ -561,10 +558,7 @@ func imagingSmoke(ctx context.Context, a *app.Application, first, second *imageW
 	// Admit a capture on the last live domain window, then intentionally close
 	// the application owner. The native handle and program counter stay usable
 	// for a real teardown barrier even though public Stats no longer does.
-	lifetime, err := a.WindowContext(first.view.Window)
-	if err != nil {
-		return err
-	}
+	lifetime := first.windowRef.Context()
 	_, _, releasesBeforeClose := first.model.resourceIdentity()
 	if err := owner(a, func() error {
 		windows := a.Windows()
@@ -574,7 +568,7 @@ func imagingSmoke(ctx context.Context, a *app.Application, first, second *imageW
 		if e := first.view.SnapshotAsync(lifetime, func(cogent.GPUSnapshot, error) { dropped.Add(1) }); e != nil {
 			return e
 		}
-		return a.CloseWindow(first.view.Window)
+		return a.CloseWindow(first.windowRef)
 	}); err != nil {
 		return err
 	}

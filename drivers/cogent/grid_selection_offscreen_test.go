@@ -619,7 +619,7 @@ func TestManagedGridRowSelectionQueuedIntentNativeTabAndWindowClose(t *testing.T
 		if e := a.Do(func() {
 			binding := m.implementation.find("one").state.root.control.grid
 			binding.post(ui.GridSelection, g.SelectAll)
-			closeErr = a.CloseWindow("one")
+			closeErr = a.CloseWindow(fixtureWindowRef(a, "one"))
 		}); e != nil {
 			t.Fatal(e)
 		}

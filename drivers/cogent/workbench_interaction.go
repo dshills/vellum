@@ -49,7 +49,7 @@ func (w *Workbench) queue(change func() error) {
 		return
 	}
 	generation := w.generation.Load()
-	err := w.Owner.PostWindow(w.Window, func() {
+	err := w.Owner.PostWindow(w.windowRef, func() {
 		if w.retired.Load() || generation != w.generation.Load() {
 			return
 		}
@@ -181,11 +181,11 @@ func (w *Workbench) postWindowBounds(capture *nativeBoundsCapture) {
 	if capture == nil {
 		return
 	}
-	lifetime, err := w.Owner.WindowContext(w.Window)
+	lifetime, err := scopedWindowContext(w.Owner, w.windowRef)
 	if err != nil || lifetime.Err() != nil {
 		return
 	}
-	err = w.Owner.PostWindow(w.Window, func() {
+	err = w.Owner.PostWindow(w.windowRef, func() {
 		if capture.sequence != w.boundsSequence.Load() || capture.epoch != w.geometryEpoch.Load() || w.Group == nil || w.Group.windows[w.SessionWindow] != w {
 			return
 		}

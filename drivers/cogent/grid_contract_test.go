@@ -110,7 +110,7 @@ func TestManagedGridQueueLifetimeAndScopeRefusal(t *testing.T) {
 		failures++
 	}
 	before, _ := g.State()
-	if e := a.PostWindow("one", func() {}); e != nil {
+	if e := a.PostWindow(fixtureWindowRef(a, "one"), func() {}); e != nil {
 		t.Fatal(e)
 	}
 	b.post(ui.GridSelection, func() error { return g.Move(1, 0) })
@@ -156,7 +156,7 @@ func TestManagedGridQueueLifetimeAndScopeRefusal(t *testing.T) {
 		t.Fatal(e)
 	}
 	b.post(ui.GridSelection, func() error { return g.Move(1, 0) })
-	if e := a.CloseWindow("one"); e != nil {
+	if e := a.CloseWindow(fixtureWindowRef(a, "one")); e != nil {
 		t.Fatal(e)
 	}
 	if e := a.Drain(); e != nil {

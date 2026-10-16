@@ -86,7 +86,7 @@ func (m *FrameMetrics) GridInputDetails() GridInputDetails {
 
 func bindGridInputDetails(g *gridBinding) *gridInputBinding {
 	frameMetricsRegistry.Lock()
-	b := frameMetricsRegistry.windows[frameWindowKey{g.owner, g.window}]
+	b := frameMetricsRegistry.windows[frameWindowKey{g.owner, g.window, g.windowRef}]
 	frameMetricsRegistry.Unlock()
 	if b == nil || b.metrics.gridInputs == nil {
 		return nil
@@ -140,7 +140,7 @@ func (g *gridBinding) postInputControl(origin gridInputOrigin, reason ui.GridCha
 		g.observeTransition(origin, reason, virtual.GridState{}, virtual.GridState{}, "widget-refused")
 		return
 	}
-	if err := r.control.a.PostWindow(r.control.window, func() {
+	if err := r.control.a.PostWindow(r.control.windowRef, func() {
 		if !r.control.retired {
 			fn()
 		} else {

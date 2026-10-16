@@ -12,7 +12,7 @@ import (
 
 // reconcile preserves compatible native widgets by ID throughout a managed tree.
 // Validation and allocation finish before any retained node is moved or removed.
-func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Application, window string, themes ...ui.Theme) (*record, error) {
+func reconcileScoped(parent core.Widget, previous *record, n ui.Node, a *app.Application, scope app.WindowRef, themes ...ui.Theme) (*record, error) {
 	var theme ui.Theme
 	if previous != nil {
 		theme = previous.theme
@@ -54,6 +54,12 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 	if err := validateExtensions(n); err != nil {
 		return previous, err
 	}
+	if _, err := scopedWindowContext(a, scope); err != nil {
+		return previous, err
+	}
+	if previous != nil && previous.scope != scope {
+		return previous, app.ErrWindowClosed
+	}
 	old := map[string]*record{}
 	var collect func(*record)
 	collect = func(r *record) {
@@ -83,7 +89,7 @@ func reconcile(parent core.Widget, previous *record, n ui.Node, a *app.Applicati
 		r := old[node.ID]
 		if r == nil || !compatible(r.node, node) {
 			var err error
-			r, err = mountShallow(p, node, a, window, theme)
+			r, err = mountShallowScoped(p, node, a, scope, theme)
 			if err != nil {
 				return nil, err
 			}

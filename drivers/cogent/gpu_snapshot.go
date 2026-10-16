@@ -98,7 +98,7 @@ func (g *GPUView) SnapshotAsync(ctx context.Context, callback func(GPUSnapshot, 
 	if err := gpuBudget(g.budget(), r.stats.TargetBytes, r.stats.BufferBytes, r.stats.TextureBytes, r.stats.ReadbackBytes, r.stats.AsyncReadbackBytes, bytes); err != nil {
 		return err
 	}
-	lifetime, err := g.Owner.WindowContext(g.Window)
+	lifetime, err := scopedWindowContext(g.Owner, g.widget.windowRef)
 	if err != nil || lifetime.Err() != nil {
 		return ErrFrameNotReady
 	}
@@ -312,7 +312,7 @@ func (w *gpuViewWidget) deliverSnapshot(job *gpuSnapshotJob, resultErr error) {
 	}
 	g := w.owner
 	native := w.native.Load()
-	ctx, err := w.application.WindowContext(w.windowID)
+	ctx, err := scopedWindowContext(w.application, w.windowRef)
 	live := native != nil && !native.window.IsClosed() && !w.retired.Load() && g != nil && g.widget == w && g.Owner == w.application && g.Window == w.windowID && g.Program == w.program && g.Depth == w.depth && err == nil && ctx.Err() == nil && job.ctx.Err() == nil && r.stats.ResourceGeneration == job.result.ResourceGeneration
 	if !live {
 		r.finishSnapshot(job, false)

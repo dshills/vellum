@@ -23,7 +23,7 @@ import (
 )
 
 func TestControlledViewAndCommandContract(t *testing.T) {
-	if vellum.Version != "v0.1.0-alpha.1" {
+	if vellum.Version != "v0.1.0-alpha.2" {
 		t.Fatal(vellum.Version)
 	}
 	checked := false
@@ -67,13 +67,11 @@ func TestWindowScopedTaskCommitContract(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer a.Close()
-	if err := a.Open(app.Window{ID: "main", Title: "Consumer", Width: 400, Height: 300, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label, Text: "Consumer"} }}); err != nil {
-		t.Fatal(err)
-	}
-	lifetime, err := a.WindowContext("main")
+	ref, err := a.OpenWindow(app.Window{ID: "main", Title: "Consumer", Width: 400, Height: 300, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label, Text: "Consumer"} }})
 	if err != nil {
 		t.Fatal(err)
 	}
+	lifetime := ref.Context()
 	manager, err := tasks.New(a, 1, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +107,7 @@ func TestWindowScopedTaskCommitContract(t *testing.T) {
 	if commits != 1 {
 		t.Fatal(commits)
 	}
-	if err := a.CloseWindow("main"); err != nil {
+	if err := a.CloseWindow(ref); err != nil {
 		t.Fatal(err)
 	}
 	if lifetime.Err() == nil || a.Context().Err() == nil {
@@ -218,7 +216,10 @@ func TestPublicDocumentSessionSaveAndClosePolicy(t *testing.T) {
 	value := 42
 	requests := 0
 	confirmed := false
-	a.Open(app.Window{ID: "main", Title: "SDK", Width: 200, Height: 200, CloseRequest: func() bool { requests++; return confirmed }, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }})
+	ref, err := a.OpenWindow(app.Window{ID: "main", Title: "SDK", Width: 200, Height: 200, CloseRequest: func() bool { requests++; return confirmed }, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }})
+	if err != nil {
+		t.Fatal(err)
+	}
 	path := filepath.Join(t.TempDir(), "SDK.vellum")
 	completed := false
 	session, err := document.New(document.Config[int]{Owner: a, Window: "main", Journal: j, Codec: document.Codec[int]{Capture: func() (int, error) { return value, nil }, Encode: func(v int) ([]byte, error) { return []byte(strconv.Itoa(v)), nil }, Decode: func(b []byte) (int, error) { return strconv.Atoi(string(b)) }, Install: func(v int) error { value = v; return nil }}, OnComplete: func(r document.Result) {
@@ -231,7 +232,7 @@ func TestPublicDocumentSessionSaveAndClosePolicy(t *testing.T) {
 		t.Fatal(err)
 	}
 	a.Do(func() {
-		if !errors.Is(a.RequestCloseWindow("main"), app.ErrCloseRefused) {
+		if !errors.Is(a.RequestCloseWindow(ref), app.ErrCloseRefused) {
 			t.Fatal("public close policy ignored")
 		}
 		if err := session.Save(context.Background(), document.SaveOptions{Path: path}); err != nil {
@@ -248,7 +249,7 @@ func TestPublicDocumentSessionSaveAndClosePolicy(t *testing.T) {
 	}
 	confirmed = true
 	a.Do(func() {
-		if err := a.RequestCloseWindow("main"); err != nil {
+		if err := a.RequestCloseWindow(ref); err != nil {
 			t.Fatal(err)
 		}
 	})

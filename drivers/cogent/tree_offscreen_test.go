@@ -277,7 +277,7 @@ func TestManagedTreeBindingCloseAndCaps(t *testing.T) {
 	if e := a.Open(app.Window{ID: "other", Title: "Other", Width: 200, Height: 100, View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label, Text: "Alive"} }}); e != nil {
 		t.Fatal(e)
 	}
-	if e := a.CloseWindow("one"); e != nil {
+	if e := a.CloseWindow(fixtureWindowRef(a, "one")); e != nil {
 		t.Fatal(e)
 	}
 	var e error

@@ -18,12 +18,15 @@ func TestGPUGeometryAndCameraCreatedBeforeUpdates(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer a.Close()
+	if err := a.Open(scopeDeclaration("standalone-unit")); err != nil {
+		t.Fatal(err)
+	}
 	model, err := canvas.New([]canvas.Rect{{ID: "back", Width: 50, Height: 25, Color: color.RGBA{67, 197, 166, 255}}, {ID: "front", Width: 10, Height: 10, Color: color.RGBA{255, 190, 69, 255}}})
 	if err != nil {
 		t.Fatal(err)
 	}
 	model.View.SetSize(800, 400)
-	g := &GPUCanvas{Owner: a, Model: model}
+	g := &GPUCanvas{Owner: a, Window: "standalone-unit", Model: model}
 	host := core.NewBody("headless")
 	native := g.Mount(host)
 	if native == nil || len(g.solids) != 2 || g.solids[0] == nil || g.solids[1] == nil {
@@ -53,8 +56,11 @@ func TestGPUGeometryAndCameraCreatedBeforeUpdates(t *testing.T) {
 func TestCameraDepthAndAllocatedSize(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(scopeDeclaration("standalone-unit")); err != nil {
+		t.Fatal(err)
+	}
 	model, _ := canvas.New([]canvas.Rect{{ID: "a", Width: 10, Height: 10}, {ID: "b", Width: 10, Height: 10}})
-	g := &GPUCanvas{Owner: a, Model: model}
+	g := &GPUCanvas{Owner: a, Window: "standalone-unit", Model: model}
 	g.Mount(core.NewBody("depth"))
 	g.widget.Geom.ContentBBox = image.Rect(100, 50, 1500, 350)
 	g.size()
@@ -78,11 +84,14 @@ func TestCameraDepthAndAllocatedSize(t *testing.T) {
 func TestCanvasPointerEventsUseOwnSelection(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(scopeDeclaration("standalone-unit")); err != nil {
+		t.Fatal(err)
+	}
 	model, _ := canvas.New([]canvas.Rect{{ID: "a", Width: 20, Height: 20}, {ID: "b", X: 50, Width: 20, Height: 20}})
 	model.View.SetSize(800, 400)
 	model.View.Center = canvas.Point{X: 40, Y: 10}
 	selected := ""
-	g := &GPUCanvas{Owner: a, Model: model, Select: func(id string) { selected = id }}
+	g := &GPUCanvas{Owner: a, Window: "standalone-unit", Model: model, Select: func(id string) { selected = id }}
 	g.Mount(core.NewBody("pointer"))
 	g.widget.Geom.ContentBBox = image.Rect(100, 50, 900, 450)
 	point := model.View.Screen(canvas.Point{X: 60, Y: 10})

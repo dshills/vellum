@@ -445,7 +445,7 @@ func TestManagedGridInlineSettlementRetiresWithWindowAndApp(t *testing.T) {
 	if e := a.Do(func() { inner = SettleGridEdit(testContext, a, "one", g, func(e error) { calls++; result = e }) }); e != nil || inner != nil {
 		t.Fatal(e, inner)
 	}
-	if e := a.CloseWindow("one"); e != nil {
+	if e := a.CloseWindow(fixtureWindowRef(a, "one")); e != nil {
 		t.Fatal(e)
 	}
 	gridFrame(t, m)

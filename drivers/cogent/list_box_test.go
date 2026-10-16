@@ -155,7 +155,7 @@ func TestListBoxQueueRefusalAndWindowClosure(t *testing.T) {
 		t.Fatal("refusal restore", reports)
 	}
 	queueListBox(r, "b", r.control.choice.buttons["b"])
-	if err := a.CloseWindow("ax"); err != nil {
+	if err := a.CloseWindow(fixtureWindowRef(a, "ax")); err != nil {
 		t.Fatal(err)
 	}
 	a.Drain()

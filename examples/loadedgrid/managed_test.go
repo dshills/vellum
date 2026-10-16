@@ -263,7 +263,7 @@ func TestActualLoadedGridWorkerRoutingAndFilterFIFO(t *testing.T) {
 			// worker is still explicit and consumes credit until actual terminal cleanup.
 			press(t, m, batch, "small", "sort-asc")
 			ids = ex.PendingIDs()
-			owner(t, p, func() error { return p.owner.CloseWindow("small") })
+			owner(t, p, func() error { return p.owner.CloseWindow(p.windows[0].windowRef) })
 			settleManual(t, m, batch)
 			work(t, ex, ids[0], m, batch)
 			if !p.windows[0].manager.Pending().Idle() {

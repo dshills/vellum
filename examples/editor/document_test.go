@@ -213,7 +213,7 @@ func TestCanceledWorkerCompletesThroughFullMailbox(t *testing.T) {
 	f.owner(t, func() { f.w.start(actionSave, f.path) })
 	f.acknowledge(t, nil)
 	waitEntered(t, entered)
-	if err := f.a.PostWindow("one", func() {}); err != nil {
+	if err := f.a.PostWindow(f.w.windowRef, func() {}); err != nil {
 		t.Fatal(err)
 	}
 	f.owner(t, func() { f.w.cancel() })
@@ -520,4 +520,32 @@ func TestControlledFindFieldHasIndependentOwnerState(t *testing.T) {
 			t.Fatal("dialog dismissal failed to restore editor focus")
 		}
 	})
+}
+
+func TestRetiredEditorCloseKeepsSameNameReplacementOpen(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	if err = a.Open(app.Window{ID: "survivor", Title: "Survivor", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{Kind: ui.Label} }}); err != nil {
+		t.Fatal(err)
+	}
+	old, err := newEditorWindow(a, "document", windowOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = old.closeNow(); err != nil {
+		t.Fatal(err)
+	}
+	current, err := newEditorWindow(a, "document", windowOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = old.closeNow(); !errors.Is(err, app.ErrWindowClosed) || current.lifetime.Err() != nil {
+		t.Fatal("retired editor closed replacement", err)
+	}
+	if current.windowRef == old.windowRef || current.model == old.model || old.lifetime.Err() == nil {
+		t.Fatal("editor opening or model identity reused")
+	}
 }

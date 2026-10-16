@@ -115,7 +115,7 @@ func TestRetiredOrClosedWindowDoesNotPrepare(t *testing.T) {
 	g.Mount(core.NewBody("one"))
 	old := g.widget
 	old.Geom.Size.Actual.Content = math32.Vec2(900, 700)
-	a.CloseWindow("one")
+	a.CloseWindow(fixtureWindowRef(a, "one"))
 	old.Render()
 	if calls != 0 || view.Width != 200 {
 		t.Fatal("closed-window preparation/layout escaped", calls, view)
@@ -184,7 +184,7 @@ func TestLateCanvasInputIsBoundToItsMountedLifetime(t *testing.T) {
 		click.SetLocalOff(image.Point{})
 		old.HandleEvent(click)
 	}
-	a.CloseWindow("one")
+	a.CloseWindow(fixtureWindowRef(a, "one"))
 	emit()
 	if view != before || picked != 0 {
 		t.Fatal("cancelled-window input escaped", view, picked)

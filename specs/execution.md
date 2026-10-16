@@ -34,9 +34,11 @@ application bound. Go cannot terminate a callback that ignores cancellation.
 
 `app.Config.CompletionCapacity` defaults to 256, independently of the ordinary
 `QueueCapacity` default of 256. Both must be positive when explicitly set.
-`ReserveCompletion(window, cleanup)` binds one exact ticket to the window's
-immutable lifetime (or the application for an empty window). Reserve before
-worker submission. It never inserts a placeholder into the ready queue.
+`ReserveWindowCompletion(ref, cleanup)` binds one exact ticket to an opening's
+immutable lifetime. `ReserveCompletion(cleanup)` is explicitly application-wide.
+A zero window reference refuses rather than falling back to application scope.
+Reserve before worker submission; reservation never inserts a placeholder into
+the ready queue. Reopening a closed logical name cannot revive its old tickets.
 
 `Completion.Publish(fn)` admits the final result without waiting for ordinary
 queue space; duplicate, copied, aborted and retired tickets refuse. Ordinary

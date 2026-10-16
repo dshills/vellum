@@ -33,7 +33,7 @@ func editorFixture(t *testing.T, text string) (*app.Application, *nativeWindow, 
 	if err != nil {
 		t.Fatal(err)
 	}
-	w := &nativeWindow{body: body, window: app.Window{ID: "editor-unit"}, root: r}
+	w := &nativeWindow{body: body, window: fixtureWindow(a, "editor-unit"), root: r}
 	var source events.Source
 	w.source.Store(&source)
 	tw, err := newTextWindow(a, &source.Deque)
@@ -331,7 +331,7 @@ func TestManagedEditorNativeAdmissionStopsAtLogicalWindowClose(t *testing.T) {
 	// Keep another window live so this exercises logical window cancellation,
 	// before Cocoa attachment destruction or whole-application cancellation.
 	_ = a.Open(app.Window{ID: "other", Title: "Other", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "other", Kind: ui.Column} }})
-	_ = a.Do(func() { _ = a.CloseWindow(w.window.ID) })
+	_ = a.Do(func() { _ = a.CloseWindow(w.window.Ref()) })
 	if tw.closed.Load() || a.Context().Err() != nil || tw.acceptsNativeInput() {
 		t.Fatal("logical close still admitted native mutation")
 	}
@@ -369,7 +369,7 @@ func TestManagedEditorLogicalCloseRefusesAlreadyAdmittedInput(t *testing.T) {
 	if err := tw.pump.Send(textMessage{Kind: "input", Input: fixtureInput(r, 1, "insert", "A", "closed", 6, 6, -1, -1)}); err != nil {
 		t.Fatal(err)
 	}
-	_ = a.Do(func() { _ = a.CloseWindow(w.window.ID) })
+	_ = a.Do(func() { _ = a.CloseWindow(w.window.Ref()) })
 	for {
 		e, ok := w.source.Load().Deque.PollEvent()
 		if !ok {
@@ -842,7 +842,7 @@ func TestManagedTextFieldFocusLossFallbackAndRetirement(t *testing.T) {
 			}
 			if scenario == "closed-window" {
 				_ = a.Open(app.Window{ID: "surviving-window", Title: "Survivor", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "survivor", Kind: ui.Column} }})
-				if err := a.CloseWindow(w.window.ID); err != nil {
+				if err := a.CloseWindow(w.window.Ref()); err != nil {
 					t.Fatal(err)
 				}
 			} else if scenario == "retired-field" {
@@ -906,7 +906,7 @@ func TestManagedTextFieldFocusLossDoesNotActivateInterveningField(t *testing.T) 
 	tw.setActiveClient(first.control.client, true)
 	first.widget.(*core.TextField).Send(events.FocusLost)
 	_ = a.Open(app.Window{ID: "other-live", Title: "Other", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "other", Kind: ui.Column} }})
-	if err := a.CloseWindow(w.window.ID); err != nil {
+	if err := a.CloseWindow(w.window.Ref()); err != nil {
 		t.Fatal(err)
 	}
 	_ = a.Do(func() {

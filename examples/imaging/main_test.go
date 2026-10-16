@@ -20,7 +20,7 @@ func TestCaptureCompletionNeverBlocksFullDiagnosticMailbox(t *testing.T) {
 			}
 			defer a.Close()
 			w, spec := newImageWindow(a, "capture", false, make(chan error, 1))
-			if err := a.Open(spec); err != nil {
+			if w.windowRef, err = a.OpenWindow(spec); err != nil {
 				t.Fatal(err)
 			}
 			prior := errors.New("prior unread diagnostic")

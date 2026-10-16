@@ -100,7 +100,10 @@ func TestWorkbenchPanelReceivesIndependentThemeSnapshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	w := &Workbench{Owner: a, Workspace: model, Panels: []Panel{{ID: "panel", Title: "Panel", View: func() ui.Node {
+	if _, err := fixtureMountScope(a, "main"); err != nil {
+		t.Fatal(err)
+	}
+	w := &Workbench{Owner: a, Window: "main", Workspace: model, Panels: []Panel{{ID: "panel", Title: "Panel", View: func() ui.Node {
 		return ui.Node{ID: "row", Kind: ui.Row, Children: []ui.Node{{ID: "label", Kind: ui.Label, Text: "value"}}}
 	}}}}
 	theme := ui.Theme{Kinds: map[ui.Kind]ui.Style{ui.Row: {Gap: ui.Some(float32(8))}}}
@@ -141,7 +144,10 @@ func TestReconcileNewThemeRestylesRetainedNodesAndPanels(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	w := &Workbench{Owner: a, Workspace: model, Panels: []Panel{{ID: "panel", Title: "Panel", View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label, Text: "value"} }}}}
+	if _, err := fixtureMountScope(a, "main"); err != nil {
+		t.Fatal(err)
+	}
+	w := &Workbench{Owner: a, Window: "main", Workspace: model, Panels: []Panel{{ID: "panel", Title: "Panel", View: func() ui.Node { return ui.Node{ID: "label", Kind: ui.Label, Text: "value"} }}}}
 	n = ui.Node{ID: "ext", Kind: ui.Extension, Custom: w}
 	r, err = reconcile(host, r, n, a, "main", first)
 	if err != nil {

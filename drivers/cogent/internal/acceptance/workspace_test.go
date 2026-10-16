@@ -194,7 +194,7 @@ func TestDisclosureUsesReservedWorkerAndJoinsRetirement(t *testing.T) {
 		t.Fatal("expansion failed", expanded, w.State())
 	}
 	start(virtual.OutlineCollapse)
-	if err = a.CloseWindow("worker"); err != nil {
+	if err = a.CloseWindow(currentFixtureRef(a, "worker")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err = executor.StepNext(context.Background()); err != nil {

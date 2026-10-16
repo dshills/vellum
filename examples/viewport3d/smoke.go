@@ -69,7 +69,7 @@ func press(ctx context.Context, id string) error {
 		}
 	}
 }
-func viewportSmoke(ctx context.Context, a *app.Application, g, other *cogent.GPUView, m, otherModel *cubeProgram, errors <-chan error, chrome func()) error {
+func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef app.WindowRef, g, other *cogent.GPUView, m, otherModel *cubeProgram, errors <-chan error, chrome func()) error {
 	initial, err := waitFrame(ctx, a, g, 0)
 	if err != nil {
 		return err
@@ -312,7 +312,7 @@ func viewportSmoke(ctx context.Context, a *app.Application, g, other *cogent.GPU
 		if otherAfter.Frames != independent.Frames || otherAfter.BufferAllocations != independent.BufferAllocations {
 			return fmt.Errorf("first-window changes affected independent resources")
 		}
-		return a.CloseWindow(g.Window)
+		return a.CloseWindow(primaryRef)
 	}); err != nil {
 		return err
 	}
@@ -330,7 +330,7 @@ func viewportSmoke(ctx context.Context, a *app.Application, g, other *cogent.GPU
 	if err := depthPixel(a, other); err != nil {
 		return err
 	}
-	if err := owner(a, func() error { return a.CloseWindow(other.Window) }); err != nil {
+	if err := owner(a, func() error { return a.CloseWindow(otherRef) }); err != nil {
 		return err
 	}
 	report := map[string]any{"initial": initial, "independentBufferNamespaces": true, "orbitPixelsChanged": true, "chrome": unchanged, "orbit": orbited, "dolly": dollied, "rebuilt": rebuilt, "resized": last, "cleared": cleared, "independent": otherAfter, "depth": "near red face before far blue face; both center pixels red", "callbackFaults": "controlled Prepare and Draw failures; partial resources retired and rebuilt", "readback": "explicit synchronous snapshots only", "closure": "closed adapters unavailable; other window remains usable", "result": "pass"}

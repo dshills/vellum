@@ -19,6 +19,7 @@ type documentWorkflow struct {
 	session        documentPersistence
 	owner          *app.Application
 	window         string
+	windowRef      app.WindowRef
 	status         func(string)
 	pending        string
 	savingDecision bool
@@ -70,7 +71,7 @@ func (w *documentWorkflow) discard() {
 	pending := w.pending
 	w.cancel()
 	if pending == "close" {
-		if err := w.owner.CloseWindow(w.window); err != nil {
+		if err := w.owner.CloseWindow(w.windowRef); err != nil {
 			w.status(err.Error())
 		}
 		return
@@ -96,7 +97,7 @@ func (w *documentWorkflow) complete(r document.Result) {
 	pending := w.pending
 	w.cancel()
 	if pending == "close" {
-		if err := w.owner.CloseWindow(w.window); err != nil {
+		if err := w.owner.CloseWindow(w.windowRef); err != nil {
 			w.status(err.Error())
 		}
 		return

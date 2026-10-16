@@ -56,6 +56,7 @@ type outlineBinding struct {
 	previous                   *outlineBinding
 	owner                      *app.Application
 	window                     string
+	windowRef                  app.WindowRef
 	model                      *virtual.Outline
 	lifetimeDone               <-chan struct{}
 	incarnation, epoch, frames uint64
@@ -105,18 +106,18 @@ func mountTree(parent tree.Node, r *record, a *app.Application, window string) (
 	if err := validateNativeTree(r.node); err != nil {
 		return nil, err
 	}
-	life, err := a.WindowContext(window)
+	life, err := scopedWindowContext(a, r.scope)
 	if err != nil {
 		return nil, err
 	}
 	outlineRegistry.Lock()
 	old := outlineRegistry.models[r.node.Tree]
-	if old != nil && (outlineRegistry.preparing[r.node.Tree] != old || old.owner != a || old.window != window) || outlineRegistry.next == math.MaxUint64 {
+	if old != nil && (outlineRegistry.preparing[r.node.Tree] != old || old.owner != a || old.windowRef != r.scope) || outlineRegistry.next == math.MaxUint64 {
 		outlineRegistry.Unlock()
 		return nil, ErrTreeBinding
 	}
 	outlineRegistry.next++
-	t := &outlineBinding{r: r, owner: a, window: window, model: r.node.Tree, lifetimeDone: life.Done(), incarnation: outlineRegistry.next, previous: old, scope: true}
+	t := &outlineBinding{r: r, owner: a, window: window, windowRef: r.scope, model: r.node.Tree, lifetimeDone: life.Done(), incarnation: outlineRegistry.next, previous: old, scope: true}
 	outlineRegistry.models[t.model] = t
 	outlineRegistry.Unlock()
 	r.control.outline = t
@@ -420,7 +421,7 @@ func (t *outlineBinding) requestViewport(req outlineRequest) {
 	}
 	t.requested = req
 	t.requestMu.Unlock()
-	err := t.owner.PostWindow(t.window, func() {
+	err := t.owner.PostWindow(t.windowRef, func() {
 		t.apply(ui.TreeViewport, false, func() error {
 			s, e := t.model.State()
 			if e != nil {

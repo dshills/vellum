@@ -138,6 +138,11 @@ func (g *GPUView) Mount(parent tree.Node) core.Widget {
 		g.report(err)
 		return nil
 	}
+	ref, err := captureMountScope(parent, g.Owner, g.Window)
+	if err != nil {
+		g.report(err)
+		return nil
+	}
 	if g.widget != nil && !g.widget.retired.Load() {
 		g.report(errors.New("GPU view: already mounted"))
 		return nil
@@ -154,6 +159,7 @@ func (g *GPUView) Mount(parent tree.Node) core.Widget {
 	}()
 	w := tree.New[gpuViewWidget](parent)
 	w.owner, w.application, w.windowID, w.program, w.depth = g, g.Owner, g.Window, g.Program, g.Depth
+	w.windowRef = ref
 	w.resources.prepare, w.resources.draw, w.resources.cleanup = g.Program.Prepare, g.Program.Draw, g.Program.Release
 	g.widget = w
 	w.Styler(func(s *styles.Style) {
@@ -207,7 +213,7 @@ func (g *GPUView) NativeWindow() system.Window {
 	if g == nil || g.Owner == nil || g.widget == nil || g.widget.retired.Load() || g.Owner != g.widget.application || g.Window != g.widget.windowID {
 		return nil
 	}
-	ctx, err := g.Owner.WindowContext(g.Window)
+	ctx, err := scopedWindowContext(g.Owner, g.widget.windowRef)
 	if err != nil || ctx.Err() != nil {
 		return nil
 	}
@@ -320,6 +326,7 @@ type gpuViewWidget struct {
 	owner       *GPUView
 	application *app.Application
 	windowID    string
+	windowRef   app.WindowRef
 	program     *GPUProgram
 	depth       bool
 	retired     atomic.Bool
@@ -355,7 +362,7 @@ func (w *gpuViewWidget) ownerEvent(fn func()) {
 		if w.retired.Load() || g == nil || g.widget != w {
 			return
 		}
-		ctx, err := w.application.WindowContext(w.windowID)
+		ctx, err := scopedWindowContext(w.application, w.windowRef)
 		if err != nil || ctx.Err() != nil {
 			return
 		}
@@ -381,7 +388,7 @@ func (w *gpuViewWidget) Render() {
 		if w.retired.Load() || g.widget != w {
 			return
 		}
-		ctx, err := w.application.WindowContext(w.windowID)
+		ctx, err := scopedWindowContext(w.application, w.windowRef)
 		if err != nil || ctx.Err() != nil {
 			return
 		}

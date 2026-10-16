@@ -8,14 +8,15 @@ import (
 	"cogentcore.org/core/styles/states"
 	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
+	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/virtual"
-	"fmt"
 	"html"
 	"strings"
 )
 
 type VirtualTable struct {
+	input   *virtualMountScope
 	OnError func(error)
 	wheel   float32
 	Owner   *app.Application
@@ -32,6 +33,15 @@ func (v *VirtualTable) Mount(parent tree.Node) core.Widget {
 	if v == nil || v.Owner == nil || v.Model == nil || v.Model.Source() == nil || v.Model.VisibleCount() < 1 || v.Model.VisibleCount() > virtual.MaxVisible {
 		return nil
 	}
+	ref, err := captureMountScope(parent, v.Owner, v.Window)
+	if err != nil {
+		if v.OnError != nil {
+			v.OnError(err)
+		}
+		return nil
+	}
+	lease := &virtualMountScope{owner: v.Owner, ref: ref, window: v.Window}
+	v.input = lease
 	v.rows = nil
 	v.wheel = 0
 	v.host = core.NewFrame(parent)
@@ -49,7 +59,7 @@ func (v *VirtualTable) Mount(parent tree.Node) core.Widget {
 		if d < 0 {
 			text = "Previous page"
 		}
-		core.NewButton(bar).SetText(text).OnClick(func(events.Event) { v.scroll(d) })
+		core.NewButton(bar).SetText(text).OnClick(func(events.Event) { v.scrollFrom(lease, d) })
 	}
 	v.status = core.NewText(bar)
 	for i := 0; i < v.Model.VisibleCount(); i++ {
@@ -63,7 +73,7 @@ func (v *VirtualTable) Mount(parent tree.Node) core.Widget {
 			s.Font.Size = units.Dp(12)
 		})
 		b.OnClick(func(events.Event) {
-			v.Owner.Do(func() {
+			v.ownerEvent(lease, func() {
 				r, err := v.Model.SelectVisible(slot)
 				if err != nil {
 					if v.OnError != nil {
@@ -79,40 +89,41 @@ func (v *VirtualTable) Mount(parent tree.Node) core.Widget {
 	}
 	v.host.On(events.Scroll, func(e events.Event) {
 		if s, ok := e.(*events.MouseScroll); ok {
-			d := wheelRows(&v.wheel, s.Delta.Y)
-			v.scroll(d)
+			v.ownerEvent(lease, func() { d := wheelRows(&v.wheel, s.Delta.Y); v.scrollOwned(d) })
 			e.SetHandled()
 		}
 	})
 	return v.host
 }
-func (v *VirtualTable) scroll(delta int) {
+func (v *VirtualTable) scroll(delta int) { v.scrollFrom(v.input, delta) }
+func (v *VirtualTable) scrollFrom(lease *virtualMountScope, delta int) {
+	v.ownerEvent(lease, func() { v.scrollOwned(delta) })
+}
+func (v *VirtualTable) scrollOwned(delta int) {
 	if delta == 0 {
 		return
 	}
-	v.Owner.Do(func() {
-		old := v.Model.StartRow()
-		start := v.Model.StartRow() + delta
-		if start < 0 {
-			start = 0
+	old := v.Model.StartRow()
+	start := v.Model.StartRow() + delta
+	if start < 0 {
+		start = 0
+	}
+	maximum := v.Model.Len() - v.Model.VisibleCount()
+	if maximum < 0 {
+		maximum = 0
+	}
+	if start > maximum {
+		start = maximum
+	}
+	if err := v.Model.SetViewport(start, v.Model.VisibleCount()); err != nil {
+		if v.OnError != nil {
+			v.OnError(err)
 		}
-		maximum := v.Model.Len() - v.Model.VisibleCount()
-		if maximum < 0 {
-			maximum = 0
-		}
-		if start > maximum {
-			start = maximum
-		}
-		if err := v.Model.SetViewport(start, v.Model.VisibleCount()); err != nil {
-			if v.OnError != nil {
-				v.OnError(err)
-			}
-			return
-		}
-		if old != v.Model.StartRow() {
-			v.Owner.Invalidate(v.Window)
-		}
-	})
+		return
+	}
+	if old != v.Model.StartRow() {
+		v.Owner.Invalidate(v.Window)
+	}
 }
 func (v *VirtualTable) Sync(core.Widget) error {
 	if v == nil || v.Model == nil || v.Model.Source() == nil || v.host == nil || v.Model.VisibleCount() != len(v.rows) {
@@ -146,6 +157,7 @@ func (v *VirtualTable) Sync(core.Widget) error {
 }
 
 type VirtualTree struct {
+	input        *virtualMountScope
 	OnError      func(error)
 	wheel        float32
 	Owner        *app.Application
@@ -162,6 +174,15 @@ func (v *VirtualTree) Mount(parent tree.Node) core.Widget {
 	if v == nil || v.Owner == nil || v.Model == nil || v.Count < 1 || v.Count > virtual.MaxVisible {
 		return nil
 	}
+	ref, err := captureMountScope(parent, v.Owner, v.Window)
+	if err != nil {
+		if v.OnError != nil {
+			v.OnError(err)
+		}
+		return nil
+	}
+	lease := &virtualMountScope{owner: v.Owner, ref: ref, window: v.Window}
+	v.input = lease
 	v.rows = nil
 	v.wheel = 0
 	v.host = core.NewFrame(parent)
@@ -177,7 +198,7 @@ func (v *VirtualTree) Mount(parent tree.Node) core.Widget {
 			s.Font.Size = units.Dp(12)
 		})
 		b.OnClick(func(events.Event) {
-			v.Owner.Do(func() {
+			v.ownerEvent(lease, func() {
 				if slot >= len(v.visible) {
 					return
 				}
@@ -196,7 +217,7 @@ func (v *VirtualTree) Mount(parent tree.Node) core.Widget {
 	}
 	v.host.On(events.Scroll, func(e events.Event) {
 		if s, ok := e.(*events.MouseScroll); ok {
-			v.Owner.Do(func() {
+			v.ownerEvent(lease, func() {
 				d := wheelRows(&v.wheel, s.Delta.Y)
 				if d == 0 {
 					return
@@ -263,4 +284,36 @@ func wheelRows(remainder *float32, delta float32) int {
 	rows := int(*remainder / 24)
 	*remainder -= float32(rows) * 24
 	return rows
+}
+
+// One immutable mount lease per host. Reusing an extension object cannot make
+// listeners from a former native pool adopt the newly mounted opening.
+type virtualMountScope struct {
+	owner  *app.Application
+	ref    app.WindowRef
+	window string
+}
+
+func (s *virtualMountScope) live(owner *app.Application, window string) bool {
+	return s != nil && s.owner == owner && s.window == window && s.ref.Context().Err() == nil
+}
+func (v *VirtualTable) ownerEvent(lease *virtualMountScope, fn func()) error {
+	if lease == nil {
+		return app.ErrInvalidWindowRef
+	}
+	return lease.owner.Do(func() {
+		if v.input == lease && lease.live(v.Owner, v.Window) {
+			fn()
+		}
+	})
+}
+func (v *VirtualTree) ownerEvent(lease *virtualMountScope, fn func()) error {
+	if lease == nil {
+		return app.ErrInvalidWindowRef
+	}
+	return lease.owner.Do(func() {
+		if v.input == lease && lease.live(v.Owner, v.Window) {
+			fn()
+		}
+	})
 }

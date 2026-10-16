@@ -100,6 +100,11 @@ func (g *MeshCanvas) Mount(parent tree.Node) core.Widget {
 		g.report(err)
 		return nil
 	}
+	ref, err := captureMountScope(parent, g.Owner, g.Window)
+	if err != nil {
+		g.report(err)
+		return nil
+	}
 	if g.widget != nil && !g.widget.retired.Load() {
 		g.report(errors.New("drawing: adapter is already mounted"))
 		return nil
@@ -109,6 +114,7 @@ func (g *MeshCanvas) Mount(parent tree.Node) core.Widget {
 	g.widget.owner = g
 	g.widget.application = g.Owner
 	g.widget.windowID = g.Window
+	g.widget.windowRef = ref
 	g.widget.Styler(func(s *styles.Style) {
 		s.Min.Set(units.Dp(240), units.Dp(200))
 		s.Grow.Set(1, 1)
@@ -195,7 +201,7 @@ func (g *MeshCanvas) NativeWindow() system.Window {
 	if g == nil || g.Owner == nil || g.widget == nil || g.widget.retired.Load() || g.Owner != g.widget.application || g.Window != g.widget.windowID {
 		return nil
 	}
-	ctx, err := g.Owner.WindowContext(g.Window)
+	ctx, err := scopedWindowContext(g.Owner, g.widget.windowRef)
 	if err != nil || ctx.Err() != nil {
 		return nil
 	}
@@ -328,6 +334,7 @@ type meshWidget struct {
 	owner       *MeshCanvas
 	application *app.Application
 	windowID    string
+	windowRef   app.WindowRef
 	retired     atomic.Bool
 	resources   meshResources
 	native      atomic.Pointer[drawingWindow]
@@ -369,7 +376,7 @@ func (w *meshWidget) Render() {
 		if w.retired.Load() || g.widget != w {
 			return
 		}
-		ctx, err := w.application.WindowContext(w.windowID)
+		ctx, err := scopedWindowContext(w.application, w.windowRef)
 		if err != nil || ctx.Err() != nil {
 			return
 		}
@@ -853,7 +860,7 @@ func (w *meshWidget) ownerEvent(fn func()) {
 		if w.retired.Load() || g == nil || g.widget != w || g.Owner != w.application || g.Window != w.windowID {
 			return
 		}
-		ctx, err := w.application.WindowContext(w.windowID)
+		ctx, err := scopedWindowContext(w.application, w.windowRef)
 		if err != nil || ctx.Err() != nil {
 			return
 		}

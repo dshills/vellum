@@ -2,9 +2,9 @@ package cogent
 
 import (
 	"cogentcore.org/core/core"
+	"fmt"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/virtual"
-	"fmt"
 	"testing"
 )
 
@@ -20,11 +20,14 @@ func TestNativePoolStaysBoundedAcrossScroll(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer a.Close()
+	if err := a.Open(scopeDeclaration("standalone-unit")); err != nil {
+		t.Fatal(err)
+	}
 	model, err := virtual.NewTable(largeSource{}, 20)
 	if err != nil {
 		t.Fatal(err)
 	}
-	v := &VirtualTable{Owner: a, Model: model}
+	v := &VirtualTable{Owner: a, Window: "standalone-unit", Model: model}
 	host := core.NewBody("headless")
 	native := v.Mount(host)
 	if err := v.Sync(native); err != nil {
@@ -63,6 +66,9 @@ func TestExternalTreeCollapseClampsViewport(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer a.Close()
+	if err := a.Open(scopeDeclaration("standalone-unit")); err != nil {
+		t.Fatal(err)
+	}
 	nodes := []virtual.TreeNode{{ID: "root"}}
 	for i := 0; i < 100; i++ {
 		nodes = append(nodes, virtual.TreeNode{ID: fmt.Sprint(i), Parent: "root"})
@@ -72,7 +78,7 @@ func TestExternalTreeCollapseClampsViewport(t *testing.T) {
 		t.Fatal(err)
 	}
 	model.Toggle("root")
-	v := &VirtualTree{Owner: a, Model: model, Start: 80, Count: 20}
+	v := &VirtualTree{Owner: a, Window: "standalone-unit", Model: model, Start: 80, Count: 20}
 	host := core.NewBody("headless")
 	native := v.Mount(host)
 	if err := v.Sync(native); err != nil {
@@ -90,8 +96,11 @@ func TestExternalTreeCollapseClampsViewport(t *testing.T) {
 func TestVirtualAdaptersRemountFreshPools(t *testing.T) {
 	a, _ := app.New(app.Config{})
 	defer a.Close()
+	if err := a.Open(scopeDeclaration("standalone-unit")); err != nil {
+		t.Fatal(err)
+	}
 	model, _ := virtual.NewTable(largeSource{}, 20)
-	table := &VirtualTable{Owner: a, Model: model}
+	table := &VirtualTable{Owner: a, Window: "standalone-unit", Model: model}
 	table.Mount(core.NewBody("first"))
 	old := table.rows[0]
 	w := table.Mount(core.NewBody("second"))
@@ -102,7 +111,7 @@ func TestVirtualAdaptersRemountFreshPools(t *testing.T) {
 		t.Fatal(err)
 	}
 	modelTree, _ := virtual.NewTree([]virtual.TreeNode{{ID: "root"}})
-	tree := &VirtualTree{Owner: a, Model: modelTree, Count: 20}
+	tree := &VirtualTree{Owner: a, Window: "standalone-unit", Model: modelTree, Count: 20}
 	tree.Mount(core.NewBody("first tree"))
 	old = tree.rows[0]
 	w = tree.Mount(core.NewBody("second tree"))

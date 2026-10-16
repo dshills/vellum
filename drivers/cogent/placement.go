@@ -30,6 +30,7 @@ import (
 type placementKey struct {
 	owner  *app.Application
 	window string
+	ref    app.WindowRef
 }
 
 var placementWindows = struct {
@@ -100,7 +101,7 @@ func syncPlacement(r *record) error {
 		return nil
 	}
 	if old == nil {
-		domain, err := c.a.WindowContext(c.window)
+		domain, err := scopedWindowContext(c.a, c.windowRef)
 		if err != nil || domain.Err() != nil {
 			return app.ErrWindowClosed
 		}
@@ -116,7 +117,7 @@ func syncPlacement(r *record) error {
 				return fmt.Errorf("placement: model or endpoint already has a native binding")
 			}
 		}
-		key := placementKey{c.a, c.window}
+		key := placementKey{c.a, c.window, c.windowRef}
 		window := placementWindows.windows[key]
 		if window == nil {
 			window = &placementWindow{key: key}
@@ -275,7 +276,7 @@ func beginPlacement(r *record, e events.Event) {
 		if !b.live() || b.window.active != nil {
 			return
 		}
-		life, err := r.control.a.WindowContext(r.control.window)
+		life, err := scopedWindowContext(r.control.a, r.control.windowRef)
 		if err != nil || life.Err() != nil {
 			return
 		}
@@ -285,7 +286,7 @@ func beginPlacement(r *record, e events.Event) {
 			placementRefusal(r, err)
 			return
 		}
-		ticket, err := r.control.a.ReserveCompletion(r.control.window, nil)
+		ticket, err := r.control.a.ReserveWindowCompletion(r.control.windowRef, nil)
 		if err != nil {
 			g.Cancel()
 			placementRefusal(r, err)
@@ -351,7 +352,7 @@ func (w *placementWindow) event(cap *nativePlacement, e events.Event) {
 			cap.gesture.Cancel()
 			return
 		}
-		life, err := w.key.owner.WindowContext(w.key.window)
+		life, err := scopedWindowContext(w.key.owner, w.key.ref)
 		if err != nil || life.Err() != nil {
 			cap.gesture.Cancel()
 			return
@@ -564,7 +565,7 @@ func (b *placementBinding) applyPendingViewport() bool {
 	if !b.live() || frame == nil || b.frame.Load() != frame || b.model == nil {
 		return false
 	}
-	life, err := b.r.control.a.WindowContext(b.r.control.window)
+	life, err := scopedWindowContext(b.r.control.a, b.r.control.windowRef)
 	if err != nil || life != b.domain || life.Err() != nil {
 		return false
 	}
@@ -586,7 +587,7 @@ func (b *placementBinding) requestViewport(frame *placementFrame) {
 	if !b.viewportQueued.CompareAndSwap(false, true) {
 		return
 	}
-	err := b.r.control.a.PostWindow(b.r.control.window, func() {
+	err := b.r.control.a.PostWindow(b.r.control.windowRef, func() {
 		// Clear before consuming, so a frame published during execution can post
 		// its own callback rather than becoming stranded behind this one.
 		b.viewportQueued.Store(false)
@@ -684,7 +685,7 @@ func canvasOwnerEvent(r *record, e events.Event, change func(*placementBinding, 
 		return
 	}
 	err := r.control.a.Do(func() {
-		life, lifeErr := r.control.a.WindowContext(r.control.window)
+		life, lifeErr := scopedWindowContext(r.control.a, r.control.windowRef)
 		if lifeErr != nil || life != b.domain || life.Err() != nil || !b.live() || !scope.allowed() || b.frame.Load() != frame || b.window.canvasEpoch.Load() != epoch || !canvasFrameCurrent(b, frame) {
 			return
 		}

@@ -37,7 +37,7 @@ type Completion struct {
 	self     *Completion
 	app      *Application
 	id       uint64
-	window   string
+	window   WindowRef
 	lifetime context.Context
 	state    completionState
 	err      error
@@ -57,23 +57,31 @@ type completionHook struct {
 // Publish, never in cleanup.
 // Reservation credit retires at dispatch termination/revocation; Cleanup
 // remains observable and prevents Pending.Idle until the hook has returned.
-// An empty window scopes the reservation to the whole application.
-func (a *Application) ReserveCompletion(window string, cleanup func(error)) (*Completion, error) {
+func (a *Application) ReserveCompletion(cleanup func(error)) (*Completion, error) {
+	return a.reserveCompletion(WindowRef{}, cleanup)
+}
+
+// ReserveWindowCompletion reserves delivery for exactly the captured opening.
+// A zero, foreign or retired reference refuses; it never means application scope.
+func (a *Application) ReserveWindowCompletion(window WindowRef, cleanup func(error)) (*Completion, error) {
+	if window.lifetime == nil {
+		return nil, ErrInvalidWindowRef
+	}
+	return a.reserveCompletion(window, cleanup)
+}
+
+func (a *Application) reserveCompletion(window WindowRef, cleanup func(error)) (*Completion, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if a.closed {
 		return nil, ErrClosed
 	}
 	lifetime := a.ctx
-	if window != "" {
-		var ok bool
-		lifetime, ok = a.lifetimes[window]
-		if !ok {
-			return nil, fmt.Errorf("vellum: unknown window %q", window)
+	if window.lifetime != nil {
+		if err := a.windowRefErrorLocked(window); err != nil {
+			return nil, err
 		}
-		if lifetime.Err() != nil {
-			return nil, ErrWindowClosed
-		}
+		lifetime = window.Context()
 	}
 	if len(a.completions) >= a.completionCapacity {
 		return nil, ErrCompletionCapacity
@@ -222,10 +230,10 @@ func runCompletionHooks(hooks []completionHook) {
 	}
 }
 
-func (a *Application) revokeLocked(window string, err error) []completionHook {
+func (a *Application) revokeLocked(window WindowRef, err error) []completionHook {
 	var hooks []completionHook
 	for _, c := range a.completions {
-		if c.state == completionRunning || window != "" && c.window != window {
+		if c.state == completionRunning || window.lifetime != nil && c.window != window {
 			continue
 		}
 		a.unlinkLocked(c)

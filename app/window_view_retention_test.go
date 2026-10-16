@@ -29,7 +29,7 @@ func TestClosedWindowReleasesViewCaptureWithSurvivor(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err = a.CloseWindow("temporary"); err != nil {
+	if err = a.CloseWindow(windowRef(t, a, "temporary")); err != nil {
 		t.Fatal(err)
 	}
 	runtime.GC()

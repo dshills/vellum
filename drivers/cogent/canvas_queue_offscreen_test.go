@@ -79,12 +79,12 @@ func TestCanvasQueuedActionsKeepOrigin(t *testing.T) {
 				})
 				refresh()
 			case "closed-window":
-				if err := f.app.CloseWindow("main"); err != nil {
+				if err := f.app.CloseWindow(fixtureWindowRef(f.app, "main")); err != nil {
 					t.Fatal(err)
 				}
 			case "capture-aba":
 				var source *record
-				for _, b := range placementWindows.windows[placementKey{f.app, "main"}].bindings {
+				for _, b := range placementWindows.windows[placementKey{f.app, "main", fixtureWindowRef(f.app, "main")}].bindings {
 					if b.source != nil {
 						source = b.r
 					}
@@ -95,7 +95,7 @@ func TestCanvasQueuedActionsKeepOrigin(t *testing.T) {
 				_, el := manualDockElement(t, f.manual, "main", "box")
 				point := el.Bounds.Min.Add(el.Bounds.Size().Div(2))
 				source.widget.AsWidget().Send(events.MouseDown, events.NewMouse(events.MouseDown, events.Left, point, 0))
-				window := placementWindows.windows[placementKey{f.app, "main"}]
+				window := placementWindows.windows[placementKey{f.app, "main", fixtureWindowRef(f.app, "main")}]
 				if window.active == nil {
 					t.Fatal("production pointer capture not acquired")
 				}

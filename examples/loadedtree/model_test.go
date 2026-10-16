@@ -190,7 +190,7 @@ func TestCanceledLoadAndWindowResultRefusal(t *testing.T) {
 		t.Fatal(e)
 	}
 	id := ex.PendingIDs()[0]
-	if e := owned(p, func() error { return p.owner.CloseWindow(w.id) }); e != nil {
+	if e := owned(p, func() error { return p.owner.CloseWindow(w.windowRef) }); e != nil {
 		t.Fatal(e)
 	}
 	if w.manager.Pending().Idle() {

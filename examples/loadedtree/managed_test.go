@@ -271,7 +271,7 @@ func TestActualStoredTreeRoutesAndWorkers(t *testing.T) {
 			}
 			press(t, m, batch, "small", "expand")
 			id = ex.PendingIDs()[0]
-			if e := owned(p, func() error { return p.owner.CloseWindow("small") }); e != nil {
+			if e := owned(p, func() error { return p.owner.CloseWindow(p.windows[0].windowRef) }); e != nil {
 				t.Fatal(e)
 			}
 			settleManual(t, m, batch)

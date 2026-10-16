@@ -11,6 +11,15 @@ func sampleWindow(id string) Window {
 	return Window{ID: id, Title: id, Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Column} }}
 }
 
+func windowRef(t *testing.T, a *Application, id string) WindowRef {
+	t.Helper()
+	ref, err := a.WindowRef(id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return ref
+}
+
 type windowsDriver struct{ t *testing.T }
 
 func (d windowsDriver) Run(ctx context.Context, a *Application) error {
@@ -18,32 +27,36 @@ func (d windowsDriver) Run(ctx context.Context, a *Application) error {
 	if err := a.Open(sampleWindow("second")); err != nil {
 		t.Fatal(err)
 	}
-	first, _ := a.WindowContext("first")
-	second, _ := a.WindowContext("second")
+	firstRef, secondRef := windowRef(t, a, "first"), windowRef(t, a, "second")
+	first, second := firstRef.Context(), secondRef.Context()
 	count := 0
-	if err := a.PostWindow("first", func() { t.Fatal("closed window delivery") }); err != nil {
+	if err := a.PostWindow(firstRef, func() { t.Fatal("closed window delivery") }); err != nil {
 		t.Fatal(err)
 	}
-	if err := a.CloseWindow("first"); err != nil {
+	if err := a.CloseWindow(windowRef(t, a, "first")); err != nil {
 		t.Fatal(err)
 	}
 	if first.Err() == nil || second.Err() != nil || ctx.Err() != nil {
 		t.Fatal("window lifetime isolation failed")
 	}
-	if a.Open(sampleWindow("first")) == nil {
-		t.Fatal("reused closed identity")
+	reopened, err := a.OpenWindow(sampleWindow("first"))
+	if err != nil || reopened == firstRef {
+		t.Fatal("fresh opening refused or aliased", err)
 	}
-	if !errors.Is(a.PostWindow("first", func() {}), ErrWindowClosed) {
+	if err := a.CloseWindow(reopened); err != nil {
+		t.Fatal(err)
+	}
+	if !errors.Is(a.PostWindow(firstRef, func() {}), ErrWindowClosed) {
 		t.Fatal("closed delivery accepted")
 	}
-	if err := a.PostWindow("second", func() { count++ }); err != nil {
+	if err := a.PostWindow(secondRef, func() { count++ }); err != nil {
 		t.Fatal(err)
 	}
 	a.Drain()
 	if count != 1 || len(a.Windows()) != 1 {
 		t.Fatal("surviving window lost")
 	}
-	if err := a.CloseWindow("second"); err != nil {
+	if err := a.CloseWindow(secondRef); err != nil {
 		t.Fatal(err)
 	}
 	if ctx.Err() == nil || second.Err() == nil {
@@ -65,7 +78,7 @@ func TestWindowTopologyWakes(t *testing.T) {
 	a.SetWake(func() { calls++ })
 	a.Open(sampleWindow("first"))
 	a.Open(sampleWindow("second"))
-	a.CloseWindow("first")
+	a.CloseWindow(windowRef(t, a, "first"))
 	if calls != 3 {
 		t.Fatal(calls)
 	}
@@ -115,11 +128,12 @@ func TestConcurrentLastCloseAndOpen(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		a, _ := New(Config{})
 		a.Open(sampleWindow("first"))
+		firstRef := windowRef(t, a, "first")
 		start := make(chan struct{})
 		opened := make(chan error, 1)
 		closed := make(chan error, 1)
 		go func() { <-start; opened <- a.Open(sampleWindow("second")) }()
-		go func() { <-start; closed <- a.CloseWindow("first") }()
+		go func() { <-start; closed <- a.CloseWindow(firstRef) }()
 		close(start)
 		openErr, closeErr := <-opened, <-closed
 		if closeErr != nil {

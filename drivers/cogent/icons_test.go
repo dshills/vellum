@@ -186,11 +186,11 @@ func TestIconsButtonWindowClosureRevokesPendingActivation(t *testing.T) {
 	}
 	w := r.widget.(*core.Button)
 	w.Send(events.Click)
-	if err := a.CloseWindow("ax"); err != nil {
+	if err := a.CloseWindow(fixtureWindowRef(a, "ax")); err != nil {
 		t.Fatal(err)
 	}
 	witness := 0
-	if err := a.PostWindow("other", func() { witness++ }); err != nil {
+	if err := a.PostWindow(fixtureWindowRef(a, "other"), func() { witness++ }); err != nil {
 		t.Fatal(err)
 	}
 	a.Drain()

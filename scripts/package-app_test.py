@@ -33,7 +33,7 @@ class AppChecks(unittest.TestCase):
    app.package(binary,out,"Test","org.example.test","0.1.0","darwin")
    self.assertTrue((out/"Contents/Info.plist").is_file());self.assertTrue((out/"Contents/MacOS/Test").is_file());execute.assert_not_called()
    info=plistlib.loads((out/"Contents/Info.plist").read_bytes());self.assertEqual(info["CFBundleShortVersionString"],"0.1.0");self.assertEqual(info["CFBundleVersion"],"1")
-   manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());self.assertEqual(manifest["sdk_release"],"v0.1.0-alpha.1");self.assertEqual(manifest["build_version"],"1")
+   manifest=json.loads((out/"Contents/Resources/APP_MANIFEST.json").read_text());self.assertEqual(manifest["sdk_release"],"v0.1.0-alpha.2");self.assertEqual(manifest["build_version"],"1")
  def test_bundle_versions_are_distinct_and_numeric(self):
   with tempfile.TemporaryDirectory() as tmp,mock.patch.object(app.platform,"system",return_value="Darwin"),mock.patch.object(app,"darwin_dependencies"),mock.patch.object(app,"run_child"):
    root=Path(tmp);binary=root/"binary";binary.write_bytes(b"\xcf\xfa\xed\xfefixture")

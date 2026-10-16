@@ -82,6 +82,7 @@ type Config[T any] struct {
 type Session[T any] struct {
 	config    Config[T]
 	lifetime  context.Context
+	window    app.WindowRef
 	path      string
 	busy      bool
 	action    Action
@@ -103,11 +104,11 @@ func New[T any](c Config[T]) (*Session[T], error) {
 	if c.Owner == nil || c.Journal == nil || c.Codec.Capture == nil || c.Codec.Encode == nil || c.Codec.Decode == nil || c.Codec.Install == nil {
 		return nil, fmt.Errorf("document: owner, journal and complete codec required")
 	}
-	lifetime, err := c.Owner.WindowContext(c.Window)
+	window, err := c.Owner.WindowRef(c.Window)
 	if err != nil {
 		return nil, err
 	}
-	if lifetime.Err() != nil {
+	if window.Context().Err() != nil {
 		return nil, app.ErrWindowClosed
 	}
 	if c.MaxBytes == 0 {
@@ -134,7 +135,7 @@ func New[T any](c Config[T]) (*Session[T], error) {
 	if c.Store == nil {
 		c.Store = FileStore{}
 	}
-	return &Session[T]{config: c, lifetime: lifetime, path: c.Path}, nil
+	return &Session[T]{config: c, lifetime: window.Context(), window: window, path: c.Path}, nil
 }
 
 func (s *Session[T]) State() State {
@@ -182,7 +183,7 @@ func (s *Session[T]) start(ctx context.Context, action Action, work func(context
 	op, cancel := context.WithCancel(ctx)
 	stop := context.AfterFunc(s.lifetime, cancel)
 	state := &operationState{}
-	ticket, err := s.config.Owner.ReserveCompletion(s.config.Window, func(error) {
+	ticket, err := s.config.Owner.ReserveWindowCompletion(s.window, func(error) {
 		cancel()
 		stop()
 		state.mu.Lock()

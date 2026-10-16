@@ -33,12 +33,16 @@ or native allocation attribution. Geometry persistence is disabled within this
 disposable fixture so unique titles do not write user preferences. No input,
 clipboard, permission or OS setting change is part of the test.
 
-The portable 1,000-cycle regression separately proves shared canceled-context
-retention and survivor-only cancel-function storage while retaining ID tombstones.
-Native cycles establish observed mounting/readback/normal closure at this scope.
-They do not qualify the full P11 integrated component mix, 1,000-control baseline,
-continuous workload latency, overnight soak, native heap or physical GPU memory.
-Historical ID strings and caller-held objects remain separate retention costs.
+The alpha.2 portable 1,000-cycle regressions cover both unique-name and same-name
+retirement with live-only lifetime/cancel maps. Exact opening references reject
+stale work after name reuse; see [window lifetimes](window-lifetimes.md).
+Historical native campaigns ran their recorded source with ID tombstones; they
+do not qualify this API transition. Fresh native same-name lifecycle evidence
+remains required. Native cycles establish observed mounting/readback/normal
+closure only at their recorded scope. They do not qualify the full P11 integrated
+component mix, 1,000-control baseline, continuous workload latency, overnight
+soak, native heap or physical GPU memory. Caller-held objects remain separate
+retention costs.
 
 An optional `-heap-profile` writes a diagnostic after worker checks and before
 application closure, including after a safety-limit failure. It requires a new

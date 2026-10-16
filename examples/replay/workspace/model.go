@@ -64,6 +64,7 @@ type Fixture struct {
 	argument                        string
 	invoking                        bool
 	life                            context.Context
+	windowRefs                      map[string]app.WindowRef
 	outcomes                        []outcome
 	nextObject                      uint64
 	attempts                        map[string]int
@@ -74,7 +75,7 @@ func New(a *app.Application, ex execution.Executor, rows int) (*Fixture, error) 
 	if a == nil || ex == nil || (rows != 10_000 && rows != MaxRows) {
 		return nil, ErrUnavailable
 	}
-	f := &Fixture{Owner: a, Commands: command.New(), rows: rows, data: &source{}, name: "North Star", status: "No project", attempts: map[string]int{}}
+	f := &Fixture{Owner: a, Commands: command.New(), rows: rows, data: &source{}, name: "North Star", status: "No project", attempts: map[string]int{}, windowRefs: map[string]app.WindowRef{}}
 	failed := true
 	defer func() {
 		if failed {
@@ -147,16 +148,13 @@ func New(a *app.Application, ex execution.Executor, rows int) (*Fixture, error) 
 		id := id
 		f.Dock.Panels = append(f.Dock.Panels, cogent.Panel{ID: id, Title: map[string]string{"tree": "Outline", "canvas": "Canvas", "grid": "Table", "notes": "Notes", "properties": "Properties"}[id], View: func() ui.Node { return f.panel(id) }})
 	}
-	if err = a.Open(app.Window{ID: "workspace", Title: "Vellum professional workspace", Width: Width, Height: Height, View: f.View}); err != nil {
+	if f.windowRefs["workspace"], err = a.OpenWindow(app.Window{ID: "workspace", Title: "Vellum professional workspace", Width: Width, Height: Height, View: f.View}); err != nil {
 		return nil, err
 	}
-	if err = a.Open(app.Window{ID: "inspector", Title: "Shared project inspector", Width: 500, Height: 320, View: f.Inspector}); err != nil {
+	if f.windowRefs["inspector"], err = a.OpenWindow(app.Window{ID: "inspector", Title: "Shared project inspector", Width: 500, Height: 320, View: f.Inspector}); err != nil {
 		return nil, err
 	}
-	f.life, err = a.WindowContext("workspace")
-	if err != nil {
-		return nil, err
-	}
+	f.life = f.windowRefs["workspace"].Context()
 	f.manager, err = tasks.NewWithConfig(tasks.Config{Owner: a, Window: "workspace", Executor: ex, Limit: 1, Invalidate: f.touch})
 	if err != nil {
 		return nil, err
@@ -229,7 +227,7 @@ func (f *Fixture) register() error {
 		{ID: "redo", Label: "Redo", Shortcut: "Meta+Shift+Z", ShortcutScope: command.AfterFocusShortcuts, Execute: func(context.Context) error { e := f.Journal.Redo(); f.touch(); return e }},
 		{ID: "modal", Label: "Open modal", Execute: func(context.Context) error { f.modal = true; f.touch(); return nil }},
 		{ID: "close-modal", Label: "Close modal", Execute: func(context.Context) error { f.modal = false; f.touch(); return nil }},
-		{ID: "close-main", Label: "Close main window", Execute: func(context.Context) error { return f.Owner.CloseWindow("workspace") }},
+		{ID: "close-main", Label: "Close main window", Execute: func(context.Context) error { return f.Owner.CloseWindow(f.windowRefs["workspace"]) }},
 	}
 	for _, c := range definitions {
 		id := c.ID

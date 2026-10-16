@@ -168,11 +168,7 @@ func (b *NativeBackend) CheckManifest(ctx context.Context, m replay.Manifest) er
 		if w.ID != m.Windows[i].ID || w.Width != float32(m.Windows[i].Width) || w.Height != float32(m.Windows[i].Height) {
 			return replay.ErrBackend
 		}
-		lifetime, err := b.Fixture.Owner.WindowContext(w.ID)
-		if err != nil {
-			return err
-		}
-		if lifetime.Err() != nil {
+		if w.Ref() != b.Fixture.windowRef || b.Fixture.windowRef.Context().Err() != nil {
 			return app.ErrWindowClosed
 		}
 	}
@@ -216,11 +212,7 @@ func (b *NativeBackend) checkLive(ctx context.Context, o replay.Operation) (coge
 	if o.Window == "" {
 		return cogent.ManualWindowSnapshot{}, nil
 	}
-	lifetime, err := b.Fixture.Owner.WindowContext(o.Window)
-	if err != nil {
-		return cogent.ManualWindowSnapshot{}, err
-	}
-	if lifetime.Err() != nil {
+	if o.Window != b.Fixture.Window || b.Fixture.windowRef.Context().Err() != nil {
 		return cogent.ManualWindowSnapshot{}, app.ErrWindowClosed
 	}
 	s, err := b.Driver.Snapshot(ctx)

@@ -179,15 +179,15 @@ func TestSaveCompletionDropsAfterWindowLifetimeEnds(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	ctx, err := a.WindowContext("save")
+	ref, err := a.WindowRef("save")
 	if err != nil {
 		t.Fatal(err)
 	}
 	a.SetServices(saveServices{path: filepath.Join(t.TempDir(), "capture.png")})
 	w := &imageWindow{application: a, view: &cogent.GPUView{Window: "save"}, captureBusy: true, status: "original"}
 	// Save is a worker method; no native chooser or UI owner is needed here.
-	w.save(ctx, image.NewNRGBA(image.Rect(0, 0, 2, 2)))
-	if err := a.CloseWindow("save"); err != nil {
+	w.save(ref.Context(), image.NewNRGBA(image.Rect(0, 0, 2, 2)))
+	if err := a.CloseWindow(ref); err != nil {
 		t.Fatal(err)
 	}
 	if err := a.Drain(); err != nil {

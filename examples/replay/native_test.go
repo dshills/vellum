@@ -292,7 +292,7 @@ func TestNativeCaptureFrameAndStaleAdmission(t *testing.T) {
 	if _, err := b.Capture(nativeContext, capOp); err != nil {
 		t.Fatal("stable frame unavailable", err)
 	}
-	if err := b.Fixture.Owner.CloseWindow(w.ID); err != nil {
+	if err := b.Fixture.Owner.CloseWindow(b.Fixture.windowRef); err != nil {
 		t.Fatal(err)
 	}
 	now := b.Clock.Now()
