@@ -68,3 +68,11 @@ client, whole-text and geometry values retain their existing JSON and native
 validation path, including workbench/dialog namespaces and private grid editors.
 This removes an unnecessary update from text-client-free frames; elapsed frame
 savings and the unchanged ordinary targets need separate native comparison.
+
+The standalone main/modal accessibility smoke and stored-grid accessibility
+smoke disable the process-local window geometry saver before creating any app
+or native window. They restore the previous switch after native teardown and
+report the disabled switch in their terminal acceptance record. These fixtures
+must neither restore saved window bounds nor write user window geometry. This
+isolation is required separately from ordinary performance mode; an unlaunched
+readiness refusal is not a native acceptance result.

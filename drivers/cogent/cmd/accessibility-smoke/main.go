@@ -420,10 +420,14 @@ func check(ctx context.Context, a *app.Application, m *model) (result error) {
 	if err := checkWorkbench(ctx, a); err != nil {
 		return err
 	}
-	json.NewEncoder(os.Stdout).Encode(map[string]any{"result": "PASS", "native": "macOS NSAccessibility", "reachable_elements": len(final.Elements), "checks": []string{"reachable Cocoa tree", "native NSWindow identity and AXWindow role", "roles labels values native hit testing", "deterministic equal-frame descendant and sibling hit testing", "controlled native actions", "disabled refusal", "Tab order", "selected tab visibility", "bounded stable virtual rows and paging", "real outline pager geometry and native hit testing", "independent outline selection disclosure and leaf refusal", "modal isolation Tab wrap Escape", "live dock panel namespaces activation focus modal geometry and retirement"}, "voiceover_tested": false, "preferences_changed": false})
+	json.NewEncoder(os.Stdout).Encode(map[string]any{"result": "PASS", "native": "macOS NSAccessibility", "reachable_elements": len(final.Elements), "checks": []string{"reachable Cocoa tree", "native NSWindow identity and AXWindow role", "roles labels values native hit testing", "deterministic equal-frame descendant and sibling hit testing", "controlled native actions", "disabled refusal", "Tab order", "selected tab visibility", "bounded stable virtual rows and paging", "real outline pager geometry and native hit testing", "independent outline selection disclosure and leaf refusal", "modal isolation Tab wrap Escape", "live dock panel namespaces activation focus modal geometry and retirement"}, "voiceover_tested": false, "preferences_changed": false, "geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver})
 	return nil
 }
 func main() {
+	// Disposable acceptance windows must not restore or persist user geometry.
+	previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
+	core.DebugSettings.DisableWindowGeometrySaver = true
+	defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
 	if os.Getenv("VELLUM_AX_EVENT_TRACE") == "1" {
 		core.DebugSettings.EventTrace = true
 		core.DebugSettings.FocusTrace = true

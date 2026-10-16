@@ -8,6 +8,7 @@ import (
 	"math"
 	"time"
 
+	"cogentcore.org/core/core"
 	"github.com/dshills/vellum/drivers/cogent"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
@@ -185,6 +186,10 @@ func (p *perfProgram) checkGridAccessibility(ctx context.Context, metrics *cogen
 }
 
 func runGridAccessibilitySmoke(rows int, variable bool) error {
+	// Keep this separate acceptance path as isolated as ordinary perf mode.
+	previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
+	core.DebugSettings.DisableWindowGeometrySaver = true
+	defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 	p, _, err := newPerfProgram(ctx, perfConfig{Rows: rows, Variable: variable, Samples: 120, Warmup: 128})
@@ -224,5 +229,5 @@ func runGridAccessibilitySmoke(rows int, variable bool) error {
 	if _, err := cogent.InspectAccessibility(context.Background(), "perf"); err == nil {
 		return errors.New("grid AX closed attachment remained queryable")
 	}
-	return perfEmit("grid.accessibility.closed", map[string]any{"attachment_query_refused": true})
+	return perfEmit("grid.accessibility.closed", map[string]any{"attachment_query_refused": true, "geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver})
 }
