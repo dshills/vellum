@@ -4,10 +4,12 @@ package main
 
 import (
 	"encoding/json"
+	"image"
 	"testing"
 	"time"
 
 	"cogentcore.org/core/core"
+	"github.com/dshills/vellum/drivers/cogent"
 )
 
 // All cases return before Application.New. No window, native driver, clipboard
@@ -30,6 +32,43 @@ func TestInvalidConfigurationFailsBeforeNativeSetup(t *testing.T) {
 				t.Fatal("invalid configuration changed geometry persistence")
 			}
 		})
+	}
+}
+
+func TestDistinctVisibleCellSkipsRetainedOverscanAndCurrentCursor(t *testing.T) {
+	cell := func(id string, bounds image.Rectangle) cogent.GridCellGeometry {
+		return cogent.GridCellGeometry{ID: id, RowKey: id, ColumnID: "c00", Bounds: bounds}
+	}
+	visible := cell("visible", image.Rect(492, 174, 600, 208))
+	current := cell("current", image.Rect(492, 208, 600, 248))
+	for _, test := range []struct {
+		name  string
+		cells []cogent.GridCellGeometry
+	}{
+		{"leading-overscan", []cogent.GridCellGeometry{cell("overscan", image.Rectangle{}), visible}},
+		{"current-cursor", []cogent.GridCellGeometry{current, visible}},
+		{"zero-width", []cogent.GridCellGeometry{cell("zero-width", image.Rect(492, 174, 492, 208)), visible}},
+		{"zero-height", []cogent.GridCellGeometry{cell("zero-height", image.Rect(492, 174, 600, 174)), visible}},
+		{"inverted-bounds", []cogent.GridCellGeometry{cell("inverted", image.Rectangle{Min: image.Pt(600, 208), Max: image.Pt(492, 174)}), visible}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got, ok := distinctVisibleCell(test.cells, current.RowKey, current.ColumnID)
+			if !ok || got != visible {
+				t.Fatalf("selected non-visible/current cell: %+v %v", got, ok)
+			}
+		})
+	}
+}
+
+func TestDistinctVisibleCellRetainsPartialClippingAndRefusesNoTarget(t *testing.T) {
+	partial := cogent.GridCellGeometry{ID: "partial", RowKey: "r1", ColumnID: "c01", Bounds: image.Rect(492, 174, 493, 175)}
+	if got, ok := distinctVisibleCell([]cogent.GridCellGeometry{partial}, "r1", "c00"); !ok || got != partial {
+		t.Fatalf("partially visible distinct column refused: %+v %v", got, ok)
+	}
+	for _, cells := range [][]cogent.GridCellGeometry{nil, {{ID: "overscan"}}, {partial}} {
+		if got, ok := distinctVisibleCell(cells, partial.RowKey, partial.ColumnID); ok || got != (cogent.GridCellGeometry{}) {
+			t.Fatalf("invented distinct visible target: %+v %v", got, ok)
+		}
 	}
 }
 

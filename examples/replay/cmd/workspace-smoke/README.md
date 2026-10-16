@@ -38,3 +38,8 @@ behavior, establish pixel identity or qualify human IME/VoiceOver/displays.
 Implementation, offscreen controls and compilation are separate from actual
 native execution. Do not claim a native pass until the exact built source has
 completed and its external process/cleanup evidence has been reviewed.
+
+Table selection uses a distinct cell with positive clipped measured bounds.
+Retained overscan cells with empty bounds are excluded; partially visible cells
+remain eligible. The table step waits for that geometry and native publication
+before the single selection proposal.

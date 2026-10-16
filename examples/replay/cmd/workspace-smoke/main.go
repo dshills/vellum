@@ -38,11 +38,10 @@ type reply struct {
 	err   error
 }
 type controller struct {
-	a        *app.Application
-	f        *workspace.Fixture
-	records  []smoke.Record
-	last     observation
-	gridCell cogent.GridCellGeometry
+	a       *app.Application
+	f       *workspace.Fixture
+	records []smoke.Record
+	last    observation
 }
 type report struct {
 	Event                       string                         `json:"event"`
@@ -172,6 +171,17 @@ func find(s cogent.AccessibilityInspection, domain, role string) (cogent.Accessi
 }
 func usable(e cogent.AccessibilityElement) bool {
 	return e.Enabled && e.ObjectIdentity != 0 && e.Frame[2] > 0 && e.Frame[3] > 0
+}
+
+// Completed geometry includes retained overscan cells whose clipped bounds are
+// empty. Only a visible cell can become a usable native accessibility target.
+func distinctVisibleCell(cells []cogent.GridCellGeometry, row, column string) (cogent.GridCellGeometry, bool) {
+	for _, cell := range cells {
+		if !cell.Bounds.Empty() && (cell.RowKey != row || cell.ColumnID != column) {
+			return cell, true
+		}
+	}
+	return cogent.GridCellGeometry{}, false
 }
 
 func (c *controller) action(ctx context.Context, name, domain, role, kind, value string, accepted func(observation) bool, completed func(cogent.AccessibilityInspection) bool) error {
@@ -328,27 +338,23 @@ func (c *controller) scenario(ctx context.Context, rows int) error {
 		return err
 	}
 	if err = c.action(ctx, "show-table", "grid", "AXRadioButton", "press", "", func(o observation) bool {
-		return activeDocument(o.Model.Layout.Root) == "grid" && o.Grid != nil && len(o.Grid.Cells) > 1
+		if activeDocument(o.Model.Layout.Root) != "grid" || o.Grid == nil {
+			return false
+		}
+		_, ok := distinctVisibleCell(o.Grid.Cells, o.Model.Grid.Active.RowKey, o.Model.Grid.Active.ColumnID)
+		return ok
 	}, func(s cogent.AccessibilityInspection) bool {
 		e, ok, err := find(s, "table", "AXTable")
 		return err == nil && ok && usable(e) && !e.GridPending && e.GridGeneration > 0
 	}); err != nil {
 		return err
 	}
-	// Choose a rendered cell different from the current cursor. Its measured
+	// Choose a visible cell different from the current cursor. Its measured
 	// identity, native action and accepted model cursor must all agree.
-	found := false
-	for _, cell := range c.last.Grid.Cells {
-		if cell.RowKey != c.last.Model.Grid.Active.RowKey || cell.ColumnID != c.last.Model.Grid.Active.ColumnID {
-			c.gridCell = cell
-			found = true
-			break
-		}
-	}
+	cell, found := distinctVisibleCell(c.last.Grid.Cells, c.last.Model.Grid.Active.RowKey, c.last.Model.Grid.Active.ColumnID)
 	if !found {
-		return errors.New("no distinct measured table cell")
+		return errors.New("no distinct visible measured table cell")
 	}
-	cell := c.gridCell
 	if err = c.action(ctx, "select-table-cell", cell.ID, "AXCell", "press", "", func(o observation) bool {
 		return o.Model.Grid.Active.RowKey == cell.RowKey && o.Model.Grid.Active.ColumnID == cell.ColumnID && o.Grid != nil
 	}, nil); err != nil {

@@ -5,7 +5,9 @@ defines an 18-action native accessibility/owner scenario for 10k or one million
 stored table rows and 100k outline nodes. It uses the independent public example,
 commands/history, palette activation, measured cell selection and two native
 windows. Each proposal is sent once; refused or uncertain outcomes fail. A
-streaming source oracle and completed table/outline geometry are required. Each
+streaming source oracle and completed table/outline geometry are required.
+Table selection skips retained overscan cells with empty clipped bounds and the
+current cursor; positive partially clipped cells remain eligible. Each
 step has a cooperative 30-second helper cap without extending caller deadlines.
 Scenario completion is handed off after application closure returns. Final
 window/service retirement and worker joining are checked separately from an
