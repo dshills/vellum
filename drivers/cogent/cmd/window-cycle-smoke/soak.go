@@ -146,11 +146,7 @@ func checkSoak(ctx context.Context, a *app.Application, survivor *cogent.GPUCanv
 	if e != nil {
 		return e
 	}
-	gpu, m, ready, w, e := openMode(a, "soak", "Vellum composed idle soak", true)
-	if e != nil {
-		return e
-	}
-	ref, e := a.WindowRef("soak")
+	gpu, m, ready, w, ref, e := openMode(a, "soak", "Vellum composed idle soak", true)
 	if e != nil {
 		return e
 	}

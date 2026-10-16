@@ -96,3 +96,35 @@ the live-registration contract, not a sampled Go/native/GPU memory result.
 Earlier traces with the flag set to true retain their original source scope;
 current campaign validators must require the alpha.2 value rather than accept
 those historical traces as evidence for current window lifetimes.
+
+## Same-name native lifecycle fixture
+
+The opt-in window-cycle command adds `-same-name -composed -cycles=2..1000`.
+This mode refuses soak and a single cycle. All openings use
+`native-cycle-reused`; the default keeps its distinct per-cycle names and its
+33-action native plan. Openings capture the exact reference returned atomically
+by `OpenWindow`, including the separate soak path.
+
+After each replacement reaches native readback, owner probes require a distinct
+live reference, a canceled former context, refusal of old posts, closes, policies,
+completion publication and reservations, and preservation/rearming of the new
+dirty bit. A later owner acknowledgment checks that no old callback ran. The old
+native window, GPU canvas, grid and outline are checked after replacement readback
+and again after its normal 33 native actions; the replacement then closes
+independently. These sampled checks do not establish continuously observed state
+or Cocoa object deallocation.
+
+The fixture retains only the immediately preceding closed opening's probe
+references and releases the last capsule before the final memory sample. This
+bounded diagnostic retention is part of the workload, not an empty-window memory
+baseline or a full P11 memory result. One `vellum.window-lifetime` event follows
+each completed close; only cycles after the first report a prior-opening check.
+Terminal `same_name_mode` records the chosen workload and
+`same_name_replacements_verified` counts completed replacements.
+
+Pure Go probe/configuration regressions run with
+`go test -race -tags=offscreen,vellum_native_checks ./cmd/window-cycle-smoke`.
+They do not initialize a native window or GPU. Actual native readback, old resource
+retirement and the composed interactions require a separately authorized live
+run against the exact built source. No prior unique-name campaign qualifies this
+new mode, and a same-name run alone does not complete Mac/P11 acceptance.

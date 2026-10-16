@@ -396,3 +396,20 @@ Canvas2D objects. Follow the [contract](../specs/canvas-accessibility.md) and
 [checkpoint](reports/macos-canvas-accessibility/README.md) for metadata budgets,
 completed-frame coordinates, queued-action lifetime guards and the separation
 between software/inert Cocoa evidence and live human accessibility acceptance.
+
+## Same-name window lifecycle
+
+When the Mac is available for live tests, a separately built diagnostic fixture
+can exercise two complete composed openings of one logical name:
+
+```sh
+cd drivers/cogent
+go build -tags=vellum_native_checks -o /tmp/vellum-window-cycle ./cmd/window-cycle-smoke
+/tmp/vellum-window-cycle -composed -same-name -cycles=2 -sample-every=1 -timeout=5m
+```
+
+This command opens native windows and uses GPU readback; compilation alone does
+not qualify it. Follow the shared native-test scheduling/ownership process and
+keep live execution paused while the user is working. Offscreen checks and the
+exact evidence requirements are described in the
+[window lifetime contract](../specs/window-lifetimes.md#same-name-native-lifecycle-fixture).

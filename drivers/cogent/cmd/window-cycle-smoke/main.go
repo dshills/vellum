@@ -40,12 +40,16 @@ type config struct {
 	timeout       time.Duration
 	heapProfile   string
 	composed      bool
+	sameName      bool
 	soak          soakConfig
 }
 
 func (c config) validate() error {
 	if c.heapProfile != "" && (!filepath.IsAbs(c.heapProfile) || filepath.Clean(c.heapProfile) != c.heapProfile) {
 		return errors.New("heap-profile needs a clean absolute new file path")
+	}
+	if err := validateSameNameMode(c.sameName, c.composed, c.cycles, c.soak.Duration); err != nil {
+		return err
 	}
 	if c.soak.Duration != 0 {
 		return c.soak.validate(c)
@@ -100,6 +104,7 @@ func run() error {
 	flag.DurationVar(&c.timeout, "timeout", 12*time.Minute, "cooperative native loop deadline")
 	flag.StringVar(&c.heapProfile, "heap-profile", "", "optional new absolute diagnostic heap-profile path (never overwrites)")
 	flag.BoolVar(&c.composed, "composed", false, "mount and exercise the all-component workspace with 1000 dense labels in each fresh cycle window")
+	flag.BoolVar(&c.sameName, "same-name", false, "reopen one logical name across composed cycles, verifying retired references and resources; requires at least two cycles and no soak")
 	flag.DurationVar(&c.soak.Duration, "soak", 0, "total visible/occluded/minimized/background soak duration; requires composed, cycles=1, sample-every=1")
 	flag.DurationVar(&c.soak.Quiet, "soak-quiet", time.Minute, "quiet CPU/paint observation interval")
 	flag.DurationVar(&c.soak.Settle, "soak-settle", 10*time.Second, "settling interval before each quiet sample")
@@ -172,7 +177,12 @@ func run() error {
 	if errors.Join(runErr, err) == nil {
 		result = "PASS_NATIVE_WINDOW_CYCLES"
 	}
-	report := map[string]any{"event": "vellum.window-cycle.result", "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": false, "full_p11_qualified": false, "native_heap_qualified": false, "gpu_memory_qualified": false, "clipboard_access": false, "preferences_changed": false, "cooperative_timeout_seconds": c.timeout.Seconds(), "composed_workspace": c.composed, "native_action_plan": func() int {
+	report := map[string]any{"event": "vellum.window-cycle.result", "result": result, "requested_cycles": c.cycles, "completed_cycles": done, "samples": samples, "native_cleanup": cleanup, "heap_profile_requested": c.heapProfile != "", "rss_definition": "ps resident pages, bytes; not private footprint or native allocation attribution", "samples_after_forced_gc": true, "rss_guard_bytes": uint64(1 << 30), "go_heap_guard_bytes": uint64(512 << 20), "geometry_persistence_disabled_in_fixture": true, "historical_id_tombstones_retained": false, "same_name_mode": c.sameName, "same_name_replacements_verified": func() int {
+		if c.sameName {
+			return max(0, done-1)
+		}
+		return 0
+	}(), "full_p11_qualified": false, "native_heap_qualified": false, "gpu_memory_qualified": false, "clipboard_access": false, "preferences_changed": false, "cooperative_timeout_seconds": c.timeout.Seconds(), "composed_workspace": c.composed, "native_action_plan": func() int {
 		if c.composed {
 			return nativeActionPlanVersion
 		}
@@ -233,13 +243,13 @@ func (p *readyCanvas) Mount(parent tree.Node) core.Widget {
 func (p *readyCanvas) Sync(w core.Widget) error { return p.renderer.Sync(w) }
 
 func open(a *app.Application, id, title string) (*cogent.GPUCanvas, *canvas.Scene, *atomic.Bool, error) {
-	g, m, shown, _, err := openMode(a, id, title, false)
+	g, m, shown, _, _, err := openMode(a, id, title, false)
 	return g, m, shown, err
 }
-func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUCanvas, *canvas.Scene, *atomic.Bool, *acceptance.Workspace, error) {
+func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUCanvas, *canvas.Scene, *atomic.Bool, *acceptance.Workspace, app.WindowRef, error) {
 	m, err := canvas.New([]canvas.Rect{{ID: "probe", X: 0, Y: 0, Width: 100, Height: 60, Color: color.RGBA{67, 197, 166, 255}}})
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, app.WindowRef{}, err
 	}
 	m.Fit()
 	g := &cogent.GPUCanvas{Owner: a, Window: id, Model: m}
@@ -250,14 +260,14 @@ func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUC
 	if composed {
 		suite, err = acceptance.New(a, id, &readyCanvas{g, shown})
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, app.WindowRef{}, err
 		}
 	}
 	width, height := float32(480), float32(420)
 	if composed {
 		width, height = 1920, 1080
 	}
-	err = a.Open(app.Window{ID: id, Title: title, Width: width, Height: height, CloseRequest: closeRequestDiagnostic(id, os.Stdout), View: func() ui.Node {
+	ref, err := a.OpenWindow(app.Window{ID: id, Title: title, Width: width, Height: height, CloseRequest: closeRequestDiagnostic(id, os.Stdout), View: func() ui.Node {
 		if suite != nil {
 			return suite.View()
 		}
@@ -265,7 +275,7 @@ func openMode(a *app.Application, id, title string, composed bool) (*cogent.GPUC
 		children = append(children, ui.Node{ID: "canvas", Kind: ui.Extension, Grow: true, Custom: &readyCanvas{g, shown}})
 		return ui.Node{ID: "root", Kind: ui.Column, Grow: true, Children: children}
 	}})
-	return g, m, shown, suite, err
+	return g, m, shown, suite, ref, err
 }
 func wait(ctx context.Context, check func(context.Context) (bool, error)) error {
 	return waitWithin(ctx, 5*time.Second, check)
@@ -373,10 +383,15 @@ func check(ctx context.Context, a *app.Application, survivor *cogent.GPUCanvas, 
 	if err = memoryGuard(first); err != nil {
 		return err
 	}
+	var previous *retiredNativeWindow
 	for i := 0; i < c.cycles; i++ {
-		if err = cycle(ctx, a, i, c.composed); err != nil {
+		previous, err = cycle(ctx, a, i, c, previous)
+		if err != nil {
 			return fmt.Errorf("cycle %d: %w", i, err)
 		}
+		if i+1 == c.cycles {
+			previous = nil
+		} // No final probe retention in the terminal sample.
 		p.advance()
 		if (i+1)%c.every == 0 || i+1 == c.cycles {
 			if _, err = readback(ctx, a, survivor, model, shown); err != nil {
@@ -396,16 +411,12 @@ func check(ctx context.Context, a *app.Application, survivor *cogent.GPUCanvas, 
 	}
 	return nil
 }
-func cycle(ctx context.Context, a *app.Application, i int, composed bool) error {
-	id := fmt.Sprintf("native-cycle-%04d", i)
+func cycle(ctx context.Context, a *app.Application, i int, c config, previous *retiredNativeWindow) (*retiredNativeWindow, error) {
+	id := cycleWindowID(i, c.sameName)
 	title := "Vellum " + id
-	g, m, shown, suite, err := openMode(a, id, title, composed)
+	g, m, shown, suite, ref, err := openMode(a, id, title, c.composed)
 	if err != nil {
-		return err
-	}
-	ref, err := a.WindowRef(id)
-	if err != nil {
-		return err
+		return nil, err
 	}
 	original := ref.Context()
 	child, stop := context.WithCancel(original)
@@ -419,64 +430,89 @@ func cycle(ctx context.Context, a *app.Application, i int, composed bool) error 
 		}
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	native, err := readback(ctx, a, g, m, shown)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	var reopened *reopenedLifetimeProbe
+	if c.sameName {
+		if (i > 0) != (previous != nil) {
+			return nil, errors.New("same-name fixture lost its preceding opening")
+		}
+		if previous != nil {
+			reply, e := ownerProbe(ctx, a, func() ownerReply {
+				if native.IsClosed() {
+					return ownerReply{err: errors.New("replacement native window is closed")}
+				}
+				var e error
+				reopened, e = probeReopenedLifetime(a, previous.ref, ref, previous.completion)
+				if e == nil {
+					e = previous.verify(a)
+				}
+				return ownerReply{err: e}
+			})
+			if e != nil || reply.err != nil {
+				return nil, errors.Join(e, reply.err)
+			}
+		}
 	}
 	if suite != nil {
 		if err = exerciseComposed(ctx, a, id, suite, i); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	if err = inventory(ctx, []string{"Vellum cycle survivor", title}); err != nil {
-		return err
+		return nil, err
+	}
+	if reopened != nil {
+		// This owner acknowledgment follows the native action acknowledgments and
+		// any ordinary work incorrectly enqueued by the old-reference probes.
+		reply, e := ownerProbe(ctx, a, func() ownerReply {
+			return ownerReply{err: errors.Join(reopened.afterOwnerBarrier(a, ref), previous.verify(a))}
+		})
+		if e != nil || reply.err != nil {
+			return nil, errors.Join(e, reply.err)
+		}
 	}
 	if err = a.CloseWindow(ref); err != nil {
-		return err
+		return nil, err
 	}
 	if !errors.Is(original.Err(), context.Canceled) || !errors.Is(child.Err(), context.Canceled) || cleaned.Load() != 1 || badCleanup.Load() {
-		return errors.New("captured context or reserved completion not canceled")
+		return nil, errors.New("captured context or reserved completion not canceled")
 	}
 	if err = ticket.Publish(func() {}); !errors.Is(err, app.ErrWindowClosed) {
-		return fmt.Errorf("late result admission: %v", err)
+		return nil, fmt.Errorf("late result admission: %v", err)
 	}
 	if err = a.PostWindow(ref, func() {}); !errors.Is(err, app.ErrWindowClosed) {
-		return fmt.Errorf("late owner delivery: %v", err)
+		return nil, fmt.Errorf("late owner delivery: %v", err)
 	}
 	if err = wait(ctx, func(inner context.Context) (bool, error) {
 		return native.IsClosed() && core.AllRenderWindows.FindName(title) == nil, nil
 	}); err != nil {
-		return err
+		return nil, err
 	}
 	if err = inventory(ctx, []string{"Vellum cycle survivor"}); err != nil {
-		return err
+		return nil, err
+	}
+	retired := &retiredNativeWindow{ref: ref, completion: ticket, native: native, canvas: g, composed: c.composed}
+	if suite != nil {
+		retired.grid, retired.outline = suite.Grid, suite.Tree
 	}
 	limit, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	retired, e := ownerProbe(limit, a, func() ownerReply {
-		var retirement error
-		if suite != nil {
-			if _, e := cogent.InspectGrid(a, suite.Grid); !errors.Is(e, cogent.ErrGridClosed) {
-				retirement = errors.Join(retirement, fmt.Errorf("closed grid inspection: %v", e))
-			}
-			if _, e := cogent.InspectTree(a, suite.Tree); !errors.Is(e, cogent.ErrTreeClosed) {
-				retirement = errors.Join(retirement, fmt.Errorf("closed tree inspection: %v", e))
-			}
-		}
-		if g.NativeWindow() != nil {
-			retirement = errors.Join(retirement, errors.New("closed canvas exposed native window"))
-		}
-		if _, e := g.Snapshot(); !errors.Is(e, cogent.ErrFrameNotReady) {
-			retirement = errors.Join(retirement, fmt.Errorf("closed readback: %v", e))
-		}
-		return ownerReply{err: retirement}
-	})
-	if e != nil {
-		return e
+	reply, e := ownerProbe(limit, a, func() ownerReply { return ownerReply{err: retired.verify(a)} })
+	if e != nil || reply.err != nil {
+		return nil, errors.Join(e, reply.err)
 	}
-	return retired.err
+	if c.sameName {
+		if err = json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.window-lifetime", "cycle": i + 1, "window": id, "prior_opening_checked": previous != nil, "old_references_refused": previous != nil, "old_native_resources_retired": previous != nil, "old_callbacks_absent_after_owner_barrier": previous != nil, "current_opening_retired": true, "current_native_resources_retired": true, "full_p11_qualified": false}); err != nil {
+			return nil, err
+		}
+		return retired, nil
+	}
+	return nil, nil
 }
 
 type ownerReply struct {
