@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -20,9 +19,11 @@ import (
 	"image/color"
 	"math"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
+	"syscall"
 	"time"
 )
 
@@ -36,6 +37,7 @@ func main() {
 	enduranceDuration := flag.Duration("endurance", 0, "run composed workbench activity for 10s..12h (10m minimum for steady endurance evidence)")
 	enduranceOutput := flag.String("endurance-output", "", "new absolute private directory for endurance observations and trace")
 	automationEnabled := flag.Bool("automation", false, "enable private local semantic API and print its capability descriptor")
+	automationCheck := flag.Bool("automation-check", false, "isolated native API fixture; requires automation and exit-after=5s..30s")
 	flag.Parse()
 	enduranceConfig := enduranceConfig{duration: *enduranceDuration, output: *enduranceOutput}
 	if err := enduranceConfig.validate(); err != nil {
@@ -44,11 +46,18 @@ func main() {
 	if *enduranceDuration > 0 && (*smoke || *documentSmoke || *exit > 0 || *automationEnabled) {
 		must(errors.New("endurance requires a dedicated process"))
 	}
-	if *enduranceDuration > 0 {
+	must(validateAutomationCheck(*automationCheck, *automationEnabled, *exit, *smoke || *documentSmoke || *enduranceDuration > 0))
+	if *enduranceDuration > 0 || *automationCheck {
 		disableEnduranceGeometrySaver()
 	}
 	if *documentSmoke && (*smoke || *exit > 0) {
 		must(errors.New("document-smoke requires its own native process without smoke/exit-after"))
+	}
+	runContext := context.Background()
+	if *automationCheck {
+		var stopSignals context.CancelFunc
+		runContext, stopSignals = signal.NotifyContext(runContext, os.Interrupt, syscall.SIGTERM)
+		defer stopSignals()
 	}
 	a, err := app.New(app.Config{})
 	must(err)
@@ -413,15 +422,24 @@ func main() {
 	must(registry.Register(command.Command{ID: "file.open", Label: "Open", Shortcut: "Meta+O", Available: fileAvailable, Execute: workflow.open}))
 	must(registry.Register(command.Command{ID: "file.save", Label: "Save", Shortcut: "Meta+S", Available: fileAvailable, Execute: func(ctx context.Context) error { return persistence.Save(ctx, document.SaveOptions{}) }}))
 	must(registry.Register(command.Command{ID: "file.save-as", Label: "Save As", Shortcut: "Meta+Shift+S", Available: fileAvailable, Execute: func(ctx context.Context) error { return persistence.Save(ctx, document.SaveOptions{Choose: true}) }}))
+	var automationServer *automation.Server
 	if *automationEnabled {
 		semantic, err := workbenchAutomation(a, registry, parts, references, func() (int, uint64) { return selectedIndex, selectionRevision }, selectComponent)
 		must(err)
 		server, err := automation.Start(automation.Config{Owner: a, Window: "main", Registry: semantic})
 		must(err)
 		defer server.Close()
+		automationServer = server
 		// Explicit opt-in writes this credential only to the invoking process's
 		// stdout. Never include it in application semantics or audit records.
-		must(json.NewEncoder(os.Stdout).Encode(server.Endpoint()))
+		if err := writeAutomationEndpoint(os.Stdout, server); err != nil {
+			a.Close()
+			must(err)
+		}
+	}
+	var automationReady <-chan error
+	if *automationCheck {
+		automationReady = beginAutomationNativeCheck(a, gpuCanvas)
 	}
 	if *documentSmoke {
 		go func() {
@@ -521,7 +539,6 @@ func main() {
 		})
 	}
 	var enduranceDone chan error
-	runContext := context.Background()
 	var endRun context.CancelFunc
 	if *enduranceDuration > 0 {
 		runContext, endRun = context.WithTimeout(runContext, *enduranceDuration+90*time.Second)
@@ -539,6 +556,10 @@ func main() {
 	if enduranceDone != nil {
 		endRun()
 		runErr = enduranceRunResult(runErr, enduranceDone, 10*time.Second)
+	}
+	if *automationCheck {
+		a.Close()
+		runErr = errors.Join(runErr, finishAutomationNativeCheck(automationReady, automationServer))
 	}
 	must(runErr)
 	if *documentSmoke {

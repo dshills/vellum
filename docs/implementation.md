@@ -560,3 +560,22 @@ One separately admitted SDK hello run verifies its initial rectangle pixel,
 three further readbacks and owned shutdown. Other demo runtimes, ordinary frame
 and memory/endurance budgets, physical/human workflows, native component/rights
 closure and public distribution remain open.
+
+### External workbench automation consumer
+
+Added `examples/automation`, an independent public-Go client of the existing
+semantic API. Its dedicated workbench diagnostic waits for a native window and
+nonempty public GPU snapshot, disables geometry persistence within that process,
+and joins readiness retirement plus endpoint transport on closure. Descriptor
+write failures close the endpoint before the executable's exit helper.
+
+The client runs 40 serial queries/actions against 100k or million-row workbenches,
+checks typed refusals, stable virtual identities, redaction, command availability,
+rotate/raise, sparse Undo/Redo and edit/selection ABA rejection. Raw native output
+is discarded, credentials stay in memory, invoke transport failures are not
+retried, and bounded child cleanup preserves failure observations. A successful
+run also requires matching terminal audit metadata, normal native exit, endpoint
+removal and a refused post-close Call. The example is included in the non-GUI
+example check suite. Native execution results will be recorded separately; these
+source changes alone do not qualify physical input, AX, presentation, frame,
+memory, endurance, release or full macOS acceptance.

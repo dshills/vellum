@@ -120,3 +120,34 @@ headless tests exercise its actual domain bindings, history and virtual ID query
 These checks create no windows, synthesize no desktop input and do not change OS
 preferences. Full P9/P10 professional workload, native runtime, human accessibility,
 distribution and sustained performance acceptance remain open.
+
+## External native consumer fixture
+
+`examples/automation` is an independent standard-library-only consumer of public
+`Call`. It launches the native workbench with the explicit diagnostic
+`-automation -automation-check -exit-after=20s`; 100k and million-row cases are
+supported. The check flag admits only 5–30-second dedicated processes without
+other smoke/endurance modes and disables process-local geometry persistence.
+A signal context exists before endpoint or worker creation. Readiness requires a
+real native window and a successful nonempty public GPU snapshot. It makes no
+pixel, presentation or frame-budget assertion. Result receipt and worker
+retirement are separate: closure follows snapshot-worker cleanup, and the main
+path joins worker retirement and transport Done/Err before process exit, including
+readiness or descriptor-write failures.
+
+The client must validate one canonical private descriptor, ready/closed markers,
+40 serial query/action responses and their corresponding terminal audit records.
+The suite checks command/history and virtual identity semantics, explicit typed
+refusals, redaction, availability and stale revisions after both domain and
+selection ABA changes. Read-only queries omit expected_revision; invokes include
+it and are never retried on transport failure. Normal success additionally
+requires zero native exit, socket/owned-directory removal and post-close refusal.
+All raw native output is discarded, not published through error paths. Stream
+and line limits bound capture; direct-child TERM, Kill fallback and final reap
+have independent bounded attempts. An outer native test runner owns the inherited
+controller/child group and separately proves its absence. The client cannot
+promise graceful endpoint cleanup after SIGKILL or OS/process failure.
+
+Non-GUI model/transport regressions and native execution evidence are distinct.
+No physical input, native accessibility/geometry, cross-window interaction,
+performance, memory or complete macOS acceptance follows from this fixture.
