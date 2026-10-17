@@ -459,5 +459,7 @@ The complete table/tree, native/GPU memory and full Mac gates remain open.
 238b3b6 to a private archive with 7,411 hashed files, including owned stages
 0074/0075. A relocated generated consumer and public API contracts pass their
 race/vet/build scope. Nine demo applications and four replay/workspace commands
-compile with replacements confined to the extracted SDK. No application runtime
-or public distribution is qualified by these checks.
+compile with replacements confined to the extracted SDK. A subsequent bounded
+native run of that SDK hello executable verifies its rectangle center-pixel
+readback, three further snapshots and owned shutdown. Full demo runtime, physical
+input, performance/memory and public distribution remain open.

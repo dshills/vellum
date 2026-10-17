@@ -1,0 +1,111 @@
+{
+  "status": "REVIEWED_SCOPED_PRIVATE_SDK_NATIVE_SMOKE",
+  "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+  "current_checkout_commit": "e88941b2c749cf8b4ce4ee8aee1081fcac966057",
+  "provenance": {
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "current_checkout_commit": "e88941b2c749cf8b4ce4ee8aee1081fcac966057",
+    "sdk_root": "/private/tmp/vellum-current-sdk-238b3b6/demos/relocated SDK demos/extracted SDK/vellum-v0.1.0-alpha.2",
+    "binary": {
+      "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/hello",
+      "bytes": 59698610,
+      "sha256": "1d9d56dafeebd8019f3e210613a9bd326bcbebc8d407abf08f4018d2f7d16fa9"
+    },
+    "archive": {
+      "path": "/private/tmp/vellum-current-sdk-238b3b6/sdk.tar.gz",
+      "sha256": "94dd1a1de78085ae705d17e587128b83bff0bbf442fb9f1f12ed348d5ba56f32"
+    },
+    "manifest_sha256": "95f33067532d01c1853b2d42c4fac2b687409b91803c01849de37e1f73c921e8",
+    "analysis_sha256": "ebc87fac3177dfca6915776af0fc9d05df30a21927a7211aeb6adbfb7754b628",
+    "demo_receipt_sha256": "3378bf86021e03a8f2492d0e4e7c0dea58eb6be1579e9c013bbe4cc1e05f30c8"
+  },
+  "receipt": {
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "current_checkout_commit": "e88941b2c749cf8b4ce4ee8aee1081fcac966057",
+    "producer_sha256": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac",
+    "review_sha256": "19dbe0cccb9dea534664a215c0a0f8c4893a7113c7684c275616cc944d99dec2",
+    "native_runtime_executed": true,
+    "public_distribution": false,
+    "physical_input_generated": false,
+    "settings_changes": false,
+    "full_macos_qualified": false,
+    "error": null,
+    "run": {
+      "argv": [
+        "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/hello",
+        "--benchmark",
+        "--idle=1s",
+        "--samples=3"
+      ],
+      "cwd": "/private/tmp/vellum-current-sdk-238b3b6/demos/relocated SDK demos/extracted SDK/vellum-v0.1.0-alpha.2/examples/hello",
+      "started_utc": "2026-10-17T04:32:28.959870+00:00",
+      "watchdog_seconds": 45,
+      "error": null,
+      "exit_code": 0,
+      "created": true,
+      "observation_errors": [],
+      "logs_complete": true,
+      "pins_stable": true,
+      "stop_at_exit": false,
+      "pid": 73276,
+      "group": 73276,
+      "owned": {
+        "created": true,
+        "pid": 73276,
+        "group": 73276,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 73276,
+          "members": [],
+          "observation_sha256": "d162387978147d8e2ad06c425774b5c8651d32554699cf26a4649566716f0c6f"
+        }
+      },
+      "seconds": 2.387932625017129,
+      "logs": {
+        "stdout": {
+          "bytes": 243,
+          "sha256": "85d58ab3839de0e2ab8ef62d5352901cccc54e2be1dc1537f9b36165cd52ceaa"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "native_record": {
+      "event": "vellum.native.ready",
+      "geometry_persistence_disabled_in_fixture": true,
+      "go_version": "go1.27.2",
+      "heap_alloc_bytes": 62752008,
+      "height": 344,
+      "render_readback_ns": [
+        1846875,
+        1800542,
+        1869625
+      ],
+      "startup_to_verified_gpu_ns": 606934834,
+      "width": 630
+    },
+    "source_stable": true,
+    "sdk_stable": true,
+    "pins_stable": true,
+    "lease_held_through_cleanup": true,
+    "finalization_errors": [],
+    "local_stop_present": true,
+    "result": "PASS_SCOPED_PRIVATE_SDK_NATIVE_SMOKE"
+  },
+  "result_review_sha256": "1f381c5833d437d3e877db04a078dead9d3366cd6702f80bb6231e31ef1a1a35",
+  "evidence": {
+    "file": "native-evidence.tar.gz",
+    "sha256": "de47077d9a53e493efd592b7ab9edde3c48639188bf4c386c624e1fd72458187",
+    "bytes": 1187067,
+    "members": 94,
+    "expanded_bytes": 3540893
+  },
+  "provider_calls": 0,
+  "public_distribution": false,
+  "full_macos_qualified": false
+}

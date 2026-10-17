@@ -28,8 +28,12 @@ verifies 7,411 hashed files from clean `238b3b6`, including owned stages 0074/00
 The relocated generated consumer passes race/vet/build checks, and the public API
 contract module passes race/vet. Nine demo applications and four replay/workspace
 commands compile from that SDK using only its local replacements. These are
-consumption/compilation checks, with no native application execution or public
-distribution. Native packaging/release gates and full Mac qualification remain open.
+consumption/compilation checks. A subsequent scoped native hello run from that
+SDK verifies its rectangle center-pixel readback, three further snapshots and
+owned shutdown. Runtime source stays `238b3b6`, distinct from the `e88941b`
+documentation endpoint present during that test. Other demo runtime, physical
+input, sustained performance, native/GPU memory, public distribution and full
+Mac qualification remain open.
 
 The [unique lifecycle, grid diagnostics and workspace recovery checkpoint](../docs/reports/macos-workspace-recovery/README.md)
 completes 1,000 unique-name cycles and 33,000 native/owner actions on `ddd23c6`.
