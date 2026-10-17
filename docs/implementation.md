@@ -519,3 +519,18 @@ action/closure and all 480 measured callbacks pass; all four ordinary cases
 still miss 4/6 ms targets. DPI96 offscreen capture medians improve, while bitmap
 and cold/miss costs remain explicit. No native speedup, broad no-regression,
 actual GPU execution or full Mac qualification follows.
+
+
+## Intrinsic grid text at fractional display scale
+
+Passive managed grid labels now retain completed intrinsic shaping across
+rounded physical edge changes when natural dimensions and fixed text/style
+inputs remain unchanged. Unsupported sizing units/parts and all content, state,
+pending and full-layout paths keep ordinary sizing. No extra cache is added.
+Software full-layout/frozen-prior pixels, public/private geometry, dependent
+styles and custom-shaper pending regressions qualify this source change.
+An isolated owner-sync plus local-layout kernel improves from about 819 to 275 µs
+for fixed rows and 707 to 280 µs for variable rows at DPI162, including predicate
+costs. These are offscreen kernel observations, separate from painting, native
+frames and the still-open 4/6 ms and full Mac gates. See the
+[contract](../specs/grid-native.md#reusing-intrinsic-grid-text-across-rounded-cell-edges).

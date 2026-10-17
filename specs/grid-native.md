@@ -314,3 +314,37 @@ ordinary complete-frame campaign and the broader macOS acceptance workloads
 remain authoritative; unchanged full-scene raster/upload is subsequent work.
 
 A private inline field may repaint preedit without requesting layout. When its actual editor text, focus, visibility, session or completed bounds differs from the last Grid publication, owner synchronization requests one bounded host repaint so capture follows the field render. The unchanged completion refresh schedules no further paint or layout. Other controls in the same scene must also quiesce: the native tree compares its complete bounded snapshot (including same-generation pending status), effective disabled state and help before requesting full updates, while still restoring a noncanonical native scrollbar value.
+
+## Reusing intrinsic grid text across rounded cell edges
+
+A passive managed preformatted label can retain completed intrinsic shaping when
+its natural width/height remain unchanged and only rounded physical cell edges
+change. Core SizeUp starts from the same style-derived zero content size; its
+WhiteSpacePre SizeDown does not use the cell allocation. Pane positioning still
+assigns every final rounded exterior/content bound and clipping. Full painting
+and accepted snapshot order remain unchanged.
+
+The private predicate requires the same live scene and plain owned leaf Text,
+no Parts/children, no interactive abilities, non-nil shaped content, zero
+Grow/Min/Max and no shadows. It refuses allocation/parent-relative, custom,
+unknown or nonfinite unit values across the fixed Style.ToDots field set. It
+changes only allocation-rounding dirtiness. Content, selection, cursor,
+visibility, parent/new/nil-paint and previously queued dirty work keep their
+original sizing path; natural dimension changes and all existing full-layout,
+theme, DPI, scene, configuration and editor fences remain effective.
+
+No new cache, widget retention or global state is introduced. Skipped SizeFinal
+may leave private UnitContext element dimensions at an older allocation; the
+predicate admits only styles whose semantic values do not use those dimensions.
+Later normal styling rebuilds its context from current geometry. This does not
+promise equality of unused private context numbers, one shaper call per frame,
+or arbitrary dimension-dependent/custom-style reuse.
+
+Regressions compare current pixels, complete public geometry/semantics and
+visible private intrinsic/glyph-interaction geometry against full scene layout
+and the frozen prior sizing rule. They cover fractional DPI, mixed Unicode,
+multiline/tab/long/escaped text, cursor changes, real dependent-unit/parts/wrap
+fallbacks and size-sensitive lazy text restoration. Intentional missing-unit
+and lost-dirty-work faults fail actual glyph/offset assertions; the prior rule
+fails useful-reuse assertions. Kernel timings exclude painting and native
+frames. Native 4 ms p95 / 6 ms p99 and full Mac gates require separate evidence.

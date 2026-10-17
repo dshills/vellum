@@ -6,6 +6,8 @@ import (
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/styles/states"
+	"cogentcore.org/core/styles/units"
+	"cogentcore.org/core/text/text"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/ui"
 	"github.com/dshills/vellum/virtual"
@@ -231,10 +233,59 @@ func (g *gridBinding) placeRetained(w *core.Text, pane *gridPane, rect, clip vir
 		w.StateIs(states.Invisible) != clip.Empty() || oldCursor != cursor
 	oldWidth, oldHeight := gridPhysicalSize(oldRect, g.host.Styles.UnitContext.Px(1))
 	width, height := gridPhysicalSize(rect, g.host.Styles.UnitContext.Px(1))
-	size = style || !hasRect || oldWidth != width || oldHeight != height ||
-		!clip.Empty() && w.PaintText() == nil
+	allocationChanged := oldWidth != width || oldHeight != height
+	size = style || !hasRect || !clip.Empty() && w.PaintText() == nil ||
+		allocationChanged && !g.reuseGridIntrinsicSize(w, oldRect, rect)
 	g.place(w, pane, rect, clip, value, selected, cursor)
 	return
+}
+
+// reuseGridIntrinsicSize admits only the existing passive managed leaf whose
+// natural dimensions and intrinsic shaping inputs are unchanged. SizeUp resets
+// this label's content size to zero from its styles, WhiteSpacePre SizeDown is
+// a no-op, and pane Position assigns the final globally rounded cell edges.
+// Skip only that redundant sizing cause; queued content/style work stays dirty.
+func (g *gridBinding) reuseGridIntrinsicSize(w *core.Text, old, next virtual.GridRect) bool {
+	if old.Width != next.Width || old.Height != next.Height || w.This != w ||
+		w.Scene != g.host.Scene || w.Parts != nil || len(w.Children) != 0 ||
+		w.PaintText() == nil || g.layoutDirty[w] {
+		return false
+	}
+	s := &w.Styles
+	if s.Abilities != 0 || s.Text.WhiteSpace != text.WhiteSpacePre ||
+		s.Grow.X != 0 || s.Grow.Y != 0 || len(s.BoxShadow) != 0 || len(s.MaxBoxShadow) != 0 {
+		return false
+	}
+	for _, v := range [...]*units.Value{&s.Min.X, &s.Min.Y, &s.Max.X, &s.Max.Y} {
+		if v.Value != 0 || v.Dots != 0 {
+			return false
+		}
+	}
+	// Mirror the unit-bearing fields compiled by Style.ToDots. Element/parent
+	// relative values and custom callbacks may depend on the omitted SizeFinal
+	// context update; leave their original sizing path intact. Shadows above
+	// are refused wholesale, so this scan has a fixed bound and allocates no cache.
+	for _, v := range [...]*units.Value{
+		&s.Pos.X, &s.Pos.Y, &s.Min.X, &s.Min.Y, &s.Max.X, &s.Max.Y,
+		&s.Padding.Top, &s.Padding.Right, &s.Padding.Bottom, &s.Padding.Left,
+		&s.Margin.Top, &s.Margin.Right, &s.Margin.Bottom, &s.Margin.Left,
+		&s.Gap.X, &s.Gap.Y, &s.ScrollbarWidth,
+		&s.Font.Size, &s.Text.Indent, &s.Text.Hanging,
+		&s.Border.Width.Top, &s.Border.Width.Right, &s.Border.Width.Bottom, &s.Border.Width.Left,
+		&s.Border.Radius.Top, &s.Border.Radius.Right, &s.Border.Radius.Bottom, &s.Border.Radius.Left,
+		&s.Border.Offset.Top, &s.Border.Offset.Right, &s.Border.Offset.Bottom, &s.Border.Offset.Left,
+		&s.MaxBorder.Width.Top, &s.MaxBorder.Width.Right, &s.MaxBorder.Width.Bottom, &s.MaxBorder.Width.Left,
+		&s.MaxBorder.Radius.Top, &s.MaxBorder.Radius.Right, &s.MaxBorder.Radius.Bottom, &s.MaxBorder.Radius.Left,
+		&s.MaxBorder.Offset.Top, &s.MaxBorder.Offset.Right, &s.MaxBorder.Offset.Bottom, &s.MaxBorder.Offset.Left,
+	} {
+		if v.Custom != nil || v.Unit < units.UnitDp || v.Unit > units.UnitDot ||
+			v.Unit >= units.UnitEw && v.Unit <= units.UnitPh ||
+			math.IsNaN(float64(v.Value)) || math.IsInf(float64(v.Value), 0) ||
+			math.IsNaN(float64(v.Dots)) || math.IsInf(float64(v.Dots), 0) {
+			return false
+		}
+	}
+	return true
 }
 
 // LayoutLocal implements Core's explicitly fixed-allocation boundary. It never
