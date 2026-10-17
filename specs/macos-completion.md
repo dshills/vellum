@@ -48,6 +48,18 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [scene composition and tile-culling checkpoint](../docs/reports/macos-scene-composition/README.md)
+reconciles 480 measured packets across fixed/variable 10k/1M rows. Packet-local
+masks already reuse 83 resources; Ops/Refs dominate input. The resulting private
+GPU tile-culling experiment passes race, native pixel/retention, vet and build
+checks, but is rejected: only one of five ordinary pairs improves, median
+run-p95 5.002915 → 5.028750 ms. Separate diagnostics prove references fall
+55,388 → 19,405; that does not establish a latency improvement. All ten ordinary
+p95s fail 4 ms; one baseline p99 also fails 6 ms. Private overlays are archived,
+with no runtime or prepared dependency changes and no further culling tuning.
+All remaining full Mac gates remain open. The delivery plan records the next
+material architecture boundary; source-details timings do not qualify it.
+
 The [session-owned placement probe](../docs/reports/macos-placement-session/README.md)
 removes a stale test-session stop path and passes isolation/observer/routing race
 checks, vet and build. The single fresh native attempt reaches Cocoa AX readiness

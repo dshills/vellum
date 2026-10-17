@@ -1,0 +1,538 @@
+{
+  "archive": "records.tar.gz",
+  "archive_sha256": "a41c39a67b6218bcf47584769f2fad1e2c8d549a5aac51835e283011527d184d",
+  "files": {
+    "composition/assess.py": {
+      "bytes": 4965,
+      "sha256": "be33162e2eda7fde15005de6f785b155a00e4b84beb77d335d1bcf5c16c8c107"
+    },
+    "composition/assessment.json": {
+      "bytes": 10798,
+      "sha256": "69dc35ec6d0e72000a54855ed449823f60f94506888262122c8d818524762e18"
+    },
+    "composition/author.py": {
+      "bytes": 7032,
+      "sha256": "4b371cc736ff4bc6d5971d8e1c79bfec343dcba9bed75a99f6d59596f7b5afb4"
+    },
+    "composition/binary-metadata.json": {
+      "bytes": 6085,
+      "sha256": "51f3ff7832675cf1a11b2734ca937a848e0f4c86ded8b406e54ee69cc82c130a"
+    },
+    "composition/binary-origins.json": {
+      "bytes": 1335,
+      "sha256": "3c2dc3e873e9c0ee7594cf6634c8145d150105388866c61887d16779799cf9e8"
+    },
+    "composition/build-command.json": {
+      "bytes": 487,
+      "sha256": "117d10050dcc8cb01748572bfa77cdb4d4fc8533ea153a36db0862baaddad92b"
+    },
+    "composition/build.stderr": {
+      "bytes": 1123,
+      "sha256": "6bd479e41fd7cde8fff6e83730c0d67cadc75f0a49fcff54eea76b414335c609"
+    },
+    "composition/build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "composition/check.py": {
+      "bytes": 1393,
+      "sha256": "e0c5eb2324ac5d674ed8396acae90ffd84bcc14c1e4c15c32803c5edfb78b24d"
+    },
+    "composition/geometry-check.json": {
+      "bytes": 480,
+      "sha256": "1f92792eae2a830439531e3d3d0e612d254c57caa9a4a18c2fe5f7c9c9ca4d1e"
+    },
+    "composition/internal-overlay-review.json": {
+      "bytes": 365,
+      "sha256": "0c187ff30f494996f2096a95316d7c2db2ea635f5d843b0bc0d5b3f4a2833bbb"
+    },
+    "composition/internal-results-decision.json": {
+      "bytes": 1212,
+      "sha256": "8b93a7ed5836f4a6cd2aea9d8625aa867ee552836dac97a071039d2b696612a4"
+    },
+    "composition/native/fixed-10000/composition.json": {
+      "bytes": 244559,
+      "sha256": "0ccd09a87569ccc3f54912743b76ec5b63040f4bc74ee93cebf6ad6e551ae9a1"
+    },
+    "composition/native/fixed-10000/native.log": {
+      "bytes": 364880,
+      "sha256": "019f7c97d9a1780ecfb0d5665085b4a92b6038d83bd823bafc7ad1600db74049"
+    },
+    "composition/native/fixed-10000/result.json": {
+      "bytes": 422920,
+      "sha256": "2551b3a644589a98eeb5ab60256953304c48d5cb7d515495f735adaa59d0d893"
+    },
+    "composition/native/fixed-1000000/composition.json": {
+      "bytes": 244584,
+      "sha256": "22997942b3d81a6aef1d3dada190e1a8efdd63bc1ade2cf3aed6493f16897e19"
+    },
+    "composition/native/fixed-1000000/native.log": {
+      "bytes": 364848,
+      "sha256": "8284cb1b5b08ea42c75e52e610b0e8147d976fdfe648159802d864d1453c7988"
+    },
+    "composition/native/fixed-1000000/result.json": {
+      "bytes": 422891,
+      "sha256": "0cefb66d4503fb954fa0dd83fe28f16e1d9de1a87d602b7f8265ce5f2c5d2833"
+    },
+    "composition/native/variable-10000/composition.json": {
+      "bytes": 244567,
+      "sha256": "946d57af922b2b11e8d84e82fe10c0e45e8b3547d93c3df7671a504bba23b4a8"
+    },
+    "composition/native/variable-10000/native.log": {
+      "bytes": 364960,
+      "sha256": "db32151e50f786b87c75085b8d4ef3a9606352ef81dc1b4713935527b172e73f"
+    },
+    "composition/native/variable-10000/result.json": {
+      "bytes": 423023,
+      "sha256": "fb33e51e14a89c055e078945e5490a3bbd69dc2d063b3df1eb14cf0dcff649c3"
+    },
+    "composition/native/variable-1000000/composition.json": {
+      "bytes": 244590,
+      "sha256": "b91f42155e7b90004e5ffb6839c0cbe808c17955e628e08717d7aac9c77c879d"
+    },
+    "composition/native/variable-1000000/native.log": {
+      "bytes": 365040,
+      "sha256": "66f4109cc80c29b74e7d32a231cffc239c75fdea8019601b7e2ca28e8d721225"
+    },
+    "composition/native/variable-1000000/result.json": {
+      "bytes": 423104,
+      "sha256": "672b8fe9f45b049b09e6e3792f020773dd98ed4af333d15889453081986779b6"
+    },
+    "composition/native-admission.json": {
+      "bytes": 404,
+      "sha256": "f8d0590cb52807715d095cc138e34683ed5f935b382ab453763d2652cffb0ee3"
+    },
+    "composition/native-plan.json": {
+      "bytes": 2283,
+      "sha256": "e79f31d95df7ddac87b79006c7e65b7c01d081cd191e8d827bd65bd8080ae963"
+    },
+    "composition/native.py": {
+      "bytes": 6726,
+      "sha256": "1d22fe38f85a81e12487a49f378cdb302d5db9bfad8a009fab326d9f98934eeb"
+    },
+    "composition/native_input_timing_test.go": {
+      "bytes": 7939,
+      "sha256": "1a277ea20287fe416fde9c1a74e5618f751afb3cdae807a8d6025f1dffe6ca92"
+    },
+    "composition/overlay.json": {
+      "bytes": 506,
+      "sha256": "9d3f6d62a170a5b27c8bf7eaecc73c28596376d115a397f58db595850b255b6b"
+    },
+    "composition/renderer.go": {
+      "bytes": 14625,
+      "sha256": "01713f681f9947572a267ac4991a4246db7f6ee9c1973bd0594a14203f0327e9"
+    },
+    "composition/result.json": {
+      "bytes": 9335,
+      "sha256": "28279a1cc87bb072f83f05319f89c4a7dccfb99712ca0bb54f038c38cb414fcc"
+    },
+    "composition/test-command.json": {
+      "bytes": 584,
+      "sha256": "86802b61bac41ec7a7392e06f6ce2e558fa5fc98ff903ae2c38af5e43aab59fd"
+    },
+    "composition/test.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "composition/test.stdout": {
+      "bytes": 336,
+      "sha256": "9f11047c739d9d4e69b1b1f483b499558558f4314c2d71643b5311e987d6b9ea"
+    },
+    "composition/vet-command.json": {
+      "bytes": 432,
+      "sha256": "2161d2e82975d19ead8e772ed4a05956e5487061fefbda1c00906976a2b5ecb9"
+    },
+    "composition/vet.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "composition/vet.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/assess.py": {
+      "bytes": 2984,
+      "sha256": "84c2c5a3c4908c6f8be80dafd116aa639683af50f51b2d35e92915fab9d14a7a"
+    },
+    "culling/assessment.json": {
+      "bytes": 1974,
+      "sha256": "64114336fe3e01cdc7f3a382263e2b2e18abeaa0e2f7d03ae2f4bb685e9698a0"
+    },
+    "culling/author.py": {
+      "bytes": 7932,
+      "sha256": "4a2a8225662c19e07afdd7b44ddddf0f1bbb89ff52c56d9ab9a6e6cc34d2e916"
+    },
+    "culling/build-command.json": {
+      "bytes": 477,
+      "sha256": "1ab31afb39d122c170e8e61a96aca1027f2f300bbfcfbd64593501e5a7b8849a"
+    },
+    "culling/build-diagnostic-command.json": {
+      "bytes": 499,
+      "sha256": "2b8e0d2f1298f3a5b79d7998fc28ef9f893da650c918dfee2e5fedae18435112"
+    },
+    "culling/build-diagnostic.stderr": {
+      "bytes": 100,
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0"
+    },
+    "culling/build-diagnostic.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/build.stderr": {
+      "bytes": 100,
+      "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0"
+    },
+    "culling/build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/check.py": {
+      "bytes": 3238,
+      "sha256": "037efa96871cbf13e2d04622cae9834380f9fb83cd6d67ce53c98c5bcca71baf"
+    },
+    "culling/checks-scope.json": {
+      "bytes": 673,
+      "sha256": "818ad92a9cd53d4ee1762690fc8e31974f4b4af282ffa3d1e965d54b829f4139"
+    },
+    "culling/covered_encoding_test.go": {
+      "bytes": 14457,
+      "sha256": "9996c26737534543516baf41600041317fa09b887aa09c7058e5fd79f9f8490e"
+    },
+    "culling/diagnostic/composition.json": {
+      "bytes": 179667,
+      "sha256": "985a776aa8cfdb255fcfcc2a99a0d87c500eb0bd5b3f27497a0a71ffb3b7e340"
+    },
+    "culling/diagnostic/native.log": {
+      "bytes": 373116,
+      "sha256": "838573e75860c5c8e64d1b0fbb756c2ff20625f8041b538325d8905eb6c0979c"
+    },
+    "culling/diagnostic/result.json": {
+      "bytes": 422235,
+      "sha256": "820fac5c53ab5020fe8854767517e421df85d3976b57778b01198cfc7caea67a"
+    },
+    "culling/diagnostic-overlay.json": {
+      "bytes": 1238,
+      "sha256": "aa539c994899e6b241aabd862d2da33345dd34428e39cec31950451cc2c9734e"
+    },
+    "culling/diagnostic_native_input_timing_test.go": {
+      "bytes": 11123,
+      "sha256": "f57bfd72b7a4cd4c77e94b1c75af303c56cf50b7bde2b95913ad9343e5f3e92e"
+    },
+    "culling/diagnostic_renderer.go": {
+      "bytes": 15143,
+      "sha256": "e7f743ea590fe4051f0ac22fbcf75cfb15de64257e917e8b11fb563784ecf5d3"
+    },
+    "culling/documentation-check.json": {
+      "bytes": 87,
+      "sha256": "84bbf52aac2ea18a883fb3a05095e6d380dfd69dc7ff8ef3457f4b2aeebd6d83"
+    },
+    "culling/final-checks.json": {
+      "bytes": 545,
+      "sha256": "df6faa5f050d0ab9fe36fa7ec08aef7e357b6ed6a6559729437888fddf6b5056"
+    },
+    "culling/full-command.json": {
+      "bytes": 578,
+      "sha256": "a8ca7b554e034f134833722a305e65f35672b1ddb2dcab406e8f0b52eb25e304"
+    },
+    "culling/full-overlay.json": {
+      "bytes": 742,
+      "sha256": "b8875cbcc9fd962086707397b59a6cd0ab12c75b6b8e5a63e2af5246c93daa71"
+    },
+    "culling/full.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/full.stdout": {
+      "bytes": 173,
+      "sha256": "e861937d041a270a055e57ea8caf0af251530f1628d8040bf8e9bdcc5c7ca4a7"
+    },
+    "culling/generated-output-cleanup.json": {
+      "bytes": 2619,
+      "sha256": "134f12d6d2e8b95ef2c1c7662e5f66d7534cb29d2678afda96622f127a1b315f"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/grad.png": {
+      "bytes": 17545,
+      "sha256": "fa6dd8db05300fe8156aa38800622f4dc3aa68d73b4707986047529d71f47d5c"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/roundRect.png": {
+      "bytes": 17476,
+      "sha256": "80ee076bce45cf16f5aad64ac655a1f0d5cef01cbca122b2e46026d347583507"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD0.png": {
+      "bytes": 54759,
+      "sha256": "79ff693070f9b90bb7c04c9e7cb49224ce5ef281a091b1c9043b1a2ef082c119"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD1.png": {
+      "bytes": 50840,
+      "sha256": "b77d2705972eb8cd9f2fa6da22008d4729635aafa1e45bbeda15cca01de405e4"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD2.png": {
+      "bytes": 47944,
+      "sha256": "e585b233c8fe640eb4cd221ffd5b6acf8469052adda9238cd3f825c1c696721b"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD3.png": {
+      "bytes": 53017,
+      "sha256": "ed5c61402671407b4aa95b11c6749d2681f6eba89b3eaef81de52936a13f0460"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD4.png": {
+      "bytes": 45280,
+      "sha256": "e399f2537c0828e1c5af10bfdf49511ee575977c87c50a8e3ad043da7a4eb04f"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD5.png": {
+      "bytes": 45280,
+      "sha256": "e399f2537c0828e1c5af10bfdf49511ee575977c87c50a8e3ad043da7a4eb04f"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD6.png": {
+      "bytes": 45276,
+      "sha256": "c8965ebb87485b452b3584c6c9d8bfa0ee35864e5486eb09a828246b1a12c161"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeF.png": {
+      "bytes": 25352,
+      "sha256": "c205384f706c3755167c2df326b4eb89eab9c324946ac564923feee5055749b0"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeS1.png": {
+      "bytes": 47878,
+      "sha256": "f96e3bf637255344edd1e31a24cb84b7c9e695a117a8b553ab06b1df6259e869"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeS2.png": {
+      "bytes": 47878,
+      "sha256": "f96e3bf637255344edd1e31a24cb84b7c9e695a117a8b553ab06b1df6259e869"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeS3.png": {
+      "bytes": 45276,
+      "sha256": "c8965ebb87485b452b3584c6c9d8bfa0ee35864e5486eb09a828246b1a12c161"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeT1.png": {
+      "bytes": 6662,
+      "sha256": "dd7472c8e46800fe2f4e30ceb136be0a1b7870e0caec834b9111e41184a737b6"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeT2.png": {
+      "bytes": 6662,
+      "sha256": "dd7472c8e46800fe2f4e30ceb136be0a1b7870e0caec834b9111e41184a737b6"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeT3.png": {
+      "bytes": 6662,
+      "sha256": "dd7472c8e46800fe2f4e30ceb136be0a1b7870e0caec834b9111e41184a737b6"
+    },
+    "culling/generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/tmf.png": {
+      "bytes": 28847,
+      "sha256": "bb8a3f043221f4d72307aeac5a94e3a0c10c2587cd4999be4735e6f3b996c4c0"
+    },
+    "culling/internal-results-review.json": {
+      "bytes": 922,
+      "sha256": "25ef085677d877567ac511ccbeb7dd0f25e229f7c3635da57a62439c901398ef"
+    },
+    "culling/internal-source-review.json": {
+      "bytes": 666,
+      "sha256": "b81f802f90fe9bdd44d5c0c603038084c9770b52253c92b90a8fa3fd5b59c5b5"
+    },
+    "culling/native/1-baseline/native.log": {
+      "bytes": 151805,
+      "sha256": "26cbdb84501b7703fb67b625a7cbf9176d3016f003b1b000a7ed285aac6be001"
+    },
+    "culling/native/1-baseline/result.json": {
+      "bytes": 244988,
+      "sha256": "a5529c567a613068c33a8b1188d68a6c08ae4629fae6b79e02fc7aef5aa57b14"
+    },
+    "culling/native/1-candidate/native.log": {
+      "bytes": 151815,
+      "sha256": "4eeb5aeb048b20d6551df80da51b1726b5f15acee5e4312193ed8a585be5f1ec"
+    },
+    "culling/native/1-candidate/result.json": {
+      "bytes": 244999,
+      "sha256": "affe1a0d66723d8da866775befe8a1435af5bd8fb658b3e805a6b44518f081e8"
+    },
+    "culling/native/2-baseline/native.log": {
+      "bytes": 151713,
+      "sha256": "47c0e9bf3b121ee613fa0e0a328255d997a1025a10c596694c53adbd4715a291"
+    },
+    "culling/native/2-baseline/result.json": {
+      "bytes": 244896,
+      "sha256": "9be5f7c92f84d0e3e3b3a8b7b23cda867c1a12b180703b7f2a3aecbbd48e7782"
+    },
+    "culling/native/2-candidate/native.log": {
+      "bytes": 151742,
+      "sha256": "1fc3139501a46889daf9e1b51703b114c73cf9672cfbd820a78ed48028b8dee5"
+    },
+    "culling/native/2-candidate/result.json": {
+      "bytes": 244926,
+      "sha256": "62265cfed31ab41f70e202028632aee4693f128b2e89538f34a4526b6ec6c1fd"
+    },
+    "culling/native/3-baseline/native.log": {
+      "bytes": 151750,
+      "sha256": "db36eed9422f2e42cd1d54977867ecb7d99163344c4cc9bbbfa3a2265a3e7ad2"
+    },
+    "culling/native/3-baseline/result.json": {
+      "bytes": 244933,
+      "sha256": "aac59899b52f9eacf3d85713f48bd7e83d8b11d7a43cfb3142d42a5df81979f9"
+    },
+    "culling/native/3-candidate/native.log": {
+      "bytes": 151762,
+      "sha256": "6a919a08165cb02c618a1323055611af100a85184b0380b28a09f639bcd14d46"
+    },
+    "culling/native/3-candidate/result.json": {
+      "bytes": 244946,
+      "sha256": "ba7a256cc6c8a919f0394b15fd4a6177d27e0262e6d279bef9bd0ff56737c041"
+    },
+    "culling/native/4-baseline/native.log": {
+      "bytes": 151734,
+      "sha256": "eede40999c206483f1422ecb728d4e597e1c37c351bf723e75e07fcd999a52d2"
+    },
+    "culling/native/4-baseline/result.json": {
+      "bytes": 244917,
+      "sha256": "96b5bac4aec919fc61c5b928d693966a1a6c76c9afc629be4e2da36be424e65b"
+    },
+    "culling/native/4-candidate/native.log": {
+      "bytes": 151810,
+      "sha256": "9b8809dbcd2ab809b585ba3574cb8233902019e7c446f579dae05e98e2db57ec"
+    },
+    "culling/native/4-candidate/result.json": {
+      "bytes": 244994,
+      "sha256": "ebdaa43813322abc63b22f856c6d9e913374c5e0a6f4bae4c7c98e59e0485ec2"
+    },
+    "culling/native/5-baseline/native.log": {
+      "bytes": 151807,
+      "sha256": "6b22529da2549d86bee7e488e75007e14bb6c418e66640a97d82df8ef96614b2"
+    },
+    "culling/native/5-baseline/result.json": {
+      "bytes": 244990,
+      "sha256": "74b0c23a63b556857bd9363fd4cc0877213b298e71477b5ff97b7d3edef4eef3"
+    },
+    "culling/native/5-candidate/native.log": {
+      "bytes": 151761,
+      "sha256": "e3ee2f0ac82866b2e81a3db7e0b3ecca68448241ad0208d695c38f2ed5328343"
+    },
+    "culling/native/5-candidate/result.json": {
+      "bytes": 244944,
+      "sha256": "c103c96b98354c8e844c2ea60598428fc5891e4abdf5033062f20e1c71c0eb60"
+    },
+    "culling/native-admission.json": {
+      "bytes": 454,
+      "sha256": "4680f89d1414d0ab75ef021581f5e43e320817f01b44a71c5fd91da3870d3ca1"
+    },
+    "culling/native-comparison.json": {
+      "bytes": 68192,
+      "sha256": "d23131c3ca16f74cdf36492fb6b65cb43a970788641efd5253061938a48b507c"
+    },
+    "culling/native-gpu-command.json": {
+      "bytes": 485,
+      "sha256": "03f1623041fc5ead0068f26e48b6b568f34ca26391158363876722dc890e075f"
+    },
+    "culling/native-gpu-v2-command.json": {
+      "bytes": 485,
+      "sha256": "daf3d83867ab9533943648316f98ea6bb43349fdcee85826a3c50c7401862d8c"
+    },
+    "culling/native-gpu-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/native-gpu-v2.stdout": {
+      "bytes": 2255,
+      "sha256": "eb268fc07cfedda65e4f89b722b2a23cbe9fe239bb509efbc8b8d54d2bd5a03b"
+    },
+    "culling/native-gpu.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/native-gpu.stdout": {
+      "bytes": 2255,
+      "sha256": "6387e1e28519f7d28524cf8768d87ca913f5dd0fefb50e8689e1d4d0f9adef82"
+    },
+    "culling/native-plan.json": {
+      "bytes": 3491,
+      "sha256": "294eb851dc8c96cbe35bba3894d4c4def419db40ccc1e5c681aa3255a3551807"
+    },
+    "culling/native.py": {
+      "bytes": 9070,
+      "sha256": "834576ce0eb6e03f5437b6b9c7acee7ebb0a2a9533cae3760d04d39af9707a9b"
+    },
+    "culling/native_input_timing_test.go": {
+      "bytes": 8063,
+      "sha256": "ad525df8b90838db4b67cdb2db7e980259ae3e1f6c1db80e33819c71e7a706ea"
+    },
+    "culling/original_packet.go": {
+      "bytes": 9566,
+      "sha256": "10d96295547dbc013fda4183019cf4e07c56c9ff2af2cd6f7870b6d3f188d64b"
+    },
+    "culling/overlay.json": {
+      "bytes": 995,
+      "sha256": "8a22f1690253021f3e8de73425f9dabe0260260d576e9807526390fee3ea5ba3"
+    },
+    "culling/packet.go": {
+      "bytes": 10947,
+      "sha256": "fb8259f31a2491b6fcce1422aca3e5d21b3769c3c292e065b45c92ab336c4194"
+    },
+    "culling/prism-assessment.json": {
+      "bytes": 706,
+      "sha256": "badb501e83f5814711ea30785a5e954331038693d24ca1fd9595421915e3df5d"
+    },
+    "culling/prism-command.json": {
+      "bytes": 773,
+      "sha256": "c420302bdf84520722692b03e8c40a01804e26ed42fffa554a8116492cc8486f"
+    },
+    "culling/prism-rules.json": {
+      "bytes": 1690,
+      "sha256": "11b21d5d76673b89b5622ed0ea826ca9c2d518b62a23678a5bfb0125896cea0b"
+    },
+    "culling/prism.json": {
+      "bytes": 3663,
+      "sha256": "bb76bec0af4f4c93f88eda4da35403f9180888bb12c446abbed35623eb3d18ce"
+    },
+    "culling/prism.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/prism.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/prism_review.py": {
+      "bytes": 994,
+      "sha256": "256579a9db01651cbcaaf325467959d86d01bf28d748e9dfb5735cd50f22d861"
+    },
+    "culling/test-command.json": {
+      "bytes": 570,
+      "sha256": "2b396adae62f2a774170d19b5a768d48e0fb26a80b6d94f26d27292ce2220aad"
+    },
+    "culling/test-diagnostic-command.json": {
+      "bytes": 545,
+      "sha256": "7788e3a934d520d526b99573d6881852b718772b599f79301fb80647134b8a91"
+    },
+    "culling/test-diagnostic.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/test-diagnostic.stdout": {
+      "bytes": 364,
+      "sha256": "c7dcdc25399984f6b9567be5e51477118ba68c208bb4b783db28b83a7342c550"
+    },
+    "culling/test.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/test.stdout": {
+      "bytes": 1994,
+      "sha256": "dc25ca7a26528c24fb4841ae031bcdc37faccc4a29a383b7816dc421f5c36b88"
+    },
+    "culling/tile_binning_vellum_test.go": {
+      "bytes": 11407,
+      "sha256": "1df839e3371a1a6c66201afc58553f1e4edf422e5dc1e0766581ba38bcccc86d"
+    },
+    "culling/update_docs.py": {
+      "bytes": 3495,
+      "sha256": "470fd7001c3c9a5e44a8044510969f7068620caca04ec2c66fd62eeb1a3f474d"
+    },
+    "culling/vet-command.json": {
+      "bytes": 479,
+      "sha256": "dff04694a302cacd55bb6e04435a81e5d23a860508786946f36c52cfc21ecfd5"
+    },
+    "culling/vet.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "culling/vet.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
