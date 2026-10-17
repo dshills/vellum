@@ -48,6 +48,17 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [row-fragment feasibility checkpoint](../docs/reports/macos-row-fragments/README.md)
+rejects the private retained-row prototype before ordinary timing. Final race,
+pixel, actual native GPU, vet and build checks pass, but only 12 of 120 GPU
+frames show body-row reuse (588 / 11,760 opportunities, 5%) while the 8 MiB owned
+fragment/proof cache is effectively full. Both diagnostic apps exit zero; the
+CPU observer flag is filtered, causing controller correlation failure. CPU reuse
+is unavailable, and no ordinary CPU/GPU latency conclusion follows. Do not retry
+the observer or tune the cache/coordinate rules. No production/prepared change
+or gate closure follows. M3 requires a separate architecture decision; independent
+M6 minimum-Go-toolchain compatibility is the next qualification task.
+
 The [scene composition and tile-culling checkpoint](../docs/reports/macos-scene-composition/README.md)
 reconciles 480 measured packets across fixed/variable 10k/1M rows. Packet-local
 masks already reuse 83 resources; Ops/Refs dominate input. The resulting private

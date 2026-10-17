@@ -115,13 +115,15 @@ explicitly authorized tests and restore any authorized temporary state changes.
    includes the new routed Selector/NumberField regressions. Native M2 integration
    remains queued; [actual results](../docs/reports/macos-workspace-acceptance/README.md)
    distinguish software routing from desktop acceptance.
-3. **M3-A and tile culling are complete and rejected.** The complete table
+3. **M3-A, tile culling and row fragments are complete and rejected.** The complete table
    matrix still fails. No follow-up AX, packed-upload or tile-culling microtuning
    is queued. The [composition checkpoint](../docs/reports/macos-scene-composition/README.md)
    measures 480 actual packets and the failed five-pair culling comparison.
-   Smaller input alone does not improve total-frame work. The next material
-   implementation boundary is recorded below; CPU and GPU paths both need
-   qualification. M6 inventory can proceed independently.
+   Smaller input alone does not improve total-frame work. The subsequent
+   [row-fragment prototype](../docs/reports/macos-row-fragments/README.md) fails
+   its actual reuse feasibility gate before ordinary timing. A separate M3
+   architecture decision is required; no further row-cache tuning is queued.
+   Continue independent M6 minimum-toolchain qualification meanwhile.
 4. Use an authorized desktop window for other M2/M5 native checks and ordinary M3
    measurements. Never replay a completed/human-return seal.
    The one fresh bounded placement attempt has now failed its delivery observation;
@@ -172,10 +174,11 @@ is retained. One scoped Prism review covers the final rejection checkpoint.
 The next desktop work is the pending M2/M5 workflows, followed by evidence for
 any materially different M3 implementation. No small follow-up M3-A tuning.
 
-## Next M3 implementation: retained managed-row paint fragments
+## Rejected M3 prototype: retained managed-row paint fragments
 
-Implement one bounded prototype that avoids repeated row glyph/path capture on
-unchanged managed rows, shared by CPU and GPU renderers. This is a material
+The following is the original prototype scope, retained as history rather than
+queued work. It was implemented privately to avoid repeated row glyph/path
+capture on unchanged managed rows, shared by CPU and GPU renderers. This is a material
 retained-work boundary, not another operation-buffer allocation adjustment.
 Keep the original shader and encoding initially. Retain detached immutable
 integer paint operations and instantiate/replay them in their original painter
@@ -204,7 +207,15 @@ Reassess feasibility after 90 minutes of implementation/investigation. If actual
 input proof, current-fixture hits or material full-frame benefit cannot be
 established, stop this prototype, retain the failure and make a new architecture
 decision. Do not iterate into another small allocation-only candidate or rerun
-unchanged comparisons. This plan is unimplemented and closes no acceptance gate.
+unchanged comparisons. The [implemented prototype](../docs/reports/macos-row-fragments/README.md)
+passes final race, pixels, native GPU, vet and build checks, but is rejected at
+feasibility: GPU body-row reuse is 5% across 120 frames and absent in 108 frames,
+while owned storage reaches 8,387,889 / 8,388,608 bytes. CPU app exit is zero but
+its observer flag was filtered, so CPU reuse is unavailable and the combined
+diagnostic controller fails. No ordinary latency comparison is run and no CPU
+performance conclusion follows. Stop the whole prototype without observer retry,
+cache/coordinate relaxation or further architecture branches in this experiment.
+Production and stage0079 remain unchanged; no acceptance gate closes.
 
 ## Existing execution entrypoints
 
@@ -263,10 +274,12 @@ implementation checkpoint; it is not rerun after each documentation edit.
 The largest uncertainty is M3: the unchanged frame targets have repeatedly
 failed. A completion date before that is resolved would be speculative. M1 is
 complete in source, and M2's full headless replay and catalogue map are complete.
-The full matrix, rejected M3-A and rejected tile-culling comparisons are now
-recorded. The next deliverable is a material retained-work architecture decision
-and bounded implementation against the same frame targets, followed by a full
-matrix rerun only after adoption. Update the remaining estimate from that result.
+The full matrix, rejected M3-A/tile-culling comparisons and rejected row-fragment
+feasibility are recorded. M3 now needs a separate material architecture decision
+against the same targets. Do not continue tuning the rejected prototype. Complete
+the independent M6 minimum-Go-toolchain check next, then return to the architecture
+decision; rerun the full matrix only after an adopted change. Update the remaining
+estimate from those results.
 An eight-hour final soak,
 human accessibility/input verification and required display availability must
 be budgeted in addition to implementation time.
@@ -275,10 +288,10 @@ be budgeted in addition to implementation time.
 | --- | --- | --- |
 | M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. Next: material retained-work implementation below; no further AX/upload/culling microtuning. |
+| M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. Next: separate material architecture decision; no further AX/upload/culling/row-cache tuning. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
-| M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. Final SDK refresh, exact runtime/asset rights closure and owner approval remain. |
+| M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. Next: actual Go 1.25.6 compatibility (recent consumers used 1.27.2). Final SDK refresh, exact runtime/asset rights closure and owner approval remain. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.

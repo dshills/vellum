@@ -1,0 +1,486 @@
+{
+  "archive": "records.tar.gz",
+  "archive_sha256": "811aae106ad1d636349e5e3c38bdaaf3aec75fbf17ceef1ff1e43c2b7f6a8858",
+  "files": {
+    "assessment.json": {
+      "bytes": 1495,
+      "sha256": "103e3f4ac4a4235bb72adbcc3f3cfcacf4a4a870c99897ce467ae11bb770d6ec"
+    },
+    "build-command.json": {
+      "bytes": 3082,
+      "sha256": "c1e44d645754c1ee1cafb9bd676d5d9f9bade938c6e72821734ed8a42979f514"
+    },
+    "build-diagnostic-command.json": {
+      "bytes": 3257,
+      "sha256": "956de786f1b3e36585553e710a09001515e68c5e66ad6296d2aadf8580d9fa81"
+    },
+    "build-diagnostic.stderr": {
+      "bytes": 1123,
+      "sha256": "6bd479e41fd7cde8fff6e83730c0d67cadc75f0a49fcff54eea76b414335c609"
+    },
+    "build-diagnostic.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build.stderr": {
+      "bytes": 1123,
+      "sha256": "6bd479e41fd7cde8fff6e83730c0d67cadc75f0a49fcff54eea76b414335c609"
+    },
+    "build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "check.py": {
+      "bytes": 3659,
+      "sha256": "82c599a052e98045a9e6d0d6d22edeffecc94bcda0cb70e23867aff455a4d997"
+    },
+    "cleanup_generated.py": {
+      "bytes": 1682,
+      "sha256": "32c3922157ec2da616d62779cc2bc3227686fc5961daf13661f27bdbdd591ef8"
+    },
+    "diagnostic/cpu/native.log": {
+      "bytes": 244755,
+      "sha256": "9c2640bcf6811038d8521856f950479273327c2ffa859553c095ac657cd92ab4"
+    },
+    "diagnostic/cpu/result.json": {
+      "bytes": 422320,
+      "sha256": "ce6d95fb57b33ca453f88e51af7a5977f0dbf3f3bd359c302d9456a37a28a168"
+    },
+    "diagnostic/gpu/native.log": {
+      "bytes": 778202,
+      "sha256": "1ad5df7d54a7918a4305588147a004dfc60bf1ec72322b26c78f8aaeb9e32706"
+    },
+    "diagnostic/gpu/result.json": {
+      "bytes": 422733,
+      "sha256": "61625f9cf3b71610c10e203767c8a7edc0fb52ebe821827c832b94440caa14cf"
+    },
+    "diagnostic/gpu/row-reuse.json": {
+      "bytes": 671697,
+      "sha256": "1d4575d0a5c38b93ff77ffcb459a9199ad48d5d3104f0b88f173e79c22707c17"
+    },
+    "diagnostic-gpuscene-renderer.go": {
+      "bytes": 10447,
+      "sha256": "19d09cb6d1ae27ae6824fb9b75b143ccf422de5e3c6c279fe5553c2787e6804e"
+    },
+    "diagnostic-overlay.json": {
+      "bytes": 3166,
+      "sha256": "81d8370b50e5952259a24475588606849b2deaefd9ef47af5fe3c6b3644ce0bb"
+    },
+    "diagnostic-rasterx-renderer.go": {
+      "bytes": 9733,
+      "sha256": "1d834eec20accf00a2e1aa99a1b332996fee429249e447cf226b8a26b4787fb7"
+    },
+    "diagnostic-result.json": {
+      "bytes": 2165,
+      "sha256": "158e80117a46be775a6653cdf69f9c2879d1036eb0cdb76802d089e17d38b9fd"
+    },
+    "diagnostic-row.go": {
+      "bytes": 15792,
+      "sha256": "335cb01c69b180187aa4f3eb94e0d8976b69bef8c25b3095b21897aeb5dae4c6"
+    },
+    "draft_edge_tests.go": {
+      "bytes": 1711,
+      "sha256": "38c25bb639ca66b251b3875b2495459fd8d4c0e13cd7db4303c3efd18e3a0171"
+    },
+    "draft_native_test.go": {
+      "bytes": 3814,
+      "sha256": "67824f9df297f2d3f03de3d085c9dc3c7465a3a7a1f6a7b0b59411104c6d4fef"
+    },
+    "feasibility-plan.json": {
+      "bytes": 3544,
+      "sha256": "1e1c74e8491d10d9c0c3c845e53dd44612dc7c80be28f379b93da51575330486"
+    },
+    "final-checks.json": {
+      "bytes": 413,
+      "sha256": "3d5d3e6e5821ddc8f504bbfdffa013fd8b540e1b8ddaf12b9e8806ee6a3bea6e"
+    },
+    "finish_patch.py": {
+      "bytes": 2692,
+      "sha256": "19fe894368b3c3b6832b489027feaf291461f5ba0bd35179860106f86344fcd8"
+    },
+    "focused-v1-command.json": {
+      "bytes": 592,
+      "sha256": "938da16d6fd1938c7164ef80a23263fc8b8b07e216ddab49eb041c8df7d71b4c"
+    },
+    "focused-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "focused-v1.stdout": {
+      "bytes": 482,
+      "sha256": "adea4839362f0010fce709e9aad285118f6ee27daa29e8e9b19a931d78bf71dd"
+    },
+    "focused-v2-command.json": {
+      "bytes": 591,
+      "sha256": "a04f3798abf196c06e3360d85dbb2cabbcacc25d6e59d919250368732e59784c"
+    },
+    "focused-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "focused-v2.stdout": {
+      "bytes": 756,
+      "sha256": "6c20f3acb9c834c96ca9aa9ab22241b9e1b538128a81f7b8759bc0aca5cac196"
+    },
+    "focused-v4-command.json": {
+      "bytes": 591,
+      "sha256": "606787b80769536303b2a8596eb861658946914796ab028722c9b970e9e86b6d"
+    },
+    "focused-v4.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "focused-v4.stdout": {
+      "bytes": 1598,
+      "sha256": "e682e975d534508537fbd03e829ebcbbb3218cd9d3dd113d2c6c58424e40b95b"
+    },
+    "focused-v5-command.json": {
+      "bytes": 591,
+      "sha256": "cc4086b2442c11573c62b6e8c93184a9cb42f52e8e94d1fcb99f4a622d47b97d"
+    },
+    "focused-v5.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "focused-v5.stdout": {
+      "bytes": 1864,
+      "sha256": "6520e5a81143e044687aa45f0ce52f0d9c0fe8187adaf6cce6aeecb684be5abb"
+    },
+    "full-controller-v1.json": {
+      "bytes": 192,
+      "sha256": "9c323038d8b435fd97ba4b479b6b055e8b3f04344c842d92ec73b3eedc436ef7"
+    },
+    "full-v2-command.json": {
+      "bytes": 590,
+      "sha256": "3ae7031099a865a0e90d067dc18c88abb260d131fbb3087f5aa18095cfa5f7cf"
+    },
+    "full-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full-v2.stdout": {
+      "bytes": 105013,
+      "sha256": "bae864b4f71125ea3e8f93516138cf46edbfa05361a7cbf7583beaede068d6c2"
+    },
+    "full-v3-command.json": {
+      "bytes": 590,
+      "sha256": "e77706f45085fe1bede3e017a52b96cf7b61b6014e25efa13545fcf11d81310c"
+    },
+    "full-v3.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full-v3.stdout": {
+      "bytes": 105358,
+      "sha256": "707d658ff6d9e59ed4219a82e0157af18f19731a4713d83ab494bd031dcb81c1"
+    },
+    "full-v4-command.json": {
+      "bytes": 589,
+      "sha256": "41eeac18482a0b83d075d02695652030ac56c70e1583c426277b4e046f5ca752"
+    },
+    "full-v4.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full-v4.stdout": {
+      "bytes": 106220,
+      "sha256": "c308c75f2c4bb4e545c94012e77811ac499697f7166539f8ef910a444a33f099"
+    },
+    "full-v5-command.json": {
+      "bytes": 3193,
+      "sha256": "ea66cf21c1521386a7decb472fd2f6cfb854c3dd5823e9890179b62700a4bf51"
+    },
+    "full-v5.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full-v5.stdout": {
+      "bytes": 106344,
+      "sha256": "64bc809b77d65befcbbd22121ddb5b8d97a61d2174b54819284d22430c89acec"
+    },
+    "full.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "generated-output-cleanup.json": {
+      "bytes": 3843,
+      "sha256": "499d75f5aad9e38c750cb0175ba1bd2ffeae914eea2401690f88d30ece566b82"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/grad.png": {
+      "bytes": 17545,
+      "sha256": "fa6dd8db05300fe8156aa38800622f4dc3aa68d73b4707986047529d71f47d5c"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/roundRect.png": {
+      "bytes": 17476,
+      "sha256": "80ee076bce45cf16f5aad64ac655a1f0d5cef01cbca122b2e46026d347583507"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD0.png": {
+      "bytes": 54759,
+      "sha256": "79ff693070f9b90bb7c04c9e7cb49224ce5ef281a091b1c9043b1a2ef082c119"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD1.png": {
+      "bytes": 50840,
+      "sha256": "b77d2705972eb8cd9f2fa6da22008d4729635aafa1e45bbeda15cca01de405e4"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD2.png": {
+      "bytes": 47944,
+      "sha256": "e585b233c8fe640eb4cd221ffd5b6acf8469052adda9238cd3f825c1c696721b"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD3.png": {
+      "bytes": 53017,
+      "sha256": "ed5c61402671407b4aa95b11c6749d2681f6eba89b3eaef81de52936a13f0460"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD4.png": {
+      "bytes": 45280,
+      "sha256": "e399f2537c0828e1c5af10bfdf49511ee575977c87c50a8e3ad043da7a4eb04f"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD5.png": {
+      "bytes": 45280,
+      "sha256": "e399f2537c0828e1c5af10bfdf49511ee575977c87c50a8e3ad043da7a4eb04f"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeD6.png": {
+      "bytes": 45276,
+      "sha256": "c8965ebb87485b452b3584c6c9d8bfa0ee35864e5486eb09a828246b1a12c161"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeF.png": {
+      "bytes": 25352,
+      "sha256": "c205384f706c3755167c2df326b4eb89eab9c324946ac564923feee5055749b0"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeS1.png": {
+      "bytes": 47878,
+      "sha256": "f96e3bf637255344edd1e31a24cb84b7c9e695a117a8b553ab06b1df6259e869"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeS2.png": {
+      "bytes": 47878,
+      "sha256": "f96e3bf637255344edd1e31a24cb84b7c9e695a117a8b553ab06b1df6259e869"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeS3.png": {
+      "bytes": 45276,
+      "sha256": "c8965ebb87485b452b3584c6c9d8bfa0ee35864e5486eb09a828246b1a12c161"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeT1.png": {
+      "bytes": 6662,
+      "sha256": "dd7472c8e46800fe2f4e30ceb136be0a1b7870e0caec834b9111e41184a737b6"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeT2.png": {
+      "bytes": 6662,
+      "sha256": "dd7472c8e46800fe2f4e30ceb136be0a1b7870e0caec834b9111e41184a737b6"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/shapeT3.png": {
+      "bytes": 6662,
+      "sha256": "dd7472c8e46800fe2f4e30ceb136be0a1b7870e0caec834b9111e41184a737b6"
+    },
+    "generated-raster-test-output/upstream/paint/renderers/rasterx/testdata/tmf.png": {
+      "bytes": 28847,
+      "sha256": "bb8a3f043221f4d72307aeac5a94e3a0c10c2587cd4999be4735e6f3b996c4c0"
+    },
+    "grid-command.json": {
+      "bytes": 590,
+      "sha256": "03b8e6c62afb281b66b86a240dd0fcf2344248bfcda71bbfbbc87b1dbd6605e8"
+    },
+    "grid-v2-command.json": {
+      "bytes": 558,
+      "sha256": "2b8f7a1a9aa92871f0a35cb591886c5638b9002b02d6274ff5d0b352bdbf8b16"
+    },
+    "grid-v2.stderr": {
+      "bytes": 1171,
+      "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+    },
+    "grid-v2.stdout": {
+      "bytes": 17241,
+      "sha256": "d829338f6c1703536a6a95bdeb7557afbd2f2600479c079e0e33e1dbb258609f"
+    },
+    "grid-v3-command.json": {
+      "bytes": 557,
+      "sha256": "190dcb76f8cc01599fe426dd6327e7fd7b7ffe0f552650ae9f67597f39afc99d"
+    },
+    "grid-v3.stderr": {
+      "bytes": 1171,
+      "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+    },
+    "grid-v3.stdout": {
+      "bytes": 17241,
+      "sha256": "a114d914d46b51a73c6cbb9e78a753f93e9c5186bddb04be9a13145ec1108a51"
+    },
+    "grid-v4-command.json": {
+      "bytes": 3160,
+      "sha256": "9b8825d3d232d15152a0c32e7b00f7096d9cd9638d5cbddc2672567654ba0a2d"
+    },
+    "grid-v4.stderr": {
+      "bytes": 1171,
+      "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+    },
+    "grid-v4.stdout": {
+      "bytes": 17241,
+      "sha256": "a78e9e8f0ae3d1e7d94f14153aae4ae5a0e0f90600c033bf877843d32b223f28"
+    },
+    "grid.stderr": {
+      "bytes": 1171,
+      "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+    },
+    "grid.stdout": {
+      "bytes": 24672,
+      "sha256": "906134e2eb380facbc5f071b355cb77d70dbf7e37b7b8127123f72f2f0fa9df5"
+    },
+    "internal-code-review.json": {
+      "bytes": 974,
+      "sha256": "2476851a8375d9c3b98c9ed02235d13db4098b1a65c9034c79d6bc2cb163ccfd"
+    },
+    "internal-documentation-review.json": {
+      "bytes": 362,
+      "sha256": "14e8b6c08af9c12fef1a6000f1ac01f016a3f078c220eb0a089efb9bfa333498"
+    },
+    "internal-results-review.json": {
+      "bytes": 459,
+      "sha256": "0c1164622f6663731fd483af8c76048ac559c3b98f6163b1cce23e5f96535734"
+    },
+    "make_diagnostic.py": {
+      "bytes": 3340,
+      "sha256": "b8c2218b71572cb5277a285478c3bbcc2cb6867996a8c7cefbb88fadf644eac0"
+    },
+    "native-admission.json": {
+      "bytes": 374,
+      "sha256": "4be7b490a93454454b7dfc4348d228c82a933760fbd49ef80c814ffa7c5a4202"
+    },
+    "native-gpu-admission.json": {
+      "bytes": 374,
+      "sha256": "a97d3d29237d4a0878ee8c3ce7441cc0639ae25bad10039bf2bbd42ef8513f20"
+    },
+    "native-gpu-command.json": {
+      "bytes": 3088,
+      "sha256": "fb469ce587741a45c2ee7fb3c1d30c2743fa9370e5d927fa13877b4643052c97"
+    },
+    "native-gpu-plan.json": {
+      "bytes": 3147,
+      "sha256": "53ae9b01120a2340cc2dfca6faa9afbd2bdc20293519c50f32e44e90fda08df2"
+    },
+    "native-gpu.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native-gpu.stdout": {
+      "bytes": 2249,
+      "sha256": "801206f4d6a9d6bbe5b5413216c5be982b823fdde845f741c5ddd19e35677d22"
+    },
+    "native-plan.json": {
+      "bytes": 5756,
+      "sha256": "595162efd35826684089f6104df4e1388e6131fcc3c0b46d085aae0fc8b759c2"
+    },
+    "native.py": {
+      "bytes": 10415,
+      "sha256": "1581a6c8eb204fe18c7dfc830956e7dd852e8b18a0b5bc7b858f0c52135dde15"
+    },
+    "overlay.json": {
+      "bytes": 2973,
+      "sha256": "bb35f75dc7ca1bdb3295d9a52c0bfdb41771c3d7da600e59df4fb5f1794e256e"
+    },
+    "package_checkpoint.py": {
+      "bytes": 3058,
+      "sha256": "4d495f64354e4eceb9dfb4322d4c51c92722d0502c8dbe09c81b5b656374c109"
+    },
+    "patch.py": {
+      "bytes": 2863,
+      "sha256": "c9302f9461c67b49d2909f25fa4cdd147ed4afe922b7dba7b04f2e952ae368c9"
+    },
+    "post-native-proof.json": {
+      "bytes": 692,
+      "sha256": "ff022efd82deb4c6fdd9ec6017541ee4e59e7ef2eab41d9a6d64b57d641317e8"
+    },
+    "prism-command.json": {
+      "bytes": 775,
+      "sha256": "8b0deb842bec44eab678f4f2dc34bf0de53198d750585058789659cd25a3dab8"
+    },
+    "prism-rules.json": {
+      "bytes": 1976,
+      "sha256": "098012aca16449941ad9a830ceaaa992147e9a0b8598f94cc5815e8cd36906d1"
+    },
+    "prism.json": {
+      "bytes": 1077,
+      "sha256": "c546e4b309dea77d50a5c4a0ed1e7519948ca0f55fd2a518fa0ff2f2e6b8d984"
+    },
+    "prism.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism_review.py": {
+      "bytes": 994,
+      "sha256": "256579a9db01651cbcaaf325467959d86d01bf28d748e9dfb5735cd50f22d861"
+    },
+    "source/grid_glyph_placement_warm_offscreen_test.go": {
+      "bytes": 5984,
+      "sha256": "7851029ff41327fc378046fe1d955c0ed56911d964ba7daf3c66862465f0246c"
+    },
+    "source/paint/renderers/gpuscene/row_fragments_native_vellum_test.go": {
+      "bytes": 4228,
+      "sha256": "8ac7fbab1a59b8130f5b96ddcbc098b168b20d3abf9f2277872532e90f172061"
+    },
+    "source/paint/renderers/rasterx/outline_cache.go": {
+      "bytes": 5160,
+      "sha256": "0d9864050822f10ce3bab1387c41f0d8a404c9d52d7c809dfceb867c76a7b4b0"
+    },
+    "source/paint/renderers/rasterx/renderer.go": {
+      "bytes": 9397,
+      "sha256": "e96f69ef81cf0e973e00b2b54bc4c9551fc5171a67dd9d4da74fbbce3be6a52e"
+    },
+    "source/paint/renderers/rasterx/row_fragments_vellum.go": {
+      "bytes": 14495,
+      "sha256": "558bc0b6b8995194992e697b94feb57ff72a87572a49e3d154a0baaf91606a15"
+    },
+    "source/paint/renderers/rasterx/row_fragments_vellum_test.go": {
+      "bytes": 14015,
+      "sha256": "ce2bd57ce333b27b2b5b104c1fa6853641b6f9134cfe7783b5362d6199ec2b60"
+    },
+    "source/paint/renderers/rasterx/scene_packet.go": {
+      "bytes": 12980,
+      "sha256": "ada73b353f5ef9eb9e6ad4155013cf01290acd8aaec1fe950d0d993c5ab9f030"
+    },
+    "source/paint/renderers/rasterx/text.go": {
+      "bytes": 19800,
+      "sha256": "ac23d4c67b673bb53ca140ecbdef06e60a2996a185bfb98f975f4502899c6ffe"
+    },
+    "source/paint/renderers/rasterx/text_batch_test.go": {
+      "bytes": 3462,
+      "sha256": "9e40d9077b8349e1e0b818cae09ffb94870b9c05d756266f90b25cb2260c8c17"
+    },
+    "source/paint/renderers/sceneplan/fragment_vellum.go": {
+      "bytes": 3739,
+      "sha256": "b786920f6bc3e46f48300aa1ec6d9ae8edabc8a62cea1c3e3201a284152c6ac4"
+    },
+    "source/paint/renderers/sceneplan/fragment_vellum_test.go": {
+      "bytes": 2772,
+      "sha256": "f1bd5c6bb4dc93625baf1bc06f35633ed954ed7c74f3c711087cf30a3ded4d9b"
+    },
+    "start.py": {
+      "bytes": 1248,
+      "sha256": "b60a1ea993de8d377a99f0078366510eca2d44c2c4079765eca869480fc37dbf"
+    },
+    "test-disposition.json": {
+      "bytes": 603,
+      "sha256": "b05be7538c0b7245ff7abcad95f86c9212515141d3bbd5f119b42cb8564ae9b4"
+    },
+    "vet-command.json": {
+      "bytes": 3134,
+      "sha256": "3d76f27ee8dd8ca8e7e25555d46b85bd380da050b9bc7e3791db767b1f6384f3"
+    },
+    "vet.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vet.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "write_checkpoint.py": {
+      "bytes": 10725,
+      "sha256": "904e721eb13b052778186a29fd7069cf2e05a7c5275309966e8cbe979b718df7"
+    }
+  }
+}
