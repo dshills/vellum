@@ -12,6 +12,8 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/paint/ppath"
+	"cogentcore.org/core/paint/render"
+	"cogentcore.org/core/paint/renderers/gpuscene"
 	"cogentcore.org/core/paint/renderers/rasterx"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/states"
@@ -310,5 +312,62 @@ func TestManagedGridPanePaintRefusesOverlapAndAncestorEffects(t *testing.T) {
 				t.Fatal(err)
 			}
 		})
+	}
+}
+
+// Public PaintText is mutable. A transient batch must observe the current shaped
+// values on every replay; pointer identity is not a layout immutability proof.
+func TestManagedGridPanePaintBatchObservesMutableLayout(t *testing.T) {
+	model, _ := testNativeGrid(t, 10000)
+	config := manualConfig(t, 7)
+	config.LogicalDPI = 162
+	m, a := gridManual(t, config, func() ui.Node { return ui.Node{ID: "g", Kind: ui.DataGrid, Grid: model, Grow: true} })
+	gridFrame(t, m)
+	if err := a.Do(func() {
+		w := m.implementation.find("one").state
+		scene, g := w.body.Scene, w.root.control.grid
+		// Native GPU composition uses this wrapper, not the offscreen rasterx
+		// renderer. Capability delegation is necessary for actual batching.
+		previous := scene.Renderer
+		gpu := gpuscene.New(math32.FromPoint(scene.SceneGeom.Size)).(*gpuscene.Renderer)
+		scene.Renderer = gpu
+		defer func() { scene.Renderer = previous; gpu.Release() }()
+		before, _ := gridPaintPixels(scene, false)
+		scene.RenderWidget()
+		items := scene.Painter.RenderDone()
+		batches, entries := 0, 0
+		for _, item := range items {
+			if b, ok := item.(*render.TextBatch); ok {
+				batches++
+				entries += b.Len()
+			}
+		}
+		if batches == 0 || entries < 20 {
+			t.Fatalf("162-DPI route did not actually batch: %d/%d", batches, entries)
+		}
+		for _, tx := range g.cells {
+			if p := tx.PaintText(); p != nil {
+				p.Offset.X += 3
+			}
+		}
+		original, _ := gridPaintPixels(scene, true)
+		actual, _ := gridPaintPixels(scene, false)
+		if bytes.Equal(before.Pix, actual.Pix) {
+			t.Fatal("layout mutation invisible")
+		}
+		if !bytes.Equal(original.Pix, actual.Pix) {
+			t.Fatal("batch reused stale mutable layout")
+		}
+		scene.RenderWidget()
+		items = scene.Painter.RenderDone()
+		renderer := rasterx.New(math32.FromPoint(scene.SceneGeom.Size)).(*rasterx.Renderer)
+		packet := renderer.ScenePacket(items)
+		dst := image.NewRGBA(actual.Bounds())
+		if packet == nil || !packet.Replay(dst) || !bytes.Equal(dst.Pix, original.Pix) {
+			t.Fatal("capture ignored layout mutation")
+		}
+		t.Logf("actual 162-DPI batches=%d entries=%d", batches, entries)
+	}); err != nil {
+		t.Fatal(err)
 	}
 }

@@ -509,7 +509,7 @@ content refuses the entire pane proof. Decorated/differently colored cells keep
 their original box paint. Backgrounds are derived from current style and the
 already rendered parent's current background, not a stale pane cache.
 
-Temporary RenderBox changes apply only within the complete Frame.RenderWidget
+Temporary RenderBox changes apply only within the complete pane frame
 traversal and restore on normal or abnormal exit. An individual Text repaint
 therefore retains its normal background clearing. The existing experimental
 verified-scroll protocol keeps its original painter. A private reference switch
@@ -521,3 +521,38 @@ changes and isolated text repainting. The matrix includes 162 DPI and requires
 actual command reduction there. Native timing and actual GPU-route evidence
 remain separate; this optimization alone does not qualify the unchanged 4/6 ms
 frame targets or memory/endurance requirements.
+
+## Passive text batches and immutable bitmap resources
+
+Stage0079 groups contiguous eligible passive text leaves within the same full
+managed pane repaint. The driver first applies the background proof above.
+Custom-frame traversal then preserves visibility, dirty consumption, background
+updates, current shaped layouts, painter order, parts and scrollbars. Pending
+shaping, selected/highlighted or decorated cells, children/parts and debug views
+use ordinary widget rendering. Other renderers decline the explicit capability;
+rasterx and the GPU wrapper support it, including ordinary CPU fallback.
+
+This is a transient command representation. Public PaintText layouts remain
+mutable and are read each frame. No cross-frame layout identity or translated
+text-packet cache is introduced. Capture charges the original logical context,
+text and pop commands and retains full text/outline preflight and original glyph
+placement arithmetic. Both bitmap and small-outline text use the batch; the
+existing small-outline span cache and shader remain unchanged.
+
+Only immutable zero-origin masks returned by the private bitmap glyph cache may
+use a sealed snapshot bank. Each renderer retains at most 1,024 entries and
+8 MiB of charged original mask backing, detached snapshot backing and entry
+structs. Queue/map/allocator metadata and other caches are separate. Every packet
+charges each immutable snapshot once and owns its bytes through ordinary Go
+references after bank eviction, resize or release. No accessor exposes mutable
+snapshot pixels. Arbitrary public GlyphMask/image inputs retain copy-and-compare
+ownership. No snapshot captures fonts, layouts, applications or GPU handles.
+
+The [checkpoint](../docs/reports/macos-text-batch/README.md) records exact original
+CPU/packet pixels at five DPI values, actual GPU-wrapper batching at 162 DPI,
+mutable layout visibility, source detachment, clipping, legacy encoding, logical
+admission, refusal/fallback and cache retirement. Five matched fixed 10k/400-cell
+native pairs reduce median run-p95 from 5.168 to 4.951 ms and observed process Go
+allocation by about 20%. Every candidate p95 still misses 4 ms. Diagnostic GPU
+captures and native compositor pixel tests remain separate from ordinary frame,
+presentation, physical pointer, memory and full Mac qualification.

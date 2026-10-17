@@ -20,17 +20,17 @@ func (p *gridPane) RenderWidget() {
 	restore := p.elideCoveredCellBoxes()
 	defer restore()
 	if p.Scene == nil || p.Scene.Painter.State == nil {
-		p.Frame.RenderWidget()
+		p.renderPaneFrame()
 		return
 	}
 	enabled, _ := p.Scene.Property(gridScrollReuseProperty).(bool)
 	if !enabled {
-		p.Frame.RenderWidget()
+		p.renderPaneFrame()
 		return
 	}
 	items := &p.Scene.Painter.Render
 	start := len(*items)
-	p.Frame.RenderWidget()
+	p.renderPaneFrame()
 	g := p.binding
 	if g == nil || g.closed.Load() || !g.projectionReady || g.geometryRefused || start >= len(*items) {
 		return

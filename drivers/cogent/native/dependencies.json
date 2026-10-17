@@ -782,6 +782,17 @@
               "sha256": "d3af33ae13f06e1e5a563fd46b47564e29aa3c31c60c784d0222847ad7042699"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/textbatch",
+          "inputs": "native/patches/textbatch/original-hashes.json",
+          "outputs": "native/patches/textbatch/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/textbatch/0079-passive-text-batch-and-mask-resources.patch",
+              "sha256": "5c605c276c25a83f61c346101804b7fec7f71829bf5e0fd92b05ae5cbff826ac"
+            }
+          ]
         }
       ]
     },

@@ -1,0 +1,675 @@
+--- /dev/null
++++ b/core/passive_text_batch.go
+@@ -0,0 +1,62 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/styles/sides"
++	"cogentcore.org/core/tree"
++)
++
++// RenderPassiveTextBatch performs an ordinary custom-frame traversal while
++// batching contiguous undecorated passive Text leaves whose box was already
++// suppressed by a full-background proof. False has no effects. Renderers without
++// the explicit capability, debug painting and stacked frames retain the normal
++// traversal. Pending shaping and interactive/highlighted text retain RenderWidget.
++func (fr *Frame) RenderPassiveTextBatch() bool {
++	sc := fr.Scene
++	if sc == nil || sc.Painter.State == nil || fr.Styles.Display != styles.Custom || DebugSettings.RenderTrace || sc.renderBBoxes || sc.selectedWidget != nil {
++		return false
++	}
++	capability, ok := sc.Renderer.(render.TextBatchRenderer)
++	if !ok || !capability.SupportsTextBatch() {
++		return false
++	}
++	if !fr.StartRender() {
++		return true
++	}
++	fr.This.(Widget).Render()
++	var batch *render.TextBatch
++	flush := func() {
++		if batch != nil && batch.Len() != 0 {
++			sc.Painter.Render.Add(batch)
++		}
++		batch = nil
++	}
++	fr.ForWidgetChildren(func(_ int, child Widget, wb *WidgetBase) bool {
++		tx, ok := child.(*Text)
++		if !ok || tx.This != tx || tx.Styles.RenderBox || tx.Parts != nil || len(tx.Children) != 0 || tx.Styles.Abilities != 0 || tx.localTextPending || tx.paintText == nil || tx.selectRange.Len() != 0 || len(tx.highlights) != 0 || !sides.AreZero(tx.Styles.Border.Radius.Dots().Sides) {
++			flush()
++			child.RenderWidget()
++			return tree.Continue
++		}
++		tx.setFlag(false, widgetNeedsRender)
++		if !tx.IsVisible() {
++			return tree.Continue
++		}
++		tx.Styles.ComputeActualBackground(tx.parentActualBackground())
++		tx.paintText.SelectReset()
++		tx.paintText.HighlightReset()
++		sc.Painter.Paint.Defaults()
++		if batch == nil {
++			batch = render.NewTextBatch(sc.Painter.Context())
++		}
++		batch.Add(tx.paintText, tx.Geom.Pos.Content, tx.Geom.TotalBBox)
++		return tree.Continue
++	})
++	flush()
++	fr.renderParts()
++	fr.RenderScrolls()
++	fr.EndRender()
++	return true
++}
+--- /dev/null
++++ b/paint/render/text_batch.go
+@@ -0,0 +1,54 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package render
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/styles"
++	"cogentcore.org/core/text/shaped"
++	"fmt"
++	"image"
++)
++
++// TextBatchRenderer admits this transient command form. Other renderers retain
++// ordinary Text commands. Shapes have the same borrowed lifetime as NewText;
++// no layout identity or immutability is inferred across frames.
++type TextBatchRenderer interface{ SupportsTextBatch() bool }
++
++type TextEntry struct {
++	Text     *shaped.Lines
++	Position math32.Vector2
++	Bounds   image.Rectangle
++}
++
++type TextBatch struct {
++	context Context
++	entries []TextEntry
++}
++
++func NewTextBatch(parent *Context) *TextBatch {
++	// Reproduce StartRender's default cell context followed by NewText's context.
++	// Every eligible cell has a rectangular, zero-radius clip.
++	cell := NewContext(nil, &parent.Bounds, parent)
++	var defaults styles.Paint
++	defaults.Defaults()
++	batch := &TextBatch{}
++	batch.context.Init(&defaults, nil, cell)
++	return batch
++}
++func (b *TextBatch) Add(lines *shaped.Lines, position math32.Vector2, bounds image.Rectangle) {
++	b.entries = append(b.entries, TextEntry{lines, position, bounds})
++}
++func (b *TextBatch) Len() int {
++	if b == nil {
++		return 0
++	}
++	return len(b.entries)
++}
++func (b *TextBatch) At(i int) Text {
++	e := b.entries[i]
++	t := Text{Text: e.Text, Position: e.Position, Context: b.context}
++	t.Context.Bounds = Bounds{Rect: math32.B2FromRect(e.Bounds)}
++	return t
++}
++func (*TextBatch) IsRenderItem()    {}
++func (b *TextBatch) String() string { return fmt.Sprintf("passive text batch: %d", b.Len()) }
+--- a/paint/renderers/gpuscene/renderer.go
++++ b/paint/renderers/gpuscene/renderer.go
+@@ -48,6 +48,10 @@
+ func New(size math32.Vector2) render.Renderer {
+ 	return &Renderer{cpu: rasterx.New(size).(*rasterx.Renderer)}
+ }
++func (r *Renderer) SupportsTextBatch() bool {
++	return r != nil && r.cpu != nil && r.cpu.SupportsTextBatch()
++}
++
+ func (r *Renderer) Size() (units.Units, math32.Vector2) { return r.cpu.Size() }
+ func (r *Renderer) Source() []byte                      { return nil }
+ func (r *Renderer) Stats() Stats {
+--- /dev/null
++++ b/paint/renderers/rasterx/glyph_mask_resource.go
+@@ -0,0 +1,69 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"image"
++	"unsafe"
++)
++
++const glyphMaskResourceEntries = 1024
++const glyphMaskResourceBytes = 8 << 20
++
++type glyphMaskResourceEntry struct {
++	source   *image.Alpha
++	resource *sceneplan.MaskResource
++	bytes    int
++}
++
++// Keys come exclusively from the private immutable bitmap glyph cache. Account
++// for both the strongly retained original backing and the detached snapshot.
++// No font, layout, painter, packet or application references are retained.
++type glyphMaskResourceCache struct {
++	entries            map[*image.Alpha]*glyphMaskResourceEntry
++	queue              [glyphMaskResourceEntries]*glyphMaskResourceEntry
++	head, count, bytes int
++	hits, misses       uint64
++}
++
++func (rs *Renderer) maskResources() *glyphMaskResourceCache {
++	if rs.glyphMasks == nil {
++		rs.glyphMasks = &glyphMaskResourceCache{}
++	}
++	return rs.glyphMasks
++}
++func (c *glyphMaskResourceCache) get(mask *image.Alpha) *sceneplan.MaskResource {
++	if e := c.entries[mask]; e != nil {
++		c.hits++
++		return e.resource
++	}
++	c.misses++
++	if mask == nil || mask.Rect.Min != (image.Point{}) || mask.Rect.Dx() > glyphMaxSize || mask.Rect.Dy() > glyphMaxSize {
++		return nil
++	}
++	resource := sceneplan.NewMaskResource(mask)
++	if resource == nil {
++		return nil
++	}
++	cost := len(mask.Pix) + int(unsafe.Sizeof(image.Alpha{})) + resource.Bytes() + int(unsafe.Sizeof(glyphMaskResourceEntry{}))
++	if cost > glyphMaskResourceBytes {
++		return nil
++	}
++	for c.count > 0 && (c.count == glyphMaskResourceEntries || c.bytes+cost > glyphMaskResourceBytes) {
++		e := c.queue[c.head]
++		delete(c.entries, e.source)
++		c.bytes -= e.bytes
++		c.queue[c.head] = nil
++		c.head = (c.head + 1) % glyphMaskResourceEntries
++		c.count--
++	}
++	if c.entries == nil {
++		c.entries = make(map[*image.Alpha]*glyphMaskResourceEntry)
++	}
++	e := &glyphMaskResourceEntry{mask, resource, cost}
++	c.entries[mask] = e
++	c.queue[(c.head+c.count)%glyphMaskResourceEntries] = e
++	c.count++
++	c.bytes += cost
++	return resource
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/glyph_mask_resource_test.go
+@@ -0,0 +1,53 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"bytes"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"image"
++	"image/draw"
++	"testing"
++)
++
++func TestGlyphMaskResourceBoundsEvictionAndRetirement(t *testing.T) {
++	for _, size := range []int{8, 128} {
++		cache := &glyphMaskResourceCache{}
++		source := image.NewAlpha(image.Rect(0, 0, size, size))
++		for i := range source.Pix {
++			source.Pix[i] = 127
++		}
++		resource := cache.get(source)
++		if resource == nil || cache.get(source) != resource || cache.hits != 1 {
++			t.Fatal("warm identity miss")
++		}
++		b := sceneplan.New(image.Rect(0, 0, 256, 256))
++		b.DrawMaskResource(image.Rect(5, 6, size+5, size+6), image.White, resource, image.Point{}, draw.Over)
++		packet := b.Seal(false)
++		before := image.NewRGBA(packet.Bounds())
++		packet.Replay(before)
++		for range glyphMaskResourceEntries + 1 {
++			cache.get(image.NewAlpha(image.Rect(0, 0, size, size)))
++		}
++		if cache.entries[source] != nil || cache.count > glyphMaskResourceEntries || cache.bytes > glyphMaskResourceBytes {
++			t.Fatal("unbounded mask retention")
++		}
++		after := image.NewRGBA(packet.Bounds())
++		packet.Replay(after)
++		if !bytes.Equal(before.Pix, after.Pix) {
++			t.Fatal("eviction changed live packet")
++		}
++	}
++	rs := New(math32.Vec2(32, 32)).(*Renderer)
++	rs.maskResources().get(image.NewAlpha(image.Rect(0, 0, 4, 4)))
++	rs.SetSize(0, math32.Vec2(33, 32))
++	if rs.glyphMasks != nil {
++		t.Fatal("resize retained masks")
++	}
++	rs.maskResources().get(image.NewAlpha(image.Rect(0, 0, 4, 4)))
++	rs.Release()
++	rs.Release()
++	if rs.glyphMasks != nil {
++		t.Fatal("release retained masks")
++	}
++}
+--- a/paint/renderers/rasterx/renderer.go
++++ b/paint/renderers/rasterx/renderer.go
+@@ -48,6 +48,7 @@
+ 	outlineCache         *staticOutlineCache
+ 	sceneScanner         *scan.Scanner
+ 	glyphCoverage        *glyphCoverageCache
++	glyphMasks           *glyphMaskResourceCache
+ 	glyphCoverageEnabled bool
+ }
+ 
+@@ -57,13 +58,20 @@
+ 	return rs
+ }
+ 
++func (*Renderer) SupportsTextBatch() bool { return true }
++
+ func (rs *Renderer) Image() image.Image { return rs.image }
+ func (rs *Renderer) Source() []byte     { return nil }
+ 
+ // Release drops derived outline/font references at scene retirement. Keep the
+ // CPU image available to existing snapshot callers; a reused renderer can build
+ // a fresh cache on its next paint. Calls share the renderer's owner serialization.
+-func (rs *Renderer) Release() { rs.outlineCache = nil; rs.sceneScanner = nil; rs.glyphCoverage = nil }
++func (rs *Renderer) Release() {
++	rs.outlineCache = nil
++	rs.sceneScanner = nil
++	rs.glyphCoverage = nil
++	rs.glyphMasks = nil
++}
+ 
+ func (rs *Renderer) Size() (units.Units, math32.Vector2) {
+ 	return units.UnitDot, rs.size
+@@ -76,6 +84,7 @@
+ 	rs.size = size
+ 	rs.sceneScanner = nil
+ 	rs.glyphCoverage = nil
++	rs.glyphMasks = nil
+ 	rs.scrollCache = nil
+ 	rs.scrollBytes = 0
+ 	rs.scrollPlanBytes = 0
+@@ -129,6 +138,16 @@
+ 				if !copy.Rect.Empty() {
+ 					copy.SourcePos = x.SourcePos.Add(copy.Rect.Min.Sub(original.Min))
+ 					copy.Render(rs.image)
++				}
++			}
++		case *render.TextBatch:
++			for j := 0; j < x.Len(); j++ {
++				text := x.At(j)
++				if clip != (image.Rectangle{}) {
++					text.Context.Bounds.Rect = text.Context.Bounds.Rect.Intersect(math32.B2FromRect(clip))
++				}
++				if !text.Context.Bounds.Rect.IsEmpty() {
++					rs.RenderText(&text)
+ 				}
+ 			}
+ 		case *render.Text:
+--- a/paint/renderers/rasterx/scene_packet.go
++++ b/paint/renderers/rasterx/scene_packet.go
+@@ -66,8 +66,20 @@
+ 	if b.Failed() || len(commands) > sceneplan.MaxOps {
+ 		return nil
+ 	}
++	expanded := len(commands)
++	for _, item := range commands {
++		if batch, ok := item.(*render.TextBatch); ok {
++			if batch == nil || batch.Len() == 0 || batch.Len() > sceneplan.MaxOps/3 {
++				return nil
++			}
++			expanded += batch.Len()*3 - 1
++			if expanded > sceneplan.MaxOps {
++				return nil
++			}
++		}
++	}
+ 	work := &sceneWorkBudget{remaining: sceneMaxWork, outlines: font.NewGlyphOutlineBudget(1<<20, 1<<20)}
+-	if !work.take(len(commands)) {
++	if !work.take(expanded) {
+ 		return nil
+ 	}
+ 	for _, item := range commands {
+@@ -84,6 +96,13 @@
+ 			if x == nil || !sceneColorOK(x.Context.Style.Fill.Color) || !sceneColorOK(x.Context.Style.Stroke.Color) || !sceneContextFinite(&x.Context) || !work.path(x.Path, x.Context.Cumulative, math32.Vector2{}, scenePathFactor(&x.Context)) {
+ 				return nil
+ 			}
++		case *render.TextBatch:
++			for j := 0; j < x.Len(); j++ {
++				text := x.At(j)
++				if !work.text(&text) {
++					return nil
++				}
++			}
+ 		case *render.Text:
+ 			if !work.text(x) {
+ 				return nil
+@@ -93,7 +112,7 @@
+ 		}
+ 	}
+ 	spanner := &sceneSpanner{builder: b, op: int(rs.ImgSpanner.Op)}
+-	capture := &Renderer{size: rs.size, sceneRecord: b, sceneWork: work, outlineCache: rs.staticOutlines(), glyphCoverage: rs.glyphCoverageCache(), glyphCoverageEnabled: rs.glyphCoverageEnabled}
++	capture := &Renderer{size: rs.size, sceneRecord: b, sceneWork: work, outlineCache: rs.staticOutlines(), glyphCoverage: rs.glyphCoverageCache(), glyphCoverageEnabled: rs.glyphCoverageEnabled, glyphMasks: rs.maskResources()}
+ 	capture.Scanner = rs.borrowSceneScanner(spanner)
+ 	defer rs.returnSceneScanner(capture.Scanner)
+ 	capture.Raster = NewDasher(rs.image.Bounds().Dx(), rs.image.Bounds().Dy(), capture.Scanner)
+@@ -105,6 +124,14 @@
+ 			b.Draw(x.Rect, x.Source, x.SourcePos, x.Mask, x.MaskPos, x.Op)
+ 		case *render.Path:
+ 			capture.RenderPath(x)
++		case *render.TextBatch:
++			for j := 0; j < x.Len(); j++ {
++				text := x.At(j)
++				capture.RenderText(&text)
++				if b.Failed() {
++					return nil
++				}
++			}
+ 		case *render.Text:
+ 			capture.RenderText(x)
+ 		}
+--- a/paint/renderers/rasterx/text.go
++++ b/paint/renderers/rasterx/text.go
+@@ -5,6 +5,7 @@
+ package rasterx
+ 
+ import (
++	"cogentcore.org/core/paint/renderers/sceneplan"
+ 	"fmt"
+ 	"image"
+ 	"image/color"
+@@ -417,6 +418,21 @@
+ 	if UseGlyphCache && identity && stroke == nil {
+ 		mask, pi := theGlyphCache.Glyph(run.Face, g, outline, scale, pos)
+ 		if mask != nil {
++			// Only the private glyph cache's immutable zero-origin masks may
++			// enter the sealed bank. Public GlyphMask retains mutable-source Draw.
++			if rs.sceneRecord != nil && mask.Rect.Min == (image.Point{}) {
++				if _, uniform := sceneplan.Color(fill); uniform {
++					dbb := mask.Bounds().Add(pi)
++					ibb := dbb.Intersect(ctx.Bounds.Rect.ToRect())
++					if ibb.Empty() {
++						return
++					}
++					if resource := rs.maskResources().get(mask); resource != nil {
++						rs.sceneRecord.DrawMaskResource(ibb, fill, resource, ibb.Min.Sub(dbb.Min), draw.Over)
++						return
++					}
++				}
++			}
+ 			rs.GlyphMask(ctx, run, g, fill, stroke, bb, pi, mask)
+ 			return
+ 		}
+--- /dev/null
++++ b/paint/renderers/rasterx/text_batch_test.go
+@@ -0,0 +1,89 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"bytes"
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/styles"
++	"image"
++	"testing"
++)
++
++func TestTextBatchCPUReplayCaptureAndRefusal(t *testing.T) {
++	text := vellumSceneText(t)
++	text.Text.SelectReset()
++	text.Text.HighlightReset()
++	parent := text.Context
++	batch := render.NewTextBatch(&parent)
++	var ordinary render.Render
++	for _, p := range []math32.Vector2{math32.Vec2(7.25, 2.5), math32.Vec2(18.5, 27.25)} {
++		bounds := image.Rect(3, 1, 211, 79)
++		batch.Add(text.Text, p, bounds)
++		ctx := render.NewContext(nil, render.NewBoundsRect(bounds, parent.Bounds.Radius), &parent)
++		ordinary = append(ordinary, render.NewText(text.Text, styles.NewPaint(), ctx, p))
++	}
++	reference := New(math32.Vec2(240, 80)).(*Renderer)
++	reference.Render(ordinary)
++	actual := New(math32.Vec2(240, 80)).(*Renderer)
++	actual.Render(render.Render{batch})
++	if !bytes.Equal(reference.image.Pix, actual.image.Pix) {
++		t.Fatal("CPU batch changed ordered overlapping text")
++	}
++	packet := actual.ScenePacket(render.Render{batch})
++	dst := image.NewRGBA(actual.image.Rect)
++	if packet == nil || !packet.Replay(dst) || !bytes.Equal(reference.image.Pix, dst.Pix) {
++		t.Fatal("batch packet mismatch")
++	}
++	if actual.glyphMasks == nil || actual.glyphMasks.count == 0 {
++		t.Fatal("actual bitmap route did not retain sealed masks")
++	}
++	hits := actual.glyphMasks.hits
++	if actual.ScenePacket(render.Render{batch}) == nil || actual.glyphMasks.hits <= hits {
++		t.Fatal("warm capture did not reuse immutable resources")
++	}
++	// An unknown render command refuses the whole capture. Ordinary CPU replay
++	// skips that unsupported command and must paint the batch exactly once.
++	commands := render.Render{batch, &unknownBatchCommand{}}
++	before := append([]byte(nil), actual.image.Pix...)
++	clip := actual.Scanner.Clip
++	winding := actual.Scanner.UseNonZeroWinding
++	if actual.ScenePacket(commands) != nil || !bytes.Equal(before, actual.image.Pix) || actual.Scanner.Clip != clip || actual.Scanner.UseNonZeroWinding != winding {
++		t.Fatal("refusal changed CPU state")
++	}
++	clear(actual.image.Pix)
++	actual.Render(commands)
++	if !bytes.Equal(reference.image.Pix, actual.image.Pix) {
++		t.Fatal("ordinary fallback lost or duplicated batch")
++	}
++	// A retained packet survives cache destruction and subsequent owner reuse.
++	actual.Release()
++	clear(dst.Pix)
++	packet.Replay(dst)
++	if !bytes.Equal(reference.image.Pix, dst.Pix) {
++		t.Fatal("release changed retained packet")
++	}
++	for _, invalid := range []*render.TextBatch{nil, render.NewTextBatch(&parent)} {
++		if actual.ScenePacket(render.Render{invalid}) != nil {
++			t.Fatal("invalid batch admitted")
++		}
++	}
++	invalid := render.NewTextBatch(&parent)
++	invalid.Add(nil, math32.Vector2{}, image.Rect(0, 0, 2, 2))
++	if actual.ScenePacket(render.Render{invalid}) != nil {
++		t.Fatal("nil layout admitted")
++	}
++	huge := render.NewTextBatch(&parent)
++	for range sceneplan.MaxOps/3 + 1 {
++		huge.Add(text.Text, math32.Vector2{}, image.Rect(0, 0, 2, 2))
++	}
++	if actual.ScenePacket(render.Render{huge}) != nil {
++		t.Fatal("logical text command limit bypassed")
++	}
++}
++
++type unknownBatchCommand struct{}
++
++func (*unknownBatchCommand) IsRenderItem()  {}
++func (*unknownBatchCommand) String() string { return "batch refusal fixture" }
+--- a/paint/renderers/sceneplan/builder.go
++++ b/paint/renderers/sceneplan/builder.go
+@@ -18,6 +18,7 @@
+ 	head, tail                         *operationBlock
+ 	count                              int
+ 	masks                              map[*image.Alpha]*image.Alpha
++	maskResources                      map[*MaskResource]bool
+ 	stream                             *operation
+ 	streamValue                        operation
+ 	streamPacked                       bool
+@@ -422,6 +423,7 @@
+ 	b.head, b.tail = nil, nil
+ 	b.count = 0
+ 	b.masks = nil
++	b.maskResources = nil
+ 	b.stream = nil
+ 	b.streamValue = operation{}
+ 	b.spanHeaders = [9][][]span{}
+--- /dev/null
++++ b/paint/renderers/sceneplan/sealed_mask.go
+@@ -0,0 +1,67 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"image"
++	"image/draw"
++	"unsafe"
++)
++
++// MaskResource owns a detached, immutable snapshot. No accessor exposes its
++// image or pixels; builders and live packets may share it after owner eviction.
++type MaskResource struct{ mask *image.Alpha }
++
++func NewMaskResource(source *image.Alpha) *MaskResource {
++	if source == nil || !validAlpha(source) {
++		return nil
++	}
++	r := source.Rect
++	if r.Dx()*r.Dy() > MaxBytes-int(unsafe.Sizeof(image.Alpha{}))-int(unsafe.Sizeof(MaskResource{})) {
++		return nil
++	}
++	own := image.NewAlpha(image.Rectangle{Max: r.Size()})
++	for y := 0; y < r.Dy(); y++ {
++		copy(own.Pix[y*own.Stride:], source.Pix[source.PixOffset(r.Min.X, r.Min.Y+y):][:r.Dx()])
++	}
++	return &MaskResource{mask: own}
++}
++func (m *MaskResource) Bytes() int {
++	if m == nil || m.mask == nil {
++		return 0
++	}
++	return len(m.mask.Pix) + int(unsafe.Sizeof(image.Alpha{})) + int(unsafe.Sizeof(MaskResource{}))
++}
++
++// DrawMaskResource has Draw's uniform-source mask semantics. Positions use the
++// snapshot's zero origin. The resource is charged once per packet even though
++// its immutable backing may also be retained by an originating renderer.
++func (b *Builder) DrawMaskResource(rect image.Rectangle, source image.Image, resource *MaskResource, mp image.Point, op draw.Op) {
++	b.flush()
++	c, ok := Color(source)
++	if b.failed || !ok || resource == nil || resource.mask == nil || (op != draw.Src && op != draw.Over) || mp.X < -1<<20 || mp.X > 1<<20 || mp.Y < -1<<20 || mp.Y > 1<<20 {
++		b.Refuse()
++		return
++	}
++	if rect == (image.Rectangle{}) {
++		rect = b.packet.bounds
++	}
++	original := rect
++	if !validRect(original) {
++		b.Refuse()
++		return
++	}
++	rect = rect.Intersect(b.packet.bounds).Intersect(resource.mask.Rect.Add(original.Min.Sub(mp)))
++	if rect.Empty() {
++		return
++	}
++	if !b.maskResources[resource] {
++		if !b.reserve(resource.Bytes()) {
++			return
++		}
++		if b.maskResources == nil {
++			b.maskResources = make(map[*MaskResource]bool)
++		}
++		b.maskResources[resource] = true
++	}
++	b.add(operation{rect: rect, kind: Mask, op: op, color: c, mask: resource.mask, maskPos: mp.Add(rect.Min.Sub(original.Min))})
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/sealed_mask_test.go
+@@ -0,0 +1,78 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"testing"
++	"unsafe"
++)
++
++func TestMaskResourceDetachedClippedAndStable(t *testing.T) {
++	source := image.NewAlpha(image.Rect(3, 4, 11, 13))
++	for i := range source.Pix {
++		source.Pix[i] = byte(i * 13)
++	}
++	resource := NewMaskResource(source)
++	if resource == nil {
++		t.Fatal("snapshot refused")
++	}
++	bounds := image.Rect(0, 0, 30, 30)
++	b := New(bounds)
++	reference := New(bounds)
++	fill := image.NewUniform(color.NRGBA{R: 230, G: 61, B: 82, A: 191})
++	// Original Draw's mp is in source coordinates. Resource mp uses zero origin.
++	for _, r := range []image.Rectangle{image.Rect(-2, 1, 8, 11), image.Rect(7, 8, 18, 20), image.Rect(22, 24, 35, 39)} {
++		b.DrawMaskResource(r, fill, resource, image.Pt(1, 2), draw.Over)
++		reference.Draw(r, fill, image.Point{}, source, image.Pt(4, 6), draw.Over)
++	}
++	p, q := b.Seal(false), reference.Seal(false)
++	if p == nil || q == nil {
++		t.Fatal("refused")
++	}
++	// Mutating caller-owned bytes or dropping originating references cannot change
++	// sealed packet pixels or legacy wire output.
++	clear(source.Pix)
++	source = nil
++	resource = nil
++	a, z := image.NewRGBA(bounds), image.NewRGBA(bounds)
++	p.Replay(a)
++	q.Replay(z)
++	if !bytes.Equal(a.Pix, z.Pix) {
++		t.Fatal("detached mask/clipping mismatch")
++	}
++	x, ok := p.Encode()
++	y, ok2 := q.Encode()
++	if !ok || !ok2 || !bytes.Equal(x.Ops, y.Ops) || !bytes.Equal(x.Data, y.Data) || !bytes.Equal(x.Rows, y.Rows) || !bytes.Equal(x.Refs, y.Refs) {
++		t.Fatal("legacy encoding differs")
++	}
++	if b.DrawMaskResource(image.Rect(0, 0, 2, 2), fill, NewMaskResource(image.NewAlpha(image.Rect(0, 0, 2, 2))), image.Point{}, draw.Over); !b.Failed() {
++		t.Fatal("retired builder accepted mutation")
++	}
++}
++func TestMaskResourceAdmissionAndRecovery(t *testing.T) {
++	for _, a := range []*image.Alpha{nil, {Rect: image.Rect(0, 0, 4, 4), Stride: 1, Pix: make([]byte, 4)}} {
++		if NewMaskResource(a) != nil {
++			t.Fatal("malformed mask admitted")
++		}
++	}
++	r := NewMaskResource(image.NewAlpha(image.Rect(0, 0, 4, 4)))
++	b := New(image.Rect(0, 0, 8, 8))
++	b.packet.bytes = MaxBytes - r.Bytes() + 1
++	b.DrawMaskResource(image.Rect(0, 0, 4, 4), image.White, r, image.Point{}, draw.Over)
++	if b.Seal(false) != nil {
++		t.Fatal("overbudget packet accepted")
++	}
++	b = New(image.Rect(0, 0, 8, 8))
++	b.DrawMaskResource(image.Rect(0, 0, 4, 4), image.White, r, image.Point{}, draw.Over)
++	first := b.packet.bytes
++	b.DrawMaskResource(image.Rect(4, 0, 8, 4), image.White, r, image.Point{}, draw.Over)
++	if b.packet.bytes-first != int(unsafe.Sizeof(operation{})) {
++		t.Fatal("resource was charged more than once")
++	}
++	if b.Seal(false) == nil {
++		t.Fatal("fresh recovery failed")
++	}
++}

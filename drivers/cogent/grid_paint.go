@@ -133,3 +133,14 @@ func opaqueGridUniform(source image.Image) ([4]uint32, bool) {
 	rgba[0], rgba[1], rgba[2], rgba[3] = uniform.C.RGBA()
 	return rgba, rgba[3] == 65535
 }
+
+func (p *gridPane) renderPaneFrame() {
+	if p.Scene != nil {
+		reference, _ := p.Scene.Property(gridReferenceBoxPaintProperty).(bool)
+		experimental, _ := p.Scene.Property(gridScrollReuseProperty).(bool)
+		if !reference && !experimental && p.Frame.RenderPassiveTextBatch() {
+			return
+		}
+	}
+	p.Frame.RenderWidget()
+}
