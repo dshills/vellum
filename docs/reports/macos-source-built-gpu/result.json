@@ -1,0 +1,149 @@
+{
+  "schema": "vellum-private-source-built-gpu-consumer-v1",
+  "source_commit": "276a6543727bf12183c7a0acf52321a2ae82138a",
+  "wgpu_commit": "6aed50955d934ac36049ba8d002034841633ae02",
+  "headers_commit": "673658bc2bd70ec39fc55ebe6bb0173cf6d0a603",
+  "rust_compiler": "1.99.0",
+  "go_compiler": "1.27.2",
+  "rust_declared_minimum_macos": "11.0",
+  "go_consumer_declared_minimum_macos": "13.0",
+  "runtime_older_macos_qualified": false,
+  "abi_constant_checks": {
+    "size": 115,
+    "alignment": 115,
+    "offset": 522
+  },
+  "rust_compiled_packages": 80,
+  "rust_compiler_units": 103,
+  "native": [
+    {
+      "label": "gpu",
+      "roots": [
+        "TestVellumPipelineNativeOwnership",
+        "TestVellumRGBAUploadNativeRows",
+        "TestVellumStorageNativeReadback",
+        "TestVellumTextureNativeOwnershipAndReadback"
+      ],
+      "root_count": 4,
+      "subtests": 20,
+      "gpu_execution_and_readback": true,
+      "windows_created": 0,
+      "surfaces_created": 0,
+      "physical_input_verified": false,
+      "performance_qualified": false,
+      "native_memory_qualified": false
+    },
+    {
+      "label": "scene",
+      "roots": [
+        "TestVellumGPUSceneNativeActualTextAndPaths",
+        "TestVellumGPUSceneNativeCoveredUniforms",
+        "TestVellumGPUSceneNativeInputAttemptBytesFailureAndRecovery",
+        "TestVellumGPUSceneNativeIntegerCompositor",
+        "TestVellumGPUSceneNativeSharedDrawerOrderAndFallback"
+      ],
+      "root_count": 5,
+      "subtests": 3,
+      "gpu_execution_and_readback": true,
+      "windows_created": 0,
+      "surfaces_created": 0,
+      "physical_input_verified": false,
+      "performance_qualified": false,
+      "native_memory_qualified": false
+    }
+  ],
+  "expected_negative_api_stderr": true,
+  "rust_stripping_warnings": 2,
+  "first_consumer_attempt_failed": true,
+  "installed_library_changed": false,
+  "framework_runtime_source_changed": false,
+  "sdk_changed": false,
+  "complete_native_component_rights_qualified": false,
+  "performance_memory_presentation_physical_macos_qualified": false,
+  "release_binary_reproduced": false,
+  "result_review_sha256": "cdb836cbf255f18e3410072b95ac734cb61a5582b9a52a5f6c0adbc6a5c570fc",
+  "package_readiness_sha256": "d55e085b379cb60febc1124816a97f3adce16effac450315ba776fdf6d3dc964",
+  "prism": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "complete": true,
+    "raw_counts": {
+      "retained": 0,
+      "discarded": 1,
+      "suppressed": 0
+    },
+    "disposition": "refuted-for-current-acceptance-scope",
+    "finding_id": "f365b143c5ae8014",
+    "disposition_review_sha256": "430b6ee15cfa61aeda78b6c55510a0a3391503630644172b4b2ac8b24bdd75fa",
+    "report_sha256": "e3f584ea74577481981624248a92b860a55251501f91c06776d4c9146886bde8",
+    "source_association": {
+      "provider_payload_sha256": "3cafc0b95f3f82ecf622ad68974b4eeae7e3f4517c5e273dd1c410e6e31fb865",
+      "submitted_report_py_sha256": "363e35daa283741168a2f69d47810e57b81ed25875a0650676b0d32c9cbd69b4",
+      "submitted_report_snapshot": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-source-built-gpu-report-276a654/history/report-submitted-to-prism.py",
+      "post_provider_change_scope": "Report finding/disposition gate and text/counts only; build/native producers and experiment bytes unchanged"
+    },
+    "report_correction": {
+      "scope": "Post-provider report validation/prose only",
+      "provider_submitted_report_sha256": "363e35daa283741168a2f69d47810e57b81ed25875a0650676b0d32c9cbd69b4",
+      "current_report_sha256": "1e0683516c1c7f0993c1bed12e31298c4ede7de069c2df6c33a5908ba66f88f4",
+      "changes": [
+        "Consume exact independent raw-finding disposition instead of zero-raw-finding branch",
+        "Record retained/discarded/suppressed counts and tri-state source-review scope",
+        "Require separate exact package readiness and terminal input stability"
+      ],
+      "experiment_build_native_producers_unchanged": true,
+      "second_provider_call": false
+    },
+    "final_report_producer_sha256": "1e0683516c1c7f0993c1bed12e31298c4ede7de069c2df6c33a5908ba66f88f4"
+  },
+  "archive": {
+    "bytes": 3382068,
+    "sha256": "7cf5c9214f56f0207f6660dd86000d4ba4018ce5c289418618a1b370ccbdd8d3",
+    "members": 227,
+    "expanded_bytes": 150197457
+  },
+  "fingerprinted_exclusions": {
+    "/private/tmp/vellum-source-built-gpu-276a654/headers-source.tar.gz": {
+      "bytes": 120676,
+      "sha256": "6754c6c2465c79a954f7c04c7890c9f00b7ecce8addbe01b5056e860ba3933e6"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/main-source.tar.gz": {
+      "bytes": 124059,
+      "sha256": "bff001ca2f891d13dd9b5bd1fd6efc2003c54cfed9cdb21d3f84fc16d549e335"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/consumer-v1/libs-darwin/arm64/libwgpu_native.a": {
+      "bytes": 37401760,
+      "sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/consumer-v1/version-probe": {
+      "bytes": 16973938,
+      "sha256": "86acfdf483043415c1921f9328ddfa5e99798e519dca4d214363a0955d672f24"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/consumer-v2/gpu.test": {
+      "bytes": 25827986,
+      "sha256": "bec6ba09cedc798665b279dc44cefc021c2e6d3f7847915308c2fce6949a5f0b"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/consumer-v2/libs-darwin/arm64/libwgpu_native.a": {
+      "bytes": 37401760,
+      "sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/consumer-v2/scene.test": {
+      "bytes": 34559090,
+      "sha256": "d1e5f5118a481547dca29426639bc2e9d6599b611c27ccd982f1155ee53d18ed"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/consumer-v2/version-probe": {
+      "bytes": 16958402,
+      "sha256": "3343f12a342ae98ccbfd70d95dc565bf6307ab64f684eb87fdb9ec24842592d8"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/build-target-v1/aarch64-apple-darwin/release/libwgpu_native.dylib": {
+      "bytes": 7585048,
+      "sha256": "4fd3766faae37668582df8f71f999999a6400cc11cc38443e929345b10c99e9c"
+    },
+    "/private/tmp/vellum-source-built-gpu-276a654/build-target-v1/aarch64-apple-darwin/release/libwgpu_native.a": {
+      "bytes": 37401760,
+      "sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+    }
+  },
+  "compiler_caches_and_other_dependency_artifacts_outside_bundle": true
+}

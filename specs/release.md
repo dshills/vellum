@@ -78,6 +78,16 @@ that same authenticated ZIP. This is not an executed-build/compiler/features
 attestation, a reproduced source build, complete component/rights approval or
 authentication of a Vellum SDK. Existing distribution gates remain unchanged.
 
+## Private source-built GPU consumer
+
+The [pinned-source GPU consumer checkpoint](../docs/reports/macos-source-built-gpu/README.md)
+builds the exact WGPU source/header commits with recorded Rust/compiler/features,
+then passes private static-only Go consumers and nine headless GPU roots with
+23 subtests. Two Rust stripping warnings and the failed initial consumer attempt
+remain preserved. The candidate is not adopted into installed libraries or the
+SDK; complete component/rights closure, broader native UI/presentation, older
+macOS runtime, performance/memory/endurance and full Mac release remain open.
+
 ## Alpha.2 window lifetime migration
 
 Alpha.2 deliberately breaks the alpha.1 string-scoped application APIs to avoid

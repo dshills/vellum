@@ -591,3 +591,11 @@ absent. Go `cgocall` totals do not establish native function cost; the native
 sample includes substantial waiting and AX work. Profiled phase distributions
 remain diagnostic. Ordinary frame targets, memory/endurance, physical/human
 workflows and full macOS acceptance remain open. No runtime source changes here.
+
+The [pinned-source GPU consumer checkpoint](reports/macos-source-built-gpu/README.md)
+builds the exact WGPU source/header commits with recorded Rust/compiler/features,
+then passes private static-only Go consumers and nine headless GPU roots with
+23 subtests. Two Rust stripping warnings and the failed initial consumer attempt
+remain preserved. The candidate is not adopted into installed libraries or the
+SDK; complete component/rights closure, broader native UI/presentation, older
+macOS runtime, performance/memory/endurance and full Mac release remain open.

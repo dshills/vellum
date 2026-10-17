@@ -23,6 +23,14 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [pinned-source GPU consumer checkpoint](../docs/reports/macos-source-built-gpu/README.md)
+builds the exact WGPU source/header commits with recorded Rust/compiler/features,
+then passes private static-only Go consumers and nine headless GPU roots with
+23 subtests. Two Rust stripping warnings and the failed initial consumer attempt
+remain preserved. The candidate is not adopted into installed libraries or the
+SDK; complete component/rights closure, broader native UI/presentation, older
+macOS runtime, performance/memory/endurance and full Mac release remain open.
+
 The [current grid profile diagnostics](../docs/reports/macos-grid-profile-diagnostics/README.md)
 complete three CPU-profiled native apps and 3,072 callbacks on clean `30025cc`,
 plus one exact-PID native stack sample. All owned groups close and are observed
