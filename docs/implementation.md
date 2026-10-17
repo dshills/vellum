@@ -534,3 +534,17 @@ for fixed rows and 707 to 280 µs for variable rows at DPI162, including predica
 costs. These are offscreen kernel observations, separate from painting, native
 frames and the still-open 4/6 ms and full Mac gates. See the
 [contract](../specs/grid-native.md#reusing-intrinsic-grid-text-across-rounded-cell-edges).
+
+
+## Intrinsic grid sizing and matched native frames
+
+The [intrinsic-sizing checkpoint](reports/macos-grid-intrinsic-sizing/README.md) records guarded source
+`599442a`, mixed-text full-layout/prior-rule geometry and pixel oracles,
+dependent-style and pending-work controls, full installed automated checks
+and one Anthropic Prism review. Forty matched native ordinary processes
+complete 4,800 samples and 2,400 full geometry pairs. Candidate TotalUIWork
+p95 is lower in all twenty pairs, with median paired reductions of about
+10–14% across the four groups. All twenty candidate processes still miss
+4 ms p95; eight meet 6 ms p99. These are scoped workload observations;
+P4/P6/P9/P11, broader performance/memory/endurance, physical/human, current
+SDK closure and release/distribution remain open.

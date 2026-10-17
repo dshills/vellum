@@ -94,3 +94,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Detached accessibility storage and native comparison](macos-ax-copy-storage/README.md): scoped Cocoa correctness and allocation evidence; unchanged frame targets remain failed.
 
 - [Exact-location glyph coverage](macos-glyph-placement/README.md): owned stage 0076, software capture comparisons and five current-source native sanity processes; frame targets remain open.
+
+- [Grid intrinsic sizing and native comparison](macos-grid-intrinsic-sizing/README.md): guarded source reuse, mixed-text geometry oracles and separately reviewed matched native frame evidence.
