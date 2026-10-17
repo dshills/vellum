@@ -1047,3 +1047,15 @@ and repeated dirty-cell text sizing as investigation targets. They do not prove
 a causal bottleneck or savings; the Reconcile region includes accessibility
 work beyond `reconcileScoped`. Existing ordinary 4/6 ms failures and full Mac,
 P6/P11, physical/human, native/GPU memory and release gates remain open.
+
+
+## Detached accessibility storage and native evidence
+
+The [copy-storage checkpoint](../docs/reports/macos-ax-copy-storage/README.md) retains source `3a14e53`, exact legacy/
+ownership/allocation regressions, one Anthropic Prism review and actual Cocoa
+grid identity/action/closure acceptance. Fresh native runs complete 4,800
+ordinary samples and 2,400 full geometry pairs. All 20 candidate p95 and 19 p99
+processes miss 4/6 ms; fixed-row CPU p95 is higher in all five pairs. One paired
+allocation diagnostic estimates fewer Go objects, but establishes no native
+latency gain, broad no-regression or native/retained memory acceptance. P6/P11
+and full Mac, physical/human and distribution/release gates remain open.
