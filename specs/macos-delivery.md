@@ -115,7 +115,7 @@ explicitly authorized tests and restore any authorized temporary state changes.
    includes the new routed Selector/NumberField regressions. Native M2 integration
    remains queued; [actual results](../docs/reports/macos-workspace-acceptance/README.md)
    distinguish software routing from desktop acceptance.
-3. **M3-A, tile culling and row fragments are complete and rejected.** The complete table
+3. **M3-A, tile culling, row fragments and resolved shaping are rejected.** The complete table
    matrix still fails. No follow-up AX, packed-upload or tile-culling microtuning
    is queued. The [composition checkpoint](../docs/reports/macos-scene-composition/README.md)
    measures 480 actual packets and the failed five-pair culling comparison.
@@ -125,6 +125,13 @@ explicitly authorized tests and restore any authorized temporary state changes.
    architecture decision is required; no further row-cache tuning is queued.
    The independent [M6 minimum-toolchain source check](../docs/reports/macos-minimum-go/README.md)
    now passes; final SDK/rights closure remains open.
+   The [resolved-shaping checkpoint](../docs/reports/macos-resolved-shapes/README.md)
+   then proves real CPU/GPU reuse and passes correctness, but ordinary median
+   run-p95 improves only 0.074/0.076 ms, below the 0.4 ms adoption bar. Its whole
+   private overlay is rejected; all twenty p95s fail 4 ms. No shape-cache or other
+   small rejected-boundary tuning is queued. Complete missing tree/general UI
+   qualification and independent M6 inventory work before choosing a new M3
+   redesign; preserve the table failure and every other gate.
 4. Use an authorized desktop window for other M2/M5 native checks and ordinary M3
    measurements. Never replay a completed/human-return seal.
    The one fresh bounded placement attempt has now failed its delivery observation;

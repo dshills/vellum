@@ -48,6 +48,17 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [resolved-shaping checkpoint](../docs/reports/macos-resolved-shapes/README.md)
+rejects a private cache despite positive actual dirty-sizing reuse in both CPU/GPU
+modes (2,636 horizontal hits and zero misses each). Correctness/race, native GPU
+readback, builds and qualified vet pass. Five ordinary pairs per mode improve
+median run-p95 only GPU 4.596166 → 4.522458 ms (3/5 pairs) and CPU
+5.480209 → 5.404167 ms (4/5), below the frozen 0.4 ms adoption bar. All twenty
+ordinary p95s still fail 4 ms. Novel controls pass separately; all tails and prior
+fixture/vet/admission failures remain retained. No runtime/prepared change or full
+Mac gate closure. Stop this prototype without another cache/AX/culling variant;
+complete other missing acceptance evidence before selecting another M3 redesign.
+
 The [minimum-Go source compatibility checkpoint](../docs/reports/macos-minimum-go/README.md)
 passes actual Go 1.25.6 root/public-contract race and vet, complete offscreen
 driver race and vet, and a native loaded-grid application build on clean
@@ -65,8 +76,9 @@ fragment/proof cache is effectively full. Both diagnostic apps exit zero; the
 CPU observer flag is filtered, causing controller correlation failure. CPU reuse
 is unavailable, and no ordinary CPU/GPU latency conclusion follows. Do not retry
 the observer or tune the cache/coordinate rules. No production/prepared change
-or gate closure follows. M3 requires a separate architecture decision; independent
-M6 minimum-Go-toolchain compatibility is the next qualification task.
+or gate closure follows. The subsequent resolved-shaping prototype is also rejected below its adoption
+bar. Minimum-Go source compatibility is now separately qualified; full M3 and
+final M6 acceptance remain open.
 
 The [scene composition and tile-culling checkpoint](../docs/reports/macos-scene-composition/README.md)
 reconciles 480 measured packets across fixed/variable 10k/1M rows. Packet-local
