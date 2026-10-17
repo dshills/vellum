@@ -1,0 +1,412 @@
+--- a/paint/renderers/sceneplan/packet.go
++++ b/paint/renderers/sceneplan/packet.go
+@@ -180,22 +180,69 @@
+ 				dataBytes += len(row) * 12
+ 			}
+ 		}
+-		for y := o.rect.Min.Y / TileSize; y <= (o.rect.Max.Y-1)/TileSize; y++ {
+-			for x := o.rect.Min.X / TileSize; x <= (o.rect.Max.X-1)/TileSize; x++ {
+-				if refs == MaxTileReferences {
+-					return nil, false
+-				}
+-				if keep {
+-					counts[y*tiles.X+x]++
+-					retainedRefs++
+-				}
+-				refs++
++		x0, x1 := o.rect.Min.X/TileSize, (o.rect.Max.X-1)/TileSize
++		y0, y1 := o.rect.Min.Y/TileSize, (o.rect.Max.Y-1)/TileSize
++		if x0 <= x1 && y0 <= y1 {
++			n := (x1 - x0 + 1) * (y1 - y0 + 1)
++			if n > MaxTileReferences-refs {
++				return nil, false
++			}
++			refs += n
++			if keep {
++				retainedRefs += n
+ 			}
+ 		}
+ 		if len(p.ops)*opWords*4+len(counts)*8+refs*4+dataBytes > MaxBytes {
+ 			return nil, false
+ 		}
+ 	}
++	// Dense rectangles use four difference corners and one prefix pass. Sparse
++	// batches keep direct counting, avoiding a full-grid prefix for small damage.
++	if retainedRefs > 2*len(counts) {
++		for i, o := range p.ops {
++			if compact && p.coveredClear(i) {
++				continue
++			}
++			x0, x1 := o.rect.Min.X/TileSize, (o.rect.Max.X-1)/TileSize
++			y0, y1 := o.rect.Min.Y/TileSize, (o.rect.Max.Y-1)/TileSize
++			if x0 > x1 || y0 > y1 {
++				continue
++			}
++			counts[y0*tiles.X+x0]++
++			if x1+1 < tiles.X {
++				counts[y0*tiles.X+x1+1]--
++			}
++			if y1+1 < tiles.Y {
++				counts[(y1+1)*tiles.X+x0]--
++				if x1+1 < tiles.X {
++					counts[(y1+1)*tiles.X+x1+1]++
++				}
++			}
++		}
++		for y := 0; y < tiles.Y; y++ {
++			running := 0
++			for x := 0; x < tiles.X; x++ {
++				at := y*tiles.X + x
++				running += counts[at]
++				counts[at] = running
++				if y > 0 {
++					counts[at] += counts[at-tiles.X]
++				}
++			}
++		}
++	} else {
++		for i, o := range p.ops {
++			if compact && p.coveredClear(i) {
++				continue
++			}
++			for y := o.rect.Min.Y / TileSize; y <= (o.rect.Max.Y-1)/TileSize; y++ {
++				for x := o.rect.Min.X / TileSize; x <= (o.rect.Max.X-1)/TileSize; x++ {
++					counts[y*tiles.X+x]++
++				}
++			}
++		}
++	}
++
+ 	e := &Encoded{Tiles: tiles, Ops: make([]byte, 0, max(4, retainedOps*opWords*4)), Rows: make([]byte, 0, len(counts)*8), Refs: make([]byte, max(4, retainedRefs*4)), Data: make([]byte, 0, max(4, dataBytes))}
+ 	// Once each count has been copied into Rows, its slot becomes fill scratch.
+ 	positions := counts
+--- /dev/null
++++ b/paint/renderers/sceneplan/tile_binning_vellum_test.go
+@@ -0,0 +1,327 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package sceneplan
++
++import (
++	"encoding/binary"
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"reflect"
++	"testing"
++)
++
++// Frozen pre-change encoder is the byte/admission oracle, independent of the
++// revised rectangle arithmetic and difference/prefix implementation.
++func (p *Packet) originalBinningEncode(compact bool) (*Encoded, bool) {
++	if p == nil || len(p.ops) > MaxOps {
++		return nil, false
++	}
++	tiles := image.Pt((p.bounds.Dx()+TileSize-1)/TileSize, (p.bounds.Dy()+TileSize-1)/TileSize)
++	counts := make([]int, tiles.X*tiles.Y)
++	masks := make(map[*image.Alpha]uint32)
++	dataBytes, refs, retainedRefs, retainedOps := 0, 0, 0, 0
++	// Validate exact encoded sizes and bin counts before allocating any output.
++	for i, o := range p.ops {
++		keep := !compact || !p.coveredClear(i)
++		if keep {
++			retainedOps++
++		}
++		if o.mask != nil {
++			if _, ok := masks[o.mask]; !ok {
++				masks[o.mask] = uint32(dataBytes / 4)
++				dataBytes += (len(o.mask.Pix) + 3) / 4 * 4
++			}
++		}
++		switch o.kind {
++		case Pixels:
++			dataBytes += o.rect.Dx() * o.rect.Dy() * 4
++		case Spans:
++			dataBytes += len(o.rows) * 8
++			for _, row := range o.rows {
++				dataBytes += len(row) * 12
++			}
++		}
++		for y := o.rect.Min.Y / TileSize; y <= (o.rect.Max.Y-1)/TileSize; y++ {
++			for x := o.rect.Min.X / TileSize; x <= (o.rect.Max.X-1)/TileSize; x++ {
++				if refs == MaxTileReferences {
++					return nil, false
++				}
++				if keep {
++					counts[y*tiles.X+x]++
++					retainedRefs++
++				}
++				refs++
++			}
++		}
++		if len(p.ops)*opWords*4+len(counts)*8+refs*4+dataBytes > MaxBytes {
++			return nil, false
++		}
++	}
++	e := &Encoded{Tiles: tiles, Ops: make([]byte, 0, max(4, retainedOps*opWords*4)), Rows: make([]byte, 0, len(counts)*8), Refs: make([]byte, max(4, retainedRefs*4)), Data: make([]byte, 0, max(4, dataBytes))}
++	// Once each count has been copied into Rows, its slot becomes fill scratch.
++	positions := counts
++	offset := 0
++	for i, count := range counts {
++		positions[i] = offset
++		e.Rows = appendWord(e.Rows, uint32(offset))
++		e.Rows = appendWord(e.Rows, uint32(count))
++		offset += count
++	}
++	clear(masks)
++	encodedIndex := uint32(0)
++	for i, o := range p.ops {
++		if compact && p.coveredClear(i) {
++			continue
++		}
++		words := [opWords]uint32{uint32(o.rect.Min.X), uint32(o.rect.Min.Y), uint32(o.rect.Max.X), uint32(o.rect.Max.Y), o.color[0], o.color[1], o.color[2], o.color[3], o.kind, uint32(o.op), 0, 0, ^uint32(0), 0, 0, 0}
++		if o.mask != nil {
++			at, ok := masks[o.mask]
++			if !ok {
++				at = uint32(len(e.Data) / 4)
++				e.Data = packMask(e.Data, o.mask)
++				masks[o.mask] = at
++			}
++			words[12], words[13], words[14], words[15] = at, uint32(o.mask.Stride), uint32(o.maskPos.X), uint32(o.maskPos.Y)
++		}
++		if o.kind == Pixels {
++			words[10], words[11] = uint32(len(e.Data)/4), uint32(o.rect.Dx())
++			for y := 0; y < o.image.Rect.Dy(); y++ {
++				for x := 0; x < o.image.Rect.Dx(); x++ {
++					at := o.image.PixOffset(x, y)
++					e.Data = appendWord(e.Data, binary.LittleEndian.Uint32(o.image.Pix[at:at+4]))
++				}
++			}
++		}
++		if o.kind == Spans {
++			words[10] = uint32(len(e.Data) / 4)
++			base := len(e.Data)
++			e.Data = append(e.Data, make([]byte, len(o.rows)*8)...)
++			for y, row := range o.rows {
++				binary.LittleEndian.PutUint32(e.Data[base+y*8:], uint32(len(e.Data)/4))
++				binary.LittleEndian.PutUint32(e.Data[base+y*8+4:], uint32(len(row)))
++				for _, s := range row {
++					e.Data = appendWord(e.Data, uint32(s.x0))
++					e.Data = appendWord(e.Data, uint32(s.x1))
++					e.Data = appendWord(e.Data, s.alpha)
++				}
++			}
++		}
++		for _, w := range words {
++			e.Ops = appendWord(e.Ops, w)
++		}
++		for y := o.rect.Min.Y / TileSize; y <= (o.rect.Max.Y-1)/TileSize; y++ {
++			for x := o.rect.Min.X / TileSize; x <= (o.rect.Max.X-1)/TileSize; x++ {
++				bin := y*tiles.X + x
++				binary.LittleEndian.PutUint32(e.Refs[positions[bin]*4:], encodedIndex)
++				positions[bin]++
++			}
++		}
++		encodedIndex++
++	}
++	if len(e.Ops) == 0 {
++		e.Ops = e.Ops[:4]
++	}
++	if len(e.Data) == 0 {
++		e.Data = e.Data[:4]
++	}
++	return e, true
++}
++
++func binningFixture(width, height, n int, sparse bool) *Packet {
++	b := New(image.Rect(0, 0, width, height))
++	r := rand.New(rand.NewSource(75))
++	if !sparse {
++		b.Draw(image.Rect(0, 0, width, height), image.NewUniform(color.RGBA{31, 47, 63, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	}
++	for i := 0; i < n; i++ {
++		x, y := r.Intn(width), r.Intn(height)
++		w, h := 1+r.Intn(max(1, width-x)), 1+r.Intn(max(1, height-y))
++		if sparse {
++			w, h = 1, 1
++		}
++		rect := image.Rect(x, y, min(width, x+w), min(height, y+h))
++		b.Draw(rect, image.NewUniform(color.RGBA{11, 17, 23, 25}), image.Point{}, nil, image.Point{}, draw.Src)
++		b.Draw(rect, image.NewUniform(color.RGBA{61, 83, 101, 255}), image.Point{}, nil, image.Point{}, draw.Over)
++	}
++	return b.Seal(true)
++}
++func TestVellumTileBinningOriginalOracle(t *testing.T) {
++	for i := 0; i < 96; i++ {
++		p := binningFixture(17+i%31, 19+i%29, 1+i*3, i%3 == 0)
++		if p == nil {
++			t.Fatal("fixture refused", i)
++		}
++		for _, compact := range []bool{false, true} {
++			got, ok := p.encode(compact)
++			want, accepted := p.originalBinningEncode(compact)
++			if ok != accepted || !reflect.DeepEqual(got, want) {
++				t.Fatal("original encoder bytes/admission differ", i, compact)
++			}
++		}
++	}
++	for _, p := range []*Packet{stagingFixture(129, true), binningFixture(1519, 1266, 250, false), binningFixture(8192, 2048, 8, true), binningFixture(512, 512, 1025, false)} {
++		if p == nil {
++			t.Fatal("fixture absent")
++		}
++		for _, compact := range []bool{false, true} {
++			got, ok := p.encode(compact)
++			want, accepted := p.originalBinningEncode(compact)
++			if ok != accepted || !reflect.DeepEqual(got, want) {
++				t.Fatal("large/mixed encoder bytes/admission differ", compact)
++			}
++		}
++	}
++}
++func BenchmarkVellumTileBinning(b *testing.B) {
++	cases := []struct {
++		name string
++		p    *Packet
++	}{{"dense", binningFixture(512, 512, 400, false)}, {"grid-sized", binningFixture(1519, 1266, 250, false)}, {"sparse", binningFixture(8192, 2048, 8, true)}}
++	for _, tc := range cases {
++		if tc.p == nil {
++			b.Fatal("fixture absent", tc.name)
++		}
++		b.Run(tc.name, func(b *testing.B) {
++			for _, compact := range []bool{false, true} {
++				name := "all"
++				if compact {
++					name = "compact"
++				}
++				b.Run(name, func(b *testing.B) {
++					b.Run("original", func(b *testing.B) {
++						b.ReportAllocs()
++						for i := 0; i < b.N; i++ {
++							if _, ok := tc.p.originalBinningEncode(compact); !ok {
++								b.Fatal("refused")
++							}
++						}
++					})
++					b.Run("candidate", func(b *testing.B) {
++						b.ReportAllocs()
++						for i := 0; i < b.N; i++ {
++							if _, ok := tc.p.encode(compact); !ok {
++								b.Fatal("refused")
++							}
++						}
++					})
++				})
++			}
++		})
++	}
++}
++
++func TestVellumTileBinningOriginalLimitsAndBranchEdges(t *testing.T) {
++	for _, n := range []int{1, 2, 3, 8, 9, MaxOps} {
++		bounds := image.Rect(0, 0, 32, 32)
++		if n == MaxOps {
++			bounds = image.Rect(0, 0, 1, 1)
++		}
++		b := New(bounds)
++		for i := 0; i < n; i++ {
++			b.Draw(bounds, image.White, image.Point{}, nil, image.Point{}, draw.Src)
++		}
++		p := b.Seal(false)
++		if p == nil {
++			t.Fatal("branch fixture refused", n)
++		}
++		for _, compact := range []bool{false, true} {
++			a, ok := p.encode(compact)
++			z, accepted := p.originalBinningEncode(compact)
++			if !ok || !accepted || !reflect.DeepEqual(a, z) {
++				t.Fatal("branch edge/high per-tile count changed", n, compact)
++			}
++		}
++	}
++	for _, n := range []int{32, 33} {
++		bounds := image.Rect(0, 0, 8192, 2048)
++		b := New(bounds)
++		for i := 0; i < n; i++ {
++			b.Draw(bounds, image.White, image.Point{}, nil, image.Point{}, draw.Op(1-i%2))
++		}
++		p := b.Seal(false)
++		if p == nil {
++			t.Fatal("reference-limit fixture refused")
++		}
++		for _, compact := range []bool{false, true} {
++			a, ok := p.encode(compact)
++			z, accepted := p.originalBinningEncode(compact)
++			if ok != (n == 32) || ok != accepted || !reflect.DeepEqual(a, z) {
++				t.Fatal("original reference limit changed", n, compact)
++			}
++		}
++	}
++}
++
++// Original limits apply before compaction. Every fixture below is sealed by the
++// public Builder; no private operation mutation manufactures its size.
++func TestVellumTileBinningNearReferenceLimit(t *testing.T) {
++	bounds := image.Rect(0, 0, 8192, 2048)
++	columns, rows := bounds.Dx()/TileSize, bounds.Dy()/TileSize
++	perFull := columns * rows
++	for _, count := range []int{MaxTileReferences - 1, MaxTileReferences, MaxTileReferences + 1} {
++		b := New(bounds)
++		for i := 0; i < count/perFull; i++ {
++			b.Draw(bounds, image.White, image.Point{}, nil, image.Point{}, draw.Op(1-i%2))
++		}
++		remainder := count % perFull
++		fullRows, tail := remainder/columns, remainder%columns
++		if fullRows > 0 {
++			b.Draw(image.Rect(0, 0, bounds.Dx(), fullRows*TileSize), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++		}
++		if tail > 0 {
++			b.Draw(image.Rect(0, fullRows*TileSize, tail*TileSize, (fullRows+1)*TileSize), image.White, image.Point{}, nil, image.Point{}, draw.Src)
++		}
++		p := b.Seal(false)
++		if p == nil {
++			t.Fatal("near-reference fixture refused by builder", count)
++		}
++		for _, compact := range []bool{false, true} {
++			got, ok := p.encode(compact)
++			want, accepted := p.originalBinningEncode(compact)
++			if ok != (count <= MaxTileReferences) || ok != accepted || !reflect.DeepEqual(got, want) {
++				t.Fatal("original near-reference boundary changed", count, compact)
++			}
++			if ok && !compact && len(got.Refs)/4 != count {
++				t.Fatal("fixture reference count differs", count)
++			}
++		}
++	}
++}
++
++func TestVellumTileBinningExactEncodedByteLimit(t *testing.T) {
++	bounds := image.Rect(0, 0, 8192, 2048)
++	tileCount := (bounds.Dx() / TileSize) * (bounds.Dy() / TileSize)
++	// Encoded lengths are four-byte aligned. +4 is the first reachable refusal;
++	// a literal MaxBytes+1 cannot be represented by any accepted packet encoding.
++	for _, delta := range []int{-4, 0, 4} {
++		target := MaxBytes + delta
++		dataBytes := target - tileCount*8 - 2*opWords*4 - 2*4
++		bulk := dataBytes / MaxDimension * MaxDimension
++		rest := dataBytes - bulk
++		if rest <= 0 || rest > MaxDimension {
++			t.Fatal("bad byte-boundary fixture arithmetic")
++		}
++		masks := []*image.Alpha{image.NewAlpha(image.Rect(0, 0, MaxDimension, bulk/MaxDimension)), image.NewAlpha(image.Rect(0, 0, rest, 1))}
++		b := New(bounds)
++		for _, mask := range masks {
++			b.Draw(image.Rect(0, 0, 1, 1), image.White, image.Point{}, mask, image.Point{}, draw.Src)
++		}
++		p := b.Seal(false)
++		if p == nil || p.Bytes() > MaxBytes {
++			t.Fatal("encoded-byte fixture refused by builder", delta)
++		}
++		for _, compact := range []bool{false, true} {
++			got, ok := p.encode(compact)
++			want, accepted := p.originalBinningEncode(compact)
++			if ok != (delta <= 0) || ok != accepted || !reflect.DeepEqual(got, want) {
++				t.Fatal("exact encoded-byte boundary changed", delta, compact)
++			}
++			if ok && len(got.Ops)+len(got.Rows)+len(got.Refs)+len(got.Data) != target {
++				t.Fatal("encoded fixture total differs", delta)
++			}
++		}
++	}
++}

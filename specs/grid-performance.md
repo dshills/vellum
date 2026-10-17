@@ -444,3 +444,20 @@ success/refusal/recovery byte counts and reference pixels. The original single-
 operation fixture failed its headroom precondition in the admitted native run;
 that failure remains recorded. This fixture correction changes no production
 renderer, latency target, compiled-component or distribution qualification.
+
+## Scene encoding tile-bin counts
+
+Owned stage0075 changes CPU-side scene encoding work inside the GPU-requested
+source path. Original tile-reference/encoded-byte admission still charges every
+operation, including covered clears later omitted from compact output. Dense
+batches (retained references > twice the tile count) use rectangle differences
+and an in-place prefix pass; sparse batches keep direct counting. The existing
+count array becomes fill positions afterward. No new cache or retained backing
+is introduced. Encoded ABI bytes, painter order, detached ownership and packet
+replay/reset semantics must match the frozen pre-change encoder exactly.
+
+Exact admission/branch boundaries, mixed operations, frozen bytes, a wrong-corner
+control and full actual-driver software pixel comparisons precede acceptance.
+Supported software DPI96/160/192 does not qualify native DPI162. Synthetic
+encoder microbenchmarks are separate from ordinary native frame targets; all
+historical failures and full P4/P6/P11/Mac qualification remain open.

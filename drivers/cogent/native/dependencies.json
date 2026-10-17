@@ -738,6 +738,17 @@
               "sha256": "02e06af852d8e79de73d0068ee4a9f60329c78312403d9da6fd4f24de9405335"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/tilebinning",
+          "inputs": "native/patches/tilebinning/original-hashes.json",
+          "outputs": "native/patches/tilebinning/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/tilebinning/0075-adaptive-tile-bin-counts.patch",
+              "sha256": "d8ae35c6d00c1f2112e4fed17192de82484c251b4f3add6ab1439d8904a0e20a"
+            }
+          ]
         }
       ]
     },

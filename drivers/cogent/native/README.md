@@ -203,3 +203,8 @@ legacy content/dialog sizing and manual physical viewports retain their paths.
 The adapter no longer assigns initial dimensions to persistent Body.Min or
 requests screen-fraction sizing. See the [window contract](../../../specs/windows-services.md).
 The authoritative complete ordered stage list is `dependencies.json`.
+
+Stage 75 (`patches/tilebinning`) uses adaptive exact scene tile-bin counting:
+analytic original admission, dense rectangle differences/prefixes and sparse
+direct counts. Serialized bytes, painter order, compact IDs and all original
+limits stay fixed. See [owned contract](patches/tilebinning/README.md).
