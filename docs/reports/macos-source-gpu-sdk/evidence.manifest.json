@@ -1,0 +1,414 @@
+{
+  "files": {
+    "helpers/child_process.py": {
+      "bytes": 7071,
+      "sha256": "04ba2610ddf112e936e8adcd9a81c03cff422843f993c2ce8a9e1acd96f39c9c"
+    },
+    "helpers/fetch_dependencies.py": {
+      "bytes": 4765,
+      "sha256": "7d29619c8fcd1784a58220f98c2f4c7e534642fb43ec637ee4c8b7314ef29095"
+    },
+    "helpers/live_lease.py": {
+      "bytes": 910,
+      "sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4"
+    },
+    "helpers/native_archive.py": {
+      "bytes": 7086,
+      "sha256": "b186e30cf34577b0c1ccc4d25f5c090981afac25a0840942de0e83087ca4b541"
+    },
+    "helpers/owned_process.py": {
+      "bytes": 11845,
+      "sha256": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac"
+    },
+    "helpers/sdk_environment.py": {
+      "bytes": 1356,
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311"
+    },
+    "runs/check-v2/owned.json": {
+      "bytes": 884,
+      "sha256": "f0db9945f4ec584ad1d032c1ec142fee0430dfd62b7184424e9fcff95945fe33"
+    },
+    "runs/check-v2/stderr": {
+      "bytes": 2660,
+      "sha256": "14ebc86f7034d35e5291f4fa7152843e6bd8c254125191312d423e614a8c6acf"
+    },
+    "runs/check-v2/stdout": {
+      "bytes": 1075,
+      "sha256": "18a2f4559c5448f4f98cda9b3f0485b418e060dc15595e098c063c85d4b732f3"
+    },
+    "runs/check/owned.json": {
+      "bytes": 858,
+      "sha256": "90a976f4f1074e2efd482261fe5fd216aea73d1c01f614b59fd5a6d8bc42e4fc"
+    },
+    "runs/check/stderr": {
+      "bytes": 2984,
+      "sha256": "b0669053ac7b399906d3e82d102f6b266bb62dcb3e51961ef75e6d00b72c0871"
+    },
+    "runs/check/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "runs/network-probe/owned.json": {
+      "bytes": 737,
+      "sha256": "9a158ab9b4994d017c754c6e8d1bf10d74bf22effbba1200cec6893a0d38942a"
+    },
+    "runs/network-probe/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "runs/network-probe/stdout": {
+      "bytes": 701,
+      "sha256": "1045bf558af08131161edd104f7d1825b7195f9c2170501f7bf3b150bdb1df0e"
+    },
+    "runs/package-v2/owned.json": {
+      "bytes": 1182,
+      "sha256": "57a08440d3fbd59a378e7525eba804e383e5c750fdbaa4fc847e9fbdb03ced2f"
+    },
+    "runs/package-v2/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "runs/package-v2/stdout": {
+      "bytes": 239,
+      "sha256": "55b1afc122c88ebe7ba136a6f99e6f314252e5e2e3f41f43dc6cc28871830692"
+    },
+    "runs/package/owned.json": {
+      "bytes": 1179,
+      "sha256": "414f5e7dc106191a6d1d7cc63009ff8fd9cf19417bbae7277b1fe6cc73b1d63d"
+    },
+    "runs/package/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "runs/package/stdout": {
+      "bytes": 236,
+      "sha256": "6141e6623cff67b1dc5396b197ed1bcdcde4e540b4e22664c06d99fce73701b1"
+    },
+    "runs/unit-v2/owned.json": {
+      "bytes": 799,
+      "sha256": "cb580989505c88287b50bf49bfa056578d40ea247642f691d0930eba70dd6305"
+    },
+    "runs/unit-v2/stderr": {
+      "bytes": 10274,
+      "sha256": "a88327d750ea69ac53924ed3326d9ea5785f5f8a5b8af0e7b74d98cb6c828369"
+    },
+    "runs/unit-v2/stdout": {
+      "bytes": 254,
+      "sha256": "ff4d9f06da0196410f0877932d28ae4d556f210f97f7a1fa120699b05ea2acdf"
+    },
+    "runs/unit-v3/owned.json": {
+      "bytes": 799,
+      "sha256": "545eb4a614c6bdefb6114f365ef25d620e68850cadf6fd2caa53b6972cf6058a"
+    },
+    "runs/unit-v3/stderr": {
+      "bytes": 10604,
+      "sha256": "5b544878b3b11562b3daba326ae4b8b56c1ea155ea591c7a7b6c05ff18755d81"
+    },
+    "runs/unit-v3/stdout": {
+      "bytes": 254,
+      "sha256": "73672972056e9b8444d2dab01445bf48ad7dcc2ca6f57314f39a2ef649894bfb"
+    },
+    "runs/unit/owned.json": {
+      "bytes": 799,
+      "sha256": "3607b2f3d684e600fbc286b16454f145238f8e8b85d203a5a704cfda350e6ec8"
+    },
+    "runs/unit/stderr": {
+      "bytes": 10097,
+      "sha256": "9eee700fee49b9775914e266885049ac4d6a06d2121c5cb69507821f335fc207"
+    },
+    "runs/unit/stdout": {
+      "bytes": 254,
+      "sha256": "7a83f1fab95645dc0119e3f535290e989ed2beee746d6a5e1af8eae6f73a3487"
+    },
+    "source/docs/implementation.md": {
+      "bytes": 40041,
+      "sha256": "971ace24098570c725628a59f4b04768ea9a66bcba33d71713b736cea2c0bda1"
+    },
+    "source/scripts/check-sdk.py": {
+      "bytes": 16158,
+      "sha256": "b8062fbd4c57d1d8cb4d75a094184e1a5fa108cfa811fe9fb390f99f6d66be38"
+    },
+    "source/scripts/native_gpu.py": {
+      "bytes": 9500,
+      "sha256": "803d981c00f32d08a370577b37094848b2c79085cf3303a99b23d2a94336ac2c"
+    },
+    "source/scripts/native_gpu_test.py": {
+      "bytes": 12750,
+      "sha256": "f3c49d20b793c24d827f8516a630c174216095dff5144d6b61b8f32a5f9ca28a"
+    },
+    "source/scripts/new-app.py": {
+      "bytes": 2150,
+      "sha256": "c6fa1fcfb3f2940df4f61815e1e3c64a712ab005b33b12de43b0f7f62e2b37af"
+    },
+    "source/scripts/release-sdk.py": {
+      "bytes": 21831,
+      "sha256": "5dd3b569111c4703892b23c09766f8965feab3d31e182115b72028e6f9313a42"
+    },
+    "source/specs/release.md": {
+      "bytes": 28634,
+      "sha256": "de7853175176da99e2c88cbf548518b7a07eb9a96eb8649fb172a0bc8d2eb5a6"
+    },
+    "source/specs/sdk.md": {
+      "bytes": 10037,
+      "sha256": "a4caa8d86f4f80ffb1b22ec378de55c2a0d2247bb8f628d52f2247a5300eb18d"
+    },
+    "workspace/README.final.md": {
+      "bytes": 5838,
+      "sha256": "c7a6946687dc80ee84aa5a06fd7037d982d66166a2c1298e06981d574fb382b0"
+    },
+    "workspace/apply-review-fixes.py": {
+      "bytes": 547,
+      "sha256": "841ff36f7dd714444a2a9a3f3fbe25217c0bb69b5ad8b7237be3d5da7529653a"
+    },
+    "workspace/check-v2.json": {
+      "bytes": 2017235,
+      "sha256": "6fb26fdb2979e3288ba9a5fe1a4f7181b5a10bd5dc11147fd9c5b3a5e8e2b81f"
+    },
+    "workspace/check.json": {
+      "bytes": 2016123,
+      "sha256": "cd01a229c3e3b35bfe083caba9fe8f5f081b520adc826a8dc7e6d473be848398"
+    },
+    "workspace/checks.py": {
+      "bytes": 5385,
+      "sha256": "0c06d0ca1d89a3a0016db6d21086ca50d4b2688c4e93b8c199ebe6816e200efd"
+    },
+    "workspace/commit-finalization-equivalence.json": {
+      "bytes": 335,
+      "sha256": "e1ed85ecf4bffab2b9f88a48c6f92aaae166cae081bcf41b406ef69aa96808a6"
+    },
+    "workspace/commit.py": {
+      "bytes": 5695,
+      "sha256": "b6dc9c02de21d4d20357099dd8a47c82a6684200ef1194795aa964cb7c3cc23e"
+    },
+    "workspace/draft/docs/implementation.md": {
+      "bytes": 40041,
+      "sha256": "971ace24098570c725628a59f4b04768ea9a66bcba33d71713b736cea2c0bda1"
+    },
+    "workspace/draft/scripts/check-sdk.py": {
+      "bytes": 16158,
+      "sha256": "b8062fbd4c57d1d8cb4d75a094184e1a5fa108cfa811fe9fb390f99f6d66be38"
+    },
+    "workspace/draft/scripts/native_gpu.py": {
+      "bytes": 9500,
+      "sha256": "803d981c00f32d08a370577b37094848b2c79085cf3303a99b23d2a94336ac2c"
+    },
+    "workspace/draft/scripts/native_gpu_test.py": {
+      "bytes": 12750,
+      "sha256": "f3c49d20b793c24d827f8516a630c174216095dff5144d6b61b8f32a5f9ca28a"
+    },
+    "workspace/draft/scripts/new-app.py": {
+      "bytes": 2150,
+      "sha256": "c6fa1fcfb3f2940df4f61815e1e3c64a712ab005b33b12de43b0f7f62e2b37af"
+    },
+    "workspace/draft/scripts/release-sdk.py": {
+      "bytes": 21831,
+      "sha256": "5dd3b569111c4703892b23c09766f8965feab3d31e182115b72028e6f9313a42"
+    },
+    "workspace/draft/specs/release.md": {
+      "bytes": 28634,
+      "sha256": "de7853175176da99e2c88cbf548518b7a07eb9a96eb8649fb172a0bc8d2eb5a6"
+    },
+    "workspace/draft/specs/sdk.md": {
+      "bytes": 10037,
+      "sha256": "a4caa8d86f4f80ffb1b22ec378de55c2a0d2247bb8f628d52f2247a5300eb18d"
+    },
+    "workspace/gpu-provenance.json": {
+      "bytes": 1006,
+      "sha256": "3830acab26baa87e774bc8b955f4da5ad0756dd7ea086b934672bf734503c39b"
+    },
+    "workspace/history/before-target-check-sdk.py": {
+      "bytes": 15861,
+      "sha256": "b9b14c02db8bc5dedd6efd8dd912647bed6e78bf31b382c0758ecf45fb31696d"
+    },
+    "workspace/history/before-target-native_gpu_test.py": {
+      "bytes": 10553,
+      "sha256": "4706bc88d20c3004821ca5b1ab2c3fd845a0b4f0c98e2eda97826622e57b2dce"
+    },
+    "workspace/history/checks-before-target.py": {
+      "bytes": 4663,
+      "sha256": "527ec7fdee18325c8683a3068c5d62f29ba9c7abb56ec58b5b1e1d322e2bac1e"
+    },
+    "workspace/history/checks-before-unix-policy.py": {
+      "bytes": 4689,
+      "sha256": "3634913f35f35d177308cb99fef9d9e169ef7cdf7e50cae2800327d8342155c3"
+    },
+    "workspace/history/first-regression-failure.json": {
+      "bytes": 291,
+      "sha256": "684c93dfdbeb297c3806f6d822ac78ac5cfd97a6db3af67ece9a7a0e9612b67d"
+    },
+    "workspace/history/native_gpu-before-singleline.py": {
+      "bytes": 8727,
+      "sha256": "abd4ecf9f5bf754b5fd24d02554dc1a3066b5853c53dc3bdf68a45e031291929"
+    },
+    "workspace/history/pre-review-native_gpu.py": {
+      "bytes": 8742,
+      "sha256": "f282e7c43168efa1a8b061142cfb1ec11696fa99afd6f59bcd11ec84d2415d5b"
+    },
+    "workspace/history/pre-review-native_gpu_test.py": {
+      "bytes": 11084,
+      "sha256": "47b535e715ad3dfd298c3a6c8a33ad3eebf0025380ef002c9fee6db13618b5c6"
+    },
+    "workspace/install-receipt.json": {
+      "bytes": 890,
+      "sha256": "a9bc45a4458be452384aa237b9e2ee774be2a6cecde2771041f981e12008e818"
+    },
+    "workspace/install-tests.py": {
+      "bytes": 588,
+      "sha256": "8f10179c2e8bab364127268d3e4a705d69f66101559e3644ab43843da9c8c894"
+    },
+    "workspace/install.py": {
+      "bytes": 939,
+      "sha256": "dc21a030d2109dee53e3114f313572d55b0ee185784a5321ac366920f9c8d059"
+    },
+    "workspace/internal-review.json": {
+      "bytes": 2030682,
+      "sha256": "fb98a043f18ac88bfe3589b07a3a3e97a8de10046dbb41d5e9154a9622be790f"
+    },
+    "workspace/network-probe.json": {
+      "bytes": 2017082,
+      "sha256": "be5903535a6a417c1de55539c898b67e9912cdfe3b4e67f090d9ca92a6747a1f"
+    },
+    "workspace/network_probe.py": {
+      "bytes": 1894,
+      "sha256": "19cb0d111f140cffd57f132b55aec971f99aea6621085da21a44e9e1b30e9594"
+    },
+    "workspace/package-v2.json": {
+      "bytes": 2016521,
+      "sha256": "d9bf76a8086a368d03def7d9afda4be1a1cbd2f97c12b6182be99fe9156dc33b"
+    },
+    "workspace/package.json": {
+      "bytes": 2016510,
+      "sha256": "01c2bc14785d19c24730d851bb6ed8119fd5b8f4873ec6a02abc08ee4cf1bfda"
+    },
+    "workspace/package.py": {
+      "bytes": 6744,
+      "sha256": "5f5f818843abebb381d78abf21651501d6134d7b640d1c9507ad0c211f6b7a70"
+    },
+    "workspace/prism-disposition.json": {
+      "bytes": 2035138,
+      "sha256": "259b86c46cf1240bae8a2bed0a9fb818582d2e40de5e9a6deff7e11010d13f9c"
+    },
+    "workspace/prism-readiness.json": {
+      "bytes": 2029639,
+      "sha256": "5d0bed6349c7e552afc2565bf8240a9ccd9264cd906dcaddd553f36ba82b8116"
+    },
+    "workspace/prism-rules.json": {
+      "bytes": 1435,
+      "sha256": "b605a40e17a1f4fbc5b45a4be1f4e70505aa04c844bab099ce643ac9c619fec3"
+    },
+    "workspace/prism/owned.json": {
+      "bytes": 1048,
+      "sha256": "09865d47cf2d5e66ccb4c4972704147db463e67d721a400dd0f4ae331c815fce"
+    },
+    "workspace/prism/prism.json": {
+      "bytes": 4767,
+      "sha256": "35819696dd0976c5b1f35608354ed3bee67ffa483b3382dd8df5f1f563f11997"
+    },
+    "workspace/prism/receipt.json": {
+      "bytes": 2836,
+      "sha256": "9c7009b66cdc37fbe9c2ca1d012188a34eb5db6f8f4a0bc7ef538c6d9d305da1"
+    },
+    "workspace/prism/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/prism/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/prism_review.py": {
+      "bytes": 5331,
+      "sha256": "6bf300a65e7e3ee4ca3bae2b916204cfd592c5eb886727fe71543f75b713b8d7"
+    },
+    "workspace/review-probe.json": {
+      "bytes": 2437,
+      "sha256": "3e55bc44c60d5f7cfb298572466d8c535f4948830b56a4db885bc44dde031229"
+    },
+    "workspace/review_probe.py": {
+      "bytes": 3429,
+      "sha256": "d106a4000c4f4fdaea70825ca39e8291689cc745e8573ba8a35ff806deb09e63"
+    },
+    "workspace/sdk-metadata/PROVENANCE.json": {
+      "bytes": 1006,
+      "sha256": "3830acab26baa87e774bc8b955f4da5ad0756dd7ea086b934672bf734503c39b"
+    },
+    "workspace/sdk-metadata/SDK_MANIFEST.json": {
+      "bytes": 980174,
+      "sha256": "12e719c3c0f83c12ef267058ce8f7c5bb8e65b3c56eb9eb03215c1a9ddf74860"
+    },
+    "workspace/sdk-metadata/THIRD_PARTY_INVENTORY.json": {
+      "bytes": 45342,
+      "sha256": "736d4f7692ea7b8be6d75dd7fe65eccf1efb59f4d95f99fc5184a2322fb37680"
+    },
+    "workspace/sdk-summary.json": {
+      "bytes": 3614,
+      "sha256": "4d32820e8a502bf7b1d6f250d8b6c17100b7d5f874d55a942ab3d41fbe79375c"
+    },
+    "workspace/source-binding.json": {
+      "bytes": 832,
+      "sha256": "dc88184f90f558283eb4057087e1a6cb2dffb639da31f085cc62f061f1a7eea4"
+    },
+    "workspace/source-stage.json": {
+      "bytes": 968,
+      "sha256": "e33f8e552e3d0e9cbcfd7901a85c4a15946ec9d9f209700da8c28d25455f18f6"
+    },
+    "workspace/source-staged.diff": {
+      "bytes": 41126,
+      "sha256": "5585324287618087819bc2e8ebd9fc8c0583704ecc076e9ffe6d09580f4a126b"
+    },
+    "workspace/stage-source.py": {
+      "bytes": 1583,
+      "sha256": "bf50f8a524fa65061ed58562fe445898ab264c01002cb9e4f809b0a348bc6b72"
+    },
+    "workspace/stage.py": {
+      "bytes": 3988,
+      "sha256": "d8776da319911fdc682ff2036e77839a21f9d481698647820348f09d4f72a14c"
+    },
+    "workspace/unit-v2.json": {
+      "bytes": 2015856,
+      "sha256": "61b8d8bb170986d1499a3184dcda6d8240a800e8f610a498fea8c22391a1c495"
+    },
+    "workspace/unit-v3.json": {
+      "bytes": 2015856,
+      "sha256": "1f6f27f88eb3c58878d73c2addd3f3978a1643742ff917ef54f91b2492d90812"
+    },
+    "workspace/unit.json": {
+      "bytes": 2015850,
+      "sha256": "b2335ba1e2cd58e3e5b63d89093290604cb2c9e55a3b238889e9980e6cfe7b95"
+    },
+    "workspace/update-docs.py": {
+      "bytes": 490,
+      "sha256": "293b7c27e8e6b353a2819608cba1b4b1ae030f7f8af777f9b48d496565ade8af"
+    },
+    "workspace/update-helper.py": {
+      "bytes": 464,
+      "sha256": "20ce11cb22fd381642312ff662928f31860a331c17b5bf030932ec75ac55e707"
+    },
+    "workspace/update-target.py": {
+      "bytes": 572,
+      "sha256": "350863c92ba93ab2c333adc7da47f37fad78bef35e1a3ed32a02a23706cac2b2"
+    }
+  },
+  "archive": {
+    "bytes": 587420,
+    "sha256": "740651900cd544baec430f384860fea069d86dadee003a731fc5b91ea4a5edf0"
+  },
+  "excluded_principal_artifacts": [
+    {
+      "path": "/private/tmp/vellum-source-gpu-sdk-a274e8a/candidate-sdk.tar.gz",
+      "bytes": 29396606,
+      "sha256": "7f383d0cb5c3ee3553a7c3d68c26a72a6388ad4b78d529bf8a181381e06d37a0"
+    },
+    {
+      "path": "/private/tmp/vellum-source-gpu-sdk-a274e8a/candidate-sdk-v2.tar.gz",
+      "bytes": 29397418,
+      "sha256": "1777dc32f97e12056b2931f5d6d21a114a0ad191a1415c35d260b414c0d3c05d"
+    },
+    {
+      "path": "/private/tmp/vellum-source-built-gpu-276a654/build-target-v1/aarch64-apple-darwin/release/libwgpu_native.a",
+      "bytes": 37401760,
+      "sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+    }
+  ],
+  "other_exclusions": "Go caches/temp files and binaries removed by the relocation checker are absent. Full source/prepared/tool input fingerprints remain in check receipts. No native SDK run or physical input was performed."
+}

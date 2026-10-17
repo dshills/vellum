@@ -3,6 +3,8 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Private source-built GPU SDK overlay](macos-source-gpu-sdk/README.md)
+
 - [Source-built GPU workbench consumer](macos-source-gpu-framework/README.md)
 
 - [Pinned-source GPU consumer](macos-source-built-gpu/README.md)

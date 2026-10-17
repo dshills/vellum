@@ -404,3 +404,16 @@ private compatibility evidence, with no installed library, SDK or runtime source
 adoption. Source/component/standard-library rights closure, broader Mac runtime,
 physical input/presentation, performance/memory/endurance and distribution remain
 separate release gates.
+
+### Explicit private GPU SDK overlays
+
+Private `release-sdk.py` builds may carry a digest-pinned ARM64 static WGPU
+candidate and separately hashed caller-declared provenance. All-or-none input
+validation and a hard public-release refusal precede inventory and output work.
+The bounded archive/header checks, four-file capsule, derived module hashes,
+absolute generated-application replacement and strict relocated Go origin follow
+[sdk.md](sdk.md#private-arm64-mac-gpu-candidate). Default SDK packaging does not
+select an ignored capsule. The private manifest retains pending audit status;
+matching library bytes, module origin and copied Go notices do not establish
+source attestation, binary ABI/runtime compatibility or complete component/rights
+closure. Observed build/linkage and admitted native qualification remain required.

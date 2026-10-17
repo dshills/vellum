@@ -610,3 +610,13 @@ raw DTOs/native streams are not retained. The original warning-policy failure
 and omitted-empty-setting parser failure remain preserved. Installed libraries,
 runtime source and SDK are unchanged; physical input, presentation, ordinary
 performance/memory/endurance, rights closure and full Mac acceptance remain open.
+
+### Private source-built GPU SDK selection
+
+SDK packaging now supports an explicit private ARM64 static GPU candidate with
+an expected digest and separately retained unverified provenance. Generated
+applications and native examples resolve it locally, with exact capsule and
+manifest checks plus a required relocated Go module origin. The framework root
+and portable examples retain their existing module graphs. Public packaging
+refuses the candidate override and the native/Rust/standard-library component
+and rights audit remains pending. See the [SDK contract](../specs/sdk.md#private-arm64-mac-gpu-candidate).

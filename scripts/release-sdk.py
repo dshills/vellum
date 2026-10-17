@@ -19,6 +19,7 @@ from child_process import run_child, check_child_output
 
 from artifact_io import publish_exclusive
 from sdk_environment import child_environment
+import native_gpu
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMAND_TIMEOUT_SECONDS = 600
@@ -246,9 +247,14 @@ def add_member(archive, name, data, executable=False):
     archive.addfile(member, io.BytesIO(data))
 
 
-def package(root, output, public=False, include_untracked=False):
+def package(root, output, public=False, include_untracked=False, *, macos_gpu_library=None,
+            macos_gpu_sha256=None, macos_gpu_provenance=None):
     if public and include_untracked:
         raise ValueError("public SDK cannot include untracked files")
+    gpu_arguments = [macos_gpu_library is not None, macos_gpu_sha256 is not None, macos_gpu_provenance is not None]
+    if any(gpu_arguments) and (public or not all(gpu_arguments)):
+        raise ValueError("native GPU candidates require all three options and a private SDK")
+    gpu_record, gpu_files = native_gpu.candidate(macos_gpu_library, macos_gpu_sha256, macos_gpu_provenance) if all(gpu_arguments) else (None, {})
     # Outputs and their pending archive must never be discoverable as source.
     # Resolve ancestors for this containment check but preserve the caller's
     # final path so the existing/dangling-symlink refusal remains explicit.
@@ -276,6 +282,11 @@ def package(root, output, public=False, include_untracked=False):
     try:
         with public_dependencies(root) if public else nullcontext(None) as dependencies:
             inventory, notices = license_inventory(root, dependencies)
+            if gpu_record is not None:
+                inventory["native_gpu_candidate"] = {"artifact_sha256": gpu_record["files"][native_gpu.LIBRARY],
+                    "provenance_sha256": gpu_record["files"][native_gpu.PROVENANCE],
+                    "trust": native_gpu.TRUST, "distribution_audit": "pending",
+                    "scope": "Go graph notices do not close this candidate's native/Rust/standard-library component or rights audit"}
             if public and any(not item.get("module_license_files") for item in inventory["modules"]):
                 raise ValueError("a dependency has no recorded module license declaration")
             with tempfile.NamedTemporaryFile(prefix=".vellum-sdk-", dir=output.parent, delete=False) as temporary:
@@ -284,11 +295,18 @@ def package(root, output, public=False, include_untracked=False):
                     with tarfile.open(fileobj=zipped, mode="w|", format=tarfile.PAX_FORMAT) as archive:
                         for name, source in source_files(root, include_untracked=include_untracked, dependencies=dependencies):
                             data = source.read_bytes()
+                            if gpu_record is not None:
+                                overlaid = native_gpu.overlay_modfile(name, data)
+                                if overlaid is not None:
+                                    gpu_record["go_mod_overlays"][name] = {"source_sha256": native_gpu.digest(data),
+                                        "archived_sha256": native_gpu.digest(overlaid)}
+                                    data = overlaid
                             if name in untracked_candidates:
                                 included_untracked.append(name)
                             add_member(archive, prefix + "/" + name, data, bool(source.stat().st_mode & 0o111))
                             checksums[name] = hashlib.sha256(data).hexdigest()
                         generated = dict(notices)
+                        generated.update(gpu_files)
                         generated["THIRD_PARTY_INVENTORY.json"] = (json.dumps(inventory, indent=2, sort_keys=True) + "\n").encode()
                         if not public:
                             generated["PRIVATE_BUILD.txt"] = b"Private SDK validation build. Public release, licensing and platform qualification gates have not passed.\n"
@@ -298,6 +316,9 @@ def package(root, output, public=False, include_untracked=False):
                             add_member(archive, prefix + "/" + name, data)
                             checksums[name] = hashlib.sha256(data).hexdigest()
                         manifest = {"schema": 1, "release": metadata, "source": state, "private_build": not public, "untracked_files": sorted(included_untracked), "files": checksums}
+                        if gpu_record is not None:
+                            native_gpu.validate_record(gpu_record, checksums, True)
+                            manifest["native_gpu"] = gpu_record
                         add_member(archive, prefix + "/SDK_MANIFEST.json", (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode())
                 temporary.flush()
                 os.fsync(temporary.fileno())
@@ -318,8 +339,13 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--public", action="store_true", help="require the recorded public namespace and license/audit gates")
     parser.add_argument("--include-untracked", action="store_true", help="explicitly include nonignored whitelisted untracked files in a private precommit snapshot; their names are recorded")
+    parser.add_argument("--macos-gpu-library", type=Path, help="private SDK only: digest-pinned ARM64 static WGPU archive")
+    parser.add_argument("--macos-gpu-sha256", help="expected SHA-256 of the private native archive")
+    parser.add_argument("--macos-gpu-provenance", type=Path, help="bounded caller-declared JSON identifying target and exact artifact; not an attestation")
     args = parser.parse_args()
-    print(json.dumps(package(ROOT, args.output.absolute(), args.public, args.include_untracked), indent=2))
+    print(json.dumps(package(ROOT, args.output.absolute(), args.public, args.include_untracked,
+        macos_gpu_library=args.macos_gpu_library, macos_gpu_sha256=args.macos_gpu_sha256,
+        macos_gpu_provenance=args.macos_gpu_provenance), indent=2))
 
 
 if __name__ == "__main__":

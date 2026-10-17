@@ -6,6 +6,7 @@ import gzip
 import io
 import json
 import os
+import platform
 from pathlib import Path, PurePosixPath
 import re
 import shutil
@@ -16,6 +17,7 @@ from child_process import run_child, check_child_output
 import tarfile
 import tempfile
 import zlib
+import native_gpu
 
 from sdk_environment import CHILD_ENVIRONMENT, GO_CONFIGURATION, child_environment
 
@@ -171,6 +173,7 @@ def verify_archive(path, expected_sha256=None):
             raise ValueError("invalid SDK member checksum")
         if hashes[name] != expected:
             raise ValueError(f"SDK member checksum mismatch: {name}")
+    native_gpu.validate_record(manifest.get("native_gpu"), files, manifest.get("private_build"))
     return {"archive_sha256": digest, "prefix": prefix, "manifest": manifest, "_archive_bytes": archive_bytes}
 
 
@@ -205,7 +208,7 @@ def decode_objects(raw):
     return objects
 
 
-def check_origin(modules, sdk, module_path="github.com/dshills/vellum"):
+def check_origin(modules, sdk, module_path="github.com/dshills/vellum", gpu=None):
     origins = {}
     for module in modules:
         replaced = module.get("Replace")
@@ -221,6 +224,8 @@ def check_origin(modules, sdk, module_path="github.com/dshills/vellum"):
     expected = {module_path: ".", module_path + "/drivers/cogent": "drivers/cogent",
                 "cogentcore.org/core": "drivers/cogent/build/upstream",
                 "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"}
+    if gpu is not None:
+        expected[native_gpu.MODULE] = native_gpu.DIRECTORY
     for name, relative in expected.items():
         if name not in origins:
             raise ValueError(f"consumer is missing explicit SDK replacement: {name}")
@@ -251,13 +256,18 @@ def check(path, expected_sha256=None, native_runtime=False, allow_self_attested=
         raise ValueError("executing SDK code requires --sha256 from a trusted producer or explicit --allow-self-attested")
     verified = verify_archive(path, expected_sha256)
     env = child_environment()
+    gpu = verified["manifest"].get("native_gpu")
+    if gpu is not None:
+        if sys.platform != "darwin" or platform.machine() != "arm64":
+            raise ValueError("private native GPU SDK checks require an ARM64 Mac host")
+        env.update(GOOS="darwin", GOARCH="arm64")
     with tempfile.TemporaryDirectory(prefix="vellum SDK relocation ") as temporary:
         base = Path(temporary)
         sdk = extract_verified(path, base / "extracted SDK", verified)
         consumer = base / "consumer application"
         run_child(["python3", str(sdk / "scripts/new-app.py"), str(consumer), "--module=example.com/vellum-relocation-consumer"], env=env, check=True, stdout=sys.stderr, timeout=GENERATOR_TIMEOUT_SECONDS)
         modules = decode_objects(check_child_output(["go", "list", "-m", "-json", "all"], cwd=consumer, env=env, text=True, timeout=COMMAND_TIMEOUT_SECONDS))
-        origins = check_origin(modules, sdk, verified["manifest"]["release"]["module"])
+        origins = check_origin(modules, sdk, verified["manifest"]["release"]["module"], verified["manifest"].get("native_gpu"))
         run_child(["go", "mod", "verify"], cwd=consumer, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)
         for arguments in (["go", "test", "-race", "./..."], ["go", "vet", "./..."], ["go", "build", "-o", str(base / "consumer"), "."]):
             run_child(arguments, cwd=consumer, env=env, check=True, stdout=sys.stderr, timeout=COMMAND_TIMEOUT_SECONDS)

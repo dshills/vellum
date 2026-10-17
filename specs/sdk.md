@@ -106,3 +106,57 @@ The portable SDK exports `execution` alongside `tasks`, `document`, `editor` and
 `app`. The archive relocation test deletes its source fixture and consumes these
 packages through an independent module, including a manually stepped task whose
 final result is admitted while the ordinary owner queue is full.
+
+## Private ARM64 Mac GPU candidate
+
+The SDK builder accepts an explicit private static-library overlay:
+
+```sh
+python3 scripts/release-sdk.py --output /private/tmp/candidate-sdk.tar.gz \
+  --macos-gpu-library /absolute/path/libwgpu_native.a \
+  --macos-gpu-sha256 <64-lowercase-hex-digest> \
+  --macos-gpu-provenance /absolute/path/provenance.json
+```
+
+All three options are required together. `--public` rejects them before inventory,
+download or output creation, including when other public gates are approved.
+Ordinary packaging does not discover or reuse an ignored candidate directory.
+The root framework module and portable example modules remain unchanged.
+
+The library must be a regular, bounded ar archive with the expected SHA-256 and
+at least one object. Every non-index member must have a thin ARM64 Mach-O
+`MH_OBJECT` header; fat, foreign-architecture and unsupported payloads refuse.
+This observes headers and exact bytes, not complete Mach-O semantics or ABI
+compatibility. The same captured bytes are packaged. The archive limit is 64 MiB;
+the provenance JSON limit is 1 MiB, with duplicate and nonfinite JSON values refused.
+Provenance requires integer `schema: 1`, `target: "darwin-arm64"` and
+`artifact_sha256` matching the selected library. Additional fields are retained
+as caller-supplied declarations. The builder never interprets them as commands,
+source attestation, executed-build evidence, component closure or rights approval.
+
+The generated `drivers/cogent/build/libs-darwin` capsule contains exactly
+`go.mod`, owned `libs.go`, `arm64/libwgpu_native.a` and `PROVENANCE.json`.
+`SDK_MANIFEST.native_gpu` records their hashes, observed object count, target,
+explicit unverified trust label and pending distribution audit. Its module
+rewrite records contain both source and archived hashes. `source.commit` names
+the framework baseline and `source.clean` describes the checkout; the candidate
+and derived module files are disclosed overlays. Go graph notices remain
+separate from native/Rust/standard-library component and rights closure.
+
+Driver and native example main-module manifests receive relative local overrides.
+Dependency replacements are not transitive: generated applications receive an
+absolute override to the SDK capsule. The generator rechecks the capsule and
+recorded module-overlay bytes, refuses symlinks and extra files such as a competing
+dylib, and retains the existing destination and starter-license behavior.
+The archive verifier couples the optional manifest record to its exact files;
+an orphan capsule or mismatched record refuses. Relocation checks require the
+actual Go module origin to equal the capsule directory and run candidate builds
+only on an ARM64 Mac, explicitly targeting `GOOS=darwin GOARCH=arm64`.
+Direct tests/builds from the prepared upstream dependency module are outside
+these selected main-module overrides and need their own explicit replacement.
+
+Digest and origin validation do not prove static linkage or runtime behavior.
+A candidate qualification must separately inspect the compiled artifact/linkmap
+for the exact archive and absence of WGPU dylib fallback, then run admitted native
+checks. Other hosts/architectures, older OS runtimes, presentation, physical input,
+performance/memory/endurance, signing and public distribution remain separate.
