@@ -581,3 +581,35 @@ malformed/truncated input, capacity limits and exact actual-grid packet/pixel
 comparisons guard reuse. The [checkpoint](../docs/reports/macos-glyph-fingerprint/README.md)
 records software evidence; shared-computer times do not qualify native latency or
 close the unchanged P6 targets.
+
+## Exact-location glyph coverage
+
+Stage 76 may avoid rebuilding a small glyph's fixed path only for an exact
+identity-transform scene capture after original bitmap and work admission.
+The lookup key combines a live immutable outline cache epoch and nonwrapping
+uint32 entry ID with exact final effective scale and position bits. Zero IDs
+decline reuse. Cache replacement, glyph eviction, fractional coordinates, DPI
+and font-size changes cannot alias an old path.
+
+The renderer-owned placement FIFO is independently limited to 8192 metadata
+entries. It retains no fonts, outlines, images, packets or coverage arrays.
+Coverage-entry tokens plus the fingerprint identify the actual live coverage;
+the fingerprint alone never proves identity. Learning requires normal success
+and full equality with an admitted retained path. A saved absolute guarded hull
+must fit the current target and clip; original scanner/spanner/color checks and
+all logical glyph/outline/extent charges still apply on every hit.
+
+A full index with fewer than one hit per eight probes over 8192 probes pauses
+lookup and learning for 262144 eligible glyphs, then retries. This policy bounds
+saturated miss probing, not every underfull/clipped workload's cost. Index and
+token metadata add bounded ownership state outside the existing path/span byte
+limit; exact allocator or native memory budgets are separate. Resize and Release
+clear this state via the existing coverage owner. Original bitmap, transformed,
+stroked, custom and unsupported paths remain eligible for their original routes.
+
+Required evidence includes warm actual-grid hit assertions and exact original
+packet/pixel hashes, both encodings, generation exhaustion without wrap,
+replacement and FIFO cleanup, collision/current-clip refusal, exact logical work
+charges, cooldown no-learning/resume behavior, and discriminating guard-removal
+controls. Warm gains, bitmap cases and cold/clipped penalties must be reported
+separately. Software capture results do not close native P6 latency targets.

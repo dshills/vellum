@@ -749,6 +749,17 @@
               "sha256": "d8ae35c6d00c1f2112e4fed17192de82484c251b4f3add6ab1439d8904a0e20a"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/glyphplacement",
+          "inputs": "native/patches/glyphplacement/original-hashes.json",
+          "outputs": "native/patches/glyphplacement/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/glyphplacement/0076-exact-location-glyph-coverage.patch",
+              "sha256": "c180b07f524aafd81477f6d201d6a15ccb549b115c0e81e3d04cc79fc1680237"
+            }
+          ]
         }
       ]
     },

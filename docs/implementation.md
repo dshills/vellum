@@ -499,3 +499,14 @@ processes miss 4/6 ms; fixed-row CPU p95 is higher in all five pairs. One paired
 allocation diagnostic estimates fewer Go objects, but establishes no native
 latency gain, broad no-regression or native/retained memory acceptance. P6/P11
 and full Mac, physical/human and distribution/release gates remain open.
+
+Owned stage 0076 adds exact-location reuse for small glyph scene coverage after
+the existing bitmap return and original work charges. Private epoch/generation
+identities preserve the 64-bit outline-entry size; a separate 8192-entry metadata
+index validates current coverage identity, clip, target and scanner state.
+Saturated misses use a bounded pause before retry. Warm grid packet/pixel parity,
+exact logical charges, FIFO/collision/exhaustion and cooldown routing have scoped
+regressions. Warm software gains and cold/bitmap costs remain separate from the
+open native frame budgets and full macOS qualification. The
+[owned contract](../drivers/cogent/native/patches/glyphplacement/README.md) records
+the bounds and fallback requirements.

@@ -208,3 +208,10 @@ Stage 75 (`patches/tilebinning`) uses adaptive exact scene tile-bin counting:
 analytic original admission, dense rectangle differences/prefixes and sparse
 direct counts. Serialized bytes, painter order, compact IDs and all original
 limits stay fixed. See [owned contract](patches/tilebinning/README.md).
+
+Stage 76 (`patches/glyphplacement`) reuses exact-location small glyph scene
+coverage under live outline/coverage identities and the original work and scan
+guards. The independently bounded index has a saturated-miss cooldown; bitmap
+rendering retains its earlier return. See the
+[owned contract](patches/glyphplacement/README.md) for identity exhaustion,
+ownership, fallback and verification limits.

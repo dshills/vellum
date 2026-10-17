@@ -1,0 +1,985 @@
+--- a/paint/renderers/rasterx/outline_cache.go
++++ b/paint/renderers/rasterx/outline_cache.go
+@@ -24,12 +24,17 @@
+ 	gid  font.GID
+ }
+ 
++// This separate nonzero-sized epoch token retains no font, outline or cache.
++// Per-outline IDs never wrap; zero permanently declines placement reuse.
++type outlineIdentity struct{ marker byte }
++
+ type outlineEntry struct {
+-	key     outlineKey
+-	outline font.GlyphOutline
+-	cost    font.GlyphOutlineCost
+-	bytes   int
+-	extrema outlineExtrema
++	key      outlineKey
++	outline  font.GlyphOutline
++	cost     font.GlyphOutlineCost
++	bytes    int
++	extrema  outlineExtrema
++	identity uint32 // occupies the legacy trailing padding on supported 64-bit targets
+ }
+ 
+ // staticOutlineCache belongs to one renderer and its private paint captures.
+@@ -42,11 +47,13 @@
+ // not total process/native/font bytes or allocator/map metadata. Renderer GC
+ // releases its cache; resizing keeps these size-independent outlines reusable.
+ type staticOutlineCache struct {
+-	mu      sync.Mutex
+-	entries map[outlineKey]*list.Element
+-	fonts   map[*font.Font]int
+-	lru     list.List
+-	bytes   int
++	mu           sync.Mutex
++	entries      map[outlineKey]*list.Element
++	fonts        map[*font.Font]int
++	lru          list.List
++	bytes        int
++	identity     *outlineIdentity
++	nextIdentity uint32
+ }
+ 
+ func (rs *Renderer) staticOutlines() *staticOutlineCache {
+@@ -102,6 +109,7 @@
+ 	}
+ 	weight := cap(outline.Segments) * outlineSegmentBytes
+ 	if cache.entries == nil {
++		cache.identity = &outlineIdentity{1}
+ 		cache.entries = make(map[outlineKey]*list.Element)
+ 		cache.fonts = make(map[*font.Font]int)
+ 	}
+@@ -109,7 +117,13 @@
+ 		(cache.fonts[key.font] == 0 && len(cache.fonts) >= outlineCacheFonts) {
+ 		cache.evict()
+ 	}
+-	cache.entries[key] = cache.lru.PushFront(outlineEntry{key: key, outline: outline, cost: cost, bytes: weight, extrema: measureOutlineExtrema(outline)})
++	// Exhaustion declines this optimization without changing outline admission.
++	identity := uint32(0)
++	if cache.nextIdentity != ^uint32(0) {
++		cache.nextIdentity++
++		identity = cache.nextIdentity
++	}
++	cache.entries[key] = cache.lru.PushFront(outlineEntry{identity: identity, key: key, outline: outline, cost: cost, bytes: weight, extrema: measureOutlineExtrema(outline)})
+ 	cache.fonts[key.font]++
+ 	cache.bytes += weight
+ }
+--- a/paint/renderers/rasterx/glyph_coverage.go
++++ b/paint/renderers/rasterx/glyph_coverage.go
+@@ -15,11 +15,14 @@
+ const glyphCoverageSpans = 256
+ 
+ type glyphCoverageSpan = sceneplan.SpanSample
++type glyphCoverageIdentity struct{ marker byte }
++
+ type glyphCoverageEntry struct {
+-	hash  uint64
+-	path  Path
+-	spans []glyphCoverageSpan
+-	bytes int
++	identity *glyphCoverageIdentity
++	hash     uint64
++	path     Path
++	spans    []glyphCoverageSpan
++	bytes    int
+ }
+ 
+ // Per-renderer FIFO storage owns only fixed paths and ordered coverage. No font,
+@@ -30,6 +33,7 @@
+ 	queue              [glyphCoverageEntries]*glyphCoverageEntry
+ 	head, count, bytes int
+ 	hits, misses       uint64
++	placements         *glyphPlacementCache
+ }
+ 
+ func (rs *Renderer) glyphCoverageCache() *glyphCoverageCache {
+@@ -54,8 +58,13 @@
+ // preserve the key, while fractional coordinate phases remain represented.
+ // Only exact normalized operation/coordinate equality can authorize reuse.
+ func glyphCoverageGeometry(p Path, bounds, clip image.Rectangle) (image.Point, uint64, bool) {
++	o, h, _, ok := glyphCoverageGeometryHull(p, bounds, clip)
++	return o, h, ok
++}
++
++func glyphCoverageGeometryHull(p Path, bounds, clip image.Rectangle) (image.Point, uint64, image.Rectangle, bool) {
+ 	if len(p) == 0 || len(p) > glyphCoveragePathValues || bounds.Min != (image.Point{}) || clip.Empty() {
+-		return image.Point{}, 0, false
++		return image.Point{}, 0, image.Rectangle{}, false
+ 	}
+ 	lo, hi := image.Pt(1<<30, 1<<30), image.Point{}
+ 	points := 0
+@@ -73,17 +82,17 @@
+ 		case PathClose:
+ 			n = 1
+ 		default:
+-			return image.Point{}, 0, false
++			return image.Point{}, 0, image.Rectangle{}, false
+ 		}
+ 		if i+n > len(p) {
+-			return image.Point{}, 0, false
++			return image.Point{}, 0, image.Rectangle{}, false
+ 		}
+ 		h ^= uint64(uint32(p[i]))
+ 		h *= 1099511628211
+ 		for j := i + 1; j < i+n; j += 2 {
+ 			x, y := int(p[j]), int(p[j+1])
+ 			if x < 0 || y < 0 || x > 8192*64 || y > 8192*64 {
+-				return image.Point{}, 0, false
++				return image.Point{}, 0, image.Rectangle{}, false
+ 			}
+ 			if points == 0 {
+ 				anchor = image.Pt(x/64, y/64)
+@@ -101,15 +110,15 @@
+ 		i += n
+ 	}
+ 	if points == 0 {
+-		return image.Point{}, 0, false
++		return image.Point{}, 0, image.Rectangle{}, false
+ 	}
+ 	origin := image.Pt(lo.X/64, lo.Y/64)
+ 	// Include a full guard pixel. No target/clip edge may have removed a span.
+ 	hull := image.Rectangle{Min: origin, Max: image.Pt((hi.X+63)/64+1, (hi.Y+63)/64+1)}
+ 	if hull.Dx() > 128 || hull.Dy() > 128 || !hull.In(bounds) || !hull.In(clip) {
+-		return image.Point{}, 0, false
+-	}
+-	return origin, h, true
++		return image.Point{}, 0, image.Rectangle{}, false
++	}
++	return origin, h, hull, true
+ }
+ func glyphCoverageWalk(p Path, origin image.Point, each func(fixed.Int26_6)) {
+ 	for i := 0; i < len(p); {
+@@ -167,7 +176,7 @@
+ 	for c.count > 0 && (c.count == glyphCoverageEntries || c.bytes+cost > glyphCoverageBytes) {
+ 		c.evict()
+ 	}
+-	e := &glyphCoverageEntry{hash: hash, path: make(Path, len(p)), spans: make([]glyphCoverageSpan, len(spans)), bytes: cost}
++	e := &glyphCoverageEntry{identity: &glyphCoverageIdentity{1}, hash: hash, path: make(Path, len(p)), spans: make([]glyphCoverageSpan, len(spans)), bytes: cost}
+ 	i := 0
+ 	glyphCoverageWalk(p, origin, func(v fixed.Int26_6) { e.path[i] = v; i++ })
+ 	copy(e.spans, spans)
+@@ -206,52 +215,59 @@
+ 	}
+ }
+ 
+-func (rs *Renderer) drawGlyphCoverage(fill image.Image) bool {
++func (rs *Renderer) glyphCoverageReady(fill image.Image) (image.Rectangle, bool) {
+ 	if _, ok := valueUniform(fill); !ok {
+-		return false
++		return image.Rectangle{}, false
+ 	}
+ 	// Only the known owned spanners and a clean scanner participate. Custom paint
+ 	// hooks retain their original call path and scan state.
+ 	switch s := rs.Scanner.Spanner.(type) {
+ 	case *scan.ImgSpanner:
+ 		if s != rs.ImgSpanner || rs.sceneRecord != nil {
+-			return false
++			return image.Rectangle{}, false
+ 		}
+ 	case *sceneSpanner:
+ 		if rs.sceneRecord == nil || s.builder != rs.sceneRecord {
+-			return false
++			return image.Rectangle{}, false
+ 		}
+ 	default:
+-		return false
++		return image.Rectangle{}, false
+ 	}
+ 	if len(rs.Scanner.Cell) != 0 || rs.Scanner.Area != 0 || rs.Scanner.Cover != 0 || rs.Scanner.A != (fixed.Point26_6{}) || rs.Scanner.Xi != 0 || rs.Scanner.Yi != 0 || rs.Raster.Filler.A != (fixed.Point26_6{}) || rs.Raster.Filler.First != (fixed.Point26_6{}) || rs.Scanner.MinX != fixed.Int26_6(2147483647) || rs.Scanner.MinY != fixed.Int26_6(2147483647) || rs.Scanner.MaxX != fixed.Int26_6(-2147483647) || rs.Scanner.MaxY != fixed.Int26_6(-2147483647) {
+-		return false
++		return image.Rectangle{}, false
+ 	}
+ 	bounds := image.Rectangle{Max: rs.size.ToPointCeil()}
+ 	if rs.Scanner.Width != bounds.Dx() || len(rs.Scanner.CellIndex) != bounds.Dy() || rs.Raster.Filler.Scanner != rs.Scanner {
++		return image.Rectangle{}, false
++	}
++	return bounds, true
++}
++
++func (rs *Renderer) drawGlyphCoverage(fill image.Image) bool {
++	return rs.drawGlyphCoverageAt(fill, glyphPlacementKey{})
++}
++
++func (rs *Renderer) drawGlyphCoverageAt(fill image.Image, key glyphPlacementKey) bool {
++	bounds, ready := rs.glyphCoverageReady(fill)
++	if !ready {
+ 		return false
+ 	}
+-	origin, hash, ok := glyphCoverageGeometry(rs.Path, bounds, rs.Scanner.Clip)
++	origin, hash, hull, ok := glyphCoverageGeometryHull(rs.Path, bounds, rs.Scanner.Clip)
+ 	if !ok {
+ 		return false
+ 	}
+ 	cache := rs.glyphCoverageCache()
+ 	rf := &rs.Raster.Filler
++	if e := cache.entries[hash]; e != nil && glyphCoverageMatches(e, rs.Path, origin) {
++		cache.hits++
++		rs.emitGlyphCoverage(e, origin, fill)
++		if !rs.recordingFailed() {
++			cache.rememberPlacement(key, e, origin, hull)
++		}
++		return true
++	}
+ 	rf.SetWinding(true)
+ 	rf.SetColor(fill)
+-	if e := cache.entries[hash]; e != nil && glyphCoverageMatches(e, rs.Path, origin) {
+-		cache.hits++
+-		if s, ok := rs.Scanner.Spanner.(*sceneSpanner); ok && s.beginSpans() && s.builder.PackedSpans(e.spans, origin) {
+-			rf.Clear()
+-			return true
+-		}
+-		span := rs.Scanner.Spanner.GetSpanFunc()
+-		for _, s := range e.spans {
+-			span(int(s.Y)+origin.Y, int(s.X0)+origin.X, int(s.X1)+origin.X, s.Alpha)
+-		}
+-		rf.Clear()
+-		return true
+-	}
+ 	cache.misses++
+ 	original := rs.Scanner.Spanner
+ 	recorder := &glyphCoverageRecorder{underlying: original, origin: origin}
+@@ -263,6 +279,26 @@
+ 	rf.Clear()
+ 	if !recorder.failed && !rs.recordingFailed() {
+ 		cache.retain(hash, rs.Path, origin, recorder.spans)
++		if e := cache.entries[hash]; e != nil && glyphCoverageMatches(e, rs.Path, origin) {
++			cache.rememberPlacement(key, e, origin, hull)
++		}
+ 	}
+ 	return true
+ }
++
++// Emission is shared by the exact-path and exact-location routes. In particular,
++// refusal in PackedSpans follows the same original fallback and scanner cleanup.
++func (rs *Renderer) emitGlyphCoverage(e *glyphCoverageEntry, origin image.Point, fill image.Image) {
++	rf := &rs.Raster.Filler
++	rf.SetWinding(true)
++	rf.SetColor(fill)
++	if s, ok := rs.Scanner.Spanner.(*sceneSpanner); ok && s.beginSpans() && s.builder.PackedSpans(e.spans, origin) {
++		rf.Clear()
++		return
++	}
++	span := rs.Scanner.Spanner.GetSpanFunc()
++	for _, s := range e.spans {
++		span(int(s.Y)+origin.Y, int(s.X0)+origin.X, int(s.X1)+origin.X, s.Alpha)
++	}
++	rf.Clear()
++}
+--- a/paint/renderers/rasterx/text.go
++++ b/paint/renderers/rasterx/text.go
+@@ -11,6 +11,7 @@
+ 	"image/draw"
+ 	_ "image/jpeg" // load image formats for users of the API
+ 	_ "image/png"
++	"math"
+ 	"slices"
+ 	"sort"
+ 
+@@ -421,6 +422,20 @@
+ 		}
+ 	}
+ 
++	coverage := rs.glyphCoverageEnabled && UseGlyphCache && identity && stroke == nil && rs.scrollRecord == nil && run.Face.SupportsBoundedOutlines() && int(-g.Height.Round())+2*glyphMaskBorder < glyphMinSize
++	var placement glyphPlacementKey
++	// The bitmap route above retains its original bounds lookup and early return.
++	// Only the admitted small-outline scene route requests a placement identity.
++	if coverage && rs.sceneRecord != nil && ctx.Cumulative == math32.Identity2() && rs.glyphPlacementActive() {
++		if token, generation := rs.staticOutlines().placementIdentity(run.Face.Font, g.GlyphID, outline); token != nil && generation != 0 {
++			placement = glyphPlacementKey{token, generation, math.Float32bits(scale), math.Float32bits(pos.X), math.Float32bits(pos.Y)}
++			if rs.drawPlacedGlyphCoverage(fill, placement) {
++				rs.Path.Clear()
++				return
++			}
++		}
++	}
++
+ 	rs.Path.Clear()
+ 	m := ctx.Cumulative
+ 	for _, s := range outline.Segments {
+@@ -443,7 +458,7 @@
+ 		}
+ 	}
+ 	rs.Path.Stop(true)
+-	if rs.glyphCoverageEnabled && UseGlyphCache && identity && stroke == nil && rs.scrollRecord == nil && run.Face.SupportsBoundedOutlines() && int(-g.Height.Round())+2*glyphMaskBorder < glyphMinSize && rs.drawGlyphCoverage(fill) {
++	if coverage && rs.drawGlyphCoverageAt(fill, placement) {
+ 		rs.Path.Clear()
+ 		return
+ 	}
+--- /dev/null
++++ b/paint/renderers/rasterx/glyph_placement.go
+@@ -0,0 +1,136 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"github.com/go-text/typesetting/font"
++	"image"
++)
++
++const glyphPlacementEntries = 8192
++
++// Exact float32 inputs are required: integer translations at different exponent
++// boundaries need not produce identical fixed paths. Identity tokens refer only
++// to private immutable outlines and contain no font, slice or renderer reference.
++type glyphPlacementKey struct {
++	outline     *outlineIdentity
++	generation  uint32
++	scale, x, y uint32
++}
++type glyphPlacement struct {
++	hash     uint64
++	coverage *glyphCoverageIdentity
++	origin   image.Point
++	hull     image.Rectangle
++}
++
++// Fixed-capacity FIFO metadata is allocated lazily for scene captures. Values
++// retain only small identity tokens, never coverage arrays, fonts or packets.
++// Coverage eviction invalidates placements even if its hash is later reused.
++type glyphPlacementCache struct {
++	entries            map[glyphPlacementKey]glyphPlacement
++	queue              [glyphPlacementEntries]glyphPlacementKey
++	head, count        int
++	hits, misses       uint64
++	probes, wins, skip uint32
++}
++
++func (c *glyphCoverageCache) rememberPlacement(key glyphPlacementKey, e *glyphCoverageEntry, origin image.Point, hull image.Rectangle) {
++	if key.outline == nil || key.generation == 0 || e.identity == nil {
++		return
++	}
++	if c.placements == nil {
++		c.placements = &glyphPlacementCache{entries: make(map[glyphPlacementKey]glyphPlacement)}
++	}
++	p := c.placements
++	if _, ok := p.entries[key]; !ok {
++		if p.count == glyphPlacementEntries {
++			delete(p.entries, p.queue[p.head])
++			p.head = (p.head + 1) % glyphPlacementEntries
++			p.count--
++		}
++		p.queue[(p.head+p.count)%glyphPlacementEntries] = key
++		p.count++
++	}
++	p.entries[key] = glyphPlacement{e.hash, e.identity, origin, hull}
++}
++func (rs *Renderer) drawPlacedGlyphCoverage(fill image.Image, key glyphPlacementKey) bool {
++	if key.outline == nil || key.generation == 0 || rs.glyphCoverage == nil || rs.glyphCoverage.placements == nil {
++		return false
++	}
++	c := rs.glyphCoverage
++	p := c.placements
++	v, ok := p.entries[key]
++	if !ok {
++		return p.miss()
++	}
++	e := c.entries[v.hash]
++	if e == nil || e.identity != v.coverage {
++		return p.miss()
++	}
++	bounds, ready := rs.glyphCoverageReady(fill)
++	if !ready || !v.hull.In(bounds) || !v.hull.In(rs.Scanner.Clip) {
++		return p.miss()
++	}
++	p.hits++
++	p.observe(true)
++	c.hits++
++	rs.emitGlyphCoverage(e, v.origin, fill)
++	return true
++}
++
++// Retrieve only an identity for the currently live private immutable slice.
++// Public/custom outlines and a slice evicted/replaced under the same font/GID
++// cannot authorize a placement, even when their segment counts coincide.
++func (cache *staticOutlineCache) placementIdentity(f *font.Font, gid font.GID, outline font.GlyphOutline) (*outlineIdentity, uint32) {
++	if len(outline.Segments) == 0 {
++		return nil, 0
++	}
++	cache.mu.Lock()
++	defer cache.mu.Unlock()
++	element := cache.entries[outlineKey{f, gid}]
++	if element == nil {
++		return nil, 0
++	}
++	e := element.Value.(outlineEntry)
++	if len(e.outline.Segments) != len(outline.Segments) || &e.outline.Segments[0] != &outline.Segments[0] {
++		return nil, 0
++	}
++	return cache.identity, e.identity
++}
++
++const glyphPlacementProbeWindow = uint32(glyphPlacementEntries)
++const glyphPlacementCooldown = 32 * glyphPlacementProbeWindow
++
++// A full index with fewer than one hit per eight probes is not paying for its
++// lookup/admission work. Use the original path for a bounded eligible-glyph
++// interval, then probe again so stationary text can regain reuse. These counters
++// affect optimization only; original scene work and refusal checks run first.
++func (p *glyphPlacementCache) observe(hit bool) {
++	if p.count < glyphPlacementEntries {
++		return
++	}
++	p.probes++
++	if hit {
++		p.wins++
++	}
++	if p.probes == glyphPlacementProbeWindow {
++		if p.wins < glyphPlacementProbeWindow/8 {
++			p.skip = glyphPlacementCooldown
++		}
++		p.probes = 0
++		p.wins = 0
++	}
++}
++func (p *glyphPlacementCache) miss() bool { p.misses++; p.observe(false); return false }
++func (rs *Renderer) glyphPlacementActive() bool {
++	if rs.glyphCoverage == nil || rs.glyphCoverage.placements == nil {
++		return true
++	}
++	p := rs.glyphCoverage.placements
++	if p.skip != 0 {
++		p.skip--
++		return false
++	}
++	return true
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/glyph_placement_vellum_test.go
+@@ -0,0 +1,475 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"math"
++	"reflect"
++	"testing"
++	"unsafe"
++
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx/scan"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/styles/units"
++	"cogentcore.org/core/text/shaped/shapers/shapedgt"
++	"github.com/go-text/typesetting/font"
++	"golang.org/x/image/math/fixed"
++)
++
++func TestVellumGlyphPlacementLiveOutlineIdentity(t *testing.T) {
++	face := vellumOutlineFace(t)
++	gid, _ := face.NominalGlyph('0')
++	c := &staticOutlineCache{}
++	own, ok := c.ordinary(face, gid)
++	if !ok {
++		t.Fatal("outline")
++	}
++	first, firstID := c.placementIdentity(face.Font, gid, own)
++	if first == nil || firstID == 0 {
++		t.Fatal("no owned identity")
++	}
++	cloned := font.GlyphOutline{Segments: append([]font.Segment(nil), own.Segments...)}
++	if id, generation := c.placementIdentity(face.Font, gid, cloned); id != nil || generation != 0 {
++		t.Fatal("caller outline trusted")
++	}
++	c.mu.Lock()
++	c.evict()
++	c.mu.Unlock()
++	if id, generation := c.placementIdentity(face.Font, gid, own); id != nil || generation != 0 {
++		t.Fatal("evicted outline trusted")
++	}
++	replacement, ok := c.ordinary(face, gid)
++	if !ok {
++		t.Fatal("replacement outline")
++	}
++	second, secondID := c.placementIdentity(face.Font, gid, replacement)
++	if second == nil || secondID == 0 || first != second || firstID == secondID {
++		t.Fatal("outline identity reused after replacement")
++	}
++	if id, generation := c.placementIdentity(face.Font, gid, own); id != nil || generation != 0 {
++		t.Fatal("old slice trusted under new key")
++	}
++}
++
++func placementCompare(t *testing.T, r, original *Renderer, commands render.Render) {
++	t.Helper()
++	a, b := r.ScenePacket(commands), original.vellumFreshScenePacket(commands)
++	if (a == nil) != (b == nil) {
++		t.Fatal("packet admission differs")
++	}
++	if a == nil {
++		return
++	}
++	for _, gpu := range []bool{false, true} {
++		var x, y *sceneplan.Encoded
++		var ok, accepted bool
++		if gpu {
++			x, ok = a.EncodeGPU()
++			y, accepted = b.EncodeGPU()
++		} else {
++			x, ok = a.Encode()
++			y, accepted = b.Encode()
++		}
++		if ok != accepted || !reflect.DeepEqual(x, y) {
++			t.Fatal("packet bytes differ", gpu)
++		}
++	}
++	x, y := image.NewRGBA(a.Bounds()), image.NewRGBA(b.Bounds())
++	for i := range x.Pix {
++		x.Pix[i] = byte(i*17 + 3)
++		y.Pix[i] = x.Pix[i]
++	}
++	if !a.Replay(x) || !b.Replay(y) || !bytes.Equal(x.Pix, y.Pix) {
++		t.Fatal("replay pixels differ")
++	}
++}
++
++func TestVellumGlyphPlacementExactInputsAndPackets(t *testing.T) {
++	r := New(math32.Vec2(8192, 64)).(*Renderer)
++	original := New(math32.Vec2(8192, 64)).(*Renderer)
++	defer r.Release()
++	defer original.Release()
++	item := coverageSmallItem()
++	item.Context.Bounds.Rect = math32.B2(0, 0, 8192, 64)
++	run := item.Text.Lines[0].Runs[0].(*shapedgt.Run)
++	size := run.Size
++	positions := []math32.Vector2{{X: 8, Y: 24}, {X: 16, Y: 24}, {X: 8.015, Y: 24}, {X: 8.25, Y: 24}, {X: 8.984, Y: 24}, {X: 8, Y: 32}, {X: -1, Y: 24}, {X: 0, Y: 24}, {X: 8000.015, Y: 24}, {X: 8000.25, Y: 24}, {X: 8000.984, Y: 24}}
++	for round := 0; round < 2; round++ {
++		for _, pos := range positions {
++			item.Position = pos
++			placementCompare(t, r, original, render.Render{item})
++			placementCompare(t, r, original, render.Render{item})
++		}
++	}
++	if r.glyphCoverage == nil || r.glyphCoverage.placements == nil || r.glyphCoverage.placements.hits == 0 {
++		t.Fatal("no exact-location reuse")
++	}
++	hits := r.glyphCoverage.placements.hits
++	// Adjacent representable positions must not alias a prior absolute key.
++	savedGlyphs := run.Glyphs
++	run.Glyphs = run.Glyphs[:1]
++	item.Position = math32.Vec2(math.Nextafter32(8, 9), 24)
++	placementCompare(t, r, original, render.Render{item})
++	if r.glyphCoverage.placements.hits != hits {
++		t.Fatal("first glyph position bits were discarded")
++	}
++	run.Glyphs = savedGlyphs
++	for _, changed := range []fixed.Int26_6{size + 1, size - 1, size * 2, size} {
++		run.Size = changed
++		item.Position = math32.Vec2(8.25, 24)
++		placementCompare(t, r, original, render.Render{item})
++		placementCompare(t, r, original, render.Render{item})
++	}
++	run.Size = size
++	for _, matrix := range []math32.Matrix2{math32.Translate2D(.25, .5), math32.Scale2D(1.1, .9), math32.Rotate2D(.01), math32.Identity2()} {
++		item.Context.Cumulative = matrix
++		placementCompare(t, r, original, render.Render{item})
++	}
++	item.Context.Cumulative = math32.Identity2()
++	for _, clip := range []math32.Box2{math32.B2(10, 0, 8192, 64), math32.B2(0, 20, 8192, 64), math32.B2(0, 0, 8192, 64)} {
++		item.Context.Bounds.Rect = clip
++		item.Text.Color = color.NRGBA{R: 91, G: 17, B: 39, A: 71}
++		placementCompare(t, r, original, render.Render{item})
++	}
++	old := r.glyphCoverage
++	r.SetSize(units.UnitDot, math32.Vec2(256, 64))
++	original.SetSize(units.UnitDot, math32.Vec2(256, 64))
++	if r.glyphCoverage != nil {
++		t.Fatal("resize retained placement owner")
++	}
++	item.Context.Bounds.Rect = math32.B2(0, 0, 256, 64)
++	item.Position = math32.Vec2(8, 24)
++	placementCompare(t, r, original, render.Render{item})
++	if r.glyphCoverage == old {
++		t.Fatal("resize reused prior owner")
++	}
++	r.Release()
++	r.Release()
++	if r.glyphCoverage != nil || r.outlineCache != nil {
++		t.Fatal("release retained owner")
++	}
++}
++
++func placementUnit(t *testing.T) (*Renderer, glyphPlacementKey, *glyphCoverageEntry) {
++	t.Helper()
++	r := New(math32.Vec2(256, 64)).(*Renderer)
++	t.Cleanup(r.Release)
++	r.Scanner.SetClip(r.image.Bounds())
++	r.Path = coverageGlyphPath(coverageSmallItem(), math32.Vec2(8, 24))
++	key := glyphPlacementKey{outline: &outlineIdentity{1}, generation: 1, scale: 1, x: 2, y: 3}
++	fill := image.NewUniform(color.NRGBA{31, 77, 119, 193})
++	if !r.drawGlyphCoverageAt(fill, key) {
++		t.Fatal("warm draw refused")
++	}
++	if r.glyphCoverage.placements == nil || r.glyphCoverage.placements.count != 1 {
++		t.Fatal("no learned placement")
++	}
++	v := r.glyphCoverage.placements.entries[key]
++	e := r.glyphCoverage.entries[v.hash]
++	if e == nil {
++		t.Fatal("no live coverage")
++	}
++	r.Path.Clear()
++	return r, key, e
++}
++
++func TestVellumGlyphPlacementBoundedFIFOAndStaleCoverage(t *testing.T) {
++	r, key, e := placementUnit(t)
++	c := r.glyphCoverage
++	p := c.placements
++	v := p.entries[key]
++	for i := 0; i < glyphPlacementEntries+17; i++ {
++		k := key
++		k.x = uint32(i + 100)
++		c.rememberPlacement(k, e, v.origin, v.hull)
++		if len(p.entries) > glyphPlacementEntries || p.count != len(p.entries) {
++			t.Fatal("unbounded placements")
++		}
++	}
++	if _, ok := p.entries[key]; ok {
++		t.Fatal("oldest placement not evicted")
++	}
++	for _, k := range p.queue {
++		if _, ok := p.entries[k]; !ok {
++			t.Fatal("FIFO orphan")
++		}
++	}
++	c.rememberPlacement(key, e, v.origin, v.hull)
++	count := p.count
++	c.rememberPlacement(key, e, v.origin, v.hull)
++	if p.count != count {
++		t.Fatal("duplicate key consumes FIFO")
++	}
++	fill := image.NewUniform(color.NRGBA{31, 77, 119, 193})
++	// A different entry can reuse a colliding hash; its token must invalidate the
++	// old placement without retaining the old path/spans through this metadata.
++	replacement := *e
++	replacement.identity = &glyphCoverageIdentity{1}
++	c.entries[e.hash] = &replacement
++	before := bytes.Clone(r.image.Pix)
++	if r.drawPlacedGlyphCoverage(fill, key) || !bytes.Equal(before, r.image.Pix) {
++		t.Fatal("stale hash placement reused")
++	}
++	c.entries[e.hash] = e
++	c.evict()
++	if r.drawPlacedGlyphCoverage(fill, key) {
++		t.Fatal("evicted coverage reused")
++	}
++}
++
++func TestVellumGlyphPlacementCurrentGuards(t *testing.T) {
++	changes := map[string]func(*Renderer){
++		"width":         func(r *Renderer) { r.Scanner.Width-- },
++		"height":        func(r *Renderer) { r.Scanner.CellIndex = r.Scanner.CellIndex[:len(r.Scanner.CellIndex)-1] },
++		"scanner-owner": func(r *Renderer) { r.Raster.Filler.Scanner = scan.NewScannerWithRowTracking(r.ImgSpanner, 256, 64) },
++		"pending-area":  func(r *Renderer) { r.Scanner.Area = 1 },
++		"pending-pen":   func(r *Renderer) { r.Raster.Filler.A.X = 1 },
++		"clip":          func(r *Renderer) { r.Scanner.SetClip(image.Rect(10, 20, 256, 64)) },
++		"empty-clip":    func(r *Renderer) { r.Scanner.SetClip(image.Rectangle{}) },
++		"spanner-owner": func(r *Renderer) { r.Scanner.Spanner = &sceneSpanner{builder: sceneplan.New(r.image.Bounds())} },
++	}
++	for name, change := range changes {
++		t.Run(name, func(t *testing.T) {
++			r, key, _ := placementUnit(t)
++			change(r)
++			before := bytes.Clone(r.image.Pix)
++			hits := r.glyphCoverage.hits
++			if r.drawPlacedGlyphCoverage(image.NewUniform(color.White), key) || hits != r.glyphCoverage.hits || !bytes.Equal(before, r.image.Pix) {
++				t.Fatal("changed guard bypassed")
++			}
++		})
++	}
++	r, key, _ := placementUnit(t)
++	calls := 0
++	if r.drawPlacedGlyphCoverage(image.NewUniform(coveredDrawColor{&calls}), key) || calls != 0 {
++		t.Fatal("custom fill called/reused")
++	}
++	// A successful fast draw follows the original scanner cleanup and recoloring.
++	original := New(math32.Vec2(256, 64)).(*Renderer)
++	defer original.Release()
++	original.Scanner.SetClip(original.image.Bounds())
++	coverageSeed(r)
++	coverageSeed(original)
++	fill := image.NewUniform(color.NRGBA{71, 11, 39, 91})
++	if !r.drawPlacedGlyphCoverage(fill, key) {
++		t.Fatal("valid fast draw missed")
++	}
++	coverageReference(original, coverageGlyphPath(coverageSmallItem(), math32.Vec2(8, 24)), fill)
++	if !bytes.Equal(r.image.Pix, original.image.Pix) || r.Scanner.Area != 0 || r.Scanner.Cover != 0 || len(r.Scanner.Cell) != 0 {
++		t.Fatal("fast pixels/state differ")
++	}
++}
++
++func TestVellumGlyphPlacementCannotLearnHashCollision(t *testing.T) {
++	r, key, e := placementUnit(t)
++	c := r.glyphCoverage
++	c.placements = nil
++	// An occupied fingerprint with a different full path must preserve drawing
++	// while refusing to teach the placement index a false identity.
++	fake := *e
++	fake.path = append(Path(nil), e.path...)
++	fake.path[1]++
++	fake.identity = &glyphCoverageIdentity{1}
++	c.entries[e.hash] = &fake
++	r.Path = coverageGlyphPath(coverageSmallItem(), math32.Vec2(8, 24))
++	if !r.drawGlyphCoverageAt(image.NewUniform(color.White), key) {
++		t.Fatal("collision prevented original draw")
++	}
++	if c.placements != nil {
++		t.Fatal("handled-but-unretained draw learned a placement")
++	}
++}
++
++func TestVellumGlyphPlacementWarmBudgetBeforeLookup(t *testing.T) {
++	item := coverageSmallItem()
++	r := New(math32.Vec2(256, 64)).(*Renderer)
++	defer r.Release()
++	for range 3 {
++		if r.ScenePacket(render.Render{item}) == nil {
++			t.Fatal("warmup")
++		}
++	}
++	if r.glyphCoverage.placements == nil || r.glyphCoverage.placements.hits == 0 {
++		t.Fatal("no warm fast path")
++	}
++	run := item.Text.Lines[0].Runs[0].(*shapedgt.Run)
++	g := &run.Glyphs[0]
++	outline, _ := r.staticOutlines().ordinary(run.Face, g.GlyphID)
++	before := r.glyphCoverage.placements.hits
++	pixels := bytes.Clone(r.image.Pix)
++	r.sceneRecord = sceneplan.New(r.image.Bounds())
++	r.sceneWork = &sceneWorkBudget{remaining: len(outline.Segments) - 1, outlines: font.NewGlyphOutlineBudget(1<<20, 1<<20)}
++	r.GlyphOutline(&item.Context, run, g, outline, image.NewUniform(item.Text.Color), nil, run.GlyphBoundsBox(g), item.Position, true)
++	if !r.sceneRecord.Failed() || before != r.glyphCoverage.placements.hits || !bytes.Equal(pixels, r.image.Pix) {
++		t.Fatal("warm placement bypassed work")
++	}
++	r.sceneRecord = nil
++	r.sceneWork = nil
++}
++
++func TestVellumGlyphPlacementBoundedProbeCooldown(t *testing.T) {
++	p := &glyphPlacementCache{count: glyphPlacementEntries}
++	for range glyphPlacementProbeWindow {
++		p.observe(false)
++	}
++	if p.skip != glyphPlacementCooldown || p.probes != 0 || p.wins != 0 {
++		t.Fatal("cold probes not bounded")
++	}
++	r := &Renderer{glyphCoverage: &glyphCoverageCache{placements: p}}
++	for range glyphPlacementCooldown {
++		if r.glyphPlacementActive() {
++			t.Fatal("cooldown returned early")
++		}
++	}
++	if !r.glyphPlacementActive() {
++		t.Fatal("bounded cooldown never resumed")
++	}
++	for range glyphPlacementProbeWindow {
++		p.observe(true)
++	}
++	if p.skip != 0 || p.probes != 0 || p.wins != 0 {
++		t.Fatal("useful probes disabled")
++	}
++	p.count = glyphPlacementEntries - 1
++	for range glyphPlacementProbeWindow {
++		p.observe(false)
++	}
++	if p.skip != 0 || p.probes != 0 {
++		t.Fatal("cold fill disabled before index was populated")
++	}
++}
++
++func TestVellumGlyphPlacementCooldownThresholdAndRouting(t *testing.T) {
++	for _, wins := range []uint32{glyphPlacementProbeWindow/8 - 1, glyphPlacementProbeWindow / 8} {
++		p := &glyphPlacementCache{count: glyphPlacementEntries}
++		for i := uint32(0); i < glyphPlacementProbeWindow; i++ {
++			p.observe(i < wins)
++		}
++		if (p.skip != 0) != (wins < glyphPlacementProbeWindow/8) {
++			t.Fatal("cooldown threshold changed", wins)
++		}
++	}
++	item := coverageSmallItem()
++	run := item.Text.Lines[0].Runs[0].(*shapedgt.Run)
++	originalGlyphs := run.Glyphs
++	run.Glyphs = run.Glyphs[:1]
++	defer func() { run.Glyphs = originalGlyphs }()
++	item.Context.Bounds.Rect = math32.B2(0, 0, 512, 64)
++	r := New(math32.Vec2(512, 64)).(*Renderer)
++	defer r.Release()
++	original := New(math32.Vec2(512, 64)).(*Renderer)
++	defer original.Release()
++	for i := 0; i < glyphPlacementEntries; i++ {
++		item.Position = math32.Vec2(8+float32(i%2048)*.125, 24+float32(i/2048)*.125)
++		if r.ScenePacket(render.Render{item}) == nil {
++			t.Fatal("placement fill refused", i)
++		}
++	}
++	p := r.glyphCoverage.placements
++	if p == nil || p.count != glyphPlacementEntries {
++		t.Fatal("actual index not populated")
++	}
++	p.skip = 2
++	head, count, hits := p.head, p.count, p.hits
++	retained := item.Position
++	item.Position = math32.Vec2(300, 24)
++	placementCompare(t, r, original, render.Render{item})
++	if p.skip != 1 || p.head != head || p.count != count || p.hits != hits {
++		t.Fatal("cooldown learned or reused a placement")
++	}
++	item.Position = retained
++	placementCompare(t, r, original, render.Render{item})
++	if p.skip != 0 || p.head != head || p.hits != hits {
++		t.Fatal("cooldown did not preserve original routing")
++	}
++	placementCompare(t, r, original, render.Render{item})
++	if p.hits != hits+1 {
++		t.Fatal("exact reuse did not resume after bounded cooldown")
++	}
++}
++
++func TestVellumGlyphPlacementExactLogicalWorkCharge(t *testing.T) {
++	item := coverageSmallItem()
++	r := New(math32.Vec2(256, 64)).(*Renderer)
++	defer r.Release()
++	for range 3 {
++		if r.ScenePacket(render.Render{item}) == nil {
++			t.Fatal("warmup")
++		}
++	}
++	run := item.Text.Lines[0].Runs[0].(*shapedgt.Run)
++	g := &run.Glyphs[0]
++	outline, _ := r.staticOutlines().ordinary(run.Face, g.GlyphID)
++	scale := math32.FromFixed(run.Size) / float32(run.Face.Upem())
++	bounds, ok := originalOutlineBounds(outline, scale, item.Position)
++	if !ok {
++		t.Fatal("bounds")
++	}
++	extent := 1 + int(bounds.Size().X) + int(bounds.Size().Y)
++	const initial = 1 << 20
++	r.sceneRecord = sceneplan.New(r.image.Bounds())
++	r.sceneWork = &sceneWorkBudget{remaining: initial, outlines: font.NewGlyphOutlineBudget(1<<20, 1<<20)}
++	originalSpanner := r.Scanner.Spanner
++	r.Scanner.Spanner = &sceneSpanner{builder: r.sceneRecord}
++	defer func() { r.Scanner.Spanner = originalSpanner; r.sceneRecord = nil; r.sceneWork = nil }()
++	r.Scanner.SetClip(r.image.Bounds())
++	r.GlyphOutline(&item.Context, run, g, outline, image.NewUniform(item.Text.Color), nil, run.GlyphBoundsBox(g), item.Position, true)
++	if r.sceneRecord.Failed() || r.sceneWork.remaining != initial-len(outline.Segments)*(1+extent) {
++		t.Fatal("original logical work charge differs", r.sceneWork.remaining)
++	}
++}
++
++func TestVellumGlyphPlacementEpochExhaustionAndLayout(t *testing.T) {
++	type legacyOutlineEntry struct {
++		key     outlineKey
++		outline font.GlyphOutline
++		cost    font.GlyphOutlineCost
++		bytes   int
++		extrema outlineExtrema
++	}
++	if unsafe.Sizeof(uintptr(0)) == 8 && unsafe.Sizeof(outlineEntry{}) != unsafe.Sizeof(legacyOutlineEntry{}) {
++		t.Fatal("64-bit outline metadata grew")
++	}
++	face := vellumOutlineFace(t)
++	gid, _ := face.NominalGlyph('A')
++	c := &staticOutlineCache{nextIdentity: ^uint32(0) - 1}
++	own, ok := c.ordinary(face, gid)
++	if !ok {
++		t.Fatal("outline")
++	}
++	epoch, id := c.placementIdentity(face.Font, gid, own)
++	if epoch == nil || id != ^uint32(0) {
++		t.Fatal("last identity not issued")
++	}
++	otherGID, _ := face.NominalGlyph('B')
++	other, _ := c.ordinary(face, otherGID)
++	_, exhausted := c.placementIdentity(face.Font, otherGID, other)
++	if exhausted != 0 || c.nextIdentity != ^uint32(0) {
++		t.Fatal("exhaustion wrapped")
++	}
++	again, live := c.placementIdentity(face.Font, gid, own)
++	if again != epoch || live != id {
++		t.Fatal("exhaustion revoked live identity")
++	}
++	fresh := &staticOutlineCache{}
++	replacement, _ := fresh.ordinary(face, gid)
++	newEpoch, newID := fresh.placementIdentity(face.Font, gid, replacement)
++	if newEpoch == nil || newEpoch == epoch || newID != 1 {
++		t.Fatal("cache epochs alias")
++	}
++	r, key, e := placementUnit(t)
++	key.generation = 0
++	if r.drawPlacedGlyphCoverage(image.NewUniform(color.White), key) {
++		t.Fatal("zero generation reused")
++	}
++	r.glyphCoverage.placements = nil
++	r.glyphCoverage.rememberPlacement(key, e, image.Point{}, image.Rectangle{})
++	if r.glyphCoverage.placements != nil {
++		t.Fatal("zero generation learned")
++	}
++}
+--- /dev/null
++++ b/paint/renderers/rasterx/glyph_placement_bench_vellum_test.go
+@@ -0,0 +1,57 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package rasterx
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
++	"testing"
++)
++
++func placementFixture() [2]render.Render {
++	item := coverageSmallItem()
++	var result [2]render.Render
++	for frame := range result {
++		for row := 0; row < 50; row++ {
++			for col := 0; col < 8; col++ {
++				v := *item
++				v.Context.Bounds.Rect = math32.B2(0, 0, 1519, 1266)
++				v.Position = math32.Vec2(float32(10+col*96), float32(24+row*12+frame*12))
++				result[frame] = append(result[frame], &v)
++			}
++		}
++	}
++	return result
++}
++
++func BenchmarkVellumGlyphPlacementCapture(b *testing.B) {
++	for _, mode := range []string{"fixed", "alternating-rows", "cold-coordinates"} {
++		b.Run(mode, func(b *testing.B) {
++			commands := placementFixture()
++			r := New(math32.Vec2(1519, 1266)).(*Renderer)
++			defer r.Release()
++			for i := 0; i < 4; i++ {
++				if r.ScenePacket(commands[i%2]) == nil {
++					b.Fatal("warmup refused")
++				}
++			}
++			b.ReportAllocs()
++			b.ResetTimer()
++			for i := 0; i < b.N; i++ {
++				n := 0
++				if mode == "alternating-rows" {
++					n = i % 2
++				}
++				if mode == "cold-coordinates" {
++					for index, item := range commands[0] {
++						v := item.(*render.Text)
++						v.Position.Y = float32(24+(index/8)*12) + float32(i%128)*.125
++					}
++				}
++				if r.ScenePacket(commands[n]) == nil {
++					b.Fatal("capture refused")
++				}
++			}
++		})
++	}
++}
