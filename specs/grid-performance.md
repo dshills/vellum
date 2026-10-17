@@ -582,3 +582,22 @@ lower, including fixture/runtime work. Every p95 still exceeds 4 ms; no table
 or broader Mac gate closes. Separate diagnostics confirm 120 GPU captures per
 build, all accepted, no fallback, unchanged logical input. These are not physical
 pointer or presentation observations. Stage0079 prepared dependencies are unchanged.
+
+## Full current matrix and bounded next experiment
+
+The [bd672a6 matrix](../docs/reports/macos-grid-matrix/README.md) completes all
+eight fixed/variable 10k/1M CPU/GPU cases, five 120-event runs, 128 warm each. All 40
+p95s fail 4 ms; GPU case medians 4.71–4.82 ms and CPU 5.61–5.77 ms. Preserve the GPU
+1M p99 failure 8.617 ms. Every paired 10k/1M visible geometry check passes. Four
+separate 120-event GPU diagnostics show actual accepted captures with no fallback;
+those timings are excluded from ordinary acceptance. Current profiles are
+diagnostic and retain the native sample's redacted-path check failure plus a
+separate owned-PID/Mach-O-UUID assessment.
+
+Next implement M3-A's owned segmented ready snapshot under the early-fallback,
+immutable per-grid storage and action-generation contracts in macos-delivery.md.
+Require positive fast-route evidence and full old-path equivalence. Adopt only
+a >=0.4 ms median run-p95 reduction in five matched pairs with >=4/5 improvements
+and no correctness/retention/tail regression. Otherwise reject the experiment;
+a microbenchmark gain alone is insufficient. These are experiment-adoption
+criteria, not changes to the original 4 ms/6 ms targets or the full Mac finish line.

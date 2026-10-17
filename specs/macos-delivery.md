@@ -1,7 +1,7 @@
 # Mac framework delivery plan
 
-Updated 17 October 2026. The latest accessibility serializer checkpoint starts
-from clean `02f8dbe` and retains stage0079; the most recent private GPU
+Updated 17 October 2026. The latest complete table matrix measures clean
+`bd672a6` with stage0079; the most recent private GPU
 SDK and its native drawing/3D/imaging checks use clean runtime source `5eef841`.
 Owner: the main Vellum development chat. This is the execution plan for the
 existing [Mac completion requirements](macos-completion.md), not a replacement
@@ -112,13 +112,15 @@ explicitly authorized tests and restore any authorized temporary state changes.
    includes the new routed Selector/NumberField regressions. Native M2 integration
    remains queued; [actual results](../docs/reports/macos-workspace-acceptance/README.md)
    distinguish software routing from desktop acceptance.
-3. **Then M3 is the main engineering priority.** A quiet native baseline and one
-   targeted renderer/layout fix precede another broad qualification campaign.
-   Analyze existing profiles and implement/test candidates offscreen while the
-   user is working. Inventory work for M6 can proceed independently.
+3. **M3-A is the next engineering checkpoint.** The current complete table matrix
+   fails. Implement the bounded owned segmented ready-snapshot experiment below,
+   prove old-path equivalence, then run five native comparison pairs. Adopt only
+   a material full-frame gain; reject an allocation-only result. Implement/test
+   offscreen while the user is working. M6 inventory can proceed independently.
 4. Use an authorized desktop window for M2/M5 native workflows and ordinary M3
-   measurements. Reuse the prepared placement operator for one bounded attempt;
-   if delivery still fails, record that result and schedule direct/manual
+   measurements. Reuse the placement operator implementation with a fresh
+   source-bound plan and stop scope; never replay a completed/human-return seal.
+   Allow one bounded attempt; if delivery still fails, record it and schedule direct/manual
    verification instead of spending another open-ended cycle building an operator.
 5. After significant functional/performance fixes stabilize, run M4 preflight,
    ten-minute activity, 1,000-cycle campaign and overnight soak in that order.
@@ -131,6 +133,30 @@ Live tests are stopped while the user is online unless separately authorized.
 Do not remove human-return or completed-case seals. Read-only inspection,
 headless regressions, source fixes, documentation and packaging preparation can
 continue. Do not request desktop access again while independent work is available.
+
+## Next M3 implementation checkpoint: M3-A
+
+The [matrix decision](../docs/reports/macos-grid-matrix/README.md) specifies an
+owned segmented ready accessibility snapshot: construct each eligible leaf grid
+once into its final detached group, serialize an ordered reference view and share
+that immutable group with the existing ready baseline/cache. Keep callbacks and
+guards separate. Preserve independent per-grid storage and all retirement fences.
+Pending/editor/custom/namespaced/uncertain cases keep the full old route before
+state mutation. Preserve nil/empty wire distinctions and custom callback count.
+
+Prove the fast path actually runs and compare complete legacy wire, order,
+actions/generations, interleaved scopes, pending, namespaces and lifecycle. Full
+race/vet/native checks precede five ordinary interleaved comparison pairs.
+Experiment adoption requires >=0.4 ms lower median run-p95 and >=4/5 paired
+improvements without correctness, retention or tail regression. Failure means
+reject and stop small follow-up tuning of that candidate. This adoption bar does
+not replace the unchanged 4 ms p95/6 ms p99 acceptance matrix, including CPU mode.
+
+A new glyph-span shader is not selected: current-DPI bitmap routing does not
+establish a span bottleneck. Any later scene/resource redesign first needs actual
+operation/resource-kind counts and encoded-buffer composition for the failing
+fixture. Cocoa JSON parsing is asynchronously main-queued; do not attribute it
+as synchronous ReconcileNS. M3-A is planned, not implemented or qualified.
 
 ## Existing execution entrypoints
 
@@ -189,8 +215,10 @@ implementation checkpoint; it is not rerun after each documentation edit.
 The largest uncertainty is M3: the unchanged frame targets have repeatedly
 failed. A completion date before that is resolved would be speculative. M1 is
 complete in source, and M2's full headless replay and catalogue map are complete.
-The next engineering deliverable is a bounded M3 performance decision and
-measured bottleneck fix. Update the remaining estimate from that result. An eight-hour final soak,
+The bounded M3 investigation produces the current full-matrix decision. The
+next deliverable is M3-A's adopted/rejected implementation result, then a full
+matrix rerun after adoption. Update the remaining estimate from that result.
+An eight-hour final soak,
 human accessibility/input verification and required display availability must
 be budgeted in addition to implementation time.
 
@@ -198,7 +226,7 @@ be budgeted in addition to implementation time.
 | --- | --- | --- |
 | M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | [Text-batch comparison](../docs/reports/macos-text-batch/README.md) reduces median run-p95 5.168→4.951 ms, with 5/5 paired improvements and about 20% lower observed Go process allocation. Every p95 still misses 4 ms. Transient batching covers bitmap and small-outline text; only bitmap resources add sealed reuse. A [packed-upload experiment](../docs/reports/macos-packed-upload/README.md) shows no ordinary gain and is reverted. The [builtin AX writer](../docs/reports/macos-ax-semantic/README.md) reduces median run-p95 4.875→4.788 ms (4/5 pairs improve), with about 10% lower observed process allocation; every p95 still fails 4 ms. No gate closes. Next target material synchronous publication and full-capture costs; async AX work remains deferred. |
+| M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. Next: M3-A owned segmented ready snapshot below; no further small encoder tuning. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. Final SDK refresh, exact runtime/asset rights closure and owner approval remain. |
