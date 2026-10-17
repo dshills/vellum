@@ -390,3 +390,17 @@ independent source provenance, complete Rust/C dependency closure, redistributio
 rights approval or Mac runtime qualification. Transient input changes reverted
 between observations cannot be ruled out. The public audit gate stays pending.
 See the [owned-build checkpoint](../docs/reports/macos-owned-build/README.md).
+
+## Private source-built GPU workbench compatibility
+
+The [private workbench consumer](../docs/reports/macos-source-gpu-framework/README.md)
+uses alternate module manifests and an unchanged static-only replacement outside
+the checkout. Both ARM64 Go 1.27.2 consumers declare macOS 13.0; the workbench links
+141 entries from the exact source-built archive and loads no WGPU dylib. Its
+independent public automation client links no WGPU objects. Two owned native
+workbench cases pass 80 source-reviewed semantic requests and normal closure.
+Compiler warnings and both earlier validator failures remain recorded. This is
+private compatibility evidence, with no installed library, SDK or runtime source
+adoption. Source/component/standard-library rights closure, broader Mac runtime,
+physical input/presentation, performance/memory/endurance and distribution remain
+separate release gates.

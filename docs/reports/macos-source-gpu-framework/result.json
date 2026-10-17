@@ -1,0 +1,73 @@
+{
+  "result": "PASS_PRIVATE_SOURCE_ARCHIVE_WORKBENCH_SEMANTICS",
+  "source_commit": "7829cfc9f1a0dc9e4d63b20d18a58a7292cbc4fa",
+  "archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "shipped_library_changed": false,
+  "sdk_changed": false,
+  "build_and_inspection_commands": 11,
+  "binaries": [
+    {
+      "name": "workbench",
+      "path": "/private/tmp/vellum-source-gpu-framework-7829cfc/workbench",
+      "bytes": 60848146,
+      "sha256": "8da71bd7cbf6ac9e85c76e62b2f66d27ed1a60b67fd14e14f2db12b975825ae7",
+      "private_archive_object_entries": 141
+    },
+    {
+      "name": "automation",
+      "path": "/private/tmp/vellum-source-gpu-framework-7829cfc/continuation-v3/automation",
+      "bytes": 5580274,
+      "sha256": "1976667da4dacefc51945f5338b436ecc1f29ea8c86926a7ce49f81c845a1b59",
+      "private_archive_object_entries": 0
+    }
+  ],
+  "compile_warning_bytes": 1132,
+  "compile_warning_sha256": "32e1a9d869aaa745f7e88acb2bd9c09779976e8d3f2321ab7f3e5d20d72bbcde",
+  "original_strict_stderr_validator_result": "FAILED_BUILD_PRESERVED",
+  "metadata_validator_attempt": "FAILED_BUILD-V2_PRESERVED_KEYERROR_EMPTY_OMITTED_GO_VALUES",
+  "cases": [
+    {
+      "rows": 100000,
+      "execution": "confirmed_by_safe_client_summary",
+      "summary": {
+        "status": "PASS",
+        "rows": 100000,
+        "requests": 40,
+        "native_ready": true,
+        "transport_joined": true,
+        "endpoint_removed": true,
+        "post_close_refused": true,
+        "raw_native_output_published": false
+      }
+    },
+    {
+      "rows": 1000000,
+      "execution": "confirmed_by_safe_client_summary",
+      "summary": {
+        "status": "PASS",
+        "rows": 1000000,
+        "requests": 40,
+        "native_ready": true,
+        "transport_joined": true,
+        "endpoint_removed": true,
+        "post_close_refused": true,
+        "raw_native_output_published": false
+      }
+    }
+  ],
+  "result_review_sha256": "08b20e83c907282471c8d42ea0ba325c9ac650cc9bbfb7f6aae0847826093a7d",
+  "requests": 80,
+  "controls": {
+    "base": 14,
+    "intermediate": 8,
+    "final": 18,
+    "superseded_preexecution_v3_controls_not_credited": true
+  },
+  "review": "Independent internal build/native/result reviews; no new Prism call for this evidence-only checkpoint. The preceding source-build checkpoint has its separately recorded Anthropic Prism review.",
+  "physical_input_generated": false,
+  "settings_changes": false,
+  "raw_native_output_published": false,
+  "retained_raw_DTOs": false,
+  "full_macos_qualified": false,
+  "evidence_scope": "Source-reviewed public client assertions and safe scalar summaries; no retained raw DTOs or pixels."
+}

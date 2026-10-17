@@ -23,6 +23,17 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [source-built GPU workbench check](../docs/reports/macos-source-gpu-framework/README.md)
+links the private pinned-source archive into clean `7829cfc` and passes public-Go
+semantic clients at 100k and one million records: 40 requests each, native window
+and nonempty GPU snapshot readiness, edits/Undo/Redo, typed and stale-revision
+refusals, joined transport, owned endpoint removal and post-close refusal. Both
+owned groups retire. This is source-reviewed assertion/scalar-summary evidence;
+raw DTOs/native streams are not retained. The original warning-policy failure
+and omitted-empty-setting parser failure remain preserved. Installed libraries,
+runtime source and SDK are unchanged; physical input, presentation, ordinary
+performance/memory/endurance, rights closure and full Mac acceptance remain open.
+
 The [pinned-source GPU consumer checkpoint](../docs/reports/macos-source-built-gpu/README.md)
 builds the exact WGPU source/header commits with recorded Rust/compiler/features,
 then passes private static-only Go consumers and nine headless GPU roots with
