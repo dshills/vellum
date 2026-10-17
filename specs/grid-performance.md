@@ -34,6 +34,22 @@ actual switch as `geometry_persistence_disabled_in_fixture`; the previous switch
 value is restored on return, including setup failures. Ordinary interactive
 mode retains its normal geometry behavior.
 
+Current records declare `window_geometry_guard: 1` on setup, ready and end.
+Setup records the requested 1500×1250 Dp initial client size. After warm-up and
+after measured work, the worker observes native client pixel and window-manager
+sizes, render geometry, selected screen pixel/manager extent, screen/window
+logical DPI and DPR. Queries wait for native main-queue publication, execute on
+main without the application owner, and copy geometry under the native lock.
+These endpoint reads and their JSON output occur outside recorded frame work.
+They must agree; grid clips must lie inside the observed render area and grid
+scale must agree with window logical DPI / 96. A mismatch refuses measurement.
+Endpoints do not prove absence of a transient resize during the interval.
+Historical records without this guard retain their historical observation scope.
+The measurement worker is joined through application-close completion before a
+successful runtime return. A queue that never publishes/stops still relies on
+the fixture context and outer process watchdog; queued dispatch alone adds no
+cancellation guarantee.
+
 At least 400 cells, 50 row identities and eight column identities must have
 nonempty measured clips after each completed native frame. Empty overscan
 records and pool capacity do not count. A display/layout that cannot satisfy

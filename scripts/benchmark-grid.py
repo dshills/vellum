@@ -207,11 +207,50 @@ def validate_source_details(details, raster_upload_ns):
         raise ValueError("source draw sum exceeds ticket raster/upload interval")
 
 
+def validate_window_geometry(setup, ready, end):
+    """Validate observed endpoint units; absence retains historical record scope."""
+    stages = (setup, ready, end)
+    present = any("window_geometry_guard" in r or "native_window" in r or "requested_window_dp" in r for r in stages)
+    if not present:
+        return None
+    if any(type(r.get("window_geometry_guard")) is not int or r["window_geometry_guard"] != 1 for r in stages):
+        raise ValueError("native window geometry guard identity mismatch")
+    if setup.get("requested_window_dp") != [1500, 1250]:
+        raise ValueError("native window request mismatch")
+    value = ready.get("native_window")
+    fields = {"requested_dp", "client_pixels", "client_units", "render", "window_logical_dpi", "screen_number", "screen_name", "screen_pixels", "screen_geometry", "screen_logical_dpi", "dpr"}
+    if type(value) is not dict or set(value) != fields or value != end.get("native_window") or value["requested_dp"] != setup["requested_window_dp"]:
+        raise ValueError("native window endpoint mismatch")
+    def point(p, positive=False):
+        if type(p) is not dict or set(p) != {"X", "Y"} or any(type(v) is not int for v in p.values()) or positive and any(v <= 0 for v in p.values()):
+            raise ValueError("invalid native window coordinate")
+        return p["X"], p["Y"]
+    pixels = point(value["client_pixels"], True)
+    point(value["client_units"], True)
+    point(value["screen_pixels"], True)
+    screen = value["screen_geometry"]
+    if type(screen) is not dict or set(screen) != {"Min", "Max"}:
+        raise ValueError("invalid native screen extent")
+    lo, hi = point(screen["Min"]), point(screen["Max"])
+    if any(a >= b for a, b in zip(lo, hi)) or type(value["screen_number"]) is not int or value["screen_number"] < 0 or type(value["screen_name"]) is not str or not value["screen_name"]:
+        raise ValueError("invalid native screen identity")
+    if any(type(value[k]) not in (int, float) or not math.isfinite(value[k]) or value[k] <= 0 for k in ("window_logical_dpi", "screen_logical_dpi", "dpr")):
+        raise ValueError("invalid native display scale")
+    render = value["render"]
+    if type(render) is not dict or set(render) != {"Pos", "Size"}:
+        raise ValueError("invalid native render extent")
+    pos, size = point(render["Pos"]), point(render["Size"], True)
+    if any(p < 0 or p+s > limit for p, s, limit in zip(pos, size, pixels)):
+        raise ValueError("native render area outside client")
+    return value
+
+
 def validate_records(records, rows, variable, samples, novel, *, allow_profile=False, allow_source_details=False, allow_input_details=False, allow_alloc_profile=False, gpu_scene_rendering=False):
     """Require exact case, current completed geometry and one sample per tag."""
     if len(records) != samples + 3 or [r.get("event") for r in records[:2]] != ["grid.perf.setup", "grid.perf.ready"] or records[-1].get("event") != "grid.perf.end":
         raise ValueError("missing, repeated or unordered benchmark stages")
     setup, ready, end = records[0], records[1], records[-1]
+    window = validate_window_geometry(setup, ready, end)
     if type(gpu_scene_rendering) is not bool or any(r.get("gpu_scene_rendering", False) is not gpu_scene_rendering for r in records):
         raise ValueError("requested GPU scene rendering mode identity mismatch")
     for r in (setup, ready, end):
@@ -267,6 +306,16 @@ def validate_records(records, rows, variable, samples, novel, *, allow_profile=F
         if record.get("event") != "grid.perf.sample" or type(record.get("index")) is not int or record.get("index") != i or type(record.get("tag")) is not int or record.get("tag") != i + 1:
             raise ValueError("sample ordering/tag mismatch")
         geometry = record.get("geometry", {})
+        if window is not None:
+            bounds = geometry.get("bounds")
+            if type(bounds) is not dict or set(bounds) != {"Min", "Max"} or any(type(bounds[k]) is not dict or set(bounds[k]) != {"X", "Y"} or any(type(v) is not int for v in bounds[k].values()) for k in ("Min", "Max")):
+                raise ValueError("missing grid native bounds")
+            render = window["render"]
+            if any(not render["Pos"][k] <= bounds["Min"][k] < bounds["Max"][k] <= render["Pos"][k]+render["Size"][k] for k in ("X", "Y")):
+                raise ValueError("grid outside observed native render area")
+            scale = geometry.get("scale")
+            if type(scale) not in (int, float) or not math.isfinite(scale) or not math.isclose(scale, window["window_logical_dpi"]/96, rel_tol=1e-6):
+                raise ValueError("grid scale differs from observed native DPI")
         counts = [geometry.get(k) for k in ("cells", "rows", "columns")]
         if any(isinstance(n, bool) or not isinstance(n, int) for n in counts) or counts[0] < 400 or counts[1] < 50 or counts[2] < 8:
             raise ValueError("insufficient actually clipped rendered cells")

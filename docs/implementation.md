@@ -431,3 +431,14 @@ read-only external outer-frame observations pass on the current display;
 fractional-scale/boundary/restore tests are automated. See the
 [report](reports/macos-initial-window-size/README.md). Existing performance and
 physical/cross-display/complete macOS gates remain open.
+
+## Current native table viewport checkpoint
+
+The stored-grid performance fixture now validates native client/render/screen
+geometry outside measured frames and joins worker teardown. Its consumer refuses
+partial or drifting endpoints, clipping outside render and scale mismatch.
+[Forty current native runs](reports/macos-current-grid-viewport/README.md)
+completed with matched row-count geometry; all 40 missed the unchanged 4 ms p95
+target and 32 missed 6 ms p99. The actual logical grid was 767×624 after rounding.
+This fixture checkpoint does not establish an algorithmic speedup, GPU execution,
+physical input or full Mac qualification.

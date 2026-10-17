@@ -88,6 +88,41 @@ def detailed_records(samples=120, warmup=128):
     return data
 
 
+class WindowGeometryChecks(unittest.TestCase):
+    def guarded(self):
+        data = records()
+        native = {"requested_dp": [1500,1250], "client_pixels": {"X":1519,"Y":1266}, "client_units":{"X":1519,"Y":1266},
+                  "render":{"Pos":{"X":0,"Y":0},"Size":{"X":1519,"Y":1266}}, "window_logical_dpi":162,
+                  "screen_number":0,"screen_name":"fixture", "screen_pixels":{"X":5120,"Y":1440},
+                  "screen_geometry":{"Min":{"X":0,"Y":0},"Max":{"X":5120,"Y":1440}}, "screen_logical_dpi":162,"dpr":1}
+        for stage in (data[0],data[1],data[-1]): stage["window_geometry_guard"] = 1
+        data[0]["requested_window_dp"] = [1500,1250]
+        for stage in (data[1],data[-1]): stage["native_window"] = copy.deepcopy(native)
+        for sample in data[2:-1]:
+            sample["geometry"].update(scale=1.6875,bounds={"Min":{"X":10,"Y":40},"Max":{"X":1306,"Y":1093}})
+        return data
+    def test_observed_geometry_and_historical_scope(self):
+        self.assertEqual(len(benchmark.validate_records(self.guarded(),10000,False,120,False)),120)
+        self.assertEqual(len(benchmark.validate_records(records(),10000,False,120,False)),120)
+    def test_drift_missing_units_bad_scale_and_outside_grid_refuse(self):
+        for case in ("missing", "guard", "drift", "request", "scale", "outside", "zero", "nan", "render"):
+            with self.subTest(case=case):
+                data=self.guarded()
+                if case=="missing": del data[1]["native_window"]["client_units"]
+                elif case=="guard": data[-1]["window_geometry_guard"]=True
+                elif case=="drift": data[-1]["native_window"]["client_pixels"]["X"]+=1
+                elif case=="request": data[0]["requested_window_dp"][0]-=1
+                elif case=="scale": data[2]["geometry"]["scale"]=1
+                elif case=="outside": data[2]["geometry"]["bounds"]["Max"]["X"]=1600
+                else:
+                    for stage in (data[1],data[-1]):
+                        value=stage["native_window"]
+                        if case=="zero":value["client_units"]["Y"]=0
+                        elif case=="nan":value["dpr"]=float("nan")
+                        elif case=="render":value["render"]["Size"]["X"]=1600
+                with self.assertRaises(ValueError):benchmark.validate_records(data,10000,False,120,False)
+
+
 class SourceDetailTests(unittest.TestCase):
     def validate(self, data):
         return benchmark.validate_records(data, 10000, False, 120, False, allow_source_details=True)

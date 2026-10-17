@@ -988,3 +988,14 @@ This does not close physical resize/drag/cross-display, live saved restoration,
 loaded/native performance or full Mac qualification. Historical 4/6ms failures
 retain their original workload and failure status. New performance comparisons
 must report actual initial/client/render geometry and screen scale.
+
+## Current native table viewport measurements
+
+[Current measurements](../docs/reports/macos-current-grid-viewport/README.md)
+record native endpoints and display scale for 40 ordinary processes, 4,800 frames
+and 2,400 complete paired row-count geometry comparisons. The corrected initial
+client is 1519×1266 pixels at DPI162/DPR1; logical grid rounding yields 767×624.
+All runs meet the 400-cell/50-row/eight-column workload minimum, but all miss
+4 ms p95 and 32 miss 6 ms p99. P6/P11 remain open. Historical failures retain
+their workload/status; GPU execution, native/GPU memory, physical interaction,
+continuous extent/host stability and complete Mac qualification are unproven.

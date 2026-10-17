@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
 	"image/color"
 	"io/fs"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	"cogentcore.org/core/core"
+	"cogentcore.org/core/system"
 	"cogentcore.org/core/text/fonts"
 
 	"github.com/dshills/vellum/app"
@@ -93,12 +95,12 @@ func newPerfProgram(ctx context.Context, c perfConfig) (*perfProgram, map[string
 		a.Close()
 		return nil, nil, err
 	}
-	err = a.Open(app.Window{ID: "perf", Title: "Vellum stored-grid performance", Width: 1500, Height: 1250, View: p.describe})
+	err = a.Open(app.Window{ID: "perf", Title: perfWindowTitle, Width: perfWindowWidthDP, Height: perfWindowHeightDP, View: p.describe})
 	if err != nil {
 		a.Close()
 		return nil, nil, err
 	}
-	metadata := map[string]any{"geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "cpu_profile_path": c.CPUProfile, "alloc_profile_prefix": c.AllocationProfile, "mem_profile_rate": runtime.MemProfileRate, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
+	metadata := map[string]any{"window_geometry_guard": 1, "requested_window_dp": [2]float32{perfWindowWidthDP, perfWindowHeightDP}, "geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "cpu_profile_path": c.CPUProfile, "alloc_profile_prefix": c.AllocationProfile, "mem_profile_rate": runtime.MemProfileRate, "release": true, "seed": 7, "requested_font_family": "Noto Sans", "embedded_regular_font_sha256": hex.EncodeToString(fontHash[:]), "stored_value_bytes": s.logicalBytes(), "projection_stats": projection.Stats(), "memory_before_data": before, "memory_after_data_index_gc": afterData, "generate_ns": storedAt.Sub(started).Nanoseconds(), "projection_ns": projectedAt.Sub(storedAt).Nanoseconds(), "go_version": runtime.Version(), "build_settings": settings, "scope": "stored generation/projection excluded; GC baseline before native initialization; retained Go/process observations do not attribute native/GPU allocations"}
 	return p, metadata, nil
 }
 func (p *perfProgram) describe() ui.Node {
@@ -238,7 +240,14 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 	if err != nil {
 		return err
 	}
-	if err = perfEmit("grid.perf.ready", map[string]any{"rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
+	windowGeometry, err := observePerfWindow(system.TheApp)
+	if err != nil {
+		return err
+	}
+	if !initial.Bounds.In(image.Rectangle{Min: windowGeometry.Render.Pos, Max: windowGeometry.Render.Pos.Add(windowGeometry.Render.Size)}) {
+		return errors.New("loadedgrid perf: grid outside native render area")
+	}
+	if err = perfEmit("grid.perf.ready", map[string]any{"window_geometry_guard": 1, "native_window": windowGeometry, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "warmup": c.Warmup, "memory_after_warm_gc": warmMemory, "initial_geometry": initial.Bounds, "warm_start_viewport": initial.Viewport, "warm_end_viewport": warmFinal.Viewport, "warm_start_generation": initial.Generation, "warm_end_generation": warmFinal.Generation, "warm_callbacks": warmCallbacks}); err != nil {
 		return err
 	}
 	stopAllocation, err := startPerfAllocationProfile(c.AllocationProfile)
@@ -306,8 +315,15 @@ func (p *perfProgram) measure(ctx context.Context, m *cogent.FrameMetrics, c per
 	if err = stopProfile(); err != nil {
 		return err
 	}
+	finalWindowGeometry, err := observePerfWindow(system.TheApp)
+	if err != nil {
+		return err
+	}
+	if finalWindowGeometry != windowGeometry {
+		return errors.New("loadedgrid perf: native window endpoints changed")
+	}
 	runtime.GC()
-	return perfEmit("grid.perf.end", map[string]any{"rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
+	return perfEmit("grid.perf.end", map[string]any{"window_geometry_guard": 1, "native_window": finalWindowGeometry, "rows": c.Rows, "variable": c.Variable, "gpu_scene_rendering": c.GPUSceneRendering, "novel": c.Novel, "alloc_profile": c.AllocationProfile != "", "cpu_profile": c.CPUProfile != "", "source_details": c.SourceDetails, "input_details": c.InputDetails != "", "warmup_guard": 1, "samples": c.Samples, "callbacks": callbacks, "dropped": final.Dropped, "pending": final.Pending, "memory_after_measured_gc": readPerfMemory(), "native_gpu_memory": "unavailable", "presentation_timestamps": "unavailable", "allocation_scope": "process-wide Go allocation between observations includes measurement helpers; not framework-only allocation attribution"})
 }
 
 // Detailed records are diagnostic instrumentation. The ordinary constructor
@@ -356,7 +372,8 @@ func runPerf(c perfConfig) (terminal error) {
 		cancel()
 	}}
 	result := make(chan error, 1)
-	go func() { result <- p.measure(ctx, m, c); p.owner.Close() }()
+	workerDone := make(chan struct{})
+	go func() { defer close(workerDone); result <- p.measure(ctx, m, c); p.owner.Close() }()
 	native := p.owner.Run(ctx, d)
 	var measured error
 	select {
@@ -366,6 +383,11 @@ func runPerf(c perfConfig) (terminal error) {
 	case <-time.After(2 * time.Second):
 		cancel()
 		measured = errors.New("loadedgrid perf: native runtime ended before measured completion")
+	}
+	select {
+	case <-workerDone:
+	case <-ctx.Done():
+		measured = errors.Join(measured, ctx.Err())
 	}
 	select {
 	case e := <-failure:

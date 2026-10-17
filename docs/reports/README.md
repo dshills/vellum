@@ -82,3 +82,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Current external macOS accessibility](macos-current-external-ax/README.md): read-only Unicode/ranges and palette/canvas tree properties on current framework bytes, with explicit fixture overlays and the original failed collector preserved beside its corrected interpretation.
 
 - [Initial native window sizing](macos-initial-window-size/README.md): Dp creation contract, two measured native client sizes/shrinks, separate outer AX frames, bounded conversion regressions and review evidence.
+
+- [Current native grid viewport](macos-current-grid-viewport/README.md): actual native geometry, 40 ordinary processes and 4,800 frames; unchanged 4/6 ms targets still fail.
