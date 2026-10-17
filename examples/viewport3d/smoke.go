@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/system/driver/desktop"
 	"context"
 	"crypto/sha256"
@@ -70,18 +71,38 @@ func press(ctx context.Context, id string) error {
 	}
 }
 func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef app.WindowRef, g, other *cogent.GPUView, m, otherModel *cubeProgram, errors <-chan error, chrome func()) error {
-	initial, err := waitFrame(ctx, a, g, 0)
+	initialPair, err := stableInitialFrames(ctx, a, g, other)
 	if err != nil {
 		return err
 	}
-	independent, err := waitFrame(ctx, a, other, 0)
-	if err != nil {
-		return err
-	}
+	initial, independent := initialPair[0], initialPair[1]
 	if err := depthPixel(a, g); err != nil {
 		return err
 	}
 	if err := depthPixel(a, other); err != nil {
+		return err
+	}
+	// Observe only the independent adapter; retain the paired initial
+	// baseline and exact failure predicate while diagnosing its lifetime.
+	type independentObservation struct {
+		Phase           string
+		Stats           cogent.GPUViewStats
+		Revision        uint64
+		ModelGeneration uint64
+		ModelReleases   int
+	}
+	var observations []independentObservation
+	observeOther := func(phase string) error {
+		return owner(a, func() error {
+			stats, e := other.Stats()
+			if e != nil {
+				return e
+			}
+			observations = append(observations, independentObservation{phase, stats, other.Revision, otherModel.generation, otherModel.releases})
+			return nil
+		})
+	}
+	if err := observeOther("initial-depth-readbacks"); err != nil {
 		return err
 	}
 	if err := owner(a, func() error {
@@ -96,6 +117,14 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 		if e != nil {
 			return e
 		}
+		independent, e = other.Stats()
+		if e != nil {
+			return e
+		}
+		current := [2]cogent.GPUViewStats{initial, independent}
+		if !initial.Ready || !independent.Ready || initialFrameStates(current) != initialFrameStates(initialPair) {
+			return fmt.Errorf("initial targets changed after paired quiet interval: settled=%+v current=%+v", initialPair, current)
+		}
 		chrome()
 		return a.Invalidate(g.Window)
 	}); err != nil {
@@ -107,6 +136,9 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 	}
 	if unchanged.Frames != initial.Frames || unchanged.Prepares != initial.Prepares || unchanged.HelperUploads != initial.HelperUploads {
 		return fmt.Errorf("acknowledged chrome redraw rerendered program: initial=%+v now=%+v", initial, unchanged)
+	}
+	if err := observeOther("chrome"); err != nil {
+		return err
 	}
 	if initial.BufferBytes != 880 || initial.TargetBytes != uint64(initial.Size.X*initial.Size.Y)*36 || initial.TextureBytes != 0 || initial.HelperUploadBytes < 880 {
 		return fmt.Errorf("tracked 3D byte accounting: %+v", initial)
@@ -164,6 +196,9 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 	if err := depthPixel(a, g); err != nil {
 		return err
 	}
+	if err := observeOther("camera-reset"); err != nil {
+		return err
+	}
 	if err := owner(a, func() error { g.MaxGPUBytes = 1; return a.Invalidate(g.Window) }); err != nil {
 		return err
 	}
@@ -183,6 +218,9 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 		g.MaxGPUBytes = 0
 		return nil
 	}); err != nil {
+		return err
+	}
+	if err := observeOther("budget-refusal"); err != nil {
 		return err
 	}
 	last := resetCamera
@@ -224,6 +262,9 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 		if repaired.ResourceGeneration <= last.ResourceGeneration || repaired.BufferBytes != 880 {
 			return fmt.Errorf("%s did not repair resources", phase)
 		}
+		if err := observeOther(phase + "-repaired"); err != nil {
+			return err
+		}
 		last = repaired
 		if err := depthPixel(a, g); err != nil {
 			return err
@@ -241,6 +282,9 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 	}
 	last, err = stableFrame(ctx, a, g)
 	if err != nil {
+		return err
+	}
+	if err := observeOther("resource-rebuild"); err != nil {
 		return err
 	}
 	for _, size := range []image.Point{{1100, 850}, {1300, 1000}, {1200, 950}} {
@@ -261,6 +305,9 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 		}
 		last, err = stableFrame(ctx, a, g)
 		if err != nil {
+			return err
+		}
+		if err := observeOther(fmt.Sprintf("primary-resize-%dx%d", size.X, size.Y)); err != nil {
 			return err
 		}
 		if last.Size == before.Size || last.ResourceGeneration != before.ResourceGeneration || last.TargetGeneration <= before.TargetGeneration || last.BufferAllocations != before.BufferAllocations || last.BufferBytes != 880 || last.TargetBytes != uint64(last.Size.X*last.Size.Y)*36 {
@@ -302,6 +349,9 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 	}); err != nil {
 		return err
 	}
+	if err := observeOther("primary-cleared"); err != nil {
+		return err
+	}
 	var otherAfter cogent.GPUViewStats
 	if err := owner(a, func() error {
 		var e error
@@ -310,7 +360,11 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 			return e
 		}
 		if otherAfter.Frames != independent.Frames || otherAfter.BufferAllocations != independent.BufferAllocations {
-			return fmt.Errorf("first-window changes affected independent resources")
+			body, e := json.Marshal(observations)
+			if e != nil {
+				return e
+			}
+			return fmt.Errorf("first-window changes affected independent resources: initial=%+v final=%+v observations=%s", independent, otherAfter, body)
 		}
 		return a.CloseWindow(primaryRef)
 	}); err != nil {
@@ -333,7 +387,7 @@ func viewportSmoke(ctx context.Context, a *app.Application, primaryRef, otherRef
 	if err := owner(a, func() error { return a.CloseWindow(otherRef) }); err != nil {
 		return err
 	}
-	report := map[string]any{"initial": initial, "independentBufferNamespaces": true, "orbitPixelsChanged": true, "chrome": unchanged, "orbit": orbited, "dolly": dollied, "rebuilt": rebuilt, "resized": last, "cleared": cleared, "independent": otherAfter, "depth": "near red face before far blue face; both center pixels red", "callbackFaults": "controlled Prepare and Draw failures; partial resources retired and rebuilt", "readback": "explicit synchronous snapshots only", "closure": "closed adapters unavailable; other window remains usable", "result": "pass"}
+	report := map[string]any{"event": "vellum.viewport3d.smoke", "geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver, "initial": initial, "initial_pair": initialPair, "initial_baselines": [2]cogent.GPUViewStats{initial, independent}, "independentBufferNamespaces": true, "orbitPixelsChanged": true, "chrome": unchanged, "orbit": orbited, "dolly": dollied, "rebuilt": rebuilt, "resized": last, "cleared": cleared, "independent": otherAfter, "independent_observations": observations, "depth": "near red face before far blue face; both center pixels red", "callbackFaults": "controlled Prepare and Draw failures; partial resources retired and rebuilt", "readback": "explicit synchronous snapshots only", "closure": "closed adapters unavailable; other window remains usable", "result": "pass"}
 	return json.NewEncoder(os.Stdout).Encode(report)
 }
 
@@ -358,6 +412,75 @@ func stableFrame(ctx context.Context, a *app.Application, g *cogent.GPUView) (co
 		select {
 		case <-ctx.Done():
 			return now, fmt.Errorf("settling viewport target: %w", ctx.Err())
+		case <-time.After(5 * time.Millisecond):
+		}
+	}
+}
+
+// Initial native layout may submit a provisional target before its client
+// geometry settles. Keep a joint quiet interval, so waiting for one window
+// cannot leave the other window's baseline stale.
+type initialFrameState struct {
+	Size                                                                    image.Point
+	Frames, Prepares, Draws                                                 uint64
+	TargetGeneration, ResourceGeneration                                    uint64
+	BufferAllocations, TextureAllocations, HelperUploads, HelperUploadBytes uint64
+}
+
+func initialFrameStates(pair [2]cogent.GPUViewStats) [2]initialFrameState {
+	var states [2]initialFrameState
+	for i, s := range pair {
+		states[i] = initialFrameState{s.Size, s.Frames, s.Prepares, s.Draws, s.TargetGeneration, s.ResourceGeneration, s.BufferAllocations, s.TextureAllocations, s.HelperUploads, s.HelperUploadBytes}
+	}
+	return states
+}
+
+type initialFrameStability struct {
+	states  [2]initialFrameState
+	since   time.Time
+	sampled bool
+}
+
+func (s *initialFrameStability) observe(pair [2]cogent.GPUViewStats, now time.Time) bool {
+	for _, frame := range pair {
+		if !frame.Ready || frame.Frames == 0 || frame.Size.X <= 0 || frame.Size.Y <= 0 {
+			s.sampled = false
+			return false
+		}
+	}
+	states := initialFrameStates(pair)
+	if !s.sampled || states != s.states {
+		s.states, s.since, s.sampled = states, now, true
+		return false
+	}
+	return now.Sub(s.since) >= 100*time.Millisecond
+}
+
+func stableInitialFrames(ctx context.Context, a *app.Application, g, other *cogent.GPUView) ([2]cogent.GPUViewStats, error) {
+	var pair [2]cogent.GPUViewStats
+	var stability initialFrameStability
+	for {
+		err := owner(a, func() error {
+			for i, view := range []*cogent.GPUView{g, other} {
+				stats, err := view.Stats()
+				if err != nil {
+					return err
+				}
+				pair[i] = stats
+			}
+			return nil
+		})
+		if err != nil {
+			stability.sampled = false
+			if err != cogent.ErrFrameNotReady {
+				return pair, err
+			}
+		} else if stability.observe(pair, time.Now()) {
+			return pair, nil
+		}
+		select {
+		case <-ctx.Done():
+			return pair, fmt.Errorf("settling initial viewport pair: primary=%+v other=%+v: %w", pair[0], pair[1], ctx.Err())
 		case <-time.After(5 * time.Millisecond):
 		}
 	}

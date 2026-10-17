@@ -134,3 +134,14 @@ general triangle spatial index. [Retained image drawing](images.md) adds the
 compute preparation, float targets and asynchronous screenshot readback remain
 open, along with sustained GPU/frame/input and global resource acceptance.
 This phase does not qualify P4 as a whole or the Mac framework as complete.
+
+## Isolated native smoke geometry
+
+The independent example's `--smoke` mode disables backend window-geometry loading
+and saving before creating the application. The process-local setting remains
+active through native teardown and restores its prior value on normal return.
+Interactive mode retains the normal persistence behavior. The smoke result emits
+its actual `geometry_persistence_disabled_in_fixture` flag, so external validation
+can reject a run that did not isolate fixture geometry. Geometry isolation does
+not establish physical input, compositor presentation, native/GPU memory, sustained
+performance or complete Mac acceptance.

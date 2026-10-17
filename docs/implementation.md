@@ -635,3 +635,17 @@ checkpoint; full-image/presentation, physical/human workflows, ordinary frame
 latency, native/GPU memory, endurance, rights/public release and full Mac
 acceptance remain open. Internal reviews cover build, native admission/results
 and report packaging; no new Prism call for this evidence-only checkpoint.
+
+The [isolated native drawing and 3D checkpoint](reports/macos-advanced-native/README.md)
+adds process-only smoke geometry isolation and a joint initial-target baseline,
+with deterministic startup regressions. The original independent-window failure
+and a diagnostic provisional-target/chrome failure remain retained; only the
+second has a demonstrated startup-size cause. Current source-specific drawing
+and corrected viewport assertions pass with exact private source-built ARM64
+static linkage, including retained images/meshes, camera/depth, controlled fault
+repair, independent windows, resize and closure. Drawing source bytes are reused
+exactly; its native run is not repeated. One Anthropic Claude Sonnet 5.5 Prism
+checkpoint covers the nine source/test/spec leaves, with internal result/report
+reviews. These are native source-assertion/readback checks; physical interaction,
+presentation, ordinary latency, native/GPU memory, endurance, human input/accessibility,
+rights/public release and full Mac qualification remain open.

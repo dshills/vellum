@@ -165,3 +165,22 @@ into the main sRGB pass. Quantitative HDR/alpha and asynchronous lifecycle evide
 is recorded separately from general compute/float feature support. Advanced GPU
 timestamps, physical device loss, cross-display geometry and broader P4/Mac
 performance qualification remain open. See [macOS completion](macos-completion.md).
+
+## Isolated native smoke geometry
+
+The independent example's `--smoke` mode disables backend window-geometry loading
+and saving before creating the application. The process-local setting remains
+active through native teardown and restores its prior value on normal return.
+Interactive mode retains the normal persistence behavior. The smoke result emits
+its actual `geometry_persistence_disabled_in_fixture` flag, so external validation
+can reject a run that did not isolate fixture geometry. Geometry isolation does
+not establish physical input, compositor presentation, native/GPU memory, sustained
+performance or complete Mac acceptance.
+
+The 3D smoke establishes a paired 100 ms quiet interval for both initial targets,
+then captures both baselines together before its first chrome mutation. It refuses
+later frame/resource drift with the original strict retention checks. This avoids
+using a provisional first layout as the retention baseline; the quiet interval is
+an operational fixture barrier, not a guarantee that all OS work has drained.
+Bounded owner-thread observations retain independent-window state for diagnosis.
+No frame, budget, depth, pixel, fault-repair, resize or closure assertion is waived.

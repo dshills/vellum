@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"github.com/dshills/vellum/drivers/cogent"
+	"image"
 	"math"
 	"testing"
+	"time"
 )
 
 func TestCameraProjectsNearFarAndOrbit(t *testing.T) {
@@ -67,5 +71,90 @@ func TestCubeDepthProbeSubmissionOrder(t *testing.T) {
 		if index >= 24 {
 			t.Fatal("index outside geometry")
 		}
+	}
+}
+
+// Reproduce a provisional first target, then a later transition in the other
+// window. Neither individual window's earlier quiet period admits the pair.
+func TestInitialFramesRequireJointQuietInterval(t *testing.T) {
+	base := time.Unix(1, 0)
+	frame := cogent.GPUViewStats{Ready: true, Frames: 1, Prepares: 1, Draws: 1, Size: image.Pt(5102, 1330), TargetGeneration: 1, BufferAllocations: 3, HelperUploads: 3, HelperUploadBytes: 880}
+	pair := [2]cogent.GPUViewStats{frame, frame}
+	var stability initialFrameStability
+	check := func(ms int, want bool) {
+		t.Helper()
+		if got := stability.observe(pair, base.Add(time.Duration(ms)*time.Millisecond)); got != want {
+			t.Fatalf("at %dms ready=%v want %v", ms, got, want)
+		}
+	}
+	check(0, false)
+	pair[0].Size = image.Pt(792, 498)
+	pair[0].Frames++
+	pair[0].Prepares++
+	pair[0].Draws++
+	pair[0].TargetGeneration++
+	pair[0].HelperUploads++
+	pair[0].HelperUploadBytes += 64
+	check(10, false)
+	check(100, false)
+	pair[1].Size = image.Pt(632, 412)
+	pair[1].Frames++
+	pair[1].TargetGeneration++
+	check(105, false)
+	check(204, false)
+	check(205, true)
+	// A resource transition also requires a fresh joint interval even if the
+	// observed pixel dimensions and completed-frame count have not changed.
+	pair[1].ResourceGeneration++
+	pair[1].BufferAllocations += 3
+	check(220, false)
+	check(319, false)
+	check(320, true)
+}
+
+func TestInitialFramesRejectInterruptedReadiness(t *testing.T) {
+	for window := 0; window < 2; window++ {
+		for _, invalid := range []string{"not-ready", "no-frame", "no-width", "no-height"} {
+			t.Run(fmt.Sprintf("window%d/%s", window, invalid), func(t *testing.T) {
+				base := time.Unix(1, 0)
+				frame := cogent.GPUViewStats{Ready: true, Frames: 1, Size: image.Pt(640, 480)}
+				pair := [2]cogent.GPUViewStats{frame, frame}
+				var stability initialFrameStability
+				stability.observe(pair, base)
+				broken := pair
+				switch invalid {
+				case "not-ready":
+					broken[window].Ready = false
+				case "no-frame":
+					broken[window].Frames = 0
+				case "no-width":
+					broken[window].Size.X = 0
+				case "no-height":
+					broken[window].Size.Y = 0
+				}
+				if stability.observe(broken, base.Add(99*time.Millisecond)) {
+					t.Fatal("incomplete pair accepted")
+				}
+				if stability.observe(pair, base.Add(200*time.Millisecond)) || stability.observe(pair, base.Add(299*time.Millisecond)) {
+					t.Fatal("readiness interruption did not restart the quiet interval")
+				}
+				if !stability.observe(pair, base.Add(300*time.Millisecond)) {
+					t.Fatal("complete joint interval not accepted")
+				}
+			})
+		}
+	}
+}
+
+func TestInitialFramesPermitVisitsAndReadbacks(t *testing.T) {
+	base := time.Unix(1, 0)
+	frame := cogent.GPUViewStats{Ready: true, Frames: 1, Size: image.Pt(640, 480)}
+	pair := [2]cogent.GPUViewStats{frame, frame}
+	var stability initialFrameStability
+	stability.observe(pair, base)
+	pair[0].RenderVisits++
+	pair[1].SnapshotReadbacks++
+	if !stability.observe(pair, base.Add(100*time.Millisecond)) {
+		t.Fatal("non-rendering visits/readbacks blocked an otherwise quiet pair")
 	}
 }

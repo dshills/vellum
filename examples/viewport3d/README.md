@@ -29,3 +29,18 @@ borrowing requirements. These snapshots verify offscreen GPU pixels; presented
 clipping, latency, sustained performance, compute/floating-point workflows and
 asynchronous readback need separate qualification. macOS remains experimental.
 The example's code is MIT licensed.
+
+The `--smoke` fixture disables native window-geometry loading and saving before
+constructing the application and keeps that process-local setting through teardown.
+It restores the prior process value on normal return; ordinary interactive runs
+retain their usual geometry behavior. The JSON result reports the observed
+`geometry_persistence_disabled_in_fixture` flag. This isolates fixture windows
+from saved user geometry and avoids persisting the deliberate resize sequence.
+
+The 3D smoke establishes a paired 100 ms quiet interval for both initial targets,
+then captures both baselines together before its first chrome mutation. It refuses
+later frame/resource drift with the original strict retention checks. This avoids
+using a provisional first layout as the retention baseline; the quiet interval is
+an operational fixture barrier, not a guarantee that all OS work has drained.
+Bounded owner-thread observations retain independent-window state for diagnosis.
+No frame, budget, depth, pixel, fault-repair, resize or closure assertion is waived.

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cogentcore.org/core/core"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -302,7 +303,7 @@ func drawingSmoke(ctx context.Context, a *app.Application, otherRef app.WindowRe
 		return err
 	default:
 	}
-	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.drawing.smoke", "gradient_and_linear_alpha_pixels": true, "transparent_snapshot": true, "unchanged_mesh_uploads": unchanged.MeshUploads, "unchanged_offscreen_frames": unchanged.Frames, "static_pan_retains_mesh": true, "independent_windows": true, "schematic_source_objects": query.TotalObjects, "schematic_visible_objects": query.VisibleObjects, "schematic_tested_objects": query.TestedObjects, "waveform_source_samples": 1000000, "waveform_columns": columns, "waveform_submitted_triangles": wave.SubmittedTriangles, "empty_frame_clear": true, "retained_image": imageReport, "budget_refusal": true, "error_callback_resource_query": true, "resource_rebuild": true, "repeated_resize": true, "final_stats": prior, "physical_device_loss_verified": false, "presentation_latency_measured": false})
+	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.drawing.smoke", "geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver, "gradient_and_linear_alpha_pixels": true, "transparent_snapshot": true, "unchanged_mesh_uploads": unchanged.MeshUploads, "unchanged_offscreen_frames": unchanged.Frames, "static_pan_retains_mesh": true, "independent_windows": true, "schematic_source_objects": query.TotalObjects, "schematic_visible_objects": query.VisibleObjects, "schematic_tested_objects": query.TestedObjects, "waveform_source_samples": 1000000, "waveform_columns": columns, "waveform_submitted_triangles": wave.SubmittedTriangles, "empty_frame_clear": true, "retained_image": imageReport, "budget_refusal": true, "error_callback_resource_query": true, "resource_rebuild": true, "repeated_resize": true, "final_stats": prior, "physical_device_loss_verified": false, "presentation_latency_measured": false})
 }
 
 // Readiness requires an actual frame and a stable submitted allocation across

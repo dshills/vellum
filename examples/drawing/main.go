@@ -2,6 +2,7 @@
 package main
 
 import (
+	"cogentcore.org/core/core"
 	"context"
 	"flag"
 	"fmt"
@@ -18,6 +19,13 @@ import (
 func main() {
 	smoke := flag.Bool("smoke", false, "run bounded native acceptance and close both fixture windows")
 	flag.Parse()
+	if *smoke {
+		// Fixture windows must neither load nor save user geometry. Keep this
+		// process-local setting through application and native window teardown.
+		previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
+		core.DebugSettings.DisableWindowGeometrySaver = true
+		defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
+	}
 	model, err := newDrawingModel()
 	if err != nil {
 		fail(err)

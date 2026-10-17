@@ -3,6 +3,8 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Isolated native drawing and 3D fixtures](macos-advanced-native/README.md)
+
 - [Clean private SDK native consumer](macos-source-gpu-sdk-native/README.md)
 
 - [Private source-built GPU SDK overlay](macos-source-gpu-sdk/README.md)

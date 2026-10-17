@@ -30,3 +30,10 @@ for ownership, precision, resource
 accounting and acceptance limits. Snapshot tests inspect offscreen GPU pixels;
 they do not measure presentation latency or qualify native clipped composition.
 Mac runtime remains experimental. The example's code is MIT licensed.
+
+The `--smoke` fixture disables native window-geometry loading and saving before
+constructing the application and keeps that process-local setting through teardown.
+It restores the prior process value on normal return; ordinary interactive runs
+retain their usual geometry behavior. The JSON result reports the observed
+`geometry_persistence_disabled_in_fixture` flag. This isolates fixture windows
+from saved user geometry and avoids persisting the deliberate resize sequence.
