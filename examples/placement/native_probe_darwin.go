@@ -153,6 +153,18 @@ func newNativeProbeWriter(root string) (*nativeProbeWriter, error) {
 	}
 	return &nativeProbeWriter{root: root, log: log}, nil
 }
+
+// Only this probe's private output directory owns its cancellation marker.
+// Historical test-session paths must never authorize or stop a fresh session.
+func (w *nativeProbeWriter) checkStop() error {
+	if _, err := os.Lstat(filepath.Join(w.root, "stop-live")); err == nil {
+		return fmt.Errorf("probe stopped by session marker")
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return nil
+}
+
 func (w *nativeProbeWriter) write(value any) error {
 	data, err := json.Marshal(value)
 	if err != nil {
@@ -290,12 +302,8 @@ func runNativePlacementDesktopProbe() (result error) {
 				return nil
 			case <-ticker.C:
 			}
-			for _, marker := range []string{filepath.Join(w.root, "stop-live"), "/private/tmp/vellum-macos-same-name-live-ddd23c6/stop-live"} {
-				if _, err := os.Stat(marker); err == nil {
-					return fmt.Errorf("probe stopped by marker")
-				} else if !errors.Is(err, os.ErrNotExist) {
-					return err
-				}
+			if err := w.checkStop(); err != nil {
+				return err
 			}
 			var state nativePlacementState
 			if err := a.Do(func() {

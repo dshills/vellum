@@ -125,3 +125,49 @@ func TestNativeProbeObserverRetirement(t *testing.T) {
 		t.Fatal("observer panic/join not retained", err, cleaned)
 	}
 }
+
+func TestNativeProbeSessionStopIsolationAndObserverJoin(t *testing.T) {
+	one, err := newNativeProbeWriter(privateProbeDir(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer one.log.Close()
+	two, err := newNativeProbeWriter(privateProbeDir(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer two.log.Close()
+	if err := one.checkStop(); err != nil {
+		t.Fatal(err)
+	}
+	if err := two.checkStop(); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	ready := make(chan struct{})
+	o := startNativeProbeObserver(cancel, func() error { <-ready; return one.checkStop() })
+	if err := os.WriteFile(filepath.Join(one.root, "stop-live"), nil, 0600); err != nil {
+		close(ready)
+		t.Fatal(err)
+	}
+	close(ready)
+	select {
+	case <-ctx.Done():
+	case <-time.After(time.Second):
+		t.Fatal("session marker did not cancel observer")
+	}
+	cleaned := false
+	err = retireNativeProbe(cancel, o, time.Second, func() error { cleaned = true; return nil })
+	if err == nil || !strings.Contains(err.Error(), "session marker") || !cleaned {
+		t.Fatal("marker failure/join/teardown lost", err, cleaned)
+	}
+	if err := two.checkStop(); err != nil {
+		t.Fatal("one session stopped another", err)
+	}
+	// A marker-inspection error must fail closed rather than continue observing.
+	two.root = filepath.Join(two.root, "events.jsonl", "not-a-directory")
+	if err := two.checkStop(); err == nil {
+		t.Fatal("marker I/O failure ignored")
+	}
+}

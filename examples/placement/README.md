@@ -66,8 +66,10 @@ VELLUM_NATIVE_PLACEMENT_PROBE=/private/tmp/vellum-placement-probe-output \
 The output directory must be new, empty, private and free of symlink components.
 This dedicated executable follows ordinary desktop initialization on AppKit's
 original locked thread and refuses inconsistent/offscreen app identities.
-Ordinary tests use the upstream offscreen driver and never open its window. A ten-minute deadline and the shared human-return
-marker end the session. The external operator supplies all pointer/key actions.
+Ordinary tests use the upstream offscreen driver and never open its window. A ten-minute deadline and a session-owned `stop-live` marker in the private
+output directory end the session. The test controller must create this marker
+when desktop permission is withdrawn or the user returns. Historical markers
+from other sessions are kept intact and do not control a new probe. The external operator supplies all pointer/key actions.
 The probe observes the ordinary view/model, command/history, canvas-change and
 palette-activation counts, bounded gesture state and actual Cocoa geometry.
 It writes atomic `latest.json` snapshots and at most 8 MiB of `events.jsonl`.
@@ -88,3 +90,9 @@ reached one completed native accessibility snapshot, then expired while external
 app binding was pending. No pointer/key action ran; native placement workflow
 acceptance remains open. The offscreen/race checks and failed native deadline are
 reported separately, with source/build pins and owned-process retirement evidence.
+
+The [fresh session-owned probe check](../../docs/reports/macos-placement-session/README.md)
+passes cancellation-isolation/routing race tests and reaches native window/AX
+readiness, but the bounded PID-directed click/Return attempt creates no object
+and fails its observation bound. It is sealed without retry. Native placement
+needs direct/manual verification; posting receipts do not prove app delivery.

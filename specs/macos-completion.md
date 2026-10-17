@@ -48,6 +48,14 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [session-owned placement probe](../docs/reports/macos-placement-session/README.md)
+removes a stale test-session stop path and passes isolation/observer/routing race
+checks, vet and build. The single fresh native attempt reaches Cocoa AX readiness
+and posts guarded click/Return events to its owned PID, but observes no object
+or history entry and fails. It is sealed without retry; the owned PID/group are
+subsequently absent. No physical input or native placement qualification follows.
+Direct/manual verification is required; independent M3/M6 work can continue.
+
 The [M3-A segmented snapshot experiment](../docs/reports/macos-segmented-ready/README.md)
 is rejected and fully reverted. Full driver race and exact legacy wire/geometry,
 action and lifecycle regressions pass, but all five native comparison pairs lose:

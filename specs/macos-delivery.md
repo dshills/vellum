@@ -37,11 +37,14 @@ to system input/accessibility preferences are not implicitly authorized here.
 | SDK | Relocated public consumers; current private SDK drawing/3D/imaging native checks | Final clean candidate including the M1 cancellation fix, component/rights closure and distribution acceptance |
 | Performance/endurance | Existing profilers, ordinary benchmarks, scoped idle samples and historical 1,000-cycle campaigns | Ordinary targets still fail; complete current-source memory/pacing/idle/overnight qualification |
 
-The first automated desktop placement attempt expired without input. The latest
+The first automated desktop placement attempt expired without input. The second
 attempt also sent no pointer/key input: the private operator refused an unusable
-Foundation process-birth value. Its kernel-identity correction is prepared but
-unexecuted. These are test-operator outcomes, not placement acceptance. Existing
-offscreen routing and model tests remain separate evidence.
+Foundation process-birth value. A [fresh current-source attempt](../docs/reports/macos-placement-session/README.md)
+uses the corrected kernel identity and session stop scope, reaches native AX
+readiness and posts a click/Return to the owned PID, but observes no placement.
+It fails and is sealed without retry. Direct/manual verification is now required;
+no further native input operator work is queued. Existing offscreen routing and
+model tests remain separate evidence.
 
 ## Ordered delivery backlog
 
@@ -119,11 +122,11 @@ explicitly authorized tests and restore any authorized temporary state changes.
    workflows. Before another M3 scene/renderer redesign, collect actual operation
    and resource-kind counts, encoded-buffer composition and source-phase evidence
    for the failing fixture. M6 inventory can proceed independently.
-4. Use an authorized desktop window for M2/M5 native workflows and ordinary M3
-   measurements. Reuse the placement operator implementation with a fresh
-   source-bound plan and stop scope; never replay a completed/human-return seal.
-   Allow one bounded attempt; if delivery still fails, record it and schedule direct/manual
-   verification instead of spending another open-ended cycle building an operator.
+4. Use an authorized desktop window for other M2/M5 native checks and ordinary M3
+   measurements. Never replay a completed/human-return seal.
+   The one fresh bounded placement attempt has now failed its delivery observation;
+   retain its result and use direct/manual verification. Do not run another input
+   operator attempt or spend another open-ended cycle building an operator.
 5. After significant functional/performance fixes stabilize, run M4 preflight,
    ten-minute activity, 1,000-cycle campaign and overnight soak in that order.
    Stop on a real failure; diagnose and rerun the affected gate.
