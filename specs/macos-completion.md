@@ -23,6 +23,14 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [current private SDK checkpoint](../docs/reports/macos-current-sdk/README.md)
+verifies 7,411 hashed files from clean `238b3b6`, including owned stages 0074/0075.
+The relocated generated consumer passes race/vet/build checks, and the public API
+contract module passes race/vet. Nine demo applications and four replay/workspace
+commands compile from that SDK using only its local replacements. These are
+consumption/compilation checks, with no native application execution or public
+distribution. Native packaging/release gates and full Mac qualification remain open.
+
 The [unique lifecycle, grid diagnostics and workspace recovery checkpoint](../docs/reports/macos-workspace-recovery/README.md)
 completes 1,000 unique-name cycles and 33,000 native/owner actions on `ddd23c6`.
 Eight grid diagnostic configurations on `7e97a1a` complete 960 measured samples;

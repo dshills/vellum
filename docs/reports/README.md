@@ -86,3 +86,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Current native grid viewport](macos-current-grid-viewport/README.md): actual native geometry, 40 ordinary processes and 4,800 frames; unchanged 4/6 ms targets still fail.
 
 - [Adaptive scene tile bins](macos-adaptive-tile-binning/README.md): owned stage 0075, byte/pixel limits and native GPU checks; matched ordinary grid results retain the open performance gate.
+
+- [Current private SDK consumption](macos-current-sdk/README.md): 7,411 hashed files, relocated consumer/API checks and 13 compiled entrypoints; no native execution or public distribution.

@@ -1,0 +1,311 @@
+{
+  "status": "REVIEWED_CURRENT_PRIVATE_SDK_CONSUMPTION",
+  "analysis": {
+    "status": "CURRENT_PRIVATE_SDK_AND_DEMOS_RECONCILED",
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "source_files": 4654,
+    "prepared_files": 6246,
+    "source_sha256": "7f835727791768a7fff2dea1797d97a2dff1db1b083c53fb4abc8830ac1c73a7",
+    "archive": {
+      "sha256": "94dd1a1de78085ae705d17e587128b83bff0bbf442fb9f1f12ed348d5ba56f32",
+      "bytes": 18541520,
+      "manifest_files": 7411,
+      "regular_members": 7412,
+      "selected_source_files": 7310,
+      "generated_files": 101,
+      "private_build": true,
+      "version": "v0.1.0-alpha.2",
+      "namespace": "github.com/dshills/vellum"
+    },
+    "inventory": {
+      "modules": 89,
+      "distribution_audit": "pending",
+      "scope": "Go module graph and declared license/notice files; not a legal approval or complete embedded native/Rust/font audit"
+    },
+    "checks": {
+      "package": {
+        "receipt_sha256": "5ffd881de89212a6c39095eac9b16b0895858b24276280379237eb09bb160c90",
+        "seconds": 5.3479843330569565,
+        "validation": {
+          "archive": "/private/tmp/vellum-current-sdk-238b3b6/sdk.tar.gz",
+          "sha256": "94dd1a1de78085ae705d17e587128b83bff0bbf442fb9f1f12ed348d5ba56f32",
+          "version": "v0.1.0-alpha.2",
+          "modules": 89,
+          "private_build": true
+        }
+      },
+      "relocate": {
+        "receipt_sha256": "f3a7d061d1ef0549ab220db5865ecf53ecba344ce2fd824ed17ad637982150be",
+        "seconds": 48.58086258301046,
+        "validation": {
+          "event": "vellum.sdk.relocated",
+          "digest_verified_against_expected": true,
+          "trust_basis": "caller-supplied expected digest",
+          "independent_authenticity_verified": false,
+          "archive_sha256": "94dd1a1de78085ae705d17e587128b83bff0bbf442fb9f1f12ed348d5ba56f32",
+          "version": "v0.1.0-alpha.2",
+          "source": {
+            "clean": true,
+            "commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8"
+          },
+          "verified_files": 7411,
+          "replacements_within_sdk": {
+            "cogentcore.org/core": "drivers/cogent/build/upstream",
+            "github.com/dshills/vellum": ".",
+            "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+            "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+          },
+          "path_contains_spaces": true,
+          "checks": [
+            "manifest all-file integrity",
+            "external Go module cache verification",
+            "standalone consumer race/vet/build",
+            "public API scenarios race/vet"
+          ],
+          "native_runtime": "not executed",
+          "public_distribution_audit": "not certified"
+        }
+      }
+    },
+    "demos": {
+      "drawing": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/drawing",
+          "bytes": 58973378,
+          "sha256": "df8870083a4d07f4f6fe412abcb222b99be4906105693ed4d29fc2f2d2e58828"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "drawing"
+      },
+      "editor": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/editor",
+          "bytes": 58944498,
+          "sha256": "2a0b6a0a080ae5e58660ae6a3447f2ed93291d9fc9b1b70b07ba7059f61151d8"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "editor"
+      },
+      "grid": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/grid",
+          "bytes": 58888610,
+          "sha256": "81eefaa54d73c80b0a3cbed4c555a2a094a0554c9af88c9d8f99524df37bee70"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "grid"
+      },
+      "hello": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/hello",
+          "bytes": 59698610,
+          "sha256": "1d9d56dafeebd8019f3e210613a9bd326bcbebc8d407abf08f4018d2f7d16fa9"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "hello"
+      },
+      "imaging": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/imaging",
+          "bytes": 59010626,
+          "sha256": "11aa0216edce786d2c8d6a74c84d9ac23dea3a2079edcce539ebc31f9ee7a6f3"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "imaging"
+      },
+      "loadedgrid": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+          "bytes": 59290754,
+          "sha256": "ccc37ade4a6c25a7bcb7f4f054c4b1ec1a6a3c1f3c9bfbb2d03209e2af34ece7"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "loadedgrid"
+      },
+      "loadedtree": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedtree",
+          "bytes": 58931762,
+          "sha256": "6b8de0bc282e39465cf82c69d898f3df66e0e4274e1bcf65c99d368d1937fc53"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "loadedtree"
+      },
+      "placement": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/placement",
+          "bytes": 58751842,
+          "sha256": "7b9de660b650d55ed8f1b96f38a576038cec5e2b3d73a91c0ab7f16284bc2ec9"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "placement"
+      },
+      "viewport3d": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/entrypoints/build outputs/viewport3d",
+          "bytes": 58958706,
+          "sha256": "7c703ebf459c89d83bbe8a88862f3045e5ec9f5d27776e74286d4a1d0c8d5351"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": ".",
+        "tags": null,
+        "example": "viewport3d"
+      },
+      "workspace": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/entrypoints/build outputs/workspace",
+          "bytes": 58969922,
+          "sha256": "03dfcd6f912159ada8314930600d66146711e532f48dd981f092b1597fb65a41"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": "./cmd/workspace",
+        "tags": null,
+        "example": "replay"
+      },
+      "workspace-smoke": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/entrypoints/build outputs/workspace-smoke",
+          "bytes": 59131522,
+          "sha256": "92becab74c2ec9751bbd3848b58054b148767d0d7eda9de222e78e9941c6f36b"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": "./cmd/workspace-smoke",
+        "tags": "vellum_native_checks",
+        "example": "replay"
+      },
+      "managed-replay": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/entrypoints/build outputs/managed-replay",
+          "bytes": 59065298,
+          "sha256": "ee168beac3da12576eb20f10d5d22aeb3ddd3405029112314a14470b0f143c15"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": "./cmd/native",
+        "tags": "offscreen",
+        "example": "replay"
+      },
+      "workspace-replay": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/entrypoints/build outputs/workspace-replay",
+          "bytes": 63551442,
+          "sha256": "f9f9774d254a11cf7c8e6ddd8a548baca19826d66ed98acd3d69228d483c72b7"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": "./cmd/workspace-replay",
+        "tags": "offscreen",
+        "example": "replay"
+      }
+    },
+    "compiled_demo_applications": 9,
+    "compiled_replay_commands": 4,
+    "first_matrix_result": "INCOMPLETE",
+    "first_matrix_failure_requalified": false,
+    "first_matrix_failure": "Root replay package is a Go library; executable metadata check refused it. Correct documented cmd entrypoints built separately.",
+    "entrypoints_receipt_sha256": "c5141e2bfafbe9cdf702224a5cbab315208432ae613892f61012c2a81bcadbcd",
+    "owned_patch_stages": [
+      "0074",
+      "0075"
+    ],
+    "demo_receipt_sha256": "3378bf86021e03a8f2492d0e4e7c0dea58eb6be1579e9c013bbe4cc1e05f30c8",
+    "inspector_sha256": "8e181f622aa482212102aa970b9ab05a9a638ccb5a5dbcdf82a6c6ce69df04c6",
+    "native_runtime_executed": false,
+    "public_distribution": false,
+    "independent_authenticity_verified": false,
+    "full_macos_qualified": false
+  },
+  "review_sha256": "2e389716a5b95b168716aaae01a4de01d854ffbb4230d0cc7e076b5fbb4b3a97",
+  "provider_calls_this_phase": 0,
+  "provider_basis": "No implementation changes; current shipping stage75 was reviewed internally and once with Prism Anthropic Claude Sonnet5.5 in source29ec8c9.",
+  "evidence": {
+    "file": "evidence.tar.gz",
+    "sha256": "c65653e1a9222be933180a98bfcf8229efa0e31b5fd76d372997ba5b87285de4",
+    "bytes": 1316802,
+    "members": 155,
+    "expanded_bytes": 4153577,
+    "manifest_sha256": "aca2b112779ce82038cc0868357e646ffc2083a95e7f0fa1f2cc1d51a9448103"
+  },
+  "native_runtime_executed": false,
+  "public_distribution": false,
+  "full_macos_qualified": false
+}
