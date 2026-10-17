@@ -402,3 +402,14 @@ its ten-minute deadline while external app binding remained pending; the request
 later returned a timeout. No pointer/key actions were requested. Its group was reaped and absent. Native placement and
 external accessibility workflow acceptance remain open; the timeout cause is
 unassigned. This does not change the feature API or close broader Mac gates.
+
+## Pending native accessibility publication
+
+The [pending-publication checkpoint](reports/macos-pending-publication/README.md)
+adds private reuse of existing Cocoa node dictionaries after an exact prepared
+wire comparison. Native scope/epoch preflight retains full JSON fallback; pending
+and full commits share ancillary geometry cleanup. Bounded detached baselines and
+permanent exhaustion revocation preserve the proof across lifecycle boundaries.
+The final offscreen/native checks pass. Separate ordinary grid cohorts establish
+neither consistent speedup nor the required 4/6 ms targets; physical/human and
+full Mac qualification remain open. Public application APIs are unchanged.

@@ -76,3 +76,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Empty native text geometry](macos-empty-text-geometry/README.md): native selector/control/grid acceptance and all 80 ordinary runs; no consistent gain, failed targets and the unresolved candidate outlier retained.
 
 - [Native placement desktop probe](macos-placement-desktop/README.md): native-only observer and offscreen controls; external app binding timed out, no input workflows ran, failed deadline and clean owned-group retirement retained.
+
+- [Pending native accessibility publication](macos-pending-publication/README.md): exact pending-only reuse with full fallback, cache/epoch hardening, differential native regressions and separately scoped native comparison cohorts; ordinary performance and full Mac gates remain open.

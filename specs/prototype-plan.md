@@ -195,3 +195,8 @@ The large-canvas texture budget is workload-specific: a 4096² RGBA8 level is 64
 Each experiment delivers: exact revision/build instructions; platform/hardware manifest; deterministic fixtures; raw timing/memory/error data; relevant screenshots/traces; pass/fail by requirement; observed limitations; and a short keep/change/reject decision. Keep failures in the report.
 
 At G3, choose one platform layer and one renderer, record an API/ownership ADR, define supported OS/GPU/IME/screen-reader versions, identify maintainers, and estimate work from the prototypes. Only then begin production implementation. If an existing Go framework meets the same gates with smaller maintenance exposure, make Vellum a workbench extension rather than a new core.
+
+The [pending native publication checkpoint](../docs/reports/macos-pending-publication/README.md)
+retains separate pre-hardening five-pair and final one-pair grid observations.
+Its native and differential checks advance the implementation; neither ordinary
+cohort qualifies the table latency targets or closes P6/P11.

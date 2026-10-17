@@ -949,3 +949,15 @@ for native/GPU/private memory or unbounded retention, ordinary frame/input laten
 physical display/pointer or human accessibility. The failed overnight stays failed;
 full idle, P4/P6/P9/P11, interoperability, distribution and Mac acceptance remain
 open. Later source changes need their own appropriate runtime evidence.
+
+## Pending native accessibility publication checkpoint
+
+The [checkpoint](../docs/reports/macos-pending-publication/README.md) implements
+private pending-only publication under the [accessibility contract](accessibility.md#pending-only-native-publication).
+Exact detached wire comparison, native epoch/scope preflight and full fallback
+preserve completed frames and identity. Final cache/epoch corrections pass the
+affected-package offscreen race suite, vet, native semantics/grid checks and one
+fresh ordinary pair per rendering mode. The earlier five-pair cohort remains
+separate. Neither cohort qualifies the 4/6 ms targets or broad performance
+regression freedom. Physical input, human accessibility, native/GPU memory,
+P4/P6/P9/P11, overnight, interoperability and distribution remain open.
