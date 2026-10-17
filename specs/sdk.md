@@ -160,3 +160,17 @@ A candidate qualification must separately inspect the compiled artifact/linkmap
 for the exact archive and absence of WGPU dylib fallback, then run admitted native
 checks. Other hosts/architectures, older OS runtimes, presentation, physical input,
 performance/memory/endurance, signing and public distribution remain separate.
+
+## Clean private Mac candidate verification
+
+The [clean SDK consumer evidence](../docs/reports/macos-source-gpu-sdk-native/README.md)
+binds one `3da753e` private SDK to an independently generated native starter after
+relocation with spaces. All 7,436 payload hashes match the prior non-GUI-tested
+precommit archive; source/untracked manifest metadata is separately identified.
+The retained ARM64 Go 1.27.2 build declares minimum macOS 13.0, maps 141 entries
+to exact packaged static-archive members and has no WGPU dylib dependency.
+One separately admitted native run passes the permissive initial Snapshot center
+predicate and three further successful Snapshot calls, then retires its owned
+group. Image-wide equality, compositor presentation, physical input, ordinary
+latency/memory/endurance, other SDK candidates and public distribution are not
+qualified by this check. The raw warnings and internal reviews remain retained.

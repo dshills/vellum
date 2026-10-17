@@ -1,0 +1,94 @@
+{
+  "result": "PASS_CLEAN_PRIVATE_SDK_NATIVE_CONSUMER",
+  "sdk_source": {
+    "clean": true,
+    "commit": "3da753ed4e49ef18ca5ef2377c171efb970b46a1"
+  },
+  "sdk_archive": {
+    "bytes": 29397406,
+    "sha256": "82f63da6eb5023da88e531b5766676ed94367c043a4340d7e459e27d26e15600"
+  },
+  "sdk_files": 7436,
+  "module_origins": {
+    "cogentcore.org/core": "drivers/cogent/build/upstream",
+    "github.com/dshills/vellum": ".",
+    "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+    "github.com/go-text/typesetting": "drivers/cogent/build/typesetting",
+    "github.com/oliverbestmann/webgpu/libs-darwin": "drivers/cogent/build/libs-darwin"
+  },
+  "consumer_packages": 486,
+  "binary": {
+    "path": "/private/tmp/vellum-source-gpu-sdk-native/hello",
+    "bytes": 60180818,
+    "sha256": "0323d08b9c0a5ffce4cea6e9efe422d5fe6aed832e6ebde700197a684d398c17",
+    "go_version": "go1.27.2",
+    "target": "darwin-arm64",
+    "minimum_macos": "13.0",
+    "static_archive_entries": 141,
+    "dynamic_wgpu_dependency": false
+  },
+  "linkmap": {
+    "path": "/private/tmp/vellum-source-gpu-sdk-native/hello.linkmap",
+    "bytes": 12994659,
+    "sha256": "c711459eaf061deb466aeb0ff6472b153013d047d9553cf6cec7e858294b8004"
+  },
+  "selected_static_archive_entries": 141,
+  "native_record": {
+    "event": "vellum.native.ready",
+    "geometry_persistence_disabled_in_fixture": true,
+    "go_version": "go1.27.2",
+    "heap_alloc_bytes": 62731672,
+    "height": 344,
+    "render_readback_ns": [
+      1754000,
+      1761541,
+      1430542
+    ],
+    "startup_to_verified_gpu_ns": 179153834,
+    "width": 630
+  },
+  "native_execution": "qualified_three_readbacks",
+  "owned_group_absent": true,
+  "native_run_seconds": 4.388812375022098,
+  "compiler_warning": {
+    "bytes": 1113,
+    "sha256": "2e82af77723492cc5684d0ccab34cb5fc3a53b2e9d08f00a7461134f04c3f4dd"
+  },
+  "sdk_payload_comparison": {
+    "result": "EXACT_SAME_7436_MANIFEST_PAYLOAD_HASHES",
+    "prior_manifest_sha256": "12e719c3c0f83c12ef267058ce8f7c5bb8e65b3c56eb9eb03215c1a9ddf74860",
+    "clean_manifest_sha256": "42835b7a1e477cd9c444e4f516051b61d25ec95ef27f87a70485356306ef84d3",
+    "files": 7436,
+    "different_manifest_keys": [
+      "source",
+      "untracked_files"
+    ],
+    "old_source": {
+      "clean": false,
+      "commit": "a274e8aa9305f4b458b2d263e2a1c3d3d7b6a623"
+    },
+    "clean_source": {
+      "clean": true,
+      "commit": "3da753ed4e49ef18ca5ef2377c171efb970b46a1"
+    },
+    "old_untracked_files": [
+      "scripts/native_gpu.py",
+      "scripts/native_gpu_test.py"
+    ],
+    "clean_untracked_files": [],
+    "prior_sdk_archive_sha256": "1777dc32f97e12056b2931f5d6d21a114a0ad191a1415c35d260b414c0d3c05d",
+    "clean_sdk_archive_sha256": "82f63da6eb5023da88e531b5766676ed94367c043a4340d7e459e27d26e15600",
+    "interpretation": "Prior non-GUI consumer/API checks apply to identical payload bytes; clean metadata/native qualification is new. This comparison is not a rerun of those checks."
+  },
+  "guard_controls": 27,
+  "provider_calls": 0,
+  "review": "Internal build admission, actual build/linkage result review, separate native admission and final result review. No new provider call; previous implementation has separately retained Anthropic Prism review.",
+  "result_review_sha256": "a1644279a8d55bc4f8b1a88a9c4c34d2e400ae6b004ace7c1e0ad020ec2aaf93",
+  "settings_changes": false,
+  "physical_input_generated": false,
+  "presentation_qualified": false,
+  "ordinary_frame_latency_qualified": false,
+  "native_gpu_memory_qualified": false,
+  "full_macos_qualified": false,
+  "public_distribution_qualified": false
+}

@@ -620,3 +620,18 @@ manifest checks plus a required relocated Go module origin. The framework root
 and portable examples retain their existing module graphs. Public packaging
 refuses the candidate override and the native/Rust/standard-library component
 and rights audit remains pending. See the [SDK contract](../specs/sdk.md#private-arm64-mac-gpu-candidate).
+
+The [clean private SDK native consumer](reports/macos-source-gpu-sdk-native/README.md)
+builds the explicit ARM64 GPU overlay from committed `3da753e`, verifies all
+7,436 SDK payload hashes and five local module origins, and links 141 exact
+packaged static-archive entries with no WGPU dylib dependency. The retained Go
+1.27.2 ARM64 executable declares minimum macOS 13.0 and passes one owned native
+starter check: initial Snapshot center predicate `G >= 100, R <= 150, B >= 80`,
+three further successful GPU Snapshot/readback calls, geometry persistence
+disabled and normal closure/group absence. Compiler warnings remain retained.
+All payload hashes equal the earlier non-GUI-tested precommit SDK, with changed
+source/untracked metadata recorded separately. This is a private compatibility
+checkpoint; full-image/presentation, physical/human workflows, ordinary frame
+latency, native/GPU memory, endurance, rights/public release and full Mac
+acceptance remain open. Internal reviews cover build, native admission/results
+and report packaging; no new Prism call for this evidence-only checkpoint.
