@@ -1,0 +1,457 @@
+--- a/paint/renderers/sceneplan/packet.go
++++ b/paint/renderers/sceneplan/packet.go
+@@ -105,9 +105,10 @@
+ 
+ // Encoded is a detached packet for one integer compute pass. Rows has two words
+ // per tile (offset,count); Refs preserves original painter order within tiles.
+ // Ops has 16 words per operation; Data holds tightly packed masks/pixels/spans.
+-// All byte slices are owned by this result and have 4-byte alignment.
++// All byte slices have 4-byte alignment. Encode/EncodeGPU own their output;
++// EncodeGPUWithScratch explicitly permits a borrowed result.
+ type Encoded struct {
+ 	Ops, Rows, Refs, Data []byte
+ 	Tiles                 image.Point
+ }
+@@ -151,8 +152,12 @@
+ 		a.rect == b.rect && b.color[3] == 65535
+ }
+ 
+ func (p *Packet) encode(compact bool) (*Encoded, bool) {
++	return p.encodeWithScratch(compact, nil)
++}
++
++func (p *Packet) encodeWithScratch(compact bool, scratch *EncodingScratch) (*Encoded, bool) {
+ 	if p == nil || len(p.ops) > MaxOps {
+ 		return nil, false
+ 	}
+ 	tiles := image.Pt((p.bounds.Dx()+TileSize-1)/TileSize, (p.bounds.Dy()+TileSize-1)/TileSize)
+@@ -242,9 +247,10 @@
+ 			}
+ 		}
+ 	}
+ 
+-	e := &Encoded{Tiles: tiles, Ops: make([]byte, 0, max(4, retainedOps*opWords*4)), Rows: make([]byte, 0, len(counts)*8), Refs: make([]byte, max(4, retainedRefs*4)), Data: make([]byte, 0, max(4, dataBytes))}
++	e := encodingBuffers(scratch, max(4, retainedOps*opWords*4), len(counts)*8, max(4, retainedRefs*4), max(4, dataBytes))
++	e.Tiles = tiles
+ 	// Once each count has been copied into Rows, its slot becomes fill scratch.
+ 	positions := counts
+ 	offset := 0
+ 	for i, count := range counts {
+--- /dev/null
++++ b/paint/renderers/sceneplan/encoding_scratch.go
+@@ -0,0 +1,55 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++// MaxEncodingScratchBytes bounds retained byte-buffer capacity per scratch.
++const MaxEncodingScratchBytes = 1 << 20
++
++// EncodingScratch owns only scalar bytes. Its owner must serialize calls and
++// consume each borrowed encoding before the next call or Reset. It retains no
++// packet, image, font or GPU references. Encode and EncodeGPU remain detached.
++type EncodingScratch struct {
++	ops, rows, refs, data []byte
++}
++
++// Reset drops all retained backing. Existing borrowed encodings expire here.
++func (s *EncodingScratch) Reset() {
++	if s != nil {
++		*s = EncodingScratch{}
++	}
++}
++
++// EncodeGPUWithScratch has EncodeGPU's exact encoding and admission rules.
++// Its result may borrow scratch until the next call or Reset; a nil scratch
++// selects the detached path. Oversized encodings do not enter retained storage.
++func (p *Packet) EncodeGPUWithScratch(scratch *EncodingScratch) (*Encoded, bool) {
++	return p.encodeWithScratch(true, scratch)
++}
++
++func encodingBuffers(s *EncodingScratch, ops, rows, refs, data int) *Encoded {
++	if s == nil {
++		return &Encoded{Ops: make([]byte, 0, ops), Rows: make([]byte, 0, rows), Refs: make([]byte, refs), Data: make([]byte, 0, data)}
++	}
++	if max(cap(s.ops), ops)+max(cap(s.rows), rows)+max(cap(s.refs), refs)+max(cap(s.data), data) > MaxEncodingScratchBytes {
++		s.Reset()
++	}
++	if ops+rows+refs+data > MaxEncodingScratchBytes {
++		return encodingBuffers(nil, ops, rows, refs, data)
++	}
++	buffer := func(old []byte, size int) []byte {
++		if old == nil || cap(old) < size {
++			return make([]byte, size)
++		}
++		return old[:size]
++	}
++	s.ops = buffer(s.ops, ops)
++	s.rows = buffer(s.rows, rows)
++	s.refs = buffer(s.refs, refs)
++	s.data = buffer(s.data, data)
++	// Nonempty sections overwrite every logical word. Empty Ops/Data/Refs
++	// retain one zero word, as in a fresh encoding, even after a larger frame.
++	clear(s.ops[:min(4, len(s.ops))])
++	clear(s.refs[:min(4, len(s.refs))])
++	clear(s.data[:min(4, len(s.data))])
++	return &Encoded{Ops: s.ops[:0], Rows: s.rows[:0], Refs: s.refs, Data: s.data[:0]}
++}
+--- /dev/null
++++ b/paint/renderers/sceneplan/encoding_scratch_test.go
+@@ -0,0 +1,228 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package sceneplan
++
++import (
++	"bytes"
++	"image"
++	"image/color"
++	"image/draw"
++	"math/rand"
++	"reflect"
++	"testing"
++)
++
++func scratchCapacity(s *EncodingScratch) int {
++	return cap(s.ops) + cap(s.rows) + cap(s.refs) + cap(s.data)
++}
++func scratchPacket(size, count int) *Packet {
++	b := New(image.Rect(0, 0, size, size))
++	mask := image.NewAlpha(image.Rect(0, 0, 8, 12))
++	for i := range mask.Pix {
++		mask.Pix[i] = byte(i * 19)
++	}
++	for i := 0; i < count; i++ {
++		x, y := (i%80)*18, (i/80)*18
++		b.Draw(image.Rect(x, y, x+8, y+12), image.NewUniform(color.RGBA{19, 37, 61, 255}), image.Point{}, mask, image.Point{}, draw.Over)
++	}
++	return b.Seal(false)
++}
++
++func TestVellumEncodingScratchExactAlternatingPackets(t *testing.T) {
++	var scratch EncodingScratch
++	rng := rand.New(rand.NewSource(7801))
++	for trial := 0; trial < 400; trial++ {
++		size := 17 + rng.Intn(100)
++		b := New(image.Rect(0, 0, size, size))
++		mask := image.NewAlpha(image.Rect(0, 0, 7, 9))
++		rng.Read(mask.Pix)
++		pixels := image.NewRGBA(image.Rect(0, 0, 7, 9))
++		rng.Read(pixels.Pix)
++		for i := 0; i < trial%30; i++ {
++			x, y := rng.Intn(size), rng.Intn(size)
++			r := image.Rect(x, y, x+7, y+9)
++			switch i % 4 {
++			case 0:
++				b.Draw(r, image.White, image.Point{}, nil, image.Point{}, draw.Src)
++				b.Draw(r, image.Black, image.Point{}, nil, image.Point{}, draw.Over)
++			case 1:
++				b.Draw(r, image.NewUniform(color.NRGBA{13, 31, 77, 91}), image.Point{}, mask, image.Point{}, draw.Over)
++			case 2:
++				b.Draw(r, pixels, image.Point{}, mask, image.Point{}, draw.Src)
++			case 3:
++				b.BeginSpans(color.RGBA{19, 23, 37, 51}, draw.Over)
++				b.Span(y, x, x+7, uint32(rng.Intn(65536)))
++			}
++		}
++		p := b.Seal(trial%2 == 0)
++		if p == nil {
++			t.Fatal("fixture refused")
++		}
++		want, ok := p.EncodeGPU()
++		if !ok {
++			t.Fatal("reference encoding refused")
++		}
++		got, ok := p.EncodeGPUWithScratch(&scratch)
++		if !ok || !reflect.DeepEqual(got, want) {
++			t.Fatal("borrowed encoding differs", trial)
++		}
++		if scratchCapacity(&scratch) > MaxEncodingScratchBytes {
++			t.Fatal("retained cap exceeded")
++		}
++		// A later use may overwrite borrowed data; detached API output and packet
++		// replay must stay independent of that storage.
++		empty := New(image.Rect(0, 0, 1, 1)).Seal(false)
++		small, ok := empty.EncodeGPUWithScratch(&scratch)
++		fresh, _ := empty.EncodeGPU()
++		if !ok || !reflect.DeepEqual(small, fresh) {
++			t.Fatal("empty words retain previous bytes")
++		}
++		again, _ := p.EncodeGPU()
++		if !reflect.DeepEqual(again, want) {
++			t.Fatal("scratch changed detached encoding or packet")
++		}
++		if trial%7 == 0 {
++			scratch.Reset()
++			if scratchCapacity(&scratch) != 0 {
++				t.Fatal("reset retained backing")
++			}
++		}
++	}
++}
++
++func TestVellumEncodingScratchBoundAndFailureRecovery(t *testing.T) {
++	var scratch EncodingScratch
++	for _, p := range []*Packet{scratchPacket(1519, 4800), scratchPacket(17, 1), scratchPacket(1519, 4800)} {
++		want, ok := p.EncodeGPU()
++		got, accepted := p.EncodeGPUWithScratch(&scratch)
++		if ok != accepted || !reflect.DeepEqual(got, want) {
++			t.Fatal("large/small encoding differs")
++		}
++		if scratchCapacity(&scratch) > MaxEncodingScratchBytes {
++			t.Fatal("aggregate backing exceeded cap")
++		}
++	}
++	// Accepted oversized pixel payloads keep the detached fallback and retire
++	// prior scratch. The 1MiB cache cap is not an encoding admission limit.
++	b := New(image.Rect(0, 0, 600, 600))
++	pixels := image.NewRGBA(image.Rect(0, 0, 600, 600))
++	for i := range pixels.Pix {
++		pixels.Pix[i] = byte(i * 17)
++	}
++	b.Draw(pixels.Rect, pixels, image.Point{}, nil, image.Point{}, draw.Src)
++	p := b.Seal(false)
++	want, ok := p.EncodeGPU()
++	got, accepted := p.EncodeGPUWithScratch(&scratch)
++	if !ok || !accepted || !reflect.DeepEqual(got, want) || scratchCapacity(&scratch) != 0 {
++		t.Fatal("oversized accepted encoding changed or retained")
++	}
++	// Cross-shaped growth must consider capacities, rather than just new lengths.
++	encodingBuffers(&scratch, 4, 4, 4, 900000)
++	encodingBuffers(&scratch, 900000, 4, 4, 4)
++	if scratchCapacity(&scratch) > MaxEncodingScratchBytes {
++		t.Fatal("alternating capacities exceeded cap")
++	}
++	zero := &Packet{}
++	wantZero, _ := zero.EncodeGPU()
++	gotZero, _ := zero.EncodeGPUWithScratch(&scratch)
++	if !reflect.DeepEqual(gotZero, wantZero) {
++		t.Fatal("zero-value packet differs")
++	}
++	var nilPacket *Packet
++	if e, ok := nilPacket.EncodeGPUWithScratch(&scratch); ok || e != nil {
++		t.Fatal("nil packet admitted")
++	}
++	bad := &Packet{bounds: image.Rect(0, 0, 8192, 2048), ops: make([]operation, 65)}
++	for i := range bad.ops {
++		bad.ops[i] = operation{kind: Uniform, op: draw.Src, rect: bad.bounds}
++	}
++	if _, ok := bad.EncodeGPU(); ok {
++		t.Fatal("refusal fixture did not exceed tile bound")
++	}
++	if e, ok := bad.EncodeGPUWithScratch(&scratch); ok || e != nil {
++		t.Fatal("scratch waived original tile bound")
++	}
++	p = scratchPacket(23, 1)
++	want, _ = p.EncodeGPU()
++	got, accepted = p.EncodeGPUWithScratch(&scratch)
++	if !accepted || !reflect.DeepEqual(got, want) {
++		t.Fatal("refusal poisoned recovery")
++	}
++	nilResult, _ := p.EncodeGPUWithScratch(nil)
++	if !reflect.DeepEqual(nilResult, want) {
++		t.Fatal("nil scratch differs")
++	}
++	scratch.Reset()
++}
++
++var scratchBenchmarkSink *Encoded
++
++func BenchmarkVellumEncodingScratch(b *testing.B) {
++	p := scratchPacket(1519, 4800)
++	if p == nil {
++		b.Fatal("fixture refused")
++	}
++	for _, reuse := range []bool{false, true} {
++		name := "detached"
++		if reuse {
++			name = "borrowed"
++		}
++		b.Run(name, func(b *testing.B) {
++			var scratch EncodingScratch
++			b.ReportAllocs()
++			for i := 0; i < b.N; i++ {
++				var ok bool
++				if reuse {
++					scratchBenchmarkSink, ok = p.EncodeGPUWithScratch(&scratch)
++				} else {
++					scratchBenchmarkSink, ok = p.EncodeGPU()
++				}
++				if !ok {
++					b.Fatal("encoding refused")
++				}
++			}
++		})
++	}
++}
++
++func TestVellumEncodingScratchDetachedOutputOwnership(t *testing.T) {
++	p := scratchPacket(64, 3)
++	a, _ := p.EncodeGPU()
++	b, _ := p.EncodeGPU()
++	var scratch EncodingScratch
++	c, _ := p.EncodeGPUWithScratch(&scratch)
++	for _, v := range [][]byte{c.Ops, c.Rows, c.Refs, c.Data} {
++		for i := range v {
++			v[i] = 255
++		}
++	}
++	if !reflect.DeepEqual(a, b) {
++		t.Fatal("borrowed write changed detached output")
++	}
++	again, _ := p.EncodeGPU()
++	if !bytes.Equal(again.Ops, a.Ops) || !reflect.DeepEqual(again, a) {
++		t.Fatal("borrowed write changed packet")
++	}
++}
++
++func TestVellumEncodingScratchExactCapacityBoundary(t *testing.T) {
++	var scratch EncodingScratch
++	at := MaxEncodingScratchBytes - 12
++	e := encodingBuffers(&scratch, at, 4, 4, 4)
++	if scratchCapacity(&scratch) != MaxEncodingScratchBytes {
++		t.Fatal("exact cap did not retain permitted backing")
++	}
++	e.Ops = append(e.Ops, 93)
++	if scratch.ops[0] != 93 {
++		t.Fatal("boundary did not exercise borrowed storage")
++	}
++	e = encodingBuffers(&scratch, at+4, 4, 4, 4)
++	if scratchCapacity(&scratch) != 0 || cap(e.Ops) != at+4 {
++		t.Fatal("first aligned over-cap did not use detached storage")
++	}
++	e.Ops = append(e.Ops, 71)
++	e = encodingBuffers(&scratch, 4, 4, 4, 4)
++	if scratchCapacity(&scratch) != 16 || len(e.Refs) != 4 || e.Refs[0] != 0 {
++		t.Fatal("over-cap recovery differs")
++	}
++}
+--- a/paint/renderers/gpuscene/renderer.go
++++ b/paint/renderers/gpuscene/renderer.go
+@@ -33,8 +33,9 @@
+ // batch without readback. Only resources (GPU handles) are registered with the
+ // drawer; its retirement callback holds no widget, font or application state.
+ type Renderer struct {
+ 	cpu          *rasterx.Renderer
++	encoding     sceneplan.EncodingScratch
+ 	journal      []*sceneplan.Packet
+ 	journalBytes int
+ 	resources    *resources
+ 	drawer       *gpudraw.Drawer
+@@ -96,8 +97,9 @@
+ 	if old == size {
+ 		return
+ 	}
+ 	r.closeLease()
++	r.encoding.Reset()
+ 	clear(r.journal)
+ 	r.journal = nil
+ 	r.journalBytes = 0
+ 	r.imageExposed = false
+@@ -117,8 +119,9 @@
+ 	r.lease, r.drawer, r.resources = nil, nil, nil
+ 	return nil
+ }
+ func (r *Renderer) Release() {
++	r.encoding.Reset()
+ 	if r.closed {
+ 		r.cpu.Release()
+ 		return
+ 	}
+@@ -249,9 +252,11 @@
+ 		if host != nil {
+ 			host.EncodeAttempted = true
+ 			start = time.Now()
+ 		}
+-		encoded, ok = packet.EncodeGPU()
++		// Queue input writes copy these bytes synchronously below. Neither
++		// the immutable journal nor GPU retirement retains this encoding.
++		encoded, ok = packet.EncodeGPUWithScratch(&r.encoding)
+ 		if host != nil {
+ 			host.EncodeNS = time.Since(start).Nanoseconds()
+ 		}
+ 		if !ok {
+--- /dev/null
++++ b/paint/renderers/gpuscene/renderer_encoding_test.go
+@@ -0,0 +1,36 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpuscene
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/renderers/sceneplan"
++	"cogentcore.org/core/styles/units"
++	"image"
++	"reflect"
++	"testing"
++)
++
++func TestVellumGPUSceneEncodingScratchLifecycle(t *testing.T) {
++	r := New(math32.Vec2(23, 19)).(*Renderer)
++	fill := func() {
++		p, _ := inputTimingFixture(t, image.Rect(0, 0, 23, 19))
++		if _, ok := p.EncodeGPUWithScratch(&r.encoding); !ok {
++			t.Fatal("fixture refused")
++		}
++		if reflect.DeepEqual(r.encoding, sceneplan.EncodingScratch{}) {
++			t.Fatal("fixture did not populate scratch")
++		}
++	}
++	fill()
++	r.SetSize(units.UnitDot, math32.Vec2(17, 13))
++	if !reflect.DeepEqual(r.encoding, sceneplan.EncodingScratch{}) {
++		t.Fatal("resize retained encoding backing")
++	}
++	fill()
++	r.Release()
++	r.Release()
++	if !reflect.DeepEqual(r.encoding, sceneplan.EncodingScratch{}) {
++		t.Fatal("release retained encoding backing")
++	}
++}
+--- a/paint/renderers/gpuscene/native_input_timing_test.go
++++ b/paint/renderers/gpuscene/native_input_timing_test.go
+@@ -62,11 +62,18 @@
+ 		t.Fatal(err)
+ 	}
+ 	expected := image.NewRGBA(image.Rectangle{Max: size})
+ 	packet, encoded := inputTimingFixture(t, expected.Rect)
++	var scratch sceneplan.EncodingScratch
++	encoded, _ = packet.EncodeGPUWithScratch(&scratch)
+ 	inputBytes := uint64(len(encoded.Ops) + len(encoded.Rows) + len(encoded.Refs) + len(encoded.Data) + 16)
+ 	successful := func() {
+ 		t.Helper()
++		var ok bool
++		encoded, ok = packet.EncodeGPUWithScratch(&scratch)
++		if !ok {
++			t.Fatal("scratch recovery encoding refused")
++		}
+ 		host := &composer.SceneHostTiming{Available: true}
+ 		if err := res.renderWithTiming(encoded, reserve, host); err != nil {
+ 			t.Fatal(err)
+ 		}
+@@ -74,8 +81,23 @@
+ 			t.Fatal("actual successful writes differ from encoded byte ledger", host, inputBytes)
+ 		}
+ 	}
+ 	successful()
++	// Change borrowed bytes after checked submission returns, before waiting for
++	// completion/readback. Queue writes must already have copied their inputs.
++	other := sceneplan.New(expected.Rect)
++	other.Draw(expected.Rect, image.NewUniform(color.RGBA{211, 7, 13, 255}), image.Point{}, nil, image.Point{}, draw.Src)
++	if _, ok := other.Seal(false).EncodeGPUWithScratch(&scratch); !ok {
++		t.Fatal("overwrite encoding refused")
++	}
++	if !packet.Replay(expected) || !bytes.Equal(readTexture(t, dev, res.texture).Pix, expected.Pix) {
++		t.Fatal("later scratch overwrite changed submitted pixels")
++	}
++	var encodedOK bool
++	encoded, encodedOK = packet.EncodeGPUWithScratch(&scratch)
++	if !encodedOK {
++		t.Fatal("original encoding recovery refused")
++	}
+ 	headroom := false
+ 	for i, input := range [][]byte{encoded.Ops, encoded.Rows, encoded.Refs, encoded.Data} {
+ 		if res.buffers[i+1].GetSize() > uint64(len(input)) {
+ 			headroom = true

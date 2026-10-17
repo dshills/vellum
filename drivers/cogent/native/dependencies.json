@@ -771,6 +771,17 @@
               "sha256": "23996a99f698f25a14505af406fa13b6d37bb70aab12a8922bd5ffad5602bc67"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/encodingscratch",
+          "inputs": "native/patches/encodingscratch/original-hashes.json",
+          "outputs": "native/patches/encodingscratch/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/encodingscratch/0078-bounded-encoding-scratch.patch",
+              "sha256": "d3af33ae13f06e1e5a563fd46b47564e29aa3c31c60c784d0222847ad7042699"
+            }
+          ]
         }
       ]
     },

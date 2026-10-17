@@ -613,3 +613,20 @@ replacement and FIFO cleanup, collision/current-clip refusal, exact logical work
 charges, cooldown no-learning/resume behavior, and discriminating guard-removal
 controls. Warm gains, bitmap cases and cold/clipped penalties must be reported
 separately. Software capture results do not close native P6 latency targets.
+
+
+## Bounded GPU encoding workspace
+
+The serialized GPU scene renderer may retain at most 1 MiB of scalar encoded
+byte-buffer capacity. Its borrowed encoding is consumed by synchronous checked
+queue writes before the next workspace use. Immutable packet journals and GPU
+retirement callbacks retain no borrowed encoding. Existing detached encoding,
+packet admission, fallback and painter order remain unchanged; larger accepted
+encodings use detached output. Resize/release discard the workspace. This cap
+is Go backing capacity, separate from tracked GPU resources and native bytes.
+
+Acceptance requires exact output against detached encoding over alternating
+sizes/content, original budget refusals, empty padding, ownership and lifecycle;
+actual Metal upload/readback must survive overwriting scratch after submission,
+checked-write refusal and recovery. Local allocation or encoding improvements
+do not establish native frame budgets, overall memory bounds or Mac completion.

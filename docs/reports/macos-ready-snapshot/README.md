@@ -104,3 +104,8 @@ their original thresholds. Native input/accessibility, presentation, display
 transitions, native/GPU memory, integrated endurance and final SDK/release
 gates remain open. No native application, physical input, system preference
 change or public release is part of this checkpoint.
+
+The [subsequent native comparison](../macos-encoding-scratch/README.md) fails the
+unchanged target under both the controlled two-processor and normal runtime.
+The local duplicate result above does not translate into a demonstrated native
+frame improvement.
