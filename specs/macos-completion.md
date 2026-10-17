@@ -322,8 +322,14 @@ full P6/Mac completion is inferred.
 The opt-in [semantic automation endpoint](automation.md) implements a Mac-local
 capability-protected socket with typed DTO queries/actions, revision checks and
 bounded owner admission. The workbench exposes selected/stable virtual component
-inspection and a narrow shared-domain action allowlist. Headless transport/domain
-checks are separate from a live professional automation campaign.
+inspection and a narrow shared-domain action allowlist. The
+[native public-Go client campaign](../docs/reports/macos-automation-native/README.md)
+passes two 40-request cases at 100k/million rows on clean 781f847, with native
+window/nonempty snapshot readiness, command/history and revision checks, normal
+closure, socket removal and inherited owned-group absence. This is source-reviewed
+semantic assertions plus retained scalar summaries, with raw native streams/DTOs
+discarded. Physical input, AX, GPU execution/presentation, frame/memory/endurance
+and full professional automation workflows remain separate.
 
 Full P9 professional workload and large-data replay acceptance, external
 application automation workflows, native services/input/accessibility, GPU

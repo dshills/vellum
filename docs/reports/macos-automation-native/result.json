@@ -1,0 +1,133 @@
+{
+  "result": "RECONCILED_NATIVE_SEMANTIC_CLIENT_ASSERTIONS",
+  "source_commit": "781f847a2d43033d3869d7fdd2f6713656b8a803",
+  "native_cases": 2,
+  "semantic_requests": 80,
+  "cases": [
+    {
+      "rows": 100000,
+      "requests": 40,
+      "summary": {
+        "status": "PASS",
+        "rows": 100000,
+        "requests": 40,
+        "native_ready": true,
+        "transport_joined": true,
+        "endpoint_removed": true,
+        "post_close_refused": true,
+        "raw_native_output_published": false
+      },
+      "controller_group": 70097,
+      "seconds": 22.565370666910894,
+      "terminal_group_absent": true,
+      "reobserved_group_absent": {
+        "group": 70097,
+        "members": [],
+        "observation_sha256": "2400b5c5667e2aafb4de570dedc725554dfa0e1281b79e03ab2968b41c16d81f"
+      },
+      "controller_stdout_sha256": "de5b567d6539014464af7b0ac47e141884a7ee6f710ad3672074cddaac6fa89a",
+      "controller_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "rows": 1000000,
+      "requests": 40,
+      "summary": {
+        "status": "PASS",
+        "rows": 1000000,
+        "requests": 40,
+        "native_ready": true,
+        "transport_joined": true,
+        "endpoint_removed": true,
+        "post_close_refused": true,
+        "raw_native_output_published": false
+      },
+      "controller_group": 70235,
+      "seconds": 21.855692000011913,
+      "terminal_group_absent": true,
+      "reobserved_group_absent": {
+        "group": 70235,
+        "members": [],
+        "observation_sha256": "cdeefeca0e21114fe93d8340d63df21fb89672da71b4da3f0436d76c02b5662a"
+      },
+      "controller_stdout_sha256": "65a8f68407d754ae8ceb3e1a5b3b9a39266dd614fda7270918bc736ca77b0cde",
+      "controller_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "binaries": {
+    "automation": {
+      "path": "/private/tmp/vellum-native-automation-clean-781f847/automation",
+      "bytes": 5465554,
+      "sha256": "2023e0bce8447d269926d1413ee8df8aa3d88fe223244e59e87c7afe914114d1"
+    },
+    "workbench": {
+      "path": "/private/tmp/vellum-native-automation-clean-781f847/workbench",
+      "bytes": 60399586,
+      "sha256": "a70487e54ba8ebe92fe5278b8e5ababb8efa1e165aaa3130f9c6cbf393c7d999"
+    }
+  },
+  "native_receipt_sha256": "708f5a5f86aad4aad1e8acf9aef88ecb8873b775b8c9053433132fdfc9df4079",
+  "readiness_sha256": "5c5fa015d0372cf5d16fab3ec7975d07475cd32cd01f4731e0ed31b1b6e4ffa4",
+  "raw_native_streams_retained": false,
+  "saved_per_call_DTOs": false,
+  "physical_input_generated": false,
+  "settings_changes": false,
+  "full_macos_qualified": false,
+  "native_parser_finalization_controls": 23,
+  "producer_sha256": "d4a16940999e78f282987f084500a740c94131bc0ef4e00916dd97097d9b28ab",
+  "evidence_scope": "Source-reviewed client assertions/scalar summaries; raw per-call DTOs and native streams are intentionally discarded.",
+  "evidence_archive": {
+    "bytes": 5579119,
+    "sha256": "ad34caeb3831557628bba2ae6c5b0891f103fc679a0fb923ce10afcbc682763f",
+    "members": 216,
+    "expanded_bytes": 22580366
+  },
+  "result_review_sha256": "1b4b926c50d300faa26f88f92ae6cba2bd98943d387da7f7f0ab87bce60b82c7",
+  "implementation_commit": "781f847a2d43033d3869d7fdd2f6713656b8a803",
+  "prism_calls": 1,
+  "prism_provider": "anthropic",
+  "prism_model": "claude-sonnet-5-5",
+  "prism_complete": true,
+  "prism_findings": 0,
+  "evidence_checkpoint_provider_calls": 0,
+  "executables_omitted": [
+    {
+      "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-workbench-native-automation/prototype-checks-v3/automation",
+      "bytes": 5465426,
+      "sha256": "ea94537155fcb4276dc7465664b701f3e5db298e1d8b6fb9b0138abecfb106fb"
+    },
+    {
+      "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-workbench-native-automation/prototype-checks-v4/automation",
+      "bytes": 5465506,
+      "sha256": "68c6912edfacb348dd9ca3eb7ab0fb1923710c0d3de1e55dd2d104dc405b7464"
+    },
+    {
+      "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-workbench-native-automation/prototype-checks-v5/automation",
+      "bytes": 5465554,
+      "sha256": "9c8bfb36138c9bfb4b18ab513e87d9c5ab52d255950e95add4971ab88971d5da"
+    },
+    {
+      "path": "/private/tmp/vellum-native-automation-production-bde5922/automation",
+      "bytes": 5465554,
+      "sha256": "8cd163a42d3660e8afb2227921b82c7c0c7e485688d109543573afdc9e5a0fca"
+    },
+    {
+      "path": "/private/tmp/vellum-native-automation-production-bde5922/workbench",
+      "bytes": 60399586,
+      "sha256": "3dd4513d695a73f0185ee3fc819e0acf39b181bcf9827439ff065e8eb52fdaad"
+    },
+    {
+      "path": "/private/tmp/vellum-native-automation-clean-781f847/automation",
+      "bytes": 5465554,
+      "sha256": "2023e0bce8447d269926d1413ee8df8aa3d88fe223244e59e87c7afe914114d1"
+    },
+    {
+      "path": "/private/tmp/vellum-native-automation-clean-781f847/workbench",
+      "bytes": 60399586,
+      "sha256": "a70487e54ba8ebe92fe5278b8e5ababb8efa1e165aaa3130f9c6cbf393c7d999"
+    }
+  ],
+  "source_files": 4700,
+  "prepared_files": 6249,
+  "imported_provenance_records": 46,
+  "supersedes_incomplete_archive_sha256": "e0d96fe9b30a9eb33755ce85fbdd4fbdad08016115a62c9ba101f52166ea0dab"
+}

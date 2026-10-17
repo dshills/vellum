@@ -576,6 +576,10 @@ is discarded, credentials stay in memory, invoke transport failures are not
 retried, and bounded child cleanup preserves failure observations. A successful
 run also requires matching terminal audit metadata, normal native exit, endpoint
 removal and a refused post-close Call. The example is included in the non-GUI
-example check suite. Native execution results will be recorded separately; these
-source changes alone do not qualify physical input, AX, presentation, frame,
-memory, endurance, release or full macOS acceptance.
+example check suite. The [native campaign](reports/macos-automation-native/README.md)
+passes 40 semantic requests each at 100k and one million actual records from clean
+781f847. Evidence is the source-reviewed client assertions and saved scalar
+summaries; raw per-call DTOs/native streams are deliberately discarded. Both
+workbenches exit normally and their inherited owned groups are observed absent.
+Physical input, AX, presentation, frame, memory, endurance, release and full macOS
+acceptance remain open.
