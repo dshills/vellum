@@ -470,3 +470,20 @@ existing validated baseline. Its offscreen duplicate microbenchmark includes
 fresh snapshot/handler allocation. It does not measure a full native frame or
 change any workload, timing boundary or target above. Current ordinary failures
 remain open until the candidate receives the required native comparisons.
+
+## Rejected grid accessibility construction experiment
+
+The direct owner-snapshot construction benchmark compares against a frozen prior
+constructor and frame stamper on the same 400-cell completed measurement. It
+includes node construction, handler merge and stamping, but excludes JSON/native
+publication and full refresh. Time and allocation improvements in that benchmark
+do not qualify a native frame budget. Native comparisons must retain ordinary
+runtime settings, matched clip geometry and the existing p95/p99 thresholds.
+In the experiment, the prior implementation served as the geometry fallback
+when the completed measurement changed during construction.
+
+The [recorded experiment](../docs/reports/macos-grid-ax-construction/README.md)
+reduced isolated construction time/allocation but was slower in all five ordinary
+native p95 comparisons. The runtime candidate was reverted. Its archived diff
+retains the benchmark, parity tests and frozen prior implementation; none of this
+qualifies or changes the current runtime's frame result.

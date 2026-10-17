@@ -1,6 +1,6 @@
 # Mac framework delivery plan
 
-Updated 17 October 2026. Baseline: clean `762dcbf`; the most recent private GPU
+Updated 17 October 2026. Runtime baseline before the latest AX construction checkpoint: clean `ea20486`; the most recent private GPU
 SDK and its native drawing/3D/imaging checks use clean runtime source `5eef841`.
 Owner: the main Vellum development chat. This is the execution plan for the
 existing [Mac completion requirements](macos-completion.md), not a replacement
@@ -197,11 +197,23 @@ be budgeted in addition to implementation time.
 | --- | --- | --- |
 | M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | [Current native comparison](../docs/reports/macos-encoding-scratch/README.md) still misses 4 ms. Stage0078 reduces encoding allocation but not native latency; next reduce full-scene capture/coherent accessibility construction. |
+| M3 | Failing / incomplete | [Current native comparison](../docs/reports/macos-encoding-scratch/README.md) still misses 4 ms. Stage0078 reduces encoding allocation but not native latency; direct AX construction was subsequently rejected after native regression. Next investigate full refresh/scene capture and native publication. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
-| M5 | Partial; live tests stopped | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
+| M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial | Private SDK native consumers pass; incorporate the M1 cleanup fix in the final package and close native/Rust/font/asset rights. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.
 Completion is not announced with an open required row.
+
+
+### Direct grid accessibility construction checkpoint
+
+The [direct construction result](../docs/reports/macos-grid-ax-construction/README.md)
+records an experiment with passing race/vet/internal semantic checks and a Prism
+review, but slower native p95 in all five matched pairs. The runtime candidate
+was rejected and reverted. The local construction reduction does not close M3; all unchanged
+frame thresholds and the complete table/tree/application matrix still apply.
+The next bottleneck investigation must use full refresh/scene capture and native
+publication costs, rather than extrapolating another small isolated allocation
+win into framework completion. M4–M7 and native M2/M5 remain open.
