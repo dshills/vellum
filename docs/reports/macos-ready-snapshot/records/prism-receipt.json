@@ -1,0 +1,77 @@
+{
+  "argv": [
+    "/Users/dshills/Development/Go/bin/prism",
+    "review",
+    "staged",
+    "--provider",
+    "anthropic",
+    "--model",
+    "claude-sonnet-5-5",
+    "--reasoning-effort",
+    "low",
+    "--max-findings",
+    "4",
+    "--baseline",
+    "none",
+    "--min-severity",
+    "medium",
+    "--fail-on",
+    "medium",
+    "--no-auto-exclude",
+    "--no-function-context",
+    "--chunk-bytes",
+    "24000",
+    "--max-diff-bytes",
+    "30000",
+    "--paths",
+    "drivers/cogent/accessibility.go,drivers/cogent/accessibility_duplicate_offscreen_test.go,drivers/cogent/accessibility_ready_encoding_offscreen_test.go,specs/accessibility.md",
+    "--rules",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-ready-snapshot/prism-rules.json",
+    "--format",
+    "json",
+    "--out",
+    "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-ready-snapshot/prism.json"
+  ],
+  "exit_code": 1,
+  "seconds": 4.80389495799318,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "selected_payload_sha256": "258d6a350417fde4d675eccdb03cdb428f83770632c07fa368b9ff4f9c505dab",
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 4,
+    "bytes": 12928,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 8512,
+        "output": 403,
+        "costUSD": 0.021054
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "findings": 1,
+  "report_sha256": "00c8ca5269840aebfb8c3bd8bc945855fb55317b213e4f19ce087b46a83b1bd3"
+}

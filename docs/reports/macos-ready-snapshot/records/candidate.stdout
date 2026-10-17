@@ -1,0 +1,36 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/dshills/vellum/drivers/cogent
+cpu: Apple M4 Pro
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-false-2         	  134977	      1526 ns/op	    2536 B/op	      20 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-false-2         	  157563	      1523 ns/op	    2536 B/op	      20 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-false-2         	  158068	      1517 ns/op	    2536 B/op	      20 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-false-2         	  159732	      1521 ns/op	    2536 B/op	      20 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-false-2         	  158270	      1522 ns/op	    2536 B/op	      20 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-true-2          	  855348	       281.4 ns/op	     704 B/op	       7 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-true-2          	  875073	       281.7 ns/op	     704 B/op	       7 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-true-2          	  823398	       283.0 ns/op	     704 B/op	       7 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-true-2          	  822704	       283.1 ns/op	     704 B/op	       7 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-0/owned-true-2          	  841760	       283.7 ns/op	     704 B/op	       7 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-false-2        	    5421	     44440 ns/op	   65771 B/op	     115 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-false-2        	    5318	     44429 ns/op	   65602 B/op	     115 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-false-2        	    5367	     44244 ns/op	   65646 B/op	     115 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-false-2        	    5349	     44601 ns/op	   65623 B/op	     115 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-false-2        	    5378	     44612 ns/op	   65622 B/op	     115 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-true-2         	   36756	      6521 ns/op	   19144 B/op	      54 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-true-2         	   37200	      6578 ns/op	   19144 B/op	      54 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-true-2         	   37428	      6420 ns/op	   19144 B/op	      54 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-true-2         	   37200	      6428 ns/op	   19144 B/op	      54 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-40/owned-true-2         	   37472	      6403 ns/op	   19144 B/op	      54 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-false-2       	     568	    420568 ns/op	  678148 B/op	     846 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-false-2       	     564	    424569 ns/op	  701272 B/op	     847 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-false-2       	     572	    421415 ns/op	  684165 B/op	     846 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-false-2       	     560	    420123 ns/op	  674131 B/op	     846 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-false-2       	     566	    412728 ns/op	  681021 B/op	     846 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-true-2        	    4026	     57155 ns/op	  185896 B/op	     420 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-true-2        	    4053	     58184 ns/op	  185896 B/op	     420 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-true-2        	    4028	     57931 ns/op	  185896 B/op	     420 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-true-2        	    3985	     57992 ns/op	  185896 B/op	     420 allocs/op
+BenchmarkAccessibilityDuplicatePublication/cells-400/owned-true-2        	    4005	     59242 ns/op	  185896 B/op	     420 allocs/op
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent	8.358s

@@ -145,12 +145,21 @@ parent, disabled-state and stale-action rules, including independent ready grids
 and ordinary controls. Removal and closure still retire cache references.
 
 An identical owned ready snapshot with builtin scalar values may retain its
-already detached completed cache. Whole-node JSON encoding still precedes the
-comparison; current callbacks replace their predecessors without changing the
-semantic generation. Go-only focus metadata and exact cached scalar types/values
-must also match. Pending snapshots, custom/mutable values and borrowed updates
-use ordinary preparation. Direct cache preparation invalidates reuse until a
-successful ready publication, and closure clears the reuse identity.
+already detached completed cache. Exact comparison with the detached, previously
+validated wire baseline may also avoid repeating JSON encoding. Every wire field,
+node order, nil/empty action distinction and exact scalar type/value must match;
+Go-only cell focus metadata is checked separately. Current callbacks and
+activation guards replace their predecessors without changing the semantic
+generation or the guard captured by an already-admitted action. No additional
+retained cache is introduced. Empty snapshots keep ordinary encoding to preserve
+null versus []. Pending snapshots, changed fields, custom/mutable values and
+borrowed updates use ordinary validation/preparation. Builtin eligibility is
+checked before and after encoding, including pending-cache restoration; seeing a
+custom/mutable value permanently prevents certification for that publication,
+even if a custom encoder replaces it with a builtin while running. Direct cache preparation
+invalidates reuse until a successful ready publication, and closure clears the
+reuse identity and baseline. This local optimization does not qualify native
+frame budgets or process/GPU memory.
 
 Scope grouping records input indices rather than growing copied node arrays.
 After successful whole-node JSON encoding (and a second encoding when pending

@@ -1,0 +1,40 @@
+{
+  "phase": "candidate",
+  "argv": [
+    "/usr/bin/nice",
+    "-n",
+    "10",
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+    "test",
+    "-tags=offscreen",
+    "-p=2",
+    "-modfile=/private/tmp/vellum-event-publication-e96f642/driver.mod",
+    "-mod=readonly",
+    "-run=^$",
+    "-bench=^BenchmarkAccessibilityDuplicatePublication$",
+    "-benchtime=200ms",
+    "-count=5",
+    "-cpu=2",
+    "."
+  ],
+  "exit_code": 0,
+  "seconds": 14.880746041890234,
+  "logs": {
+    "stdout": {
+      "bytes": 4149,
+      "sha256": "cd88d4911cf88fe741d24737c19fc57cd06e8189f77175cafc3bba419f70276f"
+    },
+    "stderr": {
+      "bytes": 1171,
+      "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+    }
+  },
+  "source_hashes": {
+    "drivers/cogent/accessibility.go": "2fea49ce94c1742275dfea6a102325e4b5f3ed018f6cfabf5941b7d6493fb5b3",
+    "drivers/cogent/accessibility_duplicate_offscreen_test.go": "6bde0909c02ec40e9cf7ea6de25252c165d48b2d9035ab47f40953fd423c66cf"
+  },
+  "native_ui_executed": false
+}

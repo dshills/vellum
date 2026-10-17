@@ -197,7 +197,7 @@ be budgeted in addition to implementation time.
 | --- | --- | --- |
 | M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | Current ordinary frame targets remain unqualified; profile-to-fix-to-ordinary-comparison loop. |
+| M3 | Failing / incomplete | [Exact ready snapshot reuse](../docs/reports/macos-ready-snapshot/README.md) reduces a measured local cost; native frame targets remain open and need the quiet-desktop comparison. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live tests stopped | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial | Private SDK native consumers pass; incorporate the M1 cleanup fix in the final package and close native/Rust/font/asset rights. |

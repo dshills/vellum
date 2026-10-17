@@ -232,12 +232,18 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	if b.closed.Load() {
 		return
 	}
+	if owned && b.reuseReadySnapshot(nodes, handlers) {
+		return
+	}
+	// A custom marshaler can mutate captured input while encoding. Eligibility
+	// must stay false even if it leaves only builtin values behind afterward.
+	immutableValues := accessibilityImmutableValues(nodes)
 	// Reject unencodable records before they can become a retained grid view.
 	semantic, err := accessibilitySemantic(nodes)
 	if err != nil {
 		return
 	}
-	pendingGrid, immutableValues := false, true
+	pendingGrid := false
 	for _, node := range nodes {
 		pendingGrid = pendingGrid || node.GridPending
 		// Only builtin scalars can safely reuse a detached completed view.
@@ -266,6 +272,9 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	if pendingGrid {
 		// Ready records are unchanged by the scoped cache. Only pending records
 		// replace input semantics with their last-completed read-only subtree.
+		// Restored completed records may contain custom values even when the
+		// incoming pending hosts were builtin. Check before invoking them too.
+		immutableValues = immutableValues && accessibilityImmutableValues(nodes)
 		semantic, err = accessibilitySemantic(nodes)
 		if err != nil {
 			return
@@ -321,6 +330,44 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		nativeAccessibilityUpdate(b.token, payload)
 	}
 	b.mu.Unlock()
+}
+
+// An exact match against the already validated, detached wire baseline needs
+// no second JSON encoding. The completed-cache identity also guards direct
+// preparation and pending transitions; Go-only cell metadata is checked apart.
+// Empty snapshots retain normal encoding to distinguish null from [].
+func (b *accessibilityBridge) reuseReadySnapshot(nodes []accessibilityNode, handlers map[string]accessibilityHandler) bool {
+	if len(nodes) == 0 {
+		return false
+	}
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.closed.Load() || b.completedSnapshot == "" || b.completedSnapshot != b.lastSnapshot || len(b.pendingBaseline) != len(nodes) {
+		return false
+	}
+	for i := range nodes {
+		// SameWireNode accepts only exact builtin scalar values. Custom
+		// marshalers, mutable values and every changed wire field fall back
+		// to validation/encoding before retained state can be mutated.
+		if nodes[i].GridPending || !accessibilitySameWireNode(b.pendingBaseline[i], nodes[i]) {
+			return false
+		}
+	}
+	if !b.sameCompletedGridMetadata(nodes) {
+		return false
+	}
+	b.handlers = handlers
+	b.activationGuards = accessibilityActivationGuards(nodes)
+	return true
+}
+
+func accessibilityImmutableValues(nodes []accessibilityNode) bool {
+	for _, node := range nodes {
+		if !accessibilityImmutableScalar(node.Value) {
+			return false
+		}
+	}
+	return true
 }
 
 func accessibilityActivationGuards(nodes []accessibilityNode) map[string]func() bool {

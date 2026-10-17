@@ -1,0 +1,16 @@
+{
+  "finding_id": "967a53b9f6d177b5",
+  "raw_severity": "medium",
+  "raw_cli_exit_code": 1,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "provider_calls": 1,
+  "disposition": "Independently refuted; no further source change or provider call.",
+  "reasons": [
+    "SameWireNode compares every audited serialized field, action elements, pointer contents, exact scalar type/value and float bits; Go-only cell focus metadata is separately checked. Existing detached baseline has no owner/model callbacks.",
+    "reuseReadySnapshot holds b.mu from closed/certificate/baseline checks through handler and guard assignment; closeFrom uses the same lock and clears certification/baseline/references. Owner updates remain serialized."
+  ],
+  "internal_review": "Final source, guard/custom regressions, specification, full race/vet and local adoption approved. Earlier custom-encoding defect reproduced and fixed before provider review.",
+  "native_ui_executed": false,
+  "native_frame_budgets_qualified": false
+}

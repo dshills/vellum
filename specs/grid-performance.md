@@ -461,3 +461,12 @@ control and full actual-driver software pixel comparisons precede acceptance.
 Supported software DPI96/160/192 does not qualify native DPI162. Synthetic
 encoder microbenchmarks are separate from ordinary native frame targets; all
 historical failures and full P4/P6/P11/Mac qualification remain open.
+
+## Ready accessibility duplicates
+
+The [ready-snapshot checkpoint](../docs/reports/macos-ready-snapshot/README.md)
+removes repeated JSON encoding when owned ready semantics exactly match the
+existing validated baseline. Its offscreen duplicate microbenchmark includes
+fresh snapshot/handler allocation. It does not measure a full native frame or
+change any workload, timing boundary or target above. Current ordinary failures
+remain open until the candidate receives the required native comparisons.

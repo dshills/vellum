@@ -3,7 +3,9 @@
 package cogent
 
 import (
+	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"testing"
 )
@@ -19,7 +21,7 @@ func BenchmarkAccessibilityDuplicatePublication(b *testing.B) {
 				if err != nil {
 					b.Fatal(err)
 				}
-				bridge := &accessibilityBridge{lastSnapshot: semantic}
+				bridge := &accessibilityBridge{lastSnapshot: semantic, pendingBaseline: accessibilityPendingBaseline(fixture)}
 				bridge.prepareGridPublication(fixture, nil)
 				publish := func() {
 					nodes := cloneAccessibilityNodes(fixture)
@@ -54,7 +56,7 @@ func duplicateAXBridge(t testing.TB, nodes []accessibilityNode) *accessibilityBr
 	if err != nil {
 		t.Fatal(err)
 	}
-	bridge := &accessibilityBridge{lastSnapshot: semantic, done: make(chan struct{})}
+	bridge := &accessibilityBridge{lastSnapshot: semantic, pendingBaseline: accessibilityPendingBaseline(nodes), done: make(chan struct{})}
 	bridge.updateOwned(cloneAccessibilityNodes(nodes), gridAXHandlers(nodes, nil))
 	if bridge.generation.Load() != 0 {
 		t.Fatal("seed changed native publication")
@@ -169,5 +171,103 @@ func TestAccessibilityDuplicateScalarAfterCustomCannotReuseOldValue(t *testing.T
 	bridge.updateOwned(next, nil)
 	if bridge.gridPublications["g"][2].Value != "same" {
 		t.Fatal("builtin scalar reused older custom value with identical JSON")
+	}
+}
+
+// Refused new input must leave the last validated view and callbacks intact,
+// even when most of its nodes match the ready baseline used by the shortcut.
+func TestAccessibilityReadyDuplicateInvalidEncodingIsAtomic(t *testing.T) {
+	for name, mutate := range map[string]func(*accessibilityNode){
+		"float64 NaN":      func(n *accessibilityNode) { n.Value = math.NaN() },
+		"float32 infinity": func(n *accessibilityNode) { n.Value = float32(math.Inf(1)) },
+		"frame NaN":        func(n *accessibilityNode) { n.GridFrame[0] = float32(math.NaN()) },
+		"minimum infinity": func(n *accessibilityNode) { v := float32(math.Inf(-1)); n.Min = &v },
+		"maximum NaN":      func(n *accessibilityNode) { v := float32(math.NaN()); n.Max = &v },
+		"function":         func(n *accessibilityNode) { n.Value = func() {} },
+		"invalid JSON":     func(n *accessibilityNode) { n.Value = json.RawMessage("{") },
+	} {
+		t.Run(name, func(t *testing.T) {
+			nodes := gridAXCompleted("g", "root", 1, 7)
+			bridge := duplicateAXBridge(t, nodes)
+			defer bridge.close()
+			original, refused := 0, 0
+			bridge.handlers = gridAXHandlers(nodes, &original)
+			before, storage := bridge.lastSnapshot, &bridge.gridPublications["g"][0]
+			next := cloneAccessibilityNodes(nodes)
+			mutate(&next[2])
+			bridge.updateOwned(next, gridAXHandlers(next, &refused))
+			if bridge.lastSnapshot != before || bridge.generation.Load() != 0 || &bridge.gridPublications["g"][0] != storage {
+				t.Fatal("invalid encoding changed accepted publication or cache")
+			}
+			if !bridge.handlers["g:cell"](accessibilityAction{Kind: "press"}) || original != 1 || refused != 0 {
+				t.Fatal("invalid encoding replaced the accepted action")
+			}
+		})
+	}
+}
+
+func TestAccessibilityReadyDuplicateEmptyWireDistinction(t *testing.T) {
+	_, bridge := newAXTest(t, 16)
+	for _, nodes := range [][]accessibilityNode{nil, {}, nil} {
+		bridge.updateOwned(nodes, nil)
+		want, err := json.Marshal(nodes)
+		if err != nil || bridge.lastSnapshot != string(want) {
+			t.Fatal("empty and nil snapshots lost their wire distinction", bridge.lastSnapshot, err)
+		}
+	}
+	if bridge.generation.Load() != 3 {
+		t.Fatal("empty/nil changes did not retire old generations")
+	}
+}
+
+func TestAccessibilityReadyDuplicateReplacesAndRemovesActivationGuards(t *testing.T) {
+	a, bridge := newAXTest(t, 16)
+	nodes := gridAXCompleted("g", "root", 1, 7)
+	calls := 0
+	publish := func(guard func() bool) {
+		t.Helper()
+		next := cloneAccessibilityNodes(nodes)
+		next[2].activationGuard = guard
+		bridge.updateOwned(next, gridAXHandlers(next, &calls))
+	}
+	admit := func() {
+		t.Helper()
+		if !accessibilityDeliver(bridge.token, bridge.generation.Load(), "g:cell", accessibilityAction{Kind: "press"}) {
+			t.Fatal("live action admission refused")
+		}
+	}
+	drain := func() {
+		t.Helper()
+		if err := a.Drain(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	publish(func() bool { return false })
+	generation, storage := bridge.generation.Load(), &bridge.gridPublications["g"][0]
+	admit()
+	publish(func() bool { return true })
+	drain()
+	if calls != 0 {
+		t.Fatal("a duplicate refresh bypassed the already-admitted old guard")
+	}
+	admit()
+	drain()
+	if calls != 1 {
+		t.Fatal("fresh admission did not use the replacement guard")
+	}
+	publish(func() bool { return false })
+	admit()
+	drain()
+	if calls != 1 {
+		t.Fatal("fresh false guard did not revoke activation")
+	}
+	publish(nil)
+	admit()
+	drain()
+	if calls != 2 || len(bridge.activationGuards) != 0 {
+		t.Fatal("removed guard still blocked new admission")
+	}
+	if bridge.generation.Load() != generation || &bridge.gridPublications["g"][0] != storage {
+		t.Fatal("Go-only guard refresh retired unchanged semantics or completed cache")
 	}
 }
