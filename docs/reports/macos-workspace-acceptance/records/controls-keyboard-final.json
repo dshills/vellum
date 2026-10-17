@@ -1,0 +1,36 @@
+{
+  "argv": [
+    "/usr/bin/nice",
+    "-n",
+    "10",
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+    "test",
+    "-race",
+    "-tags=offscreen",
+    "-p=2",
+    "-count=1",
+    "-timeout=3m",
+    "-json",
+    "-modfile=/private/tmp/vellum-event-publication-e96f642/driver.mod",
+    "-mod=readonly",
+    "-run=^TestOrdinarySelectorAndNumberKeyboardControlledRoundTrip$",
+    "."
+  ],
+  "exit_code": 0,
+  "seconds": 10.333364291931503,
+  "logs": {
+    "stdout": {
+      "bytes": 4959,
+      "sha256": "9403dd58275b4130d9411cda7e35a0e2a1f4d67ac9b6c78aea82e4b2ae88067c"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "test_sha256": "86cc90bdfaaeeec57197292fff2d104e1f6e76a13277d755e0c81fe363451677",
+  "native_ui_executed": false
+}

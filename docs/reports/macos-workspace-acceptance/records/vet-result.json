@@ -1,0 +1,31 @@
+{
+  "source_commit": "848d7410a38b5c04e09c5968e0b1b6e1926e68d3",
+  "argv": [
+    "/usr/bin/nice",
+    "-n",
+    "10",
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)",
+    "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+    "vet",
+    "-tags=offscreen",
+    "-p=2",
+    "-modfile=/private/tmp/vellum-macos-m2-workspace-848d741/replay.mod",
+    "-mod=readonly",
+    "./..."
+  ],
+  "exit_code": 0,
+  "seconds": 14.708373500034213,
+  "logs": {
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 1023,
+      "sha256": "43e087a002f22ddf36abf62d228047eaa2408dacaa891362a278f2940a7a20ad"
+    }
+  },
+  "native_ui_executed": false
+}

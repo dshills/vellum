@@ -1,0 +1,140 @@
+{
+  "result": "PASS_FULL_WORKSPACE_SUITE",
+  "source_commit": "848d7410a38b5c04e09c5968e0b1b6e1926e68d3",
+  "prepared_sha256": "096ccd4f583f73eada35d9b1ff8bfbb29df7db860281cb5e6c63b75d22548af5",
+  "records": {
+    "examples/replay/workspace/records/1000000.golden.json": "aa0d6514fbd4978d871173b3b3f473f4fae9e069fb982582bb3580b5387fd66d",
+    "examples/replay/workspace/records/10000.golden.json": "74b6baf3b5ac61b114411686b6c0493439f4e2ce21833ed8bf703cfb800bea1b",
+    "examples/replay/workspace/records/1000000.json": "86475cf4b79b1acfbc2a5ad2805755a0e57ee36dffe64e0cf1fe10045dd3a5db",
+    "examples/replay/workspace/records/10000.json": "468306dbbe845797846ffd396454680358851b7e4d345f270091544e6e9de62a"
+  },
+  "commands": [
+    {
+      "name": "module-edit",
+      "argv": [
+        "/usr/bin/nice",
+        "-n",
+        "10",
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)",
+        "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+        "mod",
+        "edit",
+        "-modfile=/private/tmp/vellum-macos-m2-workspace-848d741/replay.mod",
+        "-replace=github.com/dshills/vellum=/private/tmp/vellum-macos-native-results-97aee13",
+        "-replace=github.com/dshills/vellum/drivers/cogent=/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent",
+        "-replace=cogentcore.org/core=/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/upstream",
+        "-replace=github.com/go-text/typesetting=/private/tmp/vellum-macos-native-results-97aee13/drivers/cogent/build/typesetting",
+        "-replace=github.com/oliverbestmann/webgpu/libs-darwin=/private/tmp/vellum-gpu-sdk-stage0077/relocated SDK/vellum-v0.1.0-alpha.2/drivers/cogent/build/libs-darwin"
+      ],
+      "exit_code": 0,
+      "seconds": 0.01503874990157783,
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "modules",
+      "argv": [
+        "/usr/bin/nice",
+        "-n",
+        "10",
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)",
+        "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+        "list",
+        "-modfile=/private/tmp/vellum-macos-m2-workspace-848d741/replay.mod",
+        "-mod=readonly",
+        "-m",
+        "-json",
+        "all"
+      ],
+      "exit_code": 0,
+      "seconds": 0.026858791010454297,
+      "logs": {
+        "stdout": {
+          "bytes": 30957,
+          "sha256": "3a9bb2cb9ba34c9d92a6972272ec3edfe631f29f7ab4601352d3e726249af426"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "verify",
+      "argv": [
+        "/usr/bin/nice",
+        "-n",
+        "10",
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)",
+        "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+        "mod",
+        "verify",
+        "-modfile=/private/tmp/vellum-macos-m2-workspace-848d741/replay.mod"
+      ],
+      "exit_code": 0,
+      "seconds": 3.42331500002183,
+      "logs": {
+        "stdout": {
+          "bytes": 21,
+          "sha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "workspace",
+      "argv": [
+        "/usr/bin/nice",
+        "-n",
+        "10",
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)",
+        "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+        "test",
+        "-modfile=/private/tmp/vellum-macos-m2-workspace-848d741/replay.mod",
+        "-mod=readonly",
+        "-p=2",
+        "-race",
+        "-tags=offscreen",
+        "-count=1",
+        "-timeout=9m",
+        "-json",
+        "./workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 146.48486050008796,
+      "logs": {
+        "stdout": {
+          "bytes": 81053,
+          "sha256": "6e38c3ff3032445e33fe5785ec775d9621dd7db21ba5c85a7eebd49c2b68ce9e"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "error": null,
+  "native_ui_executed": false,
+  "authoring": false,
+  "global_live_stop_left_untouched": true
+}

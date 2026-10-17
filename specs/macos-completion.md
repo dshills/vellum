@@ -35,6 +35,17 @@ Prism review and internal reviews are retained. Existing private SDK archives
 remain unchanged; final candidate packaging, M2–M7 and full Mac acceptance remain
 open. This work uses no native windows or system preference changes.
 
+## M2 headless workspace and catalogue
+
+The [M2 headless checkpoint](../docs/reports/macos-workspace-acceptance/README.md)
+passes the full professional workspace record at both row counts and batches
+1/7/64: 1,296 operations and 162 frozen observations, with unchanged records and
+goldens. The [catalogue map](control-acceptance.md) covers 34 public kinds plus
+two composites. New actual focused-keyboard regressions close the Selector and
+NumberField coverage gaps. Native integration, physical/human workflows and
+ordinary performance remain open; the failed native-only package selection
+under offscreen tags is retained separately from passing package outcomes.
+
 ## Latest unattended evidence
 
 The [current private SDK GPU checkpoint](../docs/reports/macos-gpu-sdk-stage0077/README.md)

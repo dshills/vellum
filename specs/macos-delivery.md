@@ -106,8 +106,11 @@ explicitly authorized tests and restore any authorized temporary state changes.
 1. **M1 source checkpoint complete.** The production SDK cancellation fix and
    its 107-method headless acceptance are [recorded here](../docs/reviews/macos-sdk-cancellation/README.md).
    The existing private SDK archive remains historical; M6 includes the fix.
-2. **Next checkpoint: M2.** Complete the public professional replay and
-   catalogue coverage using existing runners; correct actual application gaps.
+2. **M2 headless checkpoint complete.** The full public professional replay
+   passes all six frozen records. The [catalogue map](control-acceptance.md)
+   includes the new routed Selector/NumberField regressions. Native M2 integration
+   remains queued; [actual results](../docs/reports/macos-workspace-acceptance/README.md)
+   distinguish software routing from desktop acceptance.
 3. **Then M3 is the main engineering priority.** A quiet native baseline and one
    targeted renderer/layout fix precede another broad qualification campaign.
    Analyze existing profiles and implement/test candidates offscreen while the
@@ -183,20 +186,21 @@ implementation checkpoint; it is not rerun after each documentation edit.
 ## Forecast and closure ledger
 
 The largest uncertainty is M3: the unchanged frame targets have repeatedly
-failed. A completion date before that is resolved would be speculative. M1 is now complete in the source checkout. The next deliverable is the M2 full
-replay/coverage checkpoint, followed by a bounded M3 performance decision. After those, update
-the remaining work estimate from the measured gaps. An eight-hour final soak,
+failed. A completion date before that is resolved would be speculative. M1 is
+complete in source, and M2's full headless replay and catalogue map are complete.
+The next engineering deliverable is a bounded M3 performance decision and
+measured bottleneck fix. Update the remaining estimate from that result. An eight-hour final soak,
 human accessibility/input verification and required display availability must
 be budgeted in addition to implementation time.
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
 | M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
-| M2 | Partial | Reuse existing domain/routing coverage; complete the full workspace record and map the control catalogue. |
+| M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
 | M3 | Failing / incomplete | Current ordinary frame targets remain unqualified; profile-to-fix-to-ordinary-comparison loop. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live tests stopped | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
-| M6 | Partial | Private SDK native consumers pass; production CLI cleanup, final package and native/Rust/font/asset rights closure remain open. |
+| M6 | Partial | Private SDK native consumers pass; incorporate the M1 cleanup fix in the final package and close native/Rust/font/asset rights. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.

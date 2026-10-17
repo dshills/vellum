@@ -1,0 +1,90 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "825f7c550c359f21d0d0a4ea4ab58c00",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "848d7410a38b5c04e09c5968e0b1b6e1926e68d3",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "highestSeverity": "medium"
+  },
+  "findings": [
+    {
+      "id": "89024b6fb4f09f49",
+      "severity": "medium",
+      "category": "correctness",
+      "title": "Shared state mutated across goroutines; Invalidate error ignored",
+      "message": "The Post callback mutates `disabled`, which the view closure reads, and `calls` is read from the test goroutine. Post likely runs the closure on the UI goroutine. Unsynchronized shared variables (calls, selected, number, accept, disabled) are written from the UI goroutine and read or written by the test goroutine, which is a data race under -race. The Invalidate error is also discarded, so a failed invalidate would let the disabled assertion pass vacuously.",
+      "suggestion": "Guard the shared state with a mutex, or do all reads and writes inside a.Post and wait for completion. Check the Invalidate error and fail the test if it is non-nil.",
+      "confidence": 0.55,
+      "locations": [
+        {
+          "path": "drivers/cogent/controls_keyboard_offscreen_test.go",
+          "lines": {
+            "start": 77,
+            "end": 77
+          }
+        }
+      ],
+      "tags": [
+        "race",
+        "test",
+        "location-corrected"
+      ],
+      "evidence": "if err := a.Post(func() { disabled = true; _ = a.Invalidate(\"one\") }); err != nil {",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 4238,
+    "totalMs": 4245
+  },
+  "_provenance": [
+    {
+      "ai_generated": true,
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5"
+    }
+  ],
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 2,
+    "bytes": 4337,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 4487,
+        "output": 391,
+        "costUSD": 0.012884
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [],
+  "suppressed": []
+}

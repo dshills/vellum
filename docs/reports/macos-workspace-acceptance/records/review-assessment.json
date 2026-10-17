@@ -1,0 +1,17 @@
+{
+  "finding_id": "89024b6fb4f09f49",
+  "raw_severity": "medium",
+  "raw_exit_code": 1,
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "calls": 1,
+  "scope": "New routed control regression and small control contract addition",
+  "disposition": {
+    "concurrency": "Independently refuted for this manual fixture: Post enqueues; Manual.Step -> DrainN -> Do runs callbacks synchronously on the test caller. No ambient UI dispatcher is started. Final source amendment and passing test hash independently approved.",
+    "invalidation_and_disabled_precondition": "Addressed after provider review by checking Invalidate and asserting the native disabled state before input."
+  },
+  "final_test": "controls-keyboard-final.json",
+  "second_provider_call": false,
+  "runtime_implementation_changed": false,
+  "internal_review": "Approved: test, corrected catalogue map, report/ledger and final amendment; no remaining blocker."
+}

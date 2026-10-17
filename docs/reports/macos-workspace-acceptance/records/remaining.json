@@ -1,0 +1,48 @@
+{
+  "result": "FAILED_PUBLIC_REPLAY_OR_VET",
+  "source_commit": "848d7410a38b5c04e09c5968e0b1b6e1926e68d3",
+  "prepared_sha256": "096ccd4f583f73eada35d9b1ff8bfbb29df7db860281cb5e6c63b75d22548af5",
+  "commands": [
+    {
+      "name": "public-race",
+      "argv": [
+        "/usr/bin/nice",
+        "-n",
+        "10",
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)",
+        "/opt/homebrew/Cellar/go/1.27.2/libexec/bin/go",
+        "test",
+        "-race",
+        "-tags=offscreen",
+        "-p=2",
+        "-count=1",
+        "-timeout=4m",
+        "-json",
+        "-modfile=/private/tmp/vellum-macos-m2-workspace-848d741/replay.mod",
+        "-mod=readonly",
+        ".",
+        "./internal/smoke",
+        "./cmd/workspace-smoke"
+      ],
+      "exit_code": 1,
+      "seconds": 10.703717124997638,
+      "logs": {
+        "stdout": {
+          "bytes": 46013,
+          "sha256": "7f6d27b74ccf2316a3b16046da00cbcd8dcddd49431d6b803493eb5d9e7669bc"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "error": {
+    "type": "AssertionError",
+    "message": "public-race"
+  },
+  "native_ui_executed": false
+}

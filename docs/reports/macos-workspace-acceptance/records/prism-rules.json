@@ -1,0 +1,5 @@
+{
+  "focus": [
+    "Review the new focused keyboard regression and its small control-contract addition for actionable test correctness or false-positive acceptance. Runtime implementation is unchanged. The test uses primitive Manual.Input KeyChord events through actual focused Selector/NumberField widgets, checks stable option IDs/disabled skipping, numeric steps, exact callback counts/payloads, changed accepted software pixels, rejected native value restoration and disabled refusal. simpleManual registers bounded Manual.Close cleanup. Do not mistake offscreen routing for physical desktop or native popup acceptance. Internal review approved the test; full workspace replay passed separately with unchanged runtime/records."
+  ]
+}

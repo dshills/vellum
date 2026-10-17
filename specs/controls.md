@@ -183,6 +183,13 @@ content, custom wake forwarding and repeated focus sequence requests. The galler
 model test checks the complete controlled workflow. Native visual/input behavior
 still requires platform acceptance beyond these adapter checks.
 
+The [Mac control acceptance map](control-acceptance.md) names scenarios for all
+34 public node kinds and the Breadcrumb/ColorPicker composites. The focused
+Selector/NumberField keyboard regression checks disabled-option skipping, numeric
+step, single owner delivery, rejected native-value restoration and disabled
+refusal through the offscreen event route. Physical desktop acceptance remains
+a separate gate.
+
 ## Expanded desktop elements
 
 `Disclosure` is a labeled collapsible container for inspector/settings sections.
