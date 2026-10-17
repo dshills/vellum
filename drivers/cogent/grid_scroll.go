@@ -17,6 +17,8 @@ func setGridScrollReuse(scene *core.Scene, enabled bool) {
 // actual paint operations before reusing pixels; model generations, selection,
 // fonts and theme identities alone do not establish translation equivalence.
 func (p *gridPane) RenderWidget() {
+	restore := p.elideCoveredCellBoxes()
+	defer restore()
 	if p.Scene == nil || p.Scene.Painter.State == nil {
 		p.Frame.RenderWidget()
 		return

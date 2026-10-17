@@ -1,6 +1,6 @@
 # Mac framework delivery plan
 
-Updated 17 October 2026. The latest shared AX baseline checkpoint starts from clean `f641776`
+Updated 17 October 2026. The latest pane-paint checkpoint starts from clean `ae99e65`
 (stage0078 runtime); the most recent private GPU
 SDK and its native drawing/3D/imaging checks use clean runtime source `5eef841`.
 Owner: the main Vellum development chat. This is the execution plan for the
@@ -198,7 +198,7 @@ be budgeted in addition to implementation time.
 | --- | --- | --- |
 | M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | [Current native comparison](../docs/reports/macos-ax-shared-baseline/README.md) still misses 4 ms (median run-p95 5.471 ms). Shared AX baseline reduces observed process allocation about 5.5% without meaningful latency gain; direct AX construction remains rejected. Next implement grid-scoped incremental publication with full fallback; scene reconstruction remains another measured substantial cost. |
+| M3 | Failing / incomplete | [Pane-aware paint comparison](../docs/reports/macos-grid-pane-paint/README.md) reduces median run-p95 5.426→5.140 ms, with 4/5 paired improvements and about 8% lower observed Go process allocation. All p95s still miss 4 ms. Next implement a pane text batch covering bitmap and span glyphs; preserve original pixels, input/AX and fallback. Async AX work remains deferred. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. Final SDK refresh, exact runtime/asset rights closure and owner approval remain. |

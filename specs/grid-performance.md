@@ -487,3 +487,37 @@ reduced isolated construction time/allocation but was slower in all five ordinar
 native p95 comparisons. The runtime candidate was reverted. Its archived diff
 retains the benchmark, parity tests and frozen prior implementation; none of this
 qualifies or changes the current runtime's frame result.
+
+## Pane-aware managed grid painting
+
+A full managed pane repaint may omit a passive cell/header's StandardBox when
+that box would only replace the pane's freshly painted opaque uniform background
+with the same color. Text shaping, cell widget identity, per-cell clipping,
+selection/cursor borders, measurement and accessibility retain their ordinary
+paths. This removes redundant draw construction before raster capture; it does
+not relax scene operation, byte, work or tile-reference limits.
+
+Admission requires a live ready binding without an editor; a normally painted
+pane whose actual integer write rectangle matches its clipped bounding box;
+zero box margins, borders, radii and shadows; unit opacity and no state layer;
+and known opaque uniform colors. Every active ancestor context must have an
+identity cumulative transform, integer rectangular bounds, no rounded corners,
+mask or clip path. Only normal managed Text leaves in their expected pane order
+participate. A linear row/column interval proof checks disjoint cell clips,
+including preceding selected/cursor painters. Foreign, overlapping or reordered
+content refuses the entire pane proof. Decorated/differently colored cells keep
+their original box paint. Backgrounds are derived from current style and the
+already rendered parent's current background, not a stale pane cache.
+
+Temporary RenderBox changes apply only within the complete Frame.RenderWidget
+traversal and restore on normal or abnormal exit. An individual Text repaint
+therefore retains its normal background clearing. The existing experimental
+verified-scroll protocol keeps its original painter. A private reference switch
+exists for original-painter regression evidence; it is not a public configuration.
+
+Original CPU pixels and captured packet replay must match across scrolling,
+frozen panes, light/dark backgrounds, selection, disabled state, fresh background
+changes and isolated text repainting. The matrix includes 162 DPI and requires
+actual command reduction there. Native timing and actual GPU-route evidence
+remain separate; this optimization alone does not qualify the unchanged 4/6 ms
+frame targets or memory/endurance requirements.
