@@ -1,0 +1,1993 @@
+{
+  "schema": "vellum-current-external-ax-report-v1",
+  "framework_commit": "0f636c850ae1a66263bdcc1ecbaa6d8b2a1b0e9f",
+  "tracked_files": 4625,
+  "prepared_files": 6243,
+  "fixture_overlays_explicit": true,
+  "implementation_source_changed": false,
+  "readiness_sha256": "0519a76263ec19f22883c95a19eea21005777dcb078314ada2b596a69084bde4",
+  "result_review_sha256": "81a0fd6c4c9abeec33b42e0cdb6f574a378220bac2ae4872ab2ec40e62748780",
+  "reconciliation_sha256": "26c158af9f708b335126cb1b41a88e1a72fc1f19d23e8848d1db26272ee937a9",
+  "cases": {
+    "editor": {
+      "original_receipt_sha256": "ba8a43a26fb66326da350c17678b29792d41f4f7661e6f716af3b3982c7d8853",
+      "original_collection_result": "PASS_READ_ONLY_EXTERNAL_AX",
+      "original_collection_error": null,
+      "corrected_validation": {
+        "external_ax": {
+          "accessibility_trusted": true,
+          "characters_utf16": 465,
+          "combining_range_utf16": [
+            3,
+            2
+          ],
+          "emoji_bounds_screen": [
+            1102,
+            448.3828125,
+            10,
+            22
+          ],
+          "emoji_point_range_utf16": [
+            1,
+            2
+          ],
+          "event": "vellum.editor.external-ax",
+          "exact_value": true,
+          "final_line": 4,
+          "final_line_range_utf16": [
+            465,
+            0
+          ],
+          "hebrew_visual_rtl": true,
+          "pid": 99298,
+          "result": "pass",
+          "scope": "read-only external AX process; no VoiceOver, real IME or setting changes",
+          "selected_text": "\ud83d\ude00",
+          "selection_utf16": [
+            1,
+            2
+          ],
+          "split_surrogate_error": -25212
+        },
+        "geometry_persistence_disabled": true,
+        "physical_input_verified": false
+      },
+      "native_binary_sha256": "8f5e4797ad8a2b15e6adf880075ceb03a31ab1eaf068a435296f29366adbd297",
+      "client_binary_sha256": "de6ef881a8f0d1a79d17e1d86962f6940379eae53e1a6efedffdbdee84a0eaf4",
+      "controller_elapsed_seconds": 61.459715542034246,
+      "native_observed_lifetime_seconds": 60.68840845802333,
+      "client_observed_lifetime_seconds": 0.24293266597669572,
+      "client_reported_query_elapsed_seconds": null
+    },
+    "placement": {
+      "original_receipt_sha256": "b44f9e17796a6a80b481fcc49d1179f78f79012de3325d77e439a60f70488b23",
+      "original_collection_result": "FAILED_OR_CANCELED_READ_ONLY_EXTERNAL_AX",
+      "original_collection_error": {
+        "type": "ValueError",
+        "message": "exact client target"
+      },
+      "corrected_validation": {
+        "external_ax": {
+          "actions_performed": false,
+          "calls": [
+            {
+              "attribute": "AXWindows",
+              "elapsed_ns": 22446667,
+              "node": -1,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 49708,
+              "node": -1,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 32416,
+              "node": 0,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 24125,
+              "node": 0,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 40416,
+              "node": 0,
+              "status": -25205
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 26542,
+              "node": 0,
+              "status": -25212
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 23458,
+              "node": 0,
+              "status": -25205
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 36208,
+              "node": 0,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 20542,
+              "node": 0,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 789208,
+              "node": 0,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 43500,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 17416,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 27875,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 31833,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 16208,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 21541,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 20042,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 129625,
+              "node": 1,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 490125,
+              "node": 2,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 44625,
+              "node": 2,
+              "status": -25212
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 32833,
+              "node": 2,
+              "status": -25205
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 25500,
+              "node": 2,
+              "status": -25212
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 19416,
+              "node": 2,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 55875,
+              "node": 2,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 22250,
+              "node": 2,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 18916,
+              "node": 2,
+              "status": -25212
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 433042,
+              "node": 3,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 33666,
+              "node": 3,
+              "status": -25212
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 22500,
+              "node": 3,
+              "status": -25205
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 21709,
+              "node": 3,
+              "status": -25212
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 16541,
+              "node": 3,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 40083,
+              "node": 3,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 21375,
+              "node": 3,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 252625,
+              "node": 3,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 1011208,
+              "node": 4,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 36250,
+              "node": 4,
+              "status": -25212
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 28750,
+              "node": 4,
+              "status": -25205
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 24250,
+              "node": 4,
+              "status": -25212
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 18708,
+              "node": 4,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 46750,
+              "node": 4,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 22000,
+              "node": 4,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 17792,
+              "node": 4,
+              "status": -25212
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 91417,
+              "node": 5,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 73042,
+              "node": 5,
+              "status": -25205
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 52791,
+              "node": 5,
+              "status": -25205
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 46875,
+              "node": 5,
+              "status": -25212
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 46583,
+              "node": 5,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 60125,
+              "node": 5,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 47917,
+              "node": 5,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 69209,
+              "node": 5,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 14875,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 12625,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 12542,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 13292,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 12667,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 14750,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 12167,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 28375,
+              "node": 6,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 12917,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 12291,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 12833,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 13167,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11875,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 13542,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 12583,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 13833,
+              "node": 7,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 12709,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 11375,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11333,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 12792,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11459,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12875,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11500,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 17583,
+              "node": 8,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 12667,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 11166,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11250,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 12125,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11625,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12958,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11833,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 14917,
+              "node": 9,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 11916,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 11250,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11167,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 12208,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11375,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12334,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11292,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 17000,
+              "node": 10,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 19958,
+              "node": 11,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 24583,
+              "node": 11,
+              "status": -25205
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 16875,
+              "node": 11,
+              "status": -25205
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 27125,
+              "node": 11,
+              "status": -25212
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 26291,
+              "node": 11,
+              "status": -25205
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 29125,
+              "node": 11,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 23750,
+              "node": 11,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 37708,
+              "node": 11,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 28584,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 20708,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 23500,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 18125,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 15083,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 18625,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 14250,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 17041,
+              "node": 12,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 12167,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 11541,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11833,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 12167,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 12042,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 17792,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 16000,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 19209,
+              "node": 13,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 15875,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 17333,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 20542,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 16291,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 15125,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 18250,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 14292,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 15083,
+              "node": 14,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 13458,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 13250,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 13541,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 13500,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 13167,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 15000,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 13500,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 15417,
+              "node": 15,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 15000,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 12916,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 12834,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 13083,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 12542,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 15542,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 13417,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 15083,
+              "node": 16,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 13833,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 14333,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 13083,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 16208,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 17875,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 17042,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 19208,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 17250,
+              "node": 17,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 14834,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 15167,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 14583,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 14125,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 15417,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 17542,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 15083,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 14917,
+              "node": 18,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 13792,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 12667,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 13000,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 15958,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 13083,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 15792,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 16541,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 26167,
+              "node": 19,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 13167,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 12166,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11667,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 11917,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11666,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 13291,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11750,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 12709,
+              "node": 20,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 11792,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 14708,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 13334,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 11958,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11792,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 13167,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 12041,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 13833,
+              "node": 21,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 14000,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 12875,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 17834,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 12125,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 12583,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 13291,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11792,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 12792,
+              "node": 22,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 11459,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 11291,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11250,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 11459,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11208,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12625,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11708,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 13916,
+              "node": 23,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 13792,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 14958,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 17875,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 15333,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 12541,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 14042,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 12250,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 13375,
+              "node": 24,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 12125,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 11375,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11958,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 13125,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11458,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12625,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11500,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 12250,
+              "node": 25,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 11333,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 10958,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 10958,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 11416,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 10917,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12542,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11625,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 12250,
+              "node": 26,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 11417,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 10875,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 10833,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 12125,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11458,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 13458,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 12167,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 14167,
+              "node": 27,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 11792,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 11250,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 11166,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 11750,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11333,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12416,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11417,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 12250,
+              "node": 28,
+              "status": 0
+            },
+            {
+              "attribute": "AXRole",
+              "elapsed_ns": 11125,
+              "node": 29,
+              "status": 0
+            },
+            {
+              "attribute": "AXTitle",
+              "elapsed_ns": 10875,
+              "node": 29,
+              "status": 0
+            },
+            {
+              "attribute": "AXDescription",
+              "elapsed_ns": 10917,
+              "node": 29,
+              "status": 0
+            },
+            {
+              "attribute": "AXIdentifier",
+              "elapsed_ns": 12958,
+              "node": 29,
+              "status": 0
+            },
+            {
+              "attribute": "AXEnabled",
+              "elapsed_ns": 11250,
+              "node": 29,
+              "status": 0
+            },
+            {
+              "attribute": "AXPosition",
+              "elapsed_ns": 12250,
+              "node": 29,
+              "status": 0
+            },
+            {
+              "attribute": "AXSize",
+              "elapsed_ns": 11250,
+              "node": 29,
+              "status": 0
+            },
+            {
+              "attribute": "AXChildren",
+              "elapsed_ns": 12125,
+              "node": 29,
+              "status": 0
+            }
+          ],
+          "complete_bounded_walk": true,
+          "elapsed_ns": 40682417,
+          "event": "vellum.window.readonly-ax",
+          "executable": "/tmp/vellum-external-ax-diagnostic-20261017/native-build/placement.app/Contents/MacOS/placement",
+          "expected_title": "Vellum native placement probe",
+          "nodes": [
+            {
+              "AXRole": "AXWindow",
+              "AXTitle": "Vellum native placement probe",
+              "index": 0,
+              "screen_frame": [
+                1024,
+                256,
+                3072,
+                896
+              ]
+            },
+            {
+              "AXDescription": "",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cm9vdA",
+              "AXRole": "AXGroup",
+              "AXTitle": "",
+              "index": 1,
+              "screen_frame": [
+                1032,
+                296,
+                3056,
+                848
+              ]
+            },
+            {
+              "AXEnabled": true,
+              "AXRole": "AXButton",
+              "index": 2,
+              "screen_frame": [
+                1032,
+                264,
+                16,
+                16
+              ]
+            },
+            {
+              "AXEnabled": true,
+              "AXRole": "AXButton",
+              "index": 3,
+              "screen_frame": [
+                1078,
+                264,
+                16,
+                16
+              ]
+            },
+            {
+              "AXEnabled": true,
+              "AXRole": "AXButton",
+              "index": 4,
+              "screen_frame": [
+                1055,
+                264,
+                16,
+                16
+              ]
+            },
+            {
+              "AXEnabled": true,
+              "AXRole": "AXStaticText",
+              "index": 5,
+              "screen_frame": [
+                1106,
+                264,
+                204,
+                16
+              ]
+            },
+            {
+              "AXDescription": "",
+              "AXEnabled": true,
+              "AXIdentifier": "node:dG9vbGJhcg",
+              "AXRole": "AXToolbar",
+              "AXTitle": "",
+              "index": 6,
+              "screen_frame": [
+                1032,
+                296,
+                3056,
+                60
+              ]
+            },
+            {
+              "AXDescription": "Drag to place \u2022 drag the canvas or use arrow keys to pan \u2022 wheel to zoom \u2022 Escape cancels \u2022 Return on a tool places at center \u2022 Option+arrows select objects",
+              "AXEnabled": true,
+              "AXIdentifier": "node:aGVscA",
+              "AXRole": "AXStaticText",
+              "AXTitle": "Drag to place \u2022 drag the canvas or use arrow keys to pan \u2022 wheel to zoom \u2022 Escape cancels \u2022 Return on a tool places at center \u2022 Option+arrows select objects",
+              "index": 7,
+              "screen_frame": [
+                1032,
+                364,
+                1164,
+                24
+              ]
+            },
+            {
+              "AXDescription": "",
+              "AXEnabled": true,
+              "AXIdentifier": "node:d29ya3NwYWNl",
+              "AXRole": "AXRow",
+              "AXTitle": "",
+              "index": 8,
+              "screen_frame": [
+                1032,
+                396,
+                3056,
+                640
+              ]
+            },
+            {
+              "AXDescription": "",
+              "AXEnabled": true,
+              "AXIdentifier": "node:c3RhdHVz",
+              "AXRole": "AXGroup",
+              "AXTitle": "",
+              "index": 9,
+              "screen_frame": [
+                1032,
+                1044,
+                3056,
+                32
+              ]
+            },
+            {
+              "AXDescription": "",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cHJvYmUtY29udHJvbHM",
+              "AXRole": "AXToolbar",
+              "AXTitle": "",
+              "index": 10,
+              "screen_frame": [
+                1032,
+                1084,
+                3056,
+                60
+              ]
+            },
+            {
+              "AXRole": "AXGroup",
+              "index": 11,
+              "screen_frame": [
+                1079,
+                265,
+                14,
+                14
+              ]
+            },
+            {
+              "AXDescription": "Undo",
+              "AXEnabled": false,
+              "AXIdentifier": "node:dW5kbw",
+              "AXRole": "AXButton",
+              "AXTitle": "Undo",
+              "index": 12,
+              "screen_frame": [
+                1040,
+                303,
+                91,
+                46
+              ]
+            },
+            {
+              "AXDescription": "Redo",
+              "AXEnabled": false,
+              "AXIdentifier": "node:cmVkbw",
+              "AXRole": "AXButton",
+              "AXTitle": "Redo",
+              "index": 13,
+              "screen_frame": [
+                1139,
+                303,
+                89,
+                46
+              ]
+            },
+            {
+              "AXDescription": "Fit objects",
+              "AXEnabled": true,
+              "AXIdentifier": "node:Zml0",
+              "AXRole": "AXButton",
+              "AXTitle": "Fit objects",
+              "index": 14,
+              "screen_frame": [
+                1236,
+                300,
+                129,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Reset view",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cmVzZXQ",
+              "AXRole": "AXButton",
+              "AXTitle": "Reset view",
+              "index": 15,
+              "screen_frame": [
+                1373,
+                300,
+                131,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Snap to grid",
+              "AXEnabled": true,
+              "AXIdentifier": "node:c25hcA",
+              "AXRole": "AXCheckBox",
+              "AXTitle": "Snap to grid",
+              "index": 16,
+              "screen_frame": [
+                1512,
+                309,
+                127,
+                34
+              ]
+            },
+            {
+              "AXDescription": "Reject all drops",
+              "AXEnabled": true,
+              "AXIdentifier": "node:bG9jaw",
+              "AXRole": "AXCheckBox",
+              "AXTitle": "Reject all drops",
+              "index": 17,
+              "screen_frame": [
+                1647,
+                309,
+                150,
+                34
+              ]
+            },
+            {
+              "AXDescription": "Reject notes",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cmVqZWN0LW5vdGVz",
+              "AXRole": "AXCheckBox",
+              "AXTitle": "Reject notes",
+              "index": 18,
+              "screen_frame": [
+                1805,
+                309,
+                127,
+                34
+              ]
+            },
+            {
+              "AXDescription": "",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cGFsZXR0ZQ",
+              "AXRole": "AXGroup",
+              "AXTitle": "",
+              "index": 19,
+              "screen_frame": [
+                1032,
+                396,
+                147,
+                204
+              ]
+            },
+            {
+              "AXDescription": "Component canvas",
+              "AXEnabled": true,
+              "AXIdentifier": "node:ZHJhd2luZw",
+              "AXRole": "AXGroup",
+              "AXTitle": "Component canvas",
+              "index": 20,
+              "screen_frame": [
+                1187,
+                396,
+                2901,
+                640
+              ]
+            },
+            {
+              "AXDescription": "Drag a tool onto the canvas, or focus a tool and press Return to place at center. \u2022 0 objects \u2022 Undo 0 / Redo 0",
+              "AXEnabled": true,
+              "AXIdentifier": "node:bWVzc2FnZQ",
+              "AXRole": "AXStaticText",
+              "AXTitle": "Drag a tool onto the canvas, or focus a tool and press Return to place at center. \u2022 0 objects \u2022 Undo 0 / Redo 0",
+              "index": 21,
+              "screen_frame": [
+                1040,
+                1048,
+                809,
+                24
+              ]
+            },
+            {
+              "AXDescription": "Remove source on next drag",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cHJvYmUtYXJtLXNvdXJjZQ",
+              "AXRole": "AXButton",
+              "AXTitle": "Remove source on next drag",
+              "index": 22,
+              "screen_frame": [
+                1040,
+                1088,
+                251,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Remove target on next drag",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cHJvYmUtYXJtLXRhcmdldA",
+              "AXRole": "AXButton",
+              "AXTitle": "Remove target on next drag",
+              "index": 23,
+              "screen_frame": [
+                1299,
+                1088,
+                248,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Remove window on next drag",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cHJvYmUtYXJtLXdpbmRvdw",
+              "AXRole": "AXButton",
+              "AXTitle": "Remove window on next drag",
+              "index": 24,
+              "screen_frame": [
+                1555,
+                1088,
+                259,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Restore bindings",
+              "AXEnabled": true,
+              "AXIdentifier": "node:cHJvYmUtcmVzdG9yZQ",
+              "AXRole": "AXButton",
+              "AXTitle": "Restore bindings",
+              "index": 25,
+              "screen_frame": [
+                1822,
+                1088,
+                173,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Components",
+              "AXEnabled": true,
+              "AXIdentifier": "node:dG9vbHMtaGVhZGluZw",
+              "AXRole": "AXStaticText",
+              "AXTitle": "Components",
+              "index": 26,
+              "screen_frame": [
+                1032,
+                396,
+                97,
+                24
+              ]
+            },
+            {
+              "AXDescription": "Block",
+              "AXEnabled": true,
+              "AXIdentifier": "node:dG9vbC1ibG9jaw",
+              "AXRole": "AXButton",
+              "AXTitle": "Block",
+              "index": 27,
+              "screen_frame": [
+                1032,
+                428,
+                97,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Connector",
+              "AXEnabled": true,
+              "AXIdentifier": "node:dG9vbC1jb25uZWN0b3I",
+              "AXRole": "AXButton",
+              "AXTitle": "Connector",
+              "index": 28,
+              "screen_frame": [
+                1032,
+                488,
+                130,
+                52
+              ]
+            },
+            {
+              "AXDescription": "Note",
+              "AXEnabled": true,
+              "AXIdentifier": "node:dG9vbC1ub3Rl",
+              "AXRole": "AXButton",
+              "AXTitle": "Note",
+              "index": 29,
+              "screen_frame": [
+                1032,
+                548,
+                93,
+                52
+              ]
+            }
+          ],
+          "phase": "children",
+          "pid": 99733,
+          "prompt": false,
+          "result": "pass",
+          "settings_changed": false,
+          "trusted": true,
+          "window_titles": [
+            "Vellum native placement probe"
+          ]
+        },
+        "native_event_records": 11,
+        "expected_no_input_deadline": true,
+        "placement_workflow_qualified": false,
+        "physical_input_verified": false
+      },
+      "native_binary_sha256": "d7b5bcb9f3f8c808858dd8a0212187426d67cdce99bf92591a50a434dfc8e6f5",
+      "client_binary_sha256": "f9f249233fdca18ec60814241dbd3b647bee216817c28ea8cfd16c8aea61889a",
+      "controller_elapsed_seconds": 21.437428666977212,
+      "native_observed_lifetime_seconds": 20.690507458988577,
+      "client_observed_lifetime_seconds": 0.0469547079410404,
+      "client_reported_query_elapsed_seconds": 0.040682417,
+      "current_alias_observation": {
+        "client_spelling": "/tmp/vellum-external-ax-diagnostic-20261017/native-build/placement.app/Contents/MacOS/placement",
+        "launched_spelling": "/private/tmp/vellum-external-ax-diagnostic-20261017/native-build/placement.app/Contents/MacOS/placement",
+        "client_resolved": "/private/tmp/vellum-external-ax-diagnostic-20261017/native-build/placement.app/Contents/MacOS/placement",
+        "launched_resolved": "/private/tmp/vellum-external-ax-diagnostic-20261017/native-build/placement.app/Contents/MacOS/placement",
+        "device_inode_client": [
+          16777234,
+          440001910
+        ],
+        "device_inode_launched": [
+          16777234,
+          440001910
+        ],
+        "same_file": true,
+        "binary_sha256": "d7b5bcb9f3f8c808858dd8a0212187426d67cdce99bf92591a50a434dfc8e6f5",
+        "observed_utc": "2026-10-17T01:59:54.858247+00:00"
+      }
+    }
+  },
+  "original_receipts_unchanged": true,
+  "all_original_fifty_input_pins_unchanged": true,
+  "evidence": {
+    "schema": "vellum-current-external-ax-evidence-v1",
+    "archive_bytes": 565738,
+    "archive_sha256": "21f0ea04de9906d1e1e2d97b0a8a0cd23749e175c81079fe744e50327d7c5063",
+    "expanded_bytes": 1688379,
+    "entries": 66,
+    "compiled_executables_excluded": 4,
+    "manifest_sha256": "fec6188cb540e6e4dd9884123f8749eee53e780965a97399b84c6f3e9fc060d8"
+  },
+  "physical_input_verified": false,
+  "placement_workflow_qualified": false,
+  "human_ime_verified": false,
+  "voiceover_tested": false,
+  "cua_retry_performed": false,
+  "earlier_cua_timeout_cause": "unassigned",
+  "full_macos_qualified": false,
+  "producer_sha256": "84aefa3c4c1233fb619111cd4618e9ac73b436eab4e9f853a59a649ef49ccda3"
+}

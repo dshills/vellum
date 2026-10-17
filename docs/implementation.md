@@ -413,3 +413,11 @@ permanent exhaustion revocation preserve the proof across lifecycle boundaries.
 The final offscreen/native checks pass. Separate ordinary grid cohorts establish
 neither consistent speedup nor the required 4/6 ms targets; physical/human and
 full Mac qualification remain open. Public application APIs are unchanged.
+
+## Current external macOS accessibility
+
+The [current read-only AX check](reports/macos-current-external-ax/README.md)
+reaches the native editor text/ranges and the placement palette/canvas through
+separate already-trusted clients. Original source, diagnostic overlays, raw
+process output and corrected collector interpretation are retained. No input
+workflow or CUA retry is performed; physical/human and full Mac gates remain open.

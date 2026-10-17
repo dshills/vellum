@@ -78,3 +78,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Native placement desktop probe](macos-placement-desktop/README.md): native-only observer and offscreen controls; external app binding timed out, no input workflows ran, failed deadline and clean owned-group retirement retained.
 
 - [Pending native accessibility publication](macos-pending-publication/README.md): exact pending-only reuse with full fallback, cache/epoch hardening, differential native regressions and separately scoped native comparison cohorts; ordinary performance and full Mac gates remain open.
+
+- [Current external macOS accessibility](macos-current-external-ax/README.md): read-only Unicode/ranges and palette/canvas tree properties on current framework bytes, with explicit fixture overlays and the original failed collector preserved beside its corrected interpretation.

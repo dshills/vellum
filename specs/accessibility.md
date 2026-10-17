@@ -317,3 +317,11 @@ retains independent ancestor-oracle tests, actual Foundation comparisons,
 negative controls, matched topology benchmarks and a scoped live Cocoa smoke.
 Validation work is outside `FrameMetrics.TotalUIWork`; these results cannot be
 subtracted from the framework's unchanged frame-time targets.
+
+The [current external AX checkpoint](../docs/reports/macos-current-external-ax/README.md)
+checks the editor Unicode/range contract and placement palette/canvas identifiers,
+roles, labels and positive frames through read-only clients on current framework
+bytes. Exact diagnostic overlays and the original failed collector are retained
+with a separately reviewed correction. This is scoped external property evidence;
+physical input, notifications, human IME/VoiceOver and full Mac qualification
+remain separate gates.

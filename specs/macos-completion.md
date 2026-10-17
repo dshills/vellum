@@ -961,3 +961,15 @@ fresh ordinary pair per rendering mode. The earlier five-pair cohort remains
 separate. Neither cohort qualifies the 4/6 ms targets or broad performance
 regression freedom. Physical input, human accessibility, native/GPU memory,
 P4/P6/P9/P11, overnight, interoperability and distribution remain open.
+
+## Current external accessibility checkpoint
+
+The [read-only current-source check](../docs/reports/macos-current-external-ax/README.md)
+verifies external editor Unicode/ranges and native palette/canvas properties.
+Two explicit fixture overlays disable editor geometry persistence and shorten
+the placement deadline; they do not change framework implementation. The raw
+placement collector failure remains preserved, with a separately reviewed
+file-identity/native-ID correction over the same runtime data. This advances
+scoped external AX evidence without qualifying physical placement/key events,
+human accessibility, the earlier CUA timeout cause, performance or full Mac
+completion.
