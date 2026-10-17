@@ -65,3 +65,20 @@ of capture-time metadata across a normal target generation change independently.
 Current macOS acceptance and its scope are recorded in
 [acceptance/README.md](acceptance/README.md), including two passing native runs,
 exact compiler-input hashes, and the preserved failures that led to the final fixes.
+
+## Isolated native fixture geometry
+
+`--smoke` disables backend window-geometry loading and saving before creating the
+application. The process-local setting stays active through native teardown and
+restores its prior value on normal return from `run`. Interactive mode retains
+normal geometry persistence. The native result keeps `result: pass` and adds the
+stable event `vellum.imaging.smoke` plus the actual
+`geometry_persistence_disabled_in_fixture` value. A failure to isolate geometry
+must not be accepted as a qualified unattended run. This flag is not an OS
+preference edit or evidence for private buffer destruction, physical input,
+presentation, sustained performance, native/GPU memory or complete Mac acceptance.
+
+Every post-launch smoke return closes the application and joins the smoke worker
+before restoring the process-local geometry setting. Worker completion follows
+its context cleanup and application-close callback; receiving its result alone
+is not a completion barrier. The outer watchdog remains active during the join.

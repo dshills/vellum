@@ -5,6 +5,8 @@ The [implementation status](../implementation.md) describes the current framewor
 
 - [Isolated native drawing and 3D fixtures](macos-advanced-native/README.md)
 
+- [Key-event publication ownership and native imaging](macos-event-publication/README.md)
+
 - [Clean private SDK native consumer](macos-source-gpu-sdk-native/README.md)
 
 - [Private source-built GPU SDK overlay](macos-source-gpu-sdk/README.md)

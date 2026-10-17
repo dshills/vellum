@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"image"
+	"sync"
 	"testing"
 	"time"
 
@@ -74,6 +75,61 @@ func TestCaptureCompletionNeverBlocksFullDiagnosticMailbox(t *testing.T) {
 			}
 			if len(w.captureResults) != 0 {
 				t.Fatal("new diagnostic retained over full prior slot")
+			}
+		})
+	}
+}
+
+func TestSmokeWorkerCompletionFollowsCleanup(t *testing.T) {
+	for _, scenario := range []string{"success", "failure"} {
+		t.Run(scenario, func(t *testing.T) {
+			workCtx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			cleanupEntered := make(chan struct{})
+			allowCleanup := make(chan struct{})
+			var release sync.Once
+			t.Cleanup(func() { release.Do(func() { close(allowCleanup) }) })
+			cleanupFinished := false
+			want := error(nil)
+			if scenario == "failure" {
+				want = errors.New("native worker failed")
+			}
+			result, done := startSmokeWorker(func() {
+				close(cleanupEntered)
+				<-allowCleanup
+				cleanupFinished = true
+			}, func() error {
+				defer cancel()
+				return want
+			})
+			select {
+			case got := <-result:
+				if got != want || workCtx.Err() == nil {
+					t.Fatalf("result preceded work/context cleanup: got=%v want=%v context=%v", got, want, workCtx.Err())
+				}
+			case <-time.After(2 * time.Second):
+				t.Fatal("worker result unavailable")
+			}
+			select {
+			case <-cleanupEntered:
+			case <-time.After(2 * time.Second):
+				t.Fatal("stop callback not entered")
+			}
+			// The stop callback is now demonstrably blocked. Result delivery must
+			// not have published worker completion before that callback returns.
+			select {
+			case <-done:
+				t.Fatal("worker completion preceded application cleanup")
+			default:
+			}
+			release.Do(func() { close(allowCleanup) })
+			select {
+			case <-done:
+				if !cleanupFinished {
+					t.Fatal("completion did not follow cleanup")
+				}
+			case <-time.After(2 * time.Second):
+				t.Fatal("worker did not join after cleanup")
 			}
 		})
 	}

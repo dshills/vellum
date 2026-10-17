@@ -81,3 +81,16 @@ records four eligible 60-second CPU intervals below 0.5% of one CPU and no prima
 paint wakes. This is sampled short-run acceptance; application-wide wakeups,
 presents, a causal idle gain and overnight qualification remain open. The earlier
 eight-hour attempt failed after its visible phase and six occluded samples.
+
+## Key-event ownership after queue publication
+
+After `Source.Key` publishes the original key through `Deque.Send`, only the
+consumer may mutate or copy that event. The producer derives any following
+chord from its original code, rune and modifier arguments. This includes avoiding
+value-receiver Base methods, which copy fields modified by render dispatch.
+Stage 0077 preserves original-key-before-chord ordering, independent event
+identity, keypad and NumLock rules, modifier handling, producer state and the
+source's injected clock. It does not serialize unrelated producers or change
+queue compression/priority. The joined producer/consumer race regression and
+twelve-case chord matrix provide offscreen evidence; native/physical input
+and broader IME/accessibility qualification remain separate.

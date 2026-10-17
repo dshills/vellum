@@ -649,3 +649,21 @@ checkpoint covers the nine source/test/spec leaves, with internal result/report
 reviews. These are native source-assertion/readback checks; physical interaction,
 presentation, ordinary latency, native/GPU memory, endurance, human input/accessibility,
 rights/public release and full Mac qualification remain open.
+
+The [key-event publication and imaging checkpoint](reports/macos-event-publication/README.md)
+fixes the native race in which Source.Key read an event after queue ownership
+transferred to the render consumer. Stage 0077 uses original code/modifier
+arguments and preserves chord, keypad, NumLock and injected-clock semantics.
+A joined 128-key producer/consumer regression reproduces the old-source race
+and passes with the fix; a twelve-case chord matrix and preparation checks pass.
+The isolated native imaging assertions cover compute/HDR/partial alpha, capture
+lifetime, independent windows, resize/rebuild/minimize and closure, with the
+worker joined before fixture geometry restoration. Original native exit66 and
+the overly broad Unix-socket sandbox failure remain failed. Completed driver
+package outcomes are reused exactly; the entire failed workbench package passes
+under IP denial with Unix IPC allowed. One Anthropic Claude Sonnet 5.5 Prism
+checkpoint covers thirteen source/test/spec leaves, with internal reviews.
+Tests use a fresh pinned 6250-file dependency reconstruction and exact private
+ARM64 static GPU linkage. SDK refresh, physical interaction, presentation,
+ordinary latency, native/GPU memory, endurance, human input/accessibility,
+component/rights closure, public release and full Mac qualification remain open.

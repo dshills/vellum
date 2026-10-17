@@ -184,3 +184,16 @@ using a provisional first layout as the retention baseline; the quiet interval i
 an operational fixture barrier, not a guarantee that all OS work has drained.
 Bounded owner-thread observations retain independent-window state for diagnosis.
 No frame, budget, depth, pixel, fault-repair, resize or closure assertion is waived.
+
+The compute/HDR imaging example applies the same process-only geometry isolation
+in `run(true)` before constructing either fixture window and retains it through
+normal application/native teardown. Its `vellum.imaging.smoke` event reports the
+actual isolation flag without changing the existing native compute, capture,
+minimize, cancellation, resource-isolation or closure assertions. Interactive
+mode retains normal persistence; broader GPU memory and Mac qualification remain
+separate from this fixture policy.
+
+Every post-launch smoke return closes the application and joins the smoke worker
+before restoring the process-local geometry setting. Worker completion follows
+its context cleanup and application-close callback; receiving its result alone
+is not a completion barrier. The outer watchdog remains active during the join.

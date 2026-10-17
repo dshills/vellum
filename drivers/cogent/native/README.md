@@ -215,3 +215,9 @@ guards. The independently bounded index has a saturated-miss cooldown; bitmap
 rendering retains its earlier return. See the
 [owned contract](patches/glyphplacement/README.md) for identity exhaustion,
 ownership, fallback and verification limits.
+
+Stage 77 (`patches/eventpublication`) ends producer reads of a key event after
+queue publication. Chord decisions use immutable input values while the render
+consumer owns mutable event fields. The owned race regression and key/chord
+matrix preserve the original ordering, keypad/NumLock/modifier semantics and
+injected timestamps. See [publication contract](patches/eventpublication/README.md).

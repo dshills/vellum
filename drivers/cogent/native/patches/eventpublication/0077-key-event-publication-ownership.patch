@@ -1,0 +1,144 @@
+--- a/events/source.go
++++ b/events/source.go
+@@ -80,13 +80,16 @@
+ 	es.stamp(&ev.Base)
+ 	es.Deque.Send(ev)
+ 
++	// The consumer now owns ev and may mutate its Base. Use only producer
++	// arguments for chord decisions after publication; even a Base value
++	// receiver would copy concurrently mutable local-offset/handled fields.
+ 	mrn, mapped := key.CodeRuneMap[code]
+ 
+ 	if typ != KeyDown {
+ 		return
+ 	}
+ 
+-	if !ev.HasAnyModifier(key.NumLock) && code >= key.CodeKeypadNumLock && code < key.CodeKeypadEqualSign {
++	if !key.HasAnyModifier(mods, key.NumLock) && code >= key.CodeKeypadNumLock && code < key.CodeKeypadEqualSign {
+ 		if mapped {
+ 			rn = mrn
+ 		}
+@@ -97,7 +100,7 @@
+ 		return
+ 	}
+ 
+-	if ev.Code < key.CodeLeftControl && (ev.HasAnyModifier(key.Control, key.Meta) || !mapped || ev.Code == key.CodeTab) {
++	if code < key.CodeLeftControl && (key.HasAnyModifier(mods, key.Control, key.Meta) || !mapped || code == key.CodeTab) {
+ 		che := NewKey(KeyChord, rn, code, mods)
+ 		che.Init()
+ 		es.stamp(&che.Base)
+--- /dev/null
++++ b/events/source_key_ownership_vellum_test.go
+@@ -0,0 +1,112 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package events
++
++import (
++	"image"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/events/key"
++)
++
++func TestSourceKeyPublicationOwnership(t *testing.T) {
++	// An ordinary mapped key produces no chord and therefore no second queue
++	// lock that could order the producer's old post-publication Base read.
++	// Acknowledge each consumed event to keep at most one event in flight.
++	const count = 128
++	var source Source
++	consumed := make(chan Event, 2*count)
++	done := make(chan struct{})
++	stop := NewKey(KeyUp, 0, key.CodeUnknown, 0)
++	go func() {
++		defer close(done)
++		for {
++			ev := source.Deque.NextEvent()
++			if ev == stop {
++				return
++			}
++			// These are normal render-consumer mutations after queue ownership
++			// transfers; the producer must no longer copy/read this Base.
++			ev.SetLocalOff(image.Pt(17, 29))
++			ev.SetHandled()
++			consumed <- ev
++		}
++	}()
++	defer func() {
++		source.Deque.Send(stop)
++		<-done
++	}()
++	for i := 0; i < count; i++ {
++		source.Key(KeyDown, 'a', key.CodeA, 0)
++		select {
++		case ev := <-consumed:
++			if ev.Type() != KeyDown || ev.LocalOff() != image.Pt(17, 29) || !ev.IsHandled() {
++				t.Fatalf("consumer event %d: %v", i, ev)
++			}
++		case <-time.After(5 * time.Second):
++			t.Fatal("consumer did not receive published key")
++		}
++	}
++	if _, ok := source.Deque.PollEvent(); ok {
++		t.Fatal("ordinary key unexpectedly generated an extra event")
++	}
++}
++
++func TestSourceKeyChordSemantics(t *testing.T) {
++	mod := func(m key.Modifiers) key.Modifiers { return 1 << m }
++	for _, c := range []struct {
++		name      string
++		typ       Types
++		rn        rune
++		code      key.Codes
++		mods      key.Modifiers
++		chord     bool
++		chordRune rune
++	}{
++		{"letter", KeyDown, 'a', key.CodeA, 0, false, 0},
++		{"shift-letter", KeyDown, 'A', key.CodeA, mod(key.Shift), false, 0},
++		{"control-letter", KeyDown, 'a', key.CodeA, mod(key.Control), true, 'a'},
++		{"meta-letter", KeyDown, 'a', key.CodeA, mod(key.Meta), true, 'a'},
++		{"alt-letter", KeyDown, 'å', key.CodeA, mod(key.Alt), false, 0},
++		{"tab", KeyDown, '\t', key.CodeTab, 0, true, '\t'},
++		{"unmapped", KeyDown, 0, key.CodeF1, 0, true, 0},
++		{"key-up", KeyUp, 'a', key.CodeA, mod(key.Control), false, 0},
++		{"modifier", KeyDown, 0, key.CodeLeftControl, mod(key.Control), false, 0},
++		{"keypad-navigation", KeyDown, 0, key.CodeKeypad1, 0, true, '1'},
++		{"keypad-num-lock", KeyDown, '1', key.CodeKeypad1, mod(key.NumLock), false, 0},
++		{"keypad-num-control", KeyDown, '1', key.CodeKeypad1, mod(key.NumLock) | mod(key.Control), true, '1'},
++	} {
++		t.Run(c.name, func(t *testing.T) {
++			var source Source
++			now := time.Unix(17, 23)
++			source.Now = func() time.Time { return now }
++			source.Key(c.typ, c.rn, c.code, c.mods)
++			event, ok := source.Deque.PollEvent()
++			if !ok {
++				t.Fatal("missing original key")
++			}
++			original := event.(*Key)
++			if original.Type() != c.typ || original.Rune != c.rn || original.Code != c.code || original.Mods != c.mods || !original.Time().Equal(now) {
++				t.Fatalf("original key changed: %+v", original)
++			}
++			event, ok = source.Deque.PollEvent()
++			if ok != c.chord {
++				t.Fatalf("chord presence = %v, want %v", ok, c.chord)
++			}
++			if c.chord {
++				chord := event.(*Key)
++				if chord.Type() != KeyChord || chord.Rune != c.chordRune || chord.Code != c.code || chord.Mods != c.mods || !chord.Time().Equal(now) || chord == original {
++					t.Fatalf("chord changed: %+v", chord)
++				}
++			}
++			if _, ok := source.Deque.PollEvent(); ok {
++				t.Fatal("unexpected third event")
++			}
++			if source.Last.Key != c.code || source.Last.Mods != c.mods {
++				t.Fatalf("producer state changed: %+v", source.Last)
++			}
++		})
++	}
++}

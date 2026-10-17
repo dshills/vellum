@@ -170,7 +170,27 @@ func (w *imageWindow) save(ctx context.Context, img *image.NRGBA) {
 		_ = w.application.Invalidate(w.view.Window)
 	})
 }
+
+// Result publication is distinct from complete worker/application cleanup.
+// The outer smoke watchdog remains active if shutdown or a worker gets stuck.
+func startSmokeWorker(stop func(), work func() error) (<-chan error, <-chan struct{}) {
+	result := make(chan error, 1)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		defer stop()
+		result <- work()
+	}()
+	return result, done
+}
+
 func run(smoke bool) error {
+	if smoke {
+		// Keep fixture geometry isolated through application/native teardown.
+		previousGeometrySaver := core.DebugSettings.DisableWindowGeometrySaver
+		core.DebugSettings.DisableWindowGeometrySaver = true
+		defer func() { core.DebugSettings.DisableWindowGeometrySaver = previousGeometrySaver }()
+	}
 	a, err := app.New(app.Config{})
 	if err != nil {
 		return err
@@ -181,17 +201,23 @@ func run(smoke bool) error {
 	if first.windowRef, err = a.OpenWindow(spec); err != nil {
 		return err
 	}
-	result := make(chan error, 1)
+	var result <-chan error
 	if smoke {
 		second, other := newImageWindow(a, "imaging-other", false, nativeErrors)
 		if second.windowRef, err = a.OpenWindow(other); err != nil {
 			return err
 		}
-		go func() {
+		var workerDone <-chan struct{}
+		result, workerDone = startSmokeWorker(a.Close, func() error {
 			ctx, cancel := context.WithTimeout(a.Context(), 50*time.Second)
 			defer cancel()
-			result <- imagingSmoke(ctx, a, first, second, nativeErrors)
+			return imagingSmoke(ctx, a, first, second, nativeErrors)
+		})
+		defer func() {
+			// On native failure, cancel owner/window work before waiting. Joining
+			// covers every post-launch return and precedes geometry restoration.
 			a.Close()
+			<-workerDone
 		}()
 	}
 	runErr := a.Run(context.Background(), cogent.Driver{})

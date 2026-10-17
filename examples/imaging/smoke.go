@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/system"
 	"cogentcore.org/core/system/driver/desktop"
 	"github.com/dshills/vellum/app"
@@ -495,7 +496,7 @@ func imagingSmoke(ctx context.Context, a *app.Application, first, second *imageW
 			return e
 		}
 		if s.Frames != independent.Frames || s.BufferAllocations != independent.BufferAllocations {
-			return errors.New("first window modified independent resources")
+			return fmt.Errorf("first window modified independent resources: initial=%+v final=%+v", independent, s)
 		}
 		return nil
 	}); err != nil {
@@ -595,5 +596,5 @@ func imagingSmoke(ctx context.Context, a *app.Application, first, second *imageW
 	if dropped.Load() != 0 {
 		return errors.New("lifetime cancellation delivered capture")
 	}
-	return json.NewEncoder(os.Stdout).Encode(map[string]any{"result": "pass", "compute": "256² storage -> single-sample RGBA16Float -> premultiplied tone-mapped sRGB", "exposure1": referencePixel(1, false, false), "exposure2": referencePixel(2, false, false), "transparentTop": true, "nativeAdmissionRefusals": true, "explicitSyncThenAsync": true, "partialAlpha": true, "initial": initial, "chrome": chrome, "exposure": exposed, "resized": resized, "capturedFrameBeforeResize": firstCapture.Frame, "oldCaptureMetadata": map[string]uint64{"Frame": old.snapshot.Frame, "Revision": old.snapshot.Revision, "ResourceGeneration": old.snapshot.ResourceGeneration, "TargetGeneration": old.snapshot.TargetGeneration}, "deliveryAfterResize": old.current.TargetGeneration > old.snapshot.TargetGeneration, "rebuilt": rebuilt, "minimized": minimizedAfter, "busyInsideCallback": true, "independentResources": true, "quietCancelRebuildClose": true, "normalClose": map[string]any{"nativeClosed": true, "nativeDrawingLockRefused": true, "windowLifetimeCanceled": true, "appLifetimeCanceled": true, "unregistered": true, "programReleased": true, "callbackCount": dropped.Load(), "privateSnapshotCleanup": "not measured by public consumer"}, "forceCloseDomainCleanup": "explicit CloseWindow after native closure", "forceClose": "no callback, closed Stats unavailable, survivor capture passes; private reservation control flow covered by adapter regression; buffer ownership reviewed"})
+	return json.NewEncoder(os.Stdout).Encode(map[string]any{"event": "vellum.imaging.smoke", "geometry_persistence_disabled_in_fixture": core.DebugSettings.DisableWindowGeometrySaver, "result": "pass", "compute": "256² storage -> single-sample RGBA16Float -> premultiplied tone-mapped sRGB", "exposure1": referencePixel(1, false, false), "exposure2": referencePixel(2, false, false), "transparentTop": true, "nativeAdmissionRefusals": true, "explicitSyncThenAsync": true, "partialAlpha": true, "initial": initial, "chrome": chrome, "exposure": exposed, "resized": resized, "capturedFrameBeforeResize": firstCapture.Frame, "oldCaptureMetadata": map[string]uint64{"Frame": old.snapshot.Frame, "Revision": old.snapshot.Revision, "ResourceGeneration": old.snapshot.ResourceGeneration, "TargetGeneration": old.snapshot.TargetGeneration}, "deliveryAfterResize": old.current.TargetGeneration > old.snapshot.TargetGeneration, "rebuilt": rebuilt, "minimized": minimizedAfter, "busyInsideCallback": true, "independentResources": true, "quietCancelRebuildClose": true, "normalClose": map[string]any{"nativeClosed": true, "nativeDrawingLockRefused": true, "windowLifetimeCanceled": true, "appLifetimeCanceled": true, "unregistered": true, "programReleased": true, "callbackCount": dropped.Load(), "privateSnapshotCleanup": "not measured by public consumer"}, "forceCloseDomainCleanup": "explicit CloseWindow after native closure", "forceClose": "no callback, closed Stats unavailable, survivor capture passes; private reservation control flow covered by adapter regression; buffer ownership reviewed"})
 }

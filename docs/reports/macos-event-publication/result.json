@@ -1,0 +1,631 @@
+{
+  "result": "PASS_STAGE_0077_AND_NATIVE_IMAGING",
+  "source_commit": "e96f642fd1a3620ff16ca7858f991a421fcf5fda",
+  "source_state": "thirteen exact reviewed source/test/spec leaves before commit",
+  "new_sdk_archive": false,
+  "sdk_baseline_counterparts": 7027,
+  "compiled_stage_0077_separately_bound": true,
+  "reused_reconstructed_prepared_files": 6250,
+  "checkout_preparation": "separate postcommit receipt; checkout prepared trees unchanged during tests",
+  "binary": {
+    "name": "imaging",
+    "path": "/private/tmp/vellum-event-transport-e96f642/imaging",
+    "bytes": 68806914,
+    "sha256": "4fcdf59bcfbe85f39f89c93f25c5364144fd6b35b426fd54f8c32467218b941e",
+    "linkmap": {
+      "path": "/private/tmp/vellum-event-transport-e96f642/imaging.linkmap",
+      "bytes": 13139015,
+      "sha256": "30a858a53f5abd756a188a415fa5310353d3490728eaa4f9414ea64b8da38da7"
+    },
+    "private_static_members": 141,
+    "package_count": 487,
+    "race": true,
+    "minimum_macos": "13.0"
+  },
+  "native_record": {
+    "busyInsideCallback": true,
+    "capturedFrameBeforeResize": 2,
+    "chrome": {
+      "Ready": true,
+      "SnapshotPending": false,
+      "AsyncReadbackBytes": 0,
+      "AsyncSnapshotRequests": 1,
+      "AsyncSnapshotCompleted": 1,
+      "AsyncSnapshotCanceled": 0,
+      "AsyncSnapshotPolls": 2,
+      "RenderVisits": 5,
+      "Frames": 2,
+      "Prepares": 2,
+      "Draws": 2,
+      "SnapshotReadbacks": 1,
+      "ResourceGeneration": 0,
+      "TargetGeneration": 2,
+      "TargetBytes": 8506080,
+      "BufferBytes": 1048608,
+      "TextureBytes": 524288,
+      "ReadbackBytes": 1787136,
+      "HelperUploads": 2,
+      "HelperUploadBytes": 64,
+      "BufferAllocations": 2,
+      "TextureAllocations": 1,
+      "Size": {
+        "X": 792,
+        "Y": 537
+      }
+    },
+    "compute": "256\u00b2 storage -> single-sample RGBA16Float -> premultiplied tone-mapped sRGB",
+    "deliveryAfterResize": true,
+    "event": "vellum.imaging.smoke",
+    "explicitSyncThenAsync": true,
+    "exposure": {
+      "Ready": true,
+      "SnapshotPending": false,
+      "AsyncReadbackBytes": 0,
+      "AsyncSnapshotRequests": 1,
+      "AsyncSnapshotCompleted": 1,
+      "AsyncSnapshotCanceled": 0,
+      "AsyncSnapshotPolls": 2,
+      "RenderVisits": 6,
+      "Frames": 3,
+      "Prepares": 3,
+      "Draws": 3,
+      "SnapshotReadbacks": 1,
+      "ResourceGeneration": 0,
+      "TargetGeneration": 2,
+      "TargetBytes": 8506080,
+      "BufferBytes": 1048608,
+      "TextureBytes": 524288,
+      "ReadbackBytes": 1787136,
+      "HelperUploads": 3,
+      "HelperUploadBytes": 96,
+      "BufferAllocations": 2,
+      "TextureAllocations": 1,
+      "Size": {
+        "X": 792,
+        "Y": 537
+      }
+    },
+    "exposure1": {
+      "R": 213,
+      "G": 156,
+      "B": 0,
+      "A": 128
+    },
+    "exposure2": {
+      "R": 231,
+      "G": 188,
+      "B": 0,
+      "A": 128
+    },
+    "forceClose": "no callback, closed Stats unavailable, survivor capture passes; private reservation control flow covered by adapter regression; buffer ownership reviewed",
+    "forceCloseDomainCleanup": "explicit CloseWindow after native closure",
+    "geometry_persistence_disabled_in_fixture": true,
+    "independentResources": true,
+    "initial": {
+      "Ready": true,
+      "SnapshotPending": false,
+      "AsyncReadbackBytes": 0,
+      "AsyncSnapshotRequests": 0,
+      "AsyncSnapshotCompleted": 0,
+      "AsyncSnapshotCanceled": 0,
+      "AsyncSnapshotPolls": 0,
+      "RenderVisits": 4,
+      "Frames": 2,
+      "Prepares": 2,
+      "Draws": 2,
+      "SnapshotReadbacks": 0,
+      "ResourceGeneration": 0,
+      "TargetGeneration": 2,
+      "TargetBytes": 8506080,
+      "BufferBytes": 1048608,
+      "TextureBytes": 524288,
+      "ReadbackBytes": 0,
+      "HelperUploads": 2,
+      "HelperUploadBytes": 64,
+      "BufferAllocations": 2,
+      "TextureAllocations": 1,
+      "Size": {
+        "X": 792,
+        "Y": 537
+      }
+    },
+    "minimized": {
+      "Ready": true,
+      "SnapshotPending": false,
+      "AsyncReadbackBytes": 0,
+      "AsyncSnapshotRequests": 10,
+      "AsyncSnapshotCompleted": 8,
+      "AsyncSnapshotCanceled": 2,
+      "AsyncSnapshotPolls": 17,
+      "RenderVisits": 12,
+      "Frames": 7,
+      "Prepares": 7,
+      "Draws": 7,
+      "SnapshotReadbacks": 1,
+      "ResourceGeneration": 1,
+      "TargetGeneration": 5,
+      "TargetBytes": 10389960,
+      "BufferBytes": 1048608,
+      "TextureBytes": 524288,
+      "ReadbackBytes": 0,
+      "HelperUploads": 7,
+      "HelperUploadBytes": 224,
+      "BufferAllocations": 4,
+      "TextureAllocations": 2,
+      "Size": {
+        "X": 882,
+        "Y": 589
+      }
+    },
+    "nativeAdmissionRefusals": true,
+    "normalClose": {
+      "appLifetimeCanceled": true,
+      "callbackCount": 0,
+      "nativeClosed": true,
+      "nativeDrawingLockRefused": true,
+      "privateSnapshotCleanup": "not measured by public consumer",
+      "programReleased": true,
+      "unregistered": true,
+      "windowLifetimeCanceled": true
+    },
+    "oldCaptureMetadata": {
+      "Frame": 4,
+      "ResourceGeneration": 0,
+      "Revision": 2,
+      "TargetGeneration": 2
+    },
+    "partialAlpha": true,
+    "quietCancelRebuildClose": true,
+    "rebuilt": {
+      "Ready": true,
+      "SnapshotPending": false,
+      "AsyncReadbackBytes": 0,
+      "AsyncSnapshotRequests": 8,
+      "AsyncSnapshotCompleted": 6,
+      "AsyncSnapshotCanceled": 2,
+      "AsyncSnapshotPolls": 13,
+      "RenderVisits": 12,
+      "Frames": 7,
+      "Prepares": 7,
+      "Draws": 7,
+      "SnapshotReadbacks": 1,
+      "ResourceGeneration": 1,
+      "TargetGeneration": 5,
+      "TargetBytes": 10389960,
+      "BufferBytes": 1048608,
+      "TextureBytes": 524288,
+      "ReadbackBytes": 0,
+      "HelperUploads": 7,
+      "HelperUploadBytes": 224,
+      "BufferAllocations": 4,
+      "TextureAllocations": 2,
+      "Size": {
+        "X": 882,
+        "Y": 589
+      }
+    },
+    "resized": {
+      "Ready": true,
+      "SnapshotPending": true,
+      "AsyncReadbackBytes": 0,
+      "AsyncSnapshotRequests": 5,
+      "AsyncSnapshotCompleted": 4,
+      "AsyncSnapshotCanceled": 0,
+      "AsyncSnapshotPolls": 10,
+      "RenderVisits": 10,
+      "Frames": 6,
+      "Prepares": 6,
+      "Draws": 6,
+      "SnapshotReadbacks": 1,
+      "ResourceGeneration": 0,
+      "TargetGeneration": 3,
+      "TargetBytes": 10389960,
+      "BufferBytes": 1048608,
+      "TextureBytes": 524288,
+      "ReadbackBytes": 0,
+      "HelperUploads": 6,
+      "HelperUploadBytes": 192,
+      "BufferAllocations": 2,
+      "TextureAllocations": 1,
+      "Size": {
+        "X": 882,
+        "Y": 589
+      }
+    },
+    "result": "pass",
+    "transparentTop": true
+  },
+  "runs": [
+    {
+      "phase": "native-race",
+      "name": "imaging-modules",
+      "exit_code": 0,
+      "group": 44962,
+      "seconds": 2.5201270000543445
+    },
+    {
+      "phase": "native-race",
+      "name": "imaging-sources",
+      "exit_code": 0,
+      "group": 44984,
+      "seconds": 3.3291612080065534
+    },
+    {
+      "phase": "native-race",
+      "name": "imaging-race",
+      "exit_code": 0,
+      "group": 45029,
+      "seconds": 43.00186483399011
+    },
+    {
+      "phase": "native-race",
+      "name": "imaging-vet",
+      "exit_code": 0,
+      "group": 47091,
+      "seconds": 31.939326042076573
+    },
+    {
+      "phase": "native-race",
+      "name": "imaging-compile",
+      "exit_code": 0,
+      "group": 48964,
+      "seconds": 6.170414959080517
+    },
+    {
+      "phase": "native-race",
+      "name": "imaging-links",
+      "exit_code": 0,
+      "group": 49028,
+      "seconds": 2.76933358295355
+    },
+    {
+      "phase": "native-race",
+      "name": "imaging-load",
+      "exit_code": 0,
+      "group": 49062,
+      "seconds": 2.7998438340146095
+    },
+    {
+      "phase": "native-race",
+      "name": "imaging-metadata",
+      "exit_code": 0,
+      "group": 49076,
+      "seconds": 2.7522372499806806
+    },
+    {
+      "phase": "native-race",
+      "name": "native-imaging",
+      "exit_code": 66,
+      "group": 50388,
+      "seconds": 4.636388957966119
+    },
+    {
+      "phase": "unix-denial",
+      "name": "prepare-modules",
+      "exit_code": 0,
+      "group": 57864,
+      "seconds": 4.653838291065767
+    },
+    {
+      "phase": "unix-denial",
+      "name": "events-sources",
+      "exit_code": 0,
+      "group": 57996,
+      "seconds": 3.152019124943763
+    },
+    {
+      "phase": "unix-denial",
+      "name": "events-old-source-control",
+      "exit_code": 1,
+      "group": 58016,
+      "seconds": 9.620308791985735
+    },
+    {
+      "phase": "unix-denial",
+      "name": "events-race",
+      "exit_code": 0,
+      "group": 58452,
+      "seconds": 8.313319416949525
+    },
+    {
+      "phase": "unix-denial",
+      "name": "events-vet",
+      "exit_code": 0,
+      "group": 58814,
+      "seconds": 10.688848207937554
+    },
+    {
+      "phase": "unix-denial",
+      "name": "preparation-tests",
+      "exit_code": 0,
+      "group": 59523,
+      "seconds": 3.4502583750290796
+    },
+    {
+      "phase": "unix-denial",
+      "name": "driver-modules",
+      "exit_code": 0,
+      "group": 59548,
+      "seconds": 3.403497042017989
+    },
+    {
+      "phase": "unix-denial",
+      "name": "driver-sources",
+      "exit_code": 0,
+      "group": 59628,
+      "seconds": 3.8968124160310254
+    },
+    {
+      "phase": "unix-denial",
+      "name": "driver-race",
+      "exit_code": 1,
+      "group": 59751,
+      "seconds": 331.2727137079928
+    },
+    {
+      "phase": "current",
+      "name": "driver-modules",
+      "exit_code": 0,
+      "group": 68312,
+      "seconds": 3.2456017920048907
+    },
+    {
+      "phase": "current",
+      "name": "driver-sources",
+      "exit_code": 0,
+      "group": 68342,
+      "seconds": 3.686633958015591
+    },
+    {
+      "phase": "current",
+      "name": "driver-workbench-race",
+      "exit_code": 0,
+      "group": 68368,
+      "seconds": 51.243850541999564
+    },
+    {
+      "phase": "current",
+      "name": "driver-vet",
+      "exit_code": 0,
+      "group": 70411,
+      "seconds": 34.55380424996838
+    },
+    {
+      "phase": "current",
+      "name": "imaging-modules",
+      "exit_code": 0,
+      "group": 72552,
+      "seconds": 3.3251861670287326
+    },
+    {
+      "phase": "current",
+      "name": "imaging-sources",
+      "exit_code": 0,
+      "group": 72637,
+      "seconds": 3.5461997910169885
+    },
+    {
+      "phase": "current",
+      "name": "imaging-race",
+      "exit_code": 0,
+      "group": 72675,
+      "seconds": 17.903564292006195
+    },
+    {
+      "phase": "current",
+      "name": "imaging-vet",
+      "exit_code": 0,
+      "group": 72877,
+      "seconds": 13.104070625035092
+    },
+    {
+      "phase": "current",
+      "name": "imaging-compile",
+      "exit_code": 0,
+      "group": 73531,
+      "seconds": 6.388732459046878
+    },
+    {
+      "phase": "current",
+      "name": "imaging-links",
+      "exit_code": 0,
+      "group": 73595,
+      "seconds": 3.3623921669786796
+    },
+    {
+      "phase": "current",
+      "name": "imaging-load",
+      "exit_code": 0,
+      "group": 73626,
+      "seconds": 3.387170000001788
+    },
+    {
+      "phase": "current",
+      "name": "imaging-metadata",
+      "exit_code": 0,
+      "group": 73650,
+      "seconds": 3.451246791984886
+    },
+    {
+      "phase": "current",
+      "name": "native-imaging",
+      "exit_code": 0,
+      "group": 75299,
+      "seconds": 6.990980667062104
+    }
+  ],
+  "donor_event_and_driver_review_sha256": "e81ee2fa52f15a79cb4bcfc475dc909a0ca014e92e693e34e14d8d89586bec06",
+  "provider": {
+    "result": "COMPLETE_SCOPED_PROVIDER_REVIEW",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "argv": [
+      "/Users/dshills/Development/Go/bin/prism",
+      "review",
+      "staged",
+      "--provider",
+      "anthropic",
+      "--model",
+      "claude-sonnet-5-5",
+      "--reasoning-effort",
+      "low",
+      "--max-findings",
+      "5",
+      "--baseline",
+      "none",
+      "--min-severity",
+      "medium",
+      "--fail-on",
+      "medium",
+      "--no-auto-exclude",
+      "--no-function-context",
+      "--chunk-bytes",
+      "120000",
+      "--max-diff-bytes",
+      "120000",
+      "--paths",
+      "examples/imaging/main.go,examples/imaging/smoke.go,examples/imaging/README.md,specs/advanced-gpu.md,examples/imaging/main_test.go,drivers/cogent/native/patches/eventpublication/0077-key-event-publication-ownership.patch,drivers/cogent/native/patches/eventpublication/original-hashes.json,drivers/cogent/native/patches/eventpublication/output-hashes.json,drivers/cogent/native/patches/eventpublication/README.md,drivers/cogent/native/dependencies.json,drivers/cogent/prepare_test.py,drivers/cogent/native/README.md,specs/native-dispatch.md",
+      "--rules",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-event-transport-e96f642/prism-rules.json",
+      "--format",
+      "json",
+      "--out",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-event-transport-e96f642/prism/prism.json"
+    ],
+    "staged_diff_bytes": 22910,
+    "staged_diff_sha256": "fe85d1d27f4cce6411e8ea0346fd95bb1760fad4246a90c4fb935e61780265d3",
+    "producer_sha256": "fb348bee649329b0da5444faba40f09e1ff73847e1610fdb5f1e0b7d71408d30",
+    "binary_sha256": "5575dd1fc360a719a32f27e49a5a208ba60ff810957e20cf7d19322c54eaf285",
+    "readiness_sha256": "ea0bf3b5e282fc1060a4818e727208967c39f01b8d06385b86fbcddd3007d94c",
+    "error": null,
+    "finalization_errors": [],
+    "exit_code": 1,
+    "created": true,
+    "owned": {
+      "created": true,
+      "pid": 77213,
+      "group": 77213,
+      "terminal": true,
+      "group_absent": true,
+      "exit_code": 1,
+      "errors": [],
+      "observation": {
+        "group": 77213,
+        "members": [],
+        "observation_sha256": "d6306975c88073fa3aa7d4dffec5289e75cbfbd90fb90d451d7f5e2963f6b088"
+      }
+    },
+    "pid": 77213,
+    "group": 77213,
+    "logs": {
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "findings": 1,
+    "coverage": {
+      "reviewer": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5"
+        }
+      ],
+      "files": 13,
+      "bytes": 22910,
+      "chunks": 1,
+      "llmCalls": 1,
+      "cacheHit": false,
+      "cachedChunks": 0,
+      "tokens": [
+        {
+          "provider": "anthropic",
+          "model": "claude-sonnet-5-5",
+          "input": 13303,
+          "output": 337,
+          "costUSD": 0.029976
+        }
+      ],
+      "excluded": [],
+      "truncatedBytes": 0,
+      "skipped": [],
+      "complete": true
+    },
+    "report_sha256": "4193f0f6662d400761c1e22808ea652d9a9776f30822875af89055bba666197a",
+    "seconds": 7.333152291015722,
+    "completed_utc": "2026-10-17T14:54:36.132489+00:00"
+  },
+  "provider_assessment_sha256": "805dd838964703c2b00cd193b64aab811556e64485d635eb2fb7f0b7d11a3361",
+  "provider_finding_dispositions": [
+    {
+      "change_required": false,
+      "disposition": "refuted-for-current-cli-acceptance-scope",
+      "evidence": [
+        {
+          "fact": "Completion closes after work and deferred stop; result publication differs from completed cleanup.",
+          "lines": "174-184",
+          "path": "/private/tmp/vellum-macos-native-results-97aee13/examples/imaging/main.go"
+        },
+        {
+          "fact": "Smoke geometry restoration is registered first; every post-worker-launch normal return joins before restoration.",
+          "lines": "187-221",
+          "path": "/private/tmp/vellum-macos-native-results-97aee13/examples/imaging/main.go"
+        },
+        {
+          "fact": "main registers AfterFunc before run and defers Stop in the caller; join cannot deactivate that watchdog.",
+          "lines": "242-253",
+          "path": "/private/tmp/vellum-macos-native-results-97aee13/examples/imaging/main.go"
+        },
+        {
+          "fact": "AfterFunc invokes callback in its own goroutine.",
+          "lines": "173-182",
+          "path": "/opt/homebrew/Cellar/go/1.27.2/libexec/src/time/sleep.go"
+        },
+        {
+          "fact": "Exact native invocation uses timeout=75 and bounded logs through the independent owned executor.",
+          "lines": "133-146",
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-event-transport-e96f642/run.py"
+        },
+        {
+          "fact": "Executor checks a monotonic watchdog while pumping logs and always invokes owned retirement.",
+          "lines": "77-107",
+          "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/run.py"
+        }
+      ],
+      "id": "db597df6800a1515",
+      "raw_confidence": 0.6,
+      "raw_severity": "medium",
+      "raw_status": "retained",
+      "reason": "The suggestion permits confirming watchdog coverage. The only actual run call is main, which starts the 60-second AfterFunc before calling run. main cannot execute its deferred watchdog.Stop until run and all run defers, including a.Close and workerDone join, have returned. The callback runs in a separate Go goroutine. The admitted native controller independently enforces a 75-second owned-process watchdog. A blocked join remains covered by fatal failure protection for this CLI/controller path.",
+      "recommendation": "Retain the mandatory completion join. A timeout that merely returns before worker completion would restore process-only geometry state with live worker activity, recreating the earlier lifecycle defect. Fatal watchdog exit remains a failed run, not normal cleanup acceptance."
+    }
+  ],
+  "raw_provider_cli_exit_code": 1,
+  "unresolved_provider_findings": [],
+  "report_review_sha256": "3c46c8fbaab7946396f5cb294765715e46d4138c77a34cba6f5c4e490a6a603c",
+  "distinct_summary_control_cases": 8,
+  "summary_controls_reexecuted_without_recount": true,
+  "new_regression_roots": 3,
+  "worker_subcases": 2,
+  "chord_subcases": 12,
+  "acknowledged_keys": 128,
+  "guard_controls_reused": 27,
+  "original_failed_endpoints_preserved": true,
+  "old_source_negative_control_expected_failure": true,
+  "driver_full_command_remains_failed": true,
+  "successful_driver_outcomes_reused_only_as_package_scoped_evidence": true,
+  "failed_workbench_package_rerun_whole": true,
+  "supplementary_native_sample": "one unsymbolized sample; no causal or timing inference",
+  "settings_changes": false,
+  "physical_input_generated": false,
+  "presentation_qualified": false,
+  "ordinary_frame_latency_qualified": false,
+  "native_gpu_memory_qualified": false,
+  "endurance_qualified": false,
+  "full_macos_qualified": false,
+  "public_distribution_qualified": false
+}
