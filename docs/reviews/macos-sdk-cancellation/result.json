@@ -1,0 +1,129 @@
+{
+  "result": "M1_SOURCE_CHECKPOINT_ACCEPTED",
+  "base_commit": "d9d92a03b5dd247780017e71ee4722a88de7e63c",
+  "tested_python": {
+    "scripts/child_process.py": "f907c7c6ce54871c9693be9fd8a9088cf09bd22cabc4e48d3abc7191f75bc7e6",
+    "scripts/child_process_test.py": "5da0a31e8ae6c50775672d8e5c41da9b476a74e18f4e9833a30bca07f7a2a477"
+  },
+  "tests": [
+    {
+      "name": "child-tests",
+      "result": "PASS",
+      "test_methods": 16,
+      "seconds": 3.299,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "0b4ee9691ec60862eb933495fda50d8d151a12925ecb0e23fe1263ecd4132016"
+    },
+    {
+      "name": "build-macos",
+      "result": "PASS",
+      "test_methods": 11,
+      "seconds": 0.101,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d5095b239359d2594b057c065ce365ce140413f6dccdc046d5fe5391d8a2d866"
+    },
+    {
+      "name": "release-sdk",
+      "result": "PASS",
+      "test_methods": 29,
+      "seconds": 1.424,
+      "stdout_sha256": "eee053661f0afc8e2deeaf39391ec69c8da0a3b2009e5a55310e68a136398898",
+      "stderr_sha256": "e7a8abe6f6f337110fbfe21c7a910653fb22c0d155b8bed6c2b0118bf63c686c"
+    },
+    {
+      "name": "check-sdk",
+      "result": "PASS",
+      "test_methods": 24,
+      "seconds": 0.106,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "dc3105eef9f1f17e5a91c058ea414e27f7b407a346098c77b27c2526f8140856"
+    },
+    {
+      "name": "package-app",
+      "result": "PASS",
+      "test_methods": 16,
+      "seconds": 0.062,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4d1f5dacec429efb0c5ee14b495d9cb830d2e549a6710cdc9b92af389b3567e"
+    },
+    {
+      "name": "distribution-inventory",
+      "result": "PASS",
+      "test_methods": 11,
+      "seconds": 0.053,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e607e96577e89de6faace24a5b0738ef35ef10461822faf24ab3c9de00b167e2"
+    }
+  ],
+  "total_test_methods": 107,
+  "actual_signal_stage_mode_combinations": 12,
+  "restoration_boundary_cases": 1,
+  "counterfactual": {
+    "original_creation_source": "EXPECTED_FAILED_4_LIVE_CHILD_SUBCASES",
+    "pre_review_restoration_order": "EXPECTED_FAILED_STRANDED_SIGTERM"
+  },
+  "prism": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "coverage_complete": true,
+    "reviewed_files": 3,
+    "reviewed_diff_bytes": 22064,
+    "reviewed_diff_sha256": "52c2538f82dec3e1c71ee172dd5e727ae80db21134c9f2761842854e3e94cb2d",
+    "exit_code": 1,
+    "raw_medium_findings": 1,
+    "finding_id": "2b57f063be7ba84e",
+    "assessment": "Independent review confirms intentional preservation of the original cleanup error. Contract clarified; implementation unchanged; no second provider call."
+  },
+  "contract_sha256": "1302fbbb51e859be96c19bfddbedf9776934d8ce9b682f131de8e134f1d278be",
+  "artifacts": {
+    "final-child-tests.stderr": {
+      "bytes": 2307,
+      "sha256": "0b4ee9691ec60862eb933495fda50d8d151a12925ecb0e23fe1263ecd4132016"
+    },
+    "final-build-macos.stderr": {
+      "bytes": 110,
+      "sha256": "d5095b239359d2594b057c065ce365ce140413f6dccdc046d5fe5391d8a2d866"
+    },
+    "final-release-sdk.stderr": {
+      "bytes": 128,
+      "sha256": "e7a8abe6f6f337110fbfe21c7a910653fb22c0d155b8bed6c2b0118bf63c686c"
+    },
+    "final-check-sdk.stderr": {
+      "bytes": 123,
+      "sha256": "dc3105eef9f1f17e5a91c058ea414e27f7b407a346098c77b27c2526f8140856"
+    },
+    "final-package-app.stderr": {
+      "bytes": 115,
+      "sha256": "c4d1f5dacec429efb0c5ee14b495d9cb830d2e549a6710cdc9b92af389b3567e"
+    },
+    "final-distribution-inventory.stderr": {
+      "bytes": 110,
+      "sha256": "e607e96577e89de6faace24a5b0738ef35ef10461822faf24ab3c9de00b167e2"
+    },
+    "final-release-sdk.stdout": {
+      "bytes": 264,
+      "sha256": "eee053661f0afc8e2deeaf39391ec69c8da0a3b2009e5a55310e68a136398898"
+    },
+    "restoration-control.stderr": {
+      "bytes": 1346,
+      "sha256": "84c6ffa26c2193f24973f7053ab38c9fc064465b6555bc3990e1537d4d8447d5"
+    },
+    "prism.json": {
+      "bytes": 2815,
+      "sha256": "6d7b150c273cd11b309cd5e3286f0c986d358f5e2e83bb0509f85423b3a108c0"
+    },
+    "counterfactual.stderr.gz": {
+      "bytes": 561,
+      "sha256": "62f1888f59b1106087cd1d6fcdf51ab62fcf4425896cf920c9409c295eea0b0f"
+    }
+  },
+  "native_ui_executed": false,
+  "runtime_go_changed": false,
+  "existing_sdk_archive_changed": false,
+  "full_mac_complete": false,
+  "counterfactual_original_log": {
+    "bytes": 5765,
+    "sha256": "23175979cbaa10db6d6327bf44b38ea38fe9369f55df1263fc6c2800253c5214"
+  }
+}

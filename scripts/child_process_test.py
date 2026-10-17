@@ -140,4 +140,197 @@ class ChildChecks(unittest.TestCase):
                 process.kill.assert_not_called()
                 self.assertEqual(process.communicate.call_args.kwargs["timeout"], child.CLEANUP_TIMEOUT_SECONDS)
 
+SIGNAL_GRANDCHILD = r"""
+import os, signal, sys, time
+from pathlib import Path
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+Path(sys.argv[1]).write_text(str(os.getpid()))
+time.sleep(45)
+"""
+
+SIGNAL_CHILD = r"""
+import json, os, signal, subprocess, sys, time
+from pathlib import Path
+root = Path(sys.argv[1])
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+p = subprocess.Popen([sys.executable, '-c', sys.argv[2], str(root/'grandchild.ready')])
+deadline = time.monotonic()+5
+while not (root/'grandchild.ready').exists():
+    if time.monotonic()>deadline: raise TimeoutError('grandchild startup')
+    time.sleep(.01)
+(root/'owned.json').write_text(json.dumps(dict(child=os.getpid(), group=os.getpgrp(), grandchild=p.pid)))
+time.sleep(45)
+"""
+
+SIGNAL_WORKER = r"""
+import io, json, os, signal, subprocess, sys, time
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import child_process as child
+root, stage, mode = Path(sys.argv[2]), sys.argv[3], sys.argv[4]
+signum = int(sys.argv[5])
+before = {n:signal.getsignal(n) for n in (signal.SIGINT, signal.SIGTERM)}
+actual_popen, actual_retire = subprocess.Popen, child.terminate_owned_group
+actual_stream_logs = child.stream_logs
+def wait_file(path):
+    deadline=time.monotonic()+5
+    while not path.exists():
+        if time.monotonic()>deadline: raise TimeoutError('fixture boundary')
+        time.sleep(.01)
+def starting(*arguments, **options):
+    process=actual_popen(*arguments, **options)
+    wait_file(root/'owned.json')
+    if stage=='creation':
+        (root/'boundary').touch()
+        # Actual signal before the Popen wrapper has returned its owned handle.
+        os.kill(os.getpid(), signum)
+        (root/'creation-returned').touch()
+    elif stage=='running':
+        actual_communicate=process.communicate
+        def communicate(*a,**kw):
+            (root/'boundary').touch()
+            return actual_communicate(*a,**kw)
+        process.communicate=communicate
+    return process
+def retiring(process):
+    if stage=='cleanup':
+        (root/'boundary').touch()
+        wait_file(root/'release')
+    return actual_retire(process)
+def streaming(*a, **kw):
+    if stage=='running':(root/'boundary').touch()
+    return actual_stream_logs(*a, **kw)
+child.subprocess.Popen=starting
+child.terminate_owned_group=retiring
+child.stream_logs=streaming
+try:
+    args=[sys.executable,'-c',sys.argv[6],str(root),sys.argv[7]]
+    options=dict(capture_output=True, text=True) if mode=='capture' else dict(stdout=io.BytesIO(), stderr=io.BytesIO(),log_limit_bytes=1024)
+    child.run_child(args, timeout=.15 if stage=='cleanup' else 10, **options)
+except BaseException as error:
+    result=dict(exception=type(error).__name__,handlers_restored=all(signal.getsignal(n)==h for n,h in before.items()))
+    if isinstance(error,SystemExit): code=error.code
+    elif isinstance(error,KeyboardInterrupt):code=130
+    else:code=1
+    result['exit_code']=code
+    (root/'outcome.json').write_text(json.dumps(result))
+    raise SystemExit(code)
+raise SystemExit('fixture unexpectedly completed')
+"""
+
+
+@unittest.skipIf(os.name == "nt", "real SIGINT/SIGTERM acceptance is POSIX-only")
+class ChildSignalChecks(unittest.TestCase):
+    assert_retired = ChildChecks.assert_retired
+    def run_signal_case(self, stage, signum, mode="capture"):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            process=subprocess.Popen([sys.executable,'-c',SIGNAL_WORKER,str(Path(child.__file__).parent),str(root),stage,mode,str(signum),SIGNAL_CHILD,SIGNAL_GRANDCHILD],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
+            owned=None
+            try:
+                deadline=time.monotonic()+10
+                while not (root/'boundary').exists():
+                    self.assertIsNone(process.poll(),'fixture exited before boundary')
+                    self.assertLess(time.monotonic(),deadline,'fixture startup deadline')
+                    time.sleep(.01)
+                owned=json.loads((root/'owned.json').read_text())
+                self.assertEqual(owned['group'],owned['child'],'fixture must own a separate session')
+                if stage!='creation':
+                    os.kill(process.pid,signum)
+                    if stage=='cleanup':
+                        # Both default cancellation kinds arrive while group
+                        # retirement is deliberately held, before release.
+                        time.sleep(.03)
+                        os.kill(process.pid,signal.SIGINT if signum==signal.SIGTERM else signal.SIGTERM)
+                        time.sleep(.03)
+                        (root/'release').touch()
+                stdout,stderr=process.communicate(timeout=10)
+                for pid in (owned['child'],owned['grandchild']):
+                    deadline=time.monotonic()+3
+                    while True:
+                        try:self.assert_retired(pid);break
+                        except AssertionError:
+                            if time.monotonic()>deadline:raise
+                            time.sleep(.02)
+                expected=1 if stage=='cleanup' else 130 if signum==signal.SIGINT else 143
+                self.assertEqual(process.returncode,expected,(stage,mode,stdout,stderr))
+                outcome=json.loads((root/'outcome.json').read_text())
+                self.assertTrue(outcome['handlers_restored'])
+                self.assertEqual(outcome['exception'],'TimeoutExpired' if stage=='cleanup' else 'KeyboardInterrupt' if signum==signal.SIGINT else 'ChildCancelled')
+                if stage=='creation':self.assertTrue((root/'creation-returned').exists(),'Popen returned before cancellation unwound')
+            finally:
+                # Also retire real fixtures on a failing old-source control.
+                if owned is None and (root/'owned.json').exists():owned=json.loads((root/'owned.json').read_text())
+                if owned is not None:
+                    self.assertEqual(owned['group'],owned['child'])
+                    try:os.killpg(owned['group'],signal.SIGKILL)
+                    except ProcessLookupError:pass
+                try:os.killpg(process.pid,signal.SIGKILL)
+                except ProcessLookupError:pass
+                process.communicate(timeout=5)
+
+    def test_cancel_during_creation(self):
+        for signum in (signal.SIGTERM,signal.SIGINT):
+            for mode in ("capture","logs"):
+                with self.subTest(signal=signum,mode=mode):self.run_signal_case('creation',signum,mode)
+
+    def test_cancel_during_communication(self):
+        for signum in (signal.SIGTERM,signal.SIGINT):
+            for mode in ("capture","logs"):
+                with self.subTest(signal=signum,mode=mode):self.run_signal_case('running',signum,mode)
+
+    def test_repeated_signals_do_not_interrupt_cleanup(self):
+        for signum in (signal.SIGTERM,signal.SIGINT):
+            for mode in ("capture","logs"):
+                with self.subTest(signal=signum,mode=mode):self.run_signal_case('cleanup',signum,mode)
+
+    def test_signal_policy_restores_after_success_and_spawn_error(self):
+        handlers={n:signal.getsignal(n) for n in (signal.SIGINT,signal.SIGTERM)}
+        child.run_child([sys.executable,'-c','pass'],timeout=5)
+        self.assertEqual({n:signal.getsignal(n) for n in handlers},handlers)
+        with self.assertRaises(FileNotFoundError):child.run_child(['/nonexistent/vellum-command'],timeout=5)
+        self.assertEqual({n:signal.getsignal(n) for n in handlers},handlers)
+
+    def test_custom_and_ignored_signal_handlers_remain_caller_owned(self):
+        previous=signal.getsignal(signal.SIGTERM)
+        for handler in (lambda signum,frame:None,signal.SIG_IGN):
+            try:
+                signal.signal(signal.SIGTERM,handler)
+                def check_policy(*a,**kw):
+                    self.assertEqual(signal.getsignal(signal.SIGTERM),handler)
+                    raise FileNotFoundError('controlled spawn refusal')
+                with mock.patch.object(child.subprocess,'Popen',side_effect=check_policy),self.assertRaises(FileNotFoundError):child.run_child(['unused'],timeout=5)
+                self.assertEqual(signal.getsignal(signal.SIGTERM),handler)
+            finally:signal.signal(signal.SIGTERM,previous)
+
+    def test_sigint_during_restoration_does_not_strand_sigterm_handler(self):
+        before={n:signal.getsignal(n) for n in (signal.SIGINT,signal.SIGTERM)}
+        actual_signal=signal.signal
+        injected=[]
+        def restore_then_interrupt(signum,handler):
+            previous=actual_signal(signum,handler)
+            if signum==signal.SIGINT and handler==before[signal.SIGINT] and not injected:
+                injected.append(True)
+                os.kill(os.getpid(),signal.SIGINT)
+            return previous
+        try:
+            with mock.patch.object(child.signal,'signal',side_effect=restore_then_interrupt):
+                with self.assertRaises(KeyboardInterrupt):child.run_child([sys.executable,'-c','pass'],timeout=5)
+            self.assertEqual(injected,[True])
+            self.assertEqual({n:signal.getsignal(n) for n in before},before)
+        finally:
+            for signum,handler in before.items():actual_signal(signum,handler)
+
+    def test_worker_thread_does_not_install_process_signal_handlers(self):
+        import threading
+        outcome=[]
+        def run():
+            try:outcome.append(child.run_child([sys.executable,'-c',"print('worker')"],timeout=5,capture_output=True,text=True).stdout)
+            except BaseException as error:outcome.append(error)
+        worker=threading.Thread(target=run);worker.start();worker.join(timeout=10)
+        self.assertFalse(worker.is_alive());self.assertEqual(outcome,['worker\n'])
+
+
 if __name__ == "__main__": unittest.main()

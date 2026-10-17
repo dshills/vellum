@@ -211,8 +211,24 @@ Do not use it where contacting the public dependency services is prohibited.
 Only execute SDK code you already authorize with those privileges. Generator commands have a 60-second
 deadline, Go build/test/graph commands 600 seconds, native runtime 30 seconds,
 and app dependency inspection/signature commands 60 seconds.
-SDK producer/checker and app packaging child commands run in owned POSIX sessions, and timeout or
-interruption kills that process group before bounded pipe/reaping cleanup. Windows
+SDK producer/checker and app packaging child commands run in owned POSIX sessions.
+Timeout and Python interruption retire that group before bounded pipe/reaping
+cleanup. On POSIX, synchronous main-thread calls temporarily handle default
+SIGTERM and SIGINT dispositions: cancellation during `Popen` creation is deferred
+until the returned child handle is owned, then the group is retired. When
+cancellation initiates failure, SIGINT propagates `KeyboardInterrupt`; SIGTERM
+propagates `ChildCancelled`, a `SystemExit` with status 143. These initiating
+cancellations are not swallowed by ordinary `Exception` handlers. Signals received
+during an already-failing cleanup preserve its original failure instead. Further
+SIGTERM/SIGINT delivery cannot interrupt retirement. Original handlers are restored
+on success, child failure, spawn failure and cancellation.
+
+Custom and ignored signal dispositions remain caller-owned. Worker-thread calls
+do not install process-wide handlers; they retain deadline/Python-exception
+cleanup but require caller-managed process-signal cancellation. This does not
+bound an OS process-creation call before `Popen` returns, intercept SIGKILL or
+handle every termination signal. Normal/nonzero completion retains ordinary
+subprocess semantics, including deliberately launched background work. Windows
 uses fixed-argv `taskkill /PID <owned-pid> /T /F`; failure to confirm cleanup fails
 acceptance with the original timeout retained as its exception cause. An already
 exited parent does not prove its descendants exited: if taskkill cannot confirm

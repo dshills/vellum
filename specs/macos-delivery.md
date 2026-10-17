@@ -33,7 +33,7 @@ to system input/accessibility preferences are not implicitly authorized here.
 | Application/API | Public Go APIs, controls/themes, commands/tasks, documents/history, docking and independent windows | Complete composed workflow and lifecycle acceptance on a release candidate |
 | Data and canvas | Managed tables/trees, typed placement, retained drawing/images, compute/HDR and custom 3D | Frame targets, representative interaction, full resource accounting |
 | Mac integration | Cocoa input/accessibility, menus, clipboard, choosers, drops, tray and optional notifications | Human/native workflow coverage, scale/display changes, declared service support |
-| SDK | Relocated public consumers; current private SDK drawing/3D/imaging native checks | CLI cancellation ownership, final clean candidate, component/rights closure and distribution acceptance |
+| SDK | Relocated public consumers; current private SDK drawing/3D/imaging native checks | Final clean candidate including the M1 cancellation fix, component/rights closure and distribution acceptance |
 | Performance/endurance | Existing profilers, ordinary benchmarks, scoped idle samples and historical 1,000-cycle campaigns | Ordinary targets still fail; complete current-source memory/pacing/idle/overnight qualification |
 
 The first automated desktop placement attempt expired without input. The latest
@@ -103,9 +103,10 @@ explicitly authorized tests and restore any authorized temporary state changes.
 
 ## Execution order and work while the Mac is occupied
 
-1. **Next commit: M1.** Implement and test the production SDK cancellation fix.
-   The private grouped test host is not that production fix.
-2. **Following checkpoint: M2.** Complete the public professional replay and
+1. **M1 source checkpoint complete.** The production SDK cancellation fix and
+   its 107-method headless acceptance are [recorded here](../docs/reviews/macos-sdk-cancellation/README.md).
+   The existing private SDK archive remains historical; M6 includes the fix.
+2. **Next checkpoint: M2.** Complete the public professional replay and
    catalogue coverage using existing runners; correct actual application gaps.
 3. **Then M3 is the main engineering priority.** A quiet native baseline and one
    targeted renderer/layout fix precede another broad qualification campaign.
@@ -182,16 +183,15 @@ implementation checkpoint; it is not rerun after each documentation edit.
 ## Forecast and closure ledger
 
 The largest uncertainty is M3: the unchanged frame targets have repeatedly
-failed. A completion date before that is resolved would be speculative. The
-next two deliverables are the M1 product fix and the M2 full replay/coverage
-checkpoint, followed by a bounded M3 performance decision. After those, update
+failed. A completion date before that is resolved would be speculative. M1 is now complete in the source checkout. The next deliverable is the M2 full
+replay/coverage checkpoint, followed by a bounded M3 performance decision. After those, update
 the remaining work estimate from the measured gaps. An eight-hour final soak,
 human accessibility/input verification and required display availability must
 be budgeted in addition to implementation time.
 
 | Milestone | Current status | Next action / evidence needed |
 | --- | --- | --- |
-| M1 | Open | Patch the shared SDK child runner and execute cancellation boundary regressions. |
+| M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
 | M2 | Partial | Reuse existing domain/routing coverage; complete the full workspace record and map the control catalogue. |
 | M3 | Failing / incomplete | Current ordinary frame targets remain unqualified; profile-to-fix-to-ordinary-comparison loop. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |

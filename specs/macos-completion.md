@@ -25,6 +25,16 @@ identity. Replacement and real removal retire old objects. The separate stored
 400-cell Cocoa acceptance mode and scoped lifecycle/race fixtures qualify this
 behavior. Full-frame latency targets and human screen-reader checks remain open.
 
+## M1 SDK command ownership
+
+The [M1 cancellation checkpoint](../docs/reviews/macos-sdk-cancellation/README.md)
+closes default main-thread SIGTERM/SIGINT child-session cleanup in the source
+checkout, with real creation/communication/cleanup/restoration-boundary regressions
+and 107 passing headless test methods. One scoped Anthropic Claude Sonnet 5.5
+Prism review and internal reviews are retained. Existing private SDK archives
+remain unchanged; final candidate packaging, M2–M7 and full Mac acceptance remain
+open. This work uses no native windows or system preference changes.
+
 ## Latest unattended evidence
 
 The [current private SDK GPU checkpoint](../docs/reports/macos-gpu-sdk-stage0077/README.md)

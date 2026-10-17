@@ -1,0 +1,21 @@
+test_bounded_binary_logs_preserve_both_channels (__main__.ChildChecks.test_bounded_binary_logs_preserve_both_channels) ... ok
+test_invalid_bounded_log_options_refuse_before_start (__main__.ChildChecks.test_invalid_bounded_log_options_refuse_before_start) ... ok
+test_log_limit_kills_owned_group_and_keeps_only_prefix (__main__.ChildChecks.test_log_limit_kills_owned_group_and_keeps_only_prefix) ... ok
+test_process_observation_refuses_errors_and_live_descendants (__main__.ChildChecks.test_process_observation_refuses_errors_and_live_descendants) ... ok
+test_stderr_limit_timeout_and_sink_failure (__main__.ChildChecks.test_stderr_limit_timeout_and_sink_failure) ... ok
+test_success_capture_and_failed_status (__main__.ChildChecks.test_success_capture_and_failed_status) ... ok
+test_timeout_kills_real_grandchild_holding_capture_pipes (__main__.ChildChecks.test_timeout_kills_real_grandchild_holding_capture_pipes) ... ok
+test_windows_tree_termination_is_fixed_argv_and_failure_is_not_success (__main__.ChildChecks.test_windows_tree_termination_is_fixed_argv_and_failure_is_not_success) ... ok
+test_windows_unknown_tree_cleanup_preserves_original_timeout_cause (__main__.ChildChecks.test_windows_unknown_tree_cleanup_preserves_original_timeout_cause) ... ok
+test_cancel_during_communication (__main__.ChildSignalChecks.test_cancel_during_communication) ... ok
+test_cancel_during_creation (__main__.ChildSignalChecks.test_cancel_during_creation) ... ok
+test_custom_and_ignored_signal_handlers_remain_caller_owned (__main__.ChildSignalChecks.test_custom_and_ignored_signal_handlers_remain_caller_owned) ... ok
+test_repeated_signals_do_not_interrupt_cleanup (__main__.ChildSignalChecks.test_repeated_signals_do_not_interrupt_cleanup) ... ok
+test_sigint_during_restoration_does_not_strand_sigterm_handler (__main__.ChildSignalChecks.test_sigint_during_restoration_does_not_strand_sigterm_handler) ... ok
+test_signal_policy_restores_after_success_and_spawn_error (__main__.ChildSignalChecks.test_signal_policy_restores_after_success_and_spawn_error) ... ok
+test_worker_thread_does_not_install_process_signal_handlers (__main__.ChildSignalChecks.test_worker_thread_does_not_install_process_signal_handlers) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 3.299s
+
+OK

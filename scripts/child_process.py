@@ -8,6 +8,7 @@ import selectors
 import signal
 import subprocess
 import time
+import threading
 
 CLEANUP_TIMEOUT_SECONDS = 5
 
@@ -17,6 +18,77 @@ class ChildCleanupError(OSError):
 
 class ChildOutputLimitError(OSError):
     """A bounded binary log exceeded its admitted byte count."""
+
+
+class ChildCancelled(SystemExit):
+    """Default POSIX termination after the active SDK child has been retired."""
+
+    def __init__(self, signum):
+        self.signal_number = signum
+        super().__init__(128 + signum)
+
+
+class _CancellationSignals:
+    """Defer cancellation until a newly created Popen can be cleaned up.
+
+    Only the main thread's default SIGINT/SIGTERM policy is temporarily owned.
+    Custom/ignored handlers and worker-thread signal policy remain the caller's.
+    No signal mask or preexec callback is inherited by the child.
+    """
+
+    def __init__(self):
+        self.previous = {}
+        self.pending = None
+        self.running = False
+
+    def __enter__(self):
+        if os.name == "nt" or threading.current_thread() is not threading.main_thread():
+            return self
+        try:
+            for signum in (signal.SIGINT, signal.SIGTERM):
+                previous = signal.getsignal(signum)
+                if previous == signal.SIG_DFL or (signum == signal.SIGINT and previous is signal.default_int_handler):
+                    signal.signal(signum, self.handle)
+                    self.previous[signum] = previous
+        except BaseException:
+            self.restore()
+            raise
+        return self
+
+    def handle(self, signum, frame):
+        if self.pending is None:
+            self.pending = signum
+        # Popen must return ownership before interruption may unwind. Once an
+        # error starts cleanup, further signals cannot interrupt group retirement.
+        if self.running:
+            self.running = False
+            self.raise_pending()
+
+    def raise_pending(self):
+        if self.pending == signal.SIGINT:
+            raise KeyboardInterrupt
+        if self.pending is not None:
+            raise ChildCancelled(self.pending)
+
+    def start(self):
+        self.running = True
+        self.raise_pending()
+
+    def cleanup(self):
+        self.running = False
+
+    def restore(self):
+        self.cleanup()
+        # Restoring Python's default SIGINT handler can immediately raise a
+        # KeyboardInterrupt. Restore it last so other handlers are never stranded.
+        for signum in reversed(self.previous):
+            signal.signal(signum, self.previous[signum])
+        self.previous.clear()
+
+    def __exit__(self, exception_type, exception, traceback):
+        self.restore()
+        if exception_type is None:
+            self.raise_pending()
 
 
 def stream_logs(process, arguments, timeout, outputs, limit):
@@ -89,56 +161,71 @@ def run_child(arguments, *, timeout, check=False, capture_output=False, input=No
         options["creationflags"] = options.get("creationflags", 0) | subprocess.CREATE_NEW_PROCESS_GROUP
     else:
         options["start_new_session"] = True
-    process = subprocess.Popen(arguments, **options)
-    log_summaries = None
-    try:
+    with _CancellationSignals() as cancellation:
+        process = None
+        communication_completed = False
+        group_cleanup_attempted = False
+        log_summaries = None
         try:
-            if logs is None:
-                stdout, stderr = process.communicate(input=input, timeout=timeout)
-            else:
-                log_summaries = stream_logs(process, arguments, timeout, logs, log_limit_bytes)
-                stdout = stderr = None
-        except BaseException as original:
-            cleanup_error = None
+            process = subprocess.Popen(arguments, **options)
             try:
-                terminate_owned_group(process)
-            except Exception as error:
-                cleanup_error = error
+                cancellation.start()
+                if logs is None:
+                    stdout, stderr = process.communicate(input=input, timeout=timeout)
+                else:
+                    log_summaries = stream_logs(process, arguments, timeout, logs, log_limit_bytes)
+                    stdout = stderr = None
+                communication_completed = True
+            except BaseException as original:
+                cancellation.cleanup()
+                cleanup_error = None
+                try:
+                    group_cleanup_attempted = True
+                    terminate_owned_group(process)
+                except Exception as error:
+                    cleanup_error = error
+                    if process.poll() is None:
+                        process.kill()
+                try:
+                    if logs is None:
+                        stdout, stderr = process.communicate(timeout=CLEANUP_TIMEOUT_SECONDS)
+                    else:
+                        # Do not buffer a flood during failure cleanup. These logs
+                        # already contain only the admitted prefix. Closing read
+                        # ends also revokes pipe writers outside the owned group.
+                        process.stdout.close(); process.stderr.close()
+                        process.wait(timeout=CLEANUP_TIMEOUT_SECONDS)
+                        stdout = stderr = None
+                except subprocess.TimeoutExpired as error:
+                    raise ChildCleanupError("SDK child pipes remained open after cleanup attempt" + (": " + str(cleanup_error) if cleanup_error is not None else "")) from original
+                if cleanup_error is not None:
+                    raise ChildCleanupError("SDK descendant cleanup failed: " + str(cleanup_error)) from original
+                if isinstance(original, subprocess.TimeoutExpired):
+                    original.output, original.stderr = stdout, stderr
+                raise
+            completed = subprocess.CompletedProcess(arguments, process.returncode, stdout, stderr)
+            if log_summaries is not None:
+                completed.log_summaries = log_summaries
+            if check and completed.returncode:
+                raise subprocess.CalledProcessError(completed.returncode, arguments, output=stdout, stderr=stderr)
+            return completed
+        finally:
+            cancellation.cleanup()
+            if process is not None:
+                # Cancellation can arrive while unwinding an unrelated error,
+                # before its except block reaches group cleanup. The outer
+                # finally must still retire descendants, not just the leader.
+                if not communication_completed and not group_cleanup_attempted:
+                    terminate_owned_group(process)
+                for stream in (process.stdin, process.stdout, process.stderr):
+                    if stream is not None:
+                        stream.close()
                 if process.poll() is None:
                     process.kill()
-            try:
-                if logs is None:
-                    stdout, stderr = process.communicate(timeout=CLEANUP_TIMEOUT_SECONDS)
-                else:
-                    # Do not buffer a flood during failure cleanup. These logs
-                    # already contain only the admitted prefix. Closing read
-                    # ends also revokes pipe writers outside the owned group.
-                    process.stdout.close(); process.stderr.close()
-                    process.wait(timeout=CLEANUP_TIMEOUT_SECONDS)
-                    stdout = stderr = None
-            except subprocess.TimeoutExpired as error:
-                raise ChildCleanupError("SDK child pipes remained open after cleanup attempt" + (": " + str(cleanup_error) if cleanup_error is not None else "")) from original
-            if cleanup_error is not None:
-                raise ChildCleanupError("SDK descendant cleanup failed: " + str(cleanup_error)) from original
-            if isinstance(original, subprocess.TimeoutExpired):
-                original.output, original.stderr = stdout, stderr
-            raise
-        completed = subprocess.CompletedProcess(arguments, process.returncode, stdout, stderr)
-        if log_summaries is not None:
-            completed.log_summaries = log_summaries
-        if check and completed.returncode:
-            raise subprocess.CalledProcessError(completed.returncode, arguments, output=stdout, stderr=stderr)
-        return completed
-    finally:
-        for stream in (process.stdin, process.stdout, process.stderr):
-            if stream is not None:
-                stream.close()
-        if process.poll() is None:
-            process.kill()
-            try:
-                process.wait(timeout=CLEANUP_TIMEOUT_SECONDS)
-            except subprocess.TimeoutExpired as error:
-                raise ChildCleanupError("SDK direct child remained alive after termination") from error
+                    try:
+                        process.wait(timeout=CLEANUP_TIMEOUT_SECONDS)
+                    except subprocess.TimeoutExpired as error:
+                        raise ChildCleanupError("SDK direct child remained alive after termination") from error
 
 
 def check_child_output(arguments, *, timeout, **options):
