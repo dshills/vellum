@@ -325,3 +325,25 @@ bytes. Exact diagnostic overlays and the original failed collector are retained
 with a separately reviewed correction. This is scoped external property evidence;
 physical input, notifications, human IME/VoiceOver and full Mac qualification
 remain separate gates.
+
+## Detached snapshot field storage
+
+Batch copies of accessibility records and completed scoped subtrees own their
+mutable fields independently of the input records and every other snapshot.
+Snapshot-local typed backing slices may hold action strings, frames, selections,
+expanded flags and numeric bounds. Optional-field storage is sized by the exact
+number of present fields; each action slice has capacity equal to its length so
+appending cannot overwrite a neighboring record. Shared source pointers become
+distinct writable copies in the output. No cross-snapshot pool or reuse is used.
+
+Copying preserves the established record values, including exact floating-point
+bits, nil optional pointers and the legacy normalization of nil actions to an
+empty action list. The pending wire baseline still restores null actions where
+required. Arbitrary `Value` data retains its existing copy and validation rules;
+this storage change does not broaden immutable-value admission. Completed caches
+still discard activation closures, remain scoped to current membership and clear
+on removal or bridge close. Pending publication, action revocation, generation
+checks and native fallback keep their existing transaction path.
+
+Allocation-count and copy/publication benchmarks are separate from ordinary
+native frame-time, retained-memory and human accessibility qualification.

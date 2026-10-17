@@ -128,35 +128,73 @@ func cloneAccessibilityNodes(nodes []accessibilityNode) []accessibilityNode {
 		return nil
 	}
 	out := make([]accessibilityNode, len(nodes))
-	for i := range out {
-		out[i] = cloneAccessibilityNode(nodes[i])
-	}
+	copy(out, nodes)
+	detachAccessibilityNodes(out)
 	return out
 }
 
-func cloneAccessibilityNode(n accessibilityNode) accessibilityNode {
-	n.Actions = append([]string{}, n.Actions...)
-	if n.GridFrame != nil {
-		value := *n.GridFrame
-		n.GridFrame = &value
+// detachAccessibilityNodes owns the supplied records and detaches their mutable
+// fields. Storage belongs to this snapshot only: later copies cannot overwrite
+// it. Count optional fields first so sparse records do not retain unused slots.
+// Each action slice is capacity-limited to keep appends away from its neighbors.
+func detachAccessibilityNodes(nodes []accessibilityNode) {
+	var actions, frames, selections, expanded, minimums, maximums int
+	for _, n := range nodes {
+		actions += len(n.Actions)
+		if n.GridFrame != nil {
+			frames++
+		}
+		if n.TextSelection != nil {
+			selections++
+		}
+		if n.Expanded != nil {
+			expanded++
+		}
+		if n.Min != nil {
+			minimums++
+		}
+		if n.Max != nil {
+			maximums++
+		}
 	}
-	if n.TextSelection != nil {
-		value := *n.TextSelection
-		n.TextSelection = &value
+	actionStorage := make([]string, actions)
+	frameStorage := make([][4]float32, frames)
+	selectionStorage := make([][2]int, selections)
+	expandedStorage := make([]bool, expanded)
+	minimumStorage := make([]float32, minimums)
+	maximumStorage := make([]float32, maximums)
+	for i := range nodes {
+		n := &nodes[i]
+		count := len(n.Actions)
+		copy(actionStorage, n.Actions)
+		n.Actions = actionStorage[:count:count]
+		actionStorage = actionStorage[count:]
+		if n.GridFrame != nil {
+			frameStorage[0] = *n.GridFrame
+			n.GridFrame = &frameStorage[0]
+			frameStorage = frameStorage[1:]
+		}
+		if n.TextSelection != nil {
+			selectionStorage[0] = *n.TextSelection
+			n.TextSelection = &selectionStorage[0]
+			selectionStorage = selectionStorage[1:]
+		}
+		if n.Expanded != nil {
+			expandedStorage[0] = *n.Expanded
+			n.Expanded = &expandedStorage[0]
+			expandedStorage = expandedStorage[1:]
+		}
+		if n.Min != nil {
+			minimumStorage[0] = *n.Min
+			n.Min = &minimumStorage[0]
+			minimumStorage = minimumStorage[1:]
+		}
+		if n.Max != nil {
+			maximumStorage[0] = *n.Max
+			n.Max = &maximumStorage[0]
+			maximumStorage = maximumStorage[1:]
+		}
 	}
-	if n.Expanded != nil {
-		value := *n.Expanded
-		n.Expanded = &value
-	}
-	if n.Min != nil {
-		value := *n.Min
-		n.Min = &value
-	}
-	if n.Max != nil {
-		value := *n.Max
-		n.Max = &value
-	}
-	return n
 }
 
 // prepareGridPublication retains one completed subtree per currently visible
@@ -209,9 +247,10 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshotForSemantic(nodes []
 		if !host.GridPending {
 			group := make([]accessibilityNode, len(indices))
 			for i, index := range indices {
-				group[i] = cloneAccessibilityNode(nodes[index])
+				group[i] = nodes[index]
 				group[i].activationGuard = nil // Completed caches retain no owner/model closures.
 			}
+			detachAccessibilityNodes(group)
 			cache[scope] = group
 			continue
 		}
