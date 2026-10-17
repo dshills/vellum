@@ -1,5 +1,9 @@
 # Framework implementation phases
 
+For the active Mac finish line, ordered backlog and next commits, follow the
+[Mac delivery plan](../specs/macos-delivery.md). Historical phase completion below
+does not close its remaining acceptance gates.
+
 This implementation proceeds alongside the unresolved foundation checks. Those
 checks still prevent a production-ready claim. They do not prevent building and
 assessing the workbench API. Each phase receives Prism review, relevant tests,

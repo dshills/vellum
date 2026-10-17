@@ -1,5 +1,9 @@
 # macOS framework completion
 
+Execution order, milestone exit criteria and limits on investigation/review are
+maintained in the [Mac delivery plan](macos-delivery.md). This file retains the
+full acceptance scope and historical evidence.
+
 The active completion target is a professional Go-native UI framework on the local
 macOS development machine. Windows/Linux qualification is deferred. Existing
 portable packages and target adapter sources are retained, but cross-platform

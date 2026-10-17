@@ -1,7 +1,8 @@
 # Documentation
 
 Start with the [project overview](../README.md), [development guide](development.md)
-and [implementation status](implementation.md).
+and [implementation status](implementation.md). For current Mac work, follow the
+[delivery plan](../specs/macos-delivery.md).
 
 - [Research and recommendations](research/README.md): source-backed investigation and architecture alternatives.
 - [Architecture decisions](decisions/): recorded choices and the evidence available when each was made.
