@@ -556,3 +556,16 @@ native pairs reduce median run-p95 from 5.168 to 4.951 ms and observed process G
 allocation by about 20%. Every candidate p95 still misses 4 ms. Diagnostic GPU
 captures and native compositor pixel tests remain separate from ordinary frame,
 presentation, physical pointer, memory and full Mac qualification.
+
+## Rejected packed GPU upload experiment
+
+The [packed-upload record](../docs/reports/macos-packed-upload/README.md) preserves
+an implemented and reviewed one-write transport candidate. Exact GPU pixels,
+ownership, padding and failure/recovery checks pass, but three of five ordinary
+paired p95s are higher (median 5.189→5.265 ms). Its small diagnostic input-phase
+reduction does not justify adoption. The candidate, decoder and preparation stage
+are reverted; the active renderer retains five checked input writes and stage0079.
+No frame, allocation, memory or Mac acceptance requirement changes. Current
+profiles point to synchronous accessibility snapshot/serialization/publication
+and full capture as the remaining investigation, without shifting work outside
+the measured frame or weakening native transaction/fallback semantics.
