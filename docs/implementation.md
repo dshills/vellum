@@ -421,3 +421,13 @@ reaches the native editor text/ranges and the placement palette/canvas through
 separate already-trusted clients. Original source, diagnostic overlays, raw
 process output and corrected collector interpretation are retained. No input
 workflow or CUA retry is performed; physical/human and full Mac gates remain open.
+
+## Initial native window sizing checkpoint
+
+Explicit native Window dimensions now request initial Dp client size before Show,
+without becoming body minima or invoking screen-fraction sizing. Saved geometry
+and OS limits retain precedence. Two measured native size/shrink checks and
+read-only external outer-frame observations pass on the current display;
+fractional-scale/boundary/restore tests are automated. See the
+[report](reports/macos-initial-window-size/README.md). Existing performance and
+physical/cross-display/complete macOS gates remain open.

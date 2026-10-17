@@ -973,3 +973,18 @@ file-identity/native-ID correction over the same runtime data. This advances
 scoped external AX evidence without qualifying physical placement/key events,
 human accessibility, the earlier CUA timeout cause, performance or full Mac
 completion.
+
+## Initial native window sizing checkpoint
+
+[Current source and native evidence](../docs/reports/macos-initial-window-size/README.md)
+qualifies two small Dp initial client requests and later programmatic shrinking
+on the current display, with separate read-only AX outer frames. Owned stage0074
+removes persistent initial body minima and screen-fraction override, converts at
+creation with one chosen screen snapshot, preserves saved geometry precedence,
+and bounds final native dimensions. Automated tests cover scale/zoom, synthetic
+secondary screen, tiny fractional and extreme sizes plus restore options.
+
+This does not close physical resize/drag/cross-display, live saved restoration,
+loaded/native performance or full Mac qualification. Historical 4/6ms failures
+retain their original workload and failure status. New performance comparisons
+must report actual initial/client/render geometry and screen scale.

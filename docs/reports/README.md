@@ -80,3 +80,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Pending native accessibility publication](macos-pending-publication/README.md): exact pending-only reuse with full fallback, cache/epoch hardening, differential native regressions and separately scoped native comparison cohorts; ordinary performance and full Mac gates remain open.
 
 - [Current external macOS accessibility](macos-current-external-ax/README.md): read-only Unicode/ranges and palette/canvas tree properties on current framework bytes, with explicit fixture overlays and the original failed collector preserved beside its corrected interpretation.
+
+- [Initial native window sizing](macos-initial-window-size/README.md): Dp creation contract, two measured native client sizes/shrinks, separate outer AX frames, bounded conversion regressions and review evidence.

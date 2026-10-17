@@ -1,0 +1,458 @@
+{
+  "status": "REVIEWED_INITIAL_NATIVE_WINDOW_SIZE_CHECKPOINT",
+  "source_commit": "c1343ffed992988fd5bd2d9b608514ee03ba2d34",
+  "base_commit": "b3c1c20819ffc3ccda28b6d1e58f92ed53ae6056",
+  "source_binding_sha256": "344ed0cdf3bef0ee29c5da9184e32afcb1786afacef3513560182d8259ce2b88",
+  "source_payload_files": 12,
+  "source_payload_bytes": 32522,
+  "source_payload_sha256": "f35ee226df3e4f9ce92a6f92d0677e5a2af0a6c3ffb08b2984b781571e9207aa",
+  "provider_binding_sha256": "e0a0a189ad970b8e043422e1b1a9117ef03eab17c4eb6ee83081eb84ea194ee5",
+  "provider_payload_bytes": 32466,
+  "post_provider_change": "diagnostic fixture only: wait native queue publication before reads; final source/native revalidation internal",
+  "owned_patch": "0074-initial-client-size.patch",
+  "owned_patch_sha256": "02e06af852d8e79de73d0068ee4a9f60329c78312403d9da6fd4f24de9405335",
+  "tests": {
+    "prepare": {
+      "exit_code": 0,
+      "seconds": 2.352650750079192,
+      "source_stable": true
+    },
+    "focused": {
+      "exit_code": 1,
+      "seconds": 7.242670999956317,
+      "source_stable": true
+    },
+    "prepare-v2": {
+      "exit_code": 0,
+      "seconds": 2.1118771249894053,
+      "source_stable": true
+    },
+    "focused-v2": {
+      "exit_code": 0,
+      "seconds": 36.4638154580025,
+      "source_stable": true
+    },
+    "prepare-v3": {
+      "exit_code": 0,
+      "seconds": 1.9958354160189629,
+      "source_stable": true
+    },
+    "focused-v3": {
+      "exit_code": 0,
+      "seconds": 40.03689987503458,
+      "source_stable": true
+    },
+    "prepare-unit": {
+      "exit_code": 0,
+      "seconds": 0.11581212503369898,
+      "source_stable": true
+    },
+    "driver": {
+      "exit_code": 0,
+      "seconds": 106.22636695799883,
+      "source_stable": true
+    },
+    "vet": {
+      "exit_code": 0,
+      "seconds": 20.876787167042494,
+      "source_stable": true
+    },
+    "root": {
+      "exit_code": 0,
+      "seconds": 26.6544560410548,
+      "source_stable": true
+    },
+    "prepare-v4": {
+      "exit_code": 0,
+      "seconds": 1.7553482500370592,
+      "source_stable": true
+    },
+    "focused-v4": {
+      "exit_code": 0,
+      "seconds": 35.23164524999447,
+      "source_stable": true
+    }
+  },
+  "native": {
+    "small": {
+      "result": "PASS_NATIVE_INITIAL_AND_SHRINK_READONLY_AX",
+      "receipt_sha256": "a06dd1f9f0c02f818e288ba0c6e16428fce9a8566e22eb736a8760ec19368ea8",
+      "requested_dp": [
+        320,
+        240
+      ],
+      "screen": {
+        "ScreenNumber": 0,
+        "Name": "LG HDR DQHD",
+        "Geometry": {
+          "Min": {
+            "X": 0,
+            "Y": 0
+          },
+          "Max": {
+            "X": 5120,
+            "Y": 1440
+          }
+        },
+        "DevicePixelRatio": 1,
+        "PixelSize": {
+          "X": 5120,
+          "Y": 1440
+        },
+        "PhysicalSize": {
+          "X": 1204,
+          "Y": 338
+        },
+        "LogicalDPI": 162,
+        "PhysicalDPI": 108.01328,
+        "Depth": 24,
+        "RefreshRate": 60,
+        "Orientation": "OrientationUnknown",
+        "NativeOrientation": "OrientationUnknown",
+        "PrimaryOrientation": "OrientationUnknown",
+        "Manufacturer": "",
+        "Model": "",
+        "SerialNumber": ""
+      },
+      "creation_raw_pixels": {
+        "X": 324,
+        "Y": 243
+      },
+      "initial": {
+        "event": "vellum.window.initial",
+        "pid": 18460,
+        "requested_dp": [
+          320,
+          240
+        ],
+        "screen": {
+          "ScreenNumber": 0,
+          "Name": "LG HDR DQHD",
+          "Geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "DevicePixelRatio": 1,
+          "PixelSize": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "PhysicalSize": {
+            "X": 1204,
+            "Y": 338
+          },
+          "LogicalDPI": 162,
+          "PhysicalDPI": 108.01328,
+          "Depth": 24,
+          "RefreshRate": 60,
+          "Orientation": "OrientationUnknown",
+          "NativeOrientation": "OrientationUnknown",
+          "PrimaryOrientation": "OrientationUnknown",
+          "Manufacturer": "",
+          "Model": "",
+          "SerialNumber": ""
+        },
+        "pixel_size": {
+          "X": 324,
+          "Y": 243
+        },
+        "window_size": {
+          "X": 324,
+          "Y": 243
+        },
+        "render_geometry": {
+          "Pos": {
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "X": 324,
+            "Y": 243
+          }
+        },
+        "geometry_saver_disabled": true
+      },
+      "resized": {
+        "event": "vellum.window.resized",
+        "pid": 18460,
+        "requested_dp": [
+          320,
+          240
+        ],
+        "screen": {
+          "ScreenNumber": 0,
+          "Name": "LG HDR DQHD",
+          "Geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "DevicePixelRatio": 1,
+          "PixelSize": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "PhysicalSize": {
+            "X": 1204,
+            "Y": 338
+          },
+          "LogicalDPI": 162,
+          "PhysicalDPI": 108.01328,
+          "Depth": 24,
+          "RefreshRate": 60,
+          "Orientation": "OrientationUnknown",
+          "NativeOrientation": "OrientationUnknown",
+          "PrimaryOrientation": "OrientationUnknown",
+          "Manufacturer": "",
+          "Model": "",
+          "SerialNumber": ""
+        },
+        "pixel_size": {
+          "X": 162,
+          "Y": 121
+        },
+        "window_size": {
+          "X": 162,
+          "Y": 121
+        },
+        "render_geometry": {
+          "Pos": {
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "X": 162,
+            "Y": 121
+          }
+        },
+        "geometry_saver_disabled": true
+      },
+      "ax_outer_frame": [
+        2398,
+        567,
+        324,
+        275
+      ],
+      "native_exit_code": 0,
+      "client_exit_code": 0,
+      "seconds": 6.960843999986537
+    },
+    "large": {
+      "result": "PASS_NATIVE_INITIAL_AND_SHRINK_READONLY_AX",
+      "receipt_sha256": "c3a8548b3322f2c272bcb2cf94af0eded4e87167b2552a1051bdb8df309b7f3d",
+      "requested_dp": [
+        640,
+        400
+      ],
+      "screen": {
+        "ScreenNumber": 0,
+        "Name": "LG HDR DQHD",
+        "Geometry": {
+          "Min": {
+            "X": 0,
+            "Y": 0
+          },
+          "Max": {
+            "X": 5120,
+            "Y": 1440
+          }
+        },
+        "DevicePixelRatio": 1,
+        "PixelSize": {
+          "X": 5120,
+          "Y": 1440
+        },
+        "PhysicalSize": {
+          "X": 1204,
+          "Y": 338
+        },
+        "LogicalDPI": 162,
+        "PhysicalDPI": 108.01328,
+        "Depth": 24,
+        "RefreshRate": 60,
+        "Orientation": "OrientationUnknown",
+        "NativeOrientation": "OrientationUnknown",
+        "PrimaryOrientation": "OrientationUnknown",
+        "Manufacturer": "",
+        "Model": "",
+        "SerialNumber": ""
+      },
+      "creation_raw_pixels": {
+        "X": 648,
+        "Y": 405
+      },
+      "initial": {
+        "event": "vellum.window.initial",
+        "pid": 18538,
+        "requested_dp": [
+          640,
+          400
+        ],
+        "screen": {
+          "ScreenNumber": 0,
+          "Name": "LG HDR DQHD",
+          "Geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "DevicePixelRatio": 1,
+          "PixelSize": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "PhysicalSize": {
+            "X": 1204,
+            "Y": 338
+          },
+          "LogicalDPI": 162,
+          "PhysicalDPI": 108.01328,
+          "Depth": 24,
+          "RefreshRate": 60,
+          "Orientation": "OrientationUnknown",
+          "NativeOrientation": "OrientationUnknown",
+          "PrimaryOrientation": "OrientationUnknown",
+          "Manufacturer": "",
+          "Model": "",
+          "SerialNumber": ""
+        },
+        "pixel_size": {
+          "X": 648,
+          "Y": 405
+        },
+        "window_size": {
+          "X": 648,
+          "Y": 405
+        },
+        "render_geometry": {
+          "Pos": {
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "X": 648,
+            "Y": 405
+          }
+        },
+        "geometry_saver_disabled": true
+      },
+      "resized": {
+        "event": "vellum.window.resized",
+        "pid": 18538,
+        "requested_dp": [
+          640,
+          400
+        ],
+        "screen": {
+          "ScreenNumber": 0,
+          "Name": "LG HDR DQHD",
+          "Geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "DevicePixelRatio": 1,
+          "PixelSize": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "PhysicalSize": {
+            "X": 1204,
+            "Y": 338
+          },
+          "LogicalDPI": 162,
+          "PhysicalDPI": 108.01328,
+          "Depth": 24,
+          "RefreshRate": 60,
+          "Orientation": "OrientationUnknown",
+          "NativeOrientation": "OrientationUnknown",
+          "PrimaryOrientation": "OrientationUnknown",
+          "Manufacturer": "",
+          "Model": "",
+          "SerialNumber": ""
+        },
+        "pixel_size": {
+          "X": 324,
+          "Y": 202
+        },
+        "window_size": {
+          "X": 324,
+          "Y": 202
+        },
+        "render_geometry": {
+          "Pos": {
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "X": 324,
+            "Y": 202
+          }
+        },
+        "geometry_saver_disabled": true
+      },
+      "ax_outer_frame": [
+        2236,
+        486,
+        648,
+        437
+      ],
+      "native_exit_code": 0,
+      "client_exit_code": 0,
+      "seconds": 6.338712333003059
+    }
+  },
+  "binary": {
+    "path": "/private/tmp/vellum-window-sizing-native-v3-20261017/build/window-size.app/Contents/MacOS/window-size",
+    "sha256": "3043114ad1f9f61282bcbbd7cfeb970122fdea5fad15f6f07e7ad91dceed4082"
+  },
+  "diagnostic_overlay": {
+    "path": "system/driver/desktop/app.go",
+    "effect": "logs chosen screen and resolved scalar creation options before native creation",
+    "sha256": "5658d1c53b545738bca71f77ecbcf273755d35eed1aa0d5b4ad6e5f16c7432c6",
+    "source_metadata": "b3c1c2 dirty candidate, explicit logging overlay; source bytes match committed implementation, binary not relabeled as clean committed build"
+  },
+  "review": {
+    "source_sha256": "b6ecf4fffd8642a69063b8b4135f6b66ab558c0ea03640b4d3c3930fb842f8a2",
+    "native_readiness_sha256": "eb246ab166b1f86871f276521d910a0e148612e911fd182f3b5e02ac8a9451ba",
+    "result_sha256": "8b5a7c529a764becf95471b3e4fd60aefaf60080290379a97373f748e4570c9c",
+    "final_sha256": "0f9183ebf4b9553cad6d18d31c7f1f761f4999479ad1d33911d7a776a74025a8",
+    "prism_receipt_sha256": "9a8419e9b74f59dab2a0df86916fecd44c19f361c0a46d0b6929eed8be82d8ef",
+    "prism_raw_sha256": "06a928ca086be9e38b5a65de0270530c7bd90561eacdd1dc3204a407874b3dfa",
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "invocations": 1
+  },
+  "evidence": {
+    "file": "evidence.tar.gz",
+    "sha256": "764b7fc41d00166bba9e434e720be56f15c3359f4ce619ef390fa79113a6d253",
+    "compressed_bytes": 4585898,
+    "members": 169,
+    "expanded_bytes": 13449995,
+    "manifest_sha256": "e2c413fc9b01c6c2d5ee60b87ce4f35a23360bb5d6fe7947c4ac36b14efeda63"
+  },
+  "physical_input_verified": false,
+  "performance_qualified": false,
+  "full_macos_qualified": false
+}
