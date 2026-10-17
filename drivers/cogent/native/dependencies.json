@@ -727,6 +727,17 @@
               "sha256": "0075572fdd654ca0f6eddf88b09cf2fa3058eefa50999f54e70063ea8400db17"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/initialsize",
+          "inputs": "native/patches/initialsize/original-hashes.json",
+          "outputs": "native/patches/initialsize/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/initialsize/0074-initial-client-size.patch",
+              "sha256": "02e06af852d8e79de73d0068ee4a9f60329c78312403d9da6fd4f24de9405335"
+            }
+          ]
         }
       ]
     },

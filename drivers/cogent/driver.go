@@ -14,7 +14,6 @@ import (
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/styles"
-	"cogentcore.org/core/styles/units"
 	"cogentcore.org/core/tree"
 	"github.com/dshills/vellum/app"
 	"github.com/dshills/vellum/command"
@@ -273,7 +272,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 					}
 				}
 				nativeMountServices(w.body, services)
-				w.body.Styler(func(s *styles.Style) { s.Min.Set(units.Dp(spec.Width), units.Dp(spec.Height)); s.Grow.Set(1, 1) })
+				configureInitialWindow(w.body)
 				w.host = newAccessibilityHost(w)
 				bindWindowScope(w.host, a, spec.Ref())
 				w.host.Styler(func(s *styles.Style) { s.Grow.Set(1, 1); s.Direction = styles.Column })
@@ -406,7 +405,7 @@ func (d Driver) Run(ctx context.Context, a *app.Application) error {
 			w := launch[0]
 			launch = launch[1:]
 			started.Store(true)
-			w.body.NewWindow().SetUseMinSize(true).Run()
+			initialWindowStage(w.body, w.window).Run()
 		}
 	}
 	custom = func(w *nativeWindow, e events.Event) {
@@ -618,4 +617,12 @@ func drainCustom(a *app.Application, pending *atomic.Bool, refresh func(), e eve
 	if ce, ok := e.(*events.CustomEvent); ok && ce.Data == "vellum.wake" {
 		e.SetHandled()
 	}
+}
+
+// Initial dimensions belong to creation options, not persistent content minima.
+func configureInitialWindow(body *core.Body) {
+	body.Styler(func(s *styles.Style) { s.Grow.Set(1, 1) })
+}
+func initialWindowStage(body *core.Body, spec app.Window) *core.Stage {
+	return body.NewWindow().SetUseMinSize(false).SetInitialSizeDP(spec.Width, spec.Height)
 }

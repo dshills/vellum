@@ -3,6 +3,50 @@
 Vellum supports multiple desktop windows within one native process main loop.
 The portable `app` package remains independent of native dependencies.
 
+## Initial native client size
+
+`app.Window.Width` and `Height` are finite positive initial client-size requests
+in density-independent units (Dp, 160 per logical inch) for the native desktop
+driver. At creation, each dimension is multiplied by the chosen screen's
+`LogicalDPI / 160` and rounded to the nearest raw pixel (half upward). Logical
+DPI includes display scaling and framework zoom. These are neither raw pixels
+nor a promise of the exact outer decorated frame size.
+
+The request bypasses content-based and 60–80% screen sizing. It enters native
+creation before Show; it does not set `Body.Min`, a persistent resize minimum,
+or a post-show resize. Application widget minimum styles remain independent.
+The OS can resize/constrain the result, and later user or application resizing
+is authoritative. A smaller requested initial client can clip or scroll content
+whose own minimum is larger.
+
+Saved geometry, when enabled and found using the existing window-title/screen
+policy, overrides the initial request, including its saved screen, size, position
+and maximized state. Otherwise the default target is the current window's screen
+or the primary screen for the first window. Native creation resolves conversion
+and GLFW setup with one chosen screen snapshot, after first-window DPI settings
+have been applied. Screen hotplug or later OS migration can still change the
+actual result; cross-display physical behavior needs separate qualification.
+
+Requests are bounded before integer conversion to the selected screen's pixel
+extent and a float32-representable native integer limit. Final bounds survive
+the backend's legacy screen constraint conversion. The minimum is one native
+window-manager unit; macOS converts raw pixels to integer window-manager units
+using DPR, so fractional pixels may be lost. Fullscreen/OS frame constraints
+remain authoritative. Unset upstream requests retain their content/dialog rules.
+
+Manual replay retains its separately specified integer physical viewport and
+explicit logical DPI; it does not reinterpret that viewport as Dp. Workbench
+saved bounds retain their OS window-manager client units and existing later
+resize path. Historical performance results keep their original viewport and
+failure status; changing a viewport changes the workload, not its qualification.
+
+A diagnostic native fixture is available from the driver module with
+`go run ./cmd/window-size-smoke -width=320 -height=240`. It disables geometry
+persistence within its process, reports native client/render sizes, permits a
+brief separate read-only AX outer-frame query, then verifies a later shrink and
+closes. It generates no physical pointer/key input. Tests and live observations
+must state their separate coverage.
+
 ## Window lifecycle
 
 `Application.OpenWindow(Window)` registers windows before or during `Run` and

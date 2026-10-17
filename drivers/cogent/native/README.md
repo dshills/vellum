@@ -195,3 +195,11 @@ publication and cleanup paths. Headless fixtures verify temporary and retained
 ownership; actual IOSurface/physical-footprint acceptance remains open.
 See [ownership checks](patches/autorelease/README.md) and the
 [native lifetime contract](../../../specs/native-object-lifetime.md).
+
+Stage 74 (`patches/initialsize`) gives explicit Vellum desktop requests an initial
+client-size path at native creation, using the same chosen screen snapshot for
+Dp conversion, constraints and GLFW setup. Saved geometry clears the request;
+legacy content/dialog sizing and manual physical viewports retain their paths.
+The adapter no longer assigns initial dimensions to persistent Body.Min or
+requests screen-fraction sizing. See the [window contract](../../../specs/windows-services.md).
+The authoritative complete ordered stage list is `dependencies.json`.

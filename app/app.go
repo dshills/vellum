@@ -23,7 +23,12 @@ var (
 
 type Config struct{ QueueCapacity, CompletionCapacity int }
 type Window struct {
-	ID, Title     string
+	ID, Title string
+	// Width and Height are finite positive initial client-size requests. The
+	// native desktop driver interprets them in density-independent units (Dp),
+	// converts with the creation screen's logical DPI, and applies OS limits.
+	// Saved geometry takes precedence. These fields never set a resize minimum.
+	// Manual replay uses its explicit physical-pixel viewport instead.
 	Width, Height float32
 	View          func() ui.Node
 	reference     WindowRef

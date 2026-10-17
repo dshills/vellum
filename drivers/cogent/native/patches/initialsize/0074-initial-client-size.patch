@@ -1,0 +1,340 @@
+--- a/core/stage.go
++++ b/core/stage.go
+@@ -11,6 +11,7 @@
+ 	"time"
+ 
+ 	"cogentcore.org/core/base/option"
++	"cogentcore.org/core/math32"
+ 	"cogentcore.org/core/paint"
+ 	"cogentcore.org/core/paint/render"
+ 	"cogentcore.org/core/system"
+@@ -156,6 +157,12 @@
+ 	// The saved window position and size takes precedence on multi-window platforms.
+ 	UseMinSize bool
+ 
++	// InitialSizeDP is an optional initial client-size request in density-independent
++	// units (160 per logical inch). It overrides content/screen-fraction sizing for
++	// new desktop windows, but saved geometry and OS constraints take precedence.
++	// It is applied before native show and is never a persistent layout minimum.
++	InitialSizeDP math32.Vector2 `set:"-"`
++
+ 	// Resizable specifies whether a window on desktop platforms can
+ 	// be resized by the user, and whether a non-full same-window dialog can
+ 	// be resized by the user on any platform. It defaults to true.
+@@ -222,6 +229,12 @@
+ 		str += "  Rc: " + rc.String()
+ 	}
+ 	return str
++}
++
++// SetInitialSizeDP sets the initial client-size request for a new desktop window.
++func (st *Stage) SetInitialSizeDP(width, height float32) *Stage {
++	st.InitialSizeDP = math32.Vec2(width, height)
++	return st
+ }
+ 
+ // SetBackButton sets [Stage.BackButton] using [option.Option.Set].
+--- a/core/mainstage.go
++++ b/core/mainstage.go
+@@ -264,7 +264,9 @@
+ 	// Mobile windows must take up the whole window
+ 	// and thus don't consider pref size.
+ 	// Desktop new windows and non-full windows can pref size.
+-	if !TheApp.Platform().IsMobile() &&
++	explicitInitial := st.NewWindow && TheApp.Platform() != system.Offscreen &&
++		(&system.NewWindowOptions{InitialSizeDP: st.InitialSizeDP}).HasInitialSizeDP()
++	if !explicitInitial && !TheApp.Platform().IsMobile() &&
+ 		(st.NewWindow || !st.FullWindow || current == nil) {
+ 		sz = sc.contentSize(sz)
+ 		// On offscreen, we don't want any extra space, as we want the smallest
+@@ -396,38 +398,42 @@
+ 	return st
+ }
+ 
+-func (st *Stage) newRenderWindow() *renderWindow {
+-	name := st.Name
+-	title := st.Title
++// initialWindowOptions is the creation-options seam shared by real native
++// creation and regression tests. A restored window keeps its saved pixel size.
++func (st *Stage) initialWindowOptions(screen *system.Screen, saved *windowGeometry, savedScreen *system.Screen) *system.NewWindowOptions {
+ 	opts := &system.NewWindowOptions{
+-		Title:     title,
+-		Icon:      appIconImages(),
+-		Size:      st.Scene.SceneGeom.Size,
+-		Pos:       st.Pos,
+-		StdPixels: false,
+-		Screen:    st.Screen,
++		Title: st.Title, Icon: appIconImages(), Size: st.Scene.SceneGeom.Size,
++		Pos: st.Pos, Screen: st.Screen, InitialSizeDP: st.InitialSizeDP,
++	}
++	if screen != nil {
++		opts.Screen = screen.ScreenNumber
+ 	}
+ 	opts.Flags.SetFlag(!st.Resizable, system.FixedSize)
+ 	opts.Flags.SetFlag(st.Maximized, system.Maximized)
+ 	opts.Flags.SetFlag(st.Fullscreen, system.Fullscreen)
++	if saved != nil && savedScreen != nil {
++		opts.Screen = savedScreen.ScreenNumber
++		opts.Size, opts.Pos = saved.Size, saved.Pos
++		opts.InitialSizeDP = math32.Vector2{}
++		if AllRenderWindows.FindName(st.Title) != nil {
++			opts.Pos = opts.Pos.Add(image.Pt(20, 20))
++		}
++		opts.Flags.SetFlag(saved.Max, system.Maximized)
++	}
++	return opts
++}
++
++func (st *Stage) newRenderWindow() *renderWindow {
++	name, title := st.Name, st.Title
+ 	screen := st.targetScreen()
+ 	screenName := ""
+ 	if screen != nil {
+ 		screenName = screen.Name
+ 	}
+-	var wgp *windowGeometry
+-	wgp, screen = theWindowGeometrySaver.get(title, screenName)
++	wgp, savedScreen := theWindowGeometrySaver.get(title, screenName)
++	opts := st.initialWindowOptions(screen, wgp, savedScreen)
+ 	if wgp != nil {
+ 		theWindowGeometrySaver.settingStart()
+-		opts.Screen = screen.ScreenNumber
+-		opts.Size = wgp.Size
+-		opts.Pos = wgp.Pos
+-		opts.StdPixels = false
+-		if w := AllRenderWindows.FindName(title); w != nil { // offset from existing
+-			opts.Pos.X += 20
+-			opts.Pos.Y += 20
+-		}
+-		opts.Flags.SetFlag(wgp.Max, system.Maximized)
+ 	}
+ 	win := newRenderWindow(name, title, opts)
+ 	theWindowGeometrySaver.settingEnd()
+--- a/system/window.go
++++ b/system/window.go
+@@ -11,6 +11,7 @@
+ 
+ import (
+ 	"image"
++	"math"
+ 	"unicode/utf8"
+ 
+ 	"cogentcore.org/core/events"
+@@ -267,6 +268,10 @@
+ 	// StartHidden constructs a desktop GPU window without showing it. The owner
+ 	// must call Show explicitly when ready. Other drivers do not implement this.
+ 	StartHidden bool
++	// InitialSizeDP requests a desktop client size in density-independent units.
++	// A finite positive pair overrides Size/StdPixels at creation. Resolution uses
++	// the same screen snapshot as native creation; it never sets a resize minimum.
++	InitialSizeDP math32.Vector2
+ 	// Size specifies the dimensions of the new window, either in raw pixels
+ 	// or std 96 dpi pixels depending on StdPixels. If Width or Height are
+ 	// zero, a driver-dependent default will be used for each zero value
+@@ -331,6 +336,59 @@
+ 	}
+ 	if sc == nil {
+ 		return
++	}
++	o.FixupForScreen(sc)
++}
++
++// HasInitialSizeDP reports whether both initial request dimensions are usable.
++func (o *NewWindowOptions) HasInitialSizeDP() bool {
++	return o.InitialSizeDP.X > 0 && o.InitialSizeDP.Y > 0 &&
++		!math.IsInf(float64(o.InitialSizeDP.X), 0) && !math.IsInf(float64(o.InitialSizeDP.Y), 0)
++}
++
++// initialSizePixels rounds DP to raw pixels and bounds before integer conversion.
++// At least one window-manager unit is required by native window creation.
++func (o *NewWindowOptions) initialSizePixels(sc *Screen) (image.Point, bool) {
++	if !o.HasInitialSizeDP() || sc == nil || sc.PixelSize.X <= 0 || sc.PixelSize.Y <= 0 ||
++		!(sc.LogicalDPI > 0) || !(sc.DevicePixelRatio > 0) ||
++		math.IsInf(float64(sc.LogicalDPI), 0) || math.IsInf(float64(sc.DevicePixelRatio), 0) {
++		return image.Point{}, false
++	}
++	dimension := func(dp float32, available int) int {
++		minimum, limit := initialPixelBounds(sc, available)
++		pixels := math.Round(float64(dp) * float64(sc.LogicalDPI) / 160)
++		return int(min(limit, max(minimum, pixels)))
++	}
++	return image.Pt(dimension(o.InitialSizeDP.X, sc.PixelSize.X), dimension(o.InitialSizeDP.Y, sc.PixelSize.Y)), true
++}
++
++// The backend's legacy size conversion uses float32. Keep a representable
++// margin below 2^31 so rounding cannot overflow GLFW's signed 32-bit dimensions.
++func initialPixelBounds(sc *Screen, available int) (minimum, limit float64) {
++	const safeNativeSize = float64(math.MaxInt32 - 127)
++	limit = max(1, math.Floor(min(float64(available), safeNativeSize*min(1, float64(sc.DevicePixelRatio)))))
++	minimum = min(limit, max(1, math.Ceil(float64(sc.DevicePixelRatio))))
++	return
++}
++
++// FixupForScreen resolves creation options using an already chosen screen snapshot.
++// Desktop creation passes this same snapshot to GLFW, avoiding a second screen
++// lookup with potentially different DPI, scale or geometry.
++func (o *NewWindowOptions) FixupForScreen(sc *Screen) {
++	if sc == nil {
++		return
++	}
++	if size, ok := o.initialSizePixels(sc); ok && !o.Flags.HasFlag(Fullscreen) {
++		o.Size, o.StdPixels = size, false
++		// The legacy screen constraint round trip truncates fractional DPR and
++		// can undo the minimum. Preserve native-safe final creation dimensions.
++		defer func() {
++			bound := func(value, available int) int {
++				minimum, limit := initialPixelBounds(sc, available)
++				return int(min(limit, max(minimum, float64(value))))
++			}
++			o.Size = image.Pt(bound(o.Size.X, sc.PixelSize.X), bound(o.Size.Y, sc.PixelSize.Y))
++		}()
+ 	}
+ 	scsz := sc.Geometry.Size() // window coords size
+ 
+--- a/system/driver/desktop/app.go
++++ b/system/driver/desktop/app.go
+@@ -129,7 +129,7 @@
+ 	if sc == nil {
+ 		return nil, errors.New("desktop: no screen available for new window")
+ 	}
+-	opts.Fixup()
++	opts.FixupForScreen(sc)
+ 
+ 	w := &Window{
+ 		WindowMulti:  base.NewWindowMulti[*App, *composer.ComposerDrawer](a, opts),
+--- /dev/null
++++ b/core/window_initial_vellum_test.go
+@@ -0,0 +1,32 @@
++package core
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/system"
++	"image"
++	"testing"
++)
++
++func TestStageInitialWindowOptionsAndSavedPrecedence(t *testing.T) {
++	sc := &system.Screen{ScreenNumber: 1, LogicalDPI: 240, DevicePixelRatio: 2, Geometry: image.Rect(0, 0, 2000, 1200), PixelSize: image.Pt(4000, 2400)}
++	body := NewBody("initial size")
++	st := body.NewWindow().SetInitialSizeDP(400, 300)
++	// Large intrinsic/preliminary geometry must not replace an explicit request.
++	st.Scene.SceneGeom.Size = image.Pt(3000, 2000)
++	opts := st.initialWindowOptions(sc, nil, nil)
++	opts.Pos = image.Pt(1, 1)
++	opts.FixupForScreen(sc)
++	if opts.Size != image.Pt(600, 450) || opts.Screen != 1 {
++		t.Fatalf("request lost: %+v", opts)
++	}
++	savedScreen := *sc
++	savedScreen.ScreenNumber = 2
++	saved := &windowGeometry{Size: image.Pt(900, 700), Pos: image.Pt(30, 40), Max: true}
++	opts = st.initialWindowOptions(sc, saved, &savedScreen)
++	if opts.InitialSizeDP != (math32.Vector2{}) || opts.Size != saved.Size || opts.Pos != saved.Pos || opts.Screen != 2 || !opts.Flags.HasFlag(system.Maximized) {
++		t.Fatalf("saved geometry lost: %+v", opts)
++	}
++	if st.InitialSizeDP != math32.Vec2(400, 300) {
++		t.Fatal("mutated stage request")
++	}
++}
+--- /dev/null
++++ b/system/window_initial_vellum_test.go
+@@ -0,0 +1,98 @@
++package system
++
++import (
++	"cogentcore.org/core/math32"
++	"image"
++	"math"
++	"testing"
++)
++
++func initialTestApp(t *testing.T) {
++	previous := TheApp
++	TheApp = &sizingSnapshotApp{}
++	t.Cleanup(func() { TheApp = previous })
++}
++func initialTestScreen(dpi, dpr float32) *Screen {
++	return &Screen{ScreenNumber: 1, Geometry: image.Rect(2000, 0, 4000, 1200), PixelSize: image.Pt(int(2000*dpr), int(1200*dpr)), LogicalDPI: dpi, DevicePixelRatio: dpr}
++}
++func TestInitialWindowOptionsResolveAtCreation(t *testing.T) {
++	initialTestApp(t)
++	for _, tt := range []struct {
++		name     string
++		dp       math32.Vector2
++		dpi, dpr float32
++		want     image.Point
++	}{
++		{"small", math32.Vec2(320, 240), 160, 1, image.Pt(320, 240)},
++		{"distinct-small", math32.Vec2(640, 400), 160, 1, image.Pt(640, 400)},
++		{"retina", math32.Vec2(640, 400), 320, 2, image.Pt(1280, 800)},
++		{"logical-zoom", math32.Vec2(640, 400), 240, 2, image.Pt(960, 600)},
++		{"rounded-screen-dpi", math32.Vec2(640, 400), 318, 2, image.Pt(1272, 794)},
++		{"fractional-scale", math32.Vec2(640, 400), 200, 1.25, image.Pt(800, 500)},
++		{"nearest-pixel", math32.Vec2(320.5, 240.49), 160, 1, image.Pt(321, 240)},
++		{"tiny-fractional", math32.Vec2(math.SmallestNonzeroFloat32, math.SmallestNonzeroFloat32), 200, 1.25, image.Pt(2, 2)},
++		{"tiny", math32.Vec2(math.SmallestNonzeroFloat32, math.SmallestNonzeroFloat32), 320, 2, image.Pt(2, 2)},
++		{"extreme-finite", math32.Vec2(math.MaxFloat32, math.MaxFloat32), 320, 2, image.Pt(4000, 2400)},
++	} {
++		t.Run(tt.name, func(t *testing.T) {
++			sc := initialTestScreen(tt.dpi, tt.dpr)
++			before := *sc
++			opts := NewWindowOptions{Size: image.Pt(1800, 1000), StdPixels: true, Pos: image.Pt(1, 1), InitialSizeDP: tt.dp}
++			opts.FixupForScreen(sc)
++			if opts.Size != tt.want || opts.StdPixels {
++				t.Fatalf("got %v std=%v, want %v", opts.Size, opts.StdPixels, tt.want)
++			}
++			if wm := sc.WindowSizeFromPixels(opts.Size); wm.X < 1 || wm.Y < 1 || wm.X > math.MaxInt32 || wm.Y > math.MaxInt32 {
++				t.Fatalf("invalid native dimensions %v", wm)
++			}
++			if *sc != before {
++				t.Fatal("mutated screen snapshot")
++			}
++		})
++	}
++}
++func TestInitialWindowOptionsUseOnlyChosenScreen(t *testing.T) {
++	initialTestApp(t)
++	opts := NewWindowOptions{InitialSizeDP: math32.Vec2(400, 300), Pos: image.Pt(1, 1), Screen: 1}
++	// The supplied secondary screen differs from the app's primary-screen defaults.
++	sc := initialTestScreen(240, 2)
++	opts.FixupForScreen(sc)
++	if opts.Size != image.Pt(600, 450) || opts.Screen != 1 {
++		t.Fatalf("wrong creation screen: %+v", opts)
++	}
++}
++func TestInitialWindowOptionsLeaveLegacyAndFullscreen(t *testing.T) {
++	initialTestApp(t)
++	sc := initialTestScreen(320, 2)
++	opts := NewWindowOptions{Size: image.Pt(800, 600), Pos: image.Pt(1, 1)}
++	opts.FixupForScreen(sc)
++	if opts.Size != image.Pt(800, 600) {
++		t.Fatal("legacy content size changed")
++	}
++	opts.InitialSizeDP = math32.Vec2(300, 200)
++	opts.Flags.SetFlag(true, Fullscreen)
++	opts.FixupForScreen(sc)
++	if opts.Size != sc.PixelSize {
++		t.Fatal("initial request overrode fullscreen")
++	}
++	for _, dp := range []math32.Vector2{{}, math32.Vec2(-1, 2), math32.Vec2(float32(math.NaN()), 2), math32.Vec2(2, float32(math.Inf(1)))} {
++		opts = NewWindowOptions{InitialSizeDP: dp, Size: image.Pt(800, 600), Pos: image.Pt(1, 1)}
++		opts.FixupForScreen(sc)
++		if opts.Size != image.Pt(800, 600) {
++			t.Fatal("invalid optional request affected legacy path")
++		}
++	}
++}
++
++func TestInitialWindowOptionsFinalNativeIntegerBound(t *testing.T) {
++	initialTestApp(t)
++	for _, dpr := range []float32{1, 1.25, 2, .5} {
++		sc := &Screen{PixelSize: image.Pt(math.MaxInt32, math.MaxInt32), Geometry: image.Rect(0, 0, math.MaxInt32, math.MaxInt32), LogicalDPI: 320, DevicePixelRatio: dpr}
++		opts := NewWindowOptions{InitialSizeDP: math32.Vec2(math.MaxFloat32, math.MaxFloat32), Pos: image.Pt(1, 1)}
++		opts.FixupForScreen(sc)
++		wm := sc.WindowSizeFromPixels(opts.Size)
++		if opts.Size.X < 1 || opts.Size.X > math.MaxInt32-127 || wm.X < 1 || wm.X > math.MaxInt32 || wm.Y < 1 || wm.Y > math.MaxInt32 {
++			t.Fatalf("DPR %v raw=%v native=%v", dpr, opts.Size, wm)
++		}
++	}
++}
