@@ -999,3 +999,15 @@ All runs meet the 400-cell/50-row/eight-column workload minimum, but all miss
 4 ms p95 and 32 miss 6 ms p99. P6/P11 remain open. Historical failures retain
 their workload/status; GPU execution, native/GPU memory, physical interaction,
 continuous extent/host stability and complete Mac qualification are unproven.
+
+## Adaptive scene tile bins — source and native checkpoint
+
+[Stage 0075 evidence](../docs/reports/macos-adaptive-tile-binning/README.md)
+binds clean source `29ec8c9`, unchanged admission/serialized bytes and 24 actual
+retained-grid software frame pairs. Six explicit native GPU readback roots pass.
+Forty matched ordinary baseline `77da1dd` / candidate `29ec8c9` processes cover CPU/GPU
+requested modes and fixed/variable million-row grids at identical geometry.
+Candidate p95 fails 4 ms in 20/20 processes and p99 fails 6 ms in
+18/20. P6/P11 and complete Mac qualification remain open.
+Ordinary tickets do not prove GPU execution or native/GPU memory, and programmed
+event routing does not qualify physical interaction.

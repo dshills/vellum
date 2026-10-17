@@ -84,3 +84,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Initial native window sizing](macos-initial-window-size/README.md): Dp creation contract, two measured native client sizes/shrinks, separate outer AX frames, bounded conversion regressions and review evidence.
 
 - [Current native grid viewport](macos-current-grid-viewport/README.md): actual native geometry, 40 ordinary processes and 4,800 frames; unchanged 4/6 ms targets still fail.
+
+- [Adaptive scene tile bins](macos-adaptive-tile-binning/README.md): owned stage 0075, byte/pixel limits and native GPU checks; matched ordinary grid results retain the open performance gate.

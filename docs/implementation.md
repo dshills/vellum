@@ -442,3 +442,13 @@ completed with matched row-count geometry; all 40 missed the unchanged 4 ms p95
 target and 32 missed 6 ms p99. The actual logical grid was 767×624 after rounding.
 This fixture checkpoint does not establish an algorithmic speedup, GPU execution,
 physical input or full Mac qualification.
+
+## Adaptive scene tile bin counting
+
+Owned stage 0075 replaces dense per-reference count loops with four rectangle
+difference corners and an in-place prefix, while sparse batches count directly.
+Original admission limits, serialized bytes, painter order and ownership remain
+unchanged. [The checkpoint](reports/macos-adaptive-tile-binning/README.md)
+includes frozen byte/admission oracles, 24 retained-grid software frame pairs,
+six explicit native GPU readback roots and 40 matched ordinary grid processes.
+The complete table/tree, native/GPU memory and full Mac gates remain open.
