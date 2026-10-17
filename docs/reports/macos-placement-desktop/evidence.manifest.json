@@ -1,0 +1,380 @@
+{
+  "schema": "vellum-placement-desktop-evidence-v1",
+  "files": {
+    "checks-v4/compile/receipt.json": {
+      "bytes": 1687,
+      "sha256": "83c63f31124048861836d1ec2d1d53d9c5456a12ce4368602d68de893e08a536"
+    },
+    "checks-v4/compile/stderr": {
+      "bytes": 99,
+      "sha256": "1c782839408f0fdb1f2586aca4a8ca4234580788bb05ebba60c54bf161b9b3f2"
+    },
+    "checks-v4/compile/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checks-v4/routing/receipt.json": {
+      "bytes": 1394,
+      "sha256": "ce5ee58b8134b001ae448c25f08d4f937ff1e639bf7aed6dfaacb529332945da"
+    },
+    "checks-v4/routing/stderr": {
+      "bytes": 104,
+      "sha256": "e5738d5eb89b65fb11d94eaa6db544b77f0b697f07ea3e3c50ade8464c8cf635"
+    },
+    "checks-v4/routing/stdout": {
+      "bytes": 57,
+      "sha256": "e7719b709453cd4ccbc23fc6eb706e317c3a335d884bf47c9897336863552c72"
+    },
+    "checks-v4/vet/receipt.json": {
+      "bytes": 1374,
+      "sha256": "b54d7d4d9732e0446a5c4717d41337434415575a8bc8fe1dac1af0b72505b743"
+    },
+    "checks-v4/vet/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checks-v4/vet/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "checks-v4/writer/receipt.json": {
+      "bytes": 1433,
+      "sha256": "41a4116d7b41b2738421dcb8f85aecf2cffdf41283b7df225d231fea39c8d7bc"
+    },
+    "checks-v4/writer/stderr": {
+      "bytes": 104,
+      "sha256": "e5738d5eb89b65fb11d94eaa6db544b77f0b697f07ea3e3c50ade8464c8cf635"
+    },
+    "checks-v4/writer/stdout": {
+      "bytes": 57,
+      "sha256": "f18f29289ca279d4ceacc4663f00a587697be92a872f2035026e42b7e4686612"
+    },
+    "native/Vellum Placement Probe.app/Contents/Info.plist": {
+      "bytes": 621,
+      "sha256": "ad06bbe89df97e226576ed46395b6621c4a6bc7901322a975c358884381b144a"
+    },
+    "native/build.json": {
+      "bytes": 1505,
+      "sha256": "d914d17d945a256d00ccd40f86a07cb0f82f30b2bb3a73d94fd0c17f424f9cf1"
+    },
+    "native/build.stderr": {
+      "bytes": 99,
+      "sha256": "1c782839408f0fdb1f2586aca4a8ca4234580788bb05ebba60c54bf161b9b3f2"
+    },
+    "native/build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native/go-version.txt": {
+      "bytes": 4047,
+      "sha256": "5e7c90ce2db2ccc4d6be4162a4f738eeba51f89a0af984df8d4215be2d4de73f"
+    },
+    "native/native.json": {
+      "bytes": 6858,
+      "sha256": "02a1950bb1701c0e6a4d0ee39567f9863693dab6bfb245fa39e5d45728a84789"
+    },
+    "native/native.stderr": {
+      "bytes": 702,
+      "sha256": "e180a957c1e00d75042726d46bd0302db8812459e588ccac0dea10dbe94a5e15"
+    },
+    "native/native.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native/otool.txt": {
+      "bytes": 2248,
+      "sha256": "58b6f46fae248a5da6c8fc131f5655249f95a374be046b1399e46633be8c1c1c"
+    },
+    "native/owned-process.json": {
+      "bytes": 6015,
+      "sha256": "ace34b483bb579c01382f6c8a214b9a71d86332b0e883d7a59372622be939761"
+    },
+    "native/postflight.json": {
+      "bytes": 591,
+      "sha256": "1018b4a028d52df2ae242d1decaffb3d0c117440acbb868a8d9670b97e5c956c"
+    },
+    "native/preflight.json": {
+      "bytes": 446,
+      "sha256": "597805bb2bc3ac57b10c1655a0112c452031d8641788e6941d72465224db2f5a"
+    },
+    "native/run-1/events.jsonl": {
+      "bytes": 26559,
+      "sha256": "a8e6dc2aa54ddcc16064bf92dbb81320721a33f16b317423de8ab038d84197ec"
+    },
+    "native/run-1/latest.json": {
+      "bytes": 980,
+      "sha256": "ce399763fdbe048327c2e9c5c55fbfc64c2d18fee5d142faeb7960c592cd1783"
+    },
+    "native/source.json": {
+      "bytes": 1330228,
+      "sha256": "1198a9f88f9d793978e601c8889c22e5243a8d4709bce9037812b4038ea702e9"
+    },
+    "native/steps/00-initial.json": {
+      "bytes": 25958,
+      "sha256": "aa2f13fbcf26f56caf21326db4c782620817a5e77f3844c45f26ba5c1031c605"
+    },
+    "workspace/binding-v4.json": {
+      "bytes": 859,
+      "sha256": "e48068ec13af6797c95b67a51e0ed5b21bbcef1149ce323f9eda774784f24d8f"
+    },
+    "workspace/build_native.py": {
+      "bytes": 3337,
+      "sha256": "2667cae852ddbfd9083f10b206a4406dd401be658982fdf8071441606627a248"
+    },
+    "workspace/check-v2.py": {
+      "bytes": 2359,
+      "sha256": "616abcd568537de04e02b5f85ca0234f2e63ac1103d742e0fa2454c13576fd5f"
+    },
+    "workspace/check-v3.py": {
+      "bytes": 2359,
+      "sha256": "531a46e5cf4e67b848f753b86d7c580e05c361b2111e45aeceec6b2b77824100"
+    },
+    "workspace/check-v4.py": {
+      "bytes": 2359,
+      "sha256": "caf009214bdbe91d643d7cf2d929d62e0679e384e9c1e567c34e995906d267f2"
+    },
+    "workspace/check.py": {
+      "bytes": 2270,
+      "sha256": "9556961d4d9c661de77dfc0c416627d64e4f57f8e0430dfca2636e219530a18d"
+    },
+    "workspace/commit.json": {
+      "bytes": 170,
+      "sha256": "1cb6d261ec185696e0c99369addaf8c2bd7f4de6281de10b51572e4c4e399ac9"
+    },
+    "workspace/cua-outcome.json": {
+      "bytes": 372,
+      "sha256": "88f654ac215d9d38608b09731a225dace2c8361abe872b5410ab19508d43c6e8"
+    },
+    "workspace/final-review.json": {
+      "bytes": 5772,
+      "sha256": "eee2c423e750bb2b4118339accbdd4d02ac600d7cc430580a3504c85bf842c05"
+    },
+    "workspace/history-v1/check.py": {
+      "bytes": 2270,
+      "sha256": "9556961d4d9c661de77dfc0c416627d64e4f57f8e0430dfca2636e219530a18d"
+    },
+    "workspace/history-v1/examples/placement/README.md": {
+      "bytes": 4268,
+      "sha256": "5528409332229b8bc7507c5e1eba30e5700d0d808323f963be21e97798460046"
+    },
+    "workspace/history-v1/examples/placement/native_probe_darwin_test.go": {
+      "bytes": 11890,
+      "sha256": "8f7d926762c65c20dddaf9a209c0c5844c9cd6eed8ed8ce6c30edb9ad53f9bf8"
+    },
+    "workspace/history-v1/manifest.json": {
+      "bytes": 779,
+      "sha256": "51a13fb8f742e20714ff002339d2cdb52aaefaed00f5db54fd37d2e6c0e8ddbb"
+    },
+    "workspace/history-v1/source-review.json": {
+      "bytes": 9140,
+      "sha256": "913850d86d6d6a535d44d0c614c1af05070144c514ab70d628885adf53ddd5fb"
+    },
+    "workspace/history-v1/specs/placement.md": {
+      "bytes": 7908,
+      "sha256": "36318a7b300a0c2b420b4da6fc9c9a58839af6b5367bd09e78f93250d3d0f81a"
+    },
+    "workspace/history-v1/writer-failed/receipt.json": {
+      "bytes": 1129,
+      "sha256": "48cdafdf7eab6dff4f1ce1743e3b5e8836b3081c65cb2952e30bcbd06d32ead6"
+    },
+    "workspace/history-v1/writer-failed/stderr": {
+      "bytes": 1127,
+      "sha256": "91c6e4b621b467e275ad3b12ed52e5e2b79eb36711cf54160edd763f850c00db"
+    },
+    "workspace/history-v1/writer-failed/stdout": {
+      "bytes": 198,
+      "sha256": "087053bcd7441319af8c468b88591920d26422622a399d1c013acdf87dc2e875"
+    },
+    "workspace/history-v2/check-v2.py": {
+      "bytes": 2359,
+      "sha256": "616abcd568537de04e02b5f85ca0234f2e63ac1103d742e0fa2454c13576fd5f"
+    },
+    "workspace/history-v2/examples/placement/README.md": {
+      "bytes": 4470,
+      "sha256": "467867f2d03eff59499ca1c17a8cc34da3007a3df671caac2a3aafb9ba3c0634"
+    },
+    "workspace/history-v2/examples/placement/main.go": {
+      "bytes": 4427,
+      "sha256": "9b5bfe125911d1f469d9061c0e68044486093c213149a81871f4cf5cc35e6e72"
+    },
+    "workspace/history-v2/examples/placement/main_default.go": {
+      "bytes": 72,
+      "sha256": "389bbd80c115b736ecd01757f777f4e3ac24f9e3c0c73b5ffa4cd21c790f54b3"
+    },
+    "workspace/history-v2/examples/placement/native_probe_darwin.go": {
+      "bytes": 11672,
+      "sha256": "71f95be247eb6a4bf7339b0ba64a04b98731664d8a972cb46c61e0f25da5ed91"
+    },
+    "workspace/history-v2/examples/placement/native_probe_darwin_test.go": {
+      "bytes": 3474,
+      "sha256": "e7168acca3d2b95082dcbbc498fa7536b4469aa448fb01661e4095ddf871f5aa"
+    },
+    "workspace/history-v2/specs/placement.md": {
+      "bytes": 8194,
+      "sha256": "e69f45fdc2452e2852f21f5472246ebbbd48b03c4ad8c4528b629dfcc67fd430"
+    },
+    "workspace/history-v2/writer-compile-failed/receipt.json": {
+      "bytes": 1434,
+      "sha256": "661cdd95f465ede9ab698012d1ee97a69b14801871b7b2411b359390543ee516"
+    },
+    "workspace/history-v2/writer-compile-failed/stderr": {
+      "bytes": 1171,
+      "sha256": "dd273767ee4efa95346eb321539f34cefed8929d279168e2b018d80d3c95aecf"
+    },
+    "workspace/history-v2/writer-compile-failed/stdout": {
+      "bytes": 70,
+      "sha256": "cfa7e9095643951d9bfdd0e9a10d2c9043bd69960ebe1ad756e9bc289255e977"
+    },
+    "workspace/history-v3/check-v3.py": {
+      "bytes": 2359,
+      "sha256": "531a46e5cf4e67b848f753b86d7c580e05c361b2111e45aeceec6b2b77824100"
+    },
+    "workspace/history-v3/compile/receipt.json": {
+      "bytes": 1686,
+      "sha256": "195950bc9c93728b914db217f1b31c0c7ae1275906fd8746bbe47b2de4978701"
+    },
+    "workspace/history-v3/compile/stderr": {
+      "bytes": 99,
+      "sha256": "1c782839408f0fdb1f2586aca4a8ca4234580788bb05ebba60c54bf161b9b3f2"
+    },
+    "workspace/history-v3/compile/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/history-v3/examples/placement/README.md": {
+      "bytes": 4470,
+      "sha256": "467867f2d03eff59499ca1c17a8cc34da3007a3df671caac2a3aafb9ba3c0634"
+    },
+    "workspace/history-v3/examples/placement/main.go": {
+      "bytes": 4427,
+      "sha256": "9b5bfe125911d1f469d9061c0e68044486093c213149a81871f4cf5cc35e6e72"
+    },
+    "workspace/history-v3/examples/placement/main_default.go": {
+      "bytes": 72,
+      "sha256": "389bbd80c115b736ecd01757f777f4e3ac24f9e3c0c73b5ffa4cd21c790f54b3"
+    },
+    "workspace/history-v3/examples/placement/native_probe_darwin.go": {
+      "bytes": 11674,
+      "sha256": "c2a367eb8dd71d5474fe49dad1536f1ddcd7d8e5f36a31bcd560e8b75176e593"
+    },
+    "workspace/history-v3/examples/placement/native_probe_darwin_test.go": {
+      "bytes": 3474,
+      "sha256": "e7168acca3d2b95082dcbbc498fa7536b4469aa448fb01661e4095ddf871f5aa"
+    },
+    "workspace/history-v3/routing/receipt.json": {
+      "bytes": 1394,
+      "sha256": "3ff2099b72683baf71114636f22439d43df527e67cf427d69993d62b6b1affa7"
+    },
+    "workspace/history-v3/routing/stderr": {
+      "bytes": 104,
+      "sha256": "e5738d5eb89b65fb11d94eaa6db544b77f0b697f07ea3e3c50ade8464c8cf635"
+    },
+    "workspace/history-v3/routing/stdout": {
+      "bytes": 57,
+      "sha256": "b37bcb68412f95f0dba629584972971d1e2d5301bbe4bc76c5d9fd544cdda9d0"
+    },
+    "workspace/history-v3/specs/placement.md": {
+      "bytes": 8194,
+      "sha256": "e69f45fdc2452e2852f21f5472246ebbbd48b03c4ad8c4528b629dfcc67fd430"
+    },
+    "workspace/history-v3/vet/receipt.json": {
+      "bytes": 1374,
+      "sha256": "8a416244f42afc01a24a24f68363c2d978954b18082b5d21fa2e860c65446626"
+    },
+    "workspace/history-v3/vet/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/history-v3/vet/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/history-v3/writer/receipt.json": {
+      "bytes": 1433,
+      "sha256": "b5bd2c64324318b45315a6a366f5915f5418c21dd312fd0fafa2b7b97c8c746a"
+    },
+    "workspace/history-v3/writer/stderr": {
+      "bytes": 104,
+      "sha256": "e5738d5eb89b65fb11d94eaa6db544b77f0b697f07ea3e3c50ade8464c8cf635"
+    },
+    "workspace/history-v3/writer/stdout": {
+      "bytes": 57,
+      "sha256": "dde7c66dd2a2decb872fea9a8b6cea278d46954014f5a39e8f98bd847d375d6a"
+    },
+    "workspace/launcher-controls.json": {
+      "bytes": 775,
+      "sha256": "12e4b6ddf8fdb53fffd4d46a1c3bb6f327a7411f2dae25faad0ee18ecd619ea7"
+    },
+    "workspace/native-readiness.json": {
+      "bytes": 9977,
+      "sha256": "d138c16c820570258dff547d316d3f5c11f38f4a1b74eb3bed46cf05d47d807c"
+    },
+    "workspace/observe_step.py": {
+      "bytes": 1638,
+      "sha256": "85a4a9a81cd3633ca1509b53b092042d1dce1f74b33becf51a6a17943cb22787"
+    },
+    "workspace/prism-checkpoint.py": {
+      "bytes": 5599,
+      "sha256": "ac9c7db9931a9da50b9faf9a2dc9dc4151ba9820a1e21306f3c6778c69f00549"
+    },
+    "workspace/prism-v1/payload.diff": {
+      "bytes": 21492,
+      "sha256": "f97ad7e301ab525b4a8c36f744fe41190103eacbf7ba91dae581267cc743b7e4"
+    },
+    "workspace/prism-v1/prism.json": {
+      "bytes": 2391,
+      "sha256": "4b1262e90c75ddee6b03770a61912427208852b41a9d0ec7d59b2699ee8ccc8c"
+    },
+    "workspace/prism-v1/receipt.json": {
+      "bytes": 2730,
+      "sha256": "03fb5f42e31e0be9b3548c4043502f3085a67df0c5f7b69efebdca0a304e529c"
+    },
+    "workspace/prism-v1/rules.json": {
+      "bytes": 1271,
+      "sha256": "be2296e7565e3038a4e29af0de37ce5ee7de927e9cde951fa8f6abc373ce4683"
+    },
+    "workspace/prism-v1/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/prism-v1/stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace/provider-assessment.json": {
+      "bytes": 1835,
+      "sha256": "f5e1198ef88f36eaec66cf1c6c3648510f7777f344a73d39c15774a59ef3ccb6"
+    },
+    "workspace/report.py": {
+      "bytes": 12098,
+      "sha256": "b2b4ace47ec6dc1db84a9f2bd0502fd154d384ed4f01e14d90c97026bfa07609"
+    },
+    "workspace/result-review.json": {
+      "bytes": 8408,
+      "sha256": "3c3fb76b37080ad06f92069c2b6dfd88c5ae3c611e4d218a8a2e438cb5441bb7"
+    },
+    "workspace/run_native.py": {
+      "bytes": 6953,
+      "sha256": "2682d02f2e65001e64d5df15859744568b614acb33020bf62290ffb1eaebc4b8"
+    },
+    "workspace/run_native_v1_unexecuted.py": {
+      "bytes": 6755,
+      "sha256": "aa401351a62d538f2d91d24a20b774b912fd276f9aebb56f6ad942c5fa914f17"
+    },
+    "workspace/source-review-v4.json": {
+      "bytes": 12995,
+      "sha256": "487fa75ed78eab2d6306499cb297c5c482abeaba7861eba6c814049e2ea523b6"
+    },
+    "workspace/source-review.json": {
+      "bytes": 9140,
+      "sha256": "913850d86d6d6a535d44d0c614c1af05070144c514ab70d628885adf53ddd5fb"
+    }
+  },
+  "binary_hash_only": {
+    "path": "/private/tmp/vellum-placement-desktop-native/Vellum Placement Probe.app/Contents/MacOS/placementprobe",
+    "sha256": "9ce978cf777f586735b7e8186ebf6119906841a8f46e0b50c9b04fcd11c508b2",
+    "bytes": 58735602
+  },
+  "native_workflow_accepted": false,
+  "physical_input_qualified": false
+}

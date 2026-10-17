@@ -74,3 +74,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Unique lifecycle, grid diagnostics and workspace recovery](macos-workspace-recovery/README.md): 1,000 unique-name cycles, eight diagnostic grid cases and four corrected native workspace smoke configurations, with preserved failures and explicit remaining Mac gates.
 
 - [Empty native text geometry](macos-empty-text-geometry/README.md): native selector/control/grid acceptance and all 80 ordinary runs; no consistent gain, failed targets and the unresolved candidate outlier retained.
+
+- [Native placement desktop probe](macos-placement-desktop/README.md): native-only observer and offscreen controls; external app binding timed out, no input workflows ran, failed deadline and clean owned-group retirement retained.

@@ -82,3 +82,9 @@ These sampled observations do not measure performance or establish physical
 hardware input, continuously visible previews, cross-display behavior, or native
 heap reclamation. Keep desktop-automation actions and their verified outcomes
 separate from the deterministic software-routing suite above.
+
+The [first native desktop attempt](../../docs/reports/macos-placement-desktop/README.md)
+reached one completed native accessibility snapshot, then expired while external
+app binding was pending. No pointer/key action ran; native placement workflow
+acceptance remains open. The offscreen/race checks and failed native deadline are
+reported separately, with source/build pins and owned-process retirement evidence.

@@ -391,3 +391,14 @@ origin-scoped actions. See the [contract](../specs/list-box.md). Automated routi
 and inert Cocoa evidence do not qualify physical input or human VoiceOver.
 The [checkpoint report](reports/macos-list-box/README.md) binds the exact scoped
 checks and outstanding acceptance gates.
+
+## Placement desktop acceptance attempt
+
+The [native placement probe](reports/macos-placement-desktop/README.md) adds a
+dedicated opt-in Mac executable with bounded read-only observations and diagnostic
+removal controls. Writer/observer race controls, the independent placement
+offscreen suite and native vet/build pass. The actual desktop session reached
+its ten-minute deadline while external app binding remained pending; the request
+later returned a timeout. No pointer/key actions were requested. Its group was reaped and absent. Native placement and
+external accessibility workflow acceptance remain open; the timeout cause is
+unassigned. This does not change the feature API or close broader Mac gates.

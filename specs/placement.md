@@ -55,8 +55,7 @@ selection, pan/zoom, optional snapping, and Undo/Redo. Its public API consumer,
 SDK inclusion, portable history/transform tests and actual offscreen routing
 checks are checkpoint requirements. Offscreen routing and software image checks
 do not qualify physical Mac pointer capture, cross-display movement, external
-accessibility or GPU presentation. Physical checks remain deferred while the
-human is using the machine. This feature does not complete P9/P11 or the wider
+accessibility or GPU presentation. Native pointer acceptance remains a separately recorded gate. This feature does not complete P9/P11 or the wider
 Mac acceptance gates.
 
 ## Public integration
@@ -122,3 +121,10 @@ the externally supplied actions and resulting model/history states. Desktop
 automation, sampled preview state and existing software pixels do not establish
 physical hardware delivery, continuous visibility, cross-display scale changes,
 performance or native deallocation.
+
+The [native acceptance attempt](../docs/reports/macos-placement-desktop/README.md)
+records a reachable native window and the probe deadline while external app
+binding remained pending. The request later returned a timeout; owned-group
+retirement was verified. No pointer/key workflow ran. The timeout cause remains unassigned; the desktop, external accessibility
+and physical requirements remain open. A diagnostic target-removal run must retain
+its pre-removal Accepted/TargetID state before qualifying candidate cancellation.

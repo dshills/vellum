@@ -1,0 +1,40 @@
+{
+  "source_commit": "00f060bb6c1a504fbc74c39c2a406db54f8d611c",
+  "tracked_files": 4612,
+  "prepared_files": 6243,
+  "source_review_sha256": "eee2c423e750bb2b4118339accbdd4d02ac600d7cc430580a3504c85bf842c05",
+  "result_review_sha256": "3c3fb76b37080ad06f92069c2b6dfd88c5ae3c611e4d218a8a2e438cb5441bb7",
+  "native_result": "FAILED_OR_CANCELED_NATIVE_PROCESS",
+  "native_exit_code": 1,
+  "native_elapsed_seconds": 601.4770345420111,
+  "native_error": "<nil>",
+  "observer_error": "<nil>",
+  "deadline_error": "context deadline exceeded",
+  "sample_records": 12,
+  "reachable_native_snapshots": 1,
+  "startup_unavailable_snapshots": 11,
+  "closed_records": 1,
+  "jsonl_bytes": 26559,
+  "cua": {
+    "operation": "cua.getApp('com.vellum.placement.nativeprobe')",
+    "returned_error": "Computer Use server error -10005: timeoutReached",
+    "tool_wall_seconds": 924.3729,
+    "binding_succeeded": false,
+    "pointer_key_drag_actions_requested": 0,
+    "cause": "unassigned; application/external-accessibility/automation integration not diagnosed",
+    "retry_performed": false
+  },
+  "group_absence_confirmed": true,
+  "cleanup_errors": [],
+  "source_stable": true,
+  "readiness_pins_stable": true,
+  "workflow_accepted": false,
+  "full_macos_qualified": false,
+  "evidence": {
+    "archive_sha256": "5f3ecdfaf80cdacd5ee746cf8c17b3da984a01141dbb75eeaa502e8fb69a434b",
+    "archive_bytes": 585329,
+    "manifest_sha256": "3a5c04d0ea6b764cc0ef00803a0f824886f4a10b70fd1a7f713fac4d88d793cb",
+    "entries": 93,
+    "expanded_bytes": 1668609
+  }
+}
