@@ -3,6 +3,8 @@
 These reports preserve investigation outcomes and their original validation scope.
 The [implementation status](../implementation.md) describes the current framework.
 
+- [Current grid profile diagnostics](macos-grid-profile-diagnostics/README.md)
+
 - [Native workbench external semantic automation](macos-automation-native/README.md)
 
 - [Menu restoration observation availability](macos-menu-observation/README.md)

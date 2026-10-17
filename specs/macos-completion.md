@@ -23,6 +23,14 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [current grid profile diagnostics](../docs/reports/macos-grid-profile-diagnostics/README.md)
+complete three CPU-profiled native apps and 3,072 callbacks on clean `30025cc`,
+plus one exact-PID native stack sample. All owned groups close and are observed
+absent. Go `cgocall` totals do not establish native function cost; the native
+sample includes substantial waiting and AX work. Profiled phase distributions
+remain diagnostic. Ordinary frame targets, memory/endurance, physical/human
+workflows and full macOS acceptance remain open. No runtime source changes here.
+
 The [current private SDK refresh](../docs/reports/macos-sdk-refresh/README.md) binds clean `2010a33` to
 7,421 hashed files including stage 0076 and current intrinsic grid sizing.
 The relocated generated consumer passes race/vet/build and public API contracts

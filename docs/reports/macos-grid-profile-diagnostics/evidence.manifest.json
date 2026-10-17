@@ -1,0 +1,752 @@
+{
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/analyze-cpu.py": {
+    "bytes": 3732,
+    "sha256": "59b0d27876e100bd15a3414050bd2b7731bc2cef7f463acd1b1952af4b3f291b",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/analyze-cpu.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/analyze-phases.py": {
+    "bytes": 1838,
+    "sha256": "85517aec315a1f248d917a301acfabd14eadf08dbc1a265f08be83070899af6e",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/analyze-phases.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/builder-guard-correction.json": {
+    "bytes": 537,
+    "sha256": "d1f4e2323f61ad65bb640f58a77b9f00537e197602fc093c68e54c1447dc3743",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/builder-guard-correction.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-analysis-inputs.json": {
+    "bytes": 3922248,
+    "sha256": "43b35a092553929836c08d28fb004c2bb0fdcd5b76417bfe910ec6786bf34281",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-analysis-inputs.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-controls.json": {
+    "bytes": 2425,
+    "sha256": "177ad7828c83a3a3bdecd39a56881beecf4e9e0bb3444a9bb53385841ed1cc8a",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-controls.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-controls.py": {
+    "bytes": 4009,
+    "sha256": "db9499c4197d64cee869286748f9cf1da7e985dff6791007402645b439bce035",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-controls.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-native.py": {
+    "bytes": 7281,
+    "sha256": "1c587ffad97b8f846520ab7ca3f481ac48813b6e9981eef1830b8b53f5d7ed0e",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-native.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-plan.json": {
+    "bytes": 3957083,
+    "sha256": "d1618ca7e4beaf609e7d33bf09683d327d942542cc83e42e5008d2c92a39bf46",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-plan.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-readiness.json": {
+    "bytes": 3971454,
+    "sha256": "cb67949359bf8eb73bec93fb56c8bfb155a9cbcd5e99d58d52c62f35597cdd80",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-readiness.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-cum/owned.json": {
+    "bytes": 409,
+    "sha256": "89d549a672cadc1da9a7d79806143f1e8c36366521804ac0f41492cd857672d9",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-cum/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-cum/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-cum/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-cum/stdout": {
+    "bytes": 4454,
+    "sha256": "0c8ba56e6e9fde4c97e9780cfed748a9f5978a4f0880a4928de4e0fafab4383a",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-cum/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-flat/owned.json": {
+    "bytes": 397,
+    "sha256": "d52bea5f69f5b439f9e542c92931449dbf07d14bce06864ad352f4e596bce818",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-flat/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-flat/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-flat/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-flat/stdout": {
+    "bytes": 4625,
+    "sha256": "1acdc9db8ec5d78f0a98e306d5c42d1ea7c367ea7d2495bed23a008f2cc08884",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/cpu-fixed-flat/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-cum/owned.json": {
+    "bytes": 419,
+    "sha256": "e7169a9a24ec5d6f88ecb20b50b17e79a60a6d14178c16bcb4262fe9567248d2",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-cum/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-cum/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-cum/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-cum/stdout": {
+    "bytes": 4287,
+    "sha256": "eaa0357d258495257fff106b4e67b2c2a13760e90708f0dbee7a2e29913a306c",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-cum/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-flat/owned.json": {
+    "bytes": 407,
+    "sha256": "9d7ed9c6d2b6571f5a78397e3e4c31e0e89c27fc789dc97b1f2b2e8e1744a6ea",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-flat/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-flat/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-flat/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-flat/stdout": {
+    "bytes": 4692,
+    "sha256": "e3f4d8ebe7dd663795bcd8b38c01aed644b5d0bf6514d7c74ab634413cc38518",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/gpu-requested-fixed-flat/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/receipt.json": {
+    "bytes": 8175,
+    "sha256": "ce51eb21ff7cf26d4edad6f2d65f1948452a9c76d87f41e4a20f6e459f2bf4f8",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/cpu-tops-v1/receipt.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/inputs.json": {
+    "bytes": 2312,
+    "sha256": "dd064475e290bf0175e2ef3f11a8283dd7849f32822cfcdafe6f3696f28015d4",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/inputs.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/phase-analysis.json": {
+    "bytes": 4467,
+    "sha256": "844c7169cf5a292f6d6be07171665ab1ecd3fb120b52698b61ce3a86a146d950",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/phase-analysis.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_objects/owned.json": {
+    "bytes": 529,
+    "sha256": "eef16b1595dd3d80023f44e2b38d9a3cea47f086aeec9497d9e42ffaee139829",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_objects/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_objects/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_objects/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_objects/stdout": {
+    "bytes": 3489,
+    "sha256": "f4eb31241bdfddbe082a86de74a2eaa4630c8094089dc3d6f741f95b3eed9f17",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_objects/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_space/owned.json": {
+    "bytes": 527,
+    "sha256": "54bed9007d751fa5b21171267d48f8655fb258835aac2d6ce8ad03115bd52a58",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_space/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_space/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_space/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_space/stdout": {
+    "bytes": 3809,
+    "sha256": "681e59a9290a1f09a3c51cd64ad7dc2af6e903d8b7d04dcfc88109adba85dfa9",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/baseline-alloc_space/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_objects/owned.json": {
+    "bytes": 531,
+    "sha256": "67f8c5b05ff65de9e3945d3d52e38a4a38e766408a0fbb492975da61e3a79160",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_objects/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_objects/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_objects/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_objects/stdout": {
+    "bytes": 3507,
+    "sha256": "d178695384e30b1bf965bc5c0f445113a45d6b64e247a10388509bfa966838ef",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_objects/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_space/owned.json": {
+    "bytes": 529,
+    "sha256": "db556830ae8c0906d1b44a8eca188af15e163f0c87d6e10b6bc2ce822e06d206",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_space/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_space/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_space/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_space/stdout": {
+    "bytes": 3840,
+    "sha256": "dc26f02946417fa71158fa5ee354814bd969dfd2862c26568f8f547538f4f2fd",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/candidate-alloc_space/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/receipt.json": {
+    "bytes": 7589,
+    "sha256": "ded5ff74631684caf07d64ed9c626fe215cf6120f5604999b1b823313dff7d3f",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/pprof-v1/receipt.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/prepare-cpu-executed.py.txt": {
+    "bytes": 4377,
+    "sha256": "994daeffcf8681ed33bc22ee071d1558c2aef65d546270a5cd3deaa989617d38",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/prepare-cpu-executed.py.txt"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/prepare-cpu.py": {
+    "bytes": 4378,
+    "sha256": "21f8ac350c51fde60deaa95868d587939425f58b8f096d7334f80f2b1f688c2d",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/prepare-cpu.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/run.py": {
+    "bytes": 3338,
+    "sha256": "aa1e9cc69f2886bfe2d65741eed9191d66bcf1fd07a2b75e0842404ebff658a8",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-allocation-analysis/run.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/analysis.json": {
+    "bytes": 3998280,
+    "sha256": "dfda5c2f147c3eb893f823d72e2ae0f560ed57c5940d30579e05f86b843bce95",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/analysis.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/analyze.py": {
+    "bytes": 4518,
+    "sha256": "b910aab957d0e02a80f6ec044fbecdc31eb8a63ab32f2b88d489298f42767830",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/analyze.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.json": {
+    "bytes": 2371,
+    "sha256": "56b807f7d3be58b55720c9f0822062ba2aa24504f01e1d1e188f355301dba493",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.py": {
+    "bytes": 6840,
+    "sha256": "6d808467ee280a8725a26b26db2973c7edd651a3ca7bcb566c8cff1cf055deb6",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.v1.json": {
+    "bytes": 1674,
+    "sha256": "ab1f9f5f598cd3bf7462331841fea0b03e15212a1d9270ceb9ccc1d625294bdc",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.v1.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.v2.json": {
+    "bytes": 1674,
+    "sha256": "ab1f9f5f598cd3bf7462331841fea0b03e15212a1d9270ceb9ccc1d625294bdc",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.v2.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.v3.json": {
+    "bytes": 1958,
+    "sha256": "80176c5e716e1781b6bc1d996772a65649f2984b49eda751ba5d6ae729dd28d1",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/controls.v3.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/cum/owned.json": {
+    "bytes": 394,
+    "sha256": "f272151b32b61064975c040c7fb67c9b491966c2f1f80d4f16735f098373a369",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/cum/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/cum/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/cum/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/cum/stdout": {
+    "bytes": 4776,
+    "sha256": "d9e872aff60f93bfe44f4603c687147e24b70f5acc032ac481b153d030e8b9bc",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/cum/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/flat/owned.json": {
+    "bytes": 382,
+    "sha256": "aea2c8bf34533b35cb027ee7f15992d196712cc6994037f9b8118f44aead4cee",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/flat/owned.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/flat/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/flat/stderr"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/flat/stdout": {
+    "bytes": 4522,
+    "sha256": "dfa78f74cf3ebdfa1c1b59c9f431e67f8c844d6b6a5afeff12c6558a234f9d8d",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/cpu-tops-v1/flat/stdout"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/readiness.json": {
+    "bytes": 3973125,
+    "sha256": "87dad5a1bfb78a0f8ac29a3f82292473cb2d3c539c167db40754653aeb0a6166",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/readiness.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/result-review.json": {
+    "bytes": 3991103,
+    "sha256": "77f9dee8108d09852ffe9c28375f8a0d365a596fd14aaaa5025670908e3f2f23",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/result-review.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/run.py": {
+    "bytes": 10763,
+    "sha256": "d8106b31bde50478c91a0d66f47a6120772241c77676d6b4856d175bb1b1cb5f",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-native-cpu-sample/run.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/README.template.md": {
+    "bytes": 6014,
+    "sha256": "e7fada17ac80d2c64f2cd9fc75f97455c66ab1e9118b5d3562dffb6971a95834",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/README.template.md"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/check-docs.py": {
+    "bytes": 971,
+    "sha256": "670bfd988034cccbb5a1e8866f3cacee4687fd0bc7a144d9282b5f4b9ad129ca",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/check-docs.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/commit.py": {
+    "bytes": 4928,
+    "sha256": "ccf82195500feda6fa5e1d1ece61e6dbea9c9519bc3ecf40e875e34bfd607a4e",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/commit.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/report.py": {
+    "bytes": 6152,
+    "sha256": "5c3cb95f0d8aae208a5c271cfbb00370f139d5ff3e46834198d725cbacb5bd0a",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/report.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/stage.py": {
+    "bytes": 1985,
+    "sha256": "e0177e9e5415fd7341f4c27d0bd3869b0496023b008ad04dd12c0acea219489d",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/stage.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/workspace-collision-correction.json": {
+    "bytes": 1858,
+    "sha256": "e59fa62456c437c608e3a0ebe165bd01641859478f816ba278f1ad226acc44c3",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-grid-profile-foundation-30025cc/workspace-collision-correction.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/blocked-v2/run.py": {
+    "bytes": 11131,
+    "sha256": "a0e945cf886b74f4e778ae15337bc36088d950f7da4e35cdda4c7b4446a291e1",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/blocked-v2/run.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/controls-v2.json": {
+    "bytes": 8446,
+    "sha256": "ee17691079cc2cc87211a6f3510be3cdf54fdc99c2585f93d1296f253c30d85e",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/controls-v2.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/controls-v2.py": {
+    "bytes": 2592,
+    "sha256": "fb33fa0480c6e4869c33d521bd0e28a490460ef88907f76719671751d01ac11d",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/controls-v2.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/fault-controls.json": {
+    "bytes": 7296,
+    "sha256": "69cd99d8eb60a855f5acd339ad2616914e9082eb17eba0825e5f784daf04c06b",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/fault-controls.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/fault-controls.py": {
+    "bytes": 3434,
+    "sha256": "c21fbd8db8c062b0069a2072d71c14bbf1c15273d21992411c17c4c7c5eb295a",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/fault-controls.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/finalization-controls.json": {
+    "bytes": 1556,
+    "sha256": "30972aa25f86632e50654b710999ab56d7092311392f40e5b7bac3d9252e381e",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/finalization-controls.json"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/finalization-controls.py": {
+    "bytes": 2268,
+    "sha256": "1de1b76a14ae44b8134a3c9b46973c74be4579141253c9a0933243d165a7599c",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/finalization-controls.py"
+  },
+  "origins/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/run.py": {
+    "bytes": 11845,
+    "sha256": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac",
+    "origin": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-sdk-native-238b3b6/run.py"
+  },
+  "origins/private/tmp/vellum-empty-text-native-isolated-v2/live_lease.py": {
+    "bytes": 910,
+    "sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4",
+    "origin": "/private/tmp/vellum-empty-text-native-isolated-v2/live_lease.py"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build-receipt.json": {
+    "bytes": 3528,
+    "sha256": "1b5b32d72fddc41b8fe0225335c4299b5b73fdd9eed1dc3dc6e26b9f26338e95",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build-receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build/owned.json": {
+    "bytes": 347,
+    "sha256": "0b274c77084358411cc48c7596b74576148a24f1a713326c6d1c96830231e486",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build/owned.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build/stderr": {
+    "bytes": 100,
+    "sha256": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build/stderr"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build/stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/build/stdout"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/metadata/owned.json": {
+    "bytes": 324,
+    "sha256": "deba9cb2cc4b23aa8fd72ae403ff27a7a2411669e208421d56227b0b906f969f",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/metadata/owned.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/metadata/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/metadata/stderr"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/metadata/stdout": {
+    "bytes": 6087,
+    "sha256": "b8d0357937fcd5b410fca7f26479a16f041544477316aba6db8f104a987141b9",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/metadata/stdout"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/owned.json": {
+    "bytes": 393,
+    "sha256": "87d5d824b3cda00994a3e1da4492d7d4a73e6970d5a11972013c9f633260bb7e",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/owned.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/receipt.json": {
+    "bytes": 3050,
+    "sha256": "ef5ac9cd594bf72333bf6b15656f62b35942cadcb76ed72878bffebbf21e1e3a",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/stderr"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/stdout": {
+    "bytes": 1279363,
+    "sha256": "c832a352c2ff190a9d1bdfd908425055890e9d3f811e70bcd437892544325154",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/cpu-fixed/stdout"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/owned.json": {
+    "bytes": 421,
+    "sha256": "7d2b15f43fb54f04c021f068ecd2be8c0297738f89671212b4117721d7e52dbc",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/owned.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/receipt.json": {
+    "bytes": 3140,
+    "sha256": "294eb02ba7344df561cb56b6c14aba962732ce739a2e4b6dc80ca6912e30bb91",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/stderr"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/stdout": {
+    "bytes": 1278304,
+    "sha256": "3cc07a6e62dc939eaeda8e669f23dbde2e860acd91470102c25f89e057e278a2",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/gpu-requested-fixed/stdout"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/profiles/cpu-fixed.cpu.pprof": {
+    "bytes": 12275,
+    "sha256": "9b5388f1356ffd3694eb6b11ce478166055ed4ebc93b0b365d2be7c6bab76e78",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/profiles/cpu-fixed.cpu.pprof"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/profiles/gpu-requested-fixed.cpu.pprof": {
+    "bytes": 16200,
+    "sha256": "c2e6c48edd19e74072034c214f4d46906c80b351d7070d8d925736a916444f2c",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/profiles/gpu-requested-fixed.cpu.pprof"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/receipt.json": {
+    "bytes": 8014,
+    "sha256": "8d638b1f37e33a2a2fc29ca77877d08e06a078ffb3a34fe8576c5e2c2f122d2c",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/stop-live": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/native/stop-live"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/prepared.json": {
+    "bytes": 2221573,
+    "sha256": "40e2797eec32a80b5e4ecc963d43d024a15e9dc4d363bf8ee9268a4495e0e8dc",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/prepared.json"
+  },
+  "origins/private/tmp/vellum-grid-cpu-diagnostic-30025cc/source.json": {
+    "bytes": 1690055,
+    "sha256": "12a41093b4687d2479a46755dab7990a9e09a97503095dceb00e4752b65854c4",
+    "origin": "/private/tmp/vellum-grid-cpu-diagnostic-30025cc/source.json"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/build-receipt.json": {
+    "bytes": 2016102,
+    "sha256": "29b57125ba840bbebcdb52a90df83fc1700c9845f2f4c01b050ee891aa637496",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/build-receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/native-receipt.json": {
+    "bytes": 686701,
+    "sha256": "e9ea59e722b304dcb2abdb79fea7efc94d601163fa8abc691de36e14af9313cd",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/native-receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/baseline.after.pprof": {
+    "bytes": 40254,
+    "sha256": "4ebd6cfcdb2a454a6863d72a768b82c6e96b17a2c12e08293c9313b6b698cbfa",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/baseline.after.pprof"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/baseline.before.pprof": {
+    "bytes": 33804,
+    "sha256": "35e80d99a8b089b5f002561b7e97cf32f9ecdb78ae37af77b15b40b9cd9672fb",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/baseline.before.pprof"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/candidate.after.pprof": {
+    "bytes": 38515,
+    "sha256": "34b04f05d430f4c184b242b881e559bc74ae83b2d2175447a4048de6e83b39a0",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/candidate.after.pprof"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/candidate.before.pprof": {
+    "bytes": 31948,
+    "sha256": "5a0646e9a5da7faa4fab8ce7e8e52717ef9c7e34026cd0df1c4158298e4b3291",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/profiles/candidate.before.pprof"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/runs/baseline-allocation/receipt.json": {
+    "bytes": 14212,
+    "sha256": "c6c0fb6d37b1665b315425f5945b674a56a751a04d5546e4f2dd9a0bec20a867",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/runs/baseline-allocation/receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/runs/baseline-allocation/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/runs/baseline-allocation/stderr"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/runs/baseline-allocation/stdout": {
+    "bytes": 637001,
+    "sha256": "9317f78ecdafa4439b99303237c6249b1a305fb2420ac75ed3582099e4571926",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/runs/baseline-allocation/stdout"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/runs/candidate-allocation/receipt.json": {
+    "bytes": 14236,
+    "sha256": "4f0a0dc03cca7f15e2f2f25e462dc8ae848fe508bb5493c5902b3f455846dd2b",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/runs/candidate-allocation/receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/runs/candidate-allocation/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/runs/candidate-allocation/stderr"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/runs/candidate-allocation/stdout": {
+    "bytes": 638718,
+    "sha256": "aa432a2580e1b169ab2314be0d75cb74474090db26c7f82f07977806f3ac1cf2",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/runs/candidate-allocation/stdout"
+  },
+  "origins/private/tmp/vellum-grid-intrinsic-native-599442a/source.json": {
+    "bytes": 1340232,
+    "sha256": "d83383b7e2235b0653bebd560a45d8a38bf1c7ddcee35743e97e40a1e4d3d56a",
+    "origin": "/private/tmp/vellum-grid-intrinsic-native-599442a/source.json"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/app/owned.json": {
+    "bytes": 396,
+    "sha256": "310ed1215bbfa7b3022e8731cd4ded9a5c44a39514452e9522243119e8162c55",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/app/owned.json"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/app/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/app/stderr"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/app/stdout": {
+    "bytes": 1277842,
+    "sha256": "18f87870d642a82a408c46c46fd5e503759e638ac577e4156d6dc96200d013ff",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/app/stdout"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/native.sample.txt": {
+    "bytes": 963362,
+    "sha256": "5273c336ed1397b04e50958c8d22e6f1932774864ba7be4fc57204183cfec41d",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/native.sample.txt"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/receipt.json": {
+    "bytes": 4473,
+    "sha256": "374a8d48aebee2e974fc2980844beaf7a81c499b9b2f7d694e73dfcca212fed8",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/receipt.json"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampled.cpu.pprof": {
+    "bytes": 22468,
+    "sha256": "b363702918cc2f97e1da860a5486eb026563f3b36490193a2b53f6538b4177ef",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampled.cpu.pprof"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampler/owned.json": {
+    "bytes": 293,
+    "sha256": "5c4d149b7e66d032f1a5ef90555694226865ee06f258b3090f29b6b544151beb",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampler/owned.json"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampler/stderr": {
+    "bytes": 245,
+    "sha256": "5f181e0f4a62794b87b9d641118d82fc33e197d4524e33eea764460d546eafb2",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampler/stderr"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampler/stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/sampler/stdout"
+  },
+  "origins/private/tmp/vellum-grid-native-cpu-sample-30025cc/stop-live": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-grid-native-cpu-sample-30025cc/stop-live"
+  },
+  "origins/private/tmp/vellum-macos-native-results-97aee13/scripts/benchmark-grid.py": {
+    "bytes": 41262,
+    "sha256": "13f689f97e462f3af41f06cb9360bd44644583bde54adae4839970fc22ead74d",
+    "origin": "/private/tmp/vellum-macos-native-results-97aee13/scripts/benchmark-grid.py"
+  },
+  "origins/private/tmp/vellum-macos-native-results-97aee13/scripts/child_process.py": {
+    "bytes": 7071,
+    "sha256": "04ba2610ddf112e936e8adcd9a81c03cff422843f993c2ce8a9e1acd96f39c9c",
+    "origin": "/private/tmp/vellum-macos-native-results-97aee13/scripts/child_process.py"
+  },
+  "origins/private/tmp/vellum-macos-native-results-97aee13/scripts/sdk_environment.py": {
+    "bytes": 1356,
+    "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311",
+    "origin": "/private/tmp/vellum-macos-native-results-97aee13/scripts/sdk_environment.py"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/mid-stop/owned.json": {
+    "bytes": 212,
+    "sha256": "517286e4dc6ed570b00f1a41b4444c7d4b6f3904311d32ed6373c7f156e17d15",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/mid-stop/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/mid-stop/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/mid-stop/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/mid-stop/stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/mid-stop/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/overflow/owned.json": {
+    "bytes": 237,
+    "sha256": "721339a4cf5f2bee6018fddd0efc90bd0b273790d0b78608711a9c97fef60178",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/overflow/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/overflow/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/overflow/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/overflow/stdout": {
+    "bytes": 1024,
+    "sha256": "49abd65bbf7f7e40c7055093ed2e3fd75f2f602f2c5fcf955c213e3135eb03f7",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/overflow/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/pipe-descendant/owned.json": {
+    "bytes": 232,
+    "sha256": "f2a453d57bad5b9eec8d79ddb33112bedfd57ba043c8061588a13f368c2bbfe9",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/pipe-descendant/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/pipe-descendant/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/pipe-descendant/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/pipe-descendant/stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/pipe-descendant/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/success/owned.json": {
+    "bytes": 197,
+    "sha256": "2d29363ecfc4d00dfee3d7c30fee35edb13c0067750a4600e9c9f2f63c82e0ef",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/success/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/success/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/success/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/success/stdout": {
+    "bytes": 3,
+    "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/success/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/timeout/owned.json": {
+    "bytes": 212,
+    "sha256": "adea5decf656cd15caa9b2f721a971d7897d1201fe55b2af6d8e8a0003be8198",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/timeout/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/timeout/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/timeout/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/controls-v2/timeout/stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/controls-v2/timeout/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/group-fallback/owned.json": {
+    "bytes": 215,
+    "sha256": "83760b0b39d9850b7729bf094ac08d5f04835520e84aa0a06421e8588162e18e",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/group-fallback/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/group-fallback/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/group-fallback/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/group-fallback/stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/group-fallback/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/log-observation/owned.json": {
+    "bytes": 200,
+    "sha256": "bdc22b289868081031a959d84cb4051b7a830152a1e4699ec8d127aa0f5816b9",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/log-observation/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/log-observation/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/log-observation/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/log-observation/stdout": {
+    "bytes": 3,
+    "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/log-observation/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/pin-observation/owned.json": {
+    "bytes": 200,
+    "sha256": "62c913ede256fb31871eb6f05b26314e296d8cbfcff57345d5d5fad7bc915247",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/pin-observation/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/pin-observation/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/pin-observation/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/pin-observation/stdout": {
+    "bytes": 3,
+    "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/pin-observation/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/term-failure/owned.json": {
+    "bytes": 215,
+    "sha256": "6bcc0487c55fce1871ebc4e7fc2ea77f6e335684667c1b6db2943ef8964f414e",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/term-failure/owned.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/term-failure/stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/term-failure/stderr"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/fault-controls/term-failure/stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/fault-controls/term-failure/stdout"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/existing-receipt/receipt.json": {
+    "bytes": 25,
+    "sha256": "95ee6c56057161c32d3e3de7029e12c44c852e1d0acdc2043927236ba8a8a2a0",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/existing-receipt/receipt.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/existing-receipt/stop-live": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/existing-receipt/stop-live"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/normal/receipt.json": {
+    "bytes": 167,
+    "sha256": "60479e3d195ae1161f9238f0e4cceb8f09c1340be3d9ce0e37f155b1c0d86ddb",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/normal/receipt.json"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/normal/stop-live": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/normal/stop-live"
+  },
+  "origins/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/seal-failure/receipt.json": {
+    "bytes": 290,
+    "sha256": "ba8a731785255ab6183313c61958dbcaec75073af74b2a76a3c9e4ab25d5f599",
+    "origin": "/private/tmp/vellum-sdk-native-238b3b6/finalization-controls/seal-failure/receipt.json"
+  }
+}
