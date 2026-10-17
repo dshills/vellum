@@ -667,3 +667,16 @@ Tests use a fresh pinned 6250-file dependency reconstruction and exact private
 ARM64 static GPU linkage. SDK refresh, physical interaction, presentation,
 ordinary latency, native/GPU memory, endurance, human input/accessibility,
 component/rights closure, public release and full Mac qualification remain open.
+
+The [current private SDK GPU checkpoint](reports/macos-gpu-sdk-stage0077/README.md)
+packages clean `5eef841` with 7,441 hashed payload files, stage 0077 and all three
+corrected GPU examples. Relocated generated-consumer race/vet/build and public
+API race/vet checks pass. Drawing, 3D and imaging each pass one serial race-enabled native
+source-assertion/readback case with exact packaged ARM64 static linkage and owned
+shutdown. The initial relative-path verifier failure remains failed; seventeen
+completed component outcomes are reused and sixteen remaining commands pass in
+a fresh continuation. Three actual grouped cancellation controls and eight path
+controls qualify the bounded test harness. This is a private consumption checkpoint,
+with internal reviews and no unchanged implementation Prism rerun. Physical/human
+workflows, presentation, ordinary/sustained latency, native/GPU memory, endurance,
+component/rights closure, public release and full Mac acceptance remain open.
