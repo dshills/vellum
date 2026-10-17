@@ -78,6 +78,8 @@ type accessibilityBridge struct {
 	lastSnapshot      string
 	completedSnapshot string // semantic identity of the detached ready cache
 	gridPublications  map[string][]accessibilityNode
+	pendingBaseline   []accessibilityNode // detached last emitted immutable wire records, no callbacks
+	pendingExhausted  bool                // never rely on an epoch after the full counter wraps
 	geometryMembers   map[string]struct{}
 	geometryVersion   *accessibilityGeometryVersion
 	geometryCache     accessibilityGeometryCache
@@ -169,6 +171,7 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	b.handlers = nil
 	b.activationGuards = nil
 	b.gridPublications = nil
+	b.pendingBaseline = nil
 	b.completedSnapshot = ""
 	b.geometryMembers = nil
 	b.geometryVersion = nil
@@ -239,10 +242,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		pendingGrid = pendingGrid || node.GridPending
 		// Only builtin scalars can safely reuse a detached completed view.
 		// Custom marshalers and mutable values retain normal preparation.
-		switch node.Value.(type) {
-		case nil, string, bool, int, int8, int16, int32, int64,
-			uint, uint8, uint16, uint32, uint64, uintptr, float32, float64:
-		default:
+		if !accessibilityImmutableScalar(node.Value) {
 			immutableValues = false
 		}
 	}
@@ -270,6 +270,14 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		if err != nil {
 			return
 		}
+		// Pending preparation can restore values from an older completed cache.
+		// Raw host-only input cannot certify those retained values as immutable.
+		for _, node := range nodes {
+			if !accessibilityImmutableScalar(node.Value) {
+				immutableValues = false
+				break
+			}
+		}
 	}
 	b.mu.Lock()
 	if b.closed.Load() {
@@ -280,6 +288,20 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	b.activationGuards = accessibilityActivationGuards(nodes)
 	snapshot := semantic
 	unchanged := b.lastSnapshot == snapshot
+	if b.generation.Load() == math.MaxUint64 {
+		// The legacy full path may wrap its publication counter. Permanently
+		// revoke this optimization before that can alias an old native epoch.
+		b.pendingExhausted = true
+	}
+	var pendingPatch string
+	if !unchanged && owned && immutableValues && pendingGrid && !b.pendingExhausted {
+		pendingPatch = accessibilityPendingPatch(b.pendingBaseline, nodes, b.generation.Load())
+	}
+	if !owned || !immutableValues || b.pendingExhausted {
+		b.pendingBaseline = nil
+	} else if !unchanged {
+		b.pendingBaseline = accessibilityPendingBaseline(nodes)
+	}
 	b.lastSnapshot = snapshot
 	if !unchanged {
 		b.updateGeometryMembership(nodes)
@@ -292,7 +314,12 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		return
 	}
 	generation := b.generation.Add(1)
-	nativeAccessibilityUpdate(b.token, accessibilityPayload(generation, snapshot))
+	payload := accessibilityPayload(generation, snapshot)
+	if pendingPatch != "" {
+		nativeAccessibilityUpdatePending(b.token, payload, pendingPatch)
+	} else {
+		nativeAccessibilityUpdate(b.token, payload)
+	}
 	b.mu.Unlock()
 }
 

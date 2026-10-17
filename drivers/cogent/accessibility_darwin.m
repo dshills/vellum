@@ -493,6 +493,10 @@ static BOOL vellumAXCanReuse(VellumAXElement *old,NSDictionary *node,NSDictionar
 }
 // Called synchronously on the native owner by publication; inert fixtures use
 // the same transaction without NSWindow creation or notifications.
+static void vellumAXPruneGeometry(VellumAXState *state,NSDictionary *members){
+ for(NSString *identifier in state.geometry.allKeys)if(!members[identifier])[state.geometry removeObjectForKey:identifier];
+ for(NSString *identifier in state.textGeometry.allKeys)if(!members[identifier])[state.textGeometry removeObjectForKey:identifier];
+}
 static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,BOOL notify){
  if(!state||state.closed)return NO;
  NSDictionary *nodes=vellumAXValidatedNodes(snapshot);if(!nodes)return NO;
@@ -521,8 +525,7 @@ static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,B
  for(NSDictionary *node in snapshot[@"nodes"]){VellumAXElement *element=next[node[@"id"]];NSString *parent=node[@"parent"];VellumAXElement *ancestor=next[parent];element.parentElement=ancestor?:state.view;if(ancestor)[childLists[parent] addObject:element];else [roots addObject:element];}
  for(NSString *identifier in next)next[identifier].childElements=childLists[identifier];
  for(NSString *identifier in state.elements)if(!next[identifier])vellumAXRetire(state.elements[identifier]);
- for(NSString *identifier in state.geometry.allKeys)if(!next[identifier])[state.geometry removeObjectForKey:identifier];
- for(NSString *identifier in state.textGeometry.allKeys)if(!next[identifier])[state.textGeometry removeObjectForKey:identifier];
+ vellumAXPruneGeometry(state,next);
  state.elements=next;state.roots=roots;state.hierarchy=hierarchy;state.generation=generation;
  if(notify){
   if(![oldHierarchy isEqual:hierarchy])NSAccessibilityPostNotification(state.view,NSAccessibilityLayoutChangedNotification);
@@ -534,6 +537,47 @@ static BOOL vellumAXCommitSnapshot(VellumAXState *state,NSDictionary *snapshot,B
 void vellumAXUpdate(uint64_t token,const char *json){
  vellumAXWithJSONPayload(json,^(NSData *payload){
   dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXCommitSnapshot(vellumAXStates[@(token)],snapshot,YES);}});
+ });
+}
+// A Go-proven pending-only publication keeps the exact validated membership,
+// completed values/frames and object identities. Preflight all scopes and freeze
+// every replacement dictionary before changing an element or generation. The
+// full canonical payload accompanies every patch because an earlier native
+// commit may have been refused after the Go bridge advanced its generation.
+static BOOL vellumAXCommitPending(VellumAXState *state,NSDictionary *patch,BOOL notify){
+ if(!state||state.closed||![patch isKindOfClass:NSDictionary.class]||patch.count!=3||!vellumAXUInt(patch[@"previous"],YES)||!vellumAXUInt(patch[@"generation"],YES)||![patch[@"scopes"] isKindOfClass:NSArray.class])return NO;
+ uint64_t previous=[patch[@"previous"] unsignedLongLongValue],generation=[patch[@"generation"] unsignedLongLongValue];
+ NSArray *scopes=patch[@"scopes"];if(previous==UINT64_MAX||previous!=state.generation||generation!=previous+1||scopes.count==0||scopes.count>state.elements.count)return NO;
+ NSMutableDictionary *targets=[NSMutableDictionary new];
+ for(id value in scopes){
+  if(![value isKindOfClass:NSDictionary.class])return NO;NSDictionary *scope=value;NSString *identifier=scope[@"id"];
+  if(scope.count!=4||![identifier isKindOfClass:NSString.class]||identifier.length==0||targets[identifier]||!vellumAXUInt(scope[@"incarnation"],YES)||!vellumAXUInt(scope[@"completed"],YES)||!vellumAXUInt(scope[@"target"],YES))return NO;
+  VellumAXElement *host=state.elements[identifier];NSDictionary *node=host.node;
+  if(!host.live||![node[@"grid_scope"] isEqual:identifier]||(![node[@"role"] isEqual:@"table"]&&![node[@"role"] isEqual:@"outline"]&&![node[@"role"] isEqual:@"canvas"])||![node[@"grid_incarnation"] isEqual:scope[@"incarnation"]]||![node[@"grid_generation"] isEqual:scope[@"completed"]]||!node[@"grid_frame"]||[scope[@"target"] unsignedLongLongValue]<[scope[@"completed"] unsignedLongLongValue])return NO;
+  targets[identifier]=scope[@"target"];
+ }
+ NSMutableDictionary<NSString *,NSDictionary *> *replacements=[NSMutableDictionary new];
+ for(NSString *identifier in state.elements){
+  VellumAXElement *element=state.elements[identifier];NSDictionary *old=element.node;NSString *scope=old[@"grid_scope"];NSNumber *target=scope?targets[scope]:nil;if(!target)continue;
+  NSMutableDictionary *node=[old mutableCopy];node[@"grid_pending"]=@YES;node[@"grid_target_generation"]=target;node[@"disabled"]=@YES;node[@"focused"]=@NO;node[@"actions"]=@[];
+  [node removeObjectForKey:@"text_client"];[node removeObjectForKey:@"text_selection"];[node removeObjectForKey:@"text_focus"];
+  replacements[identifier]=[node copy];
+ }
+ id oldFocus=vellumAXFocused(state);NSString *oldFocusedID=[oldFocus isKindOfClass:VellumAXElement.class]?[oldFocus accessibilityIdentifier]:@"";
+ for(NSString *identifier in replacements)state.elements[identifier].node=replacements[identifier];
+ vellumAXPruneGeometry(state,state.elements);
+ state.generation=generation;
+ if(notify){id focused=vellumAXFocused(state);NSString *focusedID=focused?[focused accessibilityIdentifier]:@"";if(![focusedID isEqual:oldFocusedID])NSAccessibilityPostNotification(focused?:state.view,NSAccessibilityFocusedUIElementChangedNotification);}
+ return YES;
+}
+void vellumAXUpdatePending(uint64_t token,const char *json,const char *patch){
+ vellumAXWithJSONPayload(json,^(NSData *payload){
+  vellumAXWithJSONPayload(patch,^(NSData *pending){
+   dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{
+    VellumAXState *state=vellumAXStates[@(token)];NSDictionary *delta=[NSJSONSerialization JSONObjectWithData:pending options:0 error:nil];
+    if(!vellumAXCommitPending(state,delta,YES)){NSDictionary *snapshot=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXCommitSnapshot(state,snapshot,YES);}
+   }});
+  });
  });
 }
 static void vellumAXApplyGeometry(VellumAXState *state,NSDictionary *bounds){
@@ -563,6 +607,7 @@ static NSDictionary *vellumAXFixtureElement(VellumAXElement *element){
  }
  return result;
 }
+static void vellumAXApplyTextGeometry(VellumAXState *state,NSDictionary *entries);
 char *vellumAXScopedFixture(const char *json){
  @autoreleasepool{
   NSData *data=vellumAXJSONData(json);id steps=data?[NSJSONSerialization JSONObjectWithData:data options:0 error:nil]:nil;
@@ -570,9 +615,11 @@ char *vellumAXScopedFixture(const char *json){
   VellumAXState *state=[VellumAXState new];state.elements=[NSMutableDictionary new];state.geometry=[NSMutableDictionary new];state.textGeometry=[NSMutableDictionary new];state.roots=@[];
   NSMutableArray *held=[NSMutableArray new],*results=[NSMutableArray new];
   for(id step in steps){
-   if(![step isKindOfClass:NSDictionary.class])return strdup("");BOOL accepted=NO;
+   if(![step isKindOfClass:NSDictionary.class])return strdup("");BOOL accepted=NO,fastPath=NO;
    if([step[@"kind"] isEqual:@"update"]){accepted=vellumAXCommitSnapshot(state,step[@"snapshot"],NO);if(accepted)for(VellumAXElement *element in state.elements.allValues)if(![held containsObject:element])[held addObject:element];}
+   else if([step[@"kind"] isEqual:@"pending"]){fastPath=vellumAXCommitPending(state,step[@"patch"],NO);accepted=fastPath||vellumAXCommitSnapshot(state,step[@"snapshot"],NO);if(accepted)for(VellumAXElement *element in state.elements.allValues)if(![held containsObject:element])[held addObject:element];}
    else if([step[@"kind"] isEqual:@"geometry"])vellumAXApplyGeometry(state,step[@"bounds"]);
+   else if([step[@"kind"] isEqual:@"text_geometry"])vellumAXApplyTextGeometry(state,step[@"entries"]);
    else if([step[@"kind"] isEqual:@"select_rows"]){
     // Inert production-setter/Go-owner bridge fixture, with no native attachment.
     VellumAXElement *list=state.elements[step[@"list"]];id identifiers=step[@"rows"];
@@ -596,7 +643,9 @@ char *vellumAXScopedFixture(const char *json){
     }
    }
    for(VellumAXElement *element in held)if(!element.live){NSMutableDictionary *record=[vellumAXFixtureElement(element) mutableCopy];record[@"admitted"]=@([element request:@"press" value:@""]);[retired addObject:record];}
-   [results addObject:@{@"accepted":@(accepted),@"generation":@(state.generation),@"elements":elements,@"retired":retired,@"pending_guards":guards}];
+   NSMutableDictionary *result=[@{@"accepted":@(accepted),@"generation":@(state.generation),@"elements":elements,@"retired":retired,@"pending_guards":guards} mutableCopy];if([step[@"kind"] isEqual:@"pending"])result[@"fast_path"]=@(fastPath);
+   if([step[@"include_nodes"] boolValue]){NSMutableDictionary *nodes=[NSMutableDictionary new];for(NSString *identifier in state.elements)nodes[identifier]=state.elements[identifier].node;result[@"nodes"]=nodes;result[@"geometry"]=[state.geometry copy];result[@"text_geometry"]=[state.textGeometry copy];}
+   [results addObject:result];
   }
   NSData *result=[NSJSONSerialization dataWithJSONObject:results options:0 error:nil];if(!result)return strdup("");return strdup([[NSString alloc]initWithData:result encoding:NSUTF8StringEncoding].UTF8String?:"");
  }
@@ -646,11 +695,14 @@ static BOOL vellumAXTextEntryValid(id entry){
  if([kind isEqual:@"cells"]){if(![c[@"start"] isKindOfClass:NSNumber.class]||![c[@"end"] isKindOfClass:NSNumber.class])return NO;NSInteger start=[c[@"start"] integerValue],end=[c[@"end"] integerValue];if(start<0||end<=start||!vellumAXValidRange(text,NSMakeRange(start,end-start)))return NO;}
  else {if(![c[@"offset"] isKindOfClass:NSNumber.class]||[c[@"offset"] integerValue]<0||!vellumAXValidRange(text,NSMakeRange([c[@"offset"] unsignedIntegerValue],0)))return NO;}}}return YES;
 }
-void vellumAXTextGeometry(uint64_t token,const char *json){
- vellumAXWithJSONPayload(json,^(NSData *payload){dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{
-  VellumAXState *state=vellumAXStates[@(token)];if(!state||state.closed)return;NSDictionary *entries=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];if(![entries isKindOfClass:NSDictionary.class])return;
+static void vellumAXApplyTextGeometry(VellumAXState *state,NSDictionary *entries){
+  if(!state||state.closed||![entries isKindOfClass:NSDictionary.class])return;
   for(id key in entries)if(![key isKindOfClass:NSString.class]||!vellumAXTextEntryValid(entries[key]))return;
   for(NSString *key in entries){state.textGeometry[key]=entries[key];state.elements[key].textGeometry=entries[key];}
+}
+void vellumAXTextGeometry(uint64_t token,const char *json){
+ vellumAXWithJSONPayload(json,^(NSData *payload){dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{
+  NSDictionary *entries=[NSJSONSerialization JSONObjectWithData:payload options:0 error:nil];vellumAXApplyTextGeometry(vellumAXStates[@(token)],entries);
  }});});
 }
 void vellumAXTextProbe(uint64_t token,uint64_t request,const char *id,int start,int length,double x,double y){@autoreleasepool{NSString *identifier=id?[NSString stringWithUTF8String:id]:@"";dispatch_async(dispatch_get_main_queue(),^{@autoreleasepool{

@@ -18,6 +18,7 @@ int vellumAXSnapshotValid(const char *json);
 char *vellumAXHitFixture(const char *json, const char *bounds, double x, double y);
 void vellumAXDetach(uint64_t token);
 void vellumAXUpdate(uint64_t token, const char *json);
+void vellumAXUpdatePending(uint64_t token, const char *json, const char *patch);
 void vellumAXGeometry(uint64_t token, const char *json);
 void vellumAXTextGeometry(uint64_t token,const char *json);
 void vellumAXTextProbe(uint64_t token,uint64_t request,const char *id,int start,int length,double x,double y);
@@ -109,6 +110,13 @@ func nativeAccessibilityUpdate(token uint64, payload string) {
 	s := C.CString(payload)
 	defer C.free(unsafe.Pointer(s))
 	C.vellumAXUpdate(C.uint64_t(token), s)
+}
+
+func nativeAccessibilityUpdatePending(token uint64, payload, patch string) {
+	s, p := C.CString(payload), C.CString(patch)
+	defer C.free(unsafe.Pointer(s))
+	defer C.free(unsafe.Pointer(p))
+	C.vellumAXUpdatePending(C.uint64_t(token), s, p)
 }
 func nativeAccessibilityGeometry(token uint64, payload string) {
 	s := C.CString(payload)

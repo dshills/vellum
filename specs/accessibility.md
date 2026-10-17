@@ -122,9 +122,10 @@ includes the private grid editor.
 
 Snapshot validation returns its checked ID-to-node map for the native commit.
 Identity reuse reads previous scope ownership from the old element dictionary
-before any element is mutated. Whole-snapshot validation, monotonic epochs,
-allocation before mutation, hierarchy order and notifications retain their
-existing rules; this does not introduce a delta or partial commit protocol.
+before any element is mutated. Full publications retain whole-snapshot
+validation, monotonic epochs, allocation before mutation, hierarchy order and
+notifications. The private pending-only optimization below reuses a graph that
+has already passed that validation; it cannot change membership or hierarchy.
 
 Asynchronous JSON producers copy C bytes and enqueue their strongly capturing
 blocks inside an explicit producer autorelease pool. Consumer blocks establish
@@ -160,6 +161,47 @@ without changing complete wire records, ordering, semantic-generation equality,
 callback replacement or native validation/commit/notification behavior. Ownership
 transfer and fewer intermediate copies do not qualify total retained, native or
 GPU memory, or sustained latency by themselves.
+
+### Pending-only native publication
+
+An owned snapshot with builtin scalar values may retain one detached copy of the
+last emitted prepared wire records. Actions, pointer fields and values are
+independent of the caller; this copy retains no Go handlers, activation guards
+or focus-owner metadata. Borrowed/custom/mutable publication revokes eligibility;
+closure clears it. The copy is bounded by the current publication, with no
+history. Completed-subtree preparation and canonical JSON encoding still run.
+Reaching publication-counter exhaustion permanently revokes fast-path eligibility
+for that bridge. A later wrap of the existing full-publication counter cannot
+reuse an old native epoch as proof; the full path keeps its existing admission.
+
+A private pending patch is eligible only when the entire next prepared snapshot
+has identical IDs, order and wire fields, except that affected scopes become
+pending with a new target, disabled/unfocused nodes, empty action arrays and no
+text client/selection/focus. Values, frames, completed generation, incarnation,
+parents, roles, labels/help and ordinary/other ready controls must stay exact.
+Startup without completed frames, replacement, removal, reparenting or any other
+semantic change uses the full publication. A field audit requires an explicit
+comparison decision whenever the wire node gains a field.
+
+Every patch carries the exact preceding global generation and its successor,
+plus unique affected scope IDs, incarnations, completed and target generations.
+The native owner preflights these against its last accepted tree with the same
+strict unsigned-number rules. It freezes all changed node dictionaries before
+assigning any, advances the global generation once and posts the same focus
+change notification. It preserves object identity, hierarchy, values, completed
+frames and text-geometry caches. Existing pending action guards remain in force.
+Both full and pending commits prune geometry/text-cache entries for IDs outside
+the accepted membership. Late callbacks can stage such entries; a successful
+pending transaction must discard them too. Refused transactions leave them intact.
+
+The full canonical JSON payload always accompanies the patch. If native
+preflight fails, including after a previously refused full snapshot left the Go
+and native epochs different, the owner parses and validates that full payload.
+A refused patch/full fallback leaves the previous native state unchanged.
+Successful completion uses ordinary full admission. This private optimization
+changes no public API and is not a general incremental tree protocol. Inert
+Foundation comparisons and automated native routing must be reported separately
+from physical input, screen-reader behavior and ordinary latency qualification.
 
 ## Native integer validation
 
