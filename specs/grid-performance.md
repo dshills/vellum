@@ -569,3 +569,16 @@ No frame, allocation, memory or Mac acceptance requirement changes. Current
 profiles point to synchronous accessibility snapshot/serialization/publication
 and full capture as the remaining investigation, without shifting work outside
 the measured frame or weakening native transaction/fallback semantics.
+
+## Builtin accessibility semantic encoding
+
+The [serializer checkpoint](../docs/reports/macos-ax-semantic/README.md) preserves
+the fixed private JSON schema in owned strings, with whole-snapshot standard
+encoder fallback for custom/unsupported/nonfinite values. No cache authority or
+native publication changes. Full driver race, default/legacy JSON byte oracles,
+vet and release build pass. Five matched ordinary pairs improve median run-p95
+4.875→4.788 ms; four of five improve. Observed process allocation is about 10%
+lower, including fixture/runtime work. Every p95 still exceeds 4 ms; no table
+or broader Mac gate closes. Separate diagnostics confirm 120 GPU captures per
+build, all accepted, no fallback, unchanged logical input. These are not physical
+pointer or presentation observations. Stage0079 prepared dependencies are unchanged.

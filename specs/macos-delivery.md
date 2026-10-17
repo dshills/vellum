@@ -1,7 +1,7 @@
 # Mac framework delivery plan
 
-Updated 17 October 2026. The latest text-batch checkpoint starts from clean `0c59fe0`
-and adds stage0079; the most recent private GPU
+Updated 17 October 2026. The latest accessibility serializer checkpoint starts
+from clean `02f8dbe` and retains stage0079; the most recent private GPU
 SDK and its native drawing/3D/imaging checks use clean runtime source `5eef841`.
 Owner: the main Vellum development chat. This is the execution plan for the
 existing [Mac completion requirements](macos-completion.md), not a replacement
@@ -198,7 +198,7 @@ be budgeted in addition to implementation time.
 | --- | --- | --- |
 | M1 | Complete in source | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); final SDK incorporation remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | [Text-batch comparison](../docs/reports/macos-text-batch/README.md) reduces median run-p95 5.168→4.951 ms, with 5/5 paired improvements and about 20% lower observed Go process allocation. Every p95 still misses 4 ms. Transient batching covers bitmap and small-outline text; only bitmap resources add sealed reuse. A [packed-upload experiment](../docs/reports/macos-packed-upload/README.md) shows no ordinary gain and is reverted. Current profiles point to synchronous accessibility serialization/publication and full capture. Async AX work remains deferred. |
+| M3 | Failing / incomplete | [Text-batch comparison](../docs/reports/macos-text-batch/README.md) reduces median run-p95 5.168→4.951 ms, with 5/5 paired improvements and about 20% lower observed Go process allocation. Every p95 still misses 4 ms. Transient batching covers bitmap and small-outline text; only bitmap resources add sealed reuse. A [packed-upload experiment](../docs/reports/macos-packed-upload/README.md) shows no ordinary gain and is reverted. The [builtin AX writer](../docs/reports/macos-ax-semantic/README.md) reduces median run-p95 4.875→4.788 ms (4/5 pairs improve), with about 10% lower observed process allocation; every p95 still fails 4 ms. No gate closes. Next target material synchronous publication and full-capture costs; async AX work remains deferred. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. Final SDK refresh, exact runtime/asset rights closure and owner approval remain. |

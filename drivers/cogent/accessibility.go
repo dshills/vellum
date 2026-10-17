@@ -241,7 +241,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	// must stay false even if it leaves only builtin values behind afterward.
 	immutableValues := accessibilityImmutableValues(nodes)
 	// Reject unencodable records before they can become a retained grid view.
-	semantic, err := accessibilitySemantic(nodes)
+	semantic, err := accessibilitySemanticHinted(nodes, b.semanticAllocationHint(len(nodes)))
 	if err != nil {
 		return
 	}
@@ -277,7 +277,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 		// Restored completed records may contain custom values even when the
 		// incoming pending hosts were builtin. Check before invoking them too.
 		immutableValues = immutableValues && accessibilityImmutableValues(nodes)
-		semantic, err = accessibilitySemantic(nodes)
+		semantic, err = accessibilitySemanticHinted(nodes, b.semanticAllocationHint(len(nodes)))
 		if err != nil {
 			return
 		}
@@ -390,11 +390,18 @@ func accessibilityActivationGuards(nodes []accessibilityNode) map[string]func() 
 	return guards
 }
 
-// accessibilitySemantic preserves Marshal's compact representation without
-// copying its returned byte slice again to retain an immutable string. Encoder
-// appends exactly one record delimiter after successful encoding; that newline
-// is removed while the builder's immutable backing remains owned by the result.
+// accessibilitySemantic preserves Marshal's compact representation in an owned
+// immutable string. Builtin scalars use the fixed wire schema; any unsupported
+// value falls back for the entire snapshot to the original standard encoder,
+// preserving its custom callbacks, errors and trailing-delimiter handling.
 func accessibilitySemantic(nodes []accessibilityNode) (string, error) {
+	return accessibilitySemanticHinted(nodes, 0)
+}
+
+func accessibilitySemanticHinted(nodes []accessibilityNode, hint int) (string, error) {
+	if encoded, ok := accessibilityBuiltinSemanticHinted(nodes, hint); ok {
+		return encoded, nil
+	}
 	var buffer strings.Builder
 	if err := json.NewEncoder(&buffer).Encode(nodes); err != nil {
 		return "", err
