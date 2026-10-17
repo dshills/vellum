@@ -78,8 +78,9 @@ type accessibilityBridge struct {
 	lastSnapshot      string
 	completedSnapshot string // semantic identity of the detached ready cache
 	gridPublications  map[string][]accessibilityNode
-	pendingBaseline   []accessibilityNode // detached last emitted immutable wire records, no callbacks
-	pendingExhausted  bool                // never rely on an epoch after the full counter wraps
+	pendingBaseline   []accessibilityNode    // detached fallback wire records, no callbacks
+	readyBaseline     []accessibilityNodeRef // ordered refs to immutable detached ready cache records
+	pendingExhausted  bool                   // never rely on an epoch after the full counter wraps
 	geometryMembers   map[string]struct{}
 	geometryVersion   *accessibilityGeometryVersion
 	geometryCache     accessibilityGeometryCache
@@ -172,6 +173,7 @@ func (b *accessibilityBridge) closeFrom(source string) {
 	b.activationGuards = nil
 	b.gridPublications = nil
 	b.pendingBaseline = nil
+	b.readyBaseline = nil
 	b.completedSnapshot = ""
 	b.geometryMembers = nil
 	b.geometryVersion = nil
@@ -268,7 +270,7 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	if !pendingGrid && immutableValues {
 		completedSemantic = semantic
 	}
-	nodes, handlers = b.prepareGridPublicationSnapshotForSemantic(nodes, handlers, owned, completedSemantic)
+	nodes, handlers, readyBaseline := b.prepareGridPublicationWithBaseline(nodes, handlers, owned, completedSemantic)
 	if pendingGrid {
 		// Ready records are unchanged by the scoped cache. Only pending records
 		// replace input semantics with their last-completed read-only subtree.
@@ -304,12 +306,19 @@ func (b *accessibilityBridge) updateSnapshot(nodes []accessibilityNode, handlers
 	}
 	var pendingPatch string
 	if !unchanged && owned && immutableValues && pendingGrid && !b.pendingExhausted {
-		pendingPatch = accessibilityPendingPatch(b.pendingBaseline, nodes, b.generation.Load())
+		pendingPatch = accessibilityPendingPatchBaseline(b.wireBaseline(), nodes, b.generation.Load())
 	}
 	if !owned || !immutableValues || b.pendingExhausted {
 		b.pendingBaseline = nil
+		b.readyBaseline = nil
+	} else if readyBaseline != nil {
+		// These references share only immutable detached grid cache records;
+		// ordinary records have their own detached storage. No model is kept.
+		b.pendingBaseline = nil
+		b.readyBaseline = readyBaseline
 	} else if !unchanged {
 		b.pendingBaseline = accessibilityPendingBaseline(nodes)
+		b.readyBaseline = nil
 	}
 	b.lastSnapshot = snapshot
 	if !unchanged {
@@ -342,14 +351,15 @@ func (b *accessibilityBridge) reuseReadySnapshot(nodes []accessibilityNode, hand
 	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	if b.closed.Load() || b.completedSnapshot == "" || b.completedSnapshot != b.lastSnapshot || len(b.pendingBaseline) != len(nodes) {
+	baseline := b.wireBaseline()
+	if b.closed.Load() || b.completedSnapshot == "" || b.completedSnapshot != b.lastSnapshot || baseline.len() != len(nodes) {
 		return false
 	}
 	for i := range nodes {
 		// SameWireNode accepts only exact builtin scalar values. Custom
 		// marshalers, mutable values and every changed wire field fall back
 		// to validation/encoding before retained state can be mutated.
-		if nodes[i].GridPending || !accessibilitySameWireNode(b.pendingBaseline[i], nodes[i]) {
+		if nodes[i].GridPending || !accessibilitySameWireNode(baseline.at(i), nodes[i]) {
 			return false
 		}
 	}

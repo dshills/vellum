@@ -42,12 +42,52 @@ func accessibilityPendingBaseline(nodes []accessibilityNode) []accessibilityNode
 	return out
 }
 
+// A ready baseline references the already detached, immutable per-grid cache.
+// Nil-action wire spelling is kept separately because cache clones preserve the
+// older normalization to a nonnil empty slice. Referenced records never mutate.
+type accessibilityNodeRef struct {
+	node       *accessibilityNode
+	actionsNil bool
+}
+
+type accessibilityWireBaseline struct {
+	nodes      []accessibilityNode
+	references []accessibilityNodeRef
+}
+
+func (b *accessibilityBridge) wireBaseline() accessibilityWireBaseline {
+	return accessibilityWireBaseline{nodes: b.pendingBaseline, references: b.readyBaseline}
+}
+func (b accessibilityWireBaseline) len() int {
+	if b.references != nil {
+		return len(b.references)
+	}
+	return len(b.nodes)
+}
+func (b accessibilityWireBaseline) at(i int) accessibilityNode {
+	if b.references == nil {
+		return b.nodes[i]
+	}
+	reference := b.references[i]
+	node := *reference.node
+	if reference.actionsNil {
+		node.Actions = nil
+	}
+	node.activationGuard = nil
+	node.pressFocusID = ""
+	return node
+}
+
 // Prove exact membership, order and wire semantics against the last emitted
 // detached snapshot. A pending subtree may only disable actions/focus and text
 // editing while retaining its completed identity, values and frames. Host label
 // changes, new incarnations, removals and any ordinary change use full admission.
 func accessibilityPendingPatch(previous, next []accessibilityNode, generation uint64) string {
-	if generation == 0 || generation == math.MaxUint64 || len(previous) == 0 || len(previous) != len(next) {
+	return accessibilityPendingPatchBaseline(accessibilityWireBaseline{nodes: previous}, next, generation)
+}
+
+func accessibilityPendingPatchBaseline(previous accessibilityWireBaseline, next []accessibilityNode, generation uint64) string {
+	if generation == 0 || generation == math.MaxUint64 || previous.len() == 0 || previous.len() != len(next) {
 		return ""
 	}
 	patch := accessibilityPendingPublication{Previous: generation, Generation: generation + 1}
@@ -69,7 +109,7 @@ func accessibilityPendingPatch(previous, next []accessibilityNode, generation ui
 		return ""
 	}
 	for i, n := range next {
-		old := previous[i]
+		old := previous.at(i)
 		if scope, pending := scopes[n.GridScope]; pending {
 			if !n.GridPending || n.GridIncarnation != scope.Incarnation || n.GridGeneration != scope.Completed || n.GridTargetGeneration != scope.Target {
 				return ""

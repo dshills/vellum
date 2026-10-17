@@ -214,10 +214,15 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshot(nodes []accessibili
 // builtin-valued nodes. Install its identity atomically with the detached cache;
 // a direct preparation between this call and final publication must revoke it.
 func (b *accessibilityBridge) prepareGridPublicationSnapshotForSemantic(nodes []accessibilityNode, handlers map[string]accessibilityHandler, owned bool, completedSemantic string) ([]accessibilityNode, map[string]accessibilityHandler) {
+	nodes, handlers, _ = b.prepareGridPublicationWithBaseline(nodes, handlers, owned, completedSemantic)
+	return nodes, handlers
+}
+
+func (b *accessibilityBridge) prepareGridPublicationWithBaseline(nodes []accessibilityNode, handlers map[string]accessibilityHandler, owned bool, completedSemantic string) ([]accessibilityNode, map[string]accessibilityHandler, []accessibilityNodeRef) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	if b.closed.Load() {
-		return nil, nil
+		return nil, nil, nil
 	}
 	// Direct preparation can change the cache independently of lastSnapshot.
 	// Only a subsequent successful ready publication can certify reuse again.
@@ -278,9 +283,13 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshotForSemantic(nodes []
 		replacements[scope] = retained
 	}
 	if owned && len(replacements) == 0 {
+		var baseline []accessibilityNodeRef
+		if completedSemantic != "" && len(cache) != 0 {
+			baseline = readyAccessibilityBaseline(nodes, scopes, cache)
+		}
 		b.gridPublications = cache
 		b.completedSnapshot = completedSemantic
-		return nodes, actions
+		return nodes, actions, baseline
 	}
 	out := make([]accessibilityNode, 0, len(nodes))
 	for _, node := range nodes {
@@ -294,7 +303,40 @@ func (b *accessibilityBridge) prepareGridPublicationSnapshotForSemantic(nodes []
 	}
 	b.gridPublications = cache
 	b.completedSnapshot = completedSemantic
-	return out, actions
+	return out, actions, nil
+}
+
+// Keep the completed caches independently owned, so a pending grid cannot keep
+// a retired sibling's records alive through a shared full-snapshot backing.
+// Only the small ordered reference vector is shared with the wire comparison.
+func readyAccessibilityBaseline(nodes []accessibilityNode, scopes map[string][]int, cache map[string][]accessibilityNode) []accessibilityNodeRef {
+	baseline := make([]accessibilityNodeRef, len(nodes))
+	ordinaryCount := len(nodes)
+	for scope, group := range cache {
+		for offset, index := range scopes[scope] {
+			baseline[index] = accessibilityNodeRef{node: &group[offset], actionsNil: nodes[index].Actions == nil}
+			ordinaryCount--
+		}
+	}
+	ordinary := make([]accessibilityNode, ordinaryCount)
+	offset := 0
+	for i := range baseline {
+		if baseline[i].node == nil {
+			ordinary[offset] = nodes[i]
+			ordinary[offset].activationGuard = nil
+			ordinary[offset].pressFocusID = ""
+			offset++
+		}
+	}
+	detachAccessibilityNodes(ordinary)
+	offset = 0
+	for i := range baseline {
+		if baseline[i].node == nil {
+			baseline[i] = accessibilityNodeRef{node: &ordinary[offset], actionsNil: nodes[i].Actions == nil}
+			offset++
+		}
+	}
+	return baseline
 }
 
 // sameCompletedGridMetadata runs under b.mu after full semantic equality and

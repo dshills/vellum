@@ -144,6 +144,19 @@ and callback containers. Pending replacement keeps the original scope/incarnatio
 parent, disabled-state and stale-action rules, including independent ready grids
 and ordinary controls. Removal and closure still retire cache references.
 
+An owned ready snapshot with builtin scalar values may use a lightweight ordered
+wire baseline referencing its existing immutable detached per-grid cache records,
+with independently detached ordinary records. The original nil versus empty
+Actions spelling is retained separately for exact wire comparison; reading a
+baseline never mutates the cache. Each grid keeps independent record and field
+storage, so a pending survivor cannot retain a removed sibling's full snapshot.
+Eligible pending/fallback publications retain a detached flat baseline; borrowed
+and custom-value publications clear both baselines. Ready references are rebound on cache replacement, including
+JSON-identical Go-only metadata changes, and cleared by fallback transitions,
+borrowed/custom publication, epoch exhaustion and closure. Pending proof compares
+the previous baseline before replacing it. This changes no native payload,
+generation/action authority or public API.
+
 An identical owned ready snapshot with builtin scalar values may retain its
 already detached completed cache. Exact comparison with the detached, previously
 validated wire baseline may also avoid repeating JSON encoding. Every wire field,

@@ -180,16 +180,16 @@ func TestAccessibilityPendingBaselineDetachedAndBounded(t *testing.T) {
 	}
 	b := &accessibilityBridge{done: make(chan struct{})}
 	b.updateOwned(cloneAccessibilityNodes(baseline), nil)
-	if len(b.pendingBaseline) != len(baseline) {
+	if b.wireBaseline().len() != len(baseline) {
 		t.Fatal("missing owned baseline")
 	}
 	b.update(cloneAccessibilityNodes(baseline), nil)
-	if b.pendingBaseline != nil {
+	if b.pendingBaseline != nil || b.readyBaseline != nil {
 		t.Fatal("borrowed duplicate retained proof baseline")
 	}
 	b.updateOwned(pendingAXNodes(baseline, 10), nil)
 	b.close()
-	if b.pendingBaseline != nil {
+	if b.pendingBaseline != nil || b.readyBaseline != nil {
 		t.Fatal("close retained proof baseline")
 	}
 }
@@ -200,11 +200,11 @@ func TestAccessibilityPendingRestoredCustomValueRevokesBaseline(t *testing.T) {
 		nodes := gridAXCompleted("g", "root", 7, 9)
 		nodes[2].Value = value
 		b.updateOwned(nodes, nil)
-		if b.pendingBaseline != nil || len(b.gridPublications["g"]) == 0 {
+		if (b.pendingBaseline != nil || b.readyBaseline != nil) || len(b.gridPublications["g"]) == 0 {
 			t.Fatal("nonbuiltin completion entered proof baseline or missed cache setup")
 		}
 		b.updateOwned(gridAXPending("g", "root", 7, 10), nil)
-		if b.pendingBaseline != nil {
+		if b.pendingBaseline != nil || b.readyBaseline != nil {
 			t.Fatal("raw builtin host certified restored nonbuiltin completed values")
 		}
 		b.close()
@@ -216,21 +216,21 @@ func TestAccessibilityPendingEpochExhaustionPermanentlyRevokesProof(t *testing.T
 	defer b.close()
 	ready := gridAXCompleted("g", "", 7, 9)
 	b.updateOwned(cloneAccessibilityNodes(ready), nil)
-	if b.pendingExhausted || len(b.pendingBaseline) == 0 {
+	if b.pendingExhausted || b.wireBaseline().len() == 0 {
 		t.Fatal("ordinary publication did not establish eligible baseline")
 	}
 	// Seed the formal boundary rather than generating 2^64 publications. The
 	// legacy full route continues; this optimization may never use a reused epoch.
 	b.generation.Store(math.MaxUint64)
 	b.updateOwned(pendingAXNodes(ready, 10), nil)
-	if b.generation.Load() != 0 || !b.pendingExhausted || b.pendingBaseline != nil {
+	if b.generation.Load() != 0 || !b.pendingExhausted || (b.pendingBaseline != nil || b.readyBaseline != nil) {
 		t.Fatal("counter wrap preserved fast-path eligibility")
 	}
 	for generation := uint64(11); generation < 14; generation++ {
 		nodes := gridAXCompleted("g", "", 7, generation)
 		b.updateOwned(cloneAccessibilityNodes(nodes), nil)
 		b.updateOwned(pendingAXNodes(nodes, generation+1), nil)
-		if !b.pendingExhausted || b.pendingBaseline != nil {
+		if !b.pendingExhausted || (b.pendingBaseline != nil || b.readyBaseline != nil) {
 			t.Fatal("a later owned ready/pending publication revived an exhausted proof")
 		}
 	}

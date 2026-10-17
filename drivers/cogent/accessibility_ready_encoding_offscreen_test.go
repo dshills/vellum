@@ -33,7 +33,7 @@ func TestAccessibilityReadyDuplicateCustomEncodingCannotCertifyMutatedInput(t *t
 			if err := json.Unmarshal([]byte(initial), &published); err != nil || len(published) != len(input) || published[2].Value != "encoded before mutation" || generation != 1 {
 				t.Fatal("ordinary custom publication was dropped or changed", err)
 			}
-			if bridge.completedSnapshot != "" || bridge.pendingBaseline != nil {
+			if bridge.completedSnapshot != "" || bridge.pendingBaseline != nil || bridge.readyBaseline != nil {
 				t.Fatal("custom encoder certified a ready cache or wire baseline")
 			}
 			// This independent fresh description must publish its actual value.
