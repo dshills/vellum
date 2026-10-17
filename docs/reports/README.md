@@ -92,3 +92,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Current native grid CPU/allocation profiles](macos-current-grid-profiles/README.md): separate bounded diagnostics and conservative attribution; ordinary latency targets remain unqualified.
 
 - [Detached accessibility storage and native comparison](macos-ax-copy-storage/README.md): scoped Cocoa correctness and allocation evidence; unchanged frame targets remain failed.
+
+- [Exact-location glyph coverage](macos-glyph-placement/README.md): owned stage 0076, software capture comparisons and five current-source native sanity processes; frame targets remain open.

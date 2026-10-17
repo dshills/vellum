@@ -23,6 +23,16 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [exact-location glyph coverage checkpoint](../docs/reports/macos-glyph-placement/README.md)
+adds owned stage 0076 on source `2be8e79`, with bounded renderer metadata,
+original work/ownership/clip guards, differential software output and six
+discriminating source controls. DPI96 offscreen capture medians improve;
+cold/miss costs and unchanged bitmap routes remain separate. Five fresh native
+sanity processes pass Cocoa identity/action/closure and 480 measured scroll
+callbacks, but all four ordinary p95/p99 cases miss 4/6 ms. This establishes no
+native speedup, broad no-regression, physical/GPU execution or full Mac pass.
+
+
 The [current private SDK checkpoint](../docs/reports/macos-current-sdk/README.md)
 verifies 7,411 hashed files from clean `238b3b6`, including owned stages 0074/0075.
 The relocated generated consumer passes race/vet/build checks, and the public API

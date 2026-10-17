@@ -510,3 +510,12 @@ regressions. Warm software gains and cold/bitmap costs remain separate from the
 open native frame budgets and full macOS qualification. The
 [owned contract](../drivers/cogent/native/patches/glyphplacement/README.md) records
 the bounds and fallback requirements.
+
+
+The [exact-location glyph coverage checkpoint](reports/macos-glyph-placement/README.md)
+records source `2be8e79`, its single Anthropic Prism review, final automated
+checks and separate five-process current-source native sanity. Cocoa identity,
+action/closure and all 480 measured callbacks pass; all four ordinary cases
+still miss 4/6 ms targets. DPI96 offscreen capture medians improve, while bitmap
+and cold/miss costs remain explicit. No native speedup, broad no-regression,
+actual GPU execution or full Mac qualification follows.

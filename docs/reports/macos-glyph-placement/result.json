@@ -1,0 +1,762 @@
+{
+  "schema": 1,
+  "source_commit": "2be8e790f8d5cdce5e0adac31b2adf5d73a76656",
+  "source_parent": "25bd4739a82fb7cfbcea95d699c682bafe10b38d",
+  "source_review_sha256": "b32aa6705b8a9937d65f50c36fe91fae042876d9d248d85b1f705bb71fbf39aa",
+  "source_checkpoint": {
+    "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-glyph-placement/checkpoint-2be8e79",
+    "manifest_sha256": "ba6b8a2a45bca169b0822b404666fedf7bab2bc73140ee52655eae53bfabb5fb",
+    "files": 432,
+    "bytes": 30139515,
+    "excluded_executables": [
+      {
+        "path": "/private/tmp/vellum-glyph-placement-production-25bd473-v2/loadedgrid",
+        "bytes": 59340818,
+        "sha256": "e8ccd0a32ab74d37d9c574e07079edcfadcc45d8a5bab75fc7732394d2ea3b30"
+      }
+    ]
+  },
+  "source_files": 4678,
+  "prepared_files": 6249,
+  "owned_stage": 76,
+  "offscreen": {
+    "result": "RECOMPUTED_FINAL_EPOCH_EXPERIMENT",
+    "native_runtime_executed": false,
+    "baseline": "Exact prior four-file compiler overlay; not clean historical build",
+    "candidate": "Epoch/generation implementation compiler overlay; final test-only exhaustion assertion added separately",
+    "warm_grid_equal": true,
+    "warm_grid_records_per_process": 24,
+    "grid": [
+      {
+        "group": "(96, False)",
+        "baseline_median_ns": 1235376.0,
+        "candidate_median_ns": 931613.5,
+        "change_percent": -24.588667741643032,
+        "observations_each": 10
+      },
+      {
+        "group": "(96, True)",
+        "baseline_median_ns": 1962864.0,
+        "candidate_median_ns": 1767584.5,
+        "change_percent": -9.948702508171737,
+        "observations_each": 10
+      },
+      {
+        "group": "(160, False)",
+        "baseline_median_ns": 608652.5,
+        "candidate_median_ns": 607688.5,
+        "change_percent": -0.1583826567704838,
+        "observations_each": 10
+      },
+      {
+        "group": "(160, True)",
+        "baseline_median_ns": 622029.0,
+        "candidate_median_ns": 618780.0,
+        "change_percent": -0.5223229142049646,
+        "observations_each": 10
+      },
+      {
+        "group": "(192, False)",
+        "baseline_median_ns": 640212.5,
+        "candidate_median_ns": 640841.5,
+        "change_percent": 0.09824862838510029,
+        "observations_each": 10
+      },
+      {
+        "group": "(192, True)",
+        "baseline_median_ns": 649301.0,
+        "candidate_median_ns": 643137.5,
+        "change_percent": -0.9492515797757894,
+        "observations_each": 10
+      }
+    ],
+    "synthetic": [
+      {
+        "group": "BenchmarkVellumGlyphPlacementCapture/fixed",
+        "baseline_median_ns": 2257079,
+        "candidate_median_ns": 1501885,
+        "change_percent": -33.45890861595895,
+        "observations_each": 5
+      },
+      {
+        "group": "BenchmarkVellumGlyphPlacementCapture/alternating-rows",
+        "baseline_median_ns": 2286703,
+        "candidate_median_ns": 1519570,
+        "change_percent": -33.54755733473039,
+        "observations_each": 5
+      },
+      {
+        "group": "BenchmarkVellumGlyphPlacementCapture/cold-coordinates",
+        "baseline_median_ns": 2296917,
+        "candidate_median_ns": 2342976,
+        "change_percent": 2.0052531284325825,
+        "observations_each": 5
+      },
+      {
+        "group": "BenchmarkVellumGlyphPlacementUnderfullClippedMiss",
+        "baseline_median_ns": 1004678,
+        "candidate_median_ns": 1027391,
+        "change_percent": 2.260724331576891,
+        "observations_each": 5
+      }
+    ],
+    "source_controls": 6,
+    "controls_expected_failure": true,
+    "performance_qualification": false
+  },
+  "production": {
+    "result": "PASS_FINAL_PRODUCTION_AND_TEST_ONLY_DELTA",
+    "warm_records": 24,
+    "warm_records_equal": true,
+    "implementation_changed_after_adoption": false,
+    "full_driver_race_seconds": 233.99228579201736,
+    "native_runtime_executed": false,
+    "inputs": {
+      "/private/tmp/vellum-glyph-placement-production-25bd473-v2/receipt.json": "cd7b22f42eb1f95e260523ae32d2a93bb1858c5a68dae3392ef141d97eb8f228",
+      "/private/tmp/vellum-glyph-placement-production-25bd473-v2/source.json": "22ef2688c92fd90e325ad7456d2753b1c62e7355ad1f130b8e00a10546fe115a",
+      "/private/tmp/vellum-glyph-placement-production-25bd473-v2/prepared.json": "c05e633c89266ff5c2c5ccf25b94e62457140440c55af5df00bf85a8ef8ea995",
+      "/private/tmp/vellum-glyph-placement-prototype-25bd473/checks-v8/1-candidate-grid/stdout": "bb92e79069ced5d210a0dbe4330d5986cec606086a68eb69a1f6a590c8db24af",
+      "/private/tmp/vellum-glyph-placement-production-25bd473-v2/warm-delta/stdout": "b4a33d529149919ef5e2e7a376a5cce2f09e7ff2c60d6472da5f6f3218e0ee8f",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-glyph-placement/driver-test-delta.json": "7c5a4dcd7f8f87ef89e3569094d7537f82ba8673c6ed72add367108481476330",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-glyph-placement/commit-controls.json": "a4eecde01797e050818b80a13ce5c27c404d381f04b1951f721e81de57bc9837"
+    }
+  },
+  "provider": {
+    "provider": "Anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "files": 10,
+    "bytes": 53368,
+    "retained_findings": 0,
+    "discarded_medium": "60bf3eeb2dbcce14",
+    "disposition": "Independently refuted by complete path-input inspection; no source or test changes after provider. Raw finding retained."
+  },
+  "native": {
+    "schema": 1,
+    "result": "PASS_SCOPED_CURRENT_NATIVE_SANITY",
+    "source_commit": "2be8e790f8d5cdce5e0adac31b2adf5d73a76656",
+    "source_files": 4678,
+    "prepared_files": 6249,
+    "source_prepared_canonical_parity": true,
+    "review_sha256": "f9e4419586ecbb1ee528e47a21932d06c27b320e16622be64174d84e17521f44",
+    "binary": {
+      "path": "/private/tmp/vellum-glyph-native-2be8e79/loadedgrid",
+      "sha256": "73496fe0ea3410242013839565c55a5546391d015125167d246aea95c9892098",
+      "bytes": 59340818
+    },
+    "inputs": {
+      "/private/tmp/vellum-glyph-native-2be8e79/native-receipt.json": "4c5525c65d7ea6f4a36c82b16fd34b6ff0a0fc50178177bf94856f41680b62ab",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-glyph-native-2be8e79/readiness.json": "f9e4419586ecbb1ee528e47a21932d06c27b320e16622be64174d84e17521f44",
+      "/private/tmp/vellum-glyph-native-2be8e79/build-receipt.json": "d789ac41728c52842cc1372f2352ca6d9d20718cc2df5091d2eecb49bbbed551",
+      "/private/tmp/vellum-glyph-native-2be8e79/source.json": "c54e7a6b5c04fc44e4eb39d7c5fc000cb5af4fa5b4c9a752f86fa640107864e6",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-glyph-native-2be8e79/analyze.py": "56b670830f5d5bef904217b28204bc429737e82d16067b1c969d3a98f19b0db4",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/native-ax/stdout": "eea9f601c1fada870d0883589d65c6efe9ff7798a2857d9fbdb7c69b15315970",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/native-ax/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/native-ax/receipt.json": "22c99e1ca51b92f0e17aa33d3651ad32a406572f1ebc9bb60d28a143dc526b42",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/cpu-fixed/stdout": "9c7ddebdb2e3682f7fd708d57896bc773c5b7c59cd81044f74370dc638452c1e",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/cpu-fixed/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/cpu-fixed/receipt.json": "148e091ba793e9ae76d7c1311943ccebb0f7fe44f466a08f1ddb29aeaf88cd54",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/cpu-variable/stdout": "508f5e26bab8dcafeae2f7944d5d0397606b3e72497999f5cf6e2aab30566155",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/cpu-variable/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/cpu-variable/receipt.json": "fe00de38864fa81b625c6f94048ecbdde42e98ac25e1dbb03b9f3ab1c82a3b37",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/gpu-fixed/stdout": "97cb591c2c9211721e25cbe72acb83f2660eb000ec32b7a08d8fc9c8f6ca5b17",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/gpu-fixed/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/gpu-fixed/receipt.json": "5ae1ea5022d2b64a89fbfc63f5ef9280d15483fd99ecb7791631064b419a9504",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/gpu-variable/stdout": "4b7474f28ab44c6b5625ed3d7961ac953472b0799391e3a2871c842417c2c055",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/gpu-variable/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-glyph-native-2be8e79/runs/gpu-variable/receipt.json": "54fd2419aa5340f98a7d5fcb27692ad76f13182a1eaa77ec7aba265fce8cddfb"
+    },
+    "cases": [
+      {
+        "case": "native-ax",
+        "validation": {
+          "rows": 1000000,
+          "visible_minimum": 400,
+          "overlap_objects_reused": 2268,
+          "replacement_objects_retired": 459,
+          "native_press_admitted": true,
+          "attachment_query_refused": true,
+          "physical_input_verified": false,
+          "human_accessibility_verified": false
+        }
+      },
+      {
+        "case": "cpu-fixed",
+        "samples": 120,
+        "completed_callbacks": 120,
+        "native_window": {
+          "requested_dp": [
+            1500,
+            1250
+          ],
+          "client_pixels": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "client_units": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "render": {
+            "Pos": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "X": 1519,
+              "Y": 1266
+            }
+          },
+          "window_logical_dpi": 162,
+          "screen_number": 0,
+          "screen_name": "LG HDR DQHD",
+          "screen_pixels": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "screen_geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "screen_logical_dpi": 162,
+          "dpr": 1
+        },
+        "ui_work_ns": {
+          "count": 120,
+          "p50": 6160622,
+          "p95": 6697749,
+          "p99": 7008334,
+          "max": 7046792,
+          "min": 5704458,
+          "mean": 6196711.35,
+          "sample_stddev": 244603.2038882514,
+          "coefficient_of_variation": 0.03947306725659432
+        },
+        "phases_ns": {
+          "input_ns": {
+            "count": 120,
+            "p50": 11416,
+            "p95": 18542,
+            "p99": 31959,
+            "max": 53458,
+            "min": 6541,
+            "mean": 12402.058333333332,
+            "sample_stddev": 5074.81887294584,
+            "coefficient_of_variation": 0.40919166291180215
+          },
+          "owner_ns": {
+            "count": 120,
+            "p50": 10042,
+            "p95": 16666,
+            "p99": 29375,
+            "max": 30042,
+            "min": 6750,
+            "mean": 10951.425,
+            "sample_stddev": 3697.168536543207,
+            "coefficient_of_variation": 0.33759702838153094
+          },
+          "reconcile_ns": {
+            "count": 120,
+            "p50": 1279125,
+            "p95": 1556792,
+            "p99": 1753791,
+            "max": 1761667,
+            "min": 1155041,
+            "mean": 1306165.2666666666,
+            "sample_stddev": 105545.86768178752,
+            "coefficient_of_variation": 0.08080590594109163
+          },
+          "layout_paint_ns": {
+            "count": 120,
+            "p50": 1958167,
+            "p95": 2257834,
+            "p99": 2454542,
+            "max": 2779708,
+            "min": 1725291,
+            "mean": 1980904.0916666666,
+            "sample_stddev": 145333.0568223474,
+            "coefficient_of_variation": 0.07336703348422538
+          },
+          "gather_ns": {
+            "count": 120,
+            "p50": 3292,
+            "p95": 6416,
+            "p99": 9333,
+            "max": 16041,
+            "min": 2498,
+            "mean": 3846.85,
+            "sample_stddev": 1717.5158563479763,
+            "coefficient_of_variation": 0.44647331098118626
+          },
+          "raster_upload_ns": {
+            "count": 120,
+            "p50": 2734250,
+            "p95": 2913875,
+            "p99": 3034666,
+            "max": 3157250,
+            "min": 2407750,
+            "mean": 2737541.658333333,
+            "sample_stddev": 104926.47721763297,
+            "coefficient_of_variation": 0.038328723472838104
+          },
+          "encode_submit_ns": {
+            "count": 120,
+            "p50": 145541,
+            "p95": 192749,
+            "p99": 216625,
+            "max": 222291,
+            "min": 86001,
+            "mean": 144900,
+            "sample_stddev": 27237.73895958055,
+            "coefficient_of_variation": 0.18797611428281955
+          }
+        },
+        "p95_target_pass": false,
+        "p99_target_pass": false
+      },
+      {
+        "case": "cpu-variable",
+        "samples": 120,
+        "completed_callbacks": 120,
+        "native_window": {
+          "requested_dp": [
+            1500,
+            1250
+          ],
+          "client_pixels": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "client_units": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "render": {
+            "Pos": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "X": 1519,
+              "Y": 1266
+            }
+          },
+          "window_logical_dpi": 162,
+          "screen_number": 0,
+          "screen_name": "LG HDR DQHD",
+          "screen_pixels": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "screen_geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "screen_logical_dpi": 162,
+          "dpr": 1
+        },
+        "ui_work_ns": {
+          "count": 120,
+          "p50": 6200876,
+          "p95": 6990752,
+          "p99": 7258915,
+          "max": 8065085,
+          "min": 4536375,
+          "mean": 6029121.191666666,
+          "sample_stddev": 668380.6814917552,
+          "coefficient_of_variation": 0.11085872389090104
+        },
+        "phases_ns": {
+          "input_ns": {
+            "count": 120,
+            "p50": 10833,
+            "p95": 17250,
+            "p99": 19958,
+            "max": 20125,
+            "min": 5459,
+            "mean": 11309.383333333333,
+            "sample_stddev": 2781.90100405434,
+            "coefficient_of_variation": 0.24598167044660613
+          },
+          "owner_ns": {
+            "count": 120,
+            "p50": 35208,
+            "p95": 46875,
+            "p99": 53292,
+            "max": 55250,
+            "min": 29083,
+            "mean": 36623.208333333336,
+            "sample_stddev": 5157.78563308953,
+            "coefficient_of_variation": 0.14083380096426643
+          },
+          "reconcile_ns": {
+            "count": 120,
+            "p50": 1374375,
+            "p95": 1676750,
+            "p99": 1856417,
+            "max": 2579875,
+            "min": 1151208,
+            "mean": 1405958.025,
+            "sample_stddev": 172047.56253018873,
+            "coefficient_of_variation": 0.12237034070073945
+          },
+          "layout_paint_ns": {
+            "count": 120,
+            "p50": 1945042,
+            "p95": 2337375,
+            "p99": 2518417,
+            "max": 2795334,
+            "min": 690250,
+            "mean": 1721732.6083333334,
+            "sample_stddev": 569747.5802652928,
+            "coefficient_of_variation": 0.330915252175434
+          },
+          "gather_ns": {
+            "count": 120,
+            "p50": 3249,
+            "p95": 6958,
+            "p99": 10249,
+            "max": 11833,
+            "min": 2458,
+            "mean": 3749.9083333333333,
+            "sample_stddev": 1486.1192426219764,
+            "coefficient_of_variation": 0.3963081522318038
+          },
+          "raster_upload_ns": {
+            "count": 120,
+            "p50": 2701291,
+            "p95": 2841375,
+            "p99": 2863333,
+            "max": 2885166,
+            "min": 2450959,
+            "mean": 2706172.308333333,
+            "sample_stddev": 79971.1768574338,
+            "coefficient_of_variation": 0.029551398708490276
+          },
+          "encode_submit_ns": {
+            "count": 120,
+            "p50": 143416,
+            "p95": 181751,
+            "p99": 207751,
+            "max": 209583,
+            "min": 95416,
+            "mean": 143575.75,
+            "sample_stddev": 26241.076471965913,
+            "coefficient_of_variation": 0.18276816573805751
+          }
+        },
+        "p95_target_pass": false,
+        "p99_target_pass": false
+      },
+      {
+        "case": "gpu-fixed",
+        "samples": 120,
+        "completed_callbacks": 120,
+        "native_window": {
+          "requested_dp": [
+            1500,
+            1250
+          ],
+          "client_pixels": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "client_units": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "render": {
+            "Pos": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "X": 1519,
+              "Y": 1266
+            }
+          },
+          "window_logical_dpi": 162,
+          "screen_number": 0,
+          "screen_name": "LG HDR DQHD",
+          "screen_pixels": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "screen_geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "screen_logical_dpi": 162,
+          "dpr": 1
+        },
+        "ui_work_ns": {
+          "count": 120,
+          "p50": 5336038,
+          "p95": 6030291,
+          "p99": 6438833,
+          "max": 6703247,
+          "min": 4881000,
+          "mean": 5415584.775,
+          "sample_stddev": 325609.9419515965,
+          "coefficient_of_variation": 0.060124613588307556
+        },
+        "phases_ns": {
+          "input_ns": {
+            "count": 120,
+            "p50": 10083,
+            "p95": 19750,
+            "p99": 26750,
+            "max": 28083,
+            "min": 5333,
+            "mean": 11097.225,
+            "sample_stddev": 4108.187861280376,
+            "coefficient_of_variation": 0.37019956442086877
+          },
+          "owner_ns": {
+            "count": 120,
+            "p50": 9125,
+            "p95": 13625,
+            "p99": 17042,
+            "max": 27666,
+            "min": 5667,
+            "mean": 9621.575,
+            "sample_stddev": 2801.176228521743,
+            "coefficient_of_variation": 0.29113489512078244
+          },
+          "reconcile_ns": {
+            "count": 120,
+            "p50": 1311042,
+            "p95": 1583500,
+            "p99": 1754333,
+            "max": 1784916,
+            "min": 1174791,
+            "mean": 1335651.725,
+            "sample_stddev": 116131.89924232541,
+            "coefficient_of_variation": 0.08694774024443042
+          },
+          "layout_paint_ns": {
+            "count": 120,
+            "p50": 2025834,
+            "p95": 2415667,
+            "p99": 2967166,
+            "max": 3148708,
+            "min": 1766834,
+            "mean": 2067767.3916666666,
+            "sample_stddev": 208131.24408234694,
+            "coefficient_of_variation": 0.10065505671534385
+          },
+          "gather_ns": {
+            "count": 120,
+            "p50": 3000,
+            "p95": 6249,
+            "p99": 13874,
+            "max": 26041,
+            "min": 2375,
+            "mean": 3745.4,
+            "sample_stddev": 2576.2345833738486,
+            "coefficient_of_variation": 0.6878396388566905
+          },
+          "raster_upload_ns": {
+            "count": 120,
+            "p50": 1858916,
+            "p95": 1973167,
+            "p99": 2097292,
+            "max": 2746292,
+            "min": 1729583,
+            "mean": 1873612.825,
+            "sample_stddev": 97643.35083410429,
+            "coefficient_of_variation": 0.052115009852211215
+          },
+          "encode_submit_ns": {
+            "count": 120,
+            "p50": 109124,
+            "p95": 148875,
+            "p99": 162875,
+            "max": 167333,
+            "min": 79417,
+            "mean": 114088.63333333333,
+            "sample_stddev": 18796.475332445956,
+            "coefficient_of_variation": 0.16475326930710266
+          }
+        },
+        "p95_target_pass": false,
+        "p99_target_pass": false
+      },
+      {
+        "case": "gpu-variable",
+        "samples": 120,
+        "completed_callbacks": 120,
+        "native_window": {
+          "requested_dp": [
+            1500,
+            1250
+          ],
+          "client_pixels": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "client_units": {
+            "X": 1519,
+            "Y": 1266
+          },
+          "render": {
+            "Pos": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "X": 1519,
+              "Y": 1266
+            }
+          },
+          "window_logical_dpi": 162,
+          "screen_number": 0,
+          "screen_name": "LG HDR DQHD",
+          "screen_pixels": {
+            "X": 5120,
+            "Y": 1440
+          },
+          "screen_geometry": {
+            "Min": {
+              "X": 0,
+              "Y": 0
+            },
+            "Max": {
+              "X": 5120,
+              "Y": 1440
+            }
+          },
+          "screen_logical_dpi": 162,
+          "dpr": 1
+        },
+        "ui_work_ns": {
+          "count": 120,
+          "p50": 5392626,
+          "p95": 6215710,
+          "p99": 6442331,
+          "max": 6886877,
+          "min": 3876874,
+          "mean": 5234628.425,
+          "sample_stddev": 676799.583055125,
+          "coefficient_of_variation": 0.12929276504571097
+        },
+        "phases_ns": {
+          "input_ns": {
+            "count": 120,
+            "p50": 10125,
+            "p95": 17667,
+            "p99": 24458,
+            "max": 27875,
+            "min": 4792,
+            "mean": 11006.575,
+            "sample_stddev": 3539.3723952575156,
+            "coefficient_of_variation": 0.3215689163302404
+          },
+          "owner_ns": {
+            "count": 120,
+            "p50": 36042,
+            "p95": 45958,
+            "p99": 56208,
+            "max": 70542,
+            "min": 30583,
+            "mean": 37088.191666666666,
+            "sample_stddev": 5490.451044972617,
+            "coefficient_of_variation": 0.14803771222707543
+          },
+          "reconcile_ns": {
+            "count": 120,
+            "p50": 1371792,
+            "p95": 1720375,
+            "p99": 1806125,
+            "max": 1943334,
+            "min": 1134042,
+            "mean": 1409543.4666666666,
+            "sample_stddev": 137653.75447369667,
+            "coefficient_of_variation": 0.097658396302758
+          },
+          "layout_paint_ns": {
+            "count": 120,
+            "p50": 1982000,
+            "p95": 2376167,
+            "p99": 2479624,
+            "max": 2641500,
+            "min": 711626,
+            "mean": 1742034.0666666667,
+            "sample_stddev": 575023.8666056507,
+            "coefficient_of_variation": 0.3300876128708222
+          },
+          "gather_ns": {
+            "count": 120,
+            "p50": 3168,
+            "p95": 6458,
+            "p99": 9834,
+            "max": 76542,
+            "min": 2500,
+            "mean": 4248,
+            "sample_stddev": 6803.901800752691,
+            "coefficient_of_variation": 1.6016717986705957
+          },
+          "raster_upload_ns": {
+            "count": 120,
+            "p50": 1896292,
+            "p95": 2027375,
+            "p99": 2620750,
+            "max": 2783708,
+            "min": 1757917,
+            "mean": 1915929.55,
+            "sample_stddev": 129106.49757271427,
+            "coefficient_of_variation": 0.06738582719427981
+          },
+          "encode_submit_ns": {
+            "count": 120,
+            "p50": 112459,
+            "p95": 145334,
+            "p99": 159584,
+            "max": 186250,
+            "min": 79626,
+            "mean": 114778.575,
+            "sample_stddev": 19442.11152193358,
+            "coefficient_of_variation": 0.16938798483892645
+          }
+        },
+        "p95_target_pass": false,
+        "p99_target_pass": false
+      }
+    ],
+    "ordinary_processes": 4,
+    "ordinary_samples": 480,
+    "native_endpoints_equal": true,
+    "physical_input_verified": false,
+    "native_gpu_execution_verified": false,
+    "native_placement_cache_hits_verified": false,
+    "performance_improvement_qualified": false,
+    "no_regression_qualified": false,
+    "full_macos_qualified": false,
+    "completed_utc": "2026-10-17T06:51:38.745998+00:00"
+  },
+  "evidence": {
+    "manifest_sha256": "be28ce3d503927ea0a9745d92a76285acf457494f280f5d5a509e51fc807fec3",
+    "archive_sha256": "65c1eedb78028ccc414e946065a0df326c81f535a7abf51f0aec7b3c35b363ca",
+    "raw_files": 496,
+    "archive_bytes": 9280348
+  },
+  "full_macos_qualified": false
+}
