@@ -88,3 +88,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Adaptive scene tile bins](macos-adaptive-tile-binning/README.md): owned stage 0075, byte/pixel limits and native GPU checks; matched ordinary grid results retain the open performance gate.
 
 - [Current private SDK consumption](macos-current-sdk/README.md): 7,411 hashed files, relocated consumer/API checks and 13 compiled entrypoints; no native execution or public distribution.
+
+- [Current native grid CPU/allocation profiles](macos-current-grid-profiles/README.md): separate bounded diagnostics and conservative attribution; ordinary latency targets remain unqualified.

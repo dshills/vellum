@@ -1,0 +1,887 @@
+{
+  "status": "REVIEWED_SEPARATE_NATIVE_GRID_PROFILES",
+  "native": {
+    "result": "PASS_SEPARATE_NATIVE_CPU_ALLOCATION_DIAGNOSTICS",
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "current_checkout_commit": "cbc25c270345f1d668e18722050910d7e0374eee",
+    "producer_sha256": "0114b133d7274c63cb114e5f1e76923ef57e284d02eec8ccd0215b00df52ff34",
+    "review_sha256": "f11a345731fef8b6dbcd8eedf5dceec5cd438c5a31310b477adff7acaa9a395e",
+    "started_utc": "2026-10-17T04:58:22.957279+00:00",
+    "native_runtime_executed": true,
+    "physical_input_generated": false,
+    "settings_changes": false,
+    "performance_qualified": false,
+    "native_gpu_memory_qualified": false,
+    "full_macos_qualified": false,
+    "error": null,
+    "cases": [
+      {
+        "case": "cpu",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "-perf",
+            "-rows=1000000",
+            "-gpu-scene",
+            "-perf-samples=512",
+            "-perf-warmup=128",
+            "-perf-cpu-profile=/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/cpu.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-current-sdk-238b3b6/demos/relocated SDK demos/extracted SDK/vellum-v0.1.0-alpha.2/examples/loadedgrid",
+          "started_utc": "2026-10-17T04:58:24.500672+00:00",
+          "watchdog_seconds": 180,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 83491,
+          "group": 83491,
+          "owned": {
+            "created": true,
+            "pid": 83491,
+            "group": 83491,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 83491,
+              "members": [],
+              "observation_sha256": "8058e9ce5b6cfb2827f363439637a5748a68c1297faca3cceff05a92b51c72ec"
+            }
+          },
+          "seconds": 22.340819834033027,
+          "logs": {
+            "stdout": {
+              "bytes": 640165,
+              "sha256": "2eaaec3778245bd326be665bff2f369f951abe2c970286e3bfdcde244a460d26"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        },
+        "error": null,
+        "validation": {
+          "samples": 512,
+          "warmup": 128,
+          "completed_callbacks": 512,
+          "native_window": {
+            "requested_dp": [
+              1500,
+              1250
+            ],
+            "client_pixels": {
+              "X": 1519,
+              "Y": 1266
+            },
+            "client_units": {
+              "X": 1519,
+              "Y": 1266
+            },
+            "render": {
+              "Pos": {
+                "X": 0,
+                "Y": 0
+              },
+              "Size": {
+                "X": 1519,
+                "Y": 1266
+              }
+            },
+            "window_logical_dpi": 162,
+            "screen_number": 0,
+            "screen_name": "LG HDR DQHD",
+            "screen_pixels": {
+              "X": 5120,
+              "Y": 1440
+            },
+            "screen_geometry": {
+              "Min": {
+                "X": 0,
+                "Y": 0
+              },
+              "Max": {
+                "X": 5120,
+                "Y": 1440
+              }
+            },
+            "screen_logical_dpi": 162,
+            "dpr": 1
+          },
+          "geometry_sha256": "2f0f5f8495f6335f4720bb514a3a3e8f2a57f57fd333016d27561dfdc6036241",
+          "profiles": {
+            "cpu.pprof": {
+              "path": "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/cpu.pprof",
+              "bytes": 19442,
+              "sha256": "9e49911253f7266b1475dade728c20c80dcf75f0f3ff05d9b3730c7ed70efc6b"
+            }
+          },
+          "ordinary_target_qualified": false,
+          "gpu_execution_verified": false,
+          "physical_input_verified": false
+        }
+      },
+      {
+        "case": "allocation",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "-perf",
+            "-rows=1000000",
+            "-gpu-scene",
+            "-perf-samples=512",
+            "-perf-warmup=128",
+            "-perf-alloc-profile=/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc"
+          ],
+          "cwd": "/private/tmp/vellum-current-sdk-238b3b6/demos/relocated SDK demos/extracted SDK/vellum-v0.1.0-alpha.2/examples/loadedgrid",
+          "started_utc": "2026-10-17T04:58:46.927667+00:00",
+          "watchdog_seconds": 180,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 83624,
+          "group": 83624,
+          "owned": {
+            "created": true,
+            "pid": 83624,
+            "group": 83624,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 83624,
+              "members": [],
+              "observation_sha256": "b246f027560867b59f183858a7157c91db5037bb59b636c542cdde4b055c5c0c"
+            }
+          },
+          "seconds": 21.542038499959745,
+          "logs": {
+            "stdout": {
+              "bytes": 639653,
+              "sha256": "539d9c34d5e71c6bff1cd184db7c97c86d6c83deae2b9365cefdb9c53f844720"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        },
+        "error": null,
+        "validation": {
+          "samples": 512,
+          "warmup": 128,
+          "completed_callbacks": 512,
+          "native_window": {
+            "requested_dp": [
+              1500,
+              1250
+            ],
+            "client_pixels": {
+              "X": 1519,
+              "Y": 1266
+            },
+            "client_units": {
+              "X": 1519,
+              "Y": 1266
+            },
+            "render": {
+              "Pos": {
+                "X": 0,
+                "Y": 0
+              },
+              "Size": {
+                "X": 1519,
+                "Y": 1266
+              }
+            },
+            "window_logical_dpi": 162,
+            "screen_number": 0,
+            "screen_name": "LG HDR DQHD",
+            "screen_pixels": {
+              "X": 5120,
+              "Y": 1440
+            },
+            "screen_geometry": {
+              "Min": {
+                "X": 0,
+                "Y": 0
+              },
+              "Max": {
+                "X": 5120,
+                "Y": 1440
+              }
+            },
+            "screen_logical_dpi": 162,
+            "dpr": 1
+          },
+          "geometry_sha256": "2f0f5f8495f6335f4720bb514a3a3e8f2a57f57fd333016d27561dfdc6036241",
+          "profiles": {
+            "alloc.before.pprof": {
+              "path": "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.before.pprof",
+              "bytes": 31477,
+              "sha256": "dd0052f70a7207144e99fa80c5d75dd4b5e9ddf7529b48f2ed7cd9f182e38fb2"
+            },
+            "alloc.after.pprof": {
+              "path": "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.after.pprof",
+              "bytes": 38738,
+              "sha256": "a9cd5eb4bcf863dc037b3a8ffef1b66687f0d028cba4a3513ba4659e166f1ab5"
+            }
+          },
+          "ordinary_target_qualified": false,
+          "gpu_execution_verified": false,
+          "physical_input_verified": false
+        }
+      }
+    ],
+    "source_stable": true,
+    "sdk_stable": true,
+    "pins_stable": true,
+    "lease_held_through_cleanup": true,
+    "finalization_errors": [],
+    "local_stop_present": true
+  },
+  "offline": {
+    "result": "PASS_OFFLINE_PPROF_COMMANDS",
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "current_checkout_commit": "cbc25c270345f1d668e18722050910d7e0374eee",
+    "producer_sha256": "11455324b4197408d175504845e02fc1ea224addadc1ceda68166a6cc9a9bffc",
+    "native_receipt_sha256": "62ad816b13af6151b691ef8f58c366e21cc457f4b632131cfbd5ba3e51e330e6",
+    "tool": {
+      "path": "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+      "bytes": 19555490,
+      "sha256": "680f7524939a4304ebe6684eea798330b2bcf9f1523ee5aaa332cd080d8966aa"
+    },
+    "profiles": {
+      "cpu.pprof": {
+        "path": "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/cpu.pprof",
+        "bytes": 19442,
+        "sha256": "9e49911253f7266b1475dade728c20c80dcf75f0f3ff05d9b3730c7ed70efc6b"
+      },
+      "alloc.before.pprof": {
+        "path": "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.before.pprof",
+        "bytes": 31477,
+        "sha256": "dd0052f70a7207144e99fa80c5d75dd4b5e9ddf7529b48f2ed7cd9f182e38fb2"
+      },
+      "alloc.after.pprof": {
+        "path": "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.after.pprof",
+        "bytes": 38738,
+        "sha256": "a9cd5eb4bcf863dc037b3a8ffef1b66687f0d028cba4a3513ba4659e166f1ab5"
+      }
+    },
+    "commands": [
+      {
+        "name": "cpu-flat",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-top",
+            "-sample_index=cpu",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/cpu.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:58.819607+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 83997,
+          "group": 83997,
+          "owned": {
+            "created": true,
+            "pid": 83997,
+            "group": 83997,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 83997,
+              "members": [],
+              "observation_sha256": "8357cd06a09f25428ff09905ec66408b9350183019070a5146601f45c91b7b4d"
+            }
+          },
+          "seconds": 0.09929254197049886,
+          "logs": {
+            "stdout": {
+              "bytes": 8343,
+              "sha256": "81d37acff2f01e6702d074f80d2613ad06f392798975b80a368b806288c4025d"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "cpu-cumulative",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-top",
+            "-cum",
+            "-sample_index=cpu",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/cpu.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:58.949589+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84001,
+          "group": 84001,
+          "owned": {
+            "created": true,
+            "pid": 84001,
+            "group": 84001,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84001,
+              "members": [],
+              "observation_sha256": "a99f6f1b816f1186b6ffc923e426e6320f26b40ad351b64bc7cb4ff0e0bf7f8c"
+            }
+          },
+          "seconds": 0.08746625005733222,
+          "logs": {
+            "stdout": {
+              "bytes": 7630,
+              "sha256": "87a2548a66a608978bc472378143f9caef94b4a98493294d667bda1243a57209"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "cpu-reconcile",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-peek=reconcileScoped",
+            "-sample_index=cpu",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/cpu.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:59.068461+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84003,
+          "group": 84003,
+          "owned": {
+            "created": true,
+            "pid": 84003,
+            "group": 84003,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84003,
+              "members": [],
+              "observation_sha256": "89299892916b9ad9085c958c345436ef1e0ca026c4da02aa0cde1bff7f863259"
+            }
+          },
+          "seconds": 0.08647000009659678,
+          "logs": {
+            "stdout": {
+              "bytes": 807,
+              "sha256": "4790c5dd92edfafaa8b434203fd23e25e54adb27f0a547e1ddb71d5489784b2d"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "cpu-reconcile-traces",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-traces",
+            "-focus=reconcileScoped",
+            "-sample_index=cpu",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/cpu.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:59.186314+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84006,
+          "group": 84006,
+          "owned": {
+            "created": true,
+            "pid": 84006,
+            "group": 84006,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84006,
+              "members": [],
+              "observation_sha256": "4bfc9c1f49d7baac8f339010a0befba9647067dd24cafe8e850ee408d85c2d35"
+            }
+          },
+          "seconds": 0.08610737498383969,
+          "logs": {
+            "stdout": {
+              "bytes": 3784,
+              "sha256": "97174bee82a8a70ccf31aa3d5ea604af54c104020cec759cfb91c7bffb1fd8fc"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "alloc-space-flat",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-top",
+            "-sample_index=alloc_space",
+            "-base=/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.before.pprof",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.after.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:59.302954+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84008,
+          "group": 84008,
+          "owned": {
+            "created": true,
+            "pid": 84008,
+            "group": 84008,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84008,
+              "members": [],
+              "observation_sha256": "f734f05e6ca8d76ca6a8c495a269dd7eb2493067dd9ece39ba8592832d3accd9"
+            }
+          },
+          "seconds": 0.09400420798920095,
+          "logs": {
+            "stdout": {
+              "bytes": 8187,
+              "sha256": "8b2bcfb648ef7cc4dca740b26e5254b7f86606c0fc878c8651ff17b18b6440c8"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "alloc-space-cumulative",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-top",
+            "-cum",
+            "-sample_index=alloc_space",
+            "-base=/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.before.pprof",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.after.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:59.427929+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84010,
+          "group": 84010,
+          "owned": {
+            "created": true,
+            "pid": 84010,
+            "group": 84010,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84010,
+              "members": [],
+              "observation_sha256": "e7ce511825383f3c413fcf82eddb43eba0ec09cd8127bfe5566b3e6657e776c7"
+            }
+          },
+          "seconds": 0.09343654103577137,
+          "logs": {
+            "stdout": {
+              "bytes": 8585,
+              "sha256": "98745894e57400782a09b763a7dcfb2414a3673ab6450b6648c2aca99f0239af"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "alloc-objects-flat",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-top",
+            "-sample_index=alloc_objects",
+            "-base=/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.before.pprof",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.after.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:59.552756+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84012,
+          "group": 84012,
+          "owned": {
+            "created": true,
+            "pid": 84012,
+            "group": 84012,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84012,
+              "members": [],
+              "observation_sha256": "05df500635a6433e5958002eed35d6096ca4f93e63b72abb631fa7c8241debe3"
+            }
+          },
+          "seconds": 0.09273404092527926,
+          "logs": {
+            "stdout": {
+              "bytes": 8129,
+              "sha256": "fbf93503b60aff68b1bec5d0a2a7878f05f8a7fcf193fd1d232a8cf1daae8090"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "alloc-objects-cumulative",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-top",
+            "-cum",
+            "-sample_index=alloc_objects",
+            "-base=/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.before.pprof",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.after.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:59.676646+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84014,
+          "group": 84014,
+          "owned": {
+            "created": true,
+            "pid": 84014,
+            "group": 84014,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84014,
+              "members": [],
+              "observation_sha256": "ad7a287b60b8a688ceb5d97e7e312af40108bd1f13b2afee52159a9e41b7ecd8"
+            }
+          },
+          "seconds": 0.09347354201599956,
+          "logs": {
+            "stdout": {
+              "bytes": 8456,
+              "sha256": "7ffee6a827f641a0003962e542d2e96091578235aa04ba2a02a6988e2a0725d2"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      {
+        "name": "alloc-space-reconcile",
+        "run": {
+          "argv": [
+            "/private/tmp/vellum-profile-pprof-tool-1ba954c/pprof",
+            "-symbolize=none",
+            "-nodecount=80",
+            "-peek=reconcileScoped",
+            "-sample_index=alloc_space",
+            "-base=/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.before.pprof",
+            "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+            "/private/tmp/vellum-grid-alloc-cpu-238b3b6/profiles/alloc.after.pprof"
+          ],
+          "cwd": "/private/tmp/vellum-grid-profile-analysis-238b3b6",
+          "started_utc": "2026-10-17T04:59:59.800453+00:00",
+          "watchdog_seconds": 45,
+          "error": null,
+          "exit_code": 0,
+          "created": true,
+          "observation_errors": [],
+          "logs_complete": true,
+          "pins_stable": true,
+          "stop_at_exit": false,
+          "pid": 84016,
+          "group": 84016,
+          "owned": {
+            "created": true,
+            "pid": 84016,
+            "group": 84016,
+            "terminal": true,
+            "group_absent": true,
+            "exit_code": 0,
+            "errors": [],
+            "observation": {
+              "group": 84016,
+              "members": [],
+              "observation_sha256": "29ea8dd76c1da026e2b0b14d586321b28c6228f3a276cc6bd02f269bdd377b1d"
+            }
+          },
+          "seconds": 0.09156808303669095,
+          "logs": {
+            "stdout": {
+              "bytes": 1781,
+              "sha256": "e84b01b26bee60d3292e2da6d9fffe5c3c8c0855b939f55c1b485d3bca68cbd8"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      }
+    ],
+    "native_processes_launched": 0,
+    "native_application_binary_executed": false,
+    "physical_input_generated": false,
+    "network_requested": false,
+    "performance_qualified": false,
+    "causal_bottleneck_proven": false,
+    "full_macos_qualified": false,
+    "error": null,
+    "source_stable": true,
+    "sdk_stable": true,
+    "pins_stable": true
+  },
+  "interpretation": {
+    "status": "EXPLORATORY_PROFILE_ATTRIBUTION_NOT_CAUSAL_PROOF",
+    "producer_sha256": "1609dca542e42fb283fa132c15aa4338f57fba73eb9f9a79d0c4a86022bb9990",
+    "observations": [
+      {
+        "command": "cpu-flat",
+        "function": "runtime.cgocall",
+        "output_sha256": "81d37acff2f01e6702d074f80d2613ad06f392798975b80a368b806288c4025d",
+        "flat": "4.54s",
+        "flat_percent": 75.42,
+        "cumulative": "4.54s",
+        "cumulative_percent": 75.42
+      },
+      {
+        "command": "cpu-cumulative",
+        "function": "github.com/dshills/vellum/drivers/cogent.syncAccessibility",
+        "output_sha256": "87a2548a66a608978bc472378143f9caef94b4a98493294d667bda1243a57209",
+        "flat": "0",
+        "flat_percent": 0.0,
+        "cumulative": "0.69s",
+        "cumulative_percent": 11.46
+      },
+      {
+        "command": "cpu-reconcile",
+        "function": "github.com/dshills/vellum/drivers/cogent.reconcileScoped",
+        "output_sha256": "4790c5dd92edfafaa8b434203fd23e25e54adb27f0a547e1ddb71d5489784b2d",
+        "flat": "0",
+        "flat_percent": 0.0,
+        "cumulative": "0.02s",
+        "cumulative_percent": 0.33
+      },
+      {
+        "command": "alloc-space-cumulative",
+        "function": "github.com/dshills/vellum/drivers/cogent.syncAccessibility",
+        "output_sha256": "98745894e57400782a09b763a7dcfb2414a3673ab6450b6648c2aca99f0239af",
+        "flat": "0",
+        "flat_percent": 0.0,
+        "cumulative": "1400.34MB",
+        "cumulative_percent": 33.47
+      },
+      {
+        "command": "alloc-space-reconcile",
+        "function": "github.com/dshills/vellum/drivers/cogent.reconcileScoped",
+        "output_sha256": "e84b01b26bee60d3292e2da6d9fffe5c3c8c0855b939f55c1b485d3bca68cbd8",
+        "flat": "0",
+        "flat_percent": 0.0,
+        "cumulative": "192.46MB",
+        "cumulative_percent": 4.6
+      },
+      {
+        "command": "alloc-space-cumulative",
+        "function": "github.com/dshills/vellum/drivers/cogent.(*gridWidget).LayoutLocal",
+        "output_sha256": "98745894e57400782a09b763a7dcfb2414a3673ab6450b6648c2aca99f0239af",
+        "flat": "0",
+        "flat_percent": 0.0,
+        "cumulative": "453.57MB",
+        "cumulative_percent": 10.84
+      },
+      {
+        "command": "alloc-objects-cumulative",
+        "function": "github.com/dshills/vellum/drivers/cogent.(*gridWidget).LayoutLocal",
+        "output_sha256": "7ffee6a827f641a0003962e542d2e96091578235aa04ba2a02a6988e2a0725d2",
+        "flat": "0",
+        "flat_percent": 0.0,
+        "cumulative": "7849673",
+        "cumulative_percent": 35.6
+      }
+    ],
+    "sources": {
+      "drivers/cogent/driver.go": {
+        "sha256": "8badadb1f49393dbe68a3e15f73bb0ab767d632582a9507925948f72a5d60f61"
+      },
+      "drivers/cogent/frame_metrics.go": {
+        "sha256": "ba61af618d3d0bf7a1271ac6aff3a9bbf5ca138699a11df03cc75684a02bf349"
+      },
+      "drivers/cogent/grid_retained.go": {
+        "sha256": "0044b857e9e8a34dd7e832c1c3fa2b674d0ba3affd49fda5b826bfc9176e91ee"
+      },
+      "drivers/cogent/accessibility.go": {
+        "sha256": "1c542ca84a350247d45ad9307f9008ea81383a095fef3d599440c6df35bbc0b1"
+      },
+      "drivers/cogent/accessibility_grid_publication.go": {
+        "sha256": "6be79cc84a47d8a133f38f28a8114565380ab17abefc94b9a7152bbd36c8cc98"
+      }
+    },
+    "source_scope": "Driver refresh starts the Reconcile timer before View/reconcileScoped and calls syncAccessibility before the deferred timer end. gridWidget.LayoutLocal calls SizeUp/SizeDown/SizeFinal for dirty text, under native layout. Verify these source boundaries independently; function samples are not durations of those whole regions.",
+    "interpretation": "The initial idea that reconcileScoped itself dominates the Reconcile region is unsupported. The profile directs investigation toward accessibility publication and repeated dirty-cell text sizing. Cumulative rows overlap and must not be summed. Go CPU samples dominated by cgocall do not identify native work or explain the main-loop label; no busy-wait, idle defect or causal frame bottleneck is established.",
+    "next_work": "Investigate bounded reuse for repeated grid text layout and accessibility snapshot preparation separately. Preserve arbitrary Unicode/styles/scaling, detached ownership, pending/completed accessibility transactions, action admission and lifecycle. Require differential correctness and native matched ordinary measurements before adoption or any gain claim.",
+    "ordinary_performance_qualified": false,
+    "native_gpu_memory_qualified": false,
+    "gpu_execution_verified": false,
+    "physical_input_verified": false,
+    "full_macos_qualified": false
+  },
+  "provenance": {
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "current_checkout_commit": "cbc25c270345f1d668e18722050910d7e0374eee",
+    "sdk_root": "/private/tmp/vellum-current-sdk-238b3b6/demos/relocated SDK demos/extracted SDK/vellum-v0.1.0-alpha.2",
+    "manifest_sha256": "95f33067532d01c1853b2d42c4fac2b687409b91803c01849de37e1f73c921e8",
+    "binary": {
+      "path": "/private/tmp/vellum-current-sdk-238b3b6/demos/build outputs/loadedgrid",
+      "bytes": 59290754,
+      "sha256": "ccc37ade4a6c25a7bcb7f4f054c4b1ec1a6a3c1f3c9bfbb2d03209e2af34ece7"
+    },
+    "archive": {
+      "path": "/private/tmp/vellum-current-sdk-238b3b6/sdk.tar.gz",
+      "sha256": "94dd1a1de78085ae705d17e587128b83bff0bbf442fb9f1f12ed348d5ba56f32"
+    },
+    "build_receipt_sha256": "3378bf86021e03a8f2492d0e4e7c0dea58eb6be1579e9c013bbe4cc1e05f30c8"
+  },
+  "result_review_sha256": "91d836b67471bbab2ce96293968366986ef06abcb9c00a0cbfa91f805804a807",
+  "evidence": {
+    "sha256": "f0a97b72d349e37c08b54db36600586302b72f2e8d7eaa6158055e82470b00e5",
+    "bytes": 1163368,
+    "members": 96,
+    "expanded_bytes": 4170576
+  },
+  "provider_calls": 0,
+  "production_source_changed": false,
+  "ordinary_performance_qualified": false,
+  "native_gpu_memory_qualified": false,
+  "physical_input_verified": false,
+  "public_distribution": false,
+  "full_macos_qualified": false
+}

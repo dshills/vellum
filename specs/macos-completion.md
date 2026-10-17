@@ -1036,3 +1036,14 @@ Independent data, history, cancellation, placement and window-lifetime checks
 pass. Runtime source remains SDK `238b3b6`, distinct from current documentation
 endpoint `d4b07d0`. This advances packaged software routing evidence; native and
 physical workflows, timing/memory budgets, full P9/P11 and Mac release remain open.
+
+
+## Current native grid profile attribution
+
+The [separate CPU/allocation diagnostics](../docs/reports/macos-current-grid-profiles/README.md) complete two native
+million-row GPU-requested cases, 1,024 samples and 512 full geometry pairs on
+unchanged SDK `238b3b6` source. Offline profiles suggest accessibility publication
+and repeated dirty-cell text sizing as investigation targets. They do not prove
+a causal bottleneck or savings; the Reconcile region includes accessibility
+work beyond `reconcileScoped`. Existing ordinary 4/6 ms failures and full Mac,
+P6/P11, physical/human, native/GPU memory and release gates remain open.
