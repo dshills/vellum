@@ -48,6 +48,16 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [M3-A segmented snapshot experiment](../docs/reports/macos-segmented-ready/README.md)
+is rejected and fully reverted. Full driver race and exact legacy wire/geometry,
+action and lifecycle regressions pass, but all five native comparison pairs lose:
+median run-p95 4.749206 → 4.866957 ms despite 10.82% lower process allocation.
+Separate diagnostic counts positively observe the candidate path. No runtime or
+diagnostic-field change is retained; raw source/tests/results and the final
+rejection review are archived. The unchanged table/full Mac gates remain open.
+Further small M3-A tuning is stopped; pending native workflows and measured
+operation/resource composition precede another performance redesign.
+
 The [current private SDK GPU checkpoint](../docs/reports/macos-gpu-sdk-stage0077/README.md)
 packages clean `5eef841` with 7,441 hashed payload files, stage 0077 and all three
 corrected GPU examples. Relocated generated-consumer race/vet/build and public

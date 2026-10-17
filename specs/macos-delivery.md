@@ -112,11 +112,13 @@ explicitly authorized tests and restore any authorized temporary state changes.
    includes the new routed Selector/NumberField regressions. Native M2 integration
    remains queued; [actual results](../docs/reports/macos-workspace-acceptance/README.md)
    distinguish software routing from desktop acceptance.
-3. **M3-A is the next engineering checkpoint.** The current complete table matrix
-   fails. Implement the bounded owned segmented ready-snapshot experiment below,
-   prove old-path equivalence, then run five native comparison pairs. Adopt only
-   a material full-frame gain; reject an allocation-only result. Implement/test
-   offscreen while the user is working. M6 inventory can proceed independently.
+3. **M3-A is complete and rejected.** The current complete table matrix still
+   fails. The internally reviewed segmented snapshot passes correctness checks
+   but loses all five native pairs; the entire experiment is reverted. Stop
+   small follow-up AX tuning. Use the available desktop next for M2/M5 native
+   workflows. Before another M3 scene/renderer redesign, collect actual operation
+   and resource-kind counts, encoded-buffer composition and source-phase evidence
+   for the failing fixture. M6 inventory can proceed independently.
 4. Use an authorized desktop window for M2/M5 native workflows and ordinary M3
    measurements. Reuse the placement operator implementation with a fresh
    source-bound plan and stop scope; never replay a completed/human-return seal.
@@ -134,7 +136,7 @@ Do not remove human-return or completed-case seals. Read-only inspection,
 headless regressions, source fixes, documentation and packaging preparation can
 continue. Do not request desktop access again while independent work is available.
 
-## Next M3 implementation checkpoint: M3-A
+## Completed M3-A experiment and next boundary
 
 The [matrix decision](../docs/reports/macos-grid-matrix/README.md) specifies an
 owned segmented ready accessibility snapshot: construct each eligible leaf grid
@@ -156,7 +158,16 @@ A new glyph-span shader is not selected: current-DPI bitmap routing does not
 establish a span bottleneck. Any later scene/resource redesign first needs actual
 operation/resource-kind counts and encoded-buffer composition for the failing
 fixture. Cocoa JSON parsing is asynchronously main-queued; do not attribute it
-as synchronous ReconcileNS. M3-A is planned, not implemented or qualified.
+as synchronous ReconcileNS. M3-A was implemented, tested and rejected: see the
+[complete experiment report](../docs/reports/macos-segmented-ready/README.md).
+Median run-p95 rises 4.749206 → 4.866957 ms; all five pairs lose despite 10.82%
+lower median of per-run nearest-rank p50 process allocation. Full driver race, independent frozen
+wire/geometry/action/lifecycle checks and both JSON variants pass. Separate
+native diagnostics prove positive segmented routing. All eleven source/test
+changes and the diagnostic field are archived and reverted; no runtime change
+is retained. One scoped Prism review covers the final rejection checkpoint.
+The next desktop work is the pending M2/M5 workflows, followed by evidence for
+any materially different M3 implementation. No small follow-up M3-A tuning.
 
 ## Existing execution entrypoints
 
