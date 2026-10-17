@@ -123,7 +123,8 @@ explicitly authorized tests and restore any authorized temporary state changes.
    [row-fragment prototype](../docs/reports/macos-row-fragments/README.md) fails
    its actual reuse feasibility gate before ordinary timing. A separate M3
    architecture decision is required; no further row-cache tuning is queued.
-   Continue independent M6 minimum-toolchain qualification meanwhile.
+   The independent [M6 minimum-toolchain source check](../docs/reports/macos-minimum-go/README.md)
+   now passes; final SDK/rights closure remains open.
 4. Use an authorized desktop window for other M2/M5 native checks and ordinary M3
    measurements. Never replay a completed/human-return seal.
    The one fresh bounded placement attempt has now failed its delivery observation;
@@ -276,8 +277,9 @@ failed. A completion date before that is resolved would be speculative. M1 is
 complete in source, and M2's full headless replay and catalogue map are complete.
 The full matrix, rejected M3-A/tile-culling comparisons and rejected row-fragment
 feasibility are recorded. M3 now needs a separate material architecture decision
-against the same targets. Do not continue tuning the rejected prototype. Complete
-the independent M6 minimum-Go-toolchain check next, then return to the architecture
+against the same targets. Do not continue tuning the rejected prototype.
+The independent [M6 minimum-Go source check](../docs/reports/macos-minimum-go/README.md)
+passes; final SDK and rights closure remain open. Return to the architecture
 decision; rerun the full matrix only after an adopted change. Update the remaining
 estimate from those results.
 An eight-hour final soak,
@@ -291,7 +293,7 @@ be budgeted in addition to implementation time.
 | M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. Next: separate material architecture decision; no further AX/upload/culling/row-cache tuning. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
-| M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. Next: actual Go 1.25.6 compatibility (recent consumers used 1.27.2). Final SDK refresh, exact runtime/asset rights closure and owner approval remain. |
+| M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. [Actual Go 1.25.6 source/driver/public-contract race, vet and native build](../docs/reports/macos-minimum-go/README.md) pass; no GUI launch or full SDK qualification. Final SDK refresh, relocated/all-demo/native checks, exact runtime/asset rights closure and owner approval remain. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.

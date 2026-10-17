@@ -48,6 +48,15 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [minimum-Go source compatibility checkpoint](../docs/reports/macos-minimum-go/README.md)
+passes actual Go 1.25.6 root/public-contract race and vet, complete offscreen
+driver race and vet, and a native loaded-grid application build on clean
+`340faf0` with unchanged stage0079. Embedded binary metadata confirms the exact
+compiler. No application is launched; no runtime, prepared dependency or SDK
+changes. This closes the scoped minimum-source compatibility question, not M6:
+final relocated SDK/all-demo/native acceptance and rights closure remain open.
+No further Prism call is made for unchanged implementation evidence.
+
 The [row-fragment feasibility checkpoint](../docs/reports/macos-row-fragments/README.md)
 rejects the private retained-row prototype before ordinary timing. Final race,
 pixel, actual native GPU, vet and build checks pass, but only 12 of 120 GPU
