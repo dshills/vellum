@@ -96,3 +96,5 @@ A passing local check does not imply production or cross-platform certification.
 - [Exact-location glyph coverage](macos-glyph-placement/README.md): owned stage 0076, software capture comparisons and five current-source native sanity processes; frame targets remain open.
 
 - [Grid intrinsic sizing and native comparison](macos-grid-intrinsic-sizing/README.md): guarded source reuse, mixed-text geometry oracles and separately reviewed matched native frame evidence.
+
+- [Current private SDK and relocated consumers](macos-sdk-refresh/README.md): source `2010a33` archive/consumer checks, thirteen compiled entrypoints and one separately reviewed native SDK hello.

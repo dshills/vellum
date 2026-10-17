@@ -23,6 +23,17 @@ behavior. Full-frame latency targets and human screen-reader checks remain open.
 
 ## Latest unattended evidence
 
+The [current private SDK refresh](../docs/reports/macos-sdk-refresh/README.md) binds clean `2010a33` to
+7,421 hashed files including stage 0076 and current intrinsic grid sizing.
+The relocated generated consumer passes race/vet/build and public API contracts
+pass race/vet. Nine application roots and four actual replay/workspace command
+entrypoints compile from a second SDK extraction, with 65 direct Go commands.
+One separately admitted SDK hello run verifies its initial rectangle pixel,
+three further readbacks and owned shutdown. Other demo runtimes, ordinary frame
+and memory/endurance budgets, physical/human workflows, native component/rights
+closure and public distribution remain open.
+
+
 The [exact-location glyph coverage checkpoint](../docs/reports/macos-glyph-placement/README.md)
 adds owned stage 0076 on source `2be8e79`, with bounded renderer metadata,
 original work/ownership/clip guards, differential software output and six

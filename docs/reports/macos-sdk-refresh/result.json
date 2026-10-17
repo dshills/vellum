@@ -1,0 +1,678 @@
+{
+  "status": "REVIEWED_CURRENT_PRIVATE_SDK_AND_NATIVE_HELLO",
+  "sdk_source_commit": "2010a33cf874a85d8ff755dbaa43512d1569230c",
+  "analysis": {
+    "status": "CURRENT_PRIVATE_SDK_AND_ENTRYPOINTS_RECONCILED",
+    "source_commit": "2010a33cf874a85d8ff755dbaa43512d1569230c",
+    "source_files": 4687,
+    "prepared_files": 6249,
+    "inputs": {
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/inspect.py": "343a685d7cc0ba4f4c9fbe05dc4adb92af175b4ff10afded876559452bb148b9",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/common.py": "bdacc19aedd56e9bdd38a4575b5a6f182d714c9e2d8d7dcc77afd34d104bfff6",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/check.py": "9f16756039b918513d96fc022a74c6d896ce5085bccea487cd112226e9223747",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/demos.py": "e346c80c434c6df318a96c9f29c91db9479fc1db1a271b574157d302b348846e",
+      "/private/tmp/vellum-current-sdk-2010a33/source.json": "513f7b01ec7a4a51652b6f10d5a3e23b0f69160cbbe0d3c1b7cdc7876de74bb6",
+      "/private/tmp/vellum-current-sdk-2010a33/package/stdout": "6cdc647fba78ea5b243f3e7ac908c5f81e8b87f94c21a52b5f6386c8f4b64486",
+      "/private/tmp/vellum-current-sdk-2010a33/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/package/receipt.json": "162ba81db0d65dd6935b20db170a6554a5efc93e5811a22fc997ad453b363580",
+      "/private/tmp/vellum-current-sdk-2010a33/package/owned.json": "cdc348c9d35eb09b37b895258825cccde4b12499e919d9a0ff68521afba66a35",
+      "/private/tmp/vellum-current-sdk-2010a33/relocate/stdout": "9be169cd4955cd307b5d68ff5f816f8e4fddf32fddd4b14aafabe40d6f183361",
+      "/private/tmp/vellum-current-sdk-2010a33/relocate/stderr": "ec24cca3d194d46de58c455898a3b61e60f5a9c2a601d253231c1fa29bcb058c",
+      "/private/tmp/vellum-current-sdk-2010a33/relocate/receipt.json": "6847866267f01ead269effc275b1be70adc81efd1abfe5d28b57e9f12113cc79",
+      "/private/tmp/vellum-current-sdk-2010a33/relocate/owned.json": "a3646d45cf51e03537b26b0f126760e059277ef4ba000f84cf49b513fb254c2d",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/modules/stdout": "20dc6883e78d8a656934073d5819983ac50c5c62363e258c385500929f9cb99f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/modules/owned.json": "2a5319c0776c1dd503cf5c9567a47cb117ceff5a2c9768d0fa6653b2d45714e6",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/package/stdout": "1a2dd92514892fa0b919a89b61dca814ecd72169f06910e2f8c1e76ae5102b6b",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/package/owned.json": "95407ac7191034aec815f6b23aed0a44729de053e4a6e9ba9a9daae1386aaeec",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/verify/owned.json": "c088c50139e6d7665e271c61176a9714adef31585d4ad61fc3d4aceb9b562277",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/build/stderr": "5f4ae157037abcb0974aaf8715ccb24fd9954413e64c0cfa3fda3e0a57950979",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/build/owned.json": "da6899ff223a9851336b6bd0e9e63d7c725e029041fa81b5799022369a8ae3ad",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/metadata/stdout": "39c41c16a73ff81dec1d0170d43014f94735a8c4e6e25db0044d953bfca61bba",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/drawing/metadata/owned.json": "27156594a0229e6e9d5bcf6b128b0426a85f648ac1199af26230d5894d37c409",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/modules/stdout": "611f41d377c7cd583e96a4cce27e70eba0c789ff56108ec7aaee6b4e23f2290f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/modules/owned.json": "ccdcb9fa3ce5595e056c5e60db0d581145286576e2ec1a717f9888cd94b6c944",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/package/stdout": "6ce0f4993891d6adbb8aee7d2f5c5301cf38cbae7e93faef33a8557b4b0b4c5b",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/package/owned.json": "d022ca8993dab000e5e8171d7cb71f28dbcc9bace8e35a4b0e83d7a7d35b7642",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/verify/owned.json": "7760f1d707002b7f7622e892fb257c4e7fcc1d21b6ebee1f09566670d561e7e8",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/build/stderr": "905a7da78c61b05fffd2fe552eb734eb8e81057a78beed8de61a626721dedec3",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/build/owned.json": "bcb524759590a4f2ade52c4ab98342ac42bb81ec8b0c6ba940ac45b39b1b30ad",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/metadata/stdout": "2ad53ebfd55f78bf2f70df9286a18b68a895e3f361239f180bfb83743a863532",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/editor/metadata/owned.json": "333ecfefcbba22107a4bedb95c94341ac3e6d9054770d2fe2c7f471a83f1dbeb",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/modules/stdout": "0a81425a0e99be2db0c041c817efe0ddd8fd71f7b4c320f7813902a7bb07b6e0",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/modules/owned.json": "ff49415d88da8da482ec1c2a910501881050600b28004fdbece1b5d430326f33",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/package/stdout": "3d3c4a8e7d7d1c6bc59823aa785169319f4dff9e8f273d3c2ec11437278b03d0",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/package/owned.json": "55b1efa312bd596f60c55e358064190b174f0705cc628afd330bde7cfe83547e",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/verify/owned.json": "9acf2aa8ea47fe0685dfd466e2e883ea9b021869f07a53cc1e69590ef5955aed",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/build/stderr": "b100f90c724c9f8b9f0091c7ba7d98920240dd02b972a95c518e5d438c5e6438",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/build/owned.json": "564d4972cf30204215369f037c3ab7343ccba8b501ea5a3b7f484d3665adcb23",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/metadata/stdout": "0b1e11ec6a70ec2ec9cfed7254114502fdadaaa4c5d3fed86818ef696d2ccf52",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/grid/metadata/owned.json": "f2099a3a40a92d921c49af8ce075ec227c5216221f3e25e32d958edd96bf93c4",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/modules/stdout": "82b79e2b777d9f940831ba0cf9469bd997ff244960928afbfcf31be996be0997",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/modules/owned.json": "a89e282a09767e6f8e74bafc07542e360bf219df2738636f2194d4c5cd41dd7e",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/package/stdout": "a29aa418130a30c5e8c612d293088d106359a3cecf5f8424f712a4207a4dabe1",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/package/owned.json": "163ee23d65129c3c69202719b1017bd1e05d8379b5ab2bca7852d9cc809c74ac",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/verify/owned.json": "7953253bc5f00f5d147daa317189e160fc164ac6135771b63ae9d247fa7d6495",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/build/stderr": "792ee759a375ee914080cff59609eb9273d95d60024b193dd12c03a0bcdfcc5f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/build/owned.json": "10249293c24e1b92537b7af9aae5917e577fc3fabeaffccc8198c2f7d6be2e50",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/metadata/stdout": "c8ff259ebcc6580a8b0fbd422ce6d66fd4a5ec96ed51d71adadfee9af164998d",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/hello/metadata/owned.json": "152d7f2580c0a2199fd42d0637d3295b823ef749ce0feeabd679dd2361ddc6ba",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/modules/stdout": "07c13ca9596dffc42387fe6b8569b4da573f399fdc6f463bac5c6ac2cdcd0423",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/modules/owned.json": "96be0e611d240aa605bfbacaea34b3c09ee4c90843c74191748ea072300cef0e",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/package/stdout": "bd7ab4da502bae35799695cdb165f365286250f5abedb0f476b5f35858732c08",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/package/owned.json": "7be59d125aaeae1157c70f804feaf7a8b6349bf0a22b91ec3da995fc7a57082b",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/verify/owned.json": "2bb3e2176e16f7c0fd7ca4eb221156565a30f030748e0ca237b24ee859ae1517",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/build/stderr": "6fb773dddaf86f5a948e8c3bffc88f35a198544c20f5ec704d0a543460d7c46e",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/build/owned.json": "eae642ada77d194bf9e1cd2878b8d2b26dfdfc8dcedbd5c05dab3fa428564622",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/metadata/stdout": "61b11dd1ac02aee8b7da9b1ae82f039c188a97f14a27d6007e0c63966fd2713e",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/imaging/metadata/owned.json": "3e5c66862a445c8af75f0a234783c4d5815e431faab3e082cc3310b21f952e09",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/modules/stdout": "b9ae1b2b623db27c9ca3c6f03b95dc7e0de3496b613d8780777714b320912096",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/modules/owned.json": "1f574a82496a3453acb1b8e751ce09d7ed7529047f97829a12302065d676c8fc",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/package/stdout": "4172519106d6efbfaec25fbd5999e27c5c5c4996f382c9646c6ef78ca9c25d9f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/package/owned.json": "76c00acd26e6af6611f234a38c3176339cbb41d30ea3df744d8b4ea3e894b0c5",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/verify/owned.json": "1c13fbdb6c4b2e28dba9303baac828ca14824c023a57f3b018680a22cd95fa18",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/build/stderr": "f5984d9edbd64f4e7c35d5962abb8f02e2b2afd26d158e1c35789dd597b28fb0",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/build/owned.json": "f9c34c66282b2b262ad6224e6e882607a9ff4fc88554aa95d2957597ed03d50f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/metadata/stdout": "a6424e73e0fb3073180649ee01a9144aaa3ead089bcf39a759c82728e5b7b771",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedgrid/metadata/owned.json": "a44a72260b81af9dfbc470d7125d633bcd786c2958f01fc3accade7bfb484c95",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/modules/stdout": "6781af00a63269efa482915b7c69781fe231467ad42ef256652ac510eb646c3f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/modules/owned.json": "e8abaf0de612798c9fe23d6fcc7d443476adf616ba5bb8126f4992b64f268c1f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/package/stdout": "1e0b442ecb7dca656d3afab00dd6595ea07abbb9b4430d86633d93a88848802a",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/package/owned.json": "4d4ea7e5449edeaf81ac65b3981d2245ed94ea4d8935b4523d78211278e73be4",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/verify/owned.json": "cfbdf786270c633c5df63b7a1f8e26881ce3aa8430b1ab51efb455150e8caf79",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/build/stderr": "c04af0d122f70bfc243c9e513aa1f3109fb75f38caa6c5fbf6dafdd007fb749f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/build/owned.json": "7bfa0830f96a09ea042bb1ab1029cf7d4eddc74c857c9ce13b9a97c2e863b022",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/metadata/stdout": "bda5106ef2a2c27b9cd192901015c28876a13ed8941766548b29b6c533472138",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/loadedtree/metadata/owned.json": "f1a794dfe27d25263551563fce478e18a3a782677fdefc66b68e07fd694e5e45",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/modules/stdout": "64618d413c3aa5a9fba183bcdba8e174001e4ebce14acde83ae6585afcf33b25",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/modules/owned.json": "20e1d2257bbda5bd5fe3d684e6201e6e20352e340a4881cc6e82dc8759c35a80",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/package/stdout": "a4344180263c3afd8dc70d9fe9d5eaa06b54c8371d5c2ac4bbe95ec2cb0bef37",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/package/owned.json": "1e0d64db23b22a3bc4e76154950b9706cd18a524bd5e3e8268f411dc00c1a9ec",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/verify/owned.json": "a10bc74cca3fb3432d960c87ee70ebd1d03fbaa563b09fd1260e67700ee4c040",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/build/stderr": "1c782839408f0fdb1f2586aca4a8ca4234580788bb05ebba60c54bf161b9b3f2",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/build/owned.json": "13995e023150a2ba854a940314bfa641b392164bfea9044e1e59d99dd7e7a45e",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/metadata/stdout": "0599e6d52d038de385cef36770d4034776694bbd8d4a02f293027ce4bf804dc1",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/placement/metadata/owned.json": "0bb9b390847079bbc1906282126883cf141a3e71892b4d4f9d59df92174eb7f6",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/modules/stdout": "ad78a7b066419afe85383c4c6b77f1566c81a89d99abb772cfa6825c424ac986",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/modules/owned.json": "919e6ce7db701dcdf7ed5b1315e7c42cfde6c1ea38d7ce239f6d725d38dcb6c2",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/package/stdout": "fa112f2d9aef72b3e8d91a84120dfddb541e4ad9558dd4047427d887cfca945d",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/package/owned.json": "0c7ea3c2f781142b3d10774381c8c0ca7a3317a8fc43a35aee571196d970bb4e",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/verify/owned.json": "84a659af632b4d0b77b7a0470d5e96bc1f14bb4c9f96d7e594b8b4994f5b5822",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/build/stderr": "2d5326b808d9f5ec37cb3b950491498e5b8b5461678450d812809deec86a53bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/build/owned.json": "f4d2030d0cd34ae3f190fda5468eb0ff07cbeb43b5d482a52e1a2e42675ad968",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/metadata/stdout": "86dd902b4df6912cd39a0993a624c2e424a355bca0c9344f7f7615edfca5a023",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/viewport3d/metadata/owned.json": "8bb86323563bd57cdc9c6c72c9125ee6b510a7d9875c114fd85dc955567b6e89",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/modules/stdout": "b9f9da799d017829464955c48c392a25fa074f6bdad0d9ca1e1016019a369dd3",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/modules/owned.json": "85a1fe898c7cb6bdb3f646fd0a44edecc0e2c80ce570aedc0da27b68f5409b93",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/package/stdout": "a9d4608a72b30f0cd6ab13b7b2a510f66cd7769d397d072f34a7385b97acbb1f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/package/owned.json": "a870735f125e4c14a620b3c762ae7f2a12b857e0a7d84da17558872bdfc89e86",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/verify/owned.json": "617c64f264bcacd2da9e59fc03278d3d1530901ecb33008491d72aadce5c3be5",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/build/stderr": "0dfdbdf06299d90c8b600401d24af4fab5bb2fda5c475245393859a11336f797",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/build/owned.json": "930332ee4b64142c6d66b64fd74a7c2148179035d8d81447f5aad9c8842db4d6",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/metadata/stdout": "225552cd2ce82c8f6325893d0f51da07653551029f4c278fa306e87a47bd98d7",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace/metadata/owned.json": "0f186b8f6314d839c22f2bd3eaf3e7bb84932415008bff32487a7701fa91d74f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/modules/stdout": "b9f9da799d017829464955c48c392a25fa074f6bdad0d9ca1e1016019a369dd3",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/modules/owned.json": "4057acc5646c7ff422fccb85ab2a6e7e137cfe69da957f80001743ea9bcc6f3c",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/package/stdout": "bf67a2114c18010c7c9bfba9127ab5e730bee24637cd0bdd28f99a2e4cef8af7",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/package/owned.json": "4b223482dd8d5a2d8997f146737c4b3948bd7c25ee30253aaf94b899593ebf6a",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/verify/owned.json": "5185e1c4fd5950b43438884464dee75292d3ebe17e698dee8964b9c946b147bf",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/build/stderr": "f1a53f8295f6c5127b23923c0f179c2dbe37daf694a899cdaca16fd21e3b70a6",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/build/owned.json": "96c575a8e440539e2349c2200ffed0f5574f8eb4b1a6aa97874eee1d37b34d7f",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/metadata/stdout": "e0f90d23b6c7e564ce0d1862cad581461947cda7db467fa4ad2e5d24fa36df29",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-smoke/metadata/owned.json": "45eda65952382b95388758d6547b1a7fbfd16c60b01d6ec5fe32f0e654ffc3a4",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/modules/stdout": "b9f9da799d017829464955c48c392a25fa074f6bdad0d9ca1e1016019a369dd3",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/modules/owned.json": "006bb8dca7d6a5c7b5d85e681b0fbe274e5be501dbe0100547d00b745f11fd59",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/package/stdout": "5905ccc35c07d8be428c8f16f81ba1b35c449b2a8e9ff1e98b0fc306ae9f31fc",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/package/owned.json": "14297f4d57772ac37cc7664086524135c117f1f3e05c10239400e8f81e5e0cda",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/verify/owned.json": "712f2e566ece7d19e3330cd449492a31a168f5a137b82c38fc85bae645d4e418",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/build/stderr": "900a717a291c73f14bd8a645a1660d459c735cf0e2d55aa2a520b6514ef64f88",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/build/owned.json": "4a428e73814507cf6f9d306b85315e44088ea82470827a7f81e902784c706fa0",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/metadata/stdout": "2907de7dcc6baef2ee5f110409965b227705ca19422236eef5c6776e048c34a1",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/managed-replay/metadata/owned.json": "4627ee2c99f5ddffc7b1f072638aabec269d2012fdbdf23a8f4157c72e83f199",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/modules/stdout": "b9f9da799d017829464955c48c392a25fa074f6bdad0d9ca1e1016019a369dd3",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/modules/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/modules/owned.json": "21ff7f68ef3cc6d34b3bbd36e599adc511920d3bf820b736ba212ecfdfd23a43",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/package/stdout": "cc23e3f7840e202420b449ce546af71aca5991f19ac4ed1c1c1d03ec1be94042",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/package/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/package/owned.json": "928013357c1a70200a6e276f91e31b6627aa49b97721bae2bd7de844813e38f5",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/verify/stdout": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/verify/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/verify/owned.json": "a518d357847b4347c5c1b0243308bcacb33cd41df9cbf80498268280f59c2b06",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/build/stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/build/stderr": "f34296720090e4a73ce060d7a5c9cbbe7b9b44103274c8d94ca4a5295f2a0392",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/build/owned.json": "6212a9fefc12c9ecb9313b099ad97da84403f6a1b2412447974aaab792889e2a",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/metadata/stdout": "418a1e43974fddad4e9e60876a8ed943368ed91b605af15d03aee84a012c0dc0",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/metadata/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/workspace-replay/metadata/owned.json": "4a8955eb74f273e9a441f48eac82b5983ab59041b638ee2f47a903e22f6b4806",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/receipt.json": "1dfa591070c3d3a2cc5f7dbe37fefa7cac142c268bfd77df027aef0e8cfcd0b2",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/manifest.json": "0b1fc3fc6bcb34f359a92510b1d45e6f7b17d136e601049198838da66953d657",
+      "/private/tmp/vellum-current-sdk-2010a33/demos/sdk-files.json": "d586c341f4e0ed81d146313ba0a8707d270613f5e8a58ffdbbe34121f52bd8c1",
+      "/private/tmp/vellum-current-sdk-2010a33/sdk.tar.gz": "417f58c39b3dc53e6ee27b7be1c89a741fc9171359e8aecc6c8c42c2121339fd"
+    },
+    "archive": {
+      "path": "/private/tmp/vellum-current-sdk-2010a33/sdk.tar.gz",
+      "sha256": "417f58c39b3dc53e6ee27b7be1c89a741fc9171359e8aecc6c8c42c2121339fd",
+      "bytes": 18575704,
+      "manifest_files": 7421,
+      "regular_members": 7422,
+      "selected_source_files": 7320,
+      "generated_files": 101,
+      "private_build": true,
+      "version": "v0.1.0-alpha.2",
+      "namespace": "github.com/dshills/vellum"
+    },
+    "inventory": {
+      "modules": 89,
+      "distribution_audit": "pending",
+      "scope": "Go module graph and declared license/notice files; not a legal approval or complete embedded native/Rust/font audit"
+    },
+    "checks": {
+      "package": {
+        "validation": {
+          "archive": "/private/tmp/vellum-current-sdk-2010a33/sdk.tar.gz",
+          "sha256": "417f58c39b3dc53e6ee27b7be1c89a741fc9171359e8aecc6c8c42c2121339fd",
+          "version": "v0.1.0-alpha.2",
+          "modules": 89,
+          "private_build": true
+        },
+        "seconds": 5.762002166011371
+      },
+      "relocate": {
+        "validation": {
+          "event": "vellum.sdk.relocated",
+          "digest_verified_against_expected": true,
+          "trust_basis": "caller-supplied expected digest",
+          "independent_authenticity_verified": false,
+          "archive_sha256": "417f58c39b3dc53e6ee27b7be1c89a741fc9171359e8aecc6c8c42c2121339fd",
+          "version": "v0.1.0-alpha.2",
+          "source": {
+            "clean": true,
+            "commit": "2010a33cf874a85d8ff755dbaa43512d1569230c"
+          },
+          "verified_files": 7421,
+          "replacements_within_sdk": {
+            "cogentcore.org/core": "drivers/cogent/build/upstream",
+            "github.com/dshills/vellum": ".",
+            "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+            "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+          },
+          "path_contains_spaces": true,
+          "checks": [
+            "manifest all-file integrity",
+            "external Go module cache verification",
+            "standalone consumer race/vet/build",
+            "public API scenarios race/vet"
+          ],
+          "native_runtime": "not executed",
+          "public_distribution_audit": "not certified"
+        },
+        "seconds": 47.070490707992576
+      }
+    },
+    "compiled": {
+      "drawing": {
+        "example": "drawing",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/drawing",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/drawing",
+          "bytes": 58974018,
+          "sha256": "d32e8bcedd6fb65c505c6be904021b236f80c84502bace815befe90ccb2fb9f5"
+        }
+      },
+      "editor": {
+        "example": "editor",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/editor",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/editor",
+          "bytes": 58978146,
+          "sha256": "b169e1036e23521e5d94f15317aceef4f44b991dd4e5264e7b23e730c7f6a972"
+        }
+      },
+      "grid": {
+        "example": "grid",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/grid",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/grid",
+          "bytes": 58889234,
+          "sha256": "7131ffd3c1c347e17283172f4415a973f5a871fc8733b03c1172f495341066b8"
+        }
+      },
+      "hello": {
+        "example": "hello",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/hello",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/hello",
+          "bytes": 59715762,
+          "sha256": "7bab167e010765588bd430e5770fa4ff3557ee4bf6d3f83c701330eabca4ea0b"
+        }
+      },
+      "imaging": {
+        "example": "imaging",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/imaging",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/imaging",
+          "bytes": 59060802,
+          "sha256": "2096b5499f20597744d7944068a0759a94ec82ecb310e14a52ed36761cc84536"
+        }
+      },
+      "loadedgrid": {
+        "example": "loadedgrid",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/loadedgrid",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/loadedgrid",
+          "bytes": 59340930,
+          "sha256": "e3b8707d885db29b84a0bf04e140a24267417db7d4c7d23bc8220e89633a8a25"
+        }
+      },
+      "loadedtree": {
+        "example": "loadedtree",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/loadedtree",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/loadedtree",
+          "bytes": 58932386,
+          "sha256": "b234102a8bd80e514e6d0803b9cd2286a12b65cac1e26f0b58027ee0691fd2c9"
+        }
+      },
+      "placement": {
+        "example": "placement",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/placement",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/placement",
+          "bytes": 58768994,
+          "sha256": "66aacfe9e6f8da29566c68cb3d8abf855e58f069a6b7a44535f9fb2a0e015dca"
+        }
+      },
+      "viewport3d": {
+        "example": "viewport3d",
+        "target": ".",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/viewport3d",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/viewport3d",
+          "bytes": 58992370,
+          "sha256": "44e55bcd095b122c4458ce5111cdc028506d08aee3bec6e3caff4d07363c67cc"
+        }
+      },
+      "workspace": {
+        "example": "replay",
+        "target": "./cmd/workspace",
+        "tags": null,
+        "import_path": "github.com/dshills/vellum/examples/replay/cmd/workspace",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/workspace",
+          "bytes": 59020098,
+          "sha256": "4ee7296a0d627207cab04eb1b308be8f07ae15458b440256dacebd6896893504"
+        }
+      },
+      "workspace-smoke": {
+        "example": "replay",
+        "target": "./cmd/workspace-smoke",
+        "tags": "vellum_native_checks",
+        "import_path": "github.com/dshills/vellum/examples/replay/cmd/workspace-smoke",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/workspace-smoke",
+          "bytes": 59132162,
+          "sha256": "af8a117abd849deb0a1f4ed9fdf2100d65704e24dec308210d53af84077f68da"
+        }
+      },
+      "managed-replay": {
+        "example": "replay",
+        "target": "./cmd/native",
+        "tags": "offscreen",
+        "import_path": "github.com/dshills/vellum/examples/replay/cmd/native",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/managed-replay",
+          "bytes": 59065922,
+          "sha256": "4021a18201e9829064b80b8761f4fe6a1d866f2b90407a874fb8f0de9a89ce5e"
+        }
+      },
+      "workspace-replay": {
+        "example": "replay",
+        "target": "./cmd/workspace-replay",
+        "tags": "offscreen",
+        "import_path": "github.com/dshills/vellum/examples/replay/cmd/workspace-replay",
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/workspace-replay",
+          "bytes": 63601602,
+          "sha256": "50c6198ec3cdecdec76c8fc5e704e8dd5f8624af000aea6a3a3366336e095507"
+        }
+      }
+    },
+    "compiled_native_applications": 9,
+    "compiled_replay_commands": 4,
+    "direct_demo_commands": 65,
+    "latest_owned_stage": "0076",
+    "current_intrinsic_source_included": true,
+    "native_runtime_executed": false,
+    "public_distribution": false,
+    "independent_authenticity_verified": false,
+    "full_macos_qualified": false,
+    "network_profile": "Production controlled fixed public proxy/SumDB and verified external module cache; no offline/no-network claim.",
+    "nested_scope": "Package/relocation direct CLI groups observed absent. Nested production CLI commands use their own deadlines/cleanup; absence of each detached nested group is not independently observed. All65direct demo Go groups are observed absent.",
+    "completed_utc": "2026-10-17T08:03:46.551865+00:00"
+  },
+  "native_analysis": {
+    "result": "RECONCILED_CURRENT_PRIVATE_SDK_NATIVE_SMOKE",
+    "source_commit": "2010a33cf874a85d8ff755dbaa43512d1569230c",
+    "inputs": {
+      "/private/tmp/vellum-current-sdk-2010a33/native-smoke/receipt.json": "5541e8fadfeaf21d3776c013f73e0175615b99b351a8d24b058aac051acb2278",
+      "/private/tmp/vellum-current-sdk-2010a33/native-smoke/provenance.json": "0dd1d9af9e5cfb40495d291e502bcf44b2b68b0ccd7235e9c5e244f5fc443b22",
+      "/private/tmp/vellum-current-sdk-2010a33/native-smoke/run/owned.json": "973b637162e8c8a643ec9075226dc2b7ec6f95699850889525828a3cfe9b1c9f",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/native-readiness.json": "ab47bf893f89399a9d5c5b5418e382569eba5449ed043bc51b89217746f49837",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/inspect-native.py": "013c91e0692ee7ce6c05195193756b0301e2ce8c299f174911a2f62a73f6a401",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/native.py": "e9ca62feb02cfc5a8852555af091b03ad9f4c27ba173ff7b662545c786a01bc6",
+      "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/analysis.json": "7a3ad14e1f052e9de28d8d484cff9e5e45a871421b36f16984bef381e0814344",
+      "/private/tmp/vellum-current-sdk-2010a33/source.json": "513f7b01ec7a4a51652b6f10d5a3e23b0f69160cbbe0d3c1b7cdc7876de74bb6",
+      "/private/tmp/vellum-current-sdk-2010a33/native-smoke/run/stdout": "795afc62788125673623a62f700ba965b29927db91c4724509a463b10e5cecd1",
+      "/private/tmp/vellum-current-sdk-2010a33/native-smoke/run/stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "binary": {
+      "path": "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/hello",
+      "bytes": 59715762,
+      "sha256": "7bab167e010765588bd430e5770fa4ff3557ee4bf6d3f83c701330eabca4ea0b"
+    },
+    "archive": {
+      "path": "/private/tmp/vellum-current-sdk-2010a33/sdk.tar.gz",
+      "sha256": "417f58c39b3dc53e6ee27b7be1c89a741fc9171359e8aecc6c8c42c2121339fd",
+      "bytes": 18575704,
+      "manifest_files": 7421,
+      "regular_members": 7422,
+      "selected_source_files": 7320,
+      "generated_files": 101,
+      "private_build": true,
+      "version": "v0.1.0-alpha.2",
+      "namespace": "github.com/dshills/vellum"
+    },
+    "sdk_root": "/private/tmp/vellum-current-sdk-2010a33/demos/relocated SDK applications/vellum-v0.1.0-alpha.2",
+    "native_record": {
+      "event": "vellum.native.ready",
+      "geometry_persistence_disabled_in_fixture": true,
+      "go_version": "go1.27.2",
+      "heap_alloc_bytes": 62747464,
+      "height": 344,
+      "render_readback_ns": [
+        1807833,
+        1720334,
+        1709125
+      ],
+      "startup_to_verified_gpu_ns": 552851041,
+      "width": 630
+    },
+    "native_processes": 1,
+    "source_prepared_sdk_stable": true,
+    "direct_owned_group_absent": true,
+    "physical_input_generated": false,
+    "settings_changes": false,
+    "ordinary_frame_performance_qualified": false,
+    "native_memory_qualified": false,
+    "public_distribution": false,
+    "independent_authenticity_verified": false,
+    "full_macos_qualified": false,
+    "completed_utc": "2026-10-17T08:07:55.338801+00:00"
+  },
+  "native": {
+    "result": "PASS_SCOPED_PRIVATE_SDK_NATIVE_SMOKE",
+    "source_commit": "2010a33cf874a85d8ff755dbaa43512d1569230c",
+    "producer_sha256": "e9ca62feb02cfc5a8852555af091b03ad9f4c27ba173ff7b662545c786a01bc6",
+    "review_sha256": "ab47bf893f89399a9d5c5b5418e382569eba5449ed043bc51b89217746f49837",
+    "provenance_sha256": "0dd1d9af9e5cfb40495d291e502bcf44b2b68b0ccd7235e9c5e244f5fc443b22",
+    "native_runtime_executed": true,
+    "physical_input_generated": false,
+    "settings_changes": false,
+    "public_distribution": false,
+    "full_macos_qualified": false,
+    "error": null,
+    "run": {
+      "argv": [
+        "/private/tmp/vellum-current-sdk-2010a33/demos/compiled applications/hello",
+        "--benchmark",
+        "--idle=1s",
+        "--samples=3"
+      ],
+      "cwd": "/private/tmp/vellum-current-sdk-2010a33/demos/relocated SDK applications/vellum-v0.1.0-alpha.2/examples/hello",
+      "started_utc": "2026-10-17T08:07:08.854096+00:00",
+      "watchdog_seconds": 45,
+      "error": null,
+      "exit_code": 0,
+      "created": true,
+      "observation_errors": [],
+      "logs_complete": true,
+      "pins_stable": true,
+      "stop_at_exit": false,
+      "pid": 52486,
+      "group": 52486,
+      "owned": {
+        "created": true,
+        "pid": 52486,
+        "group": 52486,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 52486,
+          "members": [],
+          "observation_sha256": "b2f894d01e913f14b5a19ad4f56c421bc9ec29ff426d72347631a5229f387d5d"
+        }
+      },
+      "seconds": 4.839969124994241,
+      "logs": {
+        "stdout": {
+          "bytes": 243,
+          "sha256": "795afc62788125673623a62f700ba965b29927db91c4724509a463b10e5cecd1"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "native_record": {
+      "event": "vellum.native.ready",
+      "geometry_persistence_disabled_in_fixture": true,
+      "go_version": "go1.27.2",
+      "heap_alloc_bytes": 62747464,
+      "height": 344,
+      "render_readback_ns": [
+        1807833,
+        1720334,
+        1709125
+      ],
+      "startup_to_verified_gpu_ns": 552851041,
+      "width": 630
+    },
+    "source_stable": true,
+    "sdk_stable": true,
+    "pins_stable": true,
+    "lease_held_through_cleanup": true,
+    "completed_utc": "2026-10-17T08:07:17.726029+00:00",
+    "finalization_errors": [],
+    "local_stop_present": true
+  },
+  "delivery": {
+    "source_commit": "2010a33cf874a85d8ff755dbaa43512d1569230c",
+    "private_build": true,
+    "archive": {
+      "path": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-current-sdk-after-intrinsic/deliverables/vellum-v0.1.0-alpha.2-2010a33-private.tar.gz",
+      "bytes": 18575704,
+      "sha256": "417f58c39b3dc53e6ee27b7be1c89a741fc9171359e8aecc6c8c42c2121339fd"
+    },
+    "public_distribution": false
+  },
+  "result_review_sha256": "83091879d4d677594d56362aceb018fb7893c1f917e8147543a7544b648c8a37",
+  "evidence": {
+    "sha256": "58cbc02e813c04e70a626772efaa18545ad2d9e4d279a050a9d7690b2e23ec22",
+    "bytes": 6189612,
+    "members": 246,
+    "expanded_bytes": 24366686
+  },
+  "evidence_phase_provider_calls": 0,
+  "production_source_changed": false,
+  "public_distribution": false,
+  "full_macos_qualified": false
+}

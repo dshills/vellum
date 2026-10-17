@@ -548,3 +548,15 @@ p95 is lower in all twenty pairs, with median paired reductions of about
 4 ms p95; eight meet 6 ms p99. These are scoped workload observations;
 P4/P6/P9/P11, broader performance/memory/endurance, physical/human, current
 SDK closure and release/distribution remain open.
+
+## Current private SDK and relocated consumers
+
+The [current private SDK refresh](reports/macos-sdk-refresh/README.md) binds clean `2010a33` to
+7,421 hashed files including stage 0076 and current intrinsic grid sizing.
+The relocated generated consumer passes race/vet/build and public API contracts
+pass race/vet. Nine application roots and four actual replay/workspace command
+entrypoints compile from a second SDK extraction, with 65 direct Go commands.
+One separately admitted SDK hello run verifies its initial rectangle pixel,
+three further readbacks and owned shutdown. Other demo runtimes, ordinary frame
+and memory/endurance budgets, physical/human workflows, native component/rights
+closure and public distribution remain open.
