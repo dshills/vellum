@@ -110,6 +110,86 @@ def candidate(library, expected_sha256, provenance):
     return record, {DIRECTORY + "/" + name: body for name, body in generated.items()}
 
 
+
+COMPONENT_DIRECTORY = "release/native-components/wgpu-darwin-arm64"
+COMPONENT_INVENTORY = COMPONENT_DIRECTORY + "/INVENTORY.json"
+KNOWN_COMPONENT_ARCHIVE = "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883"
+MAX_COMPONENT_BYTES = 4 << 20
+MAX_COMPONENT_TOTAL = 16 << 20
+MAX_COMPONENT_FILES = 512
+
+
+def component_notice_record(record, files):
+    """Check exact SDK member coverage; declarations never grant approval."""
+    if type(record) is not dict or set(record) != {"inventory", "files", "components", "distribution_audit"} or record.get("inventory") != COMPONENT_INVENTORY or record.get("distribution_audit") != "pending" or type(record.get("components")) is not int or not 0 < record["components"] <= 256:
+        raise ValueError("invalid native component notice record")
+    hashes = record.get("files")
+    if type(hashes) is not dict or not 1 < len(hashes) <= MAX_COMPONENT_FILES or COMPONENT_INVENTORY not in hashes:
+        raise ValueError("invalid native component notice coverage")
+    for name, checksum in hashes.items():
+        if type(name) is not str or (name != COMPONENT_INVENTORY and not name.startswith(COMPONENT_DIRECTORY + "/NOTICES/")) or "\\" in name or any(part in {"", ".", ".."} for part in name.split("/")) or not sha_value(checksum) or files.get(name) != checksum:
+            raise ValueError("native component notice checksum or path mismatch")
+    if {name for name in files if name.startswith(COMPONENT_DIRECTORY + "/")} != set(hashes):
+        raise ValueError("native component notice member coverage mismatch")
+    return record
+
+
+def component_notices(root, artifact_sha256):
+    """Bind checked-in declarations to this exact private archive, when known."""
+    root = Path(root)
+    path = root / COMPONENT_INVENTORY
+    # Refuse symlinked ancestors even if a redirected final path is absent.
+    current = root
+    for part in PurePosixPath(COMPONENT_INVENTORY).parts:
+        current /= part
+        if current.is_symlink():
+            raise ValueError("native component notices cannot contain symlinks")
+    if not path.exists():
+        if artifact_sha256 == KNOWN_COMPONENT_ARCHIVE:
+            raise ValueError("known native archive requires its component notice inventory")
+        return None
+    data = read_regular(path, MAX_COMPONENT_BYTES)
+    inventory = strict_json(data)
+    if type(inventory) is not dict or type(inventory.get("schema")) is not int or inventory["schema"] != 1 or not sha_value(inventory.get("artifact_sha256")) or inventory.get("distribution_audit") != "pending":
+        raise ValueError("invalid native component inventory")
+    if inventory["artifact_sha256"] != artifact_sha256:
+        if artifact_sha256 == KNOWN_COMPONENT_ARCHIVE:
+            raise ValueError("known native archive has a mismatched component notice inventory")
+        return None  # Never apply one archive's declarations to another binary.
+    hashes, components = inventory.get("files"), inventory.get("components")
+    if type(hashes) is not dict or type(components) is not list or not 0 < len(components) <= 256:
+        raise ValueError("invalid native component inventory coverage")
+    expected = {COMPONENT_DIRECTORY + "/" + name: value for name, value in hashes.items()}
+    expected[COMPONENT_INVENTORY] = digest(data)
+    record = {"inventory": COMPONENT_INVENTORY, "files": expected, "components": len(components), "distribution_audit": "pending"}
+    component_notice_record(record, expected)
+    referenced, identities, total = set(), set(), len(data)
+    if total > MAX_COMPONENT_TOTAL:
+        raise ValueError("native component inventory exceeds aggregate byte bound")
+    for component in components:
+        if type(component) is not dict or type(component.get("id")) is not str or not component["id"] or component["id"] in identities or type(component.get("notice_files")) is not list or not component["notice_files"]:
+            raise ValueError("invalid native component identity or notices")
+        identities.add(component["id"])
+        for name in component["notice_files"]:
+            if type(name) is not str or name not in hashes:
+                raise ValueError("native component refers to missing notice")
+            referenced.add(name)
+    if referenced != set(hashes):
+        raise ValueError("native component notice is unreferenced")
+    for name, checksum in expected.items():
+        current = root
+        for part in PurePosixPath(name).parts:
+            current /= part
+            if current.is_symlink():
+                raise ValueError("native component notices cannot contain symlinks")
+        bound = MAX_COMPONENT_BYTES if name == COMPONENT_INVENTORY else min(MAX_COMPONENT_BYTES, MAX_COMPONENT_TOTAL - total)
+        content = read_regular(current, bound)
+        total += len(content) if name != COMPONENT_INVENTORY else 0
+        if total > MAX_COMPONENT_TOTAL or digest(content) != checksum:
+            raise ValueError("native component notice checksum mismatch or byte bound exceeded")
+    return record
+
+
 def overlay_modfile(name, data):
     if name != "drivers/cogent/go.mod" and not (name.startswith("examples/") and name.endswith("/go.mod") and
             re.search(rb"^\s*(?:require\s+)?github\.com/dshills/vellum/drivers/cogent\s+v\S+", data, re.MULTILINE)):
@@ -137,6 +217,8 @@ def validate_record(record, files, private_build):
         raise ValueError("native GPU manifest/member coverage mismatch")
     if hashes["go.mod"] != digest(GO_MOD) or hashes["libs.go"] != digest(LIBS_GO):
         raise ValueError("native GPU linkage differs from owned module")
+    if "component_notices" in record:
+        component_notice_record(record["component_notices"], files)
     objects = record.get("arm64_object_members")
     if type(objects) is not int or not 0 < objects < 10000:
         raise ValueError("invalid native GPU object count")
@@ -168,9 +250,13 @@ def sdk_candidate(root):
                 path /= part
                 if path.is_symlink():
                     raise ValueError("native GPU SDK paths cannot contain symlinks")
-            bound = MAX_LIBRARY_BYTES if name == DIRECTORY + "/" + LIBRARY else MAX_PROVENANCE_BYTES
+            bound = MAX_LIBRARY_BYTES if name == DIRECTORY + "/" + LIBRARY else MAX_COMPONENT_BYTES if name.startswith(COMPONENT_DIRECTORY + "/") else MAX_PROVENANCE_BYTES
             if digest(read_regular(path, bound)) != checksum:
                 raise ValueError("native GPU SDK member checksum mismatch")
+        if "component_notices" in record:
+            observed = component_notices(root, record["files"][LIBRARY])
+            if observed != record["component_notices"]:
+                raise ValueError("native component inventory does not match selected archive or record")
         # Refuse on the first unexpected entry; never traverse a tampered tree.
         for directory, allowed in [(root / DIRECTORY, {"go.mod", "libs.go", PROVENANCE, "arm64"}),
                                    (root / DIRECTORY / "arm64", {"libwgpu_native.a"})]:

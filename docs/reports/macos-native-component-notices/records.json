@@ -1,0 +1,195 @@
+{
+  "archive": {
+    "file": "records.tar.gz",
+    "bytes": 20471,
+    "sha256": "bee5f3bd525e571ffeee7e4ef2b6cee194b9ab839f925f9b895c596b48587be9"
+  },
+  "members": [
+    {
+      "path": "source-coverage.json",
+      "bytes": 489,
+      "sha256": "4fc6137255b90a21390cf7aaf1c021879d76dfa59b6e9fc4d9e34f272d98614f"
+    },
+    {
+      "path": "capsule-binding.json",
+      "bytes": 521,
+      "sha256": "9e7825a62b22c91493a5d2fe72f0fe9d4585cb566e0733024f47a1954bc1c18f"
+    },
+    {
+      "path": "prism.json",
+      "bytes": 3667,
+      "sha256": "0bac44e77841bcd780b0daebcff26fb51f71c864aafbd4932d0394f231709927"
+    },
+    {
+      "path": "prism-command.json",
+      "bytes": 924,
+      "sha256": "49a3f909ab183276325ba808f170fa477e68ea7af899d07da69adb7abd1dd632"
+    },
+    {
+      "path": "prism-rules.json",
+      "bytes": 1730,
+      "sha256": "68f0a0bf37a331a300314654539a1c837b7ed08951a5eb21743c7c84a6ebb6d7"
+    },
+    {
+      "path": "prism-input.diff",
+      "bytes": 22750,
+      "sha256": "d2e35a69ca591f7231286d31d908d55ea06354bc764d4f7873d8b76a088af94f"
+    },
+    {
+      "path": "prism.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "prism.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "provider-assessment.json",
+      "bytes": 1515,
+      "sha256": "dc2558eea6c23f9092895ed62641b58e516c16f76991eb92c0e8a258f8d82449"
+    },
+    {
+      "path": "internal-review.txt",
+      "bytes": 483,
+      "sha256": "9f41a0d7f13a752fe9f4e39831cd39202e469710c246de94e0ed664d61bddf39"
+    },
+    {
+      "path": "tests-command.json",
+      "bytes": 243,
+      "sha256": "8930cdfbb3ae351acee2ae41ac052932999ce7bdc8cf97540db87619683d6015"
+    },
+    {
+      "path": "tests.stdout",
+      "bytes": 264,
+      "sha256": "7126487f0bc4e73932298bd73f167cf563b5c6f28f3d6fc9b0772bb2304e0029"
+    },
+    {
+      "path": "tests.stderr",
+      "bytes": 175,
+      "sha256": "67a511e3304338b727930729c437239b1bb128fc99df7a8c8132a8e4ccb40a18"
+    },
+    {
+      "path": "tests-final-command.json",
+      "bytes": 243,
+      "sha256": "52dfdb85f9f69848ebe15783c758992139c404f5310e9b240e9f0278bb73e1a2"
+    },
+    {
+      "path": "tests-final.stdout",
+      "bytes": 264,
+      "sha256": "b709103069843c1dfcdda240665faaef04eb2e2add33b40c3bc76d75f0019166"
+    },
+    {
+      "path": "tests-final.stderr",
+      "bytes": 175,
+      "sha256": "b72ee273d6b08c69c1614d3f080391f0bb4a5715a041505e139b647bd66f7dfb"
+    },
+    {
+      "path": "tests-post-prism-command.json",
+      "bytes": 556,
+      "sha256": "5cd1b317e3ba77fce15a4c3bf92c217f525cb225141ebaa4f697a3680b2e31e7"
+    },
+    {
+      "path": "tests-post-prism.stdout",
+      "bytes": 264,
+      "sha256": "583ac40b2b3a2c4c625c6beae3d91af8e4d94c0acb227a03dfe75afbd1ec1ce2"
+    },
+    {
+      "path": "tests-post-prism.stderr",
+      "bytes": 176,
+      "sha256": "d9d7c5f8b9ce7f5db40340e9b23a122005e8c0e946dfc7b0193f5862d1de13be"
+    },
+    {
+      "path": "final-owned-source.diff",
+      "bytes": 24402,
+      "sha256": "a74db8d6674d85a0c76d8017fbd1822ff79277255fec4a7678ead07281379ee3"
+    },
+    {
+      "path": "fetched-notice-receipts.json",
+      "bytes": 2094,
+      "sha256": "cbdd78a890e3b49d94aaafcc05b9404b6250969f959244387e2132f93e6b5e6e"
+    },
+    {
+      "path": "repository-tree-receipts.json",
+      "bytes": 3657,
+      "sha256": "43f0174487e061f336b62bc372d6b762146487ca9fb4847912f304a81bca7519"
+    },
+    {
+      "path": "cc0-receipt.json",
+      "bytes": 302,
+      "sha256": "54976dbdd9501317c37214adee697f274f6a2e49d42ae73c4ba8c41c4ada1a67"
+    }
+  ],
+  "result": {
+    "result": "PASS_REAL_NATIVE_ARCHIVE_NOTICE_BINDING",
+    "artifact_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+    "arm64_object_members": 541,
+    "provenance_sha256": "3830acab26baa87e774bc8b955f4da5ad0756dd7ea086b934672bf734503c39b",
+    "components": 82,
+    "component_members": 409,
+    "notice_index_blobs_equal_original_worktree_bytes": 409,
+    "generated_gpu_capsule_members": 4,
+    "distribution_audit": "pending",
+    "sdk_archive_created": false,
+    "native_application_executed": false
+  },
+  "source_coverage": {
+    "result": "PASS_CURRENT_SOURCE_NOTICE_COVERAGE",
+    "components": 82,
+    "notice_files": 408,
+    "producer_source_members": 409,
+    "compiled_packages": 80,
+    "compiler_units": 103,
+    "copied_source_files_matching_executed_build_inputs": 383,
+    "artifact_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+    "inventory_sha256": "443e1760808a72d4fee88330c58271e18eb87eea633d30ef180d819c6254f55e",
+    "distribution_audit": "pending",
+    "final_sdk_produced": false
+  },
+  "tests": {
+    "argv": [
+      "/opt/homebrew/bin/python3",
+      "-B",
+      "-m",
+      "unittest",
+      "native_gpu_test",
+      "release-sdk_test",
+      "check-sdk_test",
+      "distribution-inventory_test"
+    ],
+    "exit_code": 0,
+    "seconds": 1.63994525000453,
+    "source": {
+      "scripts/native_gpu.py": "f6aa6f176bdab810d2f3f6d27dd079ee195928942ed761ac2081b2687369142d",
+      "scripts/native_gpu_test.py": "7c378729937c0157e571ca9c3d3cc8b3ee401ba497b8a238883c615caf3ee7ac",
+      "scripts/release-sdk.py": "b275d01edd199f34bf416132095f77d622519d90f6b94546345ab3957157f03a"
+    }
+  },
+  "review": {
+    "review": "Prism Anthropic Claude Sonnet5.5",
+    "raw_cli_exit": 1,
+    "raw_retained_medium": 2,
+    "provider_calls": 1,
+    "complete": true,
+    "files": 6,
+    "bytes": 22750,
+    "findings": [
+      {
+        "id": "f5308a14b90c00df",
+        "disposition": "ADDRESSED",
+        "change": "Known source-built archive now requires the exact committed inventory; missing/mismatched cases refuse. Unknown candidate hashes still gain no claim, and historical consumers without an optional record retain compatibility.",
+        "regression": "test_known_component_archive_requires_its_inventory"
+      },
+      {
+        "id": "4262c7df83fe71ab",
+        "disposition": "ADDRESSED",
+        "change": "Inventory itself must fit aggregate budget before notice reads; read_regular receives min(per-file bound, remaining aggregate budget), so file-size admission occurs before loading content. Inventory recheck remains counted once logically.",
+        "regression": "Extracted consumer with exhausted budget refuses before any notice read; >1MiB notice still succeeds within normal limits."
+      }
+    ],
+    "external_rereview_after_fixes": false,
+    "verification": "77 final affected tests pass; independent internal review approved both fixes and current source hashes.",
+    "excluded_from_provider_payload": "408 verbatim or explicitly marked supplemental notice/declaration files and generated inventory. Their hashes, compiled-source lineage, producer enumeration and Git index byte identity are mechanically checked and internally reviewed."
+  }
+}

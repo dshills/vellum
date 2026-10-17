@@ -4,3 +4,6 @@ drivers/cogent/native/patches/**/*.patch -whitespace
 # Native preparation must receive stable LF bytes on Windows checkouts.
 *.sh text eol=lf
 *.patch text eol=lf
+
+# Third-party notice hashes identify original bytes, including CRLF/spacing.
+release/native-components/wgpu-darwin-arm64/NOTICES/** -text -whitespace

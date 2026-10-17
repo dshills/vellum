@@ -255,6 +255,10 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
     if any(gpu_arguments) and (public or not all(gpu_arguments)):
         raise ValueError("native GPU candidates require all three options and a private SDK")
     gpu_record, gpu_files = native_gpu.candidate(macos_gpu_library, macos_gpu_sha256, macos_gpu_provenance) if all(gpu_arguments) else (None, {})
+    if gpu_record is not None:
+        component_notices = native_gpu.component_notices(root, macos_gpu_sha256)
+        if component_notices is not None:
+            gpu_record["component_notices"] = component_notices
     # Outputs and their pending archive must never be discoverable as source.
     # Resolve ancestors for this containment check but preserve the caller's
     # final path so the existing/dangling-symlink refusal remains explicit.
@@ -287,6 +291,8 @@ def package(root, output, public=False, include_untracked=False, *, macos_gpu_li
                     "provenance_sha256": gpu_record["files"][native_gpu.PROVENANCE],
                     "trust": native_gpu.TRUST, "distribution_audit": "pending",
                     "scope": "Go graph notices do not close this candidate's native/Rust/standard-library component or rights audit"}
+            if gpu_record is not None and "component_notices" in gpu_record:
+                inventory["native_gpu_candidate"]["component_notices"] = gpu_record["component_notices"]
             if public and any(not item.get("module_license_files") for item in inventory["modules"]):
                 raise ValueError("a dependency has no recorded module license declaration")
             with tempfile.NamedTemporaryFile(prefix=".vellum-sdk-", dir=output.parent, delete=False) as temporary:

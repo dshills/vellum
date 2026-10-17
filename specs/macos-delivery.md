@@ -200,7 +200,7 @@ be budgeted in addition to implementation time.
 | M3 | Failing / incomplete | [Current native comparison](../docs/reports/macos-encoding-scratch/README.md) still misses 4 ms. Stage0078 reduces encoding allocation but not native latency; direct AX construction was subsequently rejected after native regression. Next investigate full refresh/scene capture and native publication. |
 | M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
-| M6 | Partial | Private SDK native consumers pass; incorporate the M1 cleanup fix in the final package and close native/Rust/font/asset rights. |
+| M6 | Partial | Private SDK native consumers pass; [native notice packaging](../docs/reports/macos-native-component-notices/README.md) now binds the source-built archive declarations. Final SDK refresh, exact runtime/asset rights closure and owner approval remain. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
 
 The ledger changes only when the corresponding requirement is demonstrated.

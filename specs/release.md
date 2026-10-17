@@ -88,6 +88,42 @@ remain preserved. The candidate is not adopted into installed libraries or the
 SDK; complete component/rights closure, broader native UI/presentation, older
 macOS runtime, performance/memory/endurance and full Mac release remain open.
 
+## Source-built GPU component notices
+
+`release/native-components/wgpu-darwin-arm64/INVENTORY.json` binds collected
+notices to the exact source-built ARM64 archive SHA256. The current bundle covers
+all 80 compiled Cargo packages (103 compiler units), pinned webgpu headers and
+the executed Rust 1.99 toolchain's bundled standard-library declarations. Its
+82 component entries and 408 notice/declaration files are a conservative compiled
+superset, including host/build dependencies; they are not an exact linked-crate
+inventory, license selection or redistribution approval. Original declarations,
+copyright texts and alternative license files are retained without invented
+copyright holders. Missing crate-package notices use exact VCS-commit repository
+declarations; hexf-parse's CC0 declaration has the official standard-text supplement.
+
+The existing SDK producer automatically attaches a `component_notices` record
+only when the private GPU candidate's archive hash matches. The known source-built
+archive refuses a missing or mismatched inventory. Its checked-in
+inventory and notice files travel through the existing release source path,
+with their exact file hashes and component count referenced by the SDK manifest
+and `THIRD_PARTY_INVENTORY.json`. Unknown candidates receive no matching claim.
+No additional native capsule member or module overlay is introduced.
+
+Producer and extracted SDK consumer validate inventory schema, artifact binding,
+unique component identities, notice references and exact SDK member/hash coverage.
+They refuse traversal/symlink paths and apply bounds of 512 files, 256 components,
+4 MiB per file and 16 MiB aggregate. Validation after source enumeration detects
+an omitted or changed notice before publication. Extracted validation rechecks
+inventory semantics, not only individual file hashes. Older private capsules
+without the optional record retain their prior pending-audit behavior.
+
+The bundle's source/metadata receipts and open issues are recorded in its inventory
+and [notice guide](../release/native-components/README.md). The Apple-derived
+binding declarations, exact runtime-subcomponent attribution, generated code,
+fonts/assets and owner distribution decision remain open review items. No public
+release gate changes. A final SDK refresh and relocated native acceptance still
+follow runtime stabilization; fixture packaging is not that final qualification.
+
 ## Alpha.2 window lifetime migration
 
 Alpha.2 deliberately breaks the alpha.1 string-scoped application APIs to avoid

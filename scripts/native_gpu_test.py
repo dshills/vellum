@@ -88,7 +88,147 @@ def package(root, files, path, **kwargs):
         return release.package(root, path, **kwargs)
 
 
+def notice_bundle(root, files, checksum):
+    # Larger than the old provenance bound: bundled Rust COPYRIGHT is >1MiB.
+    name = gpu.COMPONENT_DIRECTORY + "/NOTICES/crate/LICENSE"
+    content = b"declared license text\n" * 60000
+    path = root / name
+    path.parent.mkdir(parents=True)
+    path.write_bytes(content)
+    files[name] = path
+    inventory = {"schema": 1, "artifact_sha256": checksum, "distribution_audit": "pending",
+                 "components": [{"id": "crate-1", "notice_files": ["NOTICES/crate/LICENSE"]}],
+                 "files": {"NOTICES/crate/LICENSE": gpu.digest(content)}}
+    path = root / gpu.COMPONENT_INVENTORY
+    path.write_text(json.dumps(inventory))
+    files[gpu.COMPONENT_INVENTORY] = path
+    return inventory
+
+
 class NativeGPUChecks(unittest.TestCase):
+    def test_component_notices_ship_and_verify_after_relocation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root, files = source(base)
+            options = inputs(base)
+            notice_bundle(root, files, options["macos_gpu_sha256"])
+            result = package(root, files, base / "sdk.tar.gz", **options)
+            verified = checker.verify_archive(base / "sdk.tar.gz", result["sha256"])
+            note = verified["manifest"]["native_gpu"]["component_notices"]
+            self.assertEqual(note["components"], 1)
+            self.assertEqual(note["distribution_audit"], "pending")
+            sdk = checker.extract_verified(base / "sdk.tar.gz", base / "relocated", verified)
+            shutil.rmtree(root)
+            self.assertEqual(gpu.sdk_candidate(sdk)["component_notices"], note)
+            # Consumer validation cannot rely on producer-side checks or a
+            # hash-consistent but semantically inconsistent manifest alone.
+            with mock.patch.object(gpu, "MAX_COMPONENT_TOTAL", 100), mock.patch.object(gpu, "read_regular", wraps=gpu.read_regular) as reads:
+                with self.assertRaisesRegex(ValueError, "bound"):
+                    gpu.sdk_candidate(sdk)
+                self.assertFalse(any(str(call.args[0]).startswith(str(sdk / gpu.COMPONENT_DIRECTORY / "NOTICES")) for call in reads.call_args_list), "already exhausted inventory budget still read a notice")
+            manifest_path = sdk / "SDK_MANIFEST.json"
+            manifest = json.loads(manifest_path.read_text())
+            manifest["native_gpu"]["component_notices"]["components"] = 2
+            manifest_path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                gpu.sdk_candidate(sdk)
+            manifest["native_gpu"]["component_notices"]["components"] = 1
+            notice_inventory = sdk / gpu.COMPONENT_INVENTORY
+            original_inventory = notice_inventory.read_bytes()
+            inventory_data = json.loads(original_inventory)
+            inventory_data["artifact_sha256"] = "b" * 64
+            notice_inventory.write_text(json.dumps(inventory_data))
+            changed_hash = gpu.digest(notice_inventory.read_bytes())
+            manifest["files"][gpu.COMPONENT_INVENTORY] = changed_hash
+            manifest["native_gpu"]["component_notices"]["files"][gpu.COMPONENT_INVENTORY] = changed_hash
+            manifest_path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                gpu.sdk_candidate(sdk)
+            notice_inventory.write_bytes(original_inventory)
+            original_hash = gpu.digest(original_inventory)
+            manifest["files"][gpu.COMPONENT_INVENTORY] = original_hash
+            manifest["native_gpu"]["component_notices"]["files"][gpu.COMPONENT_INVENTORY] = original_hash
+            manifest_path.write_text(json.dumps(manifest))
+            with tarfile.open(base / "sdk.tar.gz") as archive:
+                inventory = json.loads(archive.extractfile("vellum-v0.1.0-alpha.1/THIRD_PARTY_INVENTORY.json").read())
+            self.assertEqual(inventory["native_gpu_candidate"]["component_notices"], note)
+            name = next(n for n in note["files"] if n != gpu.COMPONENT_INVENTORY)
+            (sdk / name).write_bytes(b"tampered")
+            with self.assertRaisesRegex(ValueError, "checksum mismatch"):
+                gpu.sdk_candidate(sdk)
+
+    def test_known_component_archive_requires_its_inventory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with self.assertRaisesRegex(ValueError, "requires"):
+                gpu.component_notices(root, gpu.KNOWN_COMPONENT_ARCHIVE)
+            self.assertIsNone(gpu.component_notices(root, "a" * 64))
+            files = {}
+            notice_bundle(root, files, "a" * 64)
+            with self.assertRaisesRegex(ValueError, "mismatched"):
+                gpu.component_notices(root, gpu.KNOWN_COMPONENT_ARCHIVE)
+
+    def test_component_notices_refuse_missing_unreferenced_and_escaping_inputs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {}
+            original = notice_bundle(root, files, "a" * 64)
+            self.assertIsNone(gpu.component_notices(root, "b" * 64))
+            self.assertIsNotNone(gpu.component_notices(root, "a" * 64))
+            inventory_path = root / gpu.COMPONENT_INVENTORY
+            for name, change in [
+                ("traversal", lambda d: d["files"].update({"NOTICES/../elsewhere": "a" * 64})),
+                ("absolute", lambda d: d["files"].update({"/outside": "a" * 64})),
+                ("backslash", lambda d: d["files"].update({"NOTICES/x\\escape": "a" * 64})),
+                ("missing reference", lambda d: d["components"][0]["notice_files"].append("NOTICES/missing")),
+                ("unreferenced", lambda d: d["components"][0].update(notice_files=[])),
+                ("duplicate identity", lambda d: d["components"].append(d["components"][0])),
+                ("false approval", lambda d: d.update(distribution_audit="approved")),
+                ("missing component", lambda d: d.update(components=[])),
+                ("checksum", lambda d: d["files"].update({"NOTICES/crate/LICENSE": "b" * 64})),
+                ("count bound", lambda d: d["files"].update({f"NOTICES/extra-{i}": "a" * 64 for i in range(512)})),
+            ]:
+                with self.subTest(name=name):
+                    changed = copy.deepcopy(original)
+                    change(changed)
+                    inventory_path.write_text(json.dumps(changed))
+                    with self.assertRaises(ValueError):
+                        gpu.component_notices(root, "a" * 64)
+            inventory_path.write_text(json.dumps(original))
+            notice = root / gpu.COMPONENT_DIRECTORY / "NOTICES/crate/LICENSE"
+            notice.unlink()
+            notice.symlink_to(root / "missing")
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                gpu.component_notices(root, "a" * 64)
+            notice.unlink()
+            notice.parent.rmdir()
+            notice.parent.symlink_to(root / "missing-directory")
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                gpu.component_notices(root, "a" * 64)
+
+    def test_component_notices_cannot_be_omitted_or_changed_during_packaging(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root, files = source(base)
+            options = inputs(base)
+            notice_bundle(root, files, options["macos_gpu_sha256"])
+            name = gpu.COMPONENT_DIRECTORY + "/NOTICES/crate/LICENSE"
+            for case in ["omitted", "changed", "extra"]:
+                with self.subTest(case=case):
+                    selected = dict(files)
+                    if case == "omitted":
+                        del selected[name]
+                    elif case == "changed":
+                        selected[name].write_bytes(b"changed")
+                    else:
+                        extra = root / gpu.COMPONENT_DIRECTORY / "NOTICES/extra"
+                        extra.write_bytes(b"extra")
+                        selected[gpu.COMPONENT_DIRECTORY + "/NOTICES/extra"] = extra
+                    with self.assertRaises(ValueError):
+                        package(root, selected, base / (case + ".tar.gz"), **options)
+                    if case == "changed":
+                        selected[name].write_bytes(b"declared license text\n" * 60000)
+
     def test_nonfinite_declarations_include_ordinary_exponent_overflow(self):
         for literal in ["NaN", "Infinity", "-Infinity", "1e999", "-1e999"]:
             with self.subTest(literal=literal), self.assertRaisesRegex(ValueError, "nonfinite"):
