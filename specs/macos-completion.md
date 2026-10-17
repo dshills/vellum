@@ -1023,3 +1023,16 @@ Candidate p95 fails 4 ms in 20/20 processes and p99 fails 6 ms in
 18/20. P6/P11 and complete Mac qualification remain open.
 Ordinary tickets do not prove GPU execution or native/GPU memory, and programmed
 event routing does not qualify physical interaction.
+
+
+## Packaged public SDK software replay
+
+The [SDK replay follow-up](../docs/reports/macos-current-sdk/README.md)
+executes both already compiled offscreen replay commands at batches 1, 7 and 64,
+including the professional workspace with 10k/1M stored rows and a 100k-node
+outline. All nine cases complete 1,449 operations and 189 captures; 162 workspace
+captures match unchanged frozen model/layout/semantics/text/image records.
+Independent data, history, cancellation, placement and window-lifetime checks
+pass. Runtime source remains SDK `238b3b6`, distinct from current documentation
+endpoint `d4b07d0`. This advances packaged software routing evidence; native and
+physical workflows, timing/memory budgets, full P9/P11 and Mac release remain open.

@@ -1,0 +1,294 @@
+{
+  "status": "REVIEWED_PACKAGED_SOFTWARE_REPLAY_MATRIX",
+  "analysis": {
+    "result": "PASS_PACKAGED_SOFTWARE_REPLAY_MATRIX",
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "current_checkout_commit": "d4b07d06c57f3045c7a56eb731bd760fefbf7f4a",
+    "producer_sha256": "3acf31d2ad276258754c4137d28b3bcdf5ba43e9c740f21b5ce40c703da86511",
+    "cases": [
+      {
+        "label": "managed-replay-small-b1",
+        "entrypoint": "managed-replay",
+        "rows": null,
+        "batch": 1,
+        "operations": 51,
+        "checkpoints": 9,
+        "stdout_sha256": "dd65cd991a38466548f8fe72bee3a1fe54cc695d68265abb732c66733eb72577",
+        "checkpoints_sha256": "803bf696c425d204004918ff8f2b0201b1b8527a7ba69da36b100353b74a3cb7",
+        "cross_batch_equal": true,
+        "frozen_workspace_golden_compared": false
+      },
+      {
+        "label": "managed-replay-small-b7",
+        "entrypoint": "managed-replay",
+        "rows": null,
+        "batch": 7,
+        "operations": 51,
+        "checkpoints": 9,
+        "stdout_sha256": "51fe5602c2ce17b83d763c377ab7138991e13cf0e17ce882584c484aa07fe695",
+        "checkpoints_sha256": "803bf696c425d204004918ff8f2b0201b1b8527a7ba69da36b100353b74a3cb7",
+        "cross_batch_equal": true,
+        "frozen_workspace_golden_compared": false
+      },
+      {
+        "label": "managed-replay-small-b64",
+        "entrypoint": "managed-replay",
+        "rows": null,
+        "batch": 64,
+        "operations": 51,
+        "checkpoints": 9,
+        "stdout_sha256": "419b3d4413e1e6ce325453d4bf9cb0fc195da8bfaa770752eed3029fdfaec962",
+        "checkpoints_sha256": "803bf696c425d204004918ff8f2b0201b1b8527a7ba69da36b100353b74a3cb7",
+        "cross_batch_equal": true,
+        "frozen_workspace_golden_compared": false
+      },
+      {
+        "label": "workspace-replay-10000-b1",
+        "entrypoint": "workspace-replay",
+        "rows": 10000,
+        "batch": 1,
+        "operations": 216,
+        "checkpoints": 27,
+        "stdout_sha256": "3ca35ad21c47718e3a0757df2321fecebc3d5af716aa4e4d58e0efef545284f3",
+        "checkpoints_sha256": "10b255a35adc418541b11a928298a02caeeec6608165ac81cdc0d394b56ebd6c",
+        "frozen_golden_sha256": "74b6baf3b5ac61b114411686b6c0493439f4e2ce21833ed8bf703cfb800bea1b",
+        "independent_oracle": {
+          "sha256": "81a0b1fce79e51040d206bd689c8a7a366715b2a0dfe858bca144ec6a18dc712",
+          "best_row": 5055,
+          "best": 10006,
+          "filter_count": 3438,
+          "filter_row": 1960,
+          "filter_best": 10001
+        }
+      },
+      {
+        "label": "workspace-replay-10000-b7",
+        "entrypoint": "workspace-replay",
+        "rows": 10000,
+        "batch": 7,
+        "operations": 216,
+        "checkpoints": 27,
+        "stdout_sha256": "0a325324e65f5aa4967b442c87e419f37458d9ef836b2b631270c07d881e2705",
+        "checkpoints_sha256": "10b255a35adc418541b11a928298a02caeeec6608165ac81cdc0d394b56ebd6c",
+        "frozen_golden_sha256": "74b6baf3b5ac61b114411686b6c0493439f4e2ce21833ed8bf703cfb800bea1b",
+        "independent_oracle": {
+          "sha256": "81a0b1fce79e51040d206bd689c8a7a366715b2a0dfe858bca144ec6a18dc712",
+          "best_row": 5055,
+          "best": 10006,
+          "filter_count": 3438,
+          "filter_row": 1960,
+          "filter_best": 10001
+        }
+      },
+      {
+        "label": "workspace-replay-10000-b64",
+        "entrypoint": "workspace-replay",
+        "rows": 10000,
+        "batch": 64,
+        "operations": 216,
+        "checkpoints": 27,
+        "stdout_sha256": "0a325324e65f5aa4967b442c87e419f37458d9ef836b2b631270c07d881e2705",
+        "checkpoints_sha256": "10b255a35adc418541b11a928298a02caeeec6608165ac81cdc0d394b56ebd6c",
+        "frozen_golden_sha256": "74b6baf3b5ac61b114411686b6c0493439f4e2ce21833ed8bf703cfb800bea1b",
+        "independent_oracle": {
+          "sha256": "81a0b1fce79e51040d206bd689c8a7a366715b2a0dfe858bca144ec6a18dc712",
+          "best_row": 5055,
+          "best": 10006,
+          "filter_count": 3438,
+          "filter_row": 1960,
+          "filter_best": 10001
+        }
+      },
+      {
+        "label": "workspace-replay-1000000-b1",
+        "entrypoint": "workspace-replay",
+        "rows": 1000000,
+        "batch": 1,
+        "operations": 216,
+        "checkpoints": 27,
+        "stdout_sha256": "07caffd5dad8fb3e05c12725829c4cd68261c98b5bbde0bf2ddd07441ad6cb5a",
+        "checkpoints_sha256": "303cc813f13a146c2a6b821fb578780f64c224e3b2e35df69858d63a3dc8497b",
+        "frozen_golden_sha256": "aa0d6514fbd4978d871173b3b3f473f4fae9e069fb982582bb3580b5387fd66d",
+        "independent_oracle": {
+          "sha256": "6c388d1c3e9a0c13407e251f4c090ca03dc4c6294dbd9d7ed9542ea9ab1fdc03",
+          "best_row": 5055,
+          "best": 10006,
+          "filter_count": 343655,
+          "filter_row": 1960,
+          "filter_best": 10001
+        }
+      },
+      {
+        "label": "workspace-replay-1000000-b7",
+        "entrypoint": "workspace-replay",
+        "rows": 1000000,
+        "batch": 7,
+        "operations": 216,
+        "checkpoints": 27,
+        "stdout_sha256": "af919f9ea061990a92c9b9ad7ede71cffb0d7d2f3258a1627d4bb71fdd5b386c",
+        "checkpoints_sha256": "303cc813f13a146c2a6b821fb578780f64c224e3b2e35df69858d63a3dc8497b",
+        "frozen_golden_sha256": "aa0d6514fbd4978d871173b3b3f473f4fae9e069fb982582bb3580b5387fd66d",
+        "independent_oracle": {
+          "sha256": "6c388d1c3e9a0c13407e251f4c090ca03dc4c6294dbd9d7ed9542ea9ab1fdc03",
+          "best_row": 5055,
+          "best": 10006,
+          "filter_count": 343655,
+          "filter_row": 1960,
+          "filter_best": 10001
+        }
+      },
+      {
+        "label": "workspace-replay-1000000-b64",
+        "entrypoint": "workspace-replay",
+        "rows": 1000000,
+        "batch": 64,
+        "operations": 216,
+        "checkpoints": 27,
+        "stdout_sha256": "af919f9ea061990a92c9b9ad7ede71cffb0d7d2f3258a1627d4bb71fdd5b386c",
+        "checkpoints_sha256": "303cc813f13a146c2a6b821fb578780f64c224e3b2e35df69858d63a3dc8497b",
+        "frozen_golden_sha256": "aa0d6514fbd4978d871173b3b3f473f4fae9e069fb982582bb3580b5387fd66d",
+        "independent_oracle": {
+          "sha256": "6c388d1c3e9a0c13407e251f4c090ca03dc4c6294dbd9d7ed9542ea9ab1fdc03",
+          "best_row": 5055,
+          "best": 10006,
+          "filter_count": 343655,
+          "filter_row": 1960,
+          "filter_best": 10001
+        }
+      }
+    ],
+    "processes": 9,
+    "operations": 1449,
+    "checkpoints": 189,
+    "frozen_workspace_comparisons": 162,
+    "managed_cross_batch_checkpoints": 27,
+    "oracle_corruption_controls": [
+      {
+        "rows": 10000,
+        "label": "opened",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 10000,
+        "label": "sorted",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 10000,
+        "label": "filtered",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 10000,
+        "label": "notes-edited",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 10000,
+        "label": "placement-redone",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 10000,
+        "label": "surviving-inspector",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 1000000,
+        "label": "opened",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 1000000,
+        "label": "sorted",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 1000000,
+        "label": "filtered",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 1000000,
+        "label": "notes-edited",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 1000000,
+        "label": "placement-redone",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      },
+      {
+        "rows": 1000000,
+        "label": "surviving-inspector",
+        "result": "REFUSED_CORRUPTED_CAPTURE"
+      }
+    ],
+    "source_stable": true,
+    "sdk_stable": true,
+    "native_runtime_executed": false,
+    "physical_input_generated": false,
+    "performance_qualified": false,
+    "public_distribution": false,
+    "full_macos_qualified": false
+  },
+  "provenance": {
+    "source_commit": "238b3b619e5ef274c218cb62d0b348e44e3fcaf8",
+    "current_checkout_commit": "d4b07d06c57f3045c7a56eb731bd760fefbf7f4a",
+    "sdk_root": "/private/tmp/vellum-current-sdk-238b3b6/demos/relocated SDK demos/extracted SDK/vellum-v0.1.0-alpha.2",
+    "manifest_sha256": "95f33067532d01c1853b2d42c4fac2b687409b91803c01849de37e1f73c921e8",
+    "archive": {
+      "path": "/private/tmp/vellum-current-sdk-238b3b6/sdk.tar.gz",
+      "sha256": "94dd1a1de78085ae705d17e587128b83bff0bbf442fb9f1f12ed348d5ba56f32"
+    },
+    "binaries": {
+      "managed-replay": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/entrypoints/build outputs/managed-replay",
+          "bytes": 59065298,
+          "sha256": "ee168beac3da12576eb20f10d5d22aeb3ddd3405029112314a14470b0f143c15"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": "./cmd/native",
+        "tags": "offscreen",
+        "example": "replay"
+      },
+      "workspace-replay": {
+        "binary": {
+          "path": "/private/tmp/vellum-current-sdk-238b3b6/entrypoints/build outputs/workspace-replay",
+          "bytes": 63551442,
+          "sha256": "f9f9774d254a11cf7c8e6ddd8a548baca19826d66ed98acd3d69228d483c72b7"
+        },
+        "origins": {
+          "cogentcore.org/core": "drivers/cogent/build/upstream",
+          "github.com/dshills/vellum": ".",
+          "github.com/dshills/vellum/drivers/cogent": "drivers/cogent",
+          "github.com/go-text/typesetting": "drivers/cogent/build/typesetting"
+        },
+        "target": "./cmd/workspace-replay",
+        "tags": "offscreen",
+        "example": "replay"
+      }
+    },
+    "entrypoints_receipt_sha256": "c5141e2bfafbe9cdf702224a5cbab315208432ae613892f61012c2a81bcadbcd"
+  },
+  "result_review_sha256": "c18147e55d966bd4a8822b9ce431ee255e74c1f509f75844ac220375f864fa54",
+  "evidence": {
+    "file": "software-evidence.tar.gz",
+    "sha256": "1c068293beb4d07006688fbb9bef902bed32a23fd08a00ad509b90c35c93ad26",
+    "bytes": 2059597,
+    "members": 92,
+    "expanded_bytes": 20151852
+  },
+  "provider_calls": 0,
+  "native_runtime_executed": false,
+  "physical_input_generated": false,
+  "performance_qualified": false,
+  "public_distribution": false,
+  "full_macos_qualified": false
+}

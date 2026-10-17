@@ -117,3 +117,50 @@ review; this test-only follow-up receives internal result/documentation reviews.
 See [native result](native-smoke.json), [native evidence manifest](native-evidence.manifest.json)
 and [native raw evidence](native-evidence.tar.gz). The earlier consumption report
 and its original evidence archive retain their separate scope.
+
+
+## Packaged software replay follow-up
+
+The existing `managed-replay` and `workspace-replay` SDK executables, both built
+with `offscreen`, run nine cases without rebuilding or launching native windows.
+The small managed fixture runs at dispatch batches 1, 7 and 64. The professional
+workspace runs at the same batches with both 10,000 and 1,000,000 stored rows,
+twenty numeric fields per row and a 100,000-node outline after project loading.
+All cases together complete 1,449 recorded operations and 189 captures.
+
+The six workspace cases compare every one of their 162 complete captures against
+the SDK's unchanged frozen records: model, geometry, semantics, UTF-16 ranges,
+focus and software-image hashes. The small fixture's nine captures are equal
+across all three batches (27 capture observations); these comparisons use the
+first observed batch, without claiming a separate frozen small-fixture golden.
+Progress/transport counters remain outside cross-batch semantic equality.
+
+Independent contract checks derive stored-byte hashes and numeric sort/filter
+results. They also check routed two-axis selection, canceled worker installation,
+outline collapse/expand/filter, Unicode notes, tab ordering, placement preview
+and single commit, canvas selection/pan/zoom, same-object Undo/Redo, independent
+notes history, modal background isolation and surviving inspector lifetime.
+Twelve deliberate corrupted or incomplete capture controls are refused. Source
+records and golden files are read unchanged; none are authored by acceptance.
+
+All nine owned processes exit with status zero, both raw streams reach EOF and
+each process group is observed absent. Complete current tracked/prepared source,
+all 7,411 SDK file hashes, the private archive and both binaries remain unchanged.
+Runtime source stays `238b3b6`; `d4b07d0` is the separate documentation endpoint
+present in both clean checkouts during these runs.
+
+The workspace runs retain a repeated existing `lines.Lines` diagnostic that
+requires Monospace font style and applies its own correction. Managed small-
+fixture stderr is empty. This checkpoint does not fix the workspace font-style
+warning; its raw stderr remains part of the evidence alongside successful
+frozen-capture comparisons.
+
+These are software-rendered routed widget checks through the public SDK. They
+do not qualify Cocoa/physical input, native/GPU presentation or memory, timing
+budgets, full professional/native P9/P11, release distribution or full Mac
+completion. Internal result and documentation reviews cover this test-only
+checkpoint; the existing stage 0075 Prism review remains unchanged.
+
+See [software results](software-replays.json), [software manifest](software-evidence.manifest.json)
+and [software raw evidence](software-evidence.tar.gz). Earlier compilation and
+native hello evidence keep their separate source and qualification scopes.

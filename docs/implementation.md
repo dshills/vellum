@@ -463,3 +463,16 @@ compile with replacements confined to the extracted SDK. A subsequent bounded
 native run of that SDK hello executable verifies its rectangle center-pixel
 readback, three further snapshots and owned shutdown. Full demo runtime, physical
 input, performance/memory and public distribution remain open.
+
+
+## Packaged public SDK software replay
+
+The [SDK replay follow-up](reports/macos-current-sdk/README.md)
+executes both already compiled offscreen replay commands at batches 1, 7 and 64,
+including the professional workspace with 10k/1M stored rows and a 100k-node
+outline. All nine cases complete 1,449 operations and 189 captures; 162 workspace
+captures match unchanged frozen model/layout/semantics/text/image records.
+Independent data, history, cancellation, placement and window-lifetime checks
+pass. Runtime source remains SDK `238b3b6`, distinct from current documentation
+endpoint `d4b07d0`. This advances packaged software routing evidence; native and
+physical workflows, timing/memory budgets, full P9/P11 and Mac release remain open.
