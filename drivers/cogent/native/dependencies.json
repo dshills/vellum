@@ -815,6 +815,17 @@
               "sha256": "9f3ee50307aec48447c2016d662080030fcbfcb00471cd35a73bd463de004dc7"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/popuptimeout",
+          "inputs": "native/patches/popuptimeout/original-hashes.json",
+          "outputs": "native/patches/popuptimeout/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/popuptimeout/0082-owned-popup-timeouts.patch",
+              "sha256": "1c4f627d7136a7ce5e9575ec10da7b5314756a77a52ebd3d0ade3cf569786e44"
+            }
+          ]
         }
       ]
     },

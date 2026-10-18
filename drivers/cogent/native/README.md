@@ -231,3 +231,11 @@ withdraws completed geometry before owner reconstruction. See the
 [patch contract](patches/cellsurface/README.md) and the root
 `docs/reports/macos-grid-cell-surface/README.md` for measured and final-source
 verification scopes. Original frame and allocation budgets remain unchanged.
+
+Patch 0082 owns popup timeout destruction and terminal event-loop stage retirement
+under the render context. Fresh per-arming tickets revoke already-fired callbacks
+on rearm/disable/delete; Stop never joins under the owner. Manual FIFO expiry stays
+owned without recursive locking. Successful expiry requests one on-demand paint.
+The event-loop wait is released after cleanup (also on panic). See
+[checkpoint](../../../docs/reports/macos-popup-lifecycle/README.md) for scoped race,
+preparation, build and review evidence and the retained failed diagnostic.

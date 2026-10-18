@@ -1,0 +1,359 @@
+--- a/core/stage.go
++++ b/core/stage.go
+@@ -171,6 +171,9 @@
+ 	// Timeout, if greater than 0, results in a popup stages disappearing
+ 	// after this timeout duration.
+ 	Timeout time.Duration
++
++	// popupTimeout is owned by the render context and retired before scene deletion.
++	popupTimeout *popupTimeout
+ 
+ 	// BackButton is whether to add a back button to the top bar that calls
+ 	// [Scene.Close] when clicked. If it is unset, is will be treated as true
+@@ -424,6 +427,7 @@
+ }
+ 
+ func (st *Stage) delete() {
++	st.stopPopupTimeout()
+ 	if st.Scene != nil {
+ 		st.Scene.Events.CancelPointerCapture()
+ 	}
+--- a/core/popupstage.go
++++ b/core/popupstage.go
+@@ -5,8 +5,6 @@
+ package core
+ 
+ import (
+-	"time"
+-
+ 	"cogentcore.org/core/events"
+ )
+ 
+@@ -158,20 +156,7 @@
+ 	}
+ 	sc.showIter = 0
+ 
+-	if st.Timeout > 0 {
+-		scene := st.Scene
+-		callback := func() {
+-			if st.Main == nil || st.Scene != scene || scene.This == nil {
+-				return
+-			}
+-			st.popups.deleteStage(st)
+-		}
+-		if scene.ManualExecution() {
+-			scene.afterEvent(st.Timeout, callback)
+-		} else {
+-			time.AfterFunc(st.Timeout, callback)
+-		}
+-	}
++	st.startPopupTimeout()
+ 
+ 	return st
+ }
+--- a/core/renderwindow.go
++++ b/core/renderwindow.go
+@@ -485,9 +485,9 @@
+ 	if DebugSettings.WindowEventTrace {
+ 		fmt.Printf("Win: %v out of event loop\n", w.name)
+ 	}
+-	windowWait.Done()
+-	// our last act must be self destruction!
+-	w.mains.deleteAll()
++	// Retire under the same owner as rendering and timed popup callbacks.
++	defer windowWait.Done()
++	w.deleteStages()
+ }
+ 
+ // handleEvent processes given events.Event.
+--- /dev/null
++++ b/core/popup_timeout.go
+@@ -0,0 +1,76 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++
++package core
++
++import "time"
++
++// A fresh ticket identifies each arming, including reuse of the same Stage and
++// Scene. All ticket fields and Stage links are accessed under the render context.
++// A stopped callback may already be waiting for that lock; retirement never joins it.
++type popupTimeout struct {
++	stage  *Stage
++	scene  *Scene
++	owner  *renderContext
++	window *renderWindow
++	timer  ManualTimer
++}
++
++// stopPopupTimeout runs under the render context, including from Stage.delete
++// while the popup stack is locked. Stop never waits for a running callback.
++func (st *Stage) stopPopupTimeout() {
++	t := st.popupTimeout
++	st.popupTimeout = nil
++	if t != nil && t.timer != nil {
++		t.timer.Stop()
++	}
++}
++
++func (st *Stage) startPopupTimeout() {
++	st.stopPopupTimeout()
++	if st.Timeout <= 0 || st.Scene == nil || st.renderContext == nil || st.Mains == nil {
++		return
++	}
++	t := &popupTimeout{stage: st, scene: st.Scene, owner: st.renderContext, window: st.Mains.renderWindow}
++	st.popupTimeout = t
++	if t.owner.manual != nil {
++		// The manual seam dispatches under the owner; locking again would deadlock.
++		t.timer = t.scene.afterEvent(st.Timeout, t.expireOwned)
++	} else {
++		t.timer = time.AfterFunc(st.Timeout, t.run)
++	}
++	if t.timer == nil {
++		st.popupTimeout = nil
++	}
++}
++
++func (t *popupTimeout) run() {
++	// Capture the owner at arming. Reading a live Stage to find its lock here
++	// would race deletion, and it may already have been detached entirely.
++	t.owner.Lock()
++	defer t.owner.Unlock()
++	t.expireOwned()
++}
++
++func (t *popupTimeout) expireOwned() {
++	st := t.stage
++	if st.popupTimeout != t {
++		return
++	}
++	st.popupTimeout = nil
++	if st.Main == nil || st.Scene != t.scene || t.scene.This == nil || st.popups == nil {
++		return
++	}
++	if st.popups.deleteStage(st) && t.window != nil && t.window.SystemWindow != nil {
++		// An on-demand native window has no periodic paint to remove the popup.
++		t.window.requestPaintAfter(0)
++	}
++}
++
++// deleteStages is the terminal event-loop teardown, outside normal event dispatch.
++// It must acquire the owner before stack/widget destruction, just like a callback.
++func (w *renderWindow) deleteStages() {
++	rc := w.renderContext()
++	rc.Lock()
++	defer rc.Unlock()
++	w.mains.deleteAll()
++}
+--- /dev/null
++++ b/core/popup_timeout_offscreen_test.go
+@@ -0,0 +1,209 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++//go:build offscreen
++
++package core
++
++import (
++	"context"
++	"testing"
++	"time"
++
++	"cogentcore.org/core/system"
++)
++
++type popupPaintRecorder struct {
++	system.Window
++	delays []time.Duration // accessed only under the owning render context
++}
++
++func (p *popupPaintRecorder) RequestPaint()                     { p.RequestPaintAfter(0) }
++func (p *popupPaintRecorder) RequestPaintAfter(d time.Duration) { p.delays = append(p.delays, d) }
++func (p *popupPaintRecorder) IsOnDemand() bool                  { return true }
++
++func timeoutPopup(t *testing.T) (*ManualWindow, *Stage, *fixtureClock) {
++	t.Helper()
++	m, body, clock := manualFixture(t, nil)
++	drainManual(t, m)
++	sc := NewScene("timeout-popup")
++	NewButton(sc).SetText("popup")
++	st := NewPopupStage(MenuStage, sc, body).SetTimeout(time.Second).Run()
++	drainManual(t, m)
++	return m, st, clock
++}
++
++func waitPopupCallback(t *testing.T, done <-chan struct{}) {
++	t.Helper()
++	select {
++	case <-done:
++	case <-time.After(2 * time.Second):
++		t.Fatal("popup callback did not join")
++	}
++}
++
++// Schedule the exact native callback with an entry/exit barrier, rather than
++// infer lock acquisition from sleeps. No OS window or physical input is used.
++func scheduledPopupCallback(t *testing.T, ticket *popupTimeout) <-chan struct{} {
++	t.Helper()
++	entered, done := make(chan struct{}), make(chan struct{})
++	ticket.timer.Stop()
++	ticket.timer = time.AfterFunc(0, func() {
++		close(entered)
++		ticket.run()
++		close(done)
++	})
++	waitPopupCallback(t, entered)
++	return done
++}
++
++func TestPopupTimeoutNativeOwnerAndRepaint(t *testing.T) {
++	m, st, _ := timeoutPopup(t)
++	rc := m.window.renderContext()
++	rc.Lock()
++	// Exercise native arming with the real time.AfterFunc branch, while retaining
++	// the software scene/window fixture for deterministic, race-enabled checks.
++	manual := rc.manual
++	rc.manual = nil
++	st.Timeout = time.Hour
++	st.startPopupTimeout()
++	rc.manual = manual
++	ticket := st.popupTimeout
++	if _, ok := ticket.timer.(*time.Timer); !ok {
++		rc.Unlock()
++		t.Fatal("native timer not armed")
++	}
++	painter := &popupPaintRecorder{}
++	ticket.window = &renderWindow{SystemWindow: painter}
++	done := scheduledPopupCallback(t, ticket)
++	select {
++	case <-done:
++		rc.Unlock()
++		t.Fatal("native callback escaped owner lock")
++	default:
++	}
++	if st.Scene == nil || st.popupTimeout != ticket {
++		rc.Unlock()
++		t.Fatal("popup changed while owner held")
++	}
++	rc.Unlock()
++	waitPopupCallback(t, done)
++	ticket.run() // duplicate completion must not delete another popup or repaint
++	rc.Lock()
++	defer rc.Unlock()
++	if st.Scene != nil || st.popupTimeout != nil || len(painter.delays) != 1 || painter.delays[0] != 0 {
++		t.Fatalf("expiry scene=%p ticket=%p paints=%v", st.Scene, st.popupTimeout, painter.delays)
++	}
++}
++
++func TestPopupTimeoutNativeCallbackAfterRetirement(t *testing.T) {
++	t.Run("popup", func(t *testing.T) {
++		m, st, _ := timeoutPopup(t)
++		rc := m.window.renderContext()
++		rc.Lock()
++		ticket := st.popupTimeout
++		painter := &popupPaintRecorder{}
++		ticket.window = &renderWindow{SystemWindow: painter}
++		done := scheduledPopupCallback(t, ticket)
++		if !st.ClosePopup() {
++			rc.Unlock()
++			t.Fatal("close refused")
++		}
++		if st.popupTimeout != nil || st.Scene != nil {
++			rc.Unlock()
++			t.Fatal("retirement retained popup authority")
++		}
++		rc.Unlock()
++		waitPopupCallback(t, done)
++		rc.Lock()
++		paints := len(painter.delays)
++		rc.Unlock()
++		if paints != 0 {
++			t.Fatal("retired callback requested paint")
++		}
++	})
++}
++
++func TestPopupTimeoutNativeEventLoopRetirement(t *testing.T) {
++	m, st, _ := timeoutPopup(t)
++	w := m.window
++	rc := w.renderContext()
++	rc.Lock()
++	ticket := st.popupTimeout
++	painter := &popupPaintRecorder{}
++	ticket.window = &renderWindow{SystemWindow: painter}
++	// Drive the actual native event-loop exit path with the software window.
++	// The flag prevents any input read; no OS loop is launched.
++	w.flags.SetFlag(true, winStopEventLoop)
++	windowWait.Add(1)
++	entered, done := make(chan struct{}), make(chan struct{})
++	go func() {
++		close(entered)
++		w.eventLoop()
++		close(done)
++	}()
++	waitPopupCallback(t, entered)
++	select {
++	case <-done:
++		rc.Unlock()
++		t.Fatal("event-loop teardown escaped owner lock")
++	default:
++	}
++	rc.Unlock()
++	waitPopupCallback(t, done)
++	ticket.run() // An already-fired native callback may acquire rc after teardown.
++	rc.Lock()
++	defer rc.Unlock()
++	if st.Scene != nil || st.popupTimeout != nil || len(painter.delays) != 0 || w.mains.stack.Len() != 0 {
++		t.Fatal("native event-loop teardown retained authority or repainted")
++	}
++}
++
++func TestPopupTimeoutRearmAndDisableRejectOldCallbacks(t *testing.T) {
++	m, st, clock := timeoutPopup(t)
++	rc := m.window.renderContext()
++	rc.Lock()
++	old := st.popupTimeout
++	st.startPopupTimeout()
++	fresh := st.popupTimeout
++	if old == fresh || fresh == nil {
++		rc.Unlock()
++		t.Fatal("rearm reused ticket")
++	}
++	old.expireOwned()
++	if st.Scene == nil || st.popupTimeout != fresh {
++		rc.Unlock()
++		t.Fatal("old callback expired rearmed popup")
++	}
++	st.Timeout = 0
++	st.startPopupTimeout()
++	fresh.expireOwned()
++	if st.Scene == nil || st.popupTimeout != nil {
++		rc.Unlock()
++		t.Fatal("disabled timeout retained authority")
++	}
++	rc.Unlock()
++	clock.Advance(2 * time.Second)
++	drainManual(t, m)
++	if st.Scene == nil {
++		t.Fatal("stopped manual timer expired popup")
++	}
++	snap, err := m.Snapshot(context.Background())
++	if err != nil || snap.Timers != 0 {
++		t.Fatalf("timer retirement %+v %v", snap, err)
++	}
++}
++
++func TestPopupTimeoutManualDispatchUnderOwner(t *testing.T) {
++	m, st, clock := timeoutPopup(t)
++	clock.Advance(time.Second)
++	if st.Scene == nil {
++		t.Fatal("clock callback bypassed native FIFO")
++	}
++	drainManual(t, m) // A double lock in the manual callback would deadlock here.
++	if st.Scene != nil || st.popupTimeout != nil {
++		t.Fatal("manual event did not retire popup")
++	}
++	snap, err := m.Snapshot(context.Background())
++	if err != nil || snap.Timers != 0 || snap.Failure != nil {
++		t.Fatalf("manual cleanup %+v %v", snap, err)
++	}
++}

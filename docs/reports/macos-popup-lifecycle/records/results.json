@@ -1,0 +1,136 @@
+{
+  "base": "acea588d185007e862d8575dfc6e8cc58307eb7f",
+  "stage": 82,
+  "checks": {
+    "owned-core-final": {
+      "receipt": "owned-core-final.json",
+      "receipt_sha256": "f4d827d182fe6db7a479b98549b40424c34fe280d08cb06a39f770fd1e2aa02b",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 10.702452249941416,
+      "logs_complete": true,
+      "pins_stable": true,
+      "group_absent": true,
+      "group_errors": []
+    },
+    "driver-final": {
+      "receipt": "driver-final.json",
+      "receipt_sha256": "ecf0e64a7a89404190ce99cb0f23f95ac0ae56aef89ce9009a3bf709a3e27656",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 285.12045399995986,
+      "logs_complete": true,
+      "pins_stable": true,
+      "group_absent": true,
+      "group_errors": []
+    },
+    "qualified-vet-final": {
+      "receipt": "qualified-vet-final.json",
+      "receipt_sha256": "6ece6d43b3352e90487902047d59a6e47e85771262b679e533908a877a2fee28",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 0.6335855409270152,
+      "logs_complete": true,
+      "pins_stable": true,
+      "group_absent": true,
+      "group_errors": []
+    },
+    "gallery-build-final": {
+      "receipt": "gallery-build-final.json",
+      "receipt_sha256": "2e2a9f8c6db3606742597057e49aed458288137e3c981a4f3e66027d48dd17f3",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 15.735373749979772,
+      "logs_complete": true,
+      "pins_stable": true,
+      "group_absent": true,
+      "group_errors": []
+    },
+    "adopted-build": {
+      "receipt": "adopted-build.json",
+      "receipt_sha256": "d7807522850121c8e085312b7dc9eb694cb549f611457619dcc3ceb31c8637ac",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 15.224913249956444,
+      "logs_complete": true,
+      "pins_stable": true,
+      "group_absent": true,
+      "group_errors": []
+    },
+    "prepare-final": {
+      "receipt": "prepare-final.json",
+      "receipt_sha256": "fad928f899824f03234284634dfbaae1f60b354a99fe1ac066560576f5aeaa41",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 1.8383374999975786,
+      "logs_complete": true,
+      "pins_stable": true,
+      "prepared_files": 6265,
+      "prepared_exact": true,
+      "group_absent": true,
+      "group_errors": []
+    },
+    "adopted-prepare": {
+      "receipt": "adopted-prepare.json",
+      "receipt_sha256": "5ffb304f2ae7d29a887093ecbacdde56308ef887e6834408a7e89ae10a8397e2",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 1.955352957942523,
+      "logs_complete": true,
+      "pins_stable": true,
+      "prepared_files": 6265,
+      "prepared_exact": true,
+      "group_absent": true,
+      "group_errors": []
+    },
+    "prepare-tests-v2": {
+      "receipt": "prepare-tests-v2.json",
+      "receipt_sha256": "e4768ca1aa5d72a8544d4f6dad6cddcf5ca68d517486cd884bf9148b0cb1928e",
+      "exit_code": 0,
+      "error": null,
+      "seconds": 0.10253758309409022,
+      "logs_complete": true,
+      "pins_stable": true,
+      "group_absent": true,
+      "group_errors": []
+    }
+  },
+  "owned_core_cases": 43,
+  "new_test_methods": 5,
+  "preparation_test_methods": 11,
+  "toolchain": "Go1.25.6 Darwin/ARM64",
+  "controlled_gomaxprocs": 2,
+  "native_archive_for_overlay_build": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "source_default_native_library": "Separate source-checkout native build only; no runtime qualification.",
+  "native_ui_executed": false,
+  "physical_input_verified": false,
+  "sdk_refreshed": false,
+  "sdk_restored": {
+    "restored_exact_baseline": true,
+    "files": 7880,
+    "sha256": "4ce384e5873e00f148b72458ead131f42d4b3d7a464980423cb2f01881e94f26",
+    "original_payload_modified": false,
+    "quarantined_generated_png_files": 300,
+    "sdk_refresh": false
+  },
+  "prepared_overlay_parity": {
+    "prepared_files": 6265,
+    "mismatches": [],
+    "scope": "Every prepared Core/typesetting file compared against retained SDK plus exact tested overlay.",
+    "source_pins": {
+      "artifacts/macos-native-catalogue-acea588/timer-candidate/overlay.json": "5d417789736fe2bddf504461237f74ec8ef95fcbf1883a583ccc392ed1e30181"
+    }
+  },
+  "failures_retained": [
+    "core-v1: unfiltered upstream race diagnostic hit8MiB log limit; incomplete logs;300 generated SDK PNGs quarantined with original payload unchanged and exact baseline restored.",
+    "vet-v1: unkeyed composite literals and unreachable code in unchanged upstream source; qualified vet disables only those checks.",
+    "prepare-tests-final: private fixture omitted patch files; complete v2 fixture passes unchanged tests."
+  ],
+  "scope_limit": "Popup lifecycle prerequisite only. Native catalogue M2, M3-M7 and full Mac completion remain open.",
+  "internal_source_review": {
+    "file": "internal-timer-review-v2.json",
+    "sha256": "0cf8217ee98fece92e8b181b7b2f7856522436d2283e4d4a88894006dd0fe65d",
+    "approved": true
+  },
+  "prism": "Required before commit: one scoped source/documentation review; the provider outcome will be recorded in the final evidence archive. No native UI execution is admitted."
+}

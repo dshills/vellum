@@ -24,6 +24,15 @@ the retained SDK's separately pinned native library, autonomous scheduling and
 one unclassified hidden TUINS Cocoa window remain explicit limits. Physical/
 human input, presentation/performance, M3–M7 and full Mac completion remain open.
 
+
+The [popup lifecycle prerequisite](../docs/reports/macos-popup-lifecycle/README.md)
+adds stage82: timed native popup expiry and terminal event-loop stage destruction
+share the render owner, stale callbacks lose authority and successful expiry
+requests a repaint. Owned software race checks and reproducible preparation are
+separate from native/physical acceptance. The broad upstream diagnostic failure
+and restored SDK test-image side effect remain explicit. No new catalogue or
+full Mac gate is closed; ordinary Selector/NumberField native checks are next.
+
 ## Finish line
 
 Finish the Go-native framework on the local Mac: an independently consumable SDK
