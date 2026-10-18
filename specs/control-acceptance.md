@@ -44,8 +44,8 @@ claim that all Mac acceptance gates have passed.
 | `SegmentedControl` | `TestChoiceManualKeyboardPointerAndFocus`: same scenario over segmented presentation | R |
 | `Slider` | `TestColorPickerManagedKeyboardReconcileAndPixels`: actual focused key changes a managed byte slider; `TestNativeControlsChangeRetainedCallbacksAndDisabled`: typed payload and finite refusal | R/A |
 | `NumberField` | `TestOrdinarySelectorAndNumberKeyboardControlledRoundTrip`: focused numeric step, exactly one proposal, rejected-value restoration and disabled refusal | R |
-| `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: complete68/33pending; sealed failed prefixes are source-asserted, not a complete native pass | R/A/N-partial |
-| `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: complete68/33pending; sealed failed prefixes are source-asserted, not a complete native pass | W/A/N-partial |
+| `TextField` | `TestManualRealManagedProjectInput`: routed text edit and Undo; `TestManagedTextFieldFocusLossWaitsForAdmittedNativeFIFO`: native input handoff; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: current9013a73 full68-input33-state record passes; previous failed scopes stay sealed | R/A/N |
+| `MultilineText` | `TestFrozenWorkspaceRecordsAcrossBatches`: notes edits/history and UTF-16 selection; `TestManagedEditorCompositionHistoryExactBytes`: composition/committed-byte boundary; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI; native `gallery -text-native-check`: current9013a73 full68-input33-state record passes; previous failed scopes stay sealed | W/A/N |
 | `Tabs` | `TestTabCloseActualPointerKeyboardAndGeometry`: controlled pointer/key close and stale target refusal; `TestNativeTabsReorderReparentAndDisabledOption`: page identity; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/A/N |
 | `Scroll` | `TestManagedImageManualScrollClipPreservesSourceMapping`, `TestPlacementNativeScrolledContentAndPreviewPixels`: actual ancestor scroll clips and transformed content; `gallery -structure-native-check`: full50-input42-state native Go FIFO record, measured focus/geometry/state, retained pages, rejected/accepted close and stale-target retirement | R/N |
 | `Dialog` | `TestManualModalDisabledAndStaleRealRouter`: modal refusal of background input; `TestDialogSceneLifecyclePreservesChildrenAndDismissesOnce`: preserved children and single dismissal; `TestTextCataloguePublicManual`: shared text/editor/modal public routing at160/162DPI | R/A |
@@ -235,3 +235,24 @@ and modal phases are not reached; no native qualification of the prior disabled
 publication repair follows. Complete native text/modal68/33 acceptance and the
 current-candidate M2 requirement audit remain open. Physical/human M5 and M3–M7
 are separate; no acquisition retry or record/golden change is introduced.
+
+
+### Current workspace and text workflow qualification
+
+The [current workflow checkpoint](../docs/reports/macos-current-workflows/README.md)
+qualifies9013a73/stage87 native full workspace432operations54captures and complete
+text/editor/modal68inputs33states under Go1.25.6/Go2/SDK786a. The authored disabled
+and modal phases now pass. Six original software records1296/162 and portable
+root race/defaultvet pass. Every named scenario across34kinds+2composites has
+an exact PASS line in current software logs; that is execution coverage, not
+complete dedicated-contract or native-method qualification. Historical failed
+text/acquisition scopes remain failed/sealed; no causal explanation is inferred.
+
+Current docking source assertions and persisted session layout pass. Document
+source assertions and retained output are independently accepted after a separate
+source-backed footer correction:1000component nodes+project+group=1002total.
+The original document controller remains FAILED_OR_CANCELED; no native rerun.
+Injected chooser/native AX actions are separate from real panels/human VoiceOver.
+M2 still needs current native catalogue shared-runtime qualification or exact
+reuse and its dedicated-contract audit. Physical/native presentation/M5 and
+M3–M7/fullMac remain open. No records/goldens or OS settings change.

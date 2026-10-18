@@ -25,6 +25,20 @@ one unclassified hidden TUINS Cocoa window remain explicit limits. Physical/
 human input, presentation/performance, M3–M7 and full Mac completion remain open.
 
 
+The [current workflow checkpoint](../docs/reports/macos-current-workflows/README.md)
+renews the complete native workspace432/54 on9013a73/stage87 and passes the full
+text/editor/modal68/33. Current native float/redock/close-return and document
+save/dirty-close source assertions are accepted, with independent persisted
+session and retained document output checks. The original document controller
+remains failed due a checker node-count error; a separate source-derived1002total
+expectation is reviewed against the same output without a native rerun.
+Six original frozen software records and portable root race/defaultvet pass.
+M2 remains partial for current native catalogue shared-runtime qualification and
+dedicated-contract audit. Resolve those two named gaps next, then M3's materially
+different measured frame-cost fix and unchanged full matrix; M4–M7 remain open.
+The SDK is unchanged; this is controlled Go2/retained-native-archive evidence.
+
+
 The [popup lifecycle prerequisite](../docs/reports/macos-popup-lifecycle/README.md)
 adds stage82: timed native popup expiry and terminal event-loop stage destruction
 share the render owner, stale callbacks lose authority and successful expiry
