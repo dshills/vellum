@@ -141,8 +141,17 @@ explicitly authorized tests and restore any authorized temporary state changes.
    run-p95 improves only 0.074/0.076 ms, below the 0.4 ms adoption bar. Its whole
    private overlay is rejected; all twenty p95s fail 4 ms. No shape-cache or other
    small rejected-boundary tuning is queued. Complete missing tree/general UI
-   qualification and independent M6 inventory work before choosing a new M3
-   redesign; preserve the table failure and every other gate.
+   qualification and independent M6 inventory work. The [fresh SDK tree cost
+   boundary](../docs/reports/macos-tree-boundary/README.md) now records two ordinary
+   runs of 240 measured events each and two separate diagnostics of 120 each,
+   all after 128 warmups per run (480 ordinary / 240 diagnostic samples).
+   Ordinary CPU/GPU-requested p95s are
+   7.183709/7.217669 ms, both failing, with matched 68–69 clipped rows. Its next
+   bounded implementation reuses stable-key native retention and the existing
+   fixed-allocation local-layout boundary for tree viewport-only changes. Prove
+   immutable index identity and all footer/pager/style/invalidation inputs; uncertain
+   or changed non-viewport state uses the full updater. Preserve the table failure
+   and every other gate. See the prototype scope below before implementation.
 4. Use an authorized desktop window for other M2/M5 native checks and ordinary M3
    measurements. Never replay a completed/human-return seal.
    The one fresh bounded placement attempt has now failed its delivery observation;
@@ -245,6 +254,46 @@ performance conclusion follows. Stop the whole prototype without observer retry,
 cache/coordinate relaxation or further architecture branches in this experiment.
 Production and stage0079 remain unchanged; no acceptance gate closes.
 
+## Next M3 prototype: retained tree updates and local layout
+
+The [current tree cost boundary](../docs/reports/macos-tree-boundary/README.md)
+identifies roughly 3 ms of mean ordinary reconciliation plus layout/paint work.
+`syncTree` currently reassigns visible-index native rows and recursively updates
+its host on scrolling. Reuse the existing grid retention/local-layout ownership
+infrastructure for a bounded tree experiment; this is not another rejected
+AX/upload/culling/paint-fragment/shaping-cache change.
+
+Keep at most the current admitted 500 rows, retain overlapping native rows by
+stable domain key, use each departing donor once and retire surplus rows. Update
+and size changed text/state; do not run full recursive style/layout for unchanged
+retained children when the root's actual scene, parent, allocation, resolved
+style, scale, row configuration and accepted immutable index are proved unchanged.
+Equal source stamps and row counts are insufficient index identity. If the public
+model lacks a safe identity, add a comparable non-retaining capability around the
+existing private index token carried in the same snapshot, or use the complete
+fallback; never retain the model, data or old index through that capability.
+Refresh current OutlineRef, epoch and AX authority every generation: widget
+retention must not preserve stale input authority. Prove fractional-DPI sizing and
+queued-text cancellation; key identity alone cannot prove intrinsic size reuse.
+
+Initially admit viewport-only changes. Pending, selection, topology, uncertain,
+theme/font/style/scale/width and ownership changes take the original complete
+route. Include footer status, pager disabled states, scrollbar state, inherited row selected/
+disabled styles, global layout/pending fences, completed semantics/geometry,
+clipping, modal/stale refusal, callbacks and lifecycle in the proof. Local layout
+must preserve the root's outer allocation and complete scene painter order.
+
+A frozen full route supplies independent geometry, software pixels, semantics,
+actions and lifetime comparisons. Positively observe the native fast path in a
+separate diagnostic. Required race/vet/native checks precede five ordinary
+interleaved original/candidate pairs for each CPU/GPU mode. Keep the existing
+>=0.4 ms lower median run-p95 and >=4/5 paired improvements in both modes,
+without tail, correctness or retention regression. Reassess after 90 minutes of
+implementation/investigation, with an explicit adopt/reject result before further
+work. No prototype is implemented by this documentation checkpoint. A successful
+prototype still needs the full tree/general UI acceptance matrix; the unchanged
+table failures and all other Mac gates remain open.
+
 ## Existing execution entrypoints
 
 Use the pinned prepared dependencies and controlled environment from
@@ -318,7 +367,7 @@ be budgeted in addition to implementation time.
 | --- | --- | --- |
 | M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
-| M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. [Resolved shaping](../docs/reports/macos-resolved-shapes/README.md) also fails its material-gain bar despite positive reuse. Next: separate material architecture decision; no further AX/upload/culling/row/shape-cache tuning. |
+| M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. [Resolved shaping](../docs/reports/macos-resolved-shapes/README.md) also fails its material-gain bar despite positive reuse. The [current tree boundary](../docs/reports/macos-tree-boundary/README.md) also fails its two scoped ordinary observations. Next: the bounded stable-key tree/local-layout prototype above; no further AX/upload/culling/row/shape-cache tuning. |
 | M4 | Partial; current SDK preflight and sampled idle CPU pass | [Two composed cycles/66 native checks and four eligible 60-second CPU intervals](../docs/reports/macos-sdk-lifecycle-stage0079/README.md) pass with owned process-group absence and framework-tracked retirement. Extra admissions remain unattributed; one hidden Cocoa window remains unclassified, so native deallocation/leak closure stays open. Original sandbox harness failure is preserved. OS wakeups/presentation, full memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial; current SDK incorporation and scoped consumption pass | The [7,879-file current SDK](../docs/reports/macos-sdk-stage0079/README.md) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |

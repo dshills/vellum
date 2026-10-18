@@ -1,0 +1,234 @@
+{
+  "archive": "records.tar.gz",
+  "archive_sha256": "b394a1f45221313dc58338c2a5ef10e745f68e2df2188aa61d14d6ed47d9300b",
+  "files": {
+    "admission.json": {
+      "bytes": 556,
+      "sha256": "067a1082a0ab333ff83a8befb507fbdb84531d16a0e6234b4b1b0a759c4f90c9"
+    },
+    "assess.py": {
+      "bytes": 3112,
+      "sha256": "519784ca51af61a10b960d79df223c7f37dcaba74652d5ecb6036d4dcba6b3e2"
+    },
+    "assessment.json": {
+      "bytes": 25997,
+      "sha256": "37f44cb9348a78f4d255e7f0de5d4d03fc550030e0bf47291bec0ffd2573bf11"
+    },
+    "control-fixture.stdout": {
+      "bytes": 250364,
+      "sha256": "9577aa4a6de20d513ba4961ee42e5e6dceffca176d4bbe254efb85010598cd88"
+    },
+    "cpu-diagnostic/owned.json": {
+      "bytes": 369,
+      "sha256": "ebbb69d7f6a0e3d55672e10eb6498199c950fe65d6b2680ec3cd3760eccb92f6"
+    },
+    "cpu-diagnostic/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cpu-diagnostic/stdout": {
+      "bytes": 257897,
+      "sha256": "a9558e9bfd8061a3d58fe5ea5abe14251e181e63732a6e601f47208710669b44"
+    },
+    "cpu-diagnostic-result.json": {
+      "bytes": 21631,
+      "sha256": "a31bf2c32a2908de9501ea9e2d4bea56886a2dfe9074893c219e2a7bc3984e5c"
+    },
+    "cpu-ordinary/owned.json": {
+      "bytes": 341,
+      "sha256": "0eaca768dcce7c99cd6a88bedbaa6f01e276a9c15dd66aeb5e51444bf0dc9119"
+    },
+    "cpu-ordinary/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cpu-ordinary/stdout": {
+      "bytes": 259761,
+      "sha256": "009fb9b7156e59327e03bac7fa91bf24e793020e4afceb8d6863f497ae2b61a1"
+    },
+    "cpu-ordinary-result.json": {
+      "bytes": 20483,
+      "sha256": "75fc523998d0bfe3afa315d2b3447a2dcb9783b7378ccb66414f4cf40bb64459"
+    },
+    "final-checks.json": {
+      "bytes": 726,
+      "sha256": "9c7172a3ad677fa67546413b68d7cb8b56a116595ffb372a07c98d5c83d31856"
+    },
+    "final-docs.diff": {
+      "bytes": 19793,
+      "sha256": "35ecc0c7522cbe25c2f9498fa72f033c500d627fac4a713564ecc856e25ab542"
+    },
+    "gpu-diagnostic/owned.json": {
+      "bytes": 392,
+      "sha256": "2cd3263b4b4ee9dc64f2708982b782ad0492e2868184d0fda260671e1e677e71"
+    },
+    "gpu-diagnostic/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "gpu-diagnostic/stdout": {
+      "bytes": 259306,
+      "sha256": "0b92a38285c68e462b3a63069c1920c59502dba57d2bb4df8036918d30d070dd"
+    },
+    "gpu-diagnostic-result.json": {
+      "bytes": 23016,
+      "sha256": "c24ae69597b7d858275696612f677a78baf59f6f288ff6e84965bd14ab52deec"
+    },
+    "gpu-ordinary/owned.json": {
+      "bytes": 364,
+      "sha256": "f4fce4446ecf0c60e9db56608755159b5d7b94cc1cb3e8057b64d63feca2ce79"
+    },
+    "gpu-ordinary/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "gpu-ordinary/stdout": {
+      "bytes": 260140,
+      "sha256": "ee3a000c3b50e80683bd751722c579a8815143d5fe4c1dbaa71584835debc532"
+    },
+    "gpu-ordinary-result.json": {
+      "bytes": 20509,
+      "sha256": "c88663b67f18c8ce8ad0f604776e7380911aa30267c2161c57438f119a94fa27"
+    },
+    "history-assessment-v1/assess.py": {
+      "bytes": 3088,
+      "sha256": "e92502d2f0644e0d6540d92c54ececb4b9f2ee59134bcb08934b785b9a0f9059"
+    },
+    "history-assessment-v1/failure.json": {
+      "bytes": 494,
+      "sha256": "180f2750a2ca0eab7d2b7902cb6ccabaa98e399ed03524254d85b37390cc7475"
+    },
+    "internal-prism-closure.json": {
+      "bytes": 348,
+      "sha256": "48797bdf2403e4a9a56d7a3592f0bd17199f1f17f8187aac77a2a10ce7d61e70"
+    },
+    "internal-prose-review.json": {
+      "bytes": 375,
+      "sha256": "bd080fbfd762515f7dc2a473fa5f185d6d24bca5d6247b094ae913e2ef2306eb"
+    },
+    "internal-results-review.json": {
+      "bytes": 594,
+      "sha256": "2175492b2734b8a9f25da09d95e4fcabacec9b87ac8e574de8a97d1e22ebcfc9"
+    },
+    "owned-executor.py": {
+      "bytes": 12082,
+      "sha256": "52e988f62e8b11ea0d8715e7425100f66c0a5ee96f0f5bb9e574f6e513f279c8"
+    },
+    "package.py": {
+      "bytes": 3507,
+      "sha256": "f489f07b351526726d78dfc9e4d285bb7c529a594cc3b646993a4a61738cfb8d"
+    },
+    "plan.json": {
+      "bytes": 1050804,
+      "sha256": "ec33d6dd9b17700b6cd16b467c9b586899b32eb4c3b6b079413474e67b7eb725"
+    },
+    "prism-command.json": {
+      "bytes": 774,
+      "sha256": "f7f102605ccfc08fc42ef4aeff1cd178a60a47274f6fd6dad47f0a420965aefd"
+    },
+    "prism-disposition.json": {
+      "bytes": 274,
+      "sha256": "81e743ad1f7c8cbfe5ca3c084db42b5b65632f626fd2703cda418a321158df85"
+    },
+    "prism-rules.json": {
+      "bytes": 2546,
+      "sha256": "279eb0d854e6416d468f4f11b4e366bec511018230fcaa9c7f6e2989002eb76f"
+    },
+    "prism.json": {
+      "bytes": 2632,
+      "sha256": "79cf97911c57adbdbd07121da77a337f65ac481d23deb30694447aa4b264b4f1"
+    },
+    "prism.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prism_review.py": {
+      "bytes": 994,
+      "sha256": "256579a9db01651cbcaaf325467959d86d01bf28d748e9dfb5735cd50f22d861"
+    },
+    "run.py": {
+      "bytes": 7005,
+      "sha256": "5899836dc3f84dca821241dc00bd9a54d62bf03fcab058467f2e2d98d30ed352"
+    },
+    "shared/00-run.py": {
+      "bytes": 11845,
+      "sha256": "e76238012be63f58cbc5923e27f6fc227a3aca8443d85d64f466c0675382c7ac"
+    },
+    "shared/01-consume-plan.json": {
+      "bytes": 7800,
+      "sha256": "3db4e9303e1ae492633e596f5a7c2ff636e7a31ee69a9e2dec8b96e3c373cded"
+    },
+    "shared/02-consume-v2-result.json": {
+      "bytes": 154157,
+      "sha256": "d4fae78158a7e9f2b8f8f7919227c214e2ae9edf547ed79a514ffd5db27ee4ea"
+    },
+    "shared/03-run.py": {
+      "bytes": 7439,
+      "sha256": "6e8c6c4a8c814cf0c0083348e06de982fbeb9024c5744cc215bb8af67bcb214b"
+    },
+    "shared/04-control-fixture.stdout": {
+      "bytes": 250364,
+      "sha256": "9577aa4a6de20d513ba4961ee42e5e6dceffca176d4bbe254efb85010598cd88"
+    },
+    "shared/05-owned-executor.py": {
+      "bytes": 12082,
+      "sha256": "52e988f62e8b11ea0d8715e7425100f66c0a5ee96f0f5bb9e574f6e513f279c8"
+    },
+    "shared/06-run.py": {
+      "bytes": 7005,
+      "sha256": "5899836dc3f84dca821241dc00bd9a54d62bf03fcab058467f2e2d98d30ed352"
+    },
+    "shared/07-validate.py": {
+      "bytes": 8564,
+      "sha256": "f1cc885309b3415a7780b30c84da4b28db4e3156c184f88866be9afb83a67a0c"
+    },
+    "shared/08-validator-controls.json": {
+      "bytes": 1714,
+      "sha256": "6fb92ff7e02ca8f6f2b1c28a64b44e93bbae7210ffe18d38870eaec4738405e6"
+    },
+    "shared/09-validator-controls.py": {
+      "bytes": 2277,
+      "sha256": "39400c5171b71c9ecb21d6a4e1efb82ba050b3a0333322a5b7abcf3ea372be25"
+    },
+    "shared/10-live_lease.py": {
+      "bytes": 910,
+      "sha256": "90137d3675603d3018c62b46b55dbc35242d0869127acc53fdae00d35bd0f1f4"
+    },
+    "shared/11-child_process.py": {
+      "bytes": 10519,
+      "sha256": "f907c7c6ce54871c9693be9fd8a9088cf09bd22cabc4e48d3abc7191f75bc7e6"
+    },
+    "shared/12-sdk_environment.py": {
+      "bytes": 1356,
+      "sha256": "e100d93ed7ca190725c8e10d1b721cb56f2d86a5f12643b53b4ee198a79b4311"
+    },
+    "shared/13-benchmark-grid.py": {
+      "bytes": 41262,
+      "sha256": "13f689f97e462f3af41f06cb9360bd44644583bde54adae4839970fc22ead74d"
+    },
+    "shared/sdk-manifest.json": {
+      "bytes": 1117381,
+      "sha256": "43cb6eba0b67746779ced9e6cfa14735574a3504871ae3bd5d591ea08ca9c1b8"
+    },
+    "shared/sources.json": {
+      "bytes": 3165,
+      "sha256": "425a9d10543ba76554145076ceb3b96b1c13861eacf6e722358ab0c84e36b0e2"
+    },
+    "validate.py": {
+      "bytes": 8564,
+      "sha256": "f1cc885309b3415a7780b30c84da4b28db4e3156c184f88866be9afb83a67a0c"
+    },
+    "validator-controls.json": {
+      "bytes": 1714,
+      "sha256": "6fb92ff7e02ca8f6f2b1c28a64b44e93bbae7210ffe18d38870eaec4738405e6"
+    },
+    "validator-controls.py": {
+      "bytes": 2277,
+      "sha256": "39400c5171b71c9ecb21d6a4e1efb82ba050b3a0333322a5b7abcf3ea372be25"
+    }
+  }
+}

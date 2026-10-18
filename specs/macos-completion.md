@@ -48,6 +48,19 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [current SDK tree boundary](../docs/reports/macos-tree-boundary/README.md)
+completes two ordinary runs of 240 measured events each and two separate
+diagnostics of 120 each, all after 128 warmups per run (480 ordinary / 240
+diagnostic samples). Both ordinary
+100k-wide runs miss the unchanged 4 ms p95 target: CPU 7.183709 ms and
+GPU-requested 7.217669 ms. All routes match 68–69 clipped-row geometry; the GPU
+diagnostic proves 120 fresh accepted draws without fallback/reuse. One run per
+mode is cost-boundary evidence, not the repeated full tree qualification matrix.
+The next bounded prototype is stable-key native row retention with the existing
+fixed-allocation local-layout boundary, initially for viewport-only changes with
+proved immutable index identity. Full fallback, semantics/lifecycle and both-mode
+material-gain checks remain mandatory. No implementation or adoption is claimed.
+
 The [current SDK lifecycle/idle checkpoint](../docs/reports/macos-sdk-lifecycle-stage0079/README.md)
 passes two same-name composed lifetimes (66 native selector checks), a 40-second
 four-state preflight and a separate 480-second trace from the unchanged minimum-Go
