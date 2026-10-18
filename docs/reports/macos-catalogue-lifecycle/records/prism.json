@@ -1,0 +1,84 @@
+{
+  "tool": "prism",
+  "version": "1.0",
+  "runId": "e71bd0c347ab8ea688361fc962778f15",
+  "repo": {
+    "root": "/private/tmp/vellum-macos-native-results-97aee13",
+    "head": "69e4bc91875decf98162ae14355655c5237799c2",
+    "branch": "codex/macos-native-results"
+  },
+  "inputs": {
+    "mode": "staged"
+  },
+  "summary": {
+    "counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0
+    },
+    "highestSeverity": ""
+  },
+  "findings": [],
+  "timing": {
+    "gitMs": 0,
+    "llmMs": 3817,
+    "totalMs": 3852
+  },
+  "coverage": {
+    "reviewer": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    ],
+    "files": 11,
+    "bytes": 26576,
+    "chunks": 1,
+    "llmCalls": 1,
+    "cacheHit": false,
+    "cachedChunks": 0,
+    "tokens": [
+      {
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5",
+        "input": 14997,
+        "output": 293,
+        "costUSD": 0.032924
+      }
+    ],
+    "excluded": [],
+    "truncatedBytes": 0,
+    "skipped": [],
+    "complete": true
+  },
+  "discarded": [
+    {
+      "finding": {
+        "id": "200624236b544feb",
+        "severity": "medium",
+        "category": "bug",
+        "title": "Error wrapped with %v loses its chain",
+        "message": "The error message is built with %v and drops the wrapped error; when the failure is a timeout or cancellation, callers cannot match it with errors.Is. It also reads as a failure of the closed-input check even when the real failure is a different Input error.",
+        "suggestion": "Use %w to wrap the error so errors.Is and errors.As still work, and use a distinct message when closed is false versus when Input returned an unexpected error.",
+        "confidence": 0.5,
+        "locations": [
+          {
+            "path": "drivers/cogent/cmd/gallery/catalogue_lifecycle.go",
+            "lines": {
+              "start": 38,
+              "end": 38
+            }
+          }
+        ],
+        "tags": [
+          "errors"
+        ],
+        "evidence": "return false, fmt.Errorf(\"closed original window admitted input: %v\", err)",
+        "provider": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      "reason": "quoted evidence not found in drivers/cogent/cmd/gallery/catalogue_lifecycle.go"
+    }
+  ],
+  "suppressed": []
+}

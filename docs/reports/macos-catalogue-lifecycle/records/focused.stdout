@@ -1,0 +1,12 @@
+=== RUN   TestCatalogueRetiredOwnerWorkerJoins
+--- PASS: TestCatalogueRetiredOwnerWorkerJoins (0.00s)
+=== RUN   TestCatalogueLastWindowAcknowledgesAfterRunCancellation
+--- PASS: TestCatalogueLastWindowAcknowledgesAfterRunCancellation (0.05s)
+=== RUN   TestCatalogueFinalCloseRefusesCanceledScenario
+--- PASS: TestCatalogueFinalCloseRefusesCanceledScenario (0.00s)
+=== RUN   TestCatalogueFinalCloseDroppedWithRetirementIsBounded
+--- PASS: TestCatalogueFinalCloseDroppedWithRetirementIsBounded (1.00s)
+=== RUN   TestCatalogueSelectAllUsesActualCommandBitAndMacBinding
+--- PASS: TestCatalogueSelectAllUsesActualCommandBitAndMacBinding (0.00s)
+PASS
+ok  	github.com/dshills/vellum/drivers/cogent/cmd/gallery	2.588s

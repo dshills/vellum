@@ -118,3 +118,16 @@ After native Run returns, the media checker cancels pending scenario waits befor
 joining. Its final close acknowledgement and closed-reference probe use a separate
 1-second bound, so closing the last window cannot cancel their validation. The
 final corrected native record passes; the earlier passing scope stays preserved.
+
+
+## Shared shutdown contract
+
+All five catalogue modes cancel scenario waits immediately after native Run
+returns, before their six-second worker join. Final close acknowledgement and
+closed-reference validation share an independent one-second deadline, acquired
+only while the scenario remains live. This protects last-window teardown and
+bounds dropped terminal callbacks. The shared actual-Application regressions and
+current headless checks are recorded in the
+[shutdown checkpoint](../../../../docs/reports/macos-catalogue-lifecycle/README.md).
+Previous native records remain scoped to their original source; the shared
+shutdown change alone supplies no new native catalogue or physical-input result.

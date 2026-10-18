@@ -583,3 +583,14 @@ Two actual Application regressions discriminate the missing-cancel and canceled-
 close counterfactuals. Final gallery race/vet/build and the distinct corrected
 71-input/42-observation native case pass; both native scopes remain sealed.
 One original Anthropic Sonnet 5.5 call and independent fix reviews are retained.
+
+
+### Shared catalogue shutdown checkpoint
+
+The [shared lifecycle fix](../docs/reports/macos-catalogue-lifecycle/README.md)
+applies post-Run cancellation and the independently bounded final-close contract
+to all five gallery catalogue modes. Four actual Application regressions, the
+full gallery offscreen race suite, vet and native executable build pass. This
+closes the known cross-catalogue consumer shutdown defect; no native application
+runs, sealed scopes remain sealed and no full M2/M5/M3–M7 gate closes. Remaining
+structural and text/modal native acceptance follows under a fresh reviewed scope.

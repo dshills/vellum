@@ -14,12 +14,12 @@ import (
 	"time"
 )
 
-type mediaFailDriver struct {
+type catalogueFailDriver struct {
 	admitted <-chan struct{}
 	failure  error
 }
 
-func (d mediaFailDriver) Run(ctx context.Context, a *app.Application) error {
+func (d catalogueFailDriver) Run(ctx context.Context, a *app.Application) error {
 	select {
 	case <-d.admitted:
 	case <-ctx.Done():
@@ -32,7 +32,7 @@ func (d mediaFailDriver) Run(ctx context.Context, a *app.Application) error {
 	}
 	return d.failure
 }
-func TestMediaCatalogueRetiredOwnerWorkerJoins(t *testing.T) {
+func TestCatalogueRetiredOwnerWorkerJoins(t *testing.T) {
 	a, err := app.New(app.Config{})
 	if err != nil {
 		t.Fatal(err)
@@ -55,14 +55,14 @@ func TestMediaCatalogueRetiredOwnerWorkerJoins(t *testing.T) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	done := make(chan mediaOutcome, 1)
+	done := make(chan catalogueOutcome[struct{}], 1)
 	var called atomic.Bool
 	go func() {
 		e := catalogueOwner(ctx, a, ref, func() error { called.Store(true); return nil })
-		done <- mediaOutcome{err: e}
+		done <- catalogueOutcome[struct{}]{err: e}
 	}()
 	failure := errors.New("injected driver exit before owner dispatch")
-	if err = a.Run(context.Background(), mediaFailDriver{admitted, failure}); !errors.Is(err, failure) {
+	if err = a.Run(context.Background(), catalogueFailDriver{admitted, failure}); !errors.Is(err, failure) {
 		t.Fatal("actual Run failure lost", err)
 	}
 	if ref.Context().Err() == nil || a.Pending().Ordinary != 0 || called.Load() {
@@ -73,7 +73,7 @@ func TestMediaCatalogueRetiredOwnerWorkerJoins(t *testing.T) {
 		t.Fatal("worker unexpectedly finished before scenario cancellation")
 	default:
 	}
-	result, joined := mediaWorkerResult(cancel, done)
+	result, joined := catalogueWorkerResult(cancel, done)
 	if !joined {
 		cancel()
 		select {
@@ -88,12 +88,12 @@ func TestMediaCatalogueRetiredOwnerWorkerJoins(t *testing.T) {
 	}
 }
 
-type mediaClosingDriver struct {
+type catalogueClosingDriver struct {
 	admitted <-chan struct{}
 	drained  chan<- error
 }
 
-func (d mediaClosingDriver) Run(ctx context.Context, a *app.Application) error {
+func (d catalogueClosingDriver) Run(ctx context.Context, a *app.Application) error {
 	select {
 	case <-d.admitted:
 	case <-time.After(3 * time.Second):
@@ -103,7 +103,7 @@ func (d mediaClosingDriver) Run(ctx context.Context, a *app.Application) error {
 	<-ctx.Done()
 	return ctx.Err()
 }
-func TestMediaCatalogueLastWindowAcknowledgesAfterRunCancellation(t *testing.T) {
+func TestCatalogueLastWindowAcknowledgesAfterRunCancellation(t *testing.T) {
 	a, err := app.New(app.Config{})
 	if err != nil {
 		t.Fatal(err)
@@ -134,26 +134,26 @@ func TestMediaCatalogueLastWindowAcknowledgesAfterRunCancellation(t *testing.T) 
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	done := make(chan mediaOutcome, 1)
+	done := make(chan catalogueOutcome[struct{}], 1)
 	workerDone := make(chan struct{})
 	go func() {
-		closed, e := mediaFinishWindow(ctx, a, cogent.NewDesktopSession(), ref, cogent.DesktopInput{Frame: 1, Target: "retired", Type: events.KeyChord, Code: key.CodeEnd})
+		closed, e := catalogueFinishWindow(ctx, a, cogent.NewDesktopSession(), ref, cogent.DesktopInput{Frame: 1, Target: "retired", Type: events.KeyChord, Code: key.CodeEnd})
 		if e == nil && !closed {
 			e = errors.New("close did not retire ref")
 		}
-		done <- mediaOutcome{err: e}
+		done <- catalogueOutcome[struct{}]{err: e}
 		close(workerDone)
 	}()
 	drained := make(chan error, 1)
-	if e := a.Run(context.Background(), mediaClosingDriver{admitted, drained}); !errors.Is(e, context.Canceled) {
+	if e := a.Run(context.Background(), catalogueClosingDriver{admitted, drained}); !errors.Is(e, context.Canceled) {
 		t.Fatal("last window did not end actual Run", e)
 	}
 	if ref.Context().Err() == nil {
 		t.Fatal("last-window lifetime remained live")
 	}
-	joined := make(chan mediaOutcome, 1)
+	joined := make(chan catalogueOutcome[struct{}], 1)
 	go func() {
-		r, ok := mediaWorkerResult(cancel, done)
+		r, ok := catalogueWorkerResult(cancel, done)
 		if !ok {
 			r.err = errors.Join(r.err, errors.New("terminal worker did not join"))
 		}
@@ -182,5 +182,67 @@ func TestMediaCatalogueLastWindowAcknowledgesAfterRunCancellation(t *testing.T) 
 		}
 	case <-time.After(time.Second):
 		t.Fatal("owner did not finish after acknowledgement release")
+	}
+}
+
+func TestCatalogueFinalCloseRefusesCanceledScenario(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	if err = a.Open(app.Window{ID: "gallery", Title: "Canceled scenario", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }}); err != nil {
+		t.Fatal(err)
+	}
+	ref, err := a.WindowRef("gallery")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	closed, err := catalogueFinishWindow(ctx, a, cogent.NewDesktopSession(), ref, cogent.DesktopInput{})
+	if closed || !errors.Is(err, context.Canceled) || ref.Context().Err() != nil || a.Pending().Ordinary != 0 {
+		t.Fatal("canceled scenario acquired terminal authority", closed, err, a.Pending())
+	}
+}
+
+func TestCatalogueFinalCloseDroppedWithRetirementIsBounded(t *testing.T) {
+	a, err := app.New(app.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	admitted := make(chan struct{}, 1)
+	a.SetWake(func() {
+		select {
+		case admitted <- struct{}{}:
+		default:
+		}
+	})
+	if err = a.Open(app.Window{ID: "gallery", Title: "Dropped final close", Width: 100, Height: 100, View: func() ui.Node { return ui.Node{ID: "root", Kind: ui.Label} }}); err != nil {
+		t.Fatal(err)
+	}
+	<-admitted
+	ref, err := a.WindowRef("gallery")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan catalogueOutcome[struct{}], 1)
+	go func() {
+		_, e := catalogueFinishWindow(ctx, a, cogent.NewDesktopSession(), ref, cogent.DesktopInput{})
+		done <- catalogueOutcome[struct{}]{err: e}
+	}()
+	failure := errors.New("retire before final close dispatch")
+	if err = a.Run(context.Background(), catalogueFailDriver{admitted, failure}); !errors.Is(err, failure) {
+		t.Fatal("actual driver failure lost", err)
+	}
+	if ref.Context().Err() == nil || a.Pending().Ordinary != 0 {
+		t.Fatal("actual retirement did not drop terminal callback")
+	}
+	result, joined := catalogueWorkerResult(cancel, done)
+	if !joined || !errors.Is(result.err, context.DeadlineExceeded) {
+		t.Fatal("detached terminal close failed its independent deadline", joined, result.err)
 	}
 }

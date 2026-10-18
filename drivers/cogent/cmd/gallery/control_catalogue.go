@@ -515,13 +515,8 @@ func checkControlCatalogue(ctx context.Context, a *app.Application, g *gallery, 
 		err = e
 		return
 	}
-	if err = catalogueOwner(ctx, a, ref, func() error { return a.CloseWindow(ref) }); err != nil {
-		return
-	}
-	report.OriginalRefClosed = ref.Context().Err() != nil
-	e = s.Input(ctx, ref, cogent.DesktopInput{Frame: last.Frame, Target: p.Items[0].ID, Type: events.MouseDown, Button: events.Left, Position: p.Items[0].Bounds.Min})
-	if !report.OriginalRefClosed || !errors.Is(e, cogent.ErrDesktopClosed) {
-		err = fmt.Errorf("closed original window admitted popup input: %v", e)
+	report.OriginalRefClosed, err = catalogueFinishWindow(ctx, a, s, ref, cogent.DesktopInput{Frame: last.Frame, Target: p.Items[0].ID, Type: events.MouseDown, Button: events.Left, Position: p.Items[0].Bounds.Min})
+	if err != nil {
 		return
 	}
 	report.PostCloseInputError = "closed"
@@ -537,17 +532,15 @@ func runControlCatalogue(parent context.Context, a *app.Application, g *gallery,
 	if err != nil {
 		return err
 	}
-	type outcome struct {
-		report catalogueReport
-		err    error
-	}
-	done := make(chan outcome, 1)
-	go func() { r, e := checkControlCatalogue(ctx, a, g, s, ref); done <- outcome{r, e}; cancel() }()
+	done := make(chan catalogueOutcome[catalogueReport], 1)
+	go func() {
+		r, e := checkControlCatalogue(ctx, a, g, s, ref)
+		done <- catalogueOutcome[catalogueReport]{r, e}
+		cancel()
+	}()
 	runErr := a.Run(ctx, cogent.Driver{Theme: theme, DesktopSession: s})
-	var result outcome
-	select {
-	case result = <-done:
-	case <-time.After(6 * time.Second):
+	result, joined := catalogueWorkerResult(cancel, done)
+	if !joined {
 		// Do not take application/session locks when a worker failed to join.
 		fmt.Fprintln(os.Stderr, "control catalogue worker did not join after native exit")
 		os.Exit(3)
