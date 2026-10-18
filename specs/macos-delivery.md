@@ -541,7 +541,26 @@ does not identify the older failure's cause. Both scopes remain sealed.
 The new style-aware oracle has separate public Manual160/162DPI and41 synthetic
 controls, with no complete native oracle pass. Complete driver-root (`.`)/gallery race, focused
 GPU/Core regressions, build, prepare and affected-package vet pass; default Core
-vet retains12 exact baseline diagnostics. Next implement bounded visibility-aware
-Frame scheduling and deterministic hidden/occluded/visible/cancel coverage before
-a distinct native admission. Do not fabricate completion or spin on acquisition.
+vet retains12 exact baseline diagnostics. That checkpoint proposed visibility-aware
+Frame scheduling. The typed-terminal decision below preserves the existing
+contract while an authoritative drawable-ready event remains unestablished.
 Full M2/M5 and M3–M7 remain open; performance targets and release gates are unchanged.
+
+
+### Typed unavailable Frame checkpoint
+
+The [typed terminal result](../docs/reports/macos-frame-unavailable/README.md)
+preserves the first-composition contract and classifies checked known surface
+yields through `DesktopCompositionError`/`ErrDesktopFrameUnavailable`. No failed
+frame token, automatic acquisition/requeue or readiness inference is introduced.
+Cancellation identity is checked only after the actual trace terminal; capacity
+and lifetime rules remain bounded. Late cancellation may race a committed reply
+and does not retract prior work. Contradictory metadata and source-detail
+faults fail closed. Full driver-root/gallery race, focused controls, affected vet,
+build and deterministic stage86 preparation pass; default Core vet retains12
+baseline diagnostics. Synthetic measured Manual results are software evidence.
+No new native case runs; the earlier16/15 and41/35 failures stay sealed. Automatic
+pending/resumption needs an authoritative drawable-availability event that is
+not established. Continue remaining native catalogue/typed-error acceptance with
+explicit availability admission and no retry loop. M2/M5/M3–M7 and all unchanged
+performance/release gates remain open.

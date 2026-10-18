@@ -133,3 +133,26 @@ readback is performed, and acquisition timing boundaries are unchanged. Metadata
 work counts as UI work. Supported=true, Submitted=true and no failure are still
 required for a completed Frame. Native occlusion-to-visible scheduling acceptance
 is open; see the [diagnostic checkpoint](reports/macos-acquisition-diagnostics/README.md).
+
+
+### Typed unavailable results
+
+`errors.Is(err, cogent.ErrDesktopFrameUnavailable)` identifies checked known
+surface unavailability from `DesktopSession.Frame`. `errors.As` can extract a
+`*cogent.DesktopCompositionError` with detached `Failure` text and `Unavailable`
+metadata. The existing error string is preserved; no string parsing is used for
+classification. Generic/legacy failures do not acquire this identity. Context
+cancellation and closed-window/session errors retain their standard identities.
+
+An unavailable or failed composition terminal publishes no frame capability and
+releases capacity after its actual input/owner/composition terminal. Cancellation
+does not retract dispatched or committed work, and its return may race an already-
+committed reply. Publication is blocked when cancellation is observed before
+terminal collection; a late canceled wait does not erase a committed capability.
+Frame does not retry or wait automatically.
+An application can explicitly request another Frame following a meaningful
+lifecycle/application event; shown/focused state and this error do not prove
+drawable readiness. The new scalar is also available on `FrameSample`, omitted
+from JSON whenfalse. Contradictory submission flags and source-diagnostic faults
+stay failed generic terminals. Timing/ownership/first-composition contracts remain
+unchanged. See the [checkpoint and verification limits](reports/macos-frame-unavailable/README.md).

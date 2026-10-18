@@ -1,0 +1,30 @@
+{
+  "members": 195,
+  "expanded_bytes": 7841463,
+  "archive_bytes": 2574320,
+  "archive_sha256": "54e136955459226c609c1554da7af4bd701222a3197a675d37e458ab3c8f2a09",
+  "manifest_sha256": "dab886900192114c7059fa7d29df5db3e63b42cf1ce1eb988b2cde1cd544652a",
+  "binaries_included": false,
+  "native_executed": false,
+  "synthetic_measured_manual_output": true,
+  "automatic_resumption_implemented": false,
+  "full_mac_complete": false,
+  "provider": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "complete": true,
+    "cli_exit_code": 1,
+    "retained_findings": 1,
+    "discarded_comments": 0,
+    "internal_disposition_approved": true,
+    "dispositions_sha256": "c7282cc86923ca49dffcd34849132dd08da440319594d8c040f71e1fca57b298",
+    "post_review_docs": [
+      "docs/desktop-integration.md",
+      "docs/reports/macos-frame-unavailable/README.md",
+      "specs/control-acceptance.md",
+      "specs/macos-completion.md",
+      "specs/macos-delivery.md"
+    ]
+  }
+}

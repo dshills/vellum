@@ -1,0 +1,735 @@
+{
+  "checks": {
+    "cancel-negative": {
+      "exit_code": 1,
+      "seconds": 14.675338958972134,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 88777,
+        "group": 88777,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 88777,
+          "members": [],
+          "observation_sha256": "57013e501ec2010d7f78f5b6c456e76d83e1f12f101279fc11d0341a60cd813f"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 337,
+          "sha256": "12ce08b4ffe2801d8041b5dc99bf685ee117bdee0cbeed964cc2dd3598d989dc"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "cancel-fixed": {
+      "exit_code": 0,
+      "seconds": 12.650018207961693,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 91351,
+        "group": 91351,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 91351,
+          "members": [],
+          "observation_sha256": "226b9912ce1dd405fdd77d35db4d38c7be25506014bf60148a795c456a24be75"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 190,
+          "sha256": "a9697ffaf3d0e86be277958863d61308c121fbe6d3f59c118d5d0875f449f6d9"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "focused-v1": {
+      "exit_code": 0,
+      "seconds": 41.45521366700996,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 90348,
+        "group": 90348,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 90348,
+          "members": [],
+          "observation_sha256": "79570c16880cfa8f8d87ff92c9bc38e7ff7f375860e55a02b93297179da97ee1"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 11887,
+          "sha256": "ecd3d5b8cc71855b319904e11976163c4e40c1758164e58e0d5c5634f54e0abc"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "focused-final": {
+      "exit_code": 0,
+      "seconds": 11.148767082951963,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 91751,
+        "group": 91751,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 91751,
+          "members": [],
+          "observation_sha256": "908e02bd5f1869e573bef11e613c58b0efd66e3b8384de43965036a141d23137"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 11887,
+          "sha256": "347105139093e3a5ca9784379b18165955501946adbe5ff28a2da435002451ea"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "driver-final": {
+      "exit_code": 0,
+      "seconds": 291.003530834103,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 91824,
+        "group": 91824,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 91824,
+          "members": [],
+          "observation_sha256": "45b22ebb476e126c0423ba52683f9859434e59edfbfb018594f17679a170ae2c"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 260481,
+          "sha256": "36b1c5a654a23d3b9116bd9a8eaf00db5bcfdde915736957e8912073407fe27c"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "gallery-final": {
+      "exit_code": 0,
+      "seconds": 16.76099916594103,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 91793,
+        "group": 91793,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 91793,
+          "members": [],
+          "observation_sha256": "348bef77fd1ac2408009cdf7a502ca7b82429b6c10a13058c00dbbfeea8fcc68"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 3440,
+          "sha256": "3add67bb3950e4e375a59cac1c506be9b35ab4a110f0575f12feb7b37d7898ed"
+        },
+        "stderr": {
+          "bytes": 1135,
+          "sha256": "ce091ed95c82618dbbc11301177fd99677a30ab4de5c802ccb3ed5b382cad773"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "vet-final": {
+      "exit_code": 0,
+      "seconds": 17.492873375071213,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 91917,
+        "group": 91917,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 91917,
+          "members": [],
+          "observation_sha256": "dffd1bb585237c4dfae4803a4c91d5ade6b06f953f8f2ed36a2a428f1a11a043"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 2094,
+          "sha256": "0efb268990d4144b272f43038bc7dcaee3329aef37789a9f437d784ad2d4eeb5"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "vet-core-final": {
+      "exit_code": 1,
+      "seconds": 1.9306152500212193,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 91785,
+        "group": 91785,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 91785,
+          "members": [],
+          "observation_sha256": "818c31615faf714af81be626b8f7d9c9514cf689af0cae9acf896ac8257237a9"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1295,
+          "sha256": "a4627a6b2b1e1bdd20eec6e15b3aee62120dd52bedd16ce15806df6db1a49afb"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "build-final": {
+      "exit_code": 0,
+      "seconds": 20.995627917000093,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 91818,
+        "group": 91818,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 91818,
+          "members": [],
+          "observation_sha256": "665ed1f3c7be90535c091b5dc34fdec27e7c8ed24b9ecb21b25cc6898503bb21"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1130,
+          "sha256": "845628a6711a96ed7db59bdc7d620b74d918f026ee4264727626f4e54a1b89f3"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "source-negative": {
+      "exit_code": 1,
+      "seconds": 9.380253667011857,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 93741,
+        "group": 93741,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 93741,
+          "members": [],
+          "observation_sha256": "6add4b4fbca21cddb6b886136d2b54f7417b409e4a9606efd4080729af057b95"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 3209,
+          "sha256": "ff6b56ccfdb4924117913b8749919f04d28eea28d82d3051eb7fbe9051b143e4"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "source-fixed": {
+      "exit_code": 0,
+      "seconds": 11.892372833914123,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 94296,
+        "group": 94296,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 94296,
+          "members": [],
+          "observation_sha256": "d280e9ead1efc06bd8c213aea8d771ff3a9c819146bbd832d72db5003bfed579"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 2163,
+          "sha256": "5c845ad8573b900895fd5a1e3e654eac53067afffdca974c990a61498311b307"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "focused-v2": {
+      "exit_code": 0,
+      "seconds": 40.366599041968584,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 95052,
+        "group": 95052,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 95052,
+          "members": [],
+          "observation_sha256": "16a2871ff3f2e6d44e65df3226eb28b40a1ea15170b60447b601912e9cb90ca6"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 13955,
+          "sha256": "0e2fae40237e90fa899e2fb01dbbf8379db210d7fb6be026d7ae6220ff9c6516"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "driver-v2": {
+      "exit_code": 0,
+      "seconds": 306.64978391700424,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 95110,
+        "group": 95110,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 95110,
+          "members": [],
+          "observation_sha256": "12cf18b66400fe66900e50dc106ac24707276da4cd232386bac5d5d53b96228f"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 260481,
+          "sha256": "d5cb062472ba9cdd1e2697fc8a72004ac96c0329b5f924c9144880a9c8b21adb"
+        },
+        "stderr": {
+          "bytes": 1171,
+          "sha256": "807cd6914e2aa03d2837254ab97aa75bcf7dd86959eeb674df57e793b8b69082"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "gallery-v2": {
+      "exit_code": 0,
+      "seconds": 28.0314797910396,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 95051,
+        "group": 95051,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 95051,
+          "members": [],
+          "observation_sha256": "43db832658b6cceffc45cd86780e007ed6f94fa16df458b7a9e4f4b3897c0391"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 3440,
+          "sha256": "65ce42e773b09add4da20f423c64b9e0f828b9d387160f4f8cc9d4d0920d615f"
+        },
+        "stderr": {
+          "bytes": 1135,
+          "sha256": "ce091ed95c82618dbbc11301177fd99677a30ab4de5c802ccb3ed5b382cad773"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "vet-v2": {
+      "exit_code": 0,
+      "seconds": 17.3045977500733,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 95019,
+        "group": 95019,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 95019,
+          "members": [],
+          "observation_sha256": "9d1ac38180c26eec94beac9e130d1a615aabaa26cce2747b4a29bdf526686b5d"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 2094,
+          "sha256": "0efb268990d4144b272f43038bc7dcaee3329aef37789a9f437d784ad2d4eeb5"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "vet-core-v2": {
+      "exit_code": 1,
+      "seconds": 0.8851037919521332,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 95077,
+        "group": 95077,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 1,
+        "errors": [],
+        "observation": {
+          "group": 95077,
+          "members": [],
+          "observation_sha256": "27ed44b7b09a815977dd64d870cdb54a232cee02b696ec7dde9a1b91204cca24"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1295,
+          "sha256": "a4627a6b2b1e1bdd20eec6e15b3aee62120dd52bedd16ce15806df6db1a49afb"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "build-v2": {
+      "exit_code": 0,
+      "seconds": 20.290833291015588,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 95079,
+        "group": 95079,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 95079,
+          "members": [],
+          "observation_sha256": "3834f031b79891c45b053c03bdb1d471fcc3d7112b0e3e60e9a5c7e48961af9b"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1130,
+          "sha256": "845628a6711a96ed7db59bdc7d620b74d918f026ee4264727626f4e54a1b89f3"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "prepare-unit-final": {
+      "exit_code": 0,
+      "seconds": 0.21819704095833004,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 98722,
+        "group": 98722,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 98722,
+          "members": [],
+          "observation_sha256": "f033aca97af8bb44e889868444e98f7d083d1b7fd56885a35b42b3cd0871955e"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 1185,
+          "sha256": "52aa33a10f6e61b72fca30bdde3c0eb7abf06b9e54f43954a7c8eb21c01c0bcf"
+        }
+      },
+      "prepared_files": null,
+      "prepared_sha256": null
+    },
+    "prepare-candidate-final": {
+      "exit_code": 0,
+      "seconds": 2.868190167006105,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 98747,
+        "group": 98747,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 98747,
+          "members": [],
+          "observation_sha256": "8b670123136dfae23f1243616531b9e6a963707af01f77ba5fba3a7ab9f8e925"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 24084,
+          "sha256": "4cbe555acbea17ed8f77c813886698a9bfde8cc30a1c159cf9f5c0401f3c3320"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "prepared_files": 6276,
+      "prepared_sha256": "1cf2dfa8fd75d4c78cfe7e347ac81bf6e66d7c4072e9134e682897de4835d1ed"
+    },
+    "prepare-candidate-repeat": {
+      "exit_code": 0,
+      "seconds": 2.1199300000444055,
+      "error": null,
+      "logs_complete": true,
+      "pins_stable": true,
+      "owned": {
+        "created": true,
+        "pid": 98869,
+        "group": 98869,
+        "terminal": true,
+        "group_absent": true,
+        "exit_code": 0,
+        "errors": [],
+        "observation": {
+          "group": 98869,
+          "members": [],
+          "observation_sha256": "a89721ddc5888e588bd33412fe9d2d30dd3823b9f756fb7216c00f08ce017f66"
+        }
+      },
+      "logs": {
+        "stdout": {
+          "bytes": 24084,
+          "sha256": "4cbe555acbea17ed8f77c813886698a9bfde8cc30a1c159cf9f5c0401f3c3320"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "prepared_files": 6276,
+      "prepared_sha256": "1cf2dfa8fd75d4c78cfe7e347ac81bf6e66d7c4072e9134e682897de4835d1ed"
+    }
+  },
+  "core_vet": {
+    "result": "FINAL_STAGE86_CORE_VET_IDENTICAL12_TO_RETAINED_BASELINE",
+    "baseline_receipt": "/Users/dshills/Documents/ChatGPT/Go Native UI/artifacts/macos-acquisition-diagnostics-4ce6ba4/vet-core-baseline.json",
+    "baseline_receipt_sha256": "a14015482aeb04f57da20c184e422c78a42729231957d71e9acc6d0b62255d32",
+    "candidate_receipt_sha256": "b3527eae46e69af8e7d2411de38b9730d38e2fd0fc2818765ea3aa840b901904",
+    "diagnostics": [
+      "build/upstream/core/html.go:169:22: encoding/xml.EndElement struct literal uses unkeyed fields",
+      "build/upstream/core/mainstage.go:295:13: cogentcore.org/core/math32.Geom2DInt struct literal uses unkeyed fields",
+      "build/upstream/core/mainstage.go:385:13: cogentcore.org/core/math32.Geom2DInt struct literal uses unkeyed fields",
+      "build/upstream/core/textfield.go:1280:32: cogentcore.org/core/text/textpos.Range struct literal uses unkeyed fields",
+      "build/upstream/core/textfield.go:1293:36: cogentcore.org/core/text/textpos.Range struct literal uses unkeyed fields",
+      "build/upstream/core/layout_test.go:196:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+      "build/upstream/core/layout_test.go:197:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+      "build/upstream/core/layout_test.go:198:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+      "build/upstream/core/layout_test.go:199:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+      "build/upstream/core/layout_test.go:200:3: cogentcore.org/core/math32.Vector2 struct literal uses unkeyed fields",
+      "build/upstream/core/renderbench_test.go:41:2: unreachable code",
+      "build/upstream/core/renderbench_test.go:72:2: unreachable code"
+    ],
+    "candidate_exit_code": 1,
+    "baseline_exit_code": 1,
+    "all_core_vet_passed": false
+  },
+  "stage86": {
+    "stage": 86,
+    "files": [
+      "gpu/surface_acquisition.go",
+      "gpu/surface_acquisition_test.go",
+      "gpu/gpudraw/acquisition.go",
+      "gpu/gpudraw/acquisition_test.go",
+      "system/composer/timing.go",
+      "system/composer/timing_test.go",
+      "core/frame_trace.go",
+      "core/frame_acquisition_test.go",
+      "system/composer/source_timing.go",
+      "core/frame_unavailable_source_test.go",
+      "system/composer/unavailable_source_test.go"
+    ],
+    "input_hashes": {
+      "gpu/surface_acquisition.go": "ce8c7055f2217ef67bf954214059059248947d835312fc7a5a23436eb738adb5",
+      "gpu/surface_acquisition_test.go": "5879a9c6de0270499ffe373ca1cff2c03fded07c578a8612afeae204f3857887",
+      "gpu/gpudraw/acquisition.go": "bea1b2c1b95f929e0e9c359a2953bd18bc63b3a7af79b64f0ff95dc3cced2a0f",
+      "gpu/gpudraw/acquisition_test.go": "9bdfd3df121e3dd6a1f7830d2a199874c120e7fecf5ce23b2de5f972b96c250e",
+      "system/composer/timing.go": "6fe538ebbb4d9507af74579de8ccefdf48d63697a57e304598afcdd78b303816",
+      "system/composer/timing_test.go": "3243d502e772df00ab19e703711657f2c893a541e64f2554648fc5753391741a",
+      "core/frame_trace.go": "a2591565da1ac7936639850d1fc6a2a6792aa7692927405b188f2e44642953a6",
+      "core/frame_acquisition_test.go": "dba4d90e11f4106effbfa59bc0ef5c5cd2abac181f4694c3f87503459e94cfd3",
+      "system/composer/source_timing.go": "54e0857876333deb68a6e767679a1a31ae7395ad6b00ebcd2ed6b623a04a7c8f",
+      "core/frame_unavailable_source_test.go": null,
+      "system/composer/unavailable_source_test.go": null
+    },
+    "output_hashes": {
+      "gpu/surface_acquisition.go": "233b77af69d96db57ffbaeb0be40ff5a15798a7e207b81652a739959591baf63",
+      "gpu/surface_acquisition_test.go": "2753920f6aa35a9cb60c7f3b9cd6a82c30d82d99b3dc90ab73d2ee0cb43c4930",
+      "gpu/gpudraw/acquisition.go": "ef87d52608601dd41d7ca32e146ff85e716fd565319ea688c6a8dc9a0b185010",
+      "gpu/gpudraw/acquisition_test.go": "51dcc71f6cf407bd34f26debd156f7a681fcc01cbaf141367311069c8a2e1f4e",
+      "system/composer/timing.go": "cd747e9fc4efdd26765c51e1b66fedd2a1c8f1c120d90068153da08fa48e7b84",
+      "system/composer/timing_test.go": "d916fb6f307f891a84862790e59e1e17eecb46b9bf6d2208845574ea9a3a5198",
+      "core/frame_trace.go": "08ceef18cd69351f50a19f5489860aa1042cf09a2293773f7d6f6e7e66fbc901",
+      "core/frame_acquisition_test.go": "a9fa5402bcb83f33f316061bb805d3df2478a29f466266ca4e440fa20389a5fd",
+      "system/composer/source_timing.go": "b31d3c1fdbab2d68c7e12f19639eba6481a04d3cafe64b64e5a099b9b4a5d87c",
+      "core/frame_unavailable_source_test.go": "d866bda919fc3e241cc25c1392ab3e36f97195a12f056ef6ad421282d7355342",
+      "system/composer/unavailable_source_test.go": "99b507fd83181ea1a496d9cf7485e4e2001f390a7c5fe2fec948ca412d3f054e"
+    },
+    "patch_sha256": "e70614dcc4ec0db4edc36302c465ba018f90f6e7c338d7d5dfb3a37f82d9c394",
+    "candidate_review_sha256": "7cc37761c3d63ae555ed2b41ab7d973c690acde26377d6ed625d1b66757c2514"
+  },
+  "native_executed": false,
+  "synthetic_measured_manual_output": true,
+  "automatic_resumption_implemented": false,
+  "closed_full_mac_gates": []
+}

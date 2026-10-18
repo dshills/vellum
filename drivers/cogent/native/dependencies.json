@@ -859,6 +859,17 @@
               "sha256": "6da93f86a652e1bc01111e39ef3e2b2d3a67a67a14c8f894797309ccb513e24c"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/frameunavailable",
+          "inputs": "native/patches/frameunavailable/original-hashes.json",
+          "outputs": "native/patches/frameunavailable/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/frameunavailable/0086-typed-unavailable-composition.patch",
+              "sha256": "e70614dcc4ec0db4edc36302c465ba018f90f6e7c338d7d5dfb3a37f82d9c394"
+            }
+          ]
         }
       ]
     },

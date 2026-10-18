@@ -1,0 +1,453 @@
+--- a/gpu/surface_acquisition.go
++++ b/gpu/surface_acquisition.go
+@@ -99,3 +99,26 @@
+ 	}
+ 	return frame, outcome, err
+ }
++
++// IsUnavailable identifies a coherent known surface-acquisition yield. It does
++// not promise that a later attempt will succeed or authorize automatic retry.
++// Unknown, backend/view errors, missing textures and offscreen/legacy outcomes
++// are not classified as unavailable. The existing bounded retry is unchanged.
++func (o AcquisitionOutcome) IsUnavailable() bool {
++	if o.Source != AcquisitionSurface || o.Stage != AcquisitionUnavailable {
++		return false
++	}
++	switch o.Attempts {
++	case 1:
++		return o.FirstStatus == o.LastStatus && (o.LastStatus == wgpu.SurfaceGetCurrentTextureStatusOccluded || o.LastStatus == wgpu.SurfaceGetCurrentTextureStatusTimeout)
++	case 2:
++		if o.FirstStatus != wgpu.SurfaceGetCurrentTextureStatusLost && o.FirstStatus != wgpu.SurfaceGetCurrentTextureStatusOutdated {
++			return false
++		}
++		switch o.LastStatus {
++		case wgpu.SurfaceGetCurrentTextureStatusOccluded, wgpu.SurfaceGetCurrentTextureStatusTimeout, wgpu.SurfaceGetCurrentTextureStatusLost, wgpu.SurfaceGetCurrentTextureStatusOutdated:
++			return true
++		}
++	}
++	return false
++}
+--- a/gpu/surface_acquisition_test.go
++++ b/gpu/surface_acquisition_test.go
+@@ -118,3 +118,47 @@
+ 		t.Fatal("unbounded/lost unknown status", s)
+ 	}
+ }
++
++func TestVellumAcquisitionUnavailableClassification(t *testing.T) {
++	occluded := wgpu.SurfaceGetCurrentTextureStatusOccluded
++	timeout := wgpu.SurfaceGetCurrentTextureStatusTimeout
++	lost := wgpu.SurfaceGetCurrentTextureStatusLost
++	outdated := wgpu.SurfaceGetCurrentTextureStatusOutdated
++	good := AcquisitionOutcome{Source: AcquisitionSurface, Stage: AcquisitionUnavailable, Attempts: 1, FirstStatus: occluded, LastStatus: occluded}
++	valid := []AcquisitionOutcome{good, {Source: AcquisitionSurface, Stage: AcquisitionUnavailable, Attempts: 1, FirstStatus: timeout, LastStatus: timeout}}
++	for _, first := range []wgpu.SurfaceGetCurrentTextureStatus{lost, outdated} {
++		for _, last := range []wgpu.SurfaceGetCurrentTextureStatus{occluded, timeout, lost, outdated} {
++			valid = append(valid, AcquisitionOutcome{Source: AcquisitionSurface, Stage: AcquisitionUnavailable, Attempts: 2, FirstStatus: first, LastStatus: last})
++		}
++	}
++	for _, o := range valid {
++		if !o.IsUnavailable() {
++			t.Fatal("known coherent yield lost", o)
++		}
++	}
++	invalid := []AcquisitionOutcome{{}, good, good, good, good, good, good, good, good, good, good, good, good, good}
++	invalid[1].Source = AcquisitionUnknown
++	invalid[2].Source = AcquisitionRenderTexture
++	invalid[3].Stage = AcquisitionBackendError
++	invalid[4].Stage = AcquisitionViewError
++	invalid[5].Stage = AcquisitionMissingTexture
++	invalid[6].Stage = AcquisitionViewReady
++	invalid[7].Attempts = 0
++	invalid[8].Attempts = 3
++	invalid[9].FirstStatus = timeout
++	invalid[10].FirstStatus = lost
++	invalid[10].LastStatus = lost
++	invalid[11].FirstStatus = outdated
++	invalid[11].LastStatus = outdated
++	invalid[12].Attempts = 2 // first occluded cannot initiate the existing retry
++	invalid[13].FirstStatus = wgpu.SurfaceGetCurrentTextureStatusError
++	invalid[13].LastStatus = wgpu.SurfaceGetCurrentTextureStatusError
++	for _, last := range []wgpu.SurfaceGetCurrentTextureStatus{wgpu.SurfaceGetCurrentTextureStatusSuccessOptimal, wgpu.SurfaceGetCurrentTextureStatusSuccessSuboptimal, wgpu.SurfaceGetCurrentTextureStatus(0xffffffff), wgpu.SurfaceGetCurrentTextureStatusError} {
++		invalid = append(invalid, AcquisitionOutcome{Source: AcquisitionSurface, Stage: AcquisitionUnavailable, Attempts: 2, FirstStatus: lost, LastStatus: last})
++	}
++	for _, o := range invalid {
++		if o.IsUnavailable() {
++			t.Fatal("unrecorded/fatal/incoherent outcome became availability", o)
++		}
++	}
++}
+--- a/gpu/gpudraw/acquisition.go
++++ b/gpu/gpudraw/acquisition.go
+@@ -14,10 +14,12 @@
+ func beginMeasuredPass(sy *gpu.GraphicsSystem, timing *composer.ComposeTiming) (*wgpu.RenderPassEncoder, error) {
+ 	pass, elapsed, outcome, err := sy.BeginRenderPassMeasuredWithOutcome()
+ 	timing.AcquireNS = elapsed
++	timing.Unavailable = false
+ 	if err != nil {
+ 		return pass, fmt.Errorf("gpu: measured render pass failed (%s): %w", outcome.Description(), err)
+ 	}
+ 	if pass == nil {
++		timing.Unavailable = outcome.IsUnavailable()
+ 		timing.Failure = "gpu: measured render pass unavailable (" + outcome.Description() + ")"
+ 	}
+ 	return pass, nil
+--- a/gpu/gpudraw/acquisition_test.go
++++ b/gpu/gpudraw/acquisition_test.go
+@@ -57,3 +57,43 @@
+ 		}
+ 	}
+ }
++
++func TestVellumMeasuredPassUnavailableIsCheckedAndNeverSticky(t *testing.T) {
++	occluded := wgpu.SurfaceGetCurrentTextureStatusOccluded
++	cases := []struct {
++		name    string
++		out     gpu.AcquisitionOutcome
++		failure bool
++		want    bool
++	}{
++		{"occluded", gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: gpu.AcquisitionUnavailable, Attempts: 1, FirstStatus: occluded, LastStatus: occluded}, false, true},
++		{"recovery-exhausted", gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: gpu.AcquisitionUnavailable, Attempts: 2, FirstStatus: wgpu.SurfaceGetCurrentTextureStatusLost, LastStatus: wgpu.SurfaceGetCurrentTextureStatusOutdated}, false, true},
++		{"backend-error", gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: gpu.AcquisitionUnavailable, Attempts: 1, FirstStatus: occluded, LastStatus: occluded}, true, false},
++		{"view-error", gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: gpu.AcquisitionViewError, Attempts: 1, FirstStatus: wgpu.SurfaceGetCurrentTextureStatusSuccessOptimal, LastStatus: wgpu.SurfaceGetCurrentTextureStatusSuccessOptimal}, true, false},
++		{"missing-texture", gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: gpu.AcquisitionMissingTexture, Attempts: 1}, false, false},
++		{"unknown", gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: gpu.AcquisitionUnavailable, Attempts: 1, FirstStatus: wgpu.SurfaceGetCurrentTextureStatus(0xffffffff), LastStatus: wgpu.SurfaceGetCurrentTextureStatus(0xffffffff)}, false, false},
++		{"offscreen", gpu.AcquisitionOutcome{Source: gpu.AcquisitionRenderTexture, Stage: gpu.AcquisitionUnavailable}, false, false},
++		{"legacy", gpu.AcquisitionOutcome{}, false, false},
++	}
++	for _, c := range cases {
++		t.Run(c.name, func(t *testing.T) {
++			sentinel := errors.New("injected view/backend error")
++			r := &unavailableMeasuredRenderer{outcome: c.out}
++			if c.failure {
++				r.failure = sentinel
++			}
++			timing := composer.ComposeTiming{Supported: true, Unavailable: true}
++			pass, err := beginMeasuredPass(&gpu.GraphicsSystem{Renderer: r}, &timing)
++			if pass != nil || r.calls != 1 || timing.Submitted || timing.Unavailable != c.want {
++				t.Fatal("incorrect checked classification/calls", timing, err, r.calls)
++			}
++			if c.failure {
++				if !errors.Is(err, sentinel) {
++					t.Fatal("underlying failure lost", err)
++				}
++			} else if err != nil || timing.Failure == "" {
++				t.Fatal("yield qualified or lost diagnostic", timing, err)
++			}
++		})
++	}
++}
+--- a/system/composer/timing.go
++++ b/system/composer/timing.go
+@@ -7,8 +7,10 @@
+ type ComposeTiming struct {
+ 	RasterUploadNS, EncodeSubmitNS, AcquireNS, PresentCallNS int64
+ 	Supported, Submitted                                     bool
+-	Failure                                                  string
+-	SourceDetails                                            *SourceDetails
++	// Unavailable is a checked acquisition yield, never a submitted frame or a retry guarantee.
++	Unavailable   bool `json:",omitempty"`
++	Failure       string
++	SourceDetails *SourceDetails
+ }
+ 
+ // ComposeMeasured preserves the ordinary draw order and opts into a drawer's
+--- a/system/composer/timing_test.go
++++ b/system/composer/timing_test.go
+@@ -63,3 +63,20 @@
+ 		t.Fatalf("masked failed submission: %+v %v", result, order)
+ 	}
+ }
++
++func TestVellumUnavailableCompositionPreservesCheckedTerminal(t *testing.T) {
++	for _, details := range []bool{false, true} {
++		var order []string
++		d := &measuredTimingDrawer{timingDrawer: timingDrawer{order: &order}, result: ComposeTiming{Supported: true, Unavailable: true, Failure: "scripted surface yield", AcquireNS: 31}}
++		cd := &ComposerDrawer{Drawer: d, Sources: []Source{timingSource{"source", &order}}}
++		var result ComposeTiming
++		if details {
++			result = cd.ComposeMeasuredWithSourceDetails()
++		} else {
++			result = cd.ComposeMeasured()
++		}
++		if !result.Unavailable || result.Submitted || !result.Supported || result.Failure != d.result.Failure || result.AcquireNS != 31 || !reflect.DeepEqual(order, []string{"start", "source", "measured-end"}) {
++			t.Fatal("availability changed order/result", details, result, order)
++		}
++	}
++}
+--- a/core/frame_trace.go
++++ b/core/frame_trace.go
+@@ -22,8 +22,10 @@
+ 	LayoutPaintNS, GatherNS, RasterUploadNS, EncodeSubmitNS int64
+ 	AcquireNS, PresentCallNS, TotalUIWorkNS                 int64
+ 	Completed                                               bool
+-	Failure                                                 string
+-	SourceDetails                                           *composer.SourceDetails
++	// Unavailable carries checked acquisition evidence only for a failed composition.
++	Unavailable   bool `json:",omitempty"`
++	Failure       string
++	SourceDetails *composer.SourceDetails
+ }
+ 
+ type frameTracePending struct {
+@@ -108,6 +110,7 @@
+ 			p.ownerDone = true
+ 			if !p.ready {
+ 				p.Failure = "traced input did not post owner work"
++				p.Unavailable = false
+ 				p.ready = true
+ 			}
+ 		}
+@@ -225,12 +228,19 @@
+ 		p.EncodeSubmitNS += timing.EncodeSubmitNS
+ 		p.AcquireNS += timing.AcquireNS
+ 		p.PresentCallNS += timing.PresentCallNS
++		// Eligibility belongs to the original composition terminal. Diagnostic
++		// validation must neither manufacture nor retain an unavailable result.
++		unavailable := timing.Unavailable && timing.Supported && !timing.Submitted && timing.Failure != ""
+ 		if trace.sourceDetails {
+-			if failure := appendFrameSourceDetails(p.SourceDetails, timing.SourceDetails); failure != "" && timing.Failure == "" {
+-				timing.Failure = failure
++			if failure := appendFrameSourceDetails(p.SourceDetails, timing.SourceDetails); failure != "" {
++				unavailable = false
++				if timing.Failure == "" {
++					timing.Failure = failure
++				}
+ 			}
+ 		}
+-		submitted := timing.Supported && timing.Submitted && timing.Failure == ""
++		submitted := timing.Supported && timing.Submitted && timing.Failure == "" && !timing.Unavailable
++		p.Unavailable = unavailable
+ 		p.Completed = p.frameArmed && submitted
+ 		p.Failure = timing.Failure
+ 		if !submitted && p.Failure == "" {
+@@ -258,6 +268,7 @@
+ 		p.GatherNS += gather
+ 		if p.frameArmed {
+ 			p.Failure = "armed frame did not reach composition"
++			p.Unavailable = false
+ 			p.ready = true
+ 		}
+ 	}
+@@ -273,6 +284,7 @@
+ 		p.rendering = false
+ 		if !p.ready {
+ 			p.Failure = message
++			p.Unavailable = false
+ 			p.ready = true
+ 		}
+ 	}
+@@ -285,6 +297,7 @@
+ 	defer trace.mu.Unlock()
+ 	if p := trace.pending; p != nil && p.Tag == tag && !p.ready {
+ 		p.Failure = message
++		p.Unavailable = false
+ 		p.ready = true
+ 	}
+ }
+@@ -313,6 +326,7 @@
+ 	if p := trace.pending; p != nil && p.Tag == tag {
+ 		if !p.ready {
+ 			p.Failure = message
++			p.Unavailable = false
+ 			p.ready = true
+ 		}
+ 		p.retired = true
+--- a/core/frame_acquisition_test.go
++++ b/core/frame_acquisition_test.go
+@@ -37,3 +37,90 @@
+ 		}
+ 	}
+ }
++
++func vellumUnavailableTrace(t *testing.T, armed bool) (*FrameTrace, uint64) {
++	t.Helper()
++	trace := &FrameTrace{}
++	event := traceScroll()
++	if err := trace.Begin(91, event); err != nil {
++		t.Fatal(err)
++	}
++	tag, start := trace.startEvent(event)
++	trace.ExpectOwner(tag)
++	trace.endEvent(tag, start)
++	trace.Transition(tag, 17)
++	trace.OwnerWork(tag, 3)
++	if armed {
++		trace.Reconciled(tag, 5)
++	}
++	if trace.startFrame() != tag {
++		t.Fatal("trace segment not started")
++	}
++	return trace, tag
++}
++func TestVellumFrameTraceUnavailableStrictContradictionsAndLegacy(t *testing.T) {
++	cases := []struct {
++		name                  string
++		timing                composer.ComposeTiming
++		complete, unavailable bool
++	}{
++		{"checked-yield", composer.ComposeTiming{Supported: true, Unavailable: true, Failure: "yield"}, false, true},
++		{"legacy-identical-text", composer.ComposeTiming{Supported: true, Failure: "yield"}, false, false},
++		{"submitted-with-yield", composer.ComposeTiming{Supported: true, Submitted: true, Unavailable: true, Failure: "yield"}, false, false},
++		{"contradictory-success", composer.ComposeTiming{Supported: true, Submitted: true, Unavailable: true}, false, false},
++		{"unsupported-yield", composer.ComposeTiming{Unavailable: true, Failure: "yield"}, false, false},
++		{"missing-failure", composer.ComposeTiming{Supported: true, Unavailable: true}, false, false},
++		{"healthy", composer.ComposeTiming{Supported: true, Submitted: true}, true, false},
++	}
++	for _, c := range cases {
++		t.Run(c.name, func(t *testing.T) {
++			trace, tag := vellumUnavailableTrace(t, true)
++			trace.finishFrame(tag, c.timing)
++			sample, ok := trace.Take()
++			if !ok || sample.Completed != c.complete || sample.Unavailable != c.unavailable || !sample.Completed && sample.Failure == "" {
++				t.Fatal("wrong terminal", sample, ok)
++			}
++			if _, again := trace.Take(); again || trace.Pending() {
++				t.Fatal("terminal retained")
++			}
++		})
++	}
++}
++func TestVellumFrameTraceUnavailableIntermediateAndFatalRetirement(t *testing.T) {
++	yield := composer.ComposeTiming{Supported: true, Unavailable: true, Failure: "yield"}
++	trace, tag := vellumUnavailableTrace(t, false)
++	trace.finishFrame(tag, yield)
++	sample, ok := trace.Take()
++	if !ok || sample.Completed || !sample.Unavailable {
++		t.Fatal("pre-armed failure contract changed", sample, ok)
++	}
++	// A new ticket starts with zero classification and independently qualifies.
++	event := traceScroll()
++	if err := trace.Begin(92, event); err != nil {
++		t.Fatal(err)
++	}
++	next, start := trace.startEvent(event)
++	trace.ExpectOwner(next)
++	trace.endEvent(next, start)
++	trace.Transition(next, 18)
++	trace.OwnerWork(next, 0)
++	trace.Reconciled(next, 0)
++	trace.finishFrame(trace.startFrame(), composer.ComposeTiming{Supported: true, Submitted: true})
++	sample, ok = trace.Take()
++	if !ok || !sample.Completed || sample.Unavailable {
++		t.Fatal("classification leaked across tickets", sample, ok)
++	}
++	for _, retire := range []bool{false, true} {
++		trace, tag = vellumUnavailableTrace(t, true)
++		if retire {
++			trace.Retire(tag, "closed")
++		} else {
++			trace.Fail(tag, "canceled")
++		}
++		trace.finishFrame(tag, yield) // late acquisition result must not replace terminal
++		sample, ok = trace.Take()
++		if !ok || sample.Completed || sample.Unavailable || sample.Failure == "yield" {
++			t.Fatal("late availability replaced fatal/cancel/retire", sample, ok)
++		}
++	}
++}
+--- a/system/composer/source_timing.go
++++ b/system/composer/source_timing.go
+@@ -132,6 +132,9 @@
+ 		end := drawer.EndMeasured()
+ 		end.RasterUploadNS += timing.RasterUploadNS
+ 		end.SourceDetails = details
++		if failure != "" {
++			end.Unavailable = false
++		}
+ 		if end.Failure == "" {
+ 			end.Failure = failure
+ 		}
+--- /dev/null
++++ b/core/frame_unavailable_source_test.go
+@@ -0,0 +1,45 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package core
++
++import (
++	"cogentcore.org/core/system/composer"
++	"testing"
++)
++
++func TestVellumUnavailableSourceDetailsDoNotPromoteOrMaskFailure(t *testing.T) {
++	valid := &composer.SourceDetails{Compositions: 1, Records: []composer.SourceTiming{{Composition: 1, Source: 0, Kind: composer.SourceScene}}}
++	invalid := &composer.SourceDetails{Compositions: 1, Records: []composer.SourceTiming{{Composition: 2, Source: 0, Kind: composer.SourceScene}}}
++	for _, c := range []struct {
++		name    string
++		details *composer.SourceDetails
++		failure string
++		want    bool
++	}{
++		{"missing-failure-and-details", nil, "", false},
++		{"missing-failure-valid-details", valid, "", false},
++		{"checked-yield-missing-details", nil, "yield", false},
++		{"checked-yield-invalid-order", invalid, "yield", false},
++		{"checked-yield-valid-details", valid, "yield", true},
++	} {
++		t.Run(c.name, func(t *testing.T) {
++			trace := NewFrameTraceWithSourceDetails()
++			event := traceScroll()
++			if err := trace.Begin(101, event); err != nil {
++				t.Fatal(err)
++			}
++			tag, start := trace.startEvent(event)
++			trace.ExpectOwner(tag)
++			trace.endEvent(tag, start)
++			trace.Transition(tag, 9)
++			trace.OwnerWork(tag, 0)
++			trace.Reconciled(tag, 0)
++			trace.finishFrame(trace.startFrame(), composer.ComposeTiming{Supported: true, Unavailable: true, Failure: c.failure, SourceDetails: c.details})
++			sample, ok := trace.Take()
++			if !ok || sample.Completed || sample.Unavailable != c.want || sample.Failure == "" {
++				t.Fatal("diagnostic failure promoted/retained unavailable", sample, ok)
++			}
++		})
++	}
++}
+--- /dev/null
++++ b/system/composer/unavailable_source_test.go
+@@ -0,0 +1,41 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++
++package composer
++
++import "testing"
++
++func TestVellumUnavailableSourceDiagnosticsStayFatal(t *testing.T) {
++	for _, name := range []string{"healthy", "empty", "overflow", "already-active", "invalid-counter"} {
++		t.Run(name, func(t *testing.T) {
++			var order []string
++			d := newSourceTimingDrawer(&order)
++			d.result = ComposeTiming{Supported: true, Unavailable: true, Failure: "yield"}
++			source := &measuredSource{}
++			sources := []Source{source}
++			switch name {
++			case "empty":
++				sources = nil
++			case "overflow":
++				sources = make([]Source, 33)
++				for i := range sources {
++					sources[i] = source
++				}
++			case "already-active":
++				d.active = true
++			case "invalid-counter":
++				source.action = func() { d.stats.Invalid = true }
++			}
++			result := (&ComposerDrawer{Drawer: d, Sources: sources}).ComposeMeasuredWithSourceDetails()
++			if result.Unavailable != (name == "healthy") || result.Submitted || result.Failure == "" {
++				t.Fatal("source diagnostic fault became availability", result)
++			}
++			if len(order) != 2 || order[0] != "start" || order[1] != "measured-end" || source.measured != len(sources) {
++				t.Fatal("fault changed draw/end count", order, source.measured)
++			}
++			if d.active != (name == "already-active") {
++				t.Fatal("measurement ownership changed", d.active)
++			}
++		})
++	}
++}

@@ -260,10 +260,10 @@ func (s *DesktopSession) reapLocked() {
 		return
 	}
 	reply := desktopReply{}
-	if !sample.Completed || sample.Failure != "" {
-		reply.err = errors.New("cogent: desktop composition: " + sample.Failure)
-	} else if err := r.ctx.Err(); err != nil {
+	if err := r.ctx.Err(); err != nil {
 		reply.err = err
+	} else if !sample.Completed || sample.Failure != "" || sample.Unavailable {
+		reply.err = &DesktopCompositionError{Failure: sample.Failure, Unavailable: sample.Unavailable && !sample.Completed && sample.Failure != ""}
 	} else {
 		r.binding.frame = r.tag
 		reply.snapshot.Frame = r.tag
@@ -355,6 +355,10 @@ func (s *DesktopSession) wait(r *desktopRequest) (DesktopSnapshot, error) {
 
 // Frame forces a paint after preceding FIFO input and owner reconciliation, and
 // waits for its completed native composition. It is not an OS presentation fence.
+// A checked drawable-acquisition yield returns a DesktopCompositionError matching
+// ErrDesktopFrameUnavailable. It publishes no frame capability and does not retry.
+// A caller may make a new request after a meaningful lifecycle/application event;
+// neither a shown/focused window nor this error proves drawable readiness.
 func (s *DesktopSession) Frame(ctx context.Context, ref app.WindowRef) error {
 	r, e := s.submit(ctx, ref, 2, DesktopInput{})
 	if e != nil {

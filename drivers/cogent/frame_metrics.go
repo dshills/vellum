@@ -34,6 +34,7 @@ type FrameSample struct {
 	LayoutPaintNS, GatherNS, RasterUploadNS, EncodeSubmitNS int64
 	AcquireNS, PresentCallNS, TotalUIWorkNS                 int64
 	Completed                                               bool
+	Unavailable                                             bool `json:",omitempty"`
 	Failure                                                 string
 	SourceDetails                                           *FrameSourceDetails `json:"SourceDetails,omitempty"`
 }
@@ -171,7 +172,7 @@ func (m *FrameMetrics) collectLocked() {
 				QueuedNS: sample.QueuedNS, InputNS: sample.InputNS, OwnerNS: sample.OwnerNS, ReconcileNS: sample.ReconcileNS,
 				LayoutPaintNS: sample.LayoutPaintNS, GatherNS: sample.GatherNS, RasterUploadNS: sample.RasterUploadNS,
 				EncodeSubmitNS: sample.EncodeSubmitNS, AcquireNS: sample.AcquireNS, PresentCallNS: sample.PresentCallNS,
-				TotalUIWorkNS: sample.TotalUIWorkNS, Completed: sample.Completed, Failure: sample.Failure,
+				TotalUIWorkNS: sample.TotalUIWorkNS, Completed: sample.Completed, Failure: sample.Failure, Unavailable: sample.Unavailable,
 				SourceDetails: frameSourceDetails(sample.SourceDetails)})
 			m.tags[sample.Tag] = len(m.samples)
 		}
