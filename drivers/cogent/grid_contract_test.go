@@ -26,6 +26,7 @@ func gridContractOwner(t *testing.T, capacity int) (*app.Application, *core.Fram
 		t.Fatal(e)
 	}
 	host := core.NewFrame(core.NewBody("grid contracts"))
+	host.Scene.SetProperty(gridCellSurfaceProperty, true) // legacy widget implementation contract oracle
 	t.Cleanup(func() { host.Delete(); a.Close() })
 	return a, host
 }

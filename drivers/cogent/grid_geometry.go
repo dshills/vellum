@@ -101,14 +101,23 @@ func (g *gridBinding) capture() {
 	}
 	previous := g.measurement.Load()
 	wasPending := g.layoutPending.Load() || g.host.Scene != nil && g.host.Scene.GlobalLayoutPending()
-	m := &GridInspection{Window: g.window, ID: g.r.node.ID, Incarnation: g.incarnation, Generation: s.Generation, CellIncarnation: g.epoch, Frames: g.frames, Stamp: s.Stamp, Viewport: s.Viewport, Columns: s.Columns, RetainedCells: len(g.cells), RetainedHeaders: len(g.headers), RowSelection: s.Config.RowSelection, Selection: s.Selection, Scale: g.host.Styles.UnitContext.Px(1), Bounds: g.host.Geom.ContentBBox, Cells: make([]GridCellGeometry, len(g.projection.Cells)), Headers: make([]GridHeaderGeometry, len(g.projection.Headers))}
+	m := &GridInspection{Window: g.window, ID: g.r.node.ID, Incarnation: g.incarnation, Generation: s.Generation, CellIncarnation: g.epoch, Frames: g.frames, Stamp: s.Stamp, Viewport: s.Viewport, Columns: s.Columns, RetainedCells: g.retainedCellLayouts(), RetainedHeaders: len(g.headers), RowSelection: s.Config.RowSelection, Selection: s.Selection, Scale: g.host.Styles.UnitContext.Px(1), Bounds: g.host.Geom.ContentBBox, Cells: make([]GridCellGeometry, len(g.projection.Cells)), Headers: make([]GridHeaderGeometry, len(g.projection.Headers))}
 	offset := image.Point{}
 	if g.host.Scene != nil {
 		offset = g.host.Scene.SceneGeom.Pos
 	}
 	m.Bounds = m.Bounds.Add(offset)
+	if g.cellSurface != nil && !g.cellSurface.completed {
+		g.withdrawMeasurement()
+		return
+	}
 	for i, c := range g.projection.Cells {
-		bounds := g.cells[i].Geom.TotalBBox.Add(offset)
+		var bounds image.Rectangle
+		if g.cellSurface != nil {
+			bounds = g.cellSurface.cells[i].box.Add(offset)
+		} else {
+			bounds = g.cells[i].Geom.TotalBBox.Add(offset)
+		}
 		if c.Clip.Empty() {
 			bounds = image.Rectangle{}
 		}

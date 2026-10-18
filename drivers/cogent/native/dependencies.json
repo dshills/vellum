@@ -793,6 +793,17 @@
               "sha256": "5c605c276c25a83f61c346101804b7fec7f71829bf5e0fd92b05ae5cbff826ac"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/cellsurface",
+          "inputs": "native/patches/cellsurface/original-hashes.json",
+          "outputs": "native/patches/cellsurface/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/cellsurface/0080-passive-text-surface-admission.patch",
+              "sha256": "125b4774dfa44722b93d8f10784de99617182c85986d02ad86c9ac95894fd548"
+            }
+          ]
         }
       ]
     },

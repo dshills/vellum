@@ -51,6 +51,15 @@ partial; five native-library Go graph modules lack recorded declarations, and
 the mismatched source-built native notice bundle is excluded. No app is launched,
 no signing is requested and M6 rights/final runtime acceptance remains open.
 
+The [managed grid body-layout checkpoint](../docs/reports/macos-grid-cell-surface/README.md)
+replaces supported body Text widgets with current-projection pane layout values.
+Five prototype pairs per CPU/GPU improve median run-p95 by 1.12/0.77 ms, with
+5/5 improved pairs each; all run-p95s still exceed 4 ms. Corrected source passes
+headless and separate native functional route checks. Whole-process allocation
+p50 rises about 15.21%/10.17% despite lower retained Go heap. This advances the
+M3 implementation; the corrected-source full table/tree/general-UI matrix and
+allocation attribution remain next, with every original target unchanged.
+
 ## Current position
 
 | Area | Implemented and demonstrated | Still prevents completion |

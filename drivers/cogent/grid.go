@@ -74,6 +74,7 @@ type gridBinding struct {
 	closed               atomic.Bool
 	host                 *gridWidget
 	panes                [4]*gridPane
+	cellSurface          *gridCellSurface
 	cells                []*core.Text
 	headers              []*core.Text
 	horizontal, vertical *core.Slider
@@ -654,6 +655,13 @@ func syncGrid(r *record) error {
 	if err != nil {
 		return err
 	}
+	if g.cellSurface != nil && g.projectionReady && g.projection.State.Generation == state.Generation {
+		reference, _ := g.host.Scene.Property(gridCellSurfaceProperty).(bool)
+		if reference || g.cellSurface.failed || !g.host.Scene.PassiveTextSurfaceAllowed() || !g.layout.valid || g.layoutStamp() != g.layout ||
+			g.projectedDisabled != r.control.disabled || g.projectedHelp != r.node.Accessibility.Help || state.Edit.Active {
+			g.projectionReady = false // ordinary fallback before rebuilding any native child
+		}
+	}
 	if g.projectionReady && g.projection.State.Generation == state.Generation {
 		// Domain data are immutable within their stamp. Owner invalidation after
 		// capture only republishes geometry; it need not rematerialize or restyle
@@ -696,6 +704,13 @@ func syncGrid(r *record) error {
 	}
 	g.projectionReady = wasReady
 	local := g.canLayoutLocally(snap)
+	if g.wantsCellSurface(snap) {
+		return g.syncCellSurface(snap, local)
+	}
+	if g.cellSurface != nil {
+		g.retireCellSurface()
+		local = false
+	}
 	g.projectionReady = false
 	cells, retiredCells, err := g.retainCells(snap)
 	if err != nil {
@@ -845,6 +860,7 @@ func disposeGrid(r *record) {
 		return
 	}
 	g := r.control.grid
+	g.retireCellSurface()
 	g.closed.Store(true)
 	g.disposeEditing()
 	g.armed = nil

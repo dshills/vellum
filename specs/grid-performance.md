@@ -601,3 +601,32 @@ a >=0.4 ms median run-p95 reduction in five matched pairs with >=4/5 improvement
 and no correctness/retention/tail regression. Otherwise reject the experiment;
 a microbenchmark gain alone is insufficient. These are experiment-adoption
 criteria, not changes to the original 4 ms/6 ms targets or the full Mac finish line.
+
+## Managed body-cell layout checkpoint
+
+The managed grid can retain current-projection body-cell layout values instead
+of one native Text widget per cell. Stable row/column identities retain unchanged
+shapes, while headers, host input/accessibility, panes, scrollbars and editing
+keep their native ownership. Only supported passive styles and renderers admit;
+unsupported or invalidated configurations restore the original widget route.
+`GridInspection.RetainedCells` counts current cell representations, including
+value layouts. It must not be used as proof of native widget cardinality.
+
+The [cell-surface checkpoint](../docs/reports/macos-grid-cell-surface/README.md)
+records a five-pair prototype improvement in both CPU and GPU modes, separate
+positive native widget/layout counters, corrected source integration, original
+pixel/geometry/routing comparisons and the actual final qualification scope.
+The prototype median-run p95 improves 5.929751→4.811373 ms CPU and
+5.022791→4.249374 ms GPU, with 5/5 improved pairs each. All twenty run-p95s still
+fail the unchanged 4 ms threshold. Whole-process allocation p50 rises about
+15.21% CPU/10.17% GPU despite lower post-GC terminal Go heap; no allocation,
+native/GPU resource or full M3 gate closes from this comparison. Corrected
+integration timings must retain their separate source/binary identity.
+
+The value route owns no hidden widget substitutes, offscreen-row cache, font
+identity cache or paint-fragment cache. Late invalidation withdraws completed
+geometry/action admission and requests owner reconstruction; failed/incomplete
+values are not painted as completed cells. A late refusal may omit body values
+for that invalidated paint before the ordinary frame is rebuilt. The original
+route remains the independent pixel/geometry/style oracle. Explicit legacy
+widget test helpers do not change normal NewManual routing.

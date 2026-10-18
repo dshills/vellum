@@ -91,6 +91,9 @@ func gridManual(t *testing.T, config ManualConfig, view func() ui.Node) (*Manual
 			t.Error(e)
 		}
 	})
+	if err := a.Do(func() { m.implementation.find("one").state.body.Scene.SetProperty(gridCellSurfaceProperty, true) }); err != nil {
+		t.Fatal(err)
+	}
 	return m, a
 }
 func gridFrame(t *testing.T, m *Manual) { t.Helper(); unitSettle(t, m) }

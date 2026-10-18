@@ -221,3 +221,13 @@ queue publication. Chord decisions use immutable input values while the render
 consumer owns mutable event fields. The owned race regression and key/chord
 matrix preserve the original ordering, keypad/NumLock/modifier semantics and
 injected timestamps. See [publication contract](patches/eventpublication/README.md).
+
+
+Stage 80 (`patches/cellsurface`) exposes the renderer/Inspector eligibility check
+used by pane-owned passive grid cell layouts. It declines custom initialization,
+unsupported renderers and debug/Inspector traversal. Original widget fallback
+preserves host input, AX, editor and foreign native ownership; late invalidation
+withdraws completed geometry before owner reconstruction. See the
+[patch contract](patches/cellsurface/README.md) and the root
+`docs/reports/macos-grid-cell-surface/README.md` for measured and final-source
+verification scopes. Original frame and allocation budgets remain unchanged.

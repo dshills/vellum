@@ -1330,3 +1330,22 @@ p95 is lower in all twenty pairs, with median paired reductions of about
 4 ms p95; eight meet 6 ms p99. These are scoped workload observations;
 P4/P6/P9/P11, broader performance/memory/endurance, physical/human, current
 SDK closure and release/distribution remain open.
+
+
+## Managed grid body-layout checkpoint
+
+The [cell-surface report](../docs/reports/macos-grid-cell-surface/README.md)
+records a supported current-projection value route, original widget fallback,
+exact original pixels/geometry across five DPI values, routed input/AX stale
+refusal and lifecycle coverage. Headers, input owner, accessibility and native
+editing retain their existing boundaries. Stage0080 exposes only the internal
+Core renderer/Inspector eligibility hook. Normal NewManual uses the same route
+as native; legacy widget-specific tests explicitly select their original oracle.
+
+The private prototype's five ordinary pairs each mode improve median run-p95
+CPU 5.929751→4.811373 ms and GPU 5.022791→4.249374 ms, 5/5 pairs each. P99/terminal
+heap guards pass, while process allocation p50 rises 15.21%/10.17%. Every run-p95
+still fails 4 ms. Corrected-source native CPU/GPU functional checks remain separate
+from that measured overlay. No full table/tree/UI/resource/physical-input or Mac
+completion gate closes. Full current-source matrix and allocation attribution
+remain required before M3/M4 acceptance.

@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "source_base": "410a98cf5939618d11f6d326836a245782e54c46",
+  "implementation": "Current-projection pane-owned grid body layouts; existing public API and original native-widget fallback. Stage0080 internal Core admission helper.",
+  "files": {
+    "docs/reports/macos-grid-cell-surface/README.md": "853b37c6f9d0b139bcee22082706c6842209c43f7dc38218915d471de4cae875",
+    "drivers/cogent/grid.go": "965eb2009b29e4f7369732ef7ef52f7799f3ee3aa42b76390b365a14bc6ee6e4",
+    "drivers/cogent/grid_contract_test.go": "e78ec7999ac512b131a69670201029fcf294fbc914b6f51417a292a34f102668",
+    "drivers/cogent/grid_geometry.go": "423cae1188399aad80369b7ed37ceb43984eb420c41efdc3f3fab2a6abf3339a",
+    "drivers/cogent/grid_intrinsic_size_offscreen_test.go": "9e19845398a5dd1e4ab3c71e71940659104998e9922ac72bbe06944cb7150c0f",
+    "drivers/cogent/grid_offscreen_test.go": "836dbaa77bcc192201371482c416aab731c572e52ed5b97ab98ab322b10ea56b",
+    "drivers/cogent/grid_scroll.go": "b32b57e5cc45a28dd720dfe21ee1a47725eecca7374828be1cf0cf0175edcc20",
+    "drivers/cogent/grid_surface.go": "d0ca3a99a1dbf3f9a0725e8f669c093e3c7a595f171c19b5c1fea000ccd07a47",
+    "drivers/cogent/grid_surface_offscreen_test.go": "c9ebe094de3ae2b0fcd814f9e5becc2ab01c1528450efc1e1f82427d111674ec",
+    "drivers/cogent/native/README.md": "8d882c5510e6f2a110146d5574eb3ba9fe82a626ab1963579388158f8fe17856",
+    "drivers/cogent/native/dependencies.json": "e112272c6eae961b155409b14f60fa029aeb3e2e31c68b3c0ffb5c6f40a380f2",
+    "drivers/cogent/native/patches/cellsurface/0080-passive-text-surface-admission.patch": "125b4774dfa44722b93d8f10784de99617182c85986d02ad86c9ac95894fd548",
+    "drivers/cogent/native/patches/cellsurface/README.md": "10824c3c6b919e51765aa4504550813e569a31451a0a2900630401754d89a1e7",
+    "drivers/cogent/native/patches/cellsurface/original-hashes.json": "402676002a2a3ffa8427fe239ef3f6287786fecc74414c8162f21156ed4a0496",
+    "drivers/cogent/native/patches/cellsurface/output-hashes.json": "87de9a6f8e5335adcfeed1bd09e0348225fa74b5fce54cce35e531d1da802b28",
+    "drivers/cogent/prepare_test.py": "b2c89a1133c749ad66bf78814e5cc0396e4ccb8b3b5e5dcf0376afb5e7fee2b3",
+    "specs/grid-performance.md": "ec5a2f1d15fa23e1ece6703b54809b739f838f232da15fc11edfa14525883925",
+    "specs/macos-completion.md": "2dcda4ee8b216131fbb3db8eecb17d42f4d2ede44718c6730853c85e5a851d99",
+    "specs/macos-delivery.md": "7fb1a64451c9193e10255f51af18d822264967a96c250e7218f281c0cd5a237a"
+  },
+  "archive": {
+    "bytes": 2716993,
+    "sha256": "f1587a70896a6b94ea7b1d9323060c0ac8d91027cc8c406f483f4b713a79acef",
+    "members": 639,
+    "expanded_bytes": 13940914,
+    "manifest_sha256": "1a5d5bba386d7f2d031dfbe2f78ac5462f126117b65e5b6d19be681cd100d5af",
+    "validated_every_member": true,
+    "file": "records.tar.gz"
+  },
+  "reviews": {
+    "prototype_source": {
+      "record": "internal-source-review-v7.json",
+      "sha256": "2e97d37878e1ce860f4f68d223f43dba069faebfa35a11ede042e3f62c3bb5c1"
+    },
+    "prototype_results": {
+      "record": "internal-results-review.json",
+      "sha256": "49168579e56ef1027bb4d2d7fce98dfc6783fb84165e837c96006e02008bd723"
+    },
+    "integration_source": {
+      "record": "internal-integration-source-review-v2.json",
+      "sha256": "7c407a086084ec77ae1b4a9c8aa57587323e98dd1492576ec1a5f06fdab480ab"
+    },
+    "pre_prism": {
+      "record": "internal-pre-prism-review.json",
+      "sha256": "4f9253bda455bde50e270f42d3a915cb3a24b59d100e466ce6606ce601031f1a"
+    },
+    "final": {
+      "record": "internal-final-review.json",
+      "sha256": "db44d6c3e4e3ec2768284472003b8000a4dfcb670bd7a24c37671222b6613b72"
+    }
+  },
+  "checks": {
+    "integrated-driver-v3": {
+      "record": "integrated-driver-v3.json",
+      "sha256": "36164a9ffe5427ffe1fcfa1ed97f72231c4857bbbbcc4e790f35cdd069f5b526",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-example-v3": {
+      "record": "integrated-example-v3.json",
+      "sha256": "e8ed5b42850c18b2eafb478947f3a2044ce1d7a9763b5bacdc9cff2d3119be71",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-vet-v3": {
+      "record": "integrated-vet-v3.json",
+      "sha256": "71cd3ba64ff5cd25fcf99952308bb8fc33acc74da548c502425e53c920a77f58",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-build-v3": {
+      "record": "integrated-build-v3.json",
+      "sha256": "9d96f81027f622e0dd469f4be821b0dc92b2eaf22d44f2e45307d7a6ce43432a",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-diag-build-v2": {
+      "record": "integrated-diag-build-v2.json",
+      "sha256": "107c04452c2facbffdd02148d4c8fa8caa724d833d99937f39db071040664948",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-core-v1": {
+      "record": "integrated-core-v1.json",
+      "sha256": "e6ed43905d650676320b983c79a066b3d2f0da71b10eeaed4866c2552170766c",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-prepare-v1": {
+      "record": "integrated-prepare-v1.json",
+      "sha256": "3c7156ae93b7516eb0feec2d550146170f4a7fc2db51d66f68721b5d8a091802",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-prepare-tests-v1": {
+      "record": "integrated-prepare-tests-v1.json",
+      "sha256": "348dfb91612224ce9159ba292ab46ce76e7d7cf17eae080dc90b51ca3eea4513",
+      "exit_code": 0,
+      "group_absent": true
+    },
+    "integrated-focused-v6": {
+      "record": "integrated-focused-v6.json",
+      "sha256": "7280b9c464a19e5c115dd530c87dacd01d13c2cb477719280f707799ab35c3f1",
+      "exit_code": 0,
+      "group_absent": true
+    }
+  },
+  "prism": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "files": 19,
+    "bytes": 68290,
+    "complete": true,
+    "raw_exit_code": 1,
+    "raw_counts": {
+      "low": 0,
+      "medium": 1,
+      "high": 0
+    },
+    "finding_id": "83b8ecc7c1fee708",
+    "disposition": "Refuted existing complete-style invalidation; new race regression passes, comparison-disabled control rejects all three context changes.",
+    "record": "prism.json",
+    "sha256": "2317b60ff7f2863fc272686f026243b84f39c50d4f8f4d77bafa91ab76e40f8d",
+    "disposition_record": "prism-disposition.json",
+    "disposition_sha256": "9759e40caa449056413d9a2d17105d9fa81e097959f67d6fa058b0d1e1216a51",
+    "production_delta_after_provider": false,
+    "post_provider_test_delta": "TestGridCellSurfaceResolvedContextInvalidatesWithoutDirtyFlag only; initial enum-fixture compile error preserved, corrected focused-v6 passes.",
+    "discarded": 0,
+    "suppressed": 0
+  },
+  "prepared": {
+    "result": "PASS_EXACT_STAGE0080_PREPARED_CORRESPONDENCE",
+    "sdk_prepared_files": 6260,
+    "isolated_prepared_files": 6261,
+    "isolated_prepared_sha256": "0374c940c2f26205b961be34383f6a0fd882a2c73a6c6bcf4657da93dcab2496",
+    "differences": {
+      "upstream/core/passive_text_batch.go": {
+        "before": "73b2aa31d0dada4eb2ced87decbc6236c1faab5c15e1a3e0dd1a3c812b544532",
+        "after": "bb706584e4c83aee8dd3de42fe3688d6a62492c588f1087c8c564e08a5ee3837"
+      },
+      "upstream/core/passive_text_surface_test.go": {
+        "before": null,
+        "after": "7a19c21b87b9e66b12e17a78d544e46a56f7efc4c5357ea45309593e84d21372"
+      }
+    },
+    "retained_sdk_changed": false
+  },
+  "identity": {
+    "retained_sdk_commit": "abe67c625a498d27b78f9719e6038cc1d6c23e88",
+    "retained_sdk_stage": 79,
+    "retained_sdk_payload_files": 7879,
+    "minimum_go": "1.25.6",
+    "sdk_changed": false,
+    "installed_source_manifest": "integration-installed-v4.json",
+    "installed_source_manifest_sha256": "e80c77ac6c7e570185d5d37ccbddc4e8cef1ed813b20161057c2bae5d499ac7a",
+    "native_final_source_manifest": "integration-installed-v3.json",
+    "native_final_source_manifest_sha256": "a491cd3fc3a2b0284e5a095079b80f6b2955a418f3a12b3de6b360a3dd6d66fa",
+    "only_source_delta_after_native": "Existing test file; production unchanged."
+  },
+  "qualification": {
+    "prototype_ordinary_samples": 2400,
+    "pairs_each_cpu_gpu": 5,
+    "cpu_median_run_p95_ms": [
+      5.929751,
+      4.811373
+    ],
+    "gpu_median_run_p95_ms": [
+      5.022791,
+      4.249374
+    ],
+    "improved_pairs_each": 5,
+    "prototype_adoption_pass": true,
+    "all20_p95_fail_4ms": true,
+    "process_allocation_p50_increase_percent": {
+      "cpu": 15.21,
+      "gpu": 10.17
+    },
+    "corrected_native_functional_frames": {
+      "cpu": 120,
+      "gpu": 120
+    },
+    "integrated_ordinary_timing_adopted": false,
+    "physical_display_transition_proved": false,
+    "closed_mac_gates": [],
+    "next": "Full current-source table/tree/general-UI matrix and allocation attribution; original performance/resource/physical-input/distribution targets unchanged."
+  },
+  "scope": "No public push, release, tag, signing, notarization, OS settings or physical-input operation. Native scopes are sealed and every owned group is absent. Archive is the completed evidence snapshot before package/commit/canonical-prepare transaction receipts."
+}

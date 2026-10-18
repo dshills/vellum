@@ -1,0 +1,68 @@
+--- a/core/passive_text_batch.go
++++ b/core/passive_text_batch.go
+@@ -60,3 +60,13 @@
+ 	fr.EndRender()
+ 	return true
+ }
++
++// PassiveTextSurfaceAllowed reports whether a managed passive text surface can
++// replace native leaf traversal without losing renderer or Inspector behavior.
++func (sc *Scene) PassiveTextSurfaceAllowed() bool {
++	if sc == nil || sc.WidgetInit != nil || DebugSettings.RenderTrace || sc.renderBBoxes || sc.selectedWidget != nil {
++		return false
++	}
++	capability, ok := sc.Renderer.(render.TextBatchRenderer)
++	return ok && capability.SupportsTextBatch()
++}
+--- /dev/null
++++ b/core/passive_text_surface_test.go
+@@ -0,0 +1,49 @@
++// Copyright (c) 2026, Davin Hills. SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/math32"
++	"cogentcore.org/core/paint/render"
++	"cogentcore.org/core/paint/renderers/rasterx"
++	"testing"
++)
++
++type surfaceRendererWithoutBatch struct{ render.Renderer }
++
++func TestPassiveTextSurfaceAdmission(t *testing.T) {
++	var absent *Scene
++	if absent.PassiveTextSurfaceAllowed() {
++		t.Fatal("nil scene admitted")
++	}
++	sc := &Scene{Renderer: rasterx.New(math32.Vec2(20, 20))}
++	if !sc.PassiveTextSurfaceAllowed() {
++		t.Fatal("ordinary rasterx declined")
++	}
++	original := sc.Renderer
++	sc.Renderer = surfaceRendererWithoutBatch{original}
++	if sc.PassiveTextSurfaceAllowed() {
++		t.Fatal("renderer without capability admitted")
++	}
++	sc.Renderer = original
++	sc.WidgetInit = func(Widget) {}
++	if sc.PassiveTextSurfaceAllowed() {
++		t.Fatal("custom initialization admitted")
++	}
++	sc.WidgetInit = nil
++	sc.renderBBoxes = true
++	if sc.PassiveTextSurfaceAllowed() {
++		t.Fatal("bounding-box inspector admitted")
++	}
++	sc.renderBBoxes = false
++	sc.selectedWidget = &Text{}
++	if sc.PassiveTextSurfaceAllowed() {
++		t.Fatal("selected inspector widget admitted")
++	}
++	sc.selectedWidget = nil
++	before := DebugSettings.RenderTrace
++	DebugSettings.RenderTrace = true
++	defer func() { DebugSettings.RenderTrace = before }()
++	if sc.PassiveTextSurfaceAllowed() {
++		t.Fatal("debug render tracing admitted")
++	}
++}

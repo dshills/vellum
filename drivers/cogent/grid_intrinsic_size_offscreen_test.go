@@ -147,6 +147,9 @@ func TestGridIntrinsicSizeMatchesFullLayout(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
+				if err = a.Do(func() { m.implementation.find("one").state.body.Scene.SetProperty(gridCellSurfaceProperty, true) }); err != nil {
+					t.Fatal(err)
+				} // legacy intrinsic widget oracle
 				t.Cleanup(func() {
 					if e := m.Close(testContext); e != nil {
 						t.Error(e)
