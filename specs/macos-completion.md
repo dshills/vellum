@@ -1446,5 +1446,25 @@ physical/pixels/M2/M5/M3–M7 remain open with unchanged thresholds.
 
 The structural native prefix above predates the subsequent Prism tab activation
 and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
-complete driver/gallery race suites, but have not received a new native run.
-They retain the failed scope and do not close the full structural/native gate.
+complete driver-root/gallery race suites. At that prior checkpoint they had not
+received a new native run. The failed diagnostic attempt below now exercises
+those fixes but does not complete structural qualification. Both failed scopes
+remain sealed and the full structural/native gate stays open.
+
+
+### Measured acquisition checkpoint
+
+The [acquisition diagnostics result](../docs/reports/macos-acquisition-diagnostics/README.md)
+adds measured-only actual source/stage/status/attempt detail without changing
+ordinary retry/release behavior or strict completed-frame criteria. A distinct
+native50/42 scope fails after16 inputs/15 source-asserted observations with
+actual `occluded(196609)` on one acquisition attempt. Cleanup and separate whole
+post-failure boundaries pass; full native validation remains open. This result
+does not identify the older failure's cause. Both scopes remain sealed.
+The new style-aware oracle has separate public Manual160/162DPI and41 synthetic
+controls, with no complete native oracle pass. Complete driver-root (`.`)/gallery race, focused
+GPU/Core regressions, build, prepare and affected-package vet pass; default Core
+vet retains12 exact baseline diagnostics. Next implement bounded visibility-aware
+Frame scheduling and deterministic hidden/occluded/visible/cancel coverage before
+a distinct native admission. Do not fabricate completion or spin on acquisition.
+Full M2/M5 and M3–M7 remain open; performance targets and release gates are unchanged.

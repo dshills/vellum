@@ -1,0 +1,23 @@
+{
+  "members": 138,
+  "expanded_bytes": 7465261,
+  "archive_bytes": 2447297,
+  "archive_sha256": "c86538ecf05897994aca43034512ff7afad8bdd4d50db1b01c7a1a9c3d806318",
+  "manifest_sha256": "f226c3fc36df508ca06b9965b0296a663fa91da86b6341881fe58ef2231f65ec",
+  "binaries_included": false,
+  "native_result": "FAILED16/15 occluded196609; full50/42 open",
+  "native_independent_validation_complete": false,
+  "physical_input_verified": false,
+  "full_mac_complete": false,
+  "provider": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "complete": true,
+    "cli_exit_code": 1,
+    "retained_findings": 1,
+    "discarded_comments": 1,
+    "internal_disposition_approved": true,
+    "disposition": "Retained repeated-acquire/later-failure claim refuted by exact single-callback/nonnil-error paths; discarded swallowed-view-error claim refuted. Direct Surface.TryCreateView failure/nil-view injection remains a limited test-coverage gap."
+  }
+}

@@ -848,6 +848,17 @@
               "sha256": "d840e9fa4b3d41bf175d9071996c866bb2a17a52f5c258bb7e3fc98d39f1afd6"
             }
           ]
+        },
+        {
+          "origin": "drivers/cogent/native/patches/acquisitionoutcomes",
+          "inputs": "native/patches/acquisitionoutcomes/original-hashes.json",
+          "outputs": "native/patches/acquisitionoutcomes/output-hashes.json",
+          "patches": [
+            {
+              "file": "native/patches/acquisitionoutcomes/0085-measured-acquisition-outcomes.patch",
+              "sha256": "6da93f86a652e1bc01111e39ef3e2b2d3a67a67a14c8f894797309ccb513e24c"
+            }
+          ]
         }
       ]
     },

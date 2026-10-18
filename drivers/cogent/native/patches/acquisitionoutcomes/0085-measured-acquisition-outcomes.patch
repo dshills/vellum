@@ -1,0 +1,560 @@
+--- /dev/null
++++ b/gpu/surface_acquisition.go
+@@ -0,0 +1,101 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpu
++
++import (
++	"fmt"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++type AcquisitionSource uint8
++
++const (
++	AcquisitionUnknown AcquisitionSource = iota
++	AcquisitionSurface
++	AcquisitionRenderTexture
++)
++
++type AcquisitionStage uint8
++
++const (
++	AcquisitionUnrecorded AcquisitionStage = iota
++	AcquisitionBackendError
++	AcquisitionUnavailable
++	AcquisitionMissingTexture
++	AcquisitionTextureReady
++	AcquisitionViewError
++	AcquisitionViewReady
++)
++
++// AcquisitionOutcome is a detached value for one measured acquisition. It owns
++// no native handles, callbacks, strings, history or persistent per-surface state.
++// Surface acquisition makes at most two attempts; first/last preserve both.
++type AcquisitionOutcome struct {
++	Source                  AcquisitionSource
++	Stage                   AcquisitionStage
++	Attempts                uint8
++	FirstStatus, LastStatus wgpu.SurfaceGetCurrentTextureStatus
++}
++
++func (o AcquisitionOutcome) Description() string {
++	source := "unknown"
++	switch o.Source {
++	case AcquisitionSurface:
++		source = "surface"
++	case AcquisitionRenderTexture:
++		source = "render-texture"
++	}
++	stage := "unrecorded"
++	switch o.Stage {
++	case AcquisitionBackendError:
++		stage = "backend-error"
++	case AcquisitionUnavailable:
++		stage = "unavailable"
++	case AcquisitionMissingTexture:
++		stage = "missing-texture"
++	case AcquisitionTextureReady:
++		stage = "texture-ready"
++	case AcquisitionViewError:
++		stage = "view-error"
++	case AcquisitionViewReady:
++		stage = "view-ready"
++	}
++	if o.Attempts == 0 {
++		return fmt.Sprintf("source=%s stage=%s attempts=0 statuses=unrecorded", source, stage)
++	}
++	status := func(s wgpu.SurfaceGetCurrentTextureStatus) string {
++		name := s.String()
++		if name == "" {
++			name = "unknown"
++		}
++		return fmt.Sprintf("%s(%d)", name, uint32(s))
++	}
++	return fmt.Sprintf("source=%s stage=%s attempts=%d first=%s last=%s", source, stage, o.Attempts, status(o.FirstStatus), status(o.LastStatus))
++}
++
++// This observes the existing acquisition implementation, without changing its
++// yield, retry, configure or failed-handle release decisions. Only the measured
++// caller uses it; the ordinary acquisition path remains unchanged.
++func acquireSurfaceFrameOutcomeOwned(acquire func() (wgpu.SurfaceTexture, error), configure func(), release func(*wgpu.Texture)) (wgpu.SurfaceTexture, AcquisitionOutcome, error) {
++	outcome := AcquisitionOutcome{Source: AcquisitionSurface}
++	frame, err := acquireSurfaceFrameOwned(func() (wgpu.SurfaceTexture, error) {
++		frame, err := acquire()
++		outcome.Attempts++
++		outcome.LastStatus = frame.Status
++		if outcome.Attempts == 1 {
++			outcome.FirstStatus = frame.Status
++		}
++		return frame, err
++	}, configure, release)
++	switch {
++	case err != nil:
++		outcome.Stage = AcquisitionBackendError
++	case !frame.IsStatusSuccess():
++		outcome.Stage = AcquisitionUnavailable
++	case frame.Texture == nil:
++		outcome.Stage = AcquisitionMissingTexture
++	default:
++		outcome.Stage = AcquisitionTextureReady
++	}
++	return frame, outcome, err
++}
+--- /dev/null
++++ b/gpu/surface_acquisition_test.go
+@@ -0,0 +1,120 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpu
++
++import (
++	"errors"
++	"fmt"
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func TestVellumMeasuredAcquisitionMatchesOrdinaryYieldRecoveryAndRelease(t *testing.T) {
++	type step struct {
++		status        wgpu.SurfaceGetCurrentTextureStatus
++		texture, fail bool
++	}
++	lost, outdated, optimal := wgpu.SurfaceGetCurrentTextureStatusLost, wgpu.SurfaceGetCurrentTextureStatusOutdated, wgpu.SurfaceGetCurrentTextureStatusSuccessOptimal
++	for _, c := range []struct {
++		name  string
++		steps []step
++		stage AcquisitionStage
++	}{
++		{"occluded", []step{{status: wgpu.SurfaceGetCurrentTextureStatusOccluded, texture: true}}, AcquisitionUnavailable},
++		{"timeout", []step{{status: wgpu.SurfaceGetCurrentTextureStatusTimeout}}, AcquisitionUnavailable},
++		{"status-error", []step{{status: wgpu.SurfaceGetCurrentTextureStatusError}}, AcquisitionUnavailable},
++		{"unknown", []step{{status: wgpu.SurfaceGetCurrentTextureStatus(0xffffffff)}}, AcquisitionUnavailable},
++		{"lost-exhausted", []step{{status: lost, texture: true}, {status: lost, texture: true}}, AcquisitionUnavailable},
++		{"outdated-lost", []step{{status: outdated}, {status: lost}}, AcquisitionUnavailable},
++		{"lost-timeout", []step{{status: lost}, {status: wgpu.SurfaceGetCurrentTextureStatusTimeout}}, AcquisitionUnavailable},
++		{"recovered", []step{{status: outdated, texture: true}, {status: optimal, texture: true}}, AcquisitionTextureReady},
++		{"recovered-null", []step{{status: lost}, {status: optimal}}, AcquisitionMissingTexture},
++		{"success-null", []step{{status: optimal}}, AcquisitionMissingTexture},
++		{"suboptimal", []step{{status: wgpu.SurfaceGetCurrentTextureStatusSuccessSuboptimal, texture: true}}, AcquisitionTextureReady},
++		{"backend-partial", []step{{status: optimal, texture: true, fail: true}}, AcquisitionBackendError},
++		{"retry-backend-partial", []step{{status: lost, texture: true}, {status: optimal, texture: true, fail: true}}, AcquisitionBackendError},
++	} {
++		t.Run(c.name, func(t *testing.T) {
++			failure := errors.New("injected acquisition error")
++			var ordinaryEvents []string
++			var ordinaryStatus wgpu.SurfaceGetCurrentTextureStatus
++			var ordinaryTexture, ordinaryError bool
++			for _, measured := range []bool{false, true} {
++				calls := 0
++				var events []string
++				acquire := func() (wgpu.SurfaceTexture, error) {
++					if calls >= len(c.steps) {
++						t.Fatal("extra/polling acquisition")
++					}
++					v := c.steps[calls]
++					calls++
++					events = append(events, fmt.Sprint("acquire:", uint32(v.status)))
++					f := wgpu.SurfaceTexture{Status: v.status}
++					if v.texture {
++						f.Texture = &wgpu.Texture{}
++					}
++					if v.fail {
++						return f, failure
++					}
++					return f, nil
++				}
++				configure := func() { events = append(events, "configure") }
++				release := func(texture *wgpu.Texture) {
++					if texture == nil {
++						t.Fatal("nil release")
++					}
++					events = append(events, "release")
++				}
++				var f wgpu.SurfaceTexture
++				var err error
++				if measured {
++					var outcome AcquisitionOutcome
++					f, outcome, err = acquireSurfaceFrameOutcomeOwned(acquire, configure, release)
++					if outcome.Source != AcquisitionSurface || outcome.Stage != c.stage || int(outcome.Attempts) != len(c.steps) || outcome.FirstStatus != c.steps[0].status || outcome.LastStatus != c.steps[len(c.steps)-1].status {
++						t.Fatalf("incorrect detached actual outcome: %+v", outcome)
++					}
++					if !reflect.DeepEqual(events, ordinaryEvents) || f.Status != ordinaryStatus || (f.Texture != nil) != ordinaryTexture || (err != nil) != ordinaryError {
++						t.Fatal("measurement changed ordinary behavior", events, ordinaryEvents, err)
++					}
++				} else {
++					f, err = acquireSurfaceFrameOwned(acquire, configure, release)
++					ordinaryEvents = append([]string(nil), events...)
++					ordinaryStatus = f.Status
++					ordinaryTexture = f.Texture != nil
++					ordinaryError = err != nil
++				}
++				if calls != len(c.steps) || err != nil && !errors.Is(err, failure) {
++					t.Fatal("attempt bound/error identity", calls, err)
++				}
++				// Explicit release/configuration order, independent of the comparison above.
++				var want []string
++				for i, v := range c.steps {
++					want = append(want, fmt.Sprint("acquire:", uint32(v.status)))
++					success := v.status == optimal || v.status == wgpu.SurfaceGetCurrentTextureStatusSuccessSuboptimal
++					if v.texture && (v.fail || !success) {
++						want = append(want, "release")
++					}
++					if i == 0 && !v.fail && (v.status == lost || v.status == outdated) {
++						want = append(want, "configure")
++					}
++				}
++				if !reflect.DeepEqual(events, want) {
++					t.Fatal("wrong release/configuration protocol", events, want)
++				}
++			}
++		})
++	}
++}
++func TestVellumAcquisitionDescriptionIsBoundedAndDoesNotInventStatus(t *testing.T) {
++	unknown := (AcquisitionOutcome{}).Description()
++	if !strings.Contains(unknown, "attempts=0 statuses=unrecorded") || strings.Contains(unknown, "first=") {
++		t.Fatal("invented legacy status", unknown)
++	}
++	o := AcquisitionOutcome{Source: AcquisitionSource(255), Stage: AcquisitionStage(255), Attempts: 255, FirstStatus: wgpu.SurfaceGetCurrentTextureStatus(0xffffffff), LastStatus: wgpu.SurfaceGetCurrentTextureStatus(0xfffffffe)}
++	s := o.Description()
++	if len(s) > 256 || !strings.Contains(s, "unknown(4294967295)") || !strings.Contains(s, "unknown(4294967294)") {
++		t.Fatal("unbounded/lost unknown status", s)
++	}
++}
+--- a/gpu/surface_timing.go
++++ b/gpu/surface_timing.go
+@@ -12,28 +12,36 @@
+ // Only waiting for ownership and the backend acquisition calls are excluded.
+ // Reconfiguration, status checks and texture view creation remain UI work.
+ func (sf *Surface) GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error) {
++	view, elapsed, _, err := sf.GetCurrentTextureMeasuredWithOutcome()
++	return view, elapsed, err
++}
++
++// GetCurrentTextureMeasuredWithOutcome adds detached acquisition evidence without
++// changing the legacy measured method's return or lock ownership conventions.
++func (sf *Surface) GetCurrentTextureMeasuredWithOutcome() (*wgpu.TextureView, int64, AcquisitionOutcome, error) {
+ 	start := time.Now()
+ 	sf.Lock()
+ 	acquireNS := time.Since(start).Nanoseconds()
+-	stexture, err := acquireSurfaceFrame(func() (wgpu.SurfaceTexture, error) {
++	stexture, outcome, err := acquireSurfaceFrameOutcomeOwned(func() (wgpu.SurfaceTexture, error) {
+ 		start := time.Now()
+ 		frame, err := sf.surface.TryGetCurrentTexture()
+ 		acquireNS += time.Since(start).Nanoseconds()
+ 		return frame, err
+-	}, sf.Config)
++	}, sf.Config, func(texture *wgpu.Texture) { texture.Release() })
+ 	if errors.Log(err) != nil {
+ 		sf.Unlock()
+-		return nil, acquireNS, err
++		return nil, acquireNS, outcome, err
+ 	}
+ 	texture, ok := stexture.Get()
+ 	if !ok || texture == nil {
+ 		sf.Unlock()
+-		return nil, acquireNS, nil
++		return nil, acquireNS, outcome, nil
+ 	}
+ 	view, err := texture.TryCreateView(&wgpu.TextureViewDescriptor{
+ 		MipLevelCount: texture.GetMipLevelCount(), ArrayLayerCount: texture.GetDepthOrArrayLayers(), Format: sf.Format.Format,
+ 	})
+ 	if err != nil || view == nil {
++		outcome.Stage = AcquisitionViewError
+ 		if view != nil {
+ 			view.Release()
+ 		}
+@@ -42,10 +50,11 @@
+ 		if err == nil {
+ 			err = fmt.Errorf("gpu: texture view factory returned nil without error")
+ 		}
+-		return nil, acquireNS, err
++		return nil, acquireNS, outcome, err
+ 	}
+ 	sf.frame = surfaceFrame{view: view, texture: texture}
+-	return view, acquireNS, nil
++	outcome.Stage = AcquisitionViewReady
++	return view, acquireNS, outcome, nil
+ }
+ 
+ // A render texture has no surface acquisition or presentation wait.
+@@ -55,3 +64,15 @@
+ }
+ func (rt *RenderTexture) AbortCurrentTexture()   {}
+ func (rt *RenderTexture) PresentMeasured() int64 { return 0 }
++
++// Offscreen textures have no surface attempts/statuses; never invent them.
++func (rt *RenderTexture) GetCurrentTextureMeasuredWithOutcome() (*wgpu.TextureView, int64, AcquisitionOutcome, error) {
++	view, err := rt.GetCurrentTexture()
++	outcome := AcquisitionOutcome{Source: AcquisitionRenderTexture, Stage: AcquisitionViewReady}
++	if err != nil {
++		outcome.Stage = AcquisitionViewError
++	} else if view == nil {
++		outcome.Stage = AcquisitionUnavailable
++	}
++	return view, 0, outcome, err
++}
+--- a/gpu/gsystem_timing.go
++++ b/gpu/gsystem_timing.go
+@@ -10,20 +10,38 @@
+ // separated from encoder creation. Only the renderer's acquisition wait and
+ // acquisition lock wait are excluded; reconfiguration and view work are charged.
+ func (sy *GraphicsSystem) BeginRenderPassMeasured() (*wgpu.RenderPassEncoder, int64, error) {
++	pass, elapsed, _, err := sy.BeginRenderPassMeasuredWithOutcome()
++	return pass, elapsed, err
++}
++
++// BeginRenderPassMeasuredWithOutcome preserves the existing measured renderer
++// contract and optionally carries a detached outcome from its actual call.
++// Legacy measured renderers report unrecorded detail, never guessed statuses.
++func (sy *GraphicsSystem) BeginRenderPassMeasuredWithOutcome() (*wgpu.RenderPassEncoder, int64, AcquisitionOutcome, error) {
+ 	measured, ok := sy.Renderer.(interface {
+ 		GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error)
+ 		PresentMeasured() int64
+ 	})
+ 	if !ok {
+-		return nil, 0, errors.New("renderer does not support measured acquisition")
++		return nil, 0, AcquisitionOutcome{}, errors.New("renderer does not support measured acquisition")
+ 	}
+ 	var acquire int64
++	var outcome AcquisitionOutcome
+ 	pass, err := sy.beginOwnedRenderPass(true, func() (*wgpu.TextureView, error) {
+-		view, elapsed, err := measured.GetCurrentTextureMeasured()
++		var view *wgpu.TextureView
++		var elapsed int64
++		var err error
++		if detailed, ok := sy.Renderer.(interface {
++			GetCurrentTextureMeasuredWithOutcome() (*wgpu.TextureView, int64, AcquisitionOutcome, error)
++		}); ok {
++			view, elapsed, outcome, err = detailed.GetCurrentTextureMeasuredWithOutcome()
++		} else {
++			view, elapsed, err = measured.GetCurrentTextureMeasured()
++		}
+ 		acquire = elapsed
+ 		return view, err
+ 	})
+-	return pass, acquire, err
++	return pass, acquire, outcome, err
+ }
+ 
+ // EndRenderPassMeasured separates the renderer present call from encoding and
+--- /dev/null
++++ b/gpu/gsystem_acquisition_test.go
+@@ -0,0 +1,71 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpu
++
++import (
++	"errors"
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"testing"
++)
++
++type legacyAcquisitionRenderer struct {
++	Renderer
++	normal, measured, aborted int
++	failure                   error
++}
++
++func (r *legacyAcquisitionRenderer) GetCurrentTexture() (*wgpu.TextureView, error) {
++	r.normal++
++	return nil, nil
++}
++func (r *legacyAcquisitionRenderer) GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error) {
++	r.measured++
++	return nil, 17, r.failure
++}
++func (r *legacyAcquisitionRenderer) PresentMeasured() int64 { panic("unsubmitted frame presented") }
++func (r *legacyAcquisitionRenderer) AbortCurrentTexture()   { r.aborted++ }
++
++type detailedAcquisitionRenderer struct {
++	*legacyAcquisitionRenderer
++	calls   int
++	outcome AcquisitionOutcome
++}
++
++func (r *detailedAcquisitionRenderer) GetCurrentTextureMeasuredWithOutcome() (*wgpu.TextureView, int64, AcquisitionOutcome, error) {
++	r.calls++
++	return nil, 19, r.outcome, r.failure
++}
++func TestVellumMeasuredPassPreservesActualOutcomeAndLegacyContract(t *testing.T) {
++	failure := errors.New("injected acquisition error")
++	for _, failed := range []bool{false, true} {
++		r := &detailedAcquisitionRenderer{legacyAcquisitionRenderer: &legacyAcquisitionRenderer{}, outcome: AcquisitionOutcome{Source: AcquisitionSurface, Stage: AcquisitionUnavailable, Attempts: 2, FirstStatus: wgpu.SurfaceGetCurrentTextureStatusLost, LastStatus: wgpu.SurfaceGetCurrentTextureStatusOccluded}}
++		if failed {
++			r.failure = failure
++			r.outcome.Stage = AcquisitionBackendError
++		}
++		sy := &GraphicsSystem{Renderer: r}
++		pass, elapsed, outcome, err := sy.BeginRenderPassMeasuredWithOutcome()
++		if pass != nil || elapsed != 19 || outcome != r.outcome || failed && !errors.Is(err, failure) || !failed && err != nil || r.calls != 1 || r.measured != 0 || r.normal != 0 || r.aborted != 0 || sy.CommandEncoder != nil {
++			t.Fatal("measured no-frame contract changed", pass, elapsed, outcome, err, r)
++		}
++		// The existing method still returns nil/no-error on unavailable acquisition.
++		pass, elapsed, err = sy.BeginRenderPassMeasured()
++		if pass != nil || elapsed != 19 || failed && !errors.Is(err, failure) || !failed && err != nil || r.calls != 2 {
++			t.Fatal("legacy measured wrapper changed", err)
++		}
++	}
++	legacy := &legacyAcquisitionRenderer{}
++	sy := &GraphicsSystem{Renderer: legacy}
++	pass, elapsed, outcome, err := sy.BeginRenderPassMeasuredWithOutcome()
++	if pass != nil || elapsed != 17 || err != nil || outcome != (AcquisitionOutcome{}) || legacy.measured != 1 {
++		t.Fatal("invented legacy outcome", outcome, err)
++	}
++	pass, err = sy.BeginRenderPass()
++	if pass != nil || err != nil || legacy.normal != 1 || legacy.measured != 1 || legacy.aborted != 0 {
++		t.Fatal("ordinary path changed", err)
++	}
++	unsupported := &GraphicsSystem{Renderer: &observedFrameRenderer{}}
++	if pass, _, outcome, err := unsupported.BeginRenderPassMeasuredWithOutcome(); pass != nil || outcome != (AcquisitionOutcome{}) || err == nil {
++		t.Fatal("unsupported measured renderer admitted")
++	}
++}
+--- a/gpu/gpudraw/system.go
++++ b/gpu/gpudraw/system.go
+@@ -127,7 +127,7 @@
+ 	var rp *wgpu.RenderPassEncoder
+ 	var err error
+ 	if timing != nil {
+-		rp, timing.AcquireNS, err = sy.BeginRenderPassMeasured()
++		rp, err = beginMeasuredPass(sy, timing)
+ 	} else {
+ 		rp, err = sy.BeginRenderPass()
+ 	}
+--- /dev/null
++++ b/gpu/gpudraw/acquisition.go
+@@ -0,0 +1,24 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpudraw
++
++import (
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/system/composer"
++	"fmt"
++	"github.com/oliverbestmann/webgpu/wgpu"
++)
++
++// Called only by the measured path. No extra acquire, retry, polling, readback,
++// wait or presentation is added. A missing pass remains an unsuccessful frame.
++func beginMeasuredPass(sy *gpu.GraphicsSystem, timing *composer.ComposeTiming) (*wgpu.RenderPassEncoder, error) {
++	pass, elapsed, outcome, err := sy.BeginRenderPassMeasuredWithOutcome()
++	timing.AcquireNS = elapsed
++	if err != nil {
++		return pass, fmt.Errorf("gpu: measured render pass failed (%s): %w", outcome.Description(), err)
++	}
++	if pass == nil {
++		timing.Failure = "gpu: measured render pass unavailable (" + outcome.Description() + ")"
++	}
++	return pass, nil
++}
+--- /dev/null
++++ b/gpu/gpudraw/acquisition_test.go
+@@ -0,0 +1,59 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package gpudraw
++
++import (
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/system/composer"
++	"errors"
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"strings"
++	"testing"
++)
++
++type unavailableMeasuredRenderer struct {
++	gpu.Renderer
++	outcome gpu.AcquisitionOutcome
++	failure error
++	calls   int
++}
++
++func (r *unavailableMeasuredRenderer) GetCurrentTextureMeasured() (*wgpu.TextureView, int64, error) {
++	panic("detailed renderer silently fell back")
++}
++func (r *unavailableMeasuredRenderer) GetCurrentTextureMeasuredWithOutcome() (*wgpu.TextureView, int64, gpu.AcquisitionOutcome, error) {
++	r.calls++
++	return nil, 23, r.outcome, r.failure
++}
++func (r *unavailableMeasuredRenderer) PresentMeasured() int64 { panic("unsubmitted frame presented") }
++func TestVellumMeasuredPassFailureCarriesAcquisitionThroughComposition(t *testing.T) {
++	sentinel := errors.New("injected backend failure")
++	for _, c := range []struct {
++		stage    gpu.AcquisitionStage
++		status   wgpu.SurfaceGetCurrentTextureStatus
++		attempts uint8
++		fail     bool
++	}{
++		{gpu.AcquisitionUnavailable, wgpu.SurfaceGetCurrentTextureStatusOccluded, 1, false},
++		{gpu.AcquisitionUnavailable, wgpu.SurfaceGetCurrentTextureStatusLost, 2, false},
++		{gpu.AcquisitionMissingTexture, wgpu.SurfaceGetCurrentTextureStatusSuccessOptimal, 1, false},
++		{gpu.AcquisitionBackendError, wgpu.SurfaceGetCurrentTextureStatusError, 2, true},
++	} {
++		r := &unavailableMeasuredRenderer{outcome: gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: c.stage, Attempts: c.attempts, FirstStatus: c.status, LastStatus: c.status}}
++		if c.fail {
++			r.failure = sentinel
++		}
++		timing := composer.ComposeTiming{Supported: true}
++		pass, err := beginMeasuredPass(&gpu.GraphicsSystem{Renderer: r}, &timing)
++		if pass != nil || r.calls != 1 || timing.AcquireNS != 23 || timing.Submitted || !timing.Supported {
++			t.Fatal("no-frame became submission or extra acquisition", timing, err)
++		}
++		if c.fail {
++			if !errors.Is(err, sentinel) || !strings.Contains(err.Error(), r.outcome.Description()) {
++				t.Fatal("error context or identity lost", err)
++			}
++		} else if err != nil || !strings.Contains(timing.Failure, r.outcome.Description()) || !strings.Contains(timing.Failure, "render pass unavailable") {
++			t.Fatal("composition lost actual acquisition", timing, err)
++		}
++	}
++}
+--- /dev/null
++++ b/core/frame_acquisition_test.go
+@@ -0,0 +1,39 @@
++// Copyright (c) 2026, Davin Hills.
++// SPDX-License-Identifier: MIT
++package core
++
++import (
++	"cogentcore.org/core/gpu"
++	"cogentcore.org/core/system/composer"
++	"github.com/oliverbestmann/webgpu/wgpu"
++	"testing"
++)
++
++func TestVellumFrameTraceAcquisitionFailurePreservesStrictCompletion(t *testing.T) {
++	for _, submitted := range []bool{false, true} {
++		trace := &FrameTrace{}
++		event := traceScroll()
++		if err := trace.Begin(5, event); err != nil {
++			t.Fatal(err)
++		}
++		tag, start := trace.startEvent(event)
++		trace.ExpectOwner(tag)
++		trace.endEvent(tag, start)
++		trace.Transition(tag, 11)
++		trace.OwnerWork(tag, 7)
++		trace.Reconciled(tag, 13)
++		if trace.startFrame() != tag {
++			t.Fatal("armed frame not started")
++		}
++		outcome := gpu.AcquisitionOutcome{Source: gpu.AcquisitionSurface, Stage: gpu.AcquisitionUnavailable, Attempts: 2, FirstStatus: wgpu.SurfaceGetCurrentTextureStatusLost, LastStatus: wgpu.SurfaceGetCurrentTextureStatusTimeout}
++		failure := "gpu: measured render pass unavailable (" + outcome.Description() + ")"
++		trace.finishFrame(tag, composer.ComposeTiming{Supported: true, Submitted: submitted, Failure: failure, AcquireNS: 29})
++		sample, ready := trace.Take()
++		if !ready || sample.Completed || sample.Failure != failure || sample.AcquireNS != 29 {
++			t.Fatal("failed acquisition was hidden or qualified", sample, ready)
++		}
++		if _, again := trace.Take(); again {
++			t.Fatal("failure sample retained after take")
++		}
++	}
++}

@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"image/color"
 	"io/fs"
 	"math"
@@ -26,6 +27,11 @@ import (
 
 // Independent public Manual routing preflight; this is not native evidence.
 func TestStructureCataloguePublicManual(t *testing.T) {
+	for _, dpi := range []float32{160, 162} {
+		t.Run(fmt.Sprintf("dpi-%g", dpi), func(t *testing.T) { testStructureCataloguePublicManual(t, dpi) })
+	}
+}
+func testStructureCataloguePublicManual(t *testing.T, dpi float32) {
 	ctx := context.Background()
 	clock, e := execution.NewManualClock(time.Unix(1730000000, 0).UTC(), 256, 256)
 	if e != nil {
@@ -37,7 +43,7 @@ func TestStructureCataloguePublicManual(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer executor.Close()
-	cfg := cogent.ManualConfig{Clock: clock, Executor: executor, OwnerBatch: 7, MaxWindows: 1, EventCapacity: 128, LogicalDPI: 160, Theme: ui.Theme{Default: ui.Style{Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255}), Background: ui.Some(color.NRGBA{R: 248, G: 248, B: 248, A: 255}), Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 16})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}}
+	cfg := cogent.ManualConfig{Clock: clock, Executor: executor, OwnerBatch: 7, MaxWindows: 1, EventCapacity: 128, LogicalDPI: dpi, Theme: ui.Theme{Default: ui.Style{Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255}), Background: ui.Some(color.NRGBA{R: 248, G: 248, B: 248, A: 255}), Typography: ui.Some(ui.Typography{Family: "Noto Sans", Size: 16})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}}
 	if e = fs.WalkDir(fonts.Default, ".", func(path string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return e
@@ -162,6 +168,7 @@ func TestStructureCataloguePublicManual(t *testing.T) {
 	heading, handle := structureID("disclosure", "details"), structureID("split", "panes")
 	draft := find("section-draft")
 	afterY := find("section-after").Bounds.Min.Y
+	normalHeights := []int{find(heading).Bounds.Dy(), find("section-draft").Bounds.Dy(), find("section-action").Bounds.Dy()}
 	focus("details")
 	send(key.CodeLeftArrow, 0)
 	if g.details || g.detailsRequests != 1 || find("section-after").Bounds.Min.Y >= afterY {
@@ -195,10 +202,24 @@ func TestStructureCataloguePublicManual(t *testing.T) {
 		t.Fatal("readonly disclosure mutated", g.structureModel())
 	}
 	setup(func() { g.detailsReadOnly = false; g.detailsDisabled = true })
+	// Disabled Core buttons drop shadow margins; the inherited-disabled field
+	// drops its reserved border. These are distinct style states, not a restore.
+	disabledHeights := []int{find(heading).Bounds.Dy(), find("section-draft").Bounds.Dy(), find("section-action").Bounds.Dy()}
+	for i, shrink := range []int{6, 2, 6} {
+		if normalHeights[i]-disabledHeights[i] != shrink {
+			t.Fatal("disabled style metric", dpi, i, normalHeights, disabledHeights)
+		}
+	}
+	if find("section-after").Bounds.Min.Y != afterY-14 {
+		t.Fatal("disabled section layout", dpi, afterY, find("section-after").Bounds)
+	}
 	if find(heading).Enabled || find("section-draft").Enabled {
 		t.Fatal("inherited disclosure disabled state")
 	}
 	setup(func() { g.detailsDisabled = false })
+	if find("section-after").Bounds.Min.Y != afterY {
+		t.Fatal("same-style enabled restoration", dpi, afterY, find("section-after").Bounds)
+	}
 	click(heading)
 	requestFocus("structure-pages")
 	send(key.CodeRightArrow, 0)

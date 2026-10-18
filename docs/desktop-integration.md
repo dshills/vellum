@@ -112,5 +112,24 @@ qualification. Ordinary tab keyboard navigation is documented in the
 
 The structural native prefix above predates the subsequent Prism tab activation
 and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
-complete driver/gallery race suites, but have not received a new native run.
-They retain the failed scope and do not close the full structural/native gate.
+complete driver-root/gallery race suites. At that prior checkpoint they had not
+received a new native run. The failed diagnostic attempt below now exercises
+those fixes but does not complete structural qualification. Both failed scopes
+remain sealed and the full structural/native gate stays open.
+
+
+### Measured acquisition failures
+
+With the prepared stage85 backend, a measured render-pass failure includes a
+detached acquisition description: source, stage, actual attempt count and first/
+last backend statuses. A surface unavailable due to occlusion may yield an error
+such as `gpu: measured render pass unavailable (source=surface stage=unavailable
+attempts=1 first=occluded(196609) last=occluded(196609))`. A successful acquisition
+does not identify the cause of any later encoder/pass failure. Backend errors
+retain their existing error identity and text with additional acquisition context.
+Legacy measured implementations may report unrecorded detail; offscreen render
+textures have no surface status/attempts. No extra acquire, poll, present, wait or
+readback is performed, and acquisition timing boundaries are unchanged. Metadata
+work counts as UI work. Supported=true, Submitted=true and no failure are still
+required for a completed Frame. Native occlusion-to-visible scheduling acceptance
+is open; see the [diagnostic checkpoint](reports/macos-acquisition-diagnostics/README.md).
