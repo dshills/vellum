@@ -564,3 +564,22 @@ pending/resumption needs an authoritative drawable-availability event that is
 not established. Continue remaining native catalogue/typed-error acceptance with
 explicit availability admission and no retry loop. M2/M5/M3–M7 and all unchanged
 performance/release gates remain open.
+
+The [media/chrome catalogue checkpoint](../docs/reports/macos-media-catalogue/README.md)
+completes 71 native Go FIFO inputs/42 observations for shared Image, Toolbar,
+StatusBar, FormGroup, Breadcrumb and ColorPicker views. Actual focus, measured
+pointer targets, overflow, accepted/rejected/disabled/stale/hidden states and
+exact callbacks pass; original window/session/process retire. Public Manual
+160/162 DPI routing and independently sampled immutable-image replacement pixels,
+full gallery race/vet/build and 13 negative validator controls pass separately.
+Initial checker/preflight failures remain preserved. This is controlled
+Go 1.25.6/GOMAXPROCS2/SDK786a native routing; physical/OS input, IME/human accessibility, native
+pixels/presentation and full M2/M5/M3–M7 stay open. No SDK refresh occurs.
+
+Prism then identifies a real undispatched-owner wait on application retirement.
+The final media runner cancels after Run and gives final close acknowledgement/
+closed-reference validation a separate 1-second context within its 6-second join.
+Two actual Application regressions discriminate the missing-cancel and canceled-
+close counterfactuals. Final gallery race/vet/build and the distinct corrected
+71-input/42-observation native case pass; both native scopes remain sealed.
+One original Anthropic Sonnet 5.5 call and independent fix reviews are retained.

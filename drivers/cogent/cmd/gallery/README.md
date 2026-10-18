@@ -94,3 +94,27 @@ The structural native prefix above predates the subsequent Prism tab activation
 and disabled-focus fixes. Those fixes pass actual Core queue/manager routing and
 complete driver/gallery race suites, but have not received a new native run.
 They retain the failed scope and do not close the full structural/native gate.
+
+## Native media and chrome catalogue
+
+```sh
+go run ./cmd/gallery -media-native-check
+```
+
+This independent 900x700 requested view reuses the ordinary images/colors pages,
+Chrome toolbar/form/status page and public Breadcrumb component. It completes 71
+Go FIFO inputs and 42 observations with exact callbacks, actual keyboard focus,
+measured pointer targets, overflow reveal and disabled/stale/hidden refusal.
+The original window closes and the session/process retires. A 90-second scenario
+deadline and 6-second worker join bound the mode; failure exits nonzero and a typed
+drawable-unavailable result stops the case without retry. It is exclusive with
+the other check/smoke flags and disables process-local geometry persistence.
+
+The controlled Go 1.25.6/GOMAXPROCS2/SDK786a native record passes. Software Manual image pixels are
+separate evidence; native pixels, physical/OS input, IME/VoiceOver, presentation
+and full Mac acceptance remain open. See the [result](../../../../docs/reports/macos-media-catalogue/README.md).
+
+After native Run returns, the media checker cancels pending scenario waits before
+joining. Its final close acknowledgement and closed-reference probe use a separate
+1-second bound, so closing the last window cannot cancel their validation. The
+final corrected native record passes; the earlier passing scope stays preserved.

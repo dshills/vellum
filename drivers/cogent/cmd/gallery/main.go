@@ -21,6 +21,8 @@ import (
 )
 
 type gallery struct {
+	mediaPage                                                                                  string
+	mediaTools, mediaLast, imageReplacements, imageFitRequests                                 int
 	detailsRequests, splitRequests, structurePageRequests, documentSelectRequests              int
 	detailsReject, detailsReadOnly, detailsDisabled, splitReject, splitReadOnly, splitDisabled bool
 	structurePage                                                                              string
@@ -62,6 +64,7 @@ type gallery struct {
 func newGallery() *gallery {
 	g := &gallery{enabled: true, details: true, selection: "basic", tab: "controls", text: "Vellum", number: 25, split: 0.35, picture: galleryImage(), imageFit: ui.ImageContain}
 	g.structurePage = "sections"
+	g.mediaPage = "chrome"
 	g.documents = []string{"sketch", "notes"}
 	g.documentSelected = "sketch"
 	g.documentText = map[string]string{"sketch": "Untitled sketch", "notes": "Working notes"}
@@ -175,39 +178,12 @@ func (g *gallery) view() ui.Node {
 		{ID: "quiet-action", Kind: ui.Button, Text: "Quiet", Appearance: ui.ButtonQuiet},
 		{ID: "tool-action", Kind: ui.Button, Icon: ui.SymbolSearch, Appearance: ui.ButtonTool, Accessibility: ui.Accessibility{Name: "Search", Help: "Compact icon-only tool"}, Activate: func() { g.focus.ID = "project-name"; g.focus.Sequence++; g.tab = "controls" }},
 	}}}, symbols.Children...)
-	images := ui.Node{ID: "images", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
-		{ID: "image-instructions", Kind: ui.Label, Text: "Immutable shared pixels. Contain shows the full image; cover crops centrally; stretch fills both axes."},
-		{ID: "image-fit", Kind: ui.SegmentedControl, SelectedID: string(g.imageFit), Accessibility: ui.Accessibility{Name: "Image fit"}, Options: []ui.Option{{ID: string(ui.ImageContain), Label: "Contain"}, {ID: string(ui.ImageCover), Label: "Cover"}, {ID: string(ui.ImageStretch), Label: "Stretch"}}, Change: func(e ui.ChangeEvent) { g.imageFit = ui.ImageFit(e.SelectedID) }},
-		{ID: "image-preview", Kind: ui.Image, Image: g.picture, Fit: g.imageFit, Text: "Three color strips, with transparency in the blue strip", Style: ui.Style{MinSize: ui.Some(ui.Size{Width: 320, Height: 160})}},
-		{ID: "image-replace", Kind: ui.Button, Text: "Replace first strip", Activate: func() {
-			patch := image.NewNRGBA(image.Rect(0, 0, 32, 32))
-			for y := range 32 {
-				for x := range 32 {
-					patch.SetNRGBA(x, y, color.NRGBA{R: 240, G: 192, A: 255})
-				}
-			}
-			source, err := g.picture.WithPatch(patch.Bounds(), patch)
-			if err != nil {
-				panic(err)
-			}
-			g.picture = source
-		}},
-	}}
-	colorsPage := ui.Node{ID: "colors", Kind: ui.Scroll, Grow: true, Children: []ui.Node{
-		g.colorPicker.View(),
-		{ID: "color-tools", Kind: ui.Toolbar, Children: []ui.Node{
-			{ID: "color-reset", Kind: ui.Button, Text: "Reset color", Activate: func() {
-				g.colorPicker.Color = color.NRGBA{R: 32, G: 96, B: 224, A: 255}
-				g.colorPicker.ValidationMessage = ""
-			}},
-			{ID: "color-disabled", Kind: ui.Checkbox, Text: "Disable color editing", Checked: g.colorPicker.Disabled, Change: func(e ui.ChangeEvent) { g.colorPicker.Disabled = e.Checked }},
-			{ID: "color-focus", Kind: ui.Button, Text: "Focus hex", Activate: func() { g.focus.ID = ui.ColorFieldID("ink", ui.ColorHex); g.focus.Sequence++ }},
-		}},
-	}}
+	images := g.imagesView()
+	colorsPage := g.colorsView()
 
 	return ui.Node{ID: "gallery", Kind: ui.Column, Grow: true, Focus: g.focus, Style: ui.Style{Padding: ui.Some(ui.UniformInsets(16)), Gap: ui.Some(float32(12))}, Children: []ui.Node{
 		{ID: "title", Kind: ui.Label, Text: "Vellum controls gallery", Style: ui.Style{Typography: ui.Some(ui.Typography{Size: 24, Weight: 600})}},
-		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "lists", Label: "Lists"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), g.listBoxView(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
+		{ID: "pages", Kind: ui.Tabs, Grow: true, SelectedID: g.tab, Options: []ui.Option{{ID: "controls", Label: "Controls"}, {ID: "split-demo", Label: "Split panes"}, {ID: "symbols", Label: "Icons and actions"}, {ID: "images", Label: "Images"}, {ID: "colors", Label: "Colors"}, {ID: "documents", Label: "Document tabs"}, {ID: "lists", Label: "Lists"}, {ID: "chrome", Label: "Chrome"}, {ID: "about", Label: "About"}}, Change: func(e ui.ChangeEvent) { g.tab = e.SelectedID }, Children: []ui.Node{controls, splitDemo, symbols, images, colorsPage, g.documentsView(), g.listBoxView(), g.chromeView(), {ID: "about", Kind: ui.Column, Children: []ui.Node{{ID: "about-text", Kind: ui.Label, Text: "Ordinary Go nodes, retained native controls, local theme values."}}}}},
 		{ID: "preferences", Kind: ui.Dialog, Text: "Preferences", Open: g.dialog, Dismiss: func() { g.dialog = false }, Children: []ui.Node{
 			{ID: "dialog-description", Kind: ui.Label, Text: "Native modal dialog with retained content. Close with Escape or the Close button."},
 			{ID: "dialog-name", Kind: ui.TextField, Text: g.text, Change: func(e ui.ChangeEvent) { g.text = e.Text }, Accessibility: ui.Accessibility{Name: "Project name in preferences"}},
@@ -226,7 +202,11 @@ func main() {
 	choices := flag.Bool("choice-native-check", false, "run bounded ordinary choices/toggles/slider native FIFO acceptance")
 	navigation := flag.Bool("navigation-native-check", false, "run bounded list and action-menu native FIFO acceptance")
 	structure := flag.Bool("structure-native-check", false, "run bounded tabs/disclosure/split/scroll native FIFO acceptance")
+	media := flag.Bool("media-native-check", false, "run bounded image/chrome/composite native FIFO acceptance")
 	flag.Parse()
+	if *media && (*structure || *navigation || *choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
+		must(errors.New("media-native-check requires its own bounded process"))
+	}
 	if *structure && (*navigation || *choices || *catalogue || *smoke || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *exit > 0) {
 		must(errors.New("structure-native-check requires its own bounded process"))
 	}
@@ -251,7 +231,7 @@ func main() {
 	if *disclosureSmoke && (*smoke || *exit > 0) {
 		must(errors.New("disclosure-smoke requires its own bounded process"))
 	}
-	if *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation || *structure {
+	if *media || *disclosureSmoke || *menuSmoke || *colorSmoke || *progressSmoke || *catalogue || *choices || *navigation || *structure {
 		core.DebugSettings.DisableWindowGeometrySaver = true
 	}
 	a, err := app.New(app.Config{})
@@ -277,11 +257,14 @@ func main() {
 	if *structure {
 		view = g.structureCatalogueView
 	}
+	if *media {
+		view = g.mediaCatalogueView
+	}
 	if *progressSmoke {
 		view = g.progressView
 	}
 	width, height := float32(720), float32(650)
-	if *choices || *navigation || *structure {
+	if *media || *choices || *navigation || *structure {
 		width, height = 900, 700
 	}
 	must(a.Open(app.Window{ID: "gallery", Title: "Vellum Controls", Width: width, Height: height, View: view}))
@@ -336,6 +319,10 @@ func main() {
 		time.AfterFunc(2200*time.Millisecond, func() { _ = a.Post(func() { g.dialog = false; a.Invalidate("gallery") }) })
 	}
 	theme := ui.Theme{Default: ui.Style{Typography: ui.Some(ui.Typography{Size: 16}), Foreground: ui.Some(color.NRGBA{R: 32, G: 36, B: 42, A: 255})}, Kinds: map[ui.Kind]ui.Style{ui.Column: {Gap: ui.Some(float32(8))}}}
+	if *media {
+		must(runMediaCatalogue(ctx, a, g, theme))
+		return
+	}
 	if *structure {
 		must(runStructureCatalogue(ctx, a, g, theme))
 		return

@@ -23,12 +23,12 @@ claim that all Mac acceptance gates have passed.
 | `Label` | `TestRetainedReconcileAndExtensionFailure`: changed public label text reaches the retained native text widget without replacing its identity | A |
 | `Button` | `TestIconsManualArtworkInputAndReplacement`: keyboard/pointer activation, completed artwork and retained identity | R |
 | `Icon` | `TestIconsManualArtworkInputAndReplacement`: bundled symbol replacement, geometry and nonempty artwork | R |
-| `Image` | `TestManagedImageManualCenteredFitAndCompletedPixels`, `TestManagedImageManualScrollClipPreservesSourceMapping`: fit, source mapping and clipped pixels | R |
+| `Image` | `TestManagedImageManualCenteredFitAndCompletedPixels`, `TestManagedImageManualScrollClipPreservesSourceMapping`: fit, source mapping and clipped pixels; native `gallery -media-native-check` checks accepted fit/replacement callbacks, role and visible geometry (native pixels separate) | R/N |
 | `Extension` | `TestPublicWorkbenchManualConsumer`: independently consumed public dock, repeated panel-local IDs and routed activation; `TestExtensionReplacementDestroysOnlyReplacedInstance`: replacement ownership | R/A |
 | `SplitPane` | `TestSplitManualKeyboardPointerGeometryAndRetainedDraft`: divider keys/drag, measured ratio and retained child editing; `gallery -structure-native-check`: native prefix through controlled keys/geometry/state; complete50/42 pending | R/N-partial |
-| `Toolbar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: overflowing tool reveal, Home/End/arrows and disabled skipping | R |
-| `StatusBar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: owner change reaches caption, semantics and completed pixels | R |
-| `FormGroup` | `TestChromeManualToolbarOverflowAndStatusUpdates`: literal caption and child focus traversal | R |
+| `Toolbar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: overflowing tool reveal, Home/End/arrows and disabled skipping; native `gallery -media-native-check` checks actual overflow reveal, End/Home, disabled skipping and one activation | R/N |
+| `StatusBar` | `TestChromeManualToolbarOverflowAndStatusUpdates`: owner change reaches caption, semantics and completed pixels; native `gallery -media-native-check` checks accepted caption after toolbar/path actions | R/N |
+| `FormGroup` | `TestChromeManualToolbarOverflowAndStatusUpdates`: literal caption and child focus traversal; native `gallery -media-native-check` checks literal caption and actual field traversal | R/N |
 | `Disclosure` | `TestDisclosureManualPointerKeyboardGeometryAndFocus`: collapse/reopen, layout release, focus and retained children; `gallery -structure-native-check`: source-asserted native prefix through focus/state; disabled style metrics differ; independent oracle incomplete | R/N-partial |
 | `Checkbox` | `TestChoiceManualQuietPointerFocusAdvancesOrdinaryControl`: measured pointer focus and Tab; `TestNativeControlsChangeRetainedCallbacksAndDisabled`: typed change and controlled state | R/A |
 | `Switch` | `TestExpandedControlsManualFrameAndInput`: focused key changes accepted boolean and completed frame | R |
@@ -52,8 +52,8 @@ claim that all Mac acceptance gates have passed.
 | `Canvas2D` | `TestPlacementActualRoutingScaledAcrossBatches`, `TestPlacementRoutedCancellationAndRetirement`: transformed placement/history, consumption and cancellation; `TestCanvasCompletedSemanticsAndSelection`: completed object geometry | R/A |
 | `DataGrid` | `TestStoredGridRoutedReplayAcrossBatches`, `TestManagedGridRowSelectionActualPointerKeysAllAndPaging`: routed stored data, selection, scrolling and completed frames | R |
 | `DataTree` | `TestManagedTreeActualGeometryAndKeyboard`, `TestManagedTreePointerDisclosureAndRetiredPress`: indexed geometry, keys/disclosure and retired presses | R |
-| Breadcrumb composite | `TestBreadcrumbManagedInputIdentityAndFrames`, `TestBreadcrumbNarrowOverflowRevealsEnabledAncestors`: stable action IDs, routed input and narrow overflow | R |
-| ColorPicker composite | `TestColorPickerManagedKeyboardReconcileAndPixels`; `TestGalleryColorPickerAcceptedInvalidRejectedAndNormalized`: byte edit/pixels and model validation | R/A |
+| Breadcrumb composite | `TestBreadcrumbManagedInputIdentityAndFrames`, `TestBreadcrumbNarrowOverflowRevealsEnabledAncestors`: stable action IDs, routed input and narrow overflow; native `gallery -media-native-check` checks accepted/rejected/disabled path, current role and stale-frame refusal | R/N |
+| ColorPicker composite | `TestColorPickerManagedKeyboardReconcileAndPixels`; `TestGalleryColorPickerAcceptedInvalidRejectedAndNormalized`: byte edit/pixels and model validation; native `gallery -media-native-check` checks byte/hex/reject/normalize/invalid/straight-alpha and disabled/hidden refusal | R/A/N |
 
 Driver scenarios are in `drivers/cogent/*_test.go`, the public consumer scenarios
 are in `examples/replay/*_test.go` and `examples/replay/workspace/*_test.go`,
@@ -174,3 +174,22 @@ pending/resumption needs an authoritative drawable-availability event that is
 not established. Continue remaining native catalogue/typed-error acceptance with
 explicit availability admission and no retry loop. M2/M5/M3–M7 and all unchanged
 performance/release gates remain open.
+
+The [media/chrome catalogue checkpoint](../docs/reports/macos-media-catalogue/README.md)
+completes 71 native Go FIFO inputs/42 observations for shared Image, Toolbar,
+StatusBar, FormGroup, Breadcrumb and ColorPicker views. Actual focus, measured
+pointer targets, overflow, accepted/rejected/disabled/stale/hidden states and
+exact callbacks pass; original window/session/process retire. Public Manual
+160/162 DPI routing and independently sampled immutable-image replacement pixels,
+full gallery race/vet/build and 13 negative validator controls pass separately.
+Initial checker/preflight failures remain preserved. This is controlled
+Go 1.25.6/GOMAXPROCS2/SDK786a native routing; physical/OS input, IME/human accessibility, native
+pixels/presentation and full M2/M5/M3–M7 stay open. No SDK refresh occurs.
+
+Prism then identifies a real undispatched-owner wait on application retirement.
+The final media runner cancels after Run and gives final close acknowledgement/
+closed-reference validation a separate 1-second context within its 6-second join.
+Two actual Application regressions discriminate the missing-cancel and canceled-
+close counterfactuals. Final gallery race/vet/build and the distinct corrected
+71-input/42-observation native case pass; both native scopes remain sealed.
+One original Anthropic Sonnet 5.5 call and independent fix reviews are retained.
