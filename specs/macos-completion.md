@@ -56,7 +56,13 @@ meet 6 ms; seven p95s meet 4 ms, while thirty-three fail. Fixed-height
 million-row GPU is the only case meeting both targets in all five runs. The
 full M3 gate remains open. Separate actual route diagnostics and sampled
 allocation captures identify the per-cell render-style copy as the next concrete
-allocation site to address. The initial intermediate-composition validator
+allocation site. The [render-local style experiment](../docs/reports/macos-grid-paint/README.md)
+subsequently reduces allocation but fails its frozen latency bar: CPU/GPU
+median p95 gains are 0.058/0.150 ms, CPU improves only 3/5 pairs and its median
+p99 worsens. All twenty ordinary p95s exceed 4 ms. No runtime change is adopted;
+the 26-process scope seals with all 36 conditional extension cases unexecuted.
+Next close full native M2 workspace integration, then make a materially different
+measured M3 implementation decision. The initial intermediate-composition validator
 failure and independently reviewed recovery remain explicit; no native case
 is repeated. No current SDK refresh or full Mac completion is claimed.
 

@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "result": "REJECT_PRIVATE_OVERLAY",
+  "source_base": "51dbe40521d34c76abcc1ab82300b394a55fdb01",
+  "runtime_commit": "a2b4143578631cbc57f29fcc1ee18b513e4567a3",
+  "runtime_changed": false,
+  "candidate_adopted": false,
+  "files": {
+    "docs/reports/macos-grid-paint/README.md": "6662414f5920b40ca73b47ef59c9f0f7c1457e25977d5ce08d47d213fae0c93a",
+    "specs/grid-performance.md": "272c90541e12ee07302eef6ff11e0fb4821738d2688de5ed5fa2435e4d1c2818",
+    "specs/macos-completion.md": "3b671cf75b22b97da2e2321638d8ab7aaa89dfaec826278ea7bdef943fcd7cca",
+    "specs/macos-delivery.md": "4009712040d00aa8da3ceaaac0c159419ecffde9305529410e1d43d82b655d84"
+  },
+  "archive": {
+    "file": "records.tar.gz",
+    "sha256": "2c6df824f7e3670896cbc06bc89d3f4c20f7f4c465a9d82aca977607f8c4deb8",
+    "bytes": 2310600,
+    "members": 331,
+    "expanded_bytes": 14388217,
+    "manifest_sha256": "a8dccf2b7ff88c6d315c982853e22844fbf3a6e0da4b7aa751794413fead3804",
+    "validated_every_member": true
+  },
+  "reviews": {
+    "source": {
+      "record": "internal-source-review.json",
+      "sha256": "865970f7bb3e8ca469f63a113ee6db465849dd92ea4a505f680bda995d8a45a8"
+    },
+    "native_admission": {
+      "record": "admission.json",
+      "sha256": "a238c1e053e035ff376701110ce7a0ec90a9af01f589409385469d74cfc84a72"
+    },
+    "results": {
+      "record": "internal-results-review.json",
+      "sha256": "8039444e42700c3faaa3b472fe8f4ed55ae18bec2a96be8b5c28344c8a74fd48"
+    },
+    "pre_prism": {
+      "record": "internal-pre-prism-review.json",
+      "sha256": "f28b137b92e621346c71af9ac93fcc5662a31323419c174e87b746592ab3a8fc"
+    },
+    "provider": {
+      "record": "prism.json",
+      "sha256": "3a3b975084e7a3a87238d807f14e18006934bf550c8ff7a1ead5a3a310fe9737"
+    },
+    "provider_disposition": {
+      "record": "prism-disposition.json",
+      "sha256": "2ed4ab580ec44a0a2faa15fe5c375e5e946fe38c8d417ad13ac41022f6153d63"
+    },
+    "final": {
+      "record": "internal-final-review.json",
+      "sha256": "c057a753fec2dfbe322efaced74feef6368e4ae4adfcecfc04fb19aa0d8e0483"
+    }
+  },
+  "native_plan_sha256": "4ffbcd39fd1fb30a7118a4dd5cf78be6b9f7fe5e714cc2cac6b71056b18e8208",
+  "native_result_sha256": "57cb3f86af07e8dae7ddbf7b422f4766be329ebecb60c302a6aa6a16b7290c9a",
+  "analysis_sha256": "049b560fb14f7d8046d833f9b646ed3c0116b53d0105f0def4631e027dafb720",
+  "prism": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-5-5",
+    "calls": 1,
+    "complete": true,
+    "files": 4,
+    "chunks": 1,
+    "retained": 0,
+    "discarded": 2,
+    "suppressed": 0,
+    "dispositions": "Both accepted as editorial clarity; no measured result or source change. See archived prism-disposition.json."
+  },
+  "native_processes": 26,
+  "ordinary_samples": 2400,
+  "diagnostic_samples": 240,
+  "allocation_samples": 480,
+  "conditional_cases_unexecuted": 36,
+  "offline_pprof_commands": 12,
+  "prepared_files": 6261,
+  "sdk_files": 7880,
+  "sdk_payload_files": 7879,
+  "sdk_source": "abe67c625a498d27b78f9719e6038cc1d6c23e88",
+  "sdk_native_archive_sha256": "786aaad8bd66fa5f7c0dd395c57ff7454838387c8aae29f33f3c6652ecec4883",
+  "sdk_unchanged": true,
+  "full_matrix_target_pass": false,
+  "full_mac_qualified": false,
+  "closed_mac_gates": [],
+  "next": "Complete full native M2 professional workspace workflow at10k/1M; current18-action smoke insufficient. Reject furtherstyle/cachemicrotuning; fullM3architecture/table/tree/generalUI andM4-M7remain."
+}

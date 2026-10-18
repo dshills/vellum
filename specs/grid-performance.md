@@ -650,3 +650,30 @@ pooled into ordinary results. Allocation captures identify the per-cell paint
 style copy as a substantial new allocation site. A per-render style ownership
 fix is proposed; no cache, runtime fix or new allocation/latency pass is adopted
 by this result checkpoint. Existing targets and broader Mac gates remain.
+
+
+## Render-local paint ownership experiment: rejected
+
+The [paint-style experiment](../docs/reports/macos-grid-paint/README.md) replaces
+per-cell style copies with four fresh copies per pane render. Compiler escape
+output, retained paint/ScenePacket lifetime and independent pixel/geometry tests
+at five DPIs, driver-root/example race checks, vet and builds pass. Separate
+native CPU/GPU diagnostics confirm the value route and fresh final pipeline.
+
+Five ordinary fixed-10k pairs per mode use the current `81b85e39…` baseline and
+an isolated candidate, with exact geometry and 120 measured/128 warm events per
+process. Median run-p95 improves CPU 4.748167→4.690332 ms and GPU
+4.254502→4.104204 ms. CPU improves 3/5 pairs, GPU 5/5; CPU median p99 worsens
+5.162665→5.243124 ms. Both miss the frozen 0.4 ms gain; all twenty ordinary p95s
+exceed 4 ms, all p99s meet 6 ms. Ordinary median per-run allocation p50 falls
+4,160,840→3,457,944 B CPU and 5,749,032→5,043,288 B GPU. Separate sampled process
+profiles show the intended paint allocation reduction, without qualifying a
+framework-only budget or latency pass.
+
+Reject the private candidate, preserve all evidence and stop style follow-up
+tuning. Exactly 26 native processes complete (2 diagnostics +20 ordinary
++4 allocation captures); the reviewed conditional 36-case wider matrix remains
+unexecuted. No source/prepared/SDK runtime change is adopted. The preceding
+`a2b4143` full matrix remains the current production result; all unchanged M3
+and broader Mac gates remain open. Next complete native M2 integration, then
+choose a materially different measured M3 implementation.
