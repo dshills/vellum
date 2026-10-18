@@ -48,6 +48,21 @@ under offscreen tags is retained separately from passing package outcomes.
 
 ## Latest unattended evidence
 
+The [current SDK lifecycle/idle checkpoint](../docs/reports/macos-sdk-lifecycle-stage0079/README.md)
+passes two same-name composed lifetimes (66 native selector checks), a 40-second
+four-state preflight and a separate 480-second trace from the unchanged minimum-Go
+SDK. All four actual 60-second intervals satisfy the sampled CPU target at
+0.0756–0.0792% of one CPU, with zero observed primary paint wakes and framework
+post/Present attempts. Exact SDK/source/prepared pins and all owned group retirements
+pass; an initial sandbox/self-RSS harness failure remains preserved. These scoped
+results do not qualify OS wakeups/presentation, full idle, native/GPU memory,
+10-minute activity, 1,000 cycles, eight-hour endurance or full Mac acceptance.
+Extra queue admissions in the lifecycle/short traces remain unexplained, so
+loss-free delivery and one-admission-per-action behavior are unqualified. One
+hidden, inactive, untitled Cocoa window remains unclassified; only process-group
+absence and framework-tracked retirement pass, with native-window deallocation/
+leak closure open. Both Prism findings and the qualified scope are preserved.
+
 The [current SDK native checkpoint](../docs/reports/macos-sdk-native-stage0079/README.md)
 passes four serial starter/drawing/3D/imaging source-assertion/readback cases using
 the exact Go 1.25.6 non-race SDK binaries from `abe67c6`. Every process exits zero,

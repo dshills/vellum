@@ -3,7 +3,11 @@
 Updated 17 October 2026. The latest complete table matrix measures clean
 `bd672a6` with stage0079; the current headless-qualified private SDK uses clean `abe67c6`, Go 1.25.6 and
 stage0079. Four serial starter/drawing/3D/imaging native source-assertion/readback
-cases now pass from that exact SDK on this Mac.
+cases now pass from that exact SDK on this Mac. Two composed lifecycle cycles
+and four eligible 60-second idle CPU intervals also pass from the same SDK;
+full M4 acceptance remains open. Extra queue admissions in two traces and one
+unclassified hidden Cocoa window remain open anomalies; tracked retirement and
+process-group absence do not establish loss-free delivery or native deallocation.
 Owner: the main Vellum development chat. This is the execution plan for the
 existing [Mac completion requirements](macos-completion.md), not a replacement
 for those requirements or a declaration that implemented APIs have qualified.
@@ -144,8 +148,17 @@ explicitly authorized tests and restore any authorized temporary state changes.
    The one fresh bounded placement attempt has now failed its delivery observation;
    retain its result and use direct/manual verification. Do not run another input
    operator attempt or spend another open-ended cycle building an operator.
-5. After significant functional/performance fixes stabilize, run M4 preflight,
-   ten-minute activity, 1,000-cycle campaign and overnight soak in that order.
+5. The unchanged SDK now passes a [two-cycle lifecycle and four-state idle
+   checkpoint](../docs/reports/macos-sdk-lifecycle-stage0079/README.md), including
+   four eligible 60-second CPU observations. The original sandbox/self-RSS
+   harness failure is preserved; direct execution uses the historical lifecycle
+   policy without claiming IP denial. This is a bounded preflight/CPU result,
+   not full idle or endurance acceptance. Extra queue admissions remain
+   unattributed and one hidden Cocoa window remains unclassified; native-window
+   deallocation/leak closure and loss-free delivery are open. After significant functional/performance
+   fixes stabilize, rerun affected preflight evidence, then ten-minute activity,
+   1,000-cycle campaign and overnight soak in that order. Each needs its own
+   reviewed admission; these scoped passes do not launch a long campaign.
    Stop on a real failure; diagnose and rerun the affected gate.
 6. Finish M6 packaging from the frozen passing runtime, then M7 final audit.
    A package/source difference that affects a passed gate requires the relevant
@@ -306,7 +319,7 @@ be budgeted in addition to implementation time.
 | M1 | Complete in source; incorporated in current private SDK | [Reviewed fix and 107 headless tests](../docs/reviews/macos-sdk-cancellation/README.md); exact helper bytes are included in the [current SDK](../docs/reports/macos-sdk-stage0079/README.md). Full final artifact acceptance remains in M6. |
 | M2 | Headless record/map complete; native integration open | [Six frozen records and catalogue coverage](../docs/reports/macos-workspace-acceptance/README.md); native 10k/1M workflow and desktop catalogue checks remain. |
 | M3 | Failing / incomplete | [Full current table matrix](../docs/reports/macos-grid-matrix/README.md): all 40 p95s fail 4 ms; GPU case medians 4.71–4.82 ms, CPU 5.61–5.77 ms. Matched 10k/1M visible work scales flat. Four separate GPU cases confirm actual acceptance, no fallback. [Composition and rejected culling](../docs/reports/macos-scene-composition/README.md) now rule out smaller references alone. [Row-fragment feasibility](../docs/reports/macos-row-fragments/README.md) also fails. [Resolved shaping](../docs/reports/macos-resolved-shapes/README.md) also fails its material-gain bar despite positive reuse. Next: separate material architecture decision; no further AX/upload/culling/row/shape-cache tuning. |
-| M4 | Partial | Historical lifecycle and scoped idle successes; full current candidate memory, integrated activity and overnight gates remain open. |
+| M4 | Partial; current SDK preflight and sampled idle CPU pass | [Two composed cycles/66 native checks and four eligible 60-second CPU intervals](../docs/reports/macos-sdk-lifecycle-stage0079/README.md) pass with owned process-group absence and framework-tracked retirement. Extra admissions remain unattributed; one hidden Cocoa window remains unclassified, so native deallocation/leak closure stays open. Original sandbox harness failure is preserved. OS wakeups/presentation, full memory/resource accounting, ten-minute activity, 1,000-cycle and overnight gates remain open. |
 | M5 | Partial; live checks authorized while owner is away | Native fixtures exist, but physical/human/display workflows and palette input acceptance remain open. |
 | M6 | Partial; current SDK incorporation and scoped consumption pass | The [7,879-file current SDK](../docs/reports/macos-sdk-stage0079/README.md) passes actual Go 1.25.6 relocated consumer/public-contract checks, 26 default main builds plus one tagged helper and 28-font metadata mapping. [Four native SDK cases](../docs/reports/macos-sdk-native-stage0079/README.md) pass source assertions/readbacks/owned closure. Final candidate/application-bundle acceptance, broader native/human workflows, exact runtime/font/non-font/generated-asset rights and owner distribution approval remain. |
 | M7 | Open | Requirement-by-requirement final audit after all preceding gates close. |
